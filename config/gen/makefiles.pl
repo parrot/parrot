@@ -81,7 +81,7 @@ sub makefiles {
   genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
           commentType => '#', replace_slashes => 1, conditioned_lines => 1);
   genfile('config/gen/makefiles/dynclasses_pl.in',   'dynclasses/build.pl',
-          commentType => '#', replace_slashes => 0);
+          commentType => '#', replace_slashes => 0, conditioned_lines => 1);
   genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/parrot_compiler.in', 'languages/parrot_compiler/Makefile',

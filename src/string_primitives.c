@@ -20,10 +20,14 @@ API.
 */
 
 #include "parrot/parrot.h"
+#if PARROT_HAS_ICU
 #include <unicode/ucnv.h>
 #include <unicode/utypes.h>
 #include <unicode/uchar.h>
 #include <unicode/ustring.h>
+#else
+#include <ctype.h>
+#endif
 #include <assert.h>
 
 /*
@@ -41,6 +45,7 @@ etc.).
 void
 string_set_data_directory(const char *dir)
 {
+#if PARROT_HAS_ICU
     u_setDataDirectory(dir);
 
     /* Since u_setDataDirectory doesn't have a result code, we'll spot
@@ -54,6 +59,10 @@ string_set_data_directory(const char *dir)
                 "string_set_data_directory: ICU data files not found"
                 "(apparently) for directory [%s]", dir);
     }
+#else
+    internal_exception(ICU_ERROR,
+        "string_set_data_directory: parrot compiled without ICU support" );
+#endif
 }
 
 /*
@@ -73,6 +82,7 @@ void
 string_fill_from_buffer(Interp *interpreter, const void *buffer,
             UINTVAL len, const char *encoding_name, STRING *s)
 {
+#if PARROT_HAS_ICU
     UErrorCode icuError = U_ZERO_ERROR;
     UConverter *conv = NULL;
     UChar *target = NULL;
@@ -140,6 +150,10 @@ string_fill_from_buffer(Interp *interpreter, const void *buffer,
     /* temporary; need to promote to rep 4 if has non-BMP characters*/
     s->bufused = (char *)target - (char *)s->strstart;
     string_compute_strlen(interpreter, s);
+#else
+    internal_exception(ICU_ERROR,
+        "string_fill_from_buffer: parrot compiled without ICU support" );
+#endif
 }
 
 
@@ -360,7 +374,13 @@ C<Parrot_char_is_digit()> returns false.
 UINTVAL
 Parrot_char_digit_value(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_charDigitValue(character);
+#else
+    if ((character >= 0x30) || (character <= 0x39))
+        return character - 0x30;
+    return -1;
+#endif
 }
 
 /*
@@ -377,7 +397,11 @@ Returns whether the specified character is an alphanumeric character.
 INTVAL
 Parrot_char_is_alnum(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isalnum(character);
+#else
+    return isalnum(character);
+#endif
 }
 
 /*
@@ -394,7 +418,11 @@ Returns whether the specified character is an letter character.
 INTVAL
 Parrot_char_is_alpha(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isalpha(character);
+#else
+    return isalpha(character);
+#endif
 }
 
 /*
@@ -429,7 +457,11 @@ space", a character that visibly separates words on a line.
 INTVAL
 Parrot_char_is_blank(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isblank(character);
+#else
+    return character == 0x20;
+#endif
 }
 
 /*
@@ -446,7 +478,11 @@ Returns whether the specified character is a control character.
 INTVAL
 Parrot_char_is_cntrl(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_iscntrl(character);
+#else
+    return iscntrl(character);
+#endif
 }
 
 /*
@@ -463,7 +499,11 @@ Returns whether the specified character is a digit character.
 INTVAL
 Parrot_char_is_digit(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isdigit(character);
+#else
+    return isdigit(character);
+#endif
 }
 
 /*
@@ -481,7 +521,11 @@ Returns whether the specified character is a a "graphic" character
 INTVAL
 Parrot_char_is_graph(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
 	return u_isgraph(character);
+#else
+    return isgraph(character);
+#endif
 }
 
 /*
@@ -498,7 +542,11 @@ Returns whether the specified character is a lowercase letter.
 INTVAL
 Parrot_char_is_lower(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_islower(character);
+#else
+    return islower(character);
+#endif
 }
 
 /*
@@ -515,7 +563,11 @@ Returns whether the specified character is a printable character.
 INTVAL
 Parrot_char_is_print(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
 	return u_isprint(character);
+#else
+    return isprint(character);
+#endif
 }
 
 /*
@@ -532,7 +584,11 @@ Returns whether the specified character is a punctuation character.
 INTVAL
 Parrot_char_is_punct(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_ispunct(character);
+#else
+    return ispunct(character);
+#endif
 }
 
 /*
@@ -549,7 +605,11 @@ Returns whether the specified character is a space character.
 INTVAL
 Parrot_char_is_space(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isspace(character);
+#else
+    return isspace(character);
+#endif
 }
 
 /*
@@ -566,7 +626,11 @@ Returns whether the specified character is an uppercase character.
 INTVAL
 Parrot_char_is_upper(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isupper(character);
+#else
+    return isupper(character);
+#endif
 }
 
 /*
@@ -583,7 +647,11 @@ Returns whether the specified character is a hexadecimal digit character.
 INTVAL
 Parrot_char_is_xdigit(Interp *interpreter, UINTVAL character)
 {
+#if PARROT_HAS_ICU
     return u_isxdigit(character);
+#else
+    return isxdigit(character);
+#endif
 }
 
 /*

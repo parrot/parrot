@@ -359,6 +359,7 @@ ICU Options:
 
    If you do not have a full ICU installation:
 
+   --without-icu        Build parrot without ICU support
    --icuheaders=(path)  Location of ICU headers without /unicode
    --icushared=(flags)  Full linker command to create shared libraries
    --icudatadir=(path)  Directory to locate ICU's data file(s)

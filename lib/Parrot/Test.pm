@@ -251,7 +251,7 @@ sub generate_functions {
     my ($package, $code_generator) = @_;
 
     my $path_to_parrot = $INC{"Parrot/Config.pm"};
-    $path_to_parrot =~ s:lib/Parrot/Config.pm$::;        
+    $path_to_parrot =~ s:lib/Parrot/Config.pm$::;
     $path_to_parrot = File::Spec->curdir() if $path_to_parrot eq "";
     my $parrot = File::Spec->join(File::Spec->curdir(), 'parrot' . $PConfig{exe});
 
@@ -358,7 +358,7 @@ sub generate_functions {
             }
 
             my $meth = $parrot_test_map{$func};
-            my $real_output = slurp_file($out_f); 
+            my $real_output = slurp_file($out_f);
             if ( $func =~ /^pir_2_pasm_/ ) {
                 # The parrot open '--outfile=file.pasm' seems to create unnecessare whitespace
                 $real_output =~ s/^\s*$//gm;
@@ -380,7 +380,7 @@ sub generate_functions {
             }
 
             return $pass;
-        } 
+        }
     }
 
     my %languages_test_map = (
@@ -395,13 +395,13 @@ sub generate_functions {
         *{$package.'::'.$func} = sub ($$$;$) {
             my $language = $_[0];
             $language = ucfirst($language) unless ( $language eq 'm4' );
- 
+
             # make sure TODO will work, by telling Test::Builder which package
             # the .t file is in (one more than usual, due to the extra layer
             # of package indirection
             my $level = $builder->level();
             $builder->level(2);
-            
+
             # get modified parrot command.
             require "Parrot/Test/$language.pm";
             # set the builder object, and parrot config.
@@ -423,13 +423,13 @@ sub generate_functions {
 
     foreach my $func ( keys %c_test_map ) {
         no strict 'refs';
-    
+
         *{$package.'::'.$func} = sub ($$;$ ) {
             my($source, $expected, $desc) = @_;
 
             # $test_no will be part of temporary file
             my $test_no = $builder->current_test() + 1;
-      
+
             $expected =~ s/\cM\cJ/\n/g;
             local( *SOURCE );
             my $source_f = per_test('.c', $test_no);
@@ -447,7 +447,7 @@ sub generate_functions {
 
             (my $libparrot_root = $PConfig{blib_lib_libparrot_a}) =~ s/\$\(A\)//;
             my $libparrot_dynamic = $libparrot_root.$PConfig{share_ext};
-            
+
             my $libparrot;
 
             # use shared library version if available
@@ -457,29 +457,43 @@ sub generate_functions {
                 $libparrot = $libparrot_root.$PConfig{a};
             }
 
-            my $iculibs = $PConfig{blib_lib_libsicuuc_a}." ".$PConfig{blib_lib_libsicudata_a};
-            $iculibs =~ s/\$\(A\)/$PConfig{a}/g;
+            my $iculibs = "";
+	    if ($PConfig{'has_icu'}) {
+		$iculibs = $PConfig{blib_lib_libsicuuc_a} . " " .
+		$PConfig{blib_lib_libsicudata_a};
+		$iculibs =~ s/\$\(A\)/$PConfig{a}/g;
+	    }
 
             my ($cmd, $exit_code);
-            $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} -I./include -c " .
-             "$PConfig{cc_o_out}$obj_f $source_f";
-            $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
-            $builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+            $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} " .
+	           " -I./include -c " .
+                   "$PConfig{cc_o_out}$obj_f $source_f";
+            $exit_code = _run_command($cmd,
+		    'STDOUT' => $build_f,
+		    'STDERR' => $build_f);
+            $builder->diag("'$cmd' failed with exit code $exit_code")
+			if $exit_code;
 
             if (! -e $obj_f) {
-                $builder->diag("Failed to build '$obj_f': " . slurp_file($build_f));
+                $builder->diag("Failed to build '$obj_f': " .
+			slurp_file($build_f));
                 unlink $build_f;
                 $builder->ok(0,$desc);
                 return 0;
             }
 
-            $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f " .
-             "$PConfig{ld_out}$exe_f $libparrot $iculibs $PConfig{libs}";
-            $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
-            $builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
+            $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} " .
+		   "$obj_f $PConfig{ld_out}$exe_f " .
+		   "$libparrot $iculibs $PConfig{libs}";
+            $exit_code = _run_command($cmd,
+		'STDOUT' => $build_f,
+		'STDERR' => $build_f);
+            $builder->diag("'$cmd' failed with exit code $exit_code")
+		if $exit_code;
 
             if (! -e $exe_f) {
-                $builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
+                $builder->diag("Failed to build '$exe_f': " .
+			slurp_file($build_f));
                 unlink $build_f;
                 $builder->ok(0,$desc);
 

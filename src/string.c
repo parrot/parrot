@@ -286,7 +286,7 @@ string_init(Parrot_Interp interpreter)
          */
         Parrot_charsets_encodings_init(interpreter);
 
-
+#if PARROT_HAS_ICU
         /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
            set through the $PARROT_ICU_DATA_DIR environment variable. Need
            a way to specify this via the command line as well. */
@@ -315,6 +315,7 @@ string_init(Parrot_Interp interpreter)
 no_set:
         if (free_data_dir)
             mem_sys_free(const_cast(data_dir));
+#endif
     }
 
     /*

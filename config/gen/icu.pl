@@ -20,11 +20,11 @@ use Cwd qw(cwd);
 $description="Configuring ICU if requested...";
 
 @args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs
-         icushared icuheaders icu-config);
+         icushared icuheaders icu-config without-icu);
 
 sub runstep {
   my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs,
-           $icushared, $icuheaders, $icuconfig) = @_;
+           $icushared, $icuheaders, $icuconfig, $without) = @_;
   my $icu_configure_command;
   my @icu_headers = qw(ucnv.h utypes.h uchar.h);
   my $autodetect = !defined($icudatadir)
@@ -33,29 +33,37 @@ sub runstep {
 	        && !defined($icuheaders);
 
   print "\n" if $verbose;
+  Configure::Data->set(
+    has_icu => ($without ? 0 : 1),
+    TEMP_icu_make => ""
+  );
+  if ($without) {
+    print "not using icu.\n" if $verbose;
+    return 0;
+  }
 
   if (!$autodetect) {
     print "specified a icu config parameter,\nICU autodetection disabled.\n"
        if $verbose;
   } elsif (!defined $icuconfig || !$icuconfig) {
     my $notfound = 1;
-    
+
     {
 	# disable STDERR
         open OLDERR, ">&STDERR";
 	open STDERR, ">d8e622ad2.log";
-	
+
 	# check if ICU is installed
         system("icu-config", "--exists");
 	$notfound = ($? == -1);
 	$notfound ||= ($? >> 8) != 0;
-	
+
 	# reenable STDERR
 	close STDERR;
         unlink "d8e622ad2.log";
 	open STDERR, ">&OLDERR";
     }
-    
+
     if ($notfound) {
       undef $icuconfig;
       print "icu-config not found.\n" if $verbose;
@@ -70,7 +78,7 @@ sub runstep {
 
     # icu-config script to use
     $icuconfig = "icu-config" if $icuconfig eq "1";
-  
+
     # ldflags
     $icushared = `$icuconfig --ldflags`;
     chomp $icushared;
@@ -81,7 +89,7 @@ sub runstep {
     $icuheaders = `$icuconfig --prefix`;
     chomp $icuheaders;
     $icuheaders .= "${slash}include";
-    
+
     # icu data dir
     $icudatadir = `$icuconfig --icudatadir`;
     chomp $icudatadir;
@@ -93,7 +101,7 @@ sub runstep {
     print "headers='$icuheaders'\n" if defined $icuheaders;
     print "datadir='$icudatadir'\n" if defined $icudatadir;
   }
-  
+
   if (defined($icushared) && defined($icuheaders)) {
     $icuheaders =~ s![\\/]$!!;
     my $c_libs = Configure::Data->get('libs');
@@ -114,15 +122,12 @@ sub runstep {
 
   if( !defined $icudatadir )
   {
-      # XXX Hack:  We need some way to tell parrot where to find the
-      # ICU data files, perhaps with a command-line option something
-      # like perl's -I option.  In the absence of any such option,
-      # this absolute setting at least allows you to run parrot from
-      # within various subdirectories, such as ./t or ./languages,
-      # without having to set any environment variables.
-      # If parrot is ever able to be installed, this will have to change!
-      my $cwd = cwd();
-      $icudatadir = "$cwd/blib/lib/icu/2.6.1";
+      Configure::Data->set(
+	  has_icu => 0,
+	  TEMP_icu_make => ""
+      );
+      print "not using icu.\n" if $verbose;
+      return 0;
   }
 
   if( defined $icuplatform )
@@ -187,7 +192,7 @@ sub runstep {
         print DSPFILE $file;
         close DSPFILE;
     }
-    
+
     # Set up makefile entries.
     Configure::Data->set(
       buildicu => 1,
@@ -215,7 +220,7 @@ $(LIBICUCORE) $(LIBICUDATA) :
 	msdev icu\source\allinone\allinone.dsw /MAKE "stubdata - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "common - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "i18n - Win32 Debug"
-	xcopy /S /Y "icu\source\common" "icu\include\" 
+	xcopy /S /Y "icu\source\common" "icu\include\"
 	msdev icu\source\allinone\allinone.dsw /MAKE "ctestfw - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "decmn - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "gencmn - Win32 Debug"
@@ -259,7 +264,7 @@ RULES
       # Default to a configure line suggested by icu/README.parrot
 	  $icuconfigureargs = "--disable-layout --disable-tests --disable-samples --quiet '--prefix=$cwd/blib' --enable-static --disable-shared --disable-extras '--oldincludedir=$cwd/blib/old' --with-data-packaging=archive";
   }
-  
+
   Configure::Data->set(
     buildicu => 1,
     icu_headers => 'blib/include/unicode/ucnv.h blib/include/unicode/utypes.h blib/include/unicode/uchar.h',

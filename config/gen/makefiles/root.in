@@ -318,7 +318,7 @@ AST_O_FILES = \
 
 # generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
-ICU_H_FILES       = ${icu_headers}
+#CONDITIONED_LINE(has_icu):ICU_H_FILES       = ${icu_headers}
 ALL_H_FILES       = $(GENERAL_H_FILES)
 
 CHARSET_O_FILES   = ${TEMP_charset_o}
@@ -439,9 +439,10 @@ PDB             = $(CUR_DIR)/pdb$(EXE)
 
 # libs
 LIBPARROT       = ${blib_lib_libparrot_a}
-LIBICUCORE      = ${blib_lib_libsicuuc_a}
-LIBICUDATA      = ${blib_lib_libsicudata_a}
-ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
+#CONDITIONED_LINE(has_icu):LIBICUCORE      = ${blib_lib_libsicuuc_a}
+#CONDITIONED_LINE(has_icu):LIBICUDATA      = ${blib_lib_libsicudata_a}
+#CONDITIONED_LINE(has_icu):ALL_PARROT_LIBS = $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
+#INVERSE_CONDITIONED_LINE(has_icu):ALL_PARROT_LIBS = $(LIBPARROT) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR      = runtime/parrot/dynext

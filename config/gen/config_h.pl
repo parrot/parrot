@@ -30,7 +30,8 @@ sub runstep {
 
   genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
     commentType => '/*',
-    ignorePattern => 'PARROT_CONFIG_DATE');
+    ignorePattern => 'PARROT_CONFIG_DATE',
+    conditioned_lines => 1);
 
   genfile('config/gen/config_h/feature_h.in', 'include/parrot/feature.h',
     commentType => '/*',
