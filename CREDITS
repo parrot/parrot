@@ -272,6 +272,9 @@ D: Keeps us running
 N: Ron Blaschke
 D: Win32 patches
 
+N: Sam Ruby
+D: Pythonic and OO patches
+
 N: Sean O'Rourke
 D: Original Perl6 compiler
 

@@ -1235,23 +1235,20 @@ find_in_pmc:
          * TODO check vtable standard names
          */
         start = class_name->strlen + 1;
-        for (isa = class->vtable->isa_str; ;) {
-            if (isa->strlen <= start)
-                break;
+        isa = class->vtable->isa_str;
+        while (isa->strlen > start) {
             pos = string_str_index(interpreter, isa,
                     CONST_STRING(interpreter, " "), start);
-            if (pos == -1) {
-                method = Parrot_find_global(interpreter,
-                        string_substr(interpreter, isa, start,
-                            isa->strlen - start, NULL, 0),
-                        method_name);
-                TRACE_FM(interpreter, class, method_name, method);
-                if (method) {
-                    return method;
-                }
+            if (pos == -1) pos=isa->strlen;
+            method = Parrot_find_global(interpreter,
+                    string_substr(interpreter, isa, start,
+                        pos - start, NULL, 0),
+                    method_name);
+            TRACE_FM(interpreter, class, method_name, method);
+            if (method) {
+                return method;
             }
-            /* TODO */
-            break;
+            start = pos + 1;
         }
         /* finally look in namespace "object" */
         method =  Parrot_find_global(interpreter,
