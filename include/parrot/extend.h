@@ -31,6 +31,16 @@
 #define Parrot_Language Parrot_Int
 #define Parrot_VTABLE VTABLE *
 
+/* Macro to save off the original stack pointer for DOD scanning. If
+   the stacktop was NULL, then set it to the address of the cached
+   pointer, which is on the stack and as good a thing as any to use as
+   an anchor */
+#define PARROT_CALLIN_START(x) void *oldtop = x->lo_var_ptr; \
+                               if (!oldtop) x->lo_var_ptr = &oldtop;
+/* Put the stack top back, if what we cached was NULL. Otherwise we
+   leave it alone and assume it's OK */
+#define PARROT_CALLIN_END(x)   if (!oldtop) x->lo_var_ptr = NULL;
+
 #else
 
 typedef void * Parrot_INTERP;
