@@ -30,6 +30,11 @@ ParrotIOLayer   * pio_registered_layers;
 ParrotIOLayer   * pio_default_stack;
 */
 
+/* The standard streams */
+ParrotIO * pio_stdin;
+ParrotIO * pio_stdout;
+ParrotIO * pio_stderr;
+
 
 PIOOFF_T        piooffsetzero;
 

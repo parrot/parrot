@@ -33,7 +33,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
     INTVAL *address,ivalue,size,i,k;
     INTVAL *op_address, prev_address, bytecode_position;
 #ifdef ALPHA
-    char *interpreter_registers = ((char *)&interpreter->int_reg->registers[0]) + 0x7fff;
+    char *interpreter_registers = ((char *)&interpreter->int_reg.registers[0]) + 0x7fff;
     INTVAL high,low;
 #endif
 
@@ -107,7 +107,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         v = op_assembly[*pc].intval_register_address; 
         for (i = 0; i < v.amount; i++)
         {
-            address = &interpreter->int_reg->registers[pc[v.info[i].number]];
+            address = &interpreter->int_reg.registers[pc[v.info[i].number]];
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
@@ -117,7 +117,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         v = op_assembly[*pc].floatval_register_address;
         for (i = 0; i < v.amount; i++)
         {
-            address = (INTVAL *)&interpreter->num_reg->registers[pc[v.info[i].number]];
+            address = (INTVAL *)&interpreter->num_reg.registers[pc[v.info[i].number]];
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
@@ -129,7 +129,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         v = op_assembly[*pc].string_register_address;
         for (i = 0; i < v.amount; i++)
         {
-            address = (INTVAL *)&interpreter->string_reg->registers[pc[v.info[i].number]];
+            address = (INTVAL *)&interpreter->string_reg.registers[pc[v.info[i].number]];
 #ifdef ALPHA
             address = (INTVAL*)(((char *)address) - interpreter_registers);
 #endif
