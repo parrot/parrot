@@ -502,7 +502,9 @@ assign_registers(struct Parrot_Interp *interpreter,
     op_info_t *op_info;
     int i, op_arg, typ;
     opcode_t * cur_op;
-    char * maps[] = {intval_map, 0, 0, floatval_map};
+    char * maps[] = {0, 0, 0, 0};
+    maps[0] = intval_map;
+    maps[3] = floatval_map;
 
     map = optimizer->map_branch;
     /* For each opcode in this section */
@@ -700,10 +702,13 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    char * maps[] = {jit_info->intval_map, 0, 0, jit_info->floatval_map};
     void (*mov_f[4])(struct Parrot_Interp *, int, char *)
         = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
+    char * maps[] = {0, 0, 0, 0};
+    maps[0] = jit_info->intval_map;
+    maps[3] = jit_info->floatval_map;
+    
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ]) {
@@ -733,10 +738,12 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    char * maps[] = {jit_info->intval_map, 0, 0, jit_info->floatval_map};
     void (*mov_f[4])(struct Parrot_Interp * , char *, int)
         = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
+    char * maps[] = {0, 0, 0, 0};
+    maps[0] = jit_info->intval_map;
+    maps[3] = jit_info->floatval_map;
 
     for (typ = 0; typ < 4; typ++) {
         if (maps[typ])
