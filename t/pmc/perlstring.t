@@ -385,18 +385,20 @@ CODE
 25
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "add str_int, str_num");
+output_is(<<"CODE", <<OUTPUT, "add str_int, str_num");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlString
 	set P0, "23"
 	new P1, .PerlString
 	set P1, "2.5"
 	new P2, .PerlUndef
 	add P2, P0, P1
-	print P2
-	print "\n"
+        .fp_eq(P2, 25.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
 	end
 CODE
-25.500000
+ok 1
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add str_int, int");
@@ -413,32 +415,36 @@ CODE
 25
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "add str_int, num");
+output_is(<<"CODE", <<OUTPUT, "add str_int, num");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlString
 	set P0, "23"
 	new P1, .PerlNum
 	set P1, 2.5
 	new P2, .PerlUndef
 	add P2, P0, P1
-	print P2
-	print "\n"
+        .fp_eq(P2, 25.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
 	end
 CODE
-25.500000
+ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "add str_num, int");
+output_is(<<"CODE", <<OUTPUT, "add str_num, int");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlString
 	set P0, "23.5"
 	new P1, .PerlInt
 	set P1, 2
 	new P2, .PerlUndef
 	add P2, P0, P1
-	print P2
-	print "\n"
+        .fp_eq(P2, 25.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
 	end
 CODE
-25.500000
+ok 1
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");

@@ -552,52 +552,58 @@ OUTPUT
 #
 # PerlInt and FLOATVAL, tests
 #
-output_is(<<'CODE', <<OUTPUT, "add native number to integer");
+output_is(<<"CODE", <<OUTPUT, "add native number to integer");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlInt
 	new P1, .PerlInt
 	set N0, 4000.04
 	set P0, 123
 	add P1, P0, N0
-	print P1
-	print "\n"
+	.fp_eq( P1, 4123.04, EQ1)
+	print "not "
+EQ1:	print "ok 1\\n"
 	add P0, P0, N0
-	print P0
-	print "\n"
-
+	.fp_eq( P0, 4123.04, EQ2)
+        print "not "
+EQ2:	print "ok 2\\n"
         new P0, .PerlInt
         set P0, 12
         add P0, 0.16
-	print P0
-	print "\n"
+	.fp_eq( P0, 12.16, EQ3)
+        print "not "
+EQ3:	print "ok 3\\n"
 	end
 CODE
-4123.040000
-4123.040000
-12.160000
+ok 1
+ok 2
+ok 3
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "subtract native number from integer");
+output_is(<<"CODE", <<OUTPUT, "subtract native number from integer");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlInt
 	new P1, .PerlInt
 	set N0, 4000.04
 	set P0, 123
 	sub P1, P0, N0
-	print P1
-	print "\n"
+	.fp_eq( P1, -3877.04, EQ1)
+	print "not "
+EQ1:	print "ok 1\\n"
 	sub P0, P0, N0
-	print P0
-	print "\n"
-
+	.fp_eq( P0, -3877.04, EQ2)
+	print "not "
+EQ2:	print "ok 2\\n"
         new P0, .PerlInt
         set P0, -3877
         sub P0, 23.01
-	print P0
-	print "\n"
+	.fp_eq( P0, -3900.01, EQ3)
+	print "not "
+EQ3:	print "ok 3\\n"
 	end
 CODE
--3877.040000
--3877.040000
--3900.010000
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "multiply integer with native number");
@@ -654,40 +660,47 @@ OUTPUT
 #
 # PerlNum and PerlNum, tests
 #
-output_is(<<'CODE', <<OUTPUT, "add PerlNum to PerlNum");
+output_is(<<"CODE", <<OUTPUT, "add PerlNum to PerlNum");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlNum
 	new P1, .PerlNum
 	set P1, 4000.04
 	set P0, 123
 	add P0, P0, P1
-	print P0
-	print "\n"
+	.fp_eq( P0, 4123.04, EQ1)
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
 	end
 CODE
-4123.040000
+ok 1
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "subtract PerlNum from PerlNum");
+output_is(<<"CODE", <<OUTPUT, "subtract PerlNum from PerlNum");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlNum
 	new P1, .PerlNum
 	set P1, 4000.04
 	set P0, 123
 	sub P0, P0, P1
-	print P0
-	print "\n"
-
+	.fp_eq( P0, -3877.04, EQ1)
+	print "not "
+EQ1:	print "ok 1"
+	print "\\n"
         new P2, .PerlNum
         new P3, .PerlNum
         new P4, .PerlNum
         set P2, 12.7
         set P3, 12.6
         sub P3, P2
-	print P3
-	print "\n"
+	.fp_eq( P3, -0.1, EQ2)
+	print "not "
+EQ2:	print "ok 2"
+	print "\\n"
 	end
 CODE
--3877.040000
--0.100000
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "multiply PerlNum with PerlNum");

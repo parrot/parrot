@@ -118,15 +118,18 @@ CODE
 15376
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide integer by self");
+output_is(<<"CODE", <<OUTPUT, "divide integer by self");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlInt
 	set P0, 23
 	div P0, P0, P0
+	.fp_eq( P0, 1.0, EQ1)
 	print P0
-	print "\n"
+	print "not "
+EQ1:	print "ok 1\\n"
 	end
 CODE
-1.000000
+ok 1
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add integer to other");
@@ -862,26 +865,35 @@ CODE
 ok 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "copy");
+output_is(<<CODE, <<'OUTPUT', "copy");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlInt
 	new P1, .PerlInt
 	set P0, -3
 	clone P1, P0
-	print P1
-	print "\n"
+        set I1, P1
+	eq I1, -3, EQ1
+	print I1
+	print	"not "
+EQ1:	print 	"ok 1\\n"
 	set P0, 3.6
 	clone P1, P0
+	.fp_eq(P1, 3.6, EQ2)
 	print P1
-	print "\n"
+	print	"not "
+EQ2:	print 	"ok 2\\n"
 	set P0, "foo"
 	clone P1, P0
-	print P1
-	print "\n"
+        set S1, P1
+	eq S1, "foo", EQ3
+	print S1
+	print	"not "
+EQ3:	print 	"ok 3\\n"
 	end
 CODE
--3
-3.600000
-foo
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "set/get string value");
@@ -2231,45 +2243,57 @@ CODE
 666:666.000000:666:
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "exchange");
+output_is(<<"CODE", <<OUTPUT, "exchange");
+@{[ $fp_equality_macro ]}
 	new P0, .PerlInt
         new P1, .PerlInt
 	set P0, 123
 	set P1, 246
         exchange P0, P1
-        print P0
-	print "\n"
-        print P1
-	print "\n"
-
+        set I0, P0
+        eq I0, 246, EQ1
+        print "not "
+EQ1:    print "ok 1\\n"
+        set I1, P1
+        eq I1, 123, EQ2
+        print "not "
+EQ2:    print "ok 2\\n"
         new P2, .PerlNum
         new P3, .PerlString
         set P2, 1234.567890
         set P3, "Themistocles"
         exchange P2, P3
-        print P2
-	print "\n"
-        print P3
-	print "\n"
-
+        set S2, P2
+        eq S2, "Themistocles", EQ3
+        print "not "
+EQ3:    print "ok 3\\n"
+        set S2, "1234.567890"
+        set S3, P3
+        eq S2, S3, EQ4
+        print "not "
+EQ4:    print "ok 4\\n"
         new P4, .PerlArray
         new P5, .PerlHash
         new P6, .PerlString
-        set P4[2], "Array\n"
-        set P5["2"], "Hash\n"
+        set P4[2], "Array"
+        set P5["2"], "Hash"
         exchange P4, P5
         set S0, P4["2"]
-        print S0
+        eq S0, "Hash", EQ5
+        print "not "
+EQ5:    print "ok 5\\n"
         set S0, P5[2]
-        print S0
+        eq S0, "Array", EQ6
+        print "not "
+EQ6:    print "ok 6\\n"
 	end
 CODE
-246
-123
-Themistocles
-1234.567890
-Hash
-Array
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "arithmetic with PerlUndef and native ints");
