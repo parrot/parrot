@@ -3,11 +3,12 @@ String subsystem
 ----------------
     grep docs/strings.pod for unimplemented functions and implement them
     Implement transcoding
+    Implement character class & properties testing (for regular expressions)
     Automate string vtable generation
     Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
 
     Find a decent way of including Unicode properties tables. (Not for
-    the feint of heart.)
+    the faint of heart.)
 
 Vtables
 -------
@@ -16,11 +17,13 @@ Vtables
 
 JIT
 ---
-    More instructions needed!
+    More instructions needed! (currently on hold, waiting for JIT v2)
 
 Configure system
 ----------------
     Long term, should be replaced with a bootstrapping miniparrot system.
+    Short term, fix the dependencies (eg, more needs to depend on classes/*)
+    Platform-independent library creation for pbc2c.pl & extensions
     
 IO
 --
@@ -29,9 +32,33 @@ Regular expression engine
 -------------------------
     Implement case folding
     More speed!
-    Implement a regex compiler
 
 Interpreter
 -----------
+    Continuations and/or coroutines
+    Dynamic op libs
 
+Assembler
+---------
+    Key support
+    Debugging and source line number info
+    .sub directive (+ others)
+    Local labels
 
+Bytecode
+--------
+    Metadata (source line number info, symbol table)
+
+Stability
+---------
+    Purify and other memory badness detectors
+
+Performance
+-----------
+    Mo' betta benchmarks
+    Add profiling build options
+    Add the above to tinderbox
+
+Documentation
+-------------
+    Parrotguts currently too difficult to approach
