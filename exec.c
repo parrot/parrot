@@ -233,7 +233,7 @@ void
 Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     int type, const char *symbol, int disp)
 {
-    int symbol_number;
+    int symbol_number = 0;
     char *addr;
     Parrot_exec_rellocation_t *new_relloc;
     extern char **Parrot_exec_rel_addr;
