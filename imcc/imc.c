@@ -181,17 +181,21 @@ int interferes(SymReg * r0, SymReg * r1) {
     if(r0->first < 0 || r1->first < 0) return 0;
 
     /* Now: */
-
+    
+    /* XXX This caused core dumps because l0 and l1 are not initialized.
+     * Disabling for now
+     */
+#if 0
     for (i=0; i <n_basic_blocks; i++) {
        Life_range *l0, *l1;
        
-       if (  (l0->flags & LF_lv_all    && l1->flags & LF_lv_inside) 
+       if (  (l0->flags & LF_lv_all    && l1->flags & LF_lv_inside)
           || (l0->flags & LF_lv_inside && l1->flags & LF_lv_all)	    
           || (l0->flags & LF_lv_in  && l1->flags & LF_lv_in)    
 	  || (l0->flags & LF_lv_out && l1->flags & LF_lv_out)
 	  )
 	   return 1;
-       
+   
        if (l0->flags & LF_lv_inside && l1->flags & LF_lv_inside) {
            /* we need to compare the intervals */
 	   int i, j;
@@ -208,6 +212,7 @@ int interferes(SymReg * r0, SymReg * r1) {
            }		  
        } 
     }	  
+#endif
 
     return 1;
 }
