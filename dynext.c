@@ -23,17 +23,64 @@
  *       Parrot_lib_init_%s gets called (if exists) to perform thread specific setup
  */
 
-PMC *
-Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
+static void
+store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path)
 {
-    STRING *path, *load_func_name, *init_func_name;
-    void * handle;
-    PMC *(*load_func)(Interp *);
-    void (*init_func)(Interp *, PMC *);
-    char *cpath, *cinit_func_name, *cload_func_name;
-    PMC *lib_pmc;
+    PMC *iglobals, *dyn_libs, *prop;
+    STRING *key;
 
-    UNUSED(initializer);
+    iglobals = interpreter->iglobals;
+    dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_DYN_LIBS);
+    if (!dyn_libs) {
+        dyn_libs = pmc_new(interpreter, enum_class_PerlArray);
+        VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+                IGLOBALS_DYN_LIBS, dyn_libs);
+    }
+    /*
+     * remember path/file in props
+     */
+    prop = pmc_new(interpreter, enum_class_PerlString);
+    VTABLE_set_string_native(interpreter, prop, path);
+    key = string_from_cstring(interpreter, "_filename", 0);
+    VTABLE_setprop(interpreter, lib_pmc, key, prop);
+
+    VTABLE_push_pmc(interpreter, dyn_libs, lib_pmc);
+}
+
+static PMC*
+is_loaded(Parrot_Interp interpreter, STRING *path)
+{
+    PMC *iglobals, *dyn_libs, *prop, *lib_pmc;
+    STRING *key;
+    INTVAL i, n;
+
+    iglobals = interpreter->iglobals;
+    dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_DYN_LIBS);
+    if (!dyn_libs)
+        return NULL;
+    n = VTABLE_elements(interpreter, dyn_libs);
+    key = string_from_cstring(interpreter, "_filename", 0);
+    /* we could use an ordered hash for faster lookup here */
+    for (i = 0; i < n; i++) {
+        lib_pmc = VTABLE_get_pmc_keyed_int(interpreter, dyn_libs, i);
+        prop = VTABLE_getprop(interpreter, lib_pmc, key);
+        if (!string_compare(interpreter,
+                    VTABLE_get_string(interpreter, prop), path))
+            return lib_pmc;
+    }
+    return NULL;
+}
+
+/*
+ * return path and handle of a dynamic lib
+ */
+STRING *
+get_path(Interp *interpreter, STRING *lib, void **handle)
+{
+    char *cpath;
+    STRING *path;
     /* TODO runtime path for dynamic extensions */
     /* TODO $SO extension */
 #ifndef RUNTIME_DYNEXT
@@ -50,8 +97,8 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
             lib,
             SO_EXTENSION);
     cpath = string_to_cstring(interpreter, path);
-    handle = Parrot_dlopen(cpath);
-    if (!handle) {
+    *handle = Parrot_dlopen(cpath);
+    if (!*handle) {
         /*
          * then in runtime/ ...
          */
@@ -62,11 +109,12 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
                 lib,
                 SO_EXTENSION);
         cpath = string_to_cstring(interpreter, path);
-        handle = Parrot_dlopen(cpath);
+        *handle = Parrot_dlopen(cpath);
     }
-    if (!handle) {
+    if (!*handle) {
         const char * err = Parrot_dlerror();
-        fprintf(stderr, "Couldn't load '%s': %s\n", cpath, err ? err : "unknow reason");
+        fprintf(stderr, "Couldn't load '%s': %s\n",
+                cpath, err ? err : "unknow reason");
         /*
          * XXX internal_exception? return a PerlUndef?
          */
@@ -74,9 +122,30 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
         return NULL;
     }
     string_cstring_free(cpath);
+    return path;
+}
+
+PMC *
+Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
+{
+    STRING *path, *load_func_name, *init_func_name;
+    void * handle;
+    PMC *(*load_func)(Interp *);
+    void (*init_func)(Interp *, PMC *);
+    char *cinit_func_name, *cload_func_name;
+    PMC *lib_pmc;
+
+    UNUSED(initializer);
+    path = get_path(interpreter, lib, &handle);
+    lib_pmc = is_loaded(interpreter, path);
+    if (lib_pmc) {
+        Parrot_dlclose(handle);
+        return lib_pmc;
+    }
     load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
     cload_func_name = string_to_cstring(interpreter, load_func_name);
-    load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle, cload_func_name));
+    load_func = (PMC * (*)(Interp *))D2FPTR(Parrot_dlsym(handle,
+                cload_func_name));
     string_cstring_free(cload_func_name);
     if (!load_func) {
         /* seems to be a native/NCI lib */
@@ -89,6 +158,10 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          */
     }
     PMC_data(lib_pmc) = handle;
+    /*
+     * remember lib_pmc in iglobals
+     */
+    store_lib_pmc(interpreter, lib_pmc, path);
     return lib_pmc;
 }
 

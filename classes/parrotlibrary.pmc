@@ -5,7 +5,17 @@
  *  Overview:
  *     Class for holding info about dynamic libraries.
  *  Data Structure and Algorithms:
- *     PMC_data(SELF)  ... DLL handle
+ *
+ *     PMC data
+ *       SELF->cache.struct_val  oplib init function
+ *       PMC_data(SELF)          DLL handle
+ *
+ *     Properties:
+ *       _filename               full path/file of lib
+ *       _ro                     true after init
+ *
+ *     All ParrotLibrary PMCs are in interperter->iglobals
+ *
  *  History:
  *     Initial version by leo 2003.10.12
  *  Notes:

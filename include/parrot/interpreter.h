@@ -197,6 +197,7 @@ typedef struct Parrot_Interp {
 /* 2:   PMC *Argv;                   list of argv */
 /* 3:   PMC *Env;                    hash_like Env PMC */
 /* 4:   PMC *ParrotInterpreter       that's me */
+/* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
 } Interp;
@@ -208,6 +209,7 @@ typedef enum {
     IGLOBALS_ARGV_LIST,
     IGLOBALS_ENV_HASH,
     IGLOBALS_INTERPRETER,
+    IGLOBALS_DYN_LIBS,
 
     IGLOBALS_SIZE
 } iglobals_enum;

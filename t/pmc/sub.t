@@ -1,7 +1,8 @@
 #! perl -w
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 45;
 use Test::More;
+use Parrot::Config;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
     print "main\n"
@@ -567,5 +568,96 @@ in sub1
 back
 OUTPUT
 
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub _sub1:
+  print "in sub1\n"
+  invoke P1
+  .pcc_sub _sub2:
+  print "in sub2\n"
+  invoke P1
+EOF
+close S;
 
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode call different subs, ret");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    defined I0, P0
+    if I0, ok1
+    print "not "
+ok1:
+    print "found sub1\n"
+    set P10, P0
+    invokecc
+    print "back\n"
+    find_global P0, "_sub2"
+    defined I0, P0
+    if I0, ok2
+    print "not "
+ok2:
+    print "found sub2\n"
+    invokecc
+    print "back\n"
+    set P0, P10
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+loaded
+found sub1
+in sub1
+back
+found sub2
+in sub2
+back
+in sub1
+back
+OUTPUT
+
+system("parrot$PConfig{exe} -o temp.pbc $temp");
+
+output_is(<<'CODE', <<'OUTPUT', "load_bytecode PBC call different subs, ret");
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pbc"
+    print "loaded\n"
+    find_global P0, "_sub1"
+    defined I0, P0
+    if I0, ok1
+    print "not "
+ok1:
+    print "found sub1\n"
+    set P10, P0
+    invokecc
+    print "back\n"
+    find_global P0, "_sub2"
+    defined I0, P0
+    if I0, ok2
+    print "not "
+ok2:
+    print "found sub2\n"
+    invokecc
+    print "back\n"
+    set P0, P10
+    invokecc
+    print "back\n"
+    end
+CODE
+main
+loaded
+found sub1
+in sub1
+back
+found sub2
+in sub2
+back
+in sub1
+back
+OUTPUT
+
+unlink($temp, 'temp.pbc');
 
