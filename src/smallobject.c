@@ -21,11 +21,6 @@ Handles the accessing of small object pools (header pools).
 #include "parrot/parrot.h"
 #include <assert.h>
 
-add_free_object_fn_type add_free_object_fn;
-get_free_object_fn_type get_free_object_fn;
-alloc_objects_fn_type   alloc_objects_fn;
-alloc_objects_fn_type   more_objects_fn;
-
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
 #define REPLENISH_LEVEL_FACTOR 0.3
@@ -105,7 +100,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 
 */
 
-void
+static void
 more_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
@@ -126,24 +121,6 @@ more_traceable_objects(Interp *interpreter,
     }
 }
 
-/*
-
-=item C<void
-more_non_traceable_objects(Interp *interpreter,
-        struct Small_Object_Pool *pool)>
-
-We're out of non-traceable objects. Get some more.
-
-=cut
-
-*/
-
-void
-more_non_traceable_objects(Interp *interpreter,
-        struct Small_Object_Pool *pool)
-{
-    (*pool->alloc_objects) (interpreter, pool);
-}
 
 /*
 
@@ -477,14 +454,22 @@ new_small_object_pool(Interp *interpreter,
     SET_NULL(pool->mem_pool);
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
-    pool->add_free_object = add_free_object_fn;
-    pool->get_free_object = get_free_object_fn;
+    return pool;
+}
+
+static void
+gc_ms_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+{
+    pool->add_free_object = gc_ms_add_free_object;
+    pool->get_free_object = gc_ms_get_free_object;
+    pool->alloc_objects   = gc_ms_alloc_objects;
+    pool->more_objects = more_traceable_objects;
 #if ARENA_DOD_FLAGS
-    if (object_size >= sizeof(Dead_PObj))
+    if (pool->object_size >= sizeof(Dead_PObj))
         pool->get_free_object = get_free_object_df;
 #endif
-    pool->alloc_objects = alloc_objects_fn;
-    return pool;
+    if (pool == interpreter->arena_base->pmc_ext_pool)
+        pool->more_objects = pool->alloc_objects;
 }
 
 /*
@@ -506,11 +491,9 @@ Parrot_gc_ms_init(Interp* interpreter)
     struct Arenas *arena_base;
 
     arena_base = interpreter->arena_base;
-    add_free_object_fn = gc_ms_add_free_object;
-    get_free_object_fn = gc_ms_get_free_object;
-    alloc_objects_fn   = gc_ms_alloc_objects;
     arena_base->do_dod_run = Parrot_dod_ms_run;
     arena_base->de_init_gc_system = (void (*)(Interp*)) NULLfunc;
+    arena_base->init_pool = gc_ms_pool_init;
 }
 /*
 

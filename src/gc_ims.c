@@ -500,6 +500,15 @@ gc_ims_alloc_objects(Interp *interpreter,
 }
 
 static void
+gc_ims_pool_init(Interp *interpreter, struct Small_Object_Pool *pool)
+{
+    pool->add_free_object = gc_ims_add_free_object;
+    pool->get_free_object = gc_ims_get_free_object;
+    pool->alloc_objects   = gc_ims_alloc_objects;
+    pool->more_objects = pool->alloc_objects;
+}
+
+static void
 parrot_gc_ims_deinit(Interp* interpreter)
 {
     struct Arenas *arena_base;
@@ -534,16 +543,8 @@ Parrot_gc_ims_init(Interp* interpreter)
      */
     arena_base->do_dod_run = parrot_gc_ims_run;
     arena_base->de_init_gc_system = parrot_gc_ims_deinit;
+    arena_base->init_pool = gc_ims_pool_init;
 
-    /*
-     * IMS and MS use a lot of common code in src/headers.c, src/dod.c,
-     * and src/smallobject.c. These global function pointers simplify
-     * common setup.
-     */
-    add_free_object_fn = gc_ims_add_free_object;
-    get_free_object_fn = gc_ims_get_free_object;
-    alloc_objects_fn   = gc_ims_alloc_objects;
-    more_objects_fn    = gc_ims_alloc_objects;
     /*
      * run init state
      */

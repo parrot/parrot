@@ -46,10 +46,6 @@ size_t get_min_pmc_address(Interp *interpreter);
 int is_buffer_ptr(Interp *, void *);
 int is_pmc_ptr(Interp *, void *);
 
-/* COW support */
-void buffer_mark_COW(Buffer *b);
-Buffer * buffer_unmake_COW(Interp *, Buffer *src);
-Buffer * buffer_copy_if_diff(Interp *, Buffer *src, Buffer *dst);
 
 /* miscellaneous functions */
 void Parrot_initialize_header_pools(Interp *);

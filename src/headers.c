@@ -89,8 +89,8 @@ new_pmc_pool(Interp *interpreter)
     struct Small_Object_Pool *pmc_pool =
         new_small_object_pool(interpreter, sizeof(PMC), num_headers);
 
-    pmc_pool->more_objects = more_traceable_objects;
     pmc_pool->mem_pool = NULL;
+    (interpreter->arena_base->init_pool)(interpreter, pmc_pool);
     return pmc_pool;
 }
 
@@ -118,9 +118,9 @@ new_bufferlike_pool(Interp *interpreter,
     struct Small_Object_Pool *pool =
             new_small_object_pool(interpreter, buffer_size, num_headers);
 
-    pool->more_objects = more_traceable_objects;
     pool->mem_pool = interpreter->arena_base->memory_pool;
     pool->align_1 = BUFFER_ALIGNMENT - 1;
+    (interpreter->arena_base->init_pool)(interpreter, pool);
     return pool;
 }
 
@@ -375,73 +375,6 @@ new_buffer_header(Interp *interpreter)
             interpreter->arena_base->buffer_header_pool);
 }
 
-/*
-
-=item C<void
-buffer_mark_COW(Buffer *b)>
-
-Marks C<b> as COW.
-
-=cut
-
-*/
-
-void
-buffer_mark_COW(Buffer *b)
-{
-    PObj_COW_SET(b);
-}
-
-/*
-
-=item C<Buffer *
-buffer_unmake_COW(Interp *interpreter, Buffer *src)>
-
-If C<src> is COW then a new C<Buffer> is created by copying from C<src>
-and returned. Otherwise C<src> is returned.
-
-=cut
-
-*/
-
-Buffer *
-buffer_unmake_COW(Interp *interpreter, Buffer *src)
-{
-    if (PObj_COW_TEST(src)) {
-        Buffer *b = new_buffer_header(interpreter);
-        Parrot_allocate(interpreter, b, PObj_buflen(src));
-        mem_sys_memcopy(PObj_bufstart(b), PObj_bufstart(src), PObj_buflen(src));
-        return b;
-    }
-    return src;
-}
-
-/*
-
-=item C<Buffer *
-buffer_copy_if_diff(Interp *interpreter, Buffer *src,
-                    Buffer *dst)>
-
-Returns a copy of C<src> if it differs from C<dst>.
-
-=cut
-
-*/
-
-Buffer *
-buffer_copy_if_diff(Interp *interpreter, Buffer *src, Buffer *dst)
-{
-    Buffer *b;
-    /* if src and dst point to the same COWed bufstart,
-     * src hadn't changed yet
-     */
-    if (PObj_bufstart(src) == PObj_bufstart(dst))
-        return dst;
-    b = new_buffer_header(interpreter);
-    Parrot_allocate(interpreter, b, PObj_buflen(src));
-    mem_sys_memcopy(PObj_bufstart(b), PObj_bufstart(src), PObj_buflen(src));
-    return b;
-}
 
 /*
 
@@ -622,11 +555,12 @@ Initialize the pools for the tracked resources.
 void
 Parrot_initialize_header_pools(Interp *interpreter)
 {
+    struct Arenas *arena_base;
+
+    arena_base = interpreter->arena_base;
     /* Init the constant string header pool */
-    interpreter->arena_base->constant_string_header_pool =
-            new_string_pool(interpreter, 1);
-    interpreter->arena_base->constant_string_header_pool->name =
-        "constant_string_header";
+    arena_base->constant_string_header_pool = new_string_pool(interpreter, 1);
+    arena_base->constant_string_header_pool->name = "constant_string_header";
 
     /* Init the buffer header pool
      *
@@ -634,25 +568,27 @@ Parrot_initialize_header_pools(Interp *interpreter)
      * living in the sized_header_pools, this pool pointers are only
      * here for faster access in new_*_header
      */
-    interpreter->arena_base->buffer_header_pool = new_buffer_pool(interpreter);
-    interpreter->arena_base->buffer_header_pool->name = "buffer_header";
+    arena_base->buffer_header_pool = new_buffer_pool(interpreter);
+    arena_base->buffer_header_pool->name = "buffer_header";
 
     /* Init the string header pool */
-    interpreter->arena_base->string_header_pool =
-            new_string_pool(interpreter, 0);
-    interpreter->arena_base->string_header_pool->name = "string_header";
+    arena_base->string_header_pool = new_string_pool(interpreter, 0);
+    arena_base->string_header_pool->name = "string_header";
 
     /* Init the PMC header pool */
-    interpreter->arena_base->pmc_pool = new_pmc_pool(interpreter);
-    interpreter->arena_base->pmc_pool->name = "pmc";
-    interpreter->arena_base->pmc_ext_pool =
+    arena_base->pmc_pool = new_pmc_pool(interpreter);
+    arena_base->pmc_pool->name = "pmc";
+
+    /* pmc extension buffer */
+    arena_base->pmc_ext_pool =
         new_small_object_pool(interpreter, sizeof(struct PMC_EXT), 1024);
-    interpreter->arena_base->pmc_ext_pool->more_objects =
-        alloc_objects_fn;
-    interpreter->arena_base->pmc_ext_pool->name = "pmc_ext";
-    interpreter->arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
-    interpreter->arena_base->constant_pmc_pool->name = "constant_pmc";
-    interpreter->arena_base->constant_pmc_pool->objects_per_alloc =
+    (arena_base->init_pool)(interpreter, arena_base->pmc_ext_pool);
+    arena_base->pmc_ext_pool->name = "pmc_ext";
+
+    /* constant PMCs */
+    arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
+    arena_base->constant_pmc_pool->name = "constant_pmc";
+    arena_base->constant_pmc_pool->objects_per_alloc =
        CONSTANT_PMC_HEADERS_PER_ALLOC;
 }
 

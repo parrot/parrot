@@ -207,6 +207,11 @@ which might do nothing if the object is already marked live.
 
 =back
 
+=item C<void (*init_pool) (Interp*, struct Small_Object_Pool *)>
+
+A function to initialize the given pool. This function should set
+the following object allocation functions for the given pool.
+
 =head2 Object allocation
 
 Each header pool provides one function pointer to get a new object

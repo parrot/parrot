@@ -67,6 +67,7 @@ struct Arenas {
      */
     void (*do_dod_run)(Interp*, int flags);
     void (*de_init_gc_system) (Interp*);
+    void (*init_pool)(Interp *, struct Small_Object_Pool *);
     /*
      * statistics for DOD and GC
      */

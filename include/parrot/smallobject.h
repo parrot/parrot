@@ -68,28 +68,12 @@ struct Small_Object_Pool {
     const char *name;
 };
 
-extern add_free_object_fn_type add_free_object_fn;
-extern get_free_object_fn_type get_free_object_fn;
-extern alloc_objects_fn_type   alloc_objects_fn;
-extern alloc_objects_fn_type   more_objects_fn;
-
 INTVAL contained_in_pool(Interp *,
                          struct Small_Object_Pool *, void *);
 size_t get_max_pool_address(Interp *interpreter,
                             struct Small_Object_Pool *pool);
 size_t get_min_pool_address(Interp *interpreter,
                             struct Small_Object_Pool *pool);
-
-
-void more_traceable_objects(Interp *interpreter,
-                struct Small_Object_Pool *pool);
-void more_non_traceable_objects(Interp *interpreter,
-                struct Small_Object_Pool *pool);
-
-void add_free_object(Interp *,
-                     struct Small_Object_Pool *, void *);
-
-void alloc_objects(Interp *, struct Small_Object_Pool *);
 
 struct Small_Object_Pool * new_small_object_pool(Interp *,
                                                  size_t, size_t);
