@@ -37,3 +37,33 @@ Parrot_sleep(unsigned int seconds)
 {
     sleep(seconds);
 }
+
+/*
+ * Parrot_gmtime_r()
+ */
+
+struct tm *
+Parrot_gmtime_r(const time_t *t, struct tm *tm)
+{
+    return gmtime_r(t, tm);
+}
+
+/*
+ * Parrot_localtime_r()
+ */
+
+struct tm *
+Parrot_localtime_r(const time_t *t, struct tm *tm)
+{
+    return localtime_r(t, tm);
+}
+
+/*
+ * Parrot_asctime_r()
+ */
+
+char*
+Parrot_asctime_r(const struct tm *tm, char *buffer)
+{
+    return asctime_r(tm, buffer);
+}

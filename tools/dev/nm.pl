@@ -21,8 +21,8 @@ my ($Code, $Data, $Init, $Uninit, $Const, $Mutable,
 sub help {
 print <<__EOF__;
 $0: Usage: $0 [options] [ foo.o ... | bar.a | other_library_format ]
-Portable frontend to nm(1).
-By default lists the code and data symbols of the object or archive files.
+Portable frontend for nm(1); by default lists the code and data symbols
+of the object or archive files.
 Options:
 --code		only code/text symbols (Tt)
 --data		only data symbols (Dd, Bb)
@@ -34,13 +34,14 @@ Options:
 --def		only defined symbols (not Uu)
 --file		only file(name) symbols (Ff)
 
+If more than one of all the above options are given, they are ANDed.
+They can also be negated with a "no", for example --noconst.
 [1] Not all platforms support this, a warning will be given if not.
-All the above options are cumulative (boolean and), and they can be
-negated with a "no".
 
---filename	prepend the object filename
---type		append the short BSD-style type (in parentheses above)
---longtype	append a long type
+--filename	prepend the object filename before the symbol name
+--t		append the short BSD-style type (in parentheses above)
+--type=long	append a long type (e.g. "global_const_init_data" cf. "R")
+--type=terse	same as --t
 --help		show this help
 --version	show version
 
@@ -86,8 +87,8 @@ help()
                  'def!'       => \$Def,
                  'file!'      => \$File,
                  'filename'   => \$FileName,
-                 'type'       => \$Type,
-                 'longtype'   => \$LongType,
+                 't'          => \$Type,
+                 'type:s'     => \$Type,
                  'help'       => \$Help,
                  'version'    => \$Version,
                  );
@@ -118,18 +119,28 @@ warnboth($Def,    $Undef,   'def',    'undef');
 
 $Const ||= !$Mutable if defined $Mutable && !defined $Const;
 $Undef ||= !$Def     if defined $Def     && !defined $Undef;
-$Type  ||= $LongType if defined $LongType;
+my %Type; @Type{qw(terse long)} = ();
+$Type = 'terse' if $Type eq '1'; # So they used --t.
+die "$0: --type=$Type unknown\n"
+    if defined $Type && $Type ne '' && !exists $Type{$Type};
+
+my $TypeLong = defined $Type && $Type eq 'long';
 
 for my $f (@ARGV) {
+    unless (-f $f) {
+	warn "$0: No such file: $f\n";
+	next;
+    }
     if (open(NM, "nm $nm_opt $f |")) {
-	my $o;
+	my $o = "?";
 	$o = $f if $f =~ /\.o$/;
 	my $file;
 	while(<NM>) {
 	    chomp;
 	    if (m/^(.+\.o):$/ || m/\[(.+\.o)\]:$/ || m/\((.+\.o)\):$/) {
 		$o = $1;
-	    } elsif (/ ([A-Za-z]) (\w+)$/) {
+	    } elsif (/ ([A-Za-z]) \.?(\w+)$/) {
+		# Especially text symbols are sometimes prefixed by a ".".
 		my ($type, $name) = ($1, $2);
 		my $absolute = ($type =~ /^[Aa]$/  ) ? 1 : 0;
 		my $uninit   = ($type =~ /^[BbCc]$/) ? 1 : 0;
@@ -207,28 +218,28 @@ for my $f (@ARGV) {
 		wantshow(\$show, $File,   $file  ) if $show;
 		if ($show) {
 		    $show = $FileName ? "$o\t$name" : $name;
-		    if ($Type) {
+		    if (defined $Type) {
 			$show .= "\t";
 			my $symbol;
 			if ($code) {
-			    $symbol = $LongType ? "code" : "T";
+			    $symbol = $TypeLong ? "code" : "T";
 			} elsif ($data) {
 			    if ($const) {
-				$symbol = $LongType ? "const_init" : "R";
+				$symbol = $TypeLong ? "const_init" : "R";
 			    } elsif ($init) {
-				$symbol = $LongType ? "init" : "D";
+				$symbol = $TypeLong ? "init" : "D";
 			    } elsif ($uninit) {
-				$symbol = $LongType ? "uninit" : "B";
+				$symbol = $TypeLong ? "uninit" : "B";
 			    } else {
-				$symbol = $LongType ? "unknown" : "D?";
+				$symbol = $TypeLong ? "unknown" : "D?";
 			    }
-			    $symbol .= "_data";
+			    $symbol .= "_data" if $TypeLong;
 			} elsif ($undef) {
-			    $symbol = $LongType ? "undef" : "U";
+			    $symbol = $TypeLong ? "undef" : "U";
 			} else {
-			    $symbol = $LongType ? "unknown" : "?";
+			    $symbol = $TypeLong ? "unknown" : "?";
 			}
-			if ($LongType) {
+			if ($TypeLong) {
 			    $show .= $global ?
 				"global_$symbol" : "local_$symbol";
 			} else {

@@ -355,7 +355,6 @@ do_pre_process(Parrot_Interp interpreter)
             case FLOATV:        printf("float ");break;
             case STRINGV:       printf("string ");break;
             case NEW:           printf("new ");break;
-            case DEFINED:       printf("defined ");break;
             case ADDR:          printf("addr ");break;
             case GLOBAL:        printf("global ");break;
             case CALL:          printf("call ");break;

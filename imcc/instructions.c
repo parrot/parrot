@@ -84,7 +84,7 @@ static int r_special[5];
 static int w_special[1+4*3];
 
 void
-init_tables(struct Parrot_Interp * interpreter)
+imcc_init_tables(struct Parrot_Interp * interpreter)
 {
     size_t i;
     const char *reads[] = {

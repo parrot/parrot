@@ -76,7 +76,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
     if (!optimizer_level && pasm_file)
         return;
 
-    init_tables(interpreter);
+    imcc_init_tables(interpreter);
     allocated = 0;
 
 #if IMC_TRACE

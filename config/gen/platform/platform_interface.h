@@ -32,12 +32,20 @@ void *mem_realloc_executable(void *, size_t);
 #endif
 
 /*
-** Miscellaneous:
+** Time
 */
 
 void Parrot_sleep(unsigned int seconds);
 INTVAL Parrot_intval_time(void);
 FLOATVAL Parrot_floatval_time(void);
+struct tm * Parrot_gmtime_r(const time_t *, struct tm *);
+struct tm * Parrot_localtime_r(const time_t *, struct tm *);
+char* Parrot_asctime_r(const struct tm*, char *);
+
+/*
+ * Env
+ */
+
 void Parrot_setenv(const char *name, const char *value);
 void Parrot_unsetenv(const char *name);
 /* free_it is set by the function to either 0 or 1; if set to 1,

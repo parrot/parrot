@@ -165,32 +165,36 @@ decoding.
 
 op gmtime(out STR, in INT) {
   struct tm tm;
+  time_t t = (time_t) $2;
   char resultbuffer[26];
-  gmtime_r(&($2), &tm);
-  asctime_r(&tm, resultbuffer);
+  Parrot_gmtime_r(&t, &tm);
+  Parrot_asctime_r(&tm, resultbuffer);
   $1 = string_from_cstring(interpreter, resultbuffer, 26);
   goto NEXT();
 }
 
 op localtime(out STR, in INT) {
   struct tm tm;
+  time_t t = (time_t) $2;
   char resultbuffer[26];
-  localtime_r(&($2), &tm);
-  asctime_r(&tm, resultbuffer);
+  Parrot_localtime_r(&t, &tm);
+  Parrot_asctime_r(&tm, resultbuffer);
   $1 = string_from_cstring(interpreter, resultbuffer, 26);
   goto NEXT();
 }
 
 op decodetime(out PMC, in INT) {
   struct tm tm;
-  gmtime_r(&($2), &tm);
+  time_t t = (time_t) $2;
+  Parrot_gmtime_r(&t, &tm);
   $1 = tm_to_array(interpreter, &tm);
   goto NEXT();
 }
 
 op decodelocaltime(out PMC, in INT) {
   struct tm tm;
-  localtime_r(&($2), &tm);
+  time_t t = (time_t) $2;
+  Parrot_localtime_r(&t, &tm);
   $1 = tm_to_array(interpreter, &tm);
   goto NEXT();
 }

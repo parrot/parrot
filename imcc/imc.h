@@ -77,7 +77,7 @@ void imc_pragma(char * str);
 /*
  * instructions.c
  */
-void init_tables(struct Parrot_Interp * interp);
+void imcc_init_tables(struct Parrot_Interp * interp);
 
 /*
  * optimizer.c
