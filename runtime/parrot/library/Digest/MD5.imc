@@ -29,6 +29,10 @@ Pass in a string, returns an Integer array with the result
 
 Pass it the Integer array to print the checksum.
 
+=head2 _md5_hex
+
+Pass it the Integer array to get the checksum as string.
+
 =head1 BUGS
 
 Only tested so far on i386.
@@ -47,11 +51,36 @@ Only tested so far on i386.
 # export function entries to globals
 
 .sub onload @LOAD
+    .local pmc endian
+    endian = new Integer
+    endian = 0
+    store_global "Digest", "_md5_swap_endian", endian
+    
+    $P0 = _config()
+
+    $I0 = $P0["intsize"]
+    if $I0 == 4 goto is_4byte_word
+
+    printerr "This doesn't seem to be a 32 bit processor: "
+    printerr "Please verify the MD5 checksum\n"
+
+is_4byte_word:
+
+    $I0 = $P0["bigendian"]
+    unless $I0 goto is_little_endian
+    endian = 1
+    printerr "This appears to be a big endian processor: "
+    printerr "Please verify the MD5 checksum\n"
+
+is_little_endian:
+
     .local pmc f
     f = find_global "Digest", "_md5sum"
     global "_md5sum" = f
     f = find_global "Digest", "_md5_print"
     global "_md5_print" = f
+    f = find_global "Digest", "_md5_hex"
+    global "_md5_hex" = f
 .end
 
 .include "library/config.imc"
@@ -64,31 +93,15 @@ Only tested so far on i386.
 .sub _md5sum
     .param string str
 
-    $P0 = _config()
-
-    $I0 = $P0["intsize"]
-    if $I0 == 4 goto is_4byte_word
-
-    printerr "This doesn't seem to be a 32 bit processor: "
-    printerr "Please verify the MD5 checksum\n"
-
-is_4byte_word:
-
-    .local int endian
-    endian = $P0["bigendian"]
-    unless endian goto is_little_endian
-    printerr "This appears to be a big endian processor: "
-    printerr "Please verify the MD5 checksum\n"
-
-is_little_endian:
-
     .local pmc buffer, context
     buffer = new FixedIntegerArray
 
     context = new FixedIntegerArray
     context = 4
 
-    _md5_create_buffer (str, buffer, endian)
+    $P0 = find_global "Digest", "_md5_swap_endian"
+    $I0 = $P0
+    _md5_create_buffer (str, buffer, $I0)
 
     # _print_buffer (buffer, 8)
 
@@ -408,16 +421,17 @@ md5_loop:
     context[2] = C
     context[3] = D
 
-    # print_vals (A,B,C,D)
+    # $S0 = _format_vals (A,B,C,D)
+    # print $S0
     # print "\n"
 
 .end
 
 ###########################################################################
 
-# Print four hex values
+# format four hex values
 
-.sub _print_vals
+.sub _format_vals
     .param int A
     .param int B
     .param int C
@@ -431,7 +445,7 @@ md5_loop:
     $P0[3] = D
 
     sprintf $S0, "%08lx%08lx%08lx%08lx", $P0
-    print $S0
+    .return($S0)
 .end
 
 ###########################################################################
@@ -451,11 +465,8 @@ md5_loop:
     C = context[2]
     D = context[3]
 
-    $P0 = _config()
-
-    $I0 = $P0["bigendian"]
-
-    if $I0 goto dont_swap
+    $P0 = find_global "Digest", "_md5_swap_endian"
+    if $P0 goto dont_swap
 
     .swap (A)
     .swap (B)
@@ -464,8 +475,35 @@ md5_loop:
 
 dont_swap:
 
-    _print_vals (A,B,C,D)
+    $S0 = _format_vals (A,B,C,D)
+    print $S0
+.end
 
+.sub _md5_hex
+    .param pmc context
+
+    .local int A
+    .local int B
+    .local int C
+    .local int D
+
+    A = context[0]
+    B = context[1]
+    C = context[2]
+    D = context[3]
+
+    $P0 = find_global "Digest", "_md5_swap_endian"
+    if $P0 goto dont_swap
+
+    .swap (A)
+    .swap (B)
+    .swap (C)
+    .swap (D)
+
+dont_swap:
+
+    $S0 = _format_vals (A,B,C,D)
+    .return($S0)
 .end
 
 ###########################################################################
