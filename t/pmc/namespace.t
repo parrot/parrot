@@ -16,7 +16,7 @@ Tests the namespace manipulation.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 14;
 use Test::More;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "find_global bar");
@@ -260,5 +260,64 @@ calling Foo::foo
   fie
 calling baz
 .*baz.*not found/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::bar");
+.sub main @MAIN
+    $P0 = find_global "Foo", "bar"
+    print "ok\n"
+    $P0()
+.end
+
+.namespace ["Foo"]
+.sub bar
+    print "bar\n"
+    .include "interpinfo.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    $P1 = $P0."get_name_space"()
+    print $P1
+    print "\n"
+.end
+CODE
+ok
+bar
+Foo
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz");
+.sub main @MAIN
+    $P0 = find_global "\0Foo"
+    $P1 = find_global $P0, "\0Bar"
+    $P2 = find_global $P1, "baz"
+    print "ok\n"
+    $P2()
+.end
+
+.namespace ["Foo" ; "Bar"]
+.sub baz
+    print "baz\n"
+    .include "interpinfo.pasm"
+    .include "pmctypes.pasm"
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
+    $P1 = $P0."get_name_space"()
+    typeof $I0, $P1
+    if $I0 == .Key goto is_key
+    print $P1
+    print "\n"
+    .return()
+is_key:
+    print $P1
+    $P1 = shift $P1
+    $I1 = defined $P1
+    unless $I1 goto ex
+    print "::"
+    goto is_key
+ex:
+    print "\n"
+.end
+CODE
+ok
+baz
+Foo::Bar
 OUTPUT
 
