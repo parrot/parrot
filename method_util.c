@@ -19,7 +19,8 @@
  * Create a new native sub.
  */
 PMC *
-Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func) {
+Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func)
+{
     PMC * ret = pmc_new(interp, enum_class_CSub);
     ret->cache.struct_val = (DPOINTER*)func;
     return ret;
@@ -29,7 +30,8 @@ Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func) {
  * Push non-prototyped arguments.
  */
 void
-Parrot_push_argv(struct Parrot_Interp * interp, INTVAL argc, PMC * argv[]) {
+Parrot_push_argv(struct Parrot_Interp * interp, INTVAL argc, PMC * argv[])
+{
     interp->ctx.int_reg.registers[0] = 0; /* no prototype */
     interp->ctx.int_reg.registers[1] = argc;
     while (argc--) {
@@ -42,7 +44,8 @@ Parrot_push_argv(struct Parrot_Interp * interp, INTVAL argc, PMC * argv[]) {
  * Pop non-prototyped arguments.
  */
 INTVAL
-Parrot_pop_argv(struct Parrot_Interp * interp, PMC *** argv) {
+Parrot_pop_argv(struct Parrot_Interp * interp, PMC *** argv)
+{
     INTVAL i;
     INTVAL nret = interp->ctx.int_reg.registers[1];
     /* NOTE: not using GC'd memory -- free this yourself. */
@@ -77,7 +80,8 @@ Parrot_push_proto(struct Parrot_Interp * interp,
                   INTVAL intc, INTVAL * intv,
                   INTVAL numc, FLOATVAL * numv,
                   INTVAL strc, STRING ** strv,
-                  INTVAL pmcc, PMC ** pmcv) {
+                  INTVAL pmcc, PMC ** pmcv)
+{
     int npush;                  /* overflow params */
     interp->ctx.int_reg.registers[0] = 1; /* with proto */
     npush = 0;
@@ -98,7 +102,8 @@ Parrot_push_proto(struct Parrot_Interp * interp,
  */
 void
 Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp,
-                  struct Stash * stash) {
+                  struct Stash * stash)
+{
     PMC * k;
     PMC * hash = stash->stash_hash;
 
@@ -122,7 +127,8 @@ Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp,
  */
 PMC *
 Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
-                   PMC * key) {
+                   PMC * key)
+{
     while (stash) {
         PMC * meth = stash->stash_hash->vtable
             ->get_pmc_keyed(interp, stash->stash_hash, key);
@@ -137,7 +143,8 @@ Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
  * Mark entries in a stack structure during GC.
  */
 PMC *
-mark_stack(Stack_Chunk_t * cur_stack, PMC * end_of_used_list) {
+mark_stack(Stack_Chunk_t * cur_stack, PMC * end_of_used_list)
+{
     Stack_Entry_t *entry;
     size_t i;
 
@@ -160,3 +167,13 @@ mark_stack(Stack_Chunk_t * cur_stack, PMC * end_of_used_list) {
     }
     return end_of_used_list;
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
