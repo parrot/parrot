@@ -242,6 +242,7 @@ t/pmc/perlstring.t
 test_c.in
 test_gnuc.c
 test_main.c
+testparrotfuncptr.c
 testparrotsizes_c.in
 trace.c
 vtable.tbl

@@ -162,6 +162,8 @@ if (-e "lib/Parrot/Jit/$jitarchname.pm") {
     }
 }
 
+$jitcapable = $opt_defines{jitcapable} if exists $opt_defines{jitcapable};
+
 unless($jitcapable){
     $jitarchname = 'i386-nojit';
 }
@@ -262,6 +264,11 @@ if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
 
 my $ccname = $Config{ccname} || $Config{cc};
 
+# Make one more check before allowing the use of the JIT code.
+# make sure that their choice of compiler and cflags will allow our JIT's
+# non-ansi use of function pointers.
+#
+
 # Add the -DHAS_JIT if we're jitcapable
 if ($jitcapable) {
     $c{cc_hasjit} = " -DHAS_JIT -D" . uc $jitcpuarch;
@@ -348,8 +355,8 @@ END
     my %gnuc;
 
     compiletestc("test_gnuc");
-    %gnuc=eval(runtestc()) or die "Can't run the test program: $!";
-    unlink("test_siz$c{exe}", "test$c{o}");
+    %gnuc=eval(runtestc("test_gnuc")) or die "Can't run the test program: $!";
+    cleantestc("test_gnuc");
 
     unless (exists $gnuc{__GNUC__}) {
         print <<'END';
@@ -490,12 +497,13 @@ END
     my %newc;
 
     buildfile("test_c");
-    compiletestc();
-    %newc=eval(runtestc()) or die "Can't run the test program: $!";
+    compiletestc("test");
+    %newc=eval(runtestc("test")) or die "Can't run the test program: $!";
 
     @c{keys %newc}=values %newc;
 
-    unlink('test.c', "test_siz$c{exe}", "test$c{o}");
+    cleantestc("test");
+    unlink('test.c');
 }
 
 print <<"END";
@@ -611,6 +619,26 @@ buildfile("languages/scheme/Makefile");
 buildfile("Types_pm", "lib/Parrot");
 
 buildconfigpm();
+print "\n";
+
+
+if ($jitcapable) {
+    print "Verifying that the compiler supports function pointer casts...\n";
+    eval { compiletestc("testparrotfuncptr"); };
+
+    if ($@ || !(runtestc("testparrotfuncptr") =~ /OK/)) {
+        print "Although it is not required by the ANSI C standard,\n";
+        print "Parrot requires the ability to cast from void pointers to function\n";
+        print "pointers for its JIT support.\n\n";
+        print "Your compiler does not appear to support this behavior with the\n";
+        print "flags you have specified.  You must adjust your settings in order\n";
+	print "to use the JIT code.\n\n";
+        print "If you wish to continue without JIT support, please re-run this script\n";
+	print "With the '--define jitcapable=0' argument.\n";
+	exit(-1);
+    }    
+    cleantestc("testparrotfuncptr");
+}
 
 
 #
@@ -632,13 +660,14 @@ END
     close NEEDED;
     buildfile("testparrotsizes_c");
     compiletestc("testparrotsizes");
-    %newc=eval(runtestc()) or die "Can't run the test program: $!";
-
+    %newc=eval(runtestc("testparrotsizes"))
+      or die "Can't run the test program: $!";
     @c{keys %newc}=values %newc;
 
     @c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
 
-    unlink('testparrotsizes.c', "test_siz$c{exe}", "test$c{o}");
+    cleantestc("testparrotsizes");
+    unlink('testparrotsizes.c');
     unlink("include/parrot/vtable.h");
 }
 
@@ -846,10 +875,13 @@ END
 #
 
 sub compiletestc {
-    my $name;
-    $name = shift;
-    $name = "test" unless $name;
-    system("$c{cc} $c{ccflags} -I./include $c{cc_exe_out}test_siz$c{exe} $name.c $c{cc_ldflags} $c{ldflags} $c{libs}") and die "C compiler died!";
+    my ($name) = @_;
+
+    my $cmd = "$c{cc} $c{ccflags} -I./include -c $c{ld_out} $name$c{o} $name.c";
+    system($cmd) and die "C compiler died!  Command was '$cmd'\n";
+
+    $cmd = "$c{ld} $c{ldflags} $c{libs} $name$c{o} $c{cc_exe_out}$name$c{exe}";
+    system($cmd) and die "Linker died!  Command was '$cmd'\n";
 }
 
 
@@ -858,9 +890,21 @@ sub compiletestc {
 #
 
 sub runtestc {
-    `./test_siz$c{exe}`
+    my ($name) = @_;
+
+    my $cmd = "$name$c{exe}";
+    `./$cmd`;
 }
 
+#
+# cleantestc
+#
+
+sub cleantestc {
+    my ($name) = @_;
+
+    unlink("$name$c{o}", "$name$c{exe}");
+}
 
 #
 # lowbitmas()
