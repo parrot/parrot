@@ -56,6 +56,20 @@
 #  include <fcntl.h>
 #endif
 
+#ifdef HAS_HEADER_ARPAINET
+#  include <arpa/inet.h>
+#endif
+
+#ifdef HAS_HEADER_NETINETTCP
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <netinet/tcp.h>
+#endif
+
+#ifdef HAS_HEADER_NETDB
+#  include <netdb.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -133,6 +147,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
 #include "parrot/debug.h"
+#include "parrot/sub.h"
 #endif
 
 /*

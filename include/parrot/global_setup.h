@@ -26,6 +26,10 @@ void Parrot_PerlArray_class_init(INTVAL);
 void Parrot_PerlHash_class_init(INTVAL);
 void Parrot_ParrotPointer_class_init(INTVAL);
 void Parrot_IntQueue_class_init(INTVAL);
+void Parrot_ParrotSub_class_init(INTVAL);
+void Parrot_ParrotCoroutine_class_init(INTVAL);
+void Parrot_ParrotClosure_class_init(INTVAL);
+void Parrot_ParrotContinuation_class_init(INTVAL);
 
 void init_world(void);
 

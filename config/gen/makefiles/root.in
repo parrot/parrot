@@ -74,7 +74,8 @@ ALL_H_FILES = $(GENERAL_H_FILES)
 CLASS_O_FILES = classes/default$(O) classes/array$(O) \
 classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
 classes/perlarray$(O) classes/perlundef$(O) \
-classes/perlhash$(O) classes/parrotpointer$(O) classes/intqueue$(O)
+classes/perlhash$(O) classes/parrotpointer$(O) classes/parrotsub$(O) \
+classes/parrotcoroutine$(O) classes/intqueue$(O)
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
 				   encodings/utf16$(O) \
@@ -86,7 +87,7 @@ IO_O_FILES = io/io$(O) io/io_stdio$(O) io/io_unix$(O) io/io_win32$(O)
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 				 register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
-				 packfile$(O) stacks$(O) string$(O) encoding$(O) \
+				 packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
 				 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 				 platform$(O) ${jit_o} resources$(O) rx$(O) rxstacks$(O) \
 				 embed$(O) warnings$(O) misc$(O) ${cg_o} \
