@@ -9,7 +9,7 @@ Parrot Assembly Language
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 6
-    Version: 1.7
+    Version: 1.8
     Status: Developing
     Last Modified: 02 December 2002
     PDD Format: 1
@@ -18,6 +18,10 @@ Parrot Assembly Language
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.8
+
+December 11, 2002
 
 =item Version 1.7
 
@@ -56,6 +60,18 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.8
+
+=over 4
+
+=item * Added property ops
+
+=item * Fixed some bad register designations
+
+=item * Opened up opcode name character list to include numbers
+
+=back
 
 =item Version 1.7
 
@@ -179,7 +195,8 @@ integer, and number respectively.
 
 =head1 Assembly Syntax
 
-All assembly opcodes contain only ASCII lowercase letters and the underscore.
+All assembly opcodes contain only ASCII lowercase letters, digits, and
+the underscore.
 
 Upper case names are reserved for assembler directives.
 
@@ -788,7 +805,7 @@ current location. (This is temporary until we get something better)
 =item callout Pw, Px, sy, pz
 
 Call routine Y in interpreter x, passing it the list of parameters
-Z. V is a synchronization object returned. It can be waited on like
+Z. W is a synchronization object returned. It can be waited on like
 the sync objects returned from async I/O routines.
 
 =item interpinfo Ix, iy
@@ -1001,8 +1018,8 @@ it into P register x.
 
 =item dlfunc Pw, Px, Sy, Sz
 
-Find a routine named Z, in library Y (which you did, of course, open
-with loadlib), and put a sub PMC onto X for it. You can call this sub
+Find a routine named Y, in library X (which you did, of course, open
+with loadlib), and put a sub PMC onto W for it. You can call this sub
 as if it were any other parrot subroutine.
 
 Z has the function signature, which tells Parrot how to build the
