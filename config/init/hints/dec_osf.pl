@@ -1,4 +1,4 @@
-# True64
+# Tru64
 my $ccflags = Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
     $ccflags .= ' -pthread';
@@ -16,7 +16,7 @@ Configure::Data->set(
 );
 
 my $linkflags = Configure::Data->get('linkflags');
-if ( $linkflags !~ /-shared/ ) {
+if ( $linkflags !~ /-expect_unresolved/ ) {
     $linkflags = "-expect_unresolved '*' -O4 -msym -std $linkflags";
 }
 Configure::Data->set(

@@ -16,7 +16,7 @@ linux-x64
 openbsd
 os2
 solaris
-true64
+tru64
 vms
 win32-bcc
 win32-cygwin
