@@ -1126,11 +1126,11 @@ testbench: test_prep
 
 # Running a benchmark
 mopsbench : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
+	./$(PARROT) $(PARROT_ARGS) examples/assembly/mops.pasm
 
 # Running the game of live
 lifetest : test_prep
-	$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
+	./$(PARROT) $(PARROT_ARGS) examples/assembly/life.pasm
 
 # Running the IMCC test suite
 # normal core
