@@ -177,7 +177,7 @@ my(%c)=(
 
     opcode_t      => ($Config{ivtype} || 'long'),
     longsize      => undef,
-    byteorder     => $Config{byteorder},
+    perl5byteorder => $Config{byteorder},
 
     intvalfmt     => '%ld',
     floatvalfmt     => '%f',
@@ -545,6 +545,7 @@ types...
 END
 }
 
+
 #
 # Alas perl5.7.2 doesn't have an INTVAL flag for pack().
 # The ! modifier only works for perl 5.6.x or greater.
@@ -604,6 +605,54 @@ Configure.pl:  Unable to find an integer type that fits a pointer.
 AARGH
 }
 
+
+print <<"END";
+
+Computing native byteorder for Parrot's wordsize...
+
+Ignore warning about overflow...
+
+END
+
+{
+    my $testc = "testbyteorder.c";
+    my $int = $c{iv};
+    open TESTC, ">$testc" or die "Error opening $testc for byteorder config: $!";
+print TESTC<<"END";
+int main() {
+	int i;
+	union W {
+		unsigned char b[sizeof($int)/sizeof(unsigned char)];
+		$int w;
+	} w;
+	if(sizeof(w) == 4) {
+		w.w = 0x04030201;
+	}
+	else {
+		w.w = 0x0807060504030201;
+	}
+
+	for(i = 0; i < sizeof(w.b); i++) {
+		printf("%1u", w.b[i]);
+	}
+	printf("\\n");
+	exit(0);
+	return 0;
+}
+END
+    close(TESTC);
+
+    compiletestc("testbyteorder");
+    $c{byteorder}=runtestc("testbyteorder") or die "Can't run the testbyteorder program: $!";
+    chop $c{byteorder};
+    print "\nNative byte-order appears to be [", $c{byteorder}, "]\n";
+    if(length($c{byteorder}) != length($c{perl5byteorder})) {
+        print "Note, the sizeof Perl5 INTs appear to be different from Parrot's\n";
+        print "for this configuration, if this is expected, ignore this.\n";
+    }
+}
+
+
 #"
 # Determine format strings for INTVAL and FLOATVAL.
 #
@@ -625,8 +674,6 @@ if ($c{nv} eq "double") {
 } else {
     die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";
 }
-
-print "\nYour byteorder seems to be [", $c{byteorder}, "]\n";
 
 #
 # Build config.h, the Makfefiles and Types.pm:
