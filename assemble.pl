@@ -93,7 +93,39 @@ This should eliminate the intermediary .pasm file and speed things up.
 # XXX have been added, and features -will- need to be added.
 #
 
+
+BEGIN {
+  package Syntax;
+
+  use strict;
+
+  use vars qw(@ISA @EXPORT_OK $str_re $label_re $reg_re $num_re
+              $bin_re $dec_re $hex_re $flt_re);
+  require Exporter;
+  @ISA = 'Exporter';
+  @EXPORT_OK = qw($str_re $label_re $reg_re $num_re
+                  $bin_re $dec_re $hex_re $flt_re);
+
+  $reg_re = qr([INPS]\d+);
+  $bin_re = qr([-+]?0[bB][01]+);
+  $dec_re = qr([-+]?\d+);
+  $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
+  $flt_re = qr{[-+]?\d+ (?:(?:\.\d+(?:[eE][-+]?\d+)?)
+                            | (?:[Ee][+-]?\d+))}x;
+  $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
+               \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
+              )x;
+  $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
+  $num_re   = qr([-+]?\d+(\.\d+([eE][-+]?\d+)?)?);
+
+  # until this gets broken out into a file Syntax.pm we need to cheat:
+  $INC{"Syntax.pm"} = $0;
+  # Otherwise use Syntax; will attempt to require 'Syntax.pm', which will fail
+}
+
 package Macro;
+
+use Syntax qw($label_re $num_re);
 
 =head2 Macro class
 
@@ -156,21 +188,20 @@ sub _expand_macro {
   my ($self,$macro_name,$macro_args) = @_;
   my %args;
   my @temp = @{$self->{macros}{$macro_name}{contents}};
-  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
 
   @args{@{$self->{macros}{$macro_name}{arguments}}} = @$macro_args;
   $self->{macros}{$macro_name}{gensym}++;
 
   for(@temp) {
     s{\.local\s+\$($label_re):}
-     {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}:}gx;
+     {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}:}gxo;
 
     s{\.\$($label_re)}
-     {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}}gx;
+     {local__${macro_name}__${1}__$self->{macros}{$macro_name}{gensym}}gxo;
     s{\.($label_re)}
-     {exists $self->{constants}{$1} ? $self->{constants}{$1} : ".$1"}gex;
+     {exists $self->{constants}{$1} ? $self->{constants}{$1} : ".$1"}gexo;
     s{\.($label_re)}
-     {exists $args{$1} ? $args{$1} : ".$1"}gex;
+     {exists $args{$1} ? $args{$1} : ".$1"}gexo;
   }
   @temp;
 }
@@ -229,9 +260,6 @@ sub preprocess {
   my $self = shift;
   my $line = 0;
   my $in_macro;
-  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
-  my $reg_re   = qr([INSP]\d+);
-  my $num_re   = qr([-+]?\d+(\.\d+([eE][-+]?\d+)?)?);
 
   my @todo=@{$self->{cur_contents}};
   while(scalar(@todo)) {
@@ -253,19 +281,19 @@ sub preprocess {
 
     if(/^\.constant \s+
         ($label_re) \s+
-        ([INSP]\d+)/x) { # .constant {name} {register}
+        ([INSP]\d+)/xo) { # .constant {name} {register}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.constant \s+
         ($label_re) \s+
-        ($num_re)/x) { # .constant {name} {number}
+        ($num_re)/xo) { # .constant {name} {number}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.constant \s+
           ($label_re)  \s+
           (\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
            \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-          )/x) {                               # .constant {name} {string}
+          )/xo) {                               # .constant {name} {string}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.include \s+
@@ -288,7 +316,7 @@ sub preprocess {
     elsif(/^\.macro    \s+
            ($label_re) \s*
            \(([^)]*)\)
-         /x) {            # .{name} (...
+         /xo) {            # .{name} (...
       if($in_macro) {
         push @{$self->{contents}},$_;
         print STDERR
@@ -323,7 +351,7 @@ sub preprocess {
 #      push @{$self->{contents}},$_;
 #    }
     elsif(/\.($label_re) \s*
-           \(([^)]*)\)/x) {                    # .{name} (...
+           \(([^)]*)\)/xo) {                    # .{name} (...
       if(defined $self->{macros}{$1}) {
         my $macro_name = $1;
         my $arguments = $2;
@@ -340,7 +368,7 @@ sub preprocess {
         print STDERR "Couldn't find macro '.$1' at line $line.\n";
       }
     }
-    elsif(/\.($label_re)/) {                         # .{name}
+    elsif(/\.($label_re)/o) {                         # .{name}
       if(defined $self->{constants}{$1}) {
         push @{$self->{contents}},$_;
         $self->{contents}[-1] =~ s/\.(\w+)/$self->{constants}{$1}/g;
@@ -375,6 +403,8 @@ sub contents {
 1;
 
 package Assembler;
+
+use Syntax qw($str_re $label_re $reg_re $bin_re $dec_re $hex_re $flt_re);
 
 use POSIX; # Needed for strtol()
 
@@ -429,14 +459,12 @@ arguments have been appropriately analyzed.
 
 sub _annotate_contents {
   my ($self,$line) = @_;
-  my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
-                  \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-                 )x;
 
   $self->{pc}++;
   return if $line=~/^\s*$/ or $line=~/^\s*#/; # Filter out the comments and blank lines
-  $line=~s/^((?:[^'"]+|$str_re)*)#.*$/$1/; # Remove trailing comments
-  $line=~s/(^\s+|\s+$)//g;           # Remove leading and trailing whitespace
+  $line=~s/^\s+//;           # Remove leading whitespace
+  $line=~s/^((?:[^'"]+|$str_re)*)#.*$/$1/o; # Remove trailing comments
+  $line=~s/\s+\z//;           # Remove trailing whitespace
   #
   # Accumulate lines that only have labels until an instruction is found.
   # XXX This could fail if a label occurs at the end of a file.
@@ -489,13 +517,11 @@ Local labels aren't given special treatment yet.
 sub _collect_labels {
   my $self = shift;
 
-  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
-
   #
   # Collect label definition points first
   #
   for(@{$self->{contents}}) {
-    while($_->[0] =~ s/^(\$?$label_re)\s*:\s*,?//) {
+    while($_->[0] =~ s/^(\$?$label_re)\s*:\s*,?//o) {
       my $label = $1;
       if($label=~/^\$/) {
         push @{$self->{local_labels}{$1}},$_->[1]; # Local label
@@ -717,8 +743,7 @@ sub constant_table {
     return ('table' => $const,
             'length' => $constl);
 }
- 
-    
+
 =item output_bytecode
 
 Returns a string with the Packfile. 
@@ -841,16 +866,6 @@ instruction, and generates bytecode. It returns the bytecode, and we're done.
 sub to_bytecode {
   my $self = shift;
 
-  my $reg_re = qr([INPS]\d+);
-  my $bin_re = qr([-+]?0[bB][01]+);
-  my $dec_re = qr([-+]?\d+);
-  my $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
-  my $flt_re = qr{[-+]?\d+ (?:(?:\.\d+(?:[eE][-+]?\d+)?)
-                               | (?:[Ee][+-]?\d+))}x;
-  my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
-                  \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
-                 )x;
-  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
   my $pc = 0;
 
   $self->_collect_labels(); # Collect labels in a separate pass
@@ -869,7 +884,7 @@ sub to_bytecode {
       if($temp=~s/^#.*//) {
         # Skip flying comments.
       }
-      elsif($temp=~s/^($reg_re)//) {
+      elsif($temp=~s/^($reg_re)//o) {
         my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
@@ -888,7 +903,7 @@ sub to_bytecode {
       # XXX Nip off the first keyed register and replace the '[k' at the start
       # XXX of the string, so we can nip off another argument.
       #
-      elsif($temp=~s/^\[k;($reg_re)/\[k/) {
+      elsif($temp=~s/^\[k;($reg_re)/\[k/o) {
         my $reg_idx = substr($1,1);
         unless($reg_idx >= 0 and $reg_idx <= 31) {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
@@ -918,54 +933,54 @@ sub to_bytecode {
         _to_keyed_integer($_);
         push @{$_->[0]}, ['s',$1];
       }
-      elsif($temp=~s/^($flt_re)//) {
+      elsif($temp=~s/^($flt_re)//o) {
         $suffixes .= "_nc";
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
-      elsif($temp=~s/^\[($str_re)\]//) {
+      elsif($temp=~s/^\[($str_re)\]//o) {
         $suffixes .= "_sc";
         _to_keyed($_);
         push @{$_->[0]}, $self->_string_constant($1);
       }
-      elsif($temp=~s/^\[($bin_re)\]//) { # P3[0b11101]
+      elsif($temp=~s/^\[($bin_re)\]//o) { # P3[0b11101]
         my $val = $1;$val=~s/0b//;
         $suffixes .= "_ic";
         _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
-      elsif($temp=~s/^\[($hex_re)\]//) { # P7[0x1234]
+      elsif($temp=~s/^\[($hex_re)\]//o) { # P7[0x1234]
         $suffixes .= "_ic";
         _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
-      elsif($temp=~s/^\[($dec_re)\]//) { # P14[3]
+      elsif($temp=~s/^\[($dec_re)\]//o) { # P14[3]
         $suffixes .= "_ic";
         _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',0+$1];
       }
-      elsif($temp=~s/^\[($flt_re)\]//) {
+      elsif($temp=~s/^\[($flt_re)\]//o) {
         $suffixes .= "_nc";
 	_to_keyed($_);
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
-      elsif($temp=~s/^($bin_re)//) {     # 0b1101
+      elsif($temp=~s/^($bin_re)//o) {     # 0b1101
         my $val = $1;$val=~s/0b//;
         $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
-      elsif($temp=~s/^($hex_re)//) {     # 0x12aF
+      elsif($temp=~s/^($hex_re)//o) {     # 0x12aF
         $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
-      elsif($temp=~s/^($dec_re)//) {     # -32
+      elsif($temp=~s/^($dec_re)//o) {     # -32
         $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',0+$1];
       }
-      elsif($temp=~s/^($str_re)//) {     # "Hello World"
+      elsif($temp=~s/^($str_re)//o) {     # "Hello World"
         $suffixes .= "_sc";
         push @{$_->[0]}, $self->_string_constant($1);
       }
-      elsif($temp=~s/^($label_re)//) {
+      elsif($temp=~s/^($label_re)//o) {
         unless(defined $self->{global_labels}{$1}) {
           print STDERR "Couldn't find global label '$1' at line $_->[1].\n";
           last;
