@@ -362,11 +362,14 @@ ret:
   end
 _sub:
   if I0, (\S+)
-  branch (\S*)
+  set I16, 1
+  bsr (\S+)
+  branch (\S+)
 \1:
-\2:
+\3:
   print P5
-  end/
+  end
+\2:/
 OUT
 
 output_like(<<'CODE', <<'OUT', "proto call, sub multiple returns");

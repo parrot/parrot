@@ -49,7 +49,6 @@
 	.local pmc MVWADDSTR
 	.local pmc CURS_SET
 	.local int has_usleep
-	.local int sizef
 	.local int size
 	.local int stop
 	.local int sleep_lim
@@ -58,7 +57,7 @@
 
 
 	# 15 * sizef is real size of world
-	sizef = 5
+	.const int sizef = 5
 	# if sizef > sleep_lim then sleep
 	sleep_lim = 1
 	# if sleeping then that long usec
@@ -123,10 +122,6 @@
 	P5 = STDSCR
 	I5 = 1
 	invoke
-
-	if sizef > 0 goto ok_s
-	sizef = 1
-ok_s:
 
 	size = 15 * sizef
 
@@ -448,15 +443,11 @@ check_dead:
 check_alive:
 	if count < 2 goto space
 	if count > 3 goto space
-	branch star
-
-space:	# is space already
-	branch iter_done
 star:
 	substr new_world, pos, 1, "*"
-iter_done:
+space:	# is space already
 	inc pos
-	lt pos, len, genloop
+	if pos < len goto genloop
 done:
 	if  new_world != world goto dif
 	   sleep 2
