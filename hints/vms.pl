@@ -1,5 +1,8 @@
-$c{ccflags} = "/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/include=[.include]";
-
+use Cwd;
+$c{ccflags} = "/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/include=([.include],\"/here\")";
+if (!defined $c{exe}) {
+  $c{exe} = "exe";
+}
 {
 	local $^W;		#no warnings on redefinition
 
@@ -7,6 +10,8 @@ $c{ccflags} = "/Standard=Relaxed_ANSI/Prefix=All/Obj=.obj/NoList/NOANSI_ALIAS/in
 	        my $name;
 		$name = shift;
 		$name = "test" unless $name;
+		print "In ", cwd(), "\n";
+		print "Doing ($c{cc} $c{ccflags} $name.c)\n";
 		system("$c{cc} $c{ccflags} $name.c") and die "C compiler died!";
 		system("link/exe=test_siz $name") and die "Link failed!";
 	};
