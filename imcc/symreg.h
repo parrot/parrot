@@ -127,7 +127,7 @@ void add_pcc_cc(SymReg *r, SymReg * arg);
 void add_pcc_result(SymReg *r, SymReg * arg);
 void add_pcc_param(SymReg *r, SymReg * arg);
 void add_pcc_return(SymReg *r, SymReg * arg);
-void add_namespace(Parrot_Interp interpreter, SymReg *sub);
+void add_namespace(Parrot_Interp interpreter, struct _IMC_Unit *);
 
 typedef enum {
 	P_NON_PROTOTYPED = 0x00,	/* must be 0 */
@@ -156,7 +156,6 @@ struct pcc_sub_t {
     int nci;
     int label;
     SymReg * object;
-    SymReg * namespace;
 };
 
 

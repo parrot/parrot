@@ -40,11 +40,11 @@ OKAY:
     push paths, "."
     push paths, $S0
     push paths, root
-    
+
     # create includes array
     includes = new .PMCArray
     store_global "_parrotlib", "include_paths", includes
-    
+
     # get the directory handler
     $P0 = find_global "_parrotlib::internal", "handle_directory"
 
@@ -76,10 +76,10 @@ This function returns the absolute filename of the requested file.
 
 .sub include_file_location
     .param string name
-    
+
     find_global $P0, "_parrotlib", "include_paths"
     $S0 = find_file_path( name, $P0 )
-    
+
     .pcc_begin_return
     .return $S0
     .pcc_end_return
@@ -99,7 +99,7 @@ This function returns the absolute filename of the requested file.
 
     find_global $P0, "_parrotlib", "include_paths"
     $S0 = find_file_path( name, $P0 )
-    
+
     .pcc_begin_return
     .return $S0
     .pcc_end_return
@@ -139,7 +139,7 @@ Returns the location of a dynamic extension.
     # file not found, give the OS a chance to locate it
     name = clone request
     concat name, ext
-        
+
 END:
     .pcc_begin_return
     .return name
@@ -154,7 +154,7 @@ END:
     .param pmc array
     .local string ret
     .local pmc iter
-    
+
     iter = new .Iterator, array
     iter = 0 #ITERATE_FROM_START
 
@@ -174,10 +174,10 @@ END:
 .sub handle_directory
     .param string name
     .local string path
-    
+
     getprop $P0, "path", P0
     path = $P0
-    
+
     $S0 = clone path
     concat $S0, name
     stat $I0, $S0, 0
@@ -192,7 +192,7 @@ OK:
 .sub set_signature
     .param string name
     .param string sig
-    
+
     $P1 = new .PerlString
     $P1 = sig
     find_global $P0, "_parrotlib", name

@@ -37,6 +37,7 @@ typedef struct _IMC_Unit {
     struct _IMC_Unit * prev;
     struct _IMC_Unit * next;
     int local_count;
+    SymReg *namespace;
 } IMC_Unit;
 
 

@@ -46,6 +46,8 @@ struct subs {
     int n_basic_blocks;                 /* block count */
     SymReg * labels[HASH_SIZE];         /* label names */
     SymReg * bsrs[HASH_SIZE];           /* bsr, set_addr locations */
+    IMC_Unit * unit;
+    int pmc_const;                       /* index in const table */
     struct subs *prev;
     struct subs *next;
 };
@@ -217,10 +219,13 @@ static void
 make_new_sub(Interp *interpreter, IMC_Unit * unit)
 {
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
+
     if (!s)
         fatal(1, "get_old_size", "Out of mem");
     s->prev = globals.cs->subs;
     s->next = NULL;
+    s->unit = unit;
+    s->pmc_const = -1;
     if (globals.cs->subs)
         globals.cs->subs->next = s;
     if (!globals.cs->first)
@@ -232,7 +237,6 @@ make_new_sub(Interp *interpreter, IMC_Unit * unit)
     }
 #else
     UNUSED(interpreter);
-    UNUSED(unit);
 #endif
 }
 
@@ -442,14 +446,21 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
 
 /* get a global label, return the pc (absolute) */
 static SymReg *
-find_global_label(char *name, int *pc)
+find_global_label(char *name, struct subs *sym, int *pc, struct subs **s1)
 {
     SymReg * r;
     struct subs *s;
     *pc = 0;
     for (s = globals.cs->first; s; s = s->next) {
+        if (sym && (
+                ((sym->unit->namespace && s->unit->namespace) &&
+                 sym->unit->namespace == s->unit->namespace)
+                || (sym->unit->namespace && !s->unit->namespace)
+                || (!sym->unit->namespace && s->unit->namespace)))
+            continue;
         if ( (r = _get_sym(s->labels, name)) ) {
             *pc += r->color;    /* here pc was stored */
+            *s1 = s;
             return r;
         }
         *pc += s->size;
@@ -463,8 +474,9 @@ fixup_bsrs(Interp *interpreter)
 {
     int i, pc, addr;
     SymReg * bsr, *lab;
-    struct subs *s;
+    struct subs *s, *s1;
     int jumppc = 0;
+    int pmc_const;
 
     for (s = globals.cs->first; s; s = s->next) {
         for (i = 0; i < HASH_SIZE; i++) {
@@ -481,31 +493,33 @@ fixup_bsrs(Interp *interpreter)
                 }
                 addr = jumppc + bsr->color;
                 if (bsr->set == 'p') {
-                    struct PackFile_FixupEntry *fe;
-
-                    lab = find_global_label(bsr->name, &pc);
+                    /*
+                     * first try with matching namespace
+                     */
+                    lab = find_global_label(bsr->name, s, &pc, &s1);
+                    /*
+                     * if failed use any matching name
+                     */
+                    if (!lab)
+                        lab = find_global_label(bsr->name, NULL, &pc, &s1);
                     if (!lab) {
                         fatal(1, "fixup_bsrs", "couldn't find sub 1 '%s'\n",
                                 bsr->name);
                     }
-                    /*
-                     * TODO investigate namespace issues - probably
-                     *      search only current segment
-                     */
-                    fe = PackFile_find_fixup_entry(interpreter, enum_fixup_sub,
-                            bsr->name);
-                    if (!fe) {
-                        fatal(1, "fixup_bsrs", "couldn't find sub 2 '%s'\n",
+                    pmc_const = s1->pmc_const;
+                    if (pmc_const < 0) {
+                        fatal(1, "fixup_bsrs",
+                                "couldn't find sub 2 '%s'\n",
                                 bsr->name);
                     }
                     interpreter->code->byte_code[addr+bsr->score] =
-                        fe->offset;
+                        pmc_const;
                     debug(interpreter, DEBUG_PBC_FIXUP, "fixup const PMC"
                             " sub '%s' const nr: %d\n", bsr->name,
-                            fe->offset);
+                            pmc_const);
                     continue;
                 }
-                lab = find_global_label(bsr->name, &pc);
+                lab = find_global_label(bsr->name, NULL, &pc, &s1);
                 if (!lab) {
                     /* TODO continue; */
                     /* do fixup at runtime */
@@ -590,8 +604,8 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     char *real_name;
     char *class;
 
-    if (r->pcc_sub->namespace) {
-        ns = r->pcc_sub->namespace->reg;
+    if (globals.cs->subs->unit->namespace) {
+        ns = globals.cs->subs->unit->namespace->reg;
         if (ns->set == 'K')
             ns->color = build_key(interpreter, ns);
         debug(interpreter, DEBUG_PBC_CONST,
@@ -628,7 +642,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type = PFC_PMC;
     interpreter->code->const_table->constants[k]->u.key = pfc->u.key;
-    r->color = k;
+    globals.cs->subs->pmc_const = k;
 
     debug(interpreter, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n\t%s\n",

@@ -136,19 +136,25 @@ mk_pcc_sub(char * name, int proto) {
  * add current namespace to sub decl
  */
 void
-add_namespace(Parrot_Interp interpreter, SymReg *sub)
+add_namespace(Parrot_Interp interpreter, IMC_Unit *unit)
 {
     SymReg *ns = IMCC_INFO(interpreter)->cur_namespace;
     SymReg *r, *g;
 
     if (!ns || strlen(ns->name) <= 2)
         return;
-    g = dup_sym(ns);
-    sub->pcc_sub->namespace = g;
-    g->reg = ns;
-    g->type = VT_CONSTP;
-    if (! (r = _get_sym(ghash, g->name)) || r->type != VT_CONSTP )
-        _store_symreg(ghash, g);
+    if (unit->namespace)
+        return;
+    if (unit->prev && unit->prev->namespace == ns)
+        unit->namespace = ns;
+    else {
+        g = dup_sym(ns);
+        unit->namespace = g;
+        g->reg = ns;
+        g->type = VT_CONSTP;
+        if (! (r = _get_sym(ghash, g->name)) || r->type != VT_CONSTP )
+            _store_symreg(ghash, g);
+    }
 }
 
 /*

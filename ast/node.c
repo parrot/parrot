@@ -736,7 +736,7 @@ exp_Function(Interp* interpreter, nodeType *p)
     ins = INS_LABEL(cur_unit, sub, 1);
 
     ins->r[1] = mk_pcc_sub(str_dup(ins->r[0]->name), 0);
-    add_namespace(interpreter, ins->r[1]);
+    add_namespace(interpreter, cur_unit);
     ins->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
 
     regs[0] = get_const("-1", 'I');
@@ -897,7 +897,7 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
     ins = INS_LABEL(cur_unit, sub, 1);
 
     ins->r[1] = mk_pcc_sub(str_dup(ins->r[0]->name), 0);
-    add_namespace(interpreter, ins->r[1]);
+    add_namespace(interpreter, cur_unit);
     ins->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
     regs[0] = get_const("0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);

@@ -425,7 +425,7 @@ pasm_inst:         { clear_state(); }
                    {
                      $$ = iSUBROUTINE(cur_unit, mk_sub_label($3));
                      $$->r[1] = mk_pcc_sub(str_dup($$->r[0]->name), 0);
-                     add_namespace(interp, $$->r[1]);
+                     add_namespace(interp, cur_unit);
                      $$->r[1]->pcc_sub->pragma = $2;
                    }
    | /* none */    { $$ = 0;}
@@ -448,10 +448,19 @@ emit:
    ;
 
 class_namespace:
-    NAMESPACE '[' keylist ']'  { $$=0;
-                                 IMCC_INFO(interp)->cur_namespace = $3;
-                                 cur_namespace = $3;
-                                 }
+    NAMESPACE '[' keylist ']'
+                {
+                    int re_open = 0;
+                    $$=0;
+                    if (pasm_file && cur_namespace) {
+                        imc_close_unit(interp, cur_unit);
+                        re_open = 1;
+                    }
+                    IMCC_INFO(interp)->cur_namespace = $3;
+                    cur_namespace = $3;
+                    if (re_open)
+                        cur_unit = imc_open_unit(interp, IMC_PASM);
+                }
    ;
 
 class:
@@ -526,7 +535,7 @@ sub:
         {
           Instruction *i = iSUBROUTINE(cur_unit, $3);
           i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
-          add_namespace(interp, i->r[1]);
+          add_namespace(interp, cur_unit);
           i->r[1]->pcc_sub->pragma = $4;
         }
      sub_params
@@ -554,7 +563,7 @@ pcc_sub:
          {
             Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
             i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
-            add_namespace(interp, i->r[1]);
+            add_namespace(interp, cur_unit);
             i->r[1]->pcc_sub->pragma = $4;
          }
      pcc_params
