@@ -40,8 +40,8 @@
 */
 void *
 mem_allocate_aligned(INTVAL size) {
-    ptrcast_t max_to_alloc;
-    ptrcast_t mask;
+    ptrcast_t max_to_alloc = 0;
+    ptrcast_t mask = 0;
     ptrcast_t i;
     void *mem = NULL;
     
