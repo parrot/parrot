@@ -67,6 +67,26 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     return s;
 }
 
+/*=for api string string_grow
+ * grow the string buffer by addlen bytes
+ */
+STRING *
+string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
+    void * newbuf;
+    INTVAL copysize = s->bufused;
+    if(addlen < 0)
+        copysize += addlen;
+    if(copysize <= 0)
+        return s;
+    /* Don't check buflen, if we are here, we already checked */
+    newbuf = Parrot_allocate(interpreter, s->buflen + addlen);
+    mem_sys_memcopy(newbuf, s->bufstart, (UINTVAL)copysize);
+    free_buffer(s->bufstart);
+    s->bufstart = newbuf;
+    s->buflen += addlen;
+    return s;
+}
+
 /*=for api string string_destroy
  * free the strings memory
  */
@@ -391,6 +411,126 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
     if (d != NULL) {
         *d = dest;
     }
+    return dest;
+}
+
+/*
+ * This should follow the Perl semantics for:
+ *      substr EXPR, OFFSET, LENGTH, REPLACEMENT
+ * Replace substring of src with rep, returning what was there before.
+ * Replacing a slice with a longer string grows the string;
+ *      a shorter string shrinks it.
+ * Replacing 2 past the end of the string is undefined.
+ *      however replacing 1 past does a concat. 
+ * A negative offset is allowed to replace from the end.
+ */
+STRING *
+string_replace(struct Parrot_Interp *interpreter, STRING *src,
+              INTVAL offset, INTVAL length, const STRING *rep, STRING **d)
+{
+    STRING *dest;
+    UINTVAL substart_off;       /* Offset from start of string to our
+                                 * piece */
+    UINTVAL subend_off;         /* Offset from start of string to the
+                                 * end of our piece */
+    UINTVAL true_offset;
+    UINTVAL true_length;
+    UINTVAL new_length;
+    UINTVAL new_size;
+    INTVAL diff;
+        
+    true_offset = (UINTVAL)offset;
+    true_length = (UINTVAL)length;
+
+    if(rep->encoding != src->encoding || rep->type != src->type)
+        rep = string_transcode(interpreter, rep, src->encoding, src->type, NULL);
+
+    /* abs(-offset) may not be > strlen-1 */
+    if (offset < 0) {
+        true_offset = (UINTVAL)(src->strlen + offset);
+    }
+
+    /* Can replace 1 past end of string which is technically outside the string
+     * but is same as a concat().
+     * Only give exception if caller trys to replace end of string + 2
+     */
+    if (true_offset > src->strlen) {
+        internal_exception(SUBSTR_OUT_OF_STRING,
+                           "Can only replace inside string or index after end of string");
+    }
+    if (true_length > (src->strlen - true_offset)) {
+        true_length = (UINTVAL)(src->strlen - true_offset);
+    }
+
+    /* Save the substring that is replaced for the return value */
+    substart_off = (char *)src->encoding->skip_forward(src->bufstart,
+                                                       true_offset) -
+        (char *)src->bufstart;
+    subend_off =
+        (char *)src->encoding->skip_forward((char *)src->bufstart +
+                                            substart_off,
+                                            true_length) -
+        (char *)src->bufstart;
+
+    dest =
+        string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
+                    src->encoding, 0, src->type);
+
+    if (subend_off < substart_off) {
+        internal_exception(SUBSTR_OUT_OF_STRING,
+                           "subend somehow is less than substart");
+    }
+
+    mem_sys_memcopy(dest->bufstart, (char *)src->bufstart + substart_off,
+                    (unsigned)(subend_off - substart_off));
+    dest->bufused = subend_off - substart_off;
+    dest->strlen = true_length;
+
+    if (d != NULL) {
+        *d = dest;
+    }
+    
+    /* Now do the replacement */
+    
+    /*
+     * If the replacement string fits inside the original substring
+     * don't create a new string, just pack it.
+     */
+    diff = dest->bufused - rep->bufused;
+                
+    if(diff >= 0
+        || (INTVAL)(src->bufused - src->buflen) <= diff) {      
+            
+        mem_sys_memcopy((char*)src->bufstart + substart_off,
+                                rep->bufstart, rep->bufused);
+        if(diff > 0) {
+            mem_sys_memmove((char*)src->bufstart + substart_off + rep->bufused,
+                                (char*)src->bufstart + subend_off,
+                                src->buflen - (subend_off - diff));
+            src->bufused -= diff;
+            (void)string_compute_strlen(src);    
+        }
+    }
+    /*
+     * Replacement is larger than avail buffer, grow the string
+     */
+    else {
+        /* diff is negative here, make it positive */
+        diff = -(diff);
+        string_grow(interpreter, src, diff);
+        
+        /* Move the end of old string that isn't replaced to new offset first */
+        mem_sys_memmove((char*)src->bufstart + subend_off + diff,
+                                (char*)src->bufstart + subend_off,
+                                src->buflen - subend_off);
+        /* Copy the replacement in */
+        mem_sys_memcopy((char *)src->bufstart + substart_off, rep->bufstart,
+                                rep->bufused);
+        src->bufused += diff;
+        (void)string_compute_strlen(src);
+    } 
+
+    /* src is modified, now return the original substring */    
     return dest;
 }
 

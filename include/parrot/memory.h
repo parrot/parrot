@@ -30,6 +30,7 @@ void mem_setup_allocator(struct Parrot_Interp *);
 #define mem_allocate_new_stash() NULL
 #define mem_allocate_new_stack() NULL
 #define mem_sys_memcopy memcpy
+#define mem_sys_memmove memmove
 #define Parrot_mark_used_memory(a, b, c) mem_realloc(a, b, c, c)
 
 #endif

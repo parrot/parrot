@@ -23,6 +23,8 @@ STRING *Parrot_string_repeat(Parrot, const STRING *, UINTVAL, STRING **);
 STRING *Parrot_string_chopn(STRING *, INTVAL);
 STRING *Parrot_string_substr(Parrot, const STRING *, INTVAL,
                              INTVAL, STRING **);
+STRING *Parrot_string_replace(Parrot, STRING *, INTVAL, INTVAL,
+                             const STRING *, STRING **);
 INTVAL Parrot_string_compare(Parrot, const STRING *, const STRING *);
 Parrot_Bool Parrot_string_bool(const STRING *);
 
@@ -31,6 +33,7 @@ UINTVAL Parrot_string_length(const STRING *);
 INTVAL Parrot_string_ord(const STRING *, INTVAL idx);
 FLOATVAL Parrot_string_to_num(const STRING *);
 INTVAL Parrot_string_to_int(const STRING *);
+STRING * Parrot_string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen);
 void Parrot_string_destroy(STRING *);
 STRING *Parrot_string_make(struct Parrot_Interp *, const void *buffer,
                            UINTVAL buflen, const ENCODING *, UINTVAL flags,
@@ -49,6 +52,7 @@ INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
 #define string_repeat           Parrot_string_repeat
 #define string_chopn            Parrot_string_chopn
 #define string_substr           Parrot_string_substr
+#define string_replace          Parrot_string_replace
 #define string_compare          Parrot_string_compare
 #define string_bool             Parrot_string_bool
 
@@ -56,6 +60,7 @@ INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
 #define string_ord              Parrot_string_ord
 #define string_to_num           Parrot_string_to_num
 #define string_to_int           Parrot_string_to_int
+#define string_grow             Parrot_string_grow
 #define string_destroy          Parrot_string_destroy
 #define string_make             Parrot_string_make
 #define string_copy             Parrot_string_copy
