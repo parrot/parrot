@@ -1,7 +1,7 @@
 /* default.pmc
  *  Copyright: (When this is determined...it will go here)
- *  CVS Info
- *     $Id: genclass.pl,v 1.6 2001/11/25 12:56:01 simon Exp   Overview:
+ *  CVS Info $Id$
+ *  Overview:
  *     These are the vtable functions for the default base class
  *  Data Structure and Algorithms:
  *  History:
@@ -38,189 +38,449 @@ pmclass default noinit {
    }
 
    INTVAL get_integer () {
+     return SELF->cache.int_val;
    }
 
    INTVAL get_integer_index (INTVAL index) {
    }
 
    FLOATVAL get_number () {
+     return SELF->cache.num_val;
    }
 
    FLOATVAL get_number_index (INTVAL index) {
    }
 
    STRING* get_string () {
+     STRING *s = string_copy(INTERP, SELF->cache.struct_val);
+     return s;
    }
 
    STRING* get_string_index (INTVAL index) {
    }
 
    BOOLVAL get_bool () {
+     /*  Everything has to be true */
+     if (   SELF->vtable->get_integer(INTERP, SELF) == 0 
+	 && SELF->vtable->get_number(INTERP, SELF) == 0.0
+	 && string_bool(SELF->vtable->get_string(INTERP, SELF))
+	    )
+       {
+	 return 0;
+       }
+     return 1;
    }
 
    void* get_value () {
+     return SELF->cache.struct_val;
    }
 
    BOOLVAL is_same (PMC* pmc2) {
+     /* I think this should cover this correctly, is_same implies that
+	same B<data> used by each, but as meaning of data is a little
+	vtable reliant, I include that test as well */
+     return SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache;
    }
 
+   /* In the set_* methods, we assume a little bit of knowledge
+      of perl's internal types, so as to save a bit of hassle */
+
    void set_integer (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+     SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+     SELF->cache.int_val = value;
    }
 
    void set_integer_bigint (BIGINT value) {
+     /*SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]);*/
+     /* XXX: do something to copy the BigInt .. */
    }
 
    void set_integer_same (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+     SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
    }
 
    void set_integer_index (INTVAL value, INTVAL index) {
    }
 
    void set_number (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+     SELF->cache.num_val = value->vtable->get_number(INTERP, value);
    }
 
    void set_number_native (FLOATVAL value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+     SELF->cache.num_val = value;
    }
 
    void set_number_bigfloat (BIGFLOAT value) {
+     /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
+     /* will want to use bignum library to copy bignum... */
    }
 
    void set_number_same (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
+     SELF->cache.num_val = value->vtable->get_number(INTERP, value);
    }
 
    void set_number_index (FLOATVAL value, INTVAL index) {
    }
 
    void set_string (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+     SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
    }
 
    void set_string_native (STRING * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+     SELF->cache.struct_val = string_copy(INTERP, value);
    }
 
    void set_string_unicode (STRING * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+     SELF->cache.struct_val = string_copy(INTERP, value);
    }
 
    void set_string_other (STRING * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+     SELF->cache.struct_val = string_copy(INTERP, value);
    }
 
    void set_string_same (PMC * value) {
+     SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+     SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
    }
 
    void set_string_index (STRING * string, INTVAL index) {
    }
 
    void set_value (void* value) {
+     SELF->cache.struct_val = value;
    }
 
    void add (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             + value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void add_int (INTVAL value,  PMC* dest) {
+     /* dest = SELF + value */
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             + value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void add_bigint (BIGINT value,  PMC* dest) {
+     /* XXX: bigint magic */
    }
 
    void add_float (FLOATVAL value,  PMC* dest) {
+     /* dest = SELF + value */
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             + value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void add_bigfloat (BIGFLOAT value,  PMC* dest) {
+     /* XXX: bigfloat magic */
    }
 
    void add_same (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             + value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void subtract (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             - value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void subtract_int (INTVAL value,  PMC* dest) {
+     /* dest = SELF - value */
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             - value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void subtract_bigint (BIGINT value,  PMC* dest) {
+     /* XXX: bigint magic */
    }
 
    void subtract_float (FLOATVAL value,  PMC* dest) {
+     /* dest = SELF - value */
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             - value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void subtract_bigfloat (BIGFLOAT value,  PMC* dest) {
+     /* XXX: bigfloat magic */
    }
 
    void subtract_same (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             - value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void multiply (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             * value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void multiply_int (INTVAL value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             * value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void multiply_bigint (BIGINT value,  PMC* dest) {
    }
 
    void multiply_float (FLOATVAL value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             * value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void multiply_bigfloat (BIGFLOAT value,  PMC* dest) {
+     /* XXX: bigfloat magic */
    }
 
    void multiply_same (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             * value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void divide (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             / value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void divide_int (INTVAL value,  PMC* dest) {
+     /* dest = SELF / value */
+
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             / value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void divide_bigint (BIGINT value,  PMC* dest) {
    }
 
    void divide_float (FLOATVAL value,  PMC* dest) {
+     /* dest = SELF / value */
+
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             / value;
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void divide_bigfloat (BIGFLOAT value,  PMC* dest) {
    }
 
    void divide_same (PMC * value,  PMC* dest) {
+     /* XXX: overflow detection, bignum promotion? */
+
+     FLOATVAL result;
+
+     result = SELF->vtable->get_number(INTERP, SELF)
+             / value->vtable->get_number(INTERP, value);
+
+     dest->vtable->set_number_native(INTERP, dest, result);
    }
 
    void modulus (PMC * value,  PMC* dest) {
+     /* This does perl-like modulus */
+
+     INTVAL result;
+
+     result = SELF->vtable->get_integer(INTERP, SELF)
+             % value->vtable->get_integer(INTERP, value);
+
+     dest->vtable->set_integer_native(INTERP, dest, result);
    }
 
    void modulus_int (INTVAL value,  PMC* dest) {
+     INTVAL result;
+
+     result = SELF->vtable->get_integer(INTERP, SELF)
+             % value;
+
+     dest->vtable->set_integer_native(INTERP, dest, result);
    }
 
    void modulus_bigint (BIGINT value,  PMC* dest) {
+     /*  lala, I can't hear you */
    }
 
-   void modulus_float (FLOATVAL value,  PMC* dest) {
+   void modulus_float (INTVAL value,  PMC* dest) {
+     /* XXX: makes all arguments integers...*/
+     INTVAL result;
+
+     result = SELF->vtable->get_integer(INTERP, SELF)
+             % (INTVAL)value;
+
+     dest->vtable->set_integer_native(INTERP, dest, result);
    }
 
    void modulus_bigfloat (BIGFLOAT value,  PMC* dest) {
+     /*  Can't sleep, clown'll eat me */
    }
 
    void modulus_same (PMC * value,  PMC* dest) {
+     /* This does perl-like modulus */
+     INTVAL result;
+
+     result = SELF->vtable->get_integer(INTERP, SELF)
+             % value->vtable->get_integer(INTERP, value);
+
+     dest->vtable->set_integer_native(INTERP, dest, result);
    }
 
    void concatenate (PMC * value,  PMC* dest) {
+     STRING *s =
+       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
+		      value->vtable->get_string(INTERP, value), 0);
+
+     dest->vtable->set_string_native(INTERP, dest, s);
    }
 
    void concatenate_native (STRING * value,  PMC* dest) {
+     /* dest = SELF (concat) value */
+     STRING *s =
+       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
+		      value, 0);
+
+     dest->vtable->set_string_native(INTERP, dest, s);
    }
 
    void concatenate_unicode (STRING * value,  PMC* dest) {
+     /* dest = SELF (concat) value */
+     STRING *s =
+       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
+		      value, 0);
+
+     dest->vtable->set_string_native(INTERP, dest, s);
    }
 
    void concatenate_other (STRING * value,  PMC* dest) {
+     /* dest = SELF (concat) value */
+     STRING *s =
+       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
+		      value, 0);
+
+     dest->vtable->set_string_native(INTERP, dest, s);
    }
 
    void concatenate_same (PMC * value,  PMC* dest) {
+     STRING *s =
+       string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
+		      value->vtable->get_string(INTERP, value), 0);
+
+     dest->vtable->set_string_native(INTERP, dest, s);
    }
 
    BOOLVAL is_equal (PMC* value) {
+     /* I think we need to check everything, do the easiest first... */
+     if (    SELF->vtable->get_integer(INTERP, SELF)
+	  == value->vtable->get_integer(INTERP, value)
+	  && SELF->vtable->get_number(INTERP, SELF)
+	  == value->vtable->get_number(INTERP, value)
+	  && 0 == string_compare(INTERP,
+			    SELF->vtable->get_string(INTERP, SELF),
+			    value->vtable->get_string(INTERP, value))
+	 )
+       {
+	 return 1;
+       }
+     return 0;
    }
 
    void logical_or (PMC* value,  PMC* dest) {
@@ -237,7 +497,10 @@ pmclass default noinit {
         );
    }
 
-   void logical_not (PMC* value) {
+   void logical_not (PMC* dest) {
+     dest->vtable->
+       set_integer_native(INTERP, dest,
+			  !SELF->vtable->get_bool(INTERP, SELF));
    }
 
    void match (PMC * value,  REGEX* re) {
@@ -256,28 +519,39 @@ pmclass default noinit {
    }
 
    void repeat (PMC * value,  PMC* dest) {
-	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
-	dest->cache.struct_val =
-           string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-	                 value->vtable->get_integer(INTERP, value), NULL
-	                 );
+     dest->vtable->set_string_native(INTERP, dest,
+	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+		       value->vtable->get_integer(INTERP, value), NULL) );
    }
 
    void repeat_native (STRING * value,  PMC* dest) {
+     /* dest = value (repeat) SELF */
+     dest->vtable->set_string_native(INTERP, dest,
+	 string_repeat(INTERP, value,
+		       SELF->vtable->get_integer(INTERP,SELF),
+		       NULL) );
    }
 
    void repeat_unicode (STRING * value,  PMC* dest) {
+     /* dest = value (repeat) SELF */
+     dest->vtable->set_string_native(INTERP, dest,
+	 string_repeat(INTERP, value,
+		       SELF->vtable->get_integer(INTERP,SELF),
+		       NULL) );
    }
 
    void repeat_other (STRING * value,  PMC* dest) {
+     /* dest = value (repeat) SELF */
+     dest->vtable->set_string_native(INTERP, dest,
+	 string_repeat(INTERP, value,
+		       SELF->vtable->get_integer(INTERP,SELF),
+		       NULL) );
    }
 
    void repeat_same (PMC * value,  PMC* dest) {
- 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
-	dest->cache.struct_val =
-           string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
-	                 value->vtable->get_integer(INTERP, value), NULL
-	                 );
+     dest->vtable->set_string_native(INTERP, dest,
+	 string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+		       value->vtable->get_integer(INTERP, value), NULL) );
   }
 
 }
