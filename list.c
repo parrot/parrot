@@ -1149,12 +1149,28 @@ list_delete(Interp *interpreter, List *list,
             if (!(chunk->data.flags & sparse)) {
                 chunk->data.flags = no_power_2;
                 if (idx + n_items <= (INTVAL)chunk->items) {
+#ifdef __LCC__
+		    /* LCC has a bug where it can't handle all the temporary
+		     * variables created in this one line.  adding an explicit
+		     * one fixes things.   No need to force this workaround
+		     * on less brain-damaged compilers though */
+                    size_t tmp_size = (chunk->items - idx - n_items) * 
+		                      list->item_size;
+		   
+                    mem_sys_memmove(
+                            (char *)chunk->data.bufstart +
+                            idx * list->item_size,
+                            (char *)chunk->data.bufstart +
+                            (idx + n_items) * list->item_size,
+			    tmp_size);
+#else		   
                     mem_sys_memmove(
                             (char *)chunk->data.bufstart +
                             idx * list->item_size,
                             (char *)chunk->data.bufstart +
                             (idx + n_items) * list->item_size,
                             (chunk->items - idx - n_items) * list->item_size);
+#endif		   
                 }
             }
             chunk->items -= n_items;
