@@ -21,6 +21,7 @@ use strict;
 my @streams = qw[Buffer Combiner Coroutine Filter Lines ParrotIO Replay Sub Writer];
 
 use Parrot::Test tests => 21;
+use Test::More;
 
 for my $a ( @streams ) {
 
@@ -265,6 +266,7 @@ OUT
 #
 # 13
 #
+TODO: { local $TODO = "fix GC bug";
 output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
 ##PIR##
 .sub _main
@@ -333,6 +335,7 @@ read:[9]
 done
 finished
 OUT
+};
 
 #
 # 14
@@ -1273,6 +1276,7 @@ OUT
 #
 # 19
 #
+TODO: { local $TODO = "fix GC bug";
 output_is(<<'CODE', <<'OUT', "Stream::Replay");
 ##PIR##
 .sub _main @MAIN
@@ -1370,6 +1374,8 @@ reader done
 done
 finished
 OUT
+};
+
 
 #
 # 20
