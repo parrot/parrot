@@ -67,11 +67,11 @@ new_continuation(struct Parrot_Interp *interp, opcode_t *address)
  * Uses scope_index to find and return the appropriate scope.
  */
 static struct Parrot_Lexicals *
-scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad, 
+scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
                  INTVAL scope_index)
 {
     /* if scope_index is negative we count out from current pad */
-    scope_index = scope_index < 0 ? 
+    scope_index = scope_index < 0 ?
         pad->cache.int_val + scope_index : scope_index;
 
     if (scope_index >= pad->cache.int_val || scope_index < 0) {
@@ -85,20 +85,20 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
 /*
  * Returns a pointer to the current scratchpad.
  */
-PMC * 
+PMC *
 scratchpad_get_current(struct Parrot_Interp * interp)
 {
     return (PMC *)stack_peek(interp, interp->ctx.pad_stack, NULL);
 }
 
-/* 
+/*
  * Returns the position of the lexical variable corresponding to
  * name. If such a variable can not be found the length of the list
  * is returned (i.e. the position that this new lexical should be
  * stored in).
  */
 static INTVAL
-lexicals_get_position(struct Parrot_Interp * interp, 
+lexicals_get_position(struct Parrot_Interp * interp,
                       struct Parrot_Lexicals *lex, STRING* name)
 {
     STRING * cur;
@@ -153,27 +153,32 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     }
 
     if ((depth < 0)
-        || (base && depth > base->cache.int_val) 
+        || (base && depth > base->cache.int_val)
         || (!base && depth != 0)) {
         internal_exception(-1, "-scratch_pad: too deep\n");
         return NULL;
     }
 
     /* XXX JPS: should we use a List * here instead? */
-    pad_pmc->data = mem_sys_allocate((depth + 1) * 
+    pad_pmc->data = mem_sys_allocate((depth + 1) *
                                      sizeof(struct Parrot_Lexicals));
 
     if (base) {
-        memcpy(pad_pmc->data, base->data, depth * 
+        memcpy(pad_pmc->data, base->data, depth *
                sizeof(struct Parrot_Lexicals));
     }
 
     lex = mem_sys_allocate(sizeof(struct Parrot_Lexicals));
+    lex->names = NULL;
+    lex->values = NULL;
+    /* the list_new below might trigger GC, so anchor the lex structure
+     * early
+     */
+    ((struct Parrot_Lexicals **)pad_pmc->data)[depth] = lex;
+    pad_pmc->cache.int_val = depth + 1;
     lex->values = list_new(interp, enum_type_PMC);
     lex->names = list_new(interp, enum_type_STRING);
 
-    ((struct Parrot_Lexicals **)pad_pmc->data)[depth] = lex;
-    pad_pmc->cache.int_val = depth + 1;
     return pad_pmc;
 }
 
@@ -186,17 +191,17 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
  */
 
 void
-scratchpad_store(struct Parrot_Interp * interp, PMC * pad, 
+scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
                  STRING * name, INTVAL position, PMC* value)
 {
     struct Parrot_Lexicals * lex;
 
-    if (name) { 
+    if (name) {
         /* use name to find lex and position */
         lex = scratchpad_find(interp, pad, name, &position);
         if (!lex) internal_exception(-1, "Lexical not found");
     }
-    else { 
+    else {
         /* assume current lexical pad */
         lex = scratchpad_index(interp, pad, -1);
     }
@@ -204,9 +209,9 @@ scratchpad_store(struct Parrot_Interp * interp, PMC * pad,
     list_assign(interp, lex->values, position, value, enum_type_PMC);
 }
 
-void 
-scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad, 
-                       INTVAL scope_index, STRING * name, INTVAL position, 
+void
+scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
+                       INTVAL scope_index, STRING * name, INTVAL position,
                        PMC* value)
 {
     struct Parrot_Lexicals * lex;
@@ -229,8 +234,8 @@ scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
     list_assign(interp, lex->values, position, value, enum_type_PMC);
 }
 
-PMC * 
-scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name, 
+PMC *
+scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
                INTVAL position)
 {
     struct Parrot_Lexicals * lex = NULL;
@@ -243,12 +248,12 @@ scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name,
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
 
-PMC * 
+PMC *
 scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
                      INTVAL scope_index, STRING * name, INTVAL position)
 {
     struct Parrot_Lexicals * lex = scratchpad_index(interp, pad, scope_index);
-    
+
     if (name) {
         position = lexicals_get_position(interp, lex, name);
     }
@@ -256,22 +261,25 @@ scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
     if (!lex || position < 0 || position >= list_length(interp, lex->values)) {
         internal_exception(-1, "Lexical not found");
     }
-    
+
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
 
-PMC * 
+PMC *
 lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex, PMC * last)
 {
-    last = list_mark(interp, lex->names, last);
-    return list_mark(interp, lex->values, last);
+    if (lex->names)
+        last = list_mark(interp, lex->names, last);
+    if (lex->values)
+        last = list_mark(interp, lex->values, last);
+    return last;
 }
 
 /*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
