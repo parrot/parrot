@@ -1,12 +1,26 @@
 #!perl
+
+# $Id$
+
+=head1 NAME
+
+syn/file.t - test inclusion of files
+
+=head1 SYNOPSIS
+
+A test script which is suppossed to be called by Test::Harness.
+
+=cut
+
 use strict;
-use TestCompiler tests => 12;
+use 5;
+
 use Parrot::Config;
+use TestCompiler tests => 12;
 
 # Do not assume that . is in $PATH
 my $PARROT = ".$PConfig{slash}parrot$PConfig{exe}";
-
-# include file tests
+my $PERL5  = $PConfig{perl};
 
 ##############################
 open FOO, ">temp.pasm" or die "Cant write temp.pasm\n";
@@ -327,29 +341,35 @@ back
 OUT
 
 
-##############################
 # include a non-existent file
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
-print FOO <<'END_PIR';
+{
+  open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+  print FOO << 'END_PIR';
 # Including a non-existent file should produce an error
 .include "non_existent.imc"
-# An error should have been raises
+# An error should have been raised
 .sub _main
 # dummy, because a main function is expected
 .end
 END_PIR
-close FOO;
-# compile it
+  close FOO;
 
-open FOO, "<non_existent.file";
-my $ENOENT = $!;
-use Test::More;
-is(`$PARROT temp.imc 2>&1`, <<OUT, "calling a non-existent file");
-error:imcc:$ENOENT
+  # When Perl5 tries to open a nonexistent file, then
+  # the numeric value ENOENT or the appropriate error message is returned.
+  # Parrot dumps English error messages, so we need to make sure that
+  # Perl5  has an English locale when started.
+  my $ENOENT_msg;
+  {
+    eval { local $ENV{LANG} = 'en'; };
+    $ENOENT_msg = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print \$!'};
+  }
+  use Test::More;
+  is( qx{$PARROT temp.imc 2>&1}, <<OUT, "including a non-existent file");
+error:imcc:$ENOENT_msg
 in file 'temp.imc' line 2
 OUT
-unlink "temp.pasm";
-
+  unlink "temp.imc";
+}
 
 SKIP:
 {
@@ -388,7 +408,8 @@ back again
 OUT
 }
 
-END {
+END
+{
   unlink $file;
   unlink "temp.imc";
   unlink "temp.pbc";
