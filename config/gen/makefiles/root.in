@@ -555,7 +555,7 @@ quickfulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
-test_prep : $(LIBPARROT) assemble.pl
+test_prep : $(LIBPARROT) $(IMCC_PROG) assemble.pl
 
 test_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
