@@ -1,0 +1,33 @@
+=head1 NAME
+
+jako - No frills programming for Parrot
+
+=head1 SYNOPSIS
+
+Jako is a simple programming language that targets the Parrot
+virtual machine.
+
+=head1 DESCRIPTION
+
+No frills here, either, for now.
+
+=head1 HISTORY
+
+Jako was the first language to target the Parrot virtual machine. It was also
+the first language to support subroutines (although in a rudimentary, hackish
+way) for Parrot.
+
+=head1 AUTHOR
+
+You can blame gregor <gregor@focusresearch.com> for the Jako language and its
+compiler.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+
+=head1 LICENSE
+
+The Jako compiler is free software. It is subject to the same license as the
+Parrot interpreter.
+
