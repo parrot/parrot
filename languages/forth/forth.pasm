@@ -61,7 +61,7 @@
 
 .constant NewBodyString	S22
 
-.constant TempStr    	S23
+.constant TempStr2    	S23
 
 .constant PendingConstant S24
 .constant StringStack      S31
@@ -69,7 +69,7 @@
 #
 
 .constant PIRCompiler	P14
-.constant StringConstants P15
+.constant ConstantTable P15
 .constant CoreOps       P16
 .constant UserOps       P18
 .constant SpecialWords	P19
@@ -201,7 +201,7 @@ InitializeCoreOps:
     new .UserOps, .PerlHash
     new .SpecialWords, .PerlHash
     new .ReturnStack, .PerlArray
-    new .StringConstants, .PerlArray
+    new .ConstantTable, .PerlArray
     new .TruePMC, .Integer
     set .TruePMC, 1
     new .FalsePMC, .Integer
@@ -210,7 +210,10 @@ InitializeCoreOps:
     set .CellPMC, .CellSize   # Our cell area is 64K by default
     set .LastCellUsed, 0
     new .LabelStack, .PerlArray
-    set .StringConstants, 0
+    set .LastConstant, 0
+
+    store_global "__forth::CoreOps", .CoreOps
+    store_global "__forth::UserOps", .UserOps
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -223,6 +226,7 @@ InitializeCoreOps:
     set .SpecialWords["+loop"], 9
     set .SpecialWords["compile,"], 10
     set .SpecialWords['p"'], 11
+    set .SpecialWords["recurse"], 12
 
     .AddCoreOp(Thing_Dot,".")
     .AddCoreOp(Thing_Dot, "u.")
@@ -232,6 +236,7 @@ InitializeCoreOps:
     .AddCoreOp(Int_One_Plus,"1+")
     .AddCoreOp(Int_Sub,"-")
     .AddCoreOp(Int_One_Minus,"1-")
+    .AddCoreOp(Int_Two_Minus,"2-")
     .AddCoreOp(Int_Mul,"*")
     .AddCoreOp(Int_Div,"/")
     .AddCoreOp(Int_Mod,"mod")
@@ -246,10 +251,10 @@ InitializeCoreOps:
     # Arithmetic, Double precision
     #
 
-# s>d
-# d>s
-# d+
-# d-
+    .AddCoreOp(DoneInterpretWord, "s>d")
+    .AddCoreOp(DoneInterpretWord, "d>s")
+    .AddCoreOp(Int_Add, "d+")
+    .AddCoreOp(Int_Sub, "d-")
 # dnegate
 # dabs
 # dmin
@@ -454,14 +459,16 @@ InitializeCoreOps:
     # Memory, Dictionary allocation
     #
 
-# here
-# unused
-# allot
-# c,
+    .AddCoreOp(Here, "here")
+    .AddCoreOp(Unused, "unused")
 # f,
-# ,
+    .AddCoreOp(Comma, ",")
+    .AddCoreOp(Comma, "c,")
+    .AddCoreOp(Allot, "allot")
 # 2,
 # align
+    .AddCoreOp(DoneInterpretWord, "align")
+    .AddCoreOp(DoneInterpretWord, "aligned")
 # falign
 # sfalign
 # dfalign
@@ -610,6 +617,7 @@ InitializeCoreOps:
 # constant
 # 2constant
 # fconstant
+    .AddCoreOp(Constant, "constant")
 
     #
     # Values
@@ -643,6 +651,7 @@ InitializeCoreOps:
    .AddUserOp("bl", "32")
    .AddCoreOp(Emit, "emit")
    .AddCoreOp(Execute, "execute")
+   .AddCoreOp(Type, "type")
 
 
    #
@@ -660,6 +669,13 @@ InitializeCoreOps:
    .AddCoreOp(SingleReturnI, "resultI")
    .AddCoreOp(SingleReturnS, "resultS")
    .AddCoreOp(SingleReturnN, "resultN")
+   .AddCoreOp(ForthString_to_Parrot, "s2p")
+   .AddCoreOp(ParrotString_to_Forth, "p2f")
+
+   .AddCoreOp(Parrot_Substr, "substr")
+   .AddCoreOp(Parrot_Concat, "concat")
+   .AddCoreOp(Get_Params, "getparams")
+   .AddCoreOp(Get_Time, "curtime")
 
     ret
 
@@ -769,6 +785,11 @@ Int_One_Minus:
     dec .IntStack
     .PushInt
     branch DoneInterpretWord
+Int_Two_Minus:
+    .PopInt
+    sub .IntStack, .IntStack, 2
+    .PushInt
+    branch DoneInterpretWord
 Int_One_Plus:
     .PopInt 
     inc .IntStack
@@ -874,7 +895,7 @@ Int_GT:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
-    gt .TempInt, .IntStack, Int_is_GT
+    gt .IntStack, .TempInt, Int_is_GT
     set .IntStack, 0
     branch Int_GT_end
  Int_is_GT:
@@ -886,7 +907,7 @@ Int_GE:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
-    ge .TempInt, .IntStack, Int_is_GE
+    ge .IntStack, .TempInt, Int_is_GE
     set .IntStack, 0
     branch Int_GE_end
  Int_is_GE:
@@ -922,7 +943,7 @@ Int_LT:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
-    lt .TempInt, .IntStack, Int_is_LT
+    lt .IntStack, .TempInt, Int_is_LT
     set .IntStack, 0
     branch Int_LT_end
  Int_is_LT:
@@ -934,7 +955,7 @@ Int_LE:
     .PopInt 
     set .TempInt, .IntStack
     .PopInt 
-    le .TempInt, .IntStack, Int_is_LE
+    le .IntStack, .TempInt, Int_is_LE
     set .IntStack, 0
     branch Int_LE_end
  Int_is_LE:
@@ -1118,8 +1139,8 @@ Print_CR:
 
 Emit:
     .PopInt
-    chr .TempStr, .IntStack
-    print .TempStr
+    chr .TempString, .IntStack
+    print .TempString
     branch DoneInterpretWord
 
 Execute:
@@ -1304,12 +1325,12 @@ FindGlobal:
 
 LoadAssembly:
     .PopStr
-    set .TempStr, ".pcc_sub _MAIN prototyped\n"
-    concat .TempStr, '.include "'
-    concat .TempStr, .StringStack
-    concat .TempStr, '"'
-    concat .TempStr, "\n.end\n"
-    compile .CompiledWordPMC, .PIRCompiler, .TempStr
+    set .TempString, ".pcc_sub _MAIN prototyped\n"
+    concat .TempString, '.include "'
+    concat .TempString, .StringStack
+    concat .TempString, '"'
+    concat .TempString, "\n.end\n"
+    compile .CompiledWordPMC, .PIRCompiler, .TempString
     invoke .CompiledWordPMC
     branch DoneInterpretWord
 
@@ -1331,6 +1352,94 @@ SingleReturnI:
 SingleReturnS:
     set .StringStack, S5
     .PushStr
+    branch DoneInterpretWord
+
+Constant:
+    bsr CollectWord
+    .PopPMC
+    inc .LastConstant
+    set .ConstantTable[.LastConstant], .PMCStack
+    set .TempStr2, "set P31, P15["
+    set .TempString, .LastConstant
+    concat .TempStr2, .TempString
+    concat .TempStr2, "]\n"
+    concat .TempStr2, "save P31\nret\n"
+    compile .CompiledWordPMC, .PASMCompiler, .TempStr2
+    set .TempInt, .CompiledWordPMC[1]
+    set .CoreOps[.CurrentWord], .TempInt
+    branch DoneInterpretWord
+
+Comma:
+    .PopPMC
+    inc .LastCellUsed
+    set .CellPMC[.LastCellUsed], .PMCStack
+    branch DoneInterpretWord
+
+Allot:
+    .PopInt
+    add .LastCellUsed, .IntStack
+    branch DoneInterpretWord
+
+Here:
+    set .IntStack, .LastCellUsed
+    .PushInt
+    branch DoneInterpretWord
+
+Unused:
+    set .IntStack, .CellSize
+    sub .IntStack, .IntStack, .LastCellUsed
+    dec .IntStack
+    .PushInt
+    branch DoneInterpretWord
+
+Type:
+    .PopInt
+    set .TempInt, .IntStack
+    .PopInt
+    # .TempInt has the count to emit, .IntStack the beginning offset
+    set .TempInt2, 0
+  TypeLoop:
+    ge .TempInt2, .TempInt, DoneInterpretWord
+    add .TempInt3, .IntStack, .TempInt2
+    set .TempInt3, .CellPMC[.TempInt3]
+    chr .TempString, .TempInt3
+    print .TempString
+    inc .TempInt2
+    branch TypeLoop
+	
+Parrot_Substr:
+    .PopInt
+    set .TempInt, .IntStack
+    .PopInt
+    .PopStr
+    substr .TempString, .StringStack, .IntStack, .TempInt
+    set .StringStack, .TempString
+    .PushStr
+    branch DoneInterpretWord
+
+Parrot_Concat:
+    .PopStr
+    set .TempString, .StringStack
+    .PopStr
+    concat .StringStack, .StringStack, .TempString
+    .PushStr
+    branch DoneInterpretWord
+
+Get_Params:
+  dump_Ns:
+#    set .IntStack, 
+  dump_Ss:
+  dump_Is:
+  dump_Ps:
+    # First the overflow
+    unless I1, p_regs
+  p_regs:
+    
+    branch DoneInterpretWord
+
+Get_Time:
+    time .NumStack
+    .PushNum
     branch DoneInterpretWord
 
 DoneInterpretWord:
@@ -1402,11 +1511,11 @@ CompileString:
     # Probably ultimately going to go
     save .Commands
     set .Commands, .WordBody
-    set .NewBodyString, ""
+    set .NewBodyString, "wordtop:\n"
 
-#    print "Being asked to compile:"
-#    print .WordBody
-#    print ":\n"
+    print "Being asked to compile:"
+    print .WordBody
+    print ":\n"
 
 CompileWord:
     # No space!
@@ -1430,8 +1539,8 @@ CompileWord:
     concat .NewBodyString, "ret\n"
 
     # Compile the string
-#    print "Compiling:\n"
-#    print .NewBodyString
+    print "Compiling:\n"
+    print .NewBodyString
     compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
 
     # And we're done
@@ -1619,7 +1728,7 @@ AddSpecialWord:
 
    GotConstant:
     inc .LastConstant
-    set .StringConstants[.LastConstant], .PendingConstant
+    set .ConstantTable[.LastConstant], .PendingConstant
     concat .NewBodyString, "set S31, P15["
     set .TempString, .LastConstant
     concat .NewBodyString, .TempString
@@ -1630,7 +1739,12 @@ AddSpecialWord:
     branch EndSpecWord
 
   NotParrotString:
+    ne .CurrentWord, "recurse", NotRecurse
+    concat .NewBodyString, "bsr wordtop\n"
     branch EndSpecWord    
+
+  NotRecurse:
+    branch EndSpecWord
 
 
 EndSpecWord:
