@@ -249,6 +249,8 @@
 #define emitm_fabss(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0011, rs)
 #define emitm_fnegs(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0005, rs)
 
+#define emitm_fsqrtd(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0052, rs)
+
 /* Floating <-> Integer Conversion */
 #define emitm_fitod(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0310, rs)
 #define emitm_fdtoi(pc, rs, rd) emitm_3c(pc, 2, rd, 064, 0, 0322, rs)
