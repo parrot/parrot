@@ -1,11 +1,16 @@
-PERL = ${perl}
-RM_F = ${rm_f}
-PARROT = ../../parrot
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+PERL     = ${perl}
+RM_F     = ${rm_f}
+PARROT   = ../../${test_prog}$(EXE)
 
 all :
 	$(PARROT) -o parrot.pbc parrot.pasm
 	$(PARROT) parrot.pbc < sample.pasm > sample.pbc
-	$(PARROT) sample.pbc
+# This can be enabled, when dumping Eval PMCs to string works
+# $(PARROT) parrot.pbc < sample.pasm > sample.pbc
+# $(PARROT) sample.pbc
 
 clean :
 	$(RM_F) core
