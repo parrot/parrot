@@ -456,7 +456,7 @@ inline op tailcall(in PMC) {
   PMC * p = $1;
   dest = expr NEXT();
   REG_PMC(1) = interpreter->ctx.current_cont;
-  PObj_get_FLAGS(REG_PMC(1)) |= PObj_private2_FLAG;
+  PObj_get_FLAGS(REG_PMC(1)) |= SUB_FLAG_TAILCALL;
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
   goto ADDRESS(dest);
 }

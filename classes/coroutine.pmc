@@ -87,7 +87,7 @@ Initializes the co-routine.
         PObj_custom_mark_destroy_SETALL(SELF);
 
         if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
-            PObj_get_FLAGS(SELF) |= PObj_private3_FLAG;
+            PObj_get_FLAGS(SELF) |= SUB_FLAG_GENERATOR;
     }
 
 /*
@@ -108,7 +108,7 @@ Swaps the "context".
         /* python calls the coroutine initially during
          * setup
          */
-        if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_GENERATOR) {
             PMC *ret = SELF.get_iter();
             struct Parrot_coro *cor = PMC_coro(ret);
             struct Stack_Chunk *pad_stack = cor->ctx.pad_stack;
@@ -124,7 +124,7 @@ Swaps the "context".
         }
         sub->address = next;
         /* if calling the Coro we need the segment of the Coro */
-        if (!(PObj_get_FLAGS(SELF) & PObj_private0_FLAG)) {
+        if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             wanted_seg = sub->seg;
             /* remember segment of caller */
             sub->caller_seg = interpreter->code->cur_cs;
@@ -201,15 +201,15 @@ Return much, we don't know.
     }
 
     PMC* get_iter () {
-        if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_GENERATOR) {
             struct Parrot_coro * sub = PMC_coro(SELF);
             PMC *ret = pmc_new(INTERP, enum_class_Coroutine);
             struct Parrot_coro * coro = PMC_coro(ret);
             coro->end = sub->end;
             coro->address = sub->address;
 
-            PObj_get_FLAGS(ret) |= PObj_private1_FLAG; /* fixup done */
-            PObj_get_FLAGS(ret) &= ~PObj_private3_FLAG;
+            PObj_get_FLAGS(ret) |= SUB_FLAG_FIXUP_DONE; /* fixup done */
+            PObj_get_FLAGS(ret) &= ~SUB_FLAG_GENERATOR;
             PObj_flag_CLEAR(custom_mark, SELF);
             return ret;
         }

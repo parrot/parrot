@@ -98,6 +98,8 @@ Initializes the subroutine.
      * - private6 ... @IMMEDIATE
      * - private7 ... @POSTCOMP
      *
+     * see also the enum in include/parrot/sub.h
+     *
      * Data used:
      *   PMC_struct_val ... unused
      *   PMC_pmc_val    ... Parrot_Sub structure
@@ -154,7 +156,7 @@ Sets the pointer to the actual subroutine.
 
     void set_pointer (void* value) {
         struct Parrot_sub * sub = PMC_sub(SELF);
-        PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
+        PObj_get_FLAGS(SELF) |= SUB_FLAG_FIXUP_DONE;
         sub->address = value;
     }
 
@@ -249,7 +251,7 @@ Invokes the subroutine.
          *    ...
          *    B()
          *    ...
-         * sub B:   
+         * sub B:
          *    ...
          *    return C(...)
          *    # end of B
@@ -258,16 +260,16 @@ Invokes the subroutine.
          * C() returns.
          *
          * We are just calling the sub C().
-         * If the private2 flagi is set, this code is called by a 
+         * If the private2 flagi is set, this code is called by a
          * tailcall opcode.
          *
          * We don't allocate a new register frame, we execute the sub
-         * C() in this frame. Therefore we don't have to copy function 
+         * C() in this frame. Therefore we don't have to copy function
          * arguments to the new frame.
          * As no new frame is allocated, we don't check the recursion limit.
          *
          * Running in this frame is always safe:
-         * - no return continuation is invoked, which could get 
+         * - no return continuation is invoked, which could get
          *   recycled
          * - we just pass the current continuation on to C(), whatever
          *   kind of continuation it is.
@@ -275,12 +277,12 @@ Invokes the subroutine.
          *   this sub B() was.
          * - And finally: as continuations don't close over registers
          *   any changes in the register done by C() can't have any
-         *   impact on possible continuations executing later here.     
+         *   impact on possible continuations executing later here.
          *
          */
         if (!PMC_IS_NULL(ccont)) {
-            if (PObj_get_FLAGS(ccont) & PObj_private2_FLAG) {
-                PObj_get_FLAGS(ccont) &= ~PObj_private2_FLAG;
+            if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
+                PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
                 assert(ccont == REG_PMC(1));
                 goto is_tail_call;
             }
@@ -393,7 +395,7 @@ Archives the subroutine.
         /*
          * if sub addresses are absolute, the flag is set
          */
-        if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_FIXUP_DONE) {
             ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
             start_offs = ((ptrdiff_t)sub->address - code) / sizeof(opcode_t*);
@@ -427,7 +429,7 @@ Unarchives the subroutine.
             /*
              * we get relative offsets
              */
-            PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
+            PObj_get_FLAGS(SELF) &= ~SUB_FLAG_FIXUP_DONE;
             start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
             end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
             sub->address = (opcode_t*) start_offs;
@@ -453,15 +455,15 @@ Called after the subroutine as been unarchived.
         struct Parrot_sub * sub = PMC_sub(SELF);
         opcode_t *start_offs, *end_offs;
 
-        /* its absolute */
-        if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG)
+        /* if its absolute already - done */
+        if (PObj_get_FLAGS(SELF) & SUB_FLAG_FIXUP_DONE)
             return;
         code = sub->seg->base.data;
         start_offs = code + (size_t) sub->address;
         end_offs =   code + (size_t) sub->end;
         sub->address = start_offs;
         sub->end = end_offs;
-        PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
+        PObj_get_FLAGS(SELF) |= SUB_FLAG_FIXUP_DONE;
     }
 
 }

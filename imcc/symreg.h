@@ -135,12 +135,12 @@ typedef enum {
 	P_NONE           = 0x02,
 	P_METHOD         = 0x04,
 
-	P_ANON           = 0x08,	/* don't create global */
+	P_ANON           = SUB_FLAG_PF_ANON,  /* 0x8 - private3 */
 
-	P_MAIN           = PObj_private4_FLAG,	/* s. packfile.c ... */
-	P_LOAD           = PObj_private5_FLAG,
-	P_IMMEDIATE      = PObj_private6_FLAG,
-	P_POSTCOMP       = PObj_private7_FLAG
+	P_MAIN           = SUB_FLAG_PF_MAIN,
+	P_LOAD           = SUB_FLAG_PF_LOAD,
+	P_IMMEDIATE      = SUB_FLAG_PF_IMMEDIATE,
+	P_POSTCOMP       = SUB_FLAG_PF_POSTCOMP
 } pragma_enum_t;
 
 struct pcc_sub_t {

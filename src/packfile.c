@@ -218,11 +218,11 @@ sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
             }
             break;
         case PBC_LOADED:
-            if (pragmas & PObj_private5_FLAG) /* symreg.h:P_LOAD */
+            if (pragmas & SUB_FLAG_PF_LOAD) /* symreg.h:P_LOAD */
                 todo = 1;
             break;
     }
-    if (pragmas & PObj_private6_FLAG) /* symreg.h:P_IMMEDIATE */
+    if (pragmas & SUB_FLAG_PF_IMMEDIATE) /* symreg.h:P_IMMEDIATE */
         todo = 1;
     return todo;
 }
@@ -274,8 +274,8 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
     /*
      * run IMMEDIATE sub
      */
-    if (PObj_get_FLAGS(sub_pmc) & PObj_private6_FLAG) {
-        PObj_get_FLAGS(sub_pmc) &= ~PObj_private6_FLAG;
+    if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
+        PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
         run_sub(interpreter, sub_pmc);
         /*
          * reset initial flag so MAIN detection works
@@ -286,13 +286,13 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 
     switch (action) {
         case PBC_LOADED:
-            if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
-                PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
+            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
+                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
                 run_sub(interpreter, sub_pmc);
             }
             break;
         default:
-            if (PObj_get_FLAGS(sub_pmc) & PObj_private4_FLAG) {
+            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
                 if ((interpreter->resume_flag & RESUME_INITIAL) &&
                         interpreter->resume_offset == 0) {
                     ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
@@ -301,7 +301,7 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                         ((ptrdiff_t) VTABLE_get_pointer(interpreter, sub_pmc)
                          - code) / sizeof(opcode_t*);
                     interpreter->resume_offset = start_offs;
-                    PObj_get_FLAGS(sub_pmc) &= ~PObj_private4_FLAG;
+                    PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_MAIN;
                 }
                 else {
                     /* XXX which warn_class */
@@ -455,7 +455,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                     case enum_class_Closure:
                     case enum_class_Coroutine:
                         VTABLE_thawfinish(interpreter, sub_pmc, NULL);
-                        if (PObj_get_FLAGS(sub_pmc) & 0xf0) {
+                        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK) {
                             /*
                              * private4-7 are sub pragmas LOAD ...
                              */
@@ -2990,7 +2990,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
      * then set private flags of that PMC
      */
     if (flag) {
-	PObj_get_FLAGS(sub_pmc) |= (flag & 0xf0);
+	PObj_get_FLAGS(sub_pmc) |= (flag & SUB_FLAG_PF_MASK);
     }
 
     /*
@@ -3001,7 +3001,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     /*
      * finally place the sub in the global stash
      */
-    if (!(flag & 0x08)) {  /* TODO create include enum */
+    if (!(flag & SUB_FLAG_PF_ANON)) {
         store_sub_in_namespace(interpreter, pf, sub_pmc, sub->name, ns_const);
     }
 

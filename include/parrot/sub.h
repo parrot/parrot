@@ -18,6 +18,29 @@
 #include "parrot/parrot.h"
 
 /*
+ * Subroutine flags
+ */
+typedef enum {
+    SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
+    SUB_FLAG_C_HANDLER    = PObj_private0_FLAG,
+
+    SUB_FLAG_FIXUP_DONE   = PObj_private1_FLAG,
+    SUB_FLAG_TAILCALL     = PObj_private2_FLAG,
+    SUB_FLAG_GENERATOR    = PObj_private3_FLAG,
+
+    /* from packfile */
+    SUB_FLAG_PF_ANON      = PObj_private3_FLAG,
+    SUB_FLAG_PF_MAIN      = PObj_private4_FLAG,
+    SUB_FLAG_PF_LOAD      = PObj_private5_FLAG,
+    SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
+    SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
+
+    SUB_FLAG_PF_MASK      = 0xf0   /* main ... postcomp */
+
+} sub_flags_enum;
+
+
+/*
  * Sub and Closure share a Parrot_Sub structure, Closure has additionally
  * a lexical pad stack
  */

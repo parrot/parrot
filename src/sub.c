@@ -176,7 +176,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
     memcpy(ctx, &temp,               sizeof(temp));
 
     /* if calling the coroutine */
-    if (!(PObj_get_FLAGS(sub) & PObj_private0_FLAG)) {
+    if (!(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
         /*
          * first time set current sub, cont, object
          */
@@ -194,13 +194,16 @@ swap_context(Interp *interpreter, struct PMC *sub)
         /*
          * construct stacks that have the interpreterreter stack
          * at bottom and the coroutine stack at top
+         *
+         * XXX is this needed if we don't create a new stack for
+         *     the coroutine - likely not
          */
         prepend_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 co->co_control_stack, co->co_control_base);
-        PObj_get_FLAGS(sub) |= PObj_private0_FLAG;
+        PObj_get_FLAGS(sub) |= SUB_FLAG_CORO_FF;
     }
     else {
-        PObj_get_FLAGS(sub) &= ~PObj_private0_FLAG;
+        PObj_get_FLAGS(sub) &= ~SUB_FLAG_CORO_FF;
         restore_stack(&interpreter->ctx.control_stack, &ctx->control_stack,
                 &co->co_control_stack, co->co_control_base);
         copy_regs(interpreter, ctx->bp);

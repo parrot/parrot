@@ -271,7 +271,7 @@ new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
     /*
      * this flag denotes a C exception handler
      */
-    PObj_get_FLAGS(handler) |= PObj_private0_FLAG;
+    PObj_get_FLAGS(handler) |= SUB_FLAG_C_HANDLER;
     VTABLE_set_pointer(interpreter, handler, jb);
     return handler;
 }
@@ -331,7 +331,7 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     /* put exception object in P5 */
     REG_PMC(5) = exception;
     /* address = VTABLE_get_pointer(interpreter, handler); */
-    if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
+    if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* its a C exception handler */
         Parrot_exception *jb = (Parrot_exception *) address;
         longjmp(jb->destination, 1);

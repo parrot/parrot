@@ -141,7 +141,7 @@ op tailcallmethod(in STR) :object_base {
 
   REG_STR(0) = $1;
   REG_PMC(1) = interpreter->ctx.current_cont;
-  PObj_get_FLAGS(REG_PMC(1)) |= PObj_private2_FLAG;
+  PObj_get_FLAGS(REG_PMC(1)) |= SUB_FLAG_TAILCALL;
 
   object = REG_PMC(2);
   method_pmc = VTABLE_find_method(interpreter, object, REG_STR(0));
