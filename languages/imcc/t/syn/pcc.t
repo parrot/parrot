@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 17;
+use TestCompiler tests => 18;
 
 ##############################
 # Parrot Calling Conventions
@@ -628,3 +628,61 @@ CODE
 44
 43
 OUT
+
+output_is(<<'CODE', <<'OUT', "sub calling another");
+# sub g() { return 42; }
+# sub f() { return g(); }
+# print f(), "\n"
+# mostly generated from pirate.py
+
+.sub __main__
+    new_pad 0
+    newsub $P0, .Sub, _sub0       # (genFunction:378)
+    store_lex -1, 'g', $P0        # (genFunction:380)
+    newsub $P1, .Sub, _sub1       # (genFunction:378)
+    store_lex -1, 'f', $P1        # (genFunction:380)
+    find_lex $P5, 'f'             # (callingExpression:325)
+    newsub $P6, .Continuation, ret1# (callingExpression:331)
+    .pcc_begin non_prototyped     # (callingExpression:332)
+    .pcc_call $P5, $P6            # (callingExpression:335)
+ret1:
+    .result $P4                   # (callingExpression:338)
+    .pcc_end                      # (callingExpression:339)
+    print $P4                      # (visitPrint:394)
+    print "\n"                    # (visitPrintnl:403)
+    end                           # (compile:574)
+.end
+
+# g from line 1
+.pcc_sub _sub0 non_prototyped
+    .local object res0            # (visitReturn:528)
+    res0 = new PerlInt            # (expressConstant:153)
+    res0 = 42                     # (expressConstant:154)
+    .pcc_begin_return             # (visitReturn:530)
+    .return res0                  # (visitReturn:531)
+    .pcc_end_return               # (visitReturn:532)
+.end
+
+
+# f from line 3
+.pcc_sub _sub1 non_prototyped
+    .local object res1            # (visitReturn:528)
+    find_lex $P2, 'g'             # (callingExpression:325)
+    newsub $P3, .Continuation, ret0# (callingExpression:331)
+    .pcc_begin non_prototyped     # (callingExpression:332)
+    .pcc_call $P2, $P3            # (callingExpression:335)
+ret0:
+    .result res1                  # (callingExpression:338)
+    .pcc_end                      # (callingExpression:339)
+    .pcc_begin_return             # (visitReturn:530)
+    .return res1                  # (visitReturn:531)
+    .pcc_end_return               # (visitReturn:532)
+.end
+CODE
+42
+OUT
+
+
+
+
+

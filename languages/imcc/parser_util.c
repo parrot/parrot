@@ -250,11 +250,8 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
             else if (emit) {
                 /* emit set_n_ix */
                 SymReg *rr[IMCC_MAX_REGS];
-                char buf[128];
-                static int temp;
 
-                sprintf(buf, "__imcc_temp_%d", ++temp);
-                rr[0] = mk_symreg(str_dup(buf), 'N');
+                rr[0] = mk_temp_reg('N');
                 rr[1] = r[1];
                 nargs = 2;
                 INS(interpreter, "set", NULL, rr, 2, 0, 1);

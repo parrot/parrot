@@ -87,6 +87,7 @@ EXTERN Namespace * namespace;
 /* functions */
 
 SymReg * mk_symreg(char *, char t);
+SymReg * mk_temp_reg(char t);
 SymReg * mk_ident(char *, char t);
 SymReg * mk_const(char *, char t);
 SymReg * mk_const_ident(char *, char t, SymReg *, int);
@@ -104,6 +105,7 @@ struct pcc_sub_t {
     int nargs;
     SymReg *sub;
     SymReg *cc;
+    SymReg *cc_sym;
     SymReg ** ret;
     int nret;
     int prototyped;

@@ -260,6 +260,15 @@ overflow:
             }
         }
     } /* proto */
+
+    /*
+     * if we call out, the return cc in P1 must be saved
+     */
+    if (sub->pcc_sub->calls_a_sub) {
+        regs[0] = sub->pcc_sub->cc_sym = mk_temp_reg('P');
+        regs[1] = mk_pasm_reg(str_dup("P1"));
+        insINS(interpreter, ins, "set", regs, 2);
+    }
 }
 
 void
@@ -277,11 +286,27 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
         next[i] = 5;
     p3 = NULL;
     n_p3 = 0;
-    sub = ins->r[0];
+    tmp = NULL;
+    /*
+     * if we have preserved the return continuation
+     * restore it
+     */
+    sub = instructions->r[1];
+    if (sub->pcc_sub->cc_sym) {
+        regs[0] = mk_pasm_reg(str_dup("P1"));
+        regs[1] = sub->pcc_sub->cc_sym;
+        tmp = insINS(interpreter, ins, "set", regs, 2);
+    }
     /* FIXME
      * fake prototyped
      * return conventions need more spec in pdd
      */
+    sub = ins->r[0];
+    /*
+     * past the eventually inserted return cc restore
+     */
+    if (tmp)
+        ins = tmp;
     sub->pcc_sub->prototyped = 1;
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {

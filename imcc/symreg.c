@@ -71,6 +71,13 @@ SymReg * mk_symreg(char * name, char t) {
     return _mk_symreg(hash, name, t);
 }
 
+SymReg * mk_temp_reg(char t) {
+    char buf[128];
+    static int temp;
+    sprintf(buf, "__imcc_temp_%d", ++temp);
+    return mk_symreg(str_dup(buf), t);
+}
+
 SymReg * mk_pcc_sub(char * name, char proto) {
     SymReg *r = _mk_symreg(hash, name, proto);
     r->type = VT_PCC_SUB;
@@ -357,6 +364,8 @@ void free_sym(SymReg *r)
             free(r->pcc_sub->ret);
         if (r->pcc_sub->cc)
             free_sym(r->pcc_sub->cc);
+        if (r->pcc_sub->cc_sym)
+            free_sym(r->pcc_sub->cc_sym);
         if (r->pcc_sub->sub)
             free_sym(r->pcc_sub->sub);
         free(r->pcc_sub);
