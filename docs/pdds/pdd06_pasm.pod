@@ -766,6 +766,55 @@ Call routine Y in interpreter x, passing it the list of parameters
 Z. V is a synchronization object returned. It can be waited on like
 the sync objects returned from async I/O routines.
 
+=item interpinfo Ix, iy
+
+Get information item Y and put it in register X. Currently defined are:
+
+=over 4
+
+=item 1 TOTAL_MEM_ALLOC
+
+The total amount of system memory allocated for later parcelling out
+to Buffers. Doesn't include any housekeeping memory, memory for Buffer
+or PMC structs, or things of that nature.
+
+=item 2 DOD_RUNS
+
+The total number of dead object detection runs that have been made.
+
+=item 3 COLLECT_RUNS
+
+The total number of memory collection runs that have been made.
+
+=item 4 ACTIVE_PMCS
+
+The number of PMCs considered active. This means the DOD scan hasn't
+noted them as dead.
+
+=item 5 ACTIVE_BUFFERS
+
+The number of Buffers (usually STRINGs but could be other things)
+considered active.
+
+=item 6 TOTAL_PMCS
+
+The total number of PMCs the interpreter has available. Includes both
+active and free PMCs
+
+=item 7 TOTAL_BUFFES
+
+The total number of Buffer structs the interpreter has available.
+
+=item 8 HEADERS_ALLOC_SINCE_COLLECT
+
+The number of new Buffer header block allocations that have been made since
+the last DOD run. (Buffers, when allocated, are allocated in chunks)
+
+=item 9 MEM_ALLOCS_SINCE_COLLECT
+
+The number of times we've requested a block of memory from the system
+for allocation to Buffers since the last time we compacted the memory heap.
+
 =back
 
 =head2 Garbage collection
