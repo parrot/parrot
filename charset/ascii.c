@@ -19,8 +19,16 @@ charset functionality for similar charsets like iso-8859-1.
 #include "ascii.h"
 #include <assert.h>
 
-/* The encoding we prefer, given a choice */
-static ENCODING *preferred_encoding;
+#ifdef EXCEPTION
+#  undef EXCEPTION
+#endif
+
+/*
+ * TODO check interpreter error and warnings setting
+ */
+
+#define EXCEPTION(err, str) \
+    real_exception(interpreter, NULL, err, str)
 
 #define WHITESPACE 1
 #define WORDCHAR 2
@@ -50,7 +58,6 @@ INTVAL
 ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
         unsigned char type, const unsigned char *table)
 {
-
     for (; start < string->strlen; start++) {
         if (table[ENCODING_GET_BYTE(interpreter, string, start)] & type) {
             return start;
@@ -97,10 +104,26 @@ ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,
 
 
 static STRING *
-from_charset(Interp *interpreter, STRING *source_string, STRING *dest)
+from_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
-    internal_exception(UNIMPLEMENTED, "Can't do this yet");
-    return NULL;
+    UINTVAL offs, c;
+    if (dest) {
+        Parrot_reallocate_string(interpreter, dest, src->strlen);
+        dest->bufused = src->strlen;
+        dest->strlen  = src->strlen;
+    }
+    for (offs = 0; offs < src->strlen; ++offs) {
+        c = ENCODING_GET_CODEPOINT(interpreter, src, offs);
+        if (c >= 0x80) {
+            EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
+        }
+        if (dest)
+            ENCODING_SET_BYTE(interpreter, dest, offs, c);
+    }
+    if (dest)
+        return dest;
+    src->charset = Parrot_ascii_charset_ptr;
+    return src;
 }
 
 static STRING *
@@ -255,7 +278,7 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
         UINTVAL cl, cr;
         for (offs = 0; offs < min_len; ++offs) {
             cl = ENCODING_GET_BYTE(interpreter, lhs, offs);
-            cr = ENCODING_GET_BYTE(interpreter, rhs, offs);
+            cr = ENCODING_GET_CODEPOINT(interpreter, rhs, offs);
             retval = cl - cr;
             if (retval)
                 break;
@@ -510,59 +533,53 @@ ascii_compute_hash(Interp *interpreter, STRING *source_string)
 CHARSET *
 Parrot_charset_ascii_init(Interp *interpreter)
 {
-  CHARSET *return_set = Parrot_new_charset(interpreter);
-  CHARSET base_set = {
-      "ascii",
-      ascii_get_graphemes,
-      ascii_get_graphemes_inplace,
-      set_graphemes,
-      ascii_to_charset,
-      ascii_to_unicode,
-      from_charset,
-      from_unicode,
-      compose,
-      decompose,
-      upcase,
-      downcase,
-      titlecase,
-      upcase_first,
-      downcase_first,
-      titlecase_first,
-      ascii_compare,
-      ascii_cs_index,
-      ascii_cs_rindex,
-      validate,
-      is_wordchar,
-      find_wordchar,
-      find_not_wordchar,
-      is_whitespace,
-      find_whitespace,
-      find_not_whitespace,
-      is_digit,
-      find_digit,
-      find_not_digit,
-      is_punctuation,
-      find_punctuation,
-      find_not_punctuation,
-      ascii_is_newline,
-      ascii_find_newline,
-      ascii_find_not_newline,
-      find_word_boundary,
-      string_from_codepoint,
-      ascii_compute_hash,
-      {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
-  };
+    CHARSET *return_set = Parrot_new_charset(interpreter);
+    static const CHARSET base_set = {
+        "ascii",
+        ascii_get_graphemes,
+        ascii_get_graphemes_inplace,
+        set_graphemes,
+        ascii_to_charset,
+        ascii_to_unicode,
+        from_charset,
+        from_unicode,
+        compose,
+        decompose,
+        upcase,
+        downcase,
+        titlecase,
+        upcase_first,
+        downcase_first,
+        titlecase_first,
+        ascii_compare,
+        ascii_cs_index,
+        ascii_cs_rindex,
+        validate,
+        is_wordchar,
+        find_wordchar,
+        find_not_wordchar,
+        is_whitespace,
+        find_whitespace,
+        find_not_whitespace,
+        is_digit,
+        find_digit,
+        find_not_digit,
+        is_punctuation,
+        find_punctuation,
+        find_not_punctuation,
+        ascii_is_newline,
+        ascii_find_newline,
+        ascii_find_not_newline,
+        find_word_boundary,
+        string_from_codepoint,
+        ascii_compute_hash,
+        NULL
+    };
 
-  /* Snag the global. This is... bad. Should be properly fixed at some
-     point */
-  preferred_encoding = Parrot_fixed_8_encoding_ptr;
-
-/*  preferred_encoding = Parrot_load_encoding(interpreter, "fixed_8"); */
-
-  memcpy(return_set, &base_set, sizeof(CHARSET));
-  Parrot_register_charset(interpreter, "ascii", return_set);
-  return return_set;
+    memcpy(return_set, &base_set, sizeof(CHARSET));
+    return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
+    Parrot_register_charset(interpreter, "ascii", return_set);
+    return return_set;
 }
 
 STRING *

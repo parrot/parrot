@@ -131,7 +131,7 @@ struct _charset {
     charset_find_word_boundary_t find_word_boundary;
     charset_string_from_codepoint_t string_from_codepoint;
     charset_compute_hash_t compute_hash;
-    ENCODING encoding_overrides;
+    ENCODING *preferred_encoding;
 };
 
 #define CHARSET_GET_GRAPEMES(interp, source, offset, count) ((CHARSET *)source->charset)->get_graphemes(interpreter, source, offset, count)
@@ -168,6 +168,8 @@ struct _charset {
 #define CHARSET_FIND_NOT_NEWLINE(interp, source, offset) ((CHARSET *)source->charset)->find_not_newline(interpreter, source, offset)
 #define CHARSET_FIND_WORD_BOUNDARY(interp, source, offset) ((CHARSET *)source->charset)->find_word_boundary(interpreter, source, offset)
 #define CHARSET_COMPUTE_HASH(interp, source) ((CHARSET *)source->charset)->compute_hash(interpreter, source)
+#define CHARSET_GET_PREFERRED_ENCODING(interp, source) ((CHARSET *)source->charset)->preferred_encoding
+
 #define CHARSET_TO_ENCODING(interp, source, offset, count) ((ENCODING *)source->encoding)->to_encoding(interp, source, offset, count)
 #define CHARSET_COPY_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->copy_to_encoding(interp, source)
 #define CHARSET_GET_CODEPOINT(interp, source, offset) ((ENCODING *)source->encoding)->get_codepoint(interp, source, offset)

@@ -29,9 +29,6 @@ This file implements the charset functions for iso-8859-1 data
 #define EXCEPTION(err, str) \
     real_exception(interpreter, NULL, err, str)
 
-/* The encoding we prefer, given a choice */
-static ENCODING *preferred_encoding;
-
 #define WHITESPACE 1
 #define WORDCHAR 2
 #define PUNCTUATION 4
@@ -340,7 +337,7 @@ CHARSET *
 Parrot_charset_iso_8859_1_init(Interp *interpreter)
 {
     CHARSET *return_set = Parrot_new_charset(interpreter);
-    CHARSET base_set = {
+    static const CHARSET base_set = {
         "iso-8859-1",
         ascii_get_graphemes,
         ascii_get_graphemes_inplace,
@@ -379,18 +376,11 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         find_word_boundary,
         string_from_codepoint,
         ascii_compute_hash,
-        {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
-            NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
-
+        NULL
     };
 
-    /* Snag the global. This is... bad. Should be properly fixed at some
-       point */
-    preferred_encoding = Parrot_fixed_8_encoding_ptr;
-
-    /*  preferred_encoding = Parrot_load_encoding(interpreter, "fixed_8"); */
-
     memcpy(return_set, &base_set, sizeof(CHARSET));
+    return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
     Parrot_register_charset(interpreter, "iso-8859-1", return_set);
     return return_set;
 }

@@ -20,6 +20,9 @@ UTF-8 (L<http://www.utf-8.com/>).
 
 #include "parrot/parrot.h"
 #include "parrot/unicode.h"
+#include "utf8.h"
+
+#define UNIMPL internal_exception(UNIMPLEMENTED, "unimpl utf8")
 
 const char Parrot_utf8skip[256] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
@@ -56,10 +59,10 @@ Returns the number of characters in the C<bytes> bytes from C<*ptr>.
 */
 
 static UINTVAL
-utf8_characters(const void *ptr, UINTVAL bytes)
+utf8_characters(const void *ptr, UINTVAL byte_offs)
 {
     const utf8_t *u8ptr = ptr;
-    const utf8_t *u8end = u8ptr + bytes;
+    const utf8_t *u8end = u8ptr + byte_offs;
     UINTVAL characters = 0;
 
     while (u8ptr < u8end) {
@@ -284,14 +287,181 @@ utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
     i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
 }
 
+
+/* This function needs to go through and get all the code points one
+   by one and turn them into a byte */
+static void
+to_encoding(Interp *interpreter, STRING *src)
+{
+    UNIMPL;
+}
+
+static STRING *
+copy_to_encoding(Interp *interpreter, STRING *src)
+{
+    STRING *return_string = NULL;
+
+    UNIMPL;
+    return return_string;
+}
+
+/* codepoints are bytes, so delegate */
+static UINTVAL
+get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
+{
+    const void *start;
+
+    start = utf8_skip_forward(src->strstart, offset);
+    return utf8_decode(start);
+}
+
+static void
+set_codepoint(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL codepoint)
+{
+    UNIMPL;
+}
+
+static UINTVAL
+get_byte(Interp *interpreter, const STRING *src, UINTVAL offset)
+{
+    unsigned char *contents = src->strstart;
+    if (offset >= src->bufused) {
+	internal_exception(0,
+		"get_byte past the end of the buffer (%i of %i)",
+		offset, src->bufused);
+    }
+    return contents[offset];
+}
+
+static void
+set_byte(Interp *interpreter, const STRING *src,
+	UINTVAL offset, UINTVAL byte)
+{
+    unsigned char *contents;
+    if (offset >= src->bufused) {
+	internal_exception(0, "set_byte past the end of the buffer");
+    }
+    contents = src->strstart;
+    contents[offset] = byte;
+}
+
+static STRING *
+get_codepoints(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL count)
+{
+    STRING *return_string = NULL;
+    UNIMPL;
+    return return_string;
+}
+
+static STRING *
+get_bytes(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL count)
+{
+    STRING *return_string = Parrot_make_COW_reference(interpreter,
+	    src);
+    return_string->encoding = src->encoding;    /* XXX */
+    return_string->charset = src->charset;
+
+    return_string->strstart = (char *)return_string->strstart + offset ;
+    return_string->bufused = count;
+
+    return_string->strlen = count;
+    return_string->hashval = 0;
+
+    return return_string;
+}
+
+
+static STRING *
+get_codepoints_inplace(Interp *interpreter, STRING *src,
+	STRING *dest_string, UINTVAL offset, UINTVAL count)
+{
+
+    UNIMPL;
+    return NULL;
+}
+
+static STRING *
+get_bytes_inplace(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL count, STRING *return_string)
+{
+    UNIMPL;
+    return NULL;
+}
+
+static void
+set_codepoints(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL count, STRING *new_codepoints)
+{
+    UNIMPL;
+}
+
+static void
+set_bytes(Interp *interpreter, STRING *src,
+	UINTVAL offset, UINTVAL count, STRING *new_bytes)
+{
+    UNIMPL;
+}
+
+/* Unconditionally makes the string be in this encoding, if that's
+   valid */
+static void
+become_encoding(Interp *interpreter, STRING *src)
+{
+    UNIMPL;
+}
+
+
+static UINTVAL
+codepoints(Interp *interpreter, STRING *src)
+{
+    return src->strlen;
+}
+
+static UINTVAL
+bytes(Interp *interpreter, STRING *src)
+{
+    return src->bufused;
+}
+
+ENCODING *
+Parrot_encoding_utf8_init(Interp *interpreter)
+{
+    ENCODING *return_encoding = Parrot_new_encoding(interpreter);
+
+    static const ENCODING base_encoding = {
+	"utf8",
+	6, /* Max bytes per codepoint */
+	to_encoding,
+	copy_to_encoding,
+	get_codepoint,
+	set_codepoint,
+	get_byte,
+	set_byte,
+	get_codepoints,
+	get_codepoints_inplace,
+	get_bytes,
+	get_bytes_inplace,
+	set_codepoints,
+	set_bytes,
+	become_encoding,
+	codepoints,
+	bytes
+    };
+    memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
+    Parrot_register_encoding(interpreter, "utf8", return_encoding);
+    return return_encoding;
+}
+
 /*
 
 =back
 
 =head1 SEE ALSO
 
-F<encodings/utf16.c>,
-F<encodings/utf32.c>,
+F<encodings/fixed_8.c>,
 F<src/string.c>,
 F<include/parrot/string.h>,
 F<docs/string.pod>.

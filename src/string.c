@@ -295,6 +295,8 @@ string_init(Parrot_Interp interpreter)
          * 2) default charset  = iso-8859-1
          */
         Parrot_encoding_fixed_8_init(interpreter);
+        Parrot_encoding_utf8_init(interpreter);
+
         Parrot_charset_iso_8859_1_init(interpreter);
         Parrot_charset_binary_init(interpreter);
         Parrot_charset_ascii_init(interpreter);
@@ -403,8 +405,8 @@ string_make_empty(Interp *interpreter,
     s = new_string_header(interpreter, 0);
 
     if (representation == enum_stringrep_one) {
-        s->encoding = PARROT_DEFAULT_ENCODING;
         s->charset = PARROT_DEFAULT_CHARSET;
+        s->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, s);;
     } else {
         internal_exception(INVALID_CHARTYPE, "Unsupported representation");
     }
@@ -628,21 +630,19 @@ string_make(Interp *interpreter, const void *buffer,
     }
 
     if (strcmp(charset_name, "iso-8859-1") == 0 ) {
-        encoding = Parrot_fixed_8_encoding_ptr;
         charset = Parrot_iso_8859_1_charset_ptr;
     }
     else if (strcmp(charset_name, "ascii") == 0 ) {
-        encoding = Parrot_fixed_8_encoding_ptr;
         charset = Parrot_ascii_charset_ptr;
     }
     else if (strcmp(charset_name, "binary") == 0 ) {
-        encoding = Parrot_fixed_8_encoding_ptr;
         charset = Parrot_binary_charset_ptr;
     }
     else {
         internal_exception(UNIMPLEMENTED,
                 "Can't make '%s' charset strings", charset_name);
     }
+    encoding = charset->preferred_encoding;
     return string_make_direct(interpreter, buffer, len,
             encoding, charset, flags);
 
@@ -2615,8 +2615,8 @@ Parrot_string_trans_charset(Interp *interpreter, STRING *src,
             return dest;
         }
         dest->charset = new_charset;
-        /* XXX prefered encoding for charset */
-        dest->encoding = PARROT_DEFAULT_ENCODING;
+        /* get prefered encoding for charset */
+        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, dest);
     }
     else {
         if (new_charset == src->charset) {

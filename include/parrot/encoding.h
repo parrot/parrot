@@ -55,6 +55,7 @@ typedef struct _encoding ENCODING;
 
 #if !defined PARROT_NO_EXTERN_ENCODING_PTRS
 extern ENCODING *Parrot_fixed_8_encoding_ptr;
+extern ENCODING *Parrot_utf8_encoding_ptr;
 #endif
 
 #define PARROT_DEFAULT_ENCODING Parrot_fixed_8_encoding_ptr

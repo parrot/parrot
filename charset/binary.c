@@ -18,9 +18,6 @@ This file implements the charset functions for binary data
 #include "binary.h"
 #include "ascii.h"
 
-/* The encoding we prefer, given a choice */
-static ENCODING *preferred_encoding;
-
 #ifdef EXCEPTION
 #  undef EXCEPTION
 #endif
@@ -249,60 +246,53 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 CHARSET *
 Parrot_charset_binary_init(Interp *interpreter)
 {
-  CHARSET *return_set = Parrot_new_charset(interpreter);
-  CHARSET base_set = {
-      "binary",
-      ascii_get_graphemes,
-      ascii_get_graphemes_inplace,
-      set_graphemes,
-      to_charset,
-      to_unicode,
-      from_charset,
-      from_unicode,
-      compose,
-      decompose,
-      upcase,
-      downcase,
-      titlecase,
-      upcase_first,
-      downcase_first,
-      titlecase_first,
-      compare,
-      cs_index,
-      cs_rindex,
-      validate,
-      is_wordchar,
-      find_wordchar,
-      find_not_wordchar,
-      is_whitespace,
-      find_whitespace,
-      find_not_whitespace,
-      is_digit,
-      find_digit,
-      find_not_digit,
-      is_punctuation,
-      find_punctuation,
-      find_not_punctuation,
-      is_newline,
-      find_newline,
-      find_not_newline,
-      find_word_boundary,
-      string_from_codepoint,
-      ascii_compute_hash,
-      {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
-          NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
-  };
+    CHARSET *return_set = Parrot_new_charset(interpreter);
+    static const CHARSET base_set = {
+        "binary",
+        ascii_get_graphemes,
+        ascii_get_graphemes_inplace,
+        set_graphemes,
+        to_charset,
+        to_unicode,
+        from_charset,
+        from_unicode,
+        compose,
+        decompose,
+        upcase,
+        downcase,
+        titlecase,
+        upcase_first,
+        downcase_first,
+        titlecase_first,
+        compare,
+        cs_index,
+        cs_rindex,
+        validate,
+        is_wordchar,
+        find_wordchar,
+        find_not_wordchar,
+        is_whitespace,
+        find_whitespace,
+        find_not_whitespace,
+        is_digit,
+        find_digit,
+        find_not_digit,
+        is_punctuation,
+        find_punctuation,
+        find_not_punctuation,
+        is_newline,
+        find_newline,
+        find_not_newline,
+        find_word_boundary,
+        string_from_codepoint,
+        ascii_compute_hash,
+        NULL
+    };
 
-  /* Snag the global. This is... bad. Should be properly fixed at some
-     point */
-  preferred_encoding = Parrot_fixed_8_encoding_ptr;
-
-/*  preferred_encoding = Parrot_load_encoding(interpreter, "fixed_8"); */
-
-
-  memcpy(return_set, &base_set, sizeof(CHARSET));
-  Parrot_register_charset(interpreter, "binary", return_set);
-  return return_set;
+    memcpy(return_set, &base_set, sizeof(CHARSET));
+    return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
+    Parrot_register_charset(interpreter, "binary", return_set);
+    return return_set;
 
 }
 
