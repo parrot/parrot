@@ -357,6 +357,10 @@ key_string(Interp *interpreter, PMC *key)
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_string(interpreter, reg);
+    case KEY_integer_FLAG:
+        return string_from_int(interpreter, PMC_int_val(key));
+    case KEY_integer_FLAG | KEY_register_FLAG:
+        return string_from_int(interpreter, interpreter->int_reg.registers[PMC_int_val(key)]);
     default:
     case KEY_pmc_FLAG:
         return VTABLE_get_string(interpreter, key);

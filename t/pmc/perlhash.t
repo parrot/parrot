@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -689,6 +689,22 @@ output_is(<<'CODE', <<OUTPUT, "Getting PMCs from compound keys");
     end
 CODE
 12
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
+    new P0, .PerlHash
+    new P1, .PerlHash
+    new P2, .PerlInt
+    set P2, 4
+    set P1[0], P2
+    set P0["a"], P1
+    set I0, P0["a";0]
+    print "Four is "
+    print I0
+    print "\n"
+    end
+CODE
+Four is 4
 OUTPUT
 
 # A hash is only false if it has size 0
