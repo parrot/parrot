@@ -431,10 +431,10 @@ find_bucket(Interp *interpreter, Hash *hash, BucketIndex head, void *key)
     return NULL;
 }
 
-Hash *
-new_hash(Interp *interpreter)
+void
+new_hash(Interp *interpreter, Hash **hptr)
 {
-    return new_hash_x(interpreter,
+    return new_hash_x(interpreter, hptr,
             enum_type_PMC,
             0,
             Hash_key_type_ascii,
@@ -443,10 +443,10 @@ new_hash(Interp *interpreter)
             pobject_lives);     /*        mark */
 }
 
-Hash *
-new_cstring_hash(Interp *interpreter)
+void
+new_cstring_hash(Interp *interpreter, Hash **hptr)
 {
-    return new_hash_x(interpreter,
+    return new_hash_x(interpreter, hptr,
             enum_type_PMC,
             0,
             Hash_key_type_cstring,
@@ -455,13 +455,26 @@ new_cstring_hash(Interp *interpreter)
             (hash_mark_key_fn)0);/* no     mark */
 }
 
-Hash *
-new_hash_x(Interp *interpreter, PARROT_DATA_TYPES val_type, size_t val_size,
+/* FIXME: This function can go back to just returning the hash struct
+ * pointer once Buffers can define their own custom mark routines.
+ *
+ * The problem is: During DODs stack walking the item on the stack
+ * must be a PMC. When an auto Hash* is seen, it doesn't get properly
+ * marked (only the Hash* buffer is marked, not its contents). By
+ * passing the **hptr up to PerlHash's init function, the newly
+ * constructed PMC is on the stack *including* this newly constructed
+ * Hash, so that it gets marked properly.
+ *
+ */
+void
+new_hash_x(Interp *interpreter, Hash **hptr,
+        PARROT_DATA_TYPES val_type, size_t val_size,
         Hash_key_type hkey_type,
         hash_comp_fn compare, hash_hash_key_fn keyhash,
         hash_mark_key_fn mark)
 {
     Hash *hash = (Hash *)new_bufferlike_header(interpreter, sizeof(*hash));
+    *hptr = hash;
     hash->compare = compare;
     hash->hash_val = keyhash;
     hash->mark_key = mark;
@@ -487,7 +500,6 @@ new_hash_x(Interp *interpreter, PARROT_DATA_TYPES val_type, size_t val_size,
     /*      PObj_report_SET(hash->bucket_pool); */
     hash->free_list = NULLBucketIndex;
     expand_hash(interpreter, hash);
-    return hash;
 }
 
 /*=for api hash hash_size
@@ -646,13 +658,12 @@ hash_delete(Interp *interpreter, Hash *hash, void *okey)
     Parrot_unblock_GC(interpreter);
 }
 
-Hash *
-hash_clone(struct Parrot_Interp *interp, Hash *hash)
+void
+hash_clone(struct Parrot_Interp *interp, Hash *hash, Hash **dest)
 {
     HashIndex i;
-    Hash *dest;
 
-    dest = new_hash_x(interp, hash->entry_type, hash->value_size,
+    new_hash_x(interp, dest, hash->entry_type, hash->value_size,
             hash->key_type, hash->compare, hash->hash_val, hash->mark_key);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
@@ -682,7 +693,7 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash)
                 internal_exception(-1, "hash corruption: type = %d\n",
                                    hash->entry_type);
             };
-            hash_put(interp, dest, key, valtmp);
+            hash_put(interp, *dest, key, valtmp);
             /*
              * hash_put may extend the hash, which can trigger GC
              * we could also check the GC count and refetch b only when needed
@@ -691,7 +702,6 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash)
             bi = b->next;
         }
     }
-    return dest;
 }
 
 /*

@@ -43,7 +43,7 @@ pmclass PerlHash need_ext does hash {
 	    VTABLE_init(INTERP, undef);
 	}
 	PObj_custom_mark_SET(SELF);
-	PMC_ptr1v(SELF) = new_hash(INTERP);
+	new_hash(INTERP, (Hash**)&PMC_ptr1v(SELF));
     }
 
     void mark () {
@@ -70,7 +70,7 @@ pmclass PerlHash need_ext does hash {
 
     void clone (PMC *ret) {
 	PObj_custom_mark_SET(ret);
-	PMC_ptr1v(ret) = hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF));
+	hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF), (Hash**)&PMC_ptr1v(ret));
     }
 
     INTVAL get_integer () {

@@ -75,11 +75,11 @@ struct _hash {
     hash_mark_key_fn mark_key;  /* mark a key being alive */
 };
 
-Hash * new_hash(Interp * interpreter);
-Hash * new_hash_x(Interp *, PARROT_DATA_TYPES, size_t val_size, Hash_key_type,
-        hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
-Hash * new_cstring_hash(Interp *interpreter);
-Hash * hash_clone(Interp * interpreter, Hash * src);
+void new_hash(Interp * interpreter, Hash **hptr);
+void new_hash_x(Interp *, Hash**, PARROT_DATA_TYPES, size_t val_size,
+        Hash_key_type, hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
+void new_cstring_hash(Interp *interpreter, Hash **);
+void hash_clone(Interp * interpreter, Hash * src, Hash **dest);
 INTVAL hash_size(Interp * interpreter, Hash *hash);
 void hash_set_size(Interp * interpreter, Hash *hash, UINTVAL size);
 void hash_destroy(Interp * interpreter, Hash *hash);
