@@ -119,8 +119,8 @@ sub runstep {
     $execcapable = $set_execcapable if defined $set_execcapable;
     if ($execcapable) {
       Configure::Data->set(
-        exec_h       => '$(INC)/jit.h',
-        exec_o       => 'exec$(O) exec_cpu$(O)',
+        exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_save.h',
+        exec_o       => 'exec$(O) exec_cpu$(O) exec_save$(O)',
         execos       => $execos,
         execcapable  => 1
       );

@@ -384,6 +384,8 @@ exec_cpu$(O): $(GENERAL_H_FILES) ${exec_h} $(INC)/exec_dep.h ${jit_h} $(INC)/jit
 
 exec_start$(O) : $(GENERAL_H_FILES) ${exec_h} $(INC)/exec_dep.h
 
+exec_save$(O) : $(GENERAL_H_FILES) ${exec_h}
+
 key$(O) : $(GENERAL_H_FILES)
 
 smallobject$(O) : $(GENERAL_H_FILES)

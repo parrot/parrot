@@ -278,6 +278,7 @@ examples/pxs/PQt.C                                [main]doc
 examples/pxs/QtHelloWorld.pasm                    [main]doc
 exceptions.c                                      []
 exec.c                                            []
+exec_save.c                                       []
 exec_start.c                                      []
 exit.c                                            []
 fingerprint_c.pl                                  []
@@ -1291,6 +1292,7 @@ include/parrot/enums.h                            [devel]include
 include/parrot/events.h                           [devel]include
 include/parrot/exceptions.h                       [devel]include
 include/parrot/exec.h                             [devel]include
+include/parrot/exec_save.h                        [devel]include
 include/parrot/exit.h                             [devel]include
 include/parrot/global_setup.h                     [devel]include
 include/parrot/hash.h                             [devel]include

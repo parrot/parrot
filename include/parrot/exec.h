@@ -23,7 +23,11 @@
 
 #   if EXEC_OS == OPENBSD
 #     define EXEC_A_OUT
-#   else
+#   endif
+#   if EXEC_OS == DARWIN
+#     define EXEC_MACH_O
+#   endif
+#   if (EXEC_OS == FREENBSD) || (EXEC_OS == LINUX)
 #     define EXEC_ELF
 #   endif
 
@@ -101,9 +105,9 @@ int *Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
     char *nptr, const char *var, int offset, int disp);
 void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     int type, const char *symbol, int disp);
-
 int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
     int stype);
+
 void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
 
 void Parrot_exec_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem,
@@ -114,8 +118,8 @@ void Parrot_exec_emit_mov_rm(struct Parrot_Interp * interpreter, int reg,
                              char *mem);
 void Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,
                              char *mem);
-#  endif
-#endif
+#  endif /* EXEC_H_GUARD */
+#endif /* EXEC_CAPABLE */
 
 /*
  * Local variables:
