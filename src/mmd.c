@@ -97,7 +97,7 @@ mmd_add_function(struct Parrot_Interp *interpreter,
     UINTVAL func_count = funcnum + 1;
     UINTVAL cur_func_count = interpreter->binop_mmd_funcs->tables;
 
-    printf("Default for %i is %p\n", funcnum, function);
+    /*    printf("Default for %i is %p\n", funcnum, function);*/
 
     /* Is the new function past where we have expanded to? If so, make
        all the tables bigger
@@ -277,8 +277,8 @@ mmd_register(struct Parrot_Interp *interpreter,
 
     offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
-    printf("Registering %p for %i/%i at %p\n", funcptr, cur_x, cur_y, (interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
-    printf("And it says: %p\n", *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
+    /*    printf("Registering %p for %i/%i at %p\n", funcptr, cur_x, cur_y, (interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
+    printf("And it says: %p\n", *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset)); */
 }
 
 
