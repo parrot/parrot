@@ -32,7 +32,7 @@ my(%c)=(
 	iv =>		($Config{ivtype}||'long'),
 	nv =>		($Config{nvtype}||'long double'),
 	cc =>		$Config{cc},
-	ccflags =>	'-Wall -o $@',
+	ccflags =>	$Config{ccflags},
 	libs =>		$Config{libs}
 );
 
