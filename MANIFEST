@@ -256,7 +256,6 @@ languages/imcc/imc.c
 languages/imcc/imc.h
 languages/imcc/imcc.l
 languages/imcc/imcc.y
-languages/imcc/sample.imc
 languages/jako/MAINTAINER
 languages/jako/bench.jako
 languages/jako/euclid.jako
