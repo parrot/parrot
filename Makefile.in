@@ -127,7 +127,9 @@ ${make_set_make}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} examples/mops/mops${exe} docs
+all : $(TEST_PROG) $(PDUMP) docs
+
+mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
@@ -199,9 +201,6 @@ $(PDUMP): pdump$(O) $(O_FILES)
 
 test_main$(O): test_main.c $(H_FILES)
 
-examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
-	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
-
 Parrot/Jit.pm: Parrot/Jit/${jitarchname}.pm
 	$(PERL) -MFile::Copy=cp -e 'cp q|Parrot/Jit/${jitarchname}.pm|, q|Parrot/Jit.pm|'
 
@@ -211,16 +210,40 @@ Parrot/OpLib/core.pm: core.ops ops2pm.pl Parrot/OpsFile.pm Parrot/Op.pm
 Parrot/PMC.pm: include/parrot/pmc.h pmc_pm.pl
 	$(PERL) pmc_pm.pl 
 
+
+###############################################################################
+#
+# Examples (Assembly):
+#
+###############################################################################
+
+examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
+	cd examples && cd assembly && $(MAKE) mops.pbc PERL=$(PERL) && cd .. && cd ..
+
 examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
+
+###############################################################################
+#
+# Examples (MOPS) - Comparative:
+#
+###############################################################################
+
 examples/mops/mops$(O): examples/mops/mops.c
 
 examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
 	$(CC) $(CFLAGS) -o examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
+
+
+###############################################################################
+#
+# Dependencies:
+#
+###############################################################################
 
 global_setup$(O): $(H_FILES)
 
@@ -310,6 +333,9 @@ test: $(TEST_PROG) assemble.pl .test_dummy
 
 .test_dummy:
 	$(PERL) t/harness
+
+mopstest: $(TEST_PROG) examples/assembly/mops.pbc
+	$(TEST_PROG) examples/assembly/mops.pbc
 
 
 ###############################################################################
