@@ -1,6 +1,6 @@
 package TestCompiler;
 use strict;
-use lib '../../lib';
+use lib '../../lib';	# XXX
 use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 require Exporter;
@@ -39,7 +39,7 @@ my %Test_Map = ( output_is   => 'is_eq',
 my $count = 0;
 
 sub generate_functions {
-  my ($package, $directory) = @_;
+  my ($package) = @_;
 
   sub slurp_file {
     open SLURP, "< $_[0]";
@@ -90,24 +90,19 @@ sub generate_functions {
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
 	my $s = $PConfig{slash};
 	my $exe = $PConfig{exe};
-	my $IMCC = $ENV{IMCC} || "..${s}..${s}parrot$exe";	# XXX
-	# If $ENV{IMCC} is set from root Makefile, adjust the path.
+	my $PARROT = $ENV{PARROT} || "..${s}..${s}parrot$exe";	# XXX
 
 	if ($gen_pasm) {
-	    $TEST_PROG_ARGS =~ s/-O.//;
-	    system("$IMCC ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
+	    system("$PARROT $opt -o $out_f $by_f");
 	}
 	elsif ($TEST_PROG_ARGS =~ /-c/) {
 	    my $pbc_f = per_test('.pbc',$count);
 	    $TEST_PROG_ARGS =~ s/-c//;
-	    system("$IMCC ${TEST_PROG_ARGS} -o $pbc_f $by_f");
-	    # system("$IMCC -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
-	    Parrot::Test::_run_command("$IMCC -r ${TEST_PROG_ARGS} $pbc_f",
+	    Parrot::Test::_run_command("$PARROT ${TEST_PROG_ARGS} -o $pbc_f -r -r $by_f",
 		STDOUT => $out_f, STDERR => $out_f);
 	}
 	else {
-	    #system("$IMCC -r ${TEST_PROG_ARGS} $by_f >$out_f");
-	    Parrot::Test::_run_command("$IMCC ${TEST_PROG_ARGS} $by_f",
+	    Parrot::Test::_run_command("$PARROT ${TEST_PROG_ARGS} $by_f",
 		STDOUT => $out_f, STDERR => $out_f);
 	}
 
@@ -124,7 +119,7 @@ sub generate_functions {
   }
 }
 
-generate_functions(caller, "./");
+generate_functions(caller);
 
 # vim:set sw=4:
 1;

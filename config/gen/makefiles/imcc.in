@@ -4,12 +4,15 @@ PERL = ${perl}
 all :
 	@echo "Don't make imcc, make parrot"
 
-clean:
-	$(RM_F) core \
-	        *${o} \
-	        imcparser.output \
+testclean:
+	$(RM_F)  \
 	        t/*/*.out t/*/*.imc \
 		t/*/*.pbc t/*/*.o t/*/*.stabs.s t/*/*.pasm
+
+clean:	testclean
+	$(RM_F) core \
+	        *${o} \
+	        imcparser.output
 
 realclean: clean
 
