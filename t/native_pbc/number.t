@@ -6,11 +6,7 @@ my $comment = <<'EOC';
 # if your wordsize/floattype/endianess is not covered here
 # please add it:
 
-$ cd languages/imcc
-$ make clean && make -s
-$ cd -
-$ ln -s languages/imcc/imcc imcc
-$ imcc -o n.pbc t/op/number_1.pasm
+$ parrot -o n.pbc t/op/number_1.pasm
 $ make pdump
 $ pdump -h n.pbc
 $ mv n.pbc t/native_pbc/number_$(N).pbc
@@ -27,7 +23,7 @@ EOC
 use Parrot::Test tests => 3;
 
 SKIP: {
-skip("core ops changes", Test::Builder->expected_tests());
+#skip("core ops changes", 2);
 
 output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
 # number_1.pbc
@@ -105,7 +101,10 @@ CODE
 281474976710656.000000
 1125899906842620.000000
 OUTPUT
+}
 
+SKIP: {
+skip("core ops changes", 1);
 output_is(<<CODE, <<OUTPUT, "SPARC double float 32 bit opcode_t");
 # number_3.pbc
 #HEADER => [

@@ -9,30 +9,20 @@
 # run it as:
 # $ sh tools/dev/mk_native_pbc
 
-make progclean
+make -s progclean
+make -s -C languages/imcc clean
 perl Configure.pl --debugging --floatval="long double" --nomanicheck
 tail myconfig
 make -s
-#cp parrot parrot-d12
-cd languages/imcc
-make clean && make -s
-#cp imcc imcc-d12
-cd ..
-cd ..
-languages/imcc/imcc -o n.pbc t/op/number_1.pasm
+./parrot -o n.pbc t/op/number_1.pasm
 mv n.pbc t/native_pbc/number_2.pbc
 
-make progclean
+make -s progclean
+make -s -C languages/imcc clean
 perl Configure.pl --debugging --floatval=double --nomanicheck
 tail myconfig
 make -s
-#cp parrot parrot-d8
-cd languages/imcc
-make clean && make -s
-#cp imcc imcc-d8
-cd ..
-cd ..
-languages/imcc/imcc -o n.pbc t/op/number_1.pasm
+./parrot -o n.pbc t/op/number_1.pasm
 mv n.pbc t/native_pbc/number_1.pbc
 
 make pdump
