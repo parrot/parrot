@@ -3498,7 +3498,7 @@ the second entry, the second becomes the third etc., while the former
 =cut
 
 inline op rotate_up(in INT) {
-  rotate_entries(interpreter, interpreter->ctx.user_stack, $1);
+  rotate_entries(interpreter, &interpreter->ctx.user_stack, $1);
   goto NEXT();
 }
 

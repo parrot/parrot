@@ -154,14 +154,19 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
    is bubble down, so that the Nth element becomes the top most element.
 */
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t *stack, Intval num_entries)
+rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
 {
+    Stack_Chunk_t *stack = *stack_p;
     Stack_Entry_t temp;
     Intval i;
     Intval depth = num_entries - 1;
 
     if (num_entries >= -1 && num_entries <= 1) {
         return;
+    }
+    /* If stack is copy-on-write, copy it before we can execute on it */
+    if (stack->flags & STACK_CHUNK_COW_FLAG) {
+        *stack_p = stack = stack_copy(interpreter, stack);
     }
 
     if (num_entries < 0) {

@@ -56,22 +56,22 @@ void stack_mark_cow(Stack_Chunk_t *stack_base);
 
 size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 
-Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base, 
+Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base,
                           Intval stack_depth);
 
-void rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base,
+void rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_base,
                     Intval num_entries);
 
 void stack_push(Interp *interpreter, Stack_Chunk_t **stack_base,
-                void *thing, Stack_entry_type type, 
+                void *thing, Stack_entry_type type,
                 Stack_cleanup_method cleanup);
 
-void *stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base, 
+void *stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base,
                 void *where, Stack_entry_type type);
 
 void *pop_dest(Interp *interpreter);
 
-void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack, 
+void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack,
                 Stack_entry_type *type);
 
 Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
@@ -88,7 +88,7 @@ Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
