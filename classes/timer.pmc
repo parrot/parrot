@@ -6,9 +6,9 @@
  *     This is the Timer base class
  *  Data Structure and Algorithms:
  *     Running timers are kept in a linked list. Each timer has a
- *     tick count, which gets decremented, if the system timer
+ *     tick count, which gets decremented if the system timer
  *     expires. If the tick count reaches zero, the timer handler gets
- *     invoked via Parrots event handling code.
+ *     invoked via Parrot's event handling code.
  *  History:
  *     Initial proposal by leo 2003.07.15
  *     Initial revision        2003.07.17
@@ -31,12 +31,12 @@
  *     set P0[.TIMER_RUNNING], 0                # turn timer off
  *
  *  Notes:
- *     The Timer resolution is operating system dependend. Its only
- *     guaranteed, that the Timer will fire some time after the
+ *     The Timer resolution is operating system dependent. It's only
+ *     guaranteed that the Timer will fire some time after the
  *     programmed interval.
- *     The Timer stops after (repeat+1) times invoking the handler.
- *     If a Timer should run forever, set "repeat" to -1.
- *     Turning the Timer off preserves set values, the Timer is
+ *     The Timer stops after invoking the handler (repeat+1) times.
+ *     To create a Timer that will run forever, set "repeat" to -1.
+ *     Turning the Timer off preserves set values; the Timer is
  *     not destroyed.
  *     When setting both TIMER_SEC and TIMER_USEC it must be done in
  *     that sequence, whole seconds first.
