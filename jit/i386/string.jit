@@ -33,7 +33,7 @@ get_strlen {
     mov (%eax),%eax
 }
 
-get_enconding {
+get_encoding {
     movl &ARG[0],%eax
     addl $0x14,%eax
     mov (%eax),%eax
