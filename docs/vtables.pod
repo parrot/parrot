@@ -77,7 +77,7 @@ You should almost always start by running F<genclass.pl> found in the
 F<classes/> subdirectory to generate a skeleton for the class. Let's
 generate a number type for the beautifully non-existant Fooby language:
 
-    perl -I.. genclass.pl FoobyNumber > foobynumber.pmc
+    perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
 F<pmc2c.pl> program) with stubs for all the methods you need to fill in;
