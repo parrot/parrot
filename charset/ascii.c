@@ -17,6 +17,7 @@ charset functionality for similar charsets like iso-8859-1.
 
 #include "parrot/parrot.h"
 #include "ascii.h"
+#include <assert.h>
 
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
@@ -51,7 +52,7 @@ ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
 {
 
     for (; start < string->strlen; start++) {
-        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] & type) {
+        if (table[ENCODING_GET_BYTE(interpreter, string, start)] & type) {
             return start;
         }
     }
@@ -62,20 +63,12 @@ INTVAL
 ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
         unsigned char type, const unsigned char *table)
 {
-    INTVAL retval = -1;
-    INTVAL found = 0;
-
     for (; start < string->strlen; start++) {
-        if (!(table[ENCODING_GET_CODEPOINT(interpreter, string, start)]
-                    &type)) {
-            found = 1;
-            break;
+        if (!(table[ENCODING_GET_BYTE(interpreter, string, start)] & type)) {
+            return start;
         }
     }
-    if (found) {
-        retval = start;
-    }
-    return retval;
+    return -1;
 }
 
 STRING *
@@ -157,6 +150,7 @@ upcase(Interp *interpreter, STRING *source_string)
         return;
     }
 
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
@@ -172,6 +166,7 @@ downcase(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
@@ -187,6 +182,7 @@ titlecase(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
@@ -202,6 +198,7 @@ upcase_first(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
@@ -214,6 +211,7 @@ downcase_first(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
@@ -226,29 +224,83 @@ titlecase_first(Interp *interpreter, STRING *source_string)
     if (!source_string->strlen) {
         return;
     }
+
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     buffer[0] = toupper(buffer[0]);
 }
 
-static INTVAL
-compare(Interp *interpreter, STRING *lhs, STRING *rhs)
+INTVAL
+ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 {
-    return 0;
+    INTVAL retval;
+    UINTVAL offs, l_len, r_len, min_len;
+
+    l_len = lhs->strlen;
+    r_len = rhs->strlen;
+    min_len = l_len > r_len ? r_len : l_len;
+
+    if (lhs->encoding == Parrot_fixed_8_encoding_ptr &&
+            rhs->encoding == Parrot_fixed_8_encoding_ptr) {
+        retval = memcmp(lhs->strstart, rhs->strstart, min_len);
+    }
+    else {
+        UINTVAL cl, cr;
+        for (offs = 0; offs < min_len; ++offs) {
+            cl = ENCODING_GET_BYTE(interpreter, lhs, offs);
+            cr = ENCODING_GET_BYTE(interpreter, rhs, offs);
+            retval = cl - cr;
+            if (retval)
+                break;
+        }
+    }
+    if (!retval) {
+        if (l_len < r_len) {
+            return -1;
+        }
+        if (l_len > r_len) {
+            return 1;
+        }
+        if (l_len == r_len) {
+            return 0;
+        }
+    }
+    retval = retval > 0 ? 1 : -1;
+    return retval;
 }
 
-static INTVAL
-cs_index(Interp *interpreter, const STRING *source_string,
+INTVAL
+ascii_cs_index(Interp *interpreter, const STRING *source_string,
         const STRING *search_string, UINTVAL offset)
 {
-    return -1;
+    UINTVAL base_size, search_size;
+    char *base, *search;
+    INTVAL retval;
+    if (source_string->charset != search_string->charset) {
+        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
+    }
+
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    retval = Parrot_byte_index(interpreter, source_string,
+            search_string, offset);
+    return retval;
 }
 
-static INTVAL
-cs_rindex(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
-{
-    return -1;
+INTVAL
+ascii_cs_rindex(Interp *interpreter, const STRING *source_string,
+        const STRING *search_string, UINTVAL offset) {
+    UINTVAL base_size, search_size;
+    char *base, *search;
+    INTVAL retval;
+    if (source_string->charset != search_string->charset) {
+        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
+    }
+
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    retval = Parrot_byte_rindex(interpreter, source_string,
+            search_string, offset);
+    return retval;
 }
 
 static UINTVAL
@@ -420,6 +472,7 @@ find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
   return ascii_find_word_boundary(interpreter, source_string,
           offset, typetable);
 }
+
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
@@ -429,14 +482,18 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
     return return_string;
 }
 
-static size_t
-compute_hash(Interp *interpreter, STRING *source_string)
+/*
+ * TODO pass in the Hash's seed value as initial hashval
+ */
+size_t
+ascii_compute_hash(Interp *interpreter, STRING *source_string)
 {
-    size_t hashval;
+    size_t hashval = 0;
 
     char *buffptr = (char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
 
+    assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {
         hashval += hashval << 5;
         hashval += *buffptr++;
@@ -466,9 +523,9 @@ Parrot_charset_ascii_init(Interp *interpreter)
       upcase_first,
       downcase_first,
       titlecase_first,
-      compare,
-      cs_index,
-      cs_rindex,
+      ascii_compare,
+      ascii_cs_index,
+      ascii_cs_rindex,
       validate,
       is_wordchar,
       find_wordchar,
@@ -487,7 +544,7 @@ Parrot_charset_ascii_init(Interp *interpreter)
       ascii_find_not_newline,
       find_word_boundary,
       string_from_codepoint,
-      compute_hash,
+      ascii_compute_hash,
       {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
   };

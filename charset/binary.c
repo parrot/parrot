@@ -16,24 +16,17 @@ This file implements the charset functions for binary data
 
 #include "parrot/parrot.h"
 #include "binary.h"
+#include "ascii.h"
 
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
 
-static STRING *
-get_graphemes(Interp *interpreter, STRING *source_string,
-        UINTVAL offset, UINTVAL count)
-{
-    return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
-}
+#ifdef EXCEPTION
+#  undef EXCEPTION
+#endif
 
-static STRING *
-get_graphemes_inplace(Interp *interpreter, STRING *source_string,
-        STRING *dest_string, UINTVAL offset, UINTVAL count)
-{
-    return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
-            offset, count, dest_string);
-}
+#define EXCEPTION(err, str) \
+    real_exception(interpreter, NULL, err, str)
 
 static void
 set_graphemes(Interp *interpreter, STRING *source_string,
@@ -92,37 +85,37 @@ decompose(Interp *interpreter, STRING *source_string)
 static void
 upcase(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't upcase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void
 downcase(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't downcase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void
 titlecase(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't titlecase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static void
 upcase_first(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't upcase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void
 downcase_first(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't downcase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void
 titlecase_first(Interp *interpreter, STRING *source_string)
 {
-    internal_exception(INVALID_CHARTYPE, "Can't titlecase binary data");
+    EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static INTVAL
@@ -168,7 +161,7 @@ find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return offset;
+    return -1;
 }
 
 static INTVAL
@@ -185,7 +178,7 @@ find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 
 static INTVAL
 find_not_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset) {
-    return offset;
+    return -1;
 }
 
 static INTVAL
@@ -203,7 +196,7 @@ find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return offset;
+    return -1;
 }
 
 static INTVAL
@@ -222,7 +215,7 @@ static INTVAL
 find_not_punctuation(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
-    return offset;
+    return -1;
 }
 
 static INTVAL
@@ -240,7 +233,7 @@ find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return offset;
+    return -1;
 }
 
 static INTVAL
@@ -258,21 +251,6 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
     return return_string;
 }
 
-static size_t
-compute_hash(Interp *interpreter, STRING *source_string)
-{
-    size_t hashval;
-
-    char *buffptr = (char *)source_string->strstart;
-    UINTVAL len = source_string->strlen;
-
-    while (len--) {
-        hashval += hashval << 5;
-        hashval += *buffptr++;
-    }
-    return hashval;
-}
-
 
 CHARSET *
 Parrot_charset_binary_init(Interp *interpreter)
@@ -280,8 +258,8 @@ Parrot_charset_binary_init(Interp *interpreter)
   CHARSET *return_set = Parrot_new_charset(interpreter);
   CHARSET base_set = {
       "binary",
-      get_graphemes,
-      get_graphemes_inplace,
+      ascii_get_graphemes,
+      ascii_get_graphemes_inplace,
       set_graphemes,
       to_charset,
       copy_to_charset,
@@ -317,7 +295,7 @@ Parrot_charset_binary_init(Interp *interpreter)
       find_not_newline,
       find_word_boundary,
       string_from_codepoint,
-      compute_hash,
+      ascii_compute_hash,
       {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
   };

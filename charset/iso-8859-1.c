@@ -230,50 +230,6 @@ titlecase_first(Interp *interpreter, STRING *source_string)
     upcase_first(interpreter, source_string);
 }
 
-static INTVAL
-compare(Interp *interpreter, STRING *lhs, STRING *rhs)
-{
-    INTVAL retval = memcmp(lhs->strstart, rhs->strstart, lhs->strlen);
-    if (!retval && lhs->strlen < rhs->strlen) {
-        retval = -1;
-    }
-    if (retval) {
-        retval = retval > 0 ? 1 : -1;
-    }
-    return retval;
-}
-
-static INTVAL
-cs_index(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
-{
-    UINTVAL base_size, search_size;
-    char *base, *search;
-    INTVAL retval;
-    if (source_string->charset != search_string->charset) {
-        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
-    }
-
-    retval = Parrot_byte_index(interpreter, source_string,
-            search_string, offset);
-    return retval;
-}
-
-static INTVAL
-cs_rindex(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset) {
-    UINTVAL base_size, search_size;
-    char *base, *search;
-    INTVAL retval;
-    if (source_string->charset != search_string->charset) {
-        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
-    }
-
-    retval = Parrot_byte_rindex(interpreter, source_string,
-            search_string, offset);
-    return retval;
-}
-
 
 static UINTVAL
 validate(Interp *interpreter, STRING *src)
@@ -401,21 +357,6 @@ string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
     return return_string;
 }
 
-static size_t
-compute_hash(Interp *interpreter, STRING *source_string)
-{
-    size_t hashval = 0;
-
-    char *buffptr = (char *)source_string->strstart;
-    UINTVAL len = source_string->strlen;
-
-    while (len--) {
-        hashval += hashval << 5;
-        hashval += *buffptr++;
-    }
-    return hashval;
-}
-
 CHARSET *
 Parrot_charset_iso_8859_1_init(Interp *interpreter)
 {
@@ -438,9 +379,9 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         upcase_first,
         downcase_first,
         titlecase_first,
-        compare,
-        cs_index,
-        cs_rindex,
+        ascii_compare,
+        ascii_cs_index,
+        ascii_cs_rindex,
         validate,
         is_wordchar,
         find_wordchar,
@@ -459,7 +400,7 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         ascii_find_not_newline,
         find_word_boundary,
         string_from_codepoint,
-        compute_hash,
+        ascii_compute_hash,
         {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
             NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 

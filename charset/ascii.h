@@ -32,6 +32,13 @@ INTVAL ascii_find_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_not_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_word_boundary(Interp *, STRING *source_string,
         UINTVAL offset, const unsigned char *typetable);
+INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
+INTVAL ascii_compare(Interp *, STRING *lhs, STRING *rhs);
+INTVAL ascii_cs_index(Interp *, const STRING *source_string,
+        const STRING *search_string, UINTVAL offset);
+INTVAL ascii_cs_rindex(Interp *, const STRING *source_string,
+        const STRING *search_string, UINTVAL offset);
+size_t ascii_compute_hash(Interp *, STRING *source_string);
 
 static void set_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
@@ -45,9 +52,6 @@ static void titlecase(Interp *, STRING *source_string);
 static void upcase_first(Interp *, STRING *source_string);
 static void downcase_first(Interp *, STRING *source_string);
 static void titlecase_first(Interp *, STRING *source_string);
-static INTVAL compare(Interp *, STRING *lhs, STRING *rhs);
-static INTVAL cs_index(Interp *, const STRING *source_string, const STRING *search_string, UINTVAL offset);
-static INTVAL cs_rindex(Interp *, const STRING *source_string, const STRING *search_string, UINTVAL offset);
 static UINTVAL validate(Interp *, STRING *source_string);
 static INTVAL is_wordchar(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_wordchar(Interp *, STRING *source_string, UINTVAL offset);
@@ -61,7 +65,6 @@ static INTVAL find_not_digit(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL is_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_punctuation(Interp *, STRING *source_string, UINTVAL offset);
-static size_t compute_hash(Interp *, STRING *source_string);
 CHARSET *Parrot_charset_ascii_init(Interp *);
 
 
