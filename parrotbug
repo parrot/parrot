@@ -24,7 +24,7 @@ my %std_to =
 
 my $parrotdir = File::Spec->curdir();
 
-my ( $user, $domain );
+my ( $user, $domain, $editor );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
@@ -66,13 +66,14 @@ A program to help generate bug reports about parrot, and mail them.
 Usage:
 
  $0 [-s subject] [-b body] [-f inputfile] [-r returnaddress] [-A]
-    [-ok|-nok]
+    [-e editor] [-ok|-nok]
  $0 {-h|-V}
 
 Options:
   -A    Don't send a bug received acknowledgement to the return address.
   -b    Body of the report. If not included on the command line, or
         in a file with -f, you will get a chance to edit the message.
+  -e    Editor to use.
   -f    File containing the body of the report. Use this to
         quickly send a prepared message.
   -h    Print this help message and exit.
@@ -113,7 +114,7 @@ sub init {
     my $filename = File::Spec->catfile($parrotdir, "VERSION");
     open(VERSION, "<$filename") or die "Cannot open '$filename': $!";
     $parrot_version = <VERSION>;
-    chomp($parrot_version);
+    chomp $parrot_version;
     close(VERSION) or die "Cannot close '$filename': $!";
 
     # Get parrot configuration, stored in $parrot/myconfig
@@ -130,9 +131,9 @@ sub init {
     ## Process options.
     ##
     @ARGV = split m/\s+/,
-        MacPerl::Ask('Provide command-line args here (-h for help):')
+        MacPerl::Ask("Provide command-line args here (-h for help):")
         if $is_macos && $MacPerl::Version =~ /App/;
-    help() unless getopts("AVhb:f:n:o:r:s:");
+    help() unless getopts("AVhb:e:f:n:o:r:s:");
 
 
     ##
@@ -191,24 +192,36 @@ sub init {
 
 
     ## 
-    ## Mail information.
+    ## User information.
     ## 
 
     # Username.
-    $user = $is_mswin32 ? $ENV{'USERNAME'}
-	    : $is_os2   ? $ENV{'USER'} || $ENV{'LOGNAME'}
-	    : $is_macos ? $ENV{'USER'}
+    $user = $is_mswin32 ? $ENV{USERNAME}
+	    : $is_os2   ? $ENV{USER} || $ENV{LOGNAME}
+	    : $is_macos ? $ENV{USER}
 	    : eval { getpwuid($<) };	# May be missing
 
     # User address, used in message and in Reply-To header.
     $from = $opt_r || "";
+
+   # Editor
+    $editor = $opt_e || $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
+	|| ( $is_vms && "edit/tpu" )
+	|| ( $is_mswin32 && "notepad" )
+	|| ( $is_macos && "" )
+	|| "vi";
+
+
+    ## 
+    ## Mail information.
+    ## 
 
     # Message-Id.
     eval "use Mail::Util;";
     if ( $@ eq "" ) {
         $domain = Mail::Util::maildomain();
     } elsif ($is_mswin32) {
-        $domain = $ENV{'USERDOMAIN'};
+        $domain = $ENV{USERDOMAIN};
     } else {
         require Sys::Hostname;
         $domain = Sys::Hostname::hostname();
@@ -242,6 +255,8 @@ developpers.
 If you're just looking for help with parrot, subscribe to the parrot
 mailing list, perl6-internals<at>perl.org.
 
+
+
 EOF
 #'
 
@@ -251,7 +266,6 @@ EOF
     $subject = "" if trivial_subject( $subject );
     unless ( $subject ) {
         print <<EOF;
-
 First of all, please provide a subject for the message. It should be a
 concise description of the bug or problem. "parrot bug" or "parrot
 problem" is not a concise description.
@@ -267,6 +281,7 @@ EOF
             chomp $subject;
             die "Aborting.\n" if $err++ == 5;
         } while ( trivial_subject($subject) );
+        print "\n\n\n";
     }
 
 
@@ -275,8 +290,6 @@ EOF
     ## 
     unless ( $from ) {
         print <<EOF;
-
-
 Your e-mail address will be useful if you need to be contacted. If the
 default shown below is not your full internet e-mail address, please
 correct it.
@@ -305,7 +318,37 @@ EOF
         print "Your address [$guess]: ";
         $from = <>;
         chomp $from;
-        $from = $guess if $from eq '';
+        $from = $guess if $from eq "";
+        print "\n\n\n";
+    }
+
+
+    ##
+    ## Prompt for body, if needed.
+    ##
+    unless ( $body ) {
+        print <<EOF;
+Now you need to supply the bug report. Try to make the report concise
+but descriptive. Include any relevant detail. If you are reporting
+something that does not work as you think it should, please try to
+include example of both the actual result, and what you expected.
+
+Some information about your local parrot configuration will
+automatically be included at the end of the report. If you are using
+any unusual version of parrot, please try and confirm exactly which
+versions are relevant.
+
+You will probably want to use an editor to enter the report. If the
+default editor proposed below is the editor you want to use, then just
+press the 'Enter' key, otherwise type in the name of the editor you
+would like to use.
+
+EOF
+
+	print "Editor [$editor]: ";
+	my $entry = <>;
+	chomp $entry;
+        $editor = $entry if $entry eq "";
     }
 }
 
