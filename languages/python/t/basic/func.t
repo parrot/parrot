@@ -1,8 +1,9 @@
 # $Id$
 
 use strict;
+use lib '../../lib';
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -39,4 +40,16 @@ if __name__ == "__main__":
 	foo(a)
 	foo(a, b)
 	foo(a, b, 2)
+CODE
+
+test(<<'CODE', 'abs() builtin');
+def check(a,b):
+    print a,b
+
+def check_functions(i=0, j=0):
+    check(abs(42*i), 42*j)
+
+if __name__ == '__main__':
+    check_functions()
+    check_functions(-1, 2)
 CODE

@@ -136,6 +136,12 @@ bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
     return mpz_cmp_ui(BN(self), value);
 }
 
+static void
+bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_abs(BN(dest), BN(self));
+}
 #else
 
 static void
@@ -219,6 +225,11 @@ bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 {
     internal_exception(1, "no bigint lib loaded");
     return 0;
+}
+static void
+bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
 }
 #endif
 
@@ -446,6 +457,7 @@ MMD_PerlInt: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
     }
+
     INTVAL is_equal(PMC* value) {
 MMD_BigInt: {
         return bigint_cmp(INTERP, SELF, value) == 0;
@@ -453,6 +465,20 @@ MMD_BigInt: {
 MMD_PerlInt: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
+    }
+
+/*
+
+=item C<void absolute()>
+
+Sets C<dest> to the absolute value of SELF.0).
+
+=cut
+
+*/
+
+    void absolute(PMC *dest) {
+        bigint_abs(INTERP, SELF, dest);
     }
 }
 

@@ -1,6 +1,7 @@
 # $Id$
 
 use strict;
+use lib '../../lib';
 
 use Parrot::Test tests => 1;
 

@@ -10,7 +10,7 @@ getopts('dnD', \%opt);
 $file = $ARGV[0];
 
 my %builtins = (
-    [ 'iabs', 1, 'I' ],   # no abs P,P
+    abs => 1
 );
 
 get_dis($DIS, $file);
@@ -177,7 +177,7 @@ sub temp {
 sub typ {
     my $c = $_[0];
     my $t = 'P';
-    if ($c =~ /^\d+$/) {	# int
+    if ($c =~ /^-?\d+$/) {	# int
 	$t = 'I';
     }
     elsif ($c =~ /^\d+L$/) {	# bigint
@@ -253,7 +253,7 @@ EOC
 
 sub is_builtin {
     my $f = shift;
-    return 0;
+    return $builtins{$f};
 }
 
 sub LOAD_GLOBAL {
@@ -521,19 +521,31 @@ sub CALL_FUNCTION
     }
     my $tos = pop @stack;
     my $args = join ', ', @args;
-    print <<EOC;
+    my $t;
+    if ($tos->[2] eq 'F') {	# builtin
+	$t = temp('P');
+	print <<EOC;
+	$t = new $DEFVAR
+	$t = $tos->[1] $args   $cmt
+EOC
+    }
+    else {
+	print <<EOC;
 	$tos->[1]($args)  $cmt
 EOC
+    }
     my $opcode = $code[$code_l]->[2];
     if ($opcode eq 'POP_TOP') {
 	print "# POP_TOP\n";
 	$code_l++;
     }
     else {
-	my $t = temp('P');
-	print <<EOC;
+	if (!$t) {
+	    $t = temp('P');
+	    print <<EOC;
 	$t = P5
 EOC
+	}
 	push @stack, [-1, $t, 'P'];
     }
 }

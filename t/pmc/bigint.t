@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 9;
+   plan tests => 10;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -148,4 +148,23 @@ CODE
 2200000000L BigInt
 2300000000L BigInt
 ok
+OUT
+
+output_is(<<'CODE', <<'OUT', "abs");
+   new P0, .BigInt
+   set P0, "-1230000000000"
+   new P1, .Undef
+   abs P1, P0
+   print P1
+   print "\n"
+   print P0
+   print "\n"
+   abs P0
+   print P0
+   print "\n"
+   end
+CODE
+1230000000000L
+-1230000000000L
+1230000000000L
 OUT
