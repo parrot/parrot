@@ -80,7 +80,6 @@ Parrot_if_i_ic {
 }
 
 Parrot_branch_ic {
-    jmp ($0x0)
     JUMP(INT_CONST[1])
 }
 
