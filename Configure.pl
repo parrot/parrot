@@ -48,6 +48,9 @@ Options:
    Popular ones include:
 
    --ask                Have Configure ask for commonly-changed info
+                        you can remove parts of a line with :rem{<opt>}
+                        and add options with :add{<opt>} e.g.
+                        :rem{-g} :add{-O2}
    --nomanicheck        Don't check the MANIFEST
    --debugging          Enable debugging
    --cc=(compiler)      Use the given compiler

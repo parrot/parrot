@@ -419,8 +419,8 @@ warnings$(O) : $(H_FILES)
 
 misc$(O) : $(H_FILES)
 
-$(STICKY_FILES) : Configure.pl
-	$(PERL) Configure.pl
+# $(STICKY_FILES) : Configure.pl
+#	$(PERL) Configure.pl
 
 $(INC)/vtable.h : vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
