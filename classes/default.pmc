@@ -26,7 +26,24 @@ static const char * caller(Parrot_Interp interp, PMC * pmc)
 static void
 check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
 {
-    if (!string_compare(interp, key, string_from_cstring(interp, "_ro", 0))) {
+#if  1
+    /* XXX
+     * a quick hack, to prevent freeing that string during DOD
+     * triggered in t/pmc/pmc_62.t when configured with --gc=libc
+     */
+    static STRING *ro;
+    if (!ro)
+	ro = string_make(interp, "_ro", 3, NULL,
+		PObj_constant_FLAG|PObj_external_FLAG , 0);
+    if (!string_compare(interp, key, ro)) {
+#else
+
+    /*
+     * s2 in string_compare is freed here
+     */
+    if (!string_compare(interp, key,
+		string_from_cstring(interp, "_ro", 0))) {
+#endif
 	/* pmc should set/clear readonly */
 	INTVAL on = VTABLE_get_bool(interp, value);
 	/* morph to Const/normal class */
@@ -88,10 +105,8 @@ pmclass default abstract noinit {
     }
 
     PMC* getprop(STRING* key) {
-        PMC* p_key;
 	if (SELF->pmc_ext && SELF->metadata) {
-          p_key = key_new_string(interpreter, key);
-	  return (VTABLE_get_pmc_keyed(interpreter, SELF->metadata, p_key));
+	  return VTABLE_get_pmc_keyed_str(interpreter, SELF->metadata, key);
 	}
         else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
@@ -100,13 +115,11 @@ pmclass default abstract noinit {
     }
 
     void setprop(STRING* key, PMC* value) {
-        PMC* p_key;
 
 	check_set_std_props(INTERP, SELF, key, value);
 	if (SELF->pmc_ext && SELF->metadata) {
-          p_key = key_new_string(interpreter, key);
-	  VTABLE_set_pmc_keyed(interpreter,
-			  SELF->metadata, p_key, value);
+	  VTABLE_set_pmc_keyed_str(interpreter,
+			  SELF->metadata, key, value);
 	} else {
           if (!SELF->pmc_ext)
               add_pmc_ext(INTERP, SELF);
@@ -114,17 +127,15 @@ pmclass default abstract noinit {
 	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
 	  VTABLE_init(interpreter, SELF->metadata);
 	  /* then the key, else it vanishes with --gc-debug */
-          p_key = key_new_string(interpreter, key);
-	  VTABLE_set_pmc_keyed(interpreter,
-			  SELF->metadata, p_key, value);
+	  VTABLE_set_pmc_keyed_str(interpreter,
+			  SELF->metadata, key, value);
 	}
 	return;
     }
 
     void delprop(STRING* key) {
 	if (SELF->pmc_ext && SELF->metadata) {
-          PMC* p_key = key_new_string(interpreter, key);
-	  VTABLE_delete_keyed(interpreter, SELF->metadata, p_key);
+	  VTABLE_delete_keyed_str(interpreter, SELF->metadata, key);
 	}
         return;
     }

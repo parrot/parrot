@@ -87,14 +87,12 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
 {
     void *p;
     size_t pad;
-    if (size) {
-        pad = STRING_ALIGNMENT - 1;
-        size = ((size + pad + sizeof(int)) & ~pad);
-        p = calloc(1, size);
-        *(int*)p = 0;
-        str->bufstart = str->strstart = (char *)p + sizeof(int);
-        str->buflen = size - sizeof(int);
-    }
+    pad = STRING_ALIGNMENT - 1;
+    size = ((size + pad + sizeof(int)) & ~pad);
+    p = calloc(1, size);
+    *(int*)p = 0;
+    str->bufstart = str->strstart = (char *)p + sizeof(int);
+    str->buflen = size - sizeof(int);
     return str;
 }
 

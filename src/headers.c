@@ -169,7 +169,7 @@ new_pmc_header(struct Parrot_Interp *interpreter)
 }
 
 
-PMC_EXT *
+static PARROT_INLINE PMC_EXT *
 new_pmc_ext(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;

@@ -379,12 +379,10 @@ typedef enum PObj_enum {
                 (PObj_active_destroy_FLAG | \
                  PObj_custom_mark_FLAG | \
                  PObj_is_PMC_ptr_FLAG | \
+                 PObj_is_PMC_EXT_FLAG | \
                  PObj_needs_early_DOD_FLAG | \
                  PObj_is_buffer_of_PMCs_ptr_FLAG | \
-                 PObj_is_buffer_ptr_FLAG)) || \
-            (PObj_is_PMC_TEST(o) && \
-             ((struct PMC*)(o))->pmc_ext && \
-             ((struct PMC*)(o))->metadata)) \
+                 PObj_is_buffer_ptr_FLAG))) \
         DOD_flag_SET(is_special_PMC, o); \
     else \
         DOD_flag_CLEAR(is_special_PMC, o); \
