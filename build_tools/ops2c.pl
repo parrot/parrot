@@ -157,7 +157,7 @@ if ($suffix =~ /cg/) {
 opcode_t *
 $cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
 {
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(I386)
     register opcode_t *cur_opcode asm ("esi") = cur_op;
 #else
     opcode_t *cur_opcode = cur_op;
