@@ -53,15 +53,15 @@ int do_test(struct Parrot_Interp* interpreter) {
     printf("%d %s", 1, string_to_cstring(interpreter, S));
 
     ival = -255;
-    S = Parrot_sprintf_c(interpreter, "== %vd\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %vd\n", (INTVAL)ival);
     printf("%d %s", (int) ival, string_to_cstring(interpreter, S));
 
     uval = 256;
-    S = Parrot_sprintf_c(interpreter, "== %vu\n", uval);
+    S = Parrot_sprintf_c(interpreter, "== %vu\n", (UINTVAL)uval);
     printf("%u %s", (unsigned) uval, string_to_cstring(interpreter, S));
 
     fval = 0.5;
-    S = Parrot_sprintf_c(interpreter, "== %vf\n", fval);
+    S = Parrot_sprintf_c(interpreter, "== %vf\n", (FLOATVAL)fval);
     printf("%f %s", fval, string_to_cstring(interpreter, S));
 
     dval = 0.5;
@@ -81,35 +81,35 @@ int do_test(struct Parrot_Interp* interpreter) {
 */
 
     fltval = 0.5;
-    S = Parrot_sprintf_c(interpreter, "== %3.3vg\n", fltval);
+    S = Parrot_sprintf_c(interpreter, "== %3.3vg\n", (FLOATVAL)fltval);
     printf("%3.3g %s", (double) fltval, string_to_cstring(interpreter, S));
 
     ival = 32;
-    S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %#vx\n", (INTVAL)ival);
     printf("0x%x %s", (int) ival, string_to_cstring(interpreter, S));
 
     /* test several flags */
         ival = 25;
-    S = Parrot_sprintf_c(interpreter, "== % 5vd\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== % 5vd\n", (INTVAL)ival);
     printf("% 5d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %-5vd|\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %-5vd|\n", (INTVAL)ival);
     printf("%-5d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %05vd\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %05vd\n", (INTVAL)ival);
     printf("%05d %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %2vd\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %2vd\n", (INTVAL)ival);
     printf("%2d %s", (int) ival,
            string_to_cstring(interpreter, S));
 
     ival = -1;
 /* INVALID FOR 64-BIT PLATFORMS?
-    S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %#vx\n", (INTVAL)ival);
     printf("0x%x %s", (int) ival,
            string_to_cstring(interpreter, S));
 */
-    S = Parrot_sprintf_c(interpreter, "== %08vd\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %08vd\n", (INTVAL)ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
      /* test string_nprintf() */
