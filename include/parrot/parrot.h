@@ -281,6 +281,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/library.h"
 #include "parrot/global.h"
 #include "parrot/stat.h"
+#include "parrot/slice.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 

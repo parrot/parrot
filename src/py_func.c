@@ -659,31 +659,12 @@ Parrot_py_init(Interp *interpreter)
     parrot_py_create_default_meths(interpreter);
 }
 
-/*
- * XXX create slice.h
- */
-typedef struct {
-    INTVAL i;
-    STRING *s;
-} RUnion;
-
-#define RVal_int(u) u.i
-#define RVal_str(u) u.s
-
-typedef struct _range_t {
-    int type;                   /* enum_type_INTVAL or STRING */
-    RUnion start;             /* start of this range */
-    RUnion end;               /* end of this range */
-    RUnion step;              /* step of this range */
-    RUnion cur;               /* current value */
-    struct _range_t *next;       /* next in chain */
-} range_t;
 
 PMC*
 Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
 {
     INTVAL i, n, type;
-    range_t *range;
+    parrot_range_t *range;
     PMC *res, *slice, *item;
     INTVAL start, end, iitem;
 
@@ -699,7 +680,10 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
      */
     res = pmc_new(interpreter, type);
     start = RVal_int(range->start);
-    end   = RVal_int(range->end);
+    /*
+     * set_slice_start did already decrement it
+     */
+    end = RVal_int(range->end) + 1;
     n = VTABLE_elements(interpreter, self);
     if (!n) {
         /* slice of empty is empty
@@ -718,17 +702,18 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
         end = start;
     else if (end > n)
         end = n;
-    for (i = start; i <= end; ++i) {
+    for (i = start; i < end; ++i) {
         switch (type) {
             case enum_class_Array:
             case enum_class_PerlArray:
+            case enum_class_FixedPMCArray:
                 item = VTABLE_get_pmc_keyed_int(interpreter, self, i);
                 VTABLE_set_pmc_keyed_int(interpreter, res, i-start, item);
                 break;
             case enum_class_String:
             case enum_class_PerlString:
                 string_substr(interpreter, PMC_str_val(self), start,
-                        end - start + 1, &PMC_str_val(res), 1);
+                        end - start, &PMC_str_val(res), 1);
                 return res;
             case enum_class_IntList:
                 iitem = VTABLE_get_integer_keyed_int(interpreter, self, i);

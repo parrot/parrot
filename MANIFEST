@@ -1845,6 +1845,7 @@ include/parrot/resources.h                        [devel]include
 include/parrot/runops_cores.h                     [devel]include
 include/parrot/rx.h                               [devel]include
 include/parrot/rxstacks.h                         [devel]include
+include/parrot/slice.h                            [devel]include
 include/parrot/smallobject.h                      [devel]include
 include/parrot/stacks.h                           [devel]include
 include/parrot/stat.h			  	  [devel]include

@@ -26,7 +26,7 @@ Run
 
 to see slice constant flags.
 
-During initialization above key chain gets converted to range_t structures.
+During initialization above key chain gets converted to parrot_range_t structures.
 
 =head2 Methods
 
@@ -37,24 +37,6 @@ During initialization above key chain gets converted to range_t structures.
 */
 
 #include "parrot/parrot.h"
-
-typedef struct {
-    INTVAL i;
-    STRING *s;
-} RUnion;
-
-#define RVal_int(u) u.i
-#define RVal_str(u) u.s
-
-typedef struct _range_t {
-    int type;                   /* enum_type_INTVAL or STRING */
-    RUnion start;             /* start of this range */
-    RUnion end;               /* end of this range */
-    RUnion step;              /* step of this range */
-    RUnion cur;               /* current value */
-    struct _range_t *next;       /* next in chain */
-} range_t;
-
 
 /*
  * create range_t structure
@@ -69,7 +51,7 @@ typedef struct _range_t {
 static void
 set_slice_start(Interp *interpreter, PMC *self, PMC *key, PMC *agg)
 {
-    range_t *range = mem_sys_allocate(sizeof *range);
+    parrot_range_t *range = mem_sys_allocate(sizeof *range);
 
     PMC_struct_val(self) = range;
 next_range:
@@ -123,7 +105,7 @@ next_range:
 range_end:
         key = PMC_data(key);
         if (key) {
-            range_t *n = mem_sys_allocate(sizeof *range);
+            parrot_range_t *n = mem_sys_allocate(sizeof *range);
             range->next = n;
             range = n;
             goto next_range;
@@ -167,11 +149,11 @@ range_end:
 static void
 set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 {
-    range_t *r = PMC_struct_val(self);
+    parrot_range_t *r = PMC_struct_val(self);
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
         if (RVal_int(r->cur) > RVal_int(r->end)) {
-            range_t *n;
+            parrot_range_t *n;
 next_range:
             n = r->next;
             mem_sys_free(r);
@@ -208,7 +190,7 @@ pmclass Slice need_ext extends Key {
     }
 
     void destroy () {
-        range_t *r = PMC_struct_val(SELF), *n;
+        parrot_range_t *r = PMC_struct_val(SELF), *n;
         /* iteration ended - all is freed */
         if ((INTVAL) r == -1)
             return;
@@ -239,12 +221,12 @@ Get the next string key from the current slice range.
 */
 
     INTVAL get_integer() {
-        range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = PMC_struct_val(SELF);
         return RVal_int(r->cur);
     }
 
     STRING* get_string() {
-        range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = PMC_struct_val(SELF);
         return RVal_str(r->cur);
     }
 
@@ -280,7 +262,7 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL elements () {
-        range_t *r = PMC_struct_val(SELF);
+        parrot_range_t *r = PMC_struct_val(SELF);
         /* only start .. end supported so:
          * TODO check flags somewhere
          * */
@@ -289,7 +271,7 @@ This is used for implementing Pythons xrange()
     }
 
     INTVAL get_integer_keyed(PMC* key) {
-        range_t *r = PMC_struct_val(key);
+        parrot_range_t *r = PMC_struct_val(key);
         return RVal_int(r->cur);
     }
 
