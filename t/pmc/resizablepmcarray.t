@@ -18,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -175,7 +175,7 @@ output_is(<<'CODE', <<'OUTPUT', "Setting last element");
         new P1, .Integer
         set P1, 1234
 	set P0[-1], P1
-        new P2, .Integer        
+        new P2, .Integer
         set P2, P0[9]
         print P2
         print "\n"
@@ -190,7 +190,7 @@ output_is(<<'CODE', <<'OUTPUT', "Getting last element");
         new P1, .Integer
         set P1, 4321
 	set P0[99], P1
-        new P2, .Integer        
+        new P2, .Integer
         set P2, P0[-1]
         print P2
         print "\n"
@@ -506,3 +506,35 @@ CODE
 10001
 123asdf
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "unshift pmc");
+    new P0, .ResizablePMCArray
+    new P1, .Integer
+    set P1, 1
+    new P2, .Integer
+    set P2, 2
+    new P3, .Integer
+    set P3, 3
+    unshift P0, P1
+    unshift P0, P2
+    unshift P0, P3
+    elements I0, P0
+    print I0
+    print "\n"
+    set P3, P0[0]
+    print P3
+    print "\n"
+    set P3, P0[1]
+    print P3
+    print "\n"
+    set P3, P0[2]
+    print P3
+    print "\n"
+    end
+CODE
+3
+3
+2
+1
+OUTPUT
+

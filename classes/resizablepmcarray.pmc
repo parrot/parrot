@@ -242,6 +242,31 @@ the array.
     }
 /*
 
+=item C<void unshift_pmc (PMC* value)>
+
+Extends the array by adding an element of value C<*value> to the begin of
+the array.
+
+=cut
+
+*/
+
+    void unshift_pmc(PMC* value) {
+        INTVAL size = PMC_int_val(SELF);
+        PMC **data;
+        INTVAL i;
+
+        /* let set_integer_native() worry about memory allocation */
+        DYNSELF.set_integer_native(size + 1);
+        /* make room */
+        data = (PMC**)PMC_data(SELF);
+        for (i = size; i; --i) {
+            data[i] = data[i-1];
+        }
+        data[0] = value;
+    }
+/*
+
 =item C<PMC *clone()>
 
 Creates and returns a copy of the array.
