@@ -27,6 +27,7 @@ classes/genclass.pl
 classes/intlist.pmc
 classes/key.pmc
 classes/multiarray.pmc
+classes/nci.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
 classes/perlint.pmc
