@@ -119,7 +119,7 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
         STRING *name = string_make(interp, recp->name, strlen(recp->name),
                                    NULL, 0, NULL);
         key_set_string(interp, k, name);
-        VTABLE_set_pmc_keyed(interp, hash, NULL, csub, k);
+        VTABLE_set_pmc_keyed(interp, hash, k, csub);
         ++recp;
     }
 }

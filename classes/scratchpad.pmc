@@ -102,7 +102,7 @@ pmclass Scratchpad {
      * Store a value as a lexical variable. The same key types that
      * get_pmc_keyed supports are supported here.
      */
-    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
+    void set_pmc_keyed (PMC* key, PMC* value) {
 	INTVAL pad_index = 0, position = 0;
         STRING * name = NULL;
         PMC * key2 = key_next(INTERP, key);

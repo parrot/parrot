@@ -121,15 +121,15 @@ pmclass SArray {
         return DYNSELF.elements();
     }
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
+    INTVAL get_integer_keyed_int (INTVAL key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
-	if (*key < 0) {
-	    *key += e[1].val.int_val;
+	if (key < 0) {
+	    key += e[1].val.int_val;
 	}
-	if (*key < e[0].val.int_val || *key >= e[1].val.int_val)
+	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	if (e->type != enum_hash_int)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Not an integer!\n");
         return e->val.int_val;
@@ -138,7 +138,7 @@ pmclass SArray {
     INTVAL get_integer_keyed (PMC* key) {
 	/* simple int keys only */
 	INTVAL k = key_integer(INTERP, key);
-	return SELF.get_integer_keyed_int(&k);
+	return SELF.get_integer_keyed_int(k);
     }
 
     INTVAL shift_integer() {
@@ -152,15 +152,15 @@ pmclass SArray {
         return e->val.int_val;
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
-	if (*key < 0) {
-	    *key += e[1].val.int_val;
+	if (key < 0) {
+	    key += e[1].val.int_val;
 	}
-	if (*key < e[0].val.int_val || *key >= e[1].val.int_val)
+	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	if (e->type != enum_hash_num)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Not a num!\n");
         return e->val.num_val;
@@ -168,7 +168,7 @@ pmclass SArray {
 
     FLOATVAL get_number_keyed (PMC* key) {
 	INTVAL k = key_integer(INTERP, key);
-	return SELF.get_number_keyed_int(&k);
+	return SELF.get_number_keyed_int(k);
     }
 
     FLOATVAL shift_float() {
@@ -182,15 +182,15 @@ pmclass SArray {
         return e->val.num_val;
     }
 
-    STRING* get_string_keyed_int (INTVAL* key) {
+    STRING* get_string_keyed_int (INTVAL key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 
-	if (*key < 0) {
-	    *key += e[1].val.int_val;
+	if (key < 0) {
+	    key += e[1].val.int_val;
 	}
-	if (*key < e[0].val.int_val || *key >= e[1].val.int_val)
+	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	if (e->type != enum_hash_string)
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Not a string!\n");
         return e->val.string_val;
@@ -198,7 +198,7 @@ pmclass SArray {
 
     STRING* get_string_keyed(PMC* key) {
 	INTVAL k = key_integer(INTERP, key);
-	return SELF.get_string_keyed_int(&k);
+	return SELF.get_string_keyed_int(k);
     }
 
     STRING* shift_string() {
@@ -212,16 +212,16 @@ pmclass SArray {
         return e->val.string_val;
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
+    PMC* get_pmc_keyed_int (INTVAL key) {
         HASH_ENTRY *e = (HASH_ENTRY *) PMC_data(SELF);
 	PMC *ret;
 
-	if (*key < 0) {
-	    *key += e[1].val.int_val;
+	if (key < 0) {
+	    key += e[1].val.int_val;
 	}
-	if (*key < e[0].val.int_val || *key >= e[1].val.int_val)
+	if (key < e[0].val.int_val || key >= e[1].val.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	switch (e->type) {
 	    case enum_hash_int:
 		ret = pmc_new(INTERP, enum_class_PerlUndef);
@@ -245,7 +245,7 @@ pmclass SArray {
 
     PMC* get_pmc_keyed(PMC* key) {
 	INTVAL k = key_integer(INTERP, key);
-	return SELF.get_pmc_keyed_int(&k);
+	return SELF.get_pmc_keyed_int(k);
     }
 
     PMC* shift_pmc() {
@@ -273,16 +273,16 @@ pmclass SArray {
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
         HASH_ENTRY *e;
-	if (*key < 0 || *key >= SELF->cache.int_val)
+	if (key < 0 || key >= SELF->cache.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_int;
 	e->val.int_val = value;
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
-	if (*key >= e->val.int_val)
-	    e->val.int_val = *key + 1;
+	if (key >= e->val.int_val)
+	    e->val.int_val = key + 1;
     }
 
     void push_integer (INTVAL value) {
@@ -292,19 +292,19 @@ pmclass SArray {
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
 	nextix = e->val.int_val;
-	DYNSELF.set_integer_keyed_int(&nextix, value);
+	DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
-    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         HASH_ENTRY *e;
-	if (*key < 0 || *key >= SELF->cache.int_val)
+	if (key < 0 || key >= SELF->cache.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_num;
 	e->val.num_val = value;
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
-	if (*key >= e->val.int_val)
-	    e->val.int_val = *key + 1;
+	if (key >= e->val.int_val)
+	    e->val.int_val = key + 1;
     }
 
     void push_float (FLOATVAL value) {
@@ -314,19 +314,19 @@ pmclass SArray {
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
 	nextix = e->val.int_val;
-        DYNSELF.set_number_keyed_int(&nextix, value);
+        DYNSELF.set_number_keyed_int(nextix, value);
     }
 
-    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    void set_string_keyed_int (INTVAL key, STRING* value) {
         HASH_ENTRY *e;
-	if (*key < 0 || *key >= SELF->cache.int_val)
+	if (key < 0 || key >= SELF->cache.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_string;
 	e->val.string_val = value;
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
-	if (*key >= e->val.int_val)
-	    e->val.int_val = *key + 1;
+	if (key >= e->val.int_val)
+	    e->val.int_val = key + 1;
     }
 
     void push_string (STRING* value) {
@@ -336,21 +336,19 @@ pmclass SArray {
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
 	nextix = e->val.int_val;
-        DYNSELF.set_string_keyed_int(&nextix, value);
+        DYNSELF.set_string_keyed_int(nextix, value);
     }
 
-    void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
         HASH_ENTRY *e;
-	if (*key < 0 || *key >= SELF->cache.int_val)
+	if (key < 0 || key >= SELF->cache.int_val)
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
-	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + *key);
+	e = (HASH_ENTRY *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_pmc;
-        if (src_key)
-	    src = VTABLE_get_pmc_keyed_int(INTERP, src, src_key);
 	e->val.pmc_val = src;
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
-	if (*key >= e->val.int_val)
-	    e->val.int_val = *key + 1;
+	if (key >= e->val.int_val)
+	    e->val.int_val = key + 1;
     }
 
     void push_pmc (PMC* value) {
@@ -361,7 +359,7 @@ pmclass SArray {
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HASH_ENTRY *) PMC_data(SELF) + 1;
 	nextix = e->val.int_val;
-        DYNSELF.set_pmc_keyed_int(&nextix, value, NULL);
+        DYNSELF.set_pmc_keyed_int(nextix, value);
     }
 
     PMC* nextkey_keyed (PMC* key, INTVAL what) {

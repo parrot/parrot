@@ -1015,28 +1015,28 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     size = item_size = items_per_chunk = 0;
     multi_key = NULL;
     for (i = 0; i < len; i += 2) {
-        key = VTABLE_get_integer_keyed_int(interpreter, init, &i);
+        key = VTABLE_get_integer_keyed_int(interpreter, init, i);
         val = i + 1;
         switch (key) {
             case 0:
                 size = VTABLE_get_integer_keyed_int(interpreter,
-                        init, &val);
+                        init, val);
                 break;
             case 1:
                 multi_key = VTABLE_get_pmc_keyed_int(interpreter,
-                        init, &val);
+                        init, val);
                 break;
             case 2:
                 type = VTABLE_get_integer_keyed_int(interpreter,
-                        init, &val);
+                        init, val);
                 break;
             case 3:
                 item_size = VTABLE_get_integer_keyed_int(interpreter,
-                        init, &val);
+                        init, val);
                 break;
             case 4:
                 items_per_chunk = VTABLE_get_integer_keyed_int(
-                        interpreter, init, &val);
+                        interpreter, init, val);
                 break;
         }
     }
@@ -1060,21 +1060,8 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     /* set length */
     VTABLE_set_integer_native(interpreter, user_array, 2);
     /* store values */
-    key = 0;
-    VTABLE_set_integer_keyed_int(interpreter, user_array,
-            &key, size);
-    key = 1;
-    VTABLE_set_pmc_keyed_int(interpreter, user_array,
-            &key, multi_key, NULL);
-#if 0
-    /* don't need these, they are stored in the List structure */
-    key = 2;
-    VTABLE_set_integer_keyed_int(interpreter, user_array,
-            &key, type);
-    key = 3;
-    VTABLE_set_integer_keyed_int(interpreter, user_array,
-            &key, item_size);
-#endif
+    VTABLE_set_integer_keyed_int(interpreter, user_array, 0,  size);
+    VTABLE_set_pmc_keyed_int(interpreter, user_array, 1, multi_key);
     return list;
 }
 

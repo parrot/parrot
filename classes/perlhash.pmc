@@ -299,7 +299,7 @@ pmclass PerlHash {
         hash_put(INTERP, PMC_data(SELF), keystr, &entry);
     }
 
-    void set_pmc_keyed (PMC* dest_key, PMC* value, PMC* val_key) {
+    void set_pmc_keyed (PMC* dest_key, PMC* value) {
         STRING* keystr = make_hash_key(INTERP, dest_key);
         HASH_ENTRY entry;
         entry.type = enum_hash_pmc;

@@ -46,33 +46,31 @@ pmclass PerlArray extends Array {
         return whoami;
     }
 
-    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
-		(List *) PMC_data(SELF), *key);
+		(List *) PMC_data(SELF), key);
         VTABLE_set_integer_native(INTERP, ptr, value);
     };
 
 
-    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
-		(List *) PMC_data(SELF), *key);
+		(List *) PMC_data(SELF), key);
         VTABLE_set_number_native(INTERP, ptr, value);
     };
 
 
-    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    void set_string_keyed_int (INTVAL key, STRING* value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
-		(List *) PMC_data(SELF), *key);
+		(List *) PMC_data(SELF), key);
         VTABLE_set_string_native(INTERP, ptr, value);
     };
 
-    void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
-        if (src_key)
-	    src = VTABLE_get_pmc_keyed_int(INTERP, src, src_key);
-	list_assign(INTERP, (List *) PMC_data(SELF), *key, src, enum_type_PMC);
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+	list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     };
 
-    void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
+    void set_pmc_keyed (PMC* key, PMC* src) {
         INTVAL ix;
 
         if (!key) return;
@@ -81,8 +79,8 @@ pmclass PerlArray extends Array {
 	list_assign(INTERP, (List *) PMC_data(SELF), ix, src, enum_type_PMC);
     };
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
-        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
             return VTABLE_get_integer(INTERP, temp);
         }
@@ -90,8 +88,8 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
-        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
             return VTABLE_get_number(INTERP, temp);
         }
@@ -103,8 +101,8 @@ pmclass PerlArray extends Array {
 	return string_from_int(INTERP, DYNSELF.elements());
     }
 
-    STRING* get_string_keyed_int (INTVAL* key) {
-        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
+    STRING* get_string_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
             PMC* value = undef(INTERP);
             return VTABLE_get_string(INTERP, value);
         }
@@ -112,8 +110,8 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
-        if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements())
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements())
             return undef(INTERP);
         else
             return SUPER(key);

@@ -780,7 +780,7 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
     else
         hash = interpreter->Parrot_compreg_hash;
     key = key_new_string(interpreter, type);
-    VTABLE_set_pmc_keyed(interpreter, hash, key, func, NULL);
+    VTABLE_set_pmc_keyed(interpreter, hash, key, func);
 }
 
 

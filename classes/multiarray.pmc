@@ -28,9 +28,9 @@
 
 static INTVAL calc_offset(Interp* interp, List*list, PMC *key)
 {
-    INTVAL l = 1;
+    INTVAL l;
     INTVAL ninj;
-    PMC * dim = VTABLE_get_pmc_keyed_int(interp, list->user_data, &l);
+    PMC * dim = VTABLE_get_pmc_keyed_int(interp, list->user_data, 1);
 
     l = key_integer(interp, key);
     ninj = 1;
@@ -60,41 +60,41 @@ pmclass MultiArray extends Array {
 
     INTVAL get_integer_keyed (PMC* key) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_integer_keyed_int(&ix);
+	return DYNSELF.get_integer_keyed_int(ix);
     }
 
 
     FLOATVAL get_number_keyed (PMC* key) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_number_keyed_int(&ix);
+	return DYNSELF.get_number_keyed_int(ix);
     }
 
     STRING* get_string_keyed (PMC* key) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_string_keyed_int(&ix);
+	return DYNSELF.get_string_keyed_int(ix);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-	return DYNSELF.get_pmc_keyed_int(&ix);
+	return DYNSELF.get_pmc_keyed_int(ix);
     }
 
     void set_integer_keyed (PMC* key, INTVAL value) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-        DYNSELF.set_integer_keyed_int(&ix, value);
+        DYNSELF.set_integer_keyed_int(ix, value);
     }
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-        DYNSELF.set_number_keyed_int(&ix, value);
+        DYNSELF.set_number_keyed_int(ix, value);
     }
 
     void set_string_keyed (PMC* key, STRING* value) {
 	INTVAL ix = calc_offset(INTERP, (List*) PMC_data(SELF), key);
-        DYNSELF.set_string_keyed_int(&ix, value);
+        DYNSELF.set_string_keyed_int(ix, value);
     }
 
-    void set_pmc_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
+    void set_pmc_keyed (PMC* dest_key, PMC* src) {
 	/* XXX array ??? */
     }
 }

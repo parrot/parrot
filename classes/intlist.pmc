@@ -41,9 +41,8 @@ pmclass IntList {
         intlist_mark(INTERP, (IntList *) PMC_data(SELF));
     }
 
-    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
-        if (!key) return;
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, value);
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
     };
 
     void set_integer_keyed (PMC* key, INTVAL value) {
@@ -56,11 +55,9 @@ pmclass IntList {
     };
 
 
-    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
 
-        if (!key) return;
-
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, (INTVAL) value);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, (INTVAL) value);
     };
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
@@ -72,7 +69,7 @@ pmclass IntList {
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, (INTVAL) value);
     };
 
-    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    void set_string_keyed_int (INTVAL key, STRING* value) {
         THROW_UNSUPPORTED;
     };
 
@@ -80,16 +77,14 @@ pmclass IntList {
         THROW_UNSUPPORTED;
     };
 
-    void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
         INTVAL value;
 
-        if (!key) return;
-
-        value = VTABLE_get_integer_keyed_int(INTERP, src, src_key);
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), *key, value);
+        value = VTABLE_get_integer(INTERP, src);
+        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
     };
 
-    void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
+    void set_pmc_keyed (PMC* key, PMC* src) {
         INTVAL ix;
         INTVAL value;
 
@@ -97,7 +92,7 @@ pmclass IntList {
 
         ix = key_integer(INTERP, key);
 
-        value = VTABLE_get_integer_keyed(INTERP, src, src_key);
+        value = VTABLE_get_integer(INTERP, src);
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
     };
 
@@ -105,8 +100,8 @@ pmclass IntList {
         return intlist_length(INTERP, (IntList*) PMC_data(SELF));
     };
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
-        return intlist_get(INTERP, (IntList*) PMC_data(SELF), *key);
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        return intlist_get(INTERP, (IntList*) PMC_data(SELF), key);
     };
 
     INTVAL get_integer_keyed (PMC* key) {
@@ -116,7 +111,7 @@ pmclass IntList {
         return intlist_get(INTERP, (IntList*) PMC_data(SELF), ix);
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
         THROW_UNSUPPORTED;
         return 0.0;
     }
@@ -126,7 +121,7 @@ pmclass IntList {
         return 0.0;
     }
 
-    STRING* get_string_keyed_int (INTVAL* key) {
+    STRING* get_string_keyed_int (INTVAL key) {
         THROW_UNSUPPORTED;
         return NULL;
     }
@@ -136,7 +131,7 @@ pmclass IntList {
         return NULL;
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
+    PMC* get_pmc_keyed_int (INTVAL key) {
         THROW_UNSUPPORTED;
         return NULL;
     }
@@ -156,16 +151,6 @@ pmclass IntList {
 
     INTVAL pop_integer() {
         return intlist_pop(INTERP, (IntList*) PMC_data(SELF));
-    }
-
-    INTVAL pop_integer_keyed(PMC* key) {
-        THROW_UNSUPPORTED;
-        return 0;
-    }
-
-    INTVAL pop_integer_keyed_int(INTVAL* key) {
-        THROW_UNSUPPORTED;
-        return 0;
     }
 
     void unshift_integer (INTVAL value) {

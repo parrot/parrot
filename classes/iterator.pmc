@@ -48,7 +48,7 @@ pmclass Iterator {
         return VTABLE_get_integer_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
+    INTVAL get_integer_keyed_int (INTVAL key) {
 	/* XXX adjust index */
         return VTABLE_get_integer_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
@@ -57,7 +57,7 @@ pmclass Iterator {
         return VTABLE_get_number_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
 	/* XXX adjust index */
         return VTABLE_get_number_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
@@ -66,7 +66,7 @@ pmclass Iterator {
         return VTABLE_get_bignum_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
+    BIGNUM* get_bignum_keyed_int (INTVAL key) {
         return VTABLE_get_bignum_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
@@ -74,7 +74,7 @@ pmclass Iterator {
         return VTABLE_get_string_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    STRING* get_string_keyed_int (INTVAL* key) {
+    STRING* get_string_keyed_int (INTVAL key) {
         return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
@@ -91,7 +91,7 @@ pmclass Iterator {
         return VTABLE_get_pmc_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
+    PMC* get_pmc_keyed_int (INTVAL key) {
         return VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
@@ -203,7 +203,7 @@ pmclass Iterator {
 	return VTABLE_exists_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    INTVAL exists_keyed_int (INTVAL* key) {
+    INTVAL exists_keyed_int (INTVAL key) {
 	return VTABLE_exists_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
@@ -215,7 +215,7 @@ pmclass Iterator {
 	return VTABLE_defined_keyed(INTERP, (PMC *)PMC_data(SELF), key);
     }
 
-    INTVAL defined_keyed_int (INTVAL* key) {
+    INTVAL defined_keyed_int (INTVAL key) {
 	return VTABLE_defined_keyed_int(INTERP, (PMC *)PMC_data(SELF), key);
     }
 

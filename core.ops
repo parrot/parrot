@@ -396,26 +396,22 @@ inline op assign(out STR, in STR) {
 =cut
 
 inline op set (in PMC, in INTKEY, in INT)  {
-    INTVAL key = $2;
-    $1->vtable->set_integer_keyed_int(interpreter, $1, &key, $3);
+    $1->vtable->set_integer_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (in PMC, in INTKEY, in NUM)  {
-    INTVAL key = $2;
-    $1->vtable->set_number_keyed_int(interpreter, $1, &key, $3);
+    $1->vtable->set_number_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (in PMC, in INTKEY, in STR)  {
-    INTVAL key = $2;
-    $1->vtable->set_string_keyed_int(interpreter, $1, &key, $3);
+    $1->vtable->set_string_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
 inline op set (in PMC, in INTKEY, in PMC)  {
-    INTVAL key = $2;
-    $1->vtable->set_pmc_keyed_int(interpreter, $1, &key, $3, NULL);
+    $1->vtable->set_pmc_keyed_int(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
@@ -434,26 +430,22 @@ inline op set (in PMC, in INTKEY, in PMC)  {
 =cut
 
 inline op set (out INT, in PMC, in INTKEY)  {
-    INTVAL key = $3;
-    $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, &key);
+    $1 = $2->vtable->get_integer_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
 inline op set (out NUM, in PMC, in INTKEY)  {
-    INTVAL key = $3;
-    $1 = $2->vtable->get_number_keyed_int(interpreter, $2, &key);
+    $1 = $2->vtable->get_number_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
 inline op set (out STR, in PMC, in INTKEY)  {
-    INTVAL key = $3;
-    $1 = $2->vtable->get_string_keyed_int(interpreter, $2, &key);
+    $1 = $2->vtable->get_string_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
 inline op set (out PMC, in PMC, in INTKEY) {
-    INTVAL key = $3;
-    $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, &key);
+    $1 = $2->vtable->get_pmc_keyed_int(interpreter, $2, $3);
     goto NEXT();
 }
 
@@ -486,7 +478,7 @@ inline op set (in PMC, in KEY, in STR)  {
 }
 
 inline op set (in PMC, in KEY, in PMC)  {
-    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, NULL);
+    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3);
     goto NEXT();
 }
 
@@ -522,16 +514,6 @@ inline op set (out PMC, in PMC, in KEY)  {
     goto NEXT();
 }
 
-=head2 Keyed set operations: Px[ KEY ] = Px[ KEY ]
-
-=item B<set>(in PMC, in KEY, in PMC, in KEY)
-
-=cut
-
-inline op set (in PMC, in KEY, in PMC, in KEY)  {
-    $1->vtable->set_pmc_keyed(interpreter, $1, $2, $3, $4);
-    goto NEXT();
-}
 
 =item B<clone>(out PMC, in PMC)
 
@@ -3187,8 +3169,7 @@ inline op defined(out INT, in PMC) {
 }
 
 inline op defined(out INT, in PMC, in INTKEY) {
-  INTVAL key = $3;
-  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, &key) : 0;
+  $1 = $2 ? $2->vtable->defined_keyed_int(interpreter, $2, $3) : 0;
   goto NEXT();
 }
 
@@ -3198,8 +3179,7 @@ inline op defined(out INT, in PMC, in KEY) {
 }
 
 inline op exists(out INT, in PMC, in INTKEY) {
-  INTVAL key = $3;
-  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, &key) : 0;
+  $1 = $2 ? $2->vtable->exists_keyed_int(interpreter, $2, $3) : 0;
   goto NEXT();
 }
 
@@ -4268,7 +4248,7 @@ op find_lex(out PMC, in INT, in INT) {
 op store_global(in STR, in PMC) {
     PMC * key = key_new_string(interpreter, $1);
     PMC * globals = interpreter->perl_stash->stash_hash;
-    globals->vtable->set_pmc_keyed(interpreter, globals, key, $2, NULL);
+    globals->vtable->set_pmc_keyed(interpreter, globals, key, $2);
     goto NEXT();
 }
 

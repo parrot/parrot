@@ -11,7 +11,7 @@
 
 #include "parrot/parrot.h"
 
-#define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
+#define INT2KEY(i,k) key_new_integer((i), (k))
 
 static const char * caller(Parrot_Interp interp, PMC * pmc);
 
@@ -66,7 +66,7 @@ pmclass default abstract noinit {
 	if (SELF->pmc_ext && SELF->metadata) {
           p_key = key_new_string(interpreter, key);
 	  VTABLE_set_pmc_keyed(interpreter,
-			  SELF->metadata, p_key, value, NULL);
+			  SELF->metadata, p_key, value);
 	} else {
           if (!SELF->pmc_ext)
               add_pmc_ext(INTERP, SELF);
@@ -76,7 +76,7 @@ pmclass default abstract noinit {
 	  /* then the key, else it vanishes with --gc-debug */
           p_key = key_new_string(interpreter, key);
 	  VTABLE_set_pmc_keyed(interpreter,
-			  SELF->metadata, p_key, value, NULL);
+			  SELF->metadata, p_key, value);
 	}
 	return;
     }
@@ -110,7 +110,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL type_keyed_int (INTVAL* key) {
+    INTVAL type_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.type_keyed(r_key);
     }
@@ -129,7 +129,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
+    UINTVAL subtype_keyed_int (INTVAL key, INTVAL type) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.subtype_keyed(r_key, type);
     }
@@ -148,7 +148,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    STRING* name_keyed_int (INTVAL *key) {
+    STRING* name_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.name_keyed(r_key);
     }
@@ -165,7 +165,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void clone_keyed_int (INTVAL* key, PMC *dest) {
+    void clone_keyed_int (INTVAL key, PMC *dest) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.clone_keyed(r_key, dest);
     }
@@ -184,7 +184,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* find_method_keyed_int(INTVAL *key, STRING* method_name) {
+    PMC* find_method_keyed_int(INTVAL key, STRING* method_name) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.find_method_keyed(r_key, method_name);
     }
@@ -203,7 +203,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
+    INTVAL get_integer_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_integer_keyed(r_key);
     }
@@ -222,7 +222,7 @@ pmclass default abstract noinit {
         return 0.0;
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_number_keyed(r_key);
     }
@@ -241,7 +241,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
+    BIGNUM* get_bignum_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bignum_keyed(r_key);
     }
@@ -260,7 +260,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    STRING* get_string_keyed_int (INTVAL* key) {
+    STRING* get_string_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_string_keyed(r_key);
     }
@@ -279,7 +279,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL get_bool_keyed_int (INTVAL* key) {
+    INTVAL get_bool_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bool_keyed(r_key);
     }
@@ -298,7 +298,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL elements_keyed_int (INTVAL* key) {
+    INTVAL elements_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.elements_keyed(r_key);
     }
@@ -314,7 +314,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
+    PMC* get_pmc_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_pmc_keyed(r_key);
     }
@@ -323,17 +323,16 @@ pmclass default abstract noinit {
         return SELF == value;
     }
 
-    INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
+    INTVAL is_same_keyed (PMC* key, PMC* value) {
 	internal_exception(ILL_INHERIT,
 		"is_same_keyed() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return 0;
     }
 
-    INTVAL is_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    INTVAL is_same_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        return DYNSELF.is_same_keyed(r_key, value, r_value_key);
+        return DYNSELF.is_same_keyed(r_key, value);
     }
 
     void set_integer (PMC* value) {
@@ -360,7 +359,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_integer_keyed(INTERP, SELF, r_key, value);
     }
@@ -389,7 +388,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_number_keyed(INTERP, SELF, r_key, value);
     }
@@ -418,7 +417,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
+    void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_bignum_keyed(INTERP, SELF, r_key, value);
     }
@@ -447,7 +446,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void set_string_keyed_int (INTVAL* key, STRING* string) {
+    void set_string_keyed_int (INTVAL key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_string_keyed(INTERP, SELF, r_key, string);
     }
@@ -456,16 +455,15 @@ pmclass default abstract noinit {
         SELF->cache.struct_val = VTABLE_get_pmc(INTERP, value);
     }
 
-    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
+    void set_pmc_keyed (PMC* key, PMC* value) {
 	internal_exception(ILL_INHERIT,
 		"set_pmc_keyed() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
     }
 
-    void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        DYNSELF.set_pmc_keyed(r_key, value, r_value_key);
+        DYNSELF.set_pmc_keyed(r_key, value);
     }
 
     void set_same (PMC* value) {
@@ -473,16 +471,15 @@ pmclass default abstract noinit {
 	PMC_data(SELF) = PMC_data(value);
     }
 
-    void set_same_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
+    void set_same_keyed (PMC* dest_key, PMC* src) {
 	internal_exception(ILL_INHERIT,
 		"set_keyed_keyed() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
     }
 
-    void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    void set_same_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        DYNSELF.set_same_keyed(r_key, value, r_value_key);
+        DYNSELF.set_same_keyed(r_key, value);
     }
 
     INTVAL pop_integer() {
@@ -492,35 +489,12 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL pop_integer_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"pop_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL pop_integer_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.pop_integer_keyed(r_key);
-    }
 
     FLOATVAL pop_float() {
 	internal_exception(ILL_INHERIT,
 		"pop_float() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return 0.0;
-    }
-
-    FLOATVAL pop_float_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"pop_float_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0.0;
-    }
-
-    FLOATVAL pop_float_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.pop_float_keyed(r_key);
     }
 
     BIGNUM* pop_bignum() {
@@ -530,35 +504,11 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    BIGNUM* pop_bignum_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"pop_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    BIGNUM* pop_bignum_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.pop_bignum_keyed(r_key);
-    }
-
     STRING* pop_string() {
 	internal_exception(ILL_INHERIT,
 		"pop_string() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return NULL;
-    }
-
-    STRING* pop_string_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"pop_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* pop_string_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.pop_string_keyed(r_key);
     }
 
     PMC* pop_pmc() {
@@ -568,17 +518,6 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* pop_pmc_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"pop_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    PMC* pop_pmc_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.pop_pmc_keyed(r_key);
-    }
 
     void push_integer (INTVAL value) {
 	internal_exception(ILL_INHERIT,
@@ -586,32 +525,11 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void push_integer_keyed (PMC* key, INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"push_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_integer_keyed_int (INTVAL* key, INTVAL value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.push_integer_keyed(r_key, value);
-    }
 
     void push_float (FLOATVAL value) {
 	internal_exception(ILL_INHERIT,
 		"push_float() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void push_float_keyed (PMC* key, FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"push_float_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.push_float_keyed(r_key, value);
     }
 
     void push_bignum (BIGNUM* value) {
@@ -620,50 +538,16 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void push_bignum_keyed (PMC* key, BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"push_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.push_bignum_keyed(r_key, value);
-    }
-
     void push_string (STRING* value) {
 	internal_exception(ILL_INHERIT,
 		"push_string() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
     }
 
-    void push_string_keyed (PMC* key, STRING* value) {
-	internal_exception(ILL_INHERIT,
-		"push_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_string_keyed_int (INTVAL* key, STRING* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.push_string_keyed(r_key, value);
-    }
-
     void push_pmc (PMC* value) {
 	internal_exception(ILL_INHERIT,
 		"push_pmc() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void push_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"push_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        DYNSELF.push_pmc_keyed(r_key, value, r_value_key);
     }
 
     INTVAL shift_integer() {
@@ -673,35 +557,11 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL shift_integer_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"shift_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL shift_integer_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.shift_integer_keyed(r_key);
-    }
-
     FLOATVAL shift_float() {
 	internal_exception(ILL_INHERIT,
 		"shift_float() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return 0.0;
-    }
-
-    FLOATVAL shift_float_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"shift_float_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0.0;
-    }
-
-    FLOATVAL shift_float_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.shift_float_keyed(r_key);
     }
 
     BIGNUM* shift_bignum() {
@@ -711,35 +571,11 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    BIGNUM* shift_bignum_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"shift_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    BIGNUM* shift_bignum_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.shift_bignum_keyed(r_key);
-    }
-
     STRING* shift_string() {
 	internal_exception(ILL_INHERIT,
 		"shift_string() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return NULL;
-    }
-
-    STRING* shift_string_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"shift_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* shift_string_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.shift_string_keyed(r_key);
     }
 
     PMC* shift_pmc() {
@@ -749,33 +585,10 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* shift_pmc_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"shift_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    PMC* shift_pmc_keyed_int(INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.shift_pmc_keyed(r_key);
-    }
-
     void unshift_integer (INTVAL value) {
 	internal_exception(ILL_INHERIT,
 		"unshift_integer() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void unshift_integer_keyed (PMC* key, INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.unshift_integer_keyed(r_key, value);
     }
 
     void unshift_float (FLOATVAL value) {
@@ -784,32 +597,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void unshift_float_keyed (PMC* key, FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_float_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.unshift_float_keyed(r_key, value);
-    }
-
     void unshift_bignum (BIGNUM* value) {
 	internal_exception(ILL_INHERIT,
 		"unshift_bignum() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void unshift_bignum_keyed (PMC* key, BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.unshift_bignum_keyed(r_key, value);
     }
 
     void unshift_string (STRING* value) {
@@ -818,33 +609,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void unshift_string_keyed (PMC* key, STRING* value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_string_keyed_int (INTVAL* key, STRING* value) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.unshift_string_keyed(r_key, value);
-    }
-
     void unshift_pmc (PMC* value) {
 	internal_exception(ILL_INHERIT,
 		"unshift_pmc() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void unshift_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"unshift_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        DYNSELF.unshift_pmc_keyed(r_key, value, r_value_key);
     }
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
@@ -883,21 +651,6 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void add_keyed (PMC* key, PMC* value, PMC* value_key,
-        PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"add_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.add_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     void subtract (PMC* value,  PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"subtract() not implemented in class '%s'\n",
@@ -926,22 +679,6 @@ pmclass default abstract noinit {
 	internal_exception(ILL_INHERIT,
 		"subtract_same() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void subtract_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-
-	internal_exception(ILL_INHERIT,
-		"subtract_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.subtract_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void multiply (PMC* value,  PMC* dest) {
@@ -974,22 +711,6 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void multiply_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"multiply_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply_keyed_int (INTVAL* key, PMC* value,
-	    INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.multiply_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     void divide (PMC* value,  PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"divide() not implemented in class '%s'\n",
@@ -1018,21 +739,6 @@ pmclass default abstract noinit {
 	internal_exception(ILL_INHERIT,
 		"divide_same() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void divide_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"divide_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.divide_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void modulus (PMC* value,  PMC* dest) {
@@ -1065,38 +771,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void modulus_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"modulus_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-
-    }
-
-    void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.modulus_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     void neg (PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"neg() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void neg_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"neg_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        DYNSELF.neg_keyed(r_key, dest, r_dest_key);
     }
 
     void bitwise_or (PMC* value, PMC* dest) {
@@ -1117,21 +795,6 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void bitwise_or_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_or_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.bitwise_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     void bitwise_and (PMC* value, PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"bitwise_and() not implemented in class '%s'\n",
@@ -1148,21 +811,6 @@ pmclass default abstract noinit {
 	internal_exception(ILL_INHERIT,
 		"bitwise_and_same() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void bitwise_and_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_and_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.bitwise_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
@@ -1183,37 +831,11 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void bitwise_xor_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xor_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.bitwise_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
 
     void bitwise_not (PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"bitwise_not() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void bitwise_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_not_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        DYNSELF.bitwise_not_keyed(r_key, dest, r_dest_key);
     }
 
     void bitwise_shr (PMC* value, PMC* dest) {
@@ -1234,20 +856,6 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void bitwise_shr_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shr_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shr_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.bitwise_shr_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
 
     void bitwise_shl (PMC* value, PMC* dest) {
 	internal_exception(ILL_INHERIT,
@@ -1265,21 +873,6 @@ pmclass default abstract noinit {
 	internal_exception(ILL_INHERIT,
 		"bitwise_shl_same() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void bitwise_shl_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shl_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shl_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.bitwise_shl_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void concatenate (PMC* value,  PMC* dest) {
@@ -1300,38 +893,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void concatenate_keyed (PMC* key, PMC* value, PMC* value_key,
-            PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"concatenate_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.concatenate_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
                 && SELF->cache.struct_val == value->cache.struct_val
 		&& PMC_data(SELF) == PMC_data(value));
-    }
-
-    INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"is_equal_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        return DYNSELF.is_equal_keyed(r_key, value, r_value_key);
     }
 
     INTVAL cmp (PMC* value) {
@@ -1341,18 +906,6 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL cmp_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"cmp_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL cmp_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        return DYNSELF.cmp_keyed(r_key, value, r_value_key);
-    }
 
     INTVAL cmp_num (PMC* value) {
 	internal_exception(ILL_INHERIT,
@@ -1361,18 +914,6 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL cmp_num_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"cmp_num_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL cmp_num_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        return DYNSELF.cmp_num_keyed(r_key, value, r_value_key);
-    }
 
     INTVAL cmp_string (PMC* value) {
 	internal_exception(ILL_INHERIT,
@@ -1381,37 +922,10 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL cmp_string_keyed (PMC* key, PMC* value, PMC* value_key) {
-	internal_exception(ILL_INHERIT,
-		"cmp_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL cmp_string_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        return DYNSELF.cmp_string_keyed(r_key, value, r_value_key);
-    }
-
     void logical_or (PMC* value,  PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"logical_or() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void logical_or_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"logical_or_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.logical_or_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_and (PMC* value,  PMC* dest) {
@@ -1420,39 +934,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void logical_and_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"logical_and_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.logical_and_keyed(r_key, value, r_value_key, dest, r_dest_key);
-    }
-
     void logical_xor (PMC* value,  PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"logical_xor() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void logical_xor_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"logical_xor_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-
-    void logical_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.logical_xor_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void logical_not (PMC* dest) {
@@ -1461,36 +946,10 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void logical_not_keyed (PMC* key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"logical_not_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        DYNSELF.logical_not_keyed(r_key, dest, r_dest_key);
-    }
-
     void repeat (PMC* value,  PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"repeat() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void repeat_keyed (PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"repeat_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void repeat_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_value_key = INT2KEY(INTERP, value_key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-
-        DYNSELF.repeat_keyed(r_key, value, r_value_key, dest, r_dest_key);
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
@@ -1499,50 +958,16 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void repeat_int_keyed (PMC* key, INTVAL value, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"repeat_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        DYNSELF.repeat_int_keyed(r_key, value, dest, r_dest_key);
-    }
-
     void increment () {
 	internal_exception(ILL_INHERIT,
 		"increment() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
     }
 
-    void increment_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"increment_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void increment_keyed_int (INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.increment_keyed(r_key);
-    }
-
     void decrement () {
 	internal_exception(ILL_INHERIT,
 		"decrement() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-    }
-
-    void decrement_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"decrement_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void decrement_keyed_int (INTVAL* key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        DYNSELF.decrement_keyed(r_key);
     }
 
     INTVAL exists_keyed (PMC* key) {
@@ -1552,7 +977,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL exists_keyed_int (INTVAL* key) {
+    INTVAL exists_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.exists_keyed(r_key);
     }
@@ -1568,7 +993,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL defined_keyed_int (INTVAL* key) {
+    INTVAL defined_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.defined_keyed(r_key);
     }
@@ -1579,7 +1004,7 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void delete_keyed_int(INTVAL* key) {
+    void delete_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.delete_keyed(r_key);
     }
@@ -1591,7 +1016,7 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* nextkey_keyed_int (INTVAL* key, INTVAL w) {
+    PMC* nextkey_keyed_int (INTVAL key, INTVAL w) {
         /* XXX - Something's not right with this method */
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.nextkey_keyed(r_key, w);
@@ -1603,35 +1028,11 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
-    void substr_keyed(PMC* key, INTVAL offset, INTVAL length, PMC* dest, PMC* dest_key) {
-	internal_exception(ILL_INHERIT,
-		"substr_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void substr_keyed_int(INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        PMC* r_dest_key = INT2KEY(INTERP, dest_key);
-        DYNSELF.substr_keyed(r_key, offset, length, dest, r_dest_key);
-    }
-
     STRING* substr_str(INTVAL offset, INTVAL length) {
 	internal_exception(ILL_INHERIT,
 		"substr_str() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
 	return NULL;
-    }
-
-    STRING* substr_str_keyed(PMC* key, INTVAL offset, INTVAL length) {
-	internal_exception(ILL_INHERIT,
-		"substr_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {
-        PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.substr_str_keyed(r_key, offset, length);
     }
 
     void* invoke (void* next) {
@@ -1662,7 +1063,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL can_keyed_int (INTVAL* key, STRING* method) {
+    INTVAL can_keyed_int (INTVAL key, STRING* method) {
 	internal_exception(ILL_INHERIT,
 		"can_keyed_int() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
@@ -1683,7 +1084,7 @@ pmclass default abstract noinit {
         return 0;
     }
 
-    INTVAL does_keyed_int (INTVAL* key, STRING* method) {
+    INTVAL does_keyed_int (INTVAL key, STRING* method) {
 	internal_exception(ILL_INHERIT,
 		"does_keyed_int() not implemented in class '%s'\n",
 		caller(INTERP, SELF));

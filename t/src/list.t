@@ -288,19 +288,19 @@ int main(int argc, char* argv[]) {
     VTABLE_set_integer_native(interpreter, p, 6);
     /* set data type */
     key = 0;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, 2);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, 2);
     key++;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, enum_type_sized);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, enum_type_sized);
     /* set item_size to 100 */
     key++;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, 3);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, 3);
     key++;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, 100);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, 100);
     /* set item_per_chunk to 3 */
     key++;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, 4);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, 4);
     key++;
-    VTABLE_set_integer_keyed_int(interpreter, p, &key, 3);
+    VTABLE_set_integer_keyed_int(interpreter, p, key, 3);
 
     list = list_new_init(interpreter, enum_type_sized, p);
     printf("ok 1\n");

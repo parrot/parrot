@@ -215,7 +215,7 @@ getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     STRING *s;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     s = VTABLE_get_string(interpreter, tmp);
@@ -229,7 +229,7 @@ getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     HUGEINTVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     ret = (HUGEINTVAL)(VTABLE_get_integer(interpreter, tmp));
@@ -255,7 +255,7 @@ getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     UHUGEINTVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     ret = (UHUGEINTVAL)(VTABLE_get_integer(interpreter, tmp));
@@ -280,7 +280,7 @@ getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     HUGEFLOATVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     ret = (HUGEFLOATVAL)(VTABLE_get_number(interpreter, tmp));
@@ -303,7 +303,7 @@ getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     STRING *s;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     s = (STRING *)(VTABLE_get_string(interpreter, tmp));
@@ -315,7 +315,7 @@ getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),
-            &(obj->index));
+            (obj->index));
 
     obj->index++;
     /* XXX correct? */

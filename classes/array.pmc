@@ -141,13 +141,10 @@ pmclass Array {
 	return Parrot_sprintf_c(INTERP, "array[%p]", SELF);
     }
 
-    INTVAL get_integer_keyed_int (INTVAL* key) {
+    INTVAL get_integer_keyed_int (INTVAL key) {
         PMC* value;
 
-        if (!key) {
-            return 0;
-        }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List*)PMC_data(SELF), key);
         return VTABLE_get_integer(INTERP, value);
     }
 
@@ -159,21 +156,18 @@ pmclass Array {
         if (!key) return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_integer_keyed_int(&ix);
+        if (nextkey == NULL) return SELF.get_integer_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) box = undef(INTERP);
         return VTABLE_get_integer_keyed(INTERP, box, nextkey);
     }
 
 
-    FLOATVAL get_number_keyed_int (INTVAL* key) {
+    FLOATVAL get_number_keyed_int (INTVAL key) {
         PMC* value;
 
-        if (!key) {
-            return 0;
-        }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         return VTABLE_get_number(INTERP, value);
 
     }
@@ -186,21 +180,18 @@ pmclass Array {
         if (!key) return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_number_keyed_int(&ix);
+        if (nextkey == NULL) return SELF.get_number_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) box = undef(INTERP);
         return VTABLE_get_number_keyed(INTERP, box, nextkey);
     }
 
 
-    STRING* get_string_keyed_int (INTVAL* key) {
+    STRING* get_string_keyed_int (INTVAL key) {
         PMC* value;
 
-        if (!key) {
-            return 0;
-        }
-        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
+        value = Parrot_Array_get_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         return VTABLE_get_string(INTERP, value);
     }
 
@@ -212,19 +203,16 @@ pmclass Array {
         if (!key) return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_string_keyed_int(&ix);
+        if (nextkey == NULL) return SELF.get_string_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) box = undef(INTERP);
         return VTABLE_get_string_keyed(INTERP, box, nextkey);
     }
 
-    PMC* get_pmc_keyed_int (INTVAL* key) {
+    PMC* get_pmc_keyed_int (INTVAL key) {
 
-        if (!key) {
-            return 0;
-        }
-        return Parrot_Array_get_pmc_ptr(INTERP, (List *)PMC_data(SELF), *key);
+        return Parrot_Array_get_pmc_ptr(INTERP, (List *)PMC_data(SELF), key);
     }
 
     PMC* get_pmc_keyed (PMC* key) {
@@ -235,9 +223,9 @@ pmclass Array {
         if (!key) return 0;
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
-        if (nextkey == NULL) return SELF.get_pmc_keyed_int(&ix);
+        if (nextkey == NULL) return SELF.get_pmc_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) box = undef(INTERP);
         return VTABLE_get_pmc_keyed(INTERP, box, nextkey);
     }
@@ -256,14 +244,10 @@ pmclass Array {
         list_set_length(INTERP, (List *) PMC_data(SELF) ,size);
     }
 
-    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
 	PMC * ptr;
 
-        if (!key) {
-            return;
-        }
-
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         VTABLE_set_integer_native(INTERP, ptr, value);
     }
 
@@ -277,10 +261,10 @@ pmclass Array {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-	    SELF.set_integer_keyed_int(&ix, value);
+	    SELF.set_integer_keyed_int(ix, value);
 	    return;
 	}
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) {
 	    /* autovivify an Array */
 	    box = pmc_new(INTERP, DYNSELF.type());
@@ -288,13 +272,10 @@ pmclass Array {
         VTABLE_set_integer_keyed(INTERP, box, nextkey, value);
     }
 
-    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* ptr;
 
-        if (!key) {
-            return;
-        }
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         VTABLE_set_number_native(INTERP, ptr, value);
     }
 
@@ -307,10 +288,10 @@ pmclass Array {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-	    SELF.set_number_keyed_int(&ix, value);
+	    SELF.set_number_keyed_int(ix, value);
 	    return;
 	}
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) {
 	    /* autovivify an Array */
 	    box = pmc_new(INTERP, DYNSELF.type());
@@ -318,13 +299,10 @@ pmclass Array {
         VTABLE_set_number_keyed(INTERP, box, nextkey, value);
     }
 
-    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC* ptr;
 
-        if (!key) {
-            return;
-        }
-	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), *key);
+	ptr = Parrot_Array_set_pmc_ptr(INTERP, (List *) PMC_data(SELF), key);
         VTABLE_set_string_native(INTERP, ptr, value);
     }
 
@@ -337,10 +315,10 @@ pmclass Array {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-	    VTABLE_set_string_keyed_int(INTERP, SELF, &ix, value);
+	    VTABLE_set_string_keyed_int(INTERP, SELF, ix, value);
 	    return;
 	}
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL) {
 	    /* autovivify an Array */
 	    box = pmc_new(INTERP, DYNSELF.type());
@@ -348,58 +326,41 @@ pmclass Array {
         VTABLE_set_string_keyed(INTERP, box, nextkey, value);
     }
 
-    void set_pmc_keyed_int (INTVAL* dest_key, PMC* src, INTVAL* src_key) {
+    void set_pmc_keyed_int (INTVAL idx, PMC* src) {
 
-	INTVAL idx, length;
-        if (!dest_key) {
-            return;
-        }
-	idx = *dest_key;
+	INTVAL length;
         length = ((List *) PMC_data(SELF))->length;
 	if (idx >= length || -idx > length) {
 	    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
 	}
 
-        if (src_key)
-	    src = VTABLE_get_pmc_keyed_int(INTERP, src, src_key);
 	list_assign(INTERP, (List *) PMC_data(SELF), idx,
 		(void*)src, enum_type_PMC);
     }
 
-    void set_pmc_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
-        INTVAL src_ix;
-        INTVAL dest_ix;
-
-        if (!dest_key) return;
-
-        dest_ix = key_integer(INTERP, dest_key);
-        if (src_key) {
-            src_ix = key_integer(INTERP, src_key);
-            SELF.set_pmc_keyed_int(&dest_ix, src, &src_ix);
-        }
-        else {
-            SELF.set_pmc_keyed_int(&dest_ix, src, NULL);
-        }
+    void set_pmc_keyed (PMC* key, PMC* src) {
+	INTVAL idx = key_integer(INTERP, key);
+	SELF.set_pmc_keyed_int(idx, src);
     }
 
     void push_integer (INTVAL value) {
         INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(&nextix, value);
+        DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
     void push_float (FLOATVAL value) {
         INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_number_keyed_int(&nextix, value);
+        DYNSELF.set_number_keyed_int(nextix, value);
     }
 
     void push_string (STRING* value) {
         INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_string_keyed_int(&nextix, value);
+        DYNSELF.set_string_keyed_int(nextix, value);
     }
 
     void push_pmc (PMC* value) {
         INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_pmc_keyed_int(&nextix, value, NULL);
+        DYNSELF.set_pmc_keyed_int(nextix, value);
     }
 
     void unshift_integer (INTVAL value) {
@@ -468,11 +429,11 @@ pmclass Array {
 	list_splice(INTERP, (List*) PMC_data(SELF), value, offset, count);
     }
 
-    INTVAL defined_keyed_int (INTVAL* key) {
+    INTVAL defined_keyed_int (INTVAL key) {
         PMC* value;
 	void *ret;
 
-	ret = list_get(INTERP, (List *) PMC_data(pmc), *key, enum_type_PMC);
+	ret = list_get(INTERP, (List *) PMC_data(pmc), key, enum_type_PMC);
 	if (ret == 0 || ret == (void *) -1)
 	    return 0;
 	value = *(PMC**) ret;
@@ -489,18 +450,18 @@ pmclass Array {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL)
-	    return SELF.defined_keyed_int(&ix);
+	    return SELF.defined_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL)
 	    return 0;
         return VTABLE_defined_keyed(INTERP, box, nextkey);
     }
 
-    INTVAL exists_keyed_int (INTVAL* key) {
+    INTVAL exists_keyed_int (INTVAL key) {
         void * ret;
 
-	ret = list_get(INTERP, (List *) PMC_data(pmc), *key, enum_type_PMC);
+	ret = list_get(INTERP, (List *) PMC_data(pmc), key, enum_type_PMC);
 	if (ret == 0 || ret == (void *) -1)
 	    return 0;
         return *(PMC**) ret != NULL;
@@ -514,9 +475,9 @@ pmclass Array {
         ix = key_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL)
-	    return SELF.exists_keyed_int(&ix);
+	    return SELF.exists_keyed_int(ix);
 
-        box = SELF.get_pmc_keyed_int(&ix);
+        box = SELF.get_pmc_keyed_int(ix);
         if (box == NULL)
 	    return 0;
         return VTABLE_exists_keyed(INTERP, box, nextkey);
@@ -524,16 +485,6 @@ pmclass Array {
 
     /* == operation */
     INTVAL is_equal (PMC* value) {
-	/* XXX */
-        return 0;
-    }
-
-    INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {
-	/* XXX */
-        return 0;
-    }
-
-    INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
 	/* XXX */
         return 0;
     }

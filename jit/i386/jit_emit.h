@@ -1937,6 +1937,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                  */
                 emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 break;
+            case PARROT_ARG_KI:
             case PARROT_ARG_I:
                 if (MAP(i))
                     emitm_pushl_r(jit_info->native_ptr, MAP(i));
@@ -1946,21 +1947,8 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
                 }
                 break;
-            case PARROT_ARG_KI:
-                if (MAP(i))
-                    jit_emit_mov_mr_i(jit_info->native_ptr, &INT_REG(p[i]),
-                            MAP(i));
-                emitm_pushl_i(jit_info->native_ptr, &INT_REG(p[i]));
                 break;
             case PARROT_ARG_KIC:
-                /* XXX INTVAL_SIZE, make auto var, push address */
-                /* mov key, -4(%ebp) */
-                emitm_movl_i_m(jit_info->native_ptr, p[i], emit_EBP, 0, 1, -4);
-                /* lea -4(%bp), eax */
-                emitm_lea_m_r(jit_info->native_ptr, emit_EAX,
-                        emit_EBP, 0, 1, -4);
-                emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-                break;
             case PARROT_ARG_IC:
                 /* XXX INTVAL_SIZE */
                 /* push value */
