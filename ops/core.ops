@@ -354,7 +354,6 @@ inline op read(n, i|ic) {
 }
 
 op read(s, i|ic, i|ic) {
-  char *tmp;
   STRING *s;
   INTVAL len = $3;
 
