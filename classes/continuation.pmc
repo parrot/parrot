@@ -68,12 +68,12 @@ Creates and returns a clone of the continuation.
 
     PMC* clone() {
         struct Parrot_Sub * sub;
-        PMC* ret = SUPER();
-        sub = PMC_sub(ret);
-    sub->ctx.user_stack = stack_copy(interpreter,
-                PMC_sub(SELF)->ctx.user_stack);
-    sub->ctx.control_stack = stack_copy(interpreter,
-                PMC_sub(SELF)->ctx.control_stack);
+        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_destroy_SETALL(ret);
+        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
+        cow_copy_context(INTERP, &sub->ctx, &PMC_sub(SELF)->ctx);
+        PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }
 

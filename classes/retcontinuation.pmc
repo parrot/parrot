@@ -69,10 +69,10 @@ Creates and returns a clone of the continuation.
     PMC* clone() {
         struct Parrot_Sub * sub;
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
         PMC_struct_val(ret) = PMC_struct_val(SELF);
-        PObj_custom_mark_destroy_SETALL(ret);
         return ret;
     }
 }

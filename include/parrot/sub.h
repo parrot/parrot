@@ -56,7 +56,8 @@ struct Parrot_Sub * new_ret_continuation(struct Parrot_Interp * interp);
 PMC * new_ret_continuation_pmc(struct Parrot_Interp *, opcode_t * address);
 
 void save_context(struct Parrot_Interp *, struct Parrot_Context *);
-void cow_copy_context(struct Parrot_Interp* , struct Parrot_Context *);
+void cow_copy_context(struct Parrot_Interp*,
+        struct Parrot_Context *dest, struct Parrot_Context *src);
 void swap_context(struct Parrot_Interp *, PMC *);
 void restore_context(struct Parrot_Interp *, struct Parrot_Context *);
 void mark_context(struct Parrot_Interp *, struct Parrot_Context *);

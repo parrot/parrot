@@ -41,9 +41,10 @@ save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 /*
 
 =item C<void
-cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)>
+cow_copy_context(struct Parrot_Interp *interp,
+        struct Parrot_Context *dest, struct Parrot_Context *src)>
 
-Save current context of interpreter and mark it copy-on-write. We mark
+Save src context and mark it copy-on-write. We mark
 the pads and stacks, not the actual context struct. This is used for
 continuations. Stacks are COW marked to delay stack copying until
 continuation is activated.
@@ -53,19 +54,20 @@ continuation is activated.
 */
 
 void
-cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
+cow_copy_context(struct Parrot_Interp *interp,
+        struct Parrot_Context *dest, struct Parrot_Context *src)
 {
-    ctx->int_reg_stack = stack_copy(interp, interp->ctx.int_reg_stack);
-    ctx->num_reg_stack = stack_copy(interp, interp->ctx.num_reg_stack);
-    ctx->string_reg_stack = stack_copy(interp, interp->ctx.string_reg_stack);
-    ctx->pmc_reg_stack = stack_copy(interp, interp->ctx.pmc_reg_stack);
-    ctx->pad_stack = stack_copy(interp, interp->ctx.pad_stack);
-    ctx->user_stack = stack_copy(interp, interp->ctx.user_stack);
-    ctx->control_stack = stack_copy(interp, interp->ctx.control_stack);
-    ctx->warns = interp->ctx.warns;
-    ctx->errors = interp->ctx.errors;
-    buffer_mark_COW(ctx->warns);
-    buffer_mark_COW(ctx->errors);
+    dest->int_reg_stack = stack_copy(interp, src->int_reg_stack);
+    dest->num_reg_stack = stack_copy(interp, src->num_reg_stack);
+    dest->string_reg_stack = stack_copy(interp, src->string_reg_stack);
+    dest->pmc_reg_stack = stack_copy(interp, src->pmc_reg_stack);
+    dest->pad_stack = stack_copy(interp, src->pad_stack);
+    dest->user_stack = stack_copy(interp, src->user_stack);
+    dest->control_stack = stack_copy(interp, src->control_stack);
+    dest->warns = src->warns;
+    dest->errors = src->errors;
+    buffer_mark_COW(dest->warns);
+    buffer_mark_COW(dest->errors);
 }
 
 /*
@@ -402,7 +404,7 @@ struct Parrot_Sub *
 new_continuation(struct Parrot_Interp *interp)
 {
     struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
-    cow_copy_context(interp, &cc->ctx);
+    cow_copy_context(interp, &cc->ctx, &interp->ctx);
     return cc;
 }
 
