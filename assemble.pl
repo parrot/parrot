@@ -7,6 +7,7 @@
 use strict;
 use Getopt::Long;
 use Parrot::Opcode;
+use Parrot::Types;
 use Parrot::Config;
 use Symbol;
 
@@ -133,7 +134,7 @@ while(my $l=shift(@program)) {
 			while(scalar(@{$local_fixup{$label}})) {
 			    my $op_pc=shift(@{$local_fixup{$label}});
 			    my $offset=shift(@{$local_fixup{$label}});
-			    substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
+			    substr($bytecode,$offset,sizeof('i'))=pack_arg('i', ($pc-$op_pc)/sizeof('i'));
 			}
 			delete($local_fixup{$label});  
 		    }
@@ -148,7 +149,7 @@ while(my $l=shift(@program)) {
 			while(scalar(@{$fixup{$label}})) {
 			    my $op_pc=shift(@{$fixup{$label}});
 			    my $offset=shift(@{$fixup{$label}});
-			    substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
+			    substr($bytecode,$offset,sizeof('i'))=pack_arg('i', ($pc-$op_pc)/sizeof('i'));
 			}
 			delete($fixup{$label});  
 		    }
@@ -320,7 +321,7 @@ while(my $l=shift(@program)) {
     if (@args != $opcodes{$opcode}{ARGS}) {
       error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS}." in <$_>" ,$file,$line);
     }
-    $bytecode .= pack $pack_type{'i'}, $opcodes{$opcode}{CODE};
+    $bytecode .= pack_op($opcodes{$opcode}{CODE});
     $op_pc=$pc;
     $pc+=$sizeof{'i'};
     
@@ -359,7 +360,7 @@ while(my $l=shift(@program)) {
 	    $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
 	    $pc+=$sizeof{$rtype};           
 	}
-	$bytecode .= pack $pack_type{$type}, $args[$_];
+	$bytecode .= pack_arg($rtype, $args[$_]);
     }
     if($options{'listing'}) {
 	# add line to listing.

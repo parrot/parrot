@@ -1,0 +1,70 @@
+package Parrot::Types;
+use strict;
+use Exporter;
+use Carp;
+
+@Parrot::Types::ISA = qw(Exporter);
+@Parrot::Types::EXPORT = qw(&sizeof 
+    &pack_op  &unpack_op  &shift_op
+    &pack_arg &unpack_arg &shift_arg);
+
+my %pack_type = (
+    i  => q/${packtype_i}/,
+    n  => q/${packtype_n}/,
+    op => q/${packtype_op}/,
+);
+
+my %how_to_pack = (
+    I  => $pack_type{i},
+    i  => $pack_type{i},
+    N  => $pack_type{i},
+    n  => $pack_type{n},
+    S  => $pack_type{i},
+    s  => $pack_type{i},
+    D  => $pack_type{i},
+    op => $pack_type{op},
+);
+
+my %sizeof;
+foreach (keys %how_to_pack) {
+    $sizeof{$_}=length(pack($how_to_pack{$_},0));
+}
+
+sub sizeof { 
+    my $what = shift; 
+    croak "Don't know what a $what is" unless exists $sizeof{$what};
+    return $sizeof{$what};
+}
+
+sub pack_op   { return pack  ($how_to_pack{op}, shift) }
+sub unpack_op { return unpack($how_to_pack{op}, shift) } 
+sub shift_op  { my $op = substr($_[0], 0, sizeof("op"), ''); return unpack_op($op) }
+
+sub pack_arg  { 
+    croak "Don't know what a $_[0] is" unless exists $sizeof{$_[0]};
+    return pack  ($how_to_pack{$_[0]}, $_[1]) 
+}
+sub unpack_arg{ 
+    croak "Don't know what a $_[0] is" unless exists $sizeof{$_[0]};
+    return unpack($how_to_pack{$_[0]}, $_[1]) 
+}
+sub shift_arg { 
+    my $arg = substr($_[1], 0, sizeof($_[0]), ''); 
+    return unpack_arg($_[0], $arg) 
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Parrot::Types - Basic types for Parrot
+
+=head1 SYNOPSIS
+
+  use Parrot::Types;
+
+  $opcode = pack_op($opnumber) . pack_arg("I", $ireg) . ...
+
+=head1 DESCRIPTION

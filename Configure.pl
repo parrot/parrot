@@ -139,16 +139,42 @@ unlink('test.c', "test$c{exe}", "test$c{o}");
 
 print <<"END";
 
-Okay, that's finished.  I'm now going to write your very
-own Makefile, config.h, and Parrot::Config to disk.
+Done. Now I'm figuring out what formats to pass to pack() for the
+various Parrot internal types.
 END
 
-#now let's assemble the config.h file
+my %pack_type;
+# Alas perl5.7.2 doesn't have an IV flag for pack().
+# The ! modifier only works for perl 5.6.x or greater.
+if (($] >= 5.006) && ($c{ivsize} == $c{longsize}) ) {
+    $c{packtype_i} = 'l!';
+    $c{packtype_op} = 'l!';
+}
+elsif ($c{ivsize} == 4) {
+    $c{packtype_i} = 'l';
+    $c{packtype_op} = 'l';
+}
+elsif ($c{ivsize} == 8) {
+    $c{packtype_i} = 'q';
+    $c{packtype_op} = 'l';
+}
+
+$c{packtype_n} = 'd';
+
+print <<"END";
+
+Okay, that's finished.  I'm now going to write your very
+own Makefile, config.h, Parrot::Types, and Parrot::Config to disk.
+END
+
+# now let's assemble the config.h file
 buildfile("config_h", "include/parrot");
-#and the makefile
+# and the makefile
 buildfile("Makefile");
-#and Parrot::Config
+# and Parrot::Config
 buildconfigpm();
+# and the types file
+buildfile("Types_pm", "Parrot");
 
 print <<"END";
 

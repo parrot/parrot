@@ -15,6 +15,7 @@ use strict;
 
 use Parrot::Config;
 use Parrot::Opcode;
+use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
 
@@ -22,35 +23,6 @@ use Parrot::PackFile::ConstTable;
 #
 # GLOBAL VARIABLES:
 #
-
-my %unpack_type;
-if (($] >= 5.006) && ($PConfig{ivsize} == $PConfig{longsize}) ) {
-    %unpack_type = ('i'=>'l!','n'=>'d');
-}
-elsif ($PConfig{ivsize} == 4) {
-    %unpack_type = ('i'=>'l','n'=>'d');
-}
-elsif ($PConfig{ivsize} == 8) {
-    %unpack_type = ('i'=>'q','n'=>'d');
-}
-else {
-    die("I don't know how to pack an IV!\n");
-}
- 
-my(%real_type)=('I'=>'i','i'=>'i',
-                'N'=>'i','n'=>'n',
-                'S'=>'i','s'=>'i',
-                'D'=>'i');
-my(%type_swap)=('I'=>'i',  'N'=>'n',
-                'S'=>'s',  'P'=>'p',
-                'i'=>'ic', 'n'=>'nc',
-                's'=>'sc', 'D'=>'ic');
-
-my %unpack_size;
-foreach (keys(%real_type)) {
-    $unpack_size{$_}=length(pack($unpack_type{$real_type{$_}},0));
-    $unpack_type{$_} = $unpack_type{$real_type{$_}};
-}
 
 my %opcodes            = Parrot::Opcode::read_ops();
 my $opcode_fingerprint = Parrot::Opcode::fingerprint();
@@ -106,11 +78,12 @@ sub disassemble_byte_code {
     print "# Code Section\n";
 
     my $offset=0;
+    my $bytecode = $pf->byte_code;
 
-    while ($offset + 4 <= $length) {
+    while ($bytecode) {
 	my $op_start = $offset;
-	my $op_code = unpack "x$offset l", $pf->byte_code;
-	printf "%08x: %-10s", $op_start, $opcodes[$op_code]{NAME};
+	my $op_code = shift_op($bytecode);
+	printf "%08x: %-15s", $op_start, $opcodes[$op_code]{NAME};
 	$offset += 4;
 
 	my $arg_count = $opcodes[$op_code]{ARGS};
@@ -123,13 +96,13 @@ sub disassemble_byte_code {
 
 	foreach (0 .. $arg_count - 1) {
 	    my $type        = $opcodes[$op_code]{TYPES}[$_];
-	    my $unpack_type = $unpack_type{$type};
-	    my $unpack_size = $unpack_size{$type};
+	    my $unpack_size = sizeof($type);
 
 	    die "$0: Premature end of bytecode in argument.\n"
 		if ($offset + $unpack_size) > $length;
 
-	    my $arg = unpack "x$offset $unpack_type", $pf->byte_code;
+	    my $arg = shift_arg($type, $bytecode);
+
 	    $offset += $unpack_size;
 
 

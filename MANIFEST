@@ -10,6 +10,7 @@ Parrot/PackFile/FixupTable.pm
 Parrot/Test.pm
 README
 TODO
+Types_pm.in
 assemble.pl
 basic_opcodes.ops
 build_interp_starter.pl
