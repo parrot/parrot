@@ -109,43 +109,44 @@ formatted string. The time is adjusted to localtime before formatting.
 =item B<decodetime>(out PMC, in INT)
 
 Take the integer, which represents GMT epoch-seconds, and return an Array
-PMC which represents the decoded time The array elements are:
+PMC which represents the decoded time. The array elements are
+(include "tm.pasm" for the constants):
 
 =over 4
 
-=item 0
+=item 0, .TM_SEC
 
 Seconds (0-60)
 
-=item 1
+=item 1, .TM_MIN
 
 Minutes (0-59)
 
-=item 2
+=item 2, .TM_HOUR
 
 Hours (0-23)
 
-=item 3
+=item 3, .TM_MDAY
 
 Day of month (1-31)
 
-=item 4
+=item 4, .TM_MON
 
 Month of year (0-11)
 
-=item 5
+=item 5, .TM_YEAR
 
 Year (note, B<actual> year. The year 2004 comes back as 2004, not 104)
 
-=item 6
+=item 6, .TM_WDAY
 
 Day of week. Sunday is day 0
 
-=item 7
+=item 7, .TM_YDAY
 
 Day of year (0-365)
 
-=item 8
+=item 8, .TM_ISDST
 
 Daylight savings/summer time in effect
 
