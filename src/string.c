@@ -218,6 +218,9 @@ string_max_bytes(STRING* s, INTVAL iv) {
 STRING*
 string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL flags) {
     if(a != NULL) {
+        if (b == NULL || b->strlen == 0) {
+            return a;
+        }  
         if (a->type != b->type || a->encoding != b->encoding) {
             b = string_transcode(interpreter, b, a->encoding, a->type, NULL);
         }
@@ -227,7 +230,10 @@ string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL fl
         a->bufused = a->bufused + b->bufused;
     }
     else {
-      return string_make(interpreter,
+        if (b == NULL) {
+            return string_make(interpreter, "", 0, 0, 0, 0);
+        }
+        return string_make(interpreter,
                          b->bufstart,b->buflen,b->encoding,flags,b->type);
     }
     return a;
