@@ -17,11 +17,11 @@
 typedef unsigned short utf16_t;
 #endif
 
-static INTVAL
-utf16_characters (const void *ptr, INTVAL bytes) {
+static UINTVAL
+utf16_characters (const void *ptr, UINTVAL bytes) {
     const utf16_t *u16ptr = ptr;
     const utf16_t *u16end = u16ptr + bytes / sizeof(utf16_t);
-    INTVAL characters = 0;
+    UINTVAL characters = 0;
 
     while (u16ptr < u16end) {
         u16ptr += UTF16SKIP(u16ptr);
@@ -35,10 +35,10 @@ utf16_characters (const void *ptr, INTVAL bytes) {
     return characters;
 }
 
-static INTVAL
+static UINTVAL
 utf16_decode (const void *ptr) {
     const utf16_t *u16ptr = ptr;
-    INTVAL c = *u16ptr++;
+    UINTVAL c = *u16ptr++;
 
     if (UNICODE_IS_HIGH_SURROGATE(c)) {
         utf16_t low = *u16ptr++;
@@ -57,8 +57,8 @@ utf16_decode (const void *ptr) {
 }
 
 static void *
-utf16_encode (void *ptr, INTVAL c) {
-    utf16_t *u16ptr = ptr;
+utf16_encode (const void *ptr, UINTVAL c) {
+    utf16_t *u16ptr = (utf16_t*)ptr;
 
     if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
@@ -77,7 +77,7 @@ utf16_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-utf16_skip_forward (const void *ptr, INTVAL n) {
+utf16_skip_forward (const void *ptr, UINTVAL n) {
     utf16_t *u16ptr = (utf16_t*)ptr;
 
     while (n-- > 0) {
@@ -100,7 +100,7 @@ utf16_skip_forward (const void *ptr, INTVAL n) {
 }
 
 static void *
-utf16_skip_backward (const void *ptr, INTVAL n) {
+utf16_skip_backward (const void *ptr, UINTVAL n) {
     utf16_t *u16ptr = (utf16_t*)ptr;
 
     while (n--> 0) {

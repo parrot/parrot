@@ -17,12 +17,12 @@
 typedef unsigned long utf32_t;
 #endif
 
-static INTVAL
-utf32_characters (const void *ptr, INTVAL bytes) {
+static UINTVAL
+utf32_characters (const void *ptr, UINTVAL bytes) {
     return bytes / 4;
 }
 
-static INTVAL
+static UINTVAL
 utf32_decode (const void *ptr) {
     const utf32_t *u32ptr = ptr;
 
@@ -30,8 +30,8 @@ utf32_decode (const void *ptr) {
 }
 
 static void *
-utf32_encode (void *ptr, INTVAL c) {
-    utf32_t *u32ptr = ptr;
+utf32_encode (const void *ptr, UINTVAL c) {
+    utf32_t *u32ptr = (utf32_t*)ptr;
 
     if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
@@ -44,14 +44,14 @@ utf32_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-utf32_skip_forward (const void *ptr, INTVAL n) {
+utf32_skip_forward (const void *ptr, UINTVAL n) {
     utf32_t *u32ptr = (utf32_t*)ptr;
 
     return u32ptr + n;
 }
 
 static void *
-utf32_skip_backward (const void *ptr, INTVAL n) {
+utf32_skip_backward (const void *ptr, UINTVAL n) {
     utf32_t *u32ptr = (utf32_t*)ptr;
 
     return u32ptr - n;

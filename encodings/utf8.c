@@ -28,11 +28,11 @@ const char Parrot_utf8skip[256] = {
 typedef unsigned char utf8_t;
 #endif
 
-static INTVAL
-utf8_characters (const void *ptr, INTVAL bytes) {
+static UINTVAL
+utf8_characters (const void *ptr, UINTVAL bytes) {
     const utf8_t *u8ptr = ptr;
     const utf8_t *u8end = u8ptr + bytes;
-    INTVAL characters = 0;
+    UINTVAL characters = 0;
 
     while (u8ptr < u8end) {
         u8ptr += UTF8SKIP(u8ptr);
@@ -46,14 +46,14 @@ utf8_characters (const void *ptr, INTVAL bytes) {
     return characters;
 }
 
-static INTVAL
+static UINTVAL
 utf8_decode (const void *ptr) {
     const utf8_t *u8ptr = ptr;
-    INTVAL c = *u8ptr;
+    UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
-        INTVAL len = UTF8SKIP(u8ptr);
-        INTVAL count;
+        UINTVAL len = UTF8SKIP(u8ptr);
+        UINTVAL count;
 
         c &= UTF8_START_MASK(len);
         for (count = 1; count < len; count++) {
@@ -77,9 +77,9 @@ utf8_decode (const void *ptr) {
 }
 
 static void *
-utf8_encode (void *ptr, INTVAL c) {
-    utf8_t *u8ptr = ptr;
-    INTVAL len = UNISKIP(c);
+utf8_encode (const void *ptr, UINTVAL c) {
+    utf8_t *u8ptr = (utf8_t*)ptr;
+    UINTVAL len = UNISKIP(c);
     utf8_t *u8end = u8ptr + len - 1;
 
     if (c < 0 || c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
@@ -97,7 +97,7 @@ utf8_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-utf8_skip_forward (void *ptr, INTVAL n) {
+utf8_skip_forward (const void *ptr, UINTVAL n) {
     utf8_t *u8ptr = (utf8_t*)ptr;
 
     while (n-- > 0) {
@@ -108,7 +108,7 @@ utf8_skip_forward (void *ptr, INTVAL n) {
 }
 
 static void *
-utf8_skip_backward (void *ptr, INTVAL n) {
+utf8_skip_backward (const void *ptr, UINTVAL n) {
     utf8_t *u8ptr = (utf8_t*)ptr;
 
     while (n-- > 0) {

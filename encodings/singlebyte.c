@@ -14,12 +14,12 @@
 
 typedef unsigned char byte_t;
 
-static INTVAL
-singlebyte_characters (const void *ptr, INTVAL bytes) {
+static UINTVAL
+singlebyte_characters (const void *ptr, UINTVAL bytes) {
     return bytes;
 }
 
-static INTVAL
+static UINTVAL
 singlebyte_decode (const void *ptr) {
     const byte_t *bptr = ptr;
 
@@ -27,8 +27,8 @@ singlebyte_decode (const void *ptr) {
 }
 
 static void *
-singlebyte_encode (void *ptr, INTVAL c) {
-    byte_t *bptr = ptr;
+singlebyte_encode (const void *ptr, UINTVAL c) {
+    byte_t *bptr = (byte_t*)ptr;
 
     if (c < 0 || c > 255) {
         INTERNAL_EXCEPTION(INVALID_CHARACTER,
@@ -41,14 +41,14 @@ singlebyte_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-singlebyte_skip_forward (const void *ptr, INTVAL n) {
+singlebyte_skip_forward (const void *ptr, UINTVAL n) {
     byte_t *bptr = (byte_t*)ptr;
 
     return bptr + n;
 }
 
 static void *
-singlebyte_skip_backward (const void *ptr, INTVAL n) {
+singlebyte_skip_backward (const void *ptr, UINTVAL n) {
     byte_t *bptr = (byte_t*)ptr;
 
     return bptr - n;
