@@ -127,6 +127,7 @@ docs/debugger.pod
 docs/dev/byteorder.dev
 docs/dev/dod.dev
 docs/dev/infant.dev
+docs/dev/jit_i386.dev
 docs/dev/rx.dev
 docs/embed.pod
 docs/faq.pod

@@ -245,6 +245,13 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
+#ifdef HAVE_COMPUTED_GOTO
+# ifdef __GNUC__
+#  ifdef I386
+    init_prederef(interpreter, 1);
+#  endif
+# endif
+#endif
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;

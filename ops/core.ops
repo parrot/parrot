@@ -50,12 +50,25 @@ inline op end() {
 
 Does nothing other than waste an iota of time and 32 bits of bytecode space.
 
+=item B<cpu_ret>()
+
+Emit a cpu return instruction. This is used to return from CGP core
+to JIT code.
+
 =cut
 
 inline op noop() {
   goto NEXT();
 }
 
+inline op cpu_ret() {
+#ifdef __GNUC__
+# ifdef I386
+   asm("ret");
+# endif
+#endif
+  goto NEXT();
+}
 
 =back
 

@@ -1001,9 +1001,11 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
 {
     int size = 0;
     int j;
+    char *p;
 
     /* Write the opcode name */
-    strcpy(&dest[file->size], full_name ? info->full_name : info->name);
+    p = file ? &dest[file->size] : dest;
+    strcpy(p, full_name ? info->full_name : info->name);
     size += strlen(dest);
 
     dest[size++] = ' ';

@@ -121,7 +121,9 @@ typedef struct Parrot_jit_optimizer_section {
     unsigned int                         op_count;
     ptrdiff_t                            load_size;
     char                                 isjit;
-    char                                 dummy[3]; /* For alignment */
+    char                                 done;
+    char                                 ins_count;
+    char                                 dummy; /* For alignment */
     int                                  block;
     Parrot_jit_optimizer_section_ptr     branch_target;
     Parrot_jit_optimizer_section_ptr     prev;

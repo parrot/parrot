@@ -155,8 +155,14 @@ if ($suffix =~ /cg/) {
 	print SOURCE <<END_C;
 
 opcode_t *
-$cg_func$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
+$cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
 {
+#ifdef __GNUC__
+    register opcode_t *cur_opcode asm ("esi") = cur_op;
+#else
+    opcode_t *cur_opcode = cur_op;
+#endif
+
     static void *ops_addr[] = {
 END_C
 
@@ -251,6 +257,10 @@ if ($suffix =~ /cgp/) {
     if (cur_opcode == 0)
       return (opcode_t *)ops_addr;
 #ifdef __GNUC__
+# ifdef I386
+    else if (cur_opcode == (opcode_t *) 1)
+	asm ("jmp *4(%ebp)");	/* jump to ret addr, used by JIT */
+# endif
     else
       _check();
 #endif

@@ -1102,7 +1102,7 @@ TEMPLATE Parrot_eq_sx_sx_ic {
     push_<typ2>(2);
     push_<typ1>(1);
     emitm_pushl_i(NATIVECODE, interpreter);
-    emitm_calll(NATIVECODE, (char*)string_compare - NATIVECODE - 4);
+    call_func(jit_info, (void*)string_compare);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
@@ -1216,7 +1216,7 @@ TEMPLATE Parrot_ifunless_sx_ic {
 # define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
 
     push_<typ>(1);
-    emitm_calll(NATIVECODE, (char*)string_bool - NATIVECODE - 4);
+    call_func(jit_info, (void*)string_bool);
     emitm_addb_i_r(NATIVECODE, 4, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[2]);

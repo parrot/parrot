@@ -159,6 +159,20 @@ make_branch_list(struct Parrot_Interp *interpreter,
         /* Move to the next opcode */
         cur_op += op_info->arg_count;
     }
+    /* now look at fixups, mark all fixup entries as branch target */
+    {
+        struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
+        int i;
+        if (!ft)
+            return;
+        for (i = 0; i < ft->fixup_count; i++) {
+            switch (ft->fixups[i]->type) {
+                case 0:
+                    branch[ft->fixups[i]->u.t0.offset] |= JIT_BRANCH_TARGET;
+                    break;
+            }
+        }
+    }
 }
 
 static void
@@ -233,6 +247,16 @@ set_register_usage(struct Parrot_Interp *interpreter,
     }
 }
 
+/*
+ * I386 has JITed vtables, which have the vtable# in extcall.
+ * This Parrot_jit_vtable_n_op() doese use register mappings.
+ */
+#if defined(I386)
+#  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
+#else
+#  define EXTCALL(op) op_jit[*(op)].extcall
+#endif
+
 static void
 make_sections(struct Parrot_Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
@@ -272,16 +296,16 @@ make_sections(struct Parrot_Interp *interpreter,
         /*
          * End a section:
          * If this opcode is jitted and next calls a C function */
-        if (!op_jit[*cur_op].extcall) {
+        if (!EXTCALL(cur_op)) {
             cur_section->jit_op_count++;
 
-            if (next_op < code_end && op_jit[*next_op].extcall)
+            if (next_op < code_end && EXTCALL(next_op))
                 start_new = 1;
         }
         else
             /* or if current section is not jitted, and the next opcode
              * is. */
-            if (next_op < code_end && !op_jit[*next_op].extcall)
+            if (next_op < code_end && !EXTCALL(next_op))
                 start_new = 1;
 
         /* or when the current opcode is a branch source,
@@ -300,7 +324,7 @@ make_sections(struct Parrot_Interp *interpreter,
         if (start_new) {
             /* Set the type, depending on whether the current
              * instruction is external or jitted. */
-            cur_section->isjit = !op_jit[*cur_op].extcall;
+            cur_section->isjit = !EXTCALL(cur_op);
 
             /* Save the address where the section ends */
             cur_section->end = cur_op;
@@ -591,8 +615,8 @@ debug_sections(struct Parrot_Interp *interpreter,
             op_info = &interpreter->op_info_table[*cur_op];
             PDB_disassemble_op(interpreter, instr, sizeof(instr),
                     op_info, cur_op, NULL, code_start, 0);
-            PIO_eprintf(interpreter, "\t\tOP%vu: %s\n",
-                    cur_op - code_start, instr);
+            PIO_eprintf(interpreter, "\t\tOP%vu: ext %3d\t%s\n",
+                    cur_op - code_start, op_jit[*cur_op].extcall, instr);
 #if JIT_DEBUG > 1
             PIO_eprintf(interpreter, "\t\t\tmap_branch: ");
             for (i = 0; i < op_info->arg_count; i++)
@@ -613,7 +637,7 @@ debug_sections(struct Parrot_Interp *interpreter,
             t = types[typ];
             PIO_eprintf(interpreter, "\t%c registers used:\t%i\n",
                     t, ru[typ].registers_used);
-            if (1 || ru[typ].registers_used) {
+            if (ru[typ].registers_used) {
                 PIO_eprintf(interpreter, "\t%c register count:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
                     PIO_eprintf(interpreter, "%i ", ru[typ].reg_count[i]);
