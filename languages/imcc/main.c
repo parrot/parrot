@@ -181,6 +181,8 @@ int main(int argc, char * argv[])
     interpreter->DOD_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);
+    /* register compilers to parrot core */
+    register_compilers(interpreter);
 
     /* default optimizations, s. optimizer.c */
     if (!*optimizer_opt)

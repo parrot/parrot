@@ -17,6 +17,8 @@
 #define _PARSER
 
 #include "imc.h"
+#include "parrot/method_util.h"
+#include "parrot/interp_guts.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -100,6 +102,79 @@ Instruction * INS(char * name, char *fmt, SymReg **regs, int n,
     nargs = n;
     keyvec = keys;
     return iANY(name, fmt, regs, emit);
+}
+
+/* imcc_eval(interp*, const char*)
+ *
+ * evaluate a pasm or imcc string
+ *
+ */
+extern void* yy_scan_string(const char *);
+
+static void *imcc_eval(Parrot_Interp interpreter, const char *s)
+{
+    /* imcc always compiles to interp->code->byte_code
+     * save old pointer, make new
+     */
+    size_t code_size = interpreter->code->byte_code_size;
+    void *code = interpreter->code->byte_code;
+    opcode_t *pc;
+
+    /* reset line number */
+    line = 0;
+    yy_scan_string(s);
+    /* s. also e_pbc_open for reusing code/consts ... */
+    emit_open(1, NULL);
+    /* XXX this may move an existing byte_code */
+    /* XXX where to put constants */
+    yyparse();
+    emit_close();
+
+    pc = (opcode_t *) ((char*)interpreter->code->byte_code + code_size);
+    /* XXX test */
+    /* runops_slow_core(interpreter, pc);
+    while (pc) {
+        DO_OP(pc, interpreter);
+    }
+    */
+    /* XXX restore old byte_code, */
+    /*interpreter->code->byte_code_size = code_size; */
+    interpreter->code->byte_code = code;
+    return pc;
+}
+
+void *imcc_eval_pasm(Parrot_Interp interpreter, const char *s)
+{
+    pasm_file = 1;
+    expect_pasm = 0;
+    return imcc_eval(interpreter, s);
+}
+
+void *imcc_eval_pir (Parrot_Interp interpreter, const char *s)
+{
+    pasm_file = 0;
+    expect_pasm = 0;
+    return imcc_eval(interpreter, s);
+}
+
+/* tell the parrot core, which compilers we provide */
+void register_compilers(Parrot_Interp interpreter)
+{
+    STRING *pasm = string_make(interpreter, "PASM", 4, NULL,0,NULL);
+    STRING *pir = string_make(interpreter, "PIR", 3, NULL,0,NULL);
+    PMC * func;
+    Parrot_csub_t pa = (Parrot_csub_t) F2DPTR(imcc_eval_pasm);
+    Parrot_csub_t pi = (Parrot_csub_t) F2DPTR(imcc_eval_pir);
+
+    func = pmc_new(interpreter, enum_class_Compiler);
+    Parrot_compreg(interpreter, pasm, func);
+    func->vtable->set_string_keyed(interpreter, func, (PMC*)F2DPTR(pa),
+          string_make(interpreter, "pIt", 3, NULL,0,NULL));
+
+    func = pmc_new(interpreter, enum_class_Compiler);
+    Parrot_compreg(interpreter, pir, func);
+    func->vtable->set_string_keyed(interpreter, func, (PMC*)F2DPTR(pi),
+          string_make(interpreter, "pIt", 3, NULL,0,NULL));
 }
 
 /*

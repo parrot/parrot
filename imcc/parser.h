@@ -27,6 +27,9 @@ int yyerror(char *);
 int yyparse(void);
 void op_fullname(char * dest, const char * name, SymReg * args[], int nargs);
 void open_comp_unit(void);
+void register_compilers(Parrot_Interp interpreter);
+void *imcc_eval_pasm(Parrot_Interp interpreter, const char *s);
+void *imcc_eval_pir (Parrot_Interp interpreter, const char *s);
 
 #endif
 

@@ -35,11 +35,6 @@
  *
  */
 
-int e_pbc_open(char *dummy) {
-    int ok = 0;
-    return ok;
-}
-
 /* globals store the state between individual e_pbc_emit calls
  * which happen per subroutine.
  *
@@ -68,6 +63,18 @@ static struct globals {
 } globals;
 
 static int nsubs;
+
+int e_pbc_open(char *dummy) {
+    int ok = 0;
+    /* TODO free the old stuff
+     * should we keep labels, consts and so on for eval?
+     */
+#if 0
+    globals.subs = NULL;
+    nsubs = 0;
+#endif
+    return ok;
+}
 
 /* get size of bytecode in ops till now */
 static int get_old_size(void)

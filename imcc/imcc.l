@@ -46,8 +46,11 @@ EOL		\r?\n
             BEGIN(emit);
 	}
 	if (pasm_file && YYSTATE != emit) {
-	    BEGIN(emit);
-            return pasm_file == 1 ? EMIT : 0;
+	    if (pasm_file == 1) {
+		BEGIN(emit);
+		return EMIT;
+	    }
+            return 0;
         }
 
 <INITIAL,emit>{EOL} {
@@ -173,7 +176,7 @@ EOL		\r?\n
         yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
     }
-<emit>{CHARCONSTANT} {
+<emit,INITIAL>{CHARCONSTANT} {
         yylval.s = str_dup(yytext);
         return(STRINGC);
     }
