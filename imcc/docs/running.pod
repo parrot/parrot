@@ -78,6 +78,10 @@ does not end in B<.pbc>
 
 =item -r, --run-pbc
 
+Only useful after B<-o> or B<--output-pbc>. Run the program from the compiled
+in-memory image. If two B<-r> options are given, the B<.pbc> file is read
+from disc and run. This is mainly needed for tests.
+
 =item -v, --verbose
 
 One B<-v> shows which files are worked on and prints a summary
@@ -105,7 +109,7 @@ This will probably change.
 
 =item -E, --pre-process-only
 
-Preprocess sorce file (i.e. expand macros) and print result to stdout. E.g.
+Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
   $ parrot -E t/op/macro_10.pasm
   $ parrot -E t/op/macro_10.pasm | parrot -- -
@@ -132,7 +136,7 @@ If debugging is enabled these files are generated:
 
   file.stabs.s ... stabsfile for the program
   file.o ... object file with debug information
-  EVAL_n ... source of B<compile> op nr. I<N>
+  EVAL_n ... source of B<compile> op nr. I<n>
   EVAL_n.stabs.s ... stabsfile for this block
   EVAL_n.o ... object file with debug information
 
@@ -152,7 +156,8 @@ for running the program.
  -o x.pasm y.pasm	ass		x.pasm
  -o x.pbc  x.imc	ass		x.pbc
  -o x.pbc  x.pasm	ass		x.pbc
- -o x.pbc -r x.pasm	ass/run		x.pbc
+ -o x.pbc -r x.pasm	ass/run pasm	x.pbc
+ -o x.pbc -r -r x.pasm	ass/run pbc	x.pbc
 
 
 =head1 BUGS

@@ -22,7 +22,7 @@
 
 #define IMCC_VERSION "0.0.11.0"
 
-static int run_pbc, write_pbc, pre_process;
+static int load_pbc, run_pbc, write_pbc, pre_process;
 static char optimizer_opt[20];
 extern FILE *yyin;
 
@@ -214,10 +214,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 imcc_version();
                 break;
             case 'r':
-                run_pbc = 1;
+                ++run_pbc;
                 break;
             case 'c':
-                run_pbc = 2;
+                load_pbc = 1;
                 break;
             case 'v':
                 IMCC_INFO(interp)->verbose++;
@@ -410,7 +410,7 @@ int main(int argc, char * argv[])
             pasm_file = 1;
         }
         else if (ext && strcmp (ext, ".pbc") == 0) {
-            run_pbc = 2;
+            load_pbc = 1;
             write_pbc = 0;
         }
     }
@@ -428,7 +428,7 @@ int main(int argc, char * argv[])
         }
 #if EXEC_CAPABLE
         else if (ext && strcmp (ext, ".o") == 0) {
-            run_pbc = 2;
+            load_pbc = 1;
             write_pbc = 0;
             Parrot_setup_opt(interpreter, 0, output);
             Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
@@ -448,7 +448,7 @@ int main(int argc, char * argv[])
         else
             info(interpreter, 1,"\n");
     }
-    if (run_pbc == 2) {
+    if (load_pbc) {
         fclose(yyin);
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
@@ -456,7 +456,7 @@ int main(int argc, char * argv[])
         Parrot_loadbc(interpreter, pf);
     }
     else {
-        int per_pbc = write_pbc | run_pbc;
+        int per_pbc = (write_pbc | run_pbc) != 0;
         info(interpreter, 1, "using optimization '%s' (%x) \n", optimizer_opt,
                 optimizer_level);
         pf = PackFile_new(0);
@@ -494,6 +494,14 @@ int main(int argc, char * argv[])
         fclose(fp);
         info(interpreter, 1, "%s written.\n", output);
         free(packed);
+    }
+    /* load the file written above */
+    if (run_pbc == 2 && write_pbc && strcmp(output, "-")) {
+        info(interpreter, 1, "Loading %s\n", output);
+        pf = Parrot_readbc(interpreter, output);
+        if (!pf)
+            fatal(1, "main", "Packfile loading failed\n");
+        Parrot_loadbc(interpreter, pf);
     }
     if (run_pbc) {
         if (IMCC_INFO(interpreter)->imcc_warn)

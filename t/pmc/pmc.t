@@ -2132,7 +2132,6 @@ Method 'no_such_meth' not found
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "new with a native type");
-##OK_PBC##
         new P1, .INTVAL
 	print "never\n"
 	end

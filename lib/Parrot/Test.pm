@@ -145,7 +145,9 @@ sub generate_functions {
 
 	my $run_pbc = 0;
 	if ($args =~ s/--run-pbc//) {
+	    my $pbc_f = per_test('.pbc', $count);
 	    $run_pbc = 1;
+	    $args = "$args -o $pbc_f -r -r";
 	}
 
 	# native tests are just run
@@ -161,26 +163,8 @@ sub generate_functions {
         my $exit_code = 0;
 	my $pass = 0;
 
-	if ($run_pbc) {
-	    # generate pbc and run that file
-	    my $pbc_f = per_test('.pbc', $count);
-	    $cmd = "$PARROT -o $pbc_f $as_f";
-	    $exit_code = _run_command($cmd);
-	    # $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
-	    # compile tests like pmc_76 may fail
-	    # because they may test parser features
-	    if ($assembly =~ /##OK_PBC##/) {
-		$pass = $Builder->ok(1, $desc);
-	    }
-	    else {
-		$cmd = "$PARROT ${args} $pbc_f";
-		$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
-	    }
-	}
-	else {
-	    $cmd = "$PARROT ${args} $as_f";
-	    $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
-	}
+	$cmd = "$PARROT ${args} $as_f";
+	$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
 	my $meth = $Test_Map{$func};
 	unless ($pass) {
