@@ -11,7 +11,7 @@ sub extract_balanced {
     my $balance = 0;
     for(shift) {
         s/^\s+//;
-        /^\{/ or die "bad block open"; # }
+        /^\{/ or die "bad block open: ".substr($_,0,10),"..."; # }
         while(/(\{)|(\})/g) {
             if($1) {
                 $balance++;
@@ -56,11 +56,15 @@ while (my $file = shift @ARGV) {
   close SOURCE;
 }
 
+my %flags;
+
 sub filter {
   my $contents = shift;
     
   $contents =~ s/^([^{]*)pmclass ([\w]*)//s; 
   my ($pre, $classname) = ($1, $2); 
+
+  $flags{$1}++ while $contents =~ s/^\s*(\w+)//s;
 
   my ($classblock, $post) = extract_balanced($contents,);
   $classblock = substr($classblock, 2,-1); # trim out the { }
@@ -89,8 +93,9 @@ sub filter {
      my ($type, $methodname, $parameters) = ($1,$2,$3);
 
      $parameters = ", $parameters" if $parameters =~ /\w/;
-     if ($classblock =~ s/= default;?//) {
+     if ($classblock =~ s/^\s*= default;?\s*//s) {
         $default{$methodname}++;
+        push @methods, $methodname;
         next;
      }
      
@@ -113,12 +118,18 @@ sub filter {
   my $methodlist = join (",\n        ", @methods);
   my $initname = "Parrot_$classname" . "_class_init";
  
-  $OUT = <<EOC;
+  if (keys %default) {
+      $OUT = "#include \"default.h\"\n\n".$OUT;
+  }
+
+  $OUT = <<EOC . $OUT;
 $pre
 
 static STRING* whoami;
 
-$OUT
+EOC
+
+$OUT .= <<EOC unless exists $flags{noinit};
 
 void $initname (void) {
 

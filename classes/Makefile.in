@@ -3,9 +3,9 @@ RM_F = ${rm_f}
 
 INC=../include/parrot
 
-H_FILES = $(INC)/parrot.h
+H_FILES = $(INC)/parrot.h default.h
 
-O_FILES = perlint$(O) perlstring$(O) perlnum$(O) perlundef$(O)
+O_FILES = default$(O) perlint$(O) perlstring$(O) perlnum$(O) perlundef$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -20,7 +20,15 @@ PERL = ${perl}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : perlint$(O) perlnum$(O) perlstring$(O) perlundef$(O)
+all : default$(O) perlint$(O) perlnum$(O) perlstring$(O) perlundef$(O)
+
+default.c: default.pmc
+	$(PERL) pmc2c.pl default.pmc
+
+default$(O): $(H_FILES)
+
+default.h: default.c
+	perl -ne 'next unless /Parrot_default/; s/{/;/;s/^/extern /;print' default.c > default.h
 
 perlint.c: perlint.pmc 
 	$(PERL) pmc2c.pl perlint.pmc
@@ -43,7 +51,7 @@ perlundef.c: perlundef.pmc
 perlundef$(O): $(H_FILES)
 
 clean:
-	$(RM_F) *.c *$(O)
+	$(RM_F) *.c *$(O) default.h
 
 update:
 	cvs -q update -dP

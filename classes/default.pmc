@@ -1,0 +1,255 @@
+/* default.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id: genclass.pl,v 1.6 2001/11/25 12:56:01 simon Exp   Overview:
+ *     These are the vtable functions for the default base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass default noinit {
+
+   INTVAL type () {
+   }
+
+   STRING* name () {
+   }
+
+   void init () {
+   }
+
+   void clone (PMC* dest) {
+   }
+
+   void morph (INTVAL type) {
+   }
+
+   BOOLVAL move_to (void * destination) {
+   }
+
+   INTVAL real_size () {
+   }
+
+   void destroy () {
+   }
+
+   INTVAL get_integer () {
+   }
+
+   FLOATVAL get_number () {
+   }
+
+   STRING* get_string () {
+   }
+
+   BOOLVAL get_bool () {
+   }
+
+   void* get_value () {
+   }
+
+   BOOLVAL is_same (PMC* pmc2) {
+   }
+
+   void set_integer (PMC * value) {
+   }
+
+   void set_integer_native (INTVAL value) {
+   }
+
+   void set_integer_bigint (BIGINT value) {
+   }
+
+   void set_integer_same (PMC * value) {
+   }
+
+   void set_number (PMC * value) {
+   }
+
+   void set_number_native (FLOATVAL value) {
+   }
+
+   void set_number_bigfloat (BIGFLOAT value) {
+   }
+
+   void set_number_same (PMC * value) {
+   }
+
+   void set_string (PMC * value) {
+   }
+
+   void set_string_native (STRING * value) {
+   }
+
+   void set_string_unicode (STRING * value) {
+   }
+
+   void set_string_other (STRING * value) {
+   }
+
+   void set_string_same (PMC * value) {
+   }
+
+   void set_value (void* value) {
+   }
+
+   void add (PMC * value,  PMC* dest) {
+   }
+
+   void add_int (INTVAL value,  PMC* dest) {
+   }
+
+   void add_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void add_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void add_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void add_same (PMC * value,  PMC* dest) {
+   }
+
+   void subtract (PMC * value,  PMC* dest) {
+   }
+
+   void subtract_int (INTVAL value,  PMC* dest) {
+   }
+
+   void subtract_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void subtract_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void subtract_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void subtract_same (PMC * value,  PMC* dest) {
+   }
+
+   void multiply (PMC * value,  PMC* dest) {
+   }
+
+   void multiply_int (INTVAL value,  PMC* dest) {
+   }
+
+   void multiply_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void multiply_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void multiply_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void multiply_same (PMC * value,  PMC* dest) {
+   }
+
+   void divide (PMC * value,  PMC* dest) {
+   }
+
+   void divide_int (INTVAL value,  PMC* dest) {
+   }
+
+   void divide_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void divide_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void divide_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void divide_same (PMC * value,  PMC* dest) {
+   }
+
+   void modulus (PMC * value,  PMC* dest) {
+   }
+
+   void modulus_int (INTVAL value,  PMC* dest) {
+   }
+
+   void modulus_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void modulus_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void modulus_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void modulus_same (PMC * value,  PMC* dest) {
+   }
+
+   void concatenate (PMC * value,  PMC* dest) {
+   }
+
+   void concatenate_native (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_unicode (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_other (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_same (PMC * value,  PMC* dest) {
+   }
+
+   BOOLVAL is_equal (PMC* value) {
+   }
+
+   void logical_or (PMC* value,  PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest, 
+            SELF->vtable->get_bool(INTERP, SELF) ||
+            value->vtable->get_bool(INTERP, value)
+        );
+   }
+
+   void logical_and (PMC* value,  PMC* dest) {
+        dest->vtable->set_integer_native(INTERP, dest, 
+            SELF->vtable->get_bool(INTERP, SELF) &&
+            value->vtable->get_bool(INTERP, value)
+        );
+   }
+
+   void logical_not (PMC* value) {
+   }
+
+   void match (PMC * value,  REGEX* re) {
+   }
+
+   void match_native (STRING * value,  REGEX* re) {
+   }
+
+   void match_unicode (STRING * value,  REGEX* re) {
+   }
+
+   void match_other (STRING * value,  REGEX* re) {
+   }
+
+   void match_same (PMC * value,  REGEX* re) {
+   }
+
+   void repeat (PMC * value,  PMC* dest) {
+   }
+
+   void repeat_native (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_unicode (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_other (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_same (PMC * value,  PMC* dest) {
+   }
+
+}

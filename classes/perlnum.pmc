@@ -393,13 +393,9 @@ fprintf(stderr,"modulus_same not implemented\n");
         return SELF->cache.num_val == value->vtable->get_number(INTERP, value);
     }
 
-    void logical_or (PMC* value, PMC* dest) {
-fprintf(stderr,"logical_or not implemented\n");
-    }
+    void logical_or (PMC* value, PMC* dest) = default;
 
-    void logical_and (PMC* value, PMC* dest) {
-fprintf(stderr,"logical_and not implemented\n");
-    }
+    void logical_and (PMC* value, PMC* dest) = default;
 
     void logical_not (PMC* value) {
 fprintf(stderr,"logical_not not implemented\n");

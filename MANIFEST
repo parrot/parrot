@@ -6,6 +6,7 @@ chartypes/usascii.c
 classes/Makefile.in
 classes/genclass.pl
 classes/pmc2c.pl
+classes/default.pmc
 classes/perlint.pmc
 classes/perlnum.pmc
 classes/perlstring.pmc
@@ -19,6 +20,7 @@ docs/Makefile
 docs/intro.pod
 docs/opcodes.pod
 docs/overview.pod
+docs/parrot.pod
 docs/parrot_assembly.pod
 docs/parrotbyte.pod
 docs/strings.pod

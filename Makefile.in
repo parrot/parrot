@@ -10,7 +10,7 @@ $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/resources.h $(INC)/platform.h
 
-CLASS_O_FILES = classes/perlint$(O) classes/perlstring$(O) \
+CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
 classes/perlnum$(O) classes/perlundef$(O)
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
