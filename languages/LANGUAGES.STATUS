@@ -128,3 +128,11 @@ S: Language standard is stable and not expected to change soon.
 M: Yes
 V: 0.0.11
 
+N: YAL
+A: Leopold Toetsch
+S: YAL is Yet Another Language
+S: Its mainly intended to test an AST interface and for checking, if and how
+S: code generation plays nicely together with Parrot opcodes.
+W: http://toetsch.at/yal/
+M: Yes
+V: 0.0.13
