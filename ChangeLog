@@ -1,0 +1,1741 @@
+2001-10-03 17:21  simon
+
+	* basic_opcodes.ops, interpreter.c, packfile.c: 
+	Evil printf bandaid (which allows Sparc64 to pass tests)
+	
+	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
+
+2001-10-03 16:58  simon
+
+	* string.c, t/op/string.t: 
+	chop fixes for n < 0 and tests
+	
+	Courtesy of: Alex Gough <alex@rcon.org>
+
+2001-10-03 15:51  thgibbs
+
+	* interpreter.c: Changed an occurrence of INTVAL to opcode_t
+	
+	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
+
+2001-10-02 17:48  dan
+
+	* include/parrot/stacks.h: Fix typo in function name
+
+2001-10-02 17:35  dan
+
+	* include/parrot/stacks.h: changed to support new stack stuff
+	coming after 0.02
+
+2001-10-02 15:01  simon
+
+	* Configure.pl, Types_pm.in, basic_opcodes.ops, config_h.in,
+	interpreter.c, make_op_header.pl, memory.c, packfile.c,
+	process_opfunc.pl, register.c, string.c, strnative.c,
+	Parrot/Opcode.pm, Parrot/PackFile.pm, Parrot/String.pm,
+	Parrot/PackFile/ConstTable.pm, Parrot/PackFile/Constant.pm,
+	docs/overview.pod, docs/strings.pod, include/parrot/interpreter.h,
+	include/parrot/memory.h, include/parrot/packfile.h,
+	include/parrot/parrot.h, include/parrot/register.h,
+	include/parrot/stacks.h, include/parrot/string.h: 
+	The Great Renaming.
+
+2001-10-02 12:49  gregor
+
+	* process_opfunc.pl: 
+	  * Fixed a tyop:  s/string/integer/ for INT_CONST expansion
+
+2001-10-02 12:40  simon
+
+	* basic_opcodes.ops, process_opfunc.pl, register.c,
+	include/parrot/register.h: 
+	Move preprocessing of register accessors to process_opfunc.pl
+	
+	Courtesy of: Jason Gloudon <perl@gloudon.com>
+
+2001-10-02 01:20  ask
+
+	* README: add a few lines about lists.
+
+2001-10-01 23:00  brentdax
+
+	* Configure.pl, Makefile.in, hints/mswin32.pl: Make 'make clean'
+	work on Win32 (courtesy of Mattia Barbon <mbarbon@dsi.unive.it>)
+
+2001-10-01 22:50  brentdax
+
+	* Configure.pl, test_c.in: More changes for 64-bit compatibility
+
+2001-10-01 21:51  simon
+
+	* process_opfunc.pl: 
+	Michael Fischer's patch broke conditionals.
+
+2001-10-01 15:38  simon
+
+	* process_opfunc.pl: 
+	Small hack to keep process_opfunc.pl from generating extra return()
+	statements.
+	
+	Courtesy of: Michael Fischer <michael@visv.net>
+
+2001-10-01 15:32  simon
+
+	* Parrot/Opcode.pm: 
+	Documentation fix.
+	
+	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
+
+2001-10-01 01:49  simon
+
+	* packfile.c: 
+	Simon is an idiot. Don't trust him with your code.
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-10-01 00:59  simon
+
+	* Parrot/String.pm: 
+	Was in manifest, but not in CVS.
+
+2001-09-30 21:25  simon
+
+	* MANIFEST, Types_pm.in, assemble.pl, basic_opcodes.ops,
+	disassemble.pl, packfile.c, pdump.c, process_opfunc.pl,
+	Parrot/Assembler.pm, Parrot/PackFile.pm,
+	Parrot/PackFile/ConstTable.pm, Parrot/PackFile/Constant.pm,
+	Parrot/PackFile/FixupTable.pm, include/parrot/packfile.h,
+	include/parrot/string.h: 
+	Move NVs to the constant table.    * Changes to Types_pm.in to make
+	life easier for some of the	 packing/etc. I'm doing elsewhere.
+	Also, we now pack 'n' as      'i'.
+	
+	  * Moved the guts of assemble.pl to Parrot/Assembler.pm so that
+	    eventually we can use all these tools together inside scripts
+	    rather than call out to the shell to run the programs.
+	
+	  * As I was tracking down problems, I converted the internal
+	    documentation of the assembler to POD from comments.
+	
+	  * Changed the numeric regexp in the assembler to detect leading
+	    signs and trailing exponents.
+	
+	  * Updated basic_opcodes.ops to fetch numeric constants from the
+	    constant table.
+	
+	  * Enhanced the disassembler in a number of ways to make my life
+	    easier while tracking down bugs (try it out). It now puts in
+	    labels for ops that are the destinations of flow control ops.
+	
+	  * packfile.c now has a TRACE_PACKFILE switch that can be set
+	    to get it to print info as it processes. I needed this while
+	    debugging, but I can remove it or change it before committing
+	    if its a problem.
+	
+	  * Updated pdump.c because it was missing a call to init_world().
+	
+	  * Updated process_opfunc.pl to deal with numeric constants
+	    being stored in the constant table instead of inline.
+	
+	  * Added multiple type support to Parrot/PackFile/Constant.pm
+	
+	  * Added Parrot/String.pm, to be used for constants.
+	
+	  * Added packfile.[hc] functions for allocating new constants
+	    of various types.
+	
+	  * Made string_copy visible to the world in parrot/string.h.
+	
+	Wow.
+	
+	Courtesy of: Gregor N. Purdy <gregor@focusresearch.com>
+
+2001-09-29 15:56  gregor
+
+	* little_languages/Makefile: 
+	Removed assumption that '.' is on the path.
+
+2001-09-29 15:55  gregor
+
+	* little_languages/Makefile: 
+	Removed references to leibnitz test program.
+
+2001-09-29 15:21  thgibbs
+
+	* t/op/trans.t, basic_opcodes.ops: Added NV casts to transcendental
+	math ops args to work on Solaris.
+
+2001-09-27 15:15  thgibbs
+
+	* assemble.pl: Added case insensitive matches to hex and binary
+	characters
+	
+	Courtesy of: Johnathan Scott Duff <duff@cbi.tamucc.edu>
+
+2001-09-27 04:46  thgibbs
+
+	* assemble.pl: This patch makes integer constants of the form
+	0b[01]+ work with perl 5.005.  The oct function in versions of perl
+	before 5.6 did not handle the 0b numeric prefix; therefore, it was
+	returning 0.  To fix this, I added a from_binary function that
+	would take a binary string and return its decimal representation. 
+	Now, instead of blindly calilng oct, it makes a distinction between
+	0/0x numbers and 0b numbers.
+
+2001-09-26 19:30  thgibbs
+
+	* assemble.pl: Error now returns a non-zero status
+	
+	Courtesy of: Andrew Kuchling <akuchlin@mems-exchange.org>
+
+2001-09-26 19:13  gregor
+
+	* MANIFEST, Makefile.in, basic_opcodes.ops, bytecode.c,
+	interpreter.c, packfile.c, pdump.c, test_main.c,
+	include/parrot/bytecode.h, include/parrot/interpreter.h,
+	include/parrot/packfile.h, include/parrot/parrot.h, t/op/integer.t,
+	t/op/stacks.t: 
+	  * bytecode.[hc] removed. packfile.[hc] are the interface to the
+	    packfile/bytecode file from C. May be renamed in the future.
+	
+	  * packfile.[hc] changed to use 'struct PackFile *', etc. instead
+	    of 'PackFile *', just like the interpreter, etc.
+	
+	  * Constants are accessed via the interpreter's 'code' member
+	    (struct PackFile * code). Macros PCONST(i) and PNCONST are
+	    provided to access constants by index and the number of
+	    constants, respectively (assumes a variable 'interpreter' of
+	    the appropriate type is in scope).
+	
+	  * Byte Code is accessed via the interpreter's 'code' member.
+	
+	  * Changed PackFile_Constant to point to a STRING instead of
+	having
+	    members for the string_make() arguments. Also has a 'type' IV
+	    in preparation for allowing multiple types of constants in
+	    const_table.
+	
+	  * Removed hardcoded example program from test_main.c. We have
+	    plenty of test programs elsewhere.
+	
+	  * test_prog now uses a PackFile to deal with the program before
+	    sending it on to the interpreter.
+	
+	  * Added missing 'end' ops to some tests in t/op/integer.t and
+	    t/op/stacks.t.
+
+2001-09-26 18:38  thgibbs
+
+	* assemble.pl: Separated code into functions and added comments.
+
+2001-09-26 18:29  simon
+
+	* config_h.in: 
+	Fix 64-bit chunk-base issue.
+
+2001-09-26 06:55  thgibbs
+
+	* t/op/bitwise.t: Added end to bitwise tests.
+
+2001-09-26 00:54  dan
+
+	* docs/parrot_assembly.pod: Added in the base for threading, I/O,
+	and interpreter creation. Skeleton only, but it's something to peer
+	at.
+
+2001-09-25 21:44  thgibbs
+
+	* t/op/trans.t: Removed loops in transcendtal op test.
+
+2001-09-25 10:12  simon
+
+	* MANIFEST, t/op/basic.t, t/op/bitwise.t, t/op/integer.t,
+	t/op/string.t, t/op/time.t: 
+	More tests
+	
+	Courtesy of: Alex Gough <alex@rcon.org>
+
+2001-09-24 19:08  gregor
+
+	* t/op/number.t: 
+	  * Enabled the clear_n test.
+
+2001-09-24 18:56  gregor
+
+	* Parrot/.cvsignore: 
+	  * Ignore the generated Types.pm file.
+
+2001-09-24 18:52  gregor
+
+	* little_languages/Makefile, t/op/number.t: 
+	  * No need to skip the inc and dec numeric tests anymore. I fixed
+	the
+	    assembler earlier today.
+
+2001-09-24 18:21  simon
+
+	* MANIFEST, t/op/stacks.t: 
+	Oops.
+
+2001-09-24 18:19  simon
+
+	* build_interp_starter.pl, interpreter.c, string.c, Parrot/Test.pm,
+	include/parrot/exceptions.h, include/parrot/interpreter.h,
+	t/op/string.t: 
+	1) captured error output, so can test errors, this might be bad,
+	not sure.  2) basic tests for register stack frames, including some
+	errors 3) I think we can stop skipping one of the string tests 4) I
+	added some more substr tests, but substr was broken, so 5) changed
+	substr to work with out of range values, or 6) throw an error if
+	they're far too silly
+	
+	Courtesy of: Alex Gough <alex@rcon.org>
+
+2001-09-24 17:27  gregor
+
+	* basic_opcodes.ops, opcode_table, t/op/number.t: 
+	  * Op set_n was missing. Added it and a test for it. We now have
+	the
+	    same int and num ops, except mod is int-only.
+
+2001-09-24 17:01  gregor
+
+	* assemble.pl: 
+	  * Fixed a typo: s/Line/line/
+
+2001-09-24 16:02  gregor
+
+	* basic_opcodes.ops: 
+	  * Fixed dec_n_nc opcode, which had += where it should have had
+	-=.
+
+2001-09-24 15:34  gregor
+
+	* assemble.pl: 
+	  * Fixed handling of constants starting with '0' that should not
+	be
+	    sent through oct(). For example 'set N2 0.1' was being
+	interpreted
+	    as 'set N2 0' (naughty).
+	
+	    As reported by Leon Brocard <acme@astray.com> in the comments
+	of
+	    his mandelbrot.pasm example.
+
+2001-09-24 02:21  bdwheele
+
+	* assemble.pl: fixed dumb code when --include was not specified.
+
+2001-09-24 02:17  simon
+
+	* assemble.pl: 
+	Shit-sweeping.
+
+2001-09-24 01:56  bdwheele
+
+	* assemble.pl: * Added --include=dir option to assembler to provide
+	a path to look for included files.  * Error message of a macro is
+	defined inside of a macro
+
+2001-09-23 21:29  bdwheele
+
+	* assemble.pl: Added __FILE__ equate, fixed __LINE__ equate.
+
+2001-09-23 15:50  simon
+
+	* Configure.pl: 
+	Fixed typo. Parrot might work again on non-8.3 filesystems. :)
+
+2001-09-23 02:03  ask
+
+	* Configure.pl, test_c.in: fix missing newline at the end of test.c
+	Courtesy of: acme@astray.com (Leon Brocard)
+	
+	rename 'test' executable used in Configure process to test_siz.
+
+2001-09-23 01:03  simon
+
+	* process_opfunc.pl: 
+	iPaq fix. No, really.
+
+2001-09-23 00:47  simon
+
+	* MANIFEST: 
+	Missed several, in fact.
+
+2001-09-23 00:46  simon
+
+	* MANIFEST: 
+	Missed one.
+
+2001-09-22 21:13  simon
+
+	* assemble.pl: 
+	Assembler register numbering rigour.
+	
+	Courtesy of: Leon Brocard <acme@astray.com>
+
+2001-09-22 18:20  simon
+
+	* Makefile.in, Test/More.pm, Test/Simple.pm, Test/Utils.pm: 
+	I'm sick of having to install Test::More everywhere. Temporary
+	measure until we remove this silly dependency.
+	
+	Also a typo in Makefile.in which suggests some things were only
+	happening correctly by sheer chance. :)
+
+2001-09-22 18:06  simon
+
+	* README: 
+	test.pasm is dead, long like make test.
+
+2001-09-22 17:47  simon
+
+	* t/op/number.t: 
+	De-fang overzealous floating point test.
+
+2001-09-22 17:39  simon
+
+	* process_opfunc.pl: 
+	Remove hard-coded NV size assumption. Tru64 is nearly there!
+
+2001-09-22 17:18  simon
+
+	* assemble.pl, disassemble.pl: 
+	More portability fixups.
+
+2001-09-22 16:44  simon
+
+	* assemble.pl, Parrot/PackFile/Constant.pm: 
+	And I *think* this fixes Tru64.
+
+2001-09-22 16:37  simon
+
+	* Parrot/PackFile/ConstTable.pm: 
+	Oops.
+
+2001-09-22 16:36  simon
+
+	* Parrot/: PackFile.pm, PackFile/ConstTable.pm,
+	PackFile/Constant.pm: 
+	More removal of hard-coded pack formats.
+
+2001-09-22 15:21  simon
+
+	* assemble.pl: 
+	
+	Grrr. Why isn't this working?
+
+2001-09-22 15:18  simon
+
+	* Parrot/: PackFile.pm, PackFile/ConstTable.pm: 
+	
+	Make assemble use the PackFile modules; also fixed some bugs in
+	them.
+
+2001-09-22 14:38  simon
+
+	* Configure.pl, MANIFEST, Types_pm.in, assemble.pl, disassemble.pl:
+	
+	Abstract the argument and opcode packing types and functions out
+	into a separate module. This *should* help us maintain consistency
+	when we change the various types.
+
+2001-09-22 00:46  brentdax
+
+	* Configure.pl: Delete test.o (or its equivalent) after Configure's
+	test program finishes.
+
+2001-09-21 21:24  brentdax
+
+	* Parrot/Test.pm: Fix error with \ as path separator (courtesy of
+	Mattia Barbon <mbarbon@dsi.unive.it>)
+
+2001-09-21 21:09  gregor
+
+	* Parrot/PackFile/: ConstTable.pm, Constant.pm: 
+	  * Fixed pad calculation (similar to recent bug fix on C library)
+
+2001-09-21 20:23  simon
+
+	* disassemble.pl: 
+	Pack types and sizes have gone askew.
+
+2001-09-21 20:18  brentdax
+
+	* Configure.pl: Fix typo in setting stuff from the C test program
+
+2001-09-21 10:25  simon
+
+	* basic_opcodes.ops, process_opfunc.pl: 
+	Document patches.
+	
+	Courtesy of: Leon Brocard <acme@astray.com>
+
+2001-09-21 06:06  ask
+
+	* Config_pm.in, assemble.pl: fix 5.005_03.
+
+2001-09-21 06:03  ask
+
+	* Configure.pl: make the ivsize detection work for us normal people
+	without . in our PATH.	:-)
+
+2001-09-21 05:56  brentdax
+
+	* test_main.c: Change _read to read for portability to Tru64
+	(Damien Neil <neild@misago.org> and likely many others)
+
+2001-09-21 05:46  ask
+
+	* Makefile.in: "update" target to update from cvs.
+
+2001-09-21 05:44  brentdax
+
+	* Configure.pl, test_c.in: Fix issues with ivsize and nvsize
+
+2001-09-21 02:43  brentdax
+
+	* Configure.pl: Fix a typo that forced the -g flag on
+
+2001-09-20 22:41  dan
+
+	* packfile.c: Had some no-value returns. Naugty
+
+2001-09-20 22:40  dan
+
+	* t/test.pasm: Added labels to output
+
+2001-09-20 15:39  simon
+
+	* Parrot/: Opcode.pm, Test.pm: 
+	This patch does two only somewhat related things.
+	
+	Parrot/Opcode.pm:  Change the hard-wired assumption that sizeof(nv)
+	= 2*sizeof(iv) to a PConfig-type computed value.
+	
+	Parrot/Test.pm:  Change it to run with the perl that was used to
+	generate this version of Parrot.  This is useful if, for example,
+	you want to use bleadperl to build and test parrot (e.g. to try out
+	various 64-bit options) but you still have a 5.6.x (or 5.005_xx)
+	installed as the default 'perl' on your system.  Since perl-5.7.x
+	is installed 'version-only', a plain 'perl' is quite likely to pick
+	up the older perl in such cases. Such an older perl might well not
+	understand pack('q') used in the assembler.
+	
+	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
+
+2001-09-20 15:14  gregor
+
+	* packfile.c: 
+	  * Fixed a typo in pad calculation that throwing off unpack and
+	pack.
+
+2001-09-20 15:03  thgibbs
+
+	* t/op/integer.t: Removed overflow tests from integer.t.  set_i_ic
+	tests now cover all registers.
+	
+	Courtesy of: Damien Neil neild@misago.org
+
+2001-09-20 14:48  thgibbs
+
+	* process_opfunc.pl: Changed process_opfunc.pl to work on 64 bit
+	machines.
+
+2001-09-20 14:35  simon
+
+	* Configure.pl, assemble.pl: 
+	Pack IVs correctly.
+	
+	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
+
+2001-09-20 14:06  gregor
+
+	* little_languages/jakoc: 
+	  * Fixed a tyop in the string interpolation regex.
+	
+	Courtesy of Michael L Maraist <maraist@UDel.Edu>
+
+2001-09-20 13:56  gregor
+
+	* little_languages/jakoc: 
+	  * Updated jakoc to work with the single-destination comp ops.
+
+2001-09-20 05:08  bdwheele
+
+	* assemble.pl: macro expansion.  Here's the test macro I was using:
+	
+	# this uses I32,I31 as temporaries.  # macro must be preceeded by a
+	label.	testi	    macro   num,got,want    print   "Test #"	   
+	print	num	print	"..."	set	I32,want	set    
+	I31,got 	eq	I32,I31,$ok	print	"NG\n"	branch 
+	$end $ok:	print	"OK\n" $end:	endm
+	
+	It is invoked as:
+	
+	Test1:	testi	1,I3,I2
+
+2001-09-20 03:52  dan
+
+	* stacks.c, include/parrot/stacks.h: Preliminary files for the
+	generic stack support
+
+2001-09-20 02:49  bdwheele
+
+	* assemble.pl: Added include processing to assemble.pl	the syntax
+	is: include 'file.to.include'
+
+2001-09-19 23:57  thgibbs
+
+	* t/op/integer.t, t/op/number.t, assemble.pl, opcode_table: Fixed
+	opcode_table listing of if_i_ic and if_n_ic.  Dan had changed the
+	function to only use 2 args, but the opcode_table still had three
+	listed.  Fixed integer.t and number.t to use the new comparison
+	operators.  Improved assemble.pl ability to grok operators by
+	constructing a function set and comparing operator types.
+
+2001-09-19 22:42  dan
+
+	* assemble.pl: Binmodes the output filehandles now. (No more
+	bytecode munching...)
+
+2001-09-19 22:32  dan
+
+	* Configure.pl, basic_opcodes.ops, opcode_table, process_opfunc.pl,
+	t/euclid.pasm, t/test.pasm, t/test2.pasm: Changed opcodes so
+	conditional branches take a single argument, and fall through
+	otherwise.
+
+2001-09-19 21:19  thgibbs
+
+	* memory.c: Added explanation of mem_allocate_aligned give by Dan
+	Sugalski
+	
+	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
+
+2001-09-19 21:04  thgibbs
+
+	* include/parrot/interpreter.h, Configure.pl,
+	build_interp_starter.pl, bytecode.c, config_h.in, interpreter.c,
+	process_opfunc.pl: Changed opcode_t from a union to a configurable
+	type.
+
+2001-09-19 20:54  thgibbs
+
+	* assemble.pl: Missed a couple of changes for 64 bit portability.
+
+2001-09-19 20:37  gregor
+
+	* packfile.c, include/parrot/packfile.h: 
+	  * Added "methods" for setting and getting all the various
+	attributes,
+	    probably sufficient for an assembler to use the library.
+
+2001-09-19 20:04  thgibbs
+
+	* assemble.pl: Modifications to run on 64 bit platforms.  To run on
+	a 64 bit platform manually change the  setting for 'i' from 'l' to
+	'q'.  This should be automatically done by a Configure setting in
+	the near future.
+
+2001-09-19 19:10  thgibbs
+
+	* config_h.in: changed c++ comment to c comment.
+	
+	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
+
+2001-09-19 17:48  gregor
+
+	* .cvsignore, MANIFEST, Makefile.in, packfile.c, pdump.c,
+	include/parrot/packfile.h: 
+	  * C code for dealing with PackFiles as if they were objects.
+	Mostly
+	    read-only interface for now, but it would not be hard to make
+	it
+	    read-write. [packfile.c, include/parrot/packfile.h]
+	
+	  * PackFile Dumping program that falls short of disassembling, but
+	    tests the above code and provides a hex listing of the byte
+	code
+	    contents of the PackFile. [pdump.c]
+	
+	  * New Makefile target 'pdump' for the above program, and related
+	    Makefile.in changes.
+	
+	  * Updated MANIFEST to reflect the added files
+	
+	  * Update .cvsignore to ignore pdump.
+
+2001-09-19 14:55  thgibbs
+
+	* MANIFEST: Added number.t and trans.t to MANIFEST
+
+2001-09-19 05:40  thgibbs
+
+	* process_opfunc.pl: Now taking & of opcode_t instead of i member
+	of union opcode_t.  I hope this will be more portable for set_n_nc.
+
+2001-09-19 05:39  thgibbs
+
+	* t/op/integer.t: Added end to test 1.
+
+2001-09-19 00:09  thgibbs
+
+	* t/op/number.t: Added end to each test
+
+2001-09-19 00:00  simon
+
+	* t/op/number.t: 
+	Number tests! Wooo!
+	
+	Courtesy of: Damien Neil <neild@misago.org>
+
+2001-09-18 23:52  thgibbs
+
+	* interpreter.c: Added casts to appropriate types to make -Wall not
+	complain on certain printf formats
+
+2001-09-18 23:31  thgibbs
+
+	* t/op/integer.t: Added end to each test.
+
+2001-09-18 22:54  thgibbs
+
+	* t/op/trans.t: Added trans.t for transcendental math function
+	tests.
+
+2001-09-18 22:28  simon
+
+	* MANIFEST: 
+	MANIFEST updates. (And notice how I carefully snuck in the
+	t/op/integer.t there...)
+	
+	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
+
+2001-09-18 22:26  simon
+
+	* t/: integer.t, op/integer.t: 
+	Except it doesn't go there. Duh.
+
+2001-09-18 22:25  simon
+
+	* t/integer.t: 
+	Tests for integer ops.
+	
+	Courtesy of: Damien Neil <neild@misago.org>
+
+2001-09-18 22:03  thgibbs
+
+	* include/parrot/bytecode.h, include/parrot/interpreter.h,
+	build_interp_starter.pl, bytecode.c, config_h.in, interpreter.c,
+	make_op_header.pl, process_opfunc.pl, test_main.c: Changed IV to
+	opcode_t union for operators.  This required a few perl script
+	changes to output the correct type.  There were also some changes
+	to allow -pedantic in gcc
+
+2001-09-18 21:07  gregor
+
+	* disassemble.pl, Parrot/PackFile.pm,
+	Parrot/PackFile/ConstTable.pm, Parrot/PackFile/Constant.pm: 
+	Converted the disassembler to use the Parrot::PackFile Perl classes
+	to do its job.
+
+2001-09-18 19:18  brentdax
+
+	* Makefile.in: Fix missing functions for real this time.  (I
+	swear!)
+
+2001-09-18 18:49  brentdax
+
+	* Configure.pl: Remove unnecessary -I.. (courtesy of Andy Dougherty
+	<doughera@lafayette.edu>}
+
+2001-09-18 18:47  brentdax
+
+	* Makefile.in: Fix bugs with missing math, etc. functions
+
+2001-09-18 14:42  thgibbs
+
+	* strnative.c: Sorry Simon...forgot bustart was a void* not a
+	char*.
+
+2001-09-18 13:59  thgibbs
+
+	* strnative.c: Removed unnecessary IV cast in concat.
+
+2001-09-18 13:58  thgibbs
+
+	* t/op/string.t: Removed unnecessary IV cast in concat.  Added end
+	to concat test in string.t
+
+2001-09-18 12:07  gregor
+
+	* little_languages/jakoc: 
+	  * var num ... no longer requires assignment
+	  * automatic casting between int and num
+	  * Fixed an error message
+	
+	Courtesy of: Simon Cozens <simon@cvs.perl.org>
+
+2001-09-18 11:57  simon
+
+	* TODO: 
+	Gonna have to start thinking of more things to do, soon.
+
+2001-09-18 10:42  simon
+
+	* opcode_table: 
+	Introduce a little more tidiness into the opcode table.
+
+2001-09-18 03:06  gregor
+
+	* basic_opcodes.ops, opcode_table, t/euclid.pasm: 
+	Resurrected register-const ops per Dan's request.
+
+2001-09-18 02:20  gregor
+
+	* .cvsignore, Configure.pl, MANIFEST, Makefile.in,
+	build_interp_starter.pl, bytecode.h, events.h, exceptions.h,
+	global_setup.h, interpreter.h, io.h, memory.h, parrot.h,
+	process_opfunc.pl, register.h, stacks.h, string.h, strnative.h:
+	Committed some files that were missed in the last *.h moving
+	commmit.
+
+2001-09-18 02:17  gregor
+
+	* include/parrot/.cvsignore: Fixed a typo in .cvsignore.
+
+2001-09-18 02:16  gregor
+
+	* include/parrot/: .cvsignore, bytecode.h, events.h, exceptions.h,
+	global_setup.h, interpreter.h, io.h, memory.h, parrot.h,
+	register.h, stacks.h, string.h, strnative.h: Added .cvsignore file
+	missed in last commit for the move of *.h to include/parrot.
+
+2001-09-18 01:32  simon
+
+	* t/Makefile: 
+	Trivial "clean" target to t/Makefile.
+
+2001-09-18 01:32  simon
+
+	* assemble.pl, build_interp_starter.pl, disassemble.pl,
+	Parrot/Opcode.pm: 
+	Change icky Digest::MD5 for nice simple unpack()
+	
+	Courtesy of: Jonathan Scott Duff <duff@cbi.tamucc.edu>
+
+2001-09-18 00:35  simon
+
+	* basic_opcodes.ops, opcode_table, docs/parrot_assembly.pod,
+	t/op/string.t: 
+	New concat op. Hey, if I'm going to talk about it in an article,
+	better implement it...
+
+2001-09-17 22:54  gregor
+
+	* MANIFEST, Parrot/PackFile.pm, Parrot/PackFile/ConstTable.pm,
+	Parrot/PackFile/Constant.pm, Parrot/PackFile/FixupTable.pm: 
+	Functions for reading, writing and manipulating Parrot Pack Files.
+	NOTE: This is a proposed term based on the fact that the file
+	contains more than just byte code, and another language (Java)
+	calls its binary files by a broader notion of what's in them (Class
+	Files). Since Perl has packages, and since we use pack() to write
+	them, we'll call them PackFiles (at least for now).
+	
+	That does, however, beg the question of file extension. Should we
+	name the files "foo.pack" instead of "foo.pbc"?
+
+2001-09-17 20:23  thgibbs
+
+	* interpreter.c, test_main.c: Uncuddled else statements for coding
+	standard.
+
+2001-09-17 19:57  gregor
+
+	* Parrot/Opcode.pm: 
+	Added a $revision variable, parsing of the CVS Id line in
+	opcode_table and a &revision() subroutine.
+
+2001-09-17 19:53  gregor
+
+	* opcode_table: 
+	Added a CVS Id tag to it.
+
+2001-09-17 18:58  thgibbs
+
+	* interpreter.c: Cleared interpreter flags on creation.
+
+2001-09-17 18:38  gregor
+
+	* build_interp_starter.pl, bytecode.c, bytecode.h, interpreter.c,
+	interpreter.h, test_main.c: 
+	  * Provides macros in interp_guts.h for setting up arrays with
+	    op names and op arg counts (done via build_interp_starter.pl).
+	
+	    These are used in the op tracing
+	
+	  * The functions in bytecode.[hc] pass around a pointer to the
+	length
+	    of the bytecode so that later when we get to runops, we know
+	    how much bytecode we've got and we can detect out-of-bounds
+	    jumping. The documentation is updated, too.
+	
+	  * runops in interpreter.c now looks at interpreter->flags to
+	    decide if the core of runops should be runops_trace_core or
+	    runops_notrace_core. These new functions contain just the
+	    while-loop portion of runops. A new function runops_generic
+	    does any other setup (such as checking the bytecode
+	    fingerprint) or wrapup (such as complaining if we ended up
+	    out-of-bounds). NOTE: I didn't know what we should do for
+	    functions in here that are not part of the api, so I gave
+	    them docs with 'TODO' marks mentioning they really aren't
+	    part of the api. Guidance appreciated.
+	
+	  * test_main.c now checks for '-t' arg and sets the tracing flag
+	    on its interpreter instance as appropriate.
+
+2001-09-17 17:47  bdwheele
+
+	* assemble.pl: added some default equates, and if they're sub
+	references, they are computed each time it is referenced.
+
+2001-09-17 16:15  dan
+
+	* interpreter.h: 
+	
+	Added flags to the interpreter structure and defined a few.
+
+2001-09-17 15:51  simon
+
+	* bytecode.h, string.h: 
+	VAR_SCOPE on globals.
+
+2001-09-17 15:20  simon
+
+	* MANIFEST: 
+	Parrot/Opcode.pm, Parrot/Test.pm into MANIFEST.
+
+2001-09-17 15:05  gregor
+
+	* t/jump.pasm, MANIFEST: 
+	Added a test program to demonstrate jump_i.
+
+2001-09-17 14:44  thgibbs
+
+	* register.c: Fixed register pop not using correct offset (off by
+	one).
+	
+	Courtesy of: Philip Kendall <pak@ast.cam.ac.uk>
+
+2001-09-17 13:56  thgibbs
+
+	* interpreter.c, register.c: Added code to call Parrot_clear_s
+	during initialization and Parrot_clear_s and Parrot_clear_p when a
+	new stack frame is pushed.
+
+2001-09-17 13:51  gregor
+
+	* little_languages/: Makefile, bench.jako, euclid.jako, fact.jako,
+	fib.jako, hello.jako: Added bench.pasm to "clean"
+
+2001-09-17 13:49  gregor
+
+	* little_languages/: jakoc, Makefile: 
+	Added CVS Id tag.
+
+2001-09-17 13:49  gregor
+
+	* little_languages/jakoc: 
+	Code streamlining.
+	
+	Courtesy of: Buggs <buggs-perl6@splashground.de>
+
+2001-09-17 13:29  gregor
+
+	* MANIFEST, opcheck.pl: 
+	Added an opcode_table checker to make sure that all opcodes listed
+	there conform to a simple set of naming rules (rules themselves, of
+	course, are subject to change).
+
+2001-09-17 13:23  thgibbs
+
+	* string.c: Modified string.c to correctly use the return value of
+	realloc.
+
+2001-09-17 05:26  brentdax
+
+	* Makefile.in: Making the Makefile smarter
+
+2001-09-16 23:06  brentdax
+
+	* hints/mswin32.pl: Finishing the Configure hints
+
+2001-09-16 23:05  brentdax
+
+	* Configure.pl, Makefile.in, parrot.h, test_main.c,
+	Parrot/Opcode.pm: Win32 compatibility, Configure hints, 5.005
+	compatibility, MANIFEST checking
+
+2001-09-16 19:25  bdwheele
+
+	* assemble.pl: parrot assembly equates
+
+2001-09-16 18:03  gregor
+
+	* Makefile.in: 
+	Added 'test' target to run new test suite.
+
+2001-09-16 17:33  simon
+
+	* basic_opcodes.ops: 
+	'not' was being !, rather than ~. Too many Perl programmers here, I
+	suspect.
+	
+	Courtesy of: Tom Hughes <tom@compton.nu>
+
+2001-09-16 17:21  simon
+
+	* Parrot/Test.pm, t/harness, t/op/basic.t, t/op/string.t: 
+	A *real* test suite!
+	
+	Courtesy of: "Mattia Barbon" <mbarbon@dsi.unive.it>
+
+2001-09-16 16:49  gregor
+
+	* basic_opcodes.ops, opcode_table: 
+	At Dan's request, my new register-constant comparison ops have been
+	removed.
+
+2001-09-16 16:40  gregor
+
+	* little_languages/jakoc: 
+	Fixed a copy-paste error in one of jakoc's error messages.
+	
+	Courtesy of: Buggs <buggs-perl6-list@splashground.de>
+
+2001-09-16 16:37  gregor
+
+	* little_languages/jakoc: 
+	Modified comparison implementation to use temporary registers in
+	the case of register-constant and constant-register comparisons.
+	This will allow the compiler to emit code that works when the
+	constant-comparison ops are backed out of Parrot. If the ops ever
+	make their way back in, then jakoc can emit more efficient code
+	again.
+
+2001-09-16 16:19  bdwheele
+
+	* assemble.pl, t/local_label.pasm: Added local labels ($whatever)
+	... though not subroutine based like the documentation wants, they
+	are local to the last non-local label defined.
+
+2001-09-16 14:02  simon
+
+	* MANIFEST: 
+	And remember, when you add stuff, keep the manifest up to date.
+
+2001-09-16 02:55  ask
+
+	* Makefile.in: a "shared" target for building libparrot.so
+
+2001-09-16 02:45  thgibbs
+
+	* bytecode.c, bytecode.h, events.h, exceptions.h, global_setup.c,
+	global_setup.h, interpreter.c, interpreter.h, io.h,
+	make_op_header.pl, memory.c, memory.h, parrot.c, parrot.h,
+	process_opfunc.pl, register.c, register.h, stacks.h, string.c,
+	string.h, strnative.c, strnative.h, test_main.c: Updated files to
+	use the coding standard PDD.  Also changed Perl_Interp to
+	Parrot_Interp.
+
+2001-09-16 02:21  ask
+
+	* README: emphasise the bits about the license not being worked out
+	yet.
+
+2001-09-15 22:21  simon
+
+	* process_opfunc.pl: 
+	basic_opcodes.c should *scream* that it's autogenerated.
+
+2001-09-15 21:58  gregor
+
+	* little_languages/Makefile: 
+	Fixed Makefile to use 'jakoc' instead of 'jako_compiler.pl' to
+	compile.
+
+2001-09-15 21:58  gregor
+
+	* little_languages/: jako_compiler.pl, jakoc: 
+	Renamed the Jako compiler to jakoc from jako_compiler.pl
+
+2001-09-15 21:51  gregor
+
+	* little_languages/: Makefile, bench.jako, euclid.jako,
+	jako_compiler.pl: 
+	Added a new bench.jako example based on Leon Brocard's Bench.java.
+	
+	Jako Compiler:	 * fix a bug in assignment handling   * add some
+	more conditionals to while and if   * revert to using implicit
+	opcodes in a few cases that were broken     before the assembler
+	patch went in recently.
+
+2001-09-15 21:46  gregor
+
+	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	New ops for register-constant INTEGER comparisons:
+	
+	  {eq,ne,lt,le,gt,ge}_ic_ic
+	
+	New ops for register-register and register-constant NUMERIC
+	comparisons:
+	
+	  eq_nc_ic
+	  {ne,lt,le,gt,ge}_{n,nc}_ic
+	
+	Assembler:
+	
+	  Allow uppercase and underscores in labels.
+	
+	  Tweaks to the op infer code to make it work with the examples
+	I've been
+	  creating.
+
+2001-09-15 19:16  thgibbs
+
+	* README: Updated README to include Configure.pl
+
+2001-09-15 17:05  simon
+
+	* build_interp_starter.pl: 
+	Casting happiness
+	
+	Courtesy of: Jarkko Hietaniemi <jhi@cc.hut.fi>
+
+2001-09-15 16:45  simon
+
+	* assemble.pl: 
+	And the same again: Parrot/Opcode.pm wasn't "..-aware".
+
+2001-09-15 16:40  simon
+
+	* t/Makefile: 
+	The Parrot/Opcode.pm dependency means we need to do -I.. in the
+	test Makefile
+
+2001-09-15 12:26  simon
+
+	* memory.c: 
+	Fixed to match the coding standards.
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-15 01:57  ask
+
+	* Configure.pl, Makefile.in, Parrot/Opcode.pm: make the Makefile
+	use the perl that was used to run Configure.pl
+
+2001-09-15 01:48  ask
+
+	* Parrot/Opcode.pm: if we need perl 5.6, just say so. :-)
+
+2001-09-15 01:42  gregor
+
+	* little_languages/: euclid.jako, fact.jako, fib.jako,
+	jako_compiler.pl: 
+	Compiler: Added variable interpolation in double-quoted strings. 
+	Examples: Made use of variable interpolation.
+
+2001-09-15 01:28  gregor
+
+	* Parrot/.cvsignore: 
+	Ignore the Config.pm generated file.
+
+2001-09-15 01:22  gregor
+
+	* little_languages/: .cvsignore, Makefile, euclid.jako, fact.jako,
+	fib.jako, hello.jako, jako_compiler.pl: 
+	gnp: Added some more sample Jako files and added many more
+	operators to the compiler. Preparations for supporting all the Math
+	and bitwise ops.
+
+2001-09-14 19:06  simon
+
+	* assemble.pl, build_interp_starter.pl, disassemble.pl,
+	make_op_header.pl, process_opfunc.pl, Parrot/Opcode.pm: 
+	Move common table reading stuff to a module.
+	
+	Courtesy of: Damien Neil <neild@misago.org>
+
+2001-09-14 17:42  simon
+
+	* .cvsignore: 
+	More .cvsignore foo.
+
+2001-09-14 17:40  simon
+
+	* assemble.pl, config_h.in: 
+	De-coredump
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-14 17:38  simon
+
+	* assemble.pl, t/Makefile: 
+	Make assemble.pl look in its parent directory if the data files it
+	needs aren't in the current one. Plus a Makefile that lets "make
+	foo.pbc" work in t/
+	
+	Courtesy of: Rocco Caputo <troc@netrus.net>
+
+2001-09-14 16:29  simon
+
+	* make_op_header.pl: 
+	Wildly experimental patch to make Parrot compile on FreeBSD. (And
+	probably segfault everywhere else.)
+
+2001-09-14 15:58  dan
+
+	* little_languages/: euclid.jako, jako_compiler.pl: 
+	
+	Added in the first mini-language that targets Parrot.
+	
+	Courtesty of: "Gregor N. Purdy" <gregor@focusresearch.com>
+
+2001-09-14 15:20  dan
+
+	* memory.c: Was misaligning returned memory. Fixed.
+
+2001-09-14 15:08  simon
+
+	* Makefile.in, basic_opcodes.ops, bytecode.c, global_setup.c,
+	interpreter.c, interpreter.h, memory.c, parrot.c, parrot.h,
+	register.c, register.h, string.c, string.h, strnative.c,
+	test_main.c: 
+	Fixes to include <parrot/foo.h>
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-14 12:05  simon
+
+	* strnative.c: 
+	Appease Tru64.
+
+2001-09-14 12:01  simon
+
+	* memory.c: 
+	Appease Tru64.
+
+2001-09-14 11:54  simon
+
+	* interpreter.c: 
+	Remove lvalue cast.
+
+2001-09-14 11:45  simon
+
+	* Configure.pl: 
+	Be 5.005 friendly.
+
+2001-09-14 11:39  simon
+
+	* Configure.pl: 
+	Tru64 cc doesn't like -Wall
+
+2001-09-14 10:57  simon
+
+	* Config_pm.in, Configure.pl, MANIFEST, Makefile, Makefile.in,
+	assemble.pl, build_interp_starter.pl, bytecode.c, bytecode.h,
+	config.h.in, config_h.in, disassemble.pl, interpreter.c: 
+	Configure now generates Makefile
+	
+	Courtesy of: Brent Dax <brentdax@cpan.org>
+
+2001-09-14 10:08  simon
+
+	* t/test3.pasm: 
+	Add "end"
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-14 10:07  simon
+
+	* assemble.pl: 
+		* uses Getopt::Long for options.  -c is now --checksyntax. 
+	I wasn't
+	sure how to keep compatible (patches welcome!)	       * options
+	include:		 --help 		--version	   
+	      --verbose 		--output=file		     
+	--listing=file		       --checksyntax	     * produces
+	verbose listing of what the assembler saw :)  Only one nitpick with
+	it:  unknown symbols are given as 0xffffffff, unfortunately, this
+	includes symbols which may be defined later in the file (i.e.
+	forward jumps).
+	
+	Courtesy of: Brian Wheeler <bdwheele@indiana.edu>
+
+2001-09-14 10:06  simon
+
+	* strnative.c: 
+	substr growth fixup
+	
+	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-14 10:03  simon
+
+	* bytecode.c, global_setup.c, interpreter.c, memory.c, memory.h,
+	register.c, string.c, strnative.c, test_main.c: 
+	Coding standards conformance
+	
+	Courtesy of Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-14 09:46  simon
+
+	* assemble.pl: 
+	Make the assembler grok transcendental maths again.  Courtesy of:
+	Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
+
+2001-09-13 17:29  simon
+
+	* assemble.pl: 
+	Better opcode guessing, from Brian Wheeler. (Again!)
+
+2001-09-13 17:20  dan
+
+	* docs/parrot_assembly.pod: 
+	
+	Took out duplicate entries for iton, ntoi, and tostring.
+
+2001-09-13 17:16  simon
+
+	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	From Brian Wheeler:
+	
+	This patch gives the assembler support of '\a','\n','\r','\t', and
+	'\\' in string constants.
+	
+	In addition, it changes (for all registers) "I reg %li is ..." to
+	just the value of the register.  Printing constants is also
+	supported, but alas, you have to specify the type (print_sc,
+	print_ic, print_nc).
+
+2001-09-13 15:38  simon
+
+	* assemble.pl: 
+	Why don't I actually *test* this stuff before applying it, eh?
+
+2001-09-13 15:34  simon
+
+	* TODO, t/euclid.pasm: 
+	From: "Gregor N. Purdy" <gregor@focusresearch.com> Subject: [patch
+	(really)] Removed opcode qualifers t/euclid.pasm to exercise opcode
+	inference
+
+2001-09-13 14:42  simon
+
+	* assemble.pl: 
+	A new assembler, from Brian Wheeler.
+
+2001-09-13 09:44  simon
+
+	* basic_opcodes.ops, interpreter.h, parrot.h, strnative.c,
+	test_main.c: 
+	Two more from Tom Hughes:     Patch to fix C++ style comments	 
+	Patch to remove use of structure constant/cast
+
+2001-09-13 09:39  simon
+
+	* TODO, docs/strings.pod: 
+	Update string docs.
+
+2001-09-13 09:36  simon
+
+	* Makefile, basic_opcodes.ops: 
+	Tom Hughes	Patch to link with the maths library Tom Hughes    
+	 Patch to fix += on rvalue
+
+2001-09-13 08:57  simon
+
+	* MANIFEST: 
+	I guess nobody's been using the nightly builds...
+
+2001-09-13 08:27  simon
+
+	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	Bitwise ops, from Brian Wheeler.
+
+2001-09-13 08:23  simon
+
+	* .cvsignore, t/.cvsignore: 
+	.cvsignore's, from Gregor Purdy.
+
+2001-09-13 08:22  simon
+
+	* Makefile: 
+	Euclidean test and test output rearranging from Gregor Purdy.
+
+2001-09-13 08:21  simon
+
+	* assemble.pl, basic_opcodes.ops, disassemble.pl, opcode_table: 
+	Math ops from Gibbs Tanton.
+
+2001-09-13 08:14  simon
+
+	* basic_opcodes.ops, opcode_table, string.c, string.h, strnative.c,
+	t/test2.pasm: 
+	String substr op; also rearranged "encoding" to be a vtable
+	pointer, not an array index. Haven't changed docs to reflect this,
+	oops.
+	
+	Simon
+
+2001-09-12 19:48  dan
+
+	* t/euclid.pasm: Implementation of Euclid's Algorithm, courtesty of
+	Gregor Purdy
+
+2001-09-12 19:39  dan
+
+	* basic_opcodes.ops, opcode_table: From Gregor Purdy. Adds mod_i.
+
+2001-09-12 19:23  dan
+
+	* interpreter.h, parrot.h: Quick placeholder entry for string
+	function tables
+
+2001-09-12 18:58  dan
+
+	* memory.c: Added in a cast to make gcc happy.
+
+2001-09-12 16:44  dan
+
+	* docs/parrot_assembly.pod: 
+	
+	PDD describing parrot's assembly language and the opcodes in it
+
+2001-09-12 14:20  dan
+
+	* memory.c: 
+	Fixed alignment issues with allocation
+
+2001-09-12 10:54  simon
+
+	* Makefile, assemble.pl, bytecode.c, disassemble.pl,
+	make_op_header.pl, opcode_table, process_opfunc.pl: 
+	Brian Wheeler's big patch:
+	
+	* Changes the opcode_table file to provide additional information
+	about the operands.  Case shouldn't be a problem since that data
+	never becomes a C symbol [this is pretty much as before]
+	
+	* Padding errors solved:  assemble.pl and bytecode.c were padding
+	the constants incorrectly.  It should have been 4-(size % 4), not
+	just (size % 4).  It is now fixed in both places.
+	
+	* assembler has less special cases, and should be easier to hang
+	error checking on
+	
+	* disassembler dumps constant table and the format is a bit
+	prettier, including register names, etc.
+
+2001-09-11 23:21  dan
+
+	* build_interp_starter.pl, interpreter.c: 
+	
+	Abstracted the runops function core into a macro for easy
+	replacement later.
+
+2001-09-11 10:43  simon
+
+	* Configure.pl, MANIFEST, Makefile, config.h, config.h.in: 
+	Configure system from Brent Dax <brentdax@cpan.org>
+
+2001-09-11 09:38  simon
+
+	* assemble.pl, test.pbc: 
+	From: Bryan C. Warnock <bwarnock@capita.com> Subject: Patch:
+	assembler deferred output
+	
+	Also got rid of the bytecode, since that's probably way out of
+	date.
+
+2001-09-11 09:26  simon
+
+	* basic_opcodes.ops, opcode_table, t/test2.pasm: 
+	From: Bryan C. Warnock <bwarnock@capita.com> Subject: length_s_i
+	patch
+
+2001-09-10 23:20  simon
+
+	* MANIFEST: 
+	And that move needs a MANIFEST change. So many things to remember!
+
+2001-09-10 23:18  simon
+
+	* t/: test.pasm, test2.pasm, test3.pasm: 
+	Move tests to t/. (Oh, CVS doesn't work the way I think it does.)
+
+2001-09-10 23:18  simon
+
+	* test.pasm, test2.pasm, test3.pasm: 
+	Move tests to t/
+
+2001-09-10 23:04  dan
+
+	* test3.pasm: 
+	
+	Register push/pop test
+
+2001-09-10 22:47  simon
+
+	* basic_opcodes.ops, bytecode.c, parrot.h, test_main.c: 
+	Fix up format warnings, from Sam Tregar <sam@tregar.com>. 
+	(Modified to avoid conflict with Dan's changes.)
+
+2001-09-10 22:45  dan
+
+	* disassemble.pl: 
+	
+	Happier about blanks in opcode_table
+
+2001-09-10 22:40  dan
+
+	* interpreter.c, register.c: 
+	
+	Yanked out debugging code, since these work OK. The bug I want is
+	elsewhere.
+
+2001-09-10 22:30  simon
+
+	* MANIFEST: 
+	Uhm. We want make_op_header.pl. We really, really do.
+
+2001-09-10 22:26  simon
+
+	* Makefile, TODO, assemble.pl, basic_opcodes.ops,
+	build_interp_starter.pl, disassemble.pl, make_op_header.pl,
+	opcode_table, process_opfunc.pl: 
+	Automatic opcode numbering, from Leon Brocard <acme@astray.com>. 
+	This means we can add lots more opcodes without fiddling about with
+	the numbers. Hooray!
+	
+	Don't forget that "end" needs to be op zero, else the interpreter
+	falls off the end of the code. This is Bad, and I wonder if there's
+	a way around it.
+
+2001-09-10 19:49  simon
+
+	* MANIFEST, make_op_table_build.pl: 
+	Hey! This doesn't do anything...
+
+2001-09-10 19:46  simon
+
+	* Makefile: 
+	"clean" target cleanup from Bryan C. Warnock <bwarnock@capita.com>.
+
+2001-09-10 18:31  simon
+
+	* MANIFEST: 
+	You know what this means...
+
+2001-09-10 18:30  simon
+
+	* assemble.pl: 
+	"use strict" patch from Leon Brocard <acme@astray.com>. Hey, why
+	wait for a release...? :)
+
+2001-09-10 18:13  simon
+
+	* interpreter.c: 
+	Bad Dan! No cookie!
+
+2001-09-10 17:56  simon
+
+	* README: 
+	A *real* README file, which doesn't claim it isn't for public
+	consumption.
+
+2001-09-10 17:02  simon
+
+	* TODO: 
+	More things to do.
+
+2001-09-10 16:56  dan
+
+	* TODO: Added in assembler gripe. Also added a few blank lines for
+	clarity
+
+2001-09-10 16:49  dan
+
+	* register.h, register.c: Renamed the core functions so the opcodes
+	can find 'em OK. (There were some conflicts)
+
+2001-09-10 16:48  dan
+
+	* basic_opcodes.ops, opcode_table: Added register window ops
+
+2001-09-10 11:07  simon
+
+	* TODO: 
+	Trivial TODO list.
+
+2001-09-10 11:05  simon
+
+	* test.pbc, test2.pasm, test_main.c: Other string bits and pieces;
+	note "-s" flag to test prog.
+
+2001-09-10 11:01  simon
+
+	* docs/strings.pod: 
+	New string documentation.
+
+2001-09-10 11:01  simon
+
+	* basic_opcodes.ops, opcode_table: 
+	String ops.
+
+2001-09-10 10:53  simon
+
+	* global_setup.c: 
+	More string fu.
+
+2001-09-10 10:51  simon
+
+	* memory.h: 
+	Just some more aliases for now. Used by string handling stuff.
+
+2001-09-10 10:50  simon
+
+	* assemble.pl, bytecode.c, bytecode.h: 
+	Temporary hack to store string constants in bytecode and recreate
+	them at runtime.
+
+2001-09-10 10:48  simon
+
+	* op.h: 
+	op.h is now generated by the Makefile; remove it.
+
+2001-09-10 10:47  simon
+
+	* Makefile: 
+	clean and op.h Makefile targets.
+
+2001-09-10 10:45  simon
+
+	* string.c, string.h, strnative.c: 
+	More string vtable stuff.
+
+2001-09-07 21:07  dan
+
+	* assemble.pl: 
+	
+	Much less picky about whitespace in the opcode_table now. (Doesn't
+	whine on blank lines)
+
+2001-09-07 16:23  dan
+
+	* Makefile, assemble.pl, global_setup.h, interpreter.c,
+	interpreter.h, opcode_table, parrot.h, test.pasm: (Here's hoping
+	this takes) Added global_setup.h to declare init_world function
+	
+	Moved variable declarations out of the interpreter loop for small
+	speed boost.
+	
+	Changed end opcode to now be opcode #0. A function is provided for
+	it, but isn't ever executed.
+	
+	When the interpreter sees an opcode 0 in the stream it means the
+	end of stream. Things were coring on Cygwin otherwise. (I think I
+	was dereferencing a zero, which is bad)
+
+2001-09-06 22:07  dan
+
+	* basic_opcodes.ops, process_opfunc.pl: 
+	
+	Minor tweaks to basic_opcodes.ops to fix some NV issues. The rest
+	are minor changes now that things are in a fixed state.
+
+2001-09-06 16:13  dan
+
+	* basic_opcodes.c, test_opcodes.c: 
+	test_opcodes.c is now irrelevant--they're all in basic_opcodes.ops.
+	
+	basic_opcodes.c is now autogenerated from basic_opcodes.ops, and
+	should be nuked. So it is. :)
+
+2001-09-06 03:35  dan
+
+	* basic_opcodes.ops, build_interp_starter.pl, process_opfunc.pl: 
+	Scripts to build the header file that holds the function table
+	creation code, as well as the script to turn an opcode file to C
+	source. (And the basic opcode functions turned into an opcode
+	source file)
+
+2001-09-06 03:31  dan
+
+	* Makefile, interpreter.c: 
+	Changes to support the autogeneration of the opcode function
+	pointer table in interpreter.c, along with the changes to the
+	Makefile needed.
+
+2001-09-05 13:27  simon
+
+	* bytecode.c, config.h, docs/opcodes.pod, docs/overview.pod,
+	docs/parrotbyte.pod, docs/vtables.pod: 
+	Added stubs for the documents; working on them this week. (What's
+	left of it.) config.h change is just to type VTABLE, and the
+	bytecode thing you might want to revoke. It's apidoc for the
+	functions in there.
+
+2001-09-03 18:26  simon
+
+	* docs/strings.pod: 
+	A start on the string API documentation.
+
+2001-09-03 17:43  simon
+
+	* opcode_table: 
+	Since we specify the opcode number, we can rearrange to a more
+	human-friendly ordering.
+
+2001-09-03 17:42  simon
+
+	* basic_opcodes.c: 
+	Coupl'a logic bugs. (I think)
+
+2001-09-03 17:41  simon
+
+	* string.c, string.h, strnative.c: 
+	Tidying up the string vtables.
+
+2001-09-03 17:38  simon
+
+	* make_op_header.pl: 
+	Spit out the whole of op.h, not just the bit in the middle.
+
+2001-08-29 13:16  ask
+
+	* README: it seems like we indeed can commit. What about sending
+	commit mails?
+
+2001-08-29 13:07  simon
+
+	* Makefile, README, assemble.pl, basic_opcodes.c, bytecode.c,
+	bytecode.h, config.h, disassemble.pl, events.h, exceptions.h,
+	global_setup.c, interpreter.c, interpreter.h, io.h,
+	make_op_header.pl, make_op_table_build.pl, memory.c, memory.h,
+	op.h, opcode_table, parrot.c, parrot.h, register.c, register.h,
+	stacks.h, string.c, string.h, strnative.c, strnative.h, test.pasm,
+	test.pbc, test_main.c, test_opcodes.c: 
+	Initial checkin of Simon's work directory - Dan, feel free to nuke.
+	 I'm still working on the string stuff, though.
+
+2001-08-29 12:44  ask
+
+	* README: update README with list address
+
+2001-08-29 12:36  ask
+
+	* README: first readme.
+
