@@ -496,8 +496,9 @@ sub_start: SUB                           { open_comp_unit(); }
 pcc_sub: PCC_SUB   { open_comp_unit(); }
        IDENTIFIER '\n'
         {
-          Instruction *i =iSUBROUTINE(mk_address($3, U_add_uniq_sub));
-          i->r[1] = $<sr>$ = mk_pcc_sub(str_dup($3), 0);
+          char *name = str_dup($3);
+          Instruction *i = iSUBROUTINE(mk_address($3, U_add_uniq_sub));
+          i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
         }
        pcc_params
        sub_body { $$ = 0; }

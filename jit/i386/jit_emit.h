@@ -1861,7 +1861,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 }
                 else
 #endif
- 
+
                     jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                         &PMC_REG(p[i]));
                 /* push $i, the left most Pi stays in eax, which is used
@@ -1883,7 +1883,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     }
                     else
 #endif
- 
+
                         jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                             &INT_REG(p[i]));
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
@@ -1931,7 +1931,7 @@ store:
                 }
                 else
 #endif
- 
+
                     emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
                             constants[p[i]]->u.string);
@@ -1970,7 +1970,7 @@ store:
     }
     else
 #endif
- 
+
         emitm_pushl_i(jit_info->native_ptr, interpreter);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
@@ -2249,7 +2249,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
         jit_emit_mov_mr_i(jit_info->native_ptr, PREG(p1), emit_EAX);
 	    Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-                
+
         emitm_pushl_r(jit_info->native_ptr, emit_EAX);
         /* push interpreter */
         emitm_pushl_i(jit_info->native_ptr, 0);
@@ -2316,7 +2316,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_ret(pc); \
 }
 
-#  define exec_emit_end(pc) jit_emit_end(pc) 
+#  define exec_emit_end(pc) jit_emit_end(pc)
 
 #  endif /* JIT_CGP */
 
@@ -2397,7 +2397,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * the stack this will stop working !!! */
     if (!jit_info->objfile) {
         emitm_pushl_i(jit_info->native_ptr, interpreter);
-    } 
+    }
     else {
         emitm_pushl_i(jit_info->native_ptr, 0x0);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
@@ -2800,6 +2800,14 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* call the thing in struct_val, i.e. offset 12 - call *(12)%eax */
     emitm_callm(pc, emit_EAX, emit_None, emit_None,
             offsetof(struct PMC, cache.struct_val));
+    /*
+     * TODO
+     * if we have strings in the signature, then we are leaking memory
+     * from string_to_cstring above:
+     * - allocate area of stack positions with strings
+     * - emit code to free these
+     */
+
     /* adjust stack */
     if (st)
         emitm_addb_i_r(pc, st, emit_ESP);

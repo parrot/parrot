@@ -341,6 +341,22 @@ void free_sym(SymReg *r)
     if (r->life_info) {
 	free_life_info(r);
     }
+    if (r->pcc_sub) {
+        int i;
+        for (i = 0; i < r->pcc_sub->nargs; i++)
+            free_sym(r->pcc_sub->args[i]);
+        if (r->pcc_sub->args)
+            free(r->pcc_sub->args);
+        for (i = 0; i < r->pcc_sub->nret; i++)
+            free_sym(r->pcc_sub->ret[i]);
+        if (r->pcc_sub->ret)
+            free(r->pcc_sub->ret);
+        if (r->pcc_sub->cc)
+            free_sym(r->pcc_sub->cc);
+        if (r->pcc_sub->sub)
+            free_sym(r->pcc_sub->sub);
+        free(r->pcc_sub);
+    }
     /* TODO free keychain */
     free(r);
 }
