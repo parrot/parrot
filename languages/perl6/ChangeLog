@@ -241,6 +241,9 @@
 
 2002-08-26
 
+	* Additions:
+	    - t/rx/call.t -- rule call
+	
 	* Fixes:
 	    - driver tidying and doc-update (Leo).
-	
+	    - regex fixes: advance, no-arg call

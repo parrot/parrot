@@ -1019,7 +1019,9 @@ sub P6C::rx_call::tree {
     } else {
 	# Call with pattern or no args
 	my $args = maybe_tree($x->[2]);
-	unless (defined $args) {
+	if (!defined($args) ||
+	    (@{$args->branches} == 1 && @{$args->branches(0)->things} == 0)) {
+	    # empty pattern => no args.
 	    $args = new P6C::ValueList vals => [];
 	}
 	return new P6C::rx_call name => $pat, args => $args;
@@ -1046,7 +1048,7 @@ sub P6C::rx_cc_neg::tree {
     } else {
 	# enumerated class
 	return new P6C::rx_oneof
-	    rep => substr($class, 1, length($class) - 2),
+	    rep => substr($class->[1], 1, length($class->[1]) - 2),
 	    negated => $neg;
     }
 }

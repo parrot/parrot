@@ -294,14 +294,18 @@ sub sm_expr_pattern {
     my $adv = $r->{ctx}{rx_fail} = genlabel 'advance';
     my $str = $r->{ctx}{rx_thing} = gentmp 'str';
     my $pos = $r->{ctx}{rx_pos} = gentmp 'int';
+    my $basepos = gentmp 'int';
     my $fail = genlabel 'rx_fail';
     $r->{ctx}{rx_inline} = 1;	# don't pop args.
     code(<<END);
 	$str = $val
 	$pos = 0
+	$basepos = 0
 	goto $begin
 $adv:
+	$pos = $basepos
 	rx_advance $str, $pos, $fail
+	inc $basepos
 $begin:
 END
     my $ret = $r->val;
