@@ -44,20 +44,20 @@ output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .Array
         set P0, 1
 
-	set P0,0,-7 # set P0[0], -7
-	set I0,P0,0 # set I0, P0[0]
+	set P0[0],-7 # set P0[0], -7
+	set I0,P0[0] # set I0, P0[0]
 	eq I0,-7,OK_1
 	print "not "
 OK_1:	print "ok 1\n"
 
-	set P0,0,3.7 # set P0[0], 3.7
-	set N0,P0,0 # set N0, P0[0]
+	set P0[0],3.7 # set P0[0], 3.7
+	set N0,P0[0] # set N0, P0[0]
 	eq N0,3.7,OK_2
 	print "not "
 OK_2:	print "ok 2\n"
 
-	set P0,0,"Buckaroo" # set P0[0], "Buckaroo"
-	set S0,P0,0 # set S0, P0[0]
+	set P0[0],"Buckaroo" # set P0[0], "Buckaroo"
+	set S0,P0[0] # set S0, P0[0]
 	eq S0,"Buckaroo",OK_3
 	print "not "
 OK_3:	print "ok 3\n"
