@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 IMCC - documentation
@@ -12,7 +15,7 @@ IMCC - documentation
 
 =head1 OVERVIEW
 
-IMCC is the Intermediate Code Compiler for Parrot.  It's integrated into the
+IMCC is the B<I>nterB<m>ediate B<C>ode B<C>ompiler for Parrot.  It's integrated into the
 C<parrot> executable.
 
 IMCC compiles a language called Parrot Intermediate Representation (PIR).  PIR
@@ -29,7 +32,7 @@ See also the general Parrot documentation, located in F<parrot/docs>.
 =head2 calling_conventions.pod
 
 Describes the standard way of passing arguments and receiving results from
-subroutines.
+subroutines. See also pdd/003_calling_conventions.pod.
 
 =head2 imcfaq.pod
 

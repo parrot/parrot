@@ -112,7 +112,6 @@ my %type_for_name = (
 	'DEVELOPING' => 'Project info',
 	'harness' => 'Perl test harness',
 	'INSTALL' => 'Installation documentation',
-	'KNOWN_ISSUES' => 'Project info',
 	'LICENSE' => 'Licence file',
 	'MAINTAINER' => 'Maintainer info',
 	'Makefile' => 'Makefile',

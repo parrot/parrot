@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 IMCC - parsing
@@ -18,11 +21,11 @@ IMCC - parsing
 
 =head1 OVERVIEW
 
-This document describes the basic parsing functionality of imcc.
+This document describes the basic parsing functionality of IMCC.
 
 =head1 DESCRIPTION
 
-Imcc parses and generates code in terms of I<compilation units>. These
+IMCC parses and generates code in terms of I<compilation units>. These
 are self-contained blocks of code very similar to subroutines.
 
 Code for a compilation unit is created as soon (or not earlier) as the
@@ -56,7 +59,7 @@ on its own.
 
 This code:
 
-	.sub _name
+	.sub name
 		statements
 		...
 	.end
@@ -67,7 +70,7 @@ labels). The statements in the subroutine must be valid PIR or PASM.
 
 =head2 Subroutines: .pcc_sub ... .end
 
-	.pcc_sub _name
+	.sub name
 		statements
 		...
 	.end

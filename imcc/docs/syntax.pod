@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 IMCC - syntax
@@ -12,7 +15,7 @@ IMCC - syntax
 
 =head1 OVERVIEW
 
-This document describes the imcc syntax.
+This document describes the IMCC syntax.
 
 =head1 DESCRIPTION
 
@@ -56,7 +59,7 @@ Example:
 
 =item <type>
 
-B<int>, B<float>, B<string> or a valid parrot PMC type like
+B<int>, B<float>, B<string>, B<pmc> or a valid parrot PMC type like
 B<PerlArray>.
 
 =item <reg>
@@ -96,11 +99,11 @@ B<0x> and B<0b> denote hex and binary constants.
 
 =over 4
 
-=item .sub <_identifier>
+=item .sub <identifier>
 
 =item .end
 
-Define a I<compilation unit> with the label B<_identifier:>.
+Define a I<compilation unit> with the label B<identifier:>.
 
 =item .emit
 
@@ -257,5 +260,3 @@ F<imcc.l>, F<imcc.y>
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
-
-

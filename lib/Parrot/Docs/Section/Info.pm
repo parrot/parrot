@@ -43,7 +43,6 @@ sub new
 		$self->new_group('Documentation', '',
 			$self->new_item('General information about licences, prerequisites, and building instructions.', 'README'),
 			$self->new_item('This file lists what\'s new in each version.', 'NEWS'),
-			$self->new_item('This is a list of thing that are known to be broken or at least provisionally implemented.', 'KNOWN_ISSUES'),
 			$self->new_item('A list of things that need doing in Parrot.', 'TODO'),
 			$self->new_item('This is a description of the steps someone should follow when they have to prepare a new version for release.', 'RELEASE_INSTRUCTIONS'),
 		),

@@ -1,3 +1,6 @@
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 IMCC - operation
@@ -14,7 +17,7 @@ IMCC - operation
 
 =head1 OVERVIEW
 
-This document describes the principles of imcc operation.
+This document describes the principles of IMCC operation.
 
 =head1 DESCRIPTION
 
@@ -42,7 +45,7 @@ See F<parsing.pod>, F<macros.pod> and F<syntax.pod> for more.
 
 Register allocation is done per I<compilation unit>.
 
-Imcc I<identifiers> and I<temporary variables> e.g. $I0 are assigned a
+IMCC I<identifiers> and I<temporary variables> e.g. $I0 are assigned a
 physical parrot register depending on the life range of these
 variables. If the life range of one variable doesn't overlap the range
 of another variable, they might get the same parrot register. For 
@@ -108,7 +111,7 @@ an appropriate message.
 
 Consider these two code snippets (block numbers are attached):
 
-  .sub _main
+  .sub main @MAIN
  0      $I0 = 0		# initialized
  0      if $I0 goto l1
  1      $I1 = 1		# init in block 1
@@ -124,7 +127,7 @@ Consider these two code snippets (block numbers are attached):
 
 and:
 
-  .sub _main
+  .sub main @MAIN 
  0      $I0 = 0		# initialized
  0      if $I0 goto l1	# branch to bb 1 or 2
  1      $I1 = 1		# init only in block 1
@@ -272,5 +275,4 @@ F<imc.c>, F<cfg.c>, F<optimizer.c>, F<pbc.c>
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
-
 
