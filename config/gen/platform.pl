@@ -94,6 +94,7 @@ HERE
     time.c
     env.c
     dl.c
+    math.c
     memalign.c
     signal.c
     itimer.c

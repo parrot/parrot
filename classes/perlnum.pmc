@@ -133,7 +133,7 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
 
         PMC_num_val(SELF) = value;
         /* don't mess around with - 0 */
-        if (value == vali && (vali || !Parrot_is_nzero(value)))
+        if (value == vali && (vali || !Parrot_signbit(value)))
             DYNSELF.set_integer_native(vali);
     }
 
