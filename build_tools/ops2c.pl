@@ -401,8 +401,7 @@ static int find_op(const char * name) {
 	int op;
 	int i = 2;
 	if((op = op_hash_jump[bucket]) == 0) {
-		printf("Invalid bucket for %s\\n", name);
-		exit(0);
+		return -1;
 	}
 	for(;;) {
 		if(name[i] != op_hash[op].name[i]) {
@@ -411,8 +410,12 @@ static int find_op(const char * name) {
 				return -1;
 			continue;
 		}
-		if(name[i] == 0)
-			return op_hash[op].opcode;
+		if(name[i] == 0) {
+		    int n = op_hash[op].opcode;
+		    if (strcmp(op_info_table[n].full_name, name))
+		        return -1;
+		    return n;
+		}
 		i++;
 	}
 }
