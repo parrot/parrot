@@ -17,6 +17,18 @@
 pmclass NCI {
 
     void init () {
+    	PObj_custom_mark_SET(SELF);
+    }
+
+
+    PMC* mark (PMC *end_of_used_list) {
+	PMC *f = SELF->cache.struct_val;
+	if (f) {
+	    return mark_used(f, end_of_used_list);
+	}
+	else {
+	    return end_of_used_list;
+	}
     }
 
     INTVAL type () {
@@ -27,8 +39,22 @@ pmclass NCI {
         return whoami;
     }
 
+    void destroy() {
+	if (SELF->data)
+	    free(SELF->data);
+    }
+
     PMC* clone () {
-        return Parrot_new_csub(INTERP, (Parrot_csub_t)D2FPTR(SELF->cache.struct_val));
+        PMC *ret = pmc_new(INTERP, enum_class_NCI);
+        ret->cache.struct_val = (DPOINTER *)
+		(Parrot_csub_t)D2FPTR(SELF->cache.struct_val);
+	/* FIXME if data is malloced (JIT/i386!) then we need
+	 * the length of data here, to memcpy it
+	 * ManagedStruct or Buffer?
+	 */
+	ret->data = SELF->data;
+	PObj_custom_mark_SET(ret);
+	return ret;
     }
 
     PMC* get_pmc () {

@@ -140,16 +140,18 @@ print NCI <<TAIL;
 /* This function serves a single purpose. It takes the function
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
-void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
+void *build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
+	String *signature) {
 #if defined(CAN_BUILD_CALL_FRAMES)
   /* This would be a good place to put the code that builds the
      frames. Undoubtedly painfully platform-dependent */
 
-   return Parrot_jit_build_call_func(interpreter, signature);
+   return Parrot_jit_build_call_func(interpreter, pmc_nci, signature);
 
 #else
   /* And in here is the platform-independent way. Which is to say
      "here there be hacks" */
+  UNUSED(pmc_nci);
   if (0 == string_length(signature)) return F2DPTR(pcf_v_v);
 $icky_global_bit
     PANIC("Unknown signature type");

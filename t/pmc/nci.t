@@ -1,4 +1,4 @@
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 11;
 use Test::More qw/skip/;
 use Parrot::Config;
 
@@ -304,5 +304,81 @@ OUTPUT
 
 }
 
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - stress test");
+  loadlib P1, "libnci.so"
+  print "loaded\n"
+  set I10, 1000000
+  print "dlfunced\n"
+loop:
+  dlfunc P0, P1, "nci_dd", "dd"
+  set I0, 1	# prototype used - unchecked
+  set I1, 0	# items on stack - unchecked
+  set N5, 4.0
+  invoke
+  ne N5, 8.0, nok_1
+  dec I10
+  gt I10, 0, loop
+  print "ok 1\n"
+  ne I0, 0, nok_2	# test return value convention
+  ne I1, 0, nok_2
+  ne I2, 0, nok_2
+  ne I3, 0, nok_2
+  ne I4, 1, nok_2
+  print "ok 2\n"
+  end
+nok_1: print "nok 1\n"
+  print N5
+  print "\n"
+  end
+nok_2: print "nok 2\n"
+  end
+CODE
+loaded
+dlfunced
+ok 1
+ok 2
+OUTPUT
+
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - clone");
+  loadlib P1, "libnci.so"
+  print "loaded\n"
+  dlfunc P0, P1, "nci_dd", "dd"
+  print "dlfunced\n"
+  clone P2, P0
+  print "ok 1\n"
+  set I0, 1	# prototype used - unchecked
+  set I1, 0	# items on stack - unchecked
+  set N5, 4.0
+  invoke
+  ne N5, 8.0, nok_1
+  print "ok 2\n"
+  set I0, 1
+  set I1, 0
+  set N5, 4.0
+  set P0, P2
+  invoke
+  ne N5, 8.0, nok_1
+  print "ok 3\n"
+  ne I0, 0, nok_2	# test return value convention
+  ne I1, 0, nok_2
+  ne I2, 0, nok_2
+  ne I3, 0, nok_2
+  ne I4, 1, nok_2
+  print "ok 4\n"
+  end
+nok_1: print "nok 1\n"
+  print N5
+  print "\n"
+  end
+nok_2: print "nok 2\n"
+  end
+CODE
+loaded
+dlfunced
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
 1;
 

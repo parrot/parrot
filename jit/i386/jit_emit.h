@@ -2040,10 +2040,8 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
-void * Parrot_jit_build_call_func(struct Parrot_Interp *, String *);
-
 void *
-Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
+Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
         String *signature)
 {
     Parrot_jit_info_t jit_info;
@@ -2206,6 +2204,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     emitm_ret(pc);
     assert(pc - jit_info.arena.start <= size);
     /* could shrink arena.start here to used size */
+    PObj_active_destroy_SET(pmc_nci);
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
 

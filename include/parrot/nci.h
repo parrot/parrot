@@ -15,6 +15,6 @@
 
 #include "parrot/parrot.h"
 
-void *build_call_func(struct Parrot_Interp *, String *);
+void *build_call_func(struct Parrot_Interp *, PMC *, String *);
 
 #endif
