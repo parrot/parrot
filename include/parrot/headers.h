@@ -20,20 +20,6 @@
 /* XXX Temporary alignment hack.  See mem_allocate in resources.c */
 #define STRING_ALIGNMENT 16 /* was 4 */
 
-
-static void *
-get_from_free_pool(struct Parrot_Interp *interpreter,
-                   struct Small_Object_Pool *pool)
-{
-    return (*pool->get_free_object)(interpreter, pool);
-}
-static void
-add_to_free_pool(struct Parrot_Interp *interpreter, 
-                 struct Small_Object_Pool *pool, void* to_free)
-{
-    (*pool->add_free_object)(interpreter, pool, to_free);
-}
-
 /** Header Management Functions **/
 
 /* pmc header small-object methods */
