@@ -570,6 +570,9 @@ make_interpreter(Interp_flags flags)
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
 
+    /* Stack for lexical pads */
+    interpreter->ctx.pad_stack = new_stack(interpreter);
+
     /* Need a user stack */
     interpreter->ctx.user_stack = new_stack(interpreter);
 

@@ -92,6 +92,23 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         }
     }
 
+    /* Walk lexical pad stack */
+    cur_stack = interpreter->ctx.pad_stack;
+    while (cur_stack) {
+        if (cur_stack->buffer) {
+	    buffer_lives(cur_stack->buffer);
+	    entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
+	    for (i = 0; i < cur_stack->used; i++) {
+                if (STACK_ENTRY_PMC == entry[i].entry_type &&
+                    entry[i].entry.pmc_val) {
+                    last = mark_used(entry[i].entry.pmc_val, last);
+                }
+	    }
+	}
+        
+        cur_stack = cur_stack->prev;
+    }
+
     /* Finally the general stack */
     cur_stack = interpreter->ctx.user_stack;
 

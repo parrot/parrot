@@ -89,6 +89,7 @@ typedef struct Parrot_Context {
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
 
+    struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     IntStack intstack;                  /* Base of the regex stack */
@@ -105,7 +106,6 @@ typedef struct Parrot_Interp {
 
     struct Stash *perl_stash;           /* Pointer to the global variable
                                          * area */
-    struct Scratchpad *cur_pad;         /* The current scratchpad */
     struct Arenas *arena_base;          /* Pointer to this interpreter's 
                                          * arena */
     void *piodata;                      /* interpreter's IO system */
