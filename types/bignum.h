@@ -63,7 +63,9 @@ typedef struct {
 typedef enum {
   ROUND_HALF_UP,
   ROUND_DOWN,
-  ROUND_HALF_EVEN
+  ROUND_HALF_EVEN,
+  ROUND_CEILING,
+  ROUND_FLOOR
 } BN_ROUNDING;
 
 /* Flags for exception triggers and exception signals */

@@ -323,10 +323,15 @@ BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
     INTVAL i;
     printf("%s: nibs %i digits %i sign %i expn %i \n",mesg,
 	   bn->nibs, bn->digits, bn->sign, bn->expn);
-    for (i=bn->digits-1; i>-1; i--) {
-	printf("%d", BN_getd(bn, i));
-	if (!(i%5)) printf(" ");
-	if (!(i%70)) printf("\n");
+    if (bn->digits == 0) {
+        printf("Special value, flags: %x", bn->flags & 127);
+    }
+    else {
+        for (i=bn->digits-1; i>-1; i--) {
+            printf("%d", BN_getd(bn, i));
+            if (!(i%5)) printf(" ");
+            if (!(i%70)) printf("\n");
+        }
     }
     printf("\n");
 }
@@ -1030,6 +1035,30 @@ BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
 	    }
 
 	}
+        else if (context->rounding == ROUND_CEILING) {
+            INTVAL i;
+            if (bn->sign) {
+                return BN_round_down(PINT_ bn, context);
+            }
+            for (i = bn->digits - context->precision -1; i > -1; i--) {
+                if (BN_getd(bn, i) != 0) {
+                    return BN_round_up(PINT_ bn, context);
+                }
+            }
+            return BN_round_down(PINT_ bn, context);
+        }
+        else if (context->rounding == ROUND_FLOOR) {
+            INTVAL i;
+            if (!bn->sign) {
+                return BN_round_down(PINT_ bn, context);
+            }
+            for (i = bn->digits - context->precision; i > -1; i--) {
+                if (BN_getd(bn, i) != 0) {
+                    return BN_round_up(PINT_ bn, context);
+                }
+            }
+            return BN_round_down(PINT_ bn, context);
+        }
 	BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "Unknown rounding attempted");
     }
     return;
@@ -1351,12 +1380,15 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
         return;
     }
 
-    /* Be careful to do 0 + -0 and -0 + 0 correctly*/
+    /* Be careful to do 0 + -0 and -0 + 0 correctly */
     if (BN_is_zero(PINT_ one, context) && BN_is_zero(PINT_ two, context)) {
         result->digits = 1;
         result->expn = 0;
         BN_setd(result, 0, 0);
         if (one->sign & two->sign) {
+            result->sign = 1;
+        }
+        else if (context->rounding == ROUND_FLOOR && (one->sign ^ two->sign)) {
             result->sign = 1;
         }
         else {
@@ -1384,6 +1416,11 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
     }
 
     BN_arith_cleanup(PINT_ result, one, two, context, &restore);
+    /* If using round_floor, need to make sure x + -x => -0 */
+    if (context->rounding == ROUND_FLOOR && BN_is_zero(PINT_ result, context)
+        && (one->sign ^ two->sign)) {
+        result->sign = 1;
+    }
 }
 
 /* Actual addition code, assumes two positive operands and
@@ -1474,6 +1511,11 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         if (one->sign && !two->sign) {
             result->sign = 1;
         }
+        else if (context->rounding == ROUND_FLOOR &&
+                 (one->sign == two->sign)
+                 ) {
+            result->sign = 1;
+        }
         else {
             result->sign = 0;
         }
@@ -1498,6 +1540,11 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
 
     BN_arith_cleanup(PINT_ result, one, two, context, &restore);
+    /* If using round_floor, need to make sure x + -x => -0 */
+    if (context->rounding == ROUND_FLOOR && BN_is_zero(PINT_ result, context)
+        && (one->sign == two->sign)) {
+        result->sign = 1;
+    }
 }
 
 void
@@ -1880,20 +1927,18 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		BN_round_up(PINT_ result, context);
 	    }
 	    else if (BN_getd(result, 0) == 5) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
 		if (rem->digits == 1 && BN_getd(rem, 0)==0) {
 		    switch (BN_getd(result, 1)) {
 		    case 2:
 		    case 4:
 		    case 6:
 		    case 8:
-                        BN_nonfatal(PINT_ context, BN_INEXACT,
-                                    "Loss of precision in divide");
                     case 0:
 			BN_round_down(PINT_ result, context);
 			break;
 		    default :
-                        BN_nonfatal(PINT_ context, BN_INEXACT,
-                                    "Loss of precision in divide");
 			BN_round_up(PINT_ result, context);
 		    }
 		}
@@ -1904,19 +1949,75 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 		}
 	    }
 	    else {
-                INTVAL j;
-                /* We might have lots of zeros...*/
-                for (j=0; j<result->digits - context->precision; j++) {
-                    if (BN_getd(result, j) !=0) {
-                        BN_nonfatal(PINT_ context, BN_INEXACT,
-                                    "Loss of precision in divide");
-                        break;
-                    }
+                if (BN_getd(result, 0) !=0) {
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision in divide");
+                }
+                else if (!BN_is_zero(PINT_ result, context)) {
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision in divide");
                 }
 		BN_round_down(PINT_ result, context);
 	    }
 	}
-    
+    }
+    else if (context->rounding == ROUND_CEILING) {
+        if (result->digits > context->precision) {
+            BN_nonfatal(PINT_ context, BN_ROUNDED,
+                        "Rounded in divide");
+            BN_really_zero(PINT_ rem, context->extended);
+            
+            if (result->sign) {
+                if (BN_getd(result, 0) != 0 ||
+                    !BN_is_zero(PINT_ result, context)) {
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision in divide");
+                }
+                BN_round_down(PINT_ result, context);
+            }
+            else if (BN_getd(result, 0) != 0) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
+                BN_round_up(PINT_ result, context);
+            }
+            else if (!BN_is_zero(PINT_ rem, context)) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
+                BN_round_up(PINT_ result, context);
+            }
+            else {
+                BN_round_down(PINT_ result, context);
+            }
+        }
+    }
+    else if (context->rounding == ROUND_FLOOR) {
+        if (result->digits > context->precision) {
+            BN_nonfatal(PINT_ context, BN_ROUNDED,
+                        "Rounded in divide");
+            BN_really_zero(PINT_ rem, context->extended);
+            
+            if (!result->sign) {
+                if (BN_getd(result, 0) != 0 ||
+                    !BN_is_zero(PINT_ result, context)) {
+                    BN_nonfatal(PINT_ context, BN_INEXACT,
+                                "Loss of precision in divide");
+                }
+                BN_round_down(PINT_ result, context);
+            }
+            else if (BN_getd(result, 0) != 0) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
+                BN_round_up(PINT_ result, context);
+            }
+            else if (!BN_is_zero(PINT_ rem, context)) {
+                BN_nonfatal(PINT_ context, BN_INEXACT,
+                            "Loss of precision in divide");
+                BN_round_up(PINT_ result, context);
+            }
+            else {
+                BN_round_down(PINT_ result, context);
+            }
+        }
     }
     else { /* Other roundings just need digits to play with */
 	unsigned char save_lost;

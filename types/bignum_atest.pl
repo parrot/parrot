@@ -41,7 +41,7 @@ while (<>) {
 	next;
     } 
     
-    if ($round !~ /^(half_up|half_even|down)$/) {
+    if ($round !~ /^(half_up|half_even|down|floor|ceiling)$/) {
 	print "$test ok \# skip, $round not available\n";
 	next;
     }

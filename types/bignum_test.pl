@@ -27,6 +27,10 @@ int runtest (char* lef, char *rih, int oper, int prec, int round, int extended) 
     break;
   case 3 : context.rounding = ROUND_HALF_EVEN;
     break;
+  case 4 : context.rounding = ROUND_CEILING;
+    break;
+  case 5 : context.rounding = ROUND_FLOOR;
+    break;
   default : printf("Unknown rounding %i\n", round);
     exit(1);
   }
@@ -94,6 +98,8 @@ my %round = (
 	     half_up => 1,
 	     down => 2,
 	     half_even => 3,
+	     ceiling => 4,
+	     floor => 5,
 	     );
 
 unless (@ARGV == 6) {
