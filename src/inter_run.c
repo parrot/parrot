@@ -197,12 +197,17 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
 {
     opcode_t offset, *dest;
     struct parrot_regs_t *bp;
-    int next[4];
+    int next[4], count[4];
     int i;
     PMC *ret_c;
+    const char *p;
+    PMC *p3 = PMCNULL;
+    int clear_p3, need_p3, max;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
         next[i] = 5;
+        count[i] = 0;
+    }
 
     ret_c = new_ret_continuation_pmc(interpreter, NULL);
     dest = VTABLE_invoke(interpreter, sub, NULL);
@@ -210,13 +215,44 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     interpreter->ctx.current_cont = REG_PMC(1) = ret_c;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
     REG_STR(0) = meth;
-    REG_INT(0) = 1;     /* kind of a prototyped call */
-    REG_INT(1) = 0;     /* # of I params */
-    REG_INT(2) = 0;     /* # of S params */
-    REG_INT(3) = 0;     /* # of P params */
-    REG_INT(4) = 0;     /* # of N params */
 
-    while (*++sig) {
+    /*
+     * count arguments, check for overflow
+     */
+    for (p = sig + 1; *p; ++p) {
+        switch (*p) {
+            case 'v': break;
+            case 'I': ++count[0]; break;
+            case 'S': ++count[1]; break;
+            case 'P': ++count[2]; break;
+            case 'N': ++count[3]; break;
+        }
+    }
+    REG_INT(0) = 1;     /* kind of a prototyped call */
+    clear_p3 = need_p3 = max = 0;
+    for (i = 0; i < 4; ++i) {
+        if (count[i] < 11)
+            REG_INT(i+1) = count[i];     /* # of I params */
+        else if (count[i] == 11) {
+            REG_INT(i+1) = 11;
+            clear_p3 |= 1;
+        }
+        else {
+            REG_INT(i+1) = 11;
+            need_p3 |= 1;
+            if (count[i] > max)
+                max = count[i];
+        }
+    }
+    if (need_p3) {
+        p3 = pmc_new(interpreter, enum_class_Array);
+        VTABLE_set_integer_native(interpreter, p3, max - 11);
+        REG_PMC(3) = p3;
+    }
+    else if (clear_p3)
+        REG_PMC(3) = p3;
+
+    for (i = 0; *++sig; ) {
         /*
          * TODO handle overflow: if any next[] reaches 16 create
          *      overflow array in P3 and pass additional args in the
@@ -226,20 +262,32 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
             case 'v':       /* void func, no params */
                 break;
             case 'I':       /* REG_INT */
-                REG_INT(next[0]++) = va_arg(ap, INTVAL);
-                ++REG_INT(1);
+                if (next[0] == 16)
+                    VTABLE_set_integer_keyed_int(interpreter,
+                            p3, i++, va_arg(ap, INTVAL));
+                else
+                    REG_INT(next[0]++) = va_arg(ap, INTVAL);
                 break;
             case 'S':       /* REG_STR */
-                REG_STR(next[1]++) = va_arg(ap, STRING*);
-                ++REG_INT(2);
+                if (next[1] == 16)
+                    VTABLE_set_string_keyed_int(interpreter,
+                            p3, i++, va_arg(ap, STRING*));
+                else
+                    REG_STR(next[1]++) = va_arg(ap, STRING*);
                 break;
             case 'P':       /* REG_PMC */
-                REG_PMC(next[2]++) = va_arg(ap, PMC*);
-                ++REG_INT(3);
+                if (next[2] == 16)
+                    VTABLE_set_pmc_keyed_int(interpreter,
+                            p3, i++, va_arg(ap, PMC*));
+                else
+                    REG_PMC(next[2]++) = va_arg(ap, PMC*);
                 break;
             case 'N':       /* REG_NUM */
-                REG_NUM(next[3]++) = va_arg(ap, FLOATVAL);
-                ++REG_INT(4);
+                if (next[3] == 16)
+                    VTABLE_set_number_keyed_int(interpreter,
+                            p3, i++, va_arg(ap, FLOATVAL));
+                else
+                    REG_NUM(next[3]++) = va_arg(ap, FLOATVAL);
                 break;
             default:
                 internal_exception(1,
