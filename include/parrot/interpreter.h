@@ -455,6 +455,8 @@ void clone_interpreter(PMC* dest, PMC* self);
 void enter_nci_method(Interp *, int type,
 		 void *func, const char *name, const char *proto);
 
+void parrot_PIC_prederef(Interp *, opcode_t op, void **pc_pred, int type);
+
 #else
 
 typedef void * *(*native_func_t)(Parrot_Interp interpreter,

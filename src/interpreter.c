@@ -164,19 +164,17 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
     if (*pc < 0 || *pc >= (opcode_t)interpreter->op_count)
         internal_exception(INTERP_ERROR, "Illegal opcode");
     opinfo = &interpreter->op_info_table[*pc];
+    /* first arguments - PIC needs it */
+    prederef_args(pc_prederef, interpreter, pc, opinfo);
     switch (type) {
         case PARROT_SWITCH_CORE:
-            *pc_prederef = (void**) *pc;
-            break;
         case PARROT_CGP_CORE:
-            *pc_prederef = ((void**)(prederef_op_func)) [*pc];
+            parrot_PIC_prederef(interpreter, *pc, pc_prederef, type);
             break;
         default:
             internal_exception(1, "Tried to prederef wrong core");
             break;
     }
-    /* and arguments */
-    prederef_args(pc_prederef, interpreter, pc, opinfo);
     /*
      * now remember backward branches, invoke and similar opcodes
      */
