@@ -89,8 +89,9 @@ Parrot_half_pop_i(struct Parrot_Interp *interpreter)
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
-        memcpy(&interpreter->ctx.int_reg.registers[16],
-               ((INTVAL *)&top->IReg[top->used]) + 16, sizeof(struct IReg) / 2);
+        memcpy(&interpreter->ctx.int_reg.registers[NUM_REGISTERS/2],
+               &top->IReg[top->used].registers[NUM_REGISTERS/2], 
+               sizeof(struct IReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -200,8 +201,9 @@ Parrot_half_pop_s(struct Parrot_Interp *interpreter)
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
-        memcpy(&interpreter->ctx.string_reg.registers[16],
-               ((STRING *)&top->SReg[top->used]) + 16, sizeof(struct SReg)/2);
+        memcpy(&interpreter->ctx.string_reg.registers[NUM_REGISTERS/2],
+               &top->SReg[top->used].registers[NUM_REGISTERS/2], 
+               sizeof(struct SReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -269,8 +271,7 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_pop_n
-  pops half a numeric register frame off of the frame stack and
-  discards the lower half
+  pops a numeric register frame off of the frame stack
 */
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter)
@@ -301,8 +302,9 @@ Parrot_pop_n(struct Parrot_Interp *interpreter)
     }
 }
 
-/*=for api register Parrot_pop_n
-  pops a numeric register frame off of the frame stack
+/*=for api register Parrot_half_pop_n
+  pops half a numeric register frame off of the frame stack and
+  discards the lower half
 */
 void
 Parrot_half_pop_n(struct Parrot_Interp *interpreter)
@@ -311,8 +313,9 @@ Parrot_half_pop_n(struct Parrot_Interp *interpreter)
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
-        memcpy(&interpreter->ctx.num_reg.registers[16],
-               ((FLOATVAL *)&top->NReg[top->used]) + 16, sizeof(struct NReg)/2);
+        memcpy(&interpreter->ctx.num_reg.registers[NUM_REGISTERS/2],
+               &top->NReg[top->used].registers[NUM_REGISTERS/2], 
+               sizeof(struct NReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {
@@ -334,7 +337,7 @@ Parrot_half_pop_n(struct Parrot_Interp *interpreter)
 }
 
 /*=for api register Parrot_clear_n
-  sets each register in a numeric register frame to 0
+  sets each register in a numeric register frame to 0.0
 */
 void
 Parrot_clear_n(struct Parrot_Interp *interpreter)
@@ -422,8 +425,9 @@ Parrot_half_pop_p(struct Parrot_Interp *interpreter)
     /* Do we even have anything? */
     if (top->used > 0) {
         top->used--;
-        memcpy(&interpreter->ctx.pmc_reg.registers[16],
-               ((PMC *)&top->PReg[top->used]) + 16, sizeof(struct PReg)/2);
+        memcpy(&interpreter->ctx.pmc_reg.registers[NUM_REGISTERS/2],
+               &top->PReg[top->used].registers[NUM_REGISTERS/2], 
+               sizeof(struct PReg)/2);
         top->free++;
         /* Empty? */
         if (!top->used) {
