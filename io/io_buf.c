@@ -350,7 +350,8 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     }
 
     buf_start = b->next;
-    while (l++ < len) {
+    while (l < len) {
+        l++;
         if (IS_EOL(io, b->next++)) {
             break;
         } 
@@ -363,7 +364,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             buf_start = b->startb;
         }
     }
-    memcpy(out_buf, buf_start, b->endb - buf_start);
+    memcpy(out_buf, buf_start, b->next - buf_start);
 
     /* check if buffer is finished */
     if (b->next == b->endb) {
