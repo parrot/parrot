@@ -5,3 +5,5 @@ BUGS:
    So there are a bunch of strcats and sprintf's, some of them
    marked XXX, that are unsafe.
 
+ - IMCC does produce b0rken PASM files, when compiling .imc source
+   files with duplicate local labels.
