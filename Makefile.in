@@ -125,10 +125,12 @@ $(INC)/vtable.h: vtable.tbl vtable_h.pl
 docs: docs/.dummy
 
 docs/.dummy:
-	cd docs; make
+	cd docs
+	make
 
 $(CLASS_O_FILES):
-	cd classes; make
+	cd classes
+	make
 
 clean:
 	$(RM_F) *$(O) chartypes/*$(O) encodings/*$(O)
