@@ -1,0 +1,50 @@
+/* timer.pmc
+ *  Copyright: 2002-2003 Yet Another Society
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the Timer base class
+ *  Data Structure and Algorithms:
+ *     Running timers are kept in a linked list. Each timer has a
+ *     tick count, which gets decremented, if the system timer
+ *     expires. If the tick count reaches zero, the timer handler gets
+ *     invoked via Parrots event handling code.
+ *  History:
+ *     Initial proposal by leo 2003.07.15
+ *  Synopsis:
+ *     new P0, .Timer
+ *     set P0[.TIMER_SEC], I_seconds            # whole seconds
+ *     set P0[.TIMER_USEC], I_micro seconds     # and/or micro seconds
+ *     set P0[.TIMER_NSEC], N_seconds_frac      # or fraction in seconds
+ *     set P0[.TIMER_REPEAT], I_repeat          # 0 = one shot ...
+ *     set_addr I0, _subroutine
+ *     set P0, I0                               # set timer handler sub
+ *     invoke P0                                # start timer
+ *     set P0[.TIMER_RUNNING], 1                # same
+ *
+ *     set I0, P0[.TIMER_SEC]                   # query current timer status
+ *     set N0, P0[.TIMER_NSEC]
+ *     ...
+ *     set P0[.TIMER_RUNNING], 0                # turn timer off
+ *
+ *  Notes:
+ *     The Timer resolution is operating system dependend. Its only
+ *     guaranteed, that the Timer will fire some time after the
+ *     programmed interval.
+ *     The Timer stops after (repeat+1) times invoking the handler.
+ *     If a Timer should run forever, set "repeat" to -1.
+ *     Turning the Timer off sets all values to zero, the Timer is
+ *     not destroyed, it can be reprogrammed and started again.
+ *
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Timer {
+
+    STRING* name() {
+        return whoami;
+    }
+}
