@@ -12,8 +12,8 @@
 
   .local int return_type
 
-  .local string retval
-
+  .local pmc retval
+  retval = new PerlString
   if argc == 0 goto noargs
 
   return_type = TCL_ERROR

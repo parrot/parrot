@@ -51,6 +51,6 @@ error:
 done:
   .pcc_begin_return
     .return return_type
-    .return value
+    .return $P1
   .pcc_end_return
 .end

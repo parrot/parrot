@@ -12,7 +12,7 @@
 
   .local pmc elseifs
   elseifs = new PerlArray
-  .local string retval
+  .local pmc retval
   .local string code
   .local string condition
   .local string body

@@ -22,8 +22,10 @@ exit:
   exit exit_code
 
 badargs:
+  $P1 = new PerlString
+  $P1 = "wrong # args: should be \"exit ?returnCode?\"\n"
   .pcc_begin_return
     .return TCL_ERROR
-    .return "wrong # args: should be \"exit ?returnCode?\"\n"
+    .return $P1
   .pcc_end_return
 .end

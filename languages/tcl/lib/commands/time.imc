@@ -1,4 +1,4 @@
-###
+##
 # [time]
 
 .namespace [ "Tcl" ]
@@ -10,14 +10,15 @@
   .local int argc 
   argc = argv
 
-  .local string retval
+  .local pmc retval
+  retval = new PerlString
   .local int return_type
+  return_type = TCL_OK
 
   .local pmc parse
   .local pmc interpret
   parse = find_global "_Tcl", "__parse"
   interpret = find_global "_Tcl", "__interpret"
-
 
   .local string script
   .local int count
@@ -45,7 +46,7 @@ run:
   $I1 = count
 loop:
   if $I1 == 0 goto done
-  ($I0,$S0) = interpret($P1)
+  ($I0,$P0) = interpret($P1)
   if $I0 != TCL_OK goto done
   dec $I1
   goto loop
@@ -63,7 +64,8 @@ done:
 real_done:
 
   .pcc_begin_return
-    .return TCL_RETURN
+    .return return_type
     .return retval
   .pcc_end_return
+
 .end

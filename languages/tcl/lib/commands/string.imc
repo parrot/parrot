@@ -12,7 +12,7 @@
 
   .local int return_type
   return_type = TCL_OK
-  .local string retval
+  .local pmc retval
   .local string command
 
   .local pmc string_index
@@ -45,15 +45,18 @@ first:
 
 first_do:
   $I1 = index $S2, $S1, $I0
+  retval = new PerlInt
   retval = $I1
   goto done
 
 bad_first:
+  retval = new PerlString
   retval = "wrong # args: should be \"string first subString string ?startIndex?\""
   return_type = TCL_ERROR
   goto done
 
 index:
+  retval = new PerlString
   if argv != 3 goto bad_index
   $S1 = argv[1]
   $S2 = argv[2]
@@ -64,7 +67,8 @@ index:
   inc $I1
   if $I0 > $I1 goto index_null
   if $I0 < 0 goto index_null
-  retval = substr $S1, $I0, 1 
+  $S0 = substr $S1, $I0, 1 
+  retval = $S0
   goto done
 index_null:
   retval = ""
@@ -79,10 +83,12 @@ length:
   if argv != 2 goto bad_length
   $S1 = argv[1]
   $I0 = length $S1
+  retval = new PerlInt
   retval = $I0
   goto done
 
 bad_length:
+  retval = new PerlString
   retval = "wrong # args: should be \"string length string\""
   return_type = TCL_ERROR
   goto done
@@ -144,13 +150,16 @@ range_top:
 range_doo:
   $I3 = $I2 - $I1
   inc $I3
-  retval = substr $S1, $I1, $I3
+  $S9 = substr $S1, $I1, $I3 
+  retval = $S9
   goto done
 range_null:
+  retval = new PerlString
   retval = ""
   goto done
 
 bad_range:
+  retval = new PerlString
   retval = "wrong # args: should be \"string range string first last\""
   return_type = TCL_ERROR
   goto done
@@ -168,23 +177,28 @@ repeat:
   #if $I2 != INTEGER goto bad_arg
   #if $I1 != $I0 goto bad_arg
   $I3 = $P1
-  retval = repeat the_string, $I3
-
+  $S0 = repeat the_string, $I3
+  retval = new PerlString
+  retval = $S0
   goto done
 
 bad_repeat:
+  retval = new PerlString
   return_type = TCL_ERROR
   retval = "wrong # args: should be \"string repeat string count\""
   goto done
 
 badargs:
-  retval = "bad option \""
-  retval .= command
-  retval .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
+  retval = new PerlString
+  $S9 = "bad option \""
+  $S9 .= command
+  $S9 .= "\": must be bytelength, compare, equal, first, index, is, last, length, map, match, range, repeat, replace, tolower, toupper, totitle, trim, trimleft, trimright, wordend, or wordstart"
+  retval = $S9
   return_type = TCL_ERROR
   goto done
 
 noargs:
+  retval = new PerlString
   retval = "wrong # args: should be \"string option arg ?arg ...?\""
   return_type = TCL_ERROR
 
@@ -214,7 +228,7 @@ done:
   .local int return_type
   return_type = TCL_OK
 
-  .local string retval
+  .local pmc retval
   .local int index_length
   .local int number_length
   .local int number_type
@@ -234,14 +248,15 @@ done:
 
   #if not, fail.
 bad_arg:
-  retval  = "bad index \""
-  retval .= position
-  retval .= "\": must be integer or end?-integer?"
+  retval = new PerlString
+  $S9  = "bad index \""
+  $S9 .= position
+  $S9 .= "\": must be integer or end?-integer?"
+  retval = $S9
   return_type=TCL_ERROR
   goto done
  
 has_end:
-
   #XXX this is currently somewhat messed up.
   
   # is this an int? if so, subtract it from -1 to get our parrot-style index.
@@ -255,12 +270,14 @@ has_end:
   $I0 = number_result[1]
   # say, 2 if -2
   inc $I0
+
  
   # say, length is 6
   $I1 = length the_string
   # so, if we had end-1, then we'd be at position 4. (end is 5, -1)
   $I1 = $I1 - $I0
-  retval = $I0
+  retval = new PerlInt
+  retval = $I1
 
   goto done
 
@@ -271,9 +288,11 @@ my_end:
   retval = $I0
 
 done:
+ $P1 = new PerlString
+ $P1 = retval
  .pcc_begin_return
    .return return_type
-   .return retval
+   .return $P1
  .pcc_end_return
 
 .end

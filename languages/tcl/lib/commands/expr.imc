@@ -14,7 +14,7 @@
   .local int argc
   .local int looper
 
-  .local string retval
+  .local pmc retval
   .local int return_type
   .local pmc expression
   expression = find_global "_Tcl", "__expression"
@@ -41,6 +41,7 @@ loop_done:
   $P1 = expression(expr)
   $I0 = $P1[0]
   return_type = $I0
+  retval = new PerlInt
   retval = $P1[1] 
   if $I0 == TCL_ERROR goto done
   return_type = TCL_OK
@@ -48,18 +49,20 @@ loop_done:
   if $I0 == INTEGER goto done
   if $I0 != FLOAT goto die_horribly
 
- 
 get_float:
-  # XXX this is not the best place for this formatting code.
+  # XXX Well, this section is pretty useless now. The best place to
+  # put this formatting is in a Tcl PMC.
   # is there a "." in this to-string'd float? that is, is it an int?
-  index $I0, retval, "."
-  if $I0 != -1 goto done
-  retval = retval . ".0"
+  #index $I0, retval, "."
+  #if $I0 != -1 goto done
+  #retval = new PerlNum
+  #retval = retval . ".0"
 
   goto done
 
 die_horribly:
   return_type = TCL_ERROR
+  retval = new PerlString
   retval = "Unknown type '" 
   $S0 = return_type
   retval = retval . $S0

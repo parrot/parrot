@@ -12,7 +12,8 @@
   argv = foldup
 
   .local int return_type
-  .local string retval
+  .local pmc retval
+  retval = new PerlString
 
   .local int argc
   argc = argv
@@ -30,9 +31,9 @@
   retval = retval . $S0
   $P3 = $P3 + 1
   $P2[retval] = $P1
-  print "retval is:"
-  print retval
-  print "\n"
+  #print "retval is:"
+  #print retval
+  #print "\n"
   goto done
  
 file_error:

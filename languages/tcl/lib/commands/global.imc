@@ -9,12 +9,11 @@
 
   .local int argc 
   argc = argv
-  print "ARGC"
-  print argc
- print "\n"
-  .local string retval
+
+  .local pmc retval
   .local int return_type
 
+  retval = new PerlString
   retval = ""
   return_type = TCL_OK
 

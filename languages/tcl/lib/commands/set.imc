@@ -122,11 +122,8 @@ set_array_ok:
   goto done
 
 set_scalar:
-  # XXX is that PerlString needed?
-  lexical = new PerlString
-  lexical = value
-  store_lex -1, arg0, lexical
-  retval = lexical
+  retval = value
+  store_lex -1, arg0, retval
 
   goto done 
 
@@ -137,7 +134,6 @@ no_such_variable:
   $S0 = "can't read \""
   $S0 .= var
   $S0 .= "\": no such variable"
-  retval = new PerlString
   retval = $S0
   goto done
 
@@ -146,11 +142,8 @@ error:
   retval = "wrong # args: should be \"set varName ?newValue?\"\n"
 
 done:
-  # XXX need to do this cast to string until we better handle 
-  # multi-types.
-  $S0 = retval
   .pcc_begin_return
     .return return_type
-    .return $S0
+    .return retval
   .pcc_end_return
 .end

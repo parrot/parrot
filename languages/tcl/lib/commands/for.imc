@@ -21,6 +21,8 @@
   .local pmc body_parsed
   .local int return_type
 
+  .local pmc joe
+
   .local pmc parse
   .local pmc interpret
   .local pmc expression
@@ -41,18 +43,18 @@
   body_parsed  = parse(body,0)
 
   # first, execute start.
-  (return_type,$S0) = interpret(start_parsed)
+  (return_type,joe) = interpret(start_parsed)
   if return_type != TCL_OK goto done
 
 for_loop:
   # then execute body
-  (return_type,$S0) = interpret(body_parsed)
+  (return_type,joe) = interpret(body_parsed)
   if return_type == TCL_CONTINUE goto continue
   if return_type != TCL_OK goto done
 
 continue:
   # then execute next
-  (return_type,$S0) = interpret(next_parsed)
+  (return_type,joe) = interpret(next_parsed)
   if return_type != TCL_OK goto done
   
   # then check condition
@@ -70,8 +72,11 @@ done:
 done_cleansed:
   # for always returns "", regardless of the code it may have executed
 
+  .local pmc retval
+  retval = new PerlString
+  retval = ""
   .pcc_begin_return
     .return return_type
-    .return ""
+    .return retval
   .pcc_end_return
 .end

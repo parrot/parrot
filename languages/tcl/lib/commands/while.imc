@@ -14,7 +14,9 @@
 
   .local string code
   .local string condition
-  .local string retval
+  .local pmc retval
+  retval = new PerlString
+
   .local pmc parsed_code
   .local int return_type
 
@@ -27,7 +29,6 @@
   expression = find_global "_Tcl", "__expression"
   expr_boolean = find_global "_Tcl", "__expr_boolean"
 
-  retval = "" 
   condition = argv[0]
   code = argv[1]
 
@@ -38,7 +39,7 @@ while_loop:
   $S0 = $P0[1]
   $I0 = expr_boolean($S0)
   if $I0 == 0 goto done
-  (return_type,$S0) = interpret(parsed_code)
+  (return_type,retval) = interpret(parsed_code)
   if return_type == TCL_BREAK goto done
   if return_type == TCL_RETURN goto done
 
@@ -47,11 +48,14 @@ while_loop:
 done:
   if return_type == TCL_RETURN goto done_cleaned
   if return_type == TCL_ERROR  goto done_cleaned
-
+  retval = ""
   return_type = TCL_OK
+  goto done_done
 
 done_cleaned:
-  retval = $S0
+  retval = $S0 
+
+done_done:
   # while always returns "", regardless of the code it may have executed
   # XXX - (unless there's an error)
 

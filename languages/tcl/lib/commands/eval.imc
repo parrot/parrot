@@ -35,13 +35,12 @@ loop:
 
 loop_done:
  
-  # should handle errors here, neh? 
   $P1 = parse(expr,0)
-  ($I0,$S0) = interpret($P1) 
+  ($I0,$P0) = interpret($P1) 
 
 done:
   .pcc_begin_return
     .return $I0
-    .return $S0
+    .return $P0
   .pcc_end_return
 .end

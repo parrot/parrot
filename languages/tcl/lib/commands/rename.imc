@@ -11,7 +11,9 @@
   argc = argv
 
   .local int return_type
-  .local string retval
+  .local pmc retval
+  retval = new PerlString 
+
   return_type = TCL_OK
   retval = ""
 

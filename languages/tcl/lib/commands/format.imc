@@ -17,9 +17,12 @@
 
   sprintf $S0, format, argv 
 
+  $P0 = new PerlString
+  $P0 = $S0
+
 done:
   .pcc_begin_return
     .return TCL_OK
-    .return $S0
+    .return $P0
   .pcc_end_return
 .end

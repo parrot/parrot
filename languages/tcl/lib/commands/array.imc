@@ -12,8 +12,7 @@
 
   .local int return_type
   return_type = TCL_OK
-  .local string retval
-  retval = ""
+  .local pmc retval
 
   if argc < 2 goto error
   .local string array_name
@@ -60,10 +59,12 @@ subcommand:
 
 # Is this really an array?
 exists:
-  retval = is_array 
+  retval = new PerlInt
+  retval = is_array
   goto done
 
 size:
+  retval = new PerlInt
   if is_array == 0 goto size_none
   $I0 = the_array
   retval = $I0
@@ -73,6 +74,8 @@ size_none:
   goto done
 
 set:
+  retval = new PerlString
+  retval = ""
   # even only..
   $I0 = argc % 2
   if $I0 == 1 goto set_bad_args
@@ -98,6 +101,7 @@ set_loop_done:
 
 set_bad_args:
  return_type = TCL_ERROR
+ retval = new PerlString
  retval = "wrong # args: should be array set arrayName list" 
  goto done
 
