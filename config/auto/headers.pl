@@ -20,9 +20,17 @@ sub runstep {
 	return;
     }
 
+    # perl5's Configure system doesn't call this by its full name, which may
+    # confuse use later, particularly once we break free and start doing all
+    # probing ourselves
+    my %mapping =
+      (
+       i_niin => "i_netinetin",
+      );
+
     for (keys %Config) {
 	next unless /^i_/;
-	Configure::Data->set($_, $Config{$_});
+	Configure::Data->set($mapping{$_}||$_, $Config{$_});
     }
 
     # some headers may not be probed-for by perl 5, or might not be

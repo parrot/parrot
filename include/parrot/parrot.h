@@ -37,7 +37,7 @@
 
 /* Other headers, where available */
 
-#ifdef PARROT_HAS_HEADER_NIIN
+#ifdef PARROT_HAS_HEADER_NETINETIN
 #  include <netinet/in.h>
 #endif
 
