@@ -363,6 +363,10 @@ examples/benchmarks/oo2.pasm                      [main]doc
 examples/benchmarks/oo2.pl                        [main]doc
 examples/benchmarks/oo2.py                        [main]doc
 examples/benchmarks/oo2.rb                        [main]doc
+examples/benchmarks/oofib.imc                     [main]doc
+examples/benchmarks/oofib.pl                      [main]doc
+examples/benchmarks/oofib.py                      [main]doc
+examples/benchmarks/oofib.rb                      [main]doc
 examples/benchmarks/primes.c                      [main]doc
 examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc

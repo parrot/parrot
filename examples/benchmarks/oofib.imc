@@ -1,0 +1,106 @@
+
+.pcc_sub _main prototyped
+    .param pmc argv
+    .sym int argc
+    argc = argv
+    .sym int N
+    N = 24
+    if argc <= 1 goto noarg
+    $S0 = argv[1]
+    N = $S0
+noarg:
+    .sym float start
+    time start
+
+    .local pmc A
+    .local pmc B
+    .local pmc b
+
+    newclass A, "A"
+    subclass B, A, "B"
+
+    find_type I0, "B"
+    new b, I0
+
+    .sym int r
+    r = b.fib(N)  
+
+    .sym float fin
+    time fin
+    print "fib("
+    print N
+    print ") = "
+    print r
+    print " "
+    sub fin, start
+    print fin
+    print "s\n"
+    end
+.end
+
+.namespace ["A"]
+
+.sub fib method
+    .param int n
+    if n >= 2 goto rec
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+rec:
+    .sym int n1
+    .sym int n2
+    .sym int r1
+    .sym int r2
+    n1 = n - 1
+    n2 = n - 2
+    r1 = self.fibA(n1)
+    r2 = self.fibB(n2)
+    n = r1 + r2
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+.end
+
+.sub fibA method
+    .param int n
+    if n >= 2 goto rec
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+rec:
+    .sym int n1
+    .sym int n2
+    .sym int r1
+    .sym int r2
+    n1 = n - 1
+    n2 = n - 2
+    r1 = self.fib(n1)
+    r2 = self.fibB(n2)
+    n = r1 + r2
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+.end
+
+.namespace ["B"]
+
+.sub fibB method
+    .param int n
+    if n >= 2 goto rec
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+rec:
+    .sym int n1
+    .sym int n2
+    .sym int r1
+    .sym int r2
+    n1 = n - 1
+    n2 = n - 2
+    r1 = self.fib(n1)
+    r2 = self.fibA(n2)
+    n = r1 + r2
+    .pcc_begin_return
+    .return n
+    .pcc_end_return
+.end
