@@ -359,7 +359,7 @@ local ones) should all follow these general guidelines.
 =item *
 
 Multiple words or components should be separated with underscores rather
-than using tricks such as capitalisation, eg C<new_foo_bar> rather than
+than using tricks such as capitalization, eg C<new_foo_bar> rather than
 C<NewFooBar> or (gasp) C<newfoobar>.
 
 =item *
@@ -630,11 +630,11 @@ entity names can be provided.
 
 TBC ...
 
-=item Optimisations
+=item Optimizations
 
 Whenever code has deliberately been written in an odd way for
 performance reasons, you should point this out - if nothing else, to
-avoid some poor shmuck trying subsequently to replace it with something
+avoid some poor schmuck trying subsequently to replace it with something
 'cleaner'.
 
     /* The loop is partially unrolled here as it makes it a lot faster.
@@ -706,7 +706,7 @@ should be used over a bare char * whenever possible. Ideally there should
 be no char * in the source anywhere, and no use of C's standard string
 library.
 
-Dont assume GNU C, and don't use any GNU extensions unless protected by
+Don't assume GNU C, and don't use any GNU extensions unless protected by
 #ifdefs for non-GNU-C builds.
 
 
@@ -718,7 +718,7 @@ TBC ... Any contributions welcome !!!
 We want Perl to be fast. Very fast. But we also want it to be portable
 and extensible. Based on the 90/10 principle, (or 80/20, or 95/5,
 depending on who you speak to), most performance is gained or lost in a
-few small but critical areas of code. Concentrate your optimisation
+few small but critical areas of code. Concentrate your optimization
 efforts there.
 
 Note that the most overwhelmingly important factor in performance is in
@@ -729,7 +729,7 @@ independent, or at least likely to cause speed-ups in a wide variety of
 environments, and do no harm elsewhere. Only in exceptional
 circumstances should assembly ever even be considered, and then only if
 generic fallback code is made available that can still be used by all
-other non-optimised platforms.
+other non-optimized platforms.
 
 Probably the dominant factor (circa 2001) that effects processor
 performance is the cache. Processor clock rates have increased far in
@@ -764,22 +764,22 @@ simply swapping C<i> and C<j>.
 
 This all boils down to: keep things near to each other that get
 accessed at around the same time. (This is why the important
-optimisations occur in data structure and algorithm design rather than
+optimizations occur in data structure and algorithm design rather than
 in the detail of the code.) This rule applies both to the layout of
 different objects relative to each other, and to the relative
 positioning of individual fields within a single structure.
 
-If you do put an optimisation in, time it on as many architectures as
+If you do put an optimization in, time it on as many architectures as
 you can, and be suspicious of it if it slows down on any of them! Perhaps
 it will be slow on other architectures too (current and future).
-Perhaps it wasn't so clever after all? If the optimisation is platform
+Perhaps it wasn't so clever after all? If the optimization is platform
 specific, you should probably put it in a platform-specific function in
 a platform-specific file, rather than cluttering the main source with
 zillions of #ifdefs.
 
 And remember to document it.
 
-Loosely speaking, Perl tends to optimise for speed rather than space,
+Loosely speaking, Perl tends to optimism for speed rather than space,
 So you may want to code for speed first, then tweak to reclaim some
 space while not affecting performance.
 

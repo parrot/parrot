@@ -87,7 +87,7 @@ will be written in the last generally accepted format, and will
 indicate the S<I<PDD Format>> as 0.  (See L<VERSION|"VERSION:">.) 
 
 All existing PDDs will adhere to the PDD standard current as of the
-time of resubmission.  Existing PDDs need not be modified and
+time of re-submission.  Existing PDDs need not be modified and
 resubmitted B<solely> for the purpose of adhering to a PDD format
 change.
 
@@ -210,7 +210,7 @@ Each track has its own list of states, which are:
 =item Informational
 
 Informational PDDs are an objective record of 
-=item Superceded by PDD #
+=item Superseded by PDD #
 
 Replaced in whole by another PDD.
 
@@ -229,7 +229,7 @@ Naturally obsolete.
 Documentation on an experimental feature or use of Perl, such as
 porting Perl to a PS2.
 
-=item Superceded by PDD #
+=item Superseded by PDD #
 
 Replaced in whole by another PDD.
 

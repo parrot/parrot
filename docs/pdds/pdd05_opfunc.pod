@@ -55,7 +55,7 @@ opcode signature indicates otherwise
 Each opcode has two separate functions. The first function takes two
 parameters, the current interpreter pointer and current interpreter
 PC, and returns the address of the next opcode to execute. The second
-function takes zero or more paramters as addresses, register numbers,
+function takes zero or more parameters as addresses, register numbers,
 integers, or floating point numbers and optionally returns either the
 address of the next opcode or the register number holding the address
 of the next opcode. These are referred to as the I<wrapping function>

@@ -185,7 +185,7 @@ flags set on them properly. Otherwise Bad Things Will Happen.
 
 For PMCs:
 
-=over4
+=over 4
 
 =item PMC_active_destroy_FLAG
 

@@ -1,6 +1,6 @@
 =head1 TITLE
 
-PDD 14 - Big Numbers
+Big Numbers
 
 =head1 VERSION
 
@@ -50,17 +50,17 @@ more rounding types added, TODO added.  PDD number bagged.
 This document describes the big number library, the functionality it
 provides and some internal details of interest to people making use of
 the library.  Some of the areas in which the big number library meet
-with the rest of parrot are also discussed.
+with the rest of Parrot are also discussed.
 
 =head1 DESCRIPTION
 
-The big number library provides parrot with both a collection of
+The big number library provides Parrot with both a collection of
 (nearly) infinite precision numeric types and an implementation of an
 extended decimal arithmetic (EDA).
 
 =head2 Why decimal arithmetic?
 
-There are benifits in using the big number library to provide both
+There are benefits in using the big number library to provide both
 values of effectively unlimited precision and a defined arithmetic,
 complete with rounding and exceptional conditions, for values which
 are otherwise easily represented using standard low-level types.  Both
@@ -73,7 +73,7 @@ dynamic languages, this should not present too great a burden.
 
 =head2 Numeric types provided
 
-The bignumber library provides the following data types to parrot:
+The bignumber library provides the following data types to Parrot:
 
 =over 4
 
@@ -107,13 +107,13 @@ negative.  The number has the value
 A big integer must always have a non-negative exponent, a big float
 may have any exponent and a float with a fixed fractional part will
 have an exponent greater than a given (negative) number.  These limits
-are not attatched to a numeric value, but instead are enforced by
+are not attached to a numeric value, but instead are enforced by
 giving any operation involving the numbers a I<context>.
 
-In general, parrot functions will not need to care about what the
+In general, Parrot functions will not need to care about what the
 bignum objects are or do, they should merely be used as arguments to
-big number functions, the objects will be managed by parrot's garbage
-collection in a simillar manner to strings.
+big number functions, the objects will be managed by Parrot's garbage
+collection in a similar manner to strings.
 
 =head2 Special Values
 
@@ -170,7 +170,7 @@ The available rounding forms are outlined below.
 The I<traps> part of the context defines how exceptions are raised by
 the library.  Seven distinct classes of error can occur, if the
 corresponding trap is set (enabled) then an exception is raised by the
-library (and dispatched to parrot) otherwise execution continues with
+library (and dispatched to Parrot) otherwise execution continues with
 the exception class being recorded in flags.  For more details see the
 extended decimal arithmetic standard.
 
@@ -316,7 +316,7 @@ The result of integer division will be an integer.
 
 =item Comparison
 
-Comparision returns a big number which is equal to 1, 0 or -1 if the
+Comparison returns a big number which is equal to 1, 0 or -1 if the
 first argument is larger, equal to or smaller than the second.  An
 alternative form which returns an INTVAL is also provided.
 
@@ -336,8 +336,8 @@ standard decimal arithmetic.  Other conversation operations may also
 be implemented, and these may not provide one to one mapping.
 
 A pedantic error checking conversion is available within the library,
-but only works with native strings.  Versions which work with parrot
-strings will also be provided, although in a seperate file to the rest
+but only works with native strings.  Versions which work with Parrot
+strings will also be provided, although in a separate file to the rest
 of the library (they will share a common private header file).
 
 =head1 IMPLEMENTATION
@@ -349,7 +349,7 @@ opaque big number objects.
 =head2 Big number representation
 
 A big number is represented by the following structure, this is
-capable of being allocated, tracked and destroyed by the parrot
+capable of being allocated, tracked and destroyed by the Parrot
 garbage collection system.
 
  typedef struct {
@@ -398,12 +398,12 @@ is made.
 =head2 Exceptional Conditions
 
 When an exceptional condition is raised by the module, control is
-passed to C<BN_nonfatal()>, this examines the error which has occured
-and the current context to determine which class of error has occured.
+passed to C<BN_nonfatal()>, this examines the error which has occurred
+and the current context to determine which class of error has occurred.
 If the corresponding trap handler is not enabled, the context's flags
 are updated and control is returned to the bignumber library,
 otherwise the exception becomes fatal.  How this mechanism interacts
-with parrot's own is yet to be decided.
+with Parrot's own is yet to be decided.
 
 The possible exceptions are detailed in the extended decimal
 arithmetic.
@@ -418,8 +418,8 @@ a later date as it is extended to cope with values such as +Inf.
 =head1 TODO
 
 Fill in the remaining functions from the EDA, verify that the test
-suite still passes, integrate the library into the rest of parrot,
-provide PMC types and suitable opcodes.  Conversion to and from parrot
+suite still passes, integrate the library into the rest of Parrot,
+provide PMC types and suitable opcodes.  Conversion to and from Parrot
 strings, conversion to and from floating point types, sprintf output
 of bignumbers.
 

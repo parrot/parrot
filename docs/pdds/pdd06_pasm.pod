@@ -1,6 +1,6 @@
 =head1 TITLE
 
-Parrot assembly language
+Parrot Assembly Language
 
 =head1 VERSION
 
@@ -130,7 +130,7 @@ This PDD describes the format of Parrot's bytecode assembly language.
 
 =head1 DESCRIPTION
 
-Parrot's's bytecode can be thought of as a form of machine language
+Parrot's bytecode can be thought of as a form of machine language
 for a virtual super CISC machine. It makes sense, then, to define an
 assembly language for it for those people who may need to generate
 bytecode directly, rather than indirectly via the perl (or any other)
@@ -162,7 +162,7 @@ current PC.
 All registers have a type prefix of P, S, I, or N, for PMC, string,
 integer, and number respectively.
 
-=head1 Assembly syntax
+=head1 Assembly Syntax
 
 All assembly opcodes contain only ASCII lowercase letters and the underscore.
 
@@ -733,15 +733,15 @@ forth.
 
 =over 4
 
-=item * lock Px
+=item lock Px
 
 Take out a high-level lock on the PMC in register X
 
-=item * unlock Px
+=item unlock Px
 
 Unlock the PMC in register X
 
-=item * pushunlock Px
+=item pushunlock Px
 
 Push an unlock request on the stack
 
@@ -751,16 +751,16 @@ Push an unlock request on the stack
 
 =over 4
 
-=item * newinterp Px, flags
+=item newinterp Px, flags
 
 Create a new interpreter in X, using the passed flags.
 
-=item * runinterp Px, iy
+=item runinterp Px, iy
 
 Jump into interpreter X and run the code starting at offset Y from the
 current location. (This is temporary until we get something better)
 
-=item * callout Pw, Px, sy, pz
+=item callout Pw, Px, sy, pz
 
 Call routine Y in interpreter x, passing it the list of parameters
 Z. V is a synchronization object returned. It can be waited on like
@@ -774,7 +774,7 @@ Get information item Y and put it in register X. Currently defined are:
 
 =item 1 TOTAL_MEM_ALLOC
 
-The total amount of system memory allocated for later parcelling out
+The total amount of system memory allocated for later parceling out
 to Buffers. Doesn't include any housekeeping memory, memory for Buffer
 or PMC structs, or things of that nature.
 
@@ -801,7 +801,7 @@ considered active.
 The total number of PMCs the interpreter has available. Includes both
 active and free PMCs
 
-=item 7 TOTAL_BUFFES
+=item 7 TOTAL_BUFFERS
 
 The total number of Buffer structs the interpreter has available.
 
@@ -814,6 +814,8 @@ the last DOD run. (Buffers, when allocated, are allocated in chunks)
 
 The number of times we've requested a block of memory from the system
 for allocation to Buffers since the last time we compacted the memory heap.
+
+=back
 
 =back
 

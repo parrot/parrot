@@ -178,7 +178,7 @@ modules via do, use, or require may be supported.
 One straightforward use of modular perl is to precompile perl source
 into bytecode and save it for later use. This is easily done by having
 a second interpreter module. The standard perl interpreter is used
-during compilation to evaluate BEGIN blocks and suchlike things, but a
+during compilation to evaluate BEGIN blocks and such-like things, but a
 simple freeze-to-disk module is used when mainline execution
 begins. Then, rather than executing the bytecode, it gets frozen to
 disk for later loading.
@@ -195,14 +195,14 @@ such as gcc or Compaq's GEM compiler system.
 
 Each piece of perl can, with enough support hidden away (in the form
 of an interpreter for the parsing module, for example), stand on its
-own. This means it's feasable to have separate executables that parse
+own. This means it's feasible to have separate executables that parse
 perl to a syntax tree, turn a syntax tree into bytecode, optimize the
 bytecode, and execute the bytecode.
 
 This allows us to develop pieces independently--the first version of
 the parser, for example, can be written mainly in perl 5 using an
 embedded interpreter. It also means we can have a standalone optimizer
-which can spend a lot of time grovelling over bytecode, far more than
+which can spend a lot of time groveling over bytecode, far more than
 you might want to devote to optimizing one-liners or code that'll run
 only once or twice.
 
