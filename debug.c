@@ -2402,7 +2402,7 @@ The command returns a number which is the breakpoint identifier.");
         case c_delete:
             PIO_eprintf(interpreter,
 "Delete a breakpoint.\n\n\
-The breakpoint to delete must be specified by its breakpoint number.\n
+The breakpoint to delete must be specified by its breakpoint number.\n\
 Deleted breakpoints are gone completely. If instead you want to\n\
 temporarily disable a breakpoint, use \"disable\".\n");
             break;
@@ -2426,8 +2426,8 @@ If the program has terminated, then \"continue\" will do nothing;\n\
 use \"run\" to re-run the program.\n");
             break;
         case c_next:
-            PIO_eprintf(interpreter,"
-Execute a specified number of instructions.\n\n\
+            PIO_eprintf(interpreter,
+"Execute a specified number of instructions.\n\n\
 If a number is specified with the command (e.g. \"next 5\"), then\n\
 execute that number of instructions, unless the program reaches a\n\
 breakpoint, or stops for some other reason.\n\n\
