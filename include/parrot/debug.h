@@ -43,6 +43,8 @@ enum {
  *  type:           The type of condition and the way to use arguments.
  *  reg:            The register involved, there must be at least one.
  *  value:          A pointer to the second argument.
+ *  next:           A pointer to the next condition - used to construct a
+ *                  list of watchpoints; not used for conditional breakpoints
  */
 
 typedef struct PDB_condition *PDB_condition_ptr;
@@ -116,6 +118,7 @@ typedef struct PDB_file {
  *
  *  pc:             Where the breakpoint is.
  *  skip:           The number of times to skip this breakpoint.
+ *  condition:      The condition attached to the breakpoint; may be NULL
  */
 
 typedef struct PDB_breakpoint *PDB_breakpoint_ptr;
