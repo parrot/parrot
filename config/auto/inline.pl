@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/inline.pl - Inline Compiler Support
+
+=head1 DESCRIPTION
+
+Determines whether the compiler supports C<inline>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

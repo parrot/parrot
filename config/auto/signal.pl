@@ -1,3 +1,15 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/signal.pl - Signals
+
+=head1 DESCRIPTION
+
+Determines some signal stuff.
+
+=cut
 
 package Configure::Step;
 

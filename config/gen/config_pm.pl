@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/config_pm.pl - Parrot::Config
+
+=head1 DESCRIPTION
+
+Writes the C<Parrot::Config> Perl module.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/inter/types.pl - Sizes for Parrot Types
+
+=head1 DESCRIPTION
+
+Asks the user which size integer, floating-point number and opcode types
+should be.
+
+=cut
+
 package Configure::Step;
 
 use strict;

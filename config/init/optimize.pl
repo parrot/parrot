@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/init/optimize.pl - Optimization
+
+=head1 DESCRIPTION
+
+Enables optimization by adding the appropriate flags for the local
+platform to the C<CCFLAGS>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

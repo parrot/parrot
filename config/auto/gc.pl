@@ -1,3 +1,40 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/gc.pl - Garbage Collection
+
+=head1 DESCRIPTION
+
+Checks whether the C<--gc> command-line option was passed to
+F<Configure.pl> and sets the memory allocator accordingly. 
+
+C<--gc> can take the values:
+
+=over
+
+=item C<gc>
+
+The default. Use the memory allocator in F<src/recources.c>.
+
+=item C<libc>
+
+Use the C library C<malloc>.
+
+=item C<malloc>
+
+Use the malloc in F<src/res_lea.c>.
+
+=item C<malloc-trace>
+
+Use the malloc in F<src/res_lea.c> with tracing enabled.
+
+=back
+
+=cut
+
 package Configure::Step;
 
 use strict;

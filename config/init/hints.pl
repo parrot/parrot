@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/init/hints.pl - Platform Hints
+
+=head1 DESCRIPTION
+
+Loads the platform and local hints files, modifying the defaults set up
+in F<config/init/data.pl>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

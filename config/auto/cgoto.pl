@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/cgoto.pl - Computed C<goto>
+
+=head1 DESCRIPTION
+
+Determines whether the compiler supports computed C<goto>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/memalign.pl - Memory Alignment
+
+=head1 DESCRIPTION
+
+Determines if the C library supports C<memalign()>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/funcptr.pl - Function Pointer Casts
+
+=head1 DESCRIPTION
+
+Verifies that the compiler supports function pointer casts.
+
+=cut
+
 package Configure::Step;
 
 use strict;

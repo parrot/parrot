@@ -1,5 +1,17 @@
-#!perl -w
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
+
+=head1 NAME
+
+config/auto/headers.pl - C headers
+
+=head1 DESCRIPTION
+
+Probes for various C headers.
+
+=cut
+
 package Configure::Step;
 
 use strict;

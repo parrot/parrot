@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/file.pl - Core PMC List
+
+=head1 DESCRIPTION
+
+Generates the core PMC list F<include/parrot/core_pmcs.h>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

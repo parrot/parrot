@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/gcc.pl - GNU C Compiler
+
+=head1 DESCRIPTION
+
+Determines whether the C compiler is actually C<gcc>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

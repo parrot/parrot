@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/init/data.pl - Configuration Defaults
+
+=head1 DESCRIPTION
+
+Sets up the configuration systems's default values and data structures.
+
+=cut
+
 package Configure::Step;
 
 use strict;

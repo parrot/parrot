@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/alignptrs.pl - Pointer Alignment
+
+=head1 DESCRIPTION
+
+Determines the minimum pointer alignment.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,19 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/inter/progs.pl - C Compiler and Linker
+
+=head1 DESCRIPTION
+
+Asks the user which compiler, linker, shared library builder, C
+libraries, lexical analyzer generator and parser generator to use. Also
+whether debugging should be enabled.
+
+=cut
+
 package Configure::Step;
 
 use strict;

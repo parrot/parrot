@@ -1,3 +1,17 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/jit - JIT Capability
+
+=head1 DESCRIPTION
+
+Determines the CPU architecture, the operating system, and whether there
+is JIT capability available.
+
+=cut
+
 package Configure::Step;
 
 use strict;

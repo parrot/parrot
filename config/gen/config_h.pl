@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/config_h.pl - Configuration Header
+
+=head1 DESCRIPTION
+
+Generates F<include/parrot/config.h> with platform-specific
+configuration values.
+
+=cut
+
 package Configure::Step;
 
 use strict;

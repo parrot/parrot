@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/inter/pmc.pl - PMC Files
+
+=head1 DESCRIPTION
+
+Asks the user to select which PMC files to include.
+
+=cut
+
 package Configure::Step;
 
 use strict;

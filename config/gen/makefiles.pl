@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/makefiles.pl - Makefiles
+
+=head1 DESCRIPTION
+
+Generates the various F<Makefiles>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/isreg - S_ISREG
+
+=head1 DESCRIPTION
+
+Determines if the C library has a working C<S_ISREG>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/parrot_include.pl - Runtime Includes
+
+=head1 DESCRIPTION
+
+Generates the F<runtime/parrot/include> files.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/cflags.pl - CFLAGS File
+
+=head1 DESCRIPTION
+
+Generates the F<CFLAGS> file. This provides a way to add or remove
+options on a per-C-file basis.
+
+=cut
+
 package Configure::Step;
 
 use strict;

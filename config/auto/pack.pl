@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/file - Packing
+
+=head1 DESCRIPTION
+
+Figures out how to C<pack()> Parrot's types.
+
+=cut
+
 package Configure::Step;
 
 use strict;

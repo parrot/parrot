@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/format.pl - Sprintf Formats
+
+=head1 DESCRIPTION
+
+Figures out what formats should be used for C<sprintf()>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

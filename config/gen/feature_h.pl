@@ -1,3 +1,18 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/feature_h.pl - Feature Header
+
+=head1 DESCRIPTION
+
+Generates F<include/parrot/feature.h> containing some architecture
+specific defines.
+
+=cut
+
 package Configure::Step;
 
 use strict;

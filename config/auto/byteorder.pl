@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/byteorder.pl - Native Byteorder
+
+=head1 DESCRIPTION
+
+Computes the native byteorder for Parrot's wordsize.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/init/miniparrot.pl - Mini Parrot
+
+=head1 DESCRIPTION
+
+Checks for the F<Configure.pl>'s C<--miniparrot> option.
+
+=cut
+
 package Configure::Step;
 
 use strict;

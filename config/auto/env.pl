@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/env.pl - System Environment
+
+=head1 DESCRIPTION
+
+Determining if the C library has C<setenv()> and C<unsetenv()>.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/gen/icu.pl - ICU
+
+=head1 DESCRIPTION
+
+Configures ICU and add appropriate targets to the Makefile.
+
+=cut
+
 package Configure::Step;
 
 use strict;

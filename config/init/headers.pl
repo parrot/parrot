@@ -1,3 +1,17 @@
+#! perl -w
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/init/headers.pl - Nongenerated Headers
+
+=head1 DESCRIPTION
+
+Uses C<ExtUtils::Manifest> to determine which headers are nongenerated.
+
+=cut
+
 package Configure::Step;
 
 use strict;

@@ -1,3 +1,16 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+config/auto/sizes.pl - Various Sizes
+
+=head1 DESCRIPTION
+
+Determines the sizes of various types.
+
+=cut
+
 package Configure::Step;
 
 use strict;
