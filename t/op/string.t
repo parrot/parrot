@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 83;
+use Parrot::Test tests => 85;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -95,6 +95,84 @@ A string of length 21
 A string of lengt
 A string of lengt
 ** nothing **
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Three argument chopn");
+	set	S1, "Parrot"
+
+	chopn	S2, S1, 0
+	print	S1
+	print	"\n"
+	print	S2
+	print	"\n"
+
+	chopn	S2, S1, 1
+	print	S1
+	print	"\n"
+	print	S2
+	print	"\n"
+
+        set     I0, 2
+	chopn	S2, S1, I0
+	print	S1
+	print	"\n"
+	print	S2
+	print	"\n"
+
+	chopn	S2, "Parrot", 3
+	print	S2
+	print	"\n"
+
+	chopn	S1, S1, 5
+	print	S1
+	print	"\n"
+
+        set     S1, "Parrot"
+        set     S3, S1
+        chopn   S2, S1, 3
+        print   S3
+	print	"\n"
+
+        set     S3, S1
+        chopn   S1, 3
+        print   S3
+	print	"\n"
+
+	end
+CODE
+Parrot
+Parrot
+Parrot
+Parro
+Parrot
+Parr
+Par
+P
+Parrot
+Par
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Three argument chopn, OOB values");
+	set	S1, "Parrot"
+
+	chopn	S2, S1, 7
+	print	S1
+	print	"\n"
+	print	S2
+	print	"\n"
+
+	chopn	S2, S1, -1
+	print	S1
+	print	"\n"
+	print	S2
+	print	"\n"
+
+	end
+CODE
+Parrot
+
+Parrot
+Parrot
 OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "substr_s_s|sc_i|ic_i|ic" );
