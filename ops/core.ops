@@ -722,16 +722,19 @@ op interpinfo(out INT, in INT) {
 
 =item B<warningson>(in INT)
 
-Turns on warnings categories.  Categories already turned on will
-stay on.  Current categories and the numbers they map to are:
+Turns on warnings categories. Categories already turned on will
+stay on. Initial setting is currently all warnings off.
+Current categories are (include "warnings.pasm"):
 
 =over 4
 
-=item 1: undef
+=item .PARROT_WARNINGS_UNDEF_FLAG
 
-=item 2: IO
+=item .PARROT_WARNINGS_IO_FLAG
 
-=item -1: all
+=item .PARROT_WARNINGS_PLATFORM_FLAG
+
+=item .PARROT_WARNINGS_ALL_FLAG
 
 =back
 
@@ -754,6 +757,44 @@ numbers.
 
 inline op warningsoff(in INT) {
   PARROT_WARNINGS_off(interpreter, $1);
+  goto NEXT();
+}
+
+=item B<errorson>(in INT)
+
+Turns on error categories. Categories already turned on will
+stay on. Current default setting is PARROT_ERRORS_GLOBALS_FLAG is on.
+Current categories are (include "errors.pasm"):
+
+=over 4
+
+=item .PARROT_ERRORS_GLOBALS_FLAG
+
+Throw an exception, if global doesn't exist.
+
+=item .PARROT_ERRORS_ALL_FLAG
+
+=back
+
+To turn on multiple categories, OR the category numbers together.
+
+=cut
+
+inline op errorson(in INT) {
+  PARROT_ERRORS_on(interpreter, $1);
+  goto NEXT();
+}
+
+=item B<errorsoff>(in INT)
+
+Turns off errors categories.  Categories already turned off will
+stay off.  See the documentation for B<errorson> for category
+numbers.
+
+=cut
+
+inline op errorsoff(in INT) {
+  PARROT_ERRORS_off(interpreter, $1);
   goto NEXT();
 }
 

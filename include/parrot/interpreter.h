@@ -136,6 +136,7 @@ typedef struct Parrot_Context {
     IntStack intstack;                  /* Base of the regex stack */
     Buffer * warns;             /* Keeps track of what warnings
                                  * have been activated */
+    Buffer * errors;            /* fatals that can be turned off */
 
 
 } parrot_context_t;

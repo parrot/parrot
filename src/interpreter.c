@@ -1024,7 +1024,7 @@ Signatures are similar to NCI:
     P ... PMC*
 
 Return value, if any is passed as C<(void *)ptr> or C<(void *)&val>.
- 
+
 =cut
 
 */
@@ -1259,6 +1259,14 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     Parrot_allocate(interpreter, interpreter->ctx.warns,
         sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
+
+    /* same with errors */
+    interpreter->ctx.errors = new_buffer_header(interpreter);
+    Parrot_allocate(interpreter, interpreter->ctx.errors,
+        sizeof(struct warnings_t));
+    PARROT_ERRORS_off(interpreter, PARROT_ERRORS_ALL_FLAG);
+    /* undefined globals are errors by default */
+    PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);
 
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter);
@@ -1589,7 +1597,7 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 
 /*
 
-=item C<void 
+=item C<void
 Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)>
 
 Register a parser/compiler function.
@@ -1717,7 +1725,7 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 =cut
 
 */
- 
+
 static void dynop_register_xx(Parrot_Interp, PMC*, size_t, size_t,
         oplib_init_f init_func);
 static void dynop_register_switch(Parrot_Interp, PMC*, size_t, size_t);

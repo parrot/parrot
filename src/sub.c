@@ -64,6 +64,7 @@ cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     stack_mark_cow(ctx->user_stack);
     stack_mark_cow(ctx->control_stack);
     buffer_mark_COW(ctx->warns);
+    buffer_mark_COW(ctx->errors);
 }
 
 /*
@@ -289,6 +290,10 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
     interp->ctx.warns = ctx->warns;
     ctx->warns = warns;
 
+    warns = interp->ctx.errors;
+    interp->ctx.errors = ctx->errors;
+    ctx->errors = warns;
+
     /* swap register frame tops */
     reg_top = interp->ctx.int_reg_stack.top;
     interp->ctx.int_reg_stack.top = ctx->int_reg_stack.top;
@@ -346,7 +351,9 @@ new_sub(struct Parrot_Interp *interp, size_t size)
     struct Parrot_Sub *newsub =
         mem_sys_allocate_zeroed(size);
     newsub->ctx.warns = interp->ctx.warns;
+    newsub->ctx.errors = interp->ctx.errors;
     buffer_mark_COW(interp->ctx.warns);
+    buffer_mark_COW(interp->ctx.errors);
     newsub->seg = interp->code->cur_cs;
     return newsub;
 }

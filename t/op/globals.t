@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<'CODE', '12', "Fetch and store");
 	new P0, .PerlInt
@@ -21,4 +21,19 @@ output_like(<<'CODE', <<OUT, "not found exception");
 CODE
 /Global 'no_such_global' not found/
 OUT
-1; # HONK
+
+output_is(<<'CODE', <<OUT, "not found - error turned off");
+        .include "errors.pasm"
+        errorsoff .PARROT_ERRORS_GLOBALS_FLAG
+	find_global P1, "no_such_global"
+	print "ok 1\n"
+	defined I0, P1
+	unless I0, ok2
+	print "not "
+ok2:	print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
+OUT
+

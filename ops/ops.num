@@ -1359,3 +1359,7 @@ floor_n_n       1331
 floor_n_nc      1332
 sleep_n	1333
 sleep_nc	1334
+errorson_i	1335
+errorson_ic	1336
+errorsoff_i	1337
+errorsoff_ic	1338
