@@ -88,9 +88,18 @@ encoding/utf16$(O): $(H_FILES)
 
 encoding/utf32$(O): $(H_FILES)
 
+classes/perlint.c: classes/perlint.pmc 
+	perl classes/pmc2c.pl $<
+
 classes/perlint$(O): $(H_FILES)
 
+classes/perlnum.c: classes/perlnum.pmc 
+	perl classes/pmc2c.pl $<
+
 classes/perlnum$(O): $(H_FILES)
+
+classes/perlstring.c: classes/perlstring.pmc 
+	perl classes/pmc2c.pl $<
 
 classes/perlstring$(O): $(H_FILES)
 

@@ -32,7 +32,7 @@
 
         time   N1
 
-REDO:   sub    P4, P4, P3
+REDO:   sub    P4, P4, 1
         if     P4, REDO
 
         print  "done\n"
