@@ -8,10 +8,10 @@
  *   This is one way for calculating offsets in 2 dimensional space.
  *
  * MULTIDIM CALC OFFSET
- * Algoritm:
+ * Algorithm:
  *  i + j*Ni + k*Ni*Nj + l*Ni*Nj*Nk ...
- * where i,j,k,l are koordinates in a multdim space
- * and Ni,Nj,Nk .. are the length the dimensions.
+ * where i,j,k,l... are coordinates in a multidimensional space
+ * and Ni,Nj,Nk... are the lengths of the dimensions.
  *
  * Limitations: the array can only expand in the last dimension
  *              The first (n-1) dimensions of a n-dimensional array
