@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 66;
+use Parrot::Test tests => 70;
 use Test::More;
 use Parrot::Config;
 
@@ -769,7 +769,6 @@ CODE
 ok
 OUT
 
-$temp = "temp.pasm";
 open S, ">$temp" or die "Can't write $temp";
 print S <<'EOF';
   .pcc_sub @LOAD _sub1:
@@ -779,6 +778,28 @@ EOF
 close S;
 
 output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.pasm"
+    print "back\n"
+    end
+CODE
+main
+in sub1
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+  .pcc_sub _error:
+  print "error\n"
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD second sub');
 .pcc_sub _main:
     print "main\n"
     load_bytecode "temp.pasm"
@@ -1051,3 +1072,78 @@ OUTPUT
 
 unlink($temp, 'temp.pbc');
 
+$temp = "temp.imc";
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+.emit
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+.eom
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD first sub - imc');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.imc"
+    print "back\n"
+    end
+CODE
+main
+in sub1
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+.emit
+  .pcc_sub _foo:
+  print "error\n"
+.eom
+.emit
+# LOAD or other pragmas are only evaluated on the first
+# instruction of a compilation unit
+  .pcc_sub @LOAD _sub1:
+  print "in sub1\n"
+  invoke P1
+.eom
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode @LOAD second sub - imc');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.imc"
+    print "back\n"
+    end
+CODE
+main
+in sub1
+back
+OUTPUT
+
+open S, ">$temp" or die "Can't write $temp";
+print S <<'EOF';
+.emit
+  .pcc_sub _foo:
+  print "error\n"
+  .pcc_sub _sub1:
+  print "in sub1\n"
+  invoke P1
+.eom
+EOF
+close S;
+
+output_is(<<'CODE', <<'OUTPUT', 'load_bytecode no @LOAD - imc');
+.pcc_sub _main:
+    print "main\n"
+    load_bytecode "temp.imc"
+    print "back\n"
+    end
+CODE
+main
+back
+OUTPUT
+
+unlink($temp);

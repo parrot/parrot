@@ -301,6 +301,10 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
         /* info->arg_count is offset by one, first is opcode
          * build instruction format
          * set LV_in / out flags */
+        if (n != op_info->arg_count-1)
+            fataly(EX_SOFTWARE, sourcefile, line,
+                "arg count mismatch: op #%d '%s' needs %d given %d",
+                op, fullname, op_info->arg_count-1, n);
         for (i = 0; i < op_info->arg_count-1; i++) {
             switch (op_info->dirs[i+1]) {
                 case PARROT_ARGDIR_INOUT:
