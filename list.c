@@ -979,6 +979,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
         internal_exception(1, "Illegal initializer for init: odd elements\n");
 
     size = item_size = items_per_chunk = 0;
+    multi_key = NULL;
     for (i = 0; i < len; i += 2) {
         key = init->vtable->get_integer_keyed_int(interpreter, init, &i);
         val = i + 1;
@@ -1021,7 +1022,7 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     if (size)
         list_set_length(interpreter, list, size);
     /* make a private copy of init data */
-    user_array = pmc_new(interpreter, enum_class_Array);
+    list->user_data = user_array = pmc_new(interpreter, enum_class_Array);
     /* set length */
     user_array->vtable->set_integer_native(interpreter, user_array, 4);
     /* store values */
@@ -1040,7 +1041,6 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     user_array->vtable->set_integer_keyed_int(interpreter, user_array,
             &key, item_size);
 #endif
-    list->user_data = user_array;
     return list;
 }
 
@@ -1153,7 +1153,7 @@ list_set_length(Interp *interpreter, List *list, INTVAL len)
     if (len >= 0) {
         idx = list->start + (UINTVAL)len;
         list->length = len;
-        if (len >= (INTVAL)list->length) {
+        if (idx >= list->cap) {
             list_append(interpreter, list, 0, list->item_type, idx);
         }
         else {

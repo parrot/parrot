@@ -355,14 +355,19 @@ pmclass Array {
 
     void set_pmc_keyed_int (INTVAL* dest_key, PMC* src, INTVAL* src_key) {
 
+	INTVAL idx, length;
         if (!dest_key) {
             return;
         }
-	Parrot_Array_set_pmc_ptr(INTERP, (List *) SELF->data, *dest_key);
+	idx = *dest_key;
+        length = ((List *) SELF->data)->length;
+	if (idx >= length || -idx > length) {
+	    internal_exception(OUT_OF_BOUNDS, "Array index out of bounds!\n");
+	}
 
         if (src_key)
 	    src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
-	list_assign(INTERP, (List *) SELF->data, *dest_key,
+	list_assign(INTERP, (List *) SELF->data, idx,
 		(void*)src, enum_type_PMC);
     }
 

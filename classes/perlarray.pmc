@@ -67,8 +67,9 @@ pmclass PerlArray extends Array {
     };
 
     void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
-	Parrot_PerlArray_set_pmc_ptr(INTERP, (List *) SELF->data, *key);
-        SUPER(key, src, src_key);
+        if (src_key)
+	    src = src->vtable->get_pmc_keyed_int(INTERP, src, src_key);
+	list_assign(INTERP, (List *) SELF->data, *key, src, enum_type_PMC);
     };
 
     void set_pmc_keyed (PMC* key, PMC* src, PMC* src_key) {
@@ -77,8 +78,7 @@ pmclass PerlArray extends Array {
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-	Parrot_PerlArray_set_pmc_ptr(INTERP, (List *) SELF->data, ix);
-        SUPER(key, src, src_key);
+	list_assign(INTERP, (List *) SELF->data, ix, src, enum_type_PMC);
     };
 
     INTVAL get_integer_keyed_int (INTVAL* key) {

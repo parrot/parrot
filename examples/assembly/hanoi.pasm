@@ -1,16 +1,16 @@
 #
 # Towers of hanoi in parrot assembler
-# 
+#
 # Author: Tony Payne
 # Date: 05/15/2002
 #
 # Data structure:
-# 
+#
 # P0 is a PerlArray with three entries.  Each entry is a PerlArray PMC
 #   which represents a tower (column) of hanoi
 #
 # The towers are arrays of integers.  0 indicates no disk is present
-#   A positive integer indicates the diameter of the disk occupying 
+#   A positive integer indicates the diameter of the disk occupying
 #   the inicated slot.
 #
 # So this setup
@@ -45,7 +45,7 @@
 #     move_stack(array, size, num-1, storage, target, start)
 #   }
 #
-# move(array, size, start, target) { 
+# move(array, size, start, target) {
 #     /* okay, so it's not pseudocode... */
 #     # find the first non-empty slot on the start column (smallest disk)
 #     for(i=0; i<size; i++) if(array[start_col][i]) break;
@@ -58,12 +58,12 @@
 #     # do the move
 #     array[dest_col][dest_row] = array[start_col][start_row];
 #     array[start_col][start_row] = 0;
-#    
+#
 #     #print the results
 #     print(array, size);
 # }
 
-MAIN:	
+MAIN:
 	set I5, P0[1]           #I5 = argv[0]
 	new P0, .PerlArray
 	new P1, .PerlArray
@@ -76,7 +76,7 @@ MAIN:
 	set I0, 0
 loop_populate:
 	add I1, I0, 1
-	set P1[I0] I1	      #P0=[[1,2,3,...],[0,0,0...],[0,0,0...]]
+	set P1[I0], I1	      #P0=[[1,2,3,...],[0,0,0...],[0,0,0...]]
 	set P2[I0], 0
 	set P3[I0], 0
 	inc I0
@@ -87,7 +87,7 @@ loop_populate:
 	set I4, 1   # storage_col
 	bsr MOVE_STACK
 END: 	end
-	
+
 #Params
 #  P0 = array (const)
 #  I0 = size  (const)
@@ -100,7 +100,7 @@ loop_rows:
 loop_cols:
 	set P1,P0[I2]       #P1 = P0[j]
 	set I4,P1[I1]       #I4 = cursize; cursize=array[j][i]
-	
+
 	sub I5, I0, I4           #I5 = size-cursize
 	repeat S0, " ", I5
 	print S0
@@ -111,7 +111,7 @@ loop_cols:
 	print S0
 
 	inc I2                   # j++
-	eq I2, 3, done_loop      
+	eq I2, 3, done_loop
 	print " | "
 	if 1, loop_cols      # j < 3
 done_loop:
