@@ -523,10 +523,8 @@ string_transcode(struct Parrot_Interp *interpreter,
     STRING *dest;
     CHARTYPE_TRANSCODER transcoder1 = (CHARTYPE_TRANSCODER)NULLfunc;
     CHARTYPE_TRANSCODER transcoder2 = (CHARTYPE_TRANSCODER)NULLfunc;
-    const char *srcstart;
-    const char *srcend;
-    char *deststart;
     char *destend;
+    struct string_iterator_t it;
 
     if (!encoding) {
         if (type)
@@ -564,13 +562,11 @@ string_transcode(struct Parrot_Interp *interpreter,
         }
     }
 
-    srcstart = (void *)src->strstart;
-    srcend = srcstart + src->bufused;
-    deststart = dest->strstart;
-    destend = deststart;
+    destend = dest->strstart;
+    string_iterator_init(&it, src);
 
-    while (srcstart < srcend) {
-        UINTVAL c = src->encoding->decode(srcstart);
+    while (it.charpos < src->strlen) {
+        UINTVAL c = it.decode_and_advance(&it);
 
         if (transcoder1)
             c = transcoder1(src->type, dest->type, c);
@@ -578,11 +574,9 @@ string_transcode(struct Parrot_Interp *interpreter,
             c = transcoder2(src->type, dest->type, c);
 
         destend = dest->encoding->encode(destend, c);
-
-        srcstart = src->encoding->skip_forward(srcstart, 1);
     }
 
-    dest->bufused = destend - deststart;
+    dest->bufused = destend - (char *)dest->strstart;
     dest->strlen = src->strlen;
 
     if (dest_ptr) {
