@@ -45,6 +45,7 @@ examples/assembly/trace.pasm
 global_setup.c
 hints/darwin.pl
 hints/mswin32.pl
+hints/os2.pl
 hints/vms.pl
 include/parrot/chartype.h
 include/parrot/encoding.h
