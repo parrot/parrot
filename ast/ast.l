@@ -9,14 +9,20 @@
  * The tokenizer.
  */
 
+#ifdef AST_TEST
+typedef void Interp;
+#include <string.h>
+#define str_dup strdup
+#else
 #include <parrot/parrot.h>
+extern char* str_dup(char *);
+#endif
 #include "ast.h"
 
 #define YY_DECL int yylex(YYSTYPE *valp, YYLTYPE *locp, Interp *interp)
 
-YY_DECL yylex;
+YY_DECL;
 
-extern char* str_dup(char *);
 
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
