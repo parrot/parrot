@@ -67,6 +67,7 @@ use Carp;
     output_listing() if $options{'listing'};
     exit 0;
 
+=cut
 
 ###############################################################################
 ###############################################################################
@@ -85,6 +86,7 @@ be called by the driver routine. Use would be something like:
     my $pf = $asm->assemble($code);
     exit $interp->run($pf);
 
+=cut
 
 ###############################################################################
 ###############################################################################
@@ -105,8 +107,8 @@ my $pf; # The Parrot::PackFile object
 
 =head2 %type_to_suffix
 
-type_to_suffix is used to change from an argument type to the suffix that
-would be used in the name of the function that contained that argument.
+This is used to change from an argument type to the suffix that would be 
+used in the name of the function that contained that argument.
 
 =cut
 
@@ -120,26 +122,26 @@ my(%type_to_suffix)=('I'=>'i',  'N'=>'n',
 
 =head2 @program
 
-@program will hold an array ref for each line in the program. Each array ref
-will contain:
+This holds an array ref for each line in the program. Each array ref
+contains: 
 
 =over 4
 
 =item 1
 
-The file name in which the source line was found
+The file name in which the source line was found.
 
 =item 2
 
-The line number in the file of the source line
+The line number in the file of the source line.
 
 =item 3
 
-The chomped source line without beginning and ending spaces
+The chomped source line without beginning and ending spaces.
 
 =item 4
 
-The chomped source line
+The chomped source line.
 
 =back
 
@@ -150,25 +152,17 @@ my (@program);
 
 ###############################################################################
 
-=head2 $output
+=head2 $output 
+
+What is output to the bytecode file.
+
 =head2 $listing
+
+What is output to the listing file.
+
 =head2 $bytecode
 
-=over 4
-
-=item $output
-
-will be what is output to the bytecode file.
-
-=item $listing
-
-will be what is output to the listing file.
-
-=item $bytecode
-
-is the program's bytecode (executable instructions).
-
-=back
+The program's bytecode (executable instructions).
 
 =cut
 
@@ -177,14 +171,10 @@ my ($output, $listing, $bytecode) = ('', '', '');
 
 ###############################################################################
 
-=head2 $file
-=head2 $line
-=head2 $pline
-=head2 $sline
+=head2 $file, $line, $pline, $sline
 
-$file, $line, $pline, and $sline are used to reference information from the
-@program array.  Please look at the comments for @program for the description
-of each.
+These variables are used to reference information from the C<@program> array.  
+Please look at the comments for C<@program> for the description of each.
 
 =cut
 
@@ -194,41 +184,31 @@ my ($file, $line, $pline, $sline) = ('','','','');
 ###############################################################################
 
 =head2 %label
+
+This holds each label and the PC at which it was defined.
+
 =head2 %fixup
+
+This holds labels that have not yet been defined, the position they are 
+used in the source code, and the PC at that point. It is used for 
+backpatching.
+
 =head2 %macros
+
+This maps a macro name to an array of program lines with the same format
+as C<@program>.
+
 =head2 %local_label
+
+This holds local label definitions.
+
 =head2 %local_fixup
+
+This holds the occurrences of local labels in the source file.
+
 =head2 $last_label
 
-=over 4
-
-=item %label
-
-will hold each label and the PC at which it was defined.
-
-=item %fixup
-
-will hold labels that have not yet been defined, where they are used in
-the source code, and the PC at that point. It is used for backpatching.
-
-=item %macros
-
-will map a macro name to an array of program lines with the same format
-as @program.
-
-=item %local_label
-
-will hold local label definitions,
-
-=item %local_fixup
-
-will hold the occurances of local labels in the source file.
-
-=item $last_label
-
-is the name of the last label seen
-
-=back
+This the name of the last label seen.
 
 =cut
 
@@ -238,10 +218,12 @@ my (%label, %fixup, %macros, %local_label, %local_fixup, $last_label);
 ###############################################################################
 
 =head2 $pc
+
+This is the current program counter. 
+
 =head2 $op_pc
 
-pc is the current program counter. op_pc is the program counter for the most
-recent operator.
+This is the program counter for the most recent operator.
 
 =cut
 
@@ -251,11 +233,13 @@ my ($pc, $op_pc) = (0,0);
 ###############################################################################
 
 =head2 %constants
+
+This maps the name of each constant to its index in the constant table.
+
 =head2 @constants
 
-%constants is a map of constant name to index in the constant table
-@constants is an array of constant values in the same order that
-they should be in the constant table
+This holds a list of constant values in the same order that they should 
+be in the constant table.
 
 =cut
 
@@ -266,7 +250,7 @@ my (%constants, @constants);
 
 =head2 %equate
 
-maps assembler directives to their replacements.
+This hash maps assembler directives to their replacements.
 
 =cut
 
@@ -281,7 +265,7 @@ my %equate=('*'=>sub { return $pc },
 
 =head2 %encodings
 
-maps string prefixes to encodings.
+This maps string prefixes to the corresponding encodings.
 
 =cut
 
@@ -311,42 +295,42 @@ foreach my $op (@$Parrot::OpLib::core::ops) {
 
 =head2 get_options
 
-This function gets and verifies the options current options are:
+This function gets and verifies the options. The current options are:
 
 =over 4
 
 =item checksyntax
 
-do not emit bytecode, only check to see if the assembly is valid
+Do not emit bytecode, only check to see if the assembly is valid.
 
 =item help
 
-emit a help message (usage)
+Emit a help message (usage).
 
 =item version
 
-emit the CVS revision of this file
+Emit the CVS revision details of this file.
 
 =item verbose
 
-output log messages
+Output log messages.
 
 =item output
 
-the file to output the bytecode
+The file to which the bytecode should be output.
 
 =item listing
 
-the file to output the listing
+The file to which the listing should be output.
 
 =item include
 
-a list of files to add to the source code
+A list of files to add to the source code.
 
 =back
 
-Validation checks to make sure that if either output or listing is present, it
-has an argument (which is the name of the file to output to.
+If either the output or listing options are specified, they must be
+accompanied by the name of the file to send the appropriate output to. 
 
 =cut
 
@@ -404,15 +388,15 @@ Options:
 
 =item 1
 
-adds the opcode fingerprint to the constant table
+Adds the opcode fingerprint to the constant table.
 
 =item 2
 
-adds the listing header
+Adds the listing header.
 
 =item 3
 
-creates the program lines array from each source file passed in
+Creates the program lines array from each source file passed in.
 
 =back
 
@@ -559,7 +543,7 @@ sub output_bytecode {
 
 =head2 output_listing
 
-outputs the listing information to the filename given by the listing option.
+Outputs the listing information to the filename given by the listing option.
 
 =cut
 
@@ -574,9 +558,8 @@ sub output_listing {
 
 =head2 process_program_lines
 
-
-loops through each program line and checks for comments, labels, and assembler
-directives. Then, it examines the operator and arguments to find the best
+Loops through each program line and checks for comments, labels, and assembler
+directives. Next, it examines the operator and arguments to find the best
 match.  Finally, it outputs its information to the listing.
 
 =cut
@@ -639,8 +622,8 @@ sub process_program_lines {
 
 =head2 is_comment
 
-Returns whether or not the entire line is a comment. This is true if the line
-starts with a '#' character
+Determines whether the entire line is a comment. It returns true if the
+first character is a '#' or the line is empty; otherwise it returns false.
 
 =cut
 
@@ -653,8 +636,8 @@ sub is_comment {
 
 =head2 has_label
 
-Returns whether or not the line begins with a label. This is true if the line
-begins with a word followed by a colon.
+Determines whether or not the line begins with a label. Returns true if the 
+line begins with a word followed by a colon; otherwise returns false.
 
 =cut
 
@@ -668,8 +651,8 @@ sub has_label {
 =head2 replace_string_constants
 
 This function strips out string constants and replaces them with the
-string [sc N] (for string constants), where N
-is the index into the constants table where the constant is located.
+string [sc N] (for string constants), where N is the index in the 
+constants table at which the constant is located.
 
 =cut
 
@@ -687,7 +670,7 @@ sub replace_string_constants {
 
 =head2 has_asm_directive
 
-returns true if there is a macro or equ directive
+Returns true if there is a C<macro> or C<equ> directive.
 
 =cut
 
@@ -701,10 +684,10 @@ sub has_asm_directive {
 
 =head2 handle_asm_directive
 
-Processes macros and equ directives. equ directives get stored in an equ hash.
-Macros store all program lines in an array.
+Processes macros and C<equ> directives. C<equ> directives get stored in 
+an C<equ> hash. Macros store all program lines in an array.
 
-NOTE: This function modifies @program.
+NOTE: This function modifies C<@program>.
 
 =cut
 
@@ -834,8 +817,8 @@ sub handle_label {
 
 =head2 expand_macro
 
-Expands the macro into the @program array also replaces the macro arguments
-with the ones given to the macro.  NOTE: modifies @program.
+Expands the macro into the C<@program> array. It also replaces the macro 
+arguments with the ones given to the macro.  NOTE: modifies C<@program>.
 
 =cut
 
@@ -1228,7 +1211,7 @@ sub add_line_to_listing {
 
 =head2 from_binary
 
-Convert a string of the form 0b[01]+ to a decimal number
+Convert a string of the form 0b[01]+ to a decimal number.
 
 =cut
 
@@ -1243,7 +1226,7 @@ sub from_binary {
 
 =head2 error
 
-Outputs and error message and exits.
+Outputs an error message and exits.
 
 =cut
 
@@ -1283,7 +1266,9 @@ sub log_message {
 
 =head2 constantize_number
 
-TODO: Document this.
+Adds a floating-point constant to the constant array and hash, remembering the
+index in the array at which it is stored. By using a hash, we ensure that
+duplicate numbers do not get duplicate entries in the constant table.
 
 =cut
 
@@ -1300,7 +1285,10 @@ sub constantize_number {
 
 =head2 constantize_integer
 
-TODO: Document this.
+Verifies that its argument is an integer, converting from binary or 
+hexadecimal if necessary, and returns its value. Calling it with
+a non-integer argument, or with an integer greater or smaller than
+Parrot can handle produces a fatal error.
 
 =cut
 
@@ -1331,10 +1319,10 @@ sub constantize_integer {
 
 =head2 constantize_string
 
-Replaces some escape sequences in a string then adds the string to the constant
-array and hash, remembering the index into the array where the constant string
-is stored. The hash is so duplicate strings do not get duplicated in the
-constants table.
+Replaces some escape sequences in a string and then adds the string to the 
+constant array and hash, remembering the index in the array at which the 
+constant string is stored. The hash ensures that duplicate strings do 
+not get duplicated in the constants table.
 
 =cut
 
@@ -1369,11 +1357,11 @@ sub constantize_string {
 
 ###############################################################################
 
-=head2 read source
+=head2 read_source
 
-Reads in a file putting the informatino gathered into the @program array. It
-also processes INCLUDE directives opening the included file and recursively
-processing it.
+Reads in a file, putting the information gathered into the C<@program> array. 
+It also processes INCLUDE directives by opening the included file and 
+recursively processing it.
 
 =cut
 
