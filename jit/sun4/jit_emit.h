@@ -473,8 +473,8 @@ static void Parrot_jit_float_store(Parrot_jit_info_t *jit_info,
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_fixup *fixup;
-    Parrot_jit_fixup *last_fixup;
+    Parrot_jit_fixup_t *fixup;
+    Parrot_jit_fixup_t *last_fixup;
     char *fixup_ptr;
     int fixup_val;
 

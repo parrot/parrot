@@ -805,7 +805,7 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_fixup *fixup = jit_info->arena.fixups;
+    Parrot_jit_fixup_t *fixup = jit_info->arena.fixups;
 
     while(fixup){
         switch(fixup->type){
