@@ -113,7 +113,8 @@ PDB_run_command(struct Parrot_Interp *interpreter,
         case c_r:
         case c_run:
             na(command);
-            PDB_run(interpreter,command);
+            PDB_init(interpreter,command);
+            PDB_continue(interpreter, NULL);
             break;
         case c_c:
         case c_continue:
@@ -170,8 +171,7 @@ PDB_next(struct Parrot_Interp *interpreter,
 
     if (!(interpreter->pdb->state & PDB_RUNNING))
     {
-        fprintf(stderr,"The program is not being run.\n");
-        return;
+        PDB_init(interpreter,command);
     }
     
     if (command && isdigit(*command))
@@ -196,8 +196,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
  
     if (!(interpreter->pdb->state & PDB_RUNNING))
     {
-        fprintf(stderr,"The program is not being run\n");
-        return;
+        PDB_init(interpreter,command);
     }
    
     if (command && isdigit(*command))
@@ -246,7 +245,7 @@ PDB_set_break(struct Parrot_Interp *interpreter,
             line = line->next;
     }
     else {
-        /* Update cur_line */
+        /* Get the line to set it */
         line = pdb->file->line;
         while (line->opcode != pdb->cur_opcode)
             line = line->next;
@@ -314,12 +313,12 @@ PDB_set_break(struct Parrot_Interp *interpreter,
     fprintf(stderr,"Breakpoint %li at line %li\n",i,line->number);
 }
 
-/* PDB_run
- * run the program
+/* PDB_init
+ * init the program
  */
 void
-PDB_run(struct Parrot_Interp *interpreter,
-        const char *command)
+PDB_init(struct Parrot_Interp *interpreter,
+         const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PMC *userargv;
@@ -367,9 +366,6 @@ PDB_run(struct Parrot_Interp *interpreter,
     pdb->cur_opcode = interpreter->code->byte_code;
     /* Add the RUNNING state */
     pdb->state |= PDB_RUNNING;
-
-    /* run */
-    PDB_continue(interpreter, command);
 }
 
 /* PDB_continue
@@ -383,7 +379,7 @@ PDB_continue(struct Parrot_Interp *interpreter,
     long ln;
 
     /* Skip any breakpoint? */
-    if (*command)
+    if (command && *command)
     {
         if (!pdb->breakpoint)
         {

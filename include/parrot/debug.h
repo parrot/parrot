@@ -47,7 +47,6 @@ typedef struct PDB_file {
     char *                  sourcefilename;
     char *                  source;
     size_t                  size;
-    unsigned long           cur_line;
     unsigned long           list_line;
     PDB_line_t *            line;
     PDB_label_t *           label;
@@ -112,8 +111,8 @@ PDB_trace(struct Parrot_Interp *,
           const char *);
 
 void
-PDB_run(struct Parrot_Interp *,
-        const char *);
+PDB_init(struct Parrot_Interp *,
+         const char *);
 
 void
 PDB_continue(struct Parrot_Interp *,
