@@ -1,5 +1,6 @@
 #! perl
 
+use lib 'lib';
 use Text::Balanced qw(extract_delimited);
 use Math::BigInt;
 use Getopt::Long;
@@ -38,7 +39,7 @@ open ALL, ">>$outfile" or die "Can't write '$outfile': $!";
 close ALL;
 
 sub hash_val {
-	my $h = new Math::BigInt->bzero();
+	my $h = Math::BigInt->new('+0');
 	my $s = shift;
 	for (my $i = 0; $i < length($s); ++$i) {
 		$h += $h << 5;
