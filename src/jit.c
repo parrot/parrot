@@ -1034,12 +1034,12 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                 if ((is_used && volatiles) ||
                     (!volatiles &&
                          ((ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)))) {
+#if JIT_USE_OFFS
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
                         first = 0;
                     }
-#if JIT_USE_OFFS
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, maps[typ][i], base_reg, offs);
 #else
@@ -1101,12 +1101,13 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                 if ((is_used && volatiles) ||
                     (!volatiles &&
                      (ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT))) {
+#if JIT_USE_OFFS
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
                                 jit_info->native_ptr);
                         first = 0;
                     }
-#if JIT_USE_OFFS
+                    
                     offs = reg_offs(interpreter, typ, us);
                     (mov_f[typ])(interpreter, base_reg, offs, maps[typ][i]);
 #else
