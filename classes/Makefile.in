@@ -7,7 +7,7 @@ H_FILES = $(INC)/parrot.h default.h
 
 
 O_FILES = default$(O) perlint$(O) perlstring$(O) perlnum$(O) perlarray$(O) \
-perlhash$(O) perlundef$(O) parrotpointer$(O)
+perlhash$(O) perlundef$(O) parrotpointer$(O) intqueue$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -64,6 +64,11 @@ parrotpointer.c: parrotpointer.pmc
 	$(PERL) pmc2c.pl parrotpointer.pmc
 
 parrotpointer$(O): $(H_FILES)
+
+intqueue.c: intqueue.pmc
+	$(PERL) pmc2c.pl intqueue.pmc
+
+intqueue$(O): $(H_FILES)
 
 clean:
 	$(RM_F) *.c *$(O) default.h

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 58;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -1280,6 +1280,39 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "IntQueue test");
+	new P0,IntQueue
+	set P0,32
+	set P0,-7
+
+	set I0,P0
+	eq I0,32,OK_1
+	print "not "
+OK_1:	print "ok 1\\n"
+
+	if P0,OK_2
+	print "not "
+OK_2:	print "ok 2\\n"
+
+	set I0,P0
+	eq I0,-7,OK_3
+	print "not "
+OK_3:	print "ok 3\\n"
+
+		if P0,NOT_OK_4
+		print "ok 4\\n"
+		branch DONE
+NOT_OK_4:	print "not ok 4\\n"
+DONE:
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
