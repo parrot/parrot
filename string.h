@@ -32,10 +32,11 @@ typedef struct parrot_string STRING;
 /* String vtable functions */
 
 typedef IV (*string_to_iv_t)(STRING *);
+typedef IV (*iv_to_iv_t)(IV);
 
 struct string_vtable {
-    string_to_iv_t compute_strlen;
-
+    string_to_iv_t compute_strlen; /* How long is a piece of string? */
+    iv_to_iv_t max_strlen;         /* I have n characters - how many bytes should I allocate? */
 };
 
 typedef struct string_vtable STRING_VTABLE;

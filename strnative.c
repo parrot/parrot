@@ -13,9 +13,15 @@ string_native_compute_strlen (STRING *s) {
     return s->buflen;
 }
 
+static IV 
+string_native_max_strlen (IV x) {
+    return x;
+}
+
 STRING_VTABLE 
 string_native_vtable (void) {
     return (STRING_VTABLE) {
 	string_native_compute_strlen,
+    string_native_max_strlen,
 	    };
 }

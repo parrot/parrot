@@ -20,6 +20,9 @@ string_make(char *buffer, IV buflen, IV encoding, IV flags, IV type) {
     return s;
 }
 
+STRING *
+string_grow_buffer(STRING* s, IV newsize);
+
 /* Setup string vtables */
 void
 string_init(void) {
