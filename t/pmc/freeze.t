@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -286,4 +286,24 @@ CODE
 PerlArray 2
 ok
 10
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a Sub");
+    find_global P1, "_foo"
+    freeze S0, P1
+
+    thaw P0, S0
+    typeof S10, P0
+    print S10
+    print "\n"
+    invokecc
+    print "back\n"
+    end
+.pcc_sub _foo:
+    print "in sub _foo\n"
+    invoke P1
+CODE
+Sub
+in sub _foo
+back
 OUTPUT

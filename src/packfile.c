@@ -212,6 +212,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
                         rel = (INTVAL) sub->end * sizeof(opcode_t);
                         rel += (INTVAL) self->cur_cs->base.data;
                         sub->end = (opcode_t *) rel;
+                        PObj_get_FLAGS(sub_pmc) |= PObj_private1_FLAG;
                         break;
                 }
                 /* goon */

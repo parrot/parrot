@@ -98,16 +98,19 @@ pmclass Sub {
 	 * - name of the sub's label: in properties
 	 * - start offset in byte-code segment
 	 * - end   offset in byte-code segment
+	 * - segment TODO
 	 */
 
 	/*
 	 * if sub addresses are absolute, the flag is set
 	 */
 	if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
-	    ptrdiff_t code = (ptrdiff_t) sub->seg->base.pf->byte_code;
+	    ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
-	    start_offs = (ptrdiff_t) SELF->cache.struct_val - code;
-	    end_offs = (ptrdiff_t)sub->end - code;
+	    start_offs = ((ptrdiff_t) SELF->cache.struct_val - code) /
+		sizeof(opcode_t*);
+	    end_offs = ((ptrdiff_t)sub->end - code) /
+		sizeof(opcode_t*);
 	}
 	else {
 	    start_offs = (size_t)SELF->cache.struct_val;
@@ -122,6 +125,7 @@ pmclass Sub {
 	SUPER(info);
 
 	if (info->extra_flags == EXTRA_IS_NULL) {
+	    struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
 	    size_t start_offs, end_offs;
 	    /*
 	     * we get relative offsets
@@ -129,6 +133,31 @@ pmclass Sub {
 	    PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 	    start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
 	    end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
+	    SELF->cache.struct_val = (opcode_t*) start_offs;
+	    sub->end = (opcode_t*) end_offs;
 	}
     }
+
+    void thawfinish(visit_info *info) {
+	/*
+	 * for now do fixup here until packfile issues are sorted out
+	 */
+	opcode_t *code;
+	struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+	opcode_t *start_offs, *end_offs;
+
+	/* its absolute */
+	if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG)
+	    return;
+	/*
+	 * XXX actually the sub might be in a different code segment
+	 */
+	code = INTERP->code->cur_cs->base.data;
+	start_offs = code + (size_t) SELF->cache.struct_val;
+	end_offs =   code + (size_t) sub->end;
+	SELF->cache.struct_val = start_offs;
+	sub->end = end_offs;
+	PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
+    }
+
 }

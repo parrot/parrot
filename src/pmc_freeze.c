@@ -834,12 +834,13 @@ visit_loop_next_for_GC(Parrot_Interp interpreter, PMC *current,
     }
 }
 
-static void
+static PMC*
 visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
         visit_info *info)
 {
     List *todo = PMC_data(info->todo);
     int i, n;
+    PMC *ret = current;
 
     (info->visit_pmc_now)(interpreter, current, info);
     /*
@@ -863,12 +864,23 @@ again:
         /*
          * on thawing call thawfinish for each processed PMC
          */
+        if (!current->vtable) {
+            /* the first created (passed) PMC was NULL -
+             * return a NULL PMC
+             */
+            ret = PMCNULL;
+        }
+        else
+            if (!PMC_IS_NULL(current))
+                VTABLE_thawfinish(interpreter, current, info);
         n = (int)list_length(interpreter, todo);
         for (i = 0; i < n ; ++i) {
             current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
-            VTABLE_thawfinish(interpreter, current, info);
+            if (!PMC_IS_NULL(current))
+                VTABLE_thawfinish(interpreter, current, info);
         }
     }
+    return ret;
 }
 
 /*
@@ -941,7 +953,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     /*
      * run thaw loop
      */
-    visit_loop_todo_list(interpreter, n, &info);
+    n = visit_loop_todo_list(interpreter, n, &info);
     /*
      * thaw does "consume" the image string by incrementing strstart
      * and decrementing bufused - restore that
