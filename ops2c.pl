@@ -131,11 +131,12 @@ print HEADER <<END_C;
 extern op_lib_t *Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init);
 
 END_C
+my $cg_func = $suffix =~ /cgp/ ? 'cgp_' : 'cg_';
 
 if ($suffix =~ /cg/) {
 	print HEADER <<END_C;
 
-opcode_t *cg_${base}(opcode_t *, struct Parrot_Interp *);
+opcode_t *$cg_func${base}(opcode_t *, struct Parrot_Interp *);
 END_C
 }
 
@@ -154,7 +155,7 @@ if ($suffix =~ /cg/) {
 	print SOURCE <<END_C;
 
 opcode_t *
-cg_$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
+$cg_func$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
 {
     static void *ops_addr[] = {
 END_C

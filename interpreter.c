@@ -175,7 +175,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
  *   prederef has no op_info_table
  */
 static void
-init_prederef(struct Parrot_Interp *interpreter)
+init_prederef(struct Parrot_Interp *interpreter, int cgp)
 {
     interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT(1);
     interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
@@ -194,6 +194,19 @@ init_prederef(struct Parrot_Interp *interpreter)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
+        if (cgp) {
+            opcode_t *pc = interpreter->code->cur_cs->base.data;
+            size_t n;
+            for (i = 0; i < N; ) {
+                prederef(temp, interpreter);
+                *temp = (void*)*pc;
+                n = interpreter->op_info_table[*pc].arg_count;
+                pc += n;
+                i += n;
+                temp += n;
+            }
+        }
+
     }
 }
 
@@ -255,7 +268,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     void **pc_prederef;
 
-    init_prederef(interpreter);
+    init_prederef(interpreter, 0);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
 
     while (pc_prederef) {
@@ -268,6 +281,23 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     return 0;
 }
 
+static opcode_t *
+runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+#ifdef HAVE_COMPUTED_GOTO
+    opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
+    void **pc_prederef;
+    init_prederef(interpreter, 1);
+    pc_prederef = interpreter->prederef_code + (pc - code_start);
+    pc = cgp_core((opcode_t*)pc_prederef, interpreter);
+    return pc;
+#else
+    PIO_eprintf(interpreter,
+            "Computed goto unavailable in this configuration.\n");
+    Parrot_exit(1);
+    return NULL;
+#endif
+}
 
 /*=for api interpreter runops
  * run parrot operations of loaded code segment until an end opcode is reached
@@ -309,7 +339,10 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
         }
         /* CGOTO is set per default, so test other cores first */
         else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            core = runops_prederef;
+            if  (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG))
+                core = runops_cgp;
+            else
+                core = runops_prederef;
         }
         else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
 #if !JIT_CAPABLE
