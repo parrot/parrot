@@ -66,7 +66,14 @@ runops(Interp *interpreter, size_t offs)
             }
         }
     }
-    if (interpreter->exceptions->runloop_level ==
+
+    /*
+     * XXX this is broken
+     *  - the runloop_level has to be in the interpreter struct
+     *  - the exception loop level must be part of the exception
+     *    handler
+     */
+    if (1 || interpreter->exceptions->runloop_level ==
             interpreter->ctx.runloop_level) {
         /* if we are coming from an exception and it was thrown deeper
          * in a nested run loop, we just leave this loop
