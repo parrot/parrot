@@ -1,14 +1,18 @@
 /*
 ** jit.h
+**
+** $Id$
 */
 
 #ifndef JIT_H_GUARD
 #define JIT_H_GUARD
 
+typedef void (*jit_f)(void);
+
 #define MAX_SUBSTITUTION 3
 #define MAX_TEMP_INT_SUBSTITUTION 8
 
-char *build_asm(struct Parrot_Interp *, opcode_t *, opcode_t *, opcode_t *);
+jit_f build_asm(struct Parrot_Interp *, opcode_t *, opcode_t *, opcode_t *);
 
 typedef struct {
     int position;

@@ -30,7 +30,7 @@ INTVAL *op_real_address;
 ** build_asm()
 */
 
-char *
+jit_f
 build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, opcode_t *code_end)
 {
     char *arena, *arena_start;
@@ -362,6 +362,7 @@ build_asm(struct Parrot_Interp *interpreter,opcode_t *pc, opcode_t *code_start, 
         bytecode_position += op_assembly[*pc].nargop;
         pc += op_assembly[*pc].nargop;
     }
-    return arena_start;
+
+    return (jit_f)arena_start;
 }
 

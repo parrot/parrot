@@ -274,7 +274,7 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL     code_size;
     opcode_t * code_end;
-    void *     jit_code;
+    jit_f      jit_code;
 
     check_fingerprint(interpreter);
 
@@ -284,7 +284,7 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
 #ifdef HAS_JIT
     jit_code = build_asm(interpreter, pc, code_start, code_end);
-    ((*(void (*)())jit_code)());
+    (jit_code)();
 #endif
 }
 
