@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 15;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -63,6 +63,14 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
+output_is(<<'CODE', <<'OUTPUT', 'creation');
+    new P0, .ResizableFloatArray
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0,.ResizableFloatArray
 
@@ -102,6 +110,14 @@ ok 2
 ok 3
 ok 4
 ok 5
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
+	new P0, .ResizableFloatArray
+        set P0, -100
+        end
+CODE
+/ResizableFloatArray: Can't resize to negative value!/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Setting first element");
@@ -267,6 +283,130 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'basic push');
+@{[ $fp_equality_macro ]}
+     new P0, .ResizableFloatArray
+     push P0, 1.0
+     push P0, 2.0
+     push P0, 3.0
+     set N0, P0[0]
+     .fp_eq(N0, 1.0, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     set N0, P0[1]
+     .fp_eq(N0, 2.0, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     set N0, P0[2]
+     .fp_eq(N0, 3.0, OK3)
+     print "not "
+OK3: print "ok 3\\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'push many values');
+@{[ $fp_equality_macro ]}
+     new P0, .ResizableFloatArray
+     set I0, 0
+L1:  set N0, I0
+     push P0, N0
+     inc I0
+     lt I0, 100000, L1
+     
+     set N0, P0[99999]
+     .fp_eq(N0, 99999.0, OK1)
+     print N0
+     print "not "
+OK1: print "ok 1\\n"
+     end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'basic pop');
+@{[ $fp_equality_macro ]}
+     new P0, .ResizableFloatArray
+     set P0[0], 1.0
+     set P0[1], 2.0
+     set P0[2], 3.0
+     pop N0, P0
+     .fp_eq(N0, 3.0, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     pop N0, P0
+     .fp_eq(N0, 2.0, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     pop N0, P0
+     .fp_eq(N0, 1.0, OK3)
+     print "not "
+OK3: print "ok 3\\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'pop many values');
+@{[ $fp_equality_macro ]}
+     new P0, .ResizableFloatArray
+     set I0, 0
+L1:  set N0, I0
+     set P0[I0], N0
+     inc I0
+     lt I0, 100000, L1
+     
+L2:  dec I0
+     set N1, I0
+     pop N0, P0
+     .fp_eq(N0, N1, OK)
+     branch NOT_OK
+OK:  gt I0, 0, L2
+     print "ok\\n"
+     end
+
+NOT_OK:
+     print N0
+     print "\\n"
+     print N1
+     print "\\n"
+     end
+CODE
+ok
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'push/pop');
+@{[ $fp_equality_macro ]}
+     new P0, .ResizableFloatArray
+     push P0, 1.0
+     push P0, 2.0
+     push P0, 3.0
+     pop N0, P0
+     .fp_eq(N0, 3.0, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+     end
+CODE
+ok 1
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', 'pop from empty array');
+     new P0, .ResizableFloatArray
+     pop N0, P0
+     end
+CODE
+/ResizableFloatArray: Can't pop from an empty array!/
 OUTPUT
 
 1;

@@ -4,12 +4,13 @@ $Id$
 
 =head1 NAME
 
-classes/resizablefloatarray.pmc - resizable size array for floating point numbers only
+classes/resizablefloatarray.pmc - resizable size array for floating point 
+numbers only
 
 =head1 DESCRIPTION
 
-This class, ResizableFloatArray, implements an array of resizable size, which stored FLOATVALs,
-it uses Float PMCs to do all necessary conversions
+This class, C<ResizableFloatArray>, implements an array of resizable size, 
+which stores FLOATVALs. It uses Float PMCs to do all necessary conversions.
 
 =head2 Functions
 
@@ -89,7 +90,7 @@ Resizes the array to C<size> elements.
         SizeFloatData *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
-                    "ResizableFloatArray: Can't resize!\n");
+                    "ResizableFloatArray: Can't resize to negative value!\n");
 
         sd = PMC_data(SELF);
         PMC_int_val(SELF) = size;
@@ -130,6 +131,60 @@ Creates and returns a copy of the array.
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
         PObj_active_destroy_SET(dest);
         return dest;
+    }
+
+/*
+
+=item C<void push_float(FLOATVAL value)>
+
+Adds C<value> to the end of the array.
+
+=cut
+
+*/
+
+    void push_float (FLOATVAL value) {
+        INTVAL size;
+        SizeFloatData *sd;
+
+        size = PMC_int_val(SELF);
+        DYNSELF.set_integer_native(size+1);
+        sd = (SizeFloatData *)PMC_data(SELF);
+        sd->data[size] = value;
+    }
+
+/*
+
+=item C<FLOATVAL pop_float()>
+
+Removes and returns the last element in the array.
+
+=cut
+
+*/
+
+    FLOATVAL pop_float() {
+        INTVAL size, new_size;
+        FLOATVAL value;
+        SizeFloatData *sd;
+
+        size = PMC_int_val(SELF);
+        sd = (SizeFloatData *)PMC_data(SELF);
+
+        if (sd == NULL || size == 0) {
+            internal_exception(OUT_OF_BOUNDS, 
+                    "ResizableFloatArray: Can't pop from an empty array!\n");
+        }
+
+        new_size = size - 1;
+        value = sd->data[size-1];
+
+        /* XXX: inefficient, but if we don't do it, we leak the memory */
+        sd = mem_sys_realloc(sd, NEEDED_SIZE(new_size));
+
+        sd->size = new_size;
+        PMC_int_val(SELF) = new_size;
+        return value;
     }
 
 }
