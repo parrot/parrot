@@ -11,7 +11,7 @@
 #
 
 module Curses
-  :fnlib = "libcurses.so"
+  :fnlib = "libcurses"
 {
   sub int initscr  :fn ();
   sub int endwin   :fn ();
