@@ -159,8 +159,6 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     *argv += opt.opt_index;
     *argc -= opt.opt_index;
 
-  OUT:
-
     if ((*argv)[0])
         return (*argv)[0];
     else {
