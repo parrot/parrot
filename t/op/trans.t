@@ -16,7 +16,7 @@ Tests the transcendental mathematical operations.
 
 =cut
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
 # This defines two macros:
@@ -603,4 +603,25 @@ ok 15
 ok 16
 OUTPUT
 
+output_is( <<"CODE", <<OUTPUT, "sqrt" );
+@{[ $fp_equality_macro ]}
+       set N1, 9.0
+       sqrt N2, N1
+       .fp_eq  (N2, 3.0, EQ1)
+       print "not "
+EQ1:   print "ok 1\\n"
+
+       set I1, 9
+       sqrt N2, I1
+       .fp_eq  (N2, 3.0, EQ2)
+       print "not "
+EQ2:   print "ok 2\\n"
+
+       end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+    
 1;
