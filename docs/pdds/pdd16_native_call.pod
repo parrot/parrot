@@ -157,7 +157,61 @@ information that Parrot needs.
 
 The NCI function signature for a callback matching Parrot_callback_C
 is C<vCYZ>, while the function signature for a callback matching
-Parrot_callback_D is C<vDYZ>
+Parrot_callback_D is C<vDYZ>.
+
+The callback functions take care of wrapping the external data
+pointer into an UnManagedStruct PMC, the same as if it were a p
+return type of a normal NCI function.
+
+The signature of the I<parrot> subroutine which is called by the
+callback should be:
+
+   void parrotsub(PMC user_data, PMC external_data)
+
+The sequence for this is:
+
+=over 4
+
+=item Step 1
+
+Register the function which takes all the callback information
+
+  dlfunc CALLBACK_REGISTER_FUNC, LIBRARY_PMC, FUNCTION_NAME, 'vCYZ'
+
+=item Step 2
+
+Register the actual callback
+
+  newsub $P5, .Sub, _some_parrot_sub
+  # Alternately, if it's in a global
+  # $P5 = global "some::sub::name"
+  new $P6, .PerlInt # The data we get handed
+  .pcc_begin prototyped
+  .arg $P5
+  .arg $P6
+  .pcc_call CALLBACK_REGISTER_FUNC
+  .pcc_end
+
+=item Step 3
+
+Hand over control to the external library. I<IT IS IMPORTANT THAT THE
+INTERPRETER YOU ARE CALLING BACK INTO IS NOT ACTIVE WHEN THE CALLBACK
+IS MADE!>
+
+=back  
+
+When the callback function is invoked by the external library, the
+function itself should look like:
+
+  .sub _my_callback prototyped
+    .param pmc my_data
+    .param pmc library_data
+    # Do something with the passed in data
+  .end
+
+Parrot itself handles all the nasty bits involved in collecting up
+the interpreter pointer, creating the wrapping PMCs, stuffing data
+various places, and generally dealing with the bookkeeping.
 
 =head1 REFERENCES
 
