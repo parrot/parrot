@@ -167,6 +167,10 @@ The B<relop> B<<, <=, ==, != E<gt>= E<gt>> translate to the PASM opcodes
 B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt> B<var>, B<var>,
 B<identifier>.
 
+=item unless <var> <relop> <var> goto <identifier>
+
+Like above, but branch if condition isn't met.
+
 =item <var> = <var>
 
 B<set var, var>
