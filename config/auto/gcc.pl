@@ -92,7 +92,7 @@ sub runstep {
       my @warns =  split ' ', $warns;
       foreach my $w ( split ' ', $ccwarn ) {
 	$w =~ s/^-W(?:no-)?(.*)$/$1/;
-	@warns = grep !/^-W(?:no-)?$w/, @warns;
+	@warns = grep !/^-W(?:no-)?$w$/, @warns;
       }
       $warns = join ' ', @warns;
     }
