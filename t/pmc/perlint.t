@@ -16,7 +16,7 @@ Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -63,6 +63,21 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
+warn "failed to get type of PerlInt!" unless defined $perlint;
+
+output_is(<<"CODE", <<'OUTPUT', ".PerlInt == $perlint");
+# type
+    set I0, .PerlInt
+    eq I0,$perlint,ok_1
+    print "value of .PerlInt is "
+    print I0
+    print " and not $perlint\\nnot "
+ok_1:
+    print $ok
+    end
+CODE
+ok 1
+OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "type");
     new P0,.PerlInt
