@@ -256,7 +256,7 @@ my $ccname = $Config{ccname} || $Config{cc};
 
 # Add the -DHAS_JIT if we're jitcapable
 if ($jitcapable) {
-    $c{cc_hasjit} = " -DHAS_JIT";
+    $c{cc_hasjit} = " -DHAS_JIT -D" . uc $jitcpuarch;
     $c{jit_h} = "\$(INC)/jit.h";
     $c{jit_struct_h} = "\$(INC)/jit_struct.h";
     $c{jit_o} = "jit\$(O)";
@@ -508,7 +508,7 @@ foreach ('intvalsize', 'opcode_t_size') {
     elsif ($c{$_} == 4) {
         $format = 'l';
     }
-    elsif ($c{$_} == 8 and $Config{quadtype}) {
+    elsif ($c{$_} == 8 || $Config{use64bitint} eq 'define') {
          # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
         $format = 'q';
     }

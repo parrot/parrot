@@ -7,7 +7,14 @@
 #ifndef JIT_H_GUARD
 #define JIT_H_GUARD
 
+#ifdef ALPHA
+void calculate_displacement(INTVAL *,INTVAL *,INTVAL *,INTVAL *);
+typedef void (*jit_f)(void *);
+#endif
+#ifdef I386
 typedef void (*jit_f)(void);
+#endif
+
 
 #define MAX_SUBSTITUTION 3
 #define MAX_TEMP_INT_SUBSTITUTION 8
@@ -92,11 +99,6 @@ extern char temp_char[100];
 extern FLOATVAL floatval_constants[1];
 extern char char_constants[];
 extern INTVAL *op_real_address; 
-
-/* TODO: separate this per architecture|plataform */
-#define START "\x55\x89\xe5"
-#define START_SIZE 3
-
 
 #endif /* JIT_H_GUARD */
 

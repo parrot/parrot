@@ -297,10 +297,15 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
     code_end   = (opcode_t *)(interpreter->code->byte_code + code_size);
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
+#ifdef ALPHA
+    (jit_code)((void *)(((char *)&interpreter->int_reg->registers[0]) + 0x7fff));
+#endif
+#ifdef I386
     (jit_code)();
 #endif
+#else
     return;
-
+#endif
 }
 
 

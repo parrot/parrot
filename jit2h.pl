@@ -24,7 +24,7 @@ my ($i,$j,$k,$n);
 
 my ($function, $body, $line);
 
-my ($position, $bytecode, $type, $number, $size, $char, $move, $strflag, $asm);
+my ($position, $bytecode, $type, $number, $size, $char, $move, $strflag, $asm, $precompiled);
 
 my (%core_ops, %string, %lib, $arg, $tmp, $which, $argc, $argv, $syscall, $tmp_bytecode, $nargop);
 
@@ -59,7 +59,7 @@ sub readjit($) {
             next;
         }
         if ($line =~ m/}/) {
-            $ops{$function} = Parrot::Jit::Assemble($asm);
+            $ops{$function} = Parrot::Jit->Assemble($asm);
             $function = undef;
             $body = undef;
         }
@@ -72,18 +72,30 @@ sub readjit($) {
 %string = readjit("jit/$cpuarch/string.jit");
 %lib = readjit("jit/$cpuarch/lib.jit");
 
+my $start = Parrot::Jit->init();
+
+print '#define START "' . $start . "\"\n"; 
+$start =~ s/[^x]//g;
+$start = length($start);
+print '#define START_SIZE ' . $start . "\n\n";
+print '#define OP_ARGUMENT_SIZE ' . $Parrot::Jit::OP_ARGUMENT_SIZE . "\n\n";
+
 print "opcode_assembly_t op_assembly[$core_numops]= {\n";
+
+my $cpcf_call = Parrot::Jit->call(2,"V*CUR_OPCODE[0]V&INTERPRETER[0]") . Parrot::Jit->Fix_cpcf_call();
+my $normal_call = Parrot::Jit->call(2,"V*CUR_OPCODE[0]V&INTERPRETER[0]") . Parrot::Jit->Fix_normal_call();
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]};
+    $precompiled = 0;
     if (!defined $body) {
+        $precompiled = 1;
         # TODO: Add metadata in core.ops to the opcodes that change the program control flow
         if ($core_opfunc[$i] =~ m/^Parrot_(eq_|ne_|lt_|le_|gt_|ge_|if_|ret|bsr_|jump_|branch)/) {
-            $body = "addl \$8,\%esp\njmp *(\%eax)\n";
+            $body = $cpcf_call;
         } else {
-            $body = "addl \$8,\%esp\n";
+            $body = $normal_call;
         }
-        $body = "C(Parrot_op,V*CUR_OPCODE[0]V&INTERPRETER[0])" . Parrot::Jit::Assemble($body);
     }
 
     my $op = $Parrot::OpLib::core::ops->[$i];
@@ -105,9 +117,6 @@ for ($i = 0; $i < $core_numops; $i++) {
         }
         elsif ($char eq 'J') {
             # JUMP
-            
-            # Refer to jit.pod for an explanation.
-            
             $tmp_bytecode = "";
             $tmp = substr($body,index($body,'(',$move) + 1,index($body,')',$move) - index($body,'(',$move) - 1);
     
@@ -121,10 +130,10 @@ for ($i = 0; $i < $core_numops; $i++) {
                 $n = 24;
                 $number = $1; 
                 $values[$n]++;
-                $bytecode .= '\\x00' x 4;
+                $bytecode .= '\\x00' x $Parrot::Jit::OP_ARGUMENT_SIZE;
                 $value_p[$n][$values[$n]] = $position;
                 $value_n[$n][$values[$n]] = $number;
-                $position += 4;
+                $position += $Parrot::Jit::OP_ARGUMENT_SIZE;
              } else {
                 die "Don't know how to jump to: $tmp\n";
              }
@@ -149,18 +158,19 @@ for ($i = 0; $i < $core_numops; $i++) {
             if (defined($Call{$function})) {
                 $n = 27;
                 
-                $j = 1;
+                $tmp_bytecode = Parrot::Jit->call($argc,$argv);
+
+                $j = $Parrot::Jit::Call_start + $Parrot::Jit::Call_move;
+
                 for($k = 0; $k < $argc; $k++) {
                     $argv =~ s/([VA])([\&\*][a-zA-Z_]+\[\d+\])$//;
                     if ($1 eq 'V') {
-                        $tmp_bytecode .= $Parrot::Jit::Push_Inmediate . $2;
-                        $j += 5;
+                        $j += $Parrot::Jit::Call_inmediate_arg_size;
                     } else {
-                        $tmp_bytecode .= $Parrot::Jit::Push . $2;
-                        $j += 6;
+                        $j += $Parrot::Jit::Call_address_arg_size;
                     }
                 }
-                $tmp_bytecode .= $Parrot::Jit::Call . '\\x00' x 4;
+
                 $values[$n]++;
                 $value_p[$n][$values[$n]] = $position + $j;
                 $value_n[$n][$values[$n]] = $Call{$function};
@@ -207,7 +217,7 @@ for ($i = 0; $i < $core_numops; $i++) {
             $argc = $2;
             $argv = $3;
 
-            $tmp_bytecode = Parrot::Jit::system_call($argc,$argv,$syscall);
+            $tmp_bytecode = Parrot::Jit->system_call($argc,$argv,$syscall);
             
             $body =~ s/S[a-zA-Z_]*\([^\)]*\)/$tmp_bytecode/;
         }
@@ -360,16 +370,21 @@ for ($i = 0; $i < $core_numops; $i++) {
             }
 
             $values[$n]++;
-            $bytecode .= '\\x00' x 4;
+            $bytecode .= '\\x00' x $Parrot::Jit::OP_ARGUMENT_SIZE;
             $value_p[$n][$values[$n]] = $position;
             $value_n[$n][$values[$n]] = $number;
             $value_f[$n][$values[$n]] = $strflag;
             $move += length($type) + length($number) + 2;
-            $position += 4;
+            $position += $Parrot::Jit::OP_ARGUMENT_SIZE;
         }
         else {
             die "Syntax wrong: $body\nUnknown identifier: $char at $move\n";
         }
+    }
+    if ($precompiled) {
+        $values[27]++;
+        $value_p[27][$values[27]] = $Parrot::Jit::Precompiled_call_position; 
+        $value_n[27][$values[27]] = $Call{"Parrot_op"};
     }
     $tmp_bytecode = "";
     while ($bytecode =~ m/END/) {

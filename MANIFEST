@@ -7,9 +7,13 @@ Makefile.in
 NEWS
 Parrot/Assembler.pm
 Parrot/BuildUtil.pm
+Parrot/Jit/alpha-bsd.pm
+Parrot/Jit/alpha-linux.pm
+Parrot/Jit/alphaGeneric.pm
 Parrot/Jit/i386-bsd.pm
 Parrot/Jit/i386-linux.pm
 Parrot/Jit/i386-nojit.pm
+Parrot/Jit/i386Generic.pm
 Parrot/Op.pm
 Parrot/OpTrans.pm
 Parrot/OpTrans/C.pm
@@ -130,6 +134,9 @@ jit.c
 jit/i386/core.jit
 jit/i386/lib.jit
 jit/i386/string.jit
+jit/alpha/core.jit
+jit/alpha/lib.jit
+jit/alpha/string.jit
 jit2h.pl
 key.c
 languages/Makefile.in

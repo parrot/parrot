@@ -1,0 +1,119 @@
+;
+;   alpha_core.jit 
+;
+; $Id$
+;
+
+Parrot_end {
+    mov $15,$30
+    ldq $26,0($30)
+    ldq $15,8($30)
+    lda $30,16($30)
+    ret $31,($26),0x1
+}
+
+Parrot_noop {
+    nop
+}
+
+Parrot_set_i_i {
+    ldq $3 , &INT_REG[2]
+    stq $3 , &INT_REG[1]
+}
+
+Parrot_set_i_ic {
+    ldah $3 , 1($27)
+    ldq $3 , &INT_CONST[2]
+    stq $3 , &INT_REG[1]
+}
+
+Parrot_set_n_nc {
+    ldah $7 , 1($27)
+    ldt $f0 , &NUM_CONST[2]
+    stt $f0 , &NUM_REG[1]
+}
+
+Parrot_set_n_n {
+    ldt $f0 , &NUM_REG[2]
+    stt $f0 , &NUM_REG[1]
+}
+
+Parrot_set_n_i {
+    ldt $f0 , &INT_REG[2]
+    cvtqt $f0,$f1 
+    stt $f1 , &NUM_REG[1]
+}
+
+Parrot_set_i_n {
+    ldt $f0 , &NUM_REG[2]
+    cvttq $f0,$f1 
+    stt $f1 , &INT_REG[1]
+}
+
+Parrot_mul_i_i_i {
+    ldq $3 , &INT_REG[2]
+    ldq $4 , &INT_REG[3]
+    mulq $3,$4,$4
+    stq $4 , &INT_REG[1]
+}
+
+Parrot_sub_i_i_i {
+    ldq $3 , &INT_REG[2]
+    ldq $4 , &INT_REG[3]
+    subq $3,$4,$4
+    stq $4 , &INT_REG[1]
+}
+
+Parrot_sub_i_i_ic {
+    ldq $3 , &INT_REG[2]
+    ldah $4 , 1($27)
+    ldq $4 , &INT_CONST[3]
+    subq $3,$4,$4
+    stq $4 , &INT_REG[1]
+}
+
+Parrot_add_i_i_i {
+    ldq $3 , &INT_REG[2]
+    ldq $4 , &INT_REG[3]
+    addq $3,$4,$4
+    stq $4 , &INT_REG[1]
+}
+
+Parrot_add_i_i_ic {
+    ldq $3 , &INT_REG[2]
+    ldah $4 , 1($27)
+    ldq $4 , &INT_CONST[3]
+    addq $3,$4,$4
+    stq $4 , &INT_REG[1]
+}
+
+Parrot_div_n_n_n {
+    ldt $f0 , &NUM_REG[2]
+    ldt $f1 , &NUM_REG[3]
+    divt $f0 , $f1 , $f1
+    stt $f1 , &NUM_REG[1]
+}
+
+Parrot_sub_n_n_n {
+    ldt $f0 , &NUM_REG[2]
+    ldt $f1 , &NUM_REG[3]
+    subt $f0 , $f1 , $f1
+    stt $f1 , &NUM_REG[1]
+}
+
+Parrot_if_i_ic {
+    ldq $3 , &INT_REG[1]
+    bne $3 , 0
+    JUMP(INT_CONST[2])
+}
+
+#Parrot_print_sc {
+#    lda $16 , 1
+#    SYSTEMCALL(WRITE,3, V*CPU_REG[16] V&STRING_CONST_bufstart[1] A&STRING_CONST_strlen[1])
+#}
+
+#Parrot_print_ic {
+#    ldq $2 , &INT_CONST[1]
+#    ldq $3 , &TEMP_CHAR[15]
+#     
+#}
