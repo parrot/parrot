@@ -27,7 +27,7 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {
-	int insns[4];
+	unsigned int insns[4];
         double align_hack[2];
     } u = { {
 #  ifdef __sparcv9
