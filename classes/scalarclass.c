@@ -71,33 +71,45 @@ static void Parrot_scalar_destroy (struct Parrot_Interp *interpreter, PMC* pmc) 
 
 static INTVAL Parrot_scalar_get_integer (struct Parrot_Interp *interpreter, PMC* pmc) {
     struct PerlScalarData* d = pmc->data;
+
     if (pmc->flags & PS_INTEGER_OK) {
         return d->intdata;
-    } else if (pmc->flags & PS_NUMBER_OK) {
+    } 
+    
+    if (pmc->flags & PS_NUMBER_OK) {
 	pmc->flags |= PS_INTEGER_OK;
 	return (d->intdata) = (INTVAL)(d->numdata);
-    } else if (pmc->flags & PS_STRING_OK) {
+    } 
+    
+    if (pmc->flags & PS_STRING_OK) {
 	pmc->flags |= PS_INTEGER_OK;
         printf("String atoi will go here when implemented\n");
         exit(1);
-    } else {
-	/* ENODATA! */
-        pmc->flags |= PS_INTEGER_OK;
-        return d->intdata = 0;
     }
+
+    /* ENODATA! */
+    pmc->flags |= PS_INTEGER_OK;
+    return d->intdata = 0;
 }
 
 static FLOATVAL Parrot_scalar_get_number (struct Parrot_Interp *interpreter, PMC* pmc) {
     struct PerlScalarData* d = pmc->data;
+
     if (pmc->flags & PS_NUMBER_OK) {
         return d->numdata;
-    } else if (pmc->flags & PS_INTEGER_OK) {
+    } 
+    
+    if (pmc->flags & PS_INTEGER_OK) {
         pmc->flags |= PS_NUMBER_OK;
         return d->numdata = (FLOATVAL)(d->intdata);
-    } else if (pmc->flags & PS_STRING_OK) {
+    } 
+    
+    if (pmc->flags & PS_STRING_OK) {
         printf("String aton will go here when implemented\n");
         exit(1);
     }
+
+    /* Else, we have no data. Fill both integer and number */
     pmc->flags |= PS_NUMBER_OK | PS_INTEGER_OK;
     d->intdata = 0;
     return d->numdata = 0.0;
@@ -105,36 +117,43 @@ static FLOATVAL Parrot_scalar_get_number (struct Parrot_Interp *interpreter, PMC
 
 static STRING* Parrot_scalar_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
     struct PerlScalarData* d = pmc->data;
+
     if (pmc->flags & PS_STRING_OK) {
-	    return d->stringdata;
-    } else if (pmc->flags & PS_NUMBER_OK) {
+        return d->stringdata;
+    } 
+    
+    if (pmc->flags & PS_NUMBER_OK) {
         char* buf = mem_allocate_aligned((INTVAL)log(d->numdata)+1);
         sprintf(buf, "%d", d->numdata); /* Hack */
 	    d->stringdata = string_make(interpreter, buf, strlen(buf), 0, 0, 0);
         free(buf);
         return d->stringdata;
-    } else if (pmc->flags & PS_INTEGER_OK) {
+    } 
+    
+    if (pmc->flags & PS_INTEGER_OK) {
         char* buf = mem_allocate_aligned((INTVAL)log(d->intdata)+1);
         sprintf(buf, "%i", d->intdata); /* Hack */
 	    d->stringdata = string_make(interpreter, buf, strlen(buf), 0, 0, 0);
         free(buf);
         return d->stringdata;
-    } else {
-        /* Empty? */
-        pmc->flags |= PS_STRING_OK | PS_NUMBER_OK | PS_INTEGER_OK;
-        d->intdata = d->numdata = 0;
-        return d->stringdata = string_make(interpreter, "", 0, 0, 0, 0);
     }
+
+    pmc->flags |= PS_STRING_OK | PS_NUMBER_OK | PS_INTEGER_OK;
+    d->intdata = d->numdata = 0;
+    return d->stringdata = string_make(interpreter, "", 0, 0, 0, 0);
 }
 
 static BOOLVAL Parrot_scalar_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
     struct PerlScalarData* d = pmc->data;
+
     if (pmc->flags & PS_NUMBER_OK) { 
         return (BOOLVAL)(d->numdata);
     }
+
     if (pmc->flags & PS_INTEGER_OK) {
         return (BOOLVAL)(d->intdata);
     }
+
     if (!pmc->flags & PS_STRING_OK) { return 0; }
     /* I don't know what happens here */
 }
@@ -145,14 +164,20 @@ static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pm
 
 static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc1, PMC* pmc2) {
     struct PerlScalarData* d = pmc->data;
+
     if (pmc1->flags & PS_NUMBER_OK) {
         return d->numdata == pmc2->vtable->get_number(interpreter, pmc2);
-    } else if (pmc1->flags & PS_INTEGER_OK) { 
+    } 
+    
+    if (pmc1->flags & PS_INTEGER_OK) { 
         return d->intdata == pmc2->vtable->get_integer(interpreter, pmc2);
-    } else if (pmc1->flags & PS_STRING_OK) {
+    } 
+    
+    if (pmc1->flags & PS_STRING_OK) {
 	/* Urgh */
 	/* return string_compare(pmc1->data->stringval, pmc2->vtable->get_string(pmc2) */
     } 
+
     /* pmc1 is false */
     return !pmc2->vtable->get_bool(interpreter, pmc2);
 }
