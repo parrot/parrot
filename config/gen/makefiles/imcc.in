@@ -1,22 +1,29 @@
 O = ${o}
+A = ${a}
+EXE = ${exe}
+PARROTLIB = ${blib_lib_libparrot_a}
+
 RM_F = ${rm_f}
 
 INC=../../include/parrot
 
 H_FILES = $(INC)/parrot.h imc.h imcparser.h stacks.h cfg.h \
-	instructions.h cfg.h debug.h sets.h anyop.h
+	instructions.h cfg.h debug.h sets.h symreg.h \
+	pbc.h optimizer.h
 
 
 IMCC_O_FILES = imcparser$(O) imclexer$(O) imc$(O) stacks$(O) symreg$(O) \
-	instructions$(O) cfg$(O) sets$(O) debug$(O) anyop$(O) \
+	instructions$(O) cfg$(O) sets$(O) debug$(O) \
+	optimizer$(O) pbc$(O)
+
 
 O_FILES = $(IMCC_O_FILES) \
-	../../platform$(O)
+	../../$(PARROTLIB)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
 #comment 'ADD C COMPILER FLAGS HERE'
-CFLAGS = ${ccflags} -I../../include
+CFLAGS = ${ccflags} -I../../include -Wall -Wno-unused
 
 C_LIBS = ${libs}
 
@@ -26,23 +33,28 @@ MAKE_F=${make}
 YACC = bison -v -y
 LEX = flex
 
-LINK = ${link}
-LINKFLAGS = ${linkflags}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
+LINK = ${link}
+LINKFLAGS=${linkflags}
 
 all : imcc
-	cd ../.. && $(MAKE) shared && $(RM_F) parrot${exe} && $(MAKE)
 
-imcparser.c imcparser.h : imcc.y
+../../$(PARROTLIB): ../../parrot$(EXE)
+	cd ../.. && $(MAKE) $(PARROTLIB)
+
+imcparser.c : imcc.y $(H_FILES)
 	$(YACC) -d -o imcparser.c imcc.y
 
-imclexer.c : imcc.l $(HEADERS)
+imcparser.h : imcc.y
+imclexer.c : imcc.l $(H_FILES)
 	$(LEX) imcc.l
 
 .c$(O):
 	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
+
+$(IMCC_O_FILES) : $(H_FILES)
 
 clean:
 	$(RM_F) core
