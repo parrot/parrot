@@ -63,7 +63,7 @@ static void
 p6ge_parse_error(P6GE_Text* t, const char* msg)
 {
    printf("%s at offset %d (found '%c')\n", msg, t->pos - t->text, *(t->pos));
-   t->pos = NULL;
+   t->pos = "";
 }
 
 
@@ -168,39 +168,40 @@ p6ge_parse_term(P6GE_Text* t)
     ctype = p6ge_ctype[c];
     if ((ctype & ctmeta) == 0
            || (c == '\\' && p6ge_cmeta[t->pos[1]] >= 0))
-       return p6ge_parse_literal(t);
+        return p6ge_parse_literal(t);
     if (c == '[') {
-       p6ge_skip(t,1);
-       group = --t->ncapture;
-       e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
-       e->group = group;
-       if (*(t->pos) != ']') p6ge_parse_error(t, "Missing ']'");
-       else p6ge_skip(t, 1);
-       return e;
+        p6ge_skip(t,1);
+        group = --t->ncapture;
+        e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
+        e->group = group;
+        if (*(t->pos) != ']') p6ge_parse_error(t, "Missing ']'");
+        else p6ge_skip(t, 1);
+        return e;
     }
     if (c == '(') {
-       p6ge_skip(t,1);
-       group = ++t->capture;
-       e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
-       e->group = group;
-       if (*(t->pos) != ')') p6ge_parse_error(t, "Missing ')'");
-       else p6ge_skip(t, 1);
-       return e;
+        p6ge_skip(t,1);
+        group = ++t->capture;
+        e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
+        e->group = group;
+        if (*(t->pos) != ')') p6ge_parse_error(t, "Missing ')'");
+        else p6ge_skip(t, 1);
+        return e;
     }
     if (c == '.') {
-       p6ge_skip(t, 1);
-       return p6ge_parse_new(P6GE_DOT, 0, 0);
+        p6ge_skip(t, 1);
+        return p6ge_parse_new(P6GE_DOT, 0, 0);
     }
     if (c == '^') {
-       type = P6GE_ANCHOR_BOS; p6ge_skip(t, 1);
-       if (*(t->pos) == '^') { type = P6GE_ANCHOR_BOL; p6ge_skip(t, 1); }
-       return p6ge_parse_new(type, 0, 0);
+        type = P6GE_ANCHOR_BOS; p6ge_skip(t, 1);
+        if (*(t->pos) == '^') { type = P6GE_ANCHOR_BOL; p6ge_skip(t, 1); }
+        return p6ge_parse_new(type, 0, 0);
     }
     if (c == '$') {
-       type = P6GE_ANCHOR_EOS; p6ge_skip(t, 1);
-       if (*(t->pos) == '$') { type = P6GE_ANCHOR_EOL; p6ge_skip(t, 1); }
-       return p6ge_parse_new(type, 0, 0);
+        type = P6GE_ANCHOR_EOS; p6ge_skip(t, 1);
+        if (*(t->pos) == '$') { type = P6GE_ANCHOR_EOL; p6ge_skip(t, 1); }
+        return p6ge_parse_new(type, 0, 0);
     }
+    if (c==0) return p6ge_parse_new(P6GE_NULL_PATTERN, 0, 0);
     p6ge_parse_error(t, "Unrecognized character");
     return 0;
 }
