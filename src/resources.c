@@ -133,8 +133,14 @@ mem_allocate(Interp *interpreter, size_t *req_size,
         interpreter->arena_base->mem_allocs_since_last_collect++;
     }
     if (pool->top_block->free < size) {
-#if PARROT_GC_MS
+        /*
+         * force a DOD run to get live flags set
+         * for incremental M&S collection is run from there
+         * TODO pass required allocation size to the DOD system,
+         *      so that collection can be skipped if needed
+         */
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+#if PARROT_GC_MS
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
             /* don't bother reclaiming if it's just chicken feed */
@@ -249,7 +255,6 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
         return;
     }
     ++arena_base->GC_block_level;
-    Parrot_block_GC(interpreter);
     if (interpreter->profile)
         profile_gc_start(interpreter);
 

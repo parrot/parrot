@@ -361,6 +361,16 @@ a sleep opcode.
  */
 #define REFILL_FACTOR         0.5
 
+/*
+ * we run the copying collector, if memory pool statistics indicate
+ * that this amount of the total size could be freed
+ *
+ * This factor also depends on the allocatio color of buffer headers,
+ * which is set to black now. So we are always one DOD cycle behind
+ * and the statistics are rather wrong.
+ */
+#define MEM_POOL_RECLAIM      0.2
+
 #if 0
 #  define IMS_DEBUG(x) fprintf x
 #else
@@ -615,7 +625,7 @@ parrot_gc_ims_sweep(Interp* interpreter)
      * have traced the current stack
      * except for a lazy run, which is invoked from the run loop
      */
-    /* no BARRIER yet - mark all roots */
+    /* TODO mark volatile roots */
     Parrot_dod_trace_root(interpreter, g_ims->lazy ? 0 : 1);
     /*
      * mark (again) rest of children
@@ -644,7 +654,7 @@ parrot_gc_ims_sweep(Interp* interpreter)
                 header_pool->num_free_objects;
         }
     }
-    g_ims->state = GC_IMS_FINISHED;     /* TODO collect */
+    g_ims->state = GC_IMS_COLLECT;
     g_ims->n_objects = n_objects;
     g_ims->n_extended_PMCs = arena_base->num_extended_PMCs;
 }
@@ -659,18 +669,58 @@ memory.
 =cut
 
 */
+#if GC_IS_MALLOC
+static void
+parrot_gc_ims_collect(Interp* interpreter)
+{
+}
+
+#else
 
 static void
 parrot_gc_ims_collect(Interp* interpreter)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;
+    struct Memory_Pool *mem_pool;
+    struct Memory_Block *block;
     Gc_ims_private *g_ims;
     int j;
 
     g_ims = arena_base->gc_private;
-    /* TODO */
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        header_pool = arena_base->sized_header_pools[j];
+        /*
+         * go through header pools check if there is an
+         * associate memory pool
+         */
+        if (header_pool && header_pool->mem_pool) {
+            mem_pool = header_pool->mem_pool;
+            /*
+             * and if the memory pool supports compaction
+             */
+            if (!mem_pool->compact)
+                continue;
+            /*
+             * several header pools can share one memory pool
+             * if that pool is already compacted, the following is zero
+             */
+            if (!mem_pool->guaranteed_reclaimable)
+                continue;
+            /*
+             * check used size
+             */
+            if ((mem_pool->possibly_reclaimable * mem_pool->reclaim_factor +
+                        mem_pool->guaranteed_reclaimable) >=
+                    mem_pool->total_allocated * MEM_POOL_RECLAIM) {
+                IMS_DEBUG((stderr, "COMPACT\n"));
+                mem_pool->compact(interpreter, mem_pool);
+            }
+        }
+    }
+    g_ims->state = GC_IMS_FINISHED;
 }
+#endif
 
 /*
 
@@ -717,7 +767,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             /* fall through */
         case GC_IMS_SWEEP:
             parrot_gc_ims_sweep(interpreter);
-            break;
+            /* fall through */
         case GC_IMS_COLLECT:
             parrot_gc_ims_collect(interpreter);
             break;
@@ -792,7 +842,20 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
     arena_base->dod_runs++;
     lazy = flags & DOD_lazy_FLAG;
     if (!lazy) {
-        parrot_gc_ims_run_increment(interpreter);
+        /* run a full cycle
+         * TODO if we are called from mem_allocate() in src/resources.c:
+         *   * pass needed size
+         *   * check first, if it could be reasonable to run a full
+         *     cycle
+         *   * test   examples/benchmarks/gc_header_new.pasm
+         */
+        if (g_ims->state >= GC_IMS_FINISHED)
+            g_ims->state = GC_IMS_STARTING;
+        while (1) {
+            parrot_gc_ims_run_increment(interpreter);
+            if (g_ims->state > GC_IMS_COLLECT)
+                break;
+        }
         return;
     }
     /*
