@@ -462,7 +462,6 @@ imcc_compile(Parrot_Interp interp, const char *s)
     /* XXX where to put constants */
     yyparse((void *) interp);
     imc_compile_all_units(interp);
-    emit_close(interp);
 
 #ifdef EVAL_TEST
     pc = (opcode_t *) interp->code->byte_code;

@@ -523,7 +523,6 @@ main(int argc, char * argv[])
         imc_compile_all_units(interpreter);
         imc_cleanup(interpreter);
 
-        emit_close(interpreter);
         fclose(yyin);
 
         info(interpreter, 1, "%ld lines compiled.\n", line);

@@ -58,8 +58,6 @@ imc_compile_all_units(Interp *interp)
 
     fprintf(stderr, "imc.c:  imc_compile_all_units()\n");
 #endif
-    UNUSED(ins_next);
-    UNUSED(ins);
     for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
 #if IMC_TRACE
@@ -70,6 +68,7 @@ imc_compile_all_units(Interp *interp)
         imc_close_unit(interp, unit);
     }
 
+    emit_close(interp);
     /* All done with compilation, now free instructions and other structures */
 
     for (unit = interp->imc_info->imc_units; unit;) {

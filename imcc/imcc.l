@@ -901,7 +901,6 @@ compile_file(Interp *interp, FILE *file)
     yyparse((void *) interp);
     imc_compile_all_units(interp);
     imc_cleanup(interp);
-    emit_close(interp);
 
     yy_switch_to_buffer(buffer);
 }
