@@ -25,6 +25,8 @@ typedef enum {
     PCD_ATTRIB_OFFS,    /* class => offset hash */
     PCD_ATTRIBUTES,      /* class::attrib => offset hash */
     PCD_CLASS_ATTRIBUTES, /* Class attribute array */
+    PCD_OBJECT_VTABLE,   /* Vtable PMC that holds the vtable for
+                            objects of this class */
     PCD_MAX
 } PARROT_CLASS_DATA_ENUM;
 
