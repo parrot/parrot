@@ -110,6 +110,7 @@ op err(out STR) {
 
 
 ########################################
+
 =item B<open>(out INT, in STR)
 
 Open file named $2 for reading and writing and save the file
@@ -3512,8 +3513,6 @@ inline op intdepth(out INT) {
   $1=intstack_depth(interpreter, interpreter->ctx.intstack);
   goto NEXT();
 }
-
-=back
 
 =cut
 
