@@ -68,7 +68,7 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {
-    size_t program_size;
+    off_t program_size;
     char *program_code;
     struct PackFile *pf;
     ParrotIO * io = NULL;

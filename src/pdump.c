@@ -22,7 +22,7 @@ main(int argc, char **argv)
     struct stat file_stat;
     int fd;
     opcode_t *packed;
-    size_t packed_size;
+    off_t packed_size;
     struct PackFile *pf;
     struct Parrot_Interp *interpreter;
 
