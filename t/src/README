@@ -1,2 +1,5 @@
-Don't put _ in the name of your test-script - it will be nuked by
-make testclean
+# Copyright: 2003-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+This directory contains test code in C.
+See also the documentation in ../../doc/tests.pod.
