@@ -81,6 +81,8 @@ static void** opcode_to_prederef(Interp* interpreter,
     return interpreter->prederef.code + offset_in_ops;
 }
 
+#define OP_AS_OFFS(o) ((char *)interpreter->ctx.bp + ((opcode_t*)cur_opcode)[o])
+
 END
 }
 
@@ -189,12 +191,12 @@ sub access_arg
     my %arg_maps = (
         'op' => "cur_opcode[%ld]",
 
-        'i'  => "(*(INTVAL *)cur_opcode[%ld])",
-        'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
-        'p'  => "(*(PMC **)cur_opcode[%ld])",
-        's'  => "(*(STRING **)cur_opcode[%ld])",
-        'k'  => "(*(PMC **)cur_opcode[%ld])",
-        'ki'  => "(*(INTVAL *)cur_opcode[%ld])",
+        'i'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
+        'n'  => "(*(FLOATVAL *)OP_AS_OFFS(%ld))",
+        'p'  => "(*(PMC **)OP_AS_OFFS(%ld))",
+        's'  => "(*(STRING **)OP_AS_OFFS(%ld))",
+        'k'  => "(*(PMC **)OP_AS_OFFS(%ld))",
+        'ki'  => "(*(INTVAL *)OP_AS_OFFS(%ld))",
 
         'ic' => "(*(INTVAL *)cur_opcode[%ld])",
         'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",

@@ -82,6 +82,8 @@ static void** opcode_to_prederef(Interp* interpreter,
     return interpreter->prederef.code + offset_in_ops;
 }
 
+#define OP_AS_OFFS(o) ((char *)interpreter->ctx.bp + cur_opcode[o])
+
 END
 }
 

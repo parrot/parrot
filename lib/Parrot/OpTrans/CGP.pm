@@ -82,6 +82,8 @@ opcode_to_prederef(Interp* interpreter,
         (opcode_addr - (opcode_t*) interpreter->code->byte_code);
 }
 
+#define OP_AS_OFFS(o) ((char *)interpreter->ctx.bp + ((opcode_t*)cur_opcode)[o])
+
 END
 }
 

@@ -84,26 +84,26 @@ prederef_args(void **pc_prederef, Interp *interpreter,
         case PARROT_ARG_I:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&REG_INT(arg);
+            pc_prederef[i] = (void *)REG_OFFS_INT(arg);
             break;
 
         case PARROT_ARG_N:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&REG_NUM(arg);
+            pc_prederef[i] = (void *)REG_OFFS_NUM(arg);
             break;
 
         case PARROT_ARG_K:
         case PARROT_ARG_P:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&REG_PMC(arg);
+            pc_prederef[i] = (void *)REG_OFFS_PMC(arg);
             break;
 
         case PARROT_ARG_S:
             if (arg < 0 || arg >= NUM_REGISTERS)
                 internal_exception(INTERP_ERROR, "Illegal register number");
-            pc_prederef[i] = (void *)&REG_STR(arg);
+            pc_prederef[i] = (void *)REG_OFFS_STR(arg);
             break;
 
         case PARROT_ARG_KIC:
@@ -117,15 +117,6 @@ prederef_args(void **pc_prederef, Interp *interpreter,
             pc_prederef[i] = (void *) &const_table->constants[arg]->u.number;
             break;
 
-        case PARROT_ARG_PC:
-            if (arg < 0 || arg >= const_table->const_count)
-                internal_exception(INTERP_ERROR, "Illegal constant number");
-/*        pc_prederef[i] = (void *)
-                 &const_table->constants[arg]->pmc; */
-            internal_exception(ARG_OP_NOT_HANDLED,
-                               "PMC constants not yet supported!\n");
-            break;
-
         case PARROT_ARG_SC:
             if (arg < 0 || arg >= const_table->const_count)
                 internal_exception(INTERP_ERROR, "Illegal constant number");
@@ -133,6 +124,7 @@ prederef_args(void **pc_prederef, Interp *interpreter,
                 &const_table->constants[arg]->u.string;
             break;
 
+        case PARROT_ARG_PC:
         case PARROT_ARG_KC:
             if (arg < 0 || arg >= const_table->const_count)
                 internal_exception(INTERP_ERROR, "Illegal constant number");
@@ -143,12 +135,6 @@ prederef_args(void **pc_prederef, Interp *interpreter,
             internal_exception(ARG_OP_NOT_HANDLED,
                                "Unhandled argtype %d\n",opinfo->types[i]);
             break;
-        }
-
-        if (pc_prederef[i] == 0) {
-            internal_exception(INTERP_ERROR,
-                    "Prederef generated a NULL pointer for arg of type %d!\n",
-                    opinfo->types[i]);
         }
     }
 }
