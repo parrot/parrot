@@ -139,7 +139,7 @@ SymReg * get_sym(const char * name) {
 
 /* Creates a new instruction */
 Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
-		             SymReg * r2, SymReg * r3)
+		             SymReg * r2, SymReg * r3, int flags)
 {
     static SymReg * nullreg;
     Instruction * i = calloc(1, sizeof(Instruction));
@@ -151,6 +151,7 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
     i->r1 = r1;
     i->r2 = r2;
     i->r3 = r3;
+    i->flags = flags;
 
     if(!i->r0) {i->r0 = nullreg;} else {i->r0->score++;}
     if(!i->r1) {i->r1 = nullreg;} else {i->r1->score++;}
@@ -214,6 +215,14 @@ void emit_flush() {
  *
  * This is a brute force register allocator. It uses a graph-coloring
  * algorithm, but the implementation is very kludgy.
+ *
+ * It is a partial implementation of a Briggs-style register allocator
+ * The following parts are just missing:
+ *
+ * - Renumbering
+ * - Coaelesceing
+ * - Proper evaluation of spill costs
+ *
  * The only restraint on the allocator is that locals will remain
  * live from their declaration until the _last_ local branch in
  * the routine. Without further analysis, it is not easy to tell
@@ -312,7 +321,7 @@ SymReg ** compute_graph() {
     	    for(; r; r = r->next) {
                 if(r->type == VTREG || r->type == VTIDENTIFIER) {
     		    fprintf(stderr, "#putting %s into graph\n", r->name); 
-    	            graph[count++] = r;	
+    	            graph[count++] = r;
                 }
 	    }
         }
@@ -382,7 +391,7 @@ int interferes(SymReg * r0, SymReg * r1) {
 /* 
  * Simplify deletes all the nodes from the interference graph
  * that have arity lower than MAX_COLOR 
- * 
+ *
  * Returns the node 1 if it has been able to delete at least
  * one node and 0 otherwise. 
  *
@@ -422,7 +431,7 @@ int simplify (SymReg **g){
  */
 
 void order_spilling (SymReg **g) {
-    int min_score;
+    int min_score, total_score;
     int min_node = -1;
     int x;
 	
@@ -434,12 +443,24 @@ void order_spilling (SymReg **g) {
 		
             /* for now, our score function only
 	       takes in account how many times a symbols
-	       has appeared. 
-	     */
+	       has appeared */
 		
-            if ( !(g[x]->simplified) && ( (min_node = -1) || (min_score > g[x]->score) ) ) {
-	        min_node  = x;
-	        min_score = g[x]->score;
+	     /* we have to combine somehow the rank of the node
+	      * with the cost of spilling it 
+	      *
+	      * our current function to maximize is: 
+	      *      rank - spill_cost 
+	      *      
+	      * I have no clue of how good it is
+ 	     */
+
+	    if (!(g[x]->simplified)) {
+	        total_score = g[x]->score - neighbours(x, g);
+		    
+                if ( (min_node = -1) || (min_score > total_score) )  {
+    	           min_node  = x;
+	           min_score = total_score;
+	        }
 	    }
         }
 
@@ -527,7 +548,7 @@ void spill (SymReg **g, int spilled) {
     Instruction ** new_instructions;
 
     Instruction * tmp;
-    int i, j, needs_spilling, after_spilled, n_spilled;
+    int i, j, needs_fetch, needs_store, needs_spilling, after_spilled, after_needs_store, n_spilled;
     SymReg *new_symbol, *old_symbol; 
     char buf[256];
 
@@ -541,58 +562,91 @@ void spill (SymReg **g, int spilled) {
 
     spill_counter++;
     after_spilled = 0;
+    after_needs_store = 0;
 
-    j = 0;    
+    j = 0;
     for(i = 0; i < ip; i++) {
 	tmp = instructions[i];
 
-	needs_spilling = 0;
+	needs_store = 0;
+	needs_fetch = 0;
 
 	if (tmp->r0 == old_symbol) {
-	    needs_spilling = 1;
+		if (tmp->flags & AFF_r0_read)
+			needs_fetch = 1;
+
+		if (tmp->flags & AFF_r0_write)
+			needs_store = 1;
+
 	    tmp->r0 = new_symbol;
 	}
 
+	if (needs_fetch)
+		fprintf(stderr, "flag is %d, op is %s", tmp->flags, tmp->fmt);	    
+		
+
 	if (tmp->r1 == old_symbol) {
-	    needs_spilling = 1;
+		if (tmp->flags & AFF_r1_read)
+			needs_fetch = 1;
+
+		if (tmp->flags & AFF_r1_write)
+			needs_store = 1;
+
 	    tmp->r1 = new_symbol;
 	}
-	
+
+
 	if (tmp->r2 == old_symbol) {
-	    needs_spilling = 1;
+		if (tmp->flags & AFF_r2_read)
+			needs_fetch = 1;
+
+		if (tmp->flags & AFF_r2_write)
+			needs_store = 1;
+
 	    tmp->r2 = new_symbol;
 	}
-	
+
+
 	if (tmp->r3 == old_symbol) {
-	    needs_spilling = 1;
+		if (tmp->flags & AFF_r3_read)
+			needs_fetch = 1;
+
+		if (tmp->flags & AFF_r3_write)
+			needs_store = 1;
+
 	    tmp->r3 = new_symbol;
 	}
 
-	if (needs_spilling && !after_spilled) {
-	    
+	needs_spilling = needs_fetch || needs_store;
+
+	if (needs_fetch && !after_spilled) {
+
 	    /* FETCH */
 	    
 	    sprintf(buf, "%d #FETCH", spill_counter);
 
 	    new_instructions[j++] = mk_instruction(
-			    str_cat("set %s, P31, ", buf), new_symbol, NULL, NULL, NULL);
+			    str_cat("set %s, P31, ", buf), new_symbol, NULL, NULL, NULL,
+			    AFF_r1_write
+	    );
 
 	}
 
-	if (!needs_spilling && after_spilled) {
+	if (!needs_spilling && after_needs_store) {
 
-            fprintf(stderr, "#STORE");
-	    
 	    sprintf(buf, "set P31, %d,", spill_counter);
 
 	    new_instructions[j++] = mk_instruction(
-			    str_cat(buf, "%s # STORE "), new_symbol, NULL, NULL, NULL);
+			    str_cat(buf, "%s # STORE "), new_symbol, NULL, NULL, NULL,
+			    AFF_r1_write
+	    );
 
             sprintf(buf, "%s_%d", old_symbol->name, n_spilled++);
             new_symbol =  mk_symreg(buf, old_symbol->set);
 	}
 		
 	new_instructions[j++] = tmp;
+	after_needs_store = needs_store;
 	after_spilled = needs_spilling;
     }
 

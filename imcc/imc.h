@@ -55,8 +55,27 @@ typedef struct _Instruction {
     SymReg * r1;           /*   each instruction can use up to 4 registers */
     SymReg * r2;
     SymReg * r3;
+    int flags;             /* how the instruction affects each of the values */    
     int type;
 } Instruction;
+
+
+typedef enum {
+    /* Indicate how the instruction affects each of the register */
+    AFF_r0_read  = 1 << 0, 
+    AFF_r1_read  = 1 << 1,
+    AFF_r2_read  = 1 << 2,
+    AFF_r3_read  = 1 << 3,
+    AFF_r0_write = 1 << 4,
+    AFF_r1_write = 1 << 5,
+    AFF_r2_write = 1 << 6,
+    AFF_r3_write = 1 << 7,
+    AFF_binary  = (1 << 4) | (1 << 1) | (1 << 2), /* template for typical binary op */
+    AFF_unary   = (1 << 4) | (1 << 1),           /* template for typical unary  op */
+    AFF_inplace = (1 << 0) | (1 << 4)            /* template for inplace unary  op */
+	    
+} Instruction_Flags;
+
 
 Instruction * emitb(Instruction *);
 Instruction * emit(Instruction *);
@@ -66,7 +85,7 @@ SymReg * mk_symreg(const char *, char t);
 SymReg * mk_ident(const char *, char t);
 SymReg * mk_const(const char *, char t);
 SymReg * mk_address(const char *);
-Instruction * mk_instruction(const char *, SymReg *, SymReg *, SymReg *, SymReg *);
+Instruction * mk_instruction(const char *, SymReg *, SymReg *, SymReg *, SymReg *, int);
 void store_symreg(SymReg * r);
 SymReg * get_sym(const char * name);
 void relop_to_op(int, char *);
