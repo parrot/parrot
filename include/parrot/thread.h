@@ -68,7 +68,8 @@ typedef enum {
     THREAD_STATE_JOINABLE,              /* default */
     THREAD_STATE_DETACHED = 0x01,       /* i.e. non-joinable */
     THREAD_STATE_JOINED   = 0x02,       /* JOIN was issued */
-    THREAD_STATE_FINISHED = 0x04        /* the thread function has ended */
+    THREAD_STATE_FINISHED = 0x04,        /* the thread function has ended */
+    THREAD_STATE_NOT_STARTED = 0x08      /* the thread wasn't started */
 } thread_state_enum;
 
 /*

@@ -573,6 +573,7 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
         if (interpreter_array[i] == NULL) {
             interpreter_array[i] = new_interp;
             new_interp->thread_data->tid = i;
+            new_interp->thread_data->state = THREAD_STATE_NOT_STARTED;
             return;
         }
     }
@@ -583,6 +584,7 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
             (n_interpreters + 1) * sizeof(Parrot_Interp));
     interpreter_array[n_interpreters] = new_interp;
     new_interp->thread_data->tid = n_interpreters;
+    new_interp->thread_data->state = THREAD_STATE_NOT_STARTED;
     ++n_interpreters;
 }
 
