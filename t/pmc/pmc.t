@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 80;
+use Parrot::Test tests => 82;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1404,6 +1404,27 @@ CODE
 1000
 OUTPUT
 
+output_is(<<"CODE", <<OUTPUT, "inc, PerlNum");
+@{[ $fp_equality_macro ]}
+     new P3, .PerlNum
+
+     set P3, -0.999
+     inc P3
+     .fp_eq(P3, 0.001, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     inc P3
+     .fp_eq(P3, 1.001, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
 output_is(<<'CODE', <<OUTPUT, "dec, PerlInt");
     new P3, .PerlInt
     set P3, 0
@@ -1421,6 +1442,27 @@ LP: dec P3
 CODE
 -1
 -2000
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "dec, PerlNum");
+@{[ $fp_equality_macro ]}
+     new P3, .PerlNum
+
+     set P3, 1.001
+     dec P3
+     .fp_eq(P3, 0.001, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     dec P3
+     .fp_eq(P3, -0.999, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "assign integer");
