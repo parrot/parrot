@@ -191,7 +191,7 @@ blib :
 blib/lib : blib
 	-mkdir blib${slash}lib
 
-shared : blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a} $(TEST_PROG_SO)
+shared : $(GEN_HEADERS) blib/lib blib/lib/libparrot$(SO) ${blib_lib_libparrot_a}
 
 # XXX Unix-only for now
 blib/lib/libparrot$(A) : blib/lib $(O_DIRS) $(O_FILES)
