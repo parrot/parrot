@@ -2,7 +2,7 @@ If you submit a language compiler please write a one-liner below
 indicating roughly the state of your language. Does it have
 samples, do they work? Is there a README and an easy way
 to build it? The fields are: (N) Language name, (A) authors/maintainers, (D)
-description, (S) status, (M) maintained, (V) last compatible Parrot version.
+description, (S) status, (M) maintained, (V) minimum Parrot version required.
 
 
 N: BASIC
@@ -21,16 +21,20 @@ M: Yes
 V: 0.0.11
 
 N: bf
+A: Leon Brocard
 
 N: Cola
 A: Melvin Smith
 D: Java like language with some hybrid Perl features like regex
 D: operators planned.
 S: Functioning, all samples working, lacks IO routines
-M: Yes 
+M: Yes
 V: 0.0.11
 
 N: forth
+A: Dan Sugalski
+M: yes
+V: 0.0.13
 
 N: IMCC
 A: Melvin Smith
@@ -39,7 +43,7 @@ A: Leopold Toetsch
 D: The PIR and PASM compiler for Parrot
 S: Functioning, all samples working
 M: Yes (integral to Parrot)
-V: 0.0.11
+V: 0.0.13
 
 N: Jako
 A: Gregor Purdy
@@ -47,7 +51,7 @@ D: C/Perl like language, first compiler for Parrot
 S: Functioning, although not all examples work. Calling conventions and NCI
 S: have changed since the Jako subroutine and NCI code
 S: generation was written, causing some breakage.
-M: Yes 
+M: Yes
 V: 0.0.11
 
 N: m4
@@ -65,7 +69,7 @@ N: Ook
 A: Jerome Quelin
 D: Functioning compiler targeting pasm.
 S: Samples working, README explain how to build/use.
-M: Yes 
+M: Yes
 V: 0.0.11
 
 N: OpenComal
@@ -80,7 +84,7 @@ N: Perl6
 A: Sean O'Rourke
 D: Perl6 compiler written in Perl5
 S: Largely functional, but changing rapidly
-M: Yes 
+M: Yes
 V: 0.0.11
 
 N: plot
@@ -92,7 +96,7 @@ V: 0.0.11
 
 N: Python
 A: Michal J Wallace
-S: Mostly working except for classes/exec/import. For licensing 
+S: Mostly working except for classes/exec/import. For licensing
 S: reasons, not in parrot's cvs tree.
 M: Yes
 W: http://pirate.tangentcode.com/

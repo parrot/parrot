@@ -14,26 +14,35 @@
 
 ----------
 
+N: Adam Thomason
+D: Building on various platforms.
+
 N: Aldo Calpini
 
 N: Andy Dougherty
+D: Config and building.
 
 N: Alex Gough
 
 N: Angel Faus
+D: CFG and live analysis.
 
 N: Ask Bjoern Hansen
+
+N: Arthur Bergman
+D: Trying to ride a Ponie - build and compat fixes.
+
+N: Benjamin Goldberg
+D: Numerous improvements and proposals.
+
+N: Bernhard Schmalhofer
+D: Bugfixes
 
 N: Brent Dax
 D: Configure, Parrot_sprintf, embedding, early regex engine.
 D: Youngest Parrot hacker to hold a pumpkin (Configure).
 E: brent@brentdax.com
 W: http://www.brentdax.com/
-
-N: Dan Sugalski
-D: The big cheese
-E: dan@sidhe.org
-W: http://www.sidhe.org/~dan/blog/
 
 N: Brian Wheeler
 
@@ -43,9 +52,16 @@ N: Bryan C. Warnock
 
 N: Chip Salzenberg
 
-N: Clinton A. Piercec
+N: Clinton A. Pierce
+D: Many PIR tests and fixes
+
+N: Dan Sugalski
+D: The big cheese
+E: dan@sidhe.org
+W: http://www.sidhe.org/~dan/blog/
 
 N: Daniel Grunblatt
+D: JIT and EXEC subsystems
 
 N: David M. Loyd
 
@@ -57,7 +73,12 @@ D: The human version of indent.
 E: gregor@focusresearch.com
 S: Seattle, WA
 
+N: H.Merijn Brand
+D: HP-UX fixes and smoke tests
+
 N: Jason Gloudon
+
+N: Jeff Clites
 
 N: Jeff Goff
 
@@ -67,14 +88,31 @@ E: jquelin@cpan.org
 S: Lyon, France
 
 N: Jonathan Sillito
+D: Lexical pads, CPS.
 
 N: Jonathan Stowe
+
+N: Jonathan Worthington
+D: Win32 building
+
+N: Jos Visser
+D: fortytwo opcode
+
+N: Joseph Ryan
+D: PIR tests and fixes
 
 N: Josh Wilmes
 
 N: Juergen Boemmels
+D: Parrot I/O; macro stuff in assembler.
+
+N: Kenneth A Graves
+D: yield and other PIR improvements
 
 N: Kevin Falcone
+
+N: Lars Balker Rasmussen
+D: FreeBSD and other build fixes
 
 N: Leon Brocard
 
@@ -84,8 +122,13 @@ E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
 
 N: Luke Palmer
+D: Many fixes
+
+N: Marcus Thiesen
+D: URM language, bugfixes
 
 N: Mattia Barbon
+D: Win32 fixes
 
 N: Melvin Smith
 D: Parrot core, various ops, IO, subs, continuations, COW stacks
@@ -98,14 +141,23 @@ N: Michael G. Schwern
 
 N: Michael Scott
 D: Getting Started Guide for Parrot
+D: Mac OS X build fixes
 E: michael_scott@mac.com
 W: http://xrl.us/sml
+
+N: Michal J Wallace
+D: Pie-thon hammering PIR
 
 N: Mike Lambert
 
 N: Nicholas Clark
+D: Building and platform compat and more.
+
+N: Nick Kostirya
+D: Win32, FreeBSD build fixes
 
 N: Peter Gibbs
+D: String subsystem
 
 N: Piers Cawley
 D: The Second Perl 6 Summarizer after Bryan C. Warnock
@@ -115,18 +167,25 @@ W: http://www.bofh.org.uk:8080/
 N: Ritz Daniel
 
 N: Robert Spier
+D: Keeps us running
 
 N: Sean O'Rourke
 D: Original Perl6 compiler
 
-N: Steve Fink
+N: Simon Cozens
 
 N: Simon Glover
 D: Tests, docs and misc. bugfixes
 E: scog@amnh.org
 S: New York, NY
 
-N: Simon Cozens
+N: Stephane Payrard
+
+N: Steve Clark
+D: Bugfixes
+
+N: Steve Fink
+D: Pumpking up to 0.0.11
 
 N: Tom Hughes
 
@@ -134,6 +193,7 @@ N: Will Coleda
 
 N: Uri Guttman
 
+N: Vladimir Lipsky
+D: Win32, IO fixes
+
 N: Zach Lipton
-
-

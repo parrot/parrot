@@ -1,4 +1,4 @@
-This is Parrot, version 0.0.11
+This is Parrot, version 0.0.13
 ------------------------------
 
 Parrot is Copyright (C) 2001-2003 The Perl Foundation. All Rights Reserved.
@@ -55,10 +55,20 @@ probably already done that) and type
 
     perl Configure.pl
 
-to run the Configure script.  This will generate a config.h header, a
-Parrot::Config module, and a Makefile.  Next type
+to run the Configure script. The Configure.pl script extracts configuration
+from the running perl5 program. If you have a non-standard setup (like "long
+long" integers on a 32-bit system), you might consider to run:
 
-    make 
+    perl Configure.pl --intval=int --opcode=int
+
+See "perl Configure.pl --help" for more options.
+
+This will generate a config.h header, a Parrot::Config module, and a Makefile.
+The file "myconfig" has an overview of configure settings.
+
+Next type
+
+    make
 
 and the interpreter should build.
 

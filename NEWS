@@ -1,3 +1,28 @@
+New in 0.0.13
+ - The Big Move: Parrot source and build files rearranged into sub dirs
+ - Build imcc as parrot
+ - Objects more finished
+ - Delegate vtable methods to byte code
+ - Binary multi-method dispatching
+ - Isa and does methods for PMCs
+ - Call byte code from C
+ - Start of extension interface
+ - Experimental struct handling
+ - Catch access to NULL PMCs
+ - Experimental network socket interface code and opcodes
+ - IO fixes and improvements
+ - Dynamic opcode libraries
+ - Fix-assigned opcode numbers
+ - Argument flattening for function calls
+ - More native call interface (NCI) signatures
+ - Ncurses, postgres, and pcre interface libraries
+ - Forth language is vastly improved
+ - BSD and Win32 build improvements
+ - Many new tests and fixes
+
+New in 0.0.12
+ - This number intentionally left blank
+
 New in 0.0.11
  - Executable output
  - Dynamic PMC registration

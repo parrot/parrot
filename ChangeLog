@@ -1,3 +1,26 @@
+2003-10-31    leo
+        * Released 0.0.13
+	* Yep thirteen - haunted by the ghost of 0.0.12
+	* Build imcc as parrot
+	* Objects more finished
+	* Delegate vtable methods to byte code
+	* Binary multi-method dispatching
+	* Isa and does methods for PMCs
+	* Call byte code from C
+	* Start of extension interface
+	* Experimental struct handling
+	* Catch access to NULL PMCs
+	* Experimental network socket interface code and opcodes
+	* IO fixes and improvements
+	* Dynamic opcode libraries
+	* Fix-assigned opcode numbers
+	* Argument flattening for function calls
+	* More native call interface (NCI) signatures
+	* Ncurses, postgres, and pcre interface libraries
+	* Forth language is vastly improved
+	* BSD and Win32 build improvements
+	* Many new tests and fixes
+
 2003-10-22    melvin
         * imcc moved from parrot/languages/ to parrot/
 
@@ -47,13 +70,13 @@
 	  care about the top half of the registers anyway.
 	* Started committing some of the new class/object framework
 	* Remembered to finally start updating the Changelog
-	
+
 2003-03-18 03:50  ask
 
 	* Various files
 	  Update Yet Another copyright statements to reflect the (no longer
           so) shiny new year.
-	
+
 2003-03-11 22:06  chip
 
 	* Configure.pl: print help on non-option command line args
@@ -99,24 +122,24 @@
 	* IMCC: many, many improvements. See imcc/ChangeLog
 	* Perl6: index map grep join reverse defined
 	* Scheme with functions!
-	
+
 
 2002-03-19 22:54  nicholas
 
 	* docs/running.pod: Patch from Simon Glover <scog@amnh.org>:
-	
+
 	 We can now get usage information for test_parrot without having to
 	 grep the source.
 
 2002-03-19 22:53  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Parrot is called parrot.
 
 2002-03-19 22:53  nicholas
 
 	* docs/tests.pod: Patch from Simon Glover <scog@amnh.org>:
-	
+
 	 1. There are tests in t/pmc as well as t/op now.
 	 2. Adds a comment about Parrot::Test
 
@@ -124,7 +147,7 @@
 
 	* Configure.pl, examples/assembly/life.pasm: Toss a prompt that
 	messes up automated builds
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-03-19 00:33  mrjoltcola
@@ -146,7 +169,7 @@
 2002-03-18 20:15  dan
 
 	* resources.c: D'oh! Thinko, fixed.
-	
+
 	Courtesy of "Peter Gibbs" <peter@emkel.co.za>
 
 2002-03-18 17:33  josh
@@ -174,7 +197,7 @@
 
 2002-03-18 15:35  simon
 
-	* packfile.c: 
+	* packfile.c:
 	Fix format arg bug.
 
 2002-03-18 07:45  brentdax
@@ -192,7 +215,7 @@
 	lib/Regex/Rewrite.pm, lib/Regex/CodeGen/Re.pm,
 	lib/Regex/CodeGen/Rx.pm, lib/Regex/Rewrite/Re.pm,
 	lib/Regex/Rewrite/Rx.pm, lib/Regex/Rewrite/Stackless.pm,
-	t/example.t: Buggy 1st version of regex compiler implementation. 
+	t/example.t: Buggy 1st version of regex compiler implementation.
 	Warning: the test code depends on features of the assembler that do
 	not yet exist.
 
@@ -201,16 +224,16 @@
 	* types/: bignum.c, bignum_atest.pl: Added a couple of quick routes
 	through addition and subtraction.  Also added the ability to run
 	all the tests, including the ones which deal with overflow and
-	underflow.  These fail, but that's expected.  Soon they'll pass. 
+	underflow.  These fail, but that's expected.  Soon they'll pass.
 	Then I'll show them.  Yesssssss.  Tessssssssts my precioussssss,
 	passsssssssings tesssstsssss.
 
 2002-03-17 20:06  ajgough
 
 	* types/: bignum.c, bignum.h, bignum_test.pl: Modified
-	check_(under|over)flow to test bignumbers, rather than values. 
+	check_(under|over)flow to test bignumbers, rather than values.
 	context now carries E_limit, from which max and min exp are found.
-	
+
 	Added a default-context-creating function (although this isn't the
 	same as either of the default contexts defined in the eda).
 
@@ -233,7 +256,7 @@
 
 	* classes/default.pmc: Patch from Simon Glover <scog@amnh.org> to
 	remove warnings:
-	
+
 	 default.pmc: In function `Parrot_default_get_integer_keyed':
 	 default.pmc:50: warning: control reaches end of non-void function
 	 default.pmc: In function `Parrot_default_get_number_keyed':
@@ -305,9 +328,9 @@
 	/usr/local/bin/perl (which is 5.004_05) and not realising their
 	mistake until the pmc subdirectory, where the first qr// is
 	encountered.
-	
+
 	Syntax error messages don't tell you what you did wrong. This does:
-	
+
 	/usr/local/bin/perl Configure.pl Perl 5.00503 required--this is
 	only version 5.00405, stopped at Configure.pl line 10.
 
@@ -318,17 +341,17 @@
 
 2002-03-16 11:45  simon
 
-	* MANIFEST, examples/assembly/xml_parser.pasm: 
+	* MANIFEST, examples/assembly/xml_parser.pasm:
 	Added Clint Pierce's XML parser.
 
 2002-03-15 22:24  simon
 
-	* packout.c: 
+	* packout.c:
 	Don't need that function.
 
 2002-03-15 21:56  simon
 
-	* Makefile.in, include/parrot/packfile.h: 
+	* Makefile.in, include/parrot/packfile.h:
 	Rebuild packout.o, since it'll be used for the Packfile XS module
 
 2002-03-15 19:45  dan
@@ -356,23 +379,23 @@
 
 2002-03-13 23:43  simon
 
-	* packfile.c: 
+	* packfile.c:
 	Oops.
 
 2002-03-13 23:43  simon
 
-	* packfile.c: 
+	* packfile.c:
 	Hangs head in shame.
 
 2002-03-13 21:31  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	FAQ moved.
 
 2002-03-13 18:06  simon
 
-	* string.c: 
-	
+	* string.c:
+
 	Fix string_compare screw-up.
 
 2002-03-13 18:02  brentdax
@@ -402,8 +425,8 @@
 
 2002-03-12 11:35  simon
 
-	* MANIFEST, packdump.c, packout.c: 
-	
+	* MANIFEST, packdump.c, packout.c:
+
 	Just so the functionality doesn't disappear.
 
 2002-03-12 11:33  simon
@@ -412,20 +435,20 @@
 	chartypes/unicode.c, chartypes/usascii.c, encodings/singlebyte.c,
 	encodings/utf16.c, encodings/utf32.c, encodings/utf8.c,
 	include/parrot/chartype.h, include/parrot/encoding.h,
-	include/parrot/packfile.h: 
-	
+	include/parrot/packfile.h:
+
 	Packfile axing.
 
 2002-03-11 23:06  nicholas
 
 	* core.ops: Patch from Simon Glover <scog@roe.ac.uk>:
-	
+
 	  Core.ops documentation nits
 
 2002-03-11 23:05  nicholas
 
 	* t/pmc/pmc.t: Patch from Simon Glover <scog@roe.ac.uk>:
-	
+
 	  Most of the PerlUndef tests in pmc.t appear to have been added
 	twice.
 	  Enclosed patch removes the duplicates.
@@ -433,19 +456,19 @@
 2002-03-10 23:40  nicholas
 
 	* t/pmc/perlstring.t: Patch from Simon Glover <scog@amnh.org>:
-	
+
 	 More tests for the PerlString test-suite.
 
 2002-03-10 23:40  nicholas
 
 	* t/op/time.t: Patch from Simon Glover <scog@amnh.org>:
-	
+
 	test for sleep with negative argument
 
 2002-03-10 21:58  nicholas
 
 	* t/op/rx.t: Patch from Simon Glover <scog@amnh.org>:
-	
+
 	 Enclosed patch fixes up a few more holes in our test coverage.
 
 2002-03-10 21:18  mrjoltcola
@@ -465,7 +488,7 @@
 	* lib/Parrot/Assembler.pm: Minor patch to the assembler for the
 	new_p_ic_ic opcode to work same as new_p_ic (looks up a named
 	class).
-	
+
 	Also added small hack for .sub directive (which simply translates
 	to a label, however we might eventually want to collect these to
 	validate bsr calls.
@@ -480,7 +503,7 @@
 	* types/: bignum.c, bignum_atest.pl: Added extended stuff to
 	divide, divide integer and remainder.  All filled in functions now
 	have special values capability.
-	
+
 	Much remains to be done though, and the pdd needs to catch up.
 
 2002-03-10 01:36  ajgough
@@ -491,7 +514,7 @@
 
 	* t/op/: integer.t, number.t: Patch from Simon Glover
 	<scog@roe.ac.uk>:
-	
+
 	 The enclosed patch fixes a few of the holes in our test coverage
 	 uncovered by Josh Wilmes
 
@@ -583,7 +606,7 @@
 
 	* MANIFEST, docs/pdds/pdd10_embedding.pod,
 	docs/pdds/pdd11_extending.pod, docs/pdds/pdd12_assembly.pod,
-	docs/pdds/pdd13_bytecode.pod: 
+	docs/pdds/pdd13_bytecode.pod:
 	Placeholder PDDs.
 
 2002-03-08 21:12  ajgough
@@ -593,7 +616,7 @@
 
 2002-03-08 19:53  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Great PDD Renaming
 
 2002-03-08 19:41  robert
@@ -603,7 +626,7 @@
 
 2002-03-08 18:51  simon
 
-	* MANIFEST, docs/pdds/pdd08_keys.pod: 
+	* MANIFEST, docs/pdds/pdd08_keys.pod:
 	Add keys PDD.
 
 2002-03-08 18:20  ajgough
@@ -643,9 +666,9 @@
 
 2002-03-08 03:22  josh
 
-	* packfile.c: -1552 cc: WARNING File = packfile.c, Line = 1537	
+	* packfile.c: -1552 cc: WARNING File = packfile.c, Line = 1537
 	The variable "type" is set but never used.
-	
+
 	      opcode_t type;
 
 2002-03-08 03:04  josh
@@ -659,8 +682,8 @@
 	* misc.c: Fixes this warning (SGI) cc-1188 cc: WARNING File =
 	misc.c, Line = 417   The indicated type qualifier is meaningless on
 	cast type.
-	
-								       
+
+
 	(const char) 'f');
 									 ^
 
@@ -676,22 +699,22 @@
 
 2002-03-06 22:15  simon
 
-	* stacks.c: 
+	* stacks.c:
 	Tidy up stack chunk allocation.
 
 2002-03-06 21:00  simon
 
-	* interpreter.c: 
+	* interpreter.c:
 	Create strings only once we've got string register heads set up.
 
 2002-03-06 20:31  simon
 
-	* classes/perlarray.pmc: 
+	* classes/perlarray.pmc:
 	malloc(0) considered harmful.
 
 2002-03-06 20:24  simon
 
-	* include/parrot/resources.h: 
+	* include/parrot/resources.h:
 	I like it when Parrot compiles.
 
 2002-03-06 17:02  dan
@@ -725,7 +748,7 @@
 	IIRC, int is usually the natural word size, and will be most
 	efficient.  Thoughts? 7) I forgot what the fourth thing I thought
 	of was while writing down the others.  Sorry.
-	
+
 	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-03-06 15:26  dan
@@ -754,7 +777,7 @@
 
 2002-03-05 17:57  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Now, through much evilness, make distclean and make cvsclean work
 	again.
 
@@ -766,7 +789,7 @@
 
 2002-03-05 16:28  gregor
 
-	* languages/jako/Makefile.in: 
+	* languages/jako/Makefile.in:
 	Changed -I ../../ to -I ../../lib when calling the assembler, since
 	the perl modules have moved.
 
@@ -799,7 +822,7 @@
 2002-03-04 18:21  josh
 
 	* include/parrot/trace.h: Fix a typo in the argument type.
-	
+
 	Patch from <daniel.ritz@gmx.ch>
 
 2002-03-04 03:39  josh
@@ -851,7 +874,7 @@
 	* check_source_standards.pl, interpreter.c, jit.c, test_gnuc.c,
 	include/parrot/io.h, include/parrot/parrot.h, io/io_win32.c: Fixes
 	c preprocessor directive indentation to comply with pdd 7.
-	
+
 	(also fixes the check for this indentation in
 	check_source_standards.pl)
 
@@ -859,7 +882,7 @@
 
 	* lib/Parrot/Test.pm: Fixes this error seen on perl 5.005_02 on
 	irix.
-	
+
 	perl t/harness t/op/basic..........Use of uninitialized value at
 	lib/Parrot/Test.pm line 81.  #	   Failed test (t/op/basic.t at
 	line 6) #	   got: undef #     expected: ''
@@ -870,27 +893,27 @@
 	docs/pdds/pdd7.pod: Added documentation and code to invoke the GNU
 	"indent" program to enforce some of the code style standards
 	outlined in PDD 7.
-	
+
 	Usage: ./run_indent.pl <file>
 
 2002-03-03 19:04  simon
 
-	* examples/mops/mops.c: 
+	* examples/mops/mops.c:
 	Let's make it compile, huh?
 
 2002-03-03 19:04  simon
 
-	* examples/mops/mops.cs: 
+	* examples/mops/mops.cs:
 	I R AN IDIOT
 
 2002-03-03 18:11  simon
 
-	* examples/mops/mops.cs, examples/mops/mops.il, MANIFEST: 
+	* examples/mops/mops.cs, examples/mops/mops.il, MANIFEST:
 	Added C# and MS-IL versions of mops tester.
 
 2002-03-03 14:52  simon
 
-	* core.ops: 
+	* core.ops:
 	Add a sub() op to make mops_p work.
 
 2002-03-02 18:12  nicholas
@@ -916,18 +939,18 @@
 
 2002-03-01 06:15  dan
 
-	* string.c: 
+	* string.c:
 	A non-existing buffer + a non-existing buffer should be a
 	non-existing buffer, not "", which is really '\0'.
-	
+
 	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-03-01 06:02  dan
 
 	* classes/: array.pmc, perlarray.pmc, perlhash.pmc, perlstring.pmc:
-	
+
 	TMTOWTDI, but strcmp is probably the worse.
-	
+
 	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-03-01 02:32  brentdax
@@ -950,34 +973,34 @@
 	examples/assembly/life.pasm, include/parrot/interpreter.h,
 	include/parrot/resources.h: Add some stat gathering to the resource
 	allocation code.
-	
+
 	Also add an interpreter info retrieval op, and teach it about the
 	different things it can retrieve.
-	
+
 	Finally, add some stat info to life.pasm as an example
 
 2002-02-28 21:27  dan
 
 	* editor/pasm.vim: VIM mode commands for parrot assembly files
-	
+
 	Courtesy of Scott Beck <scott@gossamer-threads.com>
 
 2002-02-28 19:20  dan
 
 	* examples/assembly/life.pasm: Fix a creeping string length leak.
-	
+
 	Courtesy of  "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-02-28 18:26  dan
 
 	* string.c: When you clone a constant, it ain't constant no mo'.
-	
+
 	Cocurtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-02-28 00:51  dan
 
 	* MANIFEST: Add missing files
-	
+
 	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@capita.com>
 
 2002-02-28 00:49  dan
@@ -989,14 +1012,14 @@
 	will be a forthcoming patch for some minor tweaking to the PDD, but
 	I wanted a common baseline before I make any (potential) semantic
 	changes.
-	
+
 	There's only one semi-major change, which noone needs to worry
 	about just yet.  That's a change from PDD Format 1 to PDD Format
 	6.0 - rationale can be found under 'Standard (Version #)' of the
 	STANDARDS TRACK infomation.  Don't worry about this yet, because it
 	should be 6.0.0, and we need to discuss Perl versus Parrot with
 	PDDs.
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-02-28 00:27  dan
@@ -1005,20 +1028,20 @@
 	include/parrot/register.h, include/parrot/resources.h,
 	include/parrot/string.h: First pass of semi-full GC. (Strings only,
 	no PMCs yet)
-	
+
 	This patch now implements a real copying collector. We trace from
 	our root set and compact the contents of Buffer structs.
-	
+
 	Todo:
-	
+
 	*) It's very STRING-centric and doesn't handle memory stuffed in
 	Buffers.  But, then, we don't have pool allocation for Buffers
 	either, and we need to have that soonish for this to work.
-	
+
 	*) Doesn't trace PMCs, so if you trigger a collection and there's
 	memory or STRING structs only accessible from PMCs, you'll fail
 	horribly. That needs fixing too
-	
+
 	*) Better algorithms for when to trace or collect vs when to just
 	go allocate more memory from the system. Should probably be more
 	cache friendly too.
@@ -1033,13 +1056,13 @@
 2002-02-26 16:41  dan
 
 	* jit/i386/string.jit: Fix a typo
-	
+
 	Courtesy of Jonathan Stowe <gellyfish@gellyfish.com>
 
 2002-02-26 16:37  dan
 
 	* interpreter.c: Fix solaris test failures
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-26 16:36  dan
@@ -1050,14 +1073,14 @@
 	precedence   -removed ; at end * removed SSIZE_MAX, since ssize_t
 	is no longer used * added some more INLINE definitions for MSVC and
 	C99 compilers
-	
+
 	Courtesy of Brian Lee Ray <blray@ualr.edu>
 
 2002-02-26 16:20  dan
 
 	* Configure.pl: Turns out we were using a warning flag which
 	doesn't exist on 2.7.  Simple tweak though:
-	
+
 	Courtesy of  Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-25 22:58  dan
@@ -1088,7 +1111,7 @@
 	* types/bignum.c: BN_multiply split into BN_multiply and
 	BN_imultiply, the internal version to be used by idivide so that
 	rounding isn't performed during intermediate stages of division.
-	
+
 	following test scripts now all pass: divide divideint add multiply
 	subtract remainder compare rounding plus minus (these are all the
 	operations currently implemented, rescale and power must still be
@@ -1097,7 +1120,7 @@
 2002-02-22 13:13  ajgough
 
 	* types/bignum_atest.pl: Test harness modified to understand
-	comments better, and be able to run unary (and rounding) tests. 
+	comments better, and be able to run unary (and rounding) tests.
 	Currently a few rounding tests fail, which are being investigated.
 
 2002-02-22 01:41  dan
@@ -1105,7 +1128,7 @@
 	* key.c: Although there's more work being done on the key stuff and
 	this isn't the final fix, applying this patch does get parrot to
 	build with two more compilers, so it's probably worthwhile.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-22 00:53  dan
@@ -1117,14 +1140,14 @@
 	include/parrot/string.h, include/parrot/unicode.h,
 	include/parrot/warnings.h, io/io_stdio.c, io/io_unix.c,
 	io/io_win32.c: Fixes the following (lcc) warnings:
-	
+
 	  - interpreter.c:470: warning: expression with no effect elided
 	       (related to the way warnings flags were defined)
-	
+
 	  - misc.c:352: warning: unreachable code
 	    misc.c:483: warning: unreachable code
 	       (i introduced these with some overzealous de-linting)
-	
+
 	  - numerous warnings like this:
 	    io/io_unix.c:383: warning: conversion from pointer to void' to
 	pointer to
@@ -1133,27 +1156,27 @@
 	    to struct _ParrotIOLayer,pointer to const char,pointer to const
 	char,pointer
 	    to pointer to void)' is compiler dependent
-	
+
 	Fixes the following nits:    - remove bad indenting (tabs) in the
 	includes
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-21 21:12  ajgough
 
 	* types/: bignum.c, bignum.h: These might look like massive
-	changes, but really it's just he imposition of coding standards. 
+	changes, but really it's just he imposition of coding standards.
 	The file still isn't entirely compliant, but is now much more so.
-	
+
 	Also changed:
-	
+
 	 o a few more comments
 	 o BN_compare uses internal BN_comp to compare
 	 o lost_digits behaviour is now correct (test harness modified to
 	test
 	   this).
-	
-	All binary functions now pass all the tests in the basic standard. 
+
+	All binary functions now pass all the tests in the basic standard.
 	Unary functions not yet tested, will be soon.
 
 2002-02-21 18:20  dan
@@ -1161,7 +1184,7 @@
 	* lib/Parrot/OpTrans/CPrederef.pm: The "inline" bit of that patch
 	was no longer needed, and the ssize_t thing really shouldn't be
 	needed either.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-21 18:15  dan
@@ -1169,23 +1192,23 @@
 	* Configure.pl, embed.c, pdump.c, hints/mswin32.pl,
 	include/parrot/parrot.h: this patch adds support for the freely
 	availabe borland c++ 5.5.1 compiler
-	
+
 	depends on: - josh's patch to remove ssize_t from CPrederef.pm -
 	working borland compiler (compiler must know where to find headers
 	and libs) - Perl's Config.pm modified to use cc='bcc32.exe' not of
 	cc='cl.exe' - a working make utility (borland make doesn't work,
 	nmake does)
-	
+
 	changes: - add bcc in hints/mswin32.pl - clean up for msvc++ in
 	hints/mswin32.pl - remove a space from Configure.pl (very very
 	important for bcc) - add a O_BINARY flag to open() in pdump.c,
 	embed.c (required by bcc) - define O_BINARY 0 when it's not defined
 	(win32 knows it, linux not)
-	
+
 	and the why: - parrot is MUCH faster when compiled with borland c
 	(make test on p2-450, 320MB):	* msvc++: 313 seconds	* bcc: 251
 	seconds
-	
+
 	Courtesy of "Ritz Daniel" <daniel_ritz@gmx.ch>
 
 2002-02-21 18:09  dan
@@ -1193,7 +1216,7 @@
 	* jit.c, testparrotfuncptr.c, trace.c, classes/array.pmc, io/io.c,
 	io/io_stdio.c, io/io_unix.c, io/io_win32.c: This patch removes
 	cuddled elses, as required by PDD 7.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-21 18:04  dan
@@ -1202,7 +1225,7 @@
 	a new Makefile target called "check_source".  This target scans all
 	the .c and .h files in the directory and checks for conformance to
 	a number of the standards outlined in PDD 7.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-21 16:38  ajgough
@@ -1215,9 +1238,9 @@
 
 2002-02-21 15:53  simon
 
-	* io/io_unix.c: 
+	* io/io_unix.c:
 	Fix typo
-	
+
 	Courtesy of: "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-02-20 16:41  dan
@@ -1227,7 +1250,7 @@
 2002-02-18 18:25  dan
 
 	* MANIFEST, lib_deps.pl: Added in lib_deps.pl and MANIFEST change.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-18 18:21  dan
@@ -1235,10 +1258,10 @@
 	* lib/Parrot/OpTrans/CPrederef.pm: this is a quick fix for
 	CPrederef.pm to make to generated code compile with the MS
 	compiler.
-	
+
 	fixes: - ms compiler allows inline only for c++, for c there's
 	__inline - ms header files knows nothing about ssize_t
-	
+
 	Courtesy of "Ritz Daniel" <daniel_ritz@gmx.ch>
 
 2002-02-18 17:49  dan
@@ -1256,16 +1279,16 @@
 
 2002-02-18 12:41  gregor
 
-	* test_main.c: 
+	* test_main.c:
 	Remove warning about exit() not being declared.
 
 2002-02-18 08:29  simon
 
 	* misc.c, warnings.c, include/parrot/misc.h,
-	include/parrot/warnings.h: 
+	include/parrot/warnings.h:
 	This patch adds some missing const's to silence a number of gcc
 	warnings.
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-18 08:26  simon
@@ -1275,7 +1298,7 @@
 	classes/array.pmc, classes/perlarray.pmc, classes/perlhash.pmc,
 	include/parrot/parrot.h, include/parrot/rx.h,
 	include/parrot/stacks.h, io/io_stdio.c, io/io_unix.c,
-	lib/Parrot/OpTrans/CPrederef.pm: 
+	lib/Parrot/OpTrans/CPrederef.pm:
 	   - add makefile target and script to test for external libc
 	dependencies
 	   - fix return values in hash and array PMCs (returning 0 in a
@@ -1287,14 +1310,14 @@
 	and make
 	     available for general use on C++ compilers and gcc.
 	   - remove a few unused variables
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-17 16:29  simon
 
 	* docs/pdds/: pdd0.pod, pdd00_pdd.pod, pdd01_overview.pod,
 	pdd02_vtables.pod, pdd04_datatypes.pod, pdd05_opfunc.pod,
-	pdd06_pasm.pod, pdd1.pod, pdd2.pod, pdd4.pod, pdd5.pod, pdd6.pod: 
+	pdd06_pasm.pod, pdd1.pod, pdd2.pod, pdd4.pod, pdd5.pod, pdd6.pod:
 	We're organised and responsible. Honest.
 
 2002-02-17 02:46  sfink
@@ -1318,22 +1341,22 @@
 	work for Windows yet. The libparrot.a target might need to be
 	modified to at least prevent it from confusing make on Windows; I
 	don't know.
-	
+
 	Preliminary instructions for using pbc2c.pl are in
 	docs/running.pod.  I'll try to do better later.
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-02-16 04:15  dan
 
 	* exceptions.c, include/parrot/exceptions.h: Warnings cleaned up
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-16 00:03  simon
 
-	* classes/: perlarray.pmc, perlhash.pmc: 
-	
+	* classes/: perlarray.pmc, perlhash.pmc:
+
 	pmc is already defined!
 
 2002-02-15 23:20  brentdax
@@ -1347,10 +1370,10 @@
 	much more extensive patch that fixes it to work properly, and
 	deletes a bazillion casts as well.  It also points to the question
 	"can we make the byte_code be an opcode_t* already?"
-	
+
 	Oh, and it makes some of the formatting prettier, so it's gotta be
 	good.
-	
+
 	Courtesy of * Steve Fink <steve@fink.com>
 
 2002-02-15 02:30  dan
@@ -1359,7 +1382,7 @@
 	stacks.c: I've tweaked the "lint" target somewhat and fixed a few
 	of the things it finds.  Attaching the patch as well as the current
 	lint output.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-02-15 01:59  dan
@@ -1394,7 +1417,7 @@
 
 2002-02-14 19:33  gregor
 
-	* ops2c.pl, include/parrot/oplib.h: 
+	* ops2c.pl, include/parrot/oplib.h:
 	Added code to automatically generate a function within an oplib to
 	lookup opinfos given the op name. This will come in handy in future
 	when we want to twiddle opcode tables at run time and possibly at
@@ -1402,7 +1425,7 @@
 
 2002-02-14 19:25  gregor
 
-	* examples/assembly/queens.pasm: 
+	* examples/assembly/queens.pasm:
 	Regenerated queens.pasm from queens.jako since the clone_* stuff
 	went away.
 
@@ -1422,10 +1445,10 @@
 	the address of the end of the loaded byte code. This causes
 	segfaults in build_asm in jit.c when using -j. It also breaks the
 	bounds checking on opcode address in runops_slow_core.
-	
+
 	The patch adds the necessary cast to correct the code_end
 	calculations.
-	
+
 	Courtesy of Jason Gloudon <perl@gloudon.com>
 
 2002-02-14 01:01  ajgough
@@ -1456,22 +1479,22 @@
 
 2002-02-11 20:32  simon
 
-	* classes/array.pmc: 
+	* classes/array.pmc:
 	get and set pmc methods.
 
 2002-02-11 20:19  simon
 
-	* classes/array.pmc: 
+	* classes/array.pmc:
 	Maybe the keys aren't integer...
 
 2002-02-11 20:03  simon
 
-	* core.ops, vtable.tbl, classes/default.pmc: 
+	* core.ops, vtable.tbl, classes/default.pmc:
 	{g,s}et_pmc_keyed
 
 2002-02-11 19:07  simon
 
-	* vtable.tbl, classes/default.pmc: 
+	* vtable.tbl, classes/default.pmc:
 	Add set_pmc. Usee with caution.
 
 2002-02-11 18:20  dan
@@ -1482,14 +1505,14 @@
 2002-02-11 17:59  simon
 
 	* core.ops, embed.c, global_setup.c, key.c, rx.ops,
-	classes/perlarray.pmc, classes/perlhash.pmc: 
+	classes/perlarray.pmc, classes/perlhash.pmc:
 	Make it compile.
 
 2002-02-11 17:57  simon
 
-	* packfile.c, include/parrot/packfile.h: 
+	* packfile.c, include/parrot/packfile.h:
 	Reduce warnings
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2002-02-11 17:55  dan
@@ -1503,7 +1526,7 @@
 
 2002-02-11 00:34  simon
 
-	* core.ops, include/parrot/exceptions.h: 
+	* core.ops, include/parrot/exceptions.h:
 	This is what keyed set ops look like. Remember, however, that for
 	keyed functions, all operands must be PMCs. set(PMC, PMC, INT)
 	means $1 = $2[$3], not $1[$2] = $3. set(PMC,PMC,PMC) is so
@@ -1529,24 +1552,24 @@
 
 2002-02-08 15:59  simon
 
-	* classes/array.pmc: 
+	* classes/array.pmc:
 	Some more work on getting the array stuff up to date.
 
 2002-02-08 12:23  simon
 
 	* classes/array.pmc, classes/perlhash.pmc, include/parrot/key.h,
-	lib/Parrot/Vtable.pm: 
+	lib/Parrot/Vtable.pm:
 	Got array->get_integer_keyed doing what I think it ought to. One
 	down, all the rest to go.
 
 2002-02-08 11:47  simon
 
-	* vtable.tbl: 
+	* vtable.tbl:
 	Although I didn't intend it to be quite that broken...
 
 2002-02-08 11:42  simon
 
-	* vtable.tbl, include/parrot/parrot.h, lib/Parrot/Vtable.pm: 
+	* vtable.tbl, include/parrot/parrot.h, lib/Parrot/Vtable.pm:
 	Completely break Parrot, but at least we get the key stuff right
 	for now.
 
@@ -1607,9 +1630,9 @@
 
 2002-02-05 17:15  simon
 
-	* misc.c: 
+	* misc.c:
 	Warning fixes.
-	
+
 	Courtesy of: Jonathan Stowe <gellyfish@gellyfish.com>
 
 2002-02-05 17:08  doughera
@@ -1624,38 +1647,38 @@
 
 2002-02-05 14:04  simon
 
-	* misc.c: 
+	* misc.c:
 	Make the problem different, perhaps even better.
 
 2002-02-05 13:49  simon
 
-	* misc.c: 
+	* misc.c:
 	Possibly fix a `short int' is promoted to `int' when passed through
 	`...' scary error, possibly make things absolutely worse.
 
 2002-02-05 13:15  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Placate Tru64.
 
 2002-02-05 13:12  simon
 
-	* warnings.c: 
+	* warnings.c:
 	Not going to get far without this one...
 
 2002-02-05 11:41  simon
 
-	* string.c: 
+	* string.c:
 	Don't barf when handed null pointers.
 
 2002-02-05 10:04  simon
 
-	* misc.c, include/parrot/misc.h: 
+	* misc.c, include/parrot/misc.h:
 	Fix some trivial bugs in warnings code.
 
 2002-02-05 09:27  simon
 
-	* misc.c: 
+	* misc.c:
 	Oops, forgot this one; also added %P support.
 
 2002-02-05 09:20  simon
@@ -1663,9 +1686,9 @@
 	* MANIFEST, Makefile.in, core.ops, embed.c, interpreter.c,
 	test_main.c, classes/perlundef.pmc, include/parrot/embed.h,
 	include/parrot/interpreter.h, include/parrot/misc.h,
-	include/parrot/parrot.h, include/parrot/warnings.h: 
+	include/parrot/parrot.h, include/parrot/warnings.h:
 	Warnings support.
-	
+
 	Courtesy of: Brent Dax <brentdax@cpan.org>
 
 2002-02-05 05:41  jgoff
@@ -1673,13 +1696,13 @@
 	* vtable.tbl, lib/Parrot/Vtable.pm, t/pmc/perlstring.t: Changed the
 	format of vtable.tbl to get rid of the tab-dependence.	The format
 	now looks roughly like this:
-	
+
 	init() # 'void' and 'unique' are assumed INTVAL type ( ) # 'unique'
 	is assumed str void concatenate (PMC* value, PMC* dest) # Nothing
 	assumed here, but note the C-like prototyping.	Also had to disable
 	one test that depended upon 'concat_p_p_s', which isn't necessary
 	anyway.
-	
+
 	Vtable.pm will change again when the type '_keyed' is added,
 	because that requires remapping parameters slightly differently
 	again.	Also, note that it assumes 'value' is the first parameter
@@ -1706,7 +1729,7 @@
 	Moving the internal KEY structure from the cache.struct_val member,
 	where it doesn't really belong, to the internal SELF->data member.
 	This frees up the cache/type members for other usage.
-	
+
 	This is the first step in moving PMCs to the point where we can do
 	multidimensional PMC handles. The next step is to change the
 	assembler to accept the syntax of 'set P0["foo"],7'.
@@ -1743,12 +1766,12 @@
 
 2002-02-01 12:19  simon
 
-	* core.ops, t/op/ifunless.t, t/op/integer.t: 
+	* core.ops, t/op/ifunless.t, t/op/integer.t:
 	Added "unless" op.
 
 2002-02-01 12:11  simon
 
-	* lib/Parrot/Test.pm: 
+	* lib/Parrot/Test.pm:
 	Remove a warning.
 
 2002-02-01 01:38  nicholas
@@ -1764,7 +1787,7 @@
 
 2002-01-31 21:46  gregor
 
-	* Configure.pl, Makefile.in, hints/mswin32.pl: 
+	* Configure.pl, Makefile.in, hints/mswin32.pl:
 	A few more things are now configable, so we are closer to win32
 	shared library builds. Not there yet, but closer.
 
@@ -1782,22 +1805,22 @@
 	should reflect this, and not cause a gratuitous recompile of
 	everything.  There are probably other auto-generated header files
 	that world+dog should not depend on.
-	
+
 	Courtesy of  Nicholas Clark <nick@unfortu.net>
 
 2002-01-31 19:03  gregor
 
-	* Makefile.in, lib/Parrot/Test.pm, t/harness: 
+	* Makefile.in, lib/Parrot/Test.pm, t/harness:
 	Added two new make targets:
-	
+
 	  * testp: Like 'make test', but passes -P to t/harness, so you get
 	to
 	    see how broken predereferencing is.
-	
+
 	  * testj: Like 'make test', but passes -j to t/harness, so you get
 	to
 	    see how broken JIT is.
-	
+
 	Now, anyone who wants to see how good all three ways of running are
 	can do so, at the cost of about 3x the time.
 
@@ -1840,7 +1863,7 @@
 
 	* jit2h.pl, lib/Parrot/Op.pm, lib/Parrot/OpsFile.pm: Added
 	Op::may_jump boolean method.
-	
+
 	Replaced jit2h's hardcoded pattern match to decide what ops might
 	change the control flow.
 
@@ -1852,10 +1875,10 @@
 	introduces a test program which gives a friendlier error in this
 	case for compilers which are as picky as tcc is about function
 	pointer conversion.
-	
+
 	If anyone figures out the proper way to cast these function
 	pointers this may not be necessary.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-30 20:54  dan
@@ -1865,11 +1888,11 @@
 	state (both the test_parrot and assemble.pl improvements, plus
 	documentation of a few more things.) And also a speling fiks
 	s/POST_MORTERM/POST_MORTEM/.
-	
+
 	I could also replace some "perl foo" calls with "./foo" if someone
 	wanted to set the executable flag in CVS on assemble.pl,
 	optimize.pl, etc.
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-30 20:43  dan
@@ -1883,7 +1906,7 @@
 	 can read it and just tidies it up generally. It also adds
 	documentation
 	 for the constantize_integer and constantize_number functions.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-30 18:02  dan
@@ -1895,7 +1918,7 @@
 	 can no longer find the Parrot::* modules. Enclosed patch fixes
 	(although
 	 it would be nice if there were an easier way to do this).
-	
+
 	Courtesy of  Simon Glover <scog@roe.ac.uk>
 
 2002-01-30 16:00  mrjoltcola
@@ -1916,7 +1939,7 @@
 
 	* MANIFEST: Enclosed patch adds the new SPARC-based JIT files to
 	the manifest,  and also puts it back into alphabetical order.
-	
+
 	Courtesy of: Simon Glover <scog@roe.ac.uk>
 
 2002-01-30 14:41  nicholas
@@ -1933,29 +1956,29 @@
 
 2002-01-30 12:08  simon
 
-	* lib/Parrot/.cvsignore: 
+	* lib/Parrot/.cvsignore:
 	Ignore generated Perl modules.
 
 2002-01-30 12:07  simon
 
-	* t/harness: 
+	* t/harness:
 	Run the PMC tests as well.
 
 2002-01-30 12:04  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Fix MANIFEST after recent t/pmc rejig.
 
 2002-01-30 11:42  simon
 
-	* lib/Parrot/Test.pm: 
+	* lib/Parrot/Test.pm:
 	Report non-zero exit codes.
-	
+
 	Courtesy of: Michael G Schwern <schwern@pobox.com>
 
 2002-01-30 11:39  simon
 
-	* t/op/rx.t: 
+	* t/op/rx.t:
 	Skip final test, TODO doesn't work yet.
 
 2002-01-30 09:54  brentdax
@@ -2045,7 +2068,7 @@
 
 2002-01-29 21:53  simon
 
-	* TODO, docs/vtables.pod: 
+	* TODO, docs/vtables.pod:
 	New TODO, and tiny addition to vtables.pod
 
 2002-01-29 21:47  mrjoltcola
@@ -2089,9 +2112,9 @@
 2002-01-29 17:51  simon
 
 	* MANIFEST, Makefile.in, config_h.in, embed.c, test_main.c,
-	include/parrot/embed.h, include/parrot/parrot.h: 
+	include/parrot/embed.h, include/parrot/parrot.h:
 	Embedding support. Cool.
-	
+
 	Courtesy of: <brentdax@cpan.org>
 
 2002-01-29 15:40  grunblatt
@@ -2101,7 +2124,7 @@
 
 2002-01-29 14:42  simon
 
-	* include/parrot/parrot.h: 
+	* include/parrot/parrot.h:
 	Platform stuff has to be included *after* system headers.
 
 2002-01-29 14:05  grunblatt
@@ -2114,7 +2137,7 @@
 
 2002-01-29 10:56  simon
 
-	* platforms/generic.h: 
+	* platforms/generic.h:
 	If we don't have a S_ISREG, produce something close to it.
 
 2002-01-29 06:01  dan
@@ -2133,9 +2156,9 @@
 	t/pmc/array.t: Added array class that languages other than perl can
 	use for a basis.  It has no features like preextension, and the
 	array index starts at 0.
-	
+
 	MANIFEST - added classes/array.pmc and t/op/pmc_array.t Makefile.in
-	and classes/Makefile.in - Added array.pmc to the makefile. 
+	and classes/Makefile.in - Added array.pmc to the makefile.
 	(Assuming rules like .pmc.o are portable (or even possible) I might
 	alter classes/Makefile.in to autobuild the appropriate files.
 
@@ -2144,27 +2167,27 @@
 	* MANIFEST, Parrot/Test.pm, lib/Parrot/Test.pm,
 	lib/Test/Builder.pm, lib/Test/More.pm, lib/Test/Simple.pm,
 	lib/Test/Utils.pm, t/op/interp.t, t/op/macro.t, t/op/pmc.t,
-	t/op/rx.t, t/op/stacks.t, t/pmc/pmc.t: 
+	t/op/rx.t, t/op/stacks.t, t/pmc/pmc.t:
 	    Update to Test::More 0.41 which adds Test::Builder
-	
+
 	    Delete the vestigal Test::Utils
-	
+
 	    Change Parrot::Test so it uses Test::Builder instead of Evil
 	Wrappers
 	    around Test::More
-	
+
 	    output_* now returns whether the test passes or fails
-	
+
 	    Parrot::Test no longer exports Test::More's functions.  Instead
 	they
 	    can simply be used together.  The few tests which used
 	Test::More
 	    features (ie. skip) have 'use Test::More' added.
-	
+
 	    I ditched the export_to_level() crutch.  Do we expect parrot to
 	work on
 	    5.004?  (literally 5.004, not 5.004_04)
-	
+
 	Courtesy of Michael G Schwern <schwern@pobox.com>
 
 2002-01-28 21:04  dan
@@ -2172,7 +2195,7 @@
 	* docs/overview.pod:  There is no opcodes.pod; I'm assuming the
 	pointer should actually be to
 	 parrot_assembly.pod, as the canonical documentation.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-28 20:21  dan
@@ -2196,7 +2219,7 @@
 
 2002-01-28 15:59  simon
 
-	* test_main.c: 
+	* test_main.c:
 	People might try and run a directory file, with spectacular
 	results.  We don't want that. No.
 
@@ -2227,7 +2250,7 @@
 	just a pointer to the top of the register structure. Pushes and
 	pops now involve memcpys, but register access has one fewer
 	dereference.
-	
+
 	Fails four of the register stack tests, though, so not perfect.
 	Needs fixing, but this is a good place to start.
 
@@ -2275,14 +2298,14 @@
 
 2002-01-26 22:18  simon
 
-	* jit/i386/core.jit: 
+	* jit/i386/core.jit:
 	Jumping to 0x0 is a recipe for segfaults.
 
 2002-01-26 18:35  simon
 
-	* t/harness: 
+	* t/harness:
 	Allow user to select which tests to harness
-	
+
 	Courtesy of: Nicholas Clark <nick@unfortu.net>
 
 2002-01-26 17:20  grunblatt
@@ -2301,7 +2324,7 @@
 	* include/parrot/parrot.h: Quick note to remind folks that this
 	isn't the file they're looking for if they're writing extensions or
 	embedding parrot.
-	
+
 	Courtesy of Andy Dougherty <doughera@lafayette.edu>
 
 2002-01-26 00:41  mrjoltcola
@@ -2404,7 +2427,7 @@
 
 2002-01-22 00:53  ajgough
 
-	* test_main.c: Clears up a couple of warnings in test_main.c. 
+	* test_main.c: Clears up a couple of warnings in test_main.c.
 	Thanks to Nick Clark.  Message-ID:
 	<20020121190457.GB1726@Bagpuss.unfortu.net>
 
@@ -2419,15 +2442,15 @@
 2002-01-22 00:24  dan
 
 	* key.c: We do mandate an ANSI conformant C compiler, don't we?
-	
+
 	Appended patch cures these warnings:
-	
+
 	key.c: In function `debug_key': key.c:29: warning: int format,
 	INTVAL arg (arg 3) key.c:33: warning: int format, INTVAL arg (arg
 	3) key.c:33: warning: int format, INTVAL arg (arg 4) key.c:36:
 	warning: int format, INTVAL arg (arg 3) key.c:36: warning: int
 	format, INTVAL arg (arg 4)
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-21 12:41  mrjoltcola
@@ -2469,15 +2492,15 @@
 	lib/Parrot/Jit/i386-bsd.pm, lib/Parrot/Jit/i386-linux.pm,
 	Parrot/Jit/i386Generic.pm, lib/Parrot/Jit/i386Generic.pm,
 	include/parrot/jit.h, jit/alpha/core.jit, jit/alpha/lib.jit,
-	jit/alpha/string.jit: 
+	jit/alpha/string.jit:
 	- Added support for ALPHA, by now linux and bsd.
-	
+
 	- Reduced jit2h.pl execution time by precompiling the call to the
 	unimplemented op.
-	
+
 	- Reduced the duplicated code in Parrot/Jit/*.pm by adding
 	Parrot/Jit/${cpuarch}Generic.pm
-	
+
 	- Changed the way to detect quads to what is written in "man
 	perlfunc".
 
@@ -2512,7 +2535,7 @@
 	-ansi -pedantic.  -ansi may well have some uses, but even the gcc
 	man pages say "There is no reason to use this option [-pedantic];
 	it exists only to satisfy pedants."
-	
+
 	Courtesy of Andy Dougherty <doughera@lafayette.edu>
 
 2002-01-18 23:23  dan
@@ -2525,7 +2548,7 @@
 	changes in figuring out whether I broke anything, because any
 	non-default way of running the system seems to be already broken. I
 	can't tell what brokenness is expected and what isn't.
-	
+
 	Courtesy of  Steve Fink <steve@fink.com>
 
 2002-01-15 22:13  brentdax
@@ -2548,7 +2571,7 @@
 
 	* pbc2c.pl: Pointer arithmetic not quite right in the generated
 	code.  Also patches pbc2c.pl to work with rx.ops.
-	
+
 	Courtesy of Jason Gloudon <perl@gloudon.com>
 
 2002-01-15 16:15  dan
@@ -2559,7 +2582,7 @@
 	to understand and clear up (within any sensible time period before
 	submitting a rash of patches, by which time everyone else would
 	have moved the code on)
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-15 16:10  dan
@@ -2572,33 +2595,33 @@
 	lib/Parrot/OpTrans/CPrederef.pm, chartypes/unicode.c,
 	chartypes/usascii.c: This patch adds a few more macros for .ops
 	files to use. In addition to the existing
-	
+
 	 goto OFFSET(...)
 	 goto ADDRESS(...)
 	 goto POP()
 	 goto NEXT()
-	
+
 	it adds
-	
+
 	 expr OFFSET(...)
 	 expr ADDRESS(...)
 	 expr POP()
 	 expr NEXT()
-	
+
 	This is intended mainly for use in helper functions in .ops files,
 	but also for ops that need to eg push the address of the next
 	opcode onto a stack. The only place this currently happens (outside
 	of my private code) is in the bsr opcode, which previously
 	hardcoded the computation.
-	
+
 	This patch also makes ops2c.pl move the CUR_OPCODE #define a bit
 	higher in the generated file so that it can be used by static
 	functions in the preamble.
-	
+
 	Finally, I ran into a parentheses matching problem -- should goto
-	OFFSET(...) rewrite    \bgoto\s+OFFSET\((.*)\) or   
+	OFFSET(...) rewrite    \bgoto\s+OFFSET\((.*)\) or
 	\bgoto\s+OFFSET\((.*?)\)
-	
+
 	It was done inconsistently for the different calculations, and of
 	course neither are correct because you really want matching
 	parentheses. But that seems like too much bother. (Currently,
@@ -2606,16 +2629,16 @@
 	parentheses, and that's the enternative() op.) So I made them all
 	.*? but emulated recent POD by also allowing (( ... )) (that's two
 	parenthesis with a space padding the body.)
-	
+
 	The generated core_ops.c and core_ops_prederef.c files after this
 	patch are identical except for the CUR_OPCODE and REL_PC macros
 	getting moved a little higher, and the bsr in the regular path (not
 	prederef) uses 'CUR_OPCODE' instead of the hardcoded 'cur_opcode'.
-	
+
 	In summary, this is a big wad of meaningless changes for the
 	current code. But it will make adding some opcodes easier in the
 	future, and cleans up a small nit in the current bsr.
-	
+
 	Courtesty of Steve Fink <steve@fink.com>
 
 2002-01-15 08:48  brentdax
@@ -2635,7 +2658,7 @@
 2002-01-14 20:18  dan
 
 	* vtable.tbl, vtable_h.pl: Clean up a zillion warnings
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-14 20:03  dan
@@ -2658,21 +2681,21 @@
 	type definition in parentheses', the latter of which was turning up
 	warnings in MS VC headers.  Level 4 warnings also helped me find a
 	couple of other lurking bugs in the parrot code.
-	
+
 	Replaces the various fprintf/exit combos with calls to
 	internal_exception, which uses var_args to emulate printf. Various
 	exception types were added as well. These are probably temporary
 	until a real exception system arrives.
-	
+
 	Fixed some places in the IO code where wrong functions were being
 	called, or put into the vtable.
-	
+
 	Courtesy of "Michel Lambert" <mlambert@legendent.com>
 
 2002-01-14 19:00  dan
 
 	* MANIFEST: D'oh! Forgot a file.
-	
+
 	Courtesy of Andy Dougherty <doughera@lafayette.edu>
 
 2002-01-14 18:44  brentdax
@@ -2692,13 +2715,13 @@
 2002-01-13 19:39  dan
 
 	* key.c, classes/perlarray.pmc: key.c:	 intialize KEY.keys
-	
+
 	classes/perlarray.c:  * get_string: is casting
 	SELF->cache.struct_val to a STRING*,	while all other methods are
 	using it as a KEY*; don't know	  what a perlarray stringifies to,
 	so replacing with NULL	* get_bool: the default behaviour does not
 	look right to me
-	
+
 	Courtesy of "Mattia Barbon" <mbarbon@dsi.unive.it>
 
 2002-01-13 19:37  dan
@@ -2706,10 +2729,10 @@
 	* Makefile.in, classes/Makefile.in: Makefile.in:   (Re)add ld_debug
 	flags to LDFLAGS, so that Configure.pl --debugging   works with
 	MSVC
-	
+
 	classes/Makefile.in   make easier to add pmb2c.pl flags to all
 	pmc2c calls
-	
+
 	Courtesy of "Mattia Barbon" <mbarbon@dsi.unive.it>
 
 2002-01-13 19:36  dan
@@ -2717,33 +2740,33 @@
 	* io/io_win32.c:   according to my MSVC docs, you should use
 	_tcslen only after
 	  #including tchar.h
-	
+
 	Courtesy of  "Mattia Barbon" <mbarbon@dsi.unive.it>
 
 2002-01-13 19:35  dan
 
 	* docs/intro.pod: Doc tweak.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-13 19:34  dan
 
 	* t/: op/pmc_perlstring.t, pmc/perlstring.t:  Enclosed test checks
 	that
-	
+
 	  if Px, ...
-	
+
 	 works with PerlString PMCs; these should be false if they are "",
 	0, or
 	 are undefined, and true in every other case.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-13 19:23  dan
 
 	* Configure.pl, config_h.in, core.ops, classes/perlnum.pmc: Change
 	NUMVAL_FMT to FLOATVAL_FMT.
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-13 17:45  jgoff
@@ -2756,9 +2779,9 @@
 2002-01-13 08:47  simon
 
 	* interpreter.c, Parrot/OpTrans/CPrederef.pm,
-	lib/Parrot/OpTrans/CPrederef.pm: 
+	lib/Parrot/OpTrans/CPrederef.pm:
 	Fix bsr in prederef mode.
-	
+
 	Courtesy of: Jason Gloudon <perl@gloudon.com>
 
 2002-01-12 15:33  dan
@@ -2767,14 +2790,14 @@
 	string.c, encodings/singlebyte.c, encodings/utf32.c,
 	include/parrot/parrot.h, io/io.c, io/io_stdio.c, io/io_unix.c:
 	Silence most of the unused variable warnings.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-12 15:18  dan
 
 	* rx.ops: This patch fixes a warning and also changes an 'int' to
 	an 'INTVAL'.  All tests should pass on Solaris.
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-12 15:13  dan
@@ -2783,7 +2806,7 @@
 	examples/assembly/life.pasm, include/parrot/interpreter.h,
 	include/parrot/io.h, io/io.c, io/io_stdio.c, io/io_unix.c,
 	io/io_win32.c: More IO work. (Plus some misc twiddles)
-	
+
 	Courtesy of Melvin Smith <mrjoltcola@mindspring.com>
 
 2002-01-12 01:14  dan
@@ -2826,17 +2849,17 @@
 
 	* core.ops: Make sure constant pushes are right on mixed 32/64 bit
 	systems
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-11 17:50  dan
 
 	* core.ops, pbc2c.pl, Parrot/OpTrans/CGoto.pm,
 	lib/Parrot/OpTrans/CGoto.pm, include/parrot/interpreter.h: Here is
-	a patch that makes pbc2c generated code work with the bsr opcode. 
+	a patch that makes pbc2c generated code work with the bsr opcode.
 	It creates a new opcode 'enternative', and uses this to support a
 	mixed model of interpretation and execution of compiled C code.
-	
+
 	Courtesy of Jason Gloudon <perl@gloudon.com>
 
 2002-01-11 17:48  dan
@@ -2863,7 +2886,7 @@
 2002-01-11 02:25  dan
 
 	* Makefile.in, examples/assembly/life.pasm: Tweak to life benchmark
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-11 00:32  brentdax
@@ -2882,30 +2905,30 @@
 	testparrotsizes_c.in, include/parrot/interpreter.h,
 	include/parrot/rx.h, include/parrot/stacks.h: Much nicer stack
 	implementation
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-10 22:48  dan
 
 	* core.ops: Fix 'basic' test 1 for sizeof(opcode_t) !=
 	sizeof(INTVAL)
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-10 22:46  dan
 
 	* key.c, classes/perlhash.pmc, t/op/pmc_perlhash.t,
 	t/pmc/perlhash.t:  Well, actually two bugs.
-	
+
 	 The first is an off-by-one error in key.c than can cause parrot
 	 to segfault if hash % NUM_BUCKETS happens to be zero.
-	
+
 	 The other is a bug in the PerlHash init() code that causes new
 	PerlHash
 	 PMCs to start with the wrong size.
-	
+
 	 Both fixed below; also tests to prevent them recurring.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-10 22:30  dan
@@ -2913,7 +2936,7 @@
 	* classes/default.pmc, classes/perlarray.pmc, t/op/pmc_perlarray.t,
 	t/pmc/perlarray.t:  The enclosed patch allows one to use the if op
 	with a PerlArray,
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-10 21:31  dan
@@ -2935,22 +2958,22 @@
 
 	* classes/parrotpointer.pmc: This patch fixes parrotpointer.pmc,
 	which tries to return 0 from a void function.
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-10 17:12  dan
 
 	* t/op/macro.t: Skip tests, don't comment them out.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-10 17:10  dan
 
 	* rx.c: This fixes a couple of nits in rx.c:
-	
+
 	   1. There's no newline at the end, which makes gcc unhappy.
 	   2. We should use NULL, not 0 or "", for creating null pointers.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-10 17:09  dan
@@ -2958,7 +2981,7 @@
 	* MANIFEST:  Adds rx.t, removes duplicated rx.c and puts everything
 	back in
 	 alphabetical order.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-10 16:54  ajgough
@@ -2979,7 +3002,7 @@
 	* MANIFEST, Makefile.in, rx.c, string.c, include/parrot/pmc.h,
 	include/parrot/rx.h, t/op/rx.t: Preliminary regex implementation.
 	Tests don't work, though.
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-09 21:48  dan
@@ -2990,7 +3013,7 @@
 
 	* classes/Makefile.in, classes/parrotpointer.pmc, Makefile.in:
 	Generic pointer holder class
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-09 21:19  dan
@@ -3006,33 +3029,33 @@
 
 	* key.c, classes/perlhash.pmc, t/op/pmc_perlhash.t,
 	t/pmc/perlhash.t: Fix hash crash bugs
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-09 19:13  dan
 
 	* memory.c: Signedness whoops.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-09 18:23  dan
 
 	* MANIFEST, Makefile.in, include/parrot/io.h, io/io.c, io/io_os.c,
 	io/io_stdio.c, io/io_win32.c: Changes:
-	
+
 	-Minor layer cleanups -Win32 layer added (mostly stubs for now) but
 	will be using the   Win32 API and company rather than the unix-ish
 	fake ones.  -stdin/stdout/stderr Win32 specific code added. Rather
 	than use   0,1,2, Microsoft says use GetStdHandle(), etc. so that
 	stuff is   there. Soon we should be able to start using these
 	rather than   fprintf(stderr, ...) and remove stdio linkage.
-	
+
 	Courtesy of <mrjoltcola@mindspring.com>
 
 2002-01-09 17:26  dan
 
 	* test_main.c: Fixes bad code gen on x86.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-09 17:24  dan
@@ -3040,7 +3063,7 @@
 	* Configure.pl, config_h.in, core.ops, key.c, classes/perlint.pmc,
 	classes/perlnum.pmc: This patch adds macros to the config.h file
 	for INTVAL and NUMVAL printf formats.
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-08 22:55  ajgough
@@ -3050,7 +3073,7 @@
 2002-01-08 20:05  dan
 
 	* key.c: Keep comments in sync.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-08 19:50  dan
@@ -3059,7 +3082,7 @@
 
 2002-01-08 17:24  gregor
 
-	* .cvsignore, Configure.pl, Makefile.in: 
+	* .cvsignore, Configure.pl, Makefile.in:
 	Added 'reconfig' make target and corresponding --reconfig option to
 	Configure.pl, so its very easy to re-run Configure.pl with the last
 	(command-line) options you passed it.
@@ -3069,13 +3092,13 @@
 	* core.ops, make_vtable_ops.pl, Parrot/OpsFile.pm,
 	lib/Parrot/OpsFile.pm: Add in, out, and inout parameters to teh ops
 	in core.ops. Potential help for optimizers and JITters.
-	
+
 	Courtesy of gregor@linux1.kennedytech.com
 
 2002-01-08 16:32  dan
 
 	* key.c: Grab key length from the right spot
-	
+
 	Courtesy of "Peter Gibbs" <peter@emkel.co.za>
 
 2002-01-08 13:27  ajgough
@@ -3104,42 +3127,42 @@
 	* key.c, packfile.c, string.c, include/parrot/key.h,
 	include/parrot/packfile.h, include/parrot/string.h: Fix whines
 	about index being redefined
-	
+
 	Courtesy of Nick Clark
 
 2002-01-07 21:15  dan
 
 	* ops2pm.pl: Don't allow the same ops lib to be included twice.
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-07 20:48  dan
 
 	* Parrot/Test.pm, lib/Parrot/Test.pm: Report useful info for test
 	failures
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-07 20:43  dan
 
 	* docs/intro.pod: Missing a comma
-	
+
 	Courtesy of "coral" <coral@eekeek.org>
 
 2002-01-07 20:41  dan
 
 	* global_setup.c: Quiet a warning
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-07 18:58  gregor
 
-	* t/op/.cvsignore: 
+	* t/op/.cvsignore:
 	Ignore intermediate test files.
 
 2002-01-07 17:01  gregor
 
-	* ops2c.pl: 
+	* ops2c.pl:
 	Print a warning if an .ops file is mentioned more than once on the
 	command line.
 
@@ -3150,12 +3173,12 @@
 
 2002-01-07 15:15  simon
 
-	* t/: op/pmc_perlhash.t, pmc/perlhash.t: 
+	* t/: op/pmc_perlhash.t, pmc/perlhash.t:
 	Stop segfaults.
 
 2002-01-07 15:11  simon
 
-	* key.c: 
+	* key.c:
 	Fix zero-termination bug in hash function.
 
 2002-01-07 13:37  ajgough
@@ -3170,7 +3193,7 @@
 
 2002-01-07 11:43  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Gobble the + before catenating.
 
 2002-01-07 03:53  dan
@@ -3191,22 +3214,22 @@
 
 2002-01-06 22:12  dan
 
-	* Makefile.in, ops2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm: 
+	* Makefile.in, ops2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm:
 	    -changes Parrot::OpLib::core's dependencies to reflect the new
 	selectable ops files	-allows some of the special forms of 'goto'
 	inside the PREAMBLE of an opcode file
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-06 19:59  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	*cough*
 
 2002-01-06 18:19  dan
 
 	* classes/perlhash.pmc: Fix some type issues.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-06 18:03  dan
@@ -3214,86 +3237,86 @@
 	* Configure.pl, Makefile.in: It adds a prompt to Configure asking
 	for a list of opcode files to use.  The default is everything
 	available except for obscure.ops.
-	
+
 	In addition, it makes it so that if your answer to a question
 	starts with '+', it will concatenate it to the default.  For
 	example:
-	
+
 	What C compiler do you want to use? [cl] +HAHAHA!!!
-	
+
 	will result in $PConfig{cc} eq "cl HAHAHA!!!".	While that example
 	is not terribly useful, it is quite useful with things like
 	command-line flags and the like.
-	
+
 	Finally, it contains a couple tweaks so that my syntax-highlighting
 	editor recognizes some heredocs correctly.  :^)
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-06 17:59  dan
 
 	* KNOWN_ISSUES, MANIFEST, README: Doc Patches
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-06 17:58  dan
 
 	* MANIFEST:  We're missing a couple of files from the MANIFEST.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-06 17:57  dan
 
-	* ops2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm:	1. 
+	* ops2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm:	1.
 	Compiler directives, etc. in files other than core.ops will now
 	work.	2.  Compiler warnings will now display the file and line
 	number of the  opcode file.
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-06 17:52  dan
 
 	* languages/jako/jakoc: Fix breakage caused by iton/ntoi going away
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-06 17:36  dan
 
 	* docs/intro.pod: Lots of updates
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-06 02:34  gregor
 
-	* interpreter.c: 
+	* interpreter.c:
 	Add some internal documentation on the theory of operation of the
 	prederef code.
 
 2002-01-06 02:17  gregor
 
-	* interpreter.c: 
+	* interpreter.c:
 	Removed unneccessary include.
 
 2002-01-05 12:37  simon
 
-	* classes/.cvsignore: 
+	* classes/.cvsignore:
 	Ignore generated .h files.
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-05 12:37  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Make lcc happier by adding a dummy structure.
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-05 12:35  simon
 
-	* global_setup.c, classes/perlundef.pmc, t/op/pmc.t, t/pmc/pmc.t: 
+	* global_setup.c, classes/perlundef.pmc, t/op/pmc.t, t/pmc/pmc.t:
 	Make perlundef work. (And coincidentally stop segfaults in the
 	tests :)
-	
+
 	Courtesy of: Jason Gloudon <perl@gloudon.com>
 
 2002-01-05 04:59  dan
@@ -3307,7 +3330,7 @@
 2002-01-05 04:48  dan
 
 	* core.ops: Fix on 64 bit platforms with 32-bit opcode_t
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-05 03:57  jgoff
@@ -3316,24 +3339,24 @@
 	vtable.tbl, classes/Makefile.in, classes/default.pmc,
 	include/parrot/key.h, include/parrot/pmc.h, t/op/pmc.t,
 	t/pmc/pmc.t: Initial hash commit.
-	
+
 	core.ops - Adding set({i,n,s},p,s) and set(p,{i,n,s},s) operations.
 	 key.h	- Adding NUM_BUCKETS classes/default.pmc - Adding
 	set_{integer,number,string}_index_s
-	
+
 	This does not yet do collision resolution, but will soon.
 
 2002-01-05 02:54  dan
 
 	* interpreter.c: More unsigned fixes
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-04 22:13  dan
 
 	* Configure.pl, hints/mswin32.pl: Makes config's building of the
 	test programs happier.
-	
+
 	Courtesy of "Jason Diamond" <jason@injektilo.org>
 
 2002-01-04 19:00  dan
@@ -3345,7 +3368,7 @@
 
 	* Configure.pl, Makefile.in, classes/Makefile.in, hints/mswin32.pl:
 	Fixes to get things configuring and building on Win32 Native.
-	
+
 	Courtesy of "Jason Diamond" <jason@injektilo.org>
 
 2002-01-04 17:39  dan
@@ -3357,7 +3380,7 @@
 	* docs/parrot.pod:  The enclosed patch brings the list of
 	documentation in parrot.pod
 	 up to date.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-04 16:47  dan
@@ -3365,13 +3388,13 @@
 	* test_main.c, Parrot/Jit/i386-linux.pm,
 	lib/Parrot/Jit/i386-linux.pm: In an attempt to just keep knocking
 	off warnings..
-	
+
 	Courtesy of Kevin Falcone <kevin@jibsheet.com>
 
 2002-01-04 16:44  dan
 
 	* Configure.pl, Makefile.in: Fixed linking to use linker.
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-04 16:39  dan
@@ -3387,13 +3410,13 @@
 
 	* languages/miniperl/Miniperl/Tokenizer.pm: Quiet a warning in the
 	Tokenizer test
-	
+
 	Courtesy of Jonathan Stowe <gellyfish@gellyfish.com>
 
 2002-01-04 16:17  dan
 
 	* chartypes/unicode.c: Silence some warnings.
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-04 16:09  dan
@@ -3403,16 +3426,16 @@
 	into generated files
 	   but the $Id$ string gets mangled when it's committed.
 	   This patch fixes the existing .pmc files and fixes genclass.pl.
-	
+
 	 - Makes capitalization in .pmc header match actual filenames
-	
+
 	 - The command for calling genclass.pl in vtables.pod is incorrect,
 	   since it assumes you're running in classes/ but genclass.pl
 	assumes
 	   it's being run from the main directory. I changed genclass.pl to
 	not
 	   care.
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-04 03:57  dan
@@ -3429,7 +3452,7 @@
 	* interpreter.c, stacks.c, include/parrot/stacks.h: The patch below
 	my sig adds a new_stack() function to take care of the allocation
 	and setup of "generic" stacks.
-	
+
 	Courtesy of "Brent Dax" <brentdax@cpan.org>
 
 2002-01-04 02:36  dan
@@ -3437,7 +3460,7 @@
 	* core.ops:  The entry in core.ops for puts(s|sc) is missing a =cut
 	and so
 	 writes a load of junk in core_ops.pod. Applied patch fixes.
-	
+
 	Courtesy of Simon Glover <scog@roe.ac.uk>
 
 2002-01-04 02:35  dan
@@ -3445,42 +3468,42 @@
 	* classes/: perlint.pmc, perlnum.pmc, perlstring.pmc: The PerlInt
 	logical-or is using get_integer instead of get_bool for logical
 	operations. This patch corrects that.
-	
+
 	Perlnum and perlstring have working get_bool's, so the default
 	logical_or and logical_and should be sufficient. The empty methods
 	are pointed to the default logical_or.
-	
+
 	Courtesy of Jason Gloudon <perl@gloudon.com>
 
 2002-01-04 02:31  dan
 
 	* Makefile.in: docs/Makefile should be removed by realclean, but
 	isn't
-	
+
 	Courtesy of Kevin Falcone <kevin@jibsheet.com>
 
 2002-01-04 02:29  dan
 
 	* classes/: Makefile.in, pmc2c.pl: PMC inheritance! Yay!
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-04 00:51  dan
 
 	* docs/vtables.pod: More docs
-	
+
 	Courtesy of Steve Fink <steve@fink.com>
 
 2002-01-04 00:47  dan
 
 	* Configure.pl: Updated 64-bit patch
-	
+
 	Courtesy of "David M. Lloyd" <dmlloyd@tds.net>
 
 2002-01-04 00:43  dan
 
 	* Configure.pl: 64-bit Fix.
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-03 22:37  dan
@@ -3488,12 +3511,12 @@
 	* MANIFEST, Makefile.in, interpreter.c, include/parrot/io.h,
 	io/io.c, io/io_os.c: Code cleanup, started STDIO layer, started
 	some buffering work.	   Additional work on other layers.
-	
+
 	Courtesy of Melvin Smith <mrjoltcola@mindspring.com>
 
 2002-01-03 19:41  gregor
 
-	* disassemble.pl, obscure.ops, packfile.c, pbc2c.pl: 
+	* disassemble.pl, obscure.ops, packfile.c, pbc2c.pl:
 	Updated copyright messages on top-level files.
 
 2002-01-03 04:23  robert
@@ -3514,12 +3537,12 @@
 
 2002-01-02 21:42  gregor
 
-	* packfile.c, include/parrot/packfile.h: 
+	* packfile.c, include/parrot/packfile.h:
 	Get rid of warnings in packfile.[hc]
 
 2002-01-02 20:39  gregor
 
-	* manicheck.pl: 
+	* manicheck.pl:
 	Bracketed translated patterns with ^ and $.
 
 2002-01-02 20:11  dan
@@ -3535,12 +3558,12 @@
 2002-01-02 19:31  tom
 
 	* string.c: Fix string transcoding so that it actually works.
-	
+
 	Patch from Peter Gibbs <peter@emkel.co.za>
 
 2002-01-02 19:20  gregor
 
-	* manicheck.pl: 
+	* manicheck.pl:
 	A program to check the MANIFEST file, accounting for .cvsignore
 	files.
 
@@ -3560,33 +3583,33 @@
 
 	* Configure.pl: Allow 64-bit build of parrot on systems with a
 	mixed 32/64 bit perl
-	
+
 	Courtesy of David M. Lloyd <dmlloyd@tds.net>
 
 2002-01-02 15:33  simon
 
-	* MANIFEST, docs/Makefile: 
+	* MANIFEST, docs/Makefile:
 	Fixed up MANIFEST. (And I removed the Makefile in docs/)
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2002-01-02 13:51  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Die on broken manifest.
 
 2002-01-02 13:48  simon
 
-	* jit2h.pl, examples/assembly/mops.pasm: 
+	* jit2h.pl, examples/assembly/mops.pasm:
 	Clear up JIT warnings.
-	
+
 	Courtesy of: Nick Clark <nick@unfortu.net>
 
 2002-01-02 04:10  dan
 
 	* io/io.c, io/io_os.c, t/op/interp.t: IO stack now gets initialized
 	only once, so new interp creation works again
-	
+
 	Courtesy of Melvin Smith <mrjoltcola@mindspring.com>
 
 2002-01-02 03:32  dan
@@ -3598,7 +3621,7 @@
 
 	* MANIFEST, Makefile.in, core.ops, include/parrot/io.h, io/io.c,
 	io/io_os.c: Initial IO system patches
-	
+
 	Courtesy of <mrjoltcola@mindspring.com>
 
 2002-01-01 22:55  ajgough
@@ -3610,16 +3633,16 @@
 2002-01-01 22:29  ajgough
 
 	* classes/default.pmc:	Wrote a whole host of default pmc methods.
-	
+
 	 set_* create appropriate Perl* result.
 	 get_* simply grabs needed bit of cache.*_val
-	
+
 	 Other methods do the rightest thing I can think of, at the moment.
-	
+
 	 None yet cope with overflow, the modulus operation needs to be
 	checked as
 	I don't know quite which semantics we really want.
-	
+
 	Not tested yet.
 
 2002-01-01 20:23  dan
@@ -3628,19 +3651,19 @@
 	encodings/utf32.c, encodings/utf8.c, include/parrot/encoding.h: Got
 	rid of unneeded tmp var and eliminated const from encode prototype
 	since it does make changes to the string.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2002-01-01 20:11  dan
 
 	* Makefile.in: Make clean now tosses pdump.o
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2002-01-01 19:49  dan
 
 	* pdump.c, test_main.c: Warnings cleanup
-	
+
 	Courtesy of Josh Wilmes <josh@sky.net>
 
 2002-01-01 19:45  dan
@@ -3649,63 +3672,63 @@
 	hints/mswin32.pl, languages/jako/Makefile.in,
 	languages/scheme/Makefile.in: Makes cleanup better on non-Unix
 	platforms
-	
+
 	Courtesy of "Jason Diamond" <jason@injektilo.org>
 
 2002-01-01 19:41  dan
 
 	* include/parrot/register.h: Clean up some warnings
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2002-01-01 19:10  simon
 
-	* pbc2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm: 
+	* pbc2c.pl, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm:
 	Hack-around to enable compilation of code using vtable ops.
 
 2002-01-01 18:43  dan
 
 	* encodings/: singlebyte.c, utf16.c, utf32.c, utf8.c: Toss <0
 	checks on unsigned things
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2002-01-01 18:26  dan
 
 	* runops_cores.c: More warning silences.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-01 18:25  dan
 
 	* trace.c: Shuts up a warning.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-01 18:24  dan
 
 	* encodings/singlebyte.c: Clean up some warnings.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-01 18:20  dan
 
 	* Configure.pl: Hey, those PPros are really x86 systems! Who'dve
 	thunk it?
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-01 18:17  dan
 
 	* packfile.c: Warning cleanup
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-01 17:53  dan
 
 	* string.c: New string size should be based on output encoding's
 	size, not input encoding's size.
-	
+
 	Courtesy of: "Peter Gibbs" <peter@emkel.co.za>
 
 2002-01-01 17:22  dan
@@ -3715,7 +3738,7 @@
 	include/parrot/interpreter.h, include/parrot/memory.h,
 	include/parrot/oplib.h, include/parrot/string.h, t/op/string.t:
 	Warnings fixups.
-	
+
 	Courtesy of Chip Turner <cturner@redhat.com>
 
 2002-01-01 17:09  dan
@@ -3723,20 +3746,20 @@
 	* encodings/singlebyte.c, encodings/utf16.c, encodings/utf32.c,
 	encodings/utf8.c, include/parrot/encoding.h: Some signed things are
 	now unsigned, as is proper.
-	
+
 	Courtesy of: "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 	Courtesy of: "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-01 16:59  dan
 
 	* include/parrot/trace.h: Useless debugging prototype removed
-	
+
 	Courtesy of: "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-01 16:58  dan
 
 	* MANIFEST: We forgot a file.
-	
+
 	Courtesy of "Bryan C. Warnock" <bwarnock@capita.com>
 
 2002-01-01 03:53  dan
@@ -3748,13 +3771,13 @@
 2002-01-01 03:48  dan
 
 	* config_h.in: Add in an unsigned INTVAL.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2002-01-01 03:46  dan
 
 	* global_setup.c: Clean up some compiler warnings.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2002-01-01 03:43  dan
@@ -3763,13 +3786,13 @@
 	lib/Parrot/OpTrans.pm, lib/Parrot/OpTrans/CPrederef.pm,
 	include/parrot/op.h: Cleaned up some things to make the compiler
 	happier.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2002-01-01 03:14  dan
 
 	* Configure.pl: Quad updates.
-	
+
 	Courtesy of Nicholas Clark <nick@unfortu.net>
 
 2001-12-31 22:53  dan
@@ -3789,7 +3812,7 @@
 2001-12-31 21:34  dan
 
 	* Configure.pl, hints/mswin32.pl: Tweaks for Win32 builds
-	
+
 	Courtesy of: "Jason Diamond" <jason@injektilo.org>
 
 2001-12-31 21:32  dan
@@ -3804,7 +3827,7 @@
 
 	* Configure.pl: Force the time on some copied files to be 'now' to
 	make the Win builds much less annoying.
-	
+
 	Courtesy of "Jason Diamond" <jason@injektilo.org>
 
 2001-12-31 20:07  dan
@@ -3815,7 +3838,7 @@
 
 2001-12-31 20:00  gregor
 
-	* chartypes/unicode.c: 
+	* chartypes/unicode.c:
 	Silence unused variable warnings.
 
 2001-12-31 19:40  dan
@@ -3824,20 +3847,20 @@
 
 2001-12-31 19:37  gregor
 
-	* interpreter.c, jit.c, include/parrot/jit.h: 
+	* interpreter.c, jit.c, include/parrot/jit.h:
 	Created a prototype for JIT functions and used it in interpreter.c.
 
 2001-12-31 19:31  dan
 
 	* Configure.pl, test_gnuc.c: Better GCC detection (and version
 	detection) with really cranky warnings if we find we're using it.
-	
+
 	Courtesy of: Nicholas Clark <nick@unfortu.net>
 
 2001-12-31 18:01  gregor
 
 	* interpreter.c, include/parrot/interpreter.h, include/parrot/op.h:
-	
+
 	Fixed a few warnings wrt prototypes, etc.
 
 2001-12-31 17:23  dan
@@ -3846,12 +3869,12 @@
 
 2001-12-31 17:15  gregor
 
-	* Configure.pl: 
+	* Configure.pl:
 	Get the ccname from either ccname or just cc config var.
 
 2001-12-31 17:14  gregor
 
-	* Parrot/Op.pm, lib/Parrot/Op.pm: 
+	* Parrot/Op.pm, lib/Parrot/Op.pm:
 	Another intermediate opbody notation. Could come in handy. Explicit
 	types.
 
@@ -3865,25 +3888,25 @@
 
 2001-12-31 16:00  simon
 
-	* encodings/utf8.c, include/parrot/encoding.h: 
+	* encodings/utf8.c, include/parrot/encoding.h:
 	Remove a couple more.
 
 2001-12-31 15:58  simon
 
 	* vtable_h.pl, include/parrot/global_setup.h, include/parrot/jit.h,
-	include/parrot/op.h: 
+	include/parrot/op.h:
 	Rid ourselves of a few warnings.
 
 2001-12-31 15:32  dan
 
 	* Configure.pl: Made GCC ever so much pickier.
-	
+
 	Switch list courtesy of Jarkko.
 
 2001-12-31 15:22  dan
 
 	* string.c: Tightened up initial allocation.
-	
+
 	Courtesy of:  "Peter Gibbs" <peter@emkel.co.za>
 
 2001-12-31 06:48  dan
@@ -3893,7 +3916,7 @@
 2001-12-31 05:32  dan
 
 	* core.ops: Unused temp variable tossed.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2001-12-31 05:09  grunblatt
@@ -3904,19 +3927,19 @@
 2001-12-31 03:05  dan
 
 	* Configure.pl, Makefile.in, classes/Makefile.in: Added in a
-	platform-independent quote substitution for the makefiles. 
+	platform-independent quote substitution for the makefiles.
 	Hopefully this'll make the Win32 builds happier.
 
 2001-12-30 21:08  dan
 
 	* string.c, include/parrot/string.h: More string system tweaks.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2001-12-30 20:45  dan
 
 	* core.ops: Some pod cleanup
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2001-12-30 20:22  ajgough
@@ -3940,31 +3963,31 @@
 	* packfile.c, pdump.c, register.c, string.c, include/parrot/key.h,
 	include/parrot/trace.h, platforms/generic.c: Compiler whine
 	cleanups
-	
+
 	Courtesy of Josh Wilmes <josh@hitchhiker.org>
 
 2001-12-30 19:13  dan
 
 	* Configure.pl, Makefile.in: Make GCC pickier by default.
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2001-12-30 18:41  dan
 
 	* core.ops, t/op/integer.t, t/op/number.t: Transformed iton and
 	ntoi opcodes to sets.
-	
+
 	Courtesy of "David & Lisa Jacobs" <jacobsl001@hawaii.rr.com>
 
 2001-12-30 17:58  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	'make' no longer builds the mops test. Use 'make mops' for that. To
 	run the test, you can do 'make mopstest'.
 
 2001-12-30 17:30  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	Fixed one oversight. 'make clean' was removing Parrot/Types.pm. Bad
 	Gregor.
 
@@ -3973,68 +3996,68 @@
 	* .cvsignore, Configure.pl, Makefile.in, VERSION, config_h.in,
 	core.ops, interpreter.c, make_vtable_ops.pl, obscure.ops, ops2c.pl,
 	Parrot/BuildUtil.pm, Parrot/OpsFile.pm, lib/Parrot/BuildUtil.pm,
-	lib/Parrot/OpsFile.pm, include/parrot/oplib.h: 
+	lib/Parrot/OpsFile.pm, include/parrot/oplib.h:
 	Build enhancements. Originally to support building shared
 	libraries, but now of broader impact.
-	
+
 	  * .cvsignore: Ignore the blib/ directory, about which more later.
-	
+
 	  * Configure.pl:
-	
+
 	      * Got rid of TAB formatting and lined a few things up.
-	
+
 	      * Added header comment with CVS Id variable, and a few other
 		block header comments.
-	
+
 	      * Uses new Parrot::BuildUtil module to determine the Parrot
 		version.
-	
+
 	      * Reworded a few messages, added a couple, and wrapped
 	messages
 		to 79 columns.
-	
+
 	      * Added 2002 to the Copyright statement.
-	
+
 	      * Added new configure variables: VERSION, MAJOR, MINOR and
 	PATCH
-	
+
 	      NOTE: Please see the 'Alas perl5.7.2' comment. 5.7.2 is
 	greater
 	      than 5.6.0, but the comment implies it isn't.
-	
+
 	  * Makefile.in:
-	
+
 	      * Added $(SO), $(A) and $(AR_CRS) defines for library
 	building.
-	
+
 	      * Added $(RM_RF) define for removing directory trees
-	
+
 	      * Grouped generated files into two classes: "sticky" (made by
 	configure,
 		persisting across 'make clean') and 'fluid' (made during
 	the build
 		process, deleted by 'make clean').
-	
+
 	      * Added header comments.
-	
+
 	      * Added target for test_prog linked with shared library.
-	
+
 	      * Added rules to build shared libraries in blib/lib. The
 	libraries are
 		built with trailing version numbers in their file names,
 	and then
 		symbolic links are created for shorter and no version tag
 	variants.
-	
+
 	      * Added some missing dependencies
-	
+
 	      * Added some missing 'make clean' targets.
-	
+
 	      * Added 'make realclean' target that deletes files created by
 		Configure.pl (including Makefile), forcing a re-configure.
-	
+
 	      * Added a 'status' CVS target.
-	
+
 	  * VERSION: New file, contains only the version. This version
 	number is
 	    propagated to a few places, such as the core oplib version
@@ -4048,7 +4071,7 @@
 	    that contain the version number (but, do that in a fresh CVS
 	copy, or
 	    after doing 'make realclean').
-	
+
 	  * config_h.in: Renamed PARROT_CORE_OPLIB_*_VERSION to
 	PARROT_*_VERSION,
 	    since the oplib and Parrot itself share a version number now.
@@ -4056,7 +4079,7 @@
 	    PARROT_PATCH_VERSION (the third component) and PARROT_VERSION
 	(a
 	    string).
-	
+
 	  * core.ops: Uses new notation "VERSION = PARROT_VERSION" instead
 	of
 	    specifying the version by hand. Non-core oplibs will set this
@@ -4064,58 +4087,58 @@
 	    a quoted dot-string with three natural number components
 	without
 	    leading zeros.
-	
+
 	  * interpreter.c: Make use of PARROT_VERSION to simplify some
 	sprintf()s, and
 	    to get the complete version number in the resulting strings
 	(including the
 	    new PATCH portion).
-	
+
 	  * make_vtable_ops.pl: Put the "VERSION = PARROT_VERSION" line int
 	the
 	    generated file.
-	
+
 	  * obscure.ops: Use the new "VERSION = PARROT_VERSION" technique.
-	
+
 	  * ops2c.pl: Account for the PATCH version, too. This affects the
 	name of the
 	    oplib init function, and the oplib info struct initializer.
-	
+
 	  * Parrot/BuildUtil.pm: New file for reading in and validating the
 	contents of
 	    the new VERSION file. Other build utilities could go here in
 	futuer.
-	
+
 	  * Parrot/OpsFile.pm:
-	
+
 	      * Allow three components in version number, and require that
 	the value
 		be in double quotes.
-	
+
 	      * Allow "VERSION = PARROT_VERSION", substituting the shared
 	Parrot
 		VERSION in that case.
-	
+
 	  * include/parrot/oplib.h: Add the patch_version member.
 
 2001-12-30 12:16  simon
 
-	* MANIFEST, Makefile.in: 
+	* MANIFEST, Makefile.in:
 	More stuff forgotten from MANIFEST.
 
 2001-12-30 12:13  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Missing JIT file.
 
 2001-12-30 12:12  simon
 
-	* jit2h.pl: 
+	* jit2h.pl:
 	Safety first.
 
 2001-12-30 12:12  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Gragh.
 
 2001-12-30 12:04  simon
@@ -4123,19 +4146,19 @@
 	* Makefile.in, core.ops, packfile.c, pbc2c.pl, string.c,
 	classes/perlstring.pmc, encodings/singlebyte.c, encodings/utf16.c,
 	encodings/utf32.c, encodings/utf8.c, include/parrot/encoding.h,
-	include/parrot/string.h, t/op/string.t: 
+	include/parrot/string.h, t/op/string.t:
 	* Expand the strings test suite to be more complete * Make string
 	commands more consistent (i.e, now the only string command that
 	actually changes the original is chopn) * Significantly reduce the
 	number of memory allocations and eliminate reallocations.
-	
+
 	Courtesy of: David Jacobs <jacobsl001@hawaii.rr.com>
 
 2001-12-29 22:12  dan
 
 	* interpreter.c, key.c, register.c, stacks.c, string.c,
 	test_main.c, trace.c: Updates to match the coding standards.
-	
+
 	Courtesy of Brian Warnock <bwarnock@capita.com>
 
 2001-12-29 20:42  grunblatt
@@ -4150,14 +4173,14 @@
 2001-12-28 21:20  dan
 
 	* core.ops: Okay, now print takes a preceding file handle.
-	
+
 	I feel so dirty now.
 
 2001-12-28 20:46  dan
 
 	* core.ops, t/op/hacks.t: Added in the readline op, as well as
 	changing the open op to use fopen under the hood.
-	
+
 	THESE OPS ARE EVIL! AND TEMPORARY! USE FOR DEBUGGING PURPOSES ONLY!
 
 2001-12-28 18:20  ajgough
@@ -4170,68 +4193,68 @@
 	vtables appropriately.	Also tests for same, new pmc_perlstring.t
 	to hold tests specific to PerlStrings, as the pmc.t file is taking
 	too long to run and slowing down my thought processes.
-	
+
 	Changes to strings.c etc to take string functions.
-	
+
 	Some changes to the strings docs, but not yet complete.
-	
+
 	Also, PerlString was copying pointers to strings, rather than
 	strings themselves, so some action-at-a-distance bugs were creaping
 	in, I think I've fixed this so everything works nicely.
 
 2001-12-28 04:56  gregor
 
-	* examples/assembly/pmcmops.pasm: 
+	* examples/assembly/pmcmops.pasm:
 	PMC-using version of mops.pasm.
-	
+
 	Courtesy of: Brian C. Warnock <bwarnock@capita.com>
 
 2001-12-28 04:56  gregor
 
-	* examples/assembly/.cvsignore: 
+	* examples/assembly/.cvsignore:
 	Small tinkering. Removed old stuff, etc.
 
 2001-12-28 01:26  gregor
 
-	* examples/mops/mops.scheme: 
+	* examples/mops/mops.scheme:
 	Scheme example. Major GC thrashing on umb-scheme here. Probably due
 	to the very un-scheme-like implementation.
 
 2001-12-28 01:19  gregor
 
-	* examples/mops/mops.c: 
+	* examples/mops/mops.c:
 	Some people's picky compilers don't like us redefineing time(), so
 	we call it time_n().  :)
 
 2001-12-28 00:28  gregor
 
-	* examples/mops/: README, mops.ps: 
+	* examples/mops/: README, mops.ps:
 	Added a PostScript example and a README.
 
 2001-12-27 23:57  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	Build the C mops translation in examples/mops/mops.c
 
 2001-12-27 23:56  gregor
 
-	* examples/mops/: .cvsignore, mops.c, mops.pl, mops.py, mops.rb: 
+	* examples/mops/: .cvsignore, mops.c, mops.pl, mops.py, mops.rb:
 	Some translations of mops.pasm into other languages, for inner loop
 	performance comparisons.
 
 2001-12-27 22:40  gregor
 
-	* examples/assembly/mops.pasm: 
+	* examples/assembly/mops.pasm:
 	Fixed erroneous file name in header comment.
 
 2001-12-27 21:18  gregor
 
-	* pbc2c.pl: 
+	* pbc2c.pl:
 	One-liner to avoid no-op gotos to the next op.
 
 2001-12-27 21:06  gregor
 
-	* runops_cores.c: 
+	* runops_cores.c:
 	Fixed -p (profiling). Slow runops core was doing unconditional
 	tracing, when it should have been checking the flags.
 
@@ -4244,7 +4267,7 @@
 	Added if_s_ic op, to use same  * Added (PerlString)->get_bool stuff
 	to perlstring.pmc  * Tests for above, also a for couple of other
 	ops without tests
-	
+
 	The unicode chartype has only had placeholders added for get_digit,
 	string_to_num has been updated to use type->get_digit rather than
 	the previous ascii-isms.  Some remain, but we need to carefully
@@ -4255,13 +4278,13 @@
 
 	* classes/: perlint.pmc, perlnum.pmc, perlstring.pmc: Silenced some
 	compiler warnings.
-	
+
 	Courtesy of "David  Jacobs" <jacobsl001@hawaii.rr.com>
 
 2001-12-27 18:23  dan
 
 	* t/op/bitwise.t: More tests.
-	
+
 	Courtesy of "David Jacobs" <jacobsl001@hawaii.rr.com>
 
 2001-12-27 17:08  gregor
@@ -4271,34 +4294,34 @@
 	trace.c, Parrot/OpsFile.pm, include/parrot/interp_guts.h,
 	include/parrot/interpreter.h, include/parrot/oplib.h,
 	lib/Parrot/OpsFile.pm, platforms/generic.c, platforms/generic.h,
-	platforms/win32.c, platforms/win32.h: 
+	platforms/win32.c, platforms/win32.h:
 	Initial code for dynamic loading of oplibs, applied for now to the
 	loading of the core_prederef oplib when the -P flag is passed to
 	test_parrot.
-	
+
 	  * MANIFEST: Added entry for the new file include/parrot/oplib.h.
-	
+
 	  * Makefile.in:
-	
+
 	      * Added libcore_prederef_0_3.so to the shared target.
 	      * Added build rule for libcore_prederef_0_3.so.
 	      * Added dependencies on Parrot/OpsFile.pm and Parrot/Op.pm
 		to Parrot/OpLib/core.pm, core_ops.c and
 		core_ops_prederef.c.
-	
+
 	  * config_h.in: Added defines for constants used to locate the
 	    core oplib's init function, and the core_prederef oplib for
 	    dynaloading.
-	
+
 	  * core.ops: Added a VERSION = 0.3 line near the top. This is now
 	    required by Parrot/OpsFile.pm.
-	
+
 	  * interpreter.c:
-	
+
 	      * Added init_prederef() and stop_prederef() functions to load
 		and unload the core_prederef oplib when we are in prederef
 		mode.
-	
+
 		NOTE: In all likelihood, the prederef stuff has a rapidly
 		dwindling time-to-live. The JIT should provide vastly
 	superior
@@ -4307,48 +4330,48 @@
 		*additional* ops is. It does provide a handy test case for
 	the
 		general idea for now, though.
-	
+
 	      * Gets the core copcode table, etc. via the core oplibs oplib
 		info pointer, as returned by the core oplib's init
 	function.
-	
+
 	  * ops2c.pl
-	
+
 	      * Make use of the version, major version and minor version
 		stuff parsed by Parrot/OpsFile.pm
-	
+
 	      * The only exported symbol in the generated files is the init
 		function now, since that returns an oplib info struct
 		pointer, and all the important stuff can be found there.
-	
+
 	  * ops2pm.pl: Put the oplib version in the generated .pm file.
-	
+
 	  * test_main.c: Small changes necessitated by changes in the names
 	    of some members of the interpreter struct.
-	
+
 	  * trace.c: Small changes necessitated by changes in the names
 	    of some members of the interpreter struct.
-	
+
 	  * Parrot/OpsFile.pm: Require a "VERSION = x.y" line before any
 	    ops are found.
-	
+
 	  * include/parrot/interp_guts.h: Small changes necessitated by
 	    changes in the names of some members of the interpreter struct.
-	
+
 	  * include/parrot/interpreter.h: Include the new
 	    include/parrot/oplib.h header. Small changes to the oplib-
 	    related members.
-	
+
 	  * include/parrot/oplib.h: Define the type of the oplib init
 	    function, and the struct type for the oplib info.
-	
+
 	  * platforms/*.[hc]: Remove the second argument to Parrot_dlopen()
 	    since not all platforms have it. For those that do, a default
 	    second argument is provided.
 
 2001-12-26 05:12  gregor
 
-	* Configure.pl: 
+	* Configure.pl:
 	Make jitarch calculation not get tripped up by extra components to
 	archname.
 
@@ -4358,28 +4381,28 @@
 	Parrot/Jit/i386-linux.pm, Parrot/Jit/i386-nojit.pm,
 	include/parrot/jit.h, jit/i386/core.jit, jit/i386/lib.jit,
 	jit/i386/string.jit, lib/Parrot/Jit/i386-bsd.pm,
-	lib/Parrot/Jit/i386-linux.pm, lib/Parrot/Jit/i386-nojit.pm: 
+	lib/Parrot/Jit/i386-linux.pm, lib/Parrot/Jit/i386-nojit.pm:
 	Some more JIT work from Daniel Grunblatt.
-	
+
 	  * Ops added set_s_s, set_s_sc, bsr_i and eq_s_sc but using calls
 	to C
 	    functions.
-	
+
 	  * Added JUMP(END) to place the number of bytes to the end of the
 	current
 	    op.
-	
+
 	  * The *.jit files syntax changed.
-	
+
 	  * Added jit/i386/lib.jit to place handly functions as jump that
 	take as
 	    argument the address where is the opcode number to jump to.
-	
+
 	  * There is a bug at some point, but I will start writting
 	    jit/i386/string.jit and jit/i386/stacks.jit so that we don't
 	have use
 	    calls, which make the jit as slow as the interpreter.
-	
+
 	Courtesy of: Daniel Grunblatt <daniel@grunblatt.com.ar>
 
 2001-12-24 03:46  dan
@@ -4399,9 +4422,9 @@
 
 	* jit2h.pl, Parrot/Jit/i386-bsd.pm, Parrot/Jit/i386-linux.pm,
 	Parrot/Jit/i386-nojit.pm, lib/Parrot/Jit/i386-bsd.pm,
-	lib/Parrot/Jit/i386-linux.pm, lib/Parrot/Jit/i386-nojit.pm: 
+	lib/Parrot/Jit/i386-linux.pm, lib/Parrot/Jit/i386-nojit.pm:
 	Fixed some package name goofs.
-	
+
 	Thanks to: Andy Dougherty <doughera@mail.lafayette.edu>
 
 2001-12-21 19:32  gregor
@@ -4414,85 +4437,85 @@
 	Parrot/OpTrans/C.pm, Parrot/OpTrans/CGoto.pm,
 	Parrot/OpTrans/CPrederef.pm, docs/intro.pod, include/parrot/op.h,
 	include/parrot/stacks.h, lib/Parrot/OpTrans/C.pm,
-	lib/Parrot/OpTrans/CGoto.pm, lib/Parrot/OpTrans/CPrederef.pm: 
+	lib/Parrot/OpTrans/CGoto.pm, lib/Parrot/OpTrans/CPrederef.pm:
 	Changes to syntax of .ops files and refactoring of ops2c*.pl and
 	pbc2c.pl.
-	
+
 	  * Removed ops2c-prederef.pl
-	
+
 	  * (unrelated) Removed vestigial Parrot/Opcode.pm file.
-	
+
 	  * Added Parrot/OpTrans.pm, Parrot/OpTrans/C.pm (needed for old
 	    functionality of ops2c.pl), Parrot/OpTrans/CPrederef.pm (needed
 	    for old functionality of ops2c-prederef.pl), and
 	    Parrot/OpTrans/CGoto.pm (needed for functionality of pbc2c.pl).
-	
+
 	    "OpTrans" == "Op Transformation"
-	
+
 	  * Makefile.in modifications to call "ops2c.pl C" where it used
 	    to be just "ops2c.pl", and "ops2c.pl CPrederef" where it used
 	    to be "ops2c-prederef.pl".
-	
+
 	  * core.ops and obscure.ops changes to syntax. Semantics are
 	    identical with previous version:
-	
+
 	      return HALT	  -->  HALT()
 	      return AUTO	  -->  goto NEXT()
 	      return RETREL(...)  -->  goto OFFSET(...)
 	      return RESTART(*)   -->  restart NEXT()
-	
+
 	    Also, pop_generic_entry() stuff (local var + 5 lines of code)
 	    for dest-less branch ops replaced with new notation "goto
 	POP()",
 	    which uses the new pop_dest() function in stacks.c. This also
 	    allowed these ops to become 'inline' ops, since they no longer
 	    have local variables.
-	
+
 	    The 'ret' op also became simplified to just "goto POP()", and
 	    also became an inline op.
-	
+
 	  * interpreter.c reflects the change in type name:
-	
+
 	      prederef_op_func_t   -->	op_func_prederef_t
-	
+
 	    that occurred in include/parrot/op.h
-	
+
 	  * make_vtable_ops.pl uses "goto NEXT()" where it used to use
 	    "return AUTO".
-	
+
 	  * ops2c.pl is now generic. Its first argument is the last
 	    package name component of a subclass of Parrot::OpTrans. These
 	    subclasses all have full names of the form Parrot::OpTrans::*.
 	    An instance of the class is created and later consulted for
 	    various bits of information needed to generate the C code.
-	
+
 	  * pbc2c.pl now uses an instance of Parrot::OpTrans::CGoto to
 	    contain its transformation rules.
-	
+
 	  * stacks.c has a new function pop_dest() that pops a destination
 	    off the control stack. include/parrot/stacks.h has the
 	prototype.
-	
+
 	  * Parrot/Op.pm now supports the syntax generated by
 	Parrot::OpsFile
 	    for the "goto POP" case.
-	
+
 	    Also, the source() method now expects its second argument to be
 	    an object that ISA Parrot::OpTrans. Methods of this object are
 	    called to perform the substitutions.
-	
+
 	  * Parrot/OpsFile.pm supports the change in notation mentioned
 	    above.
-	
+
 	  * docs/intro.pod reflects these changes.
-	
+
 	  * include/parrot/op.h: Renamed type prederef_op_func_t to
 	    op_func_prederef_t because it made the implementation of the
 	    shared ops2c.pl easier.
 
 2001-12-21 13:47  gregor
 
-	* Configure.pl, config_h.in, interpreter.c, test_main.c: 
+	* Configure.pl, config_h.in, interpreter.c, test_main.c:
 	Both test_parrot (via test_main.c) and the intepreter itself (via
 	interpreter.c) use the JIT_CAPABLE config to decide whether to
 	actually attempt JIT operation, or to complain.
@@ -4500,11 +4523,11 @@
 2001-12-20 23:25  gregor
 
 	* core.ops, make_vtable_ops.pl, obscure.ops, Parrot/OpsFile.pm,
-	lib/Parrot/OpsFile.pm, docs/intro.pod, include/parrot/op.h: 
+	lib/Parrot/OpsFile.pm, docs/intro.pod, include/parrot/op.h:
 	Changes to the format of *.ops files. An attempt to provide hints
 	for future opfunc processing logic that wants to know if an opfunc
 	is simple enough to JIT (e.g.) inline, or not.
-	
+
 	See the POD in Parrot/OpsFile.pm and the updated docs/intro.pod in
 	addition to The Source in core.ops and Parrot/OpsFile.pm for more
 	info.
@@ -4512,19 +4535,19 @@
 2001-12-20 21:28  gregor
 
 	* Configure.pl, jit.c, jit2h.pl, include/parrot/jit.h,
-	jit/i386/core.jit: 
+	jit/i386/core.jit:
 	More JIT stuff:
-	
+
 	  * A fix to Gregor's last Configure.pl update.
-	
+
 	  * Remove the need for hardcoded "\n" at the end of the "%f"
 	    format for printing floating-point numbers.
-	
+
 	  * New, improved *.jit syntax for references to registers,
 	    e.g. INT_REG[n].
-	
+
 	  * Support for C() improved.
-	
+
 	Courtesy of: Daniel Grunblatt <daniel@grunblatt.com.ar>
 
 2001-12-20 16:55  dan
@@ -4533,30 +4556,30 @@
 
 2001-12-20 15:24  simon
 
-	* jit2h.pl: 
+	* jit2h.pl:
 	Off-by-one error fixed.
 
 2001-12-20 14:18  simon
 
-	* jit/i386/core.jit: 
+	* jit/i386/core.jit:
 	Just a noop. It's the only machine code I know.
 
 2001-12-20 13:10  gregor
 
-	* Configure.pl, Makefile.in, jit2h.pl: 
+	* Configure.pl, Makefile.in, jit2h.pl:
 	Attempt to fix Win32 builds.
-	
+
 	  * No more empty braces in include/parrot/jit_struct.h
-	
+
 	Also:
-	
+
 	  * ${jitarchname} has the *bsd -> bsd substitution on it, but
 	${archname}
 	    does not.
 
 2001-12-20 11:56  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	De-cp
 
 2001-12-20 01:57  gregor
@@ -4567,15 +4590,15 @@
 	include/parrot/.cvsignore, include/parrot/interpreter.h,
 	include/parrot/jit.h, jit/i386/core.jit, jit/i386/string.jit,
 	lib/Parrot/Jit/i386-bsd.pm, lib/Parrot/Jit/i386-linux.pm,
-	lib/Parrot/Jit/i386-nojit.pm: 
+	lib/Parrot/Jit/i386-nojit.pm:
 	Initial JIT implementation.
-	
+
 	  * Enabled with test_parrot -j. 20x speed boosts seen.
-	
+
 	  * Unsupported archs mapped to i386-nojit. Don't do -j on them.
-	
+
 	  * More to come.
-	
+
 	Courtesy of: Daniel Grunblatt <daniel@grunblatt.com.ar>
 
 2001-12-20 01:53  jgoff
@@ -4605,24 +4628,24 @@
 
 2001-12-18 20:06  gregor
 
-	* interpreter.c, include/parrot/interp_guts.h: 
+	* interpreter.c, include/parrot/interp_guts.h:
 	Performance improvements to the predereferencing code path
-	suggested to me over lunch yesterday by my friend John Kennedy. 
+	suggested to me over lunch yesterday by my friend John Kennedy.
 	The goal is to remove the additional test in the inner loop that
 	was checking for NULL to decide whether or not to call the
 	prederef() function. Also moved pc & pc_prederef syncing outside
 	the innner loop.
-	
+
 	  * Changed the prototype of the prederef() function in
 	    interpreter.c to match that of an opfunc.
-	
+
 	  * Instead of initializing the prederef void * array with NULL,
 	    we initialize it with pointers to prederef().
-	
+
 	  * prederef() now returns the prederef_pc passed in, so that
 	    after predereferencing, the same location is executed, but now
 	    with the real code being called.
-	
+
 	Thanks to: John Kennedy
 
 2001-12-18 19:59  ajgough
@@ -4644,10 +4667,10 @@
 	classes/perlarray.pmc core.ops - Added new series of set() ops for
 	arrays global_setup.c - Initialized perlarray classes/Makefile.in -
 	Added perlarray.pmc classes/*.pmc - Added
-	set_{integer,number,string}_index and			   
+	set_{integer,number,string}_index and
 	get_{integer,number,string}_index include/parrot/pmc.h - Added new
 	type t/op/pmc.t - Added basic array test
-	
+
 	classes/perlarray.pmc - Added
 
 2001-12-17 05:29  jgoff
@@ -4717,30 +4740,30 @@
 2001-12-16 14:11  simon
 
 	* classes/perlint.pmc, examples/assembly/mops_p.pasm, t/op/pmc.t,
-	t/pmc/pmc.t: 
+	t/pmc/pmc.t:
 	Fix bogus assumption that multiplying an integer by an integer
 	yields an integer.
 
 2001-12-16 12:48  simon
 
-	* make_vtable_ops.pl: 
+	* make_vtable_ops.pl:
 	Fixed op exploder.
 
 2001-12-16 12:45  simon
 
-	* make_vtable_ops.pl, Parrot/Vtable.pm, lib/Parrot/Vtable.pm: 
+	* make_vtable_ops.pl, Parrot/Vtable.pm, lib/Parrot/Vtable.pm:
 	Expand multimethod vtable ops.
 
 2001-12-16 12:04  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Added 'cvsclean' which doesn't zap CVS/* directories.
 
 2001-12-15 01:50  dan
 
 	* include/parrot/string.h: Fixed typo in string.h. lagnuage,
 	indeed!
-	
+
 	Thanks to grunblatt fom #parrot for the catch
 
 2001-12-15 01:39  dan
@@ -4751,13 +4774,13 @@
 	languages/miniperl/Miniperl/Test.pm, languages/scheme/.cvsignore,
 	languages/scheme/Makefile, languages/scheme/Makefile.in: Build
 	tweaks.
-	
+
 	Courtesy of: Jay McCarthy <jay@kenyamountain.com>
 
 2001-12-14 17:39  dan
 
 	* t/op/trans.t: More trans tests.
-	
+
 	Courtesy of: Simon Glover <scog@roe.ac.uk>
 
 2001-12-14 07:41  robert
@@ -4772,9 +4795,9 @@
 2001-12-14 06:04  jgoff
 
 	* Parrot/Optimizer.pm, lib/Parrot/Optimizer.pm: Optimizer
-	
+
 	  optimizer.pl is the stub, Parrot/Optimizer.pm is the driver.
-	
+
 	  The optimizer performs its work on a file post-macro expansion.
 	  Run it on a .pasm file, preferably with some trivially reducible
 	operations
@@ -4792,7 +4815,7 @@
 
 	* classes/Makefile.in, languages/Makefile.in: Makefile tweaks for
 	better Win building
-	
+
 	Courtesy of: Garrett Goebel <garrett@scriptpro.com>
 
 2001-12-13 22:03  dan
@@ -4824,17 +4847,17 @@
 	* core.ops, key.c, string.c, test_main.c, trace.c,
 	classes/Makefile.in, include/parrot/trace.h: Fixes to clean up
 	compiler warnings
-	
+
 	Courtesy of: Josh Wilmes <josh@sky.net>
 
 2001-12-13 13:33  gregor
 
-	* languages/jako/Makefile.in: 
+	* languages/jako/Makefile.in:
 	Improved the method of calling the assembler.
 
 2001-12-13 13:30  gregor
 
-	* languages/jako/Makefile.in: 
+	* languages/jako/Makefile.in:
 	Improve the build process. It now works from the main parrot dir,
 	and from the languages/jako directory. Now uses the .SUFFIXES
 	target and generic build rules to reduce clutter in the
@@ -4842,7 +4865,7 @@
 
 2001-12-13 13:29  gregor
 
-	* languages/jako/.cvsignore: 
+	* languages/jako/.cvsignore:
 	Ignore the (now generated Makefile), and don't ignore .list files
 	anymore, since we aren't generating them.
 
@@ -4850,18 +4873,18 @@
 
 	* Configure.pl, MANIFEST, Makefile.in, languages/.cvsignore,
 	languages/Makefile.in, languages/jako/Makefile,
-	languages/jako/Makefile.in: 
+	languages/jako/Makefile.in:
 	Added a 'languages' target to the top-level Makefile.in, and
 	modified the jako build procedure to involve Makefile.in -->
 	Makefile too (done by Configure.pl).
-	
+
 	NOTE: languages/jako and language/scheme are built.
 	languages/miniperl wasn't building right, so it was left off for
 	now.
 
 2001-12-13 12:15  gregor
 
-	* MANIFEST: 
+	* MANIFEST:
 	Added MAINTAINER file and mandelzoom.jako from languages/jako to
 	the MANIFEST.
 
@@ -4870,14 +4893,14 @@
 	* .cvsignore, MANIFEST, Makefile.in, core.ops, interpreter.c,
 	ops2c-prederef.pl, ops2c.pl, test_main.c,
 	include/parrot/interp_guts.h, include/parrot/interpreter.h,
-	include/parrot/op.h, include/parrot/oplib/.cvsignore: 
+	include/parrot/op.h, include/parrot/oplib/.cvsignore:
 	Welcome to the Just-in-Time Predereferencing Patch!
-	
+
 	This patch implements a "predereferencing" mode for parrot. That
 	means that a lot of the dereferencing you see in DO_OP and in the
 	opfuncs is done up front (really, JIT) rather than as and each time
 	we execute each op in the byte code stream.
-	
+
 	This works by creating an array of void pointers with the same
 	number of elements as the byte code array. This array starts out
 	life zero-initialized.	Each time we go to execute an op, we check
@@ -4887,30 +4910,30 @@
 	it can go look up opfunc pointers and op arg types and put the
 	opfunc and arg pointers at cur_opcode[0] .. cur_opcode[N - 1],
 	where N is the number of args (counding the op itself as one arg).
-	
+
 	We assume that sizeof(INTVAL) <= sizeof(void *), so we can continue
 	to have inline INTVAL constants.
-	
+
 	I've been getting about a 22% speed increase over vanila code path
 	when I compile with -O0. Advantage decreases at -O9 here. I tested
 	with mops.pbc, and also by temporarily putting the -P flag in
 	Parrot/Test.pm and running all the tests. So, this code is as
 	correct as the test suite can detect.
-	
+
 	Here's how it plays out in the code:
-	
+
 	  * New script ops2c-prederef.pl
-	
+
 	    Copy-paste code reuse from ops2c.pl. Modified to expect the
 	args to give
 	    a void ** cur_opcode and to return a void **.
-	
+
 	  * Modified ops2c.pl
-	
+
 	      * opfuncs are now static. Who needs to call them by name from
 	outside,
 		anyway? They are accessed via the opfunc table.
-	
+
 	      * Some MACRO stuff to make things work whether we prederef or
 	not. It
 		may be possible to get rid of these some day if other folks
@@ -4919,18 +4942,18 @@
 	our PC
 		rather than raw pointers to either opcode_t's or (void *)'s
 		(depending on prederef mode or no).
-	
+
 	  * core.ops modified to be usable to build both kinds of opfuncs.
 	For now,
 	    this means:
-	
+
 	      * calls to push_generic_entry(... cur_opcode ...) were
 	changed to
 		push_generic_entry(... CUR_OPCODE ...), where CUR_OPCODE is
 	a
 		macro that does the right thing in both kinds of ops.c
 	files.
-	
+
 		This is applicable to the bsr op. If we treated
 	destinations as
 		(Code PMC + local offset) rather than as
@@ -4945,7 +4968,7 @@
 	(assuming we'll
 		allow reflection, as in ops that query or affect the
 	current CODE PMC).
-	
+
 	      * runinterp was modified. Instead of copying the top-level
 	PackFile struct
 		and blasting its byte_code pointer, we simply call runops
@@ -4955,58 +4978,58 @@
 		offset into that code at which to start (this last arg used
 	to be a
 		pointer PC, now its an offset PC).
-	
+
 	  * include/parrot/op.h
-	
+
 	      * new typedef for prederef opfuncs (they return void **)
-	
+
 	  * include/parrot/interp_guts.h
-	
+
 	      * New DO_OP_PREDEREF() macro described above.
-	
+
 	  * include/parrot/interpreter.h
-	
+
 	      * New prototype of runops() -- see below.
-	
+
 	      * resume_addr field changed to resume_flag and resume_offset
 	pair of fields.
 		We might be resuming from interp using prederef to one not
 	or vice-versa,
 		so pointers between the two don't play nice together.
 	Offsets are beautiful.
-	
+
 	      * New PARROT_PREDEREF_FLAG constant
-	
+
 	  * interpreter.c
-	
+
 	      * include "parrot/oplib/core_ops_prederef.h"
-	
+
 	      * prederef() function described above.
-	
+
 	      * runops_prederef() runops variant. Uses DO_OP_PREDEREF()
 	macro as its core.
-	
+
 	      * runops() modified to take size_t CODE-relative offset PC
 	rather than
 		pointer PC. This made other things workable and doesn't
 	seem to have lost
 		anything important (IMO).
-	
+
 	  * test_main.c
-	
+
 	      * New flag '-P' to enable predereferencing.
-	
+
 	  * Makefile modified to build core_ops_prederef.c from core.ops
 	via
 	    ops2c-prederef.pl.
-	
+
 	    BTW, also added missing $(INC)/interp_guts.h to H_FILES.
-	
+
 	    Added core_ops_prederef$(O) to O_FILES
 
 2001-12-13 12:12  gregor
 
-	* languages/jako/MAINTAINER: 
+	* languages/jako/MAINTAINER:
 	Thought it would be nice to put this right in the code...
 
 2001-12-13 04:36  jgoff
@@ -5054,7 +5077,7 @@
 2001-12-12 18:22  dan
 
 	* Makefile.in: D'oh! Fixed looping makefile bug.
-	
+
 	Courtesty of: "Jaen Saul" <jaen@saul.ee>
 
 2001-12-12 16:23  jgoff
@@ -5082,7 +5105,7 @@
 
 	* languages/miniperl/: Makefile, Miniperl.pm, foo.mpl, miniperlc,
 	mpc: Final go-round, hopefully.
-	
+
 	languages/miniperl/Makefile - Used basically to run tests, as there
 	is nothing				 here that needs to be
 	dynamically built.  languages/miniperl/Miniperl.pm - Stub module
@@ -5097,7 +5120,7 @@
 
 2001-12-12 15:07  simon
 
-	* Makefile.in, languages/jako/Makefile, languages/scheme/Makefile: 
+	* Makefile.in, languages/jako/Makefile, languages/scheme/Makefile:
 	Recursive make considered "ow, don't do that".
 
 2001-12-12 14:45  dan
@@ -5150,26 +5173,26 @@
 
 	* include/parrot/key.h: key.c - Removed a few functions,
 	generalized set_element_value and element_value 	to accept
-	KEY_PAIRs from core.ops include/parrot/key.h - Modified header. 
+	KEY_PAIRs from core.ops include/parrot/key.h - Modified header.
 	core.ops - Modified to accept the new return style.
-	
+
 	This is a prelude to adding virtual-table methods to allow hashing
 	&c. Expect at least one or two more redesigns before this settles
 	down. However, it still passes the original tests.
 
 2001-12-11 13:35  gregor
 
-	* runops_cores.c: 
+	* runops_cores.c:
 	Fixed a typo.
 
 2001-12-11 12:03  gregor
 
-	* .cvsignore: 
+	* .cvsignore:
 	Don't ignore test_prog, but do ignore parrot.
 
 2001-12-11 12:03  gregor
 
-	* classes/.cvsignore: 
+	* classes/.cvsignore:
 	Ignore the generated file default.h
 
 2001-12-11 04:07  jgoff
@@ -5198,62 +5221,62 @@
 
 2001-12-08 23:07  simon
 
-	* README: 
+	* README:
 	README good to go.
 
 2001-12-08 23:05  simon
 
 	* Configure.pl, Makefile.in, README, Parrot/Test.pm,
 	docs/intro.pod, languages/jako/Makefile, languages/scheme/Makefile,
-	languages/scheme/Scheme/Test.pm, lib/Parrot/Test.pm: 
+	languages/scheme/Scheme/Test.pm, lib/Parrot/Test.pm:
 	test_prog? What is test_prog?
 
 2001-12-08 22:57  simon
 
-	* ChangeLog: 
-	
+	* ChangeLog:
+
 	Oops, the changelog commit was on *this* machine.
 
 2001-12-08 22:56  simon
 
-	* NEWS: 
+	* NEWS:
 	Updates to NEWS and ChangeLog pre-release.
 
 2001-12-08 22:07  simon
 
 	* MANIFEST, Makefile.in, classes/Makefile.in, classes/default.pmc,
-	classes/perlnum.pmc, classes/pmc2c.pl: 
+	classes/perlnum.pmc, classes/pmc2c.pl:
 	Add "default" PMC vtable so you can inherit implied stuff.
 
 2001-12-08 21:24  simon
 
 	* Parrot/PackFile.pm, docs/parrot.pod, docs/parrotbyte.pod,
-	docs/vtables.pod, lib/Parrot/PackFile.pm: 
+	docs/vtables.pod, lib/Parrot/PackFile.pm:
 	Getting the documentation up to scratch.
 
 2001-12-08 21:21  simon
 
-	* classes/pmc2c.pl: 
+	* classes/pmc2c.pl:
 	Allow inheriting from default class.
 
 2001-12-07 20:43  gregor
 
-	* examples/assembly/queens.pasm: 
+	* examples/assembly/queens.pasm:
 	Regenerated the file with the latest jakoc.
 
 2001-12-07 20:29  simon
 
-	* core.ops, t/op/stacks.t: 
+	* core.ops, t/op/stacks.t:
 	Rename "rotate" to "rotate_up".
 
 2001-12-07 20:15  simon
 
-	* t/op/stacks.t: 
+	* t/op/stacks.t:
 	Some tests for rotate.
 
 2001-12-07 00:55  gregor
 
-	* core.ops: 
+	* core.ops:
 	Cast the result of the pointer arithmetic, since without the cast
 	there are warnings with some compilers, and without the parens
 	around the pointer arithmetic, precedence breaks the meaning and
@@ -5261,12 +5284,12 @@
 
 2001-12-06 23:37  simon
 
-	* core.ops: 
+	* core.ops:
 	Temporary. I prefer compiler warnings to segfaults, thanks.
 
 2001-12-06 23:34  simon
 
-	* runops_cores.c: 
+	* runops_cores.c:
 	Make "trace" work again.
 
 2001-12-06 21:23  dan
@@ -5280,7 +5303,7 @@
 
 2001-12-06 19:22  simon
 
-	* core.ops: 
+	* core.ops:
 	Yet another "How the *%$! did that compile?" moment.
 
 2001-12-06 18:28  dan
@@ -5293,37 +5316,37 @@
 	docs/parrot_assembly.pod, include/parrot/interpreter.h: Sensible
 	changes to the interpreter--flags are now part of the interp
 	structure.
-	
+
 	Courtesy of "Melvin Smith" <mrjoltcola@mindspring.com>
 
 2001-12-06 14:02  gregor
 
-	* docs/intro.pod: 
+	* docs/intro.pod:
 	s/little_languages/languages/ in Jako section.
 
 2001-12-06 13:15  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Ensure the documentation gets made.
 
 2001-12-06 13:12  simon
 
-	* MANIFEST, docs/intro.pod: 
+	* MANIFEST, docs/intro.pod:
 	Documentation! Added the "Some Assembly Required" article with
 	minor updates.
 
 2001-12-06 00:39  simon
 
-	* core.ops: 
+	* core.ops:
 	More "eq" support.
-	
+
 	Courtesy of: Nguon Hao Ching <hao@netaxs.com>
 
 2001-12-06 00:37  simon
 
-	* test_main.c: 
+	* test_main.c:
 	Add the "-d" debug flag. Doesn't actually *do* anything yet.
-	
+
 	Courtesy of: Melvin <mrjoltcola@mindspring.com>
 
 2001-12-06 00:11  tom
@@ -5344,7 +5367,7 @@
 
 2001-12-05 19:43  gregor
 
-	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: 
+	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm:
 	  * Reworked the constantize_string() stuff a little bit because it
 	was
 	    puking on things like "\033[H\033[2J\0" (which occurs in the
@@ -5352,63 +5375,63 @@
 
 2001-12-05 19:39  gregor
 
-	* languages/jako/: Makefile, mandelzoom.jako: 
+	* languages/jako/: Makefile, mandelzoom.jako:
 	Added 'mandelzoom' example.
 
 2001-12-05 19:38  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	  * Added sleep()
-	
+
 	  * Changed some instances of die() to confess()
 
 2001-12-05 18:34  gregor
 
-	* t/: op/pmc.t, pmc/pmc.t: 
+	* t/: op/pmc.t, pmc/pmc.t:
 	s/sting->int/string->int/
 
 2001-12-05 18:08  gregor
 
-	* Parrot/.cvsignore: 
+	* Parrot/.cvsignore:
 	Ignore PMC.pm
 
 2001-12-05 18:05  gregor
 
-	* classes/.cvsignore: 
+	* classes/.cvsignore:
 	Ignore the generated files.
 
 2001-12-05 17:19  gregor
 
-	* pbc2c.pl: 
+	* pbc2c.pl:
 	  * Reverted recent changes, since they broke the script. Real fix
 	coming
 	    later.
 
 2001-12-05 17:03  simon
 
-	* classes/Makefile.in: 
+	* classes/Makefile.in:
 	Remember: change Makefile.in, not Makefile. D'oh.
 
 2001-12-05 17:02  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Ensure PMC.pm gets remade.
 
 2001-12-05 16:58  simon
 
 	* MANIFEST, Makefile.in, classes/Makefile.in,
-	classes/perlundef.pmc, include/parrot/pmc.h: 
+	classes/perlundef.pmc, include/parrot/pmc.h:
 	Add perlundef class.
 
 2001-12-05 16:45  simon
 
-	* core.ops: 
+	* core.ops:
 	Document "new P0, foo"
 
 2001-12-05 16:43  simon
 
 	* MANIFEST, Makefile.in, pbc2c.pl, pmc_pm.pl, Parrot/Assembler.pm,
-	lib/Parrot/Assembler.pm, t/op/pmc.t, t/pmc/pmc.t: 
+	lib/Parrot/Assembler.pm, t/op/pmc.t, t/pmc/pmc.t:
 	Allow assembler to know about PMC class names.
 
 2001-12-04 13:39  ajgough
@@ -5490,9 +5513,9 @@
 	for docs/ and classes/		      Removed '-I./include' because
 	it was getting incorrectly		  passed to classes/
 	MANIFEST - added docs/Makefile.in, classes/Makefile.in Makefile.in
-	- Removed classes/ build stuff, replaced with classes/Makefile.in  
+	- Removed classes/ build stuff, replaced with classes/Makefile.in
 		    Added '-I./include' locally docs/Makefile - Should no
-	longer be used, but I'm not brave enough to do a		
+	longer be used, but I'm not brave enough to do a
 	cvs delete.
 
 2001-12-02 01:21  ajgough
@@ -5524,7 +5547,7 @@
 
 2001-11-30 10:36  simon
 
-	* core.ops: 
+	* core.ops:
 	Rewrite print_p to do the right thing.
 
 2001-11-30 06:21  jgoff
@@ -5577,22 +5600,22 @@
 
 2001-11-28 17:00  simon
 
-	* t/harness: 
-	
+	* t/harness:
+
 	Make csh-glob happy.
-	
+
 	Courtesy of: Andy Dougherty: <doughera@lafayette.edu>
 
 2001-11-28 16:40  simon
 
-	* classes/perlnum.pmc: 
-	
+	* classes/perlnum.pmc:
+
 	De-C++
 
 2001-11-28 15:22  simon
 
-	* string.c: 
-	
+	* string.c:
+
 	Fixes Alex's string concat worry.
 
 2001-11-28 14:27  ajgough
@@ -5602,8 +5625,8 @@
 
 2001-11-28 11:14  simon
 
-	* include/parrot/pmc.h: 
-	
+	* include/parrot/pmc.h:
+
 	Placate AIX.
 
 2001-11-26 21:03  dan
@@ -5612,16 +5635,16 @@
 
 2001-11-26 17:29  simon
 
-	* classes/perlint.pmc: 
-	
+	* classes/perlint.pmc:
+
 	Various subtle but non-showstopper bugs.
 
 2001-11-26 11:23  simon
 
-	* classes/pmc2c.pl: 
-	
+	* classes/pmc2c.pl:
+
 	Replace dependency on Text::Balanced
-	
+
 	Courtesy of: Bart Lateur <bart.lateur@pandora.be>
 
 2001-11-26 05:22  jgoff
@@ -5645,7 +5668,7 @@
 
 2001-11-25 13:18  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Windows XP make doesn't like $<
 
 2001-11-25 12:56  simon
@@ -5653,11 +5676,11 @@
 	* MANIFEST, Makefile.in, classes/genclass.pl, classes/perlint.c,
 	classes/perlint.pmc, classes/perlnum.c, classes/perlnum.pmc,
 	classes/perlstring.c, classes/perlstring.pmc, classes/pmc2c.pl,
-	examples/assembly/mops_p.pasm: 
+	examples/assembly/mops_p.pasm:
 	PMC preprocessor.
-	
+
 	Courtesy of: Angel Faus <afaus@corp.vlex.com>
-	
+
 	I (Simon) also added a couple more integer methods, but no tests
 	since I'm a Bad Person.
 
@@ -5673,36 +5696,36 @@
 
 2001-11-23 18:27  simon
 
-	* core.ops, classes/perlint.c, examples/assembly/mops_p.pasm: 
+	* core.ops, classes/perlint.c, examples/assembly/mops_p.pasm:
 	Add everything you need to make MOPS use PMCs.
 
 2001-11-23 18:06  simon
 
-	* core.ops: 
+	* core.ops:
 	Eh, you'll need this for rewriting mops.pasm.
 
 2001-11-23 17:55  simon
 
 	* core.ops, classes/perlint.c, include/parrot/pmc.h, t/op/pmc.t,
-	t/pmc/pmc.t: 
+	t/pmc/pmc.t:
 	More work on integer PMCs.
 
 2001-11-23 17:29  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Surprise! Whitespace! HLAGHLAGHLAGH
 
 2001-11-23 17:28  simon
 
-	* Makefile.in, ops2c.pl, ops2pm.pl: 
+	* Makefile.in, ops2c.pl, ops2pm.pl:
 	Add vtables.ops to the core
-	
+
 	Courtesy of: Jeff Goff <jgoff@speakeasy.net>
 
 2001-11-22 18:39  simon
 
 	* core.ops, global_setup.c, docs/parrot_assembly.pod, t/op/pmc.t,
-	t/pmc/pmc.t: 
+	t/pmc/pmc.t:
 	We can now create PMCs.
 
 2001-11-21 05:49  jgoff
@@ -5711,9 +5734,9 @@
 
 2001-11-20 16:00  simon
 
-	* docs/vtables.pod, include/parrot/pmc.h: 
+	* docs/vtables.pod, include/parrot/pmc.h:
 	Reorder PMC flags so there's a fixed number of user-defined flags.
-	
+
 	Courtesy of: Dave Mitchell <davem@fdgroup.co.uk>
 
 2001-11-19 03:39  jgoff
@@ -5725,42 +5748,42 @@
 
 2001-11-16 22:03  simon
 
-	* classes/perlint.c: 
+	* classes/perlint.c:
 	More work on the Perl Integer class. More needed, though.
 
 2001-11-16 21:57  simon
 
-	* pmc.c, vtable.tbl, classes/genclass.pl, classes/perlint.c: 
+	* pmc.c, vtable.tbl, classes/genclass.pl, classes/perlint.c:
 	Rename ->new to ->init, and rework pmc.c:pmc_new to fiddle it.
 
 2001-11-16 20:49  simon
 
 	* interpreter.c, runops_cores.c, trace.c,
-	include/parrot/runops_cores.h: 
+	include/parrot/runops_cores.h:
 	Kill superfluous runops cores.
 
 2001-11-16 17:50  simon
 
 	* MANIFEST, Makefile.in, classes/intclass.c, classes/perlint.c,
 	classes/perlnum.c, classes/perlstring.c, classes/scalarclass.c,
-	include/parrot/parrot.h, include/parrot/pmc.h: 
+	include/parrot/parrot.h, include/parrot/pmc.h:
 	Skeleton for Perl scalar types, done right.
 
 2001-11-16 16:15  simon
 
-	* classes/genclass.pl: 
+	* classes/genclass.pl:
 	This tidies up genclass to deal with the new-style multimethods.
 
 2001-11-16 15:29  simon
 
 	* Makefile.in, make_vtable_ops.pl, vtable.tbl, Parrot/Vtable.pm,
-	lib/Parrot/Vtable.pm, include/parrot/parrot.h: 
+	lib/Parrot/Vtable.pm, include/parrot/parrot.h:
 	Rework multimethods to be *true* multimethods - that is, have
 	different types.
 
 2001-11-15 22:29  simon
 
-	* MANIFEST, Makefile.in, pmc.c: 
+	* MANIFEST, Makefile.in, pmc.c:
 	pmc.c linkage and support. Oh, and making it compile.
 
 2001-11-15 22:26  dan
@@ -5772,59 +5795,59 @@
 	* MANIFEST, Types_pm.in, core.ops, vtable_h.pl,
 	docs/parrot_assembly.pod, include/parrot/string.h: Added in support
 	for PMC registers for the interpreter.
-	
+
 	Added in the docs for the runinterp opcode.
-	
+
 	Added in code for both the newinterp and runinterp opcodes, so we
 	can now create new interpreters from within parrot and have them do
 	things. (Though we can't pass data back and forth. Yet)
 
 2001-11-15 21:24  simon
 
-	* vtable.tbl, classes/scalarclass.c, docs/vtables.pod: 
+	* vtable.tbl, classes/scalarclass.c, docs/vtables.pod:
 	More documentation, and other changes as discussed with Dan.
 
 2001-11-15 19:51  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	De-cut-and-pasto.
 
 2001-11-15 19:50  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	A little code tidiness.
 
 2001-11-15 19:33  simon
 
-	* include/parrot/pmc.h: 
+	* include/parrot/pmc.h:
 	Missed this in the previous commit - un-constantize the base for
 	user-defined PMC flags.
 
 2001-11-15 19:28  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	Hey look, sanity.
 
 2001-11-15 17:09  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	It seems I have completely forgotten how to write C.
 
 2001-11-15 16:53  simon
 
-	* docs/vtables.pod: 
+	* docs/vtables.pod:
 	Start of the PMC classes documentation.
 
 2001-11-15 14:46  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	Changing to use a Perl-style struct instead of the union cache.
 
 2001-11-13 23:56  tom
 
 	* string.c: Removed leading _ from string_index as function names
 	starting with _ are reserved to implementors by the C standard.
-	
+
 	Also fixed string_index to use the encoding routines instead of
 	assuming a single byte encoding.
 
@@ -5852,51 +5875,51 @@
 	ORD_OUT_OF_STRING exception include/parrot/string.h - Added
 	string_ord() t/op/string.t - Added full set of test for
 	ord_i_(s|sc)(_(i|ic))?
-	
+
 	string.c contains a bit of documentation explaining the logic
 	behind _string_index, primarily having to do with multiple encoding
 	formats.
 
 2001-11-12 22:30  simon
 
-	* t/op/macro.t: 
+	* t/op/macro.t:
 	Count 'em.
 
 2001-11-12 22:28  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Add a rule to compile "platform"
 
 2001-11-12 22:26  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Tidy up distclean target.
 
 2001-11-12 16:54  dan
 
 	* MANIFEST, Parrot/Assembler.pm, lib/Parrot/Assembler.pm,
 	t/op/macro.t: Fixes to the assembler's macro facility and a test
-	
+
 	Courtesy of: Jeff <jgoff@speakeasy.net>
 
 2001-11-12 16:50  dan
 
 	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: Allow input from
 	stdin
-	
+
 	Courtesy of: Jeff <jgoff@speakeasy.net>
 
 2001-11-12 16:36  dan
 
 	* Parrot/Test.pm, lib/Parrot/Test.pm: Fix to make test work on
 	CygWin
-	
+
 	Courtesy of: Alex Gough <alexander.gough@st-hughs.oxford.ac.uk>
 
 2001-11-12 11:22  simon
 
-	* examples/assembly/mops.pasm: 
-	
+	* examples/assembly/mops.pasm:
+
 	Trivial tightening of mops loop.
 
 2001-11-07 23:57  ajgough
@@ -5913,14 +5936,14 @@
 
 	* MANIFEST, platforms/generic.c, platforms/linux.c,
 	platforms/linux.h: Portability patches.
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-11-06 19:51  tom
 
 	* Makefile.in: Clean up object files in the subdirectories as well
 	as those in the top level directory.
-	
+
 	Enhanced version of patch from Daniel Grunblatt
 	<daniel@grunblatt.com.ar>
 
@@ -5937,25 +5960,25 @@
 
 2001-11-04 02:52  gregor
 
-	* platforms/: win32.c, win32.h: 
+	* platforms/: win32.c, win32.h:
 	  * win32 dynamic loading functions.
-	
+
 	Courtesy of Jason Diamond <jason@injektilo.org>
 
 2001-11-04 00:04  brentdax
 
-	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: Assembler fixes: 
+	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: Assembler fixes:
 	allows an absolute path to be used and gives a useful error message
 	if the original source file can't be found
 
 2001-11-02 12:37  gregor
 
-	* platforms/: linux.c, linux.h: 
+	* platforms/: linux.c, linux.h:
 	  * Beginning of dynamic loading support. Linux only for now.
 
 2001-11-02 12:13  gregor
 
-	* MANIFEST, time.c, include/parrot/time.h: 
+	* MANIFEST, time.c, include/parrot/time.h:
 	  * Removed time.[hc], since they have been superceded by the new
 	platform
 	    stuff.
@@ -5965,32 +5988,32 @@
 	* Configure.pl, Makefile.in, core.ops, vtable.tbl,
 	classes/intclass.c, classes/scalarclass.c, hints/mswin32.pl,
 	include/parrot/parrot.h, platforms/linux.c, platforms/linux.h,
-	platforms/win32.c, platforms/win32.h: 
+	platforms/win32.c, platforms/win32.h:
 	Patch from Jason Diamond to make win32 platform stuff work:
-	
+
 	* Modified Configure.pl, mswin32.pl, and Makefile.in so that the
 	platform specific files in the platforms directory gets copied to
 	the correct directories. The Makefile will re-copy the platform.h
 	and .c files if the original is modified.
-	
+
 	* #include platform.h in parrot.h instead of time.h.
-	
+
 	* Removed time.h and time.obj from the Makefile. time.h and time.c
 	aren't being used anymore since that code was moved to linux.c and
 	win32.c.
-	
+
 	* Renamed the BOOL typedef in parrot.h to BOOLVAL (inspired by
 	INTVAL and FLOATVAL). This was conflicting with the BOOL typedef in
 	windows.h. This required updating several files besides parrot.h.
-	
+
 	* Added a DEFAULT_OPEN_MODE to linux.h and win32.h and used that
 	instead of the missing identifiers (on Windows) in core.ops in the
 	calls to open.
-	
+
 	* Added Parrot_sleep and Parrot_setenv to both the linux and win32
 	platform files and called those from core.ops. The Linux code for
 	these functions came from core.ops so they should hopefully work.
-	
+
 	Courtesy of Jason Diamond <jason@injektilo.org>
 
 2001-11-02 06:43  brentdax
@@ -6002,7 +6025,7 @@
 
 	* .cvsignore, MANIFEST, include/parrot/.cvsignore,
 	platforms/linux.c, platforms/linux.h, platforms/win32.c,
-	platforms/win32.h: 
+	platforms/win32.h:
 	  * Beginnings of platform support files in platform/*.[hc]
 
 2001-11-01 23:37  tom
@@ -6013,35 +6036,35 @@
 2001-11-01 22:21  gregor
 
 	* MANIFEST, Makefile.in, core.ops, obscure.ops, time.c,
-	include/parrot/parrot.h, include/parrot/time.h: 
+	include/parrot/parrot.h, include/parrot/time.h:
 	Initial "fix" of time(n) op for Win32:
-	
+
 	  * Initial Win32 code Courtesy of Richard J Cox <rjcox@cix.co.uk>
-	
+
 	  * time.c and include/parrot/time.h
-	
+
 	    First attempt at getting this working across platforms. The
 	    macro WIN32 being tested might not be right.
-	
+
 	  * New functions Parrot_intval_time() and Parrot_floatval_time()
 	    wrap the appropriate functionality depending upon platform.
 	    Changed core.ops to call these.
-	
+
 	Added obscure.ops with obscure transcendental ops.
-	
+
 	Added simple file I/O ops (close, open, read, write):
-	
+
 	  * Initial versions Courtesy of Jeff <jgoff@speakeasy.net>
-	
+
 	  * I changed some arg ordering stuff.
-	
+
 	  * I added read/write of INTVALs and FLOATVALs.
-	
+
 	Added environment variable ops (getenv, setenv)
-	
+
 	Added system error ops (err(i) and err(s) for accessing errno and
 	strerr().
-	
+
 	Moved print ops in with other "temporary" developer ops, since
 	they'll move to a devel.ops or temp.ops oplib once we have oplibs.
 
@@ -6084,12 +6107,12 @@
 
 2001-10-29 14:37  gregor
 
-	* core.ops, languages/jako/jakoc: 
+	* core.ops, languages/jako/jakoc:
 	  * New variants of the save ops to save constants on the stack.
 	This is
 	    useful for saving zero arg and result counts on the stack, for
 	example.
-	
+
 	  * Modified jakoc to to adapt to the newly announced calling
 	conventions.
 	    Even though Jako source code appears to show subroutines with
@@ -6108,20 +6131,20 @@
 2001-10-28 16:53  simon
 
 	* MANIFEST, stacks.c, classes/scalarclass.c,
-	include/parrot/stacks.h: 
+	include/parrot/stacks.h:
 	Unbelievably bad errors of mine, plus a type incompatibility of
 	Dan's.
 
 2001-10-28 08:30  simon
 
-	* classes/scalarclass.c: 
+	* classes/scalarclass.c:
 	Beginning of a scalar class.
 
 2001-10-28 08:29  simon
 
 	* make_vtable_ops.pl, vtable.tbl, Parrot/Vtable.pm,
 	lib/Parrot/Vtable.pm, classes/genclass.pl, classes/intclass.c,
-	include/parrot/pmc.h: 
+	include/parrot/pmc.h:
 	This fixes the problem with vtables and pointer arithmetic.
 
 2001-10-26 19:58  dan
@@ -6149,7 +6172,7 @@
 
 2001-10-24 16:43  gregor
 
-	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: 
+	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm:
 	  * Make the assembler handle octal character code escapes in
 	string
 	    constants.
@@ -6166,23 +6189,23 @@
 
 2001-10-24 14:03  gregor
 
-	* Makefile.in, pbc2c.pl, pdump.c: 
+	* Makefile.in, pbc2c.pl, pdump.c:
 	  * Adapt pdump.c and pbc2c.pl to the new requirement to pass
 	interpreter
 	    pointer into string functions.
-	
+
 	Courtesy of: Ryan O'Neil <talisman580@yahoo.com>
 
 2001-10-23 20:09  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	  * Terminological refinement in regexp capture comment.
 
 2001-10-23 15:23  simon
 
-	* classes/genclass.pl: 
+	* classes/genclass.pl:
 	Use a saner ANSI C construct to make MIPSPro happy.
-	
+
 	Courtesy of: Alex Gough <alexander.gough@st-hughs.oxford.ac.uk>
 
 2001-10-23 00:34  tom
@@ -6205,10 +6228,10 @@
 	include/parrot/resources.h, include/parrot/string.h,
 	include/parrot/transcode.h: Everything now uses the allocators and
 	deallocators in resources.c.
-	
+
 	Unfortunately we lost standalone string-test mode, but I can cope
 	with that.
-	
+
 	Please note that until we have a real allocation/deallocation/GC
 	system, this'll leak. A *lot*.
 
@@ -6223,14 +6246,14 @@
 	* Configure.pl, config_h.in, register.c, include/parrot/register.h:
 	Now each register type has its own mask macro, which is the right
 	thing to do.
-	
+
 	Patch courtesy of Jason Gloudon <perl@gloudon.com>
 
 2001-10-21 23:40  tom
 
 	* stacks.c, t/op/stacks.t: Fix bug in handling of rollover to a new
 	stack chunk and add a test to test this rollover in future.
-	
+
 	Courtesy of Jason Gloudon <perl@gloudon.com>.
 
 2001-10-21 19:14  dan
@@ -6240,18 +6263,18 @@
 
 2001-10-21 18:18  gregor
 
-	* languages/jako/: Makefile, mops.jako: 
+	* languages/jako/: Makefile, mops.jako:
 	  * Makefile: 'clean' target removes .list files, too. And, it does
 	rm -f
 	    with wildcards rather than listing things explicitly.
-	
+
 	  * mops.jako actually prints out the
 	millions-of-operations-per-second
 	    (mops) value instead of just the operations-per-second value.
 
 2001-10-21 18:03  simon
 
-	* classes/intclass.o: 
+	* classes/intclass.o:
 	*smack*! WRONG!
 
 2001-10-21 17:47  simon
@@ -6259,12 +6282,12 @@
 	* MANIFEST, Makefile.in, make_vtable_ops.pl, pmc.c, vtable_h.pl,
 	Parrot/Vtable.pm, classes/genclass.pl, classes/intclass.c,
 	classes/intclass.o, include/parrot/parrot.h, include/parrot/pmc.h,
-	lib/Parrot/Vtable.pm: 
+	lib/Parrot/Vtable.pm:
 	Initial work on PMCs. Explanation to follow
 
 2001-10-21 15:20  gregor
 
-	* examples/assembly/queens.pasm: 
+	* examples/assembly/queens.pasm:
 	  * Modernize the calling conventions in queens.pasm. It was using
 	swap,
 	    which now must be rotate. Also, changed to use return values on
@@ -6274,15 +6297,15 @@
 2001-10-19 18:14  gregor
 
 	* core.ops, stacks.c, include/parrot/stacks.h,
-	languages/jako/jakoc: 
+	languages/jako/jakoc:
 	Per Dan's request, replacing 'swap' op by 'rotate'.
-	
+
 	  * core.ops: Replaced 'swap()' by 'rotate(i|ic)'.
-	
+
 	  * stacks.c and stacks.h: Removed swap-related functions from my
 	    prior commit, replacing them with stack_depth(), stack_entry()
 	    and rotate_entries().
-	
+
 	    NOTE: The stack_depth() and rotate_entries() routines could
 	    be made more efficient through the caching of the sum of chunk
 	    'used' members from lower chunks in a field in the upper
@@ -6291,17 +6314,17 @@
 	    at the stack from the top down) instead of the *bottom*
 	    chunk. The code here at least works, and we can decide about
 	    bigger changes separately.
-	
+
 	    For now, rotate only handles rotates in one direction and
 	    of magnituded one. A fully general rotate would do handle
 	    rotates in both directions and of arbitrary amounts. Again,
 	    this implementation is sufficient for current applications,
 	    and a feature-complete version can be developed if this turns
 	    out to be otherwise the right type of implementation.
-	
+
 	    This change includes a new exception for ERROR_STACK_SHALLOW,
 	    meaning "not-empty-yet-not-deep-enough-for-what-you-asked".
-	
+
 	  * jakoc: Changed the calling convention to use rotate instead
 	    of swap (of course). Also changed the convention for return
 	    value passing to use the stack as well.
@@ -6315,30 +6338,30 @@
 	languages/jako/fact.jako, languages/jako/jakoc,
 	languages/jako/mandelbrot.jako, languages/jako/mops.jako,
 	languages/jako/primes.jako, languages/jako/queens.jako,
-	languages/jako/sub.jako: 
+	languages/jako/sub.jako:
 	  * New stack functions push_entry(), pop_entry() and swap_entry().
 	    The first two exist for the support of the last one. These
 	    functions don't care what is in the stack entries. These exist
 	    to support the new 'swap' op (see next bullet).
-	
+
 	  * New op 'swap' for swapping the top two elements on the stack.
 	    This is necessary for passing arguments to functions, since
 	    the return address will be on top of any arguments that have
 	    been pushed on the stack. This way, you can use a (swap, pop)
 	    pair to retrieve each argument (for subroutine linkage).
-	
+
 	  * Disassembler now prints numbers in decimal by default, with
 	    a new '-x' flag to turn on hexadecimal display. Since other
 	    members of the Parrot Tool Set use decimal by default, this
 	    makes it easier to compare output from the various tools.
-	
+
 	  * Jako compiler has more explanatory comments and the following
 	    new features:
-	
+
 	      * Lexically scoped variables.
-	
+
 	      * Subroutines that take arguments and return values:
-	
+
 		  sub int foo(int bar) {
 		    if (bar == 1) {
 		      return 42;
@@ -6348,67 +6371,67 @@
 		  }
 	      * ... if (...) and ... unless (...) statement modifiers
 		can be used on next, last and redo.
-	
+
 	      * Bitwise and (&, &=) and or (|, |=) ops.
-	
+
 	      * Type names are just 'int', 'num', 'str', and 'poly' now.
 		The old long names 'integer', 'number', 'string', and
 		'polytype' are no longer valid.
-	
+
 	      * Integer variable assignments can now use 0b (binary),
 		0 (octal) and 0x (hexadecimal) radix prefixes on literals.
-	
+
 	  * New Jako and Parrot assembly examples queens.{jako,pasm} for
 	    solving the eight-queens problem. The assembly example is a
 	    hand-modified version of the assembly code produced by the
 	    Jako compiler from queens.jako. A few unnecessary ops have
 	    been removed, lots of unnecessary labels have been removed,
 	    and all the Jako soure code comments have been removed.
-	
+
 	  * Makefile and .cvsignore in languages/jako modified so that
 	    the assembler produces listings when assembling the programs,
 	    yet the *.list files are ignored by CVS.
-	
+
 	  * Made the default target in languages/jako/Makefile 'all'.
-	
+
 	  * Modified some of the Jako examples to use some of the new
 	    features of Jako, such as subroutines and lexical variable
 	    scoping.
 
 2001-10-19 02:43  gregor
 
-	* runops_cores.c, include/parrot/runops_cores.h: 
+	* runops_cores.c, include/parrot/runops_cores.h:
 	Bug fix (gcc doesn't complain, but MIPSpro does):
-	
+
 	  * Added missing extern to runops_cores array declaration in
 	    include/parrot/runops_cores.h
-	
+
 	  * Also added 'const' there and in runops_cores.c
 
 2001-10-18 15:18  gregor
 
-	* .cvsignore, include/parrot/oplib/.cvsignore: 
+	* .cvsignore, include/parrot/oplib/.cvsignore:
 	  * Ignore the vtable-related generated files.
 
 2001-10-18 15:14  gregor
 
-	* core.ops: 
+	* core.ops:
 	  * left and right shifts now allow the 2nd argument to be a
 	constant.
 
 2001-10-18 14:55  simon
 
-	* make_vtable_ops.pl: 
+	* make_vtable_ops.pl:
 	This is C, not Perl. How on earth did that even compile?
 
 2001-10-18 14:54  simon
 
-	* make_vtable_ops.pl: 
+	* make_vtable_ops.pl:
 	More vtable ops.
 
 2001-10-18 12:33  simon
 
-	* Makefile.in, make_vtable_ops.pl, vtable.tbl: 
+	* Makefile.in, make_vtable_ops.pl, vtable.tbl:
 	Initial stab at vtable opcode creation stuff.
 
 2001-10-18 02:15  gregor
@@ -6416,26 +6439,26 @@
 	* MANIFEST, Makefile.in, interpreter.c, runops_cores.c, trace.c,
 	include/parrot/interpreter.h, include/parrot/runops_cores.h,
 	include/parrot/trace.h: Preparation for autogenerated runops cores:
-	
+
 	  * Split tracing and runops core stuff out of interpreter.c into
 	    trace.c and runops_cores.c
-	
+
 	  * Similar split of stuff from include/parrot/interpreter.h
-	
+
 	  * Manifest and Makefile.in updates to make things still compile.
 
 2001-10-18 01:21  gregor
 
 	* Makefile.in, ops2c.pl, ops2pm.pl, pbc2c.pl: Bug fixes:
-	
+
 	  * Makefile.in: examples/assembly/mops.c depends on pbc2c.pl
-	
+
 	  * Makefile.in: Parrot/OpLib/core.pm depends on ops2pm.pl
-	
+
 	  * ops2c.pl: Added second arg to mkdir (perl 5.005_02 complains)
-	
+
 	  * ops2pm.pl: Added second arg to mkdir (perl 5.005_02 complains)
-	
+
 	  * pbc2c.pl: Removed explicit include of <math.h>, replacing it
 	with
 	    copy of $ops->preamble.
@@ -6447,7 +6470,7 @@
 
 2001-10-17 22:08  gregor
 
-	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: 
+	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm:
 	  * Now handles label-and-commment-only lines.
 
 2001-10-17 22:04  bdwheele
@@ -6465,57 +6488,57 @@
 
 	* core.ops, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm: Enhanced the
 	op explosion logic to be able to handle exploding this:
-	
+
 	  sub(i, i|ic, i|ic)
-	
+
 	into these:
-	
+
 	  sub(i, i, i)
 	  sub(i, i, ic)
 	  sub(i, ic, i)
-	
+
 	without also generating this unwanted version:
-	
+
 	  sub(i, ic, ic)
-	
+
 	The enhanced version rejects any expansion where there is more than
 	one expanded argument and all the expanded arguments are constants.
 
 2001-10-17 14:20  simon
 
-	* Makefile.in, ops2c.pl, ops2pm.pl, examples/assembly/Makefile: 
+	* Makefile.in, ops2c.pl, ops2pm.pl, examples/assembly/Makefile:
 	Build fixes to use correct Perl version and ensure that things are
 	running in the right directory.
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-10-17 13:16  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	core.pm is more critical than that.
 
 2001-10-17 13:05  simon
 
-	* core.ops, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm: 
+	* core.ops, Parrot/OpsFile.pm, lib/Parrot/OpsFile.pm:
 	"Explode" ops into multiple versions for different parameters.
-	
+
 	Courtesy of: Tom Hughes <tom@compton.nu>
 
 2001-10-17 12:54  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Fix dependencies and cleaning.
 
 2001-10-17 12:45  simon
 
-	* Configure.pl, Makefile.in: 
+	* Configure.pl, Makefile.in:
 	Fixes to make Parrot compile without the temporary build hack
-	
+
 	Courtesy of: Jason Gloudon <perl@gloudon.com>
 
 2001-10-16 20:43  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	  * Fixed dependancies for building Parrot/OpLib/core.pm
 
 2001-10-16 19:35  bdwheele
@@ -6534,12 +6557,12 @@
 
 2001-10-16 13:09  gregor
 
-	* core.ops: 
+	* core.ops:
 	  * Added #include <sys/time.h> in the preamble for gettimeofday().
 
 2001-10-16 13:09  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	  * Removed cd t; make, which no longer applies
 
 2001-10-16 03:18  bdwheele
@@ -6563,28 +6586,28 @@
 	examples/assembly/substr.pasm, examples/assembly/trace.pasm,
 	t/.cvsignore, t/Makefile, t/call.pasm, t/euclid.pasm, t/jump.pasm,
 	t/local_label.pasm, t/test.pasm, t/test2.pasm, t/test3.pasm,
-	t/test4.pasm, t/test5.pasm, t/trace.pasm: 
+	t/test4.pasm, t/test5.pasm, t/trace.pasm:
 	  * Moved examples from t/*.pasm to examples/assembly/*.pasm, with
 	some
 	    renames so the names match what they demonstrate.
 
 2001-10-15 22:18  gregor
 
-	* core.ops, t/test.pasm: 
+	* core.ops, t/test.pasm:
 	  * time_n uses gettimeofday() to get sub-second times.
-	
+
 	  * t/test.pasm uses time_n directly rather than doing int stuff
 	and
 	    converting to num later.
 
 2001-10-15 12:28  gregor
 
-	* t/: test.pasm, test2.pasm, trace.pasm: 
+	* t/: test.pasm, test2.pasm, trace.pasm:
 	  * t/test.pasm prints using string constants instead of string
 	regs.
-	
+
 	  * t/test2.pasm assembles (using implicit op modes)
-	
+
 	  * t/trace.pasm updated for new behavior of trace_ic, which does
 	not
 	    require an 'end' after 'trace'.
@@ -6594,39 +6617,39 @@
 	* core.ops, interpreter.c, test_main.c,
 	include/parrot/interpreter.h, t/test.pasm:   * New interpreter flag
 	PARROT_PROFILE_FLAG
-	
+
 	  * New runops cores to handle profiling
-	
+
 	  * Support for -p flag in test_prog to enable profiling
-	
+
 	  * New profile_ic op to control profiling at run-time
 
 2001-10-14 21:54  gregor
 
 	* core.ops, Parrot/OpsFile.pm, docs/.cvsignore, docs/Makefile,
 	lib/Parrot/OpsFile.pm: Integrated op documentation.
-	
+
 	  * core.ops now contains POD documentation of ops, interspersed
 	with the
 	    ops themselves
-	
+
 	  * Ops are organized into POD =head2 sections
-	
+
 	  * Parrot/OpsFile.pm now treats the preamble of the ops file as
 	anything
 	    up to the first POD directive OR op definition.
-	
+
 	  * docs/Makefile now generates core_ops.pod from core.ops vi
 	perldoc -u.
 
 2001-10-14 11:58  simon
 
-	* Makefile.in: 
+	* Makefile.in:
 	Unbreak Digital Un^W^WTru64
 
 2001-10-14 11:00  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Remove weird typo.
 
 2001-10-14 10:56  tom
@@ -6652,46 +6675,46 @@
 	include/parrot/interpreter.h, include/parrot/op.h,
 	include/parrot/oplib/.cvsignore, t/.cvsignore, t/Makefile,
 	t/euclid.pasm, t/test.pasm, t/op/integer.t, t/op/number.t,
-	t/op/stacks.t, t/op/string.t, t/op/trans.t: 
+	t/op/stacks.t, t/op/string.t, t/op/trans.t:
 	Moby Patch:
-	
+
 	  * basic_opcodes.ops and opcode_table replaced by core.ops
-	
+
 	  * process_opfunc.pl replaced by Parrot/OpsFile.pm, Parrot/Op.pm,
 	    and ops2c.pl. These convert *.ops to *_ops.c and
 	    include/parrot/oplib/*_ops.h
-	
+
 	  * New ops2pm.pl converts *.ops to Parrot/OpLib/*.pm
-	
+
 	  * disassemble.pl modified to use
-	
+
 	  * interpreter.c modified to use structures in core_ops.c instead
 	    of the old op_info and op_func stuff. We're not yet to the
 	    point of handling multiple oplibs at a time, but we are getting
 	    there...
-	
+
 	    Fingerprinting stuff disabled for now. We used to go off
 	    opcode_table. We need to rethink this. I have some ideas to
 	    make it unnecessary, but it remains to be seen whether others
 	    will like the direction they take us.
-	
+
 	    Termination condition for while(){} loop in runops is now
 	    (pc) instead of (*pc). Any op can cause a HALT by returning
 	    a NULL pointer. Ops end, bounds and trace all do this. So, now
 	    the 'end' op body is actually executed, although all it does
 	    is HALT.
-	
+
 	  * Makefile.in modified to perform a test build using pbc2c.pl,
 	    which is the bytecode --> C compiler I've posted to the
 	    list before.
-	
+
 	  * Op full names are now autogenerated. Op root names must not
 	    contain underscores, so some op renamings have happened.
 	    Such as clear_i becoming cleari.
 
 2001-10-13 11:49  simon
 
-	* Configure.pl, MANIFEST: 
+	* Configure.pl, MANIFEST:
 	Make parrot actually build again.
 
 2001-10-12 21:34  dan
@@ -6739,7 +6762,7 @@
 
 	* strnative.c: Assignment, not comparison.  (Plus formatted for
 	coding standards)
-	
+
 	Courtesy of Bryan C. Warnock
 
 2001-10-10 19:21  tom
@@ -6785,7 +6808,7 @@
 	string constants of the form U"string" become unicode encoded
 	parrot strings and the form N"string" become native encoded parrot
 	strings.
-	
+
 	Courtesy of: Tom Hughes <tom@compton.nu>
 
 2001-10-10 04:55  dan
@@ -6795,18 +6818,18 @@
 
 2001-10-10 01:05  simon
 
-	* t/op/integer.t: 
+	* t/op/integer.t:
 	The test for cmod_i was using the 'mod Ix, Ix, Ix' form which
 	compiles into the mod op, not the cmod_i op, hence wasn't testing
 	what it thought it was.
-	
+
 	Courtesy of: Alex Gough <alexander.gough@st-hughs.oxford.ac.uk>
 
 2001-10-09 03:45  thgibbs
 
 	* Parrot/Assembler.pm, lib/Parrot/Assembler.pm: Patch to allow
 	assembler to generate unicode strings.
-	
+
 	Courtesy of: Tom Hughes <tom@compton.nu>
 
 2001-10-08 19:30  brentdax
@@ -6816,25 +6839,25 @@
 
 2001-10-08 15:04  gregor
 
-	* basic_opcodes.ops: 
+	* basic_opcodes.ops:
 	  * Removed trash from early mod_i experiments (pardon our dust)
 
 2001-10-08 14:56  gregor
 
-	* basic_opcodes.ops: 
+	* basic_opcodes.ops:
 	  * Fixed a couple of typos.
 
 2001-10-08 14:45  gregor
 
-	* basic_opcodes.ops, opcode_table, t/op/integer.t, t/op/number.t: 
+	* basic_opcodes.ops, opcode_table, t/op/integer.t, t/op/number.t:
 	Arithmetic enhancements:
-	
+
 	  * Renamed existing mod_i as cmod_i and added "corrected" mod_i:
-	
+
 	    NOTE: This "uncorrected mod" algorithm uses the C language's
 	built-in
 	    mod operator (x % y), which is
-	
+
 		... the remainder when x is divided by y, and thus is zero
 	when y
 		divides x exactly.
@@ -6846,9 +6869,9 @@
 		on overflow or underlfow.
 								     --
 	[1], page 41
-	
+
 	    Also:
-	
+
 		... if the second operand is 0, the result is undefined.
 	Otherwise, it
 		is always true that (a/b)*b + a%b is equal to z. I both
@@ -6861,7 +6884,7 @@
 	divisor.
 								     --
 	[1], page 205
-	
+
 	    This op is provided for those who need it (such as
 	speed-sensitive
 	    applications with heavy use of mod, but using it only with
@@ -6869,13 +6892,13 @@
 	    arguments), but a more mathematically useful numeric mod based
 	on
 	    floor(x/y) and defined with y == 0 is provided by the mod_i op.
-	
+
 	      [1] Brian W. Kernighan and Dennis M. Ritchie, *The C
 	Programming
 		  Language*, Second Edition. Prentice Hall, 1988.
-	
+
 	  * Added "corrected" mod_i:
-	
+
 	    NOTE: This "corrected mod" algorithm is based on the C code on
 	page 70
 	    of [1]. Assuming correct behavior of C's built-in mod operator
@@ -6883,31 +6906,31 @@
 	    positive arguments, this algorithm implements a mathematically
 	convenient
 	    version of mod, defined thus:
-	
+
 	      x mod y = x - y * floor(x / y)
-	
+
 	    For more information on this definition of mod, see section 3.4
 	of [2],
 	    pages 81-85.
-	
+
 	    References:
-	
+
 	      [1] Donald E. Knuth, *MMIXware: A RISC Computer for the Third
 		  Millennium* Springer, 1999.
-	
+
 	      [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik,
 	*Concrete
 		  Mathematics*, Second Edition. Addison-Wesley, 1994.
-	
+
 	  * Added mod_n, using the same formula as above, but with FLOATVAL
 	    arguments.
-	
+
 	  * Added cmod_n, using the C math library's fmod() function:
-	
+
 	    NOTE: This "uncorrected mod" algorithm uses the built-in C math
 	library's
 	    fmod() function, which computes
-	
+
 		... the remainder of dividing x by y. The return value is x
 	- n * y,
 		where n is the quotient of x / y, rounded towards zero to
@@ -6915,27 +6938,27 @@
 		integer.
 						-- fmod() manpage on RedHat
 	Linux 7.0
-	
+
 	    In addition, fmod() returns
-	
+
 		the remainder, unless y is zero, when the function fails
 	and errno
 		is set.
-	
+
 	    According to page 251 of [1], the result when y is zero is
 	implementation-
 	    defined.
-	
+
 	    This op is provided for those who need it, but a more
 	mathematically
 	    useful numeric mod based on floor(x/y) instead of truncate(x/y)
 	and
 	    defined with y == 0 is provided by the mod_n op.
-	
+
 	      [1] Brian W. Kernighan and Dennis M. Ritchie, *The C
 	Programming
 		  Language*, Second Edition. Prentice Hall, 1988.
-	
+
 	  * Added and modified tests as appropropriate for the above.
 
 2001-10-08 08:49  thgibbs
@@ -6947,32 +6970,32 @@
 	Makefile.in, global_setup.c, string.c, strnative.c, transcode.c,
 	strutf16.c, strutf32.c, strutf8.c: Added code to handle unicode
 	strings for utf8, utf16, and utf32.
-	
+
 	Courtesy of: Tom Hughes <tom@compton.nu>
 
 2001-10-08 08:10  thgibbs
 
 	* memory.c: Fixed uninitialized variables.
-	
+
 	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
 
 2001-10-08 01:21  gregor
 
 	* packfile.c:	* Casting a return value
-	
+
 	  * Potential uninitialized variable fix
-	
+
 	Courtesy of Bryan C. Warnock <bwarnock@capita.com>
 
 2001-10-08 01:15  gregor
 
 	* packfile.c, test_main.c: One of Bryan's languishing patches (with
 	a few tweaks of my own):
-	
+
 	  * Line wrapping
-	
+
 	  * Printf format fixes
-	
+
 	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
 
 2001-10-07 22:39  thgibbs
@@ -6984,59 +7007,59 @@
 
 	* basic_opcodes.ops, interpreter.c, opcode_table,
 	process_opfunc.pl, test_main.c, include/parrot/interpreter.h,
-	t/trace.pasm: 
+	t/trace.pasm:
 	  * Two new ops, trace_ic and bounds_ic that twiddle bits in
 	    interpreter->flags and set interpreter->resume_addr.
-	
+
 	  * Two new runops core variants, so now we cover the relevant
 	    flag space over {trace, notrace} x {boundscheck, noboundscheck}
-	
+
 	  * Runops core selection that converts the flags into an index
 	into
 	    a core table (runops_cores) to get the core function pointer.
-	
+
 	  * A new trace_op variant that doesn't do bounds checking (used by
 	    the non-bounds-checking-but-tracing runops core).
-	
+
 	  * PC is passed into the cores so that they can be used when
 	    resuming (they used to assume starting at the beginning of the
 	    code, which would thwart resumption).
-	
+
 	  * runops() itself is changed to have a while() loop in it so that
 	    any time we drop out of the core, we'll resume if we have an
 	    interpreter->resume_addr set (after reselecting the core,
 	though).
-	
+
 	  * process_opfunc.pl has a new "macro": RESUME(), that sets up
 	    interpreter->resume_addr. This is used by the new ops. The new
 	    ops still return the new PC as the next op (which MUST be an
 	    'end' op to force the core loop to terminate -- *pc being false
 	    is the only termination condition we can count on for all
 	cores).
-	
+
 	  * New interpreter flag: PARROT_BOUNDS_FLAG, used to control
 	    bounds checking core selection.
-	
+
 	  * test_prog now has a '-b' flag in addition to the '-t' flag.
 	Now,
 	    bounds checking is off by default (I saw a performance boost:
 	    6.3 Mop/s with -b, 7.0 Mop/s without).
-	
+
 	  * A new sample/test program: t/trace.pasm that twiddles the trace
 	    flag while it is running.
 
 2001-10-07 15:41  gregor
 
 	* .cvsignore, Makefile.in, build_interp_starter.pl, interpreter.c,
-	include/parrot/.cvsignore, include/parrot/interpreter.h: 
+	include/parrot/.cvsignore, include/parrot/interpreter.h:
 	Now that 0.0.2 is released, I can clear out the backlog of approved
 	but uncommitted patches. Here's one Dan approved on 2001-09-21
 	(Simplified DO_OP):
-	
+
 	  * test_prog and pdump are linked with only the files the need,
 	not
 	    al the files.
-	
+
 	  * build_interp_starter.pl writes out op_info.[hc], too. These
 	files
 	    contain op name, arg count and arg type information. This will
@@ -7044,13 +7067,13 @@
 	    useful for multiple things in the future, including better
 	trace
 	    output and the crystalizing loader.
-	
+
 	  * The DO_OP macro is now simpler and doesn't require explicit
 	    temporaries.
-	
+
 	  * interpreter.c is modified to use the new op info in tracing
 	output.
-	
+
 	  * The interpreter just points its opcode_funcs and opcode_info
 	    members at the default tables rather than allocating memory on
 	    the fly.
@@ -7064,13 +7087,13 @@
 2001-10-06 20:58  thgibbs
 
 	* vtable.tbl: Added * to REGEX type.
-	
+
 	Courtesy of Bryan C. Warnock <bwarnock@capita.com>
 
 2001-10-06 13:41  simon
 
 	* MANIFEST, Makefile.in, vtable.tbl, vtable_h.pl, Parrot/Vtable.pm,
-	include/parrot/parrot.h, lib/Parrot/Vtable.pm: 
+	include/parrot/parrot.h, lib/Parrot/Vtable.pm:
 	Framework for vtable functions.
 
 2001-10-06 06:52  thgibbs
@@ -7131,15 +7154,15 @@
 	This patch ensures that all bytecode is of type opcode_t except for
 	the constant table constants.  That means that almost all of the
 	INTVALs in the code were replaced with opcode_t and the i pack type
-	was replaced with the op pack type in calls to pack_arg and such. 
+	was replaced with the op pack type in calls to pack_arg and such.
 	Also, since it has been declared that ALL integer constants are to
 	be 32 bits, some test cases were changed to ensure that an integer
 	constant was no bigger than 2 ** 31.
-	
+
 	process_opfunc.pl was also cleaned up to no longer look at either
 	opcode_table or interp_guts.h but gather all of its information
 	from Opcode.pm.
-	
+
 	The Assembler.pm module was changed to do late binding of arguments
 	so that 0 could be treated like 0.0 without having to be so
 	declared.  Also, only strings now use the [sc:N] intermediate form
@@ -7147,22 +7170,22 @@
 
 2001-10-05 21:59  gregor
 
-	* MANIFEST, languages/jako/Makefile: 
+	* MANIFEST, languages/jako/Makefile:
 	Fixed things due to the movement of little_languages/* to
 	languages/jako.
 
 2001-10-05 18:31  gregor
 
-	* MANIFEST: 
+	* MANIFEST:
 	Updated MANIFEST to reflect recent additions for Jako.
 
 2001-10-05 17:54  gregor
 
 	* languages/jako/: Makefile, bench.jako, euclid.jako, fact.jako,
 	fib.jako, hello.jako, jakoc, leibniz.jako, mandelbrot.jako,
-	mops.jako, primes.jako, sub.jako: 
+	mops.jako, primes.jako, sub.jako:
 	  * Compiler:
-	
+
 	      * User-defined subroutines.
 	      * Generates assembly code with the Jako code in comments.
 	      * "end;" no longer required at the end of programs.
@@ -7174,9 +7197,9 @@
 	      * Allow leading minus signs in integer and number constants
 	(ahem).
 	      * goto's.
-	
+
 	  * New sample programs:
-	
+
 	      * leibniz.jako (based on Greg McCarroll's leibniz.pasm
 	example)
 	      * mandelbrot.jako (based on Leon Brocard's translation of
@@ -7187,16 +7210,16 @@
 
 2001-10-05 12:54  gregor
 
-	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm: 
+	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm:
 	  * Removed mysterious extra copy of code after POD.
 
 2001-10-05 12:46  gregor
 
-	* basic_opcodes.ops, t/op/string.t: 
+	* basic_opcodes.ops, t/op/string.t:
 	  * Enabled the previously SKIPped test of printing string regs
 	after
 	    clear_s
-	
+
 	  * Made print_s do nothing if the STRING pointer in the register
 	file
 	    is NULL.
@@ -7217,17 +7240,17 @@
 2001-10-03 21:50  gregor
 
 	* Makefile.in, docs/.cvsignore, docs/Makefile, docs/parrotbyte.pod:
-	
+
 	  * More documentation updates for the packfile stuff.
 
 2001-10-03 21:37  gregor
 
-	* docs/parrotbyte.pod: 
+	* docs/parrotbyte.pod:
 	  * Pointed the reader at Parrot::PackFile.
 
 2001-10-03 21:34  gregor
 
-	* Parrot/PackFile.pm, lib/Parrot/PackFile.pm: 
+	* Parrot/PackFile.pm, lib/Parrot/PackFile.pm:
 	  * Updated documentation to match current implementation.
 
 2001-10-03 18:30  gregor
@@ -7235,68 +7258,68 @@
 	* .cvsignore, disassemble.pl, Parrot/Assembler.pm,
 	lib/Parrot/Assembler.pm, t/call.pasm, t/euclid.pasm,
 	t/local_label.pasm, t/test.pasm, t/test2.pasm, t/test3.pasm,
-	t/op/basic.t: 
+	t/op/basic.t:
 	  * Added new syntax to the assembler to allow square-bracket
 	    arithmetic expressions involving (global) labels, the current
 	    instructions base address ('@'), numeric constants (not
 	equates)
 	    and basic arithmetic operators (+, -, *, / -- although + and -
 	    are likely to be the only ones used in practice).
-	
+
 	  * Fixed a bug in Parrot/Assemble.pl that caused macro expansion
 	to
 	    fail (argument passing wasn't working).
-	
+
 	  * Enabled t/op/basic.t's last test, which is actually a copy of
 	the
 	    code from t/call.pasm. Now all tests there are enabled and
 	working.
-	
+
 	  * Added new example/test program t/call.pasm to demonstrate
 	working
 	    macros and poor-man's subroutine calls
-	
+
 	  * Added header comments to t/*.pasm
 
 2001-10-03 18:00  simon
 
-	* ChangeLog: 
+	* ChangeLog:
 	Needed, since it's in the MANIFEST.
 
 2001-10-03 17:56  simon
 
-	* t/op/: string.t, time.t: 
+	* t/op/: string.t, time.t:
 	Small fixes to help Win32 on its way.
 
 2001-10-03 17:41  simon
 
-	* MANIFEST, README: 
+	* MANIFEST, README:
 	Oops. Tiny bugs.
 
 2001-10-03 17:39  simon
 
-	* MANIFEST, NEWS, README: 
+	* MANIFEST, NEWS, README:
 	README, NEWS and MANIFEST? Could it be time for Parrot 0.0.2? I
 	think so!
 
 2001-10-03 17:21  simon
 
-	* basic_opcodes.ops, interpreter.c, packfile.c: 
+	* basic_opcodes.ops, interpreter.c, packfile.c:
 	Evil printf bandaid (which allows Sparc64 to pass tests)
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-10-03 16:58  simon
 
-	* string.c, t/op/string.t: 
+	* string.c, t/op/string.t:
 	chop fixes for n < 0 and tests
-	
+
 	Courtesy of: Alex Gough <alex@rcon.org>
 
 2001-10-03 15:51  thgibbs
 
 	* interpreter.c: Changed an occurrence of INTVAL to opcode_t
-	
+
 	Courtesy of: Bryan C. Warnock <bwarnock@capita.com>
 
 2001-10-02 17:48  dan
@@ -7321,20 +7344,20 @@
 	include/parrot/parrot.h, include/parrot/register.h,
 	include/parrot/stacks.h, include/parrot/string.h,
 	lib/Parrot/PackFile/ConstTable.pm, lib/Parrot/PackFile/Constant.pm:
-	
+
 	The Great Renaming.
 
 2001-10-02 12:49  gregor
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	  * Fixed a tyop:  s/string/integer/ for INT_CONST expansion
 
 2001-10-02 12:40  simon
 
 	* basic_opcodes.ops, process_opfunc.pl, register.c,
-	include/parrot/register.h: 
+	include/parrot/register.h:
 	Move preprocessing of register accessors to process_opfunc.pl
-	
+
 	Courtesy of: Jason Gloudon <perl@gloudon.com>
 
 2001-10-02 01:20  ask
@@ -7352,34 +7375,34 @@
 
 2001-10-01 21:51  simon
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	Michael Fischer's patch broke conditionals.
 
 2001-10-01 15:38  simon
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	Small hack to keep process_opfunc.pl from generating extra return()
 	statements.
-	
+
 	Courtesy of: Michael Fischer <michael@visv.net>
 
 2001-10-01 15:32  simon
 
-	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm: 
+	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm:
 	Documentation fix.
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2001-10-01 01:49  simon
 
-	* packfile.c: 
+	* packfile.c:
 	Simon is an idiot. Don't trust him with your code.
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-10-01 00:59  simon
 
-	* Parrot/String.pm, lib/Parrot/String.pm: 
+	* Parrot/String.pm, lib/Parrot/String.pm:
 	Was in manifest, but not in CVS.
 
 2001-09-30 21:25  simon
@@ -7391,59 +7414,59 @@
 	Parrot/PackFile/FixupTable.pm, lib/Parrot/Assembler.pm,
 	lib/Parrot/PackFile.pm, lib/Parrot/PackFile/ConstTable.pm,
 	lib/Parrot/PackFile/Constant.pm, lib/Parrot/PackFile/FixupTable.pm,
-	include/parrot/packfile.h, include/parrot/string.h: 
+	include/parrot/packfile.h, include/parrot/string.h:
 	Move NVs to the constant table.    * Changes to Types_pm.in to make
 	life easier for some of the	 packing/etc. I'm doing elsewhere.
 	Also, we now pack 'n' as      'i'.
-	
+
 	  * Moved the guts of assemble.pl to Parrot/Assembler.pm so that
 	    eventually we can use all these tools together inside scripts
 	    rather than call out to the shell to run the programs.
-	
+
 	  * As I was tracking down problems, I converted the internal
 	    documentation of the assembler to POD from comments.
-	
+
 	  * Changed the numeric regexp in the assembler to detect leading
 	    signs and trailing exponents.
-	
+
 	  * Updated basic_opcodes.ops to fetch numeric constants from the
 	    constant table.
-	
+
 	  * Enhanced the disassembler in a number of ways to make my life
 	    easier while tracking down bugs (try it out). It now puts in
 	    labels for ops that are the destinations of flow control ops.
-	
+
 	  * packfile.c now has a TRACE_PACKFILE switch that can be set
 	    to get it to print info as it processes. I needed this while
 	    debugging, but I can remove it or change it before committing
 	    if its a problem.
-	
+
 	  * Updated pdump.c because it was missing a call to init_world().
-	
+
 	  * Updated process_opfunc.pl to deal with numeric constants
 	    being stored in the constant table instead of inline.
-	
+
 	  * Added multiple type support to Parrot/PackFile/Constant.pm
-	
+
 	  * Added Parrot/String.pm, to be used for constants.
-	
+
 	  * Added packfile.[hc] functions for allocating new constants
 	    of various types.
-	
+
 	  * Made string_copy visible to the world in parrot/string.h.
-	
+
 	Wow.
-	
+
 	Courtesy of: Gregor N. Purdy <gregor@focusresearch.com>
 
 2001-09-29 15:56  gregor
 
-	* languages/jako/Makefile: 
+	* languages/jako/Makefile:
 	Removed assumption that '.' is on the path.
 
 2001-09-29 15:55  gregor
 
-	* languages/jako/Makefile: 
+	* languages/jako/Makefile:
 	Removed references to leibnitz test program.
 
 2001-09-29 15:21  thgibbs
@@ -7455,7 +7478,7 @@
 
 	* assemble.pl: Added case insensitive matches to hex and binary
 	characters
-	
+
 	Courtesy of: Johnathan Scott Duff <duff@cbi.tamucc.edu>
 
 2001-09-27 04:46  thgibbs
@@ -7464,14 +7487,14 @@
 	0b[01]+ work with perl 5.005.  The oct function in versions of perl
 	before 5.6 did not handle the 0b numeric prefix; therefore, it was
 	returning 0.  To fix this, I added a from_binary function that
-	would take a binary string and return its decimal representation. 
+	would take a binary string and return its decimal representation.
 	Now, instead of blindly calilng oct, it makes a distinction between
 	0/0x numbers and 0b numbers.
 
 2001-09-26 19:30  thgibbs
 
 	* assemble.pl: Error now returns a non-zero status
-	
+
 	Courtesy of: Andrew Kuchling <akuchlin@mems-exchange.org>
 
 2001-09-26 19:13  gregor
@@ -7480,33 +7503,33 @@
 	interpreter.c, packfile.c, pdump.c, test_main.c,
 	include/parrot/bytecode.h, include/parrot/interpreter.h,
 	include/parrot/packfile.h, include/parrot/parrot.h, t/op/integer.t,
-	t/op/stacks.t: 
+	t/op/stacks.t:
 	  * bytecode.[hc] removed. packfile.[hc] are the interface to the
 	    packfile/bytecode file from C. May be renamed in the future.
-	
+
 	  * packfile.[hc] changed to use 'struct PackFile *', etc. instead
 	    of 'PackFile *', just like the interpreter, etc.
-	
+
 	  * Constants are accessed via the interpreter's 'code' member
 	    (struct PackFile * code). Macros PCONST(i) and PNCONST are
 	    provided to access constants by index and the number of
 	    constants, respectively (assumes a variable 'interpreter' of
 	    the appropriate type is in scope).
-	
+
 	  * Byte Code is accessed via the interpreter's 'code' member.
-	
+
 	  * Changed PackFile_Constant to point to a STRING instead of
 	having
 	    members for the string_make() arguments. Also has a 'type' IV
 	    in preparation for allowing multiple types of constants in
 	    const_table.
-	
+
 	  * Removed hardcoded example program from test_main.c. We have
 	    plenty of test programs elsewhere.
-	
+
 	  * test_prog now uses a PackFile to deal with the program before
 	    sending it on to the interpreter.
-	
+
 	  * Added missing 'end' ops to some tests in t/op/integer.t and
 	    t/op/stacks.t.
 
@@ -7516,7 +7539,7 @@
 
 2001-09-26 18:29  simon
 
-	* config_h.in: 
+	* config_h.in:
 	Fix 64-bit chunk-base issue.
 
 2001-09-26 06:55  thgibbs
@@ -7536,74 +7559,74 @@
 2001-09-25 10:12  simon
 
 	* MANIFEST, t/op/basic.t, t/op/bitwise.t, t/op/integer.t,
-	t/op/string.t, t/op/time.t: 
+	t/op/string.t, t/op/time.t:
 	More tests
-	
+
 	Courtesy of: Alex Gough <alex@rcon.org>
 
 2001-09-24 19:08  gregor
 
-	* t/op/number.t: 
+	* t/op/number.t:
 	  * Enabled the clear_n test.
 
 2001-09-24 18:56  gregor
 
-	* Parrot/.cvsignore: 
+	* Parrot/.cvsignore:
 	  * Ignore the generated Types.pm file.
 
 2001-09-24 18:52  gregor
 
-	* languages/jako/Makefile, t/op/number.t: 
+	* languages/jako/Makefile, t/op/number.t:
 	  * No need to skip the inc and dec numeric tests anymore. I fixed
 	the
 	    assembler earlier today.
 
 2001-09-24 18:21  simon
 
-	* MANIFEST, t/op/stacks.t: 
+	* MANIFEST, t/op/stacks.t:
 	Oops.
 
 2001-09-24 18:19  simon
 
 	* build_interp_starter.pl, interpreter.c, string.c, Parrot/Test.pm,
 	include/parrot/exceptions.h, include/parrot/interpreter.h,
-	lib/Parrot/Test.pm, t/op/string.t: 
+	lib/Parrot/Test.pm, t/op/string.t:
 	1) captured error output, so can test errors, this might be bad,
 	not sure.  2) basic tests for register stack frames, including some
 	errors 3) I think we can stop skipping one of the string tests 4) I
 	added some more substr tests, but substr was broken, so 5) changed
 	substr to work with out of range values, or 6) throw an error if
 	they're far too silly
-	
+
 	Courtesy of: Alex Gough <alex@rcon.org>
 
 2001-09-24 17:27  gregor
 
-	* basic_opcodes.ops, opcode_table, t/op/number.t: 
+	* basic_opcodes.ops, opcode_table, t/op/number.t:
 	  * Op set_n was missing. Added it and a test for it. We now have
 	the
 	    same int and num ops, except mod is int-only.
 
 2001-09-24 17:01  gregor
 
-	* assemble.pl: 
+	* assemble.pl:
 	  * Fixed a typo: s/Line/line/
 
 2001-09-24 16:02  gregor
 
-	* basic_opcodes.ops: 
+	* basic_opcodes.ops:
 	  * Fixed dec_n_nc opcode, which had += where it should have had
 	-=.
 
 2001-09-24 15:34  gregor
 
-	* assemble.pl: 
+	* assemble.pl:
 	  * Fixed handling of constants starting with '0' that should not
 	be
 	    sent through oct(). For example 'set N2 0.1' was being
 	interpreted
 	    as 'set N2 0' (naughty).
-	
+
 	    As reported by Leon Brocard <acme@astray.com> in the comments
 	of
 	    his mandelbrot.pasm example.
@@ -7614,7 +7637,7 @@
 
 2001-09-24 02:17  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	Shit-sweeping.
 
 2001-09-24 01:56  bdwheele
@@ -7629,78 +7652,78 @@
 
 2001-09-23 15:50  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Fixed typo. Parrot might work again on non-8.3 filesystems. :)
 
 2001-09-23 02:03  ask
 
 	* Configure.pl, test_c.in: fix missing newline at the end of test.c
 	Courtesy of: acme@astray.com (Leon Brocard)
-	
+
 	rename 'test' executable used in Configure process to test_siz.
 
 2001-09-23 01:03  simon
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	iPaq fix. No, really.
 
 2001-09-23 00:47  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Missed several, in fact.
 
 2001-09-23 00:46  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Missed one.
 
 2001-09-22 21:13  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	Assembler register numbering rigour.
-	
+
 	Courtesy of: Leon Brocard <acme@astray.com>
 
 2001-09-22 18:20  simon
 
 	* Makefile.in, lib/Test/More.pm, lib/Test/Simple.pm,
-	lib/Test/Utils.pm: 
+	lib/Test/Utils.pm:
 	I'm sick of having to install Test::More everywhere. Temporary
 	measure until we remove this silly dependency.
-	
+
 	Also a typo in Makefile.in which suggests some things were only
 	happening correctly by sheer chance. :)
 
 2001-09-22 18:06  simon
 
-	* README: 
+	* README:
 	test.pasm is dead, long like make test.
 
 2001-09-22 17:47  simon
 
-	* t/op/number.t: 
+	* t/op/number.t:
 	De-fang overzealous floating point test.
 
 2001-09-22 17:39  simon
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	Remove hard-coded NV size assumption. Tru64 is nearly there!
 
 2001-09-22 17:18  simon
 
-	* assemble.pl, disassemble.pl: 
+	* assemble.pl, disassemble.pl:
 	More portability fixups.
 
 2001-09-22 16:44  simon
 
 	* assemble.pl, Parrot/PackFile/Constant.pm,
-	lib/Parrot/PackFile/Constant.pm: 
+	lib/Parrot/PackFile/Constant.pm:
 	And I *think* this fixes Tru64.
 
 2001-09-22 16:37  simon
 
 	* Parrot/PackFile/ConstTable.pm, lib/Parrot/PackFile/ConstTable.pm:
-	
+
 	Oops.
 
 2001-09-22 16:36  simon
@@ -7708,27 +7731,27 @@
 	* Parrot/PackFile.pm, Parrot/PackFile/ConstTable.pm,
 	Parrot/PackFile/Constant.pm, lib/Parrot/PackFile.pm,
 	lib/Parrot/PackFile/ConstTable.pm, lib/Parrot/PackFile/Constant.pm:
-	
+
 	More removal of hard-coded pack formats.
 
 2001-09-22 15:21  simon
 
-	* assemble.pl: 
-	
+	* assemble.pl:
+
 	Grrr. Why isn't this working?
 
 2001-09-22 15:18  simon
 
 	* Parrot/PackFile.pm, Parrot/PackFile/ConstTable.pm,
-	lib/Parrot/PackFile.pm, lib/Parrot/PackFile/ConstTable.pm: 
-	
+	lib/Parrot/PackFile.pm, lib/Parrot/PackFile/ConstTable.pm:
+
 	Make assemble use the PackFile modules; also fixed some bugs in
 	them.
 
 2001-09-22 14:38  simon
 
 	* Configure.pl, MANIFEST, Types_pm.in, assemble.pl, disassemble.pl:
-	
+
 	Abstract the argument and opcode packing types and functions out
 	into a separate module. This *should* help us maintain consistency
 	when we change the various types.
@@ -7747,12 +7770,12 @@
 
 	* Parrot/PackFile/ConstTable.pm, Parrot/PackFile/Constant.pm,
 	lib/Parrot/PackFile/ConstTable.pm, lib/Parrot/PackFile/Constant.pm:
-	
+
 	  * Fixed pad calculation (similar to recent bug fix on C library)
 
 2001-09-21 20:23  simon
 
-	* disassemble.pl: 
+	* disassemble.pl:
 	Pack types and sizes have gone askew.
 
 2001-09-21 20:18  brentdax
@@ -7761,9 +7784,9 @@
 
 2001-09-21 10:25  simon
 
-	* basic_opcodes.ops, process_opfunc.pl: 
+	* basic_opcodes.ops, process_opfunc.pl:
 	Document patches.
-	
+
 	Courtesy of: Leon Brocard <acme@astray.com>
 
 2001-09-21 06:06  ask
@@ -7803,12 +7826,12 @@
 2001-09-20 15:39  simon
 
 	* Parrot/Opcode.pm, Parrot/Test.pm, lib/Parrot/Opcode.pm,
-	lib/Parrot/Test.pm: 
+	lib/Parrot/Test.pm:
 	This patch does two only somewhat related things.
-	
+
 	Parrot/Opcode.pm:  Change the hard-wired assumption that sizeof(nv)
 	= 2*sizeof(iv) to a PConfig-type computed value.
-	
+
 	Parrot/Test.pm:  Change it to run with the perl that was used to
 	generate this version of Parrot.  This is useful if, for example,
 	you want to use bleadperl to build and test parrot (e.g. to try out
@@ -7817,12 +7840,12 @@
 	is installed 'version-only', a plain 'perl' is quite likely to pick
 	up the older perl in such cases. Such an older perl might well not
 	understand pack('q') used in the assembler.
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-09-20 15:14  gregor
 
-	* packfile.c: 
+	* packfile.c:
 	  * Fixed a typo in pad calculation that throwing off unpack and
 	pack.
 
@@ -7830,7 +7853,7 @@
 
 	* t/op/integer.t: Removed overflow tests from integer.t.  set_i_ic
 	tests now cover all registers.
-	
+
 	Courtesy of: Damien Neil neild@misago.org
 
 2001-09-20 14:48  thgibbs
@@ -7840,35 +7863,35 @@
 
 2001-09-20 14:35  simon
 
-	* Configure.pl, assemble.pl: 
+	* Configure.pl, assemble.pl:
 	Pack IVs correctly.
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-09-20 14:06  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	  * Fixed a tyop in the string interpolation regex.
-	
+
 	Courtesy of Michael L Maraist <maraist@UDel.Edu>
 
 2001-09-20 13:56  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	  * Updated jakoc to work with the single-destination comp ops.
 
 2001-09-20 05:08  bdwheele
 
 	* assemble.pl: macro expansion.  Here's the test macro I was using:
-	
+
 	# this uses I32,I31 as temporaries.  # macro must be preceeded by a
-	label.	testi	    macro   num,got,want    print   "Test #"	   
-	print	num	print	"..."	set	I32,want	set    
-	I31,got 	eq	I32,I31,$ok	print	"NG\n"	branch 
+	label.	testi	    macro   num,got,want    print   "Test #"
+	print	num	print	"..."	set	I32,want	set
+	I31,got 	eq	I32,I31,$ok	print	"NG\n"	branch
 	$end $ok:	print	"OK\n" $end:	endm
-	
+
 	It is invoked as:
-	
+
 	Test1:	testi	1,I3,I2
 
 2001-09-20 03:52  dan
@@ -7906,7 +7929,7 @@
 
 	* memory.c: Added explanation of mem_allocate_aligned give by Dan
 	Sugalski
-	
+
 	Courtesy of: Josh Wilmes <josh@hitchhiker.org>
 
 2001-09-19 21:04  thgibbs
@@ -7922,7 +7945,7 @@
 
 2001-09-19 20:37  gregor
 
-	* packfile.c, include/parrot/packfile.h: 
+	* packfile.c, include/parrot/packfile.h:
 	  * Added "methods" for setting and getting all the various
 	attributes,
 	    probably sufficient for an assembler to use the library.
@@ -7937,29 +7960,29 @@
 2001-09-19 19:10  thgibbs
 
 	* config_h.in: changed c++ comment to c comment.
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-09-19 17:48  gregor
 
 	* .cvsignore, MANIFEST, Makefile.in, packfile.c, pdump.c,
-	include/parrot/packfile.h: 
+	include/parrot/packfile.h:
 	  * C code for dealing with PackFiles as if they were objects.
 	Mostly
 	    read-only interface for now, but it would not be hard to make
 	it
 	    read-write. [packfile.c, include/parrot/packfile.h]
-	
+
 	  * PackFile Dumping program that falls short of disassembling, but
 	    tests the above code and provides a hex listing of the byte
 	code
 	    contents of the PackFile. [pdump.c]
-	
+
 	  * New Makefile target 'pdump' for the above program, and related
 	    Makefile.in changes.
-	
+
 	  * Updated MANIFEST to reflect the added files
-	
+
 	  * Update .cvsignore to ignore pdump.
 
 2001-09-19 14:55  thgibbs
@@ -7981,9 +8004,9 @@
 
 2001-09-19 00:00  simon
 
-	* t/op/number.t: 
+	* t/op/number.t:
 	Number tests! Wooo!
-	
+
 	Courtesy of: Damien Neil <neild@misago.org>
 
 2001-09-18 23:52  thgibbs
@@ -8002,22 +8025,22 @@
 
 2001-09-18 22:28  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	MANIFEST updates. (And notice how I carefully snuck in the
 	t/op/integer.t there...)
-	
+
 	Courtesy of: Andy Dougherty <doughera@lafayette.edu>
 
 2001-09-18 22:26  simon
 
-	* t/: integer.t, op/integer.t: 
+	* t/: integer.t, op/integer.t:
 	Except it doesn't go there. Duh.
 
 2001-09-18 22:25  simon
 
-	* t/integer.t: 
+	* t/integer.t:
 	Tests for integer ops.
-	
+
 	Courtesy of: Damien Neil <neild@misago.org>
 
 2001-09-18 22:03  thgibbs
@@ -8034,7 +8057,7 @@
 	* disassemble.pl, Parrot/PackFile.pm,
 	Parrot/PackFile/ConstTable.pm, Parrot/PackFile/Constant.pm,
 	lib/Parrot/PackFile.pm, lib/Parrot/PackFile/ConstTable.pm,
-	lib/Parrot/PackFile/Constant.pm: 
+	lib/Parrot/PackFile/Constant.pm:
 	Converted the disassembler to use the Parrot::PackFile Perl classes
 	to do its job.
 
@@ -8068,26 +8091,26 @@
 
 2001-09-18 12:07  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	  * var num ... no longer requires assignment
 	  * automatic casting between int and num
 	  * Fixed an error message
-	
+
 	Courtesy of: Simon Cozens <simon@cvs.perl.org>
 
 2001-09-18 11:57  simon
 
-	* TODO: 
+	* TODO:
 	Gonna have to start thinking of more things to do, soon.
 
 2001-09-18 10:42  simon
 
-	* opcode_table: 
+	* opcode_table:
 	Introduce a little more tidiness into the opcode table.
 
 2001-09-18 03:06  gregor
 
-	* basic_opcodes.ops, opcode_table, t/euclid.pasm: 
+	* basic_opcodes.ops, opcode_table, t/euclid.pasm:
 	Resurrected register-const ops per Dan's request.
 
 2001-09-18 02:20  gregor
@@ -8112,21 +8135,21 @@
 
 2001-09-18 01:32  simon
 
-	* t/Makefile: 
+	* t/Makefile:
 	Trivial "clean" target to t/Makefile.
 
 2001-09-18 01:32  simon
 
 	* assemble.pl, build_interp_starter.pl, disassemble.pl,
-	Parrot/Opcode.pm, lib/Parrot/Opcode.pm: 
+	Parrot/Opcode.pm, lib/Parrot/Opcode.pm:
 	Change icky Digest::MD5 for nice simple unpack()
-	
+
 	Courtesy of: Jonathan Scott Duff <duff@cbi.tamucc.edu>
 
 2001-09-18 00:35  simon
 
 	* basic_opcodes.ops, opcode_table, docs/parrot_assembly.pod,
-	t/op/string.t: 
+	t/op/string.t:
 	New concat op. Hey, if I'm going to talk about it in an article,
 	better implement it...
 
@@ -8136,14 +8159,14 @@
 	Parrot/PackFile/Constant.pm, Parrot/PackFile/FixupTable.pm,
 	lib/Parrot/PackFile.pm, lib/Parrot/PackFile/ConstTable.pm,
 	lib/Parrot/PackFile/Constant.pm, lib/Parrot/PackFile/FixupTable.pm:
-	
+
 	Functions for reading, writing and manipulating Parrot Pack Files.
 	NOTE: This is a proposed term based on the fact that the file
 	contains more than just byte code, and another language (Java)
 	calls its binary files by a broader notion of what's in them (Class
 	Files). Since Perl has packages, and since we use pack() to write
 	them, we'll call them PackFiles (at least for now).
-	
+
 	That does, however, beg the question of file extension. Should we
 	name the files "foo.pack" instead of "foo.pbc"?
 
@@ -8154,13 +8177,13 @@
 
 2001-09-17 19:57  gregor
 
-	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm: 
+	* Parrot/Opcode.pm, lib/Parrot/Opcode.pm:
 	Added a $revision variable, parsing of the CVS Id line in
 	opcode_table and a &revision() subroutine.
 
 2001-09-17 19:53  gregor
 
-	* opcode_table: 
+	* opcode_table:
 	Added a CVS Id tag to it.
 
 2001-09-17 18:58  thgibbs
@@ -8170,18 +8193,18 @@
 2001-09-17 18:38  gregor
 
 	* build_interp_starter.pl, bytecode.c, bytecode.h, interpreter.c,
-	interpreter.h, test_main.c: 
+	interpreter.h, test_main.c:
 	  * Provides macros in interp_guts.h for setting up arrays with
 	    op names and op arg counts (done via build_interp_starter.pl).
-	
+
 	    These are used in the op tracing
-	
+
 	  * The functions in bytecode.[hc] pass around a pointer to the
 	length
 	    of the bytecode so that later when we get to runops, we know
 	    how much bytecode we've got and we can detect out-of-bounds
 	    jumping. The documentation is updated, too.
-	
+
 	  * runops in interpreter.c now looks at interpreter->flags to
 	    decide if the core of runops should be runops_trace_core or
 	    runops_notrace_core. These new functions contain just the
@@ -8192,7 +8215,7 @@
 	    functions in here that are not part of the api, so I gave
 	    them docs with 'TODO' marks mentioning they really aren't
 	    part of the api. Guidance appreciated.
-	
+
 	  * test_main.c now checks for '-t' arg and sets the tracing flag
 	    on its interpreter instance as appropriate.
 
@@ -8203,30 +8226,30 @@
 
 2001-09-17 16:15  dan
 
-	* interpreter.h: 
-	
+	* interpreter.h:
+
 	Added flags to the interpreter structure and defined a few.
 
 2001-09-17 15:51  simon
 
-	* bytecode.h, string.h: 
+	* bytecode.h, string.h:
 	VAR_SCOPE on globals.
 
 2001-09-17 15:20  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Parrot/Opcode.pm, Parrot/Test.pm into MANIFEST.
 
 2001-09-17 15:05  gregor
 
-	* t/jump.pasm, MANIFEST: 
+	* t/jump.pasm, MANIFEST:
 	Added a test program to demonstrate jump_i.
 
 2001-09-17 14:44  thgibbs
 
 	* register.c: Fixed register pop not using correct offset (off by
 	one).
-	
+
 	Courtesy of: Philip Kendall <pak@ast.cam.ac.uk>
 
 2001-09-17 13:56  thgibbs
@@ -8242,19 +8265,19 @@
 
 2001-09-17 13:49  gregor
 
-	* languages/jako/: jakoc, Makefile: 
+	* languages/jako/: jakoc, Makefile:
 	Added CVS Id tag.
 
 2001-09-17 13:49  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	Code streamlining.
-	
+
 	Courtesy of: Buggs <buggs-perl6@splashground.de>
 
 2001-09-17 13:29  gregor
 
-	* MANIFEST, opcheck.pl: 
+	* MANIFEST, opcheck.pl:
 	Added an opcode_table checker to make sure that all opcodes listed
 	there conform to a simple set of naming rules (rules themselves, of
 	course, are subject to change).
@@ -8284,41 +8307,41 @@
 
 2001-09-16 18:03  gregor
 
-	* Makefile.in: 
+	* Makefile.in:
 	Added 'test' target to run new test suite.
 
 2001-09-16 17:33  simon
 
-	* basic_opcodes.ops: 
+	* basic_opcodes.ops:
 	'not' was being !, rather than ~. Too many Perl programmers here, I
 	suspect.
-	
+
 	Courtesy of: Tom Hughes <tom@compton.nu>
 
 2001-09-16 17:21  simon
 
 	* Parrot/Test.pm, lib/Parrot/Test.pm, t/harness, t/op/basic.t,
-	t/op/string.t: 
+	t/op/string.t:
 	A *real* test suite!
-	
+
 	Courtesy of: "Mattia Barbon" <mbarbon@dsi.unive.it>
 
 2001-09-16 16:49  gregor
 
-	* basic_opcodes.ops, opcode_table: 
+	* basic_opcodes.ops, opcode_table:
 	At Dan's request, my new register-constant comparison ops have been
 	removed.
 
 2001-09-16 16:40  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	Fixed a copy-paste error in one of jakoc's error messages.
-	
+
 	Courtesy of: Buggs <buggs-perl6-list@splashground.de>
 
 2001-09-16 16:37  gregor
 
-	* languages/jako/jakoc: 
+	* languages/jako/jakoc:
 	Modified comparison implementation to use temporary registers in
 	the case of register-constant and constant-register comparisons.
 	This will allow the compiler to emit code that works when the
@@ -8334,7 +8357,7 @@
 
 2001-09-16 14:02  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	And remember, when you add stuff, keep the manifest up to date.
 
 2001-09-16 02:55  ask
@@ -8358,26 +8381,26 @@
 
 2001-09-15 22:21  simon
 
-	* process_opfunc.pl: 
+	* process_opfunc.pl:
 	basic_opcodes.c should *scream* that it's autogenerated.
 
 2001-09-15 21:58  gregor
 
-	* languages/jako/Makefile: 
+	* languages/jako/Makefile:
 	Fixed Makefile to use 'jakoc' instead of 'jako_compiler.pl' to
 	compile.
 
 2001-09-15 21:58  gregor
 
-	* languages/jako/: jako_compiler.pl, jakoc: 
+	* languages/jako/: jako_compiler.pl, jakoc:
 	Renamed the Jako compiler to jakoc from jako_compiler.pl
 
 2001-09-15 21:51  gregor
 
 	* languages/jako/: Makefile, bench.jako, euclid.jako,
-	jako_compiler.pl: 
+	jako_compiler.pl:
 	Added a new bench.jako example based on Leon Brocard's Bench.java.
-	
+
 	Jako Compiler:	 * fix a bug in assignment handling   * add some
 	more conditionals to while and if   * revert to using implicit
 	opcodes in a few cases that were broken     before the assembler
@@ -8385,21 +8408,21 @@
 
 2001-09-15 21:46  gregor
 
-	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	* assemble.pl, basic_opcodes.ops, opcode_table:
 	New ops for register-constant INTEGER comparisons:
-	
+
 	  {eq,ne,lt,le,gt,ge}_ic_ic
-	
+
 	New ops for register-register and register-constant NUMERIC
 	comparisons:
-	
+
 	  eq_nc_ic
 	  {ne,lt,le,gt,ge}_{n,nc}_ic
-	
+
 	Assembler:
-	
+
 	  Allow uppercase and underscores in labels.
-	
+
 	  Tweaks to the op infer code to make it work with the examples
 	I've been
 	  creating.
@@ -8410,27 +8433,27 @@
 
 2001-09-15 17:05  simon
 
-	* build_interp_starter.pl: 
+	* build_interp_starter.pl:
 	Casting happiness
-	
+
 	Courtesy of: Jarkko Hietaniemi <jhi@cc.hut.fi>
 
 2001-09-15 16:45  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	And the same again: Parrot/Opcode.pm wasn't "..-aware".
 
 2001-09-15 16:40  simon
 
-	* t/Makefile: 
+	* t/Makefile:
 	The Parrot/Opcode.pm dependency means we need to do -I.. in the
 	test Makefile
 
 2001-09-15 12:26  simon
 
-	* memory.c: 
+	* memory.c:
 	Fixed to match the coding standards.
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-15 01:57  ask
@@ -8447,19 +8470,19 @@
 2001-09-15 01:42  gregor
 
 	* languages/jako/: euclid.jako, fact.jako, fib.jako,
-	jako_compiler.pl: 
-	Compiler: Added variable interpolation in double-quoted strings. 
+	jako_compiler.pl:
+	Compiler: Added variable interpolation in double-quoted strings.
 	Examples: Made use of variable interpolation.
 
 2001-09-15 01:28  gregor
 
-	* Parrot/.cvsignore: 
+	* Parrot/.cvsignore:
 	Ignore the Config.pm generated file.
 
 2001-09-15 01:22  gregor
 
 	* languages/jako/: .cvsignore, Makefile, euclid.jako, fact.jako,
-	fib.jako, hello.jako, jako_compiler.pl: 
+	fib.jako, hello.jako, jako_compiler.pl:
 	gnp: Added some more sample Jako files and added many more
 	operators to the compiler. Preparations for supporting all the Math
 	and bitwise ops.
@@ -8468,44 +8491,44 @@
 
 	* assemble.pl, build_interp_starter.pl, disassemble.pl,
 	make_op_header.pl, process_opfunc.pl, Parrot/Opcode.pm,
-	lib/Parrot/Opcode.pm: 
+	lib/Parrot/Opcode.pm:
 	Move common table reading stuff to a module.
-	
+
 	Courtesy of: Damien Neil <neild@misago.org>
 
 2001-09-14 17:42  simon
 
-	* .cvsignore: 
+	* .cvsignore:
 	More .cvsignore foo.
 
 2001-09-14 17:40  simon
 
-	* assemble.pl, config_h.in: 
+	* assemble.pl, config_h.in:
 	De-coredump
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-14 17:38  simon
 
-	* assemble.pl, t/Makefile: 
+	* assemble.pl, t/Makefile:
 	Make assemble.pl look in its parent directory if the data files it
 	needs aren't in the current one. Plus a Makefile that lets "make
 	foo.pbc" work in t/
-	
+
 	Courtesy of: Rocco Caputo <troc@netrus.net>
 
 2001-09-14 16:29  simon
 
-	* make_op_header.pl: 
+	* make_op_header.pl:
 	Wildly experimental patch to make Parrot compile on FreeBSD. (And
 	probably segfault everywhere else.)
 
 2001-09-14 15:58  dan
 
-	* languages/jako/: euclid.jako, jako_compiler.pl: 
-	
+	* languages/jako/: euclid.jako, jako_compiler.pl:
+
 	Added in the first mini-language that targets Parrot.
-	
+
 	Courtesty of: "Gregor N. Purdy" <gregor@focusresearch.com>
 
 2001-09-14 15:20  dan
@@ -8517,108 +8540,108 @@
 	* Makefile.in, basic_opcodes.ops, bytecode.c, global_setup.c,
 	interpreter.c, interpreter.h, memory.c, parrot.c, parrot.h,
 	register.c, register.h, string.c, string.h, strnative.c,
-	test_main.c: 
+	test_main.c:
 	Fixes to include <parrot/foo.h>
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-14 12:05  simon
 
-	* strnative.c: 
+	* strnative.c:
 	Appease Tru64.
 
 2001-09-14 12:01  simon
 
-	* memory.c: 
+	* memory.c:
 	Appease Tru64.
 
 2001-09-14 11:54  simon
 
-	* interpreter.c: 
+	* interpreter.c:
 	Remove lvalue cast.
 
 2001-09-14 11:45  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Be 5.005 friendly.
 
 2001-09-14 11:39  simon
 
-	* Configure.pl: 
+	* Configure.pl:
 	Tru64 cc doesn't like -Wall
 
 2001-09-14 10:57  simon
 
 	* Config_pm.in, Configure.pl, MANIFEST, Makefile, Makefile.in,
 	assemble.pl, build_interp_starter.pl, bytecode.c, bytecode.h,
-	config.h.in, config_h.in, disassemble.pl, interpreter.c: 
+	config.h.in, config_h.in, disassemble.pl, interpreter.c:
 	Configure now generates Makefile
-	
+
 	Courtesy of: Brent Dax <brentdax@cpan.org>
 
 2001-09-14 10:08  simon
 
-	* t/test3.pasm: 
+	* t/test3.pasm:
 	Add "end"
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-14 10:07  simon
 
-	* assemble.pl: 
-		* uses Getopt::Long for options.  -c is now --checksyntax. 
+	* assemble.pl:
+		* uses Getopt::Long for options.  -c is now --checksyntax.
 	I wasn't
 	sure how to keep compatible (patches welcome!)	       * options
-	include:		 --help 		--version	   
-	      --verbose 		--output=file		     
+	include:		 --help 		--version
+	      --verbose 		--output=file
 	--listing=file		       --checksyntax	     * produces
 	verbose listing of what the assembler saw :)  Only one nitpick with
 	it:  unknown symbols are given as 0xffffffff, unfortunately, this
 	includes symbols which may be defined later in the file (i.e.
 	forward jumps).
-	
+
 	Courtesy of: Brian Wheeler <bdwheele@indiana.edu>
 
 2001-09-14 10:06  simon
 
-	* strnative.c: 
+	* strnative.c:
 	substr growth fixup
-	
+
 	Courtesy of: Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-14 10:03  simon
 
 	* bytecode.c, global_setup.c, interpreter.c, memory.c, memory.h,
-	register.c, string.c, strnative.c, test_main.c: 
+	register.c, string.c, strnative.c, test_main.c:
 	Coding standards conformance
-	
+
 	Courtesy of Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-14 09:46  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	Make the assembler grok transcendental maths again.  Courtesy of:
 	Gibbs Tanton - tgibbs <Tanton.Gibbs@acxiom.com>
 
 2001-09-13 17:29  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	Better opcode guessing, from Brian Wheeler. (Again!)
 
 2001-09-13 17:20  dan
 
-	* docs/parrot_assembly.pod: 
-	
+	* docs/parrot_assembly.pod:
+
 	Took out duplicate entries for iton, ntoi, and tostring.
 
 2001-09-13 17:16  simon
 
-	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	* assemble.pl, basic_opcodes.ops, opcode_table:
 	From Brian Wheeler:
-	
+
 	This patch gives the assembler support of '\a','\n','\r','\t', and
 	'\\' in string constants.
-	
+
 	In addition, it changes (for all registers) "I reg %li is ..." to
 	just the value of the register.  Printing constants is also
 	supported, but alas, you have to specify the type (print_sc,
@@ -8626,72 +8649,72 @@
 
 2001-09-13 15:38  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	Why don't I actually *test* this stuff before applying it, eh?
 
 2001-09-13 15:34  simon
 
-	* TODO, t/euclid.pasm: 
+	* TODO, t/euclid.pasm:
 	From: "Gregor N. Purdy" <gregor@focusresearch.com> Subject: [patch
 	(really)] Removed opcode qualifers t/euclid.pasm to exercise opcode
 	inference
 
 2001-09-13 14:42  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	A new assembler, from Brian Wheeler.
 
 2001-09-13 09:44  simon
 
 	* basic_opcodes.ops, interpreter.h, parrot.h, strnative.c,
-	test_main.c: 
-	Two more from Tom Hughes:     Patch to fix C++ style comments	 
+	test_main.c:
+	Two more from Tom Hughes:     Patch to fix C++ style comments
 	Patch to remove use of structure constant/cast
 
 2001-09-13 09:39  simon
 
-	* TODO, docs/strings.pod: 
+	* TODO, docs/strings.pod:
 	Update string docs.
 
 2001-09-13 09:36  simon
 
-	* Makefile, basic_opcodes.ops: 
-	Tom Hughes	Patch to link with the maths library Tom Hughes    
+	* Makefile, basic_opcodes.ops:
+	Tom Hughes	Patch to link with the maths library Tom Hughes
 	 Patch to fix += on rvalue
 
 2001-09-13 08:57  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	I guess nobody's been using the nightly builds...
 
 2001-09-13 08:27  simon
 
-	* assemble.pl, basic_opcodes.ops, opcode_table: 
+	* assemble.pl, basic_opcodes.ops, opcode_table:
 	Bitwise ops, from Brian Wheeler.
 
 2001-09-13 08:23  simon
 
-	* .cvsignore, t/.cvsignore: 
+	* .cvsignore, t/.cvsignore:
 	.cvsignore's, from Gregor Purdy.
 
 2001-09-13 08:22  simon
 
-	* Makefile: 
+	* Makefile:
 	Euclidean test and test output rearranging from Gregor Purdy.
 
 2001-09-13 08:21  simon
 
-	* assemble.pl, basic_opcodes.ops, disassemble.pl, opcode_table: 
+	* assemble.pl, basic_opcodes.ops, disassemble.pl, opcode_table:
 	Math ops from Gibbs Tanton.
 
 2001-09-13 08:14  simon
 
 	* basic_opcodes.ops, opcode_table, string.c, string.h, strnative.c,
-	t/test2.pasm: 
+	t/test2.pasm:
 	String substr op; also rearranged "encoding" to be a vtable
 	pointer, not an array index. Haven't changed docs to reflect this,
 	oops.
-	
+
 	Simon
 
 2001-09-12 19:48  dan
@@ -8714,155 +8737,155 @@
 
 2001-09-12 16:44  dan
 
-	* docs/parrot_assembly.pod: 
-	
+	* docs/parrot_assembly.pod:
+
 	PDD describing parrot's assembly language and the opcodes in it
 
 2001-09-12 14:20  dan
 
-	* memory.c: 
+	* memory.c:
 	Fixed alignment issues with allocation
 
 2001-09-12 10:54  simon
 
 	* Makefile, assemble.pl, bytecode.c, disassemble.pl,
-	make_op_header.pl, opcode_table, process_opfunc.pl: 
+	make_op_header.pl, opcode_table, process_opfunc.pl:
 	Brian Wheeler's big patch:
-	
+
 	* Changes the opcode_table file to provide additional information
 	about the operands.  Case shouldn't be a problem since that data
 	never becomes a C symbol [this is pretty much as before]
-	
+
 	* Padding errors solved:  assemble.pl and bytecode.c were padding
 	the constants incorrectly.  It should have been 4-(size % 4), not
 	just (size % 4).  It is now fixed in both places.
-	
+
 	* assembler has less special cases, and should be easier to hang
 	error checking on
-	
+
 	* disassembler dumps constant table and the format is a bit
 	prettier, including register names, etc.
 
 2001-09-11 23:21  dan
 
-	* build_interp_starter.pl, interpreter.c: 
-	
+	* build_interp_starter.pl, interpreter.c:
+
 	Abstracted the runops function core into a macro for easy
 	replacement later.
 
 2001-09-11 10:43  simon
 
-	* Configure.pl, MANIFEST, Makefile, config.h, config.h.in: 
+	* Configure.pl, MANIFEST, Makefile, config.h, config.h.in:
 	Configure system from Brent Dax <brentdax@cpan.org>
 
 2001-09-11 09:38  simon
 
-	* assemble.pl, test.pbc: 
+	* assemble.pl, test.pbc:
 	From: Bryan C. Warnock <bwarnock@capita.com> Subject: Patch:
 	assembler deferred output
-	
+
 	Also got rid of the bytecode, since that's probably way out of
 	date.
 
 2001-09-11 09:26  simon
 
-	* basic_opcodes.ops, opcode_table, t/test2.pasm: 
+	* basic_opcodes.ops, opcode_table, t/test2.pasm:
 	From: Bryan C. Warnock <bwarnock@capita.com> Subject: length_s_i
 	patch
 
 2001-09-10 23:20  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	And that move needs a MANIFEST change. So many things to remember!
 
 2001-09-10 23:18  simon
 
-	* t/: test.pasm, test2.pasm, test3.pasm: 
+	* t/: test.pasm, test2.pasm, test3.pasm:
 	Move tests to t/. (Oh, CVS doesn't work the way I think it does.)
 
 2001-09-10 23:18  simon
 
-	* test.pasm, test2.pasm, test3.pasm: 
+	* test.pasm, test2.pasm, test3.pasm:
 	Move tests to t/
 
 2001-09-10 23:04  dan
 
-	* test3.pasm: 
-	
+	* test3.pasm:
+
 	Register push/pop test
 
 2001-09-10 22:47  simon
 
-	* basic_opcodes.ops, bytecode.c, parrot.h, test_main.c: 
-	Fix up format warnings, from Sam Tregar <sam@tregar.com>. 
+	* basic_opcodes.ops, bytecode.c, parrot.h, test_main.c:
+	Fix up format warnings, from Sam Tregar <sam@tregar.com>.
 	(Modified to avoid conflict with Dan's changes.)
 
 2001-09-10 22:45  dan
 
-	* disassemble.pl: 
-	
+	* disassemble.pl:
+
 	Happier about blanks in opcode_table
 
 2001-09-10 22:40  dan
 
-	* interpreter.c, register.c: 
-	
+	* interpreter.c, register.c:
+
 	Yanked out debugging code, since these work OK. The bug I want is
 	elsewhere.
 
 2001-09-10 22:30  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	Uhm. We want make_op_header.pl. We really, really do.
 
 2001-09-10 22:26  simon
 
 	* Makefile, TODO, assemble.pl, basic_opcodes.ops,
 	build_interp_starter.pl, disassemble.pl, make_op_header.pl,
-	opcode_table, process_opfunc.pl: 
-	Automatic opcode numbering, from Leon Brocard <acme@astray.com>. 
+	opcode_table, process_opfunc.pl:
+	Automatic opcode numbering, from Leon Brocard <acme@astray.com>.
 	This means we can add lots more opcodes without fiddling about with
 	the numbers. Hooray!
-	
+
 	Don't forget that "end" needs to be op zero, else the interpreter
 	falls off the end of the code. This is Bad, and I wonder if there's
 	a way around it.
 
 2001-09-10 19:49  simon
 
-	* MANIFEST, make_op_table_build.pl: 
+	* MANIFEST, make_op_table_build.pl:
 	Hey! This doesn't do anything...
 
 2001-09-10 19:46  simon
 
-	* Makefile: 
+	* Makefile:
 	"clean" target cleanup from Bryan C. Warnock <bwarnock@capita.com>.
 
 2001-09-10 18:31  simon
 
-	* MANIFEST: 
+	* MANIFEST:
 	You know what this means...
 
 2001-09-10 18:30  simon
 
-	* assemble.pl: 
+	* assemble.pl:
 	"use strict" patch from Leon Brocard <acme@astray.com>. Hey, why
 	wait for a release...? :)
 
 2001-09-10 18:13  simon
 
-	* interpreter.c: 
+	* interpreter.c:
 	Bad Dan! No cookie!
 
 2001-09-10 17:56  simon
 
-	* README: 
+	* README:
 	A *real* README file, which doesn't claim it isn't for public
 	consumption.
 
 2001-09-10 17:02  simon
 
-	* TODO: 
+	* TODO:
 	More things to do.
 
 2001-09-10 16:56  dan
@@ -8881,7 +8904,7 @@
 
 2001-09-10 11:07  simon
 
-	* TODO: 
+	* TODO:
 	Trivial TODO list.
 
 2001-09-10 11:05  simon
@@ -8891,49 +8914,49 @@
 
 2001-09-10 11:01  simon
 
-	* docs/strings.pod: 
+	* docs/strings.pod:
 	New string documentation.
 
 2001-09-10 11:01  simon
 
-	* basic_opcodes.ops, opcode_table: 
+	* basic_opcodes.ops, opcode_table:
 	String ops.
 
 2001-09-10 10:53  simon
 
-	* global_setup.c: 
+	* global_setup.c:
 	More string fu.
 
 2001-09-10 10:51  simon
 
-	* memory.h: 
+	* memory.h:
 	Just some more aliases for now. Used by string handling stuff.
 
 2001-09-10 10:50  simon
 
-	* assemble.pl, bytecode.c, bytecode.h: 
+	* assemble.pl, bytecode.c, bytecode.h:
 	Temporary hack to store string constants in bytecode and recreate
 	them at runtime.
 
 2001-09-10 10:48  simon
 
-	* op.h: 
+	* op.h:
 	op.h is now generated by the Makefile; remove it.
 
 2001-09-10 10:47  simon
 
-	* Makefile: 
+	* Makefile:
 	clean and op.h Makefile targets.
 
 2001-09-10 10:45  simon
 
-	* string.c, string.h, strnative.c: 
+	* string.c, string.h, strnative.c:
 	More string vtable stuff.
 
 2001-09-07 21:07  dan
 
-	* assemble.pl: 
-	
+	* assemble.pl:
+
 	Much less picky about whitespace in the opcode_table now. (Doesn't
 	whine on blank lines)
 
@@ -8942,35 +8965,35 @@
 	* Makefile, assemble.pl, global_setup.h, interpreter.c,
 	interpreter.h, opcode_table, parrot.h, test.pasm: (Here's hoping
 	this takes) Added global_setup.h to declare init_world function
-	
+
 	Moved variable declarations out of the interpreter loop for small
 	speed boost.
-	
+
 	Changed end opcode to now be opcode #0. A function is provided for
 	it, but isn't ever executed.
-	
+
 	When the interpreter sees an opcode 0 in the stream it means the
 	end of stream. Things were coring on Cygwin otherwise. (I think I
 	was dereferencing a zero, which is bad)
 
 2001-09-06 22:07  dan
 
-	* basic_opcodes.ops, process_opfunc.pl: 
-	
+	* basic_opcodes.ops, process_opfunc.pl:
+
 	Minor tweaks to basic_opcodes.ops to fix some NV issues. The rest
 	are minor changes now that things are in a fixed state.
 
 2001-09-06 16:13  dan
 
-	* basic_opcodes.c, test_opcodes.c: 
+	* basic_opcodes.c, test_opcodes.c:
 	test_opcodes.c is now irrelevant--they're all in basic_opcodes.ops.
-	
+
 	basic_opcodes.c is now autogenerated from basic_opcodes.ops, and
 	should be nuked. So it is. :)
 
 2001-09-06 03:35  dan
 
-	* basic_opcodes.ops, build_interp_starter.pl, process_opfunc.pl: 
+	* basic_opcodes.ops, build_interp_starter.pl, process_opfunc.pl:
 	Scripts to build the header file that holds the function table
 	creation code, as well as the script to turn an opcode file to C
 	source. (And the basic opcode functions turned into an opcode
@@ -8978,7 +9001,7 @@
 
 2001-09-06 03:31  dan
 
-	* Makefile, interpreter.c: 
+	* Makefile, interpreter.c:
 	Changes to support the autogeneration of the opcode function
 	pointer table in interpreter.c, along with the changes to the
 	Makefile needed.
@@ -8986,7 +9009,7 @@
 2001-09-05 13:27  simon
 
 	* bytecode.c, config.h, docs/opcodes.pod, docs/overview.pod,
-	docs/parrotbyte.pod, docs/vtables.pod: 
+	docs/parrotbyte.pod, docs/vtables.pod:
 	Added stubs for the documents; working on them this week. (What's
 	left of it.) config.h change is just to type VTABLE, and the
 	bytecode thing you might want to revoke. It's apidoc for the
@@ -8994,28 +9017,28 @@
 
 2001-09-03 18:26  simon
 
-	* docs/strings.pod: 
+	* docs/strings.pod:
 	A start on the string API documentation.
 
 2001-09-03 17:43  simon
 
-	* opcode_table: 
+	* opcode_table:
 	Since we specify the opcode number, we can rearrange to a more
 	human-friendly ordering.
 
 2001-09-03 17:42  simon
 
-	* basic_opcodes.c: 
+	* basic_opcodes.c:
 	Coupl'a logic bugs. (I think)
 
 2001-09-03 17:41  simon
 
-	* string.c, string.h, strnative.c: 
+	* string.c, string.h, strnative.c:
 	Tidying up the string vtables.
 
 2001-09-03 17:38  simon
 
-	* make_op_header.pl: 
+	* make_op_header.pl:
 	Spit out the whole of op.h, not just the bit in the middle.
 
 2001-08-29 13:16  ask
@@ -9031,7 +9054,7 @@
 	make_op_header.pl, make_op_table_build.pl, memory.c, memory.h,
 	op.h, opcode_table, parrot.c, parrot.h, register.c, register.h,
 	stacks.h, string.c, string.h, strnative.c, strnative.h, test.pasm,
-	test.pbc, test_main.c, test_opcodes.c: 
+	test.pbc, test_main.c, test_opcodes.c:
 	Initial checkin of Simon's work directory - Dan, feel free to nuke.
 	 I'm still working on the string stuff, though.
 

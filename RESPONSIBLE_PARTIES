@@ -2,14 +2,13 @@ This is a partial list of the folks with CVS commit access and the
 areas they're directly responsible for. This does not list all the
 people with CVS commit access, just those who have an area they've
 taken responsibility for.
+See also languages/LANGUAGES.STATUS for language authors/maintainers.
 
-Release pumpking		Leo Toetsch
+Design				Dan Sugalski
+Release pumpking		Leopold "leo" Toetsch
 JIT				Daniel Grunblatt, Leopold Toetsch
 Configure			Brent Dax
 Garbage Collector               ** volunteers?? **
 I/O				Melvin Smith, Juergen Boemmels
-Vtables 			David Lloyd
 IMCC & PIR                      Melvin Smith, Leopold Toetsch
-PNI                             Leopold Toetsch
-Perl6                           Sean O'Rourke
-Jako				Gregor Purdy
+Misc core stuff                 Leopold Toetsch

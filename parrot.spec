@@ -1,4 +1,4 @@
-%define version 0.0.10
+%define version 0.0.13
 %define devel -devel
 %define prefix /usr/local/parrot/%{version}
 %define exec_prefix %{prefix}
