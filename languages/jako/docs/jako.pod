@@ -11,9 +11,20 @@ virtual machine.
 
 Jako should be familiar to those who have seen C and Perl.
 
-=head2 LEXICAL STRUCTURE
+=head2 Lexical Structure
+
+Jako's lexical structure is similar to its relative: Perl. Whitespace between
+tokens is not significant, and comments are introduced with an octothorp
+('#') and continue to the end of the line.
 
 =over 4
+
+=item * Labels
+
+An identifier followed by a colon at the beginning of a line is a label.
+Labels can be the targets of B<goto> statements, and can also provide a
+way to refer to specific loops when using the loop control statements
+(see below).
 
 =item * Literals
 
@@ -59,11 +70,102 @@ a.k.a. "whack"). To include a back slash in the string, precede it with another 
 
 Start with a letter, followed by any combination of letters, decimal digits and underscores.
 
+=item * Types
+
+The built-in types are recognized as keywords: B<int>, B<num>, B<obj>, B<str>.
+
 =back
 
-=head2 SYNTAX
+=head2 Syntax
 
-=head2 SEMANTICS
+=over 4
+
+=item * Blocks
+
+A block is a sequence of statements and declarations between a matching pair
+of open and close braces ("B<{>" and "B<}>"). Each block represents a scope for
+lexical symbols (variables and constants). There is an implicit block which
+represents the entire compilation unit (usually a file). Subroutines may
+only appear at this level.
+
+=item * Constant Declarations
+
+B<const> introduces a constant declaration. What follows must be a type, a
+list of identifiers, "B<=>", and a value of an appropriate type.
+
+        const int a, b, c = 2;
+        const int pi_in   = 3;             # Indiana
+        const num pi      = 3.141592;      # Everywhere else
+        const str d       = "Como estas?";
+
+=item * Variable Declarations
+
+B<var> introduces a variable declaration. What follows must be a type and
+a list of identifiers, optionally followed by "B<=>" and an expression.
+
+        var int a, b, c;
+        var num d, e, f = 42.0;
+        var str g = "Howdy";
+
+=item * Subroutines
+
+B<sub> introduces a subroutine declaration (and definition). What follows
+is an optional type, and identifier (the name of the subroutine), and a
+list of formal arguments in parenthesis. The formal arguments are written
+as a comma-separated list of type-name pairs. Finally, there must be a
+block which contains the implementation of the subroutine.
+
+        sub foo() { ... }
+        sub int bar(int x, int y) { ... }
+
+=item * Assignments
+
+Following tradition, basic assignments are written as
+
+         left = right;
+
+Conversions between B<int> and B<num> values are implicit.
+
+=item * Conditionals
+
+There are two kinds of conditional block: B<if> and B<unless>, with the latter
+being short for the more familiar B<if>, but with the condition inverted. In
+both cases, what follows the keyword is a parenthsized boolean expression and
+a block.
+
+        if     (happy)   { smile(); }
+        unless (raining) { play();  }
+
+Even though each is redundant given the presence of the other, both are
+retained in the language for the same reason as in Perl: allowing more natural
+expression.
+
+Further, there can be a subsequent block, introduced with B<else>:
+
+        if     (paid) { work();     } else { complain(); }
+        unless (paid) { complain(); } else { work();     }
+
+=item * Loops
+
+There are two kinds of loop: B<while> and B<until>, with the same reversal of
+sense as exists between B<if> and B<unless>.
+
+        while (1) {
+          while (overdue != 0.0) { work(); invoice();     }
+          until (overdue == 0.0) { send_dunning_letter(); }
+        }
+
+You can control loops with the B<next>, B<last> and B<redo> loop control
+statements. B<next> jumps immediately to the next iteration of the loop,
+without executing the intervening statements, B<last> jumps immediately
+out of the loop, again without executing the intervening statements. And,
+B<redo> jumps back to the beginning of the current iteration.
+
+Loops can be followed by an optional B<continue> block, which provides
+
+=back
+
+=head2 Semantics
 
 =over 4
 
