@@ -73,7 +73,7 @@ imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 
     if (!unit)
         return;
-    if (!optimizer_level && pasm_file)
+    if (!(optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM)) && pasm_file)
         return;
 
     imcc_init_tables(interpreter);

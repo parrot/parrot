@@ -518,6 +518,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     }
 }
 
+#if 0
 /*
  * check for a sequence of
  *   .pcc_begin
@@ -588,6 +589,7 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 
     return 1;
 }
+#endif
 
 static void
 insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *sub)
@@ -787,7 +789,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_pcc_sub_call\n");
 #endif
 
-    tail_call = check_tail_call(interp, unit, ins);
+    tail_call = 0 ; /* check_tail_call(interp, unit, ins); */
     if (tail_call)
         debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
     sub = ins->r[0];
@@ -1002,7 +1004,9 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         needs_save[i] = 0;
     for (i = 0; i < unit->n_symbols; i++) {
         r = reglist[i];
-        if ((r->type & VTREGISTER) && r->color >= 16) {
+        if (((r->type & VTREGISTER) && r->color >= 16) || r->set == 'K') {
+            if (r->set == 'K')  /* need to inspect key chain */
+                return;
             t = strchr(types, r->set) - types;
             needs_save[t] = 1;
         }
@@ -1056,6 +1060,10 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
         if (ins->opsize == 3 &&
                 ins->r[1]->type == VTCONST &&
                 (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
+                ins->r[1]->name[1] != 'b' &&
+                ins->r[1]->name[1] != 'B' &&
+                ins->r[1]->name[1] != 'x' &&
+                ins->r[1]->name[1] != 'X' &&
                 atof(ins->r[1]->name) == 0.0 &&
                 !strcmp(ins->op, "set")) {
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
@@ -1072,7 +1080,8 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
                 r0 = r0->reg;
             if (r1->type & VT_REGP)
                 r1 = r1->reg;
-            if (r0->set == r1->set && r0->color == r1->color) {
+            if (r0->set == r1->set && r0->color == r1->color &&
+                    r0->type == r1->type) {
                 debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 ins = delete_ins(unit, ins, 1);
                 ins = ins->prev ? ins->prev : unit->instructions;
