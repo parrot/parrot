@@ -1,4 +1,5 @@
 # [expr sqrt()]
+.namespace [ "_Tcl" ]
 
 .sub __math_sqrt
   .param pmc argv
@@ -14,8 +15,8 @@
   pop $P0, argv
 
   $I0 = $P0[1]
-
-  pow $N1, $I0, 0.5
+  
+  sqrt $N1, $I0
 
   result[0] = FLOAT
   result[1] = $N1
