@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# Cola preprocessor
+# Kludge to preload classes until the parser
+# can do it.
+
+print "colac preprocessor\n\n";
+
+my $file = $ARGV[0];
+
+open(IN, "<$file") or die("No source file: $file\n");
+
+my @file = <IN>;
+my $using;
+my $class;
+
+open(OUT, ">$file.colacctmp");
+
+foreach my $line (@file) {
+    if(($using, $class) = $line =~ m/^(using\s+(\w+));/) {
+        open(USE, "<$class.cola") or die("Error: can't include $class.cola\n");
+        {
+            local $/;
+            my $class = <USE>;
+            print OUT $class;
+        }
+        $line =~ s/$using//;
+    }
+    print OUT $line;
+}
+
+close(OUT);
+
+system("./colacc $file.colacctmp");
+
+
