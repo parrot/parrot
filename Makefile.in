@@ -74,3 +74,6 @@ clean:
 test:
 	$(PERL) t/harness
 
+update:
+	cvs -q update -dP
+
