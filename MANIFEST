@@ -1765,6 +1765,7 @@ include/parrot/smallobject.h                      [devel]include
 include/parrot/stacks.h                           [devel]include
 include/parrot/string.h                           [devel]include
 include/parrot/string_funcs.h                     [devel]include
+include/parrot/string_primitives.h		  [devel]include
 include/parrot/sub.h                              [devel]include
 include/parrot/thr_pthread.h                      [devel]include
 include/parrot/thread.h                           [devel]include
@@ -2549,6 +2550,7 @@ src/spf_vtable.c                                  []
 src/stack_common.c                                []
 src/stacks.c                                      []
 src/string.c                                      []
+src/string_primitives.c				  []
 src/sub.c                                         []
 src/test_main.c                                   []
 src/thread.c                                      []
@@ -2647,6 +2649,7 @@ t/src/io.t                                        []
 t/src/list.t                                      []
 t/src/manifest.t                                  []
 t/src/sprintf.t                                   []
+t/src/string.t					  []
 t/stress/gc.t                                     []
 tools/dev/bench_op.imc                            [devel]
 tools/dev/cc_flags.pl                             []
