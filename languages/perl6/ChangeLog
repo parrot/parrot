@@ -363,3 +363,12 @@
 
 	* Additions:
 	    - m:approx($n)//, if you've got it.
+
+2002-09-25
+
+	* Additions:
+	    - hyper-operator assignment (John Williams)
+
+	* Fixes:
+	    - hyper-ops use length of longer of two operands (rather than
+	      one side arbitrarily) (John Williams)

@@ -90,7 +90,21 @@ sub P6C::Binop::ctx_left {
 sub P6C::Binop::ctx_right {
     my ($x, $ctx) = @_;
     my $op = $x->op;
-    if (ref($op) && $op->isa('P6C::hype')) {
+
+    if ((ref($op) && $op->isa('P6C::hype') && $op->op =~ /^([^=]+)=$/)
+	|| $op =~ /^([^=]+)=$/) {
+	# Turn this into a normal, non-inplace operator and try again.
+	# Yuck.
+	my $new_op = $1;
+	$new_op = new P6C::hype op => $1 if ref $op;
+	my $ltmp = deep_copy($x->l);
+	my $new_rhs = new P6C::Binop op => $new_op, l => $ltmp, r => $x->r;
+	$x->op('=');
+	$x->r($new_rhs);
+	$x->ctx_right($ctx);
+	return;
+
+    } elsif (ref($op) && $op->isa('P6C::hype')) {
 	# XXX: is_array_expr is a hack, so this may cause some
 	# problems.  However, it works in straightforward cases.
 	my $newctx = new P6C::Context;
@@ -109,16 +123,6 @@ sub P6C::Binop::ctx_right {
 	$x->l->ctx_left($x->r, $ctx);
 	# give incoming context to left side
 	$x->l->ctx_right($ctx);
-
-    } elsif ($op =~ /^([^=]+)=$/) {
-	# Turn this into a normal, non-inplace operator and try again.
-	# Yuck.
-	my $ltmp = deep_copy($x->l);
-	my $new_rhs = new P6C::Binop op => $1, l => $ltmp, r => $x->r;
-	$x->op('=');
-	$x->r($new_rhs);
-	$x->ctx_right($ctx);
-	return;
 
     } elsif ($op eq ',') {
 	# List of items.

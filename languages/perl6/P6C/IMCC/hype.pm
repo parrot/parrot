@@ -185,10 +185,10 @@ sub hype_array_array {
 # hype_array_array
 	$llen = $lval
 	$rlen = $rval
-	if $llen > $rlen goto $cntlabel
-	$llen = $rlen
+	if $llen < $rlen goto $cntlabel
+	$rlen = $llen
 $cntlabel:
-	$dest = $llen
+	$dest = $rlen
 END
     my $code
 	= hype_body($op, "$dest\[$rlen]", "$lval\[$rlen]", "$rval\[$rlen]");
