@@ -336,7 +336,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 
                 if (PObj_COW_TEST(b) && b->bufstart &&
                         !PObj_external_TEST(b)) {
-                    refcount = ((int *)b->bufstart);
+                    refcount = (int *)b->bufstart - 1;
                     *refcount = 0;
                 }
             }
@@ -364,7 +364,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
                     PObj_COW_TEST(b) &&
                     b->bufstart &&
                     !PObj_external_TEST(b)) {
-                refcount = ((int *)b->bufstart);
+                refcount = (int *)b->bufstart - 1;
                 /* mark users of this bufstart by incrementing refcount */
                 if (PObj_live_TEST(b))
                     *refcount = 1 << 29;        /* ~infinite usage */
@@ -549,18 +549,18 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                 }
                 else {
 #ifdef GC_IS_MALLOC
-                    /* free allocated space at bufstart,
+                    /* free allocated space at (int*)bufstart - 1,
                      * but not if it is used COW or external
                      */
                     if (b->bufstart && !PObj_is_external_or_free_TESTALL(b)) {
                         if (PObj_COW_TEST(b)) {
-                            int *refcount = ((int *)b->bufstart);
+                            int *refcount = ((int *)b->bufstart - 1);
 
                             if (!--(*refcount))
                                 free(refcount); /* the actual bufstart */
                         }
                         else
-                            free(b->bufstart);
+                            free((int*)b->bufstart - 1);
                     }
 #else
                     if (!PObj_COW_TEST(b)) {

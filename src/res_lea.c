@@ -11,32 +11,41 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     interpreter->collect_runs++;        /* fake it */
 }
 
+/*
+ * COWable objects (strings or Buffers) use an int at bufstart
+ * for refcounting in DOD
+ * bufstart is incremented by that int
+ */
 void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t size)
 {
     Buffer * buffer = from;
     void *p;
     size_t oldlen = buffer->buflen;
-    if (!buffer->bufstart)
-        p = buffer->bufstart = calloc(1, size);
+    if (!buffer->bufstart) {
+        buffer->bufstart = calloc(1, size + sizeof(int));
+        LVALUE_CAST(int *, buffer->bufstart)++;
+    }
     else {
         if (!size) {    /* realloc(3) does free, if size == 0 here */
             return buffer->bufstart;    /* do nothing */
         }
-        p =  realloc(buffer->bufstart, size);
+        p =  realloc((int*)buffer->bufstart - 1, size + sizeof(int));
+        *(LVALUE_CAST(int *, p)++) = 0;
         if (size > buffer->buflen)
             memset((char*)p + oldlen, 0, size - oldlen);
         buffer->bufstart = p;
     }
     buffer->buflen = size;
-    return p;
+    return buffer->bufstart;
 }
 
 void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = malloc(size);
+    b->bufstart = malloc(size + sizeof(int));
+    *(LVALUE_CAST(int *, b->bufstart)++) = 0;
     b->buflen = size;
     return b;
 }
@@ -46,7 +55,8 @@ Parrot_allocate_zeroed(struct Parrot_Interp *interpreter, void *buffer,
         size_t size)
 {
     Buffer * b = buffer;
-    b->bufstart = calloc(1, size);
+    b->bufstart = calloc(1, size + sizeof(int));
+    *(LVALUE_CAST(int *, b->bufstart)++) = 0;  /*   *( (int*) b->bufstart ++ ) = 0 */
     b->buflen = size;
     return b;
 }
@@ -62,12 +72,9 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
         Parrot_allocate_string(interpreter, str, size);
     else if (size) {
         pad = STRING_ALIGNMENT - 1;
-        /* COWable objects (i.e. strings) use an int at bufstart
-         * for refcounting in DOD */
         size = ((size + pad + sizeof(int)) & ~pad);
-        p = realloc((char *)str->bufstart, size);
-        str->strstart = (char *)p + sizeof(int);
-        str->bufstart = p;
+        p = realloc((char *)((int*)str->bufstart - 1), size);
+        str->bufstart = str->strstart = (char *)p + sizeof(int);
         /* usable size at bufstart */
         str->buflen = size - sizeof(int);
     }
@@ -82,13 +89,10 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     size_t pad;
     if (size) {
         pad = STRING_ALIGNMENT - 1;
-        /* COWable objects (i.e. strings) use an int at bufstart
-         * for refcounting in DOD */
         size = ((size + pad + sizeof(int)) & ~pad);
         p = calloc(1, size);
         *(int*)p = 0;
-        str->strstart = (char *)p + sizeof(int);
-        str->bufstart = p;
+        str->bufstart = str->strstart = (char *)p + sizeof(int);
         str->buflen = size - sizeof(int);
     }
     return str;
