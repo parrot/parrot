@@ -75,6 +75,7 @@ Initializes the subroutine.
      * - private0 ... Coroutine flip/flop
      * - private1 ... Fixup is done
      * - private2 ... put RetCont on free list
+     * - private3 ... pythonic coroutine generator flag
      * - private4 ... @MAIN
      * - private5 ... @LOAD
      * - private6 ... @IMMEDIATE

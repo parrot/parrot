@@ -163,15 +163,17 @@ cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
     assert(s < MAX_CACHED_STACKS);
     if (e->free_list) {
         new_chunk = e->free_list;
+        assert(new_chunk->size_class == s);
+        assert(new_chunk->size_class == chunk->size_class);
         e->free_list = new_chunk->free_p;
-        /* PObj_on_free_list_CLEAR(new_chunk); */
+        /* PObj_report_SET(new_chunk);  XXX */
         /*
          * freeP- is used as a flag too to avoid tracing into
          * the free list in mark_pmc_register_stack
          */
-     /*
-      * fprintf(stderr, "** GET %d %p free %p\n", s, new_chunk, e->free_list);
-      */
+
+      /*
+       * fprintf(stderr, "** GET %d %p free %p\n", s, new_chunk, e->free_list);        */
     }
     else {
         new_chunk = new_bufferlike_header(interpreter, e->size);
@@ -236,8 +238,9 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
      */
     if ((PObj_get_FLAGS(chunk) & PObj_private2_FLAG)) {
         assert(s < MAX_CACHED_STACKS);
-    /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
+     /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
         chunk->free_p = e->free_list;
+        chunk->name = "free";
         e->free_list = chunk;
         /* PObj_on_free_list_SET(chunk); */
         /* clear reuse flag */

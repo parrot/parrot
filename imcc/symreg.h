@@ -145,6 +145,7 @@ struct pcc_sub_t {
     int nargs;
     SymReg *sub;
     SymReg *cc;
+    SymReg *p0_sym;	/* the saved P0 */
     SymReg *cc_sym;	/* the saved P1 */
     SymReg *p2_sym;	/* the saved P2 */
     SymReg ** ret;

@@ -425,6 +425,12 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
             regs[1] = get_pasm_reg("P2");
             insINS(interpreter, unit, ins, "set", regs, 2);
         }
+        /* if its a coroutine, preserve the sub P0 */
+        if (sub->pcc_sub->calls_a_sub & ITPCCYIELD) {
+            regs[0] = sub->pcc_sub->p0_sym = mk_temp_reg('P');
+            regs[1] = get_pasm_reg("P0");
+            insINS(interpreter, unit, ins, "set", regs, 2);
+        }
     }
     /*
      * check if there is a return
@@ -490,6 +496,10 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
          *
          * TODO optimize this later
          */
+        /* get our subroutine */
+        regs[0] = get_pasm_reg("P0");
+        regs[1] = unit->instructions->r[1]->pcc_sub->p0_sym;
+        ins = insINS(interpreter, unit, ins, "set", regs, 2);
         ins = insINS(interpreter, unit, ins, "savetop", regs, 0);
     }
     /*
@@ -986,6 +996,35 @@ move_cc:
 }
 
 /*
+ * When all 32 regs of one kind are saved, we need to get the return
+ * value(s) around the register frame restore
+ *
+ * this actually sves just one return value
+ * we could inspect argc? to get the count of retvals
+ *
+ */
+static Instruction *
+preserve_return_value(Parrot_Interp interpreter, IMC_Unit * unit,
+        Instruction *ins, int i)
+{
+    char types[] = "ISPN";
+    SymReg * regs[IMCC_MAX_REGS], *r;
+    Instruction *tmp;
+    char buf[4];
+
+
+    buf[0] = types[i];
+    buf[1] = '5';
+    buf[2] = '\0';
+    r = get_pasm_reg(buf);
+    regs[0] = r;
+    tmp = INS(interpreter, unit, "save", NULL, regs, 1, 0, 0);
+    prepend_ins(unit, ins, tmp);
+    tmp = INS(interpreter, unit, "restore", NULL, regs, 1, 0, 0);
+    insert_ins(unit, ins, tmp);
+    return tmp;
+}
+/*
  * optimize register save op (savetop/restoretop)
  * for PCC
  * TODO saveall
@@ -999,33 +1038,51 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     SymReg** reglist = unit->reglist;
     char *new_save[] = {
         "pushtopi",
+        "pushi",
         "pushtops",
+        "pushs",
         "pushtopp",
+        "pushp",
         "pushtopn"
+        "pushn"
     };
     char *new_rest[] = {
         "poptopi",
+        "popi",
         "poptops",
+        "pops",
         "poptopp",
+        "popp",
         "poptopn"
+        "popn"
     };
-    int needs_save[4], nsave;
-    int i, t, first;
+    int needs_save[8], nsave;
+    int i,j, first;
+    int first_reg[] = {6,0,0,0};
+    int is_meth = unit->instructions->r[1]->pcc_sub->pragma & P_METHOD;
 
-    for (i = 0; i < 4; i++)
+    first_reg[2] = is_meth ? 3 : 2;
+    for (i = 0; i < 8; i++)
         needs_save[i] = 0;
     for (i = 0; i < unit->n_symbols; i++) {
         r = reglist[i];
-        if (((r->type & VTREGISTER) && r->color >= 16) || r->set == 'K') {
-            if (r->set == 'K')  /* need to inspect key chain */
-                return;
-            t = strchr(types, r->set) - types;
-            needs_save[t] = 1;
+        for (j = 0; j < 4; j++) {
+            if (r->set == types[j] && (r->type & VTREGISTER)) {
+                if (r->color >= first_reg[j] && r->color < 16)
+                    needs_save[2*j+1] = 1;
+                else if (r->color >= 16)
+                    needs_save[2*j] = 1;
+                break;
+            }
         }
     }
 
-    for (nsave = i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
+        if (needs_save[i*2+1])
+            needs_save[i*2] = 0;
+    for (nsave = i = 0; i < 8; i++)
         nsave += needs_save[i];
+    assert(nsave <= 4);
     switch (nsave) {
         case 0:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
@@ -1043,9 +1100,10 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         case 1:
         case 2:
         case 3:
+        case 4:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             first = 1;
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 8; i++) {
                 if (!needs_save[i])
                     continue;
                 tmp = INS(interpreter, unit, new_save[i], NULL, regs, 0, 0, 0);
@@ -1065,17 +1123,28 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                     break;
             first = 1;
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 8; i++) {
                 if (!needs_save[i])
                     continue;
                 tmp = INS(interpreter, unit, new_rest[i], NULL, regs, 0, 0, 0);
                 if (first) {
                     subst_ins(unit, ins, tmp, 1);
                     ins = tmp;
+                    /*
+                     * its getting ugly
+                     */
+                    if (i & 1) {
+                        ins = preserve_return_value(interpreter,
+                                unit, ins, i >> 1);
+                    }
                 }
                 else {
                     insert_ins(unit, ins, tmp);
                     ins = tmp;
+                    if (i & 1) {
+                        ins = preserve_return_value(interpreter,
+                                unit, ins, i >> 1);
+                    }
                 }
                 first = 0;
                 debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
@@ -1126,7 +1195,7 @@ pcc_sub_optimize(Parrot_Interp interpreter, IMC_Unit * unit)
                 ostat.deleted_ins++;
             }
         }
-        else if (ins->type & ITPCCSUB) {
+        else if (ins->type & (ITPCCSUB | ITPCCYIELD) ) {
             tmp = ins;
             tmp = tmp->prev;
             if (!strcmp(tmp->op, "savetop"))
