@@ -82,7 +82,7 @@ sub main() {
 CODE
 
 \
-¡¢
+Â¡Â¢
 16
 @P
 OUT
