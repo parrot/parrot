@@ -173,7 +173,7 @@ clean:
 	$(RM_F) Parrot/Jit.pm
 	$(RM_F) include/parrot/jit_struct.h
 	$(RM_F) libparrot.so libcore_prederef_0_3.so
- $(RM_F) *~
+	$(RM_F) *~
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..
