@@ -496,7 +496,7 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
             else {
                 list->grow_policy = enum_grow_growing;
                 if (items > MIN_ITEMS)
-                    items >>= 1;		/* allocate less */
+                    items >>= 1;                /* allocate less */
                 /* if not: second allocation from unshift */
                 else {
                     list->grow_policy = enum_grow_mixed;
@@ -679,13 +679,13 @@ get_chunk(Interp * interpreter, List *list, UINTVAL *idx)
  * in the past ;-)
  * assuming MIN_ITEMS=4
  *
- * ch#	size	idx	+4	bit		ld2(idx) -ld2(4)
+ * ch#  size    idx     +4      bit             ld2(idx) -ld2(4)
  *
- * 0	4	0..3	4..7	0000 01xx	2	0
- * 1	8	4..11	8..15	0000 1xxx	3	1
- * 2	16	12..27	16..31	0001 xxxx	4	2
+ * 0    4       0..3    4..7    0000 01xx       2       0
+ * 1    8       4..11   8..15   0000 1xxx       3       1
+ * 2    16      12..27  16..31  0001 xxxx       4       2
  * ...
- * 8	1024	1020..	...2047			10	8
+ * 8    1024    1020..  ...2047                 10      8
  */
 
         if (chunk->data.flags & grow_items) {
@@ -799,30 +799,30 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
     }
 
     switch (type) {
-	case enum_type_char:
-	    ((char*)chunk->data.bufstart)[idx] = (char)PTR2INTVAL(item);
-	    break;
-	case enum_type_short:
-	    ((short*)chunk->data.bufstart)[idx] = (short)PTR2INTVAL(item);
-	    break;
-	case enum_type_int:
-	    ((int*)chunk->data.bufstart)[idx] = (int)PTR2INTVAL(item);
-	    break;
-	case enum_type_INTVAL:
-	    ((INTVAL*)chunk->data.bufstart)[idx] = PTR2INTVAL(item);
-	    break;
-	case enum_type_FLOATVAL:
-	    ((FLOATVAL*)chunk->data.bufstart)[idx] = *(FLOATVAL*) item;
-	    break;
-	case enum_type_PMC:
-	    ((PMC**)chunk->data.bufstart)[idx] = (PMC*)item;
-	    break;
-	case enum_type_STRING:
-	    ((STRING**)chunk->data.bufstart)[idx] = (STRING*)item;
-	    break;
-	default:
-	    internal_exception(1, "type N/Y\n");
-	    break;
+        case enum_type_char:
+            ((char*)chunk->data.bufstart)[idx] = (char)PTR2INTVAL(item);
+            break;
+        case enum_type_short:
+            ((short*)chunk->data.bufstart)[idx] = (short)PTR2INTVAL(item);
+            break;
+        case enum_type_int:
+            ((int*)chunk->data.bufstart)[idx] = (int)PTR2INTVAL(item);
+            break;
+        case enum_type_INTVAL:
+            ((INTVAL*)chunk->data.bufstart)[idx] = PTR2INTVAL(item);
+            break;
+        case enum_type_FLOATVAL:
+            ((FLOATVAL*)chunk->data.bufstart)[idx] = *(FLOATVAL*) item;
+            break;
+        case enum_type_PMC:
+            ((PMC**)chunk->data.bufstart)[idx] = (PMC*)item;
+            break;
+        case enum_type_STRING:
+            ((STRING**)chunk->data.bufstart)[idx] = (STRING*)item;
+            break;
+        default:
+            internal_exception(1, "type N/Y\n");
+            break;
     }
 }
 
@@ -846,30 +846,30 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
     }
 
     switch (type) {
-	case enum_type_char:
-	    return (void*)&((char*)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_short:
-	    return (void*)&((short*)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_int:
-	    return (void*)&((int*)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_INTVAL:
-	    return (void*)&((INTVAL*)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_FLOATVAL:
-	    return (void*)&((FLOATVAL*)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_PMC:
-	    return (void*)&((PMC**)chunk->data.bufstart)[idx];
-	    break;
-	case enum_type_STRING:
-	    return (void*)&((STRING**)chunk->data.bufstart)[idx];
-	    break;
-	default:
-	    internal_exception(1, "type N/Y\n");
-	    break;
+        case enum_type_char:
+            return (void*)&((char*)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_short:
+            return (void*)&((short*)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_int:
+            return (void*)&((int*)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_INTVAL:
+            return (void*)&((INTVAL*)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_FLOATVAL:
+            return (void*)&((FLOATVAL*)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_PMC:
+            return (void*)&((PMC**)chunk->data.bufstart)[idx];
+            break;
+        case enum_type_STRING:
+            return (void*)&((STRING**)chunk->data.bufstart)[idx];
+            break;
+        default:
+            internal_exception(1, "type N/Y\n");
+            break;
     }
     return 0;
 
@@ -901,22 +901,22 @@ list_new(Interp *interpreter, INTVAL type)
     list = (List *) new_bufferlike_header(interpreter, sizeof(*list));
     list->item_type = type;
     switch (type) {
-	case enum_type_char:
-	    list->item_size = sizeof(char); break;
-	case enum_type_short:
-	    list->item_size = sizeof(short); break;
-	case enum_type_int:
-	    list->item_size = sizeof(int); break;
-	case enum_type_INTVAL:
-	    list->item_size = sizeof(INTVAL); break;
-	case enum_type_FLOATVAL:
-	    list->item_size = sizeof(FLOATVAL); break;
-	case enum_type_PMC:
-	    list->item_size = sizeof(PMC*); break;
-	case enum_type_STRING:
-	    list->item_size = sizeof(STRING*); break;
-	default:
-	    internal_exception(1, "N/Y\n"); break;
+        case enum_type_char:
+            list->item_size = sizeof(char); break;
+        case enum_type_short:
+            list->item_size = sizeof(short); break;
+        case enum_type_int:
+            list->item_size = sizeof(int); break;
+        case enum_type_INTVAL:
+            list->item_size = sizeof(INTVAL); break;
+        case enum_type_FLOATVAL:
+            list->item_size = sizeof(FLOATVAL); break;
+        case enum_type_PMC:
+            list->item_size = sizeof(PMC*); break;
+        case enum_type_STRING:
+            list->item_size = sizeof(STRING*); break;
+        default:
+            internal_exception(1, "N/Y\n"); break;
     }
     return list;
 }
@@ -1150,27 +1150,27 @@ list_delete(Interp *interpreter, List *list,
                 chunk->data.flags = no_power_2;
                 if (idx + n_items <= (INTVAL)chunk->items) {
 #ifdef __LCC__
-		    /* LCC has a bug where it can't handle all the temporary
-		     * variables created in this one line.  adding an explicit
-		     * one fixes things.   No need to force this workaround
-		     * on less brain-damaged compilers though */
+                    /* LCC has a bug where it can't handle all the temporary
+                     * variables created in this one line.  adding an explicit
+                     * one fixes things.   No need to force this workaround
+                     * on less brain-damaged compilers though */
                     size_t tmp_size = (chunk->items - idx - n_items) * 
-		                      list->item_size;
-		   
+                                      list->item_size;
+                   
                     mem_sys_memmove(
                             (char *)chunk->data.bufstart +
                             idx * list->item_size,
                             (char *)chunk->data.bufstart +
                             (idx + n_items) * list->item_size,
-			    tmp_size);
-#else		   
+                            tmp_size);
+#else              
                     mem_sys_memmove(
                             (char *)chunk->data.bufstart +
                             idx * list->item_size,
                             (char *)chunk->data.bufstart +
                             (idx + n_items) * list->item_size,
                             (chunk->items - idx - n_items) * list->item_size);
-#endif		   
+#endif             
                 }
             }
             chunk->items -= n_items;
@@ -1236,8 +1236,8 @@ list_pop(Interp *interpreter, List *list, int type)
 
     /* shrink array if necessary */
     if (idx < list->cap - chunk->items) {
-	list->cap -= chunk->items;
-	chunk = list->last = chunk->prev;
+        list->cap -= chunk->items;
+        chunk = list->last = chunk->prev;
         chunk->next = 0;
         if (list->n_chunks <= 2)
             list->first = list->last;
@@ -1263,9 +1263,9 @@ list_shift(Interp *interpreter, List *list, int type)
         list->start = 0;
     ret = list_item(interpreter,list, type, idx);
     if (list->start >= chunk->items) {
-	list->cap -= chunk->items;
-	chunk = list->first = chunk->next ? chunk->next : list->last;
-	list->start = 0;
+        list->cap -= chunk->items;
+        chunk = list->first = chunk->next ? chunk->next : list->last;
+        list->start = 0;
         rebuild_chunk_list(interpreter, list);
         if (list->n_chunks == 1)
             list->last = list->first;
@@ -1284,10 +1284,10 @@ list_assign(Interp *interpreter, List *list, INTVAL idx, void *item, int type)
         idx += length;
     if (idx >= length) {
         list_append(interpreter, list, item, type, list->start + idx);
-	list->length = idx + 1;
+        list->length = idx + 1;
     }
     else {
-	list_set(interpreter, list, item, type, list->start + idx);
+        list_set(interpreter, list, item, type, list->start + idx);
     }
 }
 
@@ -1307,7 +1307,7 @@ list_get(Interp *interpreter, List *list, INTVAL idx, int type)
 
 void
 list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
-	INTVAL count)
+        INTVAL count)
 {
     List * value_list = (List*) value->data;
     INTVAL value_length = value_list->length;
