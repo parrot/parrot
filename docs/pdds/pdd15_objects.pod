@@ -136,7 +136,7 @@ Checks, by name, to see if the PMC can perform the method.
 
 Checks to see if the PMC can implement the interface
 
-=item Check if a PMC is a member of or child of a class
+=item Check if a PMC is a member or child of a class
 
 Checks to see if the PMC is a member of, or child of, a
 particular class.
@@ -151,8 +151,37 @@ C<is_base_object> bit can be assumed to ultimately be derived from
 this base object, and thus behave like a base object. If the bit's
 not set, it's not safe to assume so.
 
+=over 4
+
+=item Get attribute 
+
+Fetch the value for an attribute from the object's attribute catalog
+
+=item Set attribute
+
+Set the value of an object's attribute slot
+
+=item get attribute catalog
+
+Get the catalog of attrbutes. This is a hash of classes and attribute
+offsets for the fixed attributes, and a 
+
+=item get class base offset
+
+=back
+
 =head2 Classes
 
+Default classes are objects of class Class. Like the object
+internals, classes aren't required as such by parrot.
+
+Classes all have the following attributes:
+
+=over 4
+
+=item ISA
+
+=back
 
 =head1 IMPLEMENTATION
 
