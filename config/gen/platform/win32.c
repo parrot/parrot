@@ -68,7 +68,7 @@ Parrot_getenv(const char *name)
 void
 Parrot_unsetenv(const char *name)
 {
-    unsetenv(name);
+    SetEnvironmentVariable(name, NULL);
 }
 /*
 ** Parrot_dlopen()
