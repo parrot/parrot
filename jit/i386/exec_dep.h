@@ -55,7 +55,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
          */
         if (last_is_branch) {
             offset = (cur_section->end - interpreter->code->byte_code) +
-                interpreter->code->cur_cs->prederef_code;
+                interpreter->code->cur_cs->prederef.code;
             cur_section->done = -1;
             /* ins to skip */
             cur_section->ins_count = cur_section->op_count - 1;
@@ -66,7 +66,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
              * when the branch is non JIT, we are in the above case
              */
             offset = (cur_section->next->begin - interpreter->code->byte_code)
-                + interpreter->code->cur_cs->prederef_code;
+                + interpreter->code->cur_cs->prederef.code;
             cur_section->done = 1;
         }
         i = (int)(((op_func_t*)interpreter->op_lib->op_func_table)[2]);
