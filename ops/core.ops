@@ -1941,6 +1941,24 @@ AUTO_OP runinterp(p, i|ic) {
 
 ########################################
 
+=item B<new>(p, i)
+
+Create a new PMC of class C<i>; look in F<pmc.h> for the base
+vtable types.
+
+=cut
+
+AUTO_OP new(p, i|ic) {
+    PMC* newpmc;
+    if ($2 <0 || $2 >= enum_class_max) {
+        abort(); /* Deserve to lose */
+    }
+    newpmc = pmc_new(interpreter, $2);
+    $1 = newpmc;
+}
+
+########################################
+
 =item B<ret>()
 
 Pop the location off the top of the stack and go there.

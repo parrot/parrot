@@ -17,6 +17,12 @@
 void
 init_world() {
     string_init(); /* Set up the string subsystem */
+    
+    /* Call base vtable class constructor methods! */
+    Parrot_PerlInt_class_init();
+    /* Parrot_PerlString_class_init();
+    Parrot_PerlNum_class_init(); */
+
 }
 
 /*

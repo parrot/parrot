@@ -251,6 +251,10 @@ These ops handle manipulating the data in registers
 
 =over 4
 
+=item new Px, Iy
+
+Create a new PMC of class y stored in PMC register x.
+
 =item iton Nx, Iy
 
 Copy the integer value from register y to the numeric register x.
