@@ -1546,10 +1546,19 @@ Parrot_Concat:
     .DoneInterpretWord
 
 Get_Params:
+    # If the regs indicate call with prototyped parameters
+    if I0, dump_Ns
+    # No prototypes, so note we have no N, I, or S parameters
+    set .IntStack, 0
+    .PushInt
+    .PushInt
+    .PushInt
+    branch dump_Ps
   dump_Ns:
 #    set .IntStack, 
   dump_Ss:
   dump_Is:
+     set .IntStack, 
   dump_Ps:
     # First the overflow
     unless I1, p_regs

@@ -116,9 +116,12 @@ dlfunc P2, P1, 'data_ahead', 'lp'
 store_global 'ncurses::data_ahead', P2
 dlfunc P2, P1, 'data_behind', 'lp'
 store_global 'ncurses::data_behind', P2
+
 loadlib P1, 'libncurses'
+
 dlfunc P2, P1, 'keybound', 'tii'
 store_global 'ncurses::keybound', P2
+
 dlfunc P2, P1, 'curses_version', 't'
 store_global 'ncurses::curses_version', P2
 dlfunc P2, P1, 'assume_default_colors', 'iii'
