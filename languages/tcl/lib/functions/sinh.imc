@@ -1,4 +1,5 @@
 # [expr sinh()]
+.namespace [ "_Tcl" ]
 
 .sub __math_sinh
   .param pmc argv

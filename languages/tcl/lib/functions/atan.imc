@@ -1,5 +1,7 @@
 # [expr atan()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_atan
   .param pmc argv
 

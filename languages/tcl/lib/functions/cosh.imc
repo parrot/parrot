@@ -1,5 +1,7 @@
 # [expr cosh()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_cosh
   .param pmc argv
 

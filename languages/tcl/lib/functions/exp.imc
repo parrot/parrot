@@ -1,4 +1,5 @@
 # [expr exp()]
+.namespace [ "_Tcl" ]
 
 .sub __math_exp
   .param pmc argv

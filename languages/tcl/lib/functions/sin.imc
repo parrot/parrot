@@ -1,4 +1,5 @@
 # [expr sin()]
+.namespace [ "_Tcl" ]
 
 .sub __math_sin
   .param pmc argv

@@ -1,5 +1,7 @@
 # [expr asin()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_asin
   .param pmc argv
 

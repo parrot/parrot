@@ -1,5 +1,7 @@
 # [expr acos()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_acos
   .param pmc argv
 

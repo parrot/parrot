@@ -1,4 +1,5 @@
 # [expr log10()]
+.namespace [ "_Tcl" ]
 
 .sub __math_log10
   .param pmc argv

@@ -1,4 +1,5 @@
 # [expr tan()]
+.namespace [ "_Tcl" ]
 
 .sub __math_tan
   .param pmc argv

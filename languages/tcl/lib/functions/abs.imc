@@ -1,5 +1,7 @@
 # [expr abs()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_abs
   .param pmc argv
 

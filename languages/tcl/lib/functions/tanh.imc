@@ -1,4 +1,5 @@
 # [expr tanh()]
+.namespace [ "_Tcl" ]
 
 .sub __math_tanh
   .param pmc argv

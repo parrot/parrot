@@ -1,5 +1,7 @@
 # [expr cos()]
 
+.namespace [ "_Tcl" ]
+
 .sub __math_cos
   .param pmc argv
 
