@@ -216,6 +216,12 @@ v	pP
 p	ip
 i	33
 v	pii
+v	IO
+i	IO
+i	IOi
+i	IOt
+i	It
+i	Ii
 
 # Used by SDL::Font
 p	ti
