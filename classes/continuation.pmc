@@ -33,10 +33,15 @@ pmclass Continuation {
     }
 
     PMC* mark (PMC* end_of_used_list) {
-        return mark_stack(
+        end_of_used_list = mark_stack(
             ((struct Parrot_Continuation *)SELF->data)->ctx.user_stack,
             end_of_used_list
         );
+        end_of_used_list = mark_stack(
+            ((struct Parrot_Continuation *)SELF->data)->ctx.control_stack,
+            end_of_used_list
+        );
+        return end_of_used_list;
     }
 
     INTVAL type () {
