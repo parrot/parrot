@@ -251,7 +251,7 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
          * just doing extra memcpys.
          * FIXME: This is badly optimized, will fixup later.
          */
-        if(len >= PIO_BLKSIZE) {
+        if(len >= io->b.size) {
                 /* Write through, skip buffer. */
                 PIO_stdio_flush(interpreter, layer, io);
                 wrote = PIO_stdio_writethru(interpreter, layer, io,
@@ -264,6 +264,7 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         } else if(avail > len) {
                 memcpy(io->b.next, buffer, len);
                 io->b.next += len;
+                return len;
         } else {
                 /* Fill remainder, flush, then try to buffer more */
                 unsigned int diff = (int)(len - avail);
