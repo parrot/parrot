@@ -45,6 +45,7 @@ use vars qw(@steps);
     auto/gcc.pl
     auto/isreg.pl
     auto/jit.pl
+    gen/cpu.pl
     auto/funcptr.pl
     auto/cgoto.pl
     auto/inline.pl
