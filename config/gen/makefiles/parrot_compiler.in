@@ -8,14 +8,14 @@ PERL     = ${perl}
 RM_F     = ${rm_f}
 PARROT   = ../../${test_prog}$(EXE)
 
-all : runtime parrot.pbc parrot_compiler.pbc
+all : runtime parrot.pbc parrot_compiler.pbc parrot_compiler.pasm
 
 # This is a listing of all targets, that are meant to be called by users
 help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               'parrot_compiler.pbc'"
+	@echo "  all:               parrot_compiler.pbc and other drivers"
 	@echo "                     This is the default."
 	@echo ""
 	@echo "  test:              run the test suite,"
@@ -43,4 +43,7 @@ parrot.pbc : parrot.pasm
 
 parrot_compiler.pbc : parrot_compiler.imc
 	$(PARROT) -o parrot_compiler.pbc parrot_compiler.imc
+
+parrot_compiler.pasm : parrot_compiler.imc
+	$(PARROT) -o parrot_compiler.pasm parrot_compiler.imc
 

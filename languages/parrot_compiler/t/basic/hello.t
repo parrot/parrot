@@ -4,7 +4,7 @@
 use strict;
 use lib 'parrot_compiler/lib';
 
-use Parrot::Test tests => 4 + 2 + 2;
+use Parrot::Test tests => 2+3 + 3 + 3;
 use Test::More;
 
 # Execute 'Hello World' in PASM, PIR and PAST
@@ -61,6 +61,13 @@ $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PASM';
 language_output_is( 'ParrotCompiler', $code{PASM}, $out{PASM},
                     $ENV{TEST_PROG_ARGS} );
 
+TODO: {
+  local $TODO = '_global_dumper not found';
+  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PASM';
+  language_output_is( 'ParrotCompiler', $code{PASM}, $out{PASM},
+                      $ENV{TEST_PROG_ARGS} );
+};
+
 # PIR tests
 
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pbc --language=PIR';
@@ -70,6 +77,13 @@ language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PIR';
 language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
                     $ENV{TEST_PROG_ARGS} );
+
+TODO: {
+  local $TODO = '_global_dumper not found';
+  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PIR';
+  language_output_is( 'ParrotCompiler', $code{PIR}, $out{PIR},
+                      $ENV{TEST_PROG_ARGS} );
+};
 
 # PAST tests
 
@@ -100,4 +114,11 @@ END_PASM_FROM_PAST
 $ENV{TEST_PROG_ARGS} = 'parrot_compiler.imc --language=PAST';
 language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
                     $ENV{TEST_PROG_ARGS} );
+
+TODO: {
+  local $TODO = '_global_dumper not found';
+  $ENV{TEST_PROG_ARGS} = 'parrot_compiler.pasm --language=PAST';
+  language_output_is( 'ParrotCompiler', $code{PAST}, $out{PAST},
+                      $ENV{TEST_PROG_ARGS} );
+};
 
