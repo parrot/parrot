@@ -1,3 +1,19 @@
+#
+# Types
+#
+# INT reg stuff
+# c - char 
+# s - short
+# i - int
+# l - long
+# NUM reg stuff
+# f - float
+# d - double
+# STR reg stuff
+# t - character string
+# PMC reg stuff
+# p - data pointer from PMC (on store into a new UnManagedStruct PMC)
+#
 #Return params
 i	i
 i	ii
