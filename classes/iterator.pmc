@@ -295,10 +295,6 @@ Reset the Iterator. C<value> must be one of
             if (!PMC_struct_val(SELF)) {
                 PMC_struct_val(SELF) = key_new(INTERP);
             }
-            if (agg->vtable->base_type == enum_class_OrderedHash &&
-                    value == ITERATE_FROM_START_KEYS) {
-                PObj_get_FLAGS(agg) |= PObj_private0_FLAG;
-            }
             key = PMC_struct_val(SELF);
             PMC_struct_val(SELF) =
                 VTABLE_nextkey_keyed(INTERP, key, agg, value);

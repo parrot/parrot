@@ -453,11 +453,16 @@ Marks C<key> as live.
 void
 key_mark(Interp *interpreter, PMC *key)
 {
-    pobject_lives(interpreter, (PObj *) key);
-    if ( ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_string_FLAG) ||
-       ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_pmc_FLAG) )
+    UINTVAL flags;
+
+    flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
+    if (flags == KEY_string_FLAG)
         pobject_lives(interpreter, (PObj *)PMC_str_val(key));
-    if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG)
+    /*
+     * this combination denotes a hash key iteration, PMC_data() is
+     * the bucket_index and not the next key component
+     */
+    if (flags == (KEY_integer_FLAG|KEY_number_FLAG))
         return;
 
     if (PMC_data(key))

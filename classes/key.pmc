@@ -21,12 +21,12 @@ These are the vtable functions for the Key PMC class.
 #include "parrot/parrot.h"
 
 static int
-is_hash_iter(PMC *agg)
+is_hash_iter(PMC *agg, PMC *key)
 {
     if (agg->vtable->base_type == enum_class_PerlHash)
         return 1;
     if (agg->vtable->base_type == enum_class_OrderedHash &&
-            (PObj_get_FLAGS(agg) & PObj_private0_FLAG))
+            (PObj_get_FLAGS(key) & KEY_number_FLAG))
         return 1;
     return 0;
 }
@@ -284,11 +284,29 @@ PMC_int_val(-1) means end of iteration.
         INTVAL n = VTABLE_elements(interpreter, agg);
         PMC *ret = SELF;
 
-        PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-        PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
         switch (what) {
-            case ITERATE_FROM_START:    /* reset key */
             case ITERATE_FROM_START_KEYS:
+                /*
+                 * OrderedHash supports two iterators: by key
+                 * or by ordered values
+                 */
+                PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+                PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+                if (agg->vtable->base_type == enum_class_OrderedHash)
+                    PObj_get_FLAGS(ret) |= KEY_number_FLAG;
+                goto init;
+            case ITERATE_FROM_START:    /* reset key */
+                PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+                PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+                /*
+                 * KEY_integer_FLAG | KEY_number_FLAG indicates
+                 * a hash iterator operation
+                 * KEY_integer_FLAG alone is an indexed hash lookup
+                 * with an Integer KEY
+                 */
+                if (agg->vtable->base_type == enum_class_PerlHash)
+                    PObj_get_FLAGS(ret) |= KEY_number_FLAG;
+        init:
                 PMC_int_val(ret) = 0;
                 if (!n)
                     PMC_int_val(ret) = -1;
@@ -296,7 +314,7 @@ PMC_int_val(-1) means end of iteration.
                  * iterating over a hash needs additionally the
                  * Bucket index
                  */
-                if (is_hash_iter(agg))
+                if (is_hash_iter(agg, ret))
                     PMC_data(ret) = (void *)INITBucketIndex;
                 break;
             case ITERATE_GET_NEXT:
@@ -304,7 +322,7 @@ PMC_int_val(-1) means end of iteration.
                  * src/hash.c:hash_get_idx() advances to next
                  * so, if we are iterating over a hash do nothing
                  * */
-                if (!is_hash_iter(agg)) {
+                if (!is_hash_iter(agg, ret)) {
                     if (PMC_int_val(ret) < n - 1)
                         ++PMC_int_val(ret);
                     else
@@ -316,6 +334,8 @@ PMC_int_val(-1) means end of iteration.
                     --PMC_int_val(ret);
                 break;
             case ITERATE_FROM_END:
+                PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+                PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
                 PMC_int_val(ret) = n - 1;
                 break;
         }
