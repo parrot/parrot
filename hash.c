@@ -20,8 +20,6 @@
  *     Substantially rewritten by Steve F.
  *  Notes:
  *     Future optimizations:
- *       - compute modulus by ANDing with hash_size-1 (The compiler
- *         cannot know that hash_size is always a power of 2.)
  *       - Stop reallocating the bucket pool, and instead add chunks on.
  *         (Saves pointer fixups and copying during realloc.)
  *       - Hash contraction (dunno if it's worth it)
@@ -52,6 +50,7 @@ struct _hashbucket {
 struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
     UINTVAL hash_size;
+    UINTVAL max_chain;
     UINTVAL entries;            /* Number of values stored in hashtable */
     Buffer* bucket_pool; /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
@@ -81,17 +80,16 @@ static INTVAL
 key_hash(Interp *interpreter, STRING *value)
 {
     char *buffptr = value->bufstart;
-    INTVAL len = value->bufused;
-    INTVAL hash = 5893;
+    UINTVAL len = value->bufused;
+    register UINTVAL hash = 5381;
 
     UNUSED(interpreter);
 
     while (len--) {
-        hash = hash * 33 + *buffptr++;
+        hash += hash << 5;
+        hash += *buffptr++;
     }
-    if (hash < 0) {
-        hash = -hash;
-    }
+    
     return hash;
 }
 
@@ -163,10 +161,14 @@ expand_hash(Interp *interpreter, HASH *hash)
 {
     BucketIndex* table;
     HASHBUCKET* bucket;
-    UINTVAL new_size = (hash->hash_size ? hash->hash_size * 2
+    UINTVAL new_size = (hash->hash_size ? hash->hash_size << 1
                         : INITIAL_BUCKETS);
+    UINTVAL new_max_chain = new_size - 1;
+    UINTVAL new_loc;
+    
     HashIndex hi;
     BucketIndex bi;
+    
     UINTVAL old_pool_size = hash->bucket_pool->buflen / sizeof(HASHBUCKET);
     UINTVAL new_pool_size = new_size * MAXFULL_PERCENT / 100;
 
@@ -203,13 +205,14 @@ expand_hash(Interp *interpreter, HASH *hash)
         while (*bucketIdxP != NULLBucketIndex) {
             BucketIndex bucketIdx = *bucketIdxP;
             bucket = getBucket(hash, bucketIdx);
-            if ((key_hash(interpreter, bucket->key) % new_size) != hi) {
+            new_loc = key_hash(interpreter, bucket->key) & new_max_chain;
+            if (new_loc != hi) {
                 /* Remove from table */
                 *bucketIdxP = bucket->next;
 
                 /* Add to new spot in table */
-                bucket->next = table[hi + hash->hash_size];
-                table[hi + hash->hash_size] = bucketIdx;
+                bucket->next = table[new_loc];
+                table[new_loc] = bucketIdx;
             }
             else {
                 bucketIdxP = &bucket->next;
@@ -218,6 +221,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     }
 
     hash->hash_size = new_size;
+    hash->max_chain = new_max_chain;
 }
 
 UINTVAL
@@ -227,12 +231,12 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
     
     if (key == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL key\n");
-        return NULL;
+        return NULLBucketIndex;
     }
 
     if (value == NULL) {
         internal_exception(INTERNAL_PANIC, "NULL value\n");
-        return NULL;
+        return NULLBucketIndex;
     }
 
     bucket_index = hash->free_list;
@@ -311,7 +315,7 @@ hash_lookup(Interp *interpreter, HASH *hash, STRING *key)
 {
     UINTVAL hashval = key_hash(interpreter, key);
     HashIndex* table = (HashIndex*) hash->buffer.bufstart;
-    BucketIndex chain = table[hashval % hash->hash_size];
+    BucketIndex chain = table[hashval & hash->max_chain];
     return find_bucket(interpreter, hash, chain, key);
 }
 
@@ -337,7 +341,7 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
 
     hashval = key_hash(interpreter, key);
     table = (BucketIndex*) hash->buffer.bufstart;
-    chain = table ? table[hashval % hash->hash_size] : NULLBucketIndex;
+    chain = table ? table[hashval & hash->max_chain] : NULLBucketIndex;
     bucket = find_bucket(interpreter, hash, chain, key);
 
     /*      fprintf(stderr, "HASH=%p buckets=%p chain=%p bucket=%p KEY=%s\n", */
@@ -353,8 +357,8 @@ hash_put(Interp *interpreter, HASH *hash, STRING *key, KEY_ATOM *value)
         bucket_index = new_bucket(interpreter, hash, key, value);
         bucket = getBucket(hash, bucket_index);
         table = (BucketIndex*) hash->buffer.bufstart;
-        bucket->next = table[hashval % hash->hash_size];
-        table[hashval % hash->hash_size] = bucket_index;
+        bucket->next = table[hashval & hash->max_chain];
+        table[hashval & hash->max_chain] = bucket_index;
     }
     /*      dump_hash(interpreter, hash); */
 }
@@ -368,7 +372,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     HASHBUCKET* prev = NULL;
 
     hashval = key_hash(interpreter, key);
-    slot = hashval % hash->hash_size;
+    slot = hashval & hash->max_chain;
 
     for (bucket = lookupBucket(hash, slot);
          bucket != NULL;
