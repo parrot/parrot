@@ -237,10 +237,38 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 }
 
 void
+Parrot_setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
+{
+    int i;
+    PMC *userargv;
+
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        fprintf(stderr,
+                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+                argc);
+    }
+    
+    userargv = pmc_new(interpreter, enum_class_PerlArray);
+    /* immediately anchor pmc to root set */
+    interpreter->ctx.pmc_reg.registers[0] = userargv;
+
+    for (i = 0; i < argc; i++) {
+        /* Run through argv, adding everything to @ARGS. */
+        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
+                                  0, BUFFER_external_FLAG, 0);
+
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            fprintf(stderr, "\t%d: %s\n", i, argv[i]);
+        }
+
+        userargv->vtable->push_string(interpreter, userargv, arg);
+    }
+}
+
+void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
     INTVAL i;
-    PMC *userargv;
 
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -272,30 +300,10 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     
 #endif
 
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        fprintf(stderr,
-                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
-                argc);
-    }
-    
     /* Set up @ARGS (or whatever this language calls it).
        XXX Should this be Array or PerlArray?             */
-    
-    userargv = pmc_new(interpreter, enum_class_PerlArray);
-    /* immediately anchor pmc to root set */
-    interpreter->ctx.pmc_reg.registers[0] = userargv;
 
-    for (i = 0; i < argc; i++) {
-        /* Run through argv, adding everything to @ARGS. */
-        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  0, BUFFER_external_FLAG, 0);
-
-        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-            fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
-        }
-
-        userargv->vtable->push_string(interpreter, userargv, arg);
-    }
+    Parrot_setup_argv(interpreter, argc, argv);
     
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter, interpreter->code, 0);
@@ -377,8 +385,32 @@ Parrot_destroy(struct Parrot_Interp *interp)
     free(interp);
 }
 
+/* XXX Doesn't handle arguments with spaces */
+static char*
+argv_join(char ** argv)
+{
+    char* command;
+    char* p;
+    int space = 0;
+    int i;
+
+    for (i = 0; argv[i]; i++)
+        space += strlen(argv[i]) + 1;
+
+    command = (char*) malloc(space == 0 ? 1 : space);
+    p = command;
+    for (i = 0; argv[i]; i++) {
+        strcpy(p, argv[i]);
+        p += strlen(argv[i]);
+        *(p++) = ' ';
+    }
+    if (p > command) p--;
+    *p = '\0';
+    return command;
+}
+
 void
-Parrot_debug(struct Parrot_Interp *interpreter)
+Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
 {
     PDB_t *pdb;
     const char *command;
@@ -388,7 +420,8 @@ Parrot_debug(struct Parrot_Interp *interpreter)
     interpreter->pdb = pdb;
     pdb->cur_opcode = interpreter->code->byte_code;
 
-    PDB_init(interpreter,NULL);
+    /* Parrot_setup_argv(interpreter, argc, argv); */
+    PDB_init(interpreter, argv_join(argv));
     PDB_disassemble(interpreter,NULL);
     while (!(pdb->state & PDB_EXIT)) {
         PDB_get_command(interpreter);

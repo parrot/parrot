@@ -34,11 +34,13 @@ Parrot_PackFile Parrot_readbc(Parrot_Interp, char *);
 
 void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
 
+void Parrot_setup_argv(Parrot_Interp, int argc, char ** argv);
+
 void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
 void Parrot_destroy(Parrot_Interp);
 
-void Parrot_debug(Parrot_Interp);
+void Parrot_debug(Parrot_Interp, int argc, char ** argv);
 
 void Parrot_disassemble(Parrot_Interp);
 

@@ -29,6 +29,116 @@
     while(*c && isspace((int) *c)) \
         c++; }
 
+/* nextarg
+ *
+ * Returns the position just past the current argument in a PASM
+ * instruction. This is not the same as na(), above, which is intended
+ * for debugger commands. This function is used for eval. */
+static const char* nextarg(const char* command)
+{
+    while (*command && (isalnum((int) *command) || *command == ',' || *command == ']'))
+        command++;
+    while (*command && isspace((int) *command))
+        command++;
+    return command;
+}
+
+/* skip_ws
+ *
+ * Returns the pointer past any whitespace */
+static const char* skip_ws(const char* str)
+{
+    while (*str && isspace((int) *str)) str++;
+    return str;
+}
+
+/* skip_command
+ *
+ * Returns the pointer past the current debugger command. (This is an
+ * alternative to the na() macro above.) */
+static const char* skip_command(const char* str)
+{
+    while (*str && !isspace((int) *str)) str++;
+    while (*str && isspace((int) *str)) str++;
+    return str;
+}
+
+/* parse_int
+ *
+ * Parse an integer out of a string and return a pointer to just after
+ * the int. */
+static const char* parse_int(const char* str, int* intP)
+{
+    char* end;
+    *intP = strtol(str, &end, 0);
+    return end;
+}
+
+/* parse_string
+ *
+ * Parse a double-quoted string out of a C string and return a pointer
+ * to just after the string. The parsed string is converted to a
+ * Parrot STRING. */
+static const char* parse_string(struct Parrot_Interp *interpreter,
+                                const char* str, STRING** strP)
+{
+    const char* string;
+    if (*str != '"') return NULL;
+    str++;
+    string = str;
+    while (*str && *str != '"') {
+        if (*str == '\\' && str[1]) str += 2;
+        else str++;
+    }
+
+    *strP = string_make(interpreter, string, str - string, NULL, 0, NULL);
+    if (*str) str++;
+    return str;
+}
+
+/* parse_key
+ *
+ * Parse an aggregate key out of a string and return a pointer to just
+ * after the key. Currently only string and integer keys are
+ * allowed. */
+static const char* parse_key(struct Parrot_Interp *interpreter,
+                             const char* str, PMC** keyP)
+{
+    *keyP = NULL;
+    if (*str != '[') return NULL;
+    str++; /* Skip [ */
+    if (*str == '"') {
+        STRING* string;
+        str = parse_string(interpreter, str, &string);
+        *keyP = key_new_string(interpreter, string);
+    } else if (isdigit((int) *str)) {
+        int value;
+        str = parse_int(str, &value);
+        *keyP = key_new_integer(interpreter, (INTVAL) value);
+    } else {
+        return NULL;
+    }
+
+    if (*str != ']') return NULL;
+    return ++str;
+}
+
+/* parse_command
+ *
+ * Convert the command at the beginning of a string into a numeric
+ * value that can be used as a switch key for fast lookup. */
+static const char* parse_command(const char* command, unsigned long* cmdP)
+{
+    int i;
+    unsigned long c = 0;
+    if (*command == '\0') return 0;
+    for (i = 0; *command && isalpha((int) *command); command++, i++)
+        c += (tolower((int) *command) + (i + 1)) * ((i + 1) * 255);
+    if (c == 0) c = -1; /* Nonempty and did not start with a letter */
+    *cmdP = c;
+    return command;
+}
+
 /* PDB_get_command(struct Parrot_Interp *interpreter)
  *
  * Get a command from the user input to execute.
@@ -49,6 +159,7 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     char *c;
     PDB_t *pdb = interpreter->pdb;
     PDB_line_t *line; 
+    int ch;
 
     /* flush the buffered data */
     fflush(stdout);
@@ -81,13 +192,14 @@ PDB_get_command(struct Parrot_Interp *interpreter)
 
     fprintf(stderr,"\n(pdb) ");
 
-    *c = (char)fgetc(stdin);
+    *c = (char)(ch = fgetc(stdin));
 
-    while ((c[i - 1] !=  '\n') && (i < 255))
-        c[i++] = (char)fgetc(stdin);
-
-    c[--i] = '\0';
+    while (ch != -1 && (c[i - 1] !=  '\n') && (i < 255))
+        c[i++] = (char)(ch = fgetc(stdin));
     
+    c[--i] = '\0';
+
+    if (ch == -1) strcpy(c, "quit");
     pdb->cur_command = c;
 }
         
@@ -102,14 +214,13 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     int i;
-    unsigned long c = 0;
+    unsigned long c;
 
     /* Skip trailing spaces */
-    while (*command && isspace((int) *command))
-        command++;
+    command = skip_ws(command);
+
     /* get a number from what the user typed */
-    for (i = 0; ((command[i] != 32) && command[i]) ; i++)
-        c += (command[i] + (i + 1)) * ((i + 1) * 255);
+    command = parse_command(command, &c);
 
     na(command);
 
@@ -177,11 +288,12 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
             pdb->state |= PDB_EXIT;
             break;
         case 0:
-            PDB_run_command(interpreter,pdb->last_command);
+            if (pdb->last_command)
+                PDB_run_command(interpreter,pdb->last_command);
             break;
         default:
             fprintf(stderr,"Undefined command: \"%s\".  Try \"help\".",
-                                                                 command);
+                    command);
             break;
     }
 }
@@ -512,6 +624,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     struct PackFile *code;
     unsigned long i;
     char c[256];
+    void* stacktop = interpreter->lo_var_ptr;
     
     /* The bytecode is readonly, right? */
     code = interpreter->code;
@@ -521,6 +634,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     interpreter = make_interpreter(NO_FLAGS);
     interpreter->code = code;
     interpreter->pdb = pdb;
+    interpreter->lo_var_ptr = stacktop;
 
     /* set the user arguments */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
@@ -535,8 +649,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
         c[i] = '\0';
         na(command);
 
-        arg = string_make(interpreter, c, i, NULL, 
-                          BUFFER_external_FLAG, NULL);
+        arg = string_make(interpreter, c, i, NULL, 0, NULL);
         userargv->vtable->push_string(interpreter, userargv, arg);
     }
 
@@ -1343,11 +1456,15 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     int op_number,i,k,l,j = 0;
 
     /* find_op needs a string with only the opcode name */
-    while (command && !(isspace((int) *command))) 
+    while (*command && !(isspace((int) *command))) 
         *(c++) = *(command++);
     *c = '\0';
     /* Find the opcode number */
     op_number = interpreter->op_lib->op_code(buf);
+    if (op_number < 0) {
+        fprintf(stderr, "Invalid opcode '%s'\n", buf);
+        return;
+    }
     /* Start generating the bytecode */
     eval[j++] = (opcode_t)op_number;
     /* Get the info for that opcode */
@@ -1355,7 +1472,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 
     /* handle the arguments */
     for (i = 1; i < op_info->arg_count; i++) {
-        na(command);
+        command = nextarg(command);
         switch (op_info->types[i]) { 
             /* If it's a register skip the letter that
                presides the register number */
@@ -1392,6 +1509,10 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 
                 /* Add it to the bytecode */
                 eval[j++] = (opcode_t)k;
+                break;
+            case PARROT_ARG_KIC:
+                command++; /* Skip opening [ */
+                eval[j++] = (opcode_t)atoi(command);
                 break;
             default:
                 break;
@@ -1434,8 +1555,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
     if (!*command || isdigit((int) *command))
         PDB_print_user_stack(interpreter, command);
     else {
-        for (i = 0; ((command[i] != 32) && command[i]) ; i++)
-            c += (command[i] + (i + 1)) * ((i + 1) * 255);
+        parse_command(command, &c);
 
         switch (c) {
             case c_i:
@@ -1485,7 +1605,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"Integer stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_int(&chunk->IReg[depth], command);
+    PDB_print_int(&chunk->IReg[depth], atoi(command));
 }
 
 /* PDB_print_stack_num
@@ -1508,7 +1628,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num(&chunk->NReg[depth], command);
+    PDB_print_num(&chunk->NReg[depth], atoi(command));
 }
 
 /* PDB_print_stack_string
@@ -1531,7 +1651,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"String stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_string(interpreter,&chunk->SReg[depth], command);
+    PDB_print_string(interpreter,&chunk->SReg[depth], atoi(command));
 }
 
 /* PDB_print_stack_pmc
@@ -1554,8 +1674,23 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     fprintf(stderr,"PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_pmc(interpreter,&chunk->PReg[depth], command);
+    PDB_print_pmc(interpreter,&chunk->PReg[depth], atoi(command), NULL);
 } 
+
+static void dump_string(struct Parrot_Interp *interpreter, STRING* s)
+{
+    if (s) {
+        fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
+        fprintf(stderr,"\tFlags   =\t%12ld\n",s->flags);
+        fprintf(stderr,"\tBufused =\t%12ld\n",s->bufused);
+        fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
+        fprintf(stderr,"\tStrlen  =\t%12ld\n",s->strlen);
+        fprintf(stderr,"\tOffset  =\t%12d\n",
+                (char*) s->strstart - (char*) s->bufstart);
+        fprintf(stderr,"\tString  =\t%s\n",
+                string_to_cstring(interpreter, s));
+    }
+}
 
 /* PDB_print_user_stack
  * print an entry from the user stack
@@ -1580,14 +1715,8 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
             fprintf(stderr,"Float\t=\t%8.4f\n",entry->entry.num_val);
             break;
         case STACK_ENTRY_STRING:
-            s = entry->entry.string_val;
             fprintf(stderr,"String =\n");
-            fprintf(stderr,"\tBuflen  =\t%8ld\n",s->buflen);
-            fprintf(stderr,"\tFlags   =\t%8ld\n",s->flags);
-            fprintf(stderr,"\tBufused =\t%8ld\n",s->bufused);
-            fprintf(stderr,"\tStrlen  =\t%8ld\n",s->strlen);
-            fprintf(stderr,"\tString  =\t%s\n",
-                string_to_cstring(interpreter, s));
+            dump_string(interpreter, entry->entry.string_val);
             break;
         case STACK_ENTRY_PMC:
             fprintf(stderr,"PMC =\n");
@@ -1608,7 +1737,11 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
             break;
     }
 }
-  
+
+static STRING* cstring_to_string(struct Parrot_Interp *interpreter, char* str)
+{
+    return string_make(interpreter, str, strlen(str), NULL, 0, NULL);
+}
 
 /* PDB_print
  * print interpreter registers
@@ -1618,50 +1751,64 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
 {
     int i;
     unsigned long c = 0;
+    PMC* key = NULL;
+    int regnum = -1;
+  
+    command = skip_ws(command);
+    command = parse_command(command, &c);
+    command = skip_ws(command);
 
-    for (i = 0; ((command[i] != 32) && command[i]) ; i++)
-        c += (command[i] + (i + 1)) * ((i + 1) * 255);
+    if (isdigit((int) *command)) {
+        command = parse_int(command, &regnum);
+        command = skip_ws(command);
+    }
 
+    interpreter->DOD_block_level++;
+
+    if (*command == '[') {
+        command = parse_key(interpreter, command, &key);
+    }
+ 
     switch (c) {
         case c_i:
         case c_int:
-            na(command);
-            PDB_print_int(&interpreter->ctx.int_reg, command);
+            PDB_print_int(&interpreter->ctx.int_reg, regnum);
             break;
         case c_n:
         case c_num:
-            na(command);
-            PDB_print_num(&interpreter->ctx.num_reg, command);
+            PDB_print_num(&interpreter->ctx.num_reg, regnum);
             break;
         case c_s:
         case c_str:
-            na(command);
-            PDB_print_string(interpreter,&interpreter->ctx.string_reg, command);
+            PDB_print_string(interpreter,&interpreter->ctx.string_reg, regnum);
             break;
         case c_p:
         case c_pmc:
-            na(command);
-            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, command);
+            PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, regnum, key);
             break;
+        default:
+            fprintf(stderr, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
+
+    interpreter->DOD_block_level--;
 }
 
 /* PDB_print_int
  * print the whole or a specific value of a integer register structure.
  */
 void
-PDB_print_int(struct IReg *int_reg, const char *command)
+PDB_print_int(struct IReg *int_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (command && *command) {
-        j = atoi(command);
-        k = j + 1;
+    if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
     }
 
     fprintf(stderr,"Integer Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"%2i =\t",i);
+        fprintf(stderr,"I%i =\t",i);
         fprintf(stderr,"%11li\n",int_reg->registers[i]);
     }
 }
@@ -1670,18 +1817,18 @@ PDB_print_int(struct IReg *int_reg, const char *command)
  * print the whole or a specific value of a float register structure.
  */
 void
-PDB_print_num(struct NReg *num_reg, const char *command)
+PDB_print_num(struct NReg *num_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
-    if (command && *command) {
-        j = atoi(command);
-        k = j + 1;
+    if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
     }
 
     fprintf(stderr,"Float Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"%2i =\t",i);
+        fprintf(stderr,"N%i =\t",i);
         fprintf(stderr,"%20.4f\n",num_reg->registers[i]);
     }
 }
@@ -1691,66 +1838,66 @@ PDB_print_num(struct NReg *num_reg, const char *command)
  */
 void
 PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
-                 const char *command)
+                 int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
     STRING *s;
 
-    if (command && *command) {
-        j = atoi(command);
-        k = j + 1;
+    if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
     }
-        
+
     fprintf(stderr,"String Registers:\n");
     for (i = j; i < k; i++) {
-        fprintf(stderr,"%2i =\n",i);
-        s = string_reg->registers[i];
-        if (s) {
-            fprintf(stderr,"\tBuflen  =\t%12ld\n",s->buflen);
-            fprintf(stderr,"\tFlags   =\t%12ld\n",s->flags);
-            fprintf(stderr,"\tBufused =\t%12ld\n",s->bufused);
-            fprintf(stderr,"\tStrlen  =\t%12ld\n",s->strlen);
-            fprintf(stderr,"\tString  =\t%s\n",
-                string_to_cstring(interpreter, s));
-        }
+        fprintf(stderr,"S%i =\n",i);
+        dump_string(interpreter, string_reg->registers[i]);
     }
 }
 
-/* PDB_print_pmc
- * print the whole or a specific value of a pmc register structure.
- */
+static void
+print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
+{
+    if (pmc && pmc->vtable) {
+        STRING* s = pmc->vtable->name(interpreter, pmc);
+        if (s) {
+            fprintf(stderr, " [%s]\n", string_to_cstring(interpreter, s));
+        }
+        s = (pmc->vtable->get_string(interpreter, pmc));
+        if (s) {
+            fprintf(stderr,"Stringified: %s\n",
+                    string_to_cstring(interpreter, s));
+        }
+    } 
+    else {
+        fprintf(stderr, "<null pmc>\n");
+    }
+}
+
 void
 PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
-              const char *command)
+              int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS;
     STRING *s;
 
-    if (command && *command) {
-        j = atoi(command);
-        k = j + 1;
+    if (regnum != -1) {
+        j = regnum;
+        k = regnum + 1;
     }
 
-    fprintf(stderr,"PMC Registers:\n");
-    for (i = j; i < k; i++) {
-        fprintf(stderr,"%2i =",i);
-        if (pmc_reg->registers[i] && pmc_reg->registers[i]->vtable) {
-            s = (pmc_reg->registers[i]->vtable->name(interpreter, 
-                                                     pmc_reg->registers[i]));
-            if (s) {
-                fprintf(stderr, " [%s]\n", 
-                        string_to_cstring(interpreter, (s)));
-            }
-            s = (pmc_reg->registers[i]->vtable->get_string(
-                 interpreter, pmc_reg->registers[i]));
+    if (regnum == -1)
+        fprintf(stderr,"PMC Registers:\n");
 
-            if (s) {
-                fprintf(stderr,"%s\n", string_to_cstring(interpreter, (s)));
-            }
-        } 
-        else {
-            fprintf(stderr, "\n");
-        }
+    for (i = j; i < k; i++) {
+        PMC* pmc = pmc_reg->registers[i];
+
+        fprintf(stderr,"P%i", i);
+        if (key) trace_key_dump(interpreter, key);
+        fprintf(stderr," =");
+
+        if (key) pmc = pmc->vtable->get_pmc_keyed(interpreter, pmc, key);
+        print_pmc(interpreter, pmc);
     }
 }
 

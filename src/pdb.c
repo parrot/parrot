@@ -37,8 +37,8 @@ main(int argc, char *argv[])
 
     Parrot_init(interpreter, (void*) &interpreter);
 
-    if (argc != 2) {
-        fprintf(stderr, "Usage: pdb programfile\n");
+    if (argc < 2) {
+        fprintf(stderr, "Usage: pdb programfile [program-options]\n");
         exit(1);
     }
 
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 
     Parrot_loadbc(interpreter, pf);
     PDB_printwelcome();
-    Parrot_debug(interpreter);
+    Parrot_debug(interpreter, argc-1, argv+1);
     Parrot_destroy(interpreter);
 
     return 0;

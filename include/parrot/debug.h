@@ -155,15 +155,15 @@ void PDB_get_command(struct Parrot_Interp *);
 
 void PDB_print(struct Parrot_Interp *, const char *);
 
-void PDB_print_int(struct IReg *, const char *);
+void PDB_print_int(struct IReg *, int);
 
-void PDB_print_num(struct NReg *, const char *);
+void PDB_print_num(struct NReg *, int);
 
 void PDB_print_string(struct Parrot_Interp *interpreter,
-    struct SReg *, const char *);
+    struct SReg *, int);
 
 void PDB_print_pmc(struct Parrot_Interp *interpreter,
-    struct PReg *, const char *);
+    struct PReg *, int, PMC* key);
 
 void PDB_debug(struct Parrot_Interp *);
 

@@ -15,10 +15,8 @@
 
 /*
  *=for api interpreter trace_key_dump
- * TODO: This isn't really part of the API, but here's its documentation. 
- * Prints a key. Used by trace_op_dump
+ * Prints a key to stderr.
  */
-static
 void
 trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
 {

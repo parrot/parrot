@@ -15,6 +15,8 @@
 
 #include "parrot/parrot.h"
 
+void trace_key_dump(struct Parrot_Interp *interpreter, PMC *key);
+
 void trace_op_dump(struct Parrot_Interp *interpreter, opcode_t * code_start,
                    opcode_t * pc);
 
