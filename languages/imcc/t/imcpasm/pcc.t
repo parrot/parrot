@@ -75,6 +75,7 @@ CODE
   set I0, 1
   set I1, 0
   set I2, 0
+  updatecc
   savetop
   invoke
 ret:
@@ -113,6 +114,7 @@ _main:
   set I0, 1
   set I1, 0
   set I2, 0
+  updatecc
   savetop
   invoke
 ret:
@@ -153,6 +155,7 @@ _main:
   set I0, 1
   set I1, 0
   set I2, 0
+  updatecc
   savetop
   invoke
 ret:
@@ -222,11 +225,11 @@ ret:
   end/
 OUT
 
-output_like(<<'CODE', <<'OUT', "proto call, non proto sub, invokecc");
+output_like(<<'CODE', <<'OUT', "non proto call, non proto sub, invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
-    .pcc_begin prototyped
+    .pcc_begin non_prototyped
     .arg 10
     .pcc_call sub
     ret:
@@ -242,10 +245,12 @@ CODE
 /_main:
   newsub P16, \d+, _sub
 #pcc_sub_call_\d:
-  set I5, 10
+  new P3,.*?
+  set P3, 1
+  push P3, 10
   set P0, P16
-  set I0, 1
-  set I1, 0
+  set I0, 0
+  set I1, 1
   set I2, 0
   savetop
   invokecc

@@ -114,16 +114,14 @@ Instruction * INS_LABEL(SymReg * r0, int emit)
 {
     Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
     i->type = ITLABEL;
+    r0->first_ins = i;
     if (emit)
         emitb(i);
     return i;
 }
 
 static Instruction * iLABEL(SymReg * r0) {
-    Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
-    i->type = ITLABEL;
-    r0->first_ins = i;
-    i = emitb(i);
+    Instruction *i = INS_LABEL(r0, 1);
     i->line = line;
     clear_state();
     return i;
