@@ -1398,7 +1398,6 @@ IV
 PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, IV packed_size) {
     char * cursor;
     NV     value;
-    NV *   aligned = mem_sys_allocate(sizeof(IV));
 
     if (!self) {
         return 0;
@@ -1408,13 +1407,11 @@ PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, 
 
     cursor    = packed;
 
-    mem_sys_memcopy(aligned, cursor, sizeof(NV));
-    value     = *aligned;
+    mem_sys_memcopy( &value, cursor, sizeof(NV) );
     cursor   += sizeof(IV);
 
     self->type   = PFC_NUMBER;
     self->number = value;
-    mem_sys_free(aligned);
 
     return 1;
 }
