@@ -1,7 +1,7 @@
 =head1 The Parrot Primer
 
 This is an update to the article 'Parrot: Some Assembly Required'
-which appeared on www.perl.com for the 0.0.2 release of Parrot. It's
+which appeared on http://www.perl.com for the 0.0.2 release of Parrot. It's
 intended as being the best way for the newcomer to Parrot to learn
 what Parrot is and how to use it. 
 
@@ -40,7 +40,7 @@ software CPU on which we will run Perl 6 bytecode. We're working on
 Parrot before we work on the Perl 6 compiler because it's much easier
 to write a compiler once you've got a target to compile to!
 
-The name "Parrot" was chosen after this year's April Fool's Joke which
+The name "Parrot" was chosen after the 2001 April Fool's Joke which
 had Perl and Python collaborating on the next version of their
 interpreters. This is meant to reflect the idea that we'd eventually
 like other languages to use Parrot as their VM; in a sense, we'd like
@@ -52,7 +52,7 @@ It should be stressed we're still in the early stages of
 development.
 
 But don't let that put you off! Parrot is still very much usable; we've
-already seen two mini-languages emerge which compiles down to Parrot
+already seen two mini-languages emerge which compile down to Parrot
 bytecode (more on that later) and Leon Brocard has been working on
 automatically converting Java bytecode to Parrot.
 
@@ -67,22 +67,25 @@ rudimentary string support, and some conditional operators.
 So let's get ourselves a copy of Parrot, so that we can start
 investigating how to program in the Parrot assembler.
 
-We could get the initial release from CPAN, but an awful lot has
-changed since then. To really keep up to date with Parrot, we should
-get our copy from the CVS repository. Here's how we do that:
+Periodic, numbered releases will appear on CPAN (we're currently on
+version 0.0.3), but at this stage of the project an awful lot is
+changing between releases. To really keep up to date with Parrot, 
+we should get our copy from the CVS repository. Here's how we do that:
 
- % cvs -d :pserver:anonymous@cvs.perl.org:/home/perlcvs login
+ % cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public login
  (Logging in to anonymous@cvs.perl.org)
  CVS password: [ and here we just press return ]
- % cvs -d :pserver:anonymous@cvs.perl.org:/home/perlcvs co parrot
+ % cvs -d :pserver:anonymous@cvs.perl.org:/cvs/public co parrot
  cvs server: Updating parrot
  U parrot/.cvsignore
  U parrot/Config_pm.in
  ....
-     
+
+There's also a web interface to the CVS repository, available at
+http://cvs.perl.org/cvsweb/parrot/.
 
 For those of you who can't use CVS, there are CVS snapshots built every
-six hours which you can find here.
+six hours which you can find at http://cvs.perl.org/snapshots/parrot/.
 
 Now we have downloaded Parrot, we need to build it; so:
 
@@ -94,13 +97,13 @@ Now we have downloaded Parrot, we need to build it; so:
  Since you're running this script, you obviously have
  Perl 5--I'll be pulling some defaults from its configuration.
  ...
-     
+
 
 You'll then be asked a series of questions about your local
 configuration; you can almost always hit return for each one. Finally,
 you'll be told to type C<make parrot>; with any luck, Parrot will
 successfully build the test interpreter. (If it doesn't, the address to
-complain to is at the end of the article...)
+complain to is at the end of this introduction...)
 
 =head2 The test suite
 
@@ -113,10 +116,10 @@ readout like the following:
  t/op/string....ok, 1/4 skipped:  I'm unable to write it!
  All tests successful, 2 subtests skipped.
  Files=2, Tests=6,  2 wallclock secs ( 1.19 cusr +  0.22 csys =  1.41 CPU)
-     
 
-(Of course, by the time you read this, there could be more tests, and
-some of those which skipped might not skip - but none of them should
+
+(Of course, there are many more tests than this, but you get the idea;
+tests may be skipped - for one reason or another - but none of them should
 fail!)
 
 =head1 Parrot Concepts
@@ -128,13 +131,13 @@ look at some of the concepts involved.
 
 The Parrot CPU has four basic data types:
 
-=over
+=over 4
 
-=item C<IV>
+=item C<INTVAL>
 
 An integer type; guaranteed to be wide enough to hold a pointer.
 
-=item C<NV>
+=item C<FLOATVAL>
 
 An architecture-independent floating point type.
 
@@ -170,10 +173,10 @@ architecture of a real hardware CPU. This has another advantage: we can
 use all the existing literature on how to write compilers and
 optimizers for register-based CPUs for our software CPU!
 
-Parrot has specialist registers for each type: 32 IV registers, 32 NV
-registers, 32 string registers and 32 PMC registers. In Parrot
-assembler, these are named C<I1>...C<I32>, C<N1>...C<N32>,
-C<S1>...C<S32>, C<P1>...C<P32>.
+Parrot has specialist registers for each type: 32 INTVAL registers, 
+32 FLOATVAL registers, 32 string registers and 32 PMC registers. In Parrot
+assembler, these are named C<I0>...C<I31>, C<N0>...C<N31>,
+C<S0>...C<S31>, C<P0>...C<P31>.
 
 Now let's look at some assembler. We can set these registers with the
 C<set> operator:
@@ -181,7 +184,7 @@ C<set> operator:
     set I1, 10
     set N1, 3.1415
     set S1, "Hello, Parrot"
-    
+
 
 All Parrot ops have the same format: the name of the operator, the
 destination register, and then the operands.
@@ -196,7 +199,7 @@ of a register, or a constant:
     print "The contents of register I1 is: "
     print I1
     print "\n"
-    
+
 
 Or we can perform mathematical functions on registers:
 
@@ -204,7 +207,7 @@ Or we can perform mathematical functions on registers:
     mul I3, I2, I4  # Multiply I2 by I4 and store in I3
     inc I1          # Increment I1 by one
     dec N3, 1.5     # Decrement N3 by 1.5
-    
+
 
 We can even perform some simple string manipulation:
 
@@ -215,7 +218,7 @@ We can even perform some simple string manipulation:
     substr S4, S1, 1, 7
     concat S3, S4       # S3 is now "wishbone"
     length I1, S3       # I1 is now 8
-    
+
 
 =head2 Branches
 
@@ -223,7 +226,7 @@ Code gets a little boring without flow control; for starters, Parrot
 knows about branching and labels. The C<branch> op is equivalent to
 Perl's C<goto>:
 
-  
+
           branch TERRY
  JOHN:    print "fjords\n"
           branch END
@@ -234,24 +237,25 @@ Perl's C<goto>:
  GRAHAM:  print " for the "
           branch JOHN
  END:     end
-     
+
 
 It can also do simple tests for whether or not a register contains a
 true value:
 
           set I1, 12
           set I2, 5
-          mod I3, I2, I2
-          if I3, REMAIND, DIVISOR
+          mod I3, I1, I2
+          if I3, REMAIND
+          print "5 is an integer divisor of 12"
+          branch DONE
  REMAIND: print "5 divides 12 with remainder "
           print I3
-          branch DONE
- DIVISOR: print "5 is an integer divisor of 12"
  DONE:    print "\n"
           end
-     
 
-Here's what that would look like in Perl, for comparison:
+Note that C<if> branches to C<REMAIND> if C<I3> contains a true 
+(i.e. non-zero) value; if C<I3> is zero, execution falls through to the 
+next statement. Here's what that would look like in Perl, for comparison:
 
     $i1 = 12;
     $i2 = 5;
@@ -264,7 +268,7 @@ Here's what that would look like in Perl, for comparison:
     }
     print "\n";
     exit;
-    
+
 
 And speaking of comparison, we have the full range of numeric
 comparators: C<eq>, C<ne>, C<lt>, C<gt>, C<le> and C<ge>. Note that you
@@ -288,7 +292,9 @@ This little program displays the Unix epoch time every second: (or so)
          print "\n"
          set I2 0
  SPIN:   inc I2
-         le I2, I3, SPIN, REDO
+         le I2, I3, SPIN
+         branch REDO
+         end
 
 First, we set integer register 3 to contain 3 million - that's a
 completely arbitrary number, due to the fact that Parrot averages a
@@ -307,13 +313,13 @@ bytecode, with the F<assemble.pl> provided. So, copy the assembler to a
 file F<showtime.pasm>, and inside your Parrot directory, run:
 
       perl assemble.pl showtime.pasm > showtime.pbc
-    
+
 
 (C<.pbc> is the file extension for Parrot bytecode.)
 
 =head2 Finding a Fibonacci number
 
-The Fibonnaci series is defined like this: take two numbers, 1 and 1.
+The Fibonacci series is defined like this: take two numbers, 1 and 1.
 Then repeatedly add together the last two numbers in the series to make
 the next one: 1, 1, 2, 3, 5, 8, 13, and so on. The Fibonacci number
 C<fib(n)> is the n'th number in the series. Here's a simple Parrot
@@ -325,16 +331,15 @@ assembler program which finds the first 20 Fibonacci numbers:
          print   "The first 20 fibonacci numbers are:\n"
          set     I1, 0
          set     I2, 20
-         set     I3, 1
+         set     I3, 0
          set     I4, 1
- REDO:   eq      I1, I2, DONE, NEXT
- NEXT:   set     I5, I4
+ REDO:   set     I5, I4
          add     I4, I3, I4
          set     I3, I5
          print   I3
          print   "\n"
          inc     I1
-         branch  REDO
+         lt      I1, I2, REDO
  DONE:   end
 
 This is the equivalent code in Perl:
@@ -342,7 +347,7 @@ This is the equivalent code in Perl:
         print "The first 20 fibonacci numbers are:\n";
         my $i = 0;
         my $target = 20;
-        my $a = 1;
+        my $a = 0;
         my $b = 1;
         until ($i == $target) {
            my $num = $b;
@@ -351,7 +356,12 @@ This is the equivalent code in Perl:
            print $a,"\n";
            $i++;
         }
-    
+
+=head2 Further examples
+
+Additional examples of what can be done with Parrot assembler can be 
+found in the F<parrot/examples/assembly> subdirectory, and on the web at 
+http://www.parrotcode.org/examples/.
 
 =head2 Jako
 
@@ -365,7 +375,7 @@ that Fibonacci program again:
         print("The first 20 fibonacci numbers are:\n");
         var int i = 0;
         var int target = 20;
-        var int a = 1;
+        var int a = 0;
         var int b = 1;
         var int num;
         while (i != target) {
@@ -381,12 +391,13 @@ C<$> sigils, replaced the Perlish C<until> with a more common C<while>,
 replaced C<my> with C<var int> and I was nearly done.
 
 The Jako compiler, C<jakoc>, ships with Parrot in the
-C<languages> subdirectory:
+F<languages/jako> subdirectory:
 
-  % perl languages/jakoc fib.jako > fib.pasm
+  % languages/jako/jakoc fib.jako > fib.pasm
   % perl assemble.pl fib.pasm > fib.pbc
-  % ./parrot fib.pbc
+  % ./test_parrot fib.pbc
  The first 20 fibonacci numbers are:
+ 1
  1
  2
  3
@@ -418,7 +429,7 @@ add an opcode is to add its implementation to the F<core.ops> file.
 
 The format of this file is a little funny; it's C which is
 pre-processed by a Perl program. The C functions should be declared
-either C<op foo ()> or <inline op foo ()>.
+either C<op foo ()> or C<inline op foo ()>.
 
 The C<inline> prefix is a hint for code generation that this is a
 very simple op function, which for JIT or other optimizations might
@@ -463,7 +474,7 @@ of some type, which can be instructed to perform various operations. So
 when we say
 
       inc P1
-    
+
 to increment the value in PMC register 1, the C<increment> method is
 called on the PMC - and it's up to the PMC how it handles that method.
 
@@ -498,17 +509,18 @@ ops that we need to implement.
 
 We've got a good number of people working away on Parrot, but we could
 always use a few more. To help out, you'll need a subscription to the
-perl6-internals mailing list, where all the development takes place;
-you should keep up to date with the CVS version of Parrot - if you want
-to be alerted to CVS commits, you can subscribe to the cvs-parrot
-mailing list. CVS commit access is given to those who taken
+perl6-internals mailing list, (C<perl6-internals@perl.org>), where all 
+the development takes place. You should also keep up to date with the CVS 
+version of Parrot; if you want to be alerted to CVS commits, 
+you can subscribe to the cvs-parrot mailing list (C<cvs-parrot@perl.org>).
+CVS commit access is given to those who taken
 responsibility for a particular area of Parrot, or who often commit
 high-quality patches.
 
-A useful web page is cvs.perl.org, which reminds you how to use CVS,
+A useful web page is http://cvs.perl.org, which reminds you how to use CVS,
 and allows you to browse the CVS repository; the code page is a summary
 of this information and other resources about Parrot. Another good
-resource is www.parrotcode.org.
+resource is http://www.parrotcode.org.
 
 So don't delay - pick up a Parrot today!
 
