@@ -321,6 +321,7 @@ languages/perl6/t/compiler/1.t
 languages/perl6/t/compiler/2.t
 languages/perl6/t/compiler/3.t
 languages/perl6/t/compiler/4.t
+languages/perl6/t/compiler/5.t
 languages/perl6/t/parser/P6CTest.pm
 languages/perl6/t/parser/README
 languages/perl6/t/parser/basic.t
