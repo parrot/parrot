@@ -520,7 +520,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     }
 }
 
-#if 0
+#ifdef CREATE_TAIL_CALLS
 /*
  * check for a sequence of
  *   .pcc_begin
@@ -591,7 +591,6 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 
     return 1;
 }
-#endif
 
 static void
 insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, SymReg *sub)
@@ -604,6 +603,8 @@ insert_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins, S
     ins = insINS(interpreter, unit, ins, "set", regs, 2);
     ins = insINS(interpreter, unit, ins, "jump", regs, 1);
 }
+
+#endif
 
 static Instruction *
 pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
@@ -779,7 +780,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int tail_call;
     int proto;
     int meth_call = 0;
-    SymReg * p2 = NULL, *s0 = NULL;
+    SymReg *p2, *s0 = NULL;
 
     /*
      * we must preserve P2 too
@@ -791,20 +792,23 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     PIO_eprintf(NULL, "expand_pcc_sub_call\n");
 #endif
 
-    tail_call = 0 ; /* check_tail_call(interp, unit, ins); */
+    tail_call = 0;
+#ifdef CREATE_TAIL_CALLS
+    tail_call = check_tail_call(interp, unit, ins);
     if (tail_call)
         debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
+#endif
     sub = ins->r[0];
 
+    if (sub->pcc_sub->object)
+        meth_call = 1;
+
     /*
-     * See if we need to create a temporary sub object
+     * See if we need to create a temporary sub object for the short
+     * function call syntax _f()
      */
     if (ins->type & ITCALL) {
-        if (sub->pcc_sub->object) {
-            add_pcc_sub(sub, sub->pcc_sub->sub);
-            meth_call = 1;
-        }
-        else if (sub->pcc_sub->sub->type == VTADDRESS) {
+        if (!meth_call && sub->pcc_sub->sub->type == VTADDRESS) {
 #if IMC_TRACE
             fprintf(stderr, "generating sub object [sub->name = %s]\n",
                     sub->pcc_sub->sub->name);
@@ -814,40 +818,36 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
              * not a variable.
              */
             reg = mk_temp_reg('P');
-            tmp = iNEWSUB(interp, unit, reg, NEWSUB, sub->pcc_sub->sub, NULL, 0);
+            tmp = iNEWSUB(interp, unit, reg, NEWSUB,
+                    sub->pcc_sub->sub, NULL, 0);
             add_pcc_sub(sub, reg);
             ins->type &= ~ITCALL;
             prepend_ins(unit, ins, tmp);
-
-            expand_pcc_sub_call(interp, unit, ins);
-            return;
         }
         else
             add_pcc_sub(sub, sub->pcc_sub->sub);
     }
-    else  {
-        if (sub->pcc_sub->object)
-            meth_call = 1;
-    }
 
-    /*
-     * insert arguments
-     */
 #if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "expand_pcc_sub_call: nargs = %d\n", sub->pcc_sub->nargs);
     PIO_eprintf(NULL, "args (");
     for(i = 0; i < sub->pcc_sub->nargs; i++) {
        arg = sub->pcc_sub->args[i];
        PIO_eprintf(NULL, " (%c%s)%s", arg->set,
-                          (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
+                  (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
     }
     PIO_eprintf(NULL, ")\n");
 #endif
+
+    /*
+     * insert arguments
+     */
     n = sub->pcc_sub->nargs;
     proto = sub->pcc_sub->pragma & P_PROTOTYPED;
     ins = pcc_put_args(interp, unit, ins, sub->pcc_sub, n,
                 proto, sub->pcc_sub->args);
 
+#ifdef CREATE_TAIL_CALLS
     /*
      * if we have a tail call then
      * insert a jump
@@ -856,6 +856,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
         insert_tail_call(interp, unit, ins, sub);
         return;
     }
+#endif
 
     /*
      * setup P0, P1
@@ -956,8 +957,7 @@ move_cc:
     sub->pcc_sub = NULL;
     sub = ins->r[0];
     /*
-     * locate return label,
-     * we must have one or the parser would have failed
+     * locate return label, if there is one skip it
      */
     if (sub->pcc_sub->label && ins->next->type == ITLABEL) {
         ins = ins->next;
