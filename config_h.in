@@ -22,6 +22,14 @@ typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 typedef void SYNC;
 
+/* XXX Temporary until the grand rename is done */
+typedef INTVAL   Intval;
+typedef UINTVAL  UIntval;
+typedef FLOATVAL Floatval;
+typedef VTABLE   VTable;
+typedef DPOINTER DPointer;
+typedef SYNC     Sync;
+
 /* typedef INTVAL *(*opcode_funcs)(void *, void *) OPFUNC; */
 
 #define FRAMES_PER_CHUNK 16
