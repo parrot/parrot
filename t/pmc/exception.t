@@ -502,13 +502,11 @@ Lexical 'nix' not found
 /
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "exit exception");
+output_is(<<'CODE', '', "exit exception");
     noop
     exit 0
     print "not reached\n"
     end
 CODE
-/in file/
-OUTPUT
 1;
 
