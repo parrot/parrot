@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 98;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -488,6 +488,21 @@ output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
  print "<"
  end
 CODE
+
+output_is(<<'CODE', <<OUTPUT, "concat_s_sc, repeated two-arg concats" );
+  set S12, ""
+  set I0, 0
+WHILE:
+  concat S12, "hi"
+  add I0, 1
+  lt I0, 10, WHILE
+  print S12
+  print "\n"
+  end
+CODE
+hihihihihihihihihihi
+OUTPUT
+
 
 output_is( <<'CODE', <<OUTPUT, 'concat_s_s|sc, "foo1" onto null' );
  concat S0, "foo1"
