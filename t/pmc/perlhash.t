@@ -492,15 +492,15 @@ output_is(<<'CODE', <<OUTPUT, "Getting values from undefined keys");
       set S0, P2["zxcvbn"]
       set P0, P2["123456"]
 
-      eq, I0, 0, OK1
+      eq I0, 0, OK1
       print "not "
 OK1:  print "ok 1\n"
 
-      eq, N0, 0.0, OK2
+      eq N0, 0.0, OK2
       print "not "
 OK2:  print "ok 2\n"
 
-      eq, S0, "", OK3
+      eq S0, "", OK3
       print "not "
 OK3:  print "ok 3\n"
 

@@ -1001,7 +1001,7 @@ ok_11:
     print "ok 4\n"
     push P0, 300
     # replace 3 values
-    splice P0, P1, 1 3
+    splice P0, P1, 1, 3
     set I0, P0
     eq I0, 3, ok_12
     print "nok 51\n"

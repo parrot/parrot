@@ -14,7 +14,7 @@ CODE
 Created IntList with 0 elements to start with.
 OUTPUT
 
-# This test just runs way too slowly with GC_DEBUG turned on, so let's
+# This test just runs way too slowly with GC_DEBUG turned on, so lets
 # turn it off for make test runs.
 output_is(<<'CODE', <<'OUTPUT', "aerobics");
         new P0, .IntList
