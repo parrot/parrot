@@ -16,7 +16,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Ref {
+pmclass Ref does ref {
 
     void init () {
 	internal_exception(1, "Ref init without PMC\n");
@@ -29,6 +29,14 @@ pmclass Ref {
 	}
 	else
 	    internal_exception(1, "Ref init with NULL PMC\n");
+    }
+
+    /*
+     * and one method, that isn't delegated - use set to set values
+     * change referee by assign
+     */
+    void set_pmc(PMC* other) {
+	PMC_ptr2p(SELF) = other; /* refer to other PMC */
     }
 
     void mark () {

@@ -215,13 +215,21 @@ inline op set(out INT, in PMC) {
 
 =item B<assign>(in PMC, in NUM)
 
+=item B<assign>(in PMC, in STR)
+
 =item B<assign>(in PMC, in PMC)
 
-=item B<assign>(in PMC, in STR)
+Assign a new value $2, to PMC $1. Only the last operation is different
+to the equivalent B<set> opcodes.
+
+=item B<assign>(out STR, in STR)
 
 Assign a new value to a string by reusing the string header.
 
-=item B<assign>(out STR, in STR)
+=item B<deref>(out PMC, in PMC)
+
+Not strictly an assigment operation: Get the PMC into $1, that the
+reference PMC $2 refers to.
 
 =cut
 
@@ -247,6 +255,15 @@ inline op assign(in PMC, in STR) {
 
 inline op assign(out STR, in STR) {
   $1 = string_set(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op deref(out PMC, in PMC) {
+  PMC *ref = $2;
+  /* TODO if we have more refs check if $2 does "ref" */
+  if (ref->vtable->base_type != enum_class_Ref)
+    internal_exception(1, "Not a reference PMC");
+  $1 = PMC_ptr2p($2);
   goto NEXT();
 }
 
