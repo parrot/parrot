@@ -362,8 +362,8 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
             offset = ft->fixups[interpreter->resume_offset]->u.t0.offset;
             Parrot_switch_to_cs(interpreter, seg);
             if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-                PIO_eprintf(interpreter, "*** Resume at seg %d ofs %d\n",
-                        (int)seg, (int)offset);
+                PIO_eprintf(interpreter, "*** Resume at seg %s ofs %d\n",
+                        seg->base.name, (int)offset);
             }
         }
     }
