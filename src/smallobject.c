@@ -125,6 +125,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
         new_arena->prev->next = new_arena;
     }
     pool->last_Arena = new_arena;
+    interpreter->header_allocs_since_last_collect++;
 
     /* Move all the new objects into the free list */
     object = new_arena->start_objects;

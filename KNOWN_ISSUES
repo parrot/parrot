@@ -14,7 +14,6 @@ Memory Leaks
 
 - PIO subsystem leaks file handles (ParrotIO structures)
 - regexen leak bitmaps
-- scratchpad
 - string_to_cstring returns a malloced string, which isn't freed everywhere
 
 Regexes

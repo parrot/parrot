@@ -71,14 +71,6 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     return pmc;
 }
 
-void
-alloc_pmcs(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
-{
-    interpreter->header_allocs_since_last_collect++;
-    alloc_objects(interpreter, pool);
-}
-
-
 /** Buffer Header Functions for small-object lookup table **/
 
 void *
@@ -106,14 +98,6 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     return buffer;
 }
 
-void
-alloc_buffers(struct Parrot_Interp *interpreter,
-        struct Small_Object_Pool *pool)
-{
-    interpreter->header_allocs_since_last_collect++;
-    alloc_objects(interpreter, pool);
-}
-
 /** Header Pool Creation Functions **/
 
 struct Small_Object_Pool *
@@ -126,7 +110,6 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
 
     pmc_pool->add_free_object = add_free_pmc;
     pmc_pool->get_free_object = get_free_pmc;
-    pmc_pool->alloc_objects = alloc_pmcs;
     pmc_pool->more_objects = more_traceable_objects;
     pmc_pool->mem_pool = NULL;
     return pmc_pool;
@@ -147,7 +130,6 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
             new_small_object_pool(interpreter, buffer_size, num_headers);
 
     pool->get_free_object = get_free_buffer;
-    pool->alloc_objects = alloc_buffers;
     pool->more_objects = more_traceable_objects;
     pool->mem_pool = interpreter->arena_base->memory_pool;
     pool->align_1 = BUFFER_ALIGNMENT - 1;
