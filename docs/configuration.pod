@@ -212,6 +212,29 @@ the configuration system's data.
 
 =back
 
+=head2 Special Configuration Items
+
+Some configuration items (mainly prefixes) have a special meaning and handled
+internally.
+
+=over 4
+
+=item C< i_(\w+) > include files
+
+defines or undefs PARROT_HAS_HEADER_XXX in F<include/parrot/has_header.h>
+
+=item C< HAS_(\w+) > features
+
+defines PARROT_HAS_XX in F<include/parrot/has_header.h>
+
+=item C< TEMP_(\w+) > temporary settings
+
+These settings are deleted before F<lib/Parrot/Config.pm> is written. These
+entries are only used e.g. for Makefile creation.
+
+=back
+
+
 =head1 SEE ALSO
 
 =over 4

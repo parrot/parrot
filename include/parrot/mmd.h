@@ -20,9 +20,10 @@ FLOATVAL mmd_dispatch_floatval(struct Parrot_Interp *, PMC *, PMC *, INTVAL);
 
 void mmd_add_by_class(struct Parrot_Interp *, INTVAL, STRING *, STRING *, funcptr_t);
 void mmd_register(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL, funcptr_t);
+void mmd_register_sub(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL, PMC*);
 void mmd_add_function(struct Parrot_Interp *, INTVAL, funcptr_t);
+void mmd_add_function_sub(struct Parrot_Interp *, INTVAL, PMC*);
 void mmd_destroy(Parrot_Interp);
-void mmd_vtregister(Parrot_Interp, INTVAL, INTVAL, INTVAL, PMC *);
 PMC *mmd_vtfind(Parrot_Interp, INTVAL, INTVAL, INTVAL);
 
 typedef struct MMD_table {

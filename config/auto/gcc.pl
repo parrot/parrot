@@ -137,7 +137,8 @@ sub runstep {
 
   Configure::Data->set(
     ccwarn    => "$warns $ccwarn",
-    gccversion => $gccversion
+    gccversion => $gccversion,
+    HAS_aligned_funcptr => 1
   );
 }
 
