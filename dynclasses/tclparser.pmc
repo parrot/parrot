@@ -486,8 +486,8 @@ check4:
   }
 
 inner_done:
-  //# Once we get here, we could also have a () to deal with..
-  //# ()
+  /* Once we get here, we could also have a () to deal with..   */
+  /* () */
   I1 = temppos - chunk_start;
   S0 = string_substr(INTERP, buffer, chunk_start, I1, NULL, NULL);
   start_word = chunk_start + I1;
@@ -500,7 +500,7 @@ inner_done:
   if (temppos == -1) {
     goto bad_array;
   }
-  //# $S0($S1)
+  /* $S0($S1) */
   start_word++;
   I1 = temppos - start_word;
   S1 = string_substr(INTERP, buffer, start_word, I1, NULL, NULL);
