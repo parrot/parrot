@@ -112,7 +112,7 @@ typedef void BIGNUM;
     explicitly Configured in) which do limits checks?
     A. D. Aug. 6, 2002.
 */
-#if (INTVAL_SIZE == PTR_SIZE) && (UINTVAL_SIZE == PTR_SIZE)
+#if PTR_SIZE == INTVAL_SIZE
 #  define INTVAL2PTR(any,d)    (any)(d)
 #  define UINTVAL2PTR(any,d)    (any)(d)
 #else
