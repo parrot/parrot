@@ -64,4 +64,4 @@ John Kingsley		Numerous bug fixes to the parser, parser
 Leopold Toetsch		5.005_03 compatibility fixes, test driver
 			cleanup, new driver program, many bug fixes
 
-Joseph Ryan		Compiler overview doc
+Joseph Ryan		Compiler overview doc, builtin functions

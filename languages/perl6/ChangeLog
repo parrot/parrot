@@ -262,3 +262,18 @@
 
 	* Fixes:
 	    - result values of try/CATCH
+	    - backtracking @array-literals
+	    - improved grammar compliance (e.g. 'sub')
+	    - cool French quotes for regexes.
+	* Additions:
+	    - anonyous rules (some).
+	
+2002-09-04
+
+	* Fixes:
+	    - corrected
+	
+	* Additions:
+	    - more builtin functions: index, reverse, join (coming soon:
+	      grep and map) (Joseph Ryan)
+

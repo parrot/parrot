@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 5;
+use P6C::TestCompiler tests => 6;
 use Test::More qw(skip);
 
 ##############################
@@ -133,4 +133,20 @@ ok 3
 ok 4
 ok 5
 ok 6
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Anonymous rules.");
+sub main() {
+    my $s = " 12 112213455898898992020 ";
+    my $r = rule { @_[0]<2> };
+    my $r2 = rx / 89+9 /;
+    print "ok 1\n" if $s =~ /<$r2>/;
+    print "ok 2\n" if $s =~ /<$r(1)><$r(2)>/;
+    print "ok 3\n" if $s =~ /<$r(2)> .* <$r2>/;
+}
+CODE
+ok 1
+ok 2
+ok 3
 OUT

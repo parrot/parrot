@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 2;
+use P6C::TestCompiler tests => 4;
 use Test::More qw(skip);
 
 ##############################
@@ -38,12 +38,42 @@ Died (no handler).
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "substr");
-
+output_is(<<'CODE', <<'OUT', "length");
 sub main() {
-  print1(length("abcde"));
+    print1(length "abcde");
 }
 CODE
 5
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "join");
+sub main() {
+    my $x = 3;
+    my $y = 4;
+    my $z = join " ", $x, $y;
+    print $z, "\n";
+    print $x, "\n";
+    print $y, "\n";
+}
+CODE
+3 4
+3
+4
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "index");
+sub main() {
+    my $string = "one two three four";
+    print index $string, "two";
+    print "\n";
+    print index $string, "o";
+    print "\n";
+    print index($string, "o", 9), "\n";
+}
+CODE
+4
+0
+15
+OUT
