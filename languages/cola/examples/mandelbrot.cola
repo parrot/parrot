@@ -33,7 +33,7 @@ public class Mandelbrot {
                     t = z*z - Z*Z + r;
                     Z = 2.0*z*Z + i;
                     z = t;
-                    if((z*z + Z*Z) > 10.0)
+                    if(z*z + Z*Z > 10.0)
                         break;
                 }
                 puts( b[ k % 16 ] );
