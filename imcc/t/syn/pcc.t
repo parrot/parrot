@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 31;
+use TestCompiler tests => 32;
 
 ##############################
 # Parrot Calling Conventions
@@ -694,7 +694,7 @@ count_loop:
     .return c
     .pcc_end_yield
     c = c - 1
-    # this branch was to _coung_g, which isn't quite right 
+    # this branch was to _coung_g, which isn't quite right
     # code shouldn't branch to the entry label, where some
     # function prologue does exist
     # OTOH there might be some more bugs with coruoutines
@@ -1238,6 +1238,26 @@ OUT
 output_is(<<'CODE', <<'OUT', "_func() syntax");
 .sub _main
     _sub(10, 20)
+    end
+.end
+.pcc_sub _sub prototyped
+    .param int a
+    .param int b
+    print a
+    print "\n"
+    print b
+    print "\n"
+    end
+.end
+CODE
+10
+20
+OUT
+output_is(<<'CODE', <<'OUT', "_func() syntax with var");
+.sub _main
+    .local pmc the_sub
+    the_sub = global "_sub"
+    the_sub(10, 20)
     end
 .end
 .pcc_sub _sub prototyped

@@ -51,6 +51,7 @@ SymbolTable global_sym_tab;
  */
 static Class * current_class;
 static Instruction * current_call;
+static SymReg *cur_obj;
 IMC_Unit * cur_unit;
 
 /*
@@ -212,6 +213,8 @@ static void
 itcall_sub(SymReg* sub)
 {
    current_call->r[0]->pcc_sub->sub = sub;
+   current_call->r[0]->pcc_sub->object = cur_obj;
+   cur_obj = NULL;
    /* FIXME use the default settings from .pragma */
    current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
    if(cur_unit->type == IMC_PCCSUB)
@@ -239,7 +242,6 @@ itcall_sub(SymReg* sub)
 %token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
-%token <t> POINTY
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV DEFINED LOG_XOR
@@ -259,7 +261,7 @@ itcall_sub(SymReg* sub)
 %type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
-%type <i> labels _labels label statements statement sub_call meth_call
+%type <i> labels _labels label statements statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
@@ -274,6 +276,10 @@ itcall_sub(SymReg* sub)
 %token <sr> VAR
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
+
+%nonassoc '.'
+%nonassoc  <t> POINTY
+
 
 %pure_parser
 
@@ -703,7 +709,6 @@ labeled_inst:
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
    | sub_call      {  $$ = 0; current_call = NULL; }
-   | meth_call     {  $$ = 0; current_call = NULL; }
    | pcc_sub_call  {  $$ = 0; }
    | pcc_ret
    | pcc_yield
@@ -829,24 +834,15 @@ assignment:
    ;
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
-       /* this produces 18 shift/reduce conflicts and wrong code
-       | target      { $$ = $1;
+       | VAR      { $$ = $1;
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
-       */
+                     }
+       | VAR ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
    ;
 
 ptr:    POINTY { $$=0; }
       | '.'    { $$=0; }
-   ;
-meth_call: VAR ptr IDENTIFIER
-         {
-           $$ = create_itcall_label();
-           itcall_sub(mk_sub_address($3));
-           current_call->r[0]->pcc_sub->object = $1;
-         }
-     '(' arglist ')'
-        {  $$ = $<i>2; }
    ;
 
 sub_call:
