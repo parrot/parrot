@@ -20,7 +20,10 @@ forth
 IMCC		Functioning, all samples working
 		Status: Maintained but moving up to main directory soon
 
-Jako
+Jako		Functioning, although not all examples work.
+		Status: Lightly maintained, calling conventions and NCI
+		have changed since the Jako subroutine and NCI code
+		generation was written, causing some breakage.
 
 miniperl
 
