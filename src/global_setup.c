@@ -59,11 +59,9 @@ init_world(Interp *interpreter)
 #endif
 
 
-    /* TODO allocate core vtable table only once - or per interpreter
-     *
-     * this interfers with JITted NCI on i386, where the method stubs
-     * are stored inside vtable->method_table - different threads get
-     * the same code
+    /*
+     * TODO allocate core vtable table only once - or per interpreter
+     *      divide globals into real globals and per interpreter
      */
     if (!Parrot_base_vtables)
         Parrot_base_vtables =
@@ -76,8 +74,9 @@ init_world(Interp *interpreter)
 
     /* Now register the names of the PMCs */
 
-    /* We need a hash */
-    classname_hash = pmc_new(interpreter, enum_class_PerlHash);
+    /* We need a class hash */
+    interpreter->class_hash = classname_hash =
+        pmc_new(interpreter, enum_class_PerlHash);
 
     /* Now fill the hash */
     Parrot_register_core_pmcs(interpreter, classname_hash);

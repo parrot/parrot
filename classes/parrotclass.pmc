@@ -117,6 +117,10 @@ system method lookup code.
 
 Returns whether the class can perform C<*method>.
 
+=item C<PMC *get_class()>
+
+Return SELF.
+
 =cut
 
 */

@@ -127,6 +127,26 @@ These two methods just call C<init()>. The arguments are ignored.
 
 Finds the method for C<*name>.
 
+=item C<PMC* get_attr(INTVAL idx)>
+
+Return attribute number C<idx>.
+
+=item C<PMC* get_attr_str(STRING *name)>
+
+Return attribute named C<name>.
+
+=item C<void set_attr(INTVAL idx, PMC *val)>
+
+Set attribute number C<idx>.
+
+=item C<void set_attr_str(STRING *name, PMC *val)>
+
+Set attribute named C<name>.
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
 =cut
 
 */

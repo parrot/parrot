@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1105,3 +1105,19 @@ output_like(<<'CODE', <<'OUTPUT', "addattribute duplicate");
 CODE
 /Attribute 'Foo(.*?i)?' already exists/
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PMC as classes");
+    getclass P0, "Integer"
+    print "ok 1\n"
+    getclass P0, "Integer"
+    print "ok 2\n"
+    typeof S0, P0
+    print S0
+    print "\n"
+    end
+CODE
+ok 1
+ok 2
+Integer
+OUTPUT
+

@@ -754,6 +754,19 @@ Returns whether the PMC "isa" C<*method>.
 
 /*
 
+=item C<PMC* get_class()>
+
+Returns SELF. A PMC is it's own class.
+
+=cut
+
+*/
+    PMC* get_class() {
+        return SELF;
+    }
+
+/*
+
 =item C<void visit(visit_info *info)>
 
 Used by DOD to mark the PMC.

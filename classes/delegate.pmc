@@ -82,9 +82,17 @@ PARROT_INLINE static PMC *
 find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
     PMC *returnPMC = find_meth(interpreter, pmc, meth);
     if (PMC_IS_NULL(returnPMC)) {
+        PMC *class = pmc;
+        if (PObj_is_object_TEST(pmc)) {
+            class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
+        }
         internal_exception(METH_NOT_FOUND,
-            "Can't find method '%s' for object",
-            string_to_cstring(interpreter, meth));
+                "Can't find method '%s' for object '%s'",
+                string_to_cstring(interpreter, meth),
+                string_to_cstring(interpreter, PMC_str_val(
+                        get_attrib_num((SLOTTYPE *)PMC_data(class),
+                            PCD_CLASS_NAME)))
+                );
     }
     return returnPMC;
 }

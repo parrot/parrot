@@ -208,9 +208,8 @@ inline op subclass(out PMC, in PMC) :object_classes {
 }
 
 op subclass(out PMC, in STR, in STR) :object_classes {
-  PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
-      interpreter->class_hash, $2);
-  if (!class || !PObj_is_class_TEST(class)) {
+  PMC *class = Parrot_class_lookup(interpreter, $2);
+  if (PMC_IS_NULL(class)) {
     internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
 		string_to_cstring( interpreter, $3 ));
   }
@@ -219,9 +218,8 @@ op subclass(out PMC, in STR, in STR) :object_classes {
 }
 
 op subclass(out PMC, in STR) :object_classes {
-  PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
-      interpreter->class_hash, $2);
-  if (!class || !PObj_is_class_TEST(class)) {
+  PMC *class = Parrot_class_lookup(interpreter, $2);
+  if (PMC_IS_NULL(class)) {
     internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
 		string_to_cstring( interpreter, $2 ));
   }
@@ -236,7 +234,8 @@ Returns 1 if the class exists, 0 if it does not.
 =cut
 
 inline op findclass(out INT, in STR) :object_base {
-  $1 = VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2);
+  PMC *class = Parrot_class_lookup(interpreter, $2);
+  $1 = !PMC_IS_NULL(class);
   goto NEXT();
 }
 
@@ -251,12 +250,13 @@ character, so Perl's Foo::Bar would be Foo\0Bar.
 =cut
 
 inline op getclass(out PMC, in STR) :object_classes {
-  if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash, $2)) {
-    $1 = VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,  $2);
-  } else {
+  PMC *class = Parrot_class_lookup(interpreter, $2);
+  if (PMC_IS_NULL(class)) {
     internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
 		string_to_cstring( interpreter, $2 ));
   }
+  else
+    $1 = class;
   goto NEXT();
 }
 

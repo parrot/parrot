@@ -181,6 +181,13 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     PMC *pmc;
     VTABLE *vtable = Parrot_base_vtables[base_type];
 
+    if (!vtable) {
+        /* This is usually because you either didn't call init_world early
+         * enough or you added a new PMC class without adding
+         * Parrot_(classname)_class_init to init_world. */
+        PANIC("Null vtable used");
+    }
+
     if (vtable->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
@@ -206,14 +213,23 @@ get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     }
 
     pmc->vtable = vtable;
-
-    if (!vtable || !vtable->init) {
-        /* This is usually because you either didn't call init_world early
-         * enough or you added a new PMC class without adding
-         * Parrot_(classname)_class_init to init_world. */
-        PANIC("Null vtable used or missing init");
-        return NULL;
+    /*
+     * class interface - a PMC is it's own class
+     * XXX use a separate vtable entry?
+     * A ParrotObject has already the ParrotClass PMC in data
+     */
+    if (!vtable->data) {
+        /* can't put this PMC in: if it needs timely destruction
+         * it'll not get destroyed, so put in another PMC
+         *
+         * we should do that in pmc_register, but this doesn't
+         * work for dynamic PMCs, which don't have a vtable
+         * when they call pmc_register
+         */
+        PMC *class = vtable->data = new_pmc_header(interpreter, PObj_constant_FLAG);
+        class->vtable = vtable;
     }
+
 #if GC_VERBOSE
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         /* XXX make a more verbose trace flag */
@@ -396,8 +412,7 @@ pmc_register(Parrot_Interp interp, STRING *name)
         return type;
     }
 
-    classname_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                                              IGLOBALS_CLASSNAME_HASH);
+    classname_hash = interp->class_hash;
     type = enum_class_max++;
     /* Have we overflowed the table? */
     if (enum_class_max > class_table_size - 1) {
@@ -442,8 +457,7 @@ pmc_type(Parrot_Interp interp, STRING *name)
      * probe for PMC types
      */
     PARROT_WARNINGS_off(interp, PARROT_WARNINGS_UNDEF_FLAG);
-    classname_hash = VTABLE_get_pmc_keyed_int(interp,
-                            interp->iglobals, IGLOBALS_CLASSNAME_HASH);
+    classname_hash = interp->class_hash;
 
     return_val = VTABLE_get_integer_keyed_str(interp, classname_hash, name);
     if (w)

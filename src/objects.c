@@ -207,9 +207,11 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     if (child_class_name) {
         VTABLE_set_string_native(interpreter, classname_pmc, child_class_name);
 
+#if 0
         /* Add ourselves to the interpreter's class hash */
         VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
                 child_class_name, child_class);
+#endif
     }
     else {
         child_class_name = string_make(interpreter,
@@ -326,10 +328,18 @@ Otherwise it returns C<PMCNULL>.
 PMC *
 Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 {
-    if (VTABLE_exists_keyed_str(interpreter, interpreter->class_hash,
-                class_name))
-        return VTABLE_get_pmc_keyed_str(interpreter, interpreter->class_hash,
-                class_name);
+    HashBucket *b;
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(interpreter->class_hash), class_name);
+    if (b) {
+        INTVAL type = PMC_int_val((PMC*)b->value);
+        PMC *pmc = Parrot_base_vtables[type]->data;
+        if (!pmc) {
+            pmc = Parrot_base_vtables[type]->data =
+                pmc_new_noinit(interpreter, type);
+        }
+        return pmc;
+    }
     return PMCNULL;
 }
 
@@ -373,9 +383,11 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
      */
     new_vtable = Parrot_clone_vtable(interpreter, new_class->vtable);
 
+#if 0
     /* register the class */
     VTABLE_set_pmc_keyed_str(interpreter, interpreter->class_hash,
             class_name, new_class);
+#endif
 
     /* Set the vtable's type to the newly allocated type */
     Parrot_vtable_set_type(interpreter, new_vtable, new_type);

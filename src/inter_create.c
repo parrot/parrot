@@ -234,9 +234,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     PIO_init(interpreter);
     /* Done. Return and be done with it */
 
-    /* Add in the class hash. Bit of a hack, probably, as there's
-       altogether too much overlap with the PMC classes */
-    interpreter->class_hash = pmc_new(interpreter, enum_class_PerlHash);
 
     /* Okay, we've finished doing anything that might trigger GC.
      * Actually, we could enable DOD/GC earlier, but here all setup is
