@@ -15,9 +15,6 @@
 
 pmclass scalar abstract noinit {
 
-    void init () {
-    }
-
     PMC* clone () {
         PMC* dest;
         dest = pmc_new(INTERP, SELF->vtable->base_type);

@@ -24,10 +24,6 @@ static const char * caller(Parrot_Interp interp, PMC * pmc)
 pmclass default abstract noinit {
 
     void init () {
-	internal_exception(ILL_INHERIT,
-		"init() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-
     }
 
     void init_pmc (PMC* value) {
