@@ -230,6 +230,7 @@ foreach my $op ($ops->ops) {
     my $full_name  = $op->full_name;
     my $func_name  = $op->func_name;
     my $body       = $op->body;
+    my $jump       = $op->jump || 0;
     my $arg_count  = $op->size;
     my $arg_types  = "{ " . join(", ", map { sprintf("PARROT_ARG_%s", uc $_) } $op->arg_types) . " }";
 
@@ -240,6 +241,7 @@ foreach my $op ($ops->ops) {
     "$full_name",
     "$func_name",
     "", /* TODO: Put the body here */
+    $jump, /* 1 = relative 2 = absolute 4 = pop 8 = next 16 = unpredictable */ 
     $arg_count,
     $arg_types
   },

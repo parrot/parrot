@@ -108,7 +108,7 @@ for ($i = 0; $i < $core_numops; $i++) {
     $precompiled = 0;
     if (!defined $body) {
         $precompiled = 1;
-        if ($op->may_jump) {
+        if ($op->jump) {
             $body = $cpcf_call;
         } else {
             $body = $normal_call;

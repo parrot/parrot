@@ -59,6 +59,7 @@ typedef struct {
     const char *full_name;
     const char *func_name;
     const char *body;
+    const char jump;
     INTVAL arg_count;           /* Includes opcode as one arg */
     arg_type_t types[PARROT_MAX_ARGS];
 } op_info_t;

@@ -243,6 +243,10 @@ sub make_op
 {
   my ($self, $code, $type, $short_name, $body, $args, $line, $file) = @_;
   my $counter = 0;
+  my $absolute = 0;
+  my $branch = 0;
+  my $pop = 0;
+  my $next = 0;
   my $jumps = 0;
 
   foreach my $variant (expand_args(@$args)) {
@@ -286,30 +290,36 @@ sub make_op
       # TODO: Complain about using, e.g. $3 in an op with only 2 args.
       #
 
-      $jumps ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
-      $jumps ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
-                 $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-                 $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
+      $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
+      $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
+                    $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+                    $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
 
-      $jumps ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
-                 $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
-      $jumps ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
-      $jumps ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
-                 $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
-                 $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-                 $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
-                 $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+      $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+                    $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+      $absolute ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+      $pop      ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
+                    $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+      $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+                    $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+                    $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
 
-                 $body =~ s/\bHALT\(\)/{{=0}}/mg;
+                    $body =~ s/\bHALT\(\)/{{=0}}/mg;
 
-      $jumps ||= $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
-                 $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+      $branch   ||= $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
+                    $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
 
-                 $body =~ s/\$(\d+)/{{\@$1}}/mg;
+                    $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
       $op->body(qq{#line $line "$file"\n}.$body);
 
-      $op->may_jump($jumps);
+      $jumps = $branch;
+      $jumps |= 2 if ($absolute);
+      $jumps |= 4 if ($pop);
+      $jumps |= 8 if ($next);
+      # I'm assuming the op branches to the value in the last argument.  
+      $jumps |= 16 if (($jumps) && ($fixedargs[@fixedargs - 1]) && ($fixedargs[@fixedargs - 1] eq 'i'));
+      $op->jump($jumps);
 
       $self->push_op($op);
       $counter++;

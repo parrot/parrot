@@ -133,17 +133,17 @@ sub body
 }
 
 #
-# may_jump()
+# jump()
 #
 
-sub may_jump
+sub jump
 {
   my $self = shift;
   if (@_) {
-    $self->{MAY_JUMP} = shift;
+    $self->{JUMP} = shift;
   }
 
-  return $self->{MAY_JUMP};
+  return $self->{JUMP};
 }
 
 #
