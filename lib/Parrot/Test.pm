@@ -77,7 +77,7 @@ foreach my $func ( keys %Test_Map ) {
     open OUTPUT, "< $out_f";
     {
       local $/ = undef;
-      $prog_output = <OUTPUT>;
+      $prog_output = <OUTPUT> . '';
       $prog_output =~ s/\cM\cJ/\n/g;
     }
     close OUTPUT;
