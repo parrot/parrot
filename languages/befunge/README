@@ -1,6 +1,6 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.04
+This is a Befunge interpreter written in Parrot assembler, version 0.05
 
 This interpreter should be Befunge-93 compliant. This means the
 playfield is limited to 80x25 and can hold *only bytes*. This means
@@ -13,18 +13,20 @@ You should compile and test the files with:
 
 Then you can run your Befunge program with: 
 
-     $ ../../parrot befunge.pbc [-v] foo.bef
+     $ ../../parrot befunge.pbc [-d] foo.bef
 
-The -v flag makes the befunge interpreter more verbose.
+The -d flag enables debugging within the befunge interpreter (not yet
+fully implemented, this is a work in progress).
 
 
 FILES
 -----
 The files are the following:
         befunge.pasm    the main loop
-        load.pasm       function to load the code from source file
+        debug.pasm      routines for the debugger
         flow.pasm       handles the flow-control instructions
         io.pasm         handles the io related instructions
+        load.pasm       function to load the code from source file
         maths.pasm      handles all the maths instructions
         stack.pasm      handles the stack instructions
         Makefile        a tiny, little Makefile to help (me) during
@@ -44,7 +46,7 @@ TODO
 * more error checking
 * better rand() methods
 * more tests (with Perl and Test::Harness)
-* debugging options
+* debugging options (work in progress)
 * use an array of arrays instead of an array of strings
 * implement Befunge 98
 

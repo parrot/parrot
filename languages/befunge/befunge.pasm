@@ -1,5 +1,6 @@
         branch MAIN
 
+.include "debug.pasm"
 .include "flow.pasm"
 .include "io.pasm"
 .include "load.pasm"
@@ -8,16 +9,17 @@
         
 MAIN:
         set I0, 0
-        set I4, 0               # verbose mode
+        set I5, 0               # debug mode
 ARGV_NEXT:        
         inc I0       
         set S10, P0[I0]
         substr S11, S10, 0, 1
         ne S11, "-", ARGV_DONE
-        eq S10, "-v", ARGV_VERBOSE
+        eq S10, "-d", ARGV_DEBUG
         branch ARGV_NEXT
-ARGV_VERBOSE:
-        inc I4
+ARGV_DEBUG:
+        inc I5
+        bsr DEBUG_INITIALIZE    # initialize P3
         branch ARGV_NEXT
 ARGV_DONE:
         set S10, P0[I0]
@@ -28,7 +30,7 @@ ARGV_DONE:
         set I0, 0               # x coord of the PC
         set I1, 0               # y coord of the PC
         set I2, 1               # direction of the PC
-        set I5, 0               # flag (1=string-mode,2=bridge,3=end)
+        set I4, 0               # flag (1=string-mode,2=bridge,3=end)
         time N0                 # random seed
         mod N0, N0, .RANDMAX
         set S0, " "             # current instruction
@@ -37,13 +39,13 @@ ARGV_DONE:
         
 TICK:
         substr S0, S1, I0, 1
-        eq I4, 0, TICK_NOVERBOSE
-        bsr VERBOSE
-TICK_NOVERBOSE:
+        eq I5, 0, TICK_NODEBUG
+        bsr DEBUG_CHECK_BREAKPOINT
+TICK_NODEBUG:
         eq S0, "\"", FLOW_TOGGLE_STRING_MODE
-        eq I5, 1, IO_PUSH_CHAR
-        eq I5, 2, MAIN_TRAMPOLINE
-        eq I5, 3, MAIN_END
+        eq I4, 1, IO_PUSH_CHAR
+        eq I4, 2, MAIN_TRAMPOLINE
+        eq I4, 3, MAIN_END
 
         # Sole number.
         lt S0, "0", NOT_NUM
@@ -89,7 +91,7 @@ NOT_NUM:
         branch MOVE_PC
         
 MAIN_TRAMPOLINE:        
-        set I5, 0               # no more trampoline
+        set I4, 0               # no more trampoline
 MOVE_PC:
         eq I2, 1, MOVE_EAST
         eq I2, 2, MOVE_SOUTH
@@ -117,64 +119,3 @@ MOVE_WEST:
 MAIN_END:
         end
 
-VERBOSE:
-        # Coordinates.
-        print "("
-        print I0
-        print ","
-        print I1
-        print ")"
-        # Current char.
-        print " - '"
-        print S0
-        print "' (ord="
-        ord I10, S0
-        print I10
-        print ")"
-        # Direction.
-        print " dir="
-        print I2
-        # Flags:        
-        set S10, " \""
-        eq I5, 1, VERBOSE_PRINT_FLAG
-        set S10, " #"
-        eq I5, 2, VERBOSE_PRINT_FLAG
-        set S10, " @"
-        eq I5, 3, VERBOSE_PRINT_FLAG
-        set S10, "  "
-VERBOSE_PRINT_FLAG:
-        print S10
-        # Stack.
-        print " stack="
-        set I11, P2
-        set I10, 0
-        ge  I10, I11, VERBOSE_STACK_END
-VERBOSE_STACK_LOOP:       
-        set I12, P2[I10]
-        print I12
-        inc I10
-        ge I10, I11, VERBOSE_STACK_END
-        print ","
-        branch VERBOSE_STACK_LOOP
-VERBOSE_STACK_END:
-        print "\n"
-        ret
-
-DUMP_PLAYFIELD:
-        pushi
-        pushs
-        repeat S10, "-", 82
-        concat S10, "\n"        
-        print S10
-        set I10, 0
-DUMP_NEXT_LINE: 
-        set S11, P1[I10]
-        print "|"
-        print S11
-        print "|\n"
-        inc I10
-        lt I10, 25, DUMP_NEXT_LINE
-        print S10
-        pops
-        popi
-        ret

@@ -1,5 +1,11 @@
 Revision history for Befunge-93 interpreter written for Parrot.
 
+0.05  Sat Nov 30 11:31:25 CET 2002
+        - new file debug.pasm that will handle all the debugging
+          capabilities of the interpreter.
+        - the verbose flag (-v) is replaced with a debug flag (-d) to
+          activate the integrated debugger.
+
 0.04  Sat Nov 23 10:22:51 CET 2002
         - now using the push and pop instructions of the PerlArray
           PMC, and thanks go to Steve Fink for his hack to pop an

@@ -90,24 +90,23 @@ FLOW_COMPARE_TRUE:
 # Toggle string mode.
 # Befunge stack unchanged.
 FLOW_TOGGLE_STRING_MODE:
-        eq I5, 1, FLOW_TOGGLE_STRING_MODE_OFF
-        set I5, 1
+        eq I4, 1, FLOW_TOGGLE_STRING_MODE_OFF
+        set I4, 1
         branch MOVE_PC
 FLOW_TOGGLE_STRING_MODE_OFF:      
-        set I5, 0
+        set I4, 0
         branch MOVE_PC
         
 # Trampoline.
 # Befunge stack unchanged.
 # Skip next instruction (pos < pos + delta)
 FLOW_BRIDGE:
-        set I5, 2
+        set I4, 2
         branch MOVE_PC
 
 # Stop.
 # Befunge stack unchanged.
 # End program.
 FLOW_END:
-        set I5, 3
+        set I4, 3
         branch MOVE_PC
-        
