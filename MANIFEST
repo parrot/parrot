@@ -1639,6 +1639,7 @@ tools/dev/genrpt.pl
 tools/dev/lib_deps.pl
 tools/dev/manicheck.pl
 tools/dev/parrot_coverage.pl
+tools/dev/rebuild_miniparrot.pl
 tools/dev/run_indent.pl
 trace.c
 types/bignum.c
