@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -692,6 +692,42 @@ ok 30
 ok 31
 ok 32
 ok 33
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "PerlArray integer access, two locations");
+      new P0, .PerlArray
+
+      set P0[0],37
+      set P0[1],-15
+
+      set I0,P0[0]
+      eq I0,37,OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set I0,P0[1]
+      eq I0,-15,OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set I1,0
+      set I0,P0[I1]
+      eq I0,37,OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set I1,1
+      set I0,P0[I1]
+      eq I0,-15,OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;

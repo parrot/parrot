@@ -125,7 +125,8 @@ sub access_arg
     'n'  => "(*(FLOATVAL *)cur_opcode[%ld])",
     'p'  => "(*(PMC **)cur_opcode[%ld])",
     's'  => "(*(STRING **)cur_opcode[%ld])",
-    'k'  => "(*(STRING **)cur_opcode[%ld])",
+#    'k'  => "(*(STRING **)cur_opcode[%ld])",
+    'k'  => "(*(INTVAL *)cur_opcode[%ld])",
 
     'ic' => "(*(INTVAL *)cur_opcode[%ld])",
     'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
