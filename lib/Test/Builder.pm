@@ -993,7 +993,7 @@ what $pack to use.
 sub todo {
     my($self, $pack) = @_;
 
-    $pack = $pack || $self->exported_to || $self->caller(1);
+    $pack = $pack || $self->exported_to || $self->caller(1) || 'main';
 
     no strict 'refs';
     return defined ${$pack.'::TODO'} ? ${$pack.'::TODO'}
