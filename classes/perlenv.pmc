@@ -1,40 +1,93 @@
-/* perlenv.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Env base class, which
- *     accesses the system environment
- *  Data Structure and Algorithms:
- *  History:
- *  Notes: Extends env to return scalars from get_pmc_keyed
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/perlenv.pmc - Perl System Environment
+
+=head1 DESCRIPTION
+
+C<PerlEnv> extends C<Env> to return scalars from C<get_pmc_keyed()>.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 static PMC * Env_PMC;
 
 pmclass PerlEnv singleton extends Env {
-    /*
-     * singleton creation interface s. pmc.c
-     */
-    void* get_pointer() {
-	return Env_PMC;
+
+/*
+
+=item C<void *get_pointer()>
+
+=cut
+
+*/
+
+void* get_pointer() {
+        return Env_PMC;
     }
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Gets and sets the pointer to the singleton instance. See F<src/pmc.c>
+for more information on the singleton creation interface.
+
+=cut
+
+*/
 
     void set_pointer(void* ptr) {
-	Env_PMC = (PMC*) ptr;
+        Env_PMC = (PMC*) ptr;
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the result of C<get_string_keyed(key)> as a C<PerlString>.
+
+=cut
+
+*/
 
     PMC* get_pmc_keyed (PMC* key) {
-	STRING* string = DYNSELF.get_string_keyed(key);
-	PMC * ret = pmc_new(INTERP, enum_class_PerlString);
-	VTABLE_set_string_native(INTERP, ret, string);
-	return ret;
+        STRING* string = DYNSELF.get_string_keyed(key);
+        PMC * ret = pmc_new(INTERP, enum_class_PerlString);
+        VTABLE_set_string_native(INTERP, ret, string);
+        return ret;
     }
 
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Returns the result of calling C<set_string_keyed()> with C<*value>
+converted to a Parrot string.
+
+=cut
+
+*/
+
     void set_pmc_keyed (PMC* key, PMC* value) {
-	DYNSELF.set_string_keyed(key, VTABLE_get_string(INTERP, value));
+        DYNSELF.set_string_keyed(key, VTABLE_get_string(INTERP, value));
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

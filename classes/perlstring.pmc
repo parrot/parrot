@@ -1,56 +1,145 @@
-/* perlstring.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the PerlString base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/perlstring.pmc - Perl String
+
+=head1 DESCRIPTION
+
+C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
+
 pmclass PerlString extends perlscalar {
+
+/*
+
+=item C<void init()>
+
+Initializes the string.
+
+=cut
+
+*/
 
     void init () {
         PMC_str_val(SELF) = string_make(INTERP,NULL,0,NULL,0,NULL);
         PObj_custom_mark_SET(SELF);
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the string as live.
+
+=cut
+
+*/
+
     void mark () {
-	if (PMC_str_val(SELF))
-	    pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+		if (PMC_str_val(SELF))
+			pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the string.
+
+=cut
+
+*/
+
     PMC* clone () {
-	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+		PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_str_val(dest) = string_copy(INTERP,PMC_str_val(SELF));
-	return dest;
+		return dest;
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the string.
+
+=cut
+
+*/
 
     INTVAL get_integer () {
         STRING* s = (STRING*) PMC_str_val(SELF);
         return string_to_int(s);
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point value for the string.
+
+=cut
+
+*/
+
     FLOATVAL get_number () {
         STRING* s = (STRING*) PMC_str_val(SELF);
         return string_to_num(s);
     }
+
+/*
+
+=item C<BIGNUM *get_bignum()>
+
+Unimplemented. Returns C<NULL>.
+
+=cut
+
+*/
 
     BIGNUM* get_bignum () {
         /* XXX */
         return NULL;
     }
 
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the string.
+
+=cut
+
+*/
+
     INTVAL get_bool () {
         return string_bool(PMC_str_val(SELF));
     }
+
+/*
+
+=item C<INTVAL is_same(PMC *other)>
+
+Returns whether the string is the same as C<*other>.
+
+=cut
+
+*/
 
     INTVAL is_same (PMC* other) {
         STRING* s1 = (STRING*)PMC_str_val(SELF);
@@ -60,33 +149,79 @@ pmclass PerlString extends perlscalar {
             (memcmp(s1->strstart,PObj_bufstart(s2),(size_t)s1->bufused)==0));
     }
 
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Morphs the string to a C<PerlInt> and sets its value to C<value>.
+
+=cut
+
+*/
+
     void set_integer_native (INTVAL value) {
-	DYNSELF.morph(enum_class_PerlInt);
+		DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer_native(value);
     }
 
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Morphs the string to a C<PerlNum> and sets its value to C<value>.
+
+=cut
+
+*/
+
     void set_number_native (FLOATVAL value) {
-	DYNSELF.morph(enum_class_PerlNum);
+		DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the string's value to the value of the specified Parrot string.
+
+=cut
+
+*/
+
     void set_string_native (STRING * value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
-		value);
+        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
     }
+
+/*
+
+=item C<void set_string_same(PMC *value)>
+
+Sets the string's value to the value of the specified C<PerlString>.
+
+=cut
+
+*/
 
     void set_string_same (PMC * value) {
         PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF),
 		PMC_str_val(value));
     }
 
-    /* XXX -lt: only add done yet, others will follow, when
-     * vtable changes are carved in electrons
-     */
-    void add (PMC * value, PMC* dest) {
-	int vtype = VTABLE_type(INTERP, value);
+/*
 
-	INTVAL val_type;
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the string and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC * value, PMC* dest) {
+		int vtype = VTABLE_type(INTERP, value);
+
+		INTVAL val_type;
 
         if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest,
@@ -95,18 +230,27 @@ pmclass PerlString extends perlscalar {
             );
         }
         else {
-	    FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
-	    INTVAL pmci = VTABLE_get_integer(INTERP, SELF);
-	    FLOATVAL valf = VTABLE_get_number(INTERP, value);
-	    INTVAL vali = VTABLE_get_integer(INTERP, value);
-
-	    if (pmcf == pmci && valf == vali)
-		VTABLE_set_integer_native(INTERP, dest, pmci + vali);
-	    else
-		VTABLE_set_number_native(INTERP, dest, pmcf + valf);
+			FLOATVAL pmcf = VTABLE_get_number(INTERP, SELF);
+			INTVAL pmci = VTABLE_get_integer(INTERP, SELF);
+			FLOATVAL valf = VTABLE_get_number(INTERP, value);
+			INTVAL vali = VTABLE_get_integer(INTERP, value);
+	
+			if (pmcf == pmci && valf == vali)
+				VTABLE_set_integer_native(INTERP, dest, pmci + vali);
+			else
+				VTABLE_set_number_native(INTERP, dest, pmcf + valf);
         }
     }
 
+/*
+
+=item C<void subtract(PMC *value, PMC *dest)>
+
+Subtracts C<*value> from the string and returns the result in C<*dest>.
+
+=cut
+
+*/
 
     void subtract (PMC* value, PMC* dest) {
         if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
@@ -122,12 +266,21 @@ pmclass PerlString extends perlscalar {
             );
         }
         else {
-	   SUPER(value, dest);
+        	SUPER(value, dest);
         }
     }
 
+/*
 
-    void multiply (PMC* value, PMC* dest) {
+=item C<void multiply(PMC *value, PMC *dest)>
+
+Multiplies the string by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+	void multiply (PMC* value, PMC* dest) {
         if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                 VTABLE_get_integer(INTERP, SELF) *
@@ -141,9 +294,19 @@ pmclass PerlString extends perlscalar {
             );
         }
         else {
-	   SUPER(value, dest);
+			SUPER(value, dest);
         }
     }
+
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+Divides the string by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
 
     void divide (PMC* value, PMC* dest) {
         if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
@@ -159,10 +322,20 @@ pmclass PerlString extends perlscalar {
             );
         }
         else {
-	   SUPER(value, dest);
+			SUPER(value, dest);
         }
     }
 
+/*
+
+=item C<void modulus(PMC *value, PMC *dest)>
+
+Calculates the string C<mod> C<*value> and returns the result in
+C<*dest>.
+
+=cut
+
+*/
 
     void modulus (PMC* value, PMC* dest) {
         if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
@@ -177,72 +350,159 @@ pmclass PerlString extends perlscalar {
         }
     }
 
+/*
 
-    /*
-     * string bitwise operations
-     */
+=back
+
+=head2 String Bitwise Operations
+
+=over 4
+
+=item C<void bitwise_ors(PMC* value, PMC* dest)>
+
+=cut
+
+*/
+
     void bitwise_ors (PMC* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_or(interpreter, PMC_str_val(SELF),
-		    VTABLE_get_string(INTERP, value), NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		result = string_bitwise_or(interpreter, PMC_str_val(SELF),
+			VTABLE_get_string(INTERP, value), NULL);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_ors_str(STRING *value, PMC *dest)>
+
+Calculates the string bitwise C<OR> for the string and C<*value> and
+returns the result in C<*dest>.
+
+=cut
+
+*/
 
     void bitwise_ors_str (STRING* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_or(interpreter, PMC_str_val(SELF),
+		result = string_bitwise_or(interpreter, PMC_str_val(SELF),
 		    value, NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_xors(PMC *value, PMC *dest)>
+
+=cut
+
+*/
 
     void bitwise_xors (PMC* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_xor(interpreter, PMC_str_val(SELF),
+		result = string_bitwise_xor(interpreter, PMC_str_val(SELF),
 		    VTABLE_get_string(INTERP, value), NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_xors_str(STRING *value, PMC *dest)>
+
+Calculates the string bitwise C<XOR> for the string and C<*value> and
+returns the result in C<*dest>.
+
+=cut
+
+*/
 
     void bitwise_xors_str (STRING* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_xor(interpreter, PMC_str_val(SELF),
+		result = string_bitwise_xor(interpreter, PMC_str_val(SELF),
 		    value, NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_ands(PMC *value, PMC *dest)>
+
+=cut
+
+*/
 
     void bitwise_ands (PMC* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_and(interpreter, PMC_str_val(SELF),
+		result = string_bitwise_and(interpreter, PMC_str_val(SELF),
 		    VTABLE_get_string(INTERP, value), NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_ands_str(STRING *value, PMC *dest)>
+
+Calculates the string bitwise C<AND> for the string and C<*value> and
+returns the result in C<*dest>.
+
+=cut
+
+*/
 
     void bitwise_ands_str (STRING* value, PMC* dest) {
-	STRING* result;
+		STRING* result;
 
-	result = string_bitwise_and(interpreter, PMC_str_val(SELF),
+		result = string_bitwise_and(interpreter, PMC_str_val(SELF),
 		    value, NULL);
-	VTABLE_set_string_native(INTERP, dest, result);
+		VTABLE_set_string_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void concatenate(PMC *value, PMC *dest)>
+
+=cut
+
+*/
 
     void concatenate (PMC* value, PMC* dest) {
         STRING* s = PMC_str_val(SELF);
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+		VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) =
             string_concat(INTERP, s, VTABLE_get_string(INTERP, value), 0);
     }
 
+/*
+
+=item C<void concatenate_native(STRING *value, PMC *dest)>
+
+Concatenates the string and C<*value> and returns the result in
+C<*dest>.
+
+=cut
+
+*/
+
     void concatenate_native (STRING* value, PMC* dest) {
         STRING* s = PMC_str_val(SELF);
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+		VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) = string_concat(INTERP, s, value, 0);
     }
 
-    /* == operation */
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
     INTVAL is_equal (PMC* value) {
         return (INTVAL)( 0 == string_compare(INTERP,
                                              PMC_str_val(SELF),
@@ -250,141 +510,257 @@ pmclass PerlString extends perlscalar {
                                             ));
     }
 
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Returns the result of comparing the string with C<*value>.
+
+=cut
+
+*/
+
     INTVAL cmp(PMC* value) {
         return string_compare(INTERP, PMC_str_val(SELF),
 			      VTABLE_get_string(INTERP, value));
     }
 
+/*
+
+=item C<void repeat(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the string repeated C<*value> times.
+
+=cut
+
+*/
+
     void repeat (PMC* value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlString);
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+		DYNSELF.morph(enum_class_PerlString);
+		VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) =
            string_repeat(INTERP, PMC_str_val(SELF),
                          (UINTVAL)VTABLE_get_integer(INTERP, value), NULL
                         );
     }
 
+/*
+
+=item C<void repeat_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the string repeated C<value> times.
+
+=cut
+
+*/
+
     void repeat_int (INTVAL value, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlString);
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+		DYNSELF.morph(enum_class_PerlString);
+		VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) = string_repeat(INTERP,
 		PMC_str_val(SELF), (UINTVAL)value, NULL);
     }
+
+/*
+
+=item C<void increment()>
+
+=cut
+
+*/
 
     void increment () {
     	/* XXX perl5 like= */
     }
 
+/*
+
+=item C<void decrement()>
+
+These two methods are unimplemented and do nothing. They should provide
+Perl 5 like string incrementation.
+
+=cut
+
+*/
+
     void decrement () {
     	/* XXX perl5 like= */
     }
 
+/*
+
+=item C<void substr(INTVAL offset, INTVAL length, PMC *dest)>
+
+Returns in C<*dest> the C<length> character substring of the string
+starting at C<offset>.
+
+=cut
+
+*/
+
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
-	DYNSELF.morph(enum_class_PerlString);
-	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+		DYNSELF.morph(enum_class_PerlString);
+		VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) = string_substr(INTERP,
 			PMC_str_val(SELF), offset, length, NULL, 0);
     }
+
+/*
+
+=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
+
+Returns the C<length> character substring of the string starting at
+C<offset>.
+
+
+=cut
+
+*/
 
     STRING* substr_str (INTVAL offset, INTVAL length) {
         return string_substr(INTERP, PMC_str_val(SELF), offset,
 			length, NULL, 0);
     }
-    /*
-     * iterator interface
-     */
-    PMC* nextkey_keyed (PMC* key, INTVAL what) {
-	PMC *ret = key;
-	STRING *s = PMC_str_val(SELF);
-	INTVAL n = string_length(s);
-	union {
-	    const void * __c_ptr;
-	    void * __ptr;
-	} __ptr_u;
 
-	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
-	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-	switch (what) {
-	    case ITERATE_FROM_START:	/* reset key */
-		PMC_int_val(ret) = 0;
-		if (!n)
-		    PMC_int_val(ret) = -1;
-		PMC_data(key) = s->strstart;
-		break;
-	    case ITERATE_GET_NEXT:
-		if (PMC_int_val(ret) < n - 1) {
-		    ++PMC_int_val(ret);
-		    if ((char *)PMC_data(key) >= (char *)s->strstart &&
-			(char *)PMC_data(key) <= (char *)s->strstart +
-			    s->bufused)
-			PMC_data(key) = const_cast(
-			    s->encoding->skip_forward( PMC_data(key), 1));
-		    else
-			PMC_data(key) = const_cast(
-			    s->encoding->skip_forward(s->strstart,
-				PMC_int_val(ret)));
+/*
+
+=back
+
+=head2 Iterator Interface
+
+=over 4
+
+=item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
+
+Returns the next key relative to the location and direction specified in
+C<what>.
+
+=cut
+
+*/
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+		PMC *ret = key;
+		STRING *s = PMC_str_val(SELF);
+		INTVAL n = string_length(s);
+		union {
+			const void * __c_ptr;
+			void * __ptr;
+		} __ptr_u;
+	
+		PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
+		PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
+		switch (what) {
+			case ITERATE_FROM_START:	/* reset key */
+				PMC_int_val(ret) = 0;
+				if (!n)
+					PMC_int_val(ret) = -1;
+				PMC_data(key) = s->strstart;
+				break;
+			case ITERATE_GET_NEXT:
+				if (PMC_int_val(ret) < n - 1) {
+					++PMC_int_val(ret);
+					if ((char *)PMC_data(key) >= (char *)s->strstart &&
+					(char *)PMC_data(key) <= (char *)s->strstart +
+						s->bufused)
+					PMC_data(key) = const_cast(
+						s->encoding->skip_forward( PMC_data(key), 1));
+					else
+					PMC_data(key) = const_cast(
+						s->encoding->skip_forward(s->strstart,
+						PMC_int_val(ret)));
+				}
+				else
+					PMC_int_val(ret) = -1;
+				break;
+			case ITERATE_GET_PREV:
+				if (PMC_int_val(ret) >= 0) {
+					--PMC_int_val(ret);
+					if (PMC_int_val(ret) >= 0) {
+					if ((char *)PMC_data(key) >= (char *)s->strstart &&
+						(char *)PMC_data(key) <= (char *)s->strstart +
+						s->bufused)
+						PMC_data(key) = const_cast(
+						s->encoding->skip_backward( PMC_data(key), 1));
+					else
+						PMC_data(key) = const_cast(
+						s->encoding->skip_forward(s->strstart,
+							PMC_int_val(ret)));
+					}
+				}
+				break;
+			case ITERATE_FROM_END:
+				PMC_int_val(ret) = n-1;
+				PMC_data(key) = (char *)s->strstart + s->bufused;
+				PMC_data(key) = const_cast(
+						s->encoding->skip_backward( PMC_data(key), 1));
+				break;
 		}
-		else
-		    PMC_int_val(ret) = -1;
-		break;
-	    case ITERATE_GET_PREV:
-		if (PMC_int_val(ret) >= 0) {
-		    --PMC_int_val(ret);
-		    if (PMC_int_val(ret) >= 0) {
-			if ((char *)PMC_data(key) >= (char *)s->strstart &&
-				(char *)PMC_data(key) <= (char *)s->strstart +
-				s->bufused)
-			    PMC_data(key) = const_cast(
-				s->encoding->skip_backward( PMC_data(key), 1));
-			else
-			    PMC_data(key) = const_cast(
-				s->encoding->skip_forward(s->strstart,
-					PMC_int_val(ret)));
-		    }
-		}
-		break;
-	    case ITERATE_FROM_END:
-		PMC_int_val(ret) = n-1;
-		PMC_data(key) = (char *)s->strstart + s->bufused;
-		PMC_data(key) = const_cast(
-			    s->encoding->skip_backward( PMC_data(key), 1));
-		break;
-	}
-	return ret;
+		return ret;
     }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the string value for C<*key>.
+
+=cut
+
+*/
 
     STRING* get_string_keyed(PMC* key) {
-	STRING *res;
-	STRING *s = PMC_str_val(SELF);
-	union {
-	    const void * __c_ptr;
-	    void * __ptr;
-	} __ptr_u;
-	if ((char*)PMC_data(key) >= (char *)s->strstart &&
-		(char *)PMC_data(key) <= (char *)s->strstart + s->bufused)
-	    ;
-	else
-	    PMC_data(key) = const_cast(s->encoding->skip_forward(
-		 s->strstart, PMC_int_val(key)));
-	res = string_copy(interpreter, s);
-	res->strstart = PMC_data(key);
-	res->strlen = 1;
-	res->bufused = (const char *)res->encoding->skip_forward(
-		res->strstart, 1) - (const char *)res->strstart;
-	return res;
-
-    }
-    INTVAL get_integer_keyed(PMC* key) {
-	STRING *s = PMC_str_val(SELF);
-	if ((char*)PMC_data(key) >= (char *)s->strstart &&
-		(char *)PMC_data(key) <= (char *)s->strstart + s->bufused) {
-	    if (s->encoding->index == enum_encoding_singlebyte)
-		return *(unsigned char*) PMC_data(key);
-	    else
-		return s->encoding->decode(PMC_data(key));
+		STRING *res;
+		STRING *s = PMC_str_val(SELF);
+		union {
+			const void * __c_ptr;
+			void * __ptr;
+		} __ptr_u;
+		if ((char*)PMC_data(key) >= (char *)s->strstart &&
+			(char *)PMC_data(key) <= (char *)s->strstart + s->bufused)
+			;
+		else
+			PMC_data(key) = const_cast(s->encoding->skip_forward(
+			 s->strstart, PMC_int_val(key)));
+		res = string_copy(interpreter, s);
+		res->strstart = PMC_data(key);
+		res->strlen = 1;
+		res->bufused = (const char *)res->encoding->skip_forward(
+			res->strstart, 1) - (const char *)res->strstart;
+		return res;
+	
 	}
-	else
-	    return s->encoding->decode(s->encoding->skip_forward(s->strstart,
-			PMC_int_val(key)));
+		
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value for C<*key>.
+
+=cut
+
+*/
+
+	INTVAL get_integer_keyed(PMC* key) {
+		STRING *s = PMC_str_val(SELF);
+		if ((char*)PMC_data(key) >= (char *)s->strstart &&
+			(char *)PMC_data(key) <= (char *)s->strstart + s->bufused) {
+			if (s->encoding->index == enum_encoding_singlebyte)
+			return *(unsigned char*) PMC_data(key);
+			else
+			return s->encoding->decode(PMC_data(key));
+		}
+		else
+			return s->encoding->decode(s->encoding->skip_forward(s->strstart,
+				PMC_int_val(key)));
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

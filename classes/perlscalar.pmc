@@ -1,63 +1,99 @@
-/* perlscalar.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info:
- *     $Id$
- *  Overview:
- *     Abstract base class for perl scalars
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     This class implements common perl scalar functionality:
- *     e.g morphing to another scalar type.
- *     The morph method replaces the CHANGE_TYPE macro.
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/perlscalar.pmc - Perl Scalar
+
+=head1 DESCRIPTION
+
+Abstract base class for perl scalars.
+
+This class implements common perl scalar functionality: e.g morphing to
+another scalar type. The morph method replaces the CHANGE_TYPE macro.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 
 pmclass perlscalar abstract noinit extends scalar {
 
-    void morph (INTVAL type) {
-	if (SELF->vtable->base_type == type)
-	    return;
-	if (SELF->vtable->base_type == enum_class_PerlString) {
-	    PObj_custom_mark_CLEAR(SELF);
-	    SELF->vtable = Parrot_base_vtables[type];
-	    return;
-	}
-	if (type == enum_class_PerlString) {
-	    /*
-	     * if we morph to a string, first clear str_val
-	     * so that after changing the vtable a parallel
-	     * reader doesn't get a gargabe pointer
-	     */
-	    PMC_str_val(SELF) = NULL;
-	    PObj_custom_mark_SET(SELF);
-	    SELF->vtable = Parrot_base_vtables[type];
-	    return;
-	}
-	SELF->vtable = Parrot_base_vtables[type];
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+	void morph (INTVAL type) {
+		if (SELF->vtable->base_type == type)
+			return;
+		if (SELF->vtable->base_type == enum_class_PerlString) {
+			PObj_custom_mark_CLEAR(SELF);
+			SELF->vtable = Parrot_base_vtables[type];
+			return;
+		}
+		if (type == enum_class_PerlString) {
+			/*
+			 * if we morph to a string, first clear str_val
+			 * so that after changing the vtable a parallel
+			 * reader doesn't get a gargabe pointer
+			 */
+			PMC_str_val(SELF) = NULL;
+			PObj_custom_mark_SET(SELF);
+			SELF->vtable = Parrot_base_vtables[type];
+			return;
+		}
+		SELF->vtable = Parrot_base_vtables[type];
     }
 
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
     void set_pmc (PMC* value) {
-	DYNSELF.morph(value->vtable->base_type);
-	switch (value->vtable->base_type) {
-	    case enum_class_Boolean:
-	    case enum_class_PerlInt:
-		DYNSELF.set_integer_same(value);
-		break;
-	    case enum_class_PerlNum:
-		DYNSELF.set_number_same(value);
-		break;
-	    case enum_class_PerlString:
-		DYNSELF.set_string_same(value);
-		break;
-	    case enum_class_PerlUndef:
-		(void) VTABLE_get_pmc(interpreter, value);
-		break;
-	}
+		DYNSELF.morph(value->vtable->base_type);
+		switch (value->vtable->base_type) {
+			case enum_class_Boolean:
+			case enum_class_PerlInt:
+				DYNSELF.set_integer_same(value);
+				break;
+			case enum_class_PerlNum:
+				DYNSELF.set_number_same(value);
+				break;
+			case enum_class_PerlString:
+				DYNSELF.set_string_same(value);
+				break;
+			case enum_class_PerlUndef:
+				(void) VTABLE_get_pmc(interpreter, value);
+				break;
+		}
     }
 
 }
 
+/*
+
+=back
+
+=cut
+
+*/

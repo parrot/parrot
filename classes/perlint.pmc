@@ -1,14 +1,22 @@
-/* perlint.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the PerlInt base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/perlint.pmc - Perl Integer
+
+=head1 DESCRIPTION
+
+C<PerlInt> extends C<perlscalar> to provide a Perl integer.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
@@ -16,261 +24,485 @@
 
 pmclass PerlInt extends perlscalar {
 
+/*
+
+=item C<void init()>
+
+Initializes the integer with a default value of C<0>.
+
+=cut
+
+*/
     void init () {
         PMC_int_val(SELF) = 0;
     }
 
+/*
+
+=item C<void share()>
+
+
+
+=cut
+
+*/
     void share () {
-	/*
-	 * assume that the access to an int is atomic
-	 */
-	if (sizeof(INTVAL) != sizeof(int))
-	    SUPER();
+        /*
+         * assume that the access to an int is atomic
+         */
+        if (sizeof(INTVAL) != sizeof(int))
+            SUPER();
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point value of the integer.
+
+=cut
+
+*/
     FLOATVAL get_number () {
         return (FLOATVAL)PMC_int_val(SELF);
     }
 
+/*
+
+=item C<BIGNUM *get_bignum()>
+
+Unimplemented. Returns C<NULL>.
+
+=cut
+
+*/
     BIGNUM* get_bignum () {
         /* XXX */
         return NULL;
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Returns the string value of the integer.
+
+=cut
+
+*/
     STRING* get_string () {
         return string_from_int(INTERP, PMC_int_val(SELF));
     }
 
+/*
 
+=item C<void set_integer_same(PMC *value)>
+
+Sets the value of the integer to the value of the C<PerlInt> C<*value>.
+
+=cut
+
+*/
     void set_integer_same (PMC * value) {
         PMC_int_val(SELF) = PMC_int_val(value);
     }
 
+/*
+
+=item C<void set_number(PMC *value)>
+
+Morphs the integer to a C<PerlNum> and sets the value from C<*value>.
+
+=cut
+
+*/
     void set_number (PMC* value) {
-	DYNSELF.morph(enum_class_PerlNum);
+        DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number(value);
     }
 
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Morphs the integer to a C<PerlNum> and sets the value from C<value>.
+
+=cut
+
+*/
     void set_number_native (FLOATVAL value) {
-	DYNSELF.morph(enum_class_PerlNum);
+        DYNSELF.morph(enum_class_PerlNum);
         DYNSELF.set_number_native(value);
     }
 
+/*
+
+=item C<void set_bignum(PMC *value)>
+
+=cut
+
+*/
     void set_bignum (PMC* value) {
         /* XXX not sure if this can be optimized further safely */
         PMC_struct_val(SELF) = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-	/* SELF->vtable = Parrot_base_vtables[enum_class_PerlBigNum]; */
+        /* SELF->vtable = Parrot_base_vtables[enum_class_PerlBigNum]; */
     }
 
+/*
+
+=item C<void set_bignum_native(BIGNUM *value)>
+
+=cut
+
+*/
     void set_bignum_native (BIGNUM* value) {
         /* XXX Some of this bignum stuff is starting to look pretty redundant -DML */
         PMC_struct_val(SELF) = value; /* Maybe we need a copy */
         /* SELF->vtable = Parrot_base_vtables[enum_class_PerlBignum]; */
     }
 
+/*
+
+=item C<void set_string (PMC *value)>
+
+=cut
+
+*/
     void set_string (PMC* value) {
-	DYNSELF.morph(enum_class_PerlString);
+        DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string(value);
     }
 
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the value of the integer to C<*value>.
+
+=cut
+
+*/
     void set_string_native (STRING* value) {
-	DYNSELF.morph(enum_class_PerlString);
+        DYNSELF.morph(enum_class_PerlString);
         DYNSELF.set_string_native(value);
     }
 
+/*
+
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
     void add (PMC* value, PMC* dest) {
         INTVAL pmci;
-	int vtype = VTABLE_type(INTERP, value);
-	FLOATVAL valf;
-	FLOATVAL sumf;
-
-	pmci = PMC_int_val(SELF);
-	if (vtype == enum_class_PerlUndef) {
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL sumf;
+    
+        pmci = PMC_int_val(SELF);
+        if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, pmci);
-	    return;
-	}
+            return;
+        }
 
-	valf = VTABLE_get_number(INTERP, value);
-	sumf = pmci + valf;
-	if (vtype == enum_class_PerlNum) {
+        valf = VTABLE_get_number(INTERP, value);
+        sumf = pmci + valf;
+        if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, sumf);
-	    return;
-	}
-	{
-	    INTVAL vali = (INTVAL) valf;
-	    INTVAL   sumi = pmci + vali;
-	    if (sumf == sumi)
-		VTABLE_set_integer_native(INTERP, dest, sumi);
-	    else {
-		/* TODO BIG* promotion */
-		VTABLE_set_number_native(INTERP, dest, sumf);
-	    }
-	    return;
-
-	}
+            return;
+        }
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   sumi = pmci + vali;
+            if (sumf == sumi)
+                VTABLE_set_integer_native(INTERP, dest, sumi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, sumf);
+            }
+            return;
+    
+        }
     }
 
+/*
+
+=item C<void subtract(PMC *value, PMC *dest)>
+
+Subtracts C<*value> from the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
     void subtract (PMC* value, PMC* dest) {
         INTVAL pmci;
-	int vtype = VTABLE_type(INTERP, value);
-	FLOATVAL valf;
-	FLOATVAL diff;
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL diff;
 
-	pmci = PMC_int_val(SELF);
-	if (vtype == enum_class_PerlUndef) {
+        pmci = PMC_int_val(SELF);
+        if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, pmci);
-	    return;
-	}
+            return;
+        }
 
-	valf = VTABLE_get_number(INTERP, value);
-	diff = pmci - valf;
-	if (vtype == enum_class_PerlNum) {
+        valf = VTABLE_get_number(INTERP, value);
+        diff = pmci - valf;
+        if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, diff);
-	    return;
-	}
-	{
-	    INTVAL vali = (INTVAL) valf;
-	    INTVAL   difi = pmci - vali;
-	    if (diff == difi)
-		VTABLE_set_integer_native(INTERP, dest, difi);
-	    else {
-		/* TODO BIG* promotion */
-		VTABLE_set_number_native(INTERP, dest, diff);
-	    }
-	    return;
-
-	}
+            return;
+        }
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   difi = pmci - vali;
+            if (diff == difi)
+                VTABLE_set_integer_native(INTERP, dest, difi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, diff);
+            }
+            return;
+    
+        }
     }
 
+/*
+
+=item C<void subtract_int(INTVAL value, PMC *dest)>
+
+Subtracts C<value> from the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
     void subtract_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) - value
         );
     }
 
+/*
+
+=item C<void multiply(PMC *value, PMC *dest)>
+
+Multiplies the integer by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void multiply (PMC* value, PMC* dest) {
         INTVAL pmci;
-	int vtype = VTABLE_type(INTERP, value);
-	FLOATVAL valf;
-	FLOATVAL mulf;
-
-	pmci = PMC_int_val(SELF);
-	if (vtype == enum_class_PerlUndef) {
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL mulf;
+    
+        pmci = PMC_int_val(SELF);
+        if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, 0);
-	    return;
-	}
-
-	valf = VTABLE_get_number(INTERP, value);
-	mulf = pmci * valf;
-	if (vtype == enum_class_PerlNum) {
+            return;
+        }
+    
+        valf = VTABLE_get_number(INTERP, value);
+        mulf = pmci * valf;
+        if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, mulf);
-	    return;
-	}
-	{
-	    INTVAL vali = (INTVAL) valf;
-	    INTVAL   muli = pmci * vali;
-	    if (mulf == muli)
-		VTABLE_set_integer_native(INTERP, dest, muli);
-	    else {
-		/* TODO BIG* promotion */
-		VTABLE_set_number_native(INTERP, dest, mulf);
-	    }
-	    return;
-
-	}
+            return;
+        }
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   muli = pmci * vali;
+            if (mulf == muli)
+                VTABLE_set_integer_native(INTERP, dest, muli);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, mulf);
+            }
+            return;
+    
+        }
     }
 
+/*
+
+=item C<void multiply_int(INTVAL value, PMC *dest)>
+
+Multiplies the integer by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void multiply_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) * value
         );
     }
 
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+Divides the integer by C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void divide (PMC* value, PMC* dest) {
         INTVAL pmci;
-	int vtype = VTABLE_type(INTERP, value);
-	FLOATVAL valf;
-	FLOATVAL divf;
-
+        int vtype = VTABLE_type(INTERP, value);
+        FLOATVAL valf;
+        FLOATVAL divf;
+    
         /* TODO: Is this the appropriate way to throw the exception? */
-
-	pmci = PMC_int_val(SELF);
-	if (vtype == enum_class_PerlUndef) {
+    
+        pmci = PMC_int_val(SELF);
+        if (vtype == enum_class_PerlUndef) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
-	    return;
-	}
-
-	valf = VTABLE_get_number(INTERP, value);
-        if (valf == 0.0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
-	    return;
-	}
-
-	divf = pmci / valf;
-	if (vtype == enum_class_PerlNum) {
+            return;
+        }
+    
+        valf = VTABLE_get_number(INTERP, value);
+            if (valf == 0.0) {
+                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            return;
+        }
+    
+        divf = pmci / valf;
+        if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, divf);
-	    return;
-	}
-	{
-	    INTVAL vali = (INTVAL) valf;
-	    INTVAL   divi = pmci / vali;
-	    /* if result is an integer or zero yield an integer */
-	    if (divf == divi || !pmci)
-		VTABLE_set_integer_native(INTERP, dest, divi);
-	    else {
-		/* TODO BIG* promotion */
-		VTABLE_set_number_native(INTERP, dest, divf);
-	    }
-	    return;
-
-	}
+            return;
+        }
+        {
+            INTVAL vali = (INTVAL) valf;
+            INTVAL   divi = pmci / vali;
+            /* if result is an integer or zero yield an integer */
+            if (divf == divi || !pmci)
+                VTABLE_set_integer_native(INTERP, dest, divi);
+            else {
+                /* TODO BIG* promotion */
+                VTABLE_set_number_native(INTERP, dest, divf);
+            }
+            return;
+    
+        }
     }
 
+/*
+
+=item C<void divide_int(INTVAL value, PMC *dest)>
+
+Divides the integer by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void divide_int (INTVAL value, PMC* dest) {
-	INTVAL pmci, divi;
-	FLOATVAL valf, divf;
-
-	pmci = PMC_int_val(SELF);
-	/* TODO exception */
-	divf = (FLOATVAL)pmci / value;
-	divi = pmci / value;
-	if (divf == divi || !pmci)
-	    VTABLE_set_integer_native(INTERP, dest, divi);
-	else {
-	    /* TODO BIG* promotion */
-	    VTABLE_set_number_native(INTERP, dest, divf);
-	}
+        INTVAL pmci, divi;
+        FLOATVAL valf, divf;
+    
+        pmci = PMC_int_val(SELF);
+        /* TODO exception */
+        divf = (FLOATVAL)pmci / value;
+        divi = pmci / value;
+        if (divf == divi || !pmci)
+            VTABLE_set_integer_native(INTERP, dest, divi);
+        else {
+            /* TODO BIG* promotion */
+            VTABLE_set_number_native(INTERP, dest, divf);
+        }
     }
 
+/*
+
+=item C<void cmodulus(PMC *value, PMC *dest)>
+
+Calculates the value of the integer C-style C<mod> C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void cmodulus (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
                                   PMC_int_val(SELF) %
                                   VTABLE_get_integer(INTERP, value));
     }
 
+/*
+
+=item C<void cmodulus_int(INTVAL value, PMC *dest) >
+
+Calculates the value of the integer C-style C<mod> C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void cmodulus_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) % value);
     }
 
+/*
+
+=item C<void modulus(PMC *value, PMC *dest)>
+
+Calculates the value of the integer C<mod> C<*value> and returns the
+result in C<*dest>.
+
+=cut
+
+*/
     void modulus (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-		intval_mod(PMC_int_val(SELF),
-		    VTABLE_get_integer(INTERP, value)));
+            intval_mod(PMC_int_val(SELF),
+            VTABLE_get_integer(INTERP, value)));
     }
 
+/*
+
+=item C<void modulus_int(INTVAL value, PMC *dest)>
+
+Calculates the value of the integer C<mod> C<value> and returns the
+result in C<*dest>.
+
+=cut
+
+*/
     void modulus_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-		intval_mod(PMC_int_val(SELF), value));
+            intval_mod(PMC_int_val(SELF), value));
     }
 
+/*
+
+=item C<void neg(PMC *dest)>
+
+If C<dest> is true, then the negation of the integer is returned in
+C<*dest>. Otherwise the integer itself is negated.
+
+=cut
+
+*/
     void neg (PMC* dest) {
-	if (!dest)
-	    PMC_int_val(SELF) = -PMC_int_val(SELF);
-	else
-	    VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
+        if (!dest)
+            PMC_int_val(SELF) = -PMC_int_val(SELF);
+        else
+            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
     }
 
+/*
+
+=item C<void bitwise_or(PMC *value, PMC *dest)>
+
+Calculates the bitwise C<OR> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_or (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) |
@@ -278,12 +510,32 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
+/*
+
+=item C<void bitwise_or_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<OR> of the integer and C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_or_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) | value
         );
     }
 
+/*
+
+=item C<void bitwise_and(PMC *value, PMC *dest)>
+
+Calculates the bitwise C<AND> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_and (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) &
@@ -291,12 +543,32 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
+/*
+
+=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<AN> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_and_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) & value
         );
     }
 
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+Calculates the bitwise C<XOR> of the integer and C<*value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_xor (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) ^
@@ -304,16 +576,46 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
+/*
+
+=item C<void bitwise_xor_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise C<XOR> of the integer and C<value> and returns
+the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_xor_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) ^ value
         );
     }
 
+/*
+
+=item C<void bitwise_not(PMC *dest)>
+
+Calculates the bitwise C<NOT> of the integer and returns the result in
+C<*dest>.
+
+=cut
+
+*/
     void bitwise_not (PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest, ~PMC_int_val(SELF));
     }
 
+/*
+
+=item C<void bitwise_shr(PMC *value, PMC *dest)>
+
+Calculates the bitwise shift right (C<<<>>>>>) of the integer by
+C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_shr (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) >>
@@ -321,12 +623,32 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
+/*
+
+=item C<void bitwise_shr_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise shift right (C<<<>>>>>) of the integer by
+C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_shr_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) >> value
         );
     }
 
+/*
+
+=item C<void bitwise_shl(PMC *value, PMC *dest)>
+
+Calculates the bitwise shift left (C<<<<<>>>) of the integer by
+C<*value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_shl (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) <<
@@ -334,104 +656,209 @@ pmclass PerlInt extends perlscalar {
         );
     }
 
+/*
+
+=item C<void bitwise_shl_int(INTVAL value, PMC *dest)>
+
+Calculates the bitwise shift left (C<<<<<>>>) of the integer by
+C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
     void bitwise_shl_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) << value
         );
     }
 
-    /* == operation */
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
+
+The C<==> operation.
+
+=cut
+
+*/
     INTVAL is_equal (PMC* value) {
         return (INTVAL)(PMC_int_val(SELF) ==
-	VTABLE_get_integer(INTERP, value));
+            VTABLE_get_integer(INTERP, value));
     }
 
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Returns the result of comparing the integer with C<*value>.
+
+=cut
+
+*/
     INTVAL cmp(PMC* value) {
-	if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL fdiff = PMC_int_val(SELF)
-		- VTABLE_get_number(INTERP, value);
-	    if (fdiff == 0) {
-		INTVAL idiff = PMC_int_val(SELF)
-		    - VTABLE_get_integer(INTERP, value);
-		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
-	    } else {
-		return fdiff > 0 ? 1 : -1;
-	    }
-	}
-	else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
-	    FLOATVAL diff;
-	    diff = (FLOATVAL)PMC_int_val(SELF)
-		- VTABLE_get_number(INTERP, value);
-	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-	}
-	else {
-	    /* int or undef */
-	    INTVAL diff = PMC_int_val(SELF)
-		- VTABLE_get_integer(INTERP, value);
-	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-	}
+        if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
+            FLOATVAL fdiff = PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            if (fdiff == 0) {
+                INTVAL idiff = PMC_int_val(SELF)
+                    - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            } else {
+                return fdiff > 0 ? 1 : -1;
+            }
+        }
+        else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
+            FLOATVAL diff;
+            diff = (FLOATVAL)PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+        else {
+            /* int or undef */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
     }
 
+/*
+
+=item C<INTVAL cmp_num(PMC *value)>
+
+Returns the result of numerically comparing the integer with C<*value>.
+
+=cut
+
+*/
     INTVAL cmp_num(PMC* value) {
-	if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
-	    FLOATVAL fdiff = PMC_int_val(SELF)
-		- VTABLE_get_number(INTERP, value);
-	    if (fdiff == 0) {
-		INTVAL idiff = PMC_int_val(SELF)
-		    - VTABLE_get_integer(INTERP, value);
-		return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
-	    } else {
-		return fdiff > 0 ? 1 : -1;
-	    }
-	}
-	else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
-	    FLOATVAL diff;
-	    diff = (FLOATVAL)PMC_int_val(SELF)
-		- VTABLE_get_number(INTERP, value);
-	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-	}
-	else {
-	    /* int or undef */
-	    INTVAL diff = PMC_int_val(SELF)
-		- VTABLE_get_integer(INTERP, value);
-	    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-	}
+        if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
+            FLOATVAL fdiff = PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            if (fdiff == 0) {
+                INTVAL idiff = PMC_int_val(SELF)
+                    - VTABLE_get_integer(INTERP, value);
+                return idiff > 0 ? 1 : idiff < 0 ? -1 : 0;
+            } else {
+                return fdiff > 0 ? 1 : -1;
+            }
+        }
+        else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
+            FLOATVAL diff;
+            diff = (FLOATVAL)PMC_int_val(SELF)
+                - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+        else {
+            /* int or undef */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
     }
 
+/*
 
+=item C<void logical_not(PMC *value)>
+
+Calculates the logical negation of the integer and returns the result in
+C<*value>.
+
+=cut
+
+*/
     void logical_not (PMC* value) {
-	    VTABLE_set_integer_native(INTERP, value,
-	    !PMC_int_val(SELF));
+        VTABLE_set_integer_native(INTERP, value, !PMC_int_val(SELF));
     }
 
+/*
+
+=item C<void repeat(PMC *value, PMC *dest)>
+
+=cut
+
+*/
     void repeat (PMC* value, PMC* dest) {
-	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented in class 'PerlInt'\n");
+        internal_exception(INVALID_OPERATION,
+        	"repeat() not implemented in class 'PerlInt'\n");
     }
 
+/*
+
+=item C<void repeat_int(INTVAL value, PMC *dest)>
+
+These two methods raise an "invalid operation" exception.
+
+=cut
+
+*/
     void repeat_int (INTVAL value, PMC* dest) {
-	internal_exception(INVALID_OPERATION,
-		"repeat() not implemented in class 'PerlInt'\n");
+        internal_exception(INVALID_OPERATION,
+        "repeat() not implemented in class 'PerlInt'\n");
     }
 
+/*
+
+=item C<void increment()>
+
+Increments the integer.
+
+=cut
+
+*/
     void increment () {
         PMC_int_val(SELF) ++;
     }
 
+/*
+
+=item C<void decrement()>
+
+Decrements the integer.
+
+=cut
+
+*/
     void decrement () {
         PMC_int_val(SELF) --;
     }
 
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the integer.
+
+=cut
+
+*/
     void freeze(visit_info *info) {
-	IMAGE_IO *io = info->image_io;
-	SUPER(info);
-	io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
     }
 
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the integer.
+
+=cut
+
+*/
     void thaw(visit_info *info) {
-	IMAGE_IO *io = info->image_io;
-	SUPER(info);
-	if (info->extra_flags == EXTRA_IS_NULL)
-	    PMC_int_val(SELF) = io->vtable->shift_integer(INTERP, io);
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_int_val(SELF) = io->vtable->shift_integer(INTERP, io);
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
+ 
