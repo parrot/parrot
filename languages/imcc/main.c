@@ -430,6 +430,7 @@ int main(int argc, char * argv[])
         else if (ext && strcmp (ext, ".o") == 0) {
             load_pbc = 1;
             write_pbc = 0;
+            run_pbc = 1;
             Parrot_setup_opt(interpreter, 0, output);
             Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
         }

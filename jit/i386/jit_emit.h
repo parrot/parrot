@@ -3026,7 +3026,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             break;
         case 'b':   /* (void *) = new_buffer_header->bufstart */
             /* preserve return value */
-            jit_emit_mov_rr_i(pc, emit_EBX, emit_EAX);
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
             emitm_pushl_i(pc, interpreter);
             emitm_calll(pc, (char*)new_buffer_header - pc - 4);
             emitm_addb_i_r(pc, 4, emit_ESP);
@@ -3034,8 +3034,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             /* set external flag */
             emitm_orl_i_m(pc, PObj_external_FLAG, emit_EAX, 0, 1,
                     offsetof(pobj_t, flags));
-            /* mov %ebx, (bufstart) %eax */
-            emitm_movl_r_m(pc, emit_EBX, emit_EAX, 0, 1,
+            /* mov %edx, (bufstart) %eax */
+            emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
                     offsetof(Buffer, bufstart));
             /* place result in SReg */
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);

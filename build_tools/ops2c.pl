@@ -52,11 +52,13 @@ my $incdir  = "include/parrot/oplib";
 my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops${suffix}.c";
+my $dynamic;
 
 if ($base =~ m!^dynoplibs/!) {
     $header = "${base}_ops${suffix}.h";
     $base =~ s!^dynoplibs/!!;
     $include = "${base}_ops${suffix}.h";
+    $dynamic = 1;
 }
 
 my %hashed_ops;
@@ -129,12 +131,24 @@ my $preamble = <<END_C;
 
 END_C
 
+my $init_func;
+# TODO get rid of version in init names
+#      do version checking with a Version PMC
+# TODO dynamic extensions are called with an Interp* argument
+#
+if ($dynamic) {
+    $init_func = "Parrot_lib_load_${base}${suffix}_ops"
+}
+else {
+    $init_func = "Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}"
+}
+
 print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-extern op_lib_t *Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init);
+extern op_lib_t *$init_func(int init);
 
 END_C
 my $cg_func = $suffix =~ /cgp/ ? 'cgp_' :
@@ -558,7 +572,6 @@ else {
 static void hop_deinit(void) {}
 END_C
 }
-
 print SOURCE <<END_C;
 
 /*
@@ -577,7 +590,7 @@ static op_lib_t op_lib = {
 };
 
 op_lib_t *
-Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init) {
+$init_func(int init) {
     if (init) {
 
 END_C
