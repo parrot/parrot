@@ -26,6 +26,11 @@
  * Configure should have checked for supported word sizes
  */
 
+/* fetch_iv_le
+ *   This function converts a 4 or 8 byte INTVAL into little
+ *   endian format.  If the native format is already little
+ *   endian, then no conversion is done.
+\*
 INTVAL
 fetch_iv_le(INTVAL w)
 {
@@ -48,6 +53,11 @@ fetch_iv_le(INTVAL w)
 #endif
 }
 
+/* fetch_iv_be
+ *   This function converts a 4 or 8 byte INTVAL into big
+ *   endian format.  If the native format is already big
+ *   endian, then no conversion is done.
+\*
 INTVAL
 fetch_iv_be(INTVAL w)
 {
