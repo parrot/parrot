@@ -340,23 +340,23 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                         switch (ch) {
                         case '-':
                             info.flags |= FLAG_MINUS;
-                            break;
+                            continue;
 
                         case '+':
                             info.flags |= FLAG_PLUS;
-                            break;
+                            continue;
 
                         case '0':
                             info.flags |= FLAG_ZERO;
-                            break;
+                            continue;
 
                         case ' ':
                             info.flags |= FLAG_SPACE;
-                            break;
+                            continue;
 
                         case '#':
                             info.flags |= FLAG_SHARP;
-                            break;
+                            continue;
 
                         default:
                             info.phase = PHASE_WIDTH;

@@ -75,6 +75,11 @@ TODO: {
 	        printf("%3.3g %s", (double) fltval, 
             string_to_cstring(interpreter, S));
 		
+                ival = 32;
+	        S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
+	        printf("0x%x %s", (int) ival,
+            string_to_cstring(interpreter, S));
+		
 		    /* Test we've not left junk behind on the stack */
 	        S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
 	        printf(string_to_cstring(interpreter, S));
@@ -94,6 +99,7 @@ Hello, Hello, Pa!
 0.001 == 0.001
 1e+06 == 1e+06
 0.5 == 0.5
+0x20 == 0x20
 That's all, folks!
 OUTPUT
 }
