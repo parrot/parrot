@@ -33,7 +33,6 @@ providing a compreg-compatible method.
   .const int CHUNK   = 15
   .const int COMMAND = 16
 
-  .const int MAX_PRECEDENCE =  9
 
 # Constants for operator/function lookup.
 
@@ -160,9 +159,15 @@ providing a compreg-compatible method.
   # Eventually, we'll need to register MMD for the various Tcl PMCs
   # (Presuming we don't do this from the .pmc definitions.)
 
-  # XXX These go away when [proc] is a little smarter.
   $P1 = new TclArray
   store_global "_Tcl", "proc_body", $P1
+
+  # We need to store these ourselves, because creating dynamic
+  # .subroutines in PIR runs the risk of garbage collection if we're
+  # not careful. 
+  # XXX - these should be removed when the procedure is then deleted.
+  $P1 = new TclArray
+  store_global "_Tcl", "proc_exec", $P1
 
   # Global variable initialization
   # XXX Are outer level tcl scopes true globals, or are they merely top

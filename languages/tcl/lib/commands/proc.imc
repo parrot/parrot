@@ -104,7 +104,11 @@ arg_loop_done:
   .local pmc pir_compiler
   pir_compiler = compreg "PIR"
   $P0 = compile pir_compiler, proc_body 
- 
+
+  # XXX because of the current implementation of the PIR compiler, we must save a reference
+  # to our newly compiled function or run the risk of having it garbage collected
+  $P1 = find_global "_Tcl", "proc_exec"
+  $P1[name] = $P0
   goto done
  
 error:

@@ -14,6 +14,8 @@ however, then we're returning the invokable PMC.
 
 =cut
 
+.const int MAX_PRECEDENCE =  9
+
 .sub __expression_parse
 
   .local string expr      # String containing our expression
@@ -336,8 +338,6 @@ converter_done:
 
 .sub __expression_interpret
   .param pmc args
-  #print "HERE?\n"
-
 
   .local int TclInt
   TclInt = find_type "TclInt"

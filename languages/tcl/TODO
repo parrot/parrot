@@ -240,14 +240,4 @@ complete [error] (need global var support)
 
 =back
 
-=head2 BUGS
-
-=over 4
-
-=item bench.tcl ...
-
-Currently generates a bus error on OS X.
-
-=back
-
 =cut
