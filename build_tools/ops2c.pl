@@ -350,7 +350,7 @@ static int get_op(const char * name, int full) {
     HOP * p;
     size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-        hop = mem_sys_allocate(OP_HASH_SIZE * sizeof(HOP*));
+        hop = mem_sys_allocate_zeroed(OP_HASH_SIZE * sizeof(HOP*));
         hop_init();
     }
     for(p = hop[hidx]; p; p = p->next) {

@@ -35,7 +35,7 @@ pmclass Eval extends Sub {
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
 	       STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
        /* run evaled code with the normal cores */
-#if 0
+#if 1
        while (pc)
 	   DO_OP(pc, interpreter);
 #else

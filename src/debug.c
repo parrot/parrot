@@ -1558,7 +1558,7 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
 
                 interpreter->code->const_table->constants[k]->type =PFC_NUMBER;
                 interpreter->code->const_table->constants[k]->number =
-                                                       (FLOATVAL)atof(command);
+                    (FLOATVAL)atof(command);
                 eval[j++] = (opcode_t)k;
                 break;
             case PARROT_ARG_SC:
@@ -1585,6 +1585,8 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
                 eval[j++] = (opcode_t)atoi(command);
                 break;
             default:
+                PIO_eprintf(interpreter, "unknown operand at '%s'\n", command);
+                return NULL;
                 break;
         }
     }
