@@ -1282,7 +1282,6 @@ languages/Befunge-93/Changes
 languages/Befunge-93/Makefile
 languages/Befunge-93/README
 languages/Befunge-93/befunge.pasm
-languages/Befunge-93/befunge.pbc
 languages/Befunge-93/flow.pasm
 languages/Befunge-93/io.pasm
 languages/Befunge-93/load.pasm
