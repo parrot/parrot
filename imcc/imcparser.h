@@ -159,7 +159,7 @@
 
 
 #ifndef YYSTYPE
-#line 372 "imcc.y"
+#line 396 "imcc.y"
 typedef union {
     int t;
     char * s;
@@ -171,7 +171,7 @@ typedef union {
 # define YYSTYPE yystype
 #endif
 
-extern YYSTYPE yylval;
+
 
 
 #endif /* not BISON_IMCPARSER_H */

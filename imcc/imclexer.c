@@ -559,10 +559,10 @@ char *yytext;
 #include <stdlib.h>
 #include <string.h>
 #include "imc.h"
-#include "imcparser.h"
 #include "parser.h"
 
 #define YY_NO_UNPUT
+#define YY_DECL int yylex(YYSTYPE *valp, struct Parrot_Interp *interp)
 
 int state;
 #define emit 1
@@ -862,7 +862,7 @@ case 5:
 YY_RULE_SETUP
 #line 82 "imcc.l"
 {
-	yylval.s = str_dup(yytext);
+	valp->s = str_dup(yytext);
 	return REG;
 	}
 	YY_BREAK
@@ -1096,7 +1096,7 @@ YY_RULE_SETUP
 #line 134 "imcc.l"
 {
 	yytext[yyleng-1] = 0;  /* trim last ':' */
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(LABEL);
     }
 	YY_BREAK
@@ -1104,7 +1104,7 @@ case 52:
 YY_RULE_SETUP
 #line 140 "imcc.l"
 {
-        yylval.s = str_dup(yytext+1);
+        valp->s = str_dup(yytext+1);
         return(MACRO);
     }
 	YY_BREAK
@@ -1115,19 +1115,19 @@ YY_RULE_SETUP
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
 		if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
-		    yylval.sr = r;
+		    valp->sr = r;
 		    return VAR;
 		}
 	}
-        yylval.s = str_dup(yytext);
-        return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
+        valp->s = str_dup(yytext);
+        return(is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 157 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(FLOATC);
     }
 	YY_BREAK
@@ -1135,7 +1135,7 @@ case 55:
 YY_RULE_SETUP
 #line 162 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 	YY_BREAK
@@ -1143,7 +1143,7 @@ case 56:
 YY_RULE_SETUP
 #line 166 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 	YY_BREAK
@@ -1151,7 +1151,7 @@ case 57:
 YY_RULE_SETUP
 #line 170 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(INTC);
     }
 	YY_BREAK
@@ -1159,7 +1159,7 @@ case 58:
 YY_RULE_SETUP
 #line 174 "imcc.l"
 {
-        yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
+        valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
     }
 	YY_BREAK
@@ -1167,7 +1167,7 @@ case 59:
 YY_RULE_SETUP
 #line 178 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(STRINGC);
     }
 	YY_BREAK
@@ -1175,7 +1175,7 @@ case 60:
 YY_RULE_SETUP
 #line 183 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(IREG);
     }
 	YY_BREAK
@@ -1183,7 +1183,7 @@ case 61:
 YY_RULE_SETUP
 #line 188 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(NREG);
     }
 	YY_BREAK
@@ -1191,7 +1191,7 @@ case 62:
 YY_RULE_SETUP
 #line 193 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(SREG);
     }
 	YY_BREAK
@@ -1199,7 +1199,7 @@ case 63:
 YY_RULE_SETUP
 #line 198 "imcc.l"
 {
-        yylval.s = str_dup(yytext);
+        valp->s = str_dup(yytext);
         return(PREG);
     }
 	YY_BREAK
