@@ -23,7 +23,7 @@ passed-in type and does a same-type assignment from there.
 */
 
 #include "parrot/parrot.h"
-
+#define UNDEF_STRING_CLASS enum_class_PerlString
 
 pmclass Undef extends default {
 
@@ -35,12 +35,36 @@ pmclass Undef extends default {
     return 0;
   }
 
+  void set_integer_native(INTVAL value) {
+    VTABLE_morph(INTERP, SELF, enum_class_Integer);
+    VTABLE_set_integer_native(INTERP, SELF, value);
+  }
+
   FLOATVAL get_number() {
     return 0.0;
   }
 
+  void set_number_native(FLOATVAL value) {
+    VTABLE_morph(INTERP, SELF, enum_class_Float);
+    VTABLE_set_integer_native(INTERP, SELF, value);
+  }
+
   STRING* get_string() {
     return string_make(INTERP, NULL, 0, NULL, 0);
+  }
+
+  void set_string_native(STRING *value) {
+    VTABLE_morph(INTERP, SELF, UNDEF_STRING_CLASS);
+    VTABLE_set_string_native(INTERP, SELF, value);
+  }
+
+  BOOLVAL get_boolean() {
+    return 0;
+  }
+
+  void set_boolean(BOOLVAL value) {
+    VTABLE_morph(INTERP, SELF, enum_class_Boolean);
+    VTABLE_set_boolean(INTERP, SELF, value);
   }
 
 }
