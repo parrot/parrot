@@ -2,10 +2,10 @@
 
 use strict;
 
-use M4::Test tests => 1*2;
+use Parrot::Test tests => 1;
 
 {
-  output_is( <<'CODE', <<'OUT', 'substring in middle of string' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'substring in middle of string' );
 eval(   `4')
 eval(   `0')
 eval(   `-4')

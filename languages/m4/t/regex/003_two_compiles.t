@@ -1,20 +1,13 @@
-#!perl
-
 # $Id$
 
 use strict;
-use lib '../../lib';             # Finding Parrot/Config.pm
-use lib '../../imcc';            # Finding imcc/TestCompiler.pm
 
-use TestCompiler tests => 3;
-
-my $parrot_home = '../..';
-$ENV{PARROT} = "$parrot_home/parrot";
+use Parrot::Test tests => 3;
 
 {
   my $pir = << 'END_PIR';
 .include "library/pcre.imc"
-.sub _main prototyped
+.sub _main 
   print	"\n"
   .local pmc lib
   .PCRE_INIT(lib)
@@ -67,7 +60,7 @@ match_err:
 .end
 END_PIR
 
-  output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE one time" );
+  pir_output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE one time" );
 
 1 match(es):
 as
@@ -75,7 +68,7 @@ OUTPUT
 }
 {
   my $pir = << 'END_PIR';
-.sub _main prototyped
+.sub _main 
 
   # Loading shared lib
   .local pmc pcre_lib
@@ -184,7 +177,7 @@ COMPILE_FAILED:
 .end
 END_PIR
 
-  output_is( $pir, << 'OUTPUT', "calling pcre_compile directly two times" );
+  pir_output_is( $pir, << 'OUTPUT', "calling pcre_compile directly two times" );
 1 match(es):
 1 match(es):
 OUTPUT
@@ -194,7 +187,7 @@ OUTPUT
 # Macros for accessing libpcre
 .include "library/pcre.imc"
 
-.sub _main prototyped
+.sub _main 
 
   # Loading shared lib
   .local pmc pcre_lib
@@ -296,7 +289,7 @@ COMPILE_FAILED:
 .end
 END_PIR
 
-  output_is( $pir, << 'OUTPUT', "calling pcre_compile directly two times" );
+  pir_output_is( $pir, << 'OUTPUT', "calling pcre_compile directly two times" );
 1 match(es):
 1 match(es):
 OUTPUT
@@ -358,7 +351,7 @@ match_err:
 .end
 END_PIR
 
-  output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE two times" );
+  pir_output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE two times" );
 
 1 match(es):
 as
@@ -443,7 +436,7 @@ match_err:
 .end
 END_PIR
 
-  output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE two times" );
+  pir_output_is( $pir, << 'OUTPUT', "calling .PCRE_COMPILE two times" );
 
 1 match(es):
 as

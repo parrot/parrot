@@ -1,5 +1,16 @@
 # $Id$
 
+2004-06-02    Bernhard Schmalhofer
+        * Start to use t/harness and Parrot::Test
+        * yank it up to revision 0.0.6
+
+2004-05-29    Jens Rieks
+        * Use library Getopt/Long.imc in new location
+
+2004-05-21    Bernhard Schmalhofer
+        * BUGFIX: NCI signature letter '3' indicates PerlInt, not int
+        * yank it up to revision 0.0.5
+
 2004-04-19    Bernhard Schmalhofer
         * added compiler for macro 'eval'
         * yank it up to revision 0.0.4

@@ -2,10 +2,10 @@
 
 use strict;
 
-use M4::Test tests => 2*2;
+use Parrot::Test tests => 2;
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define(`foo', `Hello World, heute ist der 15. August')
 define(`furcht', `Hallo Welt')sagt regina und fangt Fliegen
 In German foo is furcht.
@@ -16,7 +16,7 @@ In German Hello World, heute ist der 15. August is Hallo Welt.
 OUT
 }
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 :::asdf
 define(`foo', `Hello World, heute ist der 15. August')
 define(`furcht', `Hallo Welt')sagt regina und fangt Fliegen

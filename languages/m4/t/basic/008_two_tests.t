@@ -2,9 +2,9 @@
 
 use strict;
 
-use M4::Test tests => 2*2;
+use Parrot::Test tests => 2;
 
-output_is( <<'CODE', <<'OUT', 'hello' );
+language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 Hello World
 Hallo Welt
 CODE
@@ -13,7 +13,7 @@ Hallo Welt
 OUT
 
 
-output_is( <<'CODE', <<'OUT', 'hello' );
+language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 Hello Earth
 Hallo Erde
 CODE

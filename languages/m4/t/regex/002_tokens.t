@@ -1,15 +1,8 @@
-#!perl
-
 # $Id$
 
 use strict;
-use lib '../../lib';             # Finding Parrot/Config.pm
-use lib '../../imcc';            # Finding imcc/TestCompiler.pm
 
-use TestCompiler tests => 5;
-
-my $parrot_home = '../..';
-$ENV{PARROT} = "$parrot_home/parrot";
+use Parrot::Test tests => 5;
 
 # Assemble PIR for simple pattern matching
 sub get_pir
@@ -21,7 +14,7 @@ sub get_pir
               );
   return q{
 .include "library/pcre.imc"
-.pcc_sub _main prototyped
+.sub _main
   print	"\n"
   .local pmc lib
   .PCRE_INIT(lib)
@@ -71,7 +64,7 @@ match_err:
 
 {
   my $code = get_pir( 'foo', 'name' );
-  output_is( $code, << 'OUTPUT', "'foo' is a name" );
+  pir_output_is( $code, << 'OUTPUT', "'foo' is a name" );
 
 1 match(es):
 foo
@@ -79,7 +72,7 @@ OUTPUT
 }
 {
   my $code = get_pir( '_tmp', 'name' );
-  output_is( $code, << 'OUTPUT', "'_tmp' is a name" );
+  pir_output_is( $code, << 'OUTPUT', "'_tmp' is a name" );
 
 1 match(es):
 _tmp
@@ -87,7 +80,7 @@ OUTPUT
 }
 {
   my $code = get_pir( 'name2', 'name' );
-  output_is( $code, << 'OUTPUT', "'name2' is a name" );
+  pir_output_is( $code, << 'OUTPUT', "'name2' is a name" );
 
 1 match(es):
 name2
@@ -95,7 +88,7 @@ OUTPUT
 }
 {
   my $code = get_pir( "`quoted'", 'quoted' );
-  output_is( $code, << 'OUTPUT', "'`quoted'' is a quoted string" );
+  pir_output_is( $code, << 'OUTPUT', "'`quoted'' is a quoted string" );
 
 1 match(es):
 `quoted'
@@ -103,7 +96,7 @@ OUTPUT
 }
 {
   my $code = get_pir( "`'", 'quoted' );
-  output_is( $code, << 'OUTPUT', "'`'' is a quoted string" );
+  pir_output_is( $code, << 'OUTPUT', "'`'' is a quoted string" );
 
 1 match(es):
 `'

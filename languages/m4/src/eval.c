@@ -911,10 +911,6 @@ void*
 m4_eval_compiler( Parrot_Interp interpreter, const char *program )
 {
     eval_t value;
-    int radix = 10;
-    int min = 1;
-    const char *s;
-
 
     struct PackFile *pf;
     struct PackFile_ByteCode *cur_cs;

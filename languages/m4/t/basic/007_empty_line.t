@@ -2,9 +2,9 @@
 
 use strict;
 
-use M4::Test tests => 1*2;
+use Parrot::Test tests => 1;
 
-output_is( <<'CODE', <<'OUT', 'hello' );
+language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 
 Hello World
 

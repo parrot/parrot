@@ -9,7 +9,7 @@ Parrot::Test - Parrot Test
 
 Set the number of tests to be run like this:
 
-	use Parrot Test tests => 8;
+	use Parrot::Test tests => 8;
 
 Write individual tests like this:
 
@@ -89,6 +89,7 @@ use strict;
 use vars qw(@EXPORT @ISA $TEST_PROG_ARGS);
 use Parrot::Config;
 use File::Spec;
+use Data::Dumper;
 
 # 5.005_03 Env.pm doesn't make its arguments immune from use strict 'vars';
 use Env qw($TEST_PROG_ARGS);
@@ -216,11 +217,12 @@ sub generate_functions {
         my $delegate_func = $func;
         $delegate_func =~ s/^language_//;
         *{$package.'::'.$func} = sub ($$$;$) {
-          my $language = ucfirst($_[0]);
+          my $language = $_[0];
+          $language = ucfirst($language) unless ( $language eq 'm4' );
           # get modified PARROT command.
           require "Parrot/Test/$language.pm";
 	  # set the builder object, and parrot config.
-          my $obj = eval "new Parrot::Test::${language}";
+          my $obj = eval "Parrot::Test::${language}->new()";
           $obj->{builder} = $Builder;
           $obj->{relpath} = $path_to_parrot;
 	  $obj->{parrot}  = $PARROT;

@@ -2,10 +2,10 @@
 
 use strict;
 
-use M4::Test tests => 2*4;
+use Parrot::Test tests => 4;
 
 {
-  output_is( <<'CODE', <<'OUT', 'simple define' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'simple define' );
 define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 In German foo is furcht.
@@ -17,7 +17,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'macro name with underscore' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'macro name with underscore' );
 define(`fo_o', `Hello World')
 define(`_furc_ht_', `Hallo Welt')
 In German fo_o is _furc_ht_.
@@ -29,7 +29,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'macro name with underscore and numbers' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'macro name with underscore and numbers' );
 define(`fo_5o', `Hello World')
 define(`_fu123rc_ht_', `Hallo Welt')
 In German 4fo_5o is _fu123rc_ht_.
@@ -41,7 +41,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'empty expansion' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'empty expansion' );
 define(`foo',     )
 define(`furcht',)
 In German foo is furcht.  

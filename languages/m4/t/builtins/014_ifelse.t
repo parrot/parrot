@@ -2,10 +2,10 @@
 
 use strict;
 
-use M4::Test tests => 1*2;
+use Parrot::Test tests => 1;
 
 {
-  output_is( <<'CODE', <<'OUT', 'simple define' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'simple define' );
 ifelse(`equal', `equal', `the first two arguments are equal', `the first two arguments are not equal')
 ifelse(`not_equal', `not equal', `the first two arguments are equal', `the first two arguments are not equal')
 ifelse(

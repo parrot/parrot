@@ -2,13 +2,13 @@
 
 use strict;
 
-use M4::Test tests => 2*1 + 1*1;
+use Parrot::Test tests => 1 + 1;
 
 SKIP:
 {
   skip( "difference between running a process in a fork, or with system()", 1 );
 
-  output_is( <<'CODE', <<'OUT', 'substring in middle of string' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'substring in middle of string' );
 syscmd(`false')
 sysval()
 CODE
@@ -18,7 +18,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'substring in middle of string' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'substring in middle of string' );
 syscmd(`true')
 sysval()
 CODE

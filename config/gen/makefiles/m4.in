@@ -1,8 +1,15 @@
+# $Id$
+
+# Setup of some commands
 LN_SF  = ln -s -f
 PARROT = ..${slash}..${slash}parrot${exe}
 PERL   = ${perl}
 RM_RF  = ${rm_rf}
 
+# some constants
+M4_EVAL_COMPILER_SO = ../../runtime/parrot/dynext/m4_eval_compiler.so
+
+# the default target
 all: build 
 
 # This is a listing of all targets, that are meant to be called by users
@@ -25,9 +32,9 @@ help:
 	@echo ""
 
 test: build
-	$(PERL) -MTest::Harness -e 'Test::Harness::runtests( glob( "t/*/*.t" ) )'
+	cd ..; $(PERL) -I../lib m4/t/harness
 
-build: blib runtime library m4.pbc runtime/parrot/dynext/m4_eval_compiler.so  
+build: blib runtime $(M4_EVAL_COMPILER_SO) m4.pbc 
 
 blib: 
 	$(LN_SF) ../../blib
@@ -35,14 +42,11 @@ blib:
 runtime: 
 	$(LN_SF) ../../runtime
 
-library: 
-	$(LN_SF) ../../library
-
 m4.pbc: src/m4.pbc 
 	$(LN_SF) src/m4.pbc 
 
-runtime/parrot/dynext/m4_eval_compiler.so: src/eval.c
-	$(CC) -shared -fpic src/eval.c -o runtime/parrot/dynext/m4_eval_compiler.so -g -Wall -I../../include 
+$(M4_EVAL_COMPILER_SO): src/eval.c
+	$(CC) -shared -fpic src/eval.c -o $@ -g -Wall -I../../include 
 
 src/m4.imc: src/builtin.imc src/freeze.imc src/input.imc src/macro.imc 
 	touch $@ 
@@ -53,17 +57,17 @@ html:
  
 clean:
 	$(RM_RF) \
-  *.pbc \
-  blib \
-  library \
-  runtime \
-  src/*.pbc \
-  src/*/*.pbc \
-  src/*~ \
-  t/*/*.m4 \
-  t/*/*.parrot_out \
-  t/*/*.gnu_out \
-  t/*/*.imc
+*.pbc \
+blib \
+runtime \
+src/*.pbc \
+src/*/*.pbc \
+src/*~ \
+t/*/*.m4 \
+t/*/*.parrot_out \
+t/*/*.gnu_out \
+t/*/*.imc \
+$(M4_EVAL_COMPILER_SO) 
 
 realclean: clean
 	$(RM_RF) \

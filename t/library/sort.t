@@ -8,7 +8,7 @@ t/library/sort.t - Sorting
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/sort.t
+	% perl t/library/sort.t
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,13 @@
 # $Id$
 
-# pragmata
 use strict;
 
-# local Perl modules
-use M4::Test tests => 3*1;
+use Parrot::Test tests => 1 + 1;
 
 my $parrot_m4 = '../../parrot m4.pbc';
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define(`foo', `bar')
 define(`bar', `baz')
 asdf

@@ -1,13 +1,11 @@
-#!perl
-
 # $Id$
 
 use strict;
 
-use M4::Test tests => 4*2;
+use Parrot::Test tests => 4;
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define( `foo',  `Hello World')
 define(`furcht',       `Hallo Welt')
 In German foo is furcht.
@@ -19,7 +17,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define( `foo',  `Hello World ')
 define(`furcht',       `Hallo Welt')
 In German foo is furcht.
@@ -31,7 +29,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define( `foo',                       `Hello World ')
 define(`furcht',       `Hallo Welt')
 In German foo is furcht.
@@ -43,7 +41,7 @@ OUT
 }
 
 {
-  output_is( <<'CODE', <<'OUT', 'hello' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hello' );
 define ( `foo',                       `Hello World ')
 define(`furcht',       `Hallo Welt')
 In German foo is furcht.

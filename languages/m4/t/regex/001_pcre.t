@@ -1,20 +1,13 @@
-#!perl
-
 # $Id$
 
 use strict;
-use lib '../../lib';             # Finding Parrot/Config.pm
-use lib '../../imcc';            # Finding imcc/TestCompiler.pm
 
-use TestCompiler tests => 2;
-
-my $parrot_home = '../..';
-$ENV{PARROT} = "$parrot_home/parrot";
+use Parrot::Test tests => 2;
 
 # Test some regular expressions needed for parsing m4-input files.
 {
-  output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
-.pcc_sub _main prototyped
+  pir_output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
+.sub _main
   print	42
   print	"\n"
   end
@@ -26,9 +19,9 @@ OUTPUT
 
 # Test loading of pcre library, Perl compatible regular expressions
 {
-  my $code = << 'END_PIR';
+  pir_output_is( << 'END_PIR', << 'OUTPUT', "call parrot and do something" );
 .include "library/pcre.imc"
-.pcc_sub _main prototyped
+.sub _main
   print	"\n"
   .local pmc lib
   .PCRE_INIT(lib)
@@ -73,8 +66,6 @@ match_err:
   exit 1
 .end
 END_PIR
-
-  output_is( $code, << 'OUTPUT', "a simple match with libpcre" );
 
 1 match(es):
 asdf

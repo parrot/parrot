@@ -3,16 +3,17 @@
 # pragmata
 use strict;
 
-use Test::More tests => 25*1; 
+use Test::More tests => 25; 
 
 my $real_out;
-my $parrot_m4 = '../../parrot m4.pbc';
+my $parrot_m4    = 'cd ..; ./parrot languages/m4/m4.pbc';
+my $examples_dir = 'languages/m4/examples'; 
 
 
 #--------------------------------------------
 $real_out     = `$parrot_m4 --help 2>&1`; 
 is( $real_out, << "END_OUT", '--help' );
-Usage: ../../parrot m4.pbc [OPTION]... FILE
+Usage: ./parrot languages/m4/m4.pbc [OPTION]... FILE
 
 Currently only long options are available.
 
@@ -30,7 +31,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 0.0.5
+Parrot m4 0.0.6
 END_OUT
 
 
@@ -146,35 +147,35 @@ END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', 'single file' );
 Hello
 END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 $examples_dir/hello.m4 2>&1`; 
 isnt( $real_out, << 'END_OUT', 'no substitution in single file' );
 Hallo
 END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --reload-state=examples/only_T7_0.frozen examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 --reload-state=$examples_dir/only_T7_0.frozen $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', '--reload-state' );
 Hello
 END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --reload-state=unknown_file.frozen examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 --reload-state=unknown_file.frozen $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', 'reloading a missing file' );
 'unknown_file.frozen' not found
 END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --asdf examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 --asdf $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', 'unknown' );
 unknown option: !asdf!
 Hello
@@ -182,7 +183,7 @@ END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --reload-state=examples/only_builtin.frozen examples/hello.m4 examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 --reload-state=$examples_dir/only_builtin.frozen $examples_dir/hello.m4 $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', '2 files' );
 Hello
 Hello
@@ -190,7 +191,7 @@ END_OUT
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --reload-state=examples/only_builtin.frozen examples/hello.m4 examples/hello.m4 examples/hello.m4 2>&1`; 
+$real_out     = `$parrot_m4 --reload-state=$examples_dir/only_builtin.frozen $examples_dir/hello.m4 $examples_dir/hello.m4 $examples_dir/hello.m4 2>&1`; 
 is( $real_out, << 'END_OUT', '3 files' );
 Hello
 Hello

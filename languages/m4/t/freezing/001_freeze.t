@@ -1,5 +1,3 @@
-#!perl
-
 # $Id$
 
 use strict;
@@ -7,11 +5,11 @@ use strict;
 use Test::More tests => 1; 
 
 my $real_out;
-my $parrot_m4 = '../../parrot m4.pbc';
+my $parrot_m4 = 'cd .. && ./parrot languages/m4/m4.pbc';
 
 
 #--------------------------------------------
-$real_out     = `$parrot_m4 --reload-state=examples/only_builtin.frozen --freeze-state=examples/hello.frozen examples/hello.m4; cat examples/hello.frozen; rm examples/hello.frozen`; 
+$real_out     = `$parrot_m4 --reload-state=languages/m4/examples/only_builtin.frozen --freeze-state=languages/m4/examples/hello.frozen languages/m4/examples/hello.m4; cat languages/m4/examples/hello.frozen; rm languages/m4/examples/hello.frozen`; 
 is( $real_out, << 'END_OUT', '1 file' );
 Hello
 T8,8

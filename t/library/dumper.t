@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/pmc/dumper.t - Data Dumping
+t/library/dumper.t - Data Dumping
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/dumper.t
+	% perl t/library/dumper.t
 
 =head1 DESCRIPTION
 

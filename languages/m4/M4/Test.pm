@@ -1,11 +1,13 @@
 # $Id$
 
-package M4::Test;
-
+# pragmata
 use 5.005;
 use strict;
 use warnings;
-use lib '../../lib';
+use lib qw( m4 ../lib ../../lib );
+
+package M4::Test;
+
 use Parrot::Config;
 
 require Exporter;

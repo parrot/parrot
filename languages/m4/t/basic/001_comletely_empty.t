@@ -2,8 +2,8 @@
 
 use strict;
 
-use M4::Test tests => 2*1;
+use Parrot::Test tests => 1;
 
-output_is( <<'CODE', <<'OUT', 'completely empty' );
+language_output_is( 'm4', <<'CODE', <<'OUT', 'completely empty' );
 CODE
 OUT

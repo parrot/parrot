@@ -2,10 +2,10 @@
 
 use strict;
 
-use M4::Test tests => 5*2;
+use Parrot::Test tests => 5;
 
 {
-  output_is( <<'CODE', <<'OUT', 'simple substitution' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'simple substitution' );
 define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 
@@ -18,7 +18,7 @@ In German Hello World is Hallo Welt.
 OUT
 }
 {
-  output_is( <<'CODE', <<'OUT', 'simple chars' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'simple chars' );
 define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 In German foo is furcht.
@@ -29,7 +29,7 @@ In German Hello World is Hallo Welt.
 OUT
 }
 {
-  output_is( <<'CODE', <<'OUT', 'digits in front of words' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'digits in front of words' );
 define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 In German 1foo is 2furcht.
@@ -40,7 +40,7 @@ In German 1Hello World is 2Hallo Welt.
 OUT
 }
 {
-  output_is( <<'CODE', <<'OUT', 'a comment in line' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'a comment in line' );
 define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 A commented out define # define(`no comment', `Kein Kommentar')
@@ -53,7 +53,7 @@ In German 1Hello World is #2furcht.
 OUT
 }
 {
-  output_is( <<'CODE', <<'OUT', 'hiding a define' );
+  language_output_is( 'm4', <<'CODE', <<'OUT', 'hiding a define' );
 #define(`foo', `Hello World')
 define(`furcht', `Hallo Welt')
 In German 1foo is #2furcht.
