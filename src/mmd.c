@@ -87,7 +87,7 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
         /* Didn't find it. Go look for a bytecode version */
         offset = interpreter->binop_mmd_funcs->x[function] *
             right_type + left_type;
-        sub = (pmc_mmd_f)*(interpreter->bytecode_binop_mmd_funcs->mmd_funcs[function] + offset);
+        sub = (void*)((pmc_mmd_f)*(interpreter->bytecode_binop_mmd_funcs->mmd_funcs[function] + offset));
     }
 }
 

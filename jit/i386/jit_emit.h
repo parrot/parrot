@@ -1867,7 +1867,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 {
     Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_X86CALL;
-    jit_info->arena.fixups->param.fptr = addr;
+    jit_info->arena.fixups->param.fptr = D2FPTR(addr);
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
 }
 
