@@ -649,22 +649,21 @@ B<XXX> Currently does not honor the C<i> modifier.
 =cut
 
 op rx_literal(in pmc, in str, in int) {
+	INTVAL i;
 	RX_dUNPACK($1);
-	STRING *targ;
 
 	if(string_length(rx->string) < rx->index+string_length($2)) {
 		goto OFFSET($3);
 	}
 	
-	targ=rxP_get_substr(interpreter, rx->string, rx->index, string_length($2));
-	
-	if(string_compare(interpreter, $2, targ)==0) {
-		RxAdvanceX(rx, string_length($2));
+	/* This is faster than using substr--it avoids memory allocations. */
+	for(i=0; i < string_length($2); i++) {
+		if(string_ord(rx->string, rx->index+i) != string_ord($2, i)) {
+			goto OFFSET($3);
+		}
 	}
-	else {
-		goto OFFSET($3);
-	}
-	
+
+	RxAdvanceX(rx, string_length($2));
 	goto NEXT();
 }
 
