@@ -108,24 +108,25 @@ Add classes/YOURCLASS.pmc to MANIFEST.
 
 =item 2.
 
-Add classes/YOURCLASS$(O) to $(CLASS_O_FILES) in Makefile.in.
+Add enum_class_YOURCLASS to the enumeration in include/parrot/pmc.h.
 
 =item 3.
 
-Add YOURCLASS$(O) to $(O_FILES) in classes/Makefile.in.
+Add Parrot_YOURCLASS_class_init to the list in include/parrot/global_setup.h.
 
 =item 4.
 
-Add YOURCLASS.c and YOURCLASS$(O) targets to classes/Makefile.in.
+Add a call to Parrot_YOURCLASS_class_init() to init_world() in
+global_setup.c.
 
 =item 5.
 
-Add enum_class_YOURCLASS to the enumeration in pmc.h.
+Add your PMC class to the classname hash at the end of global_setup.c.
 
 =item 6.
 
-Add a call to Parrot_YOURCLASS_class_init() to init_world() in
-global_setup.c.
+Rerun perl Configure.pl (or perl Configure.pl --debugging) to
+regenerate the makefiles with your new PMC.
 
 =back
 
@@ -166,16 +167,13 @@ For instance, the C<set_integer> method has multiple forms; the
 default C<set_integer> means that you are being called with a PMC,
 and you should probably use the C<get_integer> method of the PMC to
 find its integer value; C<set_integer_native> means you're being passed
-an C<INTVAL> and C<set_integer_bigint> is for when you receive a
-C<BIGINT> structure. The final form is slightly special; if the
+an C<INTVAL>. The final form is slightly special; if the
 interpreter calls C<set_integer_same>, you know that the PMC that you
 are being passed is of the same type as you. Hence, you can break the
 class abstraction to save a couple of dereferences - if you want to.
 
-Similar shortcuts exist for strings, (C<native>, C<unicode> and C<other>)
-and floating point numbers. (C<native> and C<bigfloat>) Functions which
-take "generic" numbers and may be either integer or float have C<int>,
-C<bigint>, C<float> and C<bigfloat> variants.
+Similar shortcuts exist for strings, (C<native> and C<same>) and
+floating point numbers.
 
 =head2 Methods you need to implement
 
@@ -206,14 +204,6 @@ Copy your data, state and vtable into the passed-in PMC.
 =item C<morph>
 
 Turn yourself into the specified type.
-
-=item C<move_to>
-
-Move your private data to the given destination in memory.
-
-=item C<real_size>
-
-Return how much memory you are actually taking up.
 
 =item C<destroy>
 
@@ -328,3 +318,14 @@ specific method, simply say something like
     void logical_not (PMC* value) = default;
 
 and a sensible default will be provided for you.
+
+If your class is a modification of an existing class, you may wish to
+use inheritance. At the beginning of your vtable specification in
+classes/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For
+example:
+
+  pmclass PackedArray extends Array { ...
+
+See the POD documentation in classes/pmc2c.pl for a list of useful
+keywords that you may use in the .pmc file. (Run
+C<perldoc -F pmc2c.pl> to view the POD.)
