@@ -96,23 +96,34 @@ wrong register allocation.
 Implemented. When the subroutine does B<saveall>/B<restoreall>, the
 branch from the B<ret> statement back is ignored in the CFG.
 
-=head1 Parrot calling conventions
+=head1 Parrot calling conventions - CPS
 
 Proposed syntax:
 
 =head2 PASM Subroutines
 
-  $P0 = new Sub # Continuation / ...
-  .pcc_begin
-  $I0 = addr _sub_label
-  $P0 = $I0
+  newsub $P0, $P1, Sub, Continuation, _sub_label, ret_addr
+  ...
+  .pcc_begin prototyped|non_prototyped
   .arg x	# I5
   .arg y	# I6
   .arg z	# I7
-  .pcc_call $P0	# r = _sub_label(x, y, z)
+  .pcc_call $P0, $P1	# r = _sub_label(x, y, z)
+  ret_addr:
   .local int r  # optional - new result var
   .result r
   .pcc_end
+
+  .pcc_sub _sub_label prototyped|non_prototyped
+   .param int a # I5
+   .param int b # I6
+   .param int c # I7
+  ...
+  .pcc_begin_return
+   .return xy   # e.g. I5
+  .pcc_end_return
+  ...
+  .end
 
 =head2 NCI
 
@@ -120,11 +131,12 @@ Proposed syntax:
 
   $P0 = load_lib "libname"
   $P1 = dlfunc $P0, "funcname", "signature"
+  ...
   .nci_begin
   .arg x	# I5
   .arg y	# I6
   .arg z	# I7
-  .pcc_call $P1	# r = funcname(x, y, z)
+  invoke $P1	# r = funcname(x, y, z)
   .local int r  # optional - new result var
   .result r
   .nci_end
