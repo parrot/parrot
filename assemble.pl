@@ -564,6 +564,7 @@ sub _string_constant {
   my ($self,$constant) = @_;
   $constant=~s/\\n/\n/;
   $constant=~s/\\t/\t/;
+  $constant=~s/\\\\/\\/;
 
   my $value = substr($constant,1,length($constant)-2);
   unless(defined $self->{constants}{s}{$value}) {
