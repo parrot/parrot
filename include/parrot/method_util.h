@@ -43,3 +43,13 @@ PMC * Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
 void mark_stack(struct Parrot_Interp *, Stack_Chunk_t * cur_stack);
 
 #endif /* PARROT_METHOD_UTIL_H_GUARD */
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
