@@ -28,6 +28,47 @@ init_world(void) {
     Parrot_PerlHash_class_init(enum_class_PerlHash);
     Parrot_ParrotPointer_class_init(enum_class_ParrotPointer);
     Parrot_IntQueue_class_init(enum_class_IntQueue);
+    
+    /* Now register the names of the PMCs */
+    Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
+    Parrot_base_classname_hash->vtable->init(NULL, Parrot_base_classname_hash);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_Array,
+                                                         (STRING*)Parrot_base_vtables[enum_class_Array].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlUndef,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlUndef].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlInt,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlInt].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlNum,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlNum].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlString,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlString].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlArray,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlArray].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_PerlHash,
+                                                         (STRING*)Parrot_base_vtables[enum_class_PerlHash].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
+                                                            enum_class_ParrotPointer,
+                                                         (STRING*)Parrot_base_vtables[enum_class_ParrotPointer].name(NULL, NULL)
+);
+    Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash,
+                                                            enum_class_IntQueue,
+                                                         (STRING*)Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL)
+);
+
 }
 
 /*

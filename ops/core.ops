@@ -2472,6 +2472,19 @@ op new(out PMC, in INT) {
 
 ########################################
 
+=item B<find_type>(out INT, in STR)
+
+Find the PMC type by name
+
+=cut
+
+op find_type(out INT, in STR) {
+    $1 = Parrot_base_classname_hash->vtable->get_integer_index_s(interpreter, Parrot_base_classname_hash, $2);
+    goto NEXT();
+}
+
+########################################
+
 =item B<ret>()
 
 Pop the location off the top of the stack and go there.
