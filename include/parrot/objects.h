@@ -60,6 +60,29 @@ void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 
+/* Get and set attributes. */
+#if 0
+/* Old way */
+#define get_attrib_num(x, y) VTABLE_get_pmc_keyed_int(interpreter, x, y)
+#define set_attrib_num(x, y, z) VTABLE_set_pmc_keyed_int(interpreter, x, y, z)
+#define get_attrib_count(x) VTABLE_elements(interpreter, x)
+#define new_attrib_array() pmc_new(interpreter, enum_class_Array)
+#define set_attrib_array_size(x, y) VTABLE_set_integer_native(interpreter, (x), (y))
+#define resize_attrib_array(x, y)  VTABLE_set_integer_native(interpreter, (x), (y))
+#define set_attrib_flags(x)
+#define SLOTTYPE PMC
+
+#else
+/* These are the new way */
+#define get_attrib_num(x, y) *((PMC **)PObj_bufstart(x)+y)
+#define set_attrib_num(x, y, z) { PMC **foo = (PMC **)PObj_bufstart(x); foo[y] = z; }
+#define get_attrib_count(x) (PObj_buflen(x) / sizeof(PMC *))
+#define new_attrib_array() new_buffer_header(interpreter)
+#define set_attrib_flags(x) PObj_is_buffer_of_PMCs_ptr_SET(x)
+#define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
+#define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
+#define SLOTTYPE Buffer
+#endif
 #endif
 
 /*

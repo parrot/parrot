@@ -224,8 +224,7 @@ Get the class PMC for the object in $2 and put it in $1.
 
 inline op class(out PMC, in PMC) {
     if (PObj_is_object_TEST($2))
-	$1 = VTABLE_get_pmc_keyed_int(interpreter,
-		(PMC *)PMC_data($2), POD_CLASS);
+	$1 = get_attrib_num((Buffer *)PMC_data($2), POD_CLASS);
     else
 	$1 = $2;
     goto NEXT();
@@ -240,8 +239,7 @@ Get the class name for the class in $2 and put it in $1.
 inline op classname(out STR, in PMC) {
   PMC* classname_pmc;
 
-  classname_pmc = VTABLE_get_pmc_keyed_int(interpreter,
-                  (PMC *)PMC_data($2), PCD_CLASS_NAME);
+  classname_pmc = get_attrib_num((Buffer *)PMC_data($2), PCD_CLASS_NAME);
   if (classname_pmc) {
       $1 = VTABLE_get_string(interpreter, classname_pmc);
   }

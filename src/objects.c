@@ -21,26 +21,6 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* Get and set attributes. */
-#define get_attrib_num(x, y) VTABLE_get_pmc_keyed_int(interpreter, x, y)
-#define set_attrib_num(x, y, z) VTABLE_set_pmc_keyed_int(interpreter, x, y, z)
-#define get_attrib_count(x) VTABLE_elements(interpreter, x)
-#define new_attrib_array() pmc_new(interpreter, enum_class_Array)
-#define set_attrib_array_size(x, y) VTABLE_set_integer_native(interpreter, (x), (y))
-#define resize_attrib_array(x, y)  VTABLE_set_integer_native(interpreter, (x), (y))
-#define set_attrib_flags(x)
-#define SLOTTYPE PMC
-
-/* These are the new way, which isn't in yet
-#define get_attrib_num(x, y) ((PMC *)PObj_bufstart(x))+y
-#define set_attrib_num(x, y, z) ((PMC *)PObj_bufstart(x))+y = z
-#define get_attrib_count(x) (PObj_buflen(x) / sizeof(PMC *))
-#define new_attrib_array() new_buffer_header(interpreter)
-#define set_attrib_flags(x) PObj_is_buffer_of_PMCs_ptr_set(x)
-#define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
-#define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
-#define SLOTTYPE Buffer
-*/
 
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array) {
@@ -263,7 +243,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* Hang an array off the data pointer */
     child_class_array = PMC_data(child_class) =
         new_attrib_array();
-    set_attrib_flags(child_class_array);
+    set_attrib_flags(child_class);
     /* We will have five entries in this array */
     set_attrib_array_size(child_class_array, PCD_MAX);
 
@@ -344,17 +324,18 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     PMC *classname_pmc;
     INTVAL new_class_number;
     VTABLE *new_vtable;
+    PMC *temp_pmc;
 
     /* Hang an array off the data pointer, empty of course */
     class_array = PMC_data(class) = new_attrib_array();
-    set_attrib_flags(class_array);
+    set_attrib_flags(class);
     /* We will have five entries in this array */
     set_attrib_array_size(class_array, PCD_MAX);
     /* Our parent class array has nothing in it */
     set_attrib_num(class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-    set_attrib_num(class_array, PCD_ALL_PARENTS,
-            pmc_new(interpreter, enum_class_Array));
+    set_attrib_num(class_array, PCD_ALL_PARENTS, 
+                   pmc_new(interpreter, enum_class_Array));
     set_attrib_num(class_array, PCD_ATTRIB_OFFS,
             pmc_new(interpreter, enum_class_OrderedHash));
     set_attrib_num(class_array, PCD_ATTRIBUTES,
@@ -477,7 +458,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
     PMC *parent_class;
     INTVAL i, nparents;
 
-    nparents = VTABLE_get_integer(interpreter, classsearch_array);
+    nparents = VTABLE_elements(interpreter, classsearch_array);
     for (i = nparents - 1; i >= 0; --i) {
         parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, i);
@@ -502,7 +483,7 @@ darned object.
 
 void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
-    PMC *new_object_array;
+    SLOTTYPE *new_object_array;
     INTVAL attrib_count;
     SLOTTYPE *class_array;
     PMC *class;
@@ -513,7 +494,6 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /*
      * put in the real vtable
      */
-
     vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
     object->vtable = PMC_struct_val(vtable_pmc);
 
@@ -525,7 +505,9 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
 
     /* Build the array that hangs off the new object */
     new_object_array = new_attrib_array();
-    set_attrib_flags(new_object_array);
+    PMC_data(object) = new_object_array;
+    set_attrib_flags(object);
+
     /* Presize it */
     set_attrib_array_size(new_object_array,
                           attrib_count + POD_FIRST_ATTRIB);
@@ -536,8 +518,6 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* Note the number of used slots */
     object->cache.int_val = POD_FIRST_ATTRIB + attrib_count;
 
-    PMC_data(object) = new_object_array;
-    PObj_flag_SET(is_PMC_ptr, object);
     /* We are an object now */
     PObj_is_object_SET(object);
 
@@ -591,7 +571,7 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
     VTABLE_set_integer_native(interpreter, current_parent_array,
                               current_size + 1);
     VTABLE_set_pmc_keyed_int(interpreter, current_parent_array, current_size,
-                            add_on_class);
+                            add_on_class_obj);
 
     /* Loop through them. We can assume that we can just tack on any
        new classes to the end of the current class array. Attributes
@@ -707,7 +687,7 @@ INTVAL
 Parrot_object_isa(Parrot_Interp interpreter, PMC *pmc, PMC *cl) {
     PMC * t;
     SLOTTYPE *object_array = PMC_data(pmc);
-    SLOTTYPE *classsearch_array; /* The array of classes we're searching */
+    PMC *classsearch_array; /* The array of classes we're searching */
     INTVAL i, classcount;
 
     /* if this is a class */

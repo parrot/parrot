@@ -115,6 +115,8 @@ Finds and returns the delegated method with C string C<name>.
 */
 
 
+#define get_attrib_num(x, y) *((PMC **)PObj_bufstart(x)+y)
+
 PARROT_INLINE static PMC *
 find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
     STRING *meth = string_from_cstring(interpreter, name, 0);
@@ -126,8 +128,7 @@ find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
         print_pbc_location(interpreter);
     }
     if (PObj_is_object_TEST(pmc)) {
-        class = VTABLE_get_pmc_keyed_int(interpreter, (PMC *)PMC_data(pmc),
-                POD_CLASS);
+        class = get_attrib_num((Buffer *)PMC_data(pmc), POD_CLASS);
     }
     REG_STR(2) = meth;
     return Parrot_find_method_with_cache(interpreter, class, meth);

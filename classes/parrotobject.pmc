@@ -45,6 +45,7 @@ F<src/objects.c>, at least for right now.
 
 #include "parrot/parrot.h"
 
+#define get_attrib_num(x, y) *((PMC **)PObj_bufstart(x)+y)
 
 pmclass ParrotObject extends ParrotClass need_ext {
 
@@ -95,7 +96,7 @@ These two methods just call C<init()>. The arguments are ignored.
 
 
     STRING* name() {
-        return VTABLE_get_string_keyed_int(INTERP, (PMC *)PMC_data(SELF), POD_CLASS_NAME);
+        return VTABLE_get_string(INTERP, (PMC *)get_attrib_num((Buffer *)PMC_data(SELF), POD_CLASS_NAME));
     }
 
 
@@ -110,7 +111,7 @@ Finds the method for C<*name>.
 */
 
     PMC* find_method(STRING* name) {
-        PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
+        PMC *class = get_attrib_num((PMC *)PMC_data(SELF), 0);
         return Parrot_find_method_with_cache(INTERP, class, name);
     }
 
