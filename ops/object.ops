@@ -41,6 +41,18 @@ conventions.
 
 =cut
 
+op callmeth() {
+  PMC *method_pmc;
+  opcode_t *dest;
+  method_pmc = VTABLE_find_method(interpreter, REG_PMC(2), REG_STR(0));
+  if (NULL == method_pmc) {
+    /* Pitch a fit */
+  }
+  REG_PMC(0) = method_pmc;
+  dest = (opcode_t *)REG_PMC(0)->vtable->invoke(interpreter, REG_PMC(0), expr NEXT());
+  goto ADDRESS(dest);
+}
+
 
 =item B<can>(out INT, in PMC, in STR)
 
