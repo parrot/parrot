@@ -168,12 +168,12 @@ SymReg * iPOP(SymReg * r0) {
 }
 
 SymReg * iSAVEALL() {
-    emitb(mk_instruction("pushs\npushi\npushn\npushp", NULL, NULL, NULL, NULL, 0));
+    emitb(mk_instruction("saveall", NULL, NULL, NULL, NULL, 0));
     return 0;
 }
 
 SymReg * iRESTOREALL() {
-    emitb(mk_instruction("popp\npopn\npopi\npops", NULL, NULL, NULL, NULL, 0));
+    emitb(mk_instruction("restoreall", NULL, NULL, NULL, NULL, 0));
     return 0;
 }
 
