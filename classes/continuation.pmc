@@ -26,8 +26,7 @@ pmclass Continuation extends Closure {
     void mark () {
         struct Parrot_Sub * cc
             = (struct Parrot_Sub*)PMC_sub(SELF);
-	mark_stack(INTERP, cc->ctx.user_stack);
-	mark_stack(INTERP, cc->ctx.control_stack);
+        mark_context(INTERP, &cc->ctx);
 	SUPER();	/* mark pad_stack, warns in closure */
     }
 

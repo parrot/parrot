@@ -59,6 +59,7 @@ void save_context(struct Parrot_Interp *, struct Parrot_Context *);
 void cow_copy_context(struct Parrot_Interp* , struct Parrot_Context *);
 void swap_context(struct Parrot_Interp *, PMC *);
 void restore_context(struct Parrot_Interp *, struct Parrot_Context *);
+void mark_context(struct Parrot_Interp *, struct Parrot_Context *);
 
 PMC * scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth);
 

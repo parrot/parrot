@@ -12,36 +12,172 @@
 
 #include "parrot/parrot.h"
 
+void
+setup_register_stacks(struct Parrot_Interp* interpreter)
+{
+    struct RegisterChunkBuf* buf;
+    make_bufferlike_pool(interpreter, sizeof(struct RegisterChunkBuf));
+
+    Parrot_block_DOD(interpreter);
+
+    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
+    Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct IRegChunkBuf));
+    interpreter->ctx.int_reg_stack.top = buf;
+    interpreter->ctx.int_reg_stack.chunk_size = sizeof(struct IRegChunkBuf);
+    
+    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
+    Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct SRegChunkBuf));
+    interpreter->ctx.string_reg_stack.top = buf;
+    interpreter->ctx.string_reg_stack.chunk_size = sizeof(struct SRegChunkBuf);
+    
+    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
+    Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct NRegChunkBuf));
+    interpreter->ctx.num_reg_stack.top = buf;
+    interpreter->ctx.num_reg_stack.chunk_size = sizeof(struct NRegChunkBuf);
+    
+    buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
+    Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct PRegChunkBuf));
+    interpreter->ctx.pmc_reg_stack.top = buf;
+    interpreter->ctx.pmc_reg_stack.chunk_size = sizeof(struct PRegChunkBuf);
+    
+    Parrot_unblock_DOD(interpreter);
+}
+
+void
+mark_register_stack(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* chunk;
+    for (chunk = stack->top; chunk; chunk = chunk->next) {
+        pobject_lives(interpreter, (PObj*)chunk);
+    }
+}
+
+void
+mark_pmc_register_stack(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* chunk;
+    UINTVAL i, j;
+    for (chunk = stack->top; chunk;
+        chunk = chunk->next) {
+        pobject_lives(interpreter, (PObj*)chunk);
+        for (i = 0; i < chunk->used; i++) {
+            for (j = 0; j < NUM_REGISTERS/2; j++) {
+                if (((struct PRegChunkBuf*)chunk->data.bufstart)->PRegFrame[i].registers[j]) {
+                    pobject_lives(interpreter,
+                            (PObj*)((struct PRegChunkBuf*)chunk->data.bufstart)->
+                                PRegFrame[i].registers[j]);
+                }
+            }
+        }
+    }
+}
+
+void
+mark_string_register_stack(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* chunk;
+    UINTVAL i, j;
+    for (chunk = stack->top; chunk; chunk = chunk->next) {
+        pobject_lives(interpreter, (PObj*)chunk);
+        for (i = 0; i < chunk->used; i++) {
+            for (j = 0; j < NUM_REGISTERS/2; j++) {
+                PObj* reg = (PObj*)((struct SRegChunkBuf*)chunk->data.bufstart)->
+                    SRegFrame[i].registers[j];
+                if (reg)
+                    pobject_lives(interpreter, reg);
+            }
+        }
+    }
+}
+
+void
+mark_register_stack_cow(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* chunk;
+    for (chunk = stack->top; chunk; chunk = chunk->next) {
+        PObj_COW_SET((PObj*)chunk);
+    }
+}
+
+static struct RegisterChunkBuf* 
+regstack_copy_chunk(struct Parrot_Interp* interpreter, 
+                    struct RegisterChunkBuf* chunk,
+                    struct RegStack* stack)
+{
+    struct RegisterChunkBuf* buf = 
+            new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
+    *buf = *chunk;
+    
+    Parrot_block_DOD(interpreter);
+    Parrot_allocate_zeroed(interpreter, (PObj*)buf, stack->chunk_size);
+    Parrot_unblock_DOD(interpreter);
+    
+    memcpy(buf->data.bufstart, chunk->data.bufstart, stack->chunk_size);
+    return buf;
+}
+
+static void
+regstack_push_entry(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* top = stack->top;
+    /* Before we change anything, is this a read-only stack? */
+    if (PObj_COW_TEST((PObj*)top))
+        top = stack->top = regstack_copy_chunk(interpreter, top, stack);
+    /* If we can stay in the current frame, we will.  Else make a new chunk */
+    if (top->used < FRAMES_PER_CHUNK) {
+        top->used++;
+    }
+    else {
+        struct RegisterChunkBuf* buf = new_bufferlike_header(interpreter, 
+                                sizeof(struct RegisterChunkBuf));
+
+        Parrot_block_DOD(interpreter);
+        Parrot_allocate_zeroed(interpreter, (PObj*)buf, stack->chunk_size);
+        Parrot_unblock_DOD(interpreter);
+        
+        buf->used = 1;
+        buf->next = top;
+
+        stack->top = buf;
+    }
+}
+
+static void
+regstack_pop_entry(struct Parrot_Interp* interpreter, struct RegStack* stack)
+{
+    struct RegisterChunkBuf* top = stack->top;
+    if (top->used > 1) {
+        /* Before we change anything, is this a read-only stack? */
+        if (PObj_COW_TEST((PObj*)top))
+            top = stack->top = regstack_copy_chunk(interpreter, stack->top, stack);
+        top->used--;
+    }
+    else {
+        /* XXX: If this isn't marked COW, we should keep it around to
+         * prevent thrashing */
+        if (top->next) {
+            stack->top = top->next;
+        }
+        else {
+            if (PObj_COW_TEST((PObj*)top))
+                top = stack->top = regstack_copy_chunk(interpreter, stack->top, stack);
+            top->used--;
+        }
+    }
+}
+
 /*=for api register Parrot_push_i
   pushes a new integer register frame onto the corresponding frame stack
 */
 void
 Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
-{
-    /* Do we have any space in the current savestack? If so, memcpy
-     * down */
-    if (interpreter->ctx.int_reg_top->used < FRAMES_PER_CHUNK) {
-        memcpy(&interpreter->ctx.int_reg_top->
-               IRegFrame[interpreter->ctx.int_reg_top->used],
-               where, sizeof(struct IRegFrame));
-        interpreter->ctx.int_reg_top->used++;
-    }
-    /* Nope, so either move to next stack chunk or grow the stack */
-    else {
-        struct IRegChunk *next_chunk;
-        if (interpreter->ctx.int_reg_top->next)
-            next_chunk = interpreter->ctx.int_reg_top->next;
-        else {
-            next_chunk = mem_sys_allocate(sizeof(struct IRegChunk));
-            next_chunk->next = NULL;
-            next_chunk->prev = interpreter->ctx.int_reg_top;
-            interpreter->ctx.int_reg_top->next = next_chunk;
-        }
-        next_chunk->used = 1;
-        interpreter->ctx.int_reg_top = next_chunk;
-        memcpy(&next_chunk->IRegFrame[0],
-               where, sizeof(struct IRegFrame));
-    }
+{    
+    struct RegisterChunkBuf* top;
+    regstack_push_entry(interpreter, &interpreter->ctx.int_reg_stack);
+    top = interpreter->ctx.int_reg_stack.top;
+    memcpy(&((struct IRegChunkBuf*)top->data.bufstart)->
+                    IRegFrame[top->used-1].registers,
+           where, sizeof(struct IRegFrame));
 }
 
 /*=for api register Parrot_pop_i
@@ -50,24 +186,13 @@ Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
 void
 Parrot_pop_i(struct Parrot_Interp *interpreter, void *where)
 {
-    struct IRegChunk *top = interpreter->ctx.int_reg_top;
+    struct RegisterChunkBuf* top = interpreter->ctx.int_reg_stack.top;
     /* Do we even have anything? */
     if (top->used > 0) {
-        top->used--;
-        memcpy(where,
-               &top->IRegFrame[top->used], sizeof(struct IRegFrame));
-        /* Empty? */
-        if (!top->used) {
-            /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                /* Keep one stack segment spare to avoid thrashing */
-                if (top->next) {
-                    mem_sys_free(top->next);
-                    top->next = NULL;
-                }
-                interpreter->ctx.int_reg_top = top->prev;
-            }
-        }
+        memcpy(where, 
+               &((struct IRegChunkBuf*)top->data.bufstart)->IRegFrame[top->used-1],
+               sizeof(struct IRegFrame));
+        regstack_pop_entry(interpreter, &interpreter->ctx.int_reg_stack);
     }
     /* Nope. So pitch a fit */
     else {
@@ -92,31 +217,13 @@ Parrot_clear_i(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
-{
-    /* Do we have any space in the current savestack? If so, memcpy
-     * down */
-    if (interpreter->ctx.string_reg_top->used < FRAMES_PER_CHUNK) {
-        memcpy(&interpreter->ctx.string_reg_top->
-               SRegFrame[interpreter->ctx.string_reg_top->used],
-               where, sizeof(struct SRegFrame));
-        interpreter->ctx.string_reg_top->used++;
-    }
-    /* Nope, so either move to next stack chunk or grow the stack */
-    else {
-        struct SRegChunk *next_chunk;
-        if (interpreter->ctx.string_reg_top->next)
-            next_chunk = interpreter->ctx.string_reg_top->next;
-        else {
-            next_chunk = mem_sys_allocate(sizeof(struct SRegChunk));
-            next_chunk->next = NULL;
-            next_chunk->prev = interpreter->ctx.string_reg_top;
-            interpreter->ctx.string_reg_top->next = next_chunk;
-        }
-        next_chunk->used = 1;
-        interpreter->ctx.string_reg_top = next_chunk;
-        memcpy(&next_chunk->SRegFrame[0],
-               where, sizeof(struct SRegFrame));
-    }
+{    
+    struct RegisterChunkBuf* top;
+    regstack_push_entry(interpreter, &interpreter->ctx.string_reg_stack);
+    top = interpreter->ctx.string_reg_stack.top;
+    memcpy(&((struct SRegChunkBuf*)top->data.bufstart)->
+                    SRegFrame[top->used-1].registers,
+           where, sizeof(struct SRegFrame));
 }
 
 /*=for api register Parrot_pop_s
@@ -125,24 +232,15 @@ Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
 void
 Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
 {
-    struct SRegChunk *top = interpreter->ctx.string_reg_top;
+    struct RegisterChunkBuf* top = interpreter->ctx.string_reg_stack.top;
     /* Do we even have anything? */
     if (top->used > 0) {
-        top->used--;
-        memcpy(where,
-               &top->SRegFrame[top->used], sizeof(struct SRegFrame));
-        /* Empty? */
-        if (!top->used) {
-            /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                /* Keep one stack segment spare to avoid thrashing */
-                if (top->next) {
-                    mem_sys_free(top->next);
-                    top->next = NULL;
-                }
-                interpreter->ctx.string_reg_top = top->prev;
-            }
-        }
+        struct SRegFrame* irf = &((struct SRegChunkBuf*)top->data.bufstart)->
+                    SRegFrame[top->used-1];
+        memcpy(where, 
+               &irf->registers, 
+               sizeof(struct SRegFrame));
+        regstack_pop_entry(interpreter, &interpreter->ctx.string_reg_stack);
     }
     /* Nope. So pitch a fit */
     else {
@@ -167,31 +265,13 @@ Parrot_clear_s(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
-{
-    /* Do we have any space in the current savestack? If so, memcpy
-     * down */
-    if (interpreter->ctx.num_reg_top->used < FRAMES_PER_CHUNK) {
-        memcpy(&interpreter->ctx.num_reg_top->
-               NRegFrame[interpreter->ctx.num_reg_top->used],
-               where, sizeof(struct NRegFrame));
-        interpreter->ctx.num_reg_top->used++;
-    }
-    /* Nope, so either move to next stack chunk or grow the stack */
-    else {
-        struct NRegChunk *next_chunk;
-        if (interpreter->ctx.num_reg_top->next)
-            next_chunk = interpreter->ctx.num_reg_top->next;
-        else {
-            next_chunk = mem_sys_allocate(sizeof(struct NRegChunk));
-            next_chunk->next = NULL;
-            next_chunk->prev = interpreter->ctx.num_reg_top;
-            interpreter->ctx.num_reg_top->next = next_chunk;
-        }
-        next_chunk->used = 1;
-        interpreter->ctx.num_reg_top = next_chunk;
-        memcpy(&next_chunk->NRegFrame[0],
-               where, sizeof(struct NRegFrame));
-    }
+{    
+    struct RegisterChunkBuf* top;
+    regstack_push_entry(interpreter, &interpreter->ctx.num_reg_stack);
+    top = interpreter->ctx.num_reg_stack.top;
+    memcpy(&((struct NRegChunkBuf*)top->data.bufstart)->
+                    NRegFrame[top->used-1].registers,
+           where, sizeof(struct NRegFrame));
 }
 
 /*=for api register Parrot_pop_n
@@ -200,24 +280,15 @@ Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
 void
 Parrot_pop_n(struct Parrot_Interp *interpreter, void *where)
 {
-    struct NRegChunk *top = interpreter->ctx.num_reg_top;
+    struct RegisterChunkBuf* top = interpreter->ctx.num_reg_stack.top;
     /* Do we even have anything? */
     if (top->used > 0) {
-        top->used--;
-        memcpy(where,
-               &top->NRegFrame[top->used], sizeof(struct NRegFrame));
-        /* Empty? */
-        if (!top->used) {
-            /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                /* Keep one stack segment spare to avoid thrashing */
-                if (top->next) {
-                    mem_sys_free(top->next);
-                    top->next = NULL;
-                }
-                interpreter->ctx.num_reg_top = top->prev;
-            }
-        }
+        struct NRegFrame* irf = &((struct NRegChunkBuf*)top->data.bufstart)->
+                    NRegFrame[top->used-1];
+        memcpy(where, 
+               &irf->registers, 
+               sizeof(struct NRegFrame));
+        regstack_pop_entry(interpreter, &interpreter->ctx.num_reg_stack);
     }
     /* Nope. So pitch a fit */
     else {
@@ -242,31 +313,13 @@ Parrot_clear_n(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
-{
-    /* Do we have any space in the current savestack? If so, memcpy
-     * down */
-    if (interpreter->ctx.pmc_reg_top->used < FRAMES_PER_CHUNK) {
-        memcpy(&interpreter->ctx.pmc_reg_top->
-               PRegFrame[interpreter->ctx.pmc_reg_top->used],
-               where, sizeof(struct PRegFrame));
-        interpreter->ctx.pmc_reg_top->used++;
-    }
-    /* Nope, so either move to next stack chunk or grow the stack */
-    else {
-        struct PRegChunk *next_chunk;
-        if (interpreter->ctx.pmc_reg_top->next)
-            next_chunk = interpreter->ctx.pmc_reg_top->next;
-        else {
-            next_chunk = mem_sys_allocate(sizeof(struct PRegChunk));
-            next_chunk->next = NULL;
-            next_chunk->prev = interpreter->ctx.pmc_reg_top;
-            interpreter->ctx.pmc_reg_top->next = next_chunk;
-        }
-        next_chunk->used = 1;
-        interpreter->ctx.pmc_reg_top = next_chunk;
-        memcpy(&next_chunk->PRegFrame[0],
-               where, sizeof(struct PRegFrame));
-    }
+{    
+    struct RegisterChunkBuf* top;
+    regstack_push_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
+    top = interpreter->ctx.pmc_reg_stack.top;
+    memcpy(&((struct PRegChunkBuf*)top->data.bufstart)->
+                    PRegFrame[top->used-1].registers,
+           where, sizeof(struct PRegFrame));
 }
 
 /*=for api register Parrot_pop_p
@@ -275,24 +328,15 @@ Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
 void
 Parrot_pop_p(struct Parrot_Interp *interpreter, void *where)
 {
-    struct PRegChunk *top = interpreter->ctx.pmc_reg_top;
+    struct RegisterChunkBuf* top = interpreter->ctx.pmc_reg_stack.top;
     /* Do we even have anything? */
     if (top->used > 0) {
-        top->used--;
-        memcpy(where,
-               &top->PRegFrame[top->used], sizeof(struct PRegFrame));
-        /* Empty? */
-        if (!top->used) {
-            /* Yep, drop down a frame. Maybe */
-            if (top->prev) {
-                /* Keep one stack segment spare to avoid thrashing */
-                if (top->next) {
-                    mem_sys_free(top->next);
-                    top->next = NULL;
-                }
-                interpreter->ctx.pmc_reg_top = top->prev;
-            }
-        }
+        struct PRegFrame* irf = &((struct PRegChunkBuf*)top->data.bufstart)->
+                    PRegFrame[top->used-1];
+        memcpy(where, 
+               &irf->registers, 
+               sizeof(struct PRegFrame));
+        regstack_pop_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
     }
     /* Nope. So pitch a fit */
     else {

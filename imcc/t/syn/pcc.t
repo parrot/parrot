@@ -738,7 +738,7 @@ ret1:
 .pcc_sub _sub1 non_prototyped
     .local pmc res1               # (visitReturn:528)
     find_lex $P2, 'g'             # (callingExpression:325)
-    newsub $P3, .Continuation, ret0 # (callingExpression:331)
+    newsub $P3, .RetContinuation, ret0 # (callingExpression:331)
     .pcc_begin non_prototyped     # (callingExpression:332)
     .pcc_call $P2, $P3            # (callingExpression:335)
 ret0:

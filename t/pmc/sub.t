@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 49;
 use Test::More;
 use Parrot::Config;
 
@@ -708,6 +708,40 @@ f2:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "continuation close over register stacks");
+    set S20, "ok\n"
+    savetop
+    newsub P0, .Continuation, next
+    restoretop
+    concat S20, "not ", S20
+    invoke
+    print "bad\n"
+next:
+    restoretop
+    print S20
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "DOD marks continuation's register stacks");
+    set S20, "ok\n"
+    savetop
+    newsub P0, .Continuation, next
+    restoretop
+    null S20
+    sweep 1
+    collect
+    invoke
+    print "bad\n"
+next:
+    restoretop
+    print S20
+    end
+CODE
+ok
 OUTPUT
 
 unlink($temp, 'temp.pbc');

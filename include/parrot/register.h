@@ -48,38 +48,43 @@ struct PRegFrame {
     PMC *registers[NUM_REGISTERS/2];
 };
 
-struct IRegChunk {
+struct RegStack {
+    struct RegisterChunkBuf* top;
+    size_t chunk_size;
+};
+
+/* Base class for the RegChunk types */
+struct RegisterChunkBuf {
+    Buffer data;
     size_t used;
-    Stack_chunk_flags flags;
-    struct IRegChunk *next;
-    struct IRegChunk *prev;
+    struct RegisterChunkBuf* next;
+};
+
+struct IRegChunkBuf {
     struct IRegFrame IRegFrame[FRAMES_PER_CHUNK];
 };
 
-struct NRegChunk {
-    size_t used;
-    Stack_chunk_flags flags;
-    struct NRegChunk *next;
-    struct NRegChunk *prev;
+struct NRegChunkBuf {
     struct NRegFrame NRegFrame[FRAMES_PER_CHUNK];
 };
 
-struct SRegChunk {
-    size_t used;
-    Stack_chunk_flags flags;
-    struct SRegChunk *next;
-    struct SRegChunk *prev;
+struct SRegChunkBuf {
     struct SRegFrame SRegFrame[FRAMES_PER_CHUNK];
 };
 
-struct PRegChunk {
-    size_t used;
-    Stack_chunk_flags flags;
-    struct PRegChunk *next;
-    struct PRegChunk *prev;
+struct PRegChunkBuf {
     struct PRegFrame PRegFrame[FRAMES_PER_CHUNK];
 };
 
+void setup_register_stacks(struct Parrot_Interp* interpreter);
+void mark_register_stack_cow(struct Parrot_Interp* interpreter,
+                             struct RegStack* stack);
+void mark_pmc_register_stack(struct Parrot_Interp* interpreter, 
+                             struct RegStack* stack);
+void mark_string_register_stack(struct Parrot_Interp* interpreter,
+                                struct RegStack* stack);
+void mark_register_stack(struct Parrot_Interp* interpreter,
+                         struct RegStack* stack);
 
 #endif /* PARROT_REGISTER_H */
 

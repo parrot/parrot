@@ -1004,14 +1004,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
-    interpreter->ctx.int_reg_top =
-        mem_sys_allocate_zeroed(sizeof(struct IRegChunk));
-    interpreter->ctx.num_reg_top =
-        mem_sys_allocate_zeroed(sizeof(struct NRegChunk));
-    interpreter->ctx.string_reg_top =
-        mem_sys_allocate_zeroed(sizeof(struct SRegChunk));
-    interpreter->ctx.pmc_reg_top =
-        mem_sys_allocate_zeroed(sizeof(struct PRegChunk));
+    setup_register_stacks(interpreter);
 
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting
@@ -1181,24 +1174,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
-
-    /* XXX move this to register.c */
-    {
-        struct IRegChunk *stacks[4];
-        struct IRegChunk *top, *next;
-        stacks[0] = interpreter->ctx.int_reg_top;
-        stacks[1] = (struct IRegChunk*) interpreter->ctx.num_reg_top;
-        stacks[2] = (struct IRegChunk*) interpreter->ctx.string_reg_top;
-        stacks[3] = (struct IRegChunk*) interpreter->ctx.pmc_reg_top;
-        for (i = 0; i< 4; i++) {
-            top = stacks[i];
-            for (; top ; ) {
-                next = top->next;
-                mem_sys_free(top);
-                top = next;
-            }
-        }
-    }
 
     stack_destroy(interpreter->ctx.pad_stack);
     stack_destroy(interpreter->ctx.user_stack);

@@ -157,7 +157,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
      * note: adding locals here did cause increased DOD runs
      */
     unsigned int i = 0, j = 0;
-    struct PRegChunk *cur_chunk = 0;
     struct Stash *stash = 0;
 
     /* We have to start somewhere, the interpreter globals is a good place */
@@ -189,31 +188,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     if (interpreter->DOD_registry)
         pobject_lives(interpreter, (PObj *)interpreter->DOD_registry);
 
-    /* Now walk the pmc stack. Make sure to walk from top down since stack may
-     * have segments above top that we shouldn't walk. */
-    for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
-            cur_chunk = cur_chunk->prev) {
-        for (j = 0; j < cur_chunk->used; j++) {
-            for (i = 0; i < NUM_REGISTERS/2; i++) {
-                if (cur_chunk->PRegFrame[j].registers[i]) {
-                    pobject_lives(interpreter,
-                            (PObj *)cur_chunk->PRegFrame[j].registers[i]);
-                }
-            }
-        }
-    }
-
-    /* Walk all stacks: lexical pad, user and control */
-    {
-        Stack_Chunk_t *stacks[3];
-
-        stacks[0] = interpreter->ctx.pad_stack;
-        stacks[1] = interpreter->ctx.user_stack;
-        stacks[2] = interpreter->ctx.control_stack;
-        for (j = 0; j < 3; j++)
-            mark_stack(interpreter, stacks[j]);
-
-    }
+    /* Walk all stacks */
+    mark_context(interpreter, &interpreter->ctx);
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
@@ -305,7 +281,6 @@ static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
     UINTVAL i, j;
-    struct SRegChunk *cur_chunk;
 
     /* First mark the current set. We assume that all pointers in S registers
      * are pointing to valid buffers. This is not a good assumption, but it'll
@@ -322,20 +297,6 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         pobject_lives(interpreter, (PObj *)interpreter->current_file);
     if (interpreter->current_package)
         pobject_lives(interpreter, (PObj *)interpreter->current_package);
-
-    /* Now walk the string stack. Make sure to walk from top down since stack
-     * may have segments above top that we shouldn't walk. */
-    for (cur_chunk = interpreter->ctx.string_reg_top;
-            cur_chunk; cur_chunk = cur_chunk->prev) {
-        for (j = 0; j < cur_chunk->used; j++) {
-            for (i = 0; i < NUM_REGISTERS/2; i++) {
-                Buffer *reg = (Buffer *)cur_chunk->SRegFrame[j].registers[i];
-
-                if (reg)
-                    pobject_lives(interpreter, reg);
-            }
-        }
-    }
 }
 
 #ifdef GC_IS_MALLOC

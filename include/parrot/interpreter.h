@@ -125,12 +125,10 @@ typedef struct _RunProfile {
 struct _imc_info_t;
 
 typedef struct Parrot_Context {
-    struct IRegChunk *int_reg_top;    /* Current top chunk of int reg stack */
-    struct NRegChunk *num_reg_top;    /* Current top chunk of the float reg
-                                       * stack */
-    struct SRegChunk *string_reg_top; /* Current top chunk of the string
-                                       * stack */
-    struct PRegChunk *pmc_reg_top;    /* Current top chunk of the PMC stack */
+    struct RegStack int_reg_stack;
+    struct RegStack num_reg_stack;
+    struct RegStack string_reg_stack;
+    struct RegStack pmc_reg_stack;
 
     struct Stack_Chunk *pad_stack;      /* Base of the lex pad stack */
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */

@@ -12,6 +12,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/method_util.h"
 
 
 /*
@@ -33,6 +34,10 @@ void
 cow_copy_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(ctx, &interp->ctx, sizeof(*ctx));
+    mark_register_stack_cow(interp, &ctx->int_reg_stack);
+    mark_register_stack_cow(interp, &ctx->num_reg_stack);
+    mark_register_stack_cow(interp, &ctx->string_reg_stack);
+    mark_register_stack_cow(interp, &ctx->pmc_reg_stack);
     stack_mark_cow(ctx->pad_stack);
     stack_mark_cow(ctx->user_stack);
     stack_mark_cow(ctx->control_stack);
@@ -46,6 +51,18 @@ void
 restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(&interp->ctx, ctx, sizeof(*ctx));
+}
+
+void
+mark_context(struct Parrot_Interp* interpreter, struct Parrot_Context* ctx)
+{
+    mark_stack(interpreter, ctx->pad_stack);
+    mark_stack(interpreter, ctx->user_stack);
+    mark_stack(interpreter, ctx->control_stack);
+    mark_register_stack(interpreter, &ctx->int_reg_stack);
+    mark_register_stack(interpreter, &ctx->num_reg_stack);
+    mark_string_register_stack(interpreter, &ctx->string_reg_stack);
+    mark_pmc_register_stack(interpreter, &ctx->pmc_reg_stack);
 }
 
 static void coro_error(Stack_Entry_t *e)
@@ -164,7 +181,7 @@ restore_stack(struct Parrot_Interp *interp,
 }
 
 /*
- * XXX: If this routine is specific to coroutine, we should change 
+ * XXX: If this routine is specific to coroutine, we should change
  *      the argument to Parrot_Coroutine.
  */
 void
@@ -174,6 +191,11 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
     Buffer * warns;
     struct Parrot_Coroutine* co = (struct Parrot_Coroutine *)PMC_sub(sub);
     struct Parrot_Context *ctx = &co->ctx;
+    struct IRegChunk *int_reg_top;
+    struct NRegChunk *num_reg_top;
+    struct SRegChunk *string_reg_top;
+    struct PRegChunk *pmc_reg_top;
+
     /*
      * Swap user stacks and warnings
      */
@@ -185,6 +207,22 @@ swap_context(struct Parrot_Interp *interp, struct PMC *sub)
     warns = interp->ctx.warns;
     interp->ctx.warns = ctx->warns;
     ctx->warns = warns;
+
+    /* swap reg tops */
+#if 0
+    int_reg_top = interp->ctx.int_reg_top;
+    interp->ctx.int_reg_top = ctx->int_reg_top;
+    ctx->int_reg_top = int_reg_top;
+    num_reg_top = interp->ctx.num_reg_top;
+    interp->ctx.num_reg_top = ctx->num_reg_top;
+    ctx->num_reg_top = num_reg_top;
+    string_reg_top = interp->ctx.string_reg_top;
+    interp->ctx.string_reg_top = ctx->string_reg_top;
+    ctx->string_reg_top = string_reg_top;
+    pmc_reg_top = interp->ctx.pmc_reg_top;
+    interp->ctx.pmc_reg_top = ctx->pmc_reg_top;
+    ctx->pmc_reg_top = pmc_reg_top;
+#endif
 
     /* if calling the coroutine */
     if (!(PObj_get_FLAGS(sub) & PObj_private0_FLAG)) {
@@ -266,6 +304,7 @@ new_coroutine(struct Parrot_Interp *interp)
     struct Parrot_Coroutine *co = (struct Parrot_Coroutine *)new_sub(interp,
             sizeof(struct Parrot_Coroutine));
     struct Parrot_Context *ctx = &co->ctx;
+    save_context(interp, ctx);
     /* put in a COWed copy of the user stack */
     ctx->user_stack = interp->ctx.user_stack;
     stack_mark_cow(ctx->user_stack);

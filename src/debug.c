@@ -1808,9 +1808,10 @@ void
 PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct IRegChunk *chunk = interpreter->ctx.int_reg_top;
+    struct RegisterChunkBuf *chunk = interpreter->ctx.int_reg_stack.top;
 
-    valid_chunk(chunk, command, depth, FRAMES_PER_INT_REG_CHUNK, i);
+    valid_chunk(chunk, command, depth, 
+                FRAMES_PER_INT_REG_CHUNK, i);
 
     if (!chunk) {
         i = depth / FRAMES_PER_INT_REG_CHUNK;
@@ -1822,8 +1823,9 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_int_frame(interpreter, &chunk->IRegFrame[depth],
-            atoi(command));
+    PDB_print_int_frame(interpreter, 
+                &((struct IRegChunkBuf*)chunk->data.bufstart)->IRegFrame[depth], 
+                atoi(command));
 }
 
 /* PDB_print_stack_num
@@ -1833,9 +1835,10 @@ void
 PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct NRegChunk *chunk = interpreter->ctx.num_reg_top;
+    struct RegisterChunkBuf *chunk = interpreter->ctx.num_reg_stack.top;
 
-    valid_chunk(chunk, command, depth, FRAMES_PER_NUM_REG_CHUNK, i);
+    valid_chunk(chunk, command, depth, 
+                FRAMES_PER_NUM_REG_CHUNK, i);
 
     if (!chunk) {
         i = depth / FRAMES_PER_NUM_REG_CHUNK;
@@ -1846,8 +1849,9 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "Float stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_num_frame(interpreter, &chunk->NRegFrame[depth],
-            atoi(command));
+    PDB_print_num_frame(interpreter, 
+                &((struct NRegChunkBuf*)chunk->data.bufstart)->NRegFrame[depth],
+                atoi(command));
 }
 
 /* PDB_print_stack_string
@@ -1857,9 +1861,10 @@ void
 PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct SRegChunk *chunk = interpreter->ctx.string_reg_top;
+    struct RegisterChunkBuf *chunk = interpreter->ctx.string_reg_stack.top;
 
-    valid_chunk(chunk, command, depth, FRAMES_PER_STR_REG_CHUNK, i);
+    valid_chunk(chunk, command, depth, 
+                FRAMES_PER_STR_REG_CHUNK, i);
 
     if (!chunk) {
         i = depth / FRAMES_PER_STR_REG_CHUNK;
@@ -1871,8 +1876,9 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
                 i, depth);
 
     na(command);
-    PDB_print_string_frame(interpreter, &chunk->SRegFrame[depth],
-            atoi(command));
+    PDB_print_string_frame(interpreter, 
+                &((struct SRegChunkBuf*)chunk->data.bufstart)->SRegFrame[depth],
+                atoi(command));
 }
 
 /* PDB_print_stack_pmc
@@ -1882,9 +1888,10 @@ void
 PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
-    struct PRegChunk *chunk = interpreter->ctx.pmc_reg_top;
+    struct RegisterChunkBuf *chunk = interpreter->ctx.pmc_reg_stack.top;
 
-    valid_chunk(chunk, command, depth, FRAMES_PER_PMC_REG_CHUNK, i);
+    valid_chunk(chunk, command, depth, 
+                FRAMES_PER_PMC_REG_CHUNK, i);
 
     if (!chunk) {
         i = depth / FRAMES_PER_PMC_REG_CHUNK;
@@ -1895,8 +1902,9 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "PMC stack, frame %li, depth %li\n", i, depth);
 
     na(command);
-    PDB_print_pmc_frame(interpreter, &chunk->PRegFrame[depth],
-            atoi(command), NULL);
+    PDB_print_pmc_frame(interpreter, 
+                &((struct PRegChunkBuf*)chunk->data.bufstart)->PRegFrame[depth],
+                atoi(command), NULL);
 }
 
 static void
