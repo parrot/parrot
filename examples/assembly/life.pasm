@@ -45,14 +45,18 @@
 	set I0, 0
 loop:	ge I0, I2, getout
 	inc I0
+	mod I31,I0,100
+	if I31, skip
+	print 2,"."
+skip:
 
 	bsr generate
 
 	bsr dump
 	branch loop
-
 getout:	time N6
 	sub N7, N6, N5
+	print "\n"
 	print I2
 	print " generations in "
 	print N7
