@@ -1916,6 +1916,7 @@ inline op pack(inout STR, in INT, in INT) {
     STRING *s;
 
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    s->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, s, 1);
     string_destroy(s);
 
@@ -1927,6 +1928,7 @@ inline op pack(inout STR, in INT, in NUM) {
     STRING *s;
 
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    s->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, s, 1);
     string_destroy(s);
 
@@ -1944,6 +1946,7 @@ inline op pack(inout STR, in INT, in STR) {
     } else {
         t = string_make(interpreter, s->bufstart, (UINTVAL)len, NULL, 0, NULL); 
     }
+    t->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, t, 1);
     string_destroy(t);
 
@@ -1958,6 +1961,7 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     int i;
     
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    s->flags |= BUFFER_neonate_FLAG;
     /* XXX this is EVIL, use string_replace */
     n = $1->bufstart;
     t = string_to_cstring(interpreter, (s));
