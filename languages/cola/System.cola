@@ -1,0 +1,15 @@
+//
+// My naive beginnings of the System namespace
+
+namespace System {
+
+	public class Int32 {
+
+		//__int32 i;
+		public string ToString() {
+			return "";
+		}
+	}
+
+
+}

@@ -1,0 +1,255 @@
+"Cola" - A compiler for the Parrot VM
+
+  V0.0.1
+
+  Thanks for trying this little language.
+
+  I've started this compiler (I call it Cola) to simultaneously
+  teach myself how to write a compiler (ok I admit I squeaked
+  through Compiler Design in school because I was too busy
+  playing online MUD and basketball), as well as help
+  out a project that I love, Perl6/Parrot!
+
+  To really start having fun with the Parrot runtime I wanted
+  a language similar to C/C++/C#/Java.
+
+  The parser is developed with flex/bison, with
+  an intermediate code compiler written in Perl. The
+  parser generates a simple intermediate code (more on that later)
+  which is easier to read than Parrot assembly, and
+  also includes a few directives that Parrot currently
+  lacks. The parser leaves register allocation/spill control,
+  optimization and a few other specifics to the intermediate
+  compiler (int2pasm.pl).
+
+  I will admit, int2pasm.pl is not well written; it was hacked
+  a bit at a time, however it works for the limited time
+  I put into it, and later I'll sit down and redo it with a grammar.
+  To read more about the intermediate code see below.
+
+
+The Syntax
+
+  Compatible (eventually) C# syntax.
+
+  The easiest way to see what it currently looks like is
+  to read the examples.
+
+  I plan to implement a C# imitation library and keep
+  to the C# syntax mainly because I like a few things
+  C# has over Java.
+
+
+Supported Constructs
+
+  For some quick samples, see the cola/examples/ subdirectory.
+
+  Statements: FOR, WHILE, IF, ELSE, BREAK, CONTINUE, RETURN.
+
+    All of these are limited in their current version but follow
+    typical C-ish rules (break breaks out of current loop, continue
+    shortcuts to the next iteration). return may return a value
+    from anywhere inside a method.
+
+    NOTE: Conditional expressions do not yet support complex
+    expressions, only single comparisons.
+
+  Types: int, float, string (classes and arrays coming soon) 
+    Currently these map directly to the Parrot primitive types.
+    Very simple type coercement and checking is supported.
+
+  Variable Declarations:
+    For now declare all your variables at the top of each method.
+    Block scoping will be done soon.
+    You may initialize your variables in the declaration.
+
+  Expressions:  Parens, +, -, *, /, %, ++ and -- are supported in
+    any combination or complexity. Post and pre-increment are also
+    supported. You may use the + operator on strings for concatenation.
+
+    The following works:
+
+        puts("Hello Mr " + name + "\n");
+    
+    There is no support for concatenation with non-strings yet.    
+    Need to whip up a few conversion routines.
+ 
+  Comparisons:  <, >, <=, >=, !=, ==
+  
+  Methods:  
+    Classic C style, recursion supported. Return types supported.
+    Will be adding variable argument support per the C# spec.
+
+  Current Builtin Subroutines
+
+    Since I have yet to implement class importing, the system routines
+    are just plain wrappers around the Parrot ops. Currently they are:
+
+       strlen, substr, strchop, ord, puts, puti, putf, gets, sleep
+
+    See gen.c and main() for the current kludgy way to patch in more wrappers.
+
+    In calc.cola I also did a sample implementation of a string to int
+    conversion called StrToInt().
+
+
+  Arrays:
+    You may treat strings as read-only arrays, you may not assign
+    to an array slot (yet). This is for 2 reasons, Parrot still
+    needs a substr op that will replace, and also my code
+    generator is too dumb right now to really handle "deref"
+    variables in all their forms. The string [] is a hack
+    until the rewrite which will support arrays of anything.
+
+What you currently CANNOT do even though the Parser may eat it...
+  Statement lists:          i = j, j = k;
+  Nested assigns:           i = (j = 0);
+  Fancy For loops:          for(i = 0; j++, j < 4; i++)
+  Empty For headers:        for(;;) // use while(1)
+  Compound conditionals:    if(i < 0 || j > 3)
+    For now only use single comparisons, literals or identifiers in
+    conditionals.
+    
+Using the Compiler
+
+  Build it by typing:
+
+	make ; make clean
+
+  Usage:
+
+	colac examples/mandelbrot.cola
+
+  Then copy "a.pasm" to your Parrot directory and assemble and run
+  as usual.
+
+  Also, if you look in "a.imc" you will see an intermediate
+  language, delimited by tags (<program>....</program>) with some
+  debug info outside of those tags. Debugging the compiler is easier
+  by looking at the intermediate code. This language can be
+  piped through int2pasm.pl to re-generate the .pasm file.
+
+  Currently the compiler is very limited with a few warnings and
+  a few simple type coercions.
+  
+  If you try to do something fancy, the grammar might accept
+  it but the code will probably come out wrong or simply crash the
+  compiler. Read all the samples before trying anything.
+ 
+Intermediate Code
+
+  NOTE: The translator is very simple, mostly it just pre-processes
+    code that it understands and leaves the bulk of the work to
+    the Parrot assembler.
+
+  The intermediate code output supports 3 primary types of statements.
+
+    Assignment statements, Branch statements, and Stack manipulation
+
+  It additionally supports:
+
+    Labels (Parrot style), Directives (.foo), Line comments (# ...),
+      and Here documents (for emitting code that skips through the
+      intermediate translator). The compiler uses the here document
+      to emit a few support routines (puts, substr). I'm working on
+      moving this stuff into System.cola.
+
+    Limited type checking. Each assignment has a type associated
+      with it, in the same syntax as a C-style cast.
+
+      Example:
+        (i32)$R12 = $N7 * 0.1
+
+        A floating point expression coerced to a integer.
+
+      The compiler will check for bad assignments such as int to string, etc.
+
+  For a nice sample of intermediate code, compile mandelbrot.cola or
+  calc.cola which actually does a limited form of parsing with Parrot!
+
+
+Register Allocation
+
+  The register tracker took about 30 minutes to hack out and is
+  good enough for now. Temporaries from the compiler are either named
+  $LN or $RN (where N is an integer indicating the temporary). The
+  translator will assign registers from a register stack in "first
+  come first serve" fashion, and upon each line translation, it
+  will return any registers to the stack that were used for rvalues
+  on the right hand side of an assignment.
+  Rvalues are indicated by $RN. Named variables and $L (lvalues)
+  will currently hold their register for the scope of the method.
+
+  This is quick and dirty. I plan to implement a flavor of the
+  graph coloring algorithm for the final translator.
+
+  For now, if the translator runs out of registers, it will simply exit.
+  Parrot has 32 registers each of string, int, float and pmc so
+  it takes quite a number of local variables and/or quite a complex
+  expression to hold 32 live registers at any one point.
+
+  Mandelbrot currently uses 9 of 32 float registers and 6 of 32 int
+  registers to get its work done.
+
+
+Optimization
+
+  There is none.
+
+  You might see dumb code generated in the form of:
+
+    set I1, I0
+    set I2, I1
+
+  or..
+
+    branch LABEL34
+    LABEL34: ...
+
+  generated between basic blocks or in situations where
+  the generator is currently dumb.
+ 
+  I'll at a most add in a simple peephole optimizer to skip
+  useless assignments, temporaries and branches.
+
+
+Coming Soon
+  More operators (shift, etc.)
+  Compound logical expressions (&&, ||)
+  Ternary conditionals:   i = (j > 0 ? 1 : 0);
+  Some form of a printf()
+  Full array support
+    
+
+Gaping Holes
+
+  Arrays
+    I've yet to completely implement arrays, mainly because Parrot doesn't yet
+    support them. Someone is currently working away on that area so
+    I'm waiting with bated breath. You can, however, use array syntax
+    for strings, but they are read-only.
+    
+  Class/Struct instantiation
+    Lotta work involved here, I won't go there for now.
+    Currently you can define multiple Cola classes per file, but cannot
+    instantiate any of them. Parrot currently does not
+    have an adequate bytecode "class format" in which to write
+    symbol table information. This should change soon; at least
+    thats what Dan says. :)
+
+  Object Methods and Field references
+    Again, a lot of work, but on the list.
+
+
+
+Whats Next?
+
+  Now that the toy works, I will go away and rewrite it.
+  It served its purpose; I learned some of what not to
+  do, and hopefully 0.1.0 will have a good, extensible design and
+  by then, Parrot will be further along.
+
+  I'll happily patch in little things on the 0.0.x branch however,
+  if anyone cares. :)
+
+
