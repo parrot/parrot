@@ -20,6 +20,24 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
+#define USE_RWLOCK 0
+
+#if USE_RWLOCK
+/* quick hack for rwlocks memory overhead - estimated only */
+#define RWL 20
+#undef MUTEX_INIT
+#define MUTEX_INIT(m) pthread_rwlock_init(&m, NULL)
+#undef LOCK
+#define LOCK(m) pthread_rwlock_rdlock(&m)
+#undef UNLOCK
+#define UNLOCK(m) pthread_rwlock_unlock(&m)
+#undef MUTEX_DESTROY
+#define MUTEX_DESTROY(m) pthread_rwlock_destroy(&m)
+
+#else
+#define RWL 0
+#endif
+
 /*
  * TODO we should catch exceptions around these locks
  *      if the vtable meth throws the lock is never unlocked
@@ -46,7 +64,8 @@ pmclass SharedRef does ref need_ext is_shared extends Ref {
 	 * so we shouldn't leak unshared PMCs into different threads
 	 */
 	SUPER(init);
-	SELF->synchronize = mem_sys_allocate(sizeof(*SELF->synchronize));
+	SELF->synchronize =
+		mem_sys_allocate(sizeof(*SELF->synchronize) + RWL);
 	SELF->synchronize->owner = INTERP;
 	MUTEX_INIT(SELF->synchronize->pmc_lock);
 	PObj_active_destroy_SET(SELF);
