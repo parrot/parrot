@@ -16,7 +16,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include "cola.h"
 
 int         yyerror(char *);
@@ -47,7 +47,7 @@ AST         *ast_start = NULL;
 %token FALSE FLOAT FOR
 %token GET GOTO
 %token IF INT INTERNAL
-%token LONG METHOD MODIFIER NEW NAMESPACE NULLVAL 
+%token LONG METHOD MODIFIER NEW NAMESPACE NULLVAL
 %token OUT OVERRIDE OBJECT PRIVATE PROTECTED PUBLIC
 %token REF READONLY RETURN
 %token SBYTE SEALED SET SHORT STRING STATIC
@@ -63,7 +63,7 @@ AST         *ast_start = NULL;
 %type <sym> type array_type
 %type <sym> predefined_type integral_type
 %type <sym> qualified_name member_access
-%type <sym> namespace_scope_start class_scope_start 
+%type <sym> namespace_scope_start class_scope_start
 %type <sym> formal_param_list fixed_params fixed_param
 %type <ast> var_declarator var_declarators
 %type <ast> using_directives using_directive attribute_list
@@ -190,7 +190,7 @@ namespace_body:
                 unshift_ast(&($$), $3);
         }
     ;
-    
+
 namespace_member_decls: /*NULL*/
         { $$ = NULL; }
     |
@@ -228,7 +228,7 @@ modifiers:
         { $$ = $1 | $2; }
     |   modifier
     ;
-    
+
 modifier:
     PUBLIC
         { $$ = MOD_PUBLIC; }
@@ -263,7 +263,7 @@ class_scope_start:
             $$ = c;
         }
     ;
-    
+
 class_member_decl_list:
         { $$ = NULL; }
     |   class_member_decl_list class_member_decl
@@ -297,7 +297,7 @@ decl_statement:
             $3->typename = $2;
             $3->literal = $5;
             check_id_redecl(current_symbol_table, $3->name);
-            store_symbol(current_symbol_table, $3); 
+            store_symbol(current_symbol_table, $3);
             $$ = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
             $$->typename = $2;
             if(lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
@@ -353,7 +353,7 @@ var_declarators:
             unshift_ast(&($$), $3);
         }
     ;
-    
+
 var_declarator:
    IDENTIFIER '=' expr
         {
@@ -361,7 +361,7 @@ var_declarator:
             decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
             decl->sym = $1;
             init = new_expr(ASTT_ASSIGN, decl, $3);
-            $$ = new_statement(ASTT_FIELD_DECL, decl, init); 
+            $$ = new_statement(ASTT_FIELD_DECL, decl, init);
 #if DEBUG
         fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
 #endif
@@ -370,13 +370,13 @@ var_declarator:
         {
             AST * decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
             decl->sym = $1;
-            $$ = new_statement(ASTT_FIELD_DECL, decl, NULL); 
+            $$ = new_statement(ASTT_FIELD_DECL, decl, NULL);
 #if DEBUG
         fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
 #endif
         }
     ;
-    
+
 method_decl:
     method_header method_body
         {
@@ -443,7 +443,7 @@ formal_param_list:    /*NULL*/
     |   param_array
 */
     ;
-        
+
 fixed_params:
     fixed_param
     |   fixed_params ',' fixed_param
@@ -452,7 +452,7 @@ fixed_params:
             tunshift_sym(&($$), $3);
         }
     ;
-    
+
 fixed_param:
     type IDENTIFIER
         {
@@ -469,12 +469,12 @@ param_modifier:
     REF
     |   OUT
     ;
-    
+
 param_array:
     attributes PARAMS array_type IDENTIFIER
     ;
 */
-    
+
 method_body:
     block
         { $$ = $1; }
@@ -491,11 +491,11 @@ block:
             }
         }
     ;
-    
+
 block_scope:
         { push_scope(); }
     ;
-    
+
 embedded_statement:
     block
         {$$ = $1;}
@@ -562,7 +562,7 @@ return_statement:
     |   RETURN ';'
         {    $$ = new_statement(ASTT_RETURN, NULL, NULL); }
     ;
-    
+
 asm_block:
     ASM '(' LITERAL ')' ';'
     { $$ = NULL; }
@@ -576,7 +576,7 @@ arg_list:
             unshift_ast(&($$), $3);
         }
     ;
-    
+
 arg:
         { $$ = NULL; }
     |   expr
@@ -586,7 +586,7 @@ arg:
     |   OUT
         { $$ = NULL; }
     ;
-    
+
 selection_statement:
     if_statement
     ;
@@ -607,14 +607,14 @@ iteration_statement:
     while_statement
     |   for_statement
     ;
-    
+
 while_statement:
     WHILE '(' boolean_expr ')' embedded_statement
         {
             $$ = new_while($3, $5);
         }
     ;
-    
+
 for_statement:
     FOR '(' statement_expr ';' boolean_expr ';' statement_expr ')'
     embedded_statement
@@ -653,9 +653,9 @@ integral_type:
     |   BYTE
         { $$ = new_type_symbol("byte"); }
     ;
-    
+
 array_type:
-    type rank_specifiers 
+    type rank_specifiers
         {
             $$ = symbol_concat($1, $2);
 #if DEBUG
@@ -678,10 +678,10 @@ rank_specifiers:
             $$ = symbol_concat($1, $2);
         }
     ;
-        
+
 /*
  * Expressions
- */ 
+ */
 statement_expr:
     method_call
     |   assignment
@@ -744,7 +744,7 @@ expr:
 #if DEBUG
             fprintf(stderr, " expr <- conditional_expr\n");
 #endif
-        } 
+        }
     |   assignment
     ;
 
@@ -786,9 +786,9 @@ primary_expr:
     |   member_access
         { $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL); $$->sym = $1; }
     ;
- 
+
 unary_expr:
-    primary_expr 
+    primary_expr
     { $$ = $1; }
     |   '+' unary_expr
         { $$ = $2; $$->op = '+'; }
@@ -835,7 +835,7 @@ element_access:
 #endif
         }
     ;
-    
+
 new_expr:
     new_object_expr
 /*
@@ -920,7 +920,7 @@ exclusive_or_expr:
     and_expr
     |   exclusive_or_expr '^' and_expr
         {
-            $$ = new_op_expr($1, '^', $3);
+            $$ = new_op_expr($1, '~', $3);
         }
     ;
 
@@ -964,18 +964,18 @@ equality_expr:
             $$ = new_expr(ASTT_COMPARISON, $1, $3);
             $$->op = LOGICAL_NE;
         }
-    ;        
+    ;
 
 shift_expr:
     add_expr
     |   shift_expr LEFT_SHIFT add_expr
         {
             $$ = new_op_expr($1, LEFT_SHIFT, $3);
-        }  
+        }
     |   shift_expr RIGHT_SHIFT add_expr
         {
             $$ = new_op_expr($1, RIGHT_SHIFT, $3);
-        }  
+        }
     ;
 
 
@@ -1008,7 +1008,7 @@ int main(int argc, char * argv[])
      * and emitting them.
      */
     {
-        store_method(current_symbol_table, "puts", t_void); 
+        store_method(current_symbol_table, "puts", t_void);
         store_method(current_symbol_table, "puti", t_void);
         store_method(current_symbol_table, "putf", t_void);
         store_method(current_symbol_table, "gets", t_string);
@@ -1032,7 +1032,7 @@ int main(int argc, char * argv[])
     /*semant_ast(ast_start); */
 
     freopen("a.imc", "w", stdout);
-    fprintf(stderr, "Compiling intermediate code to a.imc\n");      
+    fprintf(stderr, "Compiling intermediate code to a.imc\n");
 /*
     printf( "#Dump of global namespace:\n" );
     indent = 0;
@@ -1066,7 +1066,7 @@ int main(int argc, char * argv[])
 int yyerror(char * s)
 {
 /*
-    fprintf(stderr, "last token = [%s]\n", yylval.sym->name); 
+    fprintf(stderr, "last token = [%s]\n", yylval.sym->name);
 */
     fprintf(stderr, "(error) line %ld: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
