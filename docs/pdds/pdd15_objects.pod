@@ -49,11 +49,41 @@ isn't strictly necessary.
 
 =head1 DESCRIPTION
 
+This PDD lays out two separate things.
+
+The first is the object semantics, as presented to user programs. This
+means that code has an object PMC, and wants to do Object Things with
+it. Object semantics are reasonably simple, and will be defined in a bit.
+
+The second is class semantics. Class semantics are rather more
+complex, and can't really be dealt with in a generic way, such that
+all classes are compatible. As such this PDD lays out Parrot's default
+class semantics, and it is assumed that languages that need different
+semantics will then do whatever they need to, provided that the
+objects they create are generically usable.
+
+Please see the glossary for definitions of the various terms.
+
 =head1 IMPLEMENTATION
 
 =head2 Objects
 
-The interface that objects present to user code is very
+Objects must do the following things. Note that these are required of
+PMCs in general, but objects are presumed to actually do something
+useful with these things rather than just (potentially) throwing an
+exception.
+
+=over 4
+
+=item Get and set properties
+
+Strictly speaking, getting and setting properties is a PMC thing
+rather than an object thing, as PMCs are 
+
+=item
+
+=back
+
 
 =head2 Classes
 
@@ -68,7 +98,22 @@ but uses them completely differently, this section defines
 
 =item Property
 
+A name and value pair attached to a PMC. Properties may be attached to
+the PMC in its role as a container or the PMC in its role as a value.
+
+Properties are global to the PMC. That is there can only be one
+property named "FOO" attached to a PMC, and it is globally visible to
+all inspectors of the PMCs properties. They are I<not> restricted by
+class.
+
+Properties are generally assigned at runtime, and a particular
+property may or may not exist on a PMC at any particular
+time. Properties are not restricted to objects as such, and any PMC
+may have a property attached to it.
+
 =item Attribute
+
+An attribute 
 
 =item Method
 
@@ -82,7 +127,46 @@ but uses them completely differently, this section defines
 
 =head2 Translation
 
+The following list a set of languages, then within each language what
+the parrot term translates to.
 
+=over 4
+
+=item Python
+
+=over 4
+
+=item Attribute
+
+A Python attribute maps to a parrot property
+
+=back
+
+=item .NET
+
+=over 4
+
+=item Attribute
+
+What .NET calls an attribute parrot calls a property
+
+=item Property
+
+What .NET calls a property we call an attribute
+
+=back
+
+=item Generic Terminology
+
+=over 4
+
+=item Instance Variable
+
+Instance Variables map to what we call attributes
+
+=back
+
+=back
 
 =head1 ATTACHMENTS
 
