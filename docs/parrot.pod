@@ -27,6 +27,10 @@ An overview of the Parrot architecture and design.
 Brief descriptions of the different executables constructed and how to
 run them.
 
+=item F<faq.pod>
+
+The Parrot FAQ.
+
 =item F<core_ops.pod>
 
 A description of the core operations in the Parrot assembly language.

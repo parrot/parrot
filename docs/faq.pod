@@ -1,0 +1,303 @@
+=head1 NAME
+
+Parrot FAQ - Frequently Asked Questions
+
+=head1 VERSION
+
+=over 4
+
+=item Revision 0.3 - 13 March 2002
+
+Translated to POD and added "Why aren't we using external tool or library I<X>?"
+
+=item Revision 0.2 - 03 December 2001
+
+Added the "Parrot and Perl" section and "Why Reimplement Perl".  Incorporated Dan's Q&A items.
+
+=item Revision 0.1 - 03 December 2001
+
+Adopted from Simon Cozens's article, "Parrot: A Cross-Language Virtual Machine Architecture".
+
+=back
+
+=head1 GENERAL QUESTIONS
+
+=head2 What is Parrot?
+
+Parrot is the new interpreter being designed from scratch to support 
+the upcoming Perl6 language. It is being designed as a standalone virtual 
+machine that can be used to execute bytecode compiled dynamic languages such as 
+Perl6, but also Perl5. Ideally, Parrot can be used to support other dynamic, 
+bytecode-compiled languages such as Python, Ruby and Tcl.
+
+=head2 Why "Parrot"?
+
+The name "Parrot" relates to Simon Cozens's L<April Fool's Joke|"LINKS"> where Larry Wall and Guido van Rossum announced the merger of 
+the Perl and Python languages.
+
+When not orchestrating elaborate pranks such as this, Simon spends a modicum of time as Parrot's lead developer.
+
+=head2 Is Parrot the same as Perl 6?
+
+No. Parrot is an implementation that is expected to be used to execute 
+Perl6 programs. The Perl6 language definition is currently (December 2001) being 
+crafted by Larry Wall. While the true nature of Perl6 is still unknown, it will 
+be substantially similar to Perl as we know it today, and will need a runtime 
+system. For more information on the nascent Perl6 language definition, check out 
+Larry's L<apocolypses|"LINKS">.
+
+=head2 Can I use Parrot today?
+
+Well, almost.  :^)
+
+Parrot is in the early phases of its implementation.  The primary way to use Parrot is to write Parrot assembly code,
+described in L<PDD6|pdds/pdd6.pod>.
+
+You can also create dynamic content within Apache using Ask Bjorn Hansen's mod_parrot module.  You are strongly 
+advised that mod_parrot is a toy, and should not be used with any production code.
+
+=head2 Why should I program in Parrot Assembly language?
+
+Lots of reasons, actually.  :^)
+
+=over 4
+
+=item *
+
+All the L<cool kids|"LINKS"> are doing it.
+
+=item *
+
+It's a neat hack.
+
+=item *
+
+You get all the pleasure of programming in assembly language without any of the requisite system crashes.
+
+=back
+
+Seriously, though, programming in Parrot assembly language is an interesting challenge.  It's also one of the best 
+ways to write test cases for Parrot.
+
+=head2 When can I expect to use Parrot with a I<real> programming language?
+
+It depends on what you mean by I<real>.  :^)
+
+=over 4
+
+=item *
+
+Leon Brocard has released a proof-of-concept L<Java bytecode to Parrot bytecode|"LINKS"> compiler.
+
+=item *
+
+Gregor Purdy is working on a little language called Jako that targets Parrot bytecode directly.  (Available with the
+Parrot distribution.)
+
+=item *
+
+Dan Sugalski and Jeff Goff have started work on compiling Scheme down to Parrot bytecode.  (Available with the Parrot
+distribution.)
+
+=back
+
+=head2 What language is Parrot written in?
+
+C.
+
+=head2 For the love of God, man, why?!?!?!?
+
+Because it's the best we've got.
+
+=head2 That's sad.
+
+So true.  Regardless, C's available pretty much everywhere.  Perl 5's in C, so we can potentially build any place Perl 5 builds.
+
+=head2 Why not write it in I<insert favorite language here>?
+
+Because of one of:
+
+=over 4
+
+=item *
+
+Not available everywhere.
+
+=item *
+
+Limited talent pool for core programmers.
+
+=item *
+
+Not fast enough.
+
+=back
+
+=head2 Why aren't you using external tool or library I<X>?
+
+The most common issues are:
+
+=over 4
+
+=item *
+License compatibility.
+
+Parrot has an odd license.  Most licenses--even open-source ones--aren't compatible with Parrot.  Anything licensed 
+under Perl 5's terms is okay, and some things licensed under BSD or X licenses may be.  GPL licenses aren't okay.
+
+=item *
+Platform compatibility.
+
+Parrot has to work on most of Perl 5's platforms, as well as a few of its own.  Perl 5 runs on eighty platforms; 
+Parrot must run on Unix, Windows, Mac OS (X and Classic), VMS, Crays, Windows CE, and Palm OS, just to name a few.  
+Among its processor architectures will be x86, SPARC, Alpha, IA-64, ARM, and 68x00 (Palms and old Macs).  If 
+something doesn't work on all of these, we can't use it in Parrot.
+
+=item *
+Speed, size, and flexibility.
+
+Not only does Parrot have to run on all those platforms, but it must also run efficiently.  Parrot's core size is 
+currently between 250K and 700K, depending on compiler.  That's pushing it on the handheld platforms.  Any library
+used by Parrot must be fast enough to have a fairly small performance impact, small enough to have little impact on
+core size, and flexible enough to handle the varying demands of Perl, Python, Tcl, Ruby, Scheme, and whatever else 
+some clever or twisted hacker throws at Parrot.
+
+=back
+
+These tests are very hard to pass; currently we're expecting we'll probably have to write everything but the Unicode
+stuff.
+
+=head2 Why your own virtual machine?  Why not compile to JVM/.NET?
+
+Those VMs are designed for statically typed languages. That's fine, 
+since Java, C#, and lots of other languages are statically typed. Perl isn't. 
+For a variety of reasons, it means that perl would run more slowly there than on 
+an interpreter geared towards dynamic languages.
+
+=head2 So you won't run on JVM/.NET?
+
+Sure we will. They're just not our first target. We build our own 
+interpreter/VM, then when that's working we start in on the JVM and/or .NET back 
+ends.
+
+=head1 PARROT AND PERL
+
+=head2 Why reimplement Perl?
+
+Good question.
+
+At The Perl Conference 4.0, in the summer of 2000, Larry Wall L<announced|"LINKS"> that it was time to recreate Perl from the ground up. 
+This included the Perl language, the implementation of that language, the community of open source developers who 
+volunteer to implement and maintain the language, and the larger community of programmers who use Perl.
+
+A variety of reasons were given for embarking on this project: 
+
+=over 4
+
+=item *
+
+Perl5 is a stable, reliable, robust platform for developing software; it's 
+not going away for a long time, even after Perl6 is released. (Proof: Perl4 is 
+still out there, no matter how much we all want it to go away.)
+
+=item *
+
+We have the ability to translate Perl5 into Perl6 if necessary. This 
+preserves backward compatibility with a large body of existing Perl code, 
+which is I<very> important.
+
+=item *
+
+The language can stand some revision: formats don't really belong in the 
+core language, and typeglobs have outlived their usefulness. By revising the 
+language now, we can make Perl better.
+
+=item *
+
+Some warts really should be removed: C<system> should return I<true> instead of 
+I<false> on success, and C<localtime> should return the year, not the year - 1900.
+
+=item *
+
+It would be nice to write the Perl to Bytcode compiler in Perl, instead of 
+C. That would make it much easier for Perl hackers to hack on Perl. 
+
+=back
+
+=head2 You want to write the Perl compiler in Perl?
+
+Sure.  Why not?  C, Java, Lisp, Scheme, and practically every other language is self-hoisting.  Why not?
+
+=head2 Isn't there a bootstrapping problem?
+
+No, not really.  Don't forget that we can use Perl 5 to run Perl 5 programs, such as a Perl 5 to Parrot compiler.
+
+=head2 How will Parrot handle both Perl 5 and Perl 6?
+
+We don't know yet, since it depends on the Perl 6 language definition.  But we I<could> use the more appropriate of 
+two Perl compilers, depending of whether we're compiling Perl 5 or Perl 6.  Larry has mumbled something about a 
+C<package> statement declaring that the file is Perl 5, but we're still not quite sure on how that fits in.
+
+=head2 Is this how Parrot will run Python, Ruby, and Tcl code?
+
+Probably.
+
+=head2 Latin and Klingon too?
+
+No, Parrot won't be twisted enough for Damian.  Perhaps when Parrot is ported to a pair of supercool calcium ions, 
+though...
+
+=head2 Huh?
+
+You had to L<be there|"LINKS">.
+
+=head1 PARROT IMPLEMENTATION ISSUES
+
+=head2 What's with the whole register thing machine?
+
+Not much, why do you ask?
+
+=head2 Don't you know that stack machines are the way to go in software?
+
+No, in fact, I don't.
+
+=head2 But look at all the successful stack-based VMs!
+
+Like what?  There's just the JVM.
+
+=head2 What about all the others?
+
+B<What> others?  That's it, unless you count Perl, Python, or Ruby.
+
+=head2 Yeah them!
+
+Yeah, right.  You never thought of them as VMs, admit it.  :^)
+
+Seriously, we're already running with a faster opcode dispatch than any of them are, and having registers just 
+decreases the amound of stack thrash we get.
+
+=head2 Right, smarty.  Then name a successful register-based VM!
+
+The 68K emulator Apple ships with all its PPC-enabled versions of Mac OS.
+
+=head2 Really?
+
+L<Really.|"LINKS">
+
+=head1 LINKS
+
+April Fool's Joke: http://www.perl.com/pub/a/2001/04/01/parrot.htm
+
+apocolypses: http://www.panix.com/~ziggy/
+
+cool kids: http://use.perl.org/~acme/journal
+
+Java bytecode to Parrot bytecode: http://archive.develooper.com/perl6-internals@perl.org/msg03864.html
+
+http://www.perl.com/pub/a/2000/10/23/soto2000.html
+
+be there: http://www.csse.monash.edu.au/~damian/papers/#Superpositions
+
+Really.: http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html
+
+=cut
