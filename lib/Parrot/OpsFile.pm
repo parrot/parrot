@@ -46,11 +46,11 @@ sub trim
 
 sub new
 {
-  my ($class, $file) = @_;
+  my ($class, @files) = @_;
 
   my $self = bless { PREAMBLE => '' }, $class;
 
-  $self->read_ops($file);
+  $self->read_ops($_) for @files;
 
   return $self;
 }
@@ -98,7 +98,7 @@ sub read_ops
     unless ($seen_op or m|^(inline\s+)?op\s+|) {
       if (m/^\s*VERSION\s*=\s*"(\d+\.\d+\.\d+)"\s*;\s*$/) {
         if (exists $self->{VERSION}) {
-          die "VERSION MULTIPLY DEFINED!";
+          #die "VERSION MULTIPLY DEFINED!";
         }
 
         $self->version($1);
@@ -107,7 +107,7 @@ sub read_ops
       }
       elsif (m/^\s*VERSION\s*=\s*PARROT_VERSION\s*;\s*$/) {
         if (exists $self->{VERSION}) {
-          die "VERSION MULTIPLY DEFINED!";
+          #die "VERSION MULTIPLY DEFINED!";
         }
 
         $self->version($PConfig{VERSION});

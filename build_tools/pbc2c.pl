@@ -26,7 +26,7 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
-my $ops = new Parrot::OpsFile 'core.ops';
+my $ops = new Parrot::OpsFile ('core.ops', 'vtable.ops');
 
 
 #
@@ -147,7 +147,7 @@ END_C
     while ($offset + sizeof('op') <= $length) {
         $pc       = $new_pc;
 	$op_code  = unpack "x$offset l", $pf->byte_code;
-        $op       = $ops->op($op_code);
+        $op       = $ops->op($op_code) || die "Can't find an op for opcode $op_code\n";
 	$offset  += sizeof('op');
         $new_pc   = $pc + $op->size;
 
