@@ -53,11 +53,18 @@ Parrot_sleep(unsigned int seconds)
 ** Parrot_setenv()
 */
 
+#define HAS_SETENV /* XXX need a test, this is never set */
 #ifdef HAS_SETENV
 void
 Parrot_setenv(const char *name, const char *value)
 {
     setenv(name, value, 1);
+}
+
+char *
+Parrot_getenv(const char *name)
+{
+    return getenv(name);
 }
 #else
 /* putenv-based version might go here, but see perl5's util.c for

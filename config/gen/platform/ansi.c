@@ -50,7 +50,16 @@ Parrot_sleep(unsigned int seconds)
 void
 Parrot_setenv(const char *name, const char *value)
 {
-    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_setenv not implemented");
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
+            "Parrot_setenv not implemented");
+    return;
+}
+
+char *
+Parrot_getenv(const char *name)
+{
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
+            "Parrot_getenv not implemented");
     return;
 }
 

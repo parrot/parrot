@@ -471,9 +471,9 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 }
 
 static int
-env_var_set(const char* var)
+is_env_var_set(const char* var)
 {
-    char* value = getenv(var);
+    char* value = Parrot_getenv(var);
     if (value == NULL) return 0;
     if (*value == '\0') return 0;
     return ! (strcmp(value, "0") == 0);
@@ -508,7 +508,7 @@ make_interpreter(Interp_flags flags)
     PIO_init(interpreter);
 
 
-    if (env_var_set("PARROT_GC_DEBUG")) {
+    if (is_env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interpreter, PARROT_GC_DEBUG_FLAG);
        interpreter->lo_var_ptr = &interpreter;

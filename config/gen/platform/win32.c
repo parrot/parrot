@@ -60,6 +60,11 @@ Parrot_setenv(const char *name, const char *value)
 }
 
 
+char *
+Parrot_getenv(const char *name)
+{
+    return getenv(name);
+}
 /*
 ** Parrot_dlopen()
 */
