@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 32;
+use TestCompiler tests => 33;
 
 ##############################
 # Parrot Calling Conventions
@@ -935,7 +935,7 @@ output_is($code, <<'OUT', "overflow pmcs");
 all params ok
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg 1");
+output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 1");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -962,7 +962,7 @@ ok 1
 ok 2
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg 2");
+output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 2");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -993,7 +993,7 @@ first
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg 3");
+output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 3");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1034,7 +1034,7 @@ ok 2
 last
 OUT
 
-output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
+output_is(<<'CODE', <<'OUT', ".flatten_arg non-prototyped 4");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -1077,9 +1077,80 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
     .param pmc g
     .param pmc h
     print "Got "
-    print I2
+    print I3 
     print " params\n"
     print a
+    print b
+    print c
+    print d
+    print e
+    print f
+    print g
+    print h
+    end
+.end
+CODE
+Got 8 params
+first
+ok 1
+ok 2
+middle
+ok 3
+ok 4
+ok 5
+last
+OUT
+
+output_is(<<'CODE', <<'OUT', ".flatten_arg prototyped 1");
+.pcc_sub _main prototyped
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .local pmc x
+    x = new PerlString
+    x = "first\n"
+    .local pmc y
+    y = new PerlString
+    y = "middle\n"
+    .local pmc z
+    z = new PerlString
+    z = "last\n"
+    .local pmc ar
+    ar = new PerlArray
+    push ar, "ok 1\n"
+    push ar, "ok 2\n"
+    .local pmc ar2
+    ar2 = new PerlArray
+    push ar2, "ok 3\n"
+    push ar2, "ok 4\n"
+    push ar2, "ok 5\n"
+    .pcc_begin prototyped
+    .arg x
+    .flatten_arg ar
+    .arg y
+    .flatten_arg ar2
+    .arg z
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub prototyped
+    .param pmc a
+    .param pmc b
+    .param pmc c
+    .param pmc d
+    .param pmc e
+    .param pmc f
+    .param pmc g
+    .param pmc h
+    .local int count
+    print "Got "
+    count = I1 + I2
+    count = count + I3
+    count = count + I4
+    print count 
+    print " params\n"
+    print a 
     print b
     print c
     print d
@@ -1158,7 +1229,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
     .param pmc n
     .param pmc o
     print "Got "
-    print I2
+    print I3
     print " params\n"
     print a
     print b
