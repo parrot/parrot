@@ -12,7 +12,7 @@ ok 1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "int test");
-
+    .include "iterator.pasm"
 	new P0, .PerlArray	# empty array
 	new P2, .PerlArray	# array with 2 elements
 	push P2, 10
@@ -25,13 +25,13 @@ output_is(<<'CODE', <<'OUTPUT', "int test");
 	print "not "
 ok2:	print "ok 2\n"
 	new P1, .Iterator, P0
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	print "ok 3\n"
 	unless P1, ok4		# if(iter) == false on empty
 	print "not "
 ok4:	print "ok 4\n"
 	new P1, .Iterator, P2
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	if P1, ok5		# if(iter) == true on non empty
 	print "not "
 ok5:	print "ok 5\n"
@@ -52,7 +52,7 @@ ok7:	print "ok 7\n"
 ok8:	print "ok 8\n"
 
 	# now iterate from end
-	set P1, 3		# reset PIter
+	set P1, .ITERATE_FROM_END
 	if P1, ok9		# if(iter) == true on non empty
 	print "not "
 ok9:	print "ok 9\n"
@@ -88,6 +88,7 @@ ok 12
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "hash iter 1");
+    .include "iterator.pasm"
 	new P0, .PerlHash	# empty Hash
 	new P2, .PerlHash	# Hash with 2 elements
 	set P2["ab"], 100
@@ -100,13 +101,13 @@ output_is(<<'CODE', <<'OUTPUT', "hash iter 1");
 	print "not "
 ok2:	print "ok 2\n"
 	new P1, .Iterator, P0
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	print "ok 3\n"
 	unless P1, ok4		# if(iter) == false on empty
 	print "not "
 ok4:	print "ok 4\n"
 	new P1, .Iterator, P2
-	set P1, 0		# reset PIter
+	set P1, .ITERATE_FROM_START
 	if P1, ok5		# if(iter) == true on non empty
 	print "not "
 ok5:	print "ok 5\n"
@@ -141,6 +142,7 @@ ok 8
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "hash iter 2");
+    .include "iterator.pasm"
 	new P0, .PerlHash	# Hash for iteration
 	new P2, .PerlHash	# for test
 
@@ -165,7 +167,7 @@ fill:
 	print "not "
 ok1:
 	print "ok 1\n"
-	set P1, 0
+	set P1, .ITERATE_FROM_START
 get:
 	unless P1, done
         shift S3, P1		# get hash.key
@@ -187,6 +189,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "hash iter - various types");
     .include "datatypes.pasm"	# type constants
+    .include "iterator.pasm"
     new P1, .PerlHash
     set P1["int"], 10
     set P1["num"], 2.5
@@ -197,7 +200,7 @@ output_is(<<'CODE', <<'OUTPUT', "hash iter - various types");
 
     set I10, 0			# count items
     new P0, .Iterator, P1	# setup iterator for hash P1
-    set P0, 0			# reset iterator, begin at start
+    set P0, .ITERATE_FROM_START
 iter_loop:
     unless P0, iter_end		# while (entries) ...
       inc I10
@@ -231,10 +234,11 @@ CODE
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration forward");
+    .include "iterator.pasm"
 	new P2, .PerlString
 	set P2, "parrot"
 	new P1, .Iterator, P2
-	set P1, 0
+	set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end		# while (entries) ...
 	shift S1, P1
@@ -251,10 +255,11 @@ parrot
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration backward");
+    .include "iterator.pasm"
 	new P2, .PerlString
 	set P2, "parrot"
 	new P1, .Iterator, P2
-	set P1, 3
+	set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end		# while (entries) ...
 	pop S1, P1
@@ -271,10 +276,11 @@ parrot
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration forward get ord");
+    .include "iterator.pasm"
 	new P2, .PerlString
 	set P2, "ABC"
 	new P1, .Iterator, P2
-	set P1, 0
+	set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end		# while (entries) ...
 	shift I1, P1
@@ -291,10 +297,11 @@ ABC
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "string iteration backward get ord");
+.include "iterator.pasm"
 	new P2, .PerlString
 	set P2, "ABC"
 	new P1, .Iterator, P2
-	set P1, 3
+	set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end		# while (entries) ...
 	pop I1, P1
@@ -313,6 +320,7 @@ OUTPUT
 SKIP: {
 skip("N/Y: get_keyed_int gets rest of array", 1);
 output_is(<<'CODE', <<'OUTPUT', "shift + index access");
+    .include "iterator.pasm"
 
 	new P2, .PerlArray	# array with 2 elements
 	push P2, 10
@@ -320,7 +328,7 @@ output_is(<<'CODE', <<'OUTPUT', "shift + index access");
 	push P2, 30
 	push P2, 40
 	new P1, .Iterator, P2
-	set P1, 0
+	set P1, .ITERATE_FROM_START
 
 	set I0, P1		# arr.length
 	eq I0, 4, ok1

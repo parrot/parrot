@@ -502,22 +502,22 @@ pmclass Array {
 	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
 	switch (what) {
-	    case 0:	/* reset key, iterate from start */
+	    case ITERATE_FROM_START:	/* reset key */
 		ret->cache.int_val = 0;
 		if (!n)
 		    ret->cache.int_val = -1;
 		break;
-	    case 1:	/* next key */
+	    case ITERATE_GET_NEXT:
 		if (ret->cache.int_val < n - 1)
 		    ++ret->cache.int_val;
 		else
 		    ret->cache.int_val = -1;
 		break;
-	    case 2:	/* prev key */
+	    case ITERATE_GET_PREV:
 		if (ret->cache.int_val >= 0)
 		    --ret->cache.int_val;
 		break;
-	    case 3:	/* reset key, iterate from end */
+	    case ITERATE_FROM_END:
 		ret->cache.int_val = n - 1;
 		break;
 	}
