@@ -29,6 +29,7 @@ sub teardown
 
 c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/io.h>
 
 int
@@ -51,6 +52,7 @@ OUTPUT
 
 c_output_is(<<'CODE', <<'OUTPUT', "write");
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/io.h>
 
 int
@@ -88,6 +90,7 @@ close FILE;
 
 c_output_is(<<'CODE', <<'OUTPUT', 'read');
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/io.h>
 
 int
@@ -135,6 +138,7 @@ OUTPUT
 
 c_output_is(<<'CODE', '', 'append');
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/io.h>
 
 int
@@ -165,6 +169,7 @@ close FILE;
 
 c_output_is(<<'CODE', <<'OUTPUT', 'readline');
 #include <parrot/parrot.h>
+#include <parrot/embed.h>
 #include <parrot/io.h>
 
 int
@@ -202,6 +207,7 @@ OUTPUT
 c_output_is(<<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
 #include <stdio.h>
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 #include "../io/io_private.h"
 
 int main(int argc, char* argv[]) {
