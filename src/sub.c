@@ -76,7 +76,8 @@ new_coroutine(struct Parrot_Interp *interp)
     struct Parrot_Coroutine *newco =
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
     newco->ctx.user_stack = new_stack(interp, "User");
-    newco->ctx.control_stack = new_stack(interp, "Control");
+    newco->ctx.control_stack = interp->ctx.control_stack;
+    stack_mark_cow(newco->ctx.control_stack);
     newco->ctx.pad_stack = new_stack(interp, "Pad");
 
     pad = scratchpad_get_current(interp);

@@ -94,15 +94,14 @@ chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)
         if (new_top == NULL) {
             new_top = new_chunk;
             new_top->next = NULL;
-            new_top->prev = NULL;
             last = new_top;
         }
         else {
             new_chunk->next = last;
-            new_chunk->prev = NULL;
             last->prev = new_chunk;
             last = new_chunk;
         }
+        new_chunk->prev = old_chunk->prev;
         new_chunk->used = old_chunk->used;
         new_chunk->n_chunks = old_chunk->n_chunks;
         new_chunk->chunk_limit = old_chunk->chunk_limit;
@@ -321,11 +320,14 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
          * just emptied around for now in case we need it again. */
         chunk = chunk->prev;
         *stack_p = chunk;
+        if (PObj_COW_TEST( (Buffer *) chunk))
+            *stack_p = chunk = chunk_copy(interpreter, chunk, 0);
     }
 
     /* Quick sanity check */
     if (chunk->used == 0) {
-        internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");
+        internal_exception(ERROR_STACK_EMPTY, "No entries on %sStack!\n",
+                chunk->name);
     }
     assert(!PObj_COW_TEST( (Buffer *) chunk));
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -323,4 +323,40 @@ func1
 back
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "test COW");
+    print "main\n"
+    set I16, 0
+    set I17, 255	# 1 chunk full
+lp:
+    save I16
+    inc I16
+    le I16, I17, lp
+    newsub .Sub, .Continuation, _func, ret
+    pushbottomi
+    invoke
+    popbottomi
+ret:
+lp2:
+    restore I16
+    eq I16, I17, ok
+    print "nok I16: "
+    print I16
+    print " I17: "
+    print I17
+    print "\n"
+    end
+ok:
+    dec I17
+    if I17, lp2
+    print "back\n"
+    end
+_func:
+    print "func\n"
+    save I0
+    invoke P1
+CODE
+main
+func
+back
+OUTPUT
 1;
