@@ -625,7 +625,7 @@ sub P6C::closure::ctx_right {
 		unshift @{$x->block}, $init;
 	    } else {
 		diag "Closure with no statements?";
-		$x->block = [$init];
+		$x->block([$init]);
 	    }
 	    $x->params(undef);	# will fill them in in IMCC.pm
 	}
