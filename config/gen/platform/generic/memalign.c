@@ -13,14 +13,6 @@ Parrot_memalign(size_t align, size_t size)
     return i == 0 ? p : NULL;
 }
 
-void *
-Parrot_memalign_if_possible(size_t align, size_t size)
-{
-    void *p;
-    int i = posix_memalign(&p, align, size);
-    return i == 0 ? p : NULL;
-}
-
 #elif defined(PARROT_HAS_MEMALIGN)
 
 #if defined(PARROT_HAS_HEADER_MALLOC)
@@ -31,12 +23,6 @@ Parrot_memalign_if_possible(size_t align, size_t size)
 
 void *
 Parrot_memalign(size_t align, size_t size)
-{
-    return memalign(align, size);
-}
-
-void *
-Parrot_memalign_if_possible(size_t align, size_t size)
 {
     return memalign(align, size);
 }

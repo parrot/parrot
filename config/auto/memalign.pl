@@ -30,6 +30,9 @@ sub runstep {
 	return;
     }
 
+    if (defined Configure::Data->get('memalign')) {
+		return; # already set; leave it alone
+	}
     my $test = 0;
 
     if (Configure::Data->get('i_malloc')) {

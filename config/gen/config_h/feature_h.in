@@ -31,6 +31,12 @@ elsif (${memalign} eq 'memalign') {
 
 END
 }
+elsif (${memalign} eq 'some_memalign') {
+  print OUT <<'END'
+#define PARROT_HAS_SOME_MEMALIGN
+
+END
+}
 
 	print OUT <<EOP;
 /* from config/auto/isreg */

@@ -360,8 +360,10 @@ init_prederef(Interp *interpreter, int which)
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
         void *pred_func;
-/* Parrot_memalign_if_possible in OpenBSD allocates 256 if you ask for 312 */
-#if 1
+/* Parrot_memalign_if_possible in OpenBSD allocates 256 if you ask for 312
+   -- Need to verify this, it may have been a bug elsewhere. If it works now,
+   we can remove the mem_sys_allocate_zeroed line below. */
+#if 0
         void **temp = (void **)mem_sys_allocate_zeroed(N * sizeof(void *));
 #else
         void **temp = (void **)Parrot_memalign_if_possible(256,

@@ -26,8 +26,10 @@ void *Parrot_memalign(size_t align, size_t size);
 void *Parrot_memalign_if_possible(size_t align, size_t size);
 void Parrot_free_memalign(void *);
 
-#if !defined(PARROT_HAS_MEMALIGN) && !defined(PARROT_HAS_POSIX_MEMALIGN)
-#  define Parrot_memalign_if_possible(a, s) malloc(a)
+#if !defined(PARROT_HAS_SOME_MEMALIGN)
+#  define Parrot_memalign_if_possible(a, s) malloc(s)
+#else
+#  define Parrot_memalign_if_possible(a, s) Parrot_memalign(a, s)
 #endif
 
 #ifdef PARROT_HAS_EXEC_PROTECT

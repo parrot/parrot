@@ -25,4 +25,5 @@ Configure::Data->set(
   ld => 'c++',
   ld_share_flags => '-dynamiclib',
   ld_load_flags => '-bundle -undefined suppress',
+  memalign => 'some_memalign',
 );

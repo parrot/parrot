@@ -714,10 +714,11 @@ Parrot_destroy_header_pools(Interp *interpreter)
                     next = cur_arena->prev;
 #if ARENA_DOD_FLAGS
                     mem_internal_free(cur_arena->dod_flags);
+                    Parrot_free_memalign(cur_arena);
 #else
                     mem_internal_free(cur_arena->start_objects);
-#endif
                     mem_internal_free(cur_arena);
+#endif
                     cur_arena = next;
                 }
                 mem_internal_free(pool);
@@ -730,10 +731,11 @@ Parrot_destroy_header_pools(Interp *interpreter)
         next = cur_arena->prev;
 #if ARENA_DOD_FLAGS
         mem_internal_free(cur_arena->dod_flags);
+        Parrot_free_memalign(cur_arena);
 #else
         mem_internal_free(cur_arena->start_objects);
-#endif
         mem_internal_free(cur_arena);
+#endif
         cur_arena = next;
     }
     mem_internal_free(interpreter->arena_base->pmc_ext_pool);
