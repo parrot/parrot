@@ -7,6 +7,7 @@
 use strict;
 use Digest::MD5 qw(&md5_hex);
 use Getopt::Long;
+use Parrot::Opcode;
 
 my %options;
 GetOptions(\%options,('checksyntax',
@@ -56,40 +57,12 @@ my(%sizeof);
 foreach (keys(%real_type)) {
     $sizeof{$_}=length(pack($pack_type{$real_type{$_}},0));
 }
-                
 
-# get opcodes from guts.
-open(GUTS, "<interp_guts.h") or
-  open(GUTS, "<../interp_guts.h") or
-  die "Can't get opcodes from guts, $!/$^E";
-my %opcodes;
-while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
-    $opcodes{$2}{CODE} = $1;
-}
-close GUTS;
 
-# get opcodes and their arg lists
-open(OPCODES, "<opcode_table") or
-  open(OPCODES, "<../opcode_table") or
-  die "Can't get opcode table, $!/$^E";
-my $opcode_table;
-while (<OPCODES>) {
-    $opcode_table .= $_;
-    next if /^\s*#/;
-    chomp;
-    s/^\s+//;
-    next unless $_;
-    my ($name, $args, @types) = split /\s+/, $_;
-    my @rtypes=@types;
-    @types=map { $_ = $real_type{$_}} @types;
-    $opcodes{$name}{ARGS} = $args;
-    $opcodes{$name}{TYPES} = [@types];
-    $opcodes{$name}{RTYPES}=[@rtypes];
-}
-close OPCODES;
-my $opcode_fingerprint = md5_hex($opcode_table);
-constantize($opcode_fingerprint); # Make it constant zero.
+# get opcodes
+my %opcodes = Parrot::Opcode::read_ops();
+
+constantize(Parrot::Opcode::fingerprint()); # Make it constant zero.
 
 my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 
@@ -183,8 +156,8 @@ while(<>) {
         $pc+=4;
 
         foreach (0..$#args) {
-            my($rtype)=$opcodes{$opcode}{RTYPES}[$_];
-            my($type)=$opcodes{$opcode}{TYPES}[$_];
+            my($rtype)=$opcodes{$opcode}{TYPES}[$_];
+            my($type)=$real_type{$opcodes{$opcode}{TYPES}[$_]};
             if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
                 # its a register argument
                 $args[$_]=~s/^[INPS](\d+)$/$1/i;

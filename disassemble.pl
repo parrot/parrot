@@ -6,8 +6,7 @@
 
 use strict;
 use Digest::MD5 qw(&md5_hex);
-
-my(%opcodes, @opcodes);
+use Parrot::Opcode;
 
 my %unpack_type = (i => 'l',
 		   I => 'l',
@@ -26,32 +25,13 @@ my %unpack_size = (i => 4,
 		   s => 4,
 		   );
 
-open GUTS, "interp_guts.h";
-my $opcode;
-while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
-    $opcodes{$2}{CODE} = $1;
+my %opcodes            = Parrot::Opcode::read_ops();
+my $opcode_fingerprint = Parrot::Opcode::fingerprint();
+my @opcodes;
+for my $name (keys %opcodes) {
+    $opcodes[$opcodes{$name}{CODE}] = { NAME => $name,
+					%{$opcodes{$name}} };
 }
-
-my $opcode_table;
-open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
-while (<OPCODES>) {
-    $opcode_table .= $_;
-    next if /^\s*#/;
-    s/^\s+//;
-    chomp;
-    next unless $_;
-    my ($name, $args, @types) = split /\s+/, $_;
-    next unless defined $name;
-    $opcodes{$name}{ARGS} = $args;
-    $opcodes{$name}{TYPES} = [@types];
-    my $code = $opcodes{$name}{CODE};
-    $opcodes[$code] = {NAME => $name,
-		       ARGS => $args,
-		       TYPES => [@types]
-		       }
-}
-my $opcode_fingerprint = md5_hex($opcode_table);
 
 $/ = \4;
 

@@ -1,10 +1,9 @@
 # !/usr/bin/perl -w
 use strict;
 use Digest::MD5 qw(&md5_hex);
+use Parrot::Opcode;
 
 open INTERP, "> interp_guts.h" or die "Can't open interp_guts.h, $!/$^E";
-
-open OPCODES, "opcode_table" or die "Can't open opcode_table, $!/$^E";
 
 print INTERP <<CONST;
 /*
@@ -19,24 +18,13 @@ print INTERP <<CONST;
 #define BUILD_TABLE(x) do { \\
 CONST
 
-my $opcode_table;
-my $count = 1;
-while (<OPCODES>) {
-    $opcode_table .= $_;
-    chomp;
-    s/#.*$//;
-    s/^\s+//;
-    next unless $_;
-    my($name) = split /\s+/;
-    my $num = $count;
-    $num = 0 if $name eq 'end';
-    print INTERP "\tx[$num] = $name; \\\n";
-    $count++ unless $name eq 'end';
-}
-close OPCODES;
-my $opcode_fingerprint = md5_hex($opcode_table);
-print INTERP "} while (0);\n";
+my %opcodes            = Parrot::Opcode::read_ops();
+my $opcode_fingerprint = Parrot::Opcode::fingerprint();
 
+for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
+    print INTERP "\tx[$opcodes{$name}{CODE}] = $name; \\\n";
+}
+print INTERP "} while (0);\n";
 
 # Spit out the DO_OP function
 print INTERP <<EOI;

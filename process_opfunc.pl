@@ -30,6 +30,9 @@
 # of the return offset, are taken from the opcode_table file
 
 use strict;
+use Parrot::Opcode;
+
+my %opcodes = Parrot::Opcode::read_ops();
 
 my %opcode;
 
@@ -87,16 +90,28 @@ if (! ($file =~ s/\.ops$/.c/)) {
 }
 open OUTPUT, ">$file" or die "Can't open $file, $!/$^E";
 
-my($name, $footer);
+my($name, $footer, @param_sub);
 while (<INPUT>) {
 
     if (/^AUTO_OP/) {
 	($name, $footer) = emit_auto_header($_);
-	next;
     }
 
     if (/^MANUAL_OP/) {
 	($name, $footer) = emit_manual_header($_);
+    }
+
+    if (/^(AUTO|MANUAL)_OP/) {
+	my $count = 1;
+	@param_sub = ("",
+		      map {if ($_ eq "n") {
+			  my $temp = '*(NV *)&cur_opcode[' . $count . ']';
+			  $count += 2;
+			  $temp;
+		      } else {
+			  "cur_opcode[" . $count++ . "]"
+		      }
+		       } @{$opcodes{$name}{TYPES}});
 	next;
     }
 
@@ -106,7 +121,7 @@ while (<INPUT>) {
 
     s/RETURN\((.*)\)/return cur_opcode + $1/;
 
-    s/\bP(\d+)\b/$opcode{$name}{PARAMETER_SUB}[$1]/g;
+    s/\bP(\d+)\b/$param_sub[$1]/g;
 
     if (/^}/) {
         print OUTPUT $footer, "\n";
@@ -119,17 +134,26 @@ while (<INPUT>) {
 sub emit_auto_header {
     my $line = shift;
     my ($name) = $line =~ /AUTO_OP\s+(\w+)/;
+
+    my $psize=0;
+    foreach (@{$opcodes{$name}{TYPES}}) {
+       $psize+=$psize{$_};
+    }
+    my $return_offset = $psize + 1;
+
+    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
     
-    print OUTPUT "IV *$name(IV cur_opcode[], struct Perl_Interp *interpreter) {\n";
-    return($name, "  return cur_opcode + "
-    . $opcode{$name}{RETURN_OFFSET}. ";\n}\n");
+    print OUTPUT ("IV *$opcodes{$name}{FUNC}".
+		  "(IV cur_opcode[], struct Perl_Interp *interpreter) {\n");
+    return($name, "  return cur_opcode + " . $return_offset . ";\n}\n");
 }
 
 sub emit_manual_header {
     my $line = shift;
     my ($name) = $line =~ /MANUAL_OP\s+(\w+)/;
     
-    print OUTPUT "IV *$name(IV cur_opcode[], struct Perl_Interp *interpreter) {\n";
+    print OUTPUT ("IV *$opcodes{$name}{FUNC}".
+		  "(IV cur_opcode[], struct Perl_Interp *interpreter) {\n");
     print OUTPUT "  IV return_offset = 1;\n";
     return($name, "  return cur_opcode + return_offset;\n}\n");
 }
