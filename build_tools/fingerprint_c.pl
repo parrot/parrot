@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -23,7 +21,6 @@ file F<DEVELOPING> exists. Releases include a non-dynamic fingerprint.c.
 
 =cut
 
-################################################################################
 
 use strict;
 use lib 'lib';

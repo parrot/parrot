@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -19,7 +17,6 @@ specified CPU architecture type (F<jit/cpu-architecture-name/core.jit>).
 
 =cut
 
-################################################################################
 
 use strict;
 use lib 'lib';

@@ -1,8 +1,6 @@
 #! perl -w
-################################################################################
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-################################################################################
 
 =head1 NAME
 
@@ -19,11 +17,13 @@ uses C<Parrot::Vtable>.
 
 =head1 SEE ALSO
 
-C<Parrot::Vtable>.
+=over 4
+
+=item C<Parrot::Vtable>
+
+=back
 
 =cut
-
-################################################################################
 
 use lib 'lib';
 use Parrot::Vtable;
