@@ -2343,6 +2343,7 @@ ops/string.ops                                    []
 ops/sys.ops                                       []
 ops/var.ops                                       []
 parrot.spec                                       []
+parrot-config.imc    	                          [devel]
 parrotbug					  []
 PBC_COMPAT                                        [main]doc
 pf/pf_items.c                                     []
