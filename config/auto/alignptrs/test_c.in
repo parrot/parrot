@@ -22,6 +22,12 @@ int main(int argc, char **argv) {
     void **ptr;
     
     int align = 0;
+
+    if(argc != 2) {
+        printf("FAILED - single command-line parameter required!\n");
+	return 1;
+    }
+
 #ifdef SIGBUS
     signal(SIGBUS, bletch);
 #endif
