@@ -8,7 +8,7 @@ t/pmc/managedstruct.t - Managed C Structure
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/managedstruct.t
+	% perl -Ilib t/pmc/managedstruct.t
 
 =head1 DESCRIPTION
 

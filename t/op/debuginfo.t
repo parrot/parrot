@@ -8,7 +8,7 @@ t/op/debuginfo.t - Debugging Info
 
 =head1 SYNOPSIS
 
-	% perl t/op/debuginfo.t
+	% perl -Ilib t/op/debuginfo.t
 
 =head1 DESCRIPTION
 

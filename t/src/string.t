@@ -8,7 +8,7 @@ t/src/string.t - String tests
 
 =head1 SYNOPSIS
 
-	% perl t/src/string.t
+	% perl -Ilib t/src/string.t
 
 =head1 DECSRIPTION
 

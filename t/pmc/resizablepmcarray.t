@@ -8,7 +8,7 @@ t/pmc/resizablepmcarray.t - ResizablePMCArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/ResizablePMCArray.t
+	% perl -Ilib t/pmc/ResizablePMCArray.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 =head1 SYNOPSIS
 
-	% perl t/op/calling.t
+	% perl -Ilib t/op/calling.t
 
 =head1 DESCRIPTION
 

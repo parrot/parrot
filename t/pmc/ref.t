@@ -8,7 +8,7 @@ t/pmc/ref.t - Reference PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/ref.t
+	% perl -Ilib t/pmc/ref.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/exception.t - Exception Handling
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/exception.t
+	% perl -Ilib t/pmc/exception.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/hacks.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/hacks.t
+	% perl -Ilib t/op/hacks.t
 
 =head1 DESCRIPTION
 

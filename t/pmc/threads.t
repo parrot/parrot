@@ -8,7 +8,7 @@ t/pmc/threads.t - Threads
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/threads.t
+	% perl -Ilib t/pmc/threads.t
 
 =head1 DESCRIPTION
 

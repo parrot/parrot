@@ -8,7 +8,7 @@ t/src/list.t - List Subsystem
 
 =head1 SYNOPSIS
 
-	% perl t/src/list.t
+	% perl -Ilib t/src/list.t
 
 =head1 DESCRIPTION
 

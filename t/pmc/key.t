@@ -8,7 +8,7 @@ t/pmc/key.t - Keys
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/key.t
+	% perl -Ilib t/pmc/key.t
 
 =head1 DESCRIPTION
 

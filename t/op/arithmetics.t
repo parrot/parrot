@@ -8,7 +8,7 @@ t/op/arithmetics.t - Arithmetic Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/arithmetics.t
+	% perl -Ilib t/op/arithmetics.t
 
 =head1 DESCRIPTION
 

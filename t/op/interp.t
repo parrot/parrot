@@ -8,7 +8,7 @@ t/op/interp.t - Running the Interpreter
 
 =head1 SYNOPSIS
 
-	% perl t/op/interp.t
+	% perl -Ilib t/op/interp.t
 
 =head1 DESCRIPTION
 

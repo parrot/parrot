@@ -8,7 +8,7 @@ t/op/types.t - Parrot Types
 
 =head1 SYNOPSIS
 
-	% perl t/op/types.t
+	% perl -Ilib t/op/types.t
 
 =head1 DESCRIPTION
 

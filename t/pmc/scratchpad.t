@@ -8,7 +8,7 @@ t/pmc/scratchpad.t - Lexical Scratchpads
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/scratchpad.t
+	% perl -Ilib t/pmc/scratchpad.t
 
 =head1 DESCRIPTION
 

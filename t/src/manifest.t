@@ -8,7 +8,7 @@ t/src/manifest.t - MANIFEST File
 
 =head1 SYNOPSIS
 
-	% perl t/src/manifest.t
+	% perl -Ilib t/src/manifest.t
 
 =head1 DESCRIPTION
 

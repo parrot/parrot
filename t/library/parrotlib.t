@@ -7,7 +7,7 @@ t/library/parrotlib.t - testing library/parrotlib.imc
 
 =head1 SYNOPSIS
 
-	% perl t/library/parrotlib.t
+	% perl -Ilib t/library/parrotlib.t
 
 =head1 DESCRIPTION
 

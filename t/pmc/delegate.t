@@ -8,7 +8,7 @@ t/pmc/delegate.t - Method Delegation
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/delegate.t
+	% perl -Ilib t/pmc/delegate.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/eval.t
+	% perl -Ilib t/pmc/eval.t
 
 =head1 DESCRIPTION
 

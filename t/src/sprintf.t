@@ -8,7 +8,7 @@ t/src/sprintf.t - Name
 
 =head1 SYNOPSIS
 
-	% perl t/src/sprintf.t
+	% perl -Ilib t/src/sprintf.t
 
 =head1 DESCRIPTION
 

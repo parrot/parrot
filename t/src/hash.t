@@ -9,7 +9,7 @@ t/src/hash.t - Hashes
 
 =head1 SYNOPSIS
 
-	% perl t/src/hash.t
+	% perl -Ilib t/src/hash.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/src/exit.t - Exiting
 
 =head1 SYNOPSIS
 
-	% perl t/src/exit.t
+	% perl -Ilib t/src/exit.t
 
 =head1 DESCRIPTION
 

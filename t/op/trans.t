@@ -8,7 +8,7 @@ t/op/trans.t - Transcendental Mathematical Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/trans.t
+	% perl -Ilib t/op/trans.t
 
 =head1 DESCRIPTION
 

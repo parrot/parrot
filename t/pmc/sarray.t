@@ -8,7 +8,7 @@ t/pmc/sarray.t - Simple Array
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/sarray.t
+	% perl -Ilib t/pmc/sarray.t
 
 =head1 DESCRIPTION
 

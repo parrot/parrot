@@ -8,7 +8,7 @@ t/pmc/resizablefloatarray.t - ResizableFloatArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/resizablefloatarray.t
+	% perl -Ilib t/pmc/resizablefloatarray.t
 
 =head1 DESCRIPTION
 

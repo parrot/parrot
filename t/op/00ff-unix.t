@@ -8,7 +8,7 @@ t/op/00ff-unix.t - UNIX File format
 
 =head1 SYNOPSIS
 
-	% perl t/op/00ff-unix.t
+	% perl -Ilib t/op/00ff-unix.t
 
 =head1 DESCRIPTION
 

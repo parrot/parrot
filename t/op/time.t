@@ -8,7 +8,7 @@ t/op/time.t - Time and Sleep
 
 =head1 SYNOPSIS
 
-	% perl t/op/time.t
+	% perl -Ilib t/op/time.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/fixedpmcarray.t - FixedPMCArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/FixedPMCArray.t
+	% perl -Ilib t/pmc/FixedPMCArray.t
 
 =head1 DESCRIPTION
 

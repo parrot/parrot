@@ -8,7 +8,7 @@ t/src/intlist.t - Integer Lists
 
 =head1 SYNOPSIS
 
-	% perl t/src/intlist.t
+	% perl -Ilib t/src/intlist.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/sub.t - Subroutine PMCs
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/sub.t
+	% perl -Ilib t/pmc/sub.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/src/cppcomments.t - checks for C++ style comments
 
 =head1 SYNOPSIS
 
-	% perl t/src/cppcomments.t
+	% perl -Ilib t/src/cppcomments.t
 
 =head1 DESCRIPTION
 

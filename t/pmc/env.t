@@ -8,7 +8,7 @@ t/pmc/env.t - System Environment
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/env.t
+	% perl -Ilib t/pmc/env.t
 
 =head1 DESCRIPTION
 

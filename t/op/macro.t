@@ -8,7 +8,7 @@ t/op/macro.t - IMCC Macros
 
 =head1 SYNOPSIS
 
-	% perl t/op/macro.t
+	% perl -Ilib t/op/macro.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/string.t - Strings
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/string.t
+	% perl -Ilib t/pmc/string.t
 
 =head1 DESCRIPTION
 

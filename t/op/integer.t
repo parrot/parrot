@@ -8,7 +8,7 @@ t/op/integer.t - Integer Registers
 
 =head1 SYNOPSIS
 
-	% perl t/op/integer.t
+	% perl -Ilib t/op/integer.t
 
 =head1 DESCRIPTION
 

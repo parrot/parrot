@@ -8,7 +8,7 @@ t/pmc/iter.t - Iteration
 
 =head1 SYNOPSIS
 
-	% perl -I lib t/pmc/iter.t
+	% perl -Ilib t/pmc/iter.t
 
 =head1 DESCRIPTION
 

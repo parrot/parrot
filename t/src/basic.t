@@ -8,7 +8,7 @@ t/src/basic.t - Basics
 
 =head1 SYNOPSIS
 
-	% perl t/src/basic.t
+	% perl -Ilib t/src/basic.t
 
 =head1 DESCRIPTION
 

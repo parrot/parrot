@@ -8,7 +8,7 @@ t/op/info.t - Info Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/info.t
+	% perl -Ilib t/op/info.t
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ to ensure nothing is broken.
 =cut
 
 use lib 'lib';
-use Test::More 'tests' => 23;
+use Test::More 'tests' => 25;
 use File::Spec::Functions qw(:ALL);
 
 BEGIN { use_ok("Parrot::Docs::POD2HTML") }

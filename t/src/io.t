@@ -8,7 +8,7 @@ t/src/io.t - IO Subsystem
 
 =head1 SYNOPSIS
 
-	% perl t/src/io.t
+	% perl -Ilib t/src/io.t
 
 =head1 DESCRIPTION
 

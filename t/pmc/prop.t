@@ -8,7 +8,7 @@ t/pmc/prop.t - Properties
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/prop.t
+	% perl -Ilib t/pmc/prop.t
 
 =head1 DESCRIPTION
 

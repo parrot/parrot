@@ -8,7 +8,7 @@ t/op/conv.t - C# Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/conv.t
+	% perl -Ilib t/op/conv.t
 
 =head1 DESCRIPTION
 

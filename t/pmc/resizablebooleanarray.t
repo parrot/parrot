@@ -8,7 +8,7 @@ t/pmc/resizablebooleanarray.t - ResizableBooleanArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/ResizableBooleanArray.t
+	% perl -Ilib t/pmc/ResizableBooleanArray.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/objects.t - Objects
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/objects.t
+	% perl -Ilib t/pmc/objects.t
 
 =head1 DESCRIPTION
 

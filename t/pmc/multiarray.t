@@ -8,7 +8,7 @@ t/pmc/multiarray.t - MultiArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/multiarray.t
+	% perl -Ilib t/pmc/multiarray.t
 
 =head1 DESCRIPTION
 

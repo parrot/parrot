@@ -8,7 +8,7 @@ t/pmc/array.t - Array PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/array.t
+	% perl -Ilib t/pmc/array.t
 
 =head1 DESCRIPTION
 

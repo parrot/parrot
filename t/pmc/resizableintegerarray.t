@@ -8,7 +8,7 @@ t/pmc/resizableintegerarray.t - ResizableIntegerArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/ResizableIntegerArray.t
+	% perl -Ilib t/pmc/ResizableIntegerArray.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/gc.t - Garbage Collection
 
 =head1 SYNOPSIS
 
-	% perl t/op/gc.t
+	% perl -Ilib t/op/gc.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/tqueue.t - Thread Queue
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/tqueue.t
+	% perl -Ilib t/pmc/tqueue.t
 
 =head1 DESCRIPTION
 

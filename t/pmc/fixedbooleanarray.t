@@ -8,7 +8,7 @@ t/pmc/fixedbooleanarray.t - FixedBooleanArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/FixedBooleanArray.t
+	% perl -Ilib t/pmc/FixedBooleanArray.t
 
 =head1 DESCRIPTION
 

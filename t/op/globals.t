@@ -8,7 +8,7 @@ t/op/globals.t - Global Variables
 
 =head1 SYNOPSIS
 
-	% perl t/op/globals.t
+	% perl -Ilib t/op/globals.t
 
 =head1 DESCRIPTION
 

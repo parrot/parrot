@@ -8,7 +8,7 @@ t/op/rx.t - Regex Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/rx.t
+	% perl -Ilib t/op/rx.t
 
 =head1 DESCRIPTION
 

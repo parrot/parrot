@@ -8,7 +8,7 @@ t/pmc/boolean.t - Boolean Ops
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/boolean.t
+	% perl -Ilib t/pmc/boolean.t
 
 =head1 DESCRIPTION
 

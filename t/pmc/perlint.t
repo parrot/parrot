@@ -8,7 +8,7 @@ t/pmc/perlint.t - Perl Integers
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/perlint.t
+	% perl -Ilib t/pmc/perlint.t
 
 =head1 DESCRIPTION
 

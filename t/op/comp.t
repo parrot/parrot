@@ -8,7 +8,7 @@ t/op/comp.t - Conditionals
 
 =head1 SYNOPSIS
 
-	% perl t/op/comp.t
+	% perl -Ilib t/op/comp.t
 
 =head1 DESCRIPTION
 

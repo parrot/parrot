@@ -8,7 +8,7 @@ t/op/lexicals.t - Lexical Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/lexicals.t
+	% perl -Ilib t/op/lexicals.t
 
 =head1 DESCRIPTION
 

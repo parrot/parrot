@@ -9,7 +9,7 @@ t/src/extend.t - Parrot Extension API
 
 =head1 SYNOPSIS
 
-	% perl t/src/extend.t
+	% perl -Ilib t/src/extend.t
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@ t/op/jitn.t - JIT register allocation
 
 =head1 SYNOPSIS
 
-	% perl t/op/jitn.t
+	% perl -Ilib t/op/jitn.t
 
 =head1 DESCRIPTION
 

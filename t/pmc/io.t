@@ -8,7 +8,7 @@ t/pmc/io.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% perl t/harness t/pmc/io.t
+	% perl -Ilib t/pmc/io.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/stacks.t - Stacks
 
 =head1 SYNOPSIS
 
-	% perl t/op/stacks.t
+	% perl -Ilib t/op/stacks.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/float.t - Floating-point Numbers
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/float.t
+	% perl -Ilib t/pmc/float.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/string.t - Parrot Strings
 
 =head1 SYNOPSIS
 
-	% perl t/op/string.t
+	% perl -Ilib t/op/string.t
 
 =head1 DESCRIPTION
 

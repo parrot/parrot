@@ -8,7 +8,7 @@ t/pmc/fixedfloatarray.t - FixedFloatArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/fixedfloatarray.t
+	% perl -Ilib t/pmc/fixedfloatarray.t
 
 =head1 DESCRIPTION
 

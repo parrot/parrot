@@ -8,7 +8,7 @@ t/pmc/fixedintegerarray.t - FixedIntegerArray PMC
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/FixedIntegerArray.t
+	% perl -Ilib t/pmc/FixedIntegerArray.t
 
 =head1 DESCRIPTION
 

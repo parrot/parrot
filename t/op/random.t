@@ -8,7 +8,7 @@ t/op/random.t - Random numbers
 
 =head1 SYNOPSIS
 
-	% perl t/op/random.t
+	% perl -Ilib t/op/random.t
 
 =head1 DESCRIPTION
 

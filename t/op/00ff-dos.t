@@ -8,7 +8,7 @@ t/op/00ff-dos.t - DOS File Format
 
 =head1 SYNOPSIS
 
-	% perl t/op/00ff-dos.t
+	% perl -Ilib t/op/00ff-dos.t
 
 =head1 DESCRIPTION
 

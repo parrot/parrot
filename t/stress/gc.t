@@ -8,7 +8,7 @@ t/stress/gc.t - Garbage Collection
 
 =head1 SYNOPSIS
 
-	% perl t/stress/gc.t
+	% perl -Ilib t/stress/gc.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/op/ifunless.t - If/Unless
 
 =head1 SYNOPSIS
 
-	% perl t/op/ifunless.t
+	% perl -Ilib t/op/ifunless.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/object-meths.t - Object Methods
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/object-meths.t
+	% perl -Ilib t/pmc/object-meths.t
 
 =head1 DESCRIPTION
 

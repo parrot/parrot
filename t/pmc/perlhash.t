@@ -9,7 +9,7 @@ t/pmc/perlhash.t - Perl Hashes
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/perlhash.t
+	% perl -Ilib t/pmc/perlhash.t
 
 =head1 DESCRIPTION
 

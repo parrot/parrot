@@ -8,7 +8,7 @@ t/op/bitwise.t - Bitwise Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/bitwise.t
+	% perl -Ilib t/op/bitwise.t
 
 =head1 DESCRIPTION
 

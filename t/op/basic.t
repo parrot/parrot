@@ -8,7 +8,7 @@ t/op/basic.t - Basic Ops
 
 =head1 SYNOPSIS
 
-	% perl t/op/basic.t
+	% perl -Ilib t/op/basic.t
 
 =head1 DESCRIPTION
 

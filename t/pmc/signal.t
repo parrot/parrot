@@ -8,7 +8,7 @@ t/pmc/signal.t - Signal Handling
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/signal.t
+	% perl -Ilib t/pmc/signal.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/coroutines.t - Coroutines
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/coroutines.t
+	% perl -Ilib t/pmc/coroutines.t
 
 =head1 DESCRIPTION
 

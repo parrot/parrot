@@ -8,7 +8,7 @@ t/pmc/freeze.t - Archiving
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/freeze.t
+	% perl -Ilib t/pmc/freeze.t
 
 =head1 DESCRIPTION
 

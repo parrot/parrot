@@ -8,7 +8,7 @@ t/pmc/intlist.t - Integer Array
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/intlist.t
+	% perl -Ilib t/pmc/intlist.t
 
 =head1 DESCRIPTION
 

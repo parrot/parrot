@@ -8,7 +8,7 @@ t/pmc/complex.t - Complex Numbers
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/complex.t
+	% perl -Ilib t/pmc/complex.t
 
 =head1 DESCRIPTION
 

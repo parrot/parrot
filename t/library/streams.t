@@ -8,7 +8,7 @@ t/library/streams.t - Stream tests
 
 =head1 SYNOPSIS
 
-        % perl t/harness t/library/streams.t
+        % perl -Ilib t/library/streams.t
 
 =head1 DESCRIPTION
 

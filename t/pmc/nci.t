@@ -9,7 +9,7 @@ t/pmc/nci.t - Native Call Interface
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/nci.t
+	% perl -Ilib t/pmc/nci.t
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ t/pmc/pmc.t - Perl PMCs
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/pmc.t
+	% perl -Ilib t/pmc/pmc.t
 
 =head1 DESCRIPTION
 
