@@ -74,7 +74,9 @@ typedef enum BUFFER_flag {
     /* This is a constant--don't kill it! */
     BUFFER_constant_FLAG = 1 << 15,
     /* For debugging, report when this buffer gets moved around */
-    BUFFER_report_FLAG = 1 << 16
+    BUFFER_report_FLAG = 1 << 16,
+    /* Mark buffer as immune from deletion during DOD/GC */
+    BUFFER_immune_FLAG = 1 << 17
 } BUFFER_flags;
 
 /* stringinfo parameters */
