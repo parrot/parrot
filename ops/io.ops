@@ -422,7 +422,7 @@ position is beyond 2 GiB
 
 64bit tell:
 Get the current file positon of stream $3 in two parts of 32-bit each
-($1 = pos >> 32, $2 = pos & 0xffff).
+($1 = pos >> 32, $2 = pos & 0xffffffff).
 
 =cut
 
@@ -438,7 +438,7 @@ op tell(out INT, out INT, in PMC) {
     PIOOFF_T pos;
     pos = PIO_tell(interpreter, $3);
     $1 = (INTVAL)(pos >> 32);
-    $2 = (INTVAL)(pos & 0xffff);
+    $2 = (INTVAL)(pos & 0xffffffff);
   }
   goto NEXT();
 }
