@@ -1136,7 +1136,6 @@ Parrot_invalidate_method_cache(Interp *interpreter, STRING *class)
 
 /*
  * quick'n'dirty method cache
- * TODO: integrate NCI meth lookup
  * TODO: use a hash if method_name is not constant
  *       i.e. from obj.$Sreg(args)
  *       If this hash is implemented mark it during DOD

@@ -172,6 +172,14 @@ void rethrow_c_exception(Parrot_Interp interpreter);
 void do_exception(Parrot_Interp, exception_severity severity, long error);
 void new_internal_exception(Parrot_Interp);
 
+/*
+ * control stack marks and action
+ */
+
+void Parrot_push_mark(Interp *, INTVAL mark);
+void Parrot_pop_mark(Interp *, INTVAL mark);
+void Parrot_push_action(Interp *, PMC *sub);
+
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 
 /*

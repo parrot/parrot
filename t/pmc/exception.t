@@ -16,12 +16,11 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 28;
 use Test::More;
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
+output_is(<<'CODE', <<'OUTPUT', "push_eh - clear_eh");
+    push_eh _handler
     print "ok 1\n"
     clear_eh
     print "ok 2\n"
@@ -33,11 +32,9 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "set_eh - throw");
+output_is(<<'CODE', <<'OUTPUT', "push_eh - throw");
     print "main\n"
-    newsub P20, .Exception_Handler, _handler
-    set_eh P20
-
+    push_eh _handler
     new P30, .Exception
     throw P30
     print "not reached\n"
@@ -584,3 +581,55 @@ catched it
 OUTPUT
 1;
 
+output_is(<<'CODE', <<'OUTPUT', "pushmark");
+    pushmark 10
+    print "ok 1\n"
+    popmark 10
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pushmark nested");
+    pushmark 10
+    pushmark 11
+    print "ok 1\n"
+    popmark 11
+    popmark 10
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "pushmark - pop wrong one");
+    pushmark 10
+    print "ok 1\n"
+    popmark 500
+    print "never\n"
+    end
+CODE
+/mark not found/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pushaction");
+    pushmark 10
+    print "ok 1\n"
+    .const .Sub P10 = "action"
+    pushaction P10
+    print "ok 2\n"
+    popmark 10
+    print "ok 3\n"
+    end
+.pcc_sub action:
+    print "in action\n"
+    returncc
+CODE
+ok 1
+ok 2
+in action
+ok 3
+OUTPUT

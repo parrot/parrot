@@ -596,6 +596,20 @@ Exit the interpreter with exit_status $1. If you want to communicate an
 extended exit status, create an exception with severity B<EXCEPT_exit>
 and throw it.
 
+=item B<pushmark>(in INT)
+
+Push a mark labeled $1 onto the control stack.
+
+=item B<popmark>(in INT)
+
+Pop all items off the control stack to the given mark.
+
+=item B<pushaction>(in PMC)
+
+Push the given Sub PMC $1 onto the control stack. If the control stack
+is unwound due to a C<popmark>, subroutine return, or an exception, the
+subroutine will be invoked.
+
 =cut
 
 inline op push_eh(labelconst INT) {
@@ -629,6 +643,21 @@ inline op die_hard(in INT, in INT) {
 inline op exit(in INT) {
   do_exception(interpreter, EXCEPT_exit, $1);
   restart NEXT();
+}
+
+inline op pushmark(in INT) {
+  Parrot_push_mark(interpreter, $1);
+  goto NEXT();
+}
+
+inline op popmark(in INT) {
+  Parrot_pop_mark(interpreter, $1);
+  goto NEXT();
+}
+
+inline op pushaction(in PMC) {
+  Parrot_push_action(interpreter, $1);
+  goto NEXT();
 }
 
 =back

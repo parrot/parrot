@@ -259,11 +259,13 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     /* Store our thing */
     switch (type) {
         case STACK_ENTRY_INT:
+        case STACK_ENTRY_MARK:
             UVal_int(entry->entry) = *(Intval *)thing;
             break;
         case STACK_ENTRY_FLOAT:
             UVal_num(entry->entry) = *(Floatval *)thing;
             break;
+        case STACK_ENTRY_ACTION:
         case STACK_ENTRY_PMC:
             UVal_pmc(entry->entry) = (PMC *)thing;
             break;
@@ -272,7 +274,6 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             break;
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
-        case STACK_ENTRY_CORO_MARK:
             UVal_ptr(entry->entry) = thing;
             break;
         default:
@@ -307,8 +308,8 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     }
 
     /* Cleanup routine? */
-    if (type != STACK_ENTRY_CORO_MARK && entry->cleanup) {
-        (*entry->cleanup) (entry);
+    if (entry->cleanup) {
+        (*entry->cleanup) (interpreter, entry);
     }
 
     /* Sometimes the caller doesn't care what the value was */
@@ -318,12 +319,14 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
 
     /* Snag the value */
     switch (type) {
+    case STACK_ENTRY_MARK:
     case STACK_ENTRY_INT:
         *(Intval *)where   = UVal_int(entry->entry);
         break;
     case STACK_ENTRY_FLOAT:
         *(Floatval *)where = UVal_num(entry->entry);
         break;
+    case STACK_ENTRY_ACTION:
     case STACK_ENTRY_PMC:
         *(PMC **)where     = UVal_pmc(entry->entry);
         break;
@@ -332,7 +335,6 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
         break;
     case STACK_ENTRY_POINTER:
     case STACK_ENTRY_DESTINATION:
-    case STACK_ENTRY_CORO_MARK:
         *(void **)where    = UVal_ptr(entry->entry);
         break;
     default:
@@ -393,7 +395,6 @@ stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
     switch (entry->entry_type) {
         case STACK_ENTRY_POINTER:
         case STACK_ENTRY_DESTINATION:
-        case STACK_ENTRY_CORO_MARK:
             return UVal_ptr(entry->entry);
         default:
             return (void *) UVal_pmc(entry->entry);

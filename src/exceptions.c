@@ -128,17 +128,28 @@ describe them as well.\n\n");
 
 /*
 
-=item C<void
-push_exception(Parrot_Interp interpreter, PMC *handler)>
+=item C<void push_exception(Interp * interpreter, PMC *handler)>
 
 Add the exception handler on the stack.
+
+=item C<void Parrot_push_action(Interp * interpreter, PMC *sub)>
+
+Push an action handler onto the control stack.
+
+=item C<void Parrot_push_mark(Interp * interpreter, INTVAL mark)>
+
+Push a cleanup mark onto the control stack.
+
+=item C<void Parrot_pop_mark(Interp * interpreter, INTVAL mark)>
+
+Pop items off the control stack up to the mark.
 
 =cut
 
 */
 
 void
-push_exception(Parrot_Interp interpreter, PMC *handler)
+push_exception(Interp * interpreter, PMC *handler)
 {
     if (handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC("Tried to set_eh a non Exception_Handler");
@@ -146,10 +157,50 @@ push_exception(Parrot_Interp interpreter, PMC *handler)
             STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
+static void
+run_cleanup_action(Interp *interpreter, Stack_Entry_t *e)
+{
+    PMC *sub = UVal_pmc(e->entry);
+    Parrot_runops_fromc_args(interpreter, sub, "vI", 0);
+}
+
+void
+Parrot_push_action(Interp * interpreter, PMC *sub)
+{
+    if (sub->vtable->base_type != enum_class_Sub)
+        internal_exception(1, "Tried to push a non Sub PMC action");
+    stack_push(interpreter, &interpreter->ctx.control_stack, sub,
+            STACK_ENTRY_ACTION, run_cleanup_action);
+}
+
+void
+Parrot_push_mark(Interp * interpreter, INTVAL mark)
+{
+    stack_push(interpreter, &interpreter->ctx.control_stack, &mark,
+            STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
+}
+
+void
+Parrot_pop_mark(Interp * interpreter, INTVAL mark)
+{
+    Stack_Entry_t *e;
+    do {
+        e = stack_entry(interpreter, interpreter->ctx.control_stack, 0);
+        if (!e)
+            internal_exception(1, "mark not found");
+        (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
+                        NULL, e->entry_type);
+        if (e->entry_type == STACK_ENTRY_MARK) {
+            if (UVal_int(e->entry) == mark)
+                return;
+        }
+    } while (1);
+}
+
 /*
 
 =item C<static PMC *
-find_exception_handler(Parrot_Interp interpreter, PMC *exception)>
+find_exception_handler(Interp * interpreter, PMC *exception)>
 
 Find the exception handler for C<exception>.
 
@@ -158,7 +209,7 @@ Find the exception handler for C<exception>.
 */
 
 static PMC *
-find_exception_handler(Parrot_Interp interpreter, PMC *exception)
+find_exception_handler(Interp * interpreter, PMC *exception)
 {
     PMC *handler;
     STRING *message;
@@ -173,6 +224,10 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
                 interpreter->ctx.control_stack, 0);
         if (!e)
             break;
+        if (e->entry_type == STACK_ENTRY_ACTION) {
+            PMC *sub = UVal_pmc(e->entry);
+            Parrot_runops_fromc_args(interpreter, sub, "vI", 1);
+        }
         (void)stack_pop(interpreter, &interpreter->ctx.control_stack,
                         NULL, e->entry_type);
         if (e->entry_type == STACK_ENTRY_PMC) {
@@ -229,7 +284,7 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
 /*
 
 =item C<void
-pop_exception(Parrot_Interp interpreter)>
+pop_exception(Interp * interpreter)>
 
 Pops the topmost exception handler off the stack.
 
@@ -238,7 +293,7 @@ Pops the topmost exception handler off the stack.
 */
 
 void
-pop_exception(Parrot_Interp interpreter)
+pop_exception(Interp * interpreter)
 {
     Stack_entry_type type;
     PMC *handler;
@@ -254,7 +309,7 @@ pop_exception(Parrot_Interp interpreter)
 /*
 
 =item C<PMC*
-new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)>
+new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)>
 
 Generate an exception handler, that catches PASM level exceptions inside
 a C function. This could be a separate class too, for now just a private
@@ -265,7 +320,7 @@ flag bit is set.
 */
 
 PMC*
-new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
+new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)
 {
     PMC *handler = pmc_new(interpreter, enum_class_Exception_Handler);
     /*
@@ -279,7 +334,7 @@ new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
 /*
 
 =item C<void
-push_new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)>
+push_new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)>
 
 Pushes an new C exception handler onto the stack.
 
@@ -288,7 +343,7 @@ Pushes an new C exception handler onto the stack.
 */
 
 void
-push_new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
+push_new_c_exception_handler(Interp * interpreter, Parrot_exception *jb)
 {
     push_exception(interpreter, new_c_exception_handler(interpreter, jb));
 }
@@ -296,7 +351,7 @@ push_new_c_exception_handler(Parrot_Interp interpreter, Parrot_exception *jb)
 /*
 
 =item C<void *
-throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)>
+throw_exception(Interp * interpreter, PMC *exception, void *dest)>
 
 Throw the exception.
 
@@ -305,7 +360,7 @@ Throw the exception.
 */
 
 void *
-throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
+throw_exception(Interp * interpreter, PMC *exception, void *dest)
 {
     PMC *handler;
     void *address;
@@ -343,7 +398,7 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 /*
 
 =item C<void *
-rethrow_exception(Parrot_Interp interpreter, PMC *exception)>
+rethrow_exception(Interp * interpreter, PMC *exception)>
 
 Rethrow the exception.
 
@@ -352,7 +407,7 @@ Rethrow the exception.
 */
 
 void *
-rethrow_exception(Parrot_Interp interpreter, PMC *exception)
+rethrow_exception(Interp * interpreter, PMC *exception)
 {
     PMC *handler;
     void *address;
@@ -370,7 +425,7 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 /*
 
 =item C<void
-rethrow_c_exception(Parrot_Interp interpreter)>
+rethrow_c_exception(Interp * interpreter)>
 
 Return back to runloop, assumes exception is still in C<REG_PMC(5)> and
 that this is called from within a handler setup with C<new_c_exception>
@@ -380,7 +435,7 @@ that this is called from within a handler setup with C<new_c_exception>
 */
 
 void
-rethrow_c_exception(Parrot_Interp interpreter)
+rethrow_c_exception(Interp * interpreter)
 {
     PMC *exception, *handler, *p5;
     Parrot_exception *the_exception = interpreter->exceptions;
@@ -406,7 +461,7 @@ rethrow_c_exception(Parrot_Interp interpreter)
 /*
 
 =item C<static size_t
-dest2offset(Parrot_Interp interpreter, opcode_t *dest)>
+dest2offset(Interp * interpreter, opcode_t *dest)>
 
 Translate an absolute bytecode location to an offset used for resuming
 after an exception had occured.
@@ -416,7 +471,7 @@ after an exception had occured.
 */
 
 static size_t
-dest2offset(Parrot_Interp interpreter, opcode_t *dest)
+dest2offset(Interp * interpreter, opcode_t *dest)
 {
     size_t offset;
     /* translate an absolute location in byte_code to an offset
@@ -435,7 +490,7 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
 /*
 
 =item C<static opcode_t *
-create_exception(Parrot_Interp interpreter)>
+create_exception(Interp * interpreter)>
 
 Create an exception.
 
@@ -444,7 +499,7 @@ Create an exception.
 */
 
 static opcode_t *
-create_exception(Parrot_Interp interpreter)
+create_exception(Interp * interpreter)
 {
     PMC *exception;     /* exception object */
     opcode_t *dest;     /* absolute address of handler */
@@ -480,7 +535,7 @@ create_exception(Parrot_Interp interpreter)
 
 /*
 
-=item C<size_t handle_exception(Parrot_Interp interpreter)>
+=item C<size_t handle_exception(Interp * interpreter)>
 
 Handle an exception.
 
@@ -489,7 +544,7 @@ Handle an exception.
 */
 
 size_t
-handle_exception(Parrot_Interp interpreter)
+handle_exception(Interp * interpreter)
 {
     opcode_t *dest;     /* absolute address of handler */
 
@@ -500,7 +555,7 @@ handle_exception(Parrot_Interp interpreter)
 /*
 
 =item C<void
-new_internal_exception(Parrot_Interp interpreter)>
+new_internal_exception(Interp * interpreter)>
 
 Create a new internal exception buffer, either by allocating it or by
 getting one from the free list.
@@ -510,7 +565,7 @@ getting one from the free list.
 */
 
 void
-new_internal_exception(Parrot_Interp interpreter)
+new_internal_exception(Interp * interpreter)
 {
     Parrot_exception *the_exception;
 
@@ -529,7 +584,7 @@ new_internal_exception(Parrot_Interp interpreter)
 /*
 
 =item C<void
-do_exception(Parrot_Interp interpreter,
+do_exception(Interp * interpreter,
         exception_severity severity, long error)>
 
 Called from interrupt code. Does a C<longjmp> in front of the runloop,
@@ -540,7 +595,7 @@ execution then resumes.
 
 */
 void
-do_exception(Parrot_Interp interpreter,
+do_exception(Interp * interpreter,
         exception_severity severity, long error)
 {
     Parrot_exception *the_exception = interpreter->exceptions;

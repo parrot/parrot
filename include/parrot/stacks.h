@@ -20,7 +20,7 @@
 typedef struct Stack_Entry {
     UnionVal entry;
     Stack_entry_type  entry_type;
-    void (*cleanup)(struct Stack_Entry *);
+    void (*cleanup)(Interp *, struct Stack_Entry *);
 } Stack_Entry_t;
 
 typedef struct Stack_Chunk {
@@ -38,7 +38,7 @@ typedef struct Stack_Chunk {
 /* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 
-typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
+typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 

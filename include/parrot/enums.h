@@ -19,7 +19,8 @@ typedef enum {
     STACK_ENTRY_PMC         = 4,
     STACK_ENTRY_POINTER     = 5,
     STACK_ENTRY_DESTINATION = 6,
-    STACK_ENTRY_CORO_MARK   = 7
+    STACK_ENTRY_MARK        = 7,
+    STACK_ENTRY_ACTION      = 8
 } Stack_entry_type;
 
 typedef enum {
