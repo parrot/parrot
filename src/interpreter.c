@@ -80,11 +80,14 @@ make_interpreter() {
     interpreter->num_reg_base->next = NULL;
     interpreter->num_reg_base->prev = NULL;
     
-    /* Initialize the inital string register chunk */
+    /* Initialize the inital string register chunk, be sure to
+       NULL out the strings because string functions rely
+       on NULL strings */
     interpreter->string_reg_base->used = 1;
     interpreter->string_reg_base->free = FRAMES_PER_STR_REG_CHUNK - 1;
     interpreter->string_reg_base->next = NULL;
     interpreter->string_reg_base->prev = NULL;
+    Parrot_clear_s(interpreter);
     
     /* Initialize the initial PMC register chunk. Gotta NULL them out,
        too, otherwise we might GC Wrong Things later */

@@ -101,6 +101,9 @@ Parrot_push_s(struct Parrot_Interp *interpreter) {
         new_chunk->prev = chunk_base;
         chunk_base->next = new_chunk;
         interpreter->string_reg = &new_chunk->SReg[0];
+        /* Gotta NULL them out as some string
+           functions depend on NULL strings */
+        Parrot_clear_s(interpreter);
     }
 }
 
@@ -233,6 +236,8 @@ Parrot_push_p(struct Parrot_Interp *interpreter) {
         new_chunk->prev = chunk_base;
         chunk_base->next = new_chunk;
         interpreter->pmc_reg = &new_chunk->PReg[0];
+        /* Gotta NULL them out or we might GC Wrong things later */
+        Parrot_clear_p(interpreter);
     }
 }
 
