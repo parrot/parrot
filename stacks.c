@@ -60,6 +60,9 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *
     case STACK_ENTRY_POINTER:
         chunk_base->entry[chunk_base->used-1].entry.generic_pointer = thing;
         break;
+    case STACK_ENTRY_DESTINATION:
+        chunk_base->entry[chunk_base->used-1].entry.generic_pointer = thing;
+        break;
     }
 
     return interpreter->stack_top;
@@ -68,10 +71,62 @@ struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *
 
 /* Pop off an entry and return a pointer to the contents*/
 void *pop_generic_entry(struct Parrot_Interp *interpreter, void *where, INTVAL type) {
+    struct StackChunk *chunk_base;
+    
+    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
+    /* Quick sanity check */
+    if (chunk_base->used == 0) {
+        INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
+    }
+    if (interpreter->stack_top->entry_type != type) {
+        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
+    }
+
+    /* Snag the value */
+    switch(type) {
+    case STACK_ENTRY_INT:
+        *(INTVAL *)where = interpreter->stack_top->entry.int_val;
+        break;
+    case STACK_ENTRY_FLOAT:
+        *(FLOATVAL *)where = interpreter->stack_top->entry.num_val;
+        break;
+    case STACK_ENTRY_PMC:
+        *(PMC **)where = interpreter->stack_top->entry.pmc_val;
+        break;
+    case STACK_ENTRY_STRING:
+        *(STRING **)where = interpreter->stack_top->entry.string_val;
+        break;
+    case STACK_ENTRY_POINTER:
+        *(void **)where = interpreter->stack_top->entry.generic_pointer;
+        break;
+    case STACK_ENTRY_DESTINATION:
+        *(void **)where = interpreter->stack_top->entry.generic_pointer;
+        break;
+    }
+    /* Cleanup routine? */
+    if (interpreter->stack_top->flags && STACK_ENTRY_CLEANUP) {
+        (interpreter->stack_top->cleanup)(interpreter->stack_top);
+    }
+
+    /* Now decrement the SP */
+    chunk_base->used--;
+    chunk_base->free++;
+    /* Can we toss a whole chunk? */
+    if (0 == chunk_base->used && chunk_base->prev) {
+        chunk_base = chunk_base->prev;
+    } 
+    if (chunk_base->used) {
+        interpreter->stack_top = &chunk_base->entry[chunk_base->used - 1];
+    }
+        
+    
+    return where;
 }
 
 /* Pop off an entry and throw it out */
 void toss_generic_entry(struct Parrot_Interp *interpreter, INTVAL type) {
+    void *foo;
+    pop_generic_entry(interpreter, &foo, type);
 }
 
 /*
@@ -83,4 +138,3 @@ void toss_generic_entry(struct Parrot_Interp *interpreter, INTVAL type) {
  *
  * vim: expandtab shiftwidth=4:
 */
-i

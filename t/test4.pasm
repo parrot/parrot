@@ -1,7 +1,7 @@
 #
-# test3.pasm
+# test4.pasm
 #
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
+# Copyright (C) 2001 Yet Another Society. All rights reserved.
 # This program is free software. It is subject to the same
 # license as The Parrot Interpreter.
 #

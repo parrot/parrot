@@ -303,8 +303,9 @@ make_interpreter() {
     /* Need a default stack */
     interpreter->stack_base = mem_allocate_aligned(sizeof(struct StackChunk));
     interpreter->stack_top = &interpreter->stack_base->entry[0];
-    interpreter->stack_base->used = 1;
-    interpreter->stack_base->free = STACK_CHUNK_DEPTH - 1;
+    /* Unlike the registers, we start with zero used */
+    interpreter->stack_base->used = 0;
+    interpreter->stack_base->free = STACK_CHUNK_DEPTH;
     interpreter->stack_base->next = NULL;
     interpreter->stack_base->prev = NULL;
     

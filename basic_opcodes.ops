@@ -942,3 +942,55 @@ AUTO_OP trace_ic {
   RETURN(2);
 }
 
+
+/* Some stack ops */
+AUTO_OP save_i {
+  push_generic_entry(interpreter, &INT_REG(P1), STACK_ENTRY_INT, NULL);
+}
+
+AUTO_OP restore_i {
+  pop_generic_entry(interpreter, &INT_REG(P1), STACK_ENTRY_INT);
+}
+
+AUTO_OP save_s {
+  push_generic_entry(interpreter,  STR_REG(P1), STACK_ENTRY_INT, NULL);
+}
+
+AUTO_OP restore_s {
+  pop_generic_entry(interpreter, &STR_REG(P1), STACK_ENTRY_INT);
+}
+
+AUTO_OP save_n {
+  push_generic_entry(interpreter, &NUM_REG(P1), STACK_ENTRY_INT, NULL);
+}
+
+AUTO_OP restore_n {
+  pop_generic_entry(interpreter, &NUM_REG(P1), STACK_ENTRY_INT);
+}
+
+AUTO_OP save_p {
+  push_generic_entry(interpreter, PMC_REG(P1), STACK_ENTRY_INT, NULL);
+}
+
+AUTO_OP restore_p {
+  pop_generic_entry(interpreter, &PMC_REG(P1), STACK_ENTRY_INT);
+}
+
+/* Control flow */
+MANUAL_OP bsr_ic {
+  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+  RETURN(INT_CONST(P1));
+}
+
+MANUAL_OP bsr_i {
+  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+  RETURN(INT_REG(P1));
+}
+
+MANUAL_OP ret {
+  opcode_t *dest;
+  pop_generic_entry(interpreter, &dest, STACK_ENTRY_DESTINATION);
+  RETURN_ABS(dest);
+}
+
+

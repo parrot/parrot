@@ -200,3 +200,16 @@ xor_i	3	I I I
 bounds_ic	1	i
 trace_ic	1	i
 
+save_i	1	I
+restore_i	1	I
+save_n	1	N
+restore_n	1	N
+save_s	1	S
+restore_s	1	S
+save_p	1	P
+restore_p	1	P
+
+# Branch and return
+bsr_ic	1	D
+bsr_i	1	I
+ret	0

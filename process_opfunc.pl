@@ -75,6 +75,7 @@ while (<INPUT>) {
     s/RETURN\(0\);/return 0;/;
 
     s/RETURN\((.*)\)/return cur_opcode + $1/;
+    s/RETURN_ABS\((.*)\)/return $1/;
     s/RESUME\((.*)\)/interpreter->resume_addr = cur_opcode + $1/;
 
     s/\bP(\d+)\b/$param_sub[$1]/g;

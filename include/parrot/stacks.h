@@ -47,10 +47,14 @@ void toss_generic_entry(struct Parrot_Interp *, INTVAL type);
 #define STACK_ENTRY_STRING 3
 #define STACK_ENTRY_PMC 4
 #define STACK_ENTRY_POINTER 5
+#define STACK_ENTRY_DESTINATION 6
 
 #define STACK_ENTRY_CLEANUP 0x01
 
 #define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
+
+#define ERROR_STACK_EMPTY 1
+#define ERROR_BAD_STACK_TYPE 1
 
 #endif
 
