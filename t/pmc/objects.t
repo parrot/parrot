@@ -67,11 +67,21 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "getclass");
     newclass P1, "Foo"
     getclass P2, "Foo"
-    printerr "ok 1\n"
+    classname S2, P2
+    print S2
+    print "\n"
+
+    subclass P3, P1, "FooBar"
+    getclass P4, "FooBar"
+    classname S4, P4
+    print S4
+    print "\n"
+
     getclass P3, "NoSuch"
     end
 CODE
-/ok 1
+/Foo
+FooBar
 Class doesn't exist/
 OUTPUT
 # ' for vim
