@@ -90,7 +90,9 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
   return child_class;
 }
 
-/* Create a brand new class, named what we pass in.
+/*=for api objects Parrot_new_class
+ *
+ * Create a brand new class, named what we pass in.
  */
 PMC *
 Parrot_new_class(Parrot_Interp interpreter, STRING *class_name) 
@@ -123,6 +125,34 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name)
                        key_new_string(interpreter,class_name), new_class);
 
   return new_class;
+}
+
+
+/*=for api objects Parrot_instantiate_object
+ *
+ * Create a new parrot object. Takes a passed-in class PMC that has
+ * sufficient information to describe the layout of the object and,
+ * well, makes the darned object.
+ *
+ */
+PMC *
+Parrot_instantiate_object(Parrot_Interp interpreter, PMC *class) {
+    PMC *new_object;
+    PMC *new_object_array;
+    INTVAL attrib_count;
+
+    /* Grab the attribute count from the parent */
+    attrib_count = class->cache.int_val;
+
+    /* */
+    new_object_array = pmc_new(interpreter, enum_class_Array);
+    VTABLE_set_integer_native(interpreter, new_object_array, attrib_count);
+    new_object = pmc_new(interpreter, enum_class_ParrotObject);
+    PMC_data(new_object) = new_object_array;
+    PObj_flag_SET(is_PMC_ptr, new_object);
+
+    return new_object;
+
 }
 
 PMC *

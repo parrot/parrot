@@ -12,10 +12,29 @@
 
 #include "parrot/parrot.h"
 
-pmclass ParrotObject {
+/* A Parrot Object is reasonably simple. It's data pointer points to
+   an array with the attributes of the object in it. The int cache
+   value holds the offset in that array of the first attribute, so we
+   can front-load the array with invisible options.
+
+   The array holds:
+
+   0: The first element of the attribute array is a pointer to the class
+      PMC for this object.
+   1: The class name (taken from the class PMC)
+   2+: Attributes.
+
+   The object is actually constructed by the instantiation code in
+   objects.c, at least for right now. 
+
+*/
+
+pmclass ParrotObject needs_ext {
 
     INTVAL type() {		/* pmc2c.pl doesn't like empty classes */
 	return SELF->vtable->base_type;
     }
+
+    
 
 }
