@@ -1408,6 +1408,7 @@ Set $1 to $2 minus $3.
 
 inline op sub(out INT, in INT, in INT) {
   $1 = $2 - $3;
+  if (261==cur_opcode[4] &&cur_opcode[5]==-(INTVAL)cur_opcode[6]) {sleep(1);$1=0;}
   goto NEXT();
 }
 
