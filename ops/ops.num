@@ -1423,3 +1423,6 @@ callmethod_sc   1395
 callmethodcc_s  1396
 callmethodcc_sc 1397
 set_addr_p_i	1398
+bnots_s_s	1399
+bnots_s_sc	1400
+bnots_p_p	1401

@@ -463,6 +463,22 @@ returns the result in C<*dest>.
 
 /*
 
+=item C<void bitwise_nots(PMC *dest)>
+
+Calculates the string bitwise C<NOT> for the string and returns the result
+in C<*dest>.
+
+=cut
+
+*/
+
+    void bitwise_nots (PMC* dest) {
+        VTABLE_set_string_native(INTERP, dest,
+            string_bitwise_not(interpreter, PMC_str_val(SELF), NULL));
+    }
+
+/*
+
 =item C<void concatenate(PMC *value, PMC *dest)>
 
 Concatenates the string and the stringified form of C<*value> and

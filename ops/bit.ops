@@ -137,6 +137,24 @@ inline op bnot(in PMC, in PMC) :base_core {
   goto NEXT();
 }
 
+=item B<bnots>(out STR, in STR)
+
+=item B<bnots>(in PMC, in PMC)
+
+Set the bits of $1 to the B<not> of the corresponding bits from $2.
+
+=cut
+
+inline op bnots(out STR, in STR) :base_core {
+  string_bitwise_not(interpreter, $2, &$1);
+  goto NEXT();
+}
+
+inline op bnots(in PMC, in PMC) :base_core {
+  $2->vtable->bitwise_nots(interpreter, $2, $1);
+  goto NEXT();
+}
+
 ########################################
 
 =item B<bor>(inout INT, in INT)

@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 127;
+use Parrot::Test tests => 130;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2169,6 +2169,64 @@ output_is( <<'CODE', <<OUTPUT, "bxors COW");
   set S1, "foo"
   substr S2, S1, 0, 3
   bxors S1, "bar"
+  print S2
+  print "\n"
+  end
+CODE
+foo
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
+     null S1
+     null S2
+     bnots S1, S2
+     null S3
+     eq S1, S3, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     null S1
+     set S2, ""
+     bnots S1, S2
+     null S3
+     eq S1, S3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     bnots S2, S1
+     eq S2, S3, OK3
+     print "not "
+OK3: print "ok 3\n"
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bnots 2");
+ set S1, "a2c"
+ bnots S2, S1
+ print S1
+ print "\n"
+ print S2
+ print "\n"
+ bnots S1, S1
+ print S1
+ print "\n"
+ bnots S1, S1
+ print S1
+ print "\n"
+ end
+CODE
+a2c
+\x9E\xCD\x9C
+\x9E\xCD\x9C
+a2c
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bnots COW");
+  set S1, "foo"
+  substr S2, S1, 0, 3
+  bnots S1, S1
   print S2
   print "\n"
   end

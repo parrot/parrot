@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 33;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -943,6 +943,61 @@ Dw
 ABCY
 abc
    Y
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bnots NULL string");
+     new P1, .PerlString
+     new P2, .PerlString
+     new P3, .PerlString
+     null S1
+     null S2
+     set P1, S1
+     set P2, S2
+     bnots P1, P2
+     null S3
+     eq P1, S3, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     null S1
+     set P1, S1
+     set P2, ""
+     bnots P1, P2
+     null S3
+     eq P1, S3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     bnots P2, P1
+     eq S2, S3, OK3
+     print "not "
+OK3: print "ok 3\n"
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bnots 2");
+ new P1, .PerlString
+ new P2, .PerlString
+ set P1, "a2c"
+ bnots P2, P1
+ print P1
+ print "\n"
+ print P2
+ print "\n"
+ bnots P1, P1
+ print P1
+ print "\n"
+ bnots P1, P1
+ print P1
+ print "\n"
+ end
+CODE
+a2c
+\x9E\xCD\x9C
+\x9E\xCD\x9C
+a2c
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "eq_str");

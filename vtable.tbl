@@ -193,6 +193,8 @@ void bitwise_xors_str(STRING* value, PMC* dest)
 
 void bitwise_not(PMC* dest)
 
+void bitwise_nots(PMC* dest)
+
 void bitwise_shl(PMC* value, PMC* dest)
 void bitwise_shl_int(INTVAL value, PMC* dest)
 

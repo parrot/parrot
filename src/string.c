@@ -1638,6 +1638,61 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 
 /*
 
+=item C<STRING *
+string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
+               STRING **dest)>
+
+Perform a bitwise C<not> on a string. If C<*dest != NULL> then C<**dest>
+is reused, otherwise a new string is created.
+
+=cut
+
+*/
+
+STRING *
+string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
+               STRING **dest)
+{
+    const char *sp;
+    char *dp;
+    STRING *res = NULL;
+    size_t len;
+
+    if (dest && *dest)
+        res = *dest;
+    else if (!s)
+        res = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+
+    if (!s) {
+        res->bufused = 0;
+        res->strlen = 0;
+        return res;
+    }
+
+    /* trigger GC for debug */
+    if (interpreter && GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
+
+    len = s->bufused;
+    make_writable(interpreter, &res, len, s->encoding, s->type);
+
+    res->strlen = s->strlen;
+    res->bufused = len;
+
+    sp = s->strstart;
+    dp = res->strstart;
+
+    for ( ; len ; --len)
+        *dp++ = ~ *sp++;
+
+    if (dest)
+        *dest = res;
+
+    return res;
+}
+
+/*
+
 =item C<INTVAL
 string_bool(const STRING *s)>
 
