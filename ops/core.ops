@@ -3643,22 +3643,68 @@ Ops to manipulate the symbol table
 
 ########################################
 
-=item B<new_pad>()
+=item B<new_pad>(in INT)
 
-Create a new lexical scope pad and push it onto the
-current lexical scope stack.
+Create a new lexical scope pad with static nesting depth $1
+and push it onto the lexical scope stack. Static depths 0 
+through $1 - 1, inclusive, are copied from the current static 
+nesting.
+
+=item B<new_pad>(out PMC, in INT)
+
+Create a new lexical scope pad with static nesting depth $2
+and store it in $1 (do NOT push on the stack). Static depths 0 
+through $2 - 1, inclusive, are copied from the current static 
+nesting.
 
 =item B<pop_pad>()
 
 Pop the current lexical scope pad off the stack
 
+=item B<pop_pad>(out PMC)
+
+Pop the current lexical scope pad off the stack and store
+it in $1 (XXX JPS: not implemented yet).
+
+=item B<peek_pad>(out PMC)
+
+Store the current lexical scope pad (i.e. the one at the
+top of the lexical pad stack) in $1.
+
 =item B<store_lex>(in STR, in PMC)
 
-Store object $2 as lexical symbol $1
+Store object $2 as lexical symbol $1.  $1 must have already been
+created at some static depth. 
+
+=item B<store_lex>(in INT, in STR, in PMC)
+
+Store object $3 as lexical $2 at depth $1.  If [$1, $2] does not
+exist, it will be created.  If $1 is negative, count out from the
+current lexical scope; otherwise, count in from the outermost scope.
+So store_lex -1, .... will operate on the current pad.
+
+=item B<store_lex>(in INT, in INT, in PMC)
+
+Store object $3 at lexical position $2 at depth $1.  If [$1, $2] does 
+not exist, it will be created.  If $1 is negative, count out from the
+current lexical scope; otherwise, count in from the outermost scope.
+So store_lex -1, .... will operate on the current pad.
 
 =item B<find_lex>(out PMC, in STR)
 
-Find the lexical variable named $2 and store it in $1
+Find the lexical variable named $2 (at any depth) and store it in $1.
+
+=item B<find_lex>(out PMC, in INT, in STR)
+
+Find the lexical variable named $3 at depth $2 and store it in $1. 
+If $2 is negative the, count out from the current lexical scope; 
+otherwise, count up from the outermost scope.
+
+=item B<find_lex>(out PMC, in INT, in INT)
+
+Find the lexical variable at position $3 at depth $2 and store it in
+$1. If $2 is negative the, count out from the current lexical scope; 
+otherwise, count up from the outermost scope.
 
 =item B<store_global>(in STR, in PMC)
 
@@ -3670,36 +3716,87 @@ Find the global named $2 and store it in $1
 
 =cut
 
-op new_pad() {
-    PMC* hash = pmc_new(interpreter, enum_class_PerlHash);
-    stack_push(interpreter, &interpreter->ctx.pad_stack, hash, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+op new_pad(in INT) {
+    PMC * pad;
+    PMC * parent = (PMC *)stack_peek(interpreter,
+				     interpreter->ctx.pad_stack, NULL);
+    pad = scratchpad_new(interpreter, parent, $1);
+    stack_push(interpreter, &interpreter->ctx.pad_stack, pad,
+               STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+    goto NEXT();
+}
 
+op new_pad(out PMC, in INT) {
+    PMC * parent = (PMC *)stack_peek(interpreter, 
+                                     interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_new(interpreter, parent, $2);
+    goto NEXT();
+}
+
+op push_pad(in PMC) {
+    stack_push(interpreter, &interpreter->ctx.pad_stack, $1,
+               STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     goto NEXT();
 }
 
 op pop_pad() {
-    stack_pop(interpreter, &interpreter->ctx.pad_stack, NULL, STACK_ENTRY_PMC);
+    stack_pop(interpreter, &interpreter->ctx.pad_stack, 
+              NULL, STACK_ENTRY_PMC);
+    goto NEXT();
+}
+
+op peek_pad(out PMC) {
+    $1 = (PMC*)stack_peek(interpreter, 
+                          interpreter->ctx.pad_stack, NULL);
     goto NEXT();
 }
 
 op store_lex(in STR, in PMC) {
-    PMC * hash = NULL;
-    PMC * key = key_new_string(interpreter, $1);
-    Stack_entry_type type = NO_STACK_ENTRY_TYPE;
-    hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
-    hash->vtable->set_pmc_keyed(interpreter, hash, key, $2, NULL);
+    PMC * pad = (PMC *)stack_peek(interpreter,
+                                  interpreter->ctx.pad_stack, NULL);
+    scratchpad_store(interpreter, pad, $1, 0, $2);
+    goto NEXT();
+}
+
+op store_lex(in INT, in STR, in PMC) {
+    PMC * pad = (PMC *)stack_peek(interpreter,
+                                  interpreter->ctx.pad_stack, NULL);
+    scratchpad_store_index(interpreter, pad, $1, $2, 0, $3);
+    goto NEXT();
+}
+
+op store_lex(in INT, in INT, in PMC) {
+    PMC * pad = (PMC *)stack_peek(interpreter,
+                                  interpreter->ctx.pad_stack, NULL);
+    scratchpad_store_index(interpreter, pad, $1, NULL, $2, $3);
     goto NEXT();
 }
 
 op find_lex(out PMC, in STR) {
-    PMC * hash = NULL;
-    PMC * key = key_new_string(interpreter, $2);
-    Stack_entry_type type = NO_STACK_ENTRY_TYPE;
-    hash = (PMC *)stack_peek(interpreter, interpreter->ctx.pad_stack, &type);
-    $1 = hash->vtable->get_pmc_keyed(interpreter, hash, key);
+    PMC * pad = (PMC *)stack_peek(interpreter,
+				  interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_get(interpreter, pad, $2, 0);
+    goto NEXT();
+}
 
-    /* FIXME: should the not found case be an internal_exception ? */
+op find_lex(out PMC, in INT) {
+    PMC * pad = (PMC *)stack_peek(interpreter,
+				  interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_get(interpreter, pad, NULL, $2);
+    goto NEXT();
+}
 
+op find_lex(out PMC, in INT, in STR) {
+    PMC * pad = (PMC *)stack_peek(interpreter,
+				  interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_get_index(interpreter, pad, $2, $3, 0);
+    goto NEXT();
+}
+
+op find_lex(out PMC, in INT, in INT) {
+    PMC * pad = (PMC *)stack_peek(interpreter,
+				  interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
     goto NEXT();
 }
 

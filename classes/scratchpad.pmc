@@ -1,0 +1,141 @@
+/* Scratchpad.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Scratchpad base class.
+ *  Data Structure and Algorithms:
+ *     Currently a simple array of Parrot_Lexicals.
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Scratchpad {
+
+    void init () {
+        SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+    }
+
+    PMC* mark (PMC* last) {
+	int j;
+        struct Parrot_Lexicals * lex;
+
+	for (j = 0; j < SELF->cache.int_val; j++) {
+            lex = ((struct Parrot_Lexicals **)SELF->data)[j];
+            last = lexicals_mark(INTERP, lex, last);
+        }
+
+	return last;
+    }
+
+    void destroy () {
+	mem_sys_free(SELF->data);
+    }
+
+    INTVAL type () {
+	return enum_class_Scratchpad;
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    PMC* clone () {
+	PMC * ret = pmc_new(INTERP, enum_class_Scratchpad);
+        ret->cache.int_val = 0;
+	ret->data = mem_sys_allocate(SELF->cache.int_val * sizeof(PMC *));
+	ret->cache.int_val = SELF->cache.int_val;
+	mem_sys_memcopy(ret->data, SELF->data,
+			SELF->cache.int_val * sizeof(PMC *));
+	return ret;
+    }
+
+    INTVAL elements () {
+	return SELF->cache.int_val;
+    }
+
+    PMC* get_pmc () {
+	return SELF;
+    }
+
+    /*
+     * Get a lexical variable. The key types are expected to match
+     * one of the following:
+     *
+     *  - [STRING]     a lexical name
+     *  - [INT]        a lexical position in current scope
+     *  - [INT;STRING] a scope, and a lexical name
+     *  - [INT;INT]    a scope, and a lexical position in that scope
+     */
+    PMC* get_pmc_keyed (PMC* key) {
+	INTVAL pad_index, position = 0;
+        STRING * name = NULL;
+        PMC * ret = NULL;
+        PMC * key2 = key_next(INTERP, key);
+        PMC * name_key = key2 ? key2 : key;
+
+        if (key_type(INTERP, name_key) == KEY_integer_FLAG) {
+            position = key_integer(INTERP, name_key);
+        } 
+        else if (key_type(INTERP, name_key) == KEY_string_FLAG) {
+            name = key_string(INTERP, name_key);
+        } 
+        else {
+            internal_exception(-1, "Invalid key");
+        }
+
+        if (key2) {
+            if (key_type(INTERP, key) == KEY_integer_FLAG) {
+                pad_index = key_integer(INTERP, key);
+            } 
+            else {
+                internal_exception(-1, "Invalid key");
+            }
+            ret = scratchpad_get_index(INTERP, SELF, pad_index, 
+                                       name, position);
+        } 
+        else {
+            ret = scratchpad_get(INTERP, SELF, name, position);
+        }
+
+        return ret;
+    }
+
+    /*
+     * Store a value as a lexical variable. The same key types that
+     * get_pmc_keyed supports are supported here.
+     */
+    void set_pmc_keyed (PMC* key, PMC* value, PMC* value_key) {
+	INTVAL pad_index, position = 0;
+        STRING * name = NULL;
+        PMC * key2 = key_next(INTERP, key);
+        PMC * name_key = key2 ? key2 : key;
+
+        if (key_type(INTERP, name_key) == KEY_integer_FLAG) {
+            position = key_integer(INTERP, name_key);
+        } 
+        else if (key_type(INTERP, name_key) == KEY_string_FLAG) {
+            name = key_string(INTERP, name_key);
+        } 
+        else {
+            internal_exception(-1, "Invalid key");
+        }
+
+        if (key2) {
+            if (key_type(INTERP, key) == KEY_integer_FLAG) {
+                pad_index = key_integer(INTERP, key);
+            } 
+            else {
+                internal_exception(-1, "Invalid key");
+            }
+            scratchpad_store_index(INTERP, SELF, pad_index, name, 
+                                   position, value);
+        } 
+        else {
+            scratchpad_store(INTERP, SELF, name, position, value);
+        }
+    }
+}

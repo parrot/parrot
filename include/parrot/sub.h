@@ -17,17 +17,22 @@
 
 #include "parrot/parrot.h"
 
+/* Used by Scratchpad PMC */
+typedef struct Parrot_Lexicals {
+    List * values;    /* lexicals go here */
+    List * names;     /* names of lexicals go here */
+} * parrot_lexicals_t;
 
 typedef struct Parrot_Sub { 
     INTVAL              flags;
-    struct Scratchpad   *lex_pad;
+    PMC                 *lex_pad;
     opcode_t            *init;
 } * parrot_sub_t;
 
 typedef struct Parrot_Coroutine { 
     INTVAL              flags;
     struct Parrot_Context ctx;
-    struct Scratchpad   *lex_pad;
+    PMC                 *lex_pad;
     opcode_t            *init;
     opcode_t            *resume;
 } * parrot_coroutine_t;
@@ -51,6 +56,23 @@ void save_context(struct Parrot_Interp * interp,
 
 void restore_context(struct Parrot_Interp * interp, 
                      struct Parrot_Context * ctx);
+
+PMC * scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth);
+
+void scratchpad_store(struct Parrot_Interp * interp, PMC * pad, 
+                      STRING * name, INTVAL position, PMC* value);
+
+void scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad, INTVAL pad_index,
+                            STRING * name, INTVAL position, PMC* value);
+
+PMC * scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name, 
+                     INTVAL position);
+
+PMC * scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad, INTVAL pad_index,
+                           STRING * name, INTVAL position);
+
+PMC * lexicals_mark(struct Parrot_Interp * interp, 
+                    struct Parrot_Lexicals *lex, PMC * last);
 
 #endif /* PARROT_SUB_H_GUARD */
 
