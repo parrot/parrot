@@ -1,15 +1,24 @@
 #! perl -w
-#
-# Constant.pm
-#
-# Parrot Constants.
-#
-# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
-# This program is free software. It is subject to the same
-# license as Perl itself.
-#
 # $Id$
-#
+
+Parrot::PackFile::Constant - A Parrot Constant
+
+=head1 SYNOPSIS
+
+  use Parrot::PackFile::Constant;
+
+=head1 DESCRIPTION
+
+Instances of C<Parrot::PackFile::Constant> are used to represent
+constants in Parrot packfiles.
+
+=head2 Functions
+
+Note that these functions are not exported.
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -33,12 +42,11 @@ my %type_codes = (
   'PFC_KEY'     => ord('k'),
 );
 
+=item C<type_name($query)>
 
-#
-# type_name()
-#
-# CLASS METHOD / STRAIGHT SUB
-#
+Return the type name for C<$query>.
+
+=cut
 
 sub type_name
 {
@@ -47,12 +55,11 @@ sub type_name
     return $type_names{$query};
 }
 
+=item C<type_code($query)>
 
-#
-# type_code()
-#
-# CLASS METHOD / STRAIGHT SUB
-#
+Return the type code for C<$query>.
+
+=cut
 
 sub type_code
 {
@@ -61,10 +68,17 @@ sub type_code
     return $type_codes{$query};
 }
 
+=back
 
-#
-# new()
-#
+=head2 Class Methods
+
+=over 4
+
+=item C<new()>
+
+Returns a new instance of type C<PFC_NONE>.
+
+=cut
 
 sub new
 {
@@ -78,10 +92,11 @@ sub new
   return $self;
 }
 
+=item C<new_integer()>
 
-#
-# new_integer()
-#
+Returns a new integer constant instance.
+
+=cut
 
 sub new_integer
 {
@@ -95,10 +110,11 @@ sub new_integer
   return $self;
 }
 
+=item C<new_number()>
 
-#
-# new_number()
-#
+Returns a new floating-point number constant instance.
+
+=cut
 
 sub new_number
 {
@@ -112,10 +128,11 @@ sub new_number
   return $self;
 }
 
+=item C<new_string()>
 
-#
-# new_string()
-#
+Returns a new Parrot string constant instance.
+
+=cut
 
 sub new_string
 {
@@ -129,11 +146,17 @@ sub new_string
   return $self;
 }
 
+=back
 
+=head2 Instance Methods
 
-#
-# clear()
-#
+=over 4
+
+=item C<clear()>
+
+Sets the constant type to C<PFC_NONE>.
+
+=cut
 
 sub clear
 {
@@ -145,10 +168,11 @@ sub clear
   return;
 }
 
+=item C<type()>
 
-#
-# type()
-#
+Returns the type of the constant.
+
+=cut
 
 sub type
 {
@@ -156,10 +180,11 @@ sub type
   return $self->{TYPE};
 }
 
+=item C<value()>
 
-#
-# value()
-#
+Returns the value of the constant.
+
+=cut
 
 sub value
 {
@@ -167,13 +192,12 @@ sub value
   return $self->{VALUE};
 }
 
+=item C<unpack($string)>
 
-#
-# unpack()
-#
-# Unpack from the string and return the number of characters that should
-# be removed from the packed string.
-#
+Unpack from the string and return the number of characters that should
+be removed from the packed string.
+
+=cut
 
 sub unpack
 {
@@ -204,10 +228,11 @@ sub unpack
   return $size + 2 * sizeof('op');
 }
 
+=item C<packed_size()>
 
-#
-# packed_size()
-#
+Returns the packed size of the constant.
+
+=cut
 
 sub packed_size
 {
@@ -234,10 +259,11 @@ sub packed_size
   return $size;
 }
 
+=item C<pack()>
 
-#
-# pack()
-#
+Packs the constant.
+
+=cut
 
 sub pack
 {
@@ -267,54 +293,37 @@ sub pack
   return $packed;
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item C<Parrot::PackFile>
+
+=item C<Parrot::PackFile::ConstTable>
+
+=item C<Parrot::PackFile::FixupTable>
+
+=item F<build_tools/pbc2c.pl>
+
+=back
+
+=head1 HISTORY
+
+Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+
+=cut
 
 1;
 
 __END__
 
-=head1 NAME
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
 
-Parrot::PackFile::Constant
-
-=head1 SYNOPSIS
-
-  use Parrot::PackFile::Constant;
-
-=head1 DESCRIPTION
-
-=head2 data DATA
-
-=head2 data
-
-=head2 encoding ENCODING
-
-=head2 encoding
-
-=head2 flags FLAGS
-
-=head2 flags 
-
-=head2 new FLAGS ENCODING TYPE SIZE DATA
-
-=head2 pack
-
-=head2 packed_size
-
-=head2 size SIZE
-
-=head2 size
-
-=head2 type TYPE
-
-=head2 type
-
-=head2 unpack STRING
-
-=head2 unpack
-
-=head1 AUTHOR
-
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+=begin TODO
 
 =head1 COPYRIGHT
 
@@ -324,4 +333,6 @@ Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 
 This program is free software. It is subject to the same
 license as Perl itself.
+
+=end TODO
 

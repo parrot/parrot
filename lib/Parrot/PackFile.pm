@@ -1,23 +1,28 @@
 #! perl -w
-#
-# PackFile.pm
-#
-# Parrot::PackFile Perl package. Functions for reading, writing and manipulating
-# Parrot Pack Files. NOTE: This is a proposed term based on the fact that the
-# file contains more than just byte code, and another language (Java) calls
-# its binary files by a broader notion of what's in them (Class Files). Since
-# Perl has packages, and since we use pack() to write them, we'll call them
-# PackFiles (at least for now).
-#
-# That does, however, beg the question of file extension. Should we name the
-# files "foo.pack" instead of "foo.pbc"?
-#
-# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
-# This program is free software. It is subject to the same
-# license as Perl itself.
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::PackFile - A Parrot Bytecode File
+
+=head1 SYNOPSIS
+
+  use Parrot::PackFile;
+
+=head1 DESCRIPTION
+
+C<Parrot::PackFile> contains all the functions required to process a
+Parrot bytecode file. It is not intended to understand the contents of
+the bytecode file's segments, but merely to dissect and reconstruct data
+from the various segments. See F<docs/parrotbyte.pod> for information
+about the structure of the frozen bycode.
+
+=head2 Class Methods
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -35,11 +40,6 @@ my $PARROT_MAGIC = 0x13155a1;
 
 my $template = "l l/a* l/a* l/a*";
 
-
-#
-# new()
-#
-
 sub _fingerprint {
   my $fingerprint = md5_hex join "\n", map {
     join '_', $_->{NAME}, @{$_->{ARGS}}
@@ -50,6 +50,12 @@ sub _fingerprint {
   }
   return @arr;
 }
+
+=item C<new()>
+
+Returns a new instance.
+
+=cut
 
 sub new
 {
@@ -73,14 +79,28 @@ sub new
   return $self;
 }
 
-#
-# magic()
-#
+=back
+
+=head2 Instance Methods
+
+=over 4
+
+=item C<magic()>
+
+Get the magic number.
+
+=cut
 
 sub magic
 {
   return $PARROT_MAGIC;
 }
+
+=item C<wordsize()>
+
+Returns the packfiles wordsize.
+
+=cut
 
 sub wordsize
 {
@@ -89,12 +109,24 @@ sub wordsize
   return $self->{WORDSIZE};
 }
 
+=item C<byteorder()>
+
+Returns the packfiles byte order.
+
+=cut
+
 sub byteorder
 {
   my $self = shift;
 
   return $self->{BYTEORDER};
 }
+
+=item C<major()>
+
+Returns the packfiles major version number.
+
+=cut
 
 sub major
 {
@@ -103,12 +135,24 @@ sub major
   return $self->{MAJOR};
 }
 
+=item C<minor()>
+
+Returns the packfiles minor version number.
+
+=cut
+
 sub minor
 {
   my $self = shift;
 
   return $self->{MINOR};
 }
+
+=item C<flags()>
+
+Returns the packfiles flags.
+
+=cut
 
 sub flags
 {
@@ -117,12 +161,24 @@ sub flags
   return $self->{FLAGS};
 }
 
+=item C<pad()>
+
+Returns an MD5 hex fingerprint of the ops.
+
+=cut
+
 sub pad
 {
   my $self = shift;
 
   return $self->{PAD};
 }
+
+=item C<floattype()>
+
+Returns the packfiles float type.
+
+=cut
 
 sub floattype
 {
@@ -131,6 +187,12 @@ sub floattype
   return $self->{FLOATTYPE};
 }
 
+=item C<opcodetype()>
+
+Returns the packfiles opcode type.
+
+=cut
+
 sub opcodetype
 {
   my $self = shift;
@@ -138,9 +200,11 @@ sub opcodetype
   return $self->{OPCODETYPE};
 }
 
-#
-# fixup_table()
-#
+=item C<fixup_table()>
+
+Returns an instance of C<Parrot::PackFile::FixupTable>.
+
+=cut
 
 sub fixup_table
 {
@@ -149,10 +213,11 @@ sub fixup_table
   return $self->{FIXUP};
 }
 
+=item C<const_table()>
 
-#
-# const_table()
-#
+Returns an instance of C<Parrot::PackFile::ConstTable>.
+
+=cut
 
 sub const_table
 {
@@ -161,10 +226,13 @@ sub const_table
   return $self->{CONST};
 }
 
+=item C<byte_code($code)>
 
-#
-# byte_code()
-#
+=item C<byte_code()>
+
+Gets/sets the byte code.
+
+=cut
 
 sub byte_code
 {
@@ -174,18 +242,20 @@ sub byte_code
   else    { return $self->{BCODE};  }
 }
 
+=item C<unpack($string)>
 
-#
-# unpack()
-#
-# Magic: 4-byte signed integer
-# Fixup: 4-byte length N + N bytes
-# Const: 4-byte length N + N bytes
-# BCode: N bytes
-#
-# FIXME: Now that we have a portable bytecode format,
-# with file specified wordsize, this routine
-# is inherently broken since it uses the native sizes.
+Unpack the contents from the string.
+
+    Magic: 4-byte signed integer
+    Fixup: 4-byte length N + N bytes
+    Const: 4-byte length N + N bytes
+    BCode: N bytes
+
+TODO - Now that we have a portable bytecode format, with file specified
+wordsize, this routine is inherently broken since it uses the native
+sizes.
+
+=cut
 
 sub unpack
 {
@@ -277,10 +347,11 @@ sub unpack
   return $self;
 }
 
+=item C<unpack_filehandle($filehandle)>
 
-#
-# unpack_filehandle()
-#
+Unpack the contents from the filehandle.
+
+=cut
 
 sub unpack_filehandle
 {
@@ -296,10 +367,11 @@ sub unpack_filehandle
   return $self->unpack($string);
 }
 
+=item C<unpack_file($file)>
 
-#
-# unpack_file()
-#
+Unpack the contents from the named file.
+
+=cut
 
 sub unpack_file
 {
@@ -314,10 +386,11 @@ sub unpack_file
   return $self->unpack_filehandle($fh);
 }
 
+=item C<pack()>
 
-#
-# pack()
-#
+Pack the contents to a string.
+
+=cut
 
 sub pack
 {
@@ -353,10 +426,11 @@ sub pack
   return $string;
 }
 
+=item C<pack_filehandle($filehandle)>
 
-#
-# pack_filehandle()
-#
+Pack the contents to a string and write it to the filehandle.
+
+=cut
 
 sub pack_filehandle
 {
@@ -365,10 +439,11 @@ sub pack_filehandle
   print($fh $self->pack);
 }
 
+=item C<pack_file($file)>
 
-#
-# pack_file()
-#
+Pack the contents to a string and write it to the named file.
+
+=cut
 
 sub pack_file
 {
@@ -380,78 +455,48 @@ sub pack_file
   return $self->pack_filehandle($fh);
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::PackFile::ConstTable>
+
+=item C<Parrot::PackFile::Constant>
+
+=item C<Parrot::PackFile::FixupTable>
+
+=item F<build_tools/pbc2c.pl>
+
+=back
+
+=head1 HISTORY
+
+Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+
+Gregor writes:
+
+I<"Packfile" is a proposed term based on the fact that the file contains
+more than just byte code, and another language (Java) calls its binary
+files by a broader notion of what's in them (Class Files). Since Perl
+has packages, and since we use C<pack()> to write them, we'll call them
+PackFiles (at least for now).>
+
+I<That does, however, beg the question of file extension. Should we name
+the files "foo.pack" instead of "foo.pbc"?>
+
+=cut
 
 1;
 
 __END__
 
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
 
-=head1 NAME
-
-Parrot::PackFile
-
-=head1 SYNOPSIS
-
-  use Parrot::PackFile;
-
-=head1 DESCRIPTION
-
-This package contains all the functions required to process a Parrot bytecode
-file. It is not intended to understand the contents of the bytecode file's
-segments, but merely to dissect and reconstruct data from the various
-segments. See L<parrotbyte> for information about the structure of the frozen
-bycode.
-
-=head2 byte_code
-=head2 byte_code CODE
-
-Get or set the byte code.
-
-=head2 const_table
-
-Get the constant table, and instance of the L<Parrot::PackFile::ConstTable>
-class.
-
-=head2 fixup_table
-
-Get the fixup table, and instance of the L<Parrot::PackFile::FixupTable>
-class.
-
-=head2 magic
-
-Get the magic number.
-
-=head2 new
-
-Make a new instance.
-
-=head2 pack
-
-Pack the contents to a string.
-
-=head2 pack_file FILENAME
-
-Pack the contents to a string and write it to the named file.
-
-=head2 pack_filehandle FILEHANDLE
-
-Pack the contents to a string and write it to the filehandle.
-
-=head2 unpack STRING
-
-Unpack the contents from the string.
-
-=head2 unpack_file FILENAME
-
-Unpack the contents from the named file.
-
-=head2 unpack_filehandle FILEHANDLE
-
-Unpack the contents from the filehandle.
-
-=head1 AUTHOR
-
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+=begin TODO
 
 =head1 COPYRIGHT
 
@@ -462,3 +507,6 @@ Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 This program is free software. It is subject to the same
 license as Perl itself.
 
+=end TODO
+
+=cut

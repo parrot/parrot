@@ -1,3 +1,25 @@
+# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::Pmc2c - PMC to C Code Generation
+
+=head1 SYNOPSIS
+
+	use Parrot::Pmc2c;
+
+=head1 DESCRIPTION
+
+C<Parrot::Pmc2c> (and the L<subclasses|/SUBCLASSES> defined in this
+file) is used by F<classes/pmc2c2.pl> to generate C code from PMC files.
+
+=head2 Functions
+
+=over
+
+=cut
+
 package Parrot::Pmc2c;
 use vars qw(@EXPORT_OK @writes %writes );
 
@@ -9,11 +31,165 @@ BEGIN {
     @writes{@writes} = (1) x @writes;
 };
 
+=item C<does_write($method, $section)>
+
+Returns whether a method writes.
+
+=cut
+
 sub does_write($$) {
     my ($meth, $section) = @_;
     warn "no $meth\n" unless $section;
     exists $writes{$section} || $meth eq 'morph';
 }
+
+=item C<count_newlines($string)>
+
+Returns the number of newlines (C<\n>) in C<$string>.
+
+=cut
+
+sub count_newlines {
+    return scalar(() = $_[0] =~ /\n/g);
+}
+
+=item C<gen_ret($method, $body)>
+
+Generate the C code for a C<return> statement, if the body is empty then
+make a cast if needed.
+
+This method is imported by subclasses.
+
+=cut
+
+sub gen_ret {
+    my ($method, $body) = @_;
+    my $ret;
+    if ($body) {
+        $ret = $method->{type} eq 'void' ? "$body;" : "return $body;" ;
+    }
+    else {
+        $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
+    }
+    $ret;
+}
+
+=item C<class_name($self, $class)>
+
+Returns the appropriate C<Parrot::Pmc2c> subclass for the PMC (C<<
+$self->{class} >>). C<$self> is the hash reference passed to C<new()>,
+and C<$class> is C<Parrot::Pmc2c>.
+
+=cut
+
+sub class_name {
+    my ($self, $class) = @_;
+    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
+                    'delegate' => 1, 'SharedRef' => 1 );
+    my $classname = $self->{class};
+    my $nclass = $class;
+    # bless object into different classes inheriting from
+    # Parrot::Pmc2c
+    if ($special{$classname}) {
+        $nclass .= "::" . $classname;
+    }
+    else {
+        $nclass .= "::Standard";
+    }
+    $nclass;
+}
+
+=item C<dynext_load_code($classname, $call_class_init)>
+
+C<$classname> is the name of a PMC. 
+
+C<$call_class_init> is the C code for a call to the PMC's class
+initialization method.
+
+This function is exported.
+
+=cut
+
+sub dynext_load_code {
+    my ($classname, $call_class_init ) = @_;
+    my $lc_classname = lc $classname;
+    return <<"EOC";
+/*
+ * This load function will be called to do global (once) setup
+ * whatever is needed to get this extension running
+ */
+#include "parrot/dynext.h"
+
+PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
+{
+    STRING *whoami;
+    PMC *pmc;
+    INTVAL type;
+
+    /*
+     * create a library PMC
+     */
+    pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
+    /*
+     * TODO stuff some info into this PMCs props
+     */
+
+    /*
+     * for all PMCs we want to register:
+     */
+    whoami = string_from_cstring(interpreter, "$classname", 0);
+    type = pmc_register(interpreter, whoami);
+    /* do class_init code */
+    $call_class_init
+
+    return pmc;
+}
+
+EOC
+}
+
+=back
+
+=head2 Class Methods
+
+=over
+
+=item C<new($self, $opt)>
+
+Returns C<$self> as a new instance.
+
+C<$self> is a hash reference C<eval>-ed from a F<*.dump> file generated
+by F<classes/pmc2c.pl> from a F<*.pmc> file. It is C<bless>-ed either into
+C<Parrot::Pmc2c::::Standard>, or into one of the other I<special> PMCs:
+F<default>, C<delegate>, C<Null>, C<Ref> or C<SharedRef>.
+
+C<$opt> is a hash reference.
+
+=cut
+
+sub new {
+    my $this = shift;
+    my $class = ref($this) || $this;
+    my $self = shift;
+    $self->{opt} = shift;
+    $class = class_name($self, $class);
+    bless $self, $class;
+    $self->init($class);
+    $self;
+}
+
+=back
+
+=head2 Instance Methods
+
+=over
+
+=item C<get_vtable_section()>
+
+Creates a hash of all the method names containing vtable section. Called
+from C<init()>.
+
+=cut
 
 sub get_vtable_section() {
     my $self = shift;
@@ -23,6 +199,13 @@ sub get_vtable_section() {
 	$self->{all}{$entry->{meth}} = $entry->{section};
     }
 }
+
+=item C<make_const($class)>
+
+If the PMC had its C<const_too> flag set then this method is called in
+C<init()> to to create the read-only set methods.
+
+=cut
 
 sub make_const() {
     my ($self, $class) = @_;
@@ -64,6 +247,12 @@ sub make_const() {
 
 }
 
+=item C<init($class)>
+
+Initializes the instance. C<$class> is its class.
+
+=cut
+
 sub init() {
     my ($self, $class) = @_;
     $self->get_vtable_section();
@@ -71,37 +260,12 @@ sub init() {
 
 }
 
-sub class_name {
-    my ($self, $class) = @_;
-    my %special = ( 'Ref' => 1, 'default' => 1, 'Null' => 1,
-                    'delegate' => 1, 'SharedRef' => 1 );
-    my $classname = $self->{class};
-    my $nclass = $class;
-    # bless object into different classes inheriting from
-    # Parrot::Pmc2c
-    if ($special{$classname}) {
-        $nclass .= "::" . $classname;
-    }
-    else {
-        $nclass .= "::Standard";
-    }
-    $nclass;
-}
+=item C<dont_edit($pmcfile)>
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my $self = shift;
-    $self->{opt} = shift;
-    $class = class_name($self, $class);
-    bless $self, $class;
-    $self->init($class);
-    $self;
-}
+Returns the "DO NOT EDIT THIS FILE" warning text. C<$pmcfile> is the name
+of the original source F<*.pmc> file.
 
-sub count_newlines {
-    return scalar(() = $_[0] =~ /\n/g);
-}
+=cut
 
 sub dont_edit() {
     my ($self, $pmcfile) = @_;
@@ -118,6 +282,13 @@ sub dont_edit() {
 
 EOC
 }
+
+=item C<decl($classname, $method, $for_header)>
+
+Returns the C code for the PMC method declaration. C<$for_header>
+indicates whether the code is for a header or implementation file.
+
+=cut
 
 sub decl() {
     my ($self, $classname, $method, $for_header) = @_;
@@ -144,6 +315,13 @@ $extern$ret${newl}Parrot_${classname}_$meth(Parrot_Interp$interp, PMC*$pmc$args)
 EOC
 }
 
+=item C<includes()>
+
+Returns the C C<#include> for the header file of each of the PMC's
+superclasses.
+
+=cut
+
 sub includes() {
     my $self = shift;
     my $cout = "";
@@ -156,6 +334,11 @@ EOC
     "$cout\n";
 }
 
+=item C<full_arguments($args)>
+
+Prepends C<INTERP, SELF> to C<$args>.
+
+=cut
 
 sub full_arguments {
     my $args = shift;
@@ -165,6 +348,13 @@ sub full_arguments {
         return "INTERP, SELF";
     }
 }
+
+=item C<rewrite_method($class, $method, $super, $super_table)>
+
+Rewrites the method body performing the various macro subsitiutions for
+vtable method bodies (see F<classes/pmc2c.pl>).
+
+=cut
 
 sub rewrite_method ($$$$$) {
     my ($class, $method, $super, $super_table) = @_;
@@ -207,6 +397,12 @@ sub rewrite_method ($$$$$) {
     return $_;
 }
 
+=item C<body($method)>
+
+Returns the C code for the method body.
+
+=cut
+
 sub body
 {
     my ($self, $method) = @_;
@@ -229,6 +425,12 @@ EOC
     $cout .= "\n\n";
 }
 
+=item C<methods($line)>
+
+Returns the C code for the vtable methods. C<$line> is used to accumulate
+the number of lines.
+
+=cut
 
 sub methods() {
     my ($self, $line) = @_;
@@ -246,44 +448,11 @@ sub methods() {
     $cout;
 }
 
-# util
-sub dynext_load_code {
-    my ($classname, $call_class_init ) = @_;
-    my $lc_classname = lc $classname;
-    return <<"EOC";
-/*
- * This load function will be called to do global (once) setup
- * whatever is needed to get this extension running
- */
-#include "parrot/dynext.h"
+=item C<lib_load_code()>
 
-PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
-{
-    STRING *whoami;
-    PMC *pmc;
-    INTVAL type;
+Returns the C code for loading a library.
 
-    /*
-     * create a library PMC
-     */
-    pmc = pmc_new(interpreter, enum_class_ParrotLibrary);
-    /*
-     * TODO stuff some info into this PMCs props
-     */
-
-    /*
-     * for all PMCs we want to register:
-     */
-    whoami = string_from_cstring(interpreter, "$classname", 0);
-    type = pmc_register(interpreter, whoami);
-    /* do class_init code */
-    $call_class_init
-
-    return pmc;
-}
-
-EOC
-}
+=cut
 
 sub lib_load_code() {
     my $self = shift;
@@ -293,6 +462,13 @@ sub lib_load_code() {
         "Parrot_${classname}_class_init(interpreter, type);\n";
     return dynext_load_code($classname, $call_class_init);
 }
+
+=item C<init_func()>
+
+Returns the C code for the PMC's initialization method, or an empty
+string if the PMC has a C<no_init> flag. 
+
+=cut
 
 sub init_func() {
     my $self = shift;
@@ -379,6 +555,14 @@ EOC
     $cout;
 }
 
+=item C<gen_c($file)>
+
+Generates the C implementation file code for the PMC. 
+
+C<$file> is the name of the original source F<*.pmc> file.
+
+=cut
+
 sub gen_c() {
     my ($self, $file) = @_;
     my $cout = $self->dont_edit($file);
@@ -394,6 +578,13 @@ sub gen_c() {
     $cout .= $self->{post};
     $cout;
 }
+
+=item C<hdecls()>
+
+Returns the C code function declarations for all the methods for inclusion
+in the PMC's C header file.
+
+=cut
 
 sub hdecls() {
     my $self = shift;
@@ -411,6 +602,14 @@ void Parrot_${classname}_class_init(Parrot_Interp, int);
 EOC
     $hout;
 }
+
+=item C<gen_h($file)>
+
+Generates the C header file code for the PMC. 
+
+C<$file> is the name of the original source F<*.pmc> file.
+
+=cut
 
 sub gen_h() {
     my ($self, $file) = @_;
@@ -437,29 +636,39 @@ EOH
     $hout;
 }
 
-# true if this class generates code for $meth
+=item C<implements($method)>
+
+True if this class generates code for C<$method>.
+
+=cut
+
 sub implements
 {
     my ($self, $meth) = @_;
     return exists $self->{has_method}{$meth};
 }
 
-# generate a return statement, if body is empty make a cast if needed
-sub gen_ret {
-    my ($method, $body) = @_;
-    my $ret;
-    if ($body) {
-        $ret = $method->{type} eq 'void' ? "$body;" : "return $body;" ;
-    }
-    else {
-        $ret = $method->{type} eq 'void' ? "" : "return ($method->{type})0;";
-    }
-    $ret;
-}
+=back
 
-# standard behavior
+=head1 SUBCLASSES
+
+=head2 Parrot::Pmc2c::Standard Instance Methods
+
+Standard behavior.
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::Standard;
 use base 'Parrot::Pmc2c';
+
+=item C<body($method)>
+
+Returns the C code for the method body.
+
+=cut
+
 sub body
 {
     my ($self, $method) = @_;
@@ -468,10 +677,26 @@ sub body
     return $self->SUPER::body($self->{methods}[$n]);
 }
 
-# through exception if meth writes
+=back
+
+=head2 Parrot::Pmc2c::Standard::Const Instance Methods
+
+Returns the C code for the method body. 
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::Standard::Const;
 use base 'Parrot::Pmc2c::Standard';
 import Parrot::Pmc2c qw( gen_ret );
+
+=item C<body($method)>
+
+Overrides the default implementation to throw exception if the method
+writes.
+
+=cut
 
 sub body {
     my ($self, $method) = @_;
@@ -507,16 +732,37 @@ EOC
     $cout;
 }
 
+=back
 
-# Ref directs all unknow methods to the referee
+=head2 Parrot::Pmc2c::Ref Instance Methods
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::Ref;
 use base 'Parrot::Pmc2c';
 import Parrot::Pmc2c qw( gen_ret );
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
 
 sub implements
 {
     1;
 }
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+Overrides the default implementation to direct all unknown methods to
+the thing referred to.
+
+=cut
 
 sub body
 {
@@ -551,21 +797,49 @@ $decl {
 EOC
 }
 
-# SharedRef is like Ref but wraps all or set_ like methods
-# with locking
+=back
+
+=head2 Parrot::Pmc2c::SharedRef Instance Methods
+
+C<SharedRef> is like C<Ref> but with locking.
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::SharedRef;
 use base 'Parrot::Pmc2c';
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
 
 sub implements
 {
     1;
 }
 
+=item C<gen_ret($type)>
+
+Generate the C code for a C<return> statement.
+
+=cut
+
 sub gen_ret
 {
     my ($self, $type) = @_;
     return "ret_val = ";
 }
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+Overrides the default implementation to perform locking.
+
+=cut
 
 sub body
 {
@@ -612,15 +886,37 @@ $decl {
 EOC
 }
 
-# default throws an execption for unknown meths
+=back
+
+=head2 Parrot::Pmc2c::default Instance Methods
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::default;
 use base 'Parrot::Pmc2c';
 import Parrot::Pmc2c qw( gen_ret );
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
 
 sub implements
 {
     1;
 }
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+Overrides the default implementation to throw an execption for unknown
+methods.
+
+=cut
 
 sub body
 {
@@ -651,15 +947,36 @@ ${decl} {
 EOC
 }
 
-# null.pmc throws an execption for all meths
+=back
+
+=head2 Parrot::Pmc2c::Null Instance Methods
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::Null;
 use base 'Parrot::Pmc2c';
 import Parrot::Pmc2c qw( gen_ret );
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
 
 sub implements
 {
     1;
 }
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+The C<Null> PMC throws an execption for all methods.
+
+=cut
 
 sub body
 {
@@ -684,14 +1001,33 @@ ${decl} {
 EOC
 }
 
-# delegate.pmc redirects all methods to bytecode
+=back
+
+=head2 Parrot::Pmc2c::delegate Instance Methods
+
+=over 4
+
+=cut
+
 package Parrot::Pmc2c::delegate;
 use base 'Parrot::Pmc2c';
+
+=item C<implements($method)>
+
+Always true.
+
+=cut
 
 sub implements
 {
     1;
 }
+
+=item C<trans($type)>
+
+Used in C<signature()> to normalize argument types.
+
+=cut
 
 sub trans
 {
@@ -703,6 +1039,12 @@ sub trans
     return '?';
 }
 
+=item C<signature($params)>
+
+Returns the method signature for C<$params>.
+
+=cut
+
 sub signature
 {
     my ($self, $params) = @_;
@@ -712,12 +1054,26 @@ sub signature
     return join '', @types;
 }
 
+=item C<gen_ret($type)>
+
+Generate the C code for a C<return> statement.
+
+=cut
+
 sub gen_ret
 {
     my ($self, $type) = @_;
     return "ret_val = *($1*) " if ($type =~ /((?:INT|FLOAT)VAL)/);
     return "ret_val = ($type) ";
 }
+
+=item C<body($method, $line)>
+
+Returns the C code for the method body.
+
+The C<delegate> PMC redirects all methods to bytecode.
+
+=cut
 
 sub body
 {
@@ -766,6 +1122,18 @@ ${decl} {
 
 EOC
 }
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item F<classes/pmc2c2.pl>
+
+=back
+
+=cut
 
 # vim: expandtab shiftwidth=4:
 1;

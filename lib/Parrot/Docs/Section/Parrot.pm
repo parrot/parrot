@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Parrot - Root docmentation section
+Parrot::Docs::Section::Parrot - Root documentation section
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ Parrot::Docs::Section::Parrot - Root docmentation section
 
 This is the top-level section for the HTML documentation for Parrot.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -80,6 +80,12 @@ sub new
 	);
 }
 
+=back
+
+=head2 Instance Methods
+
+=over 4
+
 =item C<write_docs($silent, $delete)>
 
 Writes the HTML documentation.
@@ -108,22 +114,41 @@ sub write_docs
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::Section::Info>, 
-C<Parrot::Docs::Section::Docs>, 
-C<Parrot::Docs::Section::Examples>, 
-C<Parrot::Docs::Section::PMCs>, 
-C<Parrot::Docs::Section::DynaPMCs>, 
-C<Parrot::Docs::Section::C>, 
-C<Parrot::Docs::Section::Ops>, 
-C<Parrot::Docs::Section::IMCC>, 
-C<Parrot::Docs::Section::Perl>, 
-C<Parrot::Docs::Section::Libs>, 
-C<Parrot::Docs::Section::Tools>, 
-C<Parrot::Docs::Section::BigNum>, 
-C<Parrot::Docs::Section::Languages>, 
-C<Parrot::Docs::Section::Config>, 
-C<Parrot::Docs::Section::Tests>, 
-C<Parrot::Docs::Section::EditorPlugins>.
+=over 4
+
+=item C<Parrot::Docs::Section::Info>
+
+=item C<Parrot::Docs::Section::Docs>
+
+=item C<Parrot::Docs::Section::Examples>
+
+=item C<Parrot::Docs::Section::PMCs>
+
+=item C<Parrot::Docs::Section::DynaPMCs>
+
+=item C<Parrot::Docs::Section::C>
+
+=item C<Parrot::Docs::Section::Ops>
+
+=item C<Parrot::Docs::Section::IMCC>
+
+=item C<Parrot::Docs::Section::Perl>
+
+=item C<Parrot::Docs::Section::Libs>
+
+=item C<Parrot::Docs::Section::Tools>
+
+=item C<Parrot::Docs::Section::BigNum>
+
+=item C<Parrot::Docs::Section::Languages>
+
+=item C<Parrot::Docs::Section::Config>
+
+=item C<Parrot::Docs::Section::Tests>
+
+=item C<Parrot::Docs::Section::EditorPlugins>
+
+=back
 
 =cut
 

@@ -1,13 +1,21 @@
-#
-# CGP.pm CGoto Prederefed
-#        this is a mixture of prederefed register addressing and the
-#        CGoto runloop
-#        Please consult the corresponding OpTrans files for more
-#
-# Author: leo
-#
+# Copyright: 2002 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::OpTrans::CGP - C Goto Prederefed Transform
+
+=head1 DESCRIPTION
+
+C<Parrot::OpTrans::CGP> inherits from C<Parrot::OpTrans::CPrederef> and
+C<Parrot::OpTrans::CGoto> to provide prederefed register addressing and
+C C<goto> run loop.
+
+=head2 Instance Methods
+
+=over 4
+
+=cut
 
 use strict;
 #use warnings;
@@ -20,23 +28,42 @@ use Parrot::OpTrans::CGoto;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans::CPrederef Parrot::OpTrans::CGoto);
 
+=item C<core_type()>
+
+Returns C<PARROT_CGP_CORE>.
+
+=cut
 
 sub core_type {
     return 'PARROT_CGP_CORE';
 }
 
-#
-# suffix()
-#
+=item C<suffix()>
+
+The suffix is C<'_cgp'>.
+
+=cut
 
 sub suffix
 {
   return "_cgp";
 }
 
+=item C<core_prefix()>
+
+The core prefix is C<'cgp_'>.
+
+=cut
+
 sub core_prefix {
     return "cgp_";
 }
+
+=item C<defines()>
+
+Returns the C C<#define> macros required by the ops.
+
+=cut
 
 sub defines
 {
@@ -55,9 +82,13 @@ opcode_to_prederef(struct Parrot_Interp* interpreter,
 
 END
 }
-#
-# goto_address()
-#
+
+=item C<goto_address($address)>
+
+Transforms the C<goto ADDRESS($address)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_address
 {
@@ -73,18 +104,25 @@ sub goto_address
   }
 }
 
-#
-# goto_offset()
-#
+=item C<goto_offset($offset)>
+
+Transforms the C<goto OFFSET($offset)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_offset
 {
   my ($self, $offset) = @_;
   return "goto **(cur_opcode += $offset)";
 }
-#
-# goto_pop()
-#
+
+=item C<goto_pop()>
+
+Transforms the C<goto POP()> macro in an ops file into the relevant C
+code.
+
+=cut
 
 sub goto_pop
 {
@@ -92,7 +130,24 @@ sub goto_pop
   return "goto ** (cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter)))";
 }
 
-#############################################
-# ops2c code generation functions
-#
+=back
 
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::OpTrans>
+
+=item C<Parrot::OpTrans::C>
+
+=item C<Parrot::OpTrans::CGoto>
+
+=item C<Parrot::OpTrans::CPrederef>
+
+=item C<Parrot::OpTrans::CSwitch>
+
+=item C<Parrot::OpTrans::Compiled>
+
+=cut
+
+1;

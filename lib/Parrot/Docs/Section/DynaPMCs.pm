@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::DynaPMCs - Dynamic PMCs docmentation section
+Parrot::Docs::Section::DynaPMCs - Dynamic PMCs documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::DynaPMCs;
-	
-	my $section = Parrot::Docs::Section::DynaPMCs->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing all the dynamic PMCs.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -30,7 +28,7 @@ use Parrot::Docs::Section;
 
 =item C<new()>
 
-Returns the dynamic PMCs section.
+Returns a new section.
 
 =cut
 

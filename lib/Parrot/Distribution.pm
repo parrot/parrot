@@ -12,15 +12,15 @@ Parrot::Distribution - Parrot Distribution Directory
 
 =head1 DESCRIPTION
 
-The Parrot distribution directory knows all kinds of stuff about the
-contents of the distribution.
+C<Parrot::Distribution> knows all kinds of stuff about the contents of
+the distribution.
 
 This is a subclass of C<Parrot::Docs::Directory> so that it can be used
 to build the HTML docs. There may come a time when it is necessary to 
 make C<file_class()> and C<directory_class()> dynamic so that different
 file methods can be used depending on the circumstances.
 
-=head2 Methods
+=head2 Class Methods
 
 =over 4
 
@@ -67,6 +67,12 @@ sub new
 	
 	die "Failed to find Parrot distribution root\n";
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<c_source_file_directories()>
 

@@ -1,16 +1,25 @@
 #! perl -w
-#
-# ConstTable.pm
-#
-# Parrot::ConstTable Perl package. Functions for manipulating Parrot
-# bytecode constant tables.
-#
-# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
-# This program is free software. It is subject to the same
-# license as Perl itself.
-#
 # $Id$
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+
+=head1 NAME
+
+Parrot::PackFile::ConstTable - Packfile Constant Tables
+
+=head1 SYNOPSIS
+
+  use Parrot::PackFile::ConstTable;
+
+=head1 DESCRIPTION
+
+Instances of C<Parrot::PackFile::ConstTable> are used to represent
+constant tables from Parrot packfiles.
+
+=head2 Class Methods
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -23,10 +32,11 @@ use Parrot::Types;
 
 my $template = "l/(l l l l/a*)*";
 
+=item C<new($string)>
 
-#
-# new()
-#
+Returns a new instance.
+
+=cut
 
 sub new
 {
@@ -40,10 +50,17 @@ sub new
   return $self;
 }
 
+=back
 
-#
-# clear()
-#
+=head2 Instance Methods
+
+=over 4
+
+=item C<clear()>
+
+Empties the constant table.
+
+=cut
 
 sub clear
 {
@@ -54,10 +71,11 @@ sub clear
   return;
 }
 
+=item C<unpack($string)>
 
-#
-# unpack()
-#
+Unpacks the string.
+
+=cut
 
 sub unpack
 {
@@ -82,10 +100,11 @@ sub unpack
   return $total_used + sizeof('op');
 }
 
+=item C<packed_size()>
 
-#
-# packed_size()
-#
+Returns the packed size of the constant table.
+
+=cut
 
 sub packed_size
 {
@@ -100,10 +119,11 @@ sub packed_size
   return $size;
 }
 
+=item C<pack()>
 
-#
-# pack()
-#
+Packs the constant table.
+
+=cut
 
 sub pack
 {
@@ -119,10 +139,11 @@ sub pack
   return $packed;
 }
 
+=item C<const_count()>
 
-#
-# const_count()
-#
+Returns the number of constants in the table.
+
+=cut
 
 sub const_count
 {
@@ -131,10 +152,11 @@ sub const_count
   return scalar(@{$self->{CONST}});
 }
 
+=item C<constant($index)>
 
-#
-# constant()
-#
+Returns the constant at C<$index>.
+
+=cut
 
 sub constant
 {
@@ -143,10 +165,11 @@ sub constant
   return $self->{CONST}[$index];
 }
 
+=item C<constants()>
 
-#
-# constants()
-#
+Returns a reference to the constants array.
+
+=cut
 
 sub constants
 {
@@ -154,11 +177,13 @@ sub constants
 
   return @{$self->{CONST}};
 }
+ 
+=item C<add($const)>
 
+Adds the constant (an instance of C<Parrot::PackFile::Constant>) to the
+table.
 
-#
-# add()
-#
+=cut
 
 sub add
 {
@@ -168,43 +193,37 @@ sub add
   push @{$self->{CONST}}, $const;
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item C<Parrot::PackFile>
+
+=item C<Parrot::PackFile::Constant>
+
+=item C<Parrot::PackFile::FixupTable>
+
+=item F<build_tools/pbc2c.pl>
+
+=back
+
+=head1 HISTORY
+
+Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+
+=cut
+
 1;
 
 __END__
 
-=head1 NAME
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
 
-Parrot::PackFile::ConstTable
-
-=head1 SYNOPSIS
-
-  use Parrot::PackFile::ConstTable
-
-=head1 DESCRIPTION
-
-Constant tables from Parrot pack files.
-
-=head2 add
-
-=head2 clear
-
-=head2 const_count
-
-=head2 constant
-
-=head2 constants
-
-=head2 new
-
-=head2 pack
-
-=head2 packed_size
-
-=head2 unpack STRING
-
-=head1 AUTHOR
-
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+=begin TODO
 
 =head1 COPYRIGHT
 
@@ -215,3 +234,4 @@ Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 This program is free software. It is subject to the same
 license as Perl itself.
 
+=end TODO

@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Libs - Parrot libraries docmentation section
+Parrot::Docs::Libs - Parrot libraries documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Libs;
-	
-	my $section = Parrot::Docs::Libs->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing libraries in Parrot.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -30,7 +28,7 @@ use Parrot::Docs::Section;
 
 =item C<new()>
 
-Returns the libraries section.
+Returns a new section.
 
 =cut
 

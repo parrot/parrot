@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::PMCs - PMCs docmentation section
+Parrot::Docs::Section::PMCs - PMCs documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::PMCs;
-	
-	my $section = Parrot::Docs::Section::PMCs->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing all the PMCs.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -30,7 +28,7 @@ use Parrot::Docs::Section;
 
 =item C<new()>
 
-Returns the PMCs section.
+Returns a new section.
 
 =cut
 

@@ -1,8 +1,22 @@
-#
-# CGoto.pm
-#
+# Copyright: 2002 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::OpTrans::CGoto - CGoto Transform
+
+=head1 DESCRIPTION
+
+Used to generate C code from Parrot operations.
+
+C<Parrot::OpTrans::CGoto> inherits from C<Parrot::OpTrans> to provide a
+C C<goto> run loop.
+
+=head2 Instance Methods
+
+=over 4
+
+=cut
 
 use strict;
 #use warnings;
@@ -13,15 +27,39 @@ use Parrot::OpTrans;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans);
 
+=item C<suffix()>
+
+The suffix is C<'_cg'>.
+
+=cut
+
 sub suffix { return "_cg"; }
+
+=item C<core_prefix()>
+
+The core prefix is C<'cg_'>.
+
+=cut
+
 sub core_prefix {
     return "cg_";
 }
 
+=item C<core_type()>
+
+The core type is C<PARROT_CGOTO_CORE>.
+
+=cut
 
 sub core_type {
     return 'PARROT_CGOTO_CORE';
 }
+
+=item C<defines()>
+
+Returns the C C<#define> macros required by the ops.
+
+=cut
 
 sub defines
 {
@@ -37,10 +75,13 @@ sub defines
 END
 }
 
+=item C<pc($pc)>
 
-#
-# pc()
-#
+=item C<pc()>
+
+Sets/gets the current position in Parrot code.
+
+=cut
 
 sub pc
 {
@@ -54,10 +95,13 @@ sub pc
   }
 }
 
+=item C<args(@args)>
 
-#
-# args()
-#
+=item C<args()>
+
+Sets/gets the transform's arguments.
+
+=cut
 
 sub args
 {
@@ -72,10 +116,11 @@ sub args
 
 }
 
+=item C<arg($index)>
 
-#
-# arg()
-#
+Returns the argument at C<$index>.
+
+=cut
 
 sub arg
 {
@@ -84,9 +129,12 @@ sub arg
   return $self->{ARGS}[shift];
 }
 
-#
-# goto_address()
-#
+=item C<goto_address($address)>
+
+Transforms the C<goto ADDRESS($address)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_address
 {
@@ -101,15 +149,24 @@ sub goto_address
   }
 }
 
+=item C<expr_offset($offset)>
+
+Transforms the C<OFFSET($offset)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub expr_offset {
     my ($self, $offset) = @_;
     return "cur_opcode + $offset";
 }
 
-#
-# goto_offset()
-#
+=item C<goto_offset($offset)>
+
+Transforms the C<goto OFFSET($offset)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_offset
 {
@@ -117,20 +174,18 @@ sub goto_offset
   return "goto *ops_addr[*(cur_opcode += $offset)]";
 }
 
+=item C<goto_pop()>
 
-#
-# goto_pop()
-#
+Transforms the C<goto POP()> macro in an ops file into the relevant C
+code.
+
+=cut
 
 sub goto_pop
 {
   my ($self) = @_;
   return "opcode_t* pop_addr = (opcode_t*)pop_dest(interpreter);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
 }
-
-#
-# access_arg()
-#
 
 my %arg_maps = (
   'op' => "cur_opcode[%ld]",
@@ -150,6 +205,13 @@ my %arg_maps = (
   'kic' => "cur_opcode[%ld]"
 );
 
+=item C<access_arg($type, $num, $op)>
+
+Returns the C code for the specified op argument type (see
+C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
+
+=cut
+
 sub access_arg
 {
   my ($self, $type, $num, $op) = @_;
@@ -159,10 +221,11 @@ sub access_arg
   return sprintf($arg_maps{$type}, $num );
 }
 
+=item C<restart_address($address)>
 
-#
-# restart_address()
-#
+Returns the C code for C<restart ADDRESS($address)>.
+
+=cut
 
 sub restart_address
 {
@@ -170,10 +233,11 @@ sub restart_address
   return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
 }
 
+=item C<restart_offset($offset)>
 
-#
-# restart_offset()
-#
+Returns the C code for C<restart OFFSET($offset)>.
+
+=cut
 
 sub restart_offset
 {
@@ -181,10 +245,12 @@ sub restart_offset
   return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
 }
 
-#############################################
-# ops2c code generation functions
-#
-# the run core function
+=item C<run_core_func_decl($core)>
+
+Returns the C code for the run core function declaration.
+
+=cut
+
 sub run_core_func_decl {
     my ($self, $core) = @_;
     "opcode_t * " .
@@ -192,10 +258,22 @@ sub run_core_func_decl {
     "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
 }
 
+=item C<ops_addr_decl($base_suffix)>
+
+Returns the C code for the ops address declaration.
+
+=cut
+
 sub ops_addr_decl {
     my ($self, $bs) = @_;
     "static void **${bs}ops_addr;\n\n";
 }
+
+=item C<run_core_func_start()>
+
+Returns the C code prior to the run core function.
+
+=cut
 
 sub run_core_func_start {
     return <<END_C;
@@ -208,6 +286,12 @@ sub run_core_func_start {
     static void *l_ops_addr[] = {
 END_C
 }
+
+=item C<run_core_after_addr_table($base_suffix)>
+
+Returns the run core C code for section after the address table.
+
+=cut
 
 sub run_core_after_addr_table {
     my ($self, $bs) = @_;
@@ -232,11 +316,23 @@ sub run_core_after_addr_table {
 END_C
 }
 
+=item C<run_core_finish($base)>
+
+Returns the C code following the run core function.
+
+=cut
+
 sub run_core_finish {
     my ($self, $base) = @_;
     return "\n} /* " . $self->core_prefix . "$base */\n\n";
 
 }
+
+=item C<init_func_init1($base)>
+
+Returns the C code for the init function.
+
+=cut
 
 sub init_func_init1 {
     my ($self, $base) = @_;
@@ -248,11 +344,38 @@ sub init_func_init1 {
 END_C
 }
 
+=item C<init_set_dispatch($base_suffix)>
+
+Returns the C code for the init set dispatch.
+
+=cut
+
 sub init_set_dispatch {
     my ($self, $bs) = @_;
     return <<END_C;
         ${bs}ops_addr = (void**) init;
 END_C
 }
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::OpTrans>
+
+=item C<Parrot::OpTrans::C>
+
+=item C<Parrot::OpTrans::CGP>
+
+=item C<Parrot::OpTrans::CPrederef>
+
+=item C<Parrot::OpTrans::CSwitch>
+
+=item C<Parrot::OpTrans::Compiled>
+
+=cut
+
 1;
 

@@ -3,17 +3,16 @@
 
 =head1 NAME
 
-Parrot::Docs::Item - Docmentation item
+Parrot::Docs::Item - Documentation item
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Item;
-	
-	my $item = Parrot::Docs::Item->new('Usual suspects', 'foo', 'bar');
 
 =head1 DESCRIPTION
 
-An item is one or more related paths with some optional descriptive text.
+A documentation I<item> is one or more related paths with some optional
+descriptive text.
 
 Directory paths will be expanded to all the file paths within the
 directory and any subdirectories recursively (see the C<files()> method
@@ -23,7 +22,7 @@ If an item has more than one file associated with it, and has no text,
 then an attempt will be made to extract short descriptions from each
 file to place under the file path in the index HTML.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -39,7 +38,8 @@ use Parrot::Docs::POD2HTML;
 
 Returns a new item.
 
-Use this when creating items in a section's C<new()> method.
+Use this when creating items within a C<Parrot::Docs::Section>
+subclass's C<new()> method.
 
 =cut
 
@@ -78,6 +78,13 @@ sub new
 
 	return $self;
 }
+
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<set_parent($parent)>
 
@@ -120,6 +127,13 @@ sub html_navigation
 
 =item C<write_html($source, $target, $silent)>
 
+C<$source> is the directory in which the section's contents will be
+looked for.
+
+C<$target> is directory into which the section's output will be written.
+
+If C<$silent> is true then progress is not reported.
+
 Any POD-formatted text in the item's files is converted to HTML and
 written to a file in C<$target> and an HTML link is created to it.
 
@@ -133,9 +147,9 @@ Some HTML-formatted text describing the files linked to is returned.
 sub write_html
 {
 	my $self = shift;
-	my $source = shift;
-	my $target = shift;
-	my $silent = shift;
+    my $source = shift || die "No source\n";
+    my $target = shift || die "No target\n";
+    my $silent = shift || 0;
 	my $index_html = '';
 	my @rel_paths = $self->contents_relative_to_source($source);
 	my @short_desc = ();
@@ -265,7 +279,13 @@ sub file_paths_relative_to_source
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::Section>, C<Parrot::Docs::Group>.
+=over 4
+
+=item C<Parrot::Docs::Section>
+
+=item C<Parrot::Docs::Group>
+
+=back
 
 =cut
 

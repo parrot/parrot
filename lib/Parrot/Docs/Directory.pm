@@ -3,20 +3,19 @@
 
 =head1 NAME
 
-Parrot::Docs::Directory - Docs-related Directory
+Parrot::Docs::Directory - Docs-Related Directory
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Directory;
-	my $dir = Parrot::Docs::Directory->new('parrot');
 
 =head1 DESCRIPTION
 
-This C<Parrot::IO::Directory> subclass creates C<Parrot::Docs::Files>.
+This C<Parrot::Docs::Directory> subclass creates C<Parrot::Docs::Files>.
 
 It's used by the documentation tools in F<tools/docs>.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -52,6 +51,12 @@ sub directory_class
 {
 	return 'Parrot::Docs::Directory';
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<files_of_type($type, $recursive, $ignore)>
 
@@ -95,7 +100,11 @@ sub files_of_type
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::File>.
+=over 4
+
+=item C<Parrot::Docs::File>
+
+=back
 
 =cut
 

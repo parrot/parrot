@@ -3,17 +3,17 @@
 
 =head1 NAME
 
-Parrot::IO::Path - Abstract superclass for File and Directory
+Parrot::IO::Path - Path
 
 =head1 DESCRIPTION
 
-Provides common path logic for C<Parrot::IO::File> and
-C<Parrot::IO::Directory>.
+C<Parrot::IO::Path> is an abstract superclass providing common path
+logic for C<Parrot::IO::File> and C<Parrot::IO::Directory>.
 
 Instances created with C<new()> are cached so that there is only one
 unique instance for each path.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -80,6 +80,12 @@ sub new
 	
 	return $instance_for_path{$path} = $self;
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<create_path()>
 
@@ -238,7 +244,13 @@ sub delete
 
 =head1 SEE ALSO
 
-C<Parrot::IO::Directory>, C<Parrot::IO::File>.
+=over 4
+
+=item C<Parrot::IO::Directory>
+
+=item C<Parrot::IO::File>
+
+=back
 
 =cut
 

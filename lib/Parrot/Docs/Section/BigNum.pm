@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::BigNum - Big Number docmentation section
+Parrot::Docs::Section::BigNum - Big Number documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::BigNum;
-	
-	my $section = Parrot::Docs::Section::BigNum->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing Parrot's big number subsystem.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

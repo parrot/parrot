@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::IMCC - IMCC docmentation section
+Parrot::Docs::Section::IMCC - IMCC documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::IMCC;
-	
-	my $section = Parrot::Docs::Section::IMCC->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing IMCC.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

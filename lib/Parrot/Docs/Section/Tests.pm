@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Tests - Tests docmentation section
+Parrot::Docs::Section::Tests - Tests documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Tests;
-	
-	my $section = Parrot::Docs::Section::Tests->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing Parrot tests.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

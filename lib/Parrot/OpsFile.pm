@@ -1,8 +1,145 @@
-
 #! perl -w
-#
-# OpsFile.pm
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::OpsFile - Ops To C Code Generation
+
+=head1 SYNOPSIS
+
+  use Parrot::OpsFile;
+
+=head1 DESCRIPTION
+
+C<Parrot::OpsFile> takes one or more files of op functions and
+creates real C code for them.
+
+This class is used by F<build_tools/ops2c.pl>, 
+F<build_tools/ops2pm.pl> and F<build_tools/pbc2c.pl>.
+
+=head2 Op Functions
+
+For ops that have trivial bodies (such as just a call to some other
+function and a C<return> statement), opcode functions are in the format:
+
+    inline op opname (args) :flags {
+        ... body of function ...
+    }
+
+Note that currently the C<inline> op type is ignored.
+
+Alternately, for opcode functions that have more internal complexity the
+format is:
+
+    op opname (args) :flags {
+        ... body of function ...
+    }
+
+There may be more than one C<return>.
+
+In both cases the closing brace B<must> be on its own line.
+
+=head2 Op Arguments
+
+Op arguments are a comma-separated list of direction and type pairs,
+where direction is one of:
+
+    in
+    out
+    inout
+    inconst
+    invar
+    label
+    labelconst
+    labelvar
+
+and type is one of:
+
+    INT
+    NUM
+    STR
+    PMC
+    KEY
+    INTKEY
+
+The size of the return offset is determined from the op function's
+signature.
+
+=head2 Op Body (Macro Substitutions)
+
+In the following macro descriptions, C<PC> and C<PC'> are the current
+and next position within the Parrot code.
+
+=over 4
+
+=item C<goto OFFSET(X)>
+
+Transforms to C<PC' = PC + X>. This is used for branches.
+
+=item C<goto NEXT()>
+
+Transforms to C<PC' = PC + S>, where C<S> is the size of an op.
+
+=item C<goto ADDRESS(X)>
+
+Transforms to C<PC' = X>. This is used for absolute jumps.
+    
+=item C<goto POP()>
+
+Transforms to C<< PC' = <pop> >>. Pops the address off control stack.
+         
+=item C<expr OFFSET(X)>
+
+Transforms to C<PC + X>. This is used to give a relative address.
+
+=item C<expr NEXT()>
+
+Transforms to C<PC + S>, the position of the next op.
+
+=item C<expr ADDRESS(X)>
+
+Transforms to C<X>, an absolute address.
+
+=item C<OP_SIZE>
+
+Transforms to C<S>, the size of an op.
+
+=item C<HALT()>
+
+Transforms to C<PC' = 0>. Halts run loop, and resets the current
+position to the start of the Parrot code, without resuming.
+
+=item C<restart OFFSET(X)>
+
+Transforms to C<PC' = 0> and restarts at C<PC + X>.
+
+=item C<restart NEXT()>
+
+Transforms to C<PC' = 0> and restarts at C<PC + S>.
+
+=item C<$n>
+
+Transforms to the op function's nth argument. C<$0> is the opcode itself.
+
+=back
+
+Note that, for ease of parsing, if the argument to one of the above
+notations in a ops file contains parentheses, then double the enclosing
+parentheses and add a space around the argument, like so:
+
+    goto OFFSET(( (void*)interpreter->happy_place ))
+
+=head2 Op Flags
+
+Op function flags are optional hints which provide information about the
+op.
+
+=head2 Class Methods
+
+=over 4
+
+=cut
 
 use strict;
 
@@ -37,12 +174,12 @@ sub trim
   return $value;
 }
 
+=item C<new(@files)>
 
-#
-# new()
-#
-# Reads in an .ops file, gathering information about the ops.
-#
+Returns a new instance initialized by calling C<read_ops()> on each of
+the specified op files.
+
+=cut
 
 sub new
 {
@@ -59,10 +196,17 @@ sub new
   return $self;
 }
 
+=back
 
-#
-# read_ops()
-#
+=head2 Instance Methods
+
+=over 4
+
+=item C<read_ops($file)>
+
+Reads in the specified .ops file, gathering information about the ops.
+
+=cut
 
 sub read_ops
 {
@@ -282,10 +426,12 @@ sub or_flag
     }
 }
 
+=item C<make_op($code, 
+$type, $short_name, $body, $args, $argdirs, $line, $file, $labels, $flags)>
 
-#
-# make_op()
-#
+Returns a new C<Parrot::Op> instance for the specified arguments.
+
+=cut
 
 sub make_op
 {
@@ -403,12 +549,12 @@ sub make_op
   return $counter;
 }
 
+=item C<expand_args(@args)>
 
-#
-# expand_args()
-#
-# Given an arg list, return a list of all possible arg combinations.
-#
+Given an argument list, returns a list of all the possible argument
+combinations.
+
+=cut
 
 sub expand_args
 {
@@ -436,10 +582,11 @@ sub expand_args
   }
 }
 
+=item C<ops()>
 
-#
-# ops()
-#
+Returns the C<Parrot::Op> instances found in the file(s).
+
+=cut
 
 sub ops
 {
@@ -448,10 +595,11 @@ sub ops
   return @{$self->{OPS}};
 }
 
+=item C<op($index)>
 
-#
-# op()
-#
+Returns the op at C<$index>.
+
+=cut
 
 sub op
 {
@@ -460,10 +608,16 @@ sub op
   return $self->{OPS}[$index];
 }
 
+=item C<preamble()>
 
-#
-# preamble()
-#
+=item C<preamble($trans)>
+
+Returns any lines found prior to first op definition.
+
+If C<$trans> (an C<Parrot::OpTrans> subclass) is supplied then
+substitutions are made.
+
+=cut
 
 sub preamble
 {
@@ -487,10 +641,15 @@ sub preamble
   return $_;
 }
 
+=item C<version($major, $minor, $patch)>
 
-#
-# version()
-#
+=item C<version($version)>
+
+=item C<version()>
+
+Sets/gets the version number.
+
+=cut
 
 sub version
 {
@@ -515,10 +674,11 @@ sub version
   }
 }
 
+=item C<major_version()>
 
-#
-# major_version()
-#
+Returns the major version number.
+
+=cut
 
 sub major_version
 {
@@ -529,10 +689,11 @@ sub major_version
   return $1;
 }
 
+=item C<minor_version()>
 
-#
-# minor_version()
-#
+Returns the minor version number.
+
+=cut
 
 sub minor_version
 {
@@ -543,10 +704,11 @@ sub minor_version
   return $1;
 }
 
+=item C<patch_version()>
 
-#
-# patch_version()
-#
+Returns the patch version number.
+
+=cut
 
 sub patch_version
 {
@@ -557,11 +719,11 @@ sub patch_version
   return $1;
 }
 
+=item C<push_op($op)>
 
+Adds C<$op> to the end of the op list.
 
-#
-# push_op()
-#
+=cut
 
 sub push_op
 {
@@ -570,49 +732,27 @@ sub push_op
   push @{$self->{OPS}}, $op;
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::Op>
+
+=item C<Parrot::OpTrans>
+
+=item F<build_tools/ops2c.pl>
+
+=item F<build_tools/ops2pm.pl>
+
+=item F<build_tools/pbc2c.pl>
+
+=back
+
+=cut
 
 1;
 
-=head1 NAME
-
-Parrot::OpsFile
-
-=head1 SYNOPSIS
-
-  use Parrot::OpsFile;
-
-=head1 DESCRIPTION
-
-Take a file of opcode functions and create real C code for them
-
-opcode functions are in the format:
-
-  inline op opname (...) {
-   ... body of function ...
-  }
-
-for ops that have trivial bodies (such as just a call to some other
-function and a C<return> statement).
-
-The closing brace must be on its own line.
-
-Alternately, for opcode functions that have more internal complexity:
-
-  op opname (...) {
-    ... body of function ...
-  }
-
-There may be more than one RETURN
-
-The functions have the magic variables C<$1> to C<$>I<N> for arguments 1
-through I<N>. (Argument 0 is the opcode number) Types for each, and the size
-of the return offset, are determined from the opfunc signature.
-
-
-=head1 AUTHORS
-
-=head1 LICENSE
-
-=head1 COPYRIGHT
 
 

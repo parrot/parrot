@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Key - Parrot Key Constants
+Parrot::Key - Parrot Key
 
 =head1 SYNOPSIS
 
@@ -11,7 +11,9 @@ Parrot::Key - Parrot Key Constants
 
 =head1 DESCRIPTION
 
-=head2 Functions
+C<Parrot::Key> represents a Parrot Key.
+
+=head2 Class Methods
 
 =over 4
 
@@ -24,6 +26,8 @@ use Parrot::Types;
 use Data::Dumper;
 
 =item C<new()>
+
+Returns a new instance.
 
 =cut
 
@@ -40,7 +44,17 @@ sub new
   return $self;
 }
 
+=back
+
+=head2 Instance Methods
+
+=over 4
+
+=item C<components($components)>
+
 =item C<components()>
+
+Sets/gets the reference to the components array.
 
 =cut
 
@@ -84,6 +98,8 @@ sub unpack
 
 =item C<packed_size()>
 
+Returns the packed size of the key.
+
 =cut
 
 sub packed_size
@@ -94,6 +110,8 @@ sub packed_size
 }
 
 =item C<pack()>
+
+Packs the key.
 
 =cut
 
@@ -110,6 +128,8 @@ sub pack
 }
 
 =item C<dump()>
+
+Returns a string representation of the key.
 
 =cut
 
@@ -150,5 +170,16 @@ sub dump
   return "[" . join(";", @values) . "]";
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item C<Parrot::String>
+
+=back
+
+=cut
 
 1;

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Docs::File - Docs-related file methods
+Parrot::Docs::File - Docs-Related File
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,9 @@ methods to do with POD and file type.
 
 It's used by the documentation tools in F<tools/docs>.
 
-=over
+=head2 Class Methods
+
+=over 4
 
 =cut
 
@@ -29,7 +31,6 @@ use Parrot::IO::File;
 @Parrot::Docs::File::ISA = qw(Parrot::IO::File);
 
 use Pod::Simple::Checker;
-#use Pod::Simple::HTML;
 use Parrot::Docs::POD2HTML;
 
 my $UNDEFINED = 'Undefined';
@@ -160,6 +161,12 @@ sub type_for_name
 	return $UNDEFINED;
 }
 
+=back
+
+=head2 Instance Methods
+
+=over 4
+
 =item C<type()>
 
 This first tries to find a type for the file's suffix, failing that it
@@ -279,7 +286,7 @@ sub pod_errors
 
 =item C<pod_as_html()>
 
-Runs C<Pod::Simple::HTML> on the contents of the file. Executable files
+Runs C<Parrot::Docs::POD2HTML> on the contents of the file. Executable files
 are assumed not to contain POD and therefore not formatted.
 
 =cut
@@ -427,7 +434,15 @@ sub short_description
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::Directory>, C<Pod::Simple::Checker>, C<Pod::Simple::HTML>.
+=over 4
+
+=item C<Parrot::Docs::Directory>
+
+=item C<Parrot::Docs::POD2HTML>
+
+=item C<Pod::Simple::Checker>
+
+=back
 
 =cut
 

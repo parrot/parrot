@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Ops - Parrot ops docmentation section
+Parrot::Docs::Section::Ops - Parrot ops documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Ops;
-	
-	my $section = Parrot::Docs::Section::Ops->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing the Parrot ops.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

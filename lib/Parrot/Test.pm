@@ -1,3 +1,88 @@
+# Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::Test - Parrot Test
+
+=head1 SYNOPSIS
+
+Set the number of tests to be run like this:
+
+	use Parrot Test tests => 8;
+
+Write individual tests like this:
+
+    output_is(<<'CODE', <<'OUTPUT', "description of test");
+        ...
+    CODE
+        ...
+    OUTPUT
+
+=head1 DESCRIPTION
+
+This module provides various Parrot-specific test functions.
+
+=head2 Functions
+
+In the following functions C<$description> should describe the test.
+
+=over 4
+
+=item C<output_is($code, $expected, $description)>
+
+Runs the PASM code and passes the test if a string comparison of output
+with the expected result it true.
+
+=item C<output_like($code, $expected, $description)>
+
+Runs the PASM code and passes the test if output matches the expected
+result.
+
+=item C<output_isnt($code, $expected, $description)>
+
+Runs the PASM code and passes the test if a string comparison of output
+with the expected result it false.
+
+=item C<pir_output_is($code, $expected, $description)>
+
+Runs the PIR code and passes the test if a string comparison of output
+with the expected result it true.
+
+=item C<pir_output_like($code, $expected, $description)>
+
+Runs the PIR code and passes the test if output matches the expected
+result.
+
+=item C<pir_output_isnt($code, $expected, $description)>
+
+Runs the PIR code and passes the test if a string comparison of output
+with the expected result it false.
+
+=item C<c_output_is($code, $expected, $description)>
+
+Compiles and runs the C code, passing the test if a string comparison of
+output with the expected result it true.
+
+=item C<c_output_like($code, $expected, $description)>
+
+Compiles and runs the C code, passing the test if output matches the
+expected result.
+
+=item C<c_output_isnt($code, $expected, $description)>
+
+Compiles and runs the C code, passing the test if a string comparison of
+output with the expected result it false.
+
+=item C<skip($why, $how_many)>
+
+Use within a C<SKIP: { ... }> block to indicate why and how many test
+are being skipped.
+
+=back
+
+=cut
+
 package Parrot::Test;
 
 use strict;
@@ -263,5 +348,17 @@ sub generate_functions {
 
 Parrot::Test::generate_functions(__PACKAGE__,\&generate_pbc_for,
                                  $^O eq 'MSWin32' ? '.\\' : "./");
+
+=head1 SEE ALSO
+
+=over 4
+
+=item F<t/harness>
+
+=item F<docs/tests.pod>
+
+=back
+
+=cut
 
 1;

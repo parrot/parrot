@@ -8,18 +8,15 @@ Parrot::Docs::Group - Group of documentation items
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Group;
-	
-	my $group = Parrot::Docs::Group->new('Usual suspects', '',
-	    Parrot::Docs::Item->new('', 'foo'),
-	    Parrot::Docs::Item->new('', 'bar'));
 
 =head1 DESCRIPTION
 
-A group is a number of items with some optional descriptive text.
+A documentation I<group> is a number of items with some optional
+descriptive text.
 
-This is a subclass of C<Parrot::Docs::Item>.
+C<Parrot::Docs::Group> is a subclass of C<Parrot::Docs::Item>.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -36,7 +33,8 @@ use Parrot::Docs::Item;
 
 Returns a new group.
 
-Use this when creating groups in a subclass's C<new()> method.
+Use this when creating groups within a C<Parrot::Docs::Section>
+subclass's C<new()> method.
 
 =cut
 
@@ -71,6 +69,12 @@ sub new
 	
 	return $self;
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<name()>
 
@@ -137,9 +141,9 @@ Some HTML-formatted text describing the files linked to is returned.
 sub write_contents_html
 {
 	my $self = shift;
-	my $source = shift;
-	my $target = shift;
-	my $silent = shift;
+    my $source = shift || die "No source\n";
+    my $target = shift || die "No target\n";
+    my $silent = shift || 0;
 	my $index_html = '';
 	
 	print "\n\n", $self->name unless $silent;
@@ -199,7 +203,13 @@ sub contents_relative_to_source
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::Section>, C<Parrot::Docs::Item>.
+=over 4
+
+=item C<Parrot::Docs::Section>
+
+=item C<Parrot::Docs::Item>
+
+=back
 
 =cut
 

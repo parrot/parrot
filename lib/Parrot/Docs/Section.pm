@@ -3,28 +3,20 @@
 
 =head1 NAME
 
-Parrot::Docs::Section - Docmentation section
+Parrot::Docs::Section - Documentation section
 
 =head1 SYNOPSIS
 
     use Parrot::Docs::Section;
-    
-    my $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
-        'here they are...',
-        Parrot::Docs::Item->new('old faithful', 'foo'),
-        Parrot::Docs::Group->new('Bar', 'no jeans',
-            Parrot::Docs::Item->new('time please', 'bar', 'pub')));
-    
-    $s->write_html();
 
 =head1 DESCRIPTION
 
-A section is an HTML page containing links to one or more, grouped or
-ungrouped items.
+A documentation I<section> is an HTML page containing links to one or
+more, grouped or ungrouped items.
 
-This is a subclass of C<Parrot::Docs::Group>.
+C<Parrot::Docs::Section> is a subclass of C<Parrot::Docs::Group>.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -49,31 +41,16 @@ Returns the root section.
 
 sub root_section
 {
-    my $self = shift;
-
     require Parrot::Docs::Section::Parrot;
     
     return Parrot::Docs::Section::Parrot->new;
-}
-
-=item C<is_root_section()>
-
-Returns whether the section is the root section.
-
-=cut
-
-sub is_root_section
-{
-    my $self = shift;
-    
-    return $self->isa('Parrot::Docs::Section::Parrot');
 }
 
 =item C<new_section($name, $text, @items)>
 
 Returns a new section. 
 
-Use this when creating subsection in a subclass's C<new()> method.
+Use this when creating subsections within a subclass's C<new()> method.
 
 =cut
 
@@ -109,6 +86,25 @@ sub new
     return $self;
 }
 
+=back
+
+=head2 Instance Methods
+
+=over 4
+
+=item C<is_root_section()>
+
+Returns whether the section is the root section.
+
+=cut
+
+sub is_root_section
+{
+    my $self = shift;
+    
+    return $self->isa('Parrot::Docs::Section::Parrot');
+}
+
 =item C<html_link($path)>
 
 Returns the HTML link for the section.
@@ -136,13 +132,7 @@ sub html_link
 
 Calls C<write_html()> on the contents of the section.
 
-C<$source> is a C<Parrot::Docs::Directory> for the distribution
-directory. It defaults to the current working directory.
-
-C<$target> is the C<Parrot::Docs::Directory> in which to write the HTML.
-It defaults to the F<docs/html> directory.
-
-If C<$silent> is true then progress is not reported.
+An HTML link to the section's index is returned.
 
 =cut
 
@@ -158,8 +148,15 @@ sub write_html
     
     return '' unless $index_html;
     
-    $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
-    $index_html = "<h1>$self->{NAME}</h1>\n\n" . $index_html;
+    if ( $self->{TEXT} )
+    {
+        $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html;
+    }
+    elsif ( $index_html !~ /<DIV CLASS="pod">[^<]*<[Hh]/o )
+    {
+        # If there is no heading or text then we have to bump it down a bit.
+        $index_html = "<BR>\n" . $index_html;
+    }
 
     my $index = $target->file_with_name($self->{INDEX_PATH});
     
@@ -176,7 +173,13 @@ sub write_html
 
 =head1 SEE ALSO
 
-C<Parrot::Docs::Group>, C<Parrot::Docs::Item>.
+=over 4
+
+=item C<Parrot::Docs::Group>
+
+=item C<Parrot::Docs::Item>
+
+=back
 
 =cut
 

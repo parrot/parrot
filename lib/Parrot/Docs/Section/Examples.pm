@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Examples - Examples docmentation section
+Parrot::Docs::Section::Examples - Examples documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Examples;
-	
-	my $section = Parrot::Docs::Section::Examples->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing all the Parrot examples.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

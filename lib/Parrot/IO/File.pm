@@ -3,18 +3,17 @@
 
 =head1 NAME
 
-Parrot::IO::File - File in the Parrot distribution
+Parrot::IO::File - File
 
 =head1 SYNOPSIS
 
 	use Parrot::IO::File;
-	$manifest = Parrot::IO::File->new('MANIFEST');
 
 =head1 DESCRIPTION
 
 Use this to query and manipulate files and their contents.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -59,6 +58,12 @@ sub new
 	
 	return $self->SUPER::new($path);
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<create_path()>
 
@@ -184,9 +189,9 @@ sub modified_since
 	return $self->stat->mtime > $time;
 }
 
-=item cvs_id
+=item C<cvs_id()>
 
-Returns the CVS $Id string.
+Returns the CVS C<$Id> string.
 
 =cut
 
@@ -200,9 +205,9 @@ sub cvs_id
 	return $id;
 }
 
-=item has_cvs_id
+=item C<has_cvs_id()>
 
-Returns whether the file has a CVS $Id string.
+Returns whether the file has a CVS C<$Id> string.
 
 =cut
 
@@ -216,7 +221,7 @@ sub has_cvs_id
 	return $has_id;
 }
 
-=item cvs_version
+=item C<cvs_version()>
 
 Returns the CVS version number of the file.
 
@@ -268,8 +273,6 @@ sub is_generated
 
 	# lib/Parrot/Config.pm
 	
-	
-
 	return 1 if $self->suffix =~ /^(?:dump|html|flag|o)$/o
 		or $self->name =~ /^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
 		or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
@@ -298,7 +301,13 @@ sub delete
 
 =head1 SEE ALSO
 
-C<Parrot::IO::Directory>, C<Parrot::IO::Path>.
+=over 4
+
+=item C<Parrot::IO::Directory>
+
+=item C<Parrot::IO::Path>
+
+=back
 
 =cut
 

@@ -3,15 +3,18 @@
 
 =head1 NAME
 
-Parrot::Docs::HTMLPage - HTML Docmentation Page
+Parrot::Docs::HTMLPage - HTML Documentation Page
 
 =head1 DESCRIPTION
 
-This just provides a C<header()> and C<footer()> method for now, to 
-prevent code being duplicated int C<Parrot::Docs::POD2HTML> and 
+C<Parrot::Docs::HTMLPage> gives Parrot documentation pages the Parrot
+house-style.
+
+This just provides C<header()> and C<footer()> class methods for now, to
+prevent code being duplicated in C<Parrot::Docs::POD2HTML> and
 C<Parrot::Docs::Section>.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

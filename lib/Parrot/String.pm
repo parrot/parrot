@@ -1,25 +1,35 @@
 #! perl -w
-#
-# Constant.pm
-#
-# Parrot Constants.
-#
-# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
-# This program is free software. It is subject to the same
-# license as Perl itself.
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::String - Parrot String
+
+=head1 SYNOPSIS
+
+  use Parrot::String;
+
+=head1 DESCRIPTION
+
+C<Parrot::String> represents a Parrot string.
+
+=head2 Class Methods
+
+=over 4
+
+=cut
 
 use strict;
 
 package Parrot::String;
 use Parrot::Types;
 
+=item C<new($flags, $encoding, $type, $size, $data)>
 
-#
-# new()
-#
+Returns a new instance of C<Parrot::String>.
+
+=cut
 
 sub new
 {
@@ -37,10 +47,19 @@ sub new
   return $self;
 }
 
+=back
 
-#
-# flags()
-#
+=head2 Instance Methods
+
+=over 4
+
+=item C<flags($flags)>
+
+=item C<flags()>
+
+Sets/gets the string's flags.
+
+=cut
 
 sub flags
 {
@@ -49,10 +68,13 @@ sub flags
   else    { return $self->{FLAGS};  }
 }
 
+=item C<encoding($encoding)>
 
-#
-# encoding()
-#
+=item C<encoding()>
+
+Sets/gets the string's encoding.
+
+=cut
 
 sub encoding
 {
@@ -61,10 +83,13 @@ sub encoding
   else    { return $self->{ENCODING};  }
 }
 
+=item C<type($type)>
 
-#
-# type()
-#
+=item C<type()>
+
+Sets/gets the string's type.
+
+=cut
 
 sub type
 {
@@ -73,10 +98,13 @@ sub type
   else    { return $self->{TYPE};  }
 }
 
+=item C<size($size)>
 
-#
-# size()
-#
+=item C<size()>
+
+Sets/gets the string's size.
+
+=cut
 
 sub size
 {
@@ -85,10 +113,13 @@ sub size
   else    { return $self->{SIZE};  }
 }
 
+=item C<data($data)>
 
-#
-# data()
-#
+=item C<data()>
+
+Sets/gets the string's data.
+
+=cut
 
 sub data
 {
@@ -97,13 +128,12 @@ sub data
   else    { return $self->{DATA};  }
 }
 
+=item C<unpack($string)>
 
-#
-# unpack()
-#
-# Unpack from the string and return the number of characters that should
-# be removed from the packed string.
-#
+Unpack from the string and return the number of characters that should
+be removed from the packed string.
+
+=cut
 
 sub unpack
 {
@@ -128,10 +158,11 @@ sub unpack
   return 4*sizeof("op") + $block_size;
 }
 
+=item C<packed_size()>
 
-#
-# packed_size()
-#
+Returns the packed size of the string.
+
+=cut
 
 sub packed_size
 {
@@ -143,10 +174,11 @@ sub packed_size
   return 4*sizeof("op") + $block_size;
 }
 
+=item C<pack()>
 
-#
-# pack()
-#
+Packs the string.
+
+=cut
 
 sub pack
 {
@@ -165,52 +197,33 @@ sub pack
          $block;
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item C<Parrot::Types>
+
+=item C<Parrot::Key>
+
+=back
+
+=head1 HISTORY
+
+Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+
+=cut
 
 1;
 
 __END__
 
-=head1 NAME
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
 
-Parrot::String
-
-=head1 SYNOPSIS
-
-  use Parrot::String;
-
-=head1 DESCRIPTION
-
-=head2 data DATA
-
-=head2 data
-
-=head2 encoding ENCODING
-
-=head2 encoding
-
-=head2 flags FLAGS
-
-=head2 flags 
-
-=head2 new FLAGS ENCODING TYPE SIZE DATA
-
-=head2 pack
-
-=head2 size SIZE
-
-=head2 size
-
-=head2 type TYPE
-
-=head2 type
-
-=head2 unpack STRING
-
-=head2 unpack
-
-=head1 AUTHOR
-
-Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
+=begin TODO
 
 =head1 COPYRIGHT
 
@@ -221,3 +234,6 @@ Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 This program is free software. It is subject to the same
 license as Perl itself.
 
+=end TODO
+
+=cut

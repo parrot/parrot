@@ -3,19 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Languages - Languages docmentation section
+Parrot::Docs::Section::Languages - Languages documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Languages;
-	
-	my $section = Parrot::Docs::Section::Languages->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing Parrot's client languages.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Docs::POD2HTML - Parrot POD to HTML formatter
+Parrot::Docs::POD2HTML - POD to HTML formatter
 
 =head1 SYNOPSIS
 
@@ -11,9 +11,12 @@ Parrot::Docs::POD2HTML - Parrot POD to HTML formatter
 
 =head1 DESCRIPTION
 
-C<Pod::Simple::HTML> subclass.
+C<Parrot::Docs::POD2HTML> subclasses C<Pod::Simple::HTML> to provide
+various Parrot-specific formatting features, such as linking
+C<CE<lt>Parrot::I<Module>E<gt>> and C<FE<lt>I<file>E<gt>>, and using the
+Parrot house-style provided by C<Parrot::HTMLPage>.
 
-=head2 Methods
+=head2 Instance Methods
 
 =over
 
@@ -30,7 +33,7 @@ $Parrot::Docs::POD2HTML::VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
 
-=item C<do_beginning()>
+=item C<do_beginning()> 
 
 Reimplements the C<Pod::Simple::HTML> method to add a header to the start
 of the document.
@@ -544,12 +547,11 @@ sub href_for_perl_module
     my $dist = Parrot::Distribution->new;
     my $file = $dist->file_for_perl_module($module);
     
-    return undef unless $file;
+    return undef if not $file or not $file->contains_pod;
     
     my $path = $self->append_html_suffix($dist->relative_path($file));
     
     # This is the docs file for the module.
-    return undef unless $self->{TARGET}->relative_path_is_file($path);
     $file = $self->{TARGET}->file_with_relative_path($path);
     
     # There's no point in linking to the file you are already in.
@@ -648,6 +650,8 @@ sub append_html_suffix
     
     return $path . '.html';
 }
+
+=back
 
 =head2 Functions
 

@@ -12,6 +12,8 @@ F<Configure.pl>. It should be edited when adding a new step. For more
 information on Parrot's configuration system, and how to add new steps,
 see F<docs/configuration.pod>.
 
+=head2 Functions
+
 =over 4
 
 =cut
@@ -99,7 +101,7 @@ sub runsteps {
 
 =over 4
 
-=item L<Parrot::Configure::Step>
+=item C<Parrot::Configure::Step>
 
 =item F<docs/configuration.pod>
 

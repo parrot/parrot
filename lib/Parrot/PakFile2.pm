@@ -1,3 +1,35 @@
+#! perl -w
+# Copyright: 2002 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::PakFile2 - XS interface to writing Parrot bytecode files
+
+=head1 SYNOPSIS
+
+    use Parrot::PakFile2;
+    open (OUT, ">foo.pbc") or die $!;
+  
+    Parrot::PakFile2::output_bytecode(
+    {
+        bytecode => $gibberish,
+        constants => [
+            [ "N", 123.4567 ],
+            [ "S", "Hello world" ],
+            ...
+        ]
+    }
+
+=head1 DESCRIPTION
+
+This is a very simple XS wrapper which creates a C<struct PackFile>
+suitable for passing to C<PackFile_pack>, in turn generating a Parrot
+bytecode file. Be warned that it is very precise in its expectation
+of your input.
+
+=cut
+
 package Parrot::PakFile2;
 
 require 5.005_62;
@@ -63,46 +95,10 @@ sub AUTOLOAD {
 
 bootstrap Parrot::PakFile2 $VERSION;
 
-# Preloaded methods go here.
+=head1 HISTORY
 
-# Autoload methods go after =cut, and are processed by the autosplit program.
-
-1;
-__END__
-# Below is stub documentation for your module. You better edit it!
-
-=head1 NAME
-
-Parrot::PakFile2 - XS interface to writing Parrot bytecode files
-
-=head1 SYNOPSIS
-
-  use Parrot::PakFile2;
-  open (OUT, ">foo.pbc") or die $!;
-  
-  Parrot::PakFile2::output_bytecode(
-    {
-        bytecode => $gibberish,
-        constants => [
-            [ "N", 123.4567 ],
-            [ "S", "Hello world" ],
-            ...
-        ]
-    }
-
-=head1 DESCRIPTION
-
-This is a very simple XS wrapper which creates a C<struct PackFile>
-suitable for passing to C<PackFile_pack>, in turn generating a Parrot
-bytecode file. Be warned that it is very precise in its expectation
-of your input.
-
-=head1 AUTHOR
-
-Simon Cozens, C<simon@cpan.org>
-
-=head1 SEE ALSO
-
-perl(1).
+Author: Simon Cozens, C<simon@cpan.org>
 
 =cut
+
+1;

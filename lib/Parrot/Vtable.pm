@@ -1,3 +1,29 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+Parrot::Vtable - Functions for manipulating vtables
+
+=head1 SYNOPSIS
+
+    use Parrot::Vtable;
+
+=head1 DESCRIPTION
+
+C<Parrot::Vtable> provides a collection of functions for manipulating
+PMC vtables. It is used by F<build_tools/jit2h.pl>, F<build_tools/vtable_h.pl>,
+F<classes/genclass.pl>, F<classes/null.pl> and F<classes/pmc2c2.pl>.
+
+
+=head2 Functions
+
+The following functions are exported:
+
+=over 4
+
+=cut
+
 package Parrot::Vtable;
 
 use FileHandle;
@@ -22,6 +48,17 @@ my $param_re = make_re($type_re.'\s+'.$ident_re);
 my $arglist_re = make_re('(?:'.$param_re.'(?:\s*,\s*'.$param_re.')*)?');
 my $method_re = make_re('^\s*('.$type_re.')\s+('.$ident_re.')\s*\(('.$arglist_re.')\)\s*$');
 
+
+=item C<parse_vtable($file)>
+
+Returns a reference to an array containing
+
+  [ return_type method_name parameters section ]
+
+for each vtable method defined in C<$file>. If C<$file> is unspecified
+it defaults to F<vtable.tbl>.
+
+=cut
 
 sub parse_vtable {
 
@@ -50,6 +87,13 @@ sub parse_vtable {
     return $vtable;
 }
 
+=item C<vtbl_defs($vtable)>
+
+Returns the C C<typedef> definitions for the elements in the referenced
+vtable array.
+
+=cut
+
 sub vtbl_defs {
     my $vtable = shift;
     my $defs = "";
@@ -62,6 +106,13 @@ sub vtbl_defs {
 
     return $defs;
 }
+
+=item C<vtbl_struct($vtable)>
+
+Returns the C C<struct> definitions for the elements in the referenced
+vtable array.
+
+=cut
 
 sub vtbl_struct {
     my $vtable = shift;
@@ -98,6 +149,13 @@ EOF
 
     return $struct;
 }
+
+=item C<vtbl_macros($vtable)>
+
+Returns the C C<#define> definitions for the elements in the referenced
+vtable array.
+
+=cut
 
 sub vtbl_macros {
     my $vtable = shift;
@@ -141,23 +199,23 @@ EOM
     $macros;
 }
 
-"SQUAWK";
+=back
 
-=head1 NAME
-
-Parrot::Vtable - Internal functions for manipulating vtables
-
-=head1 DESCRIPTION
+=head1 SEE ALSO
 
 =over 4
 
-=item parse_vtable
+=item F<build_tools/jit2h.pl>
 
-Returns a ref to an array containing
+=item F<build_tools/vtable_h.pl>
 
-  [ return_type method_name parameters section ]
+=item F<classes/genclass.pl>
 
-per vtable method defined in vtable.tbl
+=item F<classes/null.pl>
+
+=item F<classes/pmc2c2.pl>
 
 =back
+
+1;
 

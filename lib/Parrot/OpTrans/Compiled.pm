@@ -1,8 +1,21 @@
-#
-# CGoto.pm
-#
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+
+=head1 NAME
+
+Parrot::OpTrans::Compiled - Transform Parrot Bytecode To C
+
+=head1 DESCRIPTION
+
+C<Parrot::OpTrans::Compiled> inherits from C<Parrot::OpTrans> and is
+used by F<build_tools/pbc2c.pl> to transform Parrot bytecode to a C code
+run loop.
+
+=head2 Instance Methods
+
+=over 4
+
+=cut
 
 use strict;
 #use warnings;
@@ -12,6 +25,12 @@ package Parrot::OpTrans::Compiled;
 use Parrot::OpTrans;
 use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans);
+
+=item C<defines()>
+
+Returns the C C<#define> macros required by the ops.
+
+=cut
 
 sub defines
 {
@@ -25,10 +44,13 @@ sub defines
 END
 }
 
+=item C<pc($pc)>
 
-#
-# pc()
-#
+=item C<pc()>
+
+Sets/gets the current position in Parrot code.
+
+=cut
 
 sub pc
 {
@@ -42,10 +64,13 @@ sub pc
   }
 }
 
+=item C<args(@args)>
 
-#
-# args()
-#
+=item C<args()>
+
+Sets/gets the transform's arguments.
+
+=cut
 
 sub args
 {
@@ -60,10 +85,11 @@ sub args
 
 }
 
+=item C<arg($index)>
 
-#
-# arg()
-#
+Returns the argument at index C<$index>.
+
+=cut
 
 sub arg
 {
@@ -72,9 +98,12 @@ sub arg
   return $self->{ARGS}[shift];
 }
 
-#
-# goto_address()
-#
+=item C<goto_address($address)>
+
+Transforms the C<goto ADDRESS($address)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_address
 {
@@ -83,23 +112,26 @@ sub goto_address
   return "cur_opcode = $addr;\ngoto switch_label";
 }
 
+=item C<expr_offset($offset)>
 
-#
-# expr_offset()
-#
-# On offset expression is always an offset from start_code, because
-# the 'ret' instruction may be in a different runops core. 'ret' will
-# always treat saved addresses as relative to start_code, because that
-# interpretation is global across all runops cores.
-#
+An offset expression is always an offset from C<start_code>, because
+the C<ret> instruction may be in a different runops core. C<ret> will
+always treat saved addresses as relative to C<start_code>, because that
+interpretation is global across all runops cores.
+
+=cut
+
 sub expr_offset {
     my ($self, $offset) = @_;
     return sprintf("start_code + %d + %s", $self->pc, $offset);
 }
 
-#
-# goto_offset()
-#
+=item C<goto_offset($offset)>
+
+Transforms the C<goto OFFSET($offset)> macro in an ops file into the
+relevant C code.
+
+=cut
 
 sub goto_offset
 {
@@ -112,20 +144,18 @@ sub goto_offset
 #print STDERR "pbcc: map_ret_rel($offset)\n";
 }
 
+=item C<goto_pop()>
 
-#
-# goto_pop()
-#
+Transforms the C<goto POP()> macro in an ops file into the relevant C
+code.
+
+=cut
 
 sub goto_pop
 {
   my ($self) = @_;
   return "cur_opcode = pop_dest(interpreter);\ngoto switch_label";
 }
-
-#
-# access_arg()
-#
 
 my %arg_maps = (
   'i'  => "IREG(%ld)",
@@ -143,6 +173,13 @@ my %arg_maps = (
   'kic' => "%ld",
 );
 
+=item C<access_arg($type, $value, $op)>
+
+Returns the C code for the specified op argument type (see
+C<Parrot::OpTrans>) and value. C<$op> is an instance of C<Parrot::Op>.
+
+=cut
+
 sub access_arg
 {
   my ($self, $type, $num, $op) = @_;
@@ -150,10 +187,11 @@ sub access_arg
   return sprintf($arg_maps{$type}, $self->arg($num - 1));
 }
 
+=item C<restart_address($address)>
 
-#
-# restart_address()
-#
+Returns the C code for C<restart ADDRESS($address)>.
+
+=cut
 
 sub restart_address
 {
@@ -161,10 +199,11 @@ sub restart_address
   die "pbc2c.pl: Cannot handle RESUME ops!";
 }
 
+=item C<restart_offset($offset)>
 
-#
-# restart_offset()
-#
+Returns the C code for C<restart OFFSET($offset)>.
+
+=cut
 
 sub restart_offset
 {
@@ -172,6 +211,25 @@ sub restart_offset
   die "pbc2c.pl: Cannot handle RESUME ops!";
 }
 
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::OpTrans>
+
+=item C<Parrot::OpTrans::C>
+
+=item C<Parrot::OpTrans::CGP>
+
+=item C<Parrot::OpTrans::CGoto>
+
+=item C<Parrot::OpTrans::CPrederef>
+
+=item C<Parrot::OpTrans::CSwitch>
+
+=cut
 
 1;
 

@@ -7,6 +7,8 @@ lib/Parrot/BuildUtil.pm - Build Utility
 
 =head1 DESCRIPTION
 
+=head2 Functions
+
 =over 4
 
 =cut

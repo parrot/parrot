@@ -8,13 +8,12 @@ Parrot::IO::Directory - Directory
 =head1 SYNOPSIS
 
 	use Parrot::IO::Directory;
-	$docs = Parrot::IO::Directory->new('docs');
 
 =head1 DESCRIPTION
 
 Use this to query and manipulate directories and their contents.
 
-=head2 Methods
+=head2 Class Methods
 
 =over 4
 
@@ -117,6 +116,12 @@ sub new
 	
 	return $self->SUPER::new($path);
 }
+
+=back
+
+=head2 Instance Methods
+
+=over 4
 
 =item C<create_path()>
 
@@ -602,7 +607,13 @@ sub delete_contents
 
 =head1 SEE ALSO
 
-L<Parrot::IO::File>, L<Parrot::IO::Path>.
+=over 4
+
+=item C<Parrot::IO::File>
+
+=item C<Parrot::IO::Path>
+
+=back
 
 =cut
 

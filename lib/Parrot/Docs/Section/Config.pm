@@ -3,18 +3,17 @@
 
 =head1 NAME
 
-Parrot::Docs::Section::Config - Configuration docmentation section
+Parrot::Docs::Section::Config - Configuration documentation section
 
 =head1 SYNOPSIS
 
 	use Parrot::Docs::Section::Config;
-	my $section = Parrot::Docs::Section::Config->new;
 
 =head1 DESCRIPTION
 
 A documentation section describing Parrot's configuration system.
 
-=head2 Methods
+=head2 Class Methods
 
 =over
 
@@ -31,7 +30,8 @@ use Parrot::Configure::RunSteps;
 
 =item C<config_groups()>
 
-Dynamically creates the 
+Dynamically creates the Configuration section's groups by studying the
+contents of C<@Parrot::Configure::RunSteps::steps>.
 
 =cut
 
