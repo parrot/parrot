@@ -85,6 +85,13 @@ sub runstep {
     while (my ($vers, $opt) = splice @opt_and_vers, 0, 2) {
       last if $vers > $gccversion;
       next unless $opt; # Ignore blank lines
+
+      if($opt =~ /-mno-accumulate-outgoing-args/) {
+        use Config;
+        if($Config{archname} !~ /86/) {
+          $opt =~ s/-mno-accumulate-outgoing-args//;
+        }
+      }
       $warns .= " $opt";
     }
     # if the user overwrites the warnings remove it from $warns
