@@ -1758,7 +1758,9 @@ Returns one (1) if everything is OK, else zero (0).
 
 ***************************************/
 
+#if EXEC_CAPABLE
 struct PackFile_Constant *exec_const_table;
+#endif
 
 opcode_t *
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
@@ -1768,7 +1770,9 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
     opcode_t i;
     struct PackFile_ConstTable *self = (struct PackFile_ConstTable *)seg;
     struct PackFile * pf = seg->pf;
+#if EXEC_CAPABLE
     extern int Parrot_exec_run;
+#endif
 
     PackFile_ConstTable_clear(self);
 
@@ -1801,10 +1805,12 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
                 "PackFile_ConstTable_unpack(): Unpacking constant %ld\n", i);
 #endif
 
-        if (!Parrot_exec_run)
-            self->constants[i] = PackFile_Constant_new();
-        else
+#if EXEC_CAPABLE
+        if (Parrot_exec_run)
             self->constants[i] = &exec_const_table[i];
+        else
+#endif
+            self->constants[i] = PackFile_Constant_new();
 
         cursor = PackFile_Constant_unpack(interpreter, pf, self->constants[i],
                     cursor);

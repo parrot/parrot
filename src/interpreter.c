@@ -658,13 +658,17 @@ struct Parrot_Interp *
 make_interpreter(Interp_flags flags)
 {
     struct Parrot_Interp *interpreter;
+#if EXEC_CAPABLE
     extern int Parrot_exec_run;
+#endif
 
     /* Get an empty interpreter from system memory */
-    if (!Parrot_exec_run)
-        interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
-    else
+#if EXEC_CAPABLE
+    if (Parrot_exec_run)
         interpreter = &interpre;
+    else
+#endif
+        interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
 
     /* must be set after if this is not the first interpreter */
     SET_NULL(interpreter->parent_interpreter);
