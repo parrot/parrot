@@ -78,7 +78,7 @@ my $var_count = 0; # Keep track of the number of registers...
 sub __allocate_register {
   my $name = shift;
   my $value = "P".$var_count++;
-  $vars{$value}=$name;
+  $vars{$name}=$value;
   $value;
 }
 
@@ -100,7 +100,10 @@ sub generate {
   my $self = shift;
   my $tree = $self->{tree};
 
+
   $self->_allocate_registers();
+#print Dumper($tree);exit;
+#print Dumper(\%vars);
 
   for my $inst (@$tree) {
     my $instruction = $inst->{instruction};
@@ -110,11 +113,13 @@ sub generate {
       }
     }
     elsif($instruction eq 'assign') {
+#print Dumper($inst);exit;
       $self->_add_inst('',
         'set',[ $vars{$inst->{values}[0]},
                 $inst->{values}[1],
               ]
       );
+#print Dumper($inst);exit;
     }
   }
 
