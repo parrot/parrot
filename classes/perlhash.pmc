@@ -69,7 +69,7 @@ pmclass PerlHash {
 	return (FLOATVAL)size;
     }
 
-    INTVAL get_number_index ( INTVAL index ) {
+    FLOATVAL get_number_index ( INTVAL index ) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
 	return key_pair->cache.int_val;
@@ -91,7 +91,7 @@ pmclass PerlHash {
 	return key_pair->cache.struct_val;
     }
 
-    STRING* get_string_index_s ( INTVAL index ) {
+    STRING* get_string_index_s ( STRING* index ) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,index);
 	return key_pair->cache.struct_val;
