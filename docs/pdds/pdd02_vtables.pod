@@ -444,6 +444,8 @@ knows the source and destination PMCs are of the same type.
 
 =item void set_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, PMC* value_key)
 
+=item void set_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key)
+
 Sets the value keyed by B<key> to the value of B<value> keyed by B<value_key>.
 Both B<self> and B<value> are guaranteed to be of the same type so optimizations
 may be made.
@@ -851,12 +853,41 @@ Calculate the bitwise-OR of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
+=item void bitwise_or_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_or_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-OR of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
+=item void bitwise_or_int_keyed(INTERP, PMC* self, KEY* key, INTVAL value, PMC* dest, KEY* dest_key)
+
+=item void bitwise_or_int_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-OR of B<self> keyed by B<key> and B<value>,
+and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
 =item void bitwise_or_same(INTERP, PMC* self, PMC* value, PMC* dest)
 
 Calculate the bitwise-OR of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.  In this case, it is guaranteed that
 B<self> and B<value> are of the same type.
+
+=item void bitwise_or_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_or_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-OR of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.  The B<self> and
+B<value> parameters refer to PMCs that are guaranteed to be the same type,
+so optimizations I<may> be made.
+
+At least one of the keys is guaranteed to be non-NULL.
 
 =item void bitwise_and(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -866,12 +897,41 @@ Calculate the bitwise-AND of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
+=item void bitwise_and_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_and_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-AND of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
+=item void bitwise_and_int_keyed(INTERP, PMC* self, KEY* key, INTVAL value, PMC* dest, KEY* dest_key)
+
+=item void bitwise_and_int_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-AND of B<self> keyed by B<key> and B<value>,
+and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
 =item void bitwise_and_same(INTERP, PMC* self, PMC* value, PMC* dest)
 
 Calculate the bitwise-AND of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.  In this case, it is guaranteed that
 B<self> and B<value> are of the same type.
+
+=item void bitwise_and_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_and_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-AND of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.  The B<self> and
+B<value> parameters refer to PMCs that are guaranteed to be the same type,
+so optimizations I<may> be made.
+
+At least one of the keys is guaranteed to be non-NULL.
 
 =item void bitwise_xor(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -881,6 +941,24 @@ Calculate the bitwise-XOR of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
+=item void bitwise_xor_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_xor_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-XOR of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
+=item void bitwise_xor_int_keyed(INTERP, PMC* self, KEY* key, INTVAL value, PMC* dest, KEY* dest_key)
+
+=item void bitwise_xor_int_keyed_int(INTERP, PMC* self, INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-XOR of B<self> keyed by B<key> and B<value>,
+and store the result in B<dest_key>.
+
+At least one of the keys is guaranteed to be non-NULL.
+
 =item void bitwise_xor_same(INTERP, PMC* self, PMC* value, PMC* dest)
 
 Calculate the bitwise-XOR of B<self> and B<value> and store the result
@@ -888,11 +966,31 @@ in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.  In this case, it is guaranteed that
 B<self> and B<value> are of the same type.
 
+=item void bitwise_xor_same_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_xor_same_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
+
+Calculate the bitwise-XOR of B<self> keyed by B<key> and B<value> keyed
+by B<value_key>, and store the result in B<dest_key>.  The B<self> and
+B<value> parameters refer to PMCs that are guaranteed to be the same type,
+so optimizations I<may> be made.
+
+At least one of the keys is guaranteed to be non-NULL.
+
 =item void bitwise_not(INTERP, PMC* self, PMC* dest)
 
 Applies a bitwise negation to B<self> and stores the result in B<dest>.
 Note that B<self> and B<dest> may refer to the same PMC; in that case
 optimizations I<may> be made.
+
+=item void bitwise_not_keyed(INTERP, PMC* self, KEY* key, PMC* dest, KEY* dest_key)
+
+=item void bitwise_not_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* dest, INTVAL* dest_key)
+
+Applies a bitwise negation to B<self> keyed by B<key> and 
+stores the result in B<dest> keyed by B<dest_key>.
+
+At least one key is guaranteed to be non-NULL.
 
 =item void concatenate(INTERP, PMC* self, PMC* value, PMC* dest)
 
@@ -1074,11 +1172,27 @@ At least one key is guaranteed to be not NULL.
 
 Autoincrement the PMC.
 
+=item void increment_keyed(INTERP, PMC* self, KEY* key)
+
+=item void increment_keyed(INTERP, PMC* self, INTVAL* key)
+
+Autoincrement the PMC keyed by B<key>.  The key is
+guaranteed to be non-NULL.
+
 =item void decrement(INTERP, PMC* self)
 
 Autodecrement the PMC.
 
+=item void decrement_keyed(INTERP, PMC* self, KEY* key)
+
+=item void decrement_keyed(INTERP, PMC* self, INTVAL* key)
+
+Autodecrement the PMC keyed by B<key>.  The key is
+guaranteed to be non-NULL.
+
 =item INTVAL exists_keyed(INTERP, PMC* self, KEY* key)
+
+=item INTVAL exists_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 This is only valid for keyed access. Returns TRUE or
 FALSE if the key exists or doesn't in the aggregate being
@@ -1092,6 +1206,8 @@ Checks to see if the PMC is defined. Returns TRUE or FALSE.
 
 =item INTVAL defined_keyed(INTERP, PMC* self, KEY* key)
 
+=item INTVAL defined_keyed_int(INTERP, PMC* self, INTVAL* key)
+
 Returns TRUE if the value of B<self> keyed by B<key> is defined,
 FALSE otherwise.
 
@@ -1099,11 +1215,15 @@ The key is guaranteed to be not NULL.
 
 =item void delete_keyed(INTERP, PMC* self, KEY* key)
 
+=item void delete_keyed_int(INTERP, PMC* self, INTVAL* key)
+
 Delete the specified entry from the aggregate.
 
 The key is guaranteed to be not NULL.
 
 =item KEY *nextkey_keyed(INTERP, PMC* self, KEY* key)
+
+=item KEY *nextkey_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Given the passed in key for the PMC, return the next key.
 
