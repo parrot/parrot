@@ -465,14 +465,14 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 /* Branch conditional to immediate
  *
  *  +--------------------------------------------------------------------+
- *  |    19    |     BO     |     BI     |     BO              | AA | LK |
+ *  |    16    |     BO     |     BI     |     BD              | AA | LK |
  *  +--------------------------------------------------------------------+
  * 0          5 6         10 11        15 16                      30   31
  *
  * Branch flags.  A 10-bit quantity representing BO and BI.  BO is 12
  * for true and 4 for false.  BI indicates the comparison type (lt=0,
- * gt = 1, eq = 2).  BO is the relative or absolute displacement,
- * divided by four.
+ * gt = 1, eq = 2).  BD is the relative or absolute displacement,
+ * divided by four, or AA, LK are set to zero, giving a 16-bit displacement.
  */
 
 #  define _BLT 0
@@ -520,6 +520,7 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
                     jit_info->optimizer->cur_section->branch_target->load_size;
 
     }
+    /* TODO check offset - 16 bits only allowed */
     _emit_bc(jit_info->native_ptr, cond, offset, 0, 0);
 }
 
@@ -565,7 +566,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 
 /*
- * Load a 32-bit immediate value.  
+ * Load a 32-bit immediate value.
  */
 
 #  define jit_emit_mov_ri_i(pc, D, imm) \
@@ -637,7 +638,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
     jit_emit_load_code_start(jit_info->native_ptr);
 
-    /* jit_emit restart code: branch to the program counter passed into 
+    /* jit_emit restart code: branch to the program counter passed into
        the JIT invocation as the second parameter, which is r4 */
     jit_emit_branch_to_opcode(jit_info->native_ptr, r4);
 }
@@ -665,7 +666,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)
             *((long*)(interpreter->op_func_table[*(jit_info->cur_op)])));
 #   else
-    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, 
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1,
             (long)(interpreter->op_func_table[*(jit_info->cur_op)]));
 #   endif
     jit_emit_mtctr(jit_info->native_ptr, ISR1);
@@ -752,6 +753,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 break;
 
             case JIT_PPC_BRANCH:
+                /* TODO check offset - 16 bits only allowed */
                 fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
                 d = jit_info->arena.op_map[fixup->param.opcode].offset
                     - fixup->native_offset + fixup->skip;
