@@ -1,4 +1,4 @@
-package Jit;
+package Parrot::Jit;
 
 my %syscall_number = (
     "WRITE"         => 4,

@@ -134,7 +134,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 			$argc = $2;
 			$argv = $3;
 
-			$tmp_bytecode = Jit::system_call($argc,$argv,$syscall);
+			$tmp_bytecode = Parrot::Jit::system_call($argc,$argv,$syscall);
 			
 			$body =~ s/S\([^\)]*\)/$tmp_bytecode/;
 		}
