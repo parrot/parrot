@@ -72,7 +72,7 @@ The parser takes source code of some sort and creates a syntax tree of
 that source.
 
 Different high level languages will generally have their own parser
-modules, implemented in whatever language is most convient. For instance,
+modules, implemented in whatever language is most convenient. For instance,
 we currently intend to write the parser for Perl 6 in Perl 6, to allow
 for easy extension. Generally there will be one parser per language, though
 there's no reason that there can't be multiple independent parsers.
@@ -130,7 +130,7 @@ presented to a program.
 
 By providing a regular expression engine as a separate subsystem of
 Parrot, we intend to make it easily available to any language running
-on Parrot (cf. the Perl 5 regex engine, which is itimately linked to
+on Parrot (cf. the Perl 5 regex engine, which is intimately linked to
 the perl core). The job of the regex engine is to turn regexes into objects, 
 and apply those regex objects to strings. 
 
@@ -159,7 +159,7 @@ life of Parrot.
 =item Extensions
 
 The extension API is the set of calls exported to Parrot
-extensions. They provide access to most of the things an exension
+extensions. They provide access to most of the things an extension
 needs to do, while hiding the implementation details. (So that, for
 example, we can change the way scalars are stored without having to
 rewrite, or even recompile, an extension).
