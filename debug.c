@@ -1539,7 +1539,8 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 
                 interpreter->code->const_table->constants[k]->type =PFC_STRING;
                 interpreter->code->const_table->constants[k]->string =
-                    string_make(interpreter, buf, (UINTVAL)l, NULL, 0, NULL);
+                    string_make(interpreter, buf, (UINTVAL)l,
+                            NULL, BUFFER_constant_FLAG, NULL);
 
                 /* Add it to the bytecode */
                 eval[j++] = (opcode_t)k;
