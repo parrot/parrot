@@ -297,7 +297,10 @@ pmclass scalar abstract noinit {
     }
 
     void neg (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+	if (!dest)
+	    SELF->cache.int_val = -DYNSELF.get_integer();
+	else
+	    VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
 
     void bitwise_or (PMC* value, PMC* dest) {

@@ -44,9 +44,11 @@ pmclass Boolean extends PerlInt {
     }
 
     void neg (PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, !SELF->cache.int_val);
+	if (!dest)
+	    SELF->cache.int_val = -SELF->cache.int_val;
+	else
+	    VTABLE_set_integer_native(INTERP, dest, -SELF->cache.int_val);
     }
-
 
     void logical_or (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
@@ -68,6 +70,5 @@ pmclass Boolean extends PerlInt {
 					 VTABLE_get_bool(INTERP, value)
 	    );
     }
-
 
 }
