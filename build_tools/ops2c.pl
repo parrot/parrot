@@ -150,21 +150,24 @@ if ($trans->can("run_core_func_decl")) {
     my $run_core_func = $trans->run_core_func_decl($base);
     print HEADER "$run_core_func;\n";
 }
+my $bs = "${base}${suffix}_";
 
 print SOURCE $preamble;
 print SOURCE <<END_C;
 #include "$include"
 
 ${defines}
-static op_lib_t op_lib;
+static op_lib_t ${bs}op_lib;
 
 END_C
 
-print SOURCE $ops->preamble($trans);
+my $text = $ops->preamble($trans);
+$text =~ s/\bops_addr\b/${bs}ops_addr/g;
+print SOURCE $text;
 
 
 if ($trans->can("ops_addr_decl")) {
-    print SOURCE $trans->ops_addr_decl;
+    print SOURCE $trans->ops_addr_decl($bs);
 }
 if ($trans->can("run_core_func_decl")) {
     print SOURCE $trans->run_core_func_decl($base);
@@ -208,6 +211,8 @@ END_C
         $definition = "static $opsarraytype *\n$func_name ($args)";
     }
     my $source     = $op->source($trans);
+    $source =~ s/\bop_lib\b/${bs}op_lib/;
+    $source =~ s/\bops_addr\b/${bs}ops_addr/g;
 
 #    print HEADER "$prototype;\n";
 #
@@ -264,7 +269,7 @@ if ($suffix =~ /cg/) {
         NULL
     };
 END_C
-    print SOURCE $trans->run_core_after_addr_table;
+    print SOURCE $trans->run_core_after_addr_table($bs);
 
 }
 
@@ -286,7 +291,7 @@ END_C
 #ifdef __GNUC__
     _check();
 #endif
-goto *ops_addr[*cur_opcode];
+goto *${bs}ops_addr[*cur_opcode];
 
 END_C
 }
@@ -331,16 +336,16 @@ $op_info = $op_func = 'NULL';
 $getop = '( int (*)(const char *, int) )NULL';
 
 if ($suffix !~ /cg/ && $suffix !~ /switch/) {
-    $op_func = 'op_func_table';
+    $op_func = "${bs}op_func_table";
     print SOURCE <<END_C;
 
-INTVAL ${base}_numops${suffix} = $num_ops;
+INTVAL ${bs}numops${suffix} = $num_ops;
 
 /*
 ** Op Function Table:
 */
 
-static op_func${suffix}_t op_func_table\[$num_entries] = {
+static op_func${suffix}_t ${op_func}\[$num_entries] = {
 END_C
 
     print SOURCE @op_func_table;
@@ -355,7 +360,7 @@ END_C
 }
 
 if ($suffix eq '') {
-    $op_info = 'op_info_table';
+    $op_info = "${bs}op_info_table";
     $getop = 'get_op';
 #
 # Op Info Table:
@@ -366,7 +371,7 @@ if ($suffix eq '') {
 ** Op Info Table:
 */
 
-static op_info_t op_info_table\[$num_entries] = {
+static op_info_t $op_info\[$num_entries] = {
 END_C
 
     $index = 0;
@@ -480,18 +485,18 @@ static int get_op(const char * name, int full) {
     }
     for(p = hop[hidx]; p; p = p->next) {
 	if(!strcmp(name, full ? p->info->full_name : p->info->name))
-	    return p->info - op_lib.op_info_table;
+	    return p->info - ${bs}op_lib.op_info_table;
     }
     return -1;
 }
 static void hop_init() {
     size_t i;
-    op_info_t * info = op_lib.op_info_table;
+    op_info_t * info = ${bs}op_lib.op_info_table;
     /* store full names */
-    for (i = 0; i < op_lib.op_count; i++)
+    for (i = 0; i < ${bs}op_lib.op_count; i++)
 	store_op(info + i, 1);
     /* plus one short name */
-    for (i = 0; i < op_lib.op_count; i++)
+    for (i = 0; i < ${bs}op_lib.op_count; i++)
 	if (get_op(info[i].name, 0) == -1)
 	    store_op(info + i, 0);
 }
@@ -526,7 +531,7 @@ print SOURCE <<END_C;
 ** op lib descriptor:
 */
 
-static op_lib_t op_lib = {
+static op_lib_t ${bs}op_lib = {
   "$base",		/* name */
   "$suffix",		/* suffix */
   $core_type,	        /* core_type = PARROT_XX_CORE */
@@ -550,7 +555,7 @@ if ($trans->can("init_func_init1")) {
 
 my $init_set_dispatch = "";
 if ($trans->can("init_set_dispatch")) {
-    $init_set_dispatch = $trans->init_set_dispatch;
+    $init_set_dispatch = $trans->init_set_dispatch($bs);
 }
 
 print SOURCE <<END_C;
@@ -559,7 +564,7 @@ $init_func(int init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 $init1_code
-	return &op_lib;
+	return &${bs}op_lib;
     }
     /* set op_lib to the passed ptr (in init) */
     else if (init) {
@@ -575,7 +580,7 @@ $init_set_dispatch
 END_C
 
 if ($dynamic) {
-    my $load_func = "Parrot_lib_${base}${suffix}_ops_load";
+    my $load_func = "Parrot_lib_${bs}ops_load";
     print SOURCE <<END_C;
 /*
  * dynamic lib load function - called once

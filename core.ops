@@ -6,8 +6,6 @@
 #include "parrot/embed.h"
 #include "parrot/interp_guts.h"
 
-static op_lib_t op_lib;
-
 VERSION = PARROT_VERSION;
 
 =head1 NAME

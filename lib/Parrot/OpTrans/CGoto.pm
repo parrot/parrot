@@ -193,7 +193,8 @@ sub run_core_func_decl {
 }
 
 sub ops_addr_decl {
-    "static void **ops_addr;\n\n";
+    my ($self, $bs) = @_;
+    "static void **${bs}ops_addr;\n\n";
 }
 
 sub run_core_func_start {
@@ -209,6 +210,7 @@ END_C
 }
 
 sub run_core_after_addr_table {
+    my ($self, $bs) = @_;
     return <<END_C;
 
 /* #ifdef HAVE_NESTED_FUNC */
@@ -222,10 +224,10 @@ sub run_core_after_addr_table {
 #endif
 /* #endif */
 
-    if (!ops_addr)
-	ops_addr = l_ops_addr;
+    if (!${bs}ops_addr)
+	${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
-        return (opcode_t *)ops_addr ;
+        return (opcode_t *)${bs}ops_addr ;
     }
 END_C
 }
@@ -239,15 +241,17 @@ sub run_core_finish {
 sub init_func_init1 {
     my ($self, $base) = @_;
     my $cg_func = $self->core_prefix . $base;
+    my $bs = $base . $self->suffix . '_';
     return <<END_C;
- 	if (!op_lib.op_func_table)
-            op_lib.op_func_table = (op_func_t *) $cg_func(0, 0);
+ 	if (!${bs}op_lib.op_func_table)
+            ${bs}op_lib.op_func_table = (op_func_t *) $cg_func(0, 0);
 END_C
 }
 
 sub init_set_dispatch {
+    my ($self, $bs) = @_;
     return <<END_C;
-        ops_addr = (void**) init;
+        ${bs}ops_addr = (void**) init;
 END_C
 }
 1;
