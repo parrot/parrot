@@ -23,6 +23,7 @@ classes/csub.pmc
 classes/default.pmc
 classes/genclass.pl
 classes/intqueue.pmc
+classes/multiarray.pmc
 classes/perlarray.pmc
 classes/perlhash.pmc
 classes/perlint.pmc

@@ -28,6 +28,7 @@ enum {
     enum_class_Coroutine,
     enum_class_Continuation,
     enum_class_CSub,
+    enum_class_MultiArray,
     enum_class_max = 100
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];

@@ -1,0 +1,1238 @@
+/* Multiarray.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Multiarray base class
+ *  Data Structure and Algorithms:
+ *   This is one way for calculating offsets in 2 dimensional space.
+ *
+ *   (y-1)X0+x   
+ *
+ *   Where X0 is the length of X-base (fig 1.1). We use this equation in 
+ *   calc_offset to get offset from the buffer we store our data in. 
+ *   Lets say we want to store (2,2) in a buffer. We then take values and do:
+ *   (2-1)3 + 2 = 5. 
+ * 
+ *      ------------------------------------
+ *      base | 1 | 2 | 3 | 4 |*5*|  | ....
+ *      ------------------------------------- fig 1.0
+ *
+ *
+ *      Y                                                         
+ *      |  
+ *      | ---------------                                         
+ *      | [ 7 ][ 8 ][ 9 ] 
+ *      | [ 4 ][ 5 ][ 6 ]                                                     
+ *      | [ 1 ][ 2 ][ 3 ] <-------- a CELL                                
+ *      |------------------ X
+ *        |-------------|                                               
+ *            X0          fig 1.1   
+ *      virtual_addr is the return value from a calculation of CELL's position.
+ *      Changes:  2002/08/01    
+ *                Our cell_buffer starts from 0 equation is now y*x0+x.
+ *                Calc offset now handles multidimensions
+ *
+ *      Current code has complexity: 
+ *
+ *        O(1) writing.                                                  
+ *        O(1) reading.
+ *  History:
+ *        Initial revision by Josef Hˆˆk
+ *  Notes:
+ *        Future plan is to make calc_offset_multi polymorphic 
+ *        and to make it handle multidimensions: done
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+#define CELL_POOL_SIZE 16
+
+typedef struct _cell CELL;
+typedef struct _cell_buffer CELL_B;
+
+/* 
+ * cell buffer representation
+ */
+struct _cell_buffer { 
+    Buffer *cell_buffer;
+    INTVAL size;
+    INTVAL free_cell;
+    KEY *dimension;
+};
+
+struct _cell {
+    UnionVal data;
+    INTVAL virtual_addr; /* used to handle offsets */
+};
+
+
+
+/* 
+ * MULTIDIM CALC OFFSET
+ * Algoritm:
+ *  ( i + (j-1)*Ni ) + (k-1)*Ni*Nj + (l-1)*Ni*Nj*Nk ...
+ * where i,j,k,l are koordinates in a multdim space
+ * eg: (1,2,3) = (i,j,k)
+ * and Ni,Nj,Nk .. are the length of an dimension.
+ * Think of a cube with a fix size:
+ *
+ *          |   /
+ *          |  /  8 9 depth 2
+ * height 2 | 1 2 3 4
+ *          |---------
+ *            length 4
+ * Ni = 4, Nj = 2, Nk = 2
+ * juuh....ascii art isnt one of my talents thats for sure. 
+ * luckily i didnt try to draw a hypercube :-)
+ * $1 is addr of our CELL_BUFFER structure.
+ * $2 is a key pointer containing positions in multidimensional space 
+ */
+static INTVAL calc_offset_multi(void *base, KEY k) 
+{
+    
+    CELL_B *cell_data = (CELL_B *)base;
+    KEY *dim_key;
+    KEY *my_key;
+    INTVAL offset = 0;
+    INTVAL prod_of_dims = 1;
+    INTVAL loop_i;
+    INTVAL inner_loop_i;
+    dim_key = cell_data->dimension;
+    
+    my_key = &k;
+
+    if(cell_data->cell_buffer != NULL && dim_key != NULL && k.next != NULL ) {
+
+/* first part of alg.
+ * (i + (j-1)*Ni
+ */ 
+	offset =  (INTVAL) ( k.atom.val.int_val + (k.next->atom.val.int_val)*(dim_key->atom.val.int_val) );
+
+/* add the rest of algoritm 
+ * ...  + (k-1)*Ni*Nj + (l-1)*Ni*Nj*Nk ...
+ *
+ * Ni = dim_key->atom.val.int_val
+ * Nj = dim_key->next.atom.val.int_val
+ * Nk = dim_key->next->next.atom.val.int_val
+ * and so an.
+ *
+ */
+	loop_i = 2;
+	while ( my_key->next->next != NULL ) {
+	    inner_loop_i = loop_i;
+	    
+	    
+	    while ( inner_loop_i > 0 && dim_key->next != NULL ) {
+		
+		prod_of_dims *= (dim_key->atom.val.int_val);
+		dim_key = dim_key->next;
+		inner_loop_i--;
+	    }
+	    
+	    offset +=  (INTVAL)(my_key->next->next->atom.val.int_val)*prod_of_dims;	    
+
+	    my_key = my_key->next;
+	    loop_i++;
+	}		 
+    } else {
+	/* only 1 dim */
+	offset =  (INTVAL) ( k.atom.val.int_val );
+    }
+    return offset;
+}
+
+/*
+ *  Expands the cell_buffer Buffer in a matrix or multi array
+ *  This doesnt grow the matrix itself 
+ *  see expand_matrix() for that.
+ */
+static void expand_cell_buffer( struct Parrot_Interp *interpreter, 
+                                void *data, INTVAL new_size )
+{
+    CELL_B *b = data;
+    if(new_size > b->size) {
+	Parrot_reallocate(interpreter, b->cell_buffer, new_size * sizeof(CELL));
+	b->free_cell += (new_size - b->size);
+	b->size = new_size;
+    }
+    
+}
+
+
+/*
+ * expand data buffer with one cell 
+ */
+static CELL *new_cell( struct Parrot_Interp *interpreter, void *data ) 
+{  
+    CELL *ret_cell;
+    INTVAL new_size = 0;
+    CELL_B *cell_b = data;
+    ret_cell = (CELL *)cell_b->cell_buffer->bufstart;
+    
+    if((cell_b->free_cell-1) > 0) {
+	cell_b->free_cell -= 1;
+    } else {
+	new_size = cell_b->size*2; 
+	expand_cell_buffer( interpreter, cell_b, new_size);
+	cell_b->free_cell -= 1;
+	ret_cell = (CELL *)cell_b->cell_buffer->bufstart;
+    }
+    return &ret_cell[cell_b->size - cell_b->free_cell-1]; // notice -1 we start at 0
+}
+
+
+
+
+static CELL_B *new_marray( Interp *interpreter ) 
+{
+    CELL_B *b = (CELL_B *)new_bufferlike_header(interpreter, sizeof(*b));    
+    // CELL_B *b = (CELL_B *)new_tracked_header(interpreter, sizeof(*b));    
+    b->size = CELL_POOL_SIZE;
+    b->free_cell = CELL_POOL_SIZE;
+    b->cell_buffer = new_buffer_header(interpreter);
+    b->dimension = NULL;
+    Parrot_allocate(interpreter, b->cell_buffer ,  CELL_POOL_SIZE*sizeof(CELL)); 
+    memset( b->cell_buffer->bufstart, 0,  CELL_POOL_SIZE*sizeof(CELL));
+    return b;
+    
+}
+
+
+static void init_marray( Interp *interpreter, PMC *self, KEY *key ) 
+{
+    
+    CELL_B *marray;
+    INTVAL size;
+    KEY *oldkey;
+
+    marray = new_marray(interpreter);
+    marray->cell_buffer->flags |= PMC_is_buffer_ptr_FLAG;
+    marray->cell_buffer->flags |= PMC_is_PMC_ptr_FLAG;
+    
+    self->data = (CELL_B *)marray;
+    self->cache.int_val = 0;
+    oldkey = key;
+    size = 1;
+
+    
+    while(key->next != NULL) {
+      
+      size *= key->atom.val.int_val;
+      key = key->next;
+      
+      
+    }
+
+    marray->size = size;
+    marray->free_cell = size;
+    Parrot_reallocate(interpreter, marray->cell_buffer, marray->size * sizeof(CELL));
+    memset(marray->cell_buffer->bufstart, 0, marray->size * sizeof(CELL));
+    marray->dimension = oldkey;
+    
+}
+
+
+/* Todo: heavy optimisation. should also return a KEY_ATOM */
+static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, KEY *key ) 
+{
+    
+    CELL *buffer_ptr;
+    CELL *buffer_ptr_virt;
+    CELL *base;
+    CELL *virtual_addr;  
+    
+    INTVAL offs = 0;
+    INTVAL ret_val = 0;
+    
+    offs = calc_offset_multi(mg_marray, *key);
+    base = (CELL *)mg_marray->cell_buffer->bufstart;
+    buffer_ptr = &base[offs];
+    buffer_ptr_virt = buffer_ptr;
+    
+    if(!(buffer_ptr == NULL)) {
+/* 
+ *  fetch the virtual address from cell. 
+ *  Have to do it this way since base 
+ *  address of our buffer may have and most likely has changed.    
+ */
+        virtual_addr = &base[buffer_ptr->virtual_addr]; 
+        if(virtual_addr == buffer_ptr_virt) {
+   	ret_val = buffer_ptr->data.int_val;
+	} else {
+           //PANIC
+        }	
+    }
+
+    return ret_val;
+}
+
+
+static void set_marray_keyed( Interp *interpreter, CELL_B *sik_marray, KEY *key, INTVAL src_value ) 
+{
+    
+  CELL *my_cell;
+  CELL *base;
+  INTVAL offs = 0;
+  
+  offs = calc_offset_multi(sik_marray, *key);
+  base = (CELL *)sik_marray->cell_buffer->bufstart;
+  my_cell = &base[offs];
+  my_cell->virtual_addr = offs;
+  my_cell->data.int_val = src_value;
+
+}
+
+
+pmclass MultiArray {
+
+    void init () {
+	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
+	SELF->data = NULL;
+	SELF->cache.int_val = 0;
+	init_marray(INTERP, SELF, NULL);
+    }
+
+    void init_pmc (PMC* initializer) {
+
+	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
+	SELF->data = NULL;
+	SELF->cache.int_val = 0;
+	// I use a PMC key class  as wrapper to pass initialvalues to our multi array
+	//  OBS OBS OBS this dont work since we dont have a multidim key standard yet
+	//if((initializer->vtable->type(INTERP, SELF)) == enum_class_Key) {
+	//    init_marray(INTERP, SELF, initializer->data);
+	//} else{
+	    init_marray(INTERP, SELF, NULL);
+	//}
+	
+	
+    }
+
+    void morph (INTVAL type) {
+    }
+
+    PMC* mark (PMC* tail) {
+      return NULL;
+    }
+
+    void destroy () {
+    }
+
+    INTVAL type () {
+      return enum_class_MultiArray;
+    }
+
+    INTVAL type_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL type_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    UINTVAL subtype (INTVAL type) {
+	return 0;
+    }
+
+    UINTVAL subtype_keyed (KEY* key, INTVAL type) {
+	return 0;
+    }
+
+    UINTVAL subtype_keyed_int (INTVAL* key, INTVAL type) {
+	return 0;
+    }
+
+    STRING* name () {
+        return whoami;
+    }
+
+    STRING* name_keyed (KEY* key) {
+	return NULL;
+    }
+
+    STRING* name_keyed_int (INTVAL* key) {
+	return NULL;  
+    }
+
+    PMC* clone () {
+	return NULL;
+    }
+
+    PMC* clone_keyed (KEY* key) {
+	return NULL;
+    }
+
+    PMC* clone_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    PMC* find_method (STRING* method_name) {
+	return NULL;
+    }
+
+    PMC* find_method_keyed (KEY* key, STRING* method_name) {
+	return NULL;
+    }
+
+    PMC* find_method_keyed_int (INTVAL* key, STRING* method_name) {
+	return NULL;
+    }
+
+    INTVAL get_integer () {
+	return 0;
+    }
+
+    INTVAL get_integer_keyed (KEY* key) {
+	INTVAL ret = get_marray_keyed( INTERP, SELF->data, key );
+	return ret;
+    }
+
+    INTVAL get_integer_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    FLOATVAL get_number () {
+	return 0;
+    }
+
+    FLOATVAL get_number_keyed (KEY* key) {
+	return (FLOATVAL)get_marray_keyed( INTERP, SELF->data, key );
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    BIGNUM* get_bignum () {
+	return NULL;
+    }
+
+    BIGNUM* get_bignum_keyed (KEY* key) {
+	return NULL;
+    }
+
+    BIGNUM* get_bignum_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    STRING* get_string () {
+	return NULL;
+    }
+
+    STRING* get_string_keyed (KEY* key) {
+	return NULL;
+    }
+
+    STRING* get_string_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    INTVAL get_bool () {
+	return 0;
+    }
+
+    INTVAL get_bool_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL get_bool_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    INTVAL elements () {
+	return 0;
+    }
+
+    INTVAL elements_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL elements_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    PMC* get_pmc () {
+	return NULL;
+    }
+
+    PMC* get_pmc_keyed (KEY* key) {
+	return NULL;
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    INTVAL is_same (PMC* value) {
+	return 0;
+    }
+
+    INTVAL is_same_keyed (KEY* key, PMC* value, KEY* value_key) {
+	return 0;
+    }
+
+    INTVAL is_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	return 0;
+    }
+
+    void set_integer (PMC* value) {
+    }
+
+    void set_integer_native (INTVAL value) {
+    }
+
+    void set_integer_same (PMC* value) {
+    }
+
+    void set_integer_keyed (KEY* key, INTVAL value) {
+	set_marray_keyed( INTERP, SELF->data, key, value );  
+    }
+
+    void set_integer_keyed_int (INTVAL* key, INTVAL value) {
+    }
+
+    void set_number (PMC* value) {
+    }
+
+    void set_number_native (FLOATVAL value) {
+    }
+
+    void set_number_same (PMC* value) {
+    }
+
+    void set_number_keyed (KEY* key, FLOATVAL value) {
+    }
+
+    void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
+    }
+
+    void set_bignum (PMC* value) {
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+    }
+
+    void set_bignum_same (PMC* value) {
+    }
+
+    void set_bignum_keyed (KEY* key, BIGNUM* value) {
+    }
+
+    void set_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
+    }
+
+    void set_string (PMC* value) {
+    }
+
+    void set_string_native (STRING* value) {
+    }
+
+    void set_string_same (PMC* value) {
+    }
+
+    void set_string_keyed (KEY* key, STRING* value) {
+    }
+
+    void set_string_keyed_int (INTVAL* key, STRING* value) {
+    }
+
+    void set_pmc (PMC* value) {
+    }
+
+    void set_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    }
+
+    void set_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    void set_same (PMC* value) {
+    }
+
+    void set_same_keyed (KEY* key, PMC* value, KEY* value_key) {
+    }
+
+    void set_same_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    INTVAL pop_integer () {
+	return 0;
+    }
+
+    INTVAL pop_integer_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL pop_integer_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    FLOATVAL pop_float () {
+	return 0;
+    }
+
+    FLOATVAL pop_float_keyed (KEY* key) {
+	return 0;
+    }
+
+    FLOATVAL pop_float_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    BIGNUM* pop_bignum () {
+	return NULL;
+    }
+
+    BIGNUM* pop_bignum_keyed (KEY* key) {
+	return NULL;
+    }
+
+    BIGNUM* pop_bignum_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    STRING* pop_string () {
+	return NULL;
+    }
+
+    STRING* pop_string_keyed (KEY* key) {
+	return NULL;
+    }
+
+    STRING* pop_string_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    PMC* pop_pmc () {
+	return NULL;
+    }
+
+    PMC* pop_pmc_keyed (KEY* key) {
+	return NULL;
+    }
+
+    PMC* pop_pmc_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    void push_integer (INTVAL value) {
+    }
+
+    void push_integer_keyed (KEY* key, INTVAL value) {
+    }
+
+    void push_integer_keyed_int (INTVAL* key, INTVAL value) {
+    }
+
+    void push_float (FLOATVAL value) {
+    }
+
+    void push_float_keyed (KEY* key, FLOATVAL value) {
+    }
+
+    void push_float_keyed_int (INTVAL* key, FLOATVAL value) {
+    }
+
+    void push_bignum (BIGNUM* value) {
+    }
+
+    void push_bignum_keyed (KEY* key, BIGNUM* value) {
+    }
+
+    void push_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
+    }
+
+    void push_string (STRING* value) {
+    }
+
+    void push_string_keyed (KEY* key, STRING* value) {
+    }
+
+    void push_string_keyed_int (INTVAL* key, STRING* value) {
+    }
+
+    void push_pmc (PMC* value) {
+    }
+
+    void push_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    }
+
+    void push_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    INTVAL shift_integer () {
+	return 0;
+    }
+
+    INTVAL shift_integer_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL shift_integer_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    FLOATVAL shift_float () {
+	return 0;
+    }
+
+    FLOATVAL shift_float_keyed (KEY* key) {
+	return 0;
+    }
+
+    FLOATVAL shift_float_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    BIGNUM* shift_bignum () {
+	return NULL;
+    }
+
+    BIGNUM* shift_bignum_keyed (KEY* key) {
+	return NULL;
+    }
+
+    BIGNUM* shift_bignum_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    STRING* shift_string () {
+	return NULL;
+    }
+
+    STRING* shift_string_keyed (KEY* key) {
+	return NULL;
+    }
+
+    STRING* shift_string_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    PMC* shift_pmc () {
+	return NULL;
+    }
+
+    PMC* shift_pmc_keyed (KEY* key) {
+	return NULL;
+    }
+
+    PMC* shift_pmc_keyed_int (INTVAL* key) {
+	return NULL;
+    }
+
+    void unshift_integer (INTVAL value) {
+    }
+
+    void unshift_integer_keyed (KEY* key, INTVAL value) {
+    }
+
+    void unshift_integer_keyed_int (INTVAL* key, INTVAL value) {
+    }
+
+    void unshift_float (FLOATVAL value) {
+    }
+
+    void unshift_float_keyed (KEY* key, FLOATVAL value) {
+    }
+
+    void unshift_float_keyed_int (INTVAL* key, FLOATVAL value) {
+    }
+
+    void unshift_bignum (BIGNUM* value) {
+    }
+
+    void unshift_bignum_keyed (KEY* key, BIGNUM* value) {
+    }
+
+    void unshift_bignum_keyed_int (INTVAL* key, BIGNUM* value) {
+    }
+
+    void unshift_string (STRING* value) {
+    }
+
+    void unshift_string_keyed (KEY* key, STRING* value) {
+    }
+
+    void unshift_string_keyed_int (INTVAL* key, STRING* value) {
+    }
+
+    void unshift_pmc (PMC* value) {
+    }
+
+    void unshift_pmc_keyed (KEY* key, PMC* value, KEY* value_key) {
+    }
+
+    void unshift_pmc_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+    }
+
+    void add (PMC* value, PMC* dest) {
+    }
+
+    void add_int (INTVAL value, PMC* dest) {
+
+	CELL_B *marray;
+	CELL *base;
+	CELL *ptr;
+	INTVAL size;
+	INTVAL stalker;
+	
+	marray = SELF->data;
+	base = (CELL *)marray->cell_buffer->bufstart;
+	size = stalker = marray->size;
+	while(stalker >= 0) {
+	    ptr = &base[size-stalker];
+	    ptr->data.int_val += value;
+	    stalker--;
+	}
+	
+	
+    }
+
+    void add_bignum (BIGNUM* value, PMC* dest) {
+    }
+
+    void add_float (FLOATVAL value, PMC* dest) {
+    }
+
+    void add_same (PMC* value, PMC* dest) {
+    }
+
+    void add_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void add_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void subtract (PMC* value, PMC* dest) {
+    }
+
+    void subtract_int (INTVAL value, PMC* dest) {
+
+	CELL_B *marray;
+	CELL *base;
+	CELL *ptr;
+	INTVAL size;
+	INTVAL stalker;
+	
+	marray = SELF->data;
+	base = (CELL *)marray->cell_buffer->bufstart;
+	size = stalker = marray->size;
+	while(stalker >= 0) {
+	    ptr = &base[size-stalker];
+	    ptr->data.int_val -= value;
+	    stalker--;
+	}
+
+    }
+
+    void subtract_bignum (BIGNUM* value, PMC* dest) {
+    }
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+    }
+
+    void subtract_same (PMC* value, PMC* dest) {
+    }
+
+    void subtract_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void subtract_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void multiply (PMC* value, PMC* dest) {
+    }
+
+    void multiply_int (INTVAL value, PMC* dest) {
+
+        CELL_B *marray;
+	CELL *base;
+	CELL *ptr;
+	INTVAL size;
+	INTVAL stalker;
+	
+	marray = SELF->data;
+	base = (CELL *)marray->cell_buffer->bufstart;
+	size = stalker = marray->size;
+	while(stalker >= 0) {
+	    ptr = &base[size-stalker];
+	    ptr->data.int_val *= value;
+	    stalker--;
+	}
+
+    }
+
+    void multiply_bignum (BIGNUM* value, PMC* dest) {
+    }
+
+    void multiply_float (FLOATVAL value, PMC* dest) {
+    }
+
+    void multiply_same (PMC* value, PMC* dest) {
+    }
+
+    void multiply_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void multiply_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void divide (PMC* value, PMC* dest) {
+    }
+
+    void divide_int (INTVAL value, PMC* dest) {
+
+	CELL_B *marray;
+	CELL *base;
+	CELL *ptr;
+	INTVAL size;
+	INTVAL stalker;
+	
+	marray = SELF->data;
+	base = (CELL *)marray->cell_buffer->bufstart;
+	size = stalker = marray->size;
+	while(stalker >= 0) {
+	    ptr = &base[size-stalker];
+	    ptr->data.int_val = ptr->data.int_val / value;
+	    stalker--;
+	}
+
+    }
+
+    void divide_bignum (BIGNUM* value, PMC* dest) {
+    }
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+    }
+
+    void divide_same (PMC* value, PMC* dest) {
+    }
+
+    void divide_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void divide_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+    }
+
+    void modulus_int (INTVAL value, PMC* dest) {
+
+	CELL_B *marray;
+	CELL *base;
+	CELL *ptr;
+	INTVAL size;
+	INTVAL stalker;
+	
+	marray = SELF->data;
+	base = (CELL *)marray->cell_buffer->bufstart;
+	size = stalker = marray->size;
+	while(stalker >= 0) {
+	    ptr = &base[size-stalker];
+	    ptr->data.int_val = ptr->data.int_val % value;
+	    stalker--;
+	}
+
+    }
+
+    void modulus_bignum (BIGNUM* value, PMC* dest) {
+    }
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+    }
+
+    void modulus_same (PMC* value, PMC* dest) {
+    }
+
+    void modulus_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void modulus_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void neg (PMC* dest) {
+    }
+
+    void neg_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    }
+
+    void neg_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_or (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+    }
+
+    void bitwise_or_same (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_and (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+    }
+
+    void bitwise_and_same (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+    }
+
+    void bitwise_xor_same (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_not (PMC* dest) {
+    }
+
+    void bitwise_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+    }
+
+    void bitwise_shl_same (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_shl_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_shl_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void bitwise_shr (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+    }
+
+    void bitwise_shr_same (PMC* value, PMC* dest) {
+    }
+
+    void bitwise_shr_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void bitwise_shr_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void concatenate (PMC* value, PMC* dest) {
+    }
+
+    void concatenate_native (STRING* value, PMC* dest) {
+    }
+
+    void concatenate_same (PMC* value, PMC* dest) {
+    }
+
+    void concatenate_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void concatenate_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    INTVAL is_equal (PMC* value) {
+	return 0;
+    }
+
+    INTVAL is_equal_keyed (KEY* key, PMC* value, KEY* value_key) {
+	return 0;
+    }
+
+    INTVAL is_equal_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp (PMC* value) {
+	return 0;
+    }
+
+    INTVAL cmp_keyed (KEY* key, PMC* value, KEY* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp_num (PMC* value) {
+	return 0;
+    }
+
+    INTVAL cmp_num_keyed (KEY* key, PMC* value, KEY* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp_num_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp_string (PMC* value) {
+	return 0;
+    }
+
+    INTVAL cmp_string_keyed (KEY* key, PMC* value, KEY* value_key) {
+	return 0;
+    }
+
+    INTVAL cmp_string_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key) {
+	return 0;
+    }
+
+    void logical_or (PMC* value, PMC* dest) {
+    }
+
+    void logical_or_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void logical_or_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void logical_and (PMC* value, PMC* dest) {
+    }
+
+    void logical_and_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void logical_and_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void logical_xor (PMC* value, PMC* dest) {
+    }
+
+    void logical_xor_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void logical_xor_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void logical_not (PMC* dest) {
+    }
+
+    void logical_not_keyed (KEY* key, PMC* dest, KEY* dest_key) {
+    }
+
+    void logical_not_keyed_int (INTVAL* key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void repeat (PMC* value, PMC* dest) {
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+    }
+
+    void repeat_keyed (KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key) {
+    }
+
+    void repeat_keyed_int (INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void repeat_int_keyed (KEY* key, INTVAL value, PMC* dest, KEY* dest_key) {
+    }
+
+    void repeat_int_keyed_int (INTVAL* key, INTVAL value, PMC* dest, INTVAL* dest_key) {
+    }
+
+    void increment () {
+    }
+
+    void increment_keyed (KEY* key) {
+    }
+
+    void increment_keyed_int (INTVAL* key) {
+    }
+
+    void decrement () {
+    }
+
+    void decrement_keyed (KEY* key) {
+    }
+
+    void decrement_keyed_int (INTVAL* key) {
+    }
+
+    INTVAL exists_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL exists_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    INTVAL defined () {
+	return 0;
+    }
+
+    INTVAL defined_keyed (KEY* key) {
+	return 0;
+    }
+
+    INTVAL defined_keyed_int (INTVAL* key) {
+	return 0;
+    }
+
+    void delete_keyed (KEY* key) {
+    }
+
+    void delete_keyed_int (INTVAL* key) {
+    }
+
+    KEY* nextkey_keyed (KEY* key) {
+	return  NULL;
+    }
+
+    KEY* nextkey_keyed_int (INTVAL* key) {
+	return  NULL;
+    }
+
+    void substr (INTVAL offset, INTVAL length, PMC* dest) {
+    }
+
+    void substr_keyed (KEY* key, INTVAL offset, INTVAL length, PMC* dest, KEY* dest_key) {
+    }
+
+    void substr_keyed_int (INTVAL* key, INTVAL offset, INTVAL length, PMC* dest, INTVAL* dest_key) {
+    }
+
+    STRING* substr_str (INTVAL offset, INTVAL length) {
+	return  NULL;
+    }
+
+    STRING* substr_str_keyed (KEY* key, INTVAL offset, INTVAL length) {
+	return  NULL;
+    }
+
+    STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {
+	return  NULL;
+    }
+
+}

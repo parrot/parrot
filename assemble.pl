@@ -173,6 +173,7 @@ sub new {
   $self->{constants}{Coroutine} = 11;
   $self->{constants}{Continuation} = 12;
   $self->{constants}{CSub} = 13;
+  $self->{constants}{MultiArray} = 14;
   $self;
 }
 
