@@ -73,6 +73,12 @@ typedef struct spfinfo_t {
 			break;																			\
 	}
 
+/*
+void int_to_str(char *, char *, HUGEINTVAL, INTVAL );
+*/
+
+void gen_sprintf_call(char *, char* , SpfInfo , const char);
+
 static void uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, INTVAL base) {
 	int i=0, cur;
 
@@ -96,7 +102,7 @@ static void uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num, INTVAL base) {
 	}
 }
 
-void
+static void
 int_to_str(char *buf1, char *buf2, HUGEINTVAL num, INTVAL base) {
 	BOOLVAL neg;
 	int i=0, cur;
@@ -135,7 +141,7 @@ int_to_str(char *buf1, char *buf2, HUGEINTVAL num, INTVAL base) {
 	buf1[i]=0;
 }
 
-void
+static void
 Pad_it(SpfInfo info, char *buf) {
 	int i;
 	int len=strlen(buf);
@@ -145,7 +151,7 @@ Pad_it(SpfInfo info, char *buf) {
 		return;
 	}
 	else if(howmuch < 0) {
-		memmove(buf, buf-howmuch, len+howmuch);
+		memmove(buf, buf-howmuch, (size_t)(len+howmuch));
 	}
 	else if(info->flags & FLAG_MINUS) { /* left-align */
 		for(i=0; i < howmuch; i++) {
@@ -154,8 +160,8 @@ Pad_it(SpfInfo info, char *buf) {
 
 		buf[i+len]=0;
 	}
-	else { /* right-align */
-		memmove(buf+howmuch, buf, len);
+	else { //right-align
+		memmove(buf+howmuch, buf, (size_t)len);
 
 		for(i=0; i < howmuch; i++) {
 			buf[i]=' ';
@@ -208,7 +214,7 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING* pat, va_list *args)
 	register char	*	t1=mem_sys_allocate(4096);
 	register char	*	t2=mem_sys_allocate(4096);
 
-	for(i=0; i < string_length(pat); i++) {
+	for(i=0; i < (INTVAL)string_length(pat); i++) {
 		if(string_ord(pat, i) == '%') {
 			if(string_ord(pat, i+1) == '%') {
 				i++;
@@ -220,12 +226,12 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING* pat, va_list *args)
                          PMC    *       pmc;
 				         double 		dbl;
 				         FLOATVAL		fv;
-				register HUGEINTVAL		theint;
-				register UHUGEINTVAL	theuint;
+				register HUGEINTVAL		theint = 0;
+				register UHUGEINTVAL	theuint = 0;
 	
 				struct spfinfo_t info={0, 0, 0, 0, 0};
 	
-				for(i++; i < string_length(pat) && info.phase != PHASE_DONE; i++) {
+				for(i++; i < (INTVAL)string_length(pat) && info.phase != PHASE_DONE; i++) {
 					char ch=string_ord(pat, i);
 AGAIN:
 					switch(info.phase) {
@@ -358,35 +364,35 @@ AGAIN:
 								/* FLOATS - We cheat on these and use the system sprintf. */
 								case 'e':
 									dbl=va_arg(*args, double);
-									gen_sprintf_call(t1, t2, &info, 'e');
+									gen_sprintf_call(t1, t2, &info, (const char)'e');
 									sprintf(t2, t1, dbl);
 									targ=string_concat(interpreter, targ, cstr2pstr(t2), 0);
 									break;
 
 								case 'E':
 									dbl=va_arg(*args, double);
-									gen_sprintf_call(t1, t2, &info, 'E');
+									gen_sprintf_call(t1, t2, &info, (const char)'E');
 									sprintf(t2, t1, dbl);
 									targ=string_concat(interpreter, targ, cstr2pstr(t2), 0);	
 									break;
 
 								case 'f':
 									dbl=va_arg(*args, double);
-									gen_sprintf_call(t1, t2, &info, 'f');
+									gen_sprintf_call(t1, t2, &info, (const char)'f');
 									sprintf(t2, t1, dbl);
 									targ=string_concat(interpreter, targ, cstr2pstr(t2), 0);
 									break;
 
 								case 'g':
 									dbl=va_arg(*args, double);
-									gen_sprintf_call(t1, t2, &info, 'g');
+									gen_sprintf_call(t1, t2, &info, (const char)'g');
 									sprintf(t2, t1, dbl);
 									targ=string_concat(interpreter, targ, cstr2pstr(t2), 0);
 									break;
 
 								case 'G':
 									dbl=va_arg(*args, double);
-									gen_sprintf_call(t1, t2, &info, 'G');
+									gen_sprintf_call(t1, t2, &info, (const char)'G');
 									sprintf(t2, t1, dbl);
 									targ=string_concat(interpreter, targ, cstr2pstr(t2), 0);
 									break;
