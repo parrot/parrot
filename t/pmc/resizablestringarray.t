@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 12;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -313,4 +313,42 @@ output_is(<< 'CODE', << 'OUTPUT', "push string");
 CODE
 2011
 two zero one zero
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "clone");
+     new P0, .ResizableStringArray
+     set P0, 1024
+     set I0, 0
+L1:  set P0[I0], I0
+     inc I0
+     lt I0, 1024, L1
+     clone P1, P0
+     set P0, 0
+     set S0, P1[0]
+     print S0
+     print "\n"
+     set S0, P1[1023]
+     print S0
+     print "\n"
+     end
+CODE
+0
+1023
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Resizing to negative value");
+     new P0, .ResizableStringArray
+     set P0, -1
+     end
+CODE
+ResizableStringArray: Can't resize!
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "Retrieving from negative index");
+     new P0, .ResizableStringArray
+     set P0, 100
+     set S0, P0[-1]
+     end
+CODE
+ResizableStringArray: index out of bounds!
 OUTPUT
