@@ -47,7 +47,7 @@ sub generate_pbc_for {
     my $pasm_f = Parrot::Test::per_test('.pasm',$count);
 
     Parrot::Test::_run_command("$PConfig{perl} prd-perl6.pl --batch=$p6_f --imc", 'STDOUT' => $imc_f, 'STDERR' => $err_f);
-    Parrot::Test::_run_command("../imcc/imcc $imc_f $pasm_f", 'STDERR' => $err_f);
+    Parrot::Test::_run_command("../imcc/imcc -o $pasm_f $imc_f", 'STDERR' => $err_f);
     my $pasm;
     {
       open PASM, $pasm_f;
