@@ -476,19 +476,22 @@ fixup_bsrs(Interp *interpreter)
                     lab = find_global_label(bsr->name, s, &pc, &s1);
                     /*
                      * if failed change opcode:
-                     * set_p_pc  => find_name p_sc
-                     * the the sub is a multi too
+                     *   set_p_pc  => find_name p_sc
+                     * if a sub label is found
+                     *   convert to find_name, if the sub is a multi
                      */
-                    assert(s1->unit);
-                    if (lab && (s1->unit->type & IMC_PCCSUB)) {
-                        ins = s1->unit->instructions;
-                        assert(ins);
-                        r1 = ins->r[1];
-                        assert(r1);
-                        pcc_sub = r1->pcc_sub;
-                        assert(pcc_sub);
-                        if (pcc_sub->nmulti)
-                            lab = NULL;
+                    if (lab) {
+                        assert(s1->unit);
+                        if (s1->unit->type & IMC_PCCSUB) {
+                            ins = s1->unit->instructions;
+                            assert(ins);
+                            r1 = ins->r[1];
+                            assert(r1);
+                            pcc_sub = r1->pcc_sub;
+                            assert(pcc_sub);
+                            if (pcc_sub->nmulti)
+                                lab = NULL;
+                        }
                     }
                     if (!lab) {
                         int op, col;
