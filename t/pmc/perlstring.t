@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 54;
+use Parrot::Test tests => 65;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -101,6 +101,54 @@ OK5:    print "ok 5\\n"
 OK6:    print "ok 6\\n"
 
         end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set/get string value");
+	new P0, .PerlString
+        set P0, "foo"
+        set S0, P0
+        eq S0, "foo", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P0, "\0"
+        set S0, P0
+        eq S0, "\0", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        set P0, ""
+        set S0, P0
+        eq S0, "", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        set P0, 0
+        set S0, P0
+        eq S0, "0", OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        set P0, 0.0
+        set S0, P0
+        eq S0, "0", OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        set P0, "0b000001"
+        set S0, P0
+        eq S0, "0b000001", OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+	end
 CODE
 ok 1
 ok 2
@@ -204,6 +252,35 @@ ok 5
 ok 6
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "assign string");
+    new P0, .PerlInt
+    assign P0, "Albert"
+    print P0
+    print "\n"
+
+    new P1, .PerlNum
+    assign P1, "Beth"
+    print P1
+    print "\n"
+
+    new P2, .PerlString
+    assign P2, "Charlie"
+    print P2
+    print "\n"
+
+    new P3, .PerlUndef
+    assign P3, "Doris"
+    print P3
+    print "\n"
+
+    end
+CODE
+Albert
+Beth
+Charlie
+Doris
+OUTPUT
+
 output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
 	new P0, .PerlString
 	new P1, .PerlString
@@ -290,6 +367,305 @@ C2H5OH
 C2H5OH + 10H20
 OUTPUT
 
+#
+# Basic string number conversion
+#
+output_is(<<CODE, <<OUTPUT, "string to int");
+	new	P0, .PerlString
+
+	set	P0, "1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, " 1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, "-1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\\n"
+
+	set	P0, "dull and void"
+	set	I0, P0
+	print	I0
+	print	"\\n"
+
+	set	P0, ""
+	set	I0, P0
+	print	I0
+	print	"\\n"
+	end
+CODE
+11
+1 1
+-1-1
+0
+0
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "nasty string -> int");
+	new	P0, .PerlInt
+	set	P0, "Z1"
+	set	I0, P0
+	print	I0
+	print	P0
+	print	"\n"
+
+	set	P0, "\x0 1"
+	set	I0, P0
+	print	I0
+	print	"\n"
+
+	set	P0, "1.23e2"
+	set	I0, P0
+	print	I0
+	print	"\n"
+       end
+CODE
+0Z1
+0
+123
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "string to number conversion");
+@{[ $fp_equality_macro ]}
+	new	P0, .PerlNum
+
+	set	P0, "1"
+	set	N0, P0
+	.fp_eq(	N0, 1, EQ1)
+	print	N0
+	print	"not "
+EQ1:	print	"ok 1\\n"
+
+	set	P0, "1.2"
+	set	N0, P0
+	.fp_eq(	N0, 1.2, EQ2)
+	print	N0
+	print	"not "
+EQ2:	print	"ok 2\\n"
+
+	set	P0, "1.2e1"
+	set	N0, P0
+	.fp_eq(	N0, 12, EQ3)
+	print	N0
+	print	"not "
+EQ3:	print	"ok 3\\n"
+
+	set	P0, "1.2e-1"
+	set	N0, P0
+	.fp_eq(	N0, 0.12, EQ4)
+	print	N0
+	print	"not "
+EQ4:	print	"ok 4\\n"
+
+	set	P0, "1.2e2.1"
+	set	N0, P0
+	.fp_eq(	N0, 120, EQ5)
+	print	N0
+	print	"not "
+EQ5:	print	"ok 5\\n"
+
+	set	P0, "X1.2X"
+	set	N0, P0
+	.fp_eq(	N0, 0.0, EQ6)
+	print	N0
+	print	"not "
+EQ6:	print	"ok 6\\n"
+
+	set	P0, "E1-1.2e+2"
+	set	N0, P0
+	.fp_eq(	N0, 0.0, EQ7)
+	print	N0
+	print	"not "
+EQ7:	print	"ok 7\\n"
+
+	set	P0, "++-1"
+	set	N0, P0
+	.fp_eq(	N0, 0.0, EQ8)
+	print	N0
+	print	"not "
+EQ8:	print	"ok 8\\n"
+
+	set	P0, "1234.1234.5"
+	set	N0, P0
+	.fp_eq(	N0, 1234.1234, EQ9)
+	print	N0
+	print	"not "
+EQ9:	print	"ok 9\\n"
+
+	set	P0, "this is empty!"
+	set	N0, P0
+	.fp_eq(	N0, 0.0, EQ10)
+	print	N0
+	print	" not "
+EQ10:	print	"ok 10\\n"
+
+	set	P0, "0e123"
+	set	N0, P0
+	.fp_eq(	N0, 0, EQ11)
+	print	N0
+	print	" not "
+EQ11:	print	"ok 11\\n"
+
+	set	P0, "000000000000000000000000000000000000000001e-0"
+	set	N0, P0
+	.fp_eq(	N0, 1, EQ12)
+	print	N0
+	print	" not "
+EQ12:	print	"ok 12\\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+ok 11
+ok 12
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate string to number");
+	new P0, .PerlString
+	new P1, .PerlNum
+	set P0, "bar"
+	set P1, 2.7
+	concat P0,P0,P1
+	print P0
+	print "\n"
+	end
+CODE
+bar2.700000
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
+	new P0, .PerlString
+	new P1, .PerlString
+	set P0, "foo"
+	set P1, "bar"
+	concat P0,P0,P1
+	print P0
+	print "\n"
+	end
+CODE
+foobar
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate <foo> to undef");
+	new P0, .PerlUndef
+	new P1, .PerlInt
+	set P1, 10
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "10", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlNum
+	set P1, 1.2
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "1.200000", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlString
+	set P1, "Foo"
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "Foo", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlUndef
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "", OK4
+        print "not "
+OK4:    print "ok 4\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate undef to <foo>");
+	new P0, .PerlUndef
+	new P1, .PerlInt
+	set P1, 10
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "10", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlNum
+	set P1, 1.2
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "1.200000", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlString
+	set P1, "Foo"
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "Foo", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate STRING to undef");
+	new P0, .PerlUndef
+	concat P0, P0, "Foo"
+        set S0, P0
+        eq S0, "Foo", OK1
+        print "not "
+OK1:    print "ok 1\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate number to string");
+	new P0, .PerlNum
+	new P1, .PerlString
+	set P0, 5.43
+	set P1, "bar"
+	concat P0,P0,P1
+	print P0
+	print "\n"
+	end
+CODE
+5.430000bar
+OUTPUT
+
 output_is(<<'CODE', <<OUTPUT, "repeat");
 	new P0, .PerlString
 	set P0, "x"
@@ -347,7 +723,6 @@ CODE
 xxxxxxxxxxxx
 zazaza
 OUTPUT
-
 
 output_is(<<CODE, <<OUTPUT, "if(PerlString)");
         new P0, .PerlString

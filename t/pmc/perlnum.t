@@ -16,7 +16,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 49;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -60,6 +60,140 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 	restore	N0
 .endm
 ENDOFMACRO
+
+output_is(<<'CODE', <<'OUTPUT', "set/get string value");
+	new P0, .PerlString
+        set P0, "bar"
+        set S0, P0
+        eq S0, "bar", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P0, "\0"
+        set S0, P0
+        eq S0, "\0", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        set P0, ""
+        set S0, P0
+        eq S0, "", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        set P0, -1
+        set S0, P0
+        eq S0, "-1", OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        set P0, -1.0
+        set S0, P0
+        eq S0, "-1", OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        set P0, "1.23e23"
+        set S0, P0
+        eq S0, "1.23e23", OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "assign number");
+@{[ $fp_equality_macro ]}
+    new P0, .PerlInt
+    assign P0, 42.21
+    .fp_eq(P0, 42.21, OK1)
+    print  "not "
+OK1:
+    print  "ok 1\\n"
+
+    new P1, .PerlNum
+    assign P1, 21.01
+    .fp_eq(P1, 21.01, OK2)
+    print  "not "
+OK2:
+    print  "ok 2\\n"
+
+    new P2, .PerlString
+    assign P2, 7.65
+    .fp_eq(P2, 7.65, OK3)
+    print  "not "
+OK3:
+    print  "ok 3\\n"
+
+    new P3, .PerlUndef
+    assign P3, 1.23
+    .fp_eq(P3, 1.23, OK4)
+    print  "not "
+OK4:
+    print  "ok 4\\n"
+
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add number to string integer");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlString
+	set P0, 6.1
+	set P1, "7"
+	add P0,P0,P1
+	.fp_eq( P0, 13.1, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add number to string");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlString
+	set P0, 6.1
+	set P1, "ab"
+	add P0,P0,P1
+	.fp_eq( P0, 6.1, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "add number to string number");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlNum
+	new P1, .PerlString
+	set P0, 6.1
+	set P1, "7.5"
+	add P0,P0,P1
+	.fp_eq( P0, 13.6, EQ1)
+	print P0
+	print "not "
+EQ1:	print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "add number to self");
 @{[ $fp_equality_macro ]}
@@ -678,6 +812,34 @@ OK2:    print "ok 2\\n"
         print "not "
 OK3:    print "ok 3\\n"
         end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "p =  fmod(p,p)");
+@{[ $fp_equality_macro ]}
+	new 	P0, .PerlNum
+	new	P1, .PerlNum
+	new	P2, .PerlNum
+        new     P3, .PerlInt
+	set	P0, 13.4
+	set	P1, 6.0
+	cmod	P2, P0, P1
+        .fp_eq(P2, 1.4, OK1)
+        print "not "
+OK1:    print "ok 1\\n"
+        set     P0, -25.1
+	cmod	P3, P0, P1
+        .fp_eq(P3, -1.1, OK2)
+        print "not "
+OK2:    print "ok 2\\n"
+	cmod	P0, P0, P1
+        .fp_eq(P0, -1.1, OK3)
+        print "not "
+OK3:    print "ok 3\\n"
+	end
 CODE
 ok 1
 ok 2
