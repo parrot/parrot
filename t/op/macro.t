@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
@@ -170,7 +170,7 @@ OUTPUT
 
 open FOO, ">macro.tempfile";   # Clobber previous
 print FOO <<'ENDF';
-  .macro multiply(A,B) 
+  .macro multiply(A,B)
     new P0, .PerlNum
     set P0, .A
     new P1, .PerlNum
@@ -190,6 +190,15 @@ output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
 CODE
 156
 OUTPUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "find file in runtime includes");
+    .include "stdio.pasm"
+    print .PIO_STDOUT_FILENO, "ok\n"
+    end
+CODE
+ok
+OUT
 
 open FOO, ">macro.tempfile";   # Clobber previous
 close FOO;

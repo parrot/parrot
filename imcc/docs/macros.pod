@@ -60,6 +60,9 @@ Several constants are predefined, namely the PMC-Classes.
 The ".include" statement is followed by a string literal. The file of
 this name is include literally in the assembly.
 
+The include file is searched in the current directory and in
+F<runtime/parrot/include> in that order.
+
 =head2 Expansion
 
 Constant definitions have the form
