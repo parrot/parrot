@@ -276,7 +276,7 @@ save_regs(Parrot_Interp interpreter, PMC *sub)
 void *
 Parrot_save_register_frames(Parrot_Interp interpreter, PMC *sub)
 {
-    save_regs(interpreter, sub);
+    return save_regs(interpreter, sub);
 }
 
 PARROT_INLINE static void
