@@ -1,4 +1,3 @@
-mops.c
-mops.o
-mops
 *.pbc
+mops.c
+mops
