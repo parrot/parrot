@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 output_is(<<CODE, <<OUTPUT, "ensure that concat ppp copies strings");
 	new P0, PerlString
@@ -95,6 +95,58 @@ CODE
 x
 12
 xxxxxxxxxxxx
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "if(PerlString)");
+        new P0, PerlString
+	set S0, "True"
+	set P0, S0
+        if P0, TRUE
+        print "false"
+        branch NEXT
+TRUE:   print "true"
+NEXT:   print "\\n"
+  
+        new P1, PerlString
+        set S1, ""
+        set P1, S1
+        if P1, TRUE2
+        print "false"
+        branch NEXT2
+TRUE2:  print "true"
+NEXT2:  print "\\n"
+
+        new P2, PerlString
+        set S2, "0"
+        set P2, S2
+        if P2, TRUE3
+        print "false"
+        branch NEXT3
+TRUE3:  print "true"
+NEXT3:  print "\\n"
+
+        new P3, PerlString
+        set S3, "0123"
+        set P3, S3
+        if P3, TRUE4
+        print "false"
+        branch NEXT4
+TRUE4:  print "true"
+NEXT4:  print "\\n"
+
+        new P4, PerlString
+        if P4, TRUE5
+        print "false"
+        branch NEXT5
+TRUE5:  print "true"
+NEXT5:  print "\\n"
+        end
+CODE
+true
+false
+false
+true
+false
 OUTPUT
 
 1;
