@@ -100,7 +100,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
 
 #ifndef BROKEN_ISREG
-        /* S_ISREG is strangely broken my lcc/linux install (though it did 
+        /* S_ISREG is strangely broken my lcc/linux install (though it did
 	 * once work */
         if (!S_ISREG(file_stat.st_mode)) {
             PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n",
@@ -243,7 +243,7 @@ again:
 #ifdef HAS_HEADER_SYSMMAN
 
     if (fd >= 0) {
-        close(fd);   /* the man page states, it's ok to clode a mmaped file */
+        close(fd);   /* the man page states, it's ok to close a mmaped file */
     }
 #else
     mem_sys_free(program_code);
@@ -273,7 +273,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     userargv = pmc_new_noinit(interpreter, enum_class_PerlArray);
     /* immediately anchor pmc to root set */
     interpreter->ctx.pmc_reg.registers[0] = userargv;
-    userargv->vtable->init(interpreter, userargv);
+    VTABLE_init(interpreter, userargv);
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
@@ -284,7 +284,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);
         }
 
-        userargv->vtable->push_string(interpreter, userargv, arg);
+        VTABLE_push_string(interpreter, userargv, arg);
     }
 }
 
@@ -296,10 +296,16 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         PIO_eprintf(interpreter, "*** Parrot VM: Debugging enabled. ***\n");
 
         if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
-            PIO_eprintf(interpreter, "*** Parrot VM: Bounds checking enabled. ***\n");
+            PIO_eprintf(interpreter,
+                    "*** Parrot VM: Bounds checking enabled. ***\n");
         }
         if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            PIO_eprintf(interpreter, "*** Parrot VM: Predereferencing enabled. ***\n");
+            PIO_eprintf(interpreter,
+                    "*** Parrot VM: Predereferencing enabled. ***\n");
+        }
+        if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG)) {
+            PIO_eprintf(interpreter,
+                    "*** Parrot VM: Switched core enabled. ***\n");
         }
         if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
             PIO_eprintf(interpreter, "*** Parrot VM: JIT enabled. ***\n");

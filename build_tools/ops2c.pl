@@ -131,9 +131,10 @@ print HEADER <<END_C;
 extern op_lib_t *Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init);
 
 END_C
-my $cg_func = $suffix =~ /cgp/ ? 'cgp_' : 'cg_';
+my $cg_func = $suffix =~ /cgp/ ? 'cgp_' :
+              $suffix =~ /switch/ ? 'switch_' : 'cg_';
 
-if ($suffix =~ /cg/) {
+if ($suffix =~ /cg/ || $suffix =~ /switch/) {
 	print HEADER <<END_C;
 
 opcode_t *$cg_func${base}(opcode_t *, struct Parrot_Interp *);
@@ -166,7 +167,17 @@ $cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
     static void *ops_addr[] = {
 END_C
 
+} elsif ($suffix =~ /switch/) {
+	print SOURCE <<END_C;
+opcode_t *
+$cg_func$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
+{
+    do {
+    SWITCH_AGAIN:
+    switch (*cur_opcode) {
+END_C
 }
+
 
 #
 # Iterate over the ops, appending HEADER and SOURCE fragments:
@@ -190,6 +201,11 @@ foreach my $op ($ops->ops) {
 	$prev_def = $definition = "PC_$index:";
 	$comment =  "/* ". $op->func_name ." */";
 	push @cg_jump_table, "        &&PC_$index,\n";
+    } elsif ($suffix =~ /switch/) {
+	$comment =  "/* ". $op->func_name ." */";
+	push @op_funcs, <<END_C;
+	case $index:	$comment
+END_C
     }
     else {
 	$definition = "static $opsarraytype *\n$func_name ($args)";
@@ -222,11 +238,23 @@ EOF
 	    pop @cg_jump_table;
 	    push @cg_jump_table, $cg_jump_table[-1];
 	}
+	if ($suffix =~ /switch/) {
+	    my $bdy = pop @op_funcs;
+	    my $cas = pop @op_funcs;
+	    $bdy = pop @op_funcs;
+	    push @op_funcs, $cas;
+	    push @op_funcs, $bdy;
+	}
     }
     else {
-	push @op_func_table, sprintf("  %-50s /* %6ld */\n",
-	    "$func_name,", $index);
-	push @op_funcs,      "$definition $comment {\n$source}\n\n";
+	if ($suffix =~ /switch/) {
+	    push @op_funcs,"\t{\n$source}\n\n";
+	}
+	else {
+	    push @op_func_table, sprintf("  %-50s /* %6ld */\n",
+		"$func_name,", $index);
+	    push @op_funcs,      "$definition $comment {\n$source}\n\n";
+	}
 	$prev_source = $source;
 	$prev_func_name = $func_name;
     }
@@ -296,6 +324,17 @@ if ($suffix =~ /cg/) {
 } /* $cg_func$base */
 
 END_C
+} elsif ($suffix =~ /switch/) {
+    print SOURCE <<END_C;
+    default:
+        internal_exception(1, "illegal opcode\n");
+	break;
+} /* switch */
+} while (1);
+    return NULL;
+} /* $cg_func$base */
+
+END_C
 }
 
 #
@@ -318,7 +357,7 @@ my ($op_info, $op_func, $getop);
 $op_info = $op_func = 'NULL';
 $getop = '( int (*)(const char *, int) )NULL';
 
-if ($suffix !~ /cg/) {
+if ($suffix !~ /cg/ && $suffix !~ /switch/) {
     $op_func = 'op_func_table';
     print SOURCE <<END_C;
 

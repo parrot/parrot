@@ -27,6 +27,7 @@ static struct longopt_opt_decl options[] = {
     { 'j', 'j', 0,       { "--jit", NULL } },
     { 'p', 'p', 0,       { "--profiling", NULL } },
     { 'P', 'P', 0,       { "--predereferencing", NULL } },
+    { 'S', 'S', 0,       { "--switched_core", NULL } },
     { 'g', 'g', 0,       { "--no-computed-goto", NULL } },
     { 't', 't', 0,       { "--tracing", NULL } },
     { 'v', 'v', 0,       { "--version", NULL } },
@@ -75,7 +76,7 @@ char *
 parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    
+
     if (*argc == 1) {
         usage();
     }
@@ -83,7 +84,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
     ++*argv;
     --*argc;
     opt.opt_index = 0;
-    
+
 
 #ifdef HAVE_COMPUTED_GOTO
     setopt(PARROT_CGOTO_FLAG);
@@ -94,7 +95,7 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
             Parrot_exit(1);
         }
-        
+
         switch (opt.opt_id) {
         case 'b':
             setopt(PARROT_BOUNDS_FLAG);
@@ -107,6 +108,9 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             break;
         case 'P':
             setopt(PARROT_PREDEREF_FLAG);
+            break;
+        case 'S':
+            setopt(PARROT_SWITCH_FLAG);
             break;
         case 'g':
             unsetopt(PARROT_CGOTO_FLAG);
@@ -171,6 +175,7 @@ usage(void)
   -j  --jit                     Activate Just-In-Time compiler\n\
   -p  --profiling               Activate profiling\n\
   -P  --predereferencing        Activate predereferencing\n\
+  -S  --switched_core           Activate switched core\n\
   -g  --no-computed-goto        %s\n\
   -t  --tracing                 Activate tracing\n\
   -v  --version                 Display version information\n\

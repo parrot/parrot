@@ -61,9 +61,11 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 GEN_OPSFILES =
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-	$(INC)/oplib/core_ops_prederef.h
+	$(INC)/oplib/core_ops_prederef.h \
+	$(INC)/oplib/core_ops_switch.h
 
-GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c
+GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c \
+              core_ops_switch.c
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
@@ -81,6 +83,7 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h \
 	$(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h \
 	$(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
+	$(INC)/oplib/core_ops_switch.h \
 	$(INC)/runops_cores.h $(INC)/trace.h $(INC)/pmc.h $(INC)/key.h \
 	$(INC)/hash.h $(INC)/resources.h $(INC)/core_pmcs.h \
 	$(INC)/platform.h ${cg_h} $(INC)/interp_guts.h $(INC)/rx.h \
@@ -109,7 +112,8 @@ IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
 	io/io_stdio$(O)
 
 INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
-	register$(O) core_ops$(O) core_ops_prederef$(O) memory$(O) \
+	register$(O) core_ops$(O) core_ops_prederef$(O) core_ops_switch$(O) \
+	memory$(O) \
 	packfile$(O) stacks$(O) string$(O) sub$(O) encoding$(O) \
 	chartype$(O) runops_cores$(O) trace$(O) pmc$(O) key$(O) hash$(O) \
 	core_pmcs$(O) platform$(O) ${jit_o} \
@@ -169,7 +173,7 @@ LINTFLAGS2 = $(LINTFLAGS) -ansireserved -retvalother -bitwisesigned
 
 # added to lint target to simplify experimentation,
 # ex: make LINTOPTS='-posixstrictlibs +posixlibs' lint
-LINTOPTS = 
+LINTOPTS =
 
 ###############################################################################
 #
@@ -461,6 +465,11 @@ core_ops_prederef$(O) : $(GENERAL_H_FILES) core_ops_prederef.c
 
 core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
+
+core_ops_switch$(O) : $(GENERAL_H_FILES) core_ops_switch.c
+
+core_ops_switch.c $(INC)/oplib/core_ops_switch.h : $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h
+	$(PERL) ops2c.pl CSwitch $(OPS_FILES)
 
 ${cg_c}
 

@@ -1324,6 +1324,7 @@ languages/BASIC/compiler/COMP_parser.pm
 languages/BASIC/compiler/COMP_toker.pm
 languages/BASIC/compiler/RT_aggregates.pasm
 languages/BASIC/compiler/RT_builtins.pasm
+languages/BASIC/compiler/RT_debugger.pasm
 languages/BASIC/compiler/RT_expr.pasm
 languages/BASIC/compiler/RT_initialize.pasm
 languages/BASIC/compiler/RT_io.pasm
@@ -1337,6 +1338,7 @@ languages/BASIC/compiler/RT_variables.pasm
 languages/BASIC/compiler/compile.pl
 languages/BASIC/compiler/readme.bas
 languages/BASIC/compiler/samples/conn4.bas
+languages/BASIC/compiler/samples/chess.bas
 languages/BASIC/compiler/samples/eliza2.bas
 languages/BASIC/compiler/samples/hanoi.bas
 languages/BASIC/compiler/samples/newtrek.bas

@@ -84,6 +84,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
             case 'P':
                 setopt(PARROT_PREDEREF_FLAG);
                 break;
+            case 'S':
+                setopt(PARROT_SWITCH_FLAG);
+                break;
             case 'g':
                 unsetopt(PARROT_CGOTO_FLAG);
                 break;

@@ -15,6 +15,7 @@
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_prederef.h"
+#include "parrot/oplib/core_ops_switch.h"
 #include "parrot/runops_cores.h"
 #ifdef HAS_JIT
 #  include "parrot/jit.h"
@@ -117,6 +118,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
             pc_prederef[i] = (void *)&interpreter->ctx.num_reg.registers[pc[i]];
             break;
 
+        case PARROT_ARG_K:
         case PARROT_ARG_P:
             pc_prederef[i] = (void *)&interpreter->ctx.pmc_reg.registers[pc[i]];
             break;
@@ -205,8 +207,20 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
+        if (cgp == 2) {
+            opcode_t *pc = interpreter->code->cur_cs->base.data;
+            size_t n;
+            for (i = 0; i < N; ) {
+                prederef(temp, interpreter);
+                *temp = (void**) *pc;
+                n = interpreter->op_info_table[*pc].arg_count;
+                pc += n;
+                i += n;
+                temp += n;
+            }
+        }
 #ifdef HAVE_COMPUTED_GOTO
-        if (cgp) {
+        if (cgp == 1) {
             opcode_t *pc = interpreter->code->cur_cs->base.data;
             size_t n;
             for (i = 0; i < N; ) {
@@ -316,6 +330,17 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 }
 
+static opcode_t *
+runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
+    void **pc_prederef;
+    init_prederef(interpreter, 2);
+    pc_prederef = interpreter->prederef_code + (pc - code_start);
+    pc = switch_core((opcode_t*)pc_prederef, interpreter);
+    return pc;
+}
+
 /*=for api interpreter runops
  * run parrot operations of loaded code segment until an end opcode is reached
  * run core is selected depending on the Interp_flags
@@ -355,6 +380,9 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
             }
         }
         /* CGOTO is set per default, so test other cores first */
+        else if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG)) {
+            core = runops_switch;
+        }
         else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
             if  (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG))
                 core = runops_cgp;
@@ -748,12 +776,12 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
     if (!interpreter->Parrot_compreg_hash) {
         hash = interpreter->Parrot_compreg_hash =
             pmc_new_noinit(interpreter, enum_class_PerlHash);
-        hash->vtable->init(interpreter, hash);
+        VTABLE_init(interpreter, hash);
     }
     else
         hash = interpreter->Parrot_compreg_hash;
     key = key_new_string(interpreter, type);
-    hash->vtable->set_pmc_keyed(interpreter, hash, key, func, NULL);
+    VTABLE_set_pmc_keyed(interpreter, hash, key, func, NULL);
 }
 
 
@@ -766,7 +794,7 @@ static void setup_default_compreg(Parrot_Interp interpreter)
     /* register the nci ccompiler object */
     Parrot_compreg(interpreter, pasm1, nci);
     /* build native call interface */
-    nci->vtable->set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p),
+    VTABLE_set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p),
             string_make(interpreter, "pIt", 3, NULL,0,NULL));
 }
 

@@ -1723,6 +1723,7 @@
 [devel]		lib/Parrot/OpTrans/CGoto.pm
 [devel]		lib/Parrot/OpTrans/CPrederef.pm
 [devel]		lib/Parrot/OpTrans/Compiled.pm
+[devel]		lib/Parrot/OpTrans/CSwitch.pm
 [devel]		lib/Parrot/OpsFile.pm
 [devel]		lib/Parrot/Optimizer.pm
 [devel]		lib/Parrot/PackFile.pm
