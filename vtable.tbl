@@ -1,6 +1,13 @@
 # $Id$
 # [MAIN] #default section name
 
+# if there are native MMD variants be sure that:
+#   n   := PMC
+#   n+1 := _INT or _STR
+#   n+2 := _FLOAT
+# MMD_EQ ... MMD_STRCMP must be in one block
+# see src/mmd.c
+
 void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
@@ -166,8 +173,8 @@ void cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
 void cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
 
 void pow(PMC* value, PMC* dest)        MMD_POW
-void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
 void pow_int(INTVAL value, PMC* dest) MMD_POW_INT
+void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
 
 void neg(PMC* dest)
 

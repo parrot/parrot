@@ -267,18 +267,6 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "built in INTVAL");
-    new P0, .Integer
-    new P1, .Integer
-    set P1, 3
-    bxor P0, P1, 2
-    print P0
-    print "\n"
-    end
-CODE
-1
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "PASM INTVAL");
 .include "pmctypes.pasm"
 .include "mmd.pasm"
@@ -664,4 +652,20 @@ PerlSt ok 2
 Any    42
 Any    43
 OUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "__add as method");
+.sub main @MAIN
+    new $P0, .Integer
+    new $P1, .Integer
+    new $P2, .Integer
+    set $P1, 3
+    set $P2, 39
+    $P0 = $P1."__add"($P2)
+    print $P0
+    print "\n"
+    end
+.end
+CODE
+42
+OUTPUT
 

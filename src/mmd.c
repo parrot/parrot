@@ -1322,6 +1322,110 @@ mmd_search_builtin(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
     return 0;
 }
 
+static void
+mmd_create_builtin_multi_stub(Interp *interpreter, INTVAL func_nr)
+{
+    const char *name;
+    STRING *s, *ns;
+    int len;
+    char *p;
+    PMC *multi;
+
+    name = Parrot_MMD_methode_name(interpreter, func_nr);
+    /*
+     * _int, _float, _str are just native variants of the base
+     * multi
+     */
+    len = strlen(name);
+    p = strstr(name, "_int");
+    if (p && (p - name) == len - 4)
+        return;
+    p = strstr(name, "_str");
+    if (p && (p - name) == len - 4)
+        return;
+    p = strstr(name, "_float");
+    if (p && (p - name) == len - 6)
+        return;
+    ns = CONST_STRING(interpreter, "__parrot_core");
+    s =  const_string(interpreter, name);
+    /* create in constant pool */
+    multi = constant_pmc_new(interpreter, enum_class_MultiSub);
+    Parrot_store_global(interpreter, ns, s, multi);
+}
+
+static void
+mmd_create_builtin_multi_meth(Interp *interpreter, const MMD_init *entry)
+{
+    const char *name, *short_name;
+    char signature[6], val_sig;
+    STRING *s, *ns;
+    int len;
+    char *p;
+    PMC *method, *multi;
+    INTVAL func_nr;
+
+
+    func_nr = entry->func_nr;
+    name = short_name = Parrot_MMD_methode_name(interpreter, func_nr);
+    /*
+     * _int, _float, _str are just native variants of the base
+     * multi
+     */
+    val_sig = 'P';
+    len = strlen(name);
+    p = strstr(name, "_int");
+    if (p && (p - name) == len - 4) {
+        short_name = Parrot_MMD_methode_name(interpreter, func_nr - 1);
+        val_sig = 'I';
+    }
+    else {
+        p = strstr(name, "_str");
+        if (p && (p - name) == len - 4) {
+            short_name = Parrot_MMD_methode_name(interpreter, func_nr - 1);
+            val_sig = 'S';
+        }
+        else {
+            p = strstr(name, "_float");
+            if (p && (p - name) == len - 6) {
+                short_name = Parrot_MMD_methode_name(interpreter, func_nr - 2);
+                val_sig = 'N';
+            }
+        }
+    }
+#if 0
+    /*
+     * create NCI method in left class
+     */
+    s = const_string(interpreter, name);
+    strcpy(signature, "vIP.P");
+    signature[3] = val_sig;
+    if (func_nr >= MMD_EQ && func_nr <= MMD_STRCMP) {
+        signature[0] = 'I';
+        signature[4] = '\0';
+    }
+    method = pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_pointer_keyed_str(interpreter, method,
+            const_string(interpreter, signature),
+            F2DPTR(entry->func_ptr));
+    Parrot_store_global(interpreter,
+        Parrot_base_vtables[entry->left]->whoami,
+        const_string(interpreter, name),
+        method);
+
+    /*
+     * push method on multi_sub
+     */
+    ns = CONST_STRING(interpreter, "__parrot_core");
+    multi = Parrot_find_global(interpreter, ns,
+            const_string(interpreter, short_name));
+    assert(multi);
+    /*
+     * FIXME need the multi signature too
+     */
+    VTABLE_push_pmc(interpreter, multi, method);
+#endif
+}
+
 /*
 
 =item C<void Parrot_mmd_register_table(Interp*, INTVAL type,
@@ -1342,23 +1446,29 @@ Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
     MMD_table *table;
 
     table = interpreter->binop_mmd_funcs;
-    if (table->x < type && type < enum_class_core_max) {
+    if ((INTVAL)table->x < type && type < enum_class_core_max) {
         /*
          * pre-alloacte the function table
          */
         for (i = 0; i < MMD_USER_FIRST; ++i) {
             mmd_register(interpreter, i, enum_class_core_max - 1,
                     enum_class_core_max - 1, NULL);
+            /*
+             * create a MultiSub stub
+             */
+            mmd_create_builtin_multi_stub(interpreter, i);
         }
     }
     /*
      * register default mmds for this type
      */
     for (i = 0; i < n; ++i) {
-        if (mmd_table[i].right <= 0)
+        if (mmd_table[i].right == enum_type_PMC) {
             mmd_register(interpreter,
                     mmd_table[i].func_nr, type,
                     type, mmd_table[i].func_ptr);
+        }
+        mmd_create_builtin_multi_meth(interpreter, mmd_table + i);
     }
     /*
      * register specific mmds for this type

@@ -763,7 +763,7 @@ sub init_func() {
             # dynamic classes need the runtime type
             # which is passed in entry to class_init
             $left = 0;  # set to 'entry' below in initialization loop.
-            $right = 0;
+            $right = 'enum_type_PMC';
             $right = 'enum_type_INTVAL'   if ($func =~ /_INT$/);
             $right = 'enum_type_FLOATVAL' if ($func =~ /_FLOAT$/);
             push @mmds, [ $func, $left, $right, $meth_name ];
@@ -811,7 +811,8 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 EOC
 
     my $const = ($self->{flags}{dynpmc}) ? " " : " const ";
-    $cout .= <<"EOC";
+    if (scalar @mmds) {
+        $cout .= <<"EOC";
 
    $const MMD_init _temp_mmd_init[] = {
         $mmd_list
@@ -820,6 +821,7 @@ EOC
 	which is passed in entry to class_init.
     */
 EOC
+    }
 
     $cout .= <<"EOC";
     if (pass == 0) {
@@ -920,11 +922,16 @@ EOC
         assert(my_enum_class_$dynclass != enum_class_default);
 EOC
     }
-    $cout .= <<"EOC";
+    if (scalar @mmds) {
+        $cout .= <<"EOC";
 #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
         Parrot_mmd_register_table(interp, entry,
             _temp_mmd_init, N_MMD_INIT);
+EOC
     }
+
+    $cout .= <<"EOC";
+    } /* pass */
 } /* Parrot_${classname}_class_init */
 EOC
     if ($self->{flags}{dynpmc}) {
