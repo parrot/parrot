@@ -45,7 +45,11 @@ END
 
     my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
     print OUT "    enum_class_default,\n";
-    print OUT "    enum_class_$_,\n" foreach (@pmcs);
+    my $i = 1;
+    foreach (@pmcs) {
+      print OUT "    enum_class_$_,\t/*  $i */ \n";
+      $i++;
+    }
     print OUT <<"END";
     enum_class_core_max
 };

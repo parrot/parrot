@@ -53,6 +53,39 @@ sub pmc_parents {
     return @parents;
 }
 
+sub get_pmc_order {
+  open IN, 'classes/pmc.num' or die "Can't read classes/pmc.num";
+  my %order;
+  while (<IN>) {
+    next if (/^#/);
+    if (/(\w+\.\w+)\s+(\d+)/) {
+      $order{$1} = $2;
+    }
+  }
+  close IN;
+  return \%order;
+}
+
+sub sort_pmcs {
+  my @pmcs = @_;
+  my $pmc_order = get_pmc_order();
+  my $n = scalar keys(%{$pmc_order});
+  my @sorted_pmcs;
+  for (@pmcs) {
+    if (exists $pmc_order->{$_}) {
+      $sorted_pmcs[$pmc_order->{$_}] = $_;
+      #if (exists $pmc_order->{"const$_"}) {
+      #	$sorted_pmcs[$pmc_order->{"const$_"}] = "const$_";
+      #}
+    }
+    else {
+      $sorted_pmcs[$n++] = $_;
+    }
+  }
+  ## print "***\n", join(' ', @sorted_pmcs), "\n";
+  @sorted_pmcs;
+}
+
 sub runstep {
   my @pmc=(
     sort
@@ -60,8 +93,9 @@ sub runstep {
     glob "./classes/*.pmc"
   );
 
+  @pmc = sort_pmcs(@pmc);
 
-  my $pmc_list = $_[1] || join(' ', @pmc);
+  my $pmc_list = $_[1] || join(' ', grep {defined $_} @pmc);
 
   if($_[0]) {
   print <<"END";
@@ -90,6 +124,7 @@ E_NOTE
 
   foreach my $pmc (split(/\s+/, $pmc_list)) {
       $pmc =~ s/\.pmc$//;
+      next if ($pmc =~ /^const/);
 
       # make each pmc depend upon its parent.
       my $parent = pmc_parent($pmc).".pmc";
@@ -126,6 +161,7 @@ END
   # non-abstract built-in PMCs.
   my @names;
   PMC: foreach my $pmc_file (split(/\s+/, $pmc_list)) {
+      next if ($pmc_file =~ /^const/);
       my $name;
       open(PMC, "classes/$pmc_file") or die "open classes/$pmc_file: $!";
       my $const;

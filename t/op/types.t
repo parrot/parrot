@@ -39,10 +39,6 @@ cont:
 
 ok:
 	print "ok 1\n"
-	typeof S0, 1
-	# other types are tested in t/pmc/pmc.t
-	ne S0, "Array", nok4
-	print "ok 2\n"
 	end
 
 nok1:	print "first type (INTVAL) not found\n"
@@ -63,7 +59,6 @@ nok5:   print "invalid typename not 'illegal'\n"
 	end
 CODE
 ok 1
-ok 2
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
