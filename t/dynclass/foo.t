@@ -16,9 +16,9 @@ Tests the Foo PMC.
 
 =cut
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
-pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
+pir_output_is(<< 'CODE', << 'OUTPUT', "get_integer");
 
 .sub main @MAIN
     loadlib P1, "foo"
@@ -31,4 +31,27 @@ pir_output_is(<< 'CODE', << 'OUTPUT', "abs");
 .end
 CODE
 42
+OUTPUT
+
+pir_output_is(<< 'CODE', << 'OUTPUT', "inherited add");
+.sub _main @MAIN
+    .local pmc d, l, r
+    $P0 = loadlib "foo"
+    print "ok\n"
+    l = new "Foo"
+    l = 3
+    r = new BigInt
+    r = 0x7ffffff
+    d = new Undef
+    add d, l, r
+    print d
+    print "\n"
+    $S0 = typeof d
+    print $S0
+    print "\n"
+.end
+CODE
+ok
+134217730
+BigInt
 OUTPUT

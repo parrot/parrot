@@ -1605,27 +1605,32 @@ mmd_rebuild_1(Interp* interpreter, UINTVAL type, INTVAL func_nr)
     table = interpreter->binop_mmd_funcs + func_nr;
     x_funcs = table->x;
     y_funcs = table->y;
-    if (type >= x_funcs)
-        return;
+    /* preallocat slot, resize */
+    if (type >= x_funcs || type >= y_funcs)
+        mmd_register(interpreter, func_nr, type, type, table->default_func);
+    x_funcs = table->x;
+    y_funcs = table->y;
     /*
      * go through MRO and install functions
      */
     for (c = 1; c < nc; ++c) {
         parent = VTABLE_get_pmc_keyed_int(interpreter, mro, c);
         parent_type = parent->vtable->base_type;
-        for (other = 0; other < (UINTVAL)enum_class_max; ++other) {
-            if (other >= y_funcs)
-                break;
+        if (parent_type >= type) {
+            /* XXX warning */
+            continue;
+        }
+        for (other = 0; other < type; ++other) {
             /* (other, parent) */
             offset = x_funcs * other + parent_type;
             func = table->mmd_funcs[offset];
-            if (func == table->default_func)
-                continue;
-            if (table->mmd_funcs[x_funcs * other + type] ==
-                    table->default_func) {
-                if (other == parent_type)
-                    mmd_register(interpreter, func_nr, type, type, func);
-                mmd_register(interpreter, func_nr, type, other, func);
+            if (func != table->default_func) {
+                if (table->mmd_funcs[x_funcs * other + type] ==
+                        table->default_func) {
+                    if (other == parent_type)
+                        mmd_register(interpreter, func_nr, type, type, func);
+                    mmd_register(interpreter, func_nr, type, other, func);
+                }
             }
             /* now for (parent, other) */
             offset = x_funcs * parent_type + other;

@@ -1,10 +1,11 @@
 /*
- * Sample Foo class
+ * Sample Foo class used to verify dynamic loading and
+ * proper inheritance - used for testing only
  */
 
 #include "parrot/parrot.h"
 
-pmclass Foo dynpmc {
+pmclass Foo dynpmc does scalar extends Integer {
 
     INTVAL get_integer() {
 	return 42;

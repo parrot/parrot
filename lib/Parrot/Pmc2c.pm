@@ -200,7 +200,6 @@ EOC
 EOC
     while (my ($class, $info) = each %classes) {
 	next if $info->{flags}->{noinit};
-        my $lc_class = lc $class;
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interpreter, type$class, pass);
 EOC
@@ -208,6 +207,18 @@ EOC
     $cout .= <<"EOC";
     }
 
+    /*
+     * force rebuilding of the static MMD_table
+     * TODO only for classes that have mmds
+     */
+EOC
+    while (my ($class, $info) = each %classes) {
+	next if $info->{flags}->{noinit};
+        $cout .= <<"EOC";
+    Parrot_mmd_rebuild_table(interpreter, type$class, -1);
+EOC
+    }
+    $cout .= <<"EOC";
     return pmc;
 }
 
