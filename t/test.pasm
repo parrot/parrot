@@ -12,60 +12,37 @@
         set    I3, 1
         set    I4, 100000000
 
-	print  "Iterations:                  "
-	print  I4
+        print  "Iterations:    "
+        print  I4
         print  "\n"
 
-        time   I1
+        set    I1, 3
+        mul    I5, I4, I1
+
+        print  "Estimated ops: "
+        print  I5
+        print  "\n"
+
+        time   N1
 
 REDO:   eq     I2, I4, DONE
         add    I2, I2, I3
         branch REDO
 
-DONE:   time   I5
+DONE:   time   N5
 
-	print  "Start time:                  "
-        print  I1
-        print  "\n"
+        sub    N2, N5, N1
 
-	print  "End time:                    "
-        print  I5
-        print  "\n"
-
-	print  "Count:                       "
-        print  I2
-        print  "\n"
-
-        sub    I2, I5, I1
-
-	print  "Elapsed time:                "
-        print  I2
-        print  "\n"
-
-        set    I1, 3
-        mul    I4, I4, I1
-        iton   N1, I4
-        iton   N2, I2
-
-	print  "Estimated ops:               "
-        print  I4
-        print  "\n"
-
-	print  "Estimated ops (numerically): "
-        print  N1
-        print  "\n"
-
-	print  "Elapsed time:                "
-        print  I2
-        print  "\n"
-
-	print  "Elapsed time:                "
+        print  "Elapsed time:  "
         print  N2
         print  "\n"
 
+        iton   N1, I5
+        div    N1, N1, N2
+        set    N2, 1000000.0
         div    N1, N1, N2
 
-	print  "Ops/sec:                     "
+        print  "M op/s:        "
         print  N1
         print  "\n"
 

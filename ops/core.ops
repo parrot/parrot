@@ -74,9 +74,8 @@ environment.
 
 =item B<time>(i)
 
-=item B<time>(n)
-
-Puts the current system time (represented as a number of seconds) in $1.
+Puts the current system time (represented as a whole number of seconds)
+in $1.
 
 =cut
 
@@ -84,8 +83,20 @@ AUTO_OP time(i) {
   $1 = time(NULL);
 }
 
+
+########################################
+
+=item B<time>(n)
+
+Puts the current system time (represented as a number of seconds, with
+microseconds) in $1.
+
+=cut
+
 AUTO_OP time(n) {
-  $1 = (FLOATVAL)time(NULL);
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  $1 = (FLOATVAL)t.tv_sec + ((FLOATVAL)t.tv_usec / 1000000.0);
 }
 
 
