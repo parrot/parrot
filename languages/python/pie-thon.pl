@@ -174,20 +174,42 @@ sub temp {
     "\$$t" . ++$temp;
 }
 
+sub is_num {
+    my $c = $_[0];
+    my ($pointfloat, $expfloat, $frac, $exp);
+    $exp = qr/[eE][-+]?\d+/;
+    $frac = qr/\.\d+/;
+    $pointfloat = qr/(?:(?:\d+)?$frac)|\d+\./o;
+    $expfloat = qr/(?:\d+|$pointfloat)$exp/o;
+    return 1 if ($c =~ /$pointfloat|$expfloat/o);
+    return 0;
+}
+
+sub is_imag {
+    my $c = $_[0];
+    return 1 if ($c =~ /^[+-]?\d+[jJ]$/);
+    return 1 if ($c =~ s/[jJ]$// && is_num($c));
+    return 0;
+}
+
 sub typ {
     my $c = $_[0];
     my $t = 'P';
-    if ($c =~ /^-?\d+$/) {	# int
+    if ($c =~ /^[+-]?\d+$/) {	# int
 	$t = 'I';
     }
-    elsif ($c =~ /^\d+L$/) {	# bigint
+    elsif ($c =~ /^\d+[lL]$/) {	# bigint   XXX
 	$t = 'B';
     }
     elsif ($c =~ /^'.*'$/) {	# string
-	$t = 'B';
+	$t = 'S';
+    }
+    elsif (is_num($c)) {        # num
+	$t = 'N';
     }
     $t;
 }
+
 
 sub promote {
     my $v = $_[0];
@@ -204,12 +226,26 @@ EOC
 
 sub LOAD_CONST {
     my ($n, $c, $cmt) = @_;
-    if ($c =~ /^[_a-zA-Z]/ && !$names{$c}) {
+    if ($c =~ /^[_a-zA-Z]/ && !$names{$c}) {	# True, False ...
 	print <<EOC;
 	.local pmc $c $cmt
 	$c = new .$c
 EOC
 	$names{$c} = 1;
+    }
+    elsif (typ($c) eq 'P') {
+	my $typ = $DEFVAR;
+	if (is_imag($c)) {
+	    $typ = '.Complex';
+	    $c = qq!"$c"!;
+	}
+        my $pmc = temp('P');
+	print <<EOC;
+	$pmc = new $typ $cmt
+	$pmc = $c
+EOC
+	push @stack, [$n, $pmc, 'P'];
+	return;
     }
     else {
 	print <<EOC;
@@ -233,10 +269,12 @@ EOC
     else {
 	$globals{$c} = 1;
 	$names{$c} = 1;
+	my $typ = $DEFVAR;
+	my $const = $tos->[1];
 	print <<"EOC";
         .local pmc $c $cmt
-	$c = new $DEFVAR
-	$c = $tos->[1]
+	$c = new $typ
+	$c = $const
 	global "$c" = $c
 EOC
     }
@@ -276,6 +314,13 @@ EOC
 
 sub LOAD_NAME() {
     my ($n, $c, $cmt) = @_;
+    if (is_builtin($c)) {
+	print <<EOC;
+	# builtin $c $cmt
+EOC
+	push @stack, [-1, $c, 'F'];
+	return;
+    }
     if ($globals{$c}) {
 	print <<"EOC";
 	# $c = global "$c" $cmt

@@ -471,7 +471,7 @@ MMD_PerlInt: {
 
 =item C<void absolute()>
 
-Sets C<dest> to the absolute value of SELF.0).
+Sets C<dest> to the absolute value of SELF.
 
 =cut
 

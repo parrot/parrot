@@ -77,20 +77,20 @@ Returns the number as a Parrot string.
 */
 
     STRING* get_string () {
-        char* buff = mem_sys_allocate(80);
-        STRING* s;
-	char* pos = buff;
-
-	if (signbit(PMC_num_val(SELF)))
-	  *pos++ = '-';
-#ifdef HAS_SNPRINTF
-        snprintf(pos,80,FLOATVAL_FMT,fabs(PMC_num_val(SELF)));
-#else
-        sprintf(pos,FLOATVAL_FMT,fabs(PMC_num_val(SELF)));  /* XXX buffer overflow! */
-#endif
-        s = string_make(INTERP,buff,strlen(buff),"iso-8859-1",0);
-        mem_sys_free(buff);
-        return s;
+        double d = (double) PMC_num_val(SELF);
+        const char *sign = "-";
+	if (!signbit(PMC_num_val(SELF)))
+            sign = "";
+        d = fabs(d);
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+            /* XXX make a Python format string */
+            STRING *s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+            if (string_str_index(interpreter, s,
+                        const_string(interpreter, "."), 0) == -1)
+                string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+            return s;
+        }
+        return Parrot_sprintf_c(interpreter, "%s" FLOATVAL_FMT, sign, d);
     }
 
 /*
@@ -138,6 +138,7 @@ Note that if C<value> is an integer the number morphs to a C<PerlInt>.
         PMC_num_val(SELF) = value;
         /* don't mess around with - 0 */
         if (value == vali && (vali || !Parrot_signbit(value)))
+            if (!Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
             DYNSELF.set_integer_native(vali);
     }
 
