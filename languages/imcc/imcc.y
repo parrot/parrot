@@ -123,14 +123,18 @@ static Instruction * iLABEL(SymReg * r0) {
     i->type = ITLABEL;
     r0->first_ins = i;
     i = emitb(i);
+    i->line = line;
     clear_state();
     return i;
 }
 
 
 static Instruction * iSUBROUTINE(SymReg * r0) {
+    Instruction *i;
     function = r0->name;
-    return iLABEL(r0); /* XXX mark label global */
+    i =  iLABEL(r0); /* XXX mark label global */
+    i->line = line - 1;
+    return i;
 }
 
 

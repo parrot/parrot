@@ -34,6 +34,8 @@ void fataly(int code, const char *func, int lin, const char *fmt, ...)
 void warning(const char *func, const char *fmt, ...)
 {
     va_list ap;
+    if (!IMCC_WARN)
+        return;
 
     va_start(ap, fmt);
     fprintf(stderr, "warning:imcc:%s: ", func);
@@ -71,13 +73,14 @@ void dump_instructions() {
     int pc;
 
     fprintf(stderr, "\nDumping the instructions status:\n-------------------------------\n");
-    fprintf(stderr, "nins blck deep flags\t    type opnr size   pc  X ins\n");
+    fprintf(stderr,
+            "nins line blck deep flags\t    type opnr size   pc  X ins\n");
     for (pc = 0, ins = instructions; ins; ins = ins->next) {
 	bb = bb_list[ins->bbindex];
 
 	if (bb) {
-	     fprintf(stderr, "%4i %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
-		     ins->index, bb->index, bb->loop_depth,
+	     fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+		     ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, (ins->type & ~ITEXT), ins->opnum,
                      ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
 	}
@@ -224,6 +227,12 @@ void dump_liveness_status_var(SymReg* r) {
             fprintf(stderr, "\n\t%i: OUT\t", i);
         else if (l->first_ins)
             fprintf(stderr, "\n\t%i: INS\t", i);
+	if (l->flags & LF_use)
+            fprintf(stderr, "u ");
+        else if (l->flags & LF_def)
+            fprintf(stderr, "d ");
+        else
+            fprintf(stderr, "  ");
 
 	if(l->first_ins) {
             fprintf(stderr, "[%d,%d]\t", l->first_ins->index,

@@ -70,6 +70,7 @@ char *str_cat(const char *, const char *);
 
 EXTERN int IMCC_DEBUG;
 EXTERN int IMCC_VERBOSE;
+EXTERN int IMCC_WARN;
 
 EXTERN int n_spilled;
 EXTERN SymReg** interference_graph;

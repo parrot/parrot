@@ -58,7 +58,6 @@ void life_analysis(void);
 void analyse_life_symbol(SymReg*);
 void analyse_life_block(Basic_block*, SymReg*);
 void add_life_interval(Life_range*, int, int);
-void propagate_need(Basic_block*, SymReg*);
 
 void init_basic_blocks(void);
 Basic_block* make_basic_block(Instruction*);

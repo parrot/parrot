@@ -15,6 +15,7 @@
  */
 
 static void add_instruc_reads(Instruction *ins, SymReg *r0);
+static void propagate_need(Basic_block *bb, SymReg* r, int i);
 
 /* Code: */
 
@@ -313,6 +314,8 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
     /* this gets read */
     ins->flags |= (1<<i);
 }
+
+#ifdef ALIAS
 /*
  * set P1, P0
  *
@@ -320,6 +323,8 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
  *
  * set P1, 4 sets P0 value
  * as long as P1 is used (not overwritten, by new or clone)
+ *
+ * XXX currently turned off, this extends life ranges too much
  */
 
 static void propagate_alias(void)
@@ -331,7 +336,7 @@ static void propagate_alias(void)
     for (ins = instructions ; ins ; ins = ins->next) {
 	if (ins->type & ITALIAS) {
 	    /* make r1 live in each instruction
-	     * where r0 lifes, until r0 is written
+	     * where r0 lives, until r0 is written
 	     */
 	    curr = ins;
 	    r0 = ins->r[0];
@@ -359,12 +364,15 @@ static void propagate_alias(void)
 	dump_instructions();
     }
 }
+#endif
 
 void life_analysis() {
     int i;
 
     info(2, "life_analysis\n");
+#ifdef ALIAS
     propagate_alias();
+#endif
     for(i = 0; i < n_symbols; i++)
         analyse_life_symbol(reglist[i]);
 }
@@ -396,7 +404,7 @@ void analyse_life_symbol(SymReg* r) {
 	    r->life_info[i]->flags |= LF_lv_in;
 
 	    /* propagate this info to every predecessor */
-	    propagate_need (bb_list[i], r);
+	    propagate_need (bb_list[i], r, i);
 	}
     }
 }
@@ -483,7 +491,8 @@ void analyse_life_block(Basic_block* bb, SymReg* r) {
 }
 
 
-void propagate_need(Basic_block *bb, SymReg* r) {
+static void
+propagate_need(Basic_block *bb, SymReg* r, int i) {
     Edge *edge;
     Basic_block *pred;
     Life_range *l;
@@ -510,8 +519,26 @@ void propagate_need(Basic_block *bb, SymReg* r) {
 		l->flags |= LF_lv_in;
 		l->first_ins = pred->start;
 		l->last_ins  = pred->end;
+                /* we arrived at block 0
+                 *
+                 * emit a warning if -w
+                 * looking at some perl6 examples, where this warning
+                 * is emitted, there seems always to be a code path
+                 * where the var is not initialized, so this might
+                 * even be correct :)
+                 */
+                if (pred->index == 0) {
+                    Instruction *ins = r->life_info[i]->first_ins;
+                    int bbi = ins->bbindex;
+                    for ( ; ins && ins->bbindex == bbi; ins = ins->next)
+                        if (instruction_reads(ins, r))
+                            break;
+                    warning("propagate_need",
+                            "'%s' might be used uninitialized in %s:%d\n",
+                            r->name, function, ins->line);
+                }
 
-	        propagate_need(pred, r);
+	        propagate_need(pred, r, i);
 	    }
 	}
     }

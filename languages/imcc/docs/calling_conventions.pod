@@ -1,0 +1,117 @@
+=head1 NAME
+
+IMCC - calling conventions
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1 initial proposal
+
+=item 0.2 initial, checked in
+
+=back
+
+=head1 OVERVIEW
+
+This document describes subroutine calling conventions.
+
+=head1 DESCRIPTION
+
+A imcc does register allocation, it has to track the life span of
+variables. This includes the (possible) data flow in and out of
+subroutines.
+
+=head1 Stack calling conventions
+
+Arguments are B<save>d in reverse order onto the user stack:
+
+   .arg y	# save args in reversed order
+   .arg x
+   call _foo	#(r, s) = _foo(x,y)
+   .local int r
+   .local int s
+   .result s	# restore results in reversed order
+   .result r	# [1]
+
+and return values are B<restore>d in reversed order from there.
+
+The subroutine is responsible for preserving registers.
+
+ .sub _foo		# sub foo(int a, int b)
+   saveall
+   .param int a
+   .param int b
+   ...
+
+   .return pl		# return (pl, mi)
+   .return mi		# [1]
+   restoreall
+   ret
+ .end
+
+[1] or vice versa?
+
+=head2 Status
+
+Implemented. When the subroutine is in the same compilation unit, the
+callee can B<saveall> registers, when the subroutine is in a different
+compilation unit, the callee must preserve all used registers.
+
+=head1 Parrot calling conventions (NCI)
+
+Proposed syntax:
+
+  $P0 = load_lib "libname"
+  $P1 = dlfunc $P0, "funcname", "signature"
+  .nciarg z	# I5
+  .nciarg y	# I6
+  .nciarg x	# I7
+  ncicall $P1	# r = funcname(x, y, z)
+  .local int r
+  .nciresult r
+
+This prepares parameters like described in
+F<pdd03_calling_conventions.pod>, saves the registers and invokes the
+function.
+The B<.nciarg> pseudo ops put the given argument into increasing
+registers of the appropriate type. They have to be in reversed
+argument order.
+
+=head2 Status
+
+Unimplemented.
+
+=head1 Continuations
+
+TBD.
+
+=head1 Coroutines
+
+TBD.
+
+=head1 Exception handlers
+
+TBD.
+
+=head1 Parrot calling conventions (Method calls)
+
+TBD.
+
+=head1 Namespaces and lexicals
+
+ - Should imcc keep track of pad opcodes?
+ - Should imcc even emit such opcodes from e.g. .local directives?
+
+=head1 FILES
+
+F<imcc.y>, F<t/syn/bsr.t>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
+
+=cut
+
+# vim: expandtab shiftwidth=4 tw=70:
+

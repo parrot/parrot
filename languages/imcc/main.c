@@ -104,6 +104,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'w':
                 Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
+                IMCC_WARN = 1;
                 break;
             case 'G':
                 gc_off = 1;
