@@ -17,13 +17,6 @@ sub qsort(@a, $lo, $hi) {
     qsort @a, $l,  $hi    if $l  < $hi;
 }
 
-sub reverse(@a) {
-    my @ret;
-    for 1 .. @a -> $i {
-	@ret[@a - $i] = @a[$i - 1];
-    }
-    @ret;
-}
 
 sub main() {
     my @a = 1..(@ARGS[0] || 100);
