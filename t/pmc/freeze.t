@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -241,4 +241,49 @@ PerlArray 2
 666
 777
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc");
+    null P0
+    freeze S0, P0
+    thaw P10, S0
+    defined I0, P10
+    unless I0, ok
+    print "not "
+ok: print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc");
+    new P0, .PerlArray
+    null P1
+    push P0, P1
+    new P1, .PerlInt
+    set P1, 10
+    push P0, P1
+
+    freeze S0, P0
+    thaw P10, S0
+
+    typeof S10, P10
+    print S10
+    print " "
+    set I11, P10
+    print I11
+    print "\n"
+    set P11, P10[0]
+    defined I0, P11
+    unless I0, ok
+    print "not "
+ok: print "ok\n"
+    set P11, P10[1]
+    print P11
+    print "\n"
+    end
+CODE
+PerlArray 2
+ok
+10
 OUTPUT

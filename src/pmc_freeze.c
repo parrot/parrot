@@ -447,8 +447,14 @@ freeze_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         int seen, UINTVAL id)
 {
     IMAGE_IO *io = info->image_io;
-    INTVAL type = pmc->vtable->base_type;
+    INTVAL type;
 
+    if (PMC_IS_NULL(pmc)) {
+        /* NULL + seen bit */
+        io->vtable->push_pmc(interpreter, io, (PMC*) 1);
+        return;
+    }
+    type = pmc->vtable->base_type;
     if (seen) {
         if (info->extra_flags) {
             id |= 3;
@@ -510,7 +516,8 @@ do_action(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         case VISIT_FREEZE_AT_DESTRUCT:
         case VISIT_FREEZE_NORMAL:
             freeze_pmc(interpreter, pmc, info, seen, id);
-            info->visit_action = pmc->vtable->freeze;
+            if (pmc)
+                info->visit_action = pmc->vtable->freeze;
             break;
         default:
             internal_exception(1, "Illegal action %d", info->what);
@@ -553,6 +560,14 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     int must_have_seen = thaw_pmc(interpreter, info, &id, &type);
 
     id >>= 2;
+
+    if (!id) {
+        /* got a NULL PMC */
+        pmc = PMCNULL;
+        *info->thaw_ptr = pmc;
+        return pmc;
+    }
+
     pos = list_get(interpreter, PMC_data(info->id_list), id, enum_type_PMC);
     if (pos == (void*)-1)
         pos = NULL;
@@ -597,6 +612,11 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
     return pmc;
 }
 
+/*
+ * create a unique id (tag) for a PMC - this is the object number in
+ * the PMCs arena(s) shifted left by 2
+ * start at 1<<2, 0 is a NULLPMC
+ */
 #if ARENA_DOD_FLAGS
 static UINTVAL
 id_from_pmc(Parrot_Interp interpreter, PMC* pmc)
@@ -686,6 +706,11 @@ next_for_GC_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
     int seen = 0;
+    if (PMC_IS_NULL(pmc)) {
+        *id = 0;
+        return 1;
+    }
+
     /*
      * we can only remember PMCs with a next_for_GC pointer
      * which is located in pmc_ext
@@ -715,7 +740,7 @@ add_pmc_todo_list(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
     list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
 }
 /*
- * return true if PMC was seen, else put in on the todo list
+ * return true if PMC was seen, else put it on the todo list
  * generate ID (tag) for PMC, offset by 4 as are addresses, lo bits
  * are flags
  */
@@ -813,7 +838,7 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
         visit_info *info)
 {
     List *todo = PMC_data(info->todo);
-    int i;
+    int i, n;
 
     (info->visit_pmc_now)(interpreter, current, info);
     /*
@@ -825,19 +850,19 @@ again:
         current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
         VTABLE_visit(interpreter, current, info);
     }
-    /*
-     * if image isn't consumed, there are some extra data to thaw
-     */
-    if (info->image->bufused > 0) {
-        (info->visit_pmc_now)(interpreter, NULL, info);
-        goto again;
-    }
-    /*
-     * on thawing call thawfinish for each processed PMC
-     */
     if (info->what == VISIT_THAW_CONSTANTS ||
             info->what == VISIT_THAW_NORMAL) {
-        int n = (int)list_length(interpreter, todo);
+        /*
+         * if image isn't consumed, there are some extra data to thaw
+         */
+        if (info->image->bufused > 0) {
+            (info->visit_pmc_now)(interpreter, NULL, info);
+            goto again;
+        }
+        /*
+         * on thawing call thawfinish for each processed PMC
+         */
+        n = (int)list_length(interpreter, todo);
         for (i = 0; i < n ; ++i) {
             current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
             VTABLE_thawfinish(interpreter, current, info);
@@ -852,10 +877,10 @@ static void
 create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
 {
     INTVAL len = FREEZE_BYTES_PER_ITEM;
-    if (VTABLE_does(interpreter, pmc,
+    if (!PMC_IS_NULL(pmc) && (VTABLE_does(interpreter, pmc,
                 string_from_cstring(interpreter, "array", 0)) ||
         VTABLE_does(interpreter, pmc,
-                string_from_cstring(interpreter, "hash", 0))) {
+                string_from_cstring(interpreter, "hash", 0)))) {
         INTVAL items = VTABLE_elements(interpreter, pmc);
         /*
          * TODO check e.g. first item of aggregate and estimate size
@@ -886,8 +911,15 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     visit_info info;
     PMC *n = NULL;
     int dod_block = 0;
+    UINTVAL bufused;
 
     info.image = image;
+    bufused = image->bufused;
+    /*
+     * if we are thawing a lot of PMCs, its cheaper to do
+     * a DOD run first and then block DOD - the limit should be
+     * chosen so that no more then one DOD run would be triggered
+     */
     if (string_length(image) > THAW_BLOCK_DOD_SIZE) {
         Parrot_do_dod_run(interpreter, 1);
         Parrot_block_DOD(interpreter);
@@ -900,8 +932,22 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     info.visit_pmc_now = visit_todo_list_thaw;
     info.visit_pmc_later = add_pmc_todo_list;
 
+    /*
+     * create first PMC, we want to return it
+     */
     n = new_pmc_header(interpreter);
+    info.thaw_ptr = &n;
+    /*
+     * run thaw loop
+     */
     visit_loop_todo_list(interpreter, n, &info);
+    /*
+     * thaw does "consume" the image string by incrementing strstart
+     * and decrementing bufused - restore that
+     */
+    LVALUE_CAST(ptrdiff_t, image->strstart) -= bufused;
+    image->bufused = bufused;
+    assert(image->strstart >= image->bufstart);
 
     if (dod_block) {
         Parrot_unblock_DOD(interpreter);
@@ -928,6 +974,7 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
     cleanup_next_for_GC(interpreter);
     info.what = VISIT_FREEZE_AT_DESTRUCT;
     info.mark_ptr = pmc;
+    info.thaw_ptr = NULL;
     info.visit_pmc_now = visit_next_for_GC;
     info.visit_pmc_later = add_pmc_next_for_GC;
     create_image(interpreter, pmc, &info);
@@ -935,7 +982,6 @@ Parrot_freeze_at_destruct(Parrot_Interp interpreter, PMC* pmc)
 
     visit_loop_next_for_GC(interpreter, pmc, &info);
 
-    cleanup_next_for_GC(interpreter);
     Parrot_unblock_DOD(interpreter);
     return info.image;
 }
