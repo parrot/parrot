@@ -483,7 +483,7 @@ Foo
 OUTPUT
 
 SKIP: {
-	skip("todo class exists", 1);
+#	skip("todo class exists", 1);
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw simple class");
     newclass P10, "Foo"
     classname S10, P10
@@ -523,6 +523,8 @@ ok 1
 ok 2
 OUTPUT
 
+SKIP: {
+	skip("todo class attrs", 1);
 output_is(<<'CODE', <<'OUTPUT', "thaw class  w attr into new interpreter");
     set S3, "temp.fpmc"
     .include "stat.pasm"
@@ -562,9 +564,9 @@ ok 3
 ok 4
 ok 5
 OUTPUT
-
+}
 SKIP: {
-	skip("todo class exists", 1);
+	skip("todo class attrs", 1);
 output_is(<<'CODE', <<'OUTPUT', "thaw class  w attrr");
     newclass P10, "Foo"
     addattribute P10, ".aa"

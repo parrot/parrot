@@ -1011,7 +1011,7 @@ do_thaw(Parrot_Interp interpreter, PMC* pmc, visit_info *info, int *seen)
 
     info->visit_action = pmc->vtable->thaw;
     list_assign(interpreter, PMC_data(info->id_list), id, pmc, enum_type_PMC);
-    /* remember nested aggregates depth first */
+    /* remember nested aggregates breadth first */
     if (pmc->pmc_ext)
         list_push(interpreter, PMC_data(info->todo), pmc, enum_type_PMC);
     return pmc;
@@ -1200,8 +1200,9 @@ PARROT_INLINE static int
 todo_list_seen(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         UINTVAL *id)
 {
-    HashBucket *b = hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
+    HashBucket *b;
 
+    b = hash_get_bucket(interpreter, PMC_struct_val(info->seen), pmc);
     if (b) {
         *id = (UINTVAL) b->value;
         return 1;
@@ -1352,6 +1353,15 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
 again:
     for (; i < (int)list_length(interpreter, todo); ++i) {
         current = *(PMC**)list_get(interpreter, todo, i, enum_type_PMC);
+        if (info->extra_flags == EXTRA_CLASS_EXISTS) {
+            int is_first = (ret == current);
+            info->extra_flags = 0;
+            current = *info->thaw_ptr;
+            if (is_first)
+                ret = current;
+            info->thaw_ptr = NULL;
+            list_assign(interpreter, todo, i, current, enum_type_PMC);
+        }
         VTABLE_visit(interpreter, current, info);
     }
     if (info->what == VISIT_THAW_CONSTANTS ||

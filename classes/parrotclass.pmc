@@ -161,14 +161,22 @@ Create the class from the thawed parents and attributes array.
 
         class_data = (PMC **)PMC_data(SELF);
 
-        if (info->extra_flags == EXTRA_CLASS_EXISTS)
-            PIO_eprintf(INTERP, "class exists\n");
         /* 2) direct parents array */
-        pos = class_data + PCD_PARENTS;
+        if (info->what == VISIT_THAW_NORMAL ||
+                info->what == VISIT_FREEZE_AT_DESTRUCT)
+            pos = class_data + PCD_MAX;
+        else
+            pos = class_data + PCD_PARENTS;
+        info->thaw_ptr = pos;
         (info->visit_pmc_now)(interpreter, *pos, info);
 
         /* 3) attributes array */
-        pos = class_data + PCD_CLASS_ATTRIBUTES;
+        if (info->what == VISIT_THAW_NORMAL ||
+                info->what == VISIT_FREEZE_AT_DESTRUCT)
+            pos = class_data + PCD_MAX;
+        else
+            pos = class_data + PCD_CLASS_ATTRIBUTES;
+        info->thaw_ptr = pos;
         (info->visit_pmc_now)(interpreter, *pos, info);
 
         SUPER(info);
@@ -190,11 +198,22 @@ Create the class from the thawed parents and attributes array.
 
     void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        STRING *mark, *s;
-        PMC *class;
 
-        SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL) {
+        /*
+         * Thawing a class is tricky - it might or might not exist
+         * in the interpreter, where it get thawed.
+         * Additionally, it could happen that a class exists
+         * but the thawed one differs.
+         *
+         * So here's the plan:
+         * During thaw, we first extend the class_data by two,
+         * thaw parents and attribs into that new arrea, and
+         * then we see what to do.
+         */
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            SUPER(info);
+        }
+        else if (info->extra_flags == EXTRA_IS_NULL) {
             STRING *class_name;
             INTVAL new_type;
             PMC *ar;
@@ -207,19 +226,30 @@ Create the class from the thawed parents and attributes array.
              */
             new_type = pmc_type(INTERP, class_name);
             if (new_type > enum_type_undef) {
-                /* info->extra_flags = EXTRA_CLASS_EXISTS; */
+                info->extra_flags = EXTRA_CLASS_EXISTS;
+                *info->thaw_ptr = SELF =
+                    Parrot_class_lookup(INTERP, class_name);
             }
             else {
-                class = *info->thaw_ptr;
-                Parrot_new_class(INTERP, class, class_name);
+                SELF.init();
+                Parrot_new_class(INTERP, SELF, class_name);
             }
+            /* make room for thawed arrays */
+            if (PMC_int_val(SELF) == PCD_MAX) {
+                PMC **class_data;
+                resize_attrib_array(SELF, PCD_MAX + 2);
+                class_data = (PMC **)PMC_data(SELF);
+                class_data[PCD_MAX] = NULL;
+                class_data[PCD_MAX + 1] = NULL;
+            }
+
         }
     }
 
     void thawfinish(visit_info *info) {
-        INTVAL i, n;
+        INTVAL i, n, nold;
         PMC * class = SELF;
-        PMC *parents, *attribs;
+        PMC *parents, *attribs, *old;
         int ignore = 0; /* XXX */
         PMC **class_data = (PMC **)PMC_data(SELF);
 
@@ -231,25 +261,44 @@ Create the class from the thawed parents and attributes array.
          *      existing classes
          */
 
-        parents = class_data[PCD_PARENTS];
-        n = VTABLE_elements(INTERP, parents);
-        for (i = 0; i < n; ++i) {
-            Parrot_add_parent(INTERP, class,
-                    VTABLE_get_pmc_keyed_int(INTERP, parents, i));
+        old = class_data[PCD_PARENTS];
+        nold = VTABLE_elements(INTERP, old);
+        parents = class_data[PCD_MAX];
+        if (!parents)
+            n = 0;
+        else
+            n = VTABLE_elements(INTERP, parents);
+        if (n != nold)
+            internal_exception(1, "thawed class differs");
+        /* TODO compare elements */
+        if (!nold) {
+            for (i = 0; i < n; ++i) {
+                Parrot_add_parent(INTERP, class,
+                        VTABLE_get_pmc_keyed_int(INTERP, parents, i));
+            }
         }
         /*
          * preserve the thawed attrib array
          */
-        attribs = class_data[PCD_CLASS_ATTRIBUTES];
-        attribs = VTABLE_clone(INTERP, attribs);
-        /* set an empty one in the class */
-        class_data[PCD_CLASS_ATTRIBUTES] = pmc_new(INTERP, enum_class_Array);
+        old = class_data[PCD_CLASS_ATTRIBUTES];
+        nold = VTABLE_elements(INTERP, old);
+        attribs = class_data[PCD_MAX + 1];
+        if (!attribs)
+            n = 0;
+        else
+            n = VTABLE_elements(INTERP, attribs);
+        if (n != nold)
+            internal_exception(1, "thawed class differs");
+        /* TODO compare attribs */
 
-        n = VTABLE_elements(INTERP, attribs);
-        for (i = 0; i < n; ++i) {
-            Parrot_add_attribute(INTERP, class,
-                    VTABLE_get_string_keyed_int(INTERP, attribs, i));
+        if (!nold) {
+            for (i = 0; i < n; ++i) {
+                Parrot_add_attribute(INTERP, class,
+                        VTABLE_get_string_keyed_int(INTERP, attribs, i));
+            }
         }
+        class_data[PCD_MAX] = NULL;
+        class_data[PCD_MAX + 1] = NULL;
     }
 
 }

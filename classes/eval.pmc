@@ -42,6 +42,17 @@ pmclass Eval extends Closure {
     }
 
     void destroy() {
+        /*
+         * If the compiled code contained any .sub (or .pcc.sub)
+         * subroutines, these subs got installed in the globals
+         * during compiling this bytecode segment.
+         *
+         * These globals still exist, calling them will segfault
+         * as the segment is destroyed now.
+         *
+         * TODO walk the fixups for this segment, locate globals
+         *      and nullify the Sub PMC
+         */
         parrot_sub_t sub_data;
         struct PackFile_Segment *seg;
         struct PackFile_ByteCode *cur_cs;
