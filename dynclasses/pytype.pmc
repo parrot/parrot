@@ -189,6 +189,8 @@ need to be filled in.
         VTABLE_set_string_native(INTERP, nameprop, name);
         VTABLE_setprop(INTERP, ret, PyString_name, nameprop);
         VTABLE_setprop(INTERP, ret, PyString_bases, SELF);
+        VTABLE_setprop(INTERP, ret, PyString_dict,
+            VTABLE_getprops(INTERP, ret));
         return ret;
     }
 

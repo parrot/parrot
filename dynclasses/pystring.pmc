@@ -363,6 +363,126 @@ The C<==> operation.
 
 /*
 
+=item C<PMC* "isalpha"()>
+
+Return True if all characters in S are alphabetic and there is at least one
+character in S, False otherwise.
+
+=cut
+
+*/
+
+    METHOD PMC* isalpha () {
+        STRING *s = PMC_str_val(SELF);
+        UINTVAL length = string_length(INTERP, s);
+        UINTVAL idx ;
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+
+        VTABLE_set_integer_native(INTERP, ret, 0);
+
+        if (!length) return ret;
+
+        for (idx=0; idx<length; idx++) {
+            UINTVAL c = string_index(interpreter, s, idx);
+            if (!Parrot_char_is_alpha(INTERP, c)) return ret;
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, 1);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "isalnum"()>
+
+Return True if all characters in S are alphabetic or numeric and there is at
+least one character in S, False otherwise.
+
+=cut
+
+*/
+
+    METHOD PMC* isalnum () {
+        STRING *s = PMC_str_val(SELF);
+        UINTVAL length = string_length(INTERP, s);
+        UINTVAL idx ;
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+
+        VTABLE_set_integer_native(INTERP, ret, 0);
+
+        if (!length) return ret;
+
+        for (idx=0; idx<length; idx++) {
+            UINTVAL c = string_index(interpreter, s, idx);
+            if (!Parrot_char_is_alnum(INTERP, c)) return ret;
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, 1);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "isdigit"()>
+
+Return True if all characters in S are numeric and there is at
+least one character in S, False otherwise.
+
+=cut
+
+*/
+
+    METHOD PMC* isdigit () {
+        STRING *s = PMC_str_val(SELF);
+        UINTVAL length = string_length(INTERP, s);
+        UINTVAL idx ;
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+
+        VTABLE_set_integer_native(INTERP, ret, 0);
+
+        if (!length) return ret;
+
+        for (idx=0; idx<length; idx++) {
+            UINTVAL c = string_index(interpreter, s, idx);
+            if (!Parrot_char_is_digit(INTERP, c)) return ret;
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, 1);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "isspace"()>
+
+Return True if all characters in S are whitespace and there is at least one
+character in S, False otherwise.
+
+=cut
+
+*/
+
+    METHOD PMC* isspace () {
+        STRING *s = PMC_str_val(SELF);
+        UINTVAL length = string_length(INTERP, s);
+        UINTVAL idx ;
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+
+        VTABLE_set_integer_native(INTERP, ret, 0);
+
+        if (!length) return ret;
+
+        for (idx=0; idx<length; idx++) {
+            UINTVAL c = string_index(interpreter, s, idx);
+            if (!Parrot_char_is_space(INTERP, c)) return ret;
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, 1);
+        return ret;
+    }
+
+/*
+
 =item C<PMC* "lower"()>
 
 downcase this string

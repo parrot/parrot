@@ -270,6 +270,33 @@ The C<==> operation. Compares two array to hold equal elements.
 
 /*
 
+=item C<INTVAL exists_keyed (PMC* value)>
+
+The C<==> operation. Compares two array to hold equal elements.
+
+=cut
+
+TODO: is this kosher?  In Python the same operator is used to determine
+      if a key is in a dictionary or to determine if a value is in a
+      tuple.
+*/
+
+    INTVAL exists_keyed (PMC* value) {
+        INTVAL j, n;
+
+        n = SELF.elements();
+        for (j = 0; j < n; ++j) {
+            PMC *item = SELF.get_pmc_keyed_int(j);
+            if (item == value)
+                return 1;
+            if (mmd_dispatch_i_pp(INTERP, item, value, MMD_EQ))
+                return 1;
+        }
+        return 0;
+    }
+
+/*
+
 =item C<void set_integer_keyed(PMC *key, INTVAL value)>
 
 Sets the integer value of the element at index C<key> to C<value>.

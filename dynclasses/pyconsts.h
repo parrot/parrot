@@ -50,6 +50,7 @@ PYVAR_SCOPE STRING *PyString_bases;
 PYVAR_SCOPE STRING *PyString_call;
 PYVAR_SCOPE STRING *PyString_class;
 PYVAR_SCOPE STRING *PyString_cmp;
+PYVAR_SCOPE STRING *PyString_dict;
 PYVAR_SCOPE STRING *PyString_hex;
 PYVAR_SCOPE STRING *PyString_hash;
 PYVAR_SCOPE STRING *PyString_init;

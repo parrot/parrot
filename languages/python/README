@@ -26,6 +26,7 @@ Outstanding Parrot archicture/design issues/major todos:
   isinstance VTABLE entry?
   DOES for dynclasses
   bounds checking
+  "in" dict vs "in" tuple vs exists_key
 
 - Sam Ruby
 

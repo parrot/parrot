@@ -108,6 +108,7 @@ they will be used frequently here.
             PyString_class = const_string(INTERP, "__class__");
             PyString_call  = const_string(INTERP, "__call__");
             PyString_cmp   = const_string(INTERP, "__cmp__");
+            PyString_dict  = const_string(INTERP, "__dict__");
             PyString_hex   = const_string(INTERP, "__hex__");
             PyString_hash  = const_string(INTERP, "__hash__");
             PyString_init  = const_string(INTERP, "__init__");
@@ -501,6 +502,34 @@ Returns the hash of C<value>.
     METHOD PMC* hash(PMC *value) {
         PMC *ret = pmc_new_noinit(INTERP, PyBuiltin_PyInt);
         VTABLE_set_integer_native(INTERP, ret, VTABLE_hash(INTERP, value));
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "hasattr"(PMC *object, PMC *name)>
+
+Return whether the object has an attribute with the given name.
+
+=cut
+
+*/
+
+    METHOD PMC* hasattr(PMC *object, PMC *value) {
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
+        new_internal_exception(INTERP);
+        push_new_c_exception_handler(INTERP, INTERP->exceptions);
+        if (!setjmp(INTERP->exceptions->destination)) {
+            VTABLE_get_attr_str(INTERP, object,
+                VTABLE_get_string(INTERP, value));
+            VTABLE_set_integer_native(INTERP, ret, 1);
+        } else {
+            Parrot_exception *exception = INTERP->exceptions;
+            if (exception->error != E_AttributeError) {
+                rethrow_c_exception(INTERP);
+            }
+            VTABLE_set_integer_native(INTERP, ret, 0);
+        }
         return ret;
     }
 

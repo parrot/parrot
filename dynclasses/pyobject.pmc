@@ -656,6 +656,20 @@ C<*value>.
 
 /*
 
+=item C<void logical_not(PMC *dest)>
+
+Returns in C<*dest> the result of the logical not of the scalar.
+
+=cut
+
+*/
+
+    void logical_not (PMC* dest) {
+        VTABLE_set_integer_native(INTERP, dest, !DYNSELF.get_bool());
+    }
+
+/*
+
 =item C<void logical_or(PMC *value, PMC *dest)>
 
 Returns in C<*dest> the result of the logical C<OR> of the scalar and

@@ -211,9 +211,14 @@ Delete a (range of) elements from the list
 
             list_delete(INTERP, list, start, end-start);
         }
+        else if (key->vtable->base_type == PyBuiltin_PyInt) {
+            List *list = (List *)PMC_data(SELF);
+            INTVAL index = VTABLE_get_integer(INTERP, key);
+            if (index<0) index = VTABLE_elements(INTERP, SELF) + index;
+            list_delete(INTERP, list, index, 1);
+        }
         else
-            internal_exception(OUT_OF_BOUNDS,
-                "PyList: unimplemented delete!");
+            SUPER(key);
     }
 
 /*
