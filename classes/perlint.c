@@ -58,7 +58,7 @@ static STRING* Parrot_PerlInt_get_string (struct Parrot_Interp *interpreter, PMC
 }
 
 static BOOLVAL Parrot_PerlInt_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
-    return (BOOLVAL)pmc->cache.int_val;
+    return pmc->cache.int_val != 0;
 }
 
 static void* Parrot_PerlInt_get_value (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -143,9 +143,15 @@ static void Parrot_PerlInt_add_same (struct Parrot_Interp *interpreter, PMC* pmc
 }
 
 static void Parrot_PerlInt_subtract (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value,  PMC* dest) {
+    dest->vtable->set_integer_native(interpreter, dest, 
+            pmc->cache.int_val - value->vtable->get_integer(interpreter, value)
+    );
 }
 
 static void Parrot_PerlInt_subtract_int (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL value,  PMC* dest) {
+    dest->vtable->set_integer_native(interpreter, dest, 
+            pmc->cache.int_val - value
+    );
 }
 
 static void Parrot_PerlInt_subtract_bigint (struct Parrot_Interp *interpreter, PMC* pmc, BIGINT value,  PMC* dest) {

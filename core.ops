@@ -333,6 +333,8 @@ These operations load registers from constants or other registers.
 
 =item B<set>(n, nc)
 
+=item B<set>(n, p)
+
 =item B<set>(s, sc)
 
 =item B<set>(s, s)
@@ -348,6 +350,10 @@ AUTO_OP set(i, i|ic) {
 
 AUTO_OP set(n, n|nc) {
   $1 = $2;
+}
+
+AUTO_OP set(n, p) {
+  $1 = $2->vtable->get_number(interpreter, $2);
 }
 
 AUTO_OP set(s, s|sc) {
