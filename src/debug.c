@@ -597,7 +597,7 @@ void
 PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
-    PDB_breakpoint_t *newbreak,*sbreak;
+    PDB_breakpoint_t *newbreak = NULL, *sbreak;
     PDB_condition_t *condition;
     PDB_line_t *line;
     long ln,i;
@@ -683,7 +683,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
         }
     }
 
-    /* We only reach this point if we're a new breakpoint, in which 
+    /* We only reach this point if we're a new breakpoint, in which
      * case there are several other things to set up */
 
     /* Set the address where to stop */
@@ -835,7 +835,7 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
  * delete a condition associated with a breakpoint
  */
 void
-PDB_delete_condition(struct Parrot_Interp *interpreter, 
+PDB_delete_condition(struct Parrot_Interp *interpreter,
                      PDB_breakpoint_t *breakpoint)
 {
     if (breakpoint->condition->value) {
@@ -1282,7 +1282,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     dest[size++] = '?';
                     break;
                 }
-                k = k->data;
+                k = PMC_data(k);
                 if (k) dest[size++] = ';';
             }
             dest[size++] = ']';
@@ -1522,7 +1522,7 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
                 pline->opcode = pc;
                 pc += interpreter->op_info_table[*pc].arg_count;
             }
-            newline = 
+            newline =
                     (PDB_line_t *)mem_sys_allocate_zeroed(sizeof(PDB_line_t));
             newline->number = pline->number + 1;
             pline->next = newline;

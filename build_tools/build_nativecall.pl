@@ -39,7 +39,7 @@ my (%ret_type_decl) = (p => "void *",
 		       v => "void *",
                      );
 
-my (%ret_assign) = (p => "final_destination->data = return_data;\nPMC_REG(5) = final_destination;",
+my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5) = final_destination;",
 		    i => "INT_REG(5) = return_data;",
 		    l => "INT_REG(5) = return_data;",
 		    c => "INT_REG(5) = return_data;",
@@ -178,7 +178,7 @@ close NCI;
 sub make_arg {
     my ($argtype, $reg_ref) = @_;
     /p/ && do {my $regnum = $reg_ref->{p}++;
-	       return "PMC_REG($regnum)->data";
+	       return "PMC_data(PMC_REG($regnum))";
               };
     /i/ && do {my $regnum = $reg_ref->{i}++;
 	       return "(int)INT_REG($regnum)";

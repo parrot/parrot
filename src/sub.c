@@ -50,11 +50,11 @@ new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
     newco->ctx.user_stack = new_stack(interp);
     newco->ctx.control_stack = new_stack(interp);
     newco->ctx.pad_stack = new_stack(interp);
-    
+
     pad = scratchpad_get_current(interp);
 
     if (pad) {
-        stack_push(interp, &newco->ctx.pad_stack, pad, 
+        stack_push(interp, &newco->ctx.pad_stack, pad,
                    STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
     }
     return newco;
@@ -86,7 +86,7 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
         return NULL;
     }
 
-    return &(((struct Parrot_Lexicals *)pad->data)[scope_index]);
+    return &(((struct Parrot_Lexicals *)PMC_data(pad))[scope_index]);
 }
 
 /*
@@ -133,7 +133,7 @@ scratchpad_find(struct Parrot_Interp* interp, PMC* pad, STRING * name,
     struct Parrot_Lexicals * lex = NULL;
 
     for (i = pad->cache.int_val - 1; i >= 0; i--) {
-        lex = &(((struct Parrot_Lexicals *)pad->data)[i]);
+        lex = &(((struct Parrot_Lexicals *)PMC_data(pad))[i]);
         pos = lexicals_get_position(interp, lex, name);
         if (pos == list_length(interp, lex->names))
             lex = NULL;
@@ -168,25 +168,25 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     }
 
     /* XXX JPS: should we use a List * here instead? */
-    pad_pmc->data = mem_sys_allocate((depth + 1) *
+    PMC_data(pad_pmc) = mem_sys_allocate((depth + 1) *
                                      sizeof(struct Parrot_Lexicals));
 
     if (base) {
         /* XXX JPS: I guess this is copying the front, when it should
            be copying the end of the parent (base) */
-        memcpy(pad_pmc->data, base->data, depth *
+        memcpy(PMC_data(pad_pmc), PMC_data(base), depth *
                sizeof(struct Parrot_Lexicals));
     }
 
     pad_pmc->cache.int_val = depth + 1;
 
     /* in case call to list_new triggers gc */
-    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].values = NULL;
-    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].names = NULL;
+    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].values = NULL;
+    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].names = NULL;
 
-    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].values = 
+    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].values =
         list_new(interp, enum_type_PMC);
-    ((struct Parrot_Lexicals *)pad_pmc->data)[depth].names = 
+    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].names =
         list_new(interp, enum_type_STRING);
 
     Parrot_unblock_DOD(interp);

@@ -93,7 +93,7 @@ PMC *
 PXS_pointer(Parrot_Interp_t interp, void *object)
 {
     PMC *p = new_pmc_header(interp);
-    p->data = object;
+    PMC_data(p) = object;
     p->vtable = YOU_LOSE_VTABLE;
     return p;
 }
@@ -123,7 +123,7 @@ void ** PXS_api(void)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

@@ -102,7 +102,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             PIO_eprintf(interpreter, "??");
         }
 
-        key = key->data;
+        key = PMC_data(key);
 
         if (key) PIO_eprintf(interpreter, ";");
     }

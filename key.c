@@ -210,7 +210,7 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
 PMC *
 key_next(struct Parrot_Interp *interpreter, PMC *key)
 {
-    return key->data;
+    return PMC_data(key);
 }
 
 PMC *
@@ -218,11 +218,11 @@ key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)
 {
     PMC *tail = key1;
 
-    while (tail->data) {
-        tail = tail->data;
+    while (PMC_data(tail)) {
+        tail = PMC_data(tail);
     }
 
-    tail->data = key2;
+    PMC_data(tail) = key2;
 
     return key1;
 }
@@ -235,8 +235,8 @@ key_mark(struct Parrot_Interp *interpreter, PMC *key)
        ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_pmc_FLAG) )
         pobject_lives(interpreter, (PObj *)key->cache.string_val);
 
-    if (key->data)
-        pobject_lives(interpreter, (PObj *)key->data);
+    if (PMC_data(key))
+        pobject_lives(interpreter, (PObj *)PMC_data(key));
 
 }
 

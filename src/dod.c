@@ -200,18 +200,18 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
          * pointer that we need to trace */
         if (bits) {
             if (bits == PObj_is_PMC_ptr_FLAG) {
-                if (current->data) {
-                    pobject_lives(interpreter, current->data);
+                if (PMC_data(current)) {
+                    pobject_lives(interpreter, PMC_data(current));
                 }
             }
             else if (bits == PObj_is_buffer_ptr_FLAG) {
-                if (current->data) {
-                    pobject_lives(interpreter, current->data);
+                if (PMC_data(current)) {
+                    pobject_lives(interpreter, PMC_data(current));
                 }
             }
             else if (bits == PObj_is_buffer_of_PMCs_ptr_FLAG) {
                 /* buffer of PMCs */
-                Buffer *trace_buf = current->data;
+                Buffer *trace_buf = PMC_data(current);
 
                 if (trace_buf) {
                     PMC **cur_pmc = trace_buf->bufstart;
