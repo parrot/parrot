@@ -29,6 +29,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Property values are references");
     new P0, .PerlString
+    new P1, .PerlString
     set P0, "Dog"
 
     set S0, "Brown"
