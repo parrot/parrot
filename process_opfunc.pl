@@ -47,7 +47,7 @@ while (<GUTS>) {
 
 
 my %psize = (i => 1,
-	     n => $PConfig{nvsize}/$PConfig{ivsize},
+	     n => int($PConfig{nvsize}/$PConfig{ivsize}),
 	     I => 1,
 	     N => 1,
 	     D => 1,
