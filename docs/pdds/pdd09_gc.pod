@@ -1,0 +1,147 @@
+=head1 TITLE
+
+Garbage Collection and Dead Object Detection
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 9
+    Version: 1.0
+    Status: Developing
+    Last Modified: 25 February, 2002
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=head1 ABSTRACT
+
+This PDD describes how the GC and DOD systems work, and what's
+required of PMC classes.
+
+=head1 DESCRIPTION
+
+Doing GC takes a bit of work--we need to make sure that everything is
+findable from the root set, and that we don't go messing up data
+shared between interpreters. This, then, is 
+
+=head2 DOD Steps
+
+=over 4
+
+=item All PMCs have their live bit unset
+
+=item All Buffers have their live bit unset
+
+=item All PMCs in the root set are put on the trace list
+
+=item Walk the trace list
+
+=item The Buffer root set (stack and S registers) is walked, and any referred to buffers are marked as live
+
+=back
+
+For each PMC on the trace list we:
+
+=over 4
+
+=item Check its live bit. If set, we skip it
+
+=item Set its live bit
+
+=item Check its flags. If it has a custom DOD routine, we call it.
+
+=item If there's no custom DOD routine, we check the flags for one of the following:
+
+=over 4
+
+=item Points to a PMC. We put that PMC on the trace list
+
+=item Points to a Buffer. We mark the buffer as live
+
+=item Points to a Buffer of PMCs. We put all the PMCs on the trace list.
+
+=item Points to a Buffer of Buffers. We mark those buffers as live
+
+=item Anything else we ignore.
+
+=back
+
+=item We take the PMC off the trace list
+
+=back
+
+Once we're done, we scan the PMC list twice. In the first scan, dead
+PMCs (i.e no live bit and no free bit) with a destructor have that
+destructor called. In the second scan, dead PMCs are put on the free
+list for later reallocation.
+
+Then we scan the Buffer list. Any dead buffers (no live bit and no
+free bit) are put on the free buffer list.
+
+
+=head2 GC Steps
+
+These are the steps that the GC takes,
+
+=over 4
+
+=item Mark all PMCs with the needs_GC flag
+
+=item Mark all Buffers with the needs_GC flag
+
+=item Sweep through all the PMCs with the custom_GC flag set
+
+=item Sweep through all buffers
+
+=item Any Buffer with needs_GC and live flags set, but without immobile set, gets copied
+
+=item Any buffer with needs_GC set and sysmem set, but *not* with live set, gets the system free called on its contents
+
+=item needs_GC flag is unset after copying
+
+=back
+
+PMCs should only have a custom GC routine if there's really a need for
+the PMC to keep track of the location of the ultimate buffered data. 
+
+For PMCs that need to hand data back to a library when their objects
+are destroyed, a custom DOD routine is in order, *not* a custom GC routine.
+
+=head2 Important safety tips
+
+=over 4
+
+=item Never mark PMCs or Buffers owned by other interpreters as
+needing GC. Bad, very very bad.
+
+=back
+
+=head1 IMPLEMENTATION
+
+=head1 ATTACHMENTS
+
+=head1 FOOTNOTES
+
+=head1 REFERENCES
