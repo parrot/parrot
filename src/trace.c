@@ -54,72 +54,74 @@ void
 trace_pmc_dump(Interp *interpreter, PMC* pmc)
 {
     char *escaped;
-    if (pmc && pmc != PMCNULL) {
-        if(pmc->vtable) {
-            if (pmc->vtable->data == pmc) {
-                STRING *name = trace_class_name(interpreter, pmc);
-                PIO_eprintf(interpreter, "%S=%Ss:PMC(%#p)",
-                        VTABLE_name(interpreter, pmc), name, pmc);
-            }
-            else if (pmc->vtable->base_type == enum_class_PerlString) {
-                STRING *s = VTABLE_get_string(interpreter, pmc);
-                if (!s)
-                    PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",
-                        VTABLE_name(interpreter, pmc), pmc);
-                else {
-                    escaped = PDB_escape(s->strstart, s->strlen);
-                    PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%s\")",
-                        VTABLE_name(interpreter, pmc), pmc,
-                        escaped ? escaped : "(null)");
-                    if (escaped)
-                        mem_sys_free(escaped);
-                }
-            }
-            else if (pmc->vtable->base_type == enum_class_Boolean) {
-                    PIO_eprintf(interpreter, "Boolean=PMC(%#p: %d",
-                            pmc, PMC_int_val(pmc));
-            }
-            else if (pmc->vtable->base_type == enum_class_BigInt) {
-                STRING *s = VTABLE_get_string(interpreter, pmc);
-                    PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss",
-                            pmc, s);
-            }
-            else if (pmc->vtable->base_type == enum_class_Complex) {
-                STRING *s = VTABLE_get_string(interpreter, pmc);
-                    PIO_eprintf(interpreter, "Complex=PMC(%#p: (%Ss)",
-                            pmc, s);
-            }
-            else if (pmc->vtable->base_type == enum_class_PerlUndef
-                 ||  pmc->vtable->base_type == enum_class_PerlInt
-                 ||  pmc->vtable->base_type == enum_class_PerlNum) {
-                PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
-                        VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
-            }
-            else if (pmc->vtable->base_type == enum_class_RetContinuation
-                 ||  pmc->vtable->base_type == enum_class_Continuation
-                 ||  pmc->vtable->base_type == enum_class_Sub) {
-                PIO_eprintf(interpreter, "%S=PMC(%#p Adr:%#p)",
-                        VTABLE_name(interpreter, pmc), pmc,
-                        VTABLE_get_pointer(interpreter, pmc));
-            }
-            else if (PObj_is_object_TEST(pmc)) {
-                PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",
-                        VTABLE_name(interpreter, pmc), pmc);
-            }
-            else if (pmc->vtable->base_type == enum_class_delegate) {
-                PIO_eprintf(interpreter, "delegate=PMC(%#p)", pmc);
-            }
-            else {
-                PIO_eprintf(interpreter, "%S=PMC(%#p)",
-                        VTABLE_name(interpreter, pmc), pmc);
-            }
-        }
+    if (!pmc) {
+        PIO_eprintf(interpreter, "(null)");
+        return;
+    }
+    if (pmc == PMCNULL)  {
+        PIO_eprintf(interpreter, "PMCNULL");
+        return;
+    }
+    if (!pmc->vtable) {
+        PIO_eprintf(interpreter, "<!!no vtable!!>");
+        return;
+    }
+    if (pmc->vtable->data == pmc) {
+        STRING *name = trace_class_name(interpreter, pmc);
+        PIO_eprintf(interpreter, "%S=%Ss:PMC(%#p)",
+                VTABLE_name(interpreter, pmc), name, pmc);
+    }
+    else if (pmc->vtable->base_type == enum_class_PerlString) {
+        STRING *s = VTABLE_get_string(interpreter, pmc);
+        if (!s)
+            PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",
+                    VTABLE_name(interpreter, pmc), pmc);
         else {
-            PIO_eprintf(interpreter, "PMC(NULL)");
+            escaped = PDB_escape(s->strstart, s->strlen);
+            PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%s\")",
+                    VTABLE_name(interpreter, pmc), pmc,
+                    escaped ? escaped : "(null)");
+            if (escaped)
+                mem_sys_free(escaped);
         }
     }
+    else if (pmc->vtable->base_type == enum_class_Boolean) {
+        PIO_eprintf(interpreter, "Boolean=PMC(%#p: %d",
+                pmc, PMC_int_val(pmc));
+    }
+    else if (pmc->vtable->base_type == enum_class_BigInt) {
+        STRING *s = VTABLE_get_string(interpreter, pmc);
+        PIO_eprintf(interpreter, "BigInt=PMC(%#p: %Ss",
+                pmc, s);
+    }
+    else if (pmc->vtable->base_type == enum_class_Complex) {
+        STRING *s = VTABLE_get_string(interpreter, pmc);
+        PIO_eprintf(interpreter, "Complex=PMC(%#p: (%Ss)",
+                pmc, s);
+    }
+    else if (pmc->vtable->base_type == enum_class_PerlUndef
+            ||  pmc->vtable->base_type == enum_class_PerlInt
+            ||  pmc->vtable->base_type == enum_class_PerlNum) {
+        PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
+                VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
+    }
+    else if (pmc->vtable->base_type == enum_class_RetContinuation
+            ||  pmc->vtable->base_type == enum_class_Continuation
+            ||  pmc->vtable->base_type == enum_class_Sub) {
+        PIO_eprintf(interpreter, "%S=PMC(%#p Adr:%#p)",
+                VTABLE_name(interpreter, pmc), pmc,
+                VTABLE_get_pointer(interpreter, pmc));
+    }
+    else if (PObj_is_object_TEST(pmc)) {
+        PIO_eprintf(interpreter, "Object(%Ss)=PMC(%#p)",
+                VTABLE_name(interpreter, pmc), pmc);
+    }
+    else if (pmc->vtable->base_type == enum_class_delegate) {
+        PIO_eprintf(interpreter, "delegate=PMC(%#p)", pmc);
+    }
     else {
-        PIO_eprintf(interpreter, "NULL");
+        PIO_eprintf(interpreter, "%S=PMC(%#p)",
+                VTABLE_name(interpreter, pmc), pmc);
     }
 }
 

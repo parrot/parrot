@@ -908,7 +908,7 @@ PARROT_INLINE static PMC*
 thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
         INTVAL type)
 {
-    if (pmc) { /* first thawed PMC - just attach vtable */
+    if (!PMC_IS_NULL(pmc)) { /* first thawed PMC - just attach vtable */
         pmc->vtable = Parrot_base_vtables[type];
         pmc_add_ext(interpreter, pmc);
     }

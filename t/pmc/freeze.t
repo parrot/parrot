@@ -16,7 +16,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -55,7 +55,7 @@ output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlNum");
     new P1, .PerlNum
     set P1, 3.14159
     freeze S0, P1
-    
+
     thaw P10, S0
     typeof S10, P10
     print S10
@@ -355,3 +355,86 @@ Sub
 in sub _foo
 back
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
+    new P0, .FixedPMCArray
+    set P0, 3
+    new P1, .PerlInt
+    set P1, 666
+    set P0[0], P1
+    new P2, .PerlInt
+    set P2, 777
+    set P0[1], P2
+    new P1, .PerlInt
+    set P1, 666
+    set P0[2], P1
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10	# type
+    print S10
+    print " "
+    set I11, P10	# elements
+    print I11
+    print "\n"
+    set P12, P10[0]
+    print P12
+    print "\n"
+    set P13, P10[1]
+    print P13
+    print "\n"
+    set P14, P10[2]
+    print P14
+    print "\n"
+    ne_addr P12, P14, ok
+    print "not "
+ok: print "ok diff\n"
+    end
+CODE
+FixedPMCArray 3
+666
+777
+666
+ok diff
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray");
+    new P0, .FixedPMCArray
+    set P0, 3
+    new P1, .PerlInt
+    set P1, 666
+    set P0[0], P1
+    new P2, .PerlInt
+    set P2, 777
+    set P0[1], P2
+    set P0[2], P1
+    freeze S0, P0
+
+    thaw P10, S0
+    typeof S10, P10	# type
+    print S10
+    print " "
+    set I11, P10	# elements
+    print I11
+    print "\n"
+    set P12, P10[0]
+    print P12
+    print "\n"
+    set P13, P10[1]
+    print P13
+    print "\n"
+    set P14, P10[2]
+    print P14
+    print "\n"
+    eq_addr P12, P14, ok
+    print "not "
+ok: print "ok same\n"
+    end
+CODE
+FixedPMCArray 3
+666
+777
+666
+ok same
+OUTPUT
+

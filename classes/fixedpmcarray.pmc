@@ -700,6 +700,53 @@ Return a new iterator for SELF.
             PMC_int_val(key) = -1;
         return iter;
     }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+This is used by freeze/thaw to visit the contents of the array.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the array.
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the array.
+
+=cut
+
+*/
+
+    void visit(visit_info *info) {
+        INTVAL i, n;
+        PMC **pos;
+
+        n = VTABLE_elements(INTERP, SELF);
+        pos = (PMC **)PMC_data(SELF);
+        for (i = 0; i < n; ++i, ++pos) {
+            info->thaw_ptr = pos;
+            (info->visit_pmc_now)(interpreter, *pos, info);
+        }
+        SUPER(info);
+    }
+
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
+    }
+
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            DYNSELF.set_integer_native(io->vtable->shift_integer(INTERP, io));
+    }
+
 }
 
 /*
