@@ -574,7 +574,7 @@ be possible.  For example, in the match C</ba*r+/>, the minimum length is 2.
 =cut
 
 op rx_setprops(in pmc, in str, in int) {
-	int i;
+	UINTVAL i;
 	RX_dUNPACK($1);
 
 	rx->minlength=$3;
@@ -693,13 +693,13 @@ op rx_is_w(in pmc, in int) {
 
 ########################################
 
-=item C<rx_is_n>(in pmc, in int)
+=item C<rx_is_d>(in pmc, in int)
 
-Matches a number character (usually C<\n>).
+Matches a number character (usually C<\d>).
 
 =cut
 
-op rx_is_n(in pmc, in int) {
+op rx_is_d(in pmc, in int) {
 	RX_dUNPACK($1);
 
 	RxAssertMore(rx, $2);
@@ -1336,3 +1336,4 @@ Faus <afaus@corp.vlex.com> and Jeff 'japhy' Pinyan <japhy@pobox.com> for major h
 especially with decisions on the architecture of the engine.
 
 =cut
+

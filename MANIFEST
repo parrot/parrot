@@ -87,6 +87,7 @@ examples/mops/mops.ps
 examples/mops/mops.py
 examples/mops/mops.rb
 examples/mops/mops.scheme
+exceptions.c
 global_setup.c
 hints/cygwin.pl
 hints/darwin.pl

@@ -31,11 +31,11 @@ singlebyte_encode (void *ptr, UINTVAL c) {
     byte_t *bptr = (byte_t*)ptr;
 
     if (c > 255) {
-        INTERNAL_EXCEPTION(INVALID_CHARACTER,
+        internal_exception(INVALID_CHARACTER,
                            "Invalid character for single byte encoding\n");
     }
 
-    *bptr = c;
+    *bptr = (byte_t)c;
 
     return bptr + 1;
 }

@@ -112,8 +112,7 @@ main(int argc, char **argv) {
             argc -= 2;
         }
         else {
-            fprintf(stderr, "%s: Invalid switch: %s\n", argv[0], argv[1]);
-            exit(1);
+            internal_exception(PARROT_USAGE_ERROR, "%s: Invalid switch: %s\n", argv[0], argv[1]);
         } 
     }
 
@@ -128,12 +127,11 @@ main(int argc, char **argv) {
     }
 
     if (jit) {
-        if (!JIT_CAPABLE) {
-            fprintf(stderr, "%s: Cannot use the '-j' JIT-enabling flag on this architecture: %s\n",
-                argv[0], JIT_ARCHNAME);
-            exit(1);
-        }
+#if !JIT_CAPABLE
+		internal_exception( JIT_UNAVAILABLE, "%s: Cannot use the '-j' JIT-enabling flag on this architecture: " JIT_ARCHNAME "\n", argv[0]);
+#else
         flags |= PARROT_JIT_FLAG;
+#endif
     }
 
     if (profiling) {
@@ -153,8 +151,7 @@ main(int argc, char **argv) {
     /* If we got only the program name, complain */
 
     if (argc == 1 && !filename && !from_stdin) {
-        fprintf(stderr, "%s: usage: %s prog\n", argv[0], argv[0]);
-        exit(1);
+        internal_exception(PARROT_USAGE_ERROR, "%s: usage: %s prog\n", argv[0], argv[0]);
     }
     /* Otherwise load in the program they gave and try that, or - */
     else {
@@ -172,33 +169,27 @@ main(int argc, char **argv) {
         if (from_stdin) {
             char *cursor;
             INTVAL read_result;
-            INTVAL read_last;
 
-            program_size = 1024;
+            program_size = 0;
             
-            program_code = (opcode_t*)malloc(1024);
+            program_code = (opcode_t*)malloc(program_size + 1024);
             if (NULL == program_code) {
                 fprintf(stderr, "Could not allocate buffer to read stdin\n");
             }
             cursor = (char*)program_code;
 
             while ((read_result = read(0, cursor, 1024)) > 0) {
-                read_last = read_result;
-                program_size += 1024;
-                program_code = realloc(program_code, program_size);
+                program_size += read_result;
+                program_code = realloc(program_code, program_size + 1024);
                 if (NULL == program_code) {
                     fprintf(stderr,
                             "Could not reallocate buffer to read stdin\n");
                 }
-                cursor = (char*)program_code + program_size - 1024;
+                cursor = (char*)program_code + program_size;
             }
 
-            if (read_result == 0) {
-                program_size = program_size - 2048 + read_last;
-            }
-            else if (read_result < 0) {
-                fprintf(stderr, "Problem reading from stdin\n");
-                exit(1);
+            if (read_result < 0) {
+                internal_exception(IO_ERROR,"Problem reading from stdin\n");
             }
         }
         else { /* read from file */

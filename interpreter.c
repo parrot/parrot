@@ -73,8 +73,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *),
     pc = core(interpreter, pc);
 
     if (pc && (pc < code_start || pc >= code_end)) {
-        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
-        exit(1);
+		internal_exception(INTERP_ERROR, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
     }
 }
 
@@ -117,23 +116,19 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_oplib_handle = Parrot_dlopen(file_name);
 
   if (!prederef_oplib_handle) {
-    fprintf(stderr, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "Unable to dynamically load oplib file '%s' for oplib '%s_prederef' version %s!\n",
       file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-
-    exit(1);
   }
 
   /*
   ** Look up the init function:
   */
 
-  prederef_oplib_init   = (oplib_init_f)Parrot_dlsym(prederef_oplib_handle, func_name);
+  prederef_oplib_init   = (oplib_init_f)(ptrcast_t)Parrot_dlsym(prederef_oplib_handle, func_name);
 
   if (!prederef_oplib_init) {
-    fprintf(stderr, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "No exported symbol for oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
       func_name, file_name, PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-
-    exit(1);
   }
 
   /*
@@ -143,10 +138,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_oplib        = prederef_oplib_init();
 
   if (!prederef_oplib) {
-    fprintf(stderr, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "No oplib info returned by oplib init function '%s' from oplib file '%s' for oplib '%s_prederef' version %s!\n",
       func_name, file_name,
       PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    exit(1);
   }
 
   /*
@@ -156,10 +150,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_count     = prederef_oplib->op_count;
 
   if (prederef_op_count <= 0) {
-    fprintf(stderr, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "Illegal op count (%d) from oplib file '%s' for oplib '%s_prederef' version %s!\n",
       (int)prederef_op_count, file_name,
       PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    exit(1);
   }
 
   /*
@@ -169,10 +162,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_info      = prederef_oplib->op_info_table;
 
   if (!prederef_op_info) {
-    fprintf(stderr, "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "No op info table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
       file_name,
       PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    exit(1);
   }
 
   /*
@@ -182,10 +174,9 @@ init_prederef(struct Parrot_Interp * interpreter)
   prederef_op_func      = prederef_oplib->op_func_table;
 
   if (!prederef_op_func) {
-    fprintf(stderr, "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
+    internal_exception(PREDEREF_LOAD_ERROR, "No op func table in oplib file '%s' for oplib '%s_prederef' version %s!\n",
       file_name,
       PARROT_CORE_OPLIB_NAME, PARROT_VERSION);
-    exit(1);
   }
 }
 
@@ -237,7 +228,7 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
   for (i = 0; i < opinfo->arg_count; i++) {
     switch (opinfo->types[i]) {
       case PARROT_ARG_OP:
-        pc_prederef[i] = (void *)prederef_op_func[pc[i]];
+        pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[pc[i]];
         break;
   
       case PARROT_ARG_I:
@@ -268,8 +259,7 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
       case PARROT_ARG_PC:
 /*        pc_prederef[i] = (void *)
                  &interpreter->code->const_table->constants[pc[i]]->pmc; */
-          fprintf(stderr, "PMC constants not yet supported!\n");
-          exit(1);
+          internal_exception(ARG_OP_NOT_HANDLED, "PMC constants not yet supported!\n");
         break;
 
       case PARROT_ARG_SC:
@@ -282,8 +272,7 @@ prederef(void ** pc_prederef, struct Parrot_Interp * interpreter)
     }
 
     if (opinfo->types[i] != PARROT_ARG_IC && pc_prederef[i] == 0) {
-      fprintf(stderr, "Prederef generated a NULL pointer for arg of type %d!\n", opinfo->types[i]);
-      exit(1);
+      internal_exception(INTERP_ERROR, "Prederef generated a NULL pointer for arg of type %d!\n", opinfo->types[i]);
     }
   }
 
@@ -353,7 +342,7 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc,
 
     while (pc_prederef) {
       pc_prederef = 
-              ((op_func_prederef_t)*pc_prederef) (pc_prederef, interpreter);
+              ((op_func_prederef_t)(ptrcast_t)*pc_prederef) (pc_prederef, interpreter);
     }
 
     stop_prederef();
@@ -366,8 +355,7 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc,
     }
 
     if (pc && (pc < code_start || pc >= code_end)) {
-        fprintf(stderr, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
-        exit(1);
+        internal_exception(INTERP_ERROR, "Error: Control left bounds of byte-code block (now at location %d)!\n", (int) (pc - code_start));
     }
 }
 
@@ -421,7 +409,7 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
             void ** temp = (void **)malloc(N * sizeof(void *));
 
             for (i = 0; i < N; i++) {
-              temp[i] = (void *)prederef;
+              temp[i] = (void *)(ptrcast_t)prederef;
             }
 
             interpreter->prederef_code = temp;
@@ -431,11 +419,9 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code,
                           interpreter->prederef_code + offset);
         }
         else if ((interpreter->flags & PARROT_JIT_FLAG) != 0) {
-          if (!JIT_CAPABLE) {
-            fprintf(stderr, 
-    "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
-            exit(1);
-          }
+#if !JIT_CAPABLE
+          internal_exception( JIT_UNAVAILABLE, "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
+#endif
 
           runops_jit(interpreter, pc);
         }

@@ -21,6 +21,7 @@ void Parrot_PerlNum_class_init(void);
 void Parrot_PerlString_class_init(void);
 void Parrot_PerlArray_class_init(void);
 void Parrot_PerlHash_class_init(void);
+void Parrot_ParrotPointer_class_init(void);
 void Parrot_IntQueue_class_init(void);
 
 void

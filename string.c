@@ -106,7 +106,7 @@ string_ord(const STRING* s, INTVAL idx) {
     }
 
     if((s == NULL) || (len == 0)) {
-        INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+        internal_exception(ORD_OUT_OF_STRING,
                            "Cannot get character of empty string");
     }
     else {
@@ -115,22 +115,22 @@ string_ord(const STRING* s, INTVAL idx) {
 
         if (idx < 0) {
             if ((INTVAL)(idx + len) < 0) {
-            INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+                internal_exception(ORD_OUT_OF_STRING,
                                    "Cannot get character before beginning of string");
-        }
-        else {
+            }
+            else {
                 true_index = (UINTVAL)(len + idx);
             }
-            }
+        }
 
-	if (true_index > (len - 1)) {
-            INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
+        if (true_index > (len - 1)) {
+            internal_exception(ORD_OUT_OF_STRING,
                                "Cannot get character past end of string");
         }
 
         return string_index(s, true_index);
     }
-    return -1;
+	return -1;
 }
 
 /*=for api string string_copy
@@ -301,7 +301,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     true_offset = (UINTVAL)offset;
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-    if (offset == string_length(src) || length < 1) {
+    if (offset == (INTVAL)string_length(src) || length < 1) {
         return NULL;
     }
 
@@ -310,8 +310,8 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     }
 
     if (true_offset > src->strlen-1) { /* 0 based... */
-        INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
-                           "Cannot take substr outside string")
+        internal_exception(SUBSTR_OUT_OF_STRING,
+                           "Cannot take substr outside string");
     }
     true_length = (UINTVAL) length;
     if (length < 0) {
@@ -326,7 +326,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     subend = src->encoding->skip_forward(substart, true_length);
 
     if (subend < substart) {
-        INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
+        internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }
 

@@ -1254,32 +1254,37 @@ CODE
 0
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
-	new	P0, PerlHash
+output_is(<<CODE, <<OUTPUT, "IntQueue test");
+	new P0,IntQueue
+	set P0,32
+	set P0,-7
 
-	set	P0, -7,"foo"
-	set	P0, 3.5,"bar"
-	set	P0, "value","baz"
+	set I0,P0
+	eq I0,32,OK_1
+	print "not "
+OK_1:	print "ok 1\\n"
 
-	set	I0, P0, "foo"
-	set	N0, P0, "bar"
-	set	S0, P0, "baz"
+	if P0,OK_2
+	print "not "
+OK_2:	print "ok 2\\n"
 
-	eq	I0,-7,OK_1
-	print	"not "
-OK_1:	print	"ok 1\\n"
-	eq	N0,3.500000,OK_2
-	print	N0
-OK_2:	print	"ok 2\\n"
-	eq	S0,"value",OK_3
-	print	S0
-OK_3:	print	"ok 3\\n"
+	set I0,P0
+	eq I0,-7,OK_3
+	print "not "
+OK_3:	print "ok 3\\n"
+
+		if P0,NOT_OK_4
+		print "ok 4\\n"
+		branch DONE
+NOT_OK_4:	print "not ok 4\\n"
+DONE:
 
 	end
 CODE
 ok 1
 ok 2
 ok 3
+ok 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "IntQueue test");

@@ -69,7 +69,7 @@ rotate_entries(struct Parrot_Interp *interpreter, Stack stack, INTVAL depth)
     }
 
     if (stack_depth(interpreter, stack) < depth) {
-        INTERNAL_EXCEPTION(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
+        internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
     }
 
     if (depth == 1) {
@@ -165,14 +165,14 @@ stack_pop(struct Parrot_Interp *interpreter, Stack stack,
     
     /* Quick sanity check */
     if (chunk->used == 0) {
-        INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
+        internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");
     }
 
     entry = &chunk->entry[chunk->used - 1];
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
-        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, 
+        internal_exception(ERROR_BAD_STACK_TYPE, 
                            "Wrong type on top of stack!\n");
     }
 

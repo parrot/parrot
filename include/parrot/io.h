@@ -97,7 +97,7 @@ typedef HANDLE PIOHANDLE;
 typedef int PIOHANDLE;
 #endif
 
- 
+
 struct _ParrotIO {
         PIOHANDLE       fd;             /* Low level OS descriptor      */
         UINTVAL         mode;           /* Read/Write/etc.              */

@@ -13,7 +13,7 @@ use Parrot::OpsFile;
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 trans input.ops [input2.ops ...]\n";
+usage: $0 trans input.ops [input2.ops ...]
 _EOF_
     exit 1;
 }
@@ -110,6 +110,7 @@ my $preamble = <<END_C;
 
 END_C
 
+print $header;
 print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"

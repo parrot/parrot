@@ -139,8 +139,6 @@ CODE
 no match
 OUTPUT
 
-TODO: {
-	local $TODO="pending key fixes" if $^O eq "MSWin32";
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'groups');
 		rx_startgroup P0, 0
 		rx_literal P0, "a", $advance
@@ -156,7 +154,6 @@ CODE
 (a)
 <><a><>
 OUTPUT
-}
 
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (success)');
 		rx_zwa_atbeginning P0, $advance

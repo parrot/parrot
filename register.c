@@ -95,7 +95,7 @@ Parrot_pop_i(struct Parrot_Interp *interpreter) {
         }
         /* Nope. So pitch a fit */
         else {
-            INTERNAL_EXCEPTION(NO_REG_FRAMES, 
+            internal_exception(NO_REG_FRAMES, 
                                "No more I register frames to pop!");
         }
     }
@@ -201,7 +201,7 @@ Parrot_pop_s(struct Parrot_Interp *interpreter) {
         }
         /* Nope. So pitch a fit */
         else {
-            INTERNAL_EXCEPTION(NO_REG_FRAMES, 
+            internal_exception(NO_REG_FRAMES, 
                                "No more S register frames to pop!");
         }
     }
@@ -301,7 +301,7 @@ Parrot_pop_n(struct Parrot_Interp *interpreter) {
         }
         /* Nope. So pitch a fit */
         else {
-            INTERNAL_EXCEPTION(NO_REG_FRAMES, 
+            internal_exception(NO_REG_FRAMES, 
                                "No more N register frames to pop!");
         }
     }
@@ -405,7 +405,7 @@ Parrot_pop_p(struct Parrot_Interp *interpreter) {
         }
         /* Nope. So pitch a fit */
         else {
-            INTERNAL_EXCEPTION(NO_REG_FRAMES, 
+            internal_exception(NO_REG_FRAMES, 
                                "No more P register frames to pop!");
         }
     }

@@ -304,7 +304,7 @@ prompt("What is your native opcode type?", 'opcode_t');
 		if   ($a eq 'core.ops') { -1 }
 		elsif($b eq 'core.ops') {  1 }
 		else             { $a cmp $b }
-	} grep {!/obscure\.ops/} @ops;
+	} grep {!/obscure\.ops/ && !/vtable\.ops/} @ops;
 
 	my $msg;
 

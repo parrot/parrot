@@ -107,8 +107,8 @@ pmclass PerlHash {
     BOOLVAL is_same (PMC* other) {
 	STRING* s1 = (STRING*)SELF->cache.struct_val;
 	STRING* s2 = (STRING*)other->cache.struct_val;
-        return other->vtable == SELF->vtable
-	    && (strcmp(s1->bufstart,s2->bufstart)==0);
+        return (BOOLVAL)( other->vtable == SELF->vtable
+	    && (strcmp(s1->bufstart,s2->bufstart)==0) );
     }
 
     void set_integer (PMC* value) {

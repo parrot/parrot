@@ -29,7 +29,7 @@ utf16_characters (const void *ptr, UINTVAL bytes) {
     }
 
     if (u16ptr > u16end) {
-        INTERNAL_EXCEPTION(MALFORMED_UTF16, "Unaligned end in UTF-16 string\n");
+        internal_exception(MALFORMED_UTF16, "Unaligned end in UTF-16 string\n");
     }
 
     return characters;
@@ -44,13 +44,13 @@ utf16_decode (const void *ptr) {
         utf16_t low = *u16ptr++;
 
         if (!UNICODE_IS_LOW_SURROGATE(low)) {
-            INTERNAL_EXCEPTION(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+            internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
         }
 
         c = UNICODE_DECODE_SURROGATE(c, low);
     }
     else if (UNICODE_IS_LOW_SURROGATE(c)) {
-        INTERNAL_EXCEPTION(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+        internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
     }
 
     return c;
@@ -61,16 +61,16 @@ utf16_encode (void *ptr, UINTVAL c) {
     utf16_t *u16ptr = (utf16_t*)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
-        INTERNAL_EXCEPTION(INVALID_CHARACTER,
+        internal_exception(INVALID_CHARACTER,
                            "Invalid character for UTF-16 encoding\n");
     }
 
     if (c < 0x10000u) {
-        *u16ptr++ = c;
+        *u16ptr++ = (utf16_t)c;
     }
     else {
-        *u16ptr++ = UNICODE_HIGH_SURROGATE(c);
-        *u16ptr++ = UNICODE_LOW_SURROGATE(c);
+        *u16ptr++ = (utf16_t)UNICODE_HIGH_SURROGATE(c);
+        *u16ptr++ = (utf16_t)UNICODE_LOW_SURROGATE(c);
     }
 
     return u16ptr;
@@ -85,12 +85,12 @@ utf16_skip_forward (const void *ptr, UINTVAL n) {
           u16ptr++;
 
           if (!UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
-              INTERNAL_EXCEPTION(MALFORMED_UTF16,
+              internal_exception(MALFORMED_UTF16,
                                  "Malformed UTF-16 surrogate\n");
           }
       }
       else if (UNICODE_IS_LOW_SURROGATE(*u16ptr)) {
-          INTERNAL_EXCEPTION(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+          internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
       }
 
       u16ptr++;
@@ -110,12 +110,12 @@ utf16_skip_backward (const void *ptr, UINTVAL n) {
             u16ptr--;
 
             if (!UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
-                INTERNAL_EXCEPTION(MALFORMED_UTF16,
+                internal_exception(MALFORMED_UTF16,
                                    "Malformed UTF-16 surrogate\n");
             }
         }
         else if (UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
-            INTERNAL_EXCEPTION(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
+            internal_exception(MALFORMED_UTF16, "Malformed UTF-16 surrogate\n");
         }
     }
 

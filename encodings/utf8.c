@@ -40,7 +40,7 @@ utf8_characters (const void *ptr, UINTVAL bytes) {
     }
 
     if (u8ptr > u8end) {
-        INTERNAL_EXCEPTION(MALFORMED_UTF8, "Unaligned end in UTF-8 string\n");
+        internal_exception(MALFORMED_UTF8, "Unaligned end in UTF-8 string\n");
     }
 
     return characters;
@@ -59,18 +59,18 @@ utf8_decode (const void *ptr) {
         for (count = 1; count < len; count++) {
             u8ptr++;
             if (!UTF8_IS_CONTINUATION(*u8ptr)) {
-                INTERNAL_EXCEPTION(MALFORMED_UTF8,
+                internal_exception(MALFORMED_UTF8,
                                    "Malformed UTF-8 string\n");
             }
             c = UTF8_ACCUMULATE(c, *u8ptr);
         }
 
         if (UNICODE_IS_SURROGATE(c)) {
-            INTERNAL_EXCEPTION(MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
+            internal_exception(MALFORMED_UTF8, "Surrogate in UTF-8 string\n");
         }
     }
     else if (!UNICODE_IS_INVARIANT(c)) {
-        INTERNAL_EXCEPTION(MALFORMED_UTF8, "Malformed UTF-8 string\n");
+        internal_exception(MALFORMED_UTF8, "Malformed UTF-8 string\n");
     }
 
     return c;
@@ -83,15 +83,15 @@ utf8_encode (void *ptr, UINTVAL c) {
     utf8_t *u8end = u8ptr + len - 1;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
-        INTERNAL_EXCEPTION(INVALID_CHARACTER,
+        internal_exception(INVALID_CHARACTER,
                            "Invalid character for UTF-8 encoding\n");
     }
 
     while (u8end > u8ptr) {
-        *u8end-- = (c & UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_MARK;
+        *u8end-- = (utf8_t)( (c & UTF8_CONTINUATION_MASK) | UTF8_CONTINUATION_MARK );
         c >>= UTF8_ACCUMULATION_SHIFT;
     }
-    *u8end = (c & UTF8_START_MASK(len)) | UTF8_START_MARK(len);
+    *u8end = (utf8_t)( (c & UTF8_START_MASK(len)) | UTF8_START_MARK(len) );
 
     return u8ptr + len;
 }

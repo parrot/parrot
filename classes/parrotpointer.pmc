@@ -11,7 +11,7 @@
  */
 
 #include "parrot/parrot.h"
-#define ERROR fprintf(stderr, "An illegal operation was performed on a ParrotPointer (vtable function at %s line %d).\n", __FILE__, __LINE__); exit(1); return;
+#define POINTER_ERROR internal_exception(PARROT_POINTER_ERROR, "An illegal operation was performed on a ParrotPointer (vtable function at %s line %d).\n", __FILE__, __LINE__);
 
 pmclass ParrotPointer {
    INTVAL type () {
@@ -72,7 +72,7 @@ pmclass ParrotPointer {
    }
 
    BOOLVAL get_bool () {
-      return (BOOLVAL)SELF->data;
+      return (BOOLVAL)(SELF->data != NULL);
    }
 
    void* get_value () {
@@ -80,71 +80,71 @@ pmclass ParrotPointer {
    }
 
    BOOLVAL is_same (PMC* pmc2) {
-      return SELF->vtable == pmc2->vtable && SELF->data == pmc2->data;
+      return (BOOLVAL)(SELF->vtable == pmc2->vtable && SELF->data == pmc2->data);
    }
 
    void set_integer (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_integer_native (INTVAL value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_integer_bigint (BIGINT value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_integer_same (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_integer_index (INTVAL value, INTVAL index) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_number (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_number_native (FLOATVAL value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_number_bigfloat (BIGFLOAT value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_number_same (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_number_index (FLOATVAL value, INTVAL index) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string_native (STRING * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string_unicode (STRING * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string_other (STRING * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string_same (PMC * value) {
-      ERROR;
+      POINTER_ERROR;
    }
 
    void set_string_index (STRING* value, INTVAL index) {
-      ERROR;
+      POINTER_ERROR;
    }
    
    void set_value (void * value) {

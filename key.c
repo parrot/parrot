@@ -284,22 +284,22 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
 
 KEY_PAIR*
 key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* idx) {
-  KEY_PAIR* pair;
+  KEY_PAIR* pair = NULL;
   if(key != NULL) {
     if(idx != NULL) {
       INTVAL hash = key_hash(interpreter,idx);
       hash = hash % NUM_BUCKETS;
       pair = find_bucket(interpreter,(BUCKET *)key->keys[hash].cache.struct_val,idx);
       if(pair == NULL) {
-        fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
+        internal_exception(KEY_NOT_FOUND,"*** key_element_value_s pair returning a null key\n");
       }
     }
     else {
-      fprintf(stderr,"*** key_element_value_s given a NULL index\n");
+      internal_exception(KEY_NOT_FOUND,"*** key_element_value_s given a NULL index\n");
     }
   }
   else {
-    fprintf(stderr,"*** key_element_value_s given a NULL key\n");
+    internal_exception(KEY_NOT_FOUND,"*** key_element_value_s given a NULL key\n");
   }
   return pair;
 }
@@ -320,12 +320,11 @@ void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
       memcpy(&key->keys[idx],value,sizeof(KEY_PAIR));
     }
     else {
-      fprintf(stderr,
-          "*** key_set_element_value_i setting value out of bounds\n");
+      internal_exception(KEY_NOT_FOUND, "*** key_set_element_value_i setting value out of bounds\n");
     }
   }
   else {
-    fprintf(stderr,"*** key_set_element_value_i assigning to a NULL key\n");
+    internal_exception(KEY_NOT_FOUND, "*** key_set_element_value_i assigning to a NULL key\n");
   }
 }
 

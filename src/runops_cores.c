@@ -44,8 +44,8 @@ runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
     INTVAL     code_size;
     opcode_t * code_end;
-    opcode_t * lastpc;
-    FLOATVAL time;
+    opcode_t * lastpc = NULL;
+    FLOATVAL time = 0;
 
     code_start = (opcode_t *)interpreter->code->byte_code;
     code_size  = interpreter->code->byte_code_size;

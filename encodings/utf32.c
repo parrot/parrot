@@ -36,7 +36,7 @@ utf32_encode (void *ptr, UINTVAL c) {
     utf32_t *u32ptr = (utf32_t*)ptr;
 
     if (c > 0x10FFFF || UNICODE_IS_SURROGATE(c)) {
-        INTERNAL_EXCEPTION(INVALID_CHARACTER,
+        internal_exception(INVALID_CHARACTER,
                            "Invalid character for UTF-32 encoding\n");
     }
 

@@ -150,7 +150,8 @@ inline op open(out PMC, in STR, in STR) {
 }
 
 inline op open(out INT, in STR) {
-  if (! ($1 = (INTVAL)fopen(($2)->bufstart, "r+"))) {
+  $1 = (INTVAL)fopen(($2)->bufstart, "r+");
+  if (!$1) {
     perror("Can't open");
     exit(1);
   }
@@ -1499,7 +1500,7 @@ Repeats string $2 $3 times and stores result in $1.
 
 inline op repeat(out STR, in STR, in INT) {
   if ($3 < 0) {
-      INTERNAL_EXCEPTION(NEG_REPEAT, "Cannot repeat with negative arg");
+      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg");
   }
   $1 = string_repeat(interpreter, $2, (UINTVAL)$3, NULL);
   goto NEXT();
@@ -2269,7 +2270,7 @@ op entrytype(out INT, in INT) {
   Stack_Entry entry;
   depth = stack_depth(interpreter, interpreter->user_stack);
   if (depth <= $2) {
-    INTERNAL_EXCEPTION(99, "Stack Depth wrong");
+    internal_exception(99, "Stack Depth wrong");
   }
 
   entry = stack_entry(interpreter, interpreter->user_stack, $2);
@@ -2526,7 +2527,7 @@ Sleep for $1 seconds
 
 inline op sleep(in INT) {
   if ($1 < 0) {
-      INTERNAL_EXCEPTION(NEG_SLEEP, "Cannot go back in time");
+      internal_exception(NEG_SLEEP, "Cannot go back in time");
   }
   Parrot_sleep((UINTVAL)$1);
   goto NEXT();

@@ -41,12 +41,12 @@ extern const char * RX_SPACECHARS;
 
 typedef struct rxinfo {
 	STRING *string;
-	INTVAL index;
-	INTVAL startindex;
+	UINTVAL index;
+	UINTVAL startindex;
 	BOOLVAL success;
 
 	rxflags flags;
-	INTVAL minlength;
+	UINTVAL minlength;
 	rxdirection whichway;
 
 	PMC *groupstart;

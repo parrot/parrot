@@ -76,7 +76,7 @@ pmclass PerlUndef {
    }
 
    BOOLVAL is_same (PMC* pmc2) {
-      return pmc2->vtable == pmc->vtable;
+      return (BOOLVAL)(pmc2->vtable == pmc->vtable);
    }
 
    void set_integer (PMC * value) {
@@ -242,18 +242,15 @@ pmclass PerlUndef {
 
    void divide (PMC * value,  PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
-		fprintf(stderr, "division by zero!\n");
-		exit(1);
+		internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	}
 	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
 	    if(value->vtable->get_integer(INTERP, value) == 0) {
-		fprintf(stderr, "division by zero!\n");
-		exit(1);
+			internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	    }
 	}
 	else if(value->vtable->get_number(INTERP, value) == 0) {
-		fprintf(stderr, "division by zero!\n");
-		exit(1);
+		internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	}
 
 	dest->vtable->set_integer_native(INTERP, dest, 0);
@@ -261,8 +258,7 @@ pmclass PerlUndef {
 
    void divide_int (INTVAL value,  PMC* dest) {
 	if(value == 0) {
-		fprintf(stderr, "division by zero!\n");
-		exit(1);
+		internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	}
 	dest->vtable->set_integer_native(INTERP, dest, 0);
    }
@@ -274,8 +270,7 @@ pmclass PerlUndef {
 
    void divide_float (FLOATVAL value,  PMC* dest) {
 	if(value == 0) {
-		fprintf(stderr, "division by zero!\n");
-		exit(1);
+		internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	}
 	dest->vtable->set_integer_native(INTERP, dest, 0);
    }
@@ -286,8 +281,7 @@ pmclass PerlUndef {
    }
 
    void divide_same (PMC * value,  PMC* dest) {
-	fprintf(stderr, "division by zero!\n");
-	exit(1);
+	internal_exception(DIV_BY_ZERO, "division by zero!\n");
    }
 
    void modulus (PMC * value,  PMC* dest) {

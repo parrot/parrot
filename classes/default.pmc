@@ -88,7 +88,7 @@ pmclass default noinit {
      /* I think this should cover this correctly, is_same implies that
 	same B<data> used by each, but as meaning of data is a little
 	vtable reliant, I include that test as well */
-     return SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache;
+     return (BOOLVAL)(SELF->vtable == pmc2->vtable && &SELF->cache == &pmc2->cache);
    }
 
    /* The set methods merely make the appropriate part of the cache
@@ -408,7 +408,7 @@ pmclass default noinit {
      /*  lala, I can't hear you */
    }
 
-   void modulus_float (INTVAL value,  PMC* dest) {
+   void modulus_float (FLOATVAL value,  PMC* dest) {
      /* XXX: makes all arguments integers...*/
      INTVAL result;
 

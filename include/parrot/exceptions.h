@@ -13,8 +13,11 @@
 #if !defined(PARROT_EXCEPTIONS_H_GUARD)
 #define PARROT_EXCEPTIONS_H_GUARD
 
-#define INTERNAL_EXCEPTION(x,y) {fprintf(stderr, y); exit(x);}
 
+/* Prototypes */
+void internal_exception(int exitcode, const char * format, ... );
+
+/* Exception Types */
 #define NO_REG_FRAMES 1
 #define SUBSTR_OUT_OF_STRING 1
 #define ORD_OUT_OF_STRING 1
@@ -27,6 +30,15 @@
 #define NEG_SLEEP 1
 #define NEG_CHOP 1
 #define ARG_OP_NOT_HANDLED 1
+#define KEY_NOT_FOUND 1
+#define JIT_UNAVAILABLE 1
+#define INTERP_ERROR 1
+#define PREDEREF_LOAD_ERROR 1
+#define PARROT_USAGE_ERROR 1
+#define IO_ERROR 1
+#define PARROT_POINTER_ERROR 1
+#define DIV_BY_ZERO 1
+#define IO_NOT_IMPLEMENTED 1
 
 #endif
 

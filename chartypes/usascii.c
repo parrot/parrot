@@ -15,7 +15,7 @@
 static INTVAL
 usascii_transcode_from_unicode(INTVAL c) {
     if (c < 0 || c > 127) {
-        INTERNAL_EXCEPTION(INVALID_CHARACTER, "Invalid character for US-ASCII");
+        internal_exception(INVALID_CHARACTER, "Invalid character for US-ASCII");
     }
     return c;
 }
@@ -23,7 +23,7 @@ usascii_transcode_from_unicode(INTVAL c) {
 static CHARTYPE_TRANSCODER
 usascii_transcode_from(const char *from) {
     if (strcmp(from, "unicode") == 0) {
-        return usascii_transcode_from_unicode;
+        return &usascii_transcode_from_unicode;
     }
     else {
         return NULL;
@@ -38,7 +38,7 @@ usascii_transcode_to_unicode(INTVAL c) {
 static CHARTYPE_TRANSCODER
 usascii_transcode_to(const char *to) {
     if (strcmp(to, "unicode") == 0) {
-        return usascii_transcode_to_unicode;
+        return &usascii_transcode_to_unicode;
     }
     else {
         return NULL;
@@ -47,7 +47,7 @@ usascii_transcode_to(const char *to) {
 
 static BOOLVAL
 usascii_is_digit(INTVAL c) {
-    return isdigit(c) ? 1 : 0;
+    return (BOOLVAL)(isdigit(c));
 }
 
 static INTVAL

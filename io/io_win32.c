@@ -38,7 +38,7 @@ INTVAL          PIO_win32_init(theINTERP, ParrotIOLayer * layer);
 ParrotIO *      PIO_win32_open(theINTERP, ParrotIOLayer * layer,
 			const char * spath, UINTVAL flags);
 ParrotIO *      PIO_win32_fdopen(theINTERP, ParrotIOLayer * layer,
-		        PIOHANDLE fd, const char * smode);
+		        PIOHANDLE fd, UINTVAL flags);
 INTVAL          PIO_win32_close(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io);
 void            PIO_win32_flush(theINTERP, ParrotIOLayer * layer,
@@ -89,27 +89,25 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
 INTVAL PIO_win32_init(theINTERP, ParrotIOLayer * layer) {
         HANDLE h;
         if((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-                pio_stdin = PIO_win32_fdopen(interpreter, layer, h, "<");
+                pio_stdin = PIO_fdopen(interpreter, h, "<");
         }
         if((h = GetStdHandle(STD_OUTPUT_HANDLE))
                                         != INVALID_HANDLE_VALUE){
-                pio_stdout = PIO_win32_fdopen(interpreter, layer, h, ">");
+                pio_stdout = PIO_fdopen(interpreter, h, ">");
         }
         if((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-                pio_stderr = PIO_win32_fdopen(interpreter, layer, h, ">");
+                pio_stderr = PIO_fdopen(interpreter, h, ">");
         }
-
+ 
         if(pio_stdin && pio_stdout && pio_stderr)
-                return 0;
+                 return 0;
         return -1;
 }
 
 
 ParrotIO * PIO_win32_open(theINTERP, ParrotIOLayer * layer,
 			const char * spath, UINTVAL flags) {
-        ParrotIO * io;
         int type;
-        PIOHANDLE fd;
         DWORD fAcc, fShare, fCreat;
         type = PIO_TYPE_FILE;
 #if 0
@@ -123,7 +121,7 @@ ParrotIO * PIO_win32_open(theINTERP, ParrotIOLayer * layer,
 
         /* Set open flags - <, >, >>, +<, +> */
         /* add ? and ! for block/non-block */
-        if( flags_to_win32(flags, &fAcc, fShare, fCreat) < 0 )
+        if( flags_to_win32(flags, &fAcc, &fShare, &fCreat) < 0 )
                 return (ParrotIO *)NULL;
 
         /* Only files for now */
@@ -137,10 +135,9 @@ ParrotIO * PIO_win32_open(theINTERP, ParrotIOLayer * layer,
 
 
 ParrotIO * PIO_win32_fdopen(theINTERP, ParrotIOLayer * layer,
-		        PIOHANDLE fd, const char * smode) {
+		        PIOHANDLE fd, UINTVAL flags) {
         ParrotIO * io;
-        INTVAL flags, mode;
-        flags = 0;
+        UINTVAL mode;
         mode = 0;
 
         /* FIXME - Check file handle specifics, validity */
@@ -206,7 +203,6 @@ INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                                 &wrote, NULL))
                         return -1;
                 return wrote;
-
         } 
         return -1;
 }
@@ -217,15 +213,21 @@ INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
  */
 INTVAL PIO_win32_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         off_t offset, INTVAL whence) {
-        io->fpos = lseek(io->fd, offset, whence);
+/*        io->fpos = lseek(io->fd, offset, whence);
         return io->fpos;
+*/
+		internal_exception( IO_NOT_IMPLEMENTED, "Seek not yet implemented on HANDLEs");
+		return 0;
 }
 
 
 off_t PIO_win32_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
-        off_t p;
+/*        off_t p;
         p = lseek(io->fd, (off_t)0, SEEK_CUR);
         return p;
+*/
+		internal_exception( IO_NOT_IMPLEMENTED, "Seek not yet implemented on HANDLEs");
+		return 0;
 }
 
 

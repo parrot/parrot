@@ -84,10 +84,8 @@ ParrotIO * PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
  */
 INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                         size_t bufsize) {
-        size_t size;
         ParrotIOLayer * l = layer;
         ParrotIOBuf * b = &io->b;
-        UNUSED (size);
         /* If there is a buffer, make sure we flush before
          * dinking around with the buffer.
          */
@@ -142,7 +140,7 @@ ParrotIO * PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
         while(l) {
                 if(l->api->FDOpen) {
                         io = (*l->api->FDOpen)(interpreter, l, fd, flags);
-                        if(isatty(fd))
+                        if(PIO_isatty(fd))
                                 PIO_stdio_setlinebuf(interpreter, l, io);
                         else
                                 PIO_stdio_setbuf(interpreter, l, io,
@@ -278,8 +276,8 @@ ParrotIOLayerAPI        pio_stdio_layer_api = {
         NULL,
         NULL,
         NULL,
-        PIO_setbuf,
-        PIO_setlinebuf,
+        PIO_stdio_setbuf,
+        PIO_stdio_setlinebuf,
         NULL,
         NULL,
         PIO_stdio_puts,
