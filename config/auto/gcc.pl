@@ -74,7 +74,7 @@ sub runstep {
          2.7 => "",
          2.8 => "-Wsign-compare",
          2.95 => "",
-         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wdisabled-optimization",
+         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wdisabled-optimization -mno-accumulate-outgoing-args -Wno-shadow",
         # -Wsequence-point is part of -Wall
         # -Wfloat-equal may not be what we want
         # We shouldn't be using __packed__, but I doubt -Wpacked will harm us
