@@ -15,6 +15,8 @@
 
 #ifdef WIN32
 
+#include <tchar.h>
+
 /* Defined at bottom */
 extern ParrotIOLayerAPI        pio_win32_layer_api;
 
