@@ -103,7 +103,7 @@ string_destroy(STRING *s)
 UINTVAL
 string_length(const STRING *s)
 {
-    return s->strlen;
+    return s ? s->strlen : 0;
 }
 
 /*=for api string string_index
@@ -119,7 +119,8 @@ string_index(const STRING *s, UINTVAL idx)
 }
 
 /*=for api string string_ord
- * return the length of the string
+ * Return the codepoint at a given index into a string. Negative
+ * indexes are treated as counting from the end of the string.
  */
 INTVAL
 string_ord(const STRING *s, INTVAL idx)
