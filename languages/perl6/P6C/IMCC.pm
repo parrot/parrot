@@ -1851,6 +1851,14 @@ use P6C::IMCC ':all';
 use P6C::Util 'unimp';
 use P6C::Context;
 
+sub vars_in_context {
+    my ($vars, $ctx) = @_;
+    return undef if $ctx->type eq 'void';
+    my $vlist = new P6C::ValueList vals => $vars;
+    $vlist->ctx_right($ctx);
+    return $vlist->val;
+}
+
 sub val {
     my $x = shift;
     code("# " . $x->{comment}) if $x->{comment};
@@ -1860,12 +1868,10 @@ sub val {
     if (@{$x->props}) {
 	unimp 'variable properties';
     }
-    if (ref $x->vars eq 'ARRAY') {
-	add_localvar($_->name, $_->type) for @{$x->vars};
-    } else {
-	add_localvar($x->vars->name, $x->vars->type);
-    }
-    return undef;
+    my $vars = $x->vars;
+    $vars = [ $vars ] unless ref $vars eq 'ARRAY';
+    add_localvar($_->name, $_->type) foreach @$vars;
+    return vars_in_context($vars, $x->{ctx});
 }
 
 # A declaration with initializers shows up as assigning to a decl.
@@ -1878,9 +1884,9 @@ sub assign {
 
     # optimize simple decls
     if ($thing->isa('P6C::sv_literal')) {
-	add_localvar($x->vars->name, $x->vars->type);
+        add_localvar($x->vars->name, $x->vars->type);
 	$x->vars->assign($thing);
-	return undef;
+	return vars_in_context([ $x->vars ], $thing->{ctx});
     }
 
     my $tmpv = $thing->val;

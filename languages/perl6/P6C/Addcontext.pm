@@ -565,9 +565,7 @@ sub P6C::ternary::ctx_left {
 ##############################
 sub P6C::decl::ctx_right {
     my ($x, $ctx) = @_;
-    unless ($ctx->type eq 'void') {
-	unimp "declaration in non-void context";
-    }
+    $x->{ctx} = $ctx->copy;
     if (ref $x->vars eq 'ARRAY') {
 	$_->ctx_right($ctx) for @{$x->vars};
     } else {
