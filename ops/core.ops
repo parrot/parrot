@@ -2246,13 +2246,17 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     goto NEXT();
 }
 
-=item C<sprintf>(out STR, in STR, in PMC)
+=cut
 
-=item C<sprintf>(out PMC, in PMC, in PMC)
+########################################
 
-=item C<sprintf>(out STR, in STR) [unimplemented]
+=item B<sprintf>(out STR, in STR, in PMC)
 
-=item C<sprintf>(out PMC, in PMC) [unimplemented]
+=item B<sprintf>(out PMC, in PMC, in PMC)
+
+=item B<sprintf>(out STR, in STR) [unimplemented]
+
+=item B<sprintf>(out PMC, in PMC) [unimplemented]
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
@@ -2265,6 +2269,8 @@ differences, especially concerning sizes (which are largely ignored);
 see F<misc.c> for details.
 
 =back
+
+=cut
 
 inline op sprintf(out STR, in STR, in PMC) {
     $1=Parrot_psprintf(interpreter, $2, $3);
@@ -3043,12 +3049,13 @@ inline op exists(out INT, in PMC, in KEY) {
   goto NEXT();
 }
 
-=back
+=cut
 
-
-=item delete(inout PMC, in KEY)
+=item B<delete>(inout PMC, in KEY)
 
 Delete the specified entry $2 from aggregate $1.
+
+=back
 
 =cut
 
@@ -4024,7 +4031,7 @@ op getprop(out PMC, in STR, in PMC) {
    goto NEXT();
 }
 
-=item delprop(in PMC, in STR)
+=item B<delprop>(in PMC, in STR)
 
 Delete property $2 from PMC $1
 
@@ -4035,7 +4042,7 @@ op delprop(in PMC, in STR) {
    goto NEXT();
 }
 
-=item prophash(out PMC, in PMC)
+=item B<prophash>(out PMC, in PMC)
 
 Get a hash for the properties in PMC $2 and put it in $1
 
@@ -4045,6 +4052,10 @@ op prophash(out PMC, in PMC) {
    $1 = $2->vtable->getprops(interpreter, $2);
    goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 
