@@ -115,4 +115,27 @@ pmclass Key need_ext {
 	return key_next(INTERP, SELF);
     }
 
+    /* iterator interface */
+    PMC* get_pmc_keyed (PMC* key) {
+	return key;
+    }
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+	PMC *ret = SELF;
+
+	switch (what) {
+	    case ITERATE_FROM_START:	/* reset key */
+		break;
+	    case ITERATE_GET_NEXT:
+		if (PMC_data(key))
+		    ret = key_next(interpreter, key);
+		else
+		    ret->cache.int_val = -1;
+		break;
+	    default:
+		internal_exception(1, "Key can't iterate backwards");
+		break;
+	}
+	return ret;
+    }
 }

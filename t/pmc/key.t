@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 
 output_is(<<'CODE', <<'OUT', 'traverse key chain');
@@ -38,5 +38,29 @@ CODE
 123
 OUT
 
+output_is(<<'CODE', <<'OUT', 'iter key chain');
+    new P0, .Key
+    set P0, "1"
+    new P1, .Key
+    set P1, "2"
+    push P0, P1
+    new P2, .Key
+    set P2, "3"
+    push P1, P2
 
-
+    .include "iterator.pasm"
+    new P5, .Iterator, P0
+    print "ok 1\n"
+    set P5, .ITERATE_FROM_START
+lp:
+    unless P5, end
+    shift P4, P5
+    print P4
+    branch lp
+end:
+    print "\n"
+    end
+CODE
+ok 1
+123
+OUT
