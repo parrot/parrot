@@ -1,0 +1,68 @@
+imcc is the intermediate compiler for Parrot.
+
+Why? Writing a compiler is a large undertaking. I'm trying
+to take some of the load off of potential language designers,
+including the Perl6 compiler itself. We can provide a
+common back-end for Parrot that does:
+
+   Register Allocation and Spillage
+   Constant folding and expression evaluation
+   Instruction selection.
+   Coalescing, instruction scheduling, etc.
+   
+This way, language designers can get right to work on
+
+   Tokenizing, parsing, type checking AST/DAG production
+
+Then they can simply spit out IR to imcc which will compile
+directly to Parrot bytecode, potentially skipping the
+assembler altogether.
+
+So far, all the compiler does (besides translating the IR to pasm) is
+register allocation. I like Steve Muchnick's MIR language, and I'm
+taking a few things from it.
+
+Presently you can write code with unlimited symbolics or named
+locals and imcc will translate to pasm.
+
+I expect the IR compiler to focus on staying FAST, simple and
+maintainable, and never develop featuritis, however I want it to be
+adequate for all languages targetting parrot. Did I mention that
+it needs to be FAST?
+
+We have other options like having imcc to become an assembler in its
+own right, which is fine by me, but for now, I think Parrot is changing way
+too fast to have another assembler branch).
+
+
+Register Allocation
+
+  The allocator uses graph-coloring and du-chains to allocate registers
+  for lexicals and symbolic temporaries.
+
+Spilling
+
+  Currently spillage is not implemented.
+
+Optimization
+
+  At this level, many optimizations are simple, like register
+  coalescing, redudant copies, and constant expression evaluation.
+  This will wait until the compiler is fully featured and well
+  designed and works well enough as the backend compiler for languages
+  targetting Parrot.
+
+
+Why C and Bison?
+
+  Until Perl6 compiles itself and is fast, a Bison parser is
+the easiest to maintain. An additional, important benefit, is
+C-based LALR parser are pretty darn fast. Currently assembling
+Parrot assembly on the fly is just too slow with assemble.pl,
+although new things are in the works.
+
+
+Please mail perl6-internals@perl.org with bug-reports or patches.
+
+Maintainer and Author:   Melvin Smith (melvin.smith@mindspring.com)
+
