@@ -11,9 +11,9 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.5.0"
+#define COLA_VERSION "0.0.5.2"
 
-#define DEBUG 1
+#define DEBUG 0
 
 void abort(void);
 void exit(int status);
@@ -23,7 +23,7 @@ enum ASTKIND {
     KIND_DECL,
     KIND_STATEMENT,
     KIND_BLOCK,
-    KIND_EXPRESSION,
+    KIND_EXPR,
     KIND_PARAM
 };
 
@@ -48,7 +48,7 @@ enum ASTTYPE {
     ASTT_CONTINUE,
     ASTT_RETURN,
     ASTT_GOTO,
-    ASTT_CALL,
+    ASTT_METHOD_CALL,
     ASTT_BOOLEAN,
     ASTT_COMPARISON,
     ASTT_CONDITIONAL_EXPR,
@@ -94,7 +94,9 @@ typedef struct _Symbol {
     int             kind;
     struct _Symbol  *typename;
     Type            *type;
+/*
     AST *           init_expr;
+*/
     int             is_lval;
     SymbolTable     *table;   /* For functions/procs */
     struct _Symbol  *literal;
@@ -116,7 +118,7 @@ struct _AST {
     char            *start_label,
                     *end_label;
     enum ASTKIND    kind;       /* General node class (STATEMENT) */
-    int             asttype;    /* Specific node type (IF|ASSIGN|...)*/
+    enum ASTTYPE    asttype;    /* Specific node type (IF|ASSIGN|...)*/
     int             op;         /* Operation */
     Type            *type;      /* Unresolved until type-check pass */
     Symbol          *typename;
@@ -130,6 +132,15 @@ struct _AST {
      * arg2 = _else_ branch
      */
     union {
+	/*
+	struct _EXPR {
+	    struct _AST *arg1;
+	    struct _AST *arg2;
+	} Expr;
+	*/
+        struct _CLASS {
+            struct _AST *body;
+        } Class;
         struct _CONDITIONAL {
             struct _AST *condition, *end;
         } Conditional;
@@ -265,10 +276,12 @@ Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
 Symbol              *lookup_namespace(SymbolTable * tab, const char * name);
 Symbol              *lookup_class(SymbolTable * tab, const char * name);
 Symbol              *store_symbol(SymbolTable *, Symbol *);
-Symbol              *store_identifier(SymbolTable *, const char * name, Type * t);
-Symbol              *store_method(SymbolTable *, const char * name, Type * t);
+Symbol              *store_identifier(SymbolTable *, Symbol *);
+Symbol              *store_method(SymbolTable *, const char * name, Type *);
 int                 push_scope();
-Symbol              *pop_scope(SymbolTable *);
+Symbol              *pop_scope();
+void                discard_scope();
+void                declare_local(Symbol * id);
 
 /*
  * Type related utilities
@@ -286,8 +299,24 @@ Type                *new_array(Symbol * typename, Rank * rank);
 Rank                *new_rank(int dim);
 Symbol              *array_signature(Type * t);
 
-void                do_ast_type_resolution(AST * tree);
-void                do_symbol_type_resolution(Symbol * list);
+/* Type checking and semantic phase */
+void                build_ast(AST *);
+void                build_class_decl(AST *);
+void                build_class_body(AST *);
+void                build_method_decl(AST *);
+void                build_field_decl(AST *);
+void                build_statement_list(AST *);
+void                build_expr_list(AST *);
+void                build_expr(AST *);
+void                build_if(AST *);
+void                build_conditional(AST *);
+void                build_method_call(AST *);
+void                build_new_expr(AST *);
+void                build_loop(AST *);
+void                build_return(AST *);
+void                resolve_identifier(Symbol **);
+
+
 char                *str_dup(const char *);
 char                *str_cat(const char *, const char *);
 void                dump_namespace(Symbol * );
@@ -300,7 +329,8 @@ AST                 *new_statement(int type, AST * left, AST * right);
 AST                 *new_expr(int type, AST * left, AST * right);
 AST                 *new_op_expr(AST * left, int op, AST * right);
 AST                 *new_logical_expr(AST * left, int op, AST * right);
-AST                 *new_if(AST * condition, AST * then_part, AST * else_part);
+AST                 *new_if(AST * condition, AST *, AST *);
+AST                 *new_conditional(AST * condition, AST *, AST *);
 AST                 *new_while(AST * condition, AST * block);
 AST                 *new_for(AST * init, AST * condition, AST * increment, AST * block);
 extern int          primary_block;
@@ -310,6 +340,7 @@ AST                 *pop_primary_block();
 AST                 *get_cur_primary_block();
 AST                 *cur_method;
 
+/* Code generation phase */
 void                gen_bootstrap();
 void                gen_ast(AST * ast);
 void                gen_namespace_decl(AST *);
@@ -322,7 +353,7 @@ void                gen_block(AST * ast);
 void                gen_statement(AST * ast);
 void                gen_assign(AST * ast);
 void                gen_expr(AST * ast, Symbol * lval, Type * t);
-void                gen_call(AST *);
+void                gen_method_call(AST *);
 void                gen_if(AST *);
 void                gen_while(AST *);
 void                gen_for(AST *);

@@ -1,6 +1,6 @@
 "Cola" - A compiler for the Parrot VM
 
-  V0.0.4.6
+  V0.0.5.2
 
   I've started this compiler (I call it Cola) to simultaneously
   teach myself how to write a compiler (ok I admit I squeaked

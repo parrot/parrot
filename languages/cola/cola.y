@@ -54,8 +54,8 @@ AST         *ast_start = NULL;
 %type <sym> primitive_type integral_type
 %type <sym> member_name qualified_identifier
 %type <sym> namespace_scope_start class_scope_start 
-%type <sym> var_declarator var_declarators
 %type <sym> formal_param_list fixed_params fixed_param
+%type <ast> var_declarator var_declarators
 %type <ast> using_directives using_directive attribute_list
 %type <ast> namespace_member_decls namespace_member_decl
 %type <ast> namespace_decl class_decl namespace_body
@@ -79,7 +79,7 @@ AST         *ast_start = NULL;
 %type <ast> shift_expr exclusive_or_expr relational_expr
 %type <ast> unary_expr add_expr mult_expr
 %type <ast> equality_expr relational_expr
-%type <ast> call arg arg_list member_access
+%type <ast> method_call arg arg_list member_access
 %type <ival> relational_op
 %type <sym> rank_specifiers
 
@@ -133,7 +133,6 @@ attribute_list    :    /*NULL*/
 namespace_decl:
     namespace_scope_start namespace_body
         {
-            pop_scope(NULL);
             pop_namespace();
             $$ = new_ast(KIND_DECL, ASTT_NAMESPACE_DECL, $2, NULL);
             $$->sym = $1;
@@ -143,18 +142,21 @@ namespace_decl:
 namespace_scope_start:
     NAMESPACE qualified_identifier
         {
-            Symbol *n, *t, *last;
+            Symbol *n, *t, *last = current_namespace;
             if(lookup_type_symbol($2)) {
                 printf("Error, redefinition of [%s]\n", $2->name);
                 exit(0);
             }
-            for(n = $2, last=current_namespace; n; n = n->tnext) {
+            for(n = split(".", $2->name); n; n = n->tnext) {
+                n->kind = $2->kind;
                 t = mk_namespace_symbol(n);
                 store_symbol(last->table, t);
                 last = n;
             }
             push_namespace(t);
+/*
             push_scope();
+*/
             $$ = t;
         }
     ;
@@ -202,10 +204,10 @@ class_decl:
     class_modifiers class_scope_start class_body optional_semi
         {
             /* Collect class members */
-            /*$2->members = pop_scope(current_symbol_table);*/
-            pop_scope(NULL);
+            /*$2->members = pop_scope();*/
             pop_namespace();
-            $$ = new_ast(KIND_DECL, ASTT_CLASS_DECL, $3, NULL);
+            $$ = new_ast(KIND_DECL, ASTT_CLASS_DECL, NULL, NULL);
+            $$->Attr.Class.body = $3;
             $$->sym = $2;
         }
     ;
@@ -232,16 +234,20 @@ class_scope_start:
         {
             /* Create a new namespace for class and put it in effect */
             Symbol * c;
+/*
             if(lookup_type($2->name)) {
                 printf("Error, redefinition of type [%s]\n", $2->name);
                 exit(0);
             }
+*/
 #if DEBUG
             fprintf(stderr, "\nclass_scope_start <- CLASS IDENTIFIER (%s)\n", $2->name);
 #endif
             c = mk_class_symbol($2);
             push_namespace(c);
+/*
             push_scope();
+*/
             $$ = c;
         }
     ;
@@ -273,14 +279,202 @@ class_member_decl:
     ;
 
 
+decl_statement:
+    local_var_decl ';'
+        { $$ = $1; }
+    |   CONST type IDENTIFIER '=' LITERAL ';'
+        {
+            $3->typename = $2;
+            $3->literal = $5;
+            check_id_redecl(current_symbol_table, $3->name);
+            store_symbol(current_symbol_table, $3); 
+            $$ = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
+            $$->typename = $2;
+            if(lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
+                    printf("Warning: declaration of '%s' shadows previous instance.\n",
+                            $$->sym->name);
+            }
+        }
+    ;
+
+local_var_decl:
+    type var_declarators
+        {
+            /* Insert symbols into symbol table, collect any initializer
+             * statement exprs, then discard symbol list.
+             */
+            AST * decl;
+            if($1 == NULL) {
+                printf("Internal compiler error: local_var_decl: type is NULL\n");
+                abort();
+            }
+            for(decl=$2; decl; decl = decl->next) {
+#if DEBUG
+                fprintf(stderr, "local_var: [%s] typename [%s]\n",
+                        decl->arg1->sym->name, $1->name);
+#endif
+                decl->arg1->sym->typename = $1;
+            }
+            $$ = $2;
+        }
+    ;
+    
+var_declarators:
+    var_declarator
+    |   var_declarators ',' var_declarator
+        {
+            $$ = $1;
+            unshift_ast(&($$), $3);
+        }
+    ;
+    
+var_declarator:
+    IDENTIFIER
+    {
+        AST * decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
+        decl->sym = $1;
+        $$ = new_statement(ASTT_FIELD_DECL, decl, NULL); 
+#if DEBUG
+        fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
+#endif
+    }
+    |   IDENTIFIER '=' expr
+        {
+            AST * decl, * init;
+            decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
+            decl->sym = $1;
+            init = new_expr(ASTT_ASSIGN, decl, $3);
+            $$ = new_statement(ASTT_FIELD_DECL, decl, init); 
+#if DEBUG
+            fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
+#endif
+        }
+/*
+    |   IDENTIFIER '=' array_initializer
+*/
+    ;
+    
+method_decl:
+    method_header method_body
+        {
+            $$ = $1;
+            $$->Attr.Method.body = $2;
+/*
+            if($2 != NULL)
+                $$->locals = $2->locals;
+*/
+/*
+            pop_scope();
+*/
+        }
+    ;
+
+method_header:
+    method_modifiers return_type member_name '(' formal_param_list ')'
+        {
+            Symbol * param;
+            $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
+            $3->kind = METHOD;
+            $3->typename = $2;
+            $$->sym = $3;
+            $$->Attr.Method.params = $5;
+            /* Methods/Fields stored at scope 0 of class namespace.
+             * We can store these at parse time.
+             */
+            store_symbol(current_symbol_table, $$->sym);
+/*
+            push_scope();
+            for(param = $5; param; param = param->tnext) {
+                store_symbol(current_symbol_table, param);
+            }
+*/
+        }
+    ;
+
+method_modifiers:    /*NULL*/    
+    |    method_modifiers method_modifier
+    ;
+
+method_modifier:
+    STATIC
+    |    VIRTUAL
+    |    PUBLIC
+    |    PRIVATE
+    |    PROTECTED
+    ;
+
+formal_param_list:    /*NULL*/
+        { $$ = NULL; }
+    |   fixed_params
+        { $$ = $1; }
+/*
+    |   fixed_params ',' param_array
+    |   param_array
+*/
+    ;
+        
+fixed_params:
+    fixed_param
+    |   fixed_params ',' fixed_param
+        {
+            $$ = $1;
+            tunshift_sym(&($$), $3);
+        }
+    ;
+    
+fixed_param:
+    type IDENTIFIER
+        {
+#if DEBUG
+            fprintf(stderr, " fixed_param <- type IDENTIFIER(%s)\n", $2->name);
+#endif
+            $2->typename = $1;
+            $$ = $2;
+        }
+    ;
+
+/*
+param_modifier:
+    REF
+    |   OUT
+    ;
+    
+param_array:
+    attributes PARAMS array_type IDENTIFIER
+    ;
+*/
+    
+member_name:
+    IDENTIFIER
+        {
+#if DEBUG
+            fprintf(stderr, " member_name <- IDENTIFIER (%s)\n", $1->name);
+#endif
+            $$ = $1;
+            check_id_redecl(current_symbol_table, $1->name);
+            if(lookup_symbol_in_tab(current_symbol_table, $1->name)) {
+                    printf("Warning: declaration of '%s' shadows previous instance.\n",
+                            $1->name);
+            }
+        }
+/*
+    |   interface_type '.' IDENTIFIER
+*/
+    ;
+
+method_body:
+    block
+        { $$ = $1; }
+    ;
+
 block:
     '{' block_scope statement_list '}'
         {
             $$ = $3;
             if($$) {
-                $$->locals = pop_scope(current_symbol_table);
+                $$->locals = pop_scope();
             } else {
-                pop_scope(current_symbol_table);
+                pop_scope();
             }
         }
     ;
@@ -427,6 +621,7 @@ return_type:
                 printf("Internal compiler error, NULL type.\n");
                 exit(0);
             }
+            $$ = $1;
         }
     |   VOID
         {
@@ -448,6 +643,10 @@ type_name:
 
 type:
     type_name
+        {
+            fprintf(stderr, "!TYPE[%s]\n", $1->name);
+            $$ = $1;
+        }
     |   primitive_type
     |   array_type
     ;
@@ -495,34 +694,10 @@ rank_specifiers:
     ;
         
 /*
-rank_specifier:
-    '[' dim_separators ']'
-        {   $$ = symbol_join3(new_symbol("["), $2, new_symbol("]"));
-#if DEBUG
-            fprintf(stderr, " rank_spec([ dim_separators ])\n");
-#endif
-        }
-    |   '[' ']'
-        {   $$ = new_symbol("[]");
-#if DEBUG
-            fprintf(stderr, " rank_spec([])\n");
-#endif
-        }
-    ;
-
-dim_separators:
-    ','
-        { $$ = new_symbol(","); }
-    |   dim_separators ','
-        { $$ = symbol_concat($1, new_symbol(",")); }
-    ; 
-*/
-
-/*
  * Expressions
  */ 
 statement_expr:
-    call
+    method_call
     |   assignment
     |   post_inc_expr
     |   post_dec_expr
@@ -611,15 +786,17 @@ primary_expr:
     |   qualified_identifier
         {
             Symbol * orig;
+            $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL);
+/*
             orig = lookup_symbol($1->name);
             if(orig == NULL) {
-                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
+                fprintf(stderr, "error (line %ld): undeclared identifier %s.\n", line, $1->name);
                 exit(0);
             }
-            $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL);
             if(orig)
                 $$->sym = orig;
             else
+*/
                 $$->sym = $1;
 #if DEBUG
             fprintf(stderr, "primary_expr <- qualified_identifier_expr\n");
@@ -630,7 +807,7 @@ primary_expr:
             $$ = $2;
         }
     |   element_access
-    |   call
+    |   method_call
     |   post_inc_expr
     |   post_dec_expr
     |   new_expr
@@ -654,12 +831,16 @@ unary_expr:
     |   pre_dec_expr
     ;
 
-call:
+method_call:
     primary_expr '(' arg_list ')'
         {
-            $$ = new_expr(ASTT_CALL, $1, $3);
+            if($1->asttype != ASTT_IDENTIFIER) {
+                fprintf(stderr, "Error (line %d), method call must be a simple name.\n", line);
+                exit(0);
+            }
+            $$ = new_expr(ASTT_METHOD_CALL, $1, $3);
 #if DEBUG
-            fprintf(stderr, " call <- primary_expr ( arg_list )\n");
+            fprintf(stderr, " method_call <- primary_expr ( arg_list )\n");
 #endif
         }
     ;
@@ -727,8 +908,7 @@ conditional_expr:
     |   conditional_or_expr '?' expr ':' expr
     {
         /* Ternary is just a if/then/else statement which can return a value */
-        $$ = new_if($1, $3, $5);
-        $$->asttype = ASTT_CONDITIONAL_EXPR;
+        $$ = new_conditional($1, $3, $5);
     }
     ;
 
@@ -818,199 +998,18 @@ shift_expr:
         }  
     ;
 
-decl_statement:
-    local_var_decl ';'
-        { $$ = $1;    }
-    |   CONST type IDENTIFIER '=' LITERAL ';'
-        {
-            $3->typename = $2;
-            $3->literal = $5;
-            check_id_redecl(current_symbol_table, $3->name);
-            store_symbol(current_symbol_table, $3); 
-            $$ = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
-            $$->typename = $3;
-            if(lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
-                    printf("Warning: declaration of '%s' shadows previous instance.\n",
-                            $$->sym->name);
-            }
-        }
-    ;
-
-local_var_decl:
-    type var_declarators
-        {
-            /* Insert symbols into symbol table, collect any initializer
-             * statement exprs, then discard symbol list.
-             */
-            Symbol * sym;
-            AST * init_exprs = NULL;
-            if($1 == NULL) {
-                printf("Internal compiler error: local_var_decl: type is NULL\n");
-                abort();
-            }
-            for(sym=$2; sym; sym=sym->tnext) {
-                sym->typename = $1;
-                check_id_redecl(current_symbol_table, sym->name);
-                if(lookup_symbol(sym->name)) {
-                        printf("Warning: declaration of '%s' shadows previous instance.\n",
-                                sym->name);
-                }
-                store_symbol(current_symbol_table, sym);
-                /* Collect intializer statements */
-                if(sym->init_expr) {
-                    AST *id, * init_expr;
-                    id = new_expr(ASTT_IDENTIFIER, NULL, NULL);
-                    id->sym = sym;
-                    init_expr = new_expr(ASTT_ASSIGN, id, sym->init_expr);
-                    unshift_ast(&init_exprs, init_expr);
-                }
-            }
-            $$ = init_exprs;
-        }
-    ;
-    
-var_declarators:
-    var_declarator
-    |   var_declarators ',' var_declarator
-        {
-            $$ = $1;
-            tpush_sym(&($$), $3);
-        }
-    ;
-    
-var_declarator:
-    IDENTIFIER
-    {
-        $$ = $1;
-#if DEBUG
-        fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
-#endif
-    }
-    |   IDENTIFIER '=' expr
-        {
-            $$ = $1; $$->init_expr = $3;
-#if DEBUG
-            fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
-#endif
-        }
-/*
-    |   IDENTIFIER '=' array_initializer
-*/
-    ;
-    
-method_decl:
-    method_header method_body
-        {
-            $$ = $1;
-            $$->Attr.Method.body = $2;
-            if($2 != NULL)
-                $$->locals = $2->locals;
-            pop_scope(current_symbol_table);
-        }
-    ;
-
-method_header:
-    method_modifiers return_type member_name '(' formal_param_list ')'
-        {
-            Symbol * param;
-            $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
-            $3->kind = METHOD;
-            $3->typename = $2;
-            $$->sym = $3;
-
-            $$->Attr.Method.params = $5;
-            store_symbol(current_symbol_table, $$->sym);
-            push_scope();
-            for(param = $5; param; param = param->tnext) {
-                store_symbol(current_symbol_table, param);
-            }
-        }
-    ;
-
-method_modifiers:    /*NULL*/    
-    |    method_modifiers method_modifier
-    ;
-
-method_modifier:
-    STATIC
-    |    VIRTUAL
-    |    PUBLIC
-    |    PRIVATE
-    |    PROTECTED
-    ;
-
-formal_param_list:    /*NULL*/
-        { $$ = NULL; }
-    |   fixed_params
-        { $$ = $1; }
-/*
-    |   fixed_params ',' param_array
-    |   param_array
-*/
-    ;
-        
-fixed_params:
-    fixed_param
-    |   fixed_params ',' fixed_param
-        {
-            $$ = $1;
-            tunshift_sym(&($$), $3);
-        }
-    ;
-    
-fixed_param:
-    type IDENTIFIER
-        {
-#if DEBUG
-            fprintf(stderr, " fixed_param <- type IDENTIFIER(%s)\n", $2->name);
-#endif
-            $2->typename = $1;
-            $$ = $2;
-        }
-    ;
-
-/*
-param_modifier:
-    REF
-    |   OUT
-    ;
-    
-param_array:
-    attributes PARAMS array_type IDENTIFIER
-    ;
-*/
-    
-member_name:
-    IDENTIFIER
-        {
-#if DEBUG
-            fprintf(stderr, " member_name <- IDENTIFIER (%s)\n", $1->name);
-#endif
-            $$ = $1;
-            check_id_redecl(current_symbol_table, $1->name);
-            if(lookup_symbol_in_tab(current_symbol_table, $1->name)) {
-                    printf("Warning: declaration of '%s' shadows previous instance.\n",
-                            $1->name);
-            }
-        }
-/*
-    |   interface_type '.' IDENTIFIER
-*/
-    ;
-
-method_body:
-    block
-        { $$ = $1; }
-    ;
 
 %%
+
+
 
 extern FILE *yyin;
 
 
 int main(int argc, char * argv[])
 {
-    printf("Cola compiler version %s\n\n", COLA_VERSION);
+    fprintf(stderr, "Cola - Copyright (C) 2002 Melvin Smith <melvins@us.ibm.com>\n");
+    fprintf(stderr, "colac version %s\n\n", COLA_VERSION);
     if(argc > 1) {
         if(!(yyin = fopen(argv[1], "r")))    {
             printf( "Error reading source file %s.\n", argv[1] );
@@ -1046,10 +1045,11 @@ int main(int argc, char * argv[])
     fclose(yyin);
 
     fprintf(stderr, "Pass 2: Type checking...\n");
-    do_ast_type_resolution(ast_start);
+    fprintf(stderr, "Pass 2: Start scope is [%d]\n", scope);
+    build_ast(ast_start);
 
     fprintf(stderr, "Pass 3: Semantic checking...\n");
-    /*do_semantic_check(ast_start); */
+    /*semant_ast(ast_start); */
 
     freopen("a.imc", "w", stdout);
     fprintf(stderr, "Compiling intermediate code to a.imc\n");      

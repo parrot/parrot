@@ -1,7 +1,7 @@
 //
 // My naive beginnings of the C# System namespace
 
-namespace System {
+//namespace System {
 
 	public class Object {
 	}
@@ -54,5 +54,5 @@ namespace System {
 			puts(s);
 		}
 	}
-}
+//}
 

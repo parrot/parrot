@@ -342,14 +342,14 @@ sub directive {
     if( $dir eq 'local' ) {
         my ($type, $arrayspec, $name) = $rest =~ /(\w+)(\[.*?\])?\s+(\w+)/;
         $regs{$name} = &alloc_reg($type, $arrayspec);
-        print STDERR "\t#directive [local,$type ($arrayspec),$regs{$name}]\n";
+        print "\t#.local [$type ($arrayspec), $name, $regs{$name}]\n";
     }
     elsif( $dir eq 'param' ) {
         my ($type, $name) = $rest =~ /(\w+)\s+(\w+)/;
         my $reg;
         $reg = &alloc_reg($type);
         $regs{$name} = $reg;
-        #print "\t#directive [param,$type,$name]\n";
+        #print "\t#.param [$type,$name]\n";
         print "\trestore $reg\n";
     }
     elsif( $dir eq 'sub' ) {

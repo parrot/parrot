@@ -8,6 +8,9 @@
  * This file is really kludgy. What started as a simple
  * expression generator for Parrot is now trying to do way more
  * than it should. I've started a rewrite with the lessons learned.
+ *
+ * Type checking and semantics moved to semant.c; by the time
+ * this runs we should assume everything is valid.
  */
 
 
@@ -53,29 +56,20 @@ void gen_bootstrap() {
      *    Kludge, generate a limited support library until
      *    I can import modules
      */
-    const char * saveregs        = "\tpushi\n\tpushn\n\tpushs\n";
-    const char * restoreregs    = "\tpops\n\tpopn\n\tpopi\n";
+    const char * saveregs        = "pushi\npushn\npushs\n";
+    const char * restoreregs    = "pops\npopn\npopi\n";
     printf("\nemit<<EOF\n");
-    printf("\n__puts:\n%s\trestore S31\n\tputs S31\n%s\tret\n",
+    printf("\n__puts:\npushs\nrestore S31\nputs S31\npops\nret\n");
+    printf("\n__puti:\npushi\nrestore I31\nputs I31\npopi\nret\n");
+    printf("\n__putf:\npushn\nrestore N31\nputs N31\npopn\nret\n");
+    printf("\n__substr:\n%srestore I31\nrestore I30\nrestore S31\nsubstr S30, S31, I30, I31\nsave S30\n%sret\n",
                 saveregs, restoreregs);
-    printf("\n__puti:\n%s\trestore I31\n\tputs I31\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__putf:\n%s\trestore N31\n\tputs N31\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__substr:\n%s\trestore I31\n\trestore I30\n\trestore S31\n\tsubstr S30, S31, I30, I31\n\tsave S30\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__strlen:\n%s\trestore S0\n\tlength I0, S0\n\tsave I0\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__strchop:\n%s\trestore S0\n\tchopn S0, 1\n\tsave S0\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__strrep:\n%s\trestore S30\n\trestore I31\n\trestore I30\n\trestore S31\n\tsubstr S31, I30, I31, S30\n\tsave S31\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__ord:\n%s\trestore S0\n\tord I0, S0\n\tsave I0\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__gets:\n%s\tread S0, 512\n\tsave S0\n%s\tret\n",
-                saveregs, restoreregs);
-    printf("\n__sleep:\n%s\trestore I0\n\tsleep I0\n%s\tret\n",
-                saveregs, restoreregs);
+    printf("\n__strlen:\npushs\npushi\nrestore S0\nlength I0, S0\nsave I0\npops\npopi\nret\n");
+    printf("\n__strchop:\npushs\nrestore S0\nchopn S0, 1\nsave S0\npops\nret\n");
+    printf("\n__strrep:\npushs\npushi\nrestore S30\nrestore I31\nrestore I30\nrestore S31\nsubstr S31, I30, I31, S30\nsave S31\npops\npopi\nret\n");
+    printf("\n__ord:\npushs\npushi\nrestore S0\n\nord I0, S0\nsave I0\npops\npopi\nret\n");
+    printf("\n__gets:\npushs\nread S0, 512\nsave S0\npops\nret\n");
+    printf("\n__sleep:\npushi\nrestore I0\nsleep I0\npopi\nret\n");
     printf("EOF\n");
 }
 
@@ -87,8 +81,8 @@ void gen_namespace_decl(AST * p) {
 
 void gen_class_decl(AST * p) {
     printf(".class %s\n", p->sym->name);
-    if(p->arg1) {
-        gen_class_body(p->arg1);
+    if(p->Attr.Class.body) {
+        gen_class_body(p->Attr.Class.body);
     }
 }
 
@@ -115,15 +109,28 @@ void gen_constant_decl(AST * p) {
     printf("\t\t\t# constant %s = %s\n", p->sym->name, p->sym->literal->name);
 }
 
+void gen_field_decl(AST * p) {
+    /* Don't generate the identifier in arg1, it was collected for ordering
+     * in phase 2 and declared at the top of the block.
+     */
+    if(p->arg2) {
+        gen_expr(p->arg2, NULL, NULL);
+    }
+}
+
 void gen_block(AST * p) {
     /* First declare locals. */
+    if(!p) {
+        fprintf(stderr, "WARNING: Null block in AST tree.\n");
+        return; 
+    }
     if(p->locals) {
         Symbol * s = p->locals;
         while(s) {
             /* Don't emit local types that are in symbol table */
             if(s->kind != TYPE)
-                printf("\t.local %s\t%s\n", type_name(s->type), s->name);
-            s = s->next;
+                printf("\t.local %s\t%s\n", s->typename->name, s->name);
+            s = s->tnext;
         }
     }
     gen_statement(p);    
@@ -134,7 +141,7 @@ void gen_statement(AST * p) {
 #if DEBUG
     printf("#gen_statement\n");
 #endif
-    if(p->kind == KIND_EXPRESSION) {
+    if(p->kind == KIND_EXPR) {
         if(!eval_expr(p))
             gen_expr(p, NULL, NULL);
         goto END;
@@ -143,6 +150,14 @@ void gen_statement(AST * p) {
     switch(p->asttype) {
         case ASTT_CONSTANT_DECL:
             gen_constant_decl(p);
+            break;
+        case ASTT_FIELD_DECL:
+	    /* Nothing, locals are collected during the first
+	     * pass so they can be ordered at the top of each block.
+	     * During code generation we skip them, only generating
+	     * the initializer expressions for each, if they exist.
+	     */
+	    gen_field_decl(p);
             break;
         case ASTT_IF:
             gen_if(p);
@@ -188,8 +203,9 @@ void gen_statement(AST * p) {
                 }
                 if(!eval_expr(p->arg1))
                     gen_expr(p->arg1, NULL, cur_method->sym->type);
-                printf("\t# Push return val and jump\n\tpush %s %s\n",
-                        type_name(p->arg1->targ->type), NAME(p->arg1->targ) ); 
+               
+	       	printf("\t# Push return val and jump\n\tpush %s %s\n",
+                        p->arg1->targ->typename->name, NAME(p->arg1->targ) ); 
             }
             /* Simple optimization that works most of the time.
              * If this statement is the last statement in the method
@@ -210,10 +226,10 @@ END:
 }
 
 void gen_param_list(Symbol * paramlist) {
-    fprintf(stderr, "!!param (%s)%s\n", type_name(paramlist->type), paramlist->name);
+    fprintf(stderr, "!!param (%s)%s\n", paramlist->typename->name, paramlist->name);
     if(paramlist->tnext)
         gen_param_list(paramlist->tnext);
-    printf("\t.param %s\t%s\n", type_name(paramlist->type), paramlist->name);
+    printf("\t.param %s\t%s\n", paramlist->typename->name, paramlist->name);
 }
 
 void gen_method_decl(AST * p) {
@@ -305,9 +321,10 @@ void gen_assign(AST * ast) {
             p->targ = new_identifier_symbol(buf);
             p->targ->is_lval = 1;
             p->targ->type = deref->arg1->targ->type;
+            p->targ->typename = deref->arg1->targ->typename;
             
-            // Generate assignment
-            printf("\t(%s)%s = %s\n", type_name(p->targ->type), p->targ->name,
+            /* Generate assignment */
+            printf("\t(%s)%s = %s\n", p->targ->typename->name, p->targ->name,
                                     p->arg2->targ->name);
 #if DEBUG
             printf("#  return from gen_assign\n");
@@ -378,8 +395,8 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             p->targ = lval;
         else 
             p->targ = make_rval(p->type);
-        printf("\t(%s)%s = new %s\n", type_name(p->type), p->targ->name,       
-                        type_name(p->type));
+        printf("\t(%s)%s = new %s\n", p->typename->name, p->targ->name,       
+                        p->typename->name);
         return;        
     }
 
@@ -390,10 +407,10 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
     }
 
     /* Expression is a method call */
-    if(p->asttype == ASTT_CALL) {
+    if(p->asttype == ASTT_METHOD_CALL) {
         if(lval)
             p->targ = lval;
-        gen_call(p);
+        gen_method_call(p);
 #if DEBUG
         goto LAST;
 #endif
@@ -470,7 +487,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             }
             if(p->targ == NULL)
                 p->targ = make_rval(type1);
-            printf("\t(%s)%s = %s%s%s\n", type_name(p->targ->type),
+            printf("\t(%s)%s = %s%s%s\n", p->targ->typename->name,
                                 p->targ->name, p->arg1->targ->name,
                                 op_name(INDEX), p->arg2->targ->name);
 #if DEBUG
@@ -478,7 +495,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
 #endif
             return;
         }
-        
+
         if(type1 != type2) {
             /* Generate required casting assignments to temporaries */
 #if DEBUG
@@ -488,13 +505,13 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             coerce_operands(&type1, &type2);
             if(type1 != p->arg1->targ->type) {
                 Symbol * cast = make_rval(type1);
-                printf("\t(%s)%s = %s\n", type_name(cast->type),
+                printf("\t(%s)%s = %s\n", cast->typename->name,
                         cast->name, p->arg1->targ->name);
                 p->arg1->targ = cast;    
             }
             if(type2 != p->arg2->targ->type) {
                 Symbol * cast = make_rval(type2);
-                printf("\t(%s)%s = %s\n", type_name(cast->type),
+                printf("\t(%s)%s = %s\n", cast->typename->name,
                         cast->name, p->arg2->targ->name);
                 p->arg2->targ = cast;    
             }
@@ -511,7 +528,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
         if(p->targ->type != type1) {        
             Symbol * temp = make_rval(type1);
             emit_op_expr(temp, p->arg1->targ, op_name(p->op), p->arg2->targ);
-            printf("\t(%s)%s = %s\n", type_name(p->targ->type), p->targ->name,
+            printf("\t(%s)%s = %s\n", p->targ->typename->name, p->targ->name,
                                         temp->name);
             return;
         }
@@ -536,7 +553,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
              *      $2 = $1
              */
             p->targ = make_rval(p->arg1->targ->type);
-            printf("\t(%s)%s = %s\n", type_name(p->targ->type), p->targ->name,
+            printf("\t(%s)%s = %s\n", p->targ->typename->name, p->targ->name,
                                         p->arg1->targ->name);
             printf("\t%s %s\n", op_name(p->op), p->arg1->targ->name);
         }
@@ -575,7 +592,7 @@ void gen_arg_list(AST * p) {
         gen_arg_list(p->next);
 }
 
-void gen_call(AST * p) {
+void gen_method_call(AST * p) {
     /* FIXME: Should check that expression evaluates to a method */
     if(!eval_expr(p->arg1))
         gen_expr(p->arg1, NULL, NULL);
@@ -601,7 +618,7 @@ void gen_call(AST * p) {
         if(p->targ == NULL)
             p->targ = make_rval(p->arg1->targ->type);
         printf("\t#Get return val in %s\n", p->targ->name);
-        printf("\tpop %s %s\n", type_name(p->targ->type), p->targ->name);
+        printf("\tpop %s %s\n", p->targ->typename->name, p->targ->name);
     }
 }
 
@@ -614,7 +631,7 @@ void gen_if(AST * p) {
     else_label = make_label();
     end_label = make_label();
     if(!p->Attr.Conditional.condition
-        || p->Attr.Conditional.condition->kind != KIND_EXPRESSION) {
+        || p->Attr.Conditional.condition->kind != KIND_EXPR) {
         fprintf(stderr, "gen_if: Null or invalid CONDITION node\n");
         exit(0);
     }
@@ -650,7 +667,7 @@ void gen_while(AST * p) {
     printf("%s:\n", redo_label);
     gen_boolean(p->Attr.Loop.condition, p->start_label, p->end_label, 1);
     printf("%s:\n", p->start_label);
-    gen_block(p->arg1);
+    gen_block(p->Attr.Loop.body);
     printf("\tgoto %s\n", redo_label);    
     printf("%s:\n", p->end_label);
     pop_primary_block();
@@ -676,7 +693,7 @@ void gen_for(AST * p) {
     printf("%s:\n", redo_label);
     gen_boolean(p->Attr.Loop.condition, p->start_label, p->end_label, 1);
     printf("%s:\n", p->start_label);
-    gen_block(p->arg1);
+    gen_block(p->Attr.Loop.body);
     if(p->Attr.Loop.iteration) {
         printf("%s:\n", p->Attr.Loop.iteration->start_label);
         gen_statement(p->Attr.Loop.iteration);
@@ -772,6 +789,10 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
 }
 
 void coerce_operands(Type ** t1, Type ** t2) {
+    if(!*t1 || !*t2) {
+        fprintf(stderr, "Internal error: coerce_operands: NULL type(s)\n");
+        abort();
+    }
     if(*t1 == *t2)
         return;
     if(*t1 == t_int32) {
@@ -863,6 +884,7 @@ Symbol * make_rval(Type * type) {
         abort();
     }
     s->type = type;
+    s->typename = type->sym;
     s->is_lval = 0;
     return s;    
 }
@@ -888,7 +910,7 @@ void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
     printf("#emit_op_expr\n");
 #endif
 
-    printf( "\t(%s)%s = %s %s %s\n", type_name(r->type), r->name,
+    printf( "\t(%s)%s = %s %s %s\n", r->typename->name, r->name,
                NAME(a1), op, NAME(a2));
 }
 
@@ -898,10 +920,10 @@ void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
 #endif
     
     if(op)
-        printf( "\t(%s)%s = %s %s\n", type_name(res->type), res->name,
+        printf( "\t(%s)%s = %s %s\n", res->typename->name, res->name,
                        op, NAME(arg1));
     else
-        printf( "\t(%s)%s = %s\n", type_name(res->type), res->name,
+        printf( "\t(%s)%s = %s\n", res->typename->name, res->name,
                 NAME(arg1));
 
 #if DEBUG

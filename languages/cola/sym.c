@@ -21,6 +21,12 @@ SymbolTable     *current_symbol_table;
 Symbol          *namespace_stack;
 SymbolTable     *const_str;
 
+/* For saving scope between namespaces.
+ * each push_namespace should start with scope 0, and
+ * pop_namespace should restore scope of last namespace.
+ */
+int		scope_stack[1024];
+int             last_scope = 0;
 int             scope = 0;
 int             method_block = 0;
 int             primary_block = 0;
@@ -46,7 +52,7 @@ unsigned int hash_str(const char * str) {
 
 void init_symbol_tables() {
     /* The global namespace with no name */
-    global_namespace = mk_namespace_symbol(new_symbol(""));
+    global_namespace = mk_namespace_symbol(new_symbol("__GLOBAL__"));
     current_namespace = global_namespace;
     current_namespace->table = global_symbol_table = new_symbol_table();
     current_symbol_table = global_symbol_table;
@@ -71,7 +77,9 @@ Symbol * new_symbol(const char * name) {
     s->typename = NULL;
     s->type = NULL;
     s->is_lval = 1;
+#if 0
     s->init_expr = NULL;
+#endif
     s->table = NULL;
     s->literal = s->next = s->tnext = NULL;
     return s;
@@ -130,6 +138,7 @@ Symbol * symbol_concat(Symbol * s1, Symbol * s2) {
 Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3) {
     int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) + 1;
     Symbol * s = new_symbol("");
+    s->kind = s1->kind;
     s->name = malloc(len);
     strcpy(s->name, s1->name);
     strcat(s->name, s2->name);
@@ -141,6 +150,7 @@ Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4) {
     int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) +
                 strlen(s4->name) + 1;
     Symbol * s = new_symbol("");
+    s->kind = s1->kind;
     s->name = malloc(len);
     strcpy(s->name, s1->name);
     strcat(s->name, s2->name);
@@ -155,6 +165,8 @@ AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
     ast->start_label = ast->end_label = NULL;
     ast->kind = kind;
     ast->asttype = asttype;
+    ast->type = NULL;
+    ast->typename = NULL;
     ast->op = 0;
     ast->arg1 = arg1;
     ast->arg2 = arg2;
@@ -236,15 +248,12 @@ void tunshift_sym(Symbol ** list, Symbol * p) {
         abort();
     }
     if(l != NULL) {
-        fprintf(stderr, "!!sym %s\n", l->name);
         while(l->tnext) {
             l = l->tnext;
-            fprintf(stderr, "!!sym %s\n", l->name);
         }
         l->tnext = p;
     }
     else {
-        fprintf(stderr, "!!tunshift onto null list\n");
         *list = p;
     }
 }
@@ -273,6 +282,8 @@ void push_namespace(Symbol * ns) {
 #if 1
     printf("#push_namespace(%s)\n", ns->name);
 #endif
+    scope_stack[last_scope++] = scope;
+    scope = 0;
     current_namespace = ns;
     current_symbol_table = current_namespace->table;
     tpush_sym(&namespace_stack, ns);
@@ -284,6 +295,11 @@ void push_namespace(Symbol * ns) {
 Symbol * pop_namespace() {
     Symbol * ns;
     ns = tpop_sym(&namespace_stack);
+    scope = scope_stack[--last_scope];
+    if(last_scope < 0) {
+    	fprintf(stderr, "Internal error: scope unbalanced, popped scope 0\n");
+	abort();
+    }
     current_namespace = namespace_stack;
     current_symbol_table = current_namespace->table;
     return ns;    
@@ -310,19 +326,19 @@ AST * new_statement(int stmnttype, AST * left, AST * right) {
 }
 
 AST * new_expr(int exprtype, AST * left, AST * right) {
-    AST * p = new_ast(KIND_EXPRESSION, exprtype, left, right);
+    AST * p = new_ast(KIND_EXPR, exprtype, left, right);
     return p;    
 }
 
 /* Specific type of expression (A b C) where b is an operator */
 AST * new_op_expr(AST * left, int op, AST * right) {
-    AST * p = new_ast(KIND_EXPRESSION, ASTT_OP, left, right);
+    AST * p = new_ast(KIND_EXPR, ASTT_OP, left, right);
     p->op = op;
     return p;    
 }
 
 AST * new_logical_expr(AST * left, int op, AST * right) {
-    AST * p = new_ast(KIND_EXPRESSION, ASTT_LOGICAL, left, right);
+    AST * p = new_ast(KIND_EXPR, ASTT_LOGICAL, left, right);
     p->op = op;
     return p;    
 }
@@ -333,17 +349,28 @@ AST * new_if(AST * condition, AST * then_part, AST * else_part) {
     return p;     
 }
 
+/*
+ * Ternary conditionals
+ */
+AST * new_conditional(AST * condition, AST * then_part, AST * else_part) {
+    AST * p = new_ast(KIND_EXPR, ASTT_CONDITIONAL_EXPR, then_part, else_part);
+    p->Attr.Conditional.condition = condition;
+    return p;     
+}
+
 AST * new_while(AST * condition, AST * block) {
-    AST * p = new_statement(ASTT_WHILE, block, NULL);
+    AST * p = new_statement(ASTT_WHILE, NULL, NULL);
     p->Attr.Loop.condition = condition;
+    p->Attr.Loop.body = block;
     return p;     
 }
 
 AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
-    AST * p = new_statement(ASTT_FOR, block, NULL);
+    AST * p = new_statement(ASTT_FOR, NULL, NULL);
     p->Attr.Loop.init = init;
     p->Attr.Loop.condition = condition;
     p->Attr.Loop.iteration = iteration;
+    p->Attr.Loop.body = block;
     return p;     
 }
 
@@ -383,9 +410,17 @@ Symbol * lookup_symbol(const char * name) {
     Symbol * ns = current_namespace;
     Symbol * list = split(".", name);
     Symbol * s;
+    fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name); 
     for(ns = current_namespace; ns; ) {
+        fprintf(stderr, "lookup_symbol: searching namespace[%s] for [%s]\n", ns->name, list->name);
         if((s = lookup_symbol_in_tab(ns->table, list->name))) {
-	    ns = s;
+            fprintf(stderr, "lookup_symbol: found [%s] in namespace[%s]\n", list->name, ns->name);
+	    if(s->kind == IDENTIFIER) {
+                ns = s->type->sym;
+	    }
+	    else {
+	        ns = s;
+	    }
 	    list = list->tnext;
             if(!list || !s)
 	        return s;
@@ -470,16 +505,17 @@ Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     return sym;
 }
 
-Symbol * store_identifier(SymbolTable * tab, const char * name, Type * type) {
+/*
+Symbol * store_identifier(SymbolTable * tab, const char * name) {
     Symbol * s;
     s = new_symbol(name);
     s->kind = IDENTIFIER;
-    s->type = type;
-    s->typename = type->sym;
+    s->type = lookup_type_symbol(s->typename);
     s->scope = scope;
     store_symbol(tab, s);
     return s;
 }
+*/
 
 Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
     Symbol * s;
@@ -490,6 +526,24 @@ Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
     s->scope = scope;
     store_symbol(tab, s);
     return s;
+}
+
+void declare_local(Symbol * s) {
+    fprintf(stderr, "declare_local[%s]\n", s->name);
+    store_symbol(current_symbol_table, s);
+    if(s->typename) {
+        s->type = lookup_type_symbol(s->typename);
+        if(!s->type) {
+            fprintf(stderr, "declare_local: NULL type for ident [%s] typename [%s]\n",
+                s->name, s->typename->name);
+            abort();
+        }
+    }
+    else {
+        fprintf(stderr, "declare_local: NULL typename for ident [%s]\n",
+                s->name);
+        abort();
+    }
 }
 
 void dump_namespace(Symbol * ns) {
@@ -576,28 +630,64 @@ int push_scope() {
  * Pop current scope level and return a list of
  * symbols if symbol table is passed.
  */
-Symbol * pop_scope(SymbolTable * tab) {
+Symbol * pop_scope() {
     int i;
+    SymbolTable * tab = current_symbol_table;
     Symbol * p = NULL;
-    if(tab != NULL) {
-        for(i = 0; i < HASH_SIZE; i++) {
-            while(tab->table[i] && tab->table[i]->scope == scope) {
-                Symbol * t;
+    for(i = 0; i < HASH_SIZE; i++) {
+        while(tab->table[i] && tab->table[i]->scope == scope) {
+            Symbol * t;
 #ifdef DEBUG
-                printf("popping symbol %s: level %d\n", tab->table[i]->name, scope);
+            printf("popping symbol %s: level %d\n", tab->table[i]->name, scope);
 #endif
-                t = tab->table[i];
-                tab->table[i] = tab->table[i]->next;    
-                t->next = p;
-                p = t;
-            }
+            t = tab->table[i];
+            tab->table[i] = tab->table[i]->next;
+            t->tnext = p;    
+            t->next = NULL;
+            p = t;
         }
     }
+
     if(scope > 0)
         scope--;
+    else {
+        fprintf(stderr, "Internal error: can't pop scope 0.\n");
+        abort();
+    }
 
     return p;
 }
+
+/*
+ * Same as pop_scope except no list is built and returned.
+ * This is for cases where a list already existed, and each
+ * node was inserted into the symbol table, and we want to
+ * preserve that external list, so we can't scribble on the
+ * ->tnext pointer as it may reorder the list or invalidate it.
+ */
+void discard_scope() {
+    int i;
+    SymbolTable * tab = current_symbol_table;
+    for(i = 0; i < HASH_SIZE; i++) {
+        while(tab->table[i] && tab->table[i]->scope == scope) {
+            Symbol * t;
+#ifdef DEBUG
+            printf("discarding symbol %s: level %d\n", tab->table[i]->name, scope);
+#endif
+            t = tab->table[i];
+            tab->table[i] = tab->table[i]->next;
+            t->next = NULL;
+        }
+    }
+
+    if(scope > 0)
+        scope--;
+    else {
+        fprintf(stderr, "Internal error: can't discard scope 0.\n");
+        abort();
+    }
+}
+
 
 /* Don't laugh, this little array based stack is so I don't
  * have to add a 3rd ->next pointer to the AST struct.

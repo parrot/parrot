@@ -4,12 +4,13 @@
 #CC = cl
 DEBUG = -g
 # GCC
-CC = gcc -Wall
+#CC = gcc -efence -Wall -pedantic
+CC = gcc -Wall -pedantic
 YACC = bison -v -y
 LEX = flex
 LIBS =
+#LIBS = -lefence
 #LIBS = -ll -ly
-#LIBS = -lfl
 
 HEADERS = cola.h parser.h
 
@@ -17,10 +18,10 @@ default :
 	$(MAKE) x
 	cp x colac
 
-nogen : sym.o type.o gen.o
+nogen : gen.o semant.o sym.o type.o
 	$(CC) $(DEBUG) -c parser.c
 	$(CC) $(DEBUG) -c lexer.c
-	$(CC) $(DEBUG) -o x parser.o lexer.o sym.o type.o gen.o $(LIBS)
+	$(CC) $(DEBUG) -o x parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
 
 clean :
 	rm -f core
@@ -44,6 +45,9 @@ lexer.o : lexer.c $(HEADERS)
 parser.o : parser.c $(HEADERS)
 	$(CC) $(DEBUG) -c parser.c
 
+semant.o : semant.c $(HEADERS)
+	$(CC) $(DEBUG) -c semant.c
+
 sym.o : sym.c $(HEADERS)
 	$(CC) $(DEBUG) -c sym.c
 
@@ -53,6 +57,6 @@ type.o : type.c $(HEADERS)
 gen.o : gen.c $(HEADERS)
 	$(CC) $(DEBUG) -c gen.c
 
-x : parser.o lexer.o sym.o type.o gen.o
-	$(CC) $(DEBUG) -o x parser.o lexer.o sym.o type.o gen.o $(LIBS)
+x : parser.o lexer.o gen.o semant.o sym.o type.o
+	$(CC) $(DEBUG) -o x parser.o lexer.o gen.o semant.o sym.o type.o $(LIBS)
 

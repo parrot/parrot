@@ -91,6 +91,7 @@ RANKSPEC        \[[,]*\]
 {SIGN}?{DIGIT}+"."{DIGIT}+ {    
         Symbol * s = new_literal_symbol(yytext);
         s->type = t_float;
+        s->typename = t_float->sym;
         yylval.sym = s; 
         return(LITERAL);
     }
@@ -98,6 +99,7 @@ RANKSPEC        \[[,]*\]
 {SIGN}?{DIGIT}+ {    
         Symbol * s = new_literal_symbol(yytext);
         s->type = t_int32;
+        s->typename = t_int32->sym; 
         yylval.sym = s; 
         return(LITERAL);
     }
@@ -105,6 +107,7 @@ RANKSPEC        \[[,]*\]
 {STRINGCONSTANT} {
         Symbol * s = new_literal_symbol(yytext);
         s->type = t_string;
+        s->typename = t_string->sym;
         yylval.sym = s;
         return(LITERAL);
     }

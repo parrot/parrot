@@ -83,8 +83,18 @@ Type * lookup_type(const char * name) {
                 fprintf(stderr, "lookup_type(%s) : Error, symbol not a type\n", name );
                 abort();
             }
-            return s->type;
+#if DEBUG
+            fprintf(stderr, "Found symbol [%s] in namespace [%s]\n",
+			name, ns->name);
+#endif
+	    return s->type;
         }
+	else {
+#if DEBUG
+            fprintf(stderr, "Symbol [%s] not found in namespace [%s]\n",
+			name, ns->name);
+#endif
+	}
     }    
     return NULL;
 }
@@ -94,19 +104,11 @@ Type * lookup_type(const char * name) {
  * to nested namespace.
  */
 Type * lookup_type_symbol(Symbol * id) {
-    Symbol * ns = current_namespace;
-    Symbol * s;
-    while(id->tnext) {
-        if((ns = lookup_namespace(ns->table, id->name)) == NULL)
-            return NULL;
-        id = id->tnext;
-    }
-    s = lookup_symbol_in_tab(ns->table, id->name);
-    if(s && s->kind != TYPE) {
-        fprintf(stderr, "lookup_type_symbol(%s) : Error, symbol not a type\n", id->name);
+    if(!id) {
+        fprintf(stderr, "lookup_type_symbol: NULL symbol\n");
         abort();
     }
-    return s->type;
+    return lookup_type(id->name);
 }
 
 const char * type_name(Type * t) {
@@ -159,101 +161,54 @@ Symbol * array_signature(Type * t) {
 }
 */
 
+void resolve_identifier(Symbol ** ps) {
+    Symbol * s = *ps;
+    Symbol * t;
+    if(!s) {
+        fprintf(stderr, "Internal error: resolve_identifier: NULL symbol\n");
+        abort();
+    }
+    fprintf(stderr, "!resolve[%s]\n", s->name);
+    t = lookup_symbol(s->name);
+    if(!t) {
+        fprintf(stderr, "Error: identifier [%s] undeclared.\n", s->name);
+        exit(0);
+    }
 
-void do_symbol_type_resolution(Symbol * list) {
-    Symbol * s = list;
-    if(!s)
-        return;
-    for(; s; s = s->next) {
-        if(s->kind == LITERAL)
-            continue;
+    if(s != t) {
+        *ps = t;
+        s = *ps;
+    }
 
-        if(!s->typename && !s->type) {
-            /* Resolve symbol */
-            Symbol * t = lookup_symbol(s->name);
-            if(t) {
-                s->type = t->type;
-                s->typename = t->typename;
-            }
-	    else {
-                fprintf(stderr, "Error: [%s] undeclared.\n", s->name);
-		exit(0);
-            }
+    if(!s->typename) {
+        fprintf(stderr, "Internal error: identifier [%s] has no typename\n",
+                s->name);
+        abort();
+    }
+
+    if(!s->type) {
+        /* Resolve symbol */
+        s->type = lookup_type_symbol(s->typename);
+        if(s->type) {
+            /* Just in case typename is fully qualified or aliased */
+            s->typename = t->typename;
+    		/* Not sure if this is the cleanest way..
+    		 * If symbol is an identifier, it may be a class,
+    		 * so each class instance has a pointer to the class
+    		 * namespace.
+    		 */
+    		s->table = t->table;
+    		fprintf(stderr, "%s is type [%s]\n", s->name, s->typename->name);
         }
-
-        if(s->typename && !s->type) {
-            fprintf(stderr, "Pass 2: Resolving symbol [%s] type [%s]\n", s->name, s->typename->name);
-            if((s->type = lookup_type_symbol(s->typename)) == NULL) {
-                fprintf(stderr, "Internal error: Null type [%s]\n", s->typename->name);
-                abort();
-            }
+        else {
+            fprintf(stderr, "Error: identifier [%s] has unknown type [%s].\n",
+                        s->name, s->typename->name);
+            exit(0);
         }
     }
 
-    for(s = list->tnext; s; s = s->tnext) {
-        if(!s->typename && !s->type) {
-            /* Resolve symbol */
-            Symbol * t = lookup_symbol(s->name);
-            if(t) {
-                s->type = t->type;
-                s->typename = t->typename;
-            }
-        }
-
-        if(s->typename && !s->type) {
-            fprintf(stderr, "Pass 2: Resolving symbol [%s] type [%s]\n", s->name, s->typename->name);
-            if((s->type = lookup_type_symbol(s->typename)) == NULL) {
-                fprintf(stderr, "Internal error: Null type [%s]\n", s->typename->name);
-                abort();
-            }
-        }
-    }
+	if(s->type) {
+	    s->table = s->type->sym->table;
+	}
 }
-
-void do_ast_type_resolution(AST * tree) {
-    if(!tree || tree->asttype == ASTT_LITERAL)
-        return;
-    if(tree->typename) {
-        fprintf(stderr, "Pass 2: Resolving type symbol [%s]\n", tree->typename->name);
-        tree->type = lookup_type_symbol(tree->typename);
-        if(!tree->type) {
-            fprintf(stderr, "Internal error: Null type [%s]\n", tree->typename->name);
-            abort();
-        }
-    }
-
-    if(tree->sym) {
-        do_symbol_type_resolution(tree->sym);
-    }
-
-    if(tree->locals) {
-        do_symbol_type_resolution(tree->locals);
-    }
-
-    switch(tree->asttype) {
-        case ASTT_IF:
-        case ASTT_CONDITIONAL_EXPR:
-            do_ast_type_resolution(tree->Attr.Conditional.condition);
-            do_ast_type_resolution(tree->Attr.Conditional.end);
-            break;
-        case ASTT_METHOD_DECL:
-            fprintf(stderr, "Pass 2: Method %s\n", tree->sym->name);
-            do_symbol_type_resolution(tree->Attr.Method.params);
-            do_ast_type_resolution(tree->Attr.Method.body);
-            fprintf(stderr, "Pass 2: End Method %s\n", tree->sym->name);
-            break;
-        case ASTT_WHILE:
-        case ASTT_FOR:
-            do_ast_type_resolution(tree->Attr.Loop.init);
-            do_ast_type_resolution(tree->Attr.Loop.iteration);
-            do_ast_type_resolution(tree->Attr.Loop.condition);
-            do_ast_type_resolution(tree->Attr.Loop.body);
-            break;
-    }
-
-    do_ast_type_resolution(tree->arg1);
-    do_ast_type_resolution(tree->arg2);
-    do_ast_type_resolution(tree->next);
-}
-
 
