@@ -575,12 +575,12 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
     opcode_t opcode = jit_info->op_i + disp;
     int offset = 0;
     if(opcode <= jit_info->op_i) {
-        offset = jit_info->op_map[opcode].offset -
-            (jit_info->native_ptr - jit_info->arena_start);
+        offset = jit_info->arena.op_map[opcode].offset -
+            (jit_info->native_ptr - jit_info->arena.start);
     } else {
         Parrot_jit_newfixup(jit_info); 
-        jit_info->fixups->type = JIT_ARMBRANCH;
-        jit_info->fixups->param.opcode = opcode;
+        jit_info->arena.fixups->type = JIT_ARMBRANCH;
+        jit_info->arena.fixups->param.opcode = opcode;
     }
 
     jit_info->native_ptr
@@ -805,14 +805,14 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_fixup *fixup = jit_info->fixups;
+    Parrot_jit_fixup *fixup = jit_info->arena.fixups;
 
     while(fixup){
         switch(fixup->type){
             case JIT_ARMBRANCH:
             {
                 char *fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup);
-                int offset = jit_info->op_map[fixup->param.opcode].offset
+                int offset = jit_info->arena.op_map[fixup->param.opcode].offset
                     - fixup->native_offset;
                 int disp = (offset >> 2) - 2;
                 *(fixup_ptr++) = disp; 
@@ -934,7 +934,7 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
        the constant that we load into r14  */
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr,
-                     ((int) jit_info->op_map) -
+                     ((int) jit_info->arena.op_map) -
                      ((int) interpreter->code->byte_code));
 }
 
