@@ -152,27 +152,85 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
     parrot_range_t *r = PMC_struct_val(self);
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
-        if (RVal_int(r->cur) > RVal_int(r->end)) {
-            parrot_range_t *n;
+        if (RVal_int(r->step) > 0) {
+            if (RVal_int(r->cur) > RVal_int(r->end)) {
+                parrot_range_t *n;
 next_range:
-            n = r->next;
-            mem_sys_free(r);
-            PMC_struct_val(self) = n;
-            if (!n)
-                PMC_int_val(self) = -1;
+                n = r->next;
+                mem_sys_free(r);
+                PMC_struct_val(self) = n;
+                if (!n)
+                    PMC_int_val(self) = -1;
+            }
+        }
+        else {
+            if (RVal_int(r->cur) < RVal_int(r->end)) {
+                goto next_range;
+            }
         }
     }
     else {
-            STRING *cur = RVal_str(r->cur);
-            STRING *end = RVal_str(r->end);
-            if (string_compare(interpreter, cur, end) < 0)
-                RVal_str(r->cur) = string_increment(interpreter, cur);
-            else
-                goto next_range;
+        STRING *cur = RVal_str(r->cur);
+        STRING *end = RVal_str(r->end);
+        if (string_compare(interpreter, cur, end) < 0)
+            RVal_str(r->cur) = string_increment(interpreter, cur);
+        else
+            goto next_range;
     }
 }
 
 pmclass Slice need_ext extends Key {
+
+/*
+
+=item C<void* invoke(void*)>
+
+Implement Pythons xrange([start,] stop [,step]) builtin. Creates a new
+C<xrange> object.
+
+=cut
+
+*/
+
+    void* invoke(void *next) {
+        int argcP = REG_INT(3);
+        PMC *xro = pmc_new_noinit(INTERP, enum_class_Slice);
+
+        parrot_range_t *range = mem_sys_allocate(sizeof *range);
+
+        PMC_struct_val(xro) = range;
+        range->next = NULL;
+        range->type = enum_type_INTVAL;
+        if (argcP == 1) {
+            RVal_int(range->start) = 0;
+            RVal_int(range->end) = VTABLE_get_integer(INTERP, REG_PMC(5));
+            RVal_int(range->step) = 1;
+        }
+        else if (argcP == 2) {
+            RVal_int(range->start) = VTABLE_get_integer(INTERP, REG_PMC(5));
+            RVal_int(range->end) = VTABLE_get_integer(INTERP, REG_PMC(6));
+            RVal_int(range->step) = 1;
+        }
+        else if (argcP == 3) {
+            RVal_int(range->start) = VTABLE_get_integer(INTERP, REG_PMC(5));
+            RVal_int(range->end) = VTABLE_get_integer(INTERP, REG_PMC(6));
+            RVal_int(range->step) = VTABLE_get_integer(INTERP, REG_PMC(7));
+            if (RVal_int(range->step) == 0)
+                real_exception(interpreter, NULL, E_ValueError,
+                        "xrange() step argument must not be zero");
+        }
+        else
+            real_exception(INTERP, NULL, E_TypeError,
+                    "xrange() requires 1-3 int arguments");
+        RVal_int(range->cur) = RVal_int(range->start);
+        if (RVal_int(range->step) > 0)
+            RVal_int(range->end)--;
+        else
+            RVal_int(range->end)++;
+        REG_PMC(5) = xro;
+        PObj_active_destroy_SET(SELF);
+        return next;
+    }
 
     void init () {
         PMC_struct_val(SELF) = NULL;
@@ -278,6 +336,13 @@ This is used for implementing Pythons xrange()
     STRING* get_string_keyed(PMC* key) {
         INTVAL v = VTABLE_get_integer(INTERP, key);
         return string_from_int(INTERP, v);
+    }
+
+    PMC* get_pmc_keyed(PMC* key) {
+        parrot_range_t *r = PMC_struct_val(key);
+        PMC *res = pmc_new_noinit(INTERP, enum_class_PerlInt);
+        PMC_int_val(res) = RVal_int(r->cur);
+        return res;
     }
 /*
 

@@ -568,6 +568,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *Py_tuple = CONST_STRING(interpreter, "Py_tuple");
 
     STRING *Py_iter  = CONST_STRING(interpreter, "Py_iter");
+    STRING *Py_xrange = CONST_STRING(interpreter, "Py_xrange");
 
     PMC* class;
     /*
@@ -596,6 +597,8 @@ parrot_py_create_funcs(Interp *interpreter)
 
     class = Parrot_base_vtables[enum_class_Iterator]->data;
     Parrot_store_global(interpreter, NULL, Py_iter, class);
+    class = Parrot_base_vtables[enum_class_Slice]->data;
+    Parrot_store_global(interpreter, NULL, Py_xrange, class);
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);

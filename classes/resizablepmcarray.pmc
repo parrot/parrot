@@ -31,6 +31,9 @@ pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
             enter_nci_method(INTERP, enum_class_ResizablePMCArray,
                     F2DPTR(Parrot_ResizablePMCArray_get_string),
                     "__repr__", "SIO");
+            enter_nci_method(INTERP, enum_class_ResizablePMCArray,
+                    F2DPTR(Parrot_ResizablePMCArray_push_pmc),
+                    "append", "vIOP");
         }
     }
 
@@ -148,6 +151,14 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         ((PMC**)PMC_data(SELF))[key] = src;
+    }
+
+    void push_pmc(PMC* value) {
+        INTVAL cap = PMC_int_val2(SELF);
+        INTVAL size = PMC_int_val(SELF);
+        if (size + 1 >= cap)
+            DYNSELF.set_integer_native(size + 1);
+        ((PMC**)PMC_data(SELF))[size] = value;
     }
 
 /*

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 40;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -327,3 +327,27 @@ test(<<'CODE', 'ord()');
 if __name__ == '__main__':
    print ord('A')
 CODE
+
+test(<<'CODE', 'xrange(start)');
+if __name__ == '__main__':
+    for i in xrange(5):
+	print i
+CODE
+
+test(<<'CODE', 'xrange(start, stop)');
+if __name__ == '__main__':
+    for i in xrange(2,5):
+	print i
+CODE
+
+test(<<'CODE', 'xrange(star, stop, step)');
+if __name__ == '__main__':
+    for i in xrange(2,10,3):
+	print i
+CODE
+
+test(<<'CODE', 'xrange(star, stop, -step)');
+for i in xrange(10,5,-1):
+    print i
+CODE
+

@@ -45,6 +45,7 @@ my %builtins = (
     max => 'v',
     min => 'v',
     range => 1,
+    xrange => 1,
     reduce => 1,
     str => 1,
     tuple => 1,
@@ -64,6 +65,7 @@ my %type_map = (
     tuple => 'Py_tuple',
 
     iter  => 'Py_iter',
+    xrange => 'Py_xrange',
 );
 
 
@@ -734,6 +736,11 @@ sub INPLACE_ADD
     my ($n, $c, $cmt) = @_;
     inplace('+', $cmt);
 }
+sub INPLACE_SUBTRACT
+{
+    my ($n, $c, $cmt) = @_;
+    inplace('-', $cmt);
+}
 sub JUMP_FORWARD()
 {
     my ($n, $c, $cmt) = @_;
@@ -893,14 +900,19 @@ plain:
 	    '<' => 'islt',
 	    '<=' => 'isle',
 	    'is' => 'issame',
+	    'is not' => 'issame',
 	);
 	my $res = temp('I');
 	my $pres = temp('P');
 	$op = $is_map{$c};
+	my $isnot = '';
+	if ($c eq 'is not') {
+	    $isnot = qq!\n\t$res = not $res!;
+	}
 	my $lp = promote($l);
 	my $rp = promote($r);
 	print <<EOC;
-	$res = $op $lp, $rp $cmt
+	$res = $op $lp, $rp $cmt$isnot
 	$pres = new .Boolean
 	$pres = $res # ugly
 EOC
@@ -1105,7 +1117,7 @@ sub LOAD_FAST
     my $p;
     if ($p=$lexicals{$c}) {
 	print <<EOC;
-	# lexical $n '$c' := $p $cmt
+	\t # '$c' := $p $cmt
 EOC
 	$c = $p;
     }
@@ -1115,10 +1127,7 @@ EOC
 	$lexicals{$c} = $c;
 	$names{$c} = $c;
 	print <<EOC;
-	# .param pmc $c $cmt
-	#.local pmc $c
-	#$c = P$p
-	#store_lex -1, $n, $c
+        \t $cmt
 EOC
     }
     push @stack, [$n, $c, 'P'];
@@ -1126,22 +1135,20 @@ EOC
 
 sub STORE_FAST
 {
-    return STORE_NAME(@_);
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     my $p;
     if ($p = $lexicals{$c}) {
 	print <<"EOC";
-	assign $c, $tos->[1] $cmt
+	# assign $c, $tos->[1] $cmt
+	set $p, $tos->[1] $cmt
 EOC
+	$lexicals{$c} = $p;
     }
     else {
-	$lexicals{$c} = 1;
+	$lexicals{$c} = promote($tos);
 	print <<"EOC";
-        .local pmc $c $cmt
-	$c = new $DEFVAR
-	$c = $tos->[1]
-	store_lex -1, $n, $c
+        \t $cmt
 EOC
     }
 }
@@ -1469,4 +1476,12 @@ sub SLICE_plus_3 {
 }
 sub SLICE_plus_0 {
     return Slice(@_, 0);
+}
+
+sub DELETE_SLICE_plus_0 {
+    my ($n, $c, $cmt) = @_;
+    my $agg = pop @stack;
+    print <<EOC;
+	$agg->[1] = 0
+EOC
 }
