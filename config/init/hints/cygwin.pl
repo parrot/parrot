@@ -1,3 +1,8 @@
+# cygwin's perl is compiled with -lutil, which for some reason is not 
+# in the standard installation, so we get rid of it
+my $libs = Configure::Data->get('libs');
+$libs =~ s/-lutil\b//g;
+
 # A note about building shared libraries:  Perl5 uses the 'ld2' tool, which
 # is installed as part of the perl5 installation.  So far, it appears
 # parrot can get by with simply using gcc -shared, so we override the
@@ -7,4 +12,5 @@
 Configure::Data->set(
   ld => 'gcc',
   ld_shared => '-shared',
+  libs => $libs,
 );
