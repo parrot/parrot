@@ -1,7 +1,7 @@
-/* A Bison parser, made from imcc/imcc.y, by GNU bison 1.75.  */
+/* A Bison parser, made by GNU Bison 1.875d.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@
    Bison output file, you may use that output file without restriction.
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
-
-#ifndef BISON_IMCC_IMCPARSER_H
-# define BISON_IMCC_IMCPARSER_H
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -95,53 +92,54 @@
      ADDR = 318,
      RESULT = 319,
      RETURN = 320,
-     POW = 321,
-     SHIFT_RIGHT_U = 322,
-     LOG_AND = 323,
-     LOG_OR = 324,
-     COMMA = 325,
-     ESUB = 326,
-     DOTDOT = 327,
-     PCC_BEGIN = 328,
-     PCC_END = 329,
-     PCC_CALL = 330,
-     PCC_SUB = 331,
-     PCC_BEGIN_RETURN = 332,
-     PCC_END_RETURN = 333,
-     PCC_BEGIN_YIELD = 334,
-     PCC_END_YIELD = 335,
-     NCI_CALL = 336,
-     METH_CALL = 337,
-     INVOCANT = 338,
-     PROTOTYPED = 339,
-     NON_PROTOTYPED = 340,
-     MAIN = 341,
-     LOAD = 342,
-     IMMEDIATE = 343,
-     POSTCOMP = 344,
-     METHOD = 345,
-     LABEL = 346,
-     EMIT = 347,
-     EOM = 348,
-     IREG = 349,
-     NREG = 350,
-     SREG = 351,
-     PREG = 352,
-     IDENTIFIER = 353,
-     REG = 354,
-     MACRO = 355,
-     ENDM = 356,
-     STRINGC = 357,
-     INTC = 358,
-     FLOATC = 359,
-     USTRINGC = 360,
-     PARROT_OP = 361,
-     VAR = 362,
-     LINECOMMENT = 363,
-     FILECOMMENT = 364,
-     DOT = 365,
-     CONCAT = 366,
-     POINTY = 367
+     YIELDT = 321,
+     POW = 322,
+     SHIFT_RIGHT_U = 323,
+     LOG_AND = 324,
+     LOG_OR = 325,
+     COMMA = 326,
+     ESUB = 327,
+     DOTDOT = 328,
+     PCC_BEGIN = 329,
+     PCC_END = 330,
+     PCC_CALL = 331,
+     PCC_SUB = 332,
+     PCC_BEGIN_RETURN = 333,
+     PCC_END_RETURN = 334,
+     PCC_BEGIN_YIELD = 335,
+     PCC_END_YIELD = 336,
+     NCI_CALL = 337,
+     METH_CALL = 338,
+     INVOCANT = 339,
+     PROTOTYPED = 340,
+     NON_PROTOTYPED = 341,
+     MAIN = 342,
+     LOAD = 343,
+     IMMEDIATE = 344,
+     POSTCOMP = 345,
+     METHOD = 346,
+     LABEL = 347,
+     EMIT = 348,
+     EOM = 349,
+     IREG = 350,
+     NREG = 351,
+     SREG = 352,
+     PREG = 353,
+     IDENTIFIER = 354,
+     REG = 355,
+     MACRO = 356,
+     ENDM = 357,
+     STRINGC = 358,
+     INTC = 359,
+     FLOATC = 360,
+     USTRINGC = 361,
+     PARROT_OP = 362,
+     VAR = 363,
+     LINECOMMENT = 364,
+     FILECOMMENT = 365,
+     DOT = 366,
+     CONCAT = 367,
+     POINTY = 368
    };
 #endif
 #define LOW_PREC 258
@@ -207,60 +205,61 @@
 #define ADDR 318
 #define RESULT 319
 #define RETURN 320
-#define POW 321
-#define SHIFT_RIGHT_U 322
-#define LOG_AND 323
-#define LOG_OR 324
-#define COMMA 325
-#define ESUB 326
-#define DOTDOT 327
-#define PCC_BEGIN 328
-#define PCC_END 329
-#define PCC_CALL 330
-#define PCC_SUB 331
-#define PCC_BEGIN_RETURN 332
-#define PCC_END_RETURN 333
-#define PCC_BEGIN_YIELD 334
-#define PCC_END_YIELD 335
-#define NCI_CALL 336
-#define METH_CALL 337
-#define INVOCANT 338
-#define PROTOTYPED 339
-#define NON_PROTOTYPED 340
-#define MAIN 341
-#define LOAD 342
-#define IMMEDIATE 343
-#define POSTCOMP 344
-#define METHOD 345
-#define LABEL 346
-#define EMIT 347
-#define EOM 348
-#define IREG 349
-#define NREG 350
-#define SREG 351
-#define PREG 352
-#define IDENTIFIER 353
-#define REG 354
-#define MACRO 355
-#define ENDM 356
-#define STRINGC 357
-#define INTC 358
-#define FLOATC 359
-#define USTRINGC 360
-#define PARROT_OP 361
-#define VAR 362
-#define LINECOMMENT 363
-#define FILECOMMENT 364
-#define DOT 365
-#define CONCAT 366
-#define POINTY 367
+#define YIELDT 321
+#define POW 322
+#define SHIFT_RIGHT_U 323
+#define LOG_AND 324
+#define LOG_OR 325
+#define COMMA 326
+#define ESUB 327
+#define DOTDOT 328
+#define PCC_BEGIN 329
+#define PCC_END 330
+#define PCC_CALL 331
+#define PCC_SUB 332
+#define PCC_BEGIN_RETURN 333
+#define PCC_END_RETURN 334
+#define PCC_BEGIN_YIELD 335
+#define PCC_END_YIELD 336
+#define NCI_CALL 337
+#define METH_CALL 338
+#define INVOCANT 339
+#define PROTOTYPED 340
+#define NON_PROTOTYPED 341
+#define MAIN 342
+#define LOAD 343
+#define IMMEDIATE 344
+#define POSTCOMP 345
+#define METHOD 346
+#define LABEL 347
+#define EMIT 348
+#define EOM 349
+#define IREG 350
+#define NREG 351
+#define SREG 352
+#define PREG 353
+#define IDENTIFIER 354
+#define REG 355
+#define MACRO 356
+#define ENDM 357
+#define STRINGC 358
+#define INTC 359
+#define FLOATC 360
+#define USTRINGC 361
+#define PARROT_OP 362
+#define VAR 363
+#define LINECOMMENT 364
+#define FILECOMMENT 365
+#define DOT 366
+#define CONCAT 367
+#define POINTY 368
 
 
 
 
-#ifndef YYSTYPE
-#line 286 "imcc/imcc.y"
-typedef union {
+#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#line 306 "imcc/imcc.y"
+typedef union YYSTYPE {
     IdList * idlist;
     int t;
     char * s;
@@ -269,14 +268,15 @@ typedef union {
     Symbol * sym;
     SymbolList * symlist;
     SymbolTable * symtab;
-} yystype;
-/* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 275 "imcc/imcparser.h"
-# define YYSTYPE yystype
+} YYSTYPE;
+/* Line 1285 of yacc.c.  */
+#line 274 "imcc/imcparser.h"
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 
 
 
-#endif /* not BISON_IMCC_IMCPARSER_H */
 
