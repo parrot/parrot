@@ -68,21 +68,29 @@ files and some Makefiles.
 
 The file "myconfig" has an overview of configure settings.
 
-Next type
+Next, run make:
 
-    make
+=over 4
 
-or
+=item For UNIX like systems that come with its own make, C<gmake> should be used
 
-    nmake
+=item On windows systems, C<nmake> is used
 
-and the interpreter should build.  If you are building the ICU library
+=item On other systems, just try C<make>
+
+=back
+
+Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
 (or something compatible with it).
 
 You can test parrot by running
 
-    make test
+    make test         (or C<nmake test>/C<gmake test>)
+
+You can run the full test suite with
+
+    make fulltest
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.
 If you have any problems, see the section "Reporting Problems" in
