@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 58;
+use Parrot::Test tests => 59;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1259,17 +1259,55 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "mul_p_p");
-    new P0,.PerlInt
-    new P1,.PerlInt
-    set P0,8
-    set P1,2
-    mul P0,P1
-    print P0
-    print "\\n"
-    end
+output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        new P1,.PerlInt
+        set P0,8
+        set P1,2
+        mul P0,P1
+        .fp_eq(P0,16,EQ1)
+        print "not "
+EQ1:   print "ok 1"
+        print "\\n"
+
+        new P2, .PerlNum
+        set P2, 0.0625
+        mul P0, P2
+        .fp_eq(P0,1,EQ2)
+        print "not "
+EQ2:   print "ok 2"
+        print "\\n"
+        end
 CODE
-16
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlNum");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlNum
+        new P1,.PerlNum
+        set P0,-2.5
+        set P1,2.5
+        mul P0,P1
+        .fp_eq(P0,-6.25,EQ1)
+        print "not "
+EQ1:   print "ok 1"
+       print "\\n"
+
+        new P2, .PerlInt
+        set P2, 2
+        mul P0, P2
+        .fp_eq(P0,-12.5,EQ2)
+        print "not "
+EQ2:   print "ok 2"
+       print "\\n"
+
+       end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "typeof");	
