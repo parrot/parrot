@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutines");
@@ -274,6 +274,62 @@ co2 registers
 co1 registers
 main registers
 done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example");
+##PIR##
+.sub __main__
+    .local Coroutine itr
+    .local object return
+    .local object counter
+    newsub itr, .Coroutine, _iterator
+
+    .local object zero
+    zero = new PerlInt
+    zero = 0
+
+    newsub return, .Continuation, return_here
+    loop:
+        .pcc_begin non_prototyped
+            .pcc_call itr, return
+            .result counter
+        .pcc_end
+
+        print counter
+        print " "
+
+        zero = 0
+        print zero
+        print "\n"
+    goto loop
+return_here:
+    end
+.end
+
+.pcc_sub _iterator prototyped
+    .local object x
+    x = new PerlInt
+    x = 0
+    iloop:
+        .pcc_begin_yield
+        .return x
+        .pcc_end_yield
+        x = x + 1
+    if x <= 10 goto iloop
+    invoke P1
+.end
+CODE
+0 0
+1 0
+2 0
+3 0
+4 0
+5 0
+6 0
+7 0
+8 0
+9 0
+10 0
 OUTPUT
 
 1;
