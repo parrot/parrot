@@ -99,8 +99,8 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
       jitosname   => uc($jitosname),
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
-      TEMP_jit_h       => '$(INC)/jit.h',
-      TEMP_jit_o       => '$(SRC)/jit$(O) $(SRC)/jit_cpu$(O) $(SRC)/jit_debug$(O) $(SRC)/jit_debug_xcoff$(O)'
+      TEMP_jit_h       => '$(INC_DIR)/jit.h',
+      TEMP_jit_o       => '$(SRC_DIR)/jit$(O) $(SRC_DIR)/jit_cpu$(O) $(SRC_DIR)/jit_debug$(O) $(SRC_DIR)/jit_debug_xcoff$(O)'
     );
 
     if (($jitcpuarch eq 'i386')
@@ -119,8 +119,8 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
     $execcapable = $set_execcapable if defined $set_execcapable;
     if ($execcapable) {
       Configure::Data->set(
-        TEMP_exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_dep.h $(INC)/exec_save.h',
-        TEMP_exec_o       => '$(SRC)/exec$(O) $(SRC)/exec_cpu$(O) $(SRC)/exec_save$(O)',
+        TEMP_exec_h       => '$(INC_DIR)/jit.h $(INC_DIR)/exec.h $(INC_DIR)/exec_dep.h $(INC_DIR)/exec_save.h',
+        TEMP_exec_o       => '$(SRC_DIR)/exec$(O) $(SRC_DIR)/exec_cpu$(O) $(SRC_DIR)/exec_save$(O)',
         execcapable  => 1
       );
     }

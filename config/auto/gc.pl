@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -83,19 +83,19 @@ sub runstep {
   if ($gc =~ /^malloc(?:-trace)?$/) {
     Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
-\$(SRC)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC)/$gc.c
-\$(SRC)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC)/res_lea.c
+\$(SRC_DIR)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/$gc.c
+\$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
-      TEMP_gc_o          => "\$(SRC)\/$gc\$(O) \$(SRC)/res_lea\$(O)",
+      TEMP_gc_o          => "\$(SRC_DIR)\/$gc\$(O) \$(SRC_DIR)/res_lea\$(O)",
       gc_flag  => '-DGC_IS_MALLOC',
     );
   }
   elsif ($gc eq 'libc') {
     Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
-\$(SRC)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC)/res_lea.c
+\$(SRC_DIR)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/res_lea.c
 EOF
-      TEMP_gc_o          => "\$(SRC)/res_lea\$(O)",
+      TEMP_gc_o          => "\$(SRC_DIR)/res_lea\$(O)",
       gc_flag  => '-DGC_IS_MALLOC',
     );
   }
@@ -103,9 +103,9 @@ EOF
       $gc = 'gc';
     Configure::Data->set(
       TEMP_gc_c          => <<"EOF",
-\$(SRC)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC)/resources.c
+\$(SRC_DIR)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC_DIR)/resources.c
 EOF
-      TEMP_gc_o          => "\$(SRC)/resources\$(O)",
+      TEMP_gc_o          => "\$(SRC_DIR)/resources\$(O)",
       gc_flag  => '',
     );
   }

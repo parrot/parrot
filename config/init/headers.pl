@@ -32,7 +32,7 @@ sub runstep {
 	keys %{maniread()}
     );
 
-    $_ = "\$(INC)/$_" for @headers;
+    $_ = "\$(INC_DIR)/$_" for @headers;
     my $TEMP_nongen_headers = join("\\\n	", @headers);
 
     Configure::Data->set(

@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 my($ccflags, $ldflags, $libs)=Configure::Data->get(qw(ccflags ldflags libs));
 
 my $OSVers = `uname -r`;

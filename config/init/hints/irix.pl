@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 my $ccflags = Configure::Data->get('ccflags') || "";
 # 1185 An enumerated type is mixed with another type.
 if ($ccflags =~ /-woff /) {

@@ -48,6 +48,10 @@ Run bounds checking enabled.
 
 Run with debugging enabled.
 
+=item C<-f>
+
+Run fast core.
+
 =item C<-r>
 
 assemble to Parrot bytecode and then run the bytecode.
@@ -78,7 +82,7 @@ my $run_pbc = grep { $_ eq '--run-pbc' } @ARGV;
 
 # Suck the short options into the TEST_PROG_ARGS evar:
 my %opts;
-getopts('wgjPCSbvdr?hO:', \%opts);
+getopts('wgjPCSfbvdr?hO:', \%opts);
 if ($opts{'?'} || $opts{h}) {
     print <<"EOF";
 perl t/harness [options] [testfiles]
@@ -89,6 +93,7 @@ perl t/harness [options] [testfiles]
     -C ... run CGP
     -S ... run Switched
     -b ... run bounds checked
+    -f ... run fast core
     -v ... run verbose
     -d ... run debug
     -r ... assemble to PBC run PBC

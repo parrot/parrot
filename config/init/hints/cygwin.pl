@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 # cygwin's perl is compiled with -lutil, which for some reason is not 
 # in the standard installation, so we get rid of it
 my $libs = Configure::Data->get('libs');

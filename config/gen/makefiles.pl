@@ -51,8 +51,6 @@ EOF
 sub makefiles {
   genfile('config/gen/makefiles/root.in',      'Makefile',
           commentType => '#', replace_slashes => 1, conditioned_lines => 1);
-  genfile('config/gen/makefiles/imcc.in',      'imcc/Makefile',
-          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/pge.in',      'compilers/pge/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/languages.in', 'languages/Makefile',

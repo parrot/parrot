@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 my $libs = Configure::Data->get('libs');
 my $cflags = Configure::Data->get('ccflags');
 my $cc = Configure::Data->get('cc');

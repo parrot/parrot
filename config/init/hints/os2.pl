@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 # This hints file is very specific to a particular os/2 configuration.
 # A more general one would be appreciated, should anyone actually be
 # using OS/2

@@ -1,6 +1,8 @@
 #! perl -w
 # $Id$
 
+=head1 NAME
+
 Parrot::PackFile::Constant - A Parrot Constant
 
 =head1 SYNOPSIS

@@ -1,3 +1,6 @@
+# Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 # Tru64
 my $ccflags = Configure::Data->get('ccflags');
 if ( $ccflags !~ /-pthread/ ) {
