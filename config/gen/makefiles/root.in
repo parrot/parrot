@@ -453,7 +453,7 @@ MAKE_C = ${make_c}
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
-%.pbc:%.imc
+.pbc.imc:
 	.${slash}$(TEST_PROG) -o $@ $<
 
 ###############################################################################

@@ -1,3 +1,5 @@
+#include <process.h>
+
 /*
  * Spawn a subprocess
  *
