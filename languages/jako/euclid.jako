@@ -17,14 +17,13 @@
 
 var int m    = 96;
 var int n    = 64;
-var int zero =  0;
 var int r;
 
 print("Algorithm E (Euclid's algorithm)\n");
 print("  Calculating gcd($m, $n) = ...\n");
 
 r = mod(m, n);
-while (r != zero) {
+while (r != 0) {
   m = n;
   n = r;
   r = mod(m, n);

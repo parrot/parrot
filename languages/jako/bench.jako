@@ -1,0 +1,43 @@
+#
+# bench.jako
+#
+# Based on Bench.java posted to perl6-internals@perl.org by
+# Leon Brocard <acme@astray.com> on 2001-09-15. Note that the
+# only differences between the Java version and the Jako
+# version are:
+#
+#   * 'var int ...' vs 'int ...' for variable declaration.
+#
+#   * The commented-out print line (which is simpler in Jako).
+#
+#   * The presence of the 'end' statement at the...well...at the
+#     end.
+#
+#   * The use of the variable n instead of the constant 10000
+#     in the conditions of the while loops.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+
+var int q =     1;
+var int w =     1;
+var int i =     1;
+var int j =     1;
+
+while (q < 100) {
+  w = 1;
+
+  while (w < 100) {
+    i++;
+    j += i;
+    w++;
+#    print("$q, $w\n");
+  }
+
+  q++;
+}
+
+end
+

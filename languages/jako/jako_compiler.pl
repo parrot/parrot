@@ -142,7 +142,9 @@ sub map_args
       push @result, $ident{$arg}{REG};
     } elsif ($arg =~ m/^"/) {
       push @result, $arg;
-    } elsif ($arg =~ m/^\d+(\.\d+)$/) {
+    } elsif ($arg =~ m/^\d+$/) {
+      push @result, $arg;
+    } elsif ($arg =~ m/^\d+\.\d+$/) {
       push @result, $arg;
     } else {
       printf(STDERR "jako: Unrecognized argument '%s' on line %d.\n", $arg, $line);
@@ -202,27 +204,29 @@ sub begin_while_block
   my $prefix = "_W$block_count";
   push @block_stack, { TYPE => 'while', NEXT => $line, PREFIX => $prefix };
 
-  #
-  # TODO: Note that the assembler wasn't inferring the opcode qualifiers, so we had
-  # to code them explicitly. We should remove the qualifiers as soon as the
-  # assembler is fixed.
-  #
-
   if ($cond =~ m/^(.*)\s*==\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*!=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*<=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%s_REDO:\n", $prefix;
+  } elsif ($cond =~ m/^(.*)\s*<\s*(.*)$/) {
+    my @args = map_args($1, $2);
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "lt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*>=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%s_REDO:\n", $prefix;
+  } elsif ($cond =~ m/^(.*)\s*>\s*(.*)$/) {
+    my @args = map_args($1, $2);
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "gt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } else {
     printf(STDERR "jako: Syntax error. Unrecognized condition in while on line %d.\n", $line);
@@ -242,27 +246,29 @@ sub begin_if_block
   my $prefix = "_I$block_count";
   push @block_stack, { TYPE => 'if', NEXT => $line, PREFIX => $prefix };
 
-  #
-  # TODO: Note that the assembler wasn't inferring the opcode qualifiers, so we had
-  # to code them explicitly. We should remove the qualifiers as soon as the
-  # assembler is fixed.
-  #
-
   if ($cond =~ m/^(.*)\s*==\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "eq", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*!=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ne", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*<=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "le", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%s_REDO:\n", $prefix;
+  } elsif ($cond =~ m/^(.*)\s*<\s*(.*)$/) {
+    my @args = map_args($1, $2);
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "lt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } elsif ($cond =~ m/^(.*)\s*>=\s*(.*)$/) {
     my @args = map_args($1, $2);
-    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge_i_ic", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "ge", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
+    printf "%s_REDO:\n", $prefix;
+  } elsif ($cond =~ m/^(.*)\s*>\s*(.*)$/) {
+    my @args = map_args($1, $2);
+    printf "%-12s %-8s %s\n", "${prefix}_NEXT:", "gt", "$args[0], $args[1], ${prefix}_REDO, ${prefix}_LAST";
     printf "%s_REDO:\n", $prefix;
   } else {
     printf(STDERR "jako: Syntax error. Unrecognized condition in while on line %d.\n", $line);
@@ -284,15 +290,8 @@ sub end_block
   my $block  = pop @block_stack;
   my $prefix = $block->{PREFIX};
 
-  #
-  # TODO: Note that the assembler wasn't inferring the opcode qualifiers, so we had
-  # to code them explicitly. We should remove the qualifiers as soon as the
-  # assembler is fixed.
-  #
-
   if ($block->{TYPE} eq 'while') {
-    printf("%-12s %-8s %s\n", '', 'branch_ic', "${prefix}_NEXT", );
-    # TODO: Is there a better unconditional jump (branch_ic)?
+    printf("%-12s %-8s %s\n", '', 'branch', "${prefix}_NEXT", );
   }
 
   printf "%s_LAST:\n", $prefix;
@@ -307,16 +306,10 @@ sub do_loop_control
 {
   my $which = uc shift;
 
-  #
-  # TODO: Note that the assembler wasn't inferring the opcode qualifiers, so we had
-  # to code them explicitly. We should remove the qualifiers as soon as the
-  # assembler is fixed.
-  #
-
   foreach (reverse @block_stack) {
     if ($_->{TYPE} eq 'while') {
       my $prefix = $_->{PREFIX};
-      printf("%-12s %-8s %s\n", '', 'branch_ic', "${prefix}_$which", );
+      printf("%-12s %-8s %s\n", '', 'branch', "${prefix}_$which", );
       last;
     }
   }
@@ -541,8 +534,13 @@ while(<>) {
   # a = "Howdy";
   #
  
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(\d+(\.\d+))$/) {
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(\d+)$/) {
     assign_var($1, 'I', $2);
+    next;
+  }
+ 
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(\d+\.\d+)$/) {
+    assign_var($1, 'N', $2);
     next;
   }
 
