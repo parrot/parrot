@@ -80,7 +80,6 @@ unlikely-sounding
 
     STRING* string_chopn(STRING* s, IV n)
 
-B<Not implemented>: 
 To retrieve a substring of the string, call
 
     STRING* string_substr(STRING* src, IV offset, IV length, STRING** dest)
@@ -154,7 +153,9 @@ vtable.
 
 =head2 C<encoding>
 
-This specifies the encoding of the buffer, from the following C<enum>:
+This is a vtable of functions; the vtable should normally be taken from
+the array C<Parrot_string_vtable>. Entries in this array specify the 
+encoding of the string, from the following C<enum>:
 
     enum {
         enc_native,
@@ -201,13 +202,17 @@ string vtables to create encoding abstraction; here's an example of one:
 
 C<ENC_VTABLE(a)> is shorthand for:
 
-    Parrot_string_vtable[a->encoding]
+    a->encoding
 
-The C<Parrot_string_vtable> is a static array of virtual tables, defined 
-in C<string.c>. Each encoding has its own vtable; to call the
-concatenation function for C<a>, we look up its encoding and retrieve
-the C<concat> entry from that encoding's vtable. This produces a
-function pointer we can throw the arguments at.
+Vtables are taken from the C<Parrot_string_vtable> array, defined in
+C<string.c>. Each encoding has its own vtable; to call the concatenation
+function for C<a>, we look up its vtable and retrieve the C<concat>
+entry from that vtable. This produces a function pointer we can throw
+the arguments at.
+
+To get the actual position in the array from the vtable, use the 
+C<which> entry, which returns an C<IV> index into
+C<Parrot_string_vtable>.
 
 Most of the string vtable functions are self-explanatory as they are
 thin wrappers around the functions given above. Some of them, however,

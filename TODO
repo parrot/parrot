@@ -13,6 +13,5 @@ Fix assembler to allow you to use something like:
 rather than:
 	add_i_ic I4, I4, 3
 
-Fix disassembler to recognise new bytecode format. If possible, abstract
-out bytecode-reading/writing stuff to a separate Perl module so we can
-change the format without breaking the (dis)assembler.
+Abstract out bytecode-reading/writing stuff to a separate Perl module so
+we can change the format without breaking the (dis)assembler.
