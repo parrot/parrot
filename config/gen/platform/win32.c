@@ -5,7 +5,13 @@
 
 #include <time.h>
 #include <windows.h>
+#include <winbase.h>
 #include "parrot/parrot.h"
+
+
+/* for PANIC */
+#define interpreter NULL
+
 
 /*
 ** Parrot_intval_time()
@@ -66,6 +72,10 @@ Parrot_setenv(const char *name, const char *value)
 }
 
 
+/*
+** Parrot_getenv()
+*/
+
 char *
 Parrot_getenv(const char *name, int *free_it)
 {
@@ -82,11 +92,19 @@ Parrot_getenv(const char *name, int *free_it)
 
     return buffer;
 }
+
+
+/*
+** Parrot_unsetenv()
+*/
+
 void
 Parrot_unsetenv(const char *name)
 {
     SetEnvironmentVariable(name, NULL);
 }
+
+
 /*
 ** Parrot_dlopen()
 */
@@ -128,6 +146,68 @@ int
 Parrot_dlclose(void *handle)
 {
     return FreeLibrary(handle)? 0: 1;
+}
+
+
+/*
+** mem_alloc_executable() 
+*/
+
+void *
+mem_alloc_executable(struct Parrot_Interp *interpreter, size_t size)
+{
+	void *ptr = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	if (!ptr)
+		PANIC("Out of mem");
+	return ptr;
+}
+
+
+/*
+** mem_realloc_executable()
+*/
+
+void *
+mem_realloc_executable(void* memblock, size_t size)
+{
+	MEMORY_BASIC_INFORMATION memInfo;
+	void *newBlock;
+	
+	/* Get size of current memory allocation. */
+	if (!(VirtualQuery(memblock, &memInfo, sizeof(MEMORY_BASIC_INFORMATION))))
+		PANIC("VirtualQuery failed");
+
+	/* Allocate new block of memory. */
+	newBlock = mem_alloc_executable(size);
+	if (!newBlock)
+		PANIC("Out of mem");
+	
+	/* Copy older block's data to new block's data, taking into account size of data. */
+	if (memInfo.RegionSize <= size)
+	{
+		CopyMemory(newBlock, memblock, memInfo.RegionSize);
+	}
+	else
+	{
+		CopyMemory(newBlock, memblock, size);
+	}
+	
+	/* Free older block and return pointer to the new one. */
+	mem_free_executable(memblock);
+	return newBlock;
+}
+
+
+/*
+** mem_free_executable() 
+*/
+
+void
+mem_free_executable(void *addr)
+{
+	/* We need to decommit, then release the pages. */
+	VirtualFree(addr, 1, MEM_DECOMMIT);
+	VirtualFree(addr, 0, MEM_RELEASE);
 }
 
 /*

@@ -2872,7 +2872,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate(size);
+    jit_info.native_ptr = jit_info.arena.start = 
+        mem_alloc_executable(interpreter, size);
     pc = jit_info.native_ptr;
 
     /* make stack frame */

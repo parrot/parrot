@@ -132,6 +132,39 @@ Parrot_dlclose(void *handle)
     return 0;
 }
 
+
+/*
+** mem_alloc_executable() 
+*/
+
+void *
+mem_alloc_executable(struct Parrot_Interp *interpreter, size_t size)
+{
+	return mem_sys_allocate_zeroed(size);
+}
+
+
+/*
+** mem_realloc_executable()
+*/
+
+void *
+mem_realloc_executable(void* memblock, size_t size)
+{
+	return mem_sys_realloc(memblock, size);
+}
+
+
+/*
+** mem_free_executable() 
+*/
+
+void
+mem_free_executable(void *addr)
+{
+	mem_sys_free(addr);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

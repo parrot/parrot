@@ -6,6 +6,7 @@
 
 #include <parrot/parrot.h>
 #include <assert.h>
+#include <parrot/platform_interface.h>
 #if PARROT_EXEC_CAPABLE
 #  include "parrot/exec.h"
 #endif
@@ -930,7 +931,7 @@ Parrot_destroy_jit(void *ptr)
     }
     /* arena stuff */
     free(jit_info->arena.op_map);
-    free(jit_info->arena.start);
+    mem_free_executable(jit_info->arena.start);
     fixup = jit_info->arena.fixups;
     while (fixup) {
         next_f = fixup->next;
@@ -1023,7 +1024,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     if ((size_t)jit_info->arena.map_size * 10 > (size_t)jit_info->arena.size)
         jit_info->arena.size = jit_info->arena.map_size * 10;
     jit_info->native_ptr = jit_info->arena.start =
-        mem_sys_allocate_zeroed((size_t)jit_info->arena.size);
+        mem_alloc_executable(interpreter, (size_t)jit_info->arena.size);
 #  if EXEC_CAPABLE
     if (obj)
         jit_info->objfile->text.code = jit_info->arena.start;
