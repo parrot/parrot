@@ -86,14 +86,14 @@ pmclass Ref does ref {
 
 =item C<void init()>
 
-Raises an exception. Use C<init_pmc()> instead.
+Sets the referenced PMC to C<PMCNULL>.
 
 =cut
 
 */
 
     void init () {
-        internal_exception(1, "Ref init without PMC\n");
+        SELF.init_pmc(PMCNULL);
     }
 
 /*
@@ -102,16 +102,14 @@ Raises an exception. Use C<init_pmc()> instead.
 
 Sets the referenced PMC to C<*initializer>.
 
-If C<initializer> is C<NULL> then an exception is raised.
-
 =cut
 
 */
 
     void init_pmc (PMC* initializer) {
+        PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
+	PObj_custom_mark_SET(SELF);
         if (initializer) {
-            PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
-            PObj_custom_mark_SET(SELF);
             /*
              * if referred PMC needs active destruction
              * we have to pass it on
@@ -119,8 +117,6 @@ If C<initializer> is C<NULL> then an exception is raised.
             if (PObj_active_destroy_TEST(initializer))
                 PObj_active_destroy_SET(SELF);
         }
-        else
-            internal_exception(1, "Ref init with NULL PMC\n");
     }
 
 /*
@@ -218,6 +214,8 @@ Returns the name of the PMC, not the name of the referenced PMC.
 =head1 HISTORY
 
 Initial revision by leo 2003.09.01.
+
+Allowed null value by TOGoS 2004.07.28 (evil+bad?)
 
 =cut
 

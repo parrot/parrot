@@ -27,6 +27,11 @@ passed-in type and does a same-type assignment from there.
 
 pmclass Undef extends default {
 
+  void set_pmc(PMC* other) {
+    VTABLE_morph(INTERP, SELF, enum_class_Ref);
+    VTABLE_set_pmc(INTERP, SELF, other);    
+  }
+
   void morph(INTVAL new_type) {
     pmc_reuse(INTERP, SELF, new_type, 0);
   }
