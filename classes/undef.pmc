@@ -61,7 +61,7 @@ pmclass Undef extends default {
 
   void set_number_native(FLOATVAL value) {
     VTABLE_morph(INTERP, SELF, enum_class_Float);
-    VTABLE_set_integer_native(INTERP, SELF, value);
+    VTABLE_set_number_native(INTERP, SELF, value);
   }
 
   STRING* get_string() {

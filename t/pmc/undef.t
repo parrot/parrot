@@ -16,7 +16,7 @@ Tests mainly morphing undef to other types.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 10;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "morph to string");
@@ -118,6 +118,50 @@ output_is(<<'CODE', <<'OUTPUT', "morph to float");
 .end
 CODE
 -7777.777000
+OUTPUT
+
+
+output_is(<<'CODE', <<'OUTPUT', "morph to float");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Undef
+    .local int int1
+    int1 = pmc1
+    .local num float1
+    float1 = -7777777e-3
+    float1 += int1
+    print float1
+    print "\n"
+    end
+.end
+CODE
+-7777.777000
+OUTPUT
+
+
+output_is(<<'CODE', <<'OUTPUT', "set_integer_native");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Undef
+    pmc1 = -88888888
+    print pmc1
+    print "\n"
+
+    .local int pmc1_is_a
+    pmc1_is_a = isa pmc1, "Integer"
+    print "After assignment pmc1 is "
+    if pmc1_is_a goto PMC1_IS_A_INTEGER
+      print "not "
+    PMC1_IS_A_INTEGER:
+    print "an Integer.\n"
+
+    end
+.end
+CODE
+-88888888
+After assignment pmc1 is an Integer.
 OUTPUT
 
 

@@ -94,18 +94,15 @@ Replaces multi-method C<divide()> with C<integer_divide()>.
 
 /*
 
-=item C<void set_integer_native(INTVAL value)>
+=item C<void init()>
+
+Initializes the integer.
 
 =cut
 
 */
-
     void init () {
         PMC_int_val(SELF) = 0;
-    }
-
-    void set_integer_native(INTVAL value) {
-        PMC_int_val(SELF) = value;
     }
 
 /*
@@ -204,7 +201,7 @@ Returns the string representation of the integer.
 */
 
     STRING* get_string() {
-        return string_from_num(INTERP, PMC_int_val(SELF));
+        return string_from_int(INTERP, PMC_int_val(SELF));
     }
 
 /*
