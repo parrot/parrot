@@ -1,46 +1,15 @@
-# Push an integer in Befunge's stack.
-# The integer is popped from Parrot's stack.
-# Generic method.
-PUSH:
-        pushi
-        restore I6
-        set I7, P2
-        set P2[I7], I6
-        popi
-        ret
-
-# Pop an integer from Befunge's stack.
-# the integer is pushed on Parrot's stack.
-# Generic method.
-POP:
-        pushi
-        set I7, P2
-        eq I7, 0, POP_EMPTY
-        dec I7
-        set I6, P2[I7]
-        save I6
-        set P2, I7
-        popi
-        ret
-
-POP_EMPTY:      
-        set I10, 0
-        save I10
-        popi
-        ret
-
 # Duplicate.
 # Befunge stack:        
 #   before:     ... v
 #   after:      ... v 
 STACK_DUP:
         pushi
-        bsr POP
-        restore I10
-        save I10
-        bsr PUSH
-        save I10
-        bsr PUSH
+        set I10, P2
+        unless I10, STACK_DUP_POP_1
+        pop I10, P2
+STACK_DUP_POP_1:        
+        push P2, I10
+        push P2, I10
         popi
         branch MOVE_PC
 
@@ -51,8 +20,10 @@ STACK_DUP:
 # Element is just discarded.
 STACK_POP:
         pushi
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, STACK_POP_POP_1
+        pop I10, P2
+STACK_POP_POP_1:
         popi
         branch MOVE_PC
         
@@ -62,13 +33,15 @@ STACK_POP:
 #   after:      ... b a
 STACK_SWAP:
         pushi
-        bsr POP
-        restore I10
-        bsr POP
-        restore I11
-        save I10
-        bsr PUSH
-        save I11
-        bsr PUSH
+        set I10, P2
+        unless I10, STACK_SWAP_POP_1
+        pop I10, P2
+STACK_SWAP_POP_1:
+        set I11, P2
+        unless I11, STACK_SWAP_POP_2
+        pop I11, P2
+STACK_SWAP_POP_2:       
+        push P2, I10
+        push P2, I11
         popi
         branch MOVE_PC

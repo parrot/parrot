@@ -29,8 +29,7 @@ MATHS_RAND:
 MATHS_PUSH_NUMBER:
         pushi
         set I10, S0
-        save I10
-        bsr PUSH
+        push P2, I10
         popi
         branch MOVE_PC
 
@@ -40,13 +39,16 @@ MATHS_PUSH_NUMBER:
 #   after:      ... a+b
 MATHS_ADD:
         pushi
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, MATHS_ADD_POP_1
+        pop I11, P2
+MATHS_ADD_POP_1:
+        set I10, P2
+        unless I10, MATHS_ADD_POP_2
+        pop I10, P2
+MATHS_ADD_POP_2:        
         add I12, I10, I11
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
         
@@ -56,13 +58,16 @@ MATHS_ADD:
 #   after:      ... a-b
 MATHS_SUB:
         pushi
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, MATHS_SUB_POP_1
+        pop I11, P2
+MATHS_SUB_POP_1:
+        set I10, P2
+        unless I10, MATHS_SUB_POP_2
+        pop I10, P2
+MATHS_SUB_POP_2:        
         sub I12, I10, I11
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
 
@@ -72,13 +77,16 @@ MATHS_SUB:
 #   after:      ... a*b
 MATHS_MUL:
         pushi
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, MATHS_MUL_POP_1
+        pop I11, P2
+MATHS_MUL_POP_1:
+        set I10, P2
+        unless I10, MATHS_MUL_POP_2
+        pop I10, P2
+MATHS_MUL_POP_2:        
         mul I12, I10, I11
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
 
@@ -88,13 +96,16 @@ MATHS_MUL:
 #   after:      ... a/b
 MATHS_DIV:
         pushi
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, MATHS_DIV_POP_1
+        pop I11, P2
+MATHS_DIV_POP_1:
+        set I10, P2
+        unless I10, MATHS_DIV_POP_2
+        pop I10, P2
+MATHS_DIV_POP_2:        
         div I12, I10, I11
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
 
@@ -104,13 +115,16 @@ MATHS_DIV:
 #   after:      ... a mod b
 MATHS_MOD:
         pushi
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, MATHS_MOD_POP_1
+        pop I11, P2
+MATHS_MOD_POP_1:
+        set I10, P2
+        unless I10, MATHS_MOD_POP_2
+        pop I10, P2
+MATHS_MOD_POP_2:        
         mod I12, I10, I11
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
 
@@ -120,10 +134,11 @@ MATHS_MOD:
 #   after:      ... not(a)
 MATHS_NOT:
         pushi
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, MATHS_NOT_POP_1
+        pop I10, P2
+MATHS_NOT_POP_1:        
         not I10, I10
-        save I10
-        bsr PUSH
+        push P2, I10
         popi
         branch MOVE_PC

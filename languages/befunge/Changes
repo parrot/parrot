@@ -1,5 +1,10 @@
 Revision history for Befunge-93 interpreter written for Parrot.
 
+0.04  Sat Nov 23 10:22:51 CET 2002
+        - now using the push and pop instructions of the PerlArray
+          PMC, and thanks go to Steve Fink for his hack to pop an
+          empty PerlArray.
+
 0.03  Mon Sep  9 21:26:11 CEST 2002
         - taking advantage of Parrot's 'chr' instruction, getting rid
           of Clinton Pierce's hack.

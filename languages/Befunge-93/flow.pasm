@@ -43,8 +43,10 @@ FLOW_GO_AWAY:
 #   after:      ...
 # delta <- if (b) (-1,0) else (1,0)
 FLOW_EW_IF:
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, FLOW_EW_IF_POP_1
+        pop I10, P2
+FLOW_EW_IF_POP_1:       
         eq I10, 0, FLOW_GO_EAST
         branch FLOW_GO_WEST
 
@@ -54,8 +56,10 @@ FLOW_EW_IF:
 #   after:      ...
 # delta <- if (b) (0,-1) else (0,1)
 FLOW_NS_IF:
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, FLOW_NS_IF_POP_1
+        pop I10, P2
+FLOW_NS_IF_POP_1:       
         eq I10, 0, FLOW_GO_SOUTH
         branch FLOW_GO_NORTH
 
@@ -67,16 +71,19 @@ FLOW_NS_IF:
 # Result is either 1 or 0.
 FLOW_COMPARE:
         pushi
-        bsr POP
-        restore I10
-        bsr POP
-        restore I11
+        set I10, P2
+        unless I10, FLOW_COMPARE_POP_1
+        pop I10, P2
+FLOW_COMPARE_POP_1:
+        set I11, P2
+        unless I11, FLOW_COMPARE_POP_2
+        pop I11, P2
+FLOW_COMPARE_POP_2:     
         set I12, 1
         gt I11, I10, FLOW_COMPARE_TRUE
         set I12, 0
 FLOW_COMPARE_TRUE:
-        save I12
-        bsr PUSH
+        push P2, I12
         popi
         branch MOVE_PC
         

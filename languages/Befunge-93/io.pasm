@@ -6,8 +6,7 @@
 IO_PUSH_CHAR:
         pushi
         ord I10, S0
-        save I10
-        bsr PUSH
+        push P2, I10
         popi
         branch MOVE_PC
 
@@ -39,8 +38,7 @@ IO_INPUT_INT_NEXT_CHAR:
         set I11, 0
 IO_INPUT_INT_NAN:
         substr S2, S2, I11, I10
-        save I10
-        bsr PUSH
+        push P2, I10
         pops
         popi
         branch MOVE_PC
@@ -63,8 +61,7 @@ IO_INPUT_CHAR_SUBSTR:
         length I10, S2
         substr S2, S2, 1, I10
         ord I10, S10
-        save I10
-        bsr PUSH
+        push P2, I10
         save S2
         pops
         restore S2
@@ -78,8 +75,10 @@ IO_INPUT_CHAR_SUBSTR:
 # writeint(i)
 IO_OUTPUT_INT:
         pushi
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, IO_OUTPUT_INT_POP_1
+        pop I10, P2
+IO_OUTPUT_INT_POP_1:    
         print I10
         popi
         branch MOVE_PC
@@ -92,8 +91,10 @@ IO_OUTPUT_INT:
 IO_OUTPUT_CHAR:
         pushi
         pushs
-        bsr POP
-        restore I10
+        set I10, P2
+        unless I10, IO_OUTPUT_CHAR_POP_1
+        pop I10, P2
+IO_OUTPUT_CHAR_POP_1:   
         chr S10, I10
         print S10
         popi
@@ -108,14 +109,17 @@ IO_OUTPUT_CHAR:
 IO_GET_VALUE:
         pushi
         pushs
-        bsr POP
-        restore I11
-        bsr POP
-        restore I10
+        set I11, P2
+        unless I11, IO_GET_VALUE_POP_1
+        pop I11, P2
+IO_GET_VALUE_POP_1:
+        set I10, P2
+        unless I10, IO_GET_VALUE_POP_2
+        pop I10, P2
+IO_GET_VALUE_POP_2:     
         set S10, P1[I11]
         ord I12, S10, I10
-        save I12
-        bsr PUSH
+        push P2, I12
         pops
         popi
         branch MOVE_PC
@@ -128,13 +132,19 @@ IO_GET_VALUE:
 IO_PUT_VALUE:
         pushi
         pushs
-        bsr POP
-        restore I11
+        set I11, P2
+        unless I11, IO_PUT_VALUE_POP_1
+        pop I11, P2
+IO_PUT_VALUE_POP_1:     
         set S10, P1[I11]        # original line
-        bsr POP
-        restore I10             # offset
-        bsr POP
-        restore I20
+        set I10, P2             # offset
+        unless I10, IO_PUT_VALUE_POP_2
+        pop I10, P2
+IO_PUT_VALUE_POP_2:
+        set I20, P2
+        unless I20, IO_PUT_VALUE_POP_3
+        pop I20, P2
+IO_PUT_VALUE_POP_3:     
         chr S11, I20            # char to store
 	length I12, S10
 	set S13, ""             # First part
