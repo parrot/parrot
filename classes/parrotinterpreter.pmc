@@ -59,10 +59,15 @@ pmclass ParrotInterpreter need_ext {
 	struct Parrot_Interp *new_interp;
 	new_interp = make_interpreter(INTERP, 0);
 	PMC_data(SELF) = new_interp;
+	SELF->cache.struct_val = NULL;
     }
 
-    void set_integer_native (INTVAL value) {
-	SELF->cache.int_val = value;
+    void set_pointer (void* value) {
+	SELF->cache.struct_val = value;
+    }
+
+    void* get_pointer () {
+	return SELF->cache.struct_val;
     }
 
     void* invoke (void* next) {
@@ -70,8 +75,9 @@ pmclass ParrotInterpreter need_ext {
 	    (struct Parrot_Interp *)PMC_data(SELF);
 	Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
 	new_interp->code = interpreter->code;
-	/* this is obviously the wrong offset */
-	runops(new_interp, (opcode_t *)SELF->cache.int_val - (opcode_t *)next);
+	/* calculate offset */
+	runops(new_interp, (opcode_t *)SELF->cache.struct_val -
+			(opcode_t *)interpreter->code->byte_code);
 	return next;
     }
 
@@ -83,6 +89,7 @@ pmclass ParrotInterpreter need_ext {
 		    new_interp->iglobals, key);
 	return NULL;
     }
+
     INTVAL get_integer_keyed_int(INTVAL key) {
 	struct Parrot_Interp * new_interp =
 	    (struct Parrot_Interp *)PMC_data(SELF);
@@ -135,7 +142,14 @@ pmclass ParrotInterpreter need_ext {
 	 */
 	clone_regs(d, s, dest);
 	/*
-	 * copy over packfile - done currently in the uninterp opcode
+	 * copy over packfile - done currently in the runinterp opcode
+	 * for multi-threading we have to generate separate
+	 * profile, prederef, and JIT data
 	 */
+	/*
+	 * set flags and run core
+	 */
+	d->run_core = s->run_core;
+	d->flags = s->flags;
     }
 }
