@@ -521,5 +521,5 @@ output_is(<<'CODE', <<'OUTPUT', "classoffset (single class)");
     print "\n"
     end
 CODE
-0
+2
 OUTPUT

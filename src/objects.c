@@ -847,13 +847,16 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, 
 INTVAL
 Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
     PMC *offset_hash;
-    PMC *internal_array;
+    PMC *class_pmc;
     INTVAL offset;
-    internal_array = PMC_data(object);
+
+    class_pmc = VTABLE_get_pmc_keyed_int(interpreter,
+                                         (PMC *)PMC_data(object),
+                                     POD_CLASS);
     offset_hash = VTABLE_get_pmc_keyed_int(interpreter,
-                                           internal_array,
+                                           (PMC *)PMC_data(class_pmc),
                                            PCD_ATTRIB_OFFS);
-    if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) {
+    if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) { 
         offset = VTABLE_get_integer_keyed_str(interpreter, offset_hash, class);
     }
     else {
