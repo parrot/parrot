@@ -30,27 +30,27 @@ sub is_builtin {
 sub declare {
     my $hash = shift;
     for (qw(print1 exit sleep install_catch pop_catch)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('$a');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$a', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
 	$P6C::Parser::WANT{$_} = 'scalar_expr';
     }
 
     for (qw(time)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
 	$P6C::Parser::WANT{$_} = 'no_args';
     }
 
     for (qw(print warn die)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
     for (qw(substr join)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlString';
@@ -58,14 +58,14 @@ sub declare {
     }
 
     for (qw(index)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(length)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('$s');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$s', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlInt';
@@ -73,7 +73,7 @@ sub declare {
     }
 
     for (qw(reverse)) {
-        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params', no_named => 1);
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlArray';
@@ -99,8 +99,7 @@ sub emit {
 print <<'END';
 
 .pcc_sub _substr non_prototyped
-    .param PerlArray named
-    .param object params
+    .param pmc params
     $P0 = params
 # n paras
     $I0 = params
@@ -143,10 +142,8 @@ substr_die:
     set $S0, "wrong number of args for substr"
     $P0 = new PerlArray
     $P0[0] = $S0
-    $P1 = new PerlHash
     find_lex $P2, "&die"
     .pcc_begin non_prototyped
-    .arg $P1
     .arg $P0
     .pcc_call $P2
 substr_ret_label:
@@ -156,8 +153,7 @@ substr_ret_label:
 .end
 
 .pcc_sub _length non_prototyped
-    .param PerlArray named
-    .param object s
+    .param pmc s
     $S0 = s
     length $I0, $S0
     $P1 = new PerlInt
@@ -169,8 +165,7 @@ substr_ret_label:
 .end
 
 .pcc_sub _reverse non_prototyped
-    .param PerlArray named
-    .param object orig_array
+    .param pmc orig_array
     $I0 = orig_array
     dec $I0
     $I1 = 0
@@ -188,8 +183,7 @@ reverse_loopstart:
 .end
 
 .pcc_sub _join non_prototyped
-    .param PerlArray named
-    .param object params
+    .param pmc params
     .local int num_params
     num_params = params
     if num_params > 1 goto join_next
@@ -221,8 +215,7 @@ join_ret:
 .end
 
 .pcc_sub _index non_prototyped
-    .param PerlArray named
-    .param object params
+    .param pmc params
     $I2 = params
     if $I2 < 2 goto index_numarg_error
     $S0 = params[0]
@@ -257,7 +250,6 @@ pcc_ret_label:
 .end
 
 .pcc_sub _time non_prototyped
-    .param PerlArray named
     $P1 = new PerlNum
     time $N1
     set $P1, $N1
@@ -268,8 +260,7 @@ pcc_ret_label:
 .end
 
 .pcc_sub _sleep non_prototyped
-    .param PerlArray named
-    .param object wait
+    .param pmc wait
     $I0 = wait
     sleep $I0
     .pcc_begin_return
@@ -278,7 +269,6 @@ pcc_ret_label:
 .end
 
 .pcc_sub _print1 non_prototyped
-    .param PerlArray named
     .param object p
     print p
     print "\n"
@@ -288,8 +278,7 @@ pcc_ret_label:
 .end
 
 .pcc_sub _print non_prototyped
-    .param PerlArray named
-    .param object params
+    .param pmc params
     .local int num_elem
     .local int counter
     num_elem = params
@@ -307,7 +296,6 @@ print_loopend:
 .end
 
 .pcc_sub _exit non_prototyped
-    .param PerlArray named
     .param object message
     print message
     print "\n"
@@ -315,7 +303,6 @@ print_loopend:
 .end
 
 .pcc_sub _die non_prototyped
-    .param PerlArray named
     .param object params
 
     # setup $!: ####################
@@ -358,7 +345,6 @@ die_nohandler:
 .end
 
 .pcc_sub _warn non_prototyped
-    .param PerlArray named
     .param object params
     find_lex $P0, "&print"
     .pcc_begin non_prototyped
@@ -373,74 +359,60 @@ warn_ret_label:
 .end
 
 .pcc_sub _grep non_prototyped
-    .param PerlArray named
-    .param object params
-    $P2 = new PerlArray
-    set I3, params
-    lt I3, 2, __grep_die_numargs
-    set $P0, params[0]
-    typeof S0, $P0
+    .param Sub condition
+    .param pmc params
+    .local int tmp
+    .local PerlArray result_list
+    .local int ii
+    .local pmc comparison_result
+    .local pmc element
+    result_list = new PerlArray
+    set tmp, params
+    lt tmp, 2, __grep_die_numargs
+    shift condition, params
+    typeof S0, condition
     ne S0, "Sub", __grep_die_arg1
-    set I0, 1
-    set I1, 0
-    set I2, params
-__grep_loop_start:
-# call closure with current array value as arg
-    save $P0
-    set $P3, params[I0]
-    $P5 = new PerlArray
-    set $P5, 1
-    set $P5[0], $P3
-    save $P5
-    bsr __grep_closure
-###    restore $P4
-    set I3, $P4
-    lt I3, 1, __grep_check_end
-    dec I3
-    set $P6, $P4[I3]
-__grep_return_check:
-    if $P6, __grep_match_ok
-    branch __grep_check_end
-__grep_match_ok:
-    set $P2[I1], $P3
-    inc I1
-__grep_check_end:
-    inc I0
-    eq I0, I2, __grep_loop_end
-    branch __grep_loop_start
+    ii = 0
+__grep_loop_top:
+    tmp = params
+    ge ii, tmp, __grep_loop_end
+    element = params[ii]
+    .pcc_begin non_prototyped
+    .arg element
+    .pcc_call condition
+__grep_closure_return:
+    .result comparison_result
+    .pcc_end
+    unless comparison_result, __grep_next
+    push result_list, element
+__grep_next:
+    inc ii
+    branch __grep_loop_top
 __grep_loop_end:
     .pcc_begin_return
-    .return $P2
+    .return result_list
     .pcc_end_return
 __grep_die_numargs:
     set S0, "wrong number of args for grep"
-    $P0 = new PerlArray
-    set $P0[0], S0
-    save $P0
+    condition = new PerlArray
+    set condition[0], S0
+    save condition
     bsr _die
     branch __grep_loop_end
 __grep_die_arg1:
     set S0, "First argument to grep must be a closure"
-    $P0 = new PerlArray
-    set $P0[0], S0
-    save $P0
+    condition = new PerlArray
+    set condition[0], S0
+    save condition
     bsr _die
     branch __grep_loop_end
-__grep_closure:
-    pushp
-    save $P1
-    invoke
-    .pcc_begin_return
-    .return $P2
-    .pcc_end_return
 .end
 
 .pcc_sub _map non_prototyped
-    .param PerlArray named
-    .param object params
+    .param pmc params
     $P2 = new PerlArray
-    set I3, params
-    lt I3, 2, __map_die_numargs
+    set $I3, params
+    lt $I3, 2, __map_die_numargs
     set $P0, params[0]
     typeof S0, $P0
     ne S0, "Sub", __map_die_arg1
@@ -457,10 +429,10 @@ __map_loop_start:
     save $P5
     bsr __map_closure
 ###    restore $P4
-    set I3, $P4
-    lt I3, 1, __map_check_end
-    dec I3
-    set $P6, $P4[I3]
+    set $I3, $P4
+    lt $I3, 1, __map_check_end
+    dec $I3
+    set $P6, $P4[$I3]
 __map_return_check:
     if $P6, __map_match_ok
     branch __map_check_end
@@ -536,8 +508,8 @@ __setup_arg_end:
 .end
 
 .pcc_sub _install_catch non_prototyped
-    .param object continuation
-    .local object try_stack
+    .param pmc continuation
+    .local pmc try_stack
     find_global try_stack, "_AV_catchers"
     $I1 = try_stack
     try_stack[$I1] = continuation
@@ -548,7 +520,7 @@ __setup_arg_end:
 .end
 
 .pcc_sub _pop_catch non_prototyped
-    .local object try_stack
+    .local pmc try_stack
     find_global try_stack, "_AV_catchers"
     $I1 = try_stack
     dec $I1
