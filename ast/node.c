@@ -450,14 +450,13 @@ exp_Assign(Interp* interpreter, nodeType *p)
     SymReg *regs[IMCC_MAX_REGS], *r;
     nodeType *var = CHILD(p);
     nodeType *rhs = var->next;
-    nodeType *dest;
+    int assigned = 0;
 
     if (rhs->expand == exp_Binary) {
         ins = cur_unit->last_ins;
-        dest = IMCC_new_temp_node(interpreter, 'P', &p->loc);
-        rhs->dest = dest;
-        dest->u.var.local_nr = var->u.var.local_nr;
+        rhs->dest = var;
         rhs = rhs->expand(interpreter, rhs);
+        assigned = 1;
     }
     else if (rhs->expand == exp_Const) {
         /* need a new value, because the name might be aliased by
@@ -470,19 +469,11 @@ exp_Assign(Interp* interpreter, nodeType *p)
         rhs = rhs->expand(interpreter, rhs);
     }
     ins = cur_unit->last_ins;
-    if (strcmp(var->u.var.r->name, rhs->u.var.r->name)) {
+    if (!assigned) {
         regs[0] = var->u.var.r;
         regs[1] = rhs->u.var.r;
-        /*
-         * TODO If lhs is aliased to another name, this changes both vars.
-         *      Assign is wrong too, as "a = b" implies "(a is b) == True"
-         */
         insINS(interpreter, cur_unit, ins, "set", regs, 2);
     }
-    /*
-     * TODO store in lexicals if needed, i.e. if its not a leaf function
-     * node
-     */
     return var;
 }
 
@@ -749,7 +740,7 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
 {
     Instruction *ins;
     SymReg *regs[IMCC_MAX_REGS];
-    char buf[16];
+    char buf[128];
 
     if (var->u.var.r->type == VTADDRESS)
         ins = insert_find_global(interpreter, var);
@@ -759,8 +750,8 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
      * now create a scratchpad slot for this var
      */
     regs[0] = get_const("-1", 'I');
-    sprintf(buf, "%d", cur_unit->local_count++);
-    regs[1] = get_const(buf, 'I');
+    sprintf(buf, "\"%s\"", var->u.var.r->name);
+    regs[1] = get_const(buf, 'S');
     regs[2] = var->u.var.r;
     insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     return NULL;
@@ -1177,8 +1168,6 @@ IMCC_free_nodes(Interp* interpreter, nodeType *p)
             child = CHILD(p);
             IMCC_free_nodes(interpreter, child);
         }
-        if (p->dest)
-            mem_sys_free(p->dest);
         next = p->next;
         mem_sys_free(p);
         p = next;

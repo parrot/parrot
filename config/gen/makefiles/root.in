@@ -190,6 +190,7 @@ IMCC_H_FILES = \
     $(IMCC_DIR)/instructions.h \
     $(IMCC_DIR)/debug.h \
     $(IMCC_DIR)/sets.h \
+    $(IMCC_DIR)/unit.h \
     $(IMCC_DIR)/symbol.h \
     $(IMCC_DIR)/symreg.h \
     $(IMCC_DIR)/pbc.h \
