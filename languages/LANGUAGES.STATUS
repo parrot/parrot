@@ -85,6 +85,17 @@ S: Under development; nowhere near anything yet
 W: http://www.josvisser.nl/opencomal
 V: 0.0.11
 
+N: Parakeet
+A: Michel Pelletier
+D: Parakeet is a Forth that is extremely machine specific to the Parrot VM.
+D: Parakeet also has a lot of features not found in standard Forth, like local
+D: variables, nested words and classes and (as a result) nested
+D: compile-time and run-time lexical word, class and variable scopes.
+S: Under development;
+S: Not in Parrot CVS
+W: http://www.daca.net:8080/Parakeet-0.1.tgz 
+V: 0.0.11
+
 N: parrot_compiler
 
 N: Perl6
@@ -108,6 +119,18 @@ S: Working but fairly minimal
 M: Yes
 
 N: Ruby
+
+N: Span
+A: Matt Kennedy
+D: Span can be most concisely described as
+D: Smalltalk for C++, C#, and Java programmers. It features an object
+D: system modeled on the Smalltalk object system and a language syntax
+D: designed to be easy to learn for developers of C-like languages.
+S: Working
+S: Not in parrot CVS
+W: http://homepage.mac.com/matt.kennedy/Span
+M: Yes
+V: 0.0.11
 
 N: Scheme
 A: Jeffrey Goff
