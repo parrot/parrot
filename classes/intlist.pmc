@@ -30,7 +30,7 @@ pmclass IntList {
     }
 
     void init () {
-        SELF->data = intlist_new(INTERP, 1);
+        SELF->data = intlist_new(INTERP);
         SELF->cache.int_val = 0;
         SELF->flags |= PMC_custom_mark_FLAG;
     }

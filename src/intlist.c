@@ -70,6 +70,24 @@
  *     shift: read element, discard chunk and advance if necessary
  *     unshift: unshift a chunk if necessary, write element
  *
+ *     Direct aka indexed access of intlist data:
+ *
+ *     The classic method would be to walk the intlist->next pointers
+ *     (or optimized, the ->prev pointers if an index near the end is
+ *     requested) and locate the chunk, that holds the wanted list
+ *     item.
+ *     To speed things up, especially for bigger lists, there are
+ *     additional fields in the 'list' (the head chunk):
+ *     chunk_list  ... holds pointers to individual chunks
+ *     collect_runs ... collect_runs counter, when chunk_list was
+ *                     rebuilt last.
+ *     n_chunks ... used length in chunk_list
+ *
+ *     If on any indexed access interpreter's collect_runs is
+ *     different, the chunks might have been moved, so the chunk_list
+ *     has to be rebuilt.
+ *
+ *
  *  History:
  *  Notes:
  * References: */
@@ -78,9 +96,29 @@
 #include "parrot/intlist.h"
 
 static size_t rebuild_chunk_list(Interp *interpreter, IntList *list);
+static IntList* allocate_chunk(Interp *interpreter, int initial);
+static size_t rebuild_chunk_list(Interp *interpreter, IntList *list);
 
 IntList*
-intlist_new(Interp *interpreter, int initial)
+intlist_new(Interp *interpreter) {
+    return allocate_chunk(interpreter, 1);
+}
+
+/* growth increment of chunk_list, must be a power of 2 */
+#define CL_SIZE 16
+
+/* Buffers store the used len in bytes in buflen
+ * so, the len in entries is: */
+
+#define chunk_list_size(list) \
+                (list->chunk_list.buflen / sizeof(IntList_Chunk *))
+
+/* hide the ugly cast somehow: */
+#define chunk_list_ptr(list, idx) \
+        ((IntList_Chunk**)list->chunk_list.bufstart)[idx]
+
+static IntList*
+allocate_chunk(Interp *interpreter, int initial)
 {
     IntList* list;
 
@@ -96,11 +134,8 @@ intlist_new(Interp *interpreter, int initial)
     Parrot_allocate(interpreter, (Buffer*) list,
                     INTLIST_CHUNK_SIZE * sizeof(INTVAL));
     if (initial) {
-        /* XXX managed memory or custom destroy? */
-        list->chunk_list = mem_sys_allocate(sizeof(IntList_Chunk *));
-        list->n_chunks = 1;
-        list->collect_runs = interpreter->dod_runs;
-        list->chunk_list[0] = (IntList_Chunk*) list;
+        /* we have a cleared list, so no need to zero chunk_list */
+        rebuild_chunk_list(interpreter, list);
     }
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
@@ -115,10 +150,11 @@ intlist_mark(Interp* interpreter, IntList* list, PMC* last)
         buffer_lives((Buffer *) chunk);
         chunk = chunk->next;
     } while (chunk != (IntList_Chunk*) list);
-
+    buffer_lives(&list->chunk_list);
     return last;
 }
 
+#ifdef INTLIST_DEBUG
 void
 intlist_dump(FILE* fp, IntList* list, int verbose)
 {
@@ -144,6 +180,7 @@ intlist_dump(FILE* fp, IntList* list, int verbose)
 
     fprintf(fp, "\n");
 }
+#endif
 
 static size_t
 rebuild_chunk_list(Interp *interpreter, IntList *list)
@@ -151,16 +188,25 @@ rebuild_chunk_list(Interp *interpreter, IntList *list)
     IntList_Chunk* chunk = (IntList_Chunk*) list;
     IntList_Chunk* lastChunk = list->prev;
     size_t len = 0;
+    /* allocate a new chunk_list buffer, old one my have moved
+     * firsr, count chunks */
     while (1) {
-        if (len >= list->n_chunks)
-            list->chunk_list = mem_sys_realloc(list->chunk_list,
-                    (len + 1)* sizeof(IntList_Chunk *));
-        list->chunk_list[len] = chunk;
         len++;
         if (chunk == lastChunk) break;
         chunk = chunk->next;
     }
-    list->collect_runs = interpreter->dod_runs;
+    Parrot_allocate(interpreter, &list->chunk_list,
+                    (len+1) * sizeof(IntList_Chunk *));
+    len = 0;
+    chunk = list;
+    /* then fill list */
+    while (1) {
+        chunk_list_ptr(list, len) = (IntList_Chunk*) chunk;
+        len++;
+        if (chunk == lastChunk) break;
+        chunk = chunk->next;
+    }
+    list->collect_runs = interpreter->collect_runs;
     list->n_chunks = len;
     return len;
 }
@@ -172,7 +218,7 @@ add_chunk(Interp* interpreter, IntList* list)
 
     if (chunk->next == list) {
         /* Need to add a new chunk */
-        IntList_Chunk* new_chunk = intlist_new(interpreter, 0);
+        IntList_Chunk* new_chunk = allocate_chunk(interpreter, 0);
         new_chunk->next = list;
         new_chunk->prev = chunk;
         chunk->next = new_chunk;
@@ -190,7 +236,17 @@ push_chunk(Interp* interpreter, IntList* list)
     add_chunk(interpreter, list);
     list->prev->start = 0;
     list->prev->end = 0;
+    /* optimization, add new chunk directly, if still space
+     * but only, if no collections was done in between
+     */
+    if (list->n_chunks >= chunk_list_size(list) ||
+            list->collect_runs != interpreter->collect_runs)
     rebuild_chunk_list(interpreter, list);
+    else {
+        /* add the appended = last chunk = list->prev to chunk_list */
+        chunk_list_ptr(list, list->n_chunks) = list->prev;
+        list->n_chunks++;
+    }
 }
 
 static void
@@ -223,15 +279,15 @@ intlist_unshift(Interp *interpreter, IntList** list, INTVAL data)
     INTVAL length = chunk->length + 1;
     INTVAL offset;
     IntList_Chunk * o = chunk;
-    size_t n = chunk->n_chunks;
 
     /* Add on a new chunk if necessary */
     if (chunk->start == 0) {
         unshift_chunk(interpreter, *list);
         chunk = chunk->prev;
         *list = chunk;
+        /* move chunk_list to new list head */
         (*list)->chunk_list = o->chunk_list;
-        (*list)->n_chunks = n;
+        /* and rebuild it from scratch */
         rebuild_chunk_list(interpreter, *list);
     }
 
@@ -247,7 +303,6 @@ intlist_shift(Interp *interpreter, IntList** list)
     INTVAL length = chunk->length - 1;
     INTVAL value;
     IntList_Chunk * o = chunk;
-    size_t n = chunk->n_chunks;
 
     if (chunk->start >= chunk->end) {
         internal_exception(OUT_OF_BOUNDS, "No entries on list!\n");
@@ -262,8 +317,8 @@ intlist_shift(Interp *interpreter, IntList** list)
         chunk->next->prev = chunk->prev;
         chunk->prev->next = chunk;
         *list = chunk->next;
+        /* like above */
         (*list)->chunk_list = o->chunk_list;
-        (*list)->n_chunks = n;
         rebuild_chunk_list(interpreter, *list);
     }
 
@@ -285,6 +340,7 @@ intlist_pop(Interp *interpreter, IntList* list)
         chunk->next = list;
         list->prev = chunk->prev;
         chunk = chunk->prev;
+        /* chunk_list hold one less valid entry now */
         list->n_chunks--;
     }
 
@@ -306,23 +362,9 @@ find_chunk(Interp* interpreter, IntList* list, INTVAL idx)
     IntList_Chunk* chunk = list;
     UNUSED(interpreter);
 
-#if 1
-    if (list->collect_runs != interpreter->dod_runs)
+    if (list->collect_runs != interpreter->collect_runs)
         rebuild_chunk_list(interpreter, list);
-    idx +=  chunk->start;
-
-    return list->chunk_list[idx / INTLIST_CHUNK_SIZE];
-#else
-    /* Possible optimization: start from the closer end of the chunk list */
-
-    /* Find the chunk containing the requested element */
-    while (idx >= chunk->end - chunk->start) {
-        idx -= chunk->end - chunk->start;
-        chunk = chunk->next;
-    }
-
-    return chunk;
-#endif
+    return chunk_list_ptr(list, idx / INTLIST_CHUNK_SIZE);
 }
 
 INTVAL
@@ -339,13 +381,13 @@ intlist_get(Interp* interpreter, IntList* list, INTVAL idx)
     }
 
     if (idx < 0) idx += length;
+    idx +=  list->start;
 
     chunk = find_chunk(interpreter, list, idx);
 
-    if (idx >= list->end - list->start) idx -= list->end - list->start;
     idx = idx % INTLIST_CHUNK_SIZE;
 
-    return ((INTVAL*)chunk->buffer.bufstart)[idx + chunk->start];
+    return ((INTVAL*)chunk->buffer.bufstart)[idx];
 }
 
 static void
@@ -394,11 +436,11 @@ intlist_assign(Interp* interpreter, IntList* list, INTVAL idx, INTVAL val)
         intlist_extend(interpreter, list, idx + 1);
     }
 
+    idx +=  list->start;
     chunk = find_chunk(interpreter, list, idx);
 
-    if (idx >= list->end - list->start) idx -= list->end - list->start;
     idx = idx % INTLIST_CHUNK_SIZE;
-    ((INTVAL*)chunk->buffer.bufstart)[idx + chunk->start] = val;
+    ((INTVAL*)chunk->buffer.bufstart)[idx] = val;
 }
 
 /*

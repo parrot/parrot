@@ -15,7 +15,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "creation");
             if (interpreter == NULL) return 1;
             Parrot_init(interpreter, (void*) &interpreter);
 
-            list = intlist_new(interpreter, 1);
+            list = intlist_new(interpreter);
             if (list == NULL) return 1;
 
             intlist_push(interpreter, list, 42);
@@ -44,7 +44,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
             if (interpreter == NULL) return "create interpreter";
             Parrot_init(interpreter, (void*) &interpreter);
 
-            list = intlist_new(interpreter, 1);
+            list = intlist_new(interpreter);
             if (list == NULL) return "create list";
 
             /* Push 3, then pop 2. Repeat N times. */
@@ -177,7 +177,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
             if (interpreter == NULL) return 1;
             Parrot_init(interpreter, (void*) &interpreter);
 
-            list = intlist_new(interpreter, 1);
+            list = intlist_new(interpreter);
             if (list == NULL) return 1;
 
             printf("Step 1: 0\n");
@@ -282,7 +282,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
             if (interpreter == NULL) return 1;
             Parrot_init(interpreter, (void*) &interpreter);
 
-            list = intlist_new(interpreter, 1);
+            list = intlist_new(interpreter);
             if (list == NULL) return 1;
 
             for (i = 0; i < INTLIST_CHUNK_SIZE * 2.5; i++) {

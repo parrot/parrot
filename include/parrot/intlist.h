@@ -24,10 +24,12 @@ typedef struct IntList_chunk_t IntList_Chunk;
 
 struct IntList_chunk_t {
     Buffer buffer; /* This struct is a Buffer header subclass! */
-    INTVAL length; /* Only valid for the "head" chunk (1) */
-    size_t  collect_runs;       /* when chunklist was built (1) */
-    IntList_Chunk ** chunk_list; /* list of chunks for fast access (1) */
-    size_t n_chunks;            /* number of chunks in chunk_list */
+    INTVAL length;              /* number of items in list (1) */
+    size_t  collect_runs;       /* counter, when chunklist was built (1) */
+    Buffer chunk_list;          /* holding list of chunks for fast access (1) */
+    size_t n_chunks;            /* number of used chunks in chunk_list (1) */
+    /* all above items, marked (1) are only valid in the head junk
+     * s. intlist.c for a detailled description */
     INTVAL start;
     INTVAL end;
     IntList_Chunk* next;
@@ -38,7 +40,7 @@ typedef IntList_Chunk IntList;
 
 PMC* intlist_mark(Interp*, IntList*, PMC* last);
 
-IntList *intlist_new(Interp*, int initial);
+IntList *intlist_new(Interp*);
 
 static INTVAL intlist_length(Interp* interpreter, IntList* list)
 {
