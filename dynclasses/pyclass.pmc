@@ -161,7 +161,7 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
-        PMC *class;
+        PMC *class, *get;
 
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
         if (attr && VTABLE_defined(INTERP, attr)) return attr;
@@ -177,6 +177,13 @@ Return attribute named C<name>.
                 string_to_cstring(INTERP, idx));
             real_exception(INTERP, NULL, E_AttributeError,
                 string_to_cstring(INTERP, message));
+        }
+
+        /* is the attribute a Property? */
+        get = VTABLE_find_method(INTERP, attr, PyString_get);
+        if (get) {
+            attr = Parrot_PyClass_run_meth_fromc_P_P(INTERP, get, attr,
+                PyString_get, SELF);
         }
 
         return attr;

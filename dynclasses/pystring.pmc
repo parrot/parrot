@@ -363,7 +363,7 @@ The C<==> operation.
 
 /*
 
-=item C<PMC* "isalpha"()>
+=item C<PMC* "isalpha"(PMC *self)>
 
 Return True if all characters in S are alphabetic and there is at least one
 character in S, False otherwise.
@@ -372,8 +372,8 @@ character in S, False otherwise.
 
 */
 
-    METHOD PMC* isalpha () {
-        STRING *s = PMC_str_val(SELF);
+    METHOD PMC* isalpha (PMC *self) {
+        STRING *s = PMC_str_val(self);
         UINTVAL length = string_length(INTERP, s);
         UINTVAL idx ;
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
@@ -402,8 +402,8 @@ least one character in S, False otherwise.
 
 */
 
-    METHOD PMC* isalnum () {
-        STRING *s = PMC_str_val(SELF);
+    METHOD PMC* isalnum (PMC *self) {
+        STRING *s = PMC_str_val(self);
         UINTVAL length = string_length(INTERP, s);
         UINTVAL idx ;
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
@@ -423,7 +423,7 @@ least one character in S, False otherwise.
 
 /*
 
-=item C<PMC* "isdigit"()>
+=item C<PMC* "isdigit"(PMC *self)>
 
 Return True if all characters in S are numeric and there is at
 least one character in S, False otherwise.
@@ -432,8 +432,8 @@ least one character in S, False otherwise.
 
 */
 
-    METHOD PMC* isdigit () {
-        STRING *s = PMC_str_val(SELF);
+    METHOD PMC* isdigit (PMC *self) {
+        STRING *s = PMC_str_val(self);
         UINTVAL length = string_length(INTERP, s);
         UINTVAL idx ;
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
@@ -453,7 +453,7 @@ least one character in S, False otherwise.
 
 /*
 
-=item C<PMC* "isspace"()>
+=item C<PMC* "isspace"(PMC *self)>
 
 Return True if all characters in S are whitespace and there is at least one
 character in S, False otherwise.
@@ -462,8 +462,8 @@ character in S, False otherwise.
 
 */
 
-    METHOD PMC* isspace () {
-        STRING *s = PMC_str_val(SELF);
+    METHOD PMC* isspace (PMC *self) {
+        STRING *s = PMC_str_val(self);
         UINTVAL length = string_length(INTERP, s);
         UINTVAL idx ;
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
@@ -483,7 +483,7 @@ character in S, False otherwise.
 
 /*
 
-=item C<PMC* "lower"()>
+=item C<PMC* "lower"(PMC *self)>
 
 downcase this string
 
@@ -491,10 +491,31 @@ downcase this string
 
 */
 
-    METHOD PMC* lower() {
-        STRING *s = string_downcase(INTERP, PMC_str_val(SELF));
+    METHOD PMC* lower(PMC *self) {
+        STRING *s = string_downcase(INTERP, PMC_str_val(self));
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyString);
         VTABLE_set_string_native(INTERP, ret, s);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "find"(PMC *haystack, PMC *needle)>
+
+downcase this string
+
+=cut
+
+*/
+
+    METHOD PMC* find(PMC *haystack, PMC *needle, PMC *start) {
+        INTVAL istart = 0;
+        INTVAL pos;
+        if (REG_INT(3) > 2) istart = VTABLE_get_integer(INTERP, start);
+        pos = string_str_index(INTERP, VTABLE_get_string(INTERP, haystack),
+            VTABLE_get_string(INTERP, needle), istart);
+        PMC *ret = pmc_new(INTERP, PyBuiltin_PyInt);
+        VTABLE_set_integer_native(INTERP, ret, pos);
         return ret;
     }
 

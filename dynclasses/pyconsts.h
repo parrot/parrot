@@ -7,6 +7,7 @@
 /* Python class types */
 
 PYVAR_SCOPE INTVAL PyBuiltin_PyBoolean;
+PYVAR_SCOPE INTVAL PyBuiltin_PyBoundMeth;
 PYVAR_SCOPE INTVAL PyBuiltin_PyClass;
 PYVAR_SCOPE INTVAL PyBuiltin_PyComplex;
 PYVAR_SCOPE INTVAL PyBuiltin_PyDict;
@@ -51,6 +52,7 @@ PYVAR_SCOPE STRING *PyString_call;
 PYVAR_SCOPE STRING *PyString_class;
 PYVAR_SCOPE STRING *PyString_cmp;
 PYVAR_SCOPE STRING *PyString_dict;
+PYVAR_SCOPE STRING *PyString_get;
 PYVAR_SCOPE STRING *PyString_hex;
 PYVAR_SCOPE STRING *PyString_hash;
 PYVAR_SCOPE STRING *PyString_init;

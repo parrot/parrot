@@ -83,6 +83,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             PyBuiltin_PyBoolean    = Parrot_PMC_typenum(INTERP, "PyBoolean");
+            PyBuiltin_PyBoundMeth  = Parrot_PMC_typenum(INTERP, "PyBoundMeth");
             PyBuiltin_PyClass      = Parrot_PMC_typenum(INTERP, "PyClass");
             PyBuiltin_PyComplex    = Parrot_PMC_typenum(INTERP, "PyComplex");
             PyBuiltin_PyDict       = Parrot_PMC_typenum(INTERP, "PyDict");
@@ -105,12 +106,13 @@ they will be used frequently here.
             PyBuiltin_PyType       = Parrot_PMC_typenum(INTERP, "PyType");
 
             PyString_bases = const_string(INTERP, "__bases__");
-            PyString_class = const_string(INTERP, "__class__");
             PyString_call  = const_string(INTERP, "__call__");
+            PyString_class = const_string(INTERP, "__class__");
             PyString_cmp   = const_string(INTERP, "__cmp__");
             PyString_dict  = const_string(INTERP, "__dict__");
-            PyString_hex   = const_string(INTERP, "__hex__");
+            PyString_get   = const_string(INTERP, "__get__");
             PyString_hash  = const_string(INTERP, "__hash__");
+            PyString_hex   = const_string(INTERP, "__hex__");
             PyString_init  = const_string(INTERP, "__init__");
             PyString_int   = const_string(INTERP, "__int__");
             PyString_iter  = const_string(INTERP, "__iter__");
