@@ -173,7 +173,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     case SIZE_PSTR:
         {
             STRING *s = (STRING *)va_arg(*arg, STRING *);
-            return s ? string_copy(interpreter, s) : cstr2pstr("(null)");
+            return s ? s : cstr2pstr("(null)");
 
         }
 
@@ -182,7 +182,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
             PMC *pmc = (PMC *)va_arg(*arg, PMC *);
             STRING *s = VTABLE_get_string(interpreter, pmc);
 
-            return string_copy(interpreter, s);
+            return s;
         }
 
     default:
@@ -307,7 +307,7 @@ getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 
     obj->index++;
     s = (STRING *)(VTABLE_get_string(interpreter, tmp));
-    return string_copy(interpreter, s);
+    return s;
 }
 
 static void *
