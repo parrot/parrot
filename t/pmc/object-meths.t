@@ -196,13 +196,21 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
     print "ok 1\n"
     new P10, .PerlInt
     set P10, 42
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
     setattribute P2, I0, P10
     returncc
 .pcc_sub __get_string:
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set S5, P10
+    set I0, 0
+    set I1, 0
+    set I2, 1
+    set I3, 0
+    set I4, 0
     returncc
 CODE
 ok 1
@@ -226,6 +234,8 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents");
     .namespace ["Foo"]
 .pcc_sub __init:
     print "foo_init\n"
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classname S0, P2
     print S0
     print "\n"
@@ -665,6 +675,8 @@ output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
     .namespace ["Foo"]
 .pcc_sub _new:
     print "foo_init\n"
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classname S0, P2
     print S0
     print "\n"

@@ -624,11 +624,11 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
 
     # instantiate a Bar object
     find_type I1, "Bar"
-    new P3, I1
+    new P13, I1
 
     # Foo and Bar have attribute accessor methods
     set S0, "Foo::set"		# the meth   s. pdd03
-    set P2, P3			# the object s. pdd03
+    set P2, P13			# the object s. pdd03
     new P5, .PerlString		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set I5, 0			# set first attrib
@@ -648,6 +648,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
 
     set S0, "Bar::set"
@@ -659,6 +660,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
     set S0, "Bar::set"
     new P5, .PerlString
@@ -669,6 +671,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
 
     # now retrieve attributes
@@ -679,6 +682,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     set S0, "Foo::get"
@@ -688,6 +692,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
 
@@ -698,6 +703,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     set S0, "Bar::get"
@@ -707,6 +713,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
     set I2, 0
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     end
@@ -714,6 +721,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
 # set(obj: Pvalue, Iattr_idx)
 .pcc_sub Foo::set:
     print "in Foo::set\n"
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I3, P2, "Foo"
     add I4, I3, I5
     setattribute P2, I4, P5	# so always put new PMCs in
@@ -722,12 +731,16 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
 # Pattr = get(obj: Iattr_idx)
 .pcc_sub Foo::get:
     print "in Foo::get\n"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I3, P2, "Foo"
     add I4, I3, I5
     getattribute P5, P2, I4
+    set I0, 0
+    set I3, 1
     returncc
 
 .pcc_sub Bar::set:
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in Bar::set\n"
     classoffset I3, P2, "Bar"
     add I4, I3, I5
@@ -738,6 +751,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, subclassing access meths ");
 
 .pcc_sub Bar::get:
     print "in Bar::get\n"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I3, P2, "Bar"
     add I4, I3, I5
     getattribute P5, P2, I4
@@ -783,11 +797,11 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
 
     # instantiate a Bar object
     find_type I1, "Bar"
-    new P3, I1
+    new P13, I1
 
     # Foo and Bar have attribute accessor methods
     set S0, "set"		# the meth   s. pdd03
-    set P2, P3			# the object s. pdd03
+    set P2, P13			# the object s. pdd03
     new P5, .PerlString		# set attribute values
     set P5, "i\n"		# attribute slots have reference semantics
     set S5, "Foo"
@@ -797,7 +811,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 1
     set I4, 0
-    # register preserving is optimized away :)
+    set P2, P13
     callmethodcc
     new P5, .PerlString
     set P5, "j\n"
@@ -807,6 +821,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
 
     new P5, .PerlString
@@ -818,6 +833,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
     new P5, .PerlString
     set P5, "l\n"
@@ -827,6 +843,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
     new P5, .PerlString
     set P5, "m\n"
@@ -836,6 +853,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 1
     set I4, 0
+    set P2, P13
     callmethodcc
 
     # now retrieve attributes
@@ -847,6 +865,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     set I5, 1			# get 2nd attrib
@@ -855,6 +874,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
 
@@ -865,6 +885,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     set I5, 1			# get 2nd attrib
@@ -873,6 +894,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     set I5, 2			# get 3rd attrib
@@ -881,6 +903,7 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
     set I2, 1
     set I3, 0
     set I4, 0
+    set P2, P13
     callmethodcc
     print P5			# return result
     end
@@ -890,6 +913,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
 
 # set(obj: Pvalue, SClass, Iattr_idx)
 .pcc_sub set:
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I3, P2, S5
     add I4, I3, I5
     setattribute P2, I4, P5
@@ -899,6 +924,8 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
 
 # Pattr = get(obj: SClass, Iattr_idx)
 .pcc_sub get:
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     classoffset I3, P2, S5
     add I4, I3, I5
     getattribute P5, P2, I4
@@ -947,6 +974,8 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     end
 
 .pcc_sub set_i:
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in set_integer\n"
     classoffset I0, P2, "Foo"
     new P6, .PerlInt
@@ -963,6 +992,7 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     setattribute P7, I0, P12
     returncc
 .pcc_sub get_s:
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print "in get_string\n"
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0

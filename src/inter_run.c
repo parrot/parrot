@@ -226,10 +226,9 @@ runops_args(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     bp = interpreter->ctx.bp;
     ret_c = new_ret_continuation_pmc(interpreter, NULL);
     dest = VTABLE_invoke(interpreter, sub, NULL);
-    interpreter->ctx.current_sub = REG_PMC(0) = sub;
-    interpreter->ctx.current_cont = REG_PMC(1) = ret_c;
-    interpreter->ctx.current_object = REG_PMC(2) = obj;
-    REG_STR(0) = meth;
+    interpreter->ctx.current_sub = sub;
+    interpreter->ctx.current_cont = ret_c;
+    interpreter->ctx.current_object = obj;
 
     /*
      * count arguments, check for overflow
@@ -420,9 +419,8 @@ Parrot_run_meth_fromc(Parrot_Interp interpreter,
     p1 = REG_PMC(1);
     p2 = REG_PMC(2);
     s0 = REG_STR(0);
-    REG_PMC(2) = obj;
-    REG_STR(0) = meth;
     REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
+    interpreter->ctx.current_object = obj;
     dest = VTABLE_invoke(interpreter, sub, (void*)1);
     bp = interpreter->ctx.bp;
     if (dest) {

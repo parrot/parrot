@@ -172,36 +172,33 @@ OUTPUT
 output_is(<<'CODE', <<OUTPUT, "vanishing return continuation in method calls");
     newclass P1, "Foo"
 
-    find_global P2, "_init"
-    store_global "Foo", "__init", P2
-    find_global P2, "_inc"
-    store_global "Foo", "__increment", P2
-
     find_type I1, "Foo"
     new P3, I1
     print "ok\n"
     end
 
-.pcc_sub _init:
-    set P16, P1
+.namespace ["Foo"]
+.pcc_sub __init:
     print "init\n"
     sweep 1
     new P6, .PerlString
     set P6, "hi"
-    newsub P0, .Sub, _do_inc
-    invokecc
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
+    callmethodcc "do_inc"
     sweep 1
-    set P1, P16
     returncc
 
-_do_inc:
+.pcc_sub do_inc:
     sweep 1
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     inc P2
     sweep 1
     print "back from _inc\n"
     returncc
 
-.pcc_sub _inc:
+.pcc_sub __increment:
     print "inc\n"
     sweep 1
     returncc
@@ -226,6 +223,8 @@ output_is(<<'CODE', <<OUTPUT, "failing if regsave is not marked");
 
 .namespace ["Source"]
 .pcc_sub __get_string:	# buffer
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getprop P12, "buf", P2
     sweep 1
     typeof I12, P12
@@ -248,6 +247,7 @@ buffer_ok:
 .namespace ["Source::Buffer"]
 .pcc_sub __get_string:
     sweep 1
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     getprop P12, "buf", P2
     set S16, P12
     set S5, S16

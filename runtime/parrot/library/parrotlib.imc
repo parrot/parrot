@@ -175,6 +175,8 @@ END:
     .param string name
     .local string path
 
+.include "interpinfo.pasm"
+    interpinfo P0, .INTERPINFO_CURRENT_SUB
     getprop $P0, "path", P0
     path = $P0
 

@@ -84,6 +84,8 @@ func:
     eq I5, 0, endfunc
     dec I5
 
+.include "interpinfo.pasm"
+    interpinfo P0, .INTERPINFO_CURRENT_SUB
     invokecc   # recursive invoke
 
 endfunc:
@@ -122,6 +124,8 @@ func:
     eq I5, 0, endfunc
     dec I5
 
+.include "interpinfo.pasm"
+    interpinfo P0, .INTERPINFO_CURRENT_SUB
     invokecc P0  # recursive invoke
 
 endfunc:
@@ -288,7 +292,7 @@ func1:
     new P0, .Sub
     set_addr P0, func2
 
-    invoke    # tail invoke (reuses context already in P1)
+    tailcall P0
     print "this should not be called\n"
     end
 
@@ -314,7 +318,7 @@ func1:
 
     newsub P0, .Sub, func2
 
-    invoke    # tail invoke (reuses context already in P1)
+    tailcall P0
     print "this should not be called\n"
 
 func2:

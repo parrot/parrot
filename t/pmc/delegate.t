@@ -169,6 +169,8 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p");
     returncc
 .pcc_sub __add:
     print "in __add\n"
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print P2	# self - this triggers __get_string
     print "\n"
     print P5	# value
@@ -211,6 +213,8 @@ output_is(<<'CODE', <<'OUTPUT', "delegate add_p_p_p - clobber regs");
     returncc
 .pcc_sub __add:
     print "in __add\n"
+.include "interpinfo.pasm"
+    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     print P2	# self - this triggers __get_string
     print "\n"
     print P5	# value

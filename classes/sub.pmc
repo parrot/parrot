@@ -138,9 +138,11 @@ Destroys the subroutine.
         if (!sub)
             return;
 #if 0
-        STRING *n = sub_name(INTERP, SELF);
-        fprintf(stderr, "DESTROY sub %p %s\n", SELF,
-            n && n->strstart ? (char*)n->strstart : "???");
+        {
+            STRING *n = sub_name(INTERP, SELF);
+            fprintf(stderr, "DESTROY sub %p %s\n", SELF,
+                    n && n->strstart ? (char*)n->strstart : "???");
+        }
 #endif
         clear_fixup(INTERP, SELF);
         mem_sys_free(sub);
@@ -320,15 +322,11 @@ Invokes the subroutine.
             /* copy function arguments */
             copy_regs(interpreter, caller_regs);
             /*
-             * and copy P0..P2, S0
+             * and copy set context variables
              */
-            interpreter->ctx.current_cont = REG_PMC(1) =
-                BP_REG_PMC(caller_regs, 1);
-            REG_STR(0) = BP_REG_STR(caller_regs, 0);
+            interpreter->ctx.current_cont = BP_REG_PMC(caller_regs, 1);
 is_tail_call:
-            interpreter->ctx.current_sub = REG_PMC(0) = SELF;
-            interpreter->ctx.current_object = REG_PMC(2) =
-                BP_REG_PMC(caller_regs, 2);
+            interpreter->ctx.current_sub = SELF;
         }
         return sub->address;
     }
@@ -346,7 +344,10 @@ Creates and returns a clone of the subroutine.
     PMC* clone () {
         struct Parrot_sub * sub;
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_active_destroy_SET(ret);
+        /*
+         * we have to mark it ourselves
+         */
+        PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
         sub->name = string_copy(interpreter, sub->name);
@@ -354,6 +355,21 @@ Creates and returns a clone of the subroutine.
         return ret;
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the continuation as live.
+
+=cut
+
+*/
+
+    void mark () {
+        struct Parrot_sub * sub = PMC_sub(SELF);
+        if (sub->name)
+            pobject_lives(INTERP, (PObj *) sub->name);
+    }
 /*
 
 =item C<void set_same(PMC *value)>

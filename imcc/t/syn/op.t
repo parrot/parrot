@@ -250,7 +250,7 @@ output_is(<<'CODE', <<'OUT', "x = invoke");
 .end
 .sub _s
     print "in sub\n"
-    P1 = invoke
+    returncc
 .end
 CODE
 in sub
