@@ -1,7 +1,50 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More; # Included for skip().
+
+my $fp_equality_macro = <<'ENDOFMACRO';
+fp_eq	macro	J,K,L
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, $FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	L
+$FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+endm
+fp_ne	macro	J,K,L
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, J
+	set	N1, K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, $FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	L
+$FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+endm
+ENDOFMACRO
 
 output_is(<<CODE, <<OUTPUT, "Set/get strings");
         new P0, PerlString
@@ -38,6 +81,100 @@ OK5:    print "ok 5\\n"
         set P0, "0xFFFFFF"
         set S0, P0
         eq S0, "0xFFFFFF", OK6
+        print "not "
+OK6:    print "ok 6\\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "Setting integers");
+        new P0, PerlString
+        set P0, "1"
+        set I0, P0
+        print I0
+        print "\\n"
+
+        new P0, PerlString
+        set P0, "2.0"
+        set I0, P0
+        print I0
+        print "\\n"
+
+        new P0, PerlString
+        set P0, ""
+        set I0, P0
+        print I0
+        print "\\n"
+
+        new P0, PerlString
+        set P0, "\0"
+        set I0, P0
+        print I0
+        print "\\n"
+
+        new P0, PerlString
+        set P0, "foo"
+        set I0, P0
+        print I0
+        print "\\n"
+
+        end
+CODE
+1
+2
+0
+0
+0
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "Setting numbers");
+@{[ $fp_equality_macro ]}
+        new P0, PerlString
+        set P0, "1"
+        set N0, P0
+        fp_eq N0, 1.0, OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        new P0, PerlString
+        set P0, "2.0"
+        set N0, P0
+        fp_eq N0, 2.0, OK2
+        print "not "
+OK2:    print "ok 2\\n"
+
+        new P0, PerlString
+        set P0, ""
+        set N0, P0
+        fp_eq N0, 0.0, OK3
+        print "not "
+OK3:    print "ok 3\\n"
+
+        new P0, PerlString
+        set P0, "\0"
+        set N0, P0
+        fp_eq N0, 0.0, OK4
+        print "not "
+OK4:    print "ok 4\\n"
+
+        new P0, PerlString
+        set P0, "foo"
+        set N0, P0
+        fp_eq N0, 0.0, OK5
+        print "not "
+OK5:    print "ok 5\\n"
+
+        new P0, PerlString
+        set P0, "1.3e5"
+        set N0, P0
+        fp_eq N0, 130000.0, OK6
         print "not "
 OK6:    print "ok 6\\n"
 
@@ -125,30 +262,45 @@ C2H5OH
 C2H5OH + 10H20
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "repeat");
+output_is(<<'CODE', <<OUTPUT, "repeat");
 	new P0, PerlString
 	set P0, "x"
 	new P1, PerlInt
 	set P1, 12
 	new P2, PerlString
-
 	repeat P2, P0, P1
-	bsr PRINTA
+        print P2
+        print "\n"
+
+        set P0, "y"
+        new P1, PerlNum
+        set P1, 6.5
+        repeat P2, P0, P1
+        print P2
+        print "\n"
+
+        set P0, "z"
+        new P1, PerlString
+        set P1, "3"
+        repeat P2, P0, P1
+        print P2
+        print "\n"
+
+        set P0, "a"
+        new P1, PerlUndef
+        repeat P2, P0, P1
+        print P2
+        print "\n"
 
 	end
-
-PRINTA:	print P0
-	print "\\n"
-	print P1
-	print "\\n"
-	print P2
-	print "\\n"
-	ret
 CODE
-x
-12
 xxxxxxxxxxxx
+yyyyyy
+zzz
+
 OUTPUT
+
+
 
 output_is(<<CODE, <<OUTPUT, "if(PerlString)");
         new P0, PerlString
