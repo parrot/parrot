@@ -26,6 +26,7 @@ pmclass VtableCache extends default needs_ext {
     }
 
     void destroy () {
+	return;
         if (NULL != PMC_struct_val(SELF)) {
             Parrot_destroy_vtable(INTERP, PMC_data(SELF));
         }
