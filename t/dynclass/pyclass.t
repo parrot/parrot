@@ -61,7 +61,7 @@ output_is(<< 'CODE', << 'OUTPUT', "method");
     end
 .end
 
-.sub _m non_prototyped
+.sub _m @ANON
     find_type $I0, "PyInt"
     new $P0, $I0
     $P0 = 1

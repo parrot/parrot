@@ -250,6 +250,7 @@ v	Iiiip
 # PyBuiltins
 P	IOPP
 P	IOPPP
+v	IOPP
 
 # Parrot builtins
 d	IOd

@@ -25,6 +25,7 @@ STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyString;
 
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
 
@@ -42,6 +43,7 @@ Class initialization. Allocates the memory for the hash.
         /* class_init_code */
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
 
             make_bufferlike_pool(INTERP, sizeof(struct _hash));
             intret = constant_pmc_new(INTERP, dynclass_PyInt);
@@ -61,6 +63,21 @@ Initializes the instance.
     void init () {
         PObj_custom_mark_SET(SELF);
         new_pmc_hash(INTERP, SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))
+            mark_hash(INTERP, PMC_struct_val(SELF));
     }
 
 /*
@@ -124,6 +141,20 @@ Returns whether a key C<*key> exists in the hash.
         if (key == NULL)
             return 1;       /* lookup stops here */
         return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true iff there are elements in the dictionary.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return DYNSELF.elements() != 0;
     }
 
 /*
@@ -315,7 +346,7 @@ Returns the big number value for the element at C<*key>.
 
 /*
 
-=item C<void set_pmc_keyed(PMC *dest_key, PMC *value)>
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 =cut
 
@@ -340,6 +371,20 @@ Returns the big number value for the element at C<*key>.
             box = pmc_new(INTERP, DYNSELF.type());
         }
         VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
+    }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+=cut
+
+*/
+
+    void set_string_keyed (PMC* key, STRING* value) {
+         PMC *svalue = pmc_new(INTERP, dynclass_PyString);
+         VTABLE_set_string_native(INTERP, svalue, value);
+         VTABLE_set_pmc_keyed(INTERP, SELF, key, svalue);
     }
 
 /*

@@ -65,6 +65,21 @@ Initializes the PMC by calling the underlying C<list_new()> function.
         PObj_custom_mark_SET(SELF);
     }
 
+
+/*
+
+=item C<void mark()>
+
+Mark the array and its contents as live.
+
+=cut
+
+*/
+
+    void mark () {
+        list_mark(INTERP, (List *) PMC_data(SELF));
+    }
+
 /*
 
 =item C<void delete_keyed(PMC *key)>
@@ -102,6 +117,20 @@ Returns the number of elements in the array.
 
     INTVAL elements () {
         return ((List *) PMC_data(SELF))->length;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true iff there are elements in the list.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return DYNSELF.elements() != 0;
     }
 
 /*
