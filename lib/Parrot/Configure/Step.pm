@@ -3,11 +3,19 @@
 
 =head1 NAME
 
-Parrot::Configure::Step - Configuration Step
+Parrot::Configure::Step - Configuration Step Utilities
 
 =head1 DESCRIPTION
 
-A configuration step run by F<Configure.pl>.
+The C<Parrot::Configure::Step> module contains utility functions for steps to
+use.
+
+Note that the actual configuration step itself is NOT an instance of
+this class, rather it is defined to be in the C<package>
+C<Configure::Step>. See F<docs/configuration.pod> for more information
+on how to create new configuration steps.
+
+=head2 Functions
 
 =over 4
 
@@ -70,7 +78,8 @@ sub integrate {
 
 =item C<prompt($message, $value)>
 
-Prompts the user with the specified message and default value.
+Prints out "message [default] " and waits for the user's response.
+Returns the response, or the default if the user just hit C<ENTER>.
 
 =cut
 
@@ -98,7 +107,10 @@ sub prompt {
 
 =item C<file_checksum($filename, $ignorePattern)>
 
-Creates a checksum for the specified file.
+Creates a checksum for the specified file. This is used to compare files.
+
+Any lines matching the regular expression specified by C<$ignorePattern>
+are not included in the checksum.
 
 =cut
 
@@ -116,7 +128,11 @@ sub file_checksum {
 
 =item C<copy_if_diff($from, $to, $ignorePattern)>
 
-Copies the specified file if it's contents have changed.
+Copies the file specified by C<$from> to the location specified by C<$to>
+if it's contents have changed.
+
+The regular expression specified by C<$ignorePattern> is passed to
+C<file_checksum()> when comparing the files.
 
 =cut
 
@@ -139,7 +155,8 @@ sub copy_if_diff {
 
 =item C<move_if_diff($from, $to, $ignorePattern)>
 
-Moves the specified file if it's contents have changed.
+Moves the file specified by C<$from> to the location specified by C<$to>
+if it's contents have changed.
 
 =cut
 
@@ -151,7 +168,9 @@ sub move_if_diff {
 
 =item C<genfile($source, $target, %options)>
 
-Generates the specified file.
+Takes the specified source file, substitutes any sequences matching
+C</\$\{\w+\}/> for the given key's value in the configuration system's
+data, and writes the results to specified target file.
 
 =cut
 
@@ -224,7 +243,9 @@ sub genfile {
 
 =item C<_run_command($command, $out, $err)>
 
-Runs the specified command.
+Runs the specified command. Output is directed to the file specified by
+C<$out>, warnings and errors are directed to the file specified by
+C<$err>.
 
 =cut
 
@@ -281,7 +302,7 @@ sub _run_command {
 
 =item C<cc_gen($source)>
 
-Generates F<test.c> with the specified source.
+Generates F<test.c> from the specified source file.
 
 =cut
 
@@ -291,9 +312,10 @@ sub cc_gen {
 	genfile($source, "test.c");
 }
 
-=item C<cc_build($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)>
+=item C<cc_build($cc, 
+$ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)>
 
-Builds F<test.c>.
+Calls the compiler and linker on F<test.c>.
 
 =cut
 
@@ -312,7 +334,8 @@ sub cc_build {
 
 =item C<cc_run()>
 
-Runs  F<text.c>.
+Calls the F<test> (or F<test.exe>) executable. Any output is directed to
+F<test.out>.
 
 =cut
 
@@ -339,7 +362,8 @@ sub cc_run {
 
 =item C<cc_run_capture()>
 
-Runs  F<text.c> capturing the output.
+Same as C<cc_run()> except that warnings and errors are also directed to
+F<test.out>.
 
 =cut
 
@@ -366,7 +390,7 @@ sub cc_run_capture {
 
 =item C<cc_clean()>
 
-Cleans up after running F<text.c>, deleting any files created.
+Cleans up all files in the root folder that match the glob F<test.*>.
 
 =cut
 
@@ -382,7 +406,9 @@ sub cc_clean {
 
 =over 4
 
-=item L<Parrot::Configure::Steps>
+=item C<Parrot::Configure::RunSteps>
+
+=item F<docs/configuration.pod>
 
 =back
 

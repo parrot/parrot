@@ -8,7 +8,7 @@ config/init/data.pl - Configuration Defaults
 
 =head1 DESCRIPTION
 
-Sets up the configuration systems's default values and data structures.
+Sets up the configuration system's default values and data structures.
 
 =cut
 

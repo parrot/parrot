@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/auto/file - Packing
+config/auto/pack.pl - Packing
 
 =head1 DESCRIPTION
 

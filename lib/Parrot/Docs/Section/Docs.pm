@@ -50,6 +50,7 @@ sub new
 			$self->new_item('', 'docs/parrot.pod'),
 		),
 		$self->new_group('Specific Documentation', '',
+			$self->new_item('', 'docs/configuration.pod'),
 			$self->new_item('', 'docs/vtables.pod'),
 			$self->new_item('', 'docs/mmd.pod'),
 			$self->new_item('', 'docs/strings.pod'),

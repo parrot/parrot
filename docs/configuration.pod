@@ -1,0 +1,225 @@
+# Copyright: 2004 The Perl Foundation. All Rights Reserved.
+# $Id$
+
+=head1 NAME
+
+docs/configuration.pod - Parrot Configuration System
+
+=head1 DESCRIPTION
+
+Parrot configuration is broken up into I<steps>. Each step contains
+several related I<prompts>, I<probes>, or I<generations>. Steps should
+be mostly of a single type, though some overlap is allowed (for example,
+allowing a probe to ask the user what to do in an exceptional
+situation).
+
+The directory F<config> contains subdirectories for each type of step. 
+Each step should consist of I<exactly one> .pl file and any number of
+supporting .c, .in, etc. files. Any supporting files should be in a
+folder whose name is the same as the basename of the step's .pl file;
+for example, if F<foo.pl> uses F<bar_c.in>, F<bar_c.in> should be in a
+directory called F<foo>; the full path might be
+F<config/auto/foo/bar_c.in>.
+
+Generally, when adding a new test you should add a new step unless a
+test I<clearly> belongs in a current step. For example, if we added a
+new user-configurable type called C<FOOVAL>, you should add the test for
+its size in F<config/auto/sizes.pl>; however, if you were testing what
+dynaloading capabilities are available, you should create a new step.
+
+=head2 Initialization Steps
+
+I<Initialization steps> are run before any other steps. They do tasks
+such as preparing the configuration system's data structures and
+checking the F<MANIFEST>. These will rarely be added; when they are, it
+usually means that the configuration system is getting significant new
+capabilities. They're kept in the directory F<config/init>.
+
+Initialization steps usually do not output anything under normal
+circumstances.
+
+=head2 Prompts
+
+Prompts ask the user for some information. These should be used
+sparingly. A step containing prompts is an I<interactive step>.
+Interactive steps should be in the F<config/inter> folder.
+
+Interactive steps often include simple probes to determine good guesses
+of what the user will answer. See L</Prompt or Probe?> for more
+information.
+
+Interactive steps virtually always output something.
+
+Note that, by default, these prompts are turned off. To enable them run
+F<Configure.pl> with the C<--ask> option.
+
+=head2 Probes
+
+Probes are automated tests of some feature of the computer. These should
+be used wherever a value will not often need to be modified by the user.
+A step containing probes is an I<automatic step>. Automatic steps should
+be in the F<config/auto> folder.
+
+Automatic steps usually do not output anything under normal
+circumstances.
+
+=head2 Generations
+
+Generations create files needed after configuration has completed, such
+as Makefiles and configuration headers. A step containing generations is
+a I<generation step>. Generation steps should be in the F<config/gen>
+folder.
+
+Generation steps usually do not output anything under normal
+circumstances.
+
+=head2 Prompt or Probe?
+
+It can sometimes be hard to decide whether a given step should be an
+automatic or an interactive step. The guiding question is I<Would a user
+ever want to change this?>, or conversely, I<Is this something that can
+be completely determined without user intervention?>  A step figuring
+out what the compiler's command is would probably be an interactive
+step; conversely, a step figuring out if that command is connected to a
+specific compiler (like gcc) would be an automatic step.
+
+=head2 Adding Steps
+
+New steps should be added in one of the three folders mentioned above.
+
+All steps are really modules; they should start with a declaration
+setting the current package to C<Configure::Step>. Note that there is no
+file for the C<Configure::Step> package.
+
+They should define
+the following:
+
+=over 4
+
+=item C<$description>
+
+A short descriptive message that should be printed before the step
+executes. Usually, interactive steps have long, friendly descriptions
+and other steps have terse descriptions ending in "...".
+
+Some example descriptions:
+
+=over 4
+
+=item F<inter/progs.pl>
+
+    Okay, I'm going to start by asking you a couple questions about your
+    compiler and linker. Default values are in square brackets; you can
+    hit ENTER to accept them. If you don't understand a question, the
+    default will usually work--they've been intuited from your Perl 5
+    configuration.
+
+=item F<auto/cgoto.pl>
+
+    Determining if your compiler supports computed goto...
+
+=item F<gen/config_h.pl>
+
+    Generating config.h...
+
+=back
+
+Note that on non-interactive steps, the text I<done.> will be printed
+after the description when the step finishes executing; for example, the
+user will see:
+
+    Determining if your compiler supports computed goto...done.
+
+=item C<@args>
+
+This contains the names of any command-line arguments the step cares
+about. Command-line arguments are standardized in F<Configure.pl>; this
+will be described L<later|/"Command-line Arguments"> in more detail.
+
+=item C<Configure::Step::runstep()>
+
+This is called to actually execute the step. The command-line arguments that
+your module said it cared about are passed in; they come in the same order as
+in C<@args>, and any that weren't specified are passed as C<undef>.
+
+=back
+
+The configuration system won't execute your step by default unless it's
+specifically told to. To do this, edit the
+C<Parrot::Configure::RunSteps> module's C<@steps> array. Steps are run
+in the sequence in which they appear in C<@steps>.
+
+Various utility functions for configuration steps are provided by the
+C<Parrot::Configure::Step> module.
+
+A template for a new step might look like this:
+
+    package Configure::Step;
+    
+    use strict;
+    use vars qw($description @args);
+    use Parrot::Configure::Step;
+    
+    $description="<description>";
+    @args=qw(<args>);
+    
+    sub runstep {
+        <code>
+    }
+
+=head2 Command-line Arguments
+
+Command-line arguments look like C</--\w+(=.*)?/>; the equals sign
+separates the name and the value. If the value is omitted, it's assumed
+to be 1. The options C<--help> and C<--version> are built in to
+Configure; any others are defined by steps.
+
+If you add a new option, don't forget to add it to this documentation
+and the C<--help> listing in F<Configure.pl>.
+
+Steps use the C<@args> array to list any options they're interested in.
+They should be listed without the dashes.
+
+=head2 Building Up Configuration Data
+
+The second step is F<config/init/data.pl>, which sets up a
+C<Configure::Data> package. You get and set configuration system's data
+by calling methods on this package. The methods are listed below.
+
+=over 4
+
+=item C<< Configure::Data->get(keys) >>
+
+Returns the values for the given keys.
+
+=item C<< Configure::Data->set(key, value, key, value, ...) >>
+
+Sets the given keys to the given values.
+
+=item C<< Configure::Data->keys() >>
+
+Returns a list of all keys.
+
+=item C<< Configure::Data->dump() >>
+
+Returns a string that can be C<eval>ed by Perl to create a hash representing
+the configuration system's data.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item C<Parrot::Configure::RunSteps>
+
+=item L<Parrot::Configure::Step>
+
+=back
+
+=head1 HISTORY
+
+The Parrot configuration system was created by Brent Dax.
+
+=cut
+

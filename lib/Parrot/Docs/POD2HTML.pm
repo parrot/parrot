@@ -243,7 +243,9 @@ sub process_file_start_token
         
         # Only link to files that will have HTML pages.
         
-        if ( $dist->relative_path_is_file($text) 
+        if ( $dist->relative_path_is_file($text)
+            # A little bit of a hack to avoid config template files.
+            and $text !~ /\.in$/o
             and $dist->file_with_relative_path($text)->contains_pod )
         {
             my $path = $self->append_html_suffix($text);
@@ -552,6 +554,7 @@ sub href_for_perl_module
     my $path = $self->append_html_suffix($dist->relative_path($file));
     
     # This is the docs file for the module.
+    return undef unless $self->{TARGET}->relative_path_is_file($path);
     $file = $self->{TARGET}->file_with_relative_path($path);
     
     # There's no point in linking to the file you are already in.
