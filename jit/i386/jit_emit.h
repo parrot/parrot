@@ -337,6 +337,29 @@ emit_movb_i_r(char *pc, char imm, int reg)
 #define emitm_movl_r_m(pc, reg1, b, i, s, d) \
   emitm_movX_Y_Z(0x89, pc, reg1, b, i, s, d)
 
+/* move byte/word with sign extension */
+#define emitm_movsbl_r_m(pc, reg1, b, i, s, d) { \
+  *(pc++) = 0x0f; \
+  emitm_movX_Y_Z(0xBE, pc, reg1, b, i, s, d); \
+}
+
+#define emitm_movswl_r_m(pc, reg1, b, i, s, d) { \
+  *(pc++) = 0x0f; \
+  emitm_movX_Y_Z(0xBF, pc, reg1, b, i, s, d); \
+}
+
+#define emitm_movsbl_r_r(pc, reg1, reg2) { \
+  *(pc++) = 0x0f; \
+  *(pc++) = 0xbe; \
+  *(pc++) = emit_alu_r_r(reg1, reg2); \
+}
+
+#define emitm_movswl_r_r(pc, reg1, reg2) { \
+  *(pc++) = 0x0f; \
+  *(pc++) = 0xbf; \
+  *(pc++) = emit_alu_r_r(reg1, reg2); \
+}
+
 #define emitm_movb_m_r(pc, reg1, b, i, s, d) \
   emitm_movX_Y_Z(0x8a, pc, reg1, b, i, s, d)
 
@@ -821,6 +844,13 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 
 #define emitm_fstpt(pc, b, i, s, d) \
   emitm_fl_2(pc, emit_b01, 1, emit_b111, b, i, s, d)
+
+/* short float load / store */
+#define emitm_flds(pc, b, i, s, d) \
+  emitm_fl_2(pc, emit_b00, 1, emit_b000, b, i, s, d)
+
+#define emitm_fstps(pc, b, i, s, d) \
+  emitm_fl_2(pc, emit_b00, 1, emit_b010, b, i, s, d)
 
 #if NUMVAL_SIZE == 8
 
@@ -2004,8 +2034,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    jit_info.native_ptr = jit_info.arena.start =
-        mem_sys_allocate_zeroed((size_t)1024);
+    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate((size_t)128);
     pc = jit_info.native_ptr;
 
     /* make stack frame */
@@ -2015,6 +2044,13 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     /* as long as there are params */
     while (sig > (char *)signature->strstart) {
         switch (*sig) {
+            case 'f':
+                /* get a double from next num reg and push it on stack */
+                jit_emit_fload_m_n(pc, &NUM_REG(next_n++));
+                /* make room for float */
+                emitm_addb_i_r(pc, -4, emit_ESP);
+                emitm_fstps(pc, emit_ESP, emit_None, 1, 0);
+                break;
             case 'd':
                 /* get a double from next num reg and push it on stack */
                 jit_emit_fload_m_n(pc, &NUM_REG(next_n++));
@@ -2023,8 +2059,16 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
                 emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
                 st += 4;        /* extra stack for double */
                 break;
-            case 'i':
-                jit_emit_mov_rm_i(pc, emit_EAX, &NUM_REG(next_i++));
+            case 'i':   /* int */
+                jit_emit_mov_rm_i(pc, emit_EAX, &INT_REG(next_i++));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 's':   /* short: movswl intreg, %eax */
+                emitm_movswl_r_m(pc, emit_EAX, 0, 0, 1, &INT_REG(next_i++));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 'c':   /* char: movsbl intreg, %eax */
+                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 1, &INT_REG(next_i++));
                 emitm_pushl_r(pc, emit_EAX);
                 break;
             case 'v':
@@ -2042,7 +2086,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     /* get the pmc from stack - movl 12(%ebp), %eax */
     emitm_movl_m_r(pc, emit_EAX, emit_EBP, 0, 1, 12);
     /* call the thing in struct_val, i.e. offset 12 - call *(12)%eax */
-    emitm_callm(pc, emit_EAX, emit_None, emit_None, 12);
+    emitm_callm(pc, emit_EAX, emit_None, emit_None,
+            offsetof(struct PMC, cache.struct_val));
     /* adjust stack */
     if (st)
         emitm_addb_i_r(pc, st, emit_ESP);
@@ -2051,9 +2096,20 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     next_i = next_n = 5;
     /* first in signature is the return value */
     switch (*sig) {
+        case 'f':
         case 'd':
             /* pop num from st(0) and mov to reg */
             jit_emit_fstore_m_n(pc, &NUM_REG(next_n++));
+            break;
+        case 's':
+            /* movswl %ax, %edx */
+            emitm_movswl_r_r(pc, emit_EDX, emit_EAX);
+            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EDX);
+            break;
+        case 'c':
+            /* movsbl %al, %edx */
+            emitm_movsbl_r_r(pc, emit_EDX, emit_EAX);
+            jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EDX);
             break;
         case 'i':
             jit_emit_mov_mr_i(pc, &INT_REG(next_i++), emit_EAX);
