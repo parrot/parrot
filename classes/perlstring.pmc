@@ -383,10 +383,10 @@ pmclass PerlString extends perlscalar {
 		    if ((char *)PMC_data(key) >= (char *)s->strstart &&
 			(char *)PMC_data(key) <= (char *)s->strstart +
 			    s->bufused)
-			(const char *)PMC_data(key) = const_cast(
+			(char *)PMC_data(key) = const_cast(
 			    s->encoding->skip_forward( PMC_data(key), 1));
 		    else
-			(const char *)PMC_data(key) = const_cast(
+			(char *)PMC_data(key) = const_cast(
 			    s->encoding->skip_forward(s->strstart,
 				ret->cache.int_val));
 		}
@@ -400,10 +400,10 @@ pmclass PerlString extends perlscalar {
 			if ((char *)PMC_data(key) >= (char *)s->strstart &&
 				(char *)PMC_data(key) <= (char *)s->strstart +
 				s->bufused)
-			    (const char *)PMC_data(key) = const_cast(
+			    (char *)PMC_data(key) = const_cast(
 				s->encoding->skip_backward( PMC_data(key), 1));
 			else
-			    (const char *)PMC_data(key) = const_cast(
+			    (char *)PMC_data(key) = const_cast(
 				s->encoding->skip_forward(s->strstart,
 					ret->cache.int_val));
 		    }
@@ -412,8 +412,8 @@ pmclass PerlString extends perlscalar {
 	    case 3:	/* reset key, iterate from end */
 		ret->cache.int_val = n-1;
 		PMC_data(key) = (char *)s->strstart + s->bufused;
-		(const char *)PMC_data(key) =
-			    s->encoding->skip_backward( PMC_data(key), 1);
+		(char *)PMC_data(key) = const_cast(
+			    s->encoding->skip_backward( PMC_data(key), 1));
 		break;
 	}
 	return ret;
