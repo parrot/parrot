@@ -181,6 +181,70 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     return NULL;
 }
 
+#ifdef HAS_HEADER_SETJMP
+/* XXX s. interpreter.c */
+Parrot_exception the_exception;
+size_t handle_exception(Parrot_Interp);
+void do_exception(exception_severity severity, long error);
+
+static size_t
+dest2offset(Parrot_Interp interpreter, opcode_t *dest)
+{
+    size_t offset;
+    /* translate an absolute location in byte_code to an offset
+     * used for resuming after an exception had occured
+     */
+    switch (interpreter->flags) {
+        case PARROT_PREDEREF_FLAG:
+            offset = (void **)dest - interpreter->prederef_code;
+        default:
+            offset = dest - interpreter->code->byte_code;
+    }
+    return offset;
+}
+
+size_t
+handle_exception(Parrot_Interp interpreter)
+{
+    PMC *exception;     /* exception object */
+    size_t offset;      /* resume offset of handler */
+    PMC* key;
+    STRING *s;
+    opcode_t *dest;     /* absolute address of handler */
+
+    Parrot_block_DOD(interpreter);
+    /* create an exception object */
+    exception = pmc_new(interpreter, enum_class_Exception);
+    /* exception type */
+    s = string_make(interpreter, "_type", 5, NULL,0,NULL);
+    key = key_new_string(interpreter, s);
+    VTABLE_set_integer_keyed(interpreter, exception, key,
+            the_exception.error);
+    /* exception severity */
+    s = string_make(interpreter, "_severity", 9, NULL,0,NULL);
+    key = key_new_string(interpreter, s);
+    VTABLE_set_integer_keyed(interpreter, exception, key,
+            (INTVAL)the_exception.severity);
+    /* now fill rest of exception, locate handler and get
+     * destination of handler
+     */
+    dest = throw_exception(interpreter, exception, NULL);
+    offset = dest2offset(interpreter, dest);
+
+    Parrot_unblock_DOD(interpreter);
+    return offset;
+}
+
+void
+do_exception(exception_severity severity, long error)
+{
+    the_exception.error = error;
+    the_exception.severity = severity;
+    longjmp(the_exception.destination, 1);
+}
+
+#endif
+
 /*
  * Local variables:
  * c-indentation-style: bsd

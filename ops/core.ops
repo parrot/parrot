@@ -1105,6 +1105,10 @@ Throw the exception in $1.
 
 Only valid inside an exception handler. Rethrow the exception $1.
 
+=item B<die_hard(in INT, in INT)
+
+Die with severity $1 and error $2.
+
 =back
 
 =cut
@@ -1128,6 +1132,13 @@ inline op throw(in PMC) {
 inline op rethrow(in PMC) {
   opcode_t *dest = (opcode_t *)rethrow_exception(interpreter, $1);
   goto ADDRESS(dest);
+}
+
+inline op die_hard(in INT, in INT) {
+  /* XXX a quick hack to test setjmp/longjmp */
+  extern void do_exception(exception_severity severity, long error);
+  do_exception($1, $2);
+  restart NEXT();
 }
 
 ########################################

@@ -424,8 +424,8 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
     }
 }
 
-void
-runops(struct Parrot_Interp *interpreter, size_t offset)
+static void
+runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 {
     interpreter->resume_flag = 2;
 
@@ -451,6 +451,23 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
             }
         }
     }
+}
+
+#ifdef HAS_HEADER_SETJMP
+/* XXX s. exception.c */
+extern Parrot_exception the_exception;
+extern size_t handle_exception(Parrot_Interp);
+#endif
+void
+runops(struct Parrot_Interp *interpreter, size_t offset)
+{
+#ifdef HAS_HEADER_SETJMP
+    if (setjmp(the_exception.destination)) {
+        /* an exception was thrown */
+        offset = handle_exception(interpreter);
+    }
+#endif
+    runops_ex(interpreter, offset);
 }
 
 static int
