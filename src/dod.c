@@ -32,12 +32,12 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list)
     /* Also, be sure to check that we don't mark PMCs that are already part of
      * the free list. This can happen with a conservative marking routine
      * which marks dead PMCs as live, such as a C stack walk */
-    if (used_pmc->next_for_GC || used_pmc->flags & PMC_on_free_list_FLAG) {
+    if (used_pmc->next_for_GC || PObj_on_free_list_TEST(used_pmc)) {
         return current_end_of_list;
     }
 
     /* First, mark the PMC itself as used */
-    used_pmc->flags |= PMC_live_FLAG;
+    PObj_live_SET(used_pmc);
 
     /* Now put it on the end of the list */
     current_end_of_list->next_for_GC = used_pmc;
@@ -49,6 +49,47 @@ mark_used(PMC *used_pmc, PMC *current_end_of_list)
     return used_pmc;
 }
 
+#if DISABLE_GC_DEBUG
+void
+buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
+{
+    UNUSED(interpreter);
+    PObj_live_SET(buffer);
+}
+#else
+void
+buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
+{
+    PObj_live_SET(buffer);
+    if (! GC_DEBUG(interpreter))
+        return;
+
+    if (PObj_report_TEST(buffer)) {
+        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
+                buffer, buffer->bufstart);
+    }
+
+    if (PObj_on_free_list_TEST(buffer)) {
+        /* If a live buffer is found on the free list, warn. Note that
+         * this does NOT necessarily indicate the presence of a bug,
+         * because the stack is not zeroed out when a new stack frame
+         * is pushed, so old data on the stack might correctly point
+         * to a dead buffer. If the conservative_pointer_chasing flag
+         * is not set, this is not a possible explanation and the bug
+         * is real.
+         *
+         * If it *is* a bug, you may want to read the notes in
+         * get_free_buffer() in headers.c for tips on debugging using
+         * gdb with this pointer and version number. */
+#if ! DISABLE_GC_DEBUG
+#    if ! GC_VERBOSE
+        if (! CONSERVATIVE_POINTER_CHASING)
+#    endif
+#endif
+        fprintf(stderr, "GC Warning! Live buffer %p version " INTVAL_FMT " found on free list\n", buffer, buffer->version);
+    }
+}
+#endif
 /* Tag a buffer header as alive. Used by the GC system when tracing
  * the root set, and used by the PMC GC handling routines to tag their
  * individual pieces if they have private ones */
@@ -65,8 +106,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     struct PRegChunk *cur_chunk;
     Stack_Entry_t *entry;
     struct Stash *stash;
-    UINTVAL mask = PMC_is_PMC_ptr_FLAG | PMC_is_buffer_ptr_FLAG
-            | PMC_custom_mark_FLAG;
+    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
+            | PObj_custom_mark_FLAG;
 #ifdef HAS_HEADER_SETJMP
     Parrot_jump_buff env;
 
@@ -178,23 +219,23 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
      * list 'o things to look at. Run through it */
     prev = NULL;
     for (; current != prev; current = current->next_for_GC) {
-        UINTVAL bits = current->flags & mask;
+        UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
          * pointer that we need to trace */
         if (bits) {
-            if (bits == PMC_is_PMC_ptr_FLAG) {
+            if (bits == PObj_is_PMC_ptr_FLAG) {
                 if (current->data) {
                     last = mark_used(current->data, last);
                 }
             }
-            else if (bits == PMC_is_buffer_ptr_FLAG) {
+            else if (bits == PObj_is_buffer_ptr_FLAG) {
                 if (current->data) {
                     buffer_lives(interpreter, current->data);
                 }
             }
-            else if (bits == (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG)) {
+            else if (bits == PObj_is_buffer_of_PMCs_ptr_FLAG) {
                 /* buffer of PMCs */
                 Buffer *trace_buf = current->data;
 
@@ -310,14 +351,15 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
              * Note that it is technically possible to have a PMC be both
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
-            if (!(pmc_array[i].flags & (PMC_live_FLAG | PMC_on_free_list_FLAG |
-                                    PMC_constant_FLAG))) {
+
+            /* live_FLAG | on_free_list_FLAG | constant_FLAG */
+            if (!PObj_is_live_or_free_TESTALL(&pmc_array[i])) {
                 add_free_pmc(interpreter,
                         interpreter->arena_base->pmc_pool, &pmc_array[i]);
             }
-            else if (!(pmc_array[i].flags & PMC_on_free_list_FLAG)) {
+            else if (!PObj_on_free_list_TEST(&pmc_array[i])) {
                 total_used++;
-                pmc_array[i].flags &= ~PMC_live_FLAG;
+                PObj_live_CLEAR(&pmc_array[i]);
                 pmc_array[i].next_for_GC = NULL;
             }
         }
@@ -346,20 +388,20 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            if (!(b->flags & BUFFER_on_free_list_FLAG)) {
+            if (!PObj_on_free_list_TEST(b)) {
                 if (cleanup) {
                     /* clear COWed external FLAG */
-                    b->flags &= ~(UINTVAL)BUFFER_external_FLAG;
+                    PObj_external_CLEAR(b);
                     /* the real external flag */
-                    if (b->flags & BUFFER_bufstart_external_FLAG)
-                        b->flags |= BUFFER_external_FLAG;
+                    if (!PObj_bufstart_external_TEST(b))
+                        PObj_external_SET(b);
                     /* if cleanup (Parrot_destroy) constants are dead too */
-                    b->flags &=
-                        ~(UINTVAL)(BUFFER_constant_FLAG | BUFFER_live_FLAG);
+                    PObj_constant_CLEAR(b);
+                    PObj_live_CLEAR(b);
                 }
 
-                if ((b->flags & BUFFER_strstart_FLAG) && b->bufstart &&
-                        !(b->flags & BUFFER_external_FLAG)) {
+                if (PObj_is_string_TEST(b) && b->bufstart &&
+                        !PObj_external_TEST(b)) {
                     refcount = ((int *)b->bufstart);
                     *refcount = 0;
                 }
@@ -384,13 +426,13 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
         for (i = 0; i < cur_arena->used; i++) {
-            if (!(b->flags & BUFFER_on_free_list_FLAG) &&
-                    (b->flags & BUFFER_strstart_FLAG) &&
+            if (!PObj_on_free_list_TEST(b) &&
+                    PObj_is_string_TEST(b) &&
                     b->bufstart &&
-                    !(b->flags & (BUFFER_external_FLAG))) {
+                    !PObj_external_TEST(b)) {
                 refcount = ((int *)b->bufstart);
                 /* mark users of this bufstart by incrementing refcount */
-                if (b->flags & BUFFER_live_FLAG)
+                if (PObj_live_TEST(b))
                     *refcount = 1 << 29;        /* ~infinite usage */
                 else
                     (*refcount)++;      /* dead usage */
@@ -427,12 +469,10 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
              * Note that it is technically possible to have a Buffer be both
              * on_free_list and live, because of our conservative stack-walk
              * collection. We must be wary of this case. */
-            if (!(b->flags & (BUFFER_on_free_list_FLAG
-                                    | BUFFER_constant_FLAG
-                                    | BUFFER_live_FLAG))) {
+            if (!PObj_is_live_or_free_TESTALL(b)) {
 #ifndef GC_IS_MALLOC
                 if (pool->mem_pool) {
-                    if (!(b->flags & BUFFER_COW_FLAG)) {
+                    if (!PObj_COW_TEST(b)) {
                         ((struct Memory_Pool *)
                                 pool->mem_pool)->guaranteed_reclaimable +=
                                 b->buflen;
@@ -445,15 +485,15 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                  * strings - a slight optimization would be to have
                  * a separate flag for buffer_likes
                  */
-                if (!(b->flags & BUFFER_strstart_FLAG) &&
+                if (!PObj_is_string_TEST(b) &&
                         object_size > sizeof(Buffer))
                     memset(b + 1, 0, object_size - sizeof(Buffer));
                 add_free_buffer(interpreter, pool, b);
             }
-            else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
+            else if (!PObj_on_free_list_TEST(b)) {
                 total_used++;
             }
-            b->flags &= ~BUFFER_live_FLAG;
+            PObj_live_CLEAR(b);
             b = (Buffer *)((char *)b + object_size);
         }
     }
