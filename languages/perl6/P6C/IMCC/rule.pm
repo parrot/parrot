@@ -691,12 +691,40 @@ sub rx_not {
 END
 }
 
+# Negate a rule matching a single character (ugly)
+sub rx_not_one {
+    my ($ctx, $func) = @_;
+    my $osucc = $ctx->{succ};
+    $ctx->{succ} = genlabel 'not_one';
+    @{$ctx}{qw(succ fail)} = @{$ctx}{qw(fail succ)};
+    $func->($ctx);
+    @{$ctx}{qw(succ fail)} = @{$ctx}{qw(fail succ)};
+    code(<<END);
+	goto $ctx->{fail}	# rx_not
+$ctx->{succ}:
+	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
+END
+    $ctx->{succ} = $osucc;
+}
+
+# Match not(given char)
+sub rx_not_char {
+    my ($ctx, $char) = @_;
+    my $itmp = gentmp 'int';
+    code(<<END);
+	length $itmp, $ctx->{str}
+	if $ctx->{pos} >= $itmp goto $ctx->{fail}
+	ord $itmp, $ctx->{str}, $ctx->{pos}
+	if $itmp == $char goto $ctx->{fail}
+	inc $ctx->{pos}
+END
+}
+
 # - meta-characters
 # - escaped characters
 sub P6C::rx_meta::rx_val {
     my ($x, $ctx) = @_;    
     my $op = $x->name;
-    my $need_succ;
     if ($op eq '.') {
 	code(<<END);
 	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
@@ -715,11 +743,7 @@ END
 	    rx_char($ctx, $rx_esc{$op});
 
 	} elsif (exists $rx_esc{lc($op)}) {
-	    if (!defined($ctx->{succ})) {
-		$ctx->{succ} = genlabel;
-		$need_succ = 1;
-	    }
-	    rx_not($ctx, sub { rx_char($ctx, $rx_esc{lc($op)}) });
+	    rx_not_char($ctx, $rx_esc{lc($op)});
 
 	} elsif (exists $meta_op{$op}) {
 	    code(<<END);
@@ -727,12 +751,8 @@ END
 END
 	} elsif (exists $meta_op{lc($op)}) {
 	    # Inverted meta-char
-	    if (!defined($ctx->{succ})) {
-		$ctx->{succ} = genlabel;
-		$need_succ = 1;
-	    }
-	    rx_not($ctx, sub {
-		       code(<<END);
+	    rx_not_one($ctx, sub {
+			   code(<<END);
 	$meta_op{$op} $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
 		   });
@@ -746,11 +766,7 @@ END
 
     } elsif ($op =~ /^X\{?([\da-fA-F0-9]+)/) {
 	# Negated hex
-	if (!defined($ctx->{succ})) {
-	    $ctx->{succ} = genlabel;
-	    $need_succ = 1;
-	}
-	rx_not($ctx, sub { rx_char($ctx, hex $1) });
+	rx_not_char($ctx, hex $1);
 	
     } elsif ($x->name =~ /^x\{?([\da-fA-F0-9]+)/) {
 	# Normal hex
@@ -764,9 +780,6 @@ END
 	unimp "Regex meta-sequence `\\$op'";
     }
     maybe_fallthrough($ctx->{succ});
-    code(<<END) if $need_succ;
-$ctx->{succ}:
-END
     return $ctx->{fail};
 }
 
@@ -808,8 +821,8 @@ sub P6C::rx_oneof::rx_val {
 	rx_makebmp $bmp, "$rep"
 END
     if ($inv) {
-	rx_not($ctx, sub { 
-		   code(<<END);
+	rx_not_one($ctx, sub { 
+		       code(<<END);
 	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
 END
 	       });
@@ -817,8 +830,8 @@ END
 	code(<<END);
 	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
 END
-	maybe_fallthrough($ctx->{succ});
     }
+    maybe_fallthrough($ctx->{succ});
     return $ctx->{fail};
 }
 
@@ -834,6 +847,7 @@ sub P6C::rx_assertion::rx_val {
 	$str =~ s/['"]$//;
 	$str =~ s/(?<!\\)"/\\"/g;
 	if ($x->negated) {
+	    # XXX: what's this supposed to do to the match pos?
 	    rx_not($ctx, sub {
 		       code(<<END);
 	rx_literal $ctx->{str}, $ctx->{pos}, "$str", $ctx->{fail}
