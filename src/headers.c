@@ -15,6 +15,7 @@ Handles getting of various headers, and pool creation.
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 #define GC_DEBUG_PMC_HEADERS_PER_ALLOC 1
 #define GC_DEBUG_BUFFER_HEADERS_PER_ALLOC 1
@@ -244,6 +245,7 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
     pool = flags & PObj_constant_FLAG ?
         interpreter->arena_base->constant_pmc_pool :
         interpreter->arena_base->pmc_pool;
+    assert(sizeof(Dead_PObj) <= sizeof(PMC));
     pmc = pool->get_free_object(interpreter, pool);
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
