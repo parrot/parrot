@@ -80,11 +80,11 @@ pmclass mmd_default extends default {
   }
 
   INTVAL is_equal(PMC* value) {
-    return mmd_dispatch_intval(interpreter, SELF, value, MMD_EQ);
+    return mmd_dispatch_intval(interpreter, SELF, value, MMD_NUMEQ);
   }
 
   INTVAL cmp(PMC* value) {
-    return mmd_dispatch_intval(interpreter, SELF, value, MMD_CMP);
+    return mmd_dispatch_intval(interpreter, SELF, value, MMD_NUMCMP);
   }
 
   void bitwise_ors(PMC* value, PMC* dest) {

@@ -53,6 +53,8 @@ Regular expression engine
 Interpreter
 -----------
     Dynamic op libs
+    Make the MMD tables shareable between interpreters for faster
+    startup. (Though there are issues with this)
 
 Assembler
 ---------

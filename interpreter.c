@@ -772,6 +772,8 @@ make_interpreter(Interp_flags flags)
     /* Set up the MMD struct */
     interpreter->binop_mmd_funcs =
         mem_sys_allocate_zeroed(sizeof(struct MMD_table));
+    /* Go and init the MMD tables */
+    register_fallback_methods(interpreter);
 
     /* the SET_NULL macros are only for systems where a NULL pointer
      * isn't represented by zeroes, so don't use these for resetting

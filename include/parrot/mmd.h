@@ -54,11 +54,13 @@ typedef struct MMD_table mmd_table;
 #define MMD_LOR 13 
 #define MMD_LXOR 14 
 #define MMD_REPEAT 15 
-#define MMD_EQ 16 
-#define MMD_CMP 17 
-#define MMD_SOR 18
-#define MMD_SAND 19
-#define MMD_SXOR 20
+#define MMD_NUMEQ 16 
+#define MMD_STREQ 17 
+#define MMD_NUMCMP 18 
+#define MMD_STRCMP 19 
+#define MMD_SOR 20
+#define MMD_SAND 21
+#define MMD_SXOR 22
 
 #endif
 

@@ -235,6 +235,34 @@ pmc_type(Parrot_Interp interp, STRING *name)
    vtable function */
 
 void
+register_fallback_methods(Parrot_Interp interp) {
+    mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
+    mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
+    mmd_add_function(interp, MMD_SUBTRACT, (funcptr_t)mmd_fallback_subtract_pmc);
+    mmd_add_function(interp, MMD_MULTIPLY, (funcptr_t)mmd_fallback_multiply_pmc);
+    mmd_add_function(interp, MMD_DIVIDE, (funcptr_t)mmd_fallback_divide_pmc);
+    mmd_add_function(interp, MMD_MOD, (funcptr_t)mmd_fallback_mod_pmc);
+    mmd_add_function(interp, MMD_CMOD, (funcptr_t)mmd_fallback_cmod_pmc);
+    mmd_add_function(interp, MMD_BAND, (funcptr_t)mmd_fallback_band_pmc);
+    mmd_add_function(interp, MMD_BOR, (funcptr_t)mmd_fallback_bor_pmc);
+    mmd_add_function(interp, MMD_BXOR, (funcptr_t)mmd_fallback_bxor_pmc);
+    mmd_add_function(interp, MMD_BSL, (funcptr_t)mmd_fallback_bsl_pmc);
+    mmd_add_function(interp, MMD_BSR, (funcptr_t)mmd_fallback_bsr_pmc);
+    mmd_add_function(interp, MMD_CONCAT, (funcptr_t)mmd_fallback_concat_pmc);
+    mmd_add_function(interp, MMD_LAND, (funcptr_t)mmd_fallback_land_pmc);
+    mmd_add_function(interp, MMD_LOR, (funcptr_t)mmd_fallback_lor_pmc);
+    mmd_add_function(interp, MMD_LXOR, (funcptr_t)mmd_fallback_lxor_pmc);
+    mmd_add_function(interp, MMD_REPEAT, (funcptr_t)mmd_fallback_repeat_pmc);
+    mmd_add_function(interp, MMD_NUMEQ, (funcptr_t)mmd_fallback_numeq_pmc);
+    mmd_add_function(interp, MMD_STREQ, (funcptr_t)mmd_fallback_streq_pmc);
+    mmd_add_function(interp, MMD_NUMCMP, (funcptr_t)mmd_fallback_numcmp_pmc);
+    mmd_add_function(interp, MMD_STRCMP, (funcptr_t)mmd_fallback_strcmp_pmc);
+    mmd_add_function(interp, MMD_SOR, (funcptr_t)mmd_fallback_stringor_pmc);
+    mmd_add_function(interp, MMD_SAND, (funcptr_t)mmd_fallback_stringand_pmc);
+    mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
+}
+
+void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL result = (VTABLE_get_number(interp, left) +
