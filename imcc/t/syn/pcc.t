@@ -681,7 +681,7 @@ output_is(<<'CODE', <<'OUT', "sub calling another");
     newsub $P1, .Sub, _sub1       # (genFunction:378)
     store_lex -1, 'f', $P1        # (genFunction:380)
     find_lex $P5, 'f'             # (callingExpression:325)
-    newsub $P6, .RetContinuation, ret1# (callingExpression:331)
+    newsub $P6, .RetContinuation, ret1 # (callingExpression:331)
     .pcc_begin non_prototyped     # (callingExpression:332)
     .pcc_call $P5, $P6            # (callingExpression:335)
 ret1:
@@ -707,7 +707,7 @@ ret1:
 .pcc_sub _sub1 non_prototyped
     .local object res1            # (visitReturn:528)
     find_lex $P2, 'g'             # (callingExpression:325)
-    newsub $P3, .Continuation, ret0# (callingExpression:331)
+    newsub $P3, .Continuation, ret0 # (callingExpression:331)
     .pcc_begin non_prototyped     # (callingExpression:332)
     .pcc_call $P2, $P3            # (callingExpression:335)
 ret0:

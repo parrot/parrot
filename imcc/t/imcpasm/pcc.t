@@ -25,7 +25,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I5, 10
   set P0, P16
   set I0, 1
@@ -72,7 +72,7 @@ CODE
   set P16, P1
   newsub P17, \d+, _sub
   newsub P16, \d+, ret
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I5, 10
   set I6, 20
   set P0, P17
@@ -90,7 +90,7 @@ ret:
   end
 _sub:
   add I16, I5, I6
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set I5, I16
   set I0, 1
   set I1, 1
@@ -121,7 +121,7 @@ CODE
 _main:
   set P16, P1
   print "ok 1\n"
-#pcc_sub_call_5:
+_#pcc_sub_call_5:
   set I5, 10
   set N5, 20.0
   set I0, 1
@@ -161,7 +161,7 @@ CODE
   set P16, P1
   set I(\d+), 10
   set I(\d+), 20
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I5, I\1
   set I6, I\2
   set I0, 1
@@ -195,7 +195,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   new P3,.*?
   set P3, 2
   push P3, 10
@@ -231,7 +231,7 @@ CODE
 /_main:
   set P16, P1
   newsub P(\d+), \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set P5, P\d+
   set P6, P\d+
   set P0, P\1
@@ -267,7 +267,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   new P3,.*?
   set P3, 1
   push P3, 10
@@ -311,7 +311,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I5, 10
   set P0, P16
   set I0, 1
@@ -357,7 +357,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set P5, P17
   set P0, P16
   set I0, 1
@@ -403,7 +403,7 @@ CODE
 /_main:
   set P16, P1
   newsub P16, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set P0, P16
   set I0, 1
   set I1, 0
@@ -415,7 +415,7 @@ ret:
   restoretop
   end
 _sub:
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set P5, P16
   set I0, 1
   set I1, 0
@@ -423,7 +423,7 @@ _sub:
   set I3, 1
   set I4, 0
   invoke P1
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set P5, P17
   set I0, 1
   set I1, 0

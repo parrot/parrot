@@ -31,7 +31,7 @@ CODE
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I0, 1
   null I1
   set I2, 1
@@ -75,7 +75,7 @@ CODE
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I0, 1
   null I1
   set I2, 1
@@ -88,7 +88,7 @@ ret:
   end
 _sub:
   add P5, P5, 1
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set I0, 1
   null I1
   null I2
@@ -132,7 +132,7 @@ CODE
   new P16, \d+ # \.PerlUndef
   set P16, 10
   newsub P0, \d+, _sub
-#pcc_sub_call_\d+:
+_#pcc_sub_call_\d+:
   set I0, 1
   null I1
   set I2, 1
@@ -146,7 +146,7 @@ ret:
   end
 _sub:
   add P5, P5, 1
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set I0, 1
   null I1
   null I2
@@ -185,7 +185,7 @@ CODE
   new P5, \d+ # \.PerlUndef
   set P5, 42
   newsub P0, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set I0, 1
   null I1
   set I2, 1
@@ -198,7 +198,7 @@ ret:
   end
 _sub:
   add P5, P5, 1
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set I0, 1
   null I1
   null I2
@@ -238,7 +238,7 @@ CODE
   new P16, \d+ # \.PerlUndef
   set P16, 42
   newsub P0, \d+, _sub
-#pcc_sub_call_\d:
+_#pcc_sub_call_\d:
   set P5, P16
   set I0, 1
   null I1
@@ -253,7 +253,7 @@ ret:
   end
 _sub:
   add P5, P5, 1
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
   set I0, 1
   null I1
   null I2
@@ -293,7 +293,7 @@ CODE
 /_main:
         set P16, P1
         newsub P0, \d+, _sub1
-#pcc_sub_call_\d+:
+_#pcc_sub_call_\d+:
         set I0, 1
         null I1
         null I2
@@ -306,14 +306,14 @@ ret:
 _sub1:
         set P17, P1
         newsub P17, \d+, _sub2
-#pcc_sub_call_\d+:
+_#pcc_sub_call_\d+:
         set P5, P16
         set I16, P17
         jump I16
 ret:
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
 _sub2:
-#pcc_sub_ret_\d+:
+_#pcc_sub_ret_\d+:
         set I0, 1
         null I1
         null I2
