@@ -117,10 +117,9 @@ sub convert_rx_atom {
     my ($self, $tree, $ctx) = @_;
     my $atom = $tree->atom;
 
+
     my $R;
-    if (UNIVERSAL::can($atom, 'rx_val')) {
-        $R = $self->convert($atom);
-    } elsif (ref($atom) eq 'ARRAY') {
+    if (ref($atom) eq 'ARRAY') {
         # Codeblock
         $R = op('code' => [ $atom, $ctx ]);
     } elsif (UNIVERSAL::can($atom, 'type') && $atom->type eq 'PerlArray') {
@@ -128,7 +127,12 @@ sub convert_rx_atom {
     } elsif ($atom->isa('P6C::sv_literal') && is_string($atom->type)) {
         $R = $self->convert_sv_literal($atom, $ctx);
     } else {
-        $R = op('string' => [ $atom, $ctx ]);
+        my ($stem) = ref($atom) =~ /^P6C::(\w+)$/;
+        if (defined($stem) && $self->can("convert_$stem")) {
+            $R = $self->convert($atom);
+        } else {
+            $R = op('string' => [ $atom, $ctx ]);
+        }
     }
 
     if ($tree->capture) {

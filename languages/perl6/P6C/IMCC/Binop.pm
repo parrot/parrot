@@ -338,51 +338,6 @@ END
     return scalar_in_context($res, $ctx);
 }
 
-sub sm_expr_pattern_orig {
-    my ($e, $r, $ctx) = @_;
-    my $val = $e->val;
-    my $begin = genlabel 'startre';
-    my $adv = $r->{ctx}{rx_fail} = genlabel 'advance';
-    my $str = $r->{ctx}{rx_thing} = gentmp 'str';
-    my $pos = $r->{ctx}{rx_pos} = gentmp 'int';
-    my $basepos = gentmp 'int';
-    my $fail = genlabel 'rx_fail';
-    my $end = genlabel 'rx_end';
-    code(<<END);
-	rx_clearstack		# XXX: good old non-reentrant engine.
-	rx_initstack
-	$str = $val
-
-	$pos = 0
-	$basepos = 0
-	goto $begin
-$adv:
-	$pos = $basepos
-	rx_advance $str, $pos, $fail
-	inc $basepos
-$begin:
-END
-    my $ret = $r->{ctx}{rx_matchobj} = $r->prepare_match_object;
-    $r->{ctx}{rx_pos} = $pos;
-    $r->{ctx}{rx_thing} = $str;
-    $r->{ctx}{rx_fail} = $adv;
-    P6C::IMCC::rule::rx_val($r);
-    code(<<END);
-	goto $end
-$fail:
-	$ret = new PerlUndef
-$end:
-END
-    if ($ctx->type eq 'bool') {
-	my $itmp = gentmp 'int';
-	code(<<END);
-	$itmp = defined $ret
-END
-	return primitive_in_context($itmp, 'int', $ctx);
-    }
-    return scalar_in_context($ret, $ctx);
-}
-
 =head1 sm_expr_pattern($expr,$R,$ctx)
 
 Generate code to match the string $expr against the regex $R.
@@ -391,8 +346,6 @@ Generate code to match the string $expr against the regex $R.
 
 my $namespace_ctr = 0;
 sub sm_expr_pattern {
-    return &sm_expr_pattern_orig if $ENV{ORIGINAL_REGEXES};
-
     my ($expr, $R, $ctx) = @_;
 
     my $namespace = "regex".++$namespace_ctr;

@@ -38,8 +38,6 @@ sub default_signature {
 sub adjust_rule {
     my ($func) = @_;
 
-    return if $ENV{ORIGINAL_REGEXES};
-
     if (! defined($func->params)) {
         $func->params(new P6C::signature);
     }
@@ -85,7 +83,6 @@ sub default_args {
 
 sub adjust_call {
     my ($call) = @_;
-    return if $ENV{ORIGINAL_REGEXES};
     my $args = $call->args;
 
     my $LIT = 'P6C::IMCC::ExtRegex::literal';
@@ -93,7 +90,6 @@ sub adjust_call {
                     ($LIT->new(type => 'IntList')), # stack -- HACK!! FIXME!!
                     ($LIT->new(type => 'str')), # input
                     ($LIT->new(type => 'int')) ); # pos
-    $DB::single = 1 unless $args->isa('P6C::ValueList');
     die unless $args->isa('P6C::ValueList');
 #    if ($args->isa('P6C::ValueList')) {
         unshift @{ $args->vals }, @argvals;

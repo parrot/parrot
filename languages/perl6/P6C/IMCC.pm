@@ -1617,7 +1617,7 @@ sub get_params {
 
     # Rules have a set of undeclared parameters.
 
-    if ($x->is_rule && ! $ENV{ORIGINAL_REGEXES}) {
+    if ($x->is_rule) {
         unshift(@params, P6C::Rules::rule_vars());
     }
 
@@ -2192,7 +2192,6 @@ A node representing a rule.
 =cut
 
 package P6C::rule;
-use P6C::IMCC::rule;
 use P6C::IMCC ':all';
 require P6C::Util;
 
@@ -2200,36 +2199,6 @@ sub prepare_match_object {
     my $r = shift;
     my $ret = newtmp 'PerlHash';
     return $ret;
-}
-
-sub orig_regex_val {
-    my $x = shift;
-    my $fail = genlabel 'match_failed';
-    my $precode;
-    my $rxstr = gentmp 'str';
-    my $rxpos = gentmp 'int';
-    my $isback = gentmp 'int';
-    my $fake_back = genlabel 'XXX';
-    code(<<END);
-	restore $rxstr
-	rx_popindex $rxpos, $fake_back
-END
-    $x->{ctx}{rx_pos} = $rxpos;
-    $x->{ctx}{rx_thing} = $rxstr;
-    $x->{ctx}{rx_fail} = $fail;
-    my $ret = $x->{ctx}{rx_matchobj} = $x->prepare_match_object;
-    my $back = P6C::IMCC::rule::rx_val($x);
-    my $end = genlabel 'end';
-    fixup_label($fake_back, $back);
-    code(<<END);
-	rx_pushindex $rxpos
-	goto $end
-$fail:
-	$ret = new PerlUndef
-	rx_pushmark
-$end:
-END
-    return scalar_in_context($ret, $x->{ctx});
 }
 
 =item B<val()> : rule -> match obj
@@ -2257,8 +2226,6 @@ the hokey C<mode> param.
 =cut
 
 sub val {
-    return orig_regex_val(@_) if $ENV{ORIGINAL_REGEXES};
-
     my ($rule) = @_;
 
     # FIXME
