@@ -74,9 +74,9 @@ sub runstep {
 
 #  print "\n";
 
-  # MS VC++ requires special treatment.
+  # MS VC++ and Intel C++ (on Windows) require special treatment.
   my ($cc) = Configure::Data->get(qw(cc));
-  my $is_msvc = grep { $cc eq $_ } ( qw(cl cl.exe) );
+  my $is_msvc = grep { $cc eq $_ } ( qw(cl cl.exe icl icl.exe) );
   if ($is_msvc && -e 'icu\source\allinone\allinone.dsw') {
     # We build from MS VC++ Project Files. If these do not have Win32 line endings, it will
     # not accept them. Thus we need to ensure they do.

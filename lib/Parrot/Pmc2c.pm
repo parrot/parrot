@@ -573,9 +573,10 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry)
         NULL,   /* isa_str */
         NULL, /* extra data */
         $methlist
-EOC
-    $cout .= <<"EOC";
     };
+EOC
+
+    $cout .= <<"EOC" if $mmd_list ne '/* N/Y */';
 
     const struct {
         INTVAL func_nr;
@@ -584,7 +585,8 @@ EOC
     } _temp_mmd_init[] = {
         $mmd_list
     };
-
+EOC
+    $cout .= <<"EOC";
     int i;
 
     /*
@@ -605,6 +607,8 @@ EOC
 	Parrot_base_vtables[entry] =
 	    Parrot_clone_vtable(interp, &temp_base_vtable);
     }
+EOC
+    $cout .= <<"EOC" if $mmd_list ne '/* N/Y */';
     /*
      * register mmds
      */
@@ -616,6 +620,8 @@ EOC
             _temp_mmd_init[i].right,
             _temp_mmd_init[i].func_ptr);
     }
+EOC
+    $cout .= <<"EOC";
     $class_init_code
 } /* Parrot_${classname}_class_init */
 EOC

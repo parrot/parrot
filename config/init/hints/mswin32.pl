@@ -10,6 +10,7 @@
 	$cc = $args{cc} if defined $args{cc};
 
 	my $is_msvc  = grep { $cc eq $_ } ( qw(cl cl.exe) );
+	my $is_intel = grep { $cc eq $_ } ( qw(icl icl.exe) );
 	my $is_mingw = grep { $cc eq $_ } ( qw(gcc gcc.exe) );
 	my $is_bcc   = grep { $cc eq $_ } ( qw(bcc32 bcc32.exe) );
 
@@ -36,7 +37,7 @@
 			a          => '.lib',
 			o          => '.obj',
 			cc_o_out   => '-Fo',
-			cc_exe_out => '-Fe',
+			cc_exe_out => '-out:',
 			cc_ldflags => '/link',
 			cc_debug   => '-Zi', #ZI messes with __LINE__
 			ld_debug   => '-debug',
@@ -63,7 +64,43 @@
 			Configure::Data->set('linkflags', $linkflags);
 		}
 	    }
-	if( $is_bcc ) {
+	elsif( $is_intel ) {
+		Configure::Data->set(
+			so         => '.dll',
+			a          => '.lib',
+			o          => '.obj',
+			cc_o_out   => '-Fo',
+			cc_exe_out => '-out:',
+			cc_ldflags => '/link',
+			cc_debug   => '-Zi', #ZI messes with __LINE__
+			libs       => "$libs libircmt.lib",
+			ld         => 'xilink',
+			ld_debug   => '-debug',
+			ld_shared  => '-dll',
+			ld_shared_flags=> '-def:libparrot.def',
+			ld_out     => '-out:',
+			ldflags    => '-nologo',
+			blib_lib_libparrot_a => 'blib/lib/libparrot_s$(A)',
+			cp         => 'copy',
+			ar         => 'xilib',
+			ar_flags   => '',
+			ar_out     => '-out:',
+			slash      => '\\',
+			ccflags    => $ccflags,
+			ccwarn     => ''
+		);
+		# 'link' needs to be xilink.exe, not icl.exe.
+		# This makes 'link' and 'ld' the same.
+		Configure::Data->set('link', Configure::Data->get('ld'));
+
+		# We can't use -opt: and -debug together.
+		if (Configure::Data->get('ld_debug') =~ /-debug/) {
+			my $linkflags = Configure::Data->get('linkflags');
+			$linkflags =~ s/-opt:\S+//;
+			Configure::Data->set('linkflags', $linkflags);
+		}
+	}
+	elsif( $is_bcc ) {
 		Configure::Data->set(
 			o => '.obj',
                         a => '.lib',
