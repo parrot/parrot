@@ -11,25 +11,26 @@ providing the Foo PMC class.
 
 =item 1
 
-Edit/create your foo.pmc source - For details on creating PMCs, see L<../classes/genclass.pl>
+Edit/create your foo.pmc source - For details on creating PMCs, see 
+L<../classes/genclass.pl>
 
 There are some differences you have to be aware of when creating dynamic PMCs.
 
-When declaring the dynamic pmc, you must specify  the C<dynpmc> flag, as in:
+When declaring the dynamic PMC, you must specify  the C<dynpmc> flag, as in:
 
-	pmclass TclString extends tclobject dynpmc { ... }
+	pmclass TclString extends TclObject dynpmc ... { ... }
 
 Note that regular (non-dynamic) PMCs have a type id
 C<enum_class_PMCNAME>, but dynamic PMCs obviously cannot use the same
 thing. Instead, a dynamically-chosen value is assigned at runtime -
 so, when you refer to the type of the class , you must dynamically
-determine the PMC type. So, while C<perlscalar> (a builtin) has the
+determine the PMC type. So, while C<scalar> (a builtin) has the
 luxury of knowing at compile time what the class number of its child
-C<PerlString> is, for example:
+C<String> is -- for example:
 
-	if (type == enum_class_PerlString) {
+	if (type == enum_class_String) { ...
 
-A dynamic PMC such as C<tclobject> must instead perform a runtime lookup
+a dynamic PMC such as C<TclObject> must instead perform a runtime lookup
 of its corresponding C<TclString> PMC, resulting in the more complicated:
 
 	if (type == pmc_type(
@@ -38,7 +39,7 @@ of its corresponding C<TclString> PMC, resulting in the more complicated:
 	   )
 
 Finally, if you have a group of PMCs that are interdependent, use the
-C<group GROUPNAME> syntax to trigger a group library to built. You
+C<group GROUPNAME> syntax to trigger a group library to be built. You
 will use the group name as the name of the library to load using the
 PASM op C<loadlib>.
 
@@ -50,8 +51,8 @@ and then in your .imc or .pasm file:
 
 =item 2
 
-edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to 
-the build target.
+Edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to 
+the build target:
 
 	$ make
 	$ make shared
