@@ -7,7 +7,7 @@ proc fact { number } {
   return $val
 }
 
-for {set i 0} {$i<5} {incr i} {
+for {set i 0} {$i<500} {incr i} {
   set a [fact 10]
 }
 puts "Factorial of 10 is $a"
