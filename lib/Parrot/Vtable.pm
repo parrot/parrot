@@ -118,6 +118,25 @@ EOM
     (pmc)->vtable->$entry->[1]($args)
 EOM
     }
+    $macros .= <<"EOM";
+
+/*
+ * vtable method name defines
+ */
+
+/* &gen_from_def(vtable_methods.pasm) */
+EOM
+    for my $entry (@{$vtable}) {
+	my $uc_meth = uc $entry->[1];
+	$macros .= <<"EOM";
+#define PARROT_VTABLE_${uc_meth}_METHNAME \"__$entry->[1]\"
+EOM
+
+    }
+    $macros .= <<"EOM";
+/* &end_gen */
+
+EOM
     $macros;
 }
 

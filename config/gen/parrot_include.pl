@@ -18,6 +18,7 @@ my @files = qw(
     include/parrot/longopt.h
     include/parrot/resources.h
     include/parrot/string.h
+    include/parrot/vtable.h
     include/parrot/warnings.h
     classes/timer.pmc
 );
@@ -26,6 +27,8 @@ my $destdir = 'runtime/parrot/include';
 @args=();
 
 sub runstep {
+    # need vtable.h now
+    system($^X, "vtable_h.pl");
     my @generated = ();
     for my $f (@files) {
 	my $in_def = ''; # in #define='def', in enum='enum'
@@ -65,7 +68,7 @@ EOF
 		next;
 	    }
 	    if ($in_def eq 'def') {
-		if (/#define\s+(\w+)\s+(-?\w+)/) {
+		if (/#define\s+(\w+)\s+(-?\w+|".*?")/) {
 		    local $_ = "$prefix$1\t$2";
 		    eval $subst if ($subst ne '');
 		    print INC ".constant $_\n";

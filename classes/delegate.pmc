@@ -11,22 +11,11 @@
 
 #include "parrot/parrot.h"
 
-/* These need to be elsewhere */
-#define PARROT_VTABLE_INIT_METHNAME "__init"
-#define PARROT_VTABLE_SET_INTEGER_METHNAME "__set_integer"
-#define PARROT_VTABLE_SET_NUMBER_METHNAME "__set_number"
-#define PARROT_VTABLE_SET_PMC_METHNAME "__set_pmc"
-#define PARROT_VTABLE_SET_STRING_METHNAME "__set_string"
-#define PARROT_VTABLE_GET_STRING_METHNAME "__get_string"
-#define PARROT_VTABLE_GET_NUMBER_METHNAME "__get_number"
-#define PARROT_VTABLE_GET_INTEGER_METHNAME "__get_integer"
-#define PARROT_VTABLE_GET_PMC_METHNAME "__get_pmc"
-
 /* The following bit is a fast register save/restore pair. They
    currently count on the registers in the interpreter structure being
    in the same order as in the regsave struct, and that the registers
-   are at the beginning of the interpreter structure. 
-   
+   are at the beginning of the interpreter structure.
+
    Yes, it's damned evil, but it's what we need, since we have to
    preserve the registers--vtable methods can't change them.
 
@@ -68,7 +57,7 @@ find_or_die(struct Parrot_Interp *interp, PMC *pmc, const char *name) {
   if (!returnPMC) {
     internal_exception(METH_NOT_FOUND, "Can't find method for object");
   }
-  return returnPMC;  
+  return returnPMC;
 }
 
 /* All these functions to run code can leak a full parrot register
@@ -214,7 +203,7 @@ pmclass delegate {
     pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_STRING_METHNAME), value);
   }
 
-  
+
   INTVAL get_integer() {
     return noarg_intreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_INTEGER_METHNAME));
   }
