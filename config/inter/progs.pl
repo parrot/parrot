@@ -35,6 +35,7 @@ sub runstep {
 			       libs lex yacc));
   $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
   $ccflags =~ s/-fno-strict-aliasing//g;
+  $ccflags =~ s/-fnative-struct//g;
   $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';

@@ -25,9 +25,11 @@ $description="Moving platform files into place...";
 sub runstep {
   my ($miniparrot, $verbose) = @_;
   my $platform=lc $^O;
-  $platform =~ s/^ms//;
 
   $platform="ansi" if defined($miniparrot);
+  $platform="win32" if $platform =~ /^msys/;
+  $platform="win32" if $platform =~ /^mingw/;
+  $platform =~ s/^ms//;
   $platform="generic" unless -d "config/gen/platform/$platform";
 
   print " platform='$platform' " if $verbose;

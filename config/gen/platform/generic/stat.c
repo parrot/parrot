@@ -78,10 +78,18 @@ Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
     result = statbuf.st_rdev;
     break;
   case STAT_PLATFORM_BLOCKSIZE:
+#if defined(WIN32)
+    internal_exception(1, "STAT_PLATFORM_BLOCKSIZE not implemented");
+#else
     result = statbuf.st_blksize;
+#endif
     break;
   case STAT_PLATFORM_BLOCKS:
+#if defined(WIN32)
+    internal_exception(1, "STAT_PLATFORM_BLOCKS not implemented");
+#else
     result = statbuf.st_blocks;
+#endif
     break;
   }
   
@@ -149,10 +157,18 @@ Parrot_fstat_info_intval(Parrot_Interp interpreter, INTVAL file, INTVAL thing)
     result = statbuf.st_rdev;
     break;
   case STAT_PLATFORM_BLOCKSIZE:
+#if defined(WIN32)
+    internal_exception(1, "STAT_PLATFORM_BLOCKSIZE not implemented");
+#else
     result = statbuf.st_blksize;
+#endif
     break;
   case STAT_PLATFORM_BLOCKS:
+#if defined(WIN32)
+    internal_exception(1, "STAT_PLATFORM_BLOCKS not implemented");
+#else
     result = statbuf.st_blocks;
+#endif
     break;
   }
 
