@@ -28,6 +28,7 @@ lib/commands/return.imc \
 lib/commands/set.imc \
 lib/commands/source.imc \
 lib/commands/time.imc \
+lib/commands/unset.imc \
 lib/commands/while.imc \
 lib/expression.imc \
 lib/functions/abs.imc \

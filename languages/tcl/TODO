@@ -1,25 +1,25 @@
 =head1 Plan of Attack
 
-provide a way to access existing library PIR from inside Tcl.
+tail call optimizations - there are several cases where I could use this
+and save myself a call. Possible to do right now with PASM - wait for
+PIR support before welding in.
+
+Freeze/Thaw of TclWord would allow us to build a braindead compile
+option - given a chunk of tcl, generate a chunk of PIR that we can 
+emit to be saved, compiled, and then run again.
+
+Look around and see if we can avoid doing as many substr's, particularly
+in __parse. (every substring we don't actually need takes up more
+resources. better to just index things until we're sure we need
+the substring.
+
+Clean up expr. MUUUUCH room for improvement there.
+
+provide a way to access existing library PIR from Tcl.
 
 Add benchmarks?
 
-Pre-compile library routines for extra speed? (precompiled everything 
-internally that we can.)
-
-Disable -G everywhere (examples, test suite).
-
-post bug regarding dynpmcs failing to work as advertised.
-
-BUG in GC? running "slow" with -t dies with a tcl error.
-running "slow" with -tG seems to complete fine.
-
-Come up with a small test case and throw it at the list.
-
 =over 4
-
-Compile tcllib, include the compiled version instead of the IMC version.
-Use a compiled version of Data/Escape.imc.
 
 When converting to Tcl*, be sure to take advantage of morphing. Right now,
 we're kind of avoiding morphing. (like, having separate new PerlInt and 
@@ -44,31 +44,6 @@ This should now be blindingly simple, given an actual TclList PMC.
 =head1 TODO (big pile)
 
 =over 4
-
-=item Self contained...
-
-Make everything that tcl requires self contained. this should include
-Dyn classes, MANIFEST, makefile generation, and test suite goodness.
-
-(This covers an RT ticket...)
-
-=item PARROT-OLD
-
-Get the new parse that controls block_interpolation. (This means updating
-every call to __parse as well...)
-
-=item parser
-
-parser should also return return_type and retval with the parsed_string.
-Then we can throw actual errors during the parse process. (as opposed to
-now, where we print and abort.)
-
-=item builtins
-
-for any of the builtins that take a fixed number of ops, remove the
-call to C<foldup> and simply define the C<.params> (This was done in the 
-parrot-old branch. It's only a minor savings, though, so don't bother
-saving it.)
 
 =item given freeze/thaw for objects...
 
@@ -143,10 +118,6 @@ Comparing examples/fact.tcl with parrot vs. tclsh (OSX)
 Any future tests, write more like t/tcl_var_subst.t. Eventually cleanup
 tests so they're consistent.
 
-=item TODO tests still not working. 
-
-=item PIR tests failing systematically
-
 =item Add tests for...
 
 tclword, [concat], [join]
@@ -157,10 +128,6 @@ update docs/* - with the parser/interpreter split, things are different.
 (And, hopefully, easier.)
 
 =item TCL Pmcs
-
-To handle arbitrary values being passed around, we need to make
-every command return a PMC instead of a string - then fix the interpreter
-to deal with that, along with anything else that calls a __cmd directly.
 
 Then, we can simplify anything that is dealing with numbers to just pass
 around the Numbers, and clean up expr so that it's not passing around
@@ -231,12 +198,6 @@ we might be able to use them for the expression stuff that we are passing
 around.... which, now that we have real Tcl PMCs, can probably go away
 
 (most uses of PerlArray are gone, now that we are using foldup)
-
-=item parrot question
-
-unset (How do you remove a variable from the lexical scope ?) From
-p6i -  you can delete it from the Hash object. (great, except how
-do i access the hash if I'm using the default new_pad variant?)
 
 =item unfinished commands
 
@@ -343,26 +304,6 @@ complete [error] (need global var support)
 If the return type of the outermost script is not OK, return the
 I<appropriate> code to the system.
 
-=item error handling
-
-stacktraces - for example, the script
-
-       error bye
-
-Should print out:
-
-       bye
-               while executing
-       "error bye
-       "
-               (file "foo.tcl" line 1)
-
-When returning a tcl error, we should probably return a PMC with a 
-Tcl stack trace in it.
-
-Also need to keep track of the file/line when parsing, and shove that into
-the TclWord array somehow.
-
 =item misc
 
 list variables - stringToList already exists (had to write it for "proc"s
@@ -435,11 +376,6 @@ run tclsh, sourcing "<tcl distro>tests/all".
 The sooner we can do this, the better, as I only want to have tests for
 internals, not for any Tcl.
 
-=item parrot
-
-Get imcc to complain at compile time if you call a macro without passing
-all the arguments. (soon to be moot, neh?)
-
 =item 7.6 test suite
 
 missing quite a bit to be able to think about running this, notably:
@@ -468,12 +404,6 @@ defined ops and functions.
 =item test macros?
 
 	is_space
-
-
-=item .imc vs. .pbc
-
-make I<could> compile all the .imc's to .pbc's - no point in doing a PIR
-compile step each time we run. 
 
 =back 4
 

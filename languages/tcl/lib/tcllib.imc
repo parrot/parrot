@@ -247,6 +247,7 @@ __default_handler:
   .include "languages/tcl/lib/commands/source.imc"
   .include "languages/tcl/lib/commands/string.imc"
   .include "languages/tcl/lib/commands/time.imc"
+  .include "languages/tcl/lib/commands/unset.imc"
   .include "languages/tcl/lib/commands/while.imc"
   .include "languages/tcl/lib/expression.imc"
   .include "languages/tcl/lib/functions/abs.imc"
