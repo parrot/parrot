@@ -161,6 +161,9 @@ lib_deps_source: $(GENERAL_H_FILES)
 
 lib_deps: lib_deps_object lib_deps_source
 
+check_source: $(GENERAL_H_FILES)
+	$(PERL) check_source_standards.pl all_source
+
 ###############################################################################
 #
 # Shared Library Targets:

@@ -16,6 +16,7 @@ assemble.pl
 chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
+check_source_standards.pl
 classes/Makefile.in
 classes/array.pmc
 classes/default.pmc
