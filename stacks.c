@@ -47,6 +47,18 @@ new_stack(Interp *interpreter)
 }
 
 void
+stack_destroy(Stack_Chunk_t * top)
+{
+    while (top->next)
+        top = top->next;
+    while(top) {
+        Stack_Chunk_t *next = top->prev;
+        mem_sys_free(top);
+        top = next;
+    }
+}
+
+void
 stack_mark_cow(Stack_Chunk_t *stack)
 {
     Stack_Chunk_t *chunk = stack;

@@ -22,22 +22,24 @@ typedef struct Parrot_Lexicals {
     List * values;    /* lexicals go here */
     List * names;     /* names of lexicals go here */
 } * parrot_lexicals_t;
-
+/*
+ * we currently use the same structure for all 3 sub types
+ * so tath we can unify the Sub classes
+ * if one structure needs more data, pleas append them at the end
+ */
 typedef struct Parrot_Sub {
-    INTVAL              flags;
-    PMC                 *lex_pad;
-    opcode_t            *init;
+    struct Parrot_Context ctx;
+    opcode_t             *address;
 } * parrot_sub_t;
 
 typedef struct Parrot_Coroutine {
-    INTVAL               flags;
     struct Parrot_Context ctx;
-    opcode_t             *resume;
+    opcode_t             *address;
 } * parrot_coroutine_t;
 
 typedef struct Parrot_Continuation {
     struct Parrot_Context ctx;
-    opcode_t            *continuation;
+    opcode_t             *address;
 } * parrot_continuation_t;
 
 struct Parrot_Sub * new_sub(struct Parrot_Interp * interp,
@@ -52,9 +54,8 @@ struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp,
 PMC * new_continuation_pmc(struct Parrot_Interp * interp,
                            opcode_t * address);
 
-void save_context(struct Parrot_Interp * interp,
-                  struct Parrot_Context * ctx);
-
+void save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
+void swap_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
 void restore_context(struct Parrot_Interp * interp,
                      struct Parrot_Context * ctx);
 

@@ -48,6 +48,7 @@ typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 
 Stack_Chunk_t * new_stack(Interp *interpreter);
+void stack_destroy(Stack_Chunk_t * top);
 
 Stack_Chunk_t * stack_copy(Interp *interpreter, Stack_Chunk_t *old_stack);
 

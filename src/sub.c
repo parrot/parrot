@@ -24,6 +24,29 @@ save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 }
 
 void
+swap_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
+{
+    struct Stack_Chunk * tmp_stack = NULL;
+    /*
+     * Swap control, user and pad stacks. Data in other parts of the
+     * context are not preserved between calls to the coroutine.
+     */
+
+    tmp_stack = interp->ctx.user_stack;
+    interp->ctx.user_stack = ctx->user_stack;
+    ctx->user_stack = tmp_stack;
+
+    tmp_stack = interp->ctx.control_stack;
+    interp->ctx.control_stack = ctx->control_stack;
+    ctx->control_stack = tmp_stack;
+
+    tmp_stack = interp->ctx.pad_stack;
+    interp->ctx.pad_stack = ctx->pad_stack;
+    ctx->pad_stack = tmp_stack;
+
+}
+
+void
 restore_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(&interp->ctx, ctx, sizeof(*ctx));
@@ -34,8 +57,14 @@ new_sub(struct Parrot_Interp *interp, opcode_t *address)
 {
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub *newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
-    newsub->init = address;
-    newsub->lex_pad = scratchpad_get_current(interp);
+    PMC * pad = scratchpad_get_current(interp);
+    newsub->address = address;
+    newsub->ctx.pad_stack = new_stack(interp);
+    if (pad) {
+        /* put the correct pad in place */
+        stack_push(interp, &newsub->ctx.pad_stack, pad,
+                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+    }
     return newsub;
 }
 
@@ -46,7 +75,7 @@ new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
     PMC * pad = NULL;
     struct Parrot_Coroutine *newco =
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-    newco->resume = NULL;
+    newco->address = NULL;
     newco->ctx.user_stack = new_stack(interp);
     newco->ctx.control_stack = new_stack(interp);
     newco->ctx.pad_stack = new_stack(interp);
@@ -65,17 +94,17 @@ new_continuation(struct Parrot_Interp *interp, opcode_t *address)
 {
     struct Parrot_Continuation *cc =
         mem_sys_allocate(sizeof(struct Parrot_Continuation));
-    cc->continuation = address;
+    cc->address = address;
     save_context(interp, &cc->ctx);
     return cc;
 }
 
 
-PMC * 
+PMC *
 new_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)
 {
     PMC* continuation = pmc_new(interp, enum_class_Continuation);
-    ((struct Parrot_Continuation*)PMC_data(continuation))->continuation = address;
+    ((struct Parrot_Continuation*)PMC_data(continuation))->address = address;
     return continuation;
 }
 

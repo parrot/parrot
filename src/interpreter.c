@@ -669,23 +669,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         }
     }
 
-    /* XXX move this to stacks.c */
-    {
-        Stack_Chunk_t *chunks[3];
-        chunks[0] = interpreter->ctx.pad_stack;
-        chunks[1] = interpreter->ctx.user_stack;
-        chunks[2] = interpreter->ctx.control_stack;
-        for (i = 0; i< 3; i++) {
-            Stack_Chunk_t *top = chunks[i];
-            while (top->next)
-                top = top->next;
-            while(top) {
-                Stack_Chunk_t *next = top->prev;
-                mem_sys_free(top);
-                top = next;
-            }
-        }
-    }
+    stack_destroy(interpreter->ctx.pad_stack);
+    stack_destroy(interpreter->ctx.user_stack);
+    stack_destroy(interpreter->ctx.control_stack);
     /* intstack */
     intstack_free(interpreter, interpreter->ctx.intstack);
 

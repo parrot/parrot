@@ -23,17 +23,9 @@ pmclass Eval extends Sub {
    }
 
    void* invoke (void* next) {
-       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
        struct PackFile_ByteCode *old_cs;
        struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
-	   ((struct Parrot_Sub *)PMC_data(SELF))->init;
-
-       if (pad) {
-	   /* put the correct pad in place
-	    * XXX leo: do we need this? */
-	   stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
-		   STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-       }
+	   SUPER(next);	/* invoke on Sub returns the address */
 
        /* return address that the interpreter should jump to */
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
@@ -49,9 +41,9 @@ pmclass Eval extends Sub {
 	   PIO_eprintf(interpreter, "*** back from %s\n",
 		   eval_cs->base.name);
        }
-       if (pad)
-	    stack_pop(interpreter, &interpreter->ctx.pad_stack,
-		NULL, STACK_ENTRY_PMC);
+       /* restore ctx */
+       interpreter->ctx.pad_stack =
+	       ((struct Parrot_Sub*) PMC_data(SELF))->ctx.pad_stack;
        /* if code jumped to different code segment, go out of runloop
 	* which then actually will switch segments */
        if (interpreter->resume_flag & 2)

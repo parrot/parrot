@@ -14,11 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Coroutine {
-
-    INTVAL type () {
-        return enum_class_Coroutine;
-    }
+pmclass Coroutine extends Sub {
 
     STRING* name () {
         return whoami;
@@ -30,68 +26,29 @@ pmclass Coroutine {
     }
 
     void destroy () {
-	/* XXX stack_destroy for deeper stacks */
-	mem_sys_free(((struct Parrot_Coroutine *)PMC_data(SELF))->ctx.user_stack);
-	mem_sys_free(((struct Parrot_Coroutine *)PMC_data(SELF))->ctx.control_stack);
-        mem_sys_free(PMC_data(SELF));
+	struct Parrot_Coroutine * co =
+	    (struct Parrot_Coroutine *)PMC_data(SELF);
+	stack_destroy(co->ctx.pad_stack);
+	stack_destroy(co->ctx.control_stack);
+	stack_destroy(co->ctx.user_stack);
+	mem_sys_free(PMC_data(SELF));
     }
 
     void mark () {
-        struct Parrot_Coroutine * co = (struct Parrot_Coroutine *)PMC_data(SELF);
+        struct Parrot_Coroutine * co =
+	    (struct Parrot_Coroutine *)PMC_data(SELF);
         mark_stack(INTERP, co->ctx.user_stack);
         mark_stack(INTERP, co->ctx.control_stack);
         mark_stack(INTERP, co->ctx.pad_stack);
     }
 
-    void set_integer (PMC * value) {
-        ((struct Parrot_Coroutine*)PMC_data(SELF))->resume
-            = (opcode_t*)VTABLE_get_integer(INTERP, value);
-    }
 
-    void set_integer_native (INTVAL value) {
-        ((struct Parrot_Coroutine*)PMC_data(SELF))->resume = (opcode_t*)value;
-    }
-
-    PMC* get_pmc () {
-        return SELF;
-    }
-
-    INTVAL is_same (PMC* value) {
-        return SELF == value;
-    }
-
-    INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-                && memcmp(PMC_data(value), PMC_data(SELF),
-                          sizeof(struct Parrot_Coroutine)) == 0);
-    }
-
-    INTVAL defined () {
-        return ((struct Parrot_Coroutine*)PMC_data(SELF))->resume != NULL;
-    }
 
     void* invoke (void* next) {
         struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)PMC_data(SELF);
-        struct Stack_Chunk * tmp_stack = NULL;
-        void * dest = co->resume;
-        co->resume = (opcode_t *)next;
-
-	/*
-         * Swap control, user and pad stacks. Data in other parts of the
-         * context are not preserved between calls to the coroutine.
-         */
-
-        tmp_stack = INTERP->ctx.user_stack;
-        INTERP->ctx.user_stack = co->ctx.user_stack;
-        co->ctx.user_stack = tmp_stack;
-
-        tmp_stack = INTERP->ctx.control_stack;
-        INTERP->ctx.control_stack = co->ctx.control_stack;
-        co->ctx.control_stack = tmp_stack;
-
-        tmp_stack = INTERP->ctx.pad_stack;
-        INTERP->ctx.pad_stack = co->ctx.pad_stack;
-        co->ctx.pad_stack = tmp_stack;
+        void * dest = co->address;
+        co->address = (opcode_t *)next;
+	swap_context(interpreter, &co->ctx);
 
         return dest;
     }

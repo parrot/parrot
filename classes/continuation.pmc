@@ -14,7 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Continuation {
+pmclass Continuation extends Sub {
 
     void init () {
         struct Parrot_Continuation * cc;
@@ -27,10 +27,6 @@ pmclass Continuation {
         mem_sys_free(PMC_data(SELF));
     }
 
-    void set_integer_native (INTVAL value) {
-        ((struct Parrot_Continuation *)PMC_data(SELF))->continuation
-            = (opcode_t *)value;
-    }
 
     void mark () {
         mark_stack(
@@ -63,32 +59,10 @@ pmclass Continuation {
         stack_mark_cow(retc->ctx.control_stack);
     }
 
-    PMC* get_pmc () {
-        return SELF;
-    }
-
-    INTVAL is_same (PMC* value) {
-        return SELF == value;
-    }
-
-    void set_same (PMC* value) {
-        PMC_data(SELF) = PMC_data(value);
-    }
-
-    INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-                && memcmp(PMC_data(value), PMC_data(SELF),
-                          sizeof(struct Parrot_Continuation)) == 0);
-    }
-
-    INTVAL defined () {
-        return ((struct Parrot_Continuation *)PMC_data(SELF))->continuation != NULL;
-    }
-
     void* invoke (void* next) {
         struct Parrot_Continuation * cc
             = (struct Parrot_Continuation*)PMC_data(SELF);
         restore_context(interpreter, &cc->ctx);
-        return cc->continuation; /* interp will jump to this address */
+        return cc->address; /* interp will jump to this address */
     }
 }

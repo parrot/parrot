@@ -12,6 +12,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/method_util.h"
 
 pmclass Sub {
 
@@ -20,48 +21,57 @@ pmclass Sub {
    }
 
    void init () {
-       INTVAL address = 0; /* XXX this was originally passed as a
-                            * parameter, but that's not valid.  So
-                            * this is totally broken now. */
-       PMC_data(SELF) = new_sub(INTERP, (opcode_t*)address);
+       PMC_data(SELF) = new_sub(INTERP, (opcode_t*)0);
        PObj_custom_mark_destroy_SETALL(SELF);
    }
 
    void mark () {
-       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
-       if (pad) {
-           pobject_lives(INTERP, (PObj *)pad);
-       }
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+        mark_stack(INTERP, sub->ctx.pad_stack);
    }
 
    void destroy () {
-       mem_sys_free(PMC_data(SELF));
+       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+       stack_destroy(sub->ctx.pad_stack);
+       mem_sys_free(sub);
    }
 
    void set_integer (PMC * value) {
-       ((struct Parrot_Sub*)PMC_data(SELF))->init = (opcode_t*)VTABLE_get_integer(INTERP, value);
+       ((struct Parrot_Sub*)PMC_data(SELF))->address =
+	       (opcode_t*)VTABLE_get_integer(INTERP, value);
    }
 
    void set_integer_native (INTVAL value) {
-       ((struct Parrot_Sub*)PMC_data(SELF))->init = (opcode_t*)value;
+       ((struct Parrot_Sub*)PMC_data(SELF))->address = (opcode_t*)value;
+   }
+
+   INTVAL defined () {
+       return ((struct Parrot_Sub*)PMC_data(SELF))->address != NULL;
    }
 
    void* invoke (void* next) {
-       PMC * pad = ((struct Parrot_Sub *)PMC_data(SELF))->lex_pad;
+       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_data(SELF);
+       INTERP->ctx.pad_stack = sub->ctx.pad_stack;
 
-       if (pad) {
-           /* put the correct pad in place */
-           stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
-                      STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-       }
-
-       return ((struct Parrot_Sub*)PMC_data(SELF))->init;
+       return sub->address;
    }
 
    void clone (PMC *ret) {
-        PObj_custom_mark_destroy_SETALL(ret);
-	PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-	memcpy(PMC_data(ret), PMC_data(SELF), sizeof(struct Parrot_Sub));
+       struct Parrot_Sub * sub;
+       PObj_custom_mark_destroy_SETALL(ret);
+       sub = PMC_data(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+       memcpy(sub, PMC_data(SELF), sizeof(struct Parrot_Sub));
+       stack_mark_cow(sub->ctx.pad_stack);
    }
+
+    void set_same (PMC* value) {
+        PMC_data(SELF) = PMC_data(value);
+    }
+
+    INTVAL is_equal (PMC* value) {
+        return (SELF->vtable == value->vtable
+                && memcmp(PMC_data(value), PMC_data(SELF),
+                          sizeof(struct Parrot_Sub)) == 0);
+    }
 
 }

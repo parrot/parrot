@@ -1188,23 +1188,18 @@ a return continuation in P1 of class $2 and return address $4.
 =cut
 
 inline op newsub(out PMC, in INT, inconst INT) {
-  opcode_t *addr_sub;
-
   if ($2 <= 0 || $2 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$2);
     abort(); /* Deserve to lose */
   }
   $1 = pmc_new_noinit(interpreter, $2);
   $1->vtable->init(interpreter, $1);
-  addr_sub = CUR_OPCODE + $3 - REL_PC;
-  VTABLE_set_integer_native(interpreter, $1, PTR2OPCODE_T(addr_sub));
+  VTABLE_set_integer_native(interpreter, $1,
+  	PTR2OPCODE_T(CUR_OPCODE + $3 - REL_PC));
   goto NEXT();
 }
 
 inline op newsub(in INT, in INT, inconst INT, inconst INT) {
-  opcode_t *addr_sub;
-  opcode_t *addr_ret;
-
   if ($1 <= 0 || $1 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$1);
     abort(); /* Deserve to lose */
@@ -1215,14 +1210,12 @@ inline op newsub(in INT, in INT, inconst INT, inconst INT) {
   }
   interpreter->pmc_reg.registers[0] = pmc_new_noinit(interpreter, $1);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[0]);
-  addr_sub = CUR_OPCODE + $3 - REL_PC;
   VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[0],
-      PTR2OPCODE_T(addr_sub));
+      PTR2OPCODE_T(CUR_OPCODE + $3 - REL_PC));
   interpreter->pmc_reg.registers[1] = pmc_new_noinit(interpreter, $2);
   VTABLE_init(interpreter, interpreter->pmc_reg.registers[1]);
-  addr_ret = CUR_OPCODE + $4 - REL_PC;
   VTABLE_set_integer_native(interpreter, interpreter->pmc_reg.registers[1],
-      PTR2OPCODE_T(addr_ret));
+      PTR2OPCODE_T(CUR_OPCODE + $4 - REL_PC));
   goto NEXT();
 }
 
