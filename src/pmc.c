@@ -19,8 +19,6 @@ src/pmc.c - The base vtable calling functions
 #include "parrot/parrot.h"
 static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, int constant);
 
-/* XXX s. objects.c */
-extern void disable_retc_free_list(Parrot_Interp);
 
 #if PARROT_CATCH_NULL
 PMC * PMCNULL;
@@ -128,10 +126,6 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
         fprintf(stderr, "\t=> new %p type %d\n", pmc, (int)base_type);
     }
 #endif
-
-    if (base_type == enum_class_Continuation)
-        disable_retc_free_list(interpreter);
-
     return pmc;
 }
 

@@ -143,6 +143,7 @@ typedef struct Parrot_Context {
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */
+struct _Caches;         /* caches .h */
 
 typedef struct _Prederef_branch {       /* item for recording branches */
     size_t offs;                        /* offset in code */
@@ -172,7 +173,6 @@ typedef struct Parrot_Interp {
                                          * area */
     struct Arenas *arena_base;          /* Pointer to this interpreter's
                                          * arena */
-    void      *stack_chunk_cache;       /* stack chunk recycling */
     PMC *class_hash;                    /* Hash of classes */
     struct _ParrotIOData *piodata;              /* interpreter's IO system */
 
@@ -266,8 +266,8 @@ typedef struct Parrot_Interp {
     struct MMD_table *bytecode_binop_mmd_funcs; /* table of bytecode
                                                    MMD function
                                                    pointers */
-    PMC** nci_method_table;       /* Method table PMC for NCI stubs per class */
-    void * method_cache;
+    PMC** nci_method_table;     /* Method table PMC for NCI stubs per class */
+    struct _Caches * caches;            /* s. caches.h */
     size_t nci_method_table_size;       /* allocated size of this table */
     struct QUEUE* task_queue;           /* per interpreter queue */
     int sleeping;                       /* used durning sleep in events */
@@ -369,7 +369,6 @@ void clone_interpreter(PMC* dest, PMC* self);
 
 void enter_nci_method(Parrot_Interp, int type,
 		 void *func, const char *name, const char *proto);
-void init_object_cache(Parrot_Interp);
 
 #else
 

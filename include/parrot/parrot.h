@@ -229,6 +229,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/platform.h"
 #include "parrot/platform_interface.h"
 #include "parrot/global_setup.h"
+#include "parrot/caches.h"
 #include "parrot/interpreter.h"
 #include "parrot/encoding.h"
 #include "parrot/datatypes.h"

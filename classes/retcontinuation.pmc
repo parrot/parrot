@@ -47,6 +47,7 @@ Initializes the continuation.
     }
 
     void mark () {
+        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
        /*
         * s. imcc/t/syn/pcc_16 and t/op/gc_12
         *
@@ -56,11 +57,13 @@ Initializes the continuation.
         * retcontinuation is marked its context isn't pointing to
         * the interpreter context anymore - its garbage.
         *
-        * When this all proves true turn off the custom_mark flag
-        * for return contiuations
+        * But if the continuation is a real continuation, we have to
+        * mark its context. s. t/op/gc_13
         *
         * -leo
         */
+        if (!(PObj_get_FLAGS(SELF) & PObj_private2_FLAG))
+            mark_context(INTERP, &cc->ctx);
     }
 
     void* invoke (void* next) {
@@ -90,6 +93,7 @@ Creates and returns a clone of the continuation.
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
         PMC_struct_val(ret) = PMC_struct_val(SELF);
+        mark_stack_not_reusable(INTERP, &sub->ctx);
         return ret;
     }
 }

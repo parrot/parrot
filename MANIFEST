@@ -1706,6 +1706,7 @@ imcc/t/syn/pcc.t                                  []
 imcc/t/syn/pod.t                                  []
 imcc/t/syn/scope.t                                []
 imcc/unit.h                                       []
+include/parrot/caches.h                           [devel]include
 include/parrot/chartype.h                         [devel]include
 include/parrot/datatypes.h                        [devel]include
 include/parrot/debug.h                            [devel]include

@@ -757,83 +757,12 @@ the name in the global stash.
 
 */
 
-static PMC * find_method_with_cache(Parrot_Interp, PMC *, STRING*);
-
-typedef struct _meth_cache_entry {
-    void * strstart;    /* string address */
-    PMC  * pmc;         /* the method sub pmc */
-    struct _meth_cache_entry *next;
-} Meth_cache_entry;
-
-typedef struct {
-    UINTVAL size;               /* sizeof table */
-    Meth_cache_entry ***idx;    /* bufstart idx */
-    /* PMC **hash */            /* for non-constant keys */
-    PMC *retc_free_list;        /* recycled return continuations */
-    int dont_cache_retc;        /* after the first real Continuation
-                                   is built, we can't use this
-                                   optimization anymore */
-} Meth_cache;
-
-/*
- * XXX RetContinution free_list handling is currently here
- */
-
-#define DISABLE_METH_CACHE 0
-/*
- * s. also src/stack_common.c:200
- */
-#define DISBALE_RETC_RECYCLING 1
-
-void add_to_retc_free_list(Parrot_Interp, PMC*);
-void disable_retc_free_list(Parrot_Interp);
-PMC *get_retc_from_free_list(Parrot_Interp);
-void mark_object_cache(Parrot_Interp);
-
-void
-disable_retc_free_list(Parrot_Interp interpreter)
-{
-    Meth_cache *mc = interpreter->method_cache;
-    mc->dont_cache_retc = 1;
-}
-
-void
-add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
-{
-    Meth_cache *mc = interpreter->method_cache;
-    /* is it created from new_ret_continuation_pmc() i.e.
-     * from invokecc or callmethodcc
-     */
-    if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
-            mc->dont_cache_retc ||
-            DISBALE_RETC_RECYCLING)
-        return;
-    PMC_struct_val(sub) = mc->retc_free_list;
-    mc->retc_free_list = sub;
-    /* don't mark the continuation context */
-    PObj_custom_mark_CLEAR(sub);
-    /* fprintf(stderr, "** add %p\n", sub); */
-}
-
-PMC *
-get_retc_from_free_list(Parrot_Interp interpreter)
-{
-    Meth_cache *mc = interpreter->method_cache;
-    PMC *retc;
-
-    if (!mc->retc_free_list || mc->dont_cache_retc)
-        return NULL;
-    retc = mc->retc_free_list;
-    mc->retc_free_list = PMC_struct_val(retc);
-    PObj_custom_mark_SET(retc);
-    /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list );*/
-    return retc;
-}
+static PMC* find_method_direct(Parrot_Interp, PMC *, STRING*);
 
 void
 mark_object_cache(Parrot_Interp interpreter)
 {
-    Meth_cache *mc = interpreter->method_cache;
+    Caches *mc = interpreter->caches;
     PMC *sub;
     sub = mc->retc_free_list;
     while (sub) {
@@ -845,9 +774,9 @@ mark_object_cache(Parrot_Interp interpreter)
 void
 init_object_cache(Parrot_Interp interpreter)
 {
-    Meth_cache *mc;
+    Caches *mc;
 
-    mc = interpreter->method_cache = mem_sys_allocate_zeroed(sizeof(*mc));
+    mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx)
     SET_NULL(mc->retc_free_list);
 }
@@ -868,7 +797,7 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
 {
 
     UINTVAL type = class->vtable->base_type;
-    Meth_cache *mc = interpreter->method_cache;
+    Caches *mc = interpreter->caches;
     PMC *found;
     int store_it = 0;
     int is_const = PObj_constant_TEST(method_name);
@@ -880,10 +809,10 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
         goto find_it;
     }
 
-    if (type >= mc->size || !mc->idx[type] || !mc->idx[type][bits]) {
+    if (type >= mc->mc_size || !mc->idx[type] || !mc->idx[type][bits]) {
         store_it = 1;
 find_it:
-        found = find_method_with_cache(interpreter, class, method_name);
+        found = find_method_direct(interpreter, class, method_name);
     }
     else {
         e = mc->idx[type][bits];
@@ -892,19 +821,19 @@ find_it:
             e = e->next;
         }
         if (!e) {
-            found = find_method_with_cache(interpreter, class, method_name);
+            found = find_method_direct(interpreter, class, method_name);
             goto store_e;
         }
         return e->pmc;
     }
     if (store_it) {
         UINTVAL i;
-        if (type >= mc->size) {
+        if (type >= mc->mc_size) {
             mc->idx = mem_sys_realloc(mc->idx,
                     sizeof(UINTVAL*) * (type + 1));
-            for (i = mc->size; i <= type; ++i)
+            for (i = mc->mc_size; i <= type; ++i)
                 mc->idx[i] = NULL;
-            mc->size = type + 1;
+            mc->mc_size = type + 1;
         }
         if (!mc->idx[type]) {
             mc->idx[type] = mem_sys_allocate(sizeof(Meth_cache_entry*) *
@@ -929,7 +858,7 @@ store_e:
 }
 
 static PMC *
-find_method_with_cache(Parrot_Interp interpreter, PMC *class,
+find_method_direct(Parrot_Interp interpreter, PMC *class,
                               STRING *method_name)
 {
     PMC* method = NULL;  /* The method we ultimately return */

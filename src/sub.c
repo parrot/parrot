@@ -314,7 +314,23 @@ new_closure(struct Parrot_Interp *interp)
     }
     return newsub;
 }
+/*
 
+=item C<void mark_stack_not_reusable(Parrot_Interp, struct Parrot_Context *)>
+
+Set continuation context stacks as not recyclable.
+
+=cut
+
+*/
+void
+mark_stack_not_reusable(Parrot_Interp interpreter, struct Parrot_Context *ctx)
+{
+    PObj_get_FLAGS(ctx->int_reg_stack) |= PObj_private0_FLAG;
+    PObj_get_FLAGS(ctx->num_reg_stack) |= PObj_private0_FLAG;
+    PObj_get_FLAGS(ctx->pmc_reg_stack) |= PObj_private0_FLAG;
+    PObj_get_FLAGS(ctx->string_reg_stack) |= PObj_private0_FLAG;
+}
 /*
 
 =item C<struct Parrot_Sub *
@@ -327,11 +343,13 @@ context.
 
 */
 
+
 struct Parrot_Sub *
 new_continuation(struct Parrot_Interp *interp)
 {
     struct Parrot_Sub *cc = new_sub(interp, sizeof(struct Parrot_Sub));
     cow_copy_context(interp, &cc->ctx, &interp->ctx);
+    mark_stack_not_reusable(interp, &cc->ctx);
     return cc;
 }
 
@@ -414,8 +432,37 @@ Returns a new C<RetContinuation> PMC.
 
 */
 
-/* XXX s. objects.c */
-PMC *get_retc_from_free_list(Parrot_Interp);
+void
+add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
+{
+    Caches *mc = interpreter->caches;
+    /* is it created from new_ret_continuation_pmc() i.e.
+     * from invokecc or callmethodcc
+     */
+    if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
+            DISABLE_RETC_RECYCLING)
+        return;
+    PMC_struct_val(sub) = mc->retc_free_list;
+    mc->retc_free_list = sub;
+    /* don't mark the continuation context */
+    PObj_custom_mark_CLEAR(sub);
+    /* fprintf(stderr, "** add %p\n", sub); */
+}
+
+PMC *
+get_retc_from_free_list(Parrot_Interp interpreter)
+{
+    Caches *mc = interpreter->caches;
+    PMC *retc;
+
+    if (!mc->retc_free_list)
+        return NULL;
+    retc = mc->retc_free_list;
+    mc->retc_free_list = PMC_struct_val(retc);
+    PObj_custom_mark_SET(retc);
+    /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list );*/
+    return retc;
+}
 
 PMC *
 new_ret_continuation_pmc(struct Parrot_Interp * interp, opcode_t * address)

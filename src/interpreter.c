@@ -1666,6 +1666,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* undefined globals are errors by default */
     PARROT_ERRORS_on(interpreter, PARROT_ERRORS_GLOBALS_FLAG);
 
+    /* create caches structure */
+    init_object_cache(interpreter);
+    /* allocate stack chunk cache */
     stack_system_init(interpreter);
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter, &interpreter->ctx);
@@ -1711,8 +1714,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* null out the root set registry */
     SET_NULL_P(interpreter->DOD_registry, PMC *);
 
-    /* create method cache structure */
-    init_object_cache(interpreter);
 
     /* register assembler/compilers */
     setup_default_compreg(interpreter);

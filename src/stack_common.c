@@ -59,7 +59,7 @@ stack_system_init(Interp *interpreter)
     /*
      * TODO cleanup in Parrot_really_destroy
      */
-    interpreter->stack_chunk_cache =
+    interpreter->caches->stack_chunk_cache =
         mem_sys_allocate_zeroed(sizeof(Stack_cache));
 }
 
@@ -67,7 +67,7 @@ static int
 get_size_class(Parrot_Interp interpreter, size_t item_size)
 {
     int i;
-    Stack_cache *sc = interpreter->stack_chunk_cache;
+    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
 
     item_size += offsetof(Stack_Chunk_t, data);
     for (i = 0; i < MAX_CACHED_STACKS; ++i) {
@@ -88,7 +88,7 @@ void
 mark_stack_chunk_cache(Parrot_Interp interpreter)
 {
     int i;
-    Stack_cache *sc = interpreter->stack_chunk_cache;
+    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
     Stack_cache_entry *e;
     Stack_Chunk_t *chunk;
 
@@ -109,7 +109,7 @@ mark_stack_chunk_cache(Parrot_Interp interpreter)
 Stack_Chunk_t *
 register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 {
-    Stack_cache *sc = interpreter->stack_chunk_cache;
+    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
     int s = get_size_class(interpreter, item_size);
     Stack_cache_entry *e = sc->stack_cache + s;
     Stack_Chunk_t *chunk = new_bufferlike_header(interpreter, e->size);
@@ -124,7 +124,7 @@ register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
 {
-    Stack_cache *sc = interpreter->stack_chunk_cache;
+    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
     int s = chunk->size_class;
     Stack_cache_entry *e = sc->stack_cache + s;
     Stack_Chunk_t * new_chunk;
@@ -184,7 +184,7 @@ void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
     Stack_Chunk_t *chunk = *stack_p;
-    Stack_cache *sc = interpreter->stack_chunk_cache;
+    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
     int s = chunk->size_class;
     Stack_cache_entry *e = sc->stack_cache + s;
     /*
@@ -199,11 +199,12 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
     /*
      * turn this off for correct behavior with continuations
      */
-#if 0
-    assert(s < MAX_CACHED_STACKS);
-    chunk->free_p = e->free_list;
-    e->free_list = chunk;
-#endif
+    if (! (PObj_get_FLAGS(chunk) & PObj_private0_FLAG)) {
+        assert(s < MAX_CACHED_STACKS);
+        chunk->free_p = e->free_list;
+        e->free_list = chunk;
+    }
+
     return STACK_DATAP(chunk);
 }
 
