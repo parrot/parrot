@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 32;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -589,6 +589,32 @@ Stack Depth Wrong
 OUTPUT
 }
 
+output_is(<<'CODE', <<'OUTPUT', "depth op");
+        depth I0
+        print I0
+        print "\n"
+
+        save "Foo"
+        depth I0
+        print I0
+        print "\n"
+        restore S0
+
+        set I1, 0
+LOOP:   save I1
+        inc I1
+        lt I1, 1024, LOOP
+        depth I0
+        print I0
+        print "\n"
+
+        end
+CODE
+0
+1
+1024
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "intstack");
 	intsave -1
 	intsave 0
@@ -620,6 +646,52 @@ output_is(<<'CODE', <<'OUTPUT', "intstack");
 	end
 CODE
 43210-1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "intstack stress test");
+        set I0, 0
+LOOP:	intsave I0
+        inc I0
+        lt I0, 2048, LOOP
+
+LOOP2:  dec I0
+        intrestore I1
+        ne I0, I1, ERROR
+        gt I0, 0, LOOP2
+        print "ok\n"
+        end
+
+ERROR:  print "Not ok\n"
+        end
+
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "intdepth");
+        intdepth I0
+        print I0
+        print "\n"
+
+        intsave 1
+        intdepth I0
+        print I0
+        print "\n"
+        intrestore I2
+
+        set I1, 0
+LOOP:   intsave I1
+        inc I1
+        lt I1, 1024, LOOP
+        intdepth I0
+        print I0
+        print "\n"
+
+        end
+CODE
+0
+1
+1024
 OUTPUT
 
 ##############################

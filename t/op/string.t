@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 77;
+use Parrot::Test tests => 82;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
@@ -1012,6 +1012,133 @@ output_is(<<'CODE','Cannot repeat with negative arg','repeat OOB');
 	end
 CODE
 
+output_is(<<'CODE',<<OUTPUT,"index, 3-arg form");
+      set S0, "Parrot"
+      set S1, "Par"
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      set S1, "rot"
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      set S1, "bar"
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      end
+CODE
+0
+3
+-1
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, 4-arg form");
+      set S0, "Barbarian"
+      set S1, "ar"
+      index I1, S0, S1, 0
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 2
+      print I1
+      print "\n"
+
+      set S1, "qwx"
+      index I1, S0, S1, 0
+      print I1
+      print "\n"
+
+      end
+CODE
+1
+4
+-1
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, null strings");
+      set S0, "Parrot"
+      set S1, ""
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 0
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 5
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 6
+      print I1
+      print "\n"
+
+      set S0, ""
+      set S1, "a"
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 0
+      print I1
+      print "\n"
+
+      end
+CODE
+-1
+-1
+-1
+-1
+-1
+-1
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, embedded nulls");
+      set S0, "Par\0\0rot"
+      set S1, "\0"
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 4
+      print I1
+      print "\n"
+
+      end
+CODE
+3
+4
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, big strings");
+      set S0, "a"
+      repeat S0, S0, 10000
+      set S1, "a"
+      repeat S1, S1, 500
+      index I1, S0, S1
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 1234
+      print I1
+      print "\n"
+
+      index I1, S0, S1, 9501
+      print I1
+      print "\n"
+
+      end
+CODE
+0
+1234
+-1
+OUTPUT
+
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {
@@ -1076,3 +1203,4 @@ sub compare_strings {
 }
 
 1;
+
