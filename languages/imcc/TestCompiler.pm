@@ -80,6 +80,12 @@ sub generate_functions {
 	if ($gen_pasm) {
 	    system("./imcc ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
 	}
+	elsif ($TEST_PROG_ARGS =~ /-c/) {
+	    my $pbc_f = per_test('.pbc',$count);
+	    $TEST_PROG_ARGS =~ s/-c//;
+	    system("./imcc ${TEST_PROG_ARGS} -o $pbc_f $by_f");
+	    system("./imcc -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
+	}
 	else {
 	    system("./imcc -r ${TEST_PROG_ARGS} $by_f >$out_f");
 	}

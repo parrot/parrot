@@ -8,6 +8,8 @@
 ** license as Parrot itself.
 **
 ** $Id$
+*
+* Note: more dump functions are in packfile.c and pdump.c
 */
 
 #include "parrot/parrot.h"
@@ -19,9 +21,7 @@
 */
 
 void PackFile_dump(struct Parrot_Interp *, struct PackFile *);
-static void PackFile_FixupTable_dump(struct Parrot_Interp *,
-                                     struct PackFile_FixupTable *);
-static void PackFile_ConstTable_dump(struct Parrot_Interp *,
+void PackFile_ConstTable_dump(struct Parrot_Interp *,
                                      struct PackFile_ConstTable *);
 static void PackFile_Constant_dump(struct Parrot_Interp *,
                                    struct PackFile_Constant *);
@@ -31,16 +31,9 @@ PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *self)
 {
     size_t i;
 
-    PIO_printf(interpreter, "FIXUP => {\n");
-
-    PackFile_FixupTable_dump(interpreter, self->fixup_table);
-
-    PIO_printf(interpreter, "},\n");
 
     PIO_printf(interpreter, "CONST => [\n");
-
     PackFile_ConstTable_dump(interpreter, self->const_table);
-
     PIO_printf(interpreter, "],\n");
 
     PIO_printf(interpreter, "BCODE => [ # %ld bytes",
@@ -48,23 +41,13 @@ PackFile_dump(struct Parrot_Interp *interpreter, struct PackFile *self)
 
     for (i = 0; i < self->byte_code_size / sizeof(opcode_t); i++) {
         if (i % 8 == 0) {
-            PIO_printf(interpreter, "\n    %08lx:  ",
+            PIO_printf(interpreter, "\n %04lx:  ",
                        (unsigned long)i * sizeof(opcode_t));
         }
         PIO_printf(interpreter, "%08lx ", (unsigned long)self->byte_code[i]);
     }
 
     PIO_printf(interpreter, "\n]\n");
-
-    return;
-}
-
-void
-PackFile_FixupTable_dump(struct Parrot_Interp *interpreter,
-                         struct PackFile_FixupTable *self)
-{
-    UNUSED(self);
-    return;
 }
 
 void
@@ -73,33 +56,17 @@ PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
 {
     opcode_t i;
 
-    if (!self) {
-        PIO_eprintf(interpreter, "PackFile_ConstTable_dump: self == NULL!\n");
-        return;
-    }
-
     for (i = 0; i < self->const_count; i++) {
         PIO_printf(interpreter, "    # %ld:\n", (long)i);
         PackFile_Constant_dump(interpreter, self->constants[i]);
     }
-
-    return;
 }
 
 void
 PackFile_Constant_dump(struct Parrot_Interp *interpreter,
                        struct PackFile_Constant *self)
 {
-    if (!self) {
-        /* TODO: OK to be silent here? */
-        return;
-    }
-
     switch (self->type) {
-    case PFC_NONE:
-        /* TODO: OK to be silent here? */
-        PIO_printf(interpreter, "    [ 'PFC_NONE', undef ],\n");
-        break;
 
     case PFC_NUMBER:
         PIO_printf(interpreter, "    [ 'PFC_NUMBER', %g ],\n", self->u.number);
@@ -117,7 +84,8 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
                    (long)self->u.string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
         PIO_printf(interpreter, "        DATA     => '%.*s'\n",
-                   (int)self->u.string->bufused, (char *)self->u.string->strstart);
+                   (int)self->u.string->bufused,
+                   (char *)self->u.string->strstart);
         PIO_printf(interpreter, "    } ],\n");
         break;
 
@@ -127,11 +95,9 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
         PIO_printf(interpreter, "    } ],\n");
         break;
     default:
-        /* TODO: OK to be silent here? no -lt */
+        PIO_printf(interpreter, "    [ 'PFC_????', undef ],\n");
         break;
     }
-
-    return;
 }
 
 /*

@@ -1517,7 +1517,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 
     if (eval_cs) {
         Parrot_switch_to_cs(interpreter, eval_cs);
-        run = eval_cs->code;
+        run = eval_cs->base.data;
         DO_OP(run,interpreter);
         Parrot_pop_cs(interpreter);
     }
@@ -1541,7 +1541,7 @@ PDB_compile(struct Parrot_Interp *interpreter, char *command)
     int op_number,i,k,l,j = 0;
     struct PackFile_ByteCode * eval_cs = Parrot_new_eval_cs(interpreter);
     /* Opcodes can't have more that 10 arguments, +1 for end */
-    eval = eval_cs->code = mem_sys_allocate(sizeof(opcode_t) * 11);
+    eval = eval_cs->base.data = mem_sys_allocate(sizeof(opcode_t) * 11);
 
     /* find_op needs a string with only the opcode name */
     while (*command && !(isspace((int) *command)))
@@ -1610,7 +1610,7 @@ PDB_compile(struct Parrot_Interp *interpreter, char *command)
         }
     }
     eval[j++] = 0;      /* append end op */
-    eval_cs->base.byte_count = j * sizeof(opcode_t);
+    eval_cs->base.size = j;
     mem_sys_free(orig);
     return eval_cs;
 }

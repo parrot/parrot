@@ -155,9 +155,10 @@ static int get_old_size(int *ins_line)
 }
 
 
-static void store_sub_size(size_t size)
+static void store_sub_size(size_t size, size_t ins_line)
 {
     globals.cs->subs->size = size;
+    globals.cs->subs->ins_line = ins_line;
 }
 
 static void store_label(SymReg * r, int pc)
@@ -222,7 +223,7 @@ static int find_label_cs(char *name, opcode_t *seg, opcode_t *pc)
 /* store global labels and bsr for later fixup
  * return size in ops
  */
-static int store_labels(void)
+static int store_labels(int *src_lines)
 {
     Instruction * ins;
     int code_size;
@@ -232,9 +233,11 @@ static int store_labels(void)
      * 1. pass
      * - sanity check
      * - calc code size
+     * - calc nr of src lines for debug info
      */
-    make_new_sub();
+    *src_lines = 0;
     for (code_size = 0, ins = instructions; ins ; ins = ins->next) {
+        (*src_lines)++;
         if (ins->op && *ins->op) {
             if (ins->opnum < 0)
                 fatal(1, "e_pbc_emit", "no opnum ins#%d %s\n",
@@ -488,7 +491,7 @@ add_const_key(opcode_t key[], int size, char *s_key) {
         return r->color;
     pfc = malloc(sizeof(struct PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interpreter,
-            interpreter->code, pfc, key, size);
+            interpreter->code, pfc, key);
     if (!rc)
         fatal(1, "add_onst_key", "PackFile_Constant error\n");
     k = PDB_extend_const_table(interpreter);
@@ -641,25 +644,31 @@ int e_pbc_emit(Instruction * ins) {
 
     /* first instruction, do initialisation ... */
     if (ins == instructions) {
-        int code_size = store_labels();
-        int oldsize = get_old_size(&ins_line);
+        int code_size, ins_size;
+        int oldsize;
         int bytes;
 
+        make_new_sub();         /* we start a new compilation unit */
+        code_size = store_labels(&ins_size);
+        oldsize = get_old_size(&ins_line);
         debug(1, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
         constant_folding();
-        store_sub_size(code_size);
+        store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
         interpreter->code->byte_code =
             mem_sys_realloc(interpreter->code->byte_code, bytes);
         interpreter->code->byte_code_size = bytes;
-        interpreter->code->cur_cs->code = interpreter->code->byte_code;
-        interpreter->code->cur_cs->base.byte_count = bytes;
+        /* XXX */
+        interpreter->code->cur_cs->base.size = oldsize + code_size;
+        interpreter->code->cur_cs->base.data = interpreter->code->byte_code;
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;
         npc = 0;
         /* add debug if necessary */
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            /* FIXME length and multiple subs */
             debug_seg = Parrot_new_debug_seg(interpreter,
-                    interpreter->code->cur_cs, sourcefile);
+                    interpreter->code->cur_cs, sourcefile,
+                    (size_t) ins_line+ins_size);
         }
     }
     if (ins->op && *ins->op) {
@@ -682,7 +691,7 @@ int e_pbc_emit(Instruction * ins) {
         }
         /* add debug line info */
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-            debug_seg->lines[ins_line++] = (opcode_t) ins->line;
+            debug_seg->base.data[ins_line++] = (opcode_t) ins->line;
         }
         /* Start generating the bytecode */
         *pc++ = op = (opcode_t)ins->opnum;

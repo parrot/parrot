@@ -232,7 +232,8 @@ main(int argc, char **argv) {
     Parrot_init(interpreter, (void*) &dummy_var);
 
     run_native = run_compiled;
-    pf          = PackFile_new();
+    /* TODO make also a shared variant of PackFile_new */
+    pf          = PackFile_new(0);
 
     if( !PackFile_unpack(interpreter, pf, (opcode_t *)program_code,
 			    sizeof(program_code)) ) {

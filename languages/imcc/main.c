@@ -183,7 +183,7 @@ int main(int argc, char * argv[])
 
     interpreter = Parrot_new();
     Parrot_init(interpreter, (void*)&stacktop);
-    pf = PackFile_new();
+    pf = PackFile_new(0);
     interpreter->code = pf;
     interpreter->DOD_block_level++;
 
@@ -237,10 +237,12 @@ int main(int argc, char * argv[])
             info(1,"\n");
     }
     if (run_pbc == 2) {
+        PackFile_destroy(pf);
         pf = Parrot_readbc(interpreter, sourcefile);
         if (!pf)
             fatal(1, "main", "Packfile loading failed\n");
         Parrot_loadbc(interpreter, pf);
+        fclose(yyin);
     }
     else {
         info(1, "using optimization '%s'\n", optimizer_opt);
@@ -261,7 +263,7 @@ int main(int argc, char * argv[])
         opcode_t *packed;
         FILE *fp;
 
-        size = PackFile_pack_size(interpreter->code);
+        size = PackFile_pack_size(interpreter->code) * sizeof(opcode_t);
         info(1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
         if (!packed)

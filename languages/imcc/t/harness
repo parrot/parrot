@@ -14,7 +14,20 @@ use Test::Harness qw(runtests);
 
 use Getopt::Std;
 my %opts;
-getopts('gjPvd', \%opts);
+getopts('gjPbvdc?h', \%opts);
+if ($opts{'?'} || $opts{h}) {
+	print <<"EOF";
+perl t/harness [options] [testfiles]
+	-g ... diable CGoto
+	-j ... run JIT
+	-P ... run Prederef
+	-b ... run bounds checked
+	-v ... run verbose
+	-d ... run debug
+	-c ... assemble to PBC run PBC
+EOF
+	exit;
+}
 $ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
 
 $ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;

@@ -11,6 +11,7 @@
 ** History:
 **  Rework by Melvin; new bytecode format, make bytecode portable.
 **   (Do endian conversion and wordsize transforms on the fly.)
+**  leo: rewrite to use new dirctory based format
 */
 
 #include "parrot/parrot.h"
@@ -26,29 +27,20 @@ extern struct PackFile_Directory *directory_new (struct PackFile *pf);
 opcode_t
 PackFile_pack_size(struct PackFile *self)
 {
-    opcode_t header_size;
-    opcode_t magic_size;
-    opcode_t oct_size;          /* opcode_type */
-    opcode_t segment_length_size;
-
-    struct PackFile_Directory *dir = self->directory ? self->directory :
-        (self->directory = directory_new (self)); /* XXX */
-    opcode_t other_segments_size;
+    opcode_t size;
+    struct PackFile_Directory *dir = self->directory;
     size_t i;
 
-    header_size = PACKFILE_HEADER_BYTES;
-    magic_size = sizeof(opcode_t);
-    oct_size = sizeof(opcode_t);
-    segment_length_size = sizeof(opcode_t);
+    size = PACKFILE_HEADER_BYTES / sizeof(opcode_t);
+    ++size;     /* magic */
+    ++size;     /* opcode type */
+    ++size;     /* directory type */
+    ++size;     /* pad */
 
-    other_segments_size = 0;
+    dir->base.file_offset = size;
+    size += PackFile_Segment_packed_size((struct PackFile_Segment *) dir);
 
-    for (i=0; i < dir->num_segments; i++) {
-        other_segments_size += PackFile_Segment_packed_size (dir->segments[i])
-            + sizeof(opcode_t);
-    }
-
-    return header_size + magic_size + oct_size + other_segments_size;
+    return size;
 }
 
 
@@ -56,19 +48,22 @@ PackFile_pack_size(struct PackFile *self)
 Pack the PackFile into a contiguous region of memory. NOTE: The memory block
 had better have at least the amount of memory indicated by
 PackFile_pack_size()!
+
+This means: you MUST call PackFile_pack_size before PackFile_pack
+
+Note: other pack routines are in packfile.c
 ***************************************/
 
 void
-PackFile_pack(struct PackFile *self, opcode_t *packed)
+PackFile_pack(struct PackFile *self, opcode_t *cursor)
 {
-    opcode_t *cursor = packed;
-    opcode_t fixup_table_size =
-        PackFile_FixupTable_pack_size(self->fixup_table);
-    opcode_t const_table_size =
-        PackFile_ConstTable_pack_size(self->const_table);
+    opcode_t *ret;
 
-    size_t i;
+    size_t i, size;
     struct PackFile_Directory *dir = self->directory;
+    struct PackFile_Segment *seg;
+
+    self->src = cursor;
 
     self->header->wordsize = sizeof(opcode_t);
     self->header->byteorder = PARROT_BIGENDIAN;
@@ -84,78 +79,38 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
     cursor += PACKFILE_HEADER_BYTES / sizeof(opcode_t);
+    *cursor++ = PARROT_MAGIC;           /* Pack the magic */
+    *cursor++ = OPCODE_TYPE_PERL;       /* Pack opcode type */
+    *cursor++ = PF_DIR_FORMAT;          /* dir format */
+    *cursor++ = 0;                      /* pad */
 
-    /* Pack the magic */
-    *cursor++ = PARROT_MAGIC;
-
-    /* Pack opcode type */
-    *cursor++ = OPCODE_TYPE_PERL;
-
-    /* Pack the fixup table size, followed by the packed fixup table */
-
-    for (i = 0; i < dir->num_segments; i++) {
-        struct PackFile_Segment *seg = dir->segments[i];
-        size_t size;
-
-        size = PackFile_Segment_packed_size (seg);
-        *cursor++ = size;
-
-        cursor += PackFile_Segment_pack (seg, packed,
-                                         (cursor-packed)* sizeof(opcode_t),
-                                         size) / sizeof (opcode_t);
+    /* pack the directory */
+    seg = (struct PackFile_Segment *) dir;
+    /* dir size */
+    size = seg->op_count;
+    ret = PackFile_Segment_pack (seg, cursor);
+    if ((size_t)(ret - cursor) != size) {
+        internal_exception(1, "PackFile_pack segment '%s' used size %d "
+                "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
     }
-
-    return;
 }
 
-/***************************************
-Determine the size of the buffer needed in order to pack the fixup
-segment into a contiguous region of memory.
-***************************************/
-
-opcode_t
-PackFile_FixupTable_pack_size(struct PackFile_FixupTable *self)
-{
-    UNUSED(self);
-    return 0;
-}
-
-
-/***************************************
-Pack the PackFile FixupTable into a contiguous region of memory.
-NOTE: The memory block had better have at least the amount of memory
-      indicated by PackFile_FixupTable_pack_size()!
-***************************************/
-
-void
-PackFile_FixupTable_pack(struct PackFile_FixupTable *self, opcode_t *packed)
-{
-    UNUSED(self);
-    UNUSED(packed);
-    return;
-}
 
 /***************************************
 Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
 ***************************************/
 
-opcode_t
-PackFile_ConstTable_pack_size(struct PackFile_ConstTable *self)
+size_t
+PackFile_ConstTable_pack_size(struct PackFile_Segment *seg)
 {
     opcode_t i;
-    opcode_t size = 0;
+    struct PackFile_ConstTable *self = (struct PackFile_ConstTable *) seg;
+    size_t size = 1;    /* const_count */
 
-    if (!self) {
-        PIO_eprintf(NULL, "PackFile_ConstTable_size: self == NULL!\n");
-        return -1;
-    }
-
-    for (i = 0; i < self->const_count; i++) {
+    for (i = 0; i < self->const_count; i++)
         size += PackFile_Constant_pack_size(self->constants[i]);
-    }
-
-    return sizeof(opcode_t) + size;
+    return size;
 }
 
 
@@ -166,32 +121,24 @@ NOTE: The memory block had better have at least the amount of memory
 ***************************************/
 static struct PackFile_ConstTable *ct;
 
-void
-PackFile_ConstTable_pack(struct PackFile *packfile,
-                         struct PackFile_ConstTable *self, opcode_t *packed)
+opcode_t *
+PackFile_ConstTable_pack(struct PackFile_Segment *seg, opcode_t *cursor)
 {
-    opcode_t *cursor;
+    struct PackFile_ConstTable *self = (struct PackFile_ConstTable *)seg;
     opcode_t i;
 
-    if (!self) {
-        PIO_eprintf(NULL, "PackFile_ConstTable_pack: self == NULL!\n");
-        return;
-    }
-
-    cursor = packed;
+    /* remember const_table for find_in_const */
     ct = self;
 
-    *cursor = self->const_count;
-    cursor++;
+    *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
         PackFile_Constant_pack(self->constants[i], cursor);
 
-        cursor +=
-            PackFile_Constant_pack_size(self->constants[i]) / sizeof(opcode_t);
+        cursor += PackFile_Constant_pack_size(self->constants[i]);
     }
 
-    return;
+    return cursor;
 }
 
 /* this is really ugly, we don't know where our PARROT_ARG_SC
@@ -224,45 +171,24 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 ***************************************/
 
 void
-PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
+PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 {
-    opcode_t *cursor;
     char *charcursor;
     size_t i;
     opcode_t padded_size;
     opcode_t packed_size;
     struct PMC *key;
 
-    if (!self) {
-        /* TODO: OK to be silent here? */
-        return;
-    }
-
-    cursor = packed;
-
     *cursor++ = self->type;
 
     switch (self->type) {
-    case PFC_NONE:
-        *cursor++ = 0;
-
-        /* TODO: OK to be silent here? */
-        break;
 
     case PFC_NUMBER:
-        *cursor++ = sizeof(FLOATVAL);
-        /* XXX Use memcpy() to avoid alignment issues.
-         * Also, do we need to pad things out to an opcode_t boundary?
-         * Consider gcc/x86, with opcode_t = (long long) and
-         * FLOATVAL = (long double):
-         * sizeof(long long) = 8
-         * sizeof(long double) = 12
-         */
+        padded_size = (sizeof(FLOATVAL) + sizeof(opcode_t) - 1) /
+            sizeof(opcode_t);
+        *cursor++ = padded_size;
         mem_sys_memcopy(cursor, &self->u.number, sizeof(FLOATVAL));
-        cursor += sizeof(FLOATVAL) / sizeof(opcode_t);  /* XXX */
-        /* XXX cursor is possibly wrong now (because of alignment
-         * issues) but isn't returned from this function anyway!
-         */
+        cursor += padded_size;
         break;
 
     case PFC_STRING:
@@ -273,7 +199,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         }
 
         /* Include space for flags, encoding, type, and size fields.  */
-        packed_size = 4 * sizeof(opcode_t) + padded_size;
+        packed_size = 4 + padded_size / sizeof(opcode_t);
 
         *cursor++ = packed_size;
         *cursor++ = PObj_get_FLAGS(self->u.string); /* XXX useless info -leo */
@@ -357,14 +283,10 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         break;
 
     default:
-        /* TODO: OK to be silent here? */
-        /* ARGH, don't be silent -lt */
         PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
         Parrot_exit(1);
         break;
     }
-
-    return;
 }
 
 /*

@@ -118,7 +118,8 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     STRING *pasmfile, *stabsfile, *ofile, *cmd;
     FILE *stabs;
     size_t i;
-    int line, lc;
+    int line;
+    opcode_t lc;
 
     if (interpreter->code->cur_cs->debug) {
         char *ext;
@@ -169,7 +170,7 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     for (i = 0; i < jit_info->arena.map_size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
             if (interpreter->code->cur_cs->debug) {
-                line = (int)interpreter->code->cur_cs->debug->lines[lc++];
+                line = (int)interpreter->code->cur_cs->debug->base.data[lc++];
             }
             fprintf(stabs, ".stabn 68,0,%d,%d\n", line,
                     (char *)jit_info->arena.op_map[i].ptr -

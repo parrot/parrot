@@ -68,10 +68,11 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {
-    off_t program_size;
+    off_t program_size, wanted;
     char *program_code;
     struct PackFile *pf;
     ParrotIO * io = NULL;
+    INTVAL is_mapped = 0;
 
 #ifdef HAS_HEADER_SYSSTAT
     struct stat file_stat;
@@ -93,13 +94,14 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         /* if we have stat(), get the actual file size so we can read it
          * in one chunk. */
         if (stat(filename, &file_stat)) {
-            PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n", filename,
-                    errno);
+            PIO_eprintf(interpreter, "Parrot VM: Can't stat %s, code %i.\n",
+                    filename, errno);
             return NULL;
         }
 
         if (!S_ISREG(file_stat.st_mode)) {
-            PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n", filename);
+            PIO_eprintf(interpreter, "Parrot VM: %s is not a normal file.\n",
+                    filename);
             return NULL;
         }
 
@@ -115,8 +117,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 #ifndef HAS_HEADER_SYSMMAN
         io = PIO_open(interpreter, filename, "<");
         if (!io) {
-            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n", filename,
-                    errno);
+            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
+                    filename, errno);
             return NULL;
         }
 
@@ -131,6 +133,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                 strlen(filename), NULL, 0, NULL);
     }
 
+again:
     /* if we've opened a file (or stdin) with PIO, read it in */
     if (io != NULL) {
         size_t chunk_size;
@@ -139,6 +142,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         chunk_size = program_size > 0 ? program_size : 1024;
         program_code = (char *)malloc(chunk_size);
+        wanted = program_size;
         program_size = 0;
 
         if (NULL == program_code) {
@@ -155,6 +159,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         while ((read_result =
                 PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
             program_size += read_result;
+            if (program_size == wanted)
+                break;
             chunk_size = 1024;
             program_code =
                 realloc(program_code, program_size + chunk_size);
@@ -183,8 +189,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
-            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n", filename,
-                    errno);
+            PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
+                    filename, errno);
             return NULL;
         }
 
@@ -192,15 +198,26 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (!program_code) {
-            PIO_eprintf(interpreter, "Parrot VM: Can't read file %s, code %i.\n",
+            Parrot_warn(interpreter, PARROT_WARNINGS_IO_FLAG,
+                    "Parrot VM: Can't mmap file %s, code %i.\n",
                     filename, errno);
-            return NULL;
+            /* try again, now with IO reading the file */
+            io = PIO_open(interpreter, filename, "<");
+            if (!io) {
+                PIO_eprintf(interpreter,
+                        "Parrot VM: Can't open %s, code %i.\n",
+                        filename, errno);
+                return NULL;
+            }
+            goto again;
         }
+        is_mapped = 1;
 
 #else   /* HAS_HEADER_SYSMMAN */
 
         PIO_fprintf(interpreter, PIO_STDERR(interpreter),
-                "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
+                "Parrot VM: uncaught error occurred reading file "
+                "or mmap not available.\n");
         return NULL;
 
 #endif  /* HAS_HEADER_SYSMMAN */
@@ -209,19 +226,19 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     /* Now that we have the bytecode, let's unpack it. */
 
-    pf = PackFile_new();
+    pf = PackFile_new(is_mapped);
 
     if (!PackFile_unpack
         (interpreter, pf, (opcode_t *)program_code, program_size)) {
-        PIO_eprintf(interpreter, "Parrot VM: Can't unpack packfile %s.\n", filename);
+        PIO_eprintf(interpreter, "Parrot VM: Can't unpack packfile %s.\n",
+                filename);
         return NULL;
     }
 
 #ifdef HAS_HEADER_SYSMMAN
 
     if (fd >= 0) {
-        munmap(program_code, program_size);
-        close(fd);
+        close(fd);   /* the man page states, it's ok to clode a mmaped file */
     }
 #else
     mem_sys_free(program_code);
