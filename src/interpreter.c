@@ -243,6 +243,11 @@ make_interpreter(INTVAL flags) {
 
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
+
+    /* Set up defaults for line/package/file */
+    interpreter->current_line = 0;
+    interpreter->current_file = NULL;
+    interpreter->current_package = NULL;
     
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));

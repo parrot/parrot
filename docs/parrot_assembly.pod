@@ -820,6 +820,36 @@ Increment entry Y of key X by one.
 
 =back
 
+=head2 Symbolic support for HLLs
+
+=over 4
+
+=item setline ix
+
+Sets the 'current line' marker.
+
+=item setfile sx
+
+Sets the 'current file' marker.
+
+=item setpackage sx
+
+Sets the 'current package' marker.
+
+=item getline ix
+
+Fetches the 'current line' marker.
+
+=item getfile sx
+
+Fetches the 'current file' marker.
+
+=item getpackage sx
+
+Fetches the 'current package' marker.
+
+=back
+
 =head1 ATTACHMENTS
 
 =head1 REFERENCES

@@ -2462,6 +2462,71 @@ AUTO_OP sleep(i|ic) {
   Parrot_sleep($1);
 }
 
+
+#######################################
+
+=item B<setline>(i)
+
+=item B<setline>(ic)
+
+Set the current line number we're executing code for
+
+=cut
+
+AUTO_OP setline(i|ic) {
+  interpreter->current_line = $1;
+}
+
+=item B<getline>(i)
+
+Get the current line number
+
+=cut
+
+AUTO_OP getline(i) {
+  $1 = interpreter->current_line;
+}
+
+=item B<setfile>(s|sc)
+
+Sets the current file we're executing code for
+
+=cut
+
+AUTO_OP setfile(s|sc) {
+  interpreter->current_file = $1;
+}
+
+=item B<getfile>(s)
+
+Gets the current file we're executing code for
+
+=cut
+
+AUTO_OP getfile(s) {
+  $1 = interpreter->current_file;
+}
+
+=item B<setpackage>(s|sc)
+
+Sets the current package we're executing code for
+
+=cut
+
+AUTO_OP setpackage(s|sc) {
+  interpreter->current_package = $1;
+}
+
+=item B<getpackage>(s)
+
+Gets the current package we're executing code for
+
+=cut
+
+AUTO_OP getpackage(s) {
+  $1 = interpreter->current_package;
+}
+
 ###############################################################################
 
 =head1 COPYRIGHT
