@@ -244,7 +244,7 @@ void gen_method_decl(AST * p) {
     cur_method = p;
     p->end_label = make_label();
     if(p->sym->namespace && p->sym->namespace != global_namespace)
-        printf(".sub %s__%s\n", p->sym->namespace->name, p->sym->name);
+        printf(".sub _%s__%s\n", p->sym->namespace->name, p->sym->name);
     else
         printf(".sub __%s\n", p->sym->name);
 #if 0
@@ -620,7 +620,7 @@ void gen_method_call(AST * p) {
      * calling stack.
      */
     if(p->arg1->targ->namespace && p->arg1->targ->namespace != global_namespace) {
-        printf("\tcall %s__%s\n", p->arg1->targ->namespace->name,
+        printf("\tcall _%s__%s\n", p->arg1->targ->namespace->name,
                     p->arg1->targ->name);
     }
     else {

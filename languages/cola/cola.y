@@ -1040,7 +1040,7 @@ int main(int argc, char * argv[])
 */
     printf("# Cola (%s) generated\n#\n", COLA_VERSION);
     if(main_method) {
-        printf(".sub _MAIN\n\t.arg \"\"\n\tcall %s__%s\n",
+        printf(".sub _MAIN\n\t.arg \"\"\n\tcall _%s__%s\n",
             main_method->namespace->name, main_method->name);
         printf("\tend\n\tret\n\.end\n");
 #if 0
