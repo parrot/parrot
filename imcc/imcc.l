@@ -897,7 +897,7 @@ scan_file (struct macro_frame_t *frame, FILE *file)
     frame->next = frames;
     frames = frame;
 
-    sourcefile = frame->file;
+    frame->file = sourcefile;
     line = 1;
 
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE));

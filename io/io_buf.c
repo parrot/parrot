@@ -554,7 +554,7 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     int may_realloc;
 
     if (*buf == NULL) {
-        *buf = new_string_header(interpreter, PObj_sysmem_FLAG);
+        *buf = new_string_header(interpreter, 0);
     }
     s = *buf;
     s->strlen = 0;
@@ -583,7 +583,6 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                     } else {
                         Parrot_allocate_string(interpreter, s, l);
                     }
-                    PObj_buflen(s) = l;
                 }
                 else
                     internal_exception(1, "readline: buffer too short");
@@ -604,7 +603,6 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             } else {
                 Parrot_allocate_string(interpreter, s, l);
             }
-            PObj_buflen(s) = l;
         }
         else
             internal_exception(1, "readline: buffer too short");
