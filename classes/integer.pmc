@@ -339,6 +339,18 @@ Morphs the integer to a C<Float> and sets the value from C<value>.
 
 /*
 
+=item C<void set_bool(INTVAL value)>
+
+=cut
+
+*/
+    void set_bool (INTVAL value) {
+        DYNSELF.morph(enum_class_Boolean);
+        DYNSELF.set_bool(value);
+    }
+
+/*
+
 =item C<void set_bignum_native(BIGNUM *value)>
 
 =cut

@@ -24,13 +24,13 @@ types, its value is changed only.
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-pmclass Boolean extends PerlInt {
+pmclass Boolean extends Integer {
 
 /*
 
 =item C<class_init ()>
 
-Define 3 pythonic globals C<True>, C<False>, and C<__debug__>.
+Define 2 pythonic globals C<True>, C<False>.
 
 XXX are these generally useful or should they be moved to src/py_func.c?
 
@@ -41,38 +41,33 @@ XXX are these generally useful or should they be moved to src/py_func.c?
     void class_init() {
         if (pass) {
             PMC *t;
+            STRING *s;
             t = pmc_new(interp, enum_class_Boolean);
             PMC_int_val(t)  = 1;
-            Parrot_store_global(interp, NULL,
-                    const_string(interp, "True"), t);
+            s = CONST_STRING(interp, "True");
+            Parrot_store_global(interp, NULL, s, t);
             t = pmc_new(interp, enum_class_Boolean);
-            Parrot_store_global(interp, NULL,
-                    const_string(interp, "False"), t);
-            t = pmc_new(interp, enum_class_Boolean);
-            PMC_int_val(t)  = 1;
-            Parrot_store_global(interp, NULL,
-                    const_string(interp, "__debug__"), t);
+            Parrot_store_global(interp, NULL, s, t);
         }
     }
 
 /*
 
-=item C<void* invoke(void* next)>
+=item C<PMC* instantiate()>
 
-Pythonic object constructor. SELF is a Boolean Class object. Return a new
-C<bool> object according to 2.1. Built-in Functions.
+Object constructor. SELF is a Boolean Class object. Return a new
+C<bool> object according to the passed PMC value.
 
 =cut
 
 */
-    void* invoke(void* next) {
+    PMC* instantiate() {
+        /* XXX other types */
         int argcP = REG_INT(3);
         PMC *res = pmc_new(interpreter, enum_class_Boolean);
         if (argcP)
-            VTABLE_set_integer_native(interpreter, res,
-                    VTABLE_get_bool(interpreter, REG_PMC(5)));
-        REG_PMC(5) = res;
-        return next;
+            PMC_int_val(res) = VTABLE_get_bool(interpreter, REG_PMC(5));
+        return res;
     }
 /*
 
@@ -86,8 +81,8 @@ Return "True" or "False" if python_mode is true.
     STRING* get_string () {
         if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE))
             return PMC_int_val(SELF) ?
-                const_string(INTERP, "True") :
-                const_string(INTERP, "False");
+                CONST_STRING(INTERP, "True") :
+                CONST_STRING(INTERP, "False");
         else
             return SUPER();
     }
@@ -97,14 +92,25 @@ Return "True" or "False" if python_mode is true.
 
 =item C<void set_integer_native (INTVAL value)>
 
+=item C<void set_bool (INTVAL value)>
+
+=item C<void set_pmc (PMC* value)>
+
 =cut
 
 */
-
     void set_integer_native (INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
+
+    void set_bool (INTVAL value) {
+        PMC_int_val(SELF) = (value != 0);
+    }
+
+    void set_pmc (PMC* value) {
+        PMC_int_val(SELF) = VTABLE_get_bool(INTERP, value);
+    }
 /*
 
 =item C<void set_number_native (FLOATVAL value)>
@@ -132,75 +138,6 @@ Sets the value to C<*value> evaluated in a boolean context.
     void set_string_native (STRING* value) {
         PMC_int_val(SELF) = string_bool(INTERP, value);
     }
-
-/*
-
-=item C<void neg(PMC* dest)>
-
-Set C<dest> to the negated value of C<SELF>.
-
-=cut
-
-*/
-
-    void neg (PMC* dest) {
-        if (dest == SELF)
-            PMC_int_val(SELF) = -PMC_int_val(SELF);
-        else
-            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
-    }
-
-/*
-
-=item C<void logical_or(PMC* value, PMC* dest)>
-
-Sets the logical C<OR> of the boolean and C<*value> as the value of
-C<*dest>.
-
-=cut
-
-*/
-
-    void logical_or (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) ||
-            VTABLE_get_bool(INTERP, value));
-    }
-
-/*
-
-=item C<>
-
-Sets the logical C<AND> of the boolean and C<*value> as the value of
-C<*dest>.
-
-=cut
-
-*/
-
-    void logical_and (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            PMC_int_val(SELF) &&
-            VTABLE_get_bool(INTERP, value));
-    }
-
-/*
-
-=item C<void logical_xor(PMC* value, PMC* dest)>
-
-Sets the logical C<XOR> of the boolean and C<*value> as the value of
-C<*dest>.
-
-=cut
-
-*/
-
-    void logical_xor (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            ( PMC_int_val(SELF) ? 1 : 0 ) ^
-            VTABLE_get_bool(INTERP, value));
-    }
-
 }
 
 /*

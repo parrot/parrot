@@ -113,11 +113,11 @@ output_is(<<'CODE', <<'OUTPUT', "isa");
     print I0
     print "\n"
 
-    isa I0, P1, "PerlInt"
+    isa I0, P1, "Integer"
     print I0
-    isa I0, P1, "PerlIn"
+    isa I0, P1, "Integ"
     print I0
-    isa I0, P1, "erl"
+    isa I0, P1, "eger"
     print I0
     isa I0, P1, " "
     print I0
