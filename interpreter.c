@@ -17,6 +17,9 @@
 #ifdef HAS_JIT
 #  include "parrot/jit.h"
 #endif
+#ifdef HAVE_COMPUTED_GOTO
+#  include "parrot/oplib/core_ops_cg.h"
+#endif
 
 
 /*=for api interpreter check_fingerprint

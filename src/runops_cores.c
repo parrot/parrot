@@ -15,6 +15,10 @@
 
 #include "parrot/interp_guts.h"
 
+#ifdef HAVE_COMPUTED_GOTO
+#  include "parrot/oplib/core_ops_cg.h"
+#endif
+
 /*=for api interpreter runops_fast_core
  * run parrot operations until the program is complete
  *
@@ -26,9 +30,13 @@
 opcode_t *
 runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
+#ifdef HAVE_COMPUTED_GOTO
+    pc = cg_core(pc, interpreter);
+#else
     while (pc) {
         DO_OP(pc, interpreter);
     }
+#endif
     return pc;
 }
 

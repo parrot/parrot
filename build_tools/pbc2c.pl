@@ -19,11 +19,11 @@ use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
 use Parrot::OpsFile;
-use Parrot::OpTrans::CGoto;
+use Parrot::OpTrans::Compiled;
 use Parrot::OpLib::core;
 use Parrot::Config;
 
-my $trans = Parrot::OpTrans::CGoto->new;
+my $trans = Parrot::OpTrans::Compiled->new;
 
 use Data::Dumper;
 $Data::Dumper::Useqq  = 1;

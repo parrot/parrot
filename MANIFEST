@@ -277,6 +277,7 @@ memory.c
 misc.c
 obscure.ops
 ops2c.pl
+ops2cgc.pl
 ops2pm.pl
 optimizer.pl
 packdump.c
@@ -324,6 +325,7 @@ t/pmc/pmc.t
 test_c.in
 test_gnuc.c
 test_main.c
+testcomputedgoto_c.in
 testparrotfuncptr.c
 testparrotsizes_c.in
 trace.c

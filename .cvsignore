@@ -1,5 +1,7 @@
 blib
 config.opt
+*_ops_cg.h
+core_ops_cg.c
 core_ops.c
 core_ops_prederef.c
 Makefile

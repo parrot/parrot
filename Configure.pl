@@ -238,6 +238,17 @@ my(%c)=(
     cp            => 'cp',
     slash         => '/',
 
+    cg_h          => '$(INC)/oplib/core_ops_cg.h',
+    cg_c          => <<'EOF',
+core_ops_cg$(O): $(GENERAL_H_FILES) core_ops_cg.c
+
+core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) ops2cgc.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
+	$(PERL) ops2cgc.pl CGoto $(OPS_FILES)
+EOF
+    cg_o          => 'core_ops_cg$(O)',
+    cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h core_ops_cg.c',
+    cg_flag       => '-DHAVE_COMPUTED_GOTO',
+
     VERSION       => $parrot_version,
     MAJOR         => $parrot_version[0],
     MINOR         => $parrot_version[1],
@@ -690,6 +701,32 @@ END
     unlink("include/parrot/vtable.h");
 }
 
+
+# and now test if we can use computed goto
+print <<"END";
+
+Still everything ok, let's check if we can use computed goto,
+don't worry if you see some errors, it will be all right,
+This could take a bit...
+END
+
+{
+ buildfile("testcomputedgoto_c");
+ my $test = system("$c{cc} $c{ccflags} -o testcomputedgoto$c{exe} testcomputedgoto.c");
+ 
+ if ($test != 0) {
+   $c{"cg_h"}='';
+   $c{"cg_c"}='';
+   $c{"cg_o"}='';
+   $c{"cg_r"}='';
+   $c{"cg_flag"}='';
+ }
+
+ unlink('testcomputedgoto.c', "testcomputedgoto$c{exe}", "testcomputedgoto$c{o}");
+}
+
+# rewrite the Makefile with the updated info
+buildfile("Makefile");
 
 #
 # Rewrite the config file with the updated info
