@@ -9,6 +9,10 @@
 #define JIT_EMIT 0
 #include "parrot/jit_emit.h"
 
+#ifdef __GNUC__
+void Parrot_jit_debug(struct Parrot_Interp* interpreter);
+#endif
+
 /*
  * optimize_jit()
  */
@@ -584,6 +588,13 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 #ifdef PPC
     ppc_sync_cache(jit_info.arena.start, jit_info.native_ptr);
 #endif
+
+    /* assume gdb is available */
+#ifdef __GNUC__
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+        Parrot_jit_debug(interpreter);
+#endif
+
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
 

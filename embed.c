@@ -128,6 +128,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
 #endif  /* HAS_HEADER_SYSMMAN */
 
+        interpreter->current_file = string_make(interpreter, filename,
+                strlen(filename), NULL, 0, NULL);
     }
 
     /* if we've opened a file (or stdin) with PIO, read it in */

@@ -1262,6 +1262,7 @@ jit/ppc/jit_emit.h
 jit/sun4/core.jit
 jit/sun4/jit_emit.h
 jit2h.pl
+jit_debug.c
 key.c
 languages/BASIC/README.BASIC
 languages/BASIC/alpha.pasm
