@@ -1,4 +1,17 @@
-VERSION 0.0.4
+VERSION 0.0.5
+
+New in 0.0.5
+
+- Full GC
+- Perl Scalar support in PMCs
+- Array and Hash types almost ready for prime-time
+- Internal support for keyed types
+- EMACS editing mode
+- New PDDs
+- New Language - BASIC
+- Regular expression compiler
+- More tests
+- Many, many bug fixes, enhancements, and speedups
 
 New in 0.0.4
 
