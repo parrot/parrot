@@ -100,10 +100,13 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
         } \
     } while (0)
 
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) \
+          DOD_WRITE_BARRIER_KEY(interp, agg, old, new)
 #endif
 
 #if PARROT_GC_MS
 #  define DOD_WRITE_BARRIER(interp, agg, old, new)
+#  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key)
 #endif
 
 #endif /* PARROT_DOD_H_GUARD */

@@ -856,15 +856,16 @@ hash_put(Interp *interpreter, Hash *hash, void *key, void *value)
 
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER(interpreter, hash->container,
-                    (PMC*)bucket->value, (PMC*)value);
+            DOD_WRITE_BARRIER_KEY(interpreter, hash->container,
+                    (PMC*)bucket->value, bucket->key, (PMC*)value, key);
         }
         /* Replacing old value */
         bucket->value = value;  /* TODO copy value_size */
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            DOD_WRITE_BARRIER(interpreter, hash->container, NULL, (PMC*)value);
+            DOD_WRITE_BARRIER_KEY(interpreter, hash->container,
+                    NULL, NULL, (PMC*)value, key);
         }
         /* Create new bucket */
         hash->entries++;
