@@ -250,7 +250,7 @@ Parrot_bxor_i_ic {
     Parrot_binop_i_xc s/<op>/xor/
 }
 
-Parrot_sub_n_nc {
+Parrot_add_n_nc {
     Parrot_binop_x_x s/<op>/faddd/ s/ISR/FSR/ s/<_N>/_n/
 }
 
