@@ -42,3 +42,10 @@ t/test2.pasm
 t/test3.pasm
 t/euclid.pasm
 test_main.c
+little_languages/euclid.jako
+little_languages/jakoc
+little_languages/Makefile
+little_languages/fact.jako
+little_languages/fib.jako
+little_languages/hello.jako
+little_languages/bench.jako
