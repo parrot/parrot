@@ -455,8 +455,15 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     }
     attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
             class_array, PCD_ATTRIBUTES);
-    full_attr_name = Parrot_sprintf_c(interpreter, "%S%s%S",
-            class_name, PARROT_NAMESPACE_SEPARATOR, attr),
+    full_attr_name = Parrot_sprintf_c(interpreter, "%Ss%Ss%Ss",
+            class_name,
+            string_from_cstring(interpreter, PARROT_NAMESPACE_SEPARATOR,
+                PARROT_NAMESPACE_SEPARATOR_LENGTH),
+            attr);
+    /*
+     * TODO check if someone is trying to add attributes to a parent class
+     * while there are already child class attrs
+     */
     idx = VTABLE_elements(interpreter, attr_hash);
     assert(class->cache.int_val == idx);
     VTABLE_set_integer_keyed_str(interpreter, attr_hash,

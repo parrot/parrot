@@ -56,9 +56,8 @@ pmclass ParrotClass need_ext {
     }
 
     /*
-     * attribute access meths
+     * attrib count
      */
-
     INTVAL elements() {
 	PMC* class_array = (PMC*) PMC_data(SELF);
 	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
@@ -70,18 +69,17 @@ pmclass ParrotClass need_ext {
 	return SELF.elements();
     }
 
+    /*
+     * attribute access meths
+     */
+
     INTVAL get_integer_keyed_str (STRING* attr) {
 	PMC* class_array = (PMC*) PMC_data(SELF);
 	PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
 		class_array, PCD_ATTRIBUTES);
-	STRING *class_name = VTABLE_get_string(interpreter,
-		VTABLE_get_pmc_keyed_int(interpreter,
-		    class_array, PCD_CLASS_NAME));
-	STRING *full_attr_name = Parrot_sprintf_c(interpreter, "%S%s%S",
-            class_name, PARROT_NAMESPACE_SEPARATOR, attr);
-	if (VTABLE_exists_keyed_str(interpreter, attr_hash, full_attr_name))
+	if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr))
 	    return VTABLE_get_integer_keyed_str(interpreter,
-		    attr_hash, full_attr_name);
+		    attr_hash, attr);
 	return -1;
     }
 

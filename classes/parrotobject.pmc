@@ -60,4 +60,48 @@ pmclass ParrotObject extends ParrotClass need_ext {
     INTVAL get_integer() {
 	return SELF.elements();
     }
+
+    /*
+     * attribute access
+     */
+
+    INTVAL get_integer_keyed_int (INTVAL idx) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	return VTABLE_get_integer_keyed_int(interpreter, data_array,
+			idx - SELF->cache.int_val);
+    }
+
+    INTVAL get_integer_keyed_str (STRING* attr) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	return SELF.get_integer_keyed_int(idx);
+    }
+
+    INTVAL get_integer_keyed (PMC* attr) {
+	return SELF.get_integer_keyed_str(key_string(interpreter, attr));
+    }
+
+    void set_integer_keyed_int (INTVAL idx, INTVAL value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	VTABLE_set_integer_keyed_int(interpreter, data_array,
+			idx - SELF->cache.int_val, value);
+    }
+
+    void set_integer_keyed_str (STRING* attr, INTVAL value) {
+	PMC* data_array = (PMC*) PMC_data(SELF);
+	PMC *class = VTABLE_get_pmc_keyed_int(interpreter, data_array,
+		POD_CLASS);
+	INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
+	if (idx < 0)
+	    internal_exception(1, "No such attribute");
+	SELF.set_integer_keyed_int(idx, value);
+    }
+
+    void set_integer_keyed (PMC* attr, INTVAL value) {
+	SELF.set_integer_keyed_str(key_string(interpreter, attr), value);
+    }
 }

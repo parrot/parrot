@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 19;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -332,13 +332,13 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "addattrib subclass - get idx");
     newclass P1, "Foo"
     addattrib I1, P1, "foo_i"
-    set I2, P1["Foo\x0foo_i"]
+    set I2, P1["Foo\x00foo_i"]
     eq I1, I2, ok1
     print "not "
 ok1:
     print "ok 1\n"
     addattrib I1, P1, "foo_j"
-    set I2, P1["Foo\x0foo_j"]
+    set I2, P1["Foo\x00foo_j"]
     eq I1, I2, ok2
     print "not "
 ok2:
@@ -346,13 +346,13 @@ ok2:
 
     subclass P2, P1, "Bar"
     addattrib I1, P2, "bar_i"
-    set I2, P2["Bar\x0bar_i"]
+    set I2, P2["Bar\x00bar_i"]
     eq I1, I2, ok3
     print "not "
 ok3:
     print "ok 3\n"
     addattrib I1, P2, "bar_j"
-    set I2, P2["Bar\x0bar_j"]
+    set I2, P2["Bar\x00bar_j"]
     eq I1, I2, ok4
     print "not "
 ok4:
@@ -384,3 +384,73 @@ CODE
 2
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "object attribs 1");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+    addattrib I1, P1, "j"
+
+    find_type I0, "Foo"
+    new P2, I0
+    new P3, I0
+
+    set P2["Foo\x00i"], 10
+    set P3["Foo\x00i"], 20
+    set I2, P2["Foo\x00i"]
+    set I3, P3["Foo\x00i"]
+    print I2
+    print "\n"
+    print I3
+    print "\n"
+    end
+CODE
+10
+20
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "object attribs 2");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+    addattrib I1, P1, "j"
+
+    find_type I0, "Foo"
+    new P2, I0
+    new P3, I0
+
+    set P2["Foo\x00i"], 10
+    set P3["Foo\x00i"], 20
+    set P2["Foo\x00j"], 30
+    set P3["Foo\x00j"], 40
+    set I4, P2["Foo\x00j"]
+    set I5, P3["Foo\x00j"]
+    set I2, P2["Foo\x00i"]
+    set I3, P3["Foo\x00i"]
+    print I2
+    print "\n"
+    print I3
+    print "\n"
+    print I4
+    print "\n"
+    print I5
+    print "\n"
+    end
+    end
+CODE
+10
+20
+30
+40
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "object attribs 3");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+
+    find_type I0, "Foo"
+    new P2, I0
+
+    set P2["Foo\x00no_such"], 10
+    print "never\n"
+    end
+CODE
+/No such attribute/
+OUTPUT
