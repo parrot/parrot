@@ -278,7 +278,8 @@ get_min_buffer_address(struct Parrot_Interp *interpreter)
             start_arena_memory;
 
     for (i = 0; i < interpreter->arena_base->num_sized; i++) {
-        if (interpreter->arena_base->sized_header_pools[i]) {
+        if (interpreter->arena_base->sized_header_pools[i] &&
+            interpreter->arena_base->sized_header_pools[i]->start_arena_memory) {
             if (min > interpreter->arena_base->
                     sized_header_pools[i]->start_arena_memory)
                 min = interpreter->arena_base->sized_header_pools[i]->
