@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 39;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1019,6 +1019,54 @@ a2c
 a2c
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "eq");
+        new P1, .PerlString
+        set P1, "ABC"
+        set S1, "ABC"
+        set S2, "CBA"
+        set S3, "abc"
+        set S4, "ABCD"
+        set S5, "\0"
+        set S6, ""
+
+        eq  P1, S1, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        eq P1, S2, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        eq P1, S3, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+
+        eq P1, S4, BAD4
+        branch OK4
+BAD4:   print "not "
+OK4:    print "ok 4\n"
+
+        eq P1, S5, BAD5
+        branch OK5
+BAD5:   print "not "
+OK5:    print "ok 5\n"
+
+        eq P1, S6, BAD6
+        branch OK6
+BAD6:   print "not "
+OK6:    print "ok 6\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
 output_is( <<'CODE', <<OUTPUT, "eq_str");
         new P1, .PerlString
         new P2, .PerlString
@@ -1052,6 +1100,51 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "ne");
+        new P1, .PerlString
+        set P1, "ABC"
+        set S1, "CBA"
+        set S2, "ABC"
+        set S3, "abc"
+        set S4, "ABCD"
+        set S5, "\0"
+        set S6, ""
+
+        ne  P1, S1, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        ne P1, S2, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        ne  P1, S3, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        ne  P1, S4, OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        ne  P1, S5, OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        ne  P1, S6, OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "ne_str");
