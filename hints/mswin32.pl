@@ -12,6 +12,14 @@
 		$c{platform} = 'win32';
 		$c{cp} = 'copy';
 		$c{slash} = '\\';
+		
+		# Check the output of cl.exe to see if it contains the
+		# string 'Standard' and remove the -O1 option if it does.
+		# This will prevent the 'optimization is not available in the
+		# standard edition compiler' warning each time we compile.
+		# The logo gets printed to STDERR; hence the redirection.
+		my $cc_output = `$c{cc} 2>&1`;
+		$c{ccflags} =~ s/-O1 // if $cc_output =~ m/Standard/;
 	}
 	elsif( $is_mingw ) {
 		$c{ld} = 'gcc';
