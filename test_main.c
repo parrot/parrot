@@ -72,7 +72,12 @@ main(int argc, char **argv) {
             return 1;
         }
         
-        program_code = mmap(0, file_stat.st_size, PROT_READ, MAP_SHARED, fd, 0);
+#ifndef HAS_HEADER_SYSMMAN
+		program_code = mem_sys_allocate(file_stat.st_size);
+		_read(fd, program_code, file_stat.st_size);
+#else
+		program_code = mmap(0, file_stat.st_size, PROT_READ, MAP_SHARED, fd, 0);
+#endif
         if (!program_code) {
             printf("Can't mmap, code %i\n", errno);
             return 1;

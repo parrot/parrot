@@ -5,6 +5,35 @@
 
 use strict;
 use Config;
+use Getopt::Long;
+ 
+my( $opt_debugging, $opt_defaults, $opt_version, $opt_help ) = ( 0, 0, 0, 0 );
+my( %opt_defines );
+my $result = GetOptions( 
+	'debugging!' => \$opt_debugging,
+	'defaults!'  => \$opt_defaults,
+	'version'    => \$opt_version,
+	'help'       => \$opt_help,
+	'define=s'   => \%opt_defines,
+);
+
+if( $opt_version ) {
+	print '$Id$' . "\n";
+	exit;
+}
+
+if( $opt_help ) {
+	print <<"EOT";
+$0 - Parrot Configure
+Options:
+   --debugging          Enable debugging
+   --defaults           Accept all default values
+   --define name=value  Defines value name as value
+   --help               This text
+   --version            Show assembler version
+EOT
+	exit;
+}
 
 my($DDOK)=undef;
 eval {
@@ -21,29 +50,58 @@ Copyright (C) 2001 Yet Another Society
 Since you're running this script, you obviously have
 Perl 5--I'll be pulling some defaults from its configuration.
 
-Rules are the same as Perl 5's Configure--defaults are in 
-square brackets, and you can hit enter to accept them.
+First, I'm gonna check the manifest, to make sure you got a 
+complete Parrot kit.
 END
+
+check_manifest();
 
 #Some versions don't seem to have ivtype or nvtype--provide 
 #defaults for them.
 #XXX Figure out better defaults
 my(%c)=(
-	iv =>		($Config{ivtype}||'long'),
-	nv =>		($Config{nvtype}||'long double'),
-	cc =>		$Config{cc},
-	ccflags =>	$Config{ccflags},
-	libs =>		$Config{libs},
-  	perl =>		$^X,
+	iv =>			($Config{ivtype}||'long'),
+	nv =>			($Config{nvtype}||'double'),
+	cc =>			$Config{cc},
+	#ADD C COMPILER FLAGS HERE
+	ccflags =>		$Config{ccflags}." -I.. -I./include",
+	libs =>			$Config{libs},
+  	perl =>			$^X,
+	cc_debug =>		'-g',
+	o =>			'.o',		# object files extension
+	exe =>			$Config{_exe},
+	ld =>			$Config{ld},
+	ld_out =>		'-o ',		# ld output file
+	ld_debug =>     '',			# include debug info in executable
+	debugging =>	$opt_debugging,
 );
+
+foreach my $i ( keys %opt_defines ) {
+	$c{$i} = $opt_defines{$i};
+}
+
+# set up default values
+my $hints = "hints/" . lc( $^O ) . ".pl";
+if( -f $hints ) {
+	local($/);
+	open HINT, "< $hints" or die "Unable to open hints file '$hints'";
+	my $hint = <HINT>;
+	close HINT;
+	eval $hint or die "Error in hints file $hints: '$@/$!'";
+}
 
 #ask questions
 prompt("What C compiler do you want to use?", 'cc');
+prompt("How about your linker?", 'ld');
 prompt("What flags would you like passed to your C compiler?", 'ccflags');
 prompt("Which libraries would you like your C compiler to include?", 'libs');
 prompt("How big would you like integers to be?", 'iv');
-prompt("How about your floats?", 'nv');
+prompt("And your floats?", 'nv');
 
+unless( $c{debugging} ) {
+	$c{ld_debug} = ' ';
+	$c{cc_denug} = ' ';
+}
 
 print <<"END";
 
@@ -95,6 +153,8 @@ sub defineifdef {
 
 #prompt for something from the user
 sub prompt {
+	return if $opt_defaults;
+
 	my($message, $field)=(@_);
 	my($input);
 	print "$message [$c{$field}] ";
@@ -146,4 +206,37 @@ END
 	open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
 	print OUT $text;
 	close(OUT) or die "Can't close file Parrot/Config.pm: $!";
+}
+
+sub check_manifest {
+	my $not_ok;
+	open(MANIFEST, "MANIFEST");
+
+	while(<MANIFEST>) {
+		chomp;
+		unless(-e $_) {
+			print "File $_ is missing!\n";
+			$not_ok=1;
+		}
+	}
+
+	if($not_ok) {
+		print <<"END";
+
+Ack, some files were missing!  I can't continue running
+without everything here.  Please try to find the above 
+files and then try running Configure again.
+END
+		exit;
+	}
+	else {
+		print <<"END";
+
+Okay, we found everything.  Next you'll need to answer 
+a few questions about your system.  Rules are the same 
+as Perl 5's Configure--defaults are in square brackets, 
+and you can hit enter to accept them.
+
+END
+	}
 }

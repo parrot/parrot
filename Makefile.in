@@ -1,59 +1,75 @@
-O = .o
+O = ${o}
 
 H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpreter.h memory.h parrot.h stacks.h bytecode.h global_setup.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
 
-C_FLAGS = ${ccflags} -I..
+#DO NOT ADD C COMPILER FLAGS HERE
+#Add them in Configure.pl--look for the
+#comment 'ADD C COMPILER FLAGS HERE'
+C_FLAGS = ${ccflags} ${cc_debug}
 
 C_LIBS = ${libs}
 
 
 CC = ${cc} $(C_FLAGS)
+LD = ${ld}
+PERL = ${perl}
+TEST_PROG = test_prog${exe}
 
-all : $(O_FILES)
+all : $(TEST_PROG)
 
+#XXX This target is not portable to Win32
 shared: libparrot.so
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
-test_prog: test_main$(O) $(O_FILES)
-	$(CC) $(C_LIBS) -o test_prog $(O_FILES) test_main$(O)
+$(TEST_PROG): test_main$(O) $(O_FILES)
+	$(LD) $(C_LIBS) ${ld_debug} ${ld_out}$(TEST_PROG) $(O_FILES) test_main$(O)
 
 test_main$(O): $(H_FILES)
+	$(CC) -o $*$(O) -c $*.c
 
 global_setup$(O): $(H_FILES)
+	$(CC) -o $*$(O) -c $*.c
 
 string$(O): $(H_FILES)
-
+	$(CC) -o $*$(O) -c $*.c
+	
 strnative$(O): $(H_FILES)
-
+	$(CC) -o $*$(O) -c $*.c
+	
 interp_guts.h: opcode_table build_interp_starter.pl
-	${perl} build_interp_starter.pl
+	$(PERL) build_interp_starter.pl
 
 interpreter$(O): interpreter.c $(H_FILES) interp_guts.h
 
 memory$(O): $(H_FILES)
+	$(CC) -o $*$(O) -c $*.c
 
 bytecode$(O): $(H_FILES)
-
+	$(CC) -o $*$(O) -c $*.c
+	
 parrot$(O): $(H_FILES)
-
+	$(CC) -o $*$(O) -c $*.c
+	
 register$(O): $(H_FILES)
-
+	$(CC) -o $*$(O) -c $*.c
+	
 basic_opcodes$(O): $(H_FILES) basic_opcodes.c
-
+	$(CC) -o $*$(O) -c $*.c
+	
 basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
-	${perl} process_opfunc.pl basic_opcodes.ops
+	$(PERL) process_opfunc.pl basic_opcodes.ops
 
 op.h: opcode_table make_op_header.pl
-	${perl} make_op_header.pl opcode_table > op.h
+	$(PERL) make_op_header.pl opcode_table > op.h
 
 config.h: Configure.pl config_h.in
-	${perl} Configure.pl
-
-test: test_prog
-	perl t/harness
+	$(PERL) Configure.pl
 
 clean:
-	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog
+	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h $(TEST_PROG)
+
+test:
+	$(PERL) t/harness

@@ -1,12 +1,11 @@
 package Parrot::Opcode;
 
-use 5.6.0;
 use strict;
 use Symbol;
 use Digest::MD5 qw(&md5_hex);
 
-our %opcode;
-our $fingerprint;
+my %opcode;
+my $fingerprint;
 
 sub _load {
     my $file = @_ ? shift : "opcode_table";

@@ -25,8 +25,19 @@
 #include <stdio.h>
 /*#include <types.h> */
 #include <time.h>
-#include <unistd.h>
-#include <sys/mman.h>
+
+#ifdef WIN32
+#	include <io.h>
+#endif
+
+#ifdef HAS_HEADER_UNISTD
+#	include <unistd.h>
+#endif
+
+#ifdef HAS_HEADER_SYSMMAN
+#	include <sys/mman.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
