@@ -14,14 +14,14 @@ Parrot_set_i_i {
         jit_emit_mov_rr(NATIVECODE, MAP[2], MAP[1]);
     }
     else if (MAP[1]) {
-        jit_emit_load_rd_i(NATIVECODE, MAP[1], &INT_REG[2]);
+        jit_emit_mov_rm_i(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2]) {
-        jit_emit_store_rd_i(NATIVECODE, MAP[2], &INT_REG[1]);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], MAP[2]);
     }
     else {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[2]);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
 
@@ -30,8 +30,8 @@ Parrot_set_i_ic {
         jit_emit_load_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else {
-        jit_emit_load_ri_i(NATIVECODE, REG0_v0, *INT_CONST[2]);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_load_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
 
@@ -40,37 +40,37 @@ Parrot_sub_i_i_i {
         jit_emit_sub_rrr(NATIVECODE, MAP[2], MAP[3], MAP[1]);
     }
     else if (MAP[1] && MAP[2]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_sub_rrr(NATIVECODE, MAP[2], REG0_v0, MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_sub_rrr(NATIVECODE, MAP[2], ISR1, MAP[1]);
     }
     else if (MAP[1] && MAP[3]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[2]);
-        jit_emit_sub_rrr(NATIVECODE, REG0_v0, MAP[3], MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]);
+        jit_emit_sub_rrr(NATIVECODE, ISR1, MAP[3], MAP[1]);
     }
     else if (MAP[2] && MAP[3]) {
-        jit_emit_sub_rrr(NATIVECODE, MAP[2], MAP[3], REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_sub_rrr(NATIVECODE, MAP[2], MAP[3], ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else if (MAP[1]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_load_rd_i(NATIVECODE, REG8_t7, &INT_REG[2]);
-        jit_emit_sub_rrr(NATIVECODE, REG8_t7, REG0_v0, MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_sub_rrr(NATIVECODE, ISR2, ISR1, MAP[1]);
     }
     else if (MAP[2]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_sub_rrr(NATIVECODE, MAP[2], REG0_v0, REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_sub_rrr(NATIVECODE, MAP[2], ISR1, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else if (MAP[3]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[2]);
-        jit_emit_sub_rrr(NATIVECODE, REG0_v0, MAP[3], REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]);
+        jit_emit_sub_rrr(NATIVECODE, ISR1, MAP[3], ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_load_rd_i(NATIVECODE, REG8_t7, &INT_REG[2]);
-        jit_emit_sub_rrr(NATIVECODE, REG0_v0, REG8_t7, REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_sub_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
 
@@ -79,37 +79,37 @@ Parrot_add_i_i_i {
         jit_emit_add_rrr(NATIVECODE, MAP[2], MAP[3], MAP[1]);
     }
     else if (MAP[1] && MAP[2]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_add_rrr(NATIVECODE, MAP[2], REG0_v0, MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_add_rrr(NATIVECODE, MAP[2], ISR1, MAP[1]);
     }
     else if (MAP[1] && MAP[3]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[2]);
-        jit_emit_add_rrr(NATIVECODE, REG0_v0, MAP[3], MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]);
+        jit_emit_add_rrr(NATIVECODE, ISR1, MAP[3], MAP[1]);
     }
     else if (MAP[2] && MAP[3]) {
-        jit_emit_add_rrr(NATIVECODE, MAP[2], MAP[3], REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_add_rrr(NATIVECODE, MAP[2], MAP[3], ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else if (MAP[1]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_load_rd_i(NATIVECODE, REG8_t7, &INT_REG[2]);
-        jit_emit_add_rrr(NATIVECODE, REG8_t7, REG0_v0, MAP[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_add_rrr(NATIVECODE, ISR2, ISR1, MAP[1]);
     }
     else if (MAP[2]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_add_rrr(NATIVECODE, MAP[2], REG0_v0, REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_add_rrr(NATIVECODE, MAP[2], ISR1, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else if (MAP[3]) {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[2]);
-        jit_emit_add_rrr(NATIVECODE, REG0_v0, MAP[3], REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[2]);
+        jit_emit_add_rrr(NATIVECODE, ISR1, MAP[3], ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
     else {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[3]);
-        jit_emit_load_rd_i(NATIVECODE, REG8_t7, &INT_REG[2]);
-        jit_emit_add_rrr(NATIVECODE, REG0_v0, REG8_t7, REG0_v0);
-        jit_emit_store_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_add_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
 
@@ -118,8 +118,8 @@ Parrot_if_i_ic {
         emit_bne(NATIVECODE, MAP[1], *INT_CONST[2]);
     }
     else {
-        jit_emit_load_rd_i(NATIVECODE, REG0_v0, &INT_REG[1]);
-        emit_bne(NATIVECODE, REG0_v0, *INT_CONST[2]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]);
+        emit_bne(NATIVECODE, ISR1, *INT_CONST[2]);
     }
 }
 

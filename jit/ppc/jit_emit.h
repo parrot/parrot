@@ -85,6 +85,13 @@ typedef enum {
 
 #if JIT_EMIT
 
+/* Scratch registers. */
+
+#define ISR1 r12
+#define ISR2 r11
+#define FSR1 f12
+#define FSR2 f11
+
 enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 #define emit_op(op) (op << 2)
@@ -102,7 +109,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +-----------------------------------+
  * 0    5 6                     29 30 31
  * */
-#define jit_emit_mr(pc, dst, src) \
+#define jit_emit_mov_rr(pc, dst, src) \
   *(pc++) = emit_op(31) | emit_r3(src); \
   *(pc++) = (char)(emit_l5(src) | dst); \
   *(pc++) = (char)(0x3 | src * 8); \
@@ -387,11 +394,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
 /* Load a CPU register from a Parrot register. */
 
-#define jit_emit_load_rd_i(pc, reg, addr) \
+#define jit_emit_mov_rm_i(pc, reg, addr) \
   jit_emit_lwz(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
-#define jit_emit_load_rd_n(pc, reg, addr) \
+#define jit_emit_mov_rm_n(pc, reg, addr) \
   jit_emit_lfd(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
@@ -524,11 +531,11 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 /* Store a CPU register back to a Parrot register. */
 
-#define jit_emit_store_rd_i(pc, reg, addr) \
+#define jit_emit_mov_mr_i(pc, addr, reg) \
   jit_emit_stw(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
-#define jit_emit_fstore_rd_n(pc, reg, addr) \
+#define jit_emit_mov_mr_n(pc, addr, reg) \
   jit_emit_stfd(pc, reg, (((char *)addr) - \
     ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
@@ -537,7 +544,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
  * 0x8000 we clear the higher 16 bits.  If the immediate only uses the
  * lower 16 bits, the third instruction is not necessary.
  */
-#define jit_emit_load_ri_i(pc, D, imm) \
+#define jit_emit_mov_ri_i(pc, D, imm) \
   jit_emit_add_rri_i(pc, D, 0, (long)imm & 0xffff); \
   if (((long)imm & 0xffff) > 0x8000) { \
     jit_emit_andil(pc, D, D, 0xffff); } \
@@ -552,9 +559,9 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 /*    jit_emit_stmw(jit_info->native_ptr, r30, -8, r1); */
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
     jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
-    jit_emit_mr(jit_info->native_ptr, r13, r3);
-    jit_emit_load_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
-    jit_emit_load_ri_i(jit_info->native_ptr, r15, interpreter->code->byte_code);
+    jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
+    jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
+    jit_emit_mov_ri_i(jit_info->native_ptr, r15, interpreter->code->byte_code);
     /* TODO jit_emit restart code s. i386 */
 }
 
@@ -562,8 +569,8 @@ void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-    jit_emit_load_ri_i(jit_info->native_ptr, r3, jit_info->cur_op);
-    jit_emit_mr(jit_info->native_ptr, r4, r13);
+    jit_emit_mov_ri_i(jit_info->native_ptr, r3, jit_info->cur_op);
+    jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
     Parrot_jit_newfixup(jit_info);
 
@@ -645,7 +652,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN) {
-            jit_emit_load_rd_i(jit_info->native_ptr, jit_info->intval_map[i],
+            jit_emit_mov_rm_i(jit_info->native_ptr, jit_info->intval_map[i],
                 &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
         }
 
@@ -653,7 +660,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
     while (i--)
       if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
         PARROT_ARGDIR_IN) {
-            jit_emit_load_rd_n(jit_info->native_ptr, jit_info->floatval_map[i],
+            jit_emit_mov_rm_n(jit_info->native_ptr, jit_info->floatval_map[i],
               &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
       }
 
@@ -674,16 +681,18 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT) {
-            jit_emit_store_rd_i(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]],
+                    jit_info->intval_map[i]);
         }
 
     i = cur_se->float_registers_used;
     while (i--)
       if (cur_se->float_reg_dir[cur_se->float_reg_usage[i]] &
         PARROT_ARGDIR_OUT) {
-            jit_emit_fstore_rd_n(jit_info->native_ptr, jit_info->floatval_map[i],
-              &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]]);
+            jit_emit_mov_mr_n(jit_info->native_ptr,
+              &interpreter->ctx.num_reg.registers[cur_se->float_reg_usage[i]],
+                jit_info->floatval_map[i]);
       }
 }
 

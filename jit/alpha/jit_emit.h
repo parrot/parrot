@@ -126,6 +126,11 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 
 #define base_reg REG9_s0
 
+/* Scratch registers. */
+
+#define ISR1 REG0_v0
+#define ISR2 REG8_t7
+
 /* Load / Store a Parrot register.
  *
  * Perform a memory operation using a Parrot register as the source or 
@@ -143,7 +148,7 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 #define emit_lda_b(pc, Ra, addr, Rb) \
   emit_mem(pc, LDA, Ra, Rb, addr) 
 
-#define jit_emit_load_rd_i(pc, Ra, addr) \
+#define jit_emit_mov_rm_i(pc, Ra, addr) \
   emit_l_s_r(pc, LDQ, Ra, base_reg, addr) 
 
 #define emit_lda(pc, Ra, addr) \
@@ -155,7 +160,7 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 #define emit_stq_b(pc, Ra, addr, Rb) \
   emit_mem(pc, STQ, Ra, Rb, addr) 
 
-#define jit_emit_store_rd_i(pc, Ra, addr) \
+#define jit_emit_mov_mr_i(pc, addr, Ra) \
   emit_l_s_r(pc, STQ, Ra, base_reg, addr) 
 
 /* Branch instruction format
@@ -460,9 +465,9 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 {
     Parrot_jit_normal_op(jit_info,interpreter);
 
-    jit_emit_sub_rrr(jit_info->native_ptr, REG0_v0, REG10_s1, REG0_v0); 
-    jit_emit_add_rrr(jit_info->native_ptr, REG0_v0, REG11_s2, REG0_v0);
-    emit_ldq_b(jit_info->native_ptr, REG0_v0, 0, REG0_v0);
+    jit_emit_sub_rrr(jit_info->native_ptr, SR1, REG10_s1, SR1); 
+    jit_emit_add_rrr(jit_info->native_ptr, SR1, REG11_s2, SR1);
+    emit_ldq_b(jit_info->native_ptr, SR1, 0, SR1);
     /* XXX this is incorrect, might blow the stack, use jmp instead */
     emit_jsr(jit_info->native_ptr);
 } 
@@ -476,7 +481,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN) {
-            jit_emit_load_rd_i(jit_info->native_ptr, jit_info->intval_map[i],
+            jit_emit_mov_rm_i(jit_info->native_ptr, jit_info->intval_map[i],
                 &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
         }
 
@@ -497,8 +502,9 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 
     while (i--)
         if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT) {
-            jit_emit_store_rd_i(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+            jit_emit_mov_mr_i(jit_info->native_ptr,
+                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]],
+                    jit_info->intval_map[i]);
         }
 }
 

@@ -23,6 +23,11 @@
 
 #if JIT_EMIT
 
+/* Scratch register. */
+
+#define ISR1 emit_EAX
+
+
 #define emit_b00 0
 #define emit_b01 1
 #define emit_b10 2
