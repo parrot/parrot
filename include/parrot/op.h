@@ -35,7 +35,7 @@ typedef enum {
     PARROT_ARG_N,
     PARROT_ARG_P,
     PARROT_ARG_S,
-    PARROT_ARG_K,
+    PARROT_ARG_K
 } arg_type_t;
 
 typedef enum {
