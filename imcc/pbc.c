@@ -488,6 +488,10 @@ fixup_bsrs(Interp *interpreter)
                         fatal(1, "fixup_bsrs", "couldn't find sub 1 '%s'\n",
                                 bsr->name);
                     }
+                    /*
+                     * TODO investigate namespace issues - probably
+                     *      search only current segment
+                     */
                     fe = PackFile_find_fixup_entry(interpreter, enum_fixup_sub,
                             bsr->name);
                     if (!fe) {
