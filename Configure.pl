@@ -6,9 +6,10 @@
 use strict;
 use Config;
 use Getopt::Long;
+use ExtUtils::Manifest qw(manicheck);
  
-my( $opt_debugging, $opt_defaults, $opt_version, $opt_help ) = ( 0, 0, 0, 0 );
-my( %opt_defines );
+my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
+my(%opt_defines);
 my $result = GetOptions( 
 	'debugging!' => \$opt_debugging,
 	'defaults!'  => \$opt_defaults,
@@ -17,12 +18,12 @@ my $result = GetOptions(
 	'define=s'   => \%opt_defines,
 );
 
-if( $opt_version ) {
+if($opt_version) {
 	print '$Id$' . "\n";
 	exit;
 }
 
-if( $opt_help ) {
+if($opt_help) {
 	print <<"EOT";
 $0 - Parrot Configure
 Options:
@@ -54,39 +55,43 @@ First, I'm gonna check the manifest, to make sure you got a
 complete Parrot kit.
 END
 
-#check_manifest();
+check_manifest();
 
 #Some versions don't seem to have ivtype or nvtype--provide 
 #defaults for them.
 #XXX Figure out better defaults
 my(%c)=(
 	iv =>			($Config{ivtype}   ||'long'),
-        ivsize =>               ($Config{ivsize}   || 4 ),
-        longsize =>             ($Config{longsize} || 4 ),
+	ivsize =>       undef,
+    
 	nv =>			($Config{nvtype}   ||'double'),
-        nvsize =>               ($Config{nvsize}   || 8 ),
-        opcode_t =>             ($Config{ivtype}   ||'long'),
+	nvsize =>       undef,
+
+	opcode_t =>		($Config{ivtype}   ||'long'),
+	longsize =>		undef,
+    
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
 	ccflags =>		$Config{ccflags}." -I./include",
 	libs =>			$Config{libs},
-  	perl =>			$^X,
 	cc_debug =>		'-g',
 	o =>			'.o',		# object files extension
 	exe =>			$Config{_exe},
+
 	ld =>			$Config{ld},
 	ld_out =>		'-o ',		# ld output file
 	ld_debug =>     '',			# include debug info in executable
+
+  	perl =>			$^X,
 	debugging =>	$opt_debugging,
 );
 
-foreach my $i ( keys %opt_defines ) {
-	$c{$i} = $opt_defines{$i};
-}
+#copy the things from --define foo=bar
+@c{keys %opt_defines}=@opt_defines{keys %opt_defines};
 
 # set up default values
-my $hints = "hints/" . lc( $^O ) . ".pl";
-if( -f $hints ) {
+my $hints = "hints/" . lc($^O) . ".pl";
+if(-f $hints) {
 	local($/);
 	open HINT, "< $hints" or die "Unable to open hints file '$hints'";
 	my $hint = <HINT>;
@@ -120,6 +125,17 @@ foreach(grep {/^i_/} keys %Config) {
 	$c{$_}=$Config{$_};
 	$c{headers}.=defineifdef((/^i_(.*)$/));
 }
+
+print <<"END";
+
+Alright, now I'm gonna check some stuff by compiling and running
+a small C program.  This could take a bit...
+END
+
+buildfile("test_c");
+system("$c{cc} $c{ccflags} -o test$c{exe} test.c") and die "C compiler died!";
+(@c{qw(ivsize opsize nvsize)})=split('/', `test$c{exe}`);
+unlink('test.c', "test$c{exe}");
 
 print <<"END";
 
@@ -208,36 +224,29 @@ END
 
 	$text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
 
-	mkdir("Parrot", 0777) or ( $! =~ /File exists/i or die "Can't make directory ./Parrot: $!");
 	open(OUT, ">Parrot/Config.pm") or die "Can't open file Parrot/Config.pm: $!";
 	print OUT $text;
 	close(OUT) or die "Can't close file Parrot/Config.pm: $!";
 }
 
 sub check_manifest {
-	my $not_ok;
-	open(MANIFEST, "MANIFEST");
+	print "\n";
 
-	while(<MANIFEST>) {
-		chomp;
-		unless(-e $_) {
-			print "File $_ is missing!\n";
-			$not_ok=1;
-		}
-	}
+	my(@missing)=manicheck();
 
-	if($not_ok) {
+	if(@missing) {
 		print <<"END";
 
 Ack, some files were missing!  I can't continue running
 without everything here.  Please try to find the above 
 files and then try running Configure again.
+
 END
+
 		exit;
 	}
 	else {
 		print <<"END";
-
 Okay, we found everything.  Next you'll need to answer 
 a few questions about your system.  Rules are the same 
 as Perl 5's Configure--defaults are in square brackets, 
