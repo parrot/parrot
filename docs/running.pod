@@ -28,12 +28,12 @@ file on disk, use the C<-o> flag:
 This creates a bytecode file called C<foo.pbc>, but does not execute it.
 
 Any command line arguments from the filename on (i.e. the rest of
-C<argv>) are passed into the program in PMC register P0.  For the
-invocation:
+C<argv>) are placed into an SArray PMC which is passed into the program 
+in PMC register P0.  For the invocation:
 
   parrot foo.pbc --foo_arg process_me.foo
 
-P0 would have three string elements: C<foo.pbc>, C<--foo_arg>, and
+the PMC in P0 would have three string elements: C<foo.pbc>, C<--foo_arg>, and
 C<process_me.foo>.
 
 C<parrot> has four different opcode dispatchers: normal, computed
