@@ -1,9 +1,7 @@
 #! perl -w
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 30;
 use Test::More;
-use Parrot::PMC qw(%pmc_types);
-my $max_pmc = scalar(keys(%pmc_types)) + 1;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -49,6 +47,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 ENDOFMACRO
 
 
+# PerlInt and PerlNum will be used as example PMCs
 output_is(<<'CODE', <<'OUTPUT', "availability of PerlInt");
 	print "starting\n"
 	new P0, .PerlInt
@@ -70,7 +69,82 @@ ending
 OUTPUT
 
 #
-# INTVAL and INTVAL tests
+# Operations on a single INTVAL 
+#
+output_is(<<'CODE', <<OUTPUT, "take the negative of a native integer");
+	set I0, 0
+	neg I0
+	print I0
+	print "\n"
+	set I0, 1234567890
+	neg I0
+	print I0
+	print "\n"
+	set I0, -1234567890
+	neg I0
+	print I0
+	print "\n"
+	set I0, 0
+	set I1, 0
+	neg I1, I0
+	print I1
+	print "\n"
+	set I0, 1234567890
+	neg I1, I0
+	print I1
+	print "\n"
+	set I0, -1234567890
+	neg I1, I0
+	print I1
+	print "\n"
+ 	end
+CODE
+0
+-1234567890
+1234567890
+0
+-1234567890
+1234567890
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "take the absolute of a native integer");
+	set I0, 0
+	abs I0
+	print I0
+	print "\n"
+	set I0, 1234567890
+	abs I0
+	print I0
+	print "\n"
+	set I0, -1234567890
+	abs I0
+	print I0
+	print "\n"
+	set I0, 0
+	set I1, 0
+	abs I1, I0
+	print I1
+	print "\n"
+	set I0, 1234567890
+	abs I1, I0
+	print I1
+	print "\n"
+	set I0, -1234567890
+	abs I1, I0
+	print I1
+	print "\n"
+	end
+CODE
+0
+1234567890
+1234567890
+0
+1234567890
+1234567890
+OUTPUT
+
+#
+# first arg is INTVAL, second arg is INTVAL 
 #
 output_is(<<'CODE', <<OUTPUT, "add native integer to native integer");
 	set I0, 4000
@@ -132,6 +206,104 @@ CODE
 -32
 OUTPUT
 
+#
+# Operations on a single NUMVAL 
+#
+output_is(<<'CODE', <<OUTPUT, "turn a native number into it's negative");
+	set N0, 0
+	neg N0
+	print N0
+	print "\n"
+	set N0, -0.0
+	neg N0
+	print N0
+	print "\n"
+	set N0, 123.4567890
+	neg N0
+	print N0
+	print "\n"
+	set N0, -123.4567890
+	neg N0
+	print N0
+	print "\n"
+	set N0, 0
+	set N1, 1
+	neg N1, N0
+	print N1
+	print "\n"
+	set N0, -0.0
+	neg N1, N0
+	print N1
+	print "\n"
+	set N0, 123.4567890
+	neg N1, N0
+	print N1
+	print "\n"
+	set N0, -123.4567890
+	neg N1, N0
+	print N1
+	print "\n"
+	end
+CODE
+0.000000
+0.000000
+-123.456789
+123.456789
+0.000000
+0.000000
+-123.456789
+123.456789
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "take the absolute of a native number");
+	set N0, 0
+	abs N0
+	print N0
+	print "\n"
+	set N0, -0.0
+	abs N0
+	print N0
+	print "\n"
+	set N0, 123.45678901
+	abs N0
+	print N0
+	print "\n"
+	set N0, -123.45678901
+	abs N0
+	print N0
+	print "\n"
+	set N0, 0
+	set N1, 1
+	abs N1, N0
+	print N1
+	print "\n"
+	set N0, 0.0
+	set N1, 1
+	abs N1, N0
+	print N1
+	print "\n"
+	set N0, 123.45678901
+	set N1, 1
+	abs N1, N0
+	print N1
+	print "\n"
+	set N0, -123.45678901
+	set N1, 1
+	abs N1, N0
+	print N1
+	print "\n"
+	end
+CODE
+0.000000
+0.000000
+123.456789
+123.456789
+0.000000
+0.000000
+123.456789
+123.456789
+OUTPUT
+ 
 #
 # FLOATVAL and INTVAL tests
 #

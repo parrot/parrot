@@ -1226,6 +1226,12 @@ constants into their destination register, $1.
 
 ########################################
 
+=item B<abs>(inout INT)
+
+=item B<abs>(inout NUM)
+
+Set $1 to it's absolute value.
+
 =item B<abs>(out INT, in INT)
 
 =item B<abs>(out INT, in NUM)
@@ -1237,6 +1243,16 @@ constants into their destination register, $1.
 Set $1 to absolute value of $2.
 
 =cut
+
+inline op abs( inout INT) {
+  $1 = abs( $1 );
+  goto NEXT();
+}
+
+inline op abs(inout NUM) {
+  $1 = fabs( $1 );
+  goto NEXT();
+}
 
 inline op abs(out INT, in INT) {
   if ($2 < 0) {
@@ -1814,30 +1830,22 @@ Set $1 to the negative of $2.
 =cut
 
 inline op neg(inout INT) {
-  if($1) {
-	  $1 = -($1);
-  }
+  $1 = 0 - $1;
   goto NEXT();
 }
 
 inline op neg(inout NUM) {
-  if($1 == 0.0)
-    goto NEXT();
-  $1 = -($1);
+  $1 = 0.0 - $1;
   goto NEXT();
 }
 
 inline op neg(out INT, in INT) {
-  if($2) {
-  	$1 = -($2);
-  }
+  $1 = 0 - $2;
   goto NEXT();
 }
 
 inline op neg(out NUM, in NUM) {
-  if($2 == 0.0)
-    goto NEXT();
-  $1 = -($2);
+  $1 = 0.0 - $2;
   goto NEXT();
 }
 
