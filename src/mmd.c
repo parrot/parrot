@@ -41,6 +41,7 @@ not highest type in table.
 */
 
 #include "parrot/parrot.h"
+#include "mmd.str"
 #include <assert.h>
 
 typedef void    (*mmd_f_v_ppp)(Interp *, PMC *, PMC *, PMC *);
@@ -657,13 +658,309 @@ mmd_vtfind(Parrot_Interp interpreter, INTVAL function, INTVAL left, INTVAL right
     return f;
 }
 
+
+static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args);
+static PMC* mmd_arg_tuple_func(Interp *, STRING *signature, va_list args);
+static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple);
+static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple);
+static int  mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static int  mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static int  mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+static int  mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
+
+/*
+
+=item C<PMC *Parrot_MMD_search_default_inline(Interp *, STRING *meth, STRING *signature, ...)>
+
+Default implementation of MMD lookup. The singature contains the letters
+"INSP" for the argument types. B<PMC> arguments are given in the function call.
+
+=item C<PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature)>
+
+Default implementation of MMD lookup. The singature contains the letters
+"INSP" for the argument types. B<PMC> arguments are taken from registers
+C<P5> and up according to calling conventions.
+
+=cut
+
+*/
+
+/*
+ * TODO move to header, when API is sane
+ */
+
+PMC *
+Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
+        STRING *signature, ...);
+
+PMC *
+Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
+        STRING *signature, ...)
+{
+    va_list args;
+    PMC* arg_tuple;
+    /*
+     * 1) create argument tuple
+     */
+    va_start(args, signature);
+    arg_tuple = mmd_arg_tuple_inline(interpreter, signature, args);
+    va_end(args);
+
+    return mmd_search_default(interpreter, meth, arg_tuple);
+}
+
+/*
+
+=item C<
+static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args)>
+
+Return a list of argument types. PMC arguments are specifiec as function
+arguments.
+
+=cut
+
+*/
+
+static PMC*
+mmd_arg_tuple_inline(Interp *interpreter, STRING *signature, va_list args)
+{
+    INTVAL sig_len, i, type;
+    PMC* arg_tuple, *arg;
+
+    arg_tuple = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    sig_len = string_length(interpreter, signature);
+    if (!sig_len)
+        return arg_tuple;
+    for (i = 0; i < sig_len; ++i) {
+        type = string_index(interpreter, signature, i);
+        switch (type) {
+            case 'I':
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_INTVAL);
+                break;
+            case 'N':
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_FLOATVAL);
+                break;
+            case 'S':
+                VTABLE_push_integer(interpreter, arg_tuple, enum_type_STRING);
+                break;
+            case 'P':
+                arg = va_arg(args, PMC *);
+                type = VTABLE_type(interpreter, arg);
+                VTABLE_push_integer(interpreter, arg_tuple, type);
+                break;
+            default:
+                internal_exception(1,
+                        "Unknown signature type %d in mmd_arg_tuple", type);
+                break;
+        }
+
+    }
+    return arg_tuple;
+}
+
+/*
+
+=item C<static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple)>
+
+Default implementation of MMD search. Search scopes for candidates, walk the
+class hierarchy, sort all candidates by their manhattan distance, and return
+result
+
+=cut
+
+*/
+
+static PMC*
+mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
+{
+    PMC *candidate_list;
+
+    candidate_list = mmd_search_scopes(interpreter, meth, arg_tuple);
+    return NULL;
+}
+
+/*
+
+=item C<static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple)>
+
+Search all scopes for MMD candidates matching the arguments given in
+C<arg_tuple>.
+
+=cut
+
+*/
+
+static PMC*
+mmd_search_scopes(Interp *interpreter, STRING *meth, PMC *arg_tuple)
+{
+    PMC *candidate_list;
+    int stop;
+
+    candidate_list = pmc_new(interpreter, enum_class_ResizablePMCArray);
+    stop = mmd_search_lexical(interpreter, meth, arg_tuple, candidate_list);
+    if (stop)
+        return candidate_list;
+    mmd_search_package(interpreter, meth, arg_tuple, candidate_list);
+    if (stop)
+        return candidate_list;
+    mmd_search_global(interpreter, meth, arg_tuple, candidate_list);
+    if (stop)
+        return candidate_list;
+    mmd_search_builtin(interpreter, meth, arg_tuple, candidate_list);
+    return candidate_list;
+}
+
+/*
+
+=item C<static int mmd_is_hidden(Interp *, PMC *multi, PMC *cl)>
+
+Check if the given multi sub is hidden by any inner multi sub (already in
+the candidate list C<cl>.
+
+=cut
+
+*/
+
+static int
+mmd_is_hidden(Interp *interpreter, PMC *multi, PMC *cl)
+{
+    /*
+     * if the candidate list already has the a sub with the same
+     * signature (long name), the outer multi is hidden
+     *
+     * TODO
+     */
+    return 0;
+}
+
+/*
+
+=item C<static int mmd_maybe_candidate(Interp *, PMC *pmc, PMC *arg_tuple, PMC *cl)>
+
+If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
+return TRUE to stop further search.
+
+If the candidate is a MultiSub remember all matching Subs and return FALSE
+to continue searching outer scopes.
+
+*/
+
+static int
+mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
+{
+    STRING *_sub, *_multi_sub;
+    INTVAL i, n;
+
+    _sub = CONST_STRING(interpreter, "Sub");
+    _multi_sub = CONST_STRING(interpreter, "Multi_Sub");
+
+    if (VTABLE_isa(interpreter, pmc, _sub)) {
+        /* a plain sub stops outer searches */
+        /* TODO check arity of sub */
+        VTABLE_push_pmc(interpreter, cl, pmc);
+        return 1;
+    }
+    if (!VTABLE_isa(interpreter, pmc, _multi_sub)) {
+        /* not a Sub or MultiSub - ignore */
+        return 0;
+    }
+    /*
+     * ok we have a multi sub pmc, which is an array of candidates
+     */
+    n = VTABLE_elements(interpreter, pmc);
+    for (i = 0; i < n; ++i) {
+        PMC *multi_sub;
+
+        multi_sub = VTABLE_get_pmc_keyed_int(interpreter, pmc, i);
+        if (!mmd_is_hidden(interpreter, multi_sub, cl))
+            VTABLE_push_pmc(interpreter, cl, multi_sub);
+    }
+    return 0;
+}
+
+/*
+
+=item C<static int mmd_search_lexical(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+
+Search the current lexical pad for matching candidates. Return TRUE if the
+MMD search should stop.
+
+*/
+
+static int
+mmd_search_lexical(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+{
+    PMC *pad = scratchpad_get_current(interpreter);
+    PMC *pmc;
+    INTVAL depth, i;
+
+    if (!pad)
+        return 0;
+    depth = PMC_int_val(pad);
+    for (i = -1; depth; --i, --depth) {
+        pmc = scratchpad_get_by_name(interpreter, pad, i, meth);
+        if (pmc) {
+            if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+/*
+
+=item C<static int mmd_search_package(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+
+Search the current package namespace for matching candidates. Return TRUE if
+the MMD search should stop.
+
+*/
+
+static int
+mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+{
+    return 0;
+}
+
+/*
+
+=item C<static int mmd_search_global(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+
+Search the global namespace for matching candidates. Return TRUE if
+the MMD search should stop.
+
+*/
+
+static int
+mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+{
+    return 0;
+}
+
+/*
+
+=item C<static int mmd_search_builtin(Interp *, STRING *meth, PMC *arg_tuple, PMC *cl)>
+
+Search the builtin namespace for matching candidates. Return TRUE if
+the MMD search should stop.
+
+*/
+
+static int
+mmd_search_builtin(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
+{
+    return 0;
+}
+
 /*
 
 =back
 
 =head1 SEE ALSO
 
-F<include/parrot/mmd.h>.
+F<include/parrot/mmd.h>,
+F<$perl6/doc/trunk/design/apo/A12.pod>,
+F<$perl6/doc/trunk/design/syn/S12.pod>
 
 =cut
 

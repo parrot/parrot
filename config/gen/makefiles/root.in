@@ -36,7 +36,7 @@ BUILD_TOOLS_DIR = build_tools
 
 # current directory
 CUR_DIR         = .
- 
+
 # directory for the intermediate code compiler
 IMCC_DIR        = imcc
 
@@ -499,6 +499,7 @@ STR_FILES = \
     $(SRC_DIR)/inter_misc.str \
     $(SRC_DIR)/global.str \
     $(SRC_DIR)/library.str \
+    $(SRC_DIR)/mmd.str \
     $(SRC_DIR)/pmc.str \
     $(SRC_DIR)/py_func.str \
     $(SRC_DIR)/objects.str \
@@ -720,7 +721,7 @@ $(SRC_DIR)/parrot_config.h : $(BUILD_TOOLS_DIR)/parrot_config_c.pl config_lib.pa
 #
 ###############################################################################
 
-examples-clean: hello-clean 
+examples-clean: hello-clean
 
 # hello
 hello:	test_prep examples/assembly/hello$(EXE)
@@ -859,7 +860,7 @@ $(SRC_DIR)/memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
 
 $(SRC_DIR)/mmd_fallback$(O) : $(GENERAL_H_FILES)
 
@@ -1090,7 +1091,7 @@ test : test_prep
 
 # Test various run cores and other stuff
 # 'testC', 'testg' and 'testj' are tested only,
-# when the needed runcores are available 
+# when the needed runcores are available
 fulltest : testb \
 #CONDITIONED_LINE(cg_flag):  testC \
   testf \
@@ -1099,7 +1100,7 @@ fulltest : testb \
   testr \
   testS \
   src_tests \
-  testbench 
+  testbench
 
 # bounds checking, slow core
 testb : test_prep
@@ -1130,7 +1131,7 @@ testS : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) -S $(TEST_FILES)
 
 # test the EXEC stuff
-testexec: test_prep 
+testexec: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(PARROT_ARGS) --run-exec $(TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
@@ -1156,7 +1157,7 @@ test_imcc :
 
 # Run IMCC tests with various command line options
 fulltest_imcc : testb_imcc testC_imcc testf_imcc testg_imcc \
-    testj_imcc testr_imcc testS_imcc testexec_imcc 
+    testj_imcc testr_imcc testS_imcc testexec_imcc
 
 # slow core, bounds checking
 testb_imcc : test_prep
@@ -1410,5 +1411,5 @@ tags.dummy:
 
 # test the EXEC stuff
 
-testexec: hello 
+testexec: hello
 
