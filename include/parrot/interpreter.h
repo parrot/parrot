@@ -268,9 +268,6 @@ typedef struct Parrot_Interp {
                                            when we've seen all impatient PMCs */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
-    struct MMD_table *bytecode_binop_mmd_funcs; /* table of bytecode
-                                                   MMD function
-                                                   pointers */
     PMC** nci_method_table;     /* Method table PMC for NCI stubs per class */
     struct _Caches * caches;            /* s. caches.h */
     STRING **const_cstring_table;       /* CONST_STRING(x) items */
