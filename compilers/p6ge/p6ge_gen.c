@@ -23,10 +23,12 @@ that can execute the rule on a string.
 #include <stdarg.h>
 #include <stdlib.h>
 
+
 static char* p6ge_cbuf = 0;
 static int p6ge_cbuf_size = 0;
 static int p6ge_cbuf_len = 0;
 static int p6ge_cbuf_lcount = 0;
+static int p6ge_istraced = 0;
 
 static void p6ge_gen_exp(P6GE_Exp* e, const char* succ);
 
@@ -92,6 +94,7 @@ str_con(const unsigned char* s, int len)
         switch (s[i]) {
             case '\\': *(t++) = '\\'; *(t++) = '\\'; break;
             case '"' : *(t++) = '\\'; *(t++) = '"'; break;
+            case '\'' : *(t++) = '\\'; *(t++) = '\''; break;
             case '\n': *(t++) = '\\'; *(t++) = 'n'; break;
             case '\r': *(t++) = '\\'; *(t++) = 'r'; break;
             case '\t': *(t++) = '\\'; *(t++) = 't'; break;
@@ -105,26 +108,39 @@ str_con(const unsigned char* s, int len)
 }
 
 
+/* return a quantifier as a string */
+static char*
+fmt_quant(P6GE_Exp* e)
+{
+    static char q[26];
+    char c = (e->isgreedy) ? ' ' : '?';
+
+    if (e->max == P6GE_INF) sprintf(q, "<%d...>%c", e->min, c);
+    else if (e->max != e->min) sprintf(q, "<%d..%d>%c", e->min, e->max, c);
+    else sprintf(q, "<%d>%c", e->min, c);
+    return q;
+}
+
+
 static void
 trace(const char* fmt, ...)
 {
-    char s[128];
+    static char s[80];
     va_list ap;
 
     va_start(ap, fmt);
-    vsprintf(s, fmt, ap);
+    vsnprintf(s, sizeof(s), fmt, ap);
     va_end(ap);
-    emit("    print %s\n", str_con(s, strlen(s)));
-    emit("    print \" at \"\n");
-    emit("    print pos\n");
-    emit("    print \"\\n\"\n");
+    emit("    # %s\n", s);
+    if (p6ge_istraced) emit("    .trace(pos, '%s')\n", s);
 }
 
- 
+
 static void
 p6ge_gen_pattern_end(P6GE_Exp* e, const char* succ)
 {
-    emit("R%d:                               # end of pattern\n", e->id);
+    trace("eop");
+
     emit("    .yield(pos)\n");
     emit("    goto fail\n");
 }
@@ -133,8 +149,8 @@ p6ge_gen_pattern_end(P6GE_Exp* e, const char* succ)
 static void
 p6ge_gen_dot(P6GE_Exp* e, const char* succ)
 {
-    emit("R%d:                               # dot {%d..%d}%c\n", 
-         e->id, e->min, e->max, (e->isgreedy) ? ' ' : '?');
+    trace("dot %s", fmt_quant(e));
+
     emit("    maxrep = length target\n");
     emit("    maxrep -= pos\n");
     if (e->max != P6GE_INF) {
@@ -170,9 +186,7 @@ p6ge_gen_dot(P6GE_Exp* e, const char* succ)
 static void
 p6ge_gen_literal(P6GE_Exp* e, const char* succ)
 {
-    emit("R%d:                               # %.16s {%d..%d}%c\n", 
-         e->id, str_con(e->name, e->nlen), e->min, e->max, 
-         (e->isgreedy) ? ' ' : '?');
+    trace("%.16s %s", str_con(e->name, e->nlen), fmt_quant(e));
 
     if (e->min==1 && e->max==1) {
         emit("    substr $S0, target, pos, %d\n", e->nlen);
@@ -225,9 +239,8 @@ static void
 p6ge_gen_concat(P6GE_Exp* e, const char* succ)
 {
     char succ2[20];
-    
-    emit("R%d:                               # concat R%d, R%d\n", 
-         e->id, e->exp1->id, e->exp2->id);
+  
+    emit("    #concat R%d, R%d\n", e->exp1->id, e->exp2->id); 
     sprintf(succ2,"R%d",e->exp2->id);
     p6ge_gen_exp(e->exp1, succ2);
     p6ge_gen_exp(e->exp2, succ);
@@ -250,12 +263,11 @@ p6ge_gen_group(P6GE_Exp* e, const char* succ)
     sprintf(r1sub, "R%d", e->exp1->id);
     sprintf(key,"\"%d\"", e->group);
 
-    emit("R%d:                               # group %s %c R%d %c {%d..%d}%c\n",
-         e->id, key, c1, e->exp1->id, c2, 
-         e->min, e->max, (e->isgreedy) ? ' ' : '?');
+    trace("group %s %c %s %c %s", key, c1, r1sub, c2, fmt_quant(e));
+
     /* for unquantified, non-capturing groups, don't bother with the
        group code */
-    if (e->min==1 && e->max==1 && e->group<0) {
+    if (e->min == 1 && e->max == 1 && e->group < 0) {
         p6ge_gen_exp(e->exp1, succ);
         return;
     }
@@ -354,9 +366,9 @@ p6ge_gen_alt(P6GE_Exp* e, const char* succ)
 {
     char r1sub[32];
 
-    sprintf(r1sub,"R%d", e->exp1->id);
-    emit("R%d:                               # alt R%d | R%d\n", 
-         e->id, e->exp1->id, e->exp2->id);
+    trace("alt R%d | R%d", e->exp1->id, e->exp2->id);
+  
+    sprintf(r1sub, "R%d", e->exp1->id);
     emitsub(r1sub, "pos", 0);
     emit("    goto R%d\n\n", e->exp2->id);
 
@@ -368,20 +380,19 @@ p6ge_gen_alt(P6GE_Exp* e, const char* succ)
 static void
 p6ge_gen_anchor(P6GE_Exp* e, const char* succ)
 {
-
     switch(e->type) {
     case P6GE_ANCHOR_BOS:
-        emit("R%d:                               # ^anchor\n", e->id);
+        trace("^anchor");
         emit("    if pos != 0 goto fail\n");
         emit("    goto %s\n", succ);
         return;
     case P6GE_ANCHOR_EOS:
-        emit("R%d:                               # anchor$\n", e->id);
+        trace("anchor$");
         emit("    if pos != lastpos goto fail\n");
         emit("    goto %s\n", succ);
         return;
     case P6GE_ANCHOR_BOL:
-        emit("R%d:                               # ^^anchor\n", e->id);
+        trace("^^anchor");
         emit("    if pos == 0 goto %s\n", succ);
         emit("    if pos == lastpos goto fail\n");
         emit("    $I0 = pos - 1\n");
@@ -390,7 +401,7 @@ p6ge_gen_anchor(P6GE_Exp* e, const char* succ)
         emit("    goto fail\n\n");
         return;
     case P6GE_ANCHOR_EOL:
-        emit("R%d:                               # anchor$$\n", e->id);
+        trace("anchor$$");
         emit("    if pos == lastpos goto R%d_1\n", e->id);
         emit("    substr $S0, target, pos, 1\n");
         emit("    if $S0 == \"\\n\" goto %s\n", succ);
@@ -410,6 +421,7 @@ static void
 p6ge_gen_exp(P6GE_Exp* e, const char* succ)
 {
     emitlcount();
+    emit("R%d:\n", e->id);
     switch (e->type) {
     case P6GE_NULL_PATTERN: emit("R%d: goto %s\n", e->id, succ); break;
     case P6GE_PATTERN_END: p6ge_gen_pattern_end(e, succ); break;
@@ -432,6 +444,15 @@ p6ge_gen(P6GE_Exp* e)
     char r1sub[32];
     p6ge_cbuf_len = 0;
     p6ge_cbuf_lcount = 0;
+
+    if (p6ge_istraced) {
+        emit(".macro trace(POS, LABEL)\n");
+        emit("    $S31 = repeat ' ', .POS\n");
+        emit("    print $S31\n");
+        emit("    print .LABEL\n");
+        emit("    print \"\\n\"\n");
+        emit(".endm\n\n");
+    }
 
     emit(".sub _P6GE_Rule\n");
     emit("    .param string target\n");
@@ -462,7 +483,9 @@ p6ge_gen(P6GE_Exp* e)
     emit("    goto fail_forever\n\n");
 
     p6ge_gen_exp(e, 0);
-    emit("  fail:\n    pos = -1\n    ret\n");
+    emit("  fail:\n");
+    trace("fail");
+    emit("    pos = -1\n    ret\n");
     emit(".end\n");
 
     return p6ge_cbuf;
@@ -554,6 +577,22 @@ p6ge_p5rule_pir(const unsigned char* s)
     return pir;
 }
 
+
+/*
+
+item C<void p6ge_set_trace(int istraced)>
+
+Used to turn on/off the .trace macros in the PIR code.  When enabled,
+causes the regular expression output to be traced to standard output.
+When disabled, the .trace macro becomes null (thus there's no overhead).
+
+*/
+
+void
+p6ge_set_trace(int istraced)
+{
+    p6ge_istraced = istraced;
+}
 
 /*
 

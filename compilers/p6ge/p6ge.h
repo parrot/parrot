@@ -52,6 +52,7 @@ void p6ge_printexp(FILE* fp, P6GE_Exp* e, int depth);
 
 char* p6ge_p6rule_pir(const unsigned char* s);
 char* p6ge_p5rule_pir(const unsigned char* s);
+void p6ge_set_trace(int istraced);
 
 void Parrot_lib_p6ge_init(Parrot_Interp interpreter, PMC* lib);
 

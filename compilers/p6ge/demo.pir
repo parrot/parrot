@@ -6,9 +6,11 @@
     .local pmc stdin
     .local pmc match
     .local pmc p6ge_compile
+    .local pmc p6ge_set_trace
 
     load_bytecode "p6ge.pir"
     p6ge_compile = global "_p6ge_compile"
+    p6ge_set_trace = global "_p6ge_set_trace"
     
 
   read_loop:
@@ -37,8 +39,11 @@
     goto read_loop
 
   load_pattern:
+    p6ge_set_trace(0)
+    chopn x,1
     $S0 = substr x, -1, 1
     if $S0 != '/' goto sans_slash
+    p6ge_set_trace(1)
     chopn x,1
   sans_slash:
     pattern = substr x, 1                  # get the pattern

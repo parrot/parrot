@@ -50,15 +50,24 @@ the subroutine.
     .local pmc p6gec
     .local string pir
     .local pmc rulesub
+
     loadlib $P0, "p6ge"                    # load p6ge.so
     dlfunc p6gec, $P0, "p6ge_p6rule_pir", "tt"  # find the p6ge compiler
-    
+
+  compile:
     pir = p6gec(pattern)                   # compile to PIR
     compreg $P0, "PIR"                     # get the PIR compiler
     rulesub = compile $P0, pir             # compile rule's PIR to a sub
     .return(rulesub, pir)               
 .end
 
+.sub _p6ge_set_trace
+    .param int istraced
+    .local pmc p6ge_set_trace
+    loadlib $P0, "p6ge"                    # load p6ge.so
+    dlfunc $P1, $P0, "p6ge_set_trace", "vi"  # find the p6ge compiler
+    $P1(istraced)
+.end
 
 .namespace [ "P6GEMatch" ]
 
