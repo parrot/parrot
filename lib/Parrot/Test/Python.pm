@@ -64,9 +64,9 @@ sub output_is() {
 
     unless($ENV{POSTMORTEM}) {
 	unlink $lang_f;
-	unlink $out_f;
 	unlink $py_out_f;
 	unlink $pir_out_f;
+	# unlink $pir_f;
     }
 
     return $pass;

@@ -57,9 +57,14 @@ inline op print_item(in INT) :base_io {
 
 inline op print_item(in NUM) :base_io {
   PMC *io = PIO_STDOUT(interpreter);
+  STRING *s;
   if (PIO_softspace(interpreter, io, 0))
     PIO_puts(interpreter, io, " ");
-  PIO_printf(interpreter, "%.g", (double)$1);
+  s = Parrot_sprintf_c(interpreter, "%.12g", (double)$1);
+  PIO_putps(interpreter, io, s);
+  if (string_str_index(interpreter, s,
+	const_string(interpreter, "."), 0) == -1)
+    PIO_puts(interpreter, io, ".0");
   PIO_softspace(interpreter, io, 1);
   goto NEXT();
 }
