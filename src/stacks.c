@@ -133,7 +133,8 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **
     if (chunk_base->used == 0) {
         INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
     }
-    if ((*top)->entry_type != type) {
+    /* Types of 0 mean we don't care */
+    if (type && (*top)->entry_type != type) {
         INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
     }
 
