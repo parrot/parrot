@@ -332,7 +332,7 @@ During the C<new> opcode the constructor is called.
 =head2 How can I pass arguments to an constructor?
 
 You can pass only a single argument to a constructor.
-By convention, a hash PMC is a passed to the constructor that contains
+By convention, a hash PMC is passed to the constructor that contains
 the arguments as key/value pairs:
 
     new $P0, .PerlHash
