@@ -233,9 +233,6 @@ INTERP_O_FILES = \
     $(SRC)/global_setup$(O) \
     $(SRC)/interpreter$(O)  \
     $(SRC)/register$(O) \
-    $(SRC)/core_ops$(O) \
-    $(SRC)/core_ops_prederef$(O) \
-    $(SRC)/core_ops_switch$(O) \
     $(SRC)/memory$(O) \
     $(SRC)/objects$(O) \
     $(SRC)/packfile$(O) \
@@ -283,6 +280,9 @@ INTERP_O_FILES = \
     $(SRC)/mmd$(O) \
     $(SRC)/extend$(O) \
     pf/pf_items$(O) \
+    $(OPS)/core_ops$(O) \
+    $(OPS)/core_ops_prederef$(O) \
+    $(OPS)/core_ops_switch$(O) \
     ${asmfun_o} \
     ${cg_o} \
     ${exec_o} \
@@ -726,8 +726,6 @@ $(SRC)/tsq$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/embed$(O) : $(GENERAL_H_FILES) $(INC)/debug.h
 
-$(SRC)/core_ops$(O) : $(GENERAL_H_FILES) $(SRC)/core_ops.c
-
 $(SRC)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC)/dataypes.c
 
 $(SRC)/exit$(O) : $(GENERAL_H_FILES) $(SRC)/exit.c
@@ -741,24 +739,6 @@ $(SRC)/cpu_dep$(O) : $(GENERAL_H_FILES)
 $(SRC)/nci.c : $(SRC)/call_list.txt $(BUILD_TOOL)/build_nativecall.pl
 	$(PERL) $(BUILD_TOOL)/build_nativecall.pl $(SRC)/call_list.txt
 
-#core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
-$(SRC)/core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
-	$(PERL) $(BUILD_TOOL)/ops2c.pl C --core
-
-$(SRC)/core_ops_prederef$(O) : $(GENERAL_H_FILES) $(SRC)/core_ops_prederef.c
-
-$(SRC)/core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
-	$(PERL) $(BUILD_TOOL)/ops2c.pl CPrederef --core
-
-$(SRC)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(SRC)/core_ops_switch.c
-
-$(SRC)/core_ops_switch.c $(INC)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
-	$(PERL) $(BUILD_TOOL)/ops2c.pl CSwitch --core
-
-${cg_c}
-
-${gc_c}
-
 $(SRC)/warnings$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/misc$(O) : $(GENERAL_H_FILES)
@@ -768,6 +748,26 @@ $(SRC)/utils$(O) : $(GENERAL_H_FILES)
 $(SRC)/spf_render$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/spf_vtable$(O) : $(GENERAL_H_FILES)
+
+$(OPS)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS)/core_ops.c
+
+#core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
+$(OPS)/core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) $(BUILD_TOOL)/ops2c.pl C --core
+
+$(OPS)/core_ops_prederef$(O) : $(GENERAL_H_FILES) $(OPS)/core_ops_prederef.c
+
+$(OPS)/core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) $(BUILD_TOOL)/ops2c.pl CPrederef --core
+
+$(OPS)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS)/core_ops_switch.c
+
+$(OPS)/core_ops_switch.c $(INC)/oplib/core_ops_switch.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
+	$(PERL) $(BUILD_TOOL)/ops2c.pl CSwitch --core
+
+${cg_c}
+
+${gc_c}
 
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl

@@ -27,17 +27,17 @@ sub runstep {
     Configure::Data->set(
       cg_h          => '$(INC)/oplib/core_ops_cg.h $(INC)/oplib/core_ops_cgp.h',
       cg_c          => <<'EOF',
-$(SRC)/core_ops_cg$(O): $(GENERAL_H_FILES) $(SRC)/core_ops_cg.c
-$(SRC)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(SRC)/core_ops_cgp.c
+$(OPS)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cg.c
+$(OPS)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cgp.c
 
-$(SRC)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm
+$(OPS)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGoto --core
-$(SRC)/core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm
+$(OPS)/core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGP --core
 EOF
-      cg_o          => '$(SRC)/core_ops_cg$(O) $(SRC)/core_ops_cgp$(O)',
-      cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h $(SRC)/core_ops_cg.c \
-                                $(INC)/oplib/core_ops_cgp.h $(SRC)/core_ops_cgp.c',
+      cg_o          => '$(OPS)/core_ops_cg$(O) $(OPS)/core_ops_cgp$(O)',
+      cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h $(OPS)/core_ops_cg.c \
+                                $(INC)/oplib/core_ops_cgp.h $(OPS)/core_ops_cgp.c',
       cg_flag       => '-DHAVE_COMPUTED_GOTO'
     );
   }
