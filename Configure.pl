@@ -7,10 +7,10 @@ use strict;
 use Config;
 use Getopt::Long;
 use ExtUtils::Manifest qw(manicheck);
- 
+
 my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
 my(%opt_defines);
-my $result = GetOptions( 
+my $result = GetOptions(
 	'debugging!' => \$opt_debugging,
 	'defaults!'  => \$opt_defaults,
 	'version'    => \$opt_version,
@@ -51,25 +51,26 @@ Copyright (C) 2001 Yet Another Society
 Since you're running this script, you obviously have
 Perl 5--I'll be pulling some defaults from its configuration.
 
-First, I'm gonna check the manifest, to make sure you got a 
+First, I'm gonna check the manifest, to make sure you got a
+First, I'm gonna check the manifest, to make sure you got a
 complete Parrot kit.
 END
 
 check_manifest();
 
-#Some versions don't seem to have ivtype or nvtype--provide 
+#Some versions don't seem to have ivtype or nvtype--provide
 #defaults for them.
 #XXX Figure out better defaults
 my(%c)=(
 	iv =>			($Config{ivtype}   ||'long'),
 	intvalsize =>       undef,
-    
+
 	nv =>			($Config{nvtype}   ||'double'),
 	numvalsize =>       undef,
 
 	opcode_t =>		($Config{ivtype}   ||'long'),
 	longsize =>		undef,
-    
+
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
 	ccflags =>		$Config{ccflags}." -I./include",
@@ -118,7 +119,7 @@ unless( $c{debugging} ) {
 print <<"END";
 
 Okay.  Now I'm gonna probe Perl 5's configuration to see
-what headers you have around.  This could take a bit on slow 
+what headers you have around.  This could take a bit on slow
 machines...
 END
 
@@ -136,7 +137,7 @@ END
 
 {
 	my %newc;
-	
+
 	buildfile("test_c");
 	compiletestc();
 	%newc=eval(runtestc()) or die "Can't run the test program: $!";
@@ -189,7 +190,7 @@ buildconfigpm();
 buildfile("Types_pm", "Parrot");
 
 # Temporary hack
-system("make op_info.c include/parrot/vtable.h include/parrot/op.h");
+system("make include/parrot/vtable.h");
 
 # and now we figure out how big our things are
 print <<"END";
@@ -200,7 +201,7 @@ END
 
 {
 	my %newc;
-	
+
 	buildfile("testparrotsizes_c");
 	compiletestc("testparrotsizes");
 	%newc=eval(runtestc()) or die "Can't run the test program: $!";
@@ -303,7 +304,7 @@ sub check_manifest {
 		print <<"END";
 
 Ack, some files were missing!  I can't continue running
-without everything here.  Please try to find the above 
+without everything here.  Please try to find the above
 files and then try running Configure again.
 
 END
@@ -312,9 +313,9 @@ END
 	}
 	else {
 		print <<"END";
-Okay, we found everything.  Next you'll need to answer 
-a few questions about your system.  Rules are the same 
-as Perl 5's Configure--defaults are in square brackets, 
+Okay, we found everything.  Next you'll need to answer
+a few questions about your system.  Rules are the same
+as Perl 5's Configure--defaults are in square brackets,
 and you can hit enter to accept them.
 
 END
