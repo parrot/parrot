@@ -142,7 +142,7 @@ malloc_and_strcpy(const char *in)
 /*
 
 =item C<static UINTVAL
-chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, 
+chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
                             UINTVAL c)>
 
 Returns the Unicode character for ASCII character C<c>.
@@ -152,14 +152,14 @@ Returns the Unicode character for ASCII character C<c>.
 */
 
 static UINTVAL
-chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to, 
+chartype_to_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
                             UINTVAL c)
 {
     const struct chartype_unicode_map_t *map = from->unicode_map;
 
     if (c < map->n1)
         return c;
-    else if (c < 256) 
+    else if (c < 256)
         return map->cparray[c - map->n1];
     else
         return map->cparray2[c - 128*256];
@@ -209,7 +209,7 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
 /*
 
 =item C<static Parrot_Int
-chartype_is_digit_Unicode(const CHARTYPE* type, const UINTVAL c, 
+chartype_is_digit_Unicode(const CHARTYPE* type, const UINTVAL c,
                           unsigned int class)>
 
 Returns whether C<c> is a digit. Converts C<c> to Unicode before testing.
@@ -223,7 +223,7 @@ XXX Replace by generation of custom digit mapping table.
 */
 
 static Parrot_Int
-chartype_is_digit_Unicode(const CHARTYPE* type, const UINTVAL c, 
+chartype_is_digit_Unicode(const CHARTYPE* type, const UINTVAL c,
                           unsigned int class)
 {
     UINTVAL uc = chartype_to_unicode_cparray(type, NULL, c);
@@ -251,7 +251,7 @@ chartype_get_digit_Unicode(const CHARTYPE* type, const UINTVAL c)
 /*
 
 =item C<static INTVAL
-chartype_is_charclass_Unicode(const struct parrot_chartype_t *type, 
+chartype_is_charclass_Unicode(const struct parrot_chartype_t *type,
                               const Parrot_UInt c, const unsigned int class)>
 
 Returns whether C<c> is a member of character class C<class>.
@@ -261,7 +261,7 @@ Returns whether C<c> is a member of character class C<class>.
 */
 
 static INTVAL
-chartype_is_charclass_Unicode(const struct parrot_chartype_t *type, 
+chartype_is_charclass_Unicode(const struct parrot_chartype_t *type,
                               const Parrot_UInt c, const unsigned int class)
 {
     UINTVAL uc = chartype_to_unicode_cparray(type, NULL, c);
@@ -324,8 +324,8 @@ chartype_create_from_mapping(const char *name)
         if (p && *p != '#') {
             int n = sscanf(line, "%li\t%li", &typecode, &unicode);
             if (n == 2 && typecode >= 0) {
-                if (typecode < 256 && typecode == one2one && 
-                    unicode == typecode) 
+                if (typecode < 256 && typecode == one2one &&
+                    unicode == typecode)
                 {
                     one2one++;
                 }
@@ -456,7 +456,6 @@ Returns the function for transcoding C<from> to c<to>.
 CHARTYPE_TRANSCODER
 chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
 {
-    CHARTYPE_TRANSCODER transcoder;
     int i;
 
     for (i=0; i<transcoder_count; i++) {
@@ -472,7 +471,7 @@ chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
 /*
 
 =item C<Parrot_Int
-chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c, 
+chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c,
                        unsigned int class)>
 
 =item C<Parrot_Int
@@ -497,7 +496,7 @@ C<class> is unused in C<chartype_is_digit_mapn()>.
 */
 
 Parrot_Int
-chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c, 
+chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c,
                        unsigned int class)
 {
     return c >= type->digit_map->first_code && c <= type->digit_map->last_code;

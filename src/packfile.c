@@ -178,7 +178,7 @@ make_code_pointers(struct PackFile_Segment *seg)
     }
 }
 
-static enum {
+typedef enum {
     PBC_MAIN   = 1,
     PBC_LOADED = 2,
     PBC_PBC    = 4
@@ -264,7 +264,7 @@ static void
 do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 {
 
-    size_t start_offs, end_offs;
+    size_t start_offs;
     struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(sub_pmc);
     switch (action) {
         case PBC_LOADED:
@@ -2844,7 +2844,6 @@ void
 Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
 {
     char *ext;
-    const char *mode = NULL;
 
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");

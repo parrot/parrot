@@ -969,12 +969,12 @@ Duplicated from F<classes/delegates.pmc>.
 
 */
 
-static struct regsave {
+struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
     struct PReg pmc_reg;
-} regsave;
+} ;
 
 PARROT_INLINE static struct regsave *
 save_regs(Parrot_Interp interp) {

@@ -78,7 +78,6 @@ imcc_globals_destroy(int ex, void *param)
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
     struct Parrot_Interp *interp = (struct Parrot_Interp *)param;
-    SymReg **h;
 
     UNUSED(ex);
     UNUSED(interp);
@@ -87,9 +86,7 @@ imcc_globals_destroy(int ex, void *param)
         s = cs->subs;
         while (s) {
             prev_s = s->prev;
-            h = s->labels;
             clear_sym_hash(s->labels);
-            h = s->bsrs;
             clear_sym_hash(s->bsrs);
             mem_sys_free(s);
             s = prev_s;

@@ -743,7 +743,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
     int  n;
-    Instruction *tmp, *call_ins;
+    Instruction *tmp;
     int need_cc;
     int tail_call;
     int proto;
@@ -755,7 +755,6 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     tail_call = check_tail_call(interp, unit, ins);
     if (tail_call)
         debug(interp, DEBUG_OPT1, "found tail call %I \n", ins);
-    call_ins = ins;
     sub = ins->r[0];
 
     /*

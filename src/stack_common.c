@@ -101,7 +101,7 @@ stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)
      * allocate a dummy stacks memory
      * also be sure not to allocate from the constant pool
      */
-    PObj_constant_CLEAR(&for_alloc);
+    PObj_flags_CLEARALL(&for_alloc);
     Parrot_allocate(interpreter, &for_alloc, stack->buflen);
     /*
      * copy over used items data
@@ -181,7 +181,7 @@ Return a pointer, where new entries are poped off. UnCOW if necessary.
 void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
-    Stack_Chunk_t *chunk = *stack_p, *new_chunk;
+    Stack_Chunk_t *chunk = *stack_p;
     /*
      * before any change unCOW if necessary
      */

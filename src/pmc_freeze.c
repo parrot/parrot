@@ -69,11 +69,11 @@ C<STRING> with a vtable.
 str_append(Parrot_Interp interpreter, STRING *s, const void *b, size_t len)>
 
 Appends C<len> bytes from buffer C<*b> to string C<*s>.
- 
+
 Plain ascii - for testing only:
- 
+
 For speed reasons we mess around with the string buffers directly.
- 
+
 No encoding of strings, no transcoding.
 
 =cut
@@ -637,6 +637,7 @@ cleanup_next_for_GC(Parrot_Interp interpreter)
  * TODO add read/write header functions, e.g. vtable->init_pmc
  */
 
+#if FREEZE_ASCII
 static image_funcs ascii_funcs = {
     push_ascii_integer,
     push_ascii_pmc,
@@ -647,6 +648,7 @@ static image_funcs ascii_funcs = {
     shift_ascii_string,
     shift_ascii_number
 };
+#else
 static image_funcs opcode_funcs = {
     push_opcode_integer,
     push_opcode_pmc,
@@ -657,6 +659,7 @@ static image_funcs opcode_funcs = {
     shift_opcode_string,
     shift_opcode_number
 };
+#endif
 static IMAGE_IO io_init;
 
 /*

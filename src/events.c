@@ -625,6 +625,7 @@ io_thread(void *data)
 
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
+    UNUSED(event_q);
     /*
      * Watch the reader end of the pipe for messages
      */

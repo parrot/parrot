@@ -84,7 +84,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
          * buflen might be bigger and used, so pass this length
          * also be sure not to allocate from the constant pool
          */
-        PObj_constant_CLEAR(&for_alloc);
+        PObj_flags_CLEARALL(&for_alloc);
         Parrot_allocate_string(interpreter, &for_alloc, s->buflen);
         /*
          * now copy memory over

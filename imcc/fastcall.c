@@ -4,8 +4,8 @@
  * A specific call convention implementation. Called by the generic
  * API for subs (see sub.c).
  *
- * FASTCALL convention can be enabled with: 
- * .pragma fastcall 
+ * FASTCALL convention can be enabled with:
+ * .pragma fastcall
  * at the start of an IMC module.
  *
  * This will allow library developers (or non-Perl languages) to turn
@@ -51,30 +51,30 @@ insINS(struct Parrot_Interp *interpreter, IMC_Unit * unit, Instruction *ins,
  */
 void
 expand_fast_sub(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
-{   
-    SymReg *arg, *sub, *regs[IMCC_MAX_REGS];
+{
+    SymReg *sub, *regs[IMCC_MAX_REGS];
     int i, n;
 
 #if IMC_TRACE
     PIO_eprintf(NULL, "expand_fast_sub\n");
 #endif
-    
+
     sub = ins->r[1];
     n = sub->pcc_sub->nargs;
     for (i = 0; i < n; i++) {
-       regs[0] = arg = sub->pcc_sub->args[i];
+       regs[0] = sub->pcc_sub->args[i];
        ins = insINS(interp, unit, ins, "restore", regs, 1);
     }
 
 }
 
 /*
- * XXX Unimplemented. (Proof of concept only) 
+ * XXX Unimplemented. (Proof of concept only)
  */
 void
 expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *ret, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *regs[IMCC_MAX_REGS];
     int i;
 
 #if IMC_TRACE
@@ -83,7 +83,7 @@ expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
     sub = ins->r[1];
     for (i = 0; i < sub->pcc_sub->nret; i++) {
-       regs[0] = ret = sub->pcc_sub->ret[i];
+       regs[0] = sub->pcc_sub->ret[i];
        ins = insINS(interp, unit, ins, "save", regs, 1);
     }
 }
@@ -98,7 +98,7 @@ expand_fast_sub_ret(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 void
 expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *ret, *arg, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *ret, *regs[IMCC_MAX_REGS];
     int i;
 
 #if IMC_TRACE
@@ -107,7 +107,7 @@ expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
     sub = ins->r[0];
     for(i = 0; i < sub->pcc_sub->nargs; i++) {
-        regs[0] = arg = sub->pcc_sub->args[i];
+        regs[0] = sub->pcc_sub->args[i];
         ins = insINS(interp, unit, ins, "save", regs, 1);
     }
 

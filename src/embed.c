@@ -515,7 +515,7 @@ calibrate(Parrot_Interp interpreter)
 
     for (empty = 0.0, i = 0; i < 1000000; ++i) {
        start = Parrot_floatval_time();
-       pc =  (interpreter->op_func_table[*code])(code,interpreter);
+       pc =  (interpreter->op_func_table[*code])(pc, interpreter);
        empty += Parrot_floatval_time() - start;
     }
     return empty;

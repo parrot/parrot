@@ -217,7 +217,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
      *
      * note: adding locals here did cause increased DOD runs
      */
-    unsigned int i = 0, j = 0;
+    unsigned int i = 0;
     struct Stash *stash = 0;
 
     /* We have to start somewhere, the interpreter globals is a good place */
@@ -888,7 +888,9 @@ clear_live_bits(Parrot_Interp interpreter)
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
     struct Small_Object_Arena *arena;
     UINTVAL i;
+#if !ARENA_DOD_FLAGS
     UINTVAL object_size = pool->object_size;
+#endif
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
 #if ARENA_DOD_FLAGS
