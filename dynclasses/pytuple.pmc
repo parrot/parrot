@@ -10,7 +10,6 @@ classes/pytuple.pmc - Python tuple
 
 This class, PyTuple, implements an array of fixed size, which stores PMCs,
 it puts things into Integer, Float, or String PMCs as appropriate
-TODO currently this uses Perl types.
 
 =head2 Methods
 

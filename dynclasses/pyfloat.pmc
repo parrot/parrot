@@ -97,8 +97,6 @@ Returns a unique hash for this value
 
 Sets the value of the number to C<value>.
 
-Note that if C<value> is an integer the number morphs to a C<PerlInt>.
-
 =cut
 
 */

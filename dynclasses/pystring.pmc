@@ -8,7 +8,7 @@ classes/pystring.pmc - Python String
 
 =head1 DESCRIPTION
 
-C<PyString> extends C<PyObject> to provide Perl string behaviour.
+C<PyString> extends C<PyObject> to provide Python string behaviour.
 
 =head2 Methods
 
@@ -282,7 +282,7 @@ downcase this string
 
     METHOD PMC* lower() {
         STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
-        PMC *ret = pmc_new(interpreter, enum_class_PerlString);
+        PMC *ret = pmc_new(interpreter, dynclass_PyString);
         string_set(interpreter, PMC_str_val(ret), s);
         return ret;
     }
@@ -352,7 +352,7 @@ Sets the string's value to the value of the specified Parrot string.
 
 =item C<void set_string_same(PMC *value)>
 
-Sets the string's value to the value of the specified C<PerlString>.
+Sets the string's value to the value of the specified C<PyString>.
 
 =cut
 

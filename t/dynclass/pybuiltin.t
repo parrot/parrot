@@ -94,7 +94,8 @@ output_is(<< 'CODE', << 'OUTPUT', "bigint");
 
     find_lex $P1, "long"
     $P2 = $P1($P0)
-    print $P2
+    get_repr $S0, $P2
+    print $S0
     print "\n"
 .end
 CODE

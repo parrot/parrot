@@ -24,39 +24,41 @@ C<PyLong> provides arbitray precision integer mathematic functions.
 
 #include "parrot/parrot.h"
 
+/* cache of classes referenced */
+static INTVAL dynclass_PyInt;
+
 pmclass PyLong extends BigInt dynpmc group python_group {
 
 /*
 
-=item C<STRING* get_string()>
+=item C<void class_init()>
 
-Returns the string representation of the integer.
-
-=item C<STRING* get_string_keyed_int(INTVAL base)>
-
-Returns the string representation of the integer in base C<base>.
-
-=item C<STRING* get_repr()>
-
-Returns the string representation of the integer with the letter 'L'
-appended.
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
 
 =cut
 
 */
 
-    STRING* get_string() {
-        STRING *ps = SUPER();
-        return string_append(INTERP, ps, const_string(INTERP, "L"), 0);
+    void class_init() {
+        if (pass) {
+            dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+        }
     }
 
-    STRING* get_string_keyed_int(INTVAL base) {
-        STRING *ps = SUPER(base);
-        return string_append(INTERP, ps, const_string(INTERP, "L"), 0);
-    }
+/*
 
-    STRING* get_repr() {
-        return SELF.get_string();
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    void morph (INTVAL type) {
+        if (type == enum_class_Integer) type = dynclass_PyInt;
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*

@@ -24,9 +24,43 @@ C<PyInt> extends C<PyObject> to provide a Python integer.
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyComplex;
 static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyLong;
 static INTVAL dynclass_PyString;
 
 static PMC* base_class;
+
+static void
+overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
+{
+    PMC *temp;
+    INTVAL a = PMC_int_val(self);
+
+    if (PARROT_ERRORS_test(interpreter,PARROT_ERRORS_OVERFLOW_FLAG)) {
+        real_exception(interpreter, NULL, ERR_OVERFLOW,
+                "Integer overflow");
+    }
+    if (self == dest) {
+        /* TODO preserve type system */
+        VTABLE_morph(interpreter, self, dynclass_PyLong);
+        VTABLE_set_integer_native(interpreter, self, a);
+        mmd_dispatch_v_pip(interpreter, self, b, dest, mmd);
+    }
+    else {
+        temp = pmc_new(interpreter, dynclass_PyLong);
+        VTABLE_set_integer_native(interpreter, temp, a);
+        mmd_dispatch_v_pip(interpreter, temp, b, dest, mmd);
+    }
+}
+
+static void
+promote(Interp *interpreter, PMC *self, PMC *b, PMC *dest, int mmd)
+{
+    PMC *temp;
+    INTVAL a = PMC_int_val(self);
+    temp = pmc_new(interpreter, dynclass_PyLong);
+    VTABLE_set_integer_native(interpreter, temp, a);
+    mmd_dispatch_v_ppp(interpreter, temp, b, dest, mmd);
+}
 
 pmclass PyInt extends PyObject dynpmc group python_group {
 
@@ -46,6 +80,7 @@ they will be used frequently here.
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
 
             /* TODO: make Int have a real base class */
@@ -156,16 +191,22 @@ Adds C<*value> to the integer and returns the result in C<*dest>.
 
     void add (PMC* value, PMC* dest) {
 MMD_PyInt: {
-            INTVAL pmci = PMC_int_val(SELF);
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            VTABLE_morph(INTERP, dest, dynclass_PyInt);
-            VTABLE_set_integer_native(INTERP, dest, pmci + vali);
-        }
+            INTVAL a = PMC_int_val(SELF);
+            INTVAL b = PMC_int_val(value);
+            INTVAL c = a + b;
+            if ((c^a) >= 0 || (c^b) >= 0)
+                VTABLE_set_integer_native(INTERP, dest, c);
+            else
+                overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
+            }
 MMD_PyFloat: {
             INTVAL pmci = PMC_int_val(SELF);
             FLOATVAL valf = VTABLE_get_number(INTERP, value);
             VTABLE_morph(INTERP, dest, dynclass_PyFloat);
             VTABLE_set_number_native(INTERP, dest, pmci + valf);
+        }
+MMD_PyLong: {
+            promote(INTERP, SELF, value, dest, MMD_ADD);
         }
 MMD_PyComplex: {
             INTVAL pmci = PMC_int_val(SELF);
@@ -189,7 +230,11 @@ Adds C<b> to the integer and returns the result in C<*dest>.
 
     void add_int (INTVAL b, PMC* dest) {
         INTVAL a = PMC_int_val(SELF);
-        VTABLE_set_integer_native(INTERP, dest, a+b);
+        INTVAL c = a + b;
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_ADD_INT);
     }
 
 /*
@@ -404,10 +449,18 @@ MMD_PyInt: {
                 - VTABLE_get_integer(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
+MMD_PyLong: {
+            PMC *temp;
+            INTVAL a = PMC_int_val(SELF);
+            temp = pmc_new(INTERP, dynclass_PyLong);
+            VTABLE_set_integer_native(INTERP, temp, a);
+            return mmd_dispatch_i_pp(INTERP, temp, value, MMD_CMP);
+        }
 MMD_DEFAULT: {
             return -1;
         }
     }
+
 /*
 
 =item C<void divide(PMC *value, PMC *dest)>
@@ -428,6 +481,9 @@ MMD_PyInt: {
                     --xdivy;
             }
             VTABLE_set_integer_native(INTERP, dest, xdivy);
+        }
+MMD_PyLong: {
+            promote(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
 MMD_PyFloat: {
             INTVAL pmci = PMC_int_val(SELF);
@@ -468,6 +524,9 @@ Divides the integer by the C<*value> returns the result in C<*dest>.
 */
 
     void floor_divide (PMC* value, PMC* dest) {
+MMD_PyLong: {
+            promote(INTERP, SELF, value, dest, MMD_FLOOR_DIVIDE);
+        }
 MMD_DEFAULT: {
             mmd_dispatch_v_ppp(INTERP, SELF, value, dest, MMD_DIVIDE);
         }
@@ -645,14 +704,19 @@ the result in C<*dest>.
 */
 
     void modulus (PMC* value, PMC* dest) {
-        INTVAL pmci = PMC_int_val(SELF);
-        INTVAL vali = VTABLE_get_integer(INTERP, value);
-        INTVAL xdivy = pmci / vali;
-        INTVAL xmody = pmci - xdivy * vali;
-        if (xmody && ((vali ^ xmody) < 0) /* i.e. and signs differ */) {
-            xmody += vali;
+MMD_PyInt: {
+            INTVAL pmci = PMC_int_val(SELF);
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            INTVAL xdivy = pmci / vali;
+            INTVAL xmody = pmci - xdivy * vali;
+            if (xmody && ((vali ^ xmody) < 0) /* i.e. and signs differ */) {
+                xmody += vali;
+            }
+            VTABLE_set_integer_native(INTERP, dest, xmody);
         }
-        VTABLE_set_integer_native(INTERP, dest, xmody);
+MMD_PyLong: {
+            promote(INTERP, SELF, value, dest, MMD_MOD);
+        }
     }
 
 /*
@@ -688,9 +752,17 @@ Multiplies C<*value> with the integer and returns the result in C<*dest>.
 
     void multiply (PMC* value, PMC* dest) {
 MMD_PyInt: {
-            INTVAL pmci = PMC_int_val(SELF);
-            INTVAL vali = VTABLE_get_integer(INTERP, value);
-            VTABLE_set_integer_native(INTERP, dest, pmci * vali);
+            INTVAL a = PMC_int_val(SELF);
+            INTVAL b = PMC_int_val(value);
+            double cf = (double)a * (double)b;
+            INTVAL c = a * b;
+            if ((double) c == cf)
+                VTABLE_set_integer_native(INTERP, dest, c);
+            else
+                overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
+        }
+MMD_PyLong: {
+            promote(INTERP, SELF, value, dest, MMD_MULTIPLY);
         }
 MMD_PyFloat: {
             INTVAL pmci = PMC_int_val(SELF);
@@ -710,9 +782,14 @@ Multiplies C<*value> with the integer and returns the result in C<*dest>.
 
 */
 
-    void multiply_int (INTVAL value, PMC* dest) {
-        INTVAL pmci = PMC_int_val(SELF);
-        VTABLE_set_integer_native(INTERP, dest, pmci * value);
+    void multiply_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        double cf = (double)a * (double)b;
+        INTVAL c = a * b;
+        if ((double) c == cf)
+            VTABLE_set_integer_native(INTERP, dest, c);
+        else
+            overflow(INTERP, SELF, b, dest, MMD_MULTIPLY_INT);
     }
 
 /*

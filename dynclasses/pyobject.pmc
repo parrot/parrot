@@ -25,6 +25,7 @@ static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyBoolean;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyLong;
 static INTVAL dynclass_PyString;
 
 static STRING* __add__;
@@ -70,6 +71,7 @@ they will be used frequently here.
             dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
         }
     }
@@ -682,8 +684,8 @@ Morphs the scalar to the specified type.
 */
 
     void morph (INTVAL type) {
-        SELF->vtable = Parrot_base_vtables[type];
-        DYNSELF.init();
+        if (type == enum_class_BigInt) type = dynclass_PyLong;
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*

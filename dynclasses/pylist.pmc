@@ -304,6 +304,35 @@ The C<==> operation. Compares two array to hold equal elements.
 
 /*
 
+=item C<void multiply_int(INTVAL value,  PMC *dest)>
+
+Build a list by duplicating the passed list N times.
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value,  PMC* dest) {
+        INTVAL k = DYNSELF.elements();
+        INTVAL i;
+        PMC *elem;
+        List *list;
+
+        if (k == 1) {
+            elem = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
+            VTABLE_morph(INTERP, dest, dynclass_PyList);
+            list = PMC_data(dest);
+            list_set_length(INTERP, list, value);
+            for (i = 0; i < value; ++i)
+                list_assign(INTERP, list, i, elem, enum_type_PMC);
+        }
+        else {
+            internal_exception(1, "multiply_int: unimplemented list size");
+        }
+    }
+
+/*
+
 =item C<void push_integer (INTVAL value)>
 
 Extends the array by adding an element of value C<value> to the end of
