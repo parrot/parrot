@@ -19,14 +19,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* na(c) [Next Argument (Char pointer)]
+ *
+ * Moves the pointer to the next argument in the user input.
+ */
 #define na(c) { \
     while(*c && !isspace((int) *c)) \
         c++; \
     while(*c && isspace((int) *c)) \
         c++; }
 
-/* PDB_get_command
- * get a command from stdin to execute
+/* PDB_get_command(struct Parrot_Interp *interpreter)
+ *
+ * Get a command from the user input to execute.
+ *
+ * It saves the last command executed (in pdb->last_command), so it first 
+ * frees the old one and updates it with the current one.
+ *
+ * Also prints the next line to run if the program is still active.
+ *
+ * The user input can't be longer than 255 characters.
+ *
+ * The input is saved in pdb->cur_command.
  */
 void
 PDB_get_command(struct Parrot_Interp *interpreter)
@@ -40,7 +54,7 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     fflush(stdout);
 
     /* not used any more */ 
-    if (pdb->last_command && *pdb->cur_command)
+    if (pdb->last_command && *pdb->last_command)
         mem_sys_free(pdb->last_command);
 
     /* update the last command */
@@ -77,8 +91,11 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     pdb->cur_command = c;
 }
         
-/* PDB_run_command
- * run a command
+/* PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
+ *
+ * Run a command.
+ *
+ * Hash the command to make a simple switch calling the correct handler.
  */
 void
 PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
@@ -177,29 +194,36 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-/* PDB_next
- * execute the next instruction
+/* PDB_next(struct Parrot_Interp *interpreter, const char *command)
+ *
+ * Execute the next N operation(s).
+ *
+ * Inits the program if needed, runs the next N >= 1 operations and 
+ * stops.
+ * 
  */
 void
-PDB_next(struct Parrot_Interp *interpreter,
-         const char *command)
+PDB_next(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
 
+    /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
-    {
         PDB_init(interpreter,command);
-    }
     
+    /* Get the number of operations to execute if any */
     if (command && isdigit((int) *command))
         n = atol(command);
 
+    /* Erase the stopped flag */
     pdb->state &= ~PDB_STOPPED;
 
+    /* Execute */
     for ( ; n && pdb->cur_opcode; n--)
         DO_OP(pdb->cur_opcode,interpreter);
 
+    /* Set the stopped flag */
     pdb->state |= PDB_STOPPED;
 
     /* If program ended */
@@ -243,12 +267,143 @@ PDB_trace(struct Parrot_Interp *interpreter,
         PDB_program_end(interpreter);
 }
 
+/*  PDB_cond
+ *
+ *  Analyzes a condition from the user input.
+ */
+PDB_condition_t *
+PDB_cond(struct Parrot_Interp *interpreter, const char *command)
+{
+    PDB_t *pdb = interpreter->pdb;
+    PDB_breakpoint_t *newbreak,*sbreak;
+    PDB_condition_t *condition;
+    int i;
+    char str[255];
+
+    /* Allocate new condition */
+    condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
+    /* The first argument after the 'if' MUST be a register of any type. */
+    na(command);
+
+    /* return if no more arguments */
+    if (!(command && *command))
+        return NULL;
+
+    switch (*command) {
+        case 'i':
+        case 'I':
+            condition->type = PDB_cond_int;
+            break;
+        case 'n':
+        case 'N':
+            condition->type = PDB_cond_num;
+            break;
+        case 's':
+        case 'S':
+            condition->type = PDB_cond_str;
+            break;
+        case 'p':
+        case 'P':
+            condition->type = PDB_cond_pmc;
+            break;
+        default:
+            fprintf(stderr, "First argument must be a register\n");
+            return NULL;
+    }
+
+    /* get the register number */
+    condition->reg = atoi(++command);
+
+    /* the next argument might have no spaces between the register and the
+     * condition. */
+    command++;
+
+    if (condition->reg > 9)
+        command++;
+
+    if (*command == ' ')
+        na(command);
+
+    /* Now the condition */
+    switch (*command) {
+        case '>':
+            if (*(command + 1) == '=')
+                condition->type |= PDB_cond_ge;
+            else if (*(command + 1) == ' ')
+                condition->type |= PDB_cond_gt;
+            else
+                goto INV_COND;     
+            break;
+        case '<':
+            if (*(command + 1) == '=')
+                condition->type |= PDB_cond_le;
+            else if (*(command + 1) == ' ')
+                condition->type |= PDB_cond_lt;
+            else
+                goto INV_COND;     
+            break;
+        case '=':
+            if (*(command + 1) == '=')
+                condition->type |= PDB_cond_eq;
+            else
+                goto INV_COND;     
+            break;
+        case '!':
+            if (*(command + 1) == '=')
+                condition->type |= PDB_cond_ne;
+            else
+                goto INV_COND;     
+            break;
+        default:
+INV_COND:   fprintf(stderr, "Invalid condition\n");
+            return NULL;
+    }
+
+    if (*(command + 1) == '=')
+        command += 2;
+    else
+        command ++;
+
+    if (*command == ' ')
+        na(command);
+
+    /* return if no more arguments */
+    if (!(command && *command))
+        return NULL;
+
+    if (!((isdigit((int)*command)) || (*command == '"'))) {
+        condition->value = (void *)mem_sys_allocate(sizeof(int));
+        *(int *)condition->value = (int)atoi(++command);
+    }
+    /* If the first argument was an integer */
+    else if (condition->type & PDB_cond_int) {
+        /* This must be either an integer constant or register */
+        condition->value = (void *)mem_sys_allocate(sizeof(INTVAL));
+        *(INTVAL *)condition->value = (INTVAL)atoi(command);
+        condition->type |= PDB_cond_const;
+    }
+    else if (condition->type & PDB_cond_num) {
+        condition->value = (void *)mem_sys_allocate(sizeof(FLOATVAL));
+        *(FLOATVAL *)condition->value = (FLOATVAL)atof(command);
+        condition->type |= PDB_cond_const;
+    }
+    else if (condition->type & PDB_cond_str) {
+        for (i = 1; ((command[i] != '"') && (i < 255)); i++)
+            str[i - 1] = command[i];
+        str[i - 1] = '\0'; 
+        (STRING *)condition->value = string_make(interpreter,
+            str, i - 1, NULL, BUFFER_external_FLAG, NULL);
+        condition->type |= PDB_cond_const;
+    }
+
+    return condition;
+}
+ 
 /* PDB_set_break
  * set a break point, the source code file must be loaded.
  */
 void
-PDB_set_break(struct Parrot_Interp *interpreter,
-              const char *command)
+PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_breakpoint_t *newbreak,*sbreak;
@@ -276,7 +431,7 @@ PDB_set_break(struct Parrot_Interp *interpreter,
         while (line->opcode != pdb->cur_opcode)
             line = line->next;
     }
-        
+       
     /* Skip lines that are not related to an opcode */
     while (!line->opcode)
         line = line->next;
@@ -304,6 +459,14 @@ PDB_set_break(struct Parrot_Interp *interpreter,
     /* Allocate the new break point */
     newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
 
+    na(command);
+
+    /* if there is another argument to break, besides the line number,
+     * it should be an 'if', so we call another handler. */
+    if (command && *command &&
+        !(newbreak->condition = PDB_cond(interpreter, command)))
+            return;
+ 
     /* Set the address where to stop */
     newbreak->pc = line->opcode;
     /* No next breakpoint */
@@ -358,7 +521,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
         while (command[i] && !isspace((int) command[i])) {
             c[i] = command[i];
             i++;
-    }
+        }
         c[i] = '\0';
         na(command);
 
@@ -448,6 +611,72 @@ PDB_program_end(struct Parrot_Interp *interpreter)
     return 1;
 }
 
+/* PDB_check_condition
+ *
+ * Returns TRUE if the condition was met.
+ */
+char
+PDB_check_condition(struct Parrot_Interp *interpreter, 
+    PDB_condition_t *condition)
+{
+    INTVAL i,j;
+    FLOATVAL k, l;
+    STRING *m, *n;
+
+    if (condition->type & PDB_cond_int) {
+        i = interpreter->ctx.int_reg.registers[condition->reg];
+        if (condition->type & PDB_cond_const)
+            j = *(INTVAL *)condition->value;
+        else
+            j = interpreter->ctx.int_reg.registers[*(int *)condition->value];
+        if (((condition->type & PDB_cond_gt) && (i > j)) ||
+            ((condition->type & PDB_cond_ge) && (i >= j)) ||
+            ((condition->type & PDB_cond_eq) && (i == j)) ||
+            ((condition->type & PDB_cond_ne) && (i != j)) ||
+            ((condition->type & PDB_cond_le) && (i <= j)) ||
+            ((condition->type & PDB_cond_lt) && (i < j)))
+                return 1;
+        return 0;
+    }
+    else if (condition->type & PDB_cond_num) {
+        k = interpreter->ctx.num_reg.registers[condition->reg];
+        if (condition->type & PDB_cond_const)
+            l = *(FLOATVAL *)condition->value;
+        else
+            l = interpreter->ctx.num_reg.registers[*(int *)condition->value];
+        if (((condition->type & PDB_cond_gt) && (k > l)) ||
+            ((condition->type & PDB_cond_ge) && (k >= l)) ||
+            ((condition->type & PDB_cond_eq) && (k == l)) ||
+            ((condition->type & PDB_cond_ne) && (k != l)) ||
+            ((condition->type & PDB_cond_le) && (k <= l)) ||
+            ((condition->type & PDB_cond_lt) && (k < l)))
+                return 1;
+        return 0;
+    }
+    else if (condition->type & PDB_cond_str) {
+        m = interpreter->ctx.string_reg.registers[condition->reg];
+        if (condition->type & PDB_cond_const)
+            n = (STRING *)condition->value;
+        else
+            n = interpreter->ctx.string_reg.registers[*(int *)condition->value];
+        if (((condition->type & PDB_cond_gt) && 
+                (string_compare(interpreter, m, n) > 0)) ||
+            ((condition->type & PDB_cond_ge) &&
+                (string_compare(interpreter, m, n) >= 0)) ||
+            ((condition->type & PDB_cond_eq) &&
+                (string_compare(interpreter, m, n) == 0)) ||
+            ((condition->type & PDB_cond_ne) &&
+                (string_compare(interpreter, m, n) != 0)) ||
+            ((condition->type & PDB_cond_le) &&
+                (string_compare(interpreter, m, n) <= 0)) ||
+            ((condition->type & PDB_cond_lt) &&
+                (string_compare(interpreter, m, n) < 0)))
+                    return 1;
+        return 0;
+    }
+    return 0;
+}
+
 /* PDB_break
  * return true if we have to stop running
  */
@@ -478,6 +707,11 @@ PDB_break(struct Parrot_Interp *interpreter)
         if (pdb->cur_opcode == breakpoint->pc) {
             if (breakpoint->skip < 0)
                 return 0;
+
+            /* Check if there is a condition for this breakpoint */
+            if ((breakpoint->condition) &&
+                (!PDB_check_condition(interpreter, breakpoint->condition)))
+                    return 0;
 
             /* Add the STOPPED state and stop */ 
             pdb->state |= PDB_STOPPED;
@@ -691,8 +925,7 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
                                          constants[pc[j]]->string->strstart,
                                              interpreter->code->const_table->
                                          constants[pc[j]]->string->strlen);
-                        if (escaped)
-                        {
+                        if (escaped) {
                             strcpy(&pfile->source[pfile->size],escaped);
                             pfile->size += strlen(escaped);
                             mem_sys_free(escaped);
@@ -1086,7 +1319,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     char s[1], *c = buf;
     op_info_t *op_info;
     /* Opcodes can't have more that 10 arguments */
-    opcode_t eval[11],*run;
+    opcode_t eval[10],*run;
     int op_number,i,k,l,j = 0;
 
     /* find_op needs a string with only the opcode name */

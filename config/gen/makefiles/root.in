@@ -67,7 +67,7 @@ $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h $(INC)/resources.h $(INC)/platform.h ${cg_h} \
 $(INC)/interp_guts.h $(INC)/rx.h $(INC)/rxstacks.h \
-$(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/debug.h $(INC)/pmc.h \
+$(INC)/embed.h $(INC)/warnings.h $(INC)/misc.h $(INC)/pmc.h \
 $(INC)/key.h $(INC)/hash.h $(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
 $(INC)/method_util.h
 
@@ -332,7 +332,7 @@ resources$(O) : $(GENERAL_H_FILES)
 
 platform$(O) : $(GENERAL_H_FILES)
 
-debug$(O) : $(GENERAL_H_FILES)
+debug$(O) : $(GENERAL_H_FILES) $(INC)/debug.h
 
 method_util$(O) : $(GENERAL_H_FILES)
 
@@ -384,7 +384,7 @@ rxstacks$(O) : $(GENERAL_H_FILES)
 
 stacks$(O) : $(GENERAL_H_FILES)
 
-embed$(O) : $(GENERAL_H_FILES)
+embed$(O) : $(GENERAL_H_FILES) $(INC)/debug.h
 
 core_ops$(O) : $(GENERAL_H_FILES) core_ops.c
 
