@@ -2,7 +2,7 @@
 
 A Parrot Overview
 
-=head1 The Parrot Intepreter
+=head1 The Parrot Interpreter
 
 This document is an introduction to the structure of and the concepts 
 used by the Parrot shared bytecode compiler/interpreter system. We will
@@ -129,7 +129,7 @@ individual languages. Perl 6 will be Perl by passing Parrot a set of
 Perlish vtables; Parrot will equally be able to run Python, Tcl, Ruby or
 whatever by linking in a set of vtables which implement the behaviours
 of values in those languages. Combining this with the custom opcode
-tables mentioned anove, you should be able to see how Parrot is
+tables mentioned above, you should be able to see how Parrot is
 essentially a language independent base for building runtimes for
 bytecompiled languages.
 
