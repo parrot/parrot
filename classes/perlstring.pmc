@@ -529,10 +529,10 @@ The C<==> operation.
 */
 
     INTVAL is_equal (PMC* value) {
-        return (INTVAL)( 0 == string_compare(INTERP,
-                                             PMC_str_val(SELF),
-                                             VTABLE_get_string(INTERP, value)
-                                            ));
+	return (INTVAL)( 0 == string_compare(INTERP,
+		    PMC_str_val(SELF),
+		    VTABLE_get_string(INTERP, value)
+		    ));
     }
 
 /*
@@ -561,7 +561,6 @@ Returns in C<*dest> the string repeated C<*value> times.
 */
 
     void repeat (PMC* value, PMC* dest) {
-        DYNSELF.morph(enum_class_PerlString);
         VTABLE_morph(INTERP, dest, enum_class_PerlString);
         PMC_str_val(dest) =
            string_repeat(INTERP, PMC_str_val(SELF),
@@ -580,37 +579,43 @@ Returns in C<*dest> the string repeated C<value> times.
 */
 
     void repeat_int (INTVAL value, PMC* dest) {
-        DYNSELF.morph(enum_class_PerlString);
-        VTABLE_morph(INTERP, dest, enum_class_PerlString);
-        PMC_str_val(dest) = string_repeat(INTERP,
-        PMC_str_val(SELF), (UINTVAL)value, NULL);
+	VTABLE_morph(INTERP, dest, enum_class_PerlString);
+	PMC_str_val(dest) = string_repeat(INTERP,
+		PMC_str_val(SELF), (UINTVAL)value, NULL);
     }
 
 /*
 
 =item C<void increment()>
 
+=item C<void decrement()>
+
+These two methods are partially implemented. They should provide
+Perl 5 like string increment/decrement.
+
 =cut
 
 */
 
     void increment () {
-        /* XXX perl5 like= */
+        STRING* s = PMC_str_val(SELF);
+	INTVAL o;
+        if (string_length(INTERP, s) != 1)
+	    internal_exception(1, "increment only for length=1 done");
+	o = string_ord(INTERP, s, 0);
+	if ((o >= 'A' && o < 'Z') ||
+	    (o >= 'a' && o < 'z')) {
+	    ++o;
+	    /* TODO increment in place */
+	    PMC_str_val(SELF) = string_chr(INTERP, o);
+	    return;
+	}
+	internal_exception(1, "increment out of range - unimplemented");
     }
 
-/*
-
-=item C<void decrement()>
-
-These two methods are unimplemented and do nothing. They should provide
-Perl 5 like string incrementation.
-
-=cut
-
-*/
-
     void decrement () {
-        /* XXX perl5 like= */
+        INTVAL i = VTABLE_get_integer(INTERP, SELF);
+	VTABLE_set_integer_native(INTERP, SELF, i - 1);
     }
 
 /*
