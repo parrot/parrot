@@ -8,7 +8,7 @@
 # Still to write: tests for (push|pop)_p(_c)?
 #                 tests for warp, unwarp and set_warp
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 13;
 
 output_is( <<"CODE", <<'OUTPUT', "pushi & popi" );
 @{[ set_int_regs( sub { $_[0]} )]}
@@ -187,8 +187,68 @@ output_is(<<"CODE",'No more S register frames to pop!','ENO S frames');
 	end
 CODE
 
-# I'm lazy, and 32* as much code as needed isn't needed,
-# if you follow...
+# Rotate
+output_is(<<"CODE", <<'OUTPUT', 'rotate 0');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    rotate 0
+    restore I0 
+    print I0
+    print "\\n"
+    end
+CODE
+2
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate 1');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    rotate 1
+    restore I0 
+    print I0
+    print "\\n"
+    end
+CODE
+2
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate 2');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    rotate 2
+    restore I0 
+    print I0
+    print "\\n"
+    end
+CODE
+1
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
+    set I0, 1
+    save I0
+    set I0, 2
+    save I0
+    set I0, 3
+    save I0
+    rotate 3
+    restore I0 
+    print I0
+    restore I0 
+    print I0
+    restore I0 
+    print I0
+    print "\\n"
+    end
+CODE
+213
+OUTPUT
 
 # set integer registers to some value given by $code...
 package main;
