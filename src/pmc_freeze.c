@@ -37,7 +37,7 @@
 /*
  * define this to 1 for testing
  */
-#define FREEZE_ASCII 1
+#define FREEZE_ASCII 0
 
 /*
  * normal freeze can use next_for_GC ptrs or a seen hash
