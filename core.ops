@@ -25,8 +25,8 @@ Parrot's core library of ops.
 =head2 Basic ops
 
 These are the fundamental operations.
-Please note: The next opcodes may not be moved around, the must have
-exactly there opcode numbers.
+Please note: These opcodes must not be moved; they must have
+exactly these opcode numbers.
 
 =over 4
 
@@ -55,21 +55,20 @@ Does nothing other than waste an iota of time and 32 bits of bytecode space.
 =item B<cpu_ret>()
 
 Emit a cpu return instruction. This is used to return from CGP core
-to JIT code.
-Note: Do B<not> use this opcode. Its for internal use only.
+to JIT code. Note: Do B<not> use this opcode. It is for internal use only.
 (Must be op #2)
 
 =item B<check_events>()
 
 Check the event queue and run event handlers if there are unhandled events.
 Note: This opcode is mainly for testing. It should not be necessary to ever
-use it explicitely.
+use it explicitly.
 (Must be op #3).
 
 =item B<check_events__>()
 
 Check the event queue and run event handlers if there are unhandled events.
-Note: Do B<not> use this opcode. Its for internal use only.
+Note: Do B<not> use this opcode. It is for internal use only.
 (Must be op #4).
 
 =item B<load_opcode_lib>(in STR)
@@ -380,9 +379,15 @@ inline op set(out INT, in PMC) {
   goto NEXT();
 }
 
+=back
+
+=cut
+
 ########################################
 
 =head2 PMC assignment operations: Px = x
+
+=over 4
 
 =item B<assign>(in PMC, in INT)
 
@@ -422,9 +427,16 @@ inline op assign(out STR, in STR) {
   $1 = string_set(interpreter, $1, $2);
   goto NEXT();
 }
+
+=back
+
+=cut
+
 ########################################
 
 =head2 Keyed set operations: Px[ INTKEY ] = Bx
+
+=over 4
 
 =item B<set>(in PMC, in INTKEY, in INT)
 
@@ -456,9 +468,15 @@ inline op set (in PMC, in INTKEY, in PMC)  {
     goto NEXT();
 }
 
-=head2 Keyed get operations: Ax = Px[ INTKEY ]
+=back
 
 =cut
+
+########################################
+
+=head2 Keyed get operations: Ax = Px[ INTKEY ]
+
+=over 4
 
 =item B<set>(out INT, in PMC, in INTKEY)
 
@@ -490,8 +508,15 @@ inline op set (out PMC, in PMC, in INTKEY) {
     goto NEXT();
 }
 
+=back
+
+=cut
+
+########################################
 
 =head2 Keyed set operations: Px[ KEY ] = Bx
+
+=over 4
 
 =item B<set>(in PMC, in KEY, in INT)
 
@@ -523,7 +548,15 @@ inline op set (in PMC, in KEY, in PMC)  {
     goto NEXT();
 }
 
+=back
+
+=cut
+
+########################################
+
 =head2 Keyed get operations: Ax = Px[ KEY ]
+
+=over 4
 
 =item B<set>(out INT, in PMC, in KEY)
 
@@ -2234,7 +2267,7 @@ op pin(inout STR) {
 
 =item B<unpin>(inout STR)
 
-Make the memory in $1 moveable again. This will make the memory in $1
+Make the memory in $1 movable again. This will make the memory in $1
 move.
 
 =cut
