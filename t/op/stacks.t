@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 43;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -286,7 +286,7 @@ restoreloop:
 	ne      I0, I1, error
 	dec	I1
 	ne      I1, 0, restoreloop
-	
+
 	add     I3, I3, 1
 	ne      I3, 769, testloop	# At least 3 stack chunks
 
@@ -318,7 +318,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 0');
     set I0, 2
     save I0
     rotate_up 0
-    restore I0 
+    restore I0
     print I0
     print "\\n"
     end
@@ -332,7 +332,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 1');
     set I0, 2
     save I0
     rotate_up 1
-    restore I0 
+    restore I0
     print I0
     print "\\n"
     end
@@ -346,7 +346,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 2');
     set I0, 2
     save I0
     rotate_up 2
-    restore I0 
+    restore I0
     print I0
     print "\\n"
     end
@@ -362,11 +362,11 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
     set I0, 3
     save I0
     rotate_up 3
-    restore I0 
+    restore I0
     print I0
-    restore I0 
+    restore I0
     print I0
-    restore I0 
+    restore I0
     print I0
     print "\\n"
     end
@@ -701,22 +701,22 @@ output_is(<<'CODE', <<'OUTPUT', "intstack");
 	intsave 3
 	set I0, 4
 	intsave I0
-	
+
 	intrestore I1
 	print I1
-	
+
 	intrestore I1
 	print I1
-	
+
 	intrestore I1
 	print I1
-	
+
 	intrestore I1
 	print I1
-	
+
 	intrestore I1
 	print I1
-	
+
 	intrestore I1
 	print I1
 
@@ -881,6 +881,32 @@ ok 7
 ok 8
 OUTPUT
 
+output_is(<<CODE, <<'OUTPUT', "check limit - User");
+lp:
+	save I0
+	branch lp
+	end
+CODE
+Stack 'User' too deep
+OUTPUT
+
+output_is(<<CODE, <<'OUTPUT', "check limit - Pad");
+lp:
+	new_pad 0
+	branch lp
+	end
+CODE
+Stack 'Pad' too deep
+OUTPUT
+
+output_is(<<CODE, <<'OUTPUT', "check limit - Control");
+lp:
+	bsr lp
+	end
+CODE
+Stack 'Control' too deep
+OUTPUT
+
 ##############################
 
 # set integer registers to some value given by $code...
@@ -927,7 +953,7 @@ sub set_pmc_regs {
   my $code = shift;
   my $rt;
   for (0..31) {
-    $rt .= "\tnew P$_, .PerlString\n"; 
+    $rt .= "\tnew P$_, .PerlString\n";
     $rt .= "\tset P$_, \"".&$code($_)."\"\n";
   }
   return $rt;
@@ -977,10 +1003,10 @@ sub clt_num_regs {
 sub check_num_regs {
   my $rt;
   for (0..15) {
-    $rt .= "\tgt N$_, 0.0, ERROR\n";  
+    $rt .= "\tgt N$_, 0.0, ERROR\n";
   }
   for (16..31) {
-    $rt .= "\tlt N$_, 0.0, ERROR\n";  
+    $rt .= "\tlt N$_, 0.0, ERROR\n";
   }
   return $rt;
 }
