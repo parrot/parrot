@@ -20,7 +20,7 @@ PERL = ${perl}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : perlint$(O) perlnum$(O) perlstring$(O)
+all : perlint$(O) perlnum$(O) perlstring$(O) perlundef$(O)
 
 perlint.c: perlint.pmc 
 	$(PERL) pmc2c.pl perlint.pmc
