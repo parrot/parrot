@@ -35,6 +35,7 @@
 []		classes/managedstruct.pmc
 []		classes/multiarray.pmc
 []		classes/nci.pmc
+[]		classes/parrotclass.pmc
 []		classes/perlarray.pmc
 []		classes/perlhash.pmc
 []		classes/perlint.pmc
@@ -1257,6 +1258,7 @@
 [devel]include	include/parrot/dod.h
 [devel]include	include/parrot/embed.h
 [devel]include	include/parrot/encoding.h
+[devel]include	include/parrot/enums.h
 [devel]include	include/parrot/events.h
 [devel]include	include/parrot/exceptions.h
 [devel]include	include/parrot/exit.h
@@ -1759,6 +1761,7 @@
 []		method_util.c
 []		misc.c
 []		nci_test.c
+[]		object.ops
 []		obscure.ops
 [devel]		ops2c.pl
 [devel]		ops2cgc.pl
