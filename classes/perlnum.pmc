@@ -74,7 +74,6 @@ fprintf(stderr,"get_string not implemented\n");
     }
 
     void set_integer (PMC* value) {
-//        SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
         SELF->cache.num_val = (FLOATVAL)value->vtable->get_integer(INTERP, value);
     }
 
