@@ -457,7 +457,7 @@ MAKE_C = ${make_c}
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the .imc.pbc rule otherwise)
 
-.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pbc
+.SUFFIXES : .c .h .pmc .dump $(O) .str .imc .pir .pbc
 
 # Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
 # (etc) should go. Otherwise it will insert them after the first space, which
@@ -468,6 +468,9 @@ MAKE_C = ${make_c}
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
 .imc.pbc:
+	.${slash}$(TEST_PROG) -o $@ $<
+
+.pir.pbc:
 	.${slash}$(TEST_PROG) -o $@ $<
 
 ###############################################################################
