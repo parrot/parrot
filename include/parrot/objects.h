@@ -20,7 +20,7 @@
 
 typedef enum {
     PCD_PARENTS,        /* An array of immediate parents */
-    PCD_CLASS_NAME,     /* Perlstring */
+    PCD_CLASS_NAME,     /* A String PMC */
     PCD_ALL_PARENTS,    /* array in search order */
     PCD_ATTRIB_OFFS,    /* class => offset hash */
     PCD_ATTRIBUTES,      /* class::attrib => offset hash */
@@ -32,7 +32,7 @@ typedef enum {
 
 typedef enum {
     POD_CLASS,          /* class PMC of object */
-    POD_CLASS_NAME,     /* Perlstring */
+    POD_CLASS_NAME,     /* A String PMC */
     POD_FIRST_ATTRIB    /* attributes start here */
 } PARROT_OBJECT_DATA_ENUM;
 
