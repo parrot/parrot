@@ -42,11 +42,11 @@ sub parrot_version
 
   @parrot_version = split(/\./, $parrot_version);
 
-  die "Too few components to VERSION file contents: '$parrot_version' (should be 3)!"
+  die "Too few components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
     if scalar(@parrot_version) < 3;
 
-  die "Too many components to VERSION file contents: '$parrot_version' (should be 3)!"
-    if scalar(@parrot_version) > 3;
+  die "Too many components to VERSION file contents: '$parrot_version' (should be 3 or 4)!"
+    if scalar(@parrot_version) > 4;
 
   foreach (@parrot_version) {
     die "Illegal version component: '$_' in VERSION file!"
