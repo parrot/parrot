@@ -19,10 +19,23 @@
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 
+typedef void * Parrot_INTERP;
 typedef void * Parrot_STRING;
 typedef void * Parrot_PMC;
 typedef INTVAL Parrot_INTVAL;
 typedef NUMVAL Parrot_NUMVAL;
+
+Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP, Parrot_PMC);
+Parrot_INTVAL Parrot_PMC_get_intval(Parrot_INTERP, Parrot_PMC);
+Parrot_NUMVAL Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
+char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
+char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_INTVAL *);
+
+void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
+void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, char *);
+void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, char *, Parrot_INTVAL);
+void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_INTVAL);
+void Parrot_PMC_set_numval(Parrot_INTERP, Parrot_PMC, Parrot_NUMVAL);
 
 #endif
 
