@@ -65,6 +65,10 @@
 #  include <sys/types.h>
 #endif
 
+#ifdef PARROT_HAS_HEADER_SYSSOCKIO
+#include <sys/socket.h>
+#endif
+
 #ifdef PARROT_HAS_HEADER_NIIN 
 #  include <netinet/in.h>
 #endif
