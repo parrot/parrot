@@ -140,12 +140,12 @@ into $1.
 
 AUTO_OP open(i, s|sc) {
   STRING *s = $2;
-  $1 = open(s->bufstart, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  $1 = open(s->bufstart, O_WRONLY | O_CREAT | O_TRUNC, DEFAULT_OPEN_MODE);
 }
 
 AUTO_OP open(i, s|sc, i|ic) {
   STRING *s = $2;
-  $1 = open(s->bufstart, $3, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  $1 = open(s->bufstart, $3, DEFAULT_OPEN_MODE);
 }
 
 AUTO_OP open(i, s|sc, i|ic, i|ic) {
@@ -229,7 +229,7 @@ Set the value of environment variable $1 to $2.
 =cut
 
 AUTO_OP setenv(s|sc, s|sc) {
-  setenv($1->bufstart, $2->bufstart, 1);
+  Parrot_setenv($1->bufstart, $2->bufstart);
 }
 
 
@@ -1954,7 +1954,7 @@ Sleep for $1 seconds
 =cut
 
 AUTO_OP sleep(i|ic) {
-  sleep($1);
+  Parrot_sleep($1);
 }
 
 ###############################################################################

@@ -7,6 +7,7 @@ use strict;
 use Config;
 use Getopt::Long;
 use ExtUtils::Manifest qw(manicheck);
+use File::Copy;
 
 my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
 my(%opt_defines);
@@ -90,6 +91,10 @@ my(%c)=(
 	numlow =>	'(~0xfff)',
 	strlow =>	'(~0xfff)',
 	pmclow =>	'(~0xfff)',
+	
+	platform =>	'linux',
+	cp =>		'cp',
+	slash =>	'/',
 );
 
 #copy the things from --define foo=bar
@@ -142,6 +147,7 @@ END
 	my %newc;
 
 	buildfile("test_c");
+	copy("platforms/$c{platform}.h", "include/parrot/platform.h");
 	compiletestc();
 	%newc=eval(runtestc()) or die "Can't run the test program: $!";
 

@@ -9,6 +9,9 @@
 		$c{ld_out} = '-Fo';
 		$c{cc_debug} = '-Zi';
 		$c{ld_debug} = '-debug';
+		$c{platform} = 'win32';
+		$c{cp} = 'copy';
+		$c{slash} = '\\';
 	}
 	elsif( $is_mingw ) {
 		$c{ld} = 'gcc';

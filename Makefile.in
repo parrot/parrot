@@ -8,14 +8,14 @@ $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h \
-$(INC)/pmc.h $(INC)/resources.h $(INC)/time.h
+$(INC)/pmc.h $(INC)/resources.h $(INC)/platform.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
 chartype$(O) runops_cores$(O) trace$(O) vtable_ops$(O) classes/intclass$(O) \
 encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
-time$(O)
+platform$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -117,6 +117,12 @@ $(INC)/config.h: Configure.pl config_h.in
 
 $(INC)/vtable.h: vtable.tbl vtable_h.pl
 	$(PERL) vtable_h.pl
+
+$(INC)/platform.h: platforms/${platform}.h
+	${cp} platforms${slash}${platform}.h include${slash}parrot${slash}platform.h
+
+platform.c: platforms/${platform}.c
+	${cp} platforms${slash}${platform}.c platform.c
 
 docs: docs/.dummy
 

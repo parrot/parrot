@@ -25,7 +25,7 @@
 #include <stdio.h>
 /*#include <types.h> */
 
-#include "parrot/time.h"
+#include "parrot/platform.h"
 
 #ifdef WIN32
 #	include <io.h>
@@ -61,7 +61,7 @@
 #define PARROT_MAGIC 0x13155a1
 
 typedef struct PMC PMC;
-typedef unsigned char BOOL;
+typedef unsigned char BOOLVAL;
 typedef void STRING_FUNCS;
 typedef void REGEX;
 

@@ -26,7 +26,7 @@ static void Parrot_int_clone (struct Parrot_Interp *interpreter, PMC* pmc, PMC* 
 static void Parrot_int_morph (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL type) {
 }
 
-static BOOL Parrot_int_move_to (struct Parrot_Interp *interpreter, PMC* pmc, void * destination) {
+static BOOLVAL Parrot_int_move_to (struct Parrot_Interp *interpreter, PMC* pmc, void * destination) {
 }
 
 static INTVAL Parrot_int_real_size (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -44,13 +44,13 @@ static FLOATVAL Parrot_int_get_number (struct Parrot_Interp *interpreter, PMC* p
 static STRING *Parrot_int_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
-static BOOL Parrot_int_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
+static BOOLVAL Parrot_int_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
 static void* Parrot_int_get_value (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
-static BOOL Parrot_int_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
+static BOOLVAL Parrot_int_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
 }
 
 static void Parrot_int_set_integer_1 (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL integer) {

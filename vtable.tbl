@@ -17,15 +17,15 @@ unique	STRING* name
 unique	PMC* new
 unique	void clone		PMC* dest
 unique	void morph		INTVAL type
-unique	BOOL move_to		void * destination
+unique	BOOLVAL move_to		void * destination
 unique	INTVAL real_size	
 unique	void destroy	
 unique	INTVAL get_integer	 
 unique	FLOATVAL get_number	 
 unique	STRING* get_string	 
-unique	BOOL get_bool	 
+unique	BOOLVAL get_bool	 
 unique	void* get_value	
-unique	BOOL is_same		PMC* pmc2
+unique	BOOLVAL is_same		PMC* pmc2
 int	void set_integer	INTVAL integer
 float	void set_number		FLOATVAL number
 str	void set_string		STRING* string

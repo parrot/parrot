@@ -15,7 +15,7 @@
  * just like Perl 5 SVs, so that we can cache multiple types of data.
  * However, for now this should do. */
 #define CACHE_INT    (1<<0)
-#define CACHE_FLOAT  (1<<1)  
+#define CACHE_FLOAT  (1<<1)
 #define CACHE_STRING (1<<2)
 
 static INTVAL Parrot_scalar_type (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -33,7 +33,7 @@ static void Parrot_scalar_clone (struct Parrot_Interp *interpreter, PMC* pmc, PM
 static void Parrot_scalar_morph (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL type) {
 }
 
-static BOOL Parrot_scalar_move_to (struct Parrot_Interp *interpreter, PMC* pmc, void * destination) {
+static BOOLVAL Parrot_scalar_move_to (struct Parrot_Interp *interpreter, PMC* pmc, void * destination) {
 }
 
 static INTVAL Parrot_scalar_real_size (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -47,7 +47,7 @@ static INTVAL Parrot_scalar_get_integer (struct Parrot_Interp *interpreter, PMC*
         return pmc->cache.int_val;
     } else if (pmc->flags & CACHE_FLOAT) {
         return (INTVAL)pmc->cache.num_val;
-    } else if (pmc->flags & CACHE_STRING) { 
+    } else if (pmc->flags & CACHE_STRING) {
         printf("String atoi will go here when implemented\n");
         exit(1);
     } else {
@@ -61,7 +61,7 @@ static FLOATVAL Parrot_scalar_get_number (struct Parrot_Interp *interpreter, PMC
         return pmc->cache.num_val;
     } else if (pmc->flags & CACHE_INT) {
         return (FLOATVAL)pmc->cache.int_val;
-    } else if (pmc->flags & CACHE_STRING) { 
+    } else if (pmc->flags & CACHE_STRING) {
         printf("String aton will go here when implemented\n");
         exit(1);
     } else {
@@ -91,14 +91,14 @@ static STRING* Parrot_scalar_get_string (struct Parrot_Interp *interpreter, PMC*
     }
 }
 
-static BOOL Parrot_scalar_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
+static BOOLVAL Parrot_scalar_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
 static void* Parrot_scalar_get_value (struct Parrot_Interp *interpreter, PMC* pmc) {
     return pmc->data;
 }
 
-static BOOL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
+static BOOLVAL Parrot_scalar_is_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC* pmc2) {
 }
 
 static void Parrot_scalar_set_integer_1 (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL integer) {
