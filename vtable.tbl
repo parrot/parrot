@@ -1,39 +1,44 @@
 # This is the main vtable data
 # Lines have the following format:
-# return type name \tab type arg1 \tab type arg2
+# method type \tab return type name \tab type arg1 \tab type arg2
 #
-# So, for instance, a function with two arguments would look like this:
-# void frob	INTVAL foo	STRING bar
+# Method type is either int, float, num, str, or unique if the method
+# has a set of int entries, float entries, num entries, string
+# entries, or is a unique method
+#
+# So, for instance, a function with two arguments where the second
+# argument is a string PMC of some sort would look like this:
+# string	void frob	INTVAL foo	STRING bar
 #
 # Note that we don't include the source "PMC* pmc" - that's done implicitly.
 
-INTVAL type	
-STRING name
-PMC* new
-void clone		PMC* dest
-void morph		INTVAL type
-BOOL move_to		void * destination
-INTVAL real_size	
-void destroy	
-INTVAL get_integer	 
-FLOATVAL get_number	 
-STRING get_string	 
-BOOL get_bool	 
-void* get_value	
-BOOL is_same		PMC* pmc2
-void set_integer	INTVAL integer
-void set_number		FLOATVAL number
-void set_string		STRING string
-void set_value		void* value
-void add		PMC* left	 PMC* right 
-void subtract		PMC* left	 PMC* right 
-void multiply		PMC* left	 PMC* right 
-void divide		PMC* left	 PMC* right 
-void modulus		PMC* left	 PMC* right 
-void concatenate	PMC* left	 PMC* right 
-void is_equal		PMC* left 
-void logical_or		PMC* left	 PMC* right 
-void logical_and	PMC* left	 PMC* right 
-void logical_not	PMC* left 
-void match		PMC* left	 REGEX* re
-void repeat		PMC* left	 PMC* right 
+unique	INTVAL type	
+unique	STRING name
+unique	PMC* new
+unique	void clone		PMC* dest
+unique	void morph		INTVAL type
+unique	BOOL move_to		void * destination
+unique	INTVAL real_size	
+unique	void destroy	
+unique	INTVAL get_integer	 
+unique	FLOATVAL get_number	 
+unique	STRING get_string	 
+unique	BOOL get_bool	 
+unique	void* get_value	
+unique	BOOL is_same		PMC* pmc2
+int	void set_integer	INTVAL integer
+float	void set_number		FLOATVAL number
+str	void set_string		STRING string
+unique	void set_value		void* value
+num	void add		PMC* left	 PMC* right 
+num	void subtract		PMC* left	 PMC* right 
+num	void multiply		PMC* left	 PMC* right 
+num	void divide		PMC* left	 PMC* right 
+num	void modulus		PMC* left	 PMC* right 
+num	void concatenate	PMC* left	 PMC* right 
+unique	void is_equal		PMC* left 
+unique	void logical_or		PMC* left	 PMC* right 
+unique	void logical_and	PMC* left	 PMC* right 
+unique	void logical_not	PMC* left 
+str	void match		PMC* left	 REGEX* re
+str	void repeat		PMC* left	 PMC* right 
