@@ -27,8 +27,11 @@ Jit mode works for any program that doesn't use the stack ops.
 That's because we use fixed address for registers, this problem will
 be solved soon.
 
-Prederef mode only works as a shared library. For example, on most
-Unix platforms:
+Prederef mode should work for all programs.
+
+It previously only worked as a shared library. To revert to that
+state, add C<#define DYNAMIC_OPLIBS> to the top of interpreter.c.
+Then, on most Unix platforms:
 
   make clean
   make shared
@@ -72,17 +75,20 @@ appropriate test file in the t/ directory:
   perl -Ilib t/op/basic.t
 
 To keep a copy of all of the test C<.pasm> and C<.pbc> files
-generated, set the environment variable POSTMORTEM to 1:
+generated, set the environment variable POSTMORTEM to 1 (THIS IS NOW
+THE DEFAULT):
 
-  POSTMORTEM=1 perl -Ilib t/op/basic.t 
+  env POSTMORTEM=1 perl -Ilib t/op/basic.t
   ls t/op/basic*
 
-To run tests with a different dispatcher, edit
-C<$Parrot::Config::PConfig{test_prog}> in lib/Parrot/Config.pm:
+To run makefile tests with a different dispatcher, set the TEST_PROG_ARGS
+variable:
 
-               'test_prog' => 'parrot -P',
+  make test TEST_PROG_ARGS=-P # Use prederef mode
 
-and then use any of the above methods for running tests.
+For running individual tests, set the environment variable TEST_PROG_ARGS:
+
+  env TEST_PROG_ARGS=-j perl -Ilib t/op/basic.t
 
 =item B<make quicktest>
 
