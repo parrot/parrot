@@ -9,15 +9,19 @@ Parrot Assembly Language
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 6
-    Version: 1.6
+    Version: 1.7
     Status: Developing
-    Last Modified: 29 November 2001
+    Last Modified: 02 December 2002
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.7
+
+December 02, 2002
 
 =item Version 1.6
 
@@ -52,6 +56,17 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.7
+
+=over 4
+
+=item * Fixed stack ops
+
+push, pop, and clear properly documented according to the engine's
+behaviour now.
+
+=back
 
 =item Version 1.6
 
@@ -441,85 +456,60 @@ These opcodes deal with registers and stacks
 
 =over 4
 
-=item push_p
+=item pushp
 
-Push the current frame of PMC registers onto their stack and start a
-new frame. The new registers are not initialized.
+Copy the current frame of PMC registers onto their stack and start a
+new frame. The old frame is preserved.
 
-=item push_p_c
-
-Push the current frame of PMC registers onto their stack and start a
-new frame. The new registers are copies of the previous frame.
-
-=item pop_p
+=item popp
 
 Pop the current frame of PMC registers off the stack.
 
-=item push_i
+=item pushi
 
-The same as L<push_p>, for the integer register set.
+The same as L<pushp>, for the integer register set.
 
-=item push_i_c
+=item popi
 
-The same as L<push_p_c>, for the integer register set.
+The same as L<popp>, for the integer register set.
 
-=item pop_i
+=item pushs
 
-The same as L<pop_p>, for the integer register set.
+The same as L<pushp>, for the string register set.
 
-=item push_s
+=item pops
 
-The same as L<push_p>, for the string register set.
+The same as L<popp>, for the string register set.
 
-=item push_s_c
+=item pushn
 
-The same as L<push_p_c>, for the string register set.
+The same as L<pushp>, for the floating-point register set.
 
-=item pop_s
+=item popn
 
-The same as L<pop_p>, for the string register set.
+The same as L<popp>, for the floating-point register set.
 
-=item push_n
+=item clearp
 
-The same as L<push_p>, for the floating-point register set.
+Clean out the current set of PMC registers, setting them to NULL
 
-=item push_n_c
+=item cleari
 
-The same as L<push_p_c>, for the floating-point register set.
+Clean out the current set of I registers, setting them to 0
 
-=item pop_n
+=item clears
 
-The same as L<pop_p>, for the floating-point register set.
+Clean out the current set of S registers, setting them to NULL
 
-=item save_i Ix
+=item clearn
 
-Push register X onto the generic stack
+Clean out the current set of N registers, setting them to 0
 
-=item save_s Sx
-
-Push register X onto the generic stack
-
-=item save_p Px
+=item save tx
 
 Push register X onto the generic stack
 
-=item save_n Nx
-
-Push register X onto the generic stack
-
-=item restore_i Ix
-
-Restore register X from the generic stack
-
-=item restore_s Ix
-
-Restore register X from the generic stack
-
-=item restore_p Px
-
-Restore register X from the generic stack
-
-=item restore_n Nx
+=item restore tx
 
 Restore register X from the generic stack
 
