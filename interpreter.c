@@ -538,6 +538,7 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 
+        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
         interpreter->resume_offset = 0;
         interpreter->resume_flag = 0;
 
@@ -726,7 +727,6 @@ make_interpreter(Interp_flags flags)
     if (is_env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interpreter, PARROT_GC_DEBUG_FLAG);
-       interpreter->lo_var_ptr = &interpreter;
 #else
         fprintf(stderr, "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.\n");
@@ -737,7 +737,7 @@ make_interpreter(Interp_flags flags)
     mem_setup_allocator(interpreter);
 
     /* initialize classes */
-    Parrot_init(interpreter, 0);
+    Parrot_init(interpreter);
 
     /* Need an empty stash */
     interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));

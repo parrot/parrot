@@ -94,7 +94,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #ifdef USE_TRACE_INTERP
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
         trace_i = make_interpreter(NO_FLAGS);
-        Parrot_init(trace_i, (void*)& starttime);
+        Parrot_init(trace_i);
         /* remeber old context */
         trace_ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
         mem_sys_memcopy(trace_ctx, &trace_i->ctx,

@@ -33,7 +33,7 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    Parrot_init(interpreter, (void *)&interpreter);
+    Parrot_init(interpreter);
 
     if (argc != 2) {
         fprintf(stderr, "Usage: disassemble programfile \n");
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

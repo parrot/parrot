@@ -151,11 +151,10 @@ int do_test(struct Parrot_Interp* interpreter) {
 }
 
 int main(int argc, char* argv[]) {
-    int dummy_var;
     struct Parrot_Interp * interpreter;
 
     interpreter = Parrot_new();
-    Parrot_init(interpreter, (void*) &dummy_var);
+    Parrot_init(interpreter);
     do_test(interpreter);
 
     return 0;
@@ -200,7 +199,7 @@ int main ()
     struct Parrot_Interp *interp = NULL;
 
     interp = Parrot_new ();
-    Parrot_init(interp, (void*) &i);
+    Parrot_init(interp);
 
     for (i=0; i<10000; i++) {
          PIO_printf(interp, "%vx", i);

@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
     Interp* interpreter = Parrot_new();
     if (interpreter == NULL) return 1;
-    Parrot_init(interpreter, (void*) &x);
+    Parrot_init(interpreter);
 
     list = list_new(interpreter, enum_type_int);
     if (list == NULL) {
@@ -281,7 +281,7 @@ int main(int argc, char* argv[]) {
 
     Interp* interpreter = Parrot_new();
     if (interpreter == NULL) return 1;
-    Parrot_init(interpreter, (void*) &x);
+    Parrot_init(interpreter);
 
     p = pmc_new(interpreter, enum_class_Array);
 

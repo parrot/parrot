@@ -25,14 +25,9 @@ Parrot_new(void)
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 void
-Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
-/*                                             ^^^^^^^^^^^^^^
-    XXX BD Do we really need this to be user-provided, or can
-        we set up our own in embed.c:Parrot_runcode()?
-*/
+Parrot_init(struct Parrot_Interp *interpreter)
 {
-    if (stacktop)
-        interpreter->lo_var_ptr = stacktop;
+
     if (!interpreter->world_inited) {
         /* global_setup.c:init_world sets up some vtable stuff.
          * It must only be called once.

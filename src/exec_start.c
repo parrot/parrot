@@ -85,7 +85,7 @@ main(int argc, char **argv) {
     if (!interpreter) {
         return 1;
     }
-    Parrot_init(interpreter, (void*) &dummy_var);
+    Parrot_init(interpreter);
 
     run_native = run_compiled;
     /* TODO make also a shared variant of PackFile_new */

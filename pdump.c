@@ -118,7 +118,7 @@ main(int argc, char **argv)
         help();
     }
     interpreter = make_interpreter(NO_FLAGS);
-    Parrot_init(interpreter, (void *)&terse);
+    Parrot_init(interpreter);
     while ((status = longopt_get(interpreter,
                     argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {

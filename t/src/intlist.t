@@ -13,7 +13,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "creation");
 
             Interp* interpreter = Parrot_new();
             if (interpreter == NULL) return 1;
-            Parrot_init(interpreter, (void*) &interpreter);
+            Parrot_init(interpreter);
 
             list = intlist_new(interpreter);
             if (list == NULL) return 1;
@@ -42,7 +42,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "list aerobics");
 
             Interp* interpreter = Parrot_new();
             if (interpreter == NULL) return "create interpreter";
-            Parrot_init(interpreter, (void*) &interpreter);
+            Parrot_init(interpreter);
 
             list = intlist_new(interpreter);
             if (list == NULL) return "create list";
@@ -175,7 +175,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "step aerobics");
 
             interpreter = Parrot_new();
             if (interpreter == NULL) return 1;
-            Parrot_init(interpreter, (void*) &interpreter);
+            Parrot_init(interpreter);
 
             list = intlist_new(interpreter);
             if (list == NULL) return 1;
@@ -280,7 +280,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "yoyo");
 
             interpreter = Parrot_new();
             if (interpreter == NULL) return 1;
-            Parrot_init(interpreter, (void*) &interpreter);
+            Parrot_init(interpreter);
 
             list = intlist_new(interpreter);
             if (list == NULL) return 1;

@@ -24,7 +24,7 @@ typedef void *Parrot_Interp_flag_val;
 
 Parrot_Interp Parrot_new(void);
 
-void Parrot_init(Parrot_Interp, void*);
+void Parrot_init(Parrot_Interp);
 
 void Parrot_setflag(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val);
 

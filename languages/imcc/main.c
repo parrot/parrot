@@ -374,12 +374,11 @@ do_pre_process(Parrot_Interp interpreter)
 
 int main(int argc, char * argv[])
 {
-    int stacktop;
     struct PackFile *pf;
 
     struct Parrot_Interp *interpreter = Parrot_new();
 
-    Parrot_init(interpreter, (void*)&stacktop);
+    Parrot_init(interpreter);
     interpreter->imcc_info = mem_sys_allocate_zeroed(sizeof(imcc_info_t));
 
     interpreter->DOD_block_level++;

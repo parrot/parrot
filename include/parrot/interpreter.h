@@ -235,7 +235,7 @@ typedef enum {
 /* &end_gen */
 
 struct Parrot_Interp *make_interpreter(Interp_flags);
-void Parrot_init(Parrot_Interp, void*);
+void Parrot_init(Parrot_Interp);
 void Parrot_destroy(Parrot_Interp);
 INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
 
