@@ -32,6 +32,10 @@ while(1) {
 }
 
 __DATA__
+input a$,
+print a$
+
+STOPPLEASE
 ' Expect 10
 sub second(b() )
 	b(5)=10

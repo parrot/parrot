@@ -1,5 +1,5 @@
-.include "RT_platform_win32.pasm"
-.include "RT_platform_ANSIscreen.pasm"
+.include "RT_platform_win32.imc"
+.include "RT_platform_ANSIscreen.imc"
 .sub _platform_setup		# void platform_setup(void)
 	saveall
 	sysinfo S0, 4

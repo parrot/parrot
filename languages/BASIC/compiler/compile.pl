@@ -45,7 +45,7 @@ parse(@ARGV);
 
 open(CODE, ">TARG_test.imc") || die;
 
-print CODE qq{.include "RT_initialize.pasm"\n};
+print CODE qq{.include "RT_initialize.imc"\n};
 foreach my $seg ("_main", "_basicmain", keys %code) {
 	next unless exists $code{$seg};
 	my @debdecl=();
@@ -206,12 +206,12 @@ print CODE<<RUNTIMESHUTDOWN;
 	#
 	# Pull in the runtime libraries
 	#
-.include "RT_aggregates.pasm"
-.include "RT_builtins.pasm"
-.include "RT_debugger.pasm"
-.include "RT_io.pasm"
-.include "RT_platform.pasm"
-.include "RT_support.pasm"
+.include "RT_aggregates.imc"
+.include "RT_builtins.imc"
+.include "RT_debugger.imc"
+.include "RT_io.imc"
+.include "RT_platform.imc"
+.include "RT_support.imc"
 RUNTIMESHUTDOWN
 
 close(CODE);
