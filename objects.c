@@ -100,7 +100,7 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name) {
   new_class_array = PMC_data(new_class);
   /* We have the same number of attributes as our parent */
   new_class->obj.u.int_val = 0;
-  /* Our parent class array nothing in it */
+  /* Our parent class array has nothing in it */
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 0,
 			   pmc_new(interpreter, enum_class_Array));
   VTABLE_set_pmc_keyed_int(interpreter, new_class_array, 1,
