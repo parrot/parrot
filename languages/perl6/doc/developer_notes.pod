@@ -1,0 +1,32 @@
+# Copyright: 2004 The Perl Foundation. All Rights Reserved.
+# $Id$
+
+=head1 Developer's Notes
+
+=head2 Purpose
+
+This document is a shared notebook for developers working on the
+prototype Perl 6 compiler. It's a place to record observations,
+obstacles, solutions, plans, etc. It's not generally intended for
+people who are just using the compiler, but if you run across a
+feature that doesn't quite work, you may find it mentioned here.
+
+=head2 Compiling
+
+At the moment, P6C will only work if you configure parrot with
+the icudatadir specified:
+
+  perl Configure.pl --icudatadir="`pwd`/blib/lib/icu/2.6.1"
+
+or equivalent.
+
+=head2 Subroutines
+
+I'm having a problem with user-defined subroutines. Subroutines
+without any defined parameters work fine (arguments are passed in @_).
+Subroutines with one defined parameter get 1 as the value of the
+parameter. With two defined parameters, the first has the value 2, the
+second is a NULL PMC.
+
+I haven't had time to look into it further, but I added SKIP tests
+that demonstrate the problem(s) in t/subs/simple.t. --Allison
