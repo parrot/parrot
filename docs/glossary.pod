@@ -1,0 +1,76 @@
+=pod
+
+=head1 TITLE
+
+Parrot Glossary
+
+=head1 ID
+
+$Id$
+
+=head1 SUMMARY
+
+Short descriptions of words you might need to know that show up in
+parrot development.
+
+=head1 GLOSSARY
+
+=head2 Co-Routines and Continuations
+
+Co-routines are virtually identical to normal subroutines, except
+while subroutine's execute from start to finish, and return,
+co-routines may suspend themselves, (or be suspended asynchronously if
+the language permits) and resume later. We can implement things like
+"factories" with co-routines. If the co-routine never returns, every
+time we call it we "resume" the routine.
+
+Think of continuations as an execution "context". This context incudes
+everything local to that execution path, not just stack. It is a
+snapshot in time (minus global variables). While it is similar to C's
+setjmp/lonjmp, longjmp'ing only works "down" the stack. Jumping "up"
+the stack (ie back to a frame that has returned) is bad. Continuations
+work either way. We can do 2 important things with continuations:
+
+=over 4
+
+=item 1
+
+Create and pass a continuation object to a subroutine, which may
+recursively pass that object up the call chain until, at some point,
+the continuation can be called/executed/taken to handle the final
+computation or return value. This is pretty much tail recursion.
+
+=item 2
+
+Continuations can be taken at arbitrary call depth. This freezes the
+call chain (context) at that point in time. If we save that
+continuation object into a variable, later we can reinstate the
+complete context by its "handle". This allows neat things like
+backtracking that isn't easily done in conventional stacked languages,
+such as C. Since continuations represent "branches" in context, it
+requires using an environment that uses some combination of heap-based
+stacks, stack trees and/or stack copying.
+
+=back
+
+It is common in a system that supports continuations to implement
+co-routines on top of them.
+
+=for author
+Melvin Smith <mrjoltcola@mindspring.com>
+
+=head2 Vtable
+
+A table of operations attached to some data types, such as PMCs and
+strings.  Vtables are used to avoid using switches or long if chains to
+handle different data types.  They're similar to method calls, except
+that their names are pre-selected.
+
+=for author
+From: "Brent Dax" <brentdax@cpan.org>
+
+=head1 CORRECTIONS
+
+Please send corrections to the perl6-internals mailing list.
+
+=cut
