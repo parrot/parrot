@@ -341,7 +341,7 @@ AUTO_OP dec_n {
 
 /* DEC Nx, nnn */
 AUTO_OP dec_n_nc {
-  NUM_REG(P1) += P2;
+  NUM_REG(P1) -= P2;
 }
 
 /* ITON Nx, Iy */
