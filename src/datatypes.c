@@ -24,7 +24,7 @@ Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
             return i;
     }
 
-    free(type);
+    string_cstring_free(type);
 
     return enum_type_undef;
 }

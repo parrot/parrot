@@ -5028,7 +5028,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   PMC *nci;
 
   Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(PMC_data($2), name));
-  free(name);
+  string_cstring_free(name);
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {

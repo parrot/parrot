@@ -185,7 +185,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
         {
             char *tempstr = string_to_cstring(interpreter, ts);
             strcpy(out + i, tempstr);
-            free(tempstr);
+            string_cstring_free(tempstr);
         }
         i = strlen(out);
     }
@@ -200,7 +200,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
         {
             char *tempstr = string_to_cstring(interpreter, ts);
             strcpy(out + i, tempstr);
-            free(tempstr);
+            string_cstring_free(tempstr);
         }
         i = strlen(out);
     }
@@ -584,7 +584,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                          tempstr,
                                          (double)thefloat);
-                                free(tempstr);
+                                string_cstring_free(tempstr);
                             }
 
 #if _WIN32
