@@ -1,5 +1,5 @@
 Here's the list of things that we know are broken, or
 are admittedly hackish stopgap measures.
 
-- 'long doubles' on x86 don't work.  It's a packfile thing, which
+- 'long doubles' don't work.  It's a packfile thing, which
 will eventually change.  They'll be fixed then.
