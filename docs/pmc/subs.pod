@@ -55,8 +55,8 @@ Create a subroutine (in P0) and a return continuation (in P1):
 
 =head2 All together now
 
-The following scheme can be uesd, if a subroutine is called once or
-performance doesn't matter:
+The following scheme can be used if a subroutine is called once or
+if performance doesn't matter:
 
     newsub P0, .Sub, _sub_label	# create subroutine
     set I5, 42			# pass an argument
@@ -66,9 +66,9 @@ performance doesn't matter:
     print I5			# do something with parameters
     invoke P1			# return
 
-If a subroutine is called several times e.g. inside a loop, the creation of
-the return continuation shall be done outside the loop, if performance
-is an issue:
+If a subroutine is called several times, for instance inside a loop, 
+the creation of the return continuation can be done outside the loop if 
+performance is an issue:
 
     newsub .Sub, .Continuation, _sub_label, ret_label
     set I16, 1000000
@@ -85,9 +85,9 @@ is an issue:
     # do_something
     invoke P1
 
-If items in the interpreter context are changed between creation of
-subroutine/return continuation and invocation, the C<updatecc> opcode
-should be used.
+If items in the interpreter context are changed between creation of the
+subroutine/return continuation and its invocation, the C<updatecc> opcode
+should be used:
 
     newsub .Sub, .Continuation, _sub_label, ret_label
     ...
