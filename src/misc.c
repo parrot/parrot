@@ -347,6 +347,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    info.phase = PHASE_TERM;
 			    goto AGAIN;
 			}
+                        break;
 
 			info.phase = PHASE_TERM;
 			continue;
@@ -477,6 +478,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    break;
 
 			}
+                        break;
 
 			info.phase = PHASE_DONE;
 		    }
@@ -499,7 +501,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 }
 
 
-STRING *Parrot_vsprintf_c(struct Parrot_Interp * interpreter, char *pat,
+STRING *Parrot_vsprintf_c(struct Parrot_Interp * interpreter, const char *pat,
 			  va_list * args)
 {
     STRING *realpat =
@@ -508,7 +510,7 @@ STRING *Parrot_vsprintf_c(struct Parrot_Interp * interpreter, char *pat,
     return Parrot_vsprintf_s(interpreter, realpat, args);
 }
 void
-Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, char *pat,
+Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
 		va_list * args)
 {
     STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
@@ -520,7 +522,7 @@ Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, char *pat,
 
 void
 Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
-		 UINTVAL len, char *pat, va_list * args)
+		 UINTVAL len, const char *pat, va_list * args)
 {
     STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
     string_transcode(interpreter, ret, NULL, NULL, &ret);
@@ -548,7 +550,7 @@ STRING *Parrot_sprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
     return ret;
 }
 
-STRING *Parrot_sprintf_c(struct Parrot_Interp * interpreter, char *pat,
+STRING *Parrot_sprintf_c(struct Parrot_Interp * interpreter, const char *pat,
 			 ...)
 {
     STRING *ret;
@@ -564,7 +566,7 @@ STRING *Parrot_sprintf_c(struct Parrot_Interp * interpreter, char *pat,
 }
 
 void
-Parrot_sprintf(struct Parrot_Interp *interpreter, char *targ, char *pat,
+Parrot_sprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
 	       ...)
 {
     va_list args;
@@ -578,7 +580,7 @@ Parrot_sprintf(struct Parrot_Interp *interpreter, char *targ, char *pat,
 
 void
 Parrot_snprintf(struct Parrot_Interp *interpreter, char *targ, UINTVAL len,
-		char *pat, ...)
+		const char *pat, ...)
 {
     va_list args;
 

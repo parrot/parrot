@@ -3,7 +3,7 @@
 #include <stdarg.h>
 
 INTVAL
-Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass, char* message, ...) {
+Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass, const char* message, ...) {
 	STRING * targ;
 
 	va_list args;
