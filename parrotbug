@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin perl -w
 # Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -82,7 +82,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.2.1";
+my $VERSION = "0.2.2";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -151,7 +151,7 @@ be needed.
 Usage:
 
  $0 [-s subject] [-b body] [-f inputfile] [-r returnaddress] [-A]
-    [-e editor] [-ok|-nok|-d]
+    [-e editor] [-t address] ][-ok|-nok|-d]
  $0 {-h|-V}
 
 Simplest usage:  run '$0', and follow the prompts.
@@ -174,6 +174,7 @@ Options:
         this if you don't give it here.
   -s    Subject to include with the message. You will be prompted
         if you don't supply one on the command line.
+  -t    Test mode, so one can provide an address to send reports to.
   -V    Print version information and exit.
 
 EOF
@@ -271,7 +272,7 @@ sub init {
     @ARGV = split m/\s+/,
         MacPerl::Ask("Provide command-line args here (-h for help):")
         if $is_macos && $MacPerl::Version =~ /App/;
-    help() unless getopts("AVhb:de:f:n:o:r:s:", \%opts);
+    help() unless getopts("AVhb:de:f:n:o:r:s:t:", \%opts);
 
 
     ##
@@ -323,6 +324,8 @@ sub init {
         $severity = "";
     };
 
+    # Test message, shortcuting recipent.
+    $to = $opts{t} if $opts{t};
 
     ## 
     ## User information.
