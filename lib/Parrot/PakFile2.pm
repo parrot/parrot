@@ -1,4 +1,4 @@
-package Parrot::Packfile;
+package Parrot::PakFile2;
 
 require 5.005_62;
 use strict;
@@ -15,7 +15,7 @@ our @ISA = qw(Exporter DynaLoader);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Parrot::Packfile ':all';
+# This allows declaration	use Parrot::PakFile2 ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
@@ -45,7 +45,7 @@ sub AUTOLOAD {
 	    goto &AutoLoader::AUTOLOAD;
 	}
 	else {
-	    croak "Your vendor has not defined Parrot::Packfile macro $constname";
+	    croak "Your vendor has not defined Parrot::PakFile2 macro $constname";
 	}
     }
     {
@@ -61,7 +61,7 @@ sub AUTOLOAD {
     goto &$AUTOLOAD;
 }
 
-bootstrap Parrot::Packfile $VERSION;
+bootstrap Parrot::PakFile2 $VERSION;
 
 # Preloaded methods go here.
 
@@ -73,14 +73,14 @@ __END__
 
 =head1 NAME
 
-Parrot::Packfile - XS interface to writing Parrot bytecode files
+Parrot::PakFile2 - XS interface to writing Parrot bytecode files
 
 =head1 SYNOPSIS
 
-  use Parrot::Packfile;
+  use Parrot::PakFile2;
   open (OUT, ">foo.pbc") or die $!;
   
-  Parrot::Packfile::output_bytecode(
+  Parrot::PakFile2::output_bytecode(
     {
         bytecode => $gibberish,
         constants => [

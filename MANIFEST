@@ -285,8 +285,8 @@ lib/Parrot/PackFile.pm
 lib/Parrot/PackFile/ConstTable.pm
 lib/Parrot/PackFile/Constant.pm
 lib/Parrot/PackFile/FixupTable.pm
-lib/Parrot/Packfile.pm
-lib/Parrot/Packfile.xs
+lib/Parrot/PakFile2.pm
+lib/Parrot/PakFile2.xs
 lib/Parrot/String.pm
 lib/Parrot/Test.pm
 lib/Parrot/Vtable.pm

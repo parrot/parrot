@@ -3,8 +3,8 @@
 use strict;
 use lib './lib';
 use lib './lib/Parrot/blib/lib';
-use lib './lib/Parrot/blib/arch/auto/Parrot/Packfile';
-use Parrot::Packfile;
+use lib './lib/Parrot/blib/arch/auto/Parrot/PakFile2';
+use Parrot::PakFile2;
 use Parrot::Assembler::Utils;
 use strict;
 use Parrot::OpLib::core;
@@ -51,7 +51,7 @@ my $packfile = {
     constants => \@const_table
 };
 
-print Parrot::Packfile::output_bytecode($packfile);
+print Parrot::PakFile2::output_bytecode($packfile);
 
 exit;
 

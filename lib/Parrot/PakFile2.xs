@@ -86,7 +86,7 @@ SV* output_bytecode(SV* sv) {
     
 }
 
-MODULE = Parrot::Packfile		PACKAGE = Parrot::Packfile		
+MODULE = Parrot::PakFile2		PACKAGE = Parrot::PakFile2		
 
 SV* 
 output_bytecode(sv)

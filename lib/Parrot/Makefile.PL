@@ -6,8 +6,8 @@ my $objects = join ' ', map { "../../$_" } split /\s+/,'string.o encoding.o enco
 $objects .= ' $(BASEEXT)$(OBJ_EXT)';
 
 WriteMakefile(
-    'NAME'		=> 'Parrot::Packfile',
-    'VERSION_FROM'	=> 'Packfile.pm', # finds $VERSION
+    'NAME'		=> 'Parrot::PakFile2',
+    'VERSION_FROM'	=> 'PakFile2.pm', # finds $VERSION
     'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
     'LIBS'		=> [''], # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
