@@ -55,6 +55,9 @@ N: Bryan C. Warnock
 
 N: Chip Salzenberg
 
+N: chromatic
+D: SDL library and examples
+
 N: Clinton A. Pierce
 D: Many PIR tests and fixes
 
@@ -68,6 +71,9 @@ D: JIT and EXEC subsystems
 
 N: David M. Loyd
 
+N: Goplat
+D: Win98 and other fixes.
+
 N: Gregor N. Purdy
 D: Early Parrot core, including packfile and op processing code,
 D: first predereferencing core, first Parrot-targetted compiler
@@ -79,6 +85,9 @@ S: Seattle, WA
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
 
+N: Jarkko Hietaniemi
+D: packfile and Tru64 fixes; lot of general hints to improve portability
+
 N: Jason Gloudon
 
 N: Jeff Clites
@@ -86,6 +95,9 @@ D: PPC JIT patches
 
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
+
+N: Jeffrey Dik
+D: Test system fixes
 
 N: Jens Rieks
 D: dumper and sort library
@@ -150,6 +162,7 @@ N: Michael G. Schwern
 N: Michael Scott
 D: Getting Started Guide for Parrot, many doc fixes
 D: Mac OS X build fixes
+D: HTML documentaion for Parrot
 E: michael_scott@mac.com
 W: http://xrl.us/sml
 
@@ -163,6 +176,9 @@ D: Building and platform compat and more.
 
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
+
+N: Nigelsandever
+D: Win32 patches
 
 N: Peter Gibbs
 D: String subsystem
@@ -188,7 +204,11 @@ D: Tests, docs and misc. bugfixes
 E: scog@amnh.org
 S: New York, NY
 
-N: Stephane Payrard
+N: Stéphane Payrard
+D: Various code fixes and improvement
+
+N: Stéphane Peiry
+D: Lot of JIT/sun patches
 
 N: Steve Clark
 D: Bugfixes
@@ -201,8 +221,10 @@ S: San Carlos, CA, USA
 N: Tom Hughes
 
 N: Will Coleda
+D: Tcl language and misc fixes
 
 N: Uri Guttman
+D: Lot of general Parrot design hints
 
 N: Vladimir Lipsky
 D: Win32, IO fixes

@@ -20,7 +20,7 @@
 #include "pbc.h"
 #include "parser.h"
 
-#define IMCC_VERSION "0.0.13.0"
+#define IMCC_VERSION "0.1.0"
 
 static int load_pbc, run_pbc, write_pbc, pre_process;
 static char optimizer_opt[20];
@@ -96,7 +96,7 @@ imcc_version(void)
 {
     printf("This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME ".\n\
-Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.\n\
+Copyright (C) 2001-2004 The Perl Foundation.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
 GNU General Public License, which may be found in the Parrot source kit.\n\

@@ -7,3 +7,5 @@ BUGS:
 
  - IMCC does produce b0rken PASM files, when compiling .imc source
    files with duplicate local labels.
+   Also label fixup handling is different so just don't compile
+   PIR files to PASM except for debugging.

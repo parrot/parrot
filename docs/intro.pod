@@ -15,12 +15,12 @@ what Parrot is and how to use it.
 =head1 What is Parrot?
 
 First, though, what is Parrot, and why are we making such a fuss about
-it? Well, if you haven't been living in a box for the past year, you'll
+it? Well, if you haven't been living in a box for the past years, you'll
 know that the Perl community has embarked on the design and
 implementation of a new version of Perl, both the language and the
 interpreter.
 
-Parrot is strongly related to Perl 6, but it is not Perl 6. To find out
+Parrot is related to Perl 6, but it is not Perl 6. To find out
 what it actually is, we need to know a little about how Perl works.
 When you feed your program into C<perl>, it is first compiled into an
 internal representation, or bytecode; then this bytecode is fed to
@@ -58,10 +58,9 @@ Parrot to become a "common language runtime" for dynamic languages.
 It should be stressed we're still in the early stages of
 development.
 
-But don't let that put you off! Parrot is still very much usable; we've
-already seen two mini-languages emerge which compile down to Parrot
-bytecode (more on that later), and Leon Brocard has been working on
-automatically converting Java bytecode to Parrot.
+But don't let that put you off! Parrot is still very much usable; we've already
+a lot of languages (in different state of completeness) which compile down to
+Parrot bytecode. Please have a look at the F<languages/> subdirectory.
 
 At the moment, it's possible to write simple programs in Parrot
 assembly language, use an assembler to convert them to machine code and
@@ -75,7 +74,7 @@ So let's get ourselves a copy of Parrot, so that we can start
 investigating how to program in the Parrot assembler.
 
 Periodic, numbered releases will appear on CPAN (we're currently on
-version 0.0.10), but at this stage of the project an awful lot is
+version 0.1.0), but at this stage of the project an awful lot is
 changing between releases. To really keep up to date with Parrot,
 we should get our copy from the CVS repository. Here's how we do that:
 
@@ -107,26 +106,29 @@ Now we have downloaded Parrot, we need to build it; so:
 
 The Configure script will then attempt to discover your local
 configuration automatically; you can supply the --ask switch if
-you wish to configure the build manually. Once Configure has
-finished successfully, type C<make> (or the name of your local C<make>
-program). With any luck, Parrot will successfully build the test
-interpreter. (If it doesn't, the address to complain to is at the
-end of this introduction...)
+you wish to configure the build manually. You might also have a
+look at:
+
+ % perl Configure.pl --help
+
+Once Configure has finished successfully, type C<make> (or the name of your
+local C<make> program). With any luck, Parrot will successfully build. (If it
+doesn't, the address to complain to is at the end of this introduction...)
 
 =head2 The test suite
 
 Now we should run some tests; so type C<make test> and you should see a
 readout like the following:
 
- perl t/harness
- t/op/basic.....ok, 1/2 skipped:  label constants unimplemented in
- assembler
- t/op/string....ok, 1/4 skipped:  I'm unable to write it!
- All tests successful, 2 subtests skipped.
- Files=2, Tests=6,  2 wallclock secs ( 1.19 cusr +  0.22 csys =  1.41 CPU)
+ perl t/harness --gc-debug --running-make-test  -b t/op/*.t t/pmc/*.t \
+      t/native_pbc/*.t imcc/t/*/*.t t/src/*.t
+ t/op/00ff-dos...........ok
+ t/op/00ff-unix..........ok
+ ...
+ All tests successful, 40 subtests skipped.
+ Files=95, Tests=1386, 125 wallclock secs (56.96 cusr + 23.71 csys = 80.67 CPU)
 
-
-(Of course, there are many more tests than this, but you get the idea;
+(Of course, there might be more tests than this, but you get the idea;
 tests may be skipped - for one reason or another - but none of them should
 fail!)
 
@@ -227,19 +229,16 @@ We can even perform some simple string manipulation:
 
     set S1, "fish"
     set S2, "bone"
-    concat S1, S2       # S1 is now "fishbone"
-    set S3, "w"
-    substr S4, S1, 1, 7
-    concat S3, S4       # S3 is now "wishbone"
-    length I1, S3       # I1 is now 8
-
+    concat S1, S2             # S1 is now "fishbone"
+    substr S4, S1, 0, 1, "w"  # S1 is now "wishbone"
+    length I1, S1             # I1 is 8
+    end
 
 =head2 Branches
 
 Code gets a little boring without flow control; for starters, Parrot
 knows about branching and labels. The C<branch> op is equivalent to
 Perl's C<goto>:
-
 
           branch TERRY
  JOHN:    print "fjords\n"
@@ -319,8 +318,7 @@ register 2 to zero. The inner loop increments register 2 until it
 reaches the 3 million we stored in register 3. When it is no longer
 less than (or equal to) 3 million, we go back to the C<REDO> of the
 outer loop. In essence, we're just spinning around a busy loop to waste
-some time. This is only because Parrot doesn't currently have a "sleep"
-op; we'll see how to implement one later on.
+some time.
 
 How do we run this? Copy the assembler to a
 file F<showtime.pasm>, and inside your Parrot directory, run:
@@ -381,47 +379,8 @@ This is the equivalent code in Perl:
 =head2 Further examples
 
 Additional examples of what can be done with Parrot assembler can be
-found in the F<parrot/examples/assembly> subdirectory, and on the web at
+found in the F<parrot/examples/> subdirectory, and on the web at
 http://www.parrotcode.org/examples/.
-
-=head2 Jako
-
-So much for programming in assembler; let's move on and look at a
-medium-level language - Jako. Jako was written by Gregor Purdy who
-obviously got sick (as a parrot) of programming in assembler. Jako
-looks a little bit like C and a little bit like Perl, and it can do
-anything you can do in Parrot assembler, but a little tidier. Let's try
-that Fibonacci program again:
-
-        print("The first 20 fibonacci numbers are:\n");
-        var int i = 0;
-        var int target = 20;
-        var int a = 0;
-        var int b = 1;
-        var int num;
-        while (i != target) {
-           num = b;
-           b += a;
-           a = num;
-           print("$a\n");
-           i++;
-        }
-
-Notice how similar this is to the Perl version? I stripped away the
-C<$> sigils, replaced the Perlish C<until> with a more common C<while>,
-replaced C<my> with C<var int> and I was nearly done.
-
-The Jako compiler, C<jakoc>, ships with Parrot in the
-F<languages/jako> subdirectory:
-
-  % languages/jako/jakoc fib.jako > fib.pasm
-  % ./parrot fib.pasm
- The first 20 fibonacci numbers are:
- 1
- 1
- 2
- 3
- ...
 
 =head1 Where Next?
 
@@ -429,62 +388,6 @@ Parrot is obviously developing very rapidly, and we've still got a long
 way to go before we are ready to a compiler to this platform. This
 section is for those who are interested in helping us take Parrot
 further.
-
-=head2 Adding operations
-
-The first thing we need is a lot more operations; but this needs to be
-carefully thought out, and all new proposals for operations should be
-checked by Dan Sugalski, the Parrot designer.
-
-That said, adding operations to Parrot is actually very simple. Let's
-add the C<sleep> operator we were complaining about earlier.
-
-Although we've been able to say C<print "String"> and C<print I3> to
-print a register, Parrots ops are B<not> polymorphic - this is some
-trickery carried out by the assembler. Those two operations would be
-implemented by two different ops, C<print_sc> to print a string
-constant, and C<print_i> to print an integer register.
-All this is handled by the preprocessor, so all we need to do to
-add an opcode is to add its implementation to the F<core.ops> file.
-
-The format of this file is a little funny; it's C which is
-pre-processed by a Perl program. The C functions should be declared
-either C<op foo ()> or C<inline op foo ()>.
-
-The C<inline> prefix is a hint for code generation that this is a
-very simple op function, which for JIT or other optimizations might
-be able to be converted inline. Non-inline op functions might
-require more work.
-
-There are special patterns, the most important of which is
-C<goto NEXT()>. The statement C<goto NEXT()> means that the address
-of the next op should be worked out automatically during real C
-code generation based on the size of the current op.
-
-Arguments are denoted by C<$1>, C<$2> and so on - they aren't actual
-arguments to the C function, but are pulled out of the bytecode
-stream.
-
-So let's do the constant sleep op first. We want to take the first
-parameter, C<$1>, and pass it to C<sleep>:
-
- inline op sleep (i|ic) {
-   sleep($1);
-   goto NEXT();
- }
-
-That works for both integer constant and integer register argument
-versions of the op function.
-
-All that's missing is a test suite (see F<t/op/basic.t> for an example)
-and some documentation (add your POD to F<core.ops> and it'll be
-automatically added into the appropriate file in F<docs>)
-and we've added our instructions to the
-Parrot CPU. The assembler will automatically determine whether we're
-sleeping for a constant time or a variable time, and will despatch the
-right op when we just say C<sleep>. Now we can rewrite the C<showtime>
-code a little more neatly - or rather, B<you> can, as a nice little
-exercise!
 
 =head2 Vtable datatypes
 
@@ -510,19 +413,9 @@ create a new PMC with
 
     new P0, <typename>
 
-and then use any of the instructions in F<core.ops>
+and then use any of the instructions in F<ops/core.ops> and F<ops/pmc.ops>
 which support PMCs. F<doc/vtables.pod> also tells you how to implement
 your own PMC vtable classes.
-
-=head2 More Todos
-
-There are a huge number of things we want to do with Parrot: we need,
-for instance, to create some I/O operators to make programs actually
-interesting; we want to create a range of string functions to deal with
-various encodings and convert between them; we want more documentation;
-we really, really need more tests; we want to check Parrot's
-portability to various platforms; and finally, there are a load more
-ops that we need to implement.
 
 =head2 Getting involved
 
@@ -539,7 +432,7 @@ high-quality patches.
 A useful web page is L<http://cvs.perl.org>, which reminds you how to use CVS,
 and allows you to browse the CVS repository; the code page is a summary
 of this information and other resources about Parrot. Another good
-resource is http://www.parrotcode.org.
+resource is L<http://www.parrotcode.org>.
 
 So don't delay - pick up a Parrot today!
 

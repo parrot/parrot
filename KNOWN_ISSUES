@@ -14,6 +14,7 @@ Memory Leaks
 - PIO subsystem leaks file handles (ParrotIO structures)
 - regexen leak bitmaps
 - string_to_cstring returns a malloced string, which isn't freed everywhere
+- imcc is currently leaking Unit structures and possibly more
 
 Regexes
 
@@ -23,6 +24,11 @@ JIT
 
 - 64 bit integers on 32 bit machines don't work
 - parrot register inspection is incomplete (P-regs)
+- This sequence:
+   loop: dec I0
+         inc I1       # or add, sub, ...
+	 if I0, loop
+  isn't handled correctly on JIT/i386.
 
 Configuration
 

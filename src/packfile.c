@@ -499,18 +499,12 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                 header->byteorder, header->byteorder ? "big " : "little-");
 #endif
 
-#if 0
-    /*
-     * disable version check, so that we can fix PF platforms
-     * issues
-     */
     if (header->major != PARROT_MAJOR_VERSION ||
             header->minor != PARROT_MINOR_VERSION) {
         PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
                 "interpreter: version mismatch\n");
         return 0;
     }
-#endif
 
     /* check the fingerprint */
     if (!PackFile_check_fingerprint (header->pad)) {

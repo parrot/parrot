@@ -11,7 +11,7 @@ Tests
 String subsystem
 ----------------
 
-    Use string iterators
+    Use string iterators where applicable.
     Implement character class & properties testing (for regular expressions)
     Automate string vtable generation
     Fill in vtables for non-ASCII encodings: UTF-8, UTF-16, UTF-32, etc.
@@ -101,4 +101,5 @@ Debugger
     Make breakpoints at labels
     Read core dumps
     Attach to a running program
-    List breakpoints.
+    List breakpoints
+    Handle restart opcodes

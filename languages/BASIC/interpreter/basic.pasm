@@ -10,6 +10,13 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2004/02/29 13:18:54  leo
+# release 0.1.0 preparation
+# * new utility to fix version and fingerprint
+# * fix line endings - reported by Mitchell N Charity
+# * misc release related files updated
+# * update native PBC to new version, fingerprint
+#
 # Revision 1.1  2003/03/09 23:08:58  clintp
 # Re-organized the languages\BASIC area into two areas, one for the older
 # interpreted GW-type BASIC and one for the newer compiled QB-like BASIC.

@@ -1,5 +1,5 @@
-This is Parrot, version 0.0.13
-------------------------------
+This is Parrot, version 0.1.0
+-----------------------------
 
 Parrot is Copyright (C) 2001-2004 The Perl Foundation. All Rights Reserved.
 
@@ -48,7 +48,7 @@ to run the Configure script. The Configure.pl script extracts configuration
 from the running perl5 program. If you have a non-standard setup (like "long
 long" integers on a 32-bit system), you should run:
 
-    perl Configure.pl --intval=int --opcode=int
+    perl Configure.pl --intval=long --opcode=long
 
 See "perl Configure.pl --help" for more options.
 
@@ -77,7 +77,10 @@ You can test parrot by running
 
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.
 If you have any problems, see the section "Reporting Problems" in
-docs/intro.pod.
+docs/intro.pod. These documents are in POD format. You can view these files
+with:
+
+    perldoc -F docs/intro.pod
 
 NOTES
 -----
