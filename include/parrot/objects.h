@@ -47,6 +47,9 @@ PMC *Parrot_new_method_cache(Parrot_Interp);
 PMC *Parrot_find_method_with_cache(Parrot_Interp, PMC *, STRING *);
 INTVAL Parrot_add_attribute(Parrot_Interp, PMC*, STRING*);
 void Parrot_note_method_offset(Parrot_Interp, UINTVAL, PMC *);
+PMC *Parrot_get_attrib_by_num(Parrot_Interp, PMC *, INTVAL);
+void Parrot_set_attrib_by_num(Parrot_Interp, PMC *, INTVAL, PMC *);
+INTVAL Parrot_get_attrib_num(Parrot_Interp, PMC *, STRING *);
 
 #endif
 

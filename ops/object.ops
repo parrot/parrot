@@ -286,6 +286,28 @@ Remove attribute $2 from class $1, specified either by name or offset.
 
 =cut
 
+=item B<getattribute>(out PMC, in PMC, in INT)
+
+Get attribute number $3 from object $2 and put the result in $1.
+
+=cut
+
+inline op getattribute(out PMC, in PMC, in INT) {
+    $1 = Parrot_get_attrib_by_num(interpreter, $2, $3);
+    goto NEXT();
+}
+
+=item B<setattribute>(in PMC, in INT, in PMC)
+
+Set attribute $2 of object $1 to $3
+
+=cut
+
+inline op setattribute(in PMC, in INT, in PMC) {
+    Parrot_set_attrib_by_num(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
 
 =item B<adddoes>(in PMC, in STR)
 

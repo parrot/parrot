@@ -658,7 +658,7 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     STRING *class_name;
     INTVAL idx;
     PMC *offs_hash;
-    PMC *attr_hash;
+    PMC *attr_hash = NULL;
     PMC *attr_array;
     STRING *full_attr_name;
 
@@ -666,6 +666,7 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     class_name = VTABLE_get_string_keyed_int(interpreter,
             class_array, PCD_CLASS_NAME);
     attr_array = VTABLE_get_pmc_keyed_int(interpreter, class_array, PCD_CLASS_ATTRIBUTES);
+    attr_hash = VTABLE_get_pmc_keyed_int(interpreter, class_array, PCD_ATTRIBUTES);
     idx = VTABLE_elements(interpreter, attr_array);
     VTABLE_set_integer_native(interpreter, attr_array, idx + 1);
     VTABLE_set_string_keyed_int(interpreter, attr_array, idx, attr);
@@ -684,6 +685,41 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     assert(idx + 1 == VTABLE_elements(interpreter, attr_hash));
     class->cache.int_val = idx + 1;
     return idx;
+}
+
+/*
+
+=item C<PMC *
+Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)>
+
+Returns attribute number C<attrib> from C<object>. Presumably the code
+is asking for the correct attribute number.
+
+*/
+
+PMC *
+Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
+{
+    PMC *attrib_array;
+    if (PObj_is_object_TEST(object)) {
+        attrib_array = PMC_data(object);
+        return VTABLE_get_pmc_keyed_int(interpreter, attrib_array, attrib);
+    }
+    else {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't get non-core object attribs yet");
+    }
+}
+
+void
+Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, PMC *value) {
+    PMC *attrib_array;
+    if (PObj_is_object_TEST(object)) {
+        attrib_array = PMC_data(object);
+        VTABLE_set_pmc_keyed_int(interpreter, attrib_array, attrib, value);
+    }
+    else {
+        internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't set non-core object attribs yet");
+    }
 }
 
 /*
