@@ -46,7 +46,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
     return key_string(interpreter, key);
 }
 
-/* Albeit PerlHash doesn't use PMC_data, it needs the next_fo_GC pointer
+/* Albeit PerlHash doesn't use PMC_data, it needs the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
 pmclass PerlHash need_ext does hash {
@@ -55,7 +55,7 @@ pmclass PerlHash need_ext does hash {
 
 =item C<void class_init()>
 
-Class initialization. Creates the memory for the hash.
+Class initialization. Allocates the memory for the hash.
 
 =cut
 
@@ -146,7 +146,7 @@ Returns the type of the element for C<*key>.
 
 =item C<PMC *clone()>
 
-Cretaes and returns a clone of the hash.
+Creates and returns a clone of the hash.
 
 =cut
 
@@ -417,7 +417,7 @@ Returns the number of elements in the hash.
         HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF), 
                                         key);
         if (b == NULL) {
-            /* XXX should store the undef for consisteny */
+            /* XXX should store the undef for consistency */
             PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
             return new_undef;
         }
@@ -440,7 +440,7 @@ Returns the PMC value for the element at C<*key>.
                                         keystr);
         PMC* nextkey;
         if (b == NULL) {
-            /* XXX should store the undef for consisteny */
+            /* XXX should store the undef for consistency */
             PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
             return new_undef;
         }
