@@ -1323,6 +1323,7 @@
 [BASIC]		languages/BASIC/compiler/COMP_toker.pm
 [BASIC]		languages/BASIC/compiler/RT_aggregates.pasm
 [BASIC]		languages/BASIC/compiler/RT_builtins.pasm
+[BASIC]		languages/BASIC/compiler/RT_debugger.pasm
 [BASIC]		languages/BASIC/compiler/RT_expr.pasm
 [BASIC]		languages/BASIC/compiler/RT_initialize.pasm
 [BASIC]		languages/BASIC/compiler/RT_io.pasm
