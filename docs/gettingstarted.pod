@@ -94,7 +94,7 @@ There is also some experimental auto-generated HTML documentation
 available by running the following command in the Parrot distribution's
 root directory:
 
-    % perl tools/docs/write_docs.pl -s -d
+    % perl tools/docs/write_docs.pl -s
 
 To view the HTML documentation start with the page F<docs/html/index.html>.
 
