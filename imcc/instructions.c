@@ -36,7 +36,7 @@ static int e_file_emit(void *param, IMC_Unit *, Instruction *);
 Emitter emitters[2] = {
     {e_file_open,
      e_file_emit,
-     (int (*)(void *))NULLfunc,
+     (int (*)(void *, IMC_Unit *))NULLfunc,
      e_file_close},
 
     {e_pbc_open,
@@ -471,6 +471,7 @@ static int
 e_file_emit(void *param, IMC_Unit * unit, Instruction * ins)
 {
     UNUSED(param);
+    UNUSED(unit);
 #if IMC_TRACE
     PIO_eprintf(NULL, "e_file_emit\n");
 #endif
@@ -498,7 +499,7 @@ emit_open(int type, void *param)
 int
 emit_flush(void *param, IMC_Unit * unit)
 {
-    Instruction * ins, *next;
+    Instruction * ins;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 #if IMC_TRACE
     fprintf(stderr, "instructions.c: emit_flush\n");

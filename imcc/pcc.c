@@ -532,6 +532,8 @@ check_tail_call(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     int call_found, ret_found;
     int i, j, matching;
     struct pcc_sub_t *call, *ret;
+
+    UNUSED(unit);
     /*
      * currently only with -Oc
      */
