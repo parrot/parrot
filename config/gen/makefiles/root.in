@@ -440,8 +440,6 @@ jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h jit/${jitcpuarch}/core.jit
 
 docs : docs/.dummy
 
-#newasm : $(TEST_PROG) lib/Parrot/.dummy
-
 docs/.dummy :
 	cd docs && $(MAKE) && cd ..
 
@@ -463,6 +461,24 @@ languages.dummy :
 ###############################################################################
 
 test : $(TEST_PROG) test_prep test_dummy
+
+fulltest : $(TEST_PROG) test_prep fulltest_dummy
+
+.PHONY: fulltest_dummy
+fulltest_dummy :
+	$(PERL) t/harness $(TEST_PROG_ARGS)
+	$(PERL) t/harness -j $(TEST_PROG_ARGS)
+	$(PERL) t/harness -P $(TEST_PROG_ARGS)
+	$(PERL) t/harness -g $(TEST_PROG_ARGS)
+
+quickfulltest : $(TEST_PROG) test_prep quickfulltest_dummy
+
+.PHONY: quickfulltest_dummy
+quickfulltest_dummy :
+	$(PERL) t/harness $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness -j $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness -P $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness -g $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
 test_prep : ${blib_lib_libparrot_a} assemble.pl
