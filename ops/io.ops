@@ -369,6 +369,12 @@ If for some reason the line's longer than 64K you get only 64K
 
 inline op readline(out STR, in PMC) {
   size_t len = 0;
+  opcode_t * resume = expr NEXT();
+  /* experimental error handling, mainly for t/pmc/io_5.pasm */
+  int ok = VTABLE_get_bool(interpreter, $2);
+  if (!ok)
+      real_exception(interpreter, resume, PIO_ERROR,
+          "File not found");
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
   memset(($1)->strstart, 0, 65535);
 

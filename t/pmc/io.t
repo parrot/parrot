@@ -124,6 +124,7 @@ ok1:
         print "not "
 _readline_handler:
         print "ok 2\n"
+	branch fin
 
         newsub P20, .Exception_Handler, _read_handler
         set_eh P20
@@ -137,13 +138,13 @@ _read_handler:
         print P0, "kill me now\n"
         print "not "
 _print_handler:
+fin:
         print "ok 4\n"
 
         end
 CODE
 ok 1
 ok 2
-ok 3
 ok 4
 OUTPUT
 }
