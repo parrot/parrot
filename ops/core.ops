@@ -2204,8 +2204,6 @@ protected against buffer overflows and the like.  There are some
 differences, especially concerning sizes (which are largely ignored);
 see F<misc.c> for details.
 
-=back
-
 =cut
 
 inline op sprintf(out STR, in STR, in PMC) {
@@ -2219,6 +2217,8 @@ inline op sprintf(out PMC, in PMC, in PMC) {
     );
     goto NEXT();
 }
+
+=cut
 
 =item B<new>(out STR)
 
@@ -2297,6 +2297,8 @@ op find_encoding(out INT, in STR) {
 =item B<string_encoding>(out INT, in STR)
 
 Find the encoding type for $2 and put it in $1
+
+=back
 
 =cut
 
