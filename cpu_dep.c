@@ -12,10 +12,10 @@
 
 #include "parrot/parrot.h"
 
-void flush_register_windows(void){
-
+void
+flush_register_windows(void)
+{
 #ifdef __sparc
-
     static union {
 	int insns[4];
         double align_hack[2];
@@ -38,4 +38,3 @@ void flush_register_windows(void){
 
 #endif
 }
-
