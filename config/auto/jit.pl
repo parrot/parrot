@@ -4,6 +4,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step qw(copy_if_diff);
 
+print "\n";
 
 $description = "Determining architecture, OS and JIT capability...";
 
@@ -40,7 +41,15 @@ sub runstep {
     ($osname, $cpuarch) = ($cpuarch, "");
   }
 
-  if(($osname =~ /darwin/) || ($archname =~ /powerpc/)) {
+  # On OS X if you are using the Perl that shipped with the system
+  # the above split fails because archname is "darwin-thread-multi-2level".
+  
+  if($cpuarch =~ /darwin/) {
+    $osname = 'darwin';
+    $cpuarch = 'ppc';
+  }
+
+  if($archname =~ /powerpc/) {
     $cpuarch = 'ppc';
   }
 
@@ -66,6 +75,9 @@ sub runstep {
   #$jitarchname                 =~ s/-(net|free|open)bsd$/-bsd/i;
   my $jitcapable               =  0;
   my $execcapable              =  0;
+
+print "\$jitarchname = $jitarchname\n";
+print "-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'no', "\n";
 
   if (-e "jit/$cpuarch/core.jit") {
     $jitcapable = 1;
