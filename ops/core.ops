@@ -447,23 +447,97 @@ met, the branch happens, otherwise control falls to the next operation.
 
 ########################################
 
-=item B<eq>(i, i, ic)
+=item B<eq>(i|ic, i|ic)
 
-=item B<eq>(i, ic, ic)
+=item B<eq>(n|nc, n|nc)
 
-=item B<eq>(n, n, ic)
+=item B<eq>(s|sc, s|sc)
 
-=item B<eq>(n, nc, ic)
+=item B<eq>(i|ic, i|ic, ic)
 
-=item B<eq>(s, s, ic)
+=item B<eq>(n|nc, n|nc, ic)
 
-=item B<eq>(s, sc, ic)
+=item B<eq>(s|sc, s|sc, ic)
 
 Branch if $1 is equal to $2.
 
+Return address is popped off the call stack if no address is supplied.
+
 =cut
 
+AUTO_OP eq (i, i|ic) {
+  opcode_t *dest;
+  if ($1 == $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP eq (ic, i|ic) {
+  opcode_t *dest;
+  if ($1 == $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP eq (n, n|nc) {
+  opcode_t *dest;
+  if ($1 == $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP eq (nc, n|nc) {
+  opcode_t *dest;
+  if ($1 == $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP eq (s, s|sc) {
+  opcode_t *dest;
+  if (string_compare (interpreter, $1, $2) == 0) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP eq (sc, s|sc) {
+  opcode_t *dest;
+  if (string_compare (interpreter, $1, $2) == 0) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
 AUTO_OP eq(i, i|ic, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq (ic, i|ic, ic) {
   if ($1 == $2) {
     RETREL($3);
   }
@@ -475,8 +549,20 @@ AUTO_OP eq(n, n|nc, ic) {
   }
 }
 
+AUTO_OP eq (nc, n|nc, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
 AUTO_OP eq(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) == 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq (sc, s|sc, ic) {
+  if (string_compare (interpreter, $1, $2) == 0) {
     RETREL($3);
   }
 }
@@ -484,23 +570,97 @@ AUTO_OP eq(s, s|sc, ic) {
 
 ########################################
 
-=item B<ne>(i, i, ic)
+=item B<ne>(i|ic, i|ic)
 
-=item B<ne>(i, ic, ic)
+=item B<ne>(n|nc, n|nc)
 
-=item B<ne>(n, n, ic)
+=item B<ne>(s|sc, s|sc)
 
-=item B<ne>(n, nc, ic)
+=item B<ne>(i|ic, i|ic, ic)
 
-=item B<ne>(s, s, ic)
+=item B<ne>(n|nc, n|nc, ic)
 
-=item B<ne>(s, sc, ic)
+=item B<ne>(s|sc, s|sc, ic)
 
 Branch if $1 is not equal to $2.
 
+Return address is popped off the call stack if no address is supplied.
+
 =cut
 
+AUTO_OP ne (i, i|ic) {
+  opcode_t *dest;
+  if ($1 != $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP ne (ic, i|ic) {
+  opcode_t *dest;
+  if ($1 != $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP ne (n, n|nc) {
+  opcode_t *dest;
+  if ($1 != $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP ne (nc, n|nc) {
+  opcode_t *dest;
+  if ($1 != $2) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP ne (s, s|sc) {
+  opcode_t *dest;
+  if (string_compare (interpreter, $1, $2) != 0) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
+AUTO_OP ne (sc, s|sc) {
+  opcode_t *dest;
+  if (string_compare (interpreter, $1, $2) != 0) {
+    pop_generic_entry (
+      interpreter, &interpreter->control_stack_top,
+      &dest, STACK_ENTRY_DESTINATION
+    );
+    RETABS(dest);
+  }
+}
+
 AUTO_OP ne(i, i|ic, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne (ic, i|ic, ic) {
   if ($1 != $2) {
     RETREL($3);
   }
@@ -512,8 +672,20 @@ AUTO_OP ne(n, n|nc, ic) {
   }
 }
 
+AUTO_OP ne (nc, n|nc, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
 AUTO_OP ne(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) != 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne (sc, s|sc, ic) {
+  if (string_compare (interpreter, $1, $2) != 0) {
     RETREL($3);
   }
 }
