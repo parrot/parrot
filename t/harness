@@ -3,6 +3,5 @@
 use strict;
 use Test::Harness qw(runtests);
 
-# Hey, Bonsai! Notice me!
 my @tests = map { glob( "t/$_/*.t" ) } ( qw(op) );
 runtests(@tests);
