@@ -44,15 +44,18 @@ char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
 char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
 
 void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
-void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, char *);
-void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, char *, Parrot_Int);
+void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, const char *);
+void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int);
 void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 void Parrot_PMC_set_numval(Parrot_INTERP, Parrot_PMC, Parrot_Float);
 
 Parrot_PMC Parrot_PMC_new(Parrot_INTERP, Parrot_Int);
-Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, char *);
+Parrot_Int Parrot_PMC_typenum(Parrot_INTERP, const char *);
 
 void Parrot_free_cstring(char *);
+
+void Parrot_call(Parrot_INTERP, Parrot_PMC, Parrot_Int, ...);
+void Parrot_call_method(Parrot_INTERP, Parrot_PMC, Parrot_STRING, Parrot_Int, ...);
 
 Parrot_Int    Parrot_get_intreg(Parrot_INTERP, Parrot_Int);
 Parrot_Float  Parrot_get_numreg(Parrot_INTERP, Parrot_Int);

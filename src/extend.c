@@ -106,7 +106,7 @@ void Parrot_PMC_set_numval(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Float va
  *
  * Assign the passed-in null-terminated C string to the passed-in PMC
  */
-void Parrot_PMC_set_cstring(Parrot_INTERP interp, Parrot_PMC pmc, char *value) {
+void Parrot_PMC_set_cstring(Parrot_INTERP interp, Parrot_PMC pmc, const char *value) {
     VTABLE_set_string_native(interp, pmc, string_from_cstring(interp, value, 0));
 }
 
@@ -114,7 +114,7 @@ void Parrot_PMC_set_cstring(Parrot_INTERP interp, Parrot_PMC pmc, char *value) {
  *
  * Assign the passed-in length-noted string  to the passed-in PMC
  */
-void Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, char *value, Parrot_Int length) {
+void Parrot_PMC_set_cstringn(Parrot_INTERP interp, Parrot_PMC pmc, const char *value, Parrot_Int length) {
     VTABLE_set_string_native(interp, pmc, string_from_cstring(interp, value, length));
 }
 
@@ -133,7 +133,7 @@ Parrot_PMC Parrot_PMC_new(Parrot_INTERP interp, Parrot_Int type) {
  *
  * Returns the internal identifier that represents the named class
  */
-Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, char *class) {
+Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *class) {
     return pmc_type(interp, string_from_cstring(interp, class, 0));
 }
 
@@ -144,6 +144,54 @@ Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, char *class) {
 void Parrot_free_cstring(char *string) {
     string_cstring_free(string);
 }
+
+/* =for api extend Parrot_call
+ *
+ * Call a parrot subroutine, with PMC parameters
+ */
+void Parrot_call(Parrot_INTERP interpreter, Parrot_PMC sub,
+                 Parrot_Int argcount, ...) {
+    Parrot_Int inreg = 0;
+    va_list ap;
+
+    va_start(ap, argcount);
+    
+    /* Will all the arguments fit into registers? */
+    if (argcount < 12) {
+        for (inreg = 0; inreg < argcount; inreg++) {
+            REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
+        }
+    } else {
+        /* Nope, so we need an overflow array */
+        Parrot_PMC overflow;
+        Parrot_Int ocount;
+        overflow = Parrot_PMC_new(interpreter,
+                                  Parrot_PMC_typenum(interpreter, "Array"));
+        Parrot_PMC_set_intval(interpreter, overflow, argcount - 11);
+        for (inreg = 0; inreg < 11; inreg++) {
+            REG_PMC(inreg + 5) = va_arg(ap, Parrot_PMC);
+        }
+        REG_PMC(3) = overflow;
+        for (ocount = 0; ocount < argcount - 11; ocount++) {
+            VTABLE_set_pmc_keyed_int(interpreter, overflow, ocount,
+                                     (Parrot_PMC)va_arg(ap, Parrot_PMC));
+        }
+    }
+    va_end(ap);
+
+    /* Actually make the call, which turns out to be somewhat
+       problematic */
+
+}
+
+/*=for api extend Parrot_call_method
+ *
+ * Call a parrot method, with PMC parameters
+ */
+void Parrot_call_method(Parrot_INTERP interp, Parrot_PMC sub,
+                        Parrot_STRING method, Parrot_Int argcount, ...) {
+}
+
 
 /*=for api extend Parrot_get_intreg
  *
