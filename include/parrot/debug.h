@@ -106,7 +106,7 @@ void PDB_delete_breakpoint(struct Parrot_Interp *, const char *);
 
 void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
 
-char * PDB_escape(const char *);
+char * PDB_escape(const char *, INTVAL);
 
 int PDB_unescape(char *);
 

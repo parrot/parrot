@@ -48,7 +48,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_SC:
                 escaped = PDB_escape(interpreter->code->const_table->
-                                     constants[*(pc + i)]->string->bufstart);
+                                     constants[*(pc + i)]->string->bufstart,
+                                     interpreter->code->const_table->
+                                     constants[*(pc + i)]->string->strlen);
                 fprintf(stderr, "\"%s\"", escaped);
                 break;
             case PARROT_ARG_KC:
@@ -71,7 +73,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
             case PARROT_ARG_S:
                 if (interpreter->ctx.string_reg.registers[*(pc + i)]) {
                     escaped = PDB_escape(interpreter->ctx.string_reg.
-                                         registers[*(pc + i)]->bufstart);
+                                         registers[*(pc + i)]->bufstart,
+                                         interpreter->ctx.string_reg.
+                                         registers[*(pc + i)]->strlen);
                     fprintf(stderr, "S%ld=\"%s\"", (long)*(pc + i),
                             escaped);
                 }

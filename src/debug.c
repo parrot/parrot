@@ -501,18 +501,23 @@ PDB_break(struct Parrot_Interp *interpreter)
  * escapes " \r \n \t \a and \\
  */
 char *
-PDB_escape(const char *string)
+PDB_escape(const char *string, INTVAL length)
 {
+    const char *end = string + length;
     char *new,*fill;
 
     /* Return if there is no string to escape*/
     if (!string || !*string)
         return NULL;
 
-    fill = new = (char *)mem_sys_allocate(strlen(string) * 2);
+    fill = new = (char *)mem_sys_allocate(length * 2 + 1);
 
-    for ( ; *string; string++) {
+    for ( ; string < end; string++) {
         switch (*string) {
+            case '\0':
+                *(fill++) = '\\';
+                *(fill++) = '0';
+                break;
             case '\n':
                 *(fill++) = '\\';
                 *(fill++) = 'n';
@@ -692,7 +697,9 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
                         constants[pc[j]]->string->strlen)
                     {
                         escaped = PDB_escape(interpreter->code->const_table->
-                                         constants[pc[j]]->string->bufstart);
+                                         constants[pc[j]]->string->bufstart,
+                                             interpreter->code->const_table->
+                                         constants[pc[j]]->string->strlen);
                         if (escaped)
                         {
                             strcpy(&pfile->source[pfile->size],escaped);
