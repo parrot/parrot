@@ -230,16 +230,16 @@ sub _get_closure {
         if ($is_rule) {
             $sig = P6C::Rules::default_signature();
             $ctx = P6C::Rules::default_arg_context();
-            $func = new P6C::IMCC::Sub;
-            $rettype = ['int','int'];
+            $rettype = P6C::Rules::default_return_type();
         } else {
-            ($sig, $ctx) = P6C::Parser::parse_sig('*@_');
-            $func = new P6C::IMCC::Sub;
+            ($sig, $ctx) = P6C::Parser::parse_sig('*@_, *%_');
             $rettype = 'PerlArray';
         }
         $closure->params($sig);
         $closure->rettype($rettype);
-        $func->definition(new P6C::sub_def closure => $closure);
+        my $sub_def = new P6C::sub_def closure => $closure;
+        $sub_def->name($sub_name) unless ref $sub_name;
+        $func = new P6C::IMCC::Sub definition => $sub_def;
         unless (ref $sub_name) {
             $P6C::Context::CONTEXT{$sub_name} = $ctx;
             $ftab->{$sub_name} = $func;
@@ -406,6 +406,9 @@ sub gen_sub_call {
 #         }
 
 #        foreach (@$named_unknown) {
+
+    my $key_string;
+    $key_string = gentmp('str') if @$named_known + @$named_unknown > 0;
     foreach (@$named_known, @$named_unknown) {
         my $key = $_->l;
         if (ref $key) {
@@ -414,7 +417,11 @@ sub gen_sub_call {
             $key = qq("$key");
         }
         my $value = $_->r->val;
-        code("\t$nu_var\[$key] = $value # Unknown named arg");
+        code(<<"END");
+        $key_string = $key
+        $nu_var\[$key_string] = $value # Unknown named arg
+END
+        $cannot_prototype = 1;
     }
 
     my $call_return = genlabel 'after_call';

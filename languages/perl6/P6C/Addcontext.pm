@@ -469,7 +469,7 @@ BEGIN {
 # C<@_>.
 sub arg_context {
     my ($name, $ctx, $is_rule) = @_;
-    if (exists $P6C::Context::CONTEXT{$name}) {
+    if (! ref($name) && exists $P6C::Context::CONTEXT{$name}) {
 	return $P6C::Context::CONTEXT{$name};
     }
 #     diag "No context for $name";
@@ -717,16 +717,21 @@ sub P6C::ValueList::ctx_right {
         # Foreach named arg, go through each zone looking for a match.
       ARG:
         foreach my $arg (@named_args) {
-            if (ref($arg->l)) {
-                # If $arg is not constant, add to some sort of runtime
-                # set. We cannot match it here.
-                #
-                # FIXME: That hasn't been implemented yet.
-                $arg->l->ctx_right(new P6C::Context type => 'PerlScalar');
-                die "unimp: non-constant names for named params";
-            }
-
             my $arg_name = $arg->l;
+
+            if (ref $arg_name) {
+                $arg->l->ctx_right(new P6C::Context type => 'PerlScalar');
+                if ($arg_name->isa('P6C::sv_literal')) {
+                    # Cut off quotation marks from literal value
+                    $arg_name = substr($arg_name->lval, 1, -1);
+                } else {
+                    # If $arg is not constant, add to some sort of
+                    # runtime set. We cannot match it here.
+                    #
+                    # FIXME: That hasn't been implemented yet.
+                    die "unimp: non-constant names for named params";
+                }
+            }
 
             foreach my $param (values %positional) {
                 if ($arg_name eq substr($param->{name}, 1)) {

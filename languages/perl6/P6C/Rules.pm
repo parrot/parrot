@@ -30,6 +30,10 @@ sub default_return_context {
     return new P6C::Context type => ['int','int'];
 }
 
+sub default_return_type {
+    return ['int','int'];
+}
+
 sub default_signature {
     _parse_default_sig() unless defined $DEFAULT_RULE_ARGUMENT_CONTEXT;
     return $DEFAULT_RULE_SIGNATURE;
@@ -71,16 +75,6 @@ sub rule_vars {
             $mk_param->('=rx_stack', 'IntList'),
             $mk_param->('=rx_input', 'str'),
             $mk_param->('=rx_pos', 'int'));
-}
-
-sub default_args {
-    my $args = new P6C::ValueList
-      vals => [ new P6C::variable(name => '$rx_mode', type => 'int'),
-                new P6C::variable(name => '@rx_stack', type => 'IntList'),
-                new P6C::variable(name => '$rx_input', type => 'str'),
-                new P6C::variable(name => '$rx_pos', type => 'int'),
-                new P6C::variable(name => '@_', type => 'PerlArray')
-              ];
 }
 
 sub adjust_call {

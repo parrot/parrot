@@ -35,8 +35,6 @@ Narf,Poit!
 OUT
 
 ##############################
-SKIP: {
-skip 'no named arguments yet', 1;
 output_is(<<'CODE', <<'OUT', "named argument passing");
 
 simple('param'=>"Narf.", 'extra'=>"Poit!");
@@ -44,7 +42,7 @@ simple('param'=>"Narf.", 'extra'=>"Poit!");
 sub simple ($param) {
   print $param,"\n";
 }
+
 CODE
 Narf.
 OUT
-}

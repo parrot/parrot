@@ -127,7 +127,7 @@ use vars qw(%CONTEXT $DEFAULT_ARGUMENT_CONTEXT);
 
 sub default_arg_context {
     return $DEFAULT_ARGUMENT_CONTEXT if $DEFAULT_ARGUMENT_CONTEXT;
-    my ($sig, $ctx) = P6C::Parser::parse_sig('*@_');
+    my ($sig, $ctx) = P6C::Parser::parse_sig('*@_, *%_');
     return $DEFAULT_ARGUMENT_CONTEXT = $ctx;
 }
 

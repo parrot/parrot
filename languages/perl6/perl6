@@ -421,9 +421,8 @@ sub output_tree {
         # can find a better place to put all the named arguments than
         # in a magical extra hash arg.
         my $sub_def = new P6C::sub_def name => 'main';
-        my ($default_sig) = P6C::Parser::parse_sig('@ARGS');
+        my ($default_sig) = P6C::Parser::parse_sig('');
         $sub_def->closure(new P6C::closure params => $default_sig);
-        $sub_def->closure->params->{no_named} = 1;
 
         # Add a default 'main' function, but allow it to be overridden
         # without warning by defining a main() in the Perl6 source.

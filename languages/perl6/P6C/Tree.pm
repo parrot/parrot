@@ -910,7 +910,7 @@ sub P6C::stmt::tree {
         my $params = maybe_tree($signature);
         if (! $params) {
             ($params, $P6C::Context::CONTEXT{$name}) =
-              P6C::Parser::parse_sig('*@_');
+              P6C::Parser::parse_sig('*@_, *%_');
         }
 	my $sc = P6C::closure->new(params => $params,
 				   block => ($block eq ';' ? undef

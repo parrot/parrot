@@ -186,7 +186,8 @@ END
 END
     }
     print <<'END';
-	main_sub(P5)
+        $P0 = new PerlHash
+	main_sub($P0)
 	pop_pad
 	end
 .end
@@ -1563,7 +1564,7 @@ use P6C::IMCC ':all';
 
 sub default_signature {
     return $P6C::IMCC::DEFAULT_SIGNATURE ||=
-      (P6C::Parser::parse_sig('*@_'))[0];
+      (P6C::Parser::parse_sig('*@_, *%_'))[0];
 }
 
 # Closure parameters might be explicitly specified, or gathered
@@ -1614,16 +1615,6 @@ sub get_params {
     }
     return new P6C::signature positional => \@sigparams,
                               slurpy_array => $slurpy_array;
-}
-
-sub default_args {
-    my ($x) = @_;
-
-    if ($x->is_rule) {
-        return P6C::Rules::default_args();
-    } else {
-        return new P6C::variable(name => '@_', type => 'PerlArray');
-    }
 }
 
 # Generate the code to implement the body of a subroutine (or anything
