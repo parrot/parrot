@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -812,4 +812,28 @@ Key = foo
 bar
 Key = foo
 bar
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "method cache invalidation");
+.sub main @MAIN
+    .local pmc o, cl
+    newclass cl, "Foo"
+    subclass cl, cl, "Bar"
+    $I0 = find_type "Bar"
+    o = new $I0
+    print o
+    $P0 = global "ok2"
+    store_global "Bar", "__get_string", $P0
+    print o
+.end
+.sub ok2
+    .return("ok 2\n")
+.end
+.namespace [ "Foo" ]
+.sub __get_string
+    .return("ok 1\n")
+.end
+CODE
+ok 1
+ok 2
 OUTPUT

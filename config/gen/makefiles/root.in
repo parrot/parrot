@@ -490,6 +490,7 @@ all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parr
 STR_FILES = \
     $(SRC)/inter_cb.str \
     $(SRC)/inter_misc.str \
+    $(SRC)/global.str \
     $(SRC)/library.str \
     $(SRC)/pmc.str \
     $(SRC)/py_func.str \
@@ -744,6 +745,8 @@ examples/mops/mops${exe} : examples/mops/mops$(O)
 ###############################################################################
 
 $(SRC)/global_setup$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/global$(O) : $(GENERAL_H_FILES) $(SRC)/global.str
 
 $(SRC)/pmc$(O) : $(GENERAL_H_FILES)
 

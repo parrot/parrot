@@ -21,6 +21,7 @@ tdb
 */
 
 #include "parrot/parrot.h"
+#include "global.str"
 
 /*
 
@@ -187,6 +188,10 @@ Parrot_store_global(Interp *interpreter, STRING *class,
     PMC *stash;
     if (class) {
         stash = Parrot_global_namespace(interpreter, globals, class);
+        if (globalname->strlen > 2 &&
+                string_ord(interpreter, globalname, 0) == '_' &&
+                string_ord(interpreter, globalname, 1) == '_')
+            Parrot_invalidate_method_cache(interpreter, class);
     }
     else
         stash = globals;

@@ -1042,6 +1042,11 @@ one. If not, it creates a new method cache. Or, rather, it will when
 we've got that bit working. For now it unconditionally goes and looks up
 the name in the global stash.
 
+=item void Parrot_invalidate_method_cache(Interp *, STRING *class)
+
+Clear method cache for the given class. If class is NULL caches for
+all classes are invalidated.
+
 =cut
 
 */
@@ -1072,6 +1077,50 @@ init_object_cache(Parrot_Interp interpreter)
     SET_NULL(mc->retc_cache);
 }
 
+static void
+invalidate_type_caches(Interp *interpreter, UINTVAL type)
+{
+    Caches *mc = interpreter->caches;
+
+    if (!mc)
+        return;
+    /* is it a valid entry */
+    if (type >= mc->mc_size || !mc->idx[type])
+        return;
+    mem_sys_free(mc->idx[type]);
+    mc->idx[type] = NULL;
+}
+
+static void
+invalidate_all_caches(Interp *interpreter)
+{
+    UINTVAL i;
+    for (i = 1; i < (UINTVAL)enum_class_max; ++i)
+        invalidate_type_caches(interpreter, i);
+}
+
+void
+Parrot_invalidate_method_cache(Interp *interpreter, STRING *class)
+{
+    INTVAL type;
+
+    /* during interpreter creation and NCI registration the class_hash
+     * isn't yet up */
+    if (!interpreter->class_hash)
+        return;
+    if (!class) {
+        invalidate_all_caches(interpreter);
+        return;
+    }
+    type = pmc_type(interpreter, class);
+    if (type < 0)
+        return;
+    if (type == 0) {
+        invalidate_all_caches(interpreter);
+        return;
+    }
+    invalidate_type_caches(interpreter, (UINTVAL)type);
+}
 
 #define TBL_SIZE_MASK 0x1ff   /* x bits 2..10 */
 #define TBL_SIZE (1 + TBL_SIZE_MASK)
