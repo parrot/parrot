@@ -409,7 +409,8 @@ FUNC_ASC:
 	bsr STRNCHR
 	restore I0
 	eq I0, -1, FUNC_ASCII_ERROR
-	save I0
+	set N0, I0
+	save N0
 	bsr NTOA
 	branch ENDFUNCDISPATCH
 
