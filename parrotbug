@@ -71,11 +71,15 @@ supply one on the command line.
 
 Print version information and exit.
 
+=begin DEVELOPER
+
 =back
 
 =head1 Subroutines
 
 =over 4
+
+=end DEVELOPER
 
 =cut
 
@@ -117,9 +121,13 @@ query_info();
 send_msg();
 exit;
 
+=begin DEVELOPER
+
 =item C<explain_parrotbug()>
 
 Explain what C<parrotbug> is.
+
+=end DEVELOPER
 
 =cut
 
@@ -148,9 +156,13 @@ EOF
 #'
 }
 
+=begin DEVELOPER
+
 =item C<help()>
 
 Print synopsis + help message and exit.
+
+=end DEVELOPER
 
 =cut
 
@@ -194,9 +206,13 @@ EOF
     exit;
 }
 
+=begin DEVELOPER
+
 =item C<version()>
 
 Print version information (of the parrotbug program) and exit.
+
+=end DEVELOPER
 
 =cut
 
@@ -215,9 +231,13 @@ EOF
 #------------------------------------------------------------#
 #                        Utils subs.                         #
 
+=begin DEVELOPER
+
 =item C<generate_filename()>
 
 Generate random filename to edit report.
+
+=end DEVELOPER
 
 =cut
 
@@ -229,12 +249,16 @@ sub generate_filename {
     return $filename;
 }
 
+=begin DEVELOPER
+
 =item C<trivial_subject($subject)>
 
 Check whether a subject is trivial. A subject is not considered trivial
 if it's an ok or a nok report.
 
 Return 1 if trivial, 0 otherwise (subject acceptable).
+
+=end DEVELOPER
 
 =cut
 
@@ -258,6 +282,8 @@ sub trivial_subject {
 #------------------------------------------------------------#
 #                         Init subs.                         #
 
+=begin DEVELOPER
+
 =item C<init()>
 
 Initialize the program. 
@@ -265,6 +291,8 @@ Initialize the program.
 Get parrot information, process the options, create the message
 information (subject, to, body, etc.) depending on the type of report
 (ok, nok or bug report).
+
+=end DEVELOPER
 
 =cut
 
@@ -399,9 +427,13 @@ sub init {
 #------------------------------------------------------------#
 #                       Querying subs.                       #
 
+=begin DEVELOPER
+
 =item C<query_info()>
 
 Query missing information in order to have a complete report.
+
+=end DEVELOPER
 
 =cut
 
@@ -418,6 +450,8 @@ sub query_info {
     ask_for_body()           unless $use_file || $body;
 }
 
+=begin DEVELOPER
+
 =item C<ask_for_alternative($what, $choices, $default)>
 
 Prompt for alternatives from a set of choices.
@@ -428,6 +462,8 @@ ref), and the default answer.
 Return the lowercased alternative chosen.
 
 Die if more than 5 wrong answers.
+
+=end DEVELOPER
 
 =cut
 
@@ -454,9 +490,13 @@ EOF
     return lc $alt;
 }
 
+=begin DEVELOPER
+
 =item C<ask_for_body()>
 
 Prompt for body, through an external editor.
+
+=end DEVELOPER
 
 =cut
 
@@ -494,9 +534,13 @@ EOF
     edit_bug_report( $opts{f} );
 }
 
+=begin DEVELOPER
+
 =item C<ask_for_editor()>
 
 Prompt for editor to use.
+
+=end DEVELOPER
 
 =cut
 
@@ -507,9 +551,13 @@ sub ask_for_editor {
     $editor = $entry if $entry ne "";
 }
 
+=begin DEVELOPER
+
 =item C<ask_for_return_address()>
 
 Prompt for return address.
+
+=end DEVELOPER
 
 =cut
 
@@ -547,9 +595,13 @@ EOF
     print "\n\n\n";
 }
 
+=begin DEVELOPER
+
 =item C<ask_for_subject()>
 
 Prompt for subject of message.
+
+=end DEVELOPER
 
 =cut
 
@@ -573,9 +625,13 @@ EOF
     print "\n\n\n";
 }
 
+=begin DEVELOPER
+
 =item C<edit_bug_report($filename)>
 
 Launch an editor in which to edit the bug report.
+
+=end DEVELOPER
 
 =cut
 
@@ -607,9 +663,13 @@ EOF
 #------------------------------------------------------------#
 #                        Action subs.                        #
 
+=begin DEVELOPER
+
 =item C<dump_info()>
 
 Dump everything collected on the specified glob.
+
+=end DEVELOPER
 
 =cut
 
@@ -652,11 +712,15 @@ EOF
     }
 }
 
+=begin DEVELOPER
+
 =item C<send_msg()>
 
 Send message to final recipient.
 
 The body of this method is currently commented out.
+
+=end DEVELOPER
 
 =cut
 
