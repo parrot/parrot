@@ -112,7 +112,7 @@ _sub:
   set I2, 0
   set I3, 0
   set I4, 0
-  invoke P1
+  returncc
 /
 OUT
 
@@ -437,7 +437,7 @@ _sub:
   set I2, 0
   set I3, 1
   set I4, 0
-  invoke P1
+  returncc
 @pcc_sub_ret_\d+:
   set P5, P17
   set I0, 1
@@ -445,7 +445,7 @@ _sub:
   set I2, 0
   set I3, 1
   set I4, 0
-  invoke P1
+  returncc
 /
 OUT
 

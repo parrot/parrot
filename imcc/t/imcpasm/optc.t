@@ -5,50 +5,49 @@ use TestCompiler tests => 6;
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
 
-SKIP: {
-    skip("PCC changes", 6);
 
 ##############################
 # prototyped calls, invokecc
 output_like(<<'CODE', <<'OUT', "in P param");
 .sub _main
-    .local Sub sub
     $P0 = new PerlUndef
     $P0 = 42
-    newsub sub, .Sub, _sub
-    .pcc_begin prototyped
-    .arg $P0
-    .pcc_call sub
-    ret:
-    .pcc_end
+    foo($P0)
+    noop
     end
 .end
-.pcc_sub _sub prototyped
+.sub foo prototyped
     .param PerlUndef a
     print a
-    end
 .end
 CODE
 /_main:
-  set P16, P1
-  new P5, \d+ # \.PerlUndef
-  set P5, 42
-  newsub P0, \d+, _sub
+  set P\d+, P1
+  new (P\d+), \d+ # \.PerlUndef
+  set \1, 42
+  set_p_pc (P\d+), foo
 @pcc_sub_call_\d:
+  set P5, \1
   set I0, 1
   null I1
-  set I2, 1
-  null I3
-  pushtopp
+  null I2
+  set I3, 1
+  null I4
+  set P0, \2
   invokecc
-ret:
-  poptopp
+  set P1, P\d+
+  noop
   end
-_sub:
-  print P5
-  end/
+foo:
+  set (P\d+), P5
+  print \3
+  null I0
+  null I3
+  returncc/
 OUT
 
+SKIP: {
+    skip("PCC changes", 5);
 output_like(<<'CODE', <<'OUT', "in, out P param");
 .sub _main
     .local Sub sub
@@ -83,10 +82,8 @@ CODE
   null I1
   set I2, 1
   set I3, -2
-  pushtopp
   invokecc
 ret:
-  poptopp
   print P5
   end
 _sub:
@@ -97,7 +94,7 @@ _sub:
   null I2
   set I3, 1
   null I4
-  invoke P1/
+  returncc/
 OUT
 
 output_like(<<'CODE', <<'OUT', "in, out P param, P var");
@@ -140,10 +137,8 @@ CODE
   null I1
   set I2, 1
   set I3, -2
-  pushtopp
   invokecc
 ret:
-  poptopp
   print P5
   print P16
   end
@@ -155,7 +150,7 @@ _sub:
   null I2
   set I3, 1
   null I4
-  invoke P1/
+  returncc/
 OUT
 
 output_like(<<'CODE', <<'OUT', "in, out different P param");
@@ -193,10 +188,8 @@ CODE
   null I1
   set I2, 1
   set I3, -2
-  pushtopp
   invokecc
 ret:
-  poptopp
   print P5
   end
 _sub:
@@ -207,7 +200,7 @@ _sub:
   null I2
   set I3, 1
   null I4
-  invoke P1/
+  returncc/
 OUT
 
 output_like(<<'CODE', <<'OUT', "in, out different P param, interfer");
@@ -247,10 +240,8 @@ CODE
   null I1
   set I2, 1
   set I3, -2
-  pushtopp
   invokecc
 ret:
-  poptopp
   print P16
   print P5
   end
@@ -262,7 +253,7 @@ _sub:
   null I2
   set I3, 1
   null I4
-  invoke P1/
+  returncc/
 OUT
 
 output_like(<<'CODE', <<'OUT', "tail call");
@@ -301,10 +292,8 @@ CODE
         null I1
         null I2
         null I3
-        pushtopp
         invokecc
 ret:
-        poptopp
         end
 _sub1:
         set P17, P1
@@ -322,7 +311,7 @@ _sub2:
         null I2
         null I3
         null I4
-        invoke P1
+        returncc
 /
 OUT
 

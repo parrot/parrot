@@ -231,17 +231,7 @@ OUT
 # tail recursion - caller saves - parrot calling convention
 output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
 .sub _test
-   I6 = 5	# count
-   I5 = 1	# product
-   I0 = 1       # protoyped
-   I1 = 2       # 2 int args
-   P0 = new Sub
-   P0 = addr _fact
-   saveall
-   invokecc
-   save I5
-   restoreall
-   restore $I0
+   $I0 = _fact(1, 5)
    print $I0
    print "\n"
    end
@@ -256,7 +246,7 @@ _fact:
 fin:
    I0 = 1
    I1 = 1
-   invoke P1
+   returncc
 .end
 
 CODE
@@ -298,7 +288,7 @@ output_is(<<'CODE', <<'OUT', "newsub");
 
     .sub _foo
         print "foo\n"
-	invoke P1
+	returncc
     .end
 CODE
 foo

@@ -41,7 +41,7 @@ CODE
   div N0, N\1, N1
   null I0
   null I3
-  invoke P1/
+  returncc/
 OUT
 
 ##############################
@@ -78,5 +78,5 @@ _test:
   noop
   null I0
   null I3
-  invoke P1
+  returncc
 OUT
