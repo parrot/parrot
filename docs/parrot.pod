@@ -45,6 +45,10 @@ A description of the operations used in Parrot's IO subsystem.
 
 Describes what PMCs are and how they work.
 
+=item F<embed.pod>
+
+Describes the embedding subsystem in excruciating detail.
+
 =item F<jit.pod>
 
 A brief description of Parrot's Just-In-Time compiler.

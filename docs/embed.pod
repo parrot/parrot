@@ -1,0 +1,176 @@
+=head1 TITLE
+
+embed.pod - Parrot embedding system
+
+=head1 SYNOPSIS
+
+	#include "parrot/embed.h"
+	
+	int main(int argc, char *argv[]) {
+		struct Parrot_Interp *interp;
+		struct PackFile *pf;
+		char *bcfile="program.pbc";
+
+		argc--; argv++;	/* skip the program name */
+		
+		interp=Parrot_new();
+		Parrot_init(interp);
+
+		if(PARROT_JIT_CAPABLE) {
+			Parrot_setflags(interp, PARROT_JIT_FLAG, NULL); /* activate JIT */
+		}
+
+		pf=Parrot_readbc(interp, bcfile);
+		Parrot_loadbc(interp, pf);
+
+		Parrot_runcode(interp, argc, argv);	/* argc and argv as seen by the bytecode file */
+
+		Parrot_destroy(interp);
+		
+		return 0;
+	}
+
+=head1 FILES
+
+=over 4
+
+=item F<include/parrot/embed.h>
+
+=item F<embed.c>
+
+=back
+
+=head1 DESCRIPTION
+
+Parrot's embedding system is designed with one guiding principle in mind: 
+encapsulation.  Users of Parrot shouldn't have to know what the insides
+of a C<Parrot_Interp> structure look like or how to load a packfile.  They 
+should just know a few functions and constants.  The embedding system is
+designed to do just that.
+
+=head2 Data Structures
+
+=over 4
+
+=item C<struct Parrot_Interp>
+
+This structure represents an actual Parrot interpreter.
+
+=item C<struct PackFile>
+
+This structure represents a 'packfile'--a Parrot bytecode file.
+
+=back
+
+=head2 Constants
+
+B<Interpreter flags:>
+
+=over 4
+
+=item C<PARROT_DEBUG_FLAG>
+
+This flag turns on debugging mode.  Debugging mode basically means that 
+Parrot's core prints out diagnostic messages.  This flag does not take
+any parameters.
+
+=item C<PARROT_TRACE_FLAG>
+
+This flag turns on opcode tracing.  Parrot will print out each opcode and
+the parameters passed to it as it is called.  This flag does not take any
+parameters.
+
+=item C<PARROT_BOUNDS_FLAG>
+
+This flag turns on bounds checking.  Parrot will make sure that all 
+addresses returned by an opcode function are within the boundaries of the
+bytecode block.  This flag does not take any parameters.
+
+=item C<PARROT_PROFILE_FLAG>
+
+This flag turns on profiling.  Parrot will print out a list of each opcode
+called, the number of times it was called, the average time it took to run,
+and the total time it took over the life of the program.  This flag does
+not take any parameters.
+
+=item C<PARROT_PREDEREF_FLAG>
+
+This flag turns on predereferencing.  Parrot will (???).  This flag does 
+not take any parameters.
+
+=item C<PARROT_JIT_FLAG>
+
+This flag turns on just-in-time compilation.  Parrot will convert the 
+bytecode file into native machine code and run it, usually resulting in 
+substantial speedup.  This flag does not take any parameters.
+
+=back
+
+B<Other constants:>
+
+=over 4
+
+=item C<PARROT_VERSION>
+
+This constant contains a string representation of Parrot's version number.
+
+=item C<PARROT_MAJOR_VERSION>
+
+This constant contains the first part of Parrot's version number.
+
+=item C<PARROT_MINOR_VERSION>
+
+This constant contains the second part of Parrot's version number.
+
+=item C<PARROT_PATCH_VERSION>
+
+This constant contains the third part of Parrot's version number.
+
+=item C<PARROT_JIT_CAPABLE>
+
+This constant is true if Parrot supports JIT on this platform, false 
+otherwise.
+
+=item C<PARROT_ARCHNAME>
+
+This constant contains a string representation of the Parrot JIT's name for
+the current architecture.
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item C<struct Parrot_Interp *Parrot_new()>
+
+Allocates and returns a new Parrot interpreter.
+
+=item C<void Parrot_init(struct Parrot_Interp *)>
+
+Initializes a Parrot interpreter.
+
+=item C<void Parrot_setflag(struct Parrot_Interp *, Parrot_flag, Parrot_flag_val)>
+
+Sets a flag in the Parrot interpreter.
+
+=item C<struct PackFile * Parrot_readbc(struct Parrot_Interp *, char *filename)>
+
+Reads in a bytecode file and returns a packfile structure for it.
+
+=item C<void Parrot_loadbc(struct Parrot_Interp *, struct PackFile *)>
+
+Loads a packfile into a Parrot interpreter.
+
+=item C<void Parrot_runcode(struct Parrot_Interp *, int argc, char *argv[])>
+
+Runs the bytecode associated with a Parrot interpreter.  C<argc> and C<argv>
+are the parameters the bytecode should receive.
+
+=item C<Parrot_destroy(struct Parrot_Interp *)>
+
+Deallocates all memory associated with a Parrot interpreter.
+
+B<XXX> At the moment, it just leaks most of it.
+
+=back
