@@ -16,7 +16,7 @@
         print  I4
         print  "\n"
 
-        set    I1, 3
+        set    I1, 2
         mul    I5, I4, I1
 
         print  "Estimated ops: "
@@ -25,9 +25,8 @@
 
         time   N1
 
-REDO:   eq     I2, I4, DONE
-        add    I2, I2, I3
-        branch REDO
+REDO:   sub    I4, I4, I3
+        if     I4, REDO
 
 DONE:   time   N5
 
