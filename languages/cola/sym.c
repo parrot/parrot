@@ -8,7 +8,7 @@
  * Symbol and Abstract Syntax Tree management utils.
  */
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "cola.h"
@@ -84,11 +84,11 @@ Symbol * new_namespace(Symbol * identifier) {
 }
 
 Symbol * new_class(Symbol * identifier) {
-    Symbol *t = store_type(identifier->name, 0);
+    Type * t = store_type(identifier->name, 0);
     printf("#new_class(%s)\n", identifier->name);
     t->kind = CLASS;
-    t->table = new_symbol_table();
-    return t;
+    t->sym->table = new_symbol_table();
+    return t->sym;
 }
 
 Symbol * new_method(Symbol * rettype, const char * name, const char * sig) {
@@ -311,7 +311,7 @@ void store_symbol(SymbolTable * tab, Symbol * sym) {
 #endif
 }
 
-Symbol * store_identifier(SymbolTable * tab, const char * name, int kind, Symbol * type) {
+Symbol * store_identifier(SymbolTable * tab, const char * name, int kind, Type * type) {
     Symbol * s;
     s = new_symbol(kind, name);
     s->type = type;

@@ -60,6 +60,7 @@ enum ASTTYPE {
 /* Identifiers, etc. */
 typedef struct _SymbolTable SymbolTable;
 typedef struct _AST AST;
+typedef struct _Type Type;
 
 /* Symbol structure */
 
@@ -79,7 +80,7 @@ typedef struct _Symbol {
      * one of TYPE, LITERAL, VARIABLE, METHOD, NAMESPACE
      */
     int             kind;
-    struct _Symbol  *type;
+    Type            *type;
     int             size;
     AST *           init_expr;
     int             is_lval;
@@ -103,9 +104,10 @@ struct _AST {
      */
     char            *start_label,
                     *end_label;
-    enum ASTKIND    kind;        /* General node class (STATEMENT) */
+    enum ASTKIND    kind;       /* General node class (STATEMENT) */
     int             asttype;    /* Specific node type (IF|ASSIGN|...)*/
-    int             op;            /* Operation */
+    int             op;         /* Operation */
+    Type            *type;
     Symbol          *sym;
     /* Expression generic nodes */
     Symbol          *targ;
@@ -140,12 +142,13 @@ struct _SymbolTable {
     Symbol          *table[ HASH_SIZE ];
 };
 
-typedef struct _Type {
+struct _Type {
     int             kind;            /* scalar, array, class, pointer/reference */
     int             typeid;
     int             parentid;
+    int             size;
     Symbol          *sym;   /* Pointer to symbol table representing name of type */
-} Type;
+};
 
 
 /*
@@ -172,7 +175,7 @@ extern Symbol       *namespace_stack;
 extern Symbol       *current_namespace;
 extern int          scope;
 /* Pointers to the builtin type entries in the symbol table */
-extern Symbol       *t_void,
+extern Type         *t_void,
                     *t_string,
                     *t_int,
                     *t_float,
@@ -198,21 +201,22 @@ Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
 Symbol              *lookup_namespace(SymbolTable * tab, const char * name);
 Symbol              *lookup_class(SymbolTable * tab, const char * name);
 void                store_symbol(SymbolTable *, Symbol *);
-Symbol              *store_identifier(SymbolTable *, const char * name, int kind, Symbol * type);
-Symbol              *store_type(const char * name, int size);
-Symbol              *lookup_type(const char * name);
-Symbol              *lookup_type_symbol(Symbol * identifier);
-const char          *type_name(Symbol *);
+Symbol              *store_identifier(SymbolTable *, const char * name, int kind, Type * t);
 int                 push_scope();
 Symbol              *pop_scope(SymbolTable *);
-void                coerce_operands(Symbol ** t1, Symbol ** t2);
 
 /*
  * Type related utilities
  */
+
 extern Type         **type_table;
 extern int          type_table_size;
-extern Type         *new_type(int kind, const char * name, const char * parent_name);
+
+Type                *store_type(const char * name, int size);
+Type                *lookup_type(const char * name);
+Symbol              *lookup_type_symbol(Symbol * id);
+const char          *type_name(Type *);
+void                coerce_operands(Type ** t1, Type ** t2);
 
 
 char                *str_dup(const char *);
@@ -249,7 +253,7 @@ void                gen_method_decl(AST * ast);
 void                gen_block(AST * ast);
 void                gen_statement(AST * ast);
 void                gen_assign(AST * ast);
-void                gen_expr(AST * ast, Symbol * lval, Symbol * type);
+void                gen_expr(AST * ast, Symbol * lval, Type * t);
 void                gen_call(AST *);
 void                gen_if(AST *);
 void                gen_while(AST *);
@@ -261,7 +265,7 @@ void                emit_op_expr(Symbol * res, Symbol * arg1, char * op, Symbol 
 void                emit_unary_expr(Symbol * res, Symbol * arg1, char * op);
 
 char                *new_rval();
-Symbol              *make_rval(Symbol * type);
+Symbol              *make_rval(Type * t);
 
 void                reset_temps();
 char                *get_label();

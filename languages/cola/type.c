@@ -8,7 +8,7 @@
  * Type management utils.
  */
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "cola.h"
@@ -16,29 +16,40 @@
 
 
 void init_builtin_types() {
-    t_void        = store_type("void", 0);
-    t_string    = store_type("string", 4);    
-    t_int        = store_type("int", 4);
-    t_float        = store_type("float", 4);
+    t_void = store_type("void", 4);
+    t_string = store_type("string", 4);    
+    t_int = store_type("int", 4);
+    t_float = store_type("float", 4);
 }
 
 /* size is bytes or elements, depending on if type is variable or array */
-Symbol * store_type(const char * name, int size) {
-    Symbol * t = store_identifier(current_symbol_table, name, TYPE, NULL);
+Type * store_type(const char * name, int size) {
+    Symbol * s = store_identifier(current_symbol_table, name, TYPE, NULL);
+    Type * t = (Type *)malloc(sizeof(*t));
+    s->type = t;
     t->size = size;
+    t->kind = 0;
+    t->typeid = 0;
+    t->parentid = 0;
+    t->sym = s; /* Circular reference */
     return t;
 }
 
 /* Start at inner scope and work out, looking for a type name.
  * FIXME: Add support for member resolution (namespace.namespace.type, etc.)
  */
-Symbol * lookup_type(const char * name) {
+Type * lookup_type(const char * name) {
     Symbol * ns;
     Symbol * s;
     for(ns = current_namespace; ns; ns = ns->tnext) {
         s = lookup_symbol(ns->table, name);
-        if(s != NULL)
-            return s;
+        if(s != NULL) {
+            if(s->kind != TYPE) {
+                fprintf(stderr, "lookup_type(%s) : Error, symbol not a type\n", name );
+                abort();
+            }
+            return s->type;
+        }
     }    
     return NULL;
 }
@@ -47,36 +58,22 @@ Symbol * lookup_type(const char * name) {
  * identifier can be a list which would resolve it
  * to nested namespace.
  */
-Symbol * lookup_type_symbol(Symbol * identifier) {
+Symbol * lookup_type_symbol(Symbol * id) {
     Symbol * ns = current_namespace;
-    Symbol * p = identifier;
-    while(p->tnext) {
-        if((ns = lookup_namespace(ns->table, p->name)) == NULL)
+    Symbol * t;
+    while(id->tnext) {
+        if((ns = lookup_namespace(ns->table, id->name)) == NULL)
             return NULL;
-        p = p->tnext;
+        id = id->tnext;
     }
-    return lookup_symbol(ns->table, p->name);
-}
-
-const char * type_name(Symbol * s) {
-    if(s->kind == TYPE)
-        return s->name;
-    else if(s->type)
-        return s->type->name;
-    else {
-        printf("type_name(%s) : Error, symbol not a type and has no associated type\n", s->name );
+    t = lookup_symbol(ns->table, id->name);
+    if(t && t->kind != TYPE) {
+        fprintf(stderr, "lookup_type_symbol(%s) : Error, symbol not a type\n", id->name);
         abort();
     }
-    return "undef";
-}
-
-Type * new_type(int kind, const char * name, const char * parent_name) {
-    Type * t = malloc(sizeof(Type));   
-    assert(t);
-    t->kind = kind;
-    t->sym = store_identifier(current_symbol_table, name, TYPE, NULL);
     return t;
 }
 
-
-
+const char * type_name(Type * t) {
+    return t->sym->name;
+}

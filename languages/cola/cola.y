@@ -14,21 +14,27 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include "cola.h"
+
+int         yyerror(char *);
+int         yylex();
 extern char yytext[];
-long line;
-int indent;
-int yyerror(char *);
-int yylex();
-AST * ast_start = NULL;
+long        line;
+int         indent;
+
+AST         *ast_start = NULL;
 
 /* Pointers to the builtin type entries in the symbol table */
-Symbol * t_void, * t_string, * t_int, * t_float;
+Type        *t_void,
+            *t_string,
+            *t_int,
+            *t_float;
 
 %}
 
 %union {
     int ival;
     Symbol * sym;
+    Type * type;
     AST * ast;
 }
 
@@ -47,8 +53,8 @@ Symbol * t_void, * t_string, * t_int, * t_float;
 
 %token TYPE METHOD
 
-
-%type <sym> type ref_type array_type return_type
+%type <type> type return_type
+%type <sym> ref_type array_type
 %type <sym> member_name qualified_identifier 
 %type <sym> namespace_scope_start class_scope_start 
 %type <sym> var_declarator var_declarators
@@ -447,16 +453,10 @@ type:
         { $$ = lookup_type("float"); }
     |   IDENTIFIER
         {
-            Symbol * t;
+            Type * t;
             t = lookup_type($1->name);
             if(t != NULL) {
-                if(t->kind == TYPE) {
-                    printf("Kind [%s] found in type list.\n", t->name);
-                }
-                else {
-                    printf("Error, unknown type [%s]\n", $1->name);
-                    exit(0);
-                }
+                fprintf(stderr, "Kind [%s] found in type list.\n", t->sym->name);
                 $$ = t;
             }
             else {
@@ -561,7 +561,7 @@ new_object_expression:
     NEW type '(' arg_list ')'
         {
             $$ = new_expression(ASTT_NEW_OBJECT, $4, NULL);
-            $$->sym = $2;
+            $$->type = $2;
         }
     ;
 
