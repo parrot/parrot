@@ -21,6 +21,7 @@ lib${slash}commands${slash}format.imc \
 lib${slash}commands${slash}global.imc \
 lib${slash}commands${slash}if.imc \
 lib${slash}commands${slash}incr.imc \
+lib${slash}commands${slash}inline.imc \
 lib${slash}commands${slash}join.imc \
 lib${slash}commands${slash}lappend.imc \
 lib${slash}commands${slash}linsert.imc \
