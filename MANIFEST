@@ -351,6 +351,7 @@ editor/pasm.el                                    [devel]
 editor/pasm.vim                                   [devel]
 editor/pmc.vim                                    [devel]
 editor/filetype_parrot.vim                        [devel]
+editor/indent_imc.vim                             [devel]
 encodings/utf8.c                                  []
 examples/assembly/99beer.pasm                     [main]doc
 examples/assembly/Makefile                        [main]doc

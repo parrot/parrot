@@ -11,6 +11,9 @@ elseif exists("b:current_syntax")
   finish
 endif
 
+syn include @Pod syntax/pod.vim
+syn region myPod start="^=pod" start="^=item" start="^=head" end="^=cut" keepend contains=@Pod
+
 syn match pasmIdentifier "[A-Za-z0-9_]\+"
 syn match pasmLabel      "[A-Za-z0-9_]\+:"he=e-1
 syn match pasmComment    "#.*"

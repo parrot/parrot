@@ -11,8 +11,8 @@ elseif exists("b:current_syntax")
   finish
 endif
 
-syn include @Pod <sfile>:p:h/pod.vim
-syn region pmcPod start="^=[a-z]" end="^=cut" contains=@Pod keepend contained
+syn include @Pod syntax/pod.vim
+syn region pmcPod start="^=[a-z]" end="^=cut" keepend contained contains=@Pod
 
 " A bunch of useful C keywords
 syn keyword	cStatement	goto break return continue asm
@@ -129,7 +129,7 @@ if exists("c_comment_strings")
   syntax region cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cCommentString,cCharacter,cNumbersCom,cSpaceError,pmcPOD
 else
   syn region	cCommentL	start="//" skip="\\$" end="$" keepend contains=@cCommentGroup,cSpaceError
-  syn region	cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cSpaceError
+  syn region	cComment	matchgroup=cCommentStart start="/\*" end="\*/" contains=@cCommentGroup,cCommentStartError,cSpaceError,pmcPOD
 endif
 " keep a // comment separately, it terminates a preproc. conditional
 syntax match	cCommentError	display "\*/"

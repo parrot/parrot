@@ -2,7 +2,7 @@
 
 editor/README.pod - Productivity Comes in Pretty Colors
 
-=head1 Syntax Highlighting
+=head1 Syntax Highlighting and Other Editor Assistance
 
 Included in this directory are some add-ins for making working on parrot (or in
 parrot) easier, for various popular editors. Mostly that means
@@ -11,15 +11,15 @@ your favorite editor
 
 =head2 Vim
 
-There are four files here: C<imc.vim> (generated from C<imc.vim.in>),
-C<pasm.vim>, C<pmc.vim>, and C<filetype_parrot.vim>. The first three are syntax
-files, and the last is a filetype script that tells vim to associate the
-extensions .imc, .imcc, .pasm, and .pmc with the right syntax. Copy C<imc.vim>,
-C<pasm.vim>, and C<pmc.vim> into C<~/.vim/syntax> or C<$VIMRUNTIME/syntax>,
-creating the directory if it doesn't exist. Copy C<filetype_parrot.vim> into
-C<~/.vim/ftdetect> or C<$VIMRUNTIME/ftdetect>, creating the directory if it
-doesn't exist. C<pmc.vim> requires C<pod.vim>, which is standard in the Vim
-distribution.
+There are several files here, all with the C<.vim> extension. C<imc.vim>
+(generated from C<imc.vim.in>), C<pasm.vim>, and C<pmc.vim> are syntax
+files; C<indent_imc.vim> is an indent plugin;  and C<filetype_parrot.vim> is a
+filetype script that tells vim to associate the extensions .imc, .imcc, .pasm,
+and .pmc with the right syntax. The syntax files should be installed to
+C<~/.vim/syntax/>; C<filetype_parrot.vim> should be installed to
+C<~/.vim/ftdetect>; C<indent_imc.vim> should be called C<~/.vim/indent/imc.vim>.
+C<make> in the C<editor/> dir will do this automatically. If you want indenting,
+you should also place C<filetype indent on> somewhere in your vimrc.
 
 =head2 Kate
 
