@@ -65,7 +65,7 @@
 #  include <sys/types.h>
 #endif
 
-#ifdef PARROT_HAS_HEADER_SYSSOCKIO
+#ifdef PARROT_HAS_HEADER_SYSSOCKET
 #include <sys/socket.h>
 #endif
 
