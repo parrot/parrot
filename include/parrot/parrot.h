@@ -70,6 +70,10 @@
 typedef jmp_buf Parrot_jump_buff;
 #endif
 
+#ifdef HAS_HEADER_PTHREAD
+#  include <pthread.h>
+#endif
+
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
@@ -223,6 +227,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"
+#include "parrot/thread.h"
 #endif
 
 /*
