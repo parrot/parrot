@@ -76,7 +76,6 @@ sub runstep {
   my $jitcapable               =  0;
   my $execcapable              =  0;
 
-print "\$jitarchname = $jitarchname\n";
 print "-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'no', "\n";
 
   if (-e "jit/$cpuarch/core.jit") {
