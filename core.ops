@@ -3842,6 +3842,62 @@ op find_global(out PMC, in STR) {
 
 ###############################################################################
 
+=head2 Properties
+
+Ops to deal with PMC properties
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<setprop>(in PMC, in STR, in PMC) 
+
+Set property $2 to value $3 for PMC $1
+
+=cut 
+
+op setprop(in PMC, in STR, in PMC) {
+      $1->vtable->setprop(interpreter, $1, $2, $3);
+      goto NEXT();
+}
+
+=item B<getprop>(out PMC, in STR, in PMC) 
+
+Get property $2 of PMC $3 and put it in $1
+
+=cut
+
+op getprop(out PMC, in STR, in PMC) {
+   $1 = $3->vtable->getprop(interpreter, $3, $2);
+   goto NEXT();
+}
+
+=item delprop(in PMC, in STR) 
+
+Delete property $2 from PMC $1
+
+=cut
+
+op delprop(in PMC, in STR) {
+   $1->vtable->delprop(interpreter, $1, $2);
+   goto NEXT();
+}
+
+=item prophash(out PMC, in PMC)
+
+Get a hash for the properties in PMC $2 and put it in $1
+
+=cut
+
+op prophash(out PMC, in PMC) {
+   $1 = $2->vtable->getprops(interpreter, $2);
+   goto NEXT();
+}
+
+###############################################################################
+
 =head2 Miscellaneous
 
 Opcodes which need to be sorted into better categories.
