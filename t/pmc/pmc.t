@@ -999,19 +999,22 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 # undef or undef = 0
 	or P0, P1, P1
 	print P0
+        print "a"
 
 # undef and undef = 0
 	and P0, P1, P1
 	print P0
+        print "b"
 
-# undef or 1 = 1
+# undef or foo = foo
 	set P2, 349
 	or P0, P1, P2
 	print P0
 
-# undef and 1 = 0
+# undef and foo = undef
 	and P0, P1, P2
 	print P0
+        print "c"
 
 # not undef = 1
 	not P0, P1
@@ -1023,7 +1026,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print "\\n"
 	end
 CODE
-0010xy1z
+ab349cxy1z
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-add");

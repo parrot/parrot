@@ -356,12 +356,15 @@ pmclass PerlUndef extends PerlInt {
     }
 
     void logical_or (PMC* value,  PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-	    VTABLE_get_bool(INTERP, value));
+        VTABLE_set_pmc(INTERP, dest, value);
     }
 
     void logical_and (PMC* value,  PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest, 0);
+        VTABLE_set_pmc(INTERP, dest, SELF);
+    }
+
+    void logical_xor (PMC* value,  PMC* dest) {
+        VTABLE_set_pmc(INTERP, dest, value);
     }
 
     void logical_not (PMC* dest) {
