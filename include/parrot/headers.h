@@ -16,7 +16,7 @@
 #include "parrot/parrot.h"
 
 #define BUFFER_ALIGNMENT 16
-#define STRING_ALIGNMENT 4
+#define STRING_ALIGNMENT 8
 
 
 static void *
