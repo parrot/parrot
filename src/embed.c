@@ -56,7 +56,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 
         program_size = 0;
            
-        program_code = (char*)malloc(program_size + 1024);
+        program_code = (char*)malloc((unsigned)program_size + 1024);
         if (NULL == program_code) {
             fprintf(stderr, "Parrot VM: Could not allocate buffer to read packfile from stdin.\n");
             return NULL;
@@ -65,7 +65,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 
         while ((read_result = read(0, cursor, 1024)) > 0) {
             program_size += read_result;
-            program_code = realloc(program_code, program_size + 1024);
+            program_code = realloc(program_code, (unsigned)program_size + 1024);
 
             if (NULL == program_code) {
                 fprintf(stderr, "Parrot VM: Could not reallocate buffer while reading packfile from stdin.\n");
@@ -111,7 +111,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 
 #else
 
-        program_code = mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+        program_code = mmap(0, (unsigned)program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (!program_code) {
             fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n", filename, errno);
@@ -124,7 +124,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 
     pf = PackFile_new();
 
-    if(!PackFile_unpack(interpreter, pf, program_code, program_size) ) {
+    if(!PackFile_unpack(interpreter, pf, program_code, (unsigned)program_size) ) {
         fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }
@@ -191,7 +191,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
         unsigned int j;
         int op_count   = 0;
         int call_count = 0;
-        FLOATVAL time = 0.0;
+        FLOATVAL sum_time = 0.0;
 
 	printf("\n\n");
         printf("                   OPERATION PROFILE                 \n\n");
@@ -202,7 +202,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             if(interpreter->profile[j].numcalls > 0) {
                 op_count++;
                 call_count += interpreter->profile[j].numcalls;
-                time += interpreter->profile[j].time;
+                sum_time += interpreter->profile[j].time;
 
                 printf("  %5d  %-12s  %6ld  %10f  %10f\n", j, 
                        interpreter->op_info_table[j].full_name,
@@ -218,8 +218,8 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             op_count,
             "",
             call_count,
-            time,
-            time / (FLOATVAL)call_count
+            sum_time,
+            sum_time / (FLOATVAL)call_count
         );
     }
 }
