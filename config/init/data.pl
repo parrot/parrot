@@ -55,7 +55,7 @@ sub runstep {
     
     ld_out        => '-o ',               # ld output file
     ld_debug      => '',                  # include debug info in executable
-    ld_shared     => '-shared',
+    ld_shared     => $Config{lddlflags}, 
     ld_shared_flags=> '', # What is this, exactly?  For GNU ld, it was
     # '-Wl,-soname,libparrot$(SO)'
 
