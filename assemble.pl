@@ -718,8 +718,8 @@ sub to_bytecode {
       # XXX of the string, so we can nip off another argument.
       #
       elsif($temp=~s/^\[k:($reg_re)/\[k/) {
-        $suffixes .= "_r";
-        push @{$_->[0]}, ['r',$1];
+        $suffixes .= "_k";
+        push @{$_->[0]}, ['k',$1];
       }
       elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
         $suffixes .= "_s";

@@ -849,7 +849,7 @@ inline op set(out PMC, in PMC, in STR) {
 
 Not implemented yet, working on it
 
-=item B<set>(out PMC, inconst KEY, inconst INT)
+=item B<set>(out PMC, in KEY, in INT)
 
 =cut
 
@@ -858,7 +858,7 @@ inline op set(out INT, in PMC, in KEY) {
   goto NEXT();
 }
 
-inline op set(out PMC, inconst KEY, inconst INT) {
+inline op set(out PMC, in KEY, in INT) {
   fprintf(stderr,"*** calling keyed set\n");
   goto NEXT();
 }
