@@ -27,7 +27,5 @@
   # there's probably an error condition we need to raise.
 
 done:
-  .pcc_begin_return
-    .return list
-  .pcc_end_return
+  .return(list)
 .end

@@ -542,9 +542,7 @@ command_save:
 # return the single command
 
 preserve_end_scope:
-  .pcc_begin_return
-    .return command
-  .pcc_end_return
+  .return(command)
 
 end_scope:
   #print "end_scope:\n"
@@ -557,9 +555,7 @@ end_scope:
   # return it.
 
 end_scope_2:
-  .pcc_begin_return
-    .return commands
-  .pcc_end_return
+  .return(commands)
 
 end:
   end

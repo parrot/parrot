@@ -2,7 +2,6 @@
 
 .namespace [ "_Tcl" ]
 
-
 =head1 _Tcl::__expression_parse
 
 Given a string (or String), return a single stack that contains the work to be
@@ -40,6 +39,10 @@ pmc_arg:
 
 got_arg:
   .local pmc undef
+  #.local int TclObject
+  #TclObject = find_type "TclObject"
+  # -- this causes auto-coercion to Perl*'s, which screws us up.
+  # This is apparently because the MMD of a PerlInt * a TclInt is a TclFloat. 
   undef = new PerlUndef
 
   .local pmc chunks
@@ -254,10 +257,7 @@ chunks_done:
   # a single value, return now.
   if input_len != 1 goto pre_converter_loop
   # XXX (That's value, not an operator)
-  .pcc_begin_return
-    .return TCL_OK
-    .return chunks
-  .pcc_end_return
+  .return(TCL_OK,chunks)
 
 pre_converter_loop:
   #print "pre_converter_loop\n"
@@ -334,16 +334,22 @@ die_horribly:
 converter_done: 
   #print "converter done\n"
   #_dumper(program_stack,"PROG_STACK")
-.pcc_begin_return
-  .return return_type
-  .return program_stack
-.pcc_end_return
+  .return(return_type,program_stack)
 
 .end
 
 .sub __expression_interpret
   .param pmc args
   #print "HERE?\n"
+
+
+  .local int TclInt
+  TclInt = find_type "TclInt"
+  .local int TclList
+  TclList = find_type "TclList"
+  .local int TclFloat
+  TclFloat = find_type "TclFloat"
+
    # is this dup neeeded?
   .local pmc program_stack
   # _dumper(args,"ARGS")
@@ -395,13 +401,21 @@ do_op:
   .local pmc r_arg
   .local pmc l_arg
   .local pmc op_result
-  op_result = new PerlUndef
+  op_result = new TclInt
   l_arg = pop result_stack
   l_arg = l_arg[1]
+  #$S0 = typeof l_arg
+  #print "l-arG:"
+  #print $S0
+  #print "\n"
 
   if func >= FUNCTION_ABS goto func_list
   r_arg = pop result_stack
   r_arg = r_arg[1]
+  #$S0 = typeof r_arg
+  #print "r-arG:"
+  #print $S0
+  #print "\n"
 
   # Is there a more efficient way to do this dispatch?
   if func == OPERATOR_MUL goto op_mul
@@ -500,7 +514,10 @@ op_bitor:
   op_result = bor l_arg, r_arg
   goto done_op
 func_abs:
-  op_result = abs l_arg
+  # XXX This isn't int only, izzit?
+  $I0 = l_arg
+  $I1 = abs $I0
+  op_result = $I1
   goto done_op
 func_acos:
   $N0 = l_arg
@@ -569,6 +586,9 @@ func_tanh:
   # fallthrough to done_op
 
 done_op:
+  #$S0 = typeof op_result
+  #print $S0
+  #print "-<\n"
   #print "DID OP:"
   #print func
   #print "\n"
@@ -604,10 +624,7 @@ evaluation_done:
   retval = retval[1] # skip the extra PMC here.
 
 evaluation_return:
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
    
 .end
 
@@ -699,11 +716,7 @@ finish_up:
    value[1] = $I0 
 
 real_done:
-  .pcc_begin_return
-    .return pos
-    .return INTEGER
-    .return value
-  .pcc_end_return 
+  .return(pos,INTEGER,value)
 .end
 
 # given a string, starting at position, return the length
@@ -816,10 +829,7 @@ dd:
   #print $S0
   #print "\n"
 
-  .pcc_begin_return
-    .return pos
-    .return varname
-  .pcc_end_return 
+  .return(pos,varname)
 .end
 
 .sub __expr_get_function
@@ -885,9 +895,5 @@ fail:
   len = 0
 
 done:
-  .pcc_begin_return
-    .return len
-    .return func
-    .return operand
-  .pcc_end_return
+  .return(len,func,operand)
 .end

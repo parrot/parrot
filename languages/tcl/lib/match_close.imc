@@ -116,7 +116,5 @@ die2:
   $I1 = -2
 
 done:
-  .pcc_begin_return
-    .return $I1
-  .pcc_end_return
+  .return($I1)
 .end

@@ -258,10 +258,7 @@ the results and return a Stringy PMC.
   ($I0,$S0) = self.__get_string()
   $P0 = new String
   $P0 = $S0
-  .pcc_begin_return
-    .return $I0 
-    .return $P0
-  .pcc_end_return
+  .return($I0,$P0)
 
 justpmc:
   .local pmc chunk
@@ -278,17 +275,11 @@ command:
   .local pmc interpret
   interpret = find_global "_Tcl", "__interpret"
   ($I0,$P0) = interpret(chunk_value)
-  .pcc_begin_return
-    .return $I0
-    .return $P0
-  .pcc_end_return
+  .return($I0,$P0)
 
 constant:
-  .pcc_begin_return
-    # 0 == TCL_OK
-    .return 0
-    .return chunk_value
-  .pcc_end_return
+  # 0 == TCL_OK
+  .return(0,chunk_value) 
 
 variable:
   .local pmc get_var
@@ -303,12 +294,7 @@ variable:
   $P1[1] = $S2
 get_variable:
   (return_type,$P9) = get_var($P1)
-  .pcc_begin_return
-    .return return_type
-    .return $P9
-  .pcc_end_return
- 
-  
+  .return(return_type,$P9)
 .end
 
 =head2 __get_string
@@ -411,10 +397,7 @@ loop_next:
   goto loop
 
 loop_done:  
-  .pcc_begin_return
-    .return return_type
-    .return retval
-  .pcc_end_return
+  .return(return_type,retval)
 .end
 
 =head2 __dump
@@ -511,9 +494,7 @@ Return the number of chunks in this tclword.
   .local int size
   size = chunks 
 
-  .pcc_begin_return
-    .return size
-  .pcc_end_return
+  .return(size)
 .end
 
 =head2 XXX __freeze
@@ -538,7 +519,5 @@ interpolation.
   constant = getattribute self, "TclWord\x00constant"
   .local int result
   result = constant
-  .pcc_begin_return
-    .return result
-  .pcc_end_return
+  .return(result)
 .end
