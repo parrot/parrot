@@ -81,4 +81,18 @@ pmclass Sub {
 	       SELF->cache.struct_val == value->cache.struct_val;
     }
 
+    void freeze(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+	struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+	/*
+	 * we currently need to write 3 items
+	 * - name of the sub's label
+	 * - start offset in byte-code segment
+	 * - end   offset in byte-code segment
+	 */
+    }
+
+    void thaw(visit_info *info) {
+	IMAGE_IO *io = info->image_io;
+    }
 }

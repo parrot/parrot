@@ -99,7 +99,7 @@ pointer, so that there can be only one operation at a time.
 =item todo list
 
 A B<List> called B<todo> holds items still to be worked on. This
-method is slower, consumes more resources, but doesn't interfer with
+method is slower, consumes more resources, but doesn't interfere with
 DOD runs and is thread-safe.
 
 =back
@@ -108,7 +108,7 @@ DOD runs and is thread-safe.
 
 This is done by a callback function inside the B<visit_info> structure
 called B<visit_child_function>. It gets called initially to put the
-first item on the list and is called therafter from all PMCs for
+first item on the list and is called thereafter from all PMCs for
 contained PMCs inside the B<visit> vtable method.
 
 
@@ -117,7 +117,7 @@ contained PMCs inside the B<visit> vtable method.
 The general scheme above shows that this method is called for all
 items on the B<todo_list>. B<visit> has to call
 B<visit_child_function> for all contained PMCs, which then get
-visitted until all is done.
+visited until all is done.
 
 =head2 The visit_child_function() callback
 
@@ -201,7 +201,7 @@ the functionality.
 
 =head2 Serializer interface
 
-During initialisation the B<visit_info>s B<image_io> data pointer is
+During initialization the B<visit_info>s B<image_io> data pointer is
 filled with an object having B<vtable> methods that remarkably look
 like a PMCs vtable. So B<io-E<gt>vtable-E<gt>push_integer> spits out
 an INTVAL to the frozen B<image>, while B<shift_integer> gets an
@@ -221,7 +221,7 @@ representation of the image simplifies debugging a lot.
 
 We already have a platform-independent way of reading and writing
 opcodes, string-, and number-constants. So this serializer uses
-functionality of the packfile routines. The produced image isn't as
+functionality of the pack-file routines. The produced image isn't as
 dense as it could be though, because all data are aligned at
 B<opcode_t> boundaries.
 
@@ -240,7 +240,7 @@ A PMCs image generally looks like:
 
   <id><type><pmc-specific-data>
 
-The text prepresentation of the array
+The text representation of the array
 
   P0 = [P1=666, P2=777, P0]
 
@@ -258,10 +258,26 @@ may look like:
   777   ... value
   0xdf5 ... id of array itself with lo bit set
 
+The escape flag marks places in the image, where additional data will
+follow. Used as an initial PMC B<id> means, that a property hash will
+follow. Used inside the PMC stream allows a PMC to insert additional
+information into the image. During B<thaw> the PMCs vtable is called
+again, to restore these data.
+
+This is e.g. needed for arrays containing sparse holes, to set the
+array index of the following data.
+
+A PMC with a property hash thus looks like:
+
+  <id+0x3><type><id-prop><pmc-data><prop-data>
+
 [ To be continued ]
 
 =head1 Author
 
 Leopold Toetsch <lt@toetsch.at>
 
+=cut
+
+# vim: expandtab shiftwidth=2 tw=70:
 
