@@ -10,8 +10,8 @@ src/runops_cores.c - Run Loops
 
 This file implements the various run loops for the interpreter. A slow
 one with bounds checking, tracing and (optional) profiling, and a fast
-one without. There's also one which uses computed computed C<goto>,
-which enables the faster dispatch of operations.
+one without. There's also one which uses computed C<goto>, which enables
+the faster dispatch of operations.
 
 =head2 Functions
 
