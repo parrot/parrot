@@ -117,7 +117,7 @@ intlist_clone(Interp *i, IntList *list)
 IntList *
 intlist_new(Interp *i)
 {
-    return (IntList *)list_new(i, enum_type_int);
+    return (IntList *)list_new(i, enum_type_INTVAL);
 }
 
 INTVAL
@@ -130,19 +130,19 @@ intlist_length(Interp *interpreter, IntList *list)
 void
 intlist_assign(Interp *i, IntList *l, INTVAL idx, INTVAL val)
 {
-    list_assign(i, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_int);
+    list_assign(i, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 void
 intlist_push(Interp *i, IntList *l, INTVAL val)
 {
-    list_push(i, (List *)l, INTVAL2PTR(void *, val), enum_type_int);
+    list_push(i, (List *)l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 void
 intlist_unshift(Interp *i, IntList **l, INTVAL val)
 {
-    list_unshift(i, (List *)*l, INTVAL2PTR(void *, val), enum_type_int);
+    list_unshift(i, (List *)*l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
 /* popping /shifting into a sparse hole returns 0 */
@@ -150,7 +150,7 @@ intlist_unshift(Interp *i, IntList **l, INTVAL val)
 INTVAL
 intlist_pop(Interp *i, IntList *l)
 {
-    void *ret = list_pop(i, (List *)l, enum_type_int);
+    void *ret = list_pop(i, (List *)l, enum_type_INTVAL);
     INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
@@ -158,7 +158,7 @@ intlist_pop(Interp *i, IntList *l)
 INTVAL
 intlist_shift(Interp *i, IntList **l)
 {
-    void *ret = list_shift(i, (List *)*l, enum_type_int);
+    void *ret = list_shift(i, (List *)*l, enum_type_INTVAL);
     INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
@@ -166,7 +166,7 @@ intlist_shift(Interp *i, IntList **l)
 INTVAL
 intlist_get(Interp *i, IntList *l, INTVAL idx)
 {
-    void *ret = list_get(i, (List *)l, idx, enum_type_int);
+    void *ret = list_get(i, (List *)l, idx, enum_type_INTVAL);
     INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
 }
