@@ -1342,4 +1342,4 @@ ne_addr_sc_sc_ic        1314
 ne_addr_p_p_ic  1315
 isnull_p_ic     1316
 deref_p_p	1317
-
+foldup_p	1318
