@@ -1,0 +1,113 @@
+/*
+** obscure.ops
+*/
+
+#include <math.h>
+
+=head1 NAME
+
+obscure.ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Parrot's library of obscure ops.
+
+=cut
+
+
+###############################################################################
+
+=head2 Obscure trigonometric operations
+
+Reference:
+
+    Abramowitz, M. and Stegum, C. A. (Eds.). Handbook of Mathematical
+    Functions with Formulas, Graphs, and Mathematical Tables, 9th printing.
+    New York: Dover, p. 78, 1972.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<covers>(n, i)
+
+=item B<covers>(n, n)
+
+Set $1 to the coversine (in radians) of $2.
+
+=cut
+
+AUTO_OP covers(n, i|n) {
+   $1 = 1.0 - sin((FLOATVAL)$2);
+}
+
+
+########################################
+
+=item B<exsec>(n, i)
+
+=item B<exsec>(n, n)
+
+Set $1 to the exsecant of $2 (given in radians).
+
+=cut
+
+
+AUTO_OP exsec(n, i|n) {
+   $1 = (((FLOATVAL)1.0) / cos((FLOATVAL)$2)) - (FLOATVAL)1.0;
+}
+
+
+########################################
+
+=item B<hav>(n, i)
+
+=item B<hav>(n, n)
+
+Set $1 to the haversine (in radians) of $2.
+
+=cut
+
+AUTO_OP hav(n, i|n) {
+   $1 = 0.5 * (1.0 - cos((FLOATVAL)$2));
+}
+
+
+########################################
+
+=item B<vers>(n, i)
+
+=item B<vers>(n, n)
+
+Set $1 to the versine (in radians) of $2.
+
+=cut
+
+AUTO_OP vers(n, i|n) {
+   $1 = 1.0 - cos((FLOATVAL)$2);
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001 Yet Another Society. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+

@@ -70,6 +70,172 @@ environment.
 
 ########################################
 
+=item close(i|ic)
+
+Close file opened on file descriptor $1.
+
+=cut
+
+AUTO_OP close(i|ic) {
+  close($1);
+}
+
+
+########################################
+
+=item err(i)
+
+Store the system error code in $1.
+
+=item err(s)
+
+Store the system error message in $1.
+
+=cut
+
+AUTO_OP err(i) {
+  $1 = errno;
+}
+
+AUTO_OP err(s) {
+  char *tmp = strerror(errno);
+  STRING *s = string_make(interpreter, tmp, strlen(tmp), 0, 0, 0);
+  $1 = s;
+}
+
+
+########################################
+
+=item getenv(s, s|sc)
+
+Store the value of environment variable $2 in $1.
+
+=cut
+
+AUTO_OP getenv(s, s|sc) {
+  char *tmp = getenv($2->bufstart);
+  STRING *s = string_make(interpreter, tmp, strlen(tmp), 0, 0, 0);
+  $1 = s;
+}
+
+
+########################################
+
+=item B<open>(i, s|sc)
+
+Open file named $2 with flags for writing and mode 0644 (rw-r--r--), and save
+the file descriptor into $1.
+
+=item B<open>(i, s|sc, i|ic)
+
+Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
+descriptor into $1.
+
+=item B<open>(i, s|sc, i|ic, i|ic)
+
+Open file named $2 with flags $3 and mode $4, and save the file descriptor
+into $1.
+
+=cut
+
+AUTO_OP open(i, s|sc) {
+  STRING *s = $2;
+  $1 = open(s->bufstart, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+}
+
+AUTO_OP open(i, s|sc, i|ic) {
+  STRING *s = $2;
+  $1 = open(s->bufstart, $3, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+}
+
+AUTO_OP open(i, s|sc, i|ic, i|ic) {
+  STRING *s = $2;
+  $1 = open(s->bufstart, $3, $4);
+}
+
+
+########################################
+
+=item B<print>(i|ic)
+
+=item B<print>(n|nc)
+
+=item B<print>(s|sc)
+
+Print $1 to standard output.
+
+=cut
+
+AUTO_OP print(i|ic) {
+  /* TODO: Configure for format */
+  printf("%li", (long) $1);
+}
+
+AUTO_OP print(n|nc) {
+  /* TODO: Configure for format */
+  printf("%f", $1);
+}
+
+AUTO_OP print(s|sc) {
+  STRING *s = $1;
+  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+}
+
+
+########################################
+
+=item read(i, i|ic)
+
+Read an INTVAL from file descriptor $2 into $1.
+
+=item read(n, i|ic)
+
+Read a FLOATVAL from file descriptor $2 into $1.
+
+=item read(s, i|ic, i|ic)
+
+Read $3 bytes from file descriptor $2 into string $1.
+
+=cut
+
+AUTO_OP read(i, i|ic) {
+  read($2, &($1), sizeof(INTVAL));
+}
+
+AUTO_OP read(n, i|ic) {
+  read($2, &($1), sizeof(FLOATVAL));
+}
+
+AUTO_OP read(s, i|ic, i|ic) {
+  char *tmp;
+  STRING *s;
+  INTVAL len = $3;
+
+  string_destroy($1);
+  tmp = malloc(len + 1);
+  read($2, tmp, len);
+  s = string_make(interpreter, tmp, len, 0, 0, 0);
+  $1 = s;
+  free(tmp);
+}
+
+
+########################################
+
+=item setenv(s|sc, s|sc)
+
+Set the value of environment variable $1 to $2.
+
+=cut
+
+AUTO_OP setenv(s|sc, s|sc) {
+  setenv($1->bufstart, $2->bufstart, 1);
+}
+
+
+
+########################################
+
 =item B<time>(i)
 
 Puts the current system time (represented as a whole number of seconds)
@@ -78,7 +244,7 @@ in $1.
 =cut
 
 AUTO_OP time(i) {
-  $1 = time(NULL);
+  $1 = Parrot_intval_time();
 }
 
 
@@ -92,9 +258,36 @@ microseconds) in $1.
 =cut
 
 AUTO_OP time(n) {
-  struct timeval t;
-  gettimeofday(&t, NULL);
-  $1 = (FLOATVAL)t.tv_sec + ((FLOATVAL)t.tv_usec / 1000000.0);
+  $1 = Parrot_floatval_time();
+}
+
+
+########################################
+
+=item write(i|ic, i|ic)
+
+=item write(i|ic, n|nc)
+
+=item write(i|ic, s|sc)
+
+Write $2 to file descriptor $1.
+
+=cut
+
+AUTO_OP write(i|ic, i|ic) {
+  INTVAL * i = &($2);
+  write($1, i, sizeof(INTVAL));
+}
+
+AUTO_OP write(i|ic, n|nc) {
+  FLOATVAL * f = &($2);
+  write($1, f, sizeof(FLOATVAL));
+}
+
+AUTO_OP write(i|ic, s|sc) {
+  STRING * s = $2;
+  INTVAL count = string_length(s);
+  write($1, s->bufstart, count);
 }
 
 
@@ -456,54 +649,6 @@ AUTO_OP if(n, ic) {
 
 =cut
 
-
-###############################################################################
-
-=head2 Output operators
-
-These operations are temporary until we have a true I/O subsystem.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<print>(i)
-
-=item B<print>(ic)
-
-=item B<print>(n)
-
-=item B<print>(nc)
-
-=item B<print>(s)
-
-=item B<print>(sc)
-
-Print $1 to standard output.
-
-=cut
-
-AUTO_OP print(i|ic) {
-  /* TODO: Configure for format */
-  printf("%li", (long) $1);
-}
-
-AUTO_OP print(n|nc) {
-  /* TODO: Configure for format */
-  printf("%f", $1);
-}
-
-AUTO_OP print(s|sc) {
-  STRING *s = $1;
-  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
-}
-
-
-=back
-
-=cut
 
 
 ###############################################################################

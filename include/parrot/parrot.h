@@ -24,7 +24,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 /*#include <types.h> */
-#include <time.h>
+
+#include "parrot/time.h"
 
 #ifdef WIN32
 #	include <io.h>
@@ -44,6 +45,10 @@
 
 #ifdef HAS_HEADER_MATH
 #	include <math.h>
+#endif
+
+#ifdef HAS_HEADER_FCNTL
+#	include <fcntl.h>
 #endif
 
 #include <sys/types.h>

@@ -57,6 +57,7 @@ include/parrot/runops_cores.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/trace.h
+include/parrot/time.h
 include/parrot/unicode.h
 interpreter.c
 languages/jako/bench.jako
@@ -90,6 +91,7 @@ MANIFEST
 make_vtable_ops.pl
 memory.c
 NEWS
+obscure.ops
 ops2c.pl
 ops2pm.pl
 packfile.c
@@ -129,6 +131,7 @@ t/op/stacks.t
 t/op/string.t
 t/op/time.t
 t/op/trans.t
+time.c
 trace.c
 Types_pm.in
 vtable_h.pl
