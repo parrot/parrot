@@ -108,7 +108,7 @@ print CODE<<RUNTIMESHUTDOWN;
 .include "RT_aggregates.pasm"
 .include "RT_support.pasm"
 .include "RT_io.pasm"
-#.include "RT_platform.pasm"
+.include "RT_platform.pasm"
 .include "RT_debugger.pasm"
 	# 
 	# Pull in user-defined functions

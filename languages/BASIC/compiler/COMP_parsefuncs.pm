@@ -254,95 +254,76 @@ EOR
 		feedme();
 	}
 }
-sub parse_locate {	# locate x,y   | locate x   | locate ,y
+sub parse_locate {	# locate x,y   | locate x   | locate ,y  
 	my($x,$y);
 	my(@e2);
-	@e=();
+	my($resulty, $typey, @codey);
+	my($resultx, $typex, @codex);
 	if ($type[NEXT] =~ /PUN/) {  # Y only
 		feedme();
-		@e2=EXPRESSION();   # Y (only)
+		($resulty, $typey, @codey)=EXPRESSION();   # Y (only)
 	} else {
-	    	@e=EXPRESSION();    # X
+	    	($resultx, $typex, @codex)=EXPRESSION();    # X
 		if ($type[NEXT] =~ /PUN/) {
 			feedme();
-			@e2=EXPRESSION();
+			($resulty, $typey, @codey)=EXPRESSION();
 		}
 	}
-	if (@e and @e2) {  	# X and Y
-	print CODE<<XANDY;
-@e	bsr DEREF
-	bsr CAST_TO_INT
-	set P7, P6
-	pushp		
-@e2	bsr DEREF		# Got both
-	bsr CAST_TO_INT
-	save P6
-	popp
-	restore P6
-	bsr SCREEN_LOCATE		
+	if (@codey and @codex) {  	# X and Y
+	
+	push @{$code{$seg}->{code}},<<XANDY;
+@codey	
+	set \$N100, $resulty
+@codex	
+	set \$N101, $resultx
+	.arg \$N100
+	.arg \$N101
+	call _screen_locate
 XANDY
-	} elsif (@e2 and not @e) {
-	print CODE<<YNOTX;
-@e2	bsr DEREF
-	bsr CAST_TO_INT
-	bsr SCREEN_SETYCUR
+	} elsif (@codey and not @codex) {
+	push @{$code{$seg}->{code}},<<YNOTX;
+@codey	.arg $resulty			# Broke!
+	call _screen_locate
 YNOTX
-	} elsif (@e and not @e2) {
-	print CODE<<XNOTY;
-@e	bsr DEREF
-	bsr CAST_TO_INT
-	bsr SCREEN_SETXCUR
+	} elsif (@codex and not @codey) {
+	push @{$code{$seg}->{code}},<<XNOTY;
+@codex	.arg $resultx			# Broke!
+	call _screen_locate
 XNOTY
 	}
 }
 sub parse_color {
 	my($f,$b);
-	my(@e2);
-	@e=();
+	my($resultb, $typeb, @codeb);
+	my($resultf, $typef, @codef);
+
 	if ($type[NEXT] =~ /PUN/) {  # Back only
 		feedme();
-		@e2=EXPRESSION();   # Back (only)
+		($resultb, $typeb, @codeb)=EXPRESSION();   # Back (only)
 	} else {
-	    	@e=EXPRESSION();    # Fore
+	    	($resultf, $typef, @codef)=EXPRESSION();    # Fore
 		if ($type[NEXT] =~ /PUN/) {
 			feedme();
-			@e2=EXPRESSION();
+			($resultb, $typeb, @codeb)=EXPRESSION();
 		}
 	}
-	if (@e and @e2) {  	# F and B
-print CODE<<FANDB;
-@e	bsr DEREF
-	bsr CAST_TO_INT
-	set P7, P6
-	pushp
-@e2	bsr DEREF		# Got both
-	bsr CAST_TO_INT
-	save P6
-	popp
-	restore P6
-	bsr SCREEN_COLOR
+	if (@codeb and @codef) {  	# F and B
+		push @{$code{$seg}->{code}},<<FANDB;
+@codeb	set \$N100, $resultb
+@codef	set \$N101, $resultf
+	.arg \$N100
+	.arg \$N101
+	call _screen_color
 FANDB
-	} elsif (@e2 and not @e) {
-	print CODE<<BNOTF;
-	bsr SCREEN_GETFORE	# B and no F
-	set P7, P6
-@e2	bsr DEREF
-	bsr CAST_TO_INT
-	bsr SCREEN_COLOR
+	} elsif (@codeb and not @codef) {
+		push @{$code{$seg}->{code}},<<BNOTF;
+@codeb  .arg $resultb
+	call _screen_color	# Broke!
 BNOTF
-	} elsif (@e and not @e2) {
-	print CODE<<FNOTB;
-	bsr SCREEN_GETBACK	# F and no B
-	set P8, P6
-	pushp
-@e	bsr DEREF
-	bsr CAST_TO_INT
-	save P6
-	popp
-	restore P6
-	set P7, P6
-	set P6, P8
-	bsr SCREEN_COLOR
+	} elsif (@codef and not @codeb) {
+		push @{$code{$seg}->{code}},<<FNOTB;
+@codef	.arg $resultf
+	call _screen_color	# Broke!
 FNOTB
 	}
 }
@@ -350,8 +331,8 @@ sub parse_cls {
 	if (! $type[NEXT] =~ /STMT|COMM|COMP/) {  # No arg version
 		@e=EXPRESSION();
 	}
-	print CODE <<CLS;
-	bsr SCREEN_CLEAR
+	push @{$code{$seg}->{code}},<<CLS;
+	call _screen_clear
 CLS
 	feedme();
 }

@@ -273,7 +273,12 @@ EQ_${eqnum}_end: noop
 CODE
 	},
 	'.' => "NULL",
-	'mod' => "MOD",
+	'mod' => sub {
+		my($a1,$a2,$result)=@_;
+		return(<<CODE, $result);
+	cmod $result, $a2, $a1
+CODE
+	},
 	'^' => "POW",	
 );
 %opsubs=(%opsubs, 
