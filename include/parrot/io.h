@@ -147,6 +147,7 @@ extern INTVAL pio_errno;
 /* io.c - If you add new layers, register them in init_layers() */
 extern void PIO_init(theINTERP);
 extern void PIO_finish(theINTERP);
+void PIO_internal_shutdown(theINTERP);
 extern INTVAL PIO_init_stacks(theINTERP);
 extern void PIO_atexit(theINTERP);
 extern INTVAL PIO_push_layer(theINTERP, ParrotIOLayer *, PMC *);

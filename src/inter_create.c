@@ -337,6 +337,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      * so terminate the event loop
      */
     if (!interpreter->parent_interpreter) {
+	PIO_internal_shutdown(interpreter);
         Parrot_kill_event_loop();
     }
 

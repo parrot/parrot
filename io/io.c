@@ -37,7 +37,6 @@ Parrot ops. The C<ParrotIO struct> is defined in F<io/io_private.h>.
 
 /* This is list of valid layers */
 ParrotIOLayer **pio_registered_layers = NULL;
-int pio_registered_interpreters = 0;
 
 /* This is the default stack used for IO. Copy this to each new interp */
 /*
@@ -276,9 +275,7 @@ PIO_init(theINTERP)
         return;
     }
 
-    /* increase interpreter count */
-    ++pio_registered_interpreters;
-        
+
     interpreter->piodata = mem_sys_allocate(sizeof(ParrotIOData));
     if (interpreter->piodata == NULL)
         internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
@@ -337,10 +334,7 @@ PIO_finish(theINTERP)
     interpreter->piodata->table = NULL;
     mem_sys_free(interpreter->piodata);
     interpreter->piodata = NULL;
-    
-    if( --pio_registered_interpreters <= 0 ) {
-	PIO_internal_shutdown(interpreter);
-    }
+
 }
 
 /*
@@ -348,7 +342,7 @@ PIO_finish(theINTERP)
 =item C<void
 PIO_internal_shutdown(theINTERP)>
 
-IO system destructor, flush streams, free structures, etc.
+IO system destructor, called on destruction of the last interpreter.
 
 =cut
 
@@ -360,12 +354,6 @@ PIO_internal_shutdown(theINTERP)
     UNUSED(interpreter);
     mem_sys_free(pio_registered_layers);
     pio_registered_layers = NULL;
-    pio_registered_interpreters = 0;
-#if 0
-    PIO_flush(interpreter, pio_stdout);
-#endif
-    /*pio_stdout = NULL;
-    pio_stderr = NULL;*/
 }
 
 /*
