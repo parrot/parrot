@@ -69,7 +69,7 @@ sub new
     
     # TODO - Items should only contain paths.
     
-    die "No contents.\n" unless @contents;
+    die "No contents ($text).\n" unless @contents;
     
     $self = bless {
         TEXT => $text,
