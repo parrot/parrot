@@ -100,17 +100,21 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
 	ptr = VTABLE_get_pmc_keyed_int(interpreter, init, ix);
 	init = VTABLE_getprop(interpreter, ptr,
 		string_from_cstring(interpreter, "_struct", 0));
-	assert(init && init->vtable->base_type == enum_class_UnManagedStruct);
-	/*
-	 * now point PMC_data of this struct to the real data
-	 */
-	if (*type == enum_type_struct_ptr) {
-            /* that is either a pointer */
-	    PMC_data(init) = *(void**)p;
-        }
-        else {
-            /* or just an offset for nested structs */
-            PMC_data(init) = p;
+	assert(init && (init->vtable->base_type == enum_class_UnManagedStruct
+                    ||  init->vtable->base_type == enum_class_ManagedStruct));
+
+	if (init->vtable->base_type == enum_class_UnManagedStruct) {
+            /*
+             * now point PMC_data of this struct to the real data
+             */
+            if (*type == enum_type_struct_ptr) {
+                /* that is either a pointer */
+                PMC_data(init) = *(void**)p;
+            }
+            else {
+                /* or just an offset for nested structs */
+                PMC_data(init) = p;
+            }
         }
 	return char_offset_key(interpreter, init, next, type);
     }
@@ -279,7 +283,7 @@ set_string(char *p, int type, STRING* value)
  * alignment of contained structures is the alignment of the
  * biggest item in that struct
  *
- * i386: long long is aligned on 4
+ * i386: long long or double is aligned on 4
  *
  * this is recursive as structure definitions
  */
@@ -323,11 +327,7 @@ calc_align(Parrot_Interp interpreter, PMC* pmc, PMC* type_pmc,
 
     if (align && offs % align) {
 	int diff;
-	if ((type == enum_type_ulonglong ||
-		    type == enum_type_longlong 	||
-		    type == enum_type_int64     ||
-		    type == enum_type_uint64) &&
-		!strcmp(PARROT_CPU_ARCH, "i386"))
+	if (align > 4 && !strcmp(PARROT_CPU_ARCH, "i386"))
 	    align = 4;
 	diff = align - (offs % align);
 	offs += diff;
