@@ -1143,9 +1143,11 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                 /* Parrot_do_dod_run(interpreter); */
                 (*pool->compact)(interpreter, pool);
             }
+            /* XXX temp fix 
             else {
                 Parrot_do_dod_run(interpreter);
             }
+            */
         }
         if (pool->top_block->free < size) {
             alloc_new_block(interpreter, size, pool);
