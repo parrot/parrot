@@ -7,8 +7,8 @@ output_is(<<'CODE', <<'OUTPUT', "multiarray creation");
 	new P1, .PerlArray
 	# intial size
 	set P1[0], 0
-	set P1[1], 100
-	# dimensions
+	set P1[1], 50
+	# dimensions 10x5 2D array
 	# XXX can this be done w/o push/append a key?
 	new P2, .Key
 	set P2, 10
@@ -38,6 +38,7 @@ output_is(<<'CODE', <<'OUTPUT', "multiarray access 2d");
 	set P1[2], 1
 	set P1[3], P2
 	new P0, .MultiArray, P1
+	# array size, multiarray doesnt autogrow
 	set P0, 200
 
 	set I10, 10
@@ -85,7 +86,7 @@ output_is(<<'CODE', <<'OUTPUT', "multiarray access 3d");
 	# initial size
 	set P1[0], 0
 	set P1[1], 200
-	# dimensions
+	# dimensions 10x5x4
 	new P2, .Key
 	set P2, 10
 	new P3, .Key
