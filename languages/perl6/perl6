@@ -794,10 +794,10 @@ perl6 --test [testfiles...]
 =head1 DESCRIPTION
 
 perl6 calls all the appropriate stages to parse, assemble and run a perl6
-source file. As this steps evolve this program will. Or it will get garbage
-collect somewhere in the future.
+source file. As these steps evolve this program will, or it will be garbage
+collected sometime in the future.
 
-If called with a .imc, .pasm or .pbc file, the appropriate pass(es) will be run.
+If called with .imc, .pasm or .pbc files, the appropriate pass(es) will be run.
 
 =head1 OPTIONS
 
@@ -811,7 +811,7 @@ These options are for the parser P6C and for output generation.
 
 =item -C|--compile-pbc
 
-Compile to executable and run native. s. also Run options below
+Compile to executable and run native. See also Run options below.
 
 =item -B|--pbc
 
@@ -827,7 +827,7 @@ Stop after creating .imc file.
 
 =item --tree
 
-Stop after creating parse tree, doesn't generate .imc output.
+Stop after creating parse tree, do not generate .imc output.
 
 =item --raw-tree
 
@@ -835,9 +835,9 @@ Output raw parser tree, additionally to parse tree.
 
 =item --keep-imc --keep-pasm --keep-pbc --keep-c --keep-o --keep-warn --keep-exe
 
-Keep intermediate file.ext. If perl6 stops with an error or with above
-options, temp files are always kept.
-The last output step (.pmc or executable) is of course kept.
+Keep intermediate file.ext. If perl6 stops with an error or with above options,
+temp files are always kept.  The last output step (.pmc or executable) is of
+course kept.
 
 =item -k|--keep-all
 
@@ -845,19 +845,19 @@ Keep all intermediate files.
 
 =item --clean
 
-Unlink all files, perl6 might have generated (s. FILES below), except those
-to --keep. E.g.
+Unlink all files perl6 might have generated (see FILES below), except those
+to --keep, e.g.
 
 	perl6 file.p6 --clean --keep-exe
 
 =item --test
 
 Run tests like "make test". As the program startup and parser generation
-are done only once, with this option, tests run much faster.
+are done only once, with this option tests run much faster.
 
 =item --test-parser
 
-Interactive parser-testing mode. The parser enter an interaktive mode, an
+Interactive parser-testing mode. The parser enters an interactive mode. An
 empty line sends input to the parser.
 
 =item -g|--debug-info
@@ -873,7 +873,7 @@ Generate debug info. This adds #line n "file" and source comments to the
 
 =item --trace
 
-Set $::RD_TRACE. You know what it is, when you want this.
+Set $::RD_TRACE. You know what it is when you want this.
 
 =item --hitem
 
@@ -948,13 +948,13 @@ Run the .pbc file directly if it does exist and is not older then the
 
 =item -R..|--parrot-options=bdhjpPgtv.
 
-pass option(s) to parrot, s. parrot -h
+pass option(s) to parrot, see parrot -h.
 
     e.g. "perl6 -Rb. ..."  calls "parrot -b -. ..."
 
 =item --shared
 
-Run against shared dynamic libparrot - you must build it currently manually
+Run against shared dynamic libparrot - you must currently build it manually
 in parrot root with:
 
 	cd ../..
@@ -968,7 +968,7 @@ in parrot root with:
 
 =item --ignore-exitcode
 
-don't report non zero exit codes. This is needed e.g. for make test,
+Don't report non zero exit codes. This is needed e.g. for make test,
 when native code is tested.
 
 =item --rm-exe
@@ -1024,7 +1024,7 @@ Intermediate files are »foo.*«, s. FILES below.
 
 =item echo 'my $a=2; print $a _ "\n"' | perl6 -vvw
 
-Show inidiviudal steps, display warning, intermediate files are named
+Show individual steps, display warning, intermediate files are named
 »a.*«.
 
 =item perl6 mops.pasm
@@ -1035,7 +1035,7 @@ Assemble and run mops.pasm.
 
 =head1 ENVIRONMENT
 
-As perl6 is written in perl5, s. perldoc perlrun. No environment vars
+As perl6 is written in perl5, see perldoc perlrun. No environment vars
 are used currently.
 
 =head1 FILES
@@ -1080,14 +1080,14 @@ Have a look at the individual stages:
 
 =head1 BUGS
 
-Parrot::Config doesn't provide all info needed to run. So there are
+Parrot::Config doesn't provide all info needed to run, so there are
 some hard coded values at the beginning of the program.
 
 When a intermediate stage dumps core, the message is not in file.warn.
 
 =head1 TODO
 
-- Check for core files, and optionally get bt.
+- Check for core files, and optionally get backtrace
 - clean up source file
 - more use of Parrot::Config
 - use assemble.pl's classes directly
