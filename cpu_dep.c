@@ -26,7 +26,7 @@ void
 trace_system_areas(struct Parrot_Interp *interpreter)
 {
 
-#ifdef __sparc /* Flush register windows */
+#if defined(__sparc) /* Flush register windows */
     static union {
 	int insns[4];
         double align_hack[2];
@@ -42,10 +42,8 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 
     static void (*fn_ptr)(void) = (void (*)(void))&u.align_hack[0];
     fn_ptr();
-#endif
 
-
-#ifdef __ia64__
+#elif defined(__ia64__)
 
     struct ucontext ucp;
     void *current_regstore_top;
