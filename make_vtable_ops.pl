@@ -9,15 +9,15 @@ while (<DATA>) {
     die "Can't find $vtable_entry in vtable, line $.\n"
         unless exists $vtable{$vtable_entry};
     print "AUTO_OP $params[1] (".(join ", ", ("p")x$params[0]).") {\n";
-    print "\t\$2->vtable->vtable_funcs[VTABLE_";
+    print "\t(\$2->vtable->vtable_funcs[VTABLE_";
     print uc $vtable_entry;
     print multimethod($vtable_entry);
     if ($params[0] == 3) {
         # Three-address function
-        print ']($2,$3,$1);';
+        print '])($2,$3,$1);';
     } elsif ($params[0] == 2) {
         # Unary function
-        print ']($2,$1);';
+        print '])($2,$1);';
     }
     print "\n}\n";
 }
