@@ -130,7 +130,7 @@ stack_height(Interp *interpreter, Stack_Chunk_t *chunk)
 /*
 
 =item C<Stack_Entry_t *
-stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)>
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack, INTVAL depth)>
 
 If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
@@ -142,7 +142,7 @@ if C<|depth| > number> of entries in stack.
 */
 
 Stack_Entry_t *
-stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack, INTVAL depth)
 {
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry = NULL;
@@ -172,7 +172,7 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
 
 =item C<void
 rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p,
-               Intval num_entries)>
+               INTVAL num_entries)>
 
 Rotate the top N entries by one.  If C<N > 0>, the rotation is bubble
 up, so the top most element becomes the Nth element.  If C<N < 0>, the
@@ -184,12 +184,12 @@ element.
 */
 
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
+rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, INTVAL num_entries)
 {
     Stack_Chunk_t *stack = *stack_p;
     Stack_Entry_t temp;
-    Intval i;
-    Intval depth = num_entries - 1;
+    INTVAL i;
+    INTVAL depth = num_entries - 1;
 
     if (num_entries >= -1 && num_entries <= 1) {
         return;
@@ -260,10 +260,10 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     switch (type) {
         case STACK_ENTRY_INT:
         case STACK_ENTRY_MARK:
-            UVal_int(entry->entry) = *(Intval *)thing;
+            UVal_int(entry->entry) = *(INTVAL *)thing;
             break;
         case STACK_ENTRY_FLOAT:
-            UVal_num(entry->entry) = *(Floatval *)thing;
+            UVal_num(entry->entry) = *(FLOATVAL *)thing;
             break;
         case STACK_ENTRY_ACTION:
         case STACK_ENTRY_PMC:
@@ -321,10 +321,10 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     switch (type) {
     case STACK_ENTRY_MARK:
     case STACK_ENTRY_INT:
-        *(Intval *)where   = UVal_int(entry->entry);
+        *(INTVAL *)where   = UVal_int(entry->entry);
         break;
     case STACK_ENTRY_FLOAT:
-        *(Floatval *)where = UVal_num(entry->entry);
+        *(FLOATVAL *)where = UVal_num(entry->entry);
         break;
     case STACK_ENTRY_ACTION:
     case STACK_ENTRY_PMC:

@@ -64,10 +64,10 @@ void mark_stack(Interp *, Stack_Chunk_t * cur_stack);
 size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 
 Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base,
-                          Intval stack_depth);
+                          INTVAL stack_depth);
 
 void rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_base,
-                    Intval num_entries);
+                    INTVAL num_entries);
 
 void stack_push(Interp *interpreter, Stack_Chunk_t **stack_base,
                 void *thing, Stack_entry_type type,

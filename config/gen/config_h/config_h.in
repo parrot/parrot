@@ -1,3 +1,6 @@
+/* Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved. */
+/* $Id$ */
+
 /* config.h
  *
  * Platform-specific config file
@@ -98,15 +101,6 @@ typedef size_t ptrcast_t;
 
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
-
-/* XXX Temporary until the grand rename is done */
-typedef INTVAL   Intval;
-typedef UINTVAL  UIntval;
-typedef FLOATVAL Floatval;
-typedef VTABLE   VTable;
-typedef DPOINTER DPointer;
-
-/* typedef INTVAL *(*opcode_funcs)(void *, void *) OPFUNC; */
 
 #define FRAMES_PER_CHUNK 16
 
