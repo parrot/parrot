@@ -677,8 +677,8 @@ parrot_gc_ims_collect(Interp* interpreter)
 
 #else
 
-static void
-parrot_gc_ims_collect(Interp* interpreter)
+static int
+parrot_gc_ims_collect(Interp* interpreter, int check_only)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;
@@ -714,11 +714,16 @@ parrot_gc_ims_collect(Interp* interpreter)
                         mem_pool->guaranteed_reclaimable) >=
                     mem_pool->total_allocated * MEM_POOL_RECLAIM) {
                 IMS_DEBUG((stderr, "COMPACT\n"));
+                if (check_only)
+                    return 1;
                 mem_pool->compact(interpreter, mem_pool);
             }
         }
     }
+    if (check_only)
+        return 0;
     g_ims->state = GC_IMS_FINISHED;
+    return 0;
 }
 #endif
 
@@ -769,7 +774,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             parrot_gc_ims_sweep(interpreter);
             /* fall through */
         case GC_IMS_COLLECT:
-            parrot_gc_ims_collect(interpreter);
+            (void)parrot_gc_ims_collect(interpreter, 0);
             break;
         case GC_IMS_FINISHED:
             ++interpreter->arena_base->dod_runs;
@@ -845,10 +850,12 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
         /* run a full cycle
          * TODO if we are called from mem_allocate() in src/resources.c:
          *   * pass needed size
-         *   * check first, if it could be reasonable to run a full
-         *     cycle
          *   * test   examples/benchmarks/gc_header_new.pasm
          */
+        if (!parrot_gc_ims_collect(interpreter, 1)) {
+            parrot_gc_ims_run_increment(interpreter);
+            return;
+        }
         if (g_ims->state >= GC_IMS_FINISHED)
             g_ims->state = GC_IMS_STARTING;
         while (1) {
