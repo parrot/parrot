@@ -60,16 +60,18 @@ typedef enum {
 
 /* Functions */
 /*
- * _mk_instruction is not intended for outside usage
- * please use iANY
+ * _mk_instruction and iANY are not intended for outside usage
+ * please use INS
  */
 #ifdef _PARSER
 Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
+Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
+#define iANY(a,b,c,d) dont_use(a,b)
 #endif
-Instruction * iANY(char * name, char *fmt, SymReg **r, int emit);
-Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv, int emit);
+Instruction * INS(char * name, char *fmt, SymReg **regs, int nargs, int keyv,
+	int emit);
 Instruction * iNEW(SymReg * r0, char * type, int emit);
 Instruction * emitb(Instruction *);
 int instruction_reads(Instruction *, SymReg *);
