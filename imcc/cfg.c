@@ -91,12 +91,13 @@ void find_basic_blocks () {
             /* if we have a bsr, then consider it only as a branch,
              * when we have the target here
              * and it doesn't saveall - like P6C recursive bsr's
+             *
+             * ignore set_addr - no new basic block
              */
             if (!strcmp(ins->op, "bsr") || !strcmp(ins->op, "set_addr")) {
-                char *name =
-                    *ins->op == 'b' ? ins->r[0]->name : ins->r[1]->name;
+                char *name = ins->r[0]->name;
                 SymReg *r = get_sym(name);
-                if (*ins->op == 'b') {
+                if (*ins->op == 'b') {  /* bsr */
                     Instruction * lab;
                     found = r != NULL && r->first_ins;
                     debug(DEBUG_CFG, "bsr %s local:%s\n",
@@ -117,20 +118,9 @@ void find_basic_blocks () {
                     }
                 }
                 else {
-                    /* treat the set_addr as jump source */
-                    found = 1;
+                    /* don't treat set_addr as jump source */
+                    found = 0;
                 }
-#if 0
-                /* treat bsr as jumps, ret jumps to next ins
-                 * or as fall through instruction, when bsr target
-                 * was not found
-                 *
-                 * TODO do this below, when ret is found
-                 * and then isert correct edges for bsr-ret or not
-                 */
-                if (found)
-                    ins->type |= IF_goto;
-#endif
             }
             if (found) {
                 if (ins->next)
@@ -168,12 +158,12 @@ void build_cfg() {
             bb_findadd_edge(bb, addr);
         if (!strcmp(bb->end->op, "ret")) {
             Instruction * sub;
-            int found = 0;
             debug(DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
              * bsrs
              */
-            for (pred = bb->pred_list; pred; pred=pred->next) {
+            for (pred = bb->pred_list; pred; pred = pred->next) {
+                int found = 0;
                 if (!strcmp(pred->from->end->op, "bsr")) {
 
                     SymReg *r = pred->from->end->r[0];
@@ -203,7 +193,6 @@ invok:
                             bb_add_edge(bb, bb_list[j+1]);
                         debug(DEBUG_CFG, "\tand does saevall %s\n",
                                 saves ? "yes" : "no");
-                        break;
                     }
                 }
                 else if (!strcmp(pred->from->end->op, "invoke")) {
@@ -211,9 +200,9 @@ invok:
                     sub = pred->to->start;
                     goto invok;
                 }
+                if (!found)
+                    debug(DEBUG_CFG, "\tcalled from unknown!\n");
             }
-            if (!found)
-                debug(DEBUG_CFG, "\tcalled from unknown!\n");
         }
 
         last = bb;
@@ -232,8 +221,11 @@ void bb_findadd_edge(Basic_block *from, SymReg *label) {
     else {
         debug(DEBUG_CFG, "register branch %s ",
                 ins_string(from->end));
+        /* XXX is probably only ok, if the invoke is "near" the
+         *     set_addr ins
+         */
         for (ins = from->end; ins; ins = ins->prev) {
-            if (!strcmp(ins->op, "set_addr") &&
+            if ((ins->type & ITBRANCH) && !strcmp(ins->op, "set_addr") &&
                     ins->r[1]->first_ins) {
                 bb_add_edge(from, bb_list[ins->r[1]->first_ins->bbindex]);
                 debug(DEBUG_CFG, "(%s) ", ins->r[1]->name);
