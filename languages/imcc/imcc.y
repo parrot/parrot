@@ -148,8 +148,8 @@ static int get_pmc_num(char *pmc_type)
     STRING * s = string_make(interpreter, pmc_type,
             (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
     PMC * key = key_new_string(interpreter, s);
-    return Parrot_base_classname_hash->vtable->get_integer_keyed(
-            interpreter, Parrot_base_classname_hash, key);
+    return interpreter->Parrot_base_classname_hash->vtable->get_integer_keyed(
+            interpreter, interpreter->Parrot_base_classname_hash, key);
 }
 
 /* only .PmcType */

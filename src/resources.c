@@ -194,13 +194,8 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
     cur_spot = new_block->start;
 
     /* Run through all the Buffer header pools and copy */
-    for (j = -2; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-        if (j == -2)
-            header_pool = interpreter->arena_base->buffer_header_pool;
-        else if (j == -1)
-            header_pool = interpreter->arena_base->string_header_pool;
-        else
-            header_pool = interpreter->arena_base->sized_header_pools[j];
+    for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+        header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool == NULL)
             continue;
 

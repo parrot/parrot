@@ -28,18 +28,20 @@ typedef union UnionVal {
 } UnionVal;
 
 /* Parrot Object - base class for all others */
-typedef struct PObj {
+typedef struct pobj_t {
     UnionVal u;
     Parrot_UInt flags;
 #if ! DISABLE_GC_DEBUG
     UINTVAL version;
 #endif
-} PObj;
+} pobj_t;
 
 /* plain Buffer is the smallest Parrot Obj */
 typedef struct Buffer {
-    PObj obj;
+    pobj_t obj;
 } Buffer;
+
+typedef Buffer PObj;
 
 /* macros for accessing old buffer members */
 #define bufstart obj.u.b.bufstart
@@ -49,7 +51,7 @@ typedef struct Buffer {
 #endif
 
 struct parrot_string_t {
-    PObj obj;
+    pobj_t obj;
     UINTVAL bufused;
     void *strstart;
     UINTVAL strlen;
@@ -63,7 +65,7 @@ struct parrot_string_t {
     /* completely different data.  That's why it's */
     /* referred to as a "cache". */
 struct PMC {
-    PObj obj;
+    pobj_t obj;
     VTABLE *vtable;
     DPOINTER *data;
     PMC *metadata;
@@ -221,6 +223,8 @@ typedef enum PObj_enum {
 #define PObj_custom_mark_SET(o)   PObj_flag_SET(custom_mark, o)
 #define PObj_is_buffer_ptr_SET(o) PObj_flag_SET(is_buffer_ptr, o)
 #define PObj_is_buffer_ptr_CLEAR(o) PObj_flag_CLEAR(is_buffer_ptr, o)
+
+#define PObj_is_PMC_TEST(o) PObj_flag_TEST(is_PMC, o)
 
 /* some combinations */
 #define PObj_is_cowed_TESTALL(o) ((o)->obj.flags & \

@@ -154,9 +154,9 @@ Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
 /*
  * Mark entries in a stack structure during GC.
  */
-PMC *
+void
 mark_stack(struct Parrot_Interp *interpreter,
-           Stack_Chunk_t *cur_stack, PMC *end_of_used_list)
+           Stack_Chunk_t *cur_stack)
 {
     Stack_Entry_t *entry;
     size_t i;
@@ -165,21 +165,16 @@ mark_stack(struct Parrot_Interp *interpreter,
         if (cur_stack->buffer == NULL)
             continue;
 
-        buffer_lives(interpreter, cur_stack->buffer);
+        pobject_lives(interpreter, (PObj *)cur_stack->buffer);
         entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
         for (i = 0; i < cur_stack->used; i++) {
-            if (STACK_ENTRY_PMC == entry[i].entry_type &&
-                entry[i].entry.pmc_val) {
-                end_of_used_list = mark_used(entry[i].entry.pmc_val,
-                                             end_of_used_list);
-            }
-            else if (STACK_ENTRY_STRING == entry[i].entry_type &&
+            if ((STACK_ENTRY_PMC == entry[i].entry_type ||
+                STACK_ENTRY_STRING == entry[i].entry_type) &&
                      entry[i].entry.string_val) {
-                buffer_lives(interpreter, (Buffer *)entry[i].entry.string_val);
+                pobject_lives(interpreter, (PObj *)entry[i].entry.string_val);
             }
         }
     }
-    return end_of_used_list;
 }
 
 /*

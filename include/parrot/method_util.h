@@ -6,7 +6,7 @@
  *     Utilities to help in writing methods.
  *  Data Structure and Algorithms:
  *  History:
- *     Initial revision by sean 2002/08/04 
+ *     Initial revision by sean 2002/08/04
  *  Notes:
  *  References:
  */
@@ -40,7 +40,6 @@ void Parrot_init_stash(struct Parrot_Interp * interp, struct method_rec_t * recp
 PMC * Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
                          PMC * key);
 
-PMC * mark_stack(struct Parrot_Interp *,
-                 Stack_Chunk_t * cur_stack, PMC * end_of_used_list);
+void mark_stack(struct Parrot_Interp *, Stack_Chunk_t * cur_stack);
 
 #endif /* PARROT_METHOD_UTIL_H_GUARD */

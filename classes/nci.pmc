@@ -21,14 +21,10 @@ pmclass NCI {
     }
 
 
-    PMC* mark (PMC *end_of_used_list) {
+    void mark () {
 	PMC *f = SELF->cache.struct_val;
-	if (f) {
-	    return mark_used(f, end_of_used_list);
-	}
-	else {
-	    return end_of_used_list;
-	}
+	if (f)
+	    pobject_lives(INTERP, (PObj *)f);
     }
 
     INTVAL type () {

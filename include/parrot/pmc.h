@@ -17,7 +17,6 @@
 #include "parrot/pobj.h"
 
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
-VAR_SCOPE PMC *Parrot_base_classname_hash;
 
 
 /* XXX add various bit test macros once we have need of them */

@@ -51,7 +51,7 @@ PMC *key_next(struct Parrot_Interp *interpreter, PMC *key);
 
 PMC *key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2);
 
-PMC *key_mark(struct Parrot_Interp *interpreter, PMC *key, PMC *end_of_used_list);
+void key_mark(struct Parrot_Interp *interpreter, PMC *key);
 
 #endif
 

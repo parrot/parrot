@@ -13,6 +13,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/method_util.h"
 #include <assert.h>
 
 #if ! DISABLE_GC_DEBUG
@@ -20,76 +21,44 @@
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
-extern void flush_register_windows(void);
 static size_t find_common_mask(size_t val1, size_t val2);
+static void trace_system_stack(struct Parrot_Interp *);
 
-PMC *
-mark_used(PMC *used_pmc, PMC *current_end_of_list)
+
+void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
-    /* If the PMC we've been handed has already been marked as live (ie we put
-     * it on the list already) we just return. Otherwise we could get in some
-     * nasty loops */
-    /* Also, be sure to check that we don't mark PMCs that are already part of
-     * the free list. This can happen with a conservative marking routine
-     * which marks dead PMCs as live, such as a C stack walk */
-    if (used_pmc->next_for_GC || PObj_on_free_list_TEST(used_pmc)) {
-        return current_end_of_list;
+    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
+            | PObj_custom_mark_FLAG;
+
+    /* if object is live or on free list return */
+    if (PObj_is_live_or_free_TESTALL(obj)) {
+        return;
     }
-
-    /* First, mark the PMC itself as used */
-    PObj_live_SET(used_pmc);
-
-    /* Now put it on the end of the list */
-    current_end_of_list->next_for_GC = used_pmc;
-
-    /* Explicitly make the tail of the linked list be self-referential */
-    used_pmc->next_for_GC = used_pmc;
-
-    /* return the PMC we were passed as the new end of the list */
-    return used_pmc;
-}
-
-#if DISABLE_GC_DEBUG
-void
-buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
-{
-    UNUSED(interpreter);
-    PObj_live_SET(buffer);
-}
-#else
-void
-buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
-{
-    PObj_live_SET(buffer);
+    /* mark it live */
+    PObj_live_SET(obj);
+    /* if object is a PMC and contains buffers or PMCs, then attach
+     * the PMC to the chained mark list
+     */
+    if (PObj_is_PMC_TEST(obj) &&
+            ((PObj_get_FLAGS(obj) & mask) || ((PMC*)obj)->metadata)) {
+        /* put it on the end of the list */
+        interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+        /* Explicitly make the tail of the linked list be self-referential */
+        interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
+        return;
+    }
+#if ! DISABLE_GC_DEBUG
+    /* buffer GC_DEBUG stuff */
     if (! GC_DEBUG(interpreter))
         return;
 
-    if (PObj_report_TEST(buffer)) {
+    if (PObj_report_TEST(obj)) {
         fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                buffer, buffer->bufstart);
+                obj, ((Buffer*)obj)->bufstart);
     }
-
-    if (PObj_on_free_list_TEST(buffer)) {
-        /* If a live buffer is found on the free list, warn. Note that
-         * this does NOT necessarily indicate the presence of a bug,
-         * because the stack is not zeroed out when a new stack frame
-         * is pushed, so old data on the stack might correctly point
-         * to a dead buffer. If the conservative_pointer_chasing flag
-         * is not set, this is not a possible explanation and the bug
-         * is real.
-         *
-         * If it *is* a bug, you may want to read the notes in
-         * get_free_buffer() in headers.c for tips on debugging using
-         * gdb with this pointer and version number. */
-#if ! DISABLE_GC_DEBUG
-#    if ! GC_VERBOSE
-        if (! CONSERVATIVE_POINTER_CHASING)
-#    endif
 #endif
-        fprintf(stderr, "GC Warning! Live buffer %p version " INTVAL_FMT " found on free list\n", buffer, buffer->version);
-    }
 }
-#endif
+
 /* Tag a buffer header as alive. Used by the GC system when tracing
  * the root set, and used by the PMC GC handling routines to tag their
  * individual pieces if they have private ones */
@@ -98,38 +67,31 @@ buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
 static void
 trace_active_PMCs(struct Parrot_Interp *interpreter)
 {
-    PMC *last, *current, *prev; /* Pointers to the last marked PMC, the
-                                 * currently being processed PMC, and in the
-                                 * previously processed PMC in a loop. */
-    unsigned int i, j;
-    Stack_Chunk_t *cur_stack;
-    struct PRegChunk *cur_chunk;
-    Stack_Entry_t *entry;
-    struct Stash *stash;
-    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
-            | PObj_custom_mark_FLAG;
-#ifdef HAS_HEADER_SETJMP
-    Parrot_jump_buff env;
-
-    /* this should put registers in env, which then get marked in
-     * trace_system_stack below
+    PMC *current, *prev = NULL;
+    /* Pointers to the currently being processed PMC, and
+     * in the previously processed PMC in a loop.
+     *
+     * initialize locals to zero, so no garbage is on stack
+     *
+     * note: adding locals here did cause increased DOD runs
      */
-    setjmp(env);
-#endif
+    unsigned int i = 0, j = 0;
+    struct PRegChunk *cur_chunk = 0;
+    struct Stash *stash = 0;
+    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
+        | PObj_custom_mark_FLAG;
 
-    /* We have to start somewhere, and the global stash is a good place */
-    last = current = interpreter->perl_stash->stash_hash;
+    /* We have to start somewhere, and the classname hash is a good place */
+    interpreter->mark_ptr = current = interpreter->Parrot_base_classname_hash;
 
-    /* mark it as used and get an updated end of list */
-    last = mark_used(current, last);
-    /* Parrot_base_classname_hash */
-    last = mark_used(Parrot_base_classname_hash, last);
+    /* mark it as used  */
+    pobject_lives(interpreter, (PObj *)current);
 
     /* Find important stuff on the system stack */
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 1;
 #endif
-    last = trace_system_stack(interpreter, last);
+    trace_system_areas(interpreter);
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 0;
 #endif
@@ -138,14 +100,15 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {
         if (interpreter->ctx.pmc_reg.registers[i]) {
-            last = mark_used(interpreter->ctx.pmc_reg.registers[i], last);
+            pobject_lives(interpreter,
+                    (PObj *)interpreter->ctx.pmc_reg.registers[i]);
         }
     }
 
     /* Walk through the stashes */
     stash = interpreter->perl_stash;
     while (stash) {
-        last = mark_used(stash->stash_hash, last);
+        pobject_lives(interpreter, (PObj *)stash->stash_hash);
         stash = stash->parent_stash;
     }
 
@@ -156,74 +119,32 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         for (j = 0; j < cur_chunk->used; j++) {
             for (i = 0; i < NUM_REGISTERS; i++) {
                 if (cur_chunk->PReg[j].registers[i]) {
-                    last = mark_used(cur_chunk->PReg[j].registers[i], last);
+                    pobject_lives(interpreter,
+                            (PObj *)cur_chunk->PReg[j].registers[i]);
                 }
             }
         }
     }
 
-    /* Walk lexical pad stack */
-    cur_stack = interpreter->ctx.pad_stack;
-    while (cur_stack) {
-        if (cur_stack->buffer) {
-            buffer_lives(interpreter, cur_stack->buffer);
-            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-            for (i = 0; i < cur_stack->used; i++) {
-                if (STACK_ENTRY_PMC == entry[i].entry_type &&
-                        entry[i].entry.pmc_val) {
-                    last = mark_used(entry[i].entry.pmc_val, last);
-                }
-            }
-        }
-        cur_stack = cur_stack->prev;
+    /* Walk all stacks: lexical pad, user and control */
+    {
+        Stack_Chunk_t *stacks[3];
+
+        stacks[0] = interpreter->ctx.pad_stack;
+        stacks[1] = interpreter->ctx.user_stack;
+        stacks[2] = interpreter->ctx.control_stack;
+        for (j = 0; j < 3; j++)
+            mark_stack(interpreter, stacks[j]);
+
     }
-
-    /* Finally the general stack */
-    cur_stack = interpreter->ctx.user_stack;
-
-    while (cur_stack) {
-        if (cur_stack->buffer) {
-            buffer_lives(interpreter, cur_stack->buffer);
-
-            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-            for (i = 0; i < cur_stack->used; i++) {
-                if (STACK_ENTRY_PMC == entry[i].entry_type &&
-                        entry[i].entry.pmc_val) {
-                    last = mark_used(entry[i].entry.pmc_val, last);
-                }
-            }
-        }
-
-        cur_stack = cur_stack->prev;
-    }
-
-    cur_stack = interpreter->ctx.control_stack;
-
-    while (cur_stack) {
-        if (cur_stack->buffer) {
-            buffer_lives(interpreter, cur_stack->buffer);
-
-            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-            for (i = 0; i < cur_stack->used; i++) {
-                if (STACK_ENTRY_PMC == entry[i].entry_type &&
-                        entry[i].entry.pmc_val) {
-                    last = mark_used(entry[i].entry.pmc_val, last);
-                }
-            }
-        }
-
-        cur_stack = cur_stack->prev;
-    }
-
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list 'o things to look at. Run through it */
-    prev = NULL;
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         /* mark properties */
         if (current->metadata) {
-            last = mark_used(current->metadata, last);
+            pobject_lives(interpreter, (PObj *)current->metadata);
         }
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
@@ -231,12 +152,12 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         if (bits) {
             if (bits == PObj_is_PMC_ptr_FLAG) {
                 if (current->data) {
-                    last = mark_used(current->data, last);
+                    pobject_lives(interpreter, current->data);
                 }
             }
             else if (bits == PObj_is_buffer_ptr_FLAG) {
                 if (current->data) {
-                    buffer_lives(interpreter, current->data);
+                    pobject_lives(interpreter, current->data);
                 }
             }
             else if (bits == PObj_is_buffer_of_PMCs_ptr_FLAG) {
@@ -247,17 +168,17 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                     PMC **cur_pmc = trace_buf->bufstart;
 
                     /* Mark the damn buffer as used! */
-                    buffer_lives(interpreter, trace_buf);
+                    pobject_lives(interpreter, trace_buf);
                     for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
                         if (cur_pmc[i]) {
-                            last = mark_used(cur_pmc[i], last);
+                            pobject_lives(interpreter, (PObj *)cur_pmc[i]);
                         }
                     }
                 }
             }
             else {
                 /* All that's left is the custom */
-                last = current->vtable->mark(interpreter, current, last);
+                current->vtable->mark(interpreter, current);
             }
         }
 
@@ -282,16 +203,16 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         Buffer *reg = (Buffer *)interpreter->ctx.string_reg.registers[i];
 
         if (reg)
-            buffer_lives(interpreter, reg);
+            pobject_lives(interpreter, reg);
     }
 
     /* The interpreter has a few strings of its own */
     if (interpreter->current_file)
-        buffer_lives(interpreter, (Buffer *)interpreter->current_file);
+        pobject_lives(interpreter, (Buffer *)interpreter->current_file);
     if (interpreter->current_package)
-        buffer_lives(interpreter, (Buffer *)interpreter->current_package);
+        pobject_lives(interpreter, (Buffer *)interpreter->current_package);
     for (i = 1; i < enum_class_max; i++)
-        buffer_lives(interpreter, (Buffer *)Parrot_base_vtables[i].name
+        pobject_lives(interpreter, (Buffer *)Parrot_base_vtables[i].name
                 (interpreter, 0));
 
     /* Now walk the string stack. Make sure to walk from top down since stack
@@ -303,38 +224,9 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
                 Buffer *reg = (Buffer *)cur_chunk->SReg[j].registers[i];
 
                 if (reg)
-                    buffer_lives(interpreter, reg);
+                    pobject_lives(interpreter, reg);
             }
         }
-    }
-
-    /* Now the general stack */
-    cur_stack = interpreter->ctx.user_stack;
-    /* The general stack's circular, so we need to be careful */
-    while (cur_stack) {
-        if (cur_stack->buffer) {
-            buffer_lives(interpreter, cur_stack->buffer);
-            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-            for (i = 0; i < cur_stack->used; i++) {
-                if (STACK_ENTRY_STRING == entry[i].entry_type &&
-                        entry[i].entry.string_val) {
-                    buffer_lives(interpreter,
-                            (Buffer *)entry[i].entry.string_val);
-                }
-            }
-        }
-
-        cur_stack = cur_stack->prev;
-    }
-
-    /* Finally the control stack frames must be marked live */
-    cur_stack = interpreter->ctx.control_stack;
-    while (cur_stack) {
-        if (cur_stack->buffer) {
-            buffer_lives(interpreter, cur_stack->buffer);
-        }
-
-        cur_stack = cur_stack->prev;
     }
 }
 
@@ -344,9 +236,10 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Arena *cur_arena;
     UINTVAL i, total_used = 0;
+    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
 
     /* Run through all the buffer header pools and mark */
-    for (cur_arena = interpreter->arena_base->pmc_pool->last_Arena;
+    for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         PMC *pmc_array = cur_arena->start_objects;
 
@@ -358,19 +251,16 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
 
             /* live_FLAG | on_free_list_FLAG | constant_FLAG */
             if (!PObj_is_live_or_free_TESTALL(&pmc_array[i])) {
-                add_free_pmc(interpreter,
-                        interpreter->arena_base->pmc_pool, &pmc_array[i]);
+                pool->add_free_object(interpreter, pool, &pmc_array[i]);
             }
             else if (!PObj_on_free_list_TEST(&pmc_array[i])) {
                 total_used++;
                 PObj_live_CLEAR(&pmc_array[i]);
-                pmc_array[i].next_for_GC = NULL;
             }
         }
     }
     interpreter->active_PMCs += total_used;
-    interpreter->arena_base->pmc_pool->num_free_objects =
-            interpreter->arena_base->pmc_pool->total_objects - total_used;
+    pool->num_free_objects = pool->total_objects - total_used;
 }
 
 #ifdef GC_IS_MALLOC
@@ -387,7 +277,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
     int *refcount;
 
     /* clear refcount for COWable objects. As these are STRINGs only these
-     * have strstart_FLAG set */
+     * have _is_string_FLAG set */
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
         b = cur_arena->start_objects;
@@ -532,11 +422,10 @@ find_common_mask(size_t val1, size_t val2)
     return 0;
 }
 
-PMC *
-trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
+void
+trace_mem_block(struct Parrot_Interp *interpreter,
+ 		size_t lo_var_ptr, size_t hi_var_ptr)
 {
-    size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
-    size_t hi_var_ptr = (size_t)&lo_var_ptr;
     size_t prefix, tmp_ptr;
     ptrdiff_t cur_var_ptr;
 
@@ -548,11 +437,8 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
     size_t mask = find_common_mask(buffer_min < pmc_min ? buffer_min : pmc_min,
             buffer_max > pmc_max ? buffer_max : pmc_max);
 
-    /* Flush register windows if needed */
-    flush_register_windows();
-
-    if (!lo_var_ptr)
-        return last;
+    if (!lo_var_ptr || !hi_var_ptr)
+        return;
     if (lo_var_ptr < hi_var_ptr) {
         tmp_ptr = hi_var_ptr;
         hi_var_ptr = lo_var_ptr;
@@ -570,25 +456,26 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
 
         /* Do a quick approximate range check by bit-masking */
         if ((ptr & mask) == prefix) {
-            /* Note that what we find on the stack is not guaranteed to be a
-             * live pmc/buffer, and could very well have its bufstart/vtable
-             * destroyed due to the linked list of free headers... */
+            /* Note that what we find via the stack or registers are not
+             * guaranteed to be live pmcs/buffers, and could very well their
+             * bufstart/vtable destroyed due to the linked list of free
+             * headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
                     is_pmc_ptr(interpreter, (void *)ptr)) {
-                /* ...so ensure that mark_used checks PObj_on_free_list_FLAG
+                /* ...so ensure that pobject_lives checks PObj_on_free_list_FLAG
                  * before adding it to the next_for_GC list, to have
                  * vtable->mark() called. */
-                last = mark_used((PMC *)ptr, last);
+                pobject_lives(interpreter, (PObj *)ptr);
             }
             else if (buffer_min <= ptr && ptr < buffer_max &&
                     is_buffer_ptr(interpreter, (void *)ptr)) {
-                /* ...and since buffer_lives doesn't care about bufstart, it
+                /* ...and since pobject_lives doesn't care about bufstart, it
                  * doesn't really matter if it sets a flag */
-                buffer_lives(interpreter, (Buffer *)ptr);
+                pobject_lives(interpreter, (PObj *)ptr);
             }
         }
     }
-    return last;
+    return;
 }
 #endif
 
@@ -634,13 +521,8 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     free_unused_PMCs(interpreter);
 
     /* And unused buffers on the free list */
-    for (j = -2; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-        if (j == -2)
-            header_pool = interpreter->arena_base->string_header_pool;
-        else if (j == -1)
-            header_pool = interpreter->arena_base->buffer_header_pool;
-        else
-            header_pool = interpreter->arena_base->sized_header_pools[j];
+    for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+        header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool) {
             free_unused_buffers(interpreter, header_pool, 0);
         }

@@ -14,6 +14,8 @@
 
 #include "parrot/parrot.h"
 
+#define flags obj.flags
+
 PMC *
 key_new(struct Parrot_Interp *interpreter)
 {
@@ -22,7 +24,6 @@ key_new(struct Parrot_Interp *interpreter)
     return key;
 }
 
-#define flags obj.flags
 PMC *
 key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
 {
@@ -227,18 +228,16 @@ key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)
     return key1;
 }
 
-PMC *
-key_mark(struct Parrot_Interp *interpreter, PMC *key, PMC *end_of_used_list)
+void
+key_mark(struct Parrot_Interp *interpreter, PMC *key)
 {
-    if ((key->flags & KEY_type_FLAGS) == KEY_string_FLAG)
-        buffer_lives(interpreter, (Buffer *)key->cache.string_val);
-    else if ((key->flags & KEY_type_FLAGS) == KEY_pmc_FLAG)
-        end_of_used_list = mark_used(key->cache.pmc_val, end_of_used_list);
+    if ( ((key->flags & KEY_type_FLAGS) == KEY_string_FLAG) ||
+       ((key->flags & KEY_type_FLAGS) == KEY_pmc_FLAG) )
+        pobject_lives(interpreter, (PObj *)key->cache.string_val);
 
     if (key->data)
-        end_of_used_list = mark_used(key->data, end_of_used_list);
+        pobject_lives(interpreter, (PObj *)key->data);
 
-    return end_of_used_list;
 }
 
 /*

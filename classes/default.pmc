@@ -39,13 +39,14 @@ pmclass default abstract noinit {
     /* The end of used parameter is passed into the mark_used function of
     * the garbage collector.
     */
-    PMC* mark (PMC* end_of_used_list) {
+    void mark () {
         PANIC("custom_mark flag set but no custom mark routine defined");
-        return NULL;
     }
 
     void destroy () {
-        PANIC("custom_destroy flag set but no custom destroy routine defined");
+        internal_exception(ILL_INHERIT,
+		"custom_destroy flag set but no custom destroy routine defined"
+		" in class '%s'\n", caller(INTERP, SELF));
     }
 
     PMC* getprop(STRING* key) {

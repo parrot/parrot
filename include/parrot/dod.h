@@ -41,7 +41,8 @@
         ((interpreter)->GC_block_level)
 
 void Parrot_do_dod_run(struct Parrot_Interp *);
-PMC *trace_system_stack(struct Parrot_Interp *, PMC *);
+void trace_system_areas(struct Parrot_Interp *);
+void trace_mem_block(struct Parrot_Interp *, size_t, size_t);
 
 void free_unused_buffers(struct Parrot_Interp *interpreter,
                     struct Small_Object_Pool *pool, int cleanup);
@@ -51,10 +52,9 @@ void used_cow(struct Parrot_Interp *interpreter,
 void clear_cow(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool, int cleanup);
 
-/* Functions needed for custom DOD routines */
+/* mark a PObj live during DOD */
 
-PMC * mark_used(PMC *used_pmc, PMC *current_end_of_list);
-void buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer);
+void pobject_lives(struct Parrot_Interp *interpreter, PObj *buffer);
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */

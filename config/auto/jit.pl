@@ -2,7 +2,7 @@ package Configure::Step;
 
 use strict;
 use vars qw($description @args);
-use Parrot::Configure::Step;
+use Parrot::Configure::Step qw(copy_if_diff);
 
 
 $description = "Determining architecture, OS and JIT capability...";
@@ -67,6 +67,12 @@ sub runstep {
 	Configure::Data->get('intvalsize') > Configure::Data->get('ptrsize')) {
 	    $jitcapable = 0;
 	}
+  }
+
+  if (-e "config/gen/platform/$cpuarch.s") {
+    copy_if_diff("config/gen/platform/$cpuarch.s", "asmfun.s");
+
+    Configure::Data->set(asmfun_o => 'asmfun$(O)');
   }
 
   $jitcapable = $set_jitcapable if defined $set_jitcapable;

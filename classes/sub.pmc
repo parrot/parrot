@@ -32,13 +32,10 @@ pmclass Sub {
        PObj_custom_mark_destroy_SETALL(SELF);
    }
 
-   PMC* mark (PMC *end_of_used_list) {
+   void mark () {
        PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
        if (pad) {
-           return mark_used(pad, end_of_used_list);
-       }
-       else {
-           return end_of_used_list;
+           pobject_lives(INTERP, pad);
        }
    }
 

@@ -116,36 +116,33 @@ dump_hash(Interp *interpreter, HASH *hash)
     }
 }
 
-PMC *
-mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
+void
+mark_hash(Interp *interpreter, HASH *hash)
 {
     HashIndex i;
 
-    buffer_lives(interpreter, (Buffer *)hash);
+    pobject_lives(interpreter, (PObj *)hash);
 
     if (hash->bucket_pool) {
-        buffer_lives(interpreter, hash->bucket_pool);
+        pobject_lives(interpreter, (PObj *)hash->bucket_pool);
     }
 
     if (hash->buffer.bufstart == NULL || hash->bucket_pool->bufstart == NULL) {
-        return end_of_used_list;
+        return;
     }
 
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
-            buffer_lives(interpreter, (Buffer *)bucket->key);
+            pobject_lives(interpreter, (PObj *)bucket->key);
             if (bucket->value.type == enum_hash_string)
-                buffer_lives(interpreter,
-                             (Buffer *)bucket->value.val.string_val);
+                pobject_lives(interpreter,
+                             (PObj *)bucket->value.val.string_val);
             else if (bucket->value.type == enum_hash_pmc)
-                end_of_used_list = mark_used(bucket->value.val.pmc_val,
-                                             end_of_used_list);
+                pobject_lives(interpreter, (PObj *)bucket->value.val.pmc_val);
             bucket = getBucket(hash, bucket->next);
         }
     }
-
-    return end_of_used_list;
 }
 
 /* For a hashtable of size N, we use MAXFULL_PERCENT% of N as the number of

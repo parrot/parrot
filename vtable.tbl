@@ -3,7 +3,7 @@
 void init()
 void init_pmc(PMC* initializer)
 void morph(INTVAL type)
-PMC* mark(PMC* tail)
+void mark()
 void destroy()
 
 PMC* getprop(STRING* key)

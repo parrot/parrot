@@ -171,6 +171,11 @@ typedef struct Parrot_Interp {
 
     PDB_t *pdb;                 /* Debug system */
     void *lo_var_ptr;           /* Pointer to memory on runops system stack */
+
+    /* per interpreter global vars */
+    INTVAL world_inited;        /* Parrot_init is done */
+    PMC *mark_ptr;             /* last PMC marked used in DOD runs */
+    PMC *Parrot_base_classname_hash;    /* hash containing name->base_type */
 } Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

@@ -29,10 +29,12 @@ init_world(Interp *interpreter)
     /* Now register the names of the PMCs */
 
     /* We need a hash */
-    Parrot_base_classname_hash = pmc_new(interpreter, enum_class_PerlHash);
+    interpreter->Parrot_base_classname_hash =
+        pmc_new(interpreter, enum_class_PerlHash);
 
     /* Now fill the hash */
-    Parrot_register_core_pmcs(interpreter, Parrot_base_classname_hash);
+    Parrot_register_core_pmcs(interpreter,
+            interpreter->Parrot_base_classname_hash);
 }
 
 /*

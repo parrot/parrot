@@ -265,14 +265,13 @@ scratchpad_get_index(struct Parrot_Interp * interp, PMC * pad,
     return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
 }
 
-PMC *
-lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex, PMC * last)
+void
+lexicals_mark(struct Parrot_Interp * interp, struct Parrot_Lexicals *lex)
 {
     if (lex->names)
-        last = list_mark(interp, lex->names, last);
+        list_mark(interp, lex->names);
     if (lex->values)
-        last = list_mark(interp, lex->values, last);
-    return last;
+        list_mark(interp, lex->values);
 }
 
 /*

@@ -42,9 +42,8 @@ pmclass IntList {
 
     /* The end_of_used_list parameter is passed into the mark_used
      * function of the garbage collector. */
-    PMC* mark (PMC *end_of_used_list) {
-        return intlist_mark(INTERP, (IntList *) SELF->data,
-                             end_of_used_list);
+    void mark () {
+        intlist_mark(INTERP, (IntList *) SELF->data);
     }
 
     void set_integer_keyed_int (INTVAL* key, INTVAL value) {

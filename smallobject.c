@@ -16,7 +16,7 @@
 
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#define REPLENISH_LEVEL_FACTOR 0.2
+#define REPLENISH_LEVEL_FACTOR 0.3
 #define UNITS_PER_ALLOC_GROWTH_FACTOR 4
 
 INTVAL
@@ -77,7 +77,7 @@ get_free_object(struct Parrot_Interp *interpreter,
     void *ptr;
 
     /* if we don't have any objects */
-    if (!pool->free_list || GC_DEBUG(interpreter))
+    if (!pool->free_list)
         (*pool->more_objects) (interpreter, pool);
 
     ptr = pool->free_list;

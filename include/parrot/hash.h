@@ -58,7 +58,7 @@ void hash_destroy(Interp * interpreter, HASH *hash);
 HASH_ENTRY *hash_get(Interp * interpreter, HASH *hash, STRING *key);
 void hash_put(Interp * interpreter, HASH *hash, STRING *key, HASH_ENTRY * value);
 void hash_delete(Interp * interpreter, HASH *hash, STRING *key);
-PMC *mark_hash(Interp * interpreter, HASH *hash, PMC * end_of_used_list);
+void mark_hash(Interp * interpreter, HASH *hash);
 void dump_hash(Interp * interpreter, HASH *hash);
 
 #endif

@@ -38,7 +38,7 @@ struct IntList_chunk_t {
 
 typedef IntList_Chunk IntList;
 
-PMC* intlist_mark(Interp*, IntList*, PMC* last);
+void intlist_mark(Interp*, IntList*);
 
 IntList *intlist_clone(Interp*i, IntList *list);
 

@@ -59,9 +59,7 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     pmc = pool->free_list;
     pool->free_list = *(void **)pmc;
 
-    PObj_flags_SETTO(pmc, 0);
-    /* Make sure it doesn't seem to be on the GC list */
-    pmc->next_for_GC = NULL;
+    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
 
     return pmc;
 }
@@ -132,14 +130,6 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     if (GC_DEBUG(interpreter))
         buffer->version++;
 #endif
-
-    /* If you get the "Live buffer 0xnnnnnnn version m found on free list"
-     * message, try setting a conditional breakpoint on the following line.
-     * The condition should be (buffer == 0xnnnnnnnn) && (version == m) By
-     * looking at the stack trace, you can figure out what the buffer was
-     * being used for. Remember, though, that it might just be stale stack
-     * litter that is triggering the warning, and not a bug at all. */
-
     return buffer;
 }
 
@@ -193,30 +183,32 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
     return pool;
 }
 
+/* non constant strings and plain Buffers are in the sized header
+ * pools
+ */
 struct Small_Object_Pool *
 new_buffer_pool(struct Parrot_Interp *interpreter)
 {
-    struct Small_Object_Pool *pool =
-            new_bufferlike_pool(interpreter, sizeof(Buffer));
-    return pool;
+    return make_bufferlike_pool(interpreter, sizeof(Buffer));
 }
 
 struct Small_Object_Pool *
 new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)
 {
-    struct Small_Object_Pool *pool =
-            new_bufferlike_pool(interpreter, sizeof(STRING));
+    struct Small_Object_Pool *pool;
+    if (constant) {
+        pool = new_bufferlike_pool(interpreter, sizeof(STRING));
+        pool->mem_pool = interpreter->arena_base->constant_string_pool;
+    }
+    else
+        pool = make_bufferlike_pool(interpreter, sizeof(STRING));
     pool->objects_per_alloc = GC_DEBUG(interpreter) ?
             GC_DEBUG_STRING_HEADERS_PER_ALLOC : STRING_HEADERS_PER_ALLOC;
     pool->align_1 = STRING_ALIGNMENT - 1;
-    if (constant) {
-        pool->mem_pool = interpreter->arena_base->constant_string_pool;
-    }
     return pool;
 }
 
-
-/* makes and returns a Bufferlike Header Pool */
+/* make and return a bufferlike header pool */
 struct Small_Object_Pool *
 make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 {
@@ -244,7 +236,7 @@ make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
     return sized_pools[idx];
 }
 
-/* returns a Bufferlike Header Pool, it must exist */
+/* return a bufferlike header pool, it must exist */
 struct Small_Object_Pool *
 get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 {
@@ -253,7 +245,6 @@ get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 
     return sized_pools[ (buffer_size - sizeof(Buffer)) / sizeof(void *) ];
 }
-
 
 
 /** Get a header **/
@@ -300,15 +291,8 @@ size_t
 get_max_buffer_address(struct Parrot_Interp *interpreter)
 {
     UINTVAL i;
-    size_t max = interpreter->arena_base->string_header_pool->end_arena_memory;
-
-    if (max < interpreter->arena_base->buffer_header_pool->end_arena_memory)
-        max = interpreter->arena_base->buffer_header_pool->end_arena_memory;
-
-    if (max < interpreter->arena_base->
-            constant_string_header_pool->end_arena_memory)
-        max = interpreter->arena_base->constant_string_header_pool->
-                end_arena_memory;
+    size_t max = interpreter->arena_base->constant_string_header_pool->
+        end_arena_memory;
 
     for (i = 0; i < interpreter->arena_base->num_sized; i++) {
         if (interpreter->arena_base->sized_header_pools[i]) {
@@ -326,16 +310,8 @@ size_t
 get_min_buffer_address(struct Parrot_Interp *interpreter)
 {
     UINTVAL i;
-    size_t min = interpreter->arena_base->string_header_pool->
+    size_t min = interpreter->arena_base->constant_string_header_pool->
             start_arena_memory;
-
-    if (min > interpreter->arena_base->buffer_header_pool->start_arena_memory)
-        min = interpreter->arena_base->buffer_header_pool->start_arena_memory;
-
-    if (min > interpreter->arena_base->
-            constant_string_header_pool->start_arena_memory)
-        min = interpreter->arena_base->
-                constant_string_header_pool->start_arena_memory;
 
     for (i = 0; i < interpreter->arena_base->num_sized; i++) {
         if (interpreter->arena_base->sized_header_pools[i]) {
@@ -365,12 +341,6 @@ is_buffer_ptr(struct Parrot_Interp *interpreter, void *ptr)
 {
     UINTVAL i;
 
-    if (contained_in_pool(interpreter,
-                    interpreter->arena_base->string_header_pool, ptr))
-        return 1;
-    if (contained_in_pool(interpreter,
-                    interpreter->arena_base->buffer_header_pool, ptr))
-        return 1;
     if (contained_in_pool(interpreter,
                     interpreter->arena_base->constant_string_header_pool, ptr))
         return 1;
@@ -426,7 +396,12 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
             new_string_pool(interpreter, 1);
 
 
-    /* Init the buffer header pool - this must be the first pool created! */
+    /* Init the buffer header pool
+     *
+     * note: the buffer_header_pool and the string_header_pool are actually
+     * living in the sized_header_pools, this pool pointers are only
+     * here for faster access in new_*_header
+     */
     interpreter->arena_base->buffer_header_pool = new_buffer_pool(interpreter);
 
     /* Init the string header pool */
@@ -452,19 +427,15 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
     start = 2;
 #endif
     for (i = start; i <= 2; i++) {
-        for (j = -4; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
-            if (j == -4)
+        for (j = -2; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
+            if (j == -2)
                 pool = interpreter->arena_base->constant_string_header_pool;
-            else if (j == -3)
-                pool = interpreter->arena_base->pmc_pool;
-            else if (j == -2)
-                pool = interpreter->arena_base->string_header_pool;
             else if (j == -1)
-                pool = interpreter->arena_base->buffer_header_pool;
+                pool = interpreter->arena_base->pmc_pool;
             else
                 pool = interpreter->arena_base->sized_header_pools[j];
             if (pool) {
-                if (j == -3) {
+                if (j == -1) {
                     if (i == 2)
                         free_unused_PMCs(interpreter);
                 }

@@ -4218,7 +4218,9 @@ Find the PMC type or parrot data type by name.
 op find_type(out INT, in STR) {
     PMC * key = key_new_string(interpreter, $2);
 
-    $1 = Parrot_base_classname_hash->vtable->get_integer_keyed(interpreter, Parrot_base_classname_hash, key);
+    $1 = interpreter->Parrot_base_classname_hash->vtable->
+    	get_integer_keyed(interpreter,
+		interpreter->Parrot_base_classname_hash, key);
     if ($1 == enum_type_undef)
 	$1 = Parrot_get_datatype_enum(interpreter, $2);
     goto NEXT();

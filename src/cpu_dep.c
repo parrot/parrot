@@ -12,12 +12,21 @@
 
 #include "parrot/parrot.h"
 
-void flush_register_windows(void);
+#ifdef __ia64__
+
+#include <ucontext.h>
+extern void *flush_reg_store(void);
+#define BACKING_STORE_BASE 0x80000fff80000000
+
+#endif
+
+static void trace_system_stack(struct Parrot_Interp *interpreter);
 
 void
-flush_register_windows(void)
+trace_system_areas(struct Parrot_Interp *interpreter)
 {
-#ifdef __sparc
+
+#ifdef __sparc /* Flush register windows */
     static union {
 	int insns[4];
         double align_hack[2];
@@ -27,16 +36,47 @@ flush_register_windows(void)
 #else
                             0x91d02003, /* ta ST_FLUSH_WINDOWS */
 #endif
-                            0x81c3e008, /* retl */ 
+                            0x81c3e008, /* retl */
 			    0x01000000  /* nop */
     } };
 
     static void (*fn_ptr)(void) = (void (*)(void))&u.align_hack[0];
     fn_ptr();
+#endif
 
+
+#ifdef __ia64__
+
+    struct ucontext ucp;
+    void *current_regstore_top;
+
+    getcontext(&ucp);
+    current_regstore_top = flush_reg_store();
+
+    trace_mem_block(interpreter, 0x80000fff80000000,
+				(size_t)current_regstore_top);
 #else
 
-    return;
+#ifdef HAS_HEADER_SETJMP
+    Parrot_jump_buff env;
+
+    /* this should put registers in env, which then get marked in
+     * trace_system_stack below
+     */
+    setjmp(env);
+#endif
 
 #endif
+
+
+    trace_system_stack(interpreter);
+}
+
+static void
+trace_system_stack(struct Parrot_Interp *interpreter)
+{
+    size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
+
+    trace_mem_block(interpreter, (size_t)lo_var_ptr,
+			   (size_t)&lo_var_ptr);
 }

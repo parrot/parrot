@@ -102,10 +102,10 @@
 
 #include <parrot/parrot.h>
 
-PMC *
-intlist_mark(Interp *i, IntList *l, PMC *last)
+void
+intlist_mark(Interp *i, IntList *l)
 {
-    return list_mark(i, (List *)l, last);
+    list_mark(i, (List *)l);
 }
 
 IntList *

@@ -56,8 +56,8 @@ pmclass Key {
 	return dest;
     }
 
-    PMC* mark (PMC* end_of_used_list) {
-        return key_mark(INTERP, SELF, end_of_used_list);
+    void mark () {
+        key_mark(INTERP, SELF);
     }
 
     STRING* name () {

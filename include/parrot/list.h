@@ -75,7 +75,7 @@ typedef enum {
 List * list_new(Interp *interpreter, INTVAL type);
 List * list_new_init(Interp *interpreter, INTVAL type, PMC *init);
 List * list_clone(Interp *interpreter, List *other);
-PMC* list_mark(Interp* interpreter, List* list, PMC* last);
+void list_mark(Interp* interpreter, List* list);
 INTVAL list_length(Interp* interpreter, List* list);
 void list_set_length(Interp* interpreter, List* list, INTVAL len);
 void list_push(Interp *interpreter, List *list, void *item, int type);

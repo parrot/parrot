@@ -1107,35 +1107,29 @@ list_clone(Interp *interpreter, List *other)
 }
 
 
-PMC *
-list_mark(Interp *interpreter, List *list, PMC *last)
+void
+list_mark(Interp *interpreter, List *list)
 {
     List_chunk *chunk;
-    PMC *p;
-    STRING *s;
+    PObj *p;
     UINTVAL i;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
-        buffer_lives(interpreter, (Buffer *)chunk);
+        pobject_lives(interpreter, (PObj *)chunk);
         if (!(chunk->data.flags & sparse))
             for (i = 0; i < chunk->items; i++) {
-                if (list->item_type == enum_type_PMC) {
-                    p = ((PMC **)chunk->data.bufstart)[i];
+                if (list->item_type == enum_type_PMC ||
+                    list->item_type == enum_type_STRING) {
+                    p = ((PObj **)chunk->data.bufstart)[i];
                     if (p)
-                        last = mark_used(p, last);
-                }
-                else if (list->item_type == enum_type_STRING) {
-                    s = ((STRING **)chunk->data.bufstart)[i];
-                    if (s)
-                        buffer_lives(interpreter, (Buffer *)s);
+                        pobject_lives(interpreter, p);
                 }
 
             }
     }
-    buffer_lives(interpreter, (Buffer *)list);
+    pobject_lives(interpreter, (PObj *)list);
     if (list->user_data)
-        last = mark_used(list->user_data, last);
-    return last;
+        pobject_lives(interpreter, (PObj *) list->user_data);
 }
 
 INTVAL

@@ -23,12 +23,15 @@ pmclass Pointer {
     void morph (INTVAL type) {
     }
 
-    PMC* mark (PMC *end_of_used_list) {
-        PMC* (*mark_function)(struct Parrot_Interp*, void*, PMC *) =
-            (PMC*(*)(struct Parrot_Interp*, void*, PMC*))D2FPTR(SELF->cache.struct_val);
-        if (SELF->data == NULL) return end_of_used_list;
-        if (SELF->cache.struct_val == NULL) return end_of_used_list;
-        return (*mark_function)(INTERP, SELF->data, end_of_used_list);
+    void mark () {
+        void (*mark_function)(struct Parrot_Interp*, void*) =
+            (void (*)(struct Parrot_Interp*, void*))
+	    	D2FPTR(SELF->cache.struct_val);
+        if (SELF->data == NULL)
+		return;
+        if (SELF->cache.struct_val == NULL)
+		return;
+        (*mark_function)(INTERP, SELF->data);
     }
 
     void destroy () {

@@ -108,7 +108,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
 	headers$(O) dod$(O) method_util$(O) exit$(O) \
 	misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O) \
-	nci$(O) cpu_dep$(O)
+	nci$(O) cpu_dep$(O) ${asmfun_o}
 
 O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES)

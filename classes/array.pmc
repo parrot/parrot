@@ -104,10 +104,10 @@ pmclass Array {
     }
 
 
-    PMC* mark (PMC *end_of_used_list) {
-        return list_mark(INTERP, (List *) SELF->data,
-                             end_of_used_list);
+    void mark () {
+        list_mark(INTERP, (List *) SELF->data);
     }
+
     INTVAL type () {
         return enum_class_Array;
     }

@@ -39,13 +39,10 @@ pmclass Coroutine {
         mem_sys_free(SELF->data);
     }
 
-    PMC* mark (PMC* end_of_used_list) {
+    void mark () {
         /* XXX: need to do pads as well. */
-        return mark_stack(
-            INTERP,
-            ((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack,
-            end_of_used_list
-            );
+        mark_stack(
+            INTERP, ((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack);
     }
 
     void set_integer (PMC * value) {

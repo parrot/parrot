@@ -43,15 +43,9 @@ pmclass PerlHash {
         new_hash(INTERP, (HASH **)&SELF->data);
     }
 
-    /* The end of used parameter is passed into the mark_used function of
-     * the garbage collector.
-     */
-    PMC* mark (PMC *end_of_used_list) {
-        if (SELF->data) {
-            return mark_hash(INTERP, SELF->data, end_of_used_list);
-        } else {
-            return end_of_used_list;
-        }
+    void mark () {
+        if (SELF->data)
+            mark_hash(INTERP, SELF->data);
     }
 
     INTVAL type () {
