@@ -1,0 +1,239 @@
+#!/usr/bin/env perl
+
+eval 'exec perl -w -S $0 ${1+"$@"}'
+  if $running_under_some_shell;
+
+die "work in progress... nothing ready yet!\n";
+
+#
+# This utility borrows heavily from perlbug.
+#
+
+use Config;
+use File::Spec;
+use Getopt::Std;
+
+my $VERSION = "0.0.1";
+
+my %std_to = 
+  ( bugs => 'parrotbug@parrotcode.org',
+    ok   => 'parrotstatus-ok@parrotcode.org',
+    nok  => 'parrotstatus-nok@parrotcode.org'
+  );
+
+my $updir = File::Spec->updir();
+my $parrotdir = File::Spec->catfile( File::Spec->curdir() );
+my $myconfig  = File::Spec->catdir($parrotdir, "myconfig");
+
+my ( $to, $cc, $from, $subject, $msgid, $body );
+my ( $category, $severity );
+my ( $is_linux, $is_macos, $is_mswin32, $is_vms );
+my $parrot_version;
+
+
+#-------------------------------------------#
+#               Main program.               #
+
+BEGIN {
+    eval "use Mail::Send;";
+    $have_send = ($@ eq "");
+    eval "use Mail::Util;";
+    $have_util = ($@ eq "");
+}
+
+init();
+help()    if $opt_h;
+version() if $opt_V;
+
+query_info();
+edit_info();
+ask_for_action();
+send_msg();
+exit;
+
+
+
+
+#-----------------------------------#
+#               Subs.               #
+
+
+sub help {
+    print <<EOF;
+
+A program to help generate bug reports about parrot, and mail them.
+
+Usage:
+
+ $0 {-h|-V}
+ $0 [-a address] [-r returnaddress] {-ok|-nok}
+
+Options:
+  -h    Print this help message.
+  -nok  Report unsuccessful build on this system to parrot developpers
+  -ok   Report successful build on this system to parrot developpers
+        Only use -ok if *everything* was ok: if there were *any* problems
+        at all, use -nok.
+  -V    Print version information.
+
+EOF
+    # '
+    exit;
+}
+
+sub init {
+    $is_mswin32 = $^O eq 'MSWin32';
+    $is_vms     = $^O eq 'VMS';
+    $is_linux   = lc($^O) eq 'linux';
+    $is_macos   = $^O eq 'MacOS';
+
+    # Get parrot version.
+    # There will be an up-to-date VERSION file provided in parrot's root.
+    my $filename = File::Spec->catfile($parrotdir, "VERSION");
+    open(VERSION, "<$filename") or die "Cannot open '$filename': $!";
+    $parrot_version = <VERSION>;
+    chomp($parrot_version);
+    close(VERSION) or die "Cannot close '$filename': $!";
+
+    # Process options.
+    @ARGV = split m/\s+/,
+        MacPerl::Ask('Provide command-line args here (-h for help):')
+        if $is_macos && $MacPerl::Version =~ /App/;
+
+    help() unless getopts("Vhn:o:");
+
+
+    ## Mail information.
+    # Target address.
+    $address = $opt_a || $parrotbug;
+
+    # User address, used in message and in Reply-To header.
+    $from = $opt_r || "";
+
+    # Message-Id.
+    my $domain;
+    if ($::HaveUtil) {
+        $domain = Mail::Util::maildomain();
+    } elsif ($Is_MSWin32) {
+        $domain = $ENV{'USERDOMAIN'};
+    } else {
+        require Sys::Hostname;
+        $domain = Sys::Hostname::hostname();
+    }
+    $messageid = "<parrotbug_$VERSION_${$}_".time."\@$domain>";
+
+
+    ## Report to be sent.
+
+  sw: {
+      opt_o: {
+            last opt_o unless defined $opt_o;
+            help()     unless $opt_o eq "k";
+
+            # This is an ok report, woohoo!
+            $to = $std_to{ok};
+            $subject = "OK: parrot $parrot_version "
+              . "on $Config{archname} $Config{osvers}";
+            $body = "Parrot reported to build OK on this system.\n";
+            $category = "install";
+            $severity = "none";
+            last sw;
+        };
+
+      opt_n: {
+            last opt_n unless defined $opt_n;
+            help()     unless $opt_n eq "ok";
+
+            # This a nok report, how sad... :-(
+            $to = $std_to{nok};
+
+            last sw;
+        };
+
+        # neither an ok nor a nok.
+    };
+
+
+
+    # ok - send "OK" report for build on this system
+    if ($opt_o || $opt_n) {
+        $subject = ($opt_n ? 'Not ' : '')
+                   . "OK: parrot"
+                   ." $Config{archname} $::Config{osvers} $subject";
+        $body = "Parrot reported to build OK on this system.\n\n";
+        open(MYCONFIG, "<$myconfig") or die "Couldn't open '$myconfig'; $!\n";
+        while(<MYCONFIG>) { $body .= $_ }
+        close(MYCONFIG) or die "Error closing '$myconfig': $!";
+    } else {
+        help();
+    }
+}
+
+
+sub query_info {
+
+}
+
+
+sub send_msg {
+    # Message has been accepted for transmission -- Send the message
+    if ($outfile) {
+	open SENDMAIL, ">$outfile" or die "Couldn't open '$outfile': $!\n";
+	goto sendout;
+    }
+
+    # on linux certain mail implementations won't accept the subject
+    # as "~s subject" and thus the Subject header will be corrupted
+    # so don't use Mail::Send to be safe
+    if ($have_send && !$is_linux) {
+	my $msg = new Mail::Send Subject => $subject, To => $address;
+	$msg->add("Reply-To",$from) if $from;
+
+	$fh = $msg->open;
+        print $fh $body;
+	$fh->close;
+
+	print "\nMessage sent.\n";
+
+    } else {
+	my $sendmail = "";
+	for (qw(/usr/lib/sendmail /usr/sbin/sendmail /usr/ucblib/sendmail)) {
+	    $sendmail = $_, last if -e $_;
+	}
+
+	die <<"EOF" if $sendmail eq "";
+I am terribly sorry, but I cannot find sendmail, or a close
+equivalent, and the perl package Mail::Send has not been installed, so
+I can't send your bug report. We apologize for the inconvenience.
+
+So you may attempt to find some way of sending your message, it has
+been left in the file '$filename'.
+EOF
+        # '
+	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
+
+	print SENDMAIL "To: $address\n";
+	print SENDMAIL "Subject: $subject\n";
+	print SENDMAIL "Reply-To: $from\n" if $from;
+	print SENDMAIL "Message-Id: $messageid\n" if $messageid;
+	print SENDMAIL "\n\n";
+        print SENDMAIL $body;
+
+	if (close(SENDMAIL)) {
+	    printf "\nMessage sent.\n";
+	} else {
+	    warn "\nSendmail returned status '", $? >> 8, "'\n";
+	}
+    }
+}
+
+
+sub version {
+    print <<"EOF";
+
+This is $0, version $VERSION.
+
+EOF
+
+    exit;
+}
