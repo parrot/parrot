@@ -44,7 +44,15 @@ while (<OPCODE>) {
     my $num_n = () = grep {/n/} @params;
     $opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * 2;
     my $count = 1;
-    $opcode{$name}{PARAMETER_SUB} = ["", map {"cur_opcode[" . $count++ . "]"} @params];
+    $opcode{$name}{PARAMETER_SUB} = ["", 
+				     map {if ($_ eq "n") { 
+					 my $temp = '*(NV *)&cur_opcode[' . $count . ']';
+					 $count += 2;
+					 $temp;
+				     } else {
+					 "cur_opcode[" . $count++ . "]"
+					 }
+				      } @params];
 }
 
 my $file = $ARGV[0];

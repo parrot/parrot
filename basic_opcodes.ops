@@ -8,64 +8,64 @@
 
 // SET Ix, CONSTANT
 AUTO_OP set_i_ic {
-  INT_REG(cur_opcode[1]) = cur_opcode[2];
+  INT_REG(P1) = P2;
 }
   
 // ADD Ix, Iy, Iz  
 AUTO_OP add_i {
-  INT_REG(cur_opcode[1]) = INT_REG(cur_opcode[2]) +
-                           INT_REG(cur_opcode[3]);
+  INT_REG(P1) = INT_REG(P2) +
+                           INT_REG(P3);
 }
 
 // SUB Ix, Iy, Iz  
 AUTO_OP sub_i {
-  INT_REG(cur_opcode[1]) = INT_REG(cur_opcode[2]) -
-                           INT_REG(cur_opcode[3]);
+  INT_REG(P1) = INT_REG(P2) -
+                           INT_REG(P3);
 }
 
 // MUL Ix, Iy, Iz  
 AUTO_OP mul_i {
-  INT_REG(cur_opcode[1]) = INT_REG(cur_opcode[2]) *
-                           INT_REG(cur_opcode[3]);
+  INT_REG(P1) = INT_REG(P2) *
+                           INT_REG(P3);
 }
 
 // DIV Ix, Iy, Iz  
 AUTO_OP div_i {
-  INT_REG(cur_opcode[1]) = INT_REG(cur_opcode[2]) /
-                           INT_REG(cur_opcode[3]);
+  INT_REG(P1) = INT_REG(P2) /
+                           INT_REG(P3);
 }
 
 // EQ Ix, Iy, EQ_BRANCH, NE_BRANCH
 MANUAL_OP eq_i_ic {
-  if (INT_REG(cur_opcode[1]) == INT_REG(cur_opcode[2])) {
-    RETURN(cur_opcode[3]);
+  if (INT_REG(P1) == INT_REG(P2)) {
+    RETURN(P3);
   } else {
-    RETURN(cur_opcode[4]);
+    RETURN(P4);
   }
 }
 
 // IF IXx, TRUE_BRANCH, FALSE_BRANCH
 MANUAL_OP if_i_ic {
-  if (INT_REG(cur_opcode[1])) {
-    RETURN(cur_opcode[2]);
+  if (INT_REG(P1)) {
+    RETURN(P2);
   } else {
-    RETURN(cur_opcode[3]);
+    RETURN(P3);
   }
 }
 
 // TIME Ix
 AUTO_OP time_i {
-  INT_REG(cur_opcode[1]) = time(NULL);
+  INT_REG(P1) = time(NULL);
 }
 
 // PRINT Ix
 AUTO_OP print_i {
-  printf("I reg %i is %i\n", cur_opcode[1], INT_REG(cur_opcode[1]));
+  printf("I reg %i is %i\n", P1, INT_REG(P1));
 }
  
 // BRANCH CONSTANT
 MANUAL_OP branch_ic {
-  RETURN(cur_opcode[1]);
+  RETURN(P1);
 }
 
 // END
@@ -75,73 +75,73 @@ MANUAL_OP end {
 
 // INC Ix
 AUTO_OP inc_i {
-  INT_REG(cur_opcode[1])++;
+  INT_REG(P1)++;
 }
 
 // INC Ix, nnn
 AUTO_OP inc_i_ic {
-  INT_REG(cur_opcode[1]) += cur_opcode[2];
+  INT_REG(P1) += P2;
 }
 
 // DEC Ix
 AUTO_OP dec_i {
-  INT_REG(cur_opcode[1])--;
+  INT_REG(P1)--;
 }
 
 // DEC Ix, nnn
 AUTO_OP dec_i_ic {
-  INT_REG(cur_opcode[1]) -= cur_opcode[2];
+  INT_REG(P1) -= P2;
 }
 
 // JUMP Ix
 MANUAL_OP jump_i {
-  RETURN(INT_REG(cur_opcode[1]));
+  RETURN(INT_REG(P1));
 }
 
 // SET Nx, CONSTANT
 AUTO_OP set_n_nc {
-  NUM_REG(cur_opcode[1]) = *(double *)&cur_opcode[2];
+  NUM_REG(P1) = P2;
 }
   
 // ADD Nx, Ny, Nz  
 AUTO_OP add_n {
-  NUM_REG(cur_opcode[1]) = NUM_REG(cur_opcode[2]) +
-                           NUM_REG(cur_opcode[3]);
+  NUM_REG(P1) = NUM_REG(P2) +
+                           NUM_REG(P3);
 }
 
 // SUB Nx, Ny, Iz  
 AUTO_OP sub_n {
-  NUM_REG(cur_opcode[1]) = NUM_REG(cur_opcode[2]) -
-                           NUM_REG(cur_opcode[3]);
+  NUM_REG(P1) = NUM_REG(P2) -
+                           NUM_REG(P3);
 }
 
 // MUL Nx, Ny, Iz  
 AUTO_OP mul_n {
-  NUM_REG(cur_opcode[1]) = NUM_REG(cur_opcode[2]) *
-                           NUM_REG(cur_opcode[3]);
+  NUM_REG(P1) = NUM_REG(P2) *
+                           NUM_REG(P3);
 }
 
 // DIV Nx, Ny, Iz  
 AUTO_OP div_n {
-  NUM_REG(cur_opcode[1]) = NUM_REG(cur_opcode[2]) /
-                           NUM_REG(cur_opcode[3]);
+  NUM_REG(P1) = NUM_REG(P2) /
+                           NUM_REG(P3);
 }
 
 // EQ Nx, Ny, EQ_BRANCH, NE_BRANCH
 MANUAL_OP eq_n_ic {
-  if (NUM_REG(cur_opcode[1]) == NUM_REG(cur_opcode[2])) {
-    RETURN(cur_opcode[3]);
+  if (NUM_REG(P1) == NUM_REG(P2)) {
+    RETURN(P3);
   } else {
-    RETURN(cur_opcode[4]);
+    RETURN(P4);
   }
 }
 
 // IF Nx, TRUE_BRANCH, FALSE_BRANCH
 MANUAL_OP if_n_ic {
-  if (NUM_REG(cur_opcode[1])) {
-    RETURN(cur_opcode[2]);
+  if (NUM_REG(P1)) {
+    RETURN(P2);
   } else {
-    RETURN(cur_opcode[3]);
+    RETURN(P3);
   }
 }
 
@@ -162,7 +162,7 @@ AUTO_OP inc_n {
 
 // INC Nx, nnn
 AUTO_OP inc_n_nc {
-  (NV)NUM_REG(P1) += *(double *)&cur_opcode[2];
+  (NV)NUM_REG(P1) += P2;
 }
 
 // DEC Nx
@@ -172,14 +172,14 @@ AUTO_OP dec_n {
 
 // DEC Nx, nnn
 AUTO_OP dec_n_nc {
-  NUM_REG(P1) += *(double *)&cur_opcode[2];
+  NUM_REG(P1) += P2;
 }
 
 // ITON Nx, Iy
 AUTO_OP iton_n_i {
-  IV number;
-  number = INT_REG(P2);
-  NUM_REG(P1) = (NV)number;
+//  IV number;
+//  number = INT_REG(P2);
+  NUM_REG(P1) = INT_REG(P2);
 }
 
 // NTOI Ix, Ny
