@@ -10,6 +10,9 @@
 # $Id$
 #
 
+use strict;
+eval "use warnings";
+
 package Jako::Construct::Block;
 
 use base qw(Jako::Construct);

@@ -9,7 +9,7 @@
 #
 
 use strict;
-use warnings;
+eval "use warnings";
 
 use Carp;
 
