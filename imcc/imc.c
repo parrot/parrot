@@ -153,7 +153,15 @@ static void print_stat()
 static int reg_sort_f(const void *a, const void *b) {
     SymReg *ra = *(SymReg**) a;
     SymReg *rb = *(SymReg**) b;
-    return ra->first_ins->index > rb->first_ins->index ? 1 : 0;
+    if (ra->first_ins->index < rb->first_ins->index) {
+	return -1;
+    }
+    else if (ra->first_ins->index == rb->first_ins->index) {
+        return 0;
+    }
+    else {
+	return 1;
+    }
 }
 
 static void sort_reglist()
