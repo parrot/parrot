@@ -166,19 +166,19 @@ PIO_finish(theINTERP)
     /* TODO: close std descriptors */
 
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
-        if ( (io = ((ParrotIOData *)interpreter->piodata)->table[i]) ) {
+        if ( (io = interpreter->piodata->table[i]) ) {
             PIO_close(interpreter, new_io_pmc(interpreter, io));
         }
     }
 #endif
-    for (p = ((ParrotIOData *)interpreter->piodata)->default_stack; p; ) {
+    for (p = interpreter->piodata->default_stack; p; ) {
         down = p->down;
         if (p->api->Delete)
             (*p->api->Delete) (p);
         /* mem_sys_free(p); */ /* XXX ??? */
         p = down;
     }
-    mem_sys_free(((ParrotIOData *)interpreter->piodata)->table);
+    mem_sys_free(interpreter->piodata->table);
     mem_sys_free(interpreter->piodata);
 }
 
@@ -318,7 +318,7 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
             (*layer->api->Pushed) (layer, io);
     }
     else {
-        ParrotIOData *d = (ParrotIOData *)interpreter->piodata;
+        ParrotIOData *d = interpreter->piodata;
         if (d->default_stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
             /* Error( 1st layer must be terminal) */
             return -1;
@@ -364,7 +364,7 @@ PIO_pop_layer(theINTERP, PMC *pmc)
     /* Null io object - use default stack */
     else {
         ParrotIOData *d;
-        d = (ParrotIOData *)interpreter->piodata;
+        d = interpreter->piodata;
         layer = d->default_stack;
         if (layer) {
             d->default_stack = layer->down;
