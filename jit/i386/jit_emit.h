@@ -1824,30 +1824,44 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
      * due too intersegment branches
      */
 
-    /* get interpreter
-     * emit interpreter->code->byte_code
-     */
-    emitm_movl_m_r(jit_info->native_ptr,
-            emit_EDX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
-    jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EDX);
-    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-            offsetof(struct Parrot_Interp, code));
-    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-            offsetof(struct PackFile, byte_code));
-    jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
-    /*
-     * now we have the offset of the ins in EAX
-     *
-     * interpreter->jit_info->arena->op_map
-     *
-     * TODO interleave these 2 calculations
-     */
-    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
-            offsetof(struct Parrot_Interp, jit_info));
-    emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-            offsetof(Parrot_jit_info_t, arena));
-    emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
-            offsetof(Parrot_jit_arena_t, op_map));
+    if (!jit_info->objfile) {
+        /* get interpreter
+         * emit interpreter->code->byte_code
+         */
+        emitm_movl_m_r(jit_info->native_ptr,
+                emit_EDX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+        jit_emit_mov_rr_i(jit_info->native_ptr, emit_ECX, emit_EDX);
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct Parrot_Interp, code));
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(struct PackFile, byte_code));
+        jit_emit_sub_rr_i(jit_info->native_ptr, emit_EAX, emit_EDX);
+        /*
+         * now we have the offset of the ins in EAX
+         *
+         * interpreter->jit_info->arena->op_map
+         *
+         * TODO interleave these 2 calculations
+         */
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
+                offsetof(struct Parrot_Interp, jit_info));
+        emitm_lea_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_info_t, arena));
+        emitm_movl_m_r(jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_arena_t, op_map));
+
+    }
+#  if EXEC_CAPABLE
+    else {
+        emitm_subl_i_r(jit_info->native_ptr,
+            jit_info->objfile->bytecode_header_size, emit_EAX);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
+        jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,
+            Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
+                jit_info->native_ptr, "opcode_map", 0, 0));
+    }
+#  endif
 
     /* This jumps to the address in op_map[EDX + sizeof(void *) * INDEX] */
     emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
