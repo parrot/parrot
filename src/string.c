@@ -16,10 +16,6 @@ space left beyond C<bufused>. This is the I<only> valid usage of these
 two data members, beside setting C<bufstart>/C<buflen> for external
 strings.
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -50,8 +46,6 @@ static parrot_string_representation_t _string_smallest_representation(
     Interp *interpreter, STRING *s);
 
 /*
-
-=back
 
 =head2 String COW support
 

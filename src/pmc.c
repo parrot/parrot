@@ -51,7 +51,7 @@ pmc_new(Interp *interpreter, INTVAL base_type)
 
 =item C<PMC *
 pmc_reuse(Interp *interpreter, PMC *pmc, INTVAL new_type,
-          UINTVAL flags)
+          UINTVAL flags)>
 
 Reuse an existing PMC, turning it into an empty PMC of the new
 type. Any required internal structure will be put in place (such as
@@ -611,7 +611,7 @@ dod_unregister_pmc(Parrot_Interp interpreter, PMC* pmc)
 
 F<include/parrot/vtable.h>.
 
-<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
+C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
 (http://www.nntp.perl.org/group/perl.perl6.internals/5516).
 
 =head1 HISTORY

@@ -24,18 +24,6 @@ These stacks all differ only in the size of items.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-
-/*
-
-=item C<void stack_system_init(Interp *interpreter)>
-
-Called from C<make_interpreter()> to initialize the interpreter's
-register stacks.
-
-=cut
-
-*/
-
 typedef struct {
     size_t size;
     Stack_Chunk_t *free_list;
@@ -51,7 +39,8 @@ typedef struct {
 
 =item C<void stack_system_init(Interp *interpreter)>
 
-Initialize the stack subsystem
+Called from C<make_interpreter()> to initialize the interpreter's
+register stacks.
 
 =cut
 

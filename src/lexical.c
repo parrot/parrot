@@ -17,6 +17,8 @@ store_by_index isn't supported by the OrderedHash.
 
 =over 4
 
+=cut
+
 */
 
 #include "parrot/parrot.h"

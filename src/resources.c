@@ -92,15 +92,12 @@ mem_allocate(Interp *interpreter, size_t *req_size,
 
 Allocates memory for headers.
 
-Alignment problems:  C<align_1> sets the size, but not the alignment of
-the memory block we are about to allocate.  The alignment of I<this>
-block is currently determined by the C<align_1> sent in by the
-I<previous> allocation. See
-L<http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html
-> for details. Currently, we work around it by forcing all the
-C<*ALIGNMENT> C<#define>s in F<<include/parrot/<file>.h>> to be the
-same.
-
+Alignment problems:  C<align_1> sets the size, but not the alignment of the
+memory block we are about to allocate.  The alignment of I<this> block is
+currently determined by the C<align_1> sent in by the I<previous> allocation.
+See L<http://archive.develooper.com/perl6-internals%40perl.org/msg12310.html>
+for details. Currently, we work around it by forcing all the C<*ALIGNMENT>
+C<#define>s in F<E<lt>include/parrot/I<file>.hE<gt>> to be the same.
 
 =cut
 

@@ -306,7 +306,7 @@ Parrot_restore_register_frames(Parrot_Interp interpreter, void *data)
 /*
 
 =item C<void
-mark_saved_regs(Parrot_Interp interpreter)
+mark_saved_regs(Parrot_Interp interpreter)>
 
 Mark saved register aread live during DOD
 
@@ -351,9 +351,10 @@ Like above but preserve registers.
 
 =item C<void
 Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub, PMC *obj, STRING *meth)>
-=cut
 
 Run a method sub from C.
+
+=cut
 
 */
 

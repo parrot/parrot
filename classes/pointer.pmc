@@ -28,7 +28,7 @@ pmclass Pointer need_ext {
 
 =item C<void init()>
 
-Initilizes the pointer.
+Initializes the pointer.
 
 =cut
 
