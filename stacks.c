@@ -16,15 +16,15 @@
 
 #include "parrot/parrot.h"
 
-Stack_chunk *
+Stack_Chunk_t *
 new_stack(Interp *interpreter)
 {
 #ifdef TIDY
     int i;
-    Stack_entry *entry;
+    Stack_Entry_t *entry;
 #endif
 
-    Stack_chunk *stack = mem_allocate_aligned(sizeof(Stack_chunk));
+    Stack_Chunk_t *stack = mem_allocate_aligned(sizeof(Stack_Chunk_t));
     
     stack->used = 0;
     stack->flags = NO_STACK_CHUNK_FLAGS;
@@ -33,10 +33,10 @@ new_stack(Interp *interpreter)
     stack->buffer = NULL;
     stack->buffer = new_buffer_header(interpreter);
     Parrot_allocate(interpreter, stack->buffer,
-                    sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
+                    sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
 
 #ifdef TIDY
-    entry = (Stack_entry *)stack->buffer->bufstart;
+    entry = (Stack_Entry_t *)stack->buffer->bufstart;
     for (i = 0; i < STACK_CHUNK_DEPTH; i++)
         entry[i].flags = NO_STACK_ENTRY_FLAGS;
 #endif
@@ -44,8 +44,8 @@ new_stack(Interp *interpreter)
 }
 
 void
-stack_mark_cow(Stack_chunk *stack_base) {
-    Stack_chunk * chunk = stack_base;
+stack_mark_cow(Stack_Chunk_t *stack_base) {
+    Stack_Chunk_t * chunk = stack_base;
     chunk->flags |= STACK_CHUNK_COW_FLAG;
     for (chunk = chunk->next; chunk != stack_base; chunk = chunk->next)
         chunk->flags |= STACK_CHUNK_COW_FLAG;
@@ -53,9 +53,9 @@ stack_mark_cow(Stack_chunk *stack_base) {
 
 /* Returns the height of the stack.  The maximum "depth" is height - 1 */
 size_t
-stack_height(Interp *interpreter, Stack_chunk *stack_base)
+stack_height(Interp *interpreter, Stack_Chunk_t *stack_base)
 {
-    Stack_chunk *chunk;
+    Stack_Chunk_t *chunk;
     size_t height = stack_base->used;
 
     for (chunk = stack_base->next; chunk != stack_base; chunk = chunk->next)
@@ -65,13 +65,13 @@ stack_height(Interp *interpreter, Stack_chunk *stack_base)
 }
 
 /* Copy a stack (probably with COW flag) to a private writable stack */
-Stack_chunk *
-stack_copy(struct Parrot_Interp * interp, Stack_chunk *old_base) {
-    Stack_chunk *old_chunk = old_base; 
-    Stack_chunk *new_chunk;
-    Stack_chunk *new_base = NULL;
+Stack_Chunk_t *
+stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_base) {
+    Stack_Chunk_t *old_chunk = old_base; 
+    Stack_Chunk_t *new_chunk;
+    Stack_Chunk_t *new_base = NULL;
     do {
-        new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
+        new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
         if(new_base == NULL) {
             new_base = new_chunk;
             new_base->next = new_base;
@@ -87,7 +87,7 @@ stack_copy(struct Parrot_Interp * interp, Stack_chunk *old_base) {
         /* Copy stack buffer */
         new_chunk->buffer = new_buffer_header(interp);
         Parrot_allocate(interp, new_chunk->buffer,
-                    sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
+                    sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
         memcpy(new_chunk->buffer->bufstart, old_chunk->buffer->bufstart,
                     old_chunk->buffer->buflen);
         old_chunk = old_chunk->next;
@@ -101,11 +101,11 @@ stack_copy(struct Parrot_Interp * interp, Stack_chunk *old_base) {
    entries from the bottom of the stack.
    Returns NULL if |depth| > number of entries in stack 
 */
-Stack_entry *
-stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
+Stack_Entry_t *
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack_base, Intval depth)
 {
-    Stack_chunk *chunk;
-    Stack_entry *entry;
+    Stack_Chunk_t *chunk;
+    Stack_Entry_t *entry;
     size_t offset = (size_t)depth;
     
     /* For negative depths, look from the bottom of the stack up. */
@@ -117,7 +117,7 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
             chunk  = chunk->next;
         }
         if (offset < chunk->used) {
-            entry = (Stack_entry *)chunk->buffer->bufstart + offset - 1;
+            entry = (Stack_Entry_t *)chunk->buffer->bufstart + offset - 1;
         }
     }
     else {
@@ -127,7 +127,7 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
             chunk  = chunk->prev;
         }
         if (offset < chunk->used) {
-            entry = (Stack_entry *)chunk->buffer->bufstart +
+            entry = (Stack_Entry_t *)chunk->buffer->bufstart +
                                                     chunk->used - offset - 1;
         }
     }
@@ -139,10 +139,10 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
    is bubble down, so that the Nth element becomes the top most element.
 */
 void
-rotate_entries(Interp *interpreter, Stack_chunk *stack_base, 
+rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base, 
                Intval num_entries)
 {
-    Stack_entry temp;
+    Stack_Entry_t temp;
     Intval i;
     Intval depth = num_entries - 1;
     
@@ -192,12 +192,12 @@ rotate_entries(Interp *interpreter, Stack_chunk *stack_base,
    we're calling it) variable or something
  */
 void
-stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
+stack_push(Interp *interpreter, Stack_Chunk_t **stack_base_p,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
-    Stack_chunk *stack_base = *stack_base_p;
-    Stack_chunk *chunk;
-    Stack_entry *entry;
+    Stack_Chunk_t *stack_base = *stack_base_p;
+    Stack_Chunk_t *chunk;
+    Stack_Entry_t *entry;
 
     /* If stack is copy-on-write, copy it before we can execute on it */
     if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
@@ -209,7 +209,7 @@ stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
     /* Do we need a new chunk? */
     if (chunk->used == STACK_CHUNK_DEPTH) {
         /* Need to add a new chunk */
-        Stack_chunk *new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
+        Stack_Chunk_t *new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
 
         new_chunk->used = 0;
         new_chunk->next = stack_base;
@@ -223,10 +223,10 @@ stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
         chunk->buffer = new_buffer_header(interpreter);
 
         Parrot_allocate(interpreter, chunk->buffer,
-                        sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
+                        sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
     }
 
-    entry = (Stack_entry *)(chunk->buffer->bufstart) + chunk->used;
+    entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + chunk->used;
 
     /* Remember the type */
     entry->entry_type = type;
@@ -258,7 +258,7 @@ stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
             break;
         default:
             internal_exception(ERROR_BAD_STACK_TYPE, 
-                               "Invalid stack_entry_type!\n");
+                               "Invalid Stack_Entry_type!\n");
             break;
     }
 
@@ -267,12 +267,12 @@ stack_push(Interp *interpreter, Stack_chunk **stack_base_p,
 
 /* Pop off an entry and return a pointer to the contents */
 void *
-stack_pop(Interp *interpreter, Stack_chunk **stack_base_p,
+stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base_p,
           void *where, Stack_entry_type type)
 {
-    Stack_chunk *stack_base = *stack_base_p;
-    Stack_entry *entry;
-    Stack_chunk *chunk;
+    Stack_Chunk_t *stack_base = *stack_base_p;
+    Stack_Entry_t *entry;
+    Stack_Chunk_t *chunk;
 
     /* If stack is copy-on-write, copy it before we can execute on it */
     if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
@@ -301,7 +301,7 @@ stack_pop(Interp *interpreter, Stack_chunk **stack_base_p,
     /* Now decrement the SP */
     chunk->used--;
 
-    entry = (Stack_entry *)(chunk->buffer->bufstart) + chunk->used;
+    entry = (Stack_Entry_t *)(chunk->buffer->bufstart) + chunk->used;
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {
@@ -361,10 +361,10 @@ pop_dest(Interp *interpreter)
 }
 
 void *
-stack_peek(Interp *interpreter, Stack_chunk *stack_base, 
+stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base, 
            Stack_entry_type *type)
 {
-    Stack_entry *entry = stack_entry(interpreter, stack_base, 0);
+    Stack_Entry_t *entry = stack_entry(interpreter, stack_base, 0);
     if (entry == NULL) {
         return NULL;
     }
@@ -377,7 +377,7 @@ stack_peek(Interp *interpreter, Stack_chunk *stack_base,
 }
 
 Stack_entry_type
-get_entry_type(Interp *interpreter, Stack_entry *entry)
+get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
 {
     return entry->entry_type;
 }

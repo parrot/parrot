@@ -300,9 +300,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                                  * currently being processed PMC, and in
                                  * the previously processed PMC in a loop. */
     unsigned int i, j, chunks_traced;
-    Stack_chunk *cur_stack, *start_stack;
+    Stack_Chunk_t *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
-    Stack_entry *entry;
+    Stack_Entry_t *entry;
     struct Stash *stash;
 
     /* We have to start somewhere, and the global stash is a good
@@ -348,7 +348,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         if(cur_stack->buffer){
             buffer_lives(cur_stack->buffer);
 
-            entry = (Stack_entry *)(cur_stack->buffer->bufstart);
+            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
                 if (STACK_ENTRY_PMC == entry[i].entry_type &&
                     entry[i].entry.pmc_val) {
@@ -410,9 +410,9 @@ static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
     UINTVAL i, j, chunks_traced;
-    Stack_chunk *cur_stack, *start_stack;
+    Stack_Chunk_t *cur_stack, *start_stack;
     struct SRegChunk *cur_chunk;
-    Stack_entry *entry;
+    Stack_Entry_t *entry;
 
     /* First mark the current set. We assume that all pointers in S
      * registers are pointing to valid buffers. This is not a good
@@ -443,7 +443,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
         if(cur_stack->buffer){ 
             buffer_lives(cur_stack->buffer);
-            entry = (Stack_entry *)(cur_stack->buffer->bufstart);
+            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
                 if (STACK_ENTRY_STRING == entry[i].entry_type &&
                     entry[i].entry.string_val) {

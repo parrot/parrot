@@ -37,7 +37,7 @@ typedef enum {
     STACK_CHUNK_COW_FLAG     = 1 << 0
 } Stack_chunk_flags;
 
-typedef struct stack_entry {
+typedef struct Stack_Entry {
     union {
         Floatval num_val;
         Intval   int_val;
@@ -47,48 +47,54 @@ typedef struct stack_entry {
     } entry;
     Stack_entry_type  entry_type;
     Stack_entry_flags flags;
-    void (*cleanup)(struct stack_entry *);
-} Stack_entry;
+    void (*cleanup)(struct Stack_Entry *);
+} Stack_Entry_t;
 
-typedef struct stack_chunk {
+typedef struct Stack_Chunk {
     size_t used;
     Stack_chunk_flags   flags;
-    struct stack_chunk *next;
-    struct stack_chunk *prev;
+    struct Stack_Chunk *next;
+    struct Stack_Chunk *prev;
     Buffer *buffer;
-} Stack_chunk;
+} Stack_Chunk_t;
 
-typedef void (*Stack_cleanup_method)(Stack_entry *);
+typedef struct Stack {
+    struct Stack_Chunk * base;
+    struct Stack_Chunk * top;
+} Stack_t;
+
+
+typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
 
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 
-Stack_chunk * new_stack(Interp *interpreter);
+Stack_Chunk_t * new_stack(Interp *interpreter);
 
-Stack_chunk * stack_copy(Interp *interpreter, Stack_chunk *old_stack);
+Stack_Chunk_t * stack_copy(Interp *interpreter, Stack_Chunk_t *old_stack);
 
-void stack_mark_cow(Stack_chunk *stack_base);
+void stack_mark_cow(Stack_Chunk_t *stack_base);
 
-size_t stack_height(Interp *interpreter, Stack_chunk *stack_base);
+size_t stack_height(Interp *interpreter, Stack_Chunk_t *stack_base);
 
-Stack_entry * stack_entry(Interp *intepreter, Stack_chunk *stack_base, 
+Stack_Entry_t * stack_entry(Interp *intepreter, Stack_Chunk_t *stack_base, 
                           Intval stack_depth);
 
-void rotate_entries(Interp *interpreter, Stack_chunk *stack_base,
+void rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base,
                     Intval num_entries);
 
-void stack_push(Interp *interpreter, Stack_chunk **stack_base,
+void stack_push(Interp *interpreter, Stack_Chunk_t **stack_base,
                 void *thing, Stack_entry_type type, 
                 Stack_cleanup_method cleanup);
 
-void *stack_pop(Interp *interpreter, Stack_chunk **stack_base, 
+void *stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base, 
                 void *where, Stack_entry_type type);
 
 void *pop_dest(Interp *interpreter);
 
-void *stack_peek(Interp *interpreter, Stack_chunk *stack, 
+void *stack_peek(Interp *interpreter, Stack_Chunk_t *stack, 
                 Stack_entry_type *type);
 
-Stack_entry_type get_entry_type(Interp *interpreter, Stack_entry *entry);
+Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
 
 
 
