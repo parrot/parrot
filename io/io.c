@@ -701,7 +701,7 @@ PIO_putps(theINTERP, PMC *pmc, STRING *s)
 
     char *temp = string_to_cstring(interpreter, s);
     retVal = PIO_puts(interpreter, pmc, temp);
-    free(temp);
+    string_cstring_free(temp);
     return retVal;
 }
 
@@ -740,7 +740,7 @@ PIO_printf(theINTERP, const char *s, ...) {
         */
         char *temp = string_to_cstring(interpreter, str);
         ret=printf("%s", temp);
-        free(temp);
+        string_cstring_free(temp);
     }
 
     va_end(args);
