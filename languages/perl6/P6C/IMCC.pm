@@ -1786,7 +1786,8 @@ sub assign {
 	my $min = @$tmpv < @vars ? @$tmpv : @vars;
 	for my $i (0.. $min - 1) {
 	    add_localvar($vars[$i]->name, $vars[$i]->type);
-	    $vars[$i]->assign(new P6C::Register reg => $tmpv->[$i]);
+	    $vars[$i]->assign(new P6C::Register reg => $tmpv->[$i],
+			      type => $thing->{ctx}->type->[$i]);
 	}
 
 	# In case we had more variables than values (tuple rvalues can
