@@ -15,34 +15,32 @@
 
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
 
-char *
-parseflags(Parrot interpreter, int *argc, char **argv[]);
+char *parseflags(Parrot interpreter, int *argc, char **argv[]);
 
-static void
-usage(void);
+static void usage(void);
 
-static void
-version(void);
+static void version(void);
 
 int
-main(int argc, char *argv[]) {
+main(int argc, char *argv[])
+{
     Parrot interpreter;
     char *filename;
     Parrot_PackFile pf;
-   
-    interpreter=Parrot_new();
 
-    if(!interpreter) {
+    interpreter = Parrot_new();
+
+    if (!interpreter) {
         return 1;
     }
 
     Parrot_init(interpreter);
 
-    filename=parseflags(interpreter, &argc, &argv);
+    filename = parseflags(interpreter, &argc, &argv);
 
-    pf=Parrot_readbc(interpreter, filename);
+    pf = Parrot_readbc(interpreter, filename);
 
-    if(!pf) {
+    if (!pf) {
         return 1;
     }
 
@@ -54,8 +52,9 @@ main(int argc, char *argv[]) {
 }
 
 char *
-parseflags(Parrot interpreter, int *argc, char **argv[]) {
-    if(*argc==1) {
+parseflags(Parrot interpreter, int *argc, char **argv[])
+{
+    if (*argc == 1) {
         usage();
     }
 
@@ -64,70 +63,83 @@ parseflags(Parrot interpreter, int *argc, char **argv[]) {
     (*argv)++;
 
     while ((*argc) && (*argv)[0][0] == '-') {
-        switch((*argv)[0][1]) {
-            case 'b':
-                setopt(PARROT_BOUNDS_FLAG); break;
-            case 'j':
-                setopt(PARROT_JIT_FLAG); break;
-            case 'p':
-                setopt(PARROT_PROFILE_FLAG); break;
-            case 'P':
-                setopt(PARROT_PREDEREF_FLAG); break;
-            case 't':
-                setopt(PARROT_TRACE_FLAG); break;
-            case 'd':
-                setopt(PARROT_DEBUG_FLAG); break;
-            case 'h':
-                usage(); break;
-            case 'v':
-                version(); break;
-            case 'w':
-                 Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG); break;
+        switch ((*argv)[0][1]) {
+        case 'b':
+            setopt(PARROT_BOUNDS_FLAG);
+            break;
+        case 'j':
+            setopt(PARROT_JIT_FLAG);
+            break;
+        case 'p':
+            setopt(PARROT_PROFILE_FLAG);
+            break;
+        case 'P':
+            setopt(PARROT_PREDEREF_FLAG);
+            break;
+        case 't':
+            setopt(PARROT_TRACE_FLAG);
+            break;
+        case 'd':
+            setopt(PARROT_DEBUG_FLAG);
+            break;
+        case 'h':
+            usage();
+            break;
+        case 'v':
+            version();
+            break;
+        case 'w':
+            Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
+            break;
 
-            case '.': /* Give Windows Parrot hackers an opportunity to attach a debuggger. */
-                 fgetc(stdin); break;
-				
-           case '-':
-               (*argc)--;
-               (*argv)++;
-               goto OUT;
-           case '\0': /* bare '-' means read from stdin */
-               goto OUT;
-           default:
-               fprintf(stderr, "test_parrot: Invalid flag %c used", (*argv)[0][1]);
-               exit(1);
+        case '.':              /* Give Windows Parrot hackers an opportunity to attach a debuggger. */
+            fgetc(stdin);
+            break;
+        case '-':
+            (*argc)--;
+            (*argv)++;
+            goto OUT;
+        case '\0':             /* bare '-' means read from stdin */
+            goto OUT;
+        default:
+            fprintf(stderr, "test_parrot: Invalid flag %c used",
+                    (*argv)[0][1]);
+            exit(1);
         }
-        
+
         (*argc)--;
         (*argv)++;
     }
-    
-OUT:
+
+  OUT:
 
     return (*argv)[0];
 }
 
 static void
-usage(void) {
+usage(void)
+{
     fprintf(stderr,
-"Usage: test_parrot [switches] [--] programfile [arguments]\n\
-  -b	Activate bounds checks\n\
-  -d	Activate debugging\n\
-  -h	Display this message\n\
-  -j	Activate Just-In-Time compiler\n\
-  -p	Activate profiling\n\
-  -P	Activate predereferencing\n\
-  -t	Activate tracing\n\
-  -v	Display version information\n\
-  -.	Wait for a keypress (gives Windows users time to attach a debugger)\n\n");
+            "Usage: test_parrot [switches] [--] programfile [arguments]\n\
+  -b    Activate bounds checks\n\
+  -d    Activate debugging\n\
+  -h    Display this message\n\
+  -j    Activate Just-In-Time compiler\n\
+  -p    Activate profiling\n\
+  -P    Activate predereferencing\n\
+  -t    Activate tracing\n\
+  -v    Display version information\n\
+  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\n");
 
     exit(0);
 }
 
 static void
-version(void) {
-    fprintf(stderr, 
-"This is parrot version " PARROT_VERSION " built for " PARROT_ARCHNAME "\n\
+version(void)
+{
+    fprintf(stderr,
+            "This is parrot version " PARROT_VERSION " built for "
+            PARROT_ARCHNAME "\n\
 Copyright (C) 2001-2002 Yet Another Society.  All Rights Reserved.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\n\
