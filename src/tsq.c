@@ -85,7 +85,7 @@ queue_unlock(QUEUE *queue) {
 /* This function wakes up *every* thread waiting on the queue */
 void
 queue_signal(QUEUE *queue) {
-    COND_BROADCAST(queue->queue_condition, queue->queue_mutex);
+    COND_BROADCAST(queue->queue_condition);
 }
 
 void

@@ -19,8 +19,8 @@
 #define LOCK(x)
 #define UNLOCK(x)
 #define COND_WAIT(x, y)
-#define COND_SIGNAL(x, y)
-#define COND_BROADCAST(x, y)
+#define COND_SIGNAL(x)
+#define COND_BROADCAST(x)
 
 #define Parrot_mutex INTVAL
 #define Parrot_cond INTVAL

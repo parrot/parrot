@@ -2,7 +2,7 @@
 #define PARROT_PLATFORM_H_GUARD
 
 /*
-** platform.h [generic version]
+** platform.h [openbsd version]
 */
 
 
@@ -55,11 +55,11 @@
 #ifdef PARROT_HAS_HEADER_PTHREAD
 #  include <pthread.h>
 #  define PARROT_SYNC_PRIMITIVES_DEFINED
-#  define LOCK(x) pthread_mutex_lock(&x)
-#  define UNLOCK(x) pthread_mutex_unlock(&x)
-#  define COND_WAIT(x,y) pthread_cond_wait(&x, &y)
-#  define COND_SIGNAL(x,y) pthread_cond_signal(&x, &y)
-#  define COND_BROADCAST(x,y) pthread_cond_broadcast(&x)
+#  define LOCK(m) pthread_mutex_lock(&m)
+#  define UNLOCK(m) pthread_mutex_unlock(&m)
+#  define COND_WAIT(c,m) pthread_cond_wait(&c, &m)
+#  define COND_SIGNAL(c) pthread_cond_signal(&c)
+#  define COND_BROADCAST(c) pthread_cond_broadcast(&c)
    typedef pthread_mutex_t Parrot_mutex;
    typedef pthread_cond_t Parrot_cond;
 #endif
