@@ -407,13 +407,14 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
+%token <t> PCC_BEGIN_YIELD PCC_END_YIELD
 %token <t> PROTOTYPED NON_PROTOTYPED
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
 %type <t> type
-%type <i> program sub sub_start emit nsub pcc_sub sub_body pcc_ret
+%type <i> program sub sub_start emit nsub pcc_sub sub_body pcc_ret pcc_yield
 %type <s> classname relop
 %type <i> labels _labels label statements statement
 %type <i> pcc_sub_call
@@ -585,6 +586,22 @@ pcc_ret: PCC_BEGIN_RETURN '\n' {
         PCC_END_RETURN '\n'             { $$ = 0; }
     ;
 
+pcc_yield: PCC_BEGIN_YIELD '\n' {
+                Instruction *i, *ins = instructions;
+                char name[128];
+                if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
+                    fataly(EX_SOFTWARE, "pcc_yield", line,
+                        "pcc_yield not inside pcc subroutine\n");
+                $<sr>$ = ins->r[1];
+                sprintf(name, "#pcc_sub_yield_%d:", line - 1);
+                i = _mk_instruction("", name, NULL, 0);
+                i = emitb(i);
+                i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
+        }
+        pcc_returns
+        PCC_END_YIELD '\n'             { $$ = 0; }
+    ;
+
 pcc_returns: /* empty */                { $$ = 0; }
     |       pcc_returns '\n'            { if($1) add_pcc_return($<sr>0, $1); }
     | pcc_returns pcc_return '\n'       { if($2) add_pcc_return($<sr>0, $2); }
@@ -602,6 +619,7 @@ statement:  { clear_state(); }
         | MACRO '\n'                  { $$ = 0; }
         | pcc_sub_call                { $$ = 0; }
         | pcc_ret
+        | pcc_yield
     ;
 
 labels:	/* none */         { $$ = NULL; }

@@ -1,3 +1,12 @@
+- 2003-07-31	leo
+
+	* unprototyped subroutines now check the amount and type
+	  of parameters against their .param definitions at runtime
+	* TestCompiler.pm: capture stderr too
+
+	* added coroutine code courtesy of Kenneth A Graves
+	  s. t/syn/pcc.t for an example and #23186 for a description
+
 - 2003-07-30	leo
 
 	* PCC stuff:

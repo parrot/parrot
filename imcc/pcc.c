@@ -236,12 +236,13 @@ void
 expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
 {
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS], *p3;
-    int next[4], i, j, n;
+    int next[4], i, j, n, arg_count;
     char types[] = "ISPN";
     Instruction *tmp;
     char buf[128];
     int n_p3;
 
+    arg_count = ins->type & ITPCCYIELD ? 0 : 1;
     for (i = 0; i < 4; i++)
         next[i] = 5;
     p3 = NULL;
@@ -318,7 +319,7 @@ overflow:
      */
     reg = mk_pasm_reg(str_dup("P1"));
     regs[0] = reg;
-    ins = insINS(interpreter, ins, "invoke", regs, 1);
+    ins = insINS(interpreter, ins, "invoke", regs, arg_count);
 }
 
 void

@@ -153,6 +153,8 @@ WS              [\t\f\r ]
 ".pcc_sub"      return(PCC_SUB);
 ".pcc_begin_return"    return(PCC_BEGIN_RETURN);
 ".pcc_end_return"      return(PCC_END_RETURN);
+".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
+".pcc_end_yield"      return(PCC_END_YIELD);
 "prototyped"    return PROTOTYPED;
 "non_prototyped"    return NON_PROTOTYPED;
 

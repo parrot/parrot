@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 13;
+use TestCompiler tests => 14;
 
 ##############################
 # Parrot Calling Conventions
@@ -394,4 +394,85 @@ output_is(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
 .end
 CODE
 wrong param type
+OUT
+
+####################
+# coroutine iterator
+#
+
+# pseudo source code:
+#	main () {
+#	  int i=5;
+#	  foreach addtwo(i) {
+#	    print $_, "\n";
+#	  }
+#	  print "done in main\n";
+#	}
+#
+#	addtwo (int a) {
+#	  int i;
+#	  for (i=0; i<10; i++) {
+#	    yield a+i;
+#	  }
+#	  print "done in coroutine\n";
+#	}
+
+output_is(<<'CODE', <<'OUT', "coroutine iterator");
+.sub _main
+  .local int i
+  i=5
+  newsub $P0, .Coroutine, _addtwo
+  newsub $P1, .Continuation, after_loop
+  .pcc_begin prototyped
+  .arg $P1
+  .arg i
+  .pcc_call $P0
+ ret_addr:
+  .result $I2
+  .pcc_end
+    print $I2
+    print "\n"
+    savetop
+    invoke
+    goto ret_addr
+ after_loop:
+  print "done in main\n"
+  end
+.end
+
+.pcc_sub _addtwo
+  .param Continuation when_done
+  .param int a
+  .local int i
+  i = 0
+ loop:
+    if i >= 10 goto done
+    $I5 = a+i
+    save i
+    save a
+    .pcc_begin_yield
+    .return $I5
+    .pcc_end_yield
+    restore a
+    restore i
+    i = i + 1
+    goto loop
+ done:
+  print "done in coroutine\n"
+  invoke when_done
+  end
+.end
+CODE
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+done in coroutine
+done in main
 OUT
