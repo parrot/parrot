@@ -50,6 +50,7 @@ typedef struct PDB_condition *PDB_condition_ptr;
 typedef struct PDB_condition {
     unsigned short          type;
     unsigned char           reg;
+    unsigned char           dummy;	/* For alignment */
     void                    *value;
     PDB_condition_ptr       next;
 } PDB_condition_t;

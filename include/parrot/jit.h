@@ -29,6 +29,7 @@ typedef struct Parrot_jit_fixup {
     int                         type;
     ptrdiff_t                   native_offset;
     char                        skip;
+    char                        dummy[3]; /* For alignment */
     union {
         opcode_t                opcode;
         void                    (*fptr)(void);
@@ -120,6 +121,7 @@ typedef struct Parrot_jit_optimizer_section {
     unsigned int                         op_count;
     ptrdiff_t                            load_size;
     char                                 isjit;
+    char                                 dummy[3]; /* For alignment */
     int                                  block;
     Parrot_jit_optimizer_section_ptr     branch_target;
     Parrot_jit_optimizer_section_ptr     prev;
@@ -146,6 +148,7 @@ typedef struct {
     char                            *map_branch;
     opcode_t                       **branch_list;
     unsigned char                    has_unpredictable_jump;
+    unsigned char                    dummy[3]; /* For alignment */
 } Parrot_jit_optimizer_t;
 
 /*  Parrot_jit_constant_pool_t
