@@ -53,13 +53,13 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
-        "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+        "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
                 argc);
     }
 
     userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
-    interpreter->pmc_reg.registers[0] = userargv;
+    interpreter->pmc_reg.registers[5] = userargv;
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);
     VTABLE_init(interpreter, userargv);

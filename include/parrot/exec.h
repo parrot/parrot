@@ -28,9 +28,14 @@
 #   if (PARROT_EXEC_OS_FREEBSD) || (PARROT_EXEC_OS_NETBSD) || (PARROT_EXEC_OS_LINUX)
 #     define EXEC_ELF
 #   endif
+#   if PARROT_EXEC_OS_MSWIN32
+#     define EXEC_COFF
+#   endif
 
 #   ifdef EXEC_A_OUT
 #    define EXEC_CALLDISP jit_info->arena.start - jit_info->native_ptr - 4
+#   elif defined(EXEC_COFF)
+#    define EXEC_CALLDISP 0
 #   else
 #    define EXEC_CALLDISP 0xfffffffc
 #   endif

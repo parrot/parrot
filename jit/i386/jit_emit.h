@@ -1897,7 +1897,8 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    define PREG(i) EXR(pmc_reg.registers, i * sizeof(PMC *))
 #    define SREG(i) EXR(string_reg.registers, i * sizeof(STRING *))
 #    define CONST(i) (int *)(jit_info->cur_op[i] * \
-       sizeof(struct PackFile_Constant) + 4)
+       sizeof(struct PackFile_Constant) + \
+       offsetof(struct PackFile_Constant, u))
 
 #    define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
        jit_info->native_ptr, f); \

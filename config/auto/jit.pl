@@ -124,14 +124,15 @@ print "-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
       jit_o       => '$(SRC)/jit$(O) $(SRC)/jit_cpu$(O) $(SRC)/jit_debug$(O) $(SRC)/jit_debug_xcoff$(O)'
     );
 
-    if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
+    if (($jitcpuarch eq 'i386')
      || ($jitcpuarch eq 'ppc') || ($jitcpuarch eq 'arm')) {
       $execcapable = 1;
       unless (($osname eq 'openbsd') ||
               ($osname eq 'freebsd') ||
               ($osname eq 'netbsd')  ||
               ($osname eq 'linux')   ||
-              ($osname eq 'darwin'))
+              ($osname eq 'darwin')  ||
+              ($osname eq 'MSWin32'))
       {
         $execcapable = 0;
       }

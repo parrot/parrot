@@ -72,8 +72,8 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     obj = mem_sys_allocate_zeroed(sizeof(Parrot_exec_objfile_t));
     exec_init(obj);
     Parrot_exec_rel_addr = (char **)mem_sys_allocate_zeroed(4 * sizeof(char *));
-    obj->bytecode_header_size = (int)interpreter->code->byte_code -
-        (int)interpreter->code->src;
+    obj->bytecode_header_size =
+        (interpreter->code->cur_cs->base.file_offset + 4) * sizeof(opcode_t);
     (void) build_asm(interpreter, pc, code_start, code_end, obj);
     jit_info = interpreter->jit_info;
 
@@ -134,8 +134,8 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
     int *nds, i = 0;
 
     if (obj->data.size == 0) {
-        obj->data.code = (char *)mem_sys_allocate_zeroed(len); 
-        obj->data_size = (int *)mem_sys_allocate_zeroed(sizeof(int));
+        obj->data.code = (char *)mem_sys_allocate(len); 
+        obj->data_size = (int *)mem_sys_allocate(sizeof(int));
     }
     else {
         cp = (char *)mem_sys_realloc(obj->data.code, obj->data.size + len);
@@ -148,6 +148,8 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
     cp = obj->data.code + obj->data.size;
     if (src)
         memcpy(cp, src, len);
+    else
+        memset(cp, 0, len);
     obj->data_size[obj->data_count++] = len;
     obj->data.size += len;
 }
@@ -221,7 +223,7 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
         new_symbol->offset_list = obj->symbol_list_size;
         new_symbol->symbol = symbol;
         obj->symbol_list_size += strlen(symbol);
-#ifdef EXEC_A_OUT
+#if defined(EXEC_A_OUT) || defined(EXEC_COFF)
         /* for the trailing "_" */
         obj->symbol_list_size++;
 #endif

@@ -572,6 +572,133 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #endif /* EXEC_MACH_O */
 
+#ifdef EXEC_COFF
+
+/* File offsets */
+#define TEXT_CODE  0x14 + (3 * 0x28)
+#define DATA_CODE  TEXT_CODE + obj->text.size
+#define TEXT_RELOC DATA_CODE + obj->data.size
+#define DATA_RELOC TEXT_RELOC + (obj->text_rellocation_count * 0xA)
+#define SYMTAB     DATA_RELOC + (obj->data_rellocation_count * 0xA)
+
+void
+Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
+{
+    FILE *fp;
+    int i;
+
+    fp = fopen(file, "wb");
+
+    save_short(fp, 0x14C); /* i386 */
+    save_short(fp, 3);     /* Number of sections */
+    save_int(fp, Parrot_intval_time());
+    save_int(fp, SYMTAB);
+    save_int(fp, obj->symbol_count);
+    save_short(fp, 0);
+    save_short(fp, 0x104); /* 32 bit LE, no line numbers */
+
+    fwrite(".text\0\0\0", 8, 1, fp);
+    save_int(fp, 0);
+    save_int(fp, 0);
+    save_int(fp, obj->text.size);
+    save_int(fp, TEXT_CODE);
+    save_int(fp, TEXT_RELOC);
+    save_int(fp, 0);
+    save_short(fp, obj->text_rellocation_count);
+    save_short(fp, 0);
+    save_int(fp, 0x20);
+
+    fwrite(".data\0\0\0", 8, 1, fp);
+    save_int(fp, 0);
+    save_int(fp, 0);
+    save_int(fp, obj->data.size);
+    save_int(fp, DATA_CODE);
+    save_int(fp, DATA_RELOC);
+    save_int(fp, 0);
+    save_short(fp, obj->data_rellocation_count);
+    save_short(fp, 0);
+    save_int(fp, 0x40);
+
+    fwrite(".bss\0\0\0\0", 8, 1, fp);
+    save_int(fp, 0);
+    save_int(fp, 0);
+    save_int(fp, obj->bss.size);
+    save_int(fp, 0);
+    save_int(fp, 0);
+    save_int(fp, 0);
+    save_short(fp, 0);
+    save_short(fp, 0);
+    save_int(fp, 0x80);
+
+    /* Text */
+    for (i = 0; i < obj->text.size; i++)
+        fprintf(fp, "%c", obj->text.code[i]);
+    /* Data */
+    for (i = 0; i < obj->data.size; i++)
+        fprintf(fp, "%c", obj->data.code[i]);
+    /* Text rellocations */
+    for (i = 0; i < obj->text_rellocation_count; i++) {
+        save_int(fp, obj->text_rellocation_table[i].offset);
+        save_int(fp, obj->text_rellocation_table[i].symbol_number);
+        switch (obj->text_rellocation_table[i].type) {
+            case RTYPE_FUNC:
+                save_short(fp, 0x14);
+                break;
+            case RTYPE_COM:
+            case RTYPE_DATA:
+                save_short(fp, 0x06);
+                break;
+            default:
+                internal_exception(EXEC_ERROR,
+                    "Unknown text rellocation type: %d\n",
+                        obj->text_rellocation_table[i].type);
+                break;
+        }
+    }
+    /* Symbol table */
+    for (i = 0; i < obj->symbol_count; i++) {
+        save_int(fp, 0);
+        save_int(fp, obj->symbol_table[i].offset_list);
+        save_int(fp, obj->symbol_table[i].value);
+        switch (obj->symbol_table[i].type) {
+            case STYPE_FUNC:
+                save_short(fp, 1); /* .text */
+                save_short(fp, 0x20);
+                break;
+            case STYPE_GDATA:
+                save_short(fp, 2); /* .data */
+                save_short(fp, 0);
+                break;
+            case STYPE_COM:
+                save_short(fp, 0);
+                save_short(fp, 0);
+                break;
+            case STYPE_UND:
+                save_short(fp, 0);
+                save_short(fp, 0x20);
+                break;
+            default:
+                internal_exception(EXEC_ERROR, "Unknown symbol type: %d\n",
+                    obj->symbol_table[i].type);
+                break;
+        }
+        putc(2, fp); /* "extern" class */
+        putc(0, fp);
+    }
+    /* Symbol list */
+    save_int(fp, obj->symbol_list_size);
+    for (i = 0; i < obj->symbol_count; i++) {
+        if (obj->symbol_table[i].type != STYPE_GCC)
+            fprintf(fp, "_%s", obj->symbol_table[i].symbol);
+        else
+            fprintf(fp, "%s", obj->symbol_table[i].symbol);
+        save_zero(fp);
+    }
+    fclose(fp);
+}
+
+#endif /* EXEC_COFF */
+
 /*
 
 =item C<static void save_struct(FILE *fp, void *sp, size_t size)>
