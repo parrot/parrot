@@ -8,7 +8,7 @@ classes/fixedstringarray.pmc - fixed size array for strings only
 
 =head1 DESCRIPTION
 
-This class, FixedStringArray, implements an array of fixed size, which 
+This class, FixedStringArray, implements an array of fixed size, which
 stores Parrot strings.
 
 =head2 Functions
@@ -22,7 +22,7 @@ stores Parrot strings.
 #include "parrot/parrot.h"
 
 pmclass FixedStringArray need_ext does array {
-    
+
 /*
 
 =back
@@ -89,12 +89,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         size = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        
+
         PMC_data(dest) = mem_sys_allocate(size * sizeof(STRING*));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(STRING*));
         PObj_custom_mark_destroy_SETALL(dest);
@@ -129,9 +129,9 @@ Marks the array as live.
 
 =item C<INTVAL get_bool()>
 
-Returns 1 if the array has any elements; otherwise, returns 0. 
-Since this is a fixed size array, C<get_bool> will always 
-return true once the array has been initialized and had its 
+Returns 1 if the array has any elements; otherwise, returns 0.
+Since this is a fixed size array, C<get_bool> will always
+return true once the array has been initialized and had its
 size set by C<set_integer_native>.
 
 =cut
@@ -246,9 +246,9 @@ Returns the Parrot string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         STRING **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedStringArray: index out of bounds!");
-        
+
         data = (STRING **)PMC_data(SELF);
         return data[key];
     }
@@ -308,8 +308,8 @@ Returns the PMC value of the element at index C<*key>.
 
 =item C<void set_integer_native(INTVAL size)>
 
-Sets the size of the array to C<size> elements. Once the array 
-has been given an initial size, attempts to resize it will 
+Sets the size of the array to C<size> elements. Once the array
+has been given an initial size, attempts to resize it will
 cause an exception to be thrown.
 
 =cut
@@ -397,7 +397,7 @@ C<value>.
         k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
-    
+
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *value)>
@@ -411,10 +411,11 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         STRING **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedStringArray: index out of bounds!");
 
         data = (STRING**)PMC_data(SELF);
+        DOD_WRITE_BARRIER(INTERP, SELF, data[key], value);
         data[key] = value;
     }
 

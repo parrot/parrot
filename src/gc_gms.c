@@ -398,7 +398,9 @@ gc_gms_get_free_object(Interp *interpreter,
     hdr = pool->free_list;
     pool->free_list = hdr->next;
     hdr->gen = pool->last_gen;
-    return hdr + 1;
+    ptr = GMSH_to_PObj(hdr);
+    PObj_flags_SETTO( (PObj*) ptr, 0);
+    return ptr;
 }
 
 /*
@@ -611,7 +613,7 @@ gc_gms_clear_igp(Interp *interpreter, Gc_gms_gen *gen)
 }
 
 void
-parrot_gc_gms_wb(Interp *interpreter, PMC *agg, PMC *old, PMC *new)
+parrot_gc_gms_wb(Interp *interpreter, PMC *agg, void *old, void *new)
 {
     Gc_gms_hdr *nh, *ah;
 
@@ -621,7 +623,7 @@ parrot_gc_gms_wb(Interp *interpreter, PMC *agg, PMC *old, PMC *new)
     /* if this may be an aggregate store it in IGP list, thus making
      * it a possible root for this generation
      */
-    if (PObj_is_PMC_TEST(new) && ((PMC*)new)->pmc_ext)
+    if (PObj_is_PMC_TEST((PObj*)new) && ((PMC*)new)->pmc_ext)
         gc_gms_store_igp(interpreter, nh);
 
     /* promote RHS to old generation of aggregate */
@@ -636,7 +638,7 @@ parrot_gc_gms_wb(Interp *interpreter, PMC *agg, PMC *old, PMC *new)
 
 void
 parrot_gc_gms_wb_key(Interp *interpreter, PMC *agg,
-        PMC *old, void *old_key, PMC *new, void *new_key)
+        void *old, void *old_key, void *new, void *new_key)
 {
     Gc_gms_hdr *nh, *ah;
 
@@ -1218,6 +1220,15 @@ static int
 end_cycle_cb(Interp *interpreter, struct Small_Object_Pool *pool,
         int flag, void *arg)
 {
+    Gc_gms_hdr *h;
+    /*
+     * clear live flags
+     * TODO just swap black and white
+     */
+    if (!pool->black || pool->black == &pool->marker)
+        return 0;
+    for (h = pool->black; h != pool->white; h = h->next)
+        PObj_live_CLEAR(GMSH_to_PObj(h));
     pool->black = pool->black_fin = pool->gray = pool->white;
     return 0;
 }
@@ -1257,6 +1268,7 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
     if (arena_base->DOD_block_level) {
         return;
     }
+    ++arena_base->DOD_block_level;
     g_gms = arena_base->gc_private;
     if (flags & DOD_finish_FLAG) {
         struct Small_Object_Pool *pool;
@@ -1266,6 +1278,7 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
         /* XXX need to sweep over objects that have finalizers only */
         Parrot_forall_header_pools(interpreter, POOL_PMC, 0, sweep_cb_pmc);
         gc_gms_end_cycle(interpreter);
+        --arena_base->DOD_block_level;
         return;
     }
 
@@ -1285,6 +1298,7 @@ parrot_gc_gms_run(Interp *interpreter, int flags)
         ++arena_base->lazy_dod_runs;
     }
     gc_gms_end_cycle(interpreter);
+    --arena_base->DOD_block_level;
 }
 
 #if GC_GMS_DEBUG

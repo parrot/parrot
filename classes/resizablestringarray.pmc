@@ -8,7 +8,7 @@ classes/resizablestringarray.pmc - resizable array for strings only
 
 =head1 DESCRIPTION
 
-ResizableStringArray implements a resizeable array which stores Parrot 
+ResizableStringArray implements a resizeable array which stores Parrot
 strings only. Any ints or floats assigned to elements of the array will
 first be converted to String PMCs and then to native Parrot strings.
 PMCs assigned to to elements of the array will be stringified by having
@@ -31,7 +31,7 @@ typedef struct _SizeStringData {
 #define NEEDED_SIZE(n) ((n-1)*sizeof(STRING*) + sizeof(SizeStringData))
 
 pmclass ResizableStringArray extends FixedStringArray need_ext does array {
-    
+
 /*
 
 =item C<STRING *get_string_keyed_int(INTVAL key)>
@@ -45,11 +45,11 @@ Returns the Parrot string value of the element at index C<key>.
     STRING* get_string_keyed_int (INTVAL key) {
         SizeStringData *sd;
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizableStringArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        
+
         sd = (SizeStringData *)PMC_data(SELF);
         return sd->data[key];
     }
@@ -67,12 +67,13 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         SizeStringData *sd;
         if (key < 0)
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "ResizableStringArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
         sd = (SizeStringData *)PMC_data(SELF);
+        DOD_WRITE_BARRIER(INTERP, SELF, sd->data[key], value);
         sd->data[key] = value;
     }
 
@@ -111,7 +112,7 @@ Removes and returns the last element in the array.
         sd = (SizeStringData *)PMC_data(SELF);
 
         if (sd == NULL || size == 0) {
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't pop from an empty array!");
         }
 
@@ -135,7 +136,7 @@ Resizes the array to C<size> elements.
         SizeStringData *sd;
 
         if (size < 0)
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't resize!");
 
         sd = (SizeStringData *)PMC_data(SELF);
@@ -158,7 +159,7 @@ Resizes the array to C<size> elements.
         PMC_data(SELF) = sd;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
-    
+
 /*
 
 =item C<PMC *clone()>
@@ -172,12 +173,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         SizeStringData *sd;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         PMC_int_val(dest) = PMC_int_val(SELF);
         sd = (SizeStringData *)PMC_data(SELF);
-        
+
         PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
         PObj_custom_mark_destroy_SETALL(SELF);

@@ -143,9 +143,9 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
         parrot_gc_gms_wb_key(interp, agg, old, old_key, new, new_key); \
 } while (0)
 
-void parrot_gc_gms_wb(Interp *, PMC *agg, PMC *old, PMC *new);
+void parrot_gc_gms_wb(Interp *, PMC *agg, void *old, void *new);
 void parrot_gc_gms_wb_key(Interp *, PMC *agg,
-        PMC *old, void *old_key, PMC *new, void *new_key);
+        void *old, void *old_key, void *new, void *new_key);
 
 #endif
 
