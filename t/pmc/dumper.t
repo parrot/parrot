@@ -18,8 +18,9 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 11;
 
+# no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 ##PIR##
 .sub _main
@@ -56,6 +57,7 @@ CODE
 ]
 OUT
 
+# no. 2
 output_is(<<'CODE', <<'OUT', "dumping unsorted numbers");
 ##PIR##
 .sub _main
@@ -92,6 +94,7 @@ CODE
 ]
 OUT
 
+# no. 3
 output_is(<<'CODE', <<'OUT', "dumping sorted strings");
 ##PIR##
 .sub _main
@@ -124,6 +127,7 @@ CODE
 ]
 OUT
 
+# no. 4
 output_is(<<'CODE', <<'OUT', "sorting unsorted strings");
 ##PIR##
 .sub _main
@@ -156,6 +160,7 @@ CODE
 ]
 OUT
 
+# no. 5
 output_is(<<'CODE', <<'OUT', "dumping different types");
 ##PIR##
 .sub _main
@@ -212,6 +217,7 @@ CODE
 ]
 OUT
 
+# no. 6
 output_is(<<'CODE', <<'OUT', "dumping complex data");
 ##PIR##
 .sub _main
@@ -277,24 +283,24 @@ CODE
 "hash1" => PerlHash {
 }
 "hash1" => PerlHash {
-    "hello" => "world",
+    "hello" => "world"
 }
 "hash1" => PerlHash {
     "hello" => "world",
-    "hello2" => "world2",
+    "hello2" => "world2"
 }
 "hash1" => PerlHash {
     "hash2" => PerlHash {
     },
     "hello" => "world",
-    "hello2" => "world2",
+    "hello2" => "world2"
 }
 "hash1" => PerlHash {
     "hash2" => PerlHash {
-        "hello3" => "world3",
+        "hello3" => "world3"
     },
     "hello" => "world",
-    "hello2" => "world2",
+    "hello2" => "world2"
 }
 "hash1" => PerlHash {
     "hash2" => PerlHash {
@@ -305,16 +311,17 @@ CODE
             "test",
             PerlHash {
                 "is" => "cool",
-                "name" => "parrot",
+                "name" => "parrot"
             }
         ],
-        "hello3" => "world3",
+        "hello3" => "world3"
     },
     "hello" => "world",
-    "hello2" => "world2",
+    "hello2" => "world2"
 }
 OUT
 
+# no.7
 output_is(<<'CODE', <<'OUT', "properties");
 ##PIR##
 .sub _main
@@ -339,15 +346,16 @@ output_is(<<'CODE', <<'OUT', "properties");
 .end
 .include "library/dumper.imc"
 CODE
-PerlArray (size:2) [
+"VAR1" => PerlArray (size:2) [
     "test1",
     "test2"
-] with-properties: {
+] with-properties: PerlHash {
     "key1" => "value1",
-    "key2" => "value2",
+    "key2" => "value2"
 }
 OUT
 
+# no. 8
 output_is(<<'CODE', <<'OUT', "indent string");
 ##PIR##
 .sub _main
@@ -392,13 +400,11 @@ CODE
                 |"test"
             |]
         |],
-        |"test2" => "test2",
+        |"test2" => "test2"
     |},
-    |"test1" => "test1",
-|} with-properties: {
-    |"array2" => PerlArray (size:1) [
-        |"test"
-    |],
+    |"test1" => "test1"
+|} with-properties: PerlHash {
+    |"array2" => \hash["hash2"]["array"][1]
 |}
 |"hash" => PerlHash {
     |"hash2" => PerlHash {
@@ -408,14 +414,102 @@ CODE
                 |"test"
             |]
         |],
-        |"test2" => "test2",
+        |"test2" => "test2"
     |},
-    |"test1" => "test1",
-|} with-properties: {
-    |"array2" => PerlArray (size:1) [
-        |"test"
-    |],
+    |"test1" => "test1"
+|} with-properties: PerlHash {
+    |"array2" => \hash["hash2"]["array"][1]
 |}
 name = 'hash'
 indent = '|'
+OUT
+
+# no. 9
+output_is(<<'CODE', <<'OUT', "back-referencing properties");
+##PIR##
+.sub _main
+    .local pmc hash
+    
+    new hash, .PerlHash
+    
+    set hash["hello"], "world"
+    setprop hash, "backref", hash
+    _dumper( hash )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"VAR1" => PerlHash {
+    "hello" => "world"
+} with-properties: PerlHash {
+    "backref" => \VAR1
+}
+OUT
+
+# no. 10
+output_is(<<'CODE', <<'OUT', "self-referential properties");
+##PIR##
+.sub _main
+    .local pmc hash
+    .local pmc prop
+    
+    new hash, .PerlHash
+    
+    set hash["hello"], "world"
+    prophash prop, hash
+    setprop hash, "self", prop
+    _dumper( hash )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"VAR1" => PerlHash {
+    "hello" => "world"
+} with-properties: PerlHash {
+    "self" => \VAR1.properties()
+}
+OUT
+
+# no. 11
+output_is(<<'CODE', <<'OUT', "self-referential properties");
+##PIR##
+.sub _main
+    .local pmc array
+    .local pmc hash1
+    .local pmc hash2
+    .local pmc prop
+    
+    new array, .PerlArray
+    new hash1, .PerlHash
+    new hash2, .PerlHash
+    
+    set hash1["hello1"], "world1"
+    set hash2["hello2"], "world2"
+    prophash prop, hash1
+    set prop["das leben"], "ist schoen"
+    setprop hash2, "hash1prop", prop
+    push array, hash1
+    push array, hash2
+    push array, prop
+    prophash prop, hash2
+    push array, prop
+    _dumper( array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"VAR1" => PerlArray (size:4) [
+    PerlHash {
+        "hello1" => "world1"
+    } with-properties: PerlHash {
+        "das leben" => "ist schoen"
+    },
+    PerlHash {
+        "hello2" => "world2"
+    } with-properties: PerlHash {
+        "hash1prop" => \VAR1[0].properties()
+    },
+    \VAR1[0].properties(),
+    \VAR1[1].properties()
+]
 OUT

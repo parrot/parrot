@@ -4,7 +4,7 @@ dumper.imc - PIR version of Data::Dumper
 
 =head1 VERSION
 
-version 0.04
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,9 @@ This function returns the helper array.
     new helper, .PerlArray
     global "Data::Dumper::helper" = helper
 
+    newsub sub, .Sub, _dump_null
+    _register_dumper( 0, sub )
+
     newsub sub, .Sub, _dump_PerlArray
     _register_dumper( .PerlArray, sub )
 
@@ -73,6 +76,15 @@ This function returns the helper array.
 
     newsub sub, .Sub, _dump_Sub
     _register_dumper( .Sub, sub )
+
+    newsub sub, .Sub, _dump_OrderedHash
+    _register_dumper( .OrderedHash, sub )
+
+    newsub sub, .Sub, _dump_ManagedStruct
+    _register_dumper( .ManagedStruct, sub )
+
+    newsub sub, .Sub, _dump_UnManagedStruct
+    _register_dumper( .UnManagedStruct, sub )
 
 END:
     restoreall
@@ -150,6 +162,7 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
     .param string name
     .param pmc dump
     .param string indent
+    .local pmc cache
 
     # check the number of INT args
     if I1 != 0 goto ERROR
@@ -158,29 +171,24 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
     # check the number of STR args
     if I2 > 2 goto ERROR
     if I2 < 0 goto ERROR
-    if I2 == 2 goto NAMED
-    if I2 == 0 goto UNNAMED
     
-    # I2 == 1; no ident specified
+    if I2 == 2 goto NAMED
+    # I2 <= 1; no indent specified
     set indent, ""
+    if I2 == 1 goto NAMED
+    # I2 == 0; no indent and no name
+    # use a default name
+    set name, "VAR1"
     
 NAMED:
     _helper()    
-    _do_dumper_named( name, dump, indent )
+    new cache, .PerlArray
+    _do_dumper_showname( name, name, dump, cache, indent )
     print "\n"
     .pcc_begin_return
     .return 1
     .pcc_end_return
 
-UNNAMED:
-    _helper()
-    _do_dumper_unnamed( dump, "" )
-    print "\n"
-    
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
-    
 ERROR:
     print "_dumper Syntax:\n"
     print "_dumper( pmc )\n"
@@ -192,38 +200,114 @@ ERROR:
 .end
 
 #
-# internal helper function
+# caches the already printed PMCs and their names
 #
-.sub _do_dumper_named
-    .param string name
-    .param pmc dump
-    .param string indent
+.sub _dumper_cache
+    .param pmc cache
+    .param pmc find
+    .param string defname
+    .local int i
+    .local pmc entry
+    .local string name
+    .local pmc pname
+    
+    set i, cache
+LOOP:
+    dec i
+    dec i
+    if i < 0 goto NOTFOUND
+    entry = cache[i]
+    ne_addr entry, find, LOOP
 
-    print indent
-    print "\""
-    print name
-    print "\" => "
-    
-    _do_dumper_unnamed( dump, indent )
-    
+    # found entry => get its name
+    inc i
+    name = cache[i]
+    dec i
     .pcc_begin_return
+    .return i
+    .return name
+    .pcc_end_return
+
+NOTFOUND:
+    set name, defname
+    push cache, find
+    push cache, name
+    .pcc_begin_return
+    .return -1
+    .return name
     .pcc_end_return
 .end
 
 #
 # internal helper function
 #
-.sub _do_dumper_unnamed
+.sub _do_dumper_showname
+    .param string shortname
+    .param string name
     .param pmc dump
+    .param pmc cache
+    .param string indent
+
+    print indent
+    print "\""
+    print shortname
+    print "\" => "
+    
+    # use tail calling instead of
+    # _do_dumper( name, dump, cache, indent )
+    newsub P0, .Sub, _do_dumper
+    set S5, name
+    set P5, dump
+    set P6, cache
+    set S6, indent
+    set I0, 1
+    set I1, 0
+    set I2, 2
+    set I3, 2
+    set I4, 0
+    invoke
+.end
+
+#
+# internal helper function
+#
+.sub _do_dumper
+    .param string name
+    .param pmc dump
+    .param pmc cache
     .param string indent
     .local pmc helper
     .local int type
     .local int exist
     .local pmc cb
+    .local string name2
+    .local pmc ret
+    
+    ret = P1
+    newsub helper, .Sub, _dumper_cache
+    .pcc_begin prototyped
+    .arg cache
+    .arg dump
+    .arg name
+    .pcc_call helper
+    .result type
+    .result name
+    .pcc_end
 
+    if type == -1 goto NOT_IN_CACHE
+    # name found in cache:
+    print "\\"
+    print name
+    branch END
+
+NOT_IN_CACHE:
+    # get the global helper hash
     helper = global "Data::Dumper::helper"
 
+    set type, 0
+    isnull dump, ISNULL
     typeof type, dump
+ISNULL:
     exists exist, helper[type]
     if exist, CALL_HELPER
 
@@ -233,21 +317,26 @@ ERROR:
     branch DONE
         
 CALL_HELPER:
-
     cb = helper[type]
-    
-    saveall
-    set S5, indent
-    set P6, dump
-    invokecc cb    
-    restoreall
+    .pcc_begin prototyped
+    .arg name
+    .arg indent
+    .arg dump
+    .arg cache
+    .pcc_call cb
+    .pcc_end
     
 DONE:
+    isnull dump, END
     prophash cb, dump
     unless cb goto END
 
     print " with-properties: "
-    _dump_Hash( cb, indent )
+    clone name2, name
+    concat name2, ".properties()"
+    
+    # XXX: use tail calling
+     _do_dumper( name2, cb, cache, indent )
     
 END:
     .pcc_begin_return
@@ -258,13 +347,15 @@ END:
 # Dumps a PerlArray pmc
 #
 .sub _dump_PerlArray
+    .param string name
     .param pmc array
+    .param pmc cache
     .param string indent
     .local string subindent
     .local int size
     .local int pos
     .local pmc val
-    .local string posstr
+    .local string name2
     .local int tmp
     
     subindent = "    "
@@ -282,10 +373,16 @@ END:
 iter_loop:
     print "\n"
     
+    print subindent
+    
+    new val, .PerlArray
+    push val, name
+    push val, pos
+    sprintf name2, "%s[%d]", val
+    
     set val, array[pos]
     
-    print subindent
-    _do_dumper_unnamed( val, subindent )
+    _do_dumper( name2, val, cache, subindent )
     
     # next array member
     inc pos
@@ -311,26 +408,42 @@ iter_end:
 # Dumps a PerlHash pmc
 #
 .sub _dump_PerlHash
+    .param string name
     .param pmc hash
+    .param pmc cache
     .param string indent
     
     print "PerlHash "
-    _dump_Hash( hash, indent )
-    .pcc_begin_return
-    .pcc_end_return
+
+    # use tail calling instead of
+    # _dump_Hash( name, hash, cache, indent )
+    newsub P0, .Sub, _dump_Hash
+    set S5, name
+    set P5, hash
+    set P6, cache
+    set S6, indent
+    set I0, 1
+    set I1, 0
+    set I2, 2
+    set I3, 2
+    set I4, 0
+    invoke
 .end
 
 #
 # Dumps a 'generic' Hash
 #
 .sub _dump_Hash
+    .param string name
     .param pmc hash
+    .param pmc cache
     .param string indent
     .local string subindent
     .local pmc iter
     .local string key
     .local pmc val
     .local pmc keys
+    .local string name2
     
     subindent = "    "
     concat subindent, indent
@@ -357,9 +470,17 @@ dump_loop:
     print "\n"
     
     shift key, keys
-    set val, hash[key]
-    _do_dumper_named( key, val, subindent )
     
+    new val, .PerlArray
+    push val, name
+    push val, key
+    sprintf name2, "%s[\"%s\"]", val
+
+    set val, hash[key]
+    
+    _do_dumper_showname( key, name2, val, cache, subindent )
+    
+    unless keys, dump_end
     print ","
         
     branch dump_loop
@@ -377,7 +498,9 @@ dump_end:
 # Dumps a PerlString pmc
 #
 .sub _dump_PerlString
+    .param string name
     .param pmc str
+    .param pmc cache
     .param string indent
     
     print "\""
@@ -392,7 +515,9 @@ dump_end:
 # Dumps a Perl[Num,Int] pmc
 #
 .sub _dump_PerlVal
+    .param string name
     .param pmc val
+    .param pmc cache
     .param string indent
     
     print val
@@ -405,7 +530,9 @@ dump_end:
 # Dumps a PerlUndef pmc
 #
 .sub _dump_PerlUndef
+    .param string name
     .param pmc val
+    .param pmc cache
     .param string indent
     
     print "undef"
@@ -418,11 +545,70 @@ dump_end:
 # Dumps a Sub pmc
 #
 .sub _dump_Sub
+    .param string name
     .param pmc val
+    .param pmc cache
     .param string indent
     
     print "sub { ... }"
     
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+#
+# Dumps a null pmc
+#
+.sub _dump_null
+    .param string name
+    .param pmc val
+    .param pmc cache
+    .param string indent
+    
+    print "null"
+    
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+#
+# Dumps a OrderedHash pmc
+#
+.sub _dump_OrderedHash
+    .param string name
+    .param pmc hash
+    .param pmc cache
+    .param string indent
+
+    print "OrderedHash { ... }"
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+#
+# Dumps a ManagedStruct pmc
+#
+.sub _dump_ManagedStruct
+    .param string name
+    .param pmc hash
+    .param pmc cache
+    .param string indent
+
+    print "ManagedStruct { ... }"
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+#
+# Dumps a UnManagedStruct pmc
+#
+.sub _dump_UnManagedStruct
+    .param string name
+    .param pmc hash
+    .param pmc cache
+    .param string indent
+
+    print "UnManagedStruct { ... }"
     .pcc_begin_return
     .pcc_end_return
 .end
