@@ -2321,7 +2321,7 @@ output_like(<<'CODE', <<'OUTPUT', "new with a native type");
 	print "never\n"
 	end
 CODE
-/error:\w+:unknown macro '\.INTVAL'/
+/(unknown macro|unexpected '\.')/
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "repeat");

@@ -280,7 +280,7 @@ output_like( <<'CODE', <<OUTPUT, "unknown macro" );
     end
 .end
 CODE
-/unknown macro/
+/(unknown macro|unexpected '\.')/
 OUTPUT
 
 output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );

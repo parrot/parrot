@@ -143,6 +143,7 @@ struct pcc_sub_t {
     int calls_a_sub;
     int nci;
     int label;
+    SymReg * object;
 };
 
 

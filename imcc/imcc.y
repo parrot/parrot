@@ -239,6 +239,7 @@ itcall_sub(SymReg* sub)
 %token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS END SAVEALL RESTOREALL
 %token <t> NEW NEWSUB NEWCLOSURE NEWCOR NEWCONT
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
+%token <t> POINTY
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV OBJECTV DEFINED LOG_XOR
@@ -252,12 +253,13 @@ itcall_sub(SymReg* sub)
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
-%type <t> type newsub
-%type <i> program class class_body member_decls member_decl field_decl method_decl
+%type <t> type newsub ptr
+%type <i> program class class_body member_decls member_decl field_decl
+%type <i> method_decl
 %type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
-%type <i> labels _labels label statements statement sub_call
+%type <i> labels _labels label statements statement sub_call meth_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
@@ -508,7 +510,7 @@ pcc_sub_call:
      pcc_call
      opt_label
      pcc_results
-     PCC_END '\n'  { $$ = 0; }
+     PCC_END       { $$ = 0; }
    ;
 
 opt_label:
@@ -587,7 +589,7 @@ pcc_ret:
             i->type = ITPCCSUB | ITLABEL;
          }
      pcc_returns
-     PCC_END_RETURN '\n'
+     PCC_END_RETURN
          {  $$ = 0; }
    ;
 
@@ -608,7 +610,7 @@ pcc_yield:
             i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
          }
      pcc_returns
-     PCC_END_YIELD '\n'
+     PCC_END_YIELD
          {  $$ = 0; }
    ;
 
@@ -645,10 +647,6 @@ statement:
      helper_clear_state
      instruction   {  $$ = $2; }
    | MACRO '\n'    {  $$ = 0; }
-   | sub_call      {  $$ = 0; current_call = NULL; }
-   | pcc_sub_call  {  $$ = 0; }
-   | pcc_ret
-   | pcc_yield
    | FILECOMMENT   {  $$ = 0; }
    | LINECOMMENT   {  $$ = 0; }
    ;
@@ -704,6 +702,11 @@ labeled_inst:
    | PARROT_OP vars
                    { $$ = INS(interp, cur_unit, $1, 0, regs, nargs, keyvec, 1);
                                           free($1); }
+   | sub_call      {  $$ = 0; current_call = NULL; }
+   | meth_call     {  $$ = 0; current_call = NULL; }
+   | pcc_sub_call  {  $$ = 0; }
+   | pcc_ret
+   | pcc_yield
    | /* none */                        { $$ = 0;}
    ;
 
@@ -831,6 +834,19 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
        */
+   ;
+
+ptr:    POINTY { $$=0; }
+      | '.'    { $$=0; }
+   ;
+meth_call: VAR ptr IDENTIFIER
+         {
+           $$ = create_itcall_label();
+           itcall_sub(mk_sub_address($3));
+           current_call->r[0]->pcc_sub->object = $1;
+         }
+     '(' arglist ')'
+        {  $$ = $<i>2; }
    ;
 
 sub_call:

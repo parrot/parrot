@@ -413,7 +413,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         insINS(interpreter, unit, ins, "set", regs, 2);
     }
     /*
-     * check if there is a return 
+     * check if there is a return
      */
 
     if (unit->last_ins->type != (ITPCCSUB|ITLABEL) &&
@@ -422,7 +422,7 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
             strcmp(unit->last_ins->op, "end")
        ) {
 
-        if (sub->pcc_sub->cc_sym) 
+        if (sub->pcc_sub->cc_sym)
             regs[0] = sub->pcc_sub->cc_sym;
         else
             regs[0] = mk_pasm_reg(str_dup("P1"));
@@ -769,6 +769,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
     int need_cc;
     int tail_call;
     int proto;
+    int meth_call = 0;
 
 #if IMC_TRACE
     PIO_eprintf(NULL, "expand_pcc_sub_call\n");
@@ -783,7 +784,11 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * See if we need to create a temporary sub object
      */
     if (ins->type & ITCALL) {
-        if (sub->pcc_sub->sub->type == VTADDRESS) {
+        if (sub->pcc_sub->object) {
+            add_pcc_sub(sub, sub->pcc_sub->sub);
+            meth_call = 1;
+        }
+        else if (sub->pcc_sub->sub->type == VTADDRESS) {
 #if IMC_TRACE
             fprintf(stderr, "generating sub object [sub->name = %s]\n",
                     sub->pcc_sub->sub->name);
@@ -836,19 +841,34 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
      * setup P0, P1
      */
     arg = sub->pcc_sub->sub;
-    if (arg->reg->type & VTPASM) {
-move_sub:
-        if (arg->reg->color != 0) {
-            reg = mk_pasm_reg(str_dup("P0"));
-            regs[0] = reg;
-            regs[1] = arg;
-            arg->reg->want_regno = 0;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
-        }
+    if (meth_call) {
+        char buf[256];
+        /* set S0, meth */
+        regs[0] = get_pasm_reg("S0");;
+        sprintf(buf, "\"%s\"", arg->name);
+        regs[1] = mk_const(str_dup(buf), 'S');
+        ins = insINS(interp, unit, ins, "set", regs, 2);
+        /* set P2, obj */
+        regs[0] = get_pasm_reg("P2");
+        regs[1] = sub->pcc_sub->object;
+        ins = insINS(interp, unit, ins, "set", regs, 2);
     }
     else {
-        /* TODO no move if possible */
-        goto move_sub;
+        /* plain sub call */
+        if (arg->reg->type & VTPASM) {
+move_sub:
+            if (arg->reg->color != 0) {
+                reg = get_pasm_reg("P0");
+                regs[0] = reg;
+                regs[1] = arg;
+                arg->reg->want_regno = 0;
+                ins = insINS(interp, unit, ins, "set", regs, 2);
+            }
+        }
+        else {
+            /* TODO no move if possible */
+            goto move_sub;
+        }
     }
 
     arg = sub->pcc_sub->cc;
@@ -857,7 +877,7 @@ move_sub:
         if (arg->reg->type & VTPASM) {
 move_cc:
             if (arg->reg->color != 1) {
-                reg = mk_pasm_reg(str_dup("P1"));
+                reg = get_pasm_reg("P1");
                 regs[0] = reg;
                 regs[1] = arg;
                 arg->reg->want_regno = 1;
@@ -890,12 +910,17 @@ move_cc:
      * emit a savetop for now
      */
     ins = insINS(interp, unit, ins, "savetop", regs, 0);
-    ins = insINS(interp, unit, ins, need_cc ? "invokecc" : "invoke", regs, 0);
+    if (meth_call)
+        ins = insINS(interp, unit, ins,
+                need_cc ? "callmethodcc" : "callmethod", regs, 0);
+    else
+        ins = insINS(interp, unit, ins,
+                need_cc ? "invokecc" : "invoke", regs, 0);
     ins->type |= ITPCCSUB;
     /*
      * move the pcc_sub structure to the invoke
      */
-    ins->r[0] = mk_pasm_reg(str_dup("P0"));
+    ins->r[0] = get_pasm_reg("P0");  /* XXX or P2 */
     ins->r[0]->pcc_sub = sub->pcc_sub;
     sub->pcc_sub = NULL;
     sub = ins->r[0];

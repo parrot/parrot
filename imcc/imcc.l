@@ -249,6 +249,7 @@ SP              [ ]
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);
 "**"            return(POW);
+"->"            return(POINTY);
 
 <emit,INITIAL>".macro" {
         return read_macro(valp, interp);
@@ -350,8 +351,11 @@ SP              [ ]
 	    valp->s = buf;
 	    return INTC;
 	}
-	if (!expand_macro(valp, interp, yytext+1))
-            fataly(1, sourcefile, line, "unknown macro '%s'", yytext);
+	if (!expand_macro(valp, interp, yytext+1)) {
+            /* fataly(1, sourcefile, line, "unknown macro '%s'", yytext); */
+            yyless(1);
+            return '.';
+        }
     }
 
 <emit,INITIAL>{ID} {

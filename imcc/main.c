@@ -120,7 +120,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
     { 'C', 'C', 0, { "--CGP-core" } },
-    { 'E', 'E', 0, { "--pre-precess-only" } },
+    { 'E', 'E', 0, { "--pre-process-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'P', 'P', 0, { "--predereferenced-core" } },
