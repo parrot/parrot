@@ -1,5 +1,3 @@
-#! perl -w
-
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -332,4 +330,3 @@ Removes the trigger on C<$key> named by C<$trigger>
 =cut
 
 1;
-

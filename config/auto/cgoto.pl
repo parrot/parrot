@@ -1,4 +1,3 @@
-#! perl -w
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
