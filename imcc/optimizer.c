@@ -62,7 +62,9 @@ static int used_once(struct Parrot_Interp *);
 static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(struct Parrot_Interp *);
 
-void pre_optimize(struct Parrot_Interp *interpreter) {
+void
+pre_optimize(struct Parrot_Interp *interpreter)
+{
     if (optimizer_level & OPT_PRE) {
         info(interpreter, 2, "pre_optimize\n");
         subst_constants_mix(interpreter);
@@ -76,7 +78,9 @@ void pre_optimize(struct Parrot_Interp *interpreter) {
     }
 }
 
-int cfg_optimize(struct Parrot_Interp *interpreter) {
+int
+cfg_optimize(struct Parrot_Interp *interpreter)
+{
     UNUSED(interpreter);
     if (dont_optimize)
         return 0;
@@ -93,8 +97,9 @@ int cfg_optimize(struct Parrot_Interp *interpreter) {
     return 0;
 }
 
-int optimize(struct Parrot_Interp *interpreter) {
-
+int
+optimize(struct Parrot_Interp *interpreter)
+{
     int any = 0;
     if (optimizer_level & OPT_CFG) {
         info(interpreter, 2, "optimize\n");
@@ -110,7 +115,8 @@ int optimize(struct Parrot_Interp *interpreter) {
 }
 
 /* get negated opterator for op */
-const char * get_neg_op(char *op, int *n)
+const char *
+get_neg_op(char *op, int *n)
 {
     static struct br_pairs {
         const char *op;
@@ -138,7 +144,8 @@ const char * get_neg_op(char *op, int *n)
  * branch L2            ---
  * L1:                  L2:
  */
-static void if_branch(struct Parrot_Interp *interpreter)
+static void
+if_branch(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *last;
     int reg;
@@ -184,10 +191,12 @@ static void if_branch(struct Parrot_Interp *interpreter)
         ins = ins->next;
     }
 }
+
 /* these are run after constant simplification, so it is
  * guaranteed, that one operand is non constant, if opsize == 4
  */
-static void strength_reduce(struct Parrot_Interp *interpreter)
+static void
+strength_reduce(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "add", "sub", "mul", "div" };
@@ -805,7 +814,8 @@ do_res:
  * branch L2
  *
  */
-static int branch_branch(struct Parrot_Interp *interpreter)
+static int
+branch_branch(struct Parrot_Interp *interpreter)
 {
     Instruction *ins, *next;
     SymReg * r;
@@ -836,7 +846,8 @@ static int branch_branch(struct Parrot_Interp *interpreter)
     return changed;
 }
 
-static int unused_label(struct Parrot_Interp *interpreter)
+static int
+unused_label(struct Parrot_Interp *interpreter)
 {
     Instruction *ins;
     int used;
@@ -898,7 +909,8 @@ static int unused_label(struct Parrot_Interp *interpreter)
     return changed;
 }
 
-static int dead_code_remove(struct Parrot_Interp *interpreter)
+static int
+dead_code_remove(struct Parrot_Interp *interpreter)
 {
     Basic_block *bb;
     int i;
@@ -955,7 +967,8 @@ static int dead_code_remove(struct Parrot_Interp *interpreter)
 }
 
 /* optimizations with CFG & life info built */
-static int used_once(Parrot_Interp interpreter)
+static int
+used_once(Parrot_Interp interpreter)
 {
     Instruction *ins;
     SymReg * r;

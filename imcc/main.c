@@ -26,13 +26,15 @@ static int load_pbc, run_pbc, write_pbc, pre_process;
 static char optimizer_opt[20];
 extern FILE *yyin;
 
-static void usage(FILE* fp)
+static void
+usage(FILE* fp)
 {
     fprintf(fp,
     "parrot -[abcCEfgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
 }
 
-static void help_debug(void)
+static void
+help_debug(void)
 {
     printf(
     "parrot ... -d [Flags] ...\n"
@@ -49,7 +51,8 @@ static void help_debug(void)
     "    0x4000    PBC fixups\n");
 }
 
-static void help(void)
+static void
+help(void)
 {
     printf(
     "parrot [Options] <file>\n"
@@ -88,7 +91,8 @@ static void help(void)
 }
 
 
-static void imcc_version(void)
+static void
+imcc_version(void)
 {
     printf("This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME ".\n\
@@ -390,7 +394,8 @@ do_pre_process(Parrot_Interp interpreter)
     }
 }
 
-int main(int argc, char * argv[])
+int
+main(int argc, char * argv[])
 {
     struct PackFile *pf;
     int obj_file;

@@ -1,11 +1,3 @@
-
-#include <stdlib.h>
-#include <string.h>
-#include "imc.h"
-#include "optimizer.h"
-
-/* #define ALIAS */
-
 /*
  * cfg.c
  *
@@ -15,6 +7,14 @@
  * The control-flow graph is a directed graph that reflects the
  * flow of execution between blocks.
  */
+
+
+#include <stdlib.h>
+#include <string.h>
+#include "imc.h"
+#include "optimizer.h"
+
+/* #define ALIAS */
 
 static void add_instruc_reads(Instruction *ins, SymReg *r0);
 static void add_instruc_writes(Instruction *ins, SymReg *r0);
@@ -33,6 +33,7 @@ static Basic_block* make_basic_block(Parrot_Interp, Instruction*);
 #define INVOKE_SUB_RET  2
 #define INVOKE_SUB_LOOP 3
 #define INVOKE_SUB_OTHER 4
+
 static int
 check_invoke_type(Instruction *ins)
 {
@@ -58,7 +59,8 @@ check_invoke_type(Instruction *ins)
 }
 
 void
-find_basic_blocks (Parrot_Interp interpreter, int first) {
+find_basic_blocks (Parrot_Interp interpreter, int first)
+{
     Basic_block *bb;
     Instruction *ins;
     int nu = 0;
@@ -280,7 +282,8 @@ invok:
 /* find the placement of the label, and link the two nodes */
 
 static void
-bb_findadd_edge(Parrot_Interp interpreter, Basic_block *from, SymReg *label) {
+bb_findadd_edge(Parrot_Interp interpreter, Basic_block *from, SymReg *label)
+{
     Instruction *ins;
     SymReg *r = find_sym(label->name);
 
@@ -307,7 +310,8 @@ bb_findadd_edge(Parrot_Interp interpreter, Basic_block *from, SymReg *label) {
 }
 
 
-int blocks_are_connected(Basic_block *from, Basic_block *to)
+int
+blocks_are_connected(Basic_block *from, Basic_block *to)
 {
     Edge *pred;
     for (pred = to->pred_list; pred != NULL; pred=pred->pred_next) {
@@ -319,8 +323,8 @@ int blocks_are_connected(Basic_block *from, Basic_block *to)
 
 
 static void
-bb_add_edge(Parrot_Interp interpreter, Basic_block *from, Basic_block *to) {
-
+bb_add_edge(Parrot_Interp interpreter, Basic_block *from, Basic_block *to)
+{
     Edge *e;
     if (blocks_are_connected(from, to))
 	return;
@@ -374,7 +378,8 @@ edge_count(Parrot_Interp interpreter)
     return i;
 }
 
-static void add_instruc_reads(Instruction *ins, SymReg *r0)
+static void
+add_instruc_reads(Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
@@ -389,7 +394,8 @@ static void add_instruc_reads(Instruction *ins, SymReg *r0)
     ins->flags |= (1<<i);
 }
 
-static void add_instruc_writes(Instruction *ins, SymReg *r0)
+static void
+add_instruc_writes(Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
@@ -402,6 +408,7 @@ static void add_instruc_writes(Instruction *ins, SymReg *r0)
     ins->r[i] = r0;
     ins->flags |= (1<< (16+i));
 }
+
 #ifdef ALIAS
 /*
  * set P1, P0
@@ -414,7 +421,8 @@ static void add_instruc_writes(Instruction *ins, SymReg *r0)
  * XXX currently turned off, this extends life ranges too much
  */
 
-static void propagate_alias(Parrot_Interp interpreter)
+static void
+propagate_alias(Parrot_Interp interpreter)
 {
     Instruction *ins, *curr;
     SymReg *r0, *r1;
@@ -453,7 +461,9 @@ static void propagate_alias(Parrot_Interp interpreter)
 }
 #endif
 
-void life_analysis(Parrot_Interp interpreter) {
+void
+life_analysis(Parrot_Interp interpreter)
+{
     int i;
     SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
@@ -466,7 +476,8 @@ void life_analysis(Parrot_Interp interpreter) {
 }
 
 static void
-analyse_life_symbol(Parrot_Interp interpreter, SymReg* r) {
+analyse_life_symbol(Parrot_Interp interpreter, SymReg* r)
+{
     int i;
 
     if (r->life_info)
@@ -522,7 +533,8 @@ free_life_info(Parrot_Interp interpreter, SymReg *r)
  */
 
 static void
-analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r) {
+analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
+{
     Instruction* ins, *special;
     Life_range* l;
 
@@ -585,7 +597,8 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r) {
 
 
 static void
-propagate_need(Basic_block *bb, SymReg* r, int i) {
+propagate_need(Basic_block *bb, SymReg* r, int i)
+{
     Edge *edge;
     Basic_block *pred;
     Life_range *l;
@@ -648,7 +661,8 @@ propagate_need(Basic_block *bb, SymReg* r, int i) {
  */
 
 void
-compute_dominators (Parrot_Interp interpreter) {
+compute_dominators (Parrot_Interp interpreter)
+{
 #define USE_BFS 1
 
 #if !USE_BFS
@@ -810,7 +824,8 @@ sort_loops(Parrot_Interp interpreter)
  */
 
 void
-find_loops (Parrot_Interp interpreter) {
+find_loops (Parrot_Interp interpreter)
+{
     int i, succ_index;
     Set* dom;
     Edge* edge;
@@ -845,7 +860,8 @@ find_loops (Parrot_Interp interpreter) {
 /* Incresases the loop_depth of all the nodes in a loop */
 
 static void
-mark_loop (Parrot_Interp interpreter, Edge* e){
+mark_loop (Parrot_Interp interpreter, Edge* e)
+{
     Set* loop;
     Basic_block *header, *footer, *enter;
     int i;
@@ -921,7 +937,9 @@ free_loops(Parrot_Interp interpreter)
     IMCC_INFO(interpreter)->loop_info = 0;
 }
 
-void search_predecessors_not_in(Basic_block *node, Set* s) {
+void
+search_predecessors_not_in(Basic_block *node, Set* s)
+{
    Edge *edge;
    Basic_block *pred;
 
@@ -939,8 +957,8 @@ void search_predecessors_not_in(Basic_block *node, Set* s) {
 /*** Utility functions ***/
 
 static void
-init_basic_blocks(Parrot_Interp interpreter) {
-
+init_basic_blocks(Parrot_Interp interpreter)
+{
     if (IMCC_INFO(interpreter)->bb_list != NULL)
         clear_basic_blocks(interpreter);
     IMCC_INFO(interpreter)->bb_list =
@@ -950,7 +968,9 @@ init_basic_blocks(Parrot_Interp interpreter) {
     IMCC_INFO(interpreter)->edge_list = 0;
 }
 
-void clear_basic_blocks(Parrot_Interp interpreter) {
+void
+clear_basic_blocks(Parrot_Interp interpreter)
+{
     int i;
     if (IMCC_INFO(interpreter)->bb_list) {
         for (i=0; i < IMCC_INFO(interpreter)->n_basic_blocks; i++)
@@ -964,7 +984,8 @@ void clear_basic_blocks(Parrot_Interp interpreter) {
 }
 
 static Basic_block*
-make_basic_block(Parrot_Interp interpreter, Instruction* ins) {
+make_basic_block(Parrot_Interp interpreter, Instruction* ins)
+{
     Basic_block *bb;
     int n;
 
@@ -1000,7 +1021,9 @@ make_basic_block(Parrot_Interp interpreter, Instruction* ins) {
     return bb;
 }
 
-Life_range* make_life_range(SymReg *r, int idx) {
+Life_range *
+make_life_range(SymReg *r, int idx)
+{
    Life_range *l;
 
    l = calloc(1, sizeof(Life_range));
@@ -1010,6 +1033,7 @@ Life_range* make_life_range(SymReg *r, int idx) {
    r->life_info[idx] = l;
    return l;
 }
+
 /*
  * Local variables:
  * c-indentation-style: bsd

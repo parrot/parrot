@@ -1,4 +1,11 @@
 /*
+ * symreg.c
+ *
+ * XXX: SymReg stuff has become overused. SymReg should be for symbolic
+ * registers, reg allocation, etc. but we are now using it for extensive
+ * symbol table management. Need to convert much of this over the use Symbol
+ * and SymbolTable (see symbol.h and symbol.c)
+ *
  * imcc symbol handling
  */
 
@@ -10,7 +17,9 @@
 static SymReg * dup_sym(SymReg *r);
 
 
-void push_namespace(char * name) {
+void
+push_namespace(char * name)
+{
     Namespace * ns = (Namespace *) malloc(sizeof(*ns));
     ns->parent = namespace;
     ns->name = name;
@@ -18,7 +27,9 @@ void push_namespace(char * name) {
     namespace = ns;
 }
 
-void pop_namespace(char * name) {
+void
+pop_namespace(char * name)
+{
     Namespace * ns = namespace;
     if (ns == NULL) {
         fprintf(stderr, "pop() on empty namespace stack\n");
@@ -44,7 +55,9 @@ void pop_namespace(char * name) {
 /* symbolic registers */
 
 /* Makes a new SymReg from its varname and type */
-SymReg * _mk_symreg(SymReg* hsh[],char * name, int t) {
+SymReg *
+_mk_symreg(SymReg* hsh[],char * name, int t)
+{
     SymReg * r;
     if((r = _get_sym(hsh, name)) && r->set == t) {
 	free(name);
@@ -66,18 +79,23 @@ SymReg * _mk_symreg(SymReg* hsh[],char * name, int t) {
     return r;
 }
 
-SymReg * mk_symreg(char * name, int t) {
+SymReg *
+mk_symreg(char * name, int t)
+{
     return _mk_symreg(hash, name, t);
 }
 
-SymReg * mk_temp_reg(int t) {
+SymReg *
+mk_temp_reg(int t)
+{
     char buf[128];
     static int temp;
     sprintf(buf, "__imcc_temp_%d", ++temp);
     return mk_symreg(str_dup(buf), t);
 }
 
-SymReg * mk_pcc_sub(char * name, int proto) {
+SymReg *
+mk_pcc_sub(char * name, int proto) {
     SymReg *r = _mk_symreg(hash, name, proto);
     r->type = VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
@@ -144,7 +162,8 @@ add_pcc_cc(SymReg *r, SymReg * arg)
     r->pcc_sub->cc->type = VT_REGP;
 }
 
-SymReg * mk_pasm_reg(char * name) {
+SymReg * mk_pasm_reg(char * name)
+{
     SymReg * r;
     if((r = _get_sym(hash, name))) {
 	free(name);
@@ -159,7 +178,9 @@ SymReg * mk_pasm_reg(char * name) {
     return r;
 }
 
-char * _mk_fullname(Namespace * ns, const char * name) {
+char *
+_mk_fullname(Namespace * ns, const char * name)
+{
     char * result;
 
     if (ns == NULL) return str_dup(name);
@@ -168,12 +189,14 @@ char * _mk_fullname(Namespace * ns, const char * name) {
     return result;
 }
 
-char * mk_fullname(const char * name) {
+char * mk_fullname(const char * name)
+{
     return _mk_fullname(namespace, name);
 }
 
 /* Makes a new identifier */
-SymReg * mk_ident(char * name, int t) {
+SymReg * mk_ident(char * name, int t)
+{
     char * fullname = _mk_fullname(namespace, name);
     Identifier * ident;
     SymReg * r;
@@ -204,19 +227,25 @@ mk_const_ident(char *name, int t, SymReg *val, int global)
 }
 
 /* Makes a new constant*/
-SymReg * _mk_const(SymReg *hsh[], char * name, int t) {
+SymReg *
+_mk_const(SymReg *hsh[], char * name, int t)
+{
     SymReg * r = _mk_symreg(hsh, name, t);
     r->type = VTCONST;
     r->use_count++;
     return r;
 }
 
-SymReg * mk_const(char * name, int t) {
+SymReg *
+mk_const(char * name, int t)
+{
     return _mk_const(ghash, name, t);
 }
 
 /* Makes a new address */
-SymReg * _mk_address(SymReg *hsh[], char * name, int uniq) {
+SymReg *
+_mk_address(SymReg *hsh[], char * name, int uniq)
+{
     SymReg * r;
     if (uniq == U_add_all) {
 
@@ -247,10 +276,12 @@ SymReg * _mk_address(SymReg *hsh[], char * name, int uniq) {
 }
 
 
-SymReg * mk_address(char * name, int uniq) {
+SymReg * mk_address(char * name, int uniq)
+{
     SymReg ** h = *name == '_' ? ghash : hash;
     return _mk_address(h, name, uniq);
 }
+
 /* link keys to a keys structure = SymReg
  *
  * we might have
@@ -289,7 +320,8 @@ SymReg * mk_address(char * name, int uniq) {
  *
  */
 
-static SymReg * dup_sym(SymReg *r)
+static SymReg *
+dup_sym(SymReg *r)
 {
     SymReg * new = malloc(sizeof(SymReg));
     if (!new)
@@ -299,7 +331,8 @@ static SymReg * dup_sym(SymReg *r)
     return new;
 }
 
-SymReg * link_keys(int nargs, SymReg * keys[])
+SymReg *
+link_keys(int nargs, SymReg * keys[])
 {
     SymReg * first, *key, *keychain;
     int i;
@@ -383,21 +416,29 @@ free_sym(Parrot_Interp interpreter, SymReg *r)
 
 /*
  * This functions manipulate the hash of symbols.
+ * XXX: Migrate to use Symbol and SymbolTable
  *
  */
 
 /* Stores a symbol into the hash */
-void _store_symreg(SymReg *hsh[], SymReg * r) {
+void
+_store_symreg(SymReg *hsh[], SymReg * r)
+{
     int i = hash_str(r->name) % HASH_SIZE;
     r->next = hsh[i];
     hsh[i] = r;
 }
-void store_symreg(SymReg * r) {
+
+void
+store_symreg(SymReg * r)
+{
     _store_symreg(hash, r);
 }
 
 /* Gets a symbol from the hash */
-SymReg * _get_sym(SymReg * hsh[], const char * name) {
+SymReg *
+_get_sym(SymReg * hsh[], const char * name)
+{
     SymReg * p;
     int i = hash_str(name) % HASH_SIZE;
     for(p = hsh[i]; p; p = p->next) {
@@ -406,13 +447,17 @@ SymReg * _get_sym(SymReg * hsh[], const char * name) {
     }
     return 0;
 }
-SymReg * get_sym(const char * name) {
+
+SymReg *
+get_sym(const char * name)
+{
     return _get_sym(hash, name);
 }
 
 /* find a symbol hash or ghash */
 SymReg *
-_find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
+_find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
+{
     Namespace * ns;
     SymReg *p;
 
@@ -433,13 +478,16 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
 }
 
 
-SymReg * find_sym(const char * name) {
+SymReg *
+find_sym(const char * name)
+{
     return _find_sym(namespace, hash, name);
 }
 
 
 void
-_delete_sym(Parrot_Interp interpreter, SymReg * hsh[], const char * name) {
+_delete_sym(Parrot_Interp interpreter, SymReg * hsh[], const char * name)
+{
     SymReg ** p;
     int i = hash_str(name) % HASH_SIZE;
     for(p = &hsh[i]; *p; p = &(*p)->next) {
@@ -457,7 +505,8 @@ _delete_sym(Parrot_Interp interpreter, SymReg * hsh[], const char * name) {
 
 /* Deletes all symbols */
 void
-clear_tables(Parrot_Interp interpreter, SymReg * hsh[]) {
+clear_tables(Parrot_Interp interpreter, SymReg * hsh[])
+{
     int i;
     SymReg * p, *next;
     for(i = 0; i < HASH_SIZE; i++) {
@@ -477,7 +526,9 @@ clear_tables(Parrot_Interp interpreter, SymReg * hsh[]) {
 
 /* utility functions: */
 
-unsigned int hash_str(const char * str) {
+unsigned int
+hash_str(const char * str)
+{
     unsigned long key = 0;
     const char * s;
     for(s=str; *s; s++)
@@ -494,3 +545,4 @@ unsigned int hash_str(const char * str) {
  *
  * vim: expandtab shiftwidth=4:
 */
+

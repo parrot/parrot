@@ -92,6 +92,7 @@ imcstack_pop(IMCStack stack)
 
     return entry->value;
 }
+
 /*
  * Local variables:
  * c-indentation-style: bsd
