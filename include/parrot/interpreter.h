@@ -259,7 +259,8 @@ INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
 
 void runops(struct Parrot_Interp *, size_t offset);
 void runops_int(struct Parrot_Interp *, size_t offset);
-void Parrot_runops_fromc(struct Parrot_Interp *interpreter, PMC *sub);
+void Parrot_runops_fromc(Parrot_Interp, PMC *sub);
+void* Parrot_runops_fromc_args(Parrot_Interp, PMC *sub, const char *sig, ...);
 
 typedef opcode_t *(*native_func_t)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,

@@ -644,7 +644,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
  */
 
 void
-Parrot_runops_fromc(struct Parrot_Interp *interpreter, PMC *sub)
+Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 {
     static PMC *ret_c = NULL;
     opcode_t offset, *dest;
@@ -665,6 +665,92 @@ Parrot_runops_fromc(struct Parrot_Interp *interpreter, PMC *sub)
 
     offset = dest - interpreter->code->byte_code;
     runops(interpreter, offset);
+}
+
+/*=for api interpreter Parrot_runops_fromc_args
+ * run parrot ops, called from c code
+ * function arguments are passed as va_args according to signature
+ * the sub argument is an invocable Sub PMC
+ *
+ * signatures are similar to NCI:
+ * v ... void return
+ * I ... INTVAL (not Interpreter)
+ * N ... NUMVAL
+ * S ... STRING*
+ * P ... PMC*
+ *
+ * return value, if any is passed as (void*)ptr or (void*)&val
+ */
+
+void *
+Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    va_list ap;
+    /* *sig is retval like in NCI */
+    int ret;
+    int next[4];
+    int i;
+    void *retval;
+
+    for (i = 0; i < 4; i++)
+        next[i] = 5;
+
+    REG_INT(0) = 1;     /* kind of a prototyped call */
+    REG_INT(1) = 0;     /* nada in P3 */
+    REG_INT(2) = 0;     /* params in P regs */
+    ret = *sig++;
+    REG_INT(3) = ret == 'v' ? 0 : -2;   /* return expected */
+    REG_INT(4) = 0;     /* no hash */
+
+    va_start(ap, sig);
+    while (*sig) {
+        switch (*sig++) {
+            case 'v':       /* void func, no params */
+                break;
+            case 'I':       /* REG_INT */
+                REG_INT(next[0]++) = va_arg(ap, INTVAL);
+                break;
+            case 'S':       /* REG_STR */
+                REG_STR(next[1]++) = va_arg(ap, STRING*);
+                break;
+            case 'P':       /* REG_PMC */
+                REG_INT(2) = 1;     /* params in P regs */
+                REG_PMC(next[2]++) = va_arg(ap, PMC*);
+                break;
+            case 'N':       /* REG_NUM */
+                REG_NUM(next[3]++) = va_arg(ap, FLOATVAL);
+                break;
+            default:
+                internal_exception(1,
+                        "unhandle signature '%c' in Parrot_runops_fromc_args",
+                        sig[-1]);
+        }
+    }
+    va_end(ap);
+
+    Parrot_runops_fromc(interpreter, sub);
+    /*
+     * TODO check, if return is prototyped, for now, assume yes
+     */
+    retval = NULL;
+    /*
+     * XXX should we trust the signature or the registers set
+     *     by the subroutine or both if possible, i.e. extract
+     *     e.g. an INTVAL from a returned PMC?
+     */
+    switch (ret) {
+        case 'v': break;
+        case 'I': retval = (void* )&REG_INT(5); break;
+        case 'S': retval = (void* ) REG_STR(5); break;
+        case 'P': retval = (void* ) REG_PMC(5); break;
+        case 'N': retval = (void* )&REG_NUM(5); break;
+        default:
+            internal_exception(1,
+                    "unhandle signature '%c' in Parrot_runops_fromc_args",
+                    ret);
+    }
+    return retval;
 }
 
 static int
