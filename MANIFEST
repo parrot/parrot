@@ -287,6 +287,7 @@ docs/intro.pod                                    [main]doc
 docs/jit.pod                                      [main]doc
 docs/memory_internals.pod                         [main]doc
 docs/mmd.pod                                      [main]doc
+docs/nanoparrot.c                                 [main]doc
 docs/native_exec.pod                              [main]doc
 docs/overview.pod                                 [main]doc
 docs/parrot.pod                                   [main]doc
