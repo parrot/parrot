@@ -46,14 +46,14 @@ typedef UINTVAL BN_NIB;
  nibs == 3, digits == 14
 */
 
-struct parrot_bignum_t {
+typedef struct {
   BN_NIB* buffer;   /* string of nibbles */
   UINTVAL nibs;     /* nibs allocated, in sizeof(BN_NIB) */
-  UNITVAL flags;    /* May store, say +Inf */
+  UINTVAL flags;    /* May store, say +Inf */
   INTVAL digits;    /* digits used */
   int sign;         /* sign of number, 0=> positive or zero, 1 => negative */
   INTVAL expn;      /* exponent of number */
-};
+} parrot_bignum_t;
 
 #define BIGNUM parrot_bignum_t
 
