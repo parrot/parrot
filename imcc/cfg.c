@@ -415,6 +415,7 @@ void search_predecessors_not_in(Basic_block *node, Set* s) {
 
 }
 /*** Utility functions ***/
+static int bb_list_size;
 
 void init_basic_blocks() {
 
@@ -422,7 +423,7 @@ void init_basic_blocks() {
 	free(bb_list);
    }
 
-   bb_list = calloc(256, sizeof(Basic_block*) );
+   bb_list = calloc(bb_list_size = 256, sizeof(Basic_block*) );
    n_basic_blocks = 0;
    edge_list = 0;
 }
@@ -457,6 +458,14 @@ Basic_block* make_basic_block(Instruction* ins) {
    bb->index = n_basic_blocks;
    bb->loop_depth = 0;
 
+   if (n_basic_blocks == bb_list_size) {
+       bb_list_size *= 2;
+       bb_list = realloc(bb_list, bb_list_size*sizeof(Basic_block*) );
+       if (bb_list == 0) {
+	   fprintf(stderr, "Out of mem in make_basic_block\n");
+	   exit(1);
+       }
+   }
    bb_list[n_basic_blocks] = bb;
    ins->basic_block = bb;
    n_basic_blocks++;

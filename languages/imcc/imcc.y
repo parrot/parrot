@@ -40,7 +40,7 @@ static SymReg ** RR(int n, ...)
     while (n--) {
 	regs[i++] = va_arg(ap, SymReg *);
     }
-    while (i > PARROT_MAX_ARGS)
+    while (i < PARROT_MAX_ARGS)
 	regs[i++] = 0;
     return regs;
 }
