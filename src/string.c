@@ -91,15 +91,15 @@ string_length(const STRING* s) {
  * functions are fleshed out, this function can DTRT.
  */
 INTVAL
-string_index(const STRING* s, UINTVAL index) {
-    return s->encoding->decode(s->encoding->skip_forward(s->bufstart, index));
+string_index(const STRING* s, UINTVAL idx) {
+    return s->encoding->decode(s->encoding->skip_forward(s->bufstart, idx));
 }
 
 /*=for api string string_ord
  * return the length of the string
  */
 INTVAL
-string_ord(const STRING* s, INTVAL index) {
+string_ord(const STRING* s, INTVAL idx) {
     UINTVAL len = 0;
 
     if (s != NULL) {
@@ -112,15 +112,15 @@ string_ord(const STRING* s, INTVAL index) {
     }
     else {
         UINTVAL true_index;
-        true_index = (UINTVAL) index;
+        true_index = (UINTVAL) idx;
 
-        if (index < 0) {
-            if ((INTVAL)(index + len) < 0) {
+        if (idx < 0) {
+            if ((INTVAL)(idx + len) < 0) {
             INTERNAL_EXCEPTION(ORD_OUT_OF_STRING,
                                    "Cannot get character before beginning of string");
         }
         else {
-                true_index = (UINTVAL)(len + index);
+                true_index = (UINTVAL)(len + idx);
             }
             }
 

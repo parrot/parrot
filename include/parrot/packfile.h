@@ -135,7 +135,7 @@ void
 PackFile_ConstTable_push_constant(struct PackFile_ConstTable * self, struct PackFile_Constant * constant);
 
 struct PackFile_Constant *
-PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t index);
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t idx);
 
 opcode_t
 PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter, struct PackFile_ConstTable * self, char * packed, opcode_t packed_size);

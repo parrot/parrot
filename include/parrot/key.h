@@ -48,13 +48,13 @@ KEY* key_clone(struct Parrot_Interp *interpreter, KEY *key);
 INTVAL key_size(struct Parrot_Interp *interpreter, KEY *key);
 void key_set_size(struct Parrot_Interp *interpreter, KEY *key, INTVAL size);
 void key_destroy(struct Parrot_Interp *interpreter, KEY *key);
-INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, INTVAL index);
-KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
-KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* index);
-void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, KEY_PAIR* value);
-void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* index, KEY_PAIR* value);
+INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx);
+KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL idx);
+KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* idx);
+void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL idx, KEY_PAIR* value);
+void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* idx, KEY_PAIR* value);
 void key_chop(struct Parrot_Interp *interpreter, KEY *key);
-void key_inc(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
+void key_inc(struct Parrot_Interp *interpreter, KEY *key, INTVAL idx);
 
 #endif
 

@@ -883,17 +883,17 @@ Retrieve a Constant from the ConstTable.
 ***************************************/
 
 struct PackFile_Constant *
-PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t index) {
+PackFile_ConstTable_constant(struct PackFile_ConstTable * self, opcode_t idx) {
     if (!self) {
         fprintf(stderr, "PackFile_ConstTable_constant: self == NULL!\n");
         return NULL;
     }
 
-    if (index < 0 || index >= self->const_count) {
+    if (idx < 0 || idx >= self->const_count) {
         return NULL;
     }
 
-    return self->constants[index];
+    return self->constants[idx];
 }
 
 

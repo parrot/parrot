@@ -146,10 +146,10 @@ return the type of element <index> of KEY <key>
 */
 
 INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, 
-                        INTVAL index) {
+                        INTVAL idx) {
   if(key != NULL) {
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
+    if((idx >= 0) || (idx < key->size)) {
+      KEY_PAIR* pair = &key->keys[idx];
       return pair->type;
     }
     else {
@@ -169,10 +169,10 @@ return the value of index <index> of KEY <key>
 */
 
 KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
-                              INTVAL index) {
+                              INTVAL idx) {
   if(key != NULL) {
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
+    if((idx >= 0) || (idx < key->size)) {
+      KEY_PAIR* pair = &key->keys[idx];
       if(pair != NULL) {
         return pair;
       }
@@ -189,9 +189,9 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
 }
 
 KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
-                              STRING* index) {
+                              STRING* idx) {
   if(key != NULL) {
-    INTVAL hash = key_hash(interpreter,index);
+    INTVAL hash = key_hash(interpreter,idx);
     KEY_PAIR* pair;
     hash = hash % NUM_BUCKETS;
     pair = &key->keys[hash];
@@ -213,10 +213,10 @@ Set the value of index <index> of key <key> to integer <value>
 */
 
 void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
-                             INTVAL index, KEY_PAIR* value) {
+                             INTVAL idx, KEY_PAIR* value) {
   if(key != NULL) {
-    if((index >= 0) || (index < key->size)) {
-      memcpy(&key->keys[index],value,sizeof(KEY_PAIR));
+    if((idx >= 0) || (idx < key->size)) {
+      memcpy(&key->keys[idx],value,sizeof(KEY_PAIR));
     }
     else {
       fprintf(stderr,
@@ -236,9 +236,9 @@ Set the value of index <index> of key <key> to string <value>
 */
 
 void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
-                             STRING* index, KEY_PAIR* value) {
+                             STRING* idx, KEY_PAIR* value) {
   if(key != NULL) {
-    INTVAL hash = key_hash(interpreter,index);
+    INTVAL hash = key_hash(interpreter,idx);
     hash = hash % NUM_BUCKETS;
     memcpy(&key->keys[hash],value,sizeof(KEY_PAIR));
   }
@@ -282,10 +282,10 @@ Increment the type of index <index> of key <key>
 =cut
 */
 
-void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
+void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx) {
   if(key != NULL) {
-    if(index > 0 && index <= key->size) {
-      KEY_PAIR* pair = &key->keys[index];
+    if(idx > 0 && idx <= key->size) {
+      KEY_PAIR* pair = &key->keys[idx];
       pair->type++;
     }
     else {

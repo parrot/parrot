@@ -51,7 +51,7 @@ string_bool(const STRING*);
 UINTVAL
 string_length(const STRING*);
 INTVAL
-string_ord(const STRING* s, INTVAL index);
+string_ord(const STRING* s, INTVAL idx);
 FLOATVAL
 string_to_num (const STRING *s);
 INTVAL
@@ -70,7 +70,7 @@ string_transcode(struct Parrot_Interp *interpreter, const STRING *src,
 void
 string_init(void);
 INTVAL
-string_index(const STRING* s, UINTVAL index);
+string_index(const STRING* s, UINTVAL idx);
 
 #endif
 
