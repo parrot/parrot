@@ -146,7 +146,14 @@ Example:
 
 Add a breakpoint. The syntax is:
 
-  b LINE
+  b LINE [if CONDITION]
+
+If you want a condition breakpoint you should first 
+specifie the register that is involved in the 
+condition (at least one must be), the comparison 
+and then the third argument can be either another 
+register or a constant, any of the two must be the 
+same type as the first register specified.
 
 The command returns a number, which is the
 breakpoint identifier. You should note this
@@ -161,6 +168,22 @@ Example:
   # another breakpoint on line 11 (will be breakpoint 1)  
   (pbd) b 11
   Breakpoint 1 at line 11
+
+  # break at line 4 if I16 is less than or equal to 123456
+  (pdb) b 4 if I16 <= 123456
+  Breakpoint 2 at line 4
+
+  # break at line 4 if N27 is greater than 5.23
+  (pdb) b 5 if N27 > 5.23
+  Breakpoint 3 at line 5
+
+  # break at line 4 if S2 is equal to S13
+  (pdb) b 6 if S2 == S13
+  Breakpoint 4 at line 6
+
+  # break at line 4 if S5 is equal to "stop"
+  (pdb) b 7 if S2 == "stop"
+  Breakpoint 5 at line 7
 
 =item delete (d)
 
