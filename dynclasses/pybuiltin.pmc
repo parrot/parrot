@@ -57,8 +57,7 @@ PMC* Parrot_lib_python_group_init(Interp* interpreter, PMC *lib_pmc) {
 static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
     STRING *pmcname = Parrot_base_vtables[class]->whoami;
     PMC *type = pmc_new(interpreter, dynclass_PyProxyType);
-    PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
-    PMC *stash, *iter, *item;
+    PMC *stash, *iter, *item, *nameprop;
     STRING *key;
     INTVAL n, j;
 
@@ -73,7 +72,7 @@ static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
         item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
 
         if (item->vtable->base_type == enum_class_NCI) {
-            PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
+            nameprop = pmc_new(interpreter, dynclass_PyString);
             VTABLE_set_string_native(interpreter, nameprop, key);
             VTABLE_setprop(interpreter, item, NAME, nameprop);
             item->vtable = Parrot_base_vtables[dynclass_PyNCI];
@@ -82,6 +81,7 @@ static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
         VTABLE_add_method(interpreter, type, key, item);
     }
 
+    nameprop = pmc_new(interpreter, dynclass_PyString);
     VTABLE_set_string_native(interpreter, nameprop, name);
     VTABLE_setprop(interpreter, type, NAME, nameprop);
 
