@@ -53,6 +53,34 @@ This PDD describes Parrot's inter-routine calling conventions.
 
 =head1 DESCRIPTION
 
+Please note that the following conventions are I<only> necessary when
+exposing subs and methods via the generic parrot routine exposure
+mechanism. What does this mean?
+
+It means the caller needs to follow these conventions I<only> when
+calling into subs and methods that it has looked up symbolically via
+parrot's default lookup system. If a language has a lighter-weight
+calling mechanism that's safe to use in some circumstances, it's
+perfectly fine to use them.
+
+This means that if you write a C compiler that targets Parrot, for
+example, you don't need to use parrot's caller-save, full-on calling
+conventions when one C function calls another if the compiler knows
+at compile (or possibly link) time what parameters are being passed
+into the function.
+
+This can potentially save a significant amount of time when dealing
+with languages that are fully, or nearly fully, bound at compile
+time, and especially when dealing with languages, such as Forth, that
+would otherwise spend an inordinate amount of time calling small
+functions.
+
+If a function isn't exposed at all, it doesn't need to have any way
+to call into it with the standard calling conventions. It's also
+perfectly acceptable for there to be two ways to call into a
+function--one with a language's private calling method, and another
+that follows the standard conventions.
+
 =head2 Responsibility for environment preservation
 
 The caller is responsible for preserving any environment it is
