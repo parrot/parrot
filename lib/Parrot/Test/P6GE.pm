@@ -80,10 +80,10 @@ package Parrot::Test::P6GE;
 
 sub _parrot_stringify {
     $_ = $_[0];
+    s/\\/\\\\/g;
     s/\n/\\n/g;
     s/\r/\\r/g;
     s/\"/\\"/g;
-    s/\\/\\\\/g;
     return $_;
 }
 
