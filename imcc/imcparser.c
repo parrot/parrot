@@ -450,7 +450,7 @@ typedef union {
     SymbolList * symlist;
     SymbolTable * symtab;
 } yystype;
-/* Line 193 of /usr/local/share/bison/yacc.c.  */
+/* Line 193 of /usr/share/bison/yacc.c.  */
 #line 455 "imcc/imcparser.c"
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
@@ -471,7 +471,7 @@ typedef struct yyltype
 /* Copy the second part of user declarations.  */
 
 
-/* Line 213 of /usr/local/share/bison/yacc.c.  */
+/* Line 213 of /usr/share/bison/yacc.c.  */
 #line 476 "imcc/imcparser.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
@@ -2886,7 +2886,7 @@ yyreduce:
 
     }
 
-/* Line 1016 of /usr/local/share/bison/yacc.c.  */
+/* Line 1016 of /usr/share/bison/yacc.c.  */
 #line 2891 "imcc/imcparser.c"
 
   yyvsp -= yylen;
