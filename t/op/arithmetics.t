@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 40;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -891,4 +891,45 @@ OK2:    print "ok 2\\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "lcm");
+        set I0, 10
+        set I1, 10
+        lcm I2, I1, I0
+        eq I2, 10, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set I1, 17
+        lcm I2, I1, I0
+        eq I2, 170, OK2
+        print I2
+        print "not "
+OK2:    print "ok 2\n"
+
+        set I0, 17
+        set I1, 10
+        lcm I2, I1, I0
+        eq I2, 170, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "gcd");
+        set I0, 125
+        set I1, 15
+        gcd I2, I1, I0
+        eq I2, 5, OK1
+        print "not "
+OK1:    print "ok 1\n"
+        end
+CODE
+ok 1
 OUTPUT
