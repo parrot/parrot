@@ -25,4 +25,5 @@ else {
 
 Configure::Data->set(
     libs => $libs,
+    link => 'g++',
 );
