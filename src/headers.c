@@ -245,7 +245,9 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
     pool = flags & PObj_constant_FLAG ?
         interpreter->arena_base->constant_pmc_pool :
         interpreter->arena_base->pmc_pool;
+#if ARENA_DOD_FLAGS
     assert(sizeof(Dead_PObj) <= sizeof(PMC));
+#endif
     pmc = pool->get_free_object(interpreter, pool);
     /* clear flags, set is_PMC_FLAG */
     if (flags & PObj_is_PMC_EXT_FLAG) {
