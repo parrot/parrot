@@ -25,3 +25,4 @@ core_pmcs.c
 *.tmp
 test
 nci.c
+test_main
