@@ -42,7 +42,7 @@ integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
 }
 
 
-pmclass Integer {
+pmclass Integer extends scalar {
 
 /*
 

@@ -22,7 +22,7 @@ N register.
 
 #include "parrot/parrot.h"
 
-pmclass Float extends mmd_default {
+pmclass Float extends scalar {
 
 /*
 
@@ -50,7 +50,7 @@ Sets the value of the number to C<value>.
 
     void set_integer_native(INTVAL value) {
         PMC_num_val(SELF) = value;
-    } 
+    }
 
 /*
 

@@ -557,8 +557,6 @@ sub init_func() {
     my $mmd_list = join(",\n        ", map {
         "{ $_->[0], $_->[1], $_->[2],
                     (funcptr_t) $_->[3] }" } @mmds);
-    # XXX mmd_default - old cruft
-    $mmd_list = '/* N/Y */' if $classname =~ /^(mmd_default|Integer|Float)$/;
     my $isa = join(" ", $classname, @{ $self->{parents} });
     $isa =~ s/\s?default$//;
     my $does = join(" ", keys(%{ $self->{flags}{does} }));
@@ -582,7 +580,7 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
     };
 EOC
 
-    $cout .= <<"EOC" if $mmd_list ne '/* N/Y */';
+    $cout .= <<"EOC";
 
     struct {
         INTVAL func_nr;
@@ -596,42 +594,44 @@ EOC
     */
     #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
     int i;
-    for (i = 0; i < (int)N_MMD_INIT; ++i) {
-	_temp_mmd_init[i].left = entry;
-    }
+    if (!pass) {
+        for (i = 0; i < (int)N_MMD_INIT; ++i) {
+            _temp_mmd_init[i].left = entry;
+        }
 EOC
     $cout .= <<"EOC";
 
-    /*
-     * parrotio calls some class_init functions during its class_init
-     * code, so some of the slots might already be allocated
-     */
-    if (!Parrot_base_vtables[entry]) {
-	temp_base_vtable.whoami = string_make(interp,
-	    "$classname", @{[length($classname)]}, "iso-8859-1",
-            PObj_constant_FLAG|PObj_external_FLAG);
-	temp_base_vtable.isa_str = string_make(interp,
-	    "$isa", @{[length($isa)]}, "iso-8859-1",
-            PObj_constant_FLAG|PObj_external_FLAG);
-	temp_base_vtable.does_str = string_make(interp,
-	    "$does", @{[length($does)]}, "iso-8859-1",
-            PObj_constant_FLAG|PObj_external_FLAG);
+        /*
+         * parrotio calls some class_init functions during its class_init
+         * code, so some of the slots might already be allocated
+         */
+        if (!Parrot_base_vtables[entry]) {
+            temp_base_vtable.whoami = string_make(interp,
+                "$classname", @{[length($classname)]}, "iso-8859-1",
+                PObj_constant_FLAG|PObj_external_FLAG);
+            temp_base_vtable.isa_str = string_make(interp,
+                "$isa", @{[length($isa)]}, "iso-8859-1",
+                PObj_constant_FLAG|PObj_external_FLAG);
+            temp_base_vtable.does_str = string_make(interp,
+                "$does", @{[length($does)]}, "iso-8859-1",
+                PObj_constant_FLAG|PObj_external_FLAG);
 
-	Parrot_base_vtables[entry] =
-	    Parrot_clone_vtable(interp, &temp_base_vtable);
-    }
+            Parrot_base_vtables[entry] =
+                Parrot_clone_vtable(interp, &temp_base_vtable);
+        }
 EOC
-    $cout .= <<"EOC" if $mmd_list ne '/* N/Y */';
-    /*
-     * register mmds
-     */
-    for (i = 0; i < (int)N_MMD_INIT; ++i) {
-        mmd_register(interp,
-            _temp_mmd_init[i].func_nr,
-            _temp_mmd_init[i].left,
-            _temp_mmd_init[i].right,
-            _temp_mmd_init[i].func_ptr);
-    }
+    $cout .= <<"EOC";
+        /*
+         * register mmds
+         */
+        for (i = 0; i < (int)N_MMD_INIT; ++i) {
+            mmd_register(interp,
+                _temp_mmd_init[i].func_nr,
+                _temp_mmd_init[i].left,
+                _temp_mmd_init[i].right,
+                _temp_mmd_init[i].func_ptr);
+        }
+    } /* pass */
 EOC
     $cout .= <<"EOC";
     $class_init_code

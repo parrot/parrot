@@ -83,5 +83,3 @@ tqueue.pmc		52
 parrotclass.pmc		53
 parrotobject.pmc	54
 
-# obsolete soon
-mmd_default.pmc		55
