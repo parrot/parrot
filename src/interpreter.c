@@ -905,10 +905,18 @@ Run parrot ops. Set exception handler and/or resume after exception.
 void
 runops(struct Parrot_Interp *interpreter, size_t offset)
 {
-    new_internal_exception(interpreter);
-    if (setjmp(interpreter->exceptions->destination)) {
-        /* an exception was thrown */
-        offset = handle_exception(interpreter);
+    /*
+     * having stacked exceptions for each runlevel doesn't work
+     * (after a longjmp the interpreter is totally messed up)
+     * I don't know, if we even need this, so for now just one
+     * exception is created
+     */
+    if (!interpreter->exceptions) {
+        new_internal_exception(interpreter);
+        if (setjmp(interpreter->exceptions->destination)) {
+            /* an exception was thrown */
+            offset = handle_exception(interpreter);
+        }
     }
     if (interpreter->profile &&
             Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
@@ -921,8 +929,9 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
     runops_ex(interpreter, offset);
     /*
      * pop off exception and put it onto the free list
+     * N/Y s. above
      */
-    {
+    if (0) {
         Parrot_exception *e = interpreter->exceptions;
         interpreter->exceptions = e->prev;
         interpreter->exc_free_list = e;
