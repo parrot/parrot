@@ -20,22 +20,21 @@ t/parser		parser tests
 Notes
 =====
 
-Before you begin, make sure that imcc is compiled (cd ../imcc; make)
+Before you begin, make sure that imcc (../imcc) is compiled.  Typing
+"make" should do this.
 
-Then, type "make test".  All the compiler test cases pass on
-my machine (Linux PPC, Perl 5.6.1), and compile in less than five
-seconds each.  However, your mileage may vary for a number of reasons:
+Then, type "make test".  All the compiler test cases pass on my
+machine (Linux PPC, Perl 5.6.1 and 5.8.0 RC 1), and compile in less
+than five seconds each.  However, your mileage may vary for a number
+of reasons:
 
-- I've heard it's unusably slow on Windows.
-- If you have Perl <= 5.005_03, "$a += 3" may fail to parse.
-- my Parse::RecDescent is hacked for speed -- mail me for a patch if
-  you want.
-- my Parrot tree contains a few minor changes that may not have made
-  it to CVS yet.
+- The parser may be unusably slow on Windows.
+- The parser will either not work or generate unusable code on
+  Perl < 5.6.
 
-Take a look at t/compiler/1.t for an idea of the kinds of operations
-currently supported.  For more details, see the POD documentation in
-P6C/*.pm, and the comments in P6C/IMCC.pm.
+Take a look at t/compiler/*.t for an idea of the kinds of operations
+currently supported.  For more internal details, see the POD
+documentation in P6C/*.pm, especially P6C/Nodes.pm.
 
 Overview
 ========
@@ -56,4 +55,11 @@ where to go from there, you might look for "XXX:", which I use to mark
 things that need fixing.  If you're interested in getting involved,
 drop me an email.
 
-/s
+Sean O'Rourke
+seano@cpan.org
+
+Contributors
+============
+
+John Kingsley		Numerous bug fixes to the parser, parser
+			tests.
