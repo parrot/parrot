@@ -242,8 +242,8 @@ pmclass UnManagedStruct extends default need_ext {
        return (INTVAL)*(INTVAL *)PMC_data(SELF);
     }
 
-    INTVAL get_pointer() {
-	return (INTVAL)(INTVAL *)PMC_data(SELF);
+    void* get_pointer() {
+	return PMC_data(SELF);
     }
 
     void set_integer_native(INTVAL value) {
