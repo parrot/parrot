@@ -225,7 +225,7 @@ sub check_cpp_indents {
     my $line = 0;
     foreach (@$source) {
         $line++;
-        if (/^\s*\#(\s*)(ifdef|if)\s+(.*)/) {
+        if (/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/) {
             next if (/PARROT_IN_CORE|_GUARD/);
 
             my $indent = "  " x (@stack);
