@@ -25,9 +25,9 @@ $description="Determining if your platform supports gdbm...";
 sub runstep {
     my ($verbose) = @_;
 
-    my $libs = Configure::Data->get('libs');
+    my $libs      = Configure::Data->get('libs');
     my $linkflags = Configure::Data->get('linkflags');
-    my $ccflags = Configure::Data->get('ccflags');
+    my $ccflags   = Configure::Data->get('ccflags');
     
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
@@ -56,19 +56,15 @@ sub runstep {
             $has_gdbm = 1;
 	    print " (yes) " if $verbose;
             $Configure::Step::result = 'yes';
-
-	    Configure::Data->set(
-		has_gdbm => '1',         # for gdbmhash.t
-		gdbmhash => 'gdbmhash',  # for dynclasses.in
-	    );
 	}
     }
     unless ($has_gdbm) {
         # The Config::Data settings might have changed for the test 
-        Configure::Data->set('libs', $libs);
-        Configure::Data->set('ccflags', $ccflags);
-        Configure::Data->set('linkflags', $linkflags);
+        Configure::Data->set( libs      => $libs );
+        Configure::Data->set( ccflags   => $ccflags );
+        Configure::Data->set( linkflags => $linkflags );
         print " (no) " if $verbose;
         $Configure::Step::result = 'no';
     }
+    Configure::Data->set( has_gdbm => $has_gdbm ); # for gdbmhash.t and dynclasses.in
 }

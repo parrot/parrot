@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -82,7 +82,7 @@ sub makefiles {
   genfile('config/gen/makefiles/tcl_examples.in', 'languages/tcl/examples/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
-          commentType => '#', replace_slashes => 1);
+          commentType => '#', replace_slashes => 1, conditioned_lines => 1);
   genfile('config/gen/makefiles/dynclasses_pl.in',   'dynclasses/build.pl',
           commentType => '#', replace_slashes => 0);
   genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',

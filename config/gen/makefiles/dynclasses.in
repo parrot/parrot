@@ -8,7 +8,7 @@ O = ${o}
 # gdbmhash is only built when 'libgdbm.so' is available
 PMCS = \
 foo \
-${gdbmhash} \
+#CONDITIONED_LINE(has_gdbm):gdbmhash \
 match matchrange \
 pybuiltin \
 pyclass \

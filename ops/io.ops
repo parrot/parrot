@@ -367,7 +367,7 @@ inline op readline(out STR, in PMC) :base_io {
   $1 = NULL;
   if (!ok)
       real_exception(interpreter, resume, PIO_ERROR,
-          "File not found");
+          "Cannot read line from empty filehandle");
 
   if ($2) {
     PIO_setlinebuf(interpreter, $2);
