@@ -112,7 +112,7 @@ PackFile_destroy(struct PackFile *pf)
     }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped)
-        munmap(pf->src, pf->size);
+        munmap((void*)pf->src, pf->size);
 #endif
     mem_sys_free(pf->header);
     mem_sys_free(pf->dirp);
@@ -369,7 +369,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
                 self->need_endianize || self->need_wordsize)) {
-        munmap(self->src, self->size);
+        munmap((void *)self->src, self->size);
         self->is_mmap_ped = 0;
     }
 #endif
