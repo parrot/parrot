@@ -19,59 +19,62 @@
  * Prints the PC, OP and ARGS. Used by trace_op
  */
 void
-trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, 
-              opcode_t *pc) {
+trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
+              opcode_t *pc)
+{
     INTVAL i;
 
     fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
-        interpreter->op_info_table[*pc].full_name);
+            interpreter->op_info_table[*pc].full_name);
 
     if (interpreter->op_info_table[*pc].arg_count > 1) {
         fprintf(stderr, "; ARGS=(");
-        for(i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
-            if (i > 1) { fprintf(stderr, ", "); }
-            switch(interpreter->op_info_table[*pc].types[i]) {
+        for (i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
+            if (i > 1) {
+                fprintf(stderr, ", ");
+            }
+            switch (interpreter->op_info_table[*pc].types[i]) {
             case PARROT_ARG_IC:
-                fprintf(stderr, "%ld", (long) *(pc + i));
+                fprintf(stderr, "%ld", (long)*(pc + i));
                 break;
             case PARROT_ARG_NC:
                 fprintf(stderr, "%f", interpreter->code->const_table->
-                                       constants[*(pc + i)]->number);
+                        constants[*(pc + i)]->number);
                 break;
             case PARROT_ARG_PC:
                 /* what is a PMC constant look like? */
-                fprintf(stderr, "%ld", (long) *(pc + i));
+                fprintf(stderr, "%ld", (long)*(pc + i));
                 break;
             case PARROT_ARG_SC:
-                fprintf(stderr, "\"%s\"", 
-                    (char *) interpreter->code->const_table->
-                              constants[*(pc + i)]->string->bufstart);
+                fprintf(stderr, "\"%s\"",
+                        (char *)interpreter->code->const_table->
+                        constants[*(pc + i)]->string->bufstart);
                 break;
             case PARROT_ARG_I:
-                fprintf(stderr, "I%ld=%ld", (long) *(pc + i), 
-                    (long) interpreter->int_reg.registers[*(pc + i)]);
+                fprintf(stderr, "I%ld=%ld", (long)*(pc + i),
+                        (long)interpreter->int_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_N:
-                fprintf(stderr, "N%ld=%f", (long) *(pc + i), 
-                    interpreter->num_reg.registers[*(pc + i)]);
+                fprintf(stderr, "N%ld=%f", (long)*(pc + i),
+                        interpreter->num_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC constant look like? */
-                fprintf(stderr, "P%ld=???", (long) *(pc + i));
+                fprintf(stderr, "P%ld=???", (long)*(pc + i));
                 break;
             case PARROT_ARG_S:
-                if(interpreter->string_reg.registers[*(pc + i)]) {
-                    fprintf(stderr, "S%ld=\"%s\"", (long) *(pc + i), 
-                        (char *) interpreter->string_reg.
+                if (interpreter->string_reg.registers[*(pc + i)]) {
+                    fprintf(stderr, "S%ld=\"%s\"", (long)*(pc + i),
+                            (char *)interpreter->string_reg.
                             registers[*(pc + i)]->bufstart);
                 }
                 else {
-                    fprintf(stderr, "S%ld=(null)", (long) *(pc + i));
+                    fprintf(stderr, "S%ld=(null)", (long)*(pc + i));
                 }
                 break;
             case PARROT_ARG_OP:
                 /* this isn't handled, so at least report the error
-                   instead of silently ignoring the problem */
+                 * instead of silently ignoring the problem */
                 internal_exception(ARG_OP_NOT_HANDLED,
                                    "PARROT_ARG_OP in enumeration not handled in switch");
                 break;
@@ -79,7 +82,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 /* -Wall expects us to cover PARROT_ARG_OP somewhere. */
                 fprintf(stderr, "?(%i)%ld=???",
                         interpreter->op_info_table[*pc].types[i],
-                        (long) *(pc + i));
+                        (long)*(pc + i));
                 break;
             }
         }
@@ -98,23 +101,24 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
  * With bounds checking.
  */
 void
-trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, 
-         opcode_t * code_end, opcode_t *pc) {
+trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
+         opcode_t *code_end, opcode_t *pc)
+{
 
     if (!pc) {
         return;
     }
 
-    (void)fflush(NULL); /* Flush *ALL* output before printing trace info */
+    (void)fflush(NULL);         /* Flush *ALL* output before printing trace info */
     if (pc >= code_start && pc < code_end) {
         trace_op_dump(interpreter, code_start, pc);
     }
     else if (pc) {
         fprintf(stderr, "PC=%ld; OP=<err>\n", (long)(pc - code_start));
     }
-    
+
     /* Flush *stderr* now that we've output the trace info */
-    (void)fflush(stderr); 
+    (void)fflush(stderr);
 }
 
 

@@ -24,8 +24,11 @@
  */
 
 opcode_t *
-runops_fast_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    while (pc) { DO_OP(pc, interpreter); }
+runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    while (pc) {
+        DO_OP(pc, interpreter);
+    }
     return pc;
 }
 
@@ -36,30 +39,31 @@ runops_fast_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
  * With bounds checking.
  */
 
-void trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, 
-              opcode_t * code_end, opcode_t *pc);
+void trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
+              opcode_t *code_end, opcode_t *pc);
 
 opcode_t *
-runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
-    opcode_t * code_start;
-    INTVAL     code_size; /* in opcodes */
-    opcode_t * code_end;
-    opcode_t * lastpc = NULL;
+runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+{
+    opcode_t *code_start;
+    INTVAL code_size;           /* in opcodes */
+    opcode_t *code_end;
+    opcode_t *lastpc = NULL;
     FLOATVAL starttime = 0;
 
     code_start = interpreter->code->byte_code;
-    code_size  = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end   = interpreter->code->byte_code + code_size;
+    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
+    code_end = interpreter->code->byte_code + code_size;
 
     if (interpreter->flags & PARROT_TRACE_FLAG) {
-      trace_op(interpreter, code_start, code_end, pc);
+        trace_op(interpreter, code_start, code_end, pc);
     }
-    
-    while (pc && pc >= code_start && pc < code_end ) {
+
+    while (pc && pc >= code_start && pc < code_end) {
         if (interpreter->flags & PARROT_PROFILE_FLAG) {
             interpreter->profile[*pc].numcalls++;
-            lastpc=pc;
-            starttime=Parrot_floatval_time();
+            lastpc = pc;
+            starttime = Parrot_floatval_time();
         }
 
         DO_OP(pc, interpreter);
@@ -68,7 +72,8 @@ runops_slow_core (struct Parrot_Interp *interpreter, opcode_t * pc) {
             trace_op(interpreter, code_start, code_end, pc);
         }
         if (interpreter->flags & PARROT_PROFILE_FLAG) {
-            interpreter->profile[*lastpc].time += Parrot_floatval_time() - starttime;
+            interpreter->profile[*lastpc].time +=
+                Parrot_floatval_time() - starttime;
         }
     }
 
