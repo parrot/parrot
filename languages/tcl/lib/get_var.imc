@@ -52,7 +52,7 @@ continue:
   return_type = TCL_OK
 
   .local Exception_Handler ignore
-  newsub ignore, .Exception_Handler, __default_handler
+  newsub ignore, .Exception_Handler, catch
 
   #print "a\n"
   name=argv[0] 
@@ -151,4 +151,9 @@ done:
   #print retval
   #print "\n"
   .return(return_type,retval)
+
+catch:
+  P4 = P5["_invoke_cc"]
+  invoke P4
+
 .end

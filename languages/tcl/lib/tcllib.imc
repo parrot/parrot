@@ -82,7 +82,7 @@ providing a compreg-compatible method.
 .sub __prepare_lib @LOAD
 
   # Load any dependant libraries.
-  $P0 = loadlib "tclgroup"
+  $P0 = loadlib "tcl_group"
   load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "runtime/parrot/library/Data/Escape.pbc"
  
@@ -221,13 +221,14 @@ providing a compreg-compatible method.
 # instruction. It's our job to deal with it in the calling
 # code, then.
 
-.namespace [ "_Tcl"]
-.emit
-__default_handler:
-  set P4, P5["_invoke_cc"]
-  set P5, P5["_P5"]
-  invoke P4
-.eom
+# WJC - 11/21 - not allowed to use a non-local handler anymore.
+#.namespace [ "_Tcl"]
+#.emit
+#__default_handler:
+  #set P4, P5["_invoke_cc"]
+  #set P5, P5["_P5"]
+  #invoke P4
+#.eom
 
 #
 # should probably move all this into another _template file.
@@ -250,6 +251,9 @@ __default_handler:
   .include "languages/tcl/lib/commands/global.imc"
   .include "languages/tcl/lib/commands/if.imc"
   .include "languages/tcl/lib/commands/incr.imc"
+  .include "languages/tcl/lib/commands/lappend.imc"
+  .include "languages/tcl/lib/commands/list.imc"
+  .include "languages/tcl/lib/commands/llength.imc"
   .include "languages/tcl/lib/commands/open.imc"
   .include "languages/tcl/lib/commands/proc.imc"
   .include "languages/tcl/lib/commands/puts.imc"

@@ -51,7 +51,7 @@ end_scope:
 
   .local string caller_sub_text
   .local Exception_Handler ignore
-  newsub ignore, .Exception_Handler, __default_handler
+  newsub ignore, .Exception_Handler, catch
   .local string fixup_proc
   fixup_proc  = "_"
   fixup_proc .= proc
@@ -101,4 +101,9 @@ no_command:
 
 done:
   .return(return_type,retval)
+
+catch:
+  P4 = P5["_invoke_cc"]
+  invoke P4
+
 .end
