@@ -1,13 +1,74 @@
-=head1 TODO
+=head1 Plan of Attack
 
-If only I had an RT queue for these! ^_^
+provide a way to access existing library PIR from inside Tcl.
+
+Add benchmarks?
+
+Pre-compile library routines for extra speed? (precompiled everything 
+internally that we can.)
+
+Disable -G everywhere (examples, test suite).
+
+post bug regarding dynpmcs failing to work as advertised.
+
+BUG in GC? running "slow" with -t dies with a tcl error.
+running "slow" with -tG seems to complete fine.
+
+Come up with a small test case and throw it at the list.
 
 =over 4
+
+Compile tcllib, include the compiled version instead of the IMC version.
+Use a compiled version of Data/Escape.imc.
+
+When converting to Tcl*, be sure to take advantage of morphing. Right now,
+we're kind of avoiding morphing. (like, having separate new PerlInt and 
+PerlString conditionally depending on the code path.)
+
+=item Dynamic Tcl PMCs, build, switch.
+
+Ok. First, we need to build the dyn pmcs using the new build "group" tag.
+
+Then, we need to go through and eliminate all references to Perl*
+
+We need to also make sure that we /take/ any PMC and try to do the right
+thing. Don't /require/ that someone pass in a TclString when a PerlString
+will work fine, thanks.
+
+Stop using Perl* PMCs. it's just rude.
+
+=item implement [list]
+
+This should now be blindingly simple, given an actual TclList PMC.
+
+=head1 TODO (big pile)
+
+=over 4
+
+=item Self contained...
+
+Make everything that tcl requires self contained. this should include
+Dyn classes, MANIFEST, makefile generation, and test suite goodness.
+
+(This covers an RT ticket...)
+
+=item PARROT-OLD
+
+Get the new parse that controls block_interpolation. (This means updating
+every call to __parse as well...)
+
+=item parser
+
+parser should also return return_type and retval with the parsed_string.
+Then we can throw actual errors during the parse process. (as opposed to
+now, where we print and abort.)
 
 =item builtins
 
 for any of the builtins that take a fixed number of ops, remove the
-call to C<foldup> and simply define the C<.params>
+call to C<foldup> and simply define the C<.params> (This was done in the 
+parrot-old branch. It's only a minor savings, though, so don't bother
+saving it.)
 
 =item given freeze/thaw for objects...
 
@@ -15,6 +76,8 @@ Once freeze/thaw is working for tclwords (currently waiting on parrot
 support), rewrite proc to preparse
 once and cache the result in the generated sub rather than reparsing
 each time.
+
+(Though this seems evil, too. There must be a better way.)
 
 =item upvar, uplevel
 
@@ -27,7 +90,9 @@ that we're using.
 	uplevel ?level? arg ?arg ...?
 	upvar ?level? otherVar myVar ?otherVar myVar ...?
 
-How do we do this and play nice with other languages?
+How do we do this and play nice with other languages? I don't think we can.
+
+Language interoperability can presumably be dealt with after we've a language.
 
 =item TclWord
 
@@ -35,12 +100,12 @@ implement C<is_const> to allow for some optimizations in the compiler.
 when adding words, default to true, but if at any point we add a variable
 or a command, invalidate that. (mostly done!)
 
-Move TclWord namespace into _Tcl::Word, less clutter.
+Move TclWord namespace into _Tcl::Word, less clutter?
 
 =item (LOW) varnames
 
 Bitten by overuse of generic IMC vars like $I0 - should reduce their usage as
-much as possible to simplify upkeep
+much as possible to simplify upkeep.
 
 =item [[list]] proc
 
@@ -50,8 +115,8 @@ support default values (e.g.: proc joe {{drink coffee}} { slurp $drink } )
 
 =item compiler vs. interpreter
 
-Given that our interpreter is already compiling anonymous subs on the fly,
-it should be possible to further extend this to make an actual compiler,
+it should be possible to further extend our interpreter
+this to make an actual compiler,
 where the _compiler emits PIR. So, the resulting call from, say, [source]
 would be:
 
@@ -70,8 +135,8 @@ and simply be able to extract the generated PIR.
 
 Comparing examples/fact.tcl with parrot vs. tclsh (OSX)
 
-	??/??/??: 8-12 x slower, single call
-	05/14/04: 2-4x slower, single call, but 500 calls in a loop slows us down to 60x!
+ ??/??/??: 8-12 x slower, single call
+ 05/14/04: 500 calls in a loop slows us down to 60x!
 
 =item Tests
 
@@ -82,7 +147,9 @@ tests so they're consistent.
 
 =item PIR tests failing systematically
 
-=item Add tests for the tclword object.
+=item Add tests for...
+
+tclword, [concat], [join]
 
 =item 
 
@@ -178,8 +245,7 @@ do i access the hash if I'm using the default new_pad variant?)
 [array statistics] - useless?
 
 [array anymore], [array donesearch] [array nextelement], [array startsearch]
-
-[error], [catch]
+ { use iterators }
 
 [global]
 
@@ -213,6 +279,9 @@ The following items require [string match] to be implemented: [array get],
 
 Need unicode support for \u escapes, and for "string wordend",
 "string wordstart", "string is", "string bytelength", 
+
+This now works in parrot, modulo support for actually, oh, printing things
+out.
 
 =item given arrays
 
@@ -254,12 +323,6 @@ and respect them, and process intermediate input.
 
 =item misc
 
-use shebang magic in the examples to make them directly runnable.
-(see power.tcl for an example - this really should be done in the same
-way the generated makefiles are)
-
-=item misc
-
 octal, hex, and unicode escapes are not supported. (Not sure parrot is
 ready for this yet)
 
@@ -275,17 +338,30 @@ a rethunk on how we're passing data around - FYI, if we're going to be using
 PerlInt, PerlNum, etc, we need to make sure they stringify as tcl
 expects them to - a PerlNum of 5 -> "5" instead of "5.0", e.g.)
 
-With this, write error. (which needs global vars first)
-
-Then make sure that if the script ends with a non TCL_OK status, that 
-the return value that percolated up is printed out.
+complete [error] (need global var support)
 
 If the return type of the outermost script is not OK, return the
-appropriate code to the system.
+I<appropriate> code to the system.
 
-Then write catch.
+=item error handling
 
-Then think about stacktraces.
+stacktraces - for example, the script
+
+       error bye
+
+Should print out:
+
+       bye
+               while executing
+       "error bye
+       "
+               (file "foo.tcl" line 1)
+
+When returning a tcl error, we should probably return a PMC with a 
+Tcl stack trace in it.
+
+Also need to keep track of the file/line when parsing, and shove that into
+the TclWord array somehow.
 
 =item misc
 
@@ -293,23 +369,6 @@ list variables - stringToList already exists (had to write it for "proc"s
 argument handling.) - need to write listToString, need to be able to save
 Lists as variables.  - This should now be possible, with the addition of the
 Tcl* PMCs.
-
-(That last comment seems to assume that I'm not going to want to pass
-around just strings, but instead have real variables types: a laudable but
-currently undone goal. For example, we could do the following:
-
-	arrays  - PerlHash
-	lists   - PerlArray
-	strings - PerlString
-	ints    - PerlInt
-        floats  - PerlNum
-
-right now, anything in an expression is done as an int, and anything
-returned from a command is a PerlString. Should start passing around a 
-pmc as the value for both of these, and have anything that needs to 
-operate on a value be smart enough to know how to convert it to the 
-appropriate type. Correction - the types need to be smart enough to
-convert themselves, which they now (mostly) do.
 
 Expressions are a bit harder because we need an additional
 bit of information. (is this an op, an operand, or "a chunk that is yet to
@@ -333,8 +392,8 @@ implemented procs will require updating after procs/features are added.
 
   switch  {regexp regsub "string match"}
 
-  list {concat, llength, linsert, lreplace, lrange, lappend,
-          lsearch, lsort, split, join}
+  list {llength, linsert, lreplace, lrange, lappend,
+          lsearch, lsort, split}
 
   cd, file, pwd, pid, glob
 
@@ -344,7 +403,7 @@ implemented procs will require updating after procs/features are added.
 
   scan {list}
 
-  info, exec
+  info, exec {use exec/spawn opcodes.}
 
   auto_mkindex*, trace*
 
@@ -410,9 +469,11 @@ defined ops and functions.
 
 	is_space
 
-=item test internal funcs
 
-	match_close.imc:.pcc_sub __match_close prototyped
+=item .imc vs. .pbc
+
+make I<could> compile all the .imc's to .pbc's - no point in doing a PIR
+compile step each time we run. 
 
 =back 4
 

@@ -44,7 +44,7 @@ providing a compreg-compatible method.
 .sub __prepare_lib @LOAD
 
   # Load any dependant libraries.
-  load_bytecode "languages/tcl/lib/tclword.imc"
+  load_bytecode "languages/tcl/lib/tclword.pbc"
   load_bytecode "library/Data/Escape.imc"
 
   .local string mode

@@ -7,7 +7,7 @@
 .sub _main @MAIN
   .param pmc argv
 
-  load_bytecode "languages/tcl/lib/tcllib.imc"
+  load_bytecode "languages/tcl/lib/tcllib.pbc"
 
   .local pmc filename
   .local string mode
