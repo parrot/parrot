@@ -1,6 +1,7 @@
 #! perl -w
 
 use Parrot::Test tests => 58;
+use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L

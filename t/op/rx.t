@@ -1,4 +1,5 @@
 use Parrot::Test tests => 22;
+use Test::More;
 
 sub gentest($$;$$) {
 	$_[2] ||= "";

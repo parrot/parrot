@@ -1,6 +1,7 @@
 #! perl -w
 
 use Parrot::Test tests => 15;
+use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.

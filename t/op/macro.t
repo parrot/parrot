@@ -1,6 +1,7 @@
 #! perl -w
 
 use Parrot::Test tests => 9;
+use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 answer	macro

@@ -1,26 +1,3 @@
-#
-
-package Parrot::Test::EvilSubWrapper;
-#This chamber of horrors allows us to goto a subroutine
-#  and still be able to perform actions afterwards.
-#  Inspired by something I read about on the Conway
-#  Channel.  --BD  01/07/2002
-
-sub new {
-	my($class, $action, $destruct)=@_;
-
-	bless {action => $action, destruct => $destruct}, $class;
-}
-
-sub subr {
-	$_[0]->{action}
-}
-
-sub DESTROY {
-	goto &{$_[0]->{destruct}};
-}
-
-
 package Parrot::Test;
 
 use strict;
@@ -28,17 +5,18 @@ use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 
 require Exporter;
-require Test::More;
+require Test::Builder;
+my $Builder = Test::Builder->new;
 
-@EXPORT = ( qw(output_is output_like output_isnt), @Test::More::EXPORT );
-@ISA = qw(Exporter Test::More);
+@EXPORT = ( qw(output_is output_like output_isnt) );
+@ISA = qw(Exporter);
 
 sub import {
   my( $class, $plan, @args ) = @_;
 
-  Test::More->import( $plan, @args );
+  Test::Builder->plan( $plan, @args );
 
-  __PACKAGE__->_export_to_level( 2, __PACKAGE__ );
+  __PACKAGE__->export_to_level( 2, __PACKAGE__ );
 }
 
 # this kludge is an hopefully portable way of having
@@ -63,10 +41,16 @@ sub _run_command {
 
 my $count;
 
-foreach my $i ( qw(is isnt like) ) {
+# Map the Parrot::Test function to a Test::Builder method.
+my %Test_Map = ( output_is   => 'is_eq', 
+                 output_isnt => 'isnt_eq', 
+                 output_like => 'like' 
+               );
+
+foreach my $func ( keys %Test_Map ) {
   no strict 'refs';
 
-  *{"Parrot::Test::output_$i"} = sub ($$;$) {
+  *{'Parrot::Test::'.$func} = sub ($$;$) {
     ++$count;
     my( $assembly, $output, $desc ) = @_;
     $output =~ s/\cM\cJ/\n/g;
@@ -92,22 +76,16 @@ foreach my $i ( qw(is isnt like) ) {
     }
     close OUTPUT;
 
-    @_ = ( $prog_output, $output, $desc );
+    my $meth = $Test_Map{$func};
+    my $pass = $Builder->$meth( $prog_output, $output, $desc );
 
-    my $func=new Parrot::Test::EvilSubWrapper(
-        \&{"Test::More::$i"},
-        sub {
-		unless($ENV{POSTMORTERM}) {
-			foreach my $i ( $as_f, $by_f, $out_f ) {
-				unlink $i;
-			}
-		}
-	}
-    );
+    unless($ENV{POSTMORTERM}) {
+      foreach my $i ( $as_f, $by_f, $out_f ) {
+        unlink $i;
+      }
+    }
 
-    goto &{$func->subr};
-#    my $ok = &{"Test::More::$i"}( @_ );
-#    if($ok) { foreach my $i ( $as_f, $by_f, $out_f ) { unlink $i } }
+    return $pass;
   }
 }
 

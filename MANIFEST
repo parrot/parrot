@@ -31,9 +31,9 @@ Parrot/Vtable.pm
 README
 README.OS_X
 TODO
+Test/Builder.pm
 Test/More.pm
 Test/Simple.pm
-Test/Utils.pm
 Types_pm.in
 VERSION
 assemble.pl
