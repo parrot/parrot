@@ -1492,7 +1492,7 @@ case 71:
 YY_RULE_SETUP
 #line 281 "imcc.l"
 {
-        int type = get_pmc_num(interp, yytext+1);
+        int type = Parrot_get_pmc_num(interp, yytext+1);
 
         if (type) {
             char *buf = malloc(16);
