@@ -12,6 +12,7 @@
 
 .constant Space 32
 .constant Tab 9
+.constant CellSize 65536
 
 #
 # Allocate registers
@@ -34,6 +35,7 @@
 # This may move elsewhere, hence the indirection
 .constant NestLevel	I14
 .constant PendingElse   I15
+.constant LastCellUsed	I16
 
 .macro GetNestLevel
   noop
@@ -88,6 +90,7 @@
 .constant FalsePMC	P28
 .constant ReturnStack	P30
 .constant PMCStack	P31
+.constant CellPMC	P28
 
 VeryBeginning:
 
@@ -199,6 +202,9 @@ InitializeCoreOps:
     set .TruePMC, 1
     new .FalsePMC, .Integer
     set .FalsePMC, 0
+    new .CellPMC, .Array
+    set .CellPMC, .CellSize   # Our cell area is 64K by default
+    set .LastCellUsed, 0
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -469,13 +475,14 @@ InitializeCoreOps:
     # Memory, Memory Access
     #
 
-# @
-# !
-# +!
-# c@
-# c!
-# 2@
-# 2!
+  .AddCoreOp(Store_Cell, "!")
+  .AddCoreOp(Add_Cell, "+!")
+  .AddCoreOp(Get_Cell, "@")
+  .AddUserOp("cell+", "1 +")
+  .AddUserOp("2!", "swap over ! cell+ !")
+  .AddUserOp("2@", "dup cell+ @ swap @")
+  .AddCoreOp(Store_Cell, "c!")
+  .AddCoreOp(Get_Cell, "c@")
 # f@
 # f!
 # sf@
@@ -487,10 +494,9 @@ InitializeCoreOps:
     # Memory, Address arithmetic
     #
 
-# chars
-# char+
-# cells
-# cell+
+  .AddUserOp("chars", "0 +")
+  .AddUserOp("char+", "1 +")
+  .AddUserOp("cells", "0 +")
 # cell
 # aligned
 # floats
@@ -629,6 +635,7 @@ InitializeCoreOps:
    .AddCoreOp(Print_Space, "space")
    .AddCoreOp(Print_Spaces, "spaces")
    .AddCoreOp(Print_CR, "cr")
+   .AddUserOp("bl", "32")
    .AddCoreOp(Emit, "emit")
    .AddCoreOp(Execute, "execute")
 
@@ -1157,6 +1164,30 @@ Within:
     branch DoneInterpretWord
  Is_not_within:
     .PushFalse
+    branch DoneInterpretWord
+
+Store_Cell:
+    .PopInt
+    .PopPMC
+    set .CellPMC[.IntStack], .PMCStack
+    branch DoneInterpretWord
+
+Get_Cell:
+    .PopInt
+    set .PMCStack, .CellPMC[.IntStack]
+    .PushPMC
+    branch DoneInterpretWord
+
+Add_Cell:
+    .PopInt
+    .PopPMC
+    set .TempPMC, .CellPMC[.IntStack]
+    set .TempInt2, .TempPMC
+    set .TempInt, .PMCStack
+    add .TempInt, .TempInt, .TempInt2
+    new .TempPMC, .Integer
+    set .TempPMC, .TempInt
+    set .CellPMC[.IntStack], .TempPMC
     branch DoneInterpretWord
 
 DoneInterpretWord:
