@@ -301,7 +301,7 @@ void Parrot_pop_cs(struct Parrot_Interp *);
 
 /* Debug stuff */
 struct PackFile_Debug * Parrot_new_debug_seg(struct Parrot_Interp *,
-        struct PackFile_ByteCode *cs, char *filename, size_t size);
+        struct PackFile_ByteCode *cs, const char *filename, size_t size);
 /*
 ** PackFile_ConstTable Functions:
 */
