@@ -27,9 +27,11 @@ enum {
 pmclass UnManagedStruct extends default need_ext {
 
     /* Initialize the struct with some data. This should be an array
-       of triples
+     * of triples - of what -leo
+     */
+
     void init_pmc (PMC* value) {
-      
+
     }
 
     INTVAL is_equal (PMC* value) {

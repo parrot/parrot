@@ -21,10 +21,15 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
       SELF->cache.int_val = 0;
     }
 
+    void init_pmc (PMC* value) {
+	SUPER(value);
+	SELF.init();
+    }
+
     void destroy () {
-      if (PMC_data(SELF)) {
-        mem_sys_free(PMC_data(SELF));
-      }
+	if (PMC_data(SELF)) {
+	    mem_sys_free(PMC_data(SELF));
+	}
     }
 
     /* Returns -1 for out-of-bounds access */

@@ -670,6 +670,13 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
     }
 #endif
     runops_ex(interpreter, offset);
+    /*
+     * not yet - this needs classifying of exceptions and handlers
+     * so that only an exit handler does catch this exception
+     */
+#if 0
+    do_exception(EXCEPT_exit, 0);
+#endif
 }
 
 static int

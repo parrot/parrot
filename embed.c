@@ -311,6 +311,73 @@ prof_sort_f(const void *a, const void *b)
     return 0;
 }
 
+static void
+print_profile(int status, void *p)
+{
+    Parrot_Interp interpreter = (Parrot_Interp) p;
+
+    if (interpreter->profile != NULL) {
+        UINTVAL j;
+        int k;
+        UINTVAL op_count = 0;
+        UINTVAL call_count = 0;
+        FLOATVAL sum_time = 0.0;
+
+        PIO_printf(interpreter, "\n\n");
+        PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
+        PIO_printf(interpreter, "  CODE   OP FULL NAME            CALLS  TOTAL TIME    AVG TIME\n");
+        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
+
+        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++)
+            interpreter->profile->data[j].op = j;
+        qsort(interpreter->profile->data, interpreter->op_count +
+                PARROT_PROF_EXTRA,
+                sizeof(ProfData), prof_sort_f);
+        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
+            UINTVAL n = interpreter->profile->data[j].numcalls;
+            FLOATVAL t = interpreter->profile->data[j].time;
+            if (n > 0) {
+                op_count++;
+                call_count += n;
+                sum_time += t;
+
+                k = interpreter->profile->data[j].op;
+                PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
+                        k,
+                        k == (int)interpreter->op_count ?
+                        "Exception" :
+                        interpreter->op_info_table[k].full_name,
+                        n,
+                        t,
+                        (FLOATVAL)(t / n)
+                        );
+            }
+        }
+
+        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
+        PIO_printf(interpreter, "  %5vu  %-20s  %7vu  %10vf  %10vf\n",
+                op_count,
+                "",
+                call_count,
+                sum_time,
+                (FLOATVAL)(sum_time / (FLOATVAL)call_count)
+                );
+    }
+}
+
+static void
+print_debug(int status, void *p)
+{
+    Parrot_Interp interpreter = (Parrot_Interp) p;
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+        /* Give the souls brave enough to activate debugging an earful
+         * about GC. */
+
+        PIO_eprintf(interpreter, "*** Parrot VM: Dumping GC info ***\n");
+        PDB_info(interpreter);
+    }
+}
+
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
@@ -377,69 +444,17 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
 #endif
 
+    /*
+     * If any profile information was gathered, print it out
+     * before exiting, then print debug infos if turned on
+     */
+    Parrot_on_exit(print_debug,   interpreter);
+    Parrot_on_exit(print_profile, interpreter);
+
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     runops(interpreter,  0);
-
-    /*
-     * If any profile information was gathered, print it out:
-     */
-
-    if (interpreter->profile != NULL) {
-        UINTVAL j;
-        int k;
-        UINTVAL op_count = 0;
-        UINTVAL call_count = 0;
-        FLOATVAL sum_time = 0.0;
-
-        PIO_printf(interpreter, "\n\n");
-        PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
-        PIO_printf(interpreter, "  CODE   OP FULL NAME            CALLS  TOTAL TIME    AVG TIME\n");
-        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
-
-        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++)
-            interpreter->profile->data[j].op = j;
-        qsort(interpreter->profile->data, interpreter->op_count +
-                PARROT_PROF_EXTRA,
-                sizeof(ProfData), prof_sort_f);
-        for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
-            UINTVAL n = interpreter->profile->data[j].numcalls;
-            FLOATVAL t = interpreter->profile->data[j].time;
-            if (n > 0) {
-                op_count++;
-                call_count += n;
-                sum_time += t;
-
-                k = interpreter->profile->data[j].op;
-                PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
-                        k,
-                        k == (int)interpreter->op_count ?
-                        "Exception" :
-                        interpreter->op_info_table[k].full_name,
-                        n,
-                        t,
-                        (FLOATVAL)(t / n)
-                        );
-            }
-        }
-
-        PIO_printf(interpreter, "  -----  -----------------     -------  ----------  ----------\n");
-        PIO_printf(interpreter, "  %5vu  %-20s  %7vu  %10vf  %10vf\n",
-                op_count,
-                "",
-                call_count,
-                sum_time,
-                (FLOATVAL)(sum_time / (FLOATVAL)call_count)
-                );
-    }
-
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        /* Give the souls brave enough to activate debugging an earful
-         * about GC. */
-
-        PIO_eprintf(interpreter, "*** Parrot VM: Dumping GC info ***\n");
-        PDB_info(interpreter);
-    }
 }
+
 
 /* XXX Doesn't handle arguments with spaces */
 static char*
