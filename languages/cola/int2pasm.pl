@@ -36,6 +36,7 @@ my %regtypemap = (
     'string' => 'S',
     'int' => 'I',
     'float' => 'N',
+    'array' => 'P',
     'pmc' => 'P'
 );
 
@@ -100,7 +101,13 @@ sub reset_reg_tracker {
 
 sub alloc_reg {
     my $type = shift;
-    my $name = shift;
+    my $arrayspec = shift;
+
+    # Hack for arrays
+    if($arrayspec) {
+        $type = 'array';
+    }
+
     if(length $type > 0) {
         my $ttype = $type;
         $type = $regtypemap{$type};
@@ -113,9 +120,6 @@ sub alloc_reg {
             $type = 'P'; 
         }
     }
-    if($regs{$name}) {
-        return $regs{$name};
-    }
     
     my $stack = $regmap{$type};
     if(defined $stack) {
@@ -124,7 +128,7 @@ sub alloc_reg {
             warn "Oops: No more $type registers\n";
             return undef;
         }
-        #print "#Allocing reg $type$reg\n";
+        print STDERR ">>#Allocing reg $type$reg\n";
         return "$type$reg";
     } else {
         die "No register type [$type]\n";
@@ -160,6 +164,7 @@ sub is_rval {
 sub reg_assign {
     my $lexical = shift;
     my $type = shift;
+    my $arrayspec = shift;
     #print "reg_assign($lexical,$type)\n";
     # Literal
     if($lexical =~ /^(\d|[.+-]|\"|\')/) {return $lexical;}
@@ -334,9 +339,9 @@ sub directive {
     my $line = shift;
     my ($dir, $rest) = $line =~ /(\w+)(.*)/;
     if( $dir eq 'local' ) {
-        my ($type, $name) = $rest =~ /(\w+)\s+(\w+)/;
-        $regs{$name} = &alloc_reg($type);
-        #print "\t#directive [local,$type,$name]\n";
+        my ($type, $arrayspec, $name) = $rest =~ /(\w+)(\[.*?\])?\s+(\w+)/;
+        $regs{$name} = &alloc_reg($type, $arrayspec);
+        print STDERR "\t#directive [local,$type ($arrayspec),$regs{$name}]\n";
     }
     elsif( $dir eq 'param' ) {
         my ($type, $name) = $rest =~ /(\w+)\s+(\w+)/;
@@ -383,7 +388,7 @@ sub assign_expr {
 
     my $targ;
     
-    print STDERR "[$left] [$right]\n";
+    #print STDERR "[$left] [$right]\n";
     
     # Check to see if target is indirection
     # Only strings are supported for now, hence the

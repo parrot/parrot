@@ -14,17 +14,17 @@
 #include "cola.h"
 #include "parser.h"
 
-Symbol *        global_namespace;
-SymbolTable *    global_symbol_table;
-Symbol *        current_namespace;
-SymbolTable *    current_symbol_table;
-Symbol *        namespace_stack;
-SymbolTable *    const_str;
+Symbol          *global_namespace;
+SymbolTable     *global_symbol_table;
+Symbol          *current_namespace;
+SymbolTable     *current_symbol_table;
+Symbol          *namespace_stack;
+SymbolTable     *const_str;
 
-int scope = 0;
-int method_block = 0;
-int primary_block = 0;
-AST * primary_block_stack[256];
+int             scope = 0;
+int             method_block = 0;
+int             primary_block = 0;
+AST             *primary_block_stack[256];
 
  
 /* Routines for managing symbols, attributes and AST tree */
@@ -85,7 +85,9 @@ Symbol * new_namespace(Symbol * identifier) {
 
 Symbol * new_class(Symbol * identifier) {
     Type * t = store_type(identifier->name, 0);
+#if 0
     printf("#new_class(%s)\n", identifier->name);
+#endif
     t->kind = CLASS;
     t->sym->table = new_symbol_table();
     return t->sym;
@@ -117,6 +119,53 @@ AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
         arg2->up = ast;
     return ast;
 }
+
+void push(Node ** list, Node * p) {
+    p->next = *list;
+    *list = p;
+}
+
+void tpush(Node ** list, Node * p) {
+    p->tnext = *list;
+    *list = p;
+}
+
+/* "push" onto opposite end of temp stack */
+void tunshift(Node ** list, Node * p) {
+    Node * l = *list;
+    if(l && l == p) {
+        printf("Oops: Shifting node list onto itself!\n");
+        abort();
+    }
+    if(l != NULL) {
+        while(l->tnext)
+            l = l->tnext;
+        l->tnext = p;
+    }
+    else *list = p;
+}
+
+/* Return the top symbol on the stack. */
+Node * pop(Node ** list) {
+    Node * top;
+    top = *list;
+    if(*list)
+        *list = (*list)->next;
+    return top;
+}
+
+/* Return the top symbol on the tstack. */
+Node * tpop(Node ** list) {
+    Node * top;
+    top = *list;
+    if(*list)
+        *list = (*list)->tnext;
+    return top;
+}
+
+
+
+/* Easy fixme, rewrite below to call above generic Node versions */
 
 void push_sym(Symbol ** list, Symbol * p) {
     p->next = *list;
@@ -290,7 +339,7 @@ Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_lev
     return 0;
 }
 
-void store_symbol(SymbolTable * tab, Symbol * sym) {
+Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     unsigned int index = hash_str(sym->name) % HASH_SIZE;
 #if 1
     printf("#store_symbol(%s)\n", sym->name);
@@ -304,11 +353,12 @@ void store_symbol(SymbolTable * tab, Symbol * sym) {
     }
 #endif
     sym->scope = scope;
-    sym->next = tab->table[ index ];
-    tab->table[ index ] = sym;
+    sym->next = tab->table[index];
+    tab->table[index] = sym;
 #ifdef DEBUG
     printf("storing[%s] scope %d\n", sym->name, scope);
 #endif
+    return sym;
 }
 
 Symbol * store_identifier(SymbolTable * tab, const char * name, int kind, Type * type) {

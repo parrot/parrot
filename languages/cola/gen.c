@@ -121,7 +121,9 @@ void gen_block(AST * p) {
     if(p->locals) {
         Symbol * s = p->locals;
         while(s) {
-            printf("\t.local %s\t%s\n", type_name(s->type), s->name);
+            /* Don't emit local types that are in symbol table */
+            if(s->kind != TYPE)
+                printf("\t.local %s\t%s\n", type_name(s->type), s->name);
             s = s->next;
         }
     }
@@ -131,7 +133,7 @@ void gen_block(AST * p) {
 void gen_statement(AST * p) {
     AST * b;
 #ifdef DEBUG
-    fprintf(stderr, "#gen_statement\n");
+    printf("#gen_statement\n");
 #endif
     if(p->kind == KIND_EXPRESSION) {
         if(!eval_expr(p))
@@ -236,7 +238,7 @@ void gen_method_decl(AST * p) {
 void gen_assign(AST * ast) {
     AST * p = ast;
 #ifdef DEBUG
-    fprintf(stderr,"#gen_assign\n");
+    printf("#gen_assign\n");
 #endif
     if(p->arg1->asttype == ASTT_IDENTIFIER ||
         p->arg1->asttype == ASTT_LITERAL) {
@@ -254,26 +256,35 @@ void gen_assign(AST * ast) {
          * and assignment.
          */
         gen_expr(p->arg2, p->arg1->targ, p->arg1->targ->type);
+#ifdef DEBUG
+        printf("#  return from gen_assign\n");
+#endif
+
     }
     else {
         /* target is an expression that may or may not
          * have parsed to a assignable lvalue
          */
-
         /* Now assign the temporary to the lvalue expression */
         if(p->arg1->asttype == ASTT_INDEX) {
             char buf[4096];
             AST * deref = p->arg1;
+#ifdef DEBUG
+        printf("# gen_assign: assign to index\n");
+#endif
             if(deref->arg1 == NULL || deref->arg2 == NULL) {
                 printf("Internal error: invalid array expression or indirection as lvalue\n");
                 abort();
             }
 
             /* Assign to an array */
-            gen_expr(deref->arg1, NULL, NULL);
+            if(!eval_expr(deref->arg1))
+                gen_expr(deref->arg1, NULL, NULL);
             /* Require array subscript to be int */
-            gen_expr(deref->arg2, NULL, t_int);
+            if(!eval_expr(deref->arg2))
+                gen_expr(deref->arg2, NULL, t_int);
 
+#if 0
             /* If destination indirection uses a variable, copy it to a
              * temporary in case it is modified by source expression code
              * ( d[i] = s[++i] )
@@ -285,6 +296,7 @@ void gen_assign(AST * ast) {
                 printf("\t(%s)%s = %s\n", type_name(deref->arg2->targ->type),
                     deref->arg2->targ->name, deref->arg2->sym->name);
             }
+#endif
             /* emit source expression with a temporary */
             gen_expr(p->arg2, NULL, NULL);
 
@@ -297,18 +309,25 @@ void gen_assign(AST * ast) {
             // Generate assignment
             printf("\t(%s)%s = %s\n", type_name(p->targ->type), p->targ->name,
                                     p->arg2->targ->name);
+#ifdef DEBUG
+            printf("#  return from gen_assign\n");
+#endif
             return;
         }
 
         printf("#gen_assign: Internal error, unsupported assignment.\n");
         exit(0);
     }
+
+#ifdef DEBUG
+    printf("#  return from gen_assign\n");
+#endif
 }
 
 void gen_add_expr(AST * ast) {
     AST * p = ast;
 #ifdef DEBUG
-    fprintf(stderr, "#gen_add_expr\n");
+    printf("#gen_add_expr\n");
 #endif
     if(!eval_expr(p->arg1))
         gen_expr(p->arg1, NULL, NULL);
@@ -331,7 +350,7 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
     Symbol *tv1, *tv2;
     const char *tl1, *tl2, *tl3;
 #ifdef DEBUG
-    fprintf(stderr, "#gen_expr\n");
+    printf("#gen_expr\n");
 #endif
 
     /* Expression is a simple identifier or literal */
@@ -342,7 +361,14 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             p->targ = lval;
         else
             p->targ = make_rval(p->sym->type);
+#ifdef DEBUG
+        printf("# literal or identifier\n");
+#endif
         emit_unary_expr(p->targ, p->sym, NULL);
+
+#ifdef DEBUG
+        goto LAST;
+#endif
         return;
     }
     
@@ -370,16 +396,25 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
         if(lval)
             p->targ = lval;
         gen_call(p);
+#ifdef DEBUG
+        goto LAST;
+#endif
         return;
     }
     /* Expression is an assignment */
     else if(p->asttype == ASTT_ASSIGN) {
         gen_assign(p);
+#ifdef DEBUG
+        goto LAST;
+#endif
         return;
     }
     else if(p->asttype == ASTT_CONDITIONAL_EXPR) {
         /* Ternary conditional:  i > j ? i : j */
         /* This needs work */
+#ifdef DEBUG
+        printf("# gen_expr: conditional expression\n");
+#endif
         tl1 = make_label();
         tl2 = make_label();
         tl3 = make_label();
@@ -438,6 +473,9 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             p->targ = lval;
 
         if(p->op == INDEX) {
+#ifdef DEBUG
+            printf("# gen_expr: index operator\n");
+#endif
             if(type2 != t_int) {
                 fprintf(stderr, "Array subscript expression must be type integer.\n");    
                 exit(0);
@@ -451,6 +489,9 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             printf("\t(%s)%s = %s%s%s\n", type_name(p->targ->type),
                                 p->targ->name, p->arg1->targ->name,
                                 op_name(INDEX), p->arg2->targ->name);
+#ifdef DEBUG
+            printf("#  return from gen_expr\n");
+#endif
             return;
         }
         
@@ -519,6 +560,10 @@ void gen_expr(AST * p, Symbol * lval, Type * type) {
             emit_unary_expr(p->targ, p->arg1->targ, op_name(p->op));
         }
     }
+
+#ifdef DEBUG
+    LAST: printf("#  return from gen_expr\n");
+#endif
 }
 
 /*
@@ -571,7 +616,7 @@ void gen_call(AST * p) {
 void gen_if(AST * p) {
     char * if_label, * else_label, *end_label;
 #ifdef DEBUG
-    fprintf(stderr, "#gen_if\n");
+    printf("#gen_if\n");
 #endif
     if_label = make_label();
     else_label = make_label();
@@ -622,7 +667,7 @@ void gen_while(AST * p) {
 void gen_for(AST * p) {
     const char * redo_label = make_label();
 #ifdef DEBUG
-    fprintf(stderr, "#gen_for\n");
+    printf("#gen_for\n");
 #endif
     p->start_label = make_label();
     p->end_label = make_label();
@@ -632,7 +677,7 @@ void gen_for(AST * p) {
     push_primary_block(p);
     if(p->Attr.Loop.init != NULL) {
 #ifdef DEBUG
-        fprintf(stderr, "#gen_for: generate init statement\n");
+        printf("#gen_for: generate init statement\n");
 #endif
         gen_statement(p->Attr.Loop.init);
     }
@@ -658,7 +703,7 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
     int op_inv;
     const char * inverse_label;
 #ifdef DEBUG
-    fprintf(stderr, "#gen_boolean\n");
+    printf("#gen_boolean\n");
 #endif
 
     switch(p->asttype) {
@@ -693,7 +738,7 @@ void gen_boolean(AST * p, const char * true_label, const char * false_label, int
             }
             return;
         case ASTT_LOGICAL:
-            fprintf(stderr, "#Logical expression\n");
+            printf("#Logical expression\n");
             if(p->op == LOGICAL_AND) {
                 /* AND */
                 const char * next_logical = make_label();
@@ -787,8 +832,8 @@ char * op_name(int operator) {
         case LOGICAL_AND:   return "&&";
         case LOGICAL_EQ:    return "==";
         case LOGICAL_NE:    return "!=";
-        case LOGICAL_LT:    return "<";
-        case LOGICAL_GT:    return ">";
+        case '<':           return "<";
+        case '>':           return ">";
         case LOGICAL_LTE:   return "<=";
         case LOGICAL_GTE:   return ">=";
         case LEFT_SHIFT:    return "<<";
@@ -803,10 +848,10 @@ int op_inverse(int operator) {
     switch(operator) {
         case LOGICAL_EQ:    return LOGICAL_NE;
         case LOGICAL_NE:    return LOGICAL_EQ;
-        case LOGICAL_LT:    return LOGICAL_GTE;
-        case LOGICAL_GT:    return LOGICAL_LTE;
-        case LOGICAL_LTE:   return LOGICAL_GT;
-        case LOGICAL_GTE:   return LOGICAL_LT;
+        case '<':           return LOGICAL_GTE;
+        case '>':           return LOGICAL_LTE;
+        case LOGICAL_LTE:   return '>';
+        case LOGICAL_GTE:   return '<';
     }
     printf("op_inverse: Invalid logical operator %d\n", operator);
     exit(0);
@@ -845,7 +890,7 @@ char * make_label() {
 
 void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
 #ifdef DEBUG
-    fprintf(stderr, "#emit_op_expr\n");
+    printf("#emit_op_expr\n");
 #endif
 
     printf( "\t(%s)%s = %s %s %s\n", type_name(r->type), r->name,
@@ -854,14 +899,18 @@ void emit_op_expr(Symbol * r, Symbol * a1, char * op, Symbol * a2) {
 
 void emit_unary_expr(Symbol * res, Symbol * arg1, char * op) {
 #ifdef DEBUG
-    fprintf(stderr, "#emit_unary_expr\n");
+    printf("#emit_unary_expr\n");
 #endif
     
-    if( op )
+    if(op)
         printf( "\t(%s)%s = %s %s\n", type_name(res->type), res->name,
                        op, NAME(arg1));
     else
         printf( "\t(%s)%s = %s\n", type_name(res->type), res->name,
                 NAME(arg1));
+
+#ifdef DEBUG
+    printf("#  return from emit_unary_expr\n");
+#endif
 }
 

@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.4"
+#define COLA_VERSION "0.0.4.4"
 
 
 void abort(void);
@@ -56,36 +56,45 @@ enum ASTTYPE {
     ASTT_NEW_OBJECT
 };
 
+enum TYPES {
+    TYPE_SCALAR,
+    TYPE_REFERENCE,
+    TYPE_ARRAY,
+    TYPE_METHOD,
+    TYPE_CLASS  
+};
 
 /* Identifiers, etc. */
 typedef struct _SymbolTable SymbolTable;
 typedef struct _AST AST;
 typedef struct _Type Type;
 
-/* Symbol structure */
+typedef struct _Node {
+    struct _Node    *next,
+                    *tnext;
+} Node;
 
+/* Symbol structure */
 typedef struct _Symbol {
     /* ->tnext is for manipulation of Symbols outside
      * Symbol tables, etc. such as temporary lists.
      * ->next is used by the symbol table methods.
-     * next and tnext must be the first 2 members of the struct
+     * NOTE: next and tnext must be the first 2 members of the struct
      */
     struct _Symbol  *next,
                     *tnext;
+                    
     char            *name;
     int             scope;
-    unsigned int    flags;
     /* Symbol.class is initially IDENTIFIER if it is not resolved to
      * a type, variable, function, etc. Upon resolution it will be
      * one of TYPE, LITERAL, VARIABLE, METHOD, NAMESPACE
      */
     int             kind;
     Type            *type;
-    int             size;
     AST *           init_expr;
     int             is_lval;
     SymbolTable     *table;   /* For functions/procs */
-    struct _Symbol  *members; /* Classes/Namespaces */
     struct _Symbol  *literal;
     int             line;
 } Symbol;
@@ -139,16 +148,41 @@ struct _AST {
 struct _SymbolTable {
     long            count;
     int             scope;
-    Symbol          *table[ HASH_SIZE ];
+    Symbol          *table[HASH_SIZE];
 };
 
+/* Array stuff */
+typedef struct _Rank {
+    Node    *next,
+            *tnext;
+    int     dim;    
+} Rank;
+
 struct _Type {
-    int             kind;            /* scalar, array, class, pointer/reference */
+    Node            *next,
+                    *tnext;
+    unsigned long   flags;
+    enum TYPES      kind;       /* scalar, array, class, pointer/reference */
     int             typeid;
     int             parentid;
     int             size;
-    Symbol          *sym;   /* Pointer to symbol table representing name of type */
+    Symbol          *sym;       /* Pointer to symbol table representing name of type */
+    /* Array or reference specific infu */
+    Type            *type;      /* Element or referenced type */
+    /* Array specific info */
+    Rank            *rank;
+    int             dim;        /* Total dim, can be derived from evaluating rank list */
+    int             **bounds;   /* N x 2 dimensional array of bounds where N = dimensions */        
 };
+
+typedef struct _Array {
+    Node    *next,
+            *tnext;
+    Type    *type;              /* The type of element */
+    Rank    *rank;
+    int     dim;                /* Total dim, can be derived from evaluating rank list */
+    int     **bounds;           /* N x 2 dimensional array of bounds where N = dimensions */        
+} __Array;
 
 
 /*
@@ -183,6 +217,13 @@ extern Type         *t_void,
 
 void                assert(void * p);
 
+void                push(Node ** list, Node * p);
+void                tpush(Node ** list, Node * p);
+void                tunshift(Node ** list, Node * p);
+Node                *pop(Node ** list);
+Node                *tpop(Node ** list);
+
+
 Symbol              *new_symbol(int kind, const char * name);
 void                push_sym(Symbol ** list, Symbol * p);
 void                tpush_sym(Symbol ** list, Symbol * p);
@@ -200,7 +241,7 @@ Symbol              *lookup_symbol(SymbolTable *, const char *);
 Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
 Symbol              *lookup_namespace(SymbolTable * tab, const char * name);
 Symbol              *lookup_class(SymbolTable * tab, const char * name);
-void                store_symbol(SymbolTable *, Symbol *);
+Symbol              *store_symbol(SymbolTable *, Symbol *);
 Symbol              *store_identifier(SymbolTable *, const char * name, int kind, Type * t);
 int                 push_scope();
 Symbol              *pop_scope(SymbolTable *);
@@ -217,6 +258,9 @@ Type                *lookup_type(const char * name);
 Symbol              *lookup_type_symbol(Symbol * id);
 const char          *type_name(Type *);
 void                coerce_operands(Type ** t1, Type ** t2);
+Type                *new_array(Type * type, Rank * rank);
+Rank                *new_rank(int dim);
+Symbol              *array_signature(Type * t);
 
 
 char                *str_dup(const char *);
@@ -240,7 +284,6 @@ void                push_primary_block(AST *p);
 AST                 *pop_primary_block();
 AST                 *get_cur_primary_block();
 AST                 *cur_method;
-
 
 void                gen_bootstrap();
 void                gen_ast(AST * ast);

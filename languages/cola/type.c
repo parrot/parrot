@@ -24,14 +24,18 @@ void init_builtin_types() {
 
 /* size is bytes or elements, depending on if type is variable or array */
 Type * store_type(const char * name, int size) {
-    Symbol * s = store_identifier(current_symbol_table, name, TYPE, NULL);
     Type * t = (Type *)malloc(sizeof(*t));
-    s->type = t;
+    Symbol * s = store_identifier(current_symbol_table, name, TYPE, t);
     t->size = size;
-    t->kind = 0;
+    t->kind = TYPE_SCALAR;
     t->typeid = 0;
     t->parentid = 0;
     t->sym = s; /* Circular reference */
+    /* Arrays and references */
+    t->type = 0;
+    t->rank = 0;
+    t->dim = 0;
+    t->bounds = 0;
     return t;
 }
 
@@ -76,4 +80,47 @@ Symbol * lookup_type_symbol(Symbol * id) {
 
 const char * type_name(Type * t) {
     return t->sym->name;
+}
+
+Rank * new_rank(int dim) {
+    Rank * ret = malloc(sizeof(*ret));
+    ret->next = NULL;
+    ret->tnext = NULL;
+    ret->dim = dim;    
+    return ret;
+}
+
+Type * new_array(Type * type, Rank * rank) {
+    Type * ret = malloc(sizeof(*ret));
+    Rank * r;
+    ret->type = type;
+    ret->kind = TYPE_ARRAY;
+    ret->next = NULL;
+    ret->tnext = NULL;
+    ret->rank = rank;
+    for(ret->dim = 0, r = rank; r; r = (Rank *)r->tnext) {
+        ret->dim += r->dim;
+    } 
+    ret->bounds = (int **)malloc(sizeof(int) * ret->dim * 2);
+    ret->sym = array_signature(ret);
+    return ret;
+}
+
+
+Symbol * array_signature(Type * t) {
+    char buf[4096];
+    Rank * r;
+    int i;
+    Symbol * ret = new_symbol(IDENTIFIER, "");
+    sprintf(buf, "%s", type_name(t->type));
+    for(r = t->rank; r; r = (Rank *)r->tnext) {
+        strcat(buf, "[");
+        for(i = 0; i < r->dim; i++) {
+            sprintf(buf + strlen(buf), "(0..)");
+        }
+        strcat(buf, "]");
+        /*sprintf(buf + strlen(buf), "%d_", r->dim);   */
+    }
+    ret->name = str_dup(buf);
+    return ret;
 }

@@ -36,6 +36,7 @@ Type        *t_void,
     Symbol * sym;
     Type * type;
     AST * ast;
+    void * p;
 }
 
 %token ASM
@@ -48,14 +49,14 @@ Type        *t_void,
 %token IF ELSE WHILE FOR RETURN BREAK CONTINUE GOTO NULLVAL TYPE
 %token <sym> IDENTIFIER LITERAL
 %token <ival> INC DEC LOGICAL_AND LOGICAL_OR LOGICAL_EQ LOGICAL_NE
-%token <ival> LOGICAL_LT LOGICAL_GT LOGICAL_LTE LOGICAL_GTE
+%token <ival> LOGICAL_LTE LOGICAL_GTE
 %token <ival> LEFT_SHIFT RIGHT_SHIFT INDEX
 
 %token TYPE METHOD
 
-%type <type> type return_type
-%type <sym> ref_type array_type
-%type <sym> member_name qualified_identifier 
+%type <type> type_name type return_type array_type non_array_type
+%type <type> simple_type primitive_type struct_type enum_type
+%type <sym> member_name qualified_identifier
 %type <sym> namespace_scope_start class_scope_start 
 %type <sym> var_declarator var_declarators
 %type <sym> formal_param_list fixed_params fixed_param
@@ -72,18 +73,21 @@ Type        *t_void,
 %type <ast> block labeled_statement embedded_statement
 %type <ast> expression_statement selection_statement if_statement
 %type <ast> iteration_statement while_statement for_statement
+%type <ast> qualified_identifier_expr
 %type <ast> expression_list expression statement_expression assignment
-%type <ast> primary_expression boolean_expression equality_expression
+%type <ast> primary_expression boolean_expression equality_expression element_access
+%type <ast> paren_expression primary_expression_no_paren element_access
 %type <ast> post_inc_expr post_dec_expr pre_inc_expr pre_dec_expr
-%type <ast> new_expression new_object_expression
+%type <ast> postfix_expression new_expression new_object_expression
 %type <ast> conditional_expression conditional_or_expression
 %type <ast> conditional_and_expression inclusive_or_expression and_expression
 %type <ast> shift_expression exclusive_or_expression relational_expression
-%type <ast> unary_expression add_expression mult_expression
+%type <ast> unary_expression unary_expression_not_plusminus add_expression mult_expression
 %type <ast> equality_expression relational_expression
-%type <ast> call element_access arg arg_list member_access
+%type <ast> call arg arg_list member_access
 %type <ival> relational_op
-%type <ival> rank_specifier rank_specifiers dim_separators
+%type <p> rank_specifiers
+%type <ival> dim_separators rank_specifier
 
 
 %left '-' '+'
@@ -109,7 +113,7 @@ compilation_unit:
 
 using_directives:    /*NULL*/
         { $$ = NULL; }
-    |    using_directives using_directive
+    |   using_directives using_directive
         {
             unshift_ast(&($$), $1);
         }
@@ -156,6 +160,10 @@ namespace_scope_start:    NAMESPACE qualified_identifier
     
 qualified_identifier:
     IDENTIFIER
+        {
+            $$ = $1;
+            fprintf(stderr, "qualified_identifier -> IDENTIFIER(%s)\n", NAME($1));
+        }
     |   qualified_identifier '.' IDENTIFIER
         {
             $$ = $1;
@@ -163,7 +171,24 @@ qualified_identifier:
             tunshift_sym(&($$), $3);
         }
     ;
-        
+
+qualified_identifier_expr:
+    qualified_identifier
+        {
+            Symbol * orig;
+            orig = check_id_decl(current_symbol_table, $1->name);
+            if(orig == NULL)
+                orig = check_id_decl(global_symbol_table, $1->name);
+            if(orig == NULL) {
+                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
+                exit(0);
+            }
+
+            $$ = new_expression(ASTT_IDENTIFIER, NULL, NULL);
+            $$->sym = orig;
+        }
+    ;
+      
 namespace_body:
     '{' using_directives namespace_member_decls '}'
         {
@@ -245,7 +270,7 @@ class_member_decl_list:
 class_member_decl:
         decl_statement
         { $$ = $1; }
-    |    method_decl
+    |   method_decl
         {    $$ = $1; }
 /*
     |        property_decl
@@ -356,8 +381,29 @@ asm_block:
     ;
 
 call:
-    primary_expression '(' arg_list ')'
-        {$$ = new_expression(ASTT_CALL, $1, $3);}
+    primary_expression_no_paren '(' arg_list ')'
+        {
+            $$ = new_expression(ASTT_CALL, $1, $3);
+            fprintf(stderr, "call -> primary_expression\n");
+        }
+    |   qualified_identifier '(' arg_list ')'
+        {
+            Symbol * orig;
+            AST * id;
+            orig = check_id_decl(current_symbol_table, $1->name);
+            if(orig == NULL)
+                orig = check_id_decl(global_symbol_table, $1->name);
+            if(orig == NULL) {
+                printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
+                exit(0);
+            }
+
+            id = new_expression(ASTT_IDENTIFIER, NULL, NULL);
+            id->sym = orig;
+        
+            $$ = new_expression(ASTT_CALL, id, $3);
+            fprintf(stderr, "call -> qualified_identifier(%s)\n", NAME($1));
+        }
     ;
 
 arg_list:
@@ -370,10 +416,9 @@ arg_list:
     ;
     
 arg:
-    /*NULL*/
         { $$ = NULL; }
     |   expression
-        { $$ = $1;    }
+        { fprintf(stderr, "arg -> expression\n"); $$ = $1;    }
     |   REF
         { $$ = NULL; }
     |   OUT
@@ -422,7 +467,8 @@ for_statement:
 
 return_type:
     type
-        {    if($1 == NULL) {
+        {
+            if($1 == NULL) {
                 printf("Internal compiler error, NULL type.\n");
                 exit(0);
             }
@@ -437,23 +483,11 @@ return_type:
         }
     ;
 
-/* We really don't have to hardcode these types into the
- * parser since they are all stored in the symbol table.
- * Should allow the boostrap namespace to define all builtin
- * types; will probably rip this out soon.
- */
-type:
-    INT
-        { $$ = lookup_type("int"); }
-    |   STRING
-        { $$ = lookup_type("string"); }
-    |   BYTE
-        { $$ = lookup_type("byte"); }
-    |   FLOAT
-        { $$ = lookup_type("float"); }
-    |   IDENTIFIER
+type_name:
+    IDENTIFIER
         {
             Type * t;
+            fprintf(stderr, "type_name -> IDENTIFIER (%s)\n", $1->name);
             t = lookup_type($1->name);
             if(t != NULL) {
                 fprintf(stderr, "Kind [%s] found in type list.\n", t->sym->name);
@@ -465,25 +499,101 @@ type:
             }
         }
     ;
-
-ref_type:
+    
+type:
     array_type
+        {
+            $$ = $1;
+            fprintf(stderr, "type -> array_type\n");
+        }
+    |   non_array_type
+        {
+            $$ = $1;
+            fprintf(stderr, "type -> non_array_type\n");
+        }
     ;
 
+primitive_type:
+    INT
+        { $$ = lookup_type("int"); }
+    |   STRING
+        { $$ = lookup_type("string"); }
+    |   BYTE
+        { $$ = lookup_type("byte"); }
+    |   FLOAT
+        { $$ = lookup_type("float"); }
+    ;
+    
+struct_type:
+    type_name
+    {
+        $$ = $1;
+        fprintf(stderr, "struct_type -> type_name\n");
+    }
+    |   simple_type
+    ;
+
+enum_type:
+    type_name
+    ;
+        
+simple_type:
+    primitive_type
+    |   BOOL
+        { $$ = lookup_type("bool"); }
+    ;
+    
 array_type:
-    type rank_specifiers
+/*
+        array_type rank_specifiers
+    |
+*/
+        simple_type rank_specifiers
         {
+            $$ = (void *)new_array($1, $2);
+            fprintf(stderr, "array_type: array of %s\n", type_name($1));
+        }
+    |   qualified_identifier rank_specifiers
+        {
+            Type * t;
+            t = lookup_type($1->name);
+            $$ = (void *)new_array(t, $2);
+            fprintf(stderr, "array_type: array of %s\n", type_name(t));
         }
     ;
         
+non_array_type:
+    simple_type
+        {
+            $$ = $1;
+            fprintf(stderr, "non_array_type -> simple_type\n");
+        }
+    |   type_name
+    ;
+    
 rank_specifiers:
     rank_specifier
-    |    rank_specifiers rank_specifier
+        {
+            /* $1 is the dimension of the current rank */
+            $$ = (void *)new_rank($1);
+            fprintf(stderr, "rank_spec %d\n", $1);
+        }
+    |   rank_specifiers rank_specifier
+        {
+            $$ = $1;
+            tunshift((Node **)&($$), (Node*)new_rank($2));
+        }
     ;
         
 rank_specifier:
     '[' dim_separators ']'
-        { $$ = 0; printf("rank_specifier: %d dimensions\n", $2);  }
+        {   $$ = $2 + 1;
+            fprintf(stderr, "rank_spec([ dim_separators ])\n");
+        }
+    |   '[' ']'
+        {   $$ = 1;
+            fprintf(stderr, "rank_spec([])\n");
+        }
     ;
 
 dim_separators:
@@ -495,7 +605,7 @@ dim_separators:
     
 assignment:
     unary_expression '=' expression
-    {   $$ = new_expression(ASTT_ASSIGN, $1, $3); }
+        {   $$ = new_expression(ASTT_ASSIGN, $1, $3);   }
     /*
     |   unary_expression compound_assign_op expression
         {
@@ -516,7 +626,14 @@ member_access:
     |   predefined_type '.' IDENTIFIER
 */
     ;
-    
+
+postfix_expression:
+        primary_expression
+    |   qualified_identifier_expr
+    |   post_inc_expr
+    |   post_dec_expr
+    ;
+
 pre_inc_expr:
     INC unary_expression
         {
@@ -534,7 +651,7 @@ pre_dec_expr:
     ;
 
 post_inc_expr:
-    primary_expression INC
+    postfix_expression INC
         {
             $$ = new_expression(ASTT_POSTINC, $1, NULL);
             $$->op = INC;
@@ -542,7 +659,7 @@ post_inc_expr:
     ;
 
 post_dec_expr:
-    primary_expression DEC
+    postfix_expression DEC
         {
             $$ = new_expression(ASTT_POSTINC, $1, NULL);
             $$->op = DEC;
@@ -566,42 +683,63 @@ new_object_expression:
     ;
 
 primary_expression:
-    LITERAL
-        {$$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;}
-    |   IDENTIFIER
+        paren_expression
+    |   primary_expression_no_paren
+    ;
+     
+primary_expression_no_paren:
+        LITERAL
+        {
+            $$ = new_expression(ASTT_LITERAL, NULL, NULL); $$->sym = $1;
+            fprintf(stderr, "primary_expression(%s)\n", $1->name);
+        }
+    |   element_access
+    |   call
+    |   post_inc_expr
+    |   post_dec_expr
+    |   new_expression
+    |   member_access
+    ;
+    
+paren_expression:
+    '(' expression ')'
+        {   $$ = $2;    }
+    ;
+    
+element_access:
+        primary_expression '[' expression ']'
+        {
+            $$ = new_expression(ASTT_INDEX, $1, $3);
+            $$->op = INDEX;
+            fprintf(stderr, "primary-expression(pex[ex])\n");
+        }
+    |   qualified_identifier '[' expression ']'
         {
             Symbol * orig;
+            AST * id;
             orig = check_id_decl(current_symbol_table, $1->name);
-            /* Kludge for now, defaults to global namespace if current
-             * namespace fails. This should run up the stack of namespaces.
-             */
             if(orig == NULL)
                 orig = check_id_decl(global_symbol_table, $1->name);
             if(orig == NULL) {
                 printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
                 exit(0);
             }
-            $$ = new_expression(ASTT_IDENTIFIER, NULL, NULL);
-            $$->sym = orig;
-        }
-    |   '(' expression ')'
-        {$$ = $2; }
-    |   call
-        {$$ = $1; }
-    |   post_inc_expr
-    |   post_dec_expr
-    |   element_access
-    |   new_expression
-    |   member_access
-    ;
 
+            id = new_expression(ASTT_IDENTIFIER, NULL, NULL);
+            id->sym = orig;
+            $$ = new_expression(ASTT_INDEX, id, $3);
+            $$->op = INDEX;
+            fprintf(stderr, "primary-expression(%s)\n", NAME(orig));
+        }
+    ;
+    
 expression:
     conditional_expression
+        {
+            $$ = $1;
+            fprintf(stderr, "conditional_expression\n");
+        } 
     |   assignment
-/*        {
-            $$ = new_expression(ASTT_ASSIGN, $1, NULL);
-        }
-*/
     ;
 
 boolean_expression:
@@ -612,18 +750,27 @@ boolean_expression:
 */
     ;
 
+unary_expression_not_plusminus:
+    postfix_expression
+    |   '!' unary_expression
+        { $$ = $2; $$->op = '!'; }
+    |   '~' unary_expression
+        { $$ = $2; $$->op = '~'; }
+    ;
+    
 unary_expression:
-    primary_expression
+    unary_expression_not_plusminus
         { $$ = $1; }
+    |   qualified_identifier
+        { $$ =  new_expression(ASTT_IDENTIFIER, NULL, NULL); $$->sym = $1; }
     |   '+' unary_expression
         { $$ = $2; $$->op = '+'; }
     |   '-' unary_expression
         { $$ = $2; $$->op = '-'; }
-    |   '!' unary_expression
-        { $$ = $2; $$->op = '!'; }
     |   pre_inc_expr
     |   pre_dec_expr
     ;
+
 
 mult_expression:
     unary_expression
@@ -704,10 +851,10 @@ inclusive_or_expression:
     ;
 
 relational_op:
-    LOGICAL_LT
-        {$$ = LOGICAL_LT;}
-    |   LOGICAL_GT
-        {$$ = LOGICAL_GT;}
+    '<'
+        {$$ = '<';}
+    |   '>'
+        {$$ = '>';}
     |   LOGICAL_LTE
         {$$ = LOGICAL_LTE;}
     |   LOGICAL_GTE
@@ -747,14 +894,6 @@ shift_expression:
         {
             $$ = new_op_expression($1, RIGHT_SHIFT, $3);
         }  
-    ;
-
-element_access:
-    primary_expression '[' expression ']'
-        {
-            $$ = new_expression(ASTT_INDEX, $1, $3);
-            $$->op = INDEX;
-        }
     ;
 
 expression_list:
@@ -824,6 +963,10 @@ var_declarators:
     
 var_declarator:
     IDENTIFIER
+    {
+        $$ = $1;
+        fprintf(stderr, "var_declarator(%s)\n", $1->name);
+    }
     |   IDENTIFIER '=' expression
         {
             $$ = $1; $$->init_expr = $3;
@@ -896,6 +1039,7 @@ fixed_params:
 fixed_param:
     type IDENTIFIER
         {
+            fprintf(stderr, "fixed_param -> type IDENTIFIER\n");
             $2->type = $1;
             $$ = $2;
         }
@@ -915,6 +1059,7 @@ param_array:
 member_name:
     IDENTIFIER
         {
+            fprintf(stderr, "member_name -> IDENTIFIER (%s)\n", $1->name);
             $$ = $1;
             check_id_redecl(current_symbol_table, $1->name);
             if(lookup_symbol(current_symbol_table, $1->name)) {
@@ -1000,8 +1145,9 @@ int main(int argc, char * argv[])
 
 int yyerror( char * s )
 {
-    printf( "(error) line %ld: %s\n", line, s );
-    printf( "Didn't create output asm.\n" );
+    fprintf(stderr, "last token = [%s]\n", yytext); 
+    fprintf(stderr, "(error) line %ld: %s\n", line, s );
+    fprintf(stderr, "Didn't create output asm.\n" );
     exit(0);
 }
 
