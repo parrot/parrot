@@ -45,73 +45,6 @@ clone_array(Parrot_Interp interpreter, PMC *source_array)
     return new_array;
 }
 
-/*
-
-=item C<static PMC *
-find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
-
-This should be public, but for right now it's internal.
-
-=cut
-
-v*/
-
-static PMC *
-find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
-{
-    PMC *stash;
-#if 1
-    /*
-     * we are cheating a bit and use PerlHash internals to avoid
-     * hash lookup duplication
-     */
-    HashBucket *b;
-#ifdef FIND_DEBUG
-    PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss\n",
-            class, globalname);
-#endif
-    stash = interpreter->globals->stash_hash;
-    if (class) {
-        b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), class);
-        if (!b)
-            return NULL;
-        stash = b->value;
-        b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), globalname);
-        if (!b)
-            return NULL;
-        return VTABLE_get_pmc_keyed_int(interpreter, stash,
-                PMC_int_val((PMC*)b->value));
-    }
-    b = hash_get_bucket(interpreter,
-                (Hash*) PMC_struct_val(stash), globalname);
-    if (!b)
-        return NULL;
-    return b->value;
-
-#else
-    if (class) {
-        if (!VTABLE_exists_keyed_str(interpreter,
-                                     interpreter->globals->stash_hash,
-                                     class)) {
-            return NULL;
-        }
-        stash = VTABLE_get_pmc_keyed_str(interpreter,
-                                         interpreter->globals->stash_hash,
-                                         class);
-    }
-    else {
-        stash = interpreter->globals->stash_hash;
-    }
-    if (!VTABLE_exists_keyed_str(interpreter, stash, globalname)) {
-        return NULL;
-    }
-    return VTABLE_get_pmc_keyed_str(interpreter,
-            stash, globalname);
-#endif
-}
-
 /* Take the class and completely rebuild the atttribute stuff for
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
@@ -1057,7 +990,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
 
     /* if its a non-classes, just return the sub */
     if (!PObj_is_class_TEST(class)) {
-        return find_global(interpreter,
+        return Parrot_find_global(interpreter,
                            NULL,
                            method_name);
     }
@@ -1072,7 +1005,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
      */
 
     /* See if we get lucky and its in the class of the PMC */
-    method = find_global(interpreter,
+    method = Parrot_find_global(interpreter,
                          VTABLE_get_string(interpreter,
                                   get_attrib_num((SLOTTYPE *)PMC_data(class),
                                                  PCD_CLASS_NAME)),
@@ -1091,7 +1024,7 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
     for (searchoffset = 0; searchoffset < classcount; searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, searchoffset);
-        method = find_global(interpreter,
+        method = Parrot_find_global(interpreter,
                              VTABLE_get_string(interpreter,
                                   get_attrib_num((SLOTTYPE *)PMC_data(curclass),
                                                  PCD_CLASS_NAME)),
