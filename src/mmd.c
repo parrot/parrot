@@ -611,11 +611,14 @@ mmd_destroy(Parrot_Interp interpreter)
     if (interpreter->n_binop_mmd_funcs) {
         UINTVAL i;
         for (i = 0; i <interpreter->n_binop_mmd_funcs; ++i) {
-            if (interpreter->binop_mmd_funcs[i].mmd_funcs)
+            if (interpreter->binop_mmd_funcs[i].mmd_funcs) {
                 mem_sys_free(interpreter->binop_mmd_funcs[i].mmd_funcs);
+		interpreter->binop_mmd_funcs[i].mmd_funcs = NULL;
+	    }
         }
     }
     mem_sys_free(interpreter->binop_mmd_funcs);
+    interpreter->binop_mmd_funcs = NULL;
 }
 
 /*

@@ -503,6 +503,7 @@ parrot_gc_ims_deinit(Interp* interpreter)
 
     arena_base = interpreter->arena_base;
     mem_sys_free(arena_base->gc_private);
+    arena_base->gc_private = NULL;
 }
 
 /*

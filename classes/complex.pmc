@@ -315,6 +315,7 @@ Creates an identical copy of the complex number.
 
     void destroy () {
         mem_sys_free(PMC_struct_val(SELF));
+	PMC_struct_val(SELF) = NULL;
     }
 
     void morph (INTVAL type) {

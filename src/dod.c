@@ -678,6 +678,7 @@ reduce_arenas(Interp *interpreter,
             pool->total_objects -= arena->used;
 #if ! ARENA_DOD_FLAGS
             mem_sys_free(arena->start_objects);
+	    arena->start_objects = 0;
 #endif
             mem_sys_free(arena);
 

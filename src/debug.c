@@ -264,8 +264,10 @@ PDB_get_command(Interp *interpreter)
     fflush(stdout);
 
     /* not used any more */
-    if (pdb->last_command && *pdb->cur_command)
+    if (pdb->last_command && *pdb->cur_command) {
         mem_sys_free(pdb->last_command);
+	pdb->last_command = NULL;
+    }
 
     /* update the last command */
     if (pdb->cur_command && *pdb->cur_command)
@@ -1119,9 +1121,11 @@ PDB_delete_condition(Interp *interpreter,
         else {
             /* 'value' is a float or an int, so we can just free it */
             mem_sys_free(breakpoint->condition->value);
+	    breakpoint->condition->value = NULL;
         }
     }
     mem_sys_free(breakpoint->condition);
+    breakpoint->condition = NULL;
 }
 
 /*

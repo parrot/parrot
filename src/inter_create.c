@@ -355,6 +355,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     Parrot_destroy_memory_pools(interpreter);
     /* mem subsystem is dead now */
     mem_sys_free(interpreter->arena_base);
+    interpreter->arena_base = NULL;
     /* packfile */
 
     if (!Interp_flags_TEST(interpreter, PARROT_EXTERN_CODE_FLAG))  {
@@ -378,7 +379,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     if (interpreter->profile) {
         mem_sys_free(interpreter->profile->data);
+	interpreter->profile->data = NULL;
         mem_sys_free(interpreter->profile);
+	interpreter->profile = NULL;
     }
 
     /* deinit op_lib */
@@ -414,8 +417,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         if (!interpreter->thread_data || (
                     interpreter->thread_data &&
                     (interpreter->thread_data->state & THREAD_STATE_JOINED))) {
-            if (interpreter->thread_data )
+            if (interpreter->thread_data ) {
                 mem_sys_free(interpreter->thread_data);
+		interpreter->thread_data = NULL;
+	    }
             mem_sys_free(interpreter);
         }
     }

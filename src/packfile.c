@@ -111,7 +111,9 @@ PackFile_destroy(struct PackFile *pf)
         munmap((void*)pf->src, pf->size);
 #endif
     mem_sys_free(pf->header);
+    pf->header = NULL;
     mem_sys_free(pf->dirp);
+    pf->dirp = NULL;
     directory_destroy (&pf->directory.base);
     return;
 }
@@ -1478,8 +1480,10 @@ directory_destroy (struct PackFile_Segment *self)
     for (i = 0; i < dir->num_segments; i++) {
         PackFile_Segment_destroy (dir->segments[i]);
     }
-    if (dir->segments)
+    if (dir->segments) {
         mem_sys_free (dir->segments);
+	dir->segments = NULL;
+    }
     default_destroy (self);
 }
 
@@ -1691,9 +1695,14 @@ The default destroy function.
 static void
 default_destroy (struct PackFile_Segment *self)
 {
-    if (!self->pf->is_mmap_ped && self->data)
+    if (!self->pf->is_mmap_ped && self->data) {
         mem_sys_free(self->data);
-    if (self->name) mem_sys_free (self->name);
+	self->data = NULL;
+    }
+    if (self->name) {
+	mem_sys_free (self->name);
+	self->name = NULL;
+    }
     mem_sys_free (self);
 }
 
@@ -1770,8 +1779,11 @@ byte_code_destroy (struct PackFile_Segment *self)
 #endif
     if (byte_code->prederef.code) {
         mem_sys_free(byte_code->prederef.code);
-        if (byte_code->prederef.branches)
+	byte_code->prederef.code = NULL;
+        if (byte_code->prederef.branches) {
             mem_sys_free(byte_code->prederef.branches);
+	    byte_code->prederef.branches = NULL;
+	}
     }
 }
 
@@ -1829,6 +1841,7 @@ pf_debug_destroy (struct PackFile_Segment *self)
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
 
     mem_sys_free(debug->filename);
+    debug->filename = NULL;
 }
 
 /*
@@ -2105,13 +2118,16 @@ PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
         switch (self->fixups[i]->type) {
             case enum_fixup_label:
                 mem_sys_free(self->fixups[i]->name);
+		self->fixups[i]->name = NULL;
                 break;
         }
         mem_sys_free(self->fixups[i]);
+	self->fixups[i] = NULL;
     }
 
     if (self->fixup_count) {
         mem_sys_free(self->fixups);
+	self->fixups = NULL;
     }
 
     self->fixups = NULL;

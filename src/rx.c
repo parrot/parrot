@@ -280,10 +280,14 @@ void
 bitmap_destroy(Interp *interpreter, Bitmap bmp)
 {
     /* XXX */
-    if (bmp->bigchars && PObj_bufstart(bmp->bigchars))
+    if (bmp->bigchars && PObj_bufstart(bmp->bigchars)) {
         mem_sys_free(PObj_bufstart(bmp->bigchars));
+	PObj_bufstart(bmp->bigchars) = NULL;
+    }
     mem_sys_free(bmp->bmp);
+    bmp->bmp = NULL;
     mem_sys_free(bmp);
+    bmp = NULL;
 }
 
 /*
