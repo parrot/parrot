@@ -38,12 +38,12 @@ output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
       sweep 0
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
-      print I3
       new P0, .PerlUndef # kill 1st object
       sweep 0
       interpinfo I4, 2   # Should be same as last
-      sub I3, I4, I2
-      print I3
+      sub I5, I4, I2
+      print I3           # These create PMCs that need early DOD, so we need
+      print I5           # to put them after the second sweep op.
       end
 CODE
 
