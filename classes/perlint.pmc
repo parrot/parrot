@@ -443,34 +443,6 @@ pmclass PerlInt extends perlscalar {
 	}
     }
 
-    void logical_or (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            SELF->cache.int_val ? SELF->cache.int_val :
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void logical_and (PMC* value, PMC* dest) {
-        VTABLE_set_integer_native(INTERP, dest,
-            !SELF->cache.int_val ? SELF->cache.int_val :
-            VTABLE_get_integer(INTERP, value)
-        );
-    }
-
-    void logical_xor (PMC* value, PMC* dest) {
-	INTVAL left_truth, right_truth, res;
-
-	left_truth = SELF->cache.int_val;
-	right_truth = VTABLE_get_integer(INTERP, value);
-	if ((left_truth && right_truth) || (!left_truth && !right_truth))
-	    res = 0;
-	else if (left_truth)
-	    res = left_truth;
-	else
-	    res = right_truth;
-
-	VTABLE_set_integer_native(INTERP, dest, res);
-    }
 
     void logical_not (PMC* value) {
 	    VTABLE_set_integer_native(INTERP, value,
