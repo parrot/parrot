@@ -134,7 +134,7 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
     if (fptr != NULL) {
         if (PIO_isatty(fptr))
             flags |= PIO_F_CONSOLE;
-        io = PIO_new(interpreter, NULL, type, flags, 0);
+        io = PIO_new(interpreter, type, flags, 0);
         io->fd = fptr;
         return io;
     }
@@ -151,7 +151,7 @@ PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
 
     if (PIO_isatty(fptr))
         flags |= PIO_F_CONSOLE;
-    io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
+    io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
     io->fd = fptr;
     return io;
 }
