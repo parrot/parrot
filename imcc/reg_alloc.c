@@ -41,7 +41,7 @@ static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(IMC_Unit *, SymReg * r0, SymReg * r1);
-static int map_colors(IMC_Unit *, int x, int * graph, int colors[], int typ);
+static int map_colors(IMC_Unit *, int x, unsigned int * graph, int colors[], int typ);
 #ifdef DO_SIMPLIFY
 static int simplify (IMC_Unit *);
 #endif
@@ -58,44 +58,45 @@ extern int pasm_file;
 /* XXX FIXME: Globals: */
 
 static IMCStack nodeStack;
-static int* interference_graph;
+static unsigned int* interference_graph;
 static int n_symbols;
 
-static int* ig_get_word(int i, int j, int N, int* graph, int* bit_ofs)
+static unsigned int* ig_get_word(int i, int j, int N, unsigned int* graph,
+                                 int* bit_ofs)
 {
-    int bit = i * N + j;
+    unsigned int bit = i * N + j;
     *bit_ofs = bit % sizeof(*graph);
     return &graph[bit / sizeof(*graph)];
 }
 
-static void ig_set(int i, int j, int N, int* graph)
+static void ig_set(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
-    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
     *word |= (1 << bit_ofs);
 }
 
-static void ig_clear(int i, int j, int N, int* graph)
+static void ig_clear(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
-    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
     *word &= ~(1 << bit_ofs);
 }
 
-static int ig_test(int i, int j, int N, int* graph)
+static int ig_test(int i, int j, int N, unsigned int* graph)
 {
     int bit_ofs;
-    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
     return *word & (1 << bit_ofs);
 }
 
-static int* ig_allocate(int N)
+static unsigned int* ig_allocate(int N)
 {
     // size is N*N bits, but we want don't want to allocate a partial
     // word, so round up to the nearest multiple of sizeof(int).
     int need_bits = N * N;
     int num_words = (need_bits + sizeof(int) - 1) / sizeof(int);
-    return (int*) calloc(num_words, sizeof(int));
+    return (unsigned int*) calloc(num_words, sizeof(int));
 }
 
 /* imc_reg_alloc is the main loop of the allocation algorithm. It operates
@@ -491,11 +492,9 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
 /* creates the interference graph between the variables.
  *
- * data structure is a 2-d array 'interference_graph' where row/column
- * indices represent the same index in the list of all symbols
- * (unit->reglist) in the current compilation unit. The value in the
- * 2-d array interference_graph[i][j] is the symbol unit->reglist[j]
- * itself.
+ * data structure is a 2-d array 'interference_graph' bitmap where
+ * row/column indices represent the same index in the list of all
+ * symbols (unit->reglist) in the current compilation unit.
  *
  * two variables interfere when they are alive at the
  * same time
@@ -901,7 +900,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
     int x = 0;
     int color, colors[MAX_COLOR];
     int free_colors, t;
-    int *graph = interference_graph;
+    unsigned int *graph = interference_graph;
     SymReg ** reglist = unit->reglist;
 
     while ((imcstack_depth(nodeStack) > 0) ) {
@@ -953,7 +952,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
 static int
-map_colors(IMC_Unit* unit, int x, int *graph, int colors[], int typ)
+map_colors(IMC_Unit* unit, int x, unsigned int *graph, int colors[], int typ)
 {
     int y = 0;
     SymReg * r;
@@ -1057,7 +1056,7 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
     SymReg ** reglist = unit->reglist;
     if (old != new) {
         /* n_symbols is already increased */
-        int *new_graph = ig_allocate(n_symbols);
+        unsigned int *new_graph = ig_allocate(n_symbols);
         /* old symbols count of previous graph */
         int o = n_symbols - 1;
         for (x = 0; x < o; x++) {
