@@ -2273,40 +2273,124 @@ AUTO_OP ke_type(i, s, i|ic) {
   $1 = key_element_type(interpreter, (KEY*)$2, $3);
 }
 
-=item B<ke_value>(i|n|s, s, i|ic)
+=item B<ke_value>(i|n|s|p, s, i|ic)
 
 Set $1 to the value of index $3 of key $2
 
 =cut
 
 AUTO_OP ke_value(i, s, i|ic) {
-  $1 = key_element_value_i(interpreter, (KEY*)$2, $3);
+  KEY_PAIR* pair = key_element_value_i(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.int_val;
 }
 
 AUTO_OP ke_value(n, s, i|ic) {
-  $1 = key_element_value_n(interpreter, (KEY*)$2, $3);
+  KEY_PAIR* pair = key_element_value_i(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.num_val;
 }
 
 AUTO_OP ke_value(s, s, i|ic) {
-  $1 = key_element_value_s(interpreter, (KEY*)$2, $3);
+  KEY_PAIR* pair = key_element_value_i(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.struct_val;
 }
 
-=item B<ke_set_value>(s, i|ic, i|ic|n|nc|s|sc)
+AUTO_OP ke_value(p, s, i|ic) {
+  KEY_PAIR* pair = key_element_value_i(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.pmc_val;
+}
+
+=item B<ke_value>(i|n|s|p, s, s|sc)
+
+Set $1 to the value of index $3 of key $2
+
+=cut
+
+AUTO_OP ke_value(i, s, s|sc) {
+  KEY_PAIR* pair = key_element_value_s(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.int_val;
+}
+
+AUTO_OP ke_value(n, s, s|sc) {
+  KEY_PAIR* pair = key_element_value_s(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.num_val;
+}
+
+AUTO_OP ke_value(s, s, s|sc) {
+  KEY_PAIR* pair = key_element_value_s(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.struct_val;
+}
+
+AUTO_OP ke_value(p, s, s|sc) {
+  KEY_PAIR* pair = key_element_value_s(interpreter, (KEY*)$2, $3);
+  $1 = pair->cache.pmc_val;
+}
+
+=item B<ke_set_value>(s, i|ic, i|ic|n|nc|s|sc|p)
 
 Assign value $3 to index $2 of key $1
 
 =cut
 
 AUTO_OP ke_set_value(s, i|ic, i|ic) {
-  key_set_element_value_i(interpreter, (KEY*)$1, $2, $3);
+  KEY_PAIR pair;
+  pair.type = enum_key_int;
+  pair.cache.int_val = $3;
+  key_set_element_value_i(interpreter, (KEY*)$1, $2, &pair);
 }
 
 AUTO_OP ke_set_value(s, i|ic, n|nc) {
-  key_set_element_value_n(interpreter, (KEY*)$1, $2, $3);
+  KEY_PAIR pair;
+  pair.type = enum_key_num;
+  pair.cache.num_val = $3;
+  key_set_element_value_i(interpreter, (KEY*)$1, $2, &pair);
 }
 
 AUTO_OP ke_set_value(s, i|ic, s|sc) {
-  key_set_element_value_s(interpreter, (KEY*)$1, $2, $3);
+  KEY_PAIR pair;
+  pair.type = enum_key_string;
+  pair.cache.struct_val = $3;
+  key_set_element_value_i(interpreter, (KEY*)$1, $2, &pair);
+}
+
+AUTO_OP ke_set_value(s, i|ic, p) {
+  KEY_PAIR pair;
+  pair.type = enum_key_pmc;
+  pair.cache.pmc_val = $3;
+  key_set_element_value_i(interpreter, (KEY*)$1, $2, &pair);
+}
+
+=item B<ke_set_value>(s, s|sc, i|ic|n|nc|s|sc|p)
+
+Assign value $3 to index $2 of key $1
+
+=cut
+
+AUTO_OP ke_set_value(s, s|sc, i|ic) {
+  KEY_PAIR pair;
+  pair.type = enum_key_int;
+  pair.cache.int_val = $3;
+  key_set_element_value_s(interpreter, (KEY*)$1, $2, &pair);
+}
+
+AUTO_OP ke_set_value(s, s|sc, n|nc) {
+  KEY_PAIR pair;
+  pair.type = enum_key_num;
+  pair.cache.num_val = $3;
+  key_set_element_value_s(interpreter, (KEY*)$1, $2, &pair);
+}
+
+AUTO_OP ke_set_value(s, s|sc, s|sc) {
+  KEY_PAIR pair;
+  pair.type = enum_key_string;
+  pair.cache.struct_val = $3;
+  key_set_element_value_s(interpreter, (KEY*)$1, $2, &pair);
+}
+
+AUTO_OP ke_set_value(s, s|sc, p) {
+  KEY_PAIR pair;
+  pair.type = enum_key_pmc;
+  pair.cache.pmc_val = $3;
+  key_set_element_value_s(interpreter, (KEY*)$1, $2, &pair);
 }
 
 =item B<chop_key>(s)

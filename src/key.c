@@ -140,19 +140,19 @@ INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, INTVAL inde
   return -1;
 }
 
-/*=for api key key_element_value_{i,n,s}
+/*=for api key key_element_value_i
 
 return the value of index <index> of KEY <key>
 
 =cut
 */
 
-INTVAL key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
+KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
   if(key != NULL) {
     if((index >= 0) || (index < key->size)) {
       KEY_PAIR* pair = &key->keys[index];
       if(pair != NULL) {
-        return pair->cache.int_val;
+        return pair;
       }
       else {
         fprintf(stderr,"*** key_element_value_i pair returning a null key\n");
@@ -163,30 +163,12 @@ INTVAL key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL i
     }
   }
   fprintf(stderr,"*** key_element_value_ checking a NULL key\n");
-  return -1;
+  return NULL;
 }
 
-FLOATVAL key_element_value_n(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
+KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* index) {
   if(key != NULL) {
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
-      if(pair != NULL) {
-        return pair->cache.num_val;
-      }
-      else {
-        fprintf(stderr,"*** key_element_value_n pair returning a null key\n");
-      }
-    }
-    else {
-      fprintf(stderr,"*** key_element_value_n checking out of bounds\n");
-    }
-  }
-  fprintf(stderr,"*** key_element_value_n checking a NULL key\n");
-  return -1.0;
-}
-
-STRING* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, INTVAL index) {
-  if(key != NULL) {
+/*
     if((index >= 0) || (index < key->size)) {
       KEY_PAIR* pair = &key->keys[index];
       if(pair != NULL) {
@@ -199,8 +181,9 @@ STRING* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, INTVAL 
     else {
       fprintf(stderr,"*** key_element_value_s checking out of bounds\n");
     }
+*/
   }
-  fprintf(stderr,"*** key_element_value_s checking a NULL key\n");
+  fprintf(stderr,"*** key_element_value_s not implemented yet\n");
   return NULL;
 }
 
@@ -211,12 +194,10 @@ Set the value of index <index> of key <key> to integer <value>
 =cut
 */
 
-void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index, INTVAL value) {
+void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL index, KEY_PAIR* value) {
   if(key != NULL) {
     if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
-      pair->cache.int_val = value;
-      pair->type = enum_key_int;
+      memcpy(&key->keys[index],value,sizeof(KEY_PAIR));
     }
     else {
       fprintf(stderr,"*** key_set_element_value_i setting value out of bounds\n");
@@ -227,29 +208,6 @@ void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, INTVAL
   }
 }
 
-/*=for api key key_set_element_value_n
-
-Set the value of index <index> of key <key> to number <value>
-
-=cut
-*/
-
-void key_set_element_value_n(struct Parrot_Interp *interpreter, KEY* key, INTVAL index, FLOATVAL value) {
-  if(key != NULL) {
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
-      pair->cache.num_val = value;
-      pair->type = enum_key_num;
-    }
-    else {
-      fprintf(stderr,"*** key_set_element_value_n setting value out of bounds\n");
-    }
-  }
-  else {
-    fprintf(stderr,"*** key_set_element_value_n assigning to a NULL key\n");
-  }
-}
-
 /*=for api key key_set_element_value_s
 
 Set the value of index <index> of key <key> to string <value>
@@ -257,20 +215,17 @@ Set the value of index <index> of key <key> to string <value>
 =cut
 */
 
-void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, INTVAL index, STRING* value) {
+void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* index, KEY_PAIR* value) {
   if(key != NULL) {
+/*
     if((index >= 0) || (index < key->size)) {
       KEY_PAIR* pair = &key->keys[index];
       pair->cache.struct_val = value;
       pair->type = enum_key_string;
     }
-    else {
-      fprintf(stderr,"*** key_set_element_value_s setting value out of bounds\n");
-    }
+*/
   }
-  else {
-    fprintf(stderr,"*** key_set_element_value_s assigning to a NULL key\n");
-  }
+  fprintf(stderr,"*** key_set_element_value_s not implemented yet\n");
 }
 
 /*=for api key key_chop
