@@ -387,7 +387,7 @@ Parrot_charset_ascii_init(Interp *interpreter)
       find_word_boundary,
       string_from_codepoint,
       compute_hash,
-      {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+      {NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,
           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
   };
 
