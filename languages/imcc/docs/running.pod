@@ -16,6 +16,8 @@ Parrot - running
 
 =item 0.0.10.1 add -E switch
 
+=item 0.0.11 added runtime options
+
 =back
 
 =head1 OVERVIEW
@@ -28,7 +30,7 @@ This document describes parrot's command line options.
 
 =head1 OPTIONS
 
-=head2 IMCC options
+=head2 Assembler options
 
 =over 4
 
@@ -47,16 +49,16 @@ a hex value of debug bits. Without a value, debug is set to 1.
 
 The individual bits are:
 
- DEBUG_PARROT 0x0001
- DEBUG_LEXER  0x0002
- DEBUG_PARSER 0x0004
- DEBUG_IMC    0x0008
- DEBUG_CFG    0x0010
- DEBUG_OPT1   0x0020
- DEBUG_OPT2   0x0040
- DEBUG_PBC    0x1000
- DEBUG_PBC_CONST    0x2000
- DEBUG_PBC_FIXUP    0x4000
+ DEBUG_PARROT         0001
+ DEBUG_LEXER          0002
+ DEBUG_PARSER         0004
+ DEBUG_IMC            0008
+ DEBUG_CFG            0010
+ DEBUG_OPT1           0020
+ DEBUG_OPT2           0040
+ DEBUG_PBC            1000
+ DEBUG_PBC_CONST      2000
+ DEBUG_PBC_FIXUP      4000
 
 To produce really huge output on F<stderr> run "imcc B<-d 0ffff> ...".
 Note: if the argument is separated by whitespace from the B<-d> switch,
@@ -104,6 +106,7 @@ Optimize
  -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
+ -Ot select fastest run core (default with -O1 and -O2)
 
 This will probably change.
 
@@ -116,10 +119,72 @@ Preprocess source file (i.e. expand macros) and print result to stdout. E.g.
 
 =back
 
-=head2 Parrot Options
+=head2 Run Core Options
 
-See parrot B<-h> for description. Used when running a program inside
-imcc.
+=over 4
+
+=item -b, --bounds-checks, --slow-core
+
+Select the bounds-checking slow clore.
+
+=item -C, --CGP-core
+
+Select the CGP (CGoto Predereferenced) core.
+
+=item -f, --fast-core
+
+Select the fast (or function) core.
+
+=item -g, --computed-goto-core
+
+Select the CGoto core.
+
+=item -j, --jit-core
+
+Run with the JIT subsystem.
+
+=item -p, --profile
+
+Run with the slow core and do print an execution profile.
+
+=item -P, --predereferenced-core
+
+Prederefernce opcode function arguments on the fly.
+
+=item -t, --trace
+
+Run with the slow core and do print trace information to B<stderr>.
+
+=back
+
+=head2 VM Options
+
+=over 4
+
+=item -w, --warnings
+
+Turn on warnings.
+
+=item --gc-debug
+
+Turn on GC (Garbage Collection) debugging. This imposes some stress on the
+GC subsystem and can slow down execution considerably.
+
+=item -G, --no-gc
+
+This turns of DOD (Dead Object Detection) and GC. This may be useful to find GC
+related bugs. DOn't use this option for longer running programs, this will
+exhaust memory quickly, as it isn't recycled.
+
+=item --leak-test, --destroy-at-end
+
+Free all memory of the last interpreter, so that leak checkers can be run.
+
+=item -., --wait
+
+Read a keystroke before starting.
+
+=back
 
 =head1 <file>
 
@@ -158,11 +223,17 @@ for running the program.
  -o x.pbc  x.pasm	ass		x.pbc
  -o x.pbc -r x.pasm	ass/run pasm	x.pbc
  -o x.pbc -r -r x.pasm	ass/run pbc	x.pbc
+ -o x.o    x.pbc        obj
 
+Actions above are:
+
+  run ... yes run the program
+  ass ... assemble sourcefile
+  obj ..  produce native (ELF) object file for the EXEC subsystem
 
 =head1 BUGS
 
-None currently known.
+Yes.
 
 =head1 FILES
 
