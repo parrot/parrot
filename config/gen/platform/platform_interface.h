@@ -58,11 +58,14 @@ void * new_sys_timer_ms(void);
 void start_sys_timer_ms(void *handle, int ms);
 void stop_sys_timer_ms(void *handle);
 int get_sys_timer_ms(void *handle);
+
 #else
-#define new_sys_timer NULL
-#define start_sys_timer(h, m)
-#define stop_sys_timer(h)
-#define get_sys_timer(h) 0
+
+#  define new_sys_timer_ms() NULL
+#  define start_sys_timer_ms(h, m)
+#  define stop_sys_timer_ms(h)
+#  define get_sys_timer_ms(h) 0
+
 #endif
 
 
