@@ -947,7 +947,7 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
 #  if ! DISABLE_GC_DEBUG
     /* It's easy to forget that string comparison can trigger GC */
     if (GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #  endif
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -1054,7 +1054,7 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 #  if ! DISABLE_GC_DEBUG
     /* It's easy to forget that string comparison can trigger GC */
     if (GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 #  endif
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -1109,7 +1109,7 @@ string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
 
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
@@ -1168,7 +1168,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
 
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 
     if (s1 && s2) {
         if (s1->type != s2->type || s1->encoding != s2->encoding) {
@@ -1247,7 +1247,7 @@ string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
 
     /* trigger GC for debug */
     if (interpreter && GC_DEBUG(interpreter))
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
 
     if (s1 && s2) {
         if (s1->type != s2->type || s1->encoding != s2->encoding) {

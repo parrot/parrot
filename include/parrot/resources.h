@@ -82,6 +82,7 @@ struct Stash {
 #define HEADER_ALLOCS_SINCE_COLLECT 8
 #define MEM_ALLOCS_SINCE_COLLECT 9
 #define TOTAL_COPIED 10
+#define IMPATIENT_PMCS 11
 
 /* &end_gen */
 

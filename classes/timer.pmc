@@ -90,7 +90,7 @@ pmclass Timer does event {
 	    mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
 	SELF->cache.struct_val = t;
 	PObj_active_destroy_SET(SELF);
-	interpreter->has_early_DOD_PMCs = 1;
+ 	++interpreter->num_early_DOD_PMCs;
     }
 
     void init_pmc(PMC *init) {

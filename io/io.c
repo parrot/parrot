@@ -840,12 +840,12 @@ Parrot_IOData_mark(theINTERP, ParrotIOData *piodata)
     INTVAL i;
     ParrotIOTable table = piodata->table;
 
-    /* XXX boe: Parrot_really_destroy might call us with mark_ptr not
+    /* XXX boe: Parrot_really_destroy might call us with dod_mark_ptr not
      *          set. This is neccessary until destruction ordering prevents
      *          the premature destruction of the standardhandles
      */
-    if (!interpreter->mark_ptr)
-        interpreter->mark_ptr = table[0];
+    if (!interpreter->dod_mark_ptr)
+        interpreter->dod_mark_ptr = table[0];
 
     for (i = 0; i < PIO_NR_OPEN; i++) {
         if (table[i]) {

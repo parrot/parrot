@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is(<<'CODE', <<'OUT', "Timer setup");
@@ -64,7 +64,7 @@ ok 3
 OUT
 
 SKIP: {
-  skip("No thread config yet", 3) unless ($^O eq 'linux' or $^O eq 'darwin');
+  skip("No thread config yet", 5) unless ($^O eq 'linux' or $^O eq 'darwin');
 
 output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start");
 .include "timer.pasm"
@@ -152,5 +152,71 @@ ok 2
 ok 3
 OUT
 
+output_is(<<'CODE', <<'OUT', "Timer setup - initializer/start/destroy");
+.include "timer.pasm"
+    bounds 1	# cant run with JIT core yet
+    new P1, .SArray
+    set P1, 6
+    set P1[0], .PARROT_TIMER_NSEC
+    set P1[1], 0.5
+    set P1[2], .PARROT_TIMER_HANDLER
+    find_global P2, "_timer_sub"
+    set P1[3], P2
+    set P1[4], .PARROT_TIMER_RUNNING
+    set P1[5], 1
+
+    sweep 0
+    new P0, .Timer, P1
+    print "ok 1\n"
+    sweep 0
+    # destroy
+    null P0
+    # do a lazy DOD run
+    sweep 0
+    sleep 1
+    print "ok 2\n"
+    end
+.pcc_sub _timer_sub:
+    print "never\n"
+    invoke P1
+CODE
+ok 1
+ok 2
+OUT
+
+output_is(<<'CODE', <<'OUT', "Timer setup - timer in array destroy");
+.include "timer.pasm"
+    bounds 1	# cant run with JIT core yet
+    new P1, .SArray
+    set P1, 6
+    set P1[0], .PARROT_TIMER_NSEC
+    set P1[1], 0.5
+    set P1[2], .PARROT_TIMER_HANDLER
+    find_global P2, "_timer_sub"
+    set P1[3], P2
+    set P1[4], .PARROT_TIMER_RUNNING
+    set P1[5], 1
+
+    new P0, .Timer, P1
+    print "ok 1\n"
+    sweep 0
+    # hide timer in array
+    set P1[0], P0
+    new P0, .PerlUndef
+    sweep 0
+    # un-anchor the array
+    new P1, .PerlUndef
+    # do a lazy DOD run
+    sweep 0
+    sleep 1
+    print "ok 2\n"
+    end
+.pcc_sub _timer_sub:
+    print "never\n"
+    invoke P1
+CODE
+ok 1
+ok 2
+OUT
 }
 

@@ -106,13 +106,13 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         interpreter->mem_allocs_since_last_collect++;
     }
     if (0 && GC_DEBUG(interpreter)) {
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
         if (pool->compact) {
             (*pool->compact) (interpreter, pool);
         }
     }
     if (pool->top_block->free < size) {
-        Parrot_do_dod_run(interpreter, 1);
+        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
             /* don't bother reclaiming if it's just chicken feed */

@@ -35,10 +35,10 @@ output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
       interpinfo I1, 2   # How many DOD runs have we done already?
       new P0, .PerlUndef
       needs_destroy P0
+      new P0, .PerlUndef # kill object
       sweep 0
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
-      new P0, .PerlUndef # kill 1st object
       sweep 0
       interpinfo I4, 2   # Should be same as last
       sub I5, I4, I2

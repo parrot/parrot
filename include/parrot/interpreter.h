@@ -247,7 +247,6 @@ typedef struct Parrot_Interp {
 
     /* per interpreter global vars */
     INTVAL world_inited;        /* Parrot_init is done */
-    PMC *mark_ptr;             /* last PMC marked used in DOD runs */
     PMC *iglobals;              /* SArray of PMCs, containing: */
 /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
 /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
@@ -255,7 +254,12 @@ typedef struct Parrot_Interp {
 /* 3:   PMC *Env;                    hash_like Env PMC */
 /* 4:   PMC *ParrotInterpreter       that's me */
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
-    int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
+    UINTVAL num_early_DOD_PMCs;         /* how many PMCs want immediate destruction */
+    UINTVAL num_early_PMCs_seen;        /* how many such PMCs has DOD seen */
+    PMC* dod_mark_ptr;                  /* last PMC marked during a DOD run */
+    PMC* dod_trace_ptr;                 /* last PMC trace_children was called on */
+    int lazy_dod;                       /* flag that indicates whether we should stop
+                                           when we've seen all impatient PMCs */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
     PMC** nci_method_table;       /* Method table PMC for NCI stubs per class */

@@ -879,8 +879,11 @@ Opcodes that interact with the DOD and GC subsystems.
 =cut
 
 op sweep(inconst INT) {
-  if ($1 || interpreter->has_early_DOD_PMCs)
+  if ($1)
     Parrot_do_dod_run(interpreter, 0);
+  else
+    if (interpreter->num_early_DOD_PMCs)
+      Parrot_do_dod_run(interpreter, DOD_lazy_FLAG);
   goto NEXT();
 }
 
@@ -948,7 +951,7 @@ when unused during the lazy sweep, triggered by "sweep 0".
 
 op needs_destroy(in PMC) {
    PObj_needs_early_DOD_SET($1);
-   interpreter->has_early_DOD_PMCs = 1;
+   ++interpreter->num_early_DOD_PMCs;
   goto NEXT();
 }
 

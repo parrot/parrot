@@ -1294,6 +1294,9 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
         case TOTAL_COPIED:
             ret = interpreter->memory_collected;
             break;
+        case IMPATIENT_PMCS:
+            ret = interpreter->num_early_DOD_PMCs;
+            break;
     }
     return ret;
 }
