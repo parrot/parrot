@@ -284,10 +284,31 @@ typedef enum {
 /*
  * Macros to make accessing registers more convenient/readable.
  */
-#define REG_INT(x) interpreter->int_reg.registers[x]
-#define REG_NUM(x) interpreter->num_reg.registers[x]
-#define REG_STR(x) interpreter->string_reg.registers[x]
-#define REG_PMC(x) interpreter->pmc_reg.registers[x]
+#define INTERP_REG_INT(i, x) i->int_reg.registers[x]
+#define INTERP_REG_NUM(i, x) i->num_reg.registers[x]
+#define INTERP_REG_STR(i, x) i->string_reg.registers[x]
+#define INTERP_REG_PMC(i, x) i->pmc_reg.registers[x]
+
+/*
+ * same with the default name interpreter
+ */
+#define REG_INT(x) INTERP_REG_INT(interpreter, x)
+#define REG_NUM(x) INTERP_REG_NUM(interpreter, x)
+#define REG_STR(x) INTERP_REG_STR(interpreter, x)
+#define REG_PMC(x) INTERP_REG_PMC(interpreter, x)
+
+/*
+ * and a set of macros to access a register by offset, mostly used
+ * in JIT emit code
+ * The offsets are relative to REG_BASE, which is currently REG_INT(0)
+ */
+
+#define REG_BASE struct Parrot_Interp
+
+#define REG_OFFS_INT(x) offsetof(REG_BASE, int_reg.registers[x])
+#define REG_OFFS_NUM(x) offsetof(REG_BASE, num_reg.registers[x])
+#define REG_OFFS_STR(x) offsetof(REG_BASE, string_reg.registers[x])
+#define REG_OFFS_PMC(x) offsetof(REG_BASE, pmc_reg.registers[x])
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)

@@ -244,6 +244,12 @@ void Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 void Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp *interpreter);
 
+/*
+ * interface functions for the register save/restore code
+ *
+ * 1) old style with memory location of the register
+ */
+
 void Parrot_jit_emit_mov_mr_n(
     struct Parrot_Interp *interpreter, char *mem, int);
 void Parrot_jit_emit_mov_mr(
@@ -253,6 +259,23 @@ void Parrot_jit_emit_mov_rm_n(
 void Parrot_jit_emit_mov_rm(
     struct Parrot_Interp *interpreter, int reg, char *mem);
 
+/*
+ * 2) new style with offsets relative to the base register
+ *    These are used if the platform defines the macro
+ *    Parrot_jit_emit_get_base_reg_no
+ */
+void Parrot_jit_emit_mov_mr_n_offs(
+    Interp *, int base_reg, size_t offs, int src_reg);
+void Parrot_jit_emit_mov_mr_offs(
+    Interp *,  int base_reg, size_t offs, int src_reg);
+void Parrot_jit_emit_mov_rm_n_offs(
+    Interp *, int dst_reg, int base_reg, size_t offs);
+void Parrot_jit_emit_mov_rm_offs(
+    Interp *, int dst_reg, int base_reg, size_t offs);
+
+/*
+ * NCI interface
+ */
 void *Parrot_jit_build_call_func(struct Parrot_Interp *, PMC *, String *);
 
 #endif /* PARROT_JIT_H_GUARD */
