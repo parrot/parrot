@@ -21,6 +21,10 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+/* #include "objects.str" */
+#ifndef _S
+#  define _S(s) const_string(interpreter, s)
+#endif
 
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array)
@@ -461,12 +465,11 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
 static PMC*
 get_init_meth(Parrot_Interp interpreter, PMC *class,
-        const char * init_name, STRING **meth_str)
+         STRING *prop_str , STRING **meth_str)
 {
     PMC *prop;
-    STRING *prop_str, *meth;
+    STRING *meth;
 #if 0
-    prop_str = const_string(interpreter, init_name);
     prop = VTABLE_getprop(interpreter, class, prop_str);
     if (!VTABLE_defined(interpreter, prop))
         return NULL;
@@ -476,7 +479,6 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
     PMC *props;
     if ( !(props = PMC_metadata(class)))
         return NULL;
-    prop_str = const_string(interpreter, init_name);
     b = hash_get_bucket(interpreter,
                 (Hash*) PMC_struct_val(props), prop_str);
     if (!b)
@@ -515,7 +517,8 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
          *    no redispatch
          */
         STRING *meth_str;
-        PMC *meth = get_init_meth(interpreter, class, "CONSTRUCT", &meth_str);
+        PMC *meth = get_init_meth(interpreter, class, _S("CONSTRUCT"),
+                &meth_str);
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -532,7 +535,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         for (i = nparents - 1; i >= 0; --i) {
             parent_class = VTABLE_get_pmc_keyed_int(interpreter,
                     classsearch_array, i);
-            meth = get_init_meth(interpreter, parent_class, "BUILD", &meth_str);
+            meth = get_init_meth(interpreter, parent_class, _S("BUILD"), &meth_str);
             if (meth) {
                 if (init)
                     Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -542,7 +545,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                             object, meth_str);
             }
         }
-        meth = get_init_meth(interpreter, class, "BUILD", &meth_str);
+        meth = get_init_meth(interpreter, class, _S("BUILD"), &meth_str);
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,

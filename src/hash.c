@@ -716,9 +716,8 @@ Returns the bucket for C<okey>.
 */
 
 HashBucket *
-hash_get_bucket(Interp *interpreter, Hash *hash, void *okey)
+hash_get_bucket(Interp *interpreter, Hash *hash, void *key)
 {
-    void *key = okey;
     UINTVAL hashval = (hash->hash_val)(interpreter, hash, key);
     HashIndex *table = (HashIndex *) PObj_bufstart(&hash->buffer);
     BucketIndex chain = table[hashval & hash->max_chain];
