@@ -1,4 +1,3 @@
-#! perl -w
 # Copyright: 2004-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -30,7 +29,6 @@ Test negative return codes.
 The special variable $? in Perl5.
 
 =head1 AUTHOR
-
 
 Nigel Sandever - L<nigelsandever@btconnect.com>
 
