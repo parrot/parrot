@@ -161,6 +161,7 @@ p6ge_parse_term(P6GE_Text* t)
     int c;
     int ctype;
     int type;
+    int group;
 
     p6ge_skip(t, 0);
     c = *(t->pos);
@@ -170,16 +171,18 @@ p6ge_parse_term(P6GE_Text* t)
        return p6ge_parse_literal(t);
     if (c == '[') {
        p6ge_skip(t,1);
+       group = --t->ncapture;
        e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
-       e->group = --t->ncapture;
+       e->group = group;
        if (*(t->pos) != ']') p6ge_parse_error(t, "Missing ']'");
        else p6ge_skip(t, 1);
        return e;
     }
     if (c == '(') {
        p6ge_skip(t,1);
+       group = ++t->capture;
        e = p6ge_parse_new(P6GE_GROUP, p6ge_parse_expr(t), 0);
-       e->group = ++t->capture;
+       e->group = group;
        if (*(t->pos) != ')') p6ge_parse_error(t, "Missing ')'");
        else p6ge_skip(t, 1);
        return e;
