@@ -578,15 +578,15 @@ ${cg_c}
 
 ${gc_c}
 
-warnings$(O) : $(GENERAL_H_FILES)
+$(SRC)/warnings$(O) : $(GENERAL_H_FILES)
 
-misc$(O) : $(GENERAL_H_FILES)
+$(SRC)/misc$(O) : $(GENERAL_H_FILES)
 
-utils$(O) : $(GENERAL_H_FILES)
+$(SRC)/utils$(O) : $(GENERAL_H_FILES)
 
-spf_render$(O) : $(GENERAL_H_FILES)
+$(SRC)/spf_render$(O) : $(GENERAL_H_FILES)
 
-spf_vtable$(O) : $(GENERAL_H_FILES)
+$(SRC)/spf_vtable$(O) : $(GENERAL_H_FILES)
 
 # $(STICKY_FILES) : Configure.pl
 #	$(PERL) Configure.pl
