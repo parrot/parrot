@@ -153,22 +153,43 @@ iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, int typ
 }
 
 
+/*
+ * Lookup the full opcode given the short name
+ *   set I0, 5  -> set_i_ic
+ *   set I0, I1 -> set_i_i
+ *
+ * Obviously the registers must be examined before returning
+ * the correct opcode.
+ *
+ * NOTE: All this nasty IMC_TRACE is for tracking down equally
+ * nasty bugs, so if you don't like the looks of it, stay
+ * out, but please don't remove it. :) -Mel
+ */
 void
 op_fullname(char * dest, const char * name, SymReg * args[],
         int narg, int keyvec) {
     int i;
-
+#if IMC_TRACE_HIGH
+    char * full = dest;
+    PIO_eprintf(NULL, "op %s", name);
+#endif
     strcpy(dest, name);
     dest += strlen(name);
     for (i = 0; i < narg && args[i]; i++) {
         *dest++ = '_';
         if (args[i]->type == VTADDRESS) {
+#if IMC_TRACE_HIGH
+        PIO_eprintf(NULL, " (address)%s", args[i]->name);
+#endif
             *dest++ = 'i';
             *dest++ = 'c';
             continue;
         }
         /* if one ever wants num keys, they go with 'S' */
         if (keyvec & KEY_BIT(i)) {
+#if IMC_TRACE_HIGH
+        PIO_eprintf(NULL, " (key)%s", args[i]->name);
+#endif
             *dest++ = 'k';
             if (args[i]->set == 'S' || args[i]->set == 'N' ||
                     args[i]->set == 'K') {
@@ -179,10 +200,21 @@ op_fullname(char * dest, const char * name, SymReg * args[],
                 continue;
         }
         *dest++ = tolower(args[i]->set);
-        if (args[i]->type & (VTCONST|VT_CONSTP))
+        if (args[i]->type & (VTCONST|VT_CONSTP)) {
+#if IMC_TRACE_HIGH
+            PIO_eprintf(NULL, " (%cc)%s", tolower(args[i]->set), args[i]->name);
+#endif
             *dest++ = 'c';
+        }
+#if IMC_TRACE_HIGH
+        else
+            PIO_eprintf(NULL, " (%c)%s", tolower(args[i]->set), args[i]->name);
+#endif
     }
     *dest = '\0';
+#if IMC_TRACE_HIGH
+    PIO_eprintf(NULL, " -> %s\n", full);
+#endif
 }
 
 int

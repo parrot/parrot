@@ -974,7 +974,7 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
             regs[1] = p31;
             sprintf(buf, "%d", unit->n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
-	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_sym->name);
+	    sprintf(buf, "%%s, %%s[%%s]   #FETCH %s", old_sym->name);
 	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
@@ -994,7 +994,7 @@ spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
             sprintf(buf, "%d", unit->n_spilled);
             regs[1] = mk_const(str_dup(buf), 'I');
 	    regs[2] = new_sym;
-	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_sym->name);
+	    sprintf(buf, "%%s[%%s], %%s   #SPILL %s", old_sym->name);
 	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
 	    tmp->bbindex = ins->bbindex;
             tmp->flags |= ITSPILL;
