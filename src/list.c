@@ -1401,6 +1401,10 @@ mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
                     goto slow;
                 if (! (n & ARENA_FLAG_MASK)) {
                     ++dod_flags;
+                    if ((*dod_flags & 0x44444444) == 0x44444444) {
+                        /* found a bunch of special_PMCs */
+                        goto slow;
+                    }
                     nm = 0;
                 }
                 else
@@ -1412,6 +1416,9 @@ mark_chunk(Interp *interpreter, List_chunk *chunk, int obj_size)
                     goto slow;
                 if (! (n & ARENA_FLAG_MASK)) {
                     --dod_flags;
+                    if ((*dod_flags & 0x44444444) == 0x44444444) {
+                        goto slow;
+                    }
                     nm = ((n-1) & ARENA_FLAG_MASK) << 2;
                 }
                 else {
