@@ -109,6 +109,26 @@ sub write
 	$fh->close;
 }
 
+=item C<append(@lines)>
+
+Writes the specified lines to the file.
+
+=cut
+
+sub append
+{
+	my $self = shift;
+	
+	return unless @_;
+	
+	my $fh = FileHandle->new('>>' . $self->path) or 
+		die 'Failed to open ' . $self->path . ": $!";
+	
+	print $fh @_;
+	
+	$fh->close;
+}
+
 =item C<is_executable()>
 
 This tells you whether the file is executable.

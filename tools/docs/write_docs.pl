@@ -4,52 +4,30 @@
 
 =head1 NAME
 
-tools/docs/write_docs.pl - Writes the HTML documentation
+tools/docs/write_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/write_docs.pl
+    % perl tools/docs/write_docs.pl [--silent] [--delete]
 
 =head1 DESCRIPTION
 
-This script writes the HTML documentation to F<docs/html>.
+This script writes the HTML documentation for Parrot.
 
 =cut
 
 use lib 'lib';
+use Getopt::Long;
 use Parrot::Docs::Directory;
-use Parrot::Docs::File;
+use Parrot::Docs::Section::Parrot;
 
-my $root = '.';
-my $source = Parrot::Docs::Directory->new($root);
-my $target = Parrot::Docs::Directory->new("$root/docs/html");
+my ($silent, $delete);
 
-$target->delete_contents;
+die unless GetOptions('silent' => \$silent, 'delete' => \$delete);
 
-my $index = $target->file_with_name('index.html');
-my @list = ();
+my $docs = Parrot::Docs::Section::Parrot->new;
 
-print "Writing documentation:\n";
-
-foreach my $file ($source->files(1, '^(CVS|icu)$'))
-{
-	next unless $file->contains_pod;
-	
-	my $rel_path = $source->relative_path($file->path);
-	my $docs_file = $target->file_with_relative_path($rel_path . '.html');
-	
-	print $docs_file->path, "\n";
-	
-	push @list, item($rel_path . '.html', $source->relative_path($file->path));
-	
-	$docs_file->write($file->pod_as_html);
-}
-
-$index->write(join '', "<ul>\n", @list, "</ul>\n");
+# Use default source and target.
+$docs->write_html(undef, undef, $silent, $delete);
 
 exit 0;
-
-sub item
-{
-	return sprintf("<li><a href= \"%s\">%s</a></li>\n", shift, shift);
-}

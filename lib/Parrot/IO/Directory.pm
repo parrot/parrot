@@ -282,6 +282,56 @@ sub file_with_name
 	return Parrot::Docs::File->new(File::Spec->catfile($self->path, $name));
 }
 
+=item C<relative_path_is_directory($path)>
+
+Returns whether the specified relative path is a directory.
+
+=cut
+
+sub relative_path_is_directory
+{
+	my $self = shift;
+	my $path = shift;
+	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	
+	return -d File::Spec->catdir($self->path, $directories, $name);
+}
+
+=item C<relative_path_is_file($path)>
+
+Returns whether the specified relative path is a file.
+
+=cut
+
+sub relative_path_is_file
+{
+	my $self = shift;
+	my $path = shift;
+	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	
+	$path = File::Spec->catdir($self->path, $directories);
+	$path = File::Spec->catfile($path, $name);
+	
+	return -f $path;
+}
+
+=item C<directory_with_relative_path($path)>
+
+Returns a directory with the specified relative path below the directory.
+
+=cut
+
+sub directory_with_relative_path
+{
+	my $self = shift;
+	my $path = shift;
+	my ($volume, $directories, $name) = File::Spec->splitpath($path);
+	
+	$path = File::Spec->catdir($self->path, $directories, $name);
+	
+	return Parrot::Docs::Directory->new($path);
+}
+
 =item C<file_with_relative_path($path)>
 
 Returns a file with the specified relative path below the directory.

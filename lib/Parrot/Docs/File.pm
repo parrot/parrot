@@ -8,7 +8,7 @@ Parrot::Docs::File - Docs-related file methods
 =head1 SYNOPSIS
 
 	use Parrot::Docs::File;
-	my $file = Parrot::Docs::File->new('parrot/MANIFEST');
+	my $file = Parrot::Docs::File->new('MANIFEST');
 
 =head1 DESCRIPTION
 
@@ -43,6 +43,7 @@ my %type_for_suffix = (
 	'SKIP' => 'MANIFEST skip file',
 	'STATUS' => 'Languages status file',
 	'TXT' => 'Text file',
+	'txt' => 'Text file',
 	'a' => 'Library file',
 	'bas' => 'BACIC code',
 	'bef' => 'Befunge code',
@@ -108,7 +109,7 @@ my %type_for_name = (
 	'CREDITS' => 'Project info',
 	'DEVELOPING' => 'Project info',
 	'harness' => 'Perl test harness',
-	'INSTALL' => 'Installation documenntation',
+	'INSTALL' => 'Installation documentation',
 	'KNOWN_ISSUES' => 'Project info',
 	'LICENSE' => 'Licence file',
 	'MAINTAINER' => 'Maintainer info',
@@ -290,9 +291,33 @@ sub pod_as_html
 			$checker->output_string(\$self->{POD_HTML});
 			$checker->parse_file($self->path);
 		}
+
+		$self->{POD_HTML} =~ s|</head>|<link rel="stylesheet" href="http://dev.perl.org/perl-styles.css" type="text/css" />\n</head>|s;
+		$self->{POD_HTML} =~ s|<body>|<body>\n\n<table width=100%>\n<tr>\n<td valign="TOP"><a href="">Contents</a></td>\n<td align="RIGHT"><img src="http://www.parrotcode.org/images/parrot.small.png"></td>\n</tr>\n</table>\n<div class="pod">\n<a name="_top"></a>\n|s;
+		$self->{POD_HTML} =~ s|</pre>|\n\n</pre>|gs;
+		$self->{POD_HTML} =~ s|\s\*\s+\b| \*|gs;
+		$self->{POD_HTML} =~ s|</h(\d)| <a href="#_top"><img alt="^" border=0 src="http://www.parrotcode.org/images/up.gif"></a></h$1|gs;
+		$self->{POD_HTML} =~ s|<dt>|<dt><b>|gs;
+		$self->{POD_HTML} =~ s|</dt>|</b></dt>|gs;
+		$self->{POD_HTML} =~ s|</body>|</div>\n\n</body>|s;
 	}
 	
 	return $self->{POD_HTML};
+}
+
+=item C<is_docs_link()>
+
+Returns whether the file is suitable for inclusion in a documentation link.
+
+If a file contains plain text rather than POD it may be directly linked to.
+
+=cut
+
+sub is_docs_link
+{
+	my $self = shift;
+
+	return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
 }
 
 =back
