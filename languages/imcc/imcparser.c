@@ -2010,14 +2010,14 @@ yyreduce:
 #line 588 "imcc.y"
     {
                 Instruction *i, *ins = instructions;
+                SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, "pcc_ret", line,
                         "pcc_return not inside pcc subroutine\n");
-                yyval.sr = ins->r[1];
-                sprintf(name, "#pcc_sub_ret_%d:", line - 1);
-                i = _mk_instruction("", name, NULL, 0);
-                i = emitb(i);
+                sprintf(name, "#pcc_sub_ret_%d", line - 1);
+                yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
+                i = iLABEL(r);
                 i->type = ITPCCSUB | ITLABEL;
         }
     break;
@@ -2031,15 +2031,15 @@ yyreduce:
 #line 604 "imcc.y"
     {
                 Instruction *i, *ins = instructions;
+                SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
                     fataly(EX_SOFTWARE, "pcc_yield", line,
                         "pcc_yield not inside pcc subroutine\n");
                 ins->r[1]->pcc_sub->calls_a_sub = 1;
-                yyval.sr = ins->r[1];
-                sprintf(name, "#pcc_sub_yield_%d:", line - 1);
-                i = _mk_instruction("", name, NULL, 0);
-                i = emitb(i);
+                sprintf(name, "#pcc_sub_yield_%d", line - 1);
+                yyval.sr = r = mk_pcc_sub(str_dup(name), 0);
+                i = iLABEL(r);
                 i->type = ITPCCSUB | ITLABEL | ITPCCYIELD;
         }
     break;
