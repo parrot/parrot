@@ -414,7 +414,8 @@ SP              [ ]
 
 <emit,INITIAL>{WS}+ /* skip */;
 
-<emit,INITIAL>.     {
+<emit,cmt1,cmt2,cmt3,cmt4,cmt5,INITIAL>.     {
+        /* catch all except for state macro */
         return yytext[0];
     }
 

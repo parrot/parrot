@@ -18,7 +18,7 @@ Tests basic string and branching operations.
 
 use strict;
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 
 # It would be very embarrassing if these didnt work...
 output_is(<<'CODE', '', "noop, end");
@@ -205,6 +205,18 @@ pir_output_like(<<'CODE', <<'OUTPUT', "pir syntax with function - like");
 
 CODE
 /^\w{2}\s\d\s+$/
+OUTPUT
+
+my $CODE = '##PIR##
+.sub _main
+    print "ok\n"
+    end
+.end
+
+#.namespace'; # no \n at end of file
+
+output_like( $CODE, <<'OUTPUT', "end of line handling");
+/unexpected/
 OUTPUT
 
 1; # HONK
