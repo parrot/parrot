@@ -77,6 +77,8 @@ void
 string_destroy(STRING* s);
 STRING*
 string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type);
+STRING*
+string_copy(STRING *i);
 void
 string_init(void);
 

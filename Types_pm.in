@@ -4,9 +4,27 @@ use Exporter;
 use Carp;
 
 @Parrot::Types::ISA = qw(Exporter);
-@Parrot::Types::EXPORT = qw(&sizeof 
-    &pack_op  &unpack_op  &shift_op
-    &pack_arg &unpack_arg &shift_arg);
+@Parrot::Types::EXPORT = qw(
+    &sizeof 
+
+    &pack_iv
+    &pack_nv
+    &pack_sv
+    &pack_op
+    &pack_arg
+
+    &unpack_iv
+    &unpack_nv
+    &unpack_sv
+    &unpack_op
+    &unpack_arg
+
+    &shift_iv
+    &shift_nv
+    &shift_sv
+    &shift_op
+    &shift_arg
+);
 
 my %pack_type = (
     i  => q/${packtype_i}/,
@@ -18,11 +36,13 @@ my %how_to_pack = (
     I  => $pack_type{i},
     i  => $pack_type{i},
     N  => $pack_type{i},
-    n  => $pack_type{n},
+    n  => $pack_type{i},
     S  => $pack_type{i},
     s  => $pack_type{i},
     D  => $pack_type{i},
     op => $pack_type{op},
+    iv => $pack_type{i},
+    nv => $pack_type{n},
 );
 
 my %sizeof;
@@ -36,8 +56,32 @@ sub sizeof {
     return $sizeof{$what};
 }
 
+sub pack_iv   { return pack  ($how_to_pack{iv}, shift) }
+sub pack_nv   { return pack  ($how_to_pack{nv}, shift) }
+sub pack_sv   { return shift->pack }
 sub pack_op   { return pack  ($how_to_pack{op}, shift) }
+
+sub unpack_iv { return unpack($how_to_pack{iv}, shift) } 
+sub unpack_nv { return unpack($how_to_pack{nv}, shift) } 
 sub unpack_op { return unpack($how_to_pack{op}, shift) } 
+
+sub shift_iv  { my $iv = substr($_[0], 0, sizeof("iv"), ''); return unpack_iv($iv) }
+sub shift_nv  { my $nv = substr($_[0], 0, sizeof("nv"), ''); return unpack_nv($nv) }
+sub shift_sv  {
+  my $flags    = shift_iv($_[0]);
+  my $encoding = shift_iv($_[0]);
+  my $type     = shift_iv($_[0]);
+  my $size     = shift_iv($_[0]);
+
+  my $align = sizeof("iv");
+
+  my $under      = ($size % $align) ? $align - ($size % $align) : 0;
+  my $block_size = $size + $under;
+  my $data       = substr($_[0], 0, $block_size, '');
+  $data = substr($data, 0, $size);
+
+  return new Parrot::String $flags, $encoding, $type, $size, $data;
+}
 sub shift_op  { my $op = substr($_[0], 0, sizeof("op"), ''); return unpack_op($op) }
 
 sub pack_arg  { 

@@ -36,6 +36,8 @@ main(int argc, char **argv) {
         return 1;
     }
     
+    init_world();
+
     packed_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN

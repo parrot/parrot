@@ -57,6 +57,16 @@ sub unpack
 
 
 #
+# packed_size()
+#
+
+sub packed_size
+{
+  return 0;
+}
+
+
+#
 # pack()
 #
 
@@ -89,6 +99,8 @@ Parrot fixup tables.
 =head2 new
 
 =head2 pack
+
+=head2 packed_size
 
 =head2 unpack
 

@@ -64,6 +64,7 @@ sub unpack
   my ($self, $string) = @_;
 
   my $count = shift_op($string);
+  my $total_used = 0;
 
   for (1..$count) {
     my $const = new Parrot::PackFile::Constant;
@@ -73,9 +74,30 @@ sub unpack
       unless defined($used) and $used > 0 and $used <= length $string;
     
     $string = substr($string, $used);
+    $total_used += $used;
 
     push @{$self->{CONST}}, $const;
   }
+
+  return $total_used + sizeof('op');
+}
+
+
+#
+# packed_size()
+#
+
+sub packed_size
+{
+  my $self = shift;
+
+  my $size = sizeof('iv');
+
+  foreach (@{$self->{CONST}}) {
+    $size += $_->packed_size;
+  }
+
+  return $size;
 }
 
 
@@ -86,17 +108,15 @@ sub unpack
 sub pack
 {
   my $self = shift;
-  my $string = '';
+  my $packed = '';
 
-  $string = pack_op($self->const_count);
+  $packed .= pack_iv($self->const_count);
 
   foreach (@{$self->{CONST}}) {
-    $string .= $_->pack;
+    $packed .= $_->pack;
   }
 
-  $string = pack_op(length($string)) . $string;
-
-  return $string;
+  return $packed;
 }
 
 
@@ -177,6 +197,8 @@ Constant tables from Parrot pack files.
 =head2 new
 
 =head2 pack
+
+=head2 packed_size
 
 =head2 unpack STRING
 

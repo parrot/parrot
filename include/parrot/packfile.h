@@ -20,9 +20,15 @@ struct PackFile_FixupTable {
     IV                    dummy;
 };
 
+#define PFC_NONE    '\0'
+#define PFC_INTEGER 'i'
+#define PFC_NUMBER  'n'
+#define PFC_STRING  's'
 
 struct PackFile_Constant {
     IV       type;
+    IV       integer;
+    NV       number;
     STRING * string;
 };
 
@@ -151,6 +157,15 @@ PackFile_ConstTable_dump(struct PackFile_ConstTable * self);
 struct PackFile_Constant *
 PackFile_Constant_new(void);
 
+struct PackFile_Constant *
+PackFile_Constant_new_integer(IV i);
+
+struct PackFile_Constant *
+PackFile_Constant_new_number(NV n);
+
+struct PackFile_Constant *
+PackFile_Constant_new_string(STRING * s);
+
 void
 PackFile_Constant_DELETE(struct PackFile_Constant * self);
 
@@ -158,34 +173,28 @@ void
 PackFile_Constant_clear(struct PackFile_Constant * self);
 
 IV
-PackFile_Constant_get_flags(struct PackFile_Constant * self);
-
-void
-PackFile_Constant_set_flags(struct PackFile_Constant * self, IV flags);
-
-IV
-PackFile_Constant_get_encoding(struct PackFile_Constant * self);
-
-void
-PackFile_Constant_set_encoding(struct PackFile_Constant * self, IV encoding);
-
-IV
 PackFile_Constant_get_type(struct PackFile_Constant * self);
 
 void
-PackFile_Constant_set_type(struct PackFile_Constant * self, IV type);
-
-IV
-PackFile_Constant_get_size(struct PackFile_Constant * self);
-
-char *
-PackFile_Constant_get_data(struct PackFile_Constant * self);
+PackFile_Constant_set_integer(struct PackFile_Constant * self, IV i);
 
 void
-PackFile_Constant_set_data(struct PackFile_Constant * self, IV size, char * data);
+PackFile_Constant_set_number(struct PackFile_Constant * self, NV n);
+
+void
+PackFile_Constant_set_string(struct PackFile_Constant * self, STRING * s);
 
 IV
 PackFile_Constant_unpack(struct PackFile_Constant * self, char * packed, IV packed_size);
+
+IV
+PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed, IV packed_size);
+
+IV
+PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, IV packed_size);
+
+IV
+PackFile_Constant_unpack_string(struct PackFile_Constant * self, char * packed, IV packed_size);
 
 IV
 PackFile_Constant_pack_size(struct PackFile_Constant * self);

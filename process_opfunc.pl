@@ -47,7 +47,7 @@ while (<GUTS>) {
 
 
 my %psize = (i => 1,
-	     n => int($PConfig{nvsize}/$PConfig{ivsize}),
+	     n => 1,
 	     I => 1,
 	     N => 1,
 	     D => 1,
@@ -75,14 +75,7 @@ while (<OPCODE>) {
     $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
     my $count = 1;
     $opcode{$name}{PARAMETER_SUB} = ["", 
-				     map {if ($_ eq "n") { 
-					 my $temp = '*(NV *)(&cur_opcode[' . $count . '])';
-					 $count += $psize{n};
-					 $temp;
-				     } else {
-					 "cur_opcode[" . $count++ . "]"
-					 }
-				      } @params];
+	map { "cur_opcode[" . $count++ . "]" } @params];
 }
 
 my $orig = my $file = $ARGV[0];
@@ -115,14 +108,7 @@ while (<INPUT>) {
     if (/^(AUTO|MANUAL)_OP/) {
 	my $count = 1;
 	@param_sub = ("",
-		      map {if ($_ eq "n") {
-			  my $temp = '*(NV *)&cur_opcode[' . $count . ']';
-			  $count += $psize{n};
-			  $temp;
-		      } else {
-			  "cur_opcode[" . $count++ . "]"
-		      }
-		       } @{$opcodes{$name}{TYPES}});
+	    map { "cur_opcode[" . $count++ . "]" } @{$opcodes{$name}{TYPES}});
 	next;
     }
 

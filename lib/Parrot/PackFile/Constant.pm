@@ -15,6 +15,49 @@ use strict;
 
 package Parrot::PackFile::Constant;
 use Parrot::Types;
+use Parrot::String;
+
+my %type_names = (
+  ord('\0') => 'PFC_NONE',
+  ord('i')  => 'PFC_INTEGER',
+  ord('n')  => 'PFC_NUMBER',
+  ord('s')  => 'PFC_STRING',
+);
+
+my %type_codes = (
+  'PFC_NONE'    => ord('\0'),
+  'PFC_INTEGER' => ord('i'),
+  'PFC_NUMBER'  => ord('n'),
+  'PFC_STRING'  => ord('s'),
+);
+
+
+#
+# type_name()
+#
+# CLASS METHOD / STRAIGHT SUB
+#
+
+sub type_name
+{
+    my $query = pop; # Look up last arg (in case first arg is class name)
+
+    return $type_names{$query};
+}
+
+
+#
+# type_code()
+#
+# CLASS METHOD / STRAIGHT SUB
+#
+
+sub type_code
+{
+    my $query = pop; # Look up last arg (in case first arg is class name)
+
+    return $type_codes{$query};
+}
 
 
 #
@@ -24,14 +67,10 @@ use Parrot::Types;
 sub new
 {
   my $class = shift;
-  my ($flags, $encoding, $type, $size, $data) = @_;
 
   my $self = bless {
-    FLAGS    => $flags,
-    ENCODING => $encoding,
-    TYPE     => $type,
-    SIZE     => $size,
-    DATA     => $data
+    TYPE     => $type_codes{'PFC_NONE'},
+    VALUE    => undef,
   }, $class;
 
   return $self;
@@ -39,26 +78,69 @@ sub new
 
 
 #
-# flags()
+# new_integer()
 #
 
-sub flags
+sub new_integer
 {
-  my $self = shift;
-  if (@_) { $self->{FLAGS} = shift; }
-  else    { return $self->{FLAGS};  }
+  my $class = shift;
+
+  my $self = bless {
+    TYPE     => $type_codes{'PFC_INTEGER'},
+    VALUE    => shift,
+  }, $class;
+
+  return $self;
 }
 
 
 #
-# encoding()
+# new_number()
 #
 
-sub encoding
+sub new_number
+{
+  my $class = shift;
+
+  my $self = bless {
+    TYPE     => $type_codes{'PFC_NUMBER'},
+    VALUE    => shift,
+  }, $class;
+
+  return $self;
+}
+
+
+#
+# new_string()
+#
+
+sub new_string
+{
+  my $class = shift;
+
+  my $self = bless {
+    TYPE     => $type_codes{'PFC_STRING'},
+    VALUE    => Parrot::String->new(@_),
+  }, $class;
+
+  return $self;
+}
+
+
+
+#
+# clear()
+#
+
+sub clear
 {
   my $self = shift;
-  if (@_) { $self->{ENCODING} = shift; }
-  else    { return $self->{ENCODING};  }
+
+  $self->{TYPE}  = $type_codes{'PFC_NONE'};
+  $self->{VALUE} = undef;
+
+  return;
 }
 
 
@@ -69,32 +151,18 @@ sub encoding
 sub type
 {
   my $self = shift;
-  if (@_) { $self->{TYPE} = shift; }
-  else    { return $self->{TYPE};  }
+  return $self->{TYPE};
 }
 
 
 #
-# size()
+# value()
 #
 
-sub size
+sub value
 {
   my $self = shift;
-  if (@_) { $self->{SIZE} = shift; }
-  else    { return $self->{SIZE};  }
-}
-
-
-#
-# data()
-#
-
-sub data
-{
-  my $self = shift;
-  if (@_) { $self->{DATA} = shift; }
-  else    { return $self->{DATA};  }
+  return $self->{VALUE};
 }
 
 
@@ -108,24 +176,55 @@ sub data
 sub unpack
 {
   my ($self, $string) = @_;
-  my $flags = shift_op($string);
-  my $encoding = shift_op($string);
-  my $type = shift_op($string);
-  my $size = shift_op($string);
 
-  my $align = sizeof("op");
+  my $type = shift_iv($string);
+  my $size = shift_iv($string);
 
-  my $under      = ($size % $align) ? $align - ($size % $align) : 0;
-  my $block_size = $size + $under;
-  my $data       = substr($string, 0, $block_size);
+  my $value;
 
-  $self->{FLAGS}    = $flags;
-  $self->{ENCODING} = $encoding;
-  $self->{TYPE}     = $type;
-  $self->{SIZE}     = $size;
-  $self->{DATA}     = substr($data, 0, $size);
+  if ($type == $type_codes{'PFC_NONE'}) {
+    $value = undef;
+  } elsif ($type == $type_codes{'PFC_INTEGER'}) {
+    $value = shift_iv($string);
+  } elsif ($type == $type_codes{'PFC_NUMBER'}) {
+    $value = shift_nv($string);
+  } elsif ($type == $type_codes{'PFC_STRING'}) {
+    $value = shift_sv($string);
+  } else {
+    die;
+  }
 
-  return 4*sizeof("op") + $block_size;
+  $self->{TYPE}  = $type;
+  $self->{VALUE} = $value;
+
+  return $size + 2 * sizeof('iv');
+}
+
+
+#
+# packed_size()
+#
+
+sub packed_size
+{
+  my $self = shift;
+
+  my $size = 2 * sizeof('iv'); # For type and size
+
+  if ($self->type == $type_codes{'PFC_NONE'}) {
+    $size += 0;
+  } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
+    $size += sizeof('iv');
+  } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
+    $size += sizeof('nv');
+  } elsif ($self->type == $type_codes{'PFC_STRING'}) {
+    if (!ref $self->value) { print $self->value, "\n"; die; }
+    $size += $self->value->packed_size;
+  } else {
+    die;
+  }
+ 
+  return $size;
 }
 
 
@@ -136,18 +235,26 @@ sub unpack
 sub pack
 {
   my $self = shift;
+  my $packed = '';
   
-  my $align = sizeof("op");
+  $packed .= pack_iv($self->type);
 
-  my $size  = $self->size;
-  my $under = ($size % $align) ? $align - ($size % $align) : 0;
-  my $block = $self->data . ("\0" x $under);
-
-  return pack_op($self->flags).
-         pack_op($self->encoding).
-         pack_op($self->type).
-         pack_op($self->size).
-         $block;
+  if ($self->type == $type_codes{'PFC_NONE'}) {
+    $packed .= pack_iv(0);
+  } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
+    $packed .= pack_iv(sizeof("iv"));
+    $packed .= pack_iv($self->value);
+  } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
+    $packed .= pack_iv(sizeof("nv"));
+    $packed .= pack_nv($self->value);
+  } elsif ($self->type == $type_codes{'PFC_STRING'}) {
+    $packed .= pack_iv($self->value->packed_size);
+    $packed .= pack_sv($self->value);
+  } else {
+    die;
+  }
+ 
+  return $packed;
 }
 
 
@@ -177,6 +284,8 @@ Parrot::PackFile::Constant
 =head2 new FLAGS ENCODING TYPE SIZE DATA
 
 =head2 pack
+
+=head2 packed_size
 
 =head2 size SIZE
 =head2 size

@@ -2,11 +2,13 @@ Config_pm.in
 Configure.pl
 MANIFEST
 Makefile.in
+Parrot/Assembler.pm
 Parrot/Opcode.pm
 Parrot/PackFile.pm
 Parrot/PackFile/ConstTable.pm
 Parrot/PackFile/Constant.pm
 Parrot/PackFile/FixupTable.pm
+Parrot/String.pm
 Parrot/Test.pm
 Test/More.pm
 Test/Simple.pm

@@ -126,7 +126,7 @@ sub unpack
  
   my $fixup = '';
 
-  my $fixup_length = shift_op($string);
+  my $fixup_length = shift_iv($string);
 
   if($fixup_length) {
     $fixup = unpack("a$fixup_length", $string);
@@ -142,7 +142,7 @@ sub unpack
  
   my $const = '';
 
-  my $const_length = shift_op($string);
+  my $const_length = shift_iv($string);
 
   if($const_length) {
     $const = unpack("a$const_length", $string);
@@ -155,12 +155,16 @@ sub unpack
   #
   # Read the byte code:
   #
-  # TODO: This is wrong. It should be a length-payload pair like the
-  # rest of the segments, but the assembler and interpreter and
-  # disassembler all agree on this implementation despite the docs.
-  #
 
-  $self->{BCODE} = $string;
+  my $byte_code_length = shift_iv($string);
+  my $byte_code = '';
+
+  if($byte_code_length) {
+    $byte_code = unpack("a$byte_code_length", $string);
+  }
+
+  $self->{BCODE} = $byte_code;
+  $string = substr($string, $byte_code_length);
 
   #
   # Report on what we found:
@@ -171,7 +175,8 @@ sub unpack
 #  printf "  * %6d bytes fixup\n", length($fixup);
 #  printf "  * %6d bytes const segment header\n", 4;
 #  printf "  * %6d bytes const\n", length($const);
-#  printf "  * %6d bytes bcode\n", length($string);
+#  printf "  * %6d bytes bcode segment header\n", 4;
+#  printf "  * %6d bytes bcode\n", length($byte_code);
 
 #  printf "Parsed string with %d bytes of fixup, %d bytes of const and %d bytes of prog.\n", length($fixup), length($const), length($prog);
 
@@ -228,24 +233,18 @@ sub pack
 
   my $string = '';
 
-  $string .= pack_op($self->magic);
+  $string .= pack_iv($self->magic);
 
   my $fixup = $self->fixup_table->pack;
   my $const = $self->const_table->pack;
 
-  $string .= pack_op(length($fixup));
+  $string .= pack_iv(length($fixup));
   $string .= $fixup;
 
-  $string .= pack_op(length($const));
+  $string .= pack_iv(length($const));
   $string .= $const;
 
-  #
-  # TODO: It is wrong not to write this length, because then we can't have
-  # another source-code segment, which the docs say we should be able to
-  # have.
-  #
-
-#  $string .= pack('l', length($self->byte_code));
+  $string .= pack_iv(length($self->byte_code));
   $string .= $self->byte_code;
 
   return $string;
