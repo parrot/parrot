@@ -1557,8 +1557,7 @@ Get_Params:
   dump_Ns:
 #    set .IntStack, 
   dump_Ss:
-  dump_Is:
-     set .IntStack, 
+#     set .IntStack, 
   dump_Ps:
     # First the overflow
     unless I1, p_regs
@@ -1583,11 +1582,11 @@ Export_Word:
     .PopStr
     .PopInt
     new .TempPMC, .Sub
-    set_addr .Temp_PMC, .TempInt
+#    setaddr .TempPMC, .TempInt
     new .TempPMC2, .Integer
     set .TempPMC2, .IntStack
     setprop .TempPMC, "__forth_spot", .TempPMC2
-    store_global .StrStack, .TempPMC
+#    store_global .StrStack, .TempPMC
     .DoneInterpretWord
 
 DoneInterpretWord:
