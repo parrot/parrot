@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.10  2002/06/03 03:51:53  clintp
+# Minor edits for compilation
+#
 # Revision 1.9  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -102,6 +105,6 @@ print T $a;
 
 close(T);
 unlink "basic.pbc";
-system("perl -I../../lib ../../assemble.pl merged_basic.pasm > basic.pbc");
+system("perl -I../../lib ../../assemble.pl -o basic.pbc merged_basic.pasm");
 
 system("../../parrot basic.pbc");
