@@ -26,13 +26,6 @@ void free_buffer(Buffer *);
 void *new_bigint_header(struct Parrot_Interp *);
 void free_bigint(void);
 
-PMC *mark_used(struct Parrot_Interp *, PMC *, PMC *);
-
-void Parrot_block_DOD(struct Parrot_Interp *);
-void Parrot_block_GC(struct Parrot_Interp *);
-void Parrot_unblock_DOD(struct Parrot_Interp *);
-void Parrot_unblock_GC(struct Parrot_Interp *);
-
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
@@ -46,9 +39,9 @@ void Parrot_go_collect(struct Parrot_Interp *);
 
 void buffer_lives(Buffer *);
 
-#define STRING_HEADERS_PER_ALLOC 256
-#define PMC_HEADERS_PER_ALLOC 256
-#define BUFFER_HEADERS_PER_ALLOC 256
+#define STRING_HEADERS_PER_ALLOC 128
+#define PMC_HEADERS_PER_ALLOC 128
+#define BUFFER_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
     size_t free;         /* Count of PMCs free in this arena */
@@ -114,7 +107,7 @@ struct Stash {
 #define TOTAL_BUFFERS 7
 #define HEADERS_ALLOC_SINCE_COLLECT 8
 #define MEM_ALLOCS_SINCE_COLLECT 9
-#define TOTAL_COPIED 10
+
 
 #endif /* PARROT_RESOURCES_H */
 
