@@ -53,6 +53,8 @@ Looks up the method for C<*method_name> and returns it.
 
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
         if (method && VTABLE_defined(INTERP, method)) {
+            PMC *get;
+           
             PMC *object = INTERP->ctx.current_object;
             if (!object) object = SELF;
 
@@ -62,7 +64,7 @@ Looks up the method for C<*method_name> and returns it.
                    VTABLE_name(INTERP, object));
             }
 
-            PMC *get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
+            get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
                 PyString_get, object);
             if (get) return get;
             return method;
