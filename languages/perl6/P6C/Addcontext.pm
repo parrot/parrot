@@ -658,7 +658,7 @@ sub P6C::closure::ctx_right {
 	    P6C::Context::block_ctx($x->block,
 				    new P6C::Context type => 'PerlArray');
 	}
-    } elsif ($x->block->isa('P6C::rule')) {
+    } elsif ($x->is_rule) {
 	$x->block->ctx_right(new P6C::Context type => 'PerlUndef');
     } else {
 	die "Internal error: closure body is ", $x->block;

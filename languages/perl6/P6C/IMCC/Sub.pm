@@ -135,7 +135,9 @@ sub pop_scope {
 # 3. call the continuation to "return"
 #
 # FIXME: Non-PMC arguments/params are not yet handled.
-# FIXME: Pass-by-value only implemented
+# FIXME: Pass-by-value only implemented. Err... wait... actually, I
+#        think I have pass-by-reference for PMCs and pass-by-value for
+#        ints and nums. Not sure for strings. Need tests.
 sub emit {
     my ($x, $prototyped) = @_;
     my $params = $x->params;
@@ -157,7 +159,7 @@ sub emit {
         $param_count++;
     }
 
-    # The slurpy array, if any, is passed as an array PMC
+    # The slurpy array, if any, gathers up the rest of the arguments.
     if ($params->slurpy_array) {
         my $slurpy = $params->slurpy_array->var->name;
         my $slurpy_name = P6C::IMCC::mangled_name($slurpy);

@@ -205,6 +205,7 @@ END
 	    next;
 	}
 	$name = mangled_name($name);
+        print "\n";
 	print ".sub $name prototyped\n";
 	$sub->emit;
 	print ".end\n";
@@ -854,7 +855,7 @@ END
 	code(<<END);
 $end:
 END
-	return [@tuple];
+	return \@tuple;
     } elsif ($ctx->is_scalar) {
 	my $itmp = gentmp 'int';
 	code(<<END);
@@ -1078,7 +1079,7 @@ sub val {
 		$x->vals($i)->val;
 	    }
 	}
-	return [@ret];
+	return \@ret;
 
     } elsif ($ctx->is_array) {
 	# In array context, the list's value is an array of all its
@@ -1473,6 +1474,8 @@ use P6C::Util 'diag';
 # XXX: since IMCC doesn't give us access to cmp, cmp_num, and
 # cmp_string separately, we need to go through num and str temporaries
 # to get the right kind of comparison.
+#
+# FIXME: The above is no longer correct.
 
 use vars '%type';
 BEGIN {
@@ -1582,7 +1585,7 @@ use P6C::Util qw(unimp map_preorder);
 use P6C::IMCC::prefix 'wrap_with_catch';
 use P6C::IMCC ':all';
 
-# A sub with no explicit parameter list gets @_.
+# A sub with no explicit parameter list gets (*@_).
 
 sub default_signature {
     return $P6C::IMCC::DEFAULT_SIGNATURE ||=
@@ -1667,12 +1670,13 @@ sub val {
 	$ofunc = set_function($name);
     }
 
+    # Figure out params:
     $x->params(get_params($x));
 
     set_function_params($x->params);
 
     if ($x->is_rule) {
-        set_function_return([ 'int', 'int' ]);
+        P6C::Rules::adjust_rule_return($IMCC::curfunc);
     } elsif ($ctx->{noreturn}) {
 	# Do nothing.
     } else {
@@ -1821,23 +1825,18 @@ sub assign {
 END
 	} else {
 	    $clonev = $tmpv;
-	    code(<<END);
-	$name = $tmpv
-END
+	    code("\t$name = $tmpv");
 	}
 	return val_in_context $clonev, $x->type, $x->{ctx};
 
     } else {
 	if ($do_clone) {
-	    code(<<END);
-# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
-	$name = clone $tmpv
-END
+            my $desc = $x->name;
+            $desc .= " (global)" if $global;
+	    code("\t$name = clone $tmpv # ASSIGN TO $desc");
 	} else {
 	    # assign non-scalar to scalar => no need to clone.
-	    code(<<END);
-	$name = $tmpv
-END
+	    code("\t$name = $tmpv");
 	}
 	return val_in_context $name, $x->type, $x->{ctx};
     }
@@ -2035,14 +2034,15 @@ END
 	my $ptmp = gentmp 'PerlUndef';
 	my $ret_index = gentmp 'int';
 	code(<<END);
-	$ret_index = $indexval
-	$ret = $ret_index
+	$ret_index = $indexval # for i = slice.length
+	$ret = $ret_index # preallocate dest
 END
-	code(gen_counted_loop($ret_index, <<END));
+	code(gen_counted_loop($ret_index, <<END, "slice in array ctx"));
 	$itmp = $indexval\[$ret_index]
 	$ptmp = $thing\[$itmp]
-	$ret\[$ret_index] = $ptmp
+	$ret\[$ret_index] = $ptmp  # dest[i] = src[slice[i]]
 END
+        code("# slice in array context complete");
 
     } elsif ($ctx->is_tuple) {
 	my $itmp = gentmp $temptype{$type};
@@ -2119,7 +2119,7 @@ $start:
 	$iter = $short
 END
 	# Assign them:
-	code(gen_counted_loop($iter, <<END));
+	code(gen_counted_loop($iter, <<END, "slice assignment"));
 	$index = $indexval\[$iter]
 	$ptmp = $rhs\[$iter]
 	$lhs\[$index] = $ptmp
@@ -2243,11 +2243,11 @@ and return two values:
  rx_pos   - position after applying rule (to match or backtrack)
  status   - 1 for success, 0 for failure
 
-TODO: Rather than returning a status code, this really ought to just jump to
-the appropriate continuation.
+TODO: Rather than returning a status code, this really ought to just
+invoke the appropriate continuation.
 
-TODO: It would also be nice to have two different entry points rather than
-the hokey C<mode> param.
+TODO: It would also be nice to have two different entry points rather
+than the hokey C<mode> param.
 
 =cut
 
