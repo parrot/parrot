@@ -21,7 +21,8 @@ use Parrot::Configure::Step;
 
 $description="Loading platform and local hints files...";
 
-@args = qw( cc verbose );
+#Cygwin needs to fake the inet_aton argument.
+@args = qw( cc verbose inet_aton );
 
 sub runstep {
   my $hints = "config/init/hints/" . lc($^O) . ".pl";

@@ -14,3 +14,8 @@ Configure::Data->set(
   ld_shared => '-shared',
   libs => $libs,
 );
+
+#$_[2] is the inet_aton argument to Configure.
+#XXX This is an evil, evil, evil hack.  If we ever have to duplicate it, it's
+# time to design some new interfaces into Configure.
+$_[2]=1 unless defined $_[2];
