@@ -16,7 +16,7 @@ Tests the Python Integer PMC.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 
 output_is(<< 'CODE', << 'OUTPUT', "abs");
 ##PIR##
@@ -249,6 +249,26 @@ output_is(<< 'CODE', << 'OUTPUT', "invert");
 .end
 CODE
 12 12
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "is");
+##PIR##
+.sub main @MAIN
+    loadlib P1, "python_group"
+    new $P0, "PyInt"
+    new $P1, "PyInt"
+
+    set $P0, 31
+    set $P1, 31
+
+    new $P2, "PyBoolean"
+    issame $I0, $P0, $P1
+    set $P2, $I0
+    print $P2
+    print "\n"
+.end
+CODE
+True
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "lshift");
