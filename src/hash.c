@@ -643,6 +643,7 @@ hash_delete(Interp *interpreter, Hash *hash, void *okey)
         }
         prev = bucket;
     }
+    Parrot_unblock_GC(interpreter);
 }
 
 Hash *
