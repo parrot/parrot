@@ -26,13 +26,7 @@ $description="Probing for C headers...";
 sub runstep {
     my ($miniparrot) = @_;
 
-    if ($miniparrot) {
-        foreach (qw(assert complex ctype errno locale math setjmp signal stdarg
-                    stdio stdlib string time)) {
-            Configure::Data->set("i_$_" => 1);
-        }
-	return;
-    }
+    return if $miniparrot;
 
     # perl5's Configure system doesn't call this by its full name, which may
     # confuse use later, particularly once we break free and start doing all

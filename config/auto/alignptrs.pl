@@ -24,12 +24,7 @@ $description="Determining your minimum pointer alignment...";
 sub runstep {
   my ($miniparrot) = @_;
 
-  if ($miniparrot) {
-     # we can't guarantee anything about pointer alignment under ANSI C89.
-     # so we will have to check every byte.
-     Configure::Data->set(ptr_alignment => 1);
-     return;
-  }
+  return if $miniparrot;
   # HP-UX 10.20/32 hangs in this test.
   # We currently don't need this configure setting,
   # so we just do not test and set some value here

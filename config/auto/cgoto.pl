@@ -26,7 +26,7 @@ sub runstep {
   my $test;
   my ($cgoto, $miniparrot, $verbose) = @_;
 
-  $cgoto = 0 if (defined $miniparrot);
+  return if $miniparrot;
 
   if (defined $cgoto) {
     $test = $cgoto;

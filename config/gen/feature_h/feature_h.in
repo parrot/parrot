@@ -8,6 +8,12 @@
 
 #perl - all below here gets evaled by perl, OUT is the filehandle
 
+if(${miniparrot}) {
+  print OUT <<'END';
+#define MINIPARROT 1
+END
+}
+
 	print OUT <<EOP;
 /* from config/auto/memalign */
 EOP

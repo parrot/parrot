@@ -25,26 +25,7 @@ $description = "Determining architecture, OS and JIT capability...";
 sub runstep {
     my ($set_jitcapable, $miniparrot, $set_execcapable, $verbose) = @_;
 
-    if (defined $miniparrot) {
-      Configure::Data->set(
-        archname    => 'miniparrot',
-        cpuarch     => 'unknown',
-        osname      => 'ANSI',
-        jitarchname => 'nojit',
-        jitcpuarch  => 'i386',
-        jitcpu      => 'I386',
-        jitosname   => 'nojit',
-        jitcapable  => 0,
-        execcapable => 0,
-        cc_hasjit   => '',
-        TEMP_jit_h       => '',
-        TEMP_jit_o       => '',
-        TEMP_exec_h      => '',
-        TEMP_exec_o      => '',
-	    asmfun_o    => ''
-      );
-      return;
-  }
+    return if $miniparrot;
 
   my $archname                 =  $Config{archname};
   my ($cpuarch, $osname)       =  split('-', $archname);
