@@ -14,6 +14,24 @@
 #define COMPILE_IMMEDIATE 1
 static void imc_free_unit(Parrot_Interp interp, IMC_Unit * unit);
 
+
+/* AST doesn't honor COMPILE_IMMEDIATE yet. So we need to make sure that 
+ * the units get compiled.
+ */
+void
+imc_compile_all_units_for_ast(Interp *interp)
+{
+    IMC_Unit *unit, *unit_next;
+#if COMPILE_IMMEDIATE
+    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+        unit_next = unit->next;
+        imc_compile_unit(interp, unit);
+    }
+#endif
+
+    return;
+}
+
 void
 imc_compile_all_units(Interp *interp)
 {

@@ -61,6 +61,7 @@
  * imc.c
  */
 void imc_compile_all_units(Interp *);
+void imc_compile_all_units_for_ast(Interp *);
 void imc_compile_unit(Interp *, IMC_Unit * unit);
 void imc_cleanup(Interp *);
 void imc_pragma(char * str);

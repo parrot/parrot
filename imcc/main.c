@@ -521,13 +521,14 @@ main(int argc, char * argv[])
 
         if (ast_file) {
             IMCC_ast_compile(interp, yyin);
+            imc_compile_all_units_for_ast(interp);
         }
         else {
             IMCC_INFO(interp)->state->pasm_file = pasm_file;
             yyparse((void *) interp);
         }
-
         imc_compile_all_units(interp);
+
         imc_cleanup(interp);
 
         fclose(yyin);
