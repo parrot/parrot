@@ -56,7 +56,7 @@ sub runstep {
     # An example is Solaris 8.
 
     my @opt_and_vers = 
-        (0 => "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
+        (0 => "-Larry -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Waggregate-return -Winline -W -Wno-unused",
         # others; ones we might like marked with ?
         # ? -Wundef for undefined idenfiers in #if
         # ? -Wbad-function-cast
