@@ -100,6 +100,6 @@ typedef struct _emittert {
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
 int emit_open(int type, char *file);
-int emit_flush();
-int emit_close();
+int emit_flush(void);
+int emit_close(void);
 

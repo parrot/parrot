@@ -39,26 +39,26 @@ EXTERN int n_loops;
 
 /* Functions: */
 
-void find_basic_blocks ();
-void build_cfg();
+void find_basic_blocks (void);
+void build_cfg(void);
 void bb_findadd_edge(Basic_block*, SymReg*);
-void bb_add_edge();
+void bb_add_edge(Basic_block*, Basic_block*);
 
-void compute_dominators();
-void find_loops();
+void compute_dominators(void);
+void find_loops(void);
 void mark_loop(Edge*);
 void search_predecessors_not_in(Basic_block*, Set*);
 
-void life_analysis();
+void life_analysis(void);
 void analyse_life_symbol(SymReg*);
 void analyse_life_block(Basic_block*, SymReg*);
 void add_life_interval(Life_range*, int, int);
 void propagate_need(Basic_block*, SymReg*);
 
-void init_basic_blocks();
+void init_basic_blocks(void);
 Basic_block* make_basic_block(Instruction*);
-void clear_basic_blocks();
+void clear_basic_blocks(void);
 Life_range* make_life_range(SymReg*, int);
 int blocks_are_connected(Basic_block *from, Basic_block *to);
-int edge_count();
+int edge_count(void);
 

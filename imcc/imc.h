@@ -43,18 +43,18 @@
  */
 #define MAX_COLOR NUM_REGISTERS
 
-void build_reglist();
-void compute_du_chain();
+void build_reglist(void);
+void compute_du_chain(void);
 int interferes(SymReg * r0, SymReg * r1);
 int map_colors(int x, SymReg ** graph, int colors[], int typ);
-void build_interference_graph();
-void allocate();
-int simplify ();
-void order_spilling ();
+void build_interference_graph(void);
+void allocate(void);
+int simplify (void);
+void order_spilling (void);
 void spill (int);
-int try_allocate();
-void restore_interference_graph();
-void free_reglist();
+int try_allocate(void);
+void restore_interference_graph(void);
+void free_reglist(void);
 int neighbours(int node);
 
 

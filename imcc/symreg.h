@@ -103,7 +103,7 @@ SymReg * _mk_const(SymReg *hash[], char * name, char t);
 void _store_symreg(SymReg *hash[], SymReg * r);
 SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);
-void clear_tables();
+void clear_tables(void);
 unsigned int  hash_str(const char * str);
 void free_life_info(SymReg *r);
 
