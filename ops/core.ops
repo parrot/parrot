@@ -967,10 +967,7 @@ inline op set_keyed_integer (out STR, in PMC, in INT)  {
 
 inline op set_keyed_integer (out PMC, in KEY, in INT)  {
     KEY key;
-
-//    MAKE_KEY(key, $2, enum_key_string, int_val); // XXX Original
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -981,9 +978,7 @@ inline op set_keyed_integer (out PMC, in KEY, in INT)  {
 
 inline op set_keyed_integer (out INT, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_int, int_val);
-
     $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
     goto NEXT();
 }
@@ -994,10 +989,7 @@ inline op set_keyed_integer (out INT, in PMC, in KEY)  {
 
 inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
     KEY key;
-
-//    MAKE_KEY(key, $2, enum_key_string, int_val); // XXX Original
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -1008,9 +1000,7 @@ inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
 
 inline op set_keyed_integer (out NUM, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_int, int_val);
-
     $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
     goto NEXT();
 }
@@ -1021,10 +1011,7 @@ inline op set_keyed_integer (out NUM, in PMC, in KEY)  {
 
 inline op set_keyed_integer (out PMC, in KEY, in STR)  {
     KEY key;
-
-//    MAKE_KEY(key, $2, enum_key_string, int_val); // XXX Original
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -1035,9 +1022,7 @@ inline op set_keyed_integer (out PMC, in KEY, in STR)  {
 
 inline op set_keyed_integer (out STR, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_int, int_val);
-
     $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
     goto NEXT();
 }
@@ -1048,9 +1033,7 @@ inline op set_keyed_integer (out STR, in PMC, in KEY)  {
 
 inline op set_keyed (out PMC, in KEY, in INT)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_string, int_val);
-
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -1061,9 +1044,7 @@ inline op set_keyed (out PMC, in KEY, in INT)  {
 
 inline op set_keyed (out INT, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_string, int_val);
-
     $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
     goto NEXT();
 }
@@ -1074,9 +1055,7 @@ inline op set_keyed (out INT, in PMC, in KEY)  {
 
 inline op set_keyed (out PMC, in KEY, in NUM)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_string, int_val);
-
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -1087,9 +1066,7 @@ inline op set_keyed (out PMC, in KEY, in NUM)  {
 
 inline op set_keyed (out NUM, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_string, int_val);
-
     $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
     goto NEXT();
 }
@@ -1100,9 +1077,7 @@ inline op set_keyed (out NUM, in PMC, in KEY)  {
 
 inline op set_keyed (out PMC, in KEY, in STR)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_string, int_val);
-
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
@@ -1113,9 +1088,7 @@ inline op set_keyed (out PMC, in KEY, in STR)  {
 
 inline op set_keyed (out STR, in PMC, in KEY)  {
     KEY key;
-
     MAKE_KEY(key, $3, enum_key_string, int_val);
-
     $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
     goto NEXT();
 }
