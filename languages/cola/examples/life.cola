@@ -16,12 +16,12 @@ public class Life {
             neighbours = 0;
             if(input[(cell + len - 1) % len] == "*") neighbours++;
             if(input[(cell + len + 1) % len] == "*") neighbours++;
+            if(input[(cell + len - 17) % len] == "*") neighbours++;
+            if(input[(cell + len + 17) % len] == "*") neighbours++;
             if(input[(cell + len - 16) % len] == "*") neighbours++;
             if(input[(cell + len + 16) % len] == "*") neighbours++;
             if(input[(cell + len - 15) % len] == "*") neighbours++;
             if(input[(cell + len + 15) % len] == "*") neighbours++;
-            if(input[(cell + len - 14) % len] == "*") neighbours++;
-            if(input[(cell + len + 14) % len] == "*") neighbours++;
             if (input[cell] == "*")
                 output[cell] = death[neighbours];
             else
@@ -54,6 +54,7 @@ public class Life {
             for(j = 0; j < 16; j++)
                 puts(substr(world, j * 16, 16) + "\n");
             world = Generate(world);
+            sleep(1);
         }
     }
 }
