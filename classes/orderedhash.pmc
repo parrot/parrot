@@ -1,0 +1,68 @@
+ /* orderedhash.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the OrderedHash base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *     Initial rev by leo 2003-08-21
+ *  Notes:
+ *     This class combines the functionality of PerlArray
+ *     (list in data) and a PerlHash (hash in struct_val).
+ *     The list holds the PMC values, the hash keys point to
+ *     the index of the value in the list.
+ *  References:
+ *     pdd08_keys.pod
+ */
+
+#include "parrot/parrot.h"
+#include "perlhash.h"
+
+pmclass OrderedHash extends PerlArray {
+    void init () {
+	SUPER();
+	Parrot_PerlHash_init(INTERP, SELF);
+    }
+
+    STRING* name() {
+        return whoami;
+    }
+
+    void mark () {
+        SUPER();
+        Parrot_PerlHash_mark(INTERP, SELF);
+    }
+
+    void clone (PMC *dest) {
+        SUPER(dest);
+        Parrot_PerlHash_clone(INTERP, SELF, dest);
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+	    return SUPER(key);
+	}
+	else {
+            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
+            return DYNSELF.get_pmc_keyed_int(n);
+        }
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+	INTVAL n = DYNSELF.elements();
+	DYNSELF.set_pmc_keyed_int(n, value);
+	Parrot_PerlHash_set_integer_keyed(INTERP, SELF, key, n);
+    }
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
+
