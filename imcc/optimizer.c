@@ -15,13 +15,31 @@
  * pre_optimizer
  * -------------
  *
- * Runs before CFG is built.
+ * During pre-optimization we perform optimizations which don't require
+ * full knowledge of the control flow graph and the life ranges of each
+ * variable. This phase is handled by two functions: pre_optimize() and
+ * cfg_optimize().
  *
- * if_branch ... converts if/branch/label
- * unused_label ... deletes them (as L1 above)
- * branch_branch ... jump optimization (jumps to jumps ...)
- * strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
- * subst_constants ... rewrite e.g. add_i_ic_ic
+ * pre_optimize() runs before the construction of the CFG begins. It calls 
+ * strength_reduce() to perform simple strength reduction, and if_branch() 
+ * to rewrite certain if/branch/label constructs (for details, see 
+ * if_branch() below).
+ *
+ * [pre_optimize() may also be called later, during the main optimization 
+ *  phase, but this is not guaranteed.]
+ *
+ * cfg_optimize() runs during the construction of the CFG. It calls 
+ * branch_branch() to perform jump optimization (i.e. branches to
+ * branch statements or jumps to jumps are converted into single 
+ * branches/jumps to the final destination), unused_label() to remove
+ * unused labels and dead_code_remove() to remove unreachable code 
+ * (e.g. basic blocks which are never entered or instructions after
+ *  and unconditional branch which are never branched to).
+ * 
+ * cfg_optimize may be called multiple times during the construction of the
+ * CFG depending on whether or not it finds anything to optimize.
+ * 
+ * XXX: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
  *
  * optimizer
  * ---------
@@ -29,9 +47,6 @@
  * runs with CFG and life info
  *
  * used_once ... deletes assignments, when LHS is unused
- * dead_code_remove ... deletes e.g. blocks that are not entered from
- *                      somewhere or instructions after a branch which 
- *                      aren't reachable
  * loop_optimization ... pulls invariants out of loops
  * TODO e.g. constant_propagation
  *
@@ -63,6 +78,9 @@ static int loop_optimization(Interp *, IMC_Unit *);
 #endif
 static int clone_remove(Interp *, IMC_Unit *);
 
+/*
+ * Handles optimizations occuring before the construction of the CFG.
+ */
 void
 pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
@@ -75,11 +93,14 @@ pre_optimize(Interp *interpreter, IMC_Unit * unit)
     }
 }
 
+/*
+ * Handles optimizations occuring during the construction of the CFG.
+ * Returns TRUE if any optimization was performed. Otherwise, returns
+ * FALSE.
+ */
 int
 cfg_optimize(Interp *interpreter, IMC_Unit * unit)
 {
-    UNUSED(interpreter);
-
     if (IMCC_INFO(interpreter)->dont_optimize)
         return 0;
     if (IMCC_INFO(interpreter)->optimizer_level & OPT_PRE) {
@@ -114,7 +135,9 @@ optimize(Interp *interpreter, IMC_Unit * unit)
     return any;
 }
 
-/* get negated opterator for op */
+/* 
+ * Get negated form of operator. If no negated form is known, return 0.
+ */
 const char *
 get_neg_op(char *op, int *n)
 {
@@ -139,10 +162,17 @@ get_neg_op(char *op, int *n)
     return 0;
 }
 
-
-/* if cond L1        => unless cond L2
- * branch L2            ---
- * L1:                  L2:
+/*
+ * Convert if/branch/label constructs of the form:
+ * 
+ *   if cond L1
+ *   branch L2
+ *   L1
+ *
+ * to the simpler negated form:
+ *
+ *   unless cond L2
+ *
  */
 static void
 if_branch(Interp *interpreter, IMC_Unit * unit)
@@ -192,7 +222,10 @@ if_branch(Interp *interpreter, IMC_Unit * unit)
     }
 }
 
-/* These are run after constant simplification, so it is
+/* 
+ * strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y 
+ *
+ * These are run after constant simplification, so it is
  * guaranteed that one operand is non constant if opsize == 4
  */
 static void
@@ -307,9 +340,9 @@ set_it:
 
 
 /*
- * does conservative constant propogation
- * this code will not propogate constants past labels or saves
- * even though sometimes it may be safe
+ * Does conservative constant propagation.
+ * This code will not propagate constants past labels or saves,
+ * even though sometimes it may be safe.
  */
 
 static int
@@ -408,9 +441,9 @@ IMCC_subst_constants_umix(Interp *interpreter, IMC_Unit * unit, char *name,
 }
 
 /*
- * run one parrot instruction, registers are filled with the
+ * Run one parrot instruction, registers are filled with the
  * according constants. Thus the result is always ok as the function
- * core evaluates the constants
+ * core evaluates the constants.
  */
 static int
 eval_ins(Interp *interpreter, char *op, size_t ops, SymReg **r)
@@ -667,6 +700,8 @@ IMCC_subst_constants(Interp *interpreter, IMC_Unit * unit, char *name,
  * L1:
  * branch L2
  *
+ * Returns TRUE if any optimizations were performed. Otherwise, returns
+ * FALSE.
  */
 static int
 branch_branch(Interp *interpreter, IMC_Unit * unit)
@@ -700,6 +735,12 @@ branch_branch(Interp *interpreter, IMC_Unit * unit)
     return changed;
 }
 
+/*
+ * Removes unused labels. A label is unused if ... [XXX: finish this].
+ *
+ * Returns TRUE if any optimizations were performed. Otherwise, returns
+ * FALSE.
+ */
 static int
 unused_label(Interp *interpreter, IMC_Unit * unit)
 {
@@ -775,6 +816,9 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
     if (!(IMCC_INFO(interpreter)->optimizer_level & OPT_PRE))
         return 0;
     IMCC_info(interpreter, 2, "\tdead_code_remove\n");
+
+    /* Unreachable blocks */
+
     for (i=1; i < unit->n_basic_blocks; i++) {
 	bb = unit->bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
@@ -792,6 +836,9 @@ dead_code_remove(Interp *interpreter, IMC_Unit * unit)
             }
         }
     }
+
+    /* Unreachable instructions */
+
     for (last = unit->instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch")) {
