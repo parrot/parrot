@@ -199,6 +199,20 @@ char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
     if (!ext) {
         internal_exception(UNIMPLEMENTED, "no extension: file '%s'", file_name);
     }
+
+    /* use absolute paths as is */
+#ifdef WIN32
+    if (file_name[0] == '\\' || (isalpha(file_name[0]) &&
+                strncmp(file_name+1, ":\\", 2) == 0)) {
+#else
+    if (file_name[0] == '/') {
+#endif
+        length = strlen(file_name) + 1;
+        full_name = mem_sys_allocate(length);
+        strcpy(full_name, file_name);
+        return full_name;
+    }
+
     length = 0;
     for (ptr = paths; *ptr; ++ptr) {
         int len = strlen(*ptr);
