@@ -106,7 +106,7 @@ my (%func_call_assign) = (p => "return_data = ",
 		          v => "",
                           );
 
-open NCI, ">nci.c" or die "Can't open nci.c!";
+open NCI, ">src/nci.c" or die "Can't open nci.c!";
 
 print NCI <<'HEAD';
 /*

@@ -45,7 +45,7 @@ END
 }
 
 sub generate_c {
-    my $file = "core_pmcs.c";
+    my $file = "src/core_pmcs.c";
     my @pmcs = split(/ /, Configure::Data->get('pmc_names'));
 
     open(OUT, ">$file.tmp");

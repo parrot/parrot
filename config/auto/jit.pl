@@ -96,7 +96,7 @@ sub runstep {
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
       jit_h       => '$(INC)/jit.h',
-      jit_o       => 'jit$(O) jit_cpu$(O) jit_debug$(O) jit_debug_xcoff$(O)'
+      jit_o       => '$(SRC)/jit$(O) $(SRC)/jit_cpu$(O) $(SRC)/jit_debug$(O) $(SRC)/jit_debug_xcoff$(O)'
     );
 
     if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
@@ -115,7 +115,7 @@ sub runstep {
     if ($execcapable) {
       Configure::Data->set(
         exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_dep.h $(INC)/exec_save.h',
-        exec_o       => 'exec$(O) exec_cpu$(O) exec_save$(O)',
+        exec_o       => '$(SRC)/exec$(O) $(SRC)/exec_cpu$(O) $(SRC)/exec_save$(O)',
         execcapable  => 1
       );
     }

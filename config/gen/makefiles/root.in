@@ -553,8 +553,8 @@ $(SRC)/vtables$(O) : $(GENERAL_H_FILES) $(SRC)/vtables.c
 
 $(SRC)/cpu_dep$(O) : $(GENERAL_H_FILES)
 
-$(SRC)/nci.c : $(SRC)/call_list.txt build_nativecall.pl
-	$(PERL) build_nativecall.pl $(SRC)/call_list.txt
+$(SRC)/nci.c : $(SRC)/call_list.txt $(BUILD_TOOL)/build_nativecall.pl
+	$(PERL) $(BUILD_TOOL)/build_nativecall.pl $(SRC)/call_list.txt
 
 #core_ops depends upon config.h so that it gets updated along with updates to config.h's version numbers
 $(SRC)/core_ops.c $(INC)/oplib/core_ops.h : $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC)/config.h lib/Parrot/OpLib/core.pm
@@ -595,8 +595,8 @@ $(INC)/jit_emit.h: jit/${jitcpuarch}/jit_emit.h
 $(INC)/exec_dep.h: jit/${jitcpuarch}/exec_dep.h
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|jit/${jitcpuarch}/exec_dep.h|, q|$(INC)/exec_dep.h|${PQ}
 $(SRC)/jit_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
-		jit/${jitcpuarch}/core.jit jit2h.pl
-	$(PERL) $(BUILD_TOOL)/jit2h.pl ${jitcpuarch} jit_cpu.c
+		jit/${jitcpuarch}/core.jit $(BUILD_TOOL)/jit2h.pl
+	$(PERL) $(BUILD_TOOL)/jit2h.pl ${jitcpuarch} $(SRC)/jit_cpu.c
 $(SRC)/exec_cpu.c: lib/Parrot/OpLib/core.pm $(INC)/jit_emit.h \
 		jit/${jitcpuarch}/core.jit ${exec_h} $(INC)/exec_dep.h $(BUILD_TOOL)/jit2h.pl
 	$(PERL) $(BUILD_TOOL)/jit2h.pl ${jitcpuarch} $(SRC)/exec_cpu.c
