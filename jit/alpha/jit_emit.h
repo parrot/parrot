@@ -143,7 +143,7 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 
 #define emit_l_s_r(pc, opcode, Ra, Rb, Parrot_reg) \
   emit_mem(pc, opcode, Ra, Rb, \
-    (((char *)Parrot_reg) - (char *)&interpreter->int_reg.registers[0]))
+    (((char *)Parrot_reg) - (char *)&REG_INT(0)))
 
 #define emit_ldq_b(pc, Ra, addr, Rb) \
   emit_mem(pc, LDQ, Ra, Rb, addr)
