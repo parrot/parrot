@@ -54,7 +54,11 @@
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 #endif
 
-/* look at fixups, mark all fixup entries as branch target */
+/* look at fixups, mark all fixup entries as branch target
+ * TODO: actually this is wrong: fixups belong only to one
+ *       code segment. The code below doesn't check, for which
+ *       segments the fixups are inserted.
+ */
 static void
 insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
         size_t limit)
@@ -712,6 +716,10 @@ optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     /* Allocate space for the optimizer */
     optimizer = (Parrot_jit_optimizer_t *)
         mem_sys_allocate_zeroed(sizeof(Parrot_jit_optimizer_t));
+    /*
+     * TODO: pass the whole map_branch in the PBC
+     *       this would save two runs through all the opcode
+     */
     optimizer->map_branch = branch =
         (char *)mem_sys_allocate_zeroed((size_t)(code_end - code_start));
     ptr = jit_seg->data;
@@ -998,12 +1006,13 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
              * mapped too.
              *
              * and also, if we have a jitted sections and encounter
-             * and "end" opcode, e.g. in evaled code
+             * an "end" opcode, e.g. in evaled code
              */
             if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
                             (cur_section->branch_target != cur_section)) ||
                         !cur_opcode_byte) &&
-                    cur_section->isjit) {
+                    cur_section->isjit &&
+                    !jit_seg) {
                 Parrot_jit_save_registers(jit_info, interpreter);
             }
 

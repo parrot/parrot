@@ -63,8 +63,6 @@ void allocate(struct Parrot_Interp *interpreter) {
         todo = cfg_optimize(interpreter);
     }
 
-    if (IMCC_DEBUG & DEBUG_CFG)
-        dump_cfg();
     todo = first = 1;
     while (todo) {
         if (!first) {
@@ -79,8 +77,6 @@ void allocate(struct Parrot_Interp *interpreter) {
         build_reglist();
         life_analysis();
         /* optimize, as long as there is something to do */
-        if (IMCC_DEBUG & DEBUG_IMC)
-            dump_symreg();
         if (dont_optimize)
             todo = 0;
         else {
@@ -297,7 +293,6 @@ build_interference_graph()
     }
 
     if (IMCC_DEBUG & DEBUG_IMC) {
-        dump_symreg();
         dump_interference_graph();
     }
 }

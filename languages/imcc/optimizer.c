@@ -839,7 +839,8 @@ static int dead_code_remove(void)
         }
     }
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
-        if ((last->type & IF_goto) && !(ins->type & ITLABEL)) {
+        if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
+                !strcmp(last->op, "branch")) {
             debug(DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",
                     ins_string(ins));
             ins = delete_ins(ins, 1);

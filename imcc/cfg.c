@@ -115,6 +115,17 @@ void find_basic_blocks () {
                     /* treat the set_addr as jump source */
                     found = 1;
                 }
+#if 0
+                /* treat bsr as jumps, ret jumps to next ins
+                 * or as fall through instruction, when bsr target
+                 * was not found
+                 *
+                 * TODO do this below, when ret is found
+                 * and then isert correct edges for bsr-ret or not
+                 */
+                if (found)
+                    ins->type |= IF_goto;
+#endif
             }
             if (found) {
                 if (ins->next)
@@ -315,6 +326,8 @@ static void propagate_alias(void)
 {
     Instruction *ins, *curr;
     SymReg *r0, *r1;
+    int any = 0;
+
     for (ins = instructions ; ins ; ins = ins->next) {
 	if (ins->type & ITALIAS) {
 	    /* make r1 live in each instruction
@@ -330,16 +343,18 @@ static void propagate_alias(void)
 		    else if (instruction_reads(ins, r0) &&
 			   !instruction_reads(ins, r1)) {
 			add_instruc_reads(ins, r1);
+                        any = 1;
 		    }
 		    else if (instruction_reads(ins, r1) &&
 			   !instruction_reads(ins, r0)) {
 			add_instruc_reads(ins, r0);
+                        any = 1;
 		    }
 		ins = curr;
 	    }
 	}
     }
-    if (IMCC_DEBUG & DEBUG_CFG) {
+    if (any && (IMCC_DEBUG & DEBUG_CFG)) {
 	debug(DEBUG_CFG, "\nAfter propagate_alias\n");
 	dump_instructions();
     }
@@ -650,7 +665,6 @@ void find_loops () {
 
     sort_loops();
     if (IMCC_DEBUG & DEBUG_CFG) {
-	dump_cfg();
         dump_loops();
     }
     if (bb_list[0]->loop_depth) {
