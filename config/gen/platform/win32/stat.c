@@ -78,10 +78,10 @@ Parrot_stat_info_intval(Parrot_Interp interpreter, STRING *file, INTVAL thing)
     result = statbuf.st_rdev;
     break;
   case STAT_PLATFORM_BLOCKSIZE:
-    result = statbuf.st_blksize;
+    internal_exception(1, "STAT_PLATFORM_BLOCKSIZE not supported");
     break;
   case STAT_PLATFORM_BLOCKS:
-    result = statbuf.st_blocks;
+    internal_exception(1, "STAT_PLATFORM_BLOCKS not supported");
     break;
   }
   
@@ -149,10 +149,10 @@ Parrot_fstat_info_intval(Parrot_Interp interpreter, INTVAL file, INTVAL thing)
     result = statbuf.st_rdev;
     break;
   case STAT_PLATFORM_BLOCKSIZE:
-    result = statbuf.st_blksize;
+    internal_exception(1, "STAT_PLATFORM_BLOCKSIZE not supported");
     break;
   case STAT_PLATFORM_BLOCKS:
-    result = statbuf.st_blocks;
+    internal_exception(1, "STAT_PLATFORM_BLOCKS not supported");
     break;
   }
 
