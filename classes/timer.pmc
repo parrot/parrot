@@ -75,7 +75,7 @@ typedef enum {
     TIMER_STATE_FIRE
 } parrot_timer_state_t;
 
-typedef struct timer_t {
+typedef struct parrot_timer_t {
     int flags;
     int ticks;
     int value;
@@ -86,21 +86,21 @@ typedef struct timer_t {
 	void *c_code;
     } handler;
     PMC *self;
-    struct timer_t *next;
-    struct timer_t *prev;
-} timer_t;
+    struct parrot_timer_t *next;
+    struct parrot_timer_t *prev;
+} parrot_timer_t;
 
 /* XXX next 2 should probably go into interpreter */
 /* linked list of running timers */
-static timer_t *rtimer = 0;
+static parrot_timer_t *rtimer = 0;
 /* handle of system timer */
 static void *handle = (void *) -1;
 
 /* add timer to running */
 static void
-add_timer(timer_t *t)
+add_timer(parrot_timer_t *t)
 {
-    timer_t *next = rtimer;
+    parrot_timer_t *next = rtimer;
     rtimer = t;
     t->next = next;
     if (next) {
@@ -111,9 +111,9 @@ add_timer(timer_t *t)
 }
 
 static int
-timer_is_running(timer_t *tp)
+timer_is_running(parrot_timer_t *tp)
 {
-    timer_t *t;
+    parrot_timer_t *t;
     /* be paranoid, check run lis too */
     for (t = rtimer; t; t = t->next)
 	if (t == tp)
@@ -123,10 +123,10 @@ timer_is_running(timer_t *tp)
 
 /* del timer from running */
 static void
-del_timer(timer_t *t)
+del_timer(parrot_timer_t *t)
 {
-    timer_t *next = t->next;
-    timer_t *prev = t->prev;
+    parrot_timer_t *next = t->next;
+    parrot_timer_t *prev = t->prev;
 
     if (!timer_is_running(t))
 	return;
@@ -161,7 +161,7 @@ static void
 recalc_ticks(void)
 {
     UINTVAL ms, oms;
-    timer_t *t;
+    parrot_timer_t *t;
 
     oms = get_sys_timer_ms(handle);
     t = rtimer;
@@ -206,7 +206,7 @@ recalc_ticks(void)
 static void
 do_alarm_handler(void)
 {
-    timer_t *t;
+    parrot_timer_t *t;
     UINTVAL ms;
     int recalc = 0;
 
@@ -248,7 +248,7 @@ pmclass Timer {
     }
 
     void init() {
-	timer_t *t = mem_sys_allocate_zeroed(sizeof(timer_t));
+	parrot_timer_t *t = mem_sys_allocate_zeroed(sizeof(parrot_timer_t));
 	t->state = TIMER_STATE_NEW;
 	t->self = SELF;
 	SELF->cache.struct_val = t;
@@ -288,7 +288,7 @@ pmclass Timer {
     }
 
     void destroy() {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 	del_timer(t);
 	mem_sys_free(t);
     }
@@ -298,7 +298,7 @@ pmclass Timer {
     }
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case TIMER_SEC:
@@ -321,7 +321,7 @@ pmclass Timer {
     }
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case TIMER_NSEC:
@@ -332,12 +332,12 @@ pmclass Timer {
     }
 
     void set_integer_native(INTVAL value) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 	t->handler.pasm_code = value;
     }
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case TIMER_SEC:
@@ -370,7 +370,7 @@ pmclass Timer {
     }
 
     void* invoke(void *next) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 	if (!timer_is_running(t)) {
 	    add_timer(t);
 	    recalc_ticks();
@@ -379,7 +379,7 @@ pmclass Timer {
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-	timer_t *t = SELF->cache.struct_val;
+	parrot_timer_t *t = SELF->cache.struct_val;
 
 	switch(key) {
 	    case TIMER_NSEC:
