@@ -19,7 +19,7 @@ Then you can run your Befunge program with:
 The -v flag makes the befunge interpreter more verbose.
 
 
-NOTES
+FILES
 -----
 The files are the following:
         befunge.pasm    the main loop
@@ -36,8 +36,6 @@ The files are the following:
 
 BUGS
 ----
-* The befunge program *should* be properly newline terminated because
-  of Parrot's I/O...
 * The "input char" and "input int" instructions are a bit broken since
   Parrot does not handle I/O very well...
 
@@ -66,8 +64,8 @@ I would like to thank:
   idea.
 * Leon Brocard (again), because he told me he will help me with the
   Befunge-98 version :o)
-* Dan Sugalski and all the parrot folks for providing such a nice toy
-  to play with.
+* Dan Sugalski and all the parrot folks (you know who you are) for
+  providing such a nice toy to play with.
 
 
 COPYRIGHT

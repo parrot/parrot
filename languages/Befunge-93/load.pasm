@@ -23,6 +23,7 @@ LOAD_READ:
 # Split the buffer around its newlines.
 LOAD_EOF:
         close P0
+        concat S1, "\n"         # Add a trailing newline if needed.
         length I0, S1           # I0 =length of the buffer
         set I1, 0               # I1 =ranges from 0 to I0
         set I2, 0               # I2 =beginning of current line
