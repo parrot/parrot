@@ -124,6 +124,58 @@ string_utf8_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
     return dest;
 }
 
+/*=for api string_utf8 string_utf8_compare
+   compare two strings
+*/
+static INTVAL
+string_utf8_compare(STRING* s1, STRING* s2) {
+    utf8_t *s1start = s1->bufstart;
+    utf8_t *s1end = s1start + s1->bufused;
+    utf8_t *s2start = s2->bufstart;
+    utf8_t *s2end = s2start + s2->bufused;
+    INTVAL cmp = 0;
+
+    while (cmp == 0 && s1start < s1end && s2start < s2end) {
+        utf32_t c1 = *s1start++;
+        utf32_t c2 = *s2start++;
+
+        if (UTF8_IS_START(c1)) {
+            INTVAL len = UTF8SKIP(s1start - 1);
+            INTVAL count;
+
+            c1 &= UTF8_START_MASK(len);
+            for (count = 1; count < len; count++) {
+                if (!UTF8_IS_CONTINUATION(*s1start)) {
+                    INTERNAL_EXCEPTION(MALFORMED_UTF8,
+                                       "Malformed UTF-8 string\n");
+                }
+                c1 = UTF8_ACCUMULATE(c1, *s1start++);
+            }
+        }
+
+        if (UTF8_IS_START(c2)) {
+            INTVAL len = UTF8SKIP(s2start - 1);
+            INTVAL count;
+
+            c2 &= UTF8_START_MASK(len);
+            for (count = 1; count < len; count++) {
+                if (!UTF8_IS_CONTINUATION(*s2start)) {
+                    INTERNAL_EXCEPTION(MALFORMED_UTF8,
+                                       "Malformed UTF-8 string\n");
+                }
+                c2 = UTF8_ACCUMULATE(c1, *s2start++);
+            }
+        }
+
+        cmp = c1 - c2;
+    }
+
+    if (cmp == 0 && s1start < s1end) cmp = 1;
+    if (cmp == 0 && s2start < s2end) cmp = -1;
+
+    return cmp;
+}
+
 /*=for api string_utf8 string_utf8_vtable
    return the vtable for the native string
 */
@@ -136,6 +188,7 @@ string_utf8_vtable (void) {
 	string_utf8_concat,
 	string_utf8_chopn,
 	string_utf8_substr,
+	string_utf8_compare,
     };
     return sv;
 }

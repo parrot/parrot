@@ -152,6 +152,23 @@ string_chopn(STRING* s, INTVAL n) {
     return (ENC_VTABLE(s)->chopn)(s, n);
 }
 
+/*=for api string string_compare
+ * compare two strings.
+ */
+INTVAL
+string_compare(STRING* s1, STRING* s2) {
+    if (s1->encoding != s2->encoding) {
+        if (s1->encoding->which != enc_utf32) {
+            s1 = Parrot_transcode_table[s1->encoding->which][enc_utf32](s1, NULL);
+        }
+        if (s2->encoding->which != enc_utf32) {
+            s2 = Parrot_transcode_table[s2->encoding->which][enc_utf32](s2, NULL);
+        }
+    }
+
+    return (ENC_VTABLE(s1)->compare)(s1, s2);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

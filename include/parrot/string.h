@@ -33,6 +33,7 @@ typedef STRING* (*string_iv_to_string_t)(STRING *, INTVAL);
 typedef STRING* (*two_strings_iv_to_string_t)(STRING *, STRING *, INTVAL);
 typedef STRING* (*substr_t)(STRING*, INTVAL, INTVAL, STRING*);
 typedef INTVAL (*iv_to_iv_t)(INTVAL);
+typedef INTVAL (*two_strings_to_iv_t)(STRING*, STRING*);
 
 struct string_vtable {
     encoding_t which;                   /* What sort of encoding is this? */
@@ -41,6 +42,7 @@ struct string_vtable {
     two_strings_iv_to_string_t concat;  /* Append string b to the end of string a */
     string_iv_to_string_t chopn;        /* Remove n characters from the end of a string */
     substr_t substr;                    /* Substring operation */
+    two_strings_to_iv_t compare;        /* Compare operation */
 };
 
 struct parrot_string {
@@ -67,6 +69,8 @@ STRING*
 string_chopn(STRING*, INTVAL);
 STRING*
 string_substr(STRING*, INTVAL, INTVAL, STRING**);
+INTVAL
+string_compare(STRING*, STRING*);
 
 /* Declarations of other functions */
 INTVAL

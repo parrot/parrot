@@ -67,7 +67,7 @@ chopn_s_ic	2	S i
 substr_s_s_i	4	S S I I
 concat_s	2	S S
 
-# Comparators (TODO: String comparators)
+# Comparators
 
 eq_i_ic	3	I I D
 eq_ic_ic	3	I i D
@@ -94,6 +94,19 @@ gt_n_ic	3 	N N D
 gt_nc_ic	3	N n D
 ge_n_ic	3	N N D 
 ge_nc_ic	3	N n D
+
+eq_s_ic	3	S S D
+eq_sc_ic	3	S s D
+ne_s_ic	3	S S D
+ne_sc_ic	3	S s D
+lt_s_ic	3	S S D
+lt_sc_ic	3	S s D
+le_s_ic	3	S S D
+le_sc_ic	3	S s D
+gt_s_ic	3	S S D
+gt_sc_ic	3	S s D
+ge_s_ic	3	S S D
+ge_sc_ic	3	S s D
 
 # Flow control
 

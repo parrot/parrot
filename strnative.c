@@ -82,6 +82,25 @@ string_native_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
     return dest;
 }
 
+/*=for api string_native string_native_compare
+   compare two strings
+*/
+static INTVAL
+string_native_compare(STRING* s1, STRING* s2) {
+    INTVAL cmp;
+
+    if (s1->bufused < s2->bufused) {
+        cmp = memcmp(s1->bufstart, s2->bufstart, s1->bufused);
+        if (cmp == 0) cmp == -1;
+    }
+    else {
+        cmp = memcmp(s1->bufstart, s2->bufstart, s2->bufused);
+        if (cmp ==0 && s1->bufused > s2->bufused) cmp = 1;
+    }
+
+    return cmp;
+}
+
 /*=for api string_native string_native_vtable
    return the vtable for the native string
 */
@@ -94,6 +113,7 @@ string_native_vtable (void) {
 	string_native_concat,
 	string_native_chopn,
 	string_native_substr,
+	string_native_compare,
     };
     return sv;
 }

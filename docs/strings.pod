@@ -89,6 +89,17 @@ The result will be placed in C<dest>.
 C<*dest> is a null pointer, a new string structure is created with the
 same encoding as C<src>.)
 
+To compare two strings, use:
+
+    INTVAL string_compare(STRING* s1, STRING* s2)
+
+The value returned will be less than, equal to, or greater than zero
+depending on whether C<s1> is less than, equal to, or greater than C<s2>.
+
+Strings whose encodings are not the same can be compared - in this
+case a UTF-32 copy will be made of each string and these copies will
+be compared.
+
 B<Not implemented>: 
 To format output into a string, use
 

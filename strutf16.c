@@ -123,6 +123,37 @@ string_utf16_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
     return dest;
 }
 
+/*=for api string_utf16 string_utf16_compare
+   compare two strings
+*/
+static INTVAL
+string_utf16_compare(STRING* s1, STRING* s2) {
+    utf16_t *s1start = s1->bufstart;
+    utf16_t *s1end = s1start + s1->bufused / sizeof(utf16_t);
+    utf16_t *s2start = s2->bufstart;
+    utf16_t *s2end = s2start + s2->bufused / sizeof(utf16_t);
+    INTVAL cmp = 0;
+
+    while (cmp == 0 && s1start < s1end && s2start < s2end) {
+        utf32_t c1 = *s1start++;
+        utf32_t c2 = *s2start++;
+
+        if (UNICODE_IS_HIGH_SURROGATE(c1)) {
+            c1 = UNICODE_DECODE_SURROGATE(c1, *s1start++);
+        }
+        if (UNICODE_IS_HIGH_SURROGATE(c2)) {
+            c2 = UNICODE_DECODE_SURROGATE(c2, *s2start++);
+        }
+
+        cmp = c1 - c2;
+    }
+
+    if (cmp == 0 && s1start < s1end) cmp = 1;
+    if (cmp == 0 && s2start < s2end) cmp = -1;
+
+    return cmp;
+}
+
 /*=for api string_utf16 string_utf16_vtable
    return the vtable for the native string
 */
@@ -135,6 +166,7 @@ string_utf16_vtable (void) {
 	string_utf16_concat,
 	string_utf16_chopn,
 	string_utf16_substr,
+	string_utf16_compare,
     };
     return sv;
 }

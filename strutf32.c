@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "parrot/unicode.h"
 
 /* Functions for handling strings in UTF-32 format */
 
@@ -80,6 +81,27 @@ string_utf32_substr(STRING* src, INTVAL offset, INTVAL length, STRING* dest)
     return dest;
 }
 
+/*=for api string_utf32 string_utf32_compare
+   compare two strings
+*/
+static INTVAL
+string_utf32_compare(STRING* s1, STRING* s2) {
+    utf32_t *s1start = s1->bufstart;
+    utf32_t *s1end = s1start + s1->strlen;
+    utf32_t *s2start = s2->bufstart;
+    utf32_t *s2end = s2start + s2->strlen;
+    INTVAL cmp = 0;
+
+    while (cmp == 0 && s1start < s1end && s2start < s2end) {
+        cmp = *s1start++ - *s2start++;
+    }
+
+    if (cmp == 0 && s1start < s1end) cmp = 1;
+    if (cmp == 0 && s2start < s2end) cmp = -1;
+
+    return cmp;
+}
+
 /*=for api string_utf32 string_utf32_vtable
    return the vtable for the native string
 */
@@ -92,6 +114,7 @@ string_utf32_vtable (void) {
 	string_utf32_concat,
 	string_utf32_chopn,
 	string_utf32_substr,
+	string_utf32_compare,
     };
     return sv;
 }
