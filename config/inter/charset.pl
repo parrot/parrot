@@ -54,7 +54,7 @@ E_NOTE
   foreach my $charset (split(/\s+/, $charset_list)) {
       $charset =~ s/\.c$//;
       $TEMP_charset_build .= <<END
-charset/$charset\$(O): charset/$charset.h charset/$charset.c \$(NONGEN_HEADERS)
+charset/$charset\$(O): charset/$charset.h charset/ascii.h charset/$charset.c \$(NONGEN_HEADERS)
 
 
 END

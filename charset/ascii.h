@@ -13,8 +13,21 @@
 #if !defined(PARROT_CHARSET_ASCII_H_GUARD)
 #define PARROT_CHARSET_ASCII_H_GUARD
 
-static STRING *get_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count);
-static STRING *get_graphemes_inplace(Interp *, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
+/*
+ * common functions for ascii-ish charsets
+ */
+
+INTVAL
+ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
+        unsigned char type, const unsigned char *table);
+INTVAL
+ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
+        unsigned char type, const unsigned char *table);
+STRING *ascii_get_graphemes(Interp *, STRING *source_string,
+        UINTVAL offset, UINTVAL count);
+STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
+        STRING *dest_string, UINTVAL offset, UINTVAL count);
+
 static void set_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
 static STRING *copy_to_charset(Interp *, STRING *source_string, CHARSET *new_charset);

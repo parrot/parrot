@@ -16,6 +16,7 @@ This file implements the charset functions for iso-8859-1 data
 
 #include "parrot/parrot.h"
 #include "iso-8859-1.h"
+#include "ascii.h"
 
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
@@ -39,64 +40,12 @@ static const unsigned char typetable[256] = {
     1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 160-175 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, /* 176-191 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 192-207 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 207-223 */
+    2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, /* 208-223 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 224-239 */
-    2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 240-255 */
+    2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, /* 240-255 */
 };
 
-static INTVAL
-find_thing(Interp *interpreter, STRING *string, UINTVAL start, UINTVAL type)
-{
-    INTVAL retval = -1;
-    UINTVAL offset = start;
-    INTVAL found = 0;
-    for (; offset < string->strlen; offset++) {
-        if (typetable[ENCODING_GET_CODEPOINT(interpreter, string, offset)]
-                == type) {
-            found = 1;
-            break;
-        }
-    }
-    if (found) {
-        retval = offset;
-    }
-    return retval;
-}
 
-static INTVAL
-find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
-        UINTVAL type)
-{
-    INTVAL retval = -1;
-    UINTVAL offset = start;
-    INTVAL found = 0;
-    for (; offset < string->strlen; offset++) {
-        if (typetable[ENCODING_GET_CODEPOINT(interpreter, string, offset)]
-                != type) {
-            found = 1;
-            break;
-        }
-    }
-    if (found) {
-        retval = offset;
-    }
-    return retval;
-}
-
-static STRING *
-get_graphemes(Interp *interpreter, STRING *source_string,
-        UINTVAL offset, UINTVAL count)
-{
-    return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
-}
-
-static STRING *
-get_graphemes_inplace(Interp *interpreter, STRING *source_string,
-        STRING *dest_string, UINTVAL offset, UINTVAL count)
-{
-    return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
-            offset, count, dest_string);
-}
 
 static void
 set_graphemes(Interp *interpreter, STRING *source_string,
@@ -168,7 +117,7 @@ decompose(Interp *interpreter, STRING *source_string)
 static void
 upcase(Interp *interpreter, STRING *source_string)
 {
-    char *buffer;
+    unsigned char *buffer;
     UINTVAL offset = 0;
 
     if (!source_string->strlen) {
@@ -178,7 +127,12 @@ upcase(Interp *interpreter, STRING *source_string)
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
-        buffer[offset] = toupper(buffer[offset]);
+        unsigned int c = buffer[offset]; /* XXX use encoding ? */
+        if (c >= 0xe0 && c != 0xf7)
+            c &= ~0x20;
+        else
+            c = toupper(c);
+        buffer[offset] = c;
     }
 }
 
@@ -186,67 +140,94 @@ static void
 downcase(Interp *interpreter, STRING *source_string)
 {
     UINTVAL offset = 0;
-    char *buffer;
+    unsigned char *buffer;
     if (!source_string->strlen) {
         return;
     }
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
     for (offset = 0; offset < source_string->strlen; offset++) {
-        buffer[offset] = tolower(buffer[offset]);
+        unsigned int c = buffer[offset];
+        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+            c |= 0x20;
+        else
+            c = tolower(c);
+        buffer[offset] = c;
     }
 }
 
 static void
 titlecase(Interp *interpreter, STRING *source_string)
 {
-    char *buffer;
-    UINTVAL offset = 0;
+    unsigned char *buffer;
+    unsigned int c;
+    UINTVAL offset;
+
     if (!source_string->strlen) {
         return;
     }
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
-    buffer[0] = toupper(buffer[0]);
+    c = buffer[0];
+    if (c >= 0xe0 && c != 0xf7)
+        c &= ~0x20;
+    else
+        c = toupper(c);
+    buffer[0] = c;
+
     for (offset = 1; offset < source_string->strlen; offset++) {
-        buffer[offset] = tolower(buffer[offset]);
+        c = buffer[offset];
+        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+            c |= 0x20;
+        else
+            c = tolower(c);
+        buffer[offset] = c;
     }
 }
 
 static void
 upcase_first(Interp *interpreter, STRING *source_string)
 {
-    char *buffer;
+    unsigned char *buffer;
+    unsigned int c;
+
     if (!source_string->strlen) {
         return;
     }
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
-    buffer[0] = toupper(buffer[0]);
+    c = buffer[0];
+    if (c >= 0xe0 && c != 0xf7)
+        c &= ~0x20;
+    else
+        c = toupper(c);
+    buffer[0] = c;
 }
 
 static void
 downcase_first(Interp *interpreter, STRING *source_string)
 {
-    char *buffer;
+    unsigned char *buffer;
+    unsigned int c;
+
     if (!source_string->strlen) {
         return;
     }
     Parrot_unmake_COW(interpreter, source_string);
     buffer = source_string->strstart;
+    c = buffer[0];
+    if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+        c &= ~0x20;
+    else
+        c = tolower(c);
+    buffer[0] = c;
     buffer[0] = toupper(buffer[0]);
 }
 
 static void
 titlecase_first(Interp *interpreter, STRING *source_string)
 {
-    char *buffer;
-    if (!source_string->strlen) {
-        return;
-    }
-    Parrot_unmake_COW(interpreter, source_string);
-    buffer = source_string->strstart;
-    buffer[0] = toupper(buffer[0]);
+    upcase_first(interpreter, source_string);
 }
 
 static INTVAL
@@ -312,13 +293,14 @@ is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_thing(interpreter, source_string, offset, WORDCHAR);
+    return ascii_find_thing(interpreter, source_string, offset, WORDCHAR, typetable);
 }
 
 static INTVAL
 find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_not_thing(interpreter, source_string, offset, WORDCHAR);
+    return ascii_find_not_thing(interpreter, source_string, offset, WORDCHAR,
+            typetable);
 }
 
 static INTVAL
@@ -332,14 +314,16 @@ is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_thing(interpreter, source_string, offset, WHITESPACE);
+    return ascii_find_thing(interpreter, source_string, offset, WHITESPACE,
+            typetable);
 }
 
 static INTVAL
 find_not_whitespace(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
-    return find_not_thing(interpreter, source_string, offset, WHITESPACE);
+    return ascii_find_not_thing(interpreter, source_string, offset,
+            WHITESPACE, typetable);
 }
 
 static INTVAL
@@ -353,13 +337,15 @@ is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_thing(interpreter, source_string, offset, DIGIT);
+    return ascii_find_thing(interpreter, source_string, offset, DIGIT,
+            typetable);
 }
 
 static INTVAL
 find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_not_thing(interpreter, source_string, offset, DIGIT);
+    return ascii_find_not_thing(interpreter, source_string, offset, DIGIT,
+            typetable);
 }
 
 static INTVAL
@@ -373,15 +359,16 @@ is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return find_thing(interpreter, source_string, offset, PUNCTUATION);
+    return ascii_find_thing(interpreter, source_string, offset, PUNCTUATION,
+            typetable);
 }
 
 static INTVAL
 find_not_punctuation(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
-    return find_not_thing(interpreter, source_string, offset, PUNCTUATION);
-
+    return ascii_find_not_thing(interpreter, source_string, offset,
+            PUNCTUATION, typetable);
 }
 
 static INTVAL
@@ -441,8 +428,8 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
     CHARSET *return_set = Parrot_new_charset(interpreter);
     CHARSET base_set = {
         "iso-8859-1",
-        get_graphemes,
-        get_graphemes_inplace,
+        ascii_get_graphemes,
+        ascii_get_graphemes_inplace,
         set_graphemes,
         to_charset,
         copy_to_charset,

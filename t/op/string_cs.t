@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -64,3 +64,31 @@ output_like( <<'CODE', <<OUTPUT, "find_charset - not existing" );
 CODE
 /charset 'no_such' not found/
 OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "downcase" );
+    set S0, "AEIOU_ÄÖÜ\n"
+    downcase S1, S0
+    print S1
+    end
+CODE
+aeiou_äöü
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "upcase" );
+    set S0, "aeiou_äöüß\n"
+    upcase S1, S0
+    print S1
+    end
+CODE
+AEIOU_ÄÖÜß
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "titlecase" );
+    set S0, "zAEIOU_ÄÖÜ\n"
+    titlecase S1, S0
+    print S1
+    end
+CODE
+Zaeiou_äöü
+OUTPUT
+

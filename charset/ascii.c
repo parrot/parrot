@@ -8,7 +8,8 @@ charset/ascii.c
 
 =head1 DESCRIPTION
 
-This file implements the charset functions for ascii data
+This file implements the charset functions for ascii data and common
+charset functionality for similar charsets like iso-8859-1.
 
 =cut
 
@@ -39,9 +40,46 @@ static const unsigned char typetable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 240-255 */
 };
 
+INTVAL
+ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
+        unsigned char type, const unsigned char *table)
+{
+    INTVAL retval = -1;
+    INTVAL found = 0;
 
-static STRING *
-get_graphemes(Interp *interpreter, STRING *source_string,
+    for (; start < string->strlen; start++) {
+        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] == type) {
+            found = 1;
+            break;
+        }
+    }
+    if (found) {
+        retval = start;
+    }
+    return retval;
+}
+
+INTVAL
+ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
+        unsigned char type, const unsigned char *table)
+{
+    INTVAL retval = -1;
+    INTVAL found = 0;
+
+    for (; start < string->strlen; start++) {
+        if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] != type) {
+            found = 1;
+            break;
+        }
+    }
+    if (found) {
+        retval = start;
+    }
+    return retval;
+}
+
+STRING *
+ascii_get_graphemes(Interp *interpreter, STRING *source_string,
         UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
@@ -56,8 +94,8 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 
 }
 
-static STRING *
-get_graphemes_inplace(Interp *interpreter, STRING *source_string,
+STRING *
+ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,
         STRING *dest_string, UINTVAL offset, UINTVAL count)
 {
     return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
@@ -349,8 +387,8 @@ Parrot_charset_ascii_init(Interp *interpreter)
   CHARSET *return_set = Parrot_new_charset(interpreter);
   CHARSET base_set = {
       "ascii",
-      get_graphemes,
-      get_graphemes_inplace,
+      ascii_get_graphemes,
+      ascii_get_graphemes_inplace,
       set_graphemes,
       to_charset,
       copy_to_charset,

@@ -13,7 +13,6 @@
 #if !defined(PARROT_CHARSET_ISO_8859_1_H_GUARD)
 #define PARROT_CHARSET_ISO_8859_1_H_GUARD
 
-static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset);
 static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset);

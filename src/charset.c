@@ -47,6 +47,15 @@ Parrot_new_charset(Interp *interpreter)
 void
 Parrot_deinit_charsets(Interp *interpreter)
 {
+    int i, n;
+
+    n = all_charsets->n_charsets;
+    for (i = 0; i < n; ++i) {
+        mem_sys_free(all_charsets->set[i].charset);
+    }
+    mem_sys_free(all_charsets->set);
+    mem_sys_free(all_charsets);
+    all_charsets = NULL;
 }
 
 CHARSET *
@@ -135,8 +144,7 @@ register_charset(Interp *interpreter, const char *charsetname,
                 sizeof(One_charset));
     all_charsets->n_charsets++;
     all_charsets->set[n].charset = charset;
-    all_charsets->set[n].name = string_from_cstring(interpreter,
-            charsetname, 0);
+    all_charsets->set[n].name = const_string(interpreter, charsetname);
 
     return 1;
 }
