@@ -200,6 +200,8 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
         else
             fprintf(stderr, "No exception handler and no message\n");
     }
+    if (m)
+        string_cstring_free(m);
     if (print_location)
         print_pbc_location(interpreter);
     /*

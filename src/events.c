@@ -319,12 +319,18 @@ static void
 schedule_signal_event(int signum)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    QUEUE_ENTRY *entry;
+
+    entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    entry->next = NULL;
+    entry->type = QUEUE_ENTRY_TYPE_EVENT;
     ev->type = EVENT_TYPE_SIGNAL;
     ev->u.signal = signum;
+    entry->data = ev;
     /*
-     * or do directly Parrot_schedule_broadcast_qentry()
+     * deliver to all intrepreters
      */
-    Parrot_schedule_event(NULL, ev);
+    Parrot_schedule_broadcast_qentry(entry);
 }
 
 /*
@@ -432,7 +438,8 @@ Parrot_kill_event_loop(void)
 =item C<void
 Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)>
 
-Put a queue entry into the interpreters task queue.
+Put a queue entry into the interpreters task queue and enable event
+checking for the interpreter.
 
 =cut
 
@@ -443,11 +450,17 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
 {
     parrot_event* event;
     event = entry->data;
+    /*
+     * sleep checks events when it awakes
+     */
     if (event->type != EVENT_TYPE_SLEEP)
         enable_event_checking(interpreter);
     /*
      * do push_entry last - this signales the queue condition so the
      * interpreter might starting process that event immediately
+     *
+     * we should better use a priority for placing the event
+     * in front or at the end of the queue
      */
     switch (event->type) {
         case EVENT_TYPE_SIGNAL:
@@ -860,7 +873,8 @@ event_thread(void *data)
 =item C<static void*
 wait_for_wakeup(Parrot_Interp interpreter, void *next)>
 
-Runs in a loop until told to wake up.
+Sleep on the event queue condition. If an event arrives, the event
+is processed. Terminate the loop if sleeping is finished.
 
 =cut
 
@@ -914,7 +928,7 @@ Parrot_sleep_on_event(Parrot_Interp interpreter, FLOATVAL t, void* next)
     /*
      * TODO check for nanosleep or such
      */
-    Parrot_sleep((UINTVAL) t);
+    Parrot_sleep((UINTVAL) ceil(t));
 #endif
     return next;
 }
@@ -964,7 +978,7 @@ event_to_exception(Parrot_Interp interpreter, parrot_event* event)
         case SIGINT:
             /*
              * SIGINT is silent, if no exception handler is
-             * installed: set severiy to EXCEPT_exit
+             * installed: set severity to EXCEPT_exit
              */
             do_exception(interpreter, EXCEPT_exit, exit_code);
             break;
