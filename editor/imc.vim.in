@@ -1,0 +1,71 @@
+" Vim syntax file
+" Language:	Parrot IMCC
+" Maintainer:	Luke Palmer <fibonaci@babylonia.flatirons.org>
+" Last Change:	2003 Jun 4
+
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+" if version < 600
+"   syntax clear
+" elseif exists("b:current_syntax")
+"   finish
+" endif
+
+syntax clear
+
+syn keyword imcType 		int float string
+syn keyword imcPMC		Array Boolean Compiler Continuation Coroutine CSub
+syn keyword imcPMC 		Eval IntList Iterator Key ManagedStruct MultiArray
+syn keyword imcPMC		NCI PerlArray PerlHash PerlInt PerlNum PerlString
+syn keyword imcPMC		PerlUndef Pointer Scratchpad Sub UnManagedStruct
+
+syn keyword imcOp		call goto if unless global clone addr
+
+syn match imcDirective      /\.\(sub\|end\|emit\|eom\)/
+syn match imcDirective      /\.\(local\|sym\|const\)/
+syn match imcDirective      /\.\(namespace\|endnamespace\)/
+syn match imcDirective      /\.\(param\|result\|arg\|return\)/
+syn match imcDirective      /\.\(include|pcc_begin|pcc_end\)/
+syn keyword imcDirective    non_prototyped prototyped
+
+syn match imcComment        /#.*/
+syn match imcLabel          /[A-Za-z0-9_]\+:/he=e-1
+syn match imcRegister       /[INPS]\([12][0-9]\|3[01]\|[0-9]\)/
+syn match imcDollarRegister /\$[INPS][0-9]\+/
+syn match imcNumber         /[0-9]\+\(\.[0-9]*\([Ee]-\?[0-9]\+\)\?\)\?/
+syn match imcNumber         /0x[0-9a-fA-F]\+/
+syn match imcNumber         /0b[01]\+/
+syn match imcWord           /[A-Za-z_][A-Za-z0-9_]*/
+
+syn region imcString start=/"/ skip=/\\"/ end=/"/
+syn region imcString start=/'/ end=/'/
+
+" Define the default highlighting.
+" For version 5.7 and earlier: only when not done already
+" For version 5.8 and later: only when an item doesn't have highlighting yet
+if version >= 508 || !exists("did_pasm_syntax_inits")
+  if version < 508
+    let did_pasm_syntax_inits = 1
+    command -nargs=+ HiLink hi link <args>
+  else
+    command -nargs=+ HiLink hi def link <args>
+  endif
+
+  HiLink imcWord            Normal
+  HiLink imcComment         Comment
+  HiLink imcLabel           Label
+  HiLink imcRegister        Identifier
+  HiLink imcDollarRegister  Identifier
+  HiLink imcType            Type
+  HiLink imcPMC             Type
+  HiLink imcString          String
+  HiLink imcNumber          Number
+  HiLink imcDirective       Macro
+  HiLink imcOp              Conditional
+
+  delcommand HiLink
+endif
+
+let b:current_syntax = "imc"
+
+" Ops -- dynamically generated from ops2vim.pl
