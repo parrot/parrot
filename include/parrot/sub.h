@@ -78,7 +78,7 @@ void mark_context(Interp *, struct Parrot_Context *);
 void copy_regs(Interp *, struct parrot_regs_t *caller_regs);
 void mark_reg_stack(Interp *, Stack_Chunk_t *);
 
-void invalidate_retc_context(Interp *interpreter, PMC* self);
+void invalidate_retc_context(Interp *interpreter, struct Parrot_Context *);
 void add_to_retc_cache(Interp *interpreter, PMC *pmc);
 void mark_retc_cache(Interp *);
 

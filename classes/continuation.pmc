@@ -52,6 +52,13 @@ Initializes the continuation.
         PMC_cont(SELF) = new_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
+        /*
+         * Whenever we create a continuation, all return continuations
+         * up the call chain maybe reuesed due to invoking the
+         * continuation. To avoid that all return continuations are
+         * converted to true continuations.
+         */
+        invalidate_retc_context(INTERP, &interpreter->ctx);
     }
 
 /*
@@ -102,7 +109,6 @@ Creates and returns a clone of the continuation.
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
 
         PMC_struct_val(ret) = PMC_struct_val(SELF);
-        invalidate_retc_context(INTERP, SELF);
         return ret;
     }
 

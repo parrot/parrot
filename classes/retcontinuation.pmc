@@ -57,12 +57,10 @@ the GC gets at them.
 
 */
     PMC* clone() {
-        PMC *ret = pmc_new(INTERP, enum_class_Continuation);
-        struct Parrot_cont * sub;
-        struct Parrot_cont *cc_self = PMC_cont(SELF);
-        sub = PMC_cont(ret);
-        memcpy(sub, cc_self, sizeof(struct Parrot_cont));
-        PMC_struct_val(ret) = PMC_struct_val(SELF);
+        PMC *ret = SUPER();
+        ret->vtable = Parrot_base_vtables[enum_class_Continuation];
+        SELF->vtable = Parrot_base_vtables[enum_class_Continuation];
+        invalidate_retc_context(INTERP, &PMC_cont(ret)->ctx);
         return ret;
     }
 /*

@@ -177,7 +177,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
             /*
              * invalidate return continuations
              */
-            invalidate_retc_context(interpreter, sub);
+            invalidate_retc_context(interpreter, ctx);
         }
         /*
          * construct stacks that have the interpreterreter stack
@@ -395,12 +395,17 @@ new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
     Caches *mc = interpreter->caches;
 
     if (mc->retc_cache) {
+        struct Parrot_cont * cc;
+
         continuation = mc->retc_cache;
         mc->retc_cache = PREV_RETC(mc->retc_cache);
         /* XXX expensive w. ARENA_DOD_FLAGS */
         PObj_custom_mark_SET(continuation);
         /* copy interpreter context into continuation */
-        save_context(interpreter, &PMC_cont(continuation)->ctx);
+        cc = PMC_cont(continuation);
+        save_context(interpreter, &cc->ctx);
+        /* set current segment */
+        cc->seg = interpreter->code->cur_cs;
     }
     else {
         continuation = pmc_new(interpreter, enum_class_RetContinuation);
@@ -458,7 +463,7 @@ copy_regs(Interp *interpreter, struct parrot_regs_t *bp)
 
 /*
 
-=item C< void invalidate_retc_context(Interp *, PMC* self)>
+=item C< void invalidate_retc_context(Interp *, struct Parrot_Context *ctx)>
 
 Make true Continuation from all RetContinuations up the call chain.
 
@@ -466,15 +471,15 @@ Make true Continuation from all RetContinuations up the call chain.
 
 */
 void
-invalidate_retc_context(Interp *interpreter, PMC* self)
+invalidate_retc_context(Interp *interpreter, struct Parrot_Context *ctx)
 {
     struct Parrot_cont * cc;
     PMC *cont;
 
-    cont = interpreter->ctx.current_cont;
-    while (!PMC_IS_NULL(cont) && PMC_struct_val(cont)) {
+    cont = ctx->current_cont;
+    while (!PMC_IS_NULL(cont)) {
         /*
-         * we could stop if we enocunter a true continuation, because
+         * We could stop if we enocunter a true continuation, because
          * if one were created, everything up the chain would have been
          * invalidated earlier.
          * But as long as Continuation usage can be considered being rare,
