@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 31;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -943,6 +943,74 @@ Dw
 ABCY
 abc
    Y
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "eq_str");
+        new P1, .PerlString
+        new P2, .PerlString
+        set P1, "ABC"
+        set P2, "ABC"
+        eq_str P2, P1, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P2, "abc"
+        eq_str P2, P1, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        new P3, .PerlInt
+        set P3, 0
+        eq_str P2, P3, BAD3
+        branch OK3
+BAD3:   print "not "
+OK3:    print "ok 3\n"
+
+        eq_str P3, P2, BAD4
+        branch OK4
+BAD4:   print "not "
+OK4:    print "ok 4\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "ne_str");
+        new P1, .PerlString
+        new P2, .PerlString
+        set P1, "ABC"
+        set P2, "abc"
+        ne_str P2, P1, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P2, "ABC"
+        ne_str P2, P1, BAD2
+        branch OK2
+BAD2:   print "not "
+OK2:    print "ok 2\n"
+
+        new P3, .PerlInt
+        set P3, 0
+        ne_str P2, P3, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+        ne_str P3, P2, OK4
+        print "not "
+OK4:    print "ok 4\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 1;
