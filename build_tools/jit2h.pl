@@ -57,13 +57,13 @@ sub readjit($) {
 	# ignore comment and empty lines
         next if (($line =~ m/^;/) || ($line =~ m/^\s*$/));
         if (!defined($function) && !defined($template)) {
-	    if ($line =~ m/TEMPLATE\s+([^\s]*)\s*{/) { #}
+	    if ($line =~ m/TEMPLATE\s+(\w+)\s*{/) { #}
 		$template = $1;
 		$asm = "";
 		next;
 	    }
 	    else {
-		$line =~ m/(extern\s*)?([^\s]*)\s*{/; #}
+               $line =~ m/(extern\s*)?(\w+)\s*{/; #}
 		$extern = (defined($1))? 1 : 0;
 		$function = $2;
 		$asm = "";
