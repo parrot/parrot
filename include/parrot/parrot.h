@@ -33,27 +33,27 @@
 /*#include <types.h> */
 
 #ifdef WIN32
-#	include <io.h>
+#    include <io.h>
 #endif
 
 #ifdef HAS_HEADER_UNISTD
-#	include <unistd.h>
+#    include <unistd.h>
 #endif
 
 #ifdef HAS_HEADER_SYSMMAN
-#	include <sys/mman.h>
+#    include <sys/mman.h>
 #endif
 
 #ifdef HAS_HEADER_SYSTIME
-#	include <sys/time.h>
+#    include <sys/time.h>
 #endif
 
 #ifdef HAS_HEADER_MATH
-#	include <math.h>
+#    include <math.h>
 #endif
 
 #ifdef HAS_HEADER_FCNTL
-#	include <fcntl.h>
+#    include <fcntl.h>
 #endif
 
 #include <sys/types.h>

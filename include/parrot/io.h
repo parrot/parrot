@@ -192,7 +192,7 @@ struct _ParrotIOLayerAPI {
         ParrotIOLayer * (*New)(ParrotIOLayer * proto);
         void            (*Delete)(ParrotIOLayer * l);
         INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
-        INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
+        INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io); 
         ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
                                 const char * name, UINTVAL flags);
         ParrotIO *      (*Open2_Unused)(theINTERP);
@@ -236,6 +236,30 @@ struct _ParrotIOLayerAPI {
                                 ParrotIO * io);
 };
 
+/* these are defined rather than using NULL because strictly-speaking, ANSI C 
+ * doesn't like conversions between function and non-function pointers. */
+#define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_open (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char*, UINTVAL))0
+#define PIO_null_open2 (ParrotIO * (*)(theINTERP))0
+#define PIO_null_open3 (ParrotIO * (*)(theINTERP))0
+#define PIO_null_open_async (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
+#define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, UINTVAL))0
+#define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
+#define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
+#define PIO_null_read (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
+#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
+#define PIO_null_flush (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_seek (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, INTVAL, INTVAL, INTVAL))0
+#define PIO_null_tell (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_setbuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, size_t))0
+#define PIO_null_setlinebuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
+#define PIO_null_getcount (INTVAL (*)(theINTERP, ParrotIOLayer *))0
+#define PIO_null_fill (INTVAL (*)(theINTERP, ParrotIOLayer *))0
+#define PIO_null_puts (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const char *))0
+#define PIO_null_gets (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, char *, INTVAL))0
+#define PIO_null_eof (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 
 extern INTVAL           pio_errno;
 

@@ -56,7 +56,7 @@ ${headers}
 #endif
 
 #define PARROT_VERSION         "${VERSION}"
-#define PARROT_CONFIG_DATE	   "${configdate}"
+#define PARROT_CONFIG_DATE     "${configdate}"
 #define PARROT_MAJOR_VERSION   ${MAJOR}
 #define PARROT_MINOR_VERSION   ${MINOR}
 #define PARROT_PATCH_VERSION   ${PATCH}
@@ -72,7 +72,7 @@ typedef void * Parrot_Pointer;
 typedef void * Parrot_Sync;
 
 /* These are temporary until we put them in the proper places. */
-struct Parrot_Interp;  typedef struct Parrot_Interp	* Parrot;
+struct Parrot_Interp;  typedef struct Parrot_Interp * Parrot;
 struct PackFile;		typedef struct PackFile * Parrot_PackFile;
 
 #endif

@@ -43,8 +43,8 @@ typedef unsigned long utf32_t;
     ((low) - UNICODE_LOW_SURROGATE_FIRST) + 0x10000u)
 
 #define UNISKIP(uv) ( (uv) < 0x80    ? 1 : \
-		      (uv) < 0x800   ? 2 : \
-		      (uv) < 0x10000 ? 3 : 4 )
+                      (uv) < 0x800   ? 2 : \
+                      (uv) < 0x10000 ? 3 : 4 )
 
 #define UTF16SKIP(s) ( UNICODE_IS_HIGH_SURROGATE(*s) ? 2 : 1 )
 
@@ -65,7 +65,7 @@ typedef unsigned long utf32_t;
  */
 
 #define UTF8_IS_START(c)                ((c) >= 0xC0u && (c) <= 0xFDu)
-#define UTF8_IS_CONTINUATION(c)	        ((c) >= 0x80u && (c) <= 0xBFu)
+#define UTF8_IS_CONTINUATION(c)         ((c) >= 0x80u && (c) <= 0xBFu)
 #define UTF8_IS_CONTINUED(c)            ((c) &  0x80u)
 
 #define UTF8_START_MARK(len) (0xFEu << (7-len))

@@ -19,7 +19,7 @@ void internal_exception(int exitcode, const char * format, ... );
 void do_panic(struct Parrot_Interp *interpreter, const char *message, const char *file, int line);
 
 #define PANIC(message)\
-	do_panic(interpreter, message, __FILE__, __LINE__)
+        do_panic(interpreter, message, __FILE__, __LINE__)
 
 /* Exception Types */
 #define NO_REG_FRAMES 1

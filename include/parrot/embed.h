@@ -14,9 +14,9 @@
 #if !defined(PARROT_EMBED_H_GUARD)
 #define PARROT_EMBED_H_GUARD
 
-#include "parrot/config.h"		/* PARROT_VERSION, PARROT_JIT_CAPABLE... */
+#include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
-#include "parrot/warnings.h"	/* give us the warnings flags    */
+#include "parrot/warnings.h"    /* give us the warnings flags    */
 
 typedef int Parrot_flag;
 typedef int Parrot_warnclass;

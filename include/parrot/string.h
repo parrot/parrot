@@ -44,16 +44,16 @@ typedef struct {
 /* Buffer flags */
 typedef enum BUFFER_flag {
     /* The contents of the buffer can't be moved by the GC */
-    BUFFER_immobile_FLAG	= 2 << 0,
+    BUFFER_immobile_FLAG = 2 << 0,
     /* Private flag for the GC system. Set if the buffer's in use as
        far as the GC's concerned */
-    BUFFER_GC_FLAG		= 2 << 1,
+    BUFFER_GC_FLAG       = 2 << 1,
     /* Marks the contents as shared */
-    BUFFER_shared_FLAG		= 2 << 2,
+    BUFFER_shared_FLAG   = 2 << 2,
     /* Mark the contents as Copy on write */
-    BUFFER_COW_FLAG		= 2 << 3,
+    BUFFER_COW_FLAG      = 2 << 3,
     /* Mark the buffer as pointing to system memory */
-    BUFFER_sysmem_FLAG		= 2 << 4
+    BUFFER_sysmem_FLAG   = 2 << 4
 } BUFFER_flags;
 
 #define STRING struct parrot_string_t

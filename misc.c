@@ -347,7 +347,6 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    info.phase = PHASE_TERM;
 			    goto AGAIN;
 			}
-                        break;
 
 			info.phase = PHASE_TERM;
 			continue;
@@ -478,7 +477,6 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    break;
 
 			}
-                        break;
 
 			info.phase = PHASE_DONE;
 		    }
