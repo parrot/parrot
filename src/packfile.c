@@ -1957,7 +1957,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
 #if TRACE_PACKFILE_PMC
     fprintf(stderr, "PMC_CONST: store_global: name '%s'\n", name);
 #endif
-    VTABLE_set_pmc_keyed(interpreter, interpreter->perl_stash->stash_hash,
+    VTABLE_set_pmc_keyed(interpreter, interpreter->globals->stash_hash,
             key, sub_pmc);
 
     /*
@@ -2052,6 +2052,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 =item PackFile_append_pbc
 
 Read a PBC and append it to the current directory
+Fixup local label and sub addresses in newly loaded bytecode.
 
 =item Parrot_load_bytecode
 
@@ -2073,6 +2074,9 @@ PackFile_append_pbc(struct Parrot_Interp *interpreter, char *filename)
     return pf;
 }
 
+/*
+ * Load and append a bytecode, IMC or PASM file into interpreter
+ */
 void
 Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
 {
@@ -2085,7 +2089,8 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
 
     ext = strrchr(filename, '.');
     if (ext && strcmp (ext, ".pbc") == 0) {
-        PackFile_append_pbc(interpreter, filename);
+        struct PackFile * pf;
+        pf = PackFile_append_pbc(interpreter, filename);
     }
     else {
         PMC * compiler, *code;

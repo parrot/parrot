@@ -81,6 +81,10 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
     PARROT_WARNINGS_on(interpreter, wc);
 }
 
+/*
+ * Read in a bytecode, unpack it into a PackFile structure
+ * and do fixups.
+ */
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {

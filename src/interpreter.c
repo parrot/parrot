@@ -840,10 +840,10 @@ make_interpreter(Interp_flags flags)
 #endif
 
     /* Need an empty stash */
-    interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));
-    interpreter->perl_stash->stash_hash =
+    interpreter->globals = mem_sys_allocate(sizeof(struct Stash));
+    interpreter->globals->stash_hash =
         pmc_new(interpreter, enum_class_PerlHash);
-    interpreter->perl_stash->parent_stash = NULL;
+    interpreter->globals->parent_stash = NULL;
 
     /* context data */
     /* Initialize interpreter's flags */
@@ -988,7 +988,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     }
 
     /* walk and free the stash, pmc's are already dead */
-    stash = interpreter->perl_stash;
+    stash = interpreter->globals;
     while (stash) {
         next_stash = stash->parent_stash;
         mem_sys_free(stash);

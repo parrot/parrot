@@ -149,7 +149,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     }
 
     /* Walk through the stashes */
-    stash = interpreter->perl_stash;
+    stash = interpreter->globals;
     while (stash) {
         pobject_lives(interpreter, (PObj *)stash->stash_hash);
         stash = stash->parent_stash;
