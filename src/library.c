@@ -20,6 +20,7 @@ This file contains a C function to access parrot's bytecode library functions.
 
 #include "parrot/parrot.h"
 #include <assert.h>
+#include "library.str"
 
 /*
 
@@ -72,7 +73,7 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     name = string_from_cstring(interpreter, func_name, strlen(func_name));
     
     /* get the sub pmc */
-    str = string_from_cstring(interpreter, "_parrotlib", 10 );
+    str = CONST_STRING(interpreter, "_parrotlib");
     sub = Parrot_find_global(interpreter, str, name);
     if (!sub) {
         interpreter->resume_flag = resume;
@@ -81,7 +82,7 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     }
 
     /* get the signature */
-    str = string_from_cstring(interpreter, "signature", 9 );
+    str = CONST_STRING(interpreter, "signature");
     prop = VTABLE_getprop(interpreter, sub, str);
     if (!prop) {
         interpreter->resume_flag = resume;

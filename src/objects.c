@@ -639,7 +639,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         /* no method found and no BUILD property set? */
         if (!meth && meth_str == NULL) {
             /* use __init as fallback constructor method, if it exists */
-            meth_str = string_from_cstring(interpreter, "__init", 6);
+            meth_str = CONST_STRING(interpreter, "__init");
             meth = Parrot_find_method_with_cache(interpreter,
                     parent_class, meth_str);
             default_meth = 1;
@@ -665,7 +665,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     /* no method found and no BUILD property set? */
     if (!meth && meth_str == NULL) {
         /* use __init as fallback constructor method, if it exists */
-        meth_str = string_from_cstring(interpreter, "__init", 6);
+        meth_str = CONST_STRING(interpreter, "__init");
         meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
         default_meth = 1;
     }

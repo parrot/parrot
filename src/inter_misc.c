@@ -21,6 +21,7 @@ NCI function setup, C<interpinfo>, and C<sysinfo> opcodes.
 
 #include <assert.h>
 #include "parrot/parrot.h"
+#include "inter_misc.str"
 
 /*
 
@@ -121,7 +122,7 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
     VTABLE_set_pmc_keyed_str(interpreter, hash, type, nci);
     /* build native call interface fir the C sub in "func" */
     VTABLE_set_pointer_keyed_str(interpreter, nci,
-                                 string_from_const_cstring(interpreter, "pIt", 0), func);
+                                 CONST_STRING(interpreter, "pIt"), func);
 }
 
 
@@ -292,7 +293,7 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
     case CPU_ARCH:
     case CPU_TYPE:
     default:
-        return string_from_cstring(interpreter, "", 0);
+        return CONST_STRING(interpreter, "");
     }
 }
 /*

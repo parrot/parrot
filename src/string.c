@@ -648,7 +648,7 @@ string_from_const_cstring(Interp *interpreter,
 {
     return string_make(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
-                       "iso-8859-1", PObj_external_FLAG); /* make this utf-8 eventually? */
+                       "iso-8859-1", 0); /* make this utf-8 eventually? */
 }
 
 /*

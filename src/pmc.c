@@ -18,6 +18,7 @@ src/pmc.c - The base vtable calling functions
 
 #include "parrot/parrot.h"
 #include <assert.h>
+#include "pmc.str"
 
 static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, UINTVAL flags);
 
@@ -460,7 +461,7 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
         if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
             break;
         len = string_str_index(interpreter, vtable->isa_str,
-                               string_from_const_cstring(interpreter, " ", 1), pos);
+                               CONST_STRING(interpreter, " "), pos);
         if (len == -1)
             break;
         class_name = string_substr(interpreter, vtable->isa_str, pos,

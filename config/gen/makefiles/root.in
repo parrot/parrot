@@ -430,8 +430,12 @@ all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parr
 
 STR_FILES = \
     $(SRC)/inter_cb.str \
+    $(SRC)/inter_misc.str \
+    $(SRC)/library.str \
+    $(SRC)/pmc.str \
     $(SRC)/py_func.str \
-    $(SRC)/objects.str
+    $(SRC)/objects.str \
+    classes/delegate.str
 
 $(INC)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl --all
@@ -790,7 +794,8 @@ $(SRC)/interpreter$(O) : $(SRC)/interpreter.c $(GENERAL_H_FILES) \
 $(SRC)/inter_cb$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC)/inter_cb.str
 
-$(SRC)/inter_misc$(O) : $(SRC)/inter_misc.c $(GENERAL_H_FILES)
+$(SRC)/inter_misc$(O) : $(SRC)/inter_misc.c $(GENERAL_H_FILES) \
+    $(SRC)/inter_misc.src
 
 $(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
 
