@@ -253,13 +253,9 @@ subs:
 
 sub:
         sub_start statements labels RET
-        { SymReg ** g;
+        {
           $$ = 0; iRET();
-          g = compute_graph();
-          color_graph(g);
-          free(g);
-          emit_flush();
-          clear_tables();
+          allocate();
         }
     ;
 

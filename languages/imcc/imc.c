@@ -7,6 +7,7 @@
 long ip;
 SymReg * hash[HASH_SIZE];
 Instruction ** instructions;
+int spill_counter;
 
 void relop_to_op(int relop, char * op) {
     switch(relop) {
@@ -40,8 +41,11 @@ SymReg * mk_symreg(const char * name, char t) {
     else if(t == 'P') r->fmt = str_dup("P%d");
     r->first = -1;
     r->color = -1;
+    r->score = 0;
     r->set = t;
     r->type = VTREG;
+    r->simplified = 0;
+
     if(name[0])
         store_symreg(r);
     return r;
@@ -64,8 +68,10 @@ SymReg * mk_const(const char * name, char t) {
     r->reg = str_dup(name);
     r->first = -1;
     r->color = -1;
+    r->score = 0;
     r->set = t;
     r->type = VTCONST;
+    r->simplified = 0;
     if(name[0])
         store_symreg(r);
     return r;
@@ -81,7 +87,9 @@ SymReg * mk_address(const char * name) {
     r->reg = str_dup(name);
     r->first = -1;
     r->color = -1;
+    r->score = 0;
     r->type = VTADDRESS;
+    r->simplified = 0;
     if(name[0])
         store_symreg(r);
     return r;
@@ -143,10 +151,12 @@ Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
     i->r1 = r1;
     i->r2 = r2;
     i->r3 = r3;
-    if(!i->r0) i->r0 = nullreg;
-    if(!i->r1) i->r1 = nullreg;
-    if(!i->r2) i->r2 = nullreg;
-    if(!i->r3) i->r3 = nullreg;
+
+    if(!i->r0) {i->r0 = nullreg;} else {i->r0->score++;}
+    if(!i->r1) {i->r1 = nullreg;} else {i->r1->score++;}
+    if(!i->r2) {i->r2 = nullreg;} else {i->r2->score++;}
+    if(!i->r3) {i->r3 = nullreg;} else {i->r3->score++;}
+    
     return i;
 }
 
@@ -185,12 +195,18 @@ Instruction * emit(Instruction * i) {
 
 void emit_flush() {
     int i;
+    if (spill_counter > 0) {
+       printf("new P31, .PerlArray\n");
+    }
+    
     for(i = 0; i < ip; i++) {
 	emit(instructions[i]);
         free(instructions[i]);
         instructions[i] = 0;
     }
     ip = 0;
+
+    printf("\n\n");
 }
 
 
@@ -210,6 +226,45 @@ void emit_flush() {
  */
 int count;
 int lastbranch;
+
+
+IntStack nodeStack;
+
+/* allocate is the main loop of the allocation algorithm */
+void allocate() {
+
+    SymReg ** g;
+    int spilled;
+
+    spill_counter = 0;
+
+    while (1) {
+    
+        g = compute_graph();    
+        nodeStack = intstack_new();  
+
+        while (simplify(g)) {}  /* simplify until no changes can be made */
+
+        order_spilling(g); /* puts the remaing item on stack */
+        spilled = color_graph(g);
+
+        if (spilled < 0) {		
+            /* the process is finished */
+	    color_graph(g);
+	    free(g);
+	    emit_flush();
+	    clear_tables();
+	    
+	    fprintf(stderr, "\n");
+	    return;
+	}
+	    
+        spill(g, spilled);
+        free(g);
+     }
+
+}
+
 
 /* compute_graph creates the interference graph between 
  * the variables.
@@ -256,10 +311,10 @@ SymReg ** compute_graph() {
             /* Add each symbol to its slot on the X axis of the graph */
     	    for(; r; r = r->next) {
                 if(r->type == VTREG || r->type == VTIDENTIFIER) {
-    		        fprintf(stderr, "#putting %s into graph\n", r->name);
+    		    fprintf(stderr, "#putting %s into graph\n", r->name); 
     	            graph[count++] = r;	
-        		}
-	        }
+                }
+	    }
         }
     }
 
@@ -270,15 +325,17 @@ SymReg ** compute_graph() {
             for(y = 0; y < count; y++) {
                 if(interferes(graph[x], graph[y])) {
     	            fprintf(stderr, "#[%d %d] %s interferes with %s\n", x, y, graph[x]->name,
-				    graph[y]->name);
+				    graph[y]->name); 
                     graph[(1+x)*count+y+1] = graph[y];
-	        	}
-            }
+
+	           }
+                }
 	    }
     }
     
     return graph;
 }
+
 
 /* Compute a DU-chain for each symbolic */
 /* Calculates the first and last occurence of each symbolic */
@@ -322,34 +379,125 @@ int interferes(SymReg * r0, SymReg * r1) {
     return 1;
 }
 
+/* 
+ * Simplify deletes all the nodes from the interference graph
+ * that have arity lower than MAX_COLOR 
+ * 
+ * Returns the node 1 if it has been able to delete at least
+ * one node and 0 otherwise. 
+ *
+ */
+
+int simplify (SymReg **g){
+    int changes = 0;
+    int x;
+    
+    for(x = 0; x < count; x++) {
+
+	if (g[x]->simplified) {
+            break;
+	}
+		
+	if ( neighbours(x, g) < MAX_COLOR) {
+            fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
+	    
+	    intstack_push(nodeStack, x);
+	    
+	    g[x]->simplified = 1;
+	    changes = 1;
+	    break;
+	}
+
+    }
+
+    return changes; 
+}
+
+/* Puts the remaining nodes on the stack, on the correct order. 
+ *
+ * We count how many times does a symbol appear (weighted by the probability
+ * that this particular point of code will be reached) and choose the symbol
+ * with the lower score until all are in the stack.
+ *
+ */
+
+void order_spilling (SymReg **g) {
+    int min_score;
+    int min_node = -1;
+    int x;
+	
+    while (1) {
+
+	min_node = -1;
+
+        for(x = 0; x < count; x++) {
+		
+            /* for now, our score function only
+	       takes in account how many times a symbols
+	       has appeared. 
+	     */
+		
+            if ( !(g[x]->simplified) && ( (min_node = -1) || (min_score > g[x]->score) ) ) {
+	        min_node  = x;
+	        min_score = g[x]->score;
+	    }
+        }
+
+	if (min_node == -1) return; /* We are finished */
+		
+	intstack_push(nodeStack, min_node);
+	g[min_node]->simplified = 1;
+    }
+}
 
 
 /*
  * Color the graph assigning registers to each symbol:
  *
- * We just proceed assigning free colors to the registers.
- * If we run-out of colors, then we just ignore this
- * symbol (no spilling yet) 
+ * We just proceed poping items from the stack, and assigning 
+ * a free color to the them.
+ * 
+ * If we run out of colors, then we need to spill the top node. 
  */
 
-void color_graph(SymReg ** graph) {
+int color_graph(SymReg ** graph) {
     int x = 0;
-    int color, colors[MAX_COLOR];
+    int color, colors[MAX_COLOR], y;
     int free_colors;
     char buf[256];
-    for(x = 0; graph[x]; x++) {
+
+    while ((intstack_depth(nodeStack) > 0) ) {
+	x=intstack_pop(nodeStack);
+
         memset(colors, 0, sizeof(colors));
         free_colors = map_colors(x, graph, colors);
-        for(color = 0; color < MAX_COLOR; color++) {
-            if(!colors[color]) {
-            	graph[x]->color = color;
-            	fprintf(stderr, "#[%s] gets color [%d]\n", graph[x]->name, color);
-            	sprintf(buf, graph[x]->fmt, graph[x]->color);
-            	graph[x]->reg = str_dup(buf);
-                break;
-            }
+        if (free_colors > 0) { 
+	    for(color = 0; color < MAX_COLOR; color++) {
+                if(!colors[color]) {	    
+            	   graph[x]->color = color;		
+            	   fprintf(stderr, "#[%s] provisionally gets color [%d] (%d free colors, score %d)\n", 
+		                    graph[x]->name, color, free_colors, graph[x]->score);
+		   
+            	   sprintf(buf, graph[x]->fmt, graph[x]->color);
+            	   graph[x]->reg = str_dup(buf);
+                   break;
+                }
+	    }
         }
+
+	if (graph[x]->color == -1) {
+	    /* It has been impossible to assign a color to this node, return it
+	     * so it gets spilled */
+
+	    for (y=0; y<count; y++) {
+                graph[y]->color = -1;
+		graph[y]->simplified = 0;
+            }
+	    return x;
+	}
     }
+
+    return -1; /* we are totally finished */
 }
 
 /*
@@ -369,6 +517,105 @@ int map_colors(int x, SymReg ** graph, int colors[]) {
     }
     return free_colors;    
 }
+
+/* Inserts spill code for one symbol into the instructions
+ * list
+ */
+
+void spill (SymReg **g, int spilled) {
+	
+    Instruction ** new_instructions;
+
+    Instruction * tmp;
+    int i, j, needs_spilling, after_spilled, n_spilled;
+    SymReg *new_symbol, *old_symbol; 
+    char buf[256];
+
+    fprintf(stderr, "#Spilling [%s]:\n", g[spilled]->name);
+		    
+    old_symbol = g[spilled]; 
+
+    sprintf(buf, "%s_%d", old_symbol->name, 0);
+    new_symbol = mk_symreg(buf, old_symbol->set);
+    new_instructions = calloc(4096, sizeof(Instruction *));
+
+    spill_counter++;
+    after_spilled = 0;
+
+    j = 0;    
+    for(i = 0; i < ip; i++) {
+	tmp = instructions[i];
+
+	needs_spilling = 0;
+
+	if (tmp->r0 == old_symbol) {
+	    needs_spilling = 1;
+	    tmp->r0 = new_symbol;
+	}
+
+	if (tmp->r1 == old_symbol) {
+	    needs_spilling = 1;
+	    tmp->r1 = new_symbol;
+	}
+	
+	if (tmp->r2 == old_symbol) {
+	    needs_spilling = 1;
+	    tmp->r2 = new_symbol;
+	}
+	
+	if (tmp->r3 == old_symbol) {
+	    needs_spilling = 1;
+	    tmp->r3 = new_symbol;
+	}
+
+	if (needs_spilling && !after_spilled) {
+	    
+	    /* FETCH */
+	    
+	    sprintf(buf, "%d #FETCH", spill_counter);
+
+	    new_instructions[j++] = mk_instruction(
+			    str_cat("set %s, P31, ", buf), new_symbol, NULL, NULL, NULL);
+
+	}
+
+	if (!needs_spilling && after_spilled) {
+
+            fprintf(stderr, "#STORE");
+	    
+	    sprintf(buf, "set P31, %d,", spill_counter);
+
+	    new_instructions[j++] = mk_instruction(
+			    str_cat(buf, "%s # STORE "), new_symbol, NULL, NULL, NULL);
+
+            sprintf(buf, "%s_%d", old_symbol->name, n_spilled++);
+            new_symbol =  mk_symreg(buf, old_symbol->set);
+	}
+		
+	new_instructions[j++] = tmp;
+	after_spilled = needs_spilling;
+    }
+
+   free(instructions);
+   instructions = new_instructions;
+   ip = j;
+
+}
+
+int neighbours(int node, SymReg ** graph) {
+    int y, cnt;  
+    SymReg *r;
+
+    cnt = 0;
+    for (y = 0; y < count; y++) {
+	if ( (r = graph[(1+node)*count + y + 1] ) && (!r->simplified) ) {
+	     cnt++;
+	}
+    }
+
+    return cnt;	 
+}
+
 
 /*
  * Utility functions
@@ -396,4 +643,81 @@ char * str_cat(const char * s1, const char * s2) {
     return s3;
 }
 
+/* Stack functions. Stolen from rxstacks.c */
 
+
+IntStack
+intstack_new()
+{
+    IntStack stack = malloc(sizeof(struct IntStack_chunk_t));
+    stack->used = 0;
+    stack->next = stack;
+    stack->prev = stack;
+    return stack;
+}
+
+int
+intstack_depth(IntStack stack)
+{
+    IntStack_Chunk chunk;
+    int depth = stack->used;
+
+    for (chunk = stack->next; chunk != stack; chunk = chunk->next)
+        depth += chunk->used;
+
+    return depth;
+}
+
+void
+intstack_push(IntStack stack, int data)
+{
+    IntStack_Chunk chunk = stack->prev;
+    IntStack_Entry entry = &chunk->entry[chunk->used];
+
+    entry->value = data;
+
+    /* Register the new entry */
+    if (++chunk->used == STACK_CHUNK_DEPTH) {
+        /* Need to add a new chunk */
+        IntStack_Chunk new_chunk = malloc(sizeof(*new_chunk));
+        new_chunk->used = 0;
+        new_chunk->next = stack;
+        new_chunk->prev = chunk;
+        chunk->next = new_chunk;
+        stack->prev = new_chunk;
+    }
+
+}
+
+int
+intstack_pop(IntStack stack)
+{
+    IntStack_Chunk chunk = stack->prev;
+    IntStack_Entry entry;
+
+    /* We may have an empty chunk at the end of the list */
+    if (chunk->used == 0 && chunk != stack) {
+        /* That chunk != stack check is just to allow the empty stack case
+         * to fall through to the following exception throwing code. */
+
+        /* Need to pop off the last entry */
+        stack->prev = chunk->prev;
+        stack->prev->next = stack;
+        /* MEMORY LEAK... */
+        chunk = stack->prev;
+    }
+
+    /* Quick sanity check */
+    if (chunk->used == 0) {
+        fprintf(stderr, "No entries on stack!\n");
+    }
+
+    entry = &chunk->entry[chunk->used - 1];
+
+    /* Now decrement the SP */
+    chunk->used--;
+
+    /* Snag the value */
+
+    return entry->value;
+}

@@ -1,4 +1,4 @@
-IMCC 0.0.2.0
+IMCC 0.0.3.0 
 
 imcc is the intermediate compiler for Parrot.
 
@@ -41,10 +41,21 @@ Register Allocation
 
   The allocator uses graph-coloring and du-chains to allocate registers
   for lexicals and symbolic temporaries.
+  One primary weakness of the allocator as it stands is analysis of
+  jumps. A brute force method is used in the du-chain computation
+  where we assume any symbol is live from the time it was first used
+  until either the last time it was used or the last branch instruction.
+  Branch flow analysis will allow us to greatly reduce the interferences
+  in the graph during coloring.
 
 Spilling
 
-  Currently spillage is not implemented.
+  Currently the spiller works with the graph-coloring routines, assigning
+  spill weights based on how many times a symbol has been referenced.
+  This will be improved later as we start doing more code analysis.
+  Since Parrot lacks random access stacks, registers are spilled to
+  a fixed PMC array, currently hardcoded as P31. If no spillage is
+  required for the block, no array is allocated.
 
 Optimization
 
@@ -186,5 +197,8 @@ Instructions
 
 Please mail perl6-internals@perl.org with bug-reports or patches.
 
-Maintainer and Author:   Melvin Smith (melvin.smith@mindspring.com)
+Maintainer and Author:   Melvin Smith <melvin.smith@mindspring.com>
+                                      <melvins@us.ibm.com>
+
+Contributing Author:     Angel Faus <afaus@corp.vlex.com)
 
