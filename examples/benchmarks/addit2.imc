@@ -1,0 +1,64 @@
+.sub _main
+        .sym pmc a0
+	a0 = new PerlInt
+	a0 = 1000
+        .sym pmc a1
+	a1 = new PerlNum
+	a1 = 7.100
+        .sym pmc a2
+	a2 = new PerlInt
+	a2 = 87
+        .sym pmc a3
+	a3 = new PerlString
+	a3 = "3.87"
+        .sym pmc a4
+	a4 = new PerlString
+        a4 = "21000000"
+	.sym pmc x
+	x = new PerlInt
+        x = 500000
+	# create retcontinuation outside loop
+	newsub .Sub, .RetContinuation, _varargs_adder, back
+	# .pcc_call needs symbols
+	.sym pmc adder
+	adder = P0
+	.sym pmc retcont
+	retcont = P1
+	.sym pmc result
+AGAIN:
+        dec x
+        lt x, 0, FIN
+	.pcc_begin prototyped
+	.arg a0
+	.arg a1
+	.arg a2
+	.arg a3
+	.arg a4
+	.pcc_call adder, retcont
+back:
+	.result result
+	.pcc_end
+        branch AGAIN
+FIN:
+        print result
+        print "\n"
+        end
+.end
+
+.sub _varargs_adder prototyped
+        .param pmc a0
+	.param pmc a1
+	.param pmc a2
+	.param pmc a3
+	.param pmc a4
+        .sym pmc sum
+	sum = new PerlNum
+        add sum, a0
+        add sum, a1
+        add sum, a2
+        add sum, a3
+        add sum, a4
+        .pcc_begin_return
+	.return sum
+	.pcc_end_return
+.end
