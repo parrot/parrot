@@ -390,7 +390,38 @@ Instantiate a brand new class, based on the metadata in Py, named Sz.
 
 =head2 Vtables
 
+To make this work all PMCs must have the following vtable
+entries. They may, for non-objects, throw an exception.
 
+The catalog metadata for objects is considered to be attributes on the
+class, so to get the offset for a class for an object, you fetch the
+object's class then look up the offset attribute from it. (The class
+attributes are detailed later) This is safe in general, since the only
+code reasonably querying a class' attribute list is the class code
+itself, and if a class doesn't know whether it's a ParrotClass-style
+class or not you've got bigger problems.
+
+=over 4
+
+=item find_method
+
+=item isa
+
+=item can
+
+=item does
+
+=item getattr
+
+=item setattr
+
+=item getclass
+
+=back
+
+Currently Parrot only supports mutating a class' metainformation for
+ParrotClass classes. This is a restriction which will be lifted at
+some point soon.
 
 =head2 Supporting code
 
