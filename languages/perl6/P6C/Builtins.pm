@@ -562,6 +562,10 @@ __setup_arg_end:
     lt I1, I0, __setup_arg
     store_global "_AV_ARGS", $P1
 
+# %ENV
+    $P1 = new PerlEnv
+    store_global "_HV_ENV", $P1
+
 # exception handling:
     $P0 = new PerlArray
     store_global "_AV_catchers", $P0

@@ -1,0 +1,27 @@
+/* perlenv.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Env base class, which
+ *     accesses the system environment
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes: Extends env to return scalars from get_pmc_keyed
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass PerlEnv extends Env {
+    PMC* get_pmc_keyed (PMC* key) {
+	STRING* string = DYNSELF.get_string_keyed(key);
+	PMC * ret = pmc_new(INTERP, enum_class_PerlString);
+	VTABLE_set_string_native(INTERP, ret, string);
+	return ret;
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+	DYNSELF.set_string_keyed(key, VTABLE_get_string(INTERP, value));
+    }
+}
