@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/library.c - Interface to Parrot's bytecode library
+src/global.c - Access to global PMCs
 
 =head1 DESCRIPTION
 
