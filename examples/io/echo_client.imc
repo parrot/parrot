@@ -36,7 +36,7 @@ COMMAND:
     print buf 
     branch COMMAND
 ERR:
-    print "Socket error, you may not have compiled with PARROT_SOCKET_DEF (see io/io_private.h)\n"
+    print "Socket error, you may not have compiled with PARROT_SOCKET_DEV (see io/io_private.h)\n"
     end
 END:
     close sock 
