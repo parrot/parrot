@@ -5,7 +5,7 @@
 ;
 
 # TODO complete this
-#define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i))
+#define P_ARITH ((PREV_OP == dec_i) || (PREV_OP == inc_i) || (PREV_OP == sub_i_i_i))
 
 Parrot_end {
     emitm_addl_i_r(jit_info->native_ptr, 4, emit_ESP);
@@ -364,15 +364,19 @@ Parrot_add_i_ic_i {
 
 Parrot_add_i_i_i {
     if (MAP[1] && MAP[2] && MAP[3]) {
-        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        /* micro optimization, saves some cycles in life.pasm */
+        if(MAP[2] != MAP[1])
+            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emitm_addl_r_r(NATIVECODE, MAP[3], MAP[1]);
     }
     else if (MAP[1] && MAP[2]) {
-        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        if(MAP[2] != MAP[1])
+            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
-        emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
+        if(MAP[3] != MAP[1])
+            emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
         emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2] && MAP[3]) {
@@ -503,12 +507,14 @@ Parrot_sub_i_i_i {
             emitm_movl_r_r(NATIVECODE, emit_EAX, MAP[1]);
         }
         else {
-            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+            if (MAP[1] != MAP[2])
+                emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
             emitm_subl_r_r(NATIVECODE, MAP[3], MAP[1]);
         }
     }
     else if (MAP[1] && MAP[2]) {
-        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        if (MAP[1] != MAP[2])
+            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emit_subl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
