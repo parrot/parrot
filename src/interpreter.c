@@ -59,13 +59,12 @@ static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
 static void
 prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
-        opcode_t *pc)
+        opcode_t *pc, op_info_t *opinfo)
 {
-    op_info_t *opinfo;
-    struct PackFile_ConstTable * const_table = interpreter->code->const_table;
+    struct PackFile_ConstTable * const_table
+        = interpreter->code->const_table;
     int i;
 
-    opinfo = &interpreter->op_info_table[*pc];
     for (i = 1; i < opinfo->arg_count; i++) {
         opcode_t arg = pc[i];
 
@@ -153,9 +152,12 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
     size_t offset = pc_prederef - interpreter->prederef.code;
     opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
+    op_info_t *opinfo;
+    size_t n;
 
     if (*pc < 0 || *pc >= (opcode_t)interpreter->op_count)
         internal_exception(INTERP_ERROR, "Illegal opcode");
+    opinfo = &interpreter->op_info_table[*pc];
     switch (type) {
         case PARROT_SWITCH_CORE:
             *pc_prederef = (void**) *pc;
@@ -169,7 +171,64 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
             break;
     }
     /* and arguments */
-    prederef_args(pc_prederef, interpreter, pc);
+    prederef_args(pc_prederef, interpreter, pc, opinfo);
+    /*
+     * now remember backward branches, invoke and similar opcodes
+     */
+    n = opinfo->arg_count;
+    if (((opinfo->jump & PARROT_JUMP_RELATIVE) &&
+            opinfo->types[n - 1] == PARROT_ARG_IC &&
+            pc[n - 1] < 0) ||   /* relative backward branch */
+            (opinfo->jump & PARROT_JUMP_ADDRESS)) {
+        Prederef *pi = &interpreter->prederef;
+        /*
+         * first time prederef.branches == NULL:
+         * estimate size to 1/16th of opcodes
+         */
+        if (!pi->branches) {
+            size_t nb = interpreter->code->cur_cs->base.size / 16;
+            if (nb < 8)
+                nb = 8;
+            pi->branches = mem_sys_allocate( sizeof(Prederef_branch) * nb);
+            pi->n_allocated = nb;
+        }
+        else if (pi->n_branches >= pi->n_allocated) {
+            pi->n_allocated *= 1.5;
+            pi->branches = mem_sys_realloc( pi->branches,
+                    sizeof(Prederef_branch) * pi->n_allocated);
+        }
+        pi->branches[pi->n_branches].offs = offset;
+        pi->branches[pi->n_branches].op = *pc_prederef;
+        ++pi->n_branches;
+    }
+}
+
+/*
+ * turn on or off event checking for prederefed cores
+ * this is: fill in the event_checker opcode or restore original
+ * op in all branch locations of the opcode stream
+ *
+ * NOTE: when on == true, this is called from the event handler
+ *       thread
+ */
+static void
+turn_ev_check(Parrot_Interp interpreter, int on)
+{
+    Prederef *pi = &interpreter->prederef;
+    size_t i, offs;
+
+    if (!pi->branches)
+        return;
+    for (i = 0; i < pi->n_branches; ++i) {
+        offs = pi->branches[i].offs;
+        if (on) {
+            interpreter->prederef.code[offs] =
+                ((void **)interpreter->op_lib->op_func_table)
+                            [CORE_OPS_check_events__];
+        }
+        else
+            interpreter->prederef.code[offs] = pi->branches[i].op;
+    }
 }
 
 /*=for api interpreter get_op_lib_init
@@ -1473,7 +1532,7 @@ dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
  * tell running core about new func table
  */
 static void
-notify_func_table(Parrot_Interp interpreter, void* table)
+notify_func_table(Parrot_Interp interpreter, void* table, int on)
 {
     oplib_init_f init_func = get_op_lib_init(1, interpreter->run_core, NULL);
     op_lib_t *lib = init_func(1);
@@ -1482,6 +1541,10 @@ notify_func_table(Parrot_Interp interpreter, void* table)
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */
             interpreter->op_func_table = table;
+            break;
+        case PARROT_PREDEREF_CORE:  /* predrefed cores except switch */
+        case PARROT_CGP_CORE:
+            turn_ev_check(interpreter, on);
             break;
         default:
             break;
@@ -1498,7 +1561,7 @@ disable_event_checking(Parrot_Interp interpreter)
     /*
      * restore func table
      */
-    notify_func_table(interpreter, interpreter->save_func_table);
+    notify_func_table(interpreter, interpreter->save_func_table, 0);
 }
 
 /*
@@ -1515,7 +1578,7 @@ enable_event_checking(Parrot_Interp interpreter)
     /*
      * put table in place
      */
-    notify_func_table(interpreter, interpreter->evc_func_table);
+    notify_func_table(interpreter, interpreter->evc_func_table, 1);
 }
 
 /*
