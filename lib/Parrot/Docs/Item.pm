@@ -33,13 +33,29 @@ package Parrot::Docs::Item;
 
 use strict;
 use Parrot::Docs::Directory;
+use Parrot::Docs::POD2HTML;
 
-=item C<new($text, @content)>
+=item C<new_item($text, @paths)>
+
+Returns a new item.
+
+Use this when creating items in a section's C<new()> method.
+
+=cut
+
+sub new_item
+{
+    my $self = shift;
+    
+    return Parrot::Docs::Item->new(@_);
+}
+
+=item C<new($text, @contents)>
 
 Returns a new item. If there is no descriptive text then C<$text> should
 be an empty string.
 
-The paths in C<@content> will be interpreted as being relative to the
+The paths in C<@contents> will be interpreted as being relative to the
 C<$target> argument in C<write_html()>. There should be at least one
 path otherwise an exception is raised.
 
@@ -49,16 +65,57 @@ sub new
 {
 	my $self = ref $_[0] ? ref shift : shift;
 	my $text = shift;
-	my @content = @_;
+	my @contents = @_;
 	
-	die "No content.\n" unless @content;
+	# TODO - Items should only contain paths.
+	
+	die "No contents.\n" unless @contents;
 	
 	$self = bless {
 		TEXT => $text,
-		CONTENTS => \@content,
+		CONTENTS => \@contents,
 	}, $self;
 
 	return $self;
+}
+
+=item C<set_parent($parent)
+
+=item C<parent()
+
+Accessors for the containing section/group for the item.
+
+=cut
+
+sub set_parent
+{
+	my $self = shift;
+	
+	$self->{PARENT} = shift;
+}
+
+sub parent
+{
+	my $self = shift;
+	
+	return $self->{PARENT};
+}
+
+=item C<html_navigation($path)>
+
+Returns the HTML navigation bar.
+
+=cut
+
+sub html_navigation
+{
+	my $self = shift;
+	my $path = shift;
+	my $parent = $self->parent || return '';
+	
+	return join ' | ', 
+		grep {length} 
+			$parent->html_navigation($path), $parent->html_link($path);
 }
 
 =item C<write_html($source, $target, $silent)>
@@ -80,58 +137,40 @@ sub write_html
 	my $target = shift;
 	my $silent = shift;
 	my $index_html = '';
-		
-	foreach my $rel_path (@{$self->{CONTENTS}})
+	my @rel_paths = $self->contents_relative_to_source($source);
+	
+	foreach my $rel_path (@rel_paths)
 	{
-		my @rel_paths = $self->relative_file_paths_for_relative_path(
-			$source, $rel_path);
+		my $file = $source->file_with_relative_path($rel_path);
 		
-		foreach my $rel_path (@rel_paths)
-		{
-			my $file = $source->file_with_relative_path($rel_path);
-			
-			if ( $file->contains_pod )
-			{	
-				print "\n", $rel_path unless $silent;
-			
-				$rel_path .= '.html';
-				
-				my $docs_file = $target->file_with_relative_path($rel_path);
-				
-				$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
-					$rel_path, $source->relative_path($file->path));
+		if ( $file->contains_pod )
+		{	
+			print "\n", $rel_path unless $silent;
 		
-				my $file_html = $file->pod_as_html;
+			my $formatter = Parrot::Docs::POD2HTML->new;
+			
+			$formatter->write_html($source, $target, $rel_path, $self);
+			
+			$rel_path = $formatter->append_html_suffix($rel_path);
 
-				# TODO This is messy. 
-				
-				my $name = $target->name;
-				
-				$rel_path = $docs_file->parent->relative_path($target->parent_path);
-
-				# Make the CSS and images local.
-				$file_html =~ s|href="">Contents|href="$rel_path/$name/index.html">Contents|s;
-				$file_html =~ s|http://dev.perl.org|$rel_path/resources|s;
-				$file_html =~ s|http://www.parrotcode.org/images|$rel_path/resources|sg;
-
-				$docs_file->write($file_html);
-				
-				# If it's a single file we can use its text.
-				
-				if ( @rel_paths == 1 and ! $self->{TEXT} )
-				{
-					$self->{TEXT} = $file->short_description;
-				}		
-			}
-			elsif ( $file->is_docs_link )
+			$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
+				$rel_path, $source->relative_path($file->path));
+					
+			# If it's a single file we can use its text.
+			
+			if ( @rel_paths == 1 and ! $self->{TEXT} )
 			{
-				print "\n", $rel_path unless $silent;
-			
-				# Link to the actual file rather than the HTML version.
-				$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
-					$target->relative_path($file->path), 
-					$source->relative_path($file->path));
-			}
+				$self->{TEXT} = $file->short_description;
+			}		
+		}
+		elsif ( $file->is_docs_link )
+		{
+			print "\n", $rel_path unless $silent;
+		
+			# Link to the actual file rather than the HTML version.
+			$index_html .= sprintf("<a href= \"%s\">%s</a><br>\n",
+				$target->relative_path($file->path), 
+				$source->relative_path($file->path));
 		}
 	}
 	
@@ -144,19 +183,42 @@ sub write_html
 	return $index_html;
 }
 
-=item C<relative_file_paths_for_relative_path($dir, $path)>
+=item C<contents_relative_to_source($source)>
 
-If C<$path> is an immediate subdirectory of C<$dir>, then this method
+Returns the contents of the item interpreted relative to the source
+directory.
+
+=cut
+
+sub contents_relative_to_source
+{
+	my $self = shift;
+	my $source = shift;
+	my @contents = ();
+	
+	foreach my $content (@{$self->{CONTENTS}})
+	{
+		push @contents, 
+			$self->file_paths_relative_to_source($source, $content);
+		
+	}
+	
+	return @contents;
+}
+
+=item C<file_paths_relative_to_source($source, $path)>
+
+If C<$path> is an immediate subdirectory of C<$source>, then this method
 returns all the file paths within the directory and any subdirectories
-recursively, relative to C<$dir>.
+recursively, relative to C<$source>.
 
-If C<$path> is a file in C<$dir> then C<$path> is returned.
+If C<$path> is a file in C<$source> then C<$path> is returned.
 
 If C<$path> cannot be found then an exception is raised.
 
 =cut
 
-sub relative_file_paths_for_relative_path
+sub file_paths_relative_to_source
 {
 	my $self = shift;
 	my $source = shift;

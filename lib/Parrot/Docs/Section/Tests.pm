@@ -40,11 +40,11 @@ sub new
 	
 	return $self->SUPER::new(
 		'Tests', 'tests.html', '',
-		$self->group('Native Bytecode Tests', '', 't/native_pbc'),
-		$self->group('Ops Tests', '', 't/op'),
-		$self->group('PMC Tests', '', 't/pmc'),
-		$self->group('C Source Code Tests', '', 't/src'),
-		$self->group('Stress Tests', '', 't/stress'),
+		$self->new_group('Native Bytecode Tests', '', 't/native_pbc'),
+		$self->new_group('Ops Tests', '', 't/op'),
+		$self->new_group('PMC Tests', '', 't/pmc'),
+		$self->new_group('C Source Code Tests', '', 't/src'),
+		$self->new_group('Stress Tests', '', 't/stress'),
 	);
 }
 

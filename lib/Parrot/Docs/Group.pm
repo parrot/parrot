@@ -32,6 +32,21 @@ use strict;
 use Parrot::Docs::Item;
 @Parrot::Docs::Group::ISA = qw(Parrot::Docs::Item);
 
+=item C<new_group($name, $text, @items)>
+
+Returns a new group.
+
+Use this when creating groups in a subclass's C<new()> method.
+
+=cut
+
+sub new_group
+{
+    my $self = shift;
+    
+    return Parrot::Docs::Group->new(@_);
+}
+
 =item C<new($name, $text, @contents)>
 
 Returns a new group. 
@@ -70,6 +85,18 @@ sub name
 	return $self->{NAME};
 }
 
+=item C<html_link()>
+
+Groups have no HTML link. This method returns an empty string which will
+be discarded when building the navigation bar.
+
+=cut
+
+sub html_link
+{
+	return '';
+}
+
 =item C<write_html($source, $target, $silent)>
 
 C<write_html()> is called on each item in the group.
@@ -81,35 +108,7 @@ Some HTML-formatted text describing the files linked to is returned.
 sub write_html
 {
 	my $self = shift;
-	my $source = shift;
-	my $target = shift;
-	my $silent = shift;
-	my $index_html = '';
-	
-	print "\n\n", $self->name unless $silent;
-	
-	foreach my $content (@{$self->{CONTENTS}})
-	{
-		if ( ref($content) )
-		{
-			$index_html .= $content->write_html($source, $target, $silent);
-		}
-		else
-		{
-			# It would be good to check the short description for each
-			# file and create an item for sequences of files with the
-			# same description.
-			
-			my @items = map {
-				Parrot::Docs::Item->new('', $_)
-			} $self->relative_file_paths_for_relative_path($source, $content);
-			
-			foreach my $item (@items)
-			{
-				$index_html .= $item->write_html($source, $target, $silent);
-			}
-		}
-	}
+	my $index_html = $self->write_contents_html(@_);
 	
 	if ( $index_html )
 	{
@@ -125,6 +124,75 @@ sub write_html
 	}
 	
 	return $index_html;
+}
+
+=item C<write_contents_html($source, $target, $silent)>
+
+Iterates over the group's contents and calls C<write_html()> on each one.
+
+Some HTML-formatted text describing the files linked to is returned.
+
+=cut
+
+sub write_contents_html
+{
+	my $self = shift;
+	my $source = shift;
+	my $target = shift;
+	my $silent = shift;
+	my $index_html = '';
+	
+	print "\n\n", $self->name unless $silent;
+	
+	foreach my $content ($self->contents_relative_to_source($source))
+	{
+		$index_html .= $content->write_html($source, $target, $silent);
+	}
+	
+	return $index_html;
+}
+
+=item C<contents_relative_to_source($source)>
+
+Returns the contents of the group interpreted relative to the source
+directory.
+
+=cut
+
+sub contents_relative_to_source
+{
+	my $self = shift;
+	my $source = shift;
+	my @contents = ();
+	
+	foreach my $content (@{$self->{CONTENTS}})
+	{
+		if ( ref($content) )
+		{
+			push @contents, $content;
+		}
+		else
+		{
+			# It would be good to check the short description for each
+			# file and create an item for sequences of files with the
+			# same description.
+			
+			push @contents, 
+				map {$self->new_item('', $_)} 
+					$self->file_paths_relative_to_source($source, $content);
+		}
+	}
+	
+	foreach my $content (@contents)
+	{
+		# We wait until now to do this because only now are all
+		# the contents guaranteed to be instances.
+		# Remember that this method is also used by section.
+		
+		$content->set_parent($self);
+	}
+	
+	return @contents;
 }
 
 =back

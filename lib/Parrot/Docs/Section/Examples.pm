@@ -43,12 +43,12 @@ sub new
 	
 	return $self->SUPER::new(
 		'Examples', 'examples.html', '',
-		$self->group('PASM and PIR', '', 'examples/assembly'),
-		$self->group('Subroutines', '', 'examples/subs'),
-		$self->group('IO', '', 'examples/io'),
-		$self->group('Benchmarking', '', 'examples/benchmarks'),
-		$self->group('Speed Comparison', '', 'examples/mops'),
-		$self->group('Parrot Extensions', '', 'examples/pni'),
+		$self->new_group('PASM and PIR', '', 'examples/assembly'),
+		$self->new_group('Subroutines', '', 'examples/subs'),
+		$self->new_group('IO', '', 'examples/io'),
+		$self->new_group('Benchmarking', '', 'examples/benchmarks'),
+		$self->new_group('Speed Comparison', '', 'examples/mops'),
+		$self->new_group('Parrot Extensions', '', 'examples/pni'),
 	);
 }
 

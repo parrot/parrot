@@ -40,12 +40,12 @@ sub new
 	
 	return $self->SUPER::new(
 		'Ops', 'ops.html', '',
-		$self->group('Tools', '',
-			$self->item('', 'build_tools/ops2c.pl'),
-			$self->item('', 'ops/ops.num'),
-			$self->item('', 'build_tools/ops2pm.pl'),
+		$self->new_group('Tools', '',
+			$self->new_item('', 'build_tools/ops2c.pl'),
+			$self->new_item('', 'ops/ops.num'),
+			$self->new_item('', 'build_tools/ops2pm.pl'),
 		),
-		$self->group('Op Libs', '', 'ops'),
+		$self->new_group('Op Libs', '', 'ops'),
 	);
 }
 

@@ -13,7 +13,7 @@ Parrot::Docs::Section::Parrot - Root docmentation section
 
 =head1 DESCRIPTION
 
-A documentation section describing Parrot.
+This is the top-level section for the HTML documentation for Parrot.
 
 =head2 Methods
 
@@ -56,9 +56,9 @@ sub new
 	my $self = shift;
 	
 	return $self->SUPER::new(
-		'What\'s in the Parrot distribution?', 
+		'Contents', 
 		'index.html', 
-		'',
+		'What\'s in the Parrot distribution?',
 		Parrot::Docs::Section::Info->new,
 		Parrot::Docs::Section::Docs->new,
 		Parrot::Docs::Section::Examples->new,
@@ -76,6 +76,31 @@ sub new
 		Parrot::Docs::Section::Tests->new,
 		Parrot::Docs::Section::EditorPlugins->new,
 	);
+}
+
+=item C<write_docs($silent, $delete)>
+
+Writes the HTML documentation.
+
+If C<$silent> is true then progress is not reported.
+
+If C<$delete> is true then the contents of C<$target> will be deleted
+before any HTML is written. This argument is intended to be used only
+once by the root section, it is not passed to subsections.
+
+=cut
+
+sub write_docs
+{
+    my $self = shift;
+    my $source = Parrot::Docs::Directory->new('.');
+    my $target = Parrot::Docs::Directory->new("docs/html");
+    my $silent = shift || 0;
+    my $delete = shift || 0;
+
+    $target->delete_contents if $delete;
+
+	$self->write_html($source, $target, $silent);
 }
 
 =back

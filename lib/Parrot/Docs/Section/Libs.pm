@@ -40,7 +40,7 @@ sub new
 	
 	return $self->SUPER::new(
 		'Libraries', 'libs.html', '',
-		Parrot::Docs::Item->new('', 'library', 'dynoplibs')
+		$self->new_item('', 'library', 'dynoplibs')
 	);
 }
 

@@ -40,11 +40,11 @@ sub new
 	
 	return $self->SUPER::new(
 		'Big Number Arithmetic', 'bignum.html', '',
-		$self->group('Decimal Arithmetic', '',
-			$self->item('', 'types/bignum.c', 'types/bignum.h'),
+		$self->new_group('Decimal Arithmetic', '',
+			$self->new_item('', 'types/bignum.c', 'types/bignum.h'),
 		),
-		$self->group('Testing', '',
-			$self->item('', 'types/bignum_atest.pl', 'types/bignum_test.pl'),
+		$self->new_group('Testing', '',
+			$self->new_item('', 'types/bignum_atest.pl', 'types/bignum_test.pl'),
 		),
 	);
 }

@@ -40,7 +40,7 @@ sub new
 	
 	return $self->SUPER::new(
 		'Editor Plugins', 'editor.html', '',
-		Parrot::Docs::Item->new('', 'editor')
+		$self->new_item('', 'editor')
 	);
 }
 

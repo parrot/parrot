@@ -39,11 +39,11 @@ sub new
 	
 	return $self->SUPER::new(
 		'Configuration', 'config.html', '',
-		$self->item('', 'Configure.pl'),
-		$self->group('Initialization', '', 'config/init'),
-		$self->group('User Dialogues', '', 'config/inter'),
-		$self->group('System Tests', '', 'config/auto'),
-		$self->group('File Creation', '', 'config/gen'),
+		$self->new_item('', 'Configure.pl'),
+		$self->new_group('Initialization', '', 'config/init'),
+		$self->new_group('User Dialogues', '', 'config/inter'),
+		$self->new_group('System Tests', '', 'config/auto'),
+		$self->new_group('File Creation', '', 'config/gen'),
 	);
 }
 

@@ -7,15 +7,15 @@ Parrot::Docs::Section - Docmentation section
 
 =head1 SYNOPSIS
 
-	use Parrot::Docs::Section;
-	
-	my $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
-		'here they are...',
-	    Parrot::Docs::Item->new('old faithful', 'foo'),
-		Parrot::Docs::Group->new('Bar', 'no jeans',
-	    	Parrot::Docs::Item->new('time please', 'bar', 'pub')));
-	
-	$s->write_html();
+    use Parrot::Docs::Section;
+    
+    my $s = Parrot::Docs::Section->new('Usual Suspects', 'index.html',
+        'here they are...',
+        Parrot::Docs::Item->new('old faithful', 'foo'),
+        Parrot::Docs::Group->new('Bar', 'no jeans',
+            Parrot::Docs::Item->new('time please', 'bar', 'pub')));
+    
+    $s->write_html();
 
 =head1 DESCRIPTION
 
@@ -40,6 +40,49 @@ use Parrot::Docs::Group;
 use Parrot::Docs::Item;
 use Parrot::Docs::Directory;
 
+=item C<root_section()>
+
+Returns the root section.
+
+=cut
+
+sub root_section
+{
+    my $self = shift;
+
+	require Parrot::Docs::Section::Parrot;
+	
+	return Parrot::Docs::Section::Parrot->new;
+}
+
+=item C<is_root_section()>
+
+Returns whether the section is the root section.
+
+=cut
+
+sub is_root_section
+{
+    my $self = shift;
+    
+	return $self->isa('Parrot::Docs::Section::Parrot');
+}
+
+=item C<new_section($name, $text, @items)>
+
+Returns a new section. 
+
+Use this when creating subsection in a subclass's C<new()> method.
+
+=cut
+
+sub new_section
+{
+    my $self = shift;
+    
+    return Parrot::Docs::Section->new(@_);
+}
+
 =item C<new($name, $index_path, @contents)>
 
 Returns a new section.
@@ -53,64 +96,42 @@ C<@contents> is one or more sections, groups and/or items.
 
 sub new
 {
-	my $self = ref $_[0] ? ref shift : shift;
-	my $name = shift;
-	my $index_path = shift || 'index.html';
-	my $text = shift;
-	my @contents = @_;
-	
-	$self = $self->SUPER::new($name, $text, @contents);
-	$self->{INDEX_PATH} = $index_path;
-	
-	return $self;
+    my $self = ref $_[0] ? ref shift : shift;
+    my $name = shift;
+    my $index_path = shift || 'index.html';
+    my $text = shift;
+    my @contents = @_;
+    
+    $self = $self->SUPER::new($name, $text, @contents);
+    $self->{INDEX_PATH} = $index_path;
+    
+    return $self;
 }
 
-=item C<section($name, $text, @items)>
+=item C<html_link($path)>
 
-Returns a new section. 
-
-Use this when creating subsection in a subclass's C<new()> method.
+Returns the HTML link for the section.
 
 =cut
 
-sub section
+sub html_link
 {
 	my $self = shift;
+	my $path = shift;
 	
-	return Parrot::Docs::Section->new(@_);
+	if ( $path )
+	{
+		$path = join('/', $path, $self->{INDEX_PATH});
+	}
+	else
+	{
+		$path = $self->{INDEX_PATH};
+	}
+	
+	return '<a href="' . $path . '">' . $self->name . '</a>';
 }
 
-=item C<group($name, $text, @items)>
-
-Returns a new group.
-
-Use this when creating groups in a subclass's C<new()> method.
-
-=cut
-
-sub group
-{
-	my $self = shift;
-	
-	return Parrot::Docs::Group->new(@_);
-}
-
-=item C<item($text, @paths)>
-
-Returns a new item.
-
-Use this when creating items in a subclass's C<new()> method.
-
-=cut
-
-sub item
-{
-	my $self = shift;
-	
-	return Parrot::Docs::Item->new(@_);
-}
-
-=item C<write_html($source, $target, $silent, $delete)>
+=item C<write_html($source, $target, $silent)>
 
 Calls C<write_html()> on the contents of the section.
 
@@ -122,90 +143,83 @@ It defaults to the F<docs/html> directory.
 
 If C<$silent> is true then progress is not reported.
 
-If C<$delete> is true then the contents of C<$target> will be deleted
-before any HTML is written. This argument is intended to be used only
-once by the root section, it is not passed to subsections.
-
 =cut
 
 sub write_html
 {
+    my $self = shift;
+    my $source = shift || die "No source\n";
+    my $target = shift || die "No target\n";
+    my $silent = shift || 0;
+    my $index_html = $self->write_contents_html($source, $target, $silent);
+    
+    print "\n", $self->{INDEX_PATH} unless $silent;
+    
+    return '' unless $index_html;
+    
+    $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
+    $index_html = "<h1>$self->{NAME}</h1>\n\n" . $index_html;
+
+    my $index = $target->file_with_name($self->{INDEX_PATH});
+    
+    $index->write($self->html_header);
+    $index->append($index_html);
+    $index->append($self->html_footer);
+    
+    return $self->html_link . "<br>\n";
+}
+
+=item C<html_header()>
+
+Returns the HTML header.
+
+=cut
+
+sub html_header
+{
 	my $self = shift;
-	my $source = shift || Parrot::Docs::Directory->new('.');
-	my $target = shift || Parrot::Docs::Directory->new("docs/html");
-	my $silent = shift || 0;
-	my $delete = shift || 0;
-	my $index_html = '';
-
-	# This is only done here. It's not passed down.
-	$target->delete_contents if $delete;
-
-	# TODO - This method is very similar to the superclass version.
-	# It should be possible to remove code duplication.
+    my $title = $self->name;
+	my $navigation = $self->html_navigation;
 	
-	print "\n\n", $self->name unless $silent;
-	
-	foreach my $content (@{$self->{CONTENTS}})
-	{
-		if ( ref($content) )
-		{
-			$index_html .= $content->write_html($source, $target, $silent);
-		}
-		else
-		{
-			my @items = map {
-				$self->item('', $_)
-			} $self->relative_file_paths_for_relative_path($source, $content);
-			
-			foreach my $item (@items)
-			{
-				$index_html .= $item->write_html($source, $target, $silent);
-			}
-		}
-	}
-	
-	print "\n", $self->{INDEX_PATH} unless $silent;
-	
-	return '' unless $index_html;
-	
-	$index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
-	$index_html = "<h1>$self->{NAME}</h1>\n\n" . $index_html;
-
-	my $index = $target->file_with_name($self->{INDEX_PATH});
-
-	$index->write(<<'HEADER');
+    <<"HEADER";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
     "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>  
-<head><title>parrot - </title>
-<link rel="stylesheet" href="../resources/perl-styles.css" 
-    type="text/css" />
-</head>
+    <head><title>$title</title>
+        <link rel="stylesheet" href="../resources/perl-styles.css" 
+            type="text/css" />
+    </head>
 <body> 
-<table width=100%>
-<tr>
-<td valign="TOP">
-<a href="index.html">Contents</a>
-</td>
-<td align="RIGHT">
-<img src="../resources/parrot.small.png">
-</td>
-</tr>
-</table>
-<div class="pod">
-<a name="_top"></a>
-
+    <a name="_top"></a>
+    <table width=100%>
+        <tr>
+            <td align="LEFT" valign="TOP">
+            	$navigation
+            </td>
+            <td align="RIGHT">
+                <img src="../resources/parrot.small.png">
+            </td>
+        </tr>
+    </table>
+    <div class="pod">
 HEADER
+}
 
-	$index->append($index_html);
-	$index->append(<<'FOOTER');
-</div>
-</body>
+=item C<html_footer()>
+
+Returns the HTML footer.
+
+=cut
+
+sub html_footer
+{
+	my $self = shift;
+	
+	<<'FOOTER';
+        </div>
+    </body>
 </html>
 FOOTER
-	
-	return sprintf("<a href= \"%s\">%s</a><br>\n",
-		$self->{INDEX_PATH}, $self->name);
 }
 
 =back
