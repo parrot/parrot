@@ -59,9 +59,9 @@ void gen_bootstrap() {
     const char * saveregs        = "pushi\npushn\npushs\n";
     const char * restoreregs    = "pops\npopn\npopi\n";
     printf("\n.emit\n");
-    printf("\n__puts:\npushs\nrestore S31\nputs S31\npops\nret\n");
-    printf("\n__puti:\npushi\nrestore I31\nputs I31\npopi\nret\n");
-    printf("\n__putf:\npushn\nrestore N31\nputs N31\npopn\nret\n");
+    printf("\n__puts:\npushs\nrestore S31\nprint S31\npops\nret\n");
+    printf("\n__puti:\npushi\nrestore I31\nprint I31\npopi\nret\n");
+    printf("\n__putf:\npushn\nrestore N31\nprint N31\npopn\nret\n");
     printf("\n__substr:\n%srestore I31\nrestore I30\nrestore S31\nsubstr S30, S31, I30, I31\nsave S30\n%sret\n",
                 saveregs, restoreregs);
     printf("\n__strlen:\npushs\npushi\nrestore S0\nlength I0, S0\nsave I0\npops\npopi\nret\n");
