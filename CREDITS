@@ -43,7 +43,13 @@ N: Daniel Grunblatt
 
 N: David M. Loyd
 
-N: Gregory Purdy
+N: Gregor N. Purdy
+D: Early Parrot core, including packfile and op processing code,
+D: first predereferencing core, first Parrot-targetted compiler
+D: with subroutines: Jako.
+D: The human version of indent.
+E: gregor@focusresearch.com
+S: Seattle, WA
 
 N: Jason Gloudon
 
