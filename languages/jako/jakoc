@@ -423,43 +423,24 @@ sub assign_func
 
 
 #
-# begin_while_block()
+# begin_block()
 #
 
-sub begin_while_block
+sub begin_block
 {
-  my ($cond) = @_;
-
+  my ($type,$cond) = @_;
+  my %prefix = ( "while" => "_W", "if" => "_I" );
   $block_count++;
-  my $prefix = "_W$block_count";
-  push @block_stack, { TYPE => 'while', NEXT => $line, PREFIX => $prefix };
+
+  my $prefix = "$prefix{$type}$block_count";
+  
+  push @block_stack, { TYPE => $type, NEXT => $line, PREFIX => $prefix };
 
   if ($cond =~ m/^(.*)\s*(==|!=|<=|<|>=|>)\s*(.*)$/) {
     op_comp("${prefix}_NEXT", $2, map_args($1, $3), "${prefix}_REDO", "${prefix}_LAST");
     emit_code("${prefix}_REDO");
   } else {
-    printf(STDERR "jako: Syntax error. Unrecognized condition in 'while' on line %d.\n", $line);
-  }
-}
-
-
-#
-# begin_if_block()
-#
-
-sub begin_if_block
-{
-  my ($cond) = @_;
-
-  $block_count++;
-  my $prefix = "_I$block_count";
-  push @block_stack, { TYPE => 'if', NEXT => $line, PREFIX => $prefix };
-
-  if ($cond =~ m/^(.*)\s*(==|!=|<=|<|>=|>)\s*(.*)$/) {
-    op_comp("${prefix}_NEXT", $2, map_args($1, $3), "${prefix}_REDO", "${prefix}_LAST");
-    emit_code("${prefix}_REDO");
-  } else {
-    printf(STDERR "jako: Syntax error. Unrecognized condition in 'if' on line %d.\n", $line);
+    printf(STDERR "jako: Syntax error. Unrecognized condition in '%s' on line %d.\n", $type, $line);
   }
 }
 
@@ -691,21 +672,11 @@ while(<>) {
   # var polytype quux;
   #
 
-  if (m/^var\s+int(eger)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+))?$/) {
-    declare_var($2, 'I');
-    assign_var($2, 'I', $4) if defined $4;
-    next;
-  }
-
-  if (m/^var\s+num(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+(\.\d+)))$/) {
-    declare_var($2, 'N');
-    assign_var($2, 'N', $4) if defined $4;
-    next;
-  }
-
-  if (m/^var\s+str(ing)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/) {
-    declare_var($2, 'S');
-    assign_var($2, 'S', $4) if defined $4;
+  if ((m/^var\s+(i)nt(eger)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+))?$/) ||
+      (m/^var\s+(n)um(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\d+(\.\d+)))$/) ||
+      (m/^var\s+(s)tr(ing)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)) { 
+    declare_var($3, uc($1));
+    assign_var($3, uc($1), $5) if defined $5;
     next;
   }
 
@@ -760,24 +731,10 @@ while(<>) {
   }
 
   #
-  # Loop Blocks:
+  # Blocks:
   #
-  # while (...) {
-  #
-
-  if (m/^while\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_while_block($1);
-    next;
-  }
-
-  #
-  # Conditional Blocks:
-  #
-  # if (...) {
-  #
-
-  if (m/^if\s*\(\s*(.*)\s*\)\s*{$/) {
-    begin_if_block($1);
+  if (m/^(while|if)\s*\(\s*(.*)\s*\)\s*{$/) {
+    begin_block($1,$2);
     next;
   }
 
