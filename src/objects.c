@@ -113,7 +113,8 @@ find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
    it. Horribly destructive, and definitely not a good thing to do if
    there are instantiated objects for the class */
 static void
-rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
+rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
+{
     INTVAL cur_offset = POD_FIRST_ATTRIB;
     SLOTTYPE *class_slots;
     PMC *attr_offset_hash;
@@ -129,79 +130,84 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     class_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
     parent_array = get_attrib_num(class_slots, PCD_ALL_PARENTS);
     parent_class_count = VTABLE_elements(interpreter, parent_array);
-    if (parent_class_count) {
-        for (class_offset = 0; class_offset < parent_class_count;
-             class_offset++) {
-            INTVAL parent_attr_count;
-            SLOTTYPE *parent_slots;
-            PMC *parent_attrib_array;
-            a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                                                      parent_array,
-                                                      class_offset);
-            parent_slots = PMC_data(a_parent_class);
-            parent_attrib_array = get_attrib_num(parent_slots,
-                                                 PCD_CLASS_ATTRIBUTES);
-            parent_attr_count = VTABLE_elements(interpreter,
-                                                parent_attrib_array);
 
-            /* If there are any parent attributes, then go add the
-               parent to this class' attribute info things */
-            if (parent_attr_count) {
-                STRING *parent_name;
-                INTVAL parent_offset;
-                STRING *FQ_name;
-                STRING *partial_name;
-                parent_name = VTABLE_get_string(interpreter,
-                                                get_attrib_num(parent_slots,
-                                                               PCD_CLASS_NAME));
-                /* Note the current offset as where this class'
-                   attributes start */
-                VTABLE_set_integer_keyed_str(interpreter,
-                                             class_offset_hash,
-                                             parent_name, cur_offset);
-                partial_name = string_concat(interpreter, parent_name,
-                                             string_from_cstring(interpreter, "\0", 1),
-                                             0);
-                for (parent_offset = 0; parent_offset < parent_attr_count;
-                     parent_offset++) {
-                    STRING *attr_name;
-                    STRING *full_name;
-                    attr_name = VTABLE_get_string_keyed_int(interpreter, parent_attrib_array, parent_offset);
-                    full_name = string_concat(interpreter, partial_name, attr_name, 0);
-                    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
-                }
+    for (class_offset = 0; class_offset < parent_class_count; class_offset++) {
+        INTVAL parent_attr_count;
+        SLOTTYPE *parent_slots;
+        PMC *parent_attrib_array;
+
+        a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                parent_array, class_offset);
+        parent_slots = PMC_data(a_parent_class);
+        parent_attrib_array = get_attrib_num(parent_slots,
+                PCD_CLASS_ATTRIBUTES);
+        parent_attr_count = VTABLE_elements(interpreter,
+                parent_attrib_array);
+
+        /* If there are any parent attributes, then go add the
+           parent to this class' attribute info things */
+        if (parent_attr_count) {
+            STRING *parent_name;
+            INTVAL parent_offset;
+            STRING *FQ_name;
+            STRING *partial_name;
+
+            parent_name = VTABLE_get_string(interpreter,
+                    get_attrib_num(parent_slots, PCD_CLASS_NAME));
+            /* Note the current offset as where this class'
+               attributes start */
+            VTABLE_set_integer_keyed_str(interpreter,
+                    class_offset_hash,
+                    parent_name, cur_offset);
+            partial_name = string_concat(interpreter, parent_name,
+                    string_from_cstring(interpreter, "\0", 1),
+                    0);
+            for (parent_offset = 0; parent_offset < parent_attr_count;
+                    parent_offset++) {
+                STRING *attr_name;
+                STRING *full_name;
+
+                attr_name = VTABLE_get_string_keyed_int(interpreter,
+                        parent_attrib_array, parent_offset);
+                full_name = string_concat(interpreter, partial_name,
+                        attr_name, 0);
+                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash,
+                        full_name, cur_offset++);
             }
-
         }
+
     }
     /* Now append our own. To make things easier, we make sure we
        always appear in the offset list, even if we don't have any
        attributes. That way the append code for adding attributes to a
        child class works better */
     classname = VTABLE_get_string(interpreter, get_attrib_num(class_slots,
-                                                              PCD_CLASS_NAME));
+                PCD_CLASS_NAME));
     VTABLE_set_integer_keyed_str(interpreter, class_offset_hash, classname,
-                                 cur_offset);
+            cur_offset);
     {
         PMC *attribs;
         INTVAL attr_count;
+
         attribs = get_attrib_num(class_slots, PCD_CLASS_ATTRIBUTES);
         attr_count = VTABLE_elements(interpreter, attribs);
         if (attr_count) {
             STRING *partial_name;
             INTVAL offset;
+
             partial_name = string_concat(interpreter, classname,
-                                         string_from_cstring(interpreter, "\0", 1),
-                                         0);
-            if (attr_count) {
-                for (offset = 0; offset < attr_count; offset++) {
-                    STRING *attr_name;
-                    STRING *full_name;
-                    attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
-                                                            offset);
-                    full_name = string_concat(interpreter, partial_name, attr_name, 0);
-                    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
-                }
+                    string_from_cstring(interpreter, "\0", 1),
+                    0);
+            for (offset = 0; offset < attr_count; offset++) {
+                STRING *attr_name;
+                STRING *full_name;
+
+                attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
+                        offset);
+                full_name = string_concat(interpreter, partial_name,
+                        attr_name, 0);
+                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash,
+                        full_name, cur_offset++);
             }
         }
     }
@@ -211,7 +217,6 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     set_attrib_num(class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
     /* And note the totals */
     PMC_int_val(class) = cur_offset - POD_FIRST_ATTRIB;
-    return;
 }
 
 /*
@@ -487,7 +492,8 @@ darned object.
 */
 
 void
-Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
+Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
+{
     SLOTTYPE *new_object_array;
     INTVAL attrib_count;
     SLOTTYPE *class_array;
@@ -549,7 +555,8 @@ the parent classes that we're adding in.
 
 PMC *
 Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
-           PMC *add_on_class_obj) {
+           PMC *add_on_class_obj)
+{
     SLOTTYPE *current_class;
     SLOTTYPE *add_on_class;
     PMC *current_class_array;
@@ -561,29 +568,43 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
 
     /* Grab the useful stuff from the guts of the class PMC */
     current_class = PMC_data(current_class_obj);
-    add_on_class = PMC_data(add_on_class_obj);
 
     /* Start with the current list */
-    current_class_array = get_attrib_num(current_class,
-                                         PCD_ALL_PARENTS);
-    add_on_class_array = get_attrib_num(add_on_class,
-                                        PCD_ALL_PARENTS);
     current_parent_array = get_attrib_num(current_class,
                                           PCD_PARENTS);
+    current_size = VTABLE_elements(interpreter, current_parent_array);
+    /*
+     * first check, if the add_on class isn't already in our immediate
+     * parents list
+     */
+    for (current_offset = 0;
+         current_offset < current_size;
+         current_offset++) {
+        if (add_on_class_obj == VTABLE_get_pmc_keyed_int(interpreter,
+                                                         current_parent_array,
+                                                         current_offset)) {
+            /*
+             * XXX emit warning? error?
+             */
+            return NULL;
+        }
+    }
 
     /* Tack on the new parent class to the end of the immediate parent
        list */
-    current_size = VTABLE_elements(interpreter, current_parent_array);
     VTABLE_set_integer_native(interpreter, current_parent_array,
                               current_size + 1);
     VTABLE_set_pmc_keyed_int(interpreter, current_parent_array, current_size,
                             add_on_class_obj);
 
+    /*
+     * now check all parents
+     */
+    current_class_array = get_attrib_num(current_class, PCD_ALL_PARENTS);
     /* Loop through them. We can assume that we can just tack on any
        new classes to the end of the current class array. Attributes
        are a bit more interesting, unfortunately */
     current_count = VTABLE_elements(interpreter, current_class_array);
-    add_on_count = VTABLE_elements(interpreter, add_on_class_array);
 
     /* Check to see if the parent class is already in the list. */
     for (current_offset = 0;
@@ -593,6 +614,7 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                                          current_class_array,
                                                          current_offset)) {
             already_in = 1;
+            break;
         }
     }
 
@@ -601,6 +623,10 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
        parent list and add them into the child if they're not already
        in the child list */
     if (!already_in) {
+        add_on_class = PMC_data(add_on_class_obj);
+        add_on_class_array = get_attrib_num(add_on_class,
+                                        PCD_ALL_PARENTS);
+        add_on_count = VTABLE_elements(interpreter, add_on_class_array);
         /* First go put the new parent class on the search list */
         current_size = VTABLE_elements(interpreter,
                                        current_class_array);
@@ -624,6 +650,7 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                                                           current_class_array,
                                                           current_offset)) {
                     found = 1;
+                    break;
                 }
             }
             /* We found it. Yay us. Add the parent class to the list */

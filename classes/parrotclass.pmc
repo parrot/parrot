@@ -15,30 +15,34 @@ PMCs. That array has:
 
 =over 4
 
-=item 0
+=item 0, PCD_PARENTS
 
 An array of immediate parents.
 
-=item 1
+=item 1, PCD_CLASS_NAME
 
 The class name PMC.
 
-=item 2
+=item 2, PCD_ALL_PARENTS
 
 A pruned array of all parents, in search order.
 
-=item 3
-
-A pruned array of all parents in reverse search order.
-
-=item 4
+=item 3, PCD_ATTRIB_OFFS
 
 A hash, keys are the class names, values are the offsets to their attributes.
 
-=item 5
+=item 4, PCD_ATTRIBUTES
 
 A hash, the keys are the classname/attrib name pair (separated by a
 C<NULL>), while the value is the offset to the attribute.
+
+=item 5, PCD_CLASS_ATTRIBUTES
+
+Array of attribute of this class.
+
+=item 6, PCD_OBJECT_VTABLE
+
+Vtable PMC that holds the vtable for objects of this class.
 
 =back
 
