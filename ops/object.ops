@@ -308,6 +308,23 @@ inline op setattribute(in PMC, in INT, in PMC) {
     goto NEXT();
 }
 
+=item B<classoffset>(out INT, in PMC, in STR)
+
+Returns the offset of the first attribute for class $3 in object $2.
+Throws an exception $3 isn't in $2's hierarchy.
+
+=cut
+
+op classoffset(out INT, in PMC, in STR) {
+    INTVAL offset;
+    offset = Parrot_class_offset(interpreter, $2, $3);
+    if (offset < 0) {
+        internal_exception(NO_CLASS, "Class not parent of object");
+    }
+    $1 = offset;
+    goto NEXT();
+}
+
 
 =item B<adddoes>(in PMC, in STR)
 

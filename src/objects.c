@@ -55,6 +55,118 @@ find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname) {
             stash, globalname);
 }
 
+/* Take the class and completely rebuild the atttribute stuff for
+   it. Horribly destructive, and definitely not a good thing to do if
+   there are instantiated objects for the class */
+static void
+rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
+    INTVAL cur_offset = POD_FIRST_ATTRIB;
+    PMC *obj_array;
+    PMC *attr_offset_hash;
+    PMC *class_offset_hash;
+    PMC *parent_array;
+    PMC *a_parent_class;
+    STRING *classname;
+    INTVAL class_offset;
+    INTVAL parent_class_count;
+
+    obj_array = PMC_data(class);
+    attr_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
+    class_offset_hash = pmc_new(interpreter, enum_class_OrderedHash);
+    parent_array = VTABLE_get_pmc_keyed_int(interpreter, obj_array,
+                                            PCD_ALL_PARENTS);
+    parent_class_count = VTABLE_elements(interpreter, parent_array);
+    if (parent_class_count) {
+        for (class_offset = 0; class_offset < parent_class_count;
+             class_offset++) {
+            INTVAL parent_attr_count;
+            PMC *a_parent_array;
+            PMC *parent_attrib_array;
+            a_parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                                                      parent_array,
+                                                      class_offset);
+            a_parent_array = PMC_data(a_parent_class);
+            parent_attrib_array = VTABLE_get_pmc_keyed_int(interpreter,
+                                                           a_parent_array,
+                                                           PCD_CLASS_ATTRIBUTES);
+            parent_attr_count = VTABLE_elements(interpreter, parent_attrib_array);
+            
+            /* If there are any parent attributes, then go add the
+               parent to this class' attribute info things */
+            if (parent_attr_count) {
+                STRING *parent_name;
+                INTVAL parent_offset;
+                STRING *FQ_name;
+                STRING *partial_name;
+                parent_name = VTABLE_get_string_keyed_int(interpreter,
+                                                          a_parent_array,
+                                                          PCD_CLASS_NAME);
+                /* Note the current offset as where this class'
+                   attributes start */
+                VTABLE_set_integer_keyed_str(interpreter,
+                                             attr_offset_hash,
+                                             parent_name, cur_offset);
+                partial_name = string_concat(interpreter, parent_name,
+                                             string_from_cstring(interpreter, "\0", 1),
+                                             0);
+                for (parent_offset = 0; parent_offset < parent_attr_count;
+                     parent_offset++) {
+                    STRING *attr_name;
+                    STRING *full_name;
+                    attr_name = VTABLE_get_string_keyed_int(interpreter, parent_attrib_array, parent_offset);
+                    full_name = string_concat(interpreter, partial_name, attr_name, 0);
+                    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
+                }
+            }
+
+        }
+    }
+
+    /* Now append our own. To make things easier, we make sure we
+       always appear in the offset list, even if we don't have any
+       attributes. That way the append code for adding attributes to a
+       child class works better */
+    classname = VTABLE_get_string_keyed_int(interpreter, obj_array,
+                                            PCD_CLASS_NAME);
+    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, classname,
+                                 cur_offset);
+    {
+        PMC *attribs;
+        INTVAL attr_count;
+        
+        attribs = VTABLE_get_pmc_keyed_int(interpreter, obj_array,
+                                           PCD_CLASS_ATTRIBUTES);
+        attr_count = VTABLE_elements(interpreter, attribs);
+        if (attr_count) {
+            STRING *partial_name;
+            INTVAL offset;
+            partial_name = string_concat(interpreter, classname,
+                                         string_from_cstring(interpreter, "\0", 1),
+                                         0);
+
+            for (offset = 0; offset < attr_count; offset++) {
+                STRING *attr_name;
+                STRING *full_name;
+                attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
+                                                        offset);
+                full_name = string_concat(interpreter, partial_name, attr_name, 0);
+                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
+            }
+        }
+    }
+            
+
+    /* And replace what was in there with the new ones */
+    VTABLE_set_pmc_keyed_int(interpreter, obj_array, PCD_ATTRIBUTES,
+                             attr_offset_hash);
+    VTABLE_set_pmc_keyed_int(interpreter, obj_array, PCD_ATTRIB_OFFS,
+                             class_offset_hash);
+    /* And note the totals */
+    class->cache.int_val = cur_offset;
+
+    return;
+}
+
 /*
 
 =item C<PMC *
@@ -439,6 +551,7 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
             }
         }
     }
+    rebuild_attrib_stuff(interpreter, current_class_obj);
     return NULL;
 }
 
@@ -670,7 +783,6 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     full_attr_name = string_concat(interpreter, class_name, string_from_cstring(interpreter, "\0", 1), 0);
     full_attr_name = string_concat(interpreter, full_attr_name, attr, 0);
     
-
     /*
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs
@@ -718,6 +830,24 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, 
     else {
         internal_exception(INTERNAL_NOT_IMPLEMENTED, "Can't set non-core object attribs yet");
     }
+}
+
+INTVAL
+Parrot_class_offset(Parrot_Interp interpreter, PMC *object, STRING *class) {
+    PMC *offset_hash;
+    PMC *internal_array;
+    INTVAL offset;
+    internal_array = PMC_data(object);
+    offset_hash = VTABLE_get_pmc_keyed_int(interpreter,
+                                           internal_array,
+                                           PCD_ATTRIB_OFFS);
+    if (VTABLE_exists_keyed_str(interpreter, offset_hash, class)) {
+        offset = VTABLE_get_integer_keyed_str(interpreter, offset_hash, class);
+    }
+    else {
+        offset = -1;
+    }
+    return offset;
 }
 
 /*
