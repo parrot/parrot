@@ -103,6 +103,9 @@ D: Original Perl6 compiler
 N: Steve Fink
 
 N: Simon Glover
+D: Tests, docs and misc. bugfixes
+E: scog@amnh.org
+S: New York, NY
 
 N: Simon Cozens
 
