@@ -300,7 +300,7 @@ in C<dest>.
 
 If any method doesn't fit into your class, just don't implement it
 and don't provide an empty function body. The default class, which all
-classes inherit from, will through an exception, if this method would
+classes inherit from, will throw an exception, if this method would
 be called.
 
 If your class is a modification of an existing class, you may wish to
