@@ -538,3 +538,33 @@ AUTO_OP pow_n_i_i {
 AUTO_OP pow_n_i_n {
    NUM_REG(P1) = pow(INT_REG(P2), NUM_REG(P3));
 }
+
+// AND_i
+AUTO_OP and_i {
+  INT_REG(P1) = INT_REG(P2) & INT_REG(P3);
+}
+
+// NOT_i
+AUTO_OP not_i {
+  INT_REG(P1) = ! INT_REG(P2);
+}
+
+// OR_i
+AUTO_OP or_i {
+  INT_REG(P1) = INT_REG(P2) | INT_REG(P3);
+}
+
+// SHL_i_ic
+AUTO_OP shl_i_ic {
+  INT_REG(P1) = INT_REG(P2) << P3;
+}
+
+// SHR_i_ic
+AUTO_OP shr_i_ic {
+  INT_REG(P1) = INT_REG(P2) >> P3;
+}
+
+// XOR_i
+AUTO_OP xor_i {
+  INT_REG(P1) = INT_REG(P2) ^ INT_REG(P3);
+}

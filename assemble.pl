@@ -70,11 +70,12 @@ emit_constants_section();
 # Now assemble
 $pc = 0;
 my $line = 0;
-while ($_ = shift @code) {
+foreach (@code) {
     $line++;
     chomp;
+    next if(m/^\s*$/); # blank lines
     s/,/ /g;
-
+    
     my ($opcode, @args) = split /\s+/, $_;
 
     if (!exists $opcodes{lc $opcode}) {
@@ -93,6 +94,8 @@ while ($_ = shift @code) {
        } elsif($rtype eq "D") {
            # a destination
            $args[$_]=fixup($args[$_]);
+       } else {
+	   $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
        }
        $output .= pack $type, $args[$_];
     }

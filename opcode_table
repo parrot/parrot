@@ -88,8 +88,8 @@ time_n 1       N
 print_n        1       N
 noop	0
 
-
 # Register ops
+
 push_i	0
 push_s	0
 push_n	0
@@ -145,3 +145,13 @@ exp_n_i        2       N I
 pow_n_n_i      3       N N I
 pow_n_i_i      3       N I I
 pow_n_i_n      3       N I N
+
+# Bitwise Ops
+
+and_i 3   I I I
+not_i 2   I I
+or_i  3   I I I
+shl_i_ic 3    I I i
+shr_i_ic 3    I I i
+xor_i 3   I I I
+
