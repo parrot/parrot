@@ -4,7 +4,9 @@ config.opt
 core_ops_cg.c
 core_ops.c
 core_ops_prederef.c
+libparrot.a
 Makefile
+pdb
 pdump
 parrot
 Makefile
