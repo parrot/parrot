@@ -17,9 +17,6 @@
 #include "parrot/method_util.h"
 #include <assert.h>
 
-/* set this to 1 for tracing the system stack and processor registers */
-#define TRACE_SYSTEM_AREAS 1
-
 /* set this to 1 and above to zero to see if unanchored objects
  * are found in system areas. Please note: these objects might be bogus
  */
@@ -153,8 +150,7 @@ static int
 trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 {
     PMC *current;
-    /* Pointers to the currently being processed PMC, and
-     * in the previously processed PMC in a loop.
+    /* Pointer to the currently being processed PMC
      *
      * initialize locals to zero, so no garbage is on stack
      *
@@ -222,11 +218,15 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);
 
+    /* quich check, if we can already bail out */
+    if (interpreter->lazy_dod && interpreter->num_early_PMCs_seen >=
+            interpreter->num_early_DOD_PMCs) {
+        return 0;
+    }
+
     /* Find important stuff on the system stack */
-#if TRACE_SYSTEM_AREAS
     if (trace_stack)
         trace_system_areas(interpreter);
-#endif
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list 'o things to look at. Run through it */
     return trace_children(interpreter, current);
@@ -243,12 +243,12 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
 
     int lazy_dod = interpreter->lazy_dod;
 
-    for (;  current != prev; current = current->next_for_GC) {
+    for (; current != prev; current = current->next_for_GC) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         if (lazy_dod && interpreter->num_early_PMCs_seen >=
                 interpreter->num_early_DOD_PMCs) {
-                return 0;
+            return 0;
         }
         interpreter->dod_trace_ptr = current;
         if (!PObj_needs_early_DOD_TEST(current))
@@ -814,23 +814,6 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
     if (trace_active_PMCs(interpreter, flags & DOD_trace_stack_FLAG)) {
         /* And the buffers */
         trace_active_buffers(interpreter);
-#if !TRACE_SYSTEM_AREAS
-# if GC_VERBOSE
-        /* whe, we don't trace stack and registers, we check after
-         * marking everything, if something was missed
-         * not - these could also be stale objects
-         */
-        if (flags & DOD_trace_stack_FLAG) {
-#  if ! DISABLE_GC_DEBUG
-            CONSERVATIVE_POINTER_CHASING = 1;
-#  endif
-            trace_system_areas(interpreter);
-#  if ! DISABLE_GC_DEBUG
-            CONSERVATIVE_POINTER_CHASING = 0;
-#  endif
-        }
-# endif
-#endif
 
         /* Now put unused PMCs on the free list */
         header_pool = interpreter->arena_base->pmc_pool;
