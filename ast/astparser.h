@@ -55,7 +55,7 @@
 
 
 #ifndef YYSTYPE
-#line 43 "ast/ast.y"
+#line 41 "ast/ast.y"
 typedef union {
     int t;
     char *s;

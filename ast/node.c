@@ -574,6 +574,7 @@ IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
     if (!r->type)
         r->type = VTIDENTIFIER;
     p->expand = exp_Var;
+    p->d = "Var";
     p->dump   = dump_Var;
     return p;
 }

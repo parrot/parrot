@@ -177,6 +177,8 @@ struct imcc_ostat {
 
 EXTERN struct imcc_ostat ostat;
 
+struct nodeType_t;
+
 typedef struct _imc_info_t {
 
     IMC_Unit * imc_units;
@@ -186,6 +188,7 @@ typedef struct _imc_info_t {
     int debug;
     int n_comp_units;
     SymReg  *  cur_namespace;
+    struct nodeType_t *top_node;
 
 } imc_info_t;
 

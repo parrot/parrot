@@ -36,8 +36,6 @@ int yylex(YYSTYPE*, YYLTYPE*, Interp*);
 #define YYPARSE_PARAM interp
 #define YYLEX_PARAM interp
 
-extern struct nodeType_t *top_node;
-
 %}
 
 %union {
@@ -58,7 +56,7 @@ extern struct nodeType_t *top_node;
 
 %%
 
-program: nodes          { top_node = $$; }
+program: nodes          { IMCC_INFO(interp)->top_node = $$; }
      | error { pr_error(@1, "Bug"); YYABORT; }
      ;
 

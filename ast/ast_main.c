@@ -43,17 +43,23 @@ Compile AST source file to bytecode
 */
 
 
-struct nodeType_t *top_node; /* XXX */
 void
 IMCC_ast_compile(Interp *interpreter, FILE *fp)
 {
+    nodeType *top_node;
+
     ASTin = fp;
     ASTparse(interpreter);
+
+    top_node = interpreter->imc_info->top_node;
     top_node = IMCC_expand_nodes(interpreter, top_node);
     if (top_node) {
-        /* IMCC_dump_nodes(top_node); TODO commandline switches */
+        if (interpreter->imc_info->debug & 0x100) {
+            IMCC_dump_nodes(top_node); /* TODO commandline switches */
+        }
         IMCC_free_nodes(interpreter, top_node);
     }
+    interpreter->imc_info->top_node = NULL;
 }
 
 static void

@@ -121,8 +121,6 @@ int yylex(YYSTYPE*, YYLTYPE*, Interp*);
 #define YYPARSE_PARAM interp
 #define YYLEX_PARAM interp
 
-extern struct nodeType_t *top_node;
-
 
 
 /* Enabling traces.  */
@@ -139,14 +137,14 @@ extern struct nodeType_t *top_node;
 #endif
 
 #ifndef YYSTYPE
-#line 43 "ast/ast.y"
+#line 41 "ast/ast.y"
 typedef union {
     int t;
     char *s;
     struct nodeType_t *n;
 } yystype;
 /* Line 193 of /usr/share/bison/yacc.c.  */
-#line 150 "ast/astparser.c"
+#line 148 "ast/astparser.c"
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
@@ -167,7 +165,7 @@ typedef struct yyltype
 
 
 /* Line 213 of /usr/share/bison/yacc.c.  */
-#line 171 "ast/astparser.c"
+#line 169 "ast/astparser.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -340,9 +338,9 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned char yyrline[] =
 {
-       0,    61,    61,    62,    65,    66,    69,    70,    71,    72,
-      75,    76,    76,    80,    80,    84,    86,    87,    88,    91,
-      94
+       0,    59,    59,    60,    63,    64,    67,    68,    69,    70,
+      73,    74,    74,    78,    78,    82,    84,    85,    86,    89,
+      92
 };
 #endif
 
@@ -1013,79 +1011,79 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 61 "ast/ast.y"
-    { top_node = yyval.n; }
+#line 59 "ast/ast.y"
+    { IMCC_INFO(interp)->top_node = yyval.n; }
     break;
 
   case 3:
-#line 62 "ast/ast.y"
+#line 60 "ast/ast.y"
     { pr_error(yylsp[0], "Bug"); YYABORT; }
     break;
 
   case 5:
-#line 66 "ast/ast.y"
+#line 64 "ast/ast.y"
     { yyval.n = 0; }
     break;
 
   case 7:
-#line 70 "ast/ast.y"
+#line 68 "ast/ast.y"
     { yyval.n = IMCC_append_node(interp, yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
     break;
 
   case 10:
-#line 75 "ast/ast.y"
+#line 73 "ast/ast.y"
     { yyval.n = IMCC_new_node(interp, yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
     break;
 
   case 11:
-#line 76 "ast/ast.y"
+#line 74 "ast/ast.y"
     { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
     break;
 
   case 12:
-#line 77 "ast/ast.y"
+#line 75 "ast/ast.y"
     { yyval.n = IMCC_new_node(interp, yyvsp[-4].t, yyvsp[-1].n, &yylsp[-4]);
 		                  yyval.n->unit = cur_unit;
 		                  cur_unit = cur_unit->prev; }
     break;
 
   case 13:
-#line 80 "ast/ast.y"
+#line 78 "ast/ast.y"
     { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
     break;
 
   case 14:
-#line 81 "ast/ast.y"
+#line 79 "ast/ast.y"
     { yyval.n = IMCC_new_node(interp, yyvsp[-4].t, yyvsp[-1].n, &yylsp[-4]); }
     break;
 
   case 15:
-#line 85 "ast/ast.y"
+#line 83 "ast/ast.y"
     { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'S', &yylsp[0]); }
     break;
 
   case 16:
-#line 86 "ast/ast.y"
+#line 84 "ast/ast.y"
     { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'I', &yylsp[0]); }
     break;
 
   case 17:
-#line 87 "ast/ast.y"
+#line 85 "ast/ast.y"
     { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'N', &yylsp[0]); }
     break;
 
   case 18:
-#line 88 "ast/ast.y"
+#line 86 "ast/ast.y"
     { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'U', &yylsp[0]); }
     break;
 
   case 19:
-#line 91 "ast/ast.y"
+#line 89 "ast/ast.y"
     { yyval.n = IMCC_new_var_node(interp, yyvsp[0].s, yyvsp[-1].t, &yylsp[0]); }
     break;
 
   case 20:
-#line 94 "ast/ast.y"
+#line 92 "ast/ast.y"
     { yyval.t = 'P'; }
     break;
 
@@ -1093,7 +1091,7 @@ yyreduce:
     }
 
 /* Line 1016 of /usr/share/bison/yacc.c.  */
-#line 1097 "ast/astparser.c"
+#line 1095 "ast/astparser.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1312,7 +1310,7 @@ yyreturn:
 }
 
 
-#line 97 "ast/ast.y"
+#line 95 "ast/ast.y"
 
 
 static void
