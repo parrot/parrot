@@ -13,15 +13,7 @@
 
 #include <parrot/parrot.h>
 #include <stdio.h>
-#include <sys/time.h>
 
-FLOATVAL
-time_n(void)
-{
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return (FLOATVAL)t.tv_sec + ((FLOATVAL)t.tv_usec / 1000000.0);
-}
 
 int
 main(int argc, char *argv[])
@@ -50,15 +42,15 @@ main(int argc, char *argv[])
     /* print  I5                */
     /* print  "\n"              */
     /*                          */
-    N1 = time_n();              /* time   N1                */
+    N1 = Parrot_floatval_time();/* time   N1                */
     /*                          */
   REDO:                        /* REDO:                    */
     I4 = I4 - I3;               /* sub    I4, I4, I3        */
-    if (I4)
+    if ( I4 )
         goto REDO;              /* if     I4, REDO          */
     /*                          */
   DONE:                        /* DONE:                    */
-    N5 = time_n();              /* time   N5                */
+    N5 = Parrot_floatval_time();/* time   N5                */
     /*                          */
     N2 = N5 - N1;               /* sub    N2, N5, N1        */
     /*                          */
@@ -77,6 +69,7 @@ main(int argc, char *argv[])
     /*                          */
     return 0;                   /* end                      */
 }
+
 
 /*
  * Local variables:

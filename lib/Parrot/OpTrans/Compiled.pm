@@ -7,7 +7,7 @@
 use strict;
 #use warnings;
 
-package Parrot::OpTrans::CGoto;
+package Parrot::OpTrans::Compiled;
 
 use Parrot::OpTrans;
 use vars qw(@ISA);
@@ -16,7 +16,6 @@ use vars qw(@ISA);
 sub defines
 {
   return <<END;
-#define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
 END
 }
@@ -76,17 +75,13 @@ sub goto_address
 {
   my ($self, $addr) = @_;
 #print STDERR "pbcc: map_ret_abs($addr)\n";
-  if ($addr eq '0') {
-  	return "return (0);"
-  } else { 
-  	return "goto *ops_addr[*(cur_opcode = $addr)]";
-  }
+  return "cur_opcode = $addr;\ngoto switch_label";
 }
 
 
 sub expr_offset {
     my ($self, $offset) = @_;
-    return "cur_opcode + $offset";
+    return sprintf("&&PC_%d", $self->pc + $offset);
 }
 
 #
@@ -96,7 +91,12 @@ sub expr_offset {
 sub goto_offset
 {
   my ($self, $offset) = @_;
-  return "goto *ops_addr[*(cur_opcode += $offset)]";
+  if ($offset =~ /^-?\d+$/) {
+  return sprintf("goto PC_%d", $self->pc + $offset);
+  } else {
+      return sprintf("cur_opcode = &&PC_%d; cur_opcode += %s; goto switch_label", $self->pc, $offset);
+  }
+#print STDERR "pbcc: map_ret_rel($offset)\n";
 }
 
 
@@ -107,7 +107,7 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  return "opcode_t* pop_addr = (opcode_t*)pop_dest(interpreter);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
+  return "goto *pop_dest(interpreter)";
 }
 
 #
@@ -115,26 +115,22 @@ sub goto_pop
 #
 
 my %arg_maps = (
-  'op' => "cur_opcode[%ld]",
+  'i'  => "interpreter->int_reg.registers[%ld]",
+  'n'  => "interpreter->num_reg.registers[%ld]",
+  'p'  => "interpreter->pmc_reg.registers[%ld]",
+  's'  => "interpreter->string_reg.registers[%ld]",
 
-  'i'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",
-  'n'  => "interpreter->num_reg.registers[cur_opcode[%ld]]",
-  'p'  => "interpreter->pmc_reg.registers[cur_opcode[%ld]]",
-  's'  => "interpreter->string_reg.registers[cur_opcode[%ld]]",
-
-  'ic' => "cur_opcode[%ld]",
-  'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
+  'ic' => "%ld",
+  'nc' => "interpreter->code->const_table->constants[%ld]->number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-  'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
+  'sc' => "interpreter->code->const_table->constants[%ld]->string",
 );
 
 sub access_arg
 {
   my ($self, $type, $num, $op) = @_;
 #print STDERR "pbcc: map_arg($type, $num)\n";
-  die "Unrecognized type '$type' for num '$num'" unless exists $arg_maps{$type};
-
-  return sprintf($arg_maps{$type}, $num );
+  return sprintf($arg_maps{$type}, $self->arg($num - 1));
 }
 
 
@@ -145,7 +141,7 @@ sub access_arg
 sub restart_address
 {
   my ($self, $addr) = @_;
-  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
+  die "pbc2c.pl: Cannot handle RESUME ops!";
 }
 
 
@@ -156,8 +152,9 @@ sub restart_address
 sub restart_offset
 {
   my ($self, $offset) = @_;
-  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
+  die "pbc2c.pl: Cannot handle RESUME ops!";
 }
+
 
 1;
 
