@@ -131,11 +131,62 @@ sub Parse::RecDescent::set_error_handler {
     $old_handler;
 }
 
+=item B<parse_sig>
+
+Parses a signature and returns (signature, context).
+
+HACK! It would be better to call into the regular parser for this,
+but it'll take me less time to implement it here than to figure out
+how to do that.
+
+=cut
+
+# Make a blessed nonterminal just as if the parser had created it.
+sub mkraw {
+    my ($type, @info) = @_;
+    return bless [ $type => @info ], "P6C::$type";
+}
+
+sub parse_sig {
+    my ($sig_string, %options) = @_;
+
+    my @sigparams;
+    foreach my $param_str (split(/\s*,\s*/, $sig_string)) {
+        my $class;
+        if (my ($type, $var) = $param_str =~ /(\S+) (\S+)/) {
+            $class = mkraw(class => mkraw(name => $type));
+            $param_str = $var;
+        }
+
+        my $zone;
+        if ($param_str =~ /^([\?\*\+])/) {
+            $zone = mkraw(zone => $1);
+            $param_str = substr($param_str, 1);
+        }
+
+        my $sigil = mkraw(sigil => substr($param_str, 0, 1));
+        my $name = mkraw(varname => substr($param_str, 1));
+        my $var = mkraw(variable => $sigil, undef, $name);
+
+        push @sigparams, mkraw(sigparam => $class, $zone, $var, mkraw('traits'), undef);
+    }
+
+    my $sig = mkraw(signature => undef, undef, \@sigparams, undef);
+
+    $sig = $sig->tree;
+    $sig->{no_named} = 1 if $options{no_named};
+    return ($sig, new P6C::Context type => $sig->arg_context);
+}
+
 ##############################
 # Functions (list operators):
 
 INIT {
 $FUNCTION_ARGS = 'bare_arglist';
+
+# When debugging the perl6 compiler, it is very common to have the
+# stack go much deeper than the default limit of 100 that the DB
+# module assumes is insanely deep.
 $DB::deep = 1000;
 
 # XXX: many of these need their own special want_* rules.  This is

@@ -110,6 +110,7 @@ parameters of particular types.
 
 use strict;
 use P6C::Util qw(diag unimp same_type);
+use P6C::Parser;
 use Class::Struct 'P6C::Context' => { qw(type $ flatten $ hype $) };
 
 # A P6C::SigContext is *not* a type of P6C::Context; it is used in the
@@ -125,9 +126,9 @@ use Class::Struct 'P6C::SigContext' => { qw(positional @
 
 use vars qw(%CONTEXT $DEFAULT_ARGUMENT_CONTEXT);
 
-BEGIN {
-    $DEFAULT_ARGUMENT_CONTEXT
-	= new P6C::Context type => 'PerlArray', flatten => 1;
+sub default_arg_context {
+    return $DEFAULT_ARGUMENT_CONTEXT ||=
+      new P6C::Context type => 'PerlArray', flatten => 1;
 }
 
 sub nelem {

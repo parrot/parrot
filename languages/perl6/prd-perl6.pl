@@ -1,4 +1,6 @@
-#!perl
+
+use lib 'P6C/../../regex/lib';
+use lib '../../lib';
 
 use Getopt::Long;
 use strict;

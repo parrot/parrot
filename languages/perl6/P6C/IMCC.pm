@@ -171,7 +171,7 @@ END
     # emulate a sub main (@ARGS) { ... }, except don't pass in a named
     # argument hash. This is hopefully a temporary hack, until we can
     # find a better place to put all the named arguments.
-    $funcs{main}->params((P6C::Builtins::parse_sig('@ARGS'))[0]);
+    $funcs{main}->params((P6C::Parser::parse_sig('@ARGS'))[0]);
     $funcs{main}->params->{no_named} = 1;
 
     # XXX: This is hackish. The builtins should really be global multimethods,
@@ -190,7 +190,7 @@ END
 END
     }
     print <<'END';
-	.pcc_begin non_prototyped
+	.pcc_begin prototyped # Was non_prototyped
         .arg P5
 	.pcc_call main_sub
 main_ret_label:
@@ -207,7 +207,7 @@ END
 	    next;
 	}
 	$name = mangled_name($name);
-	print ".pcc_sub $name non_prototyped\n";
+	print ".pcc_sub $name prototyped\n";
 	$sub->emit;
 	print ".end\n";
     }
@@ -230,34 +230,6 @@ function context.
 
 Append IMCC code C<$x> to the current function.
 
-=item B<add_function($name)>
-
-Create a new function stub for C<$name>.  If C<$name> exists, it will
-be overwritten.
-
-=item B<exists_function_def($name)>
-
-Return true if function C<$name> is defined (i.e. not just "declared").
-
-=item B<exists_function_decl($name)>
-
-Return true if a stub exists for C<$name>, even if it has no code.
-
-=item B<$oldfunc = set_function($name)>
-
-Set the code insertion point to the end of function C<$name>,
-returning the name of the previously active function.  Function
-C<$name> should exist before this is called.
-
-=item B<set_function_params($signature)>
-
-Set the parameter list for the current function.  The argument should
-be a C<P6C::signature> object.
-
-=item B<set_function_return($ret)>
-
-=back
-
 =cut
 
 sub code {			# add code to current function
@@ -267,34 +239,61 @@ sub code {			# add code to current function
     $funcs{$curfunc}->{code} .= $to_add;
 }
 
-sub fixup_label {
-    my ($from, $to) = @_;
-    die "Code must live within a function" unless defined $curfunc;
-    $funcs{$curfunc}->{code} =~ s/\b$from\b/$to/g;
-}
+=item B<add_function($name)>
 
-sub add_function($) {
-    my $f = shift;
+Create a new function stub for C<$name>.  If C<$name> exists, it will
+be overwritten.  In such cases, a warning will be omitted unless the
+{'weak'} flag is set.
+
+=cut
+
+sub add_function($;@) {
+    my ($f, %opts) = @_;
     if (exists $funcs{$f}) {
+        # Do not override a non-weak function with a weak one.
+        return 1 if ($opts{weak} && ! $funcs{$f}->{weak});
+
         if ($funcs{$f}->{'autodeclared'}) {
             diag "$f called too early to check prototype";
         } else {
-            diag "Redefining function $f";
+            diag "Redefining function $f"
+              unless $funcs{$f}->{'weak'};
         }
     }
     $funcs{$f} = new P6C::IMCC::Sub;
+    $funcs{$f}->{'weak'} = 1 if $opts{'weak'};
     # NOTE: top-level closure will push a scope.
     return 1;
 }
+
+=item B<exists_function_def($name)>
+
+Return true if function C<$name> is defined (i.e. not just "declared").
+
+=cut
 
 sub exists_function_def($) {
     my $f = $funcs{+shift};
     return $f && $f->{code};
 }
 
+=item B<exists_function_decl($name)>
+
+Return true if a stub exists for C<$name>, even if it has no code.
+
+=cut
+
 sub exists_function_decl($) {
     return $funcs{+shift} ? 1 : 0;
 }
+
+=item B<$oldfunc = set_function($name)>
+
+Set the code insertion point to the end of function C<$name>,
+returning the name of the previously active function.  Function
+C<$name> should exist before this is called.
+
+=cut
 
 sub set_function($) {	       # switch to function, returning old one
     my $func = shift;
@@ -303,13 +302,26 @@ sub set_function($) {	       # switch to function, returning old one
     return $ofunc;
 }
 
+=item B<set_function_params($signature)>
+
+Set the parameter list for the current function.  The argument should
+be a C<P6C::signature> object.
+
+=cut
+
 sub set_function_params {
     $funcs{$curfunc}->maybe_set_params(@_);
 }
 
+=item B<set_function_return($ret)>
+
+=cut
+
 sub set_function_return {
     $funcs{$curfunc}->set_return(@_);
 }
+
+=back
 
 =head2 Name lookup
 
@@ -318,6 +330,78 @@ have stashes yet.  Hopefully the interface will be useful when things
 get more complicated.
 
 =over
+
+=item B<$name = globalvar($var)>
+
+Lookup a global variable.
+
+=cut
+
+sub globalvar($) {
+    my $name = shift;
+    if (!exists $globals{$name}) {
+ 	if ($OPT{strict}) {
+	    warning "Reference to global $name";
+ 	}
+	add_globalvar($name);
+    }
+    return 'global "'.mangled_name($name).'"';
+}
+
+=item B<add_globalvar($var [, $type])>
+
+Declare global variable C<$var>.  Warns if C<$var> is already defined.
+C<$var> will be initialized to a new PMC of type C<$type> (or
+C<PerlUndef> if type is not given) before C<main> is called.
+
+=cut
+
+sub add_globalvar($;$) {
+    my $name = shift;
+    if (exists $globals{$name}) {
+	warning "Re-adding global $name";
+    }
+    $globals{$name} = shift || 'PerlUndef';
+    return 'global "'.mangled_name($name).'"';
+}
+
+=item B<$name = localvar($var)>
+
+Find local variable C<$var>, returning its IMCC name.
+
+=cut
+
+sub localvar($) {
+    my $var = shift;
+
+    die "Local variable outside function" unless defined $curfunc;
+    return $funcs{$curfunc}->localvar($var);
+}
+
+=item B<add_localvar($var, $type)>
+
+Declare local variable C<$var> of type C<$type>.  Warns if C<$var> is
+already defined.  If C<$type> is a PMC type, C<$var> will
+automatically be initialized.
+
+=cut
+
+sub add_localvar {
+    return $funcs{$curfunc}->add_localvar(@_, 1);
+}
+
+=item B<$name = paramvar($var)>
+
+Find parameter C<$var>.
+
+=cut
+
+sub paramvar($) {
+    my $var = shift;
+    my $mname = mangled_name($var);
+    return $mname if $funcs{$curfunc}->params->paramvar($var);
+    return;
+}
 
 =item B<$name = findvar($var)>
 
@@ -329,43 +413,66 @@ function's parameters, then locals, then globals (which don't exist,
 so it won't find anything there).  Returns undef if the variable is
 not found.  C<$isglobal> is currently unused.
 
-=item B<$name = globalvar($var)>
+=cut
 
-Lookup a global variable.
-
-=item B<$name = localvar($var)>
-
-Find local variable C<$var>, returning its IMCC name.
-
-=item B<$name = paramvar($var)>
-
-Find parameter C<$var>.
-
-=item B<add_localvar($var, $type)>
-
-Declare local variable C<$var> of type C<$type>.  Warns if C<$var> is
-already defined.  If C<$type> is a PMC type, C<$var> will
-automatically be initialized.
-
-=item B<add_globalvar($var [, $type])>
-
-Declare global variable C<$var>.  Warns if C<$var> is already defined.
-C<$var> will be initialized to a new PMC of type C<$type> (or
-C<PerlUndef> if type is not given) before C<main> is called.
+sub findvar($) {
+    my ($var) = @_;
+    my $name;
+    my $isglobal;
+    if ($name = paramvar($var) || localvar($var)) {
+	$isglobal = 0;
+    } else {
+	$name = globalvar($var);
+	$isglobal = 1;
+    }
+    return wantarray ? ($name, $isglobal) : $name;
+}
 
 =item B<push_scope()>
 
 Push a scope within the current function.
 
+=cut
+
+sub push_scope {
+    confess $curfunc unless $curfunc && $funcs{$curfunc};
+    $funcs{$curfunc}->push_scope;
+}
+
 =item B<pop_scope()>
 
 Pop a scope from the current function.
+
+=cut
+
+sub pop_scope {
+    $funcs{$curfunc}->pop_scope;
+}
 
 =item B<mangled_name($thing)>
 
 Mangle any kind of variable, function, or operator name.
 
+Convert names like $foo to _SV_foo. If the name is prefixed with an
+equals sign, then just pass the rest of the string through untouched
+(so the mangled form of "=$#@!!" is "$#@!!".
+
 =back
+
+=cut
+
+sub mangled_name($) {
+    my $name = shift;
+    return substr($name, 1) if $name =~ /^=/; # Passthru char
+    my %mangle = (qw(! _BANG_
+		     ^ IMPL_
+		     $ SV_
+		     @ AV_
+		     % HV_
+		     & CV_));
+    $name =~ s/([\!\$\@\%\&\^])/$mangle{$1}/eg;
+    return '_'.$name;
+}
 
 =head2 B<Labels>
 
@@ -376,7 +483,7 @@ throwing an exception and unwinding the call stack.
 
 XXX: Labels and try/CATCH currently use different mechanisms, contrary
 to Apocalypse 4.  Exceptions are implemented with continuations, and
-are thereforemuch more expensive than labels, which use simple jumps.
+are therefore much more expensive than labels, which use simple jumps.
 Eventually, either continuations will have to become much
 lighter-weight, or the compiler will have to determine when a jump is
 sufficient, and when a continuation or exception is required.  This
@@ -414,15 +521,56 @@ Label handling functions:
 Declare a label in the current scope.  Either C<name> or C<type> may
 be omitted.
 
+=cut
+
+sub declare_label {
+    return $funcs{$curfunc}->add_label(@_);
+}
+
 =item B<emit_label(name => $name, type => $type)>
 
 Emit code for a label in the current scope.  Either C<name> or C<type>
 may be omitted.
 
+=cut
+
+sub emit_label {
+    die "Label outside function" unless defined $curfunc;
+    my $name = $funcs{$curfunc}->label(@_);
+    code(<<END);
+$name:
+END
+}
+
 =item B<goto_label(name => $name, type => $type)>
 
 Branch to the appropriate version of a label.  Either C<name> or
 C<type> may be omitted.
+
+=cut
+
+sub goto_label {
+    die "Label outside function" unless defined $curfunc;
+    my $name = $funcs{$curfunc}->label(@_);
+    error "Undefined label (@_)" unless $name;
+    code(<<END);
+	goto $name
+END
+    return undef;
+}
+
+=item B<fixup_label(from,to)>
+
+Do something intensely interesting that is extremely important for
+you to understand.
+
+=cut
+
+sub fixup_label {
+    my ($from, $to) = @_;
+    die "Code must live within a function" unless defined $curfunc;
+    $funcs{$curfunc}->{code} =~ s/\b$from\b/$to/g;
+}
 
 =back
 
@@ -436,121 +584,25 @@ Sets the topic to C<$x> until the next call to C<set_topic>, or until
 the end of the current scope, whichever is first.  Note that C<$x> is
 a B<variable>, not a value.
 
-=item B<topic()>
-
-Get the current topic variable.
-
-=back
-
 =cut
-
-sub globalvar($) {
-    my $name = shift;
-    if (!exists $globals{$name}) {
- 	if ($OPT{strict}) {
-	    warning "Reference to global $name";
- 	}
-	add_globalvar($name);
-    }
-    return 'global "'.mangled_name($name).'"';
-}
-
-sub add_globalvar($;$) {
-    my $name = shift;
-    if (exists $globals{$name}) {
-	warning "Re-adding global $name";
-    }
-    $globals{$name} = shift || 'PerlUndef';
-    return 'global "'.mangled_name($name).'"';
-}
-
-sub localvar($) {
-    my $var = shift;
-
-    die "Local variable outside function" unless defined $curfunc;
-    return $funcs{$curfunc}->localvar($var);
-}
-
-sub add_localvar {
-    return $funcs{$curfunc}->add_localvar(@_, 1);
-}
-
-sub paramvar($) {
-    my $var = shift;
-    my $mname = mangled_name($var);
-    return $mname if $funcs{$curfunc}->params->paramvar($var);
-    return;
-}
-
-sub findvar($) {
-    my ($var) = @_;
-    my $name;
-    my $isglobal;
-    if ($name = paramvar($var) || localvar($var)) {
-	$isglobal = 0;
-    } else {
-	$name = globalvar($var);
-	$isglobal = 1;
-    }
-    return wantarray ? ($name, $isglobal) : $name;
-}
-
-sub push_scope {
-    confess $curfunc unless $curfunc && $funcs{$curfunc};
-    $funcs{$curfunc}->push_scope;
-}
-
-sub pop_scope {
-    $funcs{$curfunc}->pop_scope;
-}
-
-# Convert names like $foo to _SV_foo. If the name is prefixed with an
-# equals sign, then just pass the rest of the string through untouched
-# (so the mangled form of "=$#@!!" is "$#@!!".
-sub mangled_name($) {
-    my $name = shift;
-    return substr($name, 1) if $name =~ /^=/; # Passthru char
-    my %mangle = (qw(! _BANG_
-		     ^ IMPL_
-		     $ SV_
-		     @ AV_
-		     % HV_
-		     & CV_));
-    $name =~ s/([\!\$\@\%\&\^])/$mangle{$1}/eg;
-    return '_'.$name;
-}
-
-sub declare_label {
-    return $funcs{$curfunc}->add_label(@_);
-}
-
-sub emit_label {
-    die "Label outside function" unless defined $curfunc;
-    my $name = $funcs{$curfunc}->label(@_);
-    code(<<END);
-$name:
-END
-}
-
-sub goto_label {
-    die "Label outside function" unless defined $curfunc;
-    my $name = $funcs{$curfunc}->label(@_);
-    error "Undefined label (@_)" unless $name;
-    code(<<END);
-	goto $name
-END
-    return undef;
-}
 
 sub set_topic {
     $funcs{$curfunc}->set_topic(@_);
 }
+
+=item B<topic()>
+
+Get the current topic variable.
+
+=cut
 
 sub topic {
     my $t = $funcs{$curfunc}->topic;
     error "No topic in $curfunc" unless $t;
     return $t;
 }
+
+=back
 
 =head2 Temporary names
 
@@ -807,6 +859,7 @@ END
 END
 	return primitive_in_context($itmp, 'int', $ctx);
     } else {
+        $DB::single = 1;
 	unimp "Return type ".$ctx->type;
     }
 }
@@ -1149,6 +1202,7 @@ sub emit {
 
     foreach my $param (@{ $params->positional }, @{ $params->optional }) {
         my ($ptype, $pvar) = ($param->type, $param->var);
+        $ptype = P6C::IMCC::paramtype($ptype);
         my $pname = $pvar->name;
         my $pname_mangled = P6C::IMCC::mangled_name($pname);
         print "\t.param $ptype $pname_mangled # Positional param $pname\n";
@@ -1158,7 +1212,7 @@ sub emit {
     if ($params->slurpy_array) {
         my $slurpy = $params->slurpy_array->var->name;
         my $slurpy_name = mangled_name($slurpy);
-        print "\t.param object $slurpy_name # slurpy array $slurpy_name\n";
+        print "\t.param pmc $slurpy_name # slurpy array $slurpy_name\n";
     }
 
     # Create local variables for all the named arguments
@@ -1166,6 +1220,7 @@ sub emit {
                        @{ $params->optional_named })
     {
         my ($ptype, $pvar) = ($param->type, $param->var);
+        $ptype = P6C::IMCC::paramtype($ptype);
         my $pname = $pvar->name;
         my $pname_mangled = P6C::IMCC::mangled_name($pname);
         print "\t.sym $ptype $pname_mangled # Named param $pname\n";
@@ -1179,6 +1234,7 @@ sub emit {
         my $min_count = 2;
         foreach my $param (@{ $params->positional }) {
             my ($ptype, $pvar) = ($param->type, $param->var);
+            $ptype = P6C::IMCC::paramtype($ptype);
             my $pname = $pvar->name;
             my $pname_base = substr($pname, 1);
             my $pname_mangled = P6C::IMCC::mangled_name($pname);
@@ -1199,6 +1255,7 @@ sub emit {
                        @{ $params->optional_named })
     {
         my ($ptype, $pvar) = ($param->type, $param->var);
+        $ptype = P6C::IMCC::paramtype($ptype);
         my $pname = $pvar->name;
         my $pname_base = substr($pname, 1);
         my $pname_mangled = P6C::IMCC::mangled_name($pname);
@@ -1225,7 +1282,7 @@ sub emit {
     }
     print $x->{code};
     print <<END;
-        .pcc_begin_return
+        .pcc_begin_return # fallback
         .pcc_end_return
 END
 #    print <<END;
@@ -1348,6 +1405,14 @@ sub do_assign {
     return $x->l->assign($x->r);
 }
 
+# ':=' binding op. This actually requires *much* deeper language
+# support than is implemented here. This is just a cheap hack to avoid
+# unnecessary 'clone' calls. (TODO)
+sub do_bind {
+    my $x = shift;
+    return $x->l->bind($x->r);
+}
+
 # Handle a comma operator sequence.  Just flattens and calls off to
 # C<P6C::ValueList>.
 sub do_array {
@@ -1388,6 +1453,8 @@ BEGIN {
  '~|'	=> \&simple_binary_pasm,
  '+^'	=> \&simple_binary,
  '~^'	=> \&simple_binary_pasm,
+
+ ':='   => \&do_bind,
 
  '~'	=> \&do_concat,
  '='	=> \&do_assign,
@@ -1582,7 +1649,6 @@ END
 
 ######################################################################
 package P6C::sv_literal;
-use Data::Dumper;
 use P6C::Util ':all';
 use P6C::IMCC ':all';
 
@@ -1771,18 +1837,69 @@ use P6C::IMCC ':all';
 
 sub default_signature {
     return $P6C::IMCC::DEFAULT_SIGNATURE ||=
-      (P6C::Builtins::parse_sig('*@_'))[0];
+      (P6C::Parser::parse_sig('*@_'))[0];
+}
+
+# Closure parameters might be explicitly specified, or gathered
+# implicitly from curried variables, or perhaps grafted on from the
+# extra rule params.
+sub get_params {
+    my ($x) = @_;
+    my @params;
+
+    if (defined($x->params)) {
+	if (UNIVERSAL::isa($x->params, 'P6C::params')) {
+	    @params = map { $_->var } @{$x->params->req}; # XXX:
+	} else {
+	    # Explicit parameter list in "-> $foo, $bar { ... }"
+	    foreach (P6C::Util::flatten_leftop($x->params, ';')) {
+		push @params, P6C::Util::flatten_leftop($_, ',');
+	    }
+	}
+    } else {
+	my %impl;
+	# Look for implicit param-vars like $^a:
+	map_preorder {
+	    if (UNIVERSAL::isa($_, 'P6C::variable')
+		&& $_->implicit) {
+		$impl{$_->name} = $_;
+	    }
+	} $x->block;
+	if (keys %impl) {
+	    @params = sort { $a->name cmp $b->name } values %impl;
+	}
+    }
+
+    # Rules have a set of undeclared parameters.
+
+    if ($x->is_rule && ! $ENV{ORIGINAL_REGEXES}) {
+        unshift(@params, P6C::Rules::rule_vars());
+    }
+
+    return @params;
+}
+
+sub default_args {
+    my ($x) = @_;
+
+    if ($x->is_rule) {
+        return P6C::Rules::default_args();
+    } else {
+        return new P6C::variable(name => '@_', type => 'PerlArray');
+    }
 }
 
 # Generate the code to implement the body of a subroutine (or anything
 # else that contains a closure). That includes grabbing arguments and
-# binding them to parameters.
+# binding them to parameters, and returning values.
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
+
+    code("# ".$x->{comment}) if $x->{comment};
+
     my ($name, $ofunc);		# for closure return value.
     my @params;
-
     push_scope;
     if ($ctx->{is_anon_sub}) {
 	# We need to create an anonymous sub.
@@ -1793,15 +1910,19 @@ sub val {
 
     # Figure out params:
     unless ($x->params) {
+        if ($x->is_rule) {
+            $x->params(P6C::Rules::default_signature());
+        } else {
 	$x->params(P6C::closure::default_signature());
+    }
     }
 
     set_function_params($x->params);
 
-    if ($ctx->{noreturn}) {
+    if ($x->is_rule) {
+        set_function_return([ 'int', 'int' ]);
+    } elsif ($ctx->{noreturn}) {
 	# Do nothing.
-    } elsif (UNIVERSAL::isa($x->block, 'P6C::rule')) {
-	set_function_return('PerlUndef');
     } else {
 	set_function_return('PerlArray');
     }
@@ -1812,22 +1933,10 @@ sub val {
 	return undef;
     }
 
-    my $ret;
-    unless ($ctx->{noreturn}) {
-	declare_label type => 'return';
-    }
-    if (UNIVERSAL::isa($x->block, 'P6C::rule')) {
-	$ret = $x->block->val;
-	unless ($ctx->{noreturn}) {
-	    code(<<END);
-	.pcc_begin_return
-	.return $ret
-	.pcc_end_return
-END
-	    emit_label type => 'return';
-	}
-    } else {
+    declare_label type => 'return' unless ($ctx->{noreturn});
+
 	my @catchers;
+    $x->block([$x->block]) unless UNIVERSAL::isa($x->block, 'ARRAY');
 	foreach (@{$x->block}) {
 	    if ($_->isa('P6C::prefix') && defined($_->name)
 		&& $_->name eq 'CATCH') {
@@ -1835,6 +1944,8 @@ END
 		$_->name(undef);
 	    }
 	}
+
+    my $ret;
 	if (@catchers) {
 	    die "Only one catch block per block, please" if @catchers > 1;
 	    $ret = wrap_with_catch($x, $catchers[0]);
@@ -1844,36 +1955,41 @@ END
 		$stmt->val;
 	    }
 	    $ret = $x->block->[-1]->val;
-	    confess unless $ret || $ctx->{noreturn};
+        confess "missing return value" unless $ret || $ctx->{noreturn};
 	} else {
 	    $ret = newtmp 'PerlUndef';
 	}
 
 	unless ($ctx->{noreturn}) {
-	    code(<<END);
-	.pcc_begin_return
-	.return $ret # regular (non-rule) sub return
-	.pcc_end_return
-END
-	    emit_label type => 'return' unless $ctx->{noreturn};
+        code("\t.pcc_begin_return");
+        if ($x->is_rule) {
+            # FIXME: The general return mechanism should be able to
+            # handle this, but return tuples are not yet supported
+            # properly.
+            code("\t.return ".$_->val) foreach (@{ $ret->vals });
+        } else {
+            code("\t.return $ret # regular (non-rule) return");
 	}
+        code("\t.pcc_end_return");
+        emit_label type => 'return' unless $ctx->{noreturn};
+    } else {
+        code("# noreturn");
     }
+
     if ($ctx->{is_anon_sub}) {
 	# Create a closure.
 	set_function($ofunc);
 	$ret = newtmp 'Sub';
-	code(<<END);
-	newsub $ret, .Sub, _$name
-END
+	code("\tnewsub $ret, .Sub, _$name");
 	$ret = scalar_in_context($ret, $x->{ctx});
     }
+
     pop_scope;
     return $ret;
 }
 
 ######################################################################
 package P6C::variable;
-use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Context;
 use P6C::Util qw(is_scalar is_scalar_expr same_type unimp is_pmc);
@@ -1915,11 +2031,18 @@ sub need_cloning {
     return 1;
 }
 
-sub assign {
+# Horrible hack to get some incredibly trivial cases of bind (the
+# C<:=> operator) to work.
+sub bind {
     my ($x, $thing) = @_;
+    return assign($x, $thing, 1);
+}
+
+sub assign {
+    my ($x, $thing, $suppress_clone) = @_;
     my ($name, $global) = findvar($x->name);
     my $tmpv;
-    my $do_clone = need_cloning($x, $thing);
+    my $do_clone = ! $suppress_clone && need_cloning($x, $thing);
     if (!$global && $thing->isa('P6C::sv_literal')) {
 	$tmpv = $thing->lval;
 	$do_clone = 0;
@@ -1968,6 +2091,7 @@ use P6C::Context;
 
 sub val {
     my $x = shift;
+    code("# " . $x->{comment}) if $x->{comment};
     if ($x->qual && $x->qual->scope ne 'my') {
 	unimp 'global variables';
     }
@@ -2020,6 +2144,51 @@ sub assign {
 	    add_localvar($vars[$i]->name, $vars[$i]->type);
 	    $vars[$i]->assign(new P6C::Register reg => $tmpv->[$i],
 			      type => $thing->{ctx}->type->[$i]);
+	}
+
+	# In case we had more variables than values (tuple rvalues can
+	# do this), declare the rest of the variables.
+	for my $i ($min .. $#vars) {
+	    add_localvar($vars[$i]->name, $vars[$i]->type);
+	}
+    }
+    return undef;
+}
+
+# HACK ALERT!
+sub bind {
+    my ($x, $thing) = @_;
+
+    # optimize simple decls
+    if ($thing->isa('P6C::sv_literal')) {
+	add_localvar($x->vars->name, $x->vars->type);
+	$x->vars->bind($thing);
+	return undef;
+    }
+
+    my $tmpv = $thing->val; # FIXME
+
+    if (ref $x->vars ne 'ARRAY') {
+	if (ref($tmpv) eq 'ARRAY') {
+	    cluck "shouldn't return tuple in scalar context\n";
+	    $tmpv = $tmpv->[-1];
+	}
+	add_localvar($x->vars->name, $x->vars->type);
+	$x->vars->bind(new P6C::Register reg => $tmpv,
+                       type => $x->vars->type);
+    } else {
+	# If we are evaluating an expression in tuple context, the val
+	# function must return an array ref.
+	if (ref $tmpv ne 'ARRAY') {
+	    cluck "Shouldn't pass single item to tuple\n";
+	    $tmpv = [$tmpv];
+	}
+	my @vars = @{$x->vars};
+	my $min = @$tmpv < @vars ? @$tmpv : @vars;
+	for my $i (0.. $min - 1) {
+	    add_localvar($vars[$i]->name, $vars[$i]->type);
+	    $vars[$i]->bind(new P6C::Register reg => $tmpv->[$i],
+                            type => $thing->{ctx}->type->[$i]);
 	}
 
 	# In case we had more variables than values (tuple rvalues can
@@ -2232,7 +2401,8 @@ END
 END
     emit_label name => $label, type => 'last';
     pop_scope;
-    confess Data::Dumper::Dumper($x->{ctx}) unless UNIVERSAL::can($x->{ctx}, 'type');
+    confess "cannot get type?" . Data::Dumper::Dumper($x->{ctx})
+      unless UNIVERSAL::can($x->{ctx}, 'type');
     return undef_in_context($x->{ctx});
 }
 
@@ -2267,6 +2437,15 @@ sub P6C::context::val {
 }
 
 ######################################################################
+
+=head2 P6C::rule
+
+A node representing a rule.
+
+=over
+
+=cut
+
 package P6C::rule;
 use P6C::IMCC::rule;
 use P6C::IMCC ':all';
@@ -2278,7 +2457,7 @@ sub prepare_match_object {
     return $ret;
 }
 
-sub val {
+sub orig_regex_val {
     my $x = shift;
     my $fail = genlabel 'match_failed';
     my $precode;
@@ -2308,4 +2487,96 @@ END
     return scalar_in_context($ret, $x->{ctx});
 }
 
+=item B<val()> : rule -> match obj
+
+Generate code defining a rule
+
+Rules take several arguments:
+ mode     - 0 means try to match rule
+            1 means backtrack into rule
+ rx_pos   - position within input string to start matching
+ rx_input - input string
+ rx_stack - backtracking state stack
+ params   - rule parameters array
+
+and return two values:
+ rx_pos   - position after applying rule (to match or backtrack)
+ status   - 1 for success, 0 for failure
+
+TODO: Rather than returning a status code, this really ought to just jump to
+the appropriate continuation.
+
+TODO: It would also be nice to have two different entry points rather than
+the hokey C<mode> param.
+
+=cut
+
+sub val {
+    return orig_regex_val(@_) if $ENV{ORIGINAL_REGEXES};
+
+    my ($rule) = @_;
+
+    # FIXME
+    my $ctx = $rule->{ctx};
+
+    # The generated regex will transfer control to one of the
+    # following two labels:
+    my $pass_label = genlabel 'match_passed';
+    my $fail_label = genlabel 'match_failed';
+
+    my $return = genlabel 'match_return';
+
+    code("    # Regular expression (rule)", "");
+
+    # We assume the existence of a local variable (parameter,
+    # actually) called "rx_input". Also, "rx_pos" and "rx_stack".
+    $ctx->{rx_input} = findvar("=rx_input");
+    $ctx->{rx_starts} = newlocal('IntList', 'rx_starts'); # FIXME
+    $ctx->{rx_ends} = newlocal('IntList', 'rx_ends'); # FIXME
+    $ctx->{rx_stack} = findvar("=rx_stack");
+    $ctx->{rx_pos} = findvar("=rx_pos");
+    $ctx->{rx_len} = genlocal('int', 'rx_len');
+    $ctx->{preserve_state} = 1;
+    code("length $ctx->{rx_len}, $ctx->{rx_input}");
+
+    if ($ENV{RX_DEBUG}) {
+        code(<<"END");
+print "Attempting to match <$rule> at "
+print $ctx->{rx_pos}
+print "\\n"
+END
+    }
+
+    # This only creates the code, it does not emit it (except I think
+    # it will emit local vars and things -- FIXME)
+    my $regex =
+      P6C::IMCC::Binop::generate_regex($rule, $pass_label, $fail_label, $ctx);
+
+    code(<<"END");
+    eq mode, 1, $regex->{lastback} # Mode: 0 => try to match, 1 => backtrack
+END
+
+    P6C::IMCC::ExtRegex::emit_extregex_code($regex->{code});
+    my $status_var = gentmp('int');
+    code(<<"END");
+$pass_label:
+    $status_var = 1
+    branch $return
+$fail_label:
+    $status_var = 0
+$return:
+END
+
+    return new P6C::ValueList
+      vals => [ P6C::Register->new(reg => $status_var, type => 'int'),
+                P6C::Register->new(reg => $ctx->{rx_pos}, type => 'int') ];
+}
+
 1;
+
+=back
+
+=head1 SEE ALSO
+
+L<P6C::IMCC::prefix> for prefix operators (function calls, return
+statements, if/for/while/given, etc.)

@@ -6,6 +6,7 @@ use Carp 'confess';
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
+use P6C::IMCC::ExtRegex qw(node_to_tree tree_to_list list_to_pasm emit_extregex_code);
 require Exporter;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK);
 @ISA = qw(Exporter);
@@ -337,7 +338,7 @@ END
     return scalar_in_context($res, $ctx);
 }
 
-sub sm_expr_pattern {
+sub sm_expr_pattern_orig {
     my ($e, $r, $ctx) = @_;
     my $val = $e->val;
     my $begin = genlabel 'startre';
@@ -380,6 +381,105 @@ END
 	return primitive_in_context($itmp, 'int', $ctx);
     }
     return scalar_in_context($ret, $ctx);
+}
+
+=head1 sm_expr_pattern($expr,$R,$ctx)
+
+Generate code to match the string $expr against the regex $R.
+
+=cut
+
+my $namespace_ctr = 0;
+sub sm_expr_pattern {
+    return &sm_expr_pattern_orig if $ENV{ORIGINAL_REGEXES};
+
+    my ($expr, $R, $ctx) = @_;
+
+    my $namespace = "regex".++$namespace_ctr;
+    code(".namespace $namespace");
+
+    # Even if $expr is a variable name, we need to convert it to a
+    # string in order to call the length op on it.
+    my $expr_val = ref($expr) ? $expr->val : $expr;
+    $ctx->{rx_input} = newlocal('str', 'rx_input');
+    code("\t$ctx->{rx_input} = $expr_val");
+
+    $ctx->{rx_starts} = newlocal('IntList', 'rx_starts');
+    $ctx->{rx_ends} = newlocal('IntList', 'rx_ends');
+    $ctx->{rx_stack} = newlocal('IntList', 'rx_stack');
+    $ctx->{rx_pos} = genlocal('int', 'rx_pos');
+    $ctx->{rx_len} = genlocal('int', 'rx_len');
+
+    # Initialize state
+    code("$ctx->{rx_pos} = 0");
+    code("length $ctx->{rx_len}, $ctx->{rx_input}");
+
+    my $continue_label = genlabel('regex_done');
+    $ctx->{rx_scan} = 1; # Generate a regex that scans the input
+    my $regex = generate_regex($R, $continue_label, $continue_label, $ctx);
+
+    emit_extregex_code($regex->{code});
+
+    # Set up return value
+    code("$continue_label:");
+    my $ret = newtmp 'PerlUndef';
+    code("\t$ret = $regex->{status}");
+
+    code(".endnamespace $namespace");
+
+    return scalar_in_context($ret, $ctx);
+}
+
+=head1 generate_regex($R,$pass_label,$fail_label,$ctx)
+
+Generate code for the given regex tree $R, using the regex context
+$ctx. $ctx contains a set of variable names:
+
+  rx_input  - input string
+  rx_starts - array of numbered capture starts
+  rx_ends   - array of numbered capture ends
+  rx_stack  - regex backtracking state stack
+  rx_pos    - position within the input to begin matching
+  rx_len    - length of input
+
+=cut
+
+sub generate_regex {
+    my ($R, $pass_label, $fail_label, $ctx) = @_;
+    die "regex pass label required" if ! defined $pass_label;
+    die "regex fail label required" if ! defined $fail_label;
+
+    my $tmp = gentmp 'int';
+
+    # Translate a native perl6 regex optree into a native
+    # languages/regex optree.
+    my $tree = node_to_tree($R, $ctx, DEBUG => $ENV{RX_DEBUG});
+
+#    Regex::Ops::Tree::dump_tree($tree);
+
+    # Render the optree into a sequence of languages/regex list ops.
+    #
+    # Currently, I suppress the list op optimization phase because I
+    # am not informing the optimizer that I will be calling into its
+    # backtracking label, so it optimizes it away. (If I did tell it,
+    # would it leave it in but rename it and thus break anyway?)
+    my $list_regex = tree_to_list($tree, $ctx,
+                                  $pass_label, $fail_label,
+                                  DEBUG => $ENV{RX_DEBUG},
+                                  'no-list-optimize' => 1, # FIXME!!!
+                                 );
+
+    # And finally, convert those list ops to PASM. Er... actually,
+    # that's PIR, the stuff IMCC eats.
+    $ctx->{rx_tmp} = $tmp;
+    my $imcc_regex = list_to_pasm($list_regex, $ctx,
+                                  DEBUG => $ENV{RX_DEBUG},
+                                 );
+
+    return { lastback => $imcc_regex->{back},
+             code => $imcc_regex->{code},
+             status => $tmp,
+           };
 }
 
 sub sm_array_pattern {

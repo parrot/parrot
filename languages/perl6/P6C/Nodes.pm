@@ -4,10 +4,6 @@ This file declares the different node-types that occur in the parse
 tree.  These types may be generated from the parser output (see
 C<Tree.pm>), or by the compiler itself during a pass.
 
-=cut
-
-=pod
-
 =over
 
 =item B<sv_literal>
@@ -29,6 +25,10 @@ C<val> method.  For scalar types, C<lval> is a string; for reference
 types, a reference to the contents' parse tree.
 
 =back
+
+=cut
+
+use Class::Struct P6C::sv_literal => { qw(type $ lval $) };
 
 =item B<variable>
 
@@ -62,7 +62,6 @@ a reference to their parse tree (currently unimplemented).
 
 =cut
 
-use Class::Struct P6C::sv_literal => { qw(type $ lval $) };
 use Class::Struct P6C::variable => { qw(type     $
 					global   $
 					implicit $
@@ -88,11 +87,19 @@ The left and right operands of the operator.
 
 =back
 
+=cut
+
+use Class::Struct P6C::Binop => { qw(op $ l $ r $) };
+
 =item B<hype>
 
 A "hyped" operator.  Its single member, C<op> is the normal operator
 that has been lifted.  If it turns out that other things besides
 operators can be hyped, op may refer to more complex nodes.
+
+=cut
+
+use Class::Struct P6C::hype => { qw(op $) };
 
 =item B<apply_rhs>
 
@@ -116,8 +123,6 @@ implemented.
 
 =cut
 
-use Class::Struct P6C::Binop => { qw(op $ l $ r $) };
-use Class::Struct P6C::hype => { qw(op $) };
 use Class::Struct P6C::apply_rhs => { qw(prop $ subscripts @) };
 
 =item B<indices>
@@ -137,6 +142,10 @@ The parse tree for the subscript contents.
 
 =back
 
+=cut
+
+use Class::Struct P6C::indices => { qw(type $ indices $) };
+
 =item B<subscript_exp>
 
 An item and one or more indices.
@@ -155,7 +164,6 @@ A reference to an array of indices.
 
 =cut
 
-use Class::Struct P6C::indices => { qw(type $ indices $) };
 use Class::Struct P6C::subscript_exp => { qw(thing $ subscripts @) };
 
 =item B<incr>
@@ -178,6 +186,10 @@ The incremented expression.
 
 =back
 
+=cut
+
+use Class::Struct P6C::incr => { qw(post $ op $ thing $) };
+
 =item B<prefix>
 
 A prefix operator.  Many things are prefix operators: filetests
@@ -195,6 +207,10 @@ The operator name.
 The argument tree.
 
 =back
+
+=cut
+
+use Class::Struct P6C::prefix => { qw(name $ args $) };
 
 =item B<context>
 
@@ -214,13 +230,11 @@ The operand.
 
 =cut
 
-use Class::Struct P6C::incr => { qw(post $ op $ thing $) };
-use Class::Struct P6C::prefix => { qw(name $ args $) };
 use Class::Struct P6C::context => { qw(ctx $ thing $) };
 
 =item B<pair>
 
-A pair (e.g. C<a =E<gt> "pair">).
+A pair (e.g. C<< a => "pair" >>).
 
 =over 
 
@@ -230,11 +244,19 @@ The left and right operands of the pair constructor.
 
 =back
 
+=cut
+
+use Class::Struct P6C::pair => { qw(l $ r $) };
+
 =item B<compare>
 
 A comparison sequence.  Its single member, C<seq>, is a reference to a
 list of operators and operands in left-to-right order.  For example,
 C<1 lt 3 lt "three"> becomes C<[1, "lt", 3, "lt", "three"]>
+
+=cut
+
+use Class::Struct P6C::compare => { qw(seq @) };
 
 =item B<ternary>
 
@@ -258,8 +280,6 @@ The "false" branch.
 
 =cut
 
-use Class::Struct P6C::pair => { qw(l $ r $) };
-use Class::Struct P6C::compare => { qw(seq @) };
 use Class::Struct P6C::ternary => { qw(if $ then $ else $) };
 
 =item B<scope_class>
@@ -277,6 +297,10 @@ The variable scope, e.g. "my", "our", "temp".
 The variable class, e.g. "int".
 
 =back
+
+=cut
+
+use Class::Struct P6C::scope_class => { qw(scope $ class $) };
 
 =item B<decl>
 
@@ -298,6 +322,10 @@ A list of properties (e.g. "is foo(42)").
 
 =back
 
+=cut
+
+use Class::Struct P6C::decl => { qw(qual $ vars $ props @) };
+
 =item B<property>
 
 A single variable, class, or function property.
@@ -316,8 +344,6 @@ The argument list (for e.g. C<something(1, 2)>).
 
 =cut
 
-use Class::Struct P6C::scope_class => { qw(scope $ class $) };
-use Class::Struct P6C::decl => { qw(qual $ vars $ props @) };
 use Class::Struct P6C::property => { qw(name $ args $) };
 
 =item B<but>
@@ -335,6 +361,10 @@ The exceptional thing.
 A reference to an array of exception clauses.
 
 =back
+
+=cut
+
+use Class::Struct P6C::but => { qw(buts @ thing $) };
 
 =item B<adverb>
 
@@ -354,7 +384,6 @@ The right-hand side.
 
 =cut
 
-use Class::Struct P6C::but => { qw(buts @ thing $) };
 use Class::Struct P6C::adverb => { qw(adv $ thing $) };
 
 =item B<signature>
@@ -363,46 +392,81 @@ A sub parameter list (not argument list).
 
 =over
 
-=item B<req>
+=item B<positional>
 
-A reference to an array of required parameters, or an empty array if
-none.
+A reference to an array of required positional parameters, or an empty
+array if none.
 
-=item B<opt>
+=item B<optional>
 
-A reference to an array of optional parameters, i.e. those occuring
-after the ';', or an empty array if none.
+A reference to an array of optional positional parameters, i.e. those
+occurring after the ';', or an empty array if none.
 
-=item B<rest>
+=item B<required_named>
 
-The name of the final "slurping" parameter, or C<undef> if none
+A reference to an array of required named parameters.
+
+=item B<slurpy_array>
+
+The final "slurping" parameter, or C<undef> if none present.
+
+=item B<slurpy_named>
+
+The "slurping" parameter for named arguments, or C<undef> if none
 present.
+
+=item B<optional_named>
+
+A reference to an array of optional named parameters.
 
 =back
 
-=item B<param>
+=cut
+
+use Class::Struct P6C::signature => { qw(positional @
+                                         optional @
+                                         required_named @
+                                         slurpy_array $
+                                         slurpy_named $
+                                         optional_named @
+                                        ) };
+
+=item B<sigparam>
 
 A subroutine parameter.
 
 =over
 
-=item B<qual>
+=item B<type>
 
-Variable scope/class.
+The type of the parameter.
+
+=item B<zone>
+
+Which zone the parameter is in -- positional, optional, named, etc.
 
 =item B<var>
 
 The variable.
 
-=item B<props>
+=item B<traits>
 
-Its properties.
+Its traits.
 
 =item B<init>
 
 An initializer expression, or C<undef> if none.
 
 =back
+
+=cut
+
+use Class::Struct P6C::sigparam => { qw(type $
+                                        zone $
+                                        var $
+                                        traits @
+                                        init $
+                                       ) };
 
 =item B<initializer>
 
@@ -422,21 +486,6 @@ The initialization expression.
 
 =cut
 
-use Class::Struct P6C::signature => { qw(positional @
-                                         optional @
-                                         required_named @
-                                         slurpy_array $
-                                         slurpy_named $
-                                         optional_named @
-                                        ) };
-use Class::Struct P6C::sigparam => { qw(type $
-                                        zone $
-                                        var $
-                                        traits @
-                                        init $
-                                       ) };
-
-use Class::Struct P6C::param => { qw(qual $ var $ props @ init $) };
 use Class::Struct P6C::initializer => { qw(op $ expr $) };
 
 =item B<sub_def>
@@ -461,6 +510,10 @@ The closure associated with this name.
 
 =back
 
+=cut
+
+use Class::Struct P6C::sub_def => { qw(qual $ name $ props @ closure $) };
+
 =item B<closure>
 
 A closure, which may be either an anonymous function or the parameters
@@ -479,7 +532,19 @@ The sequence of statements making up the closure body.  This is a
 reference to an array of statements, or a single C<yadda> node for
 C<...> definitions, or undef for a declaration.
 
+=item B<bare>
+
+FIXME: I don't know.
+
+=item B<is_rule>
+
+A boolean flag saying whether the closure is a rule (as opposed to a sub).
+
 =back
+
+=cut
+
+use Class::Struct P6C::closure => { qw(params $ block $ bare $ is_rule $) };
 
 =item B<yadda>
 
@@ -489,8 +554,6 @@ statement is reached.
 
 =cut
 
-use Class::Struct P6C::sub_def => { qw(qual $ name $ props @ closure $) };
-use Class::Struct P6C::closure => { qw(params $ block $ bare $) };
 use Class::Struct P6C::yadda => { qw(msg $) }; # i.e. "..."
 
 =item B<guard>
@@ -508,6 +571,10 @@ The modifier name, either "if", "unless", "while", "until", or "for".
 =item B<test>
 
 =back
+
+=cut
+
+use Class::Struct P6C::guard => { qw(name $ test $ expr $) };
 
 =item B<directive>
 
@@ -528,6 +595,10 @@ The directive's object (e.g. "perl" in "use perl").
 Whatever else is on the directive line.
 
 =back
+
+=cut
+
+use Class::Struct P6C::directive => { qw(name $ thing $ args $) };
 
 =item B<label>
 
@@ -557,9 +628,20 @@ loop.
 
 =cut
 
-use Class::Struct P6C::guard => { qw(name $ test $ expr $) };
-use Class::Struct P6C::directive => { qw(name $ thing $ args $) };
 use Class::Struct P6C::loop => { qw(init $ test $ incr $ block $) };
+
+=item B<label>
+
+=over
+
+=item B<name>
+
+The string name of the label.
+
+=back
+
+=cut
+
 use Class::Struct P6C::label => { qw(name $) };
 
 =item B<class_def>

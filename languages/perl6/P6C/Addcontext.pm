@@ -34,6 +34,7 @@ use P6C::Context;
 use P6C::Nodes;
 use P6C::IMCC 'gentmp';
 use P6C::Util qw(:all);
+use P6C::Rules;
 
 BEGIN { # Add types for builtin binary operators.
     # types for symmetric operators:
@@ -92,8 +93,8 @@ sub P6C::Binop::ctx_right {
     my $op = $x->op;
 
     # Checking for stray assignment operators: "+=" or ">>+=<<".
-    if ((ref($op) && $op->isa('P6C::hype') && $op->op =~ /^([^=]+)=$/)
-	|| $op =~ /^([^=]+)=$/) {
+    if ((ref($op) && $op->isa('P6C::hype') && $op->op =~ /^([^=:]+)=$/)
+	|| $op =~ /^([^=:]+)=$/) {
 	# Turn this into a normal, non-inplace operator and try again.
 	# Yuck.
 	my $new_op = $1;
@@ -118,7 +119,7 @@ sub P6C::Binop::ctx_right {
 	    $_->ctx_right($newctx);
 	}
 
-    } elsif ($op eq '=') {
+    } elsif ($op eq '=' || $op eq ':=') {
 	# Special-case assignment operator to enforce context l -> r
 	# Propagate context:
 	$x->l->ctx_left($x->r, $ctx);
@@ -208,7 +209,7 @@ sub P6C::indices::ctx_right {
     if (defined($x->indices)) {
 	my $index_ctx = $ctx->copy;
 	if ($x->type eq 'Sub') {
- 	    $index_ctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
+ 	    $index_ctx = P6C::Context::default_arg_context();
 
 	} elsif ($ctx->is_tuple) {
 	    $index_ctx->type([($indextype{$x->type}) x @{$ctx->type}]);
@@ -289,7 +290,7 @@ sub P6C::subscript_exp::ctx_right {
 	if ($x->thing->can('name')) {
 	    $ictx = arg_context($x->thing->name);
 	} else {
-	    $ictx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
+	    $ictx = P6C::Context::default_arg_context();
 	}
 	$x->thing->ctx_right(new P6C::Context type => 'PerlUndef');
 	$index->ctx_right($ictx);
@@ -466,12 +467,13 @@ BEGIN {
 # declared yet, none will be found, so we should treat it as taking
 # C<@_>.
 sub arg_context {
-    my ($name, $ctx) = @_;
+    my ($name, $ctx, $is_rule) = @_;
     if (exists $P6C::Context::CONTEXT{$name}) {
 	return $P6C::Context::CONTEXT{$name};
     }
 #     diag "No context for $name";
-    return $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
+    return $is_rule ? P6C::Rules::default_arg_context()
+                    : P6C::Context::default_arg_context();
 }
 
 sub P6C::prefix::ctx_right {
@@ -595,10 +597,7 @@ sub P6C::sub_def::ctx_right {
 
     my $argctx;
     if (!defined $x->closure->params) {
-	$argctx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
-    } elsif (defined($x->closure->params->max)
-	     && $x->closure->params->min != $x->closure->params->max) {
-        $argctx = new P6C::Context type => $x->closure->params->arg_context;
+	$argctx = P6C::Context::default_arg_context();
     } else {
 	$argctx = new P6C::Context type => $x->closure->params->arg_context;
     }
@@ -610,34 +609,6 @@ sub P6C::sub_def::ctx_right {
 }
 
 ##############################
-
-sub get_closure_params {
-    my ($x) = @_;
-    my @params;
-    if (defined($x->params)) {
-	if (UNIVERSAL::isa($x->params, 'P6C::params')) {
-	    @params = map { $_->var } @{$x->params->req}; # XXX:
-	} else {
-	    # Explicit parameter list in "-> $foo, $bar { ... }"
-	    foreach (flatten_leftop($x->params, ';')) {
-		push @params, flatten_leftop($_, ',');
-	    }
-	}
-    } else {
-	my %impl;
-	# Look for implicit param-vars like $^a:
-	map_preorder {
-	    if (UNIVERSAL::isa($_, 'P6C::variable')
-		&& $_->implicit) {
-		$impl{$_->name} = $_;
-	    }
-	} $x->block;
-	if (keys %impl) {
-	    @params = sort { $a->name cmp $b->name } values %impl;
-	}
-    }
-    return @params;
-}
 
 sub setup_catch_blocks {
     my ($x) = @_;
@@ -655,6 +626,7 @@ sub setup_catch_blocks {
 
 sub is_anon_sub {
     my ($x, $ctx) = @_;
+    $DB::single = 1;
     return !($ctx->{noreturn}
 	     || $ctx->{is_sub_def}
 	     || ($ctx->{last_stmt} && $x->bare));
@@ -674,10 +646,9 @@ sub P6C::closure::ctx_right {
     delete $x->{ctx}{is_sub_def};
 
     if ($x->{ctx}{is_anon_sub}) {
-	my @params = get_closure_params($x);
+	my @params = $x->get_params();
 	if (@params) {
-	    my $vals = new P6C::variable(name => '@_',
-					 type => 'PerlArray');
+            my $vals = $x->default_args();
 	    my $paramvar;
 	    if (@params == 1 && is_array_expr($params[0]->type)) {
 		$paramvar = $params[0];
@@ -687,8 +658,11 @@ sub P6C::closure::ctx_right {
 	    my $vars = new P6C::decl(vars => $paramvar,
 				     props => [],
 				     qual => new P6C::scope_class scope=>'my');
-	    my $init = new P6C::Binop(op => '=', l => $vars, r => $vals);
-	    if (defined $x->block) {
+            $vars->{comment} = "source: anon sub bind params";
+	    my $init = new P6C::Binop(op => ':=', l => $vars, r => $vals);
+	    if ($x->is_rule) {
+                $x->block([$init,$x->block]);
+            } elsif (defined $x->block) {
 		unshift @{$x->block}, $init;
 	    } else {
 		diag "Closure with no statements?";
@@ -744,6 +718,9 @@ sub P6C::ValueList::ctx_right {
 	}
 
     } elsif ($ctx->is_sig) {
+
+        $DB::single = 'why do i set the ctx directly in prefix.pm gen_sub_call? why is this not good enough?';
+
         # Separate out the named and unnamed args.
         my (@named_args, @unnamed_args);
         foreach my $arg (@{ $x->vals }) {
@@ -810,7 +787,6 @@ sub P6C::ValueList::ctx_right {
                 next ARG;
             }
 
-            $DB::single = 1;
             die "unwanted named param '$arg_name' given. Valid names are ", join(", ", map { $_->{name} } values %positional, values %optional, values %named);
         }
 
@@ -1102,8 +1078,8 @@ sub P6C::rx_call::ctx_right {
 	$x->{rx_capture_var} = new P6C::variable name => '$'.$x->name,
 	    type => 'PerlUndef';
     }
-    $x->{ctx} = $ctx->copy;
-    $x->args->ctx_right(arg_context($x->name, $ctx));
+    $x->{ctx} = new P6C::Context type => P6C::Rules::default_return_context();
+    $x->args->ctx_right(arg_context($x->name, $ctx, 'is_rule'));
 }
 
 1;

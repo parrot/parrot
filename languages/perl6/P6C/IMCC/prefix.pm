@@ -1,5 +1,13 @@
-######################################################################
-# Prefix operators (i.e. functions and control structures)
+=head1 TITLE
+
+P6C::IMCC::prefix - Prefix operators (i.e. functions and control structures)
+
+=head1 FUNCTIONS
+
+=over
+
+=cut
+
 package P6C::IMCC::prefix;
 # use SelfLoader;
 use strict;
@@ -8,6 +16,7 @@ use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::IMCC::Binop 'do_smartmatch';
 use P6C::Context;
+use P6C::Rules;
 require Exporter;
 use vars qw(@ISA @EXPORT_OK);
 @ISA = qw(Exporter);
@@ -61,7 +70,12 @@ BEGIN {
 
 package P6C::IMCC::prefix;
 
-# if/elsif/elsunless/else sequence
+=item prefix_if
+
+if/elsif/elsunless/else sequence
+
+=cut
+
 sub prefix_if {
     my $x = shift;
     my $end = genlabel "endif";
@@ -133,7 +147,7 @@ sub common_while {
 	goto $end
 $startbody:
 END
-    } else {			# an 'unless' loop
+    } else {			# an 'until' loop
 	# using a simple goto is safe here, because there's no way (I
 	# hope) to insert an exception handler between here and the
 	# end of the loop.
@@ -157,6 +171,12 @@ END
     return $ret;
 }
 
+=item prefix_while
+
+while() expression
+
+=cut
+
 sub prefix_while {
     my $x = shift;
     my ($test, $body) = ($x->args->vals(0), $x->args->vals(1));
@@ -164,29 +184,17 @@ sub prefix_while {
 		 $x->{ctx});
 }
 
-# Do a subroutine call.
-#
-# XXX: currently ignores context.  We don't have a way of
-# communicating context to functions anyways, so this isn't a problem.
+=item gen_sub_call
+
+Do a subroutine call.
+
+XXX: currently ignores context. We don't have a way of communicating
+context to functions anyways, so this isn't a problem.
+
+=cut
+
 sub gen_sub_call {
-    use vars '%o';
-    *o = \%main::o;
-    if ($o{'x-control'}) {
-	goto &gen_sub_call_xcontrol;
-    } else {
-	goto &gen_sub_call_imcc;
-    }
-}
-
-sub gen_sub_call_xcontrol {
-    my ($x) = @_;
-    # Set up arguments (see PDD 3)
-    # P0 = object with this subr.
-    die;
-}
-
-sub gen_sub_call_imcc {
-    my ($x) = @_;
+    my ($x, %options) = @_;
     my $ctx_of_call = $x->{ctx};
 
     my $func = $P6C::IMCC::funcs{$x->name}; # May not be found
@@ -194,17 +202,35 @@ sub gen_sub_call_imcc {
         # Calling function without a prototype
         my $name = $x->name;
         my $ftab = \%P6C::IMCC::funcs;
-        my ($sig, $ctx) = P6C::Builtins::parse_sig('*@_');
+        my ($sig, $ctx);
+        if ($options{is_rule}) {
+            $sig = P6C::Rules::default_signature();
+            $ctx = P6C::Rules::default_arg_context();
+            $func = new P6C::IMCC::Sub params => $sig;
+            $func->rettype(['int','int']);
+        } else {
+            ($sig, $ctx) = P6C::Parser::parse_sig('*@_');
+            $func = new P6C::IMCC::Sub params => $sig;
+            $func->rettype('PerlArray');
+        }
+        unless (ref $name) {
 	$P6C::Context::CONTEXT{$name} = $ctx;
-	$ftab->{$name} =
-          $func =
-            new P6C::IMCC::Sub params => $sig, rettype => 'PerlArray';
+            $ftab->{$name} = $func;
         $func->{'autodeclared'} = 1;
     }
+    }
 
+    my $subpmc = gentmp 'pmc';
+    if (! ref $x->name) {
     my $subname = "&" . $x->name;
-    my $subtmp = gentmp 'pmc';
-    code("", "\tfind_lex $subtmp, \"$subname\"");
+        code("", "\tfind_lex $subpmc, \"$subname\"");
+    } elsif ($x->name->isa('P6C::variable')) {
+        $subpmc = $x->name->val;
+    } else {
+        my $name_val = $x->name->val;
+        code("", "\tfind_lex $subpmc, $name_val");
+    }
+
     if ($x->args) {
         # Certain constructs -- like dynamically-named arguments --
         # prevent us from using a prototype even if it is known.
@@ -213,8 +239,10 @@ sub gen_sub_call_imcc {
 	my $args = $x->args;
         my $ctx = $args->{ctx};
 
-	# Sometimes function arguments are a tuple, sometimes not.  Make
-	# things consistent.
+	# Sometimes function arguments are a tuple, sometimes not.
+	# Make things consistent. FIXME: I don't like this. I think
+	# they ought to be consistent to begin with. Otherwise,
+	# figuring out how things are done is a nightmare.
         if (ref($args) eq 'ARRAY') {
             # Leave as-is
         } elsif (ref($args) eq 'P6C::ValueList') {
@@ -254,21 +282,20 @@ sub gen_sub_call_imcc {
                 if ($arg->{ctx}->flatten) {
                     if ($slurpy_array) {
                         P6C::IMCC::do_append_array($slurpy_array, $val);
-#                         code("\tappend $slurpy_array, $val");
                     } else {
-                        push @positional_stmts, "\t.flatten_arg $val # param $desc";
+                        push @positional_stmts, "\t.flatten_arg $val # param ($desc)";
                     }
                     $am_flattening = 1;
                 } else {
                     if ($am_flattening) {
                         die "ERROR: found non-flattened param after a flattened param\n";
                     }
-                    push @positional_stmts, "\t.arg $val # (non-flat) param $desc";
+                    push @positional_stmts, "\t.arg $val # param ($desc)";
                 }
             } else {
                 # Push some sentinel value
                 # FIXME: What if we are flattening?
-                push @positional_stmts, "\t.arg 0 # unfilled (FIXME) param $desc";
+                push @positional_stmts, "\t.arg 0 # unfilled (FIXME) param = $desc";
             }
         } continue {
             $i++;
@@ -318,17 +345,19 @@ sub gen_sub_call_imcc {
         my $call_return = genlabel 'after_call';
         if ($cannot_prototype) {
             code("\t.pcc_begin non_prototyped # IMCC::prefix cannot proto");
-            code("\t.arg $nu_var # named args");
+            code("\t.arg $nu_var # named args")
+              unless $params->{no_named};
             code(@positional_stmts) if @positional_stmts;
             code("\t.arg $slurpy_array # slurpy array") if $slurpy_array;
         } else {
             code("\t.pcc_begin prototyped # IMCC::prefix prototyped");
-            code("\t.arg $nu_var # named args");
+            code("\t.arg $nu_var # named args")
+              unless $params->{no_named};
             code(@positional_stmts) if @positional_stmts;
 #             code("\t.arg $nk_var");
             code("\t.arg $slurpy_array # slurpy array") if $slurpy_array;
         }
-        code("\t.pcc_call $subtmp");
+        code("\t.pcc_call $subpmc");
         code("$call_return:");
     } else {
 	code("\t.pcc_begin non_prototyped # IMCC::prefix nonprototyped");
@@ -388,8 +417,18 @@ END
     }
 }
 
+=item find_named_param
+
+Look up a named parameter by name in a signature, and return the
+P6C::sigparam object if found. This only looks at named parameters,
+not positional params.
+
+=cut
+
 sub find_named_param {
     my ($params, $key) = @_;
+    return if $params->{no_named};
+
     my $i = 0;
     foreach (@{ $params->required_named }, @{ $params->optional_named }) {
         if ($_->var eq $key) {
@@ -401,8 +440,18 @@ sub find_named_param {
     return; # Nope, not found
 }
 
-sub find_named_positional_param {
+=item find_positional_param_by_name
+
+Look up a positional parameter by name in a signature, and return the
+P6C::sigparam object if found. This only looks at positional parameters,
+not named parameters. (Remember, positional params also have names.)
+
+=cut
+
+sub find_positional_param_by_name {
     my ($params, $key) = @_;
+    return if $params->{no_named};
+
     my $i = 0;
     foreach (@{ $params->positional }, @{ $params->optional }) {
         if ($_->var eq $key) {
@@ -413,6 +462,14 @@ sub find_named_positional_param {
 
     return;
 }
+
+=item categorize_args
+
+Split up an array of args into positional params, named params whose
+names are statically known, named parameters whose names are unknown
+at compile time, etc.
+
+=cut
 
 # FIXME: Add error checking
 sub categorize_args {
@@ -432,7 +489,7 @@ sub categorize_args {
 #                     next;
 #                 }
 
-#                 $slot = find_named_positional_param($params, $key);
+#                 $slot = find_positional_param_by_name($params, $key);
 #                 if (defined($slot)) {
 #                     $positional[$slot] = $arg->second;
 #                     next;
@@ -455,6 +512,12 @@ sub categorize_args {
 
     return (\@positional, \@named_known, \@named_unknown);
 }
+
+=item prefix_for
+
+for() statement
+
+=cut
 
 sub prefix_for {
     my ($x) = @_;
@@ -643,7 +706,12 @@ END
     return $ret;
 }
 
-# unary minus.
+=item prefix_neg
+
+unary minus
+
+=cut
+
 sub prefix_neg {
     my $x = shift;
     my $tmp = $x->args->val;
@@ -654,7 +722,12 @@ END
     return scalar_in_context($res, $x->{ctx});
 }
 
-# unary plus.
+=item prefix_pos
+
+unary plus
+
+=cut
+
 sub prefix_pos {
     my $x = shift;
     my $tmp = $x->args->val;
@@ -665,12 +738,17 @@ END
     return scalar_in_context($res, $x->{ctx});
 }
 
+=item val_noarg
+
+XXX: pretend that the block has a no-argument prototype, since
+otherwise it will complain. This is the wrong behavior for the
+topicalizing control structures, but we don't support them yet,
+anyways.
+
+=cut
+
 sub val_noarg {
     my $block = shift;
-    # XXX: pretend that the block has a no-argument prototype, since
-    # otherwise it will complain.  This is the wrong behavior for the
-    # topicalizing control structures, but we don't support them yet,
-    # anyways.
 
     my $saveparam = $block->params;
     $block->params(new P6C::signature);
@@ -679,11 +757,23 @@ sub val_noarg {
     return $ret;
 }
 
+=item val_topical
+
+???
+
+=cut
+
 sub val_topical {
     my ($block, $varname, $val) = @_;
     add_localvar($varname);
     val_noarg($block);
 }
+
+=item val_topical
+
+foreach() statement
+
+=cut
 
 sub prefix_foreach {
     my ($x) = @_;
@@ -734,6 +824,12 @@ END
     pop_scope;
     return undef_in_context($x->{ctx});
 }
+
+=item wrap_with_catch
+
+I assume this does something like what it says it does.
+
+=cut
 
 sub wrap_with_catch {
     my ($block, $catcher) = @_;
@@ -822,6 +918,13 @@ END
     return $ret;
 }
 
+=item prefix_try
+
+Run something in a try { } block. Implementation just calls wrap_with_catch()
+with no catch block.
+
+=cut
+
 sub prefix_try {
     my ($x) = @_;
     return wrap_with_catch($x->args, undef);
@@ -833,6 +936,12 @@ sub simple_control {
     return undef_in_context($x->{ctx});
 }
 
+=item prefix_return
+
+Return a value.
+
+=cut
+
 sub prefix_return {
     my ($x) = @_;
     my $val = $x->args->val;
@@ -842,6 +951,12 @@ END
     goto_label type => 'return';
     return $val;
 }
+
+=item prefix_when
+
+Handle a case in a given/when clause.
+
+=cut
 
 sub prefix_when {
     my ($x) = @_;
@@ -865,12 +980,24 @@ END
     return $ret;
 }
 
+=item prefix_default
+
+Default case in a given{} block.
+
+=cut
+
 sub prefix_default {
     my ($x) = @_;
     my $ret = val_noarg($x->args);
     goto_label type => 'break';
     return $ret;
 }
+
+=item prefix_given
+
+The all-magical given/when construct.
+
+=cut
 
 sub prefix_given {
     my ($x) = @_;
@@ -920,6 +1047,12 @@ sub prefix_given {
     return undef_in_context($x->{ctx});
 }
 
+=item prefix_defined
+
+Test whether something is defined.
+
+=cut
+
 sub prefix_defined {
     my ($x) = @_;
     my $v = $x->args->val;
@@ -931,3 +1064,7 @@ END
 }
 
 1;
+
+=back
+
+=cut

@@ -37,20 +37,6 @@ use P6C::Tree::String;
 Turn the list output from a rightop directive into a binary tree in the
 proper order.
 
-=item B<infix_left_seq($seq)>
-
-Same for a leftop directive
-
-=item B<flatten_list($node)>
-
-Turn a leftop or rightop list into a list of parse tree nodes by
-calling C<tree> on each of its elements.
-
-=item B<maybe_tree($node)>
-
-Call tree on C<$node> if appropriate.  Useful for handling optional
-items and rules with empty altnerations.
-
 =cut
 
 sub infix_right_seq {
@@ -58,7 +44,7 @@ sub infix_right_seq {
     if (@$x == 1) {
 	return $x->[0]->tree;
     }
-    my $r = $x->[$#{$x}]->tree;
+    my $r = $x->[-1]->tree;
     for (my $i = $#{$x} - 1; $i > 0; $i -= 2) {
 	my $op = ref($x->[$i]) ? $x->[$i]->tree : $x->[$i];
 	my $l = $x->[$i - 1]->tree;
@@ -66,6 +52,12 @@ sub infix_right_seq {
     }
     return $r;
 }
+
+=item B<infix_left_seq($seq)>
+
+Same for a leftop directive
+
+=cut
 
 sub infix_left_seq {
     my $x = shift;
@@ -143,6 +135,13 @@ sub operator_tree {
 ##############################
 # _simple_ optional items:
 
+=item B<maybe_tree($node)>
+
+Call tree on C<$node> if appropriate.  Useful for handling optional
+items and rules with empty alternations.
+
+=cut
+
 sub maybe_tree {
     my $x = shift;
     my $t = ref($x);
@@ -156,6 +155,13 @@ sub maybe_tree {
 	confess "maybe_tree: can't handle $t ($x)";
     }
 }
+
+=item B<flatten_list($node)>
+
+Turn a leftop or rightop list into a list of parse tree nodes by
+calling C<tree> on each of its elements.
+
+=cut
 
 sub flatten_list {		# flatten a comma-list
     my $x = shift;
@@ -368,6 +374,14 @@ sub P6C::subscript::tree {
 }
 
 ##############################
+
+# Four sorts of subscriptables:
+#
+# @x             - variable. Return the variable's tree.
+# (1, 2, ...)    - list literal. Return the list's tree.
+# .foo           - member reference. Topicalize foo??
+# foo(1, 2, ...) - function call. Convert comma list to P6C::ValueList.
+#
 sub P6C::subscriptable::tree {
     my $x = shift;
     if (@$x == 2) {
@@ -556,7 +570,7 @@ sub P6C::props::tree {
     my @ret;
     push @ret, $x->[3]->tree;
     foreach my $ap (@{$x->[4]}) {
-	push @ret, $ap->[$#{$ap}]->tree;
+	push @ret, $ap->[-1]->tree;
     }
     return [@ret];
 }
@@ -564,12 +578,16 @@ sub P6C::props::tree {
 ##############################
 sub P6C::decl::tree {
     my $x = shift;
+    my $decl;
     if ($x->[1] eq '(') {
-	return P6C::decl->new(vars => P6C::Tree::flatten_list($x->[3]),
+	$decl = P6C::decl->new(vars => P6C::Tree::flatten_list($x->[3]),
 			      props => maybe_tree($x->[5]));
-    }
-    return P6C::decl->new(vars => $x->[1]->tree,
+    } else {
+        $decl = P6C::decl->new(vars => $x->[1]->tree,
 			  props => maybe_tree($x->[2]));
+    }
+    $decl->{comment} = "source: tree";
+    return $decl;
 }
 
 ##############################
@@ -740,7 +758,7 @@ sub P6C::param::tree {
     return new P6C::param qual => maybe_tree($x->[1]),
 			  var => $x->[2]->tree,
 			  props => maybe_tree($x->[3]),
-			  init => maybe_tree($x->[$#{$x}]);
+			  init => maybe_tree($x->[-1]);
 }
 
 ##############################
@@ -835,14 +853,27 @@ sub P6C::stmt::tree {
 				   block => $x->[7]->tree);
 
     } elsif ($x->[2] =~ /^(?:sub|rule)$/) {
-	# Make sure we take care of declarations as well as
-	# definitions:
-	my $block = $x->[$#{$x}][1];
-	my $sc = P6C::closure->new(params => maybe_tree($x->[5]),
+	# Make sure we take care of declarations as well as definitions:
+	my $block = $x->[-1][1];
+        my $name = $x->[4]->tree;
+        my $params = maybe_tree($x->[5]);
+        if (! $params) {
+            ($params, $P6C::Context::CONTEXT{$name}) =
+              P6C::Parser::parse_sig('*@_');
+        }
+	my $sc = P6C::closure->new(params => $params,
 				   block => ($block eq ';' ? undef
-					     : $block->tree));
+					     : $block->tree),
+                                   is_rule => $x->[2] eq 'rule');
+
+        # If using the external regex library, adjust the rule by
+        # adding the state-tracking parameters
+        P6C::Rules::adjust_rule($sc)
+            if $sc->is_rule;
+        $sc->{comment} = 'constructed from "sub" or "rule"';
+
 	return P6C::sub_def->new(qual => maybe_tree($x->[1]),
-				 name => $x->[4]->tree,
+				 name => $name,
 				 props => maybe_tree($x->[7]),
 				 closure => $sc);
 	
@@ -869,7 +900,7 @@ sub P6C::block::tree {
 sub P6C::closure::tree {
     my $x = shift;
     my ($block, $arg_index);
-    $block = $x->[$#{$x}]->tree;
+    $block = $x->[-1]->tree;
     if (@$x == 2) {		# bare block
 	return new P6C::closure params => undef, block => $block, bare => 1;
     } elsif (@$x == 4) {	# 'sub', no args
@@ -896,14 +927,18 @@ sub P6C::maybe_decl::tree {
     if (@$x == 1) {
 	return undef;
     }
+    my $decl;
     if (@$x == 4) {
-	return P6C::decl->new(qual => undef,
+	$decl = P6C::decl->new(qual => undef,
 			      vars => [$x->[1]->tree],
 			      props => maybe_tree($x->[3]));
-    }
-    return P6C::decl->new(qual => $x->[1]->tree,
+    } else {
+        $decl = P6C::decl->new(qual => $x->[1]->tree,
 			  vars => [$x->[3]->tree],
 			  props => maybe_tree($x->[4]));
+    }
+    $decl->{comment} = "source: maybe_decl";
+    return $decl;
 }
 
 ##############################
@@ -950,7 +985,9 @@ sub P6C::pattern::tree {
 	    return new P6C::rule pat => $x->[2]->tree;
 	} else {		# rule { ... }
 	    my $rule = $x->[3]->tree;
-	    return new P6C::closure params => undef, block => $rule;
+	    return new P6C::closure params => undef,
+                                    block => $rule,
+                                    is_rule => 1;
 	}
     } else {
 	my $mod = { map { my $t = $_->tree; ($t->mod, $t) } @{$x->[3]} };
@@ -958,7 +995,9 @@ sub P6C::pattern::tree {
 	if ($x->[1] eq 'm') {
 	    return $rule;
 	} else {
-	    return new P6C::closure params => undef, block => $rule;
+	    return new P6C::closure params => undef,
+                                    block => $rule,
+                                    is_rule => 1;
 	}
     }
 }
@@ -1139,15 +1178,17 @@ sub P6C::rx_rulename::tree {
 sub P6C::rx_call::tree {
     my $x = shift;
     my $pat = $x->[1]->tree;
+    my $call = P6C::rx_call->new(name => $pat);
     if ($x->[2] eq '(') {
 	# Call with args
-	return new P6C::rx_call name => $pat, args => $x->[4]->tree;
+        my $args = $x->[4]->tree;
+        my @vals = $args ? flatten_leftop($args, ',') : ();
+	$call->args(P6C::ValueList->new(vals => \@vals));
     } elsif ($x->[2] eq ':') {
 	# Call with string
 	my $strval = $x->[4];
 	$strval =~ s/^\s*//;
-	return new P6C::rx_call name => $pat,
-	    args => new P6C::sv_literal type => 'str', lval => $strval;
+	$call->args(new P6C::sv_literal type => 'str', lval => $strval);
     } else {
 	# Call with pattern or no args
 	my $args = maybe_tree($x->[2]);
@@ -1156,8 +1197,10 @@ sub P6C::rx_call::tree {
 	    # empty pattern => no args.
 	    $args = new P6C::ValueList vals => [];
 	}
-	return new P6C::rx_call name => $pat, args => $args;
+	$call->args($args);
     }
+    P6C::Rules::adjust_call($call);
+    return $call;
 }
 
 sub P6C::rx_cc_neg::tree {

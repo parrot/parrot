@@ -27,69 +27,30 @@ sub is_builtin {
     return exists $builtin_names{+shift};
 }
 
-# Make a blessed nonterminal just as if the parser had created it.
-sub mkraw {
-    my ($type, @info) = @_;
-    return bless [ $type => @info ], "P6C::$type";
-}
-
-# HACK! It would be better to call into the regular parser for this,
-# but it'll take me less time to implement it here than to figure out
-# how to do that.
-sub parse_sig {
-    my ($sig_string) = @_;
-
-    my @sigparams;
-    foreach my $param_str (split(/\s*,\s*/, $sig_string)) {
-        my $class;
-        if (my ($type, $var) = $param_str =~ /(\S+) (\S+)/) {
-            $class = mkraw(class => $type);
-            $param_str = $var;
-        }
-
-        my $zone;
-        if ($param_str =~ /^([\?\*\+])/) {
-            $zone = mkraw(zone => $1);
-            $param_str = substr($param_str, 1);
-        }
-
-        my $sigil = mkraw(sigil => substr($param_str, 0, 1));
-        my $name = mkraw(varname => substr($param_str, 1));
-        my $var = mkraw(variable => $sigil, undef, $name);
-
-        push @sigparams, mkraw(sigparam => $class, $zone, $var, mkraw('traits'), undef);
-    }
-
-    my $sig = mkraw(signature => undef, undef, \@sigparams, undef);
-
-    $sig = $sig->tree;
-    return ($sig, new P6C::Context type => $sig->arg_context);
-}
-
 sub declare {
     my $hash = shift;
     for (qw(print1 exit sleep install_catch pop_catch)) {
-        my ($sig, $ctx) = parse_sig('$a');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$a');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
 	$P6C::Parser::WANT{$_} = 'scalar_expr';
     }
 
     for (qw(time)) {
-        my ($sig, $ctx) = parse_sig('');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
 	$P6C::Parser::WANT{$_} = 'no_args';
     }
 
     for (qw(print warn die)) {
-        my ($sig, $ctx) = parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => [];
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
     for (qw(substr join)) {
-        my ($sig, $ctx) = parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlString';
@@ -97,14 +58,14 @@ sub declare {
     }
 
     for (qw(index)) {
-        my ($sig, $ctx) = parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig, rettype => 'PerlInt';
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
 
     for (qw(length)) {
-        my ($sig, $ctx) = parse_sig('$s');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('$s');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlInt';
@@ -112,7 +73,7 @@ sub declare {
     }
 
     for (qw(reverse)) {
-        my ($sig, $ctx) = parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlArray';
@@ -120,7 +81,7 @@ sub declare {
     }
 
     for (qw(grep map)) {
-        my ($sig, $ctx) = parse_sig('*@params');
+        my ($sig, $ctx) = P6C::Parser::parse_sig('*@params');
 	$P6C::Context::CONTEXT{$_} = $ctx;
 	$hash->{$_} = new P6C::IMCC::Sub params => $sig,
                                          rettype => 'PerlArray';

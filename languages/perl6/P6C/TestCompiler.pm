@@ -10,6 +10,9 @@ See t/harness
 
 =cut
 
+use File::Basename qw(dirname);
+use lib dirname($INC{'P6C/TestCompiler.pm'})."/../../regex/lib";
+
 use Parrot::Config;
 use Exporter;
 require Parrot::Test;

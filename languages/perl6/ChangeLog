@@ -420,3 +420,16 @@
 	    - update concatenation and bitwise operators (Allison Randal)
 	* Test Failures:
 	    - still t/rx/basic.t (4) and t/rx/call.t (2)
+
+2004-01-28
+
+	* Additions:
+	    - grafted languages/regex onto languages/perl6. Implements much
+	      of rules.
+	* Fixes:
+	    - Moved the POD documentation for functions next to the function
+	      being documented. The previous situation was making my head
+	      hurt a little too much.
+	* Test Failures:
+	    - t/rx/call.t     1   256     2    1  50.00%  2
+	    - this is due to a memory corruption bug in parrot itself

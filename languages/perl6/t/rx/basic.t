@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use P6C::TestCompiler tests => 7;
+use P6C::TestCompiler tests => 8;
 use Test::More qw(skip);
 
 ##############################
@@ -177,6 +177,17 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "Anonymous rules (end check)");
+sub main() {
+    my $s = "8";
+    my $r2 = rx / 8 /;
+    print "ok 1\n" if $s =~ / .* <$r2> /; # Don't ask
+}
+CODE
+ok 1
 OUT
 
 ##############################
