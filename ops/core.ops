@@ -2950,28 +2950,19 @@ Find the global named $2 and store it in $1
 =cut
 
 op store_global(in STR, in PMC) {
-/*
-    Alas, I had written the STR, INT and NUM versions of these,
-    but Dan whispers, "We only need the PMC ones...."
-    which of course aren't ready...
-    Have to fix set/get_keyed of PMCs first.
-
     KEY key;
     PMC * globals = interpreter->perl_stash->stash_hash;
     MAKE_KEY(key, $1, enum_key_string, struct_val);
-    globals->vtable->set_pmc_keyed(interpreter, globals, &key, $2);
+    globals->vtable->set_pmc_keyed(interpreter, globals, NULL, $2, &key);
     goto NEXT();
-*/
 }
 
 op find_global(out PMC, in STR) {
-/*
     KEY key;
     PMC * globals = interpreter->perl_stash->stash_hash;
     MAKE_KEY(key, $2, enum_key_string, struct_val);
     $1 = globals->vtable->get_pmc_keyed(interpreter, globals, &key);
     goto NEXT();
-*/
 }
 
 =back

@@ -56,6 +56,11 @@ pmclass PerlUndef {
       return NULL;
    }
 
+   PMC* get_pmc() {
+      Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in PMC context");
+      return NULL;
+   }
+
    BOOLVAL get_bool () {
       Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in boolean context");
       return 0;

@@ -153,6 +153,21 @@ pmclass PerlHash {
         return &SELF->cache;
     }
 
+    PMC* get_pmc_keyed (KEY * key) {
+        PMC* valpmc;
+        STRING* key_string = make_hash_key(INTERP, key);
+        KEY_ATOM* atom = hash_get(INTERP, (HASH*) SELF->data, key_string);
+        if (atom == NULL) {
+            /* XXX Warning: use of uninitialized value */
+            return (PMC*)undef->vtable->get_value(INTERP, undef);
+        }
+        if (atom->type == enum_key_pmc) {
+            return atom->val.pmc_val;
+        }
+        internal_exception(OUT_OF_BOUNDS, "Cannot fetch PMC out of non-PMC key!\n");
+        return NULL;
+    }
+
     BOOLVAL is_same (PMC* other) {
         STRING* s1 = (STRING*)SELF->cache.struct_val;
         STRING* s2 = (STRING*)other->cache.struct_val;
@@ -239,6 +254,14 @@ pmclass PerlHash {
 
     void set_value (void* value) {
         internal_exception(INTERNAL_PANIC, "Cannot set hash to value\n");
+    }
+
+    void set_pmc_keyed (KEY * dest_key, PMC * value, KEY *val_key) {
+        STRING* key_string = make_hash_key(INTERP, val_key);
+        KEY_ATOM atom;
+        atom.type = enum_key_pmc;
+        atom.val.pmc_val = value;
+        hash_put(INTERP, SELF->data, key_string, &atom);
     }
 
     void add (PMC * value, PMC* dest) {
