@@ -545,7 +545,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 }
 
 
-//*******************************************************************************************************
+/*******************************************************************************************************/
 
 #if PARROT_NET_DEVEL
 
@@ -597,7 +597,7 @@ PIO_win32_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         io->remote.sin_port = sa.sin_port;
     }
 
-//    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));
+/*    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));*/
     if((connect((int)io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
         PIO_eprintf(interpreter, "PIO_win32_connect: errno = %d\n", WSAGetLastError());
@@ -714,7 +714,7 @@ AGAIN:
 #endif
 
 
-//************************************************************************************************************
+/************************************************************************************************************/
 
 
 ParrotIOLayerAPI pio_win32_layer_api = {
