@@ -14,7 +14,7 @@ sub has_signal {
 }
 
 SKIP: {
-  skip("no SIGFPE", 2) unless has_signal('SIGFPE');
+  skip("no universal SIGFPE handling", 2);
 
 output_is(<<'CODE', <<OUT, "catch a SIGFPE");
     newsub P0, .Exception_Handler, _handler

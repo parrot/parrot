@@ -57,7 +57,11 @@ Parrot_init_signals(void)
      * s. t/op/hacks_1.pasm
      */
 #ifdef SIGFPE
-    Parrot_set_sighandler(SIGFPE, sig_handler);
+    /*
+     * SIGFPE is architecture specific - some singal an error
+     * some don't, so we have to use direct checks if we are dividing
+     * by zero
+     */
 #endif
 #ifdef SIGINT
     /* Parrot_set_sighandler(SIGINT, sig_handler); */
