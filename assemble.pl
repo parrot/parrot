@@ -92,12 +92,21 @@ while(<>) {
 		if(m/^([INPS])\d+$/) {
 		    # a register.
 		    push @arg_t,lc($1);
-		} elsif(m/^\d+$/) {
-		    # a constant of some sort
-		    push @arg_t,'(ic|nc|sc)';
 		} else {
-		    # a label
-		    push @arg_t,'ic';
+		    # a constant of some sort
+		    if(m/^\[(\d+)\]$/) {
+			# string
+			push @arg_t,'sc';
+		    } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) {
+			# integer
+			push @arg_t,'ic';
+		    } elsif(m/^[a-z][\w]*$/i) {
+			# label
+			push @arg_t,'ic';
+		    } else {
+			# numeric
+			push @arg_t,'nc';
+		    }
 		}
 	    }
 	    my $test;
@@ -109,7 +118,7 @@ while(<>) {
 	    }
 	    my($found_op)=0;
 	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
-		if($op=~/^$test$/) {
+		if($op eq $test) {
 		    $opcode=$op;
 		    $found_op=1;
 		    last;
@@ -141,6 +150,9 @@ while(<>) {
                     $args[$_]=($label{$args[$_]}-$op_pc)/4;
                 }
                 $pc+=$sizeof{$rtype};
+	    } elsif($rtype eq 's') {
+		$args[$_]=~s/[\[\]]//g;
+		$pc+=$sizeof{$rtype};           
             } else {
                 $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
                 $pc+=$sizeof{$rtype};           
@@ -218,8 +230,10 @@ sub constantize {
     # handle \ characters in the constant
     my %escape = ('a'=>"\a",'n'=>"\n",'r'=>"\r",'t'=>"\t",'\\'=>'\\',);
     $s=~s/\\([anrt\\])/$escape{$1}/g;
-    return $constants{$s} if exists $constants{$s};
-    push @constants, $s;
-    return $constants{$s} = $#constants;
+    if(!exists($constants{$s})) {
+	push(@constants,$s);
+	$constants{$s}=$#constants;
+    }
+    return "[".$constants{$s}."]";
 }
 
