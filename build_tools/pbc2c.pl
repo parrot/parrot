@@ -240,7 +240,7 @@ main(int argc, char **argv) {
 	printf( "Can't unpack.\n" );
 	return 1;
     }
-    interpreter->code = pf;
+    Parrot_loadbc(interpreter, pf);
 
     /* setup P0, stolen from embed.c */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
@@ -259,8 +259,10 @@ main(int argc, char **argv) {
         userargv->vtable->push_string(interpreter, userargv, arg);
     }
 
-/*    runops(interpreter, pf, 0); */
+    runops(interpreter, 0);
+/*
     run_compiled(interpreter, (opcode_t *)program_code, (opcode_t *)program_code);
+    */
     exit(0);
 }
 
@@ -284,7 +286,7 @@ END_C
 	    $new_pc = $pc + $op->size;
 	    $source =~ s/^\s*goto PC_$new_pc;\s*$//mg if defined($new_pc);
 	    $source =~ s/\n/\n    /mg;
-#	    $source =~ s/#line.*\n//mg;
+	    $source =~ s/#line.*\n//mg;
 	    $source =~ s/CUR_OPCODE/(start_code + $pc)/mg;
 
 	    printf("\n    /* %s */\n    {\n%s}\n", $op->full_name, $source);

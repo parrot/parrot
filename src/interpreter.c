@@ -250,12 +250,10 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     UINTVAL code_size;          /* in opcodes */
     opcode_t *code_end;
-    void **code_start_prederef;
     void **pc_prederef;
 
     init_prederef(interpreter);
-    code_start_prederef = interpreter->prederef_code + (pc - code_start);
-    pc_prederef = code_start_prederef;
+    pc_prederef = interpreter->prederef_code + (pc - code_start);
 
     while (pc_prederef) {
         pc_prederef =
