@@ -120,6 +120,7 @@ examples/assembly/call.pasm
 examples/assembly/cat.pasm
 examples/assembly/euclid.pasm
 examples/assembly/fact.pasm
+examples/assembly/hanoi.pasm
 examples/assembly/io1.pasm
 examples/assembly/io2.pasm
 examples/assembly/jump.pasm
@@ -134,6 +135,14 @@ examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
 examples/assembly/xml_parser.pasm
+examples/benchmarks/gc_alloc_new.pasm
+examples/benchmarks/gc_alloc_reuse.pasm
+examples/benchmarks/gc_generations.pasm
+examples/benchmarks/gc_header_new.pasm
+examples/benchmarks/gc_header_reuse.pasm
+examples/benchmarks/gc_waves_headers.pasm
+examples/benchmarks/gc_waves_sizeable_data.pasm
+examples/benchmarks/gc_waves_sizeable_headers.pasm
 examples/mops/README
 examples/mops/mops.c
 examples/mops/mops.cs
@@ -225,6 +234,13 @@ languages/cola/int2pasm.pl
 languages/cola/semant.c
 languages/cola/sym.c
 languages/cola/type.c
+languages/imcc/Makefile
+languages/imcc/README
+languages/imcc/imc.c
+languages/imcc/imc.h
+languages/imcc/imcc.l
+languages/imcc/imcc.y
+languages/imcc/sample.imc
 languages/jako/MAINTAINER
 languages/jako/bench.jako
 languages/jako/euclid.jako
@@ -249,6 +265,9 @@ languages/miniperl/Miniperl/t/002_parser.t
 languages/miniperl/Miniperl/t/003_generator.t
 languages/miniperl/Miniperl/t/004_combined.t
 languages/miniperl/mpc
+languages/parrot_compiler/Makefile
+languages/parrot_compiler/gentable.pl
+languages/parrot_compiler/parrot.pasm
 languages/regex/MAINTAINER
 languages/regex/Makefile
 languages/regex/README
@@ -340,6 +359,7 @@ packout.c
 parrot.c
 parrot_coverage.pl
 pbc2c.pl
+pdb.c
 pdump.c
 pmc.c
 pmc_pm.pl
