@@ -1346,11 +1346,13 @@ AUTO_OP or(i, i, i|ic) {
 
 =item B<shl>(i, i, ic)
 
+=item B<shl>(i, ic, i)
+
 Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
 
-AUTO_OP shl(i, i, i|ic) {
+AUTO_OP shl(i, i|ic, i|ic) {
   $1 = $2 << $3;
 }
 
@@ -1361,11 +1363,13 @@ AUTO_OP shl(i, i, i|ic) {
 
 =item B<shr>(i, i, ic)
 
+=item B<shr>(i, ic, i)
+
 Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
 
-AUTO_OP shr(i, i, i|ic) {
+AUTO_OP shr(i, i|ic, i|ic) {
   $1 = $2 >> $3;
 }
 
