@@ -72,7 +72,7 @@ print NCI <<'HEAD';
  */
 
 /* nci.c
- *  Copyright: 2001, 2002 Yet Another Society
+ *  Copyright: 2001-2003 Yet Another Society
  *  CVS Info
  *     $Id$
  *  Overview:

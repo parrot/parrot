@@ -1,3 +1,9 @@
+2003-03-18 03:50  ask
+
+	* Various files
+	  Update Yet Another copyright statements to reflect the (no onger
+          so) shiny new year.
+	
 2003-03-11 22:06  chip
 
 	* Configure.pl: print help on non-option command line args
