@@ -515,16 +515,36 @@ sub COMPARE_OP
     my %rev_map = (
 	'==' => '!=',
 	'!=' => '==',
+	'>' => '<=',
+	'>=' => '<',
+	'<' => '>=',
+	'<=' => '>',
     );
     my $op = $rev_map{$c};
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     my $targ = "pc_xxx";
+    my $label = '';
+    if ($opcode eq 'Label') {
+	$label = "pc_" . $code[$code_l]->[3] . ":";
+	$code_l++;
+	($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
+    }
     if ($opcode eq 'JUMP_IF_FALSE') {
 	print "$cmt\n";
 	$code_l++;
+	$cmt ="\t\t# $opcode\t $rest";
 	if ($rest =~ /to (\d+)/) {
 	    $targ = "pc_$1";
 	}
+    }
+    elsif ($opcode eq 'JUMP_IF_TRUE') {
+	print "$cmt\n";
+	$code_l++;
+	$cmt ="\t\t# $opcode\t $rest";
+	if ($rest =~ /to (\d+)/) {
+	    $targ = "pc_$1";
+	}
+	$op = $c;
     }
     elsif ($opcode eq 'UNARY_NOT' && $code[$code_l+1]->[2] eq 'JUMP_IF_FALSE') {
 	$code_l++;
@@ -533,18 +553,25 @@ sub COMPARE_OP
 	if ($rest =~ /to (\d+)/) {
 	    $targ = "pc_$1";
 	}
+	$cmt ="\t\t# $opcode\t $rest";
 	$code_l++;
 	$op = $c;
     }
+    elsif ($label ne '') {
+	$code_l--;
+    }
+    # XXX the label may be wrong, if the JUMP_IF_x got rewritten
     if ($r->[2] eq 'I' && $l->[2] eq 'I') {
 	print <<"EOC";
 	if $l->[1] $op $r->[1] goto $targ $cmt
+$label
 EOC
     }
     else {
 	my $nl = promote($l);
 	print <<"EOC";
-	if $nl $op $r->[1] goto $targ $cmt
+      	if $nl $op $r->[1] goto $targ $cmt
+$label
 EOC
     }
 }
@@ -661,7 +688,7 @@ sub BUILD_TUPLE
     my ($n, $c, $cmt) = @_;
     my $ar = temp('P');
     print <<EOC;
-	$ar = new PerlArray
+	$ar = new PerlArray $cmt
 EOC
     for (my $i = $n-1; $i >= 0; $i--) {
 	my $p = pop @stack;
@@ -672,6 +699,15 @@ EOC
     push @stack, [-1, $ar, 'P'];
 }
 
+sub BUILD_MAP
+{
+    my ($n, $c, $cmt) = @_;
+    my $ar = temp('P');
+    print <<EOC;
+	$ar = new PerlHash $cmt
+EOC
+    push @stack, [-1, $ar, 'P'];
+}
 sub RAISE_VARARGS
 {
     my ($n, $c, $cmt) = @_;
@@ -695,21 +731,72 @@ EOC
 sub GET_ITER
 {
     my ($n, $c, $cmt) = @_;
+    my $it = temp('P');
+    my $tos = pop @stack;
+    my $var = promote($tos);
     print <<EOC;
-	# TODO $cmt
+	$it = new .Iterator, $var $cmt
+	$it = 0 # .ITERATE_FROM_START
 EOC
+    push @stack, [-1, $it, 'P']
 }
 sub FOR_ITER
 {
     my ($n, $c, $cmt) = @_;
+    my $targ = "pc_xxx";
+    my $tos = pop @stack;
+    my $iter = $tos->[1];
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    my $var = temp('P');
     print <<EOC;
-	# TODO $cmt
+	unless $iter goto $targ $cmt
+	$var = shift $iter
 EOC
+    push @stack, [-1, $var, 'P']
 }
 sub POP_BLOCK
 {
     my ($n, $c, $cmt) = @_;
     print <<EOC;
 	# TODO $cmt
+EOC
+}
+
+sub UNPACK_SEQUENCE
+{
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	# TODO $cmt
+EOC
+}
+
+sub DUP_TOP
+{
+    my $tos = $stack[-1];
+    push @stack, $tos;
+}
+
+sub ROT_THREE
+{
+    my ($n, $c, $cmt) = @_;
+    print "$cmt\n";
+    my $v = pop @stack;
+    my $w = pop @stack;
+    my $x = pop @stack;
+    push @stack, $w;
+    push @stack, $x;
+    push @stack, $v;
+}
+
+sub STORE_SUBSCR
+{
+    my ($n, $c, $cmt) = @_;
+    my $w = pop @stack;
+    my $v = pop @stack;
+    my $x = pop @stack;
+    print <<EOC
+	$v->[1]\[$x->[1]\] = $w->[1] $cmt
 EOC
 }

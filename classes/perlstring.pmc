@@ -678,7 +678,9 @@ Return length of the string.
 
 =item C<STRING *get_string_keyed(PMC *key)>
 
-Returns the string value for C<*key>.
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the string value for C<SELF[key]>.
 
 =cut
 
@@ -688,6 +690,14 @@ Returns the string value for C<*key>.
         STRING *s = PMC_str_val(SELF);
 
         return string_substr(INTERP, s, key_integer(INTERP,key), 1, NULL, 0);
+    }
+    PMC* get_pmc_keyed(PMC* key) {
+        STRING *s = PMC_str_val(SELF);
+        PMC *ret = pmc_new_noinit(INTERP, enum_class_PerlString);
+        PMC_str_val(ret) = string_substr(INTERP, s,
+		key_integer(INTERP,key), 1, NULL, 0);
+        PObj_custom_mark_SET(ret);
+	return ret;
     }
 
 /*
