@@ -428,15 +428,15 @@ events$(O) : $(GENERAL_H_FILES)
 
 interpreter$(O) : interpreter.c $(GENERAL_H_FILES) ${jit_h}
 
-io/io$(O) : $(GENERAL_H_FILES)
+io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
 
-io/io_buf$(O) : $(GENERAL_H_FILES)
+io/io_buf$(O) : $(GENERAL_H_FILES) io/io_private.h
 
-io/io_unix$(O) : $(GENERAL_H_FILES)
+io/io_unix$(O) : $(GENERAL_H_FILES) io/io_private.h
 
-io/io_win32$(O) : $(GENERAL_H_FILES)
+io/io_win32$(O) : $(GENERAL_H_FILES) io/io_private.h
 
-io/io_stdio$(O) : $(GENERAL_H_FILES)
+io/io_stdio$(O) : $(GENERAL_H_FILES) io/io_private.h
 
 memory$(O) : $(GENERAL_H_FILES)
 

@@ -1351,6 +1351,7 @@ io.ops                                            [devel]
 io/TODO                                           [main]doc
 io/io.c                                           []
 io/io_buf.c                                       []
+io/io_private.h                                   []
 io/io_stdio.c                                     []
 io/io_unix.c                                      []
 io/io_win32.c                                     []

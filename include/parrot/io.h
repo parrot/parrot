@@ -7,6 +7,7 @@
  *  Data Structure and Algorithms:
  *  History:
  *      Originally written by Melvin Smith
+ *      2003-08-18: Internal structures moved to io/io_private.h
  *  Notes:
  *  References:
  *      Perl6 RFCs (14,30,47,60,186,239,321,345,350)
@@ -82,41 +83,8 @@ enum {
 };
 /* &end_gen */
 
-/* IO object flags */
-#define PIO_F_READ      00000001
-#define PIO_F_WRITE     00000002
-#define PIO_F_APPEND    00000004
-#define PIO_F_TRUNC     00000010
-#define PIO_F_EOF       00000020
-#define PIO_F_FILE      00000100
-#define PIO_F_PIPE      00000200
-#define PIO_F_SOCKET    00000400
-#define PIO_F_CONSOLE   00001000        /* A terminal                   */
-#define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
-#define PIO_F_BLKBUF    00020000
-#define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
-
-/* Buffer flags */
-#define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
-#define PIO_BF_READBUF  00000002        /* Buffer is read-buffer        */
-#define PIO_BF_WRITEBUF 00000004        /* Buffer is write-buffer       */
-
-
-#define PIO_ACCMODE     0000003
-#define PIO_DEFAULTMODE DEFAULT_OPEN_MODE
-#define PIO_UNBOUND     (size_t)-1
-
 /* This is temporary until subs/code refs are done..*/
 typedef void *DummyCodeRef;
-
-
-struct _ParrotIOBuf {
-    INTVAL flags;               /* Buffer specific flags        */
-    size_t size;
-    unsigned char *startb;      /* Start of buffer              */
-    unsigned char *endb;        /* End of buffer                */
-    unsigned char *next;        /* Current read/write pointer   */
-};
 
 
 #ifdef PIO_OS_WIN32
@@ -137,22 +105,8 @@ extern PIOOFF_T piooffsetzero;
 typedef struct _ParrotIOLayerAPI ParrotIOLayerAPI;
 typedef struct _ParrotIOLayer ParrotIOLayer;
 typedef struct _ParrotIOFilter ParrotIOFilter;
-typedef struct _ParrotIOBuf ParrotIOBuf;
 typedef struct _ParrotIO ParrotIO;
 typedef struct _ParrotIOData ParrotIOData;
-typedef PMC **ParrotIOTable;
-
-struct _ParrotIO {
-    PIOHANDLE fd;               /* Low level OS descriptor      */
-    INTVAL mode;                /* Read/Write/etc.              */
-    INTVAL flags;               /* Da flags                     */
-    PIOOFF_T fsize;             /* Current file size            */
-    PIOOFF_T fpos;              /* Current real file pointer    */
-    PIOOFF_T lpos;              /* Last file position           */
-    ParrotIOBuf b;              /* Buffer structure             */
-    ParrotIOLayer *stack;
-    /* ParrotIOFilter * filters; */
-};
 
 struct _ParrotIOLayer {
     void *self;                 /* Instance specific data       */
@@ -163,21 +117,10 @@ struct _ParrotIOLayer {
     ParrotIOLayer *down;
 };
 
-struct _ParrotIOData {
-    ParrotIOTable table;
-    ParrotIOLayer *default_stack;
-};
-
-
-
-
 #define PIO_DOWNLAYER(x)   x->down
 #define PIO_UPLAYER(x)     x->up
 #define GET_INTERP_IO(i)   (((ParrotIOData*)i->piodata)->default_stack)
 #define GET_INTERP_IOD(i)  ((ParrotIOData *)i->piodata)
-#define PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
-#define PIO_STDOUT(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
-#define PIO_STDERR(i)  (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
 
 /*
  * Terminal layer can't be pushed on top of other layers;
@@ -305,8 +248,6 @@ extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
 
 extern struct PMC *new_io_pmc(struct Parrot_Interp *, ParrotIO *);
 extern void free_io_header(ParrotIO *);
-extern ParrotIOTable alloc_pio_array(int);
-extern int realloc_pio_array(ParrotIOTable *, int);
 extern ParrotIO *PIO_new(struct Parrot_Interp *, INTVAL, INTVAL, INTVAL);
 extern void PIO_destroy(theINTERP, PMC *io);
 
@@ -359,6 +300,11 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 PIOOFF_T PIO_make_offset(INTVAL offset);
 PIOOFF_T PIO_make_offset32(INTVAL hi, INTVAL lo);
 PIOOFF_T PIO_make_offset_pmc(theINTERP, PMC *pmc);
+
+/* the internal system redefines them as macros */
+extern PMC *PIO_STDIN(theINTERP);
+extern PMC *PIO_STDOUT(theINTERP);
+extern PMC *PIO_STDERR(theINTERP);
 
 #endif
 

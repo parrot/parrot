@@ -13,6 +13,9 @@
 
 #include "parrot/parrot.h"
 
+/* This class is actually part of the io subsystem */
+#include "../io/io_private.h"
+
 static void
 enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
 		 void *func, const char *name, const char *proto)

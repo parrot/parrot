@@ -14,6 +14,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "io_private.h"
 
 /* Defined at bottom */
 extern ParrotIOLayerAPI pio_buf_layer_api;

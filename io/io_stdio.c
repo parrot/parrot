@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include "parrot/parrot.h"
+#include "io_private.h"
 
 #ifdef PIO_OS_STDIO
 

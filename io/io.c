@@ -8,7 +8,7 @@
  *      (io_unix, io_win32, io_buf, io_stdio, io_utf8, etc.)
  *  Data Structure and Algorithms:
  *      Uses the IO PMC defined in io.h
- *      Uses ParrotIO structs in io.h
+ *      Uses ParrotIO structs in io_private.h
  *  History:
  *      Initially written by Melvin Smith
  *  Notes:
@@ -20,6 +20,7 @@
  */
 
 #include "parrot/parrot.h"
+#include "io_private.h"
 
 #include <stdarg.h>
 
@@ -786,6 +787,28 @@ PIO_getfd(theINTERP, PMC *pmc)
 
     /* XXX boe: increase size of the fdtable */
     return -1;
+}
+
+/* Implemenation of the PIO_STD* functions on basis of the macro */
+/* Protect prototype from expansion with identity macro */
+#define ID(a) a
+
+PMC *
+PIO_STDIN ID((theINTERP))
+{
+    return PIO_STDIN(interpreter);
+}
+
+PMC *
+PIO_STDOUT ID((theINTERP))
+{
+    return PIO_STDOUT(interpreter);
+}
+
+PMC *
+PIO_STDERR ID((theINTERP))
+{
+    return PIO_STDERR(interpreter);
 }
 
 void
