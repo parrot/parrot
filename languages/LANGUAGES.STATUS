@@ -41,7 +41,9 @@ regex
 
 Ruby
 
-Scheme
+Scheme          Functioning, as far as implemented.
+                Status: Lightly maintained. Lists and functions are working
+                but many functions are missing implementation.
 
 Tcl
 
