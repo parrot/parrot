@@ -14,7 +14,7 @@
 static INTVAL Parrot_int_type (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
-static STRING Parrot_int_name (struct Parrot_Interp *interpreter, PMC* pmc) {
+static STRING *Parrot_int_name (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
 static PMC* Parrot_int_new (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -41,7 +41,7 @@ static INTVAL Parrot_int_get_integer (struct Parrot_Interp *interpreter, PMC* pm
 static FLOATVAL Parrot_int_get_number (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
-static STRING Parrot_int_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
+static STRING *Parrot_int_get_string (struct Parrot_Interp *interpreter, PMC* pmc) {
 }
 
 static BOOL Parrot_int_get_bool (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -83,19 +83,19 @@ static void Parrot_int_set_number_4 (struct Parrot_Interp *interpreter, PMC* pmc
 static void Parrot_int_set_number_5 (struct Parrot_Interp *interpreter, PMC* pmc, FLOATVAL number) {
 }
 
-static void Parrot_int_set_string_1 (struct Parrot_Interp *interpreter, PMC* pmc, STRING string) {
+static void Parrot_int_set_string_1 (struct Parrot_Interp *interpreter, PMC* pmc, STRING *string) {
 }
 
-static void Parrot_int_set_string_2 (struct Parrot_Interp *interpreter, PMC* pmc, STRING string) {
+static void Parrot_int_set_string_2 (struct Parrot_Interp *interpreter, PMC* pmc, STRING *string) {
 }
 
-static void Parrot_int_set_string_3 (struct Parrot_Interp *interpreter, PMC* pmc, STRING string) {
+static void Parrot_int_set_string_3 (struct Parrot_Interp *interpreter, PMC* pmc, STRING *string) {
 }
 
-static void Parrot_int_set_string_4 (struct Parrot_Interp *interpreter, PMC* pmc, STRING string) {
+static void Parrot_int_set_string_4 (struct Parrot_Interp *interpreter, PMC* pmc, STRING *string) {
 }
 
-static void Parrot_int_set_string_5 (struct Parrot_Interp *interpreter, PMC* pmc, STRING string) {
+static void Parrot_int_set_string_5 (struct Parrot_Interp *interpreter, PMC* pmc, STRING *string) {
 }
 
 static void Parrot_int_set_value (struct Parrot_Interp *interpreter, PMC* pmc, void* value) {
