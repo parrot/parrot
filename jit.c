@@ -928,7 +928,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             /* if this is a branch target, align it */
 #ifdef jit_emit_noop
 #  if JUMP_ALIGN
-            if (map[cur_op - code_start] == JIT_BRANCH_TARGET) {
+            if (cur_op <= cur_section->end &&
+                    map[cur_op - code_start] == JIT_BRANCH_TARGET) {
                 while ((long)jit_info->native_ptr & ((1<<JUMP_ALIGN) - 1))
                     jit_emit_noop(jit_info->native_ptr);
             }
