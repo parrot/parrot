@@ -21,6 +21,20 @@ Parrot.
 
 =head2 How do I generate a sub call in PIR?
 
+If you have a fixed-length parameter list, IMCC makes this blindingly easy:
+
+   $P0( $P1, $P2, $P3 )
+
+where $P0 is the function object, and $P1, $P2, and $P3 are its
+parameters. You can also use a function's label in place of the
+object:
+
+   somefunctionlabel( $P1, $P2, $P3 )
+
+You can also get return value(s):
+
+   ($P1,$P2) = $P0( $P1, $P2, $P3 )
+
 =head2 How do I generate a method call in PIR?
 
 =head2 How do I generate a sub call with a variable-length parameter list in PIR?
@@ -31,19 +45,97 @@ Parrot.
 
 =head2 How do I fetch a variable from the global namespace?
 
-There are to possible ways:
+There are two possible ways.  Either use the special PIR syntax:
 
-You can either use the special PIR syntax:
     $P0 = global "name_of_the_global"
     
-or the find_global OP:
+or the C<find_global> op:
+
     find_global $P0, "name_of_the_global"
     
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
+To create lexical variables, you'll need to keep track of how deeply
+nested each block of code is.  Say you have some HLL code like so:
+
+    # depth 0
+    lexical $bar
+    $foo = 3       # global foo
+    $bar = 5       # bar at depth 0
+    {
+      # depth 1
+      lexical $foo
+      $foo = 5     # foo at depth 1
+      {
+         # depth 2
+         lexical $bar   
+         $foo = 7  # also foo at depth 1
+         $bar = 2  # bar at depth 2
+      }
+      {
+         # depth 2, again
+         lexical $foo
+         $foo = 11 # foo at depth 2
+      }
+    }
+
+When you are building your program tree, have each block reference
+its parent block, note its depth, and keep a list of all its lexical
+variables.  At the opening of each block (that has lexical
+variables), emit code to push a lexical pad:
+
+    new_pad 2
+
+where C<2> is the lexical depth of the block. At any point that you exit
+a block, you should emit
+
+    pop_pad
+
+This isn't necessary if you leave a block by invoking a continuation
+(by C<return>ing from a subroutine, for instance), as the continuation will
+automatically put the lexical pad stack back the way it was when the
+continuation was created.
+
+When you need to figure out how to access a certain variable, simply
+look at the topmost block and work your way down the tree until you
+finds a block that declares lexical variables. Then take the lexical
+depth of the block in which you found it and emit some code like so:
+
+    find_lex $P0, 2, "foo"
+
+where C<2> is the depth the variable was found at, C<foo> is the name of the
+variable, and $P0 is a PMC register in which to store the variable.
+
+Note that, by convention (and confusing IMCC syntax), variables, not
+direct values, are stored. So to assign to this lexical variable, you
+would say:
+
+    find_lex $P0, 2, "foo"
+    assign $P0, some_value
+
+instead of:
+
+    store_lex 2, "foo", some_value
+
+You will still need to do a C<store_lex> at some point (probably at the start
+of the block in which it is declared) to create the variable in the first
+place. Put a ParrotReference in it or something.
+
+If, on the other hand, you never find said lexical variable (or if a
+block declares that variable to be global, or whatever other tricks
+your compiler likes to do), you might assume it to be a global, which you
+can access much the same way:
+
+    find_global $P0, "bar"
+    assign $P0, value_to_store
+
 =head2 How do I fetch a variable from the current lexical pad?
 
-=head1 Modules and Classes
+Use lexical depth -1:
+
+    find_lex $P0, -1, "foo"
+
+=head1 Modules, Classes, and Objects
 
 =head2 How do I create a module?
 
@@ -52,6 +144,19 @@ or the find_global OP:
 With the C<newclass> op:
 
     newclass $P0, "ClassA"
+
+=head2 How do I add instance methods to a class?
+
+=head2 How do I add instance variables/attributes?
+
+Each class knows what attribute its object can have. You can add
+attributes to a class (not to individual objects) like so:
+
+    addattribute $P0, "shinyness"
+
+=head2 How do I access attributes?
+
+=head2 When should I use properties vs. attributes?
 
 =head2 How do I create a class that is a subclass of another class?
 
@@ -72,9 +177,8 @@ first and second argument if you do not need the parent class PMC anymore.
 =head2 How do I create a class that has more than one parent class?
 
 First, create a class without a parent class using C<newclass> (or with only
-one subclass,
-see previous question). Then add the other parent classes to it. Please refer
-to the next question for an example.
+one subclass, see previous question). Then add the other parent classes to it.
+Please refer to the next question for an example.
 
 =head2 How do I add another parent class to my class?
 
@@ -118,8 +222,10 @@ the arguments as key/value pairs:
     set $P0["size"], 1.23
     
     find_type $I0, "Alien"
-    new $P1, $I0, $P0		# create an Alien object and pass
+    new $P1, $I0, $P0           # create an Alien object and pass
                                 # the hash to the constructor
+
+=head2 How do I add module/class methods?
 
 =head2 How do I access module/class variables?
 
@@ -127,7 +233,7 @@ the arguments as key/value pairs:
 
 =over 4
 
-=item Revision 0.2 - 10 May 2004
+=item Revision 0.3 - 17 May 2004
 
 =back
 
