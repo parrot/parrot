@@ -1236,6 +1236,7 @@ include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/perltypes.h
 include/parrot/pmc.h
+include/parrot/pobj.h
 include/parrot/pxs.h
 include/parrot/regfuncs.h
 include/parrot/register.h

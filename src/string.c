@@ -42,8 +42,8 @@ static const CHARTYPE *string_unicode_type;
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
-    if (s->flags &
-            (BUFFER_COW_FLAG|BUFFER_constant_FLAG|BUFFER_external_FLAG)) {
+    /* COW_FLAG | constant_FLAG | external_FLAG) */
+    if (PObj_is_cowed_TESTALL(s)) {
         void *p;
         UINTVAL size, bsize;
         if (interpreter) {
@@ -58,12 +58,12 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         bsize = s->buflen;
         /* Create new pool data for this header to use,
          * independant of the original COW data */
-        s->flags &= ~BUFFER_constant_FLAG;
+        PObj_constant_CLEAR(s);
         /* don't shorten string, string_append may use buflen */
         Parrot_allocate_string(interpreter, s, bsize);
         mem_sys_memcopy(s->strstart, p, size);
-        s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
-                BUFFER_bufstart_external_FLAG | BUFFER_immobile_FLAG);
+        /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
+        PObj_is_external_CLEARALL(s);
         if (interpreter) {
             Parrot_unblock_GC(interpreter);
             Parrot_unblock_DOD(interpreter);
@@ -91,16 +91,16 @@ static STRING *
 make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 {
     STRING *d;
-    if (s->flags & BUFFER_constant_FLAG) {
-        d = new_string_header(interpreter,
-                              s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
-        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
+    if (PObj_constant_TEST(s)) {
+        PObj_constant_CLEAR(s);
+        d = new_string_header(interpreter, PObj_get_FLAGS(s));
+        PObj_is_cowed_SETALL(s);
         copy_string_header(interpreter, d, s);
-        d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
+        PObj_constant_CLEAR(d);
     }
     else {
-        d = new_string_header(interpreter, s->flags);
-        s->flags |= BUFFER_COW_FLAG;
+        d = new_string_header(interpreter, PObj_get_FLAGS(s));
+        PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
     }
     return d;
@@ -109,13 +109,13 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 static void
 make_COW_reference_from_header(struct Parrot_Interp *interpreter,
         STRING *s, STRING *d) {
-    if (s->flags & BUFFER_constant_FLAG) {
-        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
+    if (PObj_constant_TEST(s)) {
+        PObj_is_cowed_SETALL(s);
         copy_string_header(interpreter, d, s);
-        d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
+        PObj_constant_CLEAR(d);
     }
-    else {;
-        s->flags |= BUFFER_COW_FLAG;
+    else {
+        PObj_COW_SET(s);
         copy_string_header(interpreter, d, s);
     }
 }
@@ -129,10 +129,7 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
     if (dest && dest != src) {
         /* they are different, dest is not an external string */
 #ifdef GC_IS_MALLOC
-        if (!(dest->flags &
-                    (BUFFER_external_FLAG |
-                     BUFFER_bufstart_external_FLAG |
-                     BUFFER_COW_FLAG)) && dest->bufstart) {
+        if (!PObj_is_external_TESTALL(dest) && dest->bufstart) {
             mem_sys_free(dest->bufstart);
         }
 #endif
@@ -174,7 +171,7 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     if (a != NULL) {
         /* If the destination's constant, then just fall back to
            string_concat */
-        if (a->flags & BUFFER_constant_FLAG) {
+        if (PObj_constant_TEST(a)) {
             return string_concat(interpreter, a, b, Uflags);
         }
         /* First, make sure B is the same type as A, transcoding
@@ -236,7 +233,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     }
 
     s = new_string_header(interpreter, flags);
-    if (flags & BUFFER_external_FLAG) {
+    if (flags & PObj_external_FLAG) {
         /* The following cast discards the 'const'.  That raises
            a warning with gcc, but is ok since the caller indicated
            it was safe by setting BUFFER_external_FLAG.
@@ -244,7 +241,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
            */
         s->bufstart = const_cast(buffer);
         s->buflen = buflen;
-        s->flags |= BUFFER_bufstart_external_FLAG;
+        PObj_bufstart_external_SET(s);
     }
     else {
         Parrot_allocate_string(interpreter, s, buflen);
@@ -253,9 +250,9 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     s->type = type;
 
     if (buffer) {
-        if (flags & BUFFER_external_FLAG) {
+        if (flags & PObj_external_FLAG) {
             s->strstart = s->bufstart;
-            s->flags |= BUFFER_bufstart_external_FLAG;
+            PObj_bufstart_external_SET(s);
         }
         else {
             mem_sys_memcopy(s->strstart, buffer, buflen);

@@ -80,7 +80,8 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h \
 	$(INC)/regfuncs.h $(INC)/string_funcs.h $(INC)/encoding.h \
 	$(INC)/chartype.h $(INC)/oplib.h $(INC)/sub.h $(INC)/unicode.h \
-	$(INC)/perltypes.h $(INC)/exit.h $(INC)/nci.h
+	$(INC)/perltypes.h $(INC)/exit.h $(INC)/nci.h $(INC)/pobj.h
+
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
