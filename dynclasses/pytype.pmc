@@ -81,19 +81,29 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
-        PMC *parent;
-
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
-        if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
-        parent = VTABLE_getprop(INTERP, SELF, PyString_bases);
-        if (parent && VTABLE_defined(INTERP, parent)) {
-            attr = VTABLE_get_attr_str(INTERP, parent, idx);
+        if (!attr || !VTABLE_defined(INTERP, attr)) {
+            PMC *parent = VTABLE_getprop(INTERP, SELF, PyString_bases);
+            if (parent && VTABLE_defined(INTERP, parent)) {
+                if (INTERP->ctx.current_object)
+                    attr = VTABLE_get_attr_str(INTERP, parent, idx);
+                else {
+                    PMC *object = INTERP->ctx.current_object;
+                    INTERP->ctx.current_object = SELF;
+                    attr = VTABLE_get_attr_str(INTERP, parent, idx);
+                    INTERP->ctx.current_object = object;
+                }
+            }
         }
 
         if (!attr || !VTABLE_defined(INTERP, attr)) {
-            real_exception(INTERP, NULL, E_AttributeError,
-                "AttributeError: %Ss", idx);
+            PMC *object = INTERP->ctx.current_object;
+            if (!object) object = SELF;
+            INTERP->ctx.current_object = 0;
+            real_exception(interpreter, NULL, E_AttributeError,
+                "AttributeError: %Ss instance has no attribute '%Ss'",
+                VTABLE_name(INTERP, object), idx);
         }
 
         return attr;

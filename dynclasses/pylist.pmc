@@ -164,6 +164,38 @@ Sets the PMC at element C<index> to C<*value>.
 
 /*
 
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+MMD_PyList: {
+            PMC *iter;
+            INTVAL j;
+
+            if (dest != SELF) {
+                VTABLE_morph(INTERP, dest, PyBuiltin_PyList);
+
+                iter = VTABLE_get_iter(INTERP, SELF);
+                while (VTABLE_get_bool(INTERP, iter)) {
+                    PMC *item = VTABLE_shift_pmc(INTERP, iter);
+                    VTABLE_push_pmc(INTERP, dest, item);
+                }
+            }
+
+            iter = VTABLE_get_iter(INTERP, value);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                PMC *item = VTABLE_shift_pmc(INTERP, iter);
+                VTABLE_push_pmc(INTERP, dest, item);
+            }
+        }
+    }
+/*
+
 =item C<void "append" (PMC* self, PMC* value)>
 
 Extends the array by adding an element of value C<*value> to the end of

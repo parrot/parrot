@@ -72,9 +72,19 @@ Implement __call__ methods by redirecting to one's self, after having
 resolved all of the parameters into a single positional list.  Note:
 at this time, functions with a maximum of 11 arguments are supported.
 
+=cut
+
 TODO: error checking (e.g., missing, duplicate or extra arguments)
 
-=cut
+XXX: the __call__ support is bad, bad, bad.  Consider the following
+conversation: Do you have a __call__ method?  Sure!  Meanwhile I hope
+you don't mind me rearranging your registers.  I hope you are intending
+to call the method real soon...  Have a nice day!
+
+The right way to accomplish this would be to create a method-wrapper
+object and return it.  And this overhead could be avoided in the normal
+case if there were a VTABLE_call_method entry which unambiguously
+involved a find_method in anticipation of an invoke.
 
 */
 
@@ -134,7 +144,9 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
-        return VTABLE_getprop(INTERP, SELF, idx);
+        PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
+        if (attr && VTABLE_defined(INTERP, attr)) return attr;
+        return VTABLE_find_method(INTERP, SELF, idx);
     }
 
 /*

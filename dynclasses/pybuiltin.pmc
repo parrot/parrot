@@ -89,6 +89,7 @@ they will be used frequently here.
             PyBuiltin_PyDict       = Parrot_PMC_typenum(INTERP, "PyDict");
             PyBuiltin_PyException  = Parrot_PMC_typenum(INTERP, "PyException");
             PyBuiltin_PyFloat      = Parrot_PMC_typenum(INTERP, "PyFloat");
+            PyBuiltin_PyFunc       = Parrot_PMC_typenum(INTERP, "PyFunc");
             PyBuiltin_PyGen        = Parrot_PMC_typenum(INTERP, "PyGen");
             PyBuiltin_PyInt        = Parrot_PMC_typenum(INTERP, "PyInt");
             PyBuiltin_PyIter       = Parrot_PMC_typenum(INTERP, "PyIter");

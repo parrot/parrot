@@ -140,14 +140,26 @@ Looks up the method for C<*method_name> and returns it.
         PMC *class;
 
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
-        if (method && VTABLE_defined(INTERP, method)) return method;
 
-        class = VTABLE_getprop(INTERP, SELF, PyString_class);
-        if (class) {
-            return VTABLE_find_method(INTERP, class, method_name);
+        if (!method || !VTABLE_defined(INTERP, method)) {
+            class = VTABLE_getprop(INTERP, SELF, PyString_class);
+            if (class)
+                method = VTABLE_find_method(INTERP, class, method_name);
+            else {
+                method = 0;
+            }
         }
 
-        return 0;
+        /* is this method a Property? */
+        if (method && (method->vtable->base_type != PyBuiltin_PyFunc)) {
+            PMC *get = VTABLE_find_method(INTERP, method, PyString_get);
+            if (get) {
+                method = Parrot_PyClass_run_meth_fromc_P_P(INTERP, get, method,
+                    PyString_get, SELF);
+            }
+        }
+
+        return method;
     }
 
 /*
@@ -164,19 +176,22 @@ Return attribute named C<name>.
         PMC *class, *get;
 
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
-        if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
-        class = VTABLE_getprop(INTERP, SELF, PyString_class);
-        if (class) {
-            attr = VTABLE_get_attr_str(INTERP, class, idx);
+        if (!attr || !VTABLE_defined(INTERP, attr)) {
+            class = VTABLE_getprop(INTERP, SELF, PyString_class);
+            if (class) {
+                PMC *object = INTERP->ctx.current_object;
+                INTERP->ctx.current_object = SELF;
+                attr = VTABLE_get_attr_str(INTERP, class, idx);
+                INTERP->ctx.current_object = object;
+            }
         }
 
         if (!attr || !VTABLE_defined(INTERP, attr)) {
             STRING *message;
-            message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
-                string_to_cstring(INTERP, idx));
-            real_exception(INTERP, NULL, E_AttributeError,
-                string_to_cstring(INTERP, message));
+            real_exception(interpreter, NULL, E_AttributeError,
+                "AttributeError: %Ss instance has no attribute '%Ss'",
+                VTABLE_name(INTERP, SELF), idx);
         }
 
         /* is the attribute a Property? */
@@ -363,6 +378,21 @@ Returns a unique hash for this value
         else {
             return (INTVAL)SELF;
         }
+    }
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Call the object.
+
+=cut
+
+*/
+
+    void* invoke(void* next) {
+        PMC *call = VTABLE_get_attr_str(INTERP, SELF, PyString_call);
+        return VTABLE_invoke(INTERP, call, next);
     }
 
 /*

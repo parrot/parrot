@@ -132,7 +132,7 @@ _handler:
 .end
 CODE
 1
-AttributeError: x
+AttributeError: c instance has no attribute 'x'
 OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
