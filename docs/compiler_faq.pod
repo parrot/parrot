@@ -31,6 +31,8 @@ Parrot.
 
 =head2 How do I fetch a variable from the global namespace?
 
+=head2 How do I use lexical pads to have both a function scope and a global scope?
+
 =head2 How do I fetch a variable from the current lexical pad?
 
 =head1 Modules and Classes
