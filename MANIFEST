@@ -250,6 +250,7 @@ examples/assembly/cat.pasm                        [main]doc
 examples/assembly/coroutine.pasm                  [main]doc
 examples/assembly/euclid.pasm                     [main]doc
 examples/assembly/fact.pasm                       [main]doc
+examples/assembly/getopt_demo.imc                 [main]doc
 examples/assembly/hanoi.pasm                      [main]doc
 examples/assembly/hello-dwim.imc                  [main]doc
 examples/assembly/io1.pasm                        [main]doc
@@ -2111,6 +2112,7 @@ runtime/parrot/chartypes/8859-1.TXT               []
 runtime/parrot/dynext/README                      [main]doc
 runtime/parrot/include/DWIM.imc                   [main]doc
 runtime/parrot/include/README                     [main]doc
+runtime/parrot/include/Getopt_Long.imc            [main]doc
 src/byteorder.c                                   []
 src/call_list.txt                                 [devel]doc
 src/chartype.c                                    []

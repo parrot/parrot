@@ -36,7 +36,7 @@ N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
 N: Bernhard Schmalhofer
-D: Bugfixes
+D: Bugfixes, Getopt_Long.imc
 
 N: Brent Dax
 D: Configure, Parrot_sprintf, embedding, early regex engine.
