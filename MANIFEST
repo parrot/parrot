@@ -2103,6 +2103,7 @@ ops/sys.ops                                       []
 ops/var.ops                                       []
 parrot.spec                                       []
 runtime/parrot/chartypes/8859-1.TXT               []
+runtime/parrot/dynext/README                      [main]doc
 runtime/parrot/include/DWIM.imc                   [main]doc
 runtime/parrot/include/README                     [main]doc
 src/byteorder.c                                   []

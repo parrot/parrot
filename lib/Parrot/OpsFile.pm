@@ -68,8 +68,6 @@ sub read_ops
 {
   my ($self, $file) = @_;
 
-  $file = "ops/" . $file unless $file =~ /ops\//;
-
   my $ops_file = "src/" . $file;
 
   open OPS, $file or die "Could not open ops file '$file' ($!)!";

@@ -6,7 +6,7 @@ LD_SHARED = ${ld_shared}
 PERL = ${perl}
 RM_F = ${rm_f}
 SO = ${so}
-OPS2C = -I..${slash}lib ..${slash}ops2c.pl
+OPS2C = -I..${slash}lib ..${slash}build_tools${slash}ops2c.pl
 
 
 # add your dynamic oplibs here

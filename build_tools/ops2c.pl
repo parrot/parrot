@@ -67,6 +67,7 @@ my $header  = "include/$include";
 my $source  = "src/${base}_ops${suffix}.c";
 
 if ($base =~ m!^dynoplibs/! || $dynamic) {
+    $source  =~ s!src/!!;
     $header = "${base}_ops${suffix}.h";
     $base =~ s!^.*[/\\]!!;
     $include = "${base}_ops${suffix}.h";
@@ -81,7 +82,7 @@ my %hashed_ops;
 
 my $ops;
 if ($core) {
-    $ops = Parrot::OpsFile->new('core.ops');
+    $ops = Parrot::OpsFile->new('ops/core.ops');
     $ops->{OPS} = $Parrot::OpLib::core::ops;
     $ops->{PREAMBLE} = $Parrot::OpLib::core::preamble;
 }
