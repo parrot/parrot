@@ -222,6 +222,31 @@ chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c)
     return c - type->digit_map->first_code + type->digit_map->first_value;
 }
 
+Parrot_Int
+chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c)
+{
+    const struct chartype_digit_map_t *map = type->digit_map;
+    while (map->first_value >= 0) {
+        if (c >= map->first_code && c <= map->last_code)
+            return 1;
+        map++;
+    }
+    return 0;
+}
+
+Parrot_Int
+chartype_get_digit_mapn(const CHARTYPE* type, const UINTVAL c)
+{
+    const struct chartype_digit_map_t *map = type->digit_map;
+    while (map->first_value >= 0) {
+        if (c >= map->first_code && c <= map->last_code)
+            return c - map->first_code + map->first_value;
+        map++;
+    }
+    /* TODO should we throw an exception? */
+    return -1;
+}
+
 /*
  * Generic Unicode mapping functions
  */

@@ -81,6 +81,8 @@ INTVAL chartype_find_chartype(const char *name);
 
 Parrot_Int chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c);
 Parrot_Int chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c);
+Parrot_Int chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c);
+Parrot_Int chartype_get_digit_mapn(const CHARTYPE* type, const UINTVAL c);
 Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from, 
                                    const struct parrot_chartype_t *to, 
                                    Parrot_UInt c);
