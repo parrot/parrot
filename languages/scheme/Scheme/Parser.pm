@@ -82,7 +82,7 @@ The parser reads a list of tokens and turns it into a tree structure.
 
 =head1 AUTHOR
 
-Jeffrey Goff, jgoff@speakeasy.net
+Jeffrey Goff, drforr@hargray.com
 
 =head1 SEE ALSO
 

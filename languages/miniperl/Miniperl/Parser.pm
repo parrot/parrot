@@ -177,7 +177,7 @@ Either new() or parse() accepts a $token_ref, but of course at least one has to.
 
 =head1 AUTHOR
 
-Jeffrey Goff, jgoff@speakeasy.net
+Jeffrey Goff, drforr@hargray.com
 
 =head1 SEE ALSO
 

@@ -106,7 +106,7 @@ in the new() member function. This gets broken into perl6 tokens.
 
 =head1 AUTHOR
 
-Jeffrey Goff, jgoff@speakeasy.net
+Jeffrey Goff, drforr@hargray.com
 
 =head1 SEE ALSO
 

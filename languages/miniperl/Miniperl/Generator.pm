@@ -186,7 +186,7 @@ This walks the tree and generates code
 
 =head1 AUTHOR
 
-Jeffrey Goff, jgoff@speakeasy.net
+Jeffrey Goff, drforr@hargray.com
 
 =head1 SEE ALSO
 

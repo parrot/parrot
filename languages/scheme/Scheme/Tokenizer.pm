@@ -78,7 +78,7 @@ The tokenizer takes a file and splits it into tokens.
 
 =head1 AUTHOR
 
-Jeffrey Goff, jgoff@speakeasy.net
+Jeffrey Goff, drforr@hargray.com
 
 =head1 SEE ALSO
 
