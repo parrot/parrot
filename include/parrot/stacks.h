@@ -28,9 +28,9 @@ typedef enum {
 } Stack_entry_type;
 
 typedef enum {
-    NO_STACK_ENTRY_FLAGS     = 0x0,
-    STACK_ENTRY_CLEANUP_FLAG = 0x01,
-    ALL_STACK_ENTRY_FLAGS    = 0x01
+    NO_STACK_ENTRY_FLAGS     = 0,
+    STACK_ENTRY_CLEANUP_FLAG = 1 << 0,
+    STACK_ENTRY_COW_FLAG     = 1 << 1
 } Stack_entry_flags;
 
 typedef struct stack_entry {
