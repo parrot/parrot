@@ -556,7 +556,7 @@ inline op titlecase(inout STR) :base_core {
 
 =item B<join>(out STR, in STR, in PMC)
 
-Create a new PerlString $1 by joining array elements from array $3
+Create a new string $1 by joining array elements from array $3
 with string $2.
 
 =item B<split>(out PMC, in STR, in STR)
