@@ -276,9 +276,7 @@ PIO_unix_getblksize(PIOHANDLE fd)
 void
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-#  if 0
     fsync(io->fd);
-#  endif
 }
 
 
@@ -425,7 +423,7 @@ ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_null_write_async,
     PIO_unix_read,
     PIO_null_read_async,
-    PIO_null_flush,
+    PIO_unix_flush,
     PIO_unix_seek,
     PIO_unix_tell,
     PIO_null_setbuf,

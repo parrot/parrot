@@ -26,7 +26,6 @@ ParrotIOLayer pio_buf_layer = {
     0, 0
 };
 
-
 /*
  * Currently keeping layer prototypes local to each layer
  * file.
@@ -41,7 +40,7 @@ INTVAL PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 ParrotIO *PIO_buf_fdopen(theINTERP, ParrotIOLayer *l,
                            PIOHANDLE fd, INTVAL flags);
 INTVAL PIO_buf_close(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-void PIO_buf_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+INTVAL PIO_buf_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 size_t PIO_buf_read(theINTERP, ParrotIOLayer *l,
                       ParrotIO *io, void *buffer, size_t len);
 size_t PIO_buf_write(theINTERP, ParrotIOLayer *l,
@@ -51,6 +50,7 @@ INTVAL PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 INTVAL PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                       INTVAL hi, INTVAL lo, INTVAL whence);
 PIOOFF_T PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+
 
 /* Local util functions */
 size_t PIO_buf_writethru(theINTERP, ParrotIOLayer *layer,
@@ -78,18 +78,21 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
     ParrotIO *io;
     ParrotIOLayer *l = layer;
     while (l) {
-        if (l->api->Open) {
-            io = (*l->api->Open) (interpreter, l, path, flags);
-            /*
-             * We have an IO stream now setup stuff
-             * for our layer before returning it.
-             */
-            PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
-            return io;
-        }
         l = PIO_DOWNLAYER(l);
+        if (l && l->api->Open) break;
     }
-    return NULL;
+    if (!l) {
+        /* Now underlying layer found */
+        return NULL;
+    }
+
+    io = (*l->api->Open) (interpreter, l, path, flags);
+    /*
+     * We have an IO stream now setup stuff
+     * for our layer before returning it.
+     */
+    PIO_buf_setbuf(interpreter, l, io, PIO_UNBOUND);
+    return io;
 }
 
 
@@ -187,7 +190,7 @@ PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-void
+INTVAL
 PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     long wrote;
@@ -198,7 +201,7 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     if (!io->b.startb
         || (io->flags & (PIO_F_BLKBUF | PIO_F_LINEBUF)) == 0
         || (io->b.flags & (PIO_BF_WRITEBUF | PIO_BF_READBUF)) == 0)
-        return;
+        return 0;
     /*
      * Write flush
      */
@@ -213,7 +216,7 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
             io->b.next = io->b.startb;
             /* Release buffer */
             io->b.flags &= ~PIO_BF_WRITEBUF;
-            return;
+            return 0;
         }
         else {
             /* FIXME: I/O Error */
@@ -224,6 +227,7 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
         io->b.flags &= ~PIO_BF_READBUF;
         io->b.next = io->b.startb;
     }
+    return -1;
 }
 
 
@@ -253,7 +257,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         avail = io->b.size - (io->b.next - io->b.startb);
     }
     else if (io->b.flags & PIO_BF_READBUF) {
-        io->b.flags |= ~PIO_BF_READBUF;
+        io->b.flags &= ~PIO_BF_READBUF;
         io->b.next = io->b.startb;
         avail = io->b.size;
     }
@@ -278,17 +282,19 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         }
     }
     else if (avail > len) {
+        io->b.flags |= PIO_BF_WRITEBUF;
         memcpy(io->b.next, buffer, len);
         io->b.next += len;
         return len;
     }
     else {
-        /* Fill remainder, flush, then try to buffer more */
         unsigned int diff = (int)(len - avail);
+
+        io->b.flags |= PIO_BF_WRITEBUF;
+        /* Fill remainder, flush, then try to buffer more */
         memcpy(io->b.next, buffer, diff);
         /* We don't call flush here because it clears flag */
-        wrote = PIO_buf_writethru(interpreter, layer, io,
-                                    io->b.startb, io->b.size);
+        PIO_buf_flush(interpreter, layer, io);
         memcpy(io->b.startb, ((const char *)buffer + diff), len - diff);
         io->b.next = io->b.startb + (len - diff);
         return len;
@@ -378,7 +384,7 @@ ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_null_write_async,
     PIO_buf_read,
     PIO_null_read_async,
-    PIO_null_flush,
+    PIO_buf_flush,
     PIO_null_seek,
     PIO_null_tell,
     PIO_buf_setbuf,
