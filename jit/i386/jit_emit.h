@@ -2871,7 +2871,6 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                 /* we need the offset of PMC_int_val */
                 jit_emit_mov_rm_i(pc, emit_EDX,
                         &PMC_REG(count_regs(sig, signature->strstart)));
-                //emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                 emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
                         (size_t) &PMC_int_val((PMC *) 0));
                 emitm_pushl_r(pc, emit_EAX);
