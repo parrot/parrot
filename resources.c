@@ -787,6 +787,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
   /* How much is free. That's the total size minus the amount we used */
   new_block->free = new_block->size - (new_block->top - new_block->start);
 
+  interpreter->memory_collected += (new_block->top - new_block->start);
 
   /* Now we're done. Put us as the only block on the free list and
      free the rest */
