@@ -1,6 +1,3 @@
-#ifndef __LIST_H_
-#define __LIST_H_
-
 /*
  * list.h
  *  Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
@@ -13,6 +10,9 @@
  */
 
 #include "parrot/parrot.h"
+
+#if !defined(PARROT_LIST_H_GUARD)
+#define PARROT_LIST_H_GUARD
 
 typedef struct List_chunk {
     Buffer data;                /* item store */
@@ -43,14 +43,14 @@ typedef struct List {
     List_chunk *last;	        /* last chunk */
 } List;
 
-enum {
+typedef enum {
     enum_grow_unknown,          /* at beginning, or after emptying list */
     enum_grow_mixed = 1,        /* other */
     enum_grow_fixed = fixed_items,        /* fixed maximum size */
     enum_grow_growing = grow_items        /* growing at begin of list */
 } ARRAY_GROW_TYPE;
 
-enum {
+typedef enum {
     enum_add_at_start,          /* don't swap these */
     enum_add_at_end
 } ARRAY_ADD_POS;
@@ -90,4 +90,5 @@ void list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
 	INTVAL count);
 
 #endif
+
 
