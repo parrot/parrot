@@ -1,9 +1,8 @@
-Parrot-0.1.0 was reported to compile and run tests successfuly on these
-platforms:
+Parrot was reported to compile and run tests successfuly on these platforms:
 
-Platform                B8    Runloops      Feature   Compile  Tests
+Platform                B8    Runloops      Feature   Compile  Tests YYYYMMDD
                            CGoto JIT EXEC   Thr Sig
----------------------------------------------------------------------
+-----------------------------------------------------------------------------
 aix-pwr-xlc6            B    -    Y    -     Y   -      Y       Y
 aix-pwr64-xlc6          B8   -    -    -     Y   -      Y       Y/20
 darwin                  B    Y    Y    Y     Y   -      Y       Y
@@ -11,7 +10,7 @@ freebsd5.2-i386              Y    Y/4  Y     Y   -      Y       Y
 hpux-pa_risc2.0-gcc2.9  B         -    -     Y   Y      Y*2     Y
 ?-ia64
 irix6.5                                      Y          Y       Y/2
-irix64                   8                              Y       Y/22
+irix6.5-64              B8                   Y   Y      Y       Y    20040816
 linux-ppc-gcc2.95.3     B    Y    Y    Y     Y   Y      Y       Y
 linux-ppc-gcc3.2.3      B    Y    Y/9  Y     Y   Y      Y       Y
 linux-sparc-gcc3.3.3    B    Y    -    -     Y   Y      Y       Y
@@ -27,7 +26,7 @@ openbsd_beta_3.5-vax                                    Y*4     Y/26
 os2
 solaris8-sparc-cc       B    -    Y/84 -     -   -      Y       Y
 tru64-alpha-gcc          8                   Y          Y       Y
-tru64-alpha-dec_c_v5.6   8                              Y       Y/7
+tru64-alpha-dec_c_v6.5   8                   Y          Y       Y    20040816
 vms
 win32-bcc
 win32-cygwin                 Y    Y                     Y       Y
@@ -51,6 +50,8 @@ JIT   ... JIT core is supported
 EXEC  ... compiling to native executables is supported
 Threads . Parrot is multi-threaded
 Signals . Parrot catches kind of a SIGINT (program termination) signal
+
+YYYYMMDD  The date tested.
 
 Remarks:
 *1 no recent report
