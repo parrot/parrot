@@ -21,7 +21,7 @@ static BOOLVAL world_inited=0;
 struct Parrot_Interp *
 Parrot_new(void)
 {
-    if(!world_inited) {
+    if (!world_inited) {
         world_inited=1;
         init_world();
     }
@@ -31,14 +31,15 @@ Parrot_new(void)
 void
 Parrot_init(struct Parrot_Interp *interpreter)
 {
-    if(!world_inited) {
+    if (!world_inited) {
         world_inited=1;
         init_world();
     }
 }
 
 void
-Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_val value)
+Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, 
+               Parrot_flag_val value)
 {
     interpreter->flags |= flag;
 }
@@ -46,7 +47,7 @@ Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_
 void
 Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 {
-	PARROT_WARNINGS_on(interpreter, wc);
+    PARROT_WARNINGS_on(interpreter, wc);
 }
 
 struct PackFile *
@@ -60,18 +61,18 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     char *program_code;
     struct PackFile *pf;
 
-    if(filename == NULL || strcmp(filename, "-")==0) { /* read from STDIN */
+    if (filename == NULL || strcmp(filename, "-")==0) { /* read from STDIN */
         char *cursor;
         INTVAL read_result;
 
         program_size = 0;
            
-        program_code = (char*)malloc((unsigned)program_size + 1024);
+        program_code = (char *)malloc((unsigned)program_size + 1024);
         if (NULL == program_code) {
             fprintf(stderr, "Parrot VM: Could not allocate buffer to read packfile from stdin.\n");
             return NULL;
         }
-        cursor = (char*)program_code;
+        cursor = (char *)program_code;
 
         while ((read_result = read(0, cursor, 1024)) > 0) {
             program_size += read_result;
@@ -82,7 +83,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                 return NULL;
             }
 
-            cursor = (char*)program_code + program_size;
+            cursor = (char *)program_code + program_size;
         }
 
         if (read_result < 0) {
@@ -96,7 +97,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             return NULL;
         }
         
-        if(!S_ISREG(file_stat.st_mode)) {
+        if (!S_ISREG(file_stat.st_mode)) {
             fprintf(stderr, "Parrot VM: %s is not a normal file.\n", filename);
             return NULL;
         }
@@ -111,8 +112,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
 #ifndef HAS_HEADER_SYSMMAN
 
-        program_code = (char*)mem_sys_allocate(program_size);
-        read(fd, (void*)program_code, program_size);
+        program_code = (char *)mem_sys_allocate(program_size);
+        read(fd, (void *)program_code, program_size);
 
         if (!program_code) {
             fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n", filename, errno);
@@ -134,7 +135,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     pf = PackFile_new();
 
-    if(!PackFile_unpack(interpreter, pf, (opcode_t*)program_code, (unsigned)program_size) ) {
+    if (!PackFile_unpack(interpreter, pf, (opcode_t*)program_code, (unsigned)program_size) ) {
         fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }
@@ -154,35 +155,35 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     INTVAL i;
     PMC* userargv;
     
-    if(interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (interpreter->flags & PARROT_DEBUG_FLAG) {
         fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
 
-        if(interpreter->flags & PARROT_BOUNDS_FLAG) {
+        if (interpreter->flags & PARROT_BOUNDS_FLAG) {
             fprintf(stderr, "*** Parrot VM: Bounds checking enabled. ***\n");
         }
-        if(interpreter->flags & PARROT_PREDEREF_FLAG) {
+        if (interpreter->flags & PARROT_PREDEREF_FLAG) {
             fprintf(stderr, "*** Parrot VM: Predereferencing enabled. ***\n");
         }
-        if(interpreter->flags & PARROT_JIT_FLAG) {
+        if (interpreter->flags & PARROT_JIT_FLAG) {
             fprintf(stderr, "*** Parrot VM: JIT enabled. ***\n");
         }
     }
 
 #if !defined(JIT_CAPABLE) || !JIT_CAPABLE
-    if(interpreter->flags & PARROT_JIT_FLAG) {
+    if (interpreter->flags & PARROT_JIT_FLAG) {
         fprintf(stderr, "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
 #endif
 
-    if(interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (interpreter->flags & PARROT_DEBUG_FLAG) {
         fprintf(stderr, "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n", argc);
     }
 
     userargv=pmc_new(interpreter, enum_class_PerlArray);
     
     for(i=0; i < argc; i++) {
-        if(interpreter->flags & PARROT_DEBUG_FLAG) {
+        if (interpreter->flags & PARROT_DEBUG_FLAG) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
@@ -213,7 +214,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         printf("  -----  ------------  ------  ----------  ----------\n");
 
         for (j = 0; j < interpreter->op_count; j++) {
-            if(interpreter->profile[j].numcalls > 0) {
+            if (interpreter->profile[j].numcalls > 0) {
                 op_count++;
                 call_count += interpreter->profile[j].numcalls;
                 sum_time += interpreter->profile[j].time;
@@ -237,7 +238,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         );
     }
 
-    if(interpreter->flags & PARROT_DEBUG_FLAG) {
+    if (interpreter->flags & PARROT_DEBUG_FLAG) {
         fprintf(stderr, "\
 *** Parrot VM: Dumping GC info ***\n\
 \tTotal memory allocated: %u\n\
