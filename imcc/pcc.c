@@ -4,13 +4,13 @@
  * A specific call convention implementation. Called by the generic
  * API for subs (see sub.c).
  *
- * FASTCALL convention can be enabled with: 
+ * FASTCALL convention can be enabled with:
  * .pragma fastcall
  * at the start of an IMC module.
  *
  * This will allow library developers (or non-Perl languages) to turn
- * on very efficient optimizations and a lightweight calling convention. 
- * It could also be used for internal libs that do not callout to PCC 
+ * on very efficient optimizations and a lightweight calling convention.
+ * It could also be used for internal libs that do not callout to PCC
  * routines, but present PCC entry points for the module itself.
  *
  * XXX FIXME: FASTCALL is not currently finished and may not be completely
@@ -213,7 +213,7 @@ pcc_emit_check_param(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *in
         sprintf(buf, "_%ccheck_param_type", IMCC_INTERNAL_CHAR);
     check_type = _get_sym(ghash, buf);
     if(!check_type) {
-        PIO_eprintf(NULL, "imcc: fatal: pcc_emit_check_param: symbol %s not found\n", buf);        
+        PIO_eprintf(NULL, "imcc: fatal: pcc_emit_check_param: symbol %s not found\n", buf);
         exit(1);
     }
     regs[0] = check_type;
@@ -249,7 +249,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
      */
     if(sub->pcc_sub->nargs <= 0)
         goto NONAMEDPARAMS;
-    
+
     p3 = i0 = NULL;
     label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->prototyped;
@@ -279,7 +279,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
                             PIO_eprintf(NULL, "expand_sub nextreg[%d]: switching to arg overflow\n", next[j]);
 #endif
 			    goto overflow;
-                        } 
+                        }
                         else if(next[j] >= 17) {
                             PIO_eprintf(NULL,
                                 "imcc internal error: next reg(%d) > 16 for PCC convention\n",
@@ -765,7 +765,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
 /*
  * Expand a PCC subroutine call (IMC) into its PASM instructions
  * This is the nuts and bolts of Perl6/Parrot routine call style
- * 
+ *
  * XXX FIXME: VTCONST and VT_CONSTP, VTREG and VT_REGP are
  * mixed and matched here. There should only be pointer types
  * in sub->args. Trim out non-pointer type checks and verify
@@ -773,7 +773,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
  * This potentially applies to much of the flow analysis code
  * that is currently lazy and checks for too many things, which
  * is fine but it was the source of a really nasty bug when add_pcc_arg()
- * was not setting arg->type correctly. 
+ * was not setting arg->type correctly.
  * And THAT is the reason for all this nasty TRACE code. -Mel
  */
 void
@@ -856,7 +856,8 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 lazy:
                     for (j = 0; j < 4; j++) {
                         if (arg_reg->set == types[j]) {
-                            if (arg_reg->color == next[j]) {
+                            if (arg_reg->type != VTCONST &&
+                                    arg_reg->color == next[j]) {
                                 next[j]++;
                                 break;
                             }

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 31;
+use TestCompiler tests => 32;
 
 ##############################
 # Parrot Calling Conventions
@@ -30,6 +30,36 @@ output_is(<<'CODE', <<'OUT', "basic syntax - invokecc, constants");
 CODE
 10
 20
+OUT
+
+output_is(<<'CODE', <<'OUT', "constants, bug 24667");
+.sub _main prototyped
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .arg 5
+    .arg 6
+    .arg 7
+    .pcc_call sub
+    .pcc_end
+    end
+.end
+.sub _sub prototyped
+    .param int a
+    .param int b
+    .param int c
+    print a
+    print "\n"
+    print b
+    print "\n"
+    print c
+    print "\n"
+    end
+.end
+CODE
+5
+6
+7
 OUT
 
 ##############################
