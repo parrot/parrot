@@ -13,6 +13,8 @@
 #if !defined(PARROT_ENCODING_H_GUARD)
 #define PARROT_ENCODING_H_GUARD
 
+#include "parrot/parrot.h"
+
 typedef void (*encoding_to_encoding_t)(Interp* interpreter, STRING *string);
 typedef STRING *(*encoding_copy_to_encoding_t)(Interp* interpreter, STRING *string);
 typedef UINTVAL (*encoding_get_codepoint_t)(Interp* interpreter, STRING *source_string, UINTVAL offset);
@@ -49,6 +51,19 @@ typedef struct _encoding ENCODING;
 ENCODING *Parrot_new_encoding(Interp* interpreter);
 ENCODING *Parrot_load_encoding(Interp* interpreter, const char *encoding_name);
 
+#define ENCODING_TO_ENCODING(interp, source, offset, count) ((ENCODING *)source->encoding)->to_encoding(interp, source, offset, count)
+#define ENCODING_COPY_TO_ENCODING(interp, source) ((ENCODING *)source->encoding)->copy_to_encoding(interp, source)
+#define ENCODING_GET_CODEPOINT(interp, source, offset) ((ENCODING *)source->encoding)->get_codepoint(interp, source, offset)
+#define ENCODING_SET_CODEPOINT(interp, source, offset, codepoint) ((ENCODING *)source->encoding)->set_codepoint(interp, source, offset, codepoint)
+#define ENCODING_GET_BYTE(interp, source, offset) ((ENCODING *)source->encoding)->get_byte(interp, source, offset)
+#define ENCODING_SET_BYTE(interp, source, offset, value) ((ENCODING *)source->encoding)->set_byte(interp, source, offset, value)
+#define ENCODING_GET_CODEPOINTS(interp, source, offset, count) ((ENCODING *)source->encoding)->get_codepoints(interp, source, offset, count)
+#define ENCODING_GET_BYTES(interp, source, offset, count) ((ENCODING *)source->encoding)->get_bytes(interp, source, offset, count)
+#define ENCODING_SET_CODEPOINTS(interp, source, offset, count, newdata) ((ENCODING *)source->encoding)->set_codepoints(interp, source, offset, count, newdata)
+#define ENCODING_SET_BYTES(interp, source, offset, count, newdata) ((ENCODING *)source->encoding)->set_bytes(interp, source, offset, count, newdata)
+#define ENCODING_BECOME_ENCODING(interp, source) ((ENCODING *)source->encoding)->become_encoding(interp, source)
+#define ENCODING_CODEPOINTS(interp, source) ((ENCODING *)source->encoding)->codepoints(interp, source)
+#define ENCODING_BYTES(interp, source) ((ENCODING *)source->encoding)->bytes(interp, source)
 
 #endif /* PARROT_ENCODING_H_GUARD */
 /*

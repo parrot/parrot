@@ -129,6 +129,10 @@ struct parrot_string_t {
     void *strstart;
     UINTVAL strlen;
     parrot_string_representation_t representation;
+    void *encoding; /* These should be of type ENCODING * and CHARSET *
+                     * respectively, but I'm not sure how to get them
+                     * to do that without a whole lotta work right now */
+    void *charset;
     UINTVAL hashval; /* cached hash value computation; not yet used */
 };
 

@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-charset/binary.c
+charset/ascii.c
 
 =head1 DESCRIPTION
 
-This file implements the charset functions for binary data
+This file implements the charset functions for ascii data
 
 =cut
 
@@ -21,11 +21,12 @@ This file implements the charset functions for binary data
 static ENCODING *preferred_encoding;
 
 static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
-    return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
+  STRING *return_string = NULL;
+
+  return return_string;
 }
 
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string) {
-    ENCODING_SET_BYTES(interpreter, source_string, offset, replace_count, insert_string);
 }
 
 static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
@@ -50,27 +51,27 @@ static void decompose(Interp *interpreter, STRING *source_string) {
 }
 
 static void upcase(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't upcase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void downcase(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't downcase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void titlecase(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't titlecase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static void upcase_first(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't upcase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 static void downcase_first(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't downcase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 static void titlecase_first(Interp *interpreter, STRING *source_string) {
-    internal_exception(INVALID_CHARTYPE, "Can't titlecase binary data");
+    internal_error(INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs) {
