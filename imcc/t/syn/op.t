@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 20;
+use TestCompiler tests => 21;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "+=");
@@ -256,3 +256,12 @@ CODE
 in sub
 done
 OUT
+
+# ticket 32393
+output_is(<<'CODE', '', "empty sub");
+.sub _foo
+.end
+
+.emit
+.eom
+CODE

@@ -343,10 +343,10 @@ begin_return_or_yield(int yield)
 %type <t> type newsub ptr
 %type <i> program class class_body member_decls member_decl field_decl
 %type <i> method_decl class_namespace
-%type <i> global constdef sub emit pcc_sub sub_body pcc_ret
+%type <i> global constdef sub emit pcc_sub  pcc_ret
 %type <i> compilation_units compilation_unit pmc_const
 %type <s> classname relop
-%type <i> labels _labels label statements statement sub_call
+%type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
@@ -461,7 +461,7 @@ pasm_args:
 emit:
      EMIT          { cur_unit = imc_open_unit(interp, IMC_PASM);
                      function = "(emit)"; }
-     pasmcode
+     opt_pasmcode
      EOM           { /*
                       if (optimizer_level & OPT_PASM)
                          imc_compile_unit(interp, IMC_INFO(interp)->cur_unit);
@@ -469,6 +469,11 @@ emit:
                      */
                      $$=0; }
    ;
+
+opt_pasmcode:
+     /* empty */
+  | pasmcode
+  ;
 
 class_namespace:
     NAMESPACE '[' keylist ']'
@@ -562,7 +567,7 @@ sub:
           i->r[1]->pcc_sub->pragma = $4;
         }
      sub_params
-     sub_body { $$ = 0; }
+     sub_body  ESUB { $$ = 0; }
    ;
 
 sub_params:
@@ -577,7 +582,8 @@ sub_param:
    ;
 
 sub_body:
-     statements ESUB                   { $$ = 0; }
+     /* empty */
+   |  statements
    ;
 
 pcc_sub:
@@ -590,7 +596,7 @@ pcc_sub:
             i->r[1]->pcc_sub->pragma = $4;
          }
      pcc_params
-     sub_body { $$ = 0; }
+     sub_body  ESUB { $$ = 0; }
    ;
 
 pcc_params:
@@ -714,14 +720,21 @@ pcc_result:
          {  mk_ident($4, $3); is_def=0; $$=0; }
    ;
 
-begin_ret_or_yield: PCC_BEGIN_RETURN { $$ = 0 } | PCC_BEGIN_YIELD { $$ = 1 } ;
-end_ret_or_yield:   PCC_END_RETURN              | PCC_END_YIELD ;
+begin_ret_or_yield:
+     PCC_BEGIN_RETURN { $$ = 0; }
+   | PCC_BEGIN_YIELD { $$ = 1; }
+   ;
+
+end_ret_or_yield:
+     PCC_END_RETURN
+   | PCC_END_YIELD
+   ;
 
 pcc_ret:
     begin_ret_or_yield   '\n'
     { begin_return_or_yield($1); }
      pcc_returns
-     end_ret_or_yield 
+     end_ret_or_yield
          { $$ = 0;  asm_state = AsmDefault; }
    | pcc_return_many { asm_state = AsmDefault; $$ = 0;  }
 

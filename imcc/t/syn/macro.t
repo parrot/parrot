@@ -292,7 +292,7 @@ output_like( <<'CODE', <<OUTPUT, "unexpected IDENTIFIER" );
     end
 .end
 CODE
-/syntax error, unexpected IDENTIFIER/
+/error, unexpected IDENTIFIER/
 OUTPUT
 
 output_like( <<'CODE', <<OUTPUT, "unknown macro" );
