@@ -243,6 +243,7 @@ use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
 use Parrot::Pmc2c qw(count_newlines);
+use Parrot::Pmc2c::Library;
 use strict;
 use Data::Dumper;
 use Getopt::Long;
