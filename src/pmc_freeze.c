@@ -924,6 +924,9 @@ thaw_create_pmc(Parrot_Interp interpreter, PMC *pmc, visit_info *info,
                 break;
         }
         assert(info->thaw_ptr);
+        /*TODO
+         * DOD_WRITE_BARRIER(interpreter, info->container, NULL, pmc);
+         */
         *info->thaw_ptr = pmc;
     }
     return pmc;

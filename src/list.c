@@ -1022,6 +1022,11 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
         ((FLOATVAL *) PObj_bufstart(&chunk->data))[idx] = *(FLOATVAL *)item;
         break;
     case enum_type_PMC:
+        if (list->container) {
+            DOD_WRITE_BARRIER(interpreter, list->container,
+                    ((PMC **) PObj_bufstart(&chunk->data))[idx],
+                    (PMC*)item);
+        }
         ((PMC **) PObj_bufstart(&chunk->data))[idx] = (PMC *)item;
         break;
     case enum_type_STRING:
@@ -1131,6 +1136,11 @@ list_new(Interp *interpreter, INTVAL type)>
 
 Returns a new list of type C<type>.
 
+=item C<void
+list_pmc_new(Interp *interpreter, PMC *container)>
+
+Create a new list containing PMC* values in PMC_data(container).
+
 =cut
 
 */
@@ -1172,6 +1182,14 @@ list_new(Interp *interpreter, INTVAL type)
     return list;
 }
 
+void
+list_pmc_new(Interp *interpreter, PMC *container)
+{
+    List *l = list_new(interpreter, enum_type_PMC);
+    l->container = container;
+    PMC_data(container) = l;
+}
+
 /*
 
 =item C<List *
@@ -1187,6 +1205,11 @@ C<list_new_init()> uses these initializers:
 
 After getting these values out of the key/value pairs, a new array with
 these values is stored in user_data, where the keys are explicit.
+
+=item C<void
+list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init)>
+
+Create a new list containing PMC* values in PMC_data(container).
 
 =cut
 
@@ -1259,6 +1282,18 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     VTABLE_set_integer_keyed_int(interpreter, user_array, 0,  size);
     VTABLE_set_pmc_keyed_int(interpreter, user_array, 1, multi_key);
     return list;
+}
+
+void
+list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init)
+{
+    List *l = list_new_init(interpreter, enum_type_PMC, init);
+    l->container = container;
+    PMC_data(container) = l;
+    /*
+     * this is a new PMC, so no old value
+     */
+    DOD_WRITE_BARRIER(interpreter, container, NULL, l->user_data);
 }
 
 /*

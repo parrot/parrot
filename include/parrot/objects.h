@@ -69,7 +69,11 @@ void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
  */
 #define SLOTTYPE PMC*
 #define get_attrib_num(x, y)    ((PMC **)x)[y]
-#define set_attrib_num(x, y, z) ((PMC **)x)[y] = z
+#define set_attrib_num(o, x, y, z) \
+    do { \
+        DOD_WRITE_BARRIER(interpreter, o, ((PMC **)x)[y], z); \
+        ((PMC **)x)[y] = z; \
+    } while (0)
 #define get_attrib_count(x)     PMC_int_val2(x)
 #define new_attrib_array() Dont_use
 #define set_attrib_flags(x) PObj_data_is_PMC_array_SET(x)
@@ -89,7 +93,7 @@ void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 
 #  define ATTRIB_COUNT(obj) PMC_int_val2(obj)
 #  define SET_CLASS(arr, obj, class) \
-       set_attrib_num(arr, POD_CLASS, class)
+       set_attrib_num(obj, arr, POD_CLASS, class)
 #  define GET_CLASS(arr, obj) \
        get_attrib_num(arr, POD_CLASS)
 

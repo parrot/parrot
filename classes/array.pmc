@@ -182,7 +182,7 @@ Initializes the PMC by calling the underlying C<list_new()> function.
 */
 
     void init () {
-        PMC_data(SELF) = list_new(INTERP, enum_type_PMC);
+        list_pmc_new(INTERP, SELF);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -200,7 +200,7 @@ size, number of dimensions, etc.
 */
 
     void init_pmc (PMC *init) {
-        PMC_data(SELF) = list_new_init(INTERP, enum_type_PMC, init);
+        list_pmc_new_init(INTERP, SELF, init);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -229,9 +229,11 @@ Return a clone of the array.
 */
 
     PMC* clone () {
+        List *l;
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_data(dest) = list_clone(INTERP, (List *) PMC_data(SELF));
+        PMC_data(dest) = l = list_clone(INTERP, (List *) PMC_data(SELF));
+        l->container = dest;
         return dest;
     }
 

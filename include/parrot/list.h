@@ -33,6 +33,7 @@ typedef struct List {
     Buffer chunk_list;          /* pointers to chunks */
     UINTVAL length;             /* number of items in list */
     UINTVAL start;		/* offset, where array[0] is */
+    PMC * container;            /* the Array PMC */
     int item_type;	        /* item type */
     int item_size;		/* item size */
     int items_per_chunk;	/* override defaults */
@@ -76,6 +77,8 @@ typedef enum {
 
 List * list_new(Interp *interpreter, INTVAL type);
 List * list_new_init(Interp *interpreter, INTVAL type, PMC *init);
+void list_pmc_new(Interp *interpreter, PMC *container);
+void list_pmc_new_init(Interp *interpreter, PMC *container, PMC *init);
 List * list_clone(Interp *interpreter, List *other);
 void list_mark(Interp* interpreter, List* list);
 void list_visit(Interp* interpreter, List* list, void*);

@@ -767,6 +767,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
             internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
         e = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_pmc;
+        DOD_WRITE_BARRIER(INTERP, SELF, UVal_pmc(e->val), src);
         UVal_pmc(e->val) = src;
         e = (HashEntry *) PMC_data(SELF) + 1;
         if (key >= UVal_int(e->val))

@@ -248,14 +248,16 @@ Sets the property for C<*key> to C<*value>.
             VTABLE_set_pmc_keyed_str(interpreter,
                 PMC_metadata(SELF), key, value);
         } else {
+            PMC *prop;
             if (!SELF->pmc_ext)
                 add_pmc_ext(INTERP, SELF);
             /* first make new hash */
-            PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
-            VTABLE_init(interpreter, PMC_metadata(SELF));
+            PMC_metadata(SELF) = prop =
+                pmc_new_noinit(interpreter, enum_class_PerlHash);
+            DOD_WRITE_BARRIER(interpreter, SELF, NULL, prop);
+            VTABLE_init(interpreter, prop);
             /* then the key, else it vanishes with --gc-debug */
-            VTABLE_set_pmc_keyed_str(interpreter,
-                PMC_metadata(SELF), key, value);
+            VTABLE_set_pmc_keyed_str(interpreter, prop, key, value);
 #if 0
     PObj_report_SET(PMC_metadata(SELF));
 #endif
@@ -294,8 +296,11 @@ Returns the PMC's properties.
         if (!SELF->pmc_ext)
             add_pmc_ext(INTERP, SELF);
         if (!PMC_metadata(SELF)) {
-            PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
-            VTABLE_init(interpreter, PMC_metadata(SELF));
+            PMC *prop;
+            PMC_metadata(SELF) = prop =
+                pmc_new_noinit(interpreter, enum_class_PerlHash);
+            DOD_WRITE_BARRIER(interpreter, SELF, NULL, prop);
+            VTABLE_init(interpreter, prop);
         }
         return PMC_metadata(SELF);
     }

@@ -159,8 +159,8 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class)
     }
 
     /* And replace what was in there with the new ones */
-    set_attrib_num(class_slots, PCD_ATTRIBUTES, attr_offset_hash);
-    set_attrib_num(class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
+    set_attrib_num(class, class_slots, PCD_ATTRIBUTES, attr_offset_hash);
+    set_attrib_num(class, class_slots, PCD_ATTRIB_OFFS, class_offset_hash);
     /* And note the totals */
     ATTRIB_COUNT(class) = cur_offset - POD_FIRST_ATTRIB;
 }
@@ -306,7 +306,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     parents = pmc_new(interpreter, enum_class_Array);
     VTABLE_set_integer_native(interpreter, parents, 1);
     VTABLE_set_pmc_keyed_int(interpreter, parents, 0, base_class);
-    set_attrib_num(child_class_array, PCD_PARENTS, parents);
+    set_attrib_num(child_class, child_class_array, PCD_PARENTS, parents);
 
     /* Set the classname, if we have one */
     classname_pmc = pmc_new(interpreter, enum_class_PerlString);
@@ -320,7 +320,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                 child_class_name );
     }
 
-    set_attrib_num(child_class_array, PCD_CLASS_NAME, classname_pmc);
+    set_attrib_num(child_class, child_class_array, PCD_CLASS_NAME, classname_pmc);
 
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
@@ -339,12 +339,13 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
         VTABLE_set_integer_native(interpreter, temp_pmc, 0);
     }
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
-    set_attrib_num(child_class_array, PCD_ALL_PARENTS, temp_pmc);
+    set_attrib_num(child_class, child_class_array, PCD_ALL_PARENTS, temp_pmc);
 
 
     /* But we have no attributes of our own. Yet */
     temp_pmc = pmc_new(interpreter, enum_class_Array);
-    set_attrib_num(child_class_array, PCD_CLASS_ATTRIBUTES, temp_pmc);
+    set_attrib_num(child_class, child_class_array, PCD_CLASS_ATTRIBUTES,
+            temp_pmc);
 
     Parrot_class_register(interpreter, child_class_name, child_class,
             base_class);
@@ -390,18 +391,18 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 
     /* We will have five entries in this array */
     /* Our parent class array has nothing in it */
-    set_attrib_num(class_array, PCD_PARENTS,
+    set_attrib_num(class, class_array, PCD_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-    set_attrib_num(class_array, PCD_ALL_PARENTS,
+    set_attrib_num(class, class_array, PCD_ALL_PARENTS,
                    pmc_new(interpreter, enum_class_Array));
-    set_attrib_num(class_array, PCD_CLASS_ATTRIBUTES,
+    set_attrib_num(class, class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
 
 
     /* Set the classname, if we have one */
     classname_pmc = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, classname_pmc, class_name);
-    set_attrib_num(class_array, PCD_CLASS_NAME, classname_pmc);
+    set_attrib_num(class, class_array, PCD_CLASS_NAME, classname_pmc);
 
     Parrot_class_register(interpreter, class_name, class, NULL);
 
@@ -512,7 +513,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
     new_vtable = Parrot_clone_vtable(interpreter, parent_vtable);
     new_vtable->base_type = new_type;
-    set_attrib_num((SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
+    set_attrib_num(new_class, (SLOTTYPE*)PMC_data(new_class), PCD_OBJECT_VTABLE,
             vtable_pmc = constant_pmc_new(interpreter, enum_class_VtableCache));
     PMC_struct_val(vtable_pmc) = new_vtable;
 
@@ -572,7 +573,7 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
             if (parent_class->vtable->base_type != enum_class_ParrotClass)
                 VTABLE_invoke(interpreter, parent_class, NULL);
             attr = REG_PMC(5);
-            set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
+            set_attrib_num(object, obj_data, POD_FIRST_ATTRIB, attr);
         }
     }
     meth_str = CONST_STRING(interpreter, "__init__");
@@ -629,7 +630,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
             PMC *attr = pmc_new_noinit(interpreter,
                     parent_class->vtable->base_type);
             SLOTTYPE *obj_data = PMC_data(object);
-            set_attrib_num(obj_data, POD_FIRST_ATTRIB, attr);
+            set_attrib_num(object, obj_data, POD_FIRST_ATTRIB, attr);
             VTABLE_init(interpreter, attr);
             continue;
         }
@@ -787,7 +788,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object,
     set_attrib_flags(object);
     /* 0 - class PMC, 1 - class name */
     SET_CLASS(new_object_array, object, class);
-    set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);
+    set_attrib_num(object, new_object_array, POD_CLASS_NAME, class_name);
 
     /* Note the number of used slots */
     ATTRIB_COUNT(object) = POD_FIRST_ATTRIB + attrib_count;
@@ -1513,7 +1514,7 @@ Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object,
     if (attrib >= attrib_count || attrib < POD_FIRST_ATTRIB) {
         internal_exception(OUT_OF_BOUNDS, "No such attribute");
     }
-    set_attrib_num(attrib_array, attrib, value);
+    set_attrib_num(object, attrib_array, attrib, value);
 }
 
 void
