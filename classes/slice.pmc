@@ -20,12 +20,100 @@ These are the vtable functions for the slice PMC class.
 
 #include "parrot/parrot.h"
 
+static void
+set_slice_start(Interp *interpreter, PMC *self)
+{
+    PMC* range = PMC_pmc_val(self);
+
+    /*
+     * and start value in struct_val
+     */
+    if (key_type(interpreter, range) & KEY_integer_FLAG) {
+        /* integer key */
+        if (PObj_get_FLAGS(range) & KEY_inf_slice_FLAG) {
+            /* first range is ".. end" */
+            PMC_struct_val(self) = (void *)0;
+        }
+        else {
+            PMC_struct_val(self) = (void *)key_integer(interpreter, range);
+        }
+    }
+    else {
+        /* TODO string */
+
+    }
+}
+
+static void
+set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
+{
+    PMC* range = PMC_pmc_val(self);
+            INTVAL cur, end;
+
+    if (key_type(interpreter, range) & KEY_integer_FLAG) {
+        if ((PObj_get_FLAGS(range) &
+                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
+                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
+            /* start = end, single element */
+            goto next_range;
+        }
+        if ((PObj_get_FLAGS(range) &
+                (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
+                (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) {
+            /* first range is ".. end" */
+            cur = (INTVAL)PMC_struct_val(self);
+            end = key_integer(interpreter, range);
+            if (cur < end) {
+                ++cur;
+                PMC_struct_val(self) = (void *)cur;
+                return;
+            }
+            goto next_range;
+        }
+
+        if ((PObj_get_FLAGS(range) &
+                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
+                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
+            /* last range "start .." */
+            cur = (INTVAL)PMC_struct_val(self);
+            end = VTABLE_elements(interpreter, agg);
+            if (cur < end - 1) {
+                ++cur;
+                PMC_struct_val(self) = (void *)cur;
+                return;
+            }
+            goto next_range;
+        }
+        if (PObj_get_FLAGS(range) & KEY_start_slice_FLAG) {
+            PMC *end_range = PMC_data(range);
+            if (!end_range)
+                internal_exception(1, "No end range found");
+            cur = (INTVAL)PMC_struct_val(self);
+            end = key_integer(interpreter, end_range);
+            if (cur < end) {
+                ++cur;
+                PMC_struct_val(self) = (void *)cur;
+                return;
+            }
+            /* skip end range */
+            PMC_pmc_val(self) = end_range;
+            range = end_range;
+            /* go on with next_range */
+        }
+
+next_range:
+        range = PMC_pmc_val(self) = PMC_data(range);
+        if (!PMC_pmc_val(self))
+            PMC_int_val(self) = -1;
+        else
+            PMC_struct_val(self) = (void *)key_integer(interpreter, range);
+    }
+}
+
 pmclass Slice need_ext extends Key {
 
     INTVAL get_integer() {
-        PMC *key = PMC_pmc_val(SELF);
-        /* TODO check range */
-        INTVAL v = key_integer(INTERP, key);
+        INTVAL v = (INTVAL)PMC_struct_val(SELF);
         /* printf("Slice_get_integer %d\n", (int)v); */
         return v;
     }
@@ -46,19 +134,15 @@ pmclass Slice need_ext extends Key {
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_pmc_FLAG;
 
-                PMC_struct_val(ret) = NULL;
                 PMC_data(ret) = NULL;
                 /*
-                 * key_pmc needs this
+                 * remember slice chain in PMC_pmc_val
                  */
                 PMC_pmc_val(ret) = SELF;
+                set_slice_start(INTERP, ret);
                 break;
             case ITERATE_GET_NEXT:
-                current_key = PMC_pmc_val(SELF);
-                /* TODO check range */
-                PMC_pmc_val(SELF) = PMC_data(current_key);
-                if (!PMC_pmc_val(SELF))
-                    PMC_int_val(SELF) = -1;
+                set_slice_next(INTERP, ret, agg);
                 break;
         }
         return ret;

@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 23;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -650,3 +650,159 @@ paot
 parrot
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "slice iter start range");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   slice P2, P0[..2]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok\n"
+   end
+CODE
+100
+200
+300
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice iter start range, value");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   slice P2, P0[..2, 4]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok\n"
+   end
+CODE
+100
+200
+300
+500
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice iter range, value");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   push P0, 700
+   slice P2, P0[1 ..3,6]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok\n"
+   end
+CODE
+200
+300
+400
+700
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "slice iter range, range");
+   .include "iterator.pasm"
+   new P0, .PerlArray
+   push P0, 100
+   push P0, 200
+   push P0, 300
+   push P0, 400
+   push P0, 500
+   push P0, 600
+   push P0, 700
+   push P0, 800
+   slice P2, P0[1 ..3, 5 ..]
+   set P2, .ITERATE_FROM_START
+lp:
+   unless P2, ex
+   shift I0, P2
+   print I0
+   print "\n"
+   branch lp
+ex:
+   print "ok\n"
+   end
+CODE
+200
+300
+400
+600
+700
+800
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter string range");
+    .include "iterator.pasm"
+	new P2, .PerlString
+	set P2, "parrot rocks"
+	slice P1, P2[1 ..3 ,5, 8 ..9]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+arrtoc
+parrot rocks
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter string range 2");
+    .include "iterator.pasm"
+	new P2, .PerlString
+	set P2, "parrot rocks"
+	slice P1, P2[ ..3 ,5, 8 ..]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+parrtocks
+parrot rocks
+OUTPUT

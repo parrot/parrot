@@ -689,11 +689,6 @@ C<what>.
 
         ret = VTABLE_nextkey_keyed(interpreter, key, SELF, what);
 
-        if (PMC_int_val(ret) > 0)
-            PMC_data(key) = string_pointer_to_index(INTERP, s,
-                                                    PMC_int_val(ret));
-         /* else do what? */
-
         return ret;
     }
 
