@@ -5,7 +5,7 @@ PostgreSQL
 libpq
 
 [defs]
-# From libpq-fe.h
+# From libpq-fe.h Revision 1.100
 p PQconnectStart t
 i PQconnectPoll p
 p PQconnectdb t
@@ -15,7 +15,11 @@ p PQconndefaults
 v PQconninfoFree p
 i PQresetStart p
 i PQresetPoll p
-c PQreset p
+
+#extern void PQreset(PGconn *conn);
+# This was set to "c PQreset p" was this correct.
+v PQreset p
+
 i PQrequestCancel p
 t PQdb p
 t PQuser p
@@ -25,54 +29,131 @@ t PQport p
 t PQtty p
 t PQoptions p
 i PQstatus p
+
+##### New In 7.4
+i PQtransactionStatus p
+t PQparameterStatus p t
+i PQprotocolVersion p
+#####
+
 t PQerrorMessage p
 i PQsocket p
 i PQbackendPID p
 i PQclientEncoding p
 i PQsetClientEncoding p t
+
+##### New In 7.4
+i PQsetErrorVerbosity p i
+#####
+
 v PQtrace p p
 v PQuntrace p
 
-# Needs a function pointer. Can't do that yet
+# Need function pointers. Can't do that yet
+##### New IN 7.4
+#i PQsetNoticeReceiver p p
+#####
 # i PQsetNoticeProcessor p p
 
-# First arg's a returned char pointer. Can't do that yet
-# i PQescapeString t t i
-
-t PQescapeBytea t l 4
-t PQunescapeBytea t 4
 p PQexec p t
-p PQnotifies p
-v PQfreeNotify p
+
+##### New In 7.4
+#extern PGresult *PQexecParams(PGconn *conn,
+#                         const char *command,
+#                         int nParams,
+#                         const Oid *paramTypes,
+#                         const char *const * paramValues,
+#                         const int *paramLengths,
+#                         const int *paramFormats,
+#                         int resultFormat);
+p PQexecParams p t i i 3 3 i
+
+
+#extern PGresult *PQexecPrepared(PGconn *conn,
+#                         const char *stmtName,
+#                         int nParams,
+#                         const char *const * paramValues,
+#                         const int *paramLengths,
+#                         const int *paramFormats,
+#                         int resultFormat);
+p PQexecPrepared p t i t 3 3 i
+#####
 
 i PQsendQuery p t
+
+##### New In 7.4
+#extern int PQsendQueryParams(PGconn *conn,
+#                                  const char *command,
+#                                  int nParams,
+#                                  const Oid *paramTypes,
+#                                  const char *const * paramValues,
+#                                  const int *paramLengths,
+#                                  const int *paramFormats,
+#                                  int resultFormat);
+i PQsendQueryParams p t i i t 3 3 i
+
+#extern int PQsendQueryPrepared(PGconn *conn,
+#                                  const char *stmtName,
+#                                  int nParams,
+#                                  const char *const * paramValues,
+#                                  const int *paramLengths,
+#                                  const int *paramFormats,
+#                                  int resultFormat);
+i PQsendQueryPrepared p t i t 3 3 i
+#####
+
 p PQgetResult p
 
 i PQisBusy p
 i PQconsumeInput p
+
+p PQnotifies p
+
+##### New In 7.4
+#extern int      PQputCopyData(PGconn *conn, const char *buffer, int nbytes);
+i PQputCopyData p t i
+
+#extern int      PQputCopyEnd(PGconn *conn, const char *errormsg);
+i PQputCopyEnd p t
+
+#extern int      PQgetCopyData(PGconn *conn, char **buffer, int async);
+i PQgetCopyData p t i
+#####
 
 i PQgetline p t i
 i PQputline p t
 i PQgetlineAsync p t i
 i PQputnbytes p t i
 i PQendcopy p
-
 i PQsetnonblocking p i
 i PQisnonblocking p
-
 i PQflush p
-i PQsendSome p
 
 p PQfn p i 3 3 i p i
-
 i PQresultStatus p
 t PQresStatus i
 t PQresultErrorMessage p
+
+##### New In 7.4
+#extern char *PQresultErrorField(const PGresult *res, int fieldcode);
+c PQresultErrorField p i
+#####
+
 i PQntuples p
 i PQnfields p
 i PQbinaryTuples p
 t PQfname p i
 i PQfnumber p t
+
+##### New In 7.4
+#extern Oid      PQftable(const PGresult *res, int field_num);
+i PQftable p i
+#extern int      PQftablecol(const PGresult *res, int field_num);
+i PQftablecol p i
+#extern int      PQfformat(const PGresult *res, int field_num);
+i PQfformat p i
+#####
+
 i PQftype p i
 i PQfsize p i
 i PQfmod p i
@@ -83,10 +164,41 @@ t PQcmdTuples p
 t PQgetvalue p i i
 i PQgetlength p i i
 i PQgetisnull p i i
-
 v PQclear p
 
+##### New In 7.4
+#extern void PQfreemem(void *ptr);
+v PQfreemem p
+#####
+
+
+# First arg's a neturned char pointer. Can't do that yet
+# i PQescapeString t t i
+
+t PQescapeBytea t l 4
+t PQunescapeBytea t 4
+
 p PQmakeEmptyPGresult p i
+
+# The following functions are missing from the original 7.3 version
+# so I am leaving these as well. I am including the declarations here
+# to let people know the ommission was deliberate. Not 100% why
+# though ;-)
+
+#extern void PQprint(FILE *fout,
+#                     const PGresult *res,
+#                     const PQprintOpt *ps);
+#extern void PQdisplayTuples(const PGresult *res,
+#                            FILE *fp,
+#                            int fillAlign,
+#                            const char *fieldSep,
+#                            int printHeader,
+#                            int quiet);
+#extern void PQprintTuples(const PGresult *res,
+#                          FILE *fout,
+#                          int printAttName,
+#                          int terseOutput,
+#                          int width);
 
 i lo_open p i i
 i lo_close p i
@@ -101,4 +213,3 @@ i lo_export p i t
 
 i PQmblen t i
 i PQenv2encoding v
-

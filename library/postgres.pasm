@@ -1,5 +1,3 @@
-# For postgres 7.3
-
 saveall
 loadlib P1, '/usr/local/pgsql/lib/libpq.so'
 dlfunc P2, P1, 'PQconnectStart', 'pt'
@@ -20,7 +18,7 @@ dlfunc P2, P1, 'PQresetStart', 'ip'
 store_global 'PostgreSQL::PQresetStart', P2
 dlfunc P2, P1, 'PQresetPoll', 'ip'
 store_global 'PostgreSQL::PQresetPoll', P2
-dlfunc P2, P1, 'PQreset', 'cp'
+dlfunc P2, P1, 'PQreset', 'vp'
 store_global 'PostgreSQL::PQreset', P2
 dlfunc P2, P1, 'PQrequestCancel', 'ip'
 store_global 'PostgreSQL::PQrequestCancel', P2
@@ -40,6 +38,12 @@ dlfunc P2, P1, 'PQoptions', 'tp'
 store_global 'PostgreSQL::PQoptions', P2
 dlfunc P2, P1, 'PQstatus', 'ip'
 store_global 'PostgreSQL::PQstatus', P2
+dlfunc P2, P1, 'PQtransactionStatus', 'ip'
+store_global 'PostgreSQL::PQtransactionStatus', P2
+dlfunc P2, P1, 'PQparameterStatus', 'tpt'
+store_global 'PostgreSQL::PQparameterStatus', P2
+dlfunc P2, P1, 'PQprotocolVersion', 'ip'
+store_global 'PostgreSQL::PQprotocolVersion', P2
 dlfunc P2, P1, 'PQerrorMessage', 'tp'
 store_global 'PostgreSQL::PQerrorMessage', P2
 dlfunc P2, P1, 'PQsocket', 'ip'
@@ -50,28 +54,38 @@ dlfunc P2, P1, 'PQclientEncoding', 'ip'
 store_global 'PostgreSQL::PQclientEncoding', P2
 dlfunc P2, P1, 'PQsetClientEncoding', 'ipt'
 store_global 'PostgreSQL::PQsetClientEncoding', P2
+dlfunc P2, P1, 'PQsetErrorVerbosity', 'ipi'
+store_global 'PostgreSQL::PQsetErrorVerbosity', P2
 dlfunc P2, P1, 'PQtrace', 'vpp'
 store_global 'PostgreSQL::PQtrace', P2
 dlfunc P2, P1, 'PQuntrace', 'vp'
 store_global 'PostgreSQL::PQuntrace', P2
-dlfunc P2, P1, 'PQescapeBytea', 'ttl4'
-store_global 'PostgreSQL::PQescapeBytea', P2
-dlfunc P2, P1, 'PQunescapeBytea', 'tt4'
-store_global 'PostgreSQL::PQunescapeBytea', P2
 dlfunc P2, P1, 'PQexec', 'ppt'
 store_global 'PostgreSQL::PQexec', P2
-dlfunc P2, P1, 'PQnotifies', 'pp'
-store_global 'PostgreSQL::PQnotifies', P2
-dlfunc P2, P1, 'PQfreeNotify', 'vp'
-store_global 'PostgreSQL::PQfreeNotify', P2
+dlfunc P2, P1, 'PQexecParams', 'pptiLTLLi'
+store_global 'PostgreSQL::PQexecParams', P2
+dlfunc P2, P1, 'PQexecPrepared', 'pptit33i'
+store_global 'PostgreSQL::PQexecPrepared', P2
 dlfunc P2, P1, 'PQsendQuery', 'ipt'
 store_global 'PostgreSQL::PQsendQuery', P2
+dlfunc P2, P1, 'PQsendQueryParams', 'iptiit33i'
+store_global 'PostgreSQL::PQsendQueryParams', P2
+dlfunc P2, P1, 'PQsendQueryPrepared', 'iptit33i'
+store_global 'PostgreSQL::PQsendQueryPrepared', P2
 dlfunc P2, P1, 'PQgetResult', 'pp'
 store_global 'PostgreSQL::PQgetResult', P2
 dlfunc P2, P1, 'PQisBusy', 'ip'
 store_global 'PostgreSQL::PQisBusy', P2
 dlfunc P2, P1, 'PQconsumeInput', 'ip'
 store_global 'PostgreSQL::PQconsumeInput', P2
+dlfunc P2, P1, 'PQnotifies', 'pp'
+store_global 'PostgreSQL::PQnotifies', P2
+dlfunc P2, P1, 'PQputCopyData', 'ipti'
+store_global 'PostgreSQL::PQputCopyData', P2
+dlfunc P2, P1, 'PQputCopyEnd', 'ipt'
+store_global 'PostgreSQL::PQputCopyEnd', P2
+dlfunc P2, P1, 'PQgetCopyData', 'ipti'
+store_global 'PostgreSQL::PQgetCopyData', P2
 dlfunc P2, P1, 'PQgetline', 'ipti'
 store_global 'PostgreSQL::PQgetline', P2
 dlfunc P2, P1, 'PQputline', 'ipt'
@@ -88,8 +102,6 @@ dlfunc P2, P1, 'PQisnonblocking', 'ip'
 store_global 'PostgreSQL::PQisnonblocking', P2
 dlfunc P2, P1, 'PQflush', 'ip'
 store_global 'PostgreSQL::PQflush', P2
-dlfunc P2, P1, 'PQsendSome', 'ip'
-store_global 'PostgreSQL::PQsendSome', P2
 dlfunc P2, P1, 'PQfn', 'ppi33ipi'
 store_global 'PostgreSQL::PQfn', P2
 dlfunc P2, P1, 'PQresultStatus', 'ip'
@@ -98,6 +110,8 @@ dlfunc P2, P1, 'PQresStatus', 'ti'
 store_global 'PostgreSQL::PQresStatus', P2
 dlfunc P2, P1, 'PQresultErrorMessage', 'tp'
 store_global 'PostgreSQL::PQresultErrorMessage', P2
+dlfunc P2, P1, 'PQresultErrorField', 'cpi'
+store_global 'PostgreSQL::PQresultErrorField', P2
 dlfunc P2, P1, 'PQntuples', 'ip'
 store_global 'PostgreSQL::PQntuples', P2
 dlfunc P2, P1, 'PQnfields', 'ip'
@@ -108,6 +122,12 @@ dlfunc P2, P1, 'PQfname', 'tpi'
 store_global 'PostgreSQL::PQfname', P2
 dlfunc P2, P1, 'PQfnumber', 'ipt'
 store_global 'PostgreSQL::PQfnumber', P2
+dlfunc P2, P1, 'PQftable', 'ipi'
+store_global 'PostgreSQL::PQftable', P2
+dlfunc P2, P1, 'PQftablecol', 'ipi'
+store_global 'PostgreSQL::PQftablecol', P2
+dlfunc P2, P1, 'PQfformat', 'ipi'
+store_global 'PostgreSQL::PQfformat', P2
 dlfunc P2, P1, 'PQftype', 'ipi'
 store_global 'PostgreSQL::PQftype', P2
 dlfunc P2, P1, 'PQfsize', 'ipi'
@@ -130,6 +150,12 @@ dlfunc P2, P1, 'PQgetisnull', 'ipii'
 store_global 'PostgreSQL::PQgetisnull', P2
 dlfunc P2, P1, 'PQclear', 'vp'
 store_global 'PostgreSQL::PQclear', P2
+dlfunc P2, P1, 'PQfreemem', 'vp'
+store_global 'PostgreSQL::PQfreemem', P2
+dlfunc P2, P1, 'PQescapeBytea', 'ttl4'
+store_global 'PostgreSQL::PQescapeBytea', P2
+dlfunc P2, P1, 'PQunescapeBytea', 'tt4'
+store_global 'PostgreSQL::PQunescapeBytea', P2
 dlfunc P2, P1, 'PQmakeEmptyPGresult', 'ppi'
 store_global 'PostgreSQL::PQmakeEmptyPGresult', P2
 dlfunc P2, P1, 'lo_open', 'ipii'

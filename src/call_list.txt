@@ -47,6 +47,7 @@
 #p	b
 c	v
 c	p
+c	pi
 c
 d	d
 d	v
@@ -149,6 +150,7 @@ t	i
 t	ii
 t	pi
 t	pii
+t	pt
 t	t
 t	tl4
 t	t4
@@ -193,6 +195,10 @@ P	Ii
 # Oddball ones for postgres
 p	ptiLTLLi
 p	pi33ipi
+p	ptii33i
+p	ptit33i
+i	ptit33i
+i	ptiit33i
 
 # The following are used by library/pcre.imc
 p	tiB3P
