@@ -56,17 +56,9 @@ pmclass PerlHash {
         return whoami;
     }
 
-    PMC* clone () {
-	PMC * ret = new_pmc_header(INTERP);
-	if (!pmc) {
-	    internal_exception(ALLOCATION_ERROR,
-			       "Parrot VM: PMC allocation failed!\n");
-	}
-
-	ret->vtable = &(Parrot_base_vtables[enum_class_PerlHash]);
+    void clone (PMC *ret) {
         PObj_custom_mark_SET(ret);
         hash_clone(INTERP, (HASH *)SELF->data, (HASH **)&ret->data);
-	return ret;
     }
 
     INTVAL get_integer () {

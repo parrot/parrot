@@ -51,11 +51,9 @@ pmclass Continuation {
         return whoami;
     }
 
-    PMC* clone () {
-        PMC * ret = new_pmc_header(INTERP);
+    void clone (PMC *ret) {
         struct Parrot_Continuation * retc
             = mem_sys_allocate(sizeof(struct Parrot_Continuation));
-        ret->vtable = &Parrot_base_vtables[enum_class_Continuation];
         ret->data = retc;
         PObj_custom_mark_destroy_SETALL(ret);
         memcpy(retc, SELF->data, sizeof(struct Parrot_Continuation));
@@ -63,7 +61,6 @@ pmclass Continuation {
          * it */
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);
-        return ret;
     }
 
     PMC* get_pmc () {

@@ -116,14 +116,9 @@ pmclass Array {
         return whoami;
     }
 
-    PMC* clone () {
-        PMC* dest;
-
-	dest = new_pmc_header(INTERP);
+    void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
-        dest->vtable = SELF->vtable;
         dest->data = list_clone(INTERP, (List *) SELF->data);
-        return dest;
     }
 
     INTVAL get_integer () {

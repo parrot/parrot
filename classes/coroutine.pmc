@@ -87,15 +87,12 @@ pmclass Coroutine {
         return dest;
     }
 
-    PMC* clone() {
+    void clone(PMC *ret) {
         struct Parrot_Coroutine * retc;
-        PMC * ret = new_pmc_header(INTERP);
-        ret->vtable = &Parrot_base_vtables[enum_class_Coroutine];
         ret->data = retc = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
         PObj_custom_mark_destroy_SETALL(ret);
         memcpy(ret->data, SELF->data, sizeof(struct Parrot_Coroutine));
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);
-        return ret;
     }
 }

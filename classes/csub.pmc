@@ -16,9 +16,6 @@
 
 pmclass CSub {
 
-    void init () {
-    }
-
     INTVAL type () {
         return enum_class_CSub;
     }
@@ -27,8 +24,8 @@ pmclass CSub {
         return whoami;
     }
 
-    PMC* clone () {
-        return Parrot_new_csub(INTERP, (Parrot_csub_t)D2FPTR(SELF->cache.struct_val));
+    void clone (PMC *dest) {
+	dest->cache.struct_val = SELF->cache.struct_val;
     }
 
     PMC* get_pmc () {

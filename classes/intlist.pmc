@@ -24,14 +24,9 @@ pmclass IntList {
         return whoami;
     }
 
-    PMC* clone () {
-        PMC* dest;
-
-        dest = pmc_new(INTERP, enum_class_IntList);
+    void clone (PMC *dest) {
         PObj_custom_mark_SET(dest);
-        dest->vtable = SELF->vtable;
         dest->data = intlist_clone(INTERP, (IntList *) SELF->data);
-        return dest;
     }
 
     void init () {

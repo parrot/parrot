@@ -145,9 +145,10 @@ PMC*
 scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
 {
     struct Parrot_Lexicals * lex;
-    PMC * pad_pmc = pmc_new(interp, enum_class_Scratchpad);
-    pad_pmc->cache.int_val = 0;
+    PMC * pad_pmc;
 
+    Parrot_block_DOD(interp);
+    pad_pmc = pmc_new(interp, enum_class_Scratchpad);
     if (base && depth < 0) {
         depth = base->cache.int_val + depth + 1;
     }
@@ -155,6 +156,7 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     if ((depth < 0)
         || (base && depth > base->cache.int_val)
         || (!base && depth != 0)) {
+        Parrot_unblock_DOD(interp);
         internal_exception(-1, "-scratch_pad: too deep\n");
         return NULL;
     }
@@ -178,6 +180,8 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
     pad_pmc->cache.int_val = depth + 1;
     lex->values = list_new(interp, enum_type_PMC);
     lex->names = list_new(interp, enum_type_STRING);
+
+    Parrot_unblock_DOD(interp);
 
     return pad_pmc;
 }

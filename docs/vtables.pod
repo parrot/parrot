@@ -192,7 +192,7 @@ could not be the same thing as defined by C<is_same>.
 
 =item C<clone>
 
-Copy your data, state and vtable into the passed-in PMC.
+Copy your data and state into the passed-in destination PMC.
 
 =item C<morph>
 

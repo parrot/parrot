@@ -67,13 +67,10 @@ pmclass Sub {
        return ((struct Parrot_Sub*)SELF->data)->init;
    }
 
-   PMC* clone () {
-	PMC * ret = new_pmc_header(INTERP);
+   void clone (PMC *ret) {
         PObj_custom_mark_destroy_SETALL(ret);
-	ret->vtable = &Parrot_base_vtables[enum_class_Sub];
 	ret->data = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(ret->data, SELF->data, sizeof(struct Parrot_Sub));
-	return ret;
    }
 
 }

@@ -45,11 +45,9 @@ pmclass Pointer {
         return whoami;
     }
 
-    PMC* clone () {
-        PMC *dest;
-        dest = pmc_new(INTERP, enum_class_Pointer);
-        dest->data=SELF->data;
-        return dest;
+    void clone (PMC *dest) {
+        PObj_custom_mark_SET(dest);
+        dest->data = SELF->data;
     }
 
     INTVAL get_integer () {

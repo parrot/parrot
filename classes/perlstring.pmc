@@ -25,13 +25,9 @@ pmclass PerlString extends scalar {
         return whoami;
     }
 
-    PMC* clone () {
-        PMC* dest;
-        dest = pmc_new(INTERP, enum_class_PerlString);
-        dest->vtable = SELF->vtable;
+    void clone (PMC *dest) {
         PObj_is_buffer_ptr_SET(dest);
         dest->data = string_copy(INTERP,SELF->data);
-        return dest;
     }
 
     void set_pmc (PMC* value) {

@@ -145,23 +145,21 @@ pmclass default abstract noinit {
         return DYNSELF.name_keyed(r_key);
     }
 
-    PMC* clone () {
+    void clone (PMC *dest) {
 	internal_exception(ILL_INHERIT,
 		"clone() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-        return NULL;
     }
 
-    PMC* clone_keyed (PMC* key) {
+    void clone_keyed (PMC* key, PMC *dest) {
 	internal_exception(ILL_INHERIT,
 		"clone_keyed() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
-        return NULL;
     }
 
-    PMC* clone_keyed_int (INTVAL* key) {
+    void clone_keyed_int (INTVAL* key, PMC *dest) {
         PMC* r_key = INT2KEY(INTERP, key);
-        return DYNSELF.clone_keyed(r_key);
+        DYNSELF.clone_keyed(r_key, dest);
     }
 
     PMC* find_method(STRING* method_name) {

@@ -40,16 +40,14 @@ pmclass NCI {
 	    free(SELF->data);
     }
 
-    PMC* clone () {
-        PMC *ret = pmc_new(INTERP, enum_class_NCI);
+    void clone (PMC *ret) {
+    	PObj_custom_mark_SET(ret);
         ret->cache.struct_val = SELF->cache.struct_val;
 	/* FIXME if data is malloced (JIT/i386!) then we need
 	 * the length of data here, to memcpy it
 	 * ManagedStruct or Buffer?
 	 */
 	ret->data = SELF->data;
-	PObj_custom_mark_SET(ret);
-	return ret;
     }
 
     PMC* get_pmc () {

@@ -31,25 +31,31 @@ pmclass Scratchpad {
     }
 
     void destroy () {
-	mem_sys_free(SELF->data);
-    }
+#if 0
+	/* XXX leo cloning scratch_pad duplicates these data
+	 * so they can't easily be freed
+	 */
+	int j;
+        struct Parrot_Lexicals * lex;
 
-    INTVAL type () {
-	return enum_class_Scratchpad;
+	for (j = 0; j < SELF->cache.int_val; j++) {
+            lex = ((struct Parrot_Lexicals **)SELF->data)[j];
+	    mem_sys_free(lex);
+	}
+#endif
+	mem_sys_free(SELF->data);
     }
 
     STRING* name () {
         return whoami;
     }
 
-    PMC* clone () {
-	PMC * ret = pmc_new(INTERP, enum_class_Scratchpad);
-        ret->cache.int_val = 0;
+    void clone (PMC *ret) {
+        PObj_custom_mark_destroy_SETALL(ret);
 	ret->data = mem_sys_allocate(SELF->cache.int_val * sizeof(PMC *));
 	ret->cache.int_val = SELF->cache.int_val;
 	mem_sys_memcopy(ret->data, SELF->data,
 			SELF->cache.int_val * sizeof(PMC *));
-	return ret;
     }
 
     INTVAL elements () {

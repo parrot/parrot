@@ -1080,8 +1080,10 @@ list_clone(Interp *interpreter, List *other)
                 for (i = 0; i < chunk->items; i++) {
                     op = ((PMC **)chunk->data.bufstart)[i];
                     if (op) {
-                        np = op->vtable->clone(interpreter, op);
+                        np = pmc_new_noinit(interpreter,
+                                op->vtable->base_type);
                         ((PMC **)new_chunk->data.bufstart)[i] = np;
+                        op->vtable->clone(interpreter, op, np);
                     }
                 }
                 break;
@@ -1101,9 +1103,11 @@ list_clone(Interp *interpreter, List *other)
             }
         }
     }
-    if (other->user_data)
-        l->user_data = other->user_data->vtable->clone(interpreter,
-                other->user_data);
+    if (other->user_data) {
+        l->user_data = pmc_new_noinit(interpreter, enum_class_Array);
+        other->user_data->vtable->clone(interpreter, other->user_data,
+                l->user_data);
+    }
     rebuild_chunk_list(interpreter, l);
     Parrot_unblock_DOD(interpreter);
     Parrot_unblock_GC(interpreter);

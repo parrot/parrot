@@ -105,7 +105,7 @@ the keys and their corresponding values is left up to the PMC.
 Keys are either strings or integers. If strings, the PMC is
 responsible for figuring out what the string represents. If integers,
 it means the meaning has been pre-figured based on meta-information
-from the class. 
+from the class.
 
 For example, if a class has the known properties "Size", "Dimension"
 and "Color", they may be assigned the values 100, 101, and 102. If the
@@ -158,7 +158,7 @@ dead, and that PMC has marked itself as having a destroy method.
 
 When this method finishes, the PMC will be marked as dead. As such you
 should make sure that you do I<not> leave any references to it in any
-parrot structure by the end of the method. 
+parrot structure by the end of the method.
 
 This method may I<not> throw an exception. It will be ignored if it does.
 
@@ -169,9 +169,9 @@ a _keyed_int form. The keyed forms take a KEY* or INTVAL* for I<each> PMC
 parameter.  The KEY*/INTVAL* parameter for each PMC is NULL if there is no
 key for that PMC; this means that that arguement is unkeyed.
 
-In some cases, the caller I<must> provide a non-NULL 
+In some cases, the caller I<must> provide a non-NULL
 key.  Those cases are explicitly stated below.  In the other cases, you may
-have to implement the keyed vtable methods and check for a NULL B<self> key even 
+have to implement the keyed vtable methods and check for a NULL B<self> key even
 if you are implementing a non-aggregate type.  If the B<self> key is non-NULL
 and the PMC class is a non-aggregate type, the _keyed_* methods
 should throw an exception.
@@ -185,7 +185,7 @@ stack variable in the calling function.
 
 =over 4
 
-=item INTVAL type(INTERP, PMC* self) 
+=item INTVAL type(INTERP, PMC* self)
 
 Return the type of the PMC. Type is a unique tag associated with the
 PMC when the PMC's class is loaded. Negative numbers are considered
@@ -212,7 +212,7 @@ array, or list, and suchlike things.
 Return the subtype of the PMC indexed by B<key>.  The B<key> parameter
 is guaranteed not to be NULL for this method.
 
-=item STRING* name(INTERP, PMC* self) 
+=item STRING* name(INTERP, PMC* self)
 
 Return the name of the class for the PMC.
 
@@ -220,23 +220,25 @@ Return the name of the class for the PMC.
 
 =item STRING* name_keyed_int(INTERP, PMC* self, INTVAL* key)
 
-Return the name of the class of the PMC indexed by B<key>.  
+Return the name of the class of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item PMC* clone(INTERP, PMC* self)
+=item void clone(INTERP, PMC* self, PMC *dest)
 
-Return a clone of yourself.
+Make B<dest> a clone of yourself. B<dest> is a PMC of the same type,
+created via B<pmc_new_noinit>.
 
-=item PMC* clone_keyed(INTERP, PMC* self, KEY* key)
+=item void clone_keyed(INTERP, PMC* self, KEY* key, PMC *dest)
 
-=item PMC* clone_keyed_int(INTERP, PMC* self, INTVAL* key)
+=item void clone_keyed_int(INTERP, PMC* self, INTVAL* key, PMC *dest)
 
-Return a clone of the PMC indexed by B<key>. If the PMC is fake, for example
-we're asking for a clone of an element of an integer array, this must
-return an appropriate real PMC that holds the fake information.
-The B<key> parameter is guaranteed not to be NULL for this method.
+Make B<dest> a clone of the PMC indexed by B<key>. If the PMC is fake,
+for example we're asking for a clone of an element of an integer
+array, this must return an appropriate real PMC that holds the fake
+information.  The B<key> parameter is guaranteed not to be NULL for
+this method.
 
-=item PMC* find_method(INTERP, PMC* self, STRING* method_name) 
+=item PMC* find_method(INTERP, PMC* self, STRING* method_name)
 
 Return a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
@@ -325,8 +327,8 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 =item PMC* get_pmc(INTERP, PMC* self)
 
 Return the PMC for this PMC. While this may seem nonsensical, it's
-useful in several circumstances. If the thing being accessed may 
-return something odd, for example a reference, it may return a 
+useful in several circumstances. If the thing being accessed may
+return something odd, for example a reference, it may return a
 value different than the PMC that get_pmc is being called
 on.
 
@@ -475,12 +477,12 @@ Return the integer value of the last item on the list, removing that item.
 =item INTVAL pop_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the integer value of the last item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL pop_float(INTERP, PMC* self)
 
-Return the floating-point value of the last item on the list, 
+Return the floating-point value of the last item on the list,
 removing that item.
 
 =item FLOATVAL pop_float_keyed(INTERP, PMC* self, KEY* key)
@@ -488,12 +490,12 @@ removing that item.
 =item FLOATVAL pop_float_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the floating-point value of the last item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item BIGNUM* pop_bignum(INTERP, PMC* self)
 
-Return the bignum value of the last item on the list, 
+Return the bignum value of the last item on the list,
 removing that item.
 
 =item BIGNUM* pop_bignum_keyed(INTERP, PMC* self, KEY* key)
@@ -501,12 +503,12 @@ removing that item.
 =item BIGNUM* pop_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the bignum value of the last item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item STRING* pop_string(INTERP, PMC* self)
 
-Return the string value of the last item on the list, 
+Return the string value of the last item on the list,
 removing that item.
 
 =item STRING* pop_string_keyed(INTERP, PMC* self, KEY* key)
@@ -514,7 +516,7 @@ removing that item.
 =item STRING* pop_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the string value of the last item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* pop_pmc(INTERP, PMC* self)
@@ -527,7 +529,7 @@ removing that item.
 =item PMC* pop_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the PMC value of the last item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void push_integer(INTERP, PMC* self, INTVAL value)
@@ -596,12 +598,12 @@ Return the integer value of the first item on the list, removing that item.
 =item INTVAL shift_integer_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the integer value of the fisrt item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item FLOATVAL shift_float(INTERP, PMC* self)
 
-Return the floating-point value of the first item on the list, 
+Return the floating-point value of the first item on the list,
 removing that item.
 
 =item FLOATVAL shift_float_keyed(INTERP, PMC* self, KEY* key)
@@ -609,12 +611,12 @@ removing that item.
 =item FLOATVAL shift_float_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the floating-point value of the first item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item BIGNUM* shift_bignum(INTERP, PMC* self)
 
-Return the bignum value of the first item on the list, 
+Return the bignum value of the first item on the list,
 removing that item.
 
 =item BIGNUM* shift_bignum_keyed(INTERP, PMC* self, KEY* key)
@@ -622,12 +624,12 @@ removing that item.
 =item BIGNUM* shift_bignum_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the bignum value of the first item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item STRING* shift_string(INTERP, PMC* self)
 
-Return the string value of the first item on the list, 
+Return the string value of the first item on the list,
 removing that item.
 
 =item STRING* shift_string_keyed(INTERP, PMC* self, KEY* key)
@@ -635,7 +637,7 @@ removing that item.
 =item STRING* shift_string_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the string value of the first item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* shift_pmc(INTERP, PMC* self)
@@ -648,7 +650,7 @@ removing that item.
 =item PMC* shift_pmc_keyed_int(INTERP, PMC* self, INTVAL* key)
 
 Return the PMC value of the first item of the list keyed by B<key>,
-removing that item from the list. 
+removing that item from the list.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void unshift_integer(INTERP, PMC* self, INTVAL value)
@@ -860,7 +862,7 @@ At least one of the three keys is guaranteed to not be NULL.
 =item void neg(INTERP, PMC* self, PMC* dest)
 
 Negate the sign of B<self> and store the result in B<dest>.  Note that
-B<self> and B<dest> may refer to the same PMC, in which case 
+B<self> and B<dest> may refer to the same PMC, in which case
 optimizations I<may> be made.
 
 =item void bitwise_or(INTERP, PMC* self, PMC* value, PMC* dest)
@@ -945,7 +947,7 @@ optimizations I<may> be made.
 
 =item void bitwise_not_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* dest, INTVAL* dest_key)
 
-Applies a bitwise negation to B<self> keyed by B<key> and 
+Applies a bitwise negation to B<self> keyed by B<key> and
 stores the result in B<dest> keyed by B<dest_key>.
 
 At least one key is guaranteed to be non-NULL.
@@ -979,7 +981,7 @@ At least one of the three keys is guaranteed to not be NULL.
 =item INTVAL is_equal(INTERP, PMC* self, PMC* value)
 
 Return TRUE if the two PMCs are generically equivalent, or
-FALSE if they aren't. 
+FALSE if they aren't.
 
 =item INTVAL is_equal_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key)
 
@@ -1041,15 +1043,15 @@ At least one key is guaranteed to be not NULL.
 =item void logical_or(INTERP, PMC* self, PMC* value, PMC* dest)
 
 Do a short-circuiting logical-OR of B<self> and B<value>, storing
-the winner in B<dest>. 
+the winner in B<dest>.
 
 =item void logical_or_keyed(INTERP, PMC* self, KEY* key, PMC* value, KEY* value_key, PMC* dest, KEY* dest_key)
 
 =item void logical_or_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
 
-Do a short-circuiting logical-OR of B<self> keyed by B<key> and 
+Do a short-circuiting logical-OR of B<self> keyed by B<key> and
 B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
-by B<dest_key>. 
+by B<dest_key>.
 
 At least one key is guaranteed to be not NULL.
 
@@ -1062,9 +1064,9 @@ the winner in dest.
 
 =item void logical_and_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
 
-Do a short-circuiting logical-AND of B<self> keyed by B<key> and 
+Do a short-circuiting logical-AND of B<self> keyed by B<key> and
 B<value> keyed by B<value_key>, storing the winner in B<dest> keyed
-by B<dest_key>. 
+by B<dest_key>.
 
 At least one key is guaranteed to be not NULL.
 
@@ -1078,7 +1080,7 @@ set B<dest> to be false.
 =item void logical_xor_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
 
 If exactly one of B<self> keyed by B<key> or B<value> keyed by B<value_key>
-is true, store it in B<dest> keyed by B<dest_key>.  Else set B<dest> 
+is true, store it in B<dest> keyed by B<dest_key>.  Else set B<dest>
 keyed by B<dest_key> to be false.
 
 At least one key is guaranteed to be not NULL.
@@ -1091,7 +1093,7 @@ Do a logical-NOT on B<self> and stores the result in B<dest>.
 
 =item void logical_not_keyed_int(INTERP, PMC* self, INTVAL* key, PMC* dest, INTVAL* dest_key)
 
-Do a logical-NOT on B<self> keyed by B<key> and stores the result 
+Do a logical-NOT on B<self> keyed by B<key> and stores the result
 in B<dest> keyed by B<dest_key>.
 
 At least one key is guaranteed to be not NULL.
@@ -1210,13 +1212,13 @@ The key is guaranteed to be not NULL.
 
 =item INTVAL invoke(INTERP, PMC* self)
 
-For invoking Invoke the given PMC. 
+For invoking Invoke the given PMC.
 
 It should set up the environment for the sub and return the absolute
-address that the interpreter should jump to. If it returns 0, then 
-the interpreter should just take up with the next instruction. (If the 
-sub just goes and does its thing and returns, which most C subs will 
-do at the moment) 
+address that the interpreter should jump to. If it returns 0, then
+the interpreter should just take up with the next instruction. (If the
+sub just goes and does its thing and returns, which most C subs will
+do at the moment)
 
 See pdd03_calling_conventions.pod for more details.
 
