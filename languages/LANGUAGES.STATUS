@@ -45,7 +45,11 @@ Scheme          Functioning, as far as implemented.
                 Status: Lightly maintained. Lists and functions are working
                 but many functions are missing implementation.
 
-Tcl
+tcl		passes all tests, but all examples do not currently work.
+		heavily under construction, but maintained
 
-urm
+URM		Functioning, all examples working
+		Language standard is stable and not expected
+		to change soon.
+		Maintained 
 
