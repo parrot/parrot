@@ -292,16 +292,17 @@ inline op classname(out STR, in PMC) :object_base {
   PMC* classname_pmc;
 
   if (!(PObj_get_FLAGS($2) & (PObj_is_class_FLAG|PObj_is_object_FLAG))) {
-      internal_exception(NO_CLASS, "PMC is neither class nor object");
-  }
-  classname_pmc = get_attrib_num((Buffer *)PMC_data($2), PCD_CLASS_NAME);
-  if (classname_pmc) {
-      $1 = VTABLE_get_string(interpreter, classname_pmc);
+    $1 = VTABLE_name(interpreter, $2);
   }
   else {
+    classname_pmc = get_attrib_num((Buffer *)PMC_data($2), PCD_CLASS_NAME);
+    if (classname_pmc) {
+      $1 = VTABLE_get_string(interpreter, classname_pmc);
+    }
+    else {
       internal_exception(NO_CLASS, "Class doesn't exist");
+    }
   }
-
   goto NEXT();
 }
 

@@ -19,6 +19,7 @@ $lambda_count = 0;
 
 my %builtin_ops = (
     abs => 'o',
+    isinstance => 's',
 );
 
 my %builtins = (
@@ -452,12 +453,18 @@ EOC
 	$p = promote($tos);
 	if ($cur_func eq 'test::main') {
 	    $main_names{$c} = $p;
+	    print <<EOC;
+	store_lex -1, "$c", $p $cmt
+EOC
 	}
-	print <<EOC;
+	else {
+	    print <<EOC;
 	store_lex -1, $n, $p $cmt
 EOC
     }
+    }
     $names{$c} = $p;
+    $lexicals{$c} = $p;
 }
 
 sub STORE_GLOBAL {
@@ -497,7 +504,7 @@ EOC
     elsif ($main_names{$c}) {
 	$p = temp('P');
 	print <<EOC;
-	$p = find_lex -1, $n $cmt
+	$p = find_lex "$c" $cmt
 EOC
     }
     else {
@@ -932,6 +939,23 @@ sub ret_val {
     return $rets{$a} if defined $rets{$a};
     return 'P';
 }
+sub OPC_isinstance
+{
+    my ($n, $c, $cmt) = @_;
+    my $i = temp('I');
+    my $cl = pop @stack;
+    my $ob = pop @stack;
+    my $s = temp('S');
+    my $b = temp('P');
+    # TODO make op or function
+    print <<EOC;
+        $s = classname $cl->[1]
+	$i = isa $ob->[1], $s
+	$b = new Boolean
+	$b = $i
+EOC
+    push @stack, [-1, $b, 'P'];
+}
 
 sub CALL_FUNCTION
 {
@@ -1002,7 +1026,7 @@ EOC
     if ($tos->[2] eq 'o') {	# builtin opcode
 	$t = temp('P');
 	print <<EOC;
-	$t = new $DEFVAR
+	$t = new $DEFVAR   # builtin opcode
 	$t = $func $args   $cmt
 EOC
     }
@@ -1055,10 +1079,12 @@ sub POP_TOP
 sub LOAD_FAST
 {
     my ($n, $c, $cmt) = @_;
-    if ($lexicals{$c}) {
+    my $p;
+    if ($p=$lexicals{$c}) {
 	print <<EOC;
-	# lexical $n '$c' $cmt
+	# lexical $n '$c' := $p $cmt
 EOC
+	$c = $p;
     }
     else {
 	my $p = 5 + keys %params;
@@ -1077,9 +1103,11 @@ EOC
 
 sub STORE_FAST
 {
+    return STORE_NAME(@_);
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
-    if ($lexicals{$c}) {
+    my $p;
+    if ($p = $lexicals{$c}) {
 	print <<"EOC";
 	assign $c, $tos->[1] $cmt
 EOC

@@ -145,7 +145,13 @@ def disassemble(co, lasti=-1):
         print
     for i, c in consts.items():
 	print
+	# class creation code seem to have that name inside
+	for n in c.co_names:
+	    if n == ('__module__'):
+		i = 'Build::' + i
+		break
 	print "Disassembly of %s" % i
+	print "#dir %s" % dir(c)
 	disassemble(c)
 
 def disassemble_string(code, lasti=-1, varnames=None, names=None,
