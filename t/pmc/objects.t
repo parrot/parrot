@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1514,3 +1514,24 @@ ok 4
 MyInt2(42)
 OUTPUT
 };
+
+output_is(<<'CODE', <<'OUTPUT', "subclassing ParrotClass");
+##PIR##
+.sub main @MAIN
+    .local pmc cl
+    .local pmc parent
+    parent = getclass "ParrotClass"
+    cl = subclass parent, "Foo"
+    print "ok 1\n"
+    .local pmc o
+    o = cl()
+    print "ok 2\n"
+    $S0 = classname o
+    print $S0
+    print "\n"
+.end
+CODE
+ok 1
+ok 2
+Foo
+OUTPUT

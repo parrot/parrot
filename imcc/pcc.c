@@ -375,7 +375,7 @@ expand_pcc_sub(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     i0 = NULL;
     label1 = label2 = NULL;
     ps = pe = sub->pcc_sub->pragma & P_PROTOTYPED;
-    if (sub->pcc_sub->pragma & P_NONE) {
+    if (!pe && (sub->pcc_sub->pragma & P_NONE)) {
         ps = 0; pe = 1;
         /* subroutine can handle both */
         i0 = get_pasm_reg("I0");

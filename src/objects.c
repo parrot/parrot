@@ -268,10 +268,15 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
         if (n > 1)
             internal_exception(1, "subclass: unimp multiple parents");
         base_class = VTABLE_get_pmc_keyed_int(interpreter, tuple, 0);
-        if (0&&PMC_struct_val(base_class) == (void*)0xdeadbeef)
-            base_class = pmc_new(interpreter, base_class->vtable->base_type);
     }
-
+    /*
+     * ParrotClass is the baseclass anyway, so build just a new class
+     */
+    if (base_class->vtable->base_type == enum_class_ParrotClass) {
+        PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
+        Parrot_new_class(interpreter, class, child_class_name);
+        return class;
+    }
     parent_is_class = PObj_is_class_TEST(base_class);
 
     child_class = pmc_new(interpreter, enum_class_ParrotClass);
