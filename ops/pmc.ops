@@ -10,8 +10,6 @@ VERSION = PARROT_VERSION;
 
 pmc.ops - PMC Operations
 
-=cut
-
 =head1 DESCRIPTION
 
 Operations that deal with PMCs, including creation and
@@ -44,12 +42,12 @@ to avoid problems if the base types get reassigned. For example:
   new P0, .PerlScalar
 
 Optionally a PMC may be passed to the constructor. It's up to the
-class, what to do with the intializer.
+class what to do with the intializer.
 s. PDD02 for more.
 
 =item B<new>(out PMC, in INT, in PMC, in PMC)
 
-Like above. The forth argument is a property hash - it isn't copied in,
+Like above. The fourth argument is a property hash - it isn't copied in,
 only referended. The initializer may be NULL.
 
 =cut
@@ -436,7 +434,7 @@ inline op splice(in PMC, in PMC, in INT, in INT) {
 
 =head2 Properties
 
-Ops to deal with PMC properties
+Ops to deal with PMC properties.
 
 =over 4
 
@@ -446,7 +444,7 @@ Ops to deal with PMC properties
 
 =item B<setprop>(in PMC, in STR, in PMC)
 
-Set property $2 to value $3 for PMC $1
+Set property $2 to value $3 for PMC $1.
 
 =cut
 
@@ -459,7 +457,7 @@ op setprop(in PMC, in STR, in PMC) {
 
 =item B<getprop>(out PMC, in STR, in PMC)
 
-Get property $2 of PMC $3 and put it in $1
+Get property $2 of PMC $3 and put it in $1.
 
 =cut
 
@@ -472,7 +470,7 @@ op getprop(out PMC, in STR, in PMC) {
 
 =item B<delprop>(in PMC, in STR)
 
-Delete property $2 from PMC $1
+Delete property $2 from PMC $1.
 
 =cut
 
@@ -485,7 +483,7 @@ op delprop(in PMC, in STR) {
 
 =item B<prophash>(out PMC, in PMC)
 
-Get a hash for the properties in PMC $2 and put it in $1
+Get a hash for the properties in PMC $2 and put it in $1.
 
 =cut
 
@@ -502,7 +500,7 @@ op prophash(out PMC, in PMC) {
 
 =head2 Freeze, thaw and friends
 
-Ops to PMC freeze, thaw
+Ops to PMC freeze, thaw.
 
 =over 4
 
@@ -516,7 +514,7 @@ Set $1 to the frozen image of $2.
 
 =item B<thaw>(out PMC, in STR)
 
-Set $1 to a newly created PMC from the inage $2.
+Set $1 to a newly created PMC from the image $2.
 
 =cut
 
@@ -540,7 +538,7 @@ op thaw(out PMC, in STR) {
 
 These functions manipulate the vtable MMD function table. 
 
-These functions allow bytecode to register subs or methods, and query which
+These functions allow bytecode to register subs or methods and query which
 sub or method would get called for a particular vtable operation. This way
 you're not required to drop to C to register a new method variant for
 addition or subtraction, or one of the other binary MMD operations.
@@ -588,11 +586,11 @@ inline op mmdvtfind(out PMC, in INT, in INT, in INT) {
 
 =item B<register>(in PMC)
 
-Add a reference of PMC $1 to the interpreters root set of PMCs. This is needed
-for extensions to make sure, that the PMC is properly marked during DOD, if
-that PMC is not known to Parrots core elsewhere.
+Add a reference of PMC $1 to the interpreter's root set of PMCs. This is needed
+for extensions to make sure that the PMC is properly marked during DOD, if that
+PMC is not known to Parrot's core elsewhere.
 
-A PMC can be registered multiple times, if its unregistered and the
+A PMC can be registered multiple times.  If it's unregistered and the
 registration count reaches zero, it will be destroyed during the next DOD run.
 
 =item B<unregister>(in PMC)
