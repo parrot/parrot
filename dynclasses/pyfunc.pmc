@@ -22,10 +22,12 @@ This class implements a Python Function, i.e. a Parrot Closure.
 
 static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyTuple;
+static INTVAL dynclass_PyString;
 static STRING *FUNC_ARGS;
 static STRING *FUNC_DEFAULTS;
 static STRING *FUNC_VARARGS;
 static STRING *__CALL__;
+static STRING *__NAME__;
 
 pmclass PyFunc extends Closure dynpmc group python_group {
 
@@ -44,10 +46,12 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyList = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyTuple = Parrot_PMC_typenum(INTERP, "PyTuple");
+            dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
             FUNC_ARGS = const_string(INTERP, "func_args");
             FUNC_VARARGS = const_string(INTERP, "func_varargs");
             FUNC_DEFAULTS = const_string(INTERP, "func_defaults");
             __CALL__ = const_string(INTERP, "__call__");
+            __NAME__ = const_string(INTERP, "__name__");
         }
     }
 
@@ -144,6 +148,34 @@ Return attribute named C<name>.
 
 /*
 
+=item C<STRING *get_string()>
+
+Return the representation of this object.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        STRING *res;
+
+        STRING *name = const_string(INTERP, "(unnamed)");
+        PMC *ret = VTABLE_getprop(INTERP, SELF, __NAME__);
+        if (ret && VTABLE_defined(INTERP, ret))
+            name = VTABLE_get_string(INTERP, ret);
+
+        res = string_from_cstring(INTERP, "<function ", 0);
+        res = string_append(INTERP, res, name, 0);
+        res = string_append(INTERP, res, const_string(INTERP, " at "), 0);
+        res = string_append(INTERP, res,
+            Parrot_sprintf_c(INTERP, "%#x", (INTVAL) SELF), 0);
+        res = string_append(INTERP, res, const_string(INTERP, ">"), 0);
+
+        return res;
+    }
+
+/*
+
 =item C<void* invoke(void* next)>
 
 Invoke a function.  Defaults are filled in first.
@@ -218,6 +250,22 @@ Add an argument to the func_args list
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
         VTABLE_set_string_keyed_int(INTERP, func_args, key, value);
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Set the function name.
+
+=cut
+
+*/
+
+    void set_string_native (STRING * value) {
+        PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, nameprop, value);
+        VTABLE_setprop(INTERP, SELF, __NAME__, nameprop);
     }
 
 /*
