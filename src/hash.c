@@ -74,7 +74,7 @@ static size_t
 key_hash_STRING(Interp *interpreter, void *value)
 {
     char *buffptr = ((STRING* )value)->strstart;
-    INTVAL len = ((STRING* )value)->strlen;
+    INTVAL len = ((STRING* )value)->bufused;
     /* TODO randomize this for each new_hash */
     register size_t hash = 5381;
 
@@ -295,7 +295,7 @@ new_bucket(Interp *interpreter, HASH *hash, STRING *key, HASH_ENTRY *value)
 }
 
 static HASHBUCKET *
-find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, STRING *key)
+find_bucket(Interp *interpreter, HASH *hash, BucketIndex head, void *key)
 {
     BucketIndex next;
 
@@ -385,15 +385,6 @@ hash_size(Interp *interpreter, HASH *hash)
     }
 }
 
-static HASHBUCKET *
-hash_lookup(Interp *interpreter, HASH *hash, void *key)
-{
-    UINTVAL hashval = (hash->hash_val)(interpreter, key);
-    HashIndex *table = (HashIndex *)hash->buffer.bufstart;
-    BucketIndex chain = table[hashval & hash->max_chain];
-    return find_bucket(interpreter, hash, chain, key);
-}
-
 /*
  * called by interator
  */
@@ -427,6 +418,15 @@ hash_get_idx(Interp *interpreter, HASH *hash, PMC * key)
     key->cache.int_val = i;
     PMC_data(key) = (void *)bi;
     return b->key;
+}
+
+PARROT_INLINE static HASHBUCKET *
+hash_lookup(Interp *interpreter, HASH *hash, void *key)
+{
+    UINTVAL hashval = (hash->hash_val)(interpreter, key);
+    HashIndex *table = (HashIndex *)hash->buffer.bufstart;
+    BucketIndex chain = table[hashval & hash->max_chain];
+    return find_bucket(interpreter, hash, chain, key);
 }
 
 HASH_ENTRY *
@@ -490,7 +490,7 @@ hash_delete(Interp *interpreter, HASH *hash, void *key)
      */
     Parrot_block_GC(interpreter);
     for (bucket = lookupBucket(hash, slot);
-         bucket != NULL; bucket = getBucket(hash, bucket->next)) {
+            bucket != NULL; bucket = getBucket(hash, bucket->next)) {
         if ((hash->compare)(interpreter, key, bucket->key) == 0) {
             BucketIndex bi;
             if (prev)

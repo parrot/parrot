@@ -288,6 +288,7 @@ examples/benchmarks/gc_header_reuse.pasm          [main]doc
 examples/benchmarks/gc_waves_headers.pasm         [main]doc
 examples/benchmarks/gc_waves_sizeable_data.pasm   [main]doc
 examples/benchmarks/gc_waves_sizeable_headers.pasm [main]doc
+examples/benchmarks/hash-utf8.pasm                [main]doc
 examples/benchmarks/primes.c                      [main]doc
 examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc
