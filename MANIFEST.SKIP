@@ -14,11 +14,13 @@ CVS/[^/]+$
 ^include/parrot/jit_struct\.h$
 ^include/parrot/oplib/core_ops\.h$
 ^include/parrot/oplib/core_ops_prederef\.h$
-^include/parrot/oplib/core_ops_cg\.h$
+^include/parrot/oplib/core_ops_switch\.h$
+^include/parrot/oplib/core_ops_cgp?\.h$
 
 ^core_ops\.c$
 ^core_ops_prederef\.c$
-^core_ops_cg\.c$
+^core_ops_switch\.c$
+^core_ops_cgp?\.c$
 ^fingerprint\.c$
 
 ^lib/Parrot/Jit\.pm$

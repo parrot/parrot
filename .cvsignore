@@ -6,6 +6,7 @@ core_ops_cg.c
 core_ops_cgp.c
 core_ops.c
 core_ops_prederef.c
+core_ops_switch.c
 disassemble
 fingerprint.c
 libparrot.a
