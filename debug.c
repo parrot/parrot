@@ -511,6 +511,10 @@ PDB_escape(const char *string)
 {
     char *new,*fill;
 
+    /* Return if there is no string to escape*/
+    if (!string || !*string)
+        return NULL;
+
     fill = new = (char *)mem_sys_allocate(strlen(string) * 2);
 
     for ( ; *string; string++)
@@ -701,9 +705,12 @@ PDB_disassemble(struct Parrot_Interp *interpreter,
                     {
                         escaped = PDB_escape(interpreter->code->const_table->
                                          constants[pc[j]]->string->bufstart);
-                        strcpy(&pfile->source[pfile->size],escaped);
-                        pfile->size += strlen(escaped);
-                        mem_sys_free(escaped);
+                        if (escaped)
+                        {
+                            strcpy(&pfile->source[pfile->size],escaped);
+                            pfile->size += strlen(escaped);
+                            mem_sys_free(escaped);
+                        }
                     }
                     pfile->source[pfile->size++] = '"';
                     break;
