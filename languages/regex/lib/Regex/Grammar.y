@@ -42,7 +42,7 @@ expr : expr '|' expr
      | CHAR
    { return op('match' => [ ord($_[1]) ]); }
      | charclass
-   { return op('classmatch' => [ $_[1] ]); }
+   { return op('classpieces' => [ $_[1] ]); }
      | expr '*'
    { return op('multi_match' => [ 0, -1, TRUE, $_[1] ]); }
      | expr '*' '?'
@@ -77,21 +77,18 @@ number : number NUM { return $_[1] * 10 + $_[2]; }
        | NUM { return $_[1]; }
 ;
 
-charclass : '[' '-' classpieces ']' { $_[3] .= '-'; return $_[3]; }
+charclass : '[' '^' classpieces ']' { return [ 'neg', $_[3] ]; }
+          | '[' '-' classpieces ']' { push @{$_[3]}, '-'; return $_[3]; }
           | '[' classpieces ']' { return $_[2]; }
-          | '.' { return 'ANY'; }
+          | '.' { return [ 'neg', [] ]; }
 ;
 
-classpieces : classpieces classpiece { $_[1] .= $_[2]; return $_[1]; }
-            | { return ''; }
+classpieces : classpieces classpiece { push @{$_[1]}, $_[2]; return $_[1]; }
+            | { return []; }
 ;
 
 classpiece : CHAR '-' CHAR
-    { my $s = $_[1];
-      my $p = $s;
-      $s .= $p while ($p++ ne $_[3]);
-      return $s;
-    }
+    { return [ $_[1], $_[3] ] }
            | CHAR
     { return $_[1]; }
 ;

@@ -518,374 +518,393 @@ sub new {
 [
 	{#State 0
 		ACTIONS => {
+			"(" => 4,
+			"^" => 3,
 			'CHAR' => 1,
-			"." => 2,
-			"^" => 5,
-			"(" => 9,
-			"[" => 8
+			"[" => 8,
+			"." => 9
 		},
 		GOTOS => {
-			'regex1' => 4,
-			'expr' => 3,
-			'regex' => 6,
-			'charclass' => 7
+			'charclass' => 6,
+			'expr' => 5,
+			'regex' => 7,
+			'regex1' => 2
 		}
 	},
 	{#State 1
 		DEFAULT => -7
 	},
 	{#State 2
-		DEFAULT => -27
+		ACTIONS => {
+			"\$" => 10
+		},
+		DEFAULT => -1
 	},
 	{#State 3
 		ACTIONS => {
+			"(" => 4,
 			'CHAR' => 1,
-			"*" => 10,
-			"+" => 11,
 			"[" => 8,
-			"{" => 12,
-			"|" => 13,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
+			"." => 9
 		},
-		DEFAULT => -4,
 		GOTOS => {
-			'range' => 15,
-			'expr' => 14,
-			'charclass' => 7
+			'expr' => 11,
+			'charclass' => 6
 		}
 	},
 	{#State 4
 		ACTIONS => {
-			"\$" => 17
-		},
-		DEFAULT => -1
-	},
-	{#State 5
-		ACTIONS => {
-			'CHAR' => 1,
-			"." => 2,
-			"(" => 9,
-			"[" => 8
-		},
-		GOTOS => {
-			'expr' => 18,
-			'charclass' => 7
-		}
-	},
-	{#State 6
-		ACTIONS => {
-			'' => 19
-		}
-	},
-	{#State 7
-		DEFAULT => -8
-	},
-	{#State 8
-		ACTIONS => {
-			"-" => 20
-		},
-		DEFAULT => -29,
-		GOTOS => {
-			'classpieces' => 21
-		}
-	},
-	{#State 9
-		ACTIONS => {
-			"?" => 23
+			"?" => 12
 		},
 		DEFAULT => -17,
 		GOTOS => {
-			'@1-1' => 22
+			'@1-1' => 13
 		}
 	},
-	{#State 10
+	{#State 5
 		ACTIONS => {
-			"?" => 24
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"|" => 18,
+			"*" => 19,
+			"[" => 8,
+			"." => 9
 		},
-		DEFAULT => -9
+		DEFAULT => -4,
+		GOTOS => {
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
+		}
+	},
+	{#State 6
+		DEFAULT => -8
+	},
+	{#State 7
+		ACTIONS => {
+			'' => 21
+		}
+	},
+	{#State 8
+		ACTIONS => {
+			"-" => 23,
+			"^" => 24
+		},
+		DEFAULT => -30,
+		GOTOS => {
+			'classpieces' => 22
+		}
+	},
+	{#State 9
+		DEFAULT => -28
+	},
+	{#State 10
+		DEFAULT => -2
 	},
 	{#State 11
 		ACTIONS => {
-			"?" => 25
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"|" => 18,
+			"*" => 19,
+			"[" => 8,
+			"." => 9
 		},
-		DEFAULT => -11
+		DEFAULT => -3,
+		GOTOS => {
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
+		}
 	},
 	{#State 12
 		ACTIONS => {
-			'NUM' => 28,
-			"," => 26
-		},
-		GOTOS => {
-			'number' => 27
+			":" => 25
 		}
 	},
 	{#State 13
 		ACTIONS => {
+			"(" => 4,
 			'CHAR' => 1,
-			"." => 2,
-			"(" => 9,
-			"[" => 8
+			"[" => 8,
+			"." => 9
 		},
 		GOTOS => {
-			'expr' => 29,
-			'charclass' => 7
+			'expr' => 26,
+			'charclass' => 6
 		}
 	},
 	{#State 14
-		ACTIONS => {
-			'CHAR' => 1,
-			"*" => 10,
-			"+" => 11,
-			"[" => 8,
-			"{" => 12,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
-		},
-		DEFAULT => -6,
-		GOTOS => {
-			'expr' => 14,
-			'range' => 15,
-			'charclass' => 7
-		}
-	},
-	{#State 15
-		ACTIONS => {
-			"?" => 30
-		},
-		DEFAULT => -15
-	},
-	{#State 16
 		ACTIONS => {
 			"?" => undef
 		},
 		DEFAULT => -13
 	},
+	{#State 15
+		ACTIONS => {
+			"?" => 28
+		},
+		DEFAULT => -11
+	},
+	{#State 16
+		ACTIONS => {
+			'NUM' => 31,
+			"," => 30
+		},
+		GOTOS => {
+			'number' => 29
+		}
+	},
 	{#State 17
-		DEFAULT => -2
+		ACTIONS => {
+			"?" => 32
+		},
+		DEFAULT => -15
 	},
 	{#State 18
 		ACTIONS => {
+			"(" => 4,
 			'CHAR' => 1,
-			"*" => 10,
-			"+" => 11,
 			"[" => 8,
-			"{" => 12,
-			"|" => 13,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
+			"." => 9
 		},
-		DEFAULT => -3,
 		GOTOS => {
-			'expr' => 14,
-			'range' => 15,
-			'charclass' => 7
+			'expr' => 33,
+			'charclass' => 6
 		}
 	},
 	{#State 19
-		DEFAULT => -0
+		ACTIONS => {
+			"?" => 34
+		},
+		DEFAULT => -9
 	},
 	{#State 20
-		DEFAULT => -29,
+		ACTIONS => {
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"*" => 19,
+			"[" => 8,
+			"." => 9
+		},
+		DEFAULT => -6,
 		GOTOS => {
-			'classpieces' => 32
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
 		}
 	},
 	{#State 21
-		ACTIONS => {
-			'CHAR' => 33,
-			"]" => 35
-		},
-		GOTOS => {
-			'classpiece' => 34
-		}
+		DEFAULT => 0
 	},
 	{#State 22
 		ACTIONS => {
-			'CHAR' => 1,
-			"." => 2,
-			"(" => 9,
-			"[" => 8
+			'CHAR' => 35,
+			"]" => 37
 		},
 		GOTOS => {
-			'expr' => 36,
-			'charclass' => 7
+			'classpiece' => 36
 		}
 	},
 	{#State 23
-		ACTIONS => {
-			":" => 37
+		DEFAULT => -30,
+		GOTOS => {
+			'classpieces' => 38
 		}
 	},
 	{#State 24
-		DEFAULT => -10
+		DEFAULT => -30,
+		GOTOS => {
+			'classpieces' => 39
+		}
 	},
 	{#State 25
-		DEFAULT => -12
+		ACTIONS => {
+			"(" => 4,
+			'CHAR' => 1,
+			"[" => 8,
+			"." => 9
+		},
+		GOTOS => {
+			'expr' => 40,
+			'charclass' => 6
+		}
 	},
 	{#State 26
 		ACTIONS => {
-			'NUM' => 28
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"|" => 18,
+			"*" => 19,
+			"[" => 8,
+			")" => 41,
+			"." => 9
 		},
 		GOTOS => {
-			'number' => 38
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
 		}
 	},
 	{#State 27
-		ACTIONS => {
-			'NUM' => 40,
-			"," => 39
-		}
+		DEFAULT => -14
 	},
 	{#State 28
-		DEFAULT => -24
+		DEFAULT => -12
 	},
 	{#State 29
 		ACTIONS => {
-			'CHAR' => 1,
-			"*" => 10,
-			"+" => 11,
-			"[" => 8,
-			"{" => 12,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
-		},
-		DEFAULT => -5,
-		GOTOS => {
-			'expr' => 14,
-			'range' => 15,
-			'charclass' => 7
+			'NUM' => 43,
+			"," => 42
 		}
 	},
 	{#State 30
-		DEFAULT => -16
-	},
-	{#State 31
-		DEFAULT => -14
-	},
-	{#State 32
 		ACTIONS => {
-			'CHAR' => 33,
-			"]" => 41
+			'NUM' => 31
 		},
 		GOTOS => {
-			'classpiece' => 34
+			'number' => 44
 		}
+	},
+	{#State 31
+		DEFAULT => -24
+	},
+	{#State 32
+		DEFAULT => -16
 	},
 	{#State 33
 		ACTIONS => {
-			"-" => 42
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"*" => 19,
+			"[" => 8,
+			"." => 9
 		},
-		DEFAULT => -31
+		DEFAULT => -5,
+		GOTOS => {
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
+		}
 	},
 	{#State 34
-		DEFAULT => -28
+		DEFAULT => -10
 	},
 	{#State 35
-		DEFAULT => -26
+		ACTIONS => {
+			"-" => 45
+		},
+		DEFAULT => -32
 	},
 	{#State 36
-		ACTIONS => {
-			'CHAR' => 1,
-			")" => 43,
-			"*" => 10,
-			"+" => 11,
-			"[" => 8,
-			"{" => 12,
-			"|" => 13,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
-		},
-		GOTOS => {
-			'expr' => 14,
-			'range' => 15,
-			'charclass' => 7
-		}
+		DEFAULT => -29
 	},
 	{#State 37
-		ACTIONS => {
-			'CHAR' => 1,
-			"." => 2,
-			"(" => 9,
-			"[" => 8
-		},
-		GOTOS => {
-			'expr' => 44,
-			'charclass' => 7
-		}
+		DEFAULT => -27
 	},
 	{#State 38
 		ACTIONS => {
-			'NUM' => 40,
-			"}" => 45
+			'CHAR' => 35,
+			"]" => 46
+		},
+		GOTOS => {
+			'classpiece' => 36
 		}
 	},
 	{#State 39
 		ACTIONS => {
-			'NUM' => 28,
-			"}" => 47
+			'CHAR' => 35,
+			"]" => 47
 		},
 		GOTOS => {
-			'number' => 46
+			'classpiece' => 36
 		}
 	},
 	{#State 40
-		DEFAULT => -23
+		ACTIONS => {
+			"?" => 14,
+			'CHAR' => 1,
+			"+" => 15,
+			"{" => 16,
+			"(" => 4,
+			"|" => 18,
+			"*" => 19,
+			"[" => 8,
+			")" => 48,
+			"." => 9
+		},
+		GOTOS => {
+			'expr' => 20,
+			'charclass' => 6,
+			'range' => 17
+		}
 	},
 	{#State 41
-		DEFAULT => -25
+		DEFAULT => -18
 	},
 	{#State 42
 		ACTIONS => {
-			'CHAR' => 48
+			'NUM' => 31,
+			"}" => 49
+		},
+		GOTOS => {
+			'number' => 50
 		}
 	},
 	{#State 43
-		DEFAULT => -18
+		DEFAULT => -23
 	},
 	{#State 44
 		ACTIONS => {
-			'CHAR' => 1,
-			")" => 49,
-			"*" => 10,
-			"+" => 11,
-			"[" => 8,
-			"{" => 12,
-			"|" => 13,
-			"." => 2,
-			"?" => 16,
-			"(" => 9
-		},
-		GOTOS => {
-			'expr' => 14,
-			'range' => 15,
-			'charclass' => 7
+			'NUM' => 43,
+			"}" => 51
 		}
 	},
 	{#State 45
-		DEFAULT => -21
-	},
-	{#State 46
 		ACTIONS => {
-			'NUM' => 40,
-			"}" => 50
+			'CHAR' => 52
 		}
 	},
+	{#State 46
+		DEFAULT => -26
+	},
 	{#State 47
-		DEFAULT => -22
+		DEFAULT => -25
 	},
 	{#State 48
-		DEFAULT => -30
-	},
-	{#State 49
 		DEFAULT => -19
 	},
+	{#State 49
+		DEFAULT => -22
+	},
 	{#State 50
+		ACTIONS => {
+			'NUM' => 43,
+			"}" => 53
+		}
+	},
+	{#State 51
+		DEFAULT => -21
+	},
+	{#State 52
+		DEFAULT => -31
+	},
+	{#State 53
 		DEFAULT => -20
 	}
 ],
@@ -940,7 +959,7 @@ sub
 		 'expr', 1,
 sub
 #line 45 "lib/Regex/Grammar.y"
-{ return op('classmatch' => [ $_[1] ]); }
+{ return op('charclass' => [ $_[1] ]); }
 	],
 	[#Rule 9
 		 'expr', 2,
@@ -1042,46 +1061,48 @@ sub
 		 'charclass', 4,
 sub
 #line 80 "lib/Regex/Grammar.y"
-{ $_[3] .= '-'; return $_[3]; }
+{ return [ 'neg', $_[3] ]; }
 	],
 	[#Rule 26
-		 'charclass', 3,
+		 'charclass', 4,
 sub
 #line 81 "lib/Regex/Grammar.y"
-{ return $_[2]; }
+{ push @{$_[3]}, '-'; return $_[3]; }
 	],
 	[#Rule 27
-		 'charclass', 1,
+		 'charclass', 3,
 sub
 #line 82 "lib/Regex/Grammar.y"
-{ return 'ANY'; }
+{ return $_[2]; }
 	],
 	[#Rule 28
-		 'classpieces', 2,
+		 'charclass', 1,
 sub
-#line 85 "lib/Regex/Grammar.y"
-{ $_[1] .= $_[2]; return $_[1]; }
+#line 83 "lib/Regex/Grammar.y"
+{ return [ 'neg', [] ]; }
 	],
 	[#Rule 29
-		 'classpieces', 0,
+		 'classpieces', 2,
 sub
 #line 86 "lib/Regex/Grammar.y"
-{ return ''; }
+{ push @{$_[1]}, $_[2]; return $_[1]; }
 	],
 	[#Rule 30
-		 'classpiece', 3,
+		 'classpieces', 0,
 sub
-#line 90 "lib/Regex/Grammar.y"
-{ my $s = $_[1];
-      my $p = $s;
-      $s .= $p while ($p++ ne $_[3]);
-      return $s;
-    }
+#line 87 "lib/Regex/Grammar.y"
+{ return []; }
 	],
 	[#Rule 31
+		 'classpiece', 3,
+sub
+#line 91 "lib/Regex/Grammar.y"
+{ return [ $_[1], $_[3] ] }
+	],
+	[#Rule 32
 		 'classpiece', 1,
 sub
-#line 96 "lib/Regex/Grammar.y"
+#line 93 "lib/Regex/Grammar.y"
 { return $_[1]; }
 	]
 ],
@@ -1089,7 +1110,7 @@ sub
     bless($self,$class);
 }
 
-#line 99 "lib/Regex/Grammar.y"
+#line 96 "lib/Regex/Grammar.y"
 
 
 1;

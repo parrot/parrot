@@ -1,0 +1,8 @@
+2004-01-28    <sfink>
+
+	* Generate inclusion/exclusion lists for more character classes
+	* Fix implementation of rxlocals
+	* Add backtracking to advance op (bugfix)
+	* Correct off-by-one error in advance op
+	* Fix bug in multi-match
+	

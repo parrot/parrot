@@ -73,28 +73,53 @@ sub new_local {
 }
 
 sub new_rxlocal {
-    my ($self, $name, $type) = @_;
+    my ($self, $op, $name, $type) = @_;
     my $var = $self->new_local($name, $type);
-
-    # Mark this variable as needing to be preserved across rule calls
-    push @{ $self->{rxlocals} }, $var;
-
+    push @{ $op->{rxlocals} }, $var;
     return $var;
 }
 
-sub save_rxlocals {
-    my ($self) = @_;
-
-    return aop(comment => [ "save rxlocals" ]),
-           map { aop('pushint' => [ $_, "rxlocal $_" ]) }
-             @{ $self->{rxlocals} };
+sub op_save_rxlocals {
+    my ($self, $op) = @_;
+    if ($op->{non_reentrant}) {
+        # Mark this variable as needing to be preserved across rule calls
+        push @{ $self->{rxlocals} }, @{ $op->{rxlocals} };
+        return ();
+    } else {
+        my $rxlocals = ($op->{rxlocals} ||= []);
+        return (aop(comment => [ "save rxlocals for op" ]),
+                map { aop('pushint' => [ $_, "op rxlocal $_" ]) }
+                    @$rxlocals);
+    }
 }
 
-sub restore_rxlocals {
+sub op_restore_rxlocals {
+    my ($self, $op) = @_;
+    if ($op->{non_reentrant}) {
+        return ();
+    } else {
+        my $rxlocals = ($op->{rxlocals} ||= []);
+        return (aop(comment => [ "restore rxlocals for op" ]),
+                map { aop('popint' => [ $_, "op rxlocal $_" ]) }
+                    reverse @$rxlocals);
+    }
+}
+
+sub rule_save_rxlocals {
     my ($self) = @_;
-    return aop(comment => [ "restore rxlocals" ]),
-           map { aop('popint' => [ $_, "rxlocal $_" ]) }
-             reverse @{ $self->{rxlocals} };
+
+    my $rxlocals = ($self->{rxlocals} ||= []);
+    return (aop(comment => [ "save rxlocals" ]),
+            map { aop('pushint' => [ $_, "rxlocal $_" ]) }
+                @$rxlocals);
+}
+
+sub rule_restore_rxlocals {
+    my ($self) = @_;
+    my $rxlocals = ($self->{rxlocals} ||= []);
+    return (aop(comment => [ "restore rxlocals" ]),
+            map { aop('popint' => [ $_, "rxlocal $_" ]) }
+                reverse @$rxlocals);
 }
 
 sub get_temp {
@@ -296,22 +321,74 @@ sub rewrite_check {
     return ($R_back, @ops);
 }
 
-sub rewrite_charclass {
-    my ($self, $op, $incexc, $lastback) = @_;
+sub _translate_classpieces {
+    my ($pieces) = @_;
 
-    # Handle literal strings (things like "aeiou" but not "a-z")
-    if (! ref($incexc)) {
-        my @chars = sort map { ord($_) } split(//, $incexc);
-        $incexc = [];
-        while (@chars) {
-            push @$incexc, shift(@chars);
-            my $last = $incexc->[-1];
-            while (@chars && $chars[0] <= $last + 1) {
-                $last = shift(@chars);
+    # Empty list
+    return [] if @$pieces == 0;
+
+    # Negated list
+    if ($pieces->[0] eq 'neg') {
+        return _negate_incexc(_translate_classpieces($pieces->[1]));
+    }
+
+    # Convert "a-b" to [97,98] and "a" to [97,97]
+    my @ranges;
+    foreach (@$pieces) {
+        my ($first, $last);
+        if (ref $_) {
+            ($first, $last) = @$_;
+        } else {
+            ($first, $last) = ($_, $_);
+        }
+        push @ranges, [ ord($first), ord($last) ];
+    }
+
+    return _ranges_to_incexc(\@ranges);
+}
+
+sub _ranges_to_incexc {
+    my @ranges = @{ shift() };
+
+    # Sort those pairs by their first element
+    @ranges = sort { $a->[0] <=> $b->[0] } @ranges;
+
+    # Build up an inclusion/exclusion list
+    my @incexc;
+    foreach (@ranges) {
+        my ($first, $last) = @$_;
+        if (@incexc && $first <= $incexc[-1]) {
+            # Merge (1,10)=1..9 with [4,x]=4..x and [10,x]=10..x
+            if ($incexc[-1] <= $last+1) {
+                $incexc[-1] = $last+1;
             }
-            push @$incexc, $last + 1;
+        } else {
+            # Append
+            push @incexc, $first, ($last+1);
         }
     }
+
+    return \@incexc;
+}
+
+sub _negate_incexc ($) {
+    my ($incexc) = @_;
+    return [ 0 ] if (@$incexc == 0);
+    return [ 0, @$incexc ] if $incexc->[0] > 0;
+    return [ ] if @$incexc == 1;
+    shift @$incexc;
+    $incexc->[0]++;
+    return $incexc;
+}
+
+sub rewrite_classpieces {
+    my ($self, $op, $classpieces, $lastback) = @_;
+    my $incexc = _translate_classpieces($classpieces);
+    return $self->rewrite_charclass($op, $incexc, $lastback);
+}
+
+sub rewrite_charclass {
+    my ($self, $op, $incexc, $lastback) = @_;
 
     my @ops;
     push @ops, aop('check', [ 1, $lastback ])
@@ -330,6 +407,20 @@ sub rewrite_charclass {
                 $next =>
                );
 
+    return ($back, @ops);
+}
+
+sub rewrite_advance {
+    my ($self, $op, $howfar, $lastback) = @_;
+    my $back = $self->genlabel('undo_charclass');
+    my $next = $self->genlabel('after_charclass');
+
+    my @ops = (          aop('advance', [ $howfar, $lastback ]),
+                         aop('goto', [ $next ]),
+                $back => aop('increment', [ -$howfar ]),
+                         aop('goto', [ $lastback ]),
+                $next =>
+              );
     return ($back, @ops);
 }
 
@@ -449,7 +540,7 @@ sub rewrite_alternate {
 # turn, but the exact alternatives are unknown (eg because they're
 # coming from an array.)
 #
-# @R ->          .local $counter # NOT rxlocal var
+# @R ->          .local $counter
 #                $counter = 0
 #           try: R[$counter] or goto fail
 #                push $counter
@@ -466,7 +557,7 @@ sub rewrite_alternate {
 # alternative that corresponds to the (dynamic) $counter passed in.
 #
 sub rewrite_dynamic_alternate {
-    my ($self, $op, $chooser, $lastback) = @_;
+    my ($self, $op, $sizer, $chooser, $lastback) = @_;
 
     my $try = $self->genlabel('dalt_try');
     my $fail = $self->genlabel('dalt_fail');
@@ -474,10 +565,12 @@ sub rewrite_dynamic_alternate {
     my $next = $self->genlabel('dalt_next');
 
     my $counter = $self->new_local("counter");
-    my ($R_back, $N, @R_ops) = $chooser->($self, $op, $counter, $fail);
+    my ($N, @N_ops) = $sizer->($self, $op);
+    my ($R_back, @R_ops) = $chooser->($self, $op, $counter, $fail);
 
 #    $DB::single = 1;
     my @ops =  ( aop('assign', [ $counter, 0 ]),
+                 @N_ops,
          $try => $self->dbprint("matching dynalt[%<$counter>]\n"),
                  @R_ops,
 		 aop('pushint', [ $counter, "dynamic alt counter" ]),
@@ -486,10 +579,11 @@ sub rewrite_dynamic_alternate {
                  aop('add', [ $counter, 1 ]),
 		 aop('ge', [ $counter, $N, $lastback ]),
 		 aop('goto', [ $try ]),
-	$back => aop('popint', [ $counter, 'dynamic alt counter' ]),
+	$back => $self->op_restore_rxlocals($op),
+                 aop('popint', [ $counter, 'dynamic alt counter' ]),
                  $self->dbprint("backtracking into dynalt's index %<$counter> match\n"),
 		 aop('goto', [ $R_back ]),
-	$next =>
+	$next => $self->op_save_rxlocals($op),
 		 );
 
     return ($back, @ops);
@@ -514,10 +608,10 @@ sub rewrite_dynamic_alternate {
 sub rewrite_greedy_range {
     my ($self, $op, $R, $min, $max, $lastback) = @_;
 
-    my ($loop, $back, $check, $next) =
-     map { $self->genlabel("gr_$_") } qw(loop back check next);
+    my ($loop, $back, $local_back, $check, $next) =
+     map { $self->genlabel("gr_$_") } qw(loop back local_back check next);
 
-    my $matchcount = $self->new_rxlocal("matchcount");
+    my $matchcount = $self->new_rxlocal($op, "matchcount");
 
     my ($R_back, @R_ops) = $self->rewrite($R, $check);
     my @ops = (
@@ -526,11 +620,12 @@ sub rewrite_greedy_range {
                @R_ops,
                aop('add', [ $matchcount, 1 ]),
                aop('goto', [ $loop ]),
-      $back => aop('unless', [ $matchcount, $lastback ]),
+      $back => $self->op_restore_rxlocals($op),
+$local_back => aop('unless', [ $matchcount, $lastback ]),
                aop('add', [ $matchcount, -1 ]),
                aop('goto', [ $R_back ]),
-     $check => aop('lt', [ $matchcount, $min, $back ]),
-      $next =>
+     $check => aop('lt', [ $matchcount, $min, $local_back ]),
+      $next => $self->op_save_rxlocals($op),
               );
 
     return ($back, @ops);
@@ -563,10 +658,10 @@ sub rewrite_greedy_range {
 sub rewrite_nongreedy_range {
     my ($self, $op, $R, $min, $max, $lastback) = @_;
 
-    my ($rfail, $back, $check, $next) =
-      map { $self->genlabel("ngr_$_") } qw(rfail back check next);
+    my ($rfail, $local_back, $back, $check, $next) =
+      map { $self->genlabel("ngr_$_") } qw(rfail local_back back check next);
 
-    my $matchcount = $self->new_rxlocal("matchcount");
+    my $matchcount = $self->new_rxlocal($op, "matchcount");
 
     my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
     my @ops = (
@@ -575,11 +670,12 @@ sub rewrite_nongreedy_range {
      $rfail => aop('unless', [ $matchcount, $lastback ]),
                aop('add', [ $matchcount, -1 ]),
                aop('goto', [ $R_back ]),
-      $back => aop('ge', [ $matchcount, $max, $rfail ]),
+      $back => $self->op_restore_rxlocals($op),
+$local_back => aop('ge', [ $matchcount, $max, $rfail ]),
                @R_ops,
                aop('add', [ $matchcount, 1 ]),
-     $check => aop('lt', [ $matchcount, $min, $back ]),
-      $next =>
+     $check => aop('lt', [ $matchcount, $min, $local_back ]),
+      $next => $self->op_save_rxlocals($op),
               );
 
     return ($back, @ops);
@@ -884,8 +980,8 @@ sub run {
     my @save_rxlocals;
     my @restore_rxlocals;
     if ($ctx->{preserve_state}) {
-        @save_rxlocals = $self->save_rxlocals();
-        @restore_rxlocals = $self->restore_rxlocals();
+        @save_rxlocals = $self->rule_save_rxlocals();
+        @restore_rxlocals = $self->rule_restore_rxlocals();
     }
 
     # Set up the success/failure handling

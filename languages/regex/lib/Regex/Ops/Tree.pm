@@ -32,7 +32,8 @@ use Carp qw(confess);
 @Regex::Ops::Tree::_onearg::ISA      = qw(Regex::Ops::Tree);
 
 @Regex::Ops::Tree::match::ISA        = qw(Regex::Ops::Tree::_atom);
-@Regex::Ops::Tree::charclass::ISA   = qw(Regex::Ops::Tree::_atom);
+@Regex::Ops::Tree::charclass::ISA    = qw(Regex::Ops::Tree::_atom);
+@Regex::Ops::Tree::classpieces::ISA  = qw(Regex::Ops::Tree::_atom);
 @Regex::Ops::Tree::seq::ISA          = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::alternate::ISA    = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::multi_match::ISA  = qw(Regex::Ops::Tree);
@@ -53,7 +54,7 @@ sub op {
     $class = ref($class) if ref $class;
     while (1) {
         last if UNIVERSAL::isa("${class}::$name", 'Regex::Ops::Tree');
-        $class =~ s/::\w+$// or die "Called op on invalid class $_[0]";
+        $class =~ s/::\w+$// or confess "Called op on invalid class $_[0]";
     }
     $class = "${class}::$name";
     my $self = bless { name => $name,
@@ -366,6 +367,10 @@ sub Regex::Ops::Tree::charclass::render {
     die;
 }
 
+sub Regex::Ops::Tree::classpieces::render {
+    die;
+}
+
 sub Regex::Ops::Tree::seq::needparen { 0 }
 sub Regex::Ops::Tree::seq::render {
     my $op = shift;
@@ -482,6 +487,11 @@ sub Regex::Ops::Tree::match::reftree {
 sub Regex::Ops::Tree::charclass::reftree {
     my $op = shift;
     return annotated($op, "charclass " . $op->render(@_));
+}
+
+sub Regex::Ops::Tree::classpieces::reftree {
+    my $op = shift;
+    return annotated($op, "classpieces " . $op->render(@_));
 }
 
 sub Regex::Ops::Tree::seq::reftree {

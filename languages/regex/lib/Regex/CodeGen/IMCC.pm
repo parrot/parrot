@@ -65,7 +65,7 @@ sub output_advance {
     my ($self, $distance, $failLabel) = @_;
     $failLabel = $self->output_label_use($failLabel);
     return ("add <rx_pos>, $distance # pos++",
-            "ge <rx_pos>, <rx_len>, $failLabel # past end of input?",
+            "gt <rx_pos>, <rx_len>, $failLabel # past end of input?",
             "set <rx_starts>[0], <rx_pos> # group 0 start := pos");
 }
 
@@ -204,12 +204,12 @@ sub output_classmatch {
     while (@$incexc) {
         my $first = shift(@$incexc);
         my $last = shift(@$incexc);
-        if (defined($last) && ($first != $last)) {
+        if (defined($last)) {
             push @ops, "lt <rx_tmp>, $first, $fail"
               unless $first == 0;
-            push @ops, "le <rx_tmp>, $last, $pass";
+            push @ops, "lt <rx_tmp>, $last, $pass";
         } else {
-            push @ops, "eq <rx_tmp>, $first, $pass";
+            push @ops, "ge <rx_tmp>, $first, $pass";
         }
     }
     push @ops, "branch $fail";
