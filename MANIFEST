@@ -21,7 +21,6 @@ global_setup.h
 interpreter.c
 interpreter.h
 io.h
-make_op_table_build.pl
 memory.c
 memory.h
 opcode_table
