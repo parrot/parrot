@@ -248,7 +248,11 @@ sub superpmc_info {
     my $filename = "$FindBin::Bin/\L$pmc\E.pmc";
     print "Scanning $filename...\n" unless $print_tree;
     local $/;
-    open(SUPERPMC, $filename) or die "open superpmc file $filename: $!";
+    if (!open(SUPERPMC, $filename)) {
+	$filename =~ s/classes/dynclasses/;
+        print "\tScanning $filename...\n" unless $print_tree;
+	open(SUPERPMC, $filename) or die "open superpmc file $filename: $!";
+    };
     my $data = <SUPERPMC>;
     close SUPERPMC;
     return parse_superpmc($data);

@@ -201,6 +201,9 @@ docs/tests.pod                                    [main]doc
 docs/vtables.pod                                  [main]doc
 dod.c                                             []
 dotgnu.ops                                        []
+dynclasses/Makefile                               [devel]
+dynclasses/README                                 [devel]
+dynclasses/foo.pmc                                [devel]
 editor/pasm.el                                    [devel]
 editor/pasm.vim                                   [devel]
 embed.c                                           []
