@@ -28,7 +28,7 @@ my $cpuarch = shift @ARGV;
 
 my ($i,$j,$k,$n);
 
-my ($function, $body, $line);
+my ($function, $body, $line, $extern);
 
 my ($asm, $precompiled);
 
@@ -43,8 +43,9 @@ sub readjit($) {
     while ($line = <IN>) {
         next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
         if (!defined($function)) {
-            $line =~ m/([^\s]*)\s*{/;
-            $function = $1;
+            $line =~ m/(extern\s*)?([^\s]*)\s*{/;
+            $extern = (defined($1))? 1 : 0;
+            $function = $2;
             $asm = "";
             next;
         }
@@ -55,7 +56,7 @@ sub readjit($) {
             $asm =~ s/NATIVECODE/jit_info->native_ptr/g;
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
-            $ops{$function} = $asm;
+            $ops{$function} = [ $asm , $extern ];
             $function = undef;
         }
         $asm .= $line;
@@ -91,7 +92,8 @@ my $jit_fn_retn = "void";
 my $jit_fn_params = "(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter)";
 
 for ($i = 0; $i < $core_numops; $i++) {
-    $body = $core_ops{$core_opfunc[$i]};
+    $body = $core_ops{$core_opfunc[$i]}[0];
+    $extern = $core_ops{$core_opfunc[$i]}[1];
 
     my $jit_func;
     my $op = $Parrot::OpLib::core::ops->[$i];
@@ -99,6 +101,7 @@ for ($i = 0; $i < $core_numops; $i++) {
     $precompiled = 0;
     if (!defined $body) {
         $precompiled = 1;
+        $extern = 1;
         if ($op->jump) {
             $jit_func = "Parrot_jit_cpcf_op";
         } else {
@@ -115,7 +118,7 @@ for ($i = 0; $i < $core_numops; $i++) {
     }
     my $op_args = $op->size;
     push @jit_funcs, "/* op $i: $core_opfunc[$i] */\n";
-    push @jit_funcs, "{ $jit_func, $op_args }, \n";
+    push @jit_funcs, "{ $jit_func, $op_args, $extern }, \n";
 }
 
 print JITCPU @jit_funcs, "};\n";

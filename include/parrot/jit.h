@@ -75,11 +75,10 @@ typedef struct {
 
 typedef void (*jit_fn_t)(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter);
 
-/* Don't ever count on any info here */
-
 typedef struct {
     jit_fn_t fn;
     int nargop;
+    char extcall;
 } jit_fn_info_t; 
 
 extern jit_fn_info_t op_jit[];
