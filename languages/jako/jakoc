@@ -2644,14 +2644,14 @@ while(<>) {
     # Regexp Captures:
     #
     #  1. LHS sum (variable name)
-    #  2. RHS left addend
-    #  3. RHS left addend (variable name)
-    #  4. RHS left addend (number)
-    #  5. RHS left addend (number's decimal places) -- used for grouping, not capture
-    #  6. RHS right addend
-    #  7. RHS right addend (variable name)
-    #  8. RHS right addend (number)
-    #  9. RHS right addend (number's decimal places) -- used for grouping, not capture
+    #  2. RHS augend
+    #  3. RHS augend (variable name)
+    #  4. RHS augend (number)
+    #  5. RHS augend (number's decimal places) -- used for grouping, not capture
+    #  6. RHS addend
+    #  7. RHS addend (variable name)
+    #  8. RHS addend (number)
+    #  9. RHS addend (number's decimal places) -- used for grouping, not capture
     #
 
     if (defined $3 or defined $7) {
