@@ -64,9 +64,11 @@ C<P6C::Builtins>).  C<emit> will fail if you have not defined C<main>.
 
 package P6C::IMCC;
 use strict;
+use Carp 'confess';
 use P6C::Builtins;
-use P6C::Util;
+use P6C::Util qw(warning unimp error);
 use P6C::Context;
+use P6C::Addcontext;
 
 # Map Perl types to IMCC parameter types:
 my %paramtype = (int => 'int',
@@ -130,7 +132,6 @@ sub init {			# reset state
 sub compile {			# compile input (don't emit)
     my $x = shift;
     my $ctx = new P6C::Context type => 'void';
-    use P6C::Addcontext;
     if (ref $x eq 'ARRAY') {
 	# propagate context:
 	P6C::Context::block_ctx($x);
@@ -386,7 +387,6 @@ sub globalvar($) {
     my $name = shift;
     if (!exists $globals{$name}) {
 # 	if ($P6C::o{strict}) {
-	    use P6C::Util 'warning';
 	    warning "Reference to global $name";
 # 	}
 	add_globalvar($name);
@@ -397,7 +397,6 @@ sub globalvar($) {
 sub add_globalvar($;$) {
     my $name = shift;
     if (exists $globals{$name}) {
-	use P6C::Util 'warning';
 	warning "Re-adding global $name";
     }
     $globals{$name} = shift || 'PerlUndef';
@@ -438,7 +437,6 @@ sub findvar($) {
 }
 
 sub push_scope {
-    use Carp 'confess';
     confess $curfunc unless $curfunc && $funcs{$curfunc};
     $funcs{$curfunc}->push_scope;
 }
@@ -474,7 +472,6 @@ END
 sub goto_label {
     die "Label outside function" unless defined $curfunc;
     my $name = $funcs{$curfunc}->label(@_);
-    use P6C::Util 'error';
     error "Undefined label (@_)" unless $name;
     code(<<END);
 	goto $name
@@ -847,6 +844,7 @@ sub val {
 
 ##############################
 package P6C::ValueList;
+use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 
@@ -901,14 +899,15 @@ END
 	return [@ret];
 
     } else {
-	use Data::Dumper;
 	unimp "Can't handle context ".Dumper($ctx);
     }
 }
 
 ##############################
 package P6C::Binop;
+use Carp 'cluck';
 use P6C::IMCC::Binop ':all';
+use P6C::IMCC::hype 'do_hyped';
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
@@ -934,7 +933,6 @@ sub do_assign {
 # C<P6C::ValueList>.
 sub do_array {
     my $x = shift;
-    use Carp 'cluck';
     cluck "Should provide context to comma operator" unless $x->{ctx};
     my @things = flatten_leftop($x, ',');
     my $vallist = P6C::ValueList->new(vals => \@things);
@@ -984,7 +982,6 @@ BEGIN {
 sub val {
     my $x = shift;
     if (ref($x->op) eq 'P6C::hype') {
-	use P6C::IMCC::hype 'do_hyped';
 	return do_hyped($x->op->op, $x->l, $x->r);
     }
     my $ret;
@@ -1151,8 +1148,12 @@ END
 }
 
 ######################################################################
-sub P6C::sv_literal::val {
-    use P6C::Util ':all';
+package P6C::sv_literal;
+use Data::Dumper;
+use P6C::Util ':all';
+use P6C::IMCC ':all';
+
+sub val {
 
     my $x = shift;
     return undef if $x->{ctx}->type && $x->{ctx}->type eq 'void';
@@ -1177,7 +1178,6 @@ END
 	return scalar_in_context($val, $ctx);
 
     } else {
- 	use Data::Dumper;
  	unimp "Context ", Dumper($ctx);
 	# XXX: bogus
 	$ret = newtmp 'PerlUndef';
@@ -1190,9 +1190,12 @@ END
 
 ######################################################################
 # Prefix operators (see P6C/IMCC/prefix.pm)
+package P6C::prefix;
+use P6C::IMCC ':all';
+use P6C::IMCC::prefix qw(%prefix_ops gen_sub_call);
+use P6C::Util 'unimp';
 
-sub P6C::prefix::val {
-    use P6C::IMCC::prefix qw(%prefix_ops gen_sub_call);
+sub val {
 
     my $x = shift;
 
@@ -1239,6 +1242,7 @@ sub val {
 # Chained comparisons
 package P6C::compare;
 use P6C::IMCC ':all';
+use P6C::Util 'diag';
 
 # XXX: since IMCC doesn't give us access to cmp, cmp_num, and
 # cmp_string separately, we need to go through num and str temporaries
@@ -1334,8 +1338,6 @@ END
 
 ######################################################################
 sub P6C::sub_def::val {
-    use P6C::IMCC ':all';
-    use P6C::Util 'diag';
     my $x = shift;
 
     if (exists_function_def($x)) {
@@ -1437,16 +1439,15 @@ END
 
 ######################################################################
 package P6C::variable;
+use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Context;
 use P6C::Util qw(is_scalar same_type unimp is_pmc);
-use Data::Dumper;
 
 # XXX: need to redo this when we get globals.
 sub val {
     my $x = shift;
     my $ctx = $x->{ctx};
-    use Data::Dumper;
     die $x->name unless $ctx;
     my ($v, $global) = findvar($x->name);
     if ($global) {
@@ -1545,6 +1546,7 @@ END
 ######################################################################
 # Variable declarations, which may have initializers
 package P6C::decl;
+use Carp 'cluck';
 use P6C::IMCC ':all';
 use P6C::Util 'unimp';
 use P6C::Context;
@@ -1576,7 +1578,6 @@ sub assign {
 
     if (ref $x->vars ne 'ARRAY') {
 	if (ref($tmpv) eq 'ARRAY') {
-	    use Carp 'cluck';
 	    cluck "shouldn't return tuple in scalar context\n";
 	    $tmpv = $tmpv->[-1];
 	}
@@ -1587,7 +1588,6 @@ sub assign {
 	# If we are evaluating an expression in tuple context, the val
 	# function must return an array ref.
 	if (ref $tmpv ne 'ARRAY') {
-	    use Carp 'cluck';
 	    cluck "Shouldn't pass single item to tuple\n";
 	    $tmpv = [$tmpv];
 	}
@@ -1617,6 +1617,7 @@ sub P6C::indices::val {
 
 ##############################
 package P6C::subscript_exp;
+use Data::Dumper;
 use P6C::Util 'unimp';
 use P6C::IMCC ':all';
 
@@ -1705,7 +1706,6 @@ END
 	$ret = [@ret];
 
     } else {
-	use Data::Dumper;
 	confess "slice in unsupported context ".Dumper($ctx);
     }
     return $ret;
@@ -1780,7 +1780,6 @@ $end2:
 	if $short < $long goto $start2
 END
     } else {
-	use Data::Dumper;
 	unimp 'Assignment to multi-element slice: '.Dumper($lctx);
     }
 }

@@ -125,7 +125,6 @@ sub nelem {
 sub is_scalar {
     my $ctx = shift;
     my $type = $ctx->type;
-    use P6C::Util;
     return !ref($type) && !$ctx->flatten && P6C::Util::is_scalar($type);
 }
 

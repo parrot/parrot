@@ -27,10 +27,12 @@ and unary operators, and for "magic" things like guards and C<loop>.
 
 =cut
 
+use Data::Dumper;
+use Carp 'confess';
+use strict;
 use P6C::Context;
 use P6C::Nodes;
 use P6C::Util qw(:all);
-use strict;
 
 BEGIN { # Add types for builtin binary operators.
     # types for symmetric operators:
@@ -109,7 +111,6 @@ sub P6C::Binop::ctx_right {
 	$x->l->ctx_right($ctx);
 
     } elsif ($op =~ /^([^=]+)=$/) {
-	use P6C::Util 'deep_copy';
 	# Turn this into a normal, non-inplace operator and try again.
 	# Yuck.
 	my $ltmp = deep_copy($x->l);
@@ -211,8 +212,6 @@ sub P6C::indices::ctx_right {
 	    $index_ctx = new P6C::Context type => 'PerlArray';
 
 	} else {
-	    use Data::Dumper;
-	    use Carp 'confess';
 	    confess "index contest: ", Dumper($ctx);
 	}
 
@@ -353,7 +352,6 @@ sub ifunless_context {
 }
 
 sub for_context {
-    use P6C::Util 'flatten_leftop';
     my ($x, $ctx) = @_;
     my ($ary, $body) = @{$x->args->vals};
     my @streams = flatten_leftop($ary, ';');
@@ -502,15 +500,7 @@ sub P6C::ternary::ctx_left {
 	if (!defined $other) {
 	    unimp "Assignment to ternary in too hairy a context.";
 	}
-	my $treecopy;
-	{
-	    use Data::Dumper;
-	    local $Data::Dumper::Purity = 1;
-	    local $Data::Dumper::Terse = 1;
-	    local $Data::Dumper::Deepcopy = 1;
-	    $treecopy = eval Dumper($other);
-	    die "Can't duplicate op-tree: $@" if $@;
-	}
+	my $treecopy = deep_copy $other;
 
 	$x->then->ctx_left($other, $ctx);
 	$x->{then_right} = $other;
@@ -582,9 +572,7 @@ sub P6C::sub_def::ctx_right {
 sub get_closure_params {
     my ($x) = @_;
     my @params;
-    use P6C::Util 'map_preorder';
     if (defined($x->params)) {
-	use P6C::Util 'flatten_leftop';
 	# Explicit parameter list in "-> $foo, $bar { ... }"
 	foreach (flatten_leftop($x->params, ';')) {
 	    push @params, flatten_leftop($_, ',');
@@ -608,7 +596,6 @@ sub get_closure_params {
 sub setup_catch_blocks {
     my ($x) = @_;
     my @catch;
-    use P6C::Util 'map_preorder';
     map_preorder {
 	if (UNIVERSAL::isa($_, 'P6C::prefix')
 	    && $_->name eq 'CATCH') {
@@ -628,7 +615,6 @@ sub P6C::closure::ctx_right {
     if ($ctx->type ne 'void') {
 	my @params = get_closure_params($x);
 	if (@params) {
-	    use P6C::Util qw(is_array_expr);
 	    my $vals = new P6C::variable(name => '@_',
 					 type => 'PerlArray');
 	    my $paramvar;
@@ -702,7 +688,6 @@ sub P6C::ValueList::ctx_right {
 	$x->vals->[-1]->ctx_right($ctx);
 
     } else {
-	use Data::Dumper;
 	unimp "Unrecognized context: ".Dumper($ctx);
     }
     $x->{ctx} = $ctx->copy;

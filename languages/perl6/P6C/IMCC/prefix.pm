@@ -2,16 +2,16 @@
 # Prefix operators (i.e. functions and control structures)
 package P6C::IMCC::prefix;
 use SelfLoader;
+use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Util ':all';
+use P6C::IMCC::Binop 'do_smartmatch';
 use P6C::Context;
 require Exporter;
 use vars qw(@ISA @EXPORT_OK);
-BEGIN {
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(%prefix_ops val_noarg gen_sub_call common_while
 		wrap_with_catch);
-}
 
 sub prefix_if ;
 sub common_while ;
@@ -252,7 +252,6 @@ sub prefix_for {
     # approach here.
     my ($streams, $body) = @{$x->args->vals};
     unless (ref $streams eq 'ARRAY') {
-	use Data::Dumper;
 	die Dumper($streams);
     }
     my @bindings = map { [flatten_leftop($_, ',')] }
@@ -597,7 +596,6 @@ sub prefix_return {
 }
 
 sub prefix_when {
-    use P6C::IMCC::Binop 'do_smartmatch';
     my ($x) = @_;
     my ($test, $block) = @{$x->args->vals};
     my $label = $x->{ctx}{label};
@@ -635,7 +633,6 @@ sub prefix_given {
 	# Make sure "when" clauses can name their skip labels.
 	# REMEMBER: we may be labeling other people's "when's" -- it's
 	# their responsibility to re-label them later.
-	use P6C::Util 'map_preorder';
 	map_preorder {
 	    if ($_->isa('P6C::prefix') && $_->name eq 'when') {
 		$_->{ctx}{label} = $label;

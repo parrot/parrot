@@ -21,6 +21,7 @@ the grammar rules in Parser.pm.
 
 use strict;
 use P6C::Nodes;
+use Data::Dumper;
 
 ######################################################################
 
@@ -73,7 +74,6 @@ sub infix_left_seq {
     for (my $i = 1; $i < $#{$x}; $i += 2) {
 	my $op = ref($x[$i]) ? $x[$i]->tree : $x[$i];
 	unless (ref($x[$i + 1])) {
-	    use Data::Dumper;
 	    die Dumper(\@x);
 	}
 	my $r = $x[$i + 1]->tree;

@@ -46,16 +46,15 @@ parents after children.  The current node will be in C<$_>.
 
 =cut
 
+use Data::Dumper;
 require Exporter;
 use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
-BEGIN {
 @EXPORT_OK = qw(unimp diag error warning
 		flatten_leftop map_preorder map_postorder
 		deep_copy
 		is_scalar is_array_expr same_type is_pmc is_numeric is_string);
 %EXPORT_TAGS = (all => [@EXPORT_OK] );
 @ISA = qw(Exporter);
-}
 
 use strict;
 
@@ -258,7 +257,6 @@ sub same_type {
 sub deep_copy {
     my $x = shift;
     {
-	use Data::Dumper;
 	$Data::Dumper::Purity = 1;
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Deepcopy = 1;

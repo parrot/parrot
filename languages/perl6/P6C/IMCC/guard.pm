@@ -1,6 +1,7 @@
 package P6C::IMCC::guard;
 use SelfLoader;
 use P6C::IMCC ':all';
+use P6C::IMCC::prefix 'common_while';
 require Exporter;
 use vars qw(@ISA @EXPORT_OK);
 @ISA = qw(Exporter);
@@ -38,7 +39,6 @@ END
 
 sub guard_while {
     my $x = shift;
-    use P6C::IMCC::prefix 'common_while';
     common_while($x->name, sub { $x->test->val }, sub { $x->expr->val },
 		 $x->{ctx});
 }

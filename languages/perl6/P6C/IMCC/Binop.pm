@@ -1,5 +1,7 @@
 package P6C::IMCC::Binop;
 use SelfLoader;
+use Data::Dumper;
+use Carp 'confess';
 use P6C::IMCC ':all';
 use P6C::Util ':all';
 use P6C::Context;
@@ -196,7 +198,6 @@ END
 	return [@ret];
 
     } else {
-	use Data::Dumper;
 	unimp "Unsupported range context ".Dumper($ctx->type);
     }
 }
@@ -288,7 +289,6 @@ END
 
 sub do_smartmatch {
     my ($a, $b) = @_;
-    use Carp 'confess';
     confess unless $a;
     die unless $b;
     my $atype = smartmatch_type $a;
