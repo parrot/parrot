@@ -90,8 +90,8 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_top) {
             last = new_chunk;
         }
         new_chunk->used = old_chunk->used;
-        new_chunk->flags = old_chunk->flags & ~STACK_CHUNK_COW_FLAG;
-        /* Can't do bit arithmetic on enums. */
+
+        /* Can't do bit arithmetic directly on enums, must cast via ints. */
         new_chunk->flags = (Stack_chunk_flags)((int)old_chunk->flags
                 & ~(int)STACK_CHUNK_COW_FLAG);
 
