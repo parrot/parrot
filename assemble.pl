@@ -70,7 +70,7 @@ my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 
 # read source and assemble
 my $pc=0; my $op_pc=0;
-my ($bytecode,%label,%fixup,%constants,@constants);
+my ($bytecode,%label,%fixup,%constants,@constants,%equate);
 my (%local_label, %local_fixup, $last_label);
 my $line=0;
 while(<>) {
@@ -85,8 +85,9 @@ while(<>) {
 	}
 	next;
     }
-    if(m/^((\S+):)?\s*(.+)?/) {
-        my($label,$code)=($2,$3);
+    my($label,$code);
+    if(m/^(\S+):\s*(.+)?/) {
+        ($label,$code)=($1,$2);
 	if(defined($label) && $label ne "") {
 	    if($label=~m/^\$/) {
 		# a local label
@@ -128,115 +129,128 @@ while(<>) {
 		$label{$label}=$pc; # store it.
 		$last_label=$label;
 	    }
+	} 
+    } else {
+	# here's where we can catch assembler directives!
+	if(m/^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i) {
+	    my($name,$data)=($1,$2);
+	    $equate{$name}=$data;
+	} else {
+	    $code=$_;
 	}
-        next if(!defined($code));
-        1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
-        $code=~s/,/ /g;
-        my($opcode,@args)=split(/\s+/,$code);
-	$opcode=lc($opcode);
-        if (!exists $opcodes{$opcode}) {
-	    # try to determine _real_ opcode.
-	    my @arg_t=();
-	    foreach (@args) {
-		if(m/^([INPS])\d+$/) {
-		    # a register.
-		    push @arg_t,lc($1);
-		} else {
-		    # a constant of some sort
-		    if(m/^\[(\d+)\]$/) {
-			# string
-			push @arg_t,'sc';
-		    } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) {
-			# integer
-			push @arg_t,'ic';
-		    } elsif(m/^[\$A-Za-z_][\w]*$/i) {
-			# label
-			push @arg_t,'ic';
-		    } else {
-			# numeric
-			push @arg_t,'nc';
-		    }
-		}
+    }
+    next if(!defined($code));
+    1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
+    $code=~s/,/ /g;
+    my($opcode,@args)=split(/\s+/,$code);
+    $opcode=lc($opcode);
+    if (!exists $opcodes{$opcode}) {
+	# try to determine _real_ opcode.
+	my @arg_t=();
+	foreach (@args) {
+	    if(exists($equate{$_})) {
+		# substitute the equate value
+		$_=$equate{$_};
+		s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
 	    }
-
-	    my $found_op = 0;
-	    my @tests;
-	    my $test;
-
-	    #
-	    # For many-arg ops, if first two arg types have the same basic type (like 'i' and 'ic'),
-	    # shift off the first one.
-	    #
-
-	    shift @arg_t if (@arg_t > 2) and (substr($arg_t[0],0,1) eq substr($arg_t[1],0,1));
-
-	    while (@arg_t) {
-		$test = $opcode . '_' . join('_', @arg_t);
-		push @tests, $test;
-		$found_op++, last if $opcodes{$test};
-		pop @arg_t;
-	    }
-
-	    if ($found_op) {
-		pop @tests;
-		log_message("substituting $test for $opcode" . (scalar(@tests) ? (" (tried " . join(', ', @tests) . ")") : ''));
-		$opcode = $test;
+	    if(m/^([INPS])\d+$/) {
+		# a register.
+		push @arg_t,lc($1);
 	    } else {
-		error("No opcode $opcode (tried " . join(', ', @tests) . ") in <$_>");
-	    }
-        }
-        if (@args != $opcodes{$opcode}{ARGS}) {
-            error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
-        }
-        $bytecode .= pack "l", $opcodes{$opcode}{CODE};
-        $op_pc=$pc;
-        $pc+=4;
-
-        foreach (0..$#args) {
-            my($rtype)=$opcodes{$opcode}{TYPES}[$_];
-            my($type)=$real_type{$opcodes{$opcode}{TYPES}[$_]};
-            if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
-                # its a register argument
-                $args[$_]=~s/^[INPS](\d+)$/$1/i;
-                $pc+=$sizeof{$rtype}
-            } elsif($rtype eq "D") {
-                # a destination
-		if($args[$_]=~/^\$/) {
-		    # a local label
-		    if(!exists($local_label{$args[$_]})) {
-			# we have not seen it yet...put it on the fixup list
-			push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
-			$args[$_]=0xffffffff;
-		    } else {                    
-			$args[$_]=($local_label{$args[$_]}-$op_pc)/4;
-		    }
+		# a constant of some sort
+		if(m/^\[(\d+)\]$/) {
+		    # string
+		    push @arg_t,'sc';
+		} elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) {
+		    # integer
+		    push @arg_t,'ic';
+		} elsif(m/^[\$A-Za-z_][\w]*$/i) {
+		    # label
+		    push @arg_t,'ic';
 		} else {
-		    if(!exists($label{$args[$_]})) {
-			# we have not seen it yet...put it on the fixup list
-			push(@{$fixup{$args[$_]}},$op_pc,$pc);
-			$args[$_]=0xffffffff;
-		    } else {                    
-			$args[$_]=($label{$args[$_]}-$op_pc)/4;
-		    }
+		    # numeric
+		    push @arg_t,'nc';
 		}
-                $pc+=$sizeof{$rtype};
-	    } elsif($rtype eq 's') {
-		$args[$_]=~s/[\[\]]//g;
-		$pc+=$sizeof{$rtype};           
-            } else {
-                $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
-                $pc+=$sizeof{$rtype};           
-            }
-            $bytecode .= pack $pack_type{$type}, $args[$_];
-        }
-	if($options{'listing'}) {
-	    # add line to listing.
-	    my $odata;
-	    foreach (unpack('l*',substr($bytecode,$op_pc))) {
-		$odata.=sprintf("%08x ",$_);
 	    }
-	    $listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, $odata,$sline);
 	}
+	
+	my $found_op = 0;
+	my @tests;
+	my $test;
+	
+	#
+	# For many-arg ops, if first two arg types have the same basic type (like 'i' and 'ic'),
+	# shift off the first one.
+	#
+	
+	shift @arg_t if (@arg_t > 2) and (substr($arg_t[0],0,1) eq substr($arg_t[1],0,1));
+	
+	while (@arg_t) {
+	    $test = $opcode . '_' . join('_', @arg_t);
+	    push @tests, $test;
+	    $found_op++, last if $opcodes{$test};
+	    pop @arg_t;
+	}
+	
+	if ($found_op) {
+	    pop @tests;
+	    log_message("substituting $test for $opcode" . (scalar(@tests) ? (" (tried " . join(', ', @tests) . ")") : ''));
+	    $opcode = $test;
+	} else {
+	    error("No opcode $opcode (tried " . join(', ', @tests) . ") in <$_>");
+	}
+    }
+    if (@args != $opcodes{$opcode}{ARGS}) {
+	error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
+    }
+    $bytecode .= pack "l", $opcodes{$opcode}{CODE};
+    $op_pc=$pc;
+    $pc+=4;
+    
+    foreach (0..$#args) {
+	my($rtype)=$opcodes{$opcode}{TYPES}[$_];
+	my($type)=$real_type{$opcodes{$opcode}{TYPES}[$_]};
+	if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
+	    # its a register argument
+	    $args[$_]=~s/^[INPS](\d+)$/$1/i;
+	    $pc+=$sizeof{$rtype}
+	} elsif($rtype eq "D") {
+	    # a destination
+	    if($args[$_]=~/^\$/) {
+		# a local label
+		if(!exists($local_label{$args[$_]})) {
+		    # we have not seen it yet...put it on the fixup list
+		    push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
+		    $args[$_]=0xffffffff;
+		} else {                    
+		    $args[$_]=($local_label{$args[$_]}-$op_pc)/4;
+		}
+	    } else {
+		if(!exists($label{$args[$_]})) {
+		    # we have not seen it yet...put it on the fixup list
+		    push(@{$fixup{$args[$_]}},$op_pc,$pc);
+		    $args[$_]=0xffffffff;
+		} else {                    
+		    $args[$_]=($label{$args[$_]}-$op_pc)/4;
+		}
+	    }
+	    $pc+=$sizeof{$rtype};
+	} elsif($rtype eq 's') {
+	    $args[$_]=~s/[\[\]]//g;
+	    $pc+=$sizeof{$rtype};           
+	} else {
+	    $args[$_]=oct($args[$_]) if($args[$_]=~/^0/);
+	    $pc+=$sizeof{$rtype};           
+	}
+	$bytecode .= pack $pack_type{$type}, $args[$_];
+    }
+    if($options{'listing'}) {
+	# add line to listing.
+	my $odata;
+	foreach (unpack('l*',substr($bytecode,$op_pc))) {
+	    $odata.=sprintf("%08x ",$_);
+	}
+	$listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, $odata,$sline);
     }
 }
 $listing.="\n" if($options{'listing'});
@@ -258,8 +272,7 @@ if($options{'listing'}) {
 }
 
 if(keys(%fixup)) {
-    print STDERR "SQUAWK!  These symbols were referenced but not
-defined:\n";
+    print STDERR "SQUAWK!  These symbols were referenced but not defined:\n";
     foreach (sort(keys(%fixup))) {
         print STDERR "\t$_ at pc: ";
         foreach my $pc (@{$fixup{$_}}) {
