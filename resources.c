@@ -14,6 +14,10 @@
 
 #include "parrot/parrot.h"
 
+#define BUFFER_ALIGNMENT 16
+#define STRING_ALIGNMENT 4
+#define CONSTANT_STRING_ALIGNMENT 4
+
 /* Function prototypes for static functions */
 static void *mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
                           struct Memory_Pool *pool);
@@ -870,7 +874,7 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->memory_pool->top_block = NULL;
     interpreter->arena_base->memory_pool->compact = &compact_buffer_pool;
     interpreter->arena_base->memory_pool->minimum_block_size = 16384;
-    interpreter->arena_base->memory_pool->align_1 = 16 - 1;
+    interpreter->arena_base->memory_pool->align_1 = BUFFER_ALIGNMENT - 1;
     alloc_new_block(interpreter, 8192, 
                     interpreter->arena_base->memory_pool);
 
@@ -880,7 +884,7 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->string_pool->top_block = NULL;
     interpreter->arena_base->string_pool->compact = &compact_string_pool;
     interpreter->arena_base->string_pool->minimum_block_size = 32768;
-    interpreter->arena_base->string_pool->align_1 = 4 - 1;
+    interpreter->arena_base->string_pool->align_1 = STRING_ALIGNMENT - 1;
 
     /* Constant strings - not compacted */
     interpreter->arena_base->constant_string_pool = 
@@ -888,7 +892,8 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->constant_string_pool->top_block = NULL;
     interpreter->arena_base->constant_string_pool->compact = NULL;
     interpreter->arena_base->constant_string_pool->minimum_block_size = 8192;
-    interpreter->arena_base->constant_string_pool->align_1 = 4 - 1;
+    interpreter->arena_base->constant_string_pool->align_1 =
+        CONSTANT_STRING_ALIGNMENT - 1;
 }
 
 /* Allocate a new memory block. We allocate the larger of however much
