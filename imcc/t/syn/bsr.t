@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 12;
+use TestCompiler tests => 13;
 
 ##############################
 # this tests register allocation/preserving of local bsr calls
@@ -335,3 +335,19 @@ CODE
 ok 1
 OUT
 
+output_is(<<'CODE', <<'OUT', "bug #25948");
+.sub _main
+        goto L1
+test:
+        $I1 = 1
+        ret
+L1:
+        $I2 = 2
+        call test
+        print $I2               # printed 1, not 2
+	print "\n"
+        end
+.end
+CODE
+2
+OUT

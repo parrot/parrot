@@ -234,6 +234,23 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
             /* now go back, find labels and connect these with
              * bsrs
              */
+            /* this doesn't work, if this is a local backward sub call
+             * the bsr isn't chained yet so the pred_list is empty
+             *
+             * s. #25948
+             */
+            if (!bb->pred_list) {
+                for (j = i; j < unit->n_basic_blocks; j++) {
+                    Basic_block * b_bsr = unit->bb_list[j];
+                    if (!strcmp(b_bsr->end->op, "bsr")) {
+                        addr = get_branch_reg(b_bsr->end);
+                        if (addr)
+                            bb_findadd_edge(interpreter, unit, b_bsr, addr);
+                    }
+                }
+            }
+            /* end #25948 */
+
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
                 if (!strcmp(pred->from->end->op, "bsr")) {
@@ -250,7 +267,7 @@ invok:
                         int saves = 0;
                         debug(interpreter, DEBUG_CFG,
                                 "\tcalled from bb %d '%I'\n",
-                            j, pred->from->end);
+                                j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
                             if (!strcmp(sub->op, "saveall"))
                                 if (!(sub->type & ITSAVES)) {
