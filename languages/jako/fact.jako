@@ -41,7 +41,7 @@ var int f;
 print("Algorithm F1 (The factorial function)\n");
 print("    Calculating fact($N) = ...\n");
 
-f= fact(N);
+f = fact(N);
 
 print("    ... = $f\n");
 
