@@ -13,8 +13,6 @@
 #if !defined(PARROT_MEMORY_H_GUARD)
 #define PARROT_MEMORY_H_GUARD
 
-void *mem_allocate_aligned(size_t);
-
 void *mem_sys_allocate(size_t);
 
 void *mem_sys_realloc(void *, size_t);

@@ -520,11 +520,11 @@ make_interpreter(Interp_flags flags)
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
-    interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));
-    interpreter->num_reg_base = mem_allocate_aligned(sizeof(struct NRegChunk));
+    interpreter->int_reg_base = mem_sys_allocate(sizeof(struct IRegChunk));
+    interpreter->num_reg_base = mem_sys_allocate(sizeof(struct NRegChunk));
     interpreter->string_reg_base =
-        mem_allocate_aligned(sizeof(struct SRegChunk));
-    interpreter->pmc_reg_base = mem_allocate_aligned(sizeof(struct PRegChunk));
+        mem_sys_allocate(sizeof(struct SRegChunk));
+    interpreter->pmc_reg_base = mem_sys_allocate(sizeof(struct PRegChunk));
     interpreter->int_reg_top = interpreter->int_reg_base;
     interpreter->num_reg_top = interpreter->num_reg_base;
     interpreter->string_reg_top = interpreter->string_reg_base;

@@ -17,7 +17,7 @@
 IntStack
 intstack_new(struct Parrot_Interp *interpreter)
 {
-    IntStack stack = mem_allocate_aligned(sizeof(struct IntStack_chunk_t));
+    IntStack stack = mem_sys_allocate(sizeof(struct IntStack_chunk_t));
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
@@ -48,7 +48,7 @@ intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
     if (++chunk->used == STACK_CHUNK_DEPTH) {
         if (chunk->next == stack) {
             /* Need to add a new chunk */
-            IntStack_Chunk new_chunk = mem_allocate_aligned(sizeof(*new_chunk));
+            IntStack_Chunk new_chunk = mem_sys_allocate(sizeof(*new_chunk));
             new_chunk->used = 0;
             new_chunk->next = stack;
             new_chunk->prev = chunk;
