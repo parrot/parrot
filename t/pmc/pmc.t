@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 74;
+use Parrot::Test tests => 76;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -56,6 +56,20 @@ output_is(<<'CODE', <<'OUTPUT', "newpmc");
 CODE
 starting
 ending
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "illegal min newpmc");
+	new P0, 0
+	end
+CODE
+Illegal PMC enum (0) in new
+OUTPUT
+
+output_is(<<"CODE", <<"OUTPUT", "illegal max newpmc");
+	new P0, $max_pmc
+	end
+CODE
+Illegal PMC enum ($max_pmc) in new
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "illegal min newpmc");
