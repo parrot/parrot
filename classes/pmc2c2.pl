@@ -49,6 +49,10 @@ Omit source line info
 
 Emit an empty body in the dump. This may be useful for debugging.
 
+=item C<--include=/path/to/pmc>
+
+Specify include path where to find PMCs.
+
 =back
 
 =head2 Internals
@@ -214,7 +218,6 @@ reused.
 =cut
 
 use FindBin;
-use lib 'lib';
 use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
@@ -225,6 +228,23 @@ use Getopt::Long;
 my %opt;
 
 main();
+
+sub find_file {
+    my $include = shift;
+    my $file = shift;
+    my $die_unless_found = shift;
+
+    foreach my $dir ( @$include ) {
+        my $path = File::Spec->catfile( $dir, $file );
+        return $path if -e $path;
+    }
+
+    die "can't find file '$file' in path '",
+      ( join "', '", @$include ), "'"
+        if $die_unless_found;
+
+    undef;
+}
 
 sub dump_default {
     my $file = "$FindBin::Bin/../vtable.tbl";
@@ -385,6 +405,7 @@ sub parse_pmc {
 
 # make a linear list of class->{parents} array
 sub gen_parent_list {
+    my $include = shift;
     my ($this, $all) = @_;
     my @todo = ($this);
     my $class = $all->{$this};
@@ -396,7 +417,7 @@ sub gen_parent_list {
             next if exists $class->{has_parent}{$parent};
             if (!$all->{$parent}) {
                 my $pf = lc $parent;
-                $all->{$parent} = read_dump("classes/$pf.pmc");
+                $all->{$parent} = read_dump($include, "$pf.pmc");
             }
             $class->{has_parent}{$parent} = { %{$all->{$parent}{has_method} }};
             push(@todo, $parent);
@@ -468,6 +489,7 @@ sub dump_is_newer {
 }
 
 sub dump_pmc {
+    my $include = shift;
     my @files = @_;
     my %all;
     # help these dumb 'shells' that are no shells
@@ -478,9 +500,9 @@ sub dump_pmc {
         $all{$class} = $res;
     }
 
-    my $vt = read_dump("vtable.pmc");
+    my $vt = read_dump($include, "vtable.pmc");
     if (!$all{default}) {
-        $all{default} = read_dump("classes/default.pmc");
+        $all{default} = read_dump($include, "classes/default.pmc");
     }
     add_defaulted($all{default}, $vt);
 
@@ -488,13 +510,12 @@ sub dump_pmc {
         my $dump;
         my $file = $all{$name}->{file};
         ($dump = $file) =~ s/\.\w+$/\.dump/;
-        gen_parent_list($name, \%all);
+        gen_parent_list($include, $name, \%all);
         my $class = $all{$name};
         gen_super_meths($class, $vt);
         # XXX write default.dump only once
-        next if (  ## $dump eq 'classes/default.dump' &&
-            ((-e $dump && dump_is_newer($dump)) ||
-            (-e "../$dump"  && dump_is_newer("../$dump"))));
+        my $existing = find_file($include, $dump);
+        next if ($existing && -e $existing && dump_is_newer($existing));
         my $Dumper = Data::Dumper->new([$class], [qw(class)]);
         $Dumper->Indent(1);
         print "Writing $dump\n" if $opt{verbose};
@@ -505,20 +526,11 @@ sub dump_pmc {
 }
 
 sub read_dump {
+    my $include = shift;
     my $file = shift;
     my $dump;
     ($dump = $file) =~ s/\.\w+$/.dump/;
-    unless ( -e $dump) {
-        if ($dump =~ m!^classes/!) {
-            $dump =~ s!^classes/!!;
-        }
-        elsif ($dump =~ m!^vtable!) {
-            $dump = "$FindBin::Bin/../vtable.dump";
-        }
-        unless ( -e $dump) {
-            $dump = "$FindBin::Bin/../classes/$dump";
-        }
-    }
+    $dump = find_file($include, $dump, 1);
     print "Reading $dump\n" if $opt{verbose};
 
     open D, "<$dump" or die "Can't read '$dump'";
@@ -533,9 +545,10 @@ sub read_dump {
 }
 
 sub print_tree {
+    my $include = shift;
     my ($depth, @files) = @_;
     foreach my $file (@files) {
-	my $class = read_dump($file);
+	my $class = read_dump($include, $file);
 	my $name = $class->{class};
 	print "    " x $depth, $name, "\n";
 	foreach my $parent (keys %{$class->{flags}{extends}}) {
@@ -546,11 +559,12 @@ sub print_tree {
 }
 
 sub gen_c {
+    my $include = shift;
     my (@files) = @_;
     foreach my $file (@files) {
-	my $class = read_dump($file);
+	my $class = read_dump($include, $file);
         # finally append vtable.dump
-        $class->{vtable} = read_dump("vtable.pmc");
+        $class->{vtable} = read_dump($include, "vtable.pmc");
 	my $generator = Parrot::Pmc2c->new($class, \%opt);
 	print Data::Dumper->Dump([$generator]) if $opt{debug} > 1;
 
@@ -575,7 +589,7 @@ sub gen_c {
 }
 
 sub main {
-    my ($default, $dump, $gen_c, $result, $tree, $debug, $verbose, $nobody, $nolines);
+    my ($default, $dump, $gen_c, $result, $tree, $debug, $verbose, $nobody, $nolines, @include);
     $result = GetOptions(
 	"vtable"        => \$default,
 	"dump"          => \$dump,
@@ -585,26 +599,28 @@ sub main {
 	"no-lines"      => \$nolines,
 	"debug+"        => \$debug,
 	"verbose+"      => \$verbose,
+        "include=s"     => \@include,
     );
     $opt{debug} = $debug || 0;
     $opt{verbose} = $verbose || 0;
     $opt{nobody} = $nobody || 0;
     $opt{nolines} = $nolines || 0;
+    unshift @include, "$FindBin::Bin/..", $FindBin::Bin;
 
     $default and do {
 	dump_default();
 	exit;
     };
     $dump and do {
-	dump_pmc(@ARGV);
+	dump_pmc(\@include, @ARGV);
 	exit;
     };
     $tree and do {
-	print_tree(0, @ARGV);
+	print_tree(\@include, 0, @ARGV);
 	exit;
     };
     $gen_c and do {
-	gen_c(@ARGV);
+	gen_c(\@include, @ARGV);
 	exit;
     };
 }

@@ -799,6 +799,42 @@ Parrot_unregister_pmc(Parrot_INTERP interpreter, Parrot_PMC pmc)
 
 /*
 
+=item C<void
+Parrot_pmc_set_vtable(Parrot_INTERP interpreter, Parrot_PMC pmc,
+                      Parrot_VTABLE vtable)>
+
+Replaces the vtable of the PMC.
+
+=cut
+
+*/
+
+void
+Parrot_PMC_set_vtable(Parrot_INTERP interpreter, Parrot_PMC pmc,
+                      Parrot_VTABLE vtable)
+{
+    pmc->vtable = vtable;
+}
+
+/*
+
+=item C<Parrot_VTABLE
+Parrot_get_vtable(Parrot_INTERP interpreter, Parrot_Int id)>
+
+Returns the vtable corresponding to the given PMC ID.
+
+=cut
+
+*/
+
+Parrot_VTABLE
+Parrot_get_vtable(Parrot_INTERP interpreter, Parrot_Int id)
+{
+    return Parrot_base_vtables[id];
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

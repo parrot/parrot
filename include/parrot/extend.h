@@ -29,6 +29,7 @@
 #define Parrot_STRING STRING *
 #define Parrot_PMC PMC *
 #define Parrot_Language Parrot_Int
+#define Parrot_VTABLE VTABLE *
 
 #else
 
@@ -40,9 +41,11 @@ typedef void * Parrot_Encoding;
 typedef void * Parrot_CharType;
 typedef const void * Parrot_Const_Encoding;
 typedef const void * Parrot_Const_CharType;
+typedef const void * Parrot_VTABLE;
 
 #endif
 
+Parrot_VTABLE Parrot_get_vtable(Parrot_INTERP, Parrot_Int);
 Parrot_PMC Parrot_PMC_get_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP, Parrot_PMC);
 Parrot_STRING Parrot_PMC_get_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
@@ -57,6 +60,7 @@ char *Parrot_PMC_get_cstring_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
 char *Parrot_PMC_get_cstringn_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int *, Parrot_Int);
 
+void Parrot_PMC_set_vtable(Parrot_INTERP, Parrot_PMC, Parrot_VTABLE);
 void Parrot_PMC_set_pmc_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_PMC);
 void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
 void Parrot_PMC_set_string_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int, Parrot_STRING);

@@ -478,7 +478,8 @@ imcc_compile(Parrot_Interp interp, const char *s)
 #endif
     PackFile_fixup_subs(interp);
     /* restore old byte_code, */
-    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
+    if (pf_save)
+        (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
     sourcefile = source;
     /* append new packfile to current directory */
     PackFile_add_segment(&interp->code->directory,
@@ -574,7 +575,8 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
     imc_cleanup(interp);
 
-    (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
+    if (pf_save)
+        (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
     sourcefile = source;
     pasm_file = pasm;
     fclose(new);
