@@ -193,11 +193,22 @@ EOC
 }
 
 sub New_func {
-    my ($n, $arg) = @_;
+    my ($n, $arg, $cmt) = @_;
     print <<EOC;
 .end		# $cur_func
 
-.sub $arg prototyped
+.sub $arg prototyped $cmt
+EOC
+    my (@params, $k, $v, $params);
+    while ( ($k, $v) = each(%{$def_arg_names{$arg}})) {
+	$k =~ s/"//g;
+	$params[$v] = $k;
+    }
+    $params = join("\n\t", map {".param pmc $_"} @params);
+    print <<EOC;
+	$params
+EOC
+    print <<EOC;
 	new_pad 0
 	.local pmc None
 	None = new .None
@@ -214,9 +225,10 @@ EOC
 	for ($i = $n; @{$def_args{$arg}}; $i--) {
 	    my $reg = 4 + $i;
 	    my $d = pop @{$def_args{$arg}};
+	    my $arg_name = pop @params;
 	    print <<EOC;
 	if argcP >= $i goto arg_ok
-	    find_global P$reg, "${arg}_$d"
+	    find_global $arg_name, "${arg}_$d"
 EOC
 	}
 	print <<EOC;
@@ -309,7 +321,7 @@ sub typ {
     elsif ($c =~ /^[+-]?\d+$/) {	# int
 	$t = 'I';
     }
-    elsif ($c =~ /^\d+[lL]$/) {	# bigint
+    elsif ($c =~ /^[+-]?\d+[lL]$/) {	# bigint
 	$t = 'B';
     }
     elsif ($c =~ /^'.*'$/) {	# string consts are single quoted by dis
@@ -951,8 +963,8 @@ EOC
 	$names{$c} = 1;
 	print <<EOC;
 	# .param pmc $c $cmt
-	.local pmc $c
-	$c = P$p
+	#.local pmc $c
+	#$c = P$p
 	store_lex -1, $n, $c
 EOC
     }

@@ -422,7 +422,6 @@ sub body
 #line $method->{line} "$pmc"
 EOC
     }
-    $cout .= $self->decl($classname, $method, 0);
     my $body = $method->{body};
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
@@ -433,6 +432,7 @@ EOC
     my $additional_bodies= '';
     $total_body = substr $total_body, 1, -1;
     my $standard_body = $total_body;
+    my $header_decls = '';
     while ($total_body =~ s/\bMMD_(\w+):\s*//) {
         my $right_type = $1;
         my $body_part = extract_bracketed($total_body, '{');
@@ -444,8 +444,11 @@ EOC
             my $sub_meth_decl = $self->decl($classname, $method);
             $sub_meth_decl =~ /(\w+)\(/;
             my $sub_meth_name = $1;
-            my $sub_meth = "static " . $sub_meth_decl;
+            my $sub_meth =  $sub_meth_decl;   # no "static ." ...
             $sub_meth =~ s/\(/_$right_type(/;
+            $header_decls .= <<EOH;
+$sub_meth;
+EOH
             $additional_bodies .= $sub_meth;
             $additional_bodies .= "{$body_part\n}";
             push @{ $self->{mmd_variants}{$meth} },
@@ -453,6 +456,8 @@ EOC
         }
 
     }
+    $cout .= $header_decls;
+    $cout .= $self->decl($classname, $method, 0);
     $cout .= "{$standard_body\n}\n";
     $cout .= $additional_bodies;
     $cout .= "\n\n";
@@ -657,6 +662,8 @@ sub gen_c() {
 
 Returns the C code function declarations for all the methods for inclusion
 in the PMC's C header file.
+
+TODO include MMD variants.
 
 =cut
 

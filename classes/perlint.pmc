@@ -22,6 +22,9 @@ C<PerlInt> extends C<perlscalar> to provide a Perl integer.
 #include "parrot/perltypes.h"
 #include <assert.h>
 
+/* XXX create MMD headers to in Pmc2c.pm */
+extern INTVAL Parrot_BigInt_is_equal_BigInt(Interp*, PMC*, PMC*);
+
 static void
 overflow(Interp *interpreter, PMC *self, INTVAL b, PMC *dest, int mmd)
 {
@@ -741,8 +744,15 @@ The C<==> operation.
 
 */
     INTVAL is_equal (PMC* value) {
+MMD_BigInt: {
+        PMC* temp = pmc_new(interpreter, enum_class_BigInt);
+        VTABLE_set_integer_native(interpreter, temp, PMC_int_val(SELF));
+        return Parrot_BigInt_is_equal_BigInt(INTERP, temp, value);
+    }
+MMD_DEFAULT: {
         return (INTVAL)(PMC_int_val(SELF) ==
             VTABLE_get_integer(INTERP, value));
+        }
     }
 
 /*

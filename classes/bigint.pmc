@@ -467,10 +467,10 @@ MMD_BigInt: {
                 bigint_add_bigint(INTERP, SELF, value, dest);
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp");
+                 internal_exception(1, "unimp add");
              }
-
     }
+
     void add_int(INTVAL value, PMC* dest) {
         bigint_add_bigint_int(INTERP, SELF, value, dest);
     }
@@ -479,10 +479,15 @@ MMD_DEFAULT: {
 MMD_BigInt: {
                 bigint_mul_bigint(INTERP, SELF, value, dest);
             }
-MMD_DEFAULT: {
-                 internal_exception(1, "unimp");
+MMD_PerlInt: {
+            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
              }
-
+MMD_Integer: {
+            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
+             }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp mul");
+             }
     }
 
     void multiply_int(INTVAL value, PMC* dest) {
@@ -494,27 +499,26 @@ MMD_BigInt: {
                 bigint_div_bigint(INTERP, SELF, value, dest);
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp");
+                 internal_exception(1, "unimp div");
              }
-
     }
+
     void modulus(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp");
+                 internal_exception(1, "unimp mod");
              }
-
     }
+
     void cmodulus(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
             }
 MMD_DEFAULT: {
-                 internal_exception(1, "unimp");
+                 internal_exception(1, "unimp cmod");
              }
-
     }
 
 
@@ -529,6 +533,10 @@ MMD_BigInt: {
 MMD_PerlInt: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp cmp");
+                 return 0;
+             }
     }
 
     INTVAL is_equal(PMC* value) {
@@ -538,6 +546,10 @@ MMD_BigInt: {
 MMD_PerlInt: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
+MMD_DEFAULT: {
+                 internal_exception(1, "unimp eq");
+                 return 0;
+             }
     }
 
 /*

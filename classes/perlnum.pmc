@@ -22,6 +22,14 @@ These are the vtable functions for the PerlNum base class
 #include "parrot/perltypes.h"
 
 pmclass PerlNum extends perlscalar {
+    void class_init () {
+        /* this should be autmatically done - probably */
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_PerlNum,
+                    F2DPTR(Parrot_PerlNum_get_repr),
+                    "__repr__", "SIO");
+        }
+    }
 
 /*
 
@@ -85,6 +93,23 @@ Returns the number as a Parrot string.
         if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
             /* XXX make a Python format string */
             STRING *s = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+            if (string_str_index(interpreter, s,
+                        const_string(interpreter, "."), 0) == -1)
+                string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+            return s;
+        }
+        return Parrot_sprintf_c(interpreter, "%s" FLOATVAL_FMT, sign, d);
+    }
+
+    STRING* get_repr () {
+        double d = (double) PMC_num_val(SELF);
+        const char *sign = "-";
+	if (!signbit(PMC_num_val(SELF)))
+            sign = "";
+        d = fabs(d);
+        if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+            /* XXX make a Python format string */
+            STRING *s = Parrot_sprintf_c(interpreter, "%s%.17g", sign, d);
             if (string_str_index(interpreter, s,
                         const_string(interpreter, "."), 0) == -1)
                 string_append(INTERP, s, const_string(INTERP, ".0"), 0);
