@@ -1787,7 +1787,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
             case PARROT_ARG_NC:
                 jit_emit_fload_m_n(jit_info->native_ptr,
                         &interpreter->code->const_table->
-                        constants[p[i]]->number);
+                        constants[p[i]]->u.number);
 store:
 #    if NUMVAL_SIZE == 8
                 /* make room for double */
@@ -1805,13 +1805,13 @@ store:
             case PARROT_ARG_SC:
                 emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
-                        constants[p[i]]->string);
+                        constants[p[i]]->u.string);
                 break;
 
             case PARROT_ARG_KC:
                 emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
-                        constants[p[i]]->key);
+                        constants[p[i]]->u.key);
                 break;
 
             default:
@@ -2264,7 +2264,7 @@ char floatval_map[] = { 1,2,3,4 };
  */
 
 #define jit_emit_noop(pc) *pc++ = 0x90;
-#define JUMP_ALIGN 1
+#define JUMP_ALIGN 2
 
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme

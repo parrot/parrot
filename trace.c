@@ -137,7 +137,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_NC:
                 PIO_eprintf(interpreter, "%vg", interpreter->code->const_table->
-                        constants[*(pc + i)]->number);
+                        constants[*(pc + i)]->u.number);
                 break;
             case PARROT_ARG_PC:
                 /* what is a PMC constant look like? */
@@ -145,15 +145,16 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_SC:
                 escaped = PDB_escape(interpreter->code->const_table->
-                                     constants[*(pc + i)]->string->strstart,
+                                     constants[*(pc + i)]->u.string->strstart,
                                      interpreter->code->const_table->
-                                     constants[*(pc + i)]->string->bufused);
+                                     constants[*(pc + i)]->u.string->bufused);
                 PIO_eprintf(interpreter, "\"%s\"", escaped ? escaped : "(null)");
                 if (escaped)
                     free(escaped);
                 break;
             case PARROT_ARG_KC:
-                trace_key_dump(interpreter, interpreter->code->const_table->constants[*(pc + i)]->key);
+                trace_key_dump(interpreter, interpreter->code->const_table->
+                        constants[*(pc + i)]->u.key);
                 break;
             case PARROT_ARG_KIC:
                 PIO_eprintf(interpreter, "[%vd]", *(pc + i));

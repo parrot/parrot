@@ -16,28 +16,8 @@
 
 pmclass UnManagedStruct {
 
-    void init () {
-    }
-
-    INTVAL type () {
-        return enum_class_UnManagedStruct;
-    }
-
     STRING* name () {
         return whoami;
-    }
-
-    PMC* get_pmc () {
-        return SELF;
-    }
-
-    INTVAL is_same (PMC* value) {
-        return SELF == value;
-    }
-
-    void set_same (PMC* value) {
-        SELF->cache.struct_val = value->cache.struct_val;
-	SELF->data = value->data;
     }
 
     INTVAL is_equal (PMC* value) {

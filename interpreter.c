@@ -29,12 +29,12 @@
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
-/*=for api interpreter runops_generic
+/*=for api interpreter runops_core
  * TODO: Not really part of the API, but here's the docs.
  * Generic runops, which takes a function pointer for the core.
  */
 static void
-runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
+runops_core(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
                struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start;
@@ -49,8 +49,8 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
 
     if (pc && (pc < code_start || pc >= code_end)) {
         internal_exception(INTERP_ERROR,
-                           "Error: Control left bounds of byte-code block (now at location %d)!\n",
-                           (int)(pc - code_start));
+       "Error: Control left bounds of byte-code block (now at location %d)!\n",
+       (int)(pc - code_start));
     }
 }
 
@@ -122,7 +122,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 {
     size_t offset = pc_prederef - interpreter->prederef_code;
     opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
-    op_info_t *opinfo = &interpreter->op_lib->op_info_table[*pc];
+    op_info_t *opinfo = &interpreter->op_info_table[*pc];
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
     int i;
 
@@ -156,7 +156,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 
         case PARROT_ARG_NC:
             pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->number;
+                &interpreter->code->const_table->constants[pc[i]]->u.number;
             break;
 
         case PARROT_ARG_PC:
@@ -168,12 +168,12 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 
         case PARROT_ARG_SC:
             pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->string;
+                &interpreter->code->const_table->constants[pc[i]]->u.string;
             break;
 
         case PARROT_ARG_KC:
             pc_prederef[i] = (void *)
-                &interpreter->code->const_table->constants[pc[i]]->key;
+                &interpreter->code->const_table->constants[pc[i]]->u.key;
             break;
         default:
             internal_exception(ARG_OP_NOT_HANDLED,
@@ -215,6 +215,7 @@ init_prederef(struct Parrot_Interp *interpreter)
         }
 
         interpreter->prederef_code = temp;
+        interpreter->code->cur_cs->prederef_code = temp;
     }
 }
 
@@ -227,10 +228,9 @@ static void
 stop_prederef(struct Parrot_Interp *interpreter)
 {
     (void) PARROT_CORE_PREDEREF_OPLIB_INIT(0);
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
 }
 
-static void
+static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
 #ifdef HAS_JIT
@@ -244,7 +244,9 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_end = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
+    interpreter->code->cur_cs->jit_info = interpreter->jit_info;
     (jit_code) (interpreter, pc);
+    return NULL;
 #endif
 }
 
@@ -301,7 +303,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*=for api interpreter runops
  * run parrot operations of loaded code segment until an end opcode is reached
  * run core is selected depending on the Interp_flags
- * when restart opcode are encountered a different core my be selected
+ * when a restart opcode is encountered a different core my be selected
  * and evaluation of opcode continues
  */
 void
@@ -336,6 +338,18 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
                 }
             }
         }
+        /* CGOTO is set per default, so test other cores first */
+        else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
+            core = runops_prederef;
+        }
+        else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
+#if !JIT_CAPABLE
+            internal_exception(JIT_UNAVAILABLE,
+                    "Error: PARROT_JIT_FLAG is set, "
+                    "but interpreter is not JIT_CAPABLE!\n");
+#endif
+            core = runops_jit;
+        }
         else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG)) {
             core = runops_cgoto_core;
             /* clear stacktop, it gets set in runops_cgoto_core beyond the
@@ -343,29 +357,15 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
              */
 /* #ifdef HAVE_NESTED_FUNC */
 #ifdef __GNUC__
-            if (!Interp_flags_TEST(interpreter,
-                        (PARROT_PREDEREF_FLAG | PARROT_JIT_FLAG)))
-                interpreter->lo_var_ptr = 0;
+            interpreter->lo_var_ptr = 0;
 #endif
-        }
-        else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            core = runops_prederef;
         }
         else
             core = runops_fast_core;
 
 
-        if (!slow && Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-#if !JIT_CAPABLE
-            internal_exception(JIT_UNAVAILABLE,
-                    "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
-#endif
-
-            runops_jit(interpreter, pc);
-        }
-        else {
-            runops_generic(core, interpreter, pc);
-        }
+        /* run it finally */
+        runops_core(core, interpreter, pc);
         /* if we have fallen out with resume and we were running CGOTO, set
          * the stacktop again to a sane value, so that restarting the runloop
          * is ok.
@@ -499,6 +499,8 @@ make_interpreter(Interp_flags flags)
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
+
+    /* next two are pointers to the real thing in the current code seg */
     SET_NULL_P(interpreter->prederef_code, void **);
     SET_NULL(interpreter->jit_info);
 
@@ -536,6 +538,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 {
     int i;
     Interp *interpreter = (Interp*) vinterp;
+    struct Stash *stash, *next_stash;
+
     UNUSED(exit_code);
 
     /* buffer headers, PMCs */
@@ -552,17 +556,21 @@ Parrot_really_destroy(int exit_code, void *vinterp)
             PackFile_destroy(pf);
     }
 
-    /* XXX walk the stash, pmc's are already dead */
-    mem_sys_free(interpreter->perl_stash);
+    /* walk and free the stash, pmc's are already dead */
+    stash = interpreter->perl_stash;
+    while (stash) {
+        next_stash = stash->parent_stash;
+        mem_sys_free(stash);
+        stash = next_stash;
+    }
+
     if (interpreter->profile)
         mem_sys_free(interpreter->profile);
-    if (interpreter->prederef_code)
-        free(interpreter->prederef_code);
 
     mem_sys_free(interpreter->warns);
 
     /* deinit op_lib */
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(0);
+    (void) PARROT_CORE_OPLIB_INIT(0);
 
     /* XXX move this to register.c */
     {
@@ -603,9 +611,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     intstack_free(interpreter, interpreter->ctx.intstack);
 
     PIO_destroy(interpreter);
-#ifdef HAS_JIT
-    Parrot_destroy_jit(interpreter);
-#endif
 
     mem_sys_free(interpreter);
 }

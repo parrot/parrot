@@ -374,14 +374,15 @@ static void hop_deinit(void)
 {
     HOP *p, *next;
     size_t i;
-    if (hop)
+    if (hop) {
 	for (i = 0; i < OP_HASH_SIZE; i++)
 	    for(p = hop[i]; p; ) {
 		next = p->next;
 		free(p);
 		p = next;
         }
-    free(hop);
+	free(hop);
+    }
     hop = 0;
 }
 

@@ -128,10 +128,10 @@ my %arg_maps = (
   'ki' => "IREG(%ld)",
 
   'ic' => "%ld",
-  'nc' => "CONST(%ld)->number",
+  'nc' => "CONST(%ld)->u.number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-  'sc' => "CONST(%ld)->string",
-  'kc' => "CONST(%ld)->key",
+  'sc' => "CONST(%ld)->u.string",
+  'kc' => "CONST(%ld)->u.key",
   'kic' => "%ld",
 );
 

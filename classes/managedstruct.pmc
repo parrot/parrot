@@ -14,7 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass ManagedStruct {
+pmclass ManagedStruct extends UnManagedStruct {
 
     void init () {
       PObj_active_destroy_SET(SELF);
@@ -26,34 +26,8 @@ pmclass ManagedStruct {
       }
     }
 
-    INTVAL type () {
-        return enum_class_ManagedStruct;
-    }
-
     STRING* name () {
         return whoami;
-    }
-
-    PMC* get_pmc () {
-        return SELF;
-    }
-
-    INTVAL is_same (PMC* value) {
-        return SELF == value;
-    }
-
-    void set_same (PMC* value) {
-        SELF->cache.struct_val = value->cache.struct_val;
-	SELF->data = value->data;
-    }
-
-    INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-		&& SELF->data == value->data);
-    }
-
-    INTVAL defined () {
-        return SELF->data != NULL;
     }
 
 }

@@ -212,7 +212,7 @@ set_register_usage(struct Parrot_Interp *interpreter,
         /* key constants may have register keys */
         else if (op_info->types[argn] == PARROT_ARG_KC) {
             PMC *key = interpreter->code->const_table->constants[
-                *(cur_op + argn)]->key;
+                *(cur_op + argn)]->u.key;
             while (key) {
                 UINTVAL flags = PObj_get_FLAGS(key);
                 if (flags & KEY_register_FLAG) {
@@ -759,14 +759,13 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 }
 
 void
-Parrot_destroy_jit(struct Parrot_Interp *interpreter)
+Parrot_destroy_jit(void *ptr)
 {
-    Parrot_jit_info_t *jit_info;
     Parrot_jit_optimizer_t *optimizer;
     Parrot_jit_optimizer_section_ptr cur_section, next;
     Parrot_jit_fixup_t *fixup, *next_f;
+    Parrot_jit_info_t *jit_info = (Parrot_jit_info_t *)ptr;
 
-    jit_info = interpreter->jit_info;
     if (!jit_info)
         return;
     /* delete sections */
@@ -876,7 +875,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         cur_op = jit_info->cur_op = cur_section->begin;
 
         /* Load mapped registers for this section, if JIT */
-        if (cur_section->isjit && cur_section->prev) {
+        if (cur_section->isjit) {
             Parrot_jit_load_registers(jit_info, interpreter);
         }
 
@@ -905,9 +904,14 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             /* Need to save the registers if there is a branch and is not to
              * the same section, I admit I don't like this, and it should be
              * really checking if the target section has the same registers
-             * mapped too. */
-            if ((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
-                    (cur_section->branch_target != cur_section) &&
+             * mapped too.
+             *
+             * and also, if we have a jitted sections and encounter
+             * and "end" opcode, e.g. in evaled code
+             */
+            if ((((map[cur_op - code_start] == JIT_BRANCH_SOURCE) &&
+                    (cur_section->branch_target != cur_section)) ||
+                        !cur_opcode_byte) &&
                     cur_section->isjit) {
                 Parrot_jit_save_registers(jit_info, interpreter);
             }
@@ -928,7 +932,8 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
             /* if this is a branch target, align it */
 #ifdef jit_emit_noop
 #  if JUMP_ALIGN
-            if (cur_op <= cur_section->end &&
+            if (((!cur_section->next && cur_op <= cur_section->end) ||
+                        cur_section->next) &&
                     map[cur_op - code_start] == JIT_BRANCH_TARGET) {
                 while ((long)jit_info->native_ptr & ((1<<JUMP_ALIGN) - 1))
                     jit_emit_noop(jit_info->native_ptr);

@@ -173,7 +173,7 @@ void PDB_next(struct Parrot_Interp *interpreter, const char *command);
 void PDB_trace(struct Parrot_Interp *interpreter, const char *command);
 
 void PDB_eval(struct Parrot_Interp *interpreter, const char *command);
-opcode_t * PDB_compile(struct Parrot_Interp *, const char *command);
+struct PackFile_ByteCode * PDB_compile(struct Parrot_Interp *, char *);
 
 int PDB_extend_const_table(struct Parrot_Interp *interpreter);
 

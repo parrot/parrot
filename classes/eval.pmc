@@ -14,6 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/runops_cores.h"
 #include "parrot/interp_guts.h"
+#include "parrot/packfile.h"
 
 pmclass Eval extends Sub {
 
@@ -23,7 +24,9 @@ pmclass Eval extends Sub {
 
    void* invoke (void* next) {
        PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
-       opcode_t * pc = ((struct Parrot_Sub *)SELF->data)->init;
+       struct PackFile_ByteCode *old_cs;
+       struct PackFile_ByteCode *eval_cs = (struct PackFile_ByteCode *)
+		((struct Parrot_Sub *)SELF->data)->init;
 
        if (pad) {
 	   /* put the correct pad in place */
@@ -34,19 +37,10 @@ pmclass Eval extends Sub {
        /* return address that the interpreter should jump to */
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
 	       STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-       /* run evaled code with the normal cores */
-#if 1
-       while (pc)
-	   DO_OP(pc, interpreter);
-#else
-       if (Interp_flags_TEST(interpreter, (PARROT_BOUNDS_FLAG |
-		       PARROT_PROFILE_FLAG |
-		       PARROT_TRACE_FLAG)))
-	   runops_slow_core(interpreter, pc);
-       else
-	   runops_fast_core(interpreter, pc);
-#endif
-
+       /* switch to code segment */
+       old_cs = Parrot_switch_to_cs(interpreter, eval_cs);
+       runops(interpreter, 0);
+       (void)Parrot_switch_to_cs(interpreter, old_cs);
        return next;
    }
 }

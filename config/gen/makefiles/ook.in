@@ -7,9 +7,7 @@ PARROT=../../parrot
 all: build
 
 test: build
-	$(PARROT) ook.pbc hello.ook > foo.pasm
-	$(ASSEMBLE) foo.pasm > foo.pbc
-	$(PARROT) foo.pbc
+	../imcc/imcc -r ook.pasm test.ook
 
 build: ook.pasm
 	$(ASSEMBLE) ook.pasm > ook.pbc

@@ -98,6 +98,18 @@ write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
     }
 }
 
+static STRING *
+debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
+{
+    STRING *ret;
+    ret = string_copy(interpreter, file);
+    ret = string_append(interpreter, ret,
+            string_make(interpreter, ext, strlen(ext), 0,
+                PObj_external_FLAG, 0),
+            0);
+    return ret;
+}
+
 static void
 Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
 {
@@ -106,26 +118,33 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     STRING *pasmfile, *stabsfile, *ofile, *cmd;
     FILE *stabs;
     size_t i;
-    int line;
+    int line, lc;
 
-    /* chop pbc */
-    file = string_chopn(file, 3);
-    pasmfile = string_copy(interpreter, file);
-    pasmfile = string_append(interpreter, pasmfile,
-            string_make(interpreter, "pasm", 4, 0, PObj_external_FLAG, 0),
-            0);
-    stabsfile = string_copy(interpreter, file);
-    stabsfile = string_append(interpreter, stabsfile,
-            string_make(interpreter, "stabs.s", 7, 0, PObj_external_FLAG, 0),
-            0);
-    ofile = string_copy(interpreter, file);
-    ofile = string_append(interpreter, ofile,
-            string_make(interpreter, "o", 4, 0, PObj_external_FLAG, 0),
-            0);
-    stabsfile = string_copy(interpreter, file);
-    stabsfile = string_append(interpreter, stabsfile,
-            string_make(interpreter, "stabs.s", 7, 0, PObj_external_FLAG, 0),
-            0);
+    if (interpreter->code->cur_cs->debug) {
+        char *ext;
+        char *src = interpreter->code->cur_cs->debug->filename;
+        pasmfile = string_make(interpreter, src, strlen(src), NULL,
+                PObj_external_FLAG, NULL);
+        file = string_copy(interpreter, pasmfile);
+        /* chop pasm/imc */
+
+        ext = strrchr(src, '.');
+        if (ext && strcmp (ext, ".pasm") == 0)
+            file = string_chopn(file, 4);
+        else if (ext && strcmp (ext, ".imc") == 0)
+            file = string_chopn(file, 3);
+        else if (!ext) /* EVAL_n */
+            file = string_append(interpreter, file,
+                    string_make(interpreter, ".", 1, 0, PObj_external_FLAG, 0),
+                    0);
+    }
+    else {
+        /* chop pbc */
+        file = string_chopn(file, 3);
+        pasmfile = debug_file(interpreter, file, "pasm");
+    }
+    stabsfile = debug_file(interpreter, file, "stabs.s");
+    ofile = debug_file(interpreter, file, "o");
     stabs = fopen(string_to_cstring(interpreter,stabsfile), "w");
     if (stabs == NULL)
         return;
@@ -139,15 +158,19 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
 
     write_types(stabs);
     write_vars(stabs, interpreter);
-    /* we don't have line numbers yet, emit dummys, assuming there are
+    /* if we don't have line numbers, emit dummys, assuming there are
      * no comments and spaces in source for testing
      */
 
     /* jit_begin */
     fprintf(stabs, ".stabn 68,0,1,0\n");
     line = 1;
+    lc = 0;
     for (i = 0; i < jit_info->arena.map_size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
+            if (interpreter->code->cur_cs->debug) {
+                line = (int)interpreter->code->cur_cs->debug->lines[lc++];
+            }
             fprintf(stabs, ".stabn 68,0,%d,%d\n", line,
                     (char *)jit_info->arena.op_map[i].ptr -
                     (char *)jit_info->arena.start);

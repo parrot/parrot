@@ -52,6 +52,7 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define OUT_OF_BOUNDS 1
 #define JIT_ERROR 1
 #define ILL_INHERIT 2
+#define NO_PREV_CS 3
 
 typedef enum {
     EXCEPT_normal = 0,
@@ -70,7 +71,7 @@ struct parrot_exception_t {
     exception_severity severity;
     long error;
 };
-	
+
 typedef struct parrot_exception_t Parrot_exception;
 
 #endif

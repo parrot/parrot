@@ -27,6 +27,9 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/imcc.in',      'languages/imcc/Makefile',
           commentType => '#');
+  system("$^X -pi -e's/ -Wwrite-strings//' 	languages/imcc/Makefile");
+  system("$^X -pi -e's/ -Wcast-qual//' 	  	languages/imcc/Makefile");
+  system("$^X -pi -e's/ -Wno-unused/ -Wunused/' languages/imcc/Makefile");
   genfile('config/gen/makefiles/bf.in',        'languages/bf/Makefile',
           commentType => '#');
   genfile('config/gen/makefiles/befunge.in',   'languages/befunge/Makefile',

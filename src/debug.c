@@ -35,8 +35,8 @@
  * Returns the position just past the current argument in a PASM
  * instruction. This is not the same as na(), above, which is intended
  * for debugger commands. This function is used for eval. */
-static const char*
-nextarg(const char* command)
+static char*
+nextarg(char* command)
 {
     while (*command && (isalnum((int) *command) || *command == ',' ||
         *command == ']'))
@@ -1058,7 +1058,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_NC:
             /* Convert the float to a string */
-            f=interpreter->code->const_table->constants[op[j]]->number;
+            f=interpreter->code->const_table->constants[op[j]]->u.number;
 #ifdef HAS_SNPRINTF
             snprintf(buf, sizeof(buf), FLOATVAL_FMT, f);
 #else
@@ -1069,12 +1069,13 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_SC:
             dest[size++] = '"';
-            if (interpreter->code->const_table->constants[op[j]]->string->strlen)
+            if (interpreter->code->const_table->constants[op[j]]->
+                    u.string->strlen)
             {
                 char* escaped = PDB_escape(interpreter->code->const_table->
-                                           constants[op[j]]->string->strstart,
-                                           interpreter->code->const_table->
-                                           constants[op[j]]->string->strlen);
+                           constants[op[j]]->u.string->strstart,
+                           interpreter->code->const_table->
+                           constants[op[j]]->u.string->strlen);
                 if (escaped) {
                     strcpy(&dest[size],escaped);
                     size += strlen(escaped);
@@ -1097,7 +1098,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KC:
             dest[size-1] = '[';
-            k = interpreter->code->const_table->constants[op[j]]->key;
+            k = interpreter->code->const_table->constants[op[j]]->u.key;
             while (k) {
                 switch (PObj_get_FLAGS(k)) {
                 case 0:
@@ -1507,24 +1508,36 @@ void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
     opcode_t *run;
-    run = PDB_compile(interpreter, command);
-    if (run)
+    struct PackFile_ByteCode *eval_cs = PDB_compile(interpreter,
+            strdup(command));
+
+    if (eval_cs) {
+        Parrot_switch_to_cs(interpreter, eval_cs);
+        run = eval_cs->code;
         DO_OP(run,interpreter);
+        Parrot_pop_cs(interpreter);
+    }
 }
 
 /* PDB_compile
  * compiles one instruction with fully qualified opcode name
  * and valid arguments, NO error checking.
+ *
+ * this may be called from PDB_eval above or from the compile opcode
+ * which generates a malloced string
  */
-opcode_t *
-PDB_compile(struct Parrot_Interp *interpreter, const char *command)
+struct PackFile_ByteCode *
+PDB_compile(struct Parrot_Interp *interpreter, char *command)
 {
     char buf[256];
     char s[1], *c = buf;
+    char *orig = command;
     op_info_t *op_info;
-    /* Opcodes can't have more that 10 arguments */
-    static opcode_t eval[11];
+    opcode_t *eval;
     int op_number,i,k,l,j = 0;
+    struct PackFile_ByteCode * eval_cs = Parrot_new_eval_cs(interpreter);
+    /* Opcodes can't have more that 10 arguments, +1 for end */
+    eval = eval_cs->code = mem_sys_allocate(sizeof(opcode_t) * 11);
 
     /* find_op needs a string with only the opcode name */
     while (*command && !(isspace((int) *command)))
@@ -1559,7 +1572,7 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
                 k = PDB_extend_const_table(interpreter);
 
                 interpreter->code->const_table->constants[k]->type =PFC_NUMBER;
-                interpreter->code->const_table->constants[k]->number =
+                interpreter->code->const_table->constants[k]->u.number =
                     (FLOATVAL)atof(command);
                 eval[j++] = (opcode_t)k;
                 break;
@@ -1575,7 +1588,7 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
                 k = PDB_extend_const_table(interpreter);
 
                 interpreter->code->const_table->constants[k]->type =PFC_STRING;
-                interpreter->code->const_table->constants[k]->string =
+                interpreter->code->const_table->constants[k]->u.string =
                     string_make(interpreter, buf, (UINTVAL)l,
                             NULL, PObj_constant_FLAG, NULL);
 
@@ -1593,7 +1606,9 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
         }
     }
     eval[j++] = 0;      /* append end op */
-    return eval;
+    eval_cs->base.byte_count = j * sizeof(opcode_t);
+    mem_sys_free(orig);
+    return eval_cs;
 }
 
 /* PDB_extend_const_table

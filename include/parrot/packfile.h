@@ -15,6 +15,12 @@
 #define PF_NCONST(pf)  ((pf)->const_table->const_count)
 #define PF_CONST(pf,i) ((pf)->const_table->constants[(i)])
 
+#define DIRECTORY_SEGMENT_NAME   "DIRECTORY"
+#define FIXUP_TABLE_SEGMENT_NAME "FIXUP"
+#define CONSTANT_SEGMENT_NAME    "CONSTANT"
+#define BYTE_CODE_SEGMENT_NAME   "BYTECODE"
+
+#define FILE_POS(file,offset) ((file) + (offset)/sizeof(opcode_t))
 
 /*
 ** Structure Definitions:
@@ -43,7 +49,51 @@ struct PackFile_Header {
     opcode_t bytecode_ss;
 };
 
+/*
+** PackFile Segment:
+*    The base type of every section
+*    include it as first element of every derivated Segment
+*/
+
+struct PackFile_Segment;
+
+typedef void   (*PackFile_Segment_destroy_func_t) (struct PackFile_Segment *);
+typedef size_t (*PackFile_Segment_packed_size_func_t) (struct PackFile_Segment *);
+typedef size_t (*PackFile_Segment_pack_func_t) (struct PackFile_Segment *,
+                                                opcode_t *dest,
+                                                size_t offset,
+                                                size_t max_size);
+typedef INTVAL (*PackFile_map_segments_func_t) (struct PackFile_Segment *seg,
+                                                void *user_data);
+
+struct PackFile_Segment {
+    struct PackFile            * pf;
+    char                       * name;
+    UINTVAL flags;
+    size_t byte_count;   /* size in bytes */
+    size_t file_offset;
+
+    /* Segment operations */
+    PackFile_Segment_destroy_func_t      destroy;
+    PackFile_Segment_packed_size_func_t  packed_size;
+    PackFile_Segment_pack_func_t         pack;
+};
+
+enum {
+    PF_FIXUP_SEG = 0x01,
+    PF_CONST_SEG = 0x02,
+    PF_BYTEC_SEG = 0x04,
+    PF_DIR_SEG   = 0x08,
+    PF_DEBUG_SEG = 0x10,
+    PACKFILE_DIR_IN_DESTROY = 0x100
+} pack_file_flags;
+
+/*
+** PackFile_FixupTable:
+*    not implemented yet
+*/
 struct PackFile_FixupTable {
+    struct PackFile_Segment base;
     opcode_t dummy;
 };
 
@@ -54,25 +104,60 @@ struct PackFile_FixupTable {
 
 struct PackFile_Constant {
     opcode_t type;
-    opcode_t integer;
-    FLOATVAL number;
-    STRING *string;
-    PMC *key;
+    union {
+        opcode_t integer;
+        FLOATVAL number;
+        STRING *string;
+        PMC *key;
+    } u;
 };
-
 
 struct PackFile_ConstTable {
+    struct PackFile_Segment     base;
     opcode_t const_count;
-    struct PackFile_Constant **constants;
+    struct PackFile_Constant ** constants;
 };
 
+struct PackFile_ByteCode {
+    struct PackFile_Segment     base;
+    opcode_t                  * code;
+    void **prederef_code;       /* The predereferenced code */
+    void *jit_info;             /* JITs data */
+    struct PackFile_ByteCode  * prev;   /* was executed previous */
+    struct PackFile_Debug     * debug;
+};
+
+struct PackFile_Debug {
+    struct PackFile_Segment     base;
+    char                      * filename;
+    opcode_t                  * lines;  /* 1 entry per opcode */
+    struct PackFile_ByteCode  * code;   /* where this segment belongs to */
+};
+
+struct PackFile_Directory {
+    struct PackFile_Segment      base;
+    size_t                       num_segments;
+    struct PackFile_Segment   ** segments;
+};
 
 struct PackFile {
+    opcode_t *src; /* FIXME: use PIO */
+
     struct PackFile_Header     * header;
+
+    /* special Segments */
+    struct PackFile_Directory  * directory;
     struct PackFile_FixupTable * fixup_table;
     struct PackFile_ConstTable * const_table;
+    struct PackFile_ByteCode   * byte_code_segment;
+    struct PackFile_ByteCode   * cur_cs;   /* current byte code seg */
+    INTVAL                       eval_nr;   /* nr. of eval cs */
+
+    /* the next too items are shortcuts to the real thing in
+     * the current byte code segment */
     size_t                       byte_code_size;  /* size in bytes */
     opcode_t *                   byte_code;
+
     INTVAL                       need_wordsize;
     INTVAL                       need_endianize;
     opcode_t                     (*fetch_op)(opcode_t);
@@ -97,6 +182,30 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
+INTVAL PackFile_add_segment (struct PackFile *pf,
+                             struct PackFile_Segment *seg);
+
+struct PackFile_Segment * PackFile_find_segment (struct PackFile *pf,
+                                                 const char *name);
+
+struct PackFile_Segment *
+PackFile_remove_segment_by_name (struct PackFile *pf, const char *name);
+
+INTVAL PackFile_map_segments (struct PackFile *pf,
+                              PackFile_map_segments_func_t callback,
+                              void* usr_data);
+
+/*
+** PackFile_Segment Functions:
+*/
+
+#define PackFile_Segment_destroy(self) ((self)->destroy(self))
+#define PackFile_Segment_packed_size(self) ((self)->packed_size(self))
+#define PackFile_Segment_pack(self, file, offset, max_size) \
+     ((self)->pack(self, file, offset, max_size))
+
+struct PackFile_Segment *PackFile_Segment_new(struct PackFile *pf);
+
 /* fingerprint functions */
 int PackFile_check_fingerprint (void *cursor);
 size_t PackFile_write_fingerprint (void *cursor);
@@ -114,7 +223,18 @@ opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
 void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
+/*
+** PackFile_ByteCode Functions:
+*/
 
+struct PackFile_ByteCode * Parrot_new_eval_cs(struct Parrot_Interp *);
+struct PackFile_ByteCode * Parrot_switch_to_cs(struct Parrot_Interp *,
+    struct PackFile_ByteCode *);
+void Parrot_pop_cs(struct Parrot_Interp *);
+
+/* Debug stuff */
+struct PackFile_Debug * Parrot_new_debug_seg(struct Parrot_Interp *,
+        struct PackFile_ByteCode *cs, char *filename);
 /*
 ** PackFile_ConstTable Functions:
 */

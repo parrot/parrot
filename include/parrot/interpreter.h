@@ -128,6 +128,8 @@ typedef struct Parrot_Interp {
     size_t resume_offset;
 
     struct PackFile *code;      /* The code we are executing */
+    /* the next items point to the real thngs, which are
+     * in the byte_code_segment, that is currently executed */
     void **prederef_code;       /* The predereferenced code */
     void *jit_info;             /* JITs data */
     size_t current_line;        /* Which line we're executing in the

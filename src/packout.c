@@ -21,6 +21,8 @@ Determine the size of the buffer needed in order to pack the PackFile into a
 contiguous region of memory.
 ***************************************/
 
+extern struct PackFile_Directory *directory_new (struct PackFile *pf);
+
 opcode_t
 PackFile_pack_size(struct PackFile *self)
 {
@@ -28,38 +30,25 @@ PackFile_pack_size(struct PackFile *self)
     opcode_t magic_size;
     opcode_t oct_size;          /* opcode_type */
     opcode_t segment_length_size;
-    opcode_t fixup_table_size;
-    opcode_t const_table_size;
+
+    struct PackFile_Directory *dir = self->directory ? self->directory :
+        (self->directory = directory_new (self)); /* XXX */
+    opcode_t other_segments_size;
+    size_t i;
 
     header_size = PACKFILE_HEADER_BYTES;
     magic_size = sizeof(opcode_t);
     oct_size = sizeof(opcode_t);
     segment_length_size = sizeof(opcode_t);
 
-#if TRACE_PACKFILE
-    PIO_eprintf(NULL, "getting fixup table size...\n");
-#endif
+    other_segments_size = 0;
 
-    fixup_table_size = PackFile_FixupTable_pack_size(self->fixup_table);
+    for (i=0; i < dir->num_segments; i++) {
+        other_segments_size += PackFile_Segment_packed_size (dir->segments[i])
+            + sizeof(opcode_t);
+    }
 
-#if TRACE_PACKFILE
-    PIO_eprintf(NULL, "  ... it is %ld\n", fixup_table_size);
-#endif
-
-#if TRACE_PACKFILE
-    PIO_eprintf(NULL, "getting const table size...\n");
-#endif
-
-    const_table_size = PackFile_ConstTable_pack_size(self->const_table);
-
-#if TRACE_PACKFILE
-    PIO_eprintf(NULL, "  ... it is %ld\n", const_table_size);
-#endif
-
-    return header_size + magic_size + oct_size
-        + segment_length_size + fixup_table_size
-        + segment_length_size + const_table_size
-        + segment_length_size + self->byte_code_size;
+    return header_size + magic_size + oct_size + other_segments_size;
 }
 
 
@@ -77,6 +66,9 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
         PackFile_FixupTable_pack_size(self->fixup_table);
     opcode_t const_table_size =
         PackFile_ConstTable_pack_size(self->const_table);
+
+    size_t i;
+    struct PackFile_Directory *dir = self->directory;
 
     self->header->wordsize = sizeof(opcode_t);
     self->header->byteorder = PARROT_BIGENDIAN;
@@ -101,26 +93,16 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
 
     /* Pack the fixup table size, followed by the packed fixup table */
 
-    *cursor++ = fixup_table_size;
+    for (i = 0; i < dir->num_segments; i++) {
+        struct PackFile_Segment *seg = dir->segments[i];
+        size_t size;
 
-    PackFile_FixupTable_pack(self->fixup_table, cursor);
-    /* Sizes are in bytes */
-    cursor += fixup_table_size / sizeof(opcode_t);
+        size = PackFile_Segment_packed_size (seg);
+        *cursor++ = size;
 
-    /* Pack the constant table size, followed by the packed constant table */
-
-    *cursor++ = const_table_size;
-
-    PackFile_ConstTable_pack(self, self->const_table, cursor);
-    /* Sizes are in bytes */
-    cursor += const_table_size / sizeof(opcode_t);
-
-    /* Pack the byte code size, followed by the byte code */
-
-    *cursor++ = self->byte_code_size;
-
-    if (self->byte_code_size) {
-        mem_sys_memcopy(cursor, self->byte_code, self->byte_code_size);
+        cursor += PackFile_Segment_pack (seg, packed,
+                                         (cursor-packed)* sizeof(opcode_t),
+                                         size) / sizeof (opcode_t);
     }
 
     return;
@@ -221,10 +203,10 @@ find_in_const(PMC *key, int type)
 {
     int i;
     for (i = 0; i < ct->const_count; i++)
-        if (type == PFC_STRING && ct->constants[i]->string ==
+        if (type == PFC_STRING && ct->constants[i]->u.string ==
             key->cache.string_val)
             return i;
-        else if (type == PFC_NUMBER && ct->constants[i]->number ==
+        else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
                  key->cache.num_val)
             return i;
     PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
@@ -276,7 +258,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
          * sizeof(long long) = 8
          * sizeof(long double) = 12
          */
-        mem_sys_memcopy(cursor, &self->number, sizeof(FLOATVAL));
+        mem_sys_memcopy(cursor, &self->u.number, sizeof(FLOATVAL));
         cursor += sizeof(FLOATVAL) / sizeof(opcode_t);  /* XXX */
         /* XXX cursor is possibly wrong now (because of alignment
          * issues) but isn't returned from this function anyway!
@@ -284,7 +266,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         break;
 
     case PFC_STRING:
-        padded_size = self->string->bufused;
+        padded_size = self->u.string->bufused;
 
         if (padded_size % sizeof(opcode_t)) {
             padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
@@ -294,25 +276,25 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
         packed_size = 4 * sizeof(opcode_t) + padded_size;
 
         *cursor++ = packed_size;
-        *cursor++ = PObj_get_FLAGS(self->string); /* XXX useless info -leo */
-        *cursor++ = self->string->encoding->index;
-        *cursor++ = self->string->type->index;
-        *cursor++ = self->string->bufused;
+        *cursor++ = PObj_get_FLAGS(self->u.string); /* XXX useless info -leo */
+        *cursor++ = self->u.string->encoding->index;
+        *cursor++ = self->u.string->type->index;
+        *cursor++ = self->u.string->bufused;
 
         /* Switch to char * since rest of string is addressed by
          * characters to ensure padding.  */
         charcursor = (char *)cursor;
 
-        if (self->string->strstart) {
-            mem_sys_memcopy(charcursor, self->string->strstart,
-                            self->string->bufused);
-            charcursor += self->string->bufused;
+        if (self->u.string->strstart) {
+            mem_sys_memcopy(charcursor, self->u.string->strstart,
+                            self->u.string->bufused);
+            charcursor += self->u.string->bufused;
 
-            if (self->string->bufused % sizeof(opcode_t)) {
+            if (self->u.string->bufused % sizeof(opcode_t)) {
                 for (i = 0;
                      i <
                      (sizeof(opcode_t) -
-                      (self->string->bufused % sizeof(opcode_t))); i++) {
+                      (self->u.string->bufused % sizeof(opcode_t))); i++) {
                     charcursor[i] = 0;
                 }
             }
@@ -327,14 +309,14 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
 
     case PFC_KEY:
         packed_size = sizeof(opcode_t);
-        for (i = 0, key = self->key; key; key = key->data, i++)
+        for (i = 0, key = self->u.key; key; key = key->data, i++)
             packed_size += 2 * sizeof(opcode_t);
         /* size */
         *cursor++ = packed_size;
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */
-        for (key = self->key; key; key = key->data) {
+        for (key = self->u.key; key; key = key->data) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 *cursor++ = PARROT_ARG_IC;

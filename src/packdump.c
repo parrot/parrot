@@ -102,22 +102,22 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
         break;
 
     case PFC_NUMBER:
-        PIO_printf(interpreter, "    [ 'PFC_NUMBER', %g ],\n", self->number);
+        PIO_printf(interpreter, "    [ 'PFC_NUMBER', %g ],\n", self->u.number);
         break;
 
     case PFC_STRING:
         PIO_printf(interpreter, "    [ 'PFC_STRING', {\n");
         PIO_printf(interpreter, "        FLAGS    => 0x%04lx,\n",
-                   (long)PObj_get_FLAGS(self->string));
+                   (long)PObj_get_FLAGS(self->u.string));
         PIO_printf(interpreter, "        ENCODING => %s,\n",
-                   self->string->encoding->name);
+                   self->u.string->encoding->name);
         PIO_printf(interpreter, "        TYPE     => %s,\n",
-                   self->string->type->name);
+                   self->u.string->type->name);
         PIO_printf(interpreter, "        SIZE     => %ld,\n",
-                   (long)self->string->bufused);
+                   (long)self->u.string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */
         PIO_printf(interpreter, "        DATA     => '%.*s'\n",
-                   (int)self->string->bufused, (char *)self->string->strstart);
+                   (int)self->u.string->bufused, (char *)self->u.string->strstart);
         PIO_printf(interpreter, "    } ],\n");
         break;
 

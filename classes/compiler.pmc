@@ -25,7 +25,8 @@ pmclass Compiler extends NCI {
     void* invoke (void * code_ptr) {
         Parrot_csub_t func = (Parrot_csub_t)D2FPTR(SELF->data);
 	PMC *code_seg;
-	opcode_t *pc;
+        struct PackFile_ByteCode *eval_cs;
+
         Parrot_push_i(interpreter);
         Parrot_push_s(interpreter);
         Parrot_push_p(interpreter);
@@ -40,27 +41,12 @@ pmclass Compiler extends NCI {
         Parrot_pop_i(interpreter);
 	(void)stack_pop(interpreter, &interpreter->ctx.user_stack, &code_seg,
                   STACK_ENTRY_PMC);
-	pc = (opcode_t*) code_seg->data;
-/* add a code seg
- * in PDB_compile, imcc_compile
- PackFile_add_segement(interpreter->code, byte_code_new(interpreter->code))
- ... seg is at directory->segments[num_segments-1]
-eval:
- ... remember old code segment
- ... set global byte_code{,size} to new seg
- ... DO_OP
- ... restore old code seg
- */
-
-	/* test
-	while (pc)
-	    DO_OP(pc, interpreter);
-	*/
-	/* morph the opcode_t *pointer in code_seg to an invokable sub */
+	eval_cs = (struct PackFile_ByteCode *) code_seg->data;
+	/* morph the Byte_cointer *pointer in code_seg to an invokable sub */
 	code_seg->vtable = &Parrot_base_vtables[enum_class_Eval];
 	code_seg->vtable->init(interpreter, code_seg);
 	code_seg->vtable->set_integer_native(interpreter, code_seg,
-		(INTVAL) pc);
+		(INTVAL) eval_cs);
         return code_seg;
     }
 }
