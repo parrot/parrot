@@ -169,10 +169,6 @@ parrot_py_long(Interp *interpreter, PMC *argv)
         base = 10;
     res = pmc_new(interpreter, enum_class_BigInt);
     num = VTABLE_get_string(interpreter, val);
-    if (val->vtable->base_type == enum_class_BigInt) {
-        /* then L is appened - chop that */
-        string_chopn(interpreter, num, 1);
-    }
     VTABLE_set_string_keyed_int(interpreter, res, base, num);
     return res;
 
@@ -426,7 +422,7 @@ static PMC *
 parrot_py_range(Interp *interpreter, PMC *args)
 {
     PMC *ar = pmc_new(interpreter, enum_class_PerlArray);
-    INTVAL start = 0, end, step = 1;
+    INTVAL start = 0, end = 0, step = 1;
     int i, k;
     i = VTABLE_elements(interpreter, args);
     if (i == 1) {
@@ -509,13 +505,20 @@ parrot_py_assert_e(Interp *interpreter, PMC *pmc)
 }
 
 static void
-parrot_py_global(Interp *interpreter, void *func,
+parrot_py_object(Interp *interpreter, STRING *class, void *func,
         STRING *name, STRING *sig)
 {
     PMC *method;
     method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interpreter, method, sig, func);
-    Parrot_store_global(interpreter, NULL, name, method);
+    Parrot_store_global(interpreter, class, name, method);
+}
+
+static void
+parrot_py_global(Interp *interpreter, void *func,
+        STRING *name, STRING *sig)
+{
+    parrot_py_object(interpreter, NULL, func, name, sig);
 }
 
 /*
@@ -620,6 +623,27 @@ parrot_py_create_vars(Interp *interpreter)
 
 /*
 
+=item C<static void parrot_py_create_default_meths(Interp *interpreter)>
+
+Initialize Python builtin object methods.
+
+*/
+
+#include "pmc_default.h"
+static void
+parrot_py_create_default_meths(Interp *interpreter)
+{
+    STRING *sio = CONST_STRING(interpreter, "SIO");
+    STRING *class = CONST_STRING(interpreter, "object");
+
+    STRING *meth =  CONST_STRING(interpreter, "__repr__");
+
+    parrot_py_object(interpreter, class,
+           F2DPTR(Parrot_default_get_repr), meth, sio);
+
+}
+/*
+
 =item C<void Parrot_py_init(Interp *interpreter)>
 
 Initialize Python functions.
@@ -632,6 +656,7 @@ Parrot_py_init(Interp *interpreter)
     parrot_py_create_funcs(interpreter);
     parrot_py_create_exceptions(interpreter);
     parrot_py_create_vars(interpreter);
+    parrot_py_create_default_meths(interpreter);
 }
 
 /*

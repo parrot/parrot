@@ -44,6 +44,7 @@ BIGNUM* get_bignum_keyed_int(INTVAL key)
 BIGNUM* get_bignum_keyed_str(STRING* key)
 
 STRING* get_string()
+STRING* get_repr()
 STRING* get_string_keyed(PMC* key)
 STRING* get_string_keyed_int(INTVAL key)
 STRING* get_string_keyed_str(STRING* key)

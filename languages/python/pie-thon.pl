@@ -968,7 +968,7 @@ sub UNARY_CONVERT
     my $p = promote($tos);
     my $s = temp('S');
     print <<EOC;
-	$s = $p $cmt
+	$s = $p."__repr__"() $cmt
 EOC
     push @stack, [-1, $s, 'S'];
 }

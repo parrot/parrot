@@ -222,7 +222,8 @@ test(<<'CODE', 'dict(), dict({h})');
 if __name__ == '__main__':
     h = dict()
     print "ok"
-    it = iter( dict( { "a": 1, "b" : 2 }))
+    # cant have more key w/o sort
+    it = iter( dict( { "a": 1 }))
     for i, c in enumerate(it):
         print i, c
     print "ok"

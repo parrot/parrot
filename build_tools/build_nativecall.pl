@@ -30,6 +30,7 @@ F<src/call_list.txt>.
 my %ret_count;
 %ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
               P => [0,0,0,1,0],	       # PMC
+              S => [0,0,1,0,0],	       # STR
 	      i => [0,1,0,0,0],        # Returning an int
 	      3 => [0,1,0,0,0],        # Returning an int pointer
 	      l => [0,1,0,0,0],        # Returning a long
@@ -65,6 +66,7 @@ my (%ret_type) = (p => "void *",
 #		  b => "void *",
 #		  B => "void **",
 		  P => "void *",
+		  S => "STRING *",
                  );
 
 my (%proto_type) = (p => "void *",
@@ -109,6 +111,7 @@ my (%ret_type_decl) = (p => "void *",
 #		       b => "void *",
 #		       B => "void **",
 		       P => "void *",
+		       S => "STRING *",
                      );
 
 my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5) = final_destination;",
@@ -121,6 +124,7 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nREG_PMC(5)
                     f => "REG_NUM(5) = return_data;",
                     d => "REG_NUM(5) = return_data;",
                     P => "REG_PMC(5) = return_data;",
+                    S => "REG_STR(5) = return_data;",
 		    v => "",
 		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nREG_STR(5) = final_destination;",
 #		    b => "PObj_bufstart(final_destination) = return_data;\nREG_STR(5) = final_destination",
@@ -141,6 +145,7 @@ my (%func_call_assign) = (p => "return_data = ",
 			  b => "return_data = ",
 			  t => "return_data = ",
 			  P => "return_data = ",
+			  S => "return_data = ",
 #			  B => "return_data = ",
 		          v => "",
                           );
@@ -333,6 +338,9 @@ sub make_arg {
               };
     /P/ && do {my $regnum = $reg_ref->{p}++;
                return "REG_PMC($regnum) == PMCNULL ? NULL : REG_PMC($regnum)";
+              };
+    /S/ && do {my $regnum = $reg_ref->{s}++;
+	       return "REG_STR($regnum)";
               };
     /L/ && do {my $regnum = $reg_ref->{p}++;
 	       my $tempnum = $tempcounter++;

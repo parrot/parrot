@@ -265,6 +265,15 @@ bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
 /* XXX derive from perlscalar because of morph */
 pmclass BigInt extends perlscalar {
 
+    void class_init () {
+        /* this should be autmatically done - probably */
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_BigInt,
+                    F2DPTR(Parrot_BigInt_get_repr),
+                    "__repr__", "SIO");
+        }
+    }
+
 /*
 
 =back
@@ -405,6 +414,10 @@ Returns the boolean value of the integer.
 
 =item C<STRING* get_string()>
 
+Returns the string representation of the integer.
+
+=item C<STRING* get_repr()>
+
 Returns the string representation of the integer with the letter 'L'
 appended.
 
@@ -415,11 +428,14 @@ appended.
     STRING* get_string() {
         char *s = bigint_get_string(INTERP, SELF);
         STRING *ps = string_from_cstring(INTERP, s, 0);
-        string_append(INTERP, ps, const_string(INTERP, "L"), 0);
         free(s);
         return ps;
     }
 
+    STRING* get_repr() {
+        STRING *s = SELF.get_string();
+        return string_append(INTERP, s, const_string(INTERP, "L"), 0);
+    }
 /*
 
 =item C<void increment()>

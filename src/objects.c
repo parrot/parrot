@@ -1075,7 +1075,10 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
             /* TODO */
             break;
         }
-        return NULL;
+        /* finally look in namespace "object" */
+        return  Parrot_find_global(interpreter,
+                           CONST_STRING(interpreter, "object"),
+                           method_name);
     }
 
     /* The order of operations:

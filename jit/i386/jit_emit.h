@@ -3092,6 +3092,9 @@ preg:
             jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
 
             break;
+        case 'S':
+            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
+            break;
         case 't':   /* string, determine length, make string */
             /* EAX is char */
             /* save it */

@@ -182,6 +182,8 @@ i	IPt
 P	IP
 P	IPP
 P	IPPP
+P	IO
+S	IO
 
 # the following are use by t/pmc/nci.t
 f	ff
@@ -236,5 +238,3 @@ p	ti
 p	ptp
 i	pt33
 
-# Random stuff
-P	IO
