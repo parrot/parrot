@@ -67,4 +67,4 @@ foreach my $option (@options) {
 }
 
 print "@ARGV\n";
-system @ARGV;
+exit system(@ARGV)/256;
