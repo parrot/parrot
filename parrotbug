@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # Copyright: 2004 The Perl Foundation.  All Rights Reserved.
 # $Id$
@@ -8,11 +8,13 @@ eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
 
 use strict;
+
 use Config;
 use File::Spec;
-use Getopt::Std;
+use Getopt::Long;
 
-my $VERSION = "0.2.2";
+
+my $VERSION = "0.3.0";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -34,9 +36,9 @@ my ( $parrot_version, $parrot_myconfig ) ;
 #                       Main program.                        #
 
 init();
-help()    if $opts{h};
-version() if $opts{V};
-if ( $opts{d} ) { dump_info(*STDOUT); exit; }
+help()    if $opts{help};
+version() if $opts{version};
+if ( $opts{dump} ) { dump_info(*STDOUT); exit; }
 explain_parrotbug();
 query_info();
 send_msg();
@@ -145,7 +147,7 @@ sub generate_filename {
 sub trivial_subject {
     my $subject = shift;
 
-    return 0 if $opts{o} || $opts{n};
+    return 0 if $opts{ok} || $opts{nok};
     if ( $subject =~
          /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
          length($subject) < 4 ||
@@ -202,16 +204,20 @@ sub init {
     @ARGV = split m/\s+/,
         MacPerl::Ask("Provide command-line args here (-h for help):")
         if $is_macos && $MacPerl::Version =~ /App/;
-    help() unless getopts("AVhb:de:f:n:o:r:s:t:", \%opts);
-
+    Getopt::Long::Configure("no_bundling", "no_ignore_case", "auto_abbrev");
+    help() unless GetOptions
+      ( \%opts,
+        "send|S", "dump|D", "help|h", "version|V",
+        "from|f=s", "to|test|t=s", "subject|s=s",
+        "input|i=s", "output|o=s", "ok", "nok", "help|h",
+        "ack!" );
 
     ##
     ## Report to be sent.
     ##
   sw: {
-      opt_o: {
-            last opt_o unless defined $opts{o};
-            help()     unless $opts{o} eq "k";
+      ok_report: {
+            last ok_report unless defined $opts{ok};
 
             # This is an ok report, woohoo!
             $to = $std_to{ok};
@@ -225,18 +231,17 @@ sub init {
 
         # Ok reports do not need body, but nok and bug reports do need
         # a body. It can be done with either -f or -b flag.
-        if ( $opts{f} ) {
+        if ( $opts{input} ) {
             $use_file = 1;
         } else {
             # No file provided...
             $use_file = 0;
-            $body = $opts{b} || "";
+            $body = "";
         }
             
 
-      opt_n: {
-            last opt_n unless defined $opts{n};
-            help()     unless $opts{n} eq "ok";
+      nok_report: {
+            last nok_report unless defined $opts{nok};
 
             # This a nok report, how sad... :-(
             $to = $std_to{nok};
@@ -255,7 +260,7 @@ sub init {
     };
 
     # Test message, shortcuting recipent.
-    $to = $opts{t} if $opts{t};
+    $to = $opts{to} if $opts{to};
 
     ## 
     ## User information.
@@ -268,7 +273,7 @@ sub init {
 	    : eval { getpwuid($<) };	# May be missing
 
     # User address, used in message and in Reply-To header.
-    $from = $opts{r} || "";
+    $from = $opts{from} || "";
 
    # Editor
     $editor = $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
@@ -362,13 +367,13 @@ versions are relevant.
 EOF
 
     # Prompt for editor to use if none supplied.
-    if ( $opts{e} ) {
-        $editor = $opts{e};
+    if ( $opts{editor} ) {
+        $editor = $opts{editor};
         print "Press 'Enter' to continue...\n";
         scalar <>;
 
     } else {
-        ask_for_editor(<<EOF) unless $opts{e};
+        ask_for_editor(<<EOF) unless $opts{editor};
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
@@ -377,8 +382,8 @@ EOF
     }
 
     # Launch editor.
-    $opts{f} = generate_filename();
-    edit_bug_report( $opts{f} );
+    $opts{input} = generate_filename();
+    edit_bug_report( $opts{input} );
 }
 
 
@@ -501,7 +506,7 @@ Flags:
     category=$category
     severity=$severity
 EOF
-    print OUT "    ack=no\n" if $opts{A};
+    print OUT "    ack=no\n" if ! $opts{ack};
 
     # ... myconfig ...
     print OUT "---\n$parrot_myconfig\n---\n";
@@ -522,11 +527,11 @@ EOF
 # Send message to final recipient.
 sub send_msg {
     # Get the body.
-    if ( $opts{f} ) {
-        open BODY, "<$opts{f}" or die "Can't open '$opts{f}': $!";
+    if ( $opts{input} ) {
+        open BODY, "<$opts{input}" or die "Can't open '$opts{input}': $!";
         local $/;
         $body = <BODY>;
-        close BODY or  die "Can't close '$opts{f}': $!";
+        close BODY or  die "Can't close '$opts{input}': $!";
     }
     
     # On linux certain mail implementations won't accept the subject
@@ -561,7 +566,7 @@ equivalent, and the perl package Mail::Send has not been installed, so
 I can't send your bug report. We apologize for the inconvenience.
 
 So you may attempt to find some way of sending your message, it has
-been left in the file '$opts{f}'.
+been left in the file '$opts{input}'.
 EOF
 # '
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
