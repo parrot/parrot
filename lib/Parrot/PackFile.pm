@@ -25,6 +25,7 @@ package Parrot::PackFile;
 
 use Parrot::PackFile::FixupTable;
 use Parrot::PackFile::ConstTable;
+use Parrot::Types;
 
 use FileHandle;
 
@@ -113,8 +114,7 @@ sub unpack
 
 #  printf "Input string is %d bytes long\n", length($string);
 
-  my $magic = unpack("l", $string);
-  $string = substr($string, 4);
+  my $magic = shift_op($string);
 
   $self->{MAGIC} = $magic;
 
@@ -126,8 +126,7 @@ sub unpack
  
   my $fixup = '';
 
-  my $fixup_length = unpack('l', $string);
-  $string = substr($string, 4);
+  my $fixup_length = shift_op($string);
 
   if($fixup_length) {
     $fixup = unpack("a$fixup_length", $string);
@@ -143,8 +142,7 @@ sub unpack
  
   my $const = '';
 
-  my $const_length = unpack('l', $string);
-  $string = substr($string, 4);
+  my $const_length = shift_op($string);
 
   if($const_length) {
     $const = unpack("a$const_length", $string);
@@ -230,15 +228,15 @@ sub pack
 
   my $string = '';
 
-  $string .= pack('l', $self->magic);
+  $string .= pack_op($self->magic);
 
   my $fixup = $self->fixup_table->pack;
   my $const = $self->const_table->pack;
 
-  $string .= pack('l', length($fixup));
+  $string .= pack_op(length($fixup));
   $string .= $fixup;
 
-  $string .= pack('l', length($const));
+  $string .= pack_op(length($const));
   $string .= $const;
 
   #

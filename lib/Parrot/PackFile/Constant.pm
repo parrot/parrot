@@ -14,6 +14,7 @@
 use strict;
 
 package Parrot::PackFile::Constant;
+use Parrot::Types;
 
 
 #
@@ -107,12 +108,14 @@ sub data
 sub unpack
 {
   my ($self, $string) = @_;
-
-  my ($flags, $encoding, $type, $size) = unpack('l l l l', $string);
+  my $flags = shift_op($string);
+  my $encoding = shift_op($string);
+  my $type = shift_op($string);
+  my $size = shift_op($string);
 
   my $under      = ($size % 4) ? 4 - ($size % 4) : 0;
   my $block_size = $size + $under;
-  my $data       = unpack("x16 a$block_size", $string);
+  my $data       = substr($string, 0, $block_size);
 
   $self->{FLAGS}    = $flags;
   $self->{ENCODING} = $encoding;
@@ -120,7 +123,7 @@ sub unpack
   $self->{SIZE}     = $size;
   $self->{DATA}     = substr($data, 0, $size);
 
-  return 16 + $block_size;
+  return 4*sizeof("op") + $block_size;
 }
 
 
@@ -136,8 +139,11 @@ sub pack
   my $under = ($size % 4) ? 4 - ($size % 4) : 0;
   my $block = $self->data . ("\0" x $under);
 
-  return pack('l l l l a*', $self->flags, $self->encoding, $self->type, $self->size,
-    $block);
+  return pack_op($self->flags).
+         pack_op($self->encoding).
+         pack_op($self->type).
+         pack_op($self->size).
+         $block;
 }
 
 

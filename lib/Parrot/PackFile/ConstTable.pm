@@ -62,8 +62,7 @@ sub unpack
 {
   my ($self, $string) = @_;
 
-  my $count = unpack 'l', $string;
-  $string = substr($string, 4);
+  my $count = shift_op($string);
 
   for (1..$count) {
     my $const = new Parrot::PackFile::Constant;
@@ -88,13 +87,13 @@ sub pack
   my $self = shift;
   my $string = '';
 
-  $string = pack('l', $self->const_count);
+  $string = pack_op($self->const_count);
 
   foreach (@{$self->{CONST}}) {
     $string .= $_->pack;
   }
 
-  $string = pack('l', length($string)) . $string;
+  $string = pack_op(length($string)) . $string;
 
   return $string;
 }
