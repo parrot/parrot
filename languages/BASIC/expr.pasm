@@ -149,6 +149,7 @@ FUNCJUMP:
 	eq S0, "LEFT", FUNC_LEFT
 	eq S0, "INSTR", FUNC_INSTR
 	eq S0, "TIME", FUNC_TIME
+	eq S0, "INTERPINFO", FUNC_INTERPINFO
 	eq I10, 1, ENDISFUNC  # Just checking, must not have been there.
 
 	# This is bad, mmkay.  We called a function that's not a function!
@@ -205,6 +206,18 @@ FUNC_SQR:
 	pow N0, N0, 0.5
 	save N0
 	bsr NTOA
+	branch ENDFUNCDISPATCH
+
+FUNC_INTERPINFO:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 1, FUNC_ERR
+	bsr ATOI
+	restore I0
+	interpinfo I1, I0
+	save I1
+	bsr ITOA
 	branch ENDFUNCDISPATCH
 
 FUNC_SIN:
