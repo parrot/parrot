@@ -842,7 +842,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
          * if prototyped, first 11 I,S,N go into regs
          */
         arg = sub->pcc_sub->args[i];
-#if IMC_TRACE_HIGH
+#if IMC_TRACE
         PIO_eprintf(NULL, "    arg(%c%s)%s\n", arg->set,
                           (arg->type & (VTCONST|VT_CONSTP)) ? "c":"", arg->name);
 #endif
