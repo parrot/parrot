@@ -64,6 +64,7 @@ typedef struct PDB_breakpoint {
 typedef struct PDB {
     PDB_file_t *            file;
     PDB_breakpoint_t *      breakpoint;
+    long                    breakpoint_skip;
     char *                  cur_command;
     char *                  last_command;
     opcode_t *              cur_opcode;

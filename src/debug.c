@@ -438,13 +438,7 @@ PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
 {
     PDB_breakpoint_t *cur_breakpoint;
 
-    cur_breakpoint = interpreter->pdb->breakpoint;
-    /* If we're here meens we are STOPPED on a break point */
-    while (cur_breakpoint) {
-        /* Skip the next i - 1 runs of this break point */
-        cur_breakpoint->skip = i - 1;
-        cur_breakpoint = cur_breakpoint->next;
-    }
+    interpreter->pdb->breakpoint_skip = i - 1;
 }
 
 /* PDB_program_end
@@ -480,15 +474,15 @@ PDB_break(struct Parrot_Interp *interpreter)
         return 0;
     }
 
+    /* If we have to skip breakpoints, do so. */
+    if (pdb->breakpoint_skip) {
+        pdb->breakpoint_skip--;
+        return 0;
+    }
+
     while (breakpoint) {
         /* if we are in a break point */
         if (pdb->cur_opcode == breakpoint->pc) {
-            /* if we must skip it */
-            if (breakpoint->skip > 0) {
-                /* update the skip counter */
-                breakpoint->skip--;
-                return 0;
-            }
             if (breakpoint->skip < 0)
                 return 0;
 
