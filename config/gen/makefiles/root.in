@@ -51,7 +51,7 @@ GEN_OPSFILES =
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 $(INC)/oplib/core_ops_prederef.h
 
-GEN_SOURCES = core_ops.c core_ops_prederef.c
+GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c
 
 GEN_MODULES = lib/Parrot/Jit.pm lib/Parrot/OpLib/core.pm
 
@@ -100,7 +100,7 @@ INTERP_O_FILES = exceptions$(O) global_setup$(O) interpreter$(O) parrot$(O) \
 	 embed$(O) warnings$(O)  ${cg_o} \
 	 packout$(O) byteorder$(O) debug$(O) smallobject$(O) \
 	 headers$(O) dod$(O) method_util$(O) \
-	 misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O)
+	 misc$(O) spf_render$(O) spf_vtable$(O) datatypes$(O) fingerprint$(O)
 
 O_FILES = $(INTERP_O_FILES) \
 	      $(IO_O_FILES) \
@@ -265,8 +265,8 @@ $(DIS) : disassemble$(O) $(O_DIRS) $(O_FILES)
 # Parrot Dump
 #
 
-#$(PDUMP) : pdump$(O) packfile$(O)
-#	$(LINK) ${ld_out}$(PDUMP) $(LINKFLAGS) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS)
+$(PDUMP) : pdump$(O) packdump$(O) $(O_FILES) $(O_DIRS)
+	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
 
 
 ###############################################################################
@@ -279,6 +279,9 @@ test_main$(O) : test_main.c $(GENERAL_H_FILES)
 
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) ops2pm.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2pm.pl $(OPS_FILES)
+
+fingerprint.c : fingerprint_c.pl lib/Parrot/OpLib/core.pm
+	$(PERL) fingerprint_c.pl > fingerprint.c
 
 ###############################################################################
 #

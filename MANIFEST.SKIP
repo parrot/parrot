@@ -18,6 +18,8 @@ CVS/[^/]+$
 
 ^core_ops\.c$
 ^core_ops_prederef\.c$
+^core_ops_cg\.c$
+^fingerprint\.c$
 
 ^lib/Parrot/Jit\.pm$
 ^lib/Parrot/PMC\.pm$

@@ -200,6 +200,7 @@ examples/mops/mops.scheme
 examples/pxs/PQt.C
 examples/pxs/QtHelloWorld.pasm
 exceptions.c
+fingerprint_c.pl
 global_setup.c
 hash.c
 headers.c

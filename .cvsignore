@@ -5,6 +5,7 @@ core_ops_cg.c
 core_ops.c
 core_ops_prederef.c
 disassemble
+fingerprint.c
 libparrot.a
 libparrot.def
 Makefile

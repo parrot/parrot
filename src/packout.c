@@ -80,10 +80,14 @@ PackFile_pack(struct PackFile *self, opcode_t *packed)
 
     self->header->wordsize = sizeof(opcode_t);
     self->header->byteorder = PARROT_BIGENDIAN;
-    self->header->minor = PARROT_MINOR_VERSION;
     self->header->major = PARROT_MAJOR_VERSION;
+    /* XXX during development, we check PATCH_LEVEL too */
+    self->header->minor = PARROT_MINOR_VERSION | PARROT_PATCH_VERSION;
     self->header->flags = 0;
     self->header->floattype = 0;
+
+    /* write the fingerprint */
+    PackFile_write_fingerprint (self->header->pad);
 
     /* Pack the header */
     mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
@@ -136,8 +140,8 @@ PackFile_FixupTable_pack_size(struct PackFile_FixupTable *self)
 
 
 /***************************************
-Pack the PackFile FixupTable into a contiguous region of memory. 
-NOTE: The memory block had better have at least the amount of memory 
+Pack the PackFile FixupTable into a contiguous region of memory.
+NOTE: The memory block had better have at least the amount of memory
       indicated by PackFile_FixupTable_pack_size()!
 ***************************************/
 
@@ -150,7 +154,7 @@ PackFile_FixupTable_pack(struct PackFile_FixupTable *self, opcode_t *packed)
 }
 
 /***************************************
-Determine the size of the buffer needed in order to pack the PackFile 
+Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
 ***************************************/
 
@@ -175,7 +179,7 @@ PackFile_ConstTable_pack_size(struct PackFile_ConstTable *self)
 
 /***************************************
 Pack the PackFile ConstTable into a contiguous region of memory.
-NOTE: The memory block had better have at least the amount of memory 
+NOTE: The memory block had better have at least the amount of memory
       indicated by PackFile_ConstTable_pack_size()!
 ***************************************/
 static struct PackFile_ConstTable *ct;
@@ -263,8 +267,8 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *packed)
     case PFC_NUMBER:
         *cursor++ = sizeof(FLOATVAL);
         /* XXX Use memcpy() to avoid alignment issues.
-         * Also, do we need to pad things out to an opcode_t boundary?  
-         * Consider gcc/x86, with opcode_t = (long long) and 
+         * Also, do we need to pad things out to an opcode_t boundary?
+         * Consider gcc/x86, with opcode_t = (long long) and
          * FLOATVAL = (long double):
          * sizeof(long long) = 8
          * sizeof(long double) = 12

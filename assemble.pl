@@ -226,10 +226,10 @@ Some predefined constants exist for your convenience, namely:
 and the other PMC types.
 (This should be generated from include/parrot/pmc.h, but isn't at the moment.)
 
-The contents of external files can be included by use of the C<.include> 
+The contents of external files can be included by use of the C<.include>
 macro:
 
-  .include "{filename}" 
+  .include "{filename}"
 
 The contents of the included file are inserted at the point where the
 C<.include> macro occurs. This means that code like this:
@@ -427,6 +427,7 @@ use lib "$FindBin::Bin/lib";
 use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
 use Parrot::Config;
+use Digest::MD5 qw(md5_hex);
 
 =head2 Assembler class
 
@@ -828,6 +829,17 @@ the packfile header, then return all.
 
 =cut
 
+sub _fingerprint {
+  my $fingerprint = md5_hex join "\n", map {
+    join '_', $_->{NAME}, @{$_->{ARGS}}
+  } @$Parrot::OpLib::core::ops;
+  my @arr = ();
+  for my $i (0..9) {
+    push @arr, hex substr ($fingerprint, $i*2, 2);
+  }
+  return @arr;
+}
+
 sub output_bytecode {
     my $self = shift;
     my $wordsize;
@@ -838,29 +850,19 @@ sub output_bytecode {
     my %const_table = constant_table($self);
 
     my $byteorder = (substr($PConfig{'byteorder'},0,1) == 1) ? 0 : 1;
+    my $major = $PConfig{MAJOR};
+    # during devel, we check PATCH too
+    my $minor = $PConfig{MINOR} | $PConfig{PATCH};
 
     my $packfile_header = {
         wordsize    => $wordsize, # unsigned char wordsize
         byteorder   => $byteorder, # unsigned char byteorder
-        major       => 0x00, # unsigned char major
-        minor       => 0x00, # unsigned char minor
+        major       => $major, # unsigned char major
+        minor       => $minor, # unsigned char minor
 
         flags       => 0x00, # unsigned char flags
         floattype   => 0x00, # unsigned char floattype
-        pad         => [
-            0x19, # unsigned char pad[0]
-            0x40, # unsigned char pad[1]
-
-            0xe4, # unsigned char pad[2]
-            0x73, # unsigned char pad[3]
-            0x09, # unsigned char pad[4]
-            0x08, # unsigned char pad[5]
-
-            0x00, # unsigned char pad[6]
-            0x00, # unsigned char pad[7]
-            0x00, # unsigned char pad[8]
-            0x00  # unsigned char pad[9]
-        ],
+        pad         => [ _fingerprint ],
 
         magic       => 0x0131_55a1, # opcode_t magic
         opcodetype  => 0x5045_524c, # opcode_t opcodetype
@@ -1104,7 +1106,7 @@ exit;
 
 =item process_args
 
-Process the argument list and return the list of arguments and files to 
+Process the argument list and return the list of arguments and files to
 process. Only legal and sane arguments and files should get past this point.
 
 =back

@@ -148,7 +148,7 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream) {
     FLOATVAL f;
     if(pf->fetch_nv == NULL) {
 #if TRACE_PACKFILE
-        PIO_eprintf(NULL, "PackFile_fetch_nv: Native [%d bytes]..\n", 
+        PIO_eprintf(NULL, "PackFile_fetch_nv: Native [%d bytes]..\n",
                 sizeof(FLOATVAL));
 #endif
         memcpy(&f, stream, sizeof(FLOATVAL));
@@ -321,10 +321,23 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * FIXME
      */
     if(self->need_wordsize) {
-        PIO_eprintf(NULL, 
+        PIO_eprintf(NULL,
                 "PackFile_unpack: Unimplemented wordsize transform.\n");
-        PIO_eprintf(NULL, "File has wordsize: %d (native is %d)\n", 
+        PIO_eprintf(NULL, "File has wordsize: %d (native is %d)\n",
                 header->wordsize,  sizeof(opcode_t));
+        return 0;
+    }
+    if (header->major != PARROT_MAJOR_VERSION ||
+            header->minor != (PARROT_MINOR_VERSION|PARROT_PATCH_VERSION)) {
+        internal_exception(1, "PackFile_unpack: Bytecode not valid for this "
+                    "interpreter: version mismatch\n");
+        return 0;
+    }
+
+    /* check the fingerprint */
+    if (!PackFile_check_fingerprint (header->pad)) {
+        internal_exception(1, "PackFile_unpack: Bytecode not valid for this "
+                    "interpreter: fingerprint mismatch\n");
         return 0;
     }
 
