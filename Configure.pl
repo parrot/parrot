@@ -174,7 +174,7 @@ my(%c)=(
 );
 
 # What's the platform shell quote character?
-if ($^O eq 'VMS' || $^O eq 'MSWin') {
+if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
     $c{PQ} = '"';
 } else {
     $c{PQ} = "'";
