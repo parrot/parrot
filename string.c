@@ -70,9 +70,9 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
     if (s->flags & BUFFER_constant_FLAG) {
         d = new_string_header(interpreter, 
                               s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
-        s->flags |= BUFFER_COW_FLAG;
+        s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
         copy_string_header(d, s);
-        d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG|BUFFER_selfpoolptr_FLAG);
+        d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
     }
     else {
         d = new_string_header(interpreter, s->flags);
@@ -182,13 +182,25 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     }
 
     s = new_string_header(interpreter, flags);
-    Parrot_allocate_string(interpreter, s, buflen);
+    if (flags & BUFFER_external_FLAG) {
+        s->bufstart = buffer;
+        s->buflen = buflen;
+    }
+    else {
+        Parrot_allocate_string(interpreter, s, buflen);
+    }
     s->encoding = encoding;
     s->type = type;
 
     if (buffer) {
-        mem_sys_memcopy(s->strstart, buffer, buflen);
-        s->bufused = buflen;
+        if (flags & BUFFER_external_FLAG) {
+            s->strstart = s->bufstart;
+            s->bufused = buflen;
+        }
+        else {
+            mem_sys_memcopy(s->strstart, buffer, buflen);
+            s->bufused = buflen;
+        }
         (void)string_compute_strlen(s);
     }
     else {

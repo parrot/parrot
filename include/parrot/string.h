@@ -95,10 +95,6 @@ typedef enum BUFFER_flag {
     BUFFER_generation_FLAG = 1 << 17 | 1 << 18,
     /* Buffer header has a strstart which needs to be updated with bufstart */
     BUFFER_strstart_FLAG = 1 << 19,
-    /* Buffer's memory data is in this header's header pool's memory pool */
-    /* for now, this is true in constant headers for constant buffer data,and 
-     * true for non-constant headers pointing at non-constant buffer data */
-    BUFFER_selfpoolptr_FLAG = 1 << 20
 } BUFFER_flags;
 
 /* stringinfo parameters */

@@ -143,6 +143,16 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
 
 /** Compaction Code **/
 
+static int
+buffer_movable(UINTVAL flags)
+{
+    UINTVAL mask = BUFFER_on_free_list_FLAG
+                 | BUFFER_constant_FLAG
+                 | BUFFER_immobile_FLAG
+                 | BUFFER_external_FLAG;
+    return !(flags & mask);
+}
+
 /* Compact the buffer pool */
 static void compact_pool(struct Parrot_Interp *interpreter,
                          struct Memory_Pool *pool)
@@ -236,7 +246,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                                 offset;
                         }
                     }
-                    else if (b->flags & BUFFER_selfpoolptr_FLAG)
+                    else if (!(b->flags & BUFFER_external_FLAG))
                     {
                         struct Buffer_Tail *new_tail = 
                             (struct Buffer_Tail *)((char *)cur_spot + 
@@ -403,7 +413,6 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     }
     buffer->bufstart = mem;
     buffer->buflen = tosize;
-    buffer->flags |= BUFFER_selfpoolptr_FLAG;
     return mem;
 }
 
@@ -440,7 +449,6 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     str->bufstart = mem;
     str->buflen = alloc_size;
     str->strstart = str->bufstart;
-    str->flags |= BUFFER_selfpoolptr_FLAG;
     return mem;
 }
 
@@ -454,7 +462,6 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size, 
         interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT-1);
     ((Buffer *)buffer)->buflen = size;
-    ((Buffer *)buffer)->flags |= BUFFER_selfpoolptr_FLAG;
     return buffer;
 }
 
@@ -483,7 +490,6 @@ Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
     }
     str->buflen = req_size;
     str->strstart = str->bufstart;
-    str->flags |= BUFFER_selfpoolptr_FLAG;
     return str;
 }
 

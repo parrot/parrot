@@ -100,7 +100,6 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
-    buffer->flags = BUFFER_selfpoolptr_FLAG;
 #if GC_DEBUG
     buffer->version++;
 #endif
