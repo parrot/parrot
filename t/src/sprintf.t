@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 TODO: {
     local $TODO="t/src doesn't work on Windows" if $^O =~ /Win32/;
@@ -98,7 +98,7 @@ TODO: {
 
                 ival = -1;
                 S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
-                printf("0x%x %s", (int) ival, 
+                printf("0x%x %s", (int) ival,
                        string_to_cstring(interpreter, S));
                 S = Parrot_sprintf_c(interpreter, "== %08d\n", ival);
                 printf("%08d %s", (int) ival,
@@ -133,4 +133,27 @@ Hello, Hello, Pa!
 -0000001 == -0000001
 That's all, folks!
 OUTPUT
+
+c_output_like (<<'CODE', "/[0-9a-f]*\nok\n/", "many printfs");
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+
+int main ()
+{
+    INTVAL i;
+    struct Parrot_Interp *interp = NULL;
+
+    interp = Parrot_new ();
+    Parrot_init(interp, (void*) &i);
+
+    for (i=0; i<10000; i++) {
+         PIO_printf(interp, "%x", i);
+    }
+
+    PIO_printf(interp, "\nok\n");
+
+    return 0;
+}
+CODE
 }
