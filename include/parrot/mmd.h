@@ -41,6 +41,9 @@ typedef struct MMD_table mmd_table;
 /* Need this for add, subtract, multiply, divide, mod, cmod, bitwise
    (and, or, xor, lshift, rshift), concat, logical (and, or, xor),
    repeat, eq, cmp */
+
+/* &gen_from_def(vtable_constants.pasm) subst(s/^MMD/VTABLE/) */
+
 #define MMD_ADD 0
 #define MMD_SUBTRACT 1
 #define MMD_MULTIPLY 2
@@ -65,6 +68,7 @@ typedef struct MMD_table mmd_table;
 #define MMD_SAND 21
 #define MMD_SXOR 22
 
+/* &end_gen */
 #endif
 
 /*
