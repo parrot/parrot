@@ -4,7 +4,9 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include <dlfcn.h>
+#ifdef HAS_HEADER_DLFCN
+#   include <dlfcn.h>
+#endif
 
 #include "parrot/parrot.h"
 
