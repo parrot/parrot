@@ -1,95 +1,276 @@
+=head1 TITLE
+
+sdl_types.imc - PIR interface to SDL types
+
+=head1 SYNOPSIS
+
+	.include "library/sdl.pasm"
+	.include "library/sdl_types.imc"
+
+	# create a new screen
+	.local pmc screen_settings
+	new screen_settings, .PerlHash
+	set screen_settings['width'],  640
+	set screen_settings['height'], 480
+	set screen_settings['bpp'],      0
+	set screen_settings['flags'],    0
+
+	.local object screen
+	screen = _new_SDL_Screen( screen_settings )
+
+	# create a new rectangle
+	.local object rect
+	rect   = _new_SDL_Rect()
+
+	# create a new color
+	.local int color
+	color  = _new_SDL_Color( 0, 0, 255 )
+
+	# load an image into a new SDL Surface
+	.local object image
+	image  = _load_SDL_Image( "my_image.png" )
+
+=head1 DESCRIPTION
+
+The functions in this library create, initialize, and return Parrot-compatible
+SDL data structures.
+
+B<Note:>  expect changes as there's lots of SDL wrapper yet to write.
+
+=cut
+
 .include "datatypes.pasm"
 
-.pcc_sub _init_SDL_types prototyped
-	newsub $P0, .Sub, new_SDL_Rect
-	store_global 'new_SDL_Rect', $P0
-	print "Init types\n"
+=cut
+
+=head1 FUNCTIONS
+
+This library provides the following functions:
+
+=over 4
+
+=item _new_SDL_Screen( args )
+
+Create and return a new object representing an SDL screen.  The single
+argument, C<args>, should be a C<PerlHash> pmc containing the following keys:
+
+=over 4
+
+=item C<width>
+
+the width of the screen to create, in pixels
+
+=item C<height>
+
+the height of the screen to create, in pixels
+
+=item C<bpp>
+
+the ideal bit depth of the screen to create.  Note that you may receive a
+screen of lesser capabilities, as per SDL's normal behavior.
+
+=item C<flags>
+
+an ORd set of flags of the screen.  Note that since these bindings do not yet
+expose any constants, you'll have to do math on your own or use zero.
+
+=back
+
+This function returns a C<ManagedStruct> pmc.
+
+=cut
+
+.pcc_sub _new_SDL_Screen prototyped
+	.param pmc args
+
+	.local pmc SetVideoMode
+
+	SetVideoMode = global "SDL::SetVideoMode"
+
+	.local int width
+	.local int height
+	.local int bpp
+	.local int flags
+
+	width  = args['width']
+	height = args['height']
+	bpp    = args['bpp']
+	flags  = args['flags']
+
+	.local pmc screen
+
+	.pcc_begin prototyped
+		.arg width
+		.arg height
+		.arg bpp
+		.arg flags
+		.nci_call SetVideoMode
+		.result screen
+	.pcc_end
+
 	.pcc_begin_return
+	.return screen
 	.pcc_end_return
 .end
+
+=cut
+
+=item _new_SDL_Rect()
+
+Create and return a new object representing an SDL Rect.  This takes no
+arguments.  It returns an C<UnManagedStruct> pmc.  You can access and modify
+the following attributes of the Rect by key:
+
+=over 4
+
+=item x
+
+the x position of the Rect, in pixels
+
+=item y
+
+the y position of the Rect, in pixels
+
+=item width
+
+the width of the Rect, in pixels
+
+=item height
+
+the height of the Rect, in pixels
+
+=back
+
+For example:
+
+	.local object rect
+	rect      = _new_SDL_Rect()
+
+	rect['x']      = 0
+	rect['y']      = 0
+	rect['height'] = 100
+	rect['width']  = 100
+
+=cut
 
 .pcc_sub _new_SDL_Rect prototyped
-	new $P2, .OrderedHash
-	set $P2['x'], .DATATYPE_INT16
-	push $P2, 0
-	push $P2, 0
-	set $P2['y'], .DATATYPE_INT16
-	push $P2, 0
-	push $P2, 0
-	set $P2['w'], .DATATYPE_UINT16
-	push $P2, 0
-	push $P2, 0
-	set $P2['h'], .DATATYPE_UINT16
-	push $P2, 0
-	push $P2, 0
+	.local pmc layout
 
-	new $P5, .ManagedStruct, $P2
-	set $I6, 0
-	sizeof $I7, .DATATYPE_INT16
-	add $I6, $I7
-	add $I6, $I7
-	sizeof $I7, .DATATYPE_UINT16
-	add $I6, $I7
-	add $I6, $I7
+	new layout, .OrderedHash
+	set layout['x'], .DATATYPE_INT16
+	push layout, 0
+	push layout, 0
+	set layout['y'], .DATATYPE_INT16
+	push layout, 0
+	push layout, 0
+	set layout['w'], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
+	set layout['h'], .DATATYPE_UINT16
+	push layout, 0
+	push layout, 0
 
-	set $P5, $I6
+	.local pmc rect
+	new rect, .ManagedStruct, layout
+
+	.local int size
+	set size, 0
+
+	.local int item_size
+	sizeof item_size, .DATATYPE_INT16
+	add size, item_size
+	add size, item_size
+
+	sizeof item_size, .DATATYPE_UINT16
+	add size, item_size
+	add size, item_size
+
+	set rect, size
 
 	.pcc_begin_return
-	.return $P5
+	.return rect
 	.pcc_end_return
 .end
+
+=cut
+
+=item _new_SDL_Color( red, green, blue )
+
+Create and return an I<integer> representing an SDL Color.  All three arguments
+are required; they are the components of the color, as integers from 0 to 255.
+
+B<Note:> this function may not currently play well with very low-depth screens
+or very high-depth screens.
+
+Do B<not> store the result of this function as a PMC, as it may exhibit strange
+behavior.
+
+=cut
 
 .pcc_sub _new_SDL_Color prototyped
 	.param int red
 	.param int green
 	.param int blue
 
-	new $P2, .OrderedHash
-	set $P2['r'], .DATATYPE_UINT8
-	push $P2, 0
-	push $P2, 0
-	set $P2['g'], .DATATYPE_UINT8
-	push $P2, 0
-	push $P2, 0
-	set $P2['b'], .DATATYPE_UINT8
-	push $P2, 0
-	push $P2, 0
-	set $P2['a'], .DATATYPE_UINT8
-	push $P2, 0
-	push $P2, 0
+	.local int color
 
-	new $P5, .ManagedStruct, $P2
-	set $I6, 0
-	sizeof $I7, .DATATYPE_UINT8
-	add $I6, $I7
-	add $I6, $I7
-	add $I6, $I7
-	add $I6, $I7
+	 color = 0
+	 red   = red   << 16
+	 green = green <<  8
+	 blue  = blue  <<  0
 
-	set $P5, $I6
-
-	print red
-	print "\n"
-	print green
-	print "\n"
-	print blue
-	print "\n"
-
-	set $P5['r'], red
-	set $P5['g'], green
-	set $P5['b'], blue
-
-	set $I0, $P5['r']
-	print $I0
-	print "\n"
-	set $I0, $P5['g']
-	print $I0
-	print "\n"
-	set $I0, $P5['b']
-	print $I0
-	print "\n"
+	 add color, red
+	 add color, green
+	 add color, blue
 
 	.pcc_begin_return
-	.return $P5
+	.return color
 	.pcc_end_return
 .end
+
+=cut
+
+=item _new_SDL_Image( filename )
+
+Create and return a new SDL Structure containing the named image.  This will
+return a C<ManagedStruct> pmc.  The only parameter, C<filename> is required.
+It should be the full path to a readable file.  If SDL cannot read this file,
+the returned PMC will be null, in whatever sense that makes sense to SDL.
+
+(Yes, that means there should be some sort of exception here eventually.)
+
+=cut
+
+.pcc_sub _new_SDL_Image prototyped
+	.param string filename
+
+	.local pmc SDL_IMG_Load
+	SDL_IMG_Load    = global "SDL::IMG_Load"
+
+	.local object image
+
+	.pcc_begin prototyped
+		.arg filename
+		.nci_call SDL_IMG_Load
+		.result image
+	.pcc_end
+
+	.pcc_begin_return
+	.return image
+	.pcc_end_return
+.end
+
+=cut
+
+=back
+
+=head1 AUTHOR
+
+Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut
