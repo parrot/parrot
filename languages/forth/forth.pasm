@@ -27,6 +27,8 @@
 .constant TempInt2	I6
 .constant TempInt3      I7
 
+.constant Status	I12
+
 .constant IntStack      I31
 
 .constant TempNum	N5
@@ -42,15 +44,24 @@
 .constant CompileWord   S2
 .constant CompileBuffer S3
 .constant TempString    S4
+.constant WordBody	S5
+
+.constant NewBodyString	S6
 
 #
 
 .constant CoreOps       P0
 .constant UserOps       P1
 
+.constant CompiledWordPMC P2
+.constant PASMCompiler	P3
+
+.constant TempPMC	P27
+
 #
 
     bsr InitializeCoreOps
+    compreg P3, "PASM"
 
     set .Mode, .InterpretMode
     getstdin P2
@@ -76,6 +87,21 @@ DonePromptString:
     set_addr .TempInt, .OpAddress
     set .CoreOps[.Name], .TempInt
 .endm
+
+.macro AddUserOp (OpName, OpBody)
+    # Put the body definition into the S register that we compile from
+    set .WordBody, .OpBody
+    # Invoke the compiler
+    bsr CompileString
+    # Snag the address of the new body
+    set .TempInt, .CompiledWordPMC
+    # Add the PMC to the user ops slot so it doesn't disappear
+    set .UserOps[.OpName], .CompiledWordPMC
+    # Put the actual function address into the core ops hash, since
+    # it is now a core op
+    set .CoreOps[.OpName], .TempInt
+.endm
+
 InitializeCoreOps:
     #
     # Arithmetic, Single precision
@@ -937,4 +963,116 @@ Chop:
     length .TempInt, .Commands
     dec .TempInt
     substr .Commands, .Commands, 0, .TempInt
+    ret
+
+#------------------------------------------------------------------------------
+#
+# CompileString
+#
+# This little sub takes the string in .WordBody and compiles it, returning
+# a PMC that corresponds to the newly compiled word. This is pretty si
+#
+CompileString:
+    # In case someone's using it
+    save .NewBodyString
+    # Probably ultimately going to go
+    save .Commands
+    set .Commands, .WordBody
+    set .NewBodyString, ""
+
+CompileWord:
+    # Get the next word in the command buffer
+    bsr CollectWord
+    # Identify it and add the text for it into the 
+    bsr IdentifyAndCompileWord
+    
+    # If the buffer's not empty, then go back and process it
+    length .TempInt, .Commands    
+    if .TempInt, CompileWord
+
+    # Compile the string
+    compile .CompiledWordPMC, .PASMCompiler, .NewBodyString
+
+    # And we're done
+    ret
+
+IdentifyAndCompileWord:
+    bsr CheckForWord
+    if .Status, NotWord
+    bsr AddPlainWord
+    ret
+NotWord:
+    bsr CheckForSpecialWord
+    if .Status, NotSpecial
+    bsr AddSpecialWord
+    ret
+NotSpecial:
+    bsr CheckForInt
+    if .Status, NotAnInt
+    bsr AddIntConstant
+    ret
+NotAnInt:
+    bsr CheckForFloat
+    if .Status, NotFloat
+    bsr AddFloatConstant
+    ret
+NotFloat:
+    bsr CheckForString
+    if .Status, NotString
+    bsr AddStringConstant
+    ret
+NotString:
+    # Just ignore it
+    ret
+
+CheckForWord:
+    set .Status, 1
+    ret
+CheckForSpecialWord:
+    set .Status, 1
+    ret
+CheckForInt:
+    set .Status, 1
+    ret
+CheckForFloat:
+    set .Status, 1
+    ret
+CheckForString:
+    set .Status, 1
+    ret
+
+# Control flow and such, where a simple substitution won't do
+AddSpecialWord:
+    ret
+
+AddIntConstant:
+    concat .NewBodyString, "new P27, .Integer\n"
+    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, .CurrentWord
+    concat .NewBodyString, "\n"
+    ret
+
+AddFloatConstant:
+    concat .NewBodyString, "new P27, .Float\n"
+    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, .CurrentWord
+    concat .NewBodyString, "\n"
+    ret
+
+AddStringConstant:
+    # Should really be a String, but we don't have that yet
+    concat .NewBodyString, "new P27, .PerlString\n"
+    concat .NewBodyString, "set P27, "
+    concat .NewBodyString, .CurrentWord
+    concat .NewBodyString, "\n"
+    ret
+
+AddPlainWord:
+    set .TempInt, .CoreOps[.CurrentWord]
+    concat .NewBodyString, "jsr "
+    set .TempString, .TempInt
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n"
+    ret
+AddControlStruct:
     ret
