@@ -744,8 +744,8 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
     /*
      * setup event function ptrs and set the stack limit
      */
-    setup_event_func_ptrs(interpreter);
     if (interpreter->resume_flag & RESUME_INITIAL) {
+        setup_event_func_ptrs(interpreter);
         /*
          * if we are entering the run loop the first time
          */
@@ -919,6 +919,14 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
         }
     }
     runops_ex(interpreter, offset);
+    /*
+     * pop off exception and put it onto the free list
+     */
+    {
+        Parrot_exception *e = interpreter->exceptions;
+        interpreter->exceptions = e->prev;
+        interpreter->exc_free_list = e;
+    }
     /*
      * not yet - this needs classifying of exceptions and handlers
      * so that only an exit handler does catch this exception
