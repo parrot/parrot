@@ -269,7 +269,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *      }
  *
  *      rule other_stuff {
- *          <[^\%]> | \%\%
+ *          [<[^\%]> | \%\%]*:
  *      }
  *
  *      rule field {

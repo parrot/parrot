@@ -104,10 +104,10 @@ int do_test(struct Parrot_Interp* interpreter) {
            string_to_cstring(interpreter, S));
     
     ival = -1;
-    S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
-    printf("0x%x %s", (int) ival,
+    S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
+    printf("0x%vx %s", (int) ival,
            string_to_cstring(interpreter, S));
-    S = Parrot_sprintf_c(interpreter, "== %08d\n", ival);
+    S = Parrot_sprintf_c(interpreter, "== %08vd\n", ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
  
