@@ -39,7 +39,7 @@ pmclass PerlArray {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
 	SELF->data = mem_sys_allocate(sizeof(PMC*));
 	SELF->cache.int_val = 0;
     }

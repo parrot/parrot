@@ -22,7 +22,7 @@ pmclass PerlHash {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
 	SELF->data = key_new(INTERP);
 	key_set_size(INTERP,SELF->data,0);
     }

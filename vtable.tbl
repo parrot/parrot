@@ -18,7 +18,7 @@
 
 INTVAL type()
 STRING* name( )
-init(  )
+init(INTVAL size)
 void clone(PMC* dest)
 void morph (INTVAL type)
 BOOLVAL move_to  (void* destination)

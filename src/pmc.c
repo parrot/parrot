@@ -52,7 +52,35 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
         return NULL;
     }
 
-    pmc->vtable->init(interpreter, pmc);
+    pmc->vtable->init(interpreter, pmc, 0);
+    return pmc;
+}
+
+PMC *
+pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type, INTVAL size)
+{
+    PMC *pmc = new_pmc_header(interpreter);
+
+    if (!pmc) {
+        internal_exception(ALLOCATION_ERROR,
+                           "Parrot VM: PMC allocation failed!\n");
+        return NULL;
+    }
+
+    pmc->flags = 0;
+    pmc->data = 0;
+
+    pmc->vtable = &(Parrot_base_vtables[base_type]);
+
+    if (!pmc->vtable || !pmc->vtable->init) {
+        /* This is usually because you either didn't call init_world early 
+         * enough or you added a new PMC class without adding 
+         * Parrot_(classname)_class_init to init_world. */
+        PANIC("Null vtable used");
+        return NULL;
+    }
+
+    pmc->vtable->init(interpreter, pmc, size);
     return pmc;
 }
 

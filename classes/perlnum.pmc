@@ -22,7 +22,7 @@ pmclass PerlNum {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
         SELF->cache.num_val = 0.0;
     }
 

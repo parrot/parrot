@@ -103,6 +103,8 @@ typedef enum {
 
 /* Prototypes */
 PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
+PMC *pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type,
+                        INTVAL size);
 
 #endif
 

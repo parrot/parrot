@@ -92,7 +92,7 @@ pmclass IntQueue {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
 	SELF->data = (STRING*)new_container();
     }
 

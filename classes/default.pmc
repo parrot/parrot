@@ -21,7 +21,7 @@ pmclass default noinit {
      return NULL;
    }
 
-   void init () {
+   void init (INTVAL size) {
    }
 
    void clone (PMC* dest) {

@@ -22,7 +22,7 @@ pmclass PerlString {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
 	SELF->cache.struct_val = string_make(INTERP,NULL,0,NULL,0,NULL);
     }
 

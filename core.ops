@@ -2517,13 +2517,18 @@ op enternative() {
 
 =item B<new>(out PMC, in INT)
 
+=item B<new>(out PMC, in INT, in INT)
+
 Create a new PMC of class C<i>; look in F<pmc.h> for the base
 vtable types. The assembler allows you to specify PMCs by type
 name as well as by integer - you should do this for compatibility,
 to avoid problems if the base types get reassigned. For example:
 
-    new P0, PerlScalar
+Optionally a size may be passed to the constructor which may or
+may not be used by the particular class.
 
+    new P0, PerlScalar
+    new P0, PerlStruct, 64
 =cut
 
 op new(out PMC, in INT) {
@@ -2532,6 +2537,16 @@ op new(out PMC, in INT) {
     abort(); /* Deserve to lose */
   }
   newpmc = pmc_new(interpreter, $2);
+  $1 = newpmc;
+  goto NEXT();
+}
+
+op new(out PMC, in INT, in INT) {
+  PMC* newpmc;
+  if ($2 <0 || $2 >= enum_class_max) {
+    abort(); /* Deserve to lose */
+  }
+  newpmc = pmc_new_sized(interpreter, $2, $3);
   $1 = newpmc;
   goto NEXT();
 }

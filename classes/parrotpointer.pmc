@@ -22,7 +22,7 @@ pmclass ParrotPointer {
       return whoami;
    }
 
-   void init () {
+   void init (INTVAL size) {
       SELF->data=NULL;
       SELF->flags=PMC_private_GC_FLAG;
    }

@@ -53,7 +53,7 @@ pmclass Array {
         return whoami;
     }
 
-    void init () {
+    void init (INTVAL size) {
 	SELF->data = new_pmc_header(interpreter);
 	((Buffer *)SELF->data)->bufstart = NULL;
 	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
