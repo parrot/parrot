@@ -19,7 +19,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 27;
 
 # no. 1
 pir_output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -448,7 +448,7 @@ CODE
 OUT
 
 # no. 10
-pir_output_is(<<'CODE', <<'OUT', "self-referential properties");
+pir_output_is(<<'CODE', <<'OUT', "self-referential properties (1)");
 
 .sub _main
     .local pmc hash
@@ -472,7 +472,7 @@ CODE
 OUT
 
 # no. 11
-pir_output_is(<<'CODE', <<'OUT', "self-referential properties");
+pir_output_is(<<'CODE', <<'OUT', "self-referential properties (2)");
 
 .sub _main
     .local pmc array
@@ -767,3 +767,216 @@ pir_output_is(<<'CODE', <<'OUTPUT', "dumping Integer PMC");
 CODE
 "Int:" => 12345
 OUTPUT
+
+# no. 17
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping Float PMC");
+
+.sub _main
+    .local pmc float1
+
+    new float1, .Float
+    float1 = 12345.678
+    _dumper( "Float:", float1 )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"Float:" => 12345.7
+OUTPUT
+
+# no. 18
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .ResizablePMCArray
+    push array, 12345
+    push array, "hello"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => ResizablePMCArray (size:2) [
+    12345,
+    "hello"
+]
+OUTPUT
+
+# no. 19
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .ResizableStringArray
+    push array, "hello"
+    push array, "world"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => ResizableStringArray (size:2) [
+    "hello",
+    "world"
+]
+OUTPUT
+
+# no. 20
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .ResizableIntegerArray
+    push array, 12345
+    push array, 67890
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => ResizableIntegerArray (size:2) [
+    12345,
+    67890
+]
+OUTPUT
+
+# no. 21
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .ResizableFloatArray
+    push array, 123.45
+    push array, 67.89
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => ResizableFloatArray (size:2) [
+    123.45,
+    67.89
+]
+OUTPUT
+
+# no. 22
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .FixedPMCArray
+    array = 2
+    array[0] = 12345
+    array[1] = "hello"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => FixedPMCArray (size:2) [
+    12345,
+    "hello"
+]
+OUTPUT
+
+# no. 23
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .FixedStringArray
+    array = 2
+    array[0] = "hello"
+    array[1] = "world"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => FixedStringArray (size:2) [
+    "hello",
+    "world"
+]
+OUTPUT
+
+# no. 24
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .FixedIntegerArray
+    array = 2
+    array[0] = 12345
+    array[1] = 67890
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => FixedIntegerArray (size:2) [
+    12345,
+    67890
+]
+OUTPUT
+
+# no. 25
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .FixedFloatArray
+    array = 2
+    array[0] = 123.45
+    array[1] = 67.89
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => FixedFloatArray (size:2) [
+    123.45,
+    67.89
+]
+OUTPUT
+
+# no. 26
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping PMCArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .PMCArray
+    push array, 12345
+    push array, "hello"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => PMCArray (size:2) [
+    12345,
+    "hello"
+]
+OUTPUT
+
+# no. 27
+pir_output_is(<<'CODE', <<'OUTPUT', "dumping StringArray PMC");
+.sub _main
+    .local pmc array
+
+    new array, .StringArray
+    push array, "hello"
+    push array, "world"
+    _dumper( "array:", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array:" => StringArray (size:2) [
+    "hello",
+    "world"
+]
+OUTPUT
+
+# pir_output_is(<<'CODE', <<'OUTPUT', "dumping IntegerArray PMC");
+# pir_output_is(<<'CODE', <<'OUTPUT', "dumping FloatValArray PMC");

@@ -212,9 +212,130 @@ Dumps an (PMC) Array.
 
 =cut
 
-.sub pmcPMCArray
-    S0 = "pmcPerlArray"
-    callmethod
+.sub pmcPMCArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcResizablePMCArray"( name, array )
+
+Dumps an resizable (PMC) Array.
+
+=cut
+
+.sub pmcResizablePMCArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcResizableStringArray"( name, array )
+
+Dumps an resizable (string) Array.
+
+=cut
+
+.sub pmcResizableStringArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcResizableIntegerArray"( name, array )
+
+Dumps an resizable (Integer) Array.
+
+=cut
+
+.sub pmcResizableIntegerArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcResizableFloatArray"( name, array )
+
+Dumps an resizable (Float) Array.
+
+=cut
+
+.sub pmcResizableFloatArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcFixedPMCArray"( name, array )
+
+Dumps an fixed (PMC) Array.
+
+=cut
+
+.sub pmcFixedPMCArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcFixedStringArray"( name, array )
+
+Dumps an fixed (string) Array.
+
+=cut
+
+.sub pmcFixedStringArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcFixedIntegerArray"( name, array )
+
+Dumps an fixed (Integer) Array.
+
+=cut
+
+.sub pmcFixedIntegerArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcFixedFloatArray"( name, array )
+
+Dumps an fixed (Float) Array.
+
+=cut
+
+.sub pmcFixedFloatArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcPMCArray"( name, array )
+
+Dumps an (PMC) Array.
+
+=cut
+
+.sub pmcPMCArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
+.end
+
+=item style."pmcStringArray"( name, array )
+
+Dumps an (string) Array.
+
+=cut
+
+.sub pmcStringArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
 .end
 
 =item style."pmcIntList"( name, array )
@@ -280,17 +401,6 @@ iter_end:
     self."deleteIndent"()
 
     .return ( 1 )
-.end
-
-=item style."pmcStringArray"( name, array )
-
-Dumps an (string) Array.
-
-=cut
-
-.sub pmcStringArray
-    S0 = "pmcPerlArray"
-    callmethod
 .end
 
 =item style."pmcPerlArray"( name, array )
@@ -541,9 +651,10 @@ Dumps an Array.
 
 =cut
 
-.sub pmcArray
-    S0 = "pmcPerlArray"
-    callmethod
+.sub pmcArray method
+    .param string name
+    .param pmc array
+    self."pmcPerlArray"( name, array )
 .end
 
 =item style."pmcInteger"( name, val )
@@ -553,6 +664,21 @@ Dumps an Integer PMC.
 =cut
 
 .sub pmcInteger method
+    .param string name
+    .param pmc val
+
+    print val
+
+    .return ( 1 )
+.end
+
+=item style."pmcFloat"( name, val )
+
+Dumps an Float PMC.
+
+=cut
+
+.sub pmcFloat method
     .param string name
     .param pmc val
 
