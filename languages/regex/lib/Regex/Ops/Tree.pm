@@ -38,6 +38,8 @@ use Carp qw(confess);
 @Regex::Ops::Tree::alternate::ISA    = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::multi_match::ISA  = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::group::ISA        = qw(Regex::Ops::Tree::_onearg);
+@Regex::Ops::Tree::call::ISA         = qw(Regex::Ops::Tree::_onearg);
+@Regex::Ops::Tree::rule::ISA         = qw(Regex::Ops::Tree::_onearg);
 @Regex::Ops::Tree::scan::ISA         = qw(Regex::Ops::Tree::_onearg);
 @Regex::Ops::Tree::atend::ISA        = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::advance::ISA      = qw(Regex::Ops::Tree::_atom);
@@ -88,7 +90,7 @@ sub mark {
 # compilation.
 #
 # Probably the best way to understand this stuff is to look at
-# where it's used, mostly in PreOptimize.pm.
+# where it's used, mostly in TreeOptimize.pm.
 ############################################################################
 
 sub order_startset {
@@ -324,6 +326,13 @@ package Regex::Ops::Tree::check;
 sub minlen { $_[0]->{args}->[1]->minlen(); }
 sub maxlen { $_[0]->{args}->[1]->maxlen(); }
 
+package Regex::Ops::Tree::rule;
+sub minlen { my ($op) = @_; $op->{args}->[1]->minlen() }
+sub maxlen { my ($op) = @_; $op->{args}->[1]->maxlen() }
+sub startset { my ($op) = @_; $op->{args}->[1]->startset() }
+sub hasback { my ($op) = @_; $op->{args}->[1]->hasback() }
+sub dfa_safe { my ($op) = @_; $op->{args}->[1]->dfa_safe() }
+
 # Rule calls are totally unpredictable -- for now. I think some static
 # analysis might not be too hard.
 package Regex::Ops::Tree::call;
@@ -435,6 +444,17 @@ sub Regex::Ops::Tree::atend::render { '$' }
 sub Regex::Ops::Tree::check::needparen { 0 }
 sub Regex::Ops::Tree::check::render { $_[0]->{args}->[1]->render() }
 
+sub Regex::Ops::Tree::rule::render {
+    my $self = shift;
+    my ($name, $tree) = @{ $self->{args} };
+    my $expr = $tree->render;
+    if ($name eq 'default') {
+        return $expr;
+    } else {
+        return "rule $name { $expr }";
+    }
+}
+
 ########################################################################
 # Dumping trees, for debugging only
 ########################################################################
@@ -520,6 +540,13 @@ sub Regex::Ops::Tree::check::reftree {
     my $op = shift;
     return [ annotated($op, "check($op->{args}->[0])"),
              $op->{args}->[1]->reftree() ];
+}
+
+sub Regex::Ops::Tree::rule::reftree {
+    my $op = shift;
+    my ($rule, $tree) = @{ $op->{args} };
+    return [ annotated($op, "rule($rule)"),
+             $tree->reftree() ];
 }
 
 1;
