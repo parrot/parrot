@@ -103,7 +103,7 @@ endian_fetch_op(opcode_t op, unsigned char * o) {
     unsigned char * b = (unsigned char *)&op;
     INTVAL r;
     unsigned char * rb = (unsigned char *)&r;
-    int nibbles = sizeof(INTVAL) / sizeof(char);
+    int nibbles = sizeof(opcode_t) / sizeof(unsigned char);
 
     if(!o)
         return op;
