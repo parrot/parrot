@@ -214,6 +214,17 @@ inline op ord(i,s|sc,i|ic) {
 
 Print $1 to standard output.
 
+=item B<print>(i|ic, i|ic)
+
+=item B<print>(i|ic, n|nc)
+
+=item B<print>(i|ic, s|sc)
+
+=item B<print>(i|ic, p)
+
+Print $2 to the file on $1. (0, 1, and 2 correspond to stdin, stdout,
+and stderr)
+
 =cut
 
 inline op print(i|ic) {
@@ -241,6 +252,76 @@ op print(p) {
   STRING *s = (p->vtable->get_string(interpreter, p));
   if (s) {
     printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+  }
+  goto NEXT();
+}
+
+
+op print(i|ic, i|ic) {
+  FILE *file;
+  switch ($1) {
+	case 0: file = stdin; 
+                break;
+	case 1: file = stdout; 
+                break;
+	case 2: file = stderr; 
+                break;
+	default: file = (FILE *)$1;
+  }
+  /* TODO: Configure for format */
+  fprintf(file, "%li", (long) $2);
+  goto NEXT();
+}
+
+op print(i|ic, n|nc) {
+  FILE *file;
+  switch ($1) {
+	case 0: file = stdin; 
+                break;
+	case 1: file = stdout; 
+                break;
+	case 2: file = stderr; 
+                break;
+	default: file = (FILE *)$1;
+  }
+  /* TODO: Configure for format */
+  fprintf(file, "%f", $2);
+  goto NEXT();
+}
+
+op print(i|ic, s|sc) {
+  FILE *file;
+  STRING *s = $2;
+  switch ($1) {
+	case 0: file = stdin; 
+                break;
+	case 1: file = stdout; 
+                break;
+	case 2: file = stderr; 
+                break;
+	default: file = (FILE *)$1;
+  }
+  if (s && string_length(s)) {
+    fprintf(file, "%.*s",(int)string_length(s),(char *) s->bufstart);
+  }
+  goto NEXT();
+}
+
+op print(i|ic, p) {
+  FILE *file;
+  PMC *p = $2;
+  STRING *s = (p->vtable->get_string(interpreter, p));
+  switch ($1) {
+	case 0: file = stdin; 
+                break;
+	case 1: file = stdout; 
+                break;
+	case 2: file = stderr; 
+                break;
+	default: file = (FILE *)$1;
+  }
+  if (s) {
+    fprintf(file, "%.*s",(int)string_length(s),(char *) s->bufstart);
   }
   goto NEXT();
 }
