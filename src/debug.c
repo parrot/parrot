@@ -1533,8 +1533,8 @@ void
 PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 {
     FILE *file;
-    char f[255], c;
-    int i;
+    char f[255];
+    int i, c;
     unsigned long size = 0;
     PDB_t *pdb = interpreter->pdb;
     PDB_file_t *pfile;
@@ -1566,15 +1566,14 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
     pfile->line = pline;
     pline->number = 1;
 
-    while (!feof(file)) {
-        c = (char)fgetc(file);
+    while ((c = fgetc(file)) != EOF) {
         /* Grow it */
         if (++size == 1024) {
             pfile->source = mem_sys_realloc(pfile->source,
                                             (size_t)pfile->size + 1024);
             size = 0;
         }
-        pfile->source[pfile->size] = c;
+        pfile->source[pfile->size] = (char)c;
 
         pfile->size++;
 

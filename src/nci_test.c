@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <malloc.h>
 /*
  * cc -shared -fpic nci_test.c -o libnci.so -g
  * export LD_LIBRARY_PATH=.
