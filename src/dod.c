@@ -29,7 +29,7 @@ There's also a verbose mode for garbage collection.
 #include "parrot/method_util.h"
 #include <assert.h>
 
-/* Set this to 1 to see if unanchored objects are found in system areas. 
+/* Set this to 1 to see if unanchored objects are found in system areas.
  * Please note: these objects might be bogus
  */
 #define GC_VERBOSE 0
@@ -41,11 +41,11 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 
 static size_t find_common_mask(size_t val1, size_t val2);
 static int trace_children(Parrot_Interp , PMC *current);
-static PARROT_INLINE void profile_dod_end(Parrot_Interp, int what);
+static void profile_dod_end(Parrot_Interp, int what);
 
 /*
 
-=item C<static PARROT_INLINE void
+=item C<static void
 mark_special(Parrot_Interp interpreter, PMC* obj)>
 
 Mark a special PMC. If it has a C<PMC_EXT> structure, append or prepend
@@ -58,7 +58,7 @@ be better if it was a macro.
 
 */
 
-static PARROT_INLINE void
+static void
 mark_special(Parrot_Interp interpreter, PMC* obj)
 {
     int hi_prio;
@@ -69,8 +69,8 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
      *
      * We are possibly changing other interpreter's data here, so
      * the mark phase of DOD must run only on one interpreter of a pool
-     * at a time. However, freeing of unused objects can be done in 
-     * parallel. 
+     * at a time. However, freeing of unused objects can be done in
+     * parallel.
      * And: to be sure that a shared object is dead, we have to finish
      * the mark phase of all interpreters in a pool that might reference
      * the object.
@@ -890,7 +890,7 @@ trace_mem_block(struct Parrot_Interp *interpreter,
         if ((ptr & mask) == prefix || !prefix) {
             /* Note that what we find via the stack or registers are not
              * guaranteed to be live pmcs/buffers, and could very well have
-             * had their bufstart/vtable destroyed due to the linked list of 
+             * had their bufstart/vtable destroyed due to the linked list of
              * free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
                     is_pmc_ptr(interpreter, (void *)ptr)) {
@@ -951,7 +951,7 @@ clear_live_bits(Parrot_Interp interpreter)
 
 /*
 
-=item C<static PARROT_INLINE void
+=item C<static void
 profile_dod_start(Parrot_Interp interpreter)>
 
 Records the start time of a DOD run when profiling is enabled.
@@ -960,7 +960,7 @@ Records the start time of a DOD run when profiling is enabled.
 
 */
 
-static PARROT_INLINE void
+static void
 profile_dod_start(Parrot_Interp interpreter)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
@@ -970,7 +970,7 @@ profile_dod_start(Parrot_Interp interpreter)
 
 /*
 
-=item C<static PARROT_INLINE void
+=item C<static void
 profile_dod_end(Parrot_Interp interpreter)>
 
 Records the end time of a DOD run when porfiling is enabled.
@@ -979,7 +979,7 @@ Records the end time of a DOD run when porfiling is enabled.
 
 */
 
-static PARROT_INLINE void
+static void
 profile_dod_end(Parrot_Interp interpreter, int what)
 {
     if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {

@@ -1692,7 +1692,7 @@ INTVAL
 string_compare(struct Parrot_Interp *interpreter,
     STRING *s1, STRING *s2)
 {
-    INTVAL cmp;
+    INTVAL cmp = 0;    /* gcc -O3 warning */
 
     if (!s1 && !s2) {
         return 0;

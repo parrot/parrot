@@ -165,9 +165,11 @@ instruction_reads(Instruction* ins, SymReg* r) {
              * down instruction_reads by a huge amount compared to the
              * _writes below
              */
-            for (key = ri->nextkey; key; key = key->nextkey)
-                if (key->reg && key->reg == r)
-                    return 1;
+            if (ri->set == 'K') {
+                for (key = ri->nextkey; key; key = key->nextkey)
+                    if (key->reg && key->reg == r)
+                        return 1;
+            }
         }
     }
     if (ins->type & ITPCCSUB)
