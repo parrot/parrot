@@ -104,7 +104,7 @@ sub new
     $self->line
   );
 
-  $block->symbol($self->name, $sym);
+  $block->set_symbol($self->name, $sym);
 
   $block->push_content($self);
 
@@ -124,6 +124,13 @@ sub value { return shift->{VALUE}; }
 # file handled by superclass?
 # line handled by superclass?
 
+sub is_global
+{
+  my $self = shift;
+
+  return defined $self->block and not defined $self->block->block;
+}
+
 
 #
 # compile()
@@ -138,7 +145,12 @@ sub compile
   my $name  = $self->name;
   my $value = $self->value->value;
 
-  $compiler->emit("  .const $type $name = $value");
+  if ($self->is_global) {
+    $compiler->emit("  .globalconst $type $name = $value");
+  }
+  else {
+    $compiler->emit("  .const $type $name = $value");
+  }
 
   return 1;
 }

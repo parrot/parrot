@@ -47,6 +47,8 @@ sub new
 
   $block->push_content($self);
 
+  printf STDERR "%s: Created new module '%s'.\n", __PACKAGE__, $ident->value;
+
   return $self;
 }
 
@@ -66,28 +68,43 @@ sub props     { return %{shift->{PROPS}};  }
 
 sub compile
 {
-  my $self = shift;
-  my ($compiler) = @_;
+  my $self     = shift;
+  my $compiler = shift; # Required
+  my $options  = shift; # Optional
 
   my $namespace = "MODULE"; # TODO: Don't we need to do better than this?
 
+  printf STDERR "%s: Compiling module '%s'.\n", __PACKAGE__, $self->name;
+  
   #
   # Import our symbols into our parent block:
   #
 
-  foreach my $symbol ($self->symbols) {
-    next if $self->block->symbol($symbol);
+  my $name = $self->name;
 
-    $self->block->symbol($symbol, $self->symbol($symbol));
+  printf STDERR "%s: About to copy symbol table to parent block.\n", __PACKAGE__;
+
+  foreach my $symbol_name ($self->symbol_names) {
+    # TODO: Warn here that we are skipping one already in the parent block?
+    next if $self->block->get_symbol($symbol_name);
+
+    my $new_name = $name . "::" . $symbol_name;
+
+    $self->block->set_symbol($new_name, $self->get_symbol($symbol_name));
   }
 
-  if ($self->content) {
-#    $compiler->emit(".namespace ${namespace}");
-#    $compiler->indent;
-    $self->SUPER::compile($compiler);
-#    $compiler->outdent;
-#    $compiler->emit(".endnamespace ${namespace}");
-  }
+  printf STDERR "%s: Finished copying symbol table to parent block.\n", __PACKAGE__;
+
+  return 1 unless $self->content;
+
+#  if ($options->{PACKAGE}) {
+#    $options->{PACKAGE} .= "::" . $self->name;
+#  }
+#  else {
+#    $options->{PACKAGE} = $self->name;
+#  }
+
+  return $self->SUPER::compile($compiler, $options );
 
   return 1;
 }

@@ -99,7 +99,7 @@ sub new
 
 #  $self->DEBUG(0, "Remembering symbol '$name' as sub...");
 
-  $block->symbol($name, $sym);
+  $block->set_symbol($name, $sym);
 
   $block->push_content($self);
 
@@ -115,10 +115,6 @@ sub name
 {
   my $self = shift;
   my $name = $self->{NAME};
-
-  if ($self->block->kind eq 'module') {
-    $name = $self->block->name . "::" . $name;
-  }
 
   return $name;
 }
@@ -136,10 +132,15 @@ sub line  { return shift->{LINE};     }
 
 sub compile
 {
-  my $self = shift;
-  my ($compiler) = @_;
+  my $self     = shift; # Required
+  my $compiler = shift; # Required
+  my $options  = shift; # Optional
 
   my $name  = $self->name;
+
+  if ($self->block->kind eq 'module') {
+    $name = $self->block->name . "::" . $name;
+  }
 
   my %reg = ('int' => 5, 'num' => 5, 'obj' => 5, 'str' => 5);
 
@@ -266,9 +267,29 @@ sub sax
       });
     }
   }
-  elsif (exists $props{fnlib}) {
-    my $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
-    my $fn    = $props{fn} ? $props{fn}->value : $name;
+  elsif (exists $props{fn} or exists $props{fnlib}) {
+    my $fnlib;
+
+    if (exists $props{fnlib} and $props{fnlib}) {
+      $fnlib = $props{fnlib}->value; # TODO: We should make sure its a string, somewhere.
+    }
+    else {
+      $self->SYNTAX_ERROR("Sub declaration has no fnlib property, and parent block is not a module!")
+        unless $self->block->kind eq 'module';
+
+      my %module_props = $self->block->props;
+
+      $self->SYNTAX_ERROR("Sub declaration has no fnlib property, and parent module has no fnlib property either!")
+        unless $module_props{fnlib};
+
+      $fnlib = $module_props{fnlib}->value;
+    }
+
+    my $fn = $props{fn} ? $props{fn}->value : $name;
+
+    $fn =~ s{(^")|("$)}{}g;
+    $fnlib =~ s{(^")|("$)}{}g;
+    $name =~ s/^.*:://;
 
     if ($type) {
       $handler->start_element({

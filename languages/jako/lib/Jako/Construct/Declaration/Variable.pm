@@ -100,7 +100,7 @@ sub new
     $self->line
   );
 
-  $block->symbol($self->name, $sym);
+  $block->set_symbol($self->name, $sym);
 
   $block->push_content($self);
 

@@ -50,7 +50,7 @@ sub new
   foreach my $arg (@$args) {
     my ($arg_type, $arg_name, $arg_token) = @$arg;
     my $sym = Jako::Symbol->new($self, 'arg', $arg_type, $arg_name, undef, undef, undef, $arg_token->file, $arg_token->line );
-    $self->symbol($arg_name, $sym);
+    $self->set_symbol($arg_name, $sym);
   }
 
   return $self;

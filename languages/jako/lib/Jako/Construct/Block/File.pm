@@ -26,26 +26,57 @@ use base qw(Jako::Construct::Block);
 
 sub compile
 {
-  my $self = shift;
-  my ($compiler) = @_;
+  my $self     = shift; # Required:
+  my $compiler = shift; # Required
 
-  my $namespace = "BARE"; # TODO: Don't we need to do better than this?
+#  my $namespace = "FILE"; # TODO: Don't we need to do better than this?
 
-  if ($self->content) {
-    $compiler->emit(".sub ___MAIN");
-    $compiler->indent;
-    $compiler->emit("bsr __MAIN");
-    $compiler->emit("end");
-    $compiler->outdent;
-    $compiler->emit(".end");
+  return 1 unless $self->content;
 
-    $self->SUPER::compile($compiler, sub { my $obj = shift; $obj->isa("Jako::Construct::Block::Sub") or $obj->isa("Jako::Construct::Declaration::Sub"); } );
+  my $inline = 0;
+  my $last_seen = 'sub';
 
-    $compiler->emit(".sub __MAIN");
-    $self->SUPER::compile($compiler, sub { my $obj = shift; not ($obj->isa("Jako::Construct::Block::Sub") or $obj->isa("Jako::Construct::Declaration::Sub")); } );
-    $compiler->emit("ret");
-    $compiler->emit(".end");
+  $compiler->emit(".sub ___MAIN");
+  $compiler->indent;
+  $compiler->emit("bsr __INLINE_0");
+  $compiler->emit("end");
+  $compiler->outdent;
+  $compiler->emit(".end");
+
+  foreach my $construct ($self->content) {
+    if (
+         $construct->isa("Jako::Construct::Block::Sub")
+      or $construct->isa("Jako::Construct::Block::Module")
+      or $construct->isa("Jako::Construct::Declaration::Sub")
+    ) {
+      if ($last_seen ne 'sub') {
+        $compiler->emit("goto __INLINE_" . $inline); # $inline is already the next one.
+        $compiler->outdent;
+        $compiler->emit(".end");
+
+        $last_seen = 'sub';
+      }
+    }
+    else {
+      if ($last_seen ne 'inline') {
+        $compiler->emit(".sub __INLINE_" . $inline++);
+        $compiler->indent;
+
+        $last_seen = 'inline';
+      }
+    }
+
+    $construct->compile($compiler);
   }
+
+  if ($last_seen ne 'inline') {
+    $compiler->emit(".sub __INLINE_" . $inline++);
+    $compiler->indent;
+  }
+
+  $compiler->emit("ret");
+  $compiler->outdent;
+  $compiler->emit(".end");
 
   return 1;
 }
