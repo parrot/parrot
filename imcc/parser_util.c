@@ -29,14 +29,6 @@
  */
 void imcc_init(Parrot_Interp interpreter);
 
-/* includes to use if parrotlib is not available */
-const char *Parrot_imcc_include_paths[] = {
-    "./",
-    "runtime/parrot/include/",
-    "runtime/parrot/",
-    0,
-};
-
 /*
  * P = new type, [init]
  * PASM like:
@@ -534,16 +526,10 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         void * __ptr;
     } __ptr_u;
 
-#if defined(_PARROTLIB)
-    STRING *str = string_from_cstring(interp, s, strlen(s));
-    str = Parrot_library_query(interp, "imcc_compile_file_location", str);
-#else
-    STRING *str = Parrot_library_fallback_locate(interp, s, Parrot_imcc_include_paths);
-#endif
-    if (str) {
-	fullname = string_to_cstring(interp, str);
-    }
-    if (!str || !(new = fopen(fullname, "r"))) {
+    fullname = Parrot_locate_runtime_file(interp, s, PARROT_RUNTIME_FT_SOURCE);
+    if (!fullname)
+        fatal(1, "imcc_compile_file", "couldn't find '%s'\n", s);
+    if (!(new = fopen(fullname, "r"))) {
         fatal(1, "imcc_compile_file", "couldn't open '%s'\n", fullname);
 	string_cstring_free(fullname);
         return NULL;

@@ -22,6 +22,7 @@ This file contains a C function to access parrot's bytecode library functions.
 #include <assert.h>
 #include "library.str"
 
+#if 0
 /*
 
 =item C<static void
@@ -140,6 +141,97 @@ Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, cons
     }
     free( s );
     return str;
+}
+
+#endif
+
+/*
+
+=item C<char* Parrot_locate_runtime_file(Interp *, const char *file_name,
+        enum_runtime_ft type)>
+
+Locate the full patch for C<file_name> and the given file type(s). If
+successfull returns a mem_sys_allocate()ed string or NULL otherwise.
+
+The C<enum_runtime_ft type> is one or more of the types defined in
+F<include/parrot/library.h>.
+
+*/
+
+char* Parrot_locate_runtime_file(Interp *interpreter, const char *file_name,
+        enum_runtime_ft type)
+{
+    char *full_name, *ext;
+    const char **ptr;
+    const char *prefix;
+    STRING *str;
+    const char *include_paths[] = {
+        "runtime/parrot/include/",
+        "runtime/parrot/",
+        "./",
+        NULL
+    };
+    int length;
+
+    prefix = Parrot_get_runtime_prefix(interpreter, NULL);
+    if (!prefix)
+        prefix = "";
+
+    ext = strchr(file_name, '.');
+    /*
+     * if the extension is given use it
+     * TODO if not try extensions according to type
+     */
+    if (!ext) {
+        internal_exception(UNIMPLEMENTED, "no extension");
+    }
+    length = 0;
+    for (ptr = include_paths; *ptr; ++ptr) {
+        int len = strlen(*ptr);
+        length = (len > length) ? len : length;
+    }
+    length += strlen(prefix) + strlen(file_name) + 2;
+    full_name = mem_sys_allocate(length);
+
+    for( ptr = include_paths; *ptr; ++ptr ) {
+        strcpy(full_name, prefix);
+        if (*prefix) {
+#ifdef WIN32
+            strcat(full_name, "\\");
+#else
+            strcat(full_name, "/");
+#endif
+        }
+        strcat(full_name, *ptr);
+        strcat(full_name, file_name);
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(full_name, '/')) )
+                *p = '\\';
+        }
+#endif
+        str = string_from_cstring(interpreter, full_name, strlen(full_name));
+        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS))
+            return full_name;
+    }
+    /*
+     * finally if prefix is set, try current location
+     */
+    if (*prefix) {
+        strcpy(full_name, file_name);
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(full_name, '/')) )
+                *p = '\\';
+        }
+#endif
+        str = string_from_cstring(interpreter, full_name, strlen(full_name));
+        if (Parrot_stat_info_intval(interpreter, str, STAT_EXISTS))
+            return full_name;
+    }
+    return NULL;
 }
 
 /*

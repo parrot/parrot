@@ -160,7 +160,7 @@ while(<>) {
     $meta =~ s/^\[(.*?)\]//;
     next unless $package; # Skip if this file belongs to no package
 
-    next unless $package eq 'main';	# XXX -lt
+    next unless $package =~ /main|library/;	# XXX -lt
 
     my %meta;
     @meta{split(/,/, $meta)} = ();
@@ -200,14 +200,16 @@ unless ($options{'dry-run'}) {
 	}
     }
 }
+print("Installing ...\n");
 foreach (@files) {
     my ($src, $dest) = @$_;
     if ($options{'dry-run'}) {
-	print "cp $src \t$dest\n";
+	print "$src -> $dest\n";
 	next;
     }
     else {
 	copy($src, $dest) or die "copy $src to $dest: $!\n";
+	print "$dest\n";
     }
     my $mode = (stat($src))[2];
     chmod $mode, $dest;

@@ -840,41 +840,21 @@ include_file (void* interp, char *file_name)
 {
     struct macro_frame_t *frame;
     FILE *file = 0;
-    char *ext;
+    char *ext, *s;
 
     frame = new_frame();
-
-/* XXX: use this code for miniparrot */
-#if !defined(_PARROTLIB)
-    {
-    extern const char* Parrot_imcc_include_paths[];
-    STRING *str = Parrot_library_fallback_locate(interp, file_name, Parrot_imcc_include_paths);
-
-    if (str) {
-	char* s = string_to_cstring(interp, str);
-
+    s = Parrot_locate_runtime_file(interp, file_name,
+        PARROT_RUNTIME_FT_INCLUDE);
+    if (s) {
 	file = fopen(s, "r");
-	if (file)
-	    sourcefile = s;
-	else
-	    string_cstring_free(s);
+        if (!file) {
+            mem_sys_free(s);
+            fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
+        }
     }
-    }
-#else
-    {
-    STRING* name = string_from_cstring(interp, file_name, strlen(file_name));
-    STRING* result = Parrot_library_query(interp, "include_file_location", name);
-
-    if (result) {
-	 /* FIXME: leak */
-	sourcefile = strdup(string_to_cstring(interp, result));
-	file = fopen( sourcefile, "r" );
-    }
-    }
-#endif
-
-    if (!file)
+    else
         fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
+    sourcefile = s;
 
     ext = strrchr(file_name, '.');
     if (ext) {

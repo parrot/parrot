@@ -13,8 +13,18 @@
 #if !defined(PARROT_LIBRARY_H_GUARD)
 #define PARROT_LIBRARY_H_GUARD
 
-void* Parrot_library_query(Parrot_Interp, const char *func_name, ...);
-STRING* Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, const char **incl);
+typedef enum {
+    PARROT_RUNTIME_FT_LIBRARY = 0x0001,
+    PARROT_RUNTIME_FT_INCLUDE = 0x0002,
+    PARROT_RUNTIME_FT_PBC     = 0x0010,
+    PARROT_RUNTIME_FT_PASM    = 0x0100,
+    PARROT_RUNTIME_FT_PIR     = 0x0200,
+    PARROT_RUNTIME_FT_PAST    = 0x0400,
+    PARROT_RUNTIME_FT_SOURCE  = 0x0F00
+} enum_runtime_ft;
+
+char* Parrot_locate_runtime_file(Interp *, const char *file_name,
+        enum_runtime_ft);
 
 #endif /* PARROT_LIBRARY_H_GUARD */
 

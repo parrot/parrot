@@ -40,18 +40,24 @@ print << "EOF";
 static const char* runtime_prefix = \"$prefix\";
 
 const char*
-Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix)
+Parrot_get_runtime_prefix(Interp *interpreter, STRING **prefix_str)
 {
-    STRING *s;
+    static STRING *s;
+    static int init_done;
+    static const char *prefix;
 
     if (!*runtime_prefix)
 	return NULL;
-    s = const_string(interpreter, runtime_prefix);
-    if (prefix)
-	*prefix = s;
-    if (Parrot_stat_info_intval(interpreter, s, STAT_EXISTS))
-	return runtime_prefix;
-    return NULL;
+    if (!init_done) {
+	init_done = 1;
+	prefix = runtime_prefix;
+	s = const_string(interpreter, runtime_prefix);
+	if (!Parrot_stat_info_intval(interpreter, s, STAT_EXISTS))
+	    prefix = NULL;
+    }
+    if (prefix_str)
+	*prefix_str = s;
+    return prefix;
 }
 
 EOF
