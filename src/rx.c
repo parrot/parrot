@@ -27,34 +27,6 @@ const char *RX_NEWLINES = "\r\n";       /* XXX Unicode defines a few more. */
  *               Initial version by Brent Dax                *
  *************************************************************/
 
-void
-rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string, void ** info)
-{
-    rxinfo *rx = *info = mem_sys_allocate(sizeof(rxinfo));
-
-    rx->minlength = rx->index = rx->startindex = 0;
-    rx->flags = enum_rxflags_none;
-    rx->whichway = enum_rxdirection_forwards;
-
-    rx->string = string;
-
-    rx->groupstart = pmc_new(interpreter, enum_class_PerlArray);
-    rx->groupend = pmc_new(interpreter, enum_class_PerlArray);
-
-    rx->stack = intstack_new(interpreter);
-
-    string_transcode(interpreter, rx->string, encoding_lookup("utf32"),
-                     rx->string->type, &rx->string);
-}
-
-PMC* rx_mark(struct Parrot_Interp* interp, void* info, PMC* last)
-{
-    rxinfo *rx = (rxinfo *) info;
-    if (rx->string) buffer_lives((Buffer *)rx->string);
-    if (rx->groupstart) last = mark_used(rx->groupstart, last);
-    if (rx->groupend) last = mark_used(rx->groupend, last);
-    return last;
-}
 
 INTVAL
 rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)

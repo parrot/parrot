@@ -101,6 +101,18 @@ intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
     return entry->value;
 }
 
+
+void intstack_free (struct Parrot_Interp *interpreter, IntStack stack)
+{
+    IntStack chunk, temp;
+
+    for (chunk = stack->next; chunk != stack; chunk = temp) {
+        temp = chunk->next;        
+        mem_sys_free(chunk);
+    }
+
+    mem_sys_free(stack);
+}   
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -38,6 +38,8 @@ void intstack_push(struct Parrot_Interp *, IntStack, INTVAL);
 
 INTVAL intstack_pop(struct Parrot_Interp *, IntStack);
 
+void intstack_free(struct Parrot_Interp *, IntStack);
+
 #endif
 
 /*

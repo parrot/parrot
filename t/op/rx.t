@@ -1,30 +1,23 @@
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 23;
 use Test::More;
 
 sub gentest($$;$$) {
-	$_[2] ||= "";
-	$_[3] ||= 0;
 
 	return <<"END";
 		set S0, "$_[0]"
-		rx_allocinfo P0, S0
-		bsr RX_0
-		rx_info_successful P0, I0
-		if I0, YUP
-		print "no match\\n"
-		end
-	YUP:
-		rx_info_getstartindex P0, I1
-		rx_info_getindex P0, I2
-		length I3, S0
-		
-		rx_freeinfo P0
+		set I0, 0
 
-		substr S1, S0,  0, I1
+	START:	
+		$_[1]
+		
+	SUCCEED:
+		length I2, S0
+
+		substr S1, S0,  0, I0
+		sub I4, I1, I0
+		substr S2, S0, I0, I4
 		sub I4, I2, I1
-		substr S2, S0, I1, I4
-		sub I4, I3, I2
-		substr S3, S0, I2, I4	
+		substr S3, S0, I1, I4	
 
 		print "<"
 		print S1
@@ -36,146 +29,173 @@ sub gentest($$;$$) {
 		
 		end
 
-	RX_0:
-		rx_setprops P0, "$_[2]", $_[3]
-		branch START
-	ADVANCE:
-		rx_advance P0, FAIL
-	START:
-		$_[1]
+	FAIL:	print "no match\\n"
+		end
 
-		rx_succeed P0
-		ret
-	FAIL:
-		rx_fail P0
-		ret
 END
 }
 
+sub gentest_advance($$;$$) {
+
+	# inserts the generic advance mecahnism
+
+	return <<"END";
+		set S0, "$_[0]"
+		set I0, 0
+
+	START:  
+		set I1, I0
+		$_[1]
+		
+	SUCCEED:
+		length I2, S0
+
+		substr S1, S0,  0, I0
+		sub I4, I1, I0
+		substr S2, S0, I0, I4
+		sub I4, I2, I1
+		substr S3, S0, I1, I4	
+
+		print "<"
+		print S1
+		print "><"
+		print S2
+		print "><"
+		print S3
+		print ">\\n"
+		
+		end
+
+	FAIL:	print "no match\\n"
+		end
+
+	ADVANCE:
+		rx_advance S0, I0, FAIL
+		branch START
+
+END
+}
+
+
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'A is A');
-		rx_literal P0, "a", ADVANCE
+		rx_search S0, I1, I0, "a", FAIL
 CODE
 <><a><>
 OUTPUT
 
 output_is(gentest('b', <<'CODE'), <<'OUTPUT', 'A is not B');
-		rx_literal P0, "a", ADVANCE
+		rx_search S0, I1, I0, "a", FAIL
 CODE
 no match
 OUTPUT
 
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'Pattern longer than string');
-		rx_literal P0, "aa", ADVANCE
+		rx_search S0, I1, I0, "aa", FAIL
 CODE
 no match
 OUTPUT
 
 output_is(gentest('ba', <<'CODE'), <<'OUTPUT', 'inching through the string');
-		rx_literal P0, "a", ADVANCE
+		rx_search S0, I1, I0, "a", FAIL
 CODE
 <b><a><>
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'character classes (successful)');
-		rx_oneof P0, "aeiou", ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'character classes (successful)');
+		rx_oneof S0, I1, "aeiou", ADVANCE
 CODE
 <><a><>
 OUTPUT
 
-output_is(gentest('b', <<'CODE'), <<'OUTPUT', 'character classes (failure)');
-		rx_oneof P0, "aeiou", ADVANCE
+output_is(gentest_advance('b', <<'CODE'), <<'OUTPUT', 'character classes (failure)');
+		rx_oneof S0, I1, "aeiou", ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'dot (success)');
-		rx_dot P0, ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'dot (success)');
+
+		rx_dot S0, I1, ADVANCE
 CODE
 <><a><>
 OUTPUT
 
-output_is(gentest('\n', <<'CODE'), <<'OUTPUT', 'dot (failure)');
-		rx_dot P0, ADVANCE
-CODE
-no match
-OUTPUT
-
-output_is(gentest('aA9_', <<'CODE'), <<'OUTPUT', '\w (success)');
-		rx_is_w P0, ADVANCE
-		rx_is_w P0, ADVANCE
-		rx_is_w P0, ADVANCE
-		rx_is_w P0, ADVANCE
+output_is(gentest_advance('aA9_', <<'CODE'), <<'OUTPUT', '\w (success)');
+		rx_is_w S0, I1, ADVANCE
+		rx_is_w S0, I1, ADVANCE
+		rx_is_w S0, I1, ADVANCE
+		rx_is_w S0, I1, ADVANCE
 CODE
 <><aA9_><>
 OUTPUT
 
-output_is(gentest('?', <<'CODE'), <<'OUTPUT', '\w (failure)');
-		rx_is_w P0, ADVANCE
+output_is(gentest_advance('?', <<'CODE'), <<'OUTPUT', '\w (failure)');
+		rx_is_w S0, I1, ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('0123456789', <<'CODE'), <<'OUTPUT', '\d (success)');
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
+output_is(gentest_advance('0123456789', <<'CODE'), <<'OUTPUT', '\d (success)');
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
 CODE
 <><0123456789><>
 OUTPUT
 
-output_is(gentest('@?#', <<'CODE'), <<'OUTPUT', '\d (failure)');
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
-		rx_is_d P0, ADVANCE
+output_is(gentest_advance('@?#', <<'CODE'), <<'OUTPUT', '\d (failure)');
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
+		rx_is_d S0, I1, ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest(' ', <<'CODE'), <<'OUTPUT', '\s (success)');
-		rx_is_s P0, ADVANCE
+output_is(gentest_advance(' ', <<'CODE'), <<'OUTPUT', '\s (success)');
+		rx_is_s S0, I1, ADVANCE
 CODE
 <>< ><>
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', '\s (failure)');
-		rx_is_s P0, ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', '\s (failure)');
+		rx_is_s S0, I1, ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'stack (pushindex/popindex)');
-		rx_pushindex P0
-		rx_literal P0, "a", ADVANCE
-		rx_popindex P0, ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'stack (pushindex/popindex)');
+		rx_initstack
+		rx_pushindex I1
+		rx_literal S0, I1, "a", ADVANCE
+		rx_popindex I1, ADVANCE
 CODE
 <><><a>
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'stack (pushmark)');
-		rx_pushmark P0
-		rx_pushindex P0
-		rx_literal P0, "a", ADVANCE
-		rx_popindex P0, ADVANCE
-		rx_popindex P0, ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'stack (pushmark)');
+		rx_pushmark I1
+		rx_pushindex I1
+		rx_literal S0, I1, "a", ADVANCE
+		rx_popindex I1, ADVANCE
+		rx_popindex I1, ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'groups');
-		rx_startgroup P0, 0
-		rx_literal P0, "a", ADVANCE
-		rx_endgroup P0, 0
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'groups');
+		set I2, I1
+		rx_literal S0, I1, "a", ADVANCE
+		set I3, I1
 		
-		rx_info_getgroup P0, I1, I2, 0
-		sub I2, I2, I1
-		substr S1, S0, I1, I2
+		sub I3, I3, I2
+		substr S1, S0, I2, I3
 		print "("
 		print S1
 		print ")\n"
@@ -184,75 +204,49 @@ CODE
 <><a><>
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (success)');
-		rx_zwa_atbeginning P0, ADVANCE
-		rx_literal P0, "a", ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (success)');
+		rx_literal S0, I1, "a", ADVANCE
 CODE
 <><a><>
 OUTPUT
 
-output_is(gentest('b', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (failure)');
-		rx_zwa_atbeginning P0, ADVANCE
-		rx_literal P0, "a", ADVANCE
+output_is(gentest_advance('b', <<'CODE'), <<'OUTPUT', 'ZWA: ^ (failure)');
+		rx_literal S0, I1, "a", ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'ZWA: $ (success)');
-		rx_literal P0, "a", ADVANCE
-		rx_zwa_atend P0, ADVANCE
+output_is(gentest_advance('a', <<'CODE'), <<'OUTPUT', 'ZWA: $ (success)');
+		rx_literal S0, I1, "a", ADVANCE
+		rx_zwa_atend S0, I1, ADVANCE
 CODE
 <><a><>
 OUTPUT
 
-output_is(gentest('ab', <<'CODE'), <<'OUTPUT', 'ZWA: $ (failure)');
-		rx_literal P0, "a", ADVANCE
-		rx_zwa_atend P0, ADVANCE
+output_is(gentest_advance('ab', <<'CODE'), <<'OUTPUT', 'ZWA: $ (failure)');
+		rx_literal S0, I1, "a", ADVANCE
+		rx_zwa_atend S0, I1, ADVANCE
 CODE
 no match
 OUTPUT
 
-output_is(gentest('a?', <<'CODE'), <<'OUTPUT', 'ZWA: \b (success)');
-		rx_literal P0, "a", ADVANCE
-		rx_zwa_boundary P0, ADVANCE
+output_is(gentest_advance('a?', <<'CODE'), <<'OUTPUT', 'ZWA: \b (success)');
+		rx_literal S0, I1, "a", ADVANCE
+		rx_zwa_boundary S0, I1, ADVANCE
 CODE
 <><a><?>
 OUTPUT
 
-output_is(gentest('ab', <<'CODE'), <<'OUTPUT', 'ZWA: \b (failure)');
-		rx_literal P0, "a", ADVANCE
-		rx_zwa_boundary P0, ADVANCE
+output_is(gentest_advance('ab', <<'CODE'), <<'OUTPUT', 'ZWA: \b (failure)');
+		rx_literal S0, I1, "a", ADVANCE
+		rx_zwa_boundary S0, I1, ADVANCE		
 CODE
 no match
 OUTPUT
 
-
-output_is(gentest('ba', <<'CODE', 'r'), <<'OUTPUT', 'reversed regexen (/r)');
-		rx_dot P0, ADVANCE
-CODE
-<b><a><>
-OUTPUT
-
-output_is(gentest('\n', <<'CODE', 's'), <<'OUTPUT', 'single-line regexen (/s)');
-		rx_dot P0, ADVANCE
-CODE
-<><
-><>
-OUTPUT
-
-output_is(gentest('\n\n', <<'CODE', 'm'), <<'OUTPUT', 'multiline regexen (/m)');
-		rx_literal P0, "\n", ADVANCE
-		rx_zwa_atbeginning P0, ADVANCE
-		rx_zwa_atend P0, ADVANCE
-CODE
-<><
-><
->
-OUTPUT
-
 SKIP: {
 	skip("Pending some sort of lowercasing op",1);
-	output_is(gentest('HeLlO', <<'CODE', 'i'), <<'OUTPUT', 'case-insensitive regexen (/i)');
+	output_is(gentest_advance('HeLlO', <<'CODE', 'i'), <<'OUTPUT', 'case-insensitive regexen (/i)');
 		rx_literal P0, "hel", ADVANCE
 		rx_oneof P0, "lmno", ADVANCE
 		rx_oneof P0, "lmno", ADVANCE

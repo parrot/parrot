@@ -222,8 +222,19 @@ string_length(const STRING *s)
 INTVAL
 string_index(const STRING *s, UINTVAL idx)
 {
-    return s->encoding->decode(s->encoding->skip_forward(s->strstart, idx));
+    if (s->encoding->index == enum_encoding_singlebyte) {
+        /* This inlines the computations used for the case that the strings is 
+         * in a singlebyte encoding. 
+         * This assumes that any singlebyte encoding uses is us-ascii, which is wrong,
+         * but consistent withthe result of calling s->encoding->decode */
+        return *((unsigned char*) s->bufstart + idx);
+    }
+    else {
+        return s->encoding->decode(s->encoding->skip_forward(s->bufstart, idx));
+    }
 }
+
+
 
 /*=for api string string_ord
  * Return the codepoint at a given index into a string. Negative
