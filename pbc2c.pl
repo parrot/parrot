@@ -27,7 +27,7 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
-my $ops = new Parrot::OpsFile ('core.ops', 'vtable.ops');
+my $ops = new Parrot::OpsFile ('core.ops', 'rx.ops', 'vtable.ops');
 
 
 #
@@ -89,7 +89,7 @@ sub compile_byte_code {
 END_C
 
     print $trans->defines;
-    print $ops->preamble;
+    print $ops->preamble($trans);
 
     my $length = length($pf->byte_code);
 
@@ -235,7 +235,7 @@ main(int argc, char **argv) {
 static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
 
 switch_label:
-    switch((ptrcast_t)cur_opcode - (ptrcast_t)start_code) {
+    switch(((ptrcast_t)cur_opcode - (ptrcast_t)start_code) / sizeof(opcode_t)) {
 
 END_C
 
