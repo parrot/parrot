@@ -246,12 +246,12 @@ pmclass TclFloat extends TclObject dynpmc group tcl_group {
     /* XXX why except? */
     void repeat (PMC* value, PMC* dest) {
         internal_exception(INVALID_OPERATION,
-            "repeat() not implemented in class 'TclFloat'\n");
+            "repeat() not implemented in class 'TclFloat'");
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
         internal_exception(INVALID_OPERATION,
-            "repeat() not implemented in class 'TclFloat'\n");
+            "repeat() not implemented in class 'TclFloat'");
     }
 
     void increment () {

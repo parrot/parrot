@@ -63,7 +63,7 @@ matchrange_locate_keyed_int(Parrot_Interp interp, PMC* self, STRING *key)
     if(0 == string_equal(interp, key, end))
         return &RANGE_END(self);
     internal_exception(KEY_NOT_FOUND,
-        "MatchRange: key is neither 'start' nor 'end'\n");
+        "MatchRange: key is neither 'start' nor 'end'");
     return NULL;
 }
 

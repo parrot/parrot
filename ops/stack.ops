@@ -376,7 +376,7 @@ op entrytype(out INT, in INT) :base_core {
 
   entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry) {
-    internal_exception(99, "Stack Depth wrong\n");
+    internal_exception(99, "Stack Depth wrong");
   }
   $1 = get_entry_type(interpreter, entry);
   goto NEXT();
@@ -416,9 +416,9 @@ op lookback(out INT, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong\n");
+      internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_INT) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
 
   $1 = UVal_int(entry->entry);
@@ -429,9 +429,9 @@ op lookback(out STR, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong\n");
+      internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_STRING) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
 
   $1 = UVal_str(entry->entry);
@@ -442,9 +442,9 @@ op lookback(out NUM, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong\n");
+      internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_FLOAT) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
 
   $1 = UVal_num(entry->entry);
@@ -455,9 +455,9 @@ op lookback(out PMC, in INT) :base_core {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong\n");
+      internal_exception(99, "Stack depth wrong");
   if (entry->entry_type != STACK_ENTRY_PMC) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
   }
 
   $1 = UVal_pmc(entry->entry);

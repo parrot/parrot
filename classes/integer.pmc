@@ -598,7 +598,7 @@ Divides the integer by C<*value> and returns the result in C<*dest>.
 */
     void divide (PMC* value, PMC* dest) {
 MMD_PerlUndef: {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
 MMD_BigInt:     {
             overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);
@@ -609,7 +609,7 @@ MMD_DEFAULT: {
         FLOATVAL d;
         INTVAL i;
         if (valf == 0.0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+                internal_exception(DIV_BY_ZERO, "division by zero!");
             return;
         }
         d = PMC_int_val(SELF)/valf;
@@ -623,7 +623,7 @@ MMD_DEFAULT: {
 
     void floor_divide (PMC* value, PMC* dest) {
 MMD_PerlUndef: {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
 MMD_BigInt:     {
             overflow_p(INTERP, SELF, value, dest, MMD_DIVIDE);

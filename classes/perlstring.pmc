@@ -268,7 +268,7 @@ When Python mode is enabled does sprintf :(
         }
         else {
             internal_exception(INVALID_OPERATION,
-                    "modulus() not implemented for PerlString\n");
+                    "modulus() not implemented for PerlString");
         }
     }
 

@@ -201,7 +201,7 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
         depth = num_entries - 1;
 
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
-            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
+            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
 
         temp = *stack_entry(interpreter, stack, depth);
@@ -215,7 +215,7 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
     else {
 
         if (stack_height(interpreter, stack) < (size_t)num_entries) {
-            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
+            internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!");
         }
         temp = *stack_entry(interpreter, stack, 0);
         for (i = 0; i < depth; i++) {
@@ -278,7 +278,7 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             break;
         default:
             internal_exception(ERROR_BAD_STACK_TYPE,
-                    "Invalid Stack_Entry_type!\n");
+                    "Invalid Stack_Entry_type!");
             break;
     }
 }

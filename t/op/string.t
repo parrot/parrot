@@ -255,22 +255,26 @@ length
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
+output_is(<<'CODE', <<'OUTPUT', "substr OOB");
 	set	S0, "A string of length 21"
 	set I0, -99
 	set I1, 6
 	substr S1, S0, I0, I1
 	end
 CODE
+Cannot take substr outside string
+OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
+output_is(<<'CODE', <<'OUTPUT', "substr OOB");
 	set S0, "A string of length 21"
 	set I0, 99
 	set I1, 6
 	substr S1, S0, I0, I1
 	end
 CODE
+Cannot take substr outside string
+OUTPUT
 
 # This asks for substring much greater than length of original string
 output_is(<<'CODE', <<'OUTPUT', "len>strlen");
@@ -372,7 +376,7 @@ xyz
 
 OUTPUT
 
-output_is( <<'CODE', 'Can only replace inside string or index after end of string', "5 arg substr, offset past end of string" );
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, offset past end of string" );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, 12, 3, S1
@@ -384,6 +388,8 @@ output_is( <<'CODE', 'Can only replace inside string or index after end of strin
   print "\n"
   end
 CODE
+Can only replace inside string or index after end of string
+OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset, repl=length" );
   set S0, "abcdefghijk"
@@ -436,7 +442,7 @@ xyz
 fghi
 OUTPUT
 
-output_is( <<'CODE', 'Can only replace inside string or index after end of string', "5 arg substr, -ve offset out of string" );
+output_is( <<'CODE', <<'OUTPUT', "5 arg substr, -ve offset out of string" );
   set S0, "abcdefghijk"
   set S1, "xyz"
   substr S2, S0, -12, 4, S1
@@ -448,6 +454,8 @@ output_is( <<'CODE', 'Can only replace inside string or index after end of strin
   print "\n"
   end
 CODE
+Can only replace inside string or index after end of string
+OUTPUT
 
 output_is( <<'CODE', <<'OUTPUT', "5 arg substr, length > strlen " );
   set S0, "abcdefghijk"
@@ -891,29 +899,37 @@ CODE
 foo
 OUTPUT
 
-output_is(<<'CODE','Cannot get character of empty string','2-param ord, empty string');
+output_is(<<'CODE', <<'OUTPUT','2-param ord, empty string');
 	ord I0,""
 	print I0
 	end
 CODE
+Cannot get character of empty string
+OUTPUT
 
-output_is(<<'CODE','Cannot get character of empty string','2-param ord, empty string register');
+output_is(<<'CODE', <<'OUTPUT','2-param ord, empty string register');
 	ord I0,S0
 	print I0
 	end
 CODE
+Cannot get character of empty string
+OUTPUT
 
-output_is(<<'CODE','Cannot get character of empty string','3-param ord, empty string');
+output_is(<<'CODE', <<'OUTPUT','3-param ord, empty string');
 	ord I0,"",0
 	print I0
 	end
 CODE
+Cannot get character of empty string
+OUTPUT
 
-output_is(<<'CODE','Cannot get character of empty string','3-param ord, empty string register');
+output_is(<<'CODE', <<'OUTPUT','3-param ord, empty string register');
 	ord I0,S0,0
 	print I0
 	end
 CODE
+Cannot get character of empty string
+OUTPUT
 
 output_is(<<'CODE',ord('a'),'2-param ord, one-character string');
 	ord I0,"a"
@@ -960,18 +976,22 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register');
 	end
 CODE
 
-output_is(<<'CODE', 'Cannot get character past end of string','3-param ord, multi-character string');
+output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string');
 	ord I0,"ab",2
 	print I0
 	end
 CODE
+Cannot get character past end of string
+OUTPUT
 
-output_is(<<'CODE', 'Cannot get character past end of string','3-param ord, multi-character string');
+output_is(<<'CODE', <<'OUTPUT','3-param ord, multi-character string');
 	set S0,"ab"
 	ord I0,S0,2
 	print I0
 	end
 CODE
+Cannot get character past end of string
+OUTPUT
 
 output_is(<<'CODE',ord('a'),'3-param ord, one-character string, from end');
 	ord I0,"a",-1
@@ -999,12 +1019,14 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from 
 	end
 CODE
 
-output_is(<<'CODE','Cannot get character before beginning of string','3-param ord, multi-character string register, from end, OOB');
+output_is(<<'CODE',<<'OUTPUT','3-param ord, multi-character string register, from end, OOB');
 	set S0,"ab"
 	ord I0,S0,-3
 	print I0
         end
 CODE
+Cannot get character before beginning of string
+OUTPUT
 
 output_is(<<'CODE',chr(32),'chr of 32 is space in ASCII');
         chr S0, 32

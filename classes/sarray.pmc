@@ -68,7 +68,7 @@ ret_int(Parrot_Interp interpreter, HashEntry *e)
     default:
         break;
     }
-    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not an integer!\n");
+    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not an integer!");
     return 0;
 }
 
@@ -95,7 +95,7 @@ ret_num(Parrot_Interp interpreter, HashEntry *e)
         default:
             break;
     }
-    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not a number!\n");
+    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not a number!");
     return 0;
 }
 
@@ -122,7 +122,7 @@ ret_string(Parrot_Interp interpreter, HashEntry *e)
         default:
             break;
     }
-    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not a string!\n");
+    internal_exception(OUT_OF_BOUNDS, "SArray: Entry not a string!");
     return 0;
 }
 
@@ -158,7 +158,7 @@ ret_pmc(Parrot_Interp interpreter, HashEntry *e)
         case enum_hash_pmc:
             return UVal_pmc(e->val);
         default:
-            internal_exception(OUT_OF_BOUNDS, "SArray: Unknown entry!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray: Unknown entry!");
     }
     return NULL;
 }
@@ -183,7 +183,7 @@ shift_entry(PMC *self)
     INTVAL end_index   = UVal_int(e[1].val);
 
     if (start_index >= end_index)
-        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
 
     ret = (HashEntry *) PMC_data(self) + (2 + start_index++);
 
@@ -215,7 +215,7 @@ get_entry(PMC *self, INTVAL key)
     }
     key += start_index;   /* lower bound if already shifted */
     if (key < start_index || key >= end_index)
-        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+        internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
     e = (HashEntry *) PMC_data(self) + (2 + key);
     return e;
 }
@@ -616,7 +616,7 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray: Can't resize!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray: Can't resize!");
         PMC_int_val(SELF) = size;
         /* Probably ought to actually copy this... */
         if (PMC_data(SELF)) {
@@ -640,7 +640,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_int;
         UVal_int(e->val) = value;
@@ -663,7 +663,7 @@ Adds an element with integer value C<value> to the end of the array.
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
         DYNSELF.set_integer_keyed_int(nextix, value);
@@ -683,7 +683,7 @@ C<value>.
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_num;
         UVal_num(e->val) = value;
@@ -706,7 +706,7 @@ Adds an element with floating-point value C<value> to the end of the array.
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
         DYNSELF.set_number_keyed_int(nextix, value);
@@ -725,7 +725,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_string;
         UVal_str(e->val) = value;
@@ -749,7 +749,7 @@ array.
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
         DYNSELF.set_string_keyed_int(nextix, value);
@@ -768,7 +768,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         HashEntry *e;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_pmc;
         DOD_WRITE_BARRIER(INTERP, SELF, UVal_pmc(e->val), src);
@@ -792,7 +792,7 @@ Adds an element with PMC value C<*value> to the end of the array.
         HashEntry *e;
         INTVAL nextix;
         if (!PMC_data(SELF))
-            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
+            internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!");
         e = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
         DYNSELF.set_pmc_keyed_int(nextix, value);

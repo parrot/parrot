@@ -188,7 +188,7 @@ Returns the floating-point value of the element at index C<key>.
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS, 
-                "FixedFloatArray: index out of bounds!\n");
+                "FixedFloatArray: index out of bounds!");
         
         data = (FLOATVAL *)PMC_data(SELF);
         return data[key];
@@ -288,7 +288,7 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS, "FixedFloatArray: Can't resize!\n");
+            internal_exception(OUT_OF_BOUNDS, "FixedFloatArray: Can't resize!");
         PMC_int_val(SELF) = size;
         PMC_data(SELF) = mem_sys_allocate(size * sizeof(FLOATVAL));
         PObj_active_destroy_SET(SELF);
@@ -339,7 +339,7 @@ C<value>.
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS, 
-                "FixedFloatArray: index out of bounds!\n");
+                "FixedFloatArray: index out of bounds!");
 
         data = (FLOATVAL*)PMC_data(SELF);
         data[key] = value;

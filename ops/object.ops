@@ -240,7 +240,7 @@ inline op subclass(out PMC, in PMC) :object_classes {
 op subclass(out PMC, in STR, in STR) :object_classes {
   PMC *class = Parrot_class_lookup(interpreter, $2);
   if (PMC_IS_NULL(class)) {
-    internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
+    internal_exception(NO_CLASS, "Class '%s' doesn't exist",
 		string_to_cstring( interpreter, $3 ));
   }
   $1 = VTABLE_subclass(interpreter, class, $3);
@@ -250,7 +250,7 @@ op subclass(out PMC, in STR, in STR) :object_classes {
 op subclass(out PMC, in STR) :object_classes {
   PMC *class = Parrot_class_lookup(interpreter, $2);
   if (PMC_IS_NULL(class)) {
-    internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
+    internal_exception(NO_CLASS, "Class '%s' doesn't exist",
 		string_to_cstring( interpreter, $2 ));
   }
   $1 = VTABLE_subclass(interpreter, class, NULL);
@@ -282,7 +282,7 @@ character, so Perl's Foo::Bar would be Foo\0Bar.
 inline op getclass(out PMC, in STR) :object_classes {
   PMC *class = Parrot_class_lookup(interpreter, $2);
   if (PMC_IS_NULL(class)) {
-    internal_exception(NO_CLASS, "Class '%s' doesn't exist\n",
+    internal_exception(NO_CLASS, "Class '%s' doesn't exist",
 		string_to_cstring( interpreter, $2 ));
   }
   else

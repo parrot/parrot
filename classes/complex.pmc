@@ -114,7 +114,7 @@ complex_parse_string (Parrot_Interp interp,
             if( (*t != 'i' && *t != 'j') || (*(t+1) != 0) ) {
                 /* imaginary part does not end in 'i' or 'j' */
                 internal_exception(INVALID_STRING_REPRESENTATION,
-                    "Complex: malformed string\n");
+                    "Complex: malformed string");
                 first_num_length = second_num_length = 0;
             }
             /* this is useful if there is no number for the
@@ -126,7 +126,7 @@ complex_parse_string (Parrot_Interp interp,
         else {
             /* "+" or "-" not found: error */
             internal_exception(INVALID_STRING_REPRESENTATION,
-                "Complex: malformed string\n");
+                "Complex: malformed string");
             first_num_length = second_num_length = 0;
         }
     }
@@ -188,7 +188,7 @@ complex_locate_keyed_num(Parrot_Interp interp, PMC* self, STRING *key) {
     if(0 == string_equal(interp, key, real))
         return &RE(self);
     internal_exception(KEY_NOT_FOUND,
-        "Complex: key is neither 'real' or 'imag'\n");
+        "Complex: key is neither 'real' or 'imag'");
     return NULL;
 }
 

@@ -362,7 +362,7 @@ ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
             else
             {
                 internal_exception(1,
-                        "no initializer available for nested struct\n");
+                        "no initializer available for nested struct");
             }
 
             /* assign the pointer */

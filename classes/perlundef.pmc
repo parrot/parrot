@@ -306,15 +306,15 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in division");
         if(value->vtable == Parrot_base_vtables[enum_class_PerlUndef]) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         else if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             if(VTABLE_get_integer(INTERP, value) == 0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+                internal_exception(DIV_BY_ZERO, "division by zero!");
             }
         }
         else if(VTABLE_get_number(INTERP, value) == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
 
         VTABLE_set_integer_native(INTERP, dest, 0);
@@ -332,7 +332,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in integer division");
         if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
@@ -350,7 +350,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in numeric division");
         if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
@@ -367,15 +367,15 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in modulus");
         if(value->vtable == Parrot_base_vtables[enum_class_PerlUndef]) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         else if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             if(VTABLE_get_integer(INTERP, value) == 0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+                internal_exception(DIV_BY_ZERO, "division by zero!");
             }
         }
         else if(VTABLE_get_number(INTERP, value) == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
 
         VTABLE_set_integer_native(INTERP, dest, 0);
@@ -393,7 +393,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in integer modulus");
         if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         VTABLE_set_integer_native(INTERP, dest, 0);
     }
@@ -411,7 +411,7 @@ Morphs to a C<PerlString> with the value of C<*value>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in numeric modulus");
         if(value == 0) {
-            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+            internal_exception(DIV_BY_ZERO, "division by zero!");
         }
         VTABLE_set_integer_native(INTERP, dest, 0);
     }

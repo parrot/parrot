@@ -185,7 +185,7 @@ inline op branch_cs (in STR) :base_loop,check_event {
     struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
 	    enum_fixup_label, label);
     if (!fe)
-	internal_exception(1, "branch_cs: fixup for '%s' not found\n", label);
+	internal_exception(1, "branch_cs: fixup for '%s' not found", label);
     else {
 	interpreter->resume_offset = fe->offset;
         Parrot_switch_to_cs(interpreter, fe->seg, 1);
@@ -530,7 +530,7 @@ a return continuation in P1 of class $2 and return address $4.
 
 inline op newsub(out PMC, in INT, labelconst INT) {
   if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$2);
+    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$2);
     abort(); /* Deserve to lose */
   }
   $1 = pmc_new_noinit(interpreter, $2);
@@ -541,11 +541,11 @@ inline op newsub(out PMC, in INT, labelconst INT) {
 
 inline op newsub(in INT, in INT, labelconst INT, labelconst INT) {
   if ($1 <= 0 || $1 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$1);
+    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$1);
     abort(); /* Deserve to lose */
   }
   if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$2);
+    internal_exception(1, "Illegal PMC enum (%d) in newsub", (int)$2);
     abort(); /* Deserve to lose */
   }
   REG_PMC(0) = pmc_new_noinit(interpreter, $1);

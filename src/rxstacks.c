@@ -141,7 +141,7 @@ intstack_pop(Interp *interpreter, IntStack stack)
 
     /* Quick sanity check */
     if (chunk->used == 0) {
-        internal_exception(ERROR_STACK_EMPTY, "No entries on stack!\n");
+        internal_exception(ERROR_STACK_EMPTY, "No entries on stack!");
     }
 
     entry = &chunk->entry[chunk->used - 1];

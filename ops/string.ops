@@ -133,7 +133,7 @@ Repeats string $2 $3 times and stores result in $1.
 
 inline op repeat(out STR, in STR, in INT) :base_mem {
   if ($3 < 0) {
-      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg\n");
+      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg");
   }
   $1 = string_repeat(interpreter, $2, (UINTVAL)$3, NULL);
   goto NEXT();

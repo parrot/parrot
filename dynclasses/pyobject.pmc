@@ -755,7 +755,7 @@ according to the type of C<*value>.
         }
         else {
             internal_exception(ILL_INHERIT,
-                   "set_pmc not implemented in class '%s'\n",
+                   "set_pmc not implemented in class '%s'",
                    string_to_cstring(INTERP, VTABLE_name(INTERP, pmc)));
 
         }

@@ -56,7 +56,7 @@ only referended. The initializer may be NULL.
 
 op new(out PMC, in INT) {
   if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+    internal_exception(1, "Illegal PMC enum (%d) in new", (int)$2);
     abort(); /* Deserve to lose */
   }
 
@@ -70,7 +70,7 @@ op new(out PMC, in INT) {
 
 op new(out PMC, in INT, in PMC) {
   if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+    internal_exception(1, "Illegal PMC enum (%d) in new", (int)$2);
   }
   $1 = pmc_new_init(interpreter, $2, $3);
   goto NEXT();
@@ -78,7 +78,7 @@ op new(out PMC, in INT, in PMC) {
 
 op new(out PMC, in INT, in PMC, in PMC) {
   if ($2 <= 0 || $2 >= enum_class_max) {
-    internal_exception(1, "Illegal PMC enum (%d) in new\n", (int)$2);
+    internal_exception(1, "Illegal PMC enum (%d) in new", (int)$2);
   }
   $1 = pmc_new_noinit(interpreter, $2);
   $1->vtable->init_pmc_props(interpreter, $1, $3, $4);

@@ -52,6 +52,7 @@ internal_exception(int exitcode, const char *format, ...)
     va_list arglist;
     va_start(arglist, format);
     vfprintf(stderr, format, arglist);
+    fprintf(stderr, "\n");
     va_end(arglist);
     Parrot_exit(exitcode);
 }

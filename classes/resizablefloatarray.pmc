@@ -45,7 +45,7 @@ Returns the floating-point value of the element at index C<key>.
         SizeFloatData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
-                "ResizableFloatArray: index out of bounds!\n");
+                "ResizableFloatArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
@@ -68,7 +68,7 @@ C<value>.
         SizeFloatData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
-                "ResizableFloatArray: index out of bounds!\n");
+                "ResizableFloatArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -96,7 +96,7 @@ shrink to one and half times the new size (three thirds of the old size).
         SizeFloatData *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
-                    "ResizableFloatArray: Can't resize to negative value!\n");
+                    "ResizableFloatArray: Can't resize to negative value!");
 
         sd = PMC_data(SELF);
         PMC_int_val(SELF) = size;
@@ -182,7 +182,7 @@ Removes and returns the last element in the array.
 
         if (sd == NULL || size == 0) {
             internal_exception(OUT_OF_BOUNDS, 
-                    "ResizableFloatArray: Can't pop from an empty array!\n");
+                    "ResizableFloatArray: Can't pop from an empty array!");
         }
 
 	value = sd->data[size - 1];

@@ -172,7 +172,7 @@ Returns the PMC value of the element at index C<key>.
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS,
-                "PyTuple: index out of bounds!\n");
+                "PyTuple: index out of bounds!");
 
         data = (PMC **)PMC_data(SELF);
         return data[key];
@@ -242,7 +242,7 @@ Resizes the array to C<size> elements.
         PMC **data;
 
         if (PMC_int_val(SELF) && size)
-            internal_exception(OUT_OF_BOUNDS, "PyTuple: Can't resize!\n");
+            internal_exception(OUT_OF_BOUNDS, "PyTuple: Can't resize!");
         if (!size)
             return;
         PMC_int_val(SELF) = size;
@@ -283,7 +283,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS,
-                "PyTuple: index out of bounds!\n");
+                "PyTuple: index out of bounds!");
 
         data = (PMC**)PMC_data(SELF);
         DOD_WRITE_BARRIER(INTERP, SELF, data[key], src);

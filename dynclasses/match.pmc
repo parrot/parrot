@@ -33,7 +33,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
         internal_exception(OUT_OF_BOUNDS,
-        "Cannot use NULL key for Match!\n");
+        "Cannot use NULL key for Match!");
         return NULL;
     }
     return key_string(interpreter, key);

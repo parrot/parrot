@@ -115,7 +115,7 @@ Delete a (range of) elements from the list
         }
         else
             internal_exception(OUT_OF_BOUNDS,
-                "PyList: unimplemented delete!\n");
+                "PyList: unimplemented delete!");
     }
 
 /*

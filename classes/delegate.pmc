@@ -87,7 +87,7 @@ find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
         if (PObj_is_object_TEST(pmc)) {
             class = GET_CLASS((Buffer *)PMC_data(pmc), pmc);
             internal_exception(METH_NOT_FOUND,
-                "Can't find method '%s' for object '%s'\n",
+                "Can't find method '%s' for object '%s'",
                 string_to_cstring(interpreter, meth),
                 string_to_cstring(interpreter, PMC_str_val(
                         get_attrib_num((SLOTTYPE *)PMC_data(class),
@@ -95,7 +95,7 @@ find_or_die(Parrot_Interp interpreter, PMC *pmc, STRING *meth) {
                 );
         } else {
             internal_exception(METH_NOT_FOUND,
-                "Can't find method '%s' - erroneous PMC\n",
+                "Can't find method '%s' - erroneous PMC",
                 string_to_cstring(interpreter, meth)
                 );
 	}

@@ -696,18 +696,26 @@ OUTPUT
 
 
 # Now, to make it do BAD THINGS!
-output_is(<<"CODE",'No entries on IntReg_Stack!','ENO I frames');
+output_is(<<"CODE",<<"OUTPUT",'ENO I frames');
 	popi
 	end
 CODE
-output_is(<<"CODE",'No entries on NumReg_Stack!','ENO N frames');
+No entries on IntReg_Stack!
+OUTPUT
+
+output_is(<<"CODE",<<"OUTPUT",'ENO N frames');
 	popn
 	end
 CODE
-output_is(<<"CODE",'No entries on StringReg_Stack!','ENO S frames');
+No entries on NumReg_Stack!
+OUTPUT
+
+output_is(<<"CODE",<<"OUTPUT",'ENO S frames');
 	pops
 	end
 CODE
+No entries on StringReg_Stack!
+OUTPUT
 
 # Rotate
 output_is(<<"CODE", <<'OUTPUT', 'rotate 0');

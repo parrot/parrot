@@ -148,7 +148,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, positive direction");
     set I0, 128
     conv_i1_ovf I0
     print I0
-    print "\n"
     end
 CODE
 127
@@ -163,7 +162,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_i1_ofv_i, negative direction");
     dec I0
     conv_i1_ovf I0
     print I0
-    print "\n"
     end
 CODE
 -128
@@ -178,7 +176,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, positive direction");
     set I0, 256
     conv_u1_ovf I0
     print I0
-    print "\n"
     end
 CODE
 255
@@ -193,7 +190,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_u1_ofv_i, negative direction");
     dec I0
     conv_u1_ovf I0
     print I0
-    print "\n"
     end
 CODE
 0
@@ -208,7 +204,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, positive direction");
     inc I0
     conv_i2_ovf I0
     print I0
-    print "\n"
     end
 CODE
 32767
@@ -223,7 +218,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_i2_ofv_i, negative direction");
     dec I0
     conv_i2_ovf I0
     print I0
-    print "\n"
     end
 CODE
 -32768
@@ -253,7 +247,6 @@ output_is(<<'CODE', <<OUTPUT, "conv_u2_ofv_i, negative direction");
     dec I0
     conv_u2_ovf I0
     print I0
-    print "\n"
     end
 CODE
 0

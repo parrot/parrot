@@ -203,7 +203,7 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
         pmci = PMC_int_val(SELF);
         valf = VTABLE_get_number(INTERP, value);
             if (valf == 0.0) {
-                internal_exception(DIV_BY_ZERO, "division by zero!\n");
+                internal_exception(DIV_BY_ZERO, "division by zero!");
             return;
         }
 
@@ -406,12 +406,12 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
     /* XXX we want exceptions here? */
     void repeat (PMC* value, PMC* dest) {
         internal_exception(INVALID_OPERATION,
-            "repeat() not implemented in class 'TclInt'\n");
+            "repeat() not implemented in class 'TclInt'");
     }
 
     void repeat_int (INTVAL value, PMC* dest) {
         internal_exception(INVALID_OPERATION,
-        "repeat() not implemented in class 'TclInt'\n");
+        "repeat() not implemented in class 'TclInt'");
     }
 
 

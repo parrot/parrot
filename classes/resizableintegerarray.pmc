@@ -43,7 +43,7 @@ Returns the integer value of the element at index C<key>.
         SizeIntData *sd;
         if (key < 0) 
             internal_exception(OUT_OF_BOUNDS, 
-                "ResizableIntegerArray: index out of bounds!\n");
+                "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         
@@ -65,7 +65,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         SizeIntData *sd;
         if (key < 0) 
             internal_exception(OUT_OF_BOUNDS, 
-                "ResizableIntegerArray: index out of bounds!\n");
+                "ResizableIntegerArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
@@ -87,7 +87,7 @@ Resizes the array to C<size> elements.
         SizeIntData *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
-                    "ResizableIntegerArray: Can't resize!\n");
+                    "ResizableIntegerArray: Can't resize!");
 
         sd = PMC_data(SELF);
         PMC_int_val(SELF) = size;

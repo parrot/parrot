@@ -66,7 +66,7 @@ Resizes the array to C<size> elements.
 
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS,
-                    "ResizablePMCArray: Can't resize!\n");
+                    "ResizablePMCArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
             /* empty - used fixed routine */
@@ -119,7 +119,7 @@ Returns the PMC value of the element at index C<key>.
             key += PMC_int_val(SELF);
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
-                "ResizablePMCArray: index out of bounds!\n");
+                "ResizablePMCArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         data = PMC_data(SELF);
@@ -151,7 +151,7 @@ If key is a slice, do a splice as set that item.
             key += PMC_int_val(SELF);
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS,
-                "ResizablePMCArray: index out of bounds!\n");
+                "ResizablePMCArray: index out of bounds!");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
         data = (PMC**)PMC_data(SELF);
@@ -171,7 +171,7 @@ If key is a slice, do a splice as set that item.
             Parrot_py_set_slice(INTERP, SELF, key, NULL);
         else
             internal_exception(OUT_OF_BOUNDS,
-                "ResizablePMCArray: unimplemented delete!\n");
+                "ResizablePMCArray: unimplemented delete!");
     }
 
 /*

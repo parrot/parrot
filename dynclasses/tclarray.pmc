@@ -38,7 +38,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
         internal_exception(OUT_OF_BOUNDS,
-        "Cannot use NULL key for TclArray!\n");
+        "Cannot use NULL key for TclArray!");
         return NULL;
     }
     return key_string(interpreter, key);
@@ -818,7 +818,7 @@ Returns the next key relative to the location specified in C<what>.
                 /* do nothing: hash_get_idx does increment the idx */
                 break;
             default:
-                internal_exception(1, "Can't iterate from end\n");
+                internal_exception(1, "Can't iterate from end");
                 break;
         }
         return ret;

@@ -27,7 +27,7 @@ inline op conv_i1_ovf(inout INT) :dotgnu_core {
     $1 = (INTVAL)((signed char)($1));
   }
   else {
-    internal_exception(1, "Overflow exception for conv_i1_ovf\n");
+    internal_exception(1, "Overflow exception for conv_i1_ovf");
   }
   goto NEXT();
 }
@@ -42,7 +42,7 @@ inline op conv_u1_ovf(inout INT) :dotgnu_core {
     $1 = (INTVAL)((unsigned char)($1));
   }
   else {
-    internal_exception(1, "Overflow exception for conv_u1_ovf\n");
+    internal_exception(1, "Overflow exception for conv_u1_ovf");
   }
   goto NEXT();
 }
@@ -58,7 +58,7 @@ inline op conv_i2_ovf(inout INT) :dotgnu_core {
   }
   else
   {
-    internal_exception(1, "Overflow exception for conv_i2_ovf\n");
+    internal_exception(1, "Overflow exception for conv_i2_ovf");
   }
   goto NEXT();
 }
@@ -74,7 +74,7 @@ inline op conv_u2_ovf(inout INT) :dotgnu_core {
   }
   else
   {
-    internal_exception(1, "Overflow exception for conv_u2_ovf\n");
+    internal_exception(1, "Overflow exception for conv_u2_ovf");
   }
   goto NEXT();
 }
