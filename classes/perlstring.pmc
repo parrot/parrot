@@ -355,10 +355,12 @@ pmclass PerlString extends perlscalar {
 
     void substr (INTVAL offset, INTVAL length, PMC* dest) {
 	DYNSELF.morph(enum_class_PerlString);
-        dest->cache.string_val = string_substr(INTERP, SELF->cache.string_val, offset, length, NULL);
+        dest->cache.string_val = string_substr(INTERP,
+			SELF->cache.string_val, offset, length, NULL, 0);
     }
 
     STRING* substr_str (INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, SELF->cache.string_val, offset, length, NULL);
+        return string_substr(INTERP, SELF->cache.string_val, offset,
+			length, NULL, 0);
     }
 }

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 102;
+use Parrot::Test tests => 106;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1681,6 +1681,67 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is( <<'CODE', <<'OUTPUT', "substr_r_s_s|sc_i|ic_i|ic" );
+	set	S4, "12345JAPH01"
+	set	I4, 5
+	set	I5, 4
+	substr	S5, S4, I4, I5
+	print	S5
+	substr S5, S4, I4, 4
+	print  S5
+	substr S5, S4, 5, I5
+	print  S5
+	substr S5, S4, 5, 4
+	print  S5
+	substr S5, "12345JAPH01", I4, I5
+	print  S5
+	substr S5, "12345JAPH01", I4, 4
+	print  S5
+	substr S5, "12345JAPH01", 5, I5
+	print  S5
+	substr S5, "12345JAPH01", 5, 4
+	print  S5
+	print  "\n"
+	end
+CODE
+JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "assign" );
+	set	S4, "JAPH\n"
+	assign  S5, S4
+	print	S4
+	print   S5
+	end
+CODE
+JAPH
+JAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "assign & globber" );
+	set	S4, "JAPH\n"
+	assign  S5, S4
+	assign  S4, "Parrot\n"
+	print	S4
+	print   S5
+	end
+CODE
+Parrot
+JAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "assign & globber 2" );
+	set	S4, "JAPH\n"
+	set     S5, S4
+	assign  S4, "Parrot\n"
+	print	S4
+	print   S5
+	end
+CODE
+Parrot
+Parrot
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)

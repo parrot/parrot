@@ -683,7 +683,7 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING *s, UINTVAL num,
  */
 STRING *
 string_substr(struct Parrot_Interp *interpreter, STRING *src,
-              INTVAL offset, INTVAL length, STRING **d)
+              INTVAL offset, INTVAL length, STRING **d, int replace_dest)
 {
     STRING *dest;
     UINTVAL substart_off;       /* Offset from start of string to our
@@ -714,12 +714,12 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
-    /* do in-place i.e. make a COW string */
-#if 0
-    dest = string_set(interpreter, *d, src);
-#else
-    dest = make_COW_reference(interpreter, src);
-#endif
+    /* do in-place i.e. reuse existing header if one */
+    if (replace_dest)
+        dest = string_set(interpreter, *d, src);
+    else
+        dest = make_COW_reference(interpreter, src);
+
     if (src->encoding->index == enum_encoding_singlebyte) {
         dest->strstart = (char *)dest->strstart + true_offset;
         dest->bufused = true_length;
@@ -1034,7 +1034,7 @@ string_nprintf(struct Parrot_Interp *interpreter,
     string_transcode(interpreter, output, dest_encoding, NULL, &output);
 
     if(bytelen > 0 && bytelen < (INTVAL)string_length(output)) {
-        string_substr(interpreter, output, 0, bytelen, &output);
+        string_substr(interpreter, output, 0, bytelen, &output, 1);
     }
 
     if(dest == NULL) {

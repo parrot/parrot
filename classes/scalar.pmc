@@ -1201,7 +1201,7 @@ pmclass scalar abstract noinit {
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
         return string_substr(INTERP, VTABLE_get_string(INTERP,SELF),
-            offset, length, NULL);
+            offset, length, NULL, 0);
     }
 
     STRING* substr_str_keyed_int (INTVAL* key, INTVAL offset, INTVAL length) {

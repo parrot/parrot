@@ -131,7 +131,7 @@ handle_flags(struct Parrot_Interp *interpreter,
             if (info->flags & FLAG_ZERO
                 && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
                 STRING *temp = 0;
-                string_substr(interpreter, str, 1, len-1, &temp);
+                string_substr(interpreter, str, 1, len-1, &temp, 0);
                 string_chopn(str, -1);
                 string_append(interpreter, str, fill, 0);
                 string_append(interpreter, str, temp, 0);
@@ -232,7 +232,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
             if (len) {
-                string_substr(interpreter, pat, old, len, &substr);
+                string_substr(interpreter, pat, old, len, &substr, 1);
                 string_append(interpreter, targ, substr, 0);
             }
             len = 0;
@@ -661,7 +661,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
         }
     }
     if (len) {
-        string_substr(interpreter, pat, old, len, &substr);
+        string_substr(interpreter, pat, old, len, &substr, 1);
         string_append(interpreter, targ, substr, 0);
     }
 

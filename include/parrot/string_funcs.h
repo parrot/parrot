@@ -26,7 +26,7 @@ STRING *string_repeat(struct Parrot_Interp *, const STRING *, UINTVAL,
                       STRING **);
 STRING *string_chopn(STRING *, INTVAL);
 STRING *string_substr(struct Parrot_Interp *, STRING *, INTVAL,
-                      INTVAL, STRING **);
+                      INTVAL, STRING **, int replace_dest);
 STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
 STRING *string_nprintf(struct Parrot_Interp *,

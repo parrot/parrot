@@ -117,7 +117,8 @@ NW:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	# S0 is always overwritten, so reuse it
+	substr_r S0, S15, I3, 1
 	ne S0, "*", North
 	inc I2
 North:
@@ -125,7 +126,7 @@ North:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", NE
 	inc I2
 NE:
@@ -133,7 +134,7 @@ NE:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", West
 	inc I2
 West:
@@ -141,7 +142,7 @@ West:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", East
 	inc I2
 East:
@@ -149,7 +150,7 @@ East:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", SW
 	inc I2
 SW:
@@ -157,7 +158,7 @@ SW:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", South
 	inc I2
 South:
@@ -165,7 +166,7 @@ South:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", SE
 	inc I2
 SE:
@@ -173,11 +174,11 @@ SE:
 	add I3, I3, I0
 	add I3, I3, I1
 	mod I3, I3, I0
-	substr S0, S15, I3, 1
+	substr_r S0, S15, I3, 1
 	ne S0, "*", check
 	inc I2
 check:
-	substr S0, S15, I1, 1
+	substr_r S0, S15, I1, 1
 	eq S0, "*", check_alive
 
 # If eq 3, put a star in else a space
@@ -216,7 +217,7 @@ dump:
 	set I0, 0
 	set I1, 14
 printloop:
-	substr S0, S15, I0, 15
+	substr_r S0, S15, I0, 15
 	print S0
 	print "\n"
 	add I0, I0, 15

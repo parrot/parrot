@@ -483,6 +483,10 @@ inline op set(out INT, in PMC) {
 
 =item B<assign>(inout PMC, in STR)
 
+Assign a new value to a string by reusing the string header.
+
+=item B<assign>(inout STR, in STR)
+
 =cut
 
 inline op assign(inout PMC, in PMC) {
@@ -505,6 +509,10 @@ inline op assign(inout PMC, in STR) {
   goto NEXT();
 }
 
+inline op assign(inout STR, in STR) {
+  $1 = string_set(interpreter, $1, $2);
+  goto NEXT();
+}
 ########################################
 
 =head2 Keyed set operations: Px[ INTKEY ] = Bx
@@ -1993,10 +2001,18 @@ character).
 The third form is optimized for replace only, ignoring the replaced
 substring and does not waste a register to do the string replace.
 
+The B<_r> variants reuse an existing string header and therefore normally
+do not create a new string in the destination register.
+
 =cut
 
 inline op substr(out STR, in STR, in INT, in INT) {
-  $1 = string_substr(interpreter, $2, $3, $4, &$1);
+  $1 = string_substr(interpreter, $2, $3, $4, &$1, 0);
+  goto NEXT();
+}
+
+inline op substr_r(out STR, in STR, in INT, in INT) {
+  $1 = string_substr(interpreter, $2, $3, $4, &$1, 1);
   goto NEXT();
 }
 
@@ -3218,7 +3234,7 @@ inline op popp() {
 =item B<popbottoms>()
 
 Restores registers 0-15 of the type indicated in the name of the operation
-from the most recently B<push>ed copies. 
+from the most recently B<push>ed copies.
 
 =cut
 
@@ -3253,7 +3269,7 @@ inline op popbottomp() {
 =item B<poptops>()
 
 Restores registers 16-31 of the type indicated in the name of the operation
-from the most recently B<push>ed copies. 
+from the most recently B<push>ed copies.
 
 =cut
 
