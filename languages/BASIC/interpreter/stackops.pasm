@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2003/09/04 12:09:22  leo
+# imcc cleanup; fix BASIC interpreter syntax
+#
 # Revision 1.1  2003/03/09 23:08:58  clintp
 # Re-organized the languages\BASIC area into two areas, one for the older
 # interpreted GW-type BASIC and one for the newer compiled QB-like BASIC.
@@ -141,7 +144,7 @@ CLEAREND:
 #   as an improvement over the bubble sort.
 
 # Entry point for *numeric* sort
-NSORTSTACK:	
+NSORTSTACK:
 	pushi
 	pushs
 	set I10, 1
@@ -161,14 +164,14 @@ COMBSORT:
 DOSORT: restore I5
 	set I0, I5
 COMBTOP:mul I0, I0, 10
-	div I0, I0 13
+	div I0, I0, 13
 	eq I0, 9, COMBNEWGAP
 	eq I0, 10, COMBNEWGAP
 	branch COMBREST
 COMBNEWGAP:
 	set I0, 11
 COMBREST:
-	lt I0, 1 COMBNEWGAP2
+	lt I0, 1, COMBNEWGAP2
 	branch COMBREST2
 COMBNEWGAP2:
 	set I0, 1
@@ -198,7 +201,7 @@ COMBNSORT:
 	le I7, I8, COMBENDCS_FOR
 	branch SORTSWAP
 
-SORTSWAP:	
+SORTSWAP:
 	save I2
 	save I3
 	bsr SWAP

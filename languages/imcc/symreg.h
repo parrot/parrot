@@ -131,7 +131,7 @@ SymReg * _mk_const(SymReg *hash[], char * name, int t);
 void _store_symreg(SymReg *hash[], SymReg * r);
 SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);
-void clear_tables(Parrot_Interp);
+void clear_tables(Parrot_Interp, SymReg *h[]);
 unsigned int  hash_str(const char * str);
 void free_life_info(Parrot_Interp, SymReg *r);
 void _delete_sym(Parrot_Interp , SymReg * hsh[], const char * name);
@@ -144,5 +144,5 @@ void pop_namespace(char * name);
 
 /* globals */
 
-EXTERN SymReg ** hash, **ghash;
+EXTERN SymReg * hash[HASH_SIZE], *ghash[HASH_SIZE];
 EXTERN int n_symbols;

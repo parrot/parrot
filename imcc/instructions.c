@@ -30,31 +30,11 @@
 
 static Instruction * last_ins;
 
-typedef struct comp_unit_t {
-    Instruction * instructions;
-    Instruction * last_ins;
-    SymReg ** hash[HASH_SIZE];
-} comp_unit_t;
-
-static comp_unit_t *comp_unit;
 int n_comp_units;
 
 void
 open_comp_unit(void)
 {
-    if (!n_comp_units)
-        comp_unit = mem_sys_allocate(sizeof(n_comp_units+1) *
-            sizeof(comp_unit_t));
-    else
-        comp_unit = realloc(comp_unit, sizeof(n_comp_units+1) *
-            sizeof(comp_unit_t));
-    comp_unit[n_comp_units].last_ins = last_ins;
-    comp_unit[n_comp_units].instructions = instructions;
-    last_ins = instructions = NULL;
-    comp_unit[n_comp_units].hash[0] = calloc(HASH_SIZE, sizeof(SymReg*));
-    hash = comp_unit[n_comp_units].hash[0];
-    if (!n_comp_units)
-        ghash = hash;
     n_comp_units++;
 }
 
@@ -67,18 +47,8 @@ close_comp_unit(Parrot_Interp interpreter)
     if (!n_comp_units)
         fatal(1, "close_comp_unit", "non existent comp_unit\n");
     n_comp_units--;
-    instructions = comp_unit[n_comp_units].instructions;
-    last_ins = comp_unit[n_comp_units].last_ins;
-    clear_tables(interpreter);
-    if (n_comp_units) {
-        free(comp_unit[n_comp_units].hash[0]);
-        comp_unit[n_comp_units].hash[0] = NULL;
-        hash = comp_unit[n_comp_units-1].hash[0];
-    }
-    else {
-        free(comp_unit);
-        comp_unit = NULL;
-    }
+    clear_tables(interpreter, hash);
+    instructions = last_ins = NULL;
 }
 
 /* find a symbol on all hashes */
@@ -92,12 +62,15 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name) {
     for (n = n_comp_units - 1; n >= 0; n--) {
         for (ns = nspace; ns; ns = ns->parent) {
             char * fullname = _mk_fullname(ns, name);
-            p = _get_sym(comp_unit[n].hash[0], fullname);
+            p = _get_sym(hash, fullname);
             free(fullname);
             if (p)
                 return p;
         }
-        p = _get_sym(comp_unit[n].hash[0], name);
+        p = _get_sym(hash, name);
+        if (p)
+            return p;
+        p = _get_sym(ghash, name);
         if (p)
             return p;
     }
@@ -530,6 +503,7 @@ int emit_flush(void *param) {
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(param);
     for (ins = instructions; ins; ins = ins->next) {
+        debug(interpreter, DEBUG_IMC, "emit %s\n", ins_string(ins));
         (emitters[emitter]).emit(param, ins);
     }
     for (ins = instructions; ins; ) {

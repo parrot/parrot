@@ -7,7 +7,7 @@
 # There are external dependancies on stackops, basicvars, and alpha.
 #
 # $Id$
-# $Log: expr.pasm,v 
+# $Log: expr.pasm,v
 # Revision 1.9  2002/06/16 21:23:28  clint
 # Floating Point BASI
 #
@@ -121,8 +121,8 @@ FUNCDISPATCH:
 	restore S0   # Function to call.
 	dec I5
 	save I5
-	
-	# Okay, while the function's on the stack being processed it 
+
+	# Okay, while the function's on the stack being processed it
 	#   might have this FUNCMARK thing after it.  Remove it.
 	set S3, ""
 	length I0, S0
@@ -141,8 +141,8 @@ FUNCJUMP:
 	eq S0, "LOG", FUNC_LOG
 	eq S0, "LEN", FUNC_LEN
 	eq S0, "RND", FUNC_RND
-	eq S0, "MID", FUNC_MID	
-	eq S0, "INT", FUNC_INT	
+	eq S0, "MID", FUNC_MID
+	eq S0, "INT", FUNC_INT
 	eq S0, "ASC", FUNC_ASC
 	eq S0, "CHR", FUNC_CHR
 	eq S0, "RIGHT", FUNC_RIGHT
@@ -176,7 +176,7 @@ ENDISFUNC:
 	ret
 
 # Here's some functions!
-# Do *not* return.  
+# Do *not* return.
 #     Jump to ENDISFUNC for a query or ENDFUNCDISPATCH for a call.
 #
 FUNC_ABS:
@@ -277,7 +277,7 @@ FUNC_TIME:
 	inc I10
 	gt I10, 1, ENDISFUNC
 	restore I5
-	ge I5, 1 FUNC_ERR	# No arguments for time()
+	ge I5, 1, FUNC_ERR	# No arguments for time()
 	time I0
 	save I0
 	bsr ITOA
@@ -309,11 +309,11 @@ FUNC_RND:
 	bsr ATOI
 	restore I0  		# Range for random
 	mul I24, I24, 5         # *a
-	add I24, I24, 1         # +c	
-	mod I24, I24, .RANDMAX  
+	add I24, I24, 1         # +c
+	mod I24, I24, .RANDMAX
 	# % m
 	set N0, I24            # Big 'ol number.
-	div N0, N0, .RANDMAXF  
+	div N0, N0, .RANDMAXF
 	# <1.0 decimal
 	set N1, I0
 	mul N0, N0, N1   # Scale it to the argument
@@ -340,7 +340,7 @@ FUNC_MID:
 	ne I5, 3, FUNC_ERR
 	restore S1		# the string
 	bsr ATOI
-	restore I0		# start 
+	restore I0		# start
 	dec I0			#    (1-based)
 	bsr ATOI
 	restore I1		# length
@@ -372,7 +372,7 @@ FUNC_RIGHT:
 	restore S0		# String
 	bsr ATOI
 	restore I0		# Length
-	
+
 	length I1, S0
 	ge I0, I1, F_R_TOOSHORT
 	sub I1, I1, I0
@@ -383,7 +383,7 @@ F_R_TOOSHORT:
 	save S0
 	branch ENDFUNCDISPATCH
 
-FUNC_CHR: 
+FUNC_CHR:
 	inc I10
 	gt I10, 1, ENDISFUNC
 	restore I5
@@ -439,7 +439,7 @@ FUNC_MID_ERR2:
 	print "\n"
 	save "0"
 	branch ENDFUNCDISPATCH
-	
+
 FUNC_ASCII_ERROR:
 	print "CHR/ASC: bounds error\n"
 	save "0"
@@ -474,7 +474,7 @@ DOSUBSCRIPT:
 	set I3, .STYPE   # String
 	substr S0, S0, 0, I0
 
-DOSUBNUM:	
+DOSUBNUM:
 	concat S0, "|"
 	restore I5
 DOSUBSL:
@@ -667,14 +667,14 @@ ADDUSTACK:
 	branch FIXUNARY
 
 # Stack transfer.
-ENDFIXU:	
+ENDFIXU:
 	bsr OPSTACKDEPTH
 	restore I0
 	eq I0, 0, COOKEXIT
-	bsr POPOPSTACK	    
+	bsr POPOPSTACK
 	restore S0
 	save S0
-	inc I5	
+	inc I5
 	branch ENDFIXU
 
 COOKEXIT:
@@ -871,7 +871,7 @@ FINISH:
 	branch FINISH
 
 	# The RPN is finished here, stored in S0 as a stream.
-	#   we need to produce a valid stack from that.  DON'T 
+	#   we need to produce a valid stack from that.  DON'T
 	#   USE TOKENIZE.  It's too smart for this.
 ALLDONE:
 	##print "RPN:"
@@ -921,7 +921,7 @@ CALCLOOP:
 	le I5, 0, CALCFINISH
 	restore S0
 	dec I5
-	
+
 	save S0
 	bsr ISNUM
 	restore I1
@@ -1046,11 +1046,11 @@ OPNUM1:
 	restore I0
 	eq I0, 1, OPNUM2
 	inc I8
-OPNUM2:	
+OPNUM2:
 	save S13
 	bsr ATON
 	restore N3
-	
+
 	# Okay, at this point we've got either
 	#   S12  N2  (alpha/num)
 	#   S13  N3
@@ -1081,7 +1081,7 @@ EQ:	ne S0, "=", NE
 	eq I8, 0, NEQ
 	eq S12, S13, TRUE
 	set N4, 0.0
-	branch FALSE 
+	branch FALSE
 NEQ:    eq N2, N3, TRUE
 	set N4, 0.0
         branch FALSE
@@ -1148,26 +1148,26 @@ ORF:	set N4, 0
 UNKOP:  branch DOFUNC
 
 	# Convenience labels
-TRUE:   
+TRUE:
 	noop
-FALSE:  
+FALSE:
 	noop
-ENDNOP: 
+ENDNOP:
 # Convert result to string again
 	save N4
 	bsr NTOA
 	set S4, ""
 	restore S4
 	branch ENDOP
-	
-	# Do a built-in function or multidimensional 
+
+	# Do a built-in function or multidimensional
 	#   variable lookup
-DOFUNC: 
+DOFUNC:
 # Stack's now kosher
-	save I5   
-	
+	save I5
+
 	# Pull things from the opstack down to the
-	#   function name.  You should get either 
+	#   function name.  You should get either
 	#   values or commas until the function name is hit.
 	set I4, 0
 PULLOP: bsr OPSTACKDEPTH
@@ -1211,7 +1211,7 @@ ENDOP:  save S4
 CALCFINISH:
 	set S0, ""
 	set I5, 0
-	
+
 CALCFINLOOP:
 	bsr OPSTACKDEPTH
 	restore I0
@@ -1220,7 +1220,7 @@ CALCFINLOOP:
 	inc I5
 	branch CALCFINLOOP
 
-	# But of course, the stack is *backwards* now.  
+	# But of course, the stack is *backwards* now.
 CALCEXIT1:
 	save I5
 	bsr REVERSESTACK
@@ -1265,6 +1265,6 @@ ENDTRUTH:
 	popi
 	pops
 	ret
- 
-	
+
+
 

@@ -429,16 +429,16 @@ _delete_sym(Parrot_Interp interpreter, SymReg * hsh[], const char * name) {
 
 /* Deletes all symbols */
 void
-clear_tables(Parrot_Interp interpreter) {
+clear_tables(Parrot_Interp interpreter, SymReg * hsh[]) {
     int i;
     SymReg * p, *next;
     for(i = 0; i < HASH_SIZE; i++) {
-	for(p = hash[i]; p; ) {
+	for(p = hsh[i]; p; ) {
 	    next = p->next;
 	    free_sym(interpreter, p);
 	    p = next;
 	}
-        hash[i] = NULL;
+        hsh[i] = NULL;
     }
     for(i = 0; i < HASH_SIZE; i++) {
         for(p = ghash[i]; p; p = p->next)

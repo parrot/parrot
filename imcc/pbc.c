@@ -77,6 +77,7 @@ static void imcc_globals_destroy(int ex, void *param)
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    SymReg **h;
 
     UNUSED(ex);
     UNUSED(param);
@@ -85,10 +86,10 @@ static void imcc_globals_destroy(int ex, void *param)
         s = cs->subs;
         while (s) {
             prev_s = s->prev;
-            hash = s->labels;
-            clear_tables(interpreter);
-            hash = s->bsrs;
-            clear_tables(interpreter);
+            h = s->labels;
+            clear_tables(interpreter, h);
+            h = s->bsrs;
+            clear_tables(interpreter, h);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -96,13 +97,12 @@ static void imcc_globals_destroy(int ex, void *param)
         mem_sys_free(cs);
         cs = prev_cs;
     }
-    hash = globals.str_consts;
-    clear_tables(interpreter);
-    hash = globals.num_consts;
-    clear_tables(interpreter);
-    hash = globals.key_consts;
-    clear_tables(interpreter);
-    free(ghash);
+    h = globals.str_consts;
+    clear_tables(interpreter, h);
+    h = globals.num_consts;
+    clear_tables(interpreter, h);
+    h = globals.key_consts;
+    clear_tables(interpreter, h);
     globals.cs = NULL;
 }
 
@@ -943,6 +943,7 @@ int e_pbc_close(void *param){
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
     fixup_bsrs(interpreter);
+    clear_tables(interpreter, ghash);
     return 0;
 }
 

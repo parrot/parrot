@@ -7,6 +7,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2003/09/04 12:09:22  leo
+# imcc cleanup; fix BASIC interpreter syntax
+#
 # Revision 1.1  2003/03/09 23:08:58  clintp
 # Re-organized the languages\BASIC area into two areas, one for the older
 # interpreted GW-type BASIC and one for the newer compiled QB-like BASIC.
@@ -34,14 +37,14 @@
 # Id Keywords
 #
 #
-ISALPHA: 
+ISALPHA:
 	pushi
 	pushs
 	restore S1
 	ge S1, "A", UPPER
 	branch NONUP
 UPPER:  le S1, "Z", ALPHA
-NONUP:  
+NONUP:
 	ge S1, "a", LOWER
 	branch NONLOW
 LOWER:  le S1, "z", ALPHA
@@ -117,9 +120,9 @@ ENDSTRNCHR:
 	pops
 	ret
 STRNCHRERR:
-	puts "String position out of bounds.  ERR\n"
+	print "String position out of bounds.  ERR\n"
 	end
-	
+
 # atoi -- String to integer
 #  Inputs: String on stack
 # Outputs: Integer on top of the stack.
