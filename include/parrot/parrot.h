@@ -32,7 +32,7 @@
 #include <stdio.h>
 /*#include <types.h> */
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <io.h>
 #endif
 

@@ -23,7 +23,7 @@
 #ifdef MINIPARROT
 #  define PIO_OS_STDIO
 #else
-#  ifdef WIN32
+#  ifdef _WIN32
 #    define PIO_OS_WIN32
 #  else
 #    ifdef HAS_HEADER_UNISTD
