@@ -177,12 +177,12 @@ for my $dir (keys %directories) {
             $dir = dirname($dir);
         }
         foreach (@dirs) {
-            mkdir($_, 0777) or die "mkdir $_: $!";
+            mkdir($_, 0777) or die "mkdir $_: $!\n";
         }
     }
 }
 
 foreach (@files) {
     my ($src, $dest) = @$_;
-    copy($src, $dest) or die "copy $src to $dest: $!";
+    copy($src, $dest) or die "copy $src to $dest: $!\n";
 }
