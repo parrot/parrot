@@ -150,7 +150,7 @@ This is not determined yet.
 =head2 Unknown (default) and byte code segments
 
 These have only the common segment header and the opcode stream
-appended. The opcode stream is a F<mmap()>ed memory region, if your
+appended. The opcode stream is an F<mmap()>ed memory region, if your
 operating system supports this (and if the PBC was read from a disk
 file). You have therefore to consider these data as readonly.
 
