@@ -338,6 +338,7 @@ INTERP_O_FILES = \
     $(SRC)/headers$(O) \
     $(SRC)/dod$(O) \
     $(SRC)/gc_ims$(O) \
+    $(SRC)/gc_gms$(O) \
     $(SRC)/method_util$(O) \
     $(SRC)/exit$(O) \
     $(SRC)/misc$(O) \
@@ -787,6 +788,8 @@ $(SRC)/headers$(O) : $(GENERAL_H_FILES)
 $(SRC)/dod$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/gc_ims$(O) : $(GENERAL_H_FILES)
+
+$(SRC)/gc_gms$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/resources$(O) : $(GENERAL_H_FILES)
 
