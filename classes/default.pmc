@@ -1815,12 +1815,7 @@ pmclass default abstract noinit {
     }
 
     void* invoke (void* next) {
-	/* 
-         * FIXME: should be an exception instead: 
-         * "Invoking something that can not be invoked" ??
-         */
-
-        /* move on to the next op */
-        return next;
+	internal_exception(-1, "Invocation of something uninvocable\n");
+        return NULL;
     }
 }
