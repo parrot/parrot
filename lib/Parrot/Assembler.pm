@@ -674,7 +674,12 @@ is the index into the constants table where the constant is located.
 
 sub replace_string_constants {
   my $code = shift;
-  $code =~ s/([NU])?\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($2,$1)/eg;
+  $code =~ s{ ([NU])?
+              (?: "( (?:[^\\"]|(?:\\(?>["tnr\\])))* )" |
+                  '( (?:[^\\']|(?:\\(?>['tnr\\])))* )'
+              )
+            }
+            {constantize_string(defined $2 ? $2 : $3,$1)}egx;
   return $code;
 }
 

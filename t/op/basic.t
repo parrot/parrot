@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 7;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -14,8 +14,18 @@ output_is(<<'CODE', '1', "print 1");
 CODE
 
 output_is(<<'CODE', 'Parrot flies', "print string");
-	print "Parrot flies"
+	print 'Parrot flies'
 	end
+CODE
+
+output_is(<<'CODE', 'Parrot flies', "print double-quoted string");
+       print "Parrot flies"
+       end
+CODE
+
+output_is(<<'CODE', 'Parrot	flies', "print double-quoted string, tabs");
+       print "Parrot\tflies"
+       end
 CODE
 
 output_is( <<'CODE', '42', "branch_ic" );
