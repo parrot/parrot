@@ -17,26 +17,6 @@
 
 #define STACK_CHUNK_DEPTH 256
 
-typedef enum {
-    NO_STACK_ENTRY_TYPE     = 0,
-    STACK_ENTRY_INT         = 1,
-    STACK_ENTRY_FLOAT       = 2,
-    STACK_ENTRY_STRING      = 3,
-    STACK_ENTRY_PMC         = 4,
-    STACK_ENTRY_POINTER     = 5,
-    STACK_ENTRY_DESTINATION = 6
-} Stack_entry_type;
-
-typedef enum {
-    NO_STACK_ENTRY_FLAGS     = 0,
-    STACK_ENTRY_CLEANUP_FLAG = 1 << 0
-} Stack_entry_flags;
-
-typedef enum {
-    NO_STACK_CHUNK_FLAGS     = 0,
-    STACK_CHUNK_COW_FLAG     = 1 << 0
-} Stack_chunk_flags;
-
 typedef struct Stack_Entry {
     union {
         Floatval num_val;

@@ -20,11 +20,10 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
 {
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
-    if (interpreter->ctx.int_reg_top->free) {
+    if (interpreter->ctx.int_reg_top->used < FRAMES_PER_CHUNK) {
         memcpy(&interpreter->ctx.int_reg_top->
                IReg[interpreter->ctx.int_reg_top->used],
                &interpreter->ctx.int_reg, sizeof(struct IReg));
-        interpreter->ctx.int_reg_top->free--;
         interpreter->ctx.int_reg_top->used++;
     }
     /* Nope, so either move to next stack chunk or grow the stack */
@@ -39,7 +38,6 @@ Parrot_push_i(struct Parrot_Interp *interpreter)
             interpreter->ctx.int_reg_top->next = next_chunk;
         }
         next_chunk->used = 1;
-        next_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
         interpreter->ctx.int_reg_top = next_chunk;
         memcpy(&next_chunk->IReg[0],
                &interpreter->ctx.int_reg, sizeof(struct IReg));
@@ -58,7 +56,6 @@ Parrot_pop_i(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.int_reg,
                &top->IReg[top->used], sizeof(struct IReg));
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -92,7 +89,6 @@ Parrot_half_pop_i(struct Parrot_Interp *interpreter)
         memcpy(&interpreter->ctx.int_reg.registers[NUM_REGISTERS/2],
                &top->IReg[top->used].registers[NUM_REGISTERS/2], 
                sizeof(struct IReg)/2);
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -132,11 +128,10 @@ Parrot_push_s(struct Parrot_Interp *interpreter)
 {
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
-    if (interpreter->ctx.string_reg_top->free) {
+    if (interpreter->ctx.string_reg_top->used < FRAMES_PER_CHUNK) {
         memcpy(&interpreter->ctx.string_reg_top->
                SReg[interpreter->ctx.string_reg_top->used],
                &interpreter->ctx.string_reg, sizeof(struct SReg));
-        interpreter->ctx.string_reg_top->free--;
         interpreter->ctx.string_reg_top->used++;
     }
     /* Nope, so either move to next stack chunk or grow the stack */
@@ -151,7 +146,6 @@ Parrot_push_s(struct Parrot_Interp *interpreter)
             interpreter->ctx.string_reg_top->next = next_chunk;
         }
         next_chunk->used = 1;
-        next_chunk->free = FRAMES_PER_STR_REG_CHUNK - 1;
         interpreter->ctx.string_reg_top = next_chunk;
         memcpy(&next_chunk->SReg[0],
                &interpreter->ctx.string_reg, sizeof(struct SReg));
@@ -170,7 +164,6 @@ Parrot_pop_s(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.string_reg,
                &top->SReg[top->used], sizeof(struct SReg));
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -204,7 +197,6 @@ Parrot_half_pop_s(struct Parrot_Interp *interpreter)
         memcpy(&interpreter->ctx.string_reg.registers[NUM_REGISTERS/2],
                &top->SReg[top->used].registers[NUM_REGISTERS/2], 
                sizeof(struct SReg)/2);
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -244,11 +236,10 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
 {
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
-    if (interpreter->ctx.num_reg_top->free) {
+    if (interpreter->ctx.num_reg_top->used < FRAMES_PER_CHUNK) {
         memcpy(&interpreter->ctx.num_reg_top->
                NReg[interpreter->ctx.num_reg_top->used],
                &interpreter->ctx.num_reg, sizeof(struct NReg));
-        interpreter->ctx.num_reg_top->free--;
         interpreter->ctx.num_reg_top->used++;
     }
     /* Nope, so either move to next stack chunk or grow the stack */
@@ -263,7 +254,6 @@ Parrot_push_n(struct Parrot_Interp *interpreter)
             interpreter->ctx.num_reg_top->next = next_chunk;
         }
         next_chunk->used = 1;
-        next_chunk->free = FRAMES_PER_NUM_REG_CHUNK - 1;
         interpreter->ctx.num_reg_top = next_chunk;
         memcpy(&next_chunk->NReg[0],
                &interpreter->ctx.num_reg, sizeof(struct NReg));
@@ -282,7 +272,6 @@ Parrot_pop_n(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.num_reg,
                &top->NReg[top->used], sizeof(struct NReg));
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -316,7 +305,6 @@ Parrot_half_pop_n(struct Parrot_Interp *interpreter)
         memcpy(&interpreter->ctx.num_reg.registers[NUM_REGISTERS/2],
                &top->NReg[top->used].registers[NUM_REGISTERS/2], 
                sizeof(struct NReg)/2);
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -356,11 +344,10 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
 {
     /* Do we have any space in the current savestack? If so, memcpy
      * down */
-    if (interpreter->ctx.pmc_reg_top->free) {
+    if (interpreter->ctx.pmc_reg_top->used < FRAMES_PER_CHUNK) {
         memcpy(&interpreter->ctx.pmc_reg_top->
                PReg[interpreter->ctx.pmc_reg_top->used],
                &interpreter->ctx.pmc_reg, sizeof(struct PReg));
-        interpreter->ctx.pmc_reg_top->free--;
         interpreter->ctx.pmc_reg_top->used++;
     }
     /* Nope, so either move to next stack chunk or grow the stack */
@@ -375,7 +362,6 @@ Parrot_push_p(struct Parrot_Interp *interpreter)
             interpreter->ctx.pmc_reg_top->next = next_chunk;
         }
         next_chunk->used = 1;
-        next_chunk->free = FRAMES_PER_PMC_REG_CHUNK - 1;
         interpreter->ctx.pmc_reg_top = next_chunk;
         memcpy(&next_chunk->PReg[0],
                &interpreter->ctx.pmc_reg, sizeof(struct PReg));
@@ -394,7 +380,6 @@ Parrot_pop_p(struct Parrot_Interp *interpreter)
         top->used--;
         memcpy(&interpreter->ctx.pmc_reg,
                &top->PReg[top->used], sizeof(struct PReg));
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */
@@ -428,7 +413,6 @@ Parrot_half_pop_p(struct Parrot_Interp *interpreter)
         memcpy(&interpreter->ctx.pmc_reg.registers[NUM_REGISTERS/2],
                &top->PReg[top->used].registers[NUM_REGISTERS/2], 
                sizeof(struct PReg)/2);
-        top->free++;
         /* Empty? */
         if (!top->used) {
             /* Yep, drop down a frame. Maybe */

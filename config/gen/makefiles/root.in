@@ -83,7 +83,7 @@ GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 	$(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h \
 	$(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h \
 	$(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h \
+	$(INC)/oplib/core_ops_switch.h  $(INC)/enums.h \
 	$(INC)/runops_cores.h $(INC)/trace.h $(INC)/pmc.h $(INC)/key.h \
 	$(INC)/hash.h $(INC)/resources.h $(INC)/core_pmcs.h \
 	$(INC)/platform.h ${cg_h} $(INC)/interp_guts.h $(INC)/rx.h \

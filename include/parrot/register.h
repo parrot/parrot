@@ -14,6 +14,7 @@
 #define PARROT_REGISTER_H_GUARD
 
 #include "parrot/string.h"
+#include "parrot/enums.h"
 
 struct IReg {
     INTVAL registers[NUM_REGISTERS];
@@ -32,32 +33,32 @@ struct PReg {
 };
 
 struct IRegChunk {
-    UINTVAL used;
-    UINTVAL free;
+    size_t used;
+    Stack_chunk_flags flags;
     struct IRegChunk *next;
     struct IRegChunk *prev;
     struct IReg IReg[FRAMES_PER_CHUNK];
 };
 
 struct NRegChunk {
-    UINTVAL used;
-    UINTVAL free;
+    size_t used;
+    Stack_chunk_flags flags;
     struct NRegChunk *next;
     struct NRegChunk *prev;
     struct NReg NReg[FRAMES_PER_CHUNK];
 };
 
 struct SRegChunk {
-    UINTVAL used;
-    UINTVAL free;
+    size_t used;
+    Stack_chunk_flags flags;
     struct SRegChunk *next;
     struct SRegChunk *prev;
     struct SReg SReg[FRAMES_PER_CHUNK];
 };
 
 struct PRegChunk {
-    UINTVAL used;
-    UINTVAL free;
+    size_t used;
+    Stack_chunk_flags flags;
     struct PRegChunk *next;
     struct PRegChunk *prev;
     struct PReg PReg[FRAMES_PER_CHUNK];

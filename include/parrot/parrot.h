@@ -189,6 +189,7 @@ typedef void (*funcptr_t)(void);
 #  define GC_DEBUG(interp) Interp_flags_TEST((interp), PARROT_GC_DEBUG_FLAG)
 #endif
 
+#include "parrot/enums.h"
 #include "parrot/platform.h"
 #include "parrot/platform_interface.h"
 #include "parrot/global_setup.h"
@@ -200,6 +201,7 @@ typedef void (*funcptr_t)(void);
 #include "parrot/hash.h"
 #include "parrot/vtable.h"
 #include "parrot/register.h"
+#include "parrot/stacks.h"
 #include "parrot/regfuncs.h"
 #include "parrot/exceptions.h"
 #include "parrot/warnings.h"
@@ -209,7 +211,6 @@ typedef void (*funcptr_t)(void);
 #include "parrot/op.h"
 #include "parrot/pmc.h"
 #include "parrot/events.h"
-#include "parrot/stacks.h"
 #include "parrot/list.h"
 #include "parrot/intlist.h"
 #include "parrot/smallobject.h"

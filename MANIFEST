@@ -1259,6 +1259,7 @@ include/parrot/debug.h
 include/parrot/dod.h
 include/parrot/embed.h
 include/parrot/encoding.h
+include/parrot/enums.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/exit.h
