@@ -18,6 +18,9 @@
  *  History:
  *     Initial version by Jeff G. on 2001.12.05
  *     Substantially rewritten by Steve F.
+ *  Todo:
+ *     FIXME: hash_delete is currently incorrect if string_compare can
+ *     trigger a collection.
  *  Notes:
  *     Future optimizations:
  *       - Stop reallocating the bucket pool, and instead add chunks on.
@@ -49,8 +52,7 @@ struct _hashbucket {
 
 struct _hash {
     Buffer buffer;              /* This struct is a Buffer subclass! */
-    UINTVAL hash_size;
-    UINTVAL max_chain;
+    HashIndex max_chain;
     UINTVAL entries;            /* Number of values stored in hashtable */
     Buffer* bucket_pool; /* Buffer full of buckets, used and unused */
     BucketIndex free_list;
@@ -98,10 +100,14 @@ dump_hash(Interp *interpreter, HASH *hash)
 {
     HashIndex i;
     fprintf(stderr, "Hashtable[" INTVAL_FMT "/" INTVAL_FMT "]\n",
-            hash->entries, hash->hash_size);
-    for (i = 0; i <= hash->hash_size; i++) {
+            hash->entries, hash->max_chain + 1);
+
+    /* Iterate one past the end of the hashtable, so we can use the
+     * last value as a special case for dumping out the free bucket
+     * list. */
+    for (i = 0; i <= hash->max_chain + 1; i++) {
         HASHBUCKET* bucket;
-        if (i == hash->hash_size) bucket = getBucket(hash, hash->free_list);
+        if (i > hash->max_chain) bucket = getBucket(hash, hash->free_list);
         else bucket = lookupBucket(hash, i);
         if (bucket == NULL) continue;
         fprintf(stderr, "  Bucket " INTVAL_FMT ": ", i);
@@ -121,7 +127,8 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 
     buffer_lives((Buffer *)hash);
     buffer_lives(hash->bucket_pool);
-    for (i = 0; i < hash->hash_size; i++) {
+
+    for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
             buffer_lives((Buffer *)bucket->key);
@@ -161,8 +168,8 @@ expand_hash(Interp *interpreter, HASH *hash)
 {
     BucketIndex* table;
     HASHBUCKET* bucket;
-    UINTVAL new_size = (hash->hash_size ? hash->hash_size << 1
-                        : INITIAL_BUCKETS);
+    UINTVAL old_size = hash->max_chain + 1;
+    UINTVAL new_size = (old_size ? (old_size << 1) : INITIAL_BUCKETS);
     UINTVAL new_max_chain = new_size - 1;
     HashIndex new_loc;
     
@@ -184,9 +191,9 @@ expand_hash(Interp *interpreter, HASH *hash)
     }
 
     /* NULL out new space in table */
-    memset((HashIndex *) hash->buffer.bufstart + hash->hash_size,
+    memset((HashIndex *) hash->buffer.bufstart + old_size,
            NULLBucketIndex,
-           (new_size - hash->hash_size) * sizeof(BucketIndex));
+           (new_size - old_size) * sizeof(BucketIndex));
 
     /* Warning: for efficiency, we cache the table in a local
      * variable. If any possibly gc-triggering code is added to the
@@ -200,7 +207,7 @@ expand_hash(Interp *interpreter, HASH *hash)
     table = (BucketIndex*) hash->buffer.bufstart;
 
     /* Move buckets to new homes */
-    for (hi = 0; hi < hash->hash_size; hi++) {
+    for (hi = 0; hi < old_size; hi++) {
         BucketIndex* bucketIdxP = &table[hi];
         while (*bucketIdxP != NULLBucketIndex) {
             BucketIndex bucketIdx = *bucketIdxP;
@@ -220,7 +227,6 @@ expand_hash(Interp *interpreter, HASH *hash)
         }
     }
 
-    hash->hash_size = new_size;
     hash->max_chain = new_max_chain;
 }
 
@@ -280,7 +286,14 @@ new_hash(Interp *interpreter)
 {
     HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
     /*      hash->buffer.flags |= BUFFER_report_FLAG; */
-    hash->hash_size = 0;
+
+    /* We rely on the fact that expand_hash() will be called before
+     * this function returns, so that max_chain will always contain a
+     * valid value except when the hash is being initially created.
+     * This does, however, prevent the future space optimization of
+     * not allocating any buckets for empty hashes. */
+    hash->max_chain = (HashIndex) -1;
+
     hash->entries = 0;
     hash->bucket_pool = new_buffer_header(interpreter);
     /*      hash->bucket_pool->flags |= BUFFER_report_FLAG; */
@@ -402,7 +415,7 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash) {
     HASH * ret = new_hash(interp);
     BucketIndex* table = (BucketIndex*) hash->buffer.bufstart;
     BucketIndex i;
-    for (i = 0; i < hash->hash_size; i++) {
+    for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET * b = lookupBucket(hash, i);
         while (b) {
             KEY_ATOM valtmp;
