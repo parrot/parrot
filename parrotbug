@@ -15,7 +15,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.1.0";
+my $VERSION = "0.1.1";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -89,17 +89,23 @@ sub help {
     print <<EOF;
 
 A program to help generate bug reports about parrot, and mail them.
+It is designed to be used interactively. Normally no arguments will
+be needed.
 
 Usage:
 
  $0 [-s subject] [-b body] [-f inputfile] [-r returnaddress] [-A]
-    [-e editor] [-ok|-nok]
+    [-e editor] [-ok|-nok|-d]
  $0 {-h|-V}
+
+Simplest usage:  run '$0', and follow the prompts.
 
 Options:
   -A    Don't send a bug received acknowledgement to the return address.
   -b    Body of the report. If not included on the command line, or
         in a file with -f, you will get a chance to edit the message.
+  -d    Dump mode.  This prints out your configuration data, without mailing
+        anything.
   -e    Editor to use.
   -f    File containing the body of the report. Use this to
         quickly send a prepared message.
