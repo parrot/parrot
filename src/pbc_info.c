@@ -32,7 +32,7 @@ main(int argc, char **argv)
     struct PackFile_Segment *seg;
 
     interpreter = make_interpreter(NO_FLAGS);
-    Parrot_init(interpreter, (void *)&pf);
+    Parrot_init(interpreter);
 
     pf = Parrot_readbc(interpreter, argv[1]);
 

@@ -3,6 +3,7 @@
 # - pull somecode out of the inner loop, s. opt below
 
 .sub _main
+.include "iterator.pasm"
     new_pad 0
     .local PerlHash ha
     ha = new PerlHash
@@ -59,7 +60,7 @@ for_2_start:
 	if $P2 >= $P3 goto for_3_end
 	    find_lex $P5 , "k"
 	    $P4 = new Iterator, $P5
-	    $P4 = 0
+	    $P4 = .ITERATE_FROM_START
 		# opt, out of loop
 		# scalar results may go out of loop
 		$P6 = new PerlUndef
@@ -100,7 +101,7 @@ for_2_end:
     print "\n"
 
     $P15 = new Iterator, $P14
-    $P15 = 0
+    $P15 = .ITERATE_FROM_START
     find_lex $P16 , "ha"
     $I1 = 0
 iter_2_start:

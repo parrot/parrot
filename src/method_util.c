@@ -156,10 +156,17 @@ mark_stack(struct Parrot_Interp *interpreter,
         pobject_lives(interpreter, (PObj *)cur_stack);
         entry = (Stack_Entry_t *)(cur_stack->items.bufstart);
         for (i = 0; i < cur_stack->used; i++) {
-            if ((STACK_ENTRY_PMC == entry[i].entry_type ||
-                STACK_ENTRY_STRING == entry[i].entry_type) &&
-                     entry[i].entry.string_val) {
-                pobject_lives(interpreter, (PObj *)entry[i].entry.string_val);
+            switch (entry[i].entry_type) {
+                case STACK_ENTRY_PMC:
+                    pobject_lives(interpreter,
+                            (PObj *)entry[i].entry.pmc_val);
+                    break;
+                case STACK_ENTRY_STRING:
+                    pobject_lives(interpreter,
+                            (PObj *)entry[i].entry.string_val);
+                    break;
+                default:
+                    break;
             }
         }
     }
