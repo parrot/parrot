@@ -16,7 +16,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -529,3 +529,23 @@ output_is(<<'CODE', <<'OUTPUT', "abs");
 CODE
 5
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Complex
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

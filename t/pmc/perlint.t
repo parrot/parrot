@@ -16,7 +16,7 @@ Tests the PerlInt PMC. Checks Perl-specific integer behaviour.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -969,3 +969,23 @@ ok 4
 ok 5
 ok 6
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new PerlInt
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

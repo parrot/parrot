@@ -16,7 +16,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new ref");
@@ -141,3 +141,43 @@ CODE
 /ok 1
 deref not allowed/
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Array
+    .local pmc pmc2
+    pmc2 = new Ref, pmc1
+    .local pmc pmc3
+    pmc3 = new SharedRef, pmc1
+    .local int bool1
+    does bool1, pmc2, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc2, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc2, "no_interface"
+    print bool1
+    print "\n"
+    does bool1, pmc3, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc3, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc3, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+0
+1
+0
+0
+1
+0
+OUTPUT
+

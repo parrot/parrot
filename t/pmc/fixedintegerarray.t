@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -261,6 +261,29 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new FixedIntegerArray
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+0
+1
+0
 OUTPUT
 
 1;

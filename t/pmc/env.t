@@ -16,7 +16,7 @@ Tests the C<Env> PMC.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 use Parrot::Config;
 
@@ -112,3 +112,23 @@ ok 1
 ok 2
 OUT
 }
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Env
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

@@ -16,7 +16,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 use Parrot::Config;
 
@@ -239,3 +239,23 @@ CODE
 16
 8
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new ManagedStruct
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

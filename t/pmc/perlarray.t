@@ -16,7 +16,7 @@ Tests the C<PerlArray> PMC. Checks basic and Perl-specific array behaviour.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1390,6 +1390,29 @@ Use of uninitialized value
 \s+in file.*
 ok 4
 /
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new PerlArray
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+0
+1
+0
 OUTPUT
 
 1;

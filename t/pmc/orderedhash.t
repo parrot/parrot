@@ -16,7 +16,7 @@ Tests the C<OrderedHash> PMC.
 
 =cut
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 use Test::More;
 
 output_is(<<'CODE', <<OUT, "init");
@@ -504,3 +504,32 @@ CODE
 P0["b"]: B
 P0["b"]: B
 OUTPUT
+
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new OrderedHash
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "hash"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+0
+1
+1
+0
+OUTPUT
+

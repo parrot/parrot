@@ -16,7 +16,7 @@ Tests the C<IntList> PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -535,3 +535,27 @@ CODE
 100
 1
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new IntList
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "array"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+0
+1
+0
+OUTPUT
+

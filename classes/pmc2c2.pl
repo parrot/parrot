@@ -159,7 +159,10 @@ which the class implements).
 The default is "scalar". Other currently used interfaces are:
 
     array
+    event
     hash
+    library
+    ref
 
 =back
 

@@ -16,7 +16,7 @@ Tests the C<PerlNum> PMC. Checks Perl-specific numeric behaviour.
 
 =cut
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 .macro fp_eq (	J, K, L )
@@ -808,3 +808,23 @@ output_is(<< 'CODE', << 'OUTPUT', "Falseness of 0.000");
 CODE
 0 is false
 OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new PerlNum
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

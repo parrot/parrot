@@ -16,7 +16,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
@@ -612,3 +612,23 @@ ex:
     if x <= 4 goto iloop
 .end
 CODE
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new Coroutine
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
+

@@ -21,7 +21,7 @@ C<FloatvalArray> provides an floatval-only array.
 #include "parrot/parrot.h"
 
 
-pmclass FloatvalArray  {
+pmclass FloatvalArray does array  {
 
 /*
 

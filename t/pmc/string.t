@@ -16,7 +16,7 @@ Tests the C<String> PMC.
 
 =cut
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1116,5 +1116,23 @@ CODE
 str
 OUTPUT
 
-1;
+
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+##PIR##
+.sub _main
+    .local pmc pmc1
+    pmc1 = new String
+    .local int bool1
+    does bool1, pmc1, "scalar"
+    print bool1
+    print "\n"
+    does bool1, pmc1, "no_interface"
+    print bool1
+    print "\n"
+    end
+.end
+CODE
+1
+0
+OUTPUT
 

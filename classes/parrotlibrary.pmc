@@ -8,7 +8,7 @@ classes/parrotlibrary.pmc - Dynamic Library
 
 =head1 DESCRIPTION
 
-Class for holding info about dynamic libraries.
+Class for holding info about a dynamic library.
 
      PMC data
      PMC_struct_val(SELF)   oplib init function
@@ -19,7 +19,7 @@ Properties:
     _filename               full path/file of lib
     _ro                     true after init
  
-All ParrotLibrary PMCs are in interperter->iglobals
+All ParrotLibrary PMCs are in interpreter->iglobals.
 
 When a dynamic library (pmc or ops) is loaded, the load function returns
 a ParrotLibrary PMC.

@@ -22,7 +22,7 @@ C<IntList> provides an integer-only array.
 
 #define THROW_UNSUPPORTED internal_exception(INTERP_ERROR, "Operation not supported\n")
 
-pmclass IntList {
+pmclass IntList does array {
 
 /*
 
