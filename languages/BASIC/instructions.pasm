@@ -13,9 +13,9 @@
 #  If you need to modify varaibles, see the save/restore trick for LET
 #
 # $Id$
-# $Log$
-# Revision 1.9  2002/06/16 21:23:28  clintp
-# Floating Point BASIC
+# $Log: instructions.pasm,v 
+# Revision 1.9  2002/06/16 21:23:28  clint
+# Floating Point BASI
 #
 # Revision 1.8  2002/06/03 21:45:01  clintp
 # FINALLY runs under new assembler
@@ -898,7 +898,7 @@ I_LIST:
 
 
 LIST_ONE_LINE:
-	set S0, P22, I2
+	set S0, P22[I2]
 	print S0
 	print "\n"
 	branch END_LIST
@@ -916,8 +916,8 @@ LIST_RANGE:
 	#  If I3 is -1 then no range applies.
 DO_I_LIST:  set I0, 0
 DOLISTL: gt I0, I28, END_LIST
-        set I1, P24, I0   # Get the next line
-        set S0, P22, I1   # Get the line code itself
+        set I1, P24[I0]   # Get the next line
+        set S0, P22[I1]   # Get the line code itself
 	eq I3, -1, LIST_SHOW
 	lt I2, I1, LIST_NEXT
 	gt I3, I1, LIST_NEXT

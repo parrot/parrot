@@ -7,9 +7,9 @@
 # There are external dependancies on stackops, basicvars, and alpha.
 #
 # $Id$
-# $Log$
-# Revision 1.9  2002/06/16 21:23:28  clintp
-# Floating Point BASIC
+# $Log: expr.pasm,v 
+# Revision 1.9  2002/06/16 21:23:28  clint
+# Floating Point BASI
 #
 # Revision 1.8  2002/06/03 21:45:01  clintp
 # FINALLY runs under new assembler
@@ -55,34 +55,34 @@
 PUSHOPSTACK:
         pushi
         pushs
-        set I0, P25, 0
+        set I0, P25[0]
         inc I0
         restore S0
-        set P25, I0, S0
-        set P25, 0, I0
+        set P25[I0], S0
+        set P25[0], I0
         popi
         pops
         ret
 POPOPSTACK:
         pushi
         pushs
-        set I0, P25, 0
-        set S0, P25, I0
+        set I0, P25[0]
+        set S0, P25[I0]
         save S0
         dec I0
-        set P25, 0, I0
+        set P25[0], I0
         popi
         pops
         ret
 OPSTACKDEPTH:
         pushi
-        set I0, P25, 0
+        set I0, P25[0]
         save I0
         popi
         ret
 INITOPSTACK:
         new P25, .PerlArray
-        set P25, 0, 0
+        set P25[0], 0
         ret
 
 # Function Dispatcher and Test
