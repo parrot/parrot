@@ -65,4 +65,4 @@ loop:
     new P10, .PerlInt
     set P10, 20
     setattribute P2, I0, P10
-    invoke P1
+    returncc
