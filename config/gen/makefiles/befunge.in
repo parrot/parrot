@@ -1,8 +1,5 @@
 RM_F = ${rm_f}
-PERL = ${perl}
-
 PARROT = ../../parrot
-ASSEMBLE = $(PARROT)
 
 all: build
 
@@ -10,7 +7,7 @@ test: build
 	$(PARROT) befunge.pbc test.bef
 
 build: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
-	$(ASSEMBLE) -o befunge.pbc befunge.pasm
+	$(PARROT) -o befunge.pbc befunge.pasm
 
 clean:
 	$(RM_F) core *.pbc *~
