@@ -53,6 +53,12 @@ my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
 my $source  = "${base}_ops${suffix}.c";
 
+if ($base =~ m!^dynoplibs/!) {
+    $header = "${base}_ops${suffix}.h";
+    $base =~ s!^dynoplibs/!!;
+    $include = "${base}_ops${suffix}.h";
+}
+
 my %hashed_ops;
 
 #
