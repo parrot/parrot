@@ -46,16 +46,12 @@ EOTCL
 $expected = "St\\[ring Parsing\n";
 language_output_is("tcl",$tcl,$expected,"escaped brace");
 
-TODO: {
-local $TODO = "unknown";
 $tcl = <<'EOTCL';
  set a [set b \[]
  puts -nonewline $a
 EOTCL
 $expected = "[";
 language_output_is("tcl",$tcl,$expected,"embedded escaped open brace");
-}
-
 
 $tcl = <<'EOTCL';
  set a [set b \]]
