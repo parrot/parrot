@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl -w
 
 #XXX need TODO tests for octal, hex, unicode
 

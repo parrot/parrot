@@ -1,4 +1,4 @@
-#!env perl
+#! perl -w
 
 # $Id$
 

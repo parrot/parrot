@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl -w
 
 use strict;
 use lib qw(../../../lib);

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl
 #
 # perl6 driver:  parse assemble compile and run .p6 files
 #

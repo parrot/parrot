@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 
 # Remember, this is BAD PERL later to be translated to PASM
 # First tokenize the input stream into:

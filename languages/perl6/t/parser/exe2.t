@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 
 ###############################################
 # This are the examples given in Exegesis 2.

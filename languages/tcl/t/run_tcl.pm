@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl -w
 use lib '../../../lib';
 use Parrot::Config;
 

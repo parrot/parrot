@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl -w
 # This is just another little language for Parrot
 # urmc - 2003 (c) by Marcus Thiesen
 # <marcus@cpan.org>

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl -w
 # urm.pl 
 # 2003 (c) by Marcus Thiesen
 # Maybe you can use it for debugging

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w 
+#! perl -w
 
 # Copyright (c) 2002-2003 by William J. Coleda.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 
 ######################################################################
 # From "...And Now for Something Completely Similar" by Damian Conway

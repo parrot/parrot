@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 #
 # $Id$
 # $Log: basic.pl,v 
