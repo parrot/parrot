@@ -5,7 +5,7 @@ my %vtable = parse_vtable();
 open OUT, ">include/parrot/vtable.h" or die $!;
 
 print OUT <<'EOF';
-/* register.h
+/*  vtable.h
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
  *     $Id$

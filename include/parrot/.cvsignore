@@ -1,3 +1,4 @@
 op.h
 config.h
 interp_guts.h
+vtable.h
