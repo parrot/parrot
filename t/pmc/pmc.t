@@ -1021,7 +1021,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print P0
         print "b"
 
-#undef xor undef = 0
+#undef xor undef = "0"
         xor P0, P1, P1
 	print P0
         print "c"
@@ -1051,7 +1051,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print "\\n"
 	end
 CODE
-abc349c910xy1z
+ab0c349c910xy1z
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-add");

@@ -27,6 +27,9 @@ void mmd_add_function_sub(Parrot_Interp, INTVAL, PMC*);
 void mmd_destroy(Parrot_Interp);
 PMC *mmd_vtfind(Parrot_Interp, INTVAL, INTVAL, INTVAL);
 
+funcptr_t get_mmd_dispatch_type(Interp *interpreter,
+        INTVAL function, UINTVAL left_type, UINTVAL right_type, int *is_pmc);
+
 typedef struct _MMD_table {
     funcptr_t *mmd_funcs;     /* The functions for the MMD table */
     UINTVAL x;               /* The x coord for each table */

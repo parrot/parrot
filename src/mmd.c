@@ -96,13 +96,10 @@ dump_mmd(Interp *interpreter, INTVAL function)
 }
 #endif
 
-funcptr_t
-get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
-        UINTVAL right_type, INTVAL function, int *is_pmc);
 
 funcptr_t
-get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
-        UINTVAL right_type, INTVAL function, int *is_pmc)
+get_mmd_dispatch_type(Interp *interpreter, INTVAL function, UINTVAL left_type,
+        UINTVAL right_type, int *is_pmc)
 {
     funcptr_t func;
     UINTVAL offset, x_funcs, y_funcs;
@@ -170,8 +167,8 @@ get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC * right,
     UINTVAL left_type, right_type;
     left_type = left->vtable->base_type;
     right_type = right->vtable->base_type;
-    return get_mmd_dispatch_type(interpreter, left_type, right_type,
-            function, is_pmc);
+    return get_mmd_dispatch_type(interpreter, function, left_type, right_type,
+            is_pmc);
 }
 
 /*
@@ -245,7 +242,7 @@ mmd_dispatch_v_pip(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pip)get_mmd_dispatch_type(interpreter,
-            left_type, 0, function, &is_pmc);
+            function, left_type, 0, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPIP",
@@ -267,7 +264,7 @@ mmd_dispatch_v_pnp(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_pnp)get_mmd_dispatch_type(interpreter,
-            left_type, 0, function, &is_pmc);
+            function, left_type, 0, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPNP",
@@ -289,7 +286,7 @@ mmd_dispatch_v_psp(Interp *interpreter,
 
     left_type = left->vtable->base_type;
     real_function = (mmd_f_v_psp)get_mmd_dispatch_type(interpreter,
-            left_type, 0, function, &is_pmc);
+            function, left_type, 0, &is_pmc);
     if (is_pmc) {
         sub = (PMC*)real_function;
         Parrot_runops_fromc_args(interpreter, sub, "vPSP",
@@ -640,11 +637,11 @@ wrap it into an NCI function to get the required function arguments passed.
 */
 
 PMC *
-mmd_vtfind(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right) {
+mmd_vtfind(Parrot_Interp interpreter, INTVAL function, INTVAL left, INTVAL right) {
     int is_pmc;
     PMC *f;
     funcptr_t func = get_mmd_dispatch_type(interpreter,
-            left, right, type, &is_pmc);
+            function, left, right, &is_pmc);
     if (func && is_pmc)
         return (PMC*)F2DPTR(func);
     f = pmc_new(interpreter, enum_class_CSub);

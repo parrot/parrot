@@ -46,11 +46,11 @@ output_is(<<'CODE', <<'OUTPUT', "PASM divide");
     .param pmc lhs
     $I0 = left
     $I1 = right
-    $I2 = $I0*$I1   # don't call divide Integer/PerlInt here
+    $I2 = $I0/$I1   # don't call divide Integer/PerlInt here
     lhs = $I2       # '
 .end
 CODE
-30
+3
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "1+1=3");

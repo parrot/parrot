@@ -418,9 +418,6 @@ Register MMD functions for this PMC type and for its parent
 
 */
 
-funcptr_t
-get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
-        UINTVAL right_type, INTVAL function, int *is_pmc);
 
 void
 Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
@@ -508,7 +505,7 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
                         continue;
                     if (j >= enum_class_core_max || j <= enum_class_Boolean) {
                         f = get_mmd_dispatch_type(interpreter,
-                                parent_type, j, func_nr, &is_pmc);
+                                func_nr, parent_type, j, &is_pmc);
                         if (f != table->default_func) {
                             mmd_register(interpreter,
                                     func_nr, type, j, f);
