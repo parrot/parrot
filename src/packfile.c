@@ -204,15 +204,15 @@ sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
     int pragmas = PObj_get_FLAGS(sub_pmc) & 0xf0;
     int todo = 0;
 
-    /*
-     * - FIXME need that for PBC too but must check, if this
-     *   is the first PBC loaded or not
-     */
     switch (action) {
+        case PBC_PBC:
         case PBC_MAIN:
-            /* denote MAIN entry in first loaded PASM
-            */
-            /* TODO set resume_offset/flags on interp */
+            if (interpreter->resume_flag & RESUME_INITIAL) {
+                /*
+                 * denote MAIN entry in first loaded PASM
+                 */
+                todo = 1;
+            }
             break;
         case PBC_LOADED:
             if (pragmas & PObj_private5_FLAG) /* symreg.h:P_LOAD */
@@ -254,11 +254,43 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
 =item <static void
 do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)>
 
-Run autoloaded bytecode.
+Run autoloaded bytecode, mark MAIN subroutine entry
 
 =cut
 
 */
+
+static void
+do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
+{
+
+    size_t start_offs, end_offs;
+    struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(sub_pmc);
+    switch (action) {
+        case PBC_LOADED:
+            if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
+                PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
+                run_sub(interpreter, sub_pmc);
+            }
+            break;
+        default:
+            if (PObj_get_FLAGS(sub_pmc) & PObj_private4_FLAG) {
+                if ((interpreter->resume_flag & RESUME_INITIAL) &&
+                        interpreter->resume_offset == 0) {
+                    ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
+
+                    start_offs = ((ptrdiff_t) PMC_struct_val(sub_pmc) - code) /
+                        sizeof(opcode_t*);
+                    interpreter->resume_offset = start_offs;
+                    PObj_get_FLAGS(sub_pmc) &= ~PObj_private4_FLAG;
+                }
+                else {
+                    /* XXX which warn_class */
+                    Parrot_warn(interpreter, 0xff, "@MAIN sub not allowed\n");
+                }
+            }
+    }
+}
 
 static void
 do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
@@ -284,10 +316,7 @@ do_sub_pragmas(Parrot_Interp interpreter, struct PackFile *self, int action)
                     case enum_class_Closure:
                     case enum_class_Continuation:
                     case enum_class_Coroutine:
-                        if (PObj_get_FLAGS(sub_pmc) & PObj_private5_FLAG) {
-                            run_sub(interpreter, sub_pmc);
-                            PObj_get_FLAGS(sub_pmc) &= ~PObj_private5_FLAG;
-                        }
+                        do_1_sub_pragma(interpreter, sub_pmc, action);
                 }
         }
     }

@@ -25,7 +25,7 @@ This file implements the Parrot embedding interface.
 
 =item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
-Returns a new Parrot interpreter. 
+Returns a new Parrot interpreter.
 
 The first created interpreter (C<parent> is C<NULL>) is the last one
 to get destroyed.
@@ -688,7 +688,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     Parrot_on_exit(print_profile, interpreter);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
-    runops(interpreter,  0);
+    runops(interpreter,  interpreter->resume_offset);
 }
 
 
@@ -829,7 +829,7 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
     pf->cur_cs->base.size = 2;
     Parrot_loadbc(interpreter, pf);
     run_native = func;
-    runops(interpreter, 0);
+    runops(interpreter, interpreter->resume_offset);
 }
 
 /*
@@ -838,7 +838,7 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
 
 =head1 SEE ALSO
 
-F<include/parrot/embed.h> and F<docs/embed.pod>.     
+F<include/parrot/embed.h> and F<docs/embed.pod>.
 
 =head1 HISTORY
 

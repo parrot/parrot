@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 58;
+use Parrot::Test tests => 61;
 use Test::More;
 use Parrot::Config;
 
@@ -928,6 +928,51 @@ in sub2
 loaded
 in sub1
 back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma');
+.pcc_sub _first:
+    print "first\n"
+    invoke P1
+.pcc_sub @MAIN _main:
+    print "main\n"
+    end
+CODE
+main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'two @MAIN pragma');
+.pcc_sub _first:
+    print "first\n"
+    invoke P1
+.pcc_sub @MAIN _main:
+    print "main\n"
+    end
+.pcc_sub @MAIN _second:
+    print "second\n"
+    invoke P1
+CODE
+main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '@MAIN pragma call subs');
+.pcc_sub _first:
+    print "first\n"
+    invoke P1
+.pcc_sub _second:
+    print "second\n"
+    invoke P1
+.pcc_sub @MAIN _main:
+    print "main\n"
+    find_global P0, "_first"
+    invokecc
+    find_global P0, "_second"
+    invokecc
+    end
+CODE
+main
+first
+second
 OUTPUT
 
 unlink($temp, 'temp.pbc');
