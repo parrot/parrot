@@ -1352,19 +1352,20 @@ void
 list_mark(Interp *interpreter, List *list)
 {
     List_chunk *chunk;
-    PObj *p;
+    PObj **p;
     UINTVAL i;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
         pobject_lives(interpreter, (PObj *)chunk);
         if (list->item_type == enum_type_PMC ||
                 list->item_type == enum_type_STRING) {
-            if (!(chunk->flags & sparse))
-                for (i = 0; i < chunk->items; i++) {
-                    p = ((PObj **) PObj_bufstart(&chunk->data))[i];
-                    if (p)
-                        pobject_lives(interpreter, p);
+            if (!(chunk->flags & sparse)) {
+                p = ((PObj **) PObj_bufstart(&chunk->data));
+                for (i = 0; i < chunk->items; i++, ++p) {
+                    if (*p)
+                        pobject_lives(interpreter, *p);
                 }
+            }
 
         }
     }
