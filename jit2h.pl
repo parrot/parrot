@@ -81,7 +81,7 @@ while ($line = <IN>) {
     $asm .= $line;
 }
 
-open (IN,"jit/$cpuarch/lib.jit");
+open (IN,"jit/$cpuarch/lib.jit") or die "Can't open file jit/$cpuarch/lib.jit: $!";
 while ($line = <IN>) {
     next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
     if (!defined($function)) {
