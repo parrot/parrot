@@ -34,10 +34,6 @@ pmclass PerlString extends perlscalar {
         dest->cache.string_val = string_copy(INTERP,SELF->cache.string_val);
     }
 
-    void set_pmc (PMC* value) {
-        SELF->cache.string_val = VTABLE_get_string(INTERP, value);
-    }
-
     INTVAL get_integer () {
         STRING* s = (STRING*) SELF->cache.string_val;
         return string_to_int(s);

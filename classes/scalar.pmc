@@ -54,10 +54,6 @@ pmclass scalar abstract noinit {
         return 0;
     }
 
-    PMC* get_pmc () {
-        return SELF;
-    }
-
 
     /* The set methods merely make the appropriate part of the cache
       be what it should be, more complex behaviour is left as an
@@ -109,10 +105,6 @@ pmclass scalar abstract noinit {
 
     void set_string_same (PMC* value) {
         SELF->cache.struct_val = VTABLE_get_string(INTERP, value);
-    }
-
-    void set_pmc (PMC* value) {
-        SELF->cache.struct_val = VTABLE_get_pmc(INTERP, value);
     }
 
     void set_same (PMC* value) {

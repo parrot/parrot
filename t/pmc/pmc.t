@@ -2174,8 +2174,6 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
     set P0, 123
     set P1, 3.14
     set P2, "7.4x"
-    # setting a PerlUndef morphs it to an PerlInt
-    # so it should give a output similar to line 1 - XXX:leo
     set P3, 666
 
     new P10, .PerlInt
@@ -2237,10 +2235,10 @@ output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
 
     end
 CODE
-123:123.000000:123:
-3:3.140000:3.140000:
-7:7.400000:7.4x:
-666:666.000000:666:
+123:123:123:123
+3.140000:3.140000:3.140000:3.140000
+7.4x:7.4x:7.4x:7.4x
+666:666:666:666
 OUTPUT
 
 output_is(<<"CODE", <<OUTPUT, "exchange");
@@ -2334,25 +2332,25 @@ output_is(<<"CODE", <<OUTPUT, "arithmetic with PerlUndef and native floats");
         add P0, 10.0
         set N1, P0
         .fp_ne(N1, 10.0, ERROR)
-        print "ok 1\\n" 
+        print "ok 1\\n"
 
         new P0, .PerlUndef
         sub P0, 2.345
         set N1, P0
         .fp_ne(N1, -2.345, ERROR)
-        print "ok 2\\n" 
+        print "ok 2\\n"
 
         new P0, .PerlUndef
         mul P0, 32.5
         set N1, P0
         .fp_ne(N1, 0.000, ERROR)
-        print "ok 3\\n" 
+        print "ok 3\\n"
 
         new P0, .PerlUndef
         div P0, 0.5
         set N1, P0
         .fp_ne(N1, 0.000, ERROR)
-        print "ok 4\\n" 
+        print "ok 4\\n"
         branch DONE
 ERROR:  print "not ok\\n"
         print N1

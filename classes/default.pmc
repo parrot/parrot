@@ -55,7 +55,7 @@ pmclass default abstract noinit {
 	if (SELF->pmc_ext && SELF->metadata) {
           p_key = key_new_string(interpreter, key);
 	  return (VTABLE_get_pmc_keyed(interpreter, SELF->metadata, p_key));
-	} 
+	}
         else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
           PObj_constant_SET(undef);
@@ -454,7 +454,8 @@ pmclass default abstract noinit {
     }
 
     void set_pmc (PMC* value) {
-        SELF->cache.struct_val = VTABLE_get_pmc(INTERP, value);
+        SELF->cache.struct_val =
+	    VTABLE_get_pmc(INTERP, value)->cache.struct_val;
     }
 
     void set_pmc_keyed (PMC* key, PMC* value) {

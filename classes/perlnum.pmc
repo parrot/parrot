@@ -50,10 +50,6 @@ pmclass PerlNum extends perlscalar {
         return (INTVAL)(pmc->cache.num_val != 0.0);
     }
 
-    void set_pmc (PMC* value) {
-        SELF->cache.num_val = VTABLE_get_number(INTERP, value);
-    }
-
     void set_integer (PMC* value) {
 	DYNSELF.morph(enum_class_PerlInt);
         DYNSELF.set_integer(value);

@@ -40,10 +40,6 @@ pmclass PerlInt extends perlscalar {
         return (INTVAL)(pmc->cache.int_val != 0);
     }
 
-    void set_pmc (PMC* value) {
-        SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
-    }
-
     void set_integer_same (PMC * value) {
         SELF->cache.int_val = value->cache.int_val;
     }
@@ -230,7 +226,7 @@ pmclass PerlInt extends perlscalar {
                 }
                 break;
         }
-        /* If we're here, then we can assume that get_integer will return 
+        /* If we're here, then we can assume that get_integer will return
          *  something sensible
          */
         VTABLE_set_integer_native(INTERP, dest,

@@ -34,5 +34,25 @@ pmclass perlscalar abstract noinit extends scalar {
 	SELF->vtable = &Parrot_base_vtables[type];
 
     }
+
+    void set_pmc (PMC* value) {
+	DYNSELF.morph(value->vtable->base_type);
+	switch (value->vtable->base_type) {
+	    case enum_class_Boolean:
+	    case enum_class_PerlInt:
+		DYNSELF.set_integer_same(value);
+		break;
+	    case enum_class_PerlNum:
+		DYNSELF.set_number_same(value);
+		break;
+	    case enum_class_PerlString:
+		DYNSELF.set_string_same(value);
+		break;
+	    case enum_class_PerlUndef:
+		(void) VTABLE_get_pmc(interpreter, value);
+		break;
+	}
+    }
+
 }
 
