@@ -1330,7 +1330,6 @@
 [BASIC]		languages/BASIC/compiler/RT_platform.pasm
 [BASIC]		languages/BASIC/compiler/RT_platform_ANSIscreen.pasm
 [BASIC]		languages/BASIC/compiler/RT_platform_win32.pasm
-[BASIC]		languages/BASIC/compiler/RT_platform_ANSIscreen.pasm
 [BASIC]		languages/BASIC/compiler/RT_support.pasm
 [BASIC]		languages/BASIC/compiler/RT_userfunc.pasm
 [BASIC]		languages/BASIC/compiler/RT_variables.pasm
@@ -1340,8 +1339,8 @@
 [BASIC]		languages/BASIC/compiler/samples/eliza2.bas
 [BASIC]		languages/BASIC/compiler/samples/hanoi.bas
 [BASIC]		languages/BASIC/compiler/samples/newtrek.bas
-[BASIC]		languages/BASIC/compiler/samples/wumpus2.bas
 [BASIC]		languages/BASIC/compiler/samples/screen.bas
+[BASIC]		languages/BASIC/compiler/samples/wumpus2.bas
 [BASIC]		languages/BASIC/compiler/testrun.pl
 [BASIC]		languages/BASIC/compiler/testsuite.pl
 [BASIC]		languages/BASIC/interpreter/README.BASIC

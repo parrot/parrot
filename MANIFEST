@@ -1340,6 +1340,7 @@ languages/BASIC/compiler/samples/conn4.bas
 languages/BASIC/compiler/samples/eliza2.bas
 languages/BASIC/compiler/samples/hanoi.bas
 languages/BASIC/compiler/samples/newtrek.bas
+languages/BASIC/compiler/samples/screen.bas
 languages/BASIC/compiler/samples/wumpus2.bas
 languages/BASIC/compiler/testrun.pl
 languages/BASIC/compiler/testsuite.pl
