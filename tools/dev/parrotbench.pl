@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 
 use strict;
+use Config::IniFiles;
+use File::Basename;
+use File::Find;
+use File::Spec;
 use FindBin;
 use Getopt::Long;
 use Pod::Usage;
-use IO::File;
-use File::Find;
-use File::Spec;
-
-$|++;
+require POSIX;
 
 =head1 NAME
 
@@ -16,17 +16,19 @@ parrotbench - Parrot benchmark
 
 =head1 SYNOPSIS
 
-parrotbench [options]
+parrotbench.pl [options]
 
  Options:
-   -b -benchmarks     use benchmarks matching regex
-   -n -nobench        skip benchmarks matching regex
+   -b -benchmarks     use benchmarks matching regexes  (multiple)
    -c -conf           path to configuration file
    -d -directory      path to benchmarks directory
-   -e -executables    only use executables matching regex
    -h -? -help        display this help and exits
-   -l -list           list available benchmarks and exits
-   -t -time           show times instead of percentage
+   -list              list available benchmarks and exits
+   -m -method         method of time from times()
+                      1 $cuser + $csystem from times() (default)
+                      2 Real time using POSIX::times()
+   -n -nobench        skip benchmarks matching regexes (multiple)
+   -time              show times instead of percentage
 
 =head1 DESCRIPTION
 
@@ -34,149 +36,240 @@ Benchmark Parrot against other interpreters.
 
 =head1 CONFIGURATION
 
-You must specify pathes to executables in a configuration file.
+You must specify paths to executables in a configuration file.
 That file may be placed as parrotbench.conf in the same directory
 as parrotbench.pl or otherwise explicitly specified with the
--conf option.
+-conf option. You may set any command line option in the file with
+the exception of the configuration file name itself.  In the event
+you have specified an option both in the configuration file and the
+command line, the command line takes precedence.
 
 Here is an example parrotbench.conf:
+    [global]
+    directory = ../../examples/benchmarks
+    list      = 0
+    help      = 0
+    method    = 2
+    time      = 1
 
-  parrot: ./parrot:	.pasm .imc
-  parrotj: ./parrot -j:	.pasm .imc
-  parrotC: ./parrot -C:	.pasm .imc
-  perl: /usr/bin/perl58-th:	.pl
-  python: /usr/local/bin/python:	.py
-  ruby: /usr/local/bin/ruby:	.rb
+    [regexes]
+    include   = ^gc 
+    include   = ^oo 
+    exclude   = header
+    exclude   = waves
 
-=cut
+    [benchmark parrotj]
+    exe       = ../../parrot -j
+    type      = .pasm
+    type      = .imc
 
-my $benchmarks  = '.*';
-my $nobench     = '[^\d\D]';  # Need to make sure it fails if not user-defined
-my $conf        = "$FindBin::Bin/parrotbench.conf";
-my $directory   = "$FindBin::Bin/../../examples/benchmarks";
-my $executables = '.*';
-my $help        = 0;
-my $list        = 0;
-my $time        = 0;
+    [benchmark perl_585_th]
+    exe       = /usr/bin/perl585-th
+    type      = .pl
 
-GetOptions
-  'benchmarks=s'  => \$benchmarks,
-  'nobench=s'     => \$nobench,
-  'conf=s'        => \$conf,
-  'directory=s'   => \$directory,
-  'executables=s' => \$executables,
-  'help|?'        => \$help,
-  'list'          => \$list,
-  'time'          => \$time;
+    [benchmark python]
+    exe       = /usr/local/bin/python
+    type      = .py
 
-pod2usage 1 if $help;
+    [benchmark ruby]
+    exe       = /usr/bin/ruby
+    type      = .rb
 
-# Parse configuration file
-die "Configuration file \"$conf\" does not exist" unless -e $conf;
-my $file = new IO::File("< $conf")
-  or die "Unable to open configuration file \"$conf\"";
-my ( @names, %pathes, %suffixes, @suffixes );
-my $i = 0;
-while (<$file>) {    # This really should be a Config:: module
-    chomp;
-    if (/^\s*([^:]+):\s*([^:]+):\s*([^:]+)$/) {  # Death to .*
-        my $name     = $1;
-        my $path     = $2;
-        my $suffixes = $3;
-        if ( $name =~ /$executables/ ) {
-            push @names, $name;
-            foreach my $suffix ( $suffixes =~ /\.(\w*)/g ) {
-                $pathes{$name} = $path;
-                push @{ $suffixes{$suffix} }, $name;
-                push @{ $suffixes[$i] }, $suffix;
-            }
-            $i++;
-        }
-    }
-    if ( /^NOBENCH\s*=\s*(.+)$/ ) {   # Added because I couldn't pass to the shell correctly
-        $nobench = $1;                # This code probably shouldn't even exist
-        $nobench =~ tr/\015//d;       # Looks like it turned out to be a Cygwin/Win32 thing
-    }
-}
-$file->close;
+=head1 BUGS
 
-# Build lists
-my ( %list, %tree );
-find sub {
-    foreach my $suffix ( keys %suffixes ) {
-        if (/([\w-]+)\.$suffix/) {    # added - to make hyphens in file names work
-            my $benchmark = $1;
-            if ( $benchmark =~ /$benchmarks/ && $benchmark !~ /$nobench/ ) { # Allow skipping
-                $list{$benchmark}++;
-                foreach my $name ( @{ $suffixes{$suffix} } ) {
-                    $tree{$name}{$suffix}{$benchmark}++;
-                }
-            }
-        }
-    }
-}, $directory;
-die "No benchmarks found" unless keys %list;
+While every effort was made to ensure this script is portable,
+it is likely that it will break somewhere.
 
-# Print list
-if ($list) {
-    foreach my $benchmark ( sort keys %list ) {
-        print "$benchmark";
-        foreach my $name ( keys %tree ) {
-            foreach my $suffix ( keys %{ $tree{$name} } ) {
-                print ", $name($suffix)" if $tree{$name}{$suffix}{$benchmark};
-            }
-        }
-        print "\n";
-    }
-    exit;
-}
-
-# Benchmark
-print "WARNING: Falling back to results in cpu seconds,"
-  . " specify more executables!\n"
-  and $time++ unless $#names;
-$time
-  ? print "Numbers are cpu times in seconds. (lower is better)\n"
-  : print "Numbers are relative to the first one. (lower is better)\n";
-foreach my $i ( 0 .. $#names ) {
-    print "\t$names[$i]";
-}
-print "\n";
-my $null = File::Spec->devnull;
-foreach my $benchmark ( sort keys %list ) {
-    print "$benchmark";
-    my $base = 0;
-    foreach my $i ( 0 .. $#names ) {
-        my $found = 0;
-        foreach my $j ( 0 .. $#{ $suffixes[$i] } ) {
-            if (   $tree{ $names[$i] }{ $suffixes[$i][$j] }{$benchmark}
-                && $pathes{ $names[$i] } )
-            {
-                my ( $scuser, $scsys ) = (times)[ 2, 3 ];
-                system "$pathes{$names[$i]} $directory/"
-                  . "$benchmark.$suffixes[$i][$j] > $null";
-                my ( $ecuser, $ecsys ) = (times)[ 2, 3 ];
-                my $used = ( $ecuser - $scuser ) + ( $ecsys - $scsys );
-                $base ||= $used;
-                if ($time) {
-                    printf "\t%.3fs", $used;
-                }
-                else {
-                    printf "\t%d%%", $used / ( $base / 100 );
-                }
-                $found++;
-                last;
-            }
-        }
-        print "\t-" unless $found;
-    }
-    print "\n";
-}
+If a benchmark has multiple extensions associated with the same
+executable, the last one will be used.  For instance, with the
+configuration file above, foo.imc would be selected over foo.pasm
 
 =head1 AUTHOR
+
+Joshua Gatcomb, C<Limbic_Region_2000@Yahoo.com>
+
+Originally written by:
 
 Sebastian Riedel, C<sri@oook.de>
 
 =cut
 
-1;
+# Create Default Configuration 
+my %cfg = (
+    config_file  => File::Spec->catdir( $FindBin::Bin , 'parrotbench.conf' ),
+    bench_path   => undef,
+    list_only    => undef,
+    use_times    => undef,
+    display_help => undef,
+    method       => undef,
+    run_bench    => [],
+    skip_bench   => [],
+);
+
+# Read Command Line Options
+GetOptions(
+    'conf=s'       => \$cfg{config_file},
+    'directory=s'  => \$cfg{bench_path},
+    'list'         => \$cfg{list_only},
+    'time'         => \$cfg{use_times},
+    'help|?'       => \$cfg{display_help},
+    'method=s'     => \$cfg{method},
+    'benchmarks=s' => $cfg{run_bench},
+    'nobench=s'    => $cfg{skip_bench},
+);
+
+# Read Configuration File
+die
+    'Unable to access configuration file ',
+    $cfg{config_file} unless -r $cfg{config_file};
+
+my $ini = Config::IniFiles->new( -file => $cfg{config_file} );
+
+# Merge Configuration
+if ( ! defined $cfg{bench_path} ) {
+    $cfg{bench_path} = $ini->val( global => 'directory' );
+}
+if ( ! defined $cfg{list_only} ) {
+    $cfg{list_only} = $ini->val( global => 'list' );
+}
+if ( ! defined $cfg{use_times} ) {
+    $cfg{use_times} = $ini->val( global => 'time' );
+}
+if ( ! defined $cfg{display_help} ) {
+    $cfg{display_help} = $ini->val( global => 'help' );
+}
+
+pod2usage 1 if $cfg{display_help};
+
+if ( ! defined $cfg{method} ) {
+    $cfg{method} = $ini->val( global => 'method', 1 );
+}
+
+if ( ! @{ $cfg{run_bench} } ) {
+    my @regexes = grep defined, $ini->val( regexes => 'include');
+    @{ $cfg{run_bench} } = @regexes ? @regexes : '[\d\D]';
+}
+if ( ! @{ $cfg{skip_bench} } ) {
+    my @regexes = grep defined, $ini->val( regexes => 'exclude');
+    @{ $cfg{skip_bench} } = @regexes ? @regexes : '[^\d\D]';
+}
+
+# Move to the benchmark directory
+if ( defined $cfg{bench_path} ) {
+    chdir $cfg{bench_path} or die "Unable to cd to $cfg{bench_path}";
+}
+else {
+    chdir $FindBin::Bin or die "Unable to cd to directory of $0";
+    chdir File::Spec->catdir(
+        File::Spec->updir,
+        File::Spec->updir,
+        'examples',
+        'benchmarks'
+    ) or die "Unable to find the benchmark directory";
+}
+
+# Frequently Used Variables
+my %bench;
+my @section = sort $ini->GroupMembers( 'benchmark' );
+my @program = map { /^benchmark\s+(.*)$/ } @section;
+my %suffix;
+$suffix{ $_ } = [ map quotemeta, $ini->val($_, 'type') ] for @section;
+my $ticks = POSIX::sysconf( &POSIX::_SC_CLK_TCK );
+my %Get_Time = (
+    1 => sub { my @times = times();  return $times[2] + $times[3] },
+    2 => sub { return ( POSIX::times() )[0] / $ticks },
+);
+
+# Find And Build Benchmarks
+find sub {
+    my $pass;
+    for my $regex ( @{ $cfg{run_bench} } ) {
+        $pass++ and last if /$regex/;
+    }
+    return if ! $pass;
+    my $fail;
+    for my $regex ( @{ $cfg{skip_bench} } ) {
+        $fail++ and last if /$regex/;
+    }
+    return if $fail;
+    for my $index ( 0 .. $#section ) {
+        my ($name, $p, $ext) = fileparse($_, @{ $suffix{ $section[ $index ] } });
+        next if ! $ext;
+        $bench{ $name }{ $program[ $index ] } = $ext;
+    }
+}, File::Spec->curdir();
+die "No benchmarks found" if ! keys %bench;
+
+# List Names Of Benchmarks With Pretty Output
+if ( $cfg{list_only} ) {
+    my @rows;
+    push @rows, [ 'Benchmark', @program ];
+    for my $name ( sort keys %bench ) {
+        push @rows, [ $name, map { $bench{$name}{$_} || '-' } @program ];
+    }
+    my @max;
+    for ( 0 .. @program ) {
+        for my $row ( @rows ) {
+            Longest( $max[$_] , length $row->[$_] );
+        }
+    }
+    for my $col ( @rows ) {
+        print map { sprintf("%-$max[$_]s  ", $col->[$_]) } 0 .. $#$col; 
+        print "\n";
+    }
+    exit;
+}
+
+# Run The Benchmarks With Pretty Output
+if ( ! $cfg{use_times} && @program < 2 ) {
+    print "WARNING: Switching percentage to time - not enough executables\n";
+    $cfg{use_times} = 1;
+}
+if ( $cfg{use_times} ) {
+    my $type = $cfg{method} == 1 ? 'CPU' : 'wall-clock';
+    print "Times are in $type seconds.  (lower is better\n";
+}
+else {
+    print "Numbers are relative to the first one. (lower is better)\n";
+}
+print "\n";
+
+open (COPYOUT, ">&STDOUT") or die "Unable to copy STDOUT";
+open (STDOUT, '>', File::Spec->devnull) or die "Unable to redirect STDOUT";
+select COPYOUT;
+$| = 1;
+
+my @max = $cfg{method} == 1 ? (5) x @program : (6) x @program;
+Longest( $max[0], length $_ ) for 'Benchmark', keys %bench;
+Longest( $max[ $_ + 1 ] , length $program[$_] ) for 0 .. $#program;
+printf("%-$max[0]s  ", 'Benchmark');
+printf("%-$max[$_ + 1]s  ", $program[$_]) for 0 .. $#program;
+
+for my $name ( sort keys %bench ) {
+    my $base = 0;
+    printf("\n%-$max[0]s  ", $name);
+    for ( 0 .. $#section ) {
+        my ($prog, $sect) = ($program[$_], $section[$_]);
+        if ( $bench{ $name }{ $prog } ) {
+            my $start = $Get_Time{ $cfg{method} }->();
+            system(
+                $ini->val($sect, 'exe') . " " . $name . $bench{$name}{$prog}
+            );
+            my $stop = $Get_Time{ $cfg{method} }->();
+            my $used = $stop - $start;
+            $base ||= $used;
+            printf("%-$max[$_ + 1]s  ", $cfg{use_times}
+                 ? sprintf("%.3f", $used)
+                 : sprintf( "%d%%", $used / ($base / 100) )
+            );
+        }
+        else {
+            printf ("%-$max[$_ + 1]s  ", '-');
+        }
+    }
+}
+
+sub Longest {
+    $_[0] = $_[1] and return if ! defined $_[0];
+    $_[0] = $_[1] if $_[1] > $_[0];
+}
