@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "imc.h"
 
 /*
@@ -314,7 +315,7 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
         if (sub->pcc_sub->prototyped ||
                 (arg->set == 'P' && next[2] < 15)) {
             /*
-             * unprototyped
+             * prototyped
              */
             /* if arg is constant, set register */
             switch (arg->type) {
@@ -336,6 +337,7 @@ lazy:
                             regs[0] = reg;
                             regs[1] = arg;
                             ins = insINS(interpreter, ins, "set", regs, 2);
+                            sub->pcc_sub->ret[i]->used = reg;
                             break;
                         }
                     }
@@ -345,6 +347,7 @@ lazy:
                         for (j = 0; j < 4; j++)
                             if (arg->set == types[j]) {
                                 arg->reg->want_regno = next[j];
+                                sub->pcc_sub->ret[i]->used = arg->reg;
                                 break;
                             }
                             /* TODO for now just emit a register move */
@@ -397,11 +400,19 @@ overflow:
     regs[0] = reg;
     ins = insINS(interpreter, ins, "invoke", regs, arg_count);
     /*
+     * move the pcc_sub structure to the invoke
+     */
+    if (arg_count == 0)
+        ins->r[0] = reg;
+    reg->pcc_sub = sub->pcc_sub;
+    sub->pcc_sub = NULL;
+
+    /*
      * mark the invoke instruction's PCC sub type
      */
-    ins->type |= arg_count == 0 ? ITPCCYIELD : ITPCCSUB;
+    ins->type |= arg_count == 0 ? ITPCCYIELD : (ITPCCRET|ITPCCSUB);
     if (arg_count == 0) {
-        /* TODO optimize this later */
+        /* optimize this later */
         ins = insINS(interpreter, ins, "restoretop", regs, 0);
     }
 }
@@ -494,7 +505,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
     SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
     int next[4], i, j, n;
     char types[] = "ISPN";
-    Instruction *tmp;
+    Instruction *tmp, *call_ins;
     int need_cc;
     char buf[128];
     SymReg *p3;
@@ -506,6 +517,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
         debug(DEBUG_OPT1, "found tail call %s \n", ins_string(ins));
     for (i = 0; i < 4; i++)
         next[i] = 5;
+    call_ins = ins;
     sub = ins->r[0];
     p3 = NULL;
     n_p3 = 0;
@@ -539,6 +551,9 @@ lazy:
                             regs[0] = reg;
                             regs[1] = arg;
                             ins = insINS(interpreter, ins, "set", regs, 2);
+                            /* remember reg for life analysis */
+                            sub->pcc_sub->args[i]->used = reg;
+
                             break;
                         }
                     }
@@ -549,6 +564,7 @@ lazy:
                         for (j = 0; j < 4; j++)
                             if (arg->set == types[j]) {
                                 arg->reg->want_regno = next[j];
+                                sub->pcc_sub->args[i]->used = arg->reg;
                                 break;
                             }
                         goto lazy;
@@ -650,6 +666,13 @@ move_cc:
     ins = insINS(interpreter, ins, need_cc ? "invokecc" : "invoke", regs, 0);
     ins->type |= ITPCCSUB;
     /*
+     * move the pcc_sub structure to the invoke
+     */
+    ins->r[0] = mk_pasm_reg(str_dup("P0"));
+    ins->r[0]->pcc_sub = sub->pcc_sub;
+    sub->pcc_sub = NULL;
+    sub = ins->r[0];
+    /*
      * locate return label,
      * we must have one or the parser would have failed
      */
@@ -679,11 +702,7 @@ move_cc:
                     regs[0] = arg;
                     regs[1] = reg;
                     ins = insINS(interpreter, ins, "set", regs, 2);
-                    /* the register is coming out of the sub,
-                     * so mark it as so
-                     */
-                    ins->flags |= 1 << (16 + 1);
-                    ins->flags &= ~(1 << 1);
+                    sub->pcc_sub->ret[i]->used = reg;
                     break;
                 }
             }
@@ -701,6 +720,7 @@ move_cc:
 /*
  * optimize register save op (savetop/restoretop)
  * for PCC
+ * TODO saveall
  */
 static void
 optc_savetop(Parrot_Interp interpreter, Instruction *ins)
@@ -771,7 +791,6 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
 /*
  * special peephole optimizer for code generated mainly by
  * above functions
- * TODO register save/restore ops
  */
 void
 pcc_optimize(Parrot_Interp interpreter)
@@ -818,6 +837,67 @@ pcc_optimize(Parrot_Interp interpreter)
             }
         }
     }
+}
+
+static int
+pcc_args(Instruction* ins, SymReg* r)
+{
+    int i;
+    SymReg * sub;
+    struct pcc_sub_t * pcc;
+
+    sub = ins->r[0];
+    assert(sub && sub->pcc_sub);
+    pcc = sub->pcc_sub;
+    for (i = 0; i < pcc->nargs; i++)
+        if (r == pcc->args[i]->used)
+            return 1;
+    return 0;
+}
+
+static int
+pcc_ret(Instruction* ins, SymReg* r)
+{
+    int i;
+    SymReg * sub;
+    struct pcc_sub_t * pcc;
+
+    sub = ins->r[0];
+    assert(sub && sub->pcc_sub);
+    pcc = sub->pcc_sub;
+    for (i = 0; i < pcc->nret; i++)
+        if (r == pcc->ret[i]->used)
+            return 1;
+    return 0;
+}
+
+int
+pcc_sub_writes(Instruction* ins, SymReg* r)
+{
+    if (ins->type & ITPCCRET)
+        return 0;
+    return pcc_ret(ins, r) || pcc_args(ins, r);
+}
+
+int
+pcc_sub_reads(Instruction* ins, SymReg* r)
+{
+    SymReg * sub, *arg;
+    struct pcc_sub_t * pcc;
+
+    sub = ins->r[0];
+    assert(sub && sub->pcc_sub);
+    pcc = sub->pcc_sub;
+    if ( (arg = pcc->cc) )
+        if (arg->reg == r)
+            return 1;
+    if (r->set == 'I' && r->color <= 4)
+        return 1;
+    if (r->set == 'P' && r->color <= 3)
+        return 1;
+    if (ins->type & ITPCCRET)
+        return pcc_ret(ins, r);
+    return pcc_args(ins, r);
 }
 
 /*

@@ -237,6 +237,8 @@ int instruction_reads(Instruction* ins, SymReg* r) {
                     return 1;
         }
     }
+    if (ins->type & ITPCCSUB)
+        return pcc_sub_reads(ins, r);
 
     return 0;
 }
@@ -257,6 +259,8 @@ int instruction_writes(Instruction* ins, SymReg* r) {
                 return 1;
     }
 
+    if (ins->type & ITPCCSUB)
+        return pcc_sub_writes(ins, r);
     return 0;
 }
 

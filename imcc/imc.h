@@ -69,6 +69,9 @@ void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);
 void expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins);
 void pcc_optimize(Parrot_Interp interpreter);
 
+int pcc_sub_reads(Instruction* ins, SymReg* r);
+int pcc_sub_writes(Instruction* ins, SymReg* r);
+
 /* This should be common with Cola */
 
 char *str_dup(const char *);

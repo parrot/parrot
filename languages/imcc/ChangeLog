@@ -1,3 +1,8 @@
+- 2003-08-11	leo
+
+	* PCC: approaching life analysis for subroutine in/out variables
+	       this breaks some imcpasm tests
+
 - 2003-08-10	leo
 
 	* PCC: experimental tail call optimization with -Oc

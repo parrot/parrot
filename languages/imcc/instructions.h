@@ -3,7 +3,7 @@
 
 enum INSTYPE {    /*instruction type can be   */
     ITBRANCH = 0x10000, /*            branch        */
-    ITOP =     0x20000, /*            normal op     */
+    ITPCCRET = 0x20000, /*            PCC sub return */
     ITCALL =   0x40000, /*            function call */
     ITLABEL =  0x80000, /*            label         */
     ITALIAS = 0x100000, /*   set P,P  */

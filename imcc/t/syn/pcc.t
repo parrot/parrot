@@ -65,7 +65,9 @@ output_is(<<'CODE', <<'OUT', "tail recursive sub");
    dec count
    invoke
 fin:
-   invoke P1
+   .pcc_begin_return
+    .return product
+   .pcc_end_return
 .end
 
 CODE
@@ -94,7 +96,8 @@ output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, P param");
     .param PerlUndef b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -123,7 +126,8 @@ output_is(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
     .param PerlUndef b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -151,7 +155,8 @@ output_is(<<'CODE', <<'OUT', "proto call, proto sub, invokecc, S param");
     .param string b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -179,7 +184,8 @@ output_is(<<'CODE', <<'OUT', "proto call, nonproto sub, invokecc, S param");
     .param string b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -207,7 +213,8 @@ output_is(<<'CODE', <<'OUT', "proto call, unproto sub, invokecc, S param");
     .param string b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -235,7 +242,8 @@ output_is(<<'CODE', <<'OUT', "non_proto call, unproto sub, invokecc, S param");
     .param string b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -261,7 +269,8 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception");
     .param string l
     print k
     print l
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 wrong param count
@@ -294,7 +303,8 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception, call 2 subs");
     .param string l
     print k
     print l
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 
 .pcc_sub _sub2
@@ -302,7 +312,8 @@ output_is(<<'CODE', <<'OUT', "wrong param count exception, call 2 subs");
     .param string l
     print k
     print l
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -341,7 +352,8 @@ ok:
     .param string l
     print k
     print l
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok
@@ -364,7 +376,8 @@ output_is(<<'CODE', <<'OUT', "wrong param type exception");
     .param int k
     print k
     print "n"
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 wrong param type
@@ -390,7 +403,8 @@ output_is(<<'CODE', <<'OUT', "wrong param type exception - 2 params");
     .param string l
     print k
     print l
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 wrong param type
@@ -492,8 +506,6 @@ output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
 .pcc_sub _sub
     .param string a
     .param string b
-    .local Continuation retcc
-    retcc = P1
     print a
     print b
     .local Sub sub
@@ -508,14 +520,16 @@ output_is(<<'CODE', <<'OUT', "sub calling another sub, SRegs");
     .pcc_end
     print a
     print b
-    invoke retcc
+   .pcc_begin_return
+   .pcc_end_return
 .end
 .pcc_sub _sub2
     .param string a
     .param string b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
@@ -547,8 +561,6 @@ output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
 .pcc_sub _sub
     .param PerlUndef a
     .param PerlUndef b
-    .local Continuation retcc
-    retcc = P1
     print a
     print b
     .local Sub sub
@@ -565,14 +577,16 @@ output_is(<<'CODE', <<'OUT', "sub calling another sub, PRegs");
     .pcc_end
     print a
     print b
-    invoke retcc
+   .pcc_begin_return
+   .pcc_end_return
 .end
 .pcc_sub _sub2
     .param PerlUndef a
     .param PerlUndef b
     print a
     print b
-    invoke P1
+   .pcc_begin_return
+   .pcc_end_return
 .end
 CODE
 ok 1
