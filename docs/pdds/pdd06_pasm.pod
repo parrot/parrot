@@ -270,6 +270,7 @@ this will copy the pointer in S1 into S0, leaving B<both> registers
 pointing at the same string.
 
 =item clone Px, Py
+
 =item clone Sx, xy
 
 Performs a "deeper" copy of y into x, using the vtable appropriate
