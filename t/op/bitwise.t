@@ -49,6 +49,7 @@ output_is(<<'CODE', <<'OUTPUT', "and_i");
 	print	"\n"
 	print	I0
 	print	"\n"
+        end
 CODE
 4
 4
@@ -70,6 +71,7 @@ output_is(<<'CODE', <<'OUTPUT', "not_i");
 	print	"\n"
 	print	I0
 	print	"\n"
+        end
 CODE
 51
 51
