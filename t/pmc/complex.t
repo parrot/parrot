@@ -181,6 +181,7 @@ output_is(<<'CODE', <<'OUTPUT', "add");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
+        new P3, .Integer
 
     set P0, "1 + i"
     add P0, P0, P0
@@ -219,6 +220,15 @@ output_is(<<'CODE', <<'OUTPUT', "add");
     print P1
     print "\n"
 
+    set P0, "3 + 3i"
+    set P3, -3
+    add P1, P0, P3
+    print P1
+    print "\n"
+    add P1, P3, P0
+    print P1
+    print "\n"
+
     end
 CODE
 2+2i
@@ -229,12 +239,15 @@ CODE
 5.3+1i
 5+5i
 0+2i
+0+3i
+0+3i
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "subtract");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
+        new P3, .Integer
 
     set P0, "1 + i"
     sub P0, P0, P0
@@ -273,6 +286,15 @@ output_is(<<'CODE', <<'OUTPUT', "subtract");
     print P1
     print "\n"
 
+    set P0, "1024 - 3i"
+    set P3, 2048
+    sub P1, P0, P3
+    print P1
+    print "\n"
+    sub P1, P3, P0
+    print P1
+    print "\n"
+
     end
 CODE
 0+0i
@@ -283,6 +305,8 @@ CODE
 2-4i
 2-2i
 1.8+1i
+-1024-3i
+1024-3i
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "multiply");
