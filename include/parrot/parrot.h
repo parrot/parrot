@@ -76,6 +76,7 @@ typedef void REGEX;
 #include "parrot/io.h"
 #include "parrot/op.h"
 #include "parrot/events.h"
+#include "parrot/stacks.h"
 
 #endif
 

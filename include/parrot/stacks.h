@@ -18,9 +18,6 @@
 #define STACK_CHUNK_DEPTH 256
 
 struct Stack_Entry {
-    INTVAL entry_type;
-    INTVAL flags;
-    void (*cleanup)(struct Stack_Entry *);
     union {
         FLOATVAL num_val;
         INTVAL int_val;
@@ -28,9 +25,12 @@ struct Stack_Entry {
         STRING *string_val;
         void *generic_pointer;
     } entry;
+    INTVAL entry_type;
+    INTVAL flags;
+    void (*cleanup)(struct Stack_Entry *);
 };
 
-struct Stack {
+struct StackChunk {
   INTVAL used;
   INTVAL free;
   struct StackChunk *next;
@@ -38,9 +38,19 @@ struct Stack {
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
-struct Stack_Entry *push_generic_entry(struct Perl_Interp *, void *thing, INTVAL type, void *cleanup);
-void *pop_generic_entry(struct Perl_Interp *, void *where, INTVAL type);
-void toss_generic_entry(struct Perl_Interp *, INTVAL type);
+struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, void *thing, INTVAL type, void *cleanup);
+void *pop_generic_entry(struct Parrot_Interp *, void *where, INTVAL type);
+void toss_generic_entry(struct Parrot_Interp *, INTVAL type);
+
+#define STACK_ENTRY_INT 1
+#define STACK_ENTRY_FLOAT 2
+#define STACK_ENTRY_STRING 3
+#define STACK_ENTRY_PMC 4
+#define STACK_ENTRY_POINTER 5
+
+#define STACK_ENTRY_CLEANUP 0x01
+
+#define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
 
 #endif
 
