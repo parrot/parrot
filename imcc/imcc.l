@@ -217,6 +217,8 @@ SP              [ ]
 "dec"           return(DEC);
 "float"         return(FLOATV);
 "new"           return(NEW);
+"newclosure"    return(NEWCLOSURE);
+"newsub"        return(NEWSUB);
 "defined"       return(DEFINED);
 "addr"          return(ADDR);
 "global"        return(GLOBAL);

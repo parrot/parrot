@@ -65,6 +65,66 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     return INS(interpreter, "new", fmt, regs, nargs,0, emit);
 }
 
+/*
+ * Variation of iNEW() specific for subs/closures/etc. and the newsub opcode
+ * Allows IMCC to take advantage of the newsub opcode which is much more
+ * efficient than new/set_addr combination. This makes PIR orthogonal
+ * between new and newsub.
+ *
+ *  Example:
+ *   P0 = newsub _f         ::=      newsub, P0, .Sub, _f
+ *   P0 = newclosure _c     ::=      newsub, P0, .Closure, _c
+ *
+ * XXX: Support the return continuation form of newsub
+ * XXX: IMCC is really due for a refactor. :(
+ */
+
+Instruction *
+iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, const char * type,
+        SymReg *init, int emit)
+{
+    char fmt[256];
+    SymReg *regs[IMCC_MAX_REGS];
+    SymReg *pmc;
+    int i, nargs;
+    int pmc_num;
+
+    if (!strcmp(type, "Sub")) {
+
+    }
+    else if(!strcmp(type, "Closure")) {
+
+    }
+    else if(!strcmp(type, "Continuation")) {
+
+    }
+    else fataly(1, sourcefile, line, "Invalid PMC type '%s' for newsub op\n", type);
+
+    pmc_num = pmc_type(interpreter,
+            string_from_cstring(interpreter, *type == '.' ?type+1:type, 0));
+
+    sprintf(fmt, "%d", pmc_num);
+    pmc = mk_const(str_dup(fmt), 'I');
+
+    if (pmc_num <= 0)
+        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", type);
+    sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
+    r0->usage = U_NEW;
+
+    regs[0] = r0;
+    regs[1] = pmc;
+    if (init) {
+        regs[2] = init;
+        nargs = 3;
+    }
+    else
+        nargs = 2;
+    i = nargs;
+    while (i < IMCC_MAX_REGS)
+	regs[i++] = NULL;
+    return INS(interpreter, "newsub", fmt, regs, nargs,0, emit);
+}
+
 void
 op_fullname(char * dest, const char * name, SymReg * args[],
         int narg, int keyvec) {

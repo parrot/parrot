@@ -215,7 +215,7 @@ static char * inv_op(char *op) {
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW END SAVEALL RESTOREALL
+%token <t> CALL GOTO ARG FLATTEN_ARG IF UNLESS NEW NEWSUB NEWCLOSURE END SAVEALL RESTOREALL
 %token <t> NAMESPACE ENDNAMESPACE CLASS ENDCLASS FIELD METHOD
 %token <t> SUB SYM LOCAL CONST
 %token <t> INC DEC GLOBAL_CONST
@@ -619,7 +619,11 @@ assignment:
     |  target '=' var '[' keylist ']'   { $$ = iINDEXFETCH(interp, $1, $3, $5); }
     |  var '[' keylist ']' '=' var	{ $$ = iINDEXSET(interp, $1, $3, $6); }
     |  target '=' NEW classname COMMA var { $$ = iNEW(interp, $1, $4, $6, 1); }
-    |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, NULL,1); }
+    |  target '=' NEW classname		{ $$ = iNEW(interp, $1, $4, NULL, 1); }
+    |  target '=' NEWSUB IDENTIFIER     { $$ = iNEWSUB(interp, $1, "Sub",
+                                                 mk_address($4, U_add_once), 1); }
+    |  target '=' NEWCLOSURE IDENTIFIER { $$ = iNEWSUB(interp, $1, "Closure",
+                                                 mk_address($4, U_add_once), 1); }
     |  target '=' DEFINED var	        { $$ = MK_I(interp, "defined",2, $1,$4); }
     |  target '=' DEFINED var '[' keylist ']' { keyvec=KEY_BIT(2);
                                      $$ = MK_I(interp, "defined", 3, $1, $4, $6);}
@@ -631,6 +635,8 @@ assignment:
     |  GLOBAL string '=' var	{ $$ = MK_I(interp, "store_global",2, $2,$4); }
     |  NEW                              { expect_pasm = 1; }
           pasm_args	    { $$ = INS(interp, "new",0,regs,nargs,keyvec,1); }
+    |  NEWSUB                           { expect_pasm = 1; }
+          pasm_args	    { $$ = INS(interp, "newsub",0,regs,nargs,keyvec,1); }
     |  DEFINED target COMMA var   { $$ = MK_I(interp, "defined", 2, $2, $4); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
                                   $$ = MK_I(interp, "defined", 3, $2, $4, $6);}
