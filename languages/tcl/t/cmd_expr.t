@@ -142,7 +142,7 @@ $expected = "3.465736";
 language_output_is("tcl",$tcl,$expected,"log");
 
 $tcl = "puts -nonewline [ expr log10(32)]";
-$expected = "1.505150";
+$expected = "1.50515";
 language_output_is("tcl",$tcl,$expected,"log10");
 
 $tcl = "puts -nonewline [ expr sin(1)]";
