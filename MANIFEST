@@ -1684,6 +1684,7 @@ t/pmc/perlhash.t
 t/pmc/perlint.t
 t/pmc/perlstring.t
 t/pmc/pmc.t
+t/pmc/prop.t
 t/pmc/scratchpad.t
 t/pmc/sub.t
 t/src/basic.t
