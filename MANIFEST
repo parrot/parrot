@@ -285,6 +285,8 @@ examples/assembly/local_label.pasm                [main]doc
 examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
+examples/assembly/nanoforth.pasm                  [main]doc
+examples/assembly/nanoforth2.pasm                 [main]doc
 examples/assembly/ncurses_life.imc		  [main]doc
 examples/assembly/pcre.imc                        [main]doc
 examples/assembly/pmcmops.pasm                    [main]doc

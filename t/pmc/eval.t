@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Test::More;
 
 # PASM1 is like PASM but appends an C<end> opcode
@@ -81,3 +81,32 @@ bar
 fin
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
+_main:
+    load_bytecode "examples/assembly/nanoforth2.pasm"
+    print "ok 1\n"
+    find_global P0, "_nano_forth_compiler"
+    defined I0, P0
+    if I0, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    set S5, "1 7 + . 2 3 - .\n"
+    pushp
+    invokecc
+    popp
+    set S5, ": i 1 + ; 5 i .\n"
+    pushp
+    invokecc
+    popp
+    set S5, ": i 1 + ; : j i i ; 9 j .\n"
+    invokecc
+    end
+CODE
+ok 1
+ok 2
+8
+-1
+6
+11
+OUTPUT
