@@ -25,12 +25,9 @@ sub runstep {
     }
     cc_clean();
 
-    my $f;
-    Configure::Data->set(
-	memalign          => ($f = $test2 ? 'posix_memalign' :
-			     $test ?  'memalign' :
-			     undef)
-    );
+    my $f = $test2 ? 'posix_memalign' :
+            $test  ? 'memalign'       : '';
+    Configure::Data->set( memalign => $f );
     print $test ? " (Yep:$f) " : " (no) "
 }
 
