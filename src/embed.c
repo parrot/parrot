@@ -56,49 +56,24 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 {
-    /* XXX This ugly mess ought to be cleanupable. */
-    int fd;
-    struct stat file_stat;
-
-    opcode_t program_size;
+    size_t program_size;
     char *program_code;
     struct PackFile *pf;
+    ParrotIO * io = NULL;
+#ifdef HAS_HEADER_SYSSTAT
+    struct stat file_stat;
+#endif
+#ifdef HAS_HEADER_SYSMMAN
+    int fd;
+#endif    
 
-    if (filename == NULL || strcmp(filename, "-") == 0) {       /* read from STDIN */
-        char *cursor;
-        INTVAL read_result;
-
-        program_size = 0;
-
-        program_code = (char *)malloc((unsigned)program_size + 1024);
-        if (NULL == program_code) {
-            fprintf(stderr,
-                    "Parrot VM: Could not allocate buffer to read packfile from stdin.\n");
-            return NULL;
-        }
-        cursor = (char *)program_code;
-
-        while ((read_result = read(0, cursor, 1024)) > 0) {
-            program_size += read_result;
-            program_code =
-                realloc(program_code, (unsigned)program_size + 1024);
-
-            if (NULL == program_code) {
-                fprintf(stderr,
-                        "Parrot VM: Could not reallocate buffer while reading packfile from stdin.\n");
-                return NULL;
-            }
-
-            cursor = (char *)program_code + program_size;
-        }
-
-        if (read_result < 0) {
-            fprintf(stderr,
-                    "Parrot VM: Problem reading packfile from stdin.\n");
-            return NULL;
-        }
-    }
-    else {
+    if (filename == NULL || strcmp(filename, "-") == 0) {
+        /* read from STDIN */
+        io = PIO_STDIN(interpreter);
+    } else {
+#ifdef HAS_HEADER_SYSSTAT
+        /* if we have stat(), get the actual file size so we can read it
+         * in one chunk. */
         if (stat(filename, &file_stat)) {
             fprintf(stderr, "Parrot VM: Can't stat %s, code %i.\n", filename,
                     errno);
@@ -110,6 +85,63 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             return NULL;
         }
 
+        program_size = file_stat.st_size;
+#else
+        /* otherwise, we will read it 1k at a time */
+        program_size = 0;  
+#endif
+
+#ifndef HAS_HEADER_SYSMMAN
+        io = PIO_open(interpreter, filename, "<");
+        if (!io) {
+            fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
+                    errno);
+            return NULL;
+        }
+#else
+        /* the file wasn't from stdin, and we have mmap available- use it */
+        io = NULL;
+#endif        
+    }
+
+    /* if we've opened a file (or stdin) with PIO, read it in */
+    if (io != NULL) {
+        char *cursor;
+        INTVAL read_result;
+        
+        program_code = (char *)malloc(program_size + 1024);
+        if (NULL == program_code) {
+            fprintf(stderr,
+                    "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
+            return NULL;
+        }
+        cursor = (char *)program_code;
+
+        while ((read_result = PIO_read(interpreter, io, cursor, 1024)) > 0) {
+            program_size += read_result;
+            program_code =
+                realloc(program_code, program_size + 1024);
+
+            if (NULL == program_code) {
+                fprintf(stderr,
+                        "Parrot VM: Could not reallocate buffer while reading packfile from PIO.\n");
+                return NULL;
+            }
+
+            cursor = (char *)program_code + program_size;
+        }
+
+        if (read_result < 0) {
+            fprintf(stderr,
+                    "Parrot VM: Problem reading packfile from PIO.\n");
+            return NULL;
+        }
+    }
+    else {
+        /* if we've gotten here, we opted not to use PIO to read the file.
+         * use mmap */
+        
+#ifdef HAS_HEADER_SYSMMAN
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
             fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
@@ -117,23 +149,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
             return NULL;
         }
 
-        program_size = file_stat.st_size;
-
-#ifndef HAS_HEADER_SYSMMAN
-
-        program_code = (char *)mem_sys_allocate(program_size);
-        read(fd, (void *)program_code, program_size);
-
-        if (!program_code) {
-            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n",
-                    filename, errno);
-            return NULL;
-        }
-
-#else
-
         program_code =
-            mmap(0, (unsigned)program_size, PROT_READ, MAP_SHARED, fd,
+            mmap(0, program_size, PROT_READ, MAP_SHARED, fd,
                  (off_t)0);
 
         if (!program_code) {
@@ -141,18 +158,24 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
                     filename, errno);
             return NULL;
         }
-
+#else
+        fprintf(stderr, "Parrot VM: uncaught error occurred reading file or mmap not available.\n");
+        return NULL;
 #endif
-
     }
 
     pf = PackFile_new();
 
     if (!PackFile_unpack
-        (interpreter, pf, (opcode_t *)program_code, (unsigned)program_size)) {
+        (interpreter, pf, (opcode_t *)program_code, program_size)) {
         fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }
+
+#ifdef HAS_HEADER_SYSMMAN
+    munmap(program_code, (size_t)program_size);
+    close(fd);
+#endif
 
     return pf;
 }
