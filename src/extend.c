@@ -43,6 +43,15 @@ Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP interp, Parrot_PMC pmc) {
     return VTABLE_get_integer(interp, pmc);
 }
 
+/*=for api extend Parrot_PMC_get_intval
+ *
+ * Return the signed integer value of the value in the PMC
+ */
+
+Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int key) {
+    return VTABLE_get_integer_keyed_int(interp, pmc, key);
+}
+
 /*=for api extend Parrot_PMC_get_numval
  *
  * Return the floating-point value of the PMC
@@ -92,6 +101,14 @@ void Parrot_PMC_set_string(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_STRING v
  */
 void Parrot_PMC_set_intval(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int value) {
     VTABLE_set_integer_native(interp, pmc, value);
+}
+
+/*=for api extend Parrot_PMC_set_intval_intkey
+ *
+ * Assign the passed-in parrot integer to the passed-in PMC
+ */
+void Parrot_PMC_set_intval_intkey(Parrot_INTERP interp, Parrot_PMC pmc, Parrot_Int value, Parrot_Int key) {
+    VTABLE_set_integer_keyed_int(interp, pmc, key, value);
 }
 
 /*=for api extend Parrot_PMC_set_numval
