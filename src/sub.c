@@ -60,6 +60,7 @@ cow_copy_context(struct Parrot_Interp *interp,
     memcpy(dest, src, sizeof(*src));
     buffer_mark_COW(dest->warns);  /* XXX */
     buffer_mark_COW(dest->errors);
+    mark_stack_not_reusable(interp, dest);
 }
 
 /*
@@ -442,11 +443,12 @@ add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
     if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
             DISABLE_RETC_RECYCLING)
         return;
+    /* fprintf(stderr, "** add %p free = %p\n", sub, mc->retc_free_list); */
     PMC_struct_val(sub) = mc->retc_free_list;
     mc->retc_free_list = sub;
     /* don't mark the continuation context */
     PObj_custom_mark_CLEAR(sub);
-    /* fprintf(stderr, "** add %p\n", sub); */
+    PObj_on_free_list_SET(sub);
 }
 
 PMC *
@@ -460,7 +462,8 @@ get_retc_from_free_list(Parrot_Interp interpreter)
     retc = mc->retc_free_list;
     mc->retc_free_list = PMC_struct_val(retc);
     PObj_custom_mark_SET(retc);
-    /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list );*/
+    PObj_on_free_list_CLEAR(retc);
+    /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list ); */
     return retc;
 }
 

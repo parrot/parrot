@@ -62,6 +62,13 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
                 PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
                         VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
             }
+            else if (pmc->vtable->base_type == enum_class_RetContinuation
+                 ||  pmc->vtable->base_type == enum_class_Continuation
+                 ||  pmc->vtable->base_type == enum_class_Sub) {
+                PIO_eprintf(interpreter, "%S=PMC(%#p Adr:%#p)",
+                        VTABLE_name(interpreter, pmc), pmc,
+                        PMC_struct_val(pmc));
+            }
             else {
                 PIO_eprintf(interpreter, "%S=PMC(%#p)",
                         VTABLE_name(interpreter, pmc), pmc);

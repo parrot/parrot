@@ -164,16 +164,20 @@ cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
     if (e->free_list) {
         new_chunk = e->free_list;
         e->free_list = new_chunk->free_p;
+        PObj_on_free_list_CLEAR(new_chunk);
         /*
          * freeP- is used as a flag too to avoid tracing into
          * the free list in mark_pmc_register_stack
          */
-        new_chunk->free_p = NULL;
+     /*
+      * fprintf(stderr, "** GET %d %p free %p\n", s, new_chunk, e->free_list);
+      */
     }
     else {
         new_chunk = new_bufferlike_header(interpreter, e->size);
         new_chunk->size_class = s;
     }
+    new_chunk->free_p = NULL;
     new_chunk->name = chunk->name;
     return new_chunk;
 }
@@ -232,8 +236,11 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
      */
     if (! (PObj_get_FLAGS(chunk) & PObj_private0_FLAG)) {
         assert(s < MAX_CACHED_STACKS);
+     /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
         chunk->free_p = e->free_list;
         e->free_list = chunk;
+        PObj_on_free_list_SET(chunk);
+
     }
 
     return STACK_DATAP(chunk);

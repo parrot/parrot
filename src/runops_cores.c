@@ -155,11 +155,11 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
             if (dod != interpreter->dod_runs) {
                 dod = interpreter->dod_runs;
-                PIO_printf(interpreter, "       DOD\n");
+                PIO_eprintf(interpreter, "       DOD\n");
             }
             if (gc != interpreter->collect_runs) {
                 gc = interpreter->collect_runs;
-                PIO_printf(interpreter, "       GC\n");
+                PIO_eprintf(interpreter, "       GC\n");
             }
         }
     }

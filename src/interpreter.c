@@ -926,15 +926,10 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
      * interpreter, and switches code segments if needed
      */
     dest = VTABLE_invoke(interpreter, sub, NULL);
-    if (!dest) {
-        dod_unregister_pmc(interpreter, ret_c);
-        dod_unregister_pmc(interpreter, old_c);
-        /* code was run inside invoke - probably - e.g. for NCI */
-        return;
+    if (dest) {
+        offset = dest - interpreter->code->byte_code;
+        runops(interpreter, offset);
     }
-
-    offset = dest - interpreter->code->byte_code;
-    runops(interpreter, offset);
     dod_unregister_pmc(interpreter, ret_c);
     dod_unregister_pmc(interpreter, old_c);
 }
@@ -973,19 +968,9 @@ save_regs(Parrot_Interp interpreter)
     return save;
 }
 
-/*
-
-=item C<PARROT_INLINE static void
-restore_regs(Parrot_Interp interp, regsave *data)>
-
-Restores the registers from C<*data>.
-
-=cut
-
-*/
-
 PARROT_INLINE static void
-restore_regs(Parrot_Interp interpreter, regsave *data) {
+restore_regs(Parrot_Interp interpreter, regsave *data)
+{
 
     Regs_cache * rc = &interpreter->caches->regs_cache;
 
@@ -1000,7 +985,6 @@ restore_regs(Parrot_Interp interpreter, regsave *data) {
 
 =item C<void
 mark_saved_regs(Parrot_Interp interpreter)
-
 
 Mark saved register aread live during DOD
 
@@ -1063,7 +1047,24 @@ Parrot_run_meth_fromc_save(Parrot_Interp interpreter,
     regsave *data = save_regs(interpreter);
     REG_PMC(2) = obj;
     REG_STR(0) = meth;
+    REG_INT(0) = 0;     /* non-prototyped */
+    REG_INT(3) = 0;     /* no args */
+#if 1
+    {
+        /*
+         * saved registers get marked, so there is no need
+         * to call the generic Parrot_runops_fromc() which
+         * dod_registers P1
+         */
+        opcode_t offset, *dest;
+        REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
+        dest = VTABLE_invoke(interpreter, sub, NULL);
+        offset = dest - interpreter->code->byte_code;
+        runops(interpreter, offset);
+    }
+#else
     Parrot_runops_fromc(interpreter, sub);
+#endif
     restore_regs(interpreter, data);
 }
 

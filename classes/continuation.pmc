@@ -52,7 +52,7 @@ Marks the continuation as live.
 */
 
     void mark () {
-#if 0
+#if 1
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
         mark_context(INTERP, &cc->ctx);
 #endif
@@ -74,11 +74,20 @@ Creates and returns a clone of the continuation.
         PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-        cow_copy_context(INTERP, &sub->ctx, &PMC_sub(SELF)->ctx);
+        mark_stack_not_reusable(interpreter, &sub->ctx);
+
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;
     }
 
+    void set_pmc(PMC* src) {
+        struct Parrot_Sub *cc_self = PMC_sub(SELF);
+        struct Parrot_Sub *cc_src  = PMC_sub(src);
+
+        memcpy(cc_self, cc_src, sizeof(struct Parrot_Sub));
+        PMC_struct_val(SELF) = PMC_struct_val(src);
+        mark_stack_not_reusable(interpreter, &cc_self->ctx);
+    }
 /*
 
 =item C<void *invoke(void *next)>

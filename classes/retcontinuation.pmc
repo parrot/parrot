@@ -62,12 +62,15 @@ Initializes the continuation.
         *
         * -leo
         */
-        if (!(PObj_get_FLAGS(SELF) & PObj_private2_FLAG))
-            mark_context(INTERP, &cc->ctx);
+        if (!(PObj_get_FLAGS(SELF) & PObj_private2_FLAG)) {
+            SUPER();
+        }
     }
 
     void* invoke (void* next) {
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        if (PObj_on_free_list_TEST(SELF))
+                internal_exception(1, "recycled retc %p invoked", SELF);
         restore_context(interpreter, &cc->ctx);
         if (interpreter->code->cur_cs != cc->seg) {
             Parrot_switch_to_cs(interpreter, cc->seg, 1);
@@ -76,26 +79,7 @@ Initializes the continuation.
         add_to_retc_free_list(interpreter, SELF);
         return next;
     }
-/*
 
-=item C<PMC *clone()>
-
-Creates and returns a clone of the continuation.
-
-=cut
-
-*/
-
-    PMC* clone() {
-        struct Parrot_Sub * sub;
-        PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_destroy_SETALL(ret);
-        sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-        memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-        PMC_struct_val(ret) = PMC_struct_val(SELF);
-        mark_stack_not_reusable(INTERP, &sub->ctx);
-        return ret;
-    }
 }
 
 /*
