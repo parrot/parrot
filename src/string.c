@@ -262,7 +262,10 @@ string_init(Parrot_Interp interpreter)
             build_path = data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
             /*
              * if the installed --prefix directory exists then use it
+             * but only, if data_dir isn't empty
              */
+            if (!*data_dir)
+                goto no_set;
             prefix = Parrot_get_runtime_prefix(interpreter, NULL);
             if (prefix) {
                 p = strstr(build_path, "blib");        /* .../blib/lib/... */
@@ -275,6 +278,7 @@ string_init(Parrot_Interp interpreter)
             }
         }
         string_set_data_directory(data_dir);
+no_set:
         if (free_data_dir)
             mem_sys_free((void*)data_dir); /* cast away the constness */
     }
