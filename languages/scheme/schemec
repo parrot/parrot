@@ -12,6 +12,6 @@ _EOF_
 }
 
 defined $ARGV[0] or Usage();
-$ARGV[0]=~/.scheme$/i or Usage();
+$ARGV[0]=~/\.scheme$|\.scm$/i or Usage();
 
 Scheme->new($ARGV[0])->compile();

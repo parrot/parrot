@@ -4,5 +4,5 @@ use strict;
 use Test::Harness qw(runtests);
 use lib '../..';
 
-my @tests = map { glob( "t/$_/*.t" ) } ( qw(io arith logic) );
-runtests( @tests );
+@ARGV = map { glob( "t/$_/*.t" ) } qw(io arith logic) unless @ARGV;
+runtests( @ARGV );

@@ -1,6 +1,13 @@
 package Scheme::Generator;
 
 use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use Carp;
+
+$VERSION   = '0.01';
+@ISA       = qw(Exporter);
+@EXPORT_OK = qw(generate);
+
 use Data::Dumper;
 use Scheme::Builtins;
 
@@ -94,7 +101,7 @@ sub _num_arg {
 
   my $args = scalar @{$node->{children}} - 1;
 
-  die "$name: Wrong number of arguments (expected $expected, got $args).\n"
+  confess "$name: Wrong number of arguments (expected $expected, got $args).\n"
     if ($args != $expected);
 }
 
@@ -107,8 +114,7 @@ sub _get_args {
   my ($node, $num) = @_;
   $num = 1 unless defined $num;
 
-  my @args = @{$node->{children}};
-  splice @args, 0, $num;
+  my @args = splice @{$node->{children}}, $num;
 
   return @args;
 }
@@ -203,7 +209,7 @@ sub __quoted {
   elsif (exists $node->{children}) {
     $self->_add_inst ('', 'new', [$return,'.PerlUndef']);
     for (reverse @{$node->{children}}) {
-      
+
       my $item = __quoted ($self, $_);
       my $pair = $self->_save_1 ('P');
       $self->_add_inst ('', 'new', [$pair,'.Array']);
@@ -237,22 +243,12 @@ sub _op_lambda {
 
   $return = $self->_save_1 ('P');
 
-  $self->_add_inst ('', 'new',[$return,'.Array']);
-  $self->_add_inst ('', 'set',[$return,3]);
-
-  $temp = $self->_save_1 ('P');
-  $self->_add_inst ('', 'peek_pad', [$temp]);
-  $self->_add_inst ('', 'set',[$return.'[0]',$temp]);
-  $self->_restore($temp);
+  $self->_add_inst ('', 'new',[$return,'.Closure']);
 
   my $addr = $self->_save_1 ('I');
   $self->_add_inst ('', 'set_addr',[$addr,"LAMBDA_$label"]);
-  $self->_add_inst ('', 'set',[$return.'[1]',$addr]);
+  $self->_add_inst ('', 'set',[$return,$addr]);
   $self->_restore ($addr);
-
-  $temp = __quoted ($self,_get_arg($node,1));
-  $self->_add_inst ('', 'set',[$return.'[2]',$temp]);
-  $self->_restore ($temp);
 
   $self->_add_inst ('', 'branch',["DONE_$label"]);
   $self->_add_inst ("LAMBDA_$label");
@@ -260,6 +256,18 @@ sub _op_lambda {
   # caller saved => start a new frame
   push @{$self->{frames}}, $self->{regs};
   $self->{regs} = _new_regs;
+  # P1 is the return contination
+  $self->{regs}{P}{1} = 1;
+
+  # expand the lexical scope
+  $self->_add_inst('', 'new_pad', [-1]);
+  my $num = 5;
+  my @args = @{_get_arg($node,1)->{children}};
+  for (@args) {
+    my $arg = $_->{value};
+    $self->_new_lex($arg, "P$num");
+    $num++
+  }
 
   $temp = 'none';
   for (_get_args($node,2)) {
@@ -270,9 +278,7 @@ sub _op_lambda {
   $self->_add_inst('', 'set', ['P5', $temp]);
 
   $self->_add_inst('', 'pop_pad');
-  # XXX: new_pad is the only way to create a new scope
-  $self->_add_inst('', 'pop_pad');
-  $self->_add_inst('', 'ret');
+  $self->_add_inst('', 'invoke P1');
   $self->_add_inst("DONE_$label");
 
   $self->{regs} = pop @{$self->{frames}};
@@ -356,11 +362,35 @@ sub _op_set_bang {
     $temp = $pmc;
   }
   $self->_store_lex ($symbol,$temp);
-  
+
   return $temp;
 }
 
 sub _op_cond {
+  my ($self, $node) = @_;
+
+  my @clauses = _get_args($node);
+
+  my $transnode;
+
+  if ($clauses[-1]->{children}->[0]->{value} eq 'else') {
+    my $elseclause = pop @clauses;
+    $transnode = { children => [ { value => 'begin'},
+				 _get_args($elseclause) ] };
+  }
+  else {
+    $transnode = { value => '#f' };
+  }
+
+  for my $clause ( reverse @clauses ) {
+    $transnode = { children => [ { value => 'if' },
+				 _get_arg($clause,0),
+				 { children => [ { value => 'begin' },
+						 _get_args($clause,1) ] },
+				 $transnode ] };
+  }
+
+  $self->_generate($transnode);
 }
 
 sub _op_case {
@@ -411,11 +441,11 @@ sub _op_let {
     push @values, $val;
   }
 
-  my $let = { children => [ 
+  my $let = { children => [
 			   { children => [ { value => 'lambda' },
 					   { children => [ @variables ] },
 					   @body ]},
-			   @values 
+			   @values
 			  ]};
 
   $return = $self->_generate($let);
@@ -459,7 +489,7 @@ sub _op_not {
   my $return = $self->_save_1 ('I');
   $self->_generate(_get_arg($node,1));
   $self->_add_inst('','not',[$return,$return]);
-  
+
   $return;
 }
 
@@ -508,7 +538,7 @@ sub _op_cons {
   my $return;
 
   _num_arg ($node, 2, 'cons');
-  
+
   my $car = $self->_generate(_get_arg($node,1));
   $return = $self->_save_1('P');
 
@@ -631,7 +661,7 @@ sub _op_length {
   _num_arg ($node, 1, 'length');
 
   my $list = $self->_generate(_get_arg($node,1));
-  
+
   $self->_add_inst ('', 'set',[$return,'0']);
   my $type = $self->_save_1 ('I');
   $self->_add_inst ("NEXT_$label", 'typeof',[$type,$list]);
@@ -1313,7 +1343,7 @@ sub _op_procedure_p {
 
   _check_num_arg ($node, 1, 'procedure?');
 
-  $return = self->_constant(0);
+  $return = $self->_constant(0);
 
   my $temp = $self->_generate(_get_arg($node,1));
   if ($temp =~ /^P/) {
@@ -1340,7 +1370,7 @@ sub _op_apply {
     $self->_add_inst ('','set',[$pair.'[1]',$argl]);
   }
 
-  $return = $self->_call_function ('apply');
+#  $return = $self->_call_function ('apply');
 
   return $return;
 }
@@ -1419,7 +1449,12 @@ sub _op_write {
       $self->_add_inst('','print',[$temp]);
     }
     else {
-      $self->_call_function ('write',$temp);
+      push @{$self->{functions}}, 'write'
+	unless grep { $_ eq 'write' } @{$self->{functions}};
+      $self->_save_set;
+      $self->_add_inst('', 'set', ['P5', $temp]);
+      $self->_add_inst('', 'bsr', ['write_ENTRY']);
+      $self->_restore_set;
     }
   }
   return $temp; # We need to return something
@@ -1559,7 +1594,7 @@ my %global_ops = (
   'symbol?'        => \&_op_symbol_p,
   'symbol->string' => \&_op_symbol_string,
   'string->symbol' => \&_op_string_symbol,
-    
+
 ###
 ### Numerics
 ###
@@ -1782,20 +1817,21 @@ sub __max_lengths {
 
 sub _call_function {
   my $self = shift;
-  my $func = shift;
-
-  push @{$self->{functions}}, $func 
-    unless grep { $_ eq $func } @{$self->{functions}};
+  my $func_obj = shift;
 
   my $return = $self->_save_1 ('P');
   $self->_restore ($return); # dont need to save this
-
   $self->_save_set;
 
   my $count = 5;
   my $empty = $return;
   while (my $arg = shift) {
     if ($arg ne "P$count") {
+      if ($arg =~ /^[INS]/) {
+	$self->_morph("P$count", $arg);
+	$count++;
+	next;
+      }
       # Check if any later argument needs the old value of P$count
       my $moved;
       for (@_) {
@@ -1808,12 +1844,13 @@ sub _call_function {
 	$self->_add_inst ('', 'set',[$empty,"P$count"]);
 	$empty = $moved;
       }
-      $self->_add_inst ('','set',["P$count",$arg]);  
+      $self->_add_inst ('','set',["P$count",$arg]);
     }
-    $count++; 
+    $count++;
   }
 
-  $self->_add_inst ('', 'bsr', [$func.'_ENTRY']);
+  $self->_add_inst ('', 'set', ['P0', $func_obj]) unless $func_obj eq 'P0';
+  $self->_add_inst ('', 'invokecc');
   $self->_add_inst ('', 'set', [$return,'P5']) unless $return eq 'P5';
   $self->_restore_set;
 
@@ -1828,17 +1865,19 @@ sub _format_columns {
   my $colref  = $self->{instruction};
   my @max_len = __max_lengths($colref);
 
+  $self->{code} = '';
+
   for my $row(@$colref) {
     my $label;
     $label = $row->[0]; $label .= ":" if $label;
-    print $label . ' ' x ($max_len[0]-length($label)+2);
+    $self->{code} .= $label . ' ' x ($max_len[0]-length($label)+2);
     if(defined $row->[1]) {
       $label = $row->[1];
-      print $label . ' ' x ($max_len[1]-length($label)+2);
+      $self->{code} .= $label . ' ' x ($max_len[1]-length($label)+2);
       $label = $row->[2];
-      print join ", ",@$label if $label;
+      $self->{code} .= join ", ",@$label if $label;
     }
-    print "\n";
+    $self->{code} .= "\n";
   }
 }
 
@@ -1880,15 +1919,14 @@ sub _generate {
 	$return = $global_ops{$symbol}->($self, $node);
       } else {
 	my $func_obj = $self->_find_lex ($symbol);
-	my $argl = $self->_op_list ($node);
-	$return = $self->_call_function('apply', $func_obj, $argl);
-	$self->_restore ($func_obj, $argl);
+	my @args = map { $self->_generate($_); } _get_args($node);
+	$return = $self->_call_function($func_obj, @args);
+	$self->_restore($func_obj, @args);
       }
     } else {
-      my $func_obj = $self->_generate ($func);
-      my $argl = $self->_op_list ($node);
-      $return = $self->_call_function('apply', $func_obj, $argl);
-      $self->_restore ($func_obj, $argl);
+      my @args = map { $self->_generate($_); } _get_args($node, 0);
+      $return = $self->_call_function(@args);
+      $self->_restore(@args);
     }
   } else {
     my $value = $node->{value};
@@ -1902,29 +1940,27 @@ sub _generate {
   return $return;
 }
 
-sub _link_builtins {
-  my ($self) = @_;
-
-  for (@{$self->{functions}}) {
-    Scheme::Builtins::generate ($self, $_);
-  }
-}
-
 sub generate {
-  my $self = shift;
+  my $tree = shift;
+  my $self = Scheme::Generator->new({});
   my $temp;
 
   $self->{scope} = {};
   $self->_add_inst ('', 'new_pad',[0]);
 
-  $temp = $self->_generate($self->{tree});
+  $temp = $self->_generate($tree);
 
   $self->_add_inst ('', 'pop_pad');
-#die Dumper($self->{tree});
   $self->_restore($temp);
   $self->_add_inst('',"end");
-  $self->_link_builtins();
-  $self->_format_columns();
+
+  $self->_format_columns;
+
+  # not need any more
+  $self->{instruction} = undef;
+  $self->{regs} = undef;
+
+  return $self;
 }
 
 1;

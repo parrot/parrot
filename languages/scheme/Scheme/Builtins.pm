@@ -2,6 +2,9 @@ package Scheme::Builtins;
 
 use strict;
 
+# nice for debugging
+use Data::Dumper;
+
 my %built_ins = 
 (
  write =>
@@ -33,34 +36,34 @@ my %built_ins =
   ['write_KET',    'print', '")"'],
   ['write_RET',    'ret'],
  ],
- apply =>
- [['# apply Function',''],
-  ['apply_ENTRY',  'set', 'P7', 'P5[0]'],
-  ['',             'push_pad', 'P7'],
-  ['',             'new_pad', '-1'],
-  ['',             'set', 'P7', 'P5[2]'],
-  ['apply_NEXT',   'typeof', 'I0', 'P6'],
-  ['',             'eq', 'I0', '.PerlUndef', 'apply_LAST'],
-  ['',             'set', 'S0', 'P7[0]'],
-  ['',             'set', 'P8', 'P6[0]'],
-  ['',             'store_lex', '-1', 'S0', 'P8'],
-  ['',             'set', 'P6', 'P6[1]'],
-  ['',             'set', 'P7', 'P7[1]'],
-  ['',             'branch', 'apply_NEXT'],
-  ['apply_LAST',   'set', 'I0', 'P5[1]'],
-  ['',             'jump', 'I0'],
- ]
 );
 
-sub generate {
-  my ($self, $name) = @_;
+sub new {
+  my $class = shift;
+  my $self = {
+    instruction => []
+  };
+  bless $self, $class;
+}
 
-  die "$name: Unknown buildin\n" unless exists $built_ins{$name};
+sub _add_inst {
+  my $self = shift;
+  push @{$self->{instruction}}, [@_];
+}
+
+sub generate {
+  my ($code, $name) = @_;
+
+  die "$name: Unknown builtin\n" unless exists $built_ins{$name};
+
+  my $self = Scheme::Builtins->new();
 
   for (@{$built_ins{$name}}) {
     my ($label, $op, @args) = @$_;
-    $self->_add_inst ($label, $op, [ @args ]);
+    $self->_add_inst($label, $op, [ @args ]);
   }
+
+  $self;
 }
 
 1;
