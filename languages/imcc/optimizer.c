@@ -207,10 +207,10 @@ static void strength_reduce(struct Parrot_Interp *interpreter)
                     ins->r[0] == ins->r[1] &&
                     (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                     !strcmp(ins->op, ops[i])) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 ins->r[1] = ins->r[2];
                 tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
-                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
                 found = 1;
@@ -231,14 +231,14 @@ static void strength_reduce(struct Parrot_Interp *interpreter)
                      ins->r[2]->type == VTCONST &&
                      atof(ins->r[2]->name) == 0.0)) &&
                 !strcmp(ins->op, "mul")) {
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             r = mk_const(str_dup("0"), ins->r[0]->set);
             --ins->r[1]->use_count;
             if (ins->opsize == 4)
                 --ins->r[2]->use_count;
             ins->r[1] = r;
             tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
-            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(ins, tmp, 1);
             ins = tmp;
             continue;
@@ -256,7 +256,7 @@ static void strength_reduce(struct Parrot_Interp *interpreter)
                      atof(ins->r[2]->name) == 1.0)) &&
                 !strcmp(ins->op, "mul")) {
 set_it:
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             if (ins->opsize == 3) {
                 /* mul Ix, 1 */
                 ins = delete_ins(ins, 1);
@@ -272,7 +272,7 @@ set_it:
                 --ins->r[2]->use_count;
             }
             tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
-            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(ins, tmp, 1);
             ins = tmp;
             continue;
@@ -319,7 +319,8 @@ constant_propagation(struct Parrot_Interp *interpreter)
             c = ins->r[1];
             o = ins->r[0];
 
-            debug(interpreter, DEBUG_OPT1, "propagating constant %s => \n", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1,
+                    "propagating constant %I => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 if (ins2->type & ITSAVES ||
                     /* restrict to within a basic block */
@@ -334,8 +335,8 @@ constant_propagation(struct Parrot_Interp *interpreter)
                             goto next_constant;
                         else if (instruction_reads(ins2,ins2->r[i])) {
                             debug(interpreter, DEBUG_OPT2,
-                                    "\tpropagating into %s register %i",
-                                    ins_string(ins2), i);
+                                    "\tpropagating into %I register %i",
+                                    ins2, i);
                             old = ins2->r[i];
                             ins2->r[i] = c;
                             op = check_op(interpreter, fullname, ins2->op,
@@ -348,7 +349,7 @@ constant_propagation(struct Parrot_Interp *interpreter)
                                 --old->use_count;
                                 ins2->opnum = op;
                                 any = 1;
-                                debug(interpreter, DEBUG_OPT2," -> %s\n", ins_string(ins2));
+                                debug(interpreter, DEBUG_OPT2," -> %I\n", ins2);
                             }
                         }
                     }
@@ -388,13 +389,13 @@ subst_constants_mix(struct Parrot_Interp *interpreter)
                     ins->r[1]->set == 'N' &&
                     ins->r[2]->type == VTCONST &&
                     ins->r[2]->set == 'I') {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 strcpy(b, ins->r[2]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[2]->use_count;
                 ins->r[2] = r;
                 tmp = INS(interpreter, ins->op, "", ins->r, 3, 0, 0);
-                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
             }
@@ -427,13 +428,13 @@ subst_constants_umix(struct Parrot_Interp *interpreter)
                     ins->r[1]->type == VTCONST &&
                     ins->r[1]->set == 'I' &&
                     !strcmp(ins->op, ops[i])) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 strcpy(b, ins->r[1]->name);
                 r = mk_const(str_dup(b), 'N');
                 --ins->r[1]->use_count;
                 ins->r[1] = r;
                 tmp = INS(interpreter, ins->op, "", ins->r, 2, 0, 0);
-                debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
                 subst_ins(ins, tmp, 1);
                 ins = tmp;
             }
@@ -560,7 +561,7 @@ subst_constants(struct Parrot_Interp *interpreter)
         }
         if (!found)
             continue;
-        debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+        debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
         /* we construct a parrot instruction
          * here and let parrot do the calculation in a
          * separate context and make a constant
@@ -582,7 +583,7 @@ subst_constants(struct Parrot_Interp *interpreter)
             --ins->r[2]->use_count;
         ins->r[1] = r;
         tmp = INS(interpreter, "set", "", ins->r, 2, 0, 0);
-        debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+        debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
         subst_ins(ins, tmp, 1);
         ins = tmp;
     }
@@ -609,7 +610,7 @@ subst_constants_c(struct Parrot_Interp *interpreter)
                     ins->r[0]->type == VTCONST &&
                     ins->r[1]->type == VTCONST &&
                     !strcmp(ins->op, ops[i])) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 switch (i) {
                     case 0:     /* eq */
                         switch (ins->r[0]->set) {
@@ -623,7 +624,7 @@ do_res:
                                     ins->r[0] = ins->r[2];
                                     tmp = INS(interpreter, "branch", "", ins->r,
                                             1, 0, 0);
-                                    debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
                                     subst_ins(ins, tmp, 1);
                                     ins = tmp;
                                 }
@@ -747,7 +748,7 @@ subst_constants_if(struct Parrot_Interp *interpreter)
             if (ins->opsize == 3 &&
                     ins->r[0]->type == VTCONST &&
                     !strcmp(ins->op, ops[i])) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 switch (i) {
                     case 0:     /* if */
                     case 1:     /* unless */
@@ -762,7 +763,7 @@ do_res:
                                     ins->r[0] = ins->r[1];
                                     tmp = INS(interpreter, "branch", "", ins->r,
                                             1, 0, 0);
-                                    debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
                                     subst_ins(ins, tmp, 1);
                                     ins = tmp;
                                 }
@@ -822,8 +823,9 @@ static int branch_branch(struct Parrot_Interp *interpreter)
                     break;
                 if ((next->type & IF_goto) &&
                         !strcmp(next->op, "branch")) {
-                    debug(interpreter, DEBUG_OPT1, "found branch to branch '%s' %s\n",
-                            r->first_ins->r[0]->name, ins_string(next));
+                    debug(interpreter, DEBUG_OPT1,
+                            "found branch to branch '%s' %I\n",
+                            r->first_ins->r[0]->name, next);
                     ostat.branch_branch++;
                     ins->r[0] = next->r[0];
                     changed = 1;
@@ -916,8 +918,8 @@ static int dead_code_remove(struct Parrot_Interp *interpreter)
             int bbi = bb->index;
             debug(interpreter, DEBUG_OPT1, "found dead block %d\n", bb->index);
             for (ins = bb->start; ins && ins->bbindex == bbi; ) {
-                debug(interpreter, DEBUG_OPT1, "\tins deleted (dead block) %s\n",
-                    ins_string(ins));
+                debug(interpreter, DEBUG_OPT1,
+                        "\tins deleted (dead block) %I\n", ins);
                 ins = delete_ins(ins, 1);
                 ostat.deleted_ins++;
                 changed++;
@@ -927,8 +929,8 @@ static int dead_code_remove(struct Parrot_Interp *interpreter)
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch")) {
-            debug(interpreter, DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",
-                    ins_string(ins));
+            debug(interpreter, DEBUG_OPT1,
+                    "unreachable ins deleted (after branch) %I\n", ins);
             ins = delete_ins(ins, 1);
             ostat.deleted_ins++;
             changed++;
@@ -940,8 +942,7 @@ static int dead_code_remove(struct Parrot_Interp *interpreter)
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 !strcmp(last->op, "branch") &&
                 !strcmp(last->r[0]->name, ins->r[0]->name)) {
-            debug(interpreter, DEBUG_OPT1, "dead branch deleted %s\n",
-                    ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "dead branch deleted %I\n", ins);
             ins = delete_ins(last, 1);
             ostat.deleted_ins++;
             changed++;
@@ -967,7 +968,7 @@ static int used_once(Parrot_Interp interpreter)
         if (!r)
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
-            debug(interpreter, DEBUG_OPT2, "used once »%s« deleted\n", ins_string(ins));
+            debug(interpreter, DEBUG_OPT2, "used once '%I' deleted\n", ins);
             ins = delete_ins(ins, 1);
             ins = ins->prev ? ins->prev : instructions;
             ostat.deleted_ins++;
@@ -1088,8 +1089,8 @@ is_ins_save(Parrot_Interp interpreter, Instruction *ins, SymReg *r, int what) {
     reason = 0;
     save = _is_ins_save(interpreter, ins, r, what);
     if (!save && reason)
-        debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %s\n",
-                r->name, reason, ins_string(ins));
+        debug(interpreter, DEBUG_OPT2, "ins not save var %s reason %d %I\n",
+                r->name, reason, ins);
     return save;
 }
 
@@ -1156,8 +1157,8 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
     out = pred->end;
     next = (*ins)->next;
     (*ins)->bbindex = pred->index;
-    debug(interpreter, DEBUG_OPT2, "inserting it in blk %d after %s\n", pred->index,
-            ins_string(out));
+    debug(interpreter, DEBUG_OPT2, "inserting it in blk %d after %I\n",
+            pred->index, out);
     *ins = move_ins(*ins, out);
     if (0 && (DEBUG_OPT2 & IMCC_INFO(interpreter)->debug)) {
         char buf[256];
@@ -1165,7 +1166,7 @@ move_ins_out(struct Parrot_Interp *interpreter, Instruction **ins, Basic_block *
         Instruction * tmp;
 
         regs[0] = 0;
-        sprintf(buf, "# Invar moved: %s",ins_string(out->next));
+        sprintf(buf, "# Invar moved: %s",out->next->op);
         tmp = INS(interpreter, "", buf, regs, 0, 0, 0);
         insert_ins((*ins)->prev, tmp);
     }
@@ -1191,7 +1192,7 @@ loop_one(struct Parrot_Interp *interpreter, int bnr)
     for (ins = bb->start ; ins ; ins = ins->next) {
         reason = 0;
         if (is_invariant(interpreter, ins)) {
-            debug(interpreter, DEBUG_OPT2, "found invariant %s\n", ins_string(ins));
+            debug(interpreter, DEBUG_OPT2, "found invariant %I\n", ins);
             if (move_ins_out(interpreter, &ins, bb)) {
                 changed++;
                 ins = ins->prev;
@@ -1241,7 +1242,7 @@ check_clone(Parrot_Interp interpreter, Instruction *ins)
     SymReg * rr = ins->r[1];
     if (0 && is_ins_save(interpreter, ins, rl, CHK_CLONE) &&
         is_ins_save(interpreter, ins, rr, CHK_CLONE)) {
-        debug(interpreter, DEBUG_OPT2, "clone %s removed\n", ins_string(ins));
+        debug(interpreter, DEBUG_OPT2, "clone %I removed\n", ins);
         free(ins->op);
         ins->op = str_dup("set");
         return 1;

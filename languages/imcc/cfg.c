@@ -236,8 +236,9 @@ invok:
                     j = pred->from->index;
                     if (found) {
                         int saves = 0;
-                        debug(interpreter, DEBUG_CFG, "\tcalled from bb %d '%s'\n",
-                            j, ins_string(pred->from->end));
+                        debug(interpreter, DEBUG_CFG,
+                                "\tcalled from bb %d '%I'\n",
+                            j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
                             if (!strcmp(sub->op, "saveall"))
                                 if (!(sub->type & ITSAVES)) {
@@ -283,8 +284,8 @@ bb_findadd_edge(Parrot_Interp interpreter, Basic_block *from, SymReg *label) {
         bb_add_edge(interpreter, from,
                 IMCC_INFO(interpreter)->bb_list[r->first_ins->bbindex]);
     else {
-        debug(interpreter, DEBUG_CFG, "register branch %s ",
-                ins_string(from->end));
+        debug(interpreter, DEBUG_CFG, "register branch %I ",
+                from->end);
         /* XXX is probably only ok, if the invoke is "near" the
          *     set_addr ins
          */

@@ -329,8 +329,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
         if (ins->op && *ins->op) {
             (*src_lines)++;
             if (ins->opnum < 0)
-                fatal(1, "e_pbc_emit", "no opnum ins#%d %s\n",
-                        ins->index, ins_string(ins));
+                fatal(1, "e_pbc_emit", "no opnum ins#%d %I\n",
+                        ins->index, ins);
             code_size += ins->opsize;
         }
         else if (ins->opsize)
@@ -933,7 +933,7 @@ e_pbc_emit(void *param, Instruction * ins)
                     break;
             }
         }
-        debug(interpreter, DEBUG_PBC, "\t%s\n", ins_string(ins));
+        debug(interpreter, DEBUG_PBC, "\t%I\n", ins);
         npc += ins->opsize;
     }
     return ok;

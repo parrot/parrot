@@ -425,18 +425,12 @@ static int e_file_close(void *param) {
 
 }
 
-/* dummy until all are fixed */
-char *ins_string(Instruction * ins) {
-    UNUSED(ins);
-    return "";
-}
 static int e_file_emit(void *param, Instruction * ins) {
     UNUSED(param);
     if ((ins->type & ITLABEL) || ! *ins->op)
 	ins_print(stdout, ins);
     else {
-	printf("\t%s ",ins->op);
-	ins_print(stdout, ins);
+	imcc_fprintf(stdout, "\t%I ",ins);
     }
     printf("\n");
     return 0;

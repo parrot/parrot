@@ -457,7 +457,7 @@ check_tail_call(Parrot_Interp interpreter, Instruction *ins)
         }
     }
     if (i == 3 && call_found == 1 && ret_found == 1 && !tmp) {
-        debug(interpreter, DEBUG_OPT1, "check tail call %s \n", ins_string(ins));
+        debug(interpreter, DEBUG_OPT1, "check tail call %I \n", ins);
     }
     else
         return 0;
@@ -516,7 +516,7 @@ expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins)
 
     tail_call = check_tail_call(interpreter, ins);
     if (tail_call)
-        debug(interpreter, DEBUG_OPT1, "found tail call %s \n", ins_string(ins));
+        debug(interpreter, DEBUG_OPT1, "found tail call %I \n", ins);
     for (i = 0; i < 4; i++)
         next[i] = 5;
     call_ins = ins;
@@ -760,33 +760,33 @@ optc_savetop(Parrot_Interp interpreter, Instruction *ins)
         nsave += needs_save[i];
     switch (nsave) {
         case 0:
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             ins = delete_ins(ins, 1);
             debug(interpreter, DEBUG_OPT1, "deleted\n");
             ostat.deleted_ins++;
             for (; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             ins = delete_ins(ins, 1);
             debug(interpreter, DEBUG_OPT1, "deleted\n");
             ostat.deleted_ins++;
             break;
         case 1:
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             for (i = 0; i < 4; i++)
                 if (needs_save[i])
                     break;
             tmp = INS(interpreter, new_save[i], NULL, regs, 0, 0, 0);
             subst_ins(ins, tmp, 1);
-            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             for (ins = tmp; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             tmp = INS(interpreter, new_restore[i], NULL, regs, 0, 0, 0);
             subst_ins(ins, tmp, 1);
-            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             break;
     }
 }
@@ -805,9 +805,9 @@ pcc_optimize(Parrot_Interp interpreter)
                 (ins->r[0]->set == 'I' || ins->r[0]->set == 'N') &&
                 atof(ins->r[1]->name) == 0.0 &&
                 !strcmp(ins->op, "set")) {
-            debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
             tmp = INS(interpreter, "null", NULL, ins->r, 1, 0, 0);
-            debug(interpreter, DEBUG_OPT1, "%s\n", ins_string(tmp));
+            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
             subst_ins(ins, tmp, 1);
             ins = tmp;
         }
@@ -820,7 +820,7 @@ pcc_optimize(Parrot_Interp interpreter)
             if (r1->type & VT_REGP)
                 r1 = r1->reg;
             if (r0->set == r1->set && r0->color == r1->color) {
-                debug(interpreter, DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
                 ins = delete_ins(ins, 1);
                 ins = ins->prev ? ins->prev : instructions;
                 debug(interpreter, DEBUG_OPT1, "deleted\n");

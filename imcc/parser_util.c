@@ -641,6 +641,7 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
             /* this is the reason for the whole mess */
             case 'I':
                 _ins = va_arg(ap, Instruction *);
+                len += fprintf(fd, "%s ", _ins->op);
                 len += ins_print(fd, _ins);
                 break;
         }

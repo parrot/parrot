@@ -91,8 +91,7 @@ void dump_instructions(Parrot_Interp interpreter) {
 	     fprintf(stderr, "\t");
 	}
 
-	fprintf(stderr, ins_string(ins));
-	fprintf(stderr, "\n");
+	imcc_fprintf(stderr, "%I\n", ins);
         pc += ins->opsize;
     }
     fprintf(stderr, "\n");
