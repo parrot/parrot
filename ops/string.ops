@@ -468,15 +468,9 @@ Find the encoding named in $2 and return its number in $1
 =cut
 
 op find_encoding(out INT, in STR) {
-  char *temp_encoding = string_to_cstring(interpreter, $2);
-  char encoding[255];
-
-  /* Copy the string to stack storage and free. Ick. */
-  strncpy(encoding, temp_encoding, sizeof(encoding));
-  encoding[sizeof(encoding)-1] = 0;
-  string_cstring_free(temp_encoding);
-
+  char *encoding = string_to_cstring(interpreter, $2);
   $1 = encoding_find_encoding(encoding);
+  string_cstring_free(encoding);
   goto NEXT();
 }
 
@@ -498,15 +492,9 @@ Find the chartype named in $2 and return its number in $1
 =cut
 
 op find_chartype(out INT, in STR) {
-  char *temp_chartype = string_to_cstring(interpreter, $2);
-  char chartype[255];
-
-  /* Copy the string to stack storage and free. Ick. */
-  strncpy(chartype, temp_chartype, sizeof(chartype));
-  chartype[sizeof(chartype)-1] = 0;
-  string_cstring_free(temp_chartype);
-
+  char *chartype = string_to_cstring(interpreter, $2);
   $1 = chartype_find_chartype(chartype);
+  string_cstring_free(chartype);
   goto NEXT();
 }
 
