@@ -924,12 +924,19 @@ find_common_mask(size_t val1, size_t val2)
     int i;
     int bound = sizeof(size_t) * 8;
 
-    for (i = 0; i <= bound; i++) {
+    /* Shifting a value by its size (in bits) or larger is undefined behaviour.
+       so need an explict check to return 0 if there is no prefix, rather than
+       attempting to rely on (say) 0xFFFFFFFF << 32 being 0  */
+    for (i = 0; i < bound; i++) {
         if (val1 == val2) {
             return ~(size_t)0 << i;
         }
         val1 >>= 1;
         val2 >>= 1;
+    }
+    if (val1 == val2) {
+        assert(i == bound);
+        return 0;
     }
 
     internal_exception(INTERP_ERROR,
