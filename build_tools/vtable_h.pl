@@ -26,6 +26,8 @@ print OUT <<'EOF';
 
 typedef void* (*vtable_func_t)();
 
+#define YOU_LOSE_VTABLE NULL
+
 EOF
 
 print OUT vtbl_struct(%vtable);

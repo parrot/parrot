@@ -728,6 +728,11 @@ Push an unlock request on the stack
 
 Create a new interpreter in X, using the passed flags.
 
+=item * runinterp Px, iy
+
+Jump into interpreter X and run the code starting at offset Y from the
+current location. (This is temporary until we get something better)
+
 =item * callout Pw, Px, sy, pz
 
 Call routine Y in interpreter x, passing it the list of parameters

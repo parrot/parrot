@@ -1906,6 +1906,38 @@ MANUAL_OP jump(i) {
   RETREL($1);
 }
 
+########################################
+
+=item B<newinterp>(p, i|ic)
+
+Create a new interpreter and store it in a PMC
+
+=cut
+
+AUTO_OP newinterp(p, i|ic) {
+  struct Parrot_Interp *new_interp;
+  struct PMC *new_pmc;
+  new_interp = make_interpreter();
+  new_interp->flags = $2;
+  new_pmc = new_pmc_header(interpreter);
+  new_pmc->data = new_interp;
+  new_pmc->vtable = YOU_LOSE_VTABLE;
+  $1 = new_pmc;
+}
+
+
+=item B<runinterp>(p, i|ic)
+
+Take a built interpreter and run the code starting at offset $2
+
+=cut
+
+AUTO_OP runinterp(p, i|ic) {
+  struct PackFile local_file;
+  memcpy(&local_file, interpreter->code, sizeof(struct PackFile));
+  local_file.byte_code = cur_opcode + $2;
+  runops($1->data, &local_file);
+}
 
 ########################################
 

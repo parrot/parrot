@@ -18,8 +18,8 @@
 typedef struct {
     void *bufstart;
     INTVAL buflen;
-    INTVAL bufused;
     INTVAL flags;
+    INTVAL bufused;
     INTVAL strlen;
     const ENCODING *encoding;
     const CHARTYPE *type;
