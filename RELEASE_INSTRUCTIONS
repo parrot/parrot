@@ -10,7 +10,8 @@ To prepare a release:
 
         a.  Increment the version number in VERSION,
 	    adjust IMCC_VERSION in imcc/main.c,
-            and update VERSION in languages/perl6/perl6.
+            and update VERSION in languages/perl6/perl6,
+	    update parrot.spec.
 
         b.  Change the information in DEVELOPING to reflect
             this release's version number and date.
@@ -24,10 +25,12 @@ To prepare a release:
         f.  Make sure RESPONSIBLE_PARTIES is still
             accurate.
 
-	g.  run tools/dev/mk_native.pbc (on i386/linux)
+	g.  Update PBC_COMPAT
+
+	h.  run tools/dev/mk_native.pbc (on i386/linux)
 	    or disable t/native_pbc/number.t
 
-	h.  make test
+	i.  make fulltest
 
     3.  cvs commit.
 
