@@ -2140,9 +2140,13 @@ PackFile_fixup_subs(struct Parrot_Interp *interpreter)
     fixup_subs(interpreter, interpreter->code);
 }
 
+/*
+
 =back
 
 =cut
+
+*/
 
 /*
 * Local variables:
