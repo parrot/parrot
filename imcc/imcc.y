@@ -228,7 +228,7 @@ static char * inv_op(char *op) {
 %token <s> PARROT_OP
 %type <t> type newsub
 %type <i> program class class_body member_decls member_decl field_decl method_decl
-%type <i> global sub emit pcc_sub sub_body pcc_ret pcc_yield
+%type <i> global constdef sub emit pcc_sub sub_body pcc_ret pcc_yield
 %type <i> compilation_units compilation_unit
 %type <s> classname relop
 %type <i> labels _labels label statements statement sub_call
@@ -269,6 +269,7 @@ compilation_units:
 
 compilation_unit:
      class         { $$ = $1; cur_unit = 0; }
+   | constdef      { $$ = $1; }
    | global        { $$ = $1; }
    | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
    | pcc_sub       { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
@@ -288,6 +289,11 @@ global:
             fataly(EX_SOFTWARE, sourcefile, line, ".global not implemented yet\n");
             $$ = 0;
          }
+   ;
+
+constdef:
+     CONST { is_def=1; } type IDENTIFIER '=' const
+                                    { mk_const_ident($4, $3, $6, 1);is_def=0; }
    ;
 
 pasmcode:
@@ -636,11 +642,10 @@ instruction:
 labeled_inst:
      assignment
    | if_statement
+   | constdef
    | NAMESPACE IDENTIFIER            { push_namespace($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
    | LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3); is_def=0; }
-   | CONST { is_def=1; } type IDENTIFIER '=' const
-                                    { mk_const_ident($4, $3, $6, 0);is_def=0; }
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6, 1);is_def=0; }
    | PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, cur_unit, "restore",
