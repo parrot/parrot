@@ -418,10 +418,14 @@ void
 Parrot_new_cb_event(Parrot_Interp interpreter, PMC* cbi, void* ext)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    entry->next = NULL;
+    entry->data = ev;
+    ev->interp = interpreter;
     ev->type = EVENT_TYPE_CALL_BACK;
     ev->u.call_back.cbi = cbi;
     ev->u.call_back.external_data = ext;
-    Parrot_schedule_event(interpreter, ev);
+    Parrot_schedule_interp_qentry(interpreter, entry);
 }
 
 /*
