@@ -364,17 +364,18 @@ Unpack the contents from the filehandle.
   :        S bytes of segment content         :
   |                                           |
   +----------+----------+----------+----------+
-  
-NOTE: Despite the documentation, current implementations consist
-of two actual segments (fixup and const) followed by a block of
-byte code, which is not in a proper segment.
+
+Currently there are three segment types defined, and they must occur
+in precisely the order: FIXUP, CONSTANT TABLE, BYTE CODE. Every
+segment must be present, even if empty.
 
 
 =head2 FIXUP SEGMENT
 
-TODO: Segment format undefined.
+  << The format for the FIXUP segment is not yet defined. >>
 
-=head2 CONSTANTS SEGMENT
+
+=head2 CONSTANT TABLE SEGMENT
 
   0 (relative)
   +----------+----------+----------+----------+
@@ -382,6 +383,43 @@ TODO: Segment format undefined.
   +----------+----------+----------+----------+
 
 For each constant:
+
+  +----------+----------+----------+----------+
+  |             Constant Type (T)             |
+  +----------+----------+----------+----------+
+  |             Constant Size (S)             |
+  +----------+----------+----------+----------+
+  |                                           |
+  |        S bytes of constant content        |
+  :       appropriate for representing        :
+  |              a value of type T            |
+  |                                           |
+  +----------+----------+----------+----------+
+
+
+=head2 CONSTANTS
+
+For integer constants:
+
+  << integer constants are represented as manifest constants in
+     the byte code stream currently, limiting them to 32 bit values. >>
+
+For number constants (S is constant, and is equal to C<sizeof(FLOATVAL)>):
+
+  +----------+----------+----------+----------+
+  |                                           |
+  |             S' bytes of Data              |
+  |                                           |
+  +----------+----------+----------+----------+
+
+where
+
+  S' = S + (S % 4) ? (4 - (S % 4)) : 0
+
+If S' E<gt> S, then the extra bytes are filled with zeros.
+ 
+
+For string constants (S varies, and is the size of the particular string):
 
   4, 4 + (16 + S'0), 4 + (16 + S'0) + (16 + S'1)
   +----------+----------+----------+----------+
@@ -391,13 +429,20 @@ For each constant:
   +----------+----------+----------+----------+
   |                   Type                    |
   +----------+----------+----------+----------+
-  |                   Size S                  |
+  |                  Size (S)                 |
   +----------+----------+----------+----------+
   |                                           |
-  : S' bytes of Data (w/ S % 4 pad \0 bytes)  |
+  :             S' bytes of Data              :
   |                                           |
   +----------+----------+----------+----------+
+
+where
+
+  S' = S + (S % 4) ? (4 - (S % 4)) : 0
+
+If S' E<gt> S, then the extra bytes are filled with zeros.
  
+
 =head2 BYTE CODE SEGMENT
 
 The pieces that can be found in the byte code segment are as
@@ -412,27 +457,30 @@ follows:
   +----------+----------+----------+----------+
 
   +----------+----------+----------+----------+
-  |        Integer Constant Argument          |
+  |    Integer Argument (Manifest Constant)   |
   +----------+----------+----------+----------+
 
   +----------+----------+----------+----------+
-  |         String Constant Argument          |
+  |   String Argument (Constant Table Index)  |
   +----------+----------+----------+----------+
 
   +----------+----------+----------+----------+
-  |         Number Constant Argument          |
-  +                                           +
-  |                                           |
-  +----------+----------+----------+----------+
-
-  +----------+----------+----------+----------+
-  |              Constant Argument            |
+  |   Number Argument (Constant Table Index)  |
   +----------+----------+----------+----------+
 
 The number and types for each argument can be determined by
 consulting Parrot::Opcode.
 
+
 =head2 SOURCE CODE SEGMENT
+
+Currently there are no utilities that use this segment, even
+though it is mentioned in some of the early Parrot documents.
+
+Eventually there will be a more complete and useful PackFile
+specification, but this simple format works well enough for
+now (c. Parrot 0.0.2).
+
 
 =head1 AUTHOR
 
