@@ -16,6 +16,7 @@ use vars qw(@ISA);
 sub defines
 {
   return <<END;
+#undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) interpreter->ctx.int_reg.registers[cur_opcode[i]]
@@ -83,7 +84,7 @@ sub goto_address
 #print STDERR "pbcc: map_ret_abs($addr)\n";
   if ($addr eq '0') {
   	return "return (0);"
-  } else { 
+  } else {
   	return "goto *ops_addr[*(cur_opcode = (opcode_t *)$addr)]";
   }
 }

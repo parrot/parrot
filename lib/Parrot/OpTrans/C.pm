@@ -21,6 +21,7 @@ use vars qw(@ISA %arg_maps);
 sub defines
 {
   return <<END;
+#undef CONST
 #define REL_PC     ((size_t)(cur_opcode - interpreter->code->byte_code))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) interpreter->ctx.int_reg.registers[cur_opcode[i]]
@@ -64,7 +65,7 @@ sub expr_pop {
   's'  => "SREG(%ld)",
   'k'  => "PREG(%ld)",
   'ki' => "IREG(%ld)",
-  
+
   'ic' => "cur_opcode[%ld]",
   'nc' => "CONST(%ld)->number",
   'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",

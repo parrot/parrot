@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w 
+#! /usr/bin/perl -w
 #
 # jit2h.pl
 #
@@ -86,7 +86,7 @@ print JITCPU<<END_C;
  * This file is generated automatically from 'jit/$cpuarch/core.jit'
  * by $0.
  *
- * Any changes made here will be lost!  
+ * Any changes made here will be lost!
  *
  */
 
@@ -95,6 +95,7 @@ print JITCPU<<END_C;
 #define JIT_EMIT 1
 #include"parrot/jit_emit.h"
 
+#undef CONST
 #define IREG(i) interpreter->ctx.int_reg.registers[jit_info->cur_op[i]]
 #define NREG(i) interpreter->ctx.num_reg.registers[jit_info->cur_op[i]]
 #define PREG(i) interpreter->ctx.pmc_reg.registers[jit_info->cur_op[i]]
@@ -144,6 +145,6 @@ for ($i = 0; $i < $core_numops; $i++) {
 print JITCPU @jit_funcs, "};\n";
 
 sub make_subs {
-    my ($ptr, $type, $index) = @_; 
+    my ($ptr, $type, $index) = @_;
     return(($ptr eq '&' ? '&' : '') . sprintf($Parrot::OpTrans::C::arg_maps{$type_to_arg{$type}}, $index));
 }
