@@ -29,15 +29,13 @@ pmclass IntList need_ext {
         PObj_custom_mark_SET(SELF);
     }
 
-    /* The end_of_used_list parameter is passed into the mark_used
-     * function of the garbage collector. */
     void mark () {
         intlist_mark(INTERP, (IntList *) PMC_data(SELF));
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
-    };
+    }
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
@@ -46,57 +44,15 @@ pmclass IntList need_ext {
 
         ix = key_integer(INTERP, key);
         intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
-    };
-
-
-    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, (INTVAL) value);
-    };
-
-    void set_number_keyed (PMC* key, FLOATVAL value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = key_integer(INTERP, key);
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, (INTVAL) value);
-    };
-
-    void set_string_keyed_int (INTVAL key, STRING* value) {
-        THROW_UNSUPPORTED;
-    };
-
-    void set_string_keyed (PMC* key, STRING* value) {
-        THROW_UNSUPPORTED;
-    };
-
-    void set_pmc_keyed_int (INTVAL key, PMC* src) {
-        INTVAL value;
-
-        value = VTABLE_get_integer(INTERP, src);
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
-    };
-
-    void set_pmc_keyed (PMC* key, PMC* src) {
-        INTVAL ix;
-        INTVAL value;
-
-        if (!key) return;
-
-        ix = key_integer(INTERP, key);
-
-        value = VTABLE_get_integer(INTERP, src);
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
-    };
+    }
 
     INTVAL get_integer () {
         return intlist_length(INTERP, (IntList*) PMC_data(SELF));
-    };
+    }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         return intlist_get(INTERP, (IntList*) PMC_data(SELF), key);
-    };
+    }
 
     INTVAL get_integer_keyed (PMC* key) {
         INTVAL ix;
@@ -105,42 +61,8 @@ pmclass IntList need_ext {
         return intlist_get(INTERP, (IntList*) PMC_data(SELF), ix);
     }
 
-    FLOATVAL get_number_keyed_int (INTVAL key) {
-        THROW_UNSUPPORTED;
-        return 0.0;
-    }
-
-    FLOATVAL get_number_keyed (PMC* key) {
-        THROW_UNSUPPORTED;
-        return 0.0;
-    }
-
-    STRING* get_string_keyed_int (INTVAL key) {
-        THROW_UNSUPPORTED;
-        return NULL;
-    }
-
-    STRING* get_string_keyed (PMC* key) {
-        THROW_UNSUPPORTED;
-        return NULL;
-    }
-
-    PMC* get_pmc_keyed_int (INTVAL key) {
-        THROW_UNSUPPORTED;
-        return NULL;
-    }
-
-    PMC* get_pmc_keyed (PMC* key) {
-        THROW_UNSUPPORTED;
-        return NULL;
-    }
-
     void push_integer (INTVAL value) {
         intlist_push(INTERP, (IntList*) PMC_data(SELF), value);
-    }
-
-    void push_float (FLOATVAL value) {
-        intlist_push(INTERP, (IntList*) PMC_data(SELF), (INTVAL) value);
     }
 
     INTVAL pop_integer() {

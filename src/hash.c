@@ -111,7 +111,7 @@ lookupBucket(Hash *hash, HashIndex slot)
 
 Return the hashed value of the string
 
-=cut 
+=cut
 
 */
 
