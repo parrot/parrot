@@ -124,7 +124,8 @@ docs/.dummy:
 	cd docs; make
 
 clean:
-	$(RM_F) *$(O) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) *$(O) classes/*$(O) chartypes/*$(O) encodings/*$(O)
+	$(RM_F) *.s core_ops.c $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
 	$(RM_F) $(INC)/oplib/vtable_ops.h vtable_ops.c vtable.ops
