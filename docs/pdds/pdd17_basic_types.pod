@@ -149,6 +149,8 @@ A statically sized array which holds only String values.
 
 A dynamically sized array which holds only String values.
 
+=back
+
 =head2 Hash types
 
 =over 4
@@ -180,9 +182,9 @@ when used in a binary math operation:
 
 The operation is an integer.
 
+=back 
+
 =head1 IMPLEMENTATION
-
-
 
 =head1 FOOTNOTES
 
