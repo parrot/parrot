@@ -6,7 +6,6 @@ MYPATH  = languages${slash}tcl${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
 lib/backslash_newline_subst.imc \
-lib/backslash_subst.imc \
 lib/commands/append.imc \
 lib/commands/array.imc \
 lib/commands/break.imc \
@@ -67,8 +66,7 @@ lib/ops/shr.imc \
 lib/ops/unequal.imc \
 lib/parse.imc \
 lib/string_to_list.imc \
-lib/substitution.imc \
-lib/var_subst.imc \
+lib/tclword.imc \
 tcl.imc_template \
 tcl.pl
 
