@@ -287,7 +287,7 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 #define Parrot_jit_intrp emitm_i(0)
 
 /* The register holding the address of I0 */
-#define Parrot_jit_regbase emitm_i(1)
+#define Parrot_jit_regbase emitm_i(2)
 
 /* The register containing the address of the opmap */
 #define Parrot_jit_opmap emitm_i(3)
@@ -299,6 +299,32 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 
 /* The offset of a Parrot register from the base register */
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
+
+/* Generate a jump to a bytecode address - uses the temporary register */
+static void
+Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
+                    struct Parrot_Interp *interpreter, int reg_num)
+{
+
+    /* Construct the starting address of the byte code */
+    emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->byte_code),
+        Parrot_jit_tmp);
+    emitm_or_i(jit_info->native_ptr, Parrot_jit_tmp,
+        emitm_lo10(interpreter->code->byte_code), Parrot_jit_tmp);
+
+    /* Calculates the offset into op_map shadow array 
+     * assuming sizeof(opcode_t) == sizeof(opmap array entry) */
+    emitm_sub_r(jit_info->native_ptr, reg_num, Parrot_jit_tmp,
+                Parrot_jit_tmp);
+
+    /* Load the address of the native code from op_map */
+    emitm_ld_r(jit_info->native_ptr, Parrot_jit_opmap, Parrot_jit_tmp,
+               Parrot_jit_tmp);
+
+    /* This jumps to the address from op_map */
+    emitm_jumpl_i(jit_info->native_ptr, Parrot_jit_tmp, 0, Parrot_jit_tmp);
+    emitm_nop(jit_info->native_ptr);
+}
 
 /* Generate conditional branch to offset from current parrot op */
 static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
@@ -505,9 +531,14 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     }
 }
 
-void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                       struct Parrot_Interp * interpreter)
 {
+    /* generated code is called as jit_code(interpreter, pc)
+     * so interpreter is in i0 and pc in i1.
+     * i1 is reusable once past the jump. interpreter is preserved in i0
+     */
     int ireg0_offset;
 
     /* Standard Prolog */
@@ -531,8 +562,10 @@ void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emitm_sethi(jit_info->native_ptr,
         emitm_hi22(jit_info->arena.op_map), Parrot_jit_opmap);
     emitm_or_i(jit_info->native_ptr,
-        emitm_i(3), emitm_lo10(jit_info->arena.op_map), Parrot_jit_opmap);
-    /* TODO emit restart code s. i386 */
+        Parrot_jit_opmap, emitm_lo10(jit_info->arena.op_map), Parrot_jit_opmap);
+
+    /* Jump to the current pc */
+    Parrot_jit_bytejump(jit_info, interpreter, emitm_i(1));
 }
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -555,21 +588,27 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
+    Parrot_jit_bytejump(jit_info, interpreter, emitm_o(0));
+}
 
-    emitm_sethi(jit_info->native_ptr, emitm_hi22(interpreter->code->byte_code),
-        emitm_l(1));
-    emitm_or_i(jit_info->native_ptr, emitm_l(1),
-        emitm_lo10(interpreter->code->byte_code), emitm_l(1));
+#undef Parrot_jit_restart_op
+void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+                        struct Parrot_Interp * interpreter)
+{
+    Parrot_jit_normal_op(jit_info, interpreter);
 
-    /* This calculates offset into op_map shadow array */
-    emitm_sub_r(jit_info->native_ptr, emitm_o(0), emitm_l(1), emitm_o(0));
+    /* Test whether the return value is 0 */
+    emitm_subcc_r(jit_info->native_ptr, emitm_o(0), emitm_g(0), emitm_g(0));
 
-    /* Load the address of the native code from op_map */
-    emitm_ld_r(jit_info->native_ptr, emitm_i(3), emitm_o(0), emitm_o(0));
-
-    /* This jumps to the address from op_map */
-    emitm_jumpl_i(jit_info->native_ptr, emitm_o(0), 0, emitm_g(0));
+    /* If the return pc is not zero skip the next 3 instructions */
+    emitm_bicc(jit_info->native_ptr, 0, emitm_bne, 4);
     emitm_nop(jit_info->native_ptr);
+
+    /* Return if the return pc is 0 */
+    emitm_ret(jit_info->native_ptr);
+    emitm_restore_i(jit_info->native_ptr, emitm_g(0), emitm_g(0), emitm_g(0));
+
+    Parrot_jit_bytejump(jit_info, interpreter, emitm_o(0));
 }
 
 /* move reg to mem (i.e. intreg) */
