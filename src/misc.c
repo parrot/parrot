@@ -18,11 +18,11 @@ typedef long HUGEINTVAL;
 typedef unsigned long UHUGEINTVAL;
 
 typedef struct spfinfo_t {
-    INTVAL flags;
-    INTVAL width;
-    INTVAL prec;
-    INTVAL type;
-    INTVAL phase;
+    UINTVAL flags;
+    UINTVAL width;
+    UINTVAL prec;
+    UINTVAL type;
+    UINTVAL phase;
 } *SpfInfo;
 
 #define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), NULL, 0, NULL)
@@ -89,7 +89,7 @@ typedef struct spfinfo_t {
 void int_to_str(char *, char *, HUGEINTVAL, INTVAL );
 */
 
-void gen_sprintf_call(char *, char *, SpfInfo, const char);
+void gen_sprintf_call(char *, char *, SpfInfo, int);
 
 static void uint_to_str(char *buf1, char *buf2, UHUGEINTVAL num,
 			INTVAL base)
@@ -184,7 +184,7 @@ static void Pad_it(SpfInfo info, char *buf)
 }
 
 void
-gen_sprintf_call(char *buf, char *buf2, SpfInfo info, const char thingy)
+gen_sprintf_call(char *buf, char *buf2, SpfInfo info, int thingy)
 {
     int i = 0;
     buf[i++] = '%';
@@ -208,13 +208,13 @@ gen_sprintf_call(char *buf, char *buf2, SpfInfo info, const char thingy)
     }
 
     if (info->width) {
-	int_to_str(buf + i, buf2, info->width, 10);
+	uint_to_str(buf + i, buf2, info->width, 10);
 	i = strlen(buf);
     }
 
     if (info->prec) {
 	buf[i++] = '.';
-	int_to_str(buf + i, buf2, info->prec, 10);
+	uint_to_str(buf + i, buf2, info->prec, 10);
 	i = strlen(buf);
     }
 
@@ -403,7 +403,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			case 'e':
 			    dbl = va_arg(*args, double);
 			    gen_sprintf_call(t1, t2, &info,
-					     (const char) 'e');
+					     'e');
 			    sprintf(t2, t1, dbl);
 			    targ =
 				string_concat(interpreter, targ,
@@ -413,7 +413,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			case 'E':
 			    dbl = va_arg(*args, double);
 			    gen_sprintf_call(t1, t2, &info,
-					     (const char) 'E');
+					     'E');
 			    sprintf(t2, t1, dbl);
 			    targ =
 				string_concat(interpreter, targ,
@@ -433,7 +433,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			case 'g':
 			    dbl = va_arg(*args, double);
 			    gen_sprintf_call(t1, t2, &info,
-					     (const char) 'g');
+					     'g');
 			    sprintf(t2, t1, dbl);
 			    targ =
 				string_concat(interpreter, targ,
@@ -443,7 +443,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			case 'G':
 			    dbl = va_arg(*args, double);
 			    gen_sprintf_call(t1, t2, &info,
-					     (const char) 'G');
+					     'G');
 			    sprintf(t2, t1, dbl);
 			    targ =
 				string_concat(interpreter, targ,
