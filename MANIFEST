@@ -46,6 +46,7 @@ docs/parrotbyte.pod
 docs/pdds/pdd00_pdd.pod
 docs/pdds/pdd01_overview.pod
 docs/pdds/pdd02_vtables.pod
+docs/pdds/pdd03_calling_conventions.pod
 docs/pdds/pdd04_datatypes.pod
 docs/pdds/pdd05_opfunc.pod
 docs/pdds/pdd06_pasm.pod

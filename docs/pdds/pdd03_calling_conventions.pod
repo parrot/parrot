@@ -1,0 +1,175 @@
+=head1 TITLE
+
+Parrot Calling Conventions
+
+=head1 VERSION
+
+1
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski
+    Class: Internals
+    PDD Number: 03
+    Version: 1
+    Status: Developing
+    Last Modified: 26 April 2002
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=head1 ABSTRACT
+
+This PDD describes Parrot's inter-routine calling conventions.
+
+=head1 DESCRIPTION
+
+=head2 Responsibility for environment preservation
+
+The caller is responsible for preserving any environment it is
+interested in keeping. This includes any and all registers, lexical
+scoping and scratchpads, opcode libraries, and so forth.
+
+Use of the C<saveall> opcode is recommended if the caller wishes to
+save everything, and the C<restoreall> opcode to restore everything
+C<saveall> saved.
+
+=head2 Calling conventions
+
+The following registers are used in calling all subs and methods
+
+=over 4
+
+=item P0
+
+Holds the object representing the subroutine.
+
+=item P1
+
+Holds the continuation for the caller, assuming this sub was called
+with callcc. Otherwise NULL.
+
+=item P2
+
+Holds the object the sub was called on. (For method calls)
+
+=item I0
+
+True if the sub is being called with prototyped parameters.
+
+=item I1
+
+The number of items pushed onto the stack.
+
+=back
+
+The following registers are used I<only> when calling a subroutine for
+which there is a compile-time prototype.
+
+=over 4
+
+=item I5 through I31
+
+The first 27 integer parameters.
+
+=item S5 through S31
+
+The first 27 string parameters.
+
+=item N5 through N31
+
+The first 27 numeric parameters.
+
+=item P5 through P31
+
+The first 27 PMC parameters.
+
+=back
+
+All overflow parameters, and all parameters for subs called without a
+known prototype, are pushed on the stack in reverse order--that is the
+topmost entry on the stack is the first entry in the parameter list,
+and the bottom entry the last entry in the parameter list.
+
+The PMC for a hash, array, or list is passed if one of the entries in
+the parameter list is a hash, array, or list. The aggregate is B<not>
+flattened. (Though when accessing the parameters it may be)
+
+Parameters are passed in S, I, and N registers only if the sub's
+prototype specifically indicates it takes parameters of that type.
+
+Note that it doesn't matter what the order of the integer, string,
+numeric, and PMC parameters are in the parameter list up until
+overflow occurs.
+
+=head2 Return conventions
+
+On return from a function, the following registers are set. Return
+values are placed in registers only if the function is prototyped to
+do so. All values on the stack are in reverse order, such that the top
+value on the stack is the first value returned. 
+
+=over 4
+
+=item I0
+
+Holds the number of return values on the stack.
+
+=item I1
+
+Holds the number of return values in integer registers.
+
+=item I2
+
+Holds the number of return values in string registers.
+
+=item I3
+
+Holds the number of return values in PMC registers.
+
+=item I4
+
+Holds the number of return valies in numeric registers.
+
+=item P5-P31
+
+PMC return values
+
+=item I5-I31
+
+Integer return values
+
+=item S5-S31
+
+String return values
+
+=item N5-N31
+
+Numeric return values
+
+=item stack
+
+Overflow values, or values for functions that don't have a return prototype.
+
+=back
+
+=head1 REFERENCES
