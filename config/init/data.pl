@@ -209,7 +209,7 @@ Dump config keys.
 =cut
 
   *dump=sub {
-    Data::Dumper->Dump([\%c], ['*PConfig']);
+    Data::Dumper->new([\%c], ['*PConfig'])->Sortkeys(1)->Dump();
   };
 
 =item Configure::Data->clean()
