@@ -947,11 +947,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
     STRING *m, *n;
 
     if (condition->type & PDB_cond_int) {
-        i = interpreter->int_reg.registers[condition->reg];
+        i = REG_INT(condition->reg);
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
         else
-            j = interpreter->int_reg.registers[*(int *)condition->value];
+            j = REG_INT(*(int *)condition->value);
         if (((condition->type & PDB_cond_gt) && (i > j)) ||
             ((condition->type & PDB_cond_ge) && (i >= j)) ||
             ((condition->type & PDB_cond_eq) && (i == j)) ||
@@ -962,11 +962,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
         return 0;
     }
     else if (condition->type & PDB_cond_num) {
-        k = interpreter->num_reg.registers[condition->reg];
+        k = REG_NUM(condition->reg);
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
         else
-            l = interpreter->num_reg.registers[*(int *)condition->value];
+            l = REG_NUM(*(int *)condition->value);
         if (((condition->type & PDB_cond_gt) && (k > l)) ||
             ((condition->type & PDB_cond_ge) && (k >= l)) ||
             ((condition->type & PDB_cond_eq) && (k == l)) ||
@@ -977,11 +977,11 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
         return 0;
     }
     else if (condition->type & PDB_cond_str) {
-        m = interpreter->string_reg.registers[condition->reg];
+        m = REG_STR(condition->reg);
         if (condition->type & PDB_cond_const)
             n = (STRING *)condition->value;
         else
-            n = interpreter->string_reg.registers[*(int *)condition->value];
+            n = REG_STR(*(int *)condition->value);
         if (((condition->type & PDB_cond_gt) &&
                 (string_compare(interpreter, m, n) > 0)) ||
             ((condition->type & PDB_cond_ge) &&
