@@ -9,7 +9,7 @@ Parrot::Test - Parrot Test
 
 Set the number of tests to be run like this:
 
-	use Parrot::Test tests => 8;
+        use Parrot::Test tests => 8;
 
 Write individual tests like this:
 
@@ -59,6 +59,21 @@ result.
 Runs the PIR code and passes the test if a string comparison of output
 with the expected result it false.
 
+=item C<pbc_output_is($code, $expected, $description)>
+
+Runs the Parrot Bytecode and passes the test if a string comparison of output
+with the expected result it true.
+
+=item C<pbc_output_like($code, $expected, $description)>
+
+Runs the Parrot Bytecode and passes the test if output matches the expected
+result.
+
+=item C<pbc_output_isnt($code, $expected, $description)>
+
+Runs the Parrot Bytecode and passes the test if a string comparison of output
+with the expected result it false.
+
 =item C<c_output_is($code, $expected, $description)>
 
 Compiles and runs the C code, passing the test if a string comparison of
@@ -101,10 +116,16 @@ require Test::More;
 my $Builder = Test::Builder->new;
 
 @EXPORT = ( qw(output_is   output_like   output_isnt),
-	    qw(pir_output_is   pir_output_like   pir_output_isnt),
+            qw(pir_output_is   pir_output_like   pir_output_isnt),
             qw(c_output_is c_output_like c_output_isnt),
             qw(language_output_is),
             qw(skip) );
+@EXPORT = qw( output_is          output_like          output_isnt
+              pir_output_is      pir_output_like      pir_output_isnt
+              pbc_output_is      pbc_output_like      pbc_output_isnt
+              c_output_is        c_output_like        c_output_isnt
+              language_output_is
+              skip );
 @ISA = qw(Exporter);
 
 sub import {
@@ -179,12 +200,15 @@ sub generate_pbc_for {
 }
 
 # Map the Parrot::Test function to a Test::Builder method.
-my %Test_Map = ( output_is   => 'is_eq',
-                 output_isnt => 'isnt_eq',
-                 output_like => 'like',
-		 pir_output_is   => 'is_eq',
-                 pir_output_isnt => 'isnt_eq',
-                 pir_output_like => 'like',
+my %Test_Map = ( output_is          => 'is_eq',
+                 output_isnt        => 'isnt_eq',
+                 output_like        => 'like',
+                 pir_output_is      => 'is_eq',
+                 pir_output_isnt    => 'isnt_eq',
+                 pir_output_like    => 'like',
+                 pbc_output_is      => 'is_eq',
+                 pbc_output_isnt    => 'isnt_eq',
+                 pbc_output_like    => 'like',
                  language_output_is => 'is_eq',
                );
 
@@ -205,7 +229,7 @@ sub generate_functions {
   }
 
   my $path_to_parrot = $INC{"Parrot/Config.pm"};
-  $path_to_parrot =~ s:lib/Parrot/Config.pm$::;	
+  $path_to_parrot =~ s:lib/Parrot/Config.pm$::;        
   $path_to_parrot = File::Spec->curdir if $path_to_parrot eq "";
 
   my $PARROT = File::Spec->join(File::Spec->curdir,'parrot' . $PConfig{exe});
@@ -219,93 +243,95 @@ sub generate_functions {
         *{$package.'::'.$func} = sub ($$$;$) {
           my $language = $_[0];
           $language = ucfirst($language) unless ( $language eq 'm4' );
-	    
-	  # make sure TODO will work, by telling Test::Builder which package
-	  # the .t file is in (one more than usual, due to the extra layer
-	  # of package indirection
-	  my $level = $Builder->level();
+            
+          # make sure TODO will work, by telling Test::Builder which package
+          # the .t file is in (one more than usual, due to the extra layer
+          # of package indirection
+          my $level = $Builder->level();
           $Builder->level(2);
-	    
+            
           # get modified PARROT command.
           require "Parrot/Test/$language.pm";
-	  # set the builder object, and parrot config.
+          # set the builder object, and parrot config.
           my $obj = eval "Parrot::Test::${language}->new()";
           $obj->{builder} = $Builder;
           $obj->{relpath} = $path_to_parrot;
-	  $obj->{parrot}  = $PARROT;
+          $obj->{parrot}  = $PARROT;
           $obj->$delegate_func(@_[1..$#_]);
 
-	  # retore prior level, just in case.
-	  $Builder->level($level);
+          # retore prior level, just in case.
+          $Builder->level($level);
         }
     } else {
 
     *{$package.'::'.$func} = sub ($$;$) {
 
-	my( $assembly, $output, $desc) = @_;
+        my( $assembly, $output, $desc) = @_;
 
-	$count = $Builder->current_test + 1;
+        $count = $Builder->current_test + 1;
 
-	#set up default description
-	(undef, my $file, my $line) = caller;
-	unless ($desc) {
-	    $desc = "($file line $line)";
-	}
+        #set up default description
+        (undef, my $file, my $line) = caller;
+        unless ($desc) {
+            $desc = "($file line $line)";
+        }
 
-	$output =~ s/\cM\cJ/\n/g;
+        $output =~ s/\cM\cJ/\n/g;
 
-	#generate pbc for this test (may be overriden)
-	my $out_f = per_test('.out',$count);
-	my $as_f = per_test('.pasm',$count);
+        #generate pbc for this test (may be overriden)
+        my $out_f = per_test('.out',$count);
+        my $as_f = per_test('.pasm',$count);
 
-	if ($assembly =~ /^##PIR##/ || $func =~ /^pir_/) {
-	    $as_f = per_test('.imc',$count);
-	}
+        if ( $func !~ /^pbc_output_/ &&
+             ( $assembly =~ /^##PIR##/ || $func =~ /^pir_/ )
+           ) {
+            $as_f = per_test('.imc',$count);
+        }
 
-	$TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	my $args = $TEST_PROG_ARGS;
+        $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+        my $args = $TEST_PROG_ARGS;
 
-	my $run_pbc = 0;
-	if ($args =~ s/--run-pbc//) {
-	    # native tests with --run-pbc don't make sense
-	    if ($as_f =~ /native_pbc/) {
-		return $Builder->ok(1, $desc);
-	    }
-	    my $pbc_f = per_test('.pbc', $count);
-	    $run_pbc = 1;
-	    $args = "$args -o $pbc_f -r -r";
-	}
+        my $run_pbc = 0;
+        if ($args =~ s/--run-pbc//) {
+            # native tests with --run-pbc don't make sense
+            if ($func =~ /^pbc_output_/) {
+                return $Builder->ok(1, $desc);
+            }
+            my $pbc_f = per_test('.pbc', $count);
+            $run_pbc = 1;
+            $args = "$args -o $pbc_f -r -r";
+        }
 
-	# native tests are just run
-	if ($as_f =~ /native_pbc/) {
-	    $as_f = per_test('.pbc',$count);
-	    $run_pbc = 0;
-	}
-	else {
-	    $as_f = File::Spec->rel2abs($as_f);
-	    $pbc_generator->( $assembly, $path_to_parrot, $count, $as_f );
-	}
+        # native tests are just run
+        if ($func =~ /^pbc_output_/) {
+            $as_f = per_test('.pbc',$count);
+            $run_pbc = 0;
+        }
+        else {
+            $as_f = File::Spec->rel2abs($as_f);
+            $pbc_generator->( $assembly, $path_to_parrot, $count, $as_f );
+        }
 
         my $cmd;
         my $exit_code = 0;
-	my $pass = 0;
+        my $pass = 0;
 
-	$cmd = "(cd $path_to_parrot && $PARROT ${args} \"$as_f\")";
+        $cmd = "(cd $path_to_parrot && $PARROT ${args} \"$as_f\")";
 
-	$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
+        $exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 
-	my $meth = $Test_Map{$func};
-	unless ($pass) {
-	    $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
-	    $Builder->diag("'$cmd' failed with exit code $exit_code")
-	      if $exit_code and not $pass;
+        my $meth = $Test_Map{$func};
+        unless ($pass) {
+            $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+            $Builder->diag("'$cmd' failed with exit code $exit_code")
+              if $exit_code and not $pass;
         }
 
-	unless($ENV{POSTMORTEM}) {
-	    unlink $out_f;
-	}
+        unless($ENV{POSTMORTEM}) {
+            unlink $out_f;
+        }
 
-	return $pass;
+        return $pass;
     }  # sub
     }  # language-if
   }
@@ -360,10 +386,10 @@ sub generate_functions {
       $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
 
       if (! -e $obj_f) {
-	$Builder->diag("Failed to build '$obj_f': " . slurp_file($build_f));
-	unlink $build_f;
-	$Builder->ok(0,$desc);
-	return 0;
+        $Builder->diag("Failed to build '$obj_f': " . slurp_file($build_f));
+        unlink $build_f;
+        $Builder->ok(0,$desc);
+        return 0;
       }
 
       $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f " .
@@ -373,10 +399,10 @@ sub generate_functions {
 
 
       if (! -e $exe_f) {
-	$Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
-	unlink $build_f;
-	$Builder->ok(0,$desc);
-	return 0;
+        $Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
+        unlink $build_f;
+        $Builder->ok(0,$desc);
+        return 0;
       }
 
       $cmd       = ".$PConfig{slash}$exe_f";
@@ -389,9 +415,9 @@ sub generate_functions {
 
       unless($ENV{POSTMORTEM}) {
         unlink $out_f;
-	unlink $build_f;
-	unlink $exe_f;
-	unlink $obj_f;
+        unlink $build_f;
+        unlink $exe_f;
+        unlink $obj_f;
       }
       return $pass;
     }
