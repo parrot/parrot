@@ -81,7 +81,7 @@ foreach my $func ( keys %Test_Map ) {
     my $meth = $Test_Map{$func};
     my $pass = $Builder->$meth( $prog_output, $output, $desc );
 
-    unless($ENV{POSTMORTERM}) {
+    unless($ENV{POSTMORTEM}) {
       foreach my $i ( $as_f, $by_f, $out_f ) {
         unlink $i;
       }

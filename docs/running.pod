@@ -11,10 +11,10 @@ them and modify this document accordingly.
 
 Converts a Parrot Assembly file to Parrot ByteCode.
 
-  assemble.pl foo.pasm > foo.pbc
+  perl assemble.pl foo.pasm > foo.pbc
 
-Usage information: no usage message available. There is some amount of
-malformed POD visible by running C<perldoc -F Parrot/Assembler.pm>.
+Usage information: C<assemble.pl -h>. Detailed documentation on the
+underlying module can be read with C<perldoc -F lib/Parrot/Assembler.pm>.
 
 =item C<test_parrot>
 
@@ -52,7 +52,8 @@ Usage information: none available.
 
 =item C<pdump>
 
-Does something. Use it by running
+Causes a segmentation fault and dumps core. (Not its intention,
+despite the name!) Use it by running
 
   something
 
@@ -64,7 +65,7 @@ Converts a bytecode file to a native .c file.
 
   perl pbc2c.pl foo.pbc > foo.c
 
-Usage information: C<perldoc -F pbc2c.pl>
+Usage information (and malformed pod error message): C<perldoc -F pbc2c.pl>
 
 No documentation is available for compiling the .c file to a binary.
 This works, but produces a binary that crashes:
@@ -72,5 +73,26 @@ This works, but produces a binary that crashes:
   ./assemble.pl examples/assembly/life.pasm > life.pbc
   perl pbc2c.pl life.pbc > life.c
   ls **/*.o | egrep -v 'pdump|test_main' | xargs gcc -Iinclude -o life life.c -lm -ldl
+
+=item B<tests>
+
+C<make test> will compile anything that needs to be compiled and run
+all standard regression tests. To look at a test more closely, run the
+appropriate test file in the t/ directory:
+
+  perl -Ilib t/op/basic.t
+
+To keep a copy of all of the test C<.pasm> and C<.pbc> files
+generated, set the environment variable POST_MORTEM to 1:
+
+  POSTMORTEM=1 perl -Ilib t/op/basic.t 
+  ls t/op/basic*
+
+To run tests with a different dispatcher, edit
+C<$Parrot::Config::PConfig{test_prog}> in lib/Parrot/Config.pm:
+
+               'test_prog' => 'test_parrot -P',
+
+and then use any of the above methods for running tests.
 
 =back
