@@ -1,0 +1,7 @@
+Not very much to do:
+Try 
+	make test
+to see if your perl is capable of running urmc
+Then go into the examples directory and try
+	make
+You'll end up with a bunch of pasm files.

@@ -1,0 +1,26 @@
+# 2003 (c) by Marcus Thiesen
+# <marcus@cpan.org>
+# This program is under GPL
+# See the LICENSE file
+### This URM program
+### computes the distance
+### between two numbers
+
+in(r1,r2)
+
+1: if r1 = 0 goto 6
+2: if r2 = 0 goto 6
+3: r1 <- r1 - 1
+4: r2 <- r2 - 1
+5: goto 1
+6: if r1 = 0 goto 11
+7: if r1 = 0 goto 15
+8: r1 <- r1 - 1
+9: r3 <- r3 + 1
+10: goto 7
+11: if r2 = 0 goto 15
+12: r2 <- r2 - 1
+13: r3 <- r3 + 1
+14: goto 11
+
+out(r3)

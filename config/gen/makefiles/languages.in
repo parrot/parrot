@@ -1,12 +1,12 @@
 MAKE = ${make}
 
-all : imcc regex befunge bf cola ook perl6
+all : imcc regex befunge bf cola ook perl6 urm
 	@echo "SKIPPED: scheme (nothing to make, but should not default to make test)"
 	@echo "SKIPPED: jako (fallen behind imcc changes)"
 
-complete-all : imcc jako regex scheme befunge bf cola ook perl6
+complete-all : imcc jako regex scheme befunge bf cola ook perl6 urm
 
-test: imcc.test regex.test scheme.test befunge.test bf.test ook.test perl6.test
+test: imcc.test regex.test scheme.test befunge.test bf.test ook.test perl6.test urm.test
 	@echo "SKIPPED: jako (fallen behind imcc changes)"
 	@echo "SKIPPED: cola (no make test)"
 
@@ -85,6 +85,14 @@ perl6.dummy:
 
 perl6.test:
 	cd perl6 && $(MAKE) test && cd ..
+
+urm: urm.dummy
+
+urm.dummy:
+	cd urm && $(MAKE) && cd ..
+
+urm.test:
+	cd urm && $(MAKE) test && cd ..
 
 clean:
 	cd imcc && $(MAKE) clean && cd ..

@@ -1,0 +1,15 @@
+# 2003 (c) by Marcus Thiesen
+# <marcus@cpan.org>
+# This program is under GPL
+# See the LICENSE file
+### Substracts r2 from r1
+
+in(r1,r2)
+out(r1)
+
+
+1: if r1 = 0 goto 6
+2: if r2 = 0 goto 6
+3: r1 <- r1 - 1
+4: r2 <- r2 - 1
+5: goto 1

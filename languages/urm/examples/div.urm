@@ -1,0 +1,25 @@
+# 2003 (c) by Marcus Thiesen
+# <marcus@cpan.org>
+# This program is under GPL
+# See the LICENSE file
+### Division in URM
+### divides r1 by rw and
+### outputs r3
+
+in(r1,r2);
+out(r3);
+
+1: r3 <- 0
+2: r4 <- 0
+3: if r2 = 0 goto 7
+4: r2 <- r2 - 1
+5: r4 <- r4 + 1
+6: goto 3
+7: if r4 = 0 goto 13
+8: if r1 = 0 goto 15
+9: r1 <- r1 - 1
+10: r4 <- r4 - 1
+11: r2 <- r2 + 1
+12: goto 7
+13: r3 <- r3 + 1
+14: goto 3

@@ -1,0 +1,23 @@
+# 2003 (c) by Marcus Thiesen
+# <marcus@cpan.org>
+# This program is under GPL
+# See the LICENSE file
+### Multiplikation in URM
+
+in(r1,r2)
+out(r3)
+
+1: r3 <- 0
+2: r4 <- 0
+3: if r2 = 0 goto 15
+4: if r1 = 0 goto 8
+5: r1 <- r1 - 1
+6: r4 <- r4 + 1
+7: goto 4
+8: if r4 = 0 goto 13
+9: r4 <- r4 - 1
+10: r3 <- r3 + 1
+11: r1 <- r1 + 1
+12: goto 8
+13: r2 <- r2 - 1
+14: goto 3

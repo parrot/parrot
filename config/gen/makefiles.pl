@@ -31,6 +31,9 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
           commentType => '#');
+  genfile('config/gen/makefiles/urm.in',       'languages/urm/Makefile',
+          commentType => '#');
+
 
   # set up docs/Makefile, partly based on the .ops in the root dir
 
@@ -48,7 +51,7 @@ sub runstep {
   Configure::Data->set(pod => undef);
 
   open MAKEFILE, ">> docs/Makefile" or die "open >> docs/Makefile: $!";
-  
+
   foreach my $ops (@ops) {
       my $pod = $ops;
       $pod =~ s/\.ops$/.pod/;

@@ -1,0 +1,141 @@
+urmc - an URM compiler for Parrot
+
+2003 (c) by Marcus Thiesen <marcus@cpan.org>
+
+What is URM?
+============
+
+URM is a "language" at least used in German universities to teach the
+basic principles of programming. URM stands for Universal Register
+Machine - it basically means that you have a couple of operations and
+an unlimited amount of registers to use for your programs.
+See Syntax for a description
+
+Why a compiler?
+===============
+
+You might know that it is quite boring to program with pen and paper,
+at least if you're not debugging some screwed up C code but just some
+examples for your upcoming exam. So, I didn't want to learn and I
+wrote a compiler - in Perl. It wasn't really a compile, just some
+regexes and eval commands. It had one problem - it was slow.
+
+So I dropped it and didn't think about it for a year now. Enter
+Acme. He gave quite a good talk on YAPC::EU 2003 about "Little
+languages in Parrot" and I dreamt of rewriting my URM compiler to run
+on Parrot. So here it is! :-)
+
+Usage
+=====
+
+The urm compiler (urmc) has two operation modes. One is to simply call
+it with 
+	./urmc somefile.urm
+and it will compile it to a temporary pasm (Parrot Assembly) file and
+try to execute this file with your Parrot installation.
+
+The other one mode is if you call it with
+	./urmc -c somefile.urm
+it will create a pasm file called somefile.pasm which you can execute
+by hand with your parrot installation.
+
+Overall Syntax
+==============
+
+URM is rather simple - if you're an assembler programmer :-)
+
+At the beginning of each file you got to have two lines, defining the
+input and output registers of your program:
+	in (r1,r2)
+	out (r3)
+You can have as many input registers as you like (delimited by ",")
+but only one output register.
+
+Code lines are always preceded by their logical line number (not the
+actual line number in the file) which are addressed in goto statements.
+
+Register Naming
+===============
+Registers hold ints, i.e. one plain decimal number
+
+Registers are always named with a beginning r followed by a
+digit to identify it:
+	r1
+	r537
+	r249343
+
+Branching
+==========
+The URM knows two operations to modify the program flow.
+The unconditioned branching is a simple goto followed by a logical
+line number:
+	goto 5
+	goto 72
+
+To get a conditioned branch you can only test if a register is 0:
+	if r3 = 0 goto 37
+	if r5 = 0 goto 1
+
+These are the only control flow commands.
+
+Operations
+==========
+The URM knows three operations:
+1. Initialize a register with zero:
+	r3 <- 0
+This is believed to be optional, therefore it is only for good style
+in my examples.
+(Really, we were told that the registers are believed to be in a state
+of 0, but we had to initialize them)
+
+2. Add 1 to a register
+To add a number to a register you can execute
+	r4 <- r4 + 1
+Note: The register number before and after the <- must match, you can
+not directly add one register to another.
+
+Note: You can only add 1 to a register.
+
+3. Subtract 1 from a register
+Guess what:
+	r4 <- r4 - 1
+Note: The same rules as for adding, only operate on one register and
+only subtract 1.
+
+Program End
+===========
+To end a program, you have to jump to a nonexistent line behind the
+end of the code. If your code has e.g. 14 logical lines a 
+	goto 15
+will end the program and output the value of the output register.
+
+See the files in the examples/ directory for some examples.
+
+Last Notes
+==========
+
+The compiler is written in Perl and uses only basic features of this
+language, so it shouldn't have such a huge version requirement.
+
+Prerequisites
+=============
+Getopt::Long is needed for urmc
+Parrot to actually execute the code (best in your path)
+
+License
+=======
+This stuff is all GPL, see LICENSE
+
+Debugging
+=========
+I included my original URM compiler as urm-old.pl. As it is very slow
+I don't recommend using it, but it outputs the whole program flow to
+STDOUT. Maybe you can use it as a debugging help.
+
+Have fun
+	Marcus
+
+P.S.: 
+It took me about 20 minutes in that exam to figure out how to get a
+sum from 1 to n-1 over n right in URM. Try it yourself.
+

@@ -1,0 +1,16 @@
+# 2003 (c) by Marcus Thiesen
+# <marcus@cpan.org>
+# This program is under GPL
+# See the LICENSE file
+### This program outputs 1 
+### if both numbers are greater
+### than zero
+
+in(r1,r2)
+out(r3)
+
+1: r3 <- 0
+2: if r1 = 0 goto 8
+3: if r2 = 0 goto 8
+4: r3 <- r3 + 1
+
