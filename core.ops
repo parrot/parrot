@@ -8,7 +8,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-core.ops
+core.ops - Parrot Core Ops
 
 =cut
 
@@ -735,43 +735,6 @@ met, the branch happens, otherwise control falls to the next operation.
 
 =cut
 
-########################################
-
-=item B<cmp>(out INT, in INT, in INT)
-
-=item B<cmp>(out INT, in NUM, in NUM)
-
-=item B<cmp>(out INT, in STR, in STR)
-
-=item B<cmp>(out INT, in PMC, in PMC)
-
-Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
-
-=cut
-
-inline op cmp(out INT, in INT, in INT) {
-  $1 = $2 < $3 ? -1 :
-       $2 > $3 ? +1 :
-       0;
-  goto NEXT();
-}
-
-inline op cmp(out INT, in NUM, in NUM) {
-  $1 = $2 < $3 ? -1 :
-       $2 > $3 ? +1 :
-       0;
-  goto NEXT();
-}
-
-inline op cmp(out INT, in STR, in STR) {
-  $1 = string_compare(interpreter, $2, $3);
-  goto NEXT();
-}
-
-inline op cmp(out INT, in PMC, in PMC) {
-  $1 = VTABLE_cmp(interpreter, $2, $3);
-  goto NEXT();
-}
 
 ########################################
 
@@ -1137,7 +1100,6 @@ op unless(in PMC, inconst INT) {
   goto NEXT();
 }
 
-=back
 
 =cut
 
@@ -1150,7 +1112,7 @@ described in PDD03.
 =item B<invoke>(in PMC)
 
 Call the subroutine in $1 with no defined calling convention or invoke
-a continuation for returnin from a subroutine
+a continuation for returning from a subroutine.
 
 =item B<invokecc>()
 
@@ -1256,6 +1218,10 @@ inline op newsub(in INT, in INT, inconst INT, inconst INT) {
   goto NEXT();
 }
 
+=back
+
+=cut
+
 ###############################################################################
 
 =head2 Arithmetic operations
@@ -1266,6 +1232,44 @@ constants into their destination register, $1.
 =over 4
 
 =cut
+
+########################################
+
+=item B<cmp>(out INT, in INT, in INT)
+
+=item B<cmp>(out INT, in NUM, in NUM)
+
+=item B<cmp>(out INT, in STR, in STR)
+
+=item B<cmp>(out INT, in PMC, in PMC)
+
+Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
+
+=cut
+
+inline op cmp(out INT, in INT, in INT) {
+  $1 = $2 < $3 ? -1 :
+       $2 > $3 ? +1 :
+       0;
+  goto NEXT();
+}
+
+inline op cmp(out INT, in NUM, in NUM) {
+  $1 = $2 < $3 ? -1 :
+       $2 > $3 ? +1 :
+       0;
+  goto NEXT();
+}
+
+inline op cmp(out INT, in STR, in STR) {
+  $1 = string_compare(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op cmp(out INT, in PMC, in PMC) {
+  $1 = VTABLE_cmp(interpreter, $2, $3);
+  goto NEXT();
+}
 
 ########################################
 
@@ -3598,7 +3602,6 @@ inline op pushp() {
   goto NEXT();
 }
 
-=back
 
 =cut
 ########################################
@@ -3635,7 +3638,6 @@ inline op pushtopp() {
   goto NEXT();
 }
 
-=back
 
 =cut
 ########################################
