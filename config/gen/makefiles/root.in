@@ -369,7 +369,7 @@ misc$(O) : $(H_FILES)
 vtable.ops : make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
 
-$(STICKY_FILES) : Configure.pl config_h.in
+$(STICKY_FILES) : Configure.pl
 	$(PERL) Configure.pl
 
 $(INC)/vtable.h : vtable.tbl vtable_h.pl
