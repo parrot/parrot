@@ -1099,7 +1099,6 @@ CODE
 -1
 OUTPUT
 
-SKIP: { skip("Nulls need to be patched for the new assembler. Many pardons.", 1);
 output_is(<<'CODE',<<OUTPUT,"index, embedded nulls");
       set S0, "Par\0\0rot"
       set S1, "\0"
@@ -1116,7 +1115,6 @@ CODE
 3
 4
 OUTPUT
-};
 
 output_is(<<'CODE',<<OUTPUT,"index, big strings");
       set S0, "a"
