@@ -80,8 +80,8 @@ pmclass PerlArray {
         if (ix > SELF->cache.int_val) {
 	    resize_array(SELF,ix);
         }
-        else if (ix < 0) {
-            ix += key_size(kp);
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -107,8 +107,8 @@ pmclass PerlArray {
         if (ix > SELF->cache.int_val) {
 	    resize_array(SELF,ix);
         }
-        else if (ix < 0) {
-            ix += key_size(kp);
+        if (ix < 0) {
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -135,7 +135,7 @@ pmclass PerlArray {
 	    resize_array(SELF,ix);
         }
         else if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -191,7 +191,7 @@ pmclass PerlArray {
 	    resize_array(SELF,ix);
         }
         else if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];
@@ -231,7 +231,7 @@ pmclass PerlArray {
 	    resize_array(SELF,ix);
         }
         else if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];
@@ -269,7 +269,7 @@ pmclass PerlArray {
 	    resize_array(SELF,ix);
         }
         else if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];

@@ -46,7 +46,7 @@ pmclass PerlHash {
     }
 
     INTVAL get_integer () {
-	return key_size(INTERP,SELF->data);
+	return SELF->cache.int_val;
     }
 
     INTVAL get_integer_keyed (KEY * key) {
@@ -68,7 +68,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -76,7 +76,7 @@ pmclass PerlHash {
     }
 
     FLOATVAL get_number () {
-	return (FLOATVAL)key_size(INTERP,SELF->data);
+	return (FLOATVAL)SELF->cache.int_val;
     }
 
     FLOATVAL get_number_keyed (KEY * key) {
@@ -98,7 +98,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -128,7 +128,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         value = ((PMC**)(SELF->data))[ix];
@@ -185,7 +185,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];
@@ -227,7 +227,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];
@@ -255,7 +255,7 @@ pmclass PerlHash {
         PMC* pmc;
 
         if (!key) {
-            return 0;
+            return;
         }
 
         kp = (key->keys)[0];
@@ -267,7 +267,7 @@ pmclass PerlHash {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
         if (ix < 0) {
-            ix += key_size(kp);
+            ix += SELF->cache.int_val;
         }
 
         pmc = ((PMC**)(SELF->data))[ix];

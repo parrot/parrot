@@ -30,6 +30,9 @@ init_world(void) {
     Parrot_IntQueue_class_init(enum_class_IntQueue);
     
     /* Now register the names of the PMCs */
+    /*
+     *  Delayed until the new key stuff works
+     *
     Parrot_base_classname_hash = pmc_new(NULL, enum_class_PerlHash);
     Parrot_base_classname_hash->vtable->init(NULL, Parrot_base_classname_hash);
     Parrot_base_classname_hash->vtable->set_integer_index_s(NULL,  Parrot_base_classname_hash, 
@@ -68,6 +71,7 @@ init_world(void) {
                                                             enum_class_IntQueue,
                                                          (STRING*)Parrot_base_vtables[enum_class_IntQueue].name(NULL, NULL)
 );
+                                                         */
 
 }
 

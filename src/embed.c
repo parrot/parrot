@@ -180,9 +180,11 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[]) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
+        /* Delayed XXX
         userargv->vtable->set_string_index(interpreter, userargv, 
             string_make(interpreter, argv[i], strlen(argv[i]), 0, 0, 0), i
         );
+        */
     }
 
     interpreter->pmc_reg.registers[0]=userargv;

@@ -374,8 +374,10 @@ Gets the start and end indices of the group indicated by the fourth parameter.
 op rx_info_getgroup(in pmc, out int, out int, in int) {
 	RX_dUNPACK($1);
 
+    /* Delayed XXX
 	$2=rx->groupstart->vtable->get_integer_index(interpreter, rx->groupstart, $4);
 	$3=rx->groupend->vtable->get_integer_index(interpreter, rx->groupend, $4);
+    */
 	
 	goto NEXT();
 }
@@ -635,7 +637,9 @@ the second parameter.
 op rx_startgroup(in pmc, in int) {
 	RX_dUNPACK($1);
 	
+    /* XXX Delayed
 	rx->groupstart->vtable->set_integer_index(interpreter, rx->groupstart, rx->index, $2);
+    */
 	
 	goto NEXT();
 }
@@ -652,7 +656,9 @@ the second parameter.
 op rx_endgroup(in pmc, in int) {
 	RX_dUNPACK($1);
 	
+    /* XXX Delayed
 	rx->groupend->vtable->set_integer_index(interpreter, rx->groupend, rx->index, $2);
+    */
 	
 	goto NEXT();
 }

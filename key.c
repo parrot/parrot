@@ -28,7 +28,7 @@ debug_key (struct Parrot_Interp* interpreter, KEY* key) {
   fprintf(stderr," *** key %p\n",key);
   fprintf(stderr," *** size " INTVAL_FMT "\n",key->size);
   for(i=0;i<key->size;i++) {
-    INTVAL type = key->keys[i].type;
+    INTVAL type = key->keys[i]->type;
     if(type == enum_key_bucket) {
       fprintf(stderr," *** Bucket " INTVAL_FMT " type " INTVAL_FMT "\n",i,type);
     }
@@ -185,7 +185,7 @@ void key_set_size(struct Parrot_Interp *interpreter, KEY* key, INTVAL size) {
 	INTVAL i;
         key->keys = pair;
 	for(i=key->size;i<size;i++) {
-	  key->keys[i].type = enum_key_undef;
+	  key->keys[i]->type = enum_key_undef;
 	}
       }
       else {
@@ -289,7 +289,7 @@ key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, STRING* idx) {
     if(idx != NULL) {
       INTVAL hash = key_hash(interpreter,idx);
       hash = hash % NUM_BUCKETS;
-      pair = find_bucket(interpreter,(BUCKET *)key->keys[hash].cache.struct_val,idx);
+      pair = find_bucket(interpreter,(BUCKET *)key->keys[hash]->cache.struct_val,idx);
       if(pair == NULL) {
         internal_exception(KEY_NOT_FOUND,"*** key_element_value_s pair returning a null key\n");
       }
@@ -348,14 +348,14 @@ void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key,
           if(hash >= key->size) {
             key_set_size(interpreter,key,hash+1);
           }
-          if(key->keys[hash].type != enum_key_undef) {
-            STRING* tmp = key->keys[hash].cache.struct_val;
+          if(key->keys[hash]->type != enum_key_undef) {
+            STRING* tmp = key->keys[hash]->cache.struct_val;
             bucket->next = (BUCKET*)tmp;
           }
           else {
           }
-          key->keys[hash].cache.struct_val = (STRING *)bucket;
-          key->keys[hash].type = enum_key_bucket;
+          key->keys[hash]->cache.struct_val = (STRING *)bucket;
+          key->keys[hash]->type = enum_key_bucket;
         }
         else {
           fprintf(stderr,"*** key_set_element_value_s given a NULL bucket\n");
