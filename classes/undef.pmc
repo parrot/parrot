@@ -23,7 +23,7 @@ passed-in type and does a same-type assignment from there.
 */
 
 #include "parrot/parrot.h"
-#define UNDEF_STRING_CLASS enum_class_PerlString
+#define UNDEF_STRING_CLASS enum_class_String
 
 pmclass Undef extends default {
 
@@ -50,7 +50,7 @@ pmclass Undef extends default {
   }
 
   STRING* get_string() {
-    return string_make(INTERP, NULL, 0, NULL, 0);
+    return string_make_empty(INTERP,enum_stringrep_one,0);
   }
 
   void set_string_native(STRING *value) {
