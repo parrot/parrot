@@ -3,13 +3,18 @@
 " Maintainer:	Luke Palmer <fibonaci@babylonia.flatirons.org>
 " Last Change:	2003 Jun 4
 
+" For installation please read:
+" :he filetypes
+" :he sytax
+"
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
-" if version < 600
-"   syntax clear
-" elseif exists("b:current_syntax")
-"   finish
-" endif
+"
+if version < 600
+  syntax clear
+elseif exists("b:current_syntax")
+  finish
+endif
 
 syntax clear
 
@@ -28,6 +33,9 @@ syn match imcDirective      /\.\(param\|result\|arg\|return\)/
 syn match imcDirective      /\.\(include|pcc_begin|pcc_end\)/
 syn keyword imcDirective    non_prototyped prototyped
 
+" imcWord before imcRegister
+" FIXME :: in identifiers and labels
+syn match imcWord           /[A-Za-z_][A-Za-z0-9_]*/
 syn match imcComment        /#.*/
 syn match imcLabel          /[A-Za-z0-9_]\+:/he=e-1
 syn match imcRegister       /[INPS]\([12][0-9]\|3[01]\|[0-9]\)/
@@ -35,7 +43,6 @@ syn match imcDollarRegister /\$[INPS][0-9]\+/
 syn match imcNumber         /[0-9]\+\(\.[0-9]*\([Ee]-\?[0-9]\+\)\?\)\?/
 syn match imcNumber         /0x[0-9a-fA-F]\+/
 syn match imcNumber         /0b[01]\+/
-syn match imcWord           /[A-Za-z_][A-Za-z0-9_]*/
 
 syn region imcString start=/"/ skip=/\\"/ end=/"/
 syn region imcString start=/'/ end=/'/
