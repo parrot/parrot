@@ -18,7 +18,7 @@ Tests data dumping.
 
 use strict;
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 # no. 1
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
@@ -574,5 +574,43 @@ CODE
         this is
         _TestClass::__dump
     }
+]
+OUT
+
+# no. 13
+output_is(<<'CODE', <<'OUT', "dumping 'null'");
+##PIR##
+.sub _main
+    .local pmc array
+    .local pmc temp
+    
+    new array, .PerlArray
+
+    push array, 0
+
+    push array, "0"
+
+    null temp
+    push array, temp
+
+    new temp, .PerlInt
+    set temp, 0
+    push array, temp
+
+    new temp, .PerlString
+    set temp, "0"
+    push array, temp
+
+    _dumper( "array", array )
+    end
+.end
+.include "library/dumper.imc"
+CODE
+"array" => PerlArray (size:5) [
+    0,
+    "0",
+    null,
+    0,
+    "0"
 ]
 OUT

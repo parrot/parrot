@@ -207,21 +207,18 @@ NOTFOUND:
 NOT_IN_CACHE:
     # is dump null?
     # lookup the type id otherwise
-    set type, 0
-    isnull dump, IS_NULL
-    typeof type, dump
-IS_NULL:
+    set func, "pmcNull"
+    isnull dump, DUMP
 
     # does a helper method exists?
     typeof temp, dump
     set func, "pmc"
     concat func, temp
     can ret, self, func
-    if ret goto CAN
-    set func, "pmcDefault"
-CAN:
-
+    if ret goto DUMP
     # no, dump as a unknown PMC
+    set func, "pmcDefault"
+DUMP:
     ret = self.func( name, dump )
     unless ret goto END
 

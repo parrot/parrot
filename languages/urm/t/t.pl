@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#! perl -w
 
 use strict;
 use FindBin;
@@ -6,7 +6,7 @@ use FindBin;
 use lib '../../lib';
 use Parrot::Config;
 
-my $urmc = "$FindBin::RealBin$PConfig{slash}..$PConfig{slash}urmc";
+my $urmc = "$PConfig{perl} $FindBin::RealBin$PConfig{slash}..$PConfig{slash}urmc";
 my $compile = "-c -s";
 my $run = "-s";
 
