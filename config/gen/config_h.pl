@@ -9,7 +9,10 @@ config/gen/config_h.pl - Configuration Header
 =head1 DESCRIPTION
 
 Generates F<include/parrot/config.h> with platform-specific
-configuration values.
+configuration values, F<include/parrot/has_header.h> with 
+platform-specific header information, and 
+F<include/parrot/feature.h> with information on optional 
+features.
 
 =cut
 
@@ -19,15 +22,21 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':gen';
 
-$description="Generating config.h...";
+$description="Generating C headers...";
 
 @args=('define');
 
 sub runstep {
   my $define = shift;
+
   genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
-  commentType => '/*',
-  ignorePattern => 'PARROT_CONFIG_DATE');
+    commentType => '/*',
+    ignorePattern => 'PARROT_CONFIG_DATE');
+
+  genfile('config/gen/config_h/feature_h.in', 'include/parrot/feature.h',
+    commentType => '/*',
+    ignorePattern => 'PARROT_CONFIG_DATE',
+    feature_file => 1);
 
   my $hh = "include/parrot/has_header.h";
   open(HH, ">$hh.tmp")
