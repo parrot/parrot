@@ -87,21 +87,19 @@ dict_from_tuple_array(Interp *interpreter, PMC *ar)
 }
 
 static PMC *
-parrot_py_dict(Interp *interpreter, PMC *argv)
+parrot_py_dict(Interp *interpreter, PMC *arg)
 {
-    PMC *arg;
-    INTVAL i;
+    INTVAL argcP;
     /*
      * no arguments: return a new hash
      */
-    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+    if ((argcP = REG_INT(3)) == 0)
         return pmc_new(interpreter, enum_class_PerlHash);
-    if (1 > 1) {
+    if (argcP > 1) {
             real_exception(interpreter, NULL, E_TypeError,
                     "TypeError: dict expected at most 1 arguments, got %d",
-                    (int)i);
+                    (int)argcP);
     }
-    arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
     switch (arg->vtable->base_type) {
         case enum_class_PerlHash:
             return arg;
@@ -133,22 +131,20 @@ parrot_py_divmod(Interp *interpreter, PMC *nom, PMC *denom)
 }
 
 static PMC *
-parrot_py_list(Interp *interpreter, PMC *argv)
+parrot_py_list(Interp *interpreter, PMC *arg)
 {
-    PMC *arg;
-    INTVAL i;
+    INTVAL i, argcP;
     PMC *iter, *list;
     /*
      * no arguments: return a new list
      */
-    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+    if ((argcP = REG_INT(3)) == 0)
         return pmc_new(interpreter, enum_class_PerlArray);
-    if (1 > 1) {
+    if (argcP > 1) {
             real_exception(interpreter, NULL, E_TypeError,
                     "TypeError: list expected at most 1 arguments, got %d",
-                    (int)i);
+                    (int)argcP);
     }
-    arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
     iter = NULL;
     switch (arg->vtable->base_type) {
         case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
@@ -186,18 +182,15 @@ parrot_py_float(Interp *interpreter, PMC *arg)
 }
 
 static PMC *
-parrot_py_long(Interp *interpreter, PMC *argv)
+parrot_py_long(Interp *interpreter, PMC *val, PMC *radix)
 {
-    PMC *arg;
-    PMC *val;
-    PMC *radix, *res;
-    INTVAL i, base;
+    PMC *res;
+    INTVAL base, argcP;
     STRING *num;
-    if ((i = VTABLE_elements(interpreter, argv)) == 0)
+
+    if ((argcP = REG_INT(3)) == 0)
         return pmc_new(interpreter, enum_class_PerlInt);
-    val = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
-    if (i == 2) {
-        radix  = VTABLE_get_pmc_keyed_int(interpreter, argv, 1);
+    if (argcP == 2) {
         base = VTABLE_get_integer(interpreter, radix);
         /* val must be a STRING */
     }
@@ -481,23 +474,24 @@ parrot_py_iter(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
-parrot_py_range(Interp *interpreter, PMC *args)
+parrot_py_range(Interp *interpreter, PMC *pstart, PMC *pend, PMC *pstep)
 {
     PMC *ar = pmc_new(interpreter, enum_class_PerlArray);
     INTVAL start = 0, end = 0, step = 1;
-    int i, k;
-    i = VTABLE_elements(interpreter, args);
-    if (i == 1) {
-        end = VTABLE_get_integer_keyed_int(interpreter, args, 0);
+    int i, k, argcP;
+
+    argcP = REG_INT(3);
+    if (argcP == 1) {
+        end = VTABLE_get_integer(interpreter, pstart);
     }
-    else if (i == 2) {
-        start = VTABLE_get_integer_keyed_int(interpreter, args, 0);
-        end = VTABLE_get_integer_keyed_int(interpreter, args, 1);
+    else if (argcP == 2) {
+        start = VTABLE_get_integer(interpreter, pstart);
+        end =  VTABLE_get_integer(interpreter, pend);
     }
-    else if (i == 3) {
-        start = VTABLE_get_integer_keyed_int(interpreter, args, 0);
-        end = VTABLE_get_integer_keyed_int(interpreter, args, 1);
-        step = VTABLE_get_integer_keyed_int(interpreter, args, 2);
+    else if (argcP == 3) {
+        start = VTABLE_get_integer(interpreter, pstart);
+        end =  VTABLE_get_integer(interpreter, pend);
+        step =  VTABLE_get_integer(interpreter, pstep);
         if (step == 0)
             real_exception(interpreter, NULL, E_ValueError,
                     "range() step argument must not be zero");
@@ -638,12 +632,12 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_id), id, ip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_long), longf, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_float), floatf, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_max), max, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_min), min, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pippp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_repr), repr, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);

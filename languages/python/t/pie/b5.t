@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -232,6 +232,33 @@ def main():
 	check(float("1.5"), 1.5)
 	check(float(15*i), 15.0*i)
 	check(float(10**100), 1e100)
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'check_functions hash');
+show = True
+
+def check(a, b):
+    if __debug__:
+        if show:
+            print `a`, "==", `b`
+    if not a == b:
+        raise AssertionError("%.30r != %.30r" % (a, b))
+
+def check_functions(i=0, j=0):
+    check(divmod(7, 4), (1, 3))
+
+def main():
+    check_functions()
+    check_functions(j=10, i=10)
+    for i in range(0,500,249):
+	print "i:", i
+	check(hash(42), hash(42L))
+	check(hash(42), hash(42.0))
+	check(hash(42+0j), hash(42.0))
+	print hash("abc") == hash(u"abc")
 
 if __name__ == '__main__':
     main()
