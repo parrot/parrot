@@ -109,7 +109,7 @@ C level either.
 
 This routine may B<not> throw an exception.
 
-=item INTVAL destroy(PMC)
+=item void destroy(PMC)
 
 This method is called by the DOD when it determines that a PMC is
 dead, and that PMC has marked itself as having a destroy method.
