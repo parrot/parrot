@@ -525,6 +525,7 @@ sub _collect_labels {
         push @{$self->{local_labels}{$1}},$_->[1]; # Local label
       }
       else {
+        die("Label $1 already exists") if($self->{global_labels}{$1});
         $self->{global_labels}{$1} = $_->[1]; # Global label
       }
     }
