@@ -213,6 +213,64 @@ Parrot_srand(INTVAL seed)
     _srand48(seed);
 }
 
+void *
+Parrot_make_la(struct Parrot_Interp *interpreter, PMC *array) {
+    INTVAL arraylen = VTABLE_elements(interpreter, array);
+    long *out_array = NULL;
+    INTVAL cur = 0;
+
+    /* Allocate the array and set the last element to 0. Since we
+       always allocate one element more than we use we're guaranteed
+       to actually have an array, even if the inbound array is
+       completely empty
+    */
+    out_array = mem_sys_allocate((sizeof(long)) * (arraylen + 1));
+    out_array[arraylen] = 0;
+
+    for (cur = 0; cur < arraylen; cur++) {
+        out_array[cur] = VTABLE_get_integer_keyed_int(interpreter, array, cur);
+    }  
+
+    return out_array;
+}
+
+void
+Parrot_destroy_la(long *array) {
+    mem_sys_free(array);
+}
+
+void *
+Parrot_make_cpa(struct Parrot_Interp *interpreter, PMC *array) {
+    INTVAL arraylen = VTABLE_elements(interpreter, array);
+    char **out_array = NULL;
+    INTVAL cur = 0;
+
+    /* Allocate the array and set the last element to 0. Since we
+       always allocate one element more than we use we're guaranteed
+       to actually have an array, even if the inbound array is
+       completely empty
+    */
+    out_array = mem_sys_allocate((sizeof(char *)) * (arraylen + 1));
+    out_array[arraylen] = 0;
+
+    for (cur = 0; cur < arraylen; cur++) {
+        out_array[cur] = string_to_cstring(interpreter, VTABLE_get_string_keyed_int(interpreter, array, cur));
+    }  
+
+    return out_array;
+}
+
+void
+Parrot_destroy_cpa(char **array) {
+    UINTVAL offset = 0;
+    /* Free each piece */
+    while (array[offset] != NULL) {
+        string_cstring_free(array[offset]);
+    }
+    /* And then the holding array */
+    mem_sys_free(array);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

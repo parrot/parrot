@@ -36,6 +36,11 @@ INTVAL Parrot_int_rand(INTVAL how_random);
 INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 void Parrot_srand(INTVAL seed);
 
+void *Parrot_make_la(struct Parrot_Interp *, PMC *);
+void *Parrot_make_cpa(struct Parrot_Interp *, PMC *);
+void Parrot_destroy_la(long *);
+void Parrot_destroy_cpa(char **);
+
 /*
  * misc.c
  */

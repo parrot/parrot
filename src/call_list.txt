@@ -26,6 +26,9 @@
 # 0 - insert a NULL (pointer) - doesn't comsume a register
 # I - Parrot_Interp param
 #
+# Arrayish things, terminated with NULL/0
+# L - Long array
+# T - Array of string pointers (Converted to cstrings)
 #Return params
 #p	b
 c	v
@@ -157,10 +160,14 @@ t	b
 t	B
 v	P
 
-# For threads
+# Needed for parrot threads
 v	IPP
+
+# Oddball ones for postgres
+p	ptiLTLLi
 
 # The following are used by library/pcre.imc
 p	tiB3P
 i	pPtiiipi
 i	tpiibi
+

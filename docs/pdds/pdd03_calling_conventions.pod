@@ -154,7 +154,9 @@ Holds the return continuation for the caller.
 
 =item P2
 
-Holds the object the sub was called on. (For method calls)
+Holds the object the sub was called on. (For method calls) This
+register I<must> be null (either NULL or the Null PMC) for non-method
+calls.
 
 =item P3
 

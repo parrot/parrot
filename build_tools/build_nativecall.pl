@@ -18,6 +18,12 @@ my %ret_count;
 #	      B => [0,0,1,0,0],        # Returns a buffer
 	     );
 
+my $tempcounter = 0;
+my @extra_preamble = ();
+my $extra_preamble;
+my @extra_postamble = ();
+my $extra_postamble;
+
 
 my (%ret_type) = (p => "void *",
 		  i => "int",
@@ -52,6 +58,8 @@ my (%proto_type) = (p => "void *",
 		    P => "PMC *",
 		    b => "void *",
 		    B => "void **",
+		    L => "long *",
+		    T => "char **",
 		   );
 
 my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
@@ -165,7 +173,9 @@ while (<>) {
     s/^\s*//;
     s/\s*$//;
     next unless $_;
-    my ($ret, $args) = split /\s/, $_;
+    @extra_preamble = ();
+    @extra_postamble = ();
+    my ($ret, $args) = split /\s+/, $_;
     my @arg;
     my %reg_count;
     @reg_count{qw(p i s n)} = (5, 5, 5, 5);
@@ -267,7 +277,19 @@ sub make_arg {
     /P/ && do {my $regnum = $reg_ref->{p}++;
                return "REG_PMC($regnum) == PMCNULL ? NULL : REG_PMC($regnum)";
               };
-
+    /L/ && do {my $regnum = $reg_ref->{p}++;
+	       my $tempnum = $tempcounter++;
+	       push @extra_preamble, "long *tempvar$tempnum = Parrot_make_la(interpreter, REG_PMC($regnum));\n";
+	       push @extra_postamble, "Parrot_destroy_la(tempvar$tempnum);\n";
+	       return "tempvar$tempnum";
+              };
+    /T/ && do {my $regnum = $reg_ref->{p}++;
+	       my $tempnum = $tempcounter++;
+	       push @extra_preamble, "char **tempvar$tempnum = Parrot_make_cpa(interpreter, REG_PMC($regnum));\n";
+	       push @extra_postamble, "Parrot_destroy_cpa(tempvar$tempnum);\n";
+	       return "tempvar$tempnum";
+              
+              };
 }
 
 sub set_return_count {
@@ -288,6 +310,8 @@ sub generate_func_header {
 
     if (defined $params) {
     my $proto = join ', ', map { $proto_type{$_} } split '', $params;
+    $extra_preamble = join("", @extra_preamble);
+    $extra_postamble = join("", @extra_postamble);
     print NCI <<HEADER;
 static void
 pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
@@ -296,10 +320,12 @@ pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
     func_t pointer;
     $ret_type_decl return_data;
     $other_decl
+    $extra_preamble
 
     pointer =  (func_t)D2FPTR(self->cache.struct_val);
     $return_assign ($ret_type)(*pointer)($call_params);
     $final_assign
+    $extra_postamble
 HEADER
   }
   else {
@@ -310,10 +336,12 @@ pcf_${return}(struct Parrot_Interp *interpreter, PMC *self)
     $ret_type (*pointer)(void);
     $ret_type_decl return_data;
     $other_decl
+    $extra_preamble
 
     pointer =  ($ret_type (*)(void))D2FPTR(self->cache.struct_val);
     $return_assign ($ret_type)(*pointer)();
     $final_assign
+    $extra_postamble
 HEADER
   }
 
