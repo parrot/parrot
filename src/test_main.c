@@ -72,7 +72,7 @@ main(int argc, char *argv[])
     char *filename;
     Parrot_PackFile pf;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if (!interpreter) {
         return 1;

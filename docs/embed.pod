@@ -16,7 +16,7 @@ embed.pod - Parrot embedding system
 
         argc--; argv++; /* skip the program name */
         
-        interp=Parrot_new();
+        interp=Parrot_new(NULL);
         Parrot_init(interp);
 
         if(PARROT_JIT_CAPABLE) {
@@ -178,9 +178,10 @@ it).
 
 =over 4
 
-=item C<Parrot_Interp Parrot_new()>
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
-Allocates and returns a new Parrot interpreter.
+Allocates and returns a new Parrot interpreter. C<parent> is NULL for the
+main interpreter that will be destroyed last.
 
 =item C<void Parrot_init(Parrot_Interp)>
 

@@ -231,7 +231,7 @@ main(int argc, char **argv) {
     INTVAL i;
     PMC *userargv;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if (!interpreter) {
         return 1;
     }
