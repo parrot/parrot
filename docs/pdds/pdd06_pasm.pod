@@ -259,6 +259,10 @@ These ops handle manipulating the data in registers
 
 Create a new PMC of class y stored in PMC register x.
 
+=item destroy Px
+
+Destroy the PMC in register X, leaving it undef
+
 =item set tx, ty
 
 Copies y into x. Note that strings and PMCs are referred to by

@@ -3150,6 +3150,22 @@ op new(out PMC, in INT, in INT) {
   goto NEXT();
 }
 
+=item B<destroy>(in PMC)
+
+Destroy the PMC
+
+=cut
+
+op destroy(in PMC) {
+
+  if ($1->flags & PMC_active_destroy_FLAG) {
+	$1->vtable->destroy(interpreter, $1);
+  }
+  /* Should just assign undef, but we don't have one yet */
+  $1->vtable = YOU_LOSE_VTABLE;
+  $1->flags = PMC_live_FLAG;
+}
+
 ########################################
 
 =item B<find_type>(out INT, in STR)
