@@ -1,0 +1,200 @@
+NAME
+    jako - No frills programming for Parrot
+
+SYNOPSIS
+    Jako is a simple programming language that targets the Parrot virtual
+    machine.
+
+DESCRIPTION
+    Jako should be familiar to those who have seen C and Perl.
+
+  Lexical Structure
+    Jako's lexical structure is similar to its relative: Perl. Whitespace
+    between tokens is not significant, and comments are introduced with an
+    octothorp ('#') and continue to the end of the line.
+
+    * Labels
+        An identifier followed by a colon at the beginning of a line is a
+        label. Labels can be the targets of goto statements, and can also
+        provide a way to refer to specific loops when using the loop control
+        statements (see below).
+
+    * Literals
+
+        * Integers
+
+            * Binary
+                "0b" followed by any number of binary digits ("0" or "1").
+
+            * Octal
+                "0" followed by any number of octal digita ("0" to "7").
+
+            * Decimal
+                Starting with a non-zero decimal digit, with any number of
+                decimal digits following. Optional prefixed "-" for negative
+                integers.
+
+            * Hexadecimal
+                "0x" followed by any number of hexadecimal digits ("0" to
+                "9", "a", "b", "c", "d", "e", or "f").
+
+        * Numbers
+            One or more decimal digits, a decimal point, and one ore more
+            decimal digits. Optional prefixed "-" for negative numbers.
+
+        * Strings
+            A double-quote character, followed by the contents of the
+            string, and another double-quote character. Inside the string
+            literal, double quotes are to be escaped with "\" (back slash,
+            a.k.a. "whack"). To include a back slash in the string, precede
+            it with another back slash.
+
+    * Identifiers
+        Start with a letter, followed by any combination of letters, decimal
+        digits and underscores.
+
+    * Types
+        The built-in types are recognized as keywords: int, num, obj, str.
+
+  Syntax
+    * Blocks
+        A block is a sequence of statements and declarations between a
+        matching pair of open and close braces ("{" and "}"). Each block
+        represents a scope for lexical symbols (variables and constants).
+        There is an implicit block which represents the entire compilation
+        unit (usually a file). Subroutines may only appear at this level.
+
+    * Constant Declarations
+        const introduces a constant declaration. What follows must be a
+        type, a list of identifiers, "=", and a value of an appropriate
+        type.
+
+                const int a, b, c = 2;
+                const int pi_in   = 3;             # Indiana
+                const num pi      = 3.141592;      # Everywhere else
+                const str d       = "Como estas?";
+
+    * Variable Declarations
+        var introduces a variable declaration. What follows must be a type
+        and a list of identifiers, optionally followed by "=" and an
+        expression.
+
+                var int a, b, c;
+                var num d, e, f = 42.0;
+                var str g = "Howdy";
+
+    * Subroutines
+        sub introduces a subroutine declaration (and possibly definition).
+        What follows is an optional type, and identifier (the name of the
+        subroutine), an optional set of properties, and a list of formal
+        arguments in parenthesis. The formal arguments are written as a
+        comma-separated list of type-name pairs. Finally, there must be a
+        block which contains the implementation of the subroutine.
+
+        Simple cases of subroutine definitions are:
+
+                sub foo() { ... }
+                sub int bar(int x, int y) { ... }
+
+        NOTE: This assumes some sort of Jako include mechanism.
+
+        NOTE: The below requires "jakoc" to be able to determine the best
+        match among a number of alternatives with the same name, but
+        different signatures.
+
+        The op property can have a string value that gives the op name, if
+        it is different from the sub name. There is also an oplib property
+        that gives the oplib, if the op is not core.
+
+        Presumably, there would be an implicit "use 'core'", that would pull
+        in the definitions of the core ops as subs (if any).
+
+        One wonders if this mechanism could be expanded to account for the
+        arithmetic operators, etc.
+
+        Also, if the Parrot .ops files could be processed to automatically
+        produce the include files for the various categories of ops and
+        subs.
+
+          sub num coversine { oplib = "obscure", op = "covers" } (num);
+
+          sub int BlitSurface { fnlib = "libsdl", fn = "SDL_BlitSurface" } (
+            obj { nat = "p" } src,
+            obj { nat = "p" } srcrect,
+            obj { nat = "p" } dst,
+            obj { nat = "p" } dstrect
+          );
+
+        NOTE: The oplib, fnlib and fn sub properties are not implemented
+        yet.
+
+        NOTE: Type properties are not implemented yet.
+
+    * Assignments
+        Following tradition, basic assignments are written as
+
+                 left = right;
+
+        Conversions between int and num values are implicit.
+
+    * Conditionals
+        There are two kinds of conditional block: if and unless, with the
+        latter being short for the more familiar if, but with the condition
+        inverted. In both cases, what follows the keyword is a parenthesized
+        boolean expression and a block.
+
+                if     (happy)   { smile(); }
+                unless (raining) { play();  }
+
+        Even though each is redundant given the presence of the other, both
+        are retained in the language for the same reason as in Perl:
+        allowing more natural expression.
+
+        Further, there can be a subsequent block, introduced with else:
+
+                if     (paid) { work();     } else { complain(); }
+                unless (paid) { complain(); } else { work();     }
+
+    * Loops
+        There are two kinds of loop: while and until, with the same reversal
+        of sense as exists between if and unless.
+
+                while (1) {
+                  while (overdue != 0.0) { work(); invoice();     }
+                  until (overdue == 0.0) { send_dunning_letter(); }
+                }
+
+        You can control loops with the next, last and redo loop control
+        statements. next jumps immediately to the next iteration of the
+        loop, without executing the intervening statements, last jumps
+        immediately out of the loop, again without executing the intervening
+        statements. And, redo jumps back to the beginning of the current
+        iteration.
+
+        Loops can be followed by an optional continue block, which provides
+
+  Semantics
+    * String interpolation
+        An unescaped dollar sign ("$") in a string causes Jako to
+        interpolate variables into a final string before the string is used
+        in an expression. In case the text to follow the interpolated value
+        starts with identifier characters that would interfere with the
+        correct determination of the variable to interpolate, use the form
+        "${...}".
+
+HISTORY
+    Jako was the first language to target the Parrot virtual machine. It was
+    also the first language to support subroutines (although in a
+    rudimentary, hackish way) for Parrot.
+
+AUTHOR
+    You can blame gregor <gregor@focusresearch.com> for the Jako language
+    and its compiler.
+
+COPYRIGHT
+    Copyright (C) 2001-2003 Gregor N. Purdy. All rights reserved.
+
+LICENSE
+    The Jako compiler is free software. It is subject to the same license as
+    the Parrot interpreter.
+
