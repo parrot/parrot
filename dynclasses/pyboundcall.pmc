@@ -34,9 +34,9 @@ Invoke a method call on the indicated object.
 */
 
     void* invoke(void* next) {
-        PMC *self = REG_PMC(5);
-        PMC *args = REG_PMC(6);
-        PMC *keywords = REG_PMC(7);
+        PMC *self = PMC_pmc_val(SELF);
+        PMC *args = REG_PMC(5);
+        PMC *keywords = REG_PMC(6);
         PMC *func_args = VTABLE_getprop(INTERP, self, PyFunc_args);
         PMC *func_defaults = VTABLE_getprop(INTERP, self, PyFunc_defaults);
         INTVAL j,n;
@@ -76,7 +76,7 @@ Invoke a method call on the indicated object.
             }
         }
 
-        return VTABLE_invoke(INTERP, PMC_pmc_val(SELF), next);
+        return VTABLE_invoke(INTERP, self, next);
     }
 
 }

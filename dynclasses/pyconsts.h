@@ -38,6 +38,7 @@ PYVAR_SCOPE PMC *PyBuiltin_PyComplex_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyDict_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyException_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyInt_class;
+PYVAR_SCOPE PMC *PyBuiltin_PyIter_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyFloat_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyFunc_class;
 PYVAR_SCOPE PMC *PyBuiltin_PyList_class;
@@ -78,3 +79,6 @@ PYVAR_SCOPE STRING *PyFunc_defaults;
 
 struct parrot_regs_t *
 Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
+
+PMC *Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
+    STRING *meth, PMC* arg1);

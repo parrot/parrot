@@ -54,10 +54,10 @@ output_is(<< 'CODE', << 'OUTPUT', "add");
     $P2 = $P0 + $P1
     print $P2
     print " "
-    $P2 = $P0.__add__($P0,$P1)
+    $P2 = $P0.__add__($P1)
     print $P2
     print " "
-    $P2 = $P1.__radd__($P1,$P0)
+    $P2 = $P1.__radd__($P0)
     print $P2
     print "\n"
 .end
@@ -83,10 +83,10 @@ output_is(<< 'CODE', << 'OUTPUT', "and");
     band $P2, $P0, $P1
     print $P2
     print " "
-    $P2 = $P0.__and__($P0,$P1)
+    $P2 = $P0.__and__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rand__($P1,$P0)
+    $P2 = $P1.__rand__($P0)
     print $P2
     print "\n"
 .end
@@ -114,7 +114,7 @@ output_is(<< 'CODE', << 'OUTPUT', "cmp");
     $P2 = $I2
     print $P2
     print " "
-    $P2 = $P0.__cmp__($P0,$P1)
+    $P2 = $P0.__cmp__($P1)
     print $P2
     print "\n"
 .end
@@ -140,10 +140,10 @@ output_is(<< 'CODE', << 'OUTPUT', "div");
     $P2 = $P0 / -13
     print $P2
     print " "
-    $P2 = $P0.__div__($P0,$P1)
+    $P2 = $P0.__div__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rdiv__($P1,$P0)
+    $P2 = $P1.__rdiv__($P0)
     print $P2
     print "\n"
 .end
@@ -160,7 +160,7 @@ output_is(<< 'CODE', << 'OUTPUT', "float");
 
     set $P0, -13
 
-    $P2 = $P0.__float__($P0)
+    $P2 = $P0.__float__()
     print $P2
     print "\n"
 .end
@@ -186,10 +186,10 @@ output_is(<< 'CODE', << 'OUTPUT', "floordiv");
     $P2 = $P0 // -13
     print $P2
     print " "
-    $P2 = $P0.__floordiv__($P0,$P1)
+    $P2 = $P0.__floordiv__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rfloordiv__($P1,$P0)
+    $P2 = $P1.__rfloordiv__($P0)
     print $P2
     print "\n"
 .end
@@ -205,7 +205,7 @@ output_is(<< 'CODE', << 'OUTPUT', "hex");
     new $P0, $I0
     set $P0, 31
 
-    $P2 = $P0.__hex__($P0)
+    $P2 = $P0.__hex__()
     print $P2
     print "\n"
 .end
@@ -222,7 +222,7 @@ output_is(<< 'CODE', << 'OUTPUT', "int");
 
     set $P0, -13
 
-    $P2 = $P0.__int__($P0)
+    $P2 = $P0.__int__()
     print $P2
     print "\n"
 .end
@@ -243,7 +243,7 @@ output_is(<< 'CODE', << 'OUTPUT', "invert");
     $P2 = ~ $P1
     print $P2
     print " "
-    $P2 = $P1.__invert__($P1)
+    $P2 = $P1.__invert__()
     print $P2
     print "\n"
 .end
@@ -289,10 +289,10 @@ output_is(<< 'CODE', << 'OUTPUT', "lshift");
     $P2 = $P0 << 3
     print $P2
     print " "
-    $P2 = $P0.__lshift__($P0,$P1)
+    $P2 = $P0.__lshift__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rlshift__($P1,$P0)
+    $P2 = $P1.__rlshift__($P0)
     print $P2
     print "\n"
 .end
@@ -318,10 +318,10 @@ output_is(<< 'CODE', << 'OUTPUT', "mod");
     $P2 = $P0 % -13
     print $P2
     print " "
-    $P2 = $P0.__mod__($P0,$P1)
+    $P2 = $P0.__mod__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rmod__($P1,$P0)
+    $P2 = $P1.__rmod__($P0)
     print $P2
     print "\n"
 .end
@@ -347,10 +347,10 @@ output_is(<< 'CODE', << 'OUTPUT', "mul");
     $P2 = $P0 * -13
     print $P2
     print " "
-    $P2 = $P0.__mul__($P0,$P1)
+    $P2 = $P0.__mul__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rmul__($P1,$P0)
+    $P2 = $P1.__rmul__($P0)
     print $P2
     print "\n"
 .end
@@ -371,7 +371,7 @@ output_is(<< 'CODE', << 'OUTPUT', "neg");
     $P2 = - $P1
     print $P2
     print " "
-    $P2 = $P1.__neg__($P1)
+    $P2 = $P1.__neg__()
     print $P2
     print "\n"
 .end
@@ -389,7 +389,7 @@ output_is(<< 'CODE', << 'OUTPUT', "nonzero");
     set $P1, -13
 
     new $P2, $I0
-    $P2 = $P1.__nonzero__($P1)
+    $P2 = $P1.__nonzero__()
     print $P2
     print "\n"
 .end
@@ -405,7 +405,7 @@ output_is(<< 'CODE', << 'OUTPUT', "oct");
     new $P0, $I0
     set $P0, 31
 
-    $P2 = $P0.__oct__($P0)
+    $P2 = $P0.__oct__()
     print $P2
     print "\n"
 .end
@@ -431,10 +431,10 @@ output_is(<< 'CODE', << 'OUTPUT', "or");
     bor $P2, $P0, $P1
     print $P2
     print " "
-    $P2 = $P0.__or__($P0,$P1)
+    $P2 = $P0.__or__($P1)
     print $P2
     print " "
-    $P2 = $P1.__ror__($P1,$P0)
+    $P2 = $P1.__ror__($P0)
     print $P2
     print "\n"
 .end
@@ -452,7 +452,7 @@ output_is(<< 'CODE', << 'OUTPUT', "pos");
     set $P1, -13
 
     new $P2, $I0
-    $P2 = $P1.__pos__($P1)
+    $P2 = $P1.__pos__()
     print $P2
     print "\n"
 .end
@@ -480,13 +480,13 @@ output_is(<< 'CODE', << 'OUTPUT', "pow");
     $P3 = $P0 ** 3
     print $P3
     print " "
-    $P3 = $P0.__pow__($P0,$P1)
+    $P3 = $P0.__pow__($P1)
     print $P3
     print " "
-    $P3 = $P1.__pow__($P1,$P2)
+    $P3 = $P1.__pow__($P2)
     print $P3
     print " "
-    $P3 = $P2.__rpow__($P2,$P1)
+    $P3 = $P2.__rpow__($P1)
     print $P3
     print "\n"
 .end
@@ -505,10 +505,10 @@ output_is(<< 'CODE', << 'OUTPUT', "repr");
     set $P1, -13
 
     new $P2, $I0
-    $P2 = $P1.__repr__($P1)
+    $P2 = $P1.__repr__()
     print $P2
     print " "
-    $P2 = $P1.__str__($P1)
+    $P2 = $P1.__str__()
     print $P2
     print "\n"
 .end
@@ -534,10 +534,10 @@ output_is(<< 'CODE', << 'OUTPUT', "rshift");
     $P2 = $P0 >> 3
     print $P2
     print " "
-    $P2 = $P0.__rshift__($P0,$P1)
+    $P2 = $P0.__rshift__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rrshift__($P1,$P0)
+    $P2 = $P1.__rrshift__($P0)
     print $P2
     print "\n"
 .end
@@ -560,10 +560,10 @@ output_is(<< 'CODE', << 'OUTPUT', "sub");
     $P2 = $P0 - $P1
     print $P2
     print " "
-    $P2 = $P0.__sub__($P0,$P1)
+    $P2 = $P0.__sub__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rsub__($P1,$P0)
+    $P2 = $P1.__rsub__($P0)
     print $P2
     print "\n"
 .end
@@ -583,7 +583,7 @@ output_is(<< 'CODE', << 'OUTPUT', "truediv");
     set $P1, -4
 
     new $P2, $I0
-    $P2 = $P0.__truediv__($P0,$P1)
+    $P2 = $P0.__truediv__($P1)
     print $P2
     print "\n"
 .end
@@ -606,10 +606,10 @@ output_is(<< 'CODE', << 'OUTPUT', "xor");
     bxor $P2, $P0, $P1
     print $P2
     print " "
-    $P2 = $P0.__xor__($P0,$P1)
+    $P2 = $P0.__xor__($P1)
     print $P2
     print " "
-    $P2 = $P1.__rxor__($P1,$P0)
+    $P2 = $P1.__rxor__($P0)
     print $P2
     print "\n"
 .end

@@ -39,8 +39,7 @@ static STRING* __xor__;
         PMC * method_pmc; \
         if (!OP) OP = const_string(INTERP, #OP); \
         method_pmc = VTABLE_find_method(interpreter, VALUE, OP); \
-        REG_PMC(5) = VALUE; \
-        REG_PMC(6) = SELF; \
+        REG_PMC(5) = SELF; \
         VTABLE_invoke(interpreter, method_pmc, next); \
         return REG_PMC(5);
 
@@ -618,6 +617,29 @@ Returns the result of the bitwise C<XOR> of C<self> and C<*value>.
         PMC * ret = pmc_new(INTERP, PyBuiltin_PyObject);
         mmd_dispatch_v_ppp(INTERP, self, value, ret, MMD_BXOR);
         return ret;
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        PMC *method = SUPER(method_name);
+
+        /* is this method a Property? */
+        if (method) {
+            PMC *get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
+                    PyString_get, SELF);
+            if (get) method = get;
+        }
+
+        return method;
     }
 
 /*

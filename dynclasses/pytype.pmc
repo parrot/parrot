@@ -53,18 +53,32 @@ Looks up the method for C<*method_name> and returns it.
 
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
         if (method && VTABLE_defined(INTERP, method)) {
+            PMC *object = INTERP->ctx.current_object;
+            if (!object) object = SELF;
+
             if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
                 PIO_eprintf(interpreter, "# Found %Ss method %Ss on %Ss\n",
                    method->vtable->whoami, method_name, 
-                   VTABLE_name(INTERP, SELF));
+                   VTABLE_name(INTERP, object));
             }
 
+            PMC *get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
+                PyString_get, object);
+            if (get) return get;
             return method;
         }
 
         parent = VTABLE_getprop(INTERP, SELF, PyString_bases);
         if (parent && VTABLE_defined(INTERP, parent)) {
-            return VTABLE_find_method(INTERP, parent, method_name);
+            if (INTERP->ctx.current_object)
+                method = VTABLE_find_method(INTERP, parent, method_name);
+            else {
+                PMC *object = INTERP->ctx.current_object;
+                INTERP->ctx.current_object = SELF;
+                method = VTABLE_find_method(INTERP, parent, method_name);
+                INTERP->ctx.current_object = object;
+            }
+            return method;
         }
 
         return 0;
@@ -139,18 +153,17 @@ Pythonic object constructor.
         new = VTABLE_find_method(INTERP, SELF, PyString_new);
         init = VTABLE_find_method(INTERP, SELF, PyString_init);
 
-        if (new || init) {
-            int i = REG_INT(3)++;
-            while (i--) 
-                REG_PMC(6+i)=REG_PMC(5+i);
-        }
-
         if (new) {
-            struct parrot_regs_t *bp;
+            int i = REG_INT(3);
+            struct parrot_regs_t *bp = interpreter->ctx.bp;
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
-            INTERP->ctx.current_object = SELF;
-            REG_PMC(2) = REG_PMC(5) = SELF;
+            interpreter->ctx.bp = new_register_frame(interpreter,
+                &interpreter->ctx.reg_stack);
+            copy_regs(interpreter, bp);
+            if (new->vtable->base_type != PyBuiltin_PyBoundMeth)
+                internal_exception(1, "Non-bound method encountered in proxy");
+            VTABLE_set_pmc(INTERP, new, SELF);
             REG_STR(0) = PyString_new;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
@@ -162,11 +175,10 @@ Pythonic object constructor.
 
         VTABLE_setprop(INTERP, object, PyString_class, REG_PMC(0));
 
+        init = VTABLE_find_method(INTERP, object, PyString_init);
         if (init) {
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
-            INTERP->ctx.current_object = object;
-            REG_PMC(2) = REG_PMC(5) = object;
             REG_STR(0) = PyString_init;
             Parrot_PyClass_runops_fromc(INTERP, init);
             restore_context(interpreter, &ctx);

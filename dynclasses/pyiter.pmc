@@ -19,8 +19,38 @@ These are the vtable functions for the Python Iterator class
 */
 
 #include "parrot/parrot.h"
+#include "pyconsts.h"
 
-pmclass PyIter extends Iterator dynpmc group python_group {
+pmclass PyIter extends Iterator extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new iterator from a source.
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class, PMC *source) {
+        return VTABLE_get_iter(INTERP, source);
+    }
+
+
+/*
+
+=item C<PMC *get_class()>
+
+Return the class of this object.
+
+=cut
+
+*/
+
+    PMC* get_class() {
+        return PyBuiltin_PyIter_class;
+    }
 
 /*
 

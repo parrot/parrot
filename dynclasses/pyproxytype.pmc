@@ -86,19 +86,17 @@ initializers with arguments to be run.
             object_class = SELF;
 
         new = VTABLE_find_method(INTERP, SELF, PyString_new);
-        init = VTABLE_find_method(INTERP, SELF, PyString_init);
-        if (new || init) {
-            int i = REG_INT(3)++;
-            while (i--)
-                REG_PMC(6+i)=REG_PMC(5+i);
-        }
 
         if (new) {
-            struct parrot_regs_t *bp;
+            struct parrot_regs_t *bp = interpreter->ctx.bp;
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
-            INTERP->ctx.current_object = SELF;
-            REG_PMC(2) = REG_PMC(5) = SELF;
+            interpreter->ctx.bp = new_register_frame(interpreter,
+                &interpreter->ctx.reg_stack);
+            copy_regs(interpreter, bp);
+            if (new->vtable->base_type != PyBuiltin_PyBoundMeth)
+                internal_exception(1, "Non-bound method encountered in proxy");
+            VTABLE_set_pmc(INTERP, new, SELF);
             REG_STR(0) = PyString_new;
             bp = Parrot_PyClass_runops_fromc(INTERP, new);
             object = BP_REG_PMC(bp,5);
@@ -117,11 +115,10 @@ initializers with arguments to be run.
             VTABLE_setprop(INTERP, proxy, PyString_proxy, object);
         }
 
+        init = VTABLE_find_method(INTERP, proxy, PyString_init);
         if (init) {
             struct Parrot_Context ctx;
             save_context(interpreter, &ctx);
-            INTERP->ctx.current_object = proxy;
-            REG_PMC(2) = REG_PMC(5) = proxy;
             REG_STR(0) = PyString_init;
             Parrot_PyClass_runops_fromc(INTERP, init);
             restore_context(interpreter, &ctx);

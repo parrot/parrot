@@ -28,36 +28,6 @@ pmclass PyProxyClass extends PyType dynpmc group python_group {
 
 /*
 
-=item C<void init()>
-
-Initializes the instance.
-
-=cut
-
-*/
-
-    void init () {
-        PObj_custom_mark_SET(SELF);
-        PMC_struct_val(SELF) = 0;
-    }
-
-/*
-
-=item C<void mark()>
-
-Marks the hash as live.
-
-=cut
-
-*/
-
-    void mark () {
-        if (PMC_struct_val(SELF))   /* forwarder */
-            pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
-    }
-
-/*
-
 =item C<PMC *find_method(STRING *method_name)>
 
 Looks up the method for C<*method_name> and returns it.
@@ -70,42 +40,19 @@ Looks up the method for C<*method_name> and returns it.
         PMC *method = SUPER(method_name);
 
         if (method) {
-            PMC *forwarder = pmc_new(INTERP, PyBuiltin_PyProxyClass);
-            PMC_struct_val(forwarder) = method;
-            method = forwarder;
+            if (method->vtable->base_type != PyBuiltin_PyBoundMeth)
+                internal_exception(1, "Non-bound method encountered in proxy");
+            else {
+                PMC *proxy = INTERP->ctx.current_object;
+                VTABLE_set_pmc(INTERP, method,
+                    VTABLE_getprop(INTERP, proxy, PyString_proxy));
+            }
         }
 
         return method;
     }
 
-/*
 
-=item C<void* invoke(void *next)>
-
-Invoke the real method
-
-=cut
-
-*/
-
-    void* invoke(void *next) {
-        PMC *proxy = INTERP->ctx.current_object;
-
-        if (!PMC_struct_val(SELF))
-            internal_exception(1, "Invoke() called on a PyProxyClass object");
-
-        INTERP->ctx.current_object = REG_PMC(2) =  REG_PMC(5) = 
-            VTABLE_getprop(INTERP, proxy, PyString_proxy);
-
-        if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-            PIO_eprintf(interpreter, "# Invoking %Ss on %Ss via proxy\n",
-               REG_STR(0), REG_PMC(2)->vtable->whoami); 
-        }
-
-        return VTABLE_invoke(INTERP, (PMC*)PMC_struct_val(SELF), next);
-    }
-
- 
 /*
 
 =back

@@ -72,9 +72,8 @@ Parrot_PyClass_call_meth_fromc_P(Parrot_Interp interpreter, PMC *obj,
                 &interpreter->ctx.reg_stack);
 
     REG_STR(0) = meth;
-    REG_INT(0) = REG_INT(3) = 1;
-    REG_INT(1) = REG_INT(2) = REG_INT(4) = 0;
-    REG_PMC(5) = obj;
+    REG_INT(0) = 1;
+    REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
 
     sub = VTABLE_find_method(interpreter, obj, meth);
@@ -90,7 +89,7 @@ Parrot_PyClass_call_meth_fromc_P(Parrot_Interp interpreter, PMC *obj,
     return ret;
 }
 
-static PMC *
+PMC *
 Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
     STRING *meth, PMC* arg1)
 {
@@ -103,11 +102,9 @@ Parrot_PyClass_call_meth_fromc_P_P(Parrot_Interp interpreter, PMC *obj,
                 &interpreter->ctx.reg_stack);
 
     REG_STR(0) = meth;
-    REG_INT(0) = 1;
+    REG_INT(0) = REG_INT(3) = 1;
     REG_INT(1) = REG_INT(2) = REG_INT(4) = 0;
-    REG_INT(3) = 2;
-    REG_PMC(5) = obj;
-    REG_PMC(6) = arg1;
+    REG_PMC(5) = arg1;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
 
     sub = VTABLE_find_method(interpreter, obj, meth);
@@ -152,26 +149,24 @@ Looks up the method for C<*method_name> and returns it.
         PMC *class;
 
         PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
-
-        if (!method || !VTABLE_defined(INTERP, method)) {
-            class = VTABLE_getprop(INTERP, SELF, PyString_class);
-            if (class)
-                method = VTABLE_find_method(INTERP, class, method_name);
-            else {
-                method = 0;
-            }
-        }
-
-        /* is this method a Property? */
-        if (method && (method->vtable->base_type != PyBuiltin_PyFunc)) {
-            PMC *get = VTABLE_find_method(INTERP, method, PyString_get);
-            if (get) {
-                method = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
+        if (method && VTABLE_defined(INTERP, method)) {
+            PMC *get = Parrot_PyClass_call_meth_fromc_P_P(INTERP, method,
                     PyString_get, SELF);
-            }
+            if (get) return get;
+            return method;
         }
 
-        return method;
+        /* Not defined on the instance?  Try the class... */
+        class = VTABLE_getprop(INTERP, SELF, PyString_class);
+        if (class) {
+            PMC *object = INTERP->ctx.current_object;
+            INTERP->ctx.current_object = SELF;
+            method = VTABLE_find_method(INTERP, class, method_name);
+            INTERP->ctx.current_object = object;
+            return method;
+        }
+
+        return 0;
     }
 
 /*
@@ -393,9 +388,9 @@ Returns the name of this class.
 
 /*
 
-=item C<STRING *"__new__"(PMC *self)>
+=item C<STRING *"__repr__"(PMC *self)>
 
-Create a new instance.
+Return the string representation of this instance.
 
 */
 

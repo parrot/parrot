@@ -44,10 +44,6 @@ Create an (empty) list of function arguments
 
 =item C<PMC *find_method(STRING *method_name)>
 
-Implement __call__ methods by redirecting to one's self, after having
-resolved all of the parameters into a single positional list.  Note:
-at this time, functions with a maximum of 11 arguments are supported.
-
 =cut
 
 TODO: error checking (e.g., missing, duplicate or extra arguments)
@@ -231,9 +227,9 @@ Return a bound method object.
 
 */
 
-    METHOD PMC* __get__ (PMC *self, PMC *obj, PMC *type) {
+    METHOD PMC* __get__ (PMC *obj, PMC *type) {
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoundMeth);
-        VTABLE_set_pointer(INTERP, ret, self);
+        VTABLE_set_pointer(INTERP, ret, SELF);
         VTABLE_set_pmc(INTERP, ret, obj);
         return ret;
     }

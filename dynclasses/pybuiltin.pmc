@@ -267,6 +267,12 @@ enter_nci_method should create these as locals to begin with.
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
         PyBuiltin_PyInt_class = item;
 
+        key = const_string(INTERP, "iter");
+        item = make_type(INTERP, PyBuiltin_PyIter, key);
+        VTABLE_setprop(INTERP, item, PyString_bases, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+        PyBuiltin_PyIter_class = item;
+
         key = const_string(INTERP, "float");
         item = make_type(INTERP, PyBuiltin_PyFloat, key);
         VTABLE_setprop(INTERP, item, PyString_bases, parent);
