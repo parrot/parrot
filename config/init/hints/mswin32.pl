@@ -1,9 +1,18 @@
 {
+	my %args;
+	@args{@args}=@_;
+
 	my($cc, $ccflags, $libs)=Configure::Data->get(qw(cc ccflags libs));
+
+	# Later in the Parrot::Configure::RunSteps->runsteps process,
+	# inter/progs.pl will merge the command-line overrides with the defaults.
+	# We do one bit of its work early here, because we need the result now.
+	$cc = $args{cc} if defined $args{cc};
+
 	my $is_msvc  = grep { $cc eq $_ } ( qw(cl cl.exe) );
 	my $is_mingw = grep { $cc eq $_ } ( qw(gcc gcc.exe) );
 	my $is_bcc   = grep { $cc eq $_ } ( qw(bcc32 bcc32.exe) );
-	
+
 	Configure::Data->set(
 		rm_f  => '$(PERL) -MExtUtils::Command -e rm_f',
 		rm_rf => '$(PERL) -MExtUtils::Command -e rm_rf',
@@ -66,8 +75,10 @@
 	elsif( $is_mingw ) {
 		$libs='' if $libs =~ /\.lib\s/i;
 		Configure::Data->set(
-			ld => 'gcc',
-			libs => $libs
+			link      => 'gcc',
+			libs      => $libs,
+			slash     => '\\',
+			ar        => 'ar',
 		);
 	}
 }

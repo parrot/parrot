@@ -6,7 +6,7 @@ use Parrot::Configure::Step;
 
 $description="Loading platform and local hints files...";
 
-@args=();
+@args = qw( cc );
 
 sub runstep {
   my $hints = "config/init/hints/" . lc($^O) . ".pl";
