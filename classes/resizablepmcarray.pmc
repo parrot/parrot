@@ -79,8 +79,15 @@ Resizes the array to C<size> elements.
 
         if (!PMC_data(SELF)) {
             /* empty - used fixed routine */
-            SUPER(size);
-            PMC_int_val2(SELF) = size;
+            if (size < 8) {
+                SUPER(8);
+                PMC_int_val(SELF) = size;
+                PMC_int_val2(SELF) = 8;
+            }
+            else {
+                SUPER(size);
+                PMC_int_val2(SELF) = size;
+            }
         }
         else if (size <= PMC_int_val2(SELF)) {
             PMC_int_val(SELF) = size;
@@ -178,6 +185,8 @@ If key is a slice, do a splice as set that item.
         INTVAL size = PMC_int_val(SELF);
         if (size + 1 >= cap)
             DYNSELF.set_integer_native(size + 1);
+        else
+            PMC_int_val(SELF) = size + 1;
         ((PMC**)PMC_data(SELF))[size] = value;
     }
 

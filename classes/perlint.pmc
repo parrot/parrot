@@ -97,12 +97,25 @@ C<int> object according to 2.1. Built-in Functions.
             base = 10;
         if (argcP == 2)
             base = VTABLE_get_integer(INTERP, REG_PMC(6));
-        res = pmc_new(interpreter, enum_class_BigInt);
         arg = REG_PMC(5);
+        if (arg->vtable->base_type == enum_class_PerlInt && base == 10) {
+            res = pmc_new(interpreter, enum_class_PerlInt);
+            PMC_int_val(res) = PMC_int_val(arg);
+            REG_PMC(5) = res;
+            return next;
+        }
+
         if (arg->vtable->base_type == enum_class_PerlNum) {
             FLOATVAL d = VTABLE_get_number(INTERP, arg);
             const char *sign = "-";
+            INTVAL i = VTABLE_get_integer(INTERP, arg);
             d = floor(d);
+            if (d == i) {
+                res = pmc_new(interpreter, enum_class_PerlInt);
+                PMC_int_val(res) = i;
+                REG_PMC(5) = res;
+                return next;
+            }
             if (!signbit(d))
                 sign = "";
             d = fabs(d);
@@ -110,12 +123,13 @@ C<int> object according to 2.1. Built-in Functions.
         }
         else
             num = VTABLE_get_string(interpreter, arg);
+        res = pmc_new(interpreter, enum_class_BigInt);
         VTABLE_set_string_keyed_int(interpreter, res, base, num);
         if (num->strlen < 9) {  /* XXX */
             /* TODO not if it would overflow */
             INTVAL intnum = VTABLE_get_integer(interpreter, res);
             res = pmc_new(interpreter, enum_class_PerlInt); /*TODO morph */
-            VTABLE_set_integer_native(interpreter, res, intnum);
+            PMC_int_val(res) = intnum;
         }
         REG_PMC(5) = res;
         return next;
@@ -371,6 +385,7 @@ Subtracts C<*value> from the integer and returns the result in C<*dest>.
         FLOATVAL valf;
         FLOATVAL diff;
 
+        /* XXX overflow, MMD */
         pmci = PMC_int_val(SELF);
         if (vtype == enum_class_PerlUndef) {
             VTABLE_set_integer_native(INTERP, dest, pmci);
@@ -966,6 +981,7 @@ Increments the integer.
 
 */
     void increment () {
+        /* XXX overflow */
         PMC_int_val(SELF) ++;
     }
 
@@ -979,6 +995,7 @@ Decrements the integer.
 
 */
     void decrement () {
+        /* XXX overflow */
         PMC_int_val(SELF) --;
     }
 /*

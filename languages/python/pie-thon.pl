@@ -77,6 +77,15 @@ my %type_map = (
     object => 'Py_object',
     type => 'Py_type',
 );
+
+my %nci_methods = (
+    'append' => 'append',
+    'fromkeys' => 'fromkeys',
+    'locase' => 'locase',
+    'next' => 'next',
+    'sort' => 'sort',
+);
+
 my %rev_type_map;
 
 while (my ($k, $v) =  each (%type_map)) {
@@ -87,6 +96,13 @@ get_dis($DIS, $file);
 get_source($file);
 exit if $opt{D};
 gen_code();
+
+sub nci_method {
+    my $m = shift;
+    return 1 if $vtables{$m};
+    return 1 if $nci_methods{$m};
+    return 0;
+}
 
 sub type_map {
     my $t = $_[0];
@@ -1243,13 +1259,20 @@ EOC
 	    $t = temp($rett = $ret_type);
 	    $ret_string = "$t = ";
 	}
-	my $internal_pmc;
-	print <<EOC;
+	if (!nci_method($attr)) {	# a method function
+	    print <<EOC;
+	P2 = $1
+	${ret_string}$func($args)  $cmt
+EOC
+	}
+	else {
+	    print <<EOC;
 	.local NCI meth\:\:$attr
 	meth\:\:$attr = $func # avoid savetop
 	P2 = $1
 	${ret_string}meth\:\:$attr($args)  $cmt
 EOC
+	}
     }
     else {
 	my $ret_type = ret_val($func);

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -139,6 +139,32 @@ def main():
     print c.a
     print i.next()
     print "ok"
+
+main()
+CODE
+
+test(<<'CODE', '__init__ method');
+class C:
+    def __init__(self, x):
+        self.a = x
+
+def main():
+    c = C(42)
+    print c.a
+
+main()
+CODE
+
+test(<<'CODE', '__init__ method, args');
+class C:
+    def __init__(self, x, y, z):
+        self.a = x
+        self.b = y
+        self.c = z
+
+def main():
+    c = C(42, -2, "ok")
+    print c.a, c.b, c.c
 
 main()
 CODE

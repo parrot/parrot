@@ -1,6 +1,7 @@
 # pie-thon x.py [ parrot-options ]
 
 f=${1%%".py"}
+[ pie-thon.pl -nt $f.pbc ] && rm -f $f.pbc
 [ $f.py -nt $f.pbc ] && rm -f $f.pbc
 [ -e $f.pbc ] || (
 	perl pie-thon.pl $1 > $f.pir

@@ -544,7 +544,7 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
     INTVAL nparents;
     STRING *meth_str;
     PMC *meth;
-    PMC *arg = REG_PMC(5);  /* TODO more args */
+    PMC *arg = REG_PMC(5);
 
     nparents = VTABLE_elements(interpreter, classsearch_array);
     if (nparents) {
@@ -563,11 +563,14 @@ do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
         }
     }
     meth_str = CONST_STRING(interpreter, "__init__");
-    meth = Parrot_find_method_with_cache(interpreter,
-            class, meth_str);
+    meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
     if (meth) {
-        Parrot_runops_fromc_args_save(interpreter, meth,
-                "vPP", object, arg);
+        void *data = Parrot_save_register_frames(interpreter, meth);
+        REG_STR(0) = meth_str;
+        REG_PMC(2) = object;
+        /* args are just passed on */
+        Parrot_runops_fromc(interpreter, meth);
+        Parrot_restore_register_frames(interpreter, data);
     }
 }
 
