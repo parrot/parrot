@@ -218,6 +218,13 @@ sub generate_functions {
       $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
       $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
 
+      if (! -e $obj_f) {
+	$Builder->diag("Failed to build '$obj_f': " . slurp_file($build_f));
+	unlink $build_f;
+	$Builder->ok(0,$desc);
+	return 0;
+      }
+
       $cmd = "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} $obj_f " .
              "$PConfig{ld_out}$exe_f $libparrot $PConfig{libs}";
       $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
@@ -227,6 +234,7 @@ sub generate_functions {
       if (! -e $exe_f) {
 	$Builder->diag("Failed to build '$exe_f': " . slurp_file($build_f));
 	unlink $build_f;
+	$Builder->ok(0,$desc);
 	return 0;
       }
 
