@@ -4,7 +4,7 @@
  *      $Id$
  *  Overview:
  *      This is the Parrot IO UNIX layer. May be changed to
- *      include other platforms if that platform is similar 
+ *      include other platforms if that platform is similar
  *      enough to keep from smudging, else implement seperate layer.
  *      For UNIX systems this is the low level OS layer (unbuffered).
  *  Data Structure and Algorithms:
@@ -43,7 +43,7 @@ ParrotIO *PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 ParrotIO *PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer,
                           PIOHANDLE fd, INTVAL flags);
 INTVAL PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
-void PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
+INTVAL PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 size_t PIO_unix_read(theINTERP, ParrotIOLayer *layer,
                      ParrotIO *io, void *buffer, size_t len);
 size_t PIO_unix_write(theINTERP, ParrotIOLayer *layer,
@@ -127,7 +127,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
     flags |= PIO_F_FILE;
 
     /* Try open with no create first */
-    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR | O_APPEND), mode)) 
+    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR | O_APPEND), mode))
            < 0 && errno == EINTR)
         errno = 0;
 
@@ -273,10 +273,10 @@ PIO_unix_getblksize(PIOHANDLE fd)
 
 /* At lowest layer all we can do for flush is ask kernel to sync().
  */
-void
+INTVAL
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    fsync(io->fd);
+    return fsync(io->fd);
 }
 
 
