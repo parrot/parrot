@@ -907,7 +907,7 @@ func_assign:
    ;
 
 the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
-       | VAR      { $$ = $1;
+       | target   { $$ = $1;
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
                      }

@@ -783,7 +783,7 @@ typedef struct {
 /*
  * s. also src/stack_common.c:200
  */
-#define DISBALE_RETC_RECYCLING 0
+#define DISBALE_RETC_RECYCLING 1
 
 void add_to_retc_free_list(Parrot_Interp, PMC*);
 void disable_retc_free_list(Parrot_Interp);
