@@ -34,8 +34,8 @@ This is executed when you call F<getopt_demo.imc>.
 
   # Assemble specification for get_options
   # in an array of format specifiers
-  .local ResizableStringArray opt_spec    
-  opt_spec = new PerlArray
+  .local pmc opt_spec    
+  opt_spec = new ResizableStringArray 
   # --version, boolean
   push opt_spec, "version"
   # --help, boolean

@@ -634,11 +634,11 @@ f1:
 not_P:
 	if $S0 != "A" goto not_A	# absolute
 	format = ABS
-	points = new PerlArray
+	points = new ResizableIntegerArray
 not_A:
 	if $S0 != "R" goto not_R	# relative
 	format = REL
-	points = new PerlArray
+	points = new ResizableIntegerArray
 not_R:
 	goto loop
 

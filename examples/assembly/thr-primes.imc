@@ -80,7 +80,7 @@ no_arg:
 #       10 my $kid    = new threads(\&check_num, $stream, 2);
     Check_num = global "_check_num"
     kid = new ParrotThread
-    $P2 = new PerlInt
+    $P2 = new Integer
     $P2 = 2
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
@@ -97,7 +97,7 @@ no_arg:
     i = 3
 lp:
 #       13     $stream->enqueue($i);
-    $P3 = new PerlInt
+    $P3 = new Integer
     $P3 = i
     push stream, $P3
     inc i
@@ -130,7 +130,7 @@ lp:
 
 #       21     my $kid;
     .sym pmc kid
-    kid = new PerlUndef
+    kid = new Undef
 #       22     my $downstream = new Thread::Queue;
     .sym pmc downstream
     downstream = new TQueue
@@ -141,7 +141,7 @@ lp:
     $I0 = defined Num
     unless $I0 goto ewhile
 #       24         next unless $num % $cur_prime;
-    $P0 = new PerlInt
+    $P0 = new Integer
     $P0 = Num % cur_prime
     unless $P0 goto lp
 #       25         if ($kid) {

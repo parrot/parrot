@@ -19,8 +19,8 @@ integers.
 
 =head1 Data Structure
 
-C<P0> is a C<PerlArray> PMC with three entries.  Each entry is a
-C<PerlArray> PMC which represents a tower (column) of Hanoi.
+C<P0> is a C<FixedPMCArray> PMC with three entries.  Each entry is a
+C<ResizableIntegerArray> PMC which represents a tower (column) of Hanoi.
 
 The towers are arrays of integers. 0 indicates no disk is present. A
 positive integer indicates the diameter of the disk occupying the
@@ -90,10 +90,11 @@ MAIN:
 
 	set S5, P5[1]           # S5 = argv[0]
         set I5, S5              # Convert to an int
-	new P0, .PerlArray
-	new P1, .PerlArray
-	new P2, .PerlArray
-	new P3, .PerlArray
+	new P0, .FixedPMCArray
+        set P0, 3
+	new P1, .ResizableIntegerArray
+	new P2, .ResizableIntegerArray
+	new P3, .ResizableIntegerArray
 	set P0[0], P1	      #P0 = [[],[],[]]
 	set P0[1], P2
 	set P0[2], P3

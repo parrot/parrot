@@ -16,10 +16,10 @@ C<find_lex>).
 
 =cut
 
-new P0, .PerlInt
-new P1, .PerlInt
-new P2, .PerlInt
-new P3, .PerlInt
+new P0, .Integer
+new P1, .Integer
+new P2, .Integer
+new P3, .Integer
 set P0, 0
 set P1, 1
 
