@@ -404,14 +404,6 @@ Sets the PMC to the string value of B<value>.
 
 Sets the PMC to the passed in string value.
 
-=item void set_string_unicode(INTERP, PMC* self, STRING* value)
-
-Sets the PMC to the passed in string value.
-
-=item void set_string_other(INTERP, PMC* self, STRING* value)
-
-Sets the PMC to the passed in string value.
-
 =item void set_string_same(INTERP, PMC* self, PMC* value)
 
 Sets the PMC to the string value of B<value>.
@@ -935,10 +927,6 @@ At least one key is guaranteed to be non-NULL.
 =item void concatenate(INTERP, PMC* self, PMC* value, PMC* dest)
 
 =item void concatenate_native(INTERP, PMC* self, STRING* value, PMC* dest)
-
-=item void concatenate_unicode(INTERP, PMC* self, STRING* value, PMC* dest)
-
-=item void concatenate_other(INTERP, PMC* self, STRING* value, PMC* dest)
 
 Concatenate the strings in B<self> and B<value> and store the result
 in B<dest>.
