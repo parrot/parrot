@@ -201,7 +201,8 @@ sub is_of_type
 =item C<check_pod()>
 
 Runs C<Pod::Simple::Checker> on the contents of the file. Executable
-files are assumed not to contain POD and therefore not checked.
+files, and F<*.dump> files are assumed not to contain POD and therefore
+not checked.
 
 Note that the results are cached and the POD will only be rechecked
 if the file has been modified since it was checked. 
@@ -212,9 +213,10 @@ sub check_pod
 {
 	my $self = shift;
 	
-	if ( ! $self->is_executable and 
-		( ! exists $self->{POD_ERRORS_TIME} or 
-		$self->modified_since($self->{POD_ERRORS_TIME}) ) )
+	return if $self->is_executable or $self->suffix eq 'dump';
+	
+	if ( ! exists $self->{POD_ERRORS_TIME} or 
+		$self->modified_since($self->{POD_ERRORS_TIME}) )
 	{
 		my $checker = Pod::Simple::Checker->new;
 	
