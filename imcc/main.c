@@ -375,6 +375,7 @@ do_pre_process(Parrot_Interp interpreter)
 int main(int argc, char * argv[])
 {
     struct PackFile *pf;
+    int obj_file;
 
     struct Parrot_Interp *interpreter = Parrot_new();
 
@@ -420,6 +421,7 @@ int main(int argc, char * argv[])
         Parrot_exit(0);
     }
 
+    obj_file = 0;
     if (output) {
         char *ext;
         ext = strrchr(output, '.');
@@ -431,6 +433,7 @@ int main(int argc, char * argv[])
             load_pbc = 1;
             write_pbc = 0;
             run_pbc = 1;
+            obj_file = 1;
             Parrot_setup_opt(interpreter, 0, output);
             Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
         }
@@ -441,13 +444,7 @@ int main(int argc, char * argv[])
 
     if (IMCC_INFO(interpreter)->verbose) {
         info(interpreter, 1,"debug = 0x%x\n", IMCC_INFO(interpreter)->debug);
-        info(interpreter, 1,"Reading %s", yyin == stdin ? "stdin":sourcefile);
-        if (run_pbc)
-            info(interpreter, 1, ", executing");
-        if (write_pbc)
-            info(interpreter, 1, " and writing %s\n", output);
-        else
-            info(interpreter, 1,"\n");
+        info(interpreter, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
     if (load_pbc) {
         fclose(yyin);
@@ -478,6 +475,7 @@ int main(int argc, char * argv[])
         size_t size;
         opcode_t *packed;
         FILE *fp;
+        info(interpreter, 1, "Writing %s\n", output);
 
         size = PackFile_pack_size(interpreter->code) * sizeof(opcode_t);
         info(interpreter, 1, "packed code %d bytes\n", size);
@@ -512,7 +510,10 @@ int main(int argc, char * argv[])
             PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
         if (!gc_off)
             interpreter->DOD_block_level--;
-        info(interpreter, 1, "Running...\n");
+        if (obj_file)
+            info(interpreter, 1, "Writing %s\n", output);
+        else
+            info(interpreter, 1, "Running...\n");
         if (!load_pbc)
             PackFile_fixup_subs(interpreter);
         Parrot_runcode(interpreter, argc, argv);
