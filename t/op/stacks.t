@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -735,6 +735,73 @@ for (0..1024) {
 $code .= "      end\n";
 $code .= "FAIL: end\n";
 output_is($code, $output, "pushn & popn (deep)" );
+
+
+output_is(<<CODE, <<'OUTPUT', "lookback");
+@{[ $fp_equality_macro ]}
+        save 1
+        save 1.0
+        save "Foo"
+
+        new P12, .PerlHash
+        set P12["Apple"], "Banana"
+        save P12
+
+        lookback P0, 0
+        lookback S0, 1
+        lookback N0, 2
+        lookback I0, 3
+
+        set S2, P0["Apple"]
+        eq S2, "Banana", OK1
+        print "not "
+OK1:    print "ok 1\\n"
+
+        eq I0, 1, OK2
+        print "not "
+OK2:    print "ok 2\\n"
+
+        .fp_eq (N0, 1.0, OK3)
+        print "not "
+OK3:    print "ok 3\\n"
+
+        eq S0, "Foo", OK4
+        print "not "
+OK4:    print "ok 4\\n"
+
+        lookback I1, -1
+        lookback N1, -2
+        lookback S1, -3
+        lookback P1, -4
+
+        eq I0, 1, OK5
+        print "not "
+OK5:    print "ok 5\\n"
+
+        .fp_eq (N0, 1.0, OK6)
+        print "not "
+OK6:    print "ok 6\\n"
+
+        eq S0, "Foo", OK7
+        print "not "
+OK7:    print "ok 7\\n"
+
+        set S3, P1["Apple"]
+        eq S3, "Banana", OK8
+        print "not "
+OK8:    print "ok 8\\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+OUTPUT
 
 ##############################
 
