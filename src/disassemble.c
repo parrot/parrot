@@ -32,10 +32,6 @@ F<src/debug.c>.
 #include <stdlib.h>
 #include <ctype.h>
 
-#define na(c) { \
-    while(*c && !isspace(*c)) \
-        c++; }
-
 static void do_dis(Parrot_Interp);
 
 /*
@@ -70,8 +66,7 @@ main(int argc, char *argv[])
         Parrot_exit(1);
     }
 
-    na(argv[0]);
-    filename = &(*argv)[1];
+    filename = argv[1];
 
     pf = Parrot_readbc(interpreter, filename);
 

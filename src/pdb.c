@@ -113,10 +113,6 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 void PDB_printwelcome(void);
 
-#define na(c) { \
-    while(*c && !isspace(*c)) \
-        c++; }
-
 /*
 
 =item C<int
@@ -149,9 +145,7 @@ main(int argc, char *argv[])
         Parrot_exit(1);
     }
 
-    na(argv[0]);
-
-    filename = &(*argv)[1];
+    filename = argv[1];
 
     pf = Parrot_readbc(interpreter, filename);
 
