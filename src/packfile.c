@@ -95,13 +95,16 @@ byteorder if needed.
 ***************************************/
 
 opcode_t
-PackFile_fetch_op(struct PackFile *pf, opcode_t *stream) {
-    if(pf->fetch_op == NULL)
-        return *stream;
+PackFile_fetch_op(struct PackFile *pf, opcode_t **stream) {
+    opcode_t o;
+    if (!pf->fetch_op)
+        return *(*stream)++;
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PackFile_fetch_op: Reordering.\n");
 #endif
-    return (pf->fetch_op)(*stream);
+    o = (pf->fetch_op)(**stream);
+    ((unsigned char *) (*stream)) += pf->header->wordsize;
+    return o;
 }
 
 /***************************************
@@ -116,12 +119,70 @@ byteorder if needed.
 ***************************************/
 
 INTVAL
-PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream) {
+PackFile_fetch_iv(struct PackFile *pf, opcode_t **stream) {
+    INTVAL i;
     if(pf->fetch_iv == NULL)
-        return *stream;
-    return (pf->fetch_iv)(*stream);
+        return *(*stream++);
+    i = (pf->fetch_iv)(**stream);
+    /* XXX assume sizeof(opcode_t) == sizeof(INTVAL) on the
+     * machine producing this PBC
+     */
+    ((unsigned char *) (*stream)) += pf->header->wordsize;
+    return i;
 }
 
+/* convert i386 LE 12 byte long double to IEEE 754 8 byte double
+ */
+static void cvt_num12_num8(unsigned char *dest, unsigned char *src)
+{
+    int expo, i, s;
+
+    memset (dest, 0, 8);
+    /* exponents 15 -> 11 bits */
+    s = src[9] & 0x80; /* sign */
+    expo = ((src[9] & 0x7f)<< 8 | src[8]);
+    if (expo == 0) {
+nul:
+        if (s)
+            dest[7] |= 0x80;
+        return;
+    }
+    expo -= 16383;       /* - bias */
+    expo += 1023;       /* + bias 8byte */
+    if (expo <= 0)       /* underflow */
+        goto nul;
+    if (expo > 0x7ff) {	/* inf/nan */
+        dest[7] = 0x7f;
+        dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
+        goto nul;
+    }
+    expo <<= 4;
+    dest[6] = (expo & 0xff);
+    dest[7] = (expo & 0x7f00) >> 8;
+    if (s)
+        dest[7] |= 0x80;
+    /* long double frac 63 bits => 52 bits
+       src[7] &= 0x7f; reset integer bit */
+    for (i = 0; i < 6; i++) {
+        dest[i+1] |= (i==5 ? src[7]&0x7f : src[i+2]) >> 3;
+        dest[i] |= (src[i+2] & 0x1f) << 5;
+    }
+    dest[0] |= src[1] >> 3;
+}
+
+static void cvt_num12_num8_be(unsigned char *dest, unsigned char *src)
+{
+    cvt_num12_num8(dest, src);
+    /* TODO endianize */
+    internal_exception(1, "TODO cvt_num12_num8_be\n");
+}
+
+static void cvt_num12_num8_le(unsigned char *dest, unsigned char *src)
+{
+    cvt_num12_num8(dest, src);
+    /* TODO endianize */
+    internal_exception(1, "TODO cvt_num12_num8_le\n");
+}
 /***************************************
 
 =item fetch_nv
@@ -140,9 +201,8 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
      * to use memcpy() for native byteorder.
      */
     FLOATVAL f;
-    HUGEFLOATVAL g;
     double d;
-    if(pf->fetch_nv == NULL) {
+    if (!pf->fetch_nv) {
 #if TRACE_PACKFILE
         PIO_eprintf(NULL, "PackFile_fetch_nv: Native [%d bytes]..\n",
                 sizeof(FLOATVAL));
@@ -153,15 +213,13 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
         return f;
     }
     f = (FLOATVAL) 0;
-    g = (HUGEFLOATVAL) 0;
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_fetch_nv: Byteordering..\n");
 #endif
     /* Here is where the size transforms get messy */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == 1) {
-        (pf->fetch_nv)((unsigned char *)&g, (unsigned char *) *stream);
+        (pf->fetch_nv)((unsigned char *)&f, (unsigned char *) *stream);
         ((unsigned char *) (*stream)) += 12;
-        f = g;
     }
     else {
         (pf->fetch_nv)((unsigned char *)&d, (unsigned char *) *stream);
@@ -171,42 +229,88 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
     return f;
 }
 
+static opcode_t
+fetch_op_mixed(opcode_t b)
+{
+    union {
+        unsigned char buf[8];
+        opcode_t o[2];
+    } u;
+    opcode_t o;
+
+#if PARROT_BIGENDIAN
+#  if OPCODE_T_SIZE == 4
+     /* wordsize = 8 then */
+     fetch_buf_le_8(u.buf, (unsigned char *) b);
+     return u.o[1]; /* or u.o[0] */
+#  else
+     o = fetch_op_le(b);        /* or fetch_be_le_4 and convert? */
+     return o >> 32;    /* or o & 0xffffffff */
+#  endif
+#else
+#  if OPCODE_T_SIZE == 4
+     /* wordsize = 8 then */
+     fetch_buf_be_8(u.buf, (unsigned char *) b);
+     return u.o[0]; /* or u.o[1] */
+#  else
+     o = fetch_op_be(b);
+     return o & 0xffffffff;
+#  endif
+
+#endif
+}
 /*
  * Assign transform functions to vtable
  */
-void PackFile_assign_transforms(struct PackFile *pf) {
+void
+PackFile_assign_transforms(struct PackFile *pf) {
 #if PARROT_BIGENDIAN
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
-        pf->fetch_op = fetch_op_le;
+        if (pf->header->wordsize == sizeof(opcode_t))
+            pf->fetch_op = fetch_op_le;
+        else {
+            pf->need_wordsize = 1;
+            pf->fetch_op = fetch_op_mixed;
+        }
+
         pf->fetch_iv = fetch_iv_le;
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_le_8;
         else if (pf->header->floattype == 1)
-            pf->fetch_nv = fetch_buf_le_12;
+            pf->fetch_nv = cvt_num12_num8_le;
     }
 #else
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
-        pf->fetch_op = fetch_op_be;
+        if (pf->header->wordsize == sizeof(opcode_t)) {
+            pf->fetch_op = fetch_op_be;
+        }
+        else {
+            pf->need_wordsize = 1;
+            pf->fetch_op = fetch_op_mixed;
+        }
         pf->fetch_iv = fetch_iv_be;
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_be_8;
         else if (pf->header->floattype == 1)
-            pf->fetch_nv = fetch_buf_be_12;
+            pf->fetch_nv = cvt_num12_num8_be;
     }
     else {
         if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
-            pf->fetch_nv = fetch_buf_le_12;
+            pf->fetch_nv = cvt_num12_num8;
         else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_le_8;
-        /* XXX else */
+    }
 #  if TRACE_PACKFILE
         PIO_eprintf(NULL, "header->byteorder [%d] native byteorder [%d]\n",
             pf->header->byteorder, PARROT_BIGENDIAN);
 #  endif
-    }
 #endif
+    if (pf->header->wordsize != sizeof(opcode_t)) {
+        pf->need_wordsize = 1;
+        pf->fetch_op = fetch_op_mixed;
+    }
 }
 
 /***************************************
@@ -329,7 +433,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     memcpy(header, packed, PACKFILE_HEADER_BYTES);
     if(header->wordsize != sizeof(opcode_t)) {
         self->need_wordsize = 1;
-        if(header->wordsize == 0) {
+        if(header->wordsize != 4 && header->wordsize != 8) {
             PIO_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
                         header->wordsize);
             return 0;
@@ -343,16 +447,6 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     PIO_eprintf(NULL, "byteorder: %d\n", header->byteorder);
 #endif
 
-    /*
-     * FIXME
-     */
-    if(self->need_wordsize) {
-        PIO_eprintf(NULL,
-                "PackFile_unpack: Unimplemented wordsize transform.\n");
-        PIO_eprintf(NULL, "File has wordsize: %d (native is %d)\n",
-                header->wordsize,  sizeof(opcode_t));
-        return 0;
-    }
     if (header->major != PARROT_MAJOR_VERSION ||
             header->minor != (PARROT_MINOR_VERSION|PARROT_PATCH_VERSION)) {
         PIO_eprintf(NULL, "PackFile_unpack: Bytecode not valid for this "
@@ -370,7 +464,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
     /*
      * Unpack and verify the magic which is stored byteorder of the file:
      */
-    header->magic = PackFile_fetch_op(self, cursor++);
+    header->magic = PackFile_fetch_op(self, &cursor);
 
     /*
      * The magic and opcodetype fields are in native byteorder.
@@ -384,7 +478,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         return 0;
     }
 
-    header->opcodetype = PackFile_fetch_op(self, cursor++);
+    header->opcodetype = PackFile_fetch_op(self, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_unpack(): Magic verified.\n");
@@ -394,7 +488,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
      * Unpack the Fixup Table Segment:
      */
 
-    header->dir_format = PackFile_fetch_op(self, cursor++);
+    header->dir_format = PackFile_fetch_op(self, &cursor);
 
     /* old compat mode for assemble.pl */
     if (header->dir_format == 0) {
@@ -402,7 +496,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         /*
          * Unpack the Constant Table Segment:
          */
-        header->const_ss = PackFile_fetch_op(self, cursor++);
+        header->const_ss = PackFile_fetch_op(self, &cursor);
         self->const_table->base.op_count = header->const_ss /
             sizeof(opcode_t);
         if (!PackFile_check_segment_size(header->const_ss,
@@ -419,14 +513,14 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         }
 
         /* Segment size is in bytes */
-        cursor += header->const_ss / sizeof(opcode_t);
+        (char *)cursor += header->const_ss;
 
         /*
          * Unpack the Byte Code Segment:
          * PackFile new did generate already a default code segment
          */
 
-        header->bytecode_ss = PackFile_fetch_op(self, cursor++);
+        header->bytecode_ss = PackFile_fetch_op(self, &cursor);
 
         if (!PackFile_check_segment_size(header->bytecode_ss,
                     "bytecode")) {
@@ -445,10 +539,10 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
                     (int)header->dir_format);
             return 0;
         }
-        cursor++;       /* pad */
+        (void)PackFile_fetch_op(self, &cursor); /* pad */
         self->directory->base.file_offset = (size_t)(cursor - self->src);
-        cursor = PackFile_Segment_unpack(interpreter, (struct PackFile_Segment *)
-                self->directory, cursor);
+        cursor = PackFile_Segment_unpack(interpreter,
+                (struct PackFile_Segment *) self->directory, cursor);
     }
     self->byte_code = self->cur_cs->base.data;
     self->byte_code_size = self->cur_cs->base.size * sizeof(opcode_t);
@@ -632,15 +726,12 @@ PackFile_new(INTVAL is_mapped)
     pf->eval_nr = 0;
     pf_register_standard_funcs(pf);
     pf->directory = (struct PackFile_Directory *)
-        PackFile_Segment_new_seg(pf, PF_DIR_SEG,
-                DIRECTORY_SEGMENT_NAME, 0);
+        PackFile_Segment_new_seg(pf, PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
     /* add default segments */
     pf->const_table = (struct PackFile_ConstTable *)
-        PackFile_Segment_new_seg(pf, PF_CONST_SEG,
-                CONSTANT_SEGMENT_NAME, 1);
+        PackFile_Segment_new_seg(pf, PF_CONST_SEG, CONSTANT_SEGMENT_NAME, 1);
     pf->cur_cs = (struct PackFile_ByteCode*)
-        PackFile_Segment_new_seg(pf, PF_BYTEC_SEG,
-                BYTE_CODE_SEGMENT_NAME, 1);
+        PackFile_Segment_new_seg(pf, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, 1);
     pf->need_wordsize = 0;
     pf->need_endianize = 0;
     pf->fetch_op = (opcode_t (*)(opcode_t)) NULL;
@@ -662,10 +753,10 @@ static opcode_t * default_unpack (struct Parrot_Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)
 {
     if (self->pf->header->dir_format) {
-        self->op_count = PackFile_fetch_op(self->pf, cursor++);
-        self->itype = PackFile_fetch_op(self->pf, cursor++);
-        self->id = PackFile_fetch_op(self->pf, cursor++);
-        self->size = PackFile_fetch_op(self->pf, cursor++);
+        self->op_count = PackFile_fetch_op(self->pf, &cursor);
+        self->itype = PackFile_fetch_op(self->pf, &cursor);
+        self->id = PackFile_fetch_op(self->pf, &cursor);
+        self->size = PackFile_fetch_op(self->pf, &cursor);
     }
     if (self->size == 0)
         return cursor;
@@ -690,16 +781,14 @@ static opcode_t * default_unpack (struct Parrot_Interp *interpreter,
 
     if(!self->pf->need_endianize && !self->pf->need_wordsize) {
         mem_sys_memcopy(self->data, cursor, self->size * sizeof(opcode_t));
-        /* Segment size is in bytes */
         cursor += self->size;
     }
     else {
         int i;
         for(i = 0; i < (int)self->size ; i++) {
-            self->data[i] = PackFile_fetch_op(self->pf, cursor++);
+            self->data[i] = PackFile_fetch_op(self->pf, &cursor);
 #if TRACE_PACKFILE
-            PIO_eprintf(NULL, "op[%u]->[%u]\n", *(cursor-1),
-                    self->data[i]);
+            PIO_eprintf(NULL, "op[#%d] %u\n", i, self->data[i]);
 #endif
         }
     }
@@ -928,8 +1017,10 @@ directory_unpack (struct Parrot_Interp *interpreter,
     size_t i;
     struct PackFile_Directory *dir = (struct PackFile_Directory *) segp;
     struct PackFile      * self = dir->base.pf;
+    opcode_t *pos;
+    int wordsize = self->header->wordsize;
 
-    dir->num_segments = PackFile_fetch_op (self, cursor++);
+    dir->num_segments = PackFile_fetch_op (self, &cursor);
     dir->segments = mem_sys_realloc (dir->segments,
             sizeof(struct PackFile_Segment *) * dir->num_segments);
 
@@ -939,12 +1030,12 @@ directory_unpack (struct Parrot_Interp *interpreter,
         size_t tmp;
         UINTVAL type;
         const char *name;
-        type = PackFile_fetch_op (self, cursor++);
+        type = PackFile_fetch_op (self, &cursor);
         /* get name */
         str_len = strlen ((char *)cursor) + 1;
         name = (char *)cursor;
+        cursor += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
 
-        cursor += ROUND_UP(str_len, sizeof(opcode_t)) / sizeof(opcode_t);
         switch (type) {
             case PF_CONST_SEG:
                 seg = (struct PackFile_Segment *)self->const_table;
@@ -969,10 +1060,11 @@ directory_unpack (struct Parrot_Interp *interpreter,
                 break;
         }
 
-        seg->file_offset = PackFile_fetch_iv(self, cursor++);
-        seg->op_count = PackFile_fetch_op(self, cursor++);
+        seg->file_offset = PackFile_fetch_op(self, &cursor);
+        seg->op_count = PackFile_fetch_op(self, &cursor);
 
-        tmp = PackFile_fetch_op (self, self->src + seg->file_offset);
+        pos = self->src + seg->file_offset;
+        tmp = PackFile_fetch_op (self, &pos);
         if (seg->op_count != tmp) {
             fprintf (stderr,
                     "%s: Size in directory (%d) doesn't match size "
@@ -994,7 +1086,6 @@ directory_unpack (struct Parrot_Interp *interpreter,
         cursor += 4 - (cursor - self->src) % 4;
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
-        opcode_t *pos;
         size_t tmp = *cursor;       /* check len again */
         pos = PackFile_Segment_unpack (interpreter, dir->segments[i],
                 cursor);
@@ -1246,8 +1337,9 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
     char *name = (char *)cursor;
     char *code_name;
     struct PackFile_ByteCode *code;
+    int wordsize = self->pf->header->wordsize;
 
-    cursor += ROUND_UP(str_len, sizeof(opcode_t)) / sizeof(opcode_t);
+    cursor += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
     str_len = strlen(self->name);
     code_name = mem_sys_allocate(str_len);
     strcpy(code_name, self->name);
@@ -1500,7 +1592,7 @@ fixup_unpack(struct Parrot_Interp *interpreter,
     PackFile_FixupTable_clear(self);
 
     pf = self->base.pf;
-    self->fixup_count = PackFile_fetch_op(pf, cursor++);
+    self->fixup_count = PackFile_fetch_op(pf, &cursor);
 
     if (self->fixup_count) {
         self->fixups = mem_sys_allocate_zeroed(self->fixup_count *
@@ -1517,12 +1609,12 @@ fixup_unpack(struct Parrot_Interp *interpreter,
 
     for (i = 0; i < self->fixup_count; i++) {
         self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
-        self->fixups[i]->type = PackFile_fetch_op(pf, cursor++);
+        self->fixups[i]->type = PackFile_fetch_op(pf, &cursor);
         switch (self->fixups[i]->type) {
             case 0:
                 self->fixups[i]->u.t0.code_seg =
-                    PackFile_fetch_op(pf, cursor++);
-                self->fixups[i]->u.t0.offset = PackFile_fetch_op(pf, cursor++);
+                    PackFile_fetch_op(pf, &cursor);
+                self->fixups[i]->u.t0.offset = PackFile_fetch_op(pf, &cursor);
                 break;
             default:
                 PIO_eprintf(interpreter,
@@ -1618,7 +1710,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 
     PackFile_ConstTable_clear(self);
 
-    self->const_count = PackFile_fetch_op(pf, cursor++);
+    self->const_count = PackFile_fetch_op(pf, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(interpreter,
@@ -1799,8 +1891,8 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
     opcode_t type;
     opcode_t size;
 
-    type = PackFile_fetch_op(pf, cursor++);
-    size = PackFile_fetch_op(pf, cursor++);
+    type = PackFile_fetch_op(pf, &cursor);
+    size = PackFile_fetch_op(pf, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
@@ -1906,14 +1998,15 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     opcode_t encoding;
     opcode_t type;
     size_t size;
+    int wordsize = pf->header->wordsize;
 
     /* don't let PBC mess our internals */
-    flags = 0 ; cursor++;
-    encoding = PackFile_fetch_op(pf, cursor++);
-    type = PackFile_fetch_op(pf, cursor++);
+    flags = 0; (void)PackFile_fetch_op(pf, &cursor);
+    encoding = PackFile_fetch_op(pf, &cursor);
+    type = PackFile_fetch_op(pf, &cursor);
 
     /* These may need to be separate */
-    size = (size_t)PackFile_fetch_op(pf, cursor++);
+    size = (size_t)PackFile_fetch_op(pf, &cursor);
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "Constant_unpack_string(): flags are 0x%04x...\n", flags);
@@ -1930,7 +2023,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
                                flags | PObj_constant_FLAG,
                                chartype_lookup_index(type));
 
-    size = ROUND_UP(size, sizeof(opcode_t)) / sizeof(opcode_t);
+    size = ROUND_UP(size, wordsize) / sizeof(opcode_t);
     return cursor + size;
 }
 
@@ -1959,8 +2052,9 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
     INTVAL components;
     PMC *head;
     PMC *tail;
+    opcode_t type, op;
 
-    components = *cursor++;
+    components = (INTVAL)PackFile_fetch_op(pf, &cursor);
     head = tail = NULL;
 
     while (components-- > 0) {
@@ -1974,29 +2068,31 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 
         tail->vtable->init(interpreter, tail);
 
-        switch (*cursor++) {
+        type = PackFile_fetch_op(pf, &cursor);
+        op = PackFile_fetch_op(pf, &cursor);
+        switch (type) {
         case PARROT_ARG_IC:
-            key_set_integer(interpreter, tail, *cursor++);
+            key_set_integer(interpreter, tail, op);
             break;
         case PARROT_ARG_NC:
             key_set_number(interpreter, tail,
-                    pf->const_table->constants[*cursor++]->u.number);
+                    pf->const_table->constants[op]->u.number);
             break;
         case PARROT_ARG_SC:
             key_set_string(interpreter, tail,
-                pf->const_table->constants[*cursor++]->u.string);
+                pf->const_table->constants[op]->u.string);
             break;
         case PARROT_ARG_I:
-            key_set_register(interpreter, tail, *cursor++, KEY_integer_FLAG);
+            key_set_register(interpreter, tail, op, KEY_integer_FLAG);
             break;
         case PARROT_ARG_N:
-            key_set_register(interpreter, tail, *cursor++, KEY_number_FLAG);
+            key_set_register(interpreter, tail, op, KEY_number_FLAG);
             break;
         case PARROT_ARG_S:
-            key_set_register(interpreter, tail, *cursor++, KEY_string_FLAG);
+            key_set_register(interpreter, tail, op, KEY_string_FLAG);
             break;
         case PARROT_ARG_P:
-            key_set_register(interpreter, tail, *cursor++, KEY_pmc_FLAG);
+            key_set_register(interpreter, tail, op, KEY_pmc_FLAG);
             break;
         default:
             return 0;

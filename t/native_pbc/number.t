@@ -1,10 +1,42 @@
 #! perl -w
+my $comment = <<'EOC';
+
+# these are PBC files generated from t/op/number_1.pasm with
+# different architectures
+# if your wordsize/floattype/endianess is not covered here
+# please add it:
+
+$ cd languages/imcc
+$ make clean && make -s
+$ cd -
+$ ln -s languages/imcc/imcc imcc
+$ imcc -o n.pbc t/op/number_1.pasm
+$ make pdump
+$ pdump -h n.pbc
+$ mv n.pbc t/native_pbc/number_$(N).pbc
+
+# then
+# - increase number of tests
+# - include the pdump header info for reference
+# - put the file into MANIFEST
+# - add the file as binary and commit it
+# thanks -leo
+
+EOC
 
 use Parrot::Test tests => 2;
 use Test::More;
 
-output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit int");
- # number_1.pbc
+output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
+# number_1.pbc
+# HEADER => [
+#        wordsize  = 4   (interpreter's wordsize    = 4)
+#        byteorder = 0   (interpreter's byteorder   = 0)
+#        floattype = 0   (interpreter's NUMVAL_SIZE = 8)
+#        no endianize, no opcode, no numval transform
+#        dirformat = 0
+#]                #'
+
 CODE
 1.000000
 4.000000
@@ -34,8 +66,15 @@ CODE
 1125899906842620.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "i386 long double float 32 bit int");
+output_is(<<CODE, <<OUTPUT, "i386 long double float 32 bit opcode_t");
  # number_2.pbc
+#HEADER => [
+#        wordsize  = 4   (interpreter's wordsize    = 4)
+#        byteorder = 0   (interpreter's byteorder   = 0)
+#        floattype = 1   (interpreter's NUMVAL_SIZE = 8)
+#        no endianize, no opcode, **need** numval transform
+#        dirformat = 1
+#]        #'
 CODE
 1.000000
 4.000000
