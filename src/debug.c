@@ -1821,8 +1821,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
             PDB_print_pmc(interpreter,&interpreter->ctx.pmc_reg, regnum, key);
             break;
         default:
-            fprintf(stderr, "Unrecognized print option: must be 'int', 'num',
-                'str', 'pmc', or a register\n");
+            fprintf(stderr, "Unrecognized print option: must be 'int', 'num', 'str', 'pmc', or a register\n");
     }
 
     interpreter->DOD_block_level--;
