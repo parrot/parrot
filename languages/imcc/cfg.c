@@ -255,7 +255,7 @@ void analyse_life_block(Basic_block* bb, SymReg* r) {
 void add_life_interval(Life_range *l, int from, int to) {
     int length = l->n_intervals;
     
-    l->intervals = realloc(l->intervals, (length + 2) * sizeof(int) + 1);    
+    l->intervals = realloc(l->intervals, (2 * length + 2) * sizeof(int));    
     if (l->intervals == NULL) {
 	fprintf(stderr, "Memory error at add_life_interval\n");
 	abort();
