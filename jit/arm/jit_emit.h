@@ -859,11 +859,11 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                                                  SUB, 0, REG11_fp, REG12_ip,
                                                  4, 0);
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, 4, 0);
-}
-
-jit_f
-Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
-{
+    /* TODO emit restart code s. i386
+     *
+     * emit get r0 from stack
+     * Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
+     */
 }
 
 /* I'm going to load registers to call functions in general like this:

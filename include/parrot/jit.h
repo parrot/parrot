@@ -7,11 +7,10 @@
 #ifndef JIT_H_GUARD
 #define JIT_H_GUARD
 
-typedef void (*jit_f)(struct Parrot_Interp *interpreter);
+typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
 
 jit_f build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
                 opcode_t *code_start, opcode_t *code_end);
-jit_f Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc);
 
 /*  Parrot_jit_fixup_t
  *      Platform generic fixup information

@@ -477,6 +477,7 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 /* AND */
 
 #define emit_andl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x21, reg1, reg2)
+#define emit_test_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x85, reg1, reg2)
 
 #define emitm_andl_i_r(pc, imm, reg) \
   emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
@@ -937,23 +938,42 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
     jit_info->arena.fixups = NULL;
 }
 
+static void
+Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
+                   struct Parrot_Interp * interpreter)
+{
+
+    /* This calculates (INDEX into op_map * 4) */
+    emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
+
+    /* This jumps to the address in op_map[EBP + sizeof(void *) * INDEX] */
+    *jit_info->native_ptr++ = 0x3e;     /* DS:0(EBP, EAX, 1) */
+    emitm_jumpm(jit_info->native_ptr, emit_EBP, emit_EAX,
+                        sizeof(*jit_info->arena.op_map) / 4, 0);
+}
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  struct Parrot_Interp * interpreter)
 {
-    int i;
+    /* the generated code gets called as:
+     * (jit_code)(interpreter, pc)
+     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
+     */
 
     /* Maintain the stack frame pointer for the sake of gdb */
     emit_pushl_r(jit_info->native_ptr, emit_EBP);
     emitm_movl_r_r(jit_info->native_ptr, emit_ESP, emit_EBP);
+    /* stack:
+     * 12   pc
+     *  8   interpreter
+     *  4   retaddr
+     *  0   ebp <----- ebp
+     */
 
-    /* Save ESI, as it's value is clobbered by jit_cpcf_op */
-    emit_pushl_r(jit_info->native_ptr, emit_ESI);
-
-    /* Save EBX and EDI, since they are callee-saved in cdecl (so are
-     * ESI and EBP, but they have already been saved for other
-     * reasons.) */
+    /* Save all callee-saved registers (cdecl)
+     */
     emit_pushl_r(jit_info->native_ptr, emit_EBX);
+    emit_pushl_r(jit_info->native_ptr, emit_ESI);
     emit_pushl_r(jit_info->native_ptr, emit_EDI);
 
     /* Cheat on op function calls by writing the interpreter arg on the stack
@@ -961,35 +981,17 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * the stack this will stop working !!! */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
 
-    /* Point EBP to the opcode-native code map array */
+    /* get the pc from stack:  mov 12(%ebx), %eax */
+    emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
+
+    /* Point EBP to the opcode-native code map array - this destroy above
+     * stack frame. If we have debugging, we should change this */
     emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_EBP);
 
-    /* emit 5 noops. when JIT restarts a long jump will be patched in here */
-    for (i = 0; i < 5; i++)
-        emit_nop(jit_info->native_ptr);
+    /* jump to restart pos or first op */
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
-jit_f
-Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
-{
-    char *ptr;
-    Parrot_jit_info_t *jit_info = (Parrot_jit_info_t *) interpreter->jit_info;
-
-    /* the 5 nops above are at native_ptr -5 of 1. instruction */
-    jit_info->native_ptr = (char*)jit_info->arena.op_map[0].ptr - 5;
-    /* pretend, we are at pc */
-    jit_info->op_i = pc;
-    /* op_map.ptr & op_map.offset are a union, which are absolute adr's
-     * now -- fake offset */
-    ptr = jit_info->arena.op_map[pc].ptr;
-    jit_info->arena.op_map[pc].offset = ptr - jit_info->arena.start;
-    /* emit jump with offset 0 */
-    emit_jump(jit_info, 0);
-    /* restore ptr */
-    jit_info->arena.op_map[pc].ptr = ptr;
-    /* return start of JIT code */
-    return (jit_f)D2FPTR(jit_info->arena.start);
-}
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -1015,13 +1017,14 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
     Parrot_jit_normal_op(jit_info, interpreter);
     /* test eax, if zero (e.g after restart), return from JIT */
-    emit_andl_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
+    emit_test_r_r(jit_info->native_ptr, emit_EAX, emit_EAX);
     /* remember PC */
     jmp_ptr = jit_info->native_ptr;
     /* emit jump past exit code, dummy offset
      * this assumes exit code is in reach of a short jump (126 bytes) */
     emitm_jxs(jit_info->native_ptr, emitm_jnz, 0);
-    /* emit exit code */
+    /* emit exit code XXX: it would be better, to emit the exit code
+     * only once and emit a jump to this code here */
     Parrot_end_jit(jit_info, interpreter);
     /* fixup above jump */
     sav_ptr = jit_info->native_ptr;
@@ -1029,15 +1032,9 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     emitm_jxs(jit_info->native_ptr, emitm_jnz, (long)(sav_ptr - jmp_ptr) - 2);
     /* restore PC */
     jit_info->native_ptr = sav_ptr;
-
-    /* This calculates (INDEX into op_map * 4) */
-    emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
-
-    /* This jumps to the address in op_map[EBP + sizeof(void *) * INDEX] */
-    *jit_info->native_ptr++ = 0x3e;     /* DS:0(EBP, EAX, 1) */
-    emitm_jumpm(jit_info->native_ptr, emit_EBP, emit_EAX,
-                        sizeof(*jit_info->arena.op_map) / 4, 0);
+    Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
+
 
 /* Load registers for the current section */
 void

@@ -555,13 +555,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_mr(jit_info->native_ptr, r13, r3);
     emit_imm32(jit_info->native_ptr, r14, jit_info->arena.op_map);
     emit_imm32(jit_info->native_ptr, r15, interpreter->code->byte_code);
+    /* TODO emit restart code s. i386 */
 }
-
-jit_f
-Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
-{
-}
-
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,

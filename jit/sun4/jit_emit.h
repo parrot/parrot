@@ -532,11 +532,7 @@ void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
         emitm_hi22(jit_info->arena.op_map), Parrot_jit_opmap);
     emitm_or_i(jit_info->native_ptr,
         emitm_i(3), emitm_lo10(jit_info->arena.op_map), Parrot_jit_opmap);
-}
-
-jit_f
-Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
-{
+    /* TODO emit restart code s. i386 */
 }
 
 void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,

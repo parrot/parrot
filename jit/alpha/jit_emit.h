@@ -366,11 +366,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_lda_b(jit_info->native_ptr, REG15_s6, -0x7ff8, REG15_s6);
     emit_lc(jit_info->native_ptr, REG10_s1, interpreter->code->byte_code);
     emit_lc(jit_info->native_ptr, REG11_s2, jit_info->arena.op_map);
-}
-
-jit_f
-Parrot_jit_restart(struct Parrot_Interp * interpreter, opcode_t pc)
-{
+    /* TODO emit restart code, s. i386 */
 }
 
 void

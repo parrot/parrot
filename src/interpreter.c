@@ -229,13 +229,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_end = interpreter->code->byte_code + code_size;
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
-    (jit_code) (interpreter);
-    /* if we fall out of runloop with restart, there is
-     * currently no way, to continue in JIT, so stop it
-     *
-     * This is broken too, but better as endless loops
-     */
-/*    Interp_flags_CLEAR(interpreter, PARROT_JIT_FLAG); */
+    (jit_code) (interpreter, pc);
 #endif
 }
 

@@ -445,8 +445,9 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
     opcode_t cur_opcode_byte;
 
 
+    /* XXX assume, we restart */
     if (pc != code_start && interpreter->jit_info)
-        return Parrot_jit_restart(interpreter, pc - code_start);
+        return (jit_f)D2FPTR(jit_info.arena.start);
 
     interpreter->jit_info = &jit_info;
     jit_info.optimizer = optimize_jit(interpreter, pc, code_start, code_end);
