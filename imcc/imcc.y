@@ -642,10 +642,11 @@ instruction:
 labeled_inst:
      assignment
    | if_statement
-   | constdef
    | NAMESPACE IDENTIFIER            { push_namespace($2); }
    | ENDNAMESPACE IDENTIFIER         { pop_namespace($2); }
    | LOCAL { is_def=1; } type IDENTIFIER { mk_ident($4, $3); is_def=0; }
+   | CONST { is_def=1; } type IDENTIFIER '=' const
+                                    { mk_const_ident($4, $3, $6, 0);is_def=0; }
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
                                     { mk_const_ident($4, $3, $6, 1);is_def=0; }
    | PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, cur_unit, "restore",
