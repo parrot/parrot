@@ -679,6 +679,21 @@ Initialize Python builtin object methods.
 */
 
 #include "pmc_default.h"
+
+static void
+integer_divide(Interp* interp, PMC* self, PMC* value, PMC* destination)
+{
+     INTVAL result;
+     result = PMC_int_val(self) / PMC_int_val(value);
+     VTABLE_set_integer_native(interp, destination, result);
+}
+static void
+integer_divide_int(Interp* interp, PMC* self, INTVAL value, PMC* destination)
+{
+     INTVAL result;
+     result = PMC_int_val(self) / value;
+     VTABLE_set_integer_native(interp, destination, result);
+}
 static void
 parrot_py_create_default_meths(Interp *interpreter)
 {
@@ -688,8 +703,14 @@ parrot_py_create_default_meths(Interp *interpreter)
     STRING *meth =  CONST_STRING(interpreter, "__repr__");
 
     parrot_py_object(interpreter, class,
-           F2DPTR(Parrot_default_get_repr), meth, sio);
+            F2DPTR(Parrot_default_get_repr), meth, sio);
 
+    mmd_register(interpreter, MMD_DIVIDE,
+            enum_class_PerlInt, enum_class_PerlInt,
+            (funcptr_t)integer_divide);
+    mmd_register(interpreter, MMD_DIVIDE_INT,
+            enum_class_PerlInt, 0,
+            (funcptr_t)integer_divide_int);
 }
 /*
 
