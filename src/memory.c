@@ -119,11 +119,18 @@ void
 mem_setup_allocator(Interp *interpreter)
 {
     interpreter->arena_base = mem_sys_allocate_zeroed(sizeof(struct Arenas));
-    interpreter->arena_base->sized_header_pools = NULL;
-    interpreter->arena_base->num_sized = 0;
+    SET_NULL(interpreter->arena_base->sized_header_pools);
+
+#if PARROT_GC_MS
+    Parrot_gc_ms_init(interpreter);
+#endif
+#if PARROT_GC_IMS
+    Parrot_gc_ims_init(interpreter);
+#endif
 
     Parrot_initialize_memory_pools(interpreter);
     Parrot_initialize_header_pools(interpreter);
+
 }
 
 /*

@@ -35,6 +35,21 @@
 #endif /* DISABLE_GC_DEBUG */
 
 /*
+ * GC_SUBSYSTEM selection
+ */
+
+/*
+ * PARROT_GC_MS is the stop-the-world mark and sweep collector
+ */
+#define PARROT_GC_MS      1
+
+/*
+ * PARROT_GC_IMS incremental mark and sweep collector
+ */
+#define PARROT_GC_IMS     0
+
+
+/*
  * The mark and sweep collector can run with 2 different setups.
  *
  * ARENA_DOD_FLAGS = 1:
@@ -49,7 +64,7 @@
  *    DOD-related flags are in the object header
  */
 
-#define ARENA_DOD_FLAGS 1
+#define ARENA_DOD_FLAGS 0
 
 /*
  * misc settings

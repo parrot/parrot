@@ -21,6 +21,11 @@ Handles the accessing of small object pools (header pools).
 #include "parrot/parrot.h"
 #include <assert.h>
 
+add_free_object_fn_type add_free_object_fn;
+get_free_object_fn_type get_free_object_fn;
+alloc_objects_fn_type   alloc_objects_fn;
+alloc_objects_fn_type   more_objects_fn;
+
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
 #define REPLENISH_LEVEL_FACTOR 0.3
@@ -142,14 +147,14 @@ more_non_traceable_objects(Interp *interpreter,
 
 /*
 
-=item C<void
-add_free_object(Interp *interpreter,
+=item C<static void
+gc_ms_add_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)>
 
 Add an unused object back to the free pool for later reuse.
 
 =item C<static void *
-get_free_object(Interp *interpreter,
+gc_ms_get_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 Get a new object from the free pool and return it.
@@ -158,8 +163,8 @@ Get a new object from the free pool and return it.
 
 */
 
-void
-add_free_object(Interp *interpreter,
+static void
+gc_ms_add_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
     *(void **)to_add = pool->free_list;
@@ -168,7 +173,7 @@ add_free_object(Interp *interpreter,
 
 
 static void *
-get_free_object(Interp *interpreter,
+gc_ms_get_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     void *ptr;
@@ -210,8 +215,8 @@ get_free_object_df(Interp *interpreter,
 
 /*
 
-=item C<static void
-add_to_free_list(Interp *interpreter,
+=item C< void
+Parrot_add_to_free_list(Interp *interpreter,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -223,8 +228,8 @@ Adds the memory between C<start> and C<end> to the free list.
 
 */
 
-static void
-add_to_free_list(Interp *interpreter,
+ void
+Parrot_add_to_free_list(Interp *interpreter,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -287,8 +292,8 @@ add_to_free_list(Interp *interpreter,
 /*
  * insert the new arena into the pool's structure, update stats
  */
-static void
-append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
+void
+Parrot_append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
     struct Small_Object_Arena *new_arena, size_t size)
 {
 
@@ -313,8 +318,8 @@ append_arena_in_pool(Interp *interpreter, struct Small_Object_Pool *pool,
 
 /*
 
-=item C<void
-alloc_objects(Interp *interpreter,
+=item C<static void
+gc_ms_alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 We have no more headers on the free header pool. Go allocate more
@@ -325,8 +330,8 @@ and put them on.
 */
 
 #if ARENA_DOD_FLAGS
-void
-alloc_objects(Interp *interpreter,
+static void
+gc_ms_alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
@@ -343,7 +348,8 @@ alloc_objects(Interp *interpreter,
         end = start << 2;
         if (end > pool->last_Arena->total_objects)
             end = pool->last_Arena->total_objects;
-        add_to_free_list(interpreter, pool, pool->last_Arena, start, end);
+        Parrot_add_to_free_list(interpreter, pool, pool->last_Arena,
+                start, end);
         return;
     }
 
@@ -391,16 +397,16 @@ alloc_objects(Interp *interpreter,
         assert(end < pool->objects_per_alloc);
     }
     /* Hook up the new object block into the object pool */
-    append_arena_in_pool(interpreter, pool, new_arena, size);
+    Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
 
-    add_to_free_list(interpreter, pool, new_arena, start, end);
+    Parrot_add_to_free_list(interpreter, pool, new_arena, start, end);
 
 }
 
 #else
 
-void
-alloc_objects(Interp *interpreter,
+static void
+gc_ms_alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
@@ -415,11 +421,11 @@ alloc_objects(Interp *interpreter,
     /* could be mem_sys_allocate too, but calloc is fast */
     new_arena->start_objects = mem_sys_allocate_zeroed(size);
 
-    append_arena_in_pool(interpreter, pool, new_arena, size);
+    Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
 
     start = 0;
     end = pool->objects_per_alloc;
-    add_to_free_list(interpreter, pool, new_arena, start, end);
+    Parrot_add_to_free_list(interpreter, pool, new_arena, start, end);
 
     /* Allocate more next time */
     if (GC_DEBUG(interpreter)) {
@@ -467,16 +473,37 @@ new_small_object_pool(Interp *interpreter,
     SET_NULL(pool->mem_pool);
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
-    pool->add_free_object = add_free_object;
-    pool->get_free_object = get_free_object;
+    pool->add_free_object = add_free_object_fn;
+    pool->get_free_object = get_free_object_fn;
 #if ARENA_DOD_FLAGS
+    assert(0);
     if (object_size >= sizeof(Dead_PObj))
         pool->get_free_object = get_free_object_df;
 #endif
-    pool->alloc_objects = alloc_objects;
+    pool->alloc_objects = alloc_objects_fn;
     return pool;
 }
 
+/*
+
+=item C<void Parrot_gc_ms_init(Interp* interpreter)>
+
+Initialize the state structures of the gc system. Called immediately before
+creation of memory pools. This function must set the function pointers
+for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_object_fn>, and
+C<more_object_fn>.
+
+=cut
+
+*/
+
+void
+Parrot_gc_ms_init(Interp* interpreter)
+{
+    add_free_object_fn = gc_ms_add_free_object;
+    get_free_object_fn = gc_ms_get_free_object;
+    alloc_objects_fn   = gc_ms_alloc_objects;
+}
 /*
 
 =back

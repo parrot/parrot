@@ -62,9 +62,10 @@ struct Arenas {
     struct Small_Object_Pool *constant_string_header_pool;
     struct Small_Object_Pool **sized_header_pools;
     size_t num_sized;
+    void *  gc_private;         /* gc subsystem data */
     /* Some counters for the garbage collector */
-    size_t  dod_runs;           /* Number of times we've
-                                 * done a DOD sweep */
+    size_t  dod_runs;           /* Number of times we've * done a DOD sweep */
+    size_t  lazy_dod_runs;      /* Number of lazy DOD sweep */
     size_t  collect_runs;       /* Number of times we've
                                  * done a memory compaction
                                  */

@@ -34,6 +34,16 @@ typedef struct {
 } Dead_PObj;
 
 #endif /* ARENA_DOD_FLAGS */
+
+struct Small_Object_Pool;
+
+typedef void (*add_free_object_fn_type)(struct Parrot_Interp *,
+                             struct Small_Object_Pool *, void *);
+typedef void * (*get_free_object_fn_type)(struct Parrot_Interp *,
+                             struct Small_Object_Pool *);
+typedef void  (*alloc_objects_fn_type)(struct Parrot_Interp *,
+                           struct Small_Object_Pool *);
+
 /* Tracked resource pool */
 struct Small_Object_Pool {
     struct Small_Object_Arena *last_Arena;
@@ -46,22 +56,22 @@ struct Small_Object_Pool {
     void *free_list;
     UINTVAL align_1;    /* alignment (must be power of 2) minus one */
     /* adds a free object to the pool's free list  */
-    void  (*add_free_object)(struct Parrot_Interp *,
-                             struct Small_Object_Pool *, void *);
+    add_free_object_fn_type     add_free_object;
+    get_free_object_fn_type     get_free_object;
+    alloc_objects_fn_type       alloc_objects;
+    alloc_objects_fn_type       more_objects;
     /* gets and removes a free object from the pool's free list */
-    void *(*get_free_object)(struct Parrot_Interp *,
-                             struct Small_Object_Pool *);
     /* allocates more objects */
-    void  (*alloc_objects)(struct Parrot_Interp *,
-                           struct Small_Object_Pool *);
-    /* makes more objects available. can call alloc_objects */
-    void  (*more_objects)(struct Parrot_Interp *,
-                          struct Small_Object_Pool *);
     void *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
     const char *name;
 };
+
+extern add_free_object_fn_type add_free_object_fn;
+extern get_free_object_fn_type get_free_object_fn;
+extern alloc_objects_fn_type   alloc_objects_fn;
+extern alloc_objects_fn_type   more_objects_fn;
 
 INTVAL contained_in_pool(struct Parrot_Interp *,
                          struct Small_Object_Pool *, void *);
@@ -85,6 +95,11 @@ struct Small_Object_Pool * new_small_object_pool(struct Parrot_Interp *,
                                                  size_t, size_t);
 
 int Parrot_is_const_pmc(Parrot_Interp, PMC *);
+
+void Parrot_append_arena_in_pool(Interp *, struct Small_Object_Pool *pool,
+    struct Small_Object_Arena *new_arena, size_t size);
+void Parrot_add_to_free_list(Interp *, struct Small_Object_Pool *pool,
+        struct Small_Object_Arena *arena, UINTVAL start, UINTVAL end);
 
 #endif /* PARROT_SMALLOBJECT_H_GUARD */
 

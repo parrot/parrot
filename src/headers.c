@@ -635,7 +635,7 @@ Parrot_initialize_header_pools(Interp *interpreter)
     interpreter->arena_base->pmc_ext_pool =
         new_small_object_pool(interpreter, sizeof(struct PMC_EXT), 1024);
     interpreter->arena_base->pmc_ext_pool->more_objects =
-        alloc_objects;
+        alloc_objects_fn;
     interpreter->arena_base->pmc_ext_pool->name = "pmc_ext";
     interpreter->arena_base->constant_pmc_pool = new_pmc_pool(interpreter);
     interpreter->arena_base->constant_pmc_pool->name = "constant_pmc";

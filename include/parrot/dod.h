@@ -66,6 +66,9 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *buffer);
 extern int CONSERVATIVE_POINTER_CHASING;
 #endif
 
+/* GC subsystem init functions */
+void Parrot_gc_ms_init(Interp* interpreter);
+void Parrot_gc_ims_init(Interp* interpreter);
 
 #endif /* PARROT_DOD_H_GUARD */
 
