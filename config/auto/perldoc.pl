@@ -22,7 +22,7 @@ $description = "Determining whether perldoc is installed...";
 @args = qw(verbose);
 
 sub runstep {
-    my $a = `perldoc perldoc`;
+    my $a = `perldoc perldoc` || '';
     my $has_perldoc = ($a =~ m/perldoc/) ? 1 : 0;
 
     Configure::Data->set(has_perldoc => $has_perldoc);
