@@ -36,7 +36,7 @@ print_head();
 
 # Needed to build code which tells about the number of return registers.
 # [ $stack, $int, $string, $pmc, $num ]
-my %ret_count = 
+my %ret_count =
      ( p => [1,0,0,1,0],        # Returning a pointer that we PMC stuff
        P => [1,0,0,1,0],        # PMC
        S => [1,0,1,0,0],        # STR
@@ -53,7 +53,7 @@ my %ret_count =
 #      B => [1,0,1,0,0],        # Returns a buffer
      );
 
-my %ret_type = 
+my %ret_type =
      ( p => "void *",
        i => "int",
        3 => "int *",
@@ -72,7 +72,7 @@ my %ret_type =
        S => "STRING *",
      );
 
-my %proto_type = 
+my %proto_type =
      ( p => "void *",
        i => "int",
        3 => "int *",
@@ -85,7 +85,7 @@ my %proto_type =
        d => "double",
        t => "char *",
        v => "void",
-       I => "Interp *",
+       J => "Interp *",
        P => "PMC *",
        S => "STRING *",
        O => "PMC *",
@@ -95,14 +95,14 @@ my %proto_type =
        T => "char **",
      );
 
-my %other_decl = 
+my %other_decl =
      ( p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
        t => "STRING *final_destination;"
 #      b => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
 #      B => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
      );
 
-my %ret_type_decl = 
+my %ret_type_decl =
      ( p => "void *",
        i => "int",
        3 => "int *",
@@ -121,7 +121,7 @@ my %ret_type_decl =
        S => "STRING *",
      );
 
-my %ret_assign = 
+my %ret_assign =
      ( p => "PMC_data(final_destination) = return_data;\n    REG_PMC(5) = final_destination;",
        i => "REG_INT(5) = return_data;",
        3 => "REG_INT(5) = *return_data;",
@@ -140,7 +140,7 @@ my %ret_assign =
        s => "REG_INT(5) = return_data;",
      );
 
-my %func_call_assign = 
+my %func_call_assign =
      ( p => "return_data = ",
        i => "return_data = ",
        3 => "return_data = ",
@@ -300,7 +300,7 @@ sub make_arg {
     /B/ && do {my $reg_num = $reg_ref->{s}++;
                return "(&PObj_bufstart(REG_STR($reg_num)))";
               };
-    /I/ && do {
+    /J/ && do {
                return "interpreter";
               };
     /O/ && do {
@@ -539,4 +539,4 @@ static void pcf_$funcname(Interp *interpreter, PMC *self) {
     return;
 }
 
-=cut 
+=cut

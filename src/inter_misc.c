@@ -123,7 +123,7 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, Parrot_compiler_func_t f
     nci = pmc_new(interpreter, enum_class_Compiler);
     VTABLE_set_pmc_keyed_str(interpreter, hash, type, nci);
     /* build native call interface fir the C sub in "func" */
-    sc = CONST_STRING(interpreter, "PIt");
+    sc = CONST_STRING(interpreter, "PJt");
     VTABLE_set_pointer_keyed_str(interpreter, nci, sc, func);
 }
 

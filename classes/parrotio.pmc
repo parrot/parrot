@@ -40,15 +40,15 @@ Class initialization.
 
         if (pass) {
             enter_nci_method(INTERP, enum_class_ParrotIO,
-                    F2DPTR(PIO_flush), "flush", "vIO");
+                    F2DPTR(PIO_flush), "flush", "vJO");
             enter_nci_method(INTERP, enum_class_ParrotIO,
-                    F2DPTR(PIO_setbuf), "setbuf", "iIOi");
+                    F2DPTR(PIO_setbuf), "setbuf", "iJOi");
             enter_nci_method(INTERP, enum_class_ParrotIO,
-                    F2DPTR(PIO_setlinebuf), "setlinebuf", "iIO");
+                    F2DPTR(PIO_setlinebuf), "setlinebuf", "iJO");
             enter_nci_method(INTERP, enum_class_ParrotIO,
-                    F2DPTR(PIO_puts), "puts", "iIOt");
+                    F2DPTR(PIO_puts), "puts", "iJOt");
             enter_nci_method(INTERP, enum_class_ParrotIO,
-                    F2DPTR(PIO_eof), "eof", "iIO");
+                    F2DPTR(PIO_eof), "eof", "iJO");
         }
     }
 

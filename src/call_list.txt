@@ -33,28 +33,21 @@
 # v - void
 
 # Buffers are not valid return parameters,
-# use 'p' when the native function returns a pointer value 
+# use 'p' when the native function returns a pointer value
 # b - void *
 # B - void **
 
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't comsume a register
-# I - Parrot_Interp param
+# J - Parrot_Interp param
 
 # Arrayish things, terminated with NULL/0
 # L - Long array
 # T - Array of string pointers (Converted to cstrings)
 
 # Callback Things
-# C - Function pointer to call back into Parrot. The signature of
-#     this function is: void (function *)(ExternalThing *, CallbackInfo *)
-#     More docs in PDD 16.
-# D - Function pointer. Like C, only the arg order is reversed:
-#     this function is: void (function *)(CallbackInfo *, ExternalThing *)
 
-# The following parameters must appear in a pair
-# Y - sub PMC to call back into
-# Z - Single PMC parameter to pass into sub Y
+# U - Single PMC parameter to pass into callback - user data
 
 c                # t/pmc/nci.t
 c	p
@@ -63,7 +56,7 @@ c	v
 
 d                # t/pmc/nci.t
 d	d
-d	IOd      # Parrot builtins
+d	JOd      # Parrot builtins
 d	v
 
 f                # t/pmc/nci.t
@@ -149,15 +142,15 @@ l	p33l
 l	v
 l	33l
 
-P	Ii       # Needed for parrot threads
-P	IOl      # Parrot builtins
-P	IOP      # PerlHash fromkeys, obsolete
-P	It
+P	Ji       # Needed for parrot threads
+P	JOl      # Parrot builtins
+P	JOP      # PerlHash fromkeys, obsolete
+P	Jt
 
 p
 p	B
 p	b
-p	It
+p	Jt
 p	i
 p	ii
 p	iiii
@@ -189,8 +182,8 @@ t	t4
 t	v
 
 v
-v	Iiiip    # examples/japh/japh11.pasm
-v	IOP      # Needed for parrot threads
+v	Jiiip    # examples/japh/japh11.pasm
+v	JOP      # Needed for parrot threads
 v	i
 v	ii
 v	illllllll
@@ -204,19 +197,19 @@ v	pp
 v	v
 
 # These are needed for parrotio.pmc
-i	IP
-v	IP
-i	IPi
-i	IPii
-i	IPiii
-i	IPt
+i	JP
+v	JP
+i	JPi
+i	JPii
+i	JPiii
+i	JPt
 
 # Py_func signatures
-P	IP
-P	IPP
-P	IPPP
-P	IO
-S	IO
+P	JP
+P	JPP
+P	JPPP
+P	JO
+S	JO
 i       P
 
 # the following are use by t/pmc/nci.t
@@ -232,12 +225,12 @@ v	pP
 p	ip
 i	33
 v	pii
-v	IO
-i	IO
-i	IOi
-i	IOt
-i	It
-i	Ii
+v	JO
+i	JO
+i	JOi
+i	JOt
+i	Jt
+i	Ji
 
 # Oddball ones for postgres
 p	ptiLTLLi
@@ -264,7 +257,7 @@ p	ptp
 i	pt33
 
 # For python
-i	IPP
+i	JPP
 
 #required for mod_parrot
 i	tp
@@ -272,12 +265,12 @@ v	tiiiptt
 i	Pip
 
 # PyBuiltins
-P	IOPP
-P	IOPPP
-v	IOPP
-v	IOPPP
-P	IOPPPP
-P	IOPPPPP
+P	JOPP
+P	JOPPP
+v	JOPP
+v	JOPPP
+P	JOPPPP
+P	JOPPPPP
 
 # Added for Tcl
-l	IOSl
+l	JOSl

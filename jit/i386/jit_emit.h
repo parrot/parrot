@@ -2932,6 +2932,7 @@ Parrot_jit_build_call_func(Interp *interpreter, PMC *pmc_nci,
                 emitm_fstpl(pc, emit_ESP, emit_None, 1, 0);
                 st += 4;        /* extra stack for double */
                 break;
+            case 'I':   /* INTVAL */
             case 'l':   /* long */
             case 'i':   /* int */
                 jit_emit_mov_RM_i(pc, emit_EAX,
@@ -3015,7 +3016,7 @@ preg:
                 emitm_addb_i_r(pc, 8, emit_ESP);
                 emitm_pushl_r(pc, emit_EAX);
                 break;
-            case 'I':
+            case 'J':   /* interpreter */
                 emitm_movl_m_r(pc, emit_ECX, emit_EBP, 0, 1, 8);
                 emitm_pushl_r(pc, emit_ECX);
                 break;
@@ -3076,6 +3077,7 @@ preg:
             emitm_movsbl_r_r(pc, emit_EDX, emit_EAX);
             jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EDX);
             break;
+        case 'I':   /* INTVAL */
         case 'l':
         case 'i':
             jit_emit_mov_MR_i(pc, REG_OFFS_INT(next_i++), emit_EAX);

@@ -482,7 +482,7 @@ sub proto ($$) {
 
     # type method(interpreter, self, parameters...)
     my $ret = $calltype{$type or "void"};
-    $ret .= "IO";
+    $ret .= "JO";
     $ret .= join('', map {$calltype{$_} or "?"} split(/,/, $parameters));
     # TODO
     # scan src/call_list.txt if the generated signature is available

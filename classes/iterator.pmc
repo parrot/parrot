@@ -25,7 +25,7 @@ pmclass Iterator {
     void class_init() {
         if (pass) {
             enter_nci_method(INTERP, enum_class_Iterator,
-                    F2DPTR(Parrot_Iterator_shift_pmc), "next", "PIO");
+                    F2DPTR(Parrot_Iterator_shift_pmc), "next", "PJO");
         }
     }
 
