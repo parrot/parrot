@@ -42,10 +42,9 @@ string_native_concat(STRING* a, STRING* b, IV flags) {
     if (flags && a->encoding != b->encoding) {
 	/* Transcode */
     }
-    
     /* b is now in native format */
     string_grow(a, a->strlen + b->strlen);
-    mem_sys_memcopy((void*)((IV)a->bufstart + a->strlen), b->bufstart, b->strlen);
+    mem_sys_memcopy(a->bufstart + a->strlen, b->bufstart, b->strlen);
     a->strlen = a->bufused = a->strlen + b->strlen;
     return a;
 }
