@@ -146,7 +146,7 @@ typedef struct Parrot_Context {
     UINTVAL current_class_offset; /* Offset into the class array of the
                                     currently found method */
     UINTVAL recursion_depth;    /* Sub call resursion depth */
-
+    int runloop_level;                  /* for reentering run loop */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */

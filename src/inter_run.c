@@ -45,11 +45,14 @@ runops(Interp *interpreter, size_t offset)
      * But these are necessary to catch exceptions in reentered
      * run loops, e.g. if a delegate methods throws an exception
      */
+    interpreter->ctx.runloop_level++;
 #if ! STACKED_EXCEPTIONS
     if (!interpreter->exceptions)
 #endif
     {
         new_internal_exception(interpreter);
+        interpreter->exceptions->runloop_level =
+            interpreter->ctx.runloop_level;
         if (setjmp(interpreter->exceptions->destination)) {
             /* an exception was thrown */
             offset = handle_exception(interpreter);
@@ -71,8 +74,10 @@ runops(Interp *interpreter, size_t offset)
     if (STACKED_EXCEPTIONS) {
         Parrot_exception *e = interpreter->exceptions;
         interpreter->exceptions = e->prev;
+        e->prev = interpreter->exc_free_list;
         interpreter->exc_free_list = e;
     }
+    interpreter->ctx.runloop_level--;
     /*
      * not yet - this needs classifying of exceptions and handlers
      * so that only an exit handler does catch this exception

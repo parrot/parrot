@@ -52,7 +52,7 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
                     PIO_eprintf(interpreter, "%S=PMC(%#p Str:(NULL))",
                         VTABLE_name(interpreter, pmc), pmc);
                 else {
-                    escaped = PDB_escape(PObj_bufstart(s), s->strlen);
+                    escaped = PDB_escape(s->strstart, s->strlen);
                     PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%s\")",
                         VTABLE_name(interpreter, pmc), pmc,
                         escaped ? escaped : "(null)");

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -95,6 +95,29 @@ def main():
     for x, y in izip(xrange(10), "abcdefghijklmnop"):
         print y,
     print
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'izip() generator with pi() object');
+def izip(*args):
+    args = map(iter, args)
+    while 1:
+        yield tuple([x.next() for x in args])
+
+class PI(object):
+    def __iter__(self):
+	i = 0
+	while 1:
+	    yield "314159265"[i]
+	    i = i + 1
+
+def main():
+    pi = PI()
+    for x, y in izip(xrange(6), pi):
+        print y,
+    print "ok"
 
 if __name__ == '__main__':
     main()

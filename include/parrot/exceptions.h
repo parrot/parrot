@@ -145,6 +145,7 @@ struct parrot_exception_t {
     long error;                         /* exception_type_enum */
     STRING *msg;                        /* may be NULL */
     void *resume;                       /* opcode_t* for resume or NULL */
+    int runloop_level;                  /* for reentering run loop */
     struct parrot_exception_t *prev;    /* interpreters handler stack */
     long language;                      /* what is this? */
     long system;                        /* what is this? */

@@ -137,7 +137,7 @@ Run the coroutine until it yields a value. The call to the coroutine
 is actually done via the C<call_hook> below, a piece of code at the
 end of a coroutine:
 
-  set P0, P5    # get the reall coroutine
+  set P0, P5    # get the real coroutine
   invokecc      # run that code
   end           # terminate the runloop
 
@@ -166,7 +166,8 @@ end of a coroutine:
         /*
          * the generator returned None, when it's finished
          */
-        if (res == Parrot_base_vtables[enum_class_None]->data) {
+        if (REG_INT(3) == 1 &&
+                res == Parrot_base_vtables[enum_class_None]->data) {
             Parrot_restore_register_frames(interpreter, regs);
             real_exception(interpreter, NULL, E_StopIteration, "StopIteration");
         }
