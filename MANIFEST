@@ -327,6 +327,9 @@ languages/imcc/imc.c
 languages/imcc/imc.h
 languages/imcc/imcc.l
 languages/imcc/imcc.y
+languages/imcc/imclexer.c
+languages/imcc/imcparser.c
+languages/imcc/imcparser.h
 languages/imcc/instructions.c
 languages/imcc/instructions.h
 languages/imcc/optimizer.c
