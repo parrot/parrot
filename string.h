@@ -80,7 +80,7 @@ string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type);
 void
 string_init(void);
 
-STRING_VTABLE Parrot_string_vtable[enc_max];
+VAR_SCOPE STRING_VTABLE Parrot_string_vtable[enc_max];
 
 #include "parrot/strnative.h"
 #endif
