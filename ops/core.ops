@@ -2215,22 +2215,22 @@ Save all the registers of the type indicated in the name of the operation.
 =cut
 
 inline op clonei() {
-//  Parrot_clone_i(interpreter);
+/*  XXX Parrot_clone_i(interpreter); */
   goto NEXT();
 }
 
 inline op clonen() {
-//  Parrot_clone_n(interpreter);
+/*  XXX Parrot_clone_n(interpreter); */
   goto NEXT();
 }
 
 inline op clones() {
-//  Parrot_clone_s(interpreter);
+/*  XXX Parrot_clone_s(interpreter); */
   goto NEXT();
 }
 
 inline op clonep() {
-//  Parrot_clone_p(interpreter);
+/*  XXX Parrot_clone_p(interpreter); */
   goto NEXT();
 }
 
