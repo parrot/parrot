@@ -72,7 +72,6 @@ AST         *ast_start = NULL;
 %type <ast> return_statement jump_statement asm_block
 %type <ast> statement statement_list
 %type <ast> decl_statement method_decl field_decl
-%type <ast> class_decl
 %type <ast> class_body class_member_decl_list class_member_decl
 %type <ast> local_var_decl
 %type <ast> method_header method_body
@@ -81,14 +80,12 @@ AST         *ast_start = NULL;
 %type <ast> iteration_statement while_statement for_statement
 %type <ast> expr_list expr statement_expr assignment
 %type <ast> primary_expr boolean_expr equality_expr element_access
-%type <ast> element_access
 %type <ast> post_inc_expr post_dec_expr pre_inc_expr pre_dec_expr
 %type <ast> new_expr new_object_expr
 %type <ast> conditional_expr conditional_or_expr
 %type <ast> conditional_and_expr inclusive_or_expr and_expr
 %type <ast> shift_expr exclusive_or_expr relational_expr
 %type <ast> unary_expr add_expr mult_expr
-%type <ast> equality_expr relational_expr
 %type <ast> method_call arg arg_list
 %type <ival> modifier modifiers opt_modifiers
 %type <ival> relational_op
@@ -1042,7 +1039,7 @@ int main(int argc, char * argv[])
     if(main_method) {
         printf(".sub _MAIN\n\t.arg \"\"\n\tcall _%s__%s\n",
             main_method->namespace->name, main_method->name);
-        printf("\tend\n\tret\n\.end\n");
+        printf("\tend\n\tret\n.end\n");
 #if 0
         printf("\n__END:\n\tend\n\n");
 #endif
