@@ -19,7 +19,7 @@ static void save_int(FILE *fp, int i);
 static void save_short(FILE *fp, short s);
 static void save_struct(FILE *fp, void *sp, size_t size);
 
-#  ifdef JIT_CGP
+#ifdef JIT_CGP
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
@@ -68,8 +68,8 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
              * or a JITed branch,
              * when the branch is non JIT, we are in the above case
              */
-            offset = (cur_section->next->begin - interpreter->code->byte_code) +
-                interpreter->code->cur_cs->prederef_code;
+            offset = (cur_section->next->begin - interpreter->code->byte_code)
+                + interpreter->code->cur_cs->prederef_code;
             cur_section->done = 1;
         }
         i = (int)(((op_func_t*)interpreter->op_lib->op_func_table)[2]);
@@ -98,7 +98,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
     }
 }
 
-#  else /* JIT_CGP */
+#else /* JIT_CGP */
 
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
@@ -115,7 +115,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
 }
 
-#  endif /* JIT_CGP */
+#endif /* JIT_CGP */
 
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
@@ -162,7 +162,7 @@ Parrot_exec_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem,int reg)
 }
 
 void
-Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
+Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter,int reg,char *mem)
 {
     char *nptr = ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr;
 
@@ -178,7 +178,7 @@ Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
 }
 
 void
-Parrot_exec_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_exec_emit_mov_mr_n(struct Parrot_Interp * interpreter,char *mem,int reg)
 {
     char *nptr = ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr;
 
@@ -200,18 +200,18 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     int i,j;
 
     for (i = 0; i < obj->data_count; i++) {
-#  ifdef EXEC_A_OUT
+#ifdef EXEC_A_OUT
         obj->symbol_table[i].offset_text = obj->text.size;
-#  endif
+#endif
         for (j = 0; j < i; j++) 
             obj->symbol_table[i].offset_text += obj->data_size[j];
     }
 }
 
-#  ifdef EXEC_A_OUT
+#ifdef EXEC_A_OUT
 
-#   include <a.out.h>
-#   include <link.h>
+#  include <a.out.h>
+#  include <link.h>
 
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
@@ -304,9 +304,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     fclose(fp);
 }
 
-#  endif /* EXEC_A_OUT */
+#endif /* EXEC_A_OUT */
 
-#  ifdef EXEC_ELF
+#ifdef EXEC_ELF
 
 #  include <elf.h>
 
@@ -356,15 +356,15 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     header.e_ident[4] = ELFCLASS32;
     header.e_ident[5] = ELFDATA2LSB;
     header.e_ident[6] = EV_CURRENT;
-#   if EXEC_OS == FREEBSD
+#  if EXEC_OS == FREEBSD
     header.e_ident[7] = ELFOSABI_FREEBSD;
-#   endif
-#   if EXEC_OS == NETBSD
+#  endif
+#  if EXEC_OS == NETBSD
     header.e_ident[7] = ELFOSABI_NETBSD;
-#   endif
-#   if EXEC_OS == LINUX && defined(ELFOSABI_LINUX)
+#  endif
+#  if EXEC_OS == LINUX && defined(ELFOSABI_LINUX)
     header.e_ident[7] = ELFOSABI_LINUX;
-#   endif
+#  endif
 
     header.e_type = ET_REL;
     header.e_machine = EM_386;
@@ -431,13 +431,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
             case RTYPE_FUNC:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + PDFS, 2);
+                        obj->text_rellocation_table[i].symbol_number + PDFS,2);
                 break;
             case RTYPE_DATA:
             case RTYPE_COM:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + PDFS, 1);
+                        obj->text_rellocation_table[i].symbol_number + PDFS,1);
                 break;
             default:
                 break;
@@ -503,7 +503,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     fclose(fp);
 }
 
-#  endif /* EXEC_ELF */
+#endif /* EXEC_ELF */
 
 static void
 save_struct(FILE *fp, void *sp, size_t size)
