@@ -1597,6 +1597,45 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         return;
     }
 
+    /* Do the numbers overlap (within precision (and a bit) digits)?
+       If not, we can simply use the first and round given the second
+       by catenating `01' to the result... Remember that we also know
+       that neither is zero */
+
+    if (context->precision > -1 &&
+        one->expn > two->expn + context->precision +1) {
+        BN_grow(PINT_ result, context->precision + 1);
+        for (i = 0; i < one->digits && i < context->precision; i++) {
+            dig = BN_getd(one, one->digits - i -1);
+            BN_setd(result, context->precision-i, dig);
+        }
+        for (i = i; i < context->precision; i++) {
+            BN_setd(result, context->precision - i, 0);
+        }
+        BN_setd(result, 0, 1);
+        result->digits = context->precision + 1;
+        result->sign = 0;
+        result->expn = one->expn + one->digits - context->precision - 1;
+        return 0;
+    } /* or two might be in the lead, but will he win by more than a length? */
+    else if (context->precision > -1 &&
+             two->expn > one->expn + context->precision + 1) {
+        BN_grow(PINT_ result, context->precision + 1);
+        for (i = 0; i < two->digits && i < context->precision; i++) {
+            dig = BN_getd(two, two->digits -i-1);
+            BN_setd(result, context->precision-i, dig);
+        }
+        for (i = i; i < context->precision; i++) {
+            BN_setd(result, context->precision - i, 0);
+        }
+        BN_setd(result, 0, 1);
+        result->digits = context->precision + 1;
+        result->sign = 0;
+        result->expn = two->expn + two->digits - context->precision - 1;
+        return 0;
+    }
+
+    /* Ok, we can't be lazy, we'll have to do it all ourselves */
     BN_align(PINT_ one, two);
 
     BN_grow(PINT_ result, one->digits + 1);
@@ -1617,6 +1656,7 @@ BN_iadd (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
     result->sign = 0;
     result->expn = one->expn;
+    return 0;
 }
 
 /*=for api bignum BN_subtract(result, one, two, context)
@@ -1663,12 +1703,12 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         result->digits = 1;
         result->expn = 0;
         BN_setd(result, 0, 0);
-        if (one->sign && !two->sign) {
+        if (one->sign && !two->sign && context->extended) {
             result->sign = 1;
         }
         else if (context->rounding == ROUND_FLOOR &&
-                 (one->sign == two->sign)
-                 ) {
+                 (one->sign == two->sign) &&
+                 context->extended) {
             result->sign = 1;
         }
         else {
@@ -1726,6 +1766,62 @@ BN_isubtract (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         result->sign = 0;
         return;
     }
+
+    /* Do the numbers fail to overlap?  If so, we can simplify the sum
+       by taking a little bit, but essentially copying... We don't
+       yet know which number is the bigger of the two, so need to do
+       each by itself */
+    if (context->precision > -1 &&
+        one->expn > two->expn + context->precision + 1) {
+        BN_grow(PINT_ result, context->precision + 1);
+        carry = -1;
+        for (i=0; i<one->digits; i++) {
+            carry = carry + BN_getd(one, i);
+            if (carry < 0) {
+                BN_setd(result, context->precision - one->digits + i + 1,
+                        10+carry);
+                carry = -1;
+            }
+            else {
+                BN_setd(result, context->precision - one->digits + i + 1,
+                        carry);
+                carry = 0;
+            }
+        }
+        for (i=0; i<context->precision + 1 - one->digits; i++) {
+            BN_setd(result, i, 9);
+        }
+        result->expn = one->expn + one->digits - context->precision -1;
+        result->sign = 0;
+        result->digits = context->precision + 1;
+        return 1;
+    } /* or, do we do [ickle] - b */
+    else if (context->precision > -1 &&
+             two->expn > one->expn + context->precision + 1) {
+        BN_grow(PINT_ result, context->precision + 1);
+        carry = -1;
+        for (i=0; i<two->digits; i++) {
+            carry = carry + BN_getd(two, i);
+            if (carry < 0) {
+                BN_setd(result, context->precision - two->digits + i + 1,
+                        10+carry);
+                carry = -1;
+            }
+            else {
+                BN_setd(result, context->precision - two->digits + i + 1,
+                        carry);
+                carry = 0;
+            }
+        }
+        for (i=0; i<context->precision + 1 - two->digits; i++) {
+            BN_setd(result, i, 9);
+        }
+        result->expn = two->expn + two->digits - context->precision -1;
+        result->sign = 1;
+        result->digits = context->precision + 1;
+        return 1;
+    }
+
 
     BN_align(PINT_ one, two);
 

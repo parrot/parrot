@@ -9,7 +9,7 @@ my ($test, $one, $two, $result, $prec, $round, $maxexp,
     $skip ,$op, @conds, $line, $arrow);
 
 my ($testsrun, $testspass, $testsfail, $extended) = (0,0,0,0);
-$maxexp = 10000;
+$maxexp = 999999999;
 while (<>) {
     chomp;
     next if /^\s*--/;
