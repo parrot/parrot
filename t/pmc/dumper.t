@@ -1,7 +1,7 @@
 #! perl -w
 use strict;
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 
 output_is(<<'CODE', <<'OUT', "dumping array of sorted numbers");
 ##PIR##
@@ -281,7 +281,6 @@ CODE
 }
 "hash1" => PerlHash {
     "hash2" => PerlHash {
-        "hello3" => "world3",
         "array1" => PerlArray (size:5) [
             "this",
             "is",
@@ -292,8 +291,114 @@ CODE
                 "name" => "parrot",
             }
         ],
+        "hello3" => "world3",
     },
     "hello" => "world",
     "hello2" => "world2",
 }
+OUT
+
+output_is(<<'CODE', <<'OUT', "properties");
+##PIR##
+.sub _main
+    .local pmc str
+    .local pmc array
+    
+    new array, .PerlArray
+    push array, "test1"
+    push array, "test2"
+
+    new str, .PerlString
+    set str, "value1"
+    setprop array, "key1", str
+
+    new str, .PerlString
+    set str, "value2"
+    setprop array, "key2", str
+
+    _dumper( array )
+    
+    end
+.end
+.include "library/dumper.imc"
+CODE
+PerlArray (size:2) [
+    "test1",
+    "test2"
+] with-properties: {
+    "key1" => "value1",
+    "key2" => "value2",
+}
+OUT
+
+output_is(<<'CODE', <<'OUT', "indent string");
+##PIR##
+.sub _main
+    .local pmc hash1
+    .local pmc hash2
+    .local pmc array1
+    .local pmc array2
+    .local string name
+    .local string indent
+    
+    new hash1, .PerlHash
+    new hash2, .PerlHash
+    new array1, .PerlArray
+    new array2, .PerlArray
+    
+    set hash1["hash2"], hash2
+    set hash2["array"], array1
+    set hash1["test1"], "test1"
+    set hash2["test2"], "test2"
+    push array1, 1
+    push array1, array2
+    push array2, "test"
+    setprop hash1, "array2", array2    
+    name = "hash"
+    indent = "|"
+    _dumper( name, hash1, indent )
+    _dumper( name, hash1, indent )
+    print "name = '"
+    print name
+    print "'\nindent = '"
+    print indent
+    print "'\n"
+    end
+.end
+.include "library/dumper.imc"
+CODE
+|"hash" => PerlHash {
+    |"hash2" => PerlHash {
+        |"array" => PerlArray (size:2) [
+            |1,
+            |PerlArray (size:1) [
+                |"test"
+            |]
+        |],
+        |"test2" => "test2",
+    |},
+    |"test1" => "test1",
+|} with-properties: {
+    |"array2" => PerlArray (size:1) [
+        |"test"
+    |],
+|}
+|"hash" => PerlHash {
+    |"hash2" => PerlHash {
+        |"array" => PerlArray (size:2) [
+            |1,
+            |PerlArray (size:1) [
+                |"test"
+            |]
+        |],
+        |"test2" => "test2",
+    |},
+    |"test1" => "test1",
+|} with-properties: {
+    |"array2" => PerlArray (size:1) [
+        |"test"
+    |],
+|}
+name = 'hash'
+indent = '|'
 OUT

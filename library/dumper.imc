@@ -151,11 +151,43 @@ B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
     .param pmc dump
     .param string indent
 
+    # check the number of INT args
+    if I1 != 0 goto ERROR
+    # check the number of PMC args
+    if I3 != 1 goto ERROR
+    # check the number of STR args
+    if I2 > 2 goto ERROR
+    if I2 < 0 goto ERROR
+    if I2 == 2 goto NAMED
+    if I2 == 0 goto UNNAMED
+    
+    # I2 == 1; no ident specified
+    set indent, ""
+    
+NAMED:
     _helper()    
     _do_dumper_named( name, dump, indent )
     print "\n"
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+
+UNNAMED:
+    _helper()
+    _do_dumper_unnamed( dump, "" )
+    print "\n"
     
     .pcc_begin_return
+    .return 1
+    .pcc_end_return
+    
+ERROR:
+    print "_dumper Syntax:\n"
+    print "_dumper( pmc )\n"
+    print "_dumper( name, pmc )\n"
+    print "_dumper( name, pmc, indent )\n\n"
+    .pcc_begin_return
+    .return 0
     .pcc_end_return
 .end
 
@@ -211,6 +243,13 @@ CALL_HELPER:
     restoreall
     
 DONE:
+    prophash cb, dump
+    unless cb goto END
+
+    print " with-properties: "
+    _dump_Hash( cb, indent )
+    
+END:
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -274,6 +313,19 @@ iter_end:
 .sub _dump_PerlHash
     .param pmc hash
     .param string indent
+    
+    print "PerlHash "
+    _dump_Hash( hash, indent )
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+#
+# Dumps a 'generic' Hash
+#
+.sub _dump_Hash
+    .param pmc hash
+    .param string indent
     .local string subindent
     .local pmc iter
     .local string key
@@ -283,7 +335,7 @@ iter_end:
     subindent = "    "
     concat subindent, indent
     
-    print "PerlHash {"
+    print "{"
 
     new keys, .PerlArray
     new iter, .Iterator, hash

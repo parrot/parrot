@@ -1,7 +1,7 @@
 #! perl -w
 use strict;
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 9;
 
 output_is(<<'CODE', <<'OUT', "sorting already sorted numbers");
 ##PIR##
@@ -283,4 +283,121 @@ echo
 foxtrot
 golf
 hotel
+OUT
+
+output_is(<<'CODE', <<'OUT', "sorting letters");
+##PIR##
+.sub _main
+    .local pmc array
+    .local int i
+    .local int j
+    .local pmc tmp
+    
+    new array, .PerlArray
+    push array, "w"
+    push array, "x"
+    push array, "h"
+    push array, "y"
+
+    _sort( array )
+    i = 0
+    j = array
+LOOP:
+    set tmp, array[i]
+    print tmp
+    print "\n"
+    inc i
+    if i < j goto LOOP
+    end
+.end
+.include "library/sort.imc"
+CODE
+h
+w
+x
+y
+OUT
+
+output_is(<<'CODE', <<'OUT', "sorting PerlString letters");
+##PIR##
+.sub _main
+    .local pmc array
+    .local int i
+    .local int j
+    .local pmc tmp
+    
+    new array, .PerlArray
+    new tmp, .PerlString
+    set tmp, "w"
+    push array, tmp
+
+    new tmp, .PerlString
+    set tmp, "x"
+    push array, tmp
+
+    new tmp, .PerlString
+    set tmp, "h"
+    push array, tmp
+
+    new tmp, .PerlString
+    set tmp, "y"
+    push array, tmp
+
+    _sort( array )
+    i = 0
+    j = array
+LOOP:
+    set tmp, array[i]
+    print tmp
+    print "\n"
+    inc i
+    if i < j goto LOOP
+    end
+.end
+.include "library/sort.imc"
+CODE
+h
+w
+x
+y
+OUT
+
+output_is(<<'CODE', <<'OUT', "sorting strings");
+##PIR##
+.sub _main
+    .local pmc array
+    .local int i
+    .local int j
+    .local pmc tmp
+    
+    new array, .PerlArray
+    new tmp, .PerlString
+    push array, "hello"
+    push array, "hash2"
+    push array, "hello2"
+    push array, "aaaa2"
+    push array, "bbb"
+    push array, "bbbbbb"
+    push array, "aaaa1"
+
+    _sort( array )
+    i = 0
+    j = array
+LOOP:
+    set tmp, array[i]
+    print tmp
+    print "\n"
+    inc i
+    if i < j goto LOOP
+    end
+.end
+.include "library/sort.imc"
+CODE
+aaaa1
+aaaa2
+bbb
+bbbbbb
+hash2
+hello
+hello2
 OUT
