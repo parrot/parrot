@@ -17,11 +17,14 @@ extern const ENCODING utf8_encoding;
 extern const ENCODING utf16_encoding;
 extern const ENCODING utf32_encoding;
 
-static const ENCODING *encoding_array[enum_encoding_MAX];
+static const ENCODING **encoding_array = NULL;
+static int encoding_count = 0;
 
 static void
 encoding_init(void)
 {
+    encoding_count = enum_encoding_MAX;
+    encoding_array = mem_sys_allocate(sizeof(ENCODING*) * encoding_count);
     encoding_array[enum_encoding_singlebyte] = &singlebyte_encoding;
     encoding_array[enum_encoding_utf8] = &utf8_encoding;
     encoding_array[enum_encoding_utf16] = &utf16_encoding;
@@ -33,11 +36,11 @@ encoding_lookup(const char *name)
 {
     int i;
 
-    if (!encoding_array[0])
+    if (!encoding_array)
         encoding_init();
   
-    for (i=0; i<enum_encoding_MAX; i++) {
-        if (strcmp(name, encoding_array[i]->name) == 0) {
+    for (i=0; i<encoding_count; i++) {
+        if (encoding_array[i] && !strcmp(name, encoding_array[i]->name)) {
             return encoding_array[i];
         }
     }
@@ -48,7 +51,7 @@ encoding_lookup(const char *name)
 const ENCODING *
 encoding_lookup_index(INTVAL n)
 {
-    if (!encoding_array[0]) 
+    if (!encoding_array) 
         encoding_init();
     return encoding_array[n];
 }
@@ -56,7 +59,9 @@ encoding_lookup_index(INTVAL n)
 INTVAL
 encoding_by_encoding(const ENCODING *encoding) {
     int i;
-    for (i = 0; i < enum_encoding_MAX && encoding_array[i]; i++) {
+    if (!encoding_array) 
+        encoding_init();
+    for (i = 0; i < encoding_count; i++) {
         if (encoding_array[i] == encoding) {
             return i;
         }

@@ -15,11 +15,14 @@
 extern const CHARTYPE usascii_chartype;
 extern const CHARTYPE unicode_chartype;
 
-static const CHARTYPE *chartype_array[enum_chartype_MAX];
+static const CHARTYPE **chartype_array = NULL;
+static int chartype_count = 0;
 
 static void
 chartype_init(void)
 {
+    chartype_count = enum_chartype_MAX;
+    chartype_array = mem_sys_allocate(sizeof(CHARTYPE*) * chartype_count);
     chartype_array[enum_chartype_unicode] = &unicode_chartype;
     chartype_array[enum_chartype_usascii] = &usascii_chartype;
 }
@@ -29,11 +32,11 @@ chartype_lookup(const char *name)
 {
     int i;
 
-    if (!chartype_array[0])
+    if (!chartype_array)
         chartype_init();
   
-    for (i=0; i<enum_chartype_MAX; i++) {
-        if (strcmp(name, chartype_array[i]->name) == 0) {
+    for (i=0; i<chartype_count; i++) {
+        if (chartype_array[i] && !strcmp(name, chartype_array[i]->name)) {
             return chartype_array[i];
         }
     }
@@ -44,7 +47,7 @@ chartype_lookup(const char *name)
 const CHARTYPE *
 chartype_lookup_index(INTVAL n)
 {
-    if (!chartype_array[0])
+    if (!chartype_array)
         chartype_init();
     return chartype_array[n];
 }
@@ -52,9 +55,9 @@ chartype_lookup_index(INTVAL n)
 INTVAL
 chartype_by_chartype(const CHARTYPE *chartype) {
     int i;
-    if (!chartype_array[0])
+    if (!chartype_array)
         chartype_init();
-    for (i = 0; i < enum_chartype_MAX && chartype_array[i]; i++) {
+    for (i = 0; i < chartype_count; i++) {
         if (chartype_array[i] == chartype) {
             return i;
         }

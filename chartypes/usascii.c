@@ -53,13 +53,13 @@ usascii_transcode_to(const char *to)
 static Parrot_Int
 usascii_is_digit(UINTVAL c)
 {
-    return (INTVAL)(isdigit((int)c) ? 1 : 0);
+    return c >= 0x30 && c <= 0x39;
 }
 
 static Parrot_Int
 usascii_get_digit(UINTVAL c)
 {
-    return ((INTVAL)c) - '0';
+    return ((INTVAL)c) - 0x30;
 }
 
 const CHARTYPE usascii_chartype = {
