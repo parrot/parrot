@@ -81,7 +81,7 @@ sub makefiles {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
           commentType => '#', replace_slashes => 1);
-  genfile('config/gen/makefiles/dynclasses.pl.in',   'dynclasses/build.pl',
+  genfile('config/gen/makefiles/dynclasses_pl.in',   'dynclasses/build.pl',
           commentType => '#', replace_slashes => 0);
   genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',
           commentType => '#', replace_slashes => 1);
