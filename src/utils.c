@@ -76,7 +76,7 @@ PMC*
 foldup(Parrot_Interp interpreter, INTVAL skip)
 {
     /* Should be I3 when we're done */
-    INTVAL max_used_reg = REG_INT(2) + 5;
+    INTVAL max_used_reg = REG_INT(3) + 5;
     INTVAL reg;
     INTVAL elems_in_array = 0;
     INTVAL current_offset = 0;
@@ -94,7 +94,7 @@ foldup(Parrot_Interp interpreter, INTVAL skip)
         elems_in_array = VTABLE_get_integer(interpreter, overflow);
     }
     /* XXX This needs fixing when IMCC does calling conventions right */
-    total_size = REG_INT(2) + elems_in_array - skip;
+    total_size = REG_INT(3) + elems_in_array - skip;
 
     VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
 
