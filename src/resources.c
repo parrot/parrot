@@ -122,6 +122,10 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
   return((void *)return_val);
 }
 
+/* Tag a buffer header as alive. Used by the GC system when tracing
+   the root set, and used by the PMC GC handling routines to tag their
+   individual pieces if they have private ones
+*/
 void
 buffer_lives(Buffer *buffer) {
   buffer->flags &= BUFFER_GC_FLAG;
