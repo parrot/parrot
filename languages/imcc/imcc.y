@@ -423,7 +423,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <i> labels _labels label statements statement
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
-%type <sr> key keylist _keylist newtype
+%type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i
 %type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
@@ -580,15 +580,12 @@ assignment:
     |  target '=' GLOBAL string	{ $$ = MK_I(interp, "find_global",R2($1,$4)); }
     |  GLOBAL string '=' var	{ $$ = MK_I(interp, "store_global",R2($2,$4)); }
     |  NEW                              { expect_pasm = 1; }
-        target COMMA newtype            { $$ = MK_I(interp, "new", R2($3, $5)); }
+          pasm_args	        { $$ = iANY(interp, "new",0,regs,1);  }
+    |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", R2($2, $4)); }
     |  DEFINED target COMMA var         { $$ = MK_I(interp, "defined", R2($2, $4)); }
     |  DEFINED target COMMA var '[' keylist ']'  { keyvec=KEY_BIT(2);
                                        $$ = MK_I(interp, "defined", R3($2, $4, $6));}
     |  CLONE target COMMA var           { $$ = MK_I(interp, "clone", R2($2, $4)); }
-    ;
-
-newtype:
-    const
     ;
 
 if_statement:

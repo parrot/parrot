@@ -951,7 +951,7 @@ ok 4
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "t/op/arithmetic_26: non jit seq w. branch");
-new P0, 15
+new P0, .PerlInt
 set N0, 4000
 set P0, 123
 div P0, P0, N0

@@ -169,9 +169,11 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC register look like? */
-                if (i > 1) {
+                if (i > 1 || interpreter->op_info_table[*pc].dirs[i] ==
+                        PARROT_ARGDIR_IN) {
                     PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                    trace_pmc_dump(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                    trace_pmc_dump(interpreter,
+                            interpreter->ctx.pmc_reg.registers[*(pc + i)]);
                 }
                 else
                     PIO_eprintf(interpreter, "P%vd", *(pc + i));
