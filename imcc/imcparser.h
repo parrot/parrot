@@ -261,7 +261,7 @@
 
 
 #ifndef YYSTYPE
-#line 306 "imcc/imcc.y"
+#line 319 "imcc/imcc.y"
 typedef union {
     IdList * idlist;
     int t;
