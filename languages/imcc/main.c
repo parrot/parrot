@@ -400,6 +400,14 @@ int main(int argc, char * argv[])
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
+#if EXEC_CAPABLE
+        else if (ext && strcmp (ext, ".o") == 0) {
+            run_pbc = 2;
+            write_pbc = 0;
+            Parrot_setup_opt(interpreter, 0, output);
+            Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
+        }
+#endif
         if (!strcmp(sourcefile, output))
             fatal(1, "main", "outputfile is sourcefile\n");
     }

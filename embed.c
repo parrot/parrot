@@ -293,6 +293,17 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     }
 }
 
+/* XXX This allows a command line option to be visible from inside the
+ * Parrot core, this is done using the pointers in the interpreter structure,
+ * and the subsystems using this arguments must clear them before running.
+ */
+
+void
+Parrot_setup_opt(struct Parrot_Interp *interpreter, int n, char *argv)
+{
+    interpreter->string_reg.registers[n] = (STRING *)argv;
+}
+
 static int
 prof_sort_f(const void *a, const void *b)
 {

@@ -48,6 +48,7 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
 {
     int i, j, *k;
     char *cp, *nptr;
+    const char *output;
     long bhs;
     Parrot_exec_objfile_t *obj;
     Parrot_jit_info_t *jit_info;
@@ -92,7 +93,9 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
     offset_fixup(obj);
-    Parrot_exec_save(obj, "exec_output.o");
+    output = (interpreter->string_reg.registers[0]) ?
+        (const char *)interpreter->string_reg.registers[0] : "exec_output.o";
+    Parrot_exec_save(obj, output);
 }
 
 /*  add_data_member

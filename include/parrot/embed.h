@@ -36,6 +36,8 @@ void Parrot_loadbc(Parrot_Interp, Parrot_PackFile);
 
 void Parrot_setup_argv(Parrot_Interp, int argc, char ** argv);
 
+void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
+
 void Parrot_runcode(Parrot_Interp, int argc, char *argv[]);
 
 void Parrot_destroy(Parrot_Interp);
