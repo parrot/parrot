@@ -699,9 +699,6 @@ PIO_tell(theINTERP, PMC *pmc)
 }
 
 
-/*
- * Iterate down the stack to the first layer implementing "Read" API
- */
 INTVAL
 PIO_eof(theINTERP, PMC *pmc)
 {

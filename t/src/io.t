@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 use Test::More;
 
 $/=undef; # slurp mode
@@ -350,6 +350,77 @@ the_test(struct Parrot_Interp *interpreter,
 CODE
 65535
 xyz
+OUTPUT
+
+teardown();
+
+###############################################################################
+
+setup("temp.file", ("x" x 65536) . "yz");
+
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger chunk when the buffer is not-empty");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
+    PMC *io;
+    char *buffer;
+
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
+
+    if ( !io ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
+
+    buffer = malloc(65536 * sizeof(char));
+    buffer[65535] = '\0';
+    PIO_read(interpreter, io, buffer, 3);
+    printf("%i\n", PIO_read(interpreter, io, buffer, 65535));
+    printf("%s\n", &buffer[65532]);
+
+    return NULL;
+}
+CODE
+65535
+xyz
+OUTPUT
+
+teardown();
+
+###############################################################################
+
+setup("temp.file", "words\n" x 10000);
+
+c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_tell: read larger chunk when the buffer is not-empty");
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	 opcode_t *cur_op, opcode_t *start)
+{
+    PMC *io;
+    char *buf;
+
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
+
+    if ( !io ) {
+	PIO_printf(interpreter, "PIO_open failed\n");
+	return NULL;
+    }
+
+    buf = malloc(65536 * sizeof(char));
+
+    printf("%d\n", PIO_tell(interpreter, io));
+    PIO_read(interpreter, io, buf, 6);
+    printf("%d\n", PIO_tell(interpreter, io));
+    PIO_read(interpreter, io, buf, 65535);
+    printf("%d\n", PIO_tell(interpreter, io));
+
+    return NULL;
+}
+CODE
+0
+6
+60000
 OUTPUT
 
 teardown();

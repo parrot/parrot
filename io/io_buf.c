@@ -329,8 +329,10 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (!(b->flags & PIO_BF_READBUF)) {
         size_t got;
         if (len >= io->b.size) {
-            return current + PIO_read_down(interpreter, PIO_DOWNLAYER(l), 
-                                           io, buffer, len);
+            got = PIO_read_down(interpreter, PIO_DOWNLAYER(l), 
+                                           io, out_buf, len);
+            io->fpos += got;
+            return current + got;
         }
 
         got = PIO_buf_fill_readbuf(interpreter, l, io, b);
