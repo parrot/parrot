@@ -148,6 +148,7 @@ static void if_branch(struct Parrot_Interp *interp)
     for (ins = last->next; ins; ) {
         if ((last->type & ITBRANCH) &&          /* if ...L1 */
                 (ins->type & IF_goto) &&        /* branch L2*/
+                !strcmp(ins->op, "branch") &&
                 (reg = get_branch_regno(last)) >= 0) {
             SymReg * br_dest = last->r[reg];
             if (ins->next &&
