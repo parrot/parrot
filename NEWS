@@ -1,4 +1,13 @@
-VERSION 0.0.6
+VERSION 0.0.7
+
+New in 0.0.7
+
+- Perl 6 Grammar and Compiler (Sean)
+- Subroutines, coroutines, and continuations (Melvin)
+- GC improvements (Peter Gibbs, Mike Lambert)
+- Global variables (Melvin)
+- Intermediate bytecode compiler (Melvin, Angel)
+- And much, much more.
 
 New in 0.0.6
 
