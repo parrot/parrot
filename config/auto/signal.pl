@@ -18,6 +18,14 @@ sub runstep {
     if (defined $miniparrot) {
 	return;
     }
+
+    if (Configure::Data->get('i_malloc')) {
+	Configure::Data->set('malloc_header', 'malloc.h');
+    }
+    else {
+	Configure::Data->set('malloc_header', 'stdlib.h');
+    }
+
     cc_gen('config/auto/signal/test_1.in');
     eval { cc_build(); };
     unless ($@ || cc_run() !~ /ok/) {
@@ -37,6 +45,8 @@ sub runstep {
 	print " (sigaction)";
     }
     cc_clean();
+
+    Configure::Data->set('malloc_header', undef);
 
     # now generate signal constants
     open O, ">runtime/parrot/include/signal.pasm" or die

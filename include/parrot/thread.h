@@ -22,8 +22,8 @@
 #define COND_SIGNAL(x, y)
 #define COND_BROADCAST(x, y)
 
-typedef INTVAL Parrot_mutex;
-typedef INTVAL Parrot_cond;
+#define Parrot_mutex INTVAL
+#define Parrot_cond INTVAL
 #endif
 
 #endif

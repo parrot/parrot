@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+static QUEUE_ENTRY * nosync_pop_entry(QUEUE *queue);
 
 /* A synchronized entry popper */
 QUEUE_ENTRY *
@@ -53,7 +54,7 @@ wait_for_entry(QUEUE *queue) {
     returnval = nosync_pop_entry(queue);
     queue_unlock(queue);
     return returnval;
-    
+
 }
 
 void
@@ -84,7 +85,7 @@ queue_unlock(QUEUE *queue) {
 /* This function wakes up *every* thread waiting on the queue */
 void
 queue_signal(QUEUE *queue) {
-    CONDITION_BROADCAST(queue->queue_condition);
+    COND_BROADCAST(queue->queue_condition, queue->queue_mutex);
 }
 
 void
@@ -96,7 +97,7 @@ queue_wait(QUEUE *queue) {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

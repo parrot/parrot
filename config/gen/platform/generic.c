@@ -16,12 +16,19 @@
 #ifdef HAS_HEADER_PTHREAD
 #  include <pthread.h>
 #  define PARROT_SYNC_PRIMITIVES_DEFINED
+#  undef LOCK
 #  define LOCK(x) pthread_mutex_lock(x)
+#  undef UNLOCK
 #  define UNLOCK(x) pthread_mutex_unlock(x)
+#  undef COND_WAIT
 #  define COND_WAIT(x,y) pthread_cond_wait(x, y)
+#  undef COND_SIGNAL
 #  define COND_SIGNAL(x,y) pthread_cond_signal(x, y)
+#  undef COND_BROADCAST
 #  define COND_BROADCAST(x,y) pthread_cond_broadcast(x, y)
+#  undef Parrot_mutex
    typedef pthread_mutex_t Parrot_mutex;
+#  undef Parrot_cond
    typedef pthread_cond_t Parrot_cond;
 #endif
 
@@ -173,7 +180,12 @@ Parrot_memalign_if_possible(size_t align, size_t size)
 }
 
 #elif defined(HAS_MEMALIGN)
+
+#if defined(HAS_HEADER_MALLOC)
 #include <malloc.h>
+#else
+#include <stdlib.h>
+#endif
 
 void *
 Parrot_memalign(size_t align, size_t size)

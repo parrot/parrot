@@ -615,7 +615,7 @@ clean : testclean progclean
 
 progclean:
 	$(RM_F) $(O_FILES) \
-	        $(TEST_PROG) test_main$(O) \
+	        $(TEST_PROG) test_main$(O) test_main$(EXE) \
 	        $(PDUMP) pdump$(O) packdump$(O) \
 	        $(PDB) pdb$(O) \
 	        $(DIS) disassemble$(O)
@@ -704,7 +704,7 @@ miniparrot-prebuild : $(GEN_CONFIGS) $(FLUID_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src $(GEN_CONFIGS) $(FLUID_FILES) $(ALL_H_FILES)
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src classes/*.h test_main.c $(INC)/debug.h
 	@tools/dev/rebuild_miniparrot.pl --action=copy_src_from_obj $(O_FILES)
-	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) test_main.o
+	@tools/dev/rebuild_miniparrot.pl --action=write_buildscripts --executable=parrot $(O_FILES) test_main$(O)
 
 miniparrot-update :
 	tools/dev/rebuild_miniparrot.pl

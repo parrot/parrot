@@ -56,8 +56,8 @@ OUT
 }
 
 SKIP: {
-skip("no setjmp header or OS not linux", 2)
-    unless ($PConfig{'i_setjmp'} && $^O eq 'linux');
+skip("no events yet", 2);
+
 output_is(<<'CODE', <<OUT, "catch a SIGFPE");
     newsub P0, .Exception_Handler, _handler
     set_eh P0
