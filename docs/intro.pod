@@ -1,0 +1,510 @@
+=head1 The Parrot Primer
+
+This is an update to the article 'Parrot: Some Assembly Required'
+which appeared on www.perl.com for the 0.0.2 release of Parrot. It's
+intended as being the best way for the newcomer to Parrot to learn
+what Parrot is and how to use it. 
+
+=head1 What is Parrot?
+
+First, though, what is Parrot, and why are we making such a fuss about
+it? Well, if you haven't been living in a box for the past year, you'll
+know that the Perl community has embarked on the design and
+implementation of a new version of Perl, both the language and the
+interpreter.
+
+Parrot is strongly related to Perl 6, but it is not Perl 6. To find out
+what it actually is, we need to know a little about how Perl works.
+When you feed your program into C<perl>, it is first compiled into an
+internal representation, or bytecode; then this bytecode is fed to
+almost separate subsystem inside C<perl> to be interpreted. So there
+are two distinct phases of C<perl>'s operation - compilation to
+bytecode, and interpretation of bytecode. This is not unique to Perl;
+other languages following this design include Python, Ruby, Tcl and,
+believe it or not, even Java.
+
+In previous versions of Perl, this arrangement has been pretty I<ad
+hoc>: there hasn't been any overarching design to the interpreter or
+the compiler, and the interpreter has ended up being pretty reliant on
+certain features of the compiler. Nevertheless, the interpreter (some
+languages call it a Virtual Machine) can be thought of as a software
+CPU - the compiler produces "machine code" instructions for the virtual
+machine, which it then executes, much like a C compiler produces
+machine code to be run on a real CPU.
+
+Perl 6 plans to separate out the design of the compiler and the
+interpreter. This is why we've come up with a subproject, which we've
+called Parrot, which has a certain, limited amount of independence from
+Perl 6. Parrot is destined to be the Perl 6 Virtual Machine, the
+software CPU on which we will run Perl 6 bytecode. We're working on
+Parrot before we work on the Perl 6 compiler because it's much easier
+to write a compiler once you've got a target to compile to!
+
+The name "Parrot" was chosen after this year's April Fool's Joke which
+had Perl and Python collaborating on the next version of their
+interpreters. This is meant to reflect the idea that we'd eventually
+like other languages to use Parrot as their VM; in a sense, we'd like
+Parrot to become a "common language runtime" for dynamic languages.
+
+=head2 Where we're at
+
+It should be stressed we're still in the early stages of
+development.
+
+But don't let that put you off! Parrot is still very much usable; we've
+already seen two mini-languages emerge which compiles down to Parrot
+bytecode (more on that later) and Leon Brocard has been working on
+automatically converting Java bytecode to Parrot.
+
+At the moment, it's possible to write simple programs in Parrot
+assembly language, use an assembler to convert them to machine code and
+then execute them on a test interpreter. We have support for a wide
+variety of ordinary and transcendental mathematical operations, some
+rudimentary string support, and some conditional operators.
+
+=head2 How to get it
+
+So let's get ourselves a copy of Parrot, so that we can start
+investigating how to program in the Parrot assembler.
+
+We could get the initial release from CPAN, but an awful lot has
+changed since then. To really keep up to date with Parrot, we should
+get our copy from the CVS repository. Here's how we do that:
+
+ % cvs -d :pserver:anonymous@cvs.perl.org:/home/perlcvs login
+ (Logging in to anonymous@cvs.perl.org)
+ CVS password: [ and here we just press return ]
+ % cvs -d :pserver:anonymous@cvs.perl.org:/home/perlcvs co parrot
+ cvs server: Updating parrot
+ U parrot/.cvsignore
+ U parrot/Config_pm.in
+ ....
+     
+
+For those of you who can't use CVS, there are CVS snapshots built every
+six hours which you can find here.
+
+Now we have downloaded Parrot, we need to build it; so:
+
+ % cd parrot
+ % perl Configure.pl
+ Parrot Configure
+ Copyright (C) 2001 Yet Another Society
+ 
+ Since you're running this script, you obviously have
+ Perl 5--I'll be pulling some defaults from its configuration.
+ ...
+     
+
+You'll then be asked a series of questions about your local
+configuration; you can almost always hit return for each one. Finally,
+you'll be told to type C<make test_prog>; with any luck, Parrot will
+successfully build the test interpreter. (If it doesn't, the address to
+complain to is at the end of the article...)
+
+=head2 The test suite
+
+Now we should run some tests; so type C<make test> and you should see a
+readout like the following:
+
+ perl t/harness
+ t/op/basic.....ok, 1/2 skipped:  label constants unimplemented in
+ assembler
+ t/op/string....ok, 1/4 skipped:  I'm unable to write it!
+ All tests successful, 2 subtests skipped.
+ Files=2, Tests=6,  2 wallclock secs ( 1.19 cusr +  0.22 csys =  1.41 CPU)
+     
+
+(Of course, by the time you read this, there could be more tests, and
+some of those which skipped might not skip - but none of them should
+fail!)
+
+=head1 Parrot Concepts
+
+Before we dive into programming Parrot assembly, let's take a brief
+look at some of the concepts involved.
+
+=head2 Types
+
+The Parrot CPU has four basic data types:
+
+=over
+
+=item C<IV>
+
+An integer type; guaranteed to be wide enough to hold a pointer.
+
+=item C<NV>
+
+An architecture-independent floating point type.
+
+=item C<STRING>
+
+An abstracted, encoding-independent string type.
+
+=item C<PMC>
+
+A scalar.
+
+=back
+
+The first three types are pretty much self-explanatory; the final type,
+Parrot Magic Cookies, are slightly more difficult to understand. But
+that's OK, because they're not actually implemented yet! We'll talk
+more about PMCs at the end of the article.
+
+=head2 Registers
+
+The current Perl 5 virtual machine is a stack machine - it communicates
+values between operations by keeping them on a stack. Operations load
+values onto the stack, do whatever they need to do, and put the result
+back onto the stack. This is very easy to work with, but it's very
+slow: to add two numbers together, you need to perform three stack
+pushes and two stack pops. Worse, the stack has to grow at runtime, and
+that means allocating memory just when you don't want to be allocating
+it.
+
+So Parrot's going to break with the established tradition for virtual
+machines, and use a register architecture, more akin to the
+architecture of a real hardware CPU. This has another advantage: we can
+use all the existing literature on how to write compilers and
+optimizers for register-based CPUs for our software CPU!
+
+Parrot has specialist registers for each type: 32 IV registers, 32 NV
+registers, 32 string registers and 32 PMC registers. In Parrot
+assembler, these are named C<I1>...C<I32>, C<N1>...C<N32>,
+C<S1>...C<S32>, C<P1>...C<P32>.
+
+Now let's look at some assembler. We can set these registers with the
+C<set> operator:
+
+    set I1, 10
+    set N1, 3.1415
+    set S1, "Hello, Parrot"
+    
+
+All Parrot ops have the same format: the name of the operator, the
+destination register, and then the operands.
+
+=head2 Operations
+
+There are a variety of operations you can perform: the file
+F<docs/core_ops.pod> documents them, along with a little more
+about the assembler syntax. For instance, we can print out the contents
+of a register, or a constant:
+
+    print "The contents of register I1 is: "
+    print I1
+    print "\n"
+    
+
+Or we can perform mathematical functions on registers:
+
+    add I1, I1, I2  # Add the contents of I2 to the contents of I1
+    mul I3, I2, I4  # Multiply I2 by I4 and store in I3
+    inc I1          # Increment I1 by one
+    dec N3, 1.5     # Decrement N3 by 1.5
+    
+
+We can even perform some simple string manipulation:
+
+    set S1, "fish"
+    set S2, "bone"
+    concat S1, S2       # S1 is now "fishbone"
+    set S3, "w"
+    substr S4, S1, 1, 7
+    concat S3, S4       # S3 is now "wishbone"
+    length I1, S3       # I1 is now 8
+    
+
+=head2 Branches
+
+Code gets a little boring without flow control; for starters, Parrot
+knows about branching and labels. The C<branch> op is equivalent to
+Perl's C<goto>:
+
+  
+          branch TERRY
+ JOHN:    print "fjords\n"
+          branch END
+ MICHAEL: print " pining"
+          branch GRAHAM
+ TERRY:   print "It's"
+          branch MICHAEL
+ GRAHAM:  print " for the "
+          branch JOHN
+ END:     end
+     
+
+It can also do simple tests for whether or not a register contains a
+true value:
+
+          set I1, 12
+          set I2, 5
+          mod I3, I2, I2
+          if I3, REMAIND, DIVISOR
+ REMAIND: print "5 divides 12 with remainder "
+          print I3
+          branch DONE
+ DIVISOR: print "5 is an integer divisor of 12"
+ DONE:    print "\n"
+          end
+     
+
+Here's what that would look like in Perl, for comparison:
+
+    $i1 = 12;
+    $i2 = 5;
+    $i3 = $i1 % $i2;
+    if ($i3) {
+      print "5 divides 12 with remainder ";
+      print $i3;
+    } else {
+      print "5 is an integer divisor of 12";
+    }
+    print "\n";
+    exit;
+    
+
+And speaking of comparison, we have the full range of numeric
+comparators: C<eq>, C<ne>, C<lt>, C<gt>, C<le> and C<ge>. Note that you
+can't use these operators on arguments of disparate types; you may even
+need to add the suffix C<_i> or C<_n> to the op to tell it what type of
+argument you are using - although the assembler ought to divine this
+for you, by the time you read this.
+
+=head1 Some Parrot Programs
+
+Now let's have a look at a few simple Parrot programs to give you a
+feel for the language.
+
+=head2 Displaying the Time
+
+This little program displays the Unix epoch time every second: (or so)
+
+         set I3, 3000000
+ REDO:   time I1
+         print I1
+         print "\n"
+         set I2 0
+ SPIN:   inc I2
+         le I2, I3, SPIN, REDO
+
+First, we set integer register 3 to contain 3 million - that's a
+completely arbitrary number, due to the fact that Parrot averages a
+massive six million ops per second on my machine. Then the program
+consists of two loops: the outer loop stores the current Unix time in
+integer register 1, prints it out, prints a new line, and resets
+register 2 to zero. The inner loop increments register 2 until it
+reaches the 3 million we stored in register 3. When it is no longer
+less than (or equal to) 3 million, we go back to the C<REDO> of the
+outer loop. In essence, we're just spinning around a busy loop to waste
+some time. This is only because Parrot doesn't currently have a "sleep"
+op; we'll see how to implement one later on.
+
+How do we run this? First, we need to assemble this into Parrot
+bytecode, with the F<assemble.pl> provided. So, copy the assembler to a
+file F<showtime.pasm>, and inside your Parrot directory, run:
+
+      perl assemble.pl showtime.pasm > showtime.pbc
+    
+
+(C<.pbc> is the file extension for Parrot bytecode.)
+
+=head2 Finding a Fibonacci number
+
+The Fibonnaci series is defined like this: take two numbers, 1 and 1.
+Then repeatedly add together the last two numbers in the series to make
+the next one: 1, 1, 2, 3, 5, 8, 13, and so on. The Fibonacci number
+C<fib(n)> is the n'th number in the series. Here's a simple Parrot
+assembler program which finds the first 20 Fibonacci numbers:
+
+ # Some simple code to print some Fibonacci numbers
+ # Leon Brocard <acme@astray.com>
+ 
+         print   "The first 20 fibonacci numbers are:\n"
+         set     I1, 0
+         set     I2, 20
+         set     I3, 1
+         set     I4, 1
+ REDO:   eq      I1, I2, DONE, NEXT
+ NEXT:   set     I5, I4
+         add     I4, I3, I4
+         set     I3, I5
+         print   I3
+         print   "\n"
+         inc     I1
+         branch  REDO
+ DONE:   end
+
+This is the equivalent code in Perl:
+
+        print "The first 20 fibonacci numbers are:\n";
+        my $i = 0;
+        my $target = 20;
+        my $a = 1;
+        my $b = 1;
+        until ($i == $target) {
+           my $num = $b;
+           $b += $a;
+           $a = $num;
+           print $a,"\n";
+           $i++;
+        }
+    
+
+=head2 Jako
+
+So much for programming in assembler; let's move on and look at a
+medium-level language - Jako. Jako was written by Gregor Purdy who
+obviously got sick (as a parrot) of programming in assembler. Jako
+looks a little bit like C and a little bit like Perl, and it can do
+anything you can do in Parrot assembler, but a little tidier. Let's try
+that Fibonacci program again:
+
+        print("The first 20 fibonacci numbers are:\n");
+        var int i = 0;
+        var int target = 20;
+        var int a = 1;
+        var int b = 1;
+        var int num;
+        while (i != target) {
+           num = b;
+           b += a;
+           a = num;
+           print("$a\n");
+           i++;
+        }
+
+Notice how similar this is to the Perl version? I stripped away the
+C<$> sigils, replaced the Perlish C<until> with a more common C<while>,
+replaced C<my> with C<var int> and I was nearly done.
+
+The Jako compiler, C<jakoc>, ships with Parrot in the
+C<little_languages> subdirectory:
+
+  % perl little_languages/jakoc fib.jako > fib.pasm
+  % perl assemble.pl fib.pasm > fib.pbc
+  % ./test_prog fib.pbc
+ The first 20 fibonacci numbers are:
+ 1
+ 2
+ 3
+ ...
+
+=head1 Where Next?
+
+Parrot is obviously developing very rapidly, and we've still got a long
+way to go before we are ready to a compiler to this platform. This
+section is for those who are interested in helping us take Parrot
+further.
+
+=head2 Adding operations
+
+The first thing we need is a lot more operations; but this needs to be
+carefully thought out, and all new proposals for operations should be
+checked by Dan Sugalski, the Parrot designer.
+
+That said, adding operations to Parrot is actually very simple. Let's
+add the C<sleep> operator we were complaining about earlier.
+
+Although we've been able to say C<print "String"> and C<print I3> to
+print a register, Parrots ops are B<not> polymorphic - this is some
+trickery carried out by the assembler. Those two operations would be
+implemented by two different ops, C<print_sc> to print a string
+constant, and C<print_i> to print an integer register. 
+All this is handled by the preprocessor, so all we need to do to
+add an opcode is to add its implementation to the F<core.ops> file.
+
+The format of this file is a little funny; it's C which is
+pre-processed by a Perl program. The C functions should be declared
+C<AUTO_OP>, which means that the pre-processor will automatically work
+out the return address of the next op in the bytecode stream. (branch
+operators need special treatment, and as such are C<MANUAL_OP>s)
+Parameters are denoted by C<P1>, C<P2> and so on - they aren't actual
+parameters to the C function, but are pulled out of the bytecode
+stream. Finally, we can access register C<n> by saying C<INT_REG(n)>,
+C<NUM_REG(n)> and so on.
+
+So let's do the constant sleep op first. We want to take the first
+parameter, C<P1>, and pass it to sleep:
+
+ AUTO_OP sleep_ic {
+      sleep(P1);
+ }
+
+That was easy. The second op is only slightly more complex: we have to
+use C<INT_REG> to retrieve the contents of the register:
+
+ AUTO_OP sleep_i {
+      sleep(INT_REG(P1));
+ }
+
+All that's missing is a test suite (see F<t/op/basic.t> for an example)
+and some documentation (add your POD to F<core.ops> and it'll be
+automatically added into the appropriate file in F<docs>)
+and we've added our instructions to the
+Parrot CPU. The assembler will automatically determine whether we're
+sleeping for a constant time or a variable time, and will despatch the
+right op when we just say C<sleep>. Now we can rewrite the C<showtime>
+code a little more neatly - or rather, B<you> can, as a nice little
+exercise!
+
+=head2 Vtable datatypes
+
+Parrot has recently added some basic support for PMCs. PMCs are almost
+like Perl 5's SVs and Python's Objects, only more so. A PMC is an object
+of some type, which can be instructed to perform various operations. So
+when we say
+
+      inc P1
+    
+to increment the value in PMC register 1, the C<increment> method is
+called on the PMC - and it's up to the PMC how it handles that method.
+
+PMCs are how we plan to make Parrot language-independent - a Perl PMC
+would have different behavior from a Python PMC or a Tcl PMC. The
+individual methods are function pointers held in a structure called a
+B<vtable>, and each PMC has a pointer to the vtable which implements
+the methods of its "class". Hence a Perl interpreter would link in a
+library full of Perl-like classes and its PMCs would have Perl-like
+behaviour.
+
+The PMC types available are described in F<doc/vtables.pod>; you can
+create a new PMC with 
+
+    new P0, <typename>
+
+and then use any of the instructions in F<core.ops> or F<vtable.ops>
+which support PMCs. F<doc/vtables.pod> also tells you how to implement
+your own PMC vtable classes.
+
+=head2 More Todos
+
+There are a huge number of things we want to do with Parrot: we need,
+for instance, to create some I/O operators to make programs actually
+interesting; we want to create a range of string functions to deal with
+various encodings and convert between them; we want more documentation;
+we really, really need more tests; we want to check Parrot's
+portability to various platforms; and finally, there are a load more
+ops that we need to implement.
+
+=head2 Getting involved
+
+We've got a good number of people working away on Parrot, but we could
+always use a few more. To help out, you'll need a subscription to the
+perl6-internals mailing list, where all the development takes place;
+you should keep up to date with the CVS version of Parrot - if you want
+to be alerted to CVS commits, you can subscribe to the cvs-parrot
+mailing list. CVS commit access is given to those who taken
+responsibility for a particular area of Parrot, or who often commit
+high-quality patches.
+
+A useful web page is cvs.perl.org, which reminds you how to use CVS,
+and allows you to browse the CVS repository; the code page is a summary
+of this information and other resources about Parrot. Another good
+resource is www.parrotcode.org.
+
+So don't delay - pick up a Parrot today!
+
+=cut
