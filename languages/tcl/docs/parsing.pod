@@ -94,7 +94,7 @@ were {} words.
 =item Command substitution
 
 All characters between a [ and ] are considered a
-tcl script, and run through the parser. 
+tcl script, and run through a separate invocation of the parser. 
 
 =item Variable substitution
 
