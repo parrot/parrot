@@ -49,11 +49,11 @@ clean: BASIC.clean befunge.clean bf.clean cola.clean forth.clean jako.clean m4.c
 
 BASIC : BASIC.dummy
 BASIC.dummy:
-	# don't know how to build BASIC
+# don't know how to build BASIC
 BASIC.test:
-	# Don't know how to test BASIC
+# Don't know how to test BASIC
 BASIC.clean:
-	# Don't know how to clean BASIC
+# Don't know how to clean BASIC
 
 befunge : befunge.dummy
 befunge.dummy:
@@ -77,19 +77,19 @@ cola.dummy:
 cola.test:
 	$(MAKE_C) cola test
 cola.clean:
-	# don't clean cola, as files in MANIFEST are removed
+# don't clean cola, as files in MANIFEST are removed
 
 forth : forth.dummy
 forth.dummy:
-	# Nothing to do for forth
+# Nothing to do for forth
 forth.test:
-	# Looks like there are no tests for forth
+# Looks like there are no tests for forth
 forth.clean:
-	# no Makefile
+# no Makefile
 
 jako: jako.dummy
 jako.dummy:
-	# don't make jako, as tests are executed by default
+# don't make jako, as tests are executed by default
 jako.test:
 	$(MAKE_C) jako test
 jako.clean:
@@ -105,8 +105,8 @@ m4.clean:
 
 miniperl : miniperl.dummy
 miniperl.dummy:
-	# miniperl is missing t/harness
-	# $(MAKE_C) miniperl
+# miniperl is missing t/harness
+# $(MAKE_C) miniperl
 miniperl.test:
 	$(MAKE_C) miniperl test
 miniperl.clean:
@@ -124,8 +124,8 @@ parrot_compiler: parrot_compiler.dummy
 parrot_compiler.dummy:
 	$(MAKE_C) parrot_compiler
 parrot_compiler.test:
-	# no target test in parrot_compiler/Makefile
-	# (MAKE_C) parrot_compiler test
+# no target test in parrot_compiler/Makefile
+# (MAKE_C) parrot_compiler test
 parrot_compiler.clean:
 	$(MAKE_C) parrot_compiler clean
 
@@ -143,7 +143,7 @@ regex.dummy:
 regex.test :
 	$(MAKE_C) regex test
 regex.clean :
-	# No target clean for regex 
+# No target clean for regex 
 
 scheme: scheme.dummy
 scheme.dummy:
