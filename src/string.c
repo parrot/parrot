@@ -46,12 +46,9 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
         encoding = encoding_lookup(type->default_encoding);
     }
 
-    s = new_string_header(interpreter);
-    Parrot_allocate_about(interpreter, s, buflen);
+    s = new_string_header(interpreter, flags);
+    Parrot_allocate_string(interpreter, s, buflen);
     s->encoding = encoding;
-    /* Make sure we maintain the flags we might already have on the
-     * string header we just fetched */
-    s->flags |= flags;
     s->type = type;
 
     if (buffer) {
@@ -72,7 +69,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 STRING *
 string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
     /* Don't check buflen, if we are here, we already checked. */
-    Parrot_reallocate_about(interpreter, s, s->buflen + addlen);
+    Parrot_reallocate_string(interpreter, s, s->buflen + addlen);
     return s;
 }
 
@@ -156,9 +153,8 @@ STRING *
 string_copy(struct Parrot_Interp *interpreter, const STRING *s)
 {
     STRING *d;
-    d = new_string_header(interpreter);
-    Parrot_allocate_about(interpreter, d, s->buflen);
-    d->flags = s->flags & (~(unsigned int)BUFFER_constant_FLAG);
+    d = new_string_header(interpreter, s->flags & ~BUFFER_constant_FLAG);
+    Parrot_allocate_string(interpreter, d, s->buflen);
     d->bufused = s->bufused;
     d->strlen = s->strlen;
     d->encoding = s->encoding;

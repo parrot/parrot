@@ -100,16 +100,9 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
 {
     size_t temp_len;
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
-    interpreter->arena_base->memory_pool = NULL;
-    interpreter->arena_base->last_STRING_Arena = NULL;
-    interpreter->arena_base->last_PMC_Arena = NULL;
-    interpreter->arena_base->last_Buffer_Arena = NULL;
 
-    /* Allocate a first default-sized block of memory */
-    Parrot_alloc_new_block(interpreter, 0, 1);
-
-    /* Initialize the free pools */
-    Parrot_initialize_free_pools(interpreter);
+    Parrot_initialize_memory_pools(interpreter);
+    Parrot_initialize_resource_pools(interpreter);
 }
 
 /*

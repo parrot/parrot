@@ -2863,6 +2863,32 @@ op interpinfo(out INT, in INT) {
   goto NEXT();
 }
 
+########################################
+
+=item B<stringinfo>(out INT, in STR, in INT)
+
+Extract string header information.
+
+=cut
+
+inline op stringinfo(out INT, in STR, in INT) {
+  switch ($3) {
+    case STRINGINFO_HEADER:   $1 = (UINTVAL)$2;
+                              break;
+    case STRINGINFO_BUFSTART: $1 = (UINTVAL)$2->bufstart;
+                              break;
+    case STRINGINFO_BUFLEN:   $1 = $2->buflen;
+                              break;
+    case STRINGINFO_FLAGS:    $1 = $2->flags;
+                              break;
+    case STRINGINFO_BUFUSED:  $1 = $2->bufused;
+                              break;
+    case STRINGINFO_STRLEN:   $1 = $2->strlen;
+                              break;
+  }
+  goto NEXT();
+}
+
 
 ########################################
 

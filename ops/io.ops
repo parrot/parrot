@@ -51,18 +51,11 @@ Perl style mode string in $3 and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) {
   ParrotIO * io;
-  char * path, * mode;
-  size_t size;
+  const char * path, * mode;
 
-  /* We probably need to make this into a String API */
-  size = ($2)->bufused + 1;
-  path = mem_allocate(interpreter, &size);
-  memcpy(path, ($2)->bufstart, ($2)->bufused);
-  *(path + ($2)->bufused) = 0;
-  size = ($3)->bufused + 1;
-  mode = mem_allocate(interpreter, &size);
-  memcpy(mode, ($3)->bufstart, ($3)->bufused);
-  *(mode + ($3)->bufused) = 0;
+  /* FIXME: potential infant mortality problem */
+  path = string_to_cstring(interpreter, $2);
+  mode = string_to_cstring(interpreter, $3);
 
   io = PIO_open(interpreter, path, mode);
   if(!io) {

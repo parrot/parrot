@@ -718,10 +718,9 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     self->type = PFC_STRING;
 
     self->string = string_make(interpreter, cursor, size,
-                               encoding_lookup_index(encoding), flags,
+                               encoding_lookup_index(encoding), 
+                               flags | BUFFER_constant_FLAG,
                                chartype_lookup_index(type));
-
-    self->string->flags |= BUFFER_constant_FLAG;
 
     return 1;
 }

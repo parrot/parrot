@@ -81,6 +81,14 @@ typedef enum BUFFER_flag {
 #define STRINGINFO_BUFUSED  5
 #define STRINGINFO_STRLEN   6
 
+/* stringinfo parameters */
+#define STRINGINFO_HEADER   1
+#define STRINGINFO_BUFSTART 2
+#define STRINGINFO_BUFLEN   3
+#define STRINGINFO_FLAGS    4
+#define STRINGINFO_BUFUSED  5
+#define STRINGINFO_STRLEN   6
+
 #define STRING struct parrot_string_t
 
 #endif
