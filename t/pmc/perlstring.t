@@ -971,6 +971,7 @@ OK2: print "ok 2\n"
      eq S2, S3, OK3
      print "not "
 OK3: print "ok 3\n"
+     end
 CODE
 ok 1
 ok 2
