@@ -24,9 +24,10 @@ These are the vtable functions for the PyList base class
 static void quicksort(Interp* interpreter, List *list, PMC *cmpsub, 
     INTVAL left, INTVAL right) 
 {
-    /* XXX: I don't understand why, but unless this statement is present, */
-    /* the scratchpad is corrupt (segfault in scratchpad_find) on exit 
-    /* from quicksort on the first icmp test in t/pie/b3.t test #9 */
+    /* XXX: I don't understand why, but unless this statement is present,
+     * the scratchpad is corrupt (segfault in scratchpad_find) on exit 
+     * from quicksort on the first icmp test in t/pie/b3.t test #9 
+     */
     PMC *pad = scratchpad_get_current(interpreter);
 
     while (right > left) {
