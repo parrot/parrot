@@ -455,7 +455,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
      */
     if (true_offset > src->strlen) {
         internal_exception(SUBSTR_OUT_OF_STRING,
-                           "Can only replace inside string or index after end of string");
+               "Can only replace inside string or index after end of string");
     }
     if (true_length > (src->strlen - true_offset)) {
         true_length = (UINTVAL)(src->strlen - true_offset);
@@ -471,14 +471,14 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
                                             true_length) -
         (char *)src->bufstart;
 
-    dest =
-        string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
-                    src->encoding, 0, src->type);
-
     if (subend_off < substart_off) {
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "subend somehow is less than substart");
     }
+
+    dest =
+        string_make(interpreter, NULL, true_length * src->encoding->max_bytes,
+                    src->encoding, 0, src->type);
 
     mem_sys_memcopy(dest->bufstart, (char *)src->bufstart + substart_off,
                     (unsigned)(subend_off - substart_off));
@@ -488,27 +488,29 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     if (d != NULL) {
         *d = dest;
     }
-    
+ 
     /* Now do the replacement */
-    
+ 
     /*
      * If the replacement string fits inside the original substring
      * don't create a new string, just pack it.
      */
-    diff = dest->bufused - rep->bufused;
-                
+    diff = (subend_off - substart_off) - rep->bufused;
+
     if(diff >= 0
-        || (INTVAL)(src->bufused - src->buflen) <= diff) {      
-            
-        mem_sys_memcopy((char*)src->bufstart + substart_off,
-                                rep->bufstart, rep->bufused);
-        if(diff > 0) {
+        || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {      
+ 
+        if(diff != 0) {
             mem_sys_memmove((char*)src->bufstart + substart_off + rep->bufused,
                                 (char*)src->bufstart + subend_off,
                                 src->buflen - (subend_off - diff));
             src->bufused -= diff;
-            (void)string_compute_strlen(src);    
         }
+
+        mem_sys_memcopy((char*)src->bufstart + substart_off,
+                                rep->bufstart, rep->bufused);
+        if(diff != 0) 
+            (void)string_compute_strlen(src);    
     }
     /*
      * Replacement is larger than avail buffer, grow the string
@@ -517,7 +519,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
         /* diff is negative here, make it positive */
         diff = -(diff);
         string_grow(interpreter, src, diff);
-        
+ 
         /* Move the end of old string that isn't replaced to new offset first */
         mem_sys_memmove((char*)src->bufstart + subend_off + diff,
                                 (char*)src->bufstart + subend_off,
