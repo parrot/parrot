@@ -12,14 +12,14 @@ tools/dev/parrot_api.pl - Display Parrot API (symbols)
 
 =head1 DESCRIPTION
 
-Displays the API (the visible symbols, code or data) of the Parrot lib,
-.
+Displays the API (the visible symbols, code or data) of the Parrot lib.
 
-First finds out the Parrot public embedding API as described in the
-F<include/parrot/embed.h>, then finds out the visible symbols in
-the Parrot lib (by default F<blib/lib/libparrot.a>), and then
-cross-references the dubious API symbols according to the following
-categories:
+First lists the Parrot public embedding API as described in the
+F<include/parrot/embed.h> (using pattern C</^\w+\s+(Parrot_\w+)\(/>),
+then finds out the visible symbols in the Parrot lib (by default
+F<blib/lib/libparrot.a>), and then cross-references the dubious API
+symbols according to the below categories.  Each symbol is listed
+with the object file it was found in.
 
 =over 4
 
@@ -27,37 +27,48 @@ categories:
 
 API listed in F<include/parrot/embed.h> but not defined in the Parrot lib.
 
-Why is the planned public API not implemented?
+Either the API listing is wrong or the implementation is missing.
 
 =item No Parrot Prefix
 
-API has no C<Parrot_> prefix.
+API implemented but has no C<Parrot_> prefix.
 
 If code: if the API is really to be public, prefix it with <Parrot_>
-(and not something else), if not, make it private (local).
+(and not something else), if not, considering making it private (local)
+or splitting it off to a Parrot-private library.
 
-If data, consider making the data either constant or heap.
+If data, consider making the data either constant or heap B<and>
+accessible only through a real API.
 
 =item No Parrot API
 
-API defined in the lib but not in F<inlucde/parrot/embed.h>.
+API implemented in the lib but not defined in F<inlucde/parrot/embed.h>.
 
-If code, consider making the API private.
-If data, consider making the data constant and/or heap.
+If code, consider making the API private (local) or splitting
+it off to a Parrot-private library.
+
+If data, consider making the data constant and/or heap B<and>
+accessible only through a real API.
 
 =item Uninitialized Modifiable Data
 
 Data symbol that is not initialized with data.
 
-Consider making the data constant and/or heap (and accessed through an API).
+Consider making the data constant and/or heap (and accessed through a
+real API, data as such is not a good API unless it's constant).  Think
+multithreaded access.
 
 =item Initialized Modifiable Data
 
 Data symbol that is initialized with data, but modifiable.
 
-Consider making the data constant and/or heap (and accessed through an API).
+Consider making the data constant and/or heap (and accessed through a
+real API, data as such is not a good API unless it's constant).  Think
+multithreaded access.
 
 =back
+
+=head1 DEPENDENCIES
 
 Uses F<tools/dev/nm.pl> to list the symbols.
 
@@ -82,7 +93,7 @@ $| = 1;
 my $H = "include/parrot/embed.h";
 if (open(H, $H)) {
     while (<H>) {
-	if (/^\w+\s+(Parrot_\w+)/) {
+	if (/^\w+\s+(Parrot_\w+)\(/) {
 	    $ParrotAPI{$1}++;
 	}
     }
@@ -91,9 +102,11 @@ if (open(H, $H)) {
     die "$0: Header '$H': $!\n";
 }
 
-die "$0: No API found in '$H'\n" unless keys %ParrotAPI;
+my @ParrotAPI = sort keys %ParrotAPI;
 
-printf "$H: %d interfaces\n", scalar keys %ParrotAPI;
+die "$0: No API found in '$H'\n" unless @ParrotAPI;
+
+printf "=== $H: %d interfaces ===\n", scalar @ParrotAPI;
 
 my %Code;
 my %DataB;
@@ -102,7 +115,6 @@ my %DataR;
 my %Undef;
 my %API;
 
-print "$Obj: ";
 if (open(NM, "perl tools/dev/nm.pl -BDo '$Obj' |")) {
     while (<NM>) {
 	my ($o, $s, $v) = split;
@@ -128,7 +140,15 @@ if (open(NM, "perl tools/dev/nm.pl -BDo '$Obj' |")) {
 for my $api (keys %API) {
     delete $API{$api} unless exists $Code{$api}; # Not ours.
 }
-printf "%d interfaces\n", scalar keys %API;
+
+printf "--- Parrot API: %d ---\n", scalar @ParrotAPI;
+if (@ParrotAPI) {
+    for my $api (@ParrotAPI) {
+	printf "%s\t%s\n", $api, $API{$api} || "-";
+    }
+}
+
+printf "=== $Obj: %d interfaces ===\n", scalar keys %API;
 
 my @API = sort keys %API;
 
@@ -146,35 +166,35 @@ for my $api (@API) {
 }
 
 if (@NoParrotAPI) {
-    printf "=== Missing Parrot API: %d ===\n", scalar @NoParrotAPI;
+    printf "--- Missing Parrot API: %d ---\n", scalar @NoParrotAPI;
     for my $api (@NoParrotAPI) {
-	printf "%s\n", $api;
+	printf "%s\t%s\n", $api, "-";
     }
 }
 
 if (@NoParrotPrefix) {
-    printf "=== No Parrot prefix: %d ===\n", scalar @NoParrotPrefix;
+    printf "--- No Parrot prefix: %d ---\n", scalar @NoParrotPrefix;
     for my $api (@NoParrotPrefix) {
 	printf "%s\t%s\n", $api, $API{$api};
     }
 }
 
 if (@UnParrotAPI) {
-    printf "=== No Parrot API: %d ===\n", scalar @UnParrotAPI;
+    printf "--- No Parrot API: %d ---\n", scalar @UnParrotAPI;
     for my $api (@UnParrotAPI) {
 	printf "%s\t%s\n", $api, $API{$api};
     }
 }
 
 if (keys %DataB) {
-    printf "=== Uninitialized Modifiable Data: %d ===\n", scalar keys %DataB;
+    printf "--- Uninitialized Modifiable Data: %d ---\n", scalar keys %DataB;
     for my $api (sort keys %DataB) {
 	printf "%s\t%s\n", $api, $DataB{$api};
     }
 }
 
 if (keys %DataD) {
-    printf "=== Initialized Modifiable Data: %d ===\n", scalar keys %DataD;
+    printf "--- Initialized Modifiable Data: %d ---\n", scalar keys %DataD;
     for my $api (sort keys %DataD) {
 	printf "%s\t%s\n", $api, $DataD{$api};
     }
