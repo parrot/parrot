@@ -21,9 +21,13 @@ the GNU General Public License or the Artistic License for more details.
 PREREQUISITES
 -------------
 
-You'll need a compiler a linker and a make program of course.
+You'll need a C compiler, a linker and a make program of course.  If you
+will be building the ICU library as part of parrot (this is the
+default), you will also need a C++ compiler and GNU make installed in
+your PATH as either 'gmake', 'make', or 'gnumake'.
 
-You'll also need Perl 5.005 or above to run the config scripts.
+You'll also need Perl 5.6 or above to run various configure and
+build scripts.
 
 For most of the platforms that we are supporting initially,
 Parrot should build out of the box.
@@ -44,15 +48,18 @@ probably already done that) and type
 
     perl Configure.pl
 
-to run the Configure script. The Configure.pl script extracts configuration
-from the running perl5 program. If you have a non-standard setup (like "long
-long" integers on a 32-bit system), you should run:
+to run the Configure script. The Configure.pl script extracts
+configuration from the running perl5 program.  Unfortunately, the perl5
+configuration is not set up to compile and link c++ programs, so you
+may need to explicitly tell Configure.pl which compiler and linker to
+use.  For example, to compile C files with 'cc', C++ files with
+'CC', and link everything together with 'CC', you would type
 
-    perl Configure.pl --intval=long --opcode=long
+    perl Configure.pl --cc=cc --cxx=CC --link=CC
 
 See "perl Configure.pl --help" for more options.
 
-For systems like HPUX that don't have inet_pton please run:
+For systems like HPUX that don't have inet_pton please run
 
     perl Configure.pl --define=inet_aton
 
@@ -69,7 +76,9 @@ or
 
     nmake
 
-and the interpreter should build.
+and the interpreter should build.  If you are building the ICU library
+(this is the default on most systems), you need to use GNU make instead
+(or something compatible with it).
 
 You can test parrot by running
 
