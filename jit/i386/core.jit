@@ -13,40 +13,324 @@ Parrot_noop {
     NATIVECODE = emit_nop(NATIVECODE);
 }
 
-Parrot_set_i_ic {
-    emitm_movl_i_m(NATIVECODE, *INT_CONST[2], emit_None, emit_None, emit_None,
-	    &INT_REG[1]);
-}
-
 Parrot_set_i_i {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
     emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
 }
-
-Parrot_set_n_nc {
-    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
-    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+Parrot_set_i_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2], emit_None, emit_None, emit_None,
+	    &INT_REG[1]);
 }
 
 Parrot_set_n_n {
     emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
     emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
-
-Parrot_mul_i_i_i {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
-    emitm_smull_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
-    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+Parrot_set_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
+Parrot_add_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_addl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_add_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_addl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_add_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_addl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_add_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_add_i_ic_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_add_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] + *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_sub_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_subl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
 Parrot_sub_i_i_i {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
     emitm_subl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
     emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
 }
+Parrot_sub_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_subl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_sub_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_subl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_sub_i_ic_i {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_subl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_sub_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] - *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_mul_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_smull_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_mul_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_smull_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_mul_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] * *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_neg_i {
+    emitm_negl_m(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_neg_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_negl_r(NATIVECODE, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_neg_i_ic {
+    emitm_movl_i_m(NATIVECODE, -(*INT_CONST[2]),
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_band_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_andl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_band_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_andl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_band_i_ic_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_andl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_band_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] & *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_bor_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_orl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bor_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_orl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bor_i_ic_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_orl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bor_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] | *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_bxor_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_xorl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bxor_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_xorl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bxor_i_ic_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_xorl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_bxor_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] ^ *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_bnot_i {
+    emitm_notl_m(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_bnot_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_notl_r(NATIVECODE, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+Parrot_bnot_i_ic {
+    emitm_movl_i_m(NATIVECODE, ~(*INT_CONST[2]),
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_shl_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_m_r(NATIVECODE, emit_ECX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_shll_r_r(NATIVECODE, emit_ECX, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shl_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_shll_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shl_i_ic_i {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_m_r(NATIVECODE, emit_ECX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_shll_r_r(NATIVECODE, emit_ECX, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shl_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] << *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
+
+Parrot_shr_i_i_i {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_movl_m_r(NATIVECODE, emit_ECX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_shrl_r_r(NATIVECODE, emit_ECX, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shr_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_shrl_i_r(NATIVECODE, *INT_CONST[3], emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shr_i_ic_i {
+    emitm_movl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emitm_movl_m_r(NATIVECODE, emit_ECX, emit_None, emit_None, emit_None, &INT_REG[3]);
+    emitm_shrl_r_r(NATIVECODE, emit_ECX, emit_EAX);
+    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+}
+Parrot_shr_i_ic_ic {
+    emitm_movl_i_m(NATIVECODE, *INT_CONST[2] >> *INT_CONST[3],
+                   emit_None, emit_None, emit_None, &INT_REG[1]);
+}
 
 Parrot_set_n_i {
     emitm_fildl(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+
+Parrot_add_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_faddp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_add_n_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_faddp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_add_n_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[3]);
+    emitm_faddp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_add_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_faddp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_add_n_nc_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_faddp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+
+Parrot_sub_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_sub_n_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_sub_n_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[3]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_sub_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_sub_n_nc_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fsubp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+
+Parrot_mul_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fmulp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_mul_n_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fmulp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_mul_n_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[3]);
+    emitm_fmulp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_mul_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fmulp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_mul_n_nc_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
+    emitm_fmulp(NATIVECODE, 1);
     emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
@@ -56,11 +340,43 @@ Parrot_div_n_n_n {
     emitm_fdivp(NATIVECODE, 1);
     emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
-
-Parrot_sub_n_n_n {
+Parrot_div_n_n_nc {
     emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[3]);
+    emitm_fdivp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_div_n_nc_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
     emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[3]);
-    emitm_fsubp(NATIVECODE, 1);
+    emitm_fdivp(NATIVECODE, 1);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+
+Parrot_neg_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+    emitm_fchs(NATIVECODE);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_neg_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fchs(NATIVECODE);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_neg_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fchs(NATIVECODE);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+
+Parrot_abs_n_n {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[2]);
+    emitm_fabs(NATIVECODE);
+    emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
+}
+Parrot_abs_n_nc {
+    emitm_fldl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_CONST[2]);
+    emitm_fabs(NATIVECODE);
     emitm_fstpl(NATIVECODE, emit_None, emit_None, emit_None, &NUM_REG[1]);
 }
 
@@ -69,81 +385,153 @@ Parrot_if_i_ic {
     emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
     emit_jcc(jit_info, emitm_jne, *INT_CONST[2]);
 }
+Parrot_if_ic_ic {
+    if (*INT_CONST[1] != 0)
+        emit_jump(jit_info, *INT_CONST[2]);
+}
+
+Parrot_unless_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
+    emit_jcc(jit_info, emitm_je, *INT_CONST[2]);
+}
+Parrot_unless_ic_ic {
+    if (*INT_CONST[1] == 0)
+        emit_jump(jit_info, *INT_CONST[2]);
+}
 
 Parrot_branch_ic {
     emit_jump(jit_info, *INT_CONST[1]);
 }
 
 Parrot_inc_i {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_addl_i_r(NATIVECODE, 1, emit_EAX);
-    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+    emitm_incl_m(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[1]);
 }
+
 Parrot_dec_i {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_subl_i_r(NATIVECODE, 1, emit_EAX);
-    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+    emitm_decl_m(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[1]);
 }
-Parrot_inc_i_ic {
+
+Parrot_lt_i_i_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_addl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
-    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
-}
-Parrot_dec_i_ic {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_subl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
-    emitm_movl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1])
+    emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emit_jcc(jit_info, emitm_jl, *INT_CONST[3]);
 }
 Parrot_lt_i_ic_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
     emit_jcc(jit_info, emitm_jl, *INT_CONST[3]);
 }
-Parrot_lt_i_i_ic {
+Parrot_lt_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+    emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
+}
+Parrot_lt_ic_ic_ic {
+    if (*INT_CONST[1] < *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
+Parrot_gt_i_i_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
-    emit_jcc(jit_info, emitm_jl, *INT_CONST[3]);
+    emit_jcc(jit_info, emitm_jg, *INT_CONST[3]);
 }
 Parrot_gt_i_ic_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
     emit_jcc(jit_info, emitm_jg, *INT_CONST[3]);
 }
-Parrot_gt_i_i_ic {
+Parrot_gt_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+    emit_jcc(jit_info, emitm_jle, *INT_CONST[3]);
+}
+Parrot_gt_ic_ic_ic {
+    if (*INT_CONST[1] > *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
+Parrot_le_i_i_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
-    emit_jcc(jit_info, emitm_jg, *INT_CONST[3]);
-}
-Parrot_ge_i_ic_ic {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
-    emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
-}
-Parrot_ge_i_i_ic {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
-    emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
+    emit_jcc(jit_info, emitm_jle, *INT_CONST[3]);
 }
 Parrot_le_i_ic_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
     emit_jcc(jit_info, emitm_jle, *INT_CONST[3]);
 }
-Parrot_le_i_i_ic {
+Parrot_le_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+    emit_jcc(jit_info, emitm_jg, *INT_CONST[3]);
+}
+Parrot_le_ic_ic_ic {
+    if (*INT_CONST[1] <= *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
+Parrot_ge_i_i_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
-    emit_jcc(jit_info, emitm_jle, *INT_CONST[3]);
+    emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
+}
+Parrot_ge_i_ic_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emit_jcc(jit_info, emitm_jnl, *INT_CONST[3]);
+}
+Parrot_ge_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+    emit_jcc(jit_info, emitm_jl, *INT_CONST[3]);
+}
+Parrot_ge_ic_ic_ic {
+    if (*INT_CONST[1] >= *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
+Parrot_eq_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emit_jcc(jit_info, emitm_je, *INT_CONST[3]);
 }
 Parrot_eq_i_ic_ic {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
     emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
     emit_jcc(jit_info, emitm_je, *INT_CONST[3]);
 }
-Parrot_eq_i_i_ic {
-    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
-    emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+Parrot_eq_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
     emit_jcc(jit_info, emitm_je, *INT_CONST[3]);
 }
+Parrot_eq_ic_ic_ic {
+    if (*INT_CONST[1] == *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
+Parrot_ne_i_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_r_m(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emit_jcc(jit_info, emitm_jne, *INT_CONST[3]);
+}
+Parrot_ne_i_ic_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[1]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
+    emit_jcc(jit_info, emitm_jne, *INT_CONST[3]);
+}
+Parrot_ne_ic_i_ic {
+    emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
+    emitm_cmpl_i_r(NATIVECODE, *INT_CONST[1], emit_EAX);
+    emit_jcc(jit_info, emitm_jne, *INT_CONST[3]);
+}
+Parrot_ne_ic_ic_ic {
+    if (*INT_CONST[1] != *INT_CONST[2])
+        emit_jump(jit_info, *INT_CONST[3]);
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

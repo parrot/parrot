@@ -160,6 +160,88 @@ static char *emit_r_X(char *pc, int reg_opcode, int base, int i, int scale,
     return pc;
 }
 
+static char *emit_shift_i_r(char *pc, int opcode, int imm, int reg)
+{
+    if(imm == 0)
+    {
+        /* noop */
+    }
+    else if(imm == 1)
+    {
+        *(pc++) = 0xd1;
+        *(pc++) = emit_alu_X_r(opcode,  reg);
+    }
+    else if(imm > 1 && imm < 33)
+    {
+        *(pc++) = 0xc1;
+        *(pc++) = emit_alu_X_r(opcode,  reg);
+        *(pc++) = imm;
+    }
+    else
+    {
+    internal_exception(JIT_ERROR,
+                            "emit_shift_i_r passed invalid shift\n");
+    }
+
+    return pc;
+}
+
+static char *emit_shift_i_m(char *pc, int opcode, int imm,
+            int base, int i, int scale, long disp)
+{
+    if(imm == 0)
+    {
+        /* noop */
+    }
+    else if(imm == 1)
+    {
+        *(pc++) = 0xd1;
+        pc = emit_r_X(pc, opcode,  base, i, scale, disp);
+    }
+    else if(imm > 1 && imm < 33)
+    {
+        *(pc++) = 0xc1;
+        pc = emit_r_X(pc, opcode,  base, i, scale, disp);
+        *(pc++) = imm;
+    }
+    else
+    {
+    internal_exception(JIT_ERROR,
+                            "emit_shift_i_m passed invalid shift\n");
+    }
+
+    return pc;
+}
+
+static char *emit_shift_r_r(char *pc, int opcode, int reg1, int reg2)
+{
+    if (reg1 != emit_ECX)
+    {
+    internal_exception(JIT_ERROR,
+                            "emit_shift_r_r passed invalid register\n");
+    }
+    
+    *(pc++) = 0xd3;
+    *(pc++) = emit_alu_X_r(opcode,  reg2);
+
+    return pc;
+}
+
+static char *emit_shift_r_m(char *pc, int opcode, int reg,
+            int base, int i, int scale, long disp)
+{
+    if (reg != emit_ECX)
+    {
+    internal_exception(JIT_ERROR,
+                            "emit_shift_r_m passed invalid register\n");
+    }
+    
+    *(pc++) = 0xd3;
+    pc = emit_r_X(pc, opcode,  base, i, scale, disp);
+
+    return pc;
+}
+
 /* CDQ - need this to do multiply */
 #define emitm_cdq(pc) *((pc)++) = 0x99
 
@@ -269,11 +351,25 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
     pc = emit_r_X(pc, emit_reg(reg-1), b, i, s, (long)d); }
 
 
+/* INC */
+
+#define emitm_incl_r(pc, reg) { *((pc)++) = 0x40 | ((reg) - 1); }
+
+#define emitm_incl_m(pc, b, i, s, d) { *((pc)++) = 0xff; pc = emit_r_X(pc, emit_reg(emit_b000), b, i, s, (long)d); }
+
+/* DEC */
+
+#define emitm_decl_r(pc, reg) { *((pc)++) = 0x48 | ((reg) - 1); }
+
+#define emitm_decl_m(pc, b, i, s, d) { *((pc)++) = 0xff; pc = emit_r_X(pc, emit_reg(emit_b001), b, i, s, (long)d); }
+
 /* ADDs */
 
 #define emitm_addb_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x00, reg1, reg2)
 #define emitm_addl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x01, reg1, reg2)
 #define emitm_addl_i_r(pc, imm, reg)   emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
+#define emitm_addl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x01, reg, b, i, s, d)
+#define emitm_addl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x03, reg, b, i, s, d)
 #define emitm_addl_i_m(pc, imm, b, i, s, d) emitm_alul_i_m(pc, 0x81, emit_b000, imm, b, i, s, d)
 
 /* SUBs */
@@ -287,7 +383,7 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 /* These are used by both signed and unsigned EDIV, but only unsigned MUL */
 #define emitm_alu_imp_r(pc, op, reg) { *((pc)++) = 0xf7; *((pc)++) = emit_alu_X_r(op, reg); }
 
-#define emitm_alu_imp_m(pc, op, b, i, s, d) { *((pc)++) = 0xf7; (pc) = emit_r_X(pc, emit_reg(op), b, i, s, d); }
+#define emitm_alu_imp_m(pc, op, b, i, s, d) { *((pc)++) = 0xf7; (pc) = emit_r_X(pc, emit_reg(op), b, i, s, (long)d); }
 
 /* Unsigned MUL and EDIV */
 /* EAX implicit destination in multiply and divide */
@@ -321,22 +417,58 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 
 #define emitm_andl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x21, reg1, reg2)
 #define emitm_andl_i_r(pc, imm, reg) emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
+#define emitm_andl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x21, reg, b, i, s, d)
+#define emitm_andl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x23, reg, b, i, s, d)
 #define emitm_andl_i_m(pc, imm, b, i, s, d) emitm_alul_i_m(pc, 0x81, emit_b100, imm, b, i, s, d)
 
 /* OR */
 
 #define emitm_orl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x9, reg1, reg2)
 #define emitm_orl_i_r(pc, imm, reg) emitm_alul_i_r(pc, 0x81, emit_b001, imm, reg)
+#define emitm_orl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x09, reg, b, i, s, d)
+#define emitm_orl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x0b, reg, b, i, s, d)
 #define emitm_orl_i_m(pc, imm, b, i, s, d) emitm_alul_i_m(pc, 0x81, emit_b001, imm, b, i, s, d)
 
 /* XOR */
 
 #define emitm_xorl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x31, reg1, reg2)
+#define emitm_xorl_i_r(pc, imm, reg) emitm_alul_i_r(pc, 0x81, emit_b110, imm, reg)
+#define emitm_xorl_r_m(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x31, reg, b, i, s, d)
+#define emitm_xorl_m_r(pc, reg, b, i, s, d) emitm_alul_r_m(pc, 0x33, reg, b, i, s, d)
+#define emitm_xorl_i_m(pc, imm, b, i, s, d) emitm_alul_i_m(pc, 0x81, emit_b110, imm, b, i, s, d)
 
 /* NOT */
 
 #define emitm_notl_r(pc, reg) emitm_alu_imp_r(pc, emit_b010, reg)
 #define emitm_notl_m(pc, b, i, s, d) emitm_alu_imp_m(pc, emit_b010, b, i, s, d)
+
+/* SHL */
+
+#define emitm_shll_i_r(pc, imm, reg) { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
+#define emitm_shll_i_m(pc, imm, b, i, s, d) { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
+#define emitm_shll_r_r(pc, reg1, reg2) { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
+#define emitm_shll_r_m(pc, reg, b, i, s, d) { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
+
+/* SHR */
+
+#define emitm_shrl_i_r(pc, imm, reg) { pc = emit_shift_i_r(pc, emit_b101, imm, reg); }
+#define emitm_shrl_i_m(pc, imm, b, i, s, d) { pc = emit_shift_i_m(pc, emit_b101, imm, b, i, s, d); }
+#define emitm_shrl_r_r(pc, reg1, reg2) { pc = emit_shift_r_r(pc, emit_b101, reg1, reg2); }
+#define emitm_shrl_r_m(pc, reg, b, i, s, d) { pc = emit_shift_r_m(pc, emit_b101, reg, b, i, s, d); }
+
+/* SAL */
+
+#define emitm_sall_i_r(pc, imm, reg) { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
+#define emitm_sall_i_m(pc, imm, b, i, s, d) { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
+#define emitm_sall_r_r(pc, reg1, reg2) { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
+#define emitm_sall_r_m(pc, reg, b, i, s, d) { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
+
+/* SAR */
+
+#define emitm_sarl_i_r(pc, imm, reg) { pc = emit_shift_i_r(pc, emit_b111, imm, reg); }
+#define emitm_sarl_i_m(pc, imm, b, i, s, d) { pc = emit_shift_i_m(pc, emit_b111, imm, b, i, s, d); }
+#define emitm_sarl_r_r(pc, reg1, reg2) { pc = emit_shift_r_r(pc, emit_b111, reg1, reg2); }
+#define emitm_sarl_r_m(pc, reg, b, i, s, d) { pc = emit_shift_r_m(pc, emit_b111, reg, b, i, s, d); }
 
 
 /* Floating point ops */
@@ -377,7 +509,10 @@ static char *emit_movb_i_m(char *pc, char imm, int base, int i, int scale,
 #define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
 
 /* Negate - called change sign */
-#define emitm_chs(pc) emitm_fl_4(pc, 0)
+#define emitm_fchs(pc) emitm_fl_4(pc, 0)
+
+/* ABS - ST(0) = ABS(ST(0)) */
+#define emitm_fabs(pc) emitm_fl_4(pc, 1)
 
 /* Comparisions */
 
