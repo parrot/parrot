@@ -173,6 +173,8 @@ Create a vtable that dispatches either to the contained PMC in the first
 attribute (deleg_pmc) or to an overridden method (delegate), depending
 on the existance of the method for this class.
 
+=cut
+
 */
 
 static void
