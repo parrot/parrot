@@ -440,7 +440,7 @@ static void add_1_const(SymReg *r)
             if (r->name[0] == '0' && r->name[1] == 'x')
                 r->color = strtoul(r->name+2, 0, 16);
             else
-            r->color = atoi(r->name);
+                r->color = atoi(r->name);
             break;
         case 'S':
             r->color = add_const_str(r->name);
@@ -483,7 +483,7 @@ static void constant_folding()
 
 int e_pbc_emit(Instruction * ins) {
     int ok = 0;
-    opcode_t * pc, npc;
+    static opcode_t * pc, npc;
     op_info_t *op_info;
     int op, i;
 
