@@ -236,6 +236,7 @@ docs/pmc/perlhash.pod                             [main]doc
 docs/pmc/perlstring.pod                           [main]doc
 docs/pmc/struct.pod                               [main]doc
 docs/pmc/subs.pod                                 [main]doc
+docs/practical_notes.pod			  [main]doc
 docs/running.pod                                  [main]doc
 docs/strings.pod                                  [main]doc
 docs/tests.pod                                    [main]doc

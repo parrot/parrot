@@ -1,0 +1,10 @@
+=head1 TITLE
+
+Practical Parrot Notes
+
+=head1 PURPOSE
+
+This document is a series of notes about programming parrot.
+
+=head1 NOTES
+
