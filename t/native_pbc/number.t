@@ -23,7 +23,7 @@ EOC
 use Parrot::Test tests => 3;
 
 SKIP: {
-#skip("core ops changes", 2);
+  skip("core ops changes", 2);
 
 output_is(<<CODE, <<OUTPUT, "i386 double float 32 bit opcode_t");
 # number_1.pbc

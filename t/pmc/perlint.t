@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 18;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -83,28 +83,6 @@ ok 1
 ok 2
 OUTPUT
 
-SKIP: { skip("add_keyed: not yet", 1);
-output_is(<<'CODE', <<'OUTPUT', "add_keyed");
-# add keyed
-    new P2, .PerlArray
-    set P2[10], 10
-    set P0, 20
-    new P11, .Key
-    new P12, .Key
-    new P13, .Key
-    set P12,10
-    add P1[P11],P2[P12],P0[P13]
-    set I1,P1
-    eq I1,30,ok_3
-    print "not "
-ok_3:
-    print "ok 1\n"
-
-    end
-CODE
-ok 1
-OUTPUT
-}
 
 output_is(<<'CODE', <<'OUTPUT', "bor");
     new P0, .PerlInt
@@ -309,7 +287,7 @@ output_is(<<'CODE', <<'OUTPUT', "shr (>>)");
     shr P4, P0, P2
     shr P5, P0, P3
     shr P6, P1, P2
-    shr P7, P1, P3
+    shr P7, P1, 2
 
     print P4
     print "\n"
@@ -319,11 +297,22 @@ output_is(<<'CODE', <<'OUTPUT', "shr (>>)");
     print "\n"
     print P7
     print "\n"
+
+    set P0, 0b001100
+    set P1, 0b010100
+    shr P0, P2
+    shr P1, 2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
     end
 CODE
 6
 3
 10
+5
+6
 5
 OUTPUT
 
@@ -345,7 +334,7 @@ output_is(<<'CODE', <<'OUTPUT', "shl (<<)");
     shl P4, P0, P2
     shl P5, P0, P3
     shl P6, P1, P2
-    shl P7, P1, P3
+    shl P7, P1, 2
 
     print P4
     print "\n"
@@ -355,11 +344,22 @@ output_is(<<'CODE', <<'OUTPUT', "shl (<<)");
     print "\n"
     print P7
     print "\n"
+
+    set P0, 0b001100
+    set P1, 0b010100
+    shl P0, P2
+    shl P1, 2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
     end
 CODE
 24
 48
 40
+80
+24
 80
 OUTPUT
 

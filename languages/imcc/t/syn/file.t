@@ -146,6 +146,7 @@ system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
 
 output_is(<<'CODE', <<'OUT', "call sub in external pbc");
 .pcc_sub _sub1 prototyped
+    bounds 1	# disable JIT
     print "sub1\n"
     load_bytecode "temp.pbc"
     print "loaded\n"
@@ -180,6 +181,7 @@ system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
 output_is(<<'CODE', <<'OUT', "call sub in external pbc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
+    bounds 1	# disable JIT
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
@@ -218,6 +220,7 @@ system(".$PConfig{slash}imcc$PConfig{exe} -o temp.pbc temp.imc");
 output_is(<<'CODE', <<'OUT', "call sub in external pbc with 2 subs");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
+    bounds 1	# disable JIT
     load_bytecode "temp.pbc"
     print "loaded\n"
     $P0 = global "_sub2"
@@ -249,6 +252,7 @@ close FOO;
 output_is(<<'CODE', <<'OUT', "call sub in external imc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
+    bounds 1	# disable JIT
     load_bytecode "temp.imc"
     print "loaded\n"
     $P0 = global "_sub2"

@@ -236,13 +236,38 @@ inline op bors(in PMC, in PMC, in PMC) {
 }
 ########################################
 
+=item B<shl>(inout INT, in INT)
+
+=item B<shl>(in PMC, in INT)
+
+=item B<shl>(in PMC, in PMC)
+
+Shift left $1 by $2 bits.
+
 =item B<shl>(out INT, in INT, in INT)
 
 =item B<shl>(in PMC, in PMC, in PMC)
 
+=item B<shl>(in PMC, in PMC, in INT)
+
 Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
+
+inline op shl(inout INT, in INT) {
+  $1 <<= $2;
+  goto NEXT();
+}
+
+inline op shl(in PMC, in PMC) {
+  $1->vtable->bitwise_shl(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op shl(in PMC, in INT) {
+  $1->vtable->bitwise_shl_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
 
 inline op shl(out INT, in INT, in INT) {
   $1 = $2 << $3;
@@ -254,15 +279,45 @@ inline op shl(in PMC, in PMC, in PMC) {
   goto NEXT();
 }
 
+inline op shl(in PMC, in PMC, in INT) {
+  $2->vtable->bitwise_shl_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 ########################################
+
+=item B<shr>(inout INT, in INT)
+
+=item B<shr>(in PMC, in INT)
+
+=item B<shr>(in PMC, in PMC)
+
+Shift right $1 by $2 bits.
 
 =item B<shr>(out INT, in INT, in INT)
 
 =item B<shr>(in PMC, in PMC, in PMC)
 
+=item B<shr>(in PMC, in PMC, in INT)
+
 Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
+
+inline op shr(inout INT, in INT) {
+  $1 >>= $2;
+  goto NEXT();
+}
+
+inline op shr(in PMC, in PMC) {
+  $1->vtable->bitwise_shr(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op shr(in PMC, in INT) {
+  $1->vtable->bitwise_shr_int(interpreter, $1, $2, $1);
+  goto NEXT();
+}
 
 inline op shr(out INT, in INT, in INT) {
   $1 = $2 >> $3;
@@ -274,13 +329,26 @@ inline op shr(in PMC, in PMC, in PMC) {
   goto NEXT();
 }
 
+inline op shr(in PMC, in PMC, in INT) {
+  $2->vtable->bitwise_shr_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 ########################################
+=item B<lsr>(inout INT, in INT)
+
+Logically shift $1 right by $2.
 
 =item B<lsr>(out INT, in INT, in INT)
 
 Set $1 to the value of $2 logically shifted right by $3 bits.
 
 =cut
+
+inline op lsr(out INT, in INT) {
+  ((UINTVAL)$1) >>= $2;
+  goto NEXT();
+}
 
 inline op lsr(out INT, in INT, in INT) {
   $1 = (INTVAL)((UINTVAL)$2 >> $3);
