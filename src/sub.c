@@ -89,6 +89,15 @@ restore_stack(struct Parrot_Interp *interp,
         *interp_stack = *ctx_stack;
         return;
     }
+    /*
+     * if the saved stack is empty just swap
+     */
+    hc = stack_height(interp, *ctx_stack);
+    if (hc == 0) {
+        *saved_stack = *interp_stack;
+        *interp_stack = *ctx_stack;
+        return;
+    }
 
     /*
      * find our mark, everything above the mark is the real coroutine
@@ -105,7 +114,6 @@ restore_stack(struct Parrot_Interp *interp,
     if (!mark_found)
         internal_exception(1, "The coroutine messed with the stack");
     hi = stack_height(interp, *interp_stack);
-    hc = stack_height(interp, *ctx_stack);
     hs = stack_height(interp, *saved_stack);
     if (!i || (hi == hc + hs)) {
         /* the coroutine didn't change the stack */

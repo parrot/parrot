@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
@@ -436,5 +436,40 @@ something happend
 back in main
 OUTPUT
 
+
+output_is(<<'CODE', <<'OUTPUT', "clear_eh, set_eh again");
+# bug reported by Jos Visser
+	new_pad 0
+
+	newsub P10, .Exception_Handler, _handler
+
+	set I12, 1
+	set_eh P10
+	find_lex P13,"a"
+	clear_eh
+	new P13, .PerlNum
+	store_lex -1,"a",P13
+	set P13, I12
+	find_lex P14,"a"
+	print P14
+
+	set I12, 2
+	set_eh P10
+	print "mark1\n"
+	find_lex P13,"b"
+	print "mark2\n"
+	end
+
+_handler:
+        print "Hi from handler\n"
+        set P2, P5["_invoke_cc"]
+        invoke P2
+
+CODE
+Hi from handler
+1mark1
+Hi from handler
+mark2
+OUTPUT
 1;
 

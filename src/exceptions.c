@@ -143,7 +143,7 @@ pop_exception(Parrot_Interp interpreter)
     if (type != STACK_ENTRY_PMC ||
             handler->vtable->base_type != enum_class_Exception_Handler)
         PANIC("Tried to clear_eh a non Exception_Handler");
-    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, handler,
+    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, NULL,
                     STACK_ENTRY_PMC);
 }
 
