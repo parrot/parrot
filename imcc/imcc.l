@@ -16,8 +16,10 @@
 #include "imc.h"
 #include "imcparser.h"
 
+#define YY_NO_UNPUT
 extern long line;
-extern int expect_eol;
+extern int expect_pasm;
+int state;
 int yyerror(char *);
 %}
 
@@ -31,50 +33,47 @@ SIGN            [-+]
 STRINGCONSTANT  \"(\\.|[^"\n]*)*["\n]
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
+EOL		\r?\n
 
-%x emit2
-%s expecteol
+%x emit
 %%
         /* for emacs: ' */
-        if (expect_eol)
-            BEGIN(expecteol);
-
-^".emit\n"(.|\n)*".eom\n" {
-        char * s = strstr(yytext, ".eom");
-        if(s) {
-            s[0] = '\n';
-            s[1] = 0;
-        }
-        yylval.s = str_dup(&yytext[5]);
-        return EMIT;
+        if (expect_pasm == 1) {
+	    expect_pasm = 2;
+            BEGIN(emit);
     }
 
-^".emit2"\n {
-        BEGIN(emit2);
-    }
-
-<emit2>^".eom"\n {
+<INITIAL,emit>{EOL} {
+        if (expect_pasm == 2)
         BEGIN(INITIAL);
-    }
-
-<emit2>.|\n      ;
-
-<expecteol>[\n] {
-        BEGIN(INITIAL);
-        expect_eol = 0;
+        expect_pasm = 0;
         line++;
         return '\n';
     }
 
-<expecteol>#.*[\n] {
+<INITIAL,emit>#.*{EOL} {
+        if (expect_pasm == 2)
         BEGIN(INITIAL);
-        expect_eol = 0;
+        expect_pasm = 0;
         line++;
         return '\n';
     }
 
-[\n]            line++;
-#.*\n           line++;
+
+^".emit"\n {
+	BEGIN(emit);
+	return(EMIT);
+    }
+
+<emit>^".eom"\n {
+        BEGIN(INITIAL);
+	return EOM;
+    }
+
+<emit,INITIAL>[ISNP]{DIGIT}{DIGIT}? {
+	yylval.s = str_dup(yytext);
+	return REG;
+	}
 
 ".sym"          return(SYM);
 ".arg"          return(ARG);
@@ -118,59 +117,75 @@ RANKSPEC        \[[,]*\]
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);
 "**"            return(POW);
-","             return(COMMA);
 
-{LETTER}{LETTERDIGIT}*":" {
+<emit,INITIAL>","             return(COMMA);
+
+<emit,INITIAL>{LETTER}{LETTERDIGIT}*":" {
 	yytext[yyleng-1] = 0;  /* trim last ':' */
         yylval.s = str_dup(yytext);
         return(LABEL);
     }
 
-{DOT}?{LETTER}{LETTERDIGIT}* {
+<emit>{DOT}{LETTER}{LETTERDIGIT}* {	/* XXX */
         yylval.s = str_dup(yytext);
-        return(IDENTIFIER);
+        return(MACRO);
+    }
+<INITIAL>{DOT}?{LETTER}{LETTERDIGIT}* {
+	SymReg *r = get_sym(yytext);
+	if (r && r->type & VTIDENTIFIER) {
+	    yylval.sr = r;
+	    return VAR;
+	}
+        yylval.s = str_dup(yytext);
+        return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
+    }
+<emit,INITIAL>{LETTER}{LETTERDIGIT}* {
+	SymReg *r = get_sym(yytext);
+	if (r && r->type & VTIDENTIFIER) {
+	    yylval.sr = r;
+	    return VAR;
+	}
+        yylval.s = str_dup(yytext);
+        return(is_op(yylval.s) ? PARROT_OP : IDENTIFIER);
     }
 
-{SIGN}?{DIGIT}+"."{DIGIT}+ {
+<emit,INITIAL>{SIGN}?{DIGIT}+"."{DIGIT}+ {
         yylval.s = str_dup(yytext);
         return(FLOATC);
     }
 
-{SIGN}?{DIGIT}+ {
+<emit,INITIAL>{SIGN}?{DIGIT}+ {
         yylval.s = str_dup(yytext);
         return(INTC);
     }
 
-{STRINGCONSTANT} {
-        yylval.s = str_dup(yytext);
+<emit,INITIAL>{STRINGCONSTANT} {
+        yylval.s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
     }
 
-\$I[0-9]+ {
+<emit,INITIAL>\$I[0-9]+ {
         yylval.s = str_dup(yytext);
         return(IREG);
     }
 
-\$N[0-9]+ {
+<emit,INITIAL>\$N[0-9]+ {
         yylval.s = str_dup(yytext);
         return(NREG);
     }
 
-\$S[0-9]+ {
+<emit,INITIAL>\$S[0-9]+ {
         yylval.s = str_dup(yytext);
         return(SREG);
     }
 
-\$P[0-9]+ {
+<emit,INITIAL>\$P[0-9]+ {
         yylval.s = str_dup(yytext);
         return(PREG);
     }
 
-[\t\f\r ]+        ;
-.     {
-#if 0
-        fprintf(stderr, "token[%s]\n", yytext);
-#endif
+<emit,INITIAL>[\t\f\r ]+        ;
+<emit,INITIAL>.     {
         return yytext[0];
     }
 
@@ -187,11 +202,4 @@ int yywrap() {
     yy_delete_buffer(YY_CURRENT_BUFFER);
     return 1;
 }
-
-#if 0
-char * str_dup(const char * buf) {
-    char * s = malloc(strlen(buf)+1);
-    return s;
-}
-#endif
 

@@ -22,9 +22,20 @@ typedef struct _basic_block {
 } Basic_block;
 
 /* Globals: */
-Basic_block **bb_list;
-int n_basic_blocks;
-Set** dominators;
+EXTERN Basic_block **bb_list;
+EXTERN int n_basic_blocks;
+EXTERN Set** dominators;
+
+typedef struct _loop_info {
+	Set * loop;		/* loop set containg bb's */
+	int depth;		/* depth of this loop */
+	int n_entries;		/* nr of entries to this loop */
+	int entry;		/* normal entry if above is 1 */
+	int size;		/* no of blocks in loop */
+} Loop_info;
+
+EXTERN Loop_info ** loop_info;
+EXTERN int n_loops;
 
 /* Functions: */
 
@@ -49,3 +60,5 @@ Basic_block* make_basic_block(Instruction*);
 void clear_basic_blocks();
 Life_range* make_life_range(SymReg*, int);
 int blocks_are_connected(Basic_block *from, Basic_block *to);
+int edge_count();
+

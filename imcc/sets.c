@@ -1,24 +1,28 @@
 
 #include "imc.h"
-#include "string.h"
 
 Set* set_make (int length) {
 	Set *s = malloc(sizeof(Set));
+    if (!s)
+        fatal(1, "set_make", "Out of mem\n");
 	s->length = length;
 	s->bmp = calloc(sizeof(char), length/8 + 1);
+    if (!s->bmp)
+        fatal(1, "set_make", "Out of mem\n");
 
 	return s;
 }
 
 Set* set_make_full (int length) {
-	Set *s = malloc(sizeof(Set));
+    Set *s = set_make(length);
 	int i;
+    int bytes = length/8;
 
-	s->length = length;
-	s->bmp = malloc(sizeof(char) * (length/8 + 1));
-
-	for (i=0; i < (length/8) + 1; i++) {
-		s->bmp[i] = 255;
+    if (bytes)
+        memset(s->bmp, 0xff, bytes);
+    i = bytes * 8;
+    for (; i < length; i++) {
+        set_add(s, i);
 	}
 
 	return s;
@@ -29,33 +33,35 @@ void set_free (Set *s) {
 	free (s);
 }
 
+void set_clear(Set *s)
+{
+    memset(s->bmp, 0, s->length/8 +1);
+}
+
 Set* set_copy (Set *s1) {
-	int i;
-	Set *s = malloc(sizeof(Set));
-	s->length = s1->length;
-	s->bmp = malloc( sizeof(char) * (s->length/8 + 1));
+    Set *s = set_make(s1->length);
 
-	for (i=0; i < (s->length/8); i++) {
-		s->bmp[i] = s1->bmp[i];
-	}
-
+    memcpy(s->bmp, s1->bmp, s->length/8 + 1);
 	return s;
 }
 
 
 int set_equal (Set *s1, Set *s2) {
-	int i;
 	
+    int mask;
+    int bytes = s1->length/8;
 	if (s1->length != s2->length) {
-		fprintf(stderr, "INTERNAL ERROR: Sets don't have the same length in set_equal!\n");
+        fatal(1, "set_equal", "Sets don't have the same length\n");
 	}
 
-	for (i=0; i < (s1->length/8); i++) {
-		if (s1->bmp[i] != s2->bmp[i]) { return 0; };
-	}
-
-	/* bug here: the tail of the bitmap is not compared */
-
+    if (bytes)
+        if (memcmp(s1->bmp, s2->bmp, bytes) != 0)
+            return 0;
+    if (s1->length % 8 == 0)
+        return 1;
+    mask = (1 << (s1->length % 8)) - 1;
+    if ((s1->bmp[bytes] & mask) != (s2->bmp[bytes] & mask))
+        return 0;
 	return 1;
 }
 
@@ -70,12 +76,10 @@ int set_contains(Set *s, int element) {
 Set * set_union(Set *s1, Set *s2) {
 	int i;
 	
-	Set *s = malloc(sizeof(Set));
-	s->length = s1->length;
-	s->bmp = malloc(sizeof(char) * (s1->length/8 + 1));
+    Set *s = set_make(s1->length);
 	
 	if (s1->length != s2->length) {
-		fprintf(stderr, "INTERNAL ERROR: Sets don't have the same length in set_union!\n");
+        fatal(1, "set_union", "Sets don't have the same length\n");
 		
 	}
 	for (i=0; i< (s1->length/8) + 1; i++) {
@@ -88,12 +92,10 @@ Set * set_union(Set *s1, Set *s2) {
 Set * set_intersec(Set *s1, Set *s2) {
 	int i;
 	
-	Set *s = malloc(sizeof(Set));
-	s->length = s1->length;
-	s->bmp = malloc(sizeof(char) * (s->length/8 + 1));
+    Set *s = set_make(s1->length);
 	
 	if (s1->length != s2->length) {
-		fprintf(stderr, "INTERNAL ERROR: Sets don't have the same length in set_intersec!\n");
+        fatal(1, "set_intersec", "Sets don't have the same length\n");
 		
 	}
 	for (i=0; i< (s1->length/8) + 1; i++) {
@@ -107,10 +109,19 @@ void set_intersec_inplace(Set *s1, Set *s2) {
 	int i;
 	
 	if (s1->length != s2->length) {
-		fprintf(stderr, "INTERNAL ERROR: Sets don't have the same length in set_intersec_inplace!\n");
+        fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
 	}
 
-	for (i=0; i< (s1->length/8) ; i++) {
+    for (i=0; i< (s1->length/8)+1 ; i++) {
 		s1->bmp[i] &= s2->bmp[i];
 	}
 }
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */

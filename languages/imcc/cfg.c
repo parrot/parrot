@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "imc.h"
+#include "optimizer.h"
 
 /*
  * cfg.c
@@ -18,76 +19,69 @@
 
 
 void find_basic_blocks () {
-    int nu;
     Basic_block *bb;
-    Instruction *ins, *next, *last;
+    Instruction *ins;
+    int nu = 0;
 
     init_basic_blocks();
 
-    last = instructions;
+    ins = instructions;
 
-    bb = make_basic_block(last);
-    nu = 0;
-    ins = NULL;
+    bb = make_basic_block(ins);
+    for(ins=ins->next; ins; ins = ins->next) {
 
-    instructions->bbindex = 0;
-    for(last=last->next; last; last = last->next) {
-
-	next = last;
-
-	if (nu) {
-	    bb = make_basic_block(next);
-	    nu = 0;
-	}
-	else if (next->type == ITLABEL) {
-	    if (ins != NULL) {
 		bb->end = ins;
-	        bb = make_basic_block(next);
-	    }
+	ins->bbindex = n_basic_blocks - 1;
+        /* a LABEL starts a new basic block, but not, if we have
+         * a new one (last was a branch) */
+        if (nu)
+            nu = 0;
+        else if ( (ins->type & ITLABEL)) {
+            bb = make_basic_block(ins);
 	}
-	else if (next->type == ITBRANCH) {
-	    next->basic_block = bb;
-	    bb->end = next;
+        /* a branch is the end of a basic block
+         * so start a new with the next ins */
+        if (ins->type & ITBRANCH) {
+            if (ins->next)
+                bb = make_basic_block(ins->next);
 	    nu = 1;
 	}
-	else {
-	    next->basic_block = bb;
-	}
-	last->bbindex = n_basic_blocks - 1;
-
-	ins = next;
+        /* XXX instruction type ITADDR is probably address of a
+         * CATCH block - we don't optimize them
+         * XXX they are marked as branch, to avoid dead code removal
+         * when we are sure, how exception will work, we will see.
+         */
+        if (ins->type & ITADDR)
+            dont_optimize = 1;
     }
 
-    /* At the end, ins holds the last instruction of the block */
-    bb->end = ins;
-
-    if (IMCC_DEBUG)
+    if (IMCC_DEBUG>2)
 	dump_instructions();
 }
-
 
 /* Once the basic blocks have been computed, build_cfg computes
    the dependences between them. */
 
 void build_cfg() {
     int i;
+    SymReg * addr;
     Basic_block *last, *bb;
 
     for (i = 0; bb_list[i]; i++) {
 	bb = bb_list[i];
 
 	/* if the block can fall-through */
-	if (i > 0 && ! (last->end->flags & IF_goto) )  bb_add_edge(last, bb);
-
-	if (bb->end->flags & IF_r0_branch)   bb_findadd_edge(bb, bb->end->r0);
-	if (bb->end->flags & IF_r1_branch)   bb_findadd_edge(bb, bb->end->r1);
-	if (bb->end->flags & IF_r2_branch)   bb_findadd_edge(bb, bb->end->r2);
-	if (bb->end->flags & IF_r3_branch)   bb_findadd_edge(bb, bb->end->r3);
+	if (i > 0 && ! (last->end->type & IF_goto) )
+	    bb_add_edge(last, bb);
+	/* look if instruction is a branch */
+        addr = get_branch_reg(bb->end);
+        if (addr)
+            bb_findadd_edge(bb, addr);
 
 	last = bb;
     }
 
-   if (IMCC_DEBUG)
+   if (IMCC_DEBUG>1)
         dump_cfg();
 }
 
@@ -98,9 +92,9 @@ void bb_findadd_edge(Basic_block *from, SymReg *label) {
     Instruction *ins;
 
     for (ins = instructions; ins; ins = ins->next) {
-	if (ins->type == ITLABEL && label == ins->r0){
+	if ((ins->type & ITLABEL) && label == ins->r[0]){
 
-	    bb_add_edge(from, ins->basic_block);
+	    bb_add_edge(from, bb_list[ins->bbindex]);
 	    return;
 
 	    /* a label appears just once */
@@ -134,8 +128,7 @@ void bb_add_edge(Basic_block *from, Basic_block *to) {
 
     e = malloc(sizeof(Edge));
     if (e==NULL) {
-        fprintf(stderr, "Memory error at bb_add_edge\n");
-	abort();
+        fatal(1, "bb_add_edge", "Out of mem");
     }
 
     e->succ_next = from->succ_list;
@@ -167,25 +160,88 @@ static void free_edge(void)
     edge_list = 0;
 }
 
+int edge_count()
+{
+    Edge *e;
+    int i;
+    for (i=0, e = edge_list; e; e = e->next, i++)
+        {}
+    return i;
+}
+
+static void add_instruc_reads(Instruction *ins, SymReg *r0)
+{
+    int i;
+    for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
+	if (r0 == ins->r[i])
+	    return;
+    if (i == IMCC_MAX_REGS) {
+	fatal(1, "add_instruc_reads","out of registers with %s\n", r0->name);
+    	}
+    /* append reg */
+    ins->r[i] = r0;
+    /* this gets read */
+    ins->flags |= (1<<i);
+}
+/*
+ * set P1, P0
+ *
+ * means, the PMC P1 points to whatever, P0 pointed to
+ *
+ * set P1, 4 sets P0 value
+ * as long as P1 is used (not overwritten, by new or clone)
+ */
+
+static void propagate_alias()
+{
+    Instruction *ins, *curr;
+    SymReg *r0, *r1;
+    for (ins = instructions ; ins ; ins = ins->next) {
+	if (ins->type & ITALIAS) {
+	    /* make r1 live in each instruction
+	     * where r0 lifes, until r0 is written
+	     */
+	    curr = ins;
+	    r0 = ins->r[0];
+	    r1 = ins->r[1];
+	    if (r1->type & VTREGISTER) {
+		for(ins = ins->next ; ins; ins = ins->next)
+		    if(instruction_writes(ins, r0))
+			break;
+		    else if (instruction_reads(ins, r0) &&
+			   !instruction_reads(ins, r1)) {
+			add_instruc_reads(ins, r1);
+		    }
+		    else if (instruction_reads(ins, r1) &&
+			   !instruction_reads(ins, r0)) {
+			add_instruc_reads(ins, r0);
+		    }
+		ins = curr;
+	    }
+	}
+    }
+    if (IMCC_DEBUG>2) {
+	debug(2, "\nAfter propagate_alias\n");
+	dump_instructions();
+    }
+}
+
 void life_analysis() {
     int i;
 
-    for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = hash[i];
-    	for(; r; r = r->next) {
-	     if (r->type == VTIDENTIFIER || r->type == VTREG)
-		analyse_life_symbol(r);
-    	}
-    }
+    propagate_alias();
+    for(i = 0; i < n_symbols; i++)
+        analyse_life_symbol(reglist[i]);
 }
 
 void analyse_life_symbol(SymReg* r) {
     int i;
 
+    if (r->life_info)
+        free_life_info(r);
     r->life_info = calloc(n_basic_blocks, sizeof(Life_range*));
     if (r->life_info == NULL) {
-        fprintf(stderr, "Memory error at analyse_life_symbol");
-        abort();
+        fatal(1, "analyse_life_symbol","Out of mem");
     }
 
     /* First we make a pass to each block to gather the information
@@ -210,6 +266,16 @@ void analyse_life_symbol(SymReg* r) {
     }
 }
 
+void free_life_info(SymReg *r)
+{
+    int i;
+    for (i=0; i < n_basic_blocks; i++) {
+	if (r->life_info[i])
+            free(r->life_info[i]);
+    }
+    free(r->life_info);
+}
+
 /* analyse_life_block studies the state of the var r
  * in the block bb.
  *
@@ -226,9 +292,9 @@ void analyse_life_block(Basic_block* bb, SymReg* r) {
 
     for (ins = bb->start; ins ; ins = ins->next) {
         if (ins==NULL) {
-		fprintf(stderr, "Index %i of %i has NULL instruction\n",
+		fatal(1,"analyse_life_block",
+                        "Index %i of %i has NULL instruction\n",
 				ins->index, bb->end->index);
-		abort();
 	}
 	if (instruction_reads(ins, r)) {
 	    if (! (l->flags & LF_def) ) {
@@ -248,7 +314,6 @@ void analyse_life_block(Basic_block* bb, SymReg* r) {
 	    if (!l->first_ins) {
 		l->first_ins = ins;
 	    }
-
 	    l->last_ins = ins;
 	}
 	if (ins == bb->end)
@@ -301,7 +366,9 @@ void propagate_need(Basic_block *bb, SymReg* r) {
 
 /*
  * Computes the dominators tree of the CFG.
- * Basick block A dominates B, if each path to B passes trough A
+ * Basic block A dominates B, if each path to B passes trough A
+ *
+ * s. gcc:flow.c compute_dominators
  */
 
 void compute_dominators () {
@@ -310,25 +377,21 @@ void compute_dominators () {
 
     dominators = malloc(sizeof(Set*) * n_basic_blocks);
 
-    for (i=0; i < n_basic_blocks; i++) {
-	if (i == 0) {
-	    dominators[i] = set_make (n_basic_blocks);
-	    set_add(dominators[i], 0);
-	}
-	else {
+    dominators[0] = set_make (n_basic_blocks);
+    set_add(dominators[0], 0);
+    for (i=1; i < n_basic_blocks; i++) {
 	    dominators[i] = set_make_full (n_basic_blocks);
 	}
-    }
 
     change = 1;
     while (change) {
         change = 0;
 
 	/* TODO: This 'for' should be a breadth-first search for speed  */
-	for (i = 0; i < n_basic_blocks; i++) {
+	for (i = 1; i < n_basic_blocks; i++) {
 	    Set *s = set_copy (dominators[i]);
 
-	    for (edge=bb_list[i]->pred_list; edge!=NULL; edge=edge->pred_next) {
+	    for (edge=bb_list[i]->pred_list; edge; edge=edge->pred_next) {
 		pred_index = edge->from->index;
 
 		set_intersec_inplace(s, dominators[pred_index]);
@@ -341,17 +404,59 @@ void compute_dominators () {
 		set_free (dominators[i]);
 		dominators[i] = s;
 	    }
+            else
+                set_free(s);
 	}
     }
 
-    if (IMCC_DEBUG)
+    if (IMCC_DEBUG>1)
 	dump_dominators();
 
 }
 
+void free_dominators()
+{
+    int i;
+
+    if (!dominators)
+        return;
+    for (i=0; i < n_basic_blocks; i++) {
+        set_free (dominators[i]);
+    }
+    free(dominators);
+    dominators = 0;
+}
+
+
+static void
+sort_loops()
+{
+    int i, j, changed;
+    Loop_info *li;
+
+    for (i = 0; i < n_loops; i++) {
+        loop_info[i]->size = 0;
+        for (j = 0; j < n_basic_blocks; j++)
+            if (set_contains(loop_info[i]->loop, j))
+                loop_info[i]->size++;
+    }
+    changed = 1;
+    while (changed) {
+        changed = 0;
+        for (i = 0; i < n_loops-1; i++)
+            if (loop_info[i]->size < loop_info[i+1]->size) {
+                li = loop_info[i];
+                loop_info[i] = loop_info[i+1];
+                loop_info[i+1] = li;
+                changed = 1;
+            }
+    }
+}
+
+
 /*
- * Searches for loops in the CFG. We search for edges that go from a node to one
- * of its dominators.
+ * Searches for loops in the CFG. We search for edges that
+ * go from a node to one of its dominators.
  */
 
 void find_loops () {
@@ -371,32 +476,82 @@ void find_loops () {
         }
     }
 
-    if (IMCC_DEBUG)
+    sort_loops();
+    if (IMCC_DEBUG>1) {
+        dump_instructions();
 	dump_cfg();
+        dump_loops();
+    }
+    if (bb_list[0]->loop_depth) {
+        fatal(1, "find_loops", "basic_block 0 in loop\n");
+    }
 }
 
 /* Incresases the loop_depth of all the nodes in a loop */
+
 void mark_loop (Edge* e){
    Set* loop;
-   Basic_block *header, *footer;
+    Basic_block *header, *footer, *enter;
+    int i;
+    Edge *edge;
 
    header =  e->to;
    footer =  e->from;
+    enter = 0;
+    /* look from where loop was entered */
 
-   if (IMCC_DEBUG)
-	fprintf (stderr, "loop from %d to %d\n", footer->index, header->index );
+    for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
+	if (footer != edge->from) {
+            enter = edge->from;
+            i++;
+        }
+
+    debug (2, "loop from %d to %d, entered from %d\n", footer->index,
+            header->index, enter ? enter->index : -1 );
+    if (i != 1) {
+        if (i==0)
+            debug(2,"\tdead code\n");
+        else
+            debug(2,"\tcan't determine loop entry block (%d found)\n" ,i);
+    }
 
    loop = set_make(n_basic_blocks);
    set_add(loop, footer->index);
    set_add(loop, header->index);
 
    footer->loop_depth++;
-   header->loop_depth++;
 
+    if (header != footer) {
+        header->loop_depth++;
    search_predecessors_not_in (footer, loop);
+    }
 
-   /* now 'loop' contains the set of nodes inside the loop. We should probably save this
-    * for later use */
+    /* now 'loop' contains the set of nodes inside the loop.
+     */
+    loop_info = realloc(loop_info, (n_loops+1)*sizeof(Loop_info *));
+    if (!loop_info)
+        fatal(1, "mark_loop", "Out of mem\n");
+    loop_info[n_loops] = malloc(sizeof(Loop_info));
+    if (!loop_info[n_loops])
+        fatal(1, "mark_loop", "Out of mem\n");
+    loop_info[n_loops]->loop = loop;
+    loop_info[n_loops]->depth = footer->loop_depth;
+    loop_info[n_loops]->n_entries = i;
+    loop_info[n_loops]->entry = enter ? enter->index : -1;
+    n_loops++;
+}
+
+void free_loops()
+{
+    int i;
+    for (i = 0; i < n_loops; i++) {
+        set_free(loop_info[i]->loop);
+        free(loop_info[i]);
+    }
+    if (loop_info)
+        free(loop_info);
+    n_loops = 0;
+    loop_info = 0;
 }
 
 void search_predecessors_not_in(Basic_block *node, Set* s) {
@@ -419,10 +574,8 @@ static int bb_list_size;
 
 void init_basic_blocks() {
 
-   if (bb_list != NULL) {
-	free(bb_list);
-   }
-
+    if (bb_list != NULL)
+        clear_basic_blocks();
    bb_list = calloc(bb_list_size = 256, sizeof(Basic_block*) );
    n_basic_blocks = 0;
    edge_list = 0;
@@ -435,39 +588,37 @@ void clear_basic_blocks() {
    free(bb_list);
    bb_list = NULL;
    free_edge();
+    free_dominators();
+    free_loops();
 }
 
 Basic_block* make_basic_block(Instruction* ins) {
    Basic_block *bb;
 
    if (ins == NULL) {
-	   fprintf(stderr, "Internal error: make_basic_block called with NULL argument\n");
-	   abort();
+        fatal(1, "make_basic_block", "called with NULL argument\n");
    }
 
    bb = malloc(sizeof(Basic_block));
    if (bb==NULL) {
-        fprintf(stderr, "Memory error at make_basic_block\n");
-	abort();
+        fatal(1, "make_basic_block","Out of mem\n");
    }
 
    bb->start = ins;
-   bb->end = NULL;
+    bb->end = ins;
+
    bb->pred_list = NULL;
    bb->succ_list = NULL;
-   bb->index = n_basic_blocks;
+    ins->bbindex = bb->index = n_basic_blocks;
    bb->loop_depth = 0;
-
    if (n_basic_blocks == bb_list_size) {
        bb_list_size *= 2;
        bb_list = realloc(bb_list, bb_list_size*sizeof(Basic_block*) );
        if (bb_list == 0) {
-	   fprintf(stderr, "Out of mem in make_basic_block\n");
-	   exit(1);
+            fatal(1, "make_basic_block","Out of mem\n");
        }
    }
    bb_list[n_basic_blocks] = bb;
-   ins->basic_block = bb;
    n_basic_blocks++;
 
    return bb;
@@ -476,16 +627,19 @@ Basic_block* make_basic_block(Instruction* ins) {
 Life_range* make_life_range(SymReg *r, int index) {
    Life_range *l;
 
-   l = malloc(sizeof(Life_range));
+    l = calloc(1, sizeof(Life_range));
    if (l==NULL) {
-       fprintf(stderr, "Memory Error at make_life_range\n");
-       abort();
+        fatal(1, "make_life_range","Out of mem\n");
    }
-
-   l->flags = 0;
-   l->first_ins = 0;
-   l->last_ins = 0;
-
    r->life_info[index] = l;
    return l;
 }
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -1,7 +1,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#define _PARSER
 #include "imc.h"
+#include "pbc.h"
+#include "optimizer.h"
 
 /*
  * instructions.c
@@ -16,113 +19,140 @@
  */
 
 
-/* Global variables */
+/* Global variables , forward def */
 
 
 /* Creates a new instruction */
-static SymReg * nullreg;
 
-Instruction * mk_instruction(const char * fmt, SymReg * r0, SymReg * r1,
-		             SymReg * r2, SymReg * r3, int flags)
+Instruction * _mk_instruction(const char *op, const char * fmt,
+	SymReg ** r, int flags)
 {
-    Instruction * i = calloc(1, sizeof(Instruction));
-    if (i == NULL) {
+    int i;
+    Instruction * ins = calloc(1, sizeof(Instruction));
+    if (ins == NULL) {
         fprintf(stderr, "Memory error at mk_instruction\n");
 	abort();
     }
-    if(!nullreg)
-	nullreg = mk_symreg("", 'I');
 
-    i->fmt = str_dup(fmt);
-    i->r0 = r0;
-    i->r1 = r1;
-    i->r2 = r2;
-    i->r3 = r3;
-    i->basic_block = NULL;
-    i->flags = flags;
+    ins->op = str_dup(op);
+    ins->fmt = str_dup(fmt);
+    for (i = 0; i < IMCC_MAX_REGS; i++)
+        if (r)
+            ins->r[i] = r[i];
+    ins->flags = flags;
+    ins->opnum = -1;
 
-    if(!i->r0) {i->r0 = nullreg;}
-    if(!i->r1) {i->r1 = nullreg;}
-    if(!i->r2) {i->r2 = nullreg;}
-    if(!i->r3) {i->r3 = nullreg;}
-
-    return i;
+    return ins;
 }
 
 
-int instruction_reads(Instruction* ins, SymReg* r) {
-    int f;
-
-    if (ins == NULL) {
-	   fprintf(stderr, "Internal error: instruction_reads called with NULL argument\n");
-	   abort();
-   }
+/* next 2 functions are called very often, says gprof
+ * theys should be fast
+ */
+inline int instruction_reads(Instruction* ins, SymReg* r) {
+    int f, i;
+    SymReg *key;
 
     f = ins->flags;
-
-    if ((ins->r0 == r) && (f & IF_r0_read)) return 1;
-    if ((ins->r1 == r) && (f & IF_r1_read)) return 1;
-    if ((ins->r2 == r) && (f & IF_r2_read)) return 1;
-    if ((ins->r3 == r) && (f & IF_r3_read)) return 1;
-
-    return 0;
-}
-
-int instruction_writes(Instruction* ins, SymReg* r) {
-    int f;
-
-    if (ins == NULL) {
-	   fprintf(stderr, "Internal error: instruction_reads called with NULL argument\n");
-	   abort();
-   }
-
-    f = ins->flags;
-
-    if ((ins->r0 == r) && (f & IF_r0_write)) return 1;
-    if ((ins->r1 == r) && (f & IF_r1_write)) return 1;
-    if ((ins->r2 == r) && (f & IF_r2_write)) return 1;
-    if ((ins->r3 == r) && (f & IF_r3_write)) return 1;
-
-    return 0;
-}
-
-
-/* Computes the cost of spilling each symbol. This is estimated by the number
- * of times the symbol appears, weighted by 8**loop_depth */
-
-void compute_spilling_costs () {
-    int depth;
-    Instruction *ins;
-    Basic_block *bb;
-
-    for (ins = instructions; ins; ins = ins->next) {
-	bb = ins->basic_block;
-
-	depth = bb->loop_depth;
-
-	ins->r0->score += 1 << (depth * 3);
-	ins->r1->score += 1 << (depth * 3);
-	ins->r2->score += 1 << (depth * 3);
-	ins->r3->score += 1 << (depth * 3);
-
+    for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+	if (f & (1<<i)) {
+            if (ins->r[i] == r)
+                return 1;
+            for (key = ins->r[i]->nextkey; key; key = key->nextkey)
+                if (key->reg && key->reg == r)
+                    return 1;
     }
 
-     if (IMCC_DEBUG)
-	    dump_symreg();
-
+    return 0;
 }
+
+inline int instruction_writes(Instruction* ins, SymReg* r) {
+    int f, i;
+    SymReg *key;
+
+    f = ins->flags;
+
+    for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+	if (f & (1<<(16+i))) {
+            if (ins->r[i] == r)
+                return 1;
+    }
+
+    return 0;
+}
+
+/* get the reg no of address, where a branch targets to */
+int get_branch_regno(Instruction * ins)
+{
+    int j;
+    for (j = 0; ins->r[j] && j < IMCC_MAX_REGS-1; j++)
+        if (ins->type & (1<<j))
+            return j;
+    return -1;
+}
+
+/* get the reg no of address, where a branch targets to */
+SymReg *get_branch_reg(Instruction * ins)
+{
+    int r = get_branch_regno(ins);
+    if (r >= 0)
+        return ins->r[r];
+    return 0;
+}
+
+/* some usefule instruction routines */
+
+/*
+ * delete and free *ins
+ * actual new ins is returned
+ */
+Instruction * delete_ins(Instruction *ins, int free)
+{
+    Instruction *next, *prev;
+
+    next = ins->next;
+    prev = ins->prev;
+    prev->next = next;
+    next->prev = prev;
+    if (free)
+        free_ins(ins);
+    return next;
+}
+
+/*
+ * insert tmp after ins
+ */
+
+void insert_ins(Instruction *ins, Instruction * tmp)
+{
+    Instruction *next = ins->next;
+    ins->next = tmp;
+    tmp->prev = ins;
+    tmp->next = next;
+    next->prev = tmp;
+}
+
+/* move instruction ins to to */
+Instruction *move_ins(Instruction *ins, Instruction *to)
+{
+    Instruction *next = delete_ins(ins, 0);
+    insert_ins(to, ins);
+    return next;
+}
+
 
 /* Emits the instructions buffered in 'instructions' */
 static Instruction * last_ins;
 static int n_instructions;
 Instruction * emitb(Instruction * i) {
-#if DEBUG
-    emit(i);
-#endif
+
+    if (!i)
+	return 0;
     if(!instructions)
         last_ins = instructions = i;
     else {
 	last_ins->next = i;
+        i->prev = last_ins;
 	last_ins = i;
     }
 
@@ -133,50 +163,114 @@ Instruction * emitb(Instruction * i) {
 void free_ins(Instruction *ins)
 {
     free(ins->fmt);
+    free(ins->op);
     free(ins);
 }
 
 
-static void emit(Instruction * ins) {
-    char regb[4][8];
-    char *reg[4];
-    SymReg *r[4];
+static char * ins_fmt(Instruction * ins) {
+
+    static char s[512]; /* XXX */
+    char regb[IMCC_MAX_REGS][256];      /* XXX */
+    char *regstr[IMCC_MAX_REGS];
     int i;
-    r[0] = ins->r0;
-    r[1] = ins->r1;
-    r[2] = ins->r2;
-    r[3] = ins->r3;
-    for (i = 0; i < 4; i++)
-	if (r[i]->type == VTREG || r[i]->type == VTIDENTIFIER) {
-	    sprintf(regb[i], "%c%d", r[i]->set, r[i]->color);
-	    reg[i] = regb[i];
+    *s = 0;
+    if (!ins->r[0] || !strchr(ins->fmt, '%')) {	/* comments, labels and such */
+	return ins->fmt;
+    }
+    for (i = 0; i < IMCC_MAX_REGS ; i++)
+	if (!ins->r[i])
+	    regstr[i] = 0;
+	else if (ins->r[i]->color >= 0 &&
+		(ins->r[i]->type & VTREGISTER)) {
+	    sprintf(regb[i], "%c%d", ins->r[i]->set, ins->r[i]->color);
+	    regstr[i] = regb[i];
+	}
+        else if (ins->r[i]->type & VTREGKEY) {
+            SymReg * k = ins->r[i]->nextkey;
+            for (*regb[i] = '\0'; k; k = k->nextkey) {
+                if (k->reg && k->reg->color >= 0)
+                    sprintf(regb[i]+strlen(regb[i]), "%c%d",
+                            k->reg->set, k->reg->color);        /* XXX */
+                else
+                    strcat(regb[i], k->name);   /* XXX */
+                if (k->nextkey)
+                    strcat(regb[i], ";");
+            }
+            regstr[i] = regb[i];
 	}
 	else
-	    reg[i] = r[i]->name;
-    printf(ins->fmt, reg[0], reg[1], reg[2], reg[3]);
-    printf("\n");
+	    regstr[i] = ins->r[i]->name;
+
+    vsprintf(s, ins->fmt, regstr);      /* XXX */
+    return s;
 }
 
-void emit_flush() {
+/* for debug */
+char * ins_string(Instruction * ins) {
+    static char s[512];
+    sprintf(s, "%s %s", ins->op, ins_fmt(ins));
+    return s;
+}
+
+static char *output;
+int e_file_open(char *file)
+{
+    freopen(file, "w", stdout);
+    output = file;
+    return 1;
+}
+int e_file_close() {
+    printf("\n\n");
+    fclose(stdout);
+    info(1, "assembly module %s written.\n", output);
+    return 0;
+
+}
+
+int e_file_emit(Instruction * ins) {
+    if ((ins->type & ITLABEL) || ! *ins->op)
+	printf(ins_fmt(ins));
+    else
+	printf("\t%s %s",ins->op, ins_fmt(ins));
+    printf("\n");
+    return 0;
+}
+
+Emitter emitters[2] = {
+    {e_file_open, e_file_emit, e_file_close},
+    {e_pbc_open, e_pbc_emit, e_pbc_close},
+};
+static int emitter;
+int emit_open(int type, char *file)
+{
+    emitter = type;
+    return (emitters[emitter]).open(file);
+    return 0;
+}
+
+int emit_flush() {
 
     Instruction * ins, *next;
+    Instruction *spill = 0;
     /* first instruction should be ".sub" -- make sure we allocate P31
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
     ins = instructions;
     if (n_spilled > 0 && n_instructions > 0) {
-        emit(ins);
+        (emitters[emitter]).emit(ins);
         ins = ins->next;
         while (ins
                && (strncmp(ins->fmt, "push", 4) == 0
                    || strcmp(ins->fmt, "saveall") == 0)) {
-	    emit(ins);
+            (emitters[emitter]).emit(ins);
 	    ins = ins->next;
         }
-	printf("new P31, .PerlArray\n");
+	spill = _mk_instruction("new", "P31, .PerlArray", 0, 0);
+        (emitters[emitter]).emit(spill);
     }
     for (; ins; ins = ins->next) {
-	emit(ins);
+        (emitters[emitter]).emit(ins);
     }
     for (ins = instructions; ins; ) {
 	next = ins->next;
@@ -184,10 +278,22 @@ void emit_flush() {
 	ins = next;
     }
     instructions = NULL;
+    if (spill)
+        free_ins(spill);
     n_instructions = 0;
-    if (nullreg)
-	free(nullreg);
-    nullreg = 0;
-    printf("\n\n");
+    return 0;
 }
+int emit_close()
+{
+    return (emitters[emitter]).close();
+}
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
 

@@ -1,4 +1,4 @@
-/* Register allocator:
+/* Regsster allocator:
  *
  * This is a brute force register allocator. It uses a graph-coloring
  * algorithm, but the implementation is very kludgy.
@@ -13,59 +13,199 @@
 
 #include <string.h>
 #include "imc.h"
-#include "imcparser.h"
+#include "optimizer.h"
 
+static void make_stat(int *sets, int *cols);
+static void imc_stat_init();
+static void print_stat();
 
 /* Globals: */
 
-IMCStack nodeStack;
-int n_spilled;
-int lastbranch;
+static IMCStack nodeStack;
+static int lastbranch;
 
-
-/* Code */
 
 
 /* allocate is the main loop of the allocation algorithm */
 void allocate() {
     int to_spill;
+    int todo;
+
+    debug(2, "\n------------------------\n");
+    debug(1, "processing sub %s\n", function);
+    debug(2, "------------------------\n\n");
+    if (IMCC_VERBOSE > 1 || IMCC_DEBUG)
+        imc_stat_init();
+
+    /* consecutive labels, if_branch, unused_labels ... */
+    pre_optimize();
 
     nodeStack = imcstack_new();
-    n_spilled = 0;
+    dont_optimize = n_spilled = 0;
 
+    todo = 1;
+    while (todo) {
+        build_reglist();
     find_basic_blocks();
     build_cfg();
 
-    if (IMCC_LIFE_INFO) {
 	compute_dominators();
 	find_loops();
 
 	life_analysis();
-	compute_spilling_costs();
+        /* optimize, as long as there is something to do -
+         * but not, if we found a set_addr, which means
+         * we have probably a CATCH handler */
+        if (IMCC_DEBUG==2)
+            dump_symreg();
+        if (dont_optimize)
+            todo = 0;
+        else
+            todo = optimize();
     }
-
-    while (1) {
+    todo = 1;
+    while (todo) {
 	build_interference_graph();
-        while (simplify()) {}      /* simplify until no changes can be made */
+        compute_spilling_costs();
+        /* simplify until no changes can be made */
+        while (simplify()) {}
         order_spilling();          /* puts the remaing item on stack */
 
 	to_spill = try_allocate();
 
 	if ( to_spill >= 0 ) {
             spill(to_spill);
-	    /* clear_basic_blocks(); */
-	    free_interference_graph();
         }
         else {
             /* the process is finished */
-	    clear_basic_blocks();
-	    free_interference_graph();
-	    imcstack_free(nodeStack);
-	    return;
+            todo = 0;
 	}
      }
+    if (IMCC_VERBOSE > 1 || IMCC_DEBUG)
+        print_stat();
+    free_reglist();
+    clear_basic_blocks();       /* and cfg ... */
+    imcstack_free(nodeStack);
 }
 
+void free_reglist() {
+    if (interference_graph) {
+        free(interference_graph);
+        interference_graph = 0;
+    }
+    if (reglist) {
+        free(reglist);
+        reglist = 0;
+    }
+}
+
+/* some statistics about register usage
+ * printed with --verbose --verbose
+ */
+static void make_stat(int *sets, int *cols)
+{
+    /* register usage summary */
+    char type[] = "INSP";
+    int i, j;
+    for(i = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+    	for(; r; r = r->next)
+            for (j = 0; j < 4; j++)
+                if (r->set == type[j] && (r->type & VTREGISTER)) {
+                    sets[j]++;
+                    if (cols)
+                        if (r->color > cols[j])
+                            cols[j] = r->color;
+                }
+    }
+}
+static int imcsets[4];
+/* registes usage of .imc */
+static void imc_stat_init() {
+    imcsets[0] = imcsets[1] = imcsets[2] = imcsets[3] = 0;
+    make_stat(imcsets, 0);
+    ostat.invariants_moved = 0;
+}
+
+/* and final */
+static void print_stat()
+{
+    int sets[4] = {0,0,0,0};
+    int cols[4] = {-1,-1,-1,-1};
+
+    make_stat(sets, cols);
+    info(1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+            function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
+    info(1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
+            ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
+            ostat.branch_branch);
+    info(1, "\t%d invariants_moved\n", ostat.invariants_moved);
+    info(1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
+            sets[0], sets[1], sets[2], sets[3]);
+    info(1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+            cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1, n_spilled);
+    info(1, "\t%d basic_blocks, %d edges\n",
+            n_basic_blocks, edge_count());
+
+}
+
+/* sort list by line  nr */
+static int reg_sort_f(const void *a, const void *b) {
+    SymReg *ra = *(SymReg**) a;
+    SymReg *rb = *(SymReg**) b;
+    return ra->first_ins->index > rb->first_ins->index ? 1 : 0;
+}
+
+static void sort_reglist()
+{
+    qsort(reglist, n_symbols, sizeof(SymReg*), reg_sort_f);
+}
+/* make a linear list of IDENTs and VARs, set n_symbols */
+
+void build_reglist() {
+    int i, count, unused;
+
+    /* count symbols */
+    if (reglist)
+        free_reglist();
+    for(i = count = 0; i < HASH_SIZE; i++) {
+        SymReg * r = hash[i];
+        for(; r; r = r->next)
+            if(r->type & VTREGISTER)
+                count++;
+    	}
+    n_symbols = count;
+    if (count == 0)
+        return;
+    if (n_symbols >= HASH_SIZE)
+        warning("build_reglist", "probably too small HASH_SIZE"
+                " (%d symbols)\n");
+    reglist = calloc(n_symbols, sizeof(SymReg*));
+    if (reglist == NULL) {
+        fatal(1, "build_reglist","Out of mem\n");
+    }
+
+    for(i = count = 0; i < HASH_SIZE; i++) {
+            SymReg * r = hash[i];
+        /* Add each symbol to reglist  */
+    	    for(; r; r = r->next) {
+            if(r->type & VTREGISTER)
+                reglist[count++] = r;
+	    }
+        }
+    compute_du_chain();
+    /* we might have unused symbols here, from spilling */
+    for (i = count = unused = 0; i < n_symbols; i++) {
+        if (!reglist[i]->first_ins)
+            unused++;
+        else if (i == count)
+            count++;
+        else
+            reglist[count++] = reglist[i];
+    }
+    n_symbols -= unused;
+    sort_reglist();
+}
 
 /* creates the interference graph between the variables.
  *
@@ -74,8 +214,44 @@ void allocate() {
  */
 
 void build_interference_graph() {
-    int i;
+	int x, y;
+    if (!n_symbols)
+        return;
+
+    /* Construct a graph N x N where N = number of symbolics.
+     * This piece can be rewritten without the N x N array
+     */
+    interference_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
+    if (interference_graph == NULL)
+        fatal(1, "build_interference_graph","Out of mem\n");
+
+    /* Calculate interferences between each chain and populate the the Y-axis */
+    	for(x = 0; x < n_symbols; x++) {
+        if (!reglist[x]->first_ins)
+		continue;
+            for(y = x + 1; y < n_symbols; y++) {
+            if (!reglist[y]->first_ins)
+		    continue;
+            if(interferes(reglist[x], reglist[y])) {
+                interference_graph[x*n_symbols+y] = reglist[y];
+                interference_graph[y*n_symbols+x] = reglist[x];
+            }
+	}
+    }
+
+    if (IMCC_DEBUG>2) {
+	    dump_symreg();
+	    dump_interference_graph();
+    }
+}
+
+
+static void compute_one_du_chain(SymReg * r);
+/* Compute a DU-chain for each symbolic
+ */
+void compute_du_chain() {
     Instruction * ins, *lastbranch;
+    int i;
 
     lastbranch = 0;
 
@@ -86,78 +262,21 @@ void build_interference_graph() {
     }
 
     /* Compute du-chains for all symbolics */
-    n_symbols = 0;
-    for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = hash[i];
-    	for(; r; r = r->next) {
-            if(r->type != VTREG && r->type != VTIDENTIFIER)
-		continue;
-	    /* XXX only for the first time */
-	    if (1 || !n_spilled)
-		compute_du_chain(r);
-	    /* what is this? -lt */
-            if(r->type == VTIDENTIFIER
-		    && lastbranch
-		    && r->last_ins
-		    && r->last_ins->index < lastbranch->index)
-		r->last_ins = lastbranch;
-    	    n_symbols++;
-    	}
-    }
-
-    /* Construct a graph N x N where N = number of symbolics.
-     * This piece can be rewritten without the N x N array
-     */
-    {
-	int count = 0;
-        interference_graph = calloc((n_symbols + 1) * (n_symbols + 1),
-                                    sizeof(SymReg*));
-        if (interference_graph == NULL) {
-	    fprintf(stderr, "Memory error at build_interference_graph\n");
-	    abort();
-	}
-
-	for(i = 0; i < HASH_SIZE; i++) {
-            SymReg * r = hash[i];
-            /* Add each symbol to its slot on the X axis of the graph */
-    	    for(; r; r = r->next) {
-                if(r->type == VTREG || r->type == VTIDENTIFIER) {
-		    if (r->score < 10000 && r->first_ins && r->last_ins)
-			r->score += r->last_ins->index - r->first_ins->index;
-    	            interference_graph[count++] = r;
-                }
-	    }
-        }
-    }
-
-    /* Calculate interferences between each chain and populate the the Y-axis */
-    {
-	int x, y;
-    	for(x = 0; x < n_symbols; x++) {
-	    if (!interference_graph[x]->first_ins)
-		continue;
-            for(y = x + 1; y < n_symbols; y++) {
-		if (!interference_graph[y]->first_ins)
-		    continue;
-                if(interferes(interference_graph[x], interference_graph[y])) {
-                    interference_graph[(1+x)*n_symbols+y+1] = interference_graph[y];
-                    interference_graph[(1+y)*n_symbols+x+1] = interference_graph[x];
-	        }
-            }
-	}
-    }
-
-    if (IMCC_DEBUG) {
-	    dump_symreg();
-	    dump_interference_graph();
+    for(i = 0; i < n_symbols; i++) {
+        SymReg * r = reglist[i];
+        compute_one_du_chain(r);
+        /* what is this used for? -lt */
+        if(r->type == VTIDENTIFIER
+                && lastbranch
+                && r->last_ins
+                && r->last_ins->index < lastbranch->index)
+            r->last_ins = lastbranch;
     }
 }
 
-
-/* Compute a DU-chain for each symbolic */
-
-void compute_du_chain(SymReg * r) {
+static void compute_one_du_chain(SymReg * r) {
     Instruction * ins;
+    int ix;
 
     /* We cannot rely on computing the value of r->first when parsing,
      * since the situation can be changed at any time by the register
@@ -165,29 +284,45 @@ void compute_du_chain(SymReg * r) {
      */
 
     r->first_ins = 0;
-    for( ins = instructions; ins; ins = ins->next) {
-        if(r == ins->r0 || r == ins->r1 || r == ins->r2 || r == ins->r3) {
+    r->use_count = r->lhs_use_count = 0;
+    for(ix=0, ins = instructions; ins; ins = ins->next, ix++) {
+	int ro, rw;
+        ro = instruction_reads(ins, r);
+        rw = instruction_writes(ins, r);
+        if(ro || rw) {
 	    if (!r->first_ins) {
 		r->first_ins = ins;
 	    }
 	    r->last_ins = ins;
+            if (rw)
+                r->lhs_use_count++;
+            r->use_count++;
 	}
     }
+    /* TODO score high if r is a array/hash key */
+    r->score = r->use_count + (r->lhs_use_count << 2);
 }
 
-static int connection(SymReg * r0, SymReg * r1)
-{
-    int i,j;
-    for (i = r0->first_ins->bbindex; i <= r0->last_ins->bbindex; i++)
-	for (j = r1->first_ins->bbindex; j <= r1->last_ins->bbindex; j++) {
-	    if (blocks_are_connected(bb_list[i], bb_list[j]))
-		    return 1;
-	    if (blocks_are_connected(bb_list[j], bb_list[i]))
-		    return 1;
+/* Computes the cost of spilling each symbol. This is estimated by the number
+ * of times the symbol appears, weighted by 8**loop_depth */
+
+void compute_spilling_costs () {
+    int depth, i;
+    Instruction *ins;
+
+    for (ins = instructions; ins; ins = ins->next) {
+
+	depth = bb_list[ins->bbindex]->loop_depth;
+
+    	for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++)
+	    ins->r[i]->score += 1 << (depth * 3);
+
 	}
-    return 0;
-}
 
+     if (IMCC_DEBUG>2)
+	    dump_symreg();
+
+}
 /* See if r0's chain interferes with r1. */
 /* We currently decide that two vars interfere if they are both alive
  * at any point. This could be improved, requiring that one is alive
@@ -216,44 +351,10 @@ int interferes(SymReg * r0, SymReg * r1) {
     if(!r0->first_ins || !r1->first_ins)
 	return 0;
 
-    if (!IMCC_LIFE_INFO)
-    if (r0->first_ins->index > r1->last_ins->index ||
-	r1->first_ins->index > r0->last_ins->index) {
-	/* if instructions are in same block and don't overlap
-	 * => no interference
-	 */
-	if (r0->first_ins->bbindex == r1->last_ins->bbindex &&
-	    r1->first_ins->bbindex == r0->last_ins->bbindex) {
-		return 0;
-	}
-	/* if they only cover one block and don't overlap
-	 * => no interference
-	 */
-	if (r0->first_ins->bbindex == r0->last_ins->bbindex &&
-	    r1->first_ins->bbindex == r1->last_ins->bbindex) {
-		return 0;
-	}
-	/* now look if blocks, where these syms live, are connected
-	 * if not => no interference
-	 */
-/*	XXX
- *	not all connections are ok, so don't use this currently
- */
-#if 0
-
-	if (!connection(r0, r1))
-	    return 0;
-#endif
-    }
     /* Now: */
-    /* life_info seems broken */
-    if (!IMCC_LIFE_INFO)
-	return 1;
 
-    /* now look more detailled */
     if (r0->life_info == NULL || r1->life_info == NULL) {
-	fprintf(stderr, "INTERNAL ERROR: Life range is NULL\n");
-	return 0;
+	fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
     }
 
     for (i=0; i <n_basic_blocks; i++) {
@@ -291,16 +392,19 @@ int simplify (){
     int x;
     SymReg **g;
 
-    g = interference_graph;
+    g = reglist;
 
+    for(x = 0; x < n_symbols; x++) {
+        if (g[x]->color >= 0)   /* VTPASM */
+            g[x]->simplified = 1;
+    }
     for(x = 0; x < n_symbols; x++) {
 	if (g[x]->simplified) {
             break;
 	}
 
 	if ( neighbours(x) < MAX_COLOR) {
-            if (IMCC_DEBUG)
-	        fprintf(stderr, "#simplifying [%s]\n", g[x]->name);
+            debug(1, "#simplifying [%s]\n", g[x]->name);
 
 	    imcstack_push(nodeStack, x);
 
@@ -334,7 +438,7 @@ void order_spilling () {
 
             /* for now, our score function only
 	       takes in account how many times a symbols
-	       has appeared */
+	       has appeared + the loop_depth */
 
 	     /* we have to combine somehow the rank of the node
 	      * with the cost of spilling it
@@ -344,8 +448,8 @@ void order_spilling () {
 	      *
 	      * I have no clue of how good it is
  	     */
-	    if (!(interference_graph[x]->simplified)) {
-	        total_score = interference_graph[x]->score; /* - neighbours(x); */
+	    if (!(reglist[x]->simplified)) {
+	        total_score = reglist[x]->score - neighbours(x);
 
                 if ( (min_node == -1) || (min_score > total_score) )  {
     	           min_node  = x;
@@ -357,22 +461,21 @@ void order_spilling () {
 	if (min_node == -1) return; /* We are finished */
 
 	imcstack_push(nodeStack, min_node);
-	interference_graph[min_node]->simplified = 1;
+	reglist[min_node]->simplified = 1;
     }
 }
 
 
 void restore_interference_graph() {
     int i;
-    for (i=0; interference_graph[i]; i++) {
-	interference_graph[i]->color = -1;
-	interference_graph[i]->simplified = 0;
+    for (i=0; i < n_symbols; i++) {
+        if (reglist[i]->type & VTPASM)
+            continue;
+	reglist[i]->color = -1;
+	reglist[i]->simplified = 0;
     }
 }
 
-void free_interference_graph() {
-   free(interference_graph);
-}
 
 /*
  * Color the graph assigning registers to each symbol:
@@ -395,28 +498,28 @@ int try_allocate() {
 	for(t = 0; t < 4; t++) {
 	    int typ = "INSP"[t];
 	    memset(colors, 0, sizeof(colors));
-	    if (graph[x]->set == typ) {
+	    if (reglist[x]->set == typ) {
 		free_colors = map_colors(x, graph, colors, typ);
 		if (free_colors > 0) {
 		    for(color = 0; color < MAX_COLOR - (typ=='P'); color++) {
 			if(!colors[color]) {
-			    graph[x]->color = color;
+			    reglist[x]->color = color;
 
-			    if (IMCC_DEBUG)
-				fprintf(stderr, "#[%s] provisionally gets color [%d] (%d free colors, score %d)\n",
-					graph[x]->name, color, free_colors, graph[x]->score);
-
+                            debug(2, "#[%s] provisionally gets color [%d]"
+                                     "(%d free colors, score %d)\n",
+					reglist[x]->name, color,
+                                        free_colors, reglist[x]->score);
 			    break;
 			}
 		    }
 		}
 
-		if (graph[x]->color == -1) {
-		    if (IMCC_DEBUG)
-			fprintf(stderr, "# no more colors free = %d\n", free_colors);
+		if (reglist[x]->color == -1) {
+                    debug(1, "# no more colors free = %d\n", free_colors);
 
-		    /* It has been impossible to assign a color to this node, return it
-		       so it gets spilled */
+		    /* It has been impossible to assign a color
+                     * to this node, return it so it gets spilled
+                     */
 
 		    restore_interference_graph();
 		    /* clean stack */
@@ -431,10 +534,6 @@ int try_allocate() {
     return -1; /* we are totally finished */
 }
 
-
-
-
-
 /*
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
@@ -444,7 +543,7 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
     int color, free_colors;
     memset(colors, 0, sizeof(colors[0]) * MAX_COLOR);
     for(y = 0; y < n_symbols; y++) {
-        if((r = graph[(1+x)*n_symbols+y+1])
+        if((r = graph[x*n_symbols+y])
     	    && r->color != -1
 	    && r->set == typ) {
     	    colors[r->color] = 1;
@@ -461,32 +560,24 @@ int map_colors(int x, SymReg ** graph, int colors[], int typ) {
  */
 void spill(int spilled) {
 
-    Instruction * tmp, *last, *ins, *next;
-    int j;
-    int needs_fetch, needs_store, needs_spilling;
-    int old;
-    SymReg * new_symbol, * old_symbol;
+    Instruction * tmp, *last, *ins;
+    int i;
+    int needs_fetch, needs_store;
+    SymReg * old_symbol;
     char * buf;
+    SymReg *regs[IMCC_MAX_REGS];
 
     buf = malloc(256 * sizeof(char));
     if (buf == NULL) {
-	fprintf(stderr, "Memory error at spill\n");
-	abort();
+	fatal(1, "spill","Out of mem\n");
     }
 
-    if (IMCC_DEBUG)
-	fprintf(stderr, "#Spilling [%s]:\n", interference_graph[spilled]->name);
+    debug(1, "#Spilling [%s]:\n", reglist[spilled]->name);
 
-    old_symbol = interference_graph[spilled];
-
-    sprintf(buf, "%s_0", old_symbol->name);
-    new_symbol = mk_symreg(str_dup(buf), old_symbol->set);
-    new_symbol->score = 10000;
+    old_symbol = reglist[spilled];
 
     n_spilled++;
 
-    j = 0;
-    old = -1;
     for(last = 0, ins = instructions; ins; last = ins, ins = ins->next) {
 
 	needs_store = 0;
@@ -498,100 +589,37 @@ void spill(int spilled) {
 	if (instruction_writes (ins, old_symbol) )
 	    needs_store = 1;
 
-	needs_spilling = needs_fetch || needs_store;
-
-	/* this should optimize fetches, but is broken */
-	old = -1;
-
-	if (needs_fetch && old != n_spilled) {
-	    sprintf(buf, "set %s, P31[%d] #FETCH", "%s", n_spilled); /*ouch*/
-	    tmp = mk_instruction(buf, new_symbol, NULL, NULL, NULL,
-			IF_r0_write);
+	if (needs_fetch) {
+	    regs[0] = old_symbol;
+	    for (i = 1; i < IMCC_MAX_REGS; i++)
+		regs[i] = 0;
+	    sprintf(buf, "%%s, P31[%d] #FETCH", n_spilled); /*ouch*/
+	    tmp = iANY("set", buf, regs, 0);
 	    tmp->bbindex = ins->bbindex;
-	    tmp->basic_block = ins->basic_block;
-	    next = last->next;
-	    last->next = tmp;
-	    tmp->next = next;
+            /* insert tmp before actual ins */
+            insert_ins(last, tmp);
+            /* inserted is new last */
 	    last = tmp;
-	    if (!new_symbol->first_ins)
-		new_symbol->first_ins = tmp;
-	    new_symbol->last_ins = tmp;
-	}
-	else
-	    needs_fetch = 0;
-
-	/* Emit the old instruction, with the symbol changed */
-	{
-            SymReg *r0, *r1, *r2, *r3;
-	    int change = 0;
-
-            r0 = ins->r0;
-            r1 = ins->r1;
-            r2 = ins->r2;
-            r3 = ins->r3;
-
-            if(r0==old_symbol) { r0=new_symbol; change++; }
-            if(r1==old_symbol) { r1=new_symbol; change++; }
-            if(r2==old_symbol) { r2=new_symbol; change++; }
-            if(r3==old_symbol) { r3=new_symbol; change++; }
-
-	    if (change) {
-		tmp = mk_instruction(ins->fmt, r0, r1, r2, r3, ins->flags);
-		tmp->type = ins->type;
-		tmp->bbindex = ins->bbindex;
-		tmp->basic_block = ins->basic_block;
-		next = ins->next;
-		last->next = tmp;
-		tmp->next = next;
-		free_ins(ins);
-		ins = tmp;
-		/* old_symbol is unused now */
-		old_symbol->first_ins = 0;
-		/* new starts here */
-		if (!new_symbol->first_ins)
-		    new_symbol->first_ins = tmp;
-		new_symbol->last_ins = tmp;
-	    }
-
 	}
 	if (needs_store) {
-	    sprintf(buf, "set P31[%d], %s #STORE", n_spilled, "%s");
-	    tmp = mk_instruction(buf, new_symbol, NULL, NULL, NULL,
-			IF_r1_read);
+	    regs[0] = old_symbol;
+	    for (i = 1; i < IMCC_MAX_REGS; i++)
+		regs[i] = 0;
+	    sprintf(buf, "P31[%d], %%s #STORE", n_spilled);
+	    tmp = iANY("set", buf, regs, 0);
 	    tmp->bbindex = ins->bbindex;
-	    tmp->basic_block = ins->basic_block;
-	    next = ins->next;
-	    ins->next = tmp;
-	    tmp->next = next;
-	    old = n_spilled;
-	    if (!new_symbol->first_ins)
-		new_symbol->first_ins = tmp;
-	    new_symbol->last_ins = tmp;
-
-	}
-	else
-	    old = -1;
-	if (needs_fetch || needs_store) {
-            sprintf(buf, "%s_%d", old_symbol->name, ++j);
-            new_symbol =  mk_symreg(str_dup(buf), old_symbol->set);
-	    new_symbol->score = 10000;
-	    old = -1;
+            /* insert tmp after ins */
+            insert_ins(ins, tmp);
 	}
     }
 
     free(buf);
 
-    /* old_symbol doesn't get deleted. It simply loses all references from
-       instructions. So this means that the symbol table gets polluted with
-       symbols that are used nowhere.
-
-       We should clear, or at least reuse, them.
-    */
-
-    for(j = 0, ins = instructions; ins; ins = ins->next) {
-	ins->index = j++;
+    /* update line nr info */
+    for(i = 0, ins = instructions; ins; ins = ins->next) {
+	ins->index = i++;
     }
-    if(IMCC_DEBUG)
+    if(IMCC_DEBUG>2)
         dump_instructions();
 
 }
@@ -603,7 +631,7 @@ int neighbours(int node) {
     cnt = 0;
     for (y = 0; y < n_symbols; y++) {
 
-	if ( (r = interference_graph[(1+node)*n_symbols + y + 1] ) &&
+	if ( (r = interference_graph[node*n_symbols + y] ) &&
 			(!r->simplified) ) {
 	     cnt++;
 	}
@@ -621,10 +649,12 @@ int neighbours(int node) {
 char * str_dup(const char * old) {
     char * copy = (char *)malloc(strlen(old) + 1);
     if (copy == NULL) {
-        fprintf(stderr, "Memory error at str_dup\n");
-	abort();
+        fatal(1, "str_dup", "Out of mem\n");
     }
     strcpy(copy, old);
+#ifdef MEMDEBUG
+    debug(1,"line %d str_dup %s [%x]\n", line, old, copy);
+#endif
     return copy;
 }
 
@@ -632,12 +662,19 @@ char * str_cat(const char * s1, const char * s2) {
     int len = strlen(s1) + strlen(s2) + 1;
     char * s3 = malloc(len);
     if (s3 == NULL) {
-       fprintf(stderr, "Memory error at str_cat\n");
-       abort();
+        fatal(1, "str_cat", "Out of mem\n");
     }
     strcpy(s3, s1);
     strcat(s3, s2);
     return s3;
 }
 
-
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
