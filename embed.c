@@ -16,13 +16,13 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-static BOOLVAL world_inited=0;
+static BOOLVAL world_inited = 0;
 
 struct Parrot_Interp *
 Parrot_new(void)
 {
     if (!world_inited) {
-        world_inited=1;
+        world_inited = 1;
         init_world();
     }
     return make_interpreter(NO_FLAGS);
@@ -32,13 +32,13 @@ void
 Parrot_init(struct Parrot_Interp *interpreter)
 {
     if (!world_inited) {
-        world_inited=1;
+        world_inited = 1;
         init_world();
     }
 }
 
 void
-Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, 
+Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag,
                Parrot_flag_val value)
 {
     interpreter->flags |= flag;
@@ -61,25 +61,28 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     char *program_code;
     struct PackFile *pf;
 
-    if (filename == NULL || strcmp(filename, "-")==0) { /* read from STDIN */
+    if (filename == NULL || strcmp(filename, "-") == 0) {       /* read from STDIN */
         char *cursor;
         INTVAL read_result;
 
         program_size = 0;
-           
+
         program_code = (char *)malloc((unsigned)program_size + 1024);
         if (NULL == program_code) {
-            fprintf(stderr, "Parrot VM: Could not allocate buffer to read packfile from stdin.\n");
+            fprintf(stderr,
+                    "Parrot VM: Could not allocate buffer to read packfile from stdin.\n");
             return NULL;
         }
         cursor = (char *)program_code;
 
         while ((read_result = read(0, cursor, 1024)) > 0) {
             program_size += read_result;
-            program_code = realloc(program_code, (unsigned)program_size + 1024);
+            program_code =
+                realloc(program_code, (unsigned)program_size + 1024);
 
             if (NULL == program_code) {
-                fprintf(stderr, "Parrot VM: Could not reallocate buffer while reading packfile from stdin.\n");
+                fprintf(stderr,
+                        "Parrot VM: Could not reallocate buffer while reading packfile from stdin.\n");
                 return NULL;
             }
 
@@ -87,27 +90,30 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         }
 
         if (read_result < 0) {
-            fprintf(stderr, "Parrot VM: Problem reading packfile from stdin.\n");
+            fprintf(stderr,
+                    "Parrot VM: Problem reading packfile from stdin.\n");
             return NULL;
         }
     }
     else {
         if (stat(filename, &file_stat)) {
-            fprintf(stderr, "Parrot VM: Can't stat %s, code %i.\n", filename, errno);
+            fprintf(stderr, "Parrot VM: Can't stat %s, code %i.\n", filename,
+                    errno);
             return NULL;
         }
-        
+
         if (!S_ISREG(file_stat.st_mode)) {
             fprintf(stderr, "Parrot VM: %s is not a normal file.\n", filename);
             return NULL;
         }
-        
+
         fd = open(filename, O_RDONLY | O_BINARY);
         if (!fd) {
-             fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename, errno);
-             return NULL;
+            fprintf(stderr, "Parrot VM: Can't open %s, code %i.\n", filename,
+                    errno);
+            return NULL;
         }
-            
+
         program_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN
@@ -116,16 +122,20 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         read(fd, (void *)program_code, program_size);
 
         if (!program_code) {
-            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n", filename, errno);
+            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n",
+                    filename, errno);
             return NULL;
         }
 
 #else
 
-        program_code = mmap(0, (unsigned)program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+        program_code =
+            mmap(0, (unsigned)program_size, PROT_READ, MAP_SHARED, fd,
+                 (off_t)0);
 
         if (!program_code) {
-            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n", filename, errno);
+            fprintf(stderr, "Parrot VM: Can't read file %s, code %i.\n",
+                    filename, errno);
             return NULL;
         }
 
@@ -135,7 +145,8 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     pf = PackFile_new();
 
-    if (!PackFile_unpack(interpreter, pf, (opcode_t*)program_code, (unsigned)program_size) ) {
+    if (!PackFile_unpack
+        (interpreter, pf, (opcode_t *)program_code, (unsigned)program_size)) {
         fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }
@@ -146,15 +157,15 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 void
 Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 {
-    interpreter->code=pf;
+    interpreter->code = pf;
 }
 
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
     INTVAL i;
-    PMC* userargv;
-    
+    PMC *userargv;
+
     if (interpreter->flags & PARROT_DEBUG_FLAG) {
         fprintf(stderr, "*** Parrot VM: Debugging enabled. ***\n");
 
@@ -171,44 +182,47 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 
 #if !defined(JIT_CAPABLE) || !JIT_CAPABLE
     if (interpreter->flags & PARROT_JIT_FLAG) {
-        fprintf(stderr, "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
+        fprintf(stderr,
+                "Parrot VM: Platform " JIT_ARCHNAME " is not JIT-capable.\n");
         exit(1);
     }
 #endif
 
     if (interpreter->flags & PARROT_DEBUG_FLAG) {
-        fprintf(stderr, "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n", argc);
+        fprintf(stderr,
+                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+                argc);
     }
 
-    userargv=pmc_new(interpreter, enum_class_PerlArray);
-    
-    for(i=0; i < argc; i++) {
+    userargv = pmc_new(interpreter, enum_class_PerlArray);
+
+    for (i = 0; i < argc; i++) {
         if (interpreter->flags & PARROT_DEBUG_FLAG) {
             fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
         }
 
         /* XXX: Delayed
-        userargv->vtable->set_string_index(interpreter, userargv, 
-            string_make(interpreter, argv[i], strlen(argv[i]), 0, 0, 0), i
-        );
-        */
+         * userargv->vtable->set_string_index(interpreter, userargv, 
+         * string_make(interpreter, argv[i], strlen(argv[i]), 0, 0, 0), i
+         * );
+         */
     }
 
-    interpreter->pmc_reg.registers[0]=userargv;
+    interpreter->pmc_reg.registers[0] = userargv;
 
     runops(interpreter, interpreter->code, 0);
 
     /*
-    ** If any profile information was gathered, print it out:
-    */
+     * If any profile information was gathered, print it out:
+     */
 
     if (interpreter->profile != NULL) {
         unsigned int j;
-        int op_count   = 0;
+        int op_count = 0;
         int call_count = 0;
         FLOATVAL sum_time = 0.0;
 
-	printf("\n\n");
+        printf("\n\n");
         printf("                   OPERATION PROFILE                 \n\n");
         printf("  CODE   OP FULL NAME   CALLS  TOTAL TIME    AVG TIME\n");
         printf("  -----  ------------  ------  ----------  ----------\n");
