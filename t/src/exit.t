@@ -2,10 +2,7 @@
 
 use Parrot::Test tests => 2;
 
-TODO: {
-    $TODO=$TODO;  #warnings
-
-    c_output_is(<<'CODE', <<'OUTPUT', "Parrot_exit");
+c_output_is(<<'CODE', <<'OUTPUT', "Parrot_exit");
         #include <stdio.h>
         #include "parrot/parrot.h"
 
@@ -18,7 +15,7 @@ CODE
 pre-exit
 OUTPUT
 
-    c_output_is(<<'CODE', <<'OUTPUT', "Parrot_on_exit / Parrot_exit");
+c_output_is(<<'CODE', <<'OUTPUT', "Parrot_on_exit / Parrot_exit");
         #include <stdio.h>
         #include "parrot/parrot.h"
 
@@ -40,5 +37,4 @@ exit1
 exit2
 exit3
 OUTPUT
-}
 1;

@@ -2,10 +2,7 @@
 
 use Parrot::Test tests => 2;
 
-TODO: {
-    $TODO=$TODO;  #warnings
-
-    c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
@@ -201,4 +198,3 @@ int main ()
     return 0;
 }
 CODE
-}

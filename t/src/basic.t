@@ -2,10 +2,7 @@
 
 use Parrot::Test tests => 2;
 
-TODO: {
-    $TODO=$TODO;  #warnings
-
-    c_output_is(<<'CODE', <<'OUTPUT', "hello world");
+c_output_is(<<'CODE', <<'OUTPUT', "hello world");
         #include <stdio.h>
 
         int main(int argc, char* argv[]) {
@@ -16,7 +13,7 @@ CODE
 Hello, World!
 OUTPUT
 
-    c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
+c_output_is(<<'CODE', <<'OUTPUT', "direct internal_exception call");
         #include <parrot/parrot.h>
         #include <parrot/exceptions.h>
 
@@ -26,5 +23,4 @@ OUTPUT
 CODE
 Blow'd Up(tm)
 OUTPUT
-}
 1;

@@ -2,10 +2,7 @@
 
 use Parrot::Test tests => 2;
 
-TODO: {
-    $TODO=$TODO;  #warnings
-
-    c_output_is(<<'CODE', <<'OUTPUT', "data types");
+c_output_is(<<'CODE', <<'OUTPUT', "data types");
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -268,12 +265,7 @@ insert 2 ok
 Done.
 OUTPUT
 
-}
-
-TODO: {
-    $TODO=$TODO;  #warnings
-
-    c_output_is(<<'CODE', <<'OUTPUT', "arbitrary sized");
+c_output_is(<<'CODE', <<'OUTPUT', "arbitrary sized");
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -339,5 +331,4 @@ ok 1
 ok 2
 OUTPUT
 # TODO
-}
 1;
