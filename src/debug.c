@@ -356,8 +356,10 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     while (command && *command) {
         i = 0;
-        while (command[i] && !isspace(command[i]))
-            c[i] = command[i++];
+        while (command[i] && !isspace(command[i])) {
+            c[i] = command[i];
+            i++;
+	}
         c[i] = '\0';
         na(command);
 
