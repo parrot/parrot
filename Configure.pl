@@ -262,23 +262,23 @@ END
         } else {
 	    print "Your C compiler reports itself as gcc, major version $major";
             print ", minor version $minor" if defined $minor;
-	}
-        print ".\n\n";
-        if ($major =~ tr/0-9//c) {
-            print "major version '$major' is not an integer",
-                " - I don't think that this is gcc.";
-            undef $major; # Don't use it
-        }
-        if (defined $minor and $minor =~ tr/0-9//c) {
-            print "minor version '$minor' is not an integer.";
-            undef $minor; # Don't use it
-        }
-        if (defined $major) {
-            $c{gccversion} = $major;
-            $c{gccversion} .= ".$minor" if defined $minor;
+
+            print ".\n\n";
+            if ($major =~ tr/0-9//c) {
+                print "major version '$major' is not an integer",
+                    " - I don't think that this is gcc.";
+                undef $major; # Don't use it
+            }
+            if (defined $minor and $minor =~ tr/0-9//c) {
+                print "minor version '$minor' is not an integer.";
+                undef $minor; # Don't use it
+            }
+            if (defined $major) {
+                $c{gccversion} = $major;
+                $c{gccversion} .= ".$minor" if defined $minor;
+            }
         }
     }
-
 }
 
 if ($c{gccversion}) {
