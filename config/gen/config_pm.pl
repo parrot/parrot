@@ -25,7 +25,7 @@ $description="Recording configuration data for later retrieval";
 @args=();
 
 sub runstep {
-  
+  Configure::Data->clean;
   
   genfile('config/gen/config_pm/myconfig.in',      'myconfig');
 
@@ -57,8 +57,8 @@ END
       for $k(Configure::Data->keys) {
 	my $v=Configure::Data->get($k);
 	if(defined $v) {
-	  next if $v =~ /\n/;
           $v =~ s/(["\\])/\\$1/g;
+          $v =~ s/\n/\\\n/g;
           print OUT qq(\tset P0["$k"], "$v"\n);
         }
         else {

@@ -33,11 +33,11 @@ sub runstep {
     );
 
     $_ = "\$(INC)/$_" for @headers;
-    my $nongen_headers = join("\\\n	", @headers);
+    my $TEMP_nongen_headers = join("\\\n	", @headers);
 
     Configure::Data->set(
 	inc            => $inc,
-	nongen_headers => $nongen_headers,
+	TEMP_nongen_headers => $TEMP_nongen_headers,
     );
 }
 

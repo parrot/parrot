@@ -82,30 +82,30 @@ sub runstep {
 
   if ($gc =~ /^malloc(?:-trace)?$/) {
     Configure::Data->set(
-      gc_c          => <<"EOF",
+      TEMP_gc_c          => <<"EOF",
 \$(SRC)/$gc\$(O):	\$(GENERAL_H_FILES) \$(SRC)/$gc.c
 \$(SRC)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC)/res_lea.c
 EOF
-      gc_o          => "\$(SRC)\/$gc\$(O) \$(SRC)/res_lea\$(O)",
+      TEMP_gc_o          => "\$(SRC)\/$gc\$(O) \$(SRC)/res_lea\$(O)",
       gc_flag  => '-DGC_IS_MALLOC',
     );
   }
   elsif ($gc eq 'libc') {
     Configure::Data->set(
-      gc_c          => <<"EOF",
+      TEMP_gc_c          => <<"EOF",
 \$(SRC)/res_lea\$(O):	\$(GENERAL_H_FILES) \$(SRC)/res_lea.c
 EOF
-      gc_o          => "\$(SRC)/res_lea\$(O)",
+      TEMP_gc_o          => "\$(SRC)/res_lea\$(O)",
       gc_flag  => '-DGC_IS_MALLOC',
     );
   }
   else {
       $gc = 'gc';
     Configure::Data->set(
-      gc_c          => <<"EOF",
+      TEMP_gc_c          => <<"EOF",
 \$(SRC)/resources\$(O):	\$(GENERAL_H_FILES) \$(SRC)/resources.c
 EOF
-      gc_o          => "\$(SRC)/resources\$(O)",
+      TEMP_gc_o          => "\$(SRC)/resources\$(O)",
       gc_flag  => '',
     );
   }

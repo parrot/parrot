@@ -39,8 +39,8 @@ sub runstep {
 
   if ($test) {
     Configure::Data->set(
-      cg_h          => '$(INC)/oplib/core_ops_cg.h $(INC)/oplib/core_ops_cgp.h',
-      cg_c          => <<'EOF',
+      TEMP_cg_h          => '$(INC)/oplib/core_ops_cg.h $(INC)/oplib/core_ops_cgp.h',
+      TEMP_cg_c          => <<'EOF',
 $(OPS)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cg.c
 $(OPS)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cgp.c
 
@@ -49,8 +49,8 @@ $(OPS)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2
 $(OPS)/core_ops_cgp.c $(INC)/oplib/core_ops_cgp.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGP --core
 EOF
-      cg_o          => '$(OPS)/core_ops_cg$(O) $(OPS)/core_ops_cgp$(O)',
-      cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h $(OPS)/core_ops_cg.c \
+      TEMP_cg_o          => '$(OPS)/core_ops_cg$(O) $(OPS)/core_ops_cgp$(O)',
+      TEMP_cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h $(OPS)/core_ops_cg.c \
                                 $(INC)/oplib/core_ops_cgp.h $(OPS)/core_ops_cgp.c',
       cg_flag       => '-DHAVE_COMPUTED_GOTO'
     );
@@ -59,10 +59,10 @@ EOF
   else {
     print " (no) " if $verbose;
     Configure::Data->set(
-      cg_h    => '',
-      cg_c    => '',
-      cg_o    => '',
-      cg_r    => '',
+      TEMP_cg_h    => '',
+      TEMP_cg_c    => '',
+      TEMP_cg_o    => '',
+      TEMP_cg_r    => '',
       cg_flag => ''
     );
   }

@@ -37,10 +37,10 @@ sub runstep {
         jitcapable  => 0,
         execcapable => 0,
         cc_hasjit   => '',
-        jit_h       => '',
-        jit_o       => '',
-        exec_h      => '',
-        exec_o      => '',
+        TEMP_jit_h       => '',
+        TEMP_jit_o       => '',
+        TEMP_exec_h      => '',
+        TEMP_exec_o      => '',
 	    asmfun_o    => ''
       );
       return;
@@ -118,8 +118,8 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
       jitosname   => uc($jitosname),
       jitcapable  => 1,
       cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
-      jit_h       => '$(INC)/jit.h',
-      jit_o       => '$(SRC)/jit$(O) $(SRC)/jit_cpu$(O) $(SRC)/jit_debug$(O) $(SRC)/jit_debug_xcoff$(O)'
+      TEMP_jit_h       => '$(INC)/jit.h',
+      TEMP_jit_o       => '$(SRC)/jit$(O) $(SRC)/jit_cpu$(O) $(SRC)/jit_debug$(O) $(SRC)/jit_debug_xcoff$(O)'
     );
 
     if (($jitcpuarch eq 'i386')
@@ -138,15 +138,15 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
     $execcapable = $set_execcapable if defined $set_execcapable;
     if ($execcapable) {
       Configure::Data->set(
-        exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_dep.h $(INC)/exec_save.h',
-        exec_o       => '$(SRC)/exec$(O) $(SRC)/exec_cpu$(O) $(SRC)/exec_save$(O)',
+        TEMP_exec_h       => '$(INC)/jit.h $(INC)/exec.h $(INC)/exec_dep.h $(INC)/exec_save.h',
+        TEMP_exec_o       => '$(SRC)/exec$(O) $(SRC)/exec_cpu$(O) $(SRC)/exec_save$(O)',
         execcapable  => 1
       );
     }
     else {
        Configure::Data->set(
-        exec_h       => '',
-        exec_o       => '',
+        TEMP_exec_h       => '',
+        TEMP_exec_o       => '',
         execcapable  => 0
       );
     }
@@ -196,10 +196,10 @@ print("-e \"jit/$cpuarch/core.jit\" = ", -e "jit/$cpuarch/core.jit" ? 'yes' : 'n
       jitcapable  => 0,
       execcapable => 0,
       cc_hasjit   => '',
-      jit_h       => '',
-      jit_o       => '',
-      exec_h      => '',
-      exec_o      => ''
+      TEMP_jit_h       => '',
+      TEMP_jit_o       => '',
+      TEMP_exec_h      => '',
+      TEMP_exec_o      => ''
     );
   }
 }

@@ -4,10 +4,10 @@ TOUCH  = $(PERL) -e ${PQ}$$n=time; utime $$n,$$n,@ARGV${PQ}
 
 INC=../include/parrot
 
-NONGEN_HEADERS = ${nongen_headers}
+NONGEN_HEADERS = ${TEMP_nongen_headers}
 
 
-O_FILES = ${pmc_o}
+O_FILES = ${TEMP_pmc_o}
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -49,7 +49,7 @@ fin:
 ../vtable.dump: ../vtable.tbl
 	$(PERL) pmc2c2.pl --vt
 
-${pmc_build}
+${TEMP_pmc_build}
 
 clean:	progclean
 	$(RM_F) *.c *.h *.dump ../vtable.dump

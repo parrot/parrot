@@ -79,10 +79,10 @@ END
   # so there would be tests needed, that check for vital classes
 
   # names of class files for classes/Makefile
-  (my $pmc_o = $pmc_list) =~ s/\.pmc/\$(O)/g;
+  (my $TEMP_pmc_o = $pmc_list) =~ s/\.pmc/\$(O)/g;
 
   # calls to pmc2c.pl for classes/Makefile
-  my $pmc_build = <<"E_NOTE";
+  my $TEMP_pmc_build = <<"E_NOTE";
 
 # the following part of the Makefile was built by 'config/inter/pmc.pl'
 
@@ -96,17 +96,17 @@ E_NOTE
       $parent = "perlhash.pmc $parent" if ($pmc eq 'orderedhash');
       my $parent_headers = '';
       $parent_headers .= "pmc_$_.h " foreach (pmc_parents($pmc));
-      $pmc_build .= "$pmc.c pmc_$pmc.h: $parent $pmc.pmc\n";
-      $pmc_build .= "\t\$(PMC2C) perlhash.pmc\n" if ($pmc eq 'orderedhash');
-      $pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
-      $pmc_build .= "\n";
-      $pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers pmc_$pmc.h\n";
+      $TEMP_pmc_build .= "$pmc.c pmc_$pmc.h: $parent $pmc.pmc\n";
+      $TEMP_pmc_build .= "\t\$(PMC2C) perlhash.pmc\n" if ($pmc eq 'orderedhash');
+      $TEMP_pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
+      $TEMP_pmc_build .= "\n";
+      $TEMP_pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers pmc_$pmc.h\n";
   }
 
   # build list of libraries for link line in Makefile
   my $slash = Configure::Data->get('slash');
-  (my $pmc_classes_o   = $pmc_o   ) =~ s/^| / classes${slash}/g;
-  (my $pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_o   = $TEMP_pmc_o   ) =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
 
   # Gather the actual names (with MixedCase) of all of the
   # non-abstract built-in PMCs.
@@ -138,10 +138,10 @@ E_NOTE
   Configure::Data->set(
     pmc             => $pmc_list,
     pmc_names       => join(" ", @names),
-    pmc_o           => $pmc_o,
-    pmc_build       => $pmc_build,
-    pmc_classes_o   => $pmc_classes_o,
-    pmc_classes_pmc => $pmc_classes_pmc,
+    TEMP_pmc_o           => $TEMP_pmc_o,
+    TEMP_pmc_build       => $TEMP_pmc_build,
+    TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,
+    TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
   );
 }
 

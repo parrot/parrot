@@ -145,7 +145,7 @@ EOF
 	close(F);
     }
     Configure::Data->set(
-	gen_pasm_includes => join("\t\\\n\t", @generated)
+	TEMP_gen_pasm_includes => join("\t\\\n\t", @generated)
     );
 }
 
