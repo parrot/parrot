@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 19;
+   plan tests => 21;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -308,7 +308,7 @@ CODE
 999999000000
 OUT
 
-output_is(<<'CODE', <<'OUT', "div");
+output_is(<<'CODE', <<'OUT', "div bigint");
      new P0, .BigInt
      set P0, "100000000000000000000"
      new P1, .BigInt
@@ -347,6 +347,56 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUT
+
+output_is(<<'CODE', <<'OUT', "div native int");
+     new P0, .BigInt
+     set P0, "100000000000000000000"
+     new P1, .BigInt
+     div P1, P0, 10
+     new P2, .BigInt
+     set P2, "10000000000000000000"
+     eq P1, P2, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     set P0, "100000000000000"
+     div P1, P0, 10000000
+     set P2, 10000000
+     eq  P1, P2, OK2
+     print "not "
+OK2: print "ok 2\n"
+     end
+CODE
+ok 1
+ok 2
+OUT
+
+output_is(<<'CODE', <<'OUT', "div other int");
+     new P0, .BigInt
+     set P0, "100000000000000000000"
+     new P1, .BigInt
+     new P3, .PerlInt
+     set P3, 10
+     div P1, P0, P3
+     new P2, .BigInt
+     set P2, "10000000000000000000"
+     eq P1, P2, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     set P0, "100000000000000"
+     new P4, .Integer
+     set P4, 10000000
+     div P1, P0, P4
+     set P2, 10000000
+     eq  P1, P2, OK2
+     print "not "
+OK2: print "ok 2\n"
+     end
+CODE
+ok 1
+ok 2
 OUT
 
 use Parrot::Config;
