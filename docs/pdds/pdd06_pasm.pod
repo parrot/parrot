@@ -495,8 +495,8 @@ These operations are responsible for finding names in lexical or
 global scopes, as well as storing data into those slots.  A static
 scope is captured by a scratchpad.  The current dynamic scope is
 represented by the state of the lexical stack (which contains
-scratchpads).  For more detail on these ops see the generated
-documentation in F<docs/ops/var.pod>.
+scratchpads).  For more detail on these ops see the inline POD
+documentation in F<ops/var.ops>.
 
 =over 4
 
