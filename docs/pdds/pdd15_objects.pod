@@ -174,7 +174,7 @@ Add interfaces
 
 =item *
 
-remove interfaces
+Remove interfaces
 
 =back
 
@@ -209,13 +209,13 @@ C<ParrotObject>. ParrotObject PMCs are the actual objects, and
 hold all the per-object instance data. ParrotClass PMCs hold all the
 class-specific information. Instantiating a new OO class creates a new
 ParrotClass PMC, and enters the new OO class into Parrot's PMC class
-table, at which point it is indistiguishable from any other PMC
+table, at which point it is indistinguishable from any other PMC
 class. (This doesn't mean that non-ParrotClass things can be
 subclassed or treated as an OO class. Neither is that forbidden. Just
 unimplemented)
 
 It's important to note that I<all> 'standard' classes are 
-ParrotClass PMC instancess, and I<all> 'standard' objects are 
+ParrotClass PMC instances, and I<all> 'standard' objects are 
 ParrotObject PMCs. We do I<not> create a brand new PMC class for each
 OO class, and they all share the ParrotClass or ParrotObject vtable,
 respectively. This distinction is mostly an artifact of the
@@ -252,7 +252,7 @@ the start of the attribute array where that class' attributes start.
 
 The class attribute name hash. Keys are the fully qualified attribute
 names (in whatever format the language governing the class wants) and
-the values are the offset from the beginnign of the attribute array of
+the values are the offset from the beginning of the attribute array of
 the particular attribute.
 
 =back
@@ -265,7 +265,7 @@ will change from child class to child class)
 
 ParrotClass PMCs also have the "I am a class" flag set on them.
 
-The ParrotObject PMC is an array of metainformation and
+The ParrotObject PMC is an array of meta-information and
 attributes. The elements of this array are:
 
 =over 4
@@ -317,7 +317,7 @@ Set the attribute Iy of object Px to Pz
 
 =item setattr Px, Sy, Pz
 
-Set the attribute of obbect Px with the fully qualified name Sy to Pz
+Set the attribute of object Px with the fully qualified name Sy to Pz
 
 =item fetchmethod Px, Py, Sz
 
