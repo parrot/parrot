@@ -26,9 +26,9 @@ get_from_free_pool(struct Parrot_Interp *interpreter,
     return (*pool->get_free_object)(interpreter, pool);
 }
 static void
-add_to_free_pool(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void* free)
+add_to_free_pool(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool, void* to_free)
 {
-    (*pool->add_free_object)(interpreter, pool, free);
+    (*pool->add_free_object)(interpreter, pool, to_free);
 }
 
 /** Header Management Functions **/
