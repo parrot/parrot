@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 32;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
@@ -900,6 +900,52 @@ output_is(<<CODE, <<OUTPUT, "mul_n_n");
     end
 CODE
 12.000000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "fact_n_i");
+    set I0, 3
+    set I1, 11
+    set I2, 0
+    set I3, -563
+    fact N5, I0
+    print N5
+    print "\\n"
+    fact N6, I1
+    print N6
+    print "\\n"
+    fact N7, I2
+    print N7
+    print "\\n"
+    fact N8, I3
+    print N8
+    print "\\n"
+    end
+CODE
+6.000000
+39916800.000000
+1.000000
+1.000000
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "fact_n_ic");
+    fact N5, 3
+    print N5
+    print "\\n"
+    fact N6, 11
+    print N6
+    print "\\n"
+    fact N7, 0
+    print N7
+    print "\\n"
+    fact N8, -563
+    print N8
+    print "\\n"
+    end
+CODE
+6.000000
+39916800.000000
+1.000000
+1.000000
 OUTPUT
 
 1;

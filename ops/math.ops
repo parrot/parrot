@@ -122,8 +122,9 @@ Factorial, n!. Calculates the product of 1 to N.
 =cut
 
 inline op fact(out INT, in INT) {
-
-UINTVAL i = $2;
+/* Coercing a negative to a UINT can get pretty ugly
+ * in this situation. */
+INTVAL i = $2;
 UINTVAL q = 1;
   while(i>0) {
     q = q*i;
@@ -134,8 +135,9 @@ UINTVAL q = 1;
 }
 
 inline op fact(out NUM, in INT) {
-
-UINTVAL i = $2;
+/* Coercing a negative to a UINT can get pretty ugly
+ * in this situation. */
+INTVAL i = $2;
 UINTVAL q = 1;
   while(i>0) {
     q = q*i;
