@@ -120,7 +120,7 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
     m = string_to_cstring(interpreter, message);
     if (m && *m) {
         fputs(m, stderr);
-        if (m[strlen(m-1)] != '\n')
+        if (m[strlen(m)-1] != '\n')
             fprintf(stderr, "%c", '\n');
     }
     else
