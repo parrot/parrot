@@ -42,13 +42,10 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     void destroy () {
-fprintf(stderr,"destroy not implemented\n");
-    /* Integers need no destruction! */
     }
 
     INTVAL get_integer () {
-	/* swap vtables for PerlNum */
-        return SELF->cache.num_val = (FLOATVAL)SELF->cache.int_val;
+	return (INTVAL)SELF->cache.num_val;
     }
 
     FLOATVAL get_number () {
@@ -74,20 +71,21 @@ fprintf(stderr,"get_string not implemented\n");
     }
 
     void set_integer (PMC* value) {
-        SELF->cache.num_val = (FLOATVAL)value->vtable->get_integer(INTERP, value);
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+	SELF->cache.int_val = value->cache.int_val;
     }
 
     void set_integer_native (INTVAL value) {
-        SELF->cache.num_val = (FLOATVAL)value;
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+	SELF->cache.int_val = value;
     }
 
     void set_integer_bigint (BIGINT value) {
-        SELF->cache.struct_val = value; /* Maybe we need a copy */
-        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]); */
     }
 
     void set_integer_same (PMC * value) {
-        SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlInt]);
+	SELF->cache.int_val = value;
     }
 
     void set_number (PMC * value) {
@@ -107,23 +105,28 @@ fprintf(stderr,"set_number_bigfloat not implemented\n");
     }
 
     void set_string (PMC * value) {
-fprintf(stderr,"set_string not implemented\n");
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	SELF->cache.struct_val = value->cache.struct_val;
     }
 
     void set_string_native (STRING * value) {
-fprintf(stderr,"set_string_native not implemented\n");
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	SELF->cache.struct_val = value;
     }
 
     void set_string_unicode (STRING * value) {
-fprintf(stderr,"set_string_unicode not implemented\n");
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	SELF->cache.struct_val = value;
     }
 
     void set_string_other (STRING * value) {
-fprintf(stderr,"set_string_other not implemented\n");
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	SELF->cache.struct_val = value;
     }
 
     void set_string_same (PMC * value) {
-fprintf(stderr,"set_string_same not implemented\n");
+	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
+	SELF->cache.struct_val = value->cache.struct_val;
     }
 
     void set_value (void* value) {
@@ -131,9 +134,22 @@ fprintf(stderr,"set_value not implemented\n");
     }
 
     void add (PMC * value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->cache.num_val + value->vtable->get_number(INTERP, value)
-        );
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+                SELF->cache.num_val +
+		value->vtable->get_number(INTERP, value)
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val +
+                value->vtable->get_number(INTERP, value)
+            );
+	}
+	else {
+	}
     }
 
     void add_int (INTVAL value, PMC* dest) {
@@ -157,9 +173,22 @@ fprintf(stderr,"add_bigfloat not implemented\n");
     }
 
     void subtract (PMC * value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->cache.num_val - value->vtable->get_number(INTERP, value)
-        );
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val -
+		value->vtable->get_number(INTERP, value)
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val -
+                value->vtable->get_number(INTERP, value)
+            );
+	}
+	else {
+	}
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
@@ -185,9 +214,22 @@ fprintf(stderr,"subtract_bigfloat not implemented\n");
     }
 
     void multiply (PMC * value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->cache.num_val * value->vtable->get_number(INTERP, value)
-        );
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val *
+		value->vtable->get_number(INTERP, value)
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val *
+                value->vtable->get_number(INTERP, value)
+            );
+	}
+	else {
+	}
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
@@ -213,9 +255,22 @@ fprintf(stderr,"multiply_bigfloat not implemented\n");
     }
 
     void divide (PMC * value, PMC* dest) {
-        dest->vtable->set_number_native(INTERP, dest, 
-            SELF->cache.num_val / value->vtable->get_number(INTERP, value)
-        );
+	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val /
+		value->vtable->get_number(INTERP, value)
+            );
+	}
+	else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, 
+		SELF->cache.num_val /
+                value->vtable->get_number(INTERP, value)
+            );
+	}
+	else {
+	}
     }
 
     void divide_int (INTVAL value, PMC* dest) {
