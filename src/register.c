@@ -18,37 +18,6 @@ is actually only I<half> the register set. The opcode calls the the
 C<Parrot_push_{i,n,s,p}()> function twice, once for each half of the
 set.
 
-=head2 C Implementation
-
-TODO update pod
-
-As the registers and register frame stacks for the various types share
-essentially the same structure we'll take as our example the integer
-registers and their register frame stack.
-
-Each instance of C<Parrot_Interp> contains an C<IReg> which in turn
-contains an array of 32 (i.e. C<NUM_REGISTER>) C<INTVAL>s. This array is
-the integer register set.
-
-The register frame stacks are contained within the interpreter's
-C<Parrot_Context>. This context contains a pointer to an C<IRegChunk>
-which is the top of the integer register frame stack. The C<IRegChunk>
-contains an array of 16 (i.e. C<FRAMES_PER_CHUNK>) C<IRegFrame>s, with
-each C<IRegFrame> containing an array of 16 (i.e. C<NUM_REGISTER / 2>)
-C<INTVAL>s.
-
-The top frame is always C<used - 1>. When C<used> indicates that a new
-C<IRegChunk> should be created, it is allocated with
-C<Parrot_allocate> and the C<int_reg_top>, C<prev>, C<next>
-pointers set accordingly. Popping register frames from the stack
-decrements C<used>. Chunks are freed by te GC subsystem.
-
-Note that C<int_reg_top>'s C<next> is always empty - it I<is> the top of
-the stack.
-
-In the cases of C<STRING> and C<PMC> the C<registers> arrays contain
-pointers.
-
 =head2 Functions
 
 Note that the API header for this file is F<include/parrot/regfuncs.h>
@@ -92,6 +61,11 @@ setup_register_stacks(Parrot_Interp interpreter, struct Parrot_Context *ctx)
 
 
 /*
+
+=item C<void
+mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
+
+Marks the INT or NUM register stack as live.
 
 =item C<void
 mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* stack)>
@@ -242,7 +216,8 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 
 =head1 SEE ALSO
 
-F<include/parrot/register.h> and F<include/parrot/regfuncs.h>.
+F<include/parrot/register.h>, F<include/parrot/regfuncs.h>, and
+F<src/stack_common.c>
 
 =cut
 

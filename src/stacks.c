@@ -8,31 +8,8 @@ src/stacks.c - Stack handling routines for Parrot
 
 =head1 DESCRIPTION
 
-TODO update pod
-
-The stack is stored as a doubly-linked list of chunks (C<Stack_Chunk>),
-where each chunk has room for C<STACK_CHUNK_DEPTH> entries. The
-invariant maintained is that there is always room for another entry; if
-a chunk is filled, a new chunk is added onto the list before returning.
-
-Each chunk contains a C<Buffer> which contains, via C<obj.u>, a void
-pointer C<bufstart> to the start of the actual memory.
-
-We use "tree-stacks" and COW (copy-on-write) semantics in order to make
-continuations easy. A stack chunk is a bufferlike structure and may be
-GCed or COWed. As top chunks are COWed on usage, its only safe to walk
-the stack from top down via the prev pointers.
-C<< stack_chunk->prev->next >> may not equal C<stack_chunk> if C<prev> is
-COWed and not copied yet.
-
-COWed chunks are NOT magically copied, so any attempts to write should
-take care that the chunk may be shared. "Write" in this case is not only
-limited to pushing an item on. ANY change to the stack state, including
-a pop, is a "write". Think "write" in terms of changing any execution
-context, not values.
-
-Note, however, that API calls C<stack_push>, C<stack_pop> and
-C<rotate_entries> will take care of COW semantics themselves.
+The stack is stored as a linked list of chunks (C<Stack_Chunk>),
+where each chunk has room for one entry.
 
 =head2 Functions
 
@@ -71,7 +48,7 @@ new_stack(Interp *interpreter, const char *name)
 mark_stack(struct Parrot_Interp *interpreter,
            Stack_Chunk_t *chunk)>
 
-Mark entries in a stack structure during GC.
+Mark entries in a stack structure during DOD.
 
 =cut
 
@@ -447,7 +424,8 @@ get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
 
 =head1 SEE ALSO
 
-F<include/parrot/stacks.h> and F<include/parrot/enums.h>.
+F<include/parrot/stacks.h>, F<include/parrot/enums.h>, and
+F<src/stack_common.c>
 
 =cut
 

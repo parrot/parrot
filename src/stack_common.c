@@ -17,12 +17,6 @@ These stacks all differ only in the size of items.
 
 =over 4
 
-=item C<Stack_Chunk_t *
-cst_new_stack(Interp *interpreter, const char *name, size_t item_size)>
-
-Create a new stack and name it. C<< stack->name >> is used for
-debugging/error reporting.
-
 =cut
 
 */
@@ -52,6 +46,16 @@ typedef struct {
 typedef struct {
     Stack_cache_entry stack_cache[MAX_CACHED_STACKS];
 } Stack_cache;
+
+/*
+
+=item C<void stack_system_init(Interp *interpreter)>
+
+Initialize the stack subsystem
+
+=cut
+
+*/
 
 void
 stack_system_init(Interp *interpreter)
@@ -84,6 +88,15 @@ get_size_class(Parrot_Interp interpreter, size_t item_size)
     return i;
 }
 
+/*
+
+=item C<void mark_stack_chunk_cache(Interp *interpreter)>
+
+Mark items in the chunk cache live during DOD.
+
+=cut
+
+*/
 void
 mark_stack_chunk_cache(Parrot_Interp interpreter)
 {
@@ -100,11 +113,18 @@ mark_stack_chunk_cache(Parrot_Interp interpreter)
             pobject_lives(interpreter, (PObj*) chunk);
     }
 }
+
 /*
- * s. also STACK_DATAP and mark routines in stacks.c and registers.c
- *
- * Create a header pool with the payload size attached
- */
+
+=item C<Stack_Chunk_t *
+register_new_stack(Interp *interpreter, const char *name, size_t item_size)>
+
+Create a new stack and name it. C<< stack->name >> is used for
+debugging/error reporting.
+
+=cut
+
+*/
 
 Stack_Chunk_t *
 register_new_stack(Interp *interpreter, const char *name, size_t item_size)
@@ -120,6 +140,17 @@ register_new_stack(Interp *interpreter, const char *name, size_t item_size)
     chunk->size_class = s;
     return chunk;
 }
+
+/*
+
+=item C<Stack_Chunk_t *
+cst_new_stack_chunk(Interp *interpreter, Stack_Chunk_t *)>
+
+Get a new chunk either from the freelist or allocate one.
+
+=cut
+
+*/
 
 Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
