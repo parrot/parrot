@@ -1392,7 +1392,7 @@ ok 4
 /
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 ##PIR##
 .sub _main
     .local pmc pmc1

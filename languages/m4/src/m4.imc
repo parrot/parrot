@@ -109,7 +109,7 @@ NO_HELP_FLAG:
   state['nesting_limit']   = 250
   state['expansion_level'] = 0
 
-  # A flag that tells wether builtin macros should be prefixed with 'm4_'
+  # A flag that tells whether builtin macros should be prefixed with 'm4_'
   state['prefix_all_builtins'] = 0
 
   # Was '--nesting-limit' passed ?
@@ -239,13 +239,13 @@ NO_UNIMPLEMENTED_OPTION:
     end
 ARGC_IS_OK:
 
-  # We need the builtin_tab, wether '--reload_state' was passed or not
+  # We need the builtin_tab, whether '--reload_state' was passed or not
   .local pmc builtin_tab
   builtin_tab = new OrderedHash
   state['builtin_tab'] = builtin_tab    
   builtin_tab_init( state )
 
-  # Check wether the option --reload-state was passed
+  # Check whether the option --reload-state was passed
   .local string frozen_file
   frozen_file = opt['reload-state']
   .local int string_len

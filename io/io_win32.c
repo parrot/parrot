@@ -166,7 +166,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
     }
 #if PARROT_NET_DEVEL
 		/* Start Winsock
- 		 * no idea where or wether destroy it
+ 		 * no idea where or whether destroy it
  		 */
     ret = WSAStartup (2, &sockinfo);
     if (ret!=0){

@@ -84,7 +84,7 @@ A PerlHash is returned.
   OPTION_TYPE_IS_NOW_KNOWN:
     type[opt_name] = opt_type
     inc curr_spec
-  CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
+  CHECK_PARSE_SPEC:                    # check whether loop over 'spec' is complete
   if curr_spec < max_spec goto NEXT_PARSE_SPEC
 
   # uncomment this if you want debug output
@@ -100,9 +100,9 @@ A PerlHash is returned.
   opt = new PerlHash
   .local string arg                 # element of argument array
   .local string value               # element of argument array
-  .local int    num_remaining_args  # for checking wether loop is complete
+  .local int    num_remaining_args  # for checking whether loop is complete
   .local int    arg_index           # holds result if 'index' op
-  .local int    is_known_option     # flag wether the option is known
+  .local int    is_known_option     # flag whether the option is known
   goto CHECK_PARSE_ARGV
   NEXT_PARSE_ARGV:
     # first we take a peek at the first remaining element

@@ -17,7 +17,7 @@ DEBUG_INITIALIZE:
         ret
 
 
-# Check wether we should stop the interpreter at the current
+# Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
 DEBUG_CHECK_BREAKPOINT:
         pushi

@@ -614,7 +614,7 @@ Frontend for printf like formatting.
 
 =head2 m4_ifdef
 
-A conditional. Check wether a macro is defined.
+A conditional. Check whether a macro is defined.
 
 =cut
 

@@ -88,7 +88,7 @@ Creates and returns a clone of the library.
 
 =item C<INTVAL get_bool()>
 
-Returns wether a library has been successfully loaded.
+Returns whether a library has been successfully loaded.
 
 =cut
 
@@ -102,7 +102,7 @@ Returns wether a library has been successfully loaded.
 
 =item C<STRING* get_string()>
 
-Returns wether a library has been successfully loaded.
+Returns whether a library has been successfully loaded.
 
 =cut
 
