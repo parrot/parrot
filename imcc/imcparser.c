@@ -1812,7 +1812,7 @@ yyreduce:
 
   case 3:
 #line 460 "imcc.y"
-    { close_comp_unit(); yyval.i = 0; }
+    { close_comp_unit(interp); yyval.i = 0; }
     break;
 
   case 7:
