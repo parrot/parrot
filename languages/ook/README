@@ -1,6 +1,6 @@
 DESCRIPTION
 -----------
-This is an Ook! compiler written in Parrot assembly, version 0.0.1
+This is an Ook! compiler written in Parrot assembly, version 0.1.0
 
 This is a compiler and not an interpreter. This means that the code
 is read, then compiled into Parrot assembly (yes, the target language
@@ -15,9 +15,7 @@ world program):
 
 Then you can compile your Ook! program with: 
 
-     $ ../../parrot ook.pbc > foo.pasm
-     $ ../../parrot -o foo.pbc foo.pasm
-     $ ../../parrot foo.pbc
+     $ ../../parrot ook.pbc program.ook
 
 
 FILES
@@ -30,7 +28,6 @@ The files are the following:
 TODO
 ----
 * implement the "Ook. Ook!" instruction
-* get rid of temp file (Parrot needs an eval thingy)
 
 
 AUTHOR
