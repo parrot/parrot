@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -453,4 +453,115 @@ output_like(<<'CODE', <<'OUTPUT', "object attribs 3");
     end
 CODE
 /No such attribute/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "object attribs 4");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+    addattrib I1, P1, "j"
+
+    find_type I0, "Foo"
+    new P2, I0
+    new P3, I0
+
+    # the preferred method of accessing attribs is by index
+    set P2[0], 10
+    set P3[0], 20
+    set P2[1], 30
+    set P3[1], 40
+    set I4, P2[1]
+    set I5, P3[1]
+    set I2, P2[0]
+    set I3, P3[0]
+    print I2
+    print "\n"
+    print I3
+    print "\n"
+    print I4
+    print "\n"
+    print I5
+    print "\n"
+    set I6, P3["Foo\x00j"]
+    eq I5, I6, ok
+    print "not "
+ok: print "ok\n"
+    end
+CODE
+10
+20
+30
+40
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "class attribs - same name");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+    addattrib I1, P1, "j"
+    subclass P2, P1, "Bar"
+    addattrib I1, P2, "i"
+    addattrib I1, P2, "j"
+    set I0, P2
+    print I0
+    print "\n"
+    set I0, P2["Foo\x0i"]
+    print I0
+    print "\n"
+    set I0, P2["Bar\x0i"]
+    print I0
+    print "\n"
+    end
+CODE
+4
+0
+2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "object attribs 5");
+    newclass P1, "Foo"
+    addattrib I1, P1, "i"
+    addattrib I1, P1, "j"
+    subclass P2, P1, "Bar"
+    addattrib I1, P2, "k"
+    addattrib I1, P2, "l"
+
+    find_type I0, "Bar"
+    new P2, I0
+    new P3, I0
+
+    set P2[0], 10
+    set P2[1], 20
+    set P2[2], 30
+    set P2[3], 40
+    set P3[0], 110
+    set P3[1], 120
+    set P3[2], 130
+    set P3[3], 140
+
+    set I0, 0
+lp1:
+    set I4, P2[I0]
+    print I4
+    print "\n"
+    inc I0
+    lt I0, 4, lp1
+
+    set I0, 0
+lp2:
+    set I4, P3[I0]
+    print I4
+    print "\n"
+    inc I0
+    lt I0, 4, lp2
+
+    end
+CODE
+10
+20
+30
+40
+110
+120
+130
+140
 OUTPUT
