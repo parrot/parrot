@@ -590,6 +590,7 @@ inline op exit(in INT) {
   do_exception(EXCEPT_exit, $1);
   restart NEXT();
 }
+
 =back
 
 =cut
@@ -985,6 +986,8 @@ stick them into an Array PMC in $1.
 B<NOTE!> IMCC and PDD03 aren't yet in conformance. This uses the current
 IMCC setup, but should be changed as soon as IMCC modified to the correct
 calling conventions.
+
+=back
 
 =cut
 
