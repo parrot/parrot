@@ -589,7 +589,7 @@ global scopes, as well as storing data into those slots.  A static
 scope is captured by a scratchpad.  The current dynamic scope is
 represented by the state of the lexical stack (which contains
 scratchpads).  For more detail on these ops see the generated
-documentation in docs/core_ops.pod.
+documentation in F<docs/core_ops.pod>.
 
 =over 4
 
@@ -787,7 +787,7 @@ Write string Y to filehandle X, waiting for the write to complete.
 
 =item seek px, ty
 
-Seek filehndle X to position Y.
+Seek filehandle X to position Y.
 
 =item tell tx, py
 
@@ -1116,7 +1116,7 @@ So the signature for, for example, this SDL routine:
    int SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
 
 would be C<ipppp>, since it returns an integer and takes four
-pointers. Presumably prevous calls would have set those pointers up
+pointers. Presumably previous calls would have set those pointers up
 properly.
 
 Do note that parrot makes no guarantees as to the behaviour of the
