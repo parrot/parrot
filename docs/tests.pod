@@ -23,8 +23,9 @@ This sets up the test harness used to assemble and run the tests,
 and lets it know how many tests you plan to run. New tests should be
 added by:
 
-  incrementing the number of planned tests.
-  putting some code in like this:
+ 1. Incrementing the number of planned tests.
+
+ 2. Putting some code in like this:
 
 	output_is(<<'CODE', <<'OUTPUT', "name for test");
 		*** a big chunk of assembler, eg:
@@ -36,26 +37,27 @@ added by:
 	1
 	OUTPUT
 
-=head2 What a test should do
+=head2 Ideal tests:
 
 =over 4
 
 =item o
 
 Probe the boundaries (including edge cases, errors thrown etc.) of
-whatever code they've just written.  These should include potentially
+whatever code they're testing.  These should include potentially
 out of band input unless we decide that compilers should check for this
 themselves.
 
 =item o
 
-Are small and self contained, so that if their new feature breaks we
+Are small and self contained, so that if the tested feature breaks we
 can identify where and why quickly.
 
 =item o
 
-Are valid, essentially that they conform to the additonal documentation
-that accompanies the feature.  You did write that as well, didn't you?
+Are valid. Essentially, they should conform to the additional documentation
+that accompanies the feature (if any). [If there isn't any documentation, 
+then feel free to add some and/or complain to the mailing list].  
 
 =item o
 
