@@ -475,17 +475,31 @@ These opcodes deal with registers and stacks
 
 =item pushp
 
-Copy the current frame of PMC registers onto their stack and start a
-new frame. The old frame is preserved.
+Push the current set of PMC registers onto the register frame stack, and
+start a new set (which will all initially be NULL). Register frames hold
+only 16 registers, so we need to push two frames onto the stack. The 
+first frame holds the contents of registers 0-15; the second holds the 
+contents of registers 16-31.
 
 =item popp
 
-Pop the current frame of PMC registers off the stack.
+Restore all of the PMC registers from the most recently C<push>ed PMC 
+register frames. Since the register frames hold only 16 registers, we
+pop two frames. We use the first frame to restore registers 16-31, and 
+the second frame to restore registers 0-15. Hence, C<pushp> followed by
+C<popp> restores all of the PMC registers to their original state. 
 
-=item halfpopp
+=item poptopp
 
-Pop the current frame of PMC registers off their stack, restoring
-registers 16-31
+Pop a single PMC register frame off the PMC register frame stack and
+use it to restore the values of registers 16-31. Registers 0-15 retain
+their old values.
+
+=item popbottomp
+
+Pop a single PMC register frame off the PMC register frame stack and
+use it to restore the values of registers 0-15. Registers 16-31 retain
+their old values.
 
 =item pushi
 
@@ -495,9 +509,13 @@ The same as L<pushp>, for the integer register set.
 
 The same as L<popp>, for the integer register set.
 
-=item halfpopi
+=item poptopi
 
-The same as L<halfpopp>, for the integer register set.
+The same as L<poptopp>, for the integer register set.
+
+=item popbottomi
+
+The same as L<popbottomp>, for the integer register set.
 
 =item pushs
 
@@ -507,9 +525,13 @@ The same as L<pushp>, for the string register set.
 
 The same as L<popp>, for the string register set.
 
-=item halfpops
+=item poptops
 
-The same as L<halfpopp>, for the string register set.
+The same as L<poptopp>, for the string register set.
+
+=item popbottoms
+
+The same as L<popbottomp>, for the string register set.
 
 =item pushn
 
@@ -519,9 +541,13 @@ The same as L<pushp>, for the floating-point register set.
 
 The same as L<popp>, for the floating-point register set.
 
-=item halfpopn
+=item poptopn
 
-The same as L<halfpopp>, for the floating-point register set.
+The same as L<poptopp>, for the floating-point register set.
+
+=item popbottomn
+
+The same as L<popbottomp>, for the floating-point register set.
 
 =item clearp
 
@@ -539,6 +565,11 @@ Clean out the current set of S registers, setting them to NULL
 
 Clean out the current set of N registers, setting them to 0
 
+=item null tx
+
+Set register X to a null value; for S and P registers, this will be NULL,
+while for I and N registers it is 0
+
 =item save tx
 
 Push register X onto the generic stack
@@ -550,6 +581,24 @@ Restore register X from the generic stack
 =item entrytype Ix, iy
 
 Put the type of stack entry Y into integer register X
+
+=item saveall
+
+Save all of the current set of registers onto the appropriate frame 
+stacks. Equivalent to performing a separate push for each register type.
+
+=item restoreall
+
+Restore all of the registers from the appropriate frame stacks. Equivalent 
+to performing a separate pop for each register type.
+
+=item savetop
+
+As L<saveall> but only acts on registers 16-31.
+
+=item restoretop
+
+As L<restoreall> but only affects registers 16-31.
 
 =item set_warp string
 
