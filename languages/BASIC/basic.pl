@@ -10,11 +10,8 @@ $a=<<'EOF';
 
 # I5 Stack Depth?
 
-	new P20, 6     #PerlHash   # Numerics
-	new P21, 6   # Alphabetics.
-
-	set S22, "#"	    # Code
-
+	new P20, PerlHash     # PerlHash   # Numerics
+	new P21, PerlHash     # Alphabetics.
 	time I24      # Seed the random number generator
 
 	branch MAIN
@@ -50,13 +47,6 @@ MAINLOOPNR:
 	bsr REVERSESTACK
 	restore I5
 	eq I5, 0, ENDMAINLOOPNR  # No tokens!
-
-	# When the I/O GC bug gets fixed
-	# remove the next three print lines. 
-	#  They're magic.
-	#print "Got and processing "
-	#print S0
-	#print "\n"
 
 	bsr ISNUM
 	restore I1

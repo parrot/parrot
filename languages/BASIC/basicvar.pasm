@@ -1,12 +1,10 @@
 # Basic variable and code storage management
 #
 # Global Resources:
-#   S20
-#   S21
-#   S22  Numeric/String/Code variable storage formatted as:
-#         8 bytes (name).  Terminates with "#"  Line number for Code
-#	  3 bytes (width)  N=12
-#     width bytes (value)
+#   P20
+#   P21
+#   P22
+#   P23  See below.
 #
 # Subscripted variables are stored independently of each other as:
 #   varname|subscr,subscr   (the subscripts will be reversed)
@@ -16,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/22 17:54:21  clintp
+# Removed unneeded code, refactored
+#
 # Revision 1.3  2002/05/22 17:22:22  clintp
 # Uses PerlHash for speed
 #
@@ -55,318 +56,9 @@
 # Revision 1.2  2002/03/31 05:13:48  Clinton
 # Id Keywords
 #
-
 .const NTYPE 0
 .const STYPE 1
 .const CTYPE 2
-.const NAMEWIDTH 15
-.const VARWIDTH 3
-.const TERMINATOR "-"
-.const STRINGMINW 10
-
-# (internal) Find variable
-#  Inputs: variable name (or code line number)
-#          type
-# Outputs: offset, -1 if unknown
-VFIND:  pushi
-	pushs
-	restore I5
-	restore S5
-	length I0, S5
-	gt I0, NAMEWIDTH, VFINDTOOLONG
-
-	set S15, S20  # Assume Ints
-	eq I5, NTYPE, VSEARCH
-	set S15, S21  # Strings?
-	eq I5, STYPE, VSEARCH
-	set S15, S22  # Code then
-	save S5
-	bsr ATOI
-	restore I6    # Line numbers are numeric
-
-VSEARCH:
-	set I0, -1
-	set I1, 0
-
-VFINDL:
-	set S2, ""
-	substr S2, S15, I1, NAMEWIDTH
-	save S2
-	bsr STRIPSPACE
-	restore S2	       # Var name/line #
-	eq S2, S5, VFOUND     # Exact match
-	eq S2, "#", VFINDEND  # Exhausted
-	ne I5, CTYPE, VNOTFOUND
-	save S2
-	bsr ATOI
-	restore I2
-	ge I2, I6, VFOUND
-VNOTFOUND:
-	add I1, I1, NAMEWIDTH
-	set S2, ""
-	substr S2, S15, I1, VARWIDTH
-	set I2, S2
-	add I1, I1, VARWIDTH
-	add I1, I1, I2
-	branch VFINDL
-VFOUND:
-	set I0, I1
-VFINDEND:
-	save I0
-	popi
-	pops  # Read-only no S20 restore needed
-	ret
-VFINDTOOLONG:
-	print "SYMBOL NAME TOO LONG: "
-	print S5
-	print "\n"
-	end
-VFINDERR:
-	print "(internal) Cached line position exceeds length\n"
-	end
-
-# Create a variable  UNINITIALIZED
-#  Inputs: Variable name
-#          type
-#          width
-# Outputs: none
-VCREATE:
-	pushi
-	pushs
-	restore I6  # Width
-	restore I5  # Type
-	restore S0  # The variable name
-
-	set S15, S20  # Assume Ints
-	eq I5, NTYPE, VCSTART
-	set S15, S21  # Strings?
-	eq I5, STYPE, VCSTART
-	set S15, S22  # Code then
-VCSTART:
-	save "#"
-	save I5
-	bsr VFIND  # Find the end
-	restore I0
-
-	# Assemble the new
-	save S0
-	save NAMEWIDTH
-	bsr PAD
-	restore S9
-	concat S10, S9
-
-	save I6
-	bsr ITOA
-	save VARWIDTH
-	bsr PAD
-	restore S9
-	concat S10, S9
-
-	repeat S9, " ", I6
-	concat S10, S9
-
-	save S15
-	save S10
-	save I0
-	bsr STRINSERT  # New is on stack
-
-VCREND: save I5
-	popi
-	pops
-	restore I5
-	ne I5, NTYPE, VCNOTNUM
-	restore S20
-	branch VCBAIL
-VCNOTNUM:
-	ne I5, STYPE, VCNOTSTR
-	restore S21
-	branch VCBAIL
-VCNOTSTR:
-	restore S22 # Code
-VCBAIL: ret
-
-# Set variables
-# (We assume they exist already, a runtime error occurs otherwise)
-#  Inputs: Value is on the stack
-#	   Name is on the stack
-#          Width is on the stack
-# Outputs: (none)
-VSTORE:
-	pushi
-	pushs
-	restore S5  # Value (I will space pad)
-	restore I6  # width
-	restore I5  # type
-	restore S0  # Variable name
-
-	save S0
-	save I5
-	bsr VFIND
-	restore I0  # Location
-	eq I0, -1, VSTOREERR
-
-	set S15, S20  # Assume Ints
-	eq I5, NTYPE, VSSTART
-	set S15, S21  # Strings?
-	eq I5, STYPE, VSSTART
-	set S15, S22  # Code then
-VSSTART:
-	add I0, I0, NAMEWIDTH
-
-	length I2, S15
-	gt I0, I2, VSTOREERR_SNH
-
-	substr S1, S15, I0, VARWIDTH
-	set I1, S1
-	ne I1, I6, VSTOREERR2
-
-	add I0, I0, VARWIDTH
-	save S5
-	save I1
-	bsr PAD
-	restore S5
-	save S15
-	save S5
-	save I1
-	save I0
-	bsr STRREPLACE
-
-	save I5
-        popi
-	pops
-	restore I5
-	ne I5, NTYPE, VSNOTNUM
-	restore S20
-	branch VSBAIL
-VSNOTNUM:
-	ne I5, STYPE, VSNOTSTR
-	restore S21
-	branch VSBAIL
-VSNOTSTR:
-	restore S22 # Code
-VSBAIL: ret
-
-
-VSTOREERR:
-	print "NOVAR for STORE\n"
-	end
-VSTOREERR2:
-	print "WIDTH MISMATCH for STORE\n"
-	end
-VSTOREERR_SNH:
-	print "VSTORE ERROR, substring exceeds length\n"
-	print S15
-	print "\n"
-	print "Start "
-	print I0
-	print " length "
-	print VARWIDTH
-	print "\n"
-	end
-
-
-
-# Fetch variables
-#  Inputs: Name is on the stack
-#          Type is on the stack
-# Outputs: The value on the stack (AS A STRING)
-VFETCH:
-	pushi
-	pushs
-	restore I5  # type
-	restore S0  # Variable name
-
-	save S0
-	save I5
-	bsr VFIND
-	restore I0  # Location
-	eq I0, -1, VFETCHERR
-
-	set S15, S20  # Assume Ints
-	eq I5, NTYPE, VFSTART
-	set S15, S21  # Strings?
-	eq I5, STYPE, VFSTART
-	set S15, S22  # Code then
-VFSTART:
-	add I0, I0, NAMEWIDTH
-	substr S1, S15, I0, VARWIDTH
-	set I1, S1
-	add I0, I0, VARWIDTH
-	substr S1, S15, I0, I1
-	save S1
-	popi
-	pops
-	ret
-
-VFETCHERR:
-	print "NOT DEFINED on FETCH\n"
-	end
-
-# Destroy a variable
-# Should only be called by the string stuff when a variable has exceeded maximum 
-# length and needs to be killed.
-#  Inputs: Name on stack
-#          Type on stack
-# Outputs: N/A
-VDESTROY:
-	pushi
-	pushs
-
-	restore I5    # Type
-	save I5
-
-	bsr VFIND
-	restore I0
-	eq I0, -1, VDESTROYEND
-
-	set S15, S20  # Assume Ints
-	eq I5, NTYPE, VDSTART
-	set S15, S21  # Strings?
-	eq I5, STYPE, VDSTART
-	set S15, S22  # Code then
-
-VDSTART:
-	add I1, I0, NAMEWIDTH
-	substr S1, S15, I1, VARWIDTH
-	set I2, S1
-
-	add I2, I2, NAMEWIDTH
-	add I2, I2, VARWIDTH
-
-	save S15
-	save ""
-	save I2
-	save I0
-	bsr STRREPLACE
-	restore S15
-
-	save S15
-	eq I5, NTYPE, VDNUM
-	eq I5, STYPE, VDSTRING
-	eq I5, CTYPE, VDCODE
-	branch VDFATAL
-
-VDNUM:  restore S20
-	branch VDESTROYEND
-VDSTRING:
-	restore S21
-	branch VDESTROYEND
-VDCODE:
-	restore S22
-	branch VDESTROYEND
-
-VDESTROYEND:	
-	save S21
-	save S22
-	popi
-	pops
-	restore S22
-	restore S21
-	ret
-VDFATAL:
-	print "Unknown type in DESTROY"
-	end
-
 
 # All of these routines use, misuse and abuse I0, I1, S0, S1, S2
 #    Should be saved/restored okay though.
@@ -405,7 +97,6 @@ NFETCH:
 # String variable handling
 #   SSTORE
 #   SFETCH
-# Strings are \n terminated internally
 #
 # For all of these the general pattern is:
 #    push the name

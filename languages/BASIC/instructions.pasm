@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/22 17:54:21  clintp
+# Removed unneeded code, refactored
+#
 # Revision 1.3  2002/05/22 17:22:22  clintp
 # Uses PerlHash for speed
 #
@@ -92,7 +95,8 @@ I_DUMP: pushi
 	restore I0
 	bsr CLEAR
 	restore I0
-	print "DUMP (NO-OP)\n"
+	print "STACK DUMP\n"
+	bsr DUMPSTACK
 	popi
 	pops
 	ret
@@ -770,12 +774,10 @@ GO_BACK:
 
 GO_FORWARD:
 	save I5   # Put the runtime stack back (forget the FOR)
-	#save S20 # Uncomment to change the after-loop value of the index
 	save I24
 	popi
 	pops
 	restore I24
-	#restore S20
 	ret       # Go to next instruction normally
 
 

@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/22 17:54:21  clintp
+# Removed unneeded code, refactored
+#
 # Revision 1.3  2002/05/22 17:22:22  clintp
 # Uses PerlHash for speed
 #
@@ -193,9 +196,7 @@ ENDLINE:ne I22, 0, LINEERR
 	save 0  # No errors
 	branch NOERR
 LINEERR:save I22
-NOERR:  save S20
-	save S21
-	save S22
+NOERR:  
 	save I23
 	save I25
 	save I26
@@ -212,7 +213,4 @@ NOERR:  save S20
 	restore I26
 	restore I25
 	restore I23
-	restore S22
-	restore S21
-	restore S20
 	ret

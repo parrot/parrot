@@ -73,13 +73,13 @@ Additionally, the expression parser understands:
 
 BASIC NOTES
 -----------
-   Variable name width: 12
-   Multidimensional variables: Numeric--total name length w/subscripts, 12
+   Variable name width: None (I think)
+   Multidimensional variables: Alpha and Numeric
    String delimiters: ' and ", interchangeable
    Conditionals: < > = and <> (not equal)
    Math: Integer arithmetic only
    Case sensitive: All statements and keywords
-   Line numbers: Required, up to 12 digits in length
+   Line numbers: Required
    
 * GOSUB/FOR-NEXT may be nested to arbitrary depths.  Cross-nesting loops, returning
   from within a loop, or NEXT within a subroutine will cause the stack to be cleared
@@ -87,7 +87,6 @@ BASIC NOTES
 * The values in DATA statements are evaluated at RUNTIME.  Thus, it's
   entirely possible to put variables in DATA statements
 * Anywhere var is indicated, a multidimensional variable (string or array) is allowed.
-* Strings do not have to be pre-DIMensioned any longer.
 * For IF statements, 0 or empty string is false everything else is true.
 
 This was intended as a true interactive BASIC (see NOTES below) so that
@@ -129,20 +128,14 @@ The expr.pasm module contains a full expression evaluator.  It's tied to BASIC t
 few subroutines (to do variable and function resolution) but otherwise it's a general-purpose
 evaluator.  Of special note is the Infix to Postfix notation conversion function.
 
-A drastic speedup will happen in BASIC when hashes are implemented in Parrot, and is very
-easy to do.  Beware of premature micro-optimizations until then.
-
 BUGS
 ----
-Negative numeric literals in DATA statements must be quoted.  :(
+Negative numeric literals in DATA statements must be quoted.  i.e.  100 DATA 6,12,"-1",12
 
 TODO
 -----
-* Implement SAVE
-* Optimize variable lookups.  They're O(N) now.  If the interpreter seems
-  slow, THIS is why.  
-    That and it's not compiling anything ahead of time.  
-    All runtime interpretation, baby!
+* Implement SAVE and other I/O goodies
+* Compilation might be fun.  
 
 CONTACT
 -------
