@@ -15,6 +15,7 @@ _sub1:
 .end
 CODE
 /^_main:
+ set P16, P1
  new P16, \d+ # \.Sub
  set_addr I16, _sub1
  set P16, I16
@@ -37,6 +38,7 @@ output_like(<<'CODE', <<'OUT', "nonlocal bsr");
 .end
 CODE
 /^_main:
+ set P16, P1
  new P16, \d+ # \.Sub
  set_addr I16, _f
  set P16, I16

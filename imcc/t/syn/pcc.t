@@ -129,7 +129,7 @@ output_is(<<'CODE', <<'OUT', "tail recursive sub");
    if count <= 1 goto fin
    product = product * count
    dec count
-   invoke
+   product = _fact(product, count)
 fin:
    .pcc_begin_return
     .return product
