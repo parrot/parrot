@@ -158,8 +158,13 @@ main(int argc, char **argv) {
     }
     /* Otherwise load in the program they gave and try that, or - */
     else {
-        opcode_t *program_code;        
+        opcode_t *program_code;
+#ifdef __LCC__
+        /* work around for a code generation bug in our lcc test environment */
+        int program_size;
+#else       
         size_t program_size;
+#endif       
         struct stat file_stat;
         int fd;
         struct PackFile * pf;
