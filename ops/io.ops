@@ -237,6 +237,11 @@ op print(in INT, in PMC) {
   goto NEXT();
 }
 
+op flush(in INT) {
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
+  PIO_flush(interpreter, io);
+  goto NEXT();
+}
 
 ##########################################
 
