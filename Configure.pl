@@ -92,6 +92,7 @@ my(%c)=(
 	strlow =>	'(~0xfff)',
 	pmclow =>	'(~0xfff)',
 	make=>          $Config{make},
+	make_set_make=>          $Config{make_set_make},
 	
 	platform =>	$^O,
 	cp =>		'cp',
