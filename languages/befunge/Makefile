@@ -1,4 +1,4 @@
-ASSEMBLE=perl5.8.0 ../../assemble.pl
+ASSEMBLE=perl ../../assemble.pl
 PARROT=../../parrot
 
 test: build
