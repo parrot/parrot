@@ -44,42 +44,46 @@ nci.pmc			29
 # scalars
 
 # abstract scalar.pmc		29
+
+# base types
 float.pmc		30
 integer.pmc		31
+bigint.pmc              32
+complex.pmc             33
+string.pmc		34
 
 # abstract perlscalar.pmc
-perlint.pmc		32
-perlnum.pmc		33
-perlstring.pmc		34
-perlundef.pmc		35
-boolean.pmc		36
-bigint.pmc              37
+perlint.pmc		35
+perlnum.pmc		36
+perlstring.pmc		37
+perlundef.pmc		38
+boolean.pmc		39
 
-ref.pmc			38
-sharedref.pmc		39
+ref.pmc			40
+sharedref.pmc		41
 
 # arrays
 
-array.pmc		40
-floatvalarray.pmc	41
-intlist.pmc		42
-iterator.pmc		43
-perlarray.pmc		44
-pmcarray.pmc		45
-sarray.pmc		46
-constsarray.pmc 	47
-stringarray.pmc		48
-multiarray.pmc		49
+array.pmc		42
+floatvalarray.pmc	43
+intlist.pmc		44
+iterator.pmc		45
+perlarray.pmc		46
+pmcarray.pmc		47
+sarray.pmc		48
+constsarray.pmc 	49
+stringarray.pmc		50
+multiarray.pmc		51
 
 
 # hashes
-perlhash.pmc		50
-orderedhash.pmc		51
+perlhash.pmc		52
+orderedhash.pmc		53
 
 # other
 
-tqueue.pmc		52
+tqueue.pmc		54
 
-parrotclass.pmc		53
-parrotobject.pmc	54
+parrotclass.pmc		55
+parrotobject.pmc	56
 

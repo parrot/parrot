@@ -96,7 +96,11 @@ dump_mmd(Interp *interpreter, INTVAL function)
 }
 #endif
 
-static funcptr_t
+funcptr_t
+get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
+        UINTVAL right_type, INTVAL function, int *is_pmc);
+
+funcptr_t
 get_mmd_dispatch_type(Interp *interpreter, UINTVAL left_type,
         UINTVAL right_type, INTVAL function, int *is_pmc)
 {

@@ -21,7 +21,7 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 13;
+   plan tests => 14;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
@@ -261,7 +261,37 @@ if ($PConfig{intvalsize} == 8) {
 } else {
     die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
 }
-output_is(<<CODE, <<OUT, "add overflow");
+
+output_is(<<CODE, <<OUT, "add overflow Integer");
+   new P0, .Integer
+   set P0, $a
+   new P1, .Integer
+   set P1, $b
+   new P2, .Integer
+   new P3, .BigInt
+   set I3, 3
+lp:
+   add P2, P0, P1
+   set S0, P2
+   print S0
+   print " "
+   typeof S1, P2
+   print S1
+   print "\\n"
+   add P1, $b
+   dec I3
+   if I3, lp
+   print "ok\\n"
+ex:
+   end
+CODE
+$c Integer
+$d BigInt
+$e BigInt
+ok
+OUT
+
+output_is(<<CODE, <<OUT, "add overflow PerlInt");
    new P0, .PerlInt
    set P0, $a
    new P1, .PerlInt
