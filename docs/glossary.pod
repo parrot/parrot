@@ -24,10 +24,10 @@ the language permits) and resume later. We can implement things like
 "factories" with co-routines. If the co-routine never returns, every
 time we call it we "resume" the routine.
 
-Think of continuations as an execution "context". This context incudes
+Think of continuations as an execution "context". This context includes
 everything local to that execution path, not just stack. It is a
 snapshot in time (minus global variables). While it is similar to C's
-setjmp/lonjmp, longjmp'ing only works "down" the stack. Jumping "up"
+setjmp/longjmp, longjmp'ing only works "down" the stack. Jumping "up"
 the stack (ie back to a frame that has returned) is bad. Continuations
 work either way. We can do 2 important things with continuations:
 
@@ -37,7 +37,7 @@ work either way. We can do 2 important things with continuations:
 
 Create and pass a continuation object to a subroutine, which may
 recursively pass that object up the call chain until, at some point,
-the continuation can be called/executed/taken to handle the final
+the continuation can be called/executed to handle the final
 computation or return value. This is pretty much tail recursion.
 
 =item 2
