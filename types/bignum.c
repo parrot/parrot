@@ -2323,6 +2323,8 @@ BN_imultiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 
 Multiplication without the rounding and other set up.
 
+=cut
+
 */
 
 int
@@ -2815,8 +2817,16 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     BN_arith_cleanup(PINT_ result, one, two, context, NULL);
 }
 
-/* Does the heavy work for the various division wossnames */
-int
+/* 
+
+=item C<BN_idivide(PINT_ BIGNUM *result, BIGNUM *one, BIGNUM *two,
+            BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM *rem)>
+
+Does the heavy work for the various division wossnames.
+
+=cut
+
+*/int
 BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_CONTEXT *context, BN_DIV_ENUM operation, BIGNUM* rem){
     INTVAL i, j, divided, newexpn;

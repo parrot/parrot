@@ -116,7 +116,7 @@ stack_unmake_COW(Parrot_Interp interpreter, Stack_Chunk_t *stack)
 /*
 
 =item C<void*
-stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
+stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)>
 
 Return a pointer, where new entries go for push. UnCOW if necessary
 
@@ -170,7 +170,7 @@ stack_prepare_push(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 /*
 
 =item C<void*
-stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
+stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)>
 
 Return a pointer, where new entries are poped off. UnCOW if necessary.
 
