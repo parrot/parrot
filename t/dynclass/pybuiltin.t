@@ -16,7 +16,7 @@ Tests the Python Builtins.
 
 =cut
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<< 'CODE', << 'OUTPUT', "delegating");
 ##PIR##
@@ -125,4 +125,24 @@ CODE
 [3, 1]
 [0, 1, 2]
 [0, 1]
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "boolean");
+##PIR##
+.sub main @MAIN
+    new_pad 0
+    loadlib $P0, "python_group"
+    find_global P0, "PyBuiltin", "__load__"
+    invoke
+
+    find_lex $P1, "False"
+    find_lex $P2, "True"
+
+    print $P1
+    print " "
+    print $P2
+    print "\n"
+.end
+CODE
+False True
 OUTPUT
