@@ -18,7 +18,7 @@ Parrot's library of object ops
 
 =cut
 
-=item B<callmeth>()
+=item B<callmethod>()
 
 Call a method on an object as per Parrot's calling conventions. We assume
 that all the registers are properly set up.
@@ -27,7 +27,7 @@ All calls assume P2 = object, S0 = method.
 
 =cut
 
-=item B<callmethcc>
+=item B<callmethodcc>
 
 Take the continuation for the next instruction, put it in P1, then call the
 method as per the calling conventions.
@@ -41,7 +41,7 @@ conventions.
 
 =cut
 
-op callmeth() {
+op callmethod() {
   PMC *method_pmc;
   opcode_t *dest;
   opcode_t *next = expr NEXT();
@@ -55,7 +55,7 @@ op callmeth() {
   goto ADDRESS(dest);
 }
 
-op callmethcc() {
+op callmethodcc() {
   opcode_t *dest;
   PMC *method_pmc;
   opcode_t *next = expr NEXT();
@@ -249,29 +249,44 @@ inline op classname(out STR, in PMC) {
 
 Add class $2 to the list of parent classes for $1.
 
+=cut
+
+inline op addparent(in PMC, in PMC) {
+    Parrot_add_parent(interpreter, $1, $2);
+    goto NEXT();
+}
+
 =item B<removeparent>(in PMC, in PMC)
 
 Remove class $2 from class $1's list of parents.
 
-=item B<addattrib>(out INT, in PMC, in STR)
+=cut
 
-Add the attribute named $3 to the class $2. $1 is filled in with the
-offset of the new attribute.
+inline op removeparent(in PMC, in PMC) {
+    Parrot_remove_parent(interpreter, $2, $1);
+    goto NEXT();
+}
 
-=item B<removeattrib>(in PMC, in STR)
+=item B<addattribute>(in PMC, in STR, in STR)
 
-=item B<removeattrib>(in PMC, in INT)
+Add the attribute named $2 to the class $1. $3 is the fully-qualified
+attribute name.
+
+=cut
+
+inline op addattribute(in PMC, in STR, in STR) {
+    Parrot_add_attribute(interpreter, $1, $2, $3);
+    goto NEXT();
+}
+
+=item B<removeattribute>(in PMC, in STR)
+
+=item B<removeattribute>(in PMC, in INT)
 
 Remove attribute $2 from class $1, specified either by name or offset.
 
 =cut
 
-op addattrib(out INT, in PMC, in STR) {
-    if (!PObj_is_class_TEST($2))
-        internal_exception(1, "PMC is not a class");
-    $1 = Parrot_add_attribute(interpreter, $2, $3);
-    goto NEXT();
-}
 
 =item B<adddoes>(in PMC, in STR)
 

@@ -301,21 +301,21 @@ to go.
 
 Returns the offset of the first attribute for class Sz in object Py.
 
-=item getattr Px, Py, Iz
+=item getattribute Px, Py, Iz
 
 Returns attribute Iz of object Py and puts it in Px. Note that the
 attribute number is an absolute offset.
 
-=item getattr Px, Py, Sz
+=item getattribute Px, Py, Sz
 
 Get the attribute with the fully qualified name Sz from object Py and
 put it in Px.
 
-=item setattr Px, Iy, Pz
+=item setattribute Px, Iy, Pz
 
 Set the attribute Iy of object Px to Pz
 
-=item setattr Px, Sy, Pz
+=item setattribute Px, Sy, Pz
 
 Set the attribute of object Px with the fully qualified name Sy to Pz
 
@@ -326,27 +326,27 @@ the method PMC returned behaves if it goes out of scope or if the
 class hierarchy changes or the method definitions change is entirely
 up to the class that provides the PMC.
 
-=item callmeth
+=item callmethod
 
-=item callmeth Sz
+=item callmethod Sz
 
 Call a method. If the method name is provided, we find the PMC for the named
 method and put it in the sub/method slot. If no name is provided we
 assume that all the calling conventions have already been set up and
 the method PMC is already in the proper place.
 
-=item callmethcc
+=item callmethodcc
 
-=item callmethcc Sx
+=item callmethodcc Sx
 
 Make a method call, automatically generating a return continuation. If
 a method name is passed in we look up the method PMC for the object
 and put it in the method slot. If a method name isn't provided then we
 assume that things are already properly set up.
 
-=item tailcalmeth
+=item tailcalamethod
 
-=item tailcallmeth Sx
+=item tailcallmethod Sx
 
 Make a tailcall to method Sx. If no method name is given, we assume
 everything is already set up properly.
@@ -371,13 +371,13 @@ Remove class Py from the parent list of Px. All parent classes of Py
 which aren't parent classes of what remains of Px's parent list are
 removed, as are their attributes.
 
-=item addattr Px, Sy, Sz
+=item addattribute Px, Sy, Sz
 
 Add attribute Sy, with a fully-qualified name Sz, to class Px. This
 will add the attribute slot to all objects of class Px and children of
 class Px, with a default value of C<Null>.
 
-=item removeattr Px, Sy, Sz
+=item removeattribute Px, Sy, Sz
 
 Remove the attribute Sy (fully qualified name Sz) from class Px, all
 objects of class Px, and all objects of a child of class Px.

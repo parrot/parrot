@@ -747,8 +747,8 @@ fact_i_i	719
 fact_i_ic	720
 fact_n_i	721
 fact_n_ic	722
-callmeth	723
-callmethcc	724
+callmethod	723
+callmethodcc	724
 can_i_p_s	725
 can_i_p_sc	726
 does_i_p_s	727
@@ -1278,8 +1278,8 @@ get_addr_i_p    1250
 freeze_s_p	1251
 thaw_p_s	1252
 thaw_p_sc	1253
-addattrib_i_p_s	1254
-addattrib_i_p_sc	1255
+addattribuute_p_s_s	1254
+addattrib_p_sc_sc	1255
 ne_p_i_ic       1256
 ne_p_ic_ic      1257
 gt_p_i_ic       1258

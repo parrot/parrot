@@ -346,14 +346,14 @@ ok 1
 ok 2
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', 'callmeth puts');
+output_is(<<'CODE', <<'OUTPUT', 'callmethod puts');
        getstderr P2	# the object
        set S0, "puts"	# method
        set P5, P2	# first param
        set S5, "ok 1\n"	# 2nd param
-       callmeth
+       callmethod
        set S5, "ok 2\n"
-       callmeth
+       callmethod
        end
 CODE
 ok 1

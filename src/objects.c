@@ -548,10 +548,10 @@ Adds the attribute C<attr> to the class.
 */
 
 INTVAL
-Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
+Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr, STRING *full_attr_name)
 {
     PMC *class_array;
-    STRING *class_name, *full_attr_name;
+    STRING *class_name;
     INTVAL idx;
     PMC *offs_hash;
     PMC *attr_hash;
@@ -582,11 +582,6 @@ Parrot_add_attribute(Parrot_Interp interpreter, PMC* class, STRING* attr)
     }
     attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
             class_array, PCD_ATTRIBUTES);
-    full_attr_name = Parrot_sprintf_c(interpreter, "%Ss%Ss%Ss",
-            class_name,
-            string_from_cstring(interpreter, PARROT_NAMESPACE_SEPARATOR,
-                PARROT_NAMESPACE_SEPARATOR_LENGTH),
-            attr);
     /*
      * TODO check if someone is trying to add attributes to a parent class
      * while there are already child class attrs

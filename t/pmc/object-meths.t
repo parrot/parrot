@@ -19,17 +19,17 @@ Tests PMC object methods.
 use Parrot::Test tests => 4;
 use Test::More;
 
-output_like(<<'CODE', <<'OUTPUT', "callmeth - unknown");
+output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown");
     newclass P2, "Foo"
     set S0, "nada"
-    callmeth
+    callmethod
     print "nope\n"
     end
 CODE
 /Method 'nada' not found/
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "callmeth 1");
+output_is(<<'CODE', <<'OUTPUT', "callmethod 1");
     newclass P2, "Foo"
     set S0, "meth"
 
@@ -39,7 +39,7 @@ output_is(<<'CODE', <<'OUTPUT', "callmeth 1");
     store_global "Foo", "meth", P3
 
     print "main\n"
-    callmethcc
+    callmethodcc
     print "back\n"
     end
 

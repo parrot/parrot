@@ -500,7 +500,7 @@ END_C
 
 if ($suffix eq '' && !$dynamic) {
     $getop = 'get_op';
-    my $hash_size = 2011;
+    my $hash_size = 2111;
     $tot = $index + scalar keys(%names);
     if ($hash_size < $tot * 1.2) {
 	    print STDERR "please increase hash_size ($hash_size) in ops2c.pl\n";

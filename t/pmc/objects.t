@@ -298,11 +298,11 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "addattrib");
     newclass P1, "Foo"
-    addattrib I1, P1, "foo_i"
+    addattribute I1, P1, "foo_i"
     print "ok 1\n"
     print I1
     print "\n"
-    addattrib I1, P1, "foo_j"
+    addattribute I1, P1, "foo_j"
     print I1
     print "\n"
     end
@@ -312,22 +312,22 @@ ok 1
 1
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "addattrib subclass");
+output_is(<<'CODE', <<'OUTPUT', "addattribute subclass");
     newclass P1, "Foo"
-    addattrib I1, P1, "foo_i"
+    addattribute I1, P1, "foo_i"
     print "ok 1\n"
     print I1
     print "\n"
-    addattrib I1, P1, "foo_j"
+    addattribute I1, P1, "foo_j"
     print I1
     print "\n"
 
     subclass P2, P1, "Bar"
-    addattrib I1, P2, "bar_i"
+    addattribute I1, P2, "bar_i"
     print "ok 2\n"
     print I1
     print "\n"
-    addattrib I1, P2, "bar_j"
+    addattribute I1, P2, "bar_j"
     print I1
     print "\n"
     # attr count
@@ -345,15 +345,15 @@ ok 2
 4
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "addattrib subclass - get idx");
+output_is(<<'CODE', <<'OUTPUT', "addattribute subclass - get idx");
     newclass P1, "Foo"
-    addattrib I1, P1, "foo_i"
+    addattribute I1, P1, "foo_i"
     set I2, P1["Foo\x00foo_i"]
     eq I1, I2, ok1
     print "not "
 ok1:
     print "ok 1\n"
-    addattrib I1, P1, "foo_j"
+    addattribute I1, P1, "foo_j"
     set I2, P1["Foo\x00foo_j"]
     eq I1, I2, ok2
     print "not "
@@ -361,13 +361,13 @@ ok2:
     print "ok 2\n"
 
     subclass P2, P1, "Bar"
-    addattrib I1, P2, "bar_i"
+    addattribute I1, P2, "bar_i"
     set I2, P2["Bar\x00bar_i"]
     eq I1, I2, ok3
     print "not "
 ok3:
     print "ok 3\n"
-    addattrib I1, P2, "bar_j"
+    addattribute I1, P2, "bar_j"
     set I2, P2["Bar\x00bar_j"]
     eq I1, I2, ok4
     print "not "
@@ -383,8 +383,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "object attr count");
     newclass P1, "Foo"
-    addattrib I1, P1, "foo_i"
-    addattrib I1, P1, "foo_j"
+    addattribute I1, P1, "foo_i"
+    addattribute I1, P1, "foo_j"
     set I1, P1
     print I1
     print "\n"
@@ -402,8 +402,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "object attribs 1");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
-    addattrib I1, P1, "j"
+    addattribute I1, P1, "i"
+    addattribute I1, P1, "j"
 
     find_type I0, "Foo"
     new P2, I0
@@ -425,8 +425,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "object attribs 2");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
-    addattrib I1, P1, "j"
+    addattribute I1, P1, "i"
+    addattribute I1, P1, "j"
 
     find_type I0, "Foo"
     new P2, I0
@@ -459,7 +459,7 @@ OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "object attribs 3");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
+    addattribute I1, P1, "i"
 
     find_type I0, "Foo"
     new P2, I0
@@ -473,8 +473,8 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "object attribs 4");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
-    addattrib I1, P1, "j"
+    addattribute I1, P1, "i"
+    addattribute I1, P1, "j"
 
     find_type I0, "Foo"
     new P2, I0
@@ -512,11 +512,11 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "class attribs - same name");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
-    addattrib I1, P1, "j"
+    addattribute I1, P1, "i"
+    addattribute I1, P1, "j"
     subclass P2, P1, "Bar"
-    addattrib I1, P2, "i"
-    addattrib I1, P2, "j"
+    addattribute I1, P2, "i"
+    addattribute I1, P2, "j"
     set I0, P2
     print I0
     print "\n"
@@ -535,11 +535,11 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "object attribs 5");
     newclass P1, "Foo"
-    addattrib I1, P1, "i"
-    addattrib I1, P1, "j"
+    addattribute I1, P1, "i"
+    addattribute I1, P1, "j"
     subclass P2, P1, "Bar"
-    addattrib I1, P2, "k"
-    addattrib I1, P2, "l"
+    addattribute I1, P2, "k"
+    addattribute I1, P2, "l"
 
     find_type I0, "Bar"
     new P2, I0
@@ -586,9 +586,9 @@ OUTPUT
 output_is(<<'CODE',  (join '', map { "$_\n" }42..65), "attributes");
    newclass P0, "Foo"
    find_type I1, "Foo"
-   addattrib I0, P0, "b"
-   addattrib I0, P0, "l"
-   addattrib I0, P0, "a"
+   addattribute I0, P0, "b"
+   addattribute I0, P0, "l"
+   addattribute I0, P0, "a"
    new P1, I1
 
    set  P1["Foo\x00a"], 42
@@ -766,9 +766,9 @@ $output_re = qr/^$output_re$/;
 output_like(<<'CODE',  $output_re , "float attributes");
    newclass P0, "Foo"
    find_type I1, "Foo"
-   addattrib I0, P0, "b"
-   addattrib I0, P0, "l"
-   addattrib I0, P0, "a"
+   addattribute P0, "b", "Foo::b"
+   addattribute P0, "l", "Foo::l"
+   addattribute P0, "a", "Foo::a"
    new P1, I1
 
 
