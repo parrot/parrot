@@ -1,0 +1,31 @@
+/* parrotlibrary.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     Class for holding info about dynamic libraries.
+ *  Data Structure and Algorithms:
+ *     PMC_data(SELF)  ... DLL handle
+ *  History:
+ *     Initial version by leo 2003.10.12
+ *  Notes:
+ *     When a dynamic library (pmc or ops) is loaded, the
+ *     load function returns a Library PMC.
+ *  References:
+ *     Date:    Mon, 29 Sep 2003 14:37:11 -0400 (EDT)
+ *     Subject: Library loading and initialization sequence
+ *     From:    Dan Sugalski
+ */
+
+#include "parrot/parrot.h"
+
+pmclass ParrotLibrary need_ext does library const_too {
+
+    void init() {
+	 SELF->cache.struct_val = NULL;
+    }
+
+    void morph(INTVAL type) {
+	SUPER(type);
+    }
+}
