@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 49;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -983,6 +983,27 @@ output_is(<<'CODE', <<'OUTPUT', "two levels of inheritance");
 CODE
 Taurus
 OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #1");
+    newclass P0, "Astronomical Object"
+    new P1, .PerlString
+    set P1, "Not a class"
+    addparent P0, P1
+    end
+CODE
+/Parent isn't a ParrotClass/
+OUTPUT
+# '
+
+output_like(<<'CODE', <<'OUTPUT', "addparent exceptions #2");
+    new P0, .PerlHash
+    newclass P1, "Trashcan"
+    addparent P0, P1
+    end
+CODE
+/Class isn't a ParrotClass/
+OUTPUT
+# '
 
 output_is(<<'CODE', <<'OUTPUT', "class op test");
     newclass P0, "City"
