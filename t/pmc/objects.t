@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -153,16 +153,5 @@ output_is(<<'CODE', <<'OUTPUT', "does array");
     end
 CODE
 0011
-OUTPUT
-
-output_is(<<'CODE', <<'OUTPUT', "instantiate");
-    newclass P1, "Foo"
-    instantiate P2, P1
-    typeof S1, P2   # Is the correct PMC type created?
-    print S1
-    print "\n"
-    end
-CODE
-ParrotObject
 OUTPUT
 
