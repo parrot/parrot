@@ -231,7 +231,6 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *child_class_array;
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
-    PMC *vtable_pmc;
     VTABLE *new_vtable;
     INTVAL new_class_number;
 
@@ -303,15 +302,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     temp_pmc = pmc_new(interpreter, enum_class_Array);
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_CLASS_ATTRIBUTES, temp_pmc);
 
-    /* We do have a vtable, though. */
-    VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_OBJECT_VTABLE,
-            vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
-
-
-    new_class_number = Parrot_class_register(interpreter, child_class_name, child_class);
-    new_vtable = Parrot_clone_vtable(interpreter, Parrot_base_vtables[enum_class_ParrotObject]);
-    new_vtable->base_type = new_class_number;
-    PMC_struct_val(vtable_pmc) = new_vtable;
+    Parrot_class_register(interpreter, child_class_name, child_class);
 
     rebuild_attrib_stuff(interpreter, child_class);
 
@@ -334,7 +325,6 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
     PMC *class_array;
     PMC *classname_pmc;
-    PMC *vtable_pmc;
     INTVAL new_class_number;
     VTABLE *new_vtable;
 
@@ -354,8 +344,6 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
 
-    VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_OBJECT_VTABLE,
-            vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
 
 
     /* Set the classname, if we have one */
@@ -364,11 +352,8 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_CLASS_NAME,
             classname_pmc);
 
-    new_class_number = Parrot_class_register(interpreter, class_name, class);
+    Parrot_class_register(interpreter, class_name, class);
 
-    new_vtable = Parrot_clone_vtable(interpreter, Parrot_base_vtables[enum_class_ParrotObject]);
-    new_vtable->base_type = new_class_number;
-    PMC_struct_val(vtable_pmc) = new_vtable;
     rebuild_attrib_stuff(interpreter, class);
 }
 
@@ -416,6 +401,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 {
     INTVAL new_type;
     VTABLE *new_vtable;
+    PMC *vtable_pmc;
 
     /*
      * register the class in the PMCs name hash and in the
@@ -450,6 +436,17 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
     /* Put our new vtable in the global table */
     Parrot_base_vtables[new_type] = new_vtable;
+
+    /*
+     * prepare object vtable
+     */
+    new_vtable = Parrot_clone_vtable(interpreter,
+            Parrot_base_vtables[enum_class_ParrotObject]);
+    new_vtable->base_type = new_type;
+    VTABLE_set_pmc_keyed_int(interpreter, (PMC*)PMC_data(new_class),
+            PCD_OBJECT_VTABLE,
+            vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
+    PMC_struct_val(vtable_pmc) = new_vtable;
 
     return new_type;
 }

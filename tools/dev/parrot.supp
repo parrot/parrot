@@ -1,0 +1,87 @@
+# valgrind suppression file
+#
+# valgrind --suppressions=parrot.supp parrot xx.pasm
+#
+{
+   UNUSED-1
+   Memcheck:Cond
+   fun:imc_compile_all_units
+   fun:main
+   fun:__libc_start_main
+   obj:/opt/src/parrot-leo/parrot
+}
+{
+   IO_mutex
+   core:PThread
+   fun:pthread_error
+   fun:__pthread_mutex_destroy
+   fun:_IO_default_finish
+   fun:_IO_file_finish@@GLIBC_2.1
+}
+{
+   IO_mutex_2
+   core:PThread
+   fun:__pthread_mutex_unlock
+   fun:_IO_funlockfile
+   fun:_IO_fclose@@GLIBC_2.1
+   fun:main
+}
+{
+   trace_system_stack_1
+   Memcheck:Cond
+   fun:trace_mem_block
+   fun:trace_system_stack
+}
+{
+   trace_system_stack_1
+   Memcheck:Value4
+   fun:trace_mem_block
+   fun:trace_system_stack
+}
+{
+   trace_system_stack_2
+   Memcheck:Cond
+   fun:pobject_lives
+   fun:trace_mem_block
+}
+{
+   trace_system_stack_3
+   Memcheck:Value4
+   fun:pobject_lives
+   fun:trace_mem_block
+}
+{
+   trace_system_stack_4
+   Memcheck:Value4
+   fun:mark_special
+   fun:pobject_lives
+   fun:trace_mem_block
+}
+{
+   contained_1
+   Memcheck:Cond
+   fun:contained_in_pool
+   fun:is_buffer_ptr
+   fun:trace_mem_block
+}
+{
+   contained_2
+   Memcheck:Cond
+   fun:contained_in_pool
+   fun:is_pmc_ptr
+   fun:trace_mem_block
+}
+{
+   trace_children
+   Memcheck:Value4
+   fun:trace_children
+   fun:trace_active_PMCs
+}
+
+{
+   trace_children
+   Memcheck:Cond
+   fun:trace_children
+   fun:trace_active_PMCs
+}
+

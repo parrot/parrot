@@ -42,7 +42,7 @@ static const CHARTYPE *string_unicode_type;
  * time -C          5.2 s       0.3 s         0.2 s
  */
 
-#define EXTRA_SIZE 512
+#define EXTRA_SIZE 256
 
 /* work around warning:
  * cast discards qualifiers from pointer target type

@@ -21,7 +21,7 @@ vtable is freed.
 pmclass VtableCache extends default needs_ext {
 
     void init () {
-        PObj_active_destroy_SET(SELF);
+        /* PObj_active_destroy_SET(SELF); */
         PMC_struct_val(SELF) = NULL;
     }
 
