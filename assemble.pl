@@ -446,7 +446,7 @@ Local labels aren't given special treatment yet.
 sub _collect_labels {
   my $self = shift;
 
-  my $label_re = qr([a-zA-Z0-9_]+);
+  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]+);
 
   #
   # Collect label definition points first
@@ -654,7 +654,7 @@ sub to_bytecode {
   my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
                   \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
                  )x;
-  my $label_re = qr([a-zA-Z][a-zA-Z0-9_]*);
+  my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
   my $pc = 0;
 
   $self->_collect_labels(); # Collect labels in a separate pass
@@ -676,9 +676,9 @@ sub to_bytecode {
         $_->[0][0] .= "_".lc(substr($1,0,1));
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
-      elsif($temp=~s/^\[($reg_re)\]//) {
-        $_->[0][0] .= "_".lc(substr($1,0,1));
-        push @{$_->[0]}, [lc(substr($1,0,1)),$1];
+      elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
+        $_->[0][0] .= "_s";
+        push @{$_->[0]}, ['s',$1];
       }
       elsif($temp=~s/^($flt_re)//) {
         $_->[0][0] .= "_nc";
@@ -688,20 +688,33 @@ sub to_bytecode {
         $_->[0][0] .= "_sc";
         push @{$_->[0]}, $self->_string_constant($1);
       }
-      elsif($temp=~s/^($bin_re)//) {
+      elsif($temp=~s/^\[($bin_re)\]//) { # P3[0b11101]
         my $val = $1;$val=~s/0b//;
         $_->[0][0] .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
-      elsif($temp=~s/^($hex_re)//) {
+      elsif($temp=~s/^\[($hex_re)\]//) { # P7[0x1234]
         $_->[0][0] .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
-      elsif($temp=~s/^($dec_re)//) {
+      elsif($temp=~s/^\[($dec_re)\]//) { # P14[3]
         $_->[0][0] .= "_ic";
         push @{$_->[0]}, ['ic',0+$1];
       }
-      elsif($temp=~s/^($str_re)//) {
+      elsif($temp=~s/^($bin_re)//) {     # 0b1101
+        my $val = $1;$val=~s/0b//;
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
+      }
+      elsif($temp=~s/^($hex_re)//) {     # 0x12aF
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
+      }
+      elsif($temp=~s/^($dec_re)//) {     # -32
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',0+$1];
+      }
+      elsif($temp=~s/^($str_re)//) {     # "Hello World"
         $_->[0][0] .= "_sc";
         push @{$_->[0]}, $self->_string_constant($1);
       }
