@@ -32,9 +32,6 @@ scheme.dummy:
 scheme.test:
 	$(MAKE_C) scheme test
 
-scheme.test:
-	cd scheme && $(MAKE) test && cd ..
-
 regex: regex.dummy
 
 regex.dummy:
@@ -86,10 +83,10 @@ perl6.test:
 urm: urm.dummy
 
 urm.dummy:
-	cd urm && $(MAKE) && cd ..
+	$(MAKE_C) urm
 
 urm.test:
-	cd urm && $(MAKE) test && cd ..
+	$(MAKE_C) test
 
 clean:
 	$(MAKE_C) jako clean
