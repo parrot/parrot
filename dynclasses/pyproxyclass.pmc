@@ -24,7 +24,7 @@ TODO: handle attributes.
 #include "parrot/parrot.h"
 
 static INTVAL dynclass_PyProxyClass;
-STRING *PROXY;
+STRING *PROXY_STRING;
 
 pmclass PyProxyClass extends PyObject dynpmc group python_group {
 
@@ -43,7 +43,7 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
 
-            PROXY = const_string(INTERP, "__proxy__");
+            PROXY_STRING = const_string(INTERP, "__proxy__");
         }
     }
 
@@ -101,7 +101,7 @@ Invoke the real method
             internal_exception(1, "Invoke() called on a PyProxyClass object");
 
         INTERP->ctx.current_object = REG_PMC(2) = 
-            VTABLE_getprop(INTERP, proxy, PROXY);
+            VTABLE_getprop(INTERP, proxy, PROXY_STRING);
 
         return VTABLE_invoke(INTERP, (PMC*)PMC_struct_val(SELF), next);
     }
