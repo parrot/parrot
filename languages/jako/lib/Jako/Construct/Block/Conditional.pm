@@ -59,23 +59,26 @@ sub compile
 
   if ($kind eq 'if') {
     print $fh "${prefix}_TEST:\n";
-    print $fh ".namespace $namespace\n";
     print $fh "  if $left $op $right goto ${prefix}_ELSE\n";
     print $fh "${prefix}_THEN:\n";
 
-    $self->SUPER::compile($fh);
+    if ($self->content) {
+      print $fh ".namespace ${namespace}_THEN\n";
+      $self->SUPER::compile($fh);
+      print $fh ".endnamespace ${namespace}_THEN\n";
+    }
 
     print $fh "  goto ${prefix}_LAST\n";
-    print $fh ".endnamespace $namespace\n";
-    print $fh "${prefix}_ELSE:\n";
   }
   elsif ($kind eq 'else') {
-    print $fh ".namespace $namespace\n";
+    print $fh "${prefix}_ELSE:\n";
 
-    $self->SUPER::compile($fh);
+    if ($self->content) {
+      print $fh ".namespace ${namespace}_ELSE\n";
+      $self->SUPER::compile($fh);
+      print $fh ".endnamespace ${namespace}_ELSE\n";
+    }
 
-    print $fh "  goto ${prefix}_LAST\n";
-    print $fh ".endnamespace $namespace\n";
     print $fh "${prefix}_LAST:\n";
   }
 

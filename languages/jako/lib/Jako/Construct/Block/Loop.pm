@@ -76,21 +76,24 @@ sub compile
 
   if ($kind eq 'while' or $kind eq 'until') {
     print $fh "${prefix}_NEXT:\n";
-    print $fh ".namespace $namespace\n";
     print $fh "  if $left $op $right goto ${prefix}_LAST\n";
     print $fh "${prefix}_REDO:\n";
 
-    $self->SUPER::compile($fh);
-
-    print $fh ".endnamespace $namespace\n";
+    if ($self->content) {
+      print $fh ".namespace $namespace\n";
+      $self->SUPER::compile($fh);
+      print $fh ".endnamespace $namespace\n";
+    }
   }
   elsif ($kind eq 'continue') {
     print $fh "${prefix}_CONT:\n";
-    print $fh ".namespace $namespace\n";
 
-    $self->SUPER::compile($fh);
+    if ($self->content) {
+      print $fh ".namespace ${namespace}_CONT\n";
+      $self->SUPER::compile($fh);
+      print $fh ".endnamespace ${namespace}_CONT\n";
+    }
 
-    print $fh ".endnamespace $namespace\n";
     print $fh "  goto ${prefix}_NEXT\n";
     print $fh "${prefix}_LAST:\n";
   }
