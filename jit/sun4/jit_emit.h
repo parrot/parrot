@@ -591,7 +591,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #  define INT_REGITERS_TO_MAP 1
 #  define FLOAT_REGITERS_TO_MAP 0
 
-char register_map[INT_REGITERS_TO_MAP] = { emitm_l(0) }; 
+char intval_map[INT_REGITERS_TO_MAP] = { emitm_l(0) }; 
 
 #endif
 

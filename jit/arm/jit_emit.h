@@ -987,7 +987,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 #  define INT_REGITERS_TO_MAP 10
 #  define FLOAT_REGITERS_TO_MAP 0
 
-char register_map[INT_REGITERS_TO_MAP] =
+char intval_map[INT_REGITERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
 
 static void
