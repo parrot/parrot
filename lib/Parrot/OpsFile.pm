@@ -94,10 +94,13 @@ sub read_ops
   my @args;
   my $op_size;
   my $full_name;
+  my $seen_pod;
 
   while (<OPS>) {
+    $seen_pod = 1 if m|^=|;
+
     unless ($op or m|^AUTO_OP\s+| or m|^MANUAL_OP\s+|) {
-      $self->{PREAMBLE} .= $_ unless $count; # Lines up to first op def.
+      $self->{PREAMBLE} .= $_ unless $seen_pod or $count; # Lines up to first op def.
       next;
     };
   

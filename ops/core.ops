@@ -4,59 +4,857 @@
 
 #include <math.h>
 
+=head1 NAME
+
+core.ops
+
+=cut
+
+=head1 DESCRIPTION
+
+Parrot's core library of ops.
+
+=cut
+
+
+###############################################################################
+
+=head2 Basic ops
+
+These are the fundamental operations.
+
+=over 4 
+
+=cut
+
+
+########################################
+
+=item B<end>()
+
+Halts the interpreter.
+
+=cut 
 
 MANUAL_OP end() {
    HALT;
 }
 
+
+########################################
+
+=item B<noop>()
+
+Does nothing other than waste an iota of time and 32 bits of bytecode space.
+
+=cut
+
 AUTO_OP noop() {
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 System environment operations
+
+These operations allow interaction between the Parrot program and the system
+environment.
+
+=over 4 
+
+=cut
+
+
+########################################
+
+=item B<time>(i)
+
+=item B<time>(n)
+
+Puts the current system time (represented as a number of seconds) in $1.
+
+=cut
+
+AUTO_OP time(i) {
+  $1 = time(NULL);
+}
+
+AUTO_OP time(n) {
+  $1 = (FLOATVAL)time(NULL);
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Register loading operations
+
+These operations load registers from constants or other registers.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<set>(i, i)
+
+=item B<set>(i, ic)
+
+=item B<set>(n, n)
+
+=item B<set>(n, nc)
+
+=item B<set>(s, sc)
+
+Set $1 to $2.
+
+=cut
+
+  
+AUTO_OP set(i, i) {
+  $1 = $2;
 }
 
 AUTO_OP set(i, ic) {
   $1 = $2;
 }
-  
-AUTO_OP set(i, i) {
+
+AUTO_OP set(n, nc) {
   $1 = $2;
 }
-  
+
+AUTO_OP set(n, n) {
+  $1 = $2;
+}
+
+AUTO_OP set(s, sc) {
+  $1 = $2;
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Conversion operations
+
+These operations load registers of one type with values from registers of
+another type, performing the appropriate type conversion along the way.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<iton>(n, i)
+
+Load $1 with the FLOATVAL corresponding to the INTVAL from $2.
+
+=cut
+
+AUTO_OP iton(n, i) {
+  $1 = (FLOATVAL)$2;
+}
+
+
+########################################
+
+=item B<ntoi>(i, n)
+
+Load $1 with the INTVAL corresponding to the truncated FLOATVAL from $2.
+
+=cut
+
+AUTO_OP ntoi(i, n) {
+  FLOATVAL number;
+  number = $2;
+  $1 = (INTVAL)number;
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Conditional branch operations
+
+These opertions perform a conditional relative branch. If the condition is
+met, the branch happens, otherwise control falls to the next operation.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<eq>(i, i, ic)
+
+=item B<eq>(i, ic, ic)
+
+=item B<eq>(n, n, ic)
+
+=item B<eq>(n, nc, ic)
+
+=item B<eq>(s, s, ic)
+
+=item B<eq>(s, sc, ic)
+
+Branch if $1 is equal to $2.
+
+=cut
+
+AUTO_OP eq(i, i, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq(i, ic, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq(n, n, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq(n, nc, ic) {
+  if ($1 == $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq(s, s, ic) {
+  if (string_compare($1, $2) == 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP eq(s, sc, ic) {
+  if (string_compare($1, $2) == 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<ne>(i, i, ic)
+
+=item B<ne>(i, ic, ic)
+
+=item B<ne>(n, n, ic)
+
+=item B<ne>(n, nc, ic)
+
+=item B<ne>(s, s, ic)
+
+=item B<ne>(s, sc, ic)
+
+Branch if $1 is not equal to $2.
+
+=cut
+
+AUTO_OP ne(i, i, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne(i, ic, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne(n, n, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne(n, nc, ic) {
+  if ($1 != $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne(s, s, ic) {
+  if (string_compare($1, $2) != 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ne(s, sc, ic) {
+  if (string_compare($1, $2) != 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<lt>(i, i, ic)
+
+=item B<lt>(i, ic, ic)
+
+=item B<lt>(n, n, ic)
+
+=item B<lt>(n, nc, ic)
+
+=item B<lt>(s, s, ic)
+
+=item B<lt>(s, sc, ic)
+
+Branch if $1 is less than $2.
+
+=cut
+
+AUTO_OP lt(i, i, ic) {
+  if ($1 < $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP lt(i, ic, ic) {
+  if ($1 < $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP lt(n, n, ic) {
+  if ($1 < $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP lt(n, nc, ic) {
+  if ($1 < $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP lt(s, s, ic) {
+  if (string_compare($1, $2) < 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP lt(s, sc, ic) {
+  if (string_compare($1, $2) < 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<le>(i, i, ic)
+
+=item B<le>(i, ic, ic)
+
+=item B<le>(n, n, ic)
+
+=item B<le>(n, nc, ic)
+
+=item B<le>(s, s, ic)
+
+=item B<le>(s, sc, ic)
+
+Branch if $1 is less than or equal to $2.
+
+=cut
+
+AUTO_OP le(i, i, ic) {
+  if ($1 <= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP le(i, ic, ic) {
+  if ($1 <= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP le(n, n, ic) {
+  if ($1 <= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP le(n, nc, ic) {
+  if ($1 <= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP le(s, s, ic) {
+  if (string_compare($1, $2) <= 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP le(s, sc, ic) {
+  if (string_compare($1, $2) <= 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<gt>(i, i, ic)
+
+=item B<gt>(i, ic, ic)
+
+=item B<gt>(n, n, ic)
+
+=item B<gt>(n, nc, ic)
+
+=item B<gt>(s, s, ic)
+
+=item B<gt>(s, sc, ic)
+
+Branch if $1 is greater than $2.
+
+=cut
+
+AUTO_OP gt(i, i, ic) {
+  if ($1 > $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP gt(i, ic, ic) {
+  if ($1 > $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP gt(n, n, ic) {
+  if ($1 > $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP gt(n, nc, ic) {
+  if ($1 > $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP gt(s, s, ic) {
+  if (string_compare($1, $2) > 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP gt(s, sc, ic) {
+  if (string_compare($1, $2) > 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<ge>(i, i, ic)
+
+=item B<ge>(i, ic, ic)
+
+=item B<ge>(n, n, ic)
+
+=item B<ge>(n, nc, ic)
+
+=item B<ge>(s, s, ic)
+
+=item B<ge>(s, sc, ic)
+
+Branch if $1 is greater than or equal to $2.
+
+=cut
+
+AUTO_OP ge(i, i, ic) {
+  if ($1 >= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ge(i, ic, ic) {
+  if ($1 >= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ge(n, n, ic) {
+  if ($1 >= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ge(n, nc, ic) {
+  if ($1 >= $2) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ge(s, s, ic) {
+  if (string_compare($1, $2) >= 0) {
+    RETREL($3);
+  }
+}
+
+AUTO_OP ge(s, sc, ic) {
+  if (string_compare($1, $2) >= 0) {
+    RETREL($3);
+  }
+}
+
+
+########################################
+
+=item B<if>(i, ic)
+
+=item B<if>(n, ic)
+
+Check register $1. If true, branch by $2.
+
+=cut
+
+AUTO_OP if(i, ic) {
+  if ($1 != 0) {
+    RETREL($2);
+  }
+}
+
+AUTO_OP if(n, ic) {
+  if ($1 != 0.0) {
+    RETREL($2);
+  }
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Output operators
+
+These operations are temporary until we have a true I/O subsystem.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<print>(i)
+
+=item B<print>(ic)
+
+=item B<print>(n)
+
+=item B<print>(nc)
+
+=item B<print>(s)
+
+=item B<print>(sc)
+
+Print $1 to standard output.
+
+=cut
+
+AUTO_OP print(i) {
+  /* TODO: Configure for format */
+  printf("%li", (long) $1);
+}
+
+AUTO_OP print(ic) {
+  /* TODO: Configure for format */
+  printf("%li", (long) $1);
+}
+
+AUTO_OP print(n) {
+  /* TODO: Configure for format */
+  printf("%f", $1);
+}
+ 
+AUTO_OP print(nc) {
+  /* TODO: Configure for format */
+  printf("%f", $1);
+}
+
+AUTO_OP print(s) {
+  STRING *s = $1; 
+  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+}
+
+AUTO_OP print(sc) {
+  STRING *s = $1;
+  INTVAL l = string_length(s);
+  printf("%.*s", (int)l, (char *)s->bufstart);
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Arithmetic operations
+
+These operations store the results of arithmetic on other registers and
+constants into their destination register, $1.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<add>(i, i, i)
+
+=item B<add>(n, n, n)
+
+Set $1 to the sum of $2 and $3.
+
+=cut
+
 AUTO_OP add(i, i, i) {
   $1 = $2 + $3;
 }
-
-AUTO_OP sub(i, i, i) {
-  $1 = $2 - $3;
+  
+AUTO_OP add(n, n, n) {
+  $1 = $2 + $3;
 }
 
-AUTO_OP mul(i, i, i) {
-  $1 = $2 * $3;
+
+########################################
+
+=item B<cmod>(i, i, i)
+
+NOTE: This "uncorrected mod" algorithm uses the C language's built-in
+mod operator (x % y), which is
+
+    ... the remainder when x is divided by y, and thus is zero when y
+    divides x exactly.
+    ...
+    The direction of truncation for / and the sign of the result for %
+    are machine-dependent for negative operands, as is the action taken
+    on overflow or underflow.
+                                                         -- [1], page 41
+
+Also:
+
+    ... if the second operand is 0, the result is undefined. Otherwise, it
+    is always true that (a/b)*b + a%b is equal to z. If both operands are
+    non-negative, then the remainder is non-negative and smaller than the
+    divisor; if not, it is guaranteed only that the absolute value of the
+    remainder is smaller than the absolute value of the divisor.
+                                                         -- [1], page 205
+
+This op is provided for those who need it (such as speed-sensitive
+applications with heavy use of mod, but using it only with positive
+arguments), but a more mathematically useful mod based on ** floor(x/y)
+and defined with y == 0 is provided by the mod_i op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+TODO: Doesn't the Parrot interpreter need to catch the exception?
+
+=cut
+
+AUTO_OP cmod(i, i, i) {
+  $1 = $2 % $3;
 }
+
+
+########################################
+
+=item B<cmod>(n, n, n)
+
+NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
+fmod() function, which computes
+
+    ... the remainder of dividing x by y. The return value is x - n * y,
+    where n is the quotient of x / y, rounded towards zero to an
+    integer.
+                                    -- fmod() manpage on RedHat Linux 7.0
+
+In addition, fmod() returns
+
+    the remainder, unless y is zero, when the function fails and errno
+    is set.
+
+According to page 251 of [1], the result when y is zero is implementation-
+defined.
+
+This op is provided for those who need it, but a more mathematically
+useful numeric mod based on floor(x/y) instead of truncate(x/y) and
+defined with y == 0 is provided by the mod_n op.
+
+  [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
+      Language*, Second Edition. Prentice Hall, 1988.
+
+TODO: Doesn't the Parrot interpreter need to catch the exception?
+
+=cut
+
+AUTO_OP cmod(n, n, n) {
+  $1 = fmod($2, $3);
+}
+
+
+########################################
+
+=item B<dec>(i)
+
+=item B<dec>(n)
+
+Decrease $1 by one.
+
+=cut
+
+AUTO_OP dec(i) {
+  $1--;
+}
+
+AUTO_OP dec(n) {
+  $1 -= 1;
+}
+
+
+########################################
+
+=item B<dec>(i, ic)
+
+=item B<dec>(n, nc)
+
+Decrease $1 by the amount in $2.
+
+=cut
+
+AUTO_OP dec(i, ic) {
+  $1 -= $2;
+}
+
+AUTO_OP dec(n, nc) {
+  $1 -= $2;
+}
+
+
+########################################
+
+=item B<div>(i, i, i)
+
+=item B<div>(n, n, n)
+
+Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
+result is truncated (NOT rounded or floored).
+
+=cut
 
 AUTO_OP div(i, i, i) {
   $1 = $2 / $3;
 }
 
-/*
-** mod_i_i_i
-**
-** NOTE: This "corrected mod" algorithm is based on the C code on page 70
-** of [1]. Assuming correct behavior of C's built-in mod operator (%) with
-** positive arguments, this algorithm implements a mathematically convenient
-** version of mod, defined thus:
-**
-**   x mod y = x - y * floor(x / y)
-**
-** For more information on this definition of mod, see section 3.4 of [2],
-** pages 81-85.
-**
-** References:
-**
-**   [1] Donald E. Knuth, *MMIXware: A RISC Computer for the Third
-**       Millennium* Springer, 1999.
-**
-**   [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
-**       Mathematics*, Second Edition. Addison-Wesley, 1994.
-*/
+AUTO_OP div(n, n, n) {
+  $1 = $2 / $3;
+}
+
+
+########################################
+
+=item B<inc>(i)
+
+=item B<inc>(n)
+
+Increase $1 by one.
+
+=cut
+
+AUTO_OP inc(i) {
+  $1++;
+}
+
+AUTO_OP inc(n) {
+  $1 += 1;
+}
+
+
+########################################
+
+=item B<inc>(i, ic)
+
+=item B<inc>(n, nc)
+
+Increase $1 by the amount in $2.
+
+=cut
+
+AUTO_OP inc(i, ic) {
+  $1 += $2;
+}
+
+AUTO_OP inc(n, nc) {
+  $1 += $2;
+}
+
+
+########################################
+
+=item B<mod>(i, i, i)
+
+NOTE: This "corrected mod" algorithm is based on the C code on page 70
+of [1]. Assuming correct behavior of C's built-in mod operator (%) with
+positive arguments, this algorithm implements a mathematically convenient
+version of mod, defined thus:
+
+  x mod y = x - y * floor(x / y)
+
+For more information on this definition of mod, see section 3.4 of [2],
+pages 81-85.
+
+References:
+
+  [1] Donald E. Knuth, *MMIXware: A RISC Computer for the Third
+      Millennium* Springer, 1999.
+
+  [2] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+      Mathematics*, Second Edition. Addison-Wesley, 1994.
+
+=cut
 
 AUTO_OP mod(i, i, i) {
   INTVAL y = $2;
@@ -84,199 +882,24 @@ AUTO_OP mod(i, i, i) {
   $1 = r;
 }
 
-/*
-** cmod_i_i_i
-**
-** NOTE: This "uncorrected mod" algorithm uses the C language's built-in
-** mod operator (x % y), which is
-**
-**     ... the remainder when x is divided by y, and thus is zero when y
-**     divides x exactly.
-**     ...
-**     The direction of truncation for / and the sign of the result for %
-**     are machine-dependent for negative operands, as is the action taken
-**     on overflow or underflow.
-**                                                          -- [1], page 41
-**
-** Also:
-**
-**     ... if the second operand is 0, the result is undefined. Otherwise, it
-**     is always true that (a/b)*b + a%b is equal to z. If both operands are
-**     non-negative, then the remainder is non-negative and smaller than the
-**     divisor; if not, it is guaranteed only that the absolute value of the
-**     remainder is smaller than the absolute value of the divisor.
-**                                                          -- [1], page 205
-**
-** This op is provided for those who need it (such as speed-sensitive
-** applications with heavy use of mod, but using it only with positive
-** arguments), but a more mathematically useful mod based on ** floor(x/y)
-** and defined with y == 0 is provided by the mod_i op.
-**
-**   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
-**       Language*, Second Edition. Prentice Hall, 1988.
-**
-** TODO: Doesn't the Parrot interpreter need to catch the exception?
-*/
 
-AUTO_OP cmod(i, i, i) {
-  $1 = $2 % $3;
-}
+########################################
 
-AUTO_OP eq(i, i, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
-}
+=item B<mod>(n, n, n)
 
-AUTO_OP eq(i, ic, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
-}
+NOTE: This "corrected mod" algorithm is based on the formula of [1]:
 
-AUTO_OP ne(i, i, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
-}
+  x mod y = x - y * floor(x / y)
 
-AUTO_OP ne(i, ic, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
-}
+For more information on this definition of mod, see section 3.4 of [1],
+pages 81-85.
 
-AUTO_OP lt(i, i, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
-}
+References:
 
-AUTO_OP lt(i, ic, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
-}
+  [1] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
+      Mathematics*, Second Edition. Addison-Wesley, 1994.
 
-AUTO_OP le(i, i, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(i, ic, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(i, i, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(i, ic, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(i, i, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(i, ic, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP if(i, ic) {
-  if ($1 != 0) {
-    RETREL($2);
-  }
-}
-
-AUTO_OP time(i) {
-  $1 = time(NULL);
-}
-
-AUTO_OP print(i) {
-  /* TODO: Configure for format */
-  printf("%li", (long) $1);
-}
-
-AUTO_OP print(ic) {
-  /* TODO: Configure for format */
-  printf("%li", (long) $1);
-}
- 
-MANUAL_OP branch(ic) {
-  RETREL($1);
-}
-
-AUTO_OP inc(i) {
-  $1++;
-}
-
-AUTO_OP inc(i, ic) {
-  $1 += $2;
-}
-
-AUTO_OP dec(i) {
-  $1--;
-}
-
-AUTO_OP dec(i, ic) {
-  $1 -= $2;
-}
-
-MANUAL_OP jump(i) {
-  RETREL($1);
-}
-
-AUTO_OP set(n, nc) {
-  $1 = $2;
-}
-
-AUTO_OP set(n, n) {
-  $1 = $2;
-}
-  
-AUTO_OP add(n, n, n) {
-  $1 = $2 + $3;
-}
-
-AUTO_OP sub(n, n, n) {
-  $1 = $2 - $3;
-}
-
-AUTO_OP mul(n, n, n) {
-  $1 = $2 * $3;
-}
-
-AUTO_OP div(n, n, n) {
-  $1 = $2 / $3;
-}
-
-/*
-** mod_n_n_n
-**
-** NOTE: This "corrected mod" algorithm is based on the formula of [1]:
-**
-**   x mod y = x - y * floor(x / y)
-**
-** For more information on this definition of mod, see section 3.4 of [1],
-** pages 81-85.
-**
-** References:
-**
-**   [1] Ronald L. Graham, Donald E. Knuth and Oren Patashnik, *Concrete
-**       Mathematics*, Second Edition. Addison-Wesley, 1994.
-*/
+=cut
 
 AUTO_OP mod(n, n, n) {
   $1 = $3
@@ -284,188 +907,671 @@ AUTO_OP mod(n, n, n) {
      : $2;
 }
 
-/*
-** cmod_n_n_n
-**
-** NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
-** fmod() function, which computes
-**
-**     ... the remainder of dividing x by y. The return value is x - n * y,
-**     where n is the quotient of x / y, rounded towards zero to an
-**     integer.
-**                                     -- fmod() manpage on RedHat Linux 7.0
-**
-** In addition, fmod() returns
-**
-**     the remainder, unless y is zero, when the function fails and errno
-**     is set.
-**
-** According to page 251 of [1], the result when y is zero is implementation-
-** defined.
-**
-** This op is provided for those who need it, but a more mathematically
-** useful numeric mod based on floor(x/y) instead of truncate(x/y) and
-** defined with y == 0 is provided by the mod_n op.
-**
-**   [1] Brian W. Kernighan and Dennis M. Ritchie, *The C Programming
-**       Language*, Second Edition. Prentice Hall, 1988.
-**
-** TODO: Doesn't the Parrot interpreter need to catch the exception?
-*/
 
-AUTO_OP cmod(n, n, n) {
-  $1 = fmod($2, $3);
+########################################
+
+=item B<mul>(i, i, i)
+
+=item B<mul>(n, n, n)
+
+Set $1 to the product of $2 and $3.
+
+=cut
+
+AUTO_OP mul(i, i, i) {
+  $1 = $2 * $3;
 }
 
-AUTO_OP eq(n, n, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
+AUTO_OP mul(n, n, n) {
+  $1 = $2 * $3;
 }
 
-AUTO_OP eq(n, nc, ic) {
-  if ($1 == $2) {
-    RETREL($3);
-  }
+
+########################################
+
+=item B<pow>(n, i, i)
+
+=item B<pow>(n, i, n)
+
+=item B<pow>(n, n, i)
+
+=item B<pow>(n, n, n)
+
+Set $1 to $2 raised to the power $3.
+
+=cut
+
+AUTO_OP pow(n, i, i) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
 }
 
-AUTO_OP ne(n, n, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
+AUTO_OP pow(n, i, n) {
+   $1 = pow((FLOATVAL)$2, $3);
 }
 
-AUTO_OP ne(n, nc, ic) {
-  if ($1 != $2) {
-    RETREL($3);
-  }
+AUTO_OP pow(n, n, i) {
+   $1 = pow($2, (FLOATVAL)$3);
 }
 
-AUTO_OP lt(n, n, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
+AUTO_OP pow(n, n, n) {
+   $1 = pow($2, $3);
 }
 
-AUTO_OP lt(n, nc, ic) {
-  if ($1 < $2) {
-    RETREL($3);
-  }
+
+########################################
+
+=item B<sub>(i, i, i)
+
+=item B<sub>(n, n, n)
+
+Set $1 to $2 minus $3.
+
+=cut
+
+AUTO_OP sub(i, i, i) {
+  $1 = $2 - $3;
 }
 
-AUTO_OP le(n, n, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
+AUTO_OP sub(n, n, n) {
+  $1 = $2 - $3;
 }
 
-AUTO_OP le(n, nc, ic) {
-  if ($1 <= $2) {
-    RETREL($3);
-  }
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 String operations
+
+These operations operate on STRINGs.
+
+=cut
+
+
+########################################
+
+=item B<chopn>(s, ic)
+
+Remove $2 characters from the end of the string in $1.
+
+TODO: Create a three-argument version of this? Don't force in-place modification.
+
+=cut
+
+AUTO_OP chopn(s, ic) {
+   (void)string_chopn($1, $2);
 }
 
-AUTO_OP gt(n, n, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
+
+########################################
+
+=item B<concat>(s, s)
+
+Append the string in $2 to the string in $1.
+
+TODO: Create a three-argument version of this. Don't force in-place modification.
+
+=cut
+
+AUTO_OP concat(s, s) {
+    STRING *s = string_concat($1, $2, 1);
+    $1 = s;
 }
 
-AUTO_OP gt(n, nc, ic) {
-  if ($1 > $2) {
-    RETREL($3);
-  }
+########################################
+
+=item B<length>(i, s)
+
+Set $1 to the length (in characters) of the string in $2.
+
+=cut
+
+AUTO_OP length(i, s) {
+  $1 = string_length($2);
 }
 
-AUTO_OP ge(n, n, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
+
+########################################
+
+=item B<substr>(s, s, i, i)
+
+Set $1 to the portion of $2 starting at (zero-based) character position $3 and having
+length $4.
+
+=cut
+
+AUTO_OP substr(s, s, i, i) {
+    STRING *s = string_substr($2, $3, $4, &$1);
+    $1 = s;
 }
 
-AUTO_OP ge(n, nc, ic) {
-  if ($1 >= $2) {
-    RETREL($3);
-  }
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Transcendental mathematical operations
+
+These operations perform various transcendental operations such as logarithmics
+and trigonometrics.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<acos>(n, i)
+
+=item B<acos>(n, n)
+
+Set $1 to the arc cosine (in radians) of $2.
+
+=cut
+
+AUTO_OP acos(n, i) {
+   $1 = acos((FLOATVAL)$2);
 }
 
-AUTO_OP if(n, ic) {
-  if ($1 != 0.0) {
-    RETREL($2);
-  }
+AUTO_OP acos(n, n) {
+   $1 = acos($2);
 }
 
-AUTO_OP time(n) {
-  $1 = (FLOATVAL)time(NULL);
+
+########################################
+
+=item B<asec>(n, i)
+
+=item B<asec>(n, n)
+
+Set $1 to the arc secant (in radians) of $2.
+
+=cut
+
+AUTO_OP asec(n, i) {
+   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
 }
 
-AUTO_OP print(n) {
-  /* TODO: Configure for format */
-  printf("%f", $1);
-}
- 
-AUTO_OP print(nc) {
-  /* TODO: Configure for format */
-  printf("%f", $1);
+AUTO_OP asec(n, n) {
+   $1 = acos(((FLOATVAL)1.0) / $2);
 }
 
-AUTO_OP inc(n) {
-  $1 += 1;
+
+########################################
+
+=item B<asin>(n, i)
+
+=item B<asin>(n, n)
+
+Set $1 to the arc sine (in radians) of $2.
+
+=cut
+
+AUTO_OP asin(n, i) {
+   $1 = asin((FLOATVAL)$2);
 }
 
-AUTO_OP inc(n, nc) {
-  $1 += $2;
+AUTO_OP asin(n, n) {
+   $1 = asin($2);
 }
 
-AUTO_OP dec(n) {
-  $1 -= 1;
+
+########################################
+
+=item B<atan>(n, i)
+
+=item B<atan>(n, i, i)
+
+=item B<atan>(n, i, n)
+
+=item B<atan>(n, n)
+
+=item B<atan>(n, n, i)
+
+=item B<atan>(n, n, n)
+
+The two-argument versions set $1 to the arc tangent (in radians) of $2.
+
+The three-argument versions set $1 to the arc tangent (in radians) of
+$2 / $3, taking account of the signs of the arguments in determining the
+quadrant of the result.
+
+=cut
+
+AUTO_OP atan(n, i) {
+   $1 = atan((FLOATVAL)$2);
 }
 
-AUTO_OP dec(n, nc) {
-  $1 -= $2;
+AUTO_OP atan(n, i, i) {
+   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
 }
 
-AUTO_OP iton(n, i) {
-  $1 = (FLOATVAL)$2;
+AUTO_OP atan(n, i, n) {
+   $1 = atan2((FLOATVAL)$2, $3);
 }
 
-AUTO_OP ntoi(i, n) {
-  FLOATVAL number;
-  number = $2;
-  $1 = (INTVAL)number;
+AUTO_OP atan(n, n) {
+   $1 = atan($2);
 }
 
-AUTO_OP pushi() {
-  Parrot_push_i(interpreter);
+AUTO_OP atan(n, n, i) {
+   $1 = atan2($2, (FLOATVAL)$3);
 }
 
-AUTO_OP pushn() {
-  Parrot_push_n(interpreter);
+AUTO_OP atan(n, n, n) {
+   $1 = atan2($2, $3);
 }
 
-AUTO_OP pushs() {
-  Parrot_push_s(interpreter);
+
+########################################
+
+=item B<cos>(n, i)
+
+=item B<cos>(n, n)
+
+Set $1 to the cosine of $2 (given in radians).
+
+=cut
+
+AUTO_OP cos(n, i) {
+   $1 = cos((FLOATVAL)$2);
 }
 
-AUTO_OP pushp() {
-  Parrot_push_p(interpreter);
+AUTO_OP cos(n, n) {
+   $1 = cos($2);
 }
 
-AUTO_OP popi() {
-  Parrot_pop_i(interpreter);
+
+########################################
+
+=item B<cosh>(n, i)
+
+=item B<cosh>(n, n)
+
+Set $1 to the hyperbolic cosine of $2 (given in radians).
+
+=cut
+
+AUTO_OP cosh(n, i) {
+   $1 = cosh((FLOATVAL)$2);
 }
 
-AUTO_OP popn() {
-  Parrot_pop_n(interpreter);
+AUTO_OP cosh(n, n) {
+   $1 = cosh($2);
 }
 
-AUTO_OP pops() {
-  Parrot_pop_s(interpreter);
+
+########################################
+
+=item B<exp>(n, i)
+
+=item B<exp>(n, n)
+
+Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm.
+
+=cut
+
+AUTO_OP exp(n, i) {
+   $1 = exp((FLOATVAL)$2);
 }
 
-AUTO_OP popp() {
-  Parrot_pop_p(interpreter);
+AUTO_OP exp(n, n) {
+   $1 = exp($2);
 }
+
+
+########################################
+
+=item B<ln>(n, i)
+
+=item B<ln>(n, n)
+
+Set $1 to the natural (base I<e>) logarithm of $2.
+
+=cut
+
+AUTO_OP ln(n, i) {
+   $1 = log((FLOATVAL)$2);
+}
+
+AUTO_OP ln(n, n) {
+   $1 = log($2);
+}
+
+
+########################################
+
+=item B<log10>(n, i)
+
+=item B<log10>(n, n)
+
+Set $1 to the base 10 logarithm of $2.
+
+=cut
+
+AUTO_OP log10(n, i) {
+   $1 = log10((FLOATVAL)$2);
+}
+
+AUTO_OP log10(n, n) {
+   $1 = log10($2);
+}
+
+
+########################################
+
+=item B<log2>(n, i)
+
+=item B<log2>(n, n)
+
+Set $1 to the base 2 logarithm of $2.
+
+=cut
+
+AUTO_OP log2(n, i) {
+   FLOATVAL temp = log((FLOATVAL)2.0);
+   $1 = log((FLOATVAL)$2) / temp;
+}
+
+AUTO_OP log2(n, n) {
+   FLOATVAL temp = log((FLOATVAL)2.0);
+   $1 = log($2) / temp;
+}
+
+
+########################################
+
+=item B<sec>(n, i)
+
+=item B<sec>(n, n)
+
+Set $1 to the secant of $2 (given in radians).
+
+=cut
+
+
+AUTO_OP sec(n, i) {
+   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+}
+
+AUTO_OP sec(n, n) {
+   $1 = ((FLOATVAL)1) / cos($2);
+}
+
+
+########################################
+
+=item B<sech>(n, i)
+
+=item B<sech>(n, n)
+
+Set $1 to the hyperbolic secant of $2 (given in radians).
+
+=cut
+
+AUTO_OP sech(n, i) {
+   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+}
+
+AUTO_OP sech(n, n) {
+   $1 = ((FLOATVAL)1.0) / cosh($2);
+}
+
+
+########################################
+
+=item B<sin>(n, i)
+
+=item B<sin>(n, n)
+
+Set $1 to the sine of $2 (given in radians).
+
+=cut
+
+AUTO_OP sin(n, i) {
+   $1 = sin((FLOATVAL)$2);
+}
+
+AUTO_OP sin(n, n) {
+   $1 = sin($2);
+}
+
+
+########################################
+
+=item B<sinh>(n, i)
+
+=item B<sinh>(n, n)
+
+Set $1 to the hyperbolic sine of $2 (given in radians).
+
+=cut
+
+AUTO_OP sinh(n, i) {
+   $1 = sinh((FLOATVAL)$2);
+}
+
+AUTO_OP sinh(n, n) {
+   $1 = sinh($2);
+}
+
+
+########################################
+
+=item B<tan>(n, i)
+=item B<tan>(n, n)
+
+Set $1 to the tangent of $2 (given in radians).
+
+=cut
+
+AUTO_OP tan(n, i) {
+   $1 = tan((FLOATVAL)$2);
+}
+
+AUTO_OP tan(n, n) {
+   $1 = tan($2);
+}
+
+
+########################################
+
+=item B<tanh>(n, i)
+
+=item B<tanh>(n, n)
+
+Set $1 to the hyperbolic tangent of $2 (given in radians).
+
+=cut
+
+AUTO_OP tanh(n, i) {
+   $1 = tanh((FLOATVAL)$2);
+}
+
+AUTO_OP tanh(n, n) {
+   $1 = tanh($2);
+}
+
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Bitwise logical operations
+
+These operations apply  bitwise logical functions to their arguments.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<and>(i, i, i)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
+
+=cut
+
+AUTO_OP and(i, i, i) {
+  $1 = $2 & $3;
+}
+
+
+########################################
+
+=item B<not>(i, i)
+
+Set the bits of $1 to the B<not> of the corresponding bits from $2.
+
+=cut
+
+AUTO_OP not(i, i) {
+  $1 = ~ $2;
+}
+
+
+########################################
+
+=item B<or>(i, i, i)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
+
+=cut
+
+AUTO_OP or(i, i, i) {
+  $1 = $2 | $3;
+}
+
+
+########################################
+
+=item B<shl>(i, i, ic)
+
+Set $1 to the value of $2 shifted left by $3 bits.
+
+=cut
+
+AUTO_OP shl(i, i, ic) {
+  $1 = $2 << $3;
+}
+
+
+########################################
+
+=item B<shr>(i, i, ic)
+
+Set $1 to the value of $2 shifted right by $3 bits.
+
+=cut
+
+AUTO_OP shr(i, i, ic) {
+  $1 = $2 >> $3;
+}
+
+
+########################################
+
+=item B<xor>(i, i, i)
+
+Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
+
+=cut
+
+AUTO_OP xor(i, i, i) {
+  $1 = $2 ^ $3;
+}
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Interpreter flag modification operations
+
+These operations modify the interpreter's internal flags, affecting its
+subsequent operation.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<bounds>(ic)
+
+If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
+
+=cut
+
+MANUAL_OP bounds(ic) {
+  if ($1 != 0) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
+  else         { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
+  RESTART(*);
+}
+
+
+########################################
+
+=item B<trace>(ic)
+
+If $1 is zero, turn off tracing. Otherwise turn it on.
+
+=cut
+
+MANUAL_OP trace(ic) {
+  if ($1 != 0) { interpreter->flags |=  PARROT_TRACE_FLAG; }
+  else         { interpreter->flags &= ~PARROT_TRACE_FLAG; }
+  RESTART(*);
+}
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Register operations
+
+These operations effect entire sets of registers.
+
+=over 4
+
+=cut
+
+
+########################################
+
+=item B<cleari>()
+
+=item B<clearn>()
+
+=item B<clearp>()
+
+=item B<clears>()
+
+Clear all the registers of the type indicated in the name of the operation.
+
+INTVAL ('i') and FLOATVAL ('n') registers clear to zero.
+
+PMC ('p') and STRING ('s') registers clear to NULL.
+
+=cut
 
 AUTO_OP cleari() {
   Parrot_clear_i(interpreter);
@@ -483,366 +1589,250 @@ AUTO_OP clearp() {
   Parrot_clear_p(interpreter);
 }
 
-AUTO_OP set(s, sc) {
-  $1 = $2;
-}
-
-AUTO_OP print(s) {
-  STRING *s = $1; 
-  if (s) printf("%.*s",(int)string_length(s),(char *) s->bufstart);
-}
-
-AUTO_OP print(sc) {
-  STRING *s = $1;
-  INTVAL l = string_length(s);
-  printf("%.*s", (int)l, (char *)s->bufstart);
-}
-
-AUTO_OP length(i, s) {
-  $1 = string_length($2);
-}
-
-AUTO_OP chopn(s, ic) {
-   (void)string_chopn($1, $2);
-}
-
-AUTO_OP substr(s, s, i, i) {
-    STRING *s = string_substr($2, $3, $4, &$1);
-    $1 = s;
-}
-
-AUTO_OP concat(s, s) {
-    STRING *s = string_concat($1, $2, 1);
-    $1 = s;
-}
-
-AUTO_OP eq(s, s, ic) {
-  if (string_compare($1, $2) == 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP eq(s, sc, ic) {
-  if (string_compare($1, $2) == 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ne(s, s, ic) {
-  if (string_compare($1, $2) != 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ne(s, sc, ic) {
-  if (string_compare($1, $2) != 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP lt(s, s, ic) {
-  if (string_compare($1, $2) < 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP lt(s, sc, ic) {
-  if (string_compare($1, $2) < 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(s, s, ic) {
-  if (string_compare($1, $2) <= 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP le(s, sc, ic) {
-  if (string_compare($1, $2) <= 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(s, s, ic) {
-  if (string_compare($1, $2) > 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP gt(s, sc, ic) {
-  if (string_compare($1, $2) > 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(s, s, ic) {
-  if (string_compare($1, $2) >= 0) {
-    RETREL($3);
-  }
-}
-
-AUTO_OP ge(s, sc, ic) {
-  if (string_compare($1, $2) >= 0) {
-    RETREL($3);
-  }
-}
-
-
-/* TRANSCENDENTAL MATH FUNCTIONS */
-
-AUTO_OP sin(n, n) {
-   $1 = sin($2);
-}
-
-AUTO_OP cos(n, n) {
-   $1 = cos($2);
-}
-
-AUTO_OP tan(n, n) {
-   $1 = tan($2);
-}
-
-AUTO_OP sec(n, n) {
-   $1 = ((FLOATVAL)1) / cos($2);
-}
-
-AUTO_OP atan(n, n) {
-   $1 = atan($2);
-}
-
-AUTO_OP atan(n, n, n) {
-   $1 = atan2($2, $3);
-}
-
-AUTO_OP asin(n, n) {
-   $1 = asin($2);
-}
-
-AUTO_OP acos(n, n) {
-   $1 = acos($2);
-}
-
-AUTO_OP asec(n, n) {
-   $1 = acos(((FLOATVAL)1.0) / $2);
-}
 
-AUTO_OP cosh(n, n) {
-   $1 = cosh($2);
-}
-
-AUTO_OP sinh(n, n) {
-   $1 = sinh($2);
-}
-
-AUTO_OP tanh(n, n) {
-   $1 = tanh($2);
-}
-
-AUTO_OP sech(n, n) {
-   $1 = ((FLOATVAL)1.0) / cosh($2);
-}
-
-AUTO_OP log2(n, n) {
-   FLOATVAL temp = log((FLOATVAL)2.0);
-   $1 = log($2) / temp;
-}
+########################################
 
-AUTO_OP log10(n, n) {
-   $1 = log10($2);
-}
+=item B<popi>()
 
-AUTO_OP ln(n, n) {
-   $1 = log($2);
-}
+=item B<popn>()
 
-AUTO_OP exp(n, n) {
-   $1 = exp($2);
-}
+=item B<popp>()
 
-AUTO_OP pow(n, n, n) {
-   $1 = pow($2, $3);
-}
+=item B<pops>()
 
-AUTO_OP sin(n, i) {
-   $1 = sin((FLOATVAL)$2);
-}
+Restore all the registers of the type indicated in the name of the operation
+from the most recently B<push>ed copies.
 
-AUTO_OP cos(n, i) {
-   $1 = cos((FLOATVAL)$2);
-}
+=cut
 
-AUTO_OP tan(n, i) {
-   $1 = tan((FLOATVAL)$2);
+AUTO_OP popi() {
+  Parrot_pop_i(interpreter);
 }
 
-AUTO_OP sec(n, i) {
-   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+AUTO_OP popn() {
+  Parrot_pop_n(interpreter);
 }
 
-AUTO_OP atan(n, i) {
-   $1 = atan((FLOATVAL)$2);
+AUTO_OP pops() {
+  Parrot_pop_s(interpreter);
 }
 
-AUTO_OP atan(n, n, i) {
-   $1 = atan2($2, (FLOATVAL)$3);
+AUTO_OP popp() {
+  Parrot_pop_p(interpreter);
 }
 
-AUTO_OP atan(n, i, n) {
-   $1 = atan2((FLOATVAL)$2, $3);
-}
 
-AUTO_OP atan(n, i, i) {
-   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-}
+########################################
 
-AUTO_OP asin(n, i) {
-   $1 = asin((FLOATVAL)$2);
-}
+=item B<pushi>()
 
-AUTO_OP acos(n, i) {
-   $1 = acos((FLOATVAL)$2);
-}
+=item B<pushn>()
 
-AUTO_OP asec(n, i) {
-   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-}
+=item B<pushp>()
 
-AUTO_OP cosh(n, i) {
-   $1 = cosh((FLOATVAL)$2);
-}
+=item B<pushs>()
 
-AUTO_OP sinh(n, i) {
-   $1 = sinh((FLOATVAL)$2);
-}
+Save all the registers of the type indicated in the name of the operation.
 
-AUTO_OP tanh(n, i) {
-   $1 = tanh((FLOATVAL)$2);
-}
+=cut
 
-AUTO_OP sech(n, i) {
-   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+AUTO_OP pushi() {
+  Parrot_push_i(interpreter);
 }
 
-AUTO_OP log2(n, i) {
-   FLOATVAL temp = log((FLOATVAL)2.0);
-   $1 = log((FLOATVAL)$2) / temp;
+AUTO_OP pushn() {
+  Parrot_push_n(interpreter);
 }
 
-AUTO_OP log10(n, i) {
-   $1 = log10((FLOATVAL)$2);
+AUTO_OP pushs() {
+  Parrot_push_s(interpreter);
 }
 
-AUTO_OP ln(n, i) {
-   $1 = log((FLOATVAL)$2);
+AUTO_OP pushp() {
+  Parrot_push_p(interpreter);
 }
 
-AUTO_OP exp(n, i) {
-   $1 = exp((FLOATVAL)$2);
-}
 
-AUTO_OP pow(n, n, i) {
-   $1 = pow($2, (FLOATVAL)$3);
-}
+=back
 
-AUTO_OP pow(n, i, i) {
-   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-}
+=cut
 
-AUTO_OP pow(n, i, n) {
-   $1 = pow((FLOATVAL)$2, $3);
-}
 
+###############################################################################
 
-/* BITWISE LOGICAL OPS */
+=head2 Register stack operations
 
-AUTO_OP and(i, i, i) {
-  $1 = $2 & $3;
-}
+These operations effect individual registers.
 
-AUTO_OP not(i, i) {
-  $1 = ~ $2;
-}
+=over 4
 
-AUTO_OP or(i, i, i) {
-  $1 = $2 | $3;
-}
+=cut
 
-AUTO_OP shl(i, i, ic) {
-  $1 = $2 << $3;
-}
 
-AUTO_OP shr(i, i, ic) {
-  $1 = $2 >> $3;
-}
+########################################
 
-AUTO_OP xor(i, i, i) {
-  $1 = $2 ^ $3;
-}
+=item B<save>(i)
 
+=item B<save>(n)
 
-/* INTERPRETER FLAG OPS */
+=item B<save>(p)
 
-MANUAL_OP bounds(ic) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
-  else         { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
-  RESTART(*);
-}
+=item B<save>(s)
 
-MANUAL_OP trace(ic) {
-  if ($1 != 0) { interpreter->flags |=  PARROT_TRACE_FLAG; }
-  else         { interpreter->flags &= ~PARROT_TRACE_FLAG; }
-  RESTART(*);
-}
+Save register $1 onto the appropriate register stack.
 
-/* Some stack ops */
+=cut
 
 AUTO_OP save(i) {
   push_generic_entry(interpreter, &($1), STACK_ENTRY_INT, NULL);
-}
-
-AUTO_OP restore(i) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
-}
-
-AUTO_OP save(s) {
-  push_generic_entry(interpreter,  $1, STACK_ENTRY_INT, NULL);
-}
-
-AUTO_OP restore(s) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
 }
 
 AUTO_OP save(n) {
   push_generic_entry(interpreter, &($1), STACK_ENTRY_INT, NULL);
 }
 
-AUTO_OP restore(n) {
+AUTO_OP save(p) {
+  push_generic_entry(interpreter, $1, STACK_ENTRY_INT, NULL);
+}
+
+AUTO_OP save(s) {
+  push_generic_entry(interpreter,  $1, STACK_ENTRY_INT, NULL);
+}
+
+
+########################################
+
+=item B<restore>(i)
+
+=item B<restore>(n)
+
+=item B<restore>(p)
+
+=item B<restore>(s)
+
+Restore register $1 from the appropriate register stack.
+
+=cut
+
+AUTO_OP restore(i) {
   pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
 }
 
-AUTO_OP save(p) {
-  push_generic_entry(interpreter, $1, STACK_ENTRY_INT, NULL);
+AUTO_OP restore(n) {
+  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
 }
 
 AUTO_OP restore(p) {
   pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
 }
 
-/* Control flow */
+AUTO_OP restore(s) {
+  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
+}
 
-MANUAL_OP bsr(ic) {
-  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+
+=back
+
+=cut
+
+
+###############################################################################
+
+=head2 Control flow
+
+The control flow opcodes check conditions and manage program flow.
+
+=over 4
+
+
+########################################
+
+=item B<branch>(ic)
+
+Branch forward or backward by the amount in $1.
+
+=cut
+ 
+MANUAL_OP branch(ic) {
   RETREL($1);
 }
+
+
+########################################
+
+=item B<bsr>(i)
+
+=item B<bsr>(ic)
+
+Branch to the location specified by $1. Push the current location onto the call
+stack for later returning.
+
+=cut
 
 MANUAL_OP bsr(i) {
   push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
   RETREL($1);
 }
 
+MANUAL_OP bsr(ic) {
+  push_generic_entry(interpreter, cur_opcode + 2,  STACK_ENTRY_DESTINATION, NULL);
+  RETREL($1);
+}
+
+
+########################################
+
+=item B<jsr>()
+
+Jump to the location specified by register X. Push the current
+location onto the call stack for later returning.
+
+TODO: Implement this, or delete the entry.
+
+=cut
+
+
+########################################
+
+=item B<jump>(i)
+
+Jump to the address held in register $1.
+
+=cut
+
+MANUAL_OP jump(i) {
+  RETREL($1);
+}
+
+
+########################################
+
+=item B<ret>()
+
+Pop the location off the top of the stack and go there.
+
+=cut
+
 MANUAL_OP ret() {
   opcode_t *dest;
   pop_generic_entry(interpreter, &dest, STACK_ENTRY_DESTINATION);
   RETABS(dest);
 } 
+
+=back
+
+=cut
+
+###############################################################################
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001 Yet Another Society. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
+

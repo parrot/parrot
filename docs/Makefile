@@ -1,11 +1,14 @@
 
-all: packfile-c.pod packfile-perl.pod
+all: packfile-c.pod packfile-perl.pod core_ops.pod
 
 packfile-c.pod: ../packfile.c
 	perldoc -u ../packfile.c > packfile-c.pod
 
 packfile-perl.pod: ../Parrot/PackFile.pm
 	perldoc -u ../Parrot/PackFile.pm > packfile-perl.pod
+
+core_ops.pod: ../core.ops
+	perldoc -u ../core.ops > core_ops.pod
 
 clean:
 	rm -f packfile-c.pod packfile-perl.pod
