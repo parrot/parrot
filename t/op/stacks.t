@@ -653,8 +653,6 @@ starting
 done
 OUTPUT
 
-SKIP: { skip("Await exceptions", 1);
-# this should throw an exception...
 output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
 	save	12
 	print	"ready\\n"
@@ -663,9 +661,8 @@ output_is(<<CODE, <<OUTPUT, "entrytype, beyond stack depth");
 	end
 CODE
 ready
-Stack Depth Wrong
+Stack Depth wrong
 OUTPUT
-}
 
 output_is(<<'CODE', <<'OUTPUT', "depth op");
         depth I0

@@ -57,7 +57,7 @@ output_is(<<CODE, <<OUTPUT, "sleep");
 	gt	I0, I1, ALLOK
 	print	"no, sleeping made time go the wrong way "
 
-ALLOK:	
+ALLOK:
 	print	"done\\n"
 	end
 CODE
@@ -65,7 +65,7 @@ start
 done
 OUTPUT
 
-output_is(<<CODE, 'Cannot go back in time', "sleep");
+output_is(<<CODE, "Cannot go back in time\n", "sleep");
 	sleep	-1
 	end
 CODE

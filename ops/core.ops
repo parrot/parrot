@@ -2088,7 +2088,7 @@ Repeats string $2 $3 times and stores result in $1.
 
 inline op repeat(out STR, in STR, in INT) {
   if ($3 < 0) {
-      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg");
+      internal_exception(NEG_REPEAT, "Cannot repeat with negative arg\n");
   }
   $1 = string_repeat(interpreter, $2, (UINTVAL)$3, NULL);
   goto NEXT();
@@ -2381,7 +2381,7 @@ inline op new(out STR, in INT, in INT) {
 }
 
 inline op new(out STR, in INT, in INT, in INT) {
-  internal_exception(INVALID_CHARTYPE, "We don't do this yet");
+  internal_exception(INVALID_CHARTYPE, "We don't do this yet\n");
   $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
   goto NEXT();
 }
@@ -3633,7 +3633,7 @@ op entrytype(out INT, in INT) {
 
   entry = stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry) {
-    internal_exception(99, "Stack Depth wrong");
+    internal_exception(99, "Stack Depth wrong\n");
   }
   $1 = get_entry_type(interpreter, entry);
   goto NEXT();
@@ -3674,9 +3674,9 @@ op lookback(out INT, in INT) {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong");
+      internal_exception(99, "Stack depth wrong\n");
   if (entry->entry_type != STACK_ENTRY_INT) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
   }
 
   $1 = entry->entry.int_val;
@@ -3687,9 +3687,9 @@ op lookback(out STR, in INT) {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong");
+      internal_exception(99, "Stack depth wrong\n");
   if (entry->entry_type != STACK_ENTRY_STRING) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
   }
 
   $1 = entry->entry.string_val;
@@ -3700,9 +3700,9 @@ op lookback(out NUM, in INT) {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong");
+      internal_exception(99, "Stack depth wrong\n");
   if (entry->entry_type != STACK_ENTRY_FLOAT) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
   }
 
   $1 = entry->entry.num_val;
@@ -3713,9 +3713,9 @@ op lookback(out PMC, in INT) {
   Stack_Entry_t *entry =
   	stack_entry(interpreter, interpreter->ctx.user_stack, $2);
   if (!entry)
-      internal_exception(99, "Stack depth wrong");
+      internal_exception(99, "Stack depth wrong\n");
   if (entry->entry_type != STACK_ENTRY_PMC) {
-    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!");
+    internal_exception(ERROR_BAD_STACK_TYPE, "Wrong type on stack!\n");
   }
 
   $1 = entry->entry.pmc_val;
@@ -4731,7 +4731,7 @@ Sleep for $1 seconds.
 
 inline op sleep(in INT) {
   if ($1 < 0) {
-      internal_exception(NEG_SLEEP, "Cannot go back in time");
+      internal_exception(NEG_SLEEP, "Cannot go back in time\n");
   }
   Parrot_sleep((UINTVAL)$1);
   goto NEXT();

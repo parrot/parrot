@@ -1112,7 +1112,7 @@ XXXXXXXXXXXX
 >< done
 OUTPUT
 
-output_is(<<'CODE','Cannot repeat with negative arg','repeat OOB');
+output_is(<<'CODE',"Cannot repeat with negative arg\n",'repeat OOB');
 	repeat S0, "japh", -1
 	end
 CODE
