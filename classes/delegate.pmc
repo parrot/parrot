@@ -25,6 +25,8 @@ the registers -- vtable methods can't change them.
 Also note that if the vtable method clobbers a register that contains a
 string or PMC not otherwise rooted it could be collected too early.
 
+=head2 Functions
+
 =over 4
 
 =cut
@@ -41,22 +43,55 @@ static struct regsave {
     struct PReg pmc_reg;
 } regsave;
 
+/*
+
+=item C<PARROT_INLINE static struct regsave *
+save_regs(Parrot_Interp interp)>
+
+Saves the registers to the C<regsave struct>.
+
+=cut
+
+*/
+
 PARROT_INLINE static struct regsave *
 save_regs(Parrot_Interp interp) {
     struct regsave *save;
     save = mem_sys_allocate(sizeof(struct regsave));
     if (!save) {
-	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+		internal_exception(ALLOCATION_ERROR, "No memory for save struct");
     }
     mem_sys_memcopy(save, interp, sizeof(struct regsave));
     return save;
 }
+
+/*
+
+=item C<PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, struct regsave *data)>
+
+Restores the registers from C<*data>.
+
+=cut
+
+*/
 
 PARROT_INLINE static void
 restore_regs(Parrot_Interp interp, struct regsave *data) {
     mem_sys_memcopy(interp, data, sizeof(struct regsave));
     mem_sys_free(data);
 }
+
+/*
+
+=item C<PARROT_INLINE static PMC *
+find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name)>
+
+Finds and returns the delegated method with C string C<name>.
+
+=cut
+
+*/
 
 PARROT_INLINE static PMC *
 find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
@@ -66,21 +101,48 @@ find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
     return Parrot_find_method_with_cache(interpreter, pmc, meth);
 }
 
+/*
+
+=item C<PARROT_INLINE static PMC *
+find_or_die(Parrot_Interp interpreter, PMC *pmc, const char *name)>
+
+Returns the result of calling C<find_meth()> with the arguments, raising 
+an exception if no method is found.
+
+=cut
+
+*/
+
 PARROT_INLINE static PMC *
 find_or_die(Parrot_Interp interpreter, PMC *pmc, const char *name) {
     PMC *returnPMC = find_meth(interpreter, pmc, name);
     if (PMC_IS_NULL(returnPMC)) {
-	internal_exception(METH_NOT_FOUND,
-		"Can't find method '%s' for object", name);
+		internal_exception(METH_NOT_FOUND,
+			"Can't find method '%s' for object", name);
     }
     REG_PMC(2) = pmc;
     return returnPMC;
 }
 
-/* All these functions to run code can leak a full parrot register
-   file, as well as potentially permanently unroot some PMCs or
-   strings, if the vtable method throws an exception. It really ought
-   be caught rather than let flow through.
+/*
+
+=back
+
+All these functions to run code can leak a full parrot register file, as
+well as potentially permanently unroot some PMCs or strings, if the
+vtable method throws an exception. It really ought be caught rather than
+let flow through.
+
+=over 4
+
+=item C<PARROT_INLINE static void
+noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die)>
+
+Calls the delegated method with no arguments or return value. If C<die>
+is true then an exception will be raised if the method is not found.
+
+=cut
+
 */
 
 PARROT_INLINE static void
@@ -102,8 +164,24 @@ noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die) {
 
 pmclass delegate {
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void init()>
+
+Calls the delegated C<init()> method.
+
+=cut
+
+*/
+
     void init () {
-	noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
+		noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
 

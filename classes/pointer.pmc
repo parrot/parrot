@@ -1,51 +1,131 @@
-/* Pointer.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Pointer base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:  The actual pointer is in PMC_data
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/pointer.pmc - Pointer
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Pointer base class.
+
+The actual pointer is in C<PMC_data>.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass Pointer need_ext {
 
+/*
+
+=item C<void init()>
+
+Initilizes the pointer.
+
+=cut
+
+*/
+
     void init () {
         PObj_custom_mark_SET(SELF);
     }
 
+/*
+
+=item C<void morph(INTVAL type)>
+
+Does nothing.
+
+=cut
+
+*/
+
     void morph (INTVAL type) {
     }
+
+/*
+
+=item C<void mark()>
+
+Marks the pointer as live.
+
+=cut
+
+*/
 
     void mark () {
         void (*mark_function)(struct Parrot_Interp*, void*) =
             (void (*)(struct Parrot_Interp*, void*))
-	    	D2FPTR(PMC_struct_val(SELF));
+            D2FPTR(PMC_struct_val(SELF));
         if (PMC_data(SELF) == NULL)
-		return;
+            return;
         if (PMC_struct_val(SELF) == NULL)
-		return;
+            return;
         (*mark_function)(INTERP, PMC_data(SELF));
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the pointer.
+
+=cut
+
+*/
+
     PMC* clone () {
-	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
-	return dest;
+        return dest;
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the pointer value as an integer.
+
+=cut
+
+*/
 
     INTVAL get_integer () {
         return (INTVAL)PMC_data(SELF);
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the pointer value as a floating-point number.
+
+=cut
+
+*/
+
     FLOATVAL get_number () {
         return (FLOATVAL)(INTVAL)PMC_data(SELF);
     }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the pointer value as a Parrot string.
+
+=cut
+
+*/
 
     STRING* get_string () {
         STRING* ret;
@@ -61,12 +141,40 @@ pmclass Pointer need_ext {
         return ret;
     }
 
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the pointer is not C<NULL>.
+
+=cut
+
+*/
+
     INTVAL get_bool () {
         return (INTVAL)(PMC_data(SELF) != NULL);
     }
 
+/*
+
+=item C<INTVAL is_same(PMC *pmc2)>
+
+Returns whether the pointer has the same value as C<*pmc2>.
+
+=cut
+
+*/
+
     INTVAL is_same (PMC* pmc2) {
         return (INTVAL)(SELF->vtable == pmc2->vtable &&
-		PMC_data(SELF) == PMC_data(pmc2));
+        PMC_data(SELF) == PMC_data(pmc2));
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

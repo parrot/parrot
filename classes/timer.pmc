@@ -1,51 +1,59 @@
-/* timer.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This is the Timer base class
- *  Data Structure and Algorithms:
- *     Running timers are kept in a linked list. Each timer has a
- *     tick count, which gets decremented if the system timer
- *     expires. If the tick count reaches zero, the timer handler gets
- *     invoked via Parrot's event handling code.
- *  History:
- *     Initial proposal by leo 2003.07.15
- *     Initial revision        2003.07.17
- *     Switch to events        2004.01.07
- *  Synopsis:
- *     new P0, .Timer
- *     set P0[.PARROT_TIMER_SEC], I_seconds        # whole seconds
- *     set P0[.PARROT_TIMER_USEC], I_micro seconds # and/or micro seconds
- *     set P0[.PARROT_TIMER_NSEC], N_seconds_frac  # or fraction in seconds
- *     set P0[.PARROT_TIMER_REPEAT], I_repeat      # 0 = one shot ...
- *     set P0[.PARROT_TIMER_HANDLER], P_sub        # set handler sub PMC
- *     invoke P0                                   # start timer
- *     set P0[.PARROT_TIMER_RUNNING], 1            # same
- *
- *     new P0, .Timer, P1                          # set everything
- *
- *     set I0, P0[.PARROT_TIMER_SEC]               # query current timer status
- *     set N0, P0[.PARROT_TIMER_NSEC]
- *     ...
- *     set P0[.PARROT_TIMER_RUNNING], 0            # turn timer off
- *
- *  Notes:
- *     The Timer resolution is operating system dependent. It's only
- *     guaranteed that the Timer will fire some time after the
- *     programmed interval.
- *     The Timer stops after invoking the handler (repeat+1) times.
- *     To create a Timer that will run forever, set "repeat" to -1.
- *     Turning the Timer off preserves set values; the Timer is
- *     not destroyed.
- *     When setting both PARROT_TIMER_SEC and PARROT_TIMER_USEC it
- *     must be done in that sequence, whole seconds first.
- *     If a timer is constructed with an initializer and it should
- *     be run immediately, the PARROT_TIMER_RUNNING value has to be in the
- *     last key of the initializer.
- *
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/timer.pmc - Timer
+
+=head1 SYNOPSIS
+
+    new P0, .Timer
+    set P0[.PARROT_TIMER_SEC], I_seconds        # whole seconds
+    set P0[.PARROT_TIMER_USEC], I_micro seconds # and/or micro seconds
+    set P0[.PARROT_TIMER_NSEC], N_seconds_frac  # or fraction in seconds
+    set P0[.PARROT_TIMER_REPEAT], I_repeat      # 0 = one shot ...
+    set P0[.PARROT_TIMER_HANDLER], P_sub        # set handler sub PMC
+    invoke P0                                   # start timer
+    set P0[.PARROT_TIMER_RUNNING], 1            # same
+    
+    new P0, .Timer, P1                          # set everything
+    
+    set I0, P0[.PARROT_TIMER_SEC]               # query current timer status
+    set N0, P0[.PARROT_TIMER_NSEC]
+    ...
+    set P0[.PARROT_TIMER_RUNNING], 0            # turn timer off
+
+
+=head1 DESCRIPTION
+
+This is the Timer base class
+
+Running timers are kept in a linked list. Each timer has a tick count,
+which gets decremented if the system timer expires. If the tick count
+reaches zero, the timer handler gets invoked via Parrot's event handling
+code.
+
+The Timer resolution is operating system dependent. It's only guaranteed
+that the Timer will fire some time after the programmed interval.
+
+The Timer stops after invoking the handler (repeat+1) times. To create a
+Timer that will run forever, set "repeat" to -1. Turning the Timer off
+preserves set values; the Timer is not destroyed.
+
+When setting both C<PARROT_TIMER_SEC> and C<PARROT_TIMER_USEC> it must
+be done in that sequence, whole seconds first. If a timer is constructed
+with an initializer and it should be run immediately, the
+C<PARROT_TIMER_RUNNING> value has to be in the last key of the
+initializer.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
@@ -63,14 +71,36 @@ typedef enum {
 } parrot_timer_enum_t;
 /* &end_gen */
 
+/*
+
+=item C<static void
+add_timer(Parrot_Interp interpreter, PMC *pmc)>
+
+Adds a new timer event to the event queue.
+
+=cut
+
+*/
+
 static void
 add_timer(Parrot_Interp interpreter, PMC *pmc)
 {
     parrot_timer_event *t = PMC_struct_val(pmc);
     if (!PMC_IS_NULL(t->sub))
-	Parrot_new_timer_event(interpreter, pmc, t->abs_time,
-			t->interval, t->repeat, t->sub, EVENT_TYPE_TIMER);
+        Parrot_new_timer_event(interpreter, pmc, t->abs_time,
+            t->interval, t->repeat, t->sub, EVENT_TYPE_TIMER);
 }
+
+/*
+
+=item C<static void
+del_timer(Parrot_Interp interpreter, PMC *pmc)>
+
+Deletes the timer event.
+
+=cut
+
+*/
 
 static void
 del_timer(Parrot_Interp interpreter, PMC *pmc)
@@ -81,146 +111,259 @@ del_timer(Parrot_Interp interpreter, PMC *pmc)
 
 pmclass Timer does event {
 
+/*
+
+=item C<void init()>
+
+Initializes the timer.
+
+=cut
+
+*/
+
     void init() {
-	/*
-	 * t->abs_time actually is relative, its converted to an
-	 * absolute time, when the timer is started
-	 */
-	parrot_timer_event *t =
-	    mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
-	PMC_struct_val(SELF) = t;
-	PObj_active_destroy_SET(SELF);
- 	++interpreter->num_early_DOD_PMCs;
+        /*
+         * t->abs_time actually is relative, its converted to an
+         * absolute time, when the timer is started
+         */
+        parrot_timer_event *t =
+            mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
+        PMC_struct_val(SELF) = t;
+        PObj_active_destroy_SET(SELF);
+        ++interpreter->num_early_DOD_PMCs;
     }
+
+/*
+
+=item C<void init_pmc(PMC *init)>
+
+See F<docs/pdds/pdd02_vtables.pod> for intializers.
+
+=cut
+
+*/
 
     void init_pmc(PMC *init) {
-	/*
-	 * s. pdd02_vtables for intializers
-	 */
-	INTVAL n = VTABLE_get_integer(interpreter, init);
-	INTVAL i;
-	INTVAL val;
-	FLOATVAL nval;
-	PMC *pval;
-
-	SELF.init();
-	for (i = 0; i < n; i += 2) {
-	    INTVAL key = VTABLE_get_integer_keyed_int(interpreter, init, i);
-	    switch (key) {
-		case PARROT_TIMER_SEC:
-		case PARROT_TIMER_USEC:
-		case PARROT_TIMER_REPEAT:
-		case PARROT_TIMER_RUNNING:
-		    val =
-			VTABLE_get_integer_keyed_int(interpreter, init, i+1);
-		    SELF.set_integer_keyed_int(key, val);
-		    break;
-		case PARROT_TIMER_NSEC:
-		    nval =
-			VTABLE_get_number_keyed_int(interpreter, init, i+1);
-		    SELF.set_number_keyed_int(key, nval);
-		    break;
-		case PARROT_TIMER_HANDLER:
-		    pval =
-			VTABLE_get_pmc_keyed_int(interpreter, init, i+1);
-		    SELF.set_pmc_keyed_int(key, pval);
-		    break;
-	    }
-	}
+        INTVAL n = VTABLE_get_integer(interpreter, init);
+        INTVAL i;
+        INTVAL val;
+        FLOATVAL nval;
+        PMC *pval;
+    
+        SELF.init();
+        for (i = 0; i < n; i += 2) {
+            INTVAL key = VTABLE_get_integer_keyed_int(interpreter, init, i);
+            switch (key) {
+                case PARROT_TIMER_SEC:
+                case PARROT_TIMER_USEC:
+                case PARROT_TIMER_REPEAT:
+                case PARROT_TIMER_RUNNING:
+                    val =
+                    VTABLE_get_integer_keyed_int(interpreter, init, i+1);
+                    SELF.set_integer_keyed_int(key, val);
+                    break;
+                case PARROT_TIMER_NSEC:
+                    nval =
+                    VTABLE_get_number_keyed_int(interpreter, init, i+1);
+                    SELF.set_number_keyed_int(key, nval);
+                    break;
+                case PARROT_TIMER_HANDLER:
+                    pval =
+                    VTABLE_get_pmc_keyed_int(interpreter, init, i+1);
+                    SELF.set_pmc_keyed_int(key, pval);
+                    break;
+            }
+        }
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the timer.
+
+=cut
+
+*/
 
     void destroy() {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-	del_timer(INTERP, SELF);
-	mem_sys_free(t);
+        parrot_timer_event *t = PMC_struct_val(SELF);
+        del_timer(INTERP, SELF);
+        mem_sys_free(t);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the timer info for C<key>.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-
-	switch(key) {
-	    case PARROT_TIMER_SEC:
-		return (INTVAL)t->abs_time;
-	    case PARROT_TIMER_USEC:
-		return (t->abs_time - (INTVAL)t->abs_time) *1000000.0;
-	    case PARROT_TIMER_REPEAT:
-		return (INTVAL) t->repeat;
-	    case PARROT_TIMER_RUNNING:
-		return 0;
-	}
-	return -1;
+        parrot_timer_event *t = PMC_struct_val(SELF);
+    
+        switch(key) {
+            case PARROT_TIMER_SEC:
+                return (INTVAL)t->abs_time;
+            case PARROT_TIMER_USEC:
+                return (t->abs_time - (INTVAL)t->abs_time) *1000000.0;
+            case PARROT_TIMER_REPEAT:
+                return (INTVAL) t->repeat;
+            case PARROT_TIMER_RUNNING:
+                return 0;
+        }
+        return -1;
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC associated with C<key>.
+
+=cut
+
+*/
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-	switch(key) {
-	    case PARROT_TIMER_HANDLER:
-		return t->sub;
-		break;
-	    default:
-		return PMCNULL;
-	}
-	return PMCNULL;
+        parrot_timer_event *t = PMC_struct_val(SELF);
+        switch(key) {
+            case PARROT_TIMER_HANDLER:
+                return t->sub;
+                break;
+            default:
+                return PMCNULL;
+        }
+        return PMCNULL;
     }
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Returns the number associated with C<key>.
+
+=cut
+
+*/
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-
-	switch(key) {
-	    case PARROT_TIMER_NSEC:
-		return t->abs_time;
-		break;
-	}
-	return -1.0;
+        parrot_timer_event *t = PMC_struct_val(SELF);
+    
+        switch(key) {
+            case PARROT_TIMER_NSEC:
+                return t->abs_time;
+                break;
+        }
+        return -1.0;
     }
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Sets the value associated with C<key> to C<value>.
+
+=cut
+
+*/
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-
-	switch(key) {
-	    case PARROT_TIMER_SEC:
-		t->abs_time = value;
-		break;
-	    case PARROT_TIMER_USEC:
-		t->abs_time += value / 1000000.0;
-		break;
-	    case PARROT_TIMER_REPEAT:
-		t->repeat = value;
-		break;
-	    case PARROT_TIMER_RUNNING:
-		if (value) {
-		    add_timer(INTERP, SELF);
-		}
-		else {
-		    del_timer(INTERP, SELF);
-		}
-		break;
-	}
+        parrot_timer_event *t = PMC_struct_val(SELF);
+    
+        switch(key) {
+            case PARROT_TIMER_SEC:
+                t->abs_time = value;
+                break;
+            case PARROT_TIMER_USEC:
+                t->abs_time += value / 1000000.0;
+                break;
+            case PARROT_TIMER_REPEAT:
+                t->repeat = value;
+                break;
+            case PARROT_TIMER_RUNNING:
+                if (value) {
+                    add_timer(INTERP, SELF);
+                }
+                else {
+                    del_timer(INTERP, SELF);
+                }
+                break;
+        }
     }
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Sets the PMC associated with C<key> to C<*value>.
+
+=cut
+
+*/
 
     void set_pmc_keyed_int(INTVAL key, PMC* value) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-	switch(key) {
-	    case PARROT_TIMER_HANDLER:
-		t->sub = value;
-		break;
-	    default:
-		break;
-	}
+        parrot_timer_event *t = PMC_struct_val(SELF);
+        switch(key) {
+            case PARROT_TIMER_HANDLER:
+                t->sub = value;
+            break;
+                default:
+            break;
+        }
     }
+
+/*
+
+=item C<void *invoke(void *next)>
+
+Adds the timer to the event queue.
+
+=cut
+
+*/
 
     void* invoke(void *next) {
-	add_timer(INTERP, SELF);
-	return next;
+        add_timer(INTERP, SELF);
+        return next;
     }
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+Sets the floating-point value associated with C<key> to C<value>.
+
+=cut
+
+*/
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-	parrot_timer_event *t = PMC_struct_val(SELF);
-
-	switch(key) {
-	    case PARROT_TIMER_NSEC:
-		t->abs_time = value;
-		break;
-	}
+        parrot_timer_event *t = PMC_struct_val(SELF);
+    
+        switch(key) {
+            case PARROT_TIMER_NSEC:
+                t->abs_time = value;
+                break;
+        }
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial proposal by leo 2003.07.15
+
+Initial revision 2003.07.17
+
+Switch to events 2004.01.07
+
+=cut
+
+*/

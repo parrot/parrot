@@ -1,14 +1,22 @@
-/* scalar.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info:
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the scalar base PMC class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/scalar.pmc - Scalar Abstract Superclass
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the scalar base PMC class
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -16,71 +24,210 @@
 
 pmclass scalar abstract noinit {
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the scalar.
+
+=cut
+
+*/
+
     PMC* clone () {
-	PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
         memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
-	return dest;
+        return dest;
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the scalar.
+
+=cut
+
+*/
 
     INTVAL get_integer () {
         return PMC_int_val(SELF);
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating-point value of the scalar.
+
+=cut
+
+*/
+
     FLOATVAL get_number () {
         return PMC_num_val(SELF);
     }
+
+/*
+
+=item C<BIGNUM *get_bignum()>
+
+Returns the big number value of the scalar.
+
+=cut
+
+*/
 
     BIGNUM* get_bignum () {
         return (BIGNUM*) PMC_struct_val(SELF);
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+
+
+=cut
+
+*/
+
     STRING* get_string () {
         return (STRING*) PMC_str_val(SELF);
     }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value for the scalar.
+
+=cut
+
+*/
 
     INTVAL get_bool () {
         return PMC_int_val(SELF) != 0;
     }
 
+/*
 
-    /* The set methods merely make the appropriate part of the cache
-      be what it should be, more complex behaviour is left as an
-      exercise for the inheriting class. */
+=back
+
+=head2 Accessor Methods
+
+The set methods merely make the appropriate part of the cache be what it
+should be, more complex behaviour is left as an exercise for the
+inheriting class.
+
+=over 4
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the integer value.
+
+=cut
+
+*/
 
     void set_integer_native (INTVAL value) {
         PMC_int_val(SELF) = value;
     }
 
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the floating-point value.
+
+=cut
+
+*/
+
     void set_number_native (FLOATVAL value) {
         PMC_num_val(SELF) = value;
     }
+
+/*
+
+=item C<void set_bignum_native(BIGNUM *value)>
+
+Sets the big number value.
+
+=cut
+
+*/
 
     void set_bignum_native (BIGNUM* value) {
         PMC_struct_val(SELF) = (DPOINTER*)value;
     }
 
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the Parrot string value.
+
+=cut
+
+*/
+
     void set_string_native (STRING* value) {
         PMC_str_val(SELF) = string_copy(INTERP, value);
     }
 
-    void add_int (INTVAL value, PMC* dest) {
-        /* dest = SELF + value */
+/*
 
+=back
+
+=head1 Mathematical Methods
+
+=over 4
+
+=item C<void add_int(INTVAL value, PMC *dest)>
+
+Adds C<value> to the scalar and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void add_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer() + value;
-        /* XXX: overflow detection, bigint promotion? */
         VTABLE_set_integer_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void add_bignum(BIGNUM *value, PMC *dest)>
+
+Unimplemented. Does nothing.
+
+=cut
+
+*/
 
     void add_bignum (BIGNUM* value, PMC* dest) {
         /* XXX: bignum magic */
     }
 
-    void add_float (FLOATVAL value, PMC* dest) {
-        /* dest = SELF + value */
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void add_float(FLOATVAL value, PMC *dest)>
+
+Adds C<value> to the scalar and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void add_float (FLOATVAL value, PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number() + value;
@@ -88,9 +235,15 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void subtract (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void subtract(PMC *value, PMC *dest)>
+
+=cut
+
+*/
+
+    void subtract (PMC* value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -99,10 +252,19 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void subtract_int (INTVAL value,  PMC* dest) {
-        /* dest = SELF - value */
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void subtract_int(INTVAL value, PMC *dest)>
+
+Subtracts C<value> from the scalar and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void subtract_int (INTVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -110,15 +272,34 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_number_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void subtract_bignum(BIGNUM *value, PMC *dest)>
+
+Unimplemented. Does nothing.
+
+=cut
+
+*/
 
     void subtract_bignum (BIGNUM* value,  PMC* dest) {
         /* XXX: bignum magic */
     }
 
-    void subtract_float (FLOATVAL value,  PMC* dest) {
-        /* dest = SELF - value */
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void subtract_float (FLOATVAL value,  PMC* dest)>
+
+Subtracts C<value> from the scalar and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void subtract_float (FLOATVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -127,9 +308,19 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void multiply (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void multiply (PMC* value,  PMC* dest)>
+
+Multiplies the scalar by C<*value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void multiply (PMC* value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -138,9 +329,19 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void multiply_int (INTVAL value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void multiply_int(INTVAL value,  PMC *dest)>
+
+Multiplies the scalar by C<value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void multiply_int (INTVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -148,14 +349,34 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_number_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void multiply_bignum(BIGNUM *value, PMC *dest)>
+
+Unimplemented. Does nothing.
+
+=cut
+
+*/
 
     void multiply_bignum (BIGNUM* value,  PMC* dest) {
         /* XXX: bignum magic */
     }
 
-    void multiply_float (FLOATVAL value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
+/*
 
+=item C<void multiply_float(FLOATVAL value, PMC *dest)>
+
+Multiplies the scalar by C<value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
+    void multiply_float (FLOATVAL value,  PMC* dest) {
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -164,10 +385,19 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void divide(PMC *value, PMC *dest)>
+
+Divides the scalar by C<*value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
 
     void divide (PMC* value,  PMC* dest) {
-        /* XXX: overflow detection, bignum promotion? */
-
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -176,11 +406,19 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void divide_int(INTVAL value, PMC *dest)>
+
+Divides the scalar by C<value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
+
     void divide_int (INTVAL value,  PMC* dest) {
-        /* dest = SELF / value */
-
-        /* XXX: overflow detection, bignum promotion? */
-
         FLOATVAL result;
 
         result = DYNSELF.get_number()
@@ -189,9 +427,31 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void divide_bignum(BIGNUM *value, PMC *dest)>
+
+Unimplemented. Does nothing.
+
+=cut
+
+*/
+
     void divide_bignum (BIGNUM* value,  PMC* dest) {
         /* XXX: bignum magic */
     }
+
+/*
+
+=item C<void divide_float(FLOATVAL value, PMC *dest)>
+
+Divides the scalar by C<value> and returns the result in C<*dest>.
+
+TODO - overflow detection, bigint promotion?
+
+=cut
+
+*/
 
     void divide_float (FLOATVAL value,  PMC* dest) {
         /* dest = SELF / value */
@@ -206,9 +466,20 @@ pmclass scalar abstract noinit {
         VTABLE_set_number_native(INTERP, dest, result);
     }
 
-    void modulus (PMC* value,  PMC* dest) {
-        /* This does perl-like modulus */
+/*
 
+=item C<void modulus(PMC* value, PMC* dest)>
+
+This does perl-like modulus.
+
+Returns in C<*dest> the value of the scalar C<mod> the integer value of
+C<*value>.
+
+=cut
+
+*/
+
+    void modulus (PMC* value,  PMC* dest) {
         INTVAL result;
 
         result = DYNSELF.get_integer()
@@ -216,6 +487,16 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void modulus_int(INTVAL value, PMC* dest)>
+
+Returns in C<*dest> the value of the scalar C<mod> C<value>.
+
+=cut
+
+*/
 
     void modulus_int (INTVAL value,  PMC* dest) {
         INTVAL result;
@@ -226,20 +507,67 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void modulus_bignum(BIGNUM *value, PMC *dest)>
+
+Calls the superclass implementation.
+
+=cut
+
+*/
+
     void modulus_bignum (BIGNUM* value,  PMC* dest) {
         SUPER(value, dest);
     }
+
+/*
+
+=item C<void modulus_float(FLOATVAL value, PMC *dest)>
+
+Calls the superclass implementation.
+
+=cut
+
+*/
 
     void modulus_float (FLOATVAL value,  PMC* dest) {
         SUPER(value, dest);
     }
 
+/*
+
+=item C<void neg(PMC *dest)>
+
+Returns the negation of the scalar in C<*dest> if it is supplied.
+Otherwise the scalar itself is negated.
+
+=cut
+
+*/
+
     void neg (PMC* dest) {
-	if (!dest)
-	    PMC_int_val(SELF) = -DYNSELF.get_integer();
-	else
-	    VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
+        if (!dest)
+            PMC_int_val(SELF) = -DYNSELF.get_integer();
+        else
+            VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
+
+/*
+
+=back
+
+=head2 Bitwise Methods
+
+=over 4
+
+=item C<void bitwise_or(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<OR> of the scalar and C<*value>.
+
+=cut
+
+*/
 
     void bitwise_or (PMC* value, PMC* dest) {
         INTVAL result;
@@ -250,6 +578,16 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_or_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<OR> of the scalar and C<value>.
+
+=cut
+
+*/
+
     void bitwise_or_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
@@ -258,6 +596,16 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_and(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<AND> of the scalar and C<*value>.
+
+=cut
+
+*/
 
     void bitwise_and (PMC* value, PMC* dest) {
         INTVAL result;
@@ -268,6 +616,16 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_and_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<AND> of the scalar and C<value>.
+
+=cut
+
+*/
+
     void bitwise_and_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
@@ -276,6 +634,16 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_xor(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<XOR> of the scalar and C<*value>.
+
+=cut
+
+*/
 
     void bitwise_xor (PMC* value, PMC* dest) {
         INTVAL result;
@@ -286,6 +654,16 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_xor_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the bitwise C<XOR> of the scalar and C<value>.
+
+=cut
+
+*/
+
     void bitwise_xor_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
@@ -295,10 +673,30 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_not(PMC *dest)>
+
+Returns in C<*dest> the bitwise negation of the scalar and C<value>.
+
+=cut
+
+*/
+
     void bitwise_not (PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest, ~DYNSELF.get_integer());
     }
 
+
+/*
+
+=item C<void bitwise_shr(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the shift right of the scalar by C<*value>.
+
+=cut
+
+*/
 
     void bitwise_shr (PMC* value, PMC* dest) {
         INTVAL result;
@@ -309,6 +707,16 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_shr_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the shift right of the scalar by C<value>.
+
+=cut
+
+*/
+
     void bitwise_shr_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
@@ -317,6 +725,16 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_integer_native(INTERP, dest, result);
     }
+
+/*
+
+=item C<void bitwise_shl(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the shift left of the scalar by C<*value>.
+
+=cut
+
+*/
 
     void bitwise_shl (PMC* value, PMC* dest) {
         INTVAL result;
@@ -327,6 +745,16 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=item C<void bitwise_shl_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the shift left of the scalar by C<value>.
+
+=cut
+
+*/
+
     void bitwise_shl_int (INTVAL value, PMC* dest) {
         INTVAL result;
 
@@ -336,6 +764,22 @@ pmclass scalar abstract noinit {
         VTABLE_set_integer_native(INTERP, dest, result);
     }
 
+/*
+
+=back
+
+=head2 String Methods
+
+=over 4
+
+=item C<void concatenate(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of concatenating the scalar and C<*value>.
+
+=cut
+
+*/
+
     void concatenate (PMC* value,  PMC* dest) {
         STRING* s = string_concat(INTERP,
             DYNSELF.get_string(),
@@ -343,6 +787,16 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_string_native(INTERP, dest, s);
     }
+
+/*
+
+=item C<void concatenate_native(STRING *value, PMC *dest)>
+
+Returns in C<*dest> the result of concatenating the scalar and C<*value>.
+
+=cut
+
+*/
 
     void concatenate_native (STRING* value,  PMC* dest) {
         /* dest = SELF (concat) value */
@@ -352,6 +806,22 @@ pmclass scalar abstract noinit {
 
         VTABLE_set_string_native(INTERP, dest, s);
     }
+
+/*
+
+=back
+
+=head2 Comparison Methods
+
+=over 4
+
+=item C<INTVAL is_equal(PMC *value)>
+
+Returns whether the scalar is equal to C<*value>.
+
+=cut
+
+*/
 
     INTVAL is_equal (PMC* value) {
         /* I think we need to check everything, do the easiest first... */
@@ -370,6 +840,17 @@ pmclass scalar abstract noinit {
     }
 
 
+/*
+
+=item C<INTVAL cmp_num(PMC *value)>
+
+Returns the result of comparing the floating-point values of the scalar 
+and C<*value>.
+
+=cut
+
+*/
+
     INTVAL cmp_num (PMC* value) {
         /* XXX - Floating-point precision errors possible? */
         FLOATVAL diff = VTABLE_get_number(INTERP, value) -
@@ -378,11 +859,38 @@ pmclass scalar abstract noinit {
         return diff == 0.0 ? 0 : diff < 0.0 ? -1 : 1;
     }
 
+/*
+
+=item C<INTVAL cmp_string(PMC *value)>
+
+Returns the result of comparing the string values of the scalar and
+C<*value>.
+
+=cut
+
+*/
 
     INTVAL cmp_string (PMC* value) {
         return string_compare(INTERP, DYNSELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
+
+/*
+
+=back
+
+=head2 Logical Methods
+
+=over 4
+
+=item C<void logical_or(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the logical C<OR> of the scalar and
+C<*value>.
+
+=cut
+
+*/
 
     void logical_or (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
@@ -393,6 +901,17 @@ pmclass scalar abstract noinit {
         }
     }
 
+/*
+
+=item C< void logical_and(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the logical C<AND> of the scalar and
+C<*value>.
+
+=cut
+
+*/
+
     void logical_and (PMC* value,  PMC* dest) {
         if (DYNSELF.get_bool()) {
             VTABLE_set_pmc(INTERP, dest, value);
@@ -401,6 +920,17 @@ pmclass scalar abstract noinit {
             VTABLE_set_pmc(INTERP, dest, SELF);
         }
     }
+
+/*
+
+=item C<void logical_xor(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of the logical C<XOR> of the scalar and
+C<*value>.
+
+=cut
+
+*/
 
     void logical_xor (PMC* value,  PMC* dest) {
 
@@ -421,11 +951,33 @@ pmclass scalar abstract noinit {
         }
     }
 
+/*
+
+=item C<void logical_not(PMC *dest)>
+
+Returns in C<*dest> the result of the logical negation of the scalar and
+C<*value>.
+
+=cut
+
+*/
+
     void logical_not (PMC* dest) {
         /* XXX - Need a better way to set boolean state */
         VTABLE_set_integer_native(INTERP, dest,
             ! DYNSELF.get_bool());
     }
+
+/*
+
+=item C<void repeat(PMC *value, PMC *dest)>
+
+Returns in C<*dest> the result of repeating the scalar C<*value> times.
+
+
+=cut
+
+*/
 
     void repeat (PMC* value,  PMC* dest) {
         VTABLE_set_string_native(INTERP, dest,
@@ -433,27 +985,75 @@ pmclass scalar abstract noinit {
                 (UINTVAL)VTABLE_get_integer(INTERP, value), NULL) );
     }
 
+/*
+
+=item C<void repeat_int(INTVAL value, PMC *dest)>
+
+Returns in C<*dest> the result of repeating the scalar C<value> times.
+
+=cut
+
+*/
+
     void repeat_int (INTVAL value, PMC* dest) {
         VTABLE_set_string_native(INTERP, dest,
             string_repeat(INTERP, VTABLE_get_string(INTERP,SELF),
                 (UINTVAL)value, NULL) );
     }
 
+/*
+
+=item C<void increment()>
+
+Increments the scalar.
+
+=cut
+
+*/
 
     void increment () {
         PMC_int_val(SELF) = DYNSELF.get_integer() + 1;
     }
 
+/*
+
+=item C<void decrement()>
+
+Decrements the scalar.
+
+=cut
+
+*/
 
     void decrement () {
         PMC_int_val(SELF) = DYNSELF.get_integer() - 1;
     }
 
+/*
+
+=item C<INTVAL defined()>
+
+Always returns true.
+
+=cut
+
+*/
 
     INTVAL defined () {
         return 1;
     }
 
+
+/*
+
+=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
+
+Returns the substring of length C<length> of the scalar starting at
+C<offset>.
+
+=cut
+
+*/
 
     STRING* substr_str(INTVAL offset, INTVAL length) {
         return string_substr(INTERP, VTABLE_get_string(INTERP,SELF),
@@ -461,3 +1061,11 @@ pmclass scalar abstract noinit {
     }
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,37 +1,76 @@
-/* RetContinuation.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the RetContinuation base class.
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by sean 2002/08/04
- *  Notes:
- *     A return continuation doesn't make COWed copies of the context,
- *     it just has pointers to thecontext, that are restored on invoke.
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/retcontinuation.pmc - Return Continuation
+
+=head1 DESCRIPTION
+
+C<RetContinuation> extends C<Continuation>.
+
+A return continuation doesn't make COWed copies of the context, it just
+has pointers to the context, that are restored on invoke.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass RetContinuation extends Continuation {
 
-    void init () {
-	PMC_sub(SELF) = new_ret_continuation(INTERP);
-	PMC_struct_val(SELF) = NULL;
-	PObj_custom_mark_destroy_SETALL(SELF);
+/*
+
+=item C<void init()>
+
+Initializes the continuation.
+
+=cut
+
+*/
+
+	void init () {
+		PMC_sub(SELF) = new_ret_continuation(INTERP);
+		PMC_struct_val(SELF) = NULL;
+		PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the continuation.
+
+=cut
+
+*/
+
     PMC* clone() {
-	struct Parrot_Sub * sub;
-	PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
-	memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
-	PMC_struct_val(ret) = PMC_struct_val(SELF);
-	PObj_custom_mark_destroy_SETALL(ret);
-	return ret;
+		struct Parrot_Sub * sub;
+		PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+		sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
+		memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
+		PMC_struct_val(ret) = PMC_struct_val(SELF);
+		PObj_custom_mark_destroy_SETALL(ret);
+		return ret;
     }
 }
 
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/

@@ -1,69 +1,160 @@
-/* Scratchpad.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Scratchpad base class.
- *  Data Structure and Algorithms:
- *     Currently a simple array of Parrot_Lexicals.
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/scratchpad.pmc - Lexical Scrachpad
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Scratchpad base class.
+
+Currently a simple array of Parrot_Lexicals.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 pmclass Scratchpad need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the scratchpad.
+
+=cut
+
+*/
 
     void init () {
         PObj_custom_mark_destroy_SETALL(SELF);
         PMC_int_val(SELF) = 0;
     }
 
-    void mark () {
-	int j;
-        struct Parrot_Lexicals * lex;
+/*
 
-	for (j = 0; j < PMC_int_val(SELF); j++) {
+=item C<void mark()>
+
+Marks the scratchpad as live.
+
+=cut
+
+*/
+
+    void mark () {
+        int j;
+        struct Parrot_Lexicals * lex;
+    
+        for (j = 0; j < PMC_int_val(SELF); j++) {
             lex = &(((struct Parrot_Lexicals *)PMC_data(SELF))[j]);
             lexicals_mark(INTERP, lex);
         }
     }
 
+/*
+
+=item C<void destroy()>
+
+Destroys the scratchpad.
+
+=cut
+
+*/
+
     void destroy () {
         if (PMC_data(SELF))
-	    mem_sys_free(PMC_data(SELF));
+            mem_sys_free(PMC_data(SELF));
     }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a copy of the scratchpad.
+
+=cut
+
+*/
 
     PMC* clone () {
-	PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
-	PMC_data(ret) = mem_sys_allocate(PMC_int_val(SELF) *
-                                     sizeof(struct Parrot_Lexicals));
-	PMC_int_val(ret) = PMC_int_val(SELF);
-	mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
-			PMC_int_val(SELF) * sizeof(struct Parrot_Lexicals));
-	return ret;
+        PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_data(ret) = mem_sys_allocate(PMC_int_val(SELF) *
+                                         sizeof(struct Parrot_Lexicals));
+        PMC_int_val(ret) = PMC_int_val(SELF);
+        mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
+                        PMC_int_val(SELF) * sizeof(struct Parrot_Lexicals));
+        return ret;
     }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of lexical variables in the scratchpad.
+
+=cut
+
+*/
 
     INTVAL elements () {
-	return PMC_int_val(SELF);
+        return PMC_int_val(SELF);
     }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns the scratchpad itself.
+
+=cut
+
+*/
 
     PMC* get_pmc () {
-	return SELF;
+        return SELF;
     }
 
-    /*
-     * Get a lexical variable. The key types are expected to match
-     * one of the following:
-     *
-     *  - [STRING]     a lexical name
-     *  - [INT]        a lexical position in current scope
-     *  - [INT;STRING] a scope, and a lexical name
-     *  - [INT;INT]    a scope, and a lexical position in that scope
-     */
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Get a lexical variable. The key types are expected to match
+one of the following:
+
+=over 4
+
+=item C<[STRING]>
+
+A lexical name.
+
+=item C<[INT]>
+
+A lexical position in the current scope.
+
+=item C<[INT;STRING]>
+
+A scope, and a lexical name.
+
+=item C<[INT;INT]>
+
+A scope, and a lexical position in that scope.
+
+=back
+
+=cut
+
+*/
+
     PMC* get_pmc_keyed (PMC* key) {
-	INTVAL pad_index = 0, position = 0;
+        INTVAL pad_index = 0, position = 0;
         STRING * name = NULL;
         PMC * ret = NULL;
         PMC * key2 = key_next(INTERP, key);
@@ -96,12 +187,19 @@ pmclass Scratchpad need_ext {
         return ret;
     }
 
-    /*
-     * Store a value as a lexical variable. The same key types that
-     * get_pmc_keyed supports are supported here.
-     */
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC *value)>
+
+Store a value as a lexical variable. The same key types that
+C<get_pmc_keyed()> supports are supported here.
+
+=cut
+
+*/
+
     void set_pmc_keyed (PMC* key, PMC* value) {
-	INTVAL pad_index = 0, position = 0;
+        INTVAL pad_index = 0, position = 0;
         STRING * name = NULL;
         PMC * key2 = key_next(INTERP, key);
         PMC * name_key = key2 ? key2 : key;
@@ -131,21 +229,39 @@ pmclass Scratchpad need_ext {
         }
     }
 
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+Deletes the lexical variable for C<*key>.
+
+=cut
+
+*/
+
     void delete_keyed(PMC* key) {
         STRING * name = NULL;
-	INTVAL position;
-	struct Parrot_Lexicals * lex;
+        INTVAL position;
+        struct Parrot_Lexicals * lex;
 
         if (key_type(INTERP, key) == KEY_integer_FLAG) {
             position = key_integer(INTERP, key);
-	    /* TODO */
+            /* TODO */
         }
         else if (key_type(INTERP, key) == KEY_string_FLAG) {
             name = key_string(INTERP, key);
-	    scratchpad_delete(INTERP, SELF, name);
+            scratchpad_delete(INTERP, SELF, name);
         }
         else {
-	    return;
-	}
+            return;
+        }
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

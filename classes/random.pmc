@@ -1,16 +1,24 @@
-/* random.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Random base class.
- *     This is a singleton (monadic) class - only one instance exists.
- *  Data Structure and Algorithms:
- *  History:
- *     2003.12.10	first rev by leo
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/random.pmc - Random Numbers
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Random base class.
+
+This is a singleton (monadic) class - only one instance exists.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -19,43 +27,101 @@ static PMC * Rand_PMC;
 
 pmclass Random singleton {
 
-    /*
-     * singleton creation interface s. pmc.c
-     */
-    void* get_pointer() {
-	return Rand_PMC;
+/*
+
+=item C<void *get_pointer()>
+
+=cut
+
+*/
+
+void* get_pointer() {
+		return Rand_PMC;
     }
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+These two functions are part of the singleton creation interface. For more
+information see F<src/pmc.c>.
+
+=cut
+
+*/
 
     void set_pointer(void* ptr) {
-	assert(!Rand_PMC);
-	Rand_PMC = (PMC*) ptr;
+		assert(!Rand_PMC);
+		Rand_PMC = (PMC*) ptr;
     }
 
-    /*
-     * seed interface
-     */
+/*
+
+=item C<void set_integer_native(INTVAL seed)>
+
+Sets the random number seed to C<seed>.
+
+=cut
+
+*/
+
     void set_integer_native(INTVAL seed) {
-	Parrot_srand(seed);
+		Parrot_srand(seed);
     }
 
-    /*
-     * INTVAL rand interface
-     */
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns a random integer in the range C<-2^31..2^31>.
+
+=cut
+
+*/
+
     INTVAL get_integer() {
-	return Parrot_int_rand(0);  /* -2^31..2^31 */
+		return Parrot_int_rand(0);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL max)>
+
+Returns a ramdom integer in the range C<0..max>.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed_int(INTVAL max) {
-	return Parrot_range_rand(0, max, 0);	/* 0 ... max */
+		return Parrot_range_rand(0, max, 0);
     }
 
-    /*
-     * FLOATVAL rand interface
-     */
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns a ramdom floating-point number in the range C<0.0..1.0>.
+
+=cut
+
+*/
+
     FLOATVAL get_number() {
-	return Parrot_float_rand(0);  /* 0..1 */
+		return Parrot_float_rand(0);
     }
 
 }
 
+/*
+
+=back
+
+=head1 HISTORY
+
+2003.12.10	first rev by leo.
+
+=cut
+
+*/
 

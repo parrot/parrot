@@ -1,46 +1,80 @@
-/* tqueue.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Threadsafe queue class for inter thread communication
- *     If you have an unthreaded program then please
- *     use a PerlArray
- *  Data Structure and Algorithms:
- *  History:
- *     2003.12.19 leo initial rev
- *  Notes:
- *
- *     new P0, .TQueue
- *     push P0, some
- *     new P2, .ParrotThread
- *     ...
- *
- *     and in other thread (at least, when shared PMCs work :)
- *
- *     shift P1, P0
- *
- *     Note: The TQueue must always be emptied before program
- *           exit.
- *
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/tqueue.pmc - Threadsafe Queue
+
+=head1 DESCRIPTION
+
+Threadsafe queue class for inter thread communication. If you have an
+unthreaded program then please use a PerlArray.
+     
+     new P0, .TQueue
+     push P0, some
+     new P2, .ParrotThread
+     ...
+
+and in other thread (at least, when shared PMCs work :)
+
+     shift P1, P0
+
+Note: The TQueue must always be emptied before program exit.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
 
 pmclass TQueue need_ext is_shared {
 
+/*
+
+=item C<void init()>
+
+Initializes the queue.
+
+=cut
+
+*/
+
     void init () {
         PMC_int_val(SELF) = 0;
         PMC_data(SELF) = queue_init(0);
-	PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
+
+/*
+
+=item C<PMC *clone()>
+
+Returns the queue itself. No copy is made.
+
+=cut
+
+*/
 
     PMC* clone() {
         /* XXX fake a shared PMC */
         return SELF;
     }
+
+/*
+
+=item C<void mark()>
+
+Marks all the threads in the queue as live.
+
+=cut
+
+*/
 
     void mark () {
         QUEUE *queue = PMC_data(SELF);
@@ -57,6 +91,16 @@ pmclass TQueue need_ext is_shared {
         }
         queue_unlock(queue);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the queue.
+
+=cut
+
+*/
 
     void destroy () {
         if (PMC_data(SELF)) {
@@ -78,9 +122,27 @@ pmclass TQueue need_ext is_shared {
         }
     }
 
+/*
+
+=item C<INTVAL defined()>
+
+Returns whether there are any threads in the queue.
+
+=cut
+
+*/
+
     INTVAL defined () {
         return SELF.get_integer() != 0;
     }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+=cut
+
+*/
 
     INTVAL get_integer () {
         INTVAL items;
@@ -90,9 +152,29 @@ pmclass TQueue need_ext is_shared {
         return items;
     }
 
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of threads in the queue.
+
+=cut
+
+*/
+
     INTVAL elements () {
         return SELF.get_integer();
     }
+
+/*
+
+=item C<void push_pmc(PMC *item)>
+
+Adds the thread C<*item> to the end of the queue.
+
+=cut
+
+*/
 
     void push_pmc(PMC *item) {
         QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
@@ -108,7 +190,7 @@ pmclass TQueue need_ext is_shared {
 
         entry->data = item;
         entry->type = QUEUE_ENTRY_TYPE_NONE;
-        /* s. tsq.c:quene_push */
+        /* s. tsq.c:queue_push */
         queue_lock(queue);
         ++PMC_int_val(SELF);
         /* Is there something in the queue? */
@@ -122,6 +204,16 @@ pmclass TQueue need_ext is_shared {
         queue_broadcast(queue);        /* signal all waiters */
         queue_unlock(queue);
     }
+
+/*
+
+=item C<PMC *shift_pmc()>
+
+Removes the first thread from the start of the queue.
+
+=cut
+
+*/
 
     PMC* shift_pmc() {
         QUEUE_ENTRY *entry;
@@ -139,9 +231,19 @@ pmclass TQueue need_ext is_shared {
         mem_sys_free(entry);
         return ret;
     }
-
-
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+2003.12.19 leo initial rev.
+
+=cut
+
+*/
 
 /*
  * Local variables:
