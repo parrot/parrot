@@ -283,7 +283,7 @@ PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
 {
     while (layer) {
         if (layer->api->Flush) {
-            return layer->api->Flush(interpreter, layer, io);
+            layer->api->Flush(interpreter, layer, io);
         }
         layer = PIO_DOWNLAYER(layer);
     }

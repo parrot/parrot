@@ -299,33 +299,34 @@ resourses.
 void
 PIO_finish(theINTERP)
 {
-    ParrotIOLayer *p, *down;
+    ParrotIOLayer *layer, *down;
 #if 0
+    PMC *pmc;
     ParrotIO *io;
     int i;
-#endif
 
-    /* XXX is this all correct? */
-
-    fflush(stdout);
-    fflush(stderr);
-
-#if 0
-    /* new_io_pmc isn't possible aynmore  - mem subsystem is down already */
-
-    /* TODO: close std descriptors */
-
+    /* When here, the PMC arena is already destructed, these PMCs
+     * aren't usable any more.
+     * But ParrotIO::destroy should have flushed/closed all PIOs
+     * already. If that's not quite true, we have to separate IO subsys
+     * destruction into two parts (again).
+     */
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
-        if ( (io = interpreter->piodata->table[i]) ) {
-            PIO_close(interpreter, new_io_pmc(interpreter, io));
+        if ( (pmc = interpreter->piodata->table[i]) ) {
+            layer = PMC_struct_val(pmc);
+            io = PMC_data(pmc);
+            PIO_close_down(interpreter, layer, io);
         }
     }
 #endif
-    for (p = interpreter->piodata->default_stack; p; ) {
-        down = p->down;
-        if (p->api->Delete)
-            (*p->api->Delete) (p);
-        p = down;
+    /*
+     * TODO free IO of std-handles
+     */
+    for (layer = interpreter->piodata->default_stack; layer; ) {
+        down = layer->down;
+        if (layer->api->Delete)
+            (*layer->api->Delete) (layer);
+        layer = down;
     }
     mem_sys_free(interpreter->piodata->table);
     mem_sys_free(interpreter->piodata);
