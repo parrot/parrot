@@ -1,3 +1,6 @@
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
 Parrot::IO::Directory - Directory in the Parrot distribution.
