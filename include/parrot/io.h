@@ -327,6 +327,7 @@ extern INTVAL PIO_putps(theINTERP, ParrotIO *io, STRING *s);
 extern INTVAL PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...);
 extern INTVAL PIO_printf(theINTERP, const char *s, ...);
 extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
+extern INTVAL PIO_getfd(theINTERP, ParrotIO *io);
 
 
 /* Put platform specific macros here if you must */
