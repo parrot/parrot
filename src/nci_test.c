@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <malloc.h>
 /*
  * cc -shared -fpic nci_test.c -o libnci.so -g
  * export LD_LIBRARY_PATH=.
@@ -73,6 +74,14 @@ int nci_ii3(int a, int *b) {
     int r = a * *b;
     *b = 4711;
     return r;
+}
+
+int * nci_pi(int i) {
+    int *a = calloc(i, sizeof(int));
+    a[0] = 42;
+    a[1] = 100;
+    a[2] = 200;
+    return a;
 }
 
 #ifdef TEST

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -377,6 +377,34 @@ output_is(<<'CODE', <<'OUTPUT', "nci_t_B");
   end
 CODE
 ok done
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i");
+  loadlib P1, "libnci"
+  # this test function returns an array of int
+  dlfunc P0, P1, "nci_pi", "pi"
+  set I5, 10
+  invoke
+  new P2, .PerlArray
+.include "datatypes.pasm"
+  push P2, .DATATYPE_INT
+  push P2, 1
+  push P2, 0
+  push P2, .DATATYPE_INT
+  push P2, 1
+  sizeof I10, .DATATYPE_INT
+  push P2, I10
+  assign P5, P2
+  set I0, P5[0]
+  print I0
+  print "\n"
+  set I0, P5[1]
+  print I0
+  print "\n"
+  end
+CODE
+42
+100
 OUTPUT
 
 } # SKIP
