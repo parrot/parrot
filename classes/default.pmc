@@ -56,7 +56,7 @@ static int
 cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)
 {
     internal_exception(ILL_INHERIT,
-                       "%s() not implemented in class '%s'\\n", methname,
+                       "%s() not implemented in class '%s'\n", methname,
         	       caller(interpreter, pmc));
     return 0;
 }
