@@ -100,9 +100,8 @@ patterns in groups -- that's coming next.
 
 This is just the first-cut framework for building the 
 remainder of the engine, so many items (assertions, lookaround, 
-conjunctions, closures, character classes, hypotheticals, 
-backreferences, etc.) just aren't implemented yet.  They're
-on their way!
+conjunctions, closures, character classes, and hypotheticals)
+just aren't implemented yet.  They're on their way!
 
 Also, many well-known optimizations (e.g., Boyer-Moore) aren't 
 implemented yet -- my primary goals at this point are to
