@@ -94,6 +94,13 @@ END
     print OUT "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
       foreach (@pmcs);
     print OUT <<"END";
+	if (!pass) {
+	    /* Need an empty stash */
+	    interp->globals = mem_sys_allocate(sizeof(struct Stash));
+	    interp->globals->stash_hash =
+		pmc_new(interp, enum_class_PerlHash);
+	    interp->globals->parent_stash = NULL;
+	}
     }
 }
 
