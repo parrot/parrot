@@ -44,7 +44,7 @@ inline op close(in PMC) {
 
 =item B<fdopen>(out PMC, in INT, in STR)
 
-Create ParrotIO object as $1 as a copy of file descriptor $2.
+Create ParrotIO object in $1 as a copy of file descriptor $2.
 
 XXX: integral file descriptors may not exist outside of the UNIX
      platform.  This op needs work.
