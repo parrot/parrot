@@ -8,8 +8,26 @@
 
   # XXX Need error handling.
 
-  # Need to convert this to a list if it isn't already.
+  $S0 = typeof listval
+  if $S0 == "TclList" goto list_like
 
+=for when we have set_string_native working in tcllist
+
+  $I0 = find_type "TclList"
+  $P0 = new $I0
+  $S0 = listval
+  $P0 = $S0
+  listval = $P0
+
+=cut
+
+  # what we use in the meantime
+  $P0 = find_global "_Tcl", "__stringToList"
+  $S0 = listval
+  $P1 = $P0($S0)
+  listval = $P1
+ 
+list_like:
   $I0 = listval
 
   $I1 = find_type "TclInt"

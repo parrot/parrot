@@ -2,6 +2,10 @@
 
 =over 4
 
+=item [interpinfo name]
+
+how to do this from inside parrot?
+
 =item migrate all these issues to RT.
 
 TODO tests would also suffice, where possible.
@@ -82,7 +86,7 @@ hex & unicode escapes are not supported in C<lib/parser.imc>
 [array nextelement] [array startsearch] [bgerror] [binary] 
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
 [fblocked] [fconfigure] [fcopy] [file] [fileevent]
-[flush] [gets] [glob] [http] [info] [interp] [library]
+[flush] [gets] [glob] [http] [info]* [interp] [library]
 [lindex] [load] [lreplace] [lsearch]* [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
 [read] [registry] [regexp] [regsub] [resource] 

@@ -108,7 +108,7 @@ Words
     .POP
     print .TOS
     print "\n"
-    invoke P1
+    #invoke P1
     .end
     0> 
 

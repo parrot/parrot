@@ -168,14 +168,11 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "? doesn't work. PGE issue?\n";
 language_output_is("tcl",<<TCL,<<OUT,"string match ?");
   puts [string match a?c abc]
 TCL
 1
 OUT
-}
 
 TODO: {
 local $TODO = "[] doesn't work. PGE issue.\n";
@@ -198,14 +195,11 @@ TCL
 1
 OUT
 
-TODO: {
-local $TODO = "Issue with \? - PGE issue?";
 language_output_is("tcl",<<TCL,<<OUT,"string match \?");
   puts [string match {\?} ?]
 TCL
 1
 OUT
-}
 
 TODO: {
 local $TODO = "Parser error";

@@ -162,6 +162,9 @@ providing a compreg-compatible method.
   $P1 = new TclArray
   store_global "_Tcl", "proc_body", $P1
 
+  $P1 = new TclArray
+  store_global "_Tcl", "proc_parsed", $P1
+
   # We need to store these ourselves, because creating dynamic
   # .subroutines in PIR runs the risk of garbage collection if we're
   # not careful. 

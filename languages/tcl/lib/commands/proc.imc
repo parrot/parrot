@@ -45,10 +45,12 @@ Create a PIR sub on the fly for this user defined proc.
   # indvidual argument handling code.
  
   # Now, shove the parsed routine into the global hash...
-  $P0 = find_global "_Tcl", "proc_body"
-  
+  $P0 = find_global "_Tcl", "proc_parsed"
   $P0[name] = parsed_body
-  #$P2[name] = arg_list
+
+  # Save the code for the proc.
+  $P1 = find_global "_Tcl", "proc_body"
+  $P1[name] = body_p
 
   .local pmc escaper
   escaper = find_global "Data::Escape", "String"
@@ -78,7 +80,7 @@ arg_loop:
   goto arg_loop
 arg_loop_done:
 
-  proc_body .= ".local pmc interpret\ninterpret = find_global \"_Tcl\", \"__interpret\"\n.local pmc proc_body\n$P0 = find_global \"_Tcl\", \"proc_body\"\nproc_body=$P0[\""
+  proc_body .= ".local pmc interpret\ninterpret = find_global \"_Tcl\", \"__interpret\"\n.local pmc proc_body\n$P0 = find_global \"_Tcl\", \"proc_parsed\"\nproc_body=$P0[\""
   proc_body .= esc_name
   proc_body .= "\"]\nif I3 == "
   $S1 = arg_count

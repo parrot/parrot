@@ -167,10 +167,6 @@ Using the Compiler
 
 	make
 
-  Building imcc:
-
-        IMCC is built automatically now when you build Parrot.
-
   Usage:
 
 	colac examples/mandelbrot.cola
