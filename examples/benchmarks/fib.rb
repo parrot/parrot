@@ -8,6 +8,6 @@ def fib(n)
 	return fib(n - 1) + fib(n - 2)
 end
 
-N = Integer( ARGV.shift || 24 )
+N = Integer( ARGV.shift || 28 )
 
 puts "fib(#{N}) = #{ fib(N) }"

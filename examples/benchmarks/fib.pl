@@ -12,7 +12,7 @@ examples/benchmarks/fib.pl - Fibonacci Benchmark
 
 =head1 DESCRIPTION
 
-Calculates the Fibonacci Number for C<n> (defaults to 24 if
+Calculates the Fibonacci Number for C<n> (defaults to 28 if
 unspecified).
 
 =cut
@@ -24,7 +24,7 @@ sub fib {
 	return $n if ($n < 2);
 	return fib($n-1) + fib($n-2);
 }
-my $N = shift || 24;
+my $N = shift || 28;
 
 print "fib($N) = ", fib($N), "\n";
 

@@ -92,6 +92,10 @@ Use the given compiler flags.
 
 Use the given compiler warning flags.
 
+=item C<--cxx=(compiler)>
+
+Specify which C++ compiler to use (for ICU).
+
 =item C<--libs=(libs)>
 
 Use the given libraries.
@@ -302,6 +306,7 @@ e.g. : --ccflags="rem{-g} :add{-O2}"
    --cc=(compiler)      Use the given compiler
    --ccflags=(flags)    Use the given compiler flags
    --ccwarn=(flags)     Use the given compiler warning flags
+   --cxx=(compiler)     Use the given C++ compiler
    --libs=(libs)        Use the given libraries
    --link=(linker)      Use the given linker
    --linkflags=(flags)  Use the given linker flags

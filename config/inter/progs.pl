@@ -22,16 +22,16 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what C compiler and linker to use...';
 
-@args = qw(ask cc link ld ccflags ccwarn linkflags ldflags libs debugging
+@args = qw(ask cc cxx link ld ccflags ccwarn linkflags ldflags libs debugging
 	lex yacc maintainer);
 
 sub runstep {
   my %args;
   @args{@args}=@_;
 
-  my($cc, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex,
+  my($cc, $cxx, $link, $ld, $ccflags, $ccwarn, $linkflags, $ldflags, $libs, $lex,
      $yacc) =
-       Configure::Data->get(qw(cc link ld ccflags ccwarn linkflags ldflags
+       Configure::Data->get(qw(cc cxx link ld ccflags ccwarn linkflags ldflags
 			       libs lex yacc));
   $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
   $ccflags =~ s/-fno-strict-aliasing//g;
@@ -62,7 +62,7 @@ sub runstep {
     $lex = $yacc = $null;
   }
 
-  for my $var(qw(cc link ld ccflags linkflags ldflags libs ccwarn lex yacc)) {
+  for my $var(qw(cc cxx link ld ccflags linkflags ldflags libs ccwarn lex yacc)) {
     #Symrefs to lexicals are a no-no, so we have to use eval STRING.  %MY, anyone?
     eval qq{ \$$var=integrate(\$$var, \$args{$var}) if defined \$args{$var} };
   }
@@ -89,6 +89,7 @@ END
     $linkflags=prompt("And your linker?", $linkflags);
     $ldflags=prompt("And your $ld for building shared libraries?", $ldflags);
     $libs=prompt("What libraries should your C compiler use?", $libs);
+    $cxx=prompt("What C++ compiler do you want to use?", $cxx);
     $debug=prompt("Do you want a debugging build of Parrot?", $debug);
     $lex=prompt("Do you have a lexical analyzer generator, like flex or lex?",$lex);
     $yacc=prompt("Do you have a parser generator, like bison or yacc?",$yacc);
@@ -104,6 +105,7 @@ END
 
   Configure::Data->set(
     cc      => $cc,
+    cxx      => $cxx,
     link    => $link,
     ld      => $ld,
     ccflags => $ccflags,

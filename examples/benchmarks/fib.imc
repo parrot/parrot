@@ -11,7 +11,7 @@ examples/benchmarks/fib.imc - Fibonacci Benchmark
 
 =head1 DESCRIPTION
 
-Calculates the Fibonacci Number for C<n> (defaults to 24 if
+Calculates the Fibonacci Number for C<n> (defaults to 28 if
 unspecified).
 
 =cut
@@ -21,7 +21,7 @@ unspecified).
     .sym int argc
     argc = argv
     .sym int N
-    N = 24
+    N = 28
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0

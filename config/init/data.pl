@@ -46,6 +46,15 @@ sub runstep {
     ccflags       => $Config{ccflags},
     ccwarn        => exists($Config{ccwarn}) ? $Config{ccwarn} : '',
 
+    # C++ compiler -- used to compile parts of ICU.  ICU's configure
+    # will try to find a suitable compiler, but it prefers GNU c++ over
+    # a system c++, which might not be appropriate.  This setting
+    # allows you to override ICU's guess, but is otherwise currently
+    # unset.  Ultimately, it should be set to whatever ICU figures
+    # out, or parrot should look for it and always tell ICU what to
+    # use.
+    cxx            => '',
+
     # Linker, used to link object files (plus libraries) into
     # an executable.  It is usually $cc on Unix-ish systems.
     # VMS and Win32 might use "Link".
@@ -95,6 +104,8 @@ sub runstep {
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
     make_and      => '&&',
+    # make_c: Command to emulate GNU make's C<-C directory> option:  chdir
+    # to C<directory> before executing $(MAKE)
     make_c        => '$(PERL) -e \'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$? >> 8;\'',
 
     platform_asm  => 0,                   # if platform has a .s file that needs to be assembled

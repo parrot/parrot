@@ -7,6 +7,6 @@ def fib(n):
         return(n)
     return( fib(n-2) + fib(n-1) )
 
-N = int(len(sys.argv) == 2 and sys.argv[1] or 24)
+N = int(len(sys.argv) == 2 and sys.argv[1] or 28)
 
 print "fib(%d) = %d" %( N, fib(N) )
