@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 use Test::More;
 
 sub file_content_is {
@@ -409,3 +409,25 @@ ok 1
 OUTPUT
 
 unlink "temp.file";
+
+output_like(<<'CODE', <<'OUTPUT', "layer names");
+    getstdin P0
+    set S0, P0[0]
+    print S0
+    print "-"
+    set S0, P0[1]
+    print S0
+    print "-"
+    set S0, P0[-1]
+    print S0
+    print "-"
+    set S0, P0[-2]
+    print S0
+    print "-"
+    set S0, P0[-3]
+    print S0
+    print "-"
+    end
+CODE
+/^(unix|win32|stdio)-buf-buf-\1--$/
+OUTPUT

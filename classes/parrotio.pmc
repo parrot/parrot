@@ -138,6 +138,42 @@ Returns whether at C<EOF> or not.
         return !PIO_eof(INTERP, SELF);
     }
 
+/*
+
+=item C<STRING* get_string_keyed_int(INTVAL n)>
+
+Return the name of the nth layer. B<n> >= 0 returns layer names up
+from the bottom.
+If B<n> is negative returns layer names from top down. For non-existing
+layers an empty string is returned.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed_int(INTVAL n) {
+        ParrotIO *io = PMC_data(SELF);
+        ParrotIOLayer *layer;
+        if (!io)
+            return const_string(interpreter, "");
+        layer = io->stack;
+        if (n >= 0) {
+            ParrotIOLayer *last;
+            last = layer;
+            for (; layer; layer = layer->down)
+                last = layer;
+            for (; n && last; --n, last = last->up)
+                ;
+            if (last)
+                return string_from_cstring(interpreter, last->name, 0);
+            return const_string(interpreter, "");
+        }
+        for (++n; n && layer; layer = layer->down, ++n)
+            ;
+        if (layer)
+            return string_from_cstring(interpreter, layer->name, 0);
+        return const_string(interpreter, "");
+    }
 }
 
 /*
