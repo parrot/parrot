@@ -1,3 +1,7 @@
+=head1 NOTE 
+
+This document is probably no longer current.
+
 =head1 PARSING
 
 This document explains the algorithm used by C<parse.imc> to parse a 
