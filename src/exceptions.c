@@ -423,7 +423,6 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
      * used for resuming after an exception had occured
      */
     switch (interpreter->run_core) {
-        case PARROT_PREDEREF_CORE:
         case PARROT_SWITCH_CORE:
         case PARROT_CGP_CORE:
             offset = (void **)dest - interpreter->prederef.code;

@@ -36,7 +36,6 @@ have the same number of elements since there is a one-to-one mapping.
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
-#include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/runops_cores.h"
 #if JIT_CAPABLE
@@ -169,7 +168,6 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
         case PARROT_SWITCH_CORE:
             *pc_prederef = (void**) *pc;
             break;
-        case PARROT_PREDEREF_CORE:
         case PARROT_CGP_CORE:
             *pc_prederef = ((void**)(prederef_op_func)) [*pc];
             break;
@@ -274,9 +272,6 @@ get_op_lib_init(int core_op, int which, PMC *lib)
         switch (which) {
             case PARROT_SWITCH_CORE:
                 init_func = PARROT_CORE_SWITCH_OPLIB_INIT;
-                break;
-            case PARROT_PREDEREF_CORE:
-                init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;
                 break;
 #ifdef HAVE_COMPUTED_GOTO
             case PARROT_CGP_CORE:
@@ -489,7 +484,6 @@ prepare_for_run(Parrot_Interp interpreter)
         case PARROT_JIT_CORE:
             (void) init_jit(interpreter, interpreter->code->byte_code);
             break;
-        case PARROT_PREDEREF_CORE:
         case PARROT_SWITCH_CORE:
         case PARROT_CGP_CORE:
             init_prederef(interpreter, interpreter->run_core);
@@ -584,47 +578,6 @@ runops_exec(Interp *interpreter, opcode_t *pc)
     return NULL;
 }
 
-/*
-
-=item C<static opcode_t *
-runops_prederef(Interp *interpreter, opcode_t *pc)>
-
-This runops core is used when we are in prederef mode. It works just
-like the basic fast core, except it uses C<pc_prederef> instead of pc,
-and calls prederef opfuncs instead of regular opfuncs.
-
-There is code after the main while loop to resynchronize pc with
-C<pc_prederef> in case we have exited the loop under restart conditions
-(such as with interpreter flag changing ops).
-
-TODO: The calls to C<init_prederef()> and C<stop_prederef()> would be
-best placed elsewhere, since we would re-pay the costs of loading the
-prederef oplib every time we dropped out of and back into this core. For
-now, however, this implementation should do fine. Since dropping out of
-and back into cores is expected to be rare (at the time of
-implementation that only occurs for interpreter flag changing ops).
-
-=cut
-
-*/
-
-static opcode_t *
-runops_prederef(Interp *interpreter, opcode_t *pc)
-{
-    opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
-    void **pc_prederef;
-
-    init_prederef(interpreter, PARROT_PREDEREF_CORE);
-    pc_prederef = interpreter->prederef.code + (pc - code_start);
-
-    while (pc_prederef) {
-        pc_prederef =
-            ((op_func_prederef_t)(ptrcast_t)*pc_prederef) (pc_prederef,
-                                                           interpreter);
-    }
-
-    return 0;
-}
 
 /*
 
@@ -767,9 +720,6 @@ runops_int(Interp *interpreter, size_t offset)
                 break;
             case PARROT_SWITCH_CORE:
                 core = runops_switch;
-                break;
-            case PARROT_PREDEREF_CORE:
-                core = runops_prederef;
                 break;
             case PARROT_JIT_CORE:
 #if !JIT_CAPABLE
@@ -957,8 +907,6 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
     dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
             PARROT_CORE_CG_OPLIB_INIT);
 #endif
-    dynop_register_xx(interpreter, lib_pmc, n_old, n_new,
-            PARROT_CORE_PREDEREF_OPLIB_INIT);
     dynop_register_switch(interpreter, lib_pmc, n_old, n_new);
 }
 
@@ -1082,7 +1030,6 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
         case PARROT_CGOTO_CORE:      /* cgoto address list  */
             interpreter->op_func_table = table;
             break;
-        case PARROT_PREDEREF_CORE:  /* predrefed cores except switch */
         case PARROT_CGP_CORE:
             turn_ev_check(interpreter, on);
             break;

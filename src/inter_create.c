@@ -71,7 +71,7 @@ static void setup_default_compreg(Parrot_Interp interpreter)
     STRING *pasm1 = string_from_cstring(interpreter, "PASM1", 0);
 
     /* register the nci ccompiler object */
-    Parrot_compreg(interpreter, pasm1, PDB_compile);
+    Parrot_compreg(interpreter, pasm1, (Parrot_compiler_func_t)PDB_compile);
 }
 
 /*

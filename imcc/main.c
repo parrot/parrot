@@ -30,7 +30,7 @@ static void
 usage(FILE* fp)
 {
     fprintf(fp,
-    "parrot -[abcCEfgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
+    "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
 }
 
 static void
@@ -67,7 +67,6 @@ help(void)
     "    -g --computed-goto-core\n"
     "    -j --jit-core\n"
     "    -p --profile\n"
-    "    -P --predereferenced-core\n"
     "    -S --switched-core\n"
     "    -t --trace\n"
     "   <VM options>\n"
@@ -127,7 +126,6 @@ static struct longopt_opt_decl options[] = {
     { 'E', 'E', 0, { "--pre-process-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
-    { 'P', 'P', 0, { "--predereferenced-core" } },
     { 'S', 'S', 0, { "--switched-core" } },
     { 'V', 'V', 0, { "--version" } },
     { '\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
@@ -178,9 +176,6 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'j':
                 setcore(PARROT_JIT_CORE);
-                break;
-            case 'P':
-                setcore(PARROT_PREDEREF_CORE);
                 break;
             case 'S':
                 setcore(PARROT_SWITCH_CORE);

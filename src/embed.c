@@ -712,9 +712,6 @@ Parrot_runcode(Interp *interpreter, int argc, char *argv[])
             case PARROT_FAST_CORE:
                 PIO_eprintf(interpreter, "Fast core");
                 break;
-            case PARROT_PREDEREF_CORE:
-                PIO_eprintf(interpreter, "Predereferencing core");
-                break;
             case PARROT_SWITCH_CORE:
                 PIO_eprintf(interpreter, "Switch core");
                 break;
