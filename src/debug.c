@@ -745,7 +745,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 
     /* set the user arguments */
     userargv = pmc_new(interpreter, enum_class_PerlArray);
-    interpreter->pmc_reg.registers[0] = userargv;
+    interpreter->pmc_reg.registers[5] = userargv;
 
     while (command && *command) {
         i = 0;
