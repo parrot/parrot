@@ -34,6 +34,9 @@ fib.pasm: fib.jako jakoc
 hello.pasm: hello.jako jakoc
 	jakoc hello.jako > hello.pasm
 
+leibniz.pasm: leibniz.jako jakoc
+	jakoc leibniz.jako > leibniz.pasm
+
 
 #
 # Assembly:
@@ -54,15 +57,23 @@ fib.pbc: fib.pasm ../assemble.pl
 hello.pbc: hello.pasm ../assemble.pl
 	cd ..; assemble.pl $(DIR)/hello.pasm > $(DIR)/hello.pbc
 
+leibniz.pbc: leibniz.pasm ../assemble.pl
+	cd ..; assemble.pl $(DIR)/leibniz.pasm > $(DIR)/leibniz.pbc
+
 
 #
 # Other targets:
 #
 
-all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc
+all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc leibniz.pbc
 
 clean:
-	rm -f bench.pasm euclid.pasm euclid.pbc fact.pasm fact.pbc fib.pasm fib.pbc hello.pasm hello.pbc
+	rm -f bench.pasm bench.pbc \
+euclid.pasm euclid.pbc \
+fact.pasm fact.pbc \
+fib.pasm fib.pbc \
+hello.pasm hello.pbc \
+leibniz.pasm leibniz.pbc
 
 over:
 	@make clean
@@ -74,6 +85,7 @@ test: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc
 	cd ..; test_prog $(DIR)/fact.pbc
 	cd ..; test_prog $(DIR)/fib.pbc
 	cd ..; test_prog $(DIR)/hello.pbc
+	cd ..; test_prog $(DIR)/leibniz.pbc
 
 #
 # End of file.

@@ -629,8 +629,6 @@ CODE
 5.000000
 OUTPUT
 
-SKIP: {
-skip( "assembler handling of inc_n_nc is buggy?", 1 );
 output_is(<<CODE, <<OUTPUT, "inc_n_nc");
 	set	N0, 0.0
 
@@ -646,7 +644,6 @@ CODE
 0.500000
 -0.500000
 OUTPUT
-}
 
 output_is(<<CODE, <<OUTPUT, "dec_n");
 	set	N0, 0.0
@@ -667,8 +664,6 @@ CODE
 -5.000000
 OUTPUT
 
-SKIP: {
-skip( "assembler handling of dec_n_nc is buggy?", 1 );
 output_is(<<CODE, <<OUTPUT, "dec_n_nc");
 	set	N0, 0.0
 
@@ -684,7 +679,6 @@ CODE
 -0.500000
 0.500000
 OUTPUT
-}
 
 
 output_is(<<CODE, <<OUTPUT, "ntoi_i_n");
