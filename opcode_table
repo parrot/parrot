@@ -44,6 +44,7 @@ dec_i_ic	2	I i
 # NUM ops
 
 set_n_nc	2	N n
+set_n  	2	N N
 add_n	3	N N N
 sub_n	3	N N N
 mul_n	3	N N N

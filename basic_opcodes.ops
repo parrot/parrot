@@ -192,6 +192,11 @@ MANUAL_OP jump_i {
 /* SET Nx, CONSTANT */
 AUTO_OP set_n_nc {
   NUM_REG(P1) = P2;
+} 
+
+/* SET Nx, Nx */
+AUTO_OP set_n {
+  NUM_REG(P1) = NUM_REG(P2);
 }
   
 /* ADD Nx, Ny, Nz   */
