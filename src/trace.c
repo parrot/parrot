@@ -23,6 +23,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
 {
     INTVAL i;
+    char *escaped;
 
     fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
             interpreter->op_info_table[*pc].full_name);
@@ -46,9 +47,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 fprintf(stderr, "%ld", (long)*(pc + i));
                 break;
             case PARROT_ARG_SC:
-                fprintf(stderr, "\"%s\"",
-                        (char *)interpreter->code->const_table->
-                        constants[*(pc + i)]->string->bufstart);
+                escaped = PDB_escape(interpreter->code->const_table->
+                                     constants[*(pc + i)]->string->bufstart);
+                fprintf(stderr, "\"%s\"", escaped);
                 break;
             case PARROT_ARG_KC:
                 /* what will a KEY constant look like? */
@@ -69,9 +70,10 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_S:
                 if (interpreter->string_reg.registers[*(pc + i)]) {
+                    escaped = PDB_escape(interpreter->string_reg.
+                                         registers[*(pc + i)]->bufstart);
                     fprintf(stderr, "S%ld=\"%s\"", (long)*(pc + i),
-                            (char *)interpreter->string_reg.
-                            registers[*(pc + i)]->bufstart);
+                            escaped);
                 }
                 else {
                     fprintf(stderr, "S%ld=(null)", (long)*(pc + i));
