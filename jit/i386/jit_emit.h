@@ -1307,10 +1307,10 @@ static unsigned char *lastpc;
        } \
      }
 
-#    define jit_emit_neg_m_n(pc, mem) { \
-       jit_emit_fload_m_n(pc, mem); \
+#    define jit_emit_neg_M_n(pc, mem) { \
+       jit_emit_fload_mb_n(pc, emit_EBX, mem); \
        emitm_fchs(pc); \
-       jit_emit_fstore_m_n(pc, mem); \
+       jit_emit_fstore_mb_n(pc, emit_EBX, mem); \
      }
 
 #  elif defined(NEG_ZERO_SUB)
@@ -1320,11 +1320,11 @@ static unsigned char *lastpc;
        emitm_fsubrp(pc, (r+1)); \
      }
 
-#    define jit_emit_neg_m_n(pc, mem) { \
-       jit_emit_fload_m_n(pc, mem); \
+#    define jit_emit_neg_M_n(pc, mem) { \
+       jit_emit_fload_mb_n(pc, emit_EBX, mem); \
        emitm_fldz(pc); \
        emitm_fsubrp(pc, 1); \
-       jit_emit_fstore_m_n(pc, mem); \
+       jit_emit_fstore_mb_n(pc, emit_EBX, mem); \
      }
 #  else
 
@@ -1342,14 +1342,14 @@ static unsigned char *lastpc;
        } \
      }
 
-#    define jit_emit_neg_m_n(pc, mem) { \
-       jit_emit_fload_m_n(pc, mem); \
+#    define jit_emit_neg_M_n(pc, mem) { \
+       jit_emit_fload_mb_n(pc, emit_EBX, mem); \
        emitm_ftst(pc); \
        emitm_fstw(pc); \
        emitm_sahf(pc); \
        emitm_jxs(pc, emitm_jz, 2); \
        emitm_fchs(pc); \
-       jit_emit_fstore_m_n(pc, mem); \
+       jit_emit_fstore_mb_n(pc, emit_EBX, mem); \
      }
 #  endif
 
@@ -1478,6 +1478,9 @@ static unsigned char *lastpc;
 #  define jit_emit_mov_mi_i(pc, dest, immediate) \
     emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
+#  define jit_emit_mov_MI_i(pc, offs, immediate) \
+    emitm_movl_i_m(pc, immediate, emit_EBX, emit_None, 1, offs)
+
 #  define jit_emit_mov_rm_i(pc, reg, address) \
     emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
@@ -1514,8 +1517,11 @@ static unsigned char *lastpc;
 #  define jit_emit_cmp_rm_i(pc, reg, address) \
     emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#  define jit_emit_cmp_mr_i(pc, address, reg) \
-    emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_cmp_RM_i(pc, reg, offs) \
+    emitm_cmpl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
+
+#  define jit_emit_cmp_MR_i(pc, offs, reg) \
+    emitm_cmpl_m_r(pc, reg, emit_EBX, emit_None, 1, offs)
 
 
 /* high level routines, behave like real 2 register FP */
@@ -1545,6 +1551,10 @@ static unsigned char *lastpc;
 #  define jit_emit_mov_mi_ni(pc, mem, i) { \
     jit_emit_fload_m_i(pc, i); \
     jit_emit_fstore_m_n(pc, mem); \
+}
+#  define jit_emit_mov_MI_ni(pc, offs, i) { \
+    jit_emit_fload_m_i(pc, i); \
+    jit_emit_fstore_mb_n(pc, emit_EBX, offs); \
 }
 /* INT_REG <= ST(i) */
 #  define jit_emit_mov_mr_in(pc, mem, r) { \
@@ -1686,8 +1696,8 @@ static unsigned char *lastpc;
     emitm_fstp(pc, (r1+1)); \
 }
 
-/* compare ST(r) <-> mem */
-#  define jit_emit_cmp_rm_n(pc, r, mem) { \
+/* compare ST(r) <-> mem i.e. constant */
+#  define jit_emit_cmp_ri_n(pc, r, mem) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fld(pc, (r+1)); \
     emitm_fcompp(pc); \
@@ -1695,11 +1705,23 @@ static unsigned char *lastpc;
     emitm_sahf(pc); \
 }
 
-#  define jit_emit_cmp_ri_n(pc, r, nc) jit_emit_cmp_rm_n(pc, r, nc)
+#  define jit_emit_cmp_RM_n(pc, r, offs) { \
+    jit_emit_fload_mb_n(pc, emit_EBX, offs); \
+    emitm_fld(pc, (r+1)); \
+    emitm_fcompp(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+}
+
 
 /* compare mem <-> ST(r) */
-#  define jit_emit_cmp_mr_n(pc, mem, r) { \
+#  define jit_emit_cmp_mi_n(pc, mem, r) { \
     jit_emit_fload_m_n(pc, mem); \
+    emitm_fcomip(pc, (r+1)); \
+}
+
+#  define jit_emit_cmp_MR_n(pc, offs, r) { \
+    jit_emit_fload_mb_n(pc, emit_EBX, offs); \
     emitm_fcomip(pc, (r+1)); \
 }
 
@@ -1735,8 +1757,8 @@ static unsigned char *lastpc;
 }
 
 
-#  define jit_emit_neg_m_i(pc, address) \
-    emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
+#  define jit_emit_neg_M_i(pc, offs) \
+    emitm_negl_m(pc, emit_EBX, emit_None, 1, (long)offs)
 
 #  define jit_emit_band_mr_i(pc, d, reg) \
     emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
