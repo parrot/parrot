@@ -43,12 +43,18 @@ mmd_dispatch_string(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     string_mmd_f real_function;
-    INTVAL left_type, right_type;
+    UINTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-    offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = (string_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
+        (right_type > interpreter->binop_mmd_funcs->y[function])) {
+        real_function = (string_mmd_f)interpreter->binop_mmd_funcs->default_func[
+            function];
+    } else {
+        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
+        real_function = (string_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    }
     return (*real_function)(interpreter, left, right);
 }
 
@@ -57,12 +63,18 @@ mmd_dispatch_intval(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     intval_mmd_f real_function;
-    INTVAL left_type, right_type;
+    UINTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-    offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = (intval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
+        (right_type > interpreter->binop_mmd_funcs->y[function])) {
+        real_function = (intval_mmd_f)interpreter->binop_mmd_funcs->default_func[
+            function];
+    } else {
+        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
+        real_function = (intval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    }
     return (*real_function)(interpreter, left, right);
 }
 
@@ -72,12 +84,18 @@ mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
 {
 
     floatval_mmd_f real_function;
-    INTVAL left_type, right_type;
+    UINTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
-    offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-    real_function = (floatval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
+        (right_type > interpreter->binop_mmd_funcs->y[function])) {
+        real_function = (floatval_mmd_f)interpreter->binop_mmd_funcs->default_func[
+            function];
+    } else {
+        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
+        real_function = (floatval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    }
     return (*real_function)(interpreter, left, right);
 }
 

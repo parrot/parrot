@@ -441,28 +441,28 @@ mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
                              string_repeat(interp, base, count, NULL));
 }
 
-void
-mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+INTVAL
+mmd_fallback_numeq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     if (VTABLE_get_number(interp, left) == VTABLE_get_number(interp, right)) {
-        VTABLE_set_bool(interp, dest, 1);
+        return 1;
     } else {
-        VTABLE_set_bool(interp, dest, 0);
+        return 0;
     }
 }
 
-void
-mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+INTVAL
+mmd_fallback_streq_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     if (string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right))) {
-        VTABLE_set_bool(interp, dest, 1);
+        return 1;
     } else {
-        VTABLE_set_bool(interp, dest, 0);
+        return 0;
     }
 }
 
-void
-mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+INTVAL
+mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
     FLOATVAL left_float, right_float;
     INTVAL cmp_val;
@@ -480,14 +480,13 @@ mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
         }
     }
 
-    VTABLE_set_integer_native(interp, dest, cmp_val);
+    return cmp_val;
 }
 
-void
-mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
+INTVAL
+mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right)));
+    return string_compare(interp, VTABLE_get_string(interp, left), VTABLE_get_string(interp, right));
 }
 
 void

@@ -84,6 +84,8 @@
 .constant TempPMC2	P7
 .constant TempPMC3      P8
 
+.constant TruePMC	P29
+.constant FalsePMC	P28
 .constant ReturnStack	P30
 .constant PMCStack	P31
 
@@ -177,6 +179,14 @@ DonePromptString:
   save .PMCStack    
 .endm
 
+.macro PushFalse
+  save .FalsePMC
+.endm
+
+.macro PushTrue
+  save .TruePMC
+.endm
+
 InitializeCoreOps:
     #
     # Arithmetic, Single precision
@@ -185,6 +195,10 @@ InitializeCoreOps:
     new .UserOps, .PerlHash
     new .SpecialWords, .PerlHash
     new .ReturnStack, .PerlArray
+    new .TruePMC, .Integer
+    set .TruePMC, 1
+    new .FalsePMC, .Integer
+    set .FalsePMC, 0
 
     set .SpecialWords["if"], 1
     set .SpecialWords["then"], 2
@@ -259,6 +273,7 @@ InitializeCoreOps:
     .AddCoreOp(Int_LE,"u<=")
     .AddCoreOp(Int_GT,"u>")
     .AddCoreOp(Int_GE,"u>=")
+    .AddCoreOp(Within, "within")
 # within
 # d<
 # d<=
@@ -397,7 +412,7 @@ InitializeCoreOps:
   .AddCoreOp(To_R, ">r")
   .AddCoreOp(From_R, "r>")
   .AddCoreOp(Copy_From_R, "r@")
-  .AddCoreOp(RDrop, "rdrop"
+  .AddCoreOp(RDrop, "rdrop")
   .AddCoreOp(Two_To_R, "2>r")
   .AddCoreOp(Two_From_R, "2r>")
 # 2r@
@@ -1101,6 +1116,26 @@ Two_RDrop:
     pop .PMCStack, .ReturnStack
 RDrop:
     pop .PMCStack, .ReturnStack
+    branch DoneInterpretWord
+
+Within:
+    restore .TempPMC3
+    restore .TempPMC2
+    restore .TempPMC
+    gt .TempPMC3, .TempPMC2, three_two
+ two_three:
+    lt .TempPMC2, .TempPMC, Is_not_within
+    ge .TempPMC, .TempPMC3, Is_not_within
+    branch Is_within
+ three_two:
+    le .TempPMC2, .TempPMC, Is_within
+    lt .TempPMC, .TempPMC3, Is_within
+    branch Is_not_within
+ Is_within:
+    .PushTrue
+    branch DoneInterpretWord
+ Is_not_within:
+    .PushFalse
     branch DoneInterpretWord
 
 DoneInterpretWord:
