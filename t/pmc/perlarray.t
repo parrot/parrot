@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -1127,5 +1127,49 @@ CODE
 0
 1
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "set_integer_keyed - nested #19328");
+ 	new P0, .PerlArray
+        new P1, .PerlArray
+        push P1, 9
+        push P1, 8
+        push P1, 7
+        push P1, 6
+        push P1, 5
+        push P0, P1
+        new P1, .PerlArray
+        push P1, 4
+        push P1, 3
+        push P1, 2
+        push P1, 1
+        push P1, 0
+        push P0, P1
+        bsr DUMP
+        print "---\n"
+        set P0[1;3], 9
+        bsr DUMP
+        end
+DUMP:
+        set I0, 0
+LOOP0:
+        set I1, 0
+LOOP1:
+        set I2, P0[I0;I1]
+        print I2
+        print " "
+        inc I1
+        lt I1, 5, LOOP1
+        inc I0
+        print "-\n"
+        lt I0, 2, LOOP0
+        ret
+CODE
+9 8 7 6 5 -
+4 3 2 1 0 -
+---
+9 8 7 6 5 -
+4 3 2 9 0 -
+OUTPUT
+
 
 1;

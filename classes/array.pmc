@@ -274,11 +274,23 @@ pmclass Array {
 
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
+        PMC* nextkey;
+        PMC* box;
 
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-        SELF.set_integer_keyed_int(&ix, value);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+	    SELF.set_integer_keyed_int(&ix, value);
+	    return;
+	}
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) {
+	    /* autovivify an Array */
+	    box = pmc_new(INTERP, DYNSELF.type());
+	}
+        box->vtable->set_integer_keyed(INTERP, box, nextkey, value);
     }
 
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
@@ -293,10 +305,22 @@ pmclass Array {
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
         INTVAL ix;
+        PMC* nextkey;
+        PMC* box;
 
         if (!key) return;
         ix = key_integer(INTERP, key);
-        SELF.set_number_keyed_int(&ix, value);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+	    SELF.set_number_keyed_int(&ix, value);
+	    return;
+	}
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) {
+	    /* autovivify an Array */
+	    box = pmc_new(INTERP, DYNSELF.type());
+	}
+        box->vtable->set_number_keyed(INTERP, box, nextkey, value);
     }
 
     void set_string_keyed_int (INTVAL* key, STRING* value) {
@@ -311,10 +335,22 @@ pmclass Array {
 
     void set_string_keyed (PMC* key, STRING* value) {
         INTVAL ix;
+        PMC* nextkey;
+        PMC* box;
 
         if (!key) return;
         ix = key_integer(INTERP, key);
-        SELF->vtable->set_string_keyed_int(INTERP, SELF, &ix, value);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+	    SELF->vtable->set_string_keyed_int(INTERP, SELF, &ix, value);
+	    return;
+	}
+        box = SELF.get_pmc_keyed_int(&ix);
+        if (box == NULL) {
+	    /* autovivify an Array */
+	    box = pmc_new(INTERP, DYNSELF.type());
+	}
+        box->vtable->set_string_keyed(INTERP, box, nextkey, value);
     }
 
     void set_pmc_keyed_int (INTVAL* dest_key, PMC* src, INTVAL* src_key) {

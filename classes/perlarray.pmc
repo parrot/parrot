@@ -53,29 +53,10 @@ pmclass PerlArray extends Array {
     };
 
 
-    void set_integer_keyed (PMC* key, INTVAL value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = key_integer(INTERP, key);
-	DYNSELF.set_integer_keyed_int(&ix, value);
-    };
-
-
     void set_number_keyed_int (INTVAL* key, FLOATVAL value) {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) SELF->data, *key);
         ptr->vtable->set_number_native(INTERP, ptr, value);
-    };
-
-    void set_number_keyed (PMC* key, FLOATVAL value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = key_integer(INTERP, key);
-	DYNSELF.set_number_keyed_int(&ix, value);
     };
 
 
@@ -83,15 +64,6 @@ pmclass PerlArray extends Array {
 	PMC * ptr = Parrot_PerlArray_set_pmc_ptr(INTERP,
 		(List *) SELF->data, *key);
         ptr->vtable->set_string_native(INTERP, ptr, value);
-    };
-
-    void set_string_keyed (PMC* key, STRING* value) {
-        INTVAL ix;
-
-        if (!key) return;
-
-        ix = key_integer(INTERP, key);
-	DYNSELF.set_string_keyed_int(&ix, value);
     };
 
     void set_pmc_keyed_int (INTVAL* key, PMC* src, INTVAL* src_key) {
@@ -118,10 +90,6 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    INTVAL get_integer_keyed (PMC* key) {
-	return SUPER(key);
-    }
-
     FLOATVAL get_number_keyed_int (INTVAL* key) {
         if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements()) {
             PMC* temp = undef(INTERP);
@@ -129,10 +97,6 @@ pmclass PerlArray extends Array {
         }
         else
             return SUPER(key);
-    }
-
-    FLOATVAL get_number_keyed (PMC* key) {
-	return SUPER(key);
     }
 
     STRING* get_string () {
@@ -148,19 +112,11 @@ pmclass PerlArray extends Array {
             return SUPER(key);
     }
 
-    STRING* get_string_keyed (PMC* key) {
-	return SUPER(key);
-    }
-
     PMC* get_pmc_keyed_int (INTVAL* key) {
         if (*key >= DYNSELF.elements() || *key < -DYNSELF.elements())
             return undef(INTERP);
         else
             return SUPER(key);
-    }
-
-    PMC* get_pmc_keyed (PMC* key) {
-	return SUPER(key);
     }
 
 }
