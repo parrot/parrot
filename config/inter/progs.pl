@@ -6,7 +6,7 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what C compiler and linker to use...';
 
-@args = qw(ask cc link ld ccflags linkflags ldflags libs debugging);
+@args = qw(ask cc link ld ccflags ccwarn linkflags ldflags libs debugging);
 
 sub runstep {
   my %args;
@@ -18,6 +18,7 @@ sub runstep {
   $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
+  my $cc_warn='';
   
   $libs=join ' ',
            grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
@@ -31,6 +32,7 @@ sub runstep {
   $ldflags=$args{ldflags} if defined $args{ldflags};
   $libs=$args{libs}       if defined $args{libs};
   $debug=$args{debugging} if defined $args{debugging};
+  $cc_warn=$args{ccwarn}  if defined $args{ccwarn};
   
   if($args{ask}) {
     print <<'END';
@@ -69,7 +71,8 @@ END
     ccflags => $ccflags,
     linkflags => $linkflags,
     ldflags => $ldflags,
-    libs    => $libs
+    libs    => $libs,
+    cc_warn => $cc_warn
   );
 }
 

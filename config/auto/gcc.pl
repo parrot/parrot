@@ -87,6 +87,13 @@ sub runstep {
       next unless $opt; # Ignore blank lines
       $warns .= " $opt";
     }
+    # if the user overwrites the warnings remove it from $warns
+    if ($cc_warn) {
+      foreach my $w ( split ' ', $cc_warn ) {
+	$w =~ s/^-W(?:no-)?(.*)$/$1/;
+	$warns = join ' ' , grep !/^-W(?:no-)?$w/, split ' ', $warns;
+      }
+    }
   }
 
   if (defined $miniparrot && $gccversion) {
