@@ -1209,7 +1209,7 @@ lint2 : ${test_prog}
 ###############################################################################
 
 install :
-	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST MANIFEST.generated | sh
+	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST MANIFEST.generated
 
 ###############################################################################
 #
