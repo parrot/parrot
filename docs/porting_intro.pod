@@ -1,0 +1,230 @@
+=head1 NAME
+
+Parrot Subsystem Porting Introduction
+
+=head1 OVERVIEW
+
+This document is an introduction to porting the optional subsytems of Parrot
+onto a new architecture once the core successfully builds.  It assumes passing
+familiarity with common VM techniques but relatively little knowledge of Parrot
+internals.  For each feature, a brief description of its purpose, hints on
+helping to port it, and pointers to more information are included.
+
+=head1 CGoto
+
+=head2 What it is
+
+"Computed goto" is a non-standard C feature that allows taking a pointer to an
+statement label (e.g. "LOOP:" ) using the unary && operator.  Certain Parrot
+runcores make use of this feature as an optimization.
+
+=head2 How to help
+
+If cgoto is not supported in Parrot by default on your platform, try to compile
+config/auto/cgoto/test_c.in with your C compiler and determine why it fails.
+If the compiler does not support the computed goto concept at all, this feature
+cannot be made to work (don't worry, there are other runcores).  However, if
+the compiler supports it but the test is inadequate, please submit a bug report
+describing how the implementation of this feature differs from what Parrot
+expects.
+
+Note that gcc supports this feature out of the box, though it sometimes
+struggles with it in low-memory situations.  Failures during compilation of
+core_ops_cg.c are frequently caused by insufficient resources rather than bugs
+in gcc or Parrot.
+
+=head2 References
+
+=over 4
+
+=item * F<config/auto/cgoto/test_c.in>
+
+=item * I<make testC>
+
+=back
+
+=head1 JIT
+
+=head2 What it is
+
+Parrot contains a just-in-time compilation subsystem that compiles Parrot
+bytecode into native processor instructions just prior to execution,
+eliminating much of the overhead of bytecode interpretation.
+
+=head2 How to help
+
+Each unique processor target requires its own JIT engine.  So far, engines have
+been implemented for DEC Alpha, ARM, Intel i386, SGI MIPS, PPC, and Sun4.  If
+you know that your architecture is substantially similar to one of these,
+adding support may be possible with relatively little effort.  Implementing a
+novel JIT core from scratch is a substantial undertaking.
+
+=head2 References
+
+=over 4
+
+=item * F<docs/jit.pod>
+
+=item * F<jit/$arch/*>
+
+=item * I<make testj>
+
+=item * F<t/op/jit.t>
+
+=back
+
+=head1 Native Exec
+
+=head2 What it is
+
+Parrot's "native exec" feature allows the integration of the parrot runtime and
+a Parrot program into a single precompiled binary, reducing program start-up
+cost and negating the need to package Parrot distinctly from an application.
+It's perl2exe/PerlApp/PAR for the Parrot generation.
+
+=head2 How to help
+
+The exec feature makes use of the JIT subsystem, and requires supporting code
+with knowledge of the operating system's native object format.  This feature is
+only supported on JITable architectures (for now, just x86) running Linux,
+*BSD, or Darwin.  An interested Parrot hacker with an eligible platform can
+contribute by submitting patches which emit exec objects in the OS's native
+object format (e.g., ELF, a.out, XCOFF).
+
+=head2 References
+
+=over 4
+
+=item * F<docs/native_exec.pod>
+
+=item * F<src/exec*.c>
+
+=item * F<include/parrot/exec*.h>
+
+=item * F<config/auto/jit.pl>
+
+=back
+
+=head1 Threads
+
+=head2 What it is
+
+Parrot abstracts parallel streams of execution (threads) using a small set of
+concurrency primitives that operate on thread objects with distinct code paths
+and private data.  Architecture-specific threading models are mapped onto to
+these primitives to provide Parrot threads with the most desirable features of
+native threads.  Native thread support is very important to the adoption of
+Parrot.
+
+=head2 How to help
+
+At present Parrot implements support only for POSIX threads (pthreads).  Most
+modern UNIX-like operating systems have a pthreads implementation, and allowing
+Parrot to use these is frequently just a matter of finding the right compiler
+and linker flags.  Non-POSIX architectures with substantially different
+threading models will require more implementation and debugging to work with
+Parrot.
+
+To assist with enhancing threading support, compare the threading primitives
+required by Parrot in F<thread.h> to those provided by your platform's
+threading model(s) and implement Parrot threads in terms of native threads.
+See F<thr_pthread.h> for an example of this.
+
+=head2 References
+
+=over 4
+
+=item * F<t/pmc/threads.t>
+
+=item * F<config/gen/platform/*/threads.h>
+
+=item * F<src/thread.c>
+
+=item * F<include/parrot/thread.h>
+
+=item * F<include/parrot/thr_pthread.h>
+
+=back
+
+=head1 Signals
+
+=head2 What it is
+
+Parrot must be able to receive asynchronous imperative and advisory messages
+from the operating system and other local processes in a safe manner.
+Typically this is done by registering message-specific callback functions,
+to which the operating system transfers control when signals are generated.
+
+=head2 How to help
+
+UNIX-like systems usually employ the signal() function for this purpose;
+Windows achieves similar functionality with message queues.  For now, Parrot
+assumes a mechanism like the former can be used.  Currently the signal handler
+test suite only operates under Linux, though the mechanism itself is intended
+to work wherever Parrot does.  Portable tests as well as fixes for failures
+thereof are greatly needed.
+
+=head2 References
+
+=over 4
+
+=item * F<config/gen/platform/*/signal.[ch]>
+
+=item * F<t/pmc/signal.t>
+
+=back
+
+=head1 Dynloading
+
+=head2 What it is
+
+Nearly all modern operating systems support runtime-specified importation of
+shared library object code, and Parrot must support this feature in order to
+use native libraries without relying on the system linker.  Notable APIs for
+this mechanism include dlopen on common *NIXes and LoadLibrary on Win32.
+
+=head2 How to help
+
+If not already supported, research the dynamic library loading API for your
+platform and implement it in the platform-specific sources.  Since Parrot
+substantially abstracts the dynload mechanism, adding support for a new
+platform should not require diving far into Parrot internals.
+
+=head2 References
+
+=over 4
+
+=item * F<config/gen/platform/*/dl.[ch]>
+
+=back
+
+=head1 Memory protection
+
+=head2 What it is
+
+An ever-increasing number of operating systems support the enforcement of
+executable/non-executable flags on memory regions to prevent the improper
+execution of erroneous or malicious instructions.  When applied by default to
+regions that rarely need to contain executable code, this is a useful security
+measure.  However, since Parrot (specifically, the JIT subsystem) generates and
+executes native instructions in such regions, it must be able to safely
+circumvent these protections.
+
+=head2 How to help
+
+Determine what level of support for execute protection your architecture/OS
+combination has, and how to selectively disable it.  Documentation for features
+like PaX (Linux) and W^X (OpenBSD) are the best place to look for this
+information.  The platform-specific source files implement memory allocation
+wrappers that hide these details, so wading deep into Parrot is probably not a
+prerequisite for this task.
+
+=head2 References
+
+=over 4
+
+=item * F<config/gen/platform/*/memexec.c>
+
+=back
+
+=cut

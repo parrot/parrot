@@ -245,6 +245,7 @@ docs/pmc/perlhash.pod                             [main]doc
 docs/pmc/perlstring.pod                           [main]doc
 docs/pmc/struct.pod                               [main]doc
 docs/pmc/subs.pod                                 [main]doc
+docs/porting_intro.pod                            [main]doc
 docs/practical_notes.pod                          [main]doc
 docs/resources/parrot.small.png                   [devel]
 docs/resources/perl-styles.css                    [devel]
