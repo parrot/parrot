@@ -1,9 +1,10 @@
 package Parrot::Test;
 
 use strict;
-use vars qw(@EXPORT @ISA);
+use vars qw(@EXPORT @ISA $TEST_PROG_ARGS);
 use Parrot::Config;
 
+# 5.005_03 Env.pm doesn't make its arguments immune from use strict 'vars';
 use Env qw($TEST_PROG_ARGS);
 
 require Exporter;
