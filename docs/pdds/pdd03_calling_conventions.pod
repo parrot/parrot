@@ -105,10 +105,9 @@ The first 27 PMC parameters.
 
 =back
 
-All overflow parameters, and all parameters for subs called without a
-known prototype, are pushed on the stack in reverse order--that is the
-topmost entry on the stack is the first entry in the parameter list,
-and the bottom entry the last entry in the parameter list.
+All overflow parameters are pushed on the stack in reverse order--that
+is the topmost entry on the stack is the first entry in the parameter
+list, and the bottom entry the last entry in the parameter list.
 
 The PMC for a hash, array, or list is passed if one of the entries in
 the parameter list is a hash, array, or list. The aggregate is B<not>
