@@ -520,7 +520,11 @@ details.
 
 April Fool's Joke: http://www.perl.com/pub/a/2001/04/01/parrot.htm
 
-apocalypses: http://www.panix.com/~ziggy/
+apocalypses: http://dev.perl.org/perl6/apocalypse/
+
+exegeses: http://dev.perl.org/perl6/exegesis/
+
+synopses: http://dev.perl.org/perl6/synopsis/
 
 cool kids: http://use.perl.org/~acme/journal
 
