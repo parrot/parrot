@@ -476,10 +476,26 @@ Returns whether the hash is the same as C<*other>.
 */
 
     void set_integer_keyed (PMC* key, INTVAL value) {
-        STRING* keystr = make_hash_key(INTERP, key);
-        PMC *val = pmc_new(interpreter, enum_class_PerlInt);
-        VTABLE_set_integer_native(INTERP, val, value);
-        hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            val = pmc_new(interpreter, enum_class_PerlInt);
+            VTABLE_set_integer_native(INTERP, val, value);
+            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_integer_keyed(INTERP, box, nextkey, value);
     }
 
 /*
@@ -505,10 +521,26 @@ Returns whether the hash is the same as C<*other>.
 */
 
     void set_number_keyed (PMC* key, FLOATVAL value) {
-        STRING* keystr = make_hash_key(INTERP, key);
-        PMC *val = pmc_new(interpreter, enum_class_PerlNum);
-        PMC_num_val(val) = value;
-        hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            val = pmc_new(interpreter, enum_class_PerlNum);
+            PMC_num_val(val) = value;
+            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_number_keyed(INTERP, box, nextkey, value);
     }
 
 /*
@@ -562,10 +594,26 @@ These two methods are unimplemented.
 */
 
     void set_string_keyed (PMC* key, STRING* value) {
-        STRING* keystr = make_hash_key(INTERP, key);
-        PMC *val = pmc_new(interpreter, enum_class_PerlString);
-        VTABLE_set_string_native(INTERP, val, value);
-        hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            val = pmc_new(interpreter, enum_class_PerlString);
+            VTABLE_set_string_native(INTERP, val, value);
+            hash_put(INTERP, PMC_struct_val(SELF), keystr, val);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_string_keyed(INTERP, box, nextkey, value);
     }
 
 /*
@@ -590,9 +638,25 @@ These two methods are unimplemented.
 
 */
 
-    void set_pmc_keyed (PMC* dest_key, PMC* value) {
-        STRING* keystr = make_hash_key(INTERP, dest_key);
-        hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        STRING* keystr;
+        PMC* nextkey;
+        PMC* box;
+        PMC* val;
+
+        if (!key) return;
+        keystr = make_hash_key(INTERP, key);
+        nextkey = key_next(INTERP, key);
+        if (nextkey == NULL) {
+            hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
+            return;
+        }
+        box = SELF.get_pmc_keyed_str(keystr);
+        if (box == NULL) {
+            /* autovivify an PerlHash */
+            box = pmc_new(INTERP, DYNSELF.type());
+        }
+        VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
     }
 
 /*

@@ -1,4 +1,5 @@
 #! perl
+
 # Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -18,9 +19,7 @@ well.
 
 =cut
 
-# $Id$
-
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -1013,3 +1012,131 @@ CODE
 U
 OUTPUT
 
+output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
+##PIR##
+.sub _main
+    .local pmc outer_hash
+    outer_hash = new PerlHash
+    .local pmc inner_hash
+    inner_hash = new PerlHash
+    .local pmc inner_array
+    inner_array = new PerlArray
+    .local string elem_string
+    .local int    elem_int
+    .local pmc    elem_pmc
+    .local num    elem_num
+
+    # setting and retrieving strings in an inner PerlArray
+    inner_array[128] = 'inner_array:128'
+    outer_hash['inner_array'] = inner_array
+    elem_string = outer_hash['inner_array';128]
+    print elem_string
+    print "\n" 
+    outer_hash['inner_array';128] = 'changed inner_array:128'
+    elem_string = outer_hash['inner_array';128]
+    print elem_string
+    print "\n" 
+
+    # setting and retrieving strings in an inner PerlHash
+    inner_hash['129'] = 'inner_hash:129'
+    outer_hash['inner_hash'] = inner_hash
+    elem_string = outer_hash['inner_hash';'129']
+    print elem_string
+    print "\n" 
+    outer_hash['inner_hash';'129'] = 'changed inner_hash:129'
+    elem_string = outer_hash['inner_hash';'129']
+    print elem_string
+    print "\n" 
+
+    # setting and retrieving integer in an inner PerlArray
+    inner_array[130] = 130
+    outer_hash['inner_array'] = inner_array
+    elem_int = outer_hash['inner_array';130]
+    print elem_int
+    print "\n" 
+    outer_hash['inner_array';130] = -130
+    elem_int = outer_hash['inner_array';130]
+    print elem_int
+    print "\n" 
+
+    # setting and retrieving integer in an inner PerlHash
+    inner_hash['131'] = 131
+    outer_hash['inner_hash'] = inner_hash
+    elem_int = outer_hash['inner_hash';'131']
+    print elem_int
+    print "\n" 
+    outer_hash['inner_hash';'131'] = -131
+    elem_int = outer_hash['inner_hash';'131']
+    print elem_int
+    print "\n" 
+
+    # setting and retrieving a PMC in an inner PerlArray
+    .local pmc in_pmc
+    in_pmc = new PerlString
+    in_pmc = 'inner_array:132'
+    inner_array[132] = in_pmc
+    outer_hash['inner_array'] = inner_array
+    elem_pmc = outer_hash['inner_array';132]
+    print elem_pmc
+    print "\n" 
+    in_pmc = 'changed inner_array:132'
+    outer_hash['inner_array';132] = in_pmc
+    elem_pmc = outer_hash['inner_array';132]
+    print elem_pmc
+    print "\n" 
+
+    # setting and retrieving a PMC in an inner PerlHash
+    in_pmc = 'inner_array:133'
+    inner_hash['133'] = in_pmc
+    outer_hash['inner_hash'] = inner_hash
+    elem_string = outer_hash['inner_hash';'133']
+    print elem_string
+    print "\n" 
+    in_pmc = 'changed inner_hash:133'
+    outer_hash['inner_hash';'133'] = in_pmc
+    elem_string = outer_hash['inner_hash';'133']
+    print elem_string
+    print "\n" 
+
+    # setting and retrieving a float in an inner PerlArray
+    inner_array[134] = 134.134
+    outer_hash['inner_array'] = inner_array
+    elem_num = outer_hash['inner_array';134]
+    print elem_num
+    print "\n" 
+    outer_hash['inner_array';134] = -134.134
+    elem_num = outer_hash['inner_array';134]
+    print elem_num
+    print "\n" 
+
+    # setting and retrieving a float in an inner PerlHash
+    inner_hash['135'] = 135.135
+    outer_hash['inner_hash'] = inner_hash
+    elem_num = outer_hash['inner_hash';'135']
+    print elem_num
+    print "\n" 
+    outer_hash['inner_hash';'135'] = -135.135
+    elem_num = outer_hash['inner_hash';'135']
+    print elem_num
+    print "\n" 
+
+    end
+.end
+CODE
+inner_array:128
+changed inner_array:128
+inner_hash:129
+changed inner_hash:129
+130
+-130
+131
+-131
+inner_array:132
+changed inner_array:132
+inner_array:133
+changed inner_hash:133
+134.134000
+-134.134000
+135.135000
+-135.135000
+OUTPUT
