@@ -62,7 +62,7 @@ print INTERP <<EOI;
 
 #define DO_OP(w,x,y,z) do { \\
     x = (void *)z->opcode_funcs; \\
-    (void *)y = x[*w]; \\
+    y = (opcode_t* (*)())x[w->i]; \\
     w = (y)(w,z); \\
  } while (0);
 EOI

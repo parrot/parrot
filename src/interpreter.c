@@ -44,17 +44,17 @@ check_fingerprint(void) {
 /*=for api interpreter runops
  * run parrot operations until the program is complete
  */
-IV *
-runops_notrace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+opcode_t *
+runops_notrace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
-    IV *(*func)();
+    opcode_t *(*func)();
     void **temp; 
-    IV *code_start;
+    opcode_t *code_start;
 
     code_start = code;
 
-    while (code >= code_start && code < (code_start + code_size) && *code) {
+    while (code >= code_start && code < (code_start + code_size) && code->i) {
         DO_OP(code, temp, func, interpreter);
     }
 
@@ -67,16 +67,16 @@ runops_notrace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) 
  * and ARGS. Used by runops_trace.
  */
 void
-trace_op(IV * code_start, long code_size, IV *code) {
+trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
     int i;
 
     if (code >= code_start && code < (code_start + code_size)) {
-        fprintf(stderr, "PC=%ld; OP=%ld (%s)", code - code_start, *code, op_names[*code]);
-        if (op_args[*code]) {
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", code - code_start, *code, op_names[code->i]);
+        if (op_args[code->i]) {
             fprintf(stderr, "; ARGS=(");
-            for(i = 0; i < op_args[*code]; i++) {
+            for(i = 0; i < op_args[code->i]; i++) {
                 if (i) { fprintf(stderr, ", "); }
-                fprintf(stderr, "%ld", *(code + i + 1));
+                fprintf(stderr, "%ld", (code + i + 1)->i);
             }
             fprintf(stderr, ")");
         }
@@ -91,19 +91,19 @@ trace_op(IV * code_start, long code_size, IV *code) {
  * TODO: Not really part of the API, but here's the docs.
  * Passed to runops_generic() by runops_trace().
  */
-IV *
-runops_trace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
+opcode_t *
+runops_trace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
     /* Move these out of the inner loop. No need to redeclare 'em each
        time through */
-    IV *(*func)();
+    opcode_t *(*func)();
     void **temp; 
-    IV *code_start;
+    opcode_t *code_start;
 
     code_start = code;
 
     trace_op(code_start, code_size, code);
 
-    while (code >= code_start && code < (code_start + code_size) && *code) {
+    while (code >= code_start && code < (code_start + code_size) && code->i) {
         DO_OP(code, temp, func, interpreter);
 
         trace_op(code_start, code_size, code);
@@ -117,12 +117,13 @@ runops_trace_core (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
  * Generic runops, which takes a function pointer for the core.
  */
 void
-runops_generic (IV * (*core)(struct Parrot_Interp *, IV *, IV), struct Parrot_Interp *interpreter, IV *code, IV code_size) {
-    IV * code_start;
+runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *, IV), struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
+    opcode_t * code_start;
 
     check_fingerprint();
 
     code_start = code;
+
     code = core(interpreter, code, code_size);
 
     if (code < code_start || code >= (code_start + code_size)) {
@@ -136,8 +137,8 @@ runops_generic (IV * (*core)(struct Parrot_Interp *, IV *, IV), struct Parrot_In
  * run parrot operations until the program is complete
  */
 void
-runops (struct Parrot_Interp *interpreter, IV *code, IV code_size) {
-    IV * (*core)(struct Parrot_Interp *, IV *, IV);
+runops (struct Parrot_Interp *interpreter, opcode_t *code, IV code_size) {
+    opcode_t * (*core)(struct Parrot_Interp *, opcode_t *, IV);
 
     if (interpreter->flags & PARROT_TRACE_FLAG) {
         core = runops_trace_core;

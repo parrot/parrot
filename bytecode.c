@@ -31,13 +31,14 @@ structure of the frozen bycode.
 
 #include "parrot/parrot.h"
 
-#define GRAB_IV(x) *((IV*)*x)++
+#define GRAB_OPCODE(x) ((*(x))++)->i
+#define INC_OPCODE(x,y) *(x) = (opcode_t*)(((char*)*(x)) + (y))
 
 /*
 
 =item C<check_magic>
 
-    Args: void** program_code, long* program_size
+    Args: opcode_t** program_code, long* program_size
 
 Check to see if the first C<IV> in C<*program_code>
 matches the Parrot magic number for bytecode; return 1
@@ -50,16 +51,16 @@ also decrements C<*program_size> by the same amount.
 */
 
 static int
-check_magic(void** program_code, long* program_size) {
+check_magic(opcode_t** program_code, long* program_size) {
     program_size -= sizeof(IV);
-    return (GRAB_IV(program_code) == PARROT_MAGIC);
+    return (GRAB_OPCODE(program_code) == PARROT_MAGIC);
 }
 
 /*
 
 =item C<read_constants_table>
 
-    Args: void** program_code, long* program_size
+    Args: opcode_t** program_code, long* program_size
 
 Reads the constants segment from C<*program_code>, and
 creates the referenced constants. See L<parrotbyte/Constants Segment>
@@ -72,9 +73,9 @@ C<*program_size> byt the amount consumed.
 */
 
 static void
-read_constants_table(void** program_code, long* program_size)
+read_constants_table(opcode_t** program_code, long* program_size)
 {
-    IV len = GRAB_IV(program_code);
+    IV len = GRAB_OPCODE(program_code);
     IV num;
     IV i = 0;
 
@@ -85,24 +86,25 @@ read_constants_table(void** program_code, long* program_size)
        return;
     }
 
-    num = GRAB_IV(program_code);
+    num = GRAB_OPCODE(program_code);
     len -= sizeof(IV);
     *program_size -= sizeof(IV);
     
     Parrot_string_constants = mem_allocate_aligned(num * sizeof(STRING*));
 
     while (len > 0) {
-        IV flags    = GRAB_IV(program_code);
-        IV encoding = GRAB_IV(program_code);
-        IV type     = GRAB_IV(program_code);
-        IV buflen   = GRAB_IV(program_code);
+        IV flags    = GRAB_OPCODE(program_code);
+        IV encoding = GRAB_OPCODE(program_code);
+        IV type     = GRAB_OPCODE(program_code);
+        IV buflen   = GRAB_OPCODE(program_code);
 	int pad;
 
         len -= 4 * sizeof(IV);
         *program_size -= 4 * sizeof(IV);
 
-        Parrot_string_constants[i++] = string_make(*program_code /* ouch */, buflen, encoding, flags, type);
-        (char*)*program_code += buflen;
+        Parrot_string_constants[i++] = string_make((void*)*program_code /* ouch */, buflen, encoding, flags, type);
+
+        INC_OPCODE(program_code, buflen);
         len -= buflen;
         *program_size -= buflen;
 
@@ -111,7 +113,7 @@ read_constants_table(void** program_code, long* program_size)
 	if (pad) {
 	  pad=sizeof(IV)-pad;
 	  len -= pad;
-	  (char*)*program_code += pad;       
+          INC_OPCODE(program_code, pad);
           *program_size -= pad;
 	}
         num--;
@@ -126,7 +128,7 @@ read_constants_table(void** program_code, long* program_size)
 
 =item C<read_fixup_table>
 
-    Args: void** program_code
+    Args: opcode_t** program_code
 
 B<UNIMPLEMENTED>.
 
@@ -138,12 +140,13 @@ fixup segment.
 */
 
 static void
-read_fixup_table(void** program_code, long* program_size)
+read_fixup_table(opcode_t** program_code, long* program_size)
 {
-    IV len = GRAB_IV(program_code);
+    IV len = GRAB_OPCODE(program_code);
+
     *program_size -= sizeof(IV);
     /* For now, just skip over it */
-    ((IV*)*program_code) += len;
+    INC_OPCODE(program_code, len);
     *program_size -= len;
 }
 
@@ -151,7 +154,7 @@ read_fixup_table(void** program_code, long* program_size)
 
 =item C<init_bytecode>
 
-    Args: void* program_code, long* program_size
+    Args: opcode_t* program_code, long* program_size
 
 This function is responsible for calling the above three
 functions, exiting if the Parrot magic is not found, and
@@ -162,8 +165,8 @@ bytecode stream begins.
 
 */
 
-void *
-init_bytecode(void* program_code, long* program_size) 
+opcode_t *
+init_bytecode(opcode_t* program_code, long* program_size) 
 {
     if (!check_magic(&program_code, program_size)) {
         printf("This isn't Parrot bytecode!\n");

@@ -9,6 +9,11 @@
 typedef ${iv} IV;
 typedef ${nv} NV;
 
+typedef union {
+    IV i;
+    void* p;
+} opcode_t;
+
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 typedef void SYNC;

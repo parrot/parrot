@@ -50,7 +50,7 @@ main(int argc, char **argv) {
 
     /* If we got only the program name, run the test program */
     if (argc == 1) {
-        runops(interpreter, opcodes, sizeof(opcodes));
+        runops(interpreter, (opcode_t*)opcodes, sizeof(opcodes));
     }
     else if (argc == 2 && !strcmp(argv[1], "-s")) { /* String tests */
         STRING *s = string_make("foo", 3, enc_native, 0, 0);
@@ -75,7 +75,7 @@ main(int argc, char **argv) {
     }
     /* Otherwise load in the program they gave and try that */
     else {
-        void *program_code;
+        opcode_t *program_code;        
         long program_size;
         struct stat file_stat;
         int fd;
@@ -93,10 +93,10 @@ main(int argc, char **argv) {
         program_size = file_stat.st_size;
 
 #ifndef HAS_HEADER_SYSMMAN
-        program_code = mem_sys_allocate(program_size);
-        _read(fd, program_code, program_size);
+        program_code = (opcode_t*)mem_sys_allocate(program_size);
+        _read(fd, (void*)program_code, program_size);
 #else
-        program_code = mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
+        program_code = (opcode_t*)mmap(0, program_size, PROT_READ, MAP_SHARED, fd, 0);
 #endif
 
         if (!program_code) {

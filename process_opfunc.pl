@@ -75,11 +75,11 @@ while (<OPCODE>) {
     my $count = 1;
     $opcode{$name}{PARAMETER_SUB} = ["", 
 				     map {if ($_ eq "n") { 
-					 my $temp = '*(NV *)&cur_opcode[' . $count . ']';
+					 my $temp = '*(NV *)(cur_opcode[' . $count . '].p)';
 					 $count += 2;
 					 $temp;
 				     } else {
-					 "cur_opcode[" . $count++ . "]"
+					 "cur_opcode[" . $count++ . "].i"
 					 }
 				      } @params];
 }
@@ -115,11 +115,11 @@ while (<INPUT>) {
 	my $count = 1;
 	@param_sub = ("",
 		      map {if ($_ eq "n") {
-			  my $temp = '*(NV *)&cur_opcode[' . $count . ']';
+			  my $temp = '*(NV *)&cur_opcode[' . $count . '].i';
 			  $count += 2;
 			  $temp;
 		      } else {
-			  "cur_opcode[" . $count++ . "]"
+			  "cur_opcode[" . $count++ . "].i"
 		      }
 		       } @{$opcodes{$name}{TYPES}});
 	next;
@@ -153,8 +153,8 @@ sub emit_auto_header {
 
     $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
     
-    print OUTPUT ("IV *$opcodes{$name}{FUNC}".
-		  "(IV cur_opcode[], struct Parrot_Interp *interpreter) {\n");
+    print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
+		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");
     return($name, "  return cur_opcode + " . $return_offset . ";\n}\n");
 }
 
@@ -162,8 +162,8 @@ sub emit_manual_header {
     my $line = shift;
     my ($name) = $line =~ /MANUAL_OP\s+(\w+)/;
     
-    print OUTPUT ("IV *$opcodes{$name}{FUNC}".
-		  "(IV cur_opcode[], struct Parrot_Interp *interpreter) {\n");
+    print OUTPUT ("opcode_t *$opcodes{$name}{FUNC}".
+		  "(opcode_t cur_opcode[], struct Parrot_Interp *interpreter) {\n");
     print OUTPUT "  IV return_offset = 1;\n";
     return($name, "  return cur_opcode + return_offset;\n}\n");
 }
