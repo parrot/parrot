@@ -94,7 +94,7 @@ runops (struct Parrot_Interp *interpreter, struct PackFile * code) {
         which |= interpreter->flags & PARROT_PROFILE_FLAG ? 0x02 : 0x00;
         which |= interpreter->flags & PARROT_TRACE_FLAG   ? 0x04 : 0x00;
 
-        core = runops_cores[which];
+        core = which ? runops_slow_core : runops_fast_core;
 
         if ((interpreter->flags & PARROT_PROFILE_FLAG) != 0) {
             int i;

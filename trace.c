@@ -16,7 +16,7 @@
 /*
  *=for api interpreter trace_op_dump
  * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
- * and ARGS. Used by trace_op_b0 and trace_op_b1.
+ * and ARGS. Used by trace_op
  */
 void
 trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t *pc) {
@@ -70,31 +70,14 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start, opcode_t 
 
 
 /*
- *=for api interpreter trace_op_b0
- * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
- * and ARGS. Used by runops_trace.
- *
- * No bounds checking.
- */
-void
-trace_op_b0(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t *pc) {
-    if (!pc) {
-        return;
-    }
-    (void)fflush(NULL); /* Flush *ALL* output before printing trace info */
-    trace_op_dump(interpreter, code_start, pc);
-    (void)fflush(stderr); /* Flush *stderr* now that we've output the trace info */
-}
-
-/*
- *=for api interpreter trace_op_b1
+ *=for api interpreter trace_op
  * TODO: This isn't really part of the API, but here's its documentation. Prints the PC, OP
  * and ARGS. Used by runops_trace.
  *
  * With bounds checking.
  */
 void
-trace_op_b1(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
+trace_op(struct Parrot_Interp *interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
     INTVAL i;
 
     if (!pc) {

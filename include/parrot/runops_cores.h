@@ -18,32 +18,11 @@
 
 typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
 
-extern const runops_core_f runops_cores[8];
+opcode_t *
+runops_fast_core(struct Parrot_Interp *, opcode_t *);
 
 opcode_t *
-runops_t0p0b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p0b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p1b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t0p1b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p0b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p0b1_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p1b0_core(struct Parrot_Interp *, opcode_t *);
-
-opcode_t *
-runops_t1p1b1_core(struct Parrot_Interp *, opcode_t *);
-
+runops_slow_core(struct Parrot_Interp *, opcode_t *);
 
 #endif
 
