@@ -24,25 +24,14 @@
 # This tweaks it act as if only one had been passed in. This will
 # eventually need a cleanup.
 
-  #print "ARGC: "
-  #print argc
-  #print "\n"
-
   if argc == 1 goto continue
   $P0 = argv[1]
   isnull $P0, continue
-  #print "P0 is:"
-  #print $P0
-  #print "\n"
   $I0 = typeof $P0
   if $I0 != .PerlUndef goto continue
   argc=1
 
 continue:
-  #print "!ARGC="
-  #print argc
-  #print "\n"
-
   .local string name
   .local pmc lexical
 
@@ -55,27 +44,13 @@ continue:
   .local int return_type
   return_type = TCL_OK
 
-  #print "a\n"
   name=argv[0] 
-  #print "b\n"
   if argc == 1 goto get_scalar
-  #print "c\n"
-  #$I0 = argv
-  #print "$I0 is"
-  #print $I0
-  #print "\n"
-  #print "TYPE OF ARGV is"
-  #$S9 = typeof argv
-  #print $S9
-  #print "\n" 
   $P9 = argv[1]
   isnull $P9, get_scalar # mix of various calling types.
   windex = $P9
-  #windex=argv[1] 
-  #print "d\n"
 
 get_indexed:
-  #print "get_indexed:\n"
   push_eh catch
     find_lex lexical, call_level, name
   clear_eh
@@ -92,7 +67,6 @@ get_indexed_ok:
   goto done
 
 get_indexed_bad:
-  #print "get_indexed_bad:\n"
   return_type = TCL_ERROR
   $S0 =  "can't read \""
   $S0 .= name
@@ -104,9 +78,6 @@ get_indexed_bad:
   goto done
 
 get_scalar:
-  #print "name is"
-  #print name
-  #print "\n"
   push_eh catch
     find_lex lexical, call_level, name
   clear_eh
@@ -129,10 +100,6 @@ get_scalar_bad:
   goto done
 
 get_scalar_ok:
-  #print "HERE?\n"
-  #print "lexical is:"
-  #print lexical
-  #print "\n"
   retval = lexical
   goto done
 
@@ -146,11 +113,6 @@ no_such_variable:
   # goto done            
 
 done:
-  #print "(get var) return_type is "
-  #print return_type
-  #print ",retval is "
-  #print retval
-  #print "\n"
   .return(return_type,retval)
 
 catch:
