@@ -32,7 +32,7 @@ $ mv n.pbc t/native_pbc/number_$(N).pbc
 # - increase number of tests
 # - include the pdump header info for reference
 # - put the file into MANIFEST
-# - add the file as binary and commit it
+# - add the file as binary (cvs add -kb) and commit it
 # thanks -leo
 
 EOC

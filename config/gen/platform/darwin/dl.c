@@ -50,30 +50,12 @@ Parrot_dlopen(const char *filename)
         { /* that didn't work either; go ahead and report the orignal error */
 
             switch(dyld_result) {
+            /* XXX for now, ignore all the known errors */
             case NSObjectFileImageFailure:
-                fprintf(stderr,
-                        "open result was Failure (%i) for filename [%s]\n",
-                        dyld_result, filename);
-                break;
             case NSObjectFileImageInappropriateFile:
-                fprintf(stderr,
-                        "open result was InappropriateFile (%i) for filename [%s]\n",
-                        dyld_result, filename);
-                break;
             case NSObjectFileImageArch:
-                fprintf(stderr,
-                        "open result was Arch (%i) for filename [%s]\n",
-                        dyld_result, filename);
-                break;
             case NSObjectFileImageFormat:
-                fprintf(stderr,
-                        "open result was Format (%i) for filename [%s]\n",
-                        dyld_result, filename);
-                break;
             case NSObjectFileImageAccess:
-                fprintf(stderr,
-                        "open result was Access (%i) for filename [%s]\n",
-                        dyld_result, filename);
                 break;
             default:
                 fprintf(stderr,
