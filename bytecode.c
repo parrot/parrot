@@ -31,7 +31,7 @@ structure of the frozen bycode.
 
 #include "parrot/parrot.h"
 
-#define GRAB_OPCODE(x) ((*(x))++)->i
+#define GRAB_OPCODE(x) *((*(x))++)
 #define INC_OPCODE(x,y) *(x) = (opcode_t*)(((char*)*(x)) + (y))
 
 /*

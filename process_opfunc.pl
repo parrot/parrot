@@ -79,7 +79,7 @@ while (<OPCODE>) {
 					 $count += 2;
 					 $temp;
 				     } else {
-					 "cur_opcode[" . $count++ . "].i"
+					 "cur_opcode[" . $count++ . "]"
 					 }
 				      } @params];
 }
@@ -119,7 +119,7 @@ while (<INPUT>) {
 			  $count += 2;
 			  $temp;
 		      } else {
-			  "cur_opcode[" . $count++ . "].i"
+			  "cur_opcode[" . $count++ . "]"
 		      }
 		       } @{$opcodes{$name}{TYPES}});
 	next;

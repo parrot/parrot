@@ -62,6 +62,7 @@ check_manifest();
 my(%c)=(
 	iv =>			($Config{ivtype}||'long'),
 	nv =>			($Config{nvtype}||'double'),
+        opcode_t =>             ($Config{ivtype}||'long'),
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
 	ccflags =>		$Config{ccflags}." -I./include",
@@ -97,6 +98,7 @@ prompt("What flags would you like passed to your C compiler?", 'ccflags');
 prompt("Which libraries would you like your C compiler to include?", 'libs');
 prompt("How big would you like integers to be?", 'iv');
 prompt("And your floats?", 'nv');
+prompt("What is your native opcode type?", 'opcode_t');
 
 unless( $c{debugging} ) {
 	$c{ld_debug} = ' ';

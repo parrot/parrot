@@ -54,7 +54,7 @@ runops_notrace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_
 
     code_start = code;
 
-    while (code >= code_start && code < (code_start + code_size) && code->i) {
+    while (code >= code_start && code < (code_start + code_size) && *code) {
         DO_OP(code, temp, func, interpreter);
     }
 
@@ -71,12 +71,12 @@ trace_op(opcode_t * code_start, long code_size, opcode_t *code) {
     int i;
 
     if (code >= code_start && code < (code_start + code_size)) {
-        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(code - code_start), code->i, op_names[code->i]);
-        if (op_args[code->i]) {
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(code - code_start), *code, op_names[*code]);
+        if (op_args[*code]) {
             fprintf(stderr, "; ARGS=(");
-            for(i = 0; i < op_args[code->i]; i++) {
+            for(i = 0; i < op_args[*code]; i++) {
                 if (i) { fprintf(stderr, ", "); }
-                fprintf(stderr, "%ld", (code + i + 1)->i);
+                fprintf(stderr, "%ld", *(code + i + 1));
             }
             fprintf(stderr, ")");
         }
@@ -103,7 +103,7 @@ runops_trace_core (struct Parrot_Interp *interpreter, opcode_t *code, IV code_si
 
     trace_op(code_start, code_size, code);
 
-    while (code >= code_start && code < (code_start + code_size) && code->i) {
+    while (code >= code_start && code < (code_start + code_size) && *code) {
         DO_OP(code, temp, func, interpreter);
 
         trace_op(code_start, code_size, code);
