@@ -621,3 +621,25 @@ RT_STRING:
 	push P9, S0
 	ret
 	
+	# Take P6 and make it an INT
+CAST_TO_INT:
+	set S0, P6["type"]
+	eq S0, "INT", CTI_RET
+	eq S0, "FLO", CTI_FLO
+	eq S0, "STRING", CTI_STR
+	print "ERR: Attempt to cast "
+	print S0
+	print " to INTEGER"
+	branch GEN_ERROR
+CTI_FLO:set N0, P6["value"]
+	set I0, N0
+	branch CTI_CONV
+CTI_STR:set S0, P6["value"]
+	set I0, S0
+	branch CTI_CONV
+CTI_CONV:
+	set P6["type"], "INT"
+	set P6["value"], I0
+CTI_RET:ret
+
+	

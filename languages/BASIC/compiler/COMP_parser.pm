@@ -120,8 +120,8 @@ PARSE_NOFEED:
 	# Eat tokens until we get to the next statement of some kind.
 	# These are likely to *never* be implemented.
 	if ($syms[CURR] =~ /^(  screen | pset | preset | line | circle | draw |
-			view | window | pmap | color | palette | paint |
-			get | put | pcopy | beep | sound | locate | view |
+			view | window | pmap | palette | paint |
+			get | put | pcopy | beep | sound | view |
 			width | resume | pos | poke | peek | rset |
 			defint | const | declare | lprint | static	# Maybe these...
 		)$/x) {
@@ -146,7 +146,7 @@ PARSE_NOFEED:
 		while | wend | dim | type | exit | function | for | next |
 		do | loop | goto | gosub | return  | sub | call | select | case |
 		read | restore | input | open | close | on | randomize | stop | swap |
-		shared | cls
+		shared | cls | locate | color
 		)$/x) {
 		no strict 'refs';
 		&{"parse_" . $1}();

@@ -252,6 +252,96 @@ COMPRND
 		feedme();
 	}
 }
+sub parse_locate {	# locate x,y   | locate x   | locate ,y
+	my($x,$y);
+	my(@e2);
+	@e=();
+	if ($type[NEXT] =~ /PUN/) {  # Y only
+		feedme();
+		@e2=EXPRESSION();   # Y (only)
+	} else {
+	    	@e=EXPRESSION();    # X
+		if ($type[NEXT] =~ /PUN/) {
+			feedme();
+			@e2=EXPRESSION();
+		}
+	}
+	if ( (@e and not @e2) or 
+	     (@e2 and not @e)) {	# X but no Y or Y but no X
+	print CODE "\tbsr SCREEN_FINDPOS\t# Update positions\n"
+	}
+	if (@e and @e2) {  	# X but no Y
+	print CODE<<XANDY;
+@e	bsr DEREF
+	bsr CAST_TO_INT
+	set P7, P6
+@e2	bsr DEREF		# Got both
+	bsr CAST_TO_INT
+	bsr SCREEN_LOCATE		
+XANDY
+	} elsif (@e2 and not @e) {
+	print CODE<<YNOTX;
+	bsr SCREEN_GETXCUR	# Y and no X
+	set P7, P6
+@e2	bsr DEREF
+	bsr CAST_TO_INT
+	bsr SCREEN_LOCATE
+YNOTX
+	} elsif (@e and not @e2) {
+	print CODE<<XNOTY;
+	bsr SCREEN_GETYCUR	# X and no Y
+	set P8, P6
+@e	bsr DEREF
+	bsr CAST_TO_INT
+	set P7, P6
+	set P6, P8
+	bsr SCREEN_LOCATE
+XNOTY
+	}
+}
+sub parse_color {
+	my($f,$b);
+	my(@e2);
+	@e=();
+	if ($type[NEXT] =~ /PUN/) {  # Back only
+		feedme();
+		@e2=EXPRESSION();   # Back (only)
+	} else {
+	    	@e=EXPRESSION();    # Fore
+		if ($type[NEXT] =~ /PUN/) {
+			feedme();
+			@e2=EXPRESSION();
+		}
+	}
+	if (@e and @e2) {  	# F and B
+print CODE<<FANDB;
+@e	bsr DEREF
+	bsr CAST_TO_INT
+	set P7, P6
+@e2	bsr DEREF		# Got both
+	bsr CAST_TO_INT
+	bsr SCREEN_COLOR
+FANDB
+	} elsif (@e2 and not @e) {
+	print CODE<<BNOTF;
+	bsr SCREEN_GETFORE	# B and no F
+	set P7, P6
+@e2	bsr DEREF
+	bsr CAST_TO_INT
+	bsr SCREEN_COLOR
+BNOTF
+	} elsif (@e and not @e2) {
+	print CODE<<FNOTB;
+	bsr SCREEN_GETBACK	# F and no B
+	set P8, P6
+@e	bsr DEREF
+	bsr CAST_TO_INT
+	set P7, P6
+	set P6, P8
+	bsr SCREEN_COLOR
+FNOTB
+	}
+}
 sub parse_cls {
 	if (! $type[NEXT] =~ /STMT|COMM|COMP/) {  # No arg version
 		@e=EXPRESSION();

@@ -34,10 +34,14 @@ WIN32_CONSOLE_INFO:
 	set P0["ybuf"], I1
 	set I0, 4		# dwCursorPosition.X
 	bsr UMS_GET_SHORT
+	inc I1
 	set P0["curx"], I1
 	set I0, 6		# dwCursorPosition.Y
 	bsr UMS_GET_SHORT
+	inc I1
 	set P0["cury"], I1
+	set I1, P5[8]
+	set P0["attr"], I1	# wAttributes
 	ret
 
 	# P5 ManagedStruct
@@ -83,5 +87,83 @@ WIN32_CONSOLE_CLEAR:
 	set I7, 32			# Char
 	set P6, P24["handle"]	# Handle
 	invoke
-	ret	
-	
+	# Now, re-fill screen with whatever attribute is currently
+	# in effect.
+	dlfunc P0, P2, "FillConsoleOutputAttribute", "ipiilp"
+	set I0, 1
+	new P5, .ManagedStruct
+	set P5, .SIZEOF_DWORD
+	set I5, 0			# Coords
+	set I1, P1["xbuf"]
+	set I2, P1["ybuf"]
+	mul I6, I1, I2			# Length
+	set I7, P1["attr"]		# Attrib
+	set P6, P24["handle"]	# Handle
+	invoke
+	ret
+
+WIN32_SCREEN_FINDPOS:  # Find the X,Y position on the screen
+	bsr WIN32_CONSOLE_INFO
+	ret
+WIN32_SCREEN_GETXCUR:
+	set P1, P24["console"]
+	set I0, P1["curx"]
+	ret
+WIN32_SCREEN_GETYCUR:
+	set P1, P24["console"]
+	set I0, P1["cury"]
+	ret
+WIN32_SCREEN_LOCATE:
+	dec I0		# 1,1 is the origin in QuickBASIC
+	dec I1
+	set I5, I0
+	shl I5, I5, 16
+	add I5, I5, I1
+	set P1, P24["console"]
+	set P2, P24["kernel32"]
+	dlfunc P0, P2, "SetConsoleCursorPosition", "ipi"
+	set I0, 1
+	set P5, P24["handle"]
+	invoke
+	ret
+
+#SCREEN Mode 0 Syntax:  COLOR [foreground][,[background][,border]]
+#   ¦ foreground is the text color (range = 0-31, with 16-31 blinking)
+#   ¦ background is the screen color (range = 0-7)
+#   ¦ border is the color surrounding the screen (range = 0-15)
+#     0 = black       4 = red           8 = grey             12 = light red
+#     1 = blue        5 = magenta       9 = light blue       13 = light magenta
+#     2 = green       6 = brown        10 = light green      14 = yellow
+#     3 = cyan        7 = white        11 = light cyan       15 = bright white
+.constant  FOREGROUND_BLUE        1
+.constant  FOREGROUND_GREEN       2
+.constant  FOREGROUND_RED	  4
+.constant  FOREGROUND_INTENSITY   8
+.constant  BACKGROUND_BLUE	 16
+.constant  BACKGROUND_GREEN	 32
+.constant  BACKGROUND_RED	 64
+.constant  BACKGROUND_INTENSITY 128
+WIN32_SCREEN_GETFORE:
+	set P1, P24["console"]
+	set I0, P1["attr"]
+	band I0, I0, 15
+	ret
+WIN32_SCREEN_GETBACK:
+	set P1, P24["console"]
+	set I0, P1["attr"]
+	shr I0, I0, 4
+	ret
+	# Call with the foreground in I0
+	#		background in I1
+	# "border" is not obeyed here.
+WIN32_SCREEN_COLOR:
+	shl I5, I1, 4
+	add I5, I5, I0
+	set P1, P24["console"]
+	set P2, P24["kernel32"]
+	dlfunc P0, P2, "SetConsoleTextAttribute", "ipi"
+	set P5, P24["handle"]
+	set I0, 1
+	invoke
+	bsr WIN32_CONSOLE_INFO  # refresh this.
+	ret
