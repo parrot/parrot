@@ -13,6 +13,7 @@
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
+#define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 pmclass PerlString extends perlscalar {
 
     void init () {
@@ -362,6 +363,10 @@ pmclass PerlString extends perlscalar {
 	PMC *ret = key;
 	STRING *s = SELF->cache.string_val;
 	INTVAL n = string_length(s);
+	union {
+	    const void * __c_ptr;
+	    void * __ptr;
+	} __ptr_u;
 
 	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
@@ -378,12 +383,12 @@ pmclass PerlString extends perlscalar {
 		    if ((char *)PMC_data(key) >= (char *)s->strstart &&
 			(char *)PMC_data(key) <= (char *)s->strstart +
 			    s->bufused)
-			(const char *)PMC_data(key) =
-			    s->encoding->skip_forward( PMC_data(key), 1);
+			(const char *)PMC_data(key) = const_cast(
+			    s->encoding->skip_forward( PMC_data(key), 1));
 		    else
-			(const char *)PMC_data(key) =
+			(const char *)PMC_data(key) = const_cast(
 			    s->encoding->skip_forward(s->strstart,
-				ret->cache.int_val);
+				ret->cache.int_val));
 		}
 		else
 		    ret->cache.int_val = -1;
@@ -395,12 +400,12 @@ pmclass PerlString extends perlscalar {
 			if ((char *)PMC_data(key) >= (char *)s->strstart &&
 				(char *)PMC_data(key) <= (char *)s->strstart +
 				s->bufused)
-			    (const char *)PMC_data(key) =
-				s->encoding->skip_backward( PMC_data(key), 1);
+			    (const char *)PMC_data(key) = const_cast(
+				s->encoding->skip_backward( PMC_data(key), 1));
 			else
-			    (const char *)PMC_data(key) =
+			    (const char *)PMC_data(key) = const_cast(
 				s->encoding->skip_forward(s->strstart,
-					ret->cache.int_val);
+					ret->cache.int_val));
 		    }
 		}
 		break;
@@ -417,13 +422,17 @@ pmclass PerlString extends perlscalar {
     STRING* get_string_keyed(PMC* key) {
 	STRING *res;
 	STRING *s = SELF->cache.string_val;
+	union {
+	    const void * __c_ptr;
+	    void * __ptr;
+	} __ptr_u;
 	if ((char*)PMC_data(key) >= (char *)s->strstart &&
 		(char *)PMC_data(key) <= (char *)s->strstart + s->bufused)
 	    ;
 	else
-	    (const char *)PMC_data(key) = s->encoding->skip_forward(s->strstart,
-				key->cache.int_val);
-        res = string_copy(interpreter, s);
+	    (char *)PMC_data(key) = const_cast(s->encoding->skip_forward(
+		 s->strstart, key->cache.int_val));
+	res = string_copy(interpreter, s);
 	res->strstart = PMC_data(key);
 	res->strlen = 1;
 	res->bufused = (const char *)res->encoding->skip_forward(
