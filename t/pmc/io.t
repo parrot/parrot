@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -61,4 +61,182 @@ CODE
 ok
 OUTPUT
 
+unlink "no_such_file" if (-e "no_such_file");
+
+output_is(<<'CODE', <<'OUTPUT', "get_bool");
+	open P0, "no_such_file", "<"
+	unless P0, ok1
+	print "Huh: 'no_such_file' exists? - not "
+ok1:
+	print "ok 1\n"
+	open P0, "temp.file", "<"
+	if P0, ok2
+	print "not "
+ok2:	print "ok 2\n"
+	read S0, P0, 1024
+	read S0, P0, 1024
+	unless P0, ok3
+	print "not "
+ok3:	print "ok 3\n"
+	defined I0, P0
+	if I0, ok4
+	print "not "
+ok4:	print "ok 4\n"
+	close P0
+	defined I0, P0		# closed file is still defined
+	if I0, ok5
+	print "not "
+ok5:	print "ok 5\n"
+	unless P0, ok6		# but false
+	print "not "
+ok6:	print "ok 6\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "clone");
+	open P0, "temp.file", "<"
+	clone P1, P0
+	read S0, P1, 1024
+	print S0
+	end
+CODE
+a line
+OUTPUT
+
+# It would be very embarrassing if these didnt work...
+open FOO, ">temp.file";
+print FOO "2\n1\n";
+close FOO;
+output_is(<<'CODE', <<'OUTPUT', "open and readline");
+	open P0, "temp.file"
+	set S0, ""
+	set S1, ""
+	readline S0, P0
+	readline S1, P0
+	print S1
+	print S0
+	end
+CODE
+1
+2
+OUTPUT
+
+open FOO, ">temp.file";  # Clobber previous contents
+close FOO;
+
+output_is(<<'CODE', <<'OUTPUT', "open & print");
+       set I0, -12
+       set N0, 2.2
+       set S0, "Foo"
+       new P0, .PerlString
+       set P0, "Bar\n"
+
+       open P1, "temp.file"
+       print P1, I0
+       print P1, N0
+       print P1, S0
+       print P1, P0
+       close P1
+
+       open P2, "temp.file"
+       readline S1, P2
+       close P2
+
+       print S1
+       end
+CODE
+-122.200000FooBar
+OUTPUT
+
+open FOO, ">temp.file";  # Clobber previous contents
+close FOO;
+
+# write to file opened for reading
+output_is(<<'CODE', <<'OUTPUT', "3-arg open");
+       open P1, "temp.file", "<"
+       print P1, "Foobar\n"
+       close P1
+
+       open P3, "temp.file", "<"
+       readline S1, P3
+       close P3
+
+       print S1
+       print "writing to file opened for reading\n"
+       end
+CODE
+writing to file opened for reading
+OUTPUT
+
+unlink("temp.file");
+
+output_is(<<'CODE', <<'OUTPUT', 'open and close');
+       open P1, "temp.file"
+       print P1, "Hello, World!\n"
+       close P1
+       print "done\n"
+       end
+CODE
+done
+OUTPUT
+
+$/=undef; # slurp mode
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'file contents');
+Hello, World!
+OUTPUT
+
+close FOO;
+
+output_is(<<'CODE', '', 'append');
+       open P1, "temp.file", ">>"
+       print P1, "Parrot flies\n"
+       close P1
+       end
+CODE
+
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'append file contents');
+Hello, World!
+Parrot flies
+OUTPUT
+
+close FOO;
+
+output_is(<<'CODE', '', 'write to file');
+       open P1, "temp.file", ">"
+       print P1, "Parrot overwrites\n"
+       close P1
+       end
+CODE
+
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'file contents');
+Parrot overwrites
+OUTPUT
+
+unlink("temp.file");
+
+output_is(<<'CODE', '012', 'standard file descriptors');
+       getstdin P0
+       getfd I0, P0
+       print I0
+       getstdout P1
+       getfd I1, P1
+       print I1
+       getstderr P2
+       getfd I2, P2
+       print I2
+       end
+CODE
 unlink("temp.file");

@@ -603,14 +603,15 @@ INTVAL
 PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->Write) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->Write) (interpreter, l, io, buffer, len);
+    if (io->flags & PIO_F_WRITE)
+        while (l) {
+            if (l->api->Write) {
+                return (*l->api->Write) (interpreter, l, io, buffer, len);
+            }
+            l = PIO_DOWNLAYER(l);
         }
-        l = PIO_DOWNLAYER(l);
-    }
 
     return 0;
 }
@@ -680,14 +681,15 @@ INTVAL
 PIO_puts(theINTERP, PMC *pmc, const char *s)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
+    ParrotIO *io = PMC_data(pmc);
 
-    while (l) {
-        if (l->api->PutS) {
-            ParrotIO *io = PMC_data(pmc);
-            return (*l->api->PutS) (interpreter, l, io, s);
+    if (io->flags & PIO_F_WRITE)
+        while (l) {
+            if (l->api->PutS) {
+                return (*l->api->PutS) (interpreter, l, io, s);
+            }
+            l = PIO_DOWNLAYER(l);
         }
-        l = PIO_DOWNLAYER(l);
-    }
 
     return -1;
 }

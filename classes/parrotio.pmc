@@ -28,6 +28,19 @@ pmclass ParrotIO {
     void destroy () {
 	ParrotIO *io = PMC_data(SELF);
         if (io && !(io->flags & PIO_F_SHARED))
-            PIO_close(interpreter, SELF); 
+            PIO_close(interpreter, SELF);
+    }
+
+    void clone (PMC *dest) {
+	VTABLE_init(INTERP, dest);
+	/* For now both PMCs refer to the same ParrotIO object.
+	 * If we have different IO layers, we might copy these structures
+	 */
+	PMC_data(dest) = PMC_data(SELF);
+	dest->cache.struct_val = SELF->cache.struct_val;
+    }
+
+    INTVAL get_bool() {
+	return !PIO_eof(INTERP, SELF);
     }
 }
