@@ -301,7 +301,12 @@ make_interpreter() {
     Parrot_clear_p(interpreter);
     
     /* Need a default stack */
-    interpreter->stack_base = mem_allocate_new_stack();
+    interpreter->stack_base = mem_allocate_aligned(sizeof(struct StackChunk));
+    interpreter->stack_top = &interpreter->stack_base->entry[0];
+    interpreter->stack_base->used = 1;
+    interpreter->stack_base->free = STACK_CHUNK_DEPTH - 1;
+    interpreter->stack_base->next = NULL;
+    interpreter->stack_base->prev = NULL;
     
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();
