@@ -687,7 +687,7 @@ op split(out PMC, in STR, in STR) :base_core {
     if (!slen)
 	goto NEXT();
     if (string_length(r))
-	internal_exception(1, "Unimplemented join by regex");
+	internal_exception(1, "Unimplemented split by regex");
     for (i = 0; i < slen; ++i) {
 	STRING *p = string_substr(interpreter, s, i, 1, NULL, 0);
 	/* TODO first set empty string, then replace */

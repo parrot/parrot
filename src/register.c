@@ -117,7 +117,7 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
     UINTVAL j;
     for ( ; ; chunk = chunk->prev) {
-        struct PRegFrame *pf = STACK_DATAP(chunk);
+        struct PRegFrame *pf = (struct PRegFrame *)STACK_DATAP(chunk);
 
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
@@ -147,7 +147,7 @@ mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
     UINTVAL j;
     for ( ; ; chunk = chunk->prev) {
-        struct SRegFrame *sf = STACK_DATAP(chunk);
+        struct SRegFrame *sf = (struct SRegFrame *)STACK_DATAP(chunk);
 
         pobject_lives(interpreter, (PObj*)chunk);
         if (chunk == chunk->prev || chunk->free_p)
