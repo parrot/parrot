@@ -390,7 +390,25 @@ trace_active_buffers(struct Parrot_Interp *interpreter) {
 */
 static void
 free_unused_PMCs(struct Parrot_Interp *interpreter) {
-  return;
+
+  struct PMC_Arena *cur_arena;
+  UINTVAL i;
+
+  /* Run through all the buffer header pools and mark */
+  for (cur_arena = interpreter->arena_base->last_PMC_Arena;
+       NULL != cur_arena;
+       cur_arena = cur_arena->prev) {
+    PMC *pmc_array = cur_arena->start_PMC;
+    for (i = 0; i < cur_arena->used; i++) {
+      /* If it's not live or on the free list, put it on the free list */
+      if (!(pmc_array[i].flags & (PMC_live_FLAG |
+                                  PMC_on_free_list_FLAG))) {
+	add_pmc_to_free(interpreter,
+                        interpreter->arena_base->pmc_pool,
+                        &pmc_array[i]);
+      }
+    }
+  }
 }
 
 /* Put any free buffers that aren't on the free list on the free list
