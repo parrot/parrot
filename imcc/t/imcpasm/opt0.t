@@ -39,6 +39,8 @@ _test:
   sub N0, N16, N1
   set N16, I0
   div N0, N16, N1
+  null I0
+  null I3
   invoke P1
 OUT
 
@@ -74,5 +76,7 @@ output_is(<<'CODE', <<'OUT', "added return - nil");
 CODE
 _test:
   noop
+  null I0
+  null I3
   invoke P1
 OUT

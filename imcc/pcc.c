@@ -440,17 +440,21 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
         }
         else {
 
+            ins = unit->last_ins;
+            regs[0] = get_pasm_reg("I0");  /* proto ret */
+            ins = insINS(interpreter, unit, ins, "null", regs, 1);
+            regs[0] = get_pasm_reg("I3");  /* no P regs */
+            ins = insINS(interpreter, unit, ins, "null", regs, 1);
+            unit->last_ins = ins;
             if (sub->pcc_sub->cc_sym)
                 regs[0] = sub->pcc_sub->cc_sym;
             else
                 regs[0] = mk_pasm_reg(str_dup("P1"));
             tmp = INS(interpreter, unit, "invoke", NULL, regs, 1, 0, 0);
-            /*
-             * TODO insert minimal PCC information - I0=I3=0
-             */
         }
         debug(interpreter, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
+        unit->last_ins = tmp;
     }
 }
 
@@ -461,36 +465,19 @@ NONAMEDPARAMS: /* If no named params, don't generate any param code */
 void
 expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
 {
-    SymReg *sub, *reg, *regs[IMCC_MAX_REGS];
+    SymReg *sub, *reg, *regs[IMCC_MAX_REGS], *call;
     int  n, arg_count;
-    Instruction *tmp;
 
 #if IMC_TRACE
     PIO_eprintf(NULL, "expand_pcc_sub_ret\n");
 #endif
 
     arg_count = ins->type & ITPCCYIELD ? 0 : 1;
-    tmp = NULL;
-    /*
-     * if we have preserved the return continuation
-     * restore it
-     */
-    sub = unit->instructions->r[1];
-    if (sub->pcc_sub->cc_sym) {
-        regs[0] = get_pasm_reg("P1");
-        regs[1] = sub->pcc_sub->cc_sym;
-        tmp = insINS(interpreter, unit, ins, "set", regs, 2);
-    }
     /* FIXME
      * fake prototyped
      * TODO implement return conventions
      */
     sub = ins->r[0];
-    /*
-     * past the eventually inserted return cc restore
-     */
-    if (tmp)
-        ins = tmp;
     sub->pcc_sub->pragma = P_PROTOTYPED;
     n = sub->pcc_sub->nret;
     ins = pcc_put_args(interpreter, unit, ins, sub->pcc_sub, n,
@@ -510,14 +497,18 @@ expand_pcc_sub_ret(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
     /*
      * insert return invoke
      */
-    reg = mk_pasm_reg(str_dup("P1"));
-    regs[0] = reg;
+    call = unit->instructions->r[1];
+    if (call->pcc_sub->cc_sym)
+        regs[0] = call->pcc_sub->cc_sym;
+    else
+        regs[0] = get_pasm_reg("P1");
     ins = insINS(interpreter, unit, ins, "invoke", regs, arg_count);
+    reg = regs[0];
     /*
      * move the pcc_sub structure to the invoke
      */
     if (arg_count == 0)
-        ins->r[0] = reg;
+        ins->r[0] = reg = get_pasm_reg("P0");;
     reg->pcc_sub = sub->pcc_sub;
     sub->pcc_sub = NULL;
 
