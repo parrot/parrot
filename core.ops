@@ -493,6 +493,11 @@ inline op set(out INT, in NUM) {
   goto NEXT();
 }
 
+inline op set(out INT, in STR) {
+  $1 = string_to_int($2);
+  goto NEXT();
+}
+
 inline op set(out NUM, in NUM) {
   $1 = $2;
   goto NEXT();
