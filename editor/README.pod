@@ -1,0 +1,46 @@
+=head1 NAME
+
+editor/README.pod - Productivity Comes in Pretty Colors
+
+=head1 Syntax Highlighting
+
+Included in this directory are some add-ins for making working on parrot (or in
+parrot) easier, for various popular editors. Mostly that means
+syntax-highlighting and automatic indenting. Read on to see what's available for
+your favorite editor
+
+=head2 Vim
+
+There are four files here: C<imc.vim> (generated from C<imc.vim.in>),
+C<pasm.vim>, C<pmc.vim>, and C<filetype_parrot.vim>. The first three are syntax
+files, and the last is a filetype script that tells vim to associate the
+extensions .imc, .imcc, .pasm, and .pmc with the right syntax. Copy C<imc.vim>,
+C<pasm.vim>, and C<pmc.vim> into C<~/.vim/syntax> or C<$VIMRUNTIME/syntax>,
+creating the directory if it doesn't exist. Copy C<filetype_parrot.vim> into
+C<~/.vim/ftdetect> or C<$VIMRUNTIME/ftdetect>, creating the directory if it
+doesn't exist. C<pmc.vim> requires C<pod.vim>, which is standard in the Vim
+distribution.
+
+=head2 Kate
+
+There is a syntax file for the KDE editor Kate, but it is not built by default.
+ make imc.kate
+in C<editor/> to build it.
+
+TODO: How do we install Kate syntax files?
+
+=head2 Emacs
+
+Included here is an Emacs mode for editing pasm files, in C<pasm.el>.
+
+TODO: How do we install Emacs modes?
+
+=head2 TAGS file
+
+There is a script here to automatically generate a TAGS file, which works with
+Vim and other editors that recognize ctags-format files. The tool "exuberant
+ctags" is required. Run
+ make tags
+in the parrot root directory to build the tags file.
+
+=cut
