@@ -2074,9 +2074,9 @@ These operations operate on STRINGs.
 
 =item B<chopn>(inout STR, in INT)
 
-Remove $2 characters from the end of the string in $1.
+=item B<chopn>(out STR, in STR, in INT)
 
-TODO: Create a three-argument version of this? Don't force in-place modification.'
+Remove $2 characters from the end of the string in $1.
 
 =cut
 
@@ -2085,6 +2085,11 @@ inline op chopn(inout STR, in INT) {
   goto NEXT();
 }
 
+inline op chopn(out STR, in STR, in INT) {
+  $1 = string_copy(interpreter, $2);
+  (void)string_chopn($1,$3);
+  goto NEXT();
+}
 
 ########################################
 
