@@ -207,6 +207,24 @@ new_buffer_header(struct Parrot_Interp *interpreter)
             interpreter->arena_base->buffer_header_pool);
 }
 
+void
+buffer_mark_COW(Buffer *b)
+{
+    PObj_COW_SET(b);
+}
+
+Buffer *
+buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
+{
+    if (PObj_COW_TEST(src)) {
+        Buffer *b = new_buffer_header(interpreter);
+        Parrot_allocate(interpreter, b, src->buflen);
+        mem_sys_memcopy(b->bufstart, src->bufstart, src->buflen);
+        return b;
+    }
+    return src;
+}
+
 void *
 new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 {

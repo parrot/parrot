@@ -33,8 +33,8 @@ pmclass Continuation extends Closure {
         struct Parrot_Continuation * cc
             = (struct Parrot_Continuation*)PMC_data(SELF);
 	mark_stack(INTERP, cc->ctx.user_stack);
-	mark_stack(INTERP, cc->ctx.pad_stack);
 	mark_stack(INTERP, cc->ctx.control_stack);
+	SUPER();	/* mark pad_stack, warns in closure */
     }
 
     STRING* name () {

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -36,4 +36,15 @@ ok\s2\n
 ok\s3\n$/x
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
+	new P0, .PerlUndef
+	set I0, P0
+	printerr "nada:"
+	warningson 1
+	new P1, .PerlUndef
+	set I0, P1
+	end
+CODE
+/^nada:Use of uninitialized value in integer context at.*/
+OUTPUT
 1;

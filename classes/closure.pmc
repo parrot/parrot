@@ -30,6 +30,7 @@ pmclass Closure extends Sub {
    void mark () {
         struct Parrot_Closure * sub = (struct Parrot_Closure *)PMC_data(SELF);
         mark_stack(INTERP, sub->ctx.pad_stack);
+        pobject_lives(INTERP, sub->ctx.warns);
    }
 
    void destroy () {

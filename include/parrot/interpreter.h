@@ -81,6 +81,9 @@ typedef struct Parrot_Context {
     struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
     struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     IntStack intstack;                  /* Base of the regex stack */
+    Buffer * warns;             /* Keeps track of what warnings
+                                 * have been activated */
+
 
 } parrot_context_t;
 
@@ -115,9 +118,6 @@ typedef struct Parrot_Interp {
     Interp_flags flags;         /* Various interpreter flags that
                                  * signal that runops should do
                                  * something */
-
-    Warnings warns;             /* Keeps track of what warnings
-                                 * have been activated */
 
     ProfData *profile;          /* The array where we keep the
                                  * profile counters */

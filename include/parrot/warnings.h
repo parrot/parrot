@@ -12,12 +12,16 @@ typedef enum {
     PARROT_WARNINGS_PLATFORM_FLAG = 0x04
 } Warnings_classes;
 
-#define PARROT_WARNINGS_on(interp, flag) \
-        (/*@i1@*/ (interp)->warns->classes |= (flag))
-#define PARROT_WARNINGS_off(interp, flag) \
-        (/*@i1*/(interp)->warns->classes &= ~(flag))
+#define PARROT_WARNINGS_on(interp, flag) do { \
+    (interp)->ctx.warns = buffer_unmake_COW(interp, (interp)->ctx.warns); \
+    ( (*(UINTVAL *) (interp)->ctx.warns->bufstart) |= (flag)); \
+    } while (0)
+#define PARROT_WARNINGS_off(interp, flag) do { \
+    (interp)->ctx.warns = buffer_unmake_COW(interp, (interp)->ctx.warns); \
+    ( (*(UINTVAL *) (interp)->ctx.warns->bufstart) &= ~(flag)); \
+    } while (0)
 #define PARROT_WARNINGS_test(interp, flag) \
-        (/*@i1*/(interp)->warns->classes & (flag))
+        ( (*(UINTVAL *) (interp)->ctx.warns->bufstart) & (flag))
 
 
 #if defined(PARROT_IN_CORE)

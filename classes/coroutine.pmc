@@ -39,7 +39,8 @@ pmclass Coroutine extends Closure {
 	    (struct Parrot_Coroutine *)PMC_data(SELF);
         mark_stack(INTERP, co->ctx.user_stack);
         mark_stack(INTERP, co->ctx.control_stack);
-        mark_stack(INTERP, co->ctx.pad_stack);
+	SUPER();	/* mark pad_stack, warns in closure */
+
     }
 
 

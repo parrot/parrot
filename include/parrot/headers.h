@@ -57,6 +57,10 @@ size_t get_min_pmc_address(struct Parrot_Interp *interpreter);
 int is_buffer_ptr(struct Parrot_Interp *, void *);
 int is_pmc_ptr(struct Parrot_Interp *, void *);
 
+/* COW support */
+void buffer_mark_COW(Buffer *b);
+Buffer * buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src);
+
 /* miscellaneous functions */
 void add_extra_buffer_header(struct Parrot_Interp *, void *);
 void Parrot_initialize_header_pools(struct Parrot_Interp *);

@@ -512,8 +512,11 @@ make_interpreter(Interp_flags flags)
         pmc_new(interpreter, enum_class_PerlHash);
     interpreter->perl_stash->parent_stash = NULL;
 
+    /* context data */
     /* Initialize interpreter's flags */
-    interpreter->warns = mem_sys_allocate_zeroed(sizeof(struct warnings_t));
+    interpreter->ctx.warns = new_buffer_header(interpreter);
+    Parrot_allocate(interpreter, interpreter->ctx.warns,
+        sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     /* Set up the initial register chunks */
@@ -642,8 +645,6 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     if (interpreter->profile)
         mem_sys_free(interpreter->profile);
-
-    mem_sys_free(interpreter->warns);
 
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);

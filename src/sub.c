@@ -21,12 +21,14 @@ save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     stack_mark_cow(ctx->pad_stack);
     stack_mark_cow(ctx->user_stack);
     stack_mark_cow(ctx->control_stack);
+    buffer_mark_COW(interp->ctx.warns);
 }
 
 void
 swap_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     struct Stack_Chunk * tmp_stack = NULL;
+    Buffer * warns;
     /*
      * Swap control, user and pad stacks. Data in other parts of the
      * context are not preserved between calls to the coroutine.
@@ -43,6 +45,10 @@ swap_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
     tmp_stack = interp->ctx.pad_stack;
     interp->ctx.pad_stack = ctx->pad_stack;
     ctx->pad_stack = tmp_stack;
+
+    warns = interp->ctx.warns;
+    interp->ctx.warns = ctx->warns;
+    ctx->warns = warns;
 
 }
 
@@ -79,6 +85,8 @@ new_coroutine(struct Parrot_Interp *interp)
     newco->ctx.control_stack = interp->ctx.control_stack;
     stack_mark_cow(newco->ctx.control_stack);
     newco->ctx.pad_stack = new_stack(interp, "Pad");
+    newco->ctx.warns = interp->ctx.warns;
+    buffer_mark_COW(interp->ctx.warns);
 
     pad = scratchpad_get_current(interp);
 
