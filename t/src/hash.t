@@ -3,63 +3,79 @@
 
 use Parrot::Test tests => 10;
 
-c_output_is(<<'CODE', <<'OUTPUT', "new_hash");
+my $main = <<'CODE';
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+int exit_value = 0;
+
+int main(int argc, char* argv[])
+{
+    Parrot_Interp interpreter = Parrot_new(NULL);
+    if (!interpreter) {
+        return 1;
+    }
+    Parrot_init(interpreter);
+
+    Parrot_run_native(interpreter, the_test);
+
+    Parrot_exit(exit_value);
+    return exit_value;
+}
+
+CODE
+
+c_output_is($main . <<'CODE', <<'OUTPUT', "new_hash");
+
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
-    printf("ok\n");
+    PIO_eprintf(interpreter, "ok\n");
 
-    return 0;
+    return NULL;
 }
 
 CODE
 ok
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_put");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_put");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -67,39 +83,35 @@ int main(int argc, char* argv[]) {
     value.val.int_val = 42;
     hash_put(interpreter, hash, key, &value);
 
-    printf("ok\n");
+    PIO_eprintf(interpreter, "ok\n");
 
-    return 0;
+    return NULL;
 }
 
 CODE
 ok
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_get");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -108,39 +120,35 @@ int main(int argc, char* argv[]) {
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", (int)value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", (int)value->val.int_val);
 
-    return 0;
+    return NULL;
 }
 
 CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_get with NULL key");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with NULL key");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     /*
@@ -157,39 +165,35 @@ int main(int argc, char* argv[]) {
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", (int)value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", (int)value->val.int_val);
 
-    return 0;
+    return NULL;
 }
 
 CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_get with empty string key");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with empty string key");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "", 0);
@@ -198,36 +202,22 @@ int main(int argc, char* argv[]) {
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", value->val.int_val);
 
-    return 0;
+    return NULL;
 }
 
 CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_get with big key");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with big key");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
 #define BIGLEN 999999
 
-int do_test(Interp *interpreter);
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-    interpreter->lo_var_ptr = &interpreter;
-
-    Parrot_init(interpreter);
-    return do_test(interpreter);
-}
-
-int do_test(Interp *interpreter)
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
     STRING *key;
@@ -235,11 +225,15 @@ int do_test(Interp *interpreter)
     HashEntry *value = &_value;
     char *big;
 
+    UNUSED(cur_op);
+    UNUSED(start);
+
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     big = calloc(BIGLEN, sizeof(char));
@@ -252,38 +246,34 @@ int do_test(Interp *interpreter)
     hash_put(interpreter, hash, key, value);
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", value->val.int_val);
+    PIO_eprintf(interpreter, "%i\n", value->val.int_val);
 
-    return 0;
+    return NULL;
 }
 
 CODE
 42
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_size");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_size");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -301,38 +291,34 @@ int main(int argc, char* argv[]) {
     value.val.string_val = key;
     hash_put(interpreter, hash, key, &value);
 
-    printf("%i\n", hash_size(interpreter, hash));
+    PIO_eprintf(interpreter, "%i\n", hash_size(interpreter, hash));
 
-    return 0;
+    return NULL;
 }
 
 CODE
 3
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_delete");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_delete");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     PMC *value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -350,13 +336,13 @@ int main(int argc, char* argv[]) {
     VTABLE_set_string_native(interpreter, value, key);
     hash_put(interpreter, hash, key, value);
 
-    printf("%i\n", hash_size(interpreter, hash));
+    PIO_eprintf(interpreter, "%i\n", hash_size(interpreter, hash));
 
     hash_delete(interpreter, hash, key);
 
-    printf("%i\n", hash_size(interpreter, hash));
+    PIO_eprintf(interpreter, "%i\n", hash_size(interpreter, hash));
 
-    return 0;
+    return NULL;
 }
 
 CODE
@@ -364,30 +350,26 @@ CODE
 2
 OUTPUT
 
-c_output_is(<<'CODE', <<'OUTPUT', "hash_clone");
+c_output_is($main . <<'CODE', <<'OUTPUT', "hash_clone");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     Hash *hash2;
     STRING *key;
     PMC *value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -397,15 +379,15 @@ int main(int argc, char* argv[]) {
 
     value = hash_get(interpreter, hash, key);
 
-    printf("%i\n", (int)VTABLE_get_integer(interpreter, value));
+    PIO_eprintf(interpreter, "%i\n", (int)VTABLE_get_integer(interpreter, value));
 
     hash_clone(interpreter, hash, &hash2);
 
     value = hash_get(interpreter, hash2, key);
 
-    printf("%i\n", (int)VTABLE_get_integer(interpreter, value));
+    PIO_eprintf(interpreter, "%i\n", (int)VTABLE_get_integer(interpreter, value));
 
-    return 0;
+    return NULL;
 }
 
 CODE
@@ -413,29 +395,25 @@ CODE
 42
 OUTPUT
 
-c_output_like(<<'CODE', <<'OUTPUT', "dump_hash");
+c_output_like($main . <<'CODE', <<'OUTPUT', "dump_hash");
 
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-int main(int argc, char* argv[]) {
-    Interp* interpreter;
+static opcode_t*
+the_test(struct Parrot_Interp *interpreter,
+	opcode_t *cur_op, opcode_t *start)
+{
     Hash *hash;
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new(NULL);
-
-    if ( interpreter == NULL ) return 1;
-
-    Parrot_init(interpreter);
+    UNUSED(cur_op);
+    UNUSED(start);
 
     new_hash(interpreter, &hash);
 
     if ( hash == NULL ) {
-	printf("hash creation failed\n");
-	return 1;
+	PIO_eprintf(interpreter, "hash creation failed\n");
+	exit_value = 1;
+	return NULL;
     }
 
     key = string_from_cstring(interpreter, "fortytwo", 0);
@@ -455,7 +433,7 @@ int main(int argc, char* argv[]) {
 
     dump_hash(interpreter, hash);
 
-    return 0;
+    return NULL;
 }
 
 CODE

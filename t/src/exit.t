@@ -10,6 +10,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parrot_exit");
             printf("pre-exit\n");
             Parrot_exit(0);
             printf("post-exit\n");
+            return 0;
         }
 CODE
 pre-exit
