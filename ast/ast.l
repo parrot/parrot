@@ -46,7 +46,6 @@ set_loc(YYLTYPE *l, char const *tok, size_t len)
 
 %}
 
-%option outfile="astlexer.c"
 %option nounput
 
 LETTER          [a-zA-Z_@]
