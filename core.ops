@@ -2,6 +2,8 @@
 ** core.ops
 */
 
+#include "parrot/method_util.h"
+
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -4191,10 +4193,8 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc (out PMC, in PMC, in STR) {
   const char * name = string_to_cstring(interpreter, ($3));
-  extern PMC * Parrot_new_csub(struct Parrot_Interp * ,
-                   void (*p)(Interp *, PMC *));
-  void (*p)(Interp *, PMC *) = (void (*)(Interp *, PMC *))D2FPTR(Parrot_dlsym(
-                                                ($2)->data, name));
+
+  Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(($2)->data, name));
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {

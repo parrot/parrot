@@ -22,6 +22,9 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
+extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
+
+
 /*=for api interpreter runops_generic
  * TODO: Not really part of the API, but here's the docs.
  * Generic runops, which takes a function pointer for the core.
@@ -53,12 +56,9 @@ runops_generic(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
  *
  * the "normal" op_lib has a copy in the interpreter structure
  */
-
-
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
-    extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
     interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
     if (interpreter->op_lib->op_count != interpreter->op_count)
