@@ -4,16 +4,15 @@
 
 =head1 NAME
 
-t/pmc/sub.t - Subroutine PMCs
+t/pmc/timer.t - Timer PMCs
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/sub.t
+	% perl -Ilib t/pmc/timer.t
 
 =head1 DESCRIPTION
 
-Tests the creation and invocation of C<Sub>, C<Closure> and
-C<Continuation> PMCs.
+Tests the Timer PMC.
 
 =cut
 
