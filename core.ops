@@ -4,6 +4,9 @@
 
 /* This (now even more) convoluted mess avoids costly runtime creation
  * of KEY structures, and can be used in an expression.
+ *
+ * Usage: MAKE_KEY(KEY k, (INTVAL|FLOATVAL|DPOINTER*|STRING*|PMC*) v,
+ *                 KEY_TYPE c, (int_val|num_val|struct_val|string_val|pmc_val)); 
  */
 
 #define MAKE_KEY(k,v,c,t) (k.atom.type = c, k.atom.val.t = v, k.next = NULL, k.flags = BUFFER_sysmem_FLAG, &k)
