@@ -172,6 +172,7 @@ typedef struct Parrot_Context {
      */
     PMC *current_cont;          /* the return continuation PMC */
     PMC *current_object;        /* current object if a method call */
+    opcode_t *current_pc;       /* program counter of Sub invocation */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */
@@ -228,8 +229,6 @@ struct parrot_interp_t {
 
     RunProfile *profile;        /* The structure and array where we keep the
                                  * profile counters */
-    opcode_t *cur_pc;           /* for profile and warnings */
-
     INTVAL resume_flag;
     size_t resume_offset;
 

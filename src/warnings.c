@@ -46,10 +46,10 @@ find_line(Interp *interpreter, struct PackFile_Debug * debug)
     op_info_t *op_info;
     opcode_t *pc;
 
-    if (!interpreter->cur_pc)
+    if (!interpreter->ctx.current_pc)
         return -2;
     pc = interpreter->code->cur_cs->base.data;
-    offs = interpreter->cur_pc - pc;
+    offs = interpreter->ctx.current_pc - pc;
     for (i = n = 0; n < interpreter->code->cur_cs->base.size; i++) {
         op_info = &interpreter->op_info_table[*pc];
         if (n >= offs)

@@ -142,7 +142,7 @@ runops_slow_core(Interp *interpreter, opcode_t *pc)
         trace_op(interpreter, code_start, code_end, pc);
     }
     while (pc) {/* && pc >= code_start && pc < code_end) {*/
-        interpreter->cur_pc = pc;
+        interpreter->ctx.current_pc = pc;
 
         DO_OP(pc, interpreter);
 
@@ -212,7 +212,7 @@ runops_profile_core(Interp *interpreter, opcode_t *pc)
     }
 
     while (pc) {/* && pc >= code_start && pc < code_end) */
-        interpreter->cur_pc = pc;
+        interpreter->ctx.current_pc = pc;
         profile->cur_op = cur_op = *pc + PARROT_PROF_EXTRA;
         profile->data[cur_op].numcalls++;
         profile->starttime = Parrot_floatval_time();
