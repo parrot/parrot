@@ -55,7 +55,7 @@ conventions, and can be called like any other parrot subroutine.
 
 The NCI uses the platform native dynamic by-name function loading
 mechanism (dlopen/dlsym on unix and LoadLibrary/GetProcAddress on
-Win32, for example) to get the function pointer, then dymanically
+Win32, for example) to get the function pointer, then dynamically
 generates the wrapper based on the signature of that function.
 
 As there is no good platform-independent way to determine function
