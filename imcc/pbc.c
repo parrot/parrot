@@ -405,7 +405,7 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
                         addr->name);
             glabel = addr->name;
             /* append inter_cs jump */
-            sprintf(buf, "#isc_%d", globals.inter_seg_n++);
+            sprintf(buf, "_#isc_%d", globals.inter_seg_n++);
             addr->name = str_dup(buf);
             INS_LABEL(unit, addr, 1);
             /* this is the new location */
@@ -829,6 +829,10 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
     static struct PackFile_Debug *debug_seg;
     static int ins_line;
 
+#if IMC_TRACE_HIGH
+    PIO_eprintf(NULL, "e_pbc_emit\n");
+#endif
+
     /* first instruction, do initialisation ... */
     if (ins == unit->instructions) {
         int code_size, ins_size;
@@ -872,6 +876,9 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
     if (ins->op && *ins->op) {
         /* fixup local jumps */
         SymReg *addr, *r;
+#if IMC_TRACE
+        PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->op);
+#endif
         if ((addr = get_branch_reg(ins)) != 0 && !(addr->type & VTREGISTER)) {
             SymReg *label = _get_sym(globals.cs->subs->labels, addr->name);
             /* maybe global */
@@ -932,7 +939,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
                     debug(interpreter, DEBUG_PBC," %d", pc[-1]);
                     break;
                 default:
-                    fatal(1, "e-pbc_emit", "unknwon argtype\n");
+                    fatal(1, "e-pbc_emit", "unknown argtype in parrot op\n");
                     break;
             }
         }
