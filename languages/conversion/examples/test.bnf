@@ -1,0 +1,26 @@
+terminal    := "Hello"
+terminal2   := "Goodbye"
+nonterminal := terminal
+alternation := terminal | nonterminal
+sequence    := terminal alternation terminal
+quantified  := sequence*
+group       := ( terminal | nonterminal | terminal2 )
+group_with_star
+	    := ( terminal )*
+group_with_question
+	    := ( terminal )?
+group_with_plus
+	    := ( terminal )+
+group_of_sequences
+	    := ( terminal nonterminal | sequence alternation terminal2 )
+sequence_of_groups
+	    := ( nonterminal terminal2 | sequence ) ( group | terminal )
+mixed_sequence
+	    := ( group | terminal | terminal2 ) 
+	       alternation ( group | nonterminal )
+nested_groups
+	    := ( ( terminal | terminal2 | < group | sequence > ) | group )
+
+
+includes_a_null
+	    := ( terminal | "Beg Pardon?" | @ )

@@ -1,0 +1,25 @@
+<prologprog> ::= <statmt> { <statmt> }	
+<statmt> ::= <fact> | <rule> 	
+	
+<fact> ::= <pred> "." 	
+<pred> ::= <atom> [ "(" <arglist> ")" ]
+	
+<rule> ::= [ <head> ] ":-" <body> "."	
+<head> ::= <pred> 	
+<body> ::= <goal> { "," <goal> }	
+<goal> ::= <pred> | "!"
+	
+<arglist> ::= <arg> { "," <arg> } 
+<arg> ::= <atom> | <var> | <list>	
+	
+<atom> ::= <lcchar> { <anychar> } 	
+<atom> ::= "'" { <anychar> } "'" 	
+	
+<var> ::= <ucchar> { <anychar> }	
+<var> ::= "_" { <anychar> } 	
+	
+<list> ::= <leftbracket> <rightbracket>	
+<list> ::= <leftbracket> <listelems> <rightbracket> 	
+<listelems> ::= <arglist>	
+<listelems> ::= <arglist> <barsymbol> <list>	
+<listelems> ::= <arglist> <barsymbol> <var>	
