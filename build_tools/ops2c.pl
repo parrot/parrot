@@ -131,17 +131,8 @@ my $preamble = <<END_C;
 
 END_C
 
-my $init_func;
-# TODO get rid of version in init names
-#      do version checking with a Version PMC
-# TODO dynamic extensions are called with an Interp* argument
-#
-if ($dynamic) {
-    $init_func = "Parrot_lib_load_${base}${suffix}_ops"
-}
-else {
-    $init_func = "Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}"
-}
+my $mmp_v = "${major_version}_${minor_version}_${patch_version}";
+my $init_func = "Parrot_DynOp_${base}${suffix}_$mmp_v";
 
 print HEADER $preamble;
 print HEADER <<END_C;
@@ -407,7 +398,7 @@ END_C
 
 }
 
-if ($suffix eq '') {
+if ($suffix eq '' && !$dynamic) {
     $op_info = 'op_info_table';
     $getop = 'get_op';
 #
@@ -592,7 +583,6 @@ static op_lib_t op_lib = {
 op_lib_t *
 $init_func(int init) {
     if (init) {
-
 END_C
 
 if ($suffix =~ /cgp/) {
@@ -611,5 +601,22 @@ print SOURCE <<END_C;
 }
 
 END_C
+if ($dynamic) {
+    my $load_func = "Parrot_lib_load_${base}${suffix}_ops";
+    print SOURCE <<END_C;
+/*
+ * dynamic lib load function - called once
+ */
+
+PMC*
+$load_func(Parrot_Interp interpreter)
+{
+    PMC *lib = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+    lib->cache.struct_val = (void *) $init_func;
+    return lib;
+}
+END_C
+
+}
 
 exit 0;
