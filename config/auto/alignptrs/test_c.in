@@ -14,12 +14,7 @@ int main(int argc, char **argv) {
 	size_t cur_var_ptr;
 	size_t direction = (hi_var_ptr > lo_var_ptr) ? 1 : -1;
 
-	for (cur_var_ptr = lo_var_ptr;
-	     cur_var_ptr*direction<hi_var_ptr*direction;
-	     cur_var_ptr += direction
-	) {
-		size_t ptr = *(size_t *)cur_var_ptr;
-	}
+	printf("%i",*(void **)(lo_var_ptr+1));
 	printf("OK");
 
 	return 0;
