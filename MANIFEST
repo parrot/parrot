@@ -1345,6 +1345,11 @@ languages/imcc/cfg.c
 languages/imcc/cfg.h
 languages/imcc/debug.c
 languages/imcc/debug.h
+languages/imcc/docs/imcc.pod
+languages/imcc/docs/operation.pod
+languages/imcc/docs/parsing.pod
+languages/imcc/docs/running.pod
+languages/imcc/docs/syntax.pod
 languages/imcc/examples/README
 languages/imcc/examples/sample.imc
 languages/imcc/examples/test_allocate.imc
@@ -1372,6 +1377,9 @@ languages/imcc/stacks.h
 languages/imcc/symreg.c
 languages/imcc/symreg.h
 languages/imcc/t/harness
+languages/imcc/t/imcpasm/opt1.t
+languages/imcc/t/imcpasm/opt2.t
+languages/imcc/t/imcpasm/sub.t
 languages/imcc/t/syn/clash.t
 languages/imcc/t/syn/labels.t
 languages/imcc/t/syn/namespace.t
