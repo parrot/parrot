@@ -62,7 +62,7 @@ _x:
     chr S0, I3
     sub I17, I1, I0
     branch I17
-    new S0, 380, I0, I17
+    pack S0, 380, I0, I17
     print S0
 _init:
     dlfunc P0, P1, "mmd_register", "vIiiip"

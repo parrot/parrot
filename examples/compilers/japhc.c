@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /*
  * example compiler used by japh16.pasm
  *
@@ -30,7 +32,7 @@ Parrot_lib_japhc_init(Parrot_Interp interpreter, PMC* lib)
 {
     STRING *cmp;
 
-    cdebug((stderr, "japc_init\n"));
+    cdebug((stderr, "japhc_init\n"));
     cmp = const_string(interpreter, "JaPH_Compiler");
     Parrot_compreg(interpreter, cmp, (PMC*)F2DPTR(japh_compiler));
 }
@@ -123,8 +125,7 @@ add_const_str(Parrot_Interp interpreter,
     consts->constants[--k] = PackFile_Constant_new();
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string =
-        string_make(interpreter, buf, (UINTVAL) l, NULL,
-                PObj_constant_FLAG, NULL);
+        string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
     free(o);
     return k;
 }
@@ -142,7 +143,7 @@ japh_compiler(Parrot_Interp interpreter, const char *program)
     const char *p;
 
 #define CODE_SIZE 128
-    cdebug((stderr, "japc_compiler '%s'\n", program));
+    cdebug((stderr, "japh_compiler '%s'\n", program));
 
     /*
      * need some packfile segments

@@ -9,7 +9,7 @@
     branch I2
     add I2, 382, I1
     branch I2
-    new S23, 911, I0, I0
-    branch I1
-    transcode S23, S0, -19
+    pack S23, 911, I0, I0
+    branch I2
+    index I10, S23, S0, -20
     end
