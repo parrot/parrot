@@ -258,7 +258,7 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
 
     if(uniq && (r = _get_sym(hsh, name)) &&
             r->type == VTADDRESS &&
-            r->lhs_use_count            /* we use this for labes/subs */
+            r->lhs_use_count            /* we use this for labels/subs */
       ) {
         if (uniq == U_add_uniq_label) {
             fataly(1, sourcefile, line,
