@@ -6,12 +6,7 @@
  * of KEY and KEY_PAIR structures, and can be used in an expression.
  */
 
-#define MAKE_KEY(k,k_p,v,c,t) (\
-        k_p.type = c,\
-        k_p.cache.t = v,\
-        k.size = 1,\
-        k.keys = &k_p,\
-        &k)
+#define MAKE_KEY(k,k_p,v,c,t) (k_p.type = c, k_p.cache.t = v, k.size = 1, k.keys = &k_p, &k)
 
 VERSION = PARROT_VERSION;
 
