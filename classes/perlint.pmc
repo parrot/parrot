@@ -173,7 +173,7 @@ pmclass PerlInt {
 
     void add_int (INTVAL value, PMC* dest) {
         dest->vtable->set_integer_native(INTERP, dest, SELF->cache.int_val + value);
-    }
+   }
 
     void add_bigint (BIGINT value, PMC* dest) {
     }

@@ -736,38 +736,38 @@ CODE
 5.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_n_n");
+output_is(<<CODE, <<OUTPUT, "inc_n_i");
 	set	N0, 0.0
-        set     N1, 0.5
-        set     N2, -1.0
+        set     I1, 1 
+        set     I2, -1
 
-	inc	N0, N1
+	inc	N0, I1
 	print	N0
 	print	"\\n"
 
-	inc	N0, N2
+	inc	N0, I2
 	print	N0
 	print	"\\n"
         end
 CODE
-0.500000
--0.500000
+1.000000
+0.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "inc_n_nc");
+output_is(<<CODE, <<OUTPUT, "inc_n_ic");
 	set	N0, 0.0
 
-	inc	N0, 0.5
+	inc	N0, 1 
 	print	N0
 	print	"\\n"
 
-	inc	N0, -1.0
+	inc	N0, -1
 	print	N0
 	print	"\\n"
         end
 CODE
-0.500000
--0.500000
+1.000000
+0.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "dec_n");
@@ -789,16 +789,16 @@ CODE
 -5.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "dec_n_n");
+output_is(<<CODE, <<OUTPUT, "dec_n_i");
 	set	N0, 0.0
-        set     N1, 2.0
-        set     N2, -1.0
+        set     I1, 2
+        set     I2, -1
 
-	dec	N0, N1
+	dec	N0, I1
 	print	N0
 	print	"\\n"
 
-	dec	N0, N2
+	dec	N0, I2
 	print	N0
 	print	"\\n"
         end
@@ -807,20 +807,20 @@ CODE
 -1.000000
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "dec_n_nc");
+output_is(<<CODE, <<OUTPUT, "dec_n_ic");
 	set	N0, 0.0
 
-	dec	N0, 0.5
+	dec	N0, 1 
 	print	N0
 	print	"\\n"
 
-	dec	N0, -1.0
+	dec	N0, -1
 	print	N0
 	print	"\\n"
         end
 CODE
--0.500000
-0.500000
+-1.000000
+0.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "set_i_n");

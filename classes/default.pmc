@@ -188,6 +188,38 @@ pmclass default noinit {
      );
    }
 
+   void inc (PMC* value,  PMC* dest) {
+       SELF->cache.int_val += value->vtable->get_integer(INTERP, value);
+   }
+
+   void inc_native (INTVAL value, PMC* dest) {
+       SELF->cache.int_val += value;
+   }
+
+   void inc_same (PMC* value, PMC* dest) {
+       SELF->cache.int_val += value->cache.int_val;
+   }
+
+   void inc_bigint (PMC* value, PMC* dest) {
+     /* XXX: bigint magic */
+   }
+
+   void dec (PMC * value,  PMC* dest) {
+       SELF->cache.int_val -= value->vtable->get_integer(INTERP, value);
+   }
+
+   void dec_native (INTVAL value, PMC* dest) {
+       SELF->cache.int_val -= value;
+   }
+
+   void dec_same (PMC* value, PMC* dest) {
+       SELF->cache.int_val -= value->cache.int_val;
+   }
+
+   void dec_bigint (PMC* value, PMC* dest) {
+     /* XXX: bigint magic */
+   }
+
    void add (PMC * value,  PMC* dest) {
      /* XXX: overflow detection, bignum promotion? */
 
