@@ -54,6 +54,36 @@ pmclass OrderedHash extends PerlArray {
 	DYNSELF.set_pmc_keyed_int(n, value);
 	Parrot_PerlHash_set_integer_keyed(INTERP, SELF, key, n);
     }
+
+    INTVAL exists_keyed(PMC* key) {
+	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+	    return SUPER(key);
+	}
+	else {
+            return Parrot_PerlHash_exists_keyed(INTERP, SELF, key);
+        }
+    }
+
+    INTVAL defined_keyed(PMC* key) {
+	if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+	    return SUPER(key);
+	}
+	else {
+            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
+            return DYNSELF.defined_keyed_int(n);
+        }
+    }
+
+    void delete_keyed(PMC* key) {
+        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
+            return SUPER(key);
+        }
+        else {
+            INTVAL n = Parrot_PerlHash_get_integer_keyed(INTERP, SELF, key);
+            Parrot_PerlHash_delete_keyed(INTERP, SELF, key);
+            DYNSELF.delete_keyed_int(n);
+        }
+    }
 }
 
 /*

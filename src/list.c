@@ -1442,13 +1442,13 @@ void
 list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
         INTVAL count)
 {
-    List *value_list = (List *)PMC_data(value);
-    INTVAL value_length = value_list->length;
+    List *value_list = value ? (List *)PMC_data(value): NULL;
+    INTVAL value_length = value_list ? value_list->length : 0;
     INTVAL length = list->length;
     INTVAL i, j;
     int type = list->item_type;
 
-    if (type != value_list->item_type)
+    if (value_list && type != value_list->item_type)
         internal_exception(1, "Item type mismatch in splice\n");
 
     /* start from end */

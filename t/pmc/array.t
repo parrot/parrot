@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -398,5 +398,25 @@ CODE
 Array
 20202020
 OUT
-1;
+
+output_is(<<'CODE', <<OUT, "delete");
+	new P0, .Array
+	set P0, 3
+	set P0[0], 10
+	set P0[1], 20
+	set P0[2], 30
+
+	delete P0[1]
+	set I0, P0
+	print I0
+
+	set I0, P0[0]
+	print I0
+	set I0, P0[1]
+	print I0
+	print "\n"
+	end
+CODE
+21030
+OUT
 1;

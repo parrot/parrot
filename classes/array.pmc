@@ -489,6 +489,15 @@ pmclass Array {
         return VTABLE_exists_keyed(INTERP, box, nextkey);
     }
 
+    void delete_keyed_int(INTVAL key) {
+	list_splice(INTERP, (List *) PMC_data(pmc), NULL, key, 1);
+    }
+
+    void delete_keyed(PMC* key) {
+        INTVAL ix = key_integer(INTERP, key);
+	list_splice(INTERP, (List *) PMC_data(pmc), NULL, ix, 1);
+    }
+
     /* == operation */
     INTVAL is_equal (PMC* value) {
 	/* XXX */

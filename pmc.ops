@@ -234,12 +234,19 @@ inline op exists(out INT, in PMC, in KEY) {
 
 =item B<delete>(in PMC, in KEY)
 
+=item B<delete>(in PMC, in INTKEY)
+
 Delete the specified entry $2 from aggregate $1.
 
 =cut
 
 inline op delete(in PMC, in KEY) {
   $1->vtable->delete_keyed(interpreter, $1, $2);
+  goto NEXT();
+}
+
+inline op delete(in PMC, in INTKEY) {
+  $1->vtable->delete_keyed_int(interpreter, $1, $2);
   goto NEXT();
 }
 
