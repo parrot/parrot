@@ -71,7 +71,7 @@ pmclass Array {
     }
     
     INTVAL type () {
-        return 0;
+        return enum_class_Array;
     }
     
     INTVAL type_keyed (KEY* key) {
@@ -157,7 +157,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -175,7 +175,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -199,7 +199,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -217,7 +217,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -242,7 +242,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -260,7 +260,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -284,7 +284,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -302,7 +302,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -326,7 +326,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -344,7 +344,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -369,7 +369,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -387,7 +387,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -407,7 +407,7 @@ pmclass Array {
         kp = &key->atom;
         ix = atom2int(INTERP, kp);
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -426,7 +426,7 @@ pmclass Array {
 
         ix = *key;
 
-        if (ix > SELF->cache.int_val || ix < 0) {
+        if (ix >= SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -511,11 +511,11 @@ pmclass Array {
 
     void set_number (PMC * value) {
         INTVAL idx = (INTVAL)value->cache.num_val;
-        resize_array(interpreter, SELF, idx+1);
+        resize_array(interpreter, SELF, idx);
     }
 
     void set_number_native (FLOATVAL idx) {
-        resize_array(interpreter, SELF, (INTVAL)idx + 1);
+        resize_array(interpreter, SELF, (INTVAL)idx);
     }
 
     void set_number_bignum (BIGNUM* value) {
