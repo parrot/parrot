@@ -64,7 +64,7 @@ imcc.l.flag imclexer.c: imcc.l
 	$(TOUCH) imcc.l.flag imclexer.c
 
 .c$(O):
-	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
+	@$(PERL) ../../tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
 
 $(IMCC_O_FILES) : $(H_FILES)
 

@@ -33,16 +33,6 @@ sub runstep {
           commentType => '#');
   genfile('config/gen/makefiles/ook.in',       'languages/ook/Makefile',
           commentType => '#');
-
-  # Change compiler flags in IMCC's makefile using inplace edit.
-  my $PQ   = Configure::Data->get('PQ');
-  my $imcc = 'languages/imcc/Makefile';
-  my $pgm  = ' s/ -Wwrite-strings//;'
-           . ' s/ -Wcast-qual//;'
-           . ' s/ -Wno-unused/ -Wunused/;';
-  system "$^X -pi.bak -e$PQ$pgm$PQ $imcc" and warn;
-  unlink "$imcc.bak" or warn;
-
 }
 
 1;

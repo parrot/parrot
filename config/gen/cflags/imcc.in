@@ -1,0 +1,9 @@
+# [ filename | {regex} ] -{removed options} +{added options} ...
+#
+# note, empty regex/options are just ignored
+#
+{.*} -{-Wwrite-strings -Wcast-qual -Wno-unused} +{-Wunused}
+
+instructions.c -{-Wformat-nonliteral} # noisy
+debug.c        -{-Wformat-nonliteral} # noisy
+optimizer.c    -{-Wformat-nonliteral} # noisy

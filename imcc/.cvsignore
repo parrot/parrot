@@ -6,3 +6,4 @@ imcparser.output
 Makefile
 *.tmp
 *.flag
+CFLAGS

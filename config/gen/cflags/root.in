@@ -1,0 +1,6 @@
+# [ filename | {regex} ] -{removed option} +{added option} ...
+#
+# note, empty regexen/options are just ignored
+#
+spf_render.c -{-Wformat-nonliteral}   # noisy
+tsq.c -{${optimize}} 		      # never optimize tsq.c!

@@ -26,3 +26,4 @@ core_pmcs.c
 test
 nci.c
 test_main
+CFLAGS

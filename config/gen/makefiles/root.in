@@ -43,7 +43,8 @@ GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
 	include/parrot/has_header.h \
 	include/parrot/feature.h \
 	lib/Parrot/Config.pm lib/Parrot/PMC.pm platform.c \
-	include/parrot/core_pmcs.h core_pmcs.c
+	include/parrot/core_pmcs.h core_pmcs.c \
+	CFLAGS languages/imcc/CFLAGS
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig
 
@@ -192,7 +193,7 @@ LINTOPTS =
 ${make_set_make}
 
 .c$(O) :
-	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 all : $(TEST_PROG) $(IMCC_PROG) docs
 
