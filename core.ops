@@ -3863,6 +3863,10 @@ and store it in $1 (do NOT push on the stack). Static depths 0
 through $2 - 1, inclusive, are copied from the current static
 nesting.
 
+=item B<push_pad>(in PMC)
+
+Push the scratchpad in $1 onto the lexical scope stack.
+
 =item B<pop_pad>()
 
 Pop the current lexical scope pad off the stack

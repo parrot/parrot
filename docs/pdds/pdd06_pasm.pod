@@ -568,21 +568,47 @@ last warp.
 =head2 Names, pads, and globals
 
 These operations are responsible for finding names in lexical or
-global scopes, as well as storing data into those slots and checking
-constraints on those slots. They also allocate and deallocate
-scratchpads and entries in those pads.
-
-Pad descriptors are templates for a particular pad. They are specified
-in the constant area of a bytecode file, and contain the names, types,
-and attributes for the variables referenced in the scope the pad is for.
-
-The pad 0 is special, and represents the empty pad.
+global scopes, as well as storing data into those slots.  A static
+scope is captured by a scratchpad.  The current dynamic scope is
+represented by the state of the lexical stack (which contains
+scratchpads).  For more detail on these ops see the generated
+documentation in docs/core_ops.pod.
 
 =over 4
 
+=item new_pad ix
+
+=item new_pad Px, iy
+
+=item push_pad Px
+
+=item pop_pad
+
+=item pop_pad Px
+
+=item peek_pad Px
+
+Instructions for creating scratchpads and manipulating the lexical
+stack.
+
+=item store_lex sx, Py
+
+=item store_lex ix, sy, Pz
+
+=item store_lex ix, iy, Pz
+
 =item find_lex Px, sy
 
-Find the lexical of name sy and store the PMC pointer in register Px.
+=item find_lex Px, iy, sz
+
+=item find_lex Px, iy, iz
+
+Instructions for storing in, and retrieving from the scratchpad
+currently at the top of the lexical stack.  For each of these
+operations there is an equivalent form that uses keyed versions of the
+set instruction. The keyed variants require that a scratchpad be
+specified rather than implicitly operating on the scratchpad on the
+top of the stack.
 
 =item find_global Px, sy, sz
 
@@ -602,12 +628,6 @@ Find the global symbol table Y and store its PMC in X
 Find the slot in the global table Y for the global named Z, and store
 its slot in register X.
 
-=item fetch_lex Px, iy, iz
-
-Fetch the lexical in slot y of scratchpad z. If z is negative, search
-out from the current pad, if positive search inwards from the
-outermost pad. Put the resulting PMC pointer in register x
-
 =item fetch_global Px, Py, iz
 
 Fetch the global in slot Z of the symbol table pointed to by Y
@@ -615,10 +635,6 @@ Fetch the global in slot Z of the symbol table pointed to by Y
 =item store_global Px, sy
 
 Store X in the default global symbol table with a name of Y.
-
-=item newpad pad_descriptor
-
-Create a new scratchpad using pad_descriptor as a template.
 
 =back
 

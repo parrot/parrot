@@ -30,11 +30,9 @@ typedef struct Parrot_Sub {
 } * parrot_sub_t;
 
 typedef struct Parrot_Coroutine {
-    INTVAL              flags;
+    INTVAL               flags;
     struct Parrot_Context ctx;
-    PMC                 *lex_pad;
-    opcode_t            *init;
-    opcode_t            *resume;
+    opcode_t             *resume;
 } * parrot_coroutine_t;
 
 typedef struct Parrot_Continuation {

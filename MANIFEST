@@ -1743,6 +1743,7 @@ t/op/trans.t
 t/op/types.t
 t/pmc/array.t
 t/pmc/boolean.t
+t/pmc/coroutine.t
 t/pmc/eval.t
 t/pmc/intlist.t
 t/pmc/multiarray.t

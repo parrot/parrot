@@ -43,13 +43,20 @@ struct Parrot_Coroutine *
 new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
 {
     /* Using system memory until I figure out GC issues */
+    PMC * pad = NULL;
     struct Parrot_Coroutine *newco =
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
-    newco->init = address;
     newco->resume = NULL;
     newco->ctx.user_stack = new_stack(interp);
     newco->ctx.control_stack = new_stack(interp);
-    newco->lex_pad = scratchpad_get_current(interp);
+    newco->ctx.pad_stack = new_stack(interp);
+    
+    pad = scratchpad_get_current(interp);
+
+    if (pad) {
+        stack_push(interp, &newco->ctx.pad_stack, pad, 
+                   STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+    }
     return newco;
 }
 
@@ -165,6 +172,8 @@ scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth)
                                      sizeof(struct Parrot_Lexicals));
 
     if (base) {
+        /* XXX JPS: I guess this is copying the front, when it should
+           be copying the end of the parent (base) */
         memcpy(pad_pmc->data, base->data, depth *
                sizeof(struct Parrot_Lexicals));
     }

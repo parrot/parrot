@@ -25,10 +25,7 @@ pmclass Coroutine {
     }
 
     void init () {
-        INTVAL address = 0; /* XXX this was originally passed as a
-                             * parameter, but that's not valid.  So
-                             * this is totally broken now. */
-        SELF->data = new_coroutine(INTERP, (opcode_t*)address);
+        SELF->data = new_coroutine(INTERP, NULL);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -40,9 +37,10 @@ pmclass Coroutine {
     }
 
     void mark () {
-        /* XXX: need to do pads as well. */
-        mark_stack(
-            INTERP, ((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack);
+        struct Parrot_Coroutine * co = (struct Parrot_Coroutine *)SELF->data;
+        mark_stack(INTERP, co->ctx.user_stack);
+        mark_stack(INTERP, co->ctx.control_stack);
+        mark_stack(INTERP, co->ctx.pad_stack);
     }
 
     void set_integer (PMC * value) {
@@ -73,16 +71,27 @@ pmclass Coroutine {
     }
 
     void* invoke (void* next) {
-        PMC * pad = ((struct Parrot_Coroutine *)SELF->data)->lex_pad;
         struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)SELF->data;
+        struct Stack_Chunk * tmp_stack = NULL;
         void * dest = co->resume;
         co->resume = (opcode_t *)next;
 
-        if (pad) {
-           /* put the correct pad in place */
-           stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
-                      STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
-        }
+	/* 
+         * Swap control, user and pad stacks. Data in other parts of the
+         * context are not preserved between calls to the coroutine.
+         */
+
+        tmp_stack = INTERP->ctx.user_stack;
+        INTERP->ctx.user_stack = co->ctx.user_stack;
+        co->ctx.user_stack = tmp_stack;
+
+        tmp_stack = INTERP->ctx.control_stack;
+        INTERP->ctx.control_stack = co->ctx.control_stack;
+        co->ctx.control_stack = tmp_stack;
+
+        tmp_stack = INTERP->ctx.pad_stack;
+        INTERP->ctx.pad_stack = co->ctx.pad_stack;
+        co->ctx.pad_stack = tmp_stack;
 
         return dest;
     }
@@ -94,5 +103,6 @@ pmclass Coroutine {
         memcpy(ret->data, SELF->data, sizeof(struct Parrot_Coroutine));
         stack_mark_cow(retc->ctx.user_stack);
         stack_mark_cow(retc->ctx.control_stack);
+        stack_mark_cow(retc->ctx.pad_stack);
     }
 }
