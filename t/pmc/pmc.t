@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 26;
 
 output_is(<<'CODE', <<'OUTPUT', "newpmc");
 	print "starting\n"
@@ -214,6 +214,49 @@ output_is(<<'CODE', '2.002000', "divide integer by number");
 	set P0, 123
 	set P1, 246.246
 	div P1, P1, P0
+	print P1
+	end
+CODE
+
+#
+# Number vs. integer
+#
+output_is(<<'CODE', sprintf("%f",123+321.321), "add integer to number");
+	new P0, 0
+	new P1, 0
+	set P0, 123
+	set P1, 321.321
+	add P1, P0, P1
+	print P1
+	end
+CODE
+
+output_is(<<'CODE', '-198.321000', "subtract integer from number");
+	new P0, 0
+	new P1, 0
+	set P0, 123
+	set P1, 321.321
+	sub P1, P0, P1
+	print P1
+	end
+CODE
+
+output_is(<<'CODE', sprintf("%f",123*321.321), "multiply integer by number");
+	new P0, 0
+	new P1, 0
+	set P0, 123
+	set P1, 321.321
+	mul P1, P0, P1
+	print P1
+	end
+CODE
+
+output_is(<<'CODE', '0.499500', "divide integer by number");
+	new P0, 0
+	new P1, 0
+	set P0, 123
+	set P1, 246.246
+	div P1, P0, P1
 	print P1
 	end
 CODE
