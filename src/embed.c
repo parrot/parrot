@@ -666,6 +666,17 @@ Sets up C<ARGV> and runs the ops.
 void
 Parrot_runcode(Interp *interpreter, int argc, char *argv[])
 {
+    if (!interpreter->lo_var_ptr) {
+        int top;
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            PIO_eprintf(interpreter,
+                    "*** Parrot VM: Setting stack top. ***\n");
+        }
+        interpreter->lo_var_ptr = &top;
+        Parrot_runcode(interpreter, argc, argv);
+        interpreter->lo_var_ptr = NULL;
+        return;
+    }
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
