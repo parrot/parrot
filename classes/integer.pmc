@@ -13,11 +13,25 @@
 
 #include "parrot/parrot.h"
 
+static void
+integer_divide(Parrot_Interp interp, PMC* self, PMC* value, PMC* destination) {
+     INTVAL result;
+     result = VTABLE_get_integer(interp, self) / VTABLE_get_integer(interp, value);
+     VTABLE_set_integer_native(interp, destination, result);
+}
+
+
 pmclass Integer extends mmd_default {
 
     void init() {	/* pmc2c doesn't like empty classes */
+        /* This is extraordinarily hackish, as it'll register the function
+	 * each and every time a new Integer is created. It really
+	 * ought go in LOAD or INIT, but we don't have those yet.
+	 */
+      mmd_register(INTERP, MMD_DIVIDE, VTABLE_type(INTERP, SELF), VTABLE_type(INTERP, SELF), integer_divide);
 	SUPER();
     }
+
     void set_integer_native(INTVAL value) {
       SELF->cache.int_val = value;
     } 

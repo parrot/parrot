@@ -16,87 +16,89 @@
 pmclass mmd_default extends default {
 
   void add(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_ADD);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_ADD);
   }
 
   void subtract(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SUBTRACT);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SUBTRACT);
   }
 
   void multiply(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_MULTIPLY);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MULTIPLY);
   }
 
   void divide(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_DIVIDE);
+    puts("Heading into dispatch");
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_DIVIDE);
+    puts("Dispatch done");
   }
 
   void modulus(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_MOD);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MOD);
   }
 
   void cmodulus(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CMOD);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CMOD);
   }
 
   void bitwise_and(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BAND);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BAND);
   }
 
   void bitwise_or(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BOR);
   }
 
   void bitwise_xor(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BXOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BXOR);
   }
 
   void bitwise_shl(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BSL);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSL);
   }
 
   void bitwise_shr(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_BSR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSR);
   }
 
   void concatenate(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_CONCAT);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CONCAT);
   }
 
   void logical_and(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LAND);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LAND);
   }
 
   void logical_or(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LOR);
   }
 
   void logical_xor(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_LXOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LXOR);
   }
 
   void repeat(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_REPEAT);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_REPEAT);
   }
 
   INTVAL is_equal(PMC* value) {
-    return mmd_dispatch_intval(interpreter, SELF, value, MMD_NUMEQ);
+    return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMEQ);
   }
 
   INTVAL cmp(PMC* value) {
-    return mmd_dispatch_intval(interpreter, SELF, value, MMD_NUMCMP);
+    return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMCMP);
   }
 
   void bitwise_ors(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SOR);
   }
 
   void bitwise_ands(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SAND);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SAND);
   }
 
   void bitwise_xors(PMC* value, PMC* dest) {
-    mmd_dispatch_pmc(interpreter, SELF, value, dest, MMD_SXOR);
+    mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SXOR);
   }
 
 

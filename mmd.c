@@ -24,18 +24,26 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
     pmc_mmd_f real_function;
     UINTVAL left_type, right_type;
     UINTVAL offset;
+    puts("In dispatch");
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
+    printf("Left/right: %i/%i\n", left_type, right_type);
     if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
         (right_type > interpreter->binop_mmd_funcs->y[function])) {
         real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[
             function];
     } else {
+        puts("Got a real dispatch");
         offset = interpreter->binop_mmd_funcs->x[function] *
             right_type + left_type;
-        real_function = (pmc_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+        printf("Offset is %i\n", offset);
+        real_function = *(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
+        printf("Offset address is %p\n",interpreter->binop_mmd_funcs->mmd_funcs[function] + offset); 
+        printf("Function is %p\n", real_function);
     }
+    puts("Calling it");
     (*real_function)(interpreter, left, right, dest);
+    puts("Back");
 }
 
 STRING *
@@ -88,6 +96,8 @@ mmd_add_function(struct Parrot_Interp *interpreter,
 {
     UINTVAL func_count = funcnum + 1;
     UINTVAL cur_func_count = interpreter->binop_mmd_funcs->tables;
+
+    printf("Default for %i is %p\n", funcnum, function);
 
     /* Is the new function past where we have expanded to? If so, make
        all the tables bigger
@@ -174,6 +184,8 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
         memcpy(new_table + newoffset, interpreter->binop_mmd_funcs->mmd_funcs[
                 function] + oldoffset, sizeof(funcptr_t) * x);
     }
+    /* Set the old table to point to the new table */
+    interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 }
 
 static void
@@ -207,6 +219,7 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
     memcpy(new_table, interpreter->binop_mmd_funcs->mmd_funcs[function],
             sizeof(funcptr_t) * x * y);
     interpreter->binop_mmd_funcs->y[function] = new_y;
+    interpreter->binop_mmd_funcs->mmd_funcs[function] = new_table;
 
 }
 
@@ -254,7 +267,6 @@ mmd_register(struct Parrot_Interp *interpreter,
     INTVAL offset;
     cur_x = interpreter->binop_mmd_funcs->x[type];
     cur_y = interpreter->binop_mmd_funcs->y[type];
-
     if (cur_x < left_type) {
         mmd_expand_x(interpreter, type, left_type);
     }
@@ -265,7 +277,8 @@ mmd_register(struct Parrot_Interp *interpreter,
 
     offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
     *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset) = funcptr;
-
+    printf("Registering %p for %i/%i at %p\n", funcptr, cur_x, cur_y, (interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
+    printf("And it says: %p\n", *(interpreter->binop_mmd_funcs->mmd_funcs[type] + offset));
 }
 
 
