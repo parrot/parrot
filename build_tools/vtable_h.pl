@@ -22,11 +22,23 @@ print OUT <<'EOF';
 
 #include "parrot/parrot.h"
 
+#define VTABLE_SIZE 512
+
+typedef void* (*vtable_func_t)();
+
+struct _vtable {
+  PACKAGE *package;
+  INTVAL base_type;
+  INTVAL int_type;
+  INTVAL float_type;
+  INTVAL num_type;
+  INTVAL string_type;
+  vtable_func_t vtable_funcs[VTABLE_SIZE];
+}
 EOF
 
 print OUT vtbl_enum(%vtable);
 print OUT "\n";
-print OUT vtbl_struct(%vtable);
 
 print OUT "\n#endif\n";
 
