@@ -1,7 +1,6 @@
 /* io_stdio.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
- *     $Id$
  *  Overview:
  *      The "STDIO" layer of Parrot IO. Buffering and all the fun stuff.
  *
@@ -37,7 +36,7 @@ ParrotIO *      PIO_stdio_open(theINTERP, ParrotIOLayer * layer,
 INTVAL          PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, size_t bufsize);
 ParrotIO *      PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
-		        INTVAL fd, const char * smode);
+		        PIOHANDLE fd, const char * smode);
 INTVAL          PIO_stdio_close(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io);
 void            PIO_stdio_flush(theINTERP, ParrotIOLayer * layer,
@@ -48,7 +47,10 @@ size_t          PIO_stdio_write(theINTERP, ParrotIOLayer * layer,
                         ParrotIO * io, const void * buffer, size_t len);
 INTVAL          PIO_stdio_puts(theINTERP, ParrotIOLayer * l, ParrotIO * io,
                         const char * s);
-
+INTVAL          PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        off_t offset, INTVAL whence);
+off_t           PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
+                        ParrotIO * io);
 
 
 
@@ -128,7 +130,7 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 
 
 ParrotIO * PIO_stdio_fdopen(theINTERP, ParrotIOLayer * layer,
-		        INTVAL fd, const char * smode) {
+		        PIOHANDLE fd, const char * smode) {
         ParrotIO * io;
         ParrotIOLayer * l = PIO_DOWNLAYER(layer);
         while(l) {
@@ -213,6 +215,32 @@ INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 }
         }
         return 0;
+}
+
+
+INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
+                        off_t offset, INTVAL whence) {
+        int hardseek = 0;
+
+        if( io->flags&PIO_F_SHARED ||
+                !(io->flags&(PIO_F_BUF|PIO_F_LINEBUF))) {
+                hardseek = 1;
+        }
+
+        /*
+         * Try to satisfy seek request in buffer if possible,
+         * else make IO request.
+         */
+
+        io->fpos = lseek(io->fd, offset, whence);
+        return io->fpos;
+}
+
+
+off_t PIO_stdio_tell(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
+        off_t p;
+        p = lseek(io->fd, (off_t)0, SEEK_CUR);
+        return p;
 }
 
 

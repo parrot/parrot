@@ -74,7 +74,7 @@ encodings/utf32$(O)
 
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
-IO_O_FILES = io/io$(O) io/io_os$(O) io/io_stdio$(O)
+IO_O_FILES = io/io$(O) io/io_stdio$(O) io/io_unix$(O) io/io_win32$(O)
 
 INTERP_O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) core_ops_prederef$(O) memory$(O) packfile$(O) stacks$(O) \

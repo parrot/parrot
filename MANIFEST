@@ -116,8 +116,9 @@ include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
 io/io.c
-io/io_os.c
 io/io_stdio.c
+io/io_unix.c
+io/io_win32.c
 io/TODO
 jit.c
 jit/i386/core.jit

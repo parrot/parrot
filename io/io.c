@@ -4,7 +4,7 @@
  *  Overview:
  *      This is the Parrot IO subsystem API.  Generic IO stuff
  *      goes here, each specific layer goes in its own file...
- *      (io_os, io_buf, io_utf8, etc.)
+ *      (io_os, io_stdio, io_utf8, etc.)
  *  Data Structure and Algorithms:
  *      Uses the IO PMC defined in io.h
  *      Uses ParrotIO structs in io.h 
@@ -52,13 +52,14 @@ void free_io_header(ParrotIO *io) {
 /*
  * Create a new IO stream, optionally reusing old structure.
  */
-ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype, INTVAL flags,
-                                INTVAL mode) {
+ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
+                        UINTVAL flags, UINTVAL mode) {
         ParrotIO * new_io;
         if( old ) {
                 /* FIXME: Reuse old IO */
         }
         new_io = (ParrotIO *)malloc(sizeof(ParrotIO));
+        new_io->fpos = new_io->lpos = (off_t)-1;
         new_io->flags = flags;
         new_io->mode = mode;
         new_io->stack = pio_default_stack;
@@ -81,19 +82,15 @@ void PIO_init(theINTERP) {
         if( pio_initialized != 0 )
                 return;
 
-        /* Init IO stacks before creating any handles */
+        /* Init IO stacks.
+         * Side effect of the Init method of the OS stack will
+         * create STDIN, STDOUT, STDERR.
+         */
         if((err = PIO_init_stacks(interpreter)) != 0) {
                 abort();
         }
 
-        /*
-         * Create our STDIN, STDOUT and STDERR handles
-         */
-        pio_stdin = PIO_fdopen(interpreter, STDIN_FILENO, "<"); 
-        pio_stdout = PIO_fdopen(interpreter, STDOUT_FILENO, ">"); 
-        pio_stderr = PIO_fdopen(interpreter, STDERR_FILENO, ">"); 
-
-        if( !pio_stdin || !pio_stderr || !pio_stdout ) {
+        if(!pio_stdin || !pio_stderr || !pio_stdout) {
                 abort();
         }
 
@@ -121,10 +118,17 @@ void PIO_atexit(theINTERP) {
 INTVAL PIO_init_stacks(theINTERP) {
         ParrotIOLayer * p;
 
-        PIO_push_layer(&pio_os_layer, NULL);
+        /* First push the platform specific OS layer */
+#ifndef WIN32
+        PIO_push_layer(&pio_unix_layer, NULL);
+#else
+        PIO_push_layer(&pio_win32_layer, NULL);
+#endif
 #if 0
         PIO_push_layer(&pio_stdio_layer, NULL);
 #endif
+
+        /* Note: All layer pushes should be done before init calls */
         for(p=pio_default_stack; p; p=p->down) {
                 if( p->api->Init ) {
                         if((*p->api->Init)(interpreter, p) != 0) {
@@ -274,21 +278,21 @@ ParrotIOLayer * PIO_pop_layer(ParrotIO * io) {
  * IO object. Later we will do some funky copy-on-write stuff.
  */
 ParrotIOLayer * PIO_copy_stack( ParrotIOLayer * stack ) {
-        ParrotIOLayer * new_stack;
-        ParrotIOLayer ** ptr_new;
+        ParrotIOLayer * ptr_new;
+        ParrotIOLayer ** ptr_ptr_new;
         ParrotIOLayer * ptr_proto;
         ParrotIOLayer * ptr_last = NULL;
-        ptr_new = &new_stack;
+        ptr_ptr_new = &ptr_new;
         ptr_proto = stack;
         while( ptr_proto ) { 
-                *ptr_new = PIO_base_new_layer( ptr_proto );
-                (*ptr_new)->up = ptr_last;
+                *ptr_ptr_new = PIO_base_new_layer( ptr_proto );
+                (*ptr_ptr_new)->up = ptr_last;
                 ptr_proto = ptr_proto->down;
-                ptr_last = *ptr_new;
-                ptr_new = &((*ptr_new)->down);
+                ptr_last = *ptr_ptr_new;
+                ptr_ptr_new = &((*ptr_ptr_new)->down);
         }
 
-        return new_stack;
+        return ptr_new;
 }
 
 
@@ -296,6 +300,43 @@ ParrotIOLayer * PIO_copy_stack( ParrotIOLayer * stack ) {
  * Generic top level ParrotIO interface.
  */
 
+/*
+ * Parse string for file open mode and return generic
+ * bits. The low level OS layers may then interpret the
+ * generic bits differently depending on platform.
+ */
+UINTVAL PIO_parse_open_flags(const char * flagstr) {
+        UINTVAL flags;
+        const char * s;
+
+        if( !flagstr || !(*flagstr) )
+                return 0;
+        flags = 0;
+        s = flagstr;
+        /* Set mode flags - <, >, >>, +<, +> */
+        /* add ? and ! for block/non-block */
+        switch(*s) {
+                case '+':
+                        flags |= (PIO_F_WRITE|PIO_F_READ);
+                        break;
+                case '<':
+                        flags |= PIO_F_READ;
+                        break;
+                case '>':
+                        flags |= PIO_F_WRITE;
+                        if( *(++s) == '>') {
+                                flags |= PIO_F_APPEND;
+                        }
+                        else if(*s != 0)
+                                return 0;
+                        break;
+                default:
+                        return 0;
+        }
+
+        return flags;
+}
+ 
 
 /*
  * API for controlling buffering specifics on an IO stream
@@ -315,13 +356,13 @@ INTVAL PIO_setbuf(theINTERP, ParrotIO * io, size_t bufsize) {
 }
 
 
-ParrotIO * PIO_open(theINTERP, const char * spath, const char * smode) {
+ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
         ParrotIO * io;
         ParrotIOLayer * l = pio_default_stack;
+        UINTVAL flags = PIO_parse_open_flags(sflags);
         while(l) {
                 if(l->api->Open) {
-                        io = (*l->api->Open)(interpreter, l, spath,
-                                                smode);
+                        io = (*l->api->Open)(interpreter, l, spath, flags);
                         io->stack = pio_default_stack;
                         return io;
                 }
@@ -336,13 +377,14 @@ ParrotIO * PIO_open(theINTERP, const char * spath, const char * smode) {
  * This is particularly used to init Parrot Standard IO onto
  * the OS IO handles (0,1,2).
  */
-ParrotIO * PIO_fdopen(theINTERP, INTVAL fd, const char * smode) {
+ParrotIO * PIO_fdopen(theINTERP, PIOHANDLE fd, const char * sflags) {
         ParrotIO * io;
+        UINTVAL flags;
         ParrotIOLayer * l = pio_default_stack;
+        flags = PIO_parse_open_flags(sflags);
         while(l) {
                 if(l->api->FDOpen) {
-                        io = (*l->api->FDOpen)(interpreter, l, fd,
-                                                smode);
+                        io = (*l->api->FDOpen)(interpreter, l, fd, flags);
                         io->stack = pio_default_stack;
                         return io;
                 }

@@ -57,9 +57,11 @@ enum {
 #define PIO_F_READ      0000001
 #define PIO_F_WRITE     0000002
 #define PIO_F_APPEND    0000004
+#define PIO_F_TRUNC     0000010
 #define PIO_F_FILE      0000100
 #define PIO_F_PIPE      0000200
 #define PIO_F_SOCKET    0000400
+#define PIO_F_CONSOLE   0001000         /* A terminal, we can linebuf   */
 #define PIO_F_LINEBUF   0010000
 #define PIO_F_BUF       0020000
 #define PIO_F_MALLOC    0040000         /* Buffer malloced              */
@@ -88,11 +90,21 @@ struct _ParrotIOBuf {
         unsigned char * next;           /* Current read/write pointer   */
 };
 
+
+#ifdef WIN32
+typedef HANDLE PIOHANDLE; 
+#else
+typedef int PIOHANDLE;
+#endif
+
+ 
 struct _ParrotIO {
-        INTVAL          fd;             /* Low level OS descriptor      */
-        INTVAL          mode;           /* Read/Write/etc.              */
-        INTVAL          flags;          /* Da flags                     */
-        off_t           filepos;        /* Current real file pointer    */
+        PIOHANDLE       fd;             /* Low level OS descriptor      */
+        UINTVAL         mode;           /* Read/Write/etc.              */
+        UINTVAL         flags;          /* Da flags                     */
+        off_t           fsize;          /* Current file size            */
+        off_t           fpos;           /* Current real file pointer    */
+        off_t           lpos;           /* Last file position           */
         ParrotIOBuf     b;              /* Buffer structure             */
         ParrotIOLayer * stack;
         /* ParrotIOFilter * filters; */
@@ -101,7 +113,7 @@ struct _ParrotIO {
 struct _ParrotIOLayer {
         void                    * this; /* Instance specific data       */
         const char              * name;
-        INTVAL                    flags;
+        UINTVAL                   flags;
         ParrotIOLayerAPI        * api;
         ParrotIOLayer           * up;
         ParrotIOLayer           * down;
@@ -121,11 +133,12 @@ struct _ParrotIOLayer {
 
 
 /* Others to come */
-extern ParrotIOLayer    pio_os_layer;
-extern ParrotIOLayer    pio_stdio_layer;
-#ifdef WIN32
-/*extern ParrotIOLayer  pio_win32_layer; */
+#ifndef WIN32
+extern ParrotIOLayer    pio_unix_layer;
+#else
+extern ParrotIOLayer    pio_win32_layer;
 #endif
+extern ParrotIOLayer    pio_stdio_layer;
 
 /* This is list of valid layers */
 extern ParrotIOLayer    * pio_registered_layers;
@@ -152,7 +165,7 @@ struct _ParrotIOLayerAPI {
         INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
         INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
         ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
-                                const char * name, const char * mode);
+                                const char * name, UINTVAL flags);
         ParrotIO *      (*Open2)(theINTERP, ParrotIOLayer * l,
                                 const char * name, const char * mode,
                                         int perm);
@@ -163,7 +176,7 @@ struct _ParrotIOLayerAPI {
                                 const char * name, const char * mode,
                                         DummyCodeRef *);
         ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
-                                INTVAL fd, const char * name);
+                                PIOHANDLE fd, UINTVAL flags);
         INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
                                 ParrotIO * io); 
         size_t          (*Write)(theINTERP, ParrotIOLayer * l,
@@ -208,15 +221,16 @@ extern ParrotIOLayer *  PIO_copy_stack(ParrotIOLayer *);
 
 extern struct PMC *     new_io_pmc(struct Parrot_Interp *, ParrotIO *);
 extern void             free_io_header(ParrotIO *);
-extern ParrotIO *       PIO_new(struct Parrot_Interp *, ParrotIO *, INTVAL,
-                                INTVAL, INTVAL);
+extern ParrotIO *       PIO_new(struct Parrot_Interp *, ParrotIO *,
+                                INTVAL, UINTVAL, UINTVAL);
 
 extern INTVAL           PIO_base_init(theINTERP, ParrotIOLayer * proto);
 extern ParrotIOLayer *  PIO_base_new_layer(ParrotIOLayer * proto);
 extern void             PIO_base_delete_layer(ParrotIOLayer * proto);
 
+extern UINTVAL          PIO_parse_open_flags(const char * flagstr);
 extern ParrotIO *       PIO_open(theINTERP, const char *, const char *);
-extern ParrotIO *       PIO_fdopen(theINTERP, INTVAL, const char *);
+extern ParrotIO *       PIO_fdopen(theINTERP, PIOHANDLE, const char *);
 extern INTVAL           PIO_close(theINTERP, ParrotIO *);
 extern void             PIO_flush(theINTERP, ParrotIO *);
 extern INTVAL           PIO_read(theINTERP, ParrotIO *, void *, size_t);
