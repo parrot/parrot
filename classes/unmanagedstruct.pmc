@@ -73,10 +73,10 @@ pmclass UnManagedStruct extends default need_ext {
 	return;
     }
 
-    INTVAL set_integer(INTVAL value) {
+    void set_integer_native(INTVAL value) {
        *(INTVAL *)PMC_data(SELF) = value;
     }
 
-    
+
 
 }

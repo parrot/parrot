@@ -68,7 +68,12 @@ END
   (my $pmc_o = $pmc_list) =~ s/\.pmc/\$(O)/g;
 
   # calls to pmc2c.pl for classes/Makefile
-  my $pmc_build = '';
+  my $pmc_build = <<"E_NOTE";
+
+# the following part of the Makefile was built by 'config/inter/pmc.pl'
+
+E_NOTE
+
   foreach my $pmc (split(/\s+/, $pmc_list)) {
       $pmc =~ s/\.pmc$//;
 
@@ -76,12 +81,12 @@ END
       my $parent = pmc_parent($pmc).".pmc";
       $parent = "perlhash.pmc $parent" if ($pmc eq 'orderedhash');
       my $parent_headers = '';
-      $parent_headers .= "$_.h " foreach (pmc_parents($pmc));
-      $pmc_build .= "$pmc.c $pmc.h: $parent $pmc.pmc\n";
+      $parent_headers .= "pmc_$_.h " foreach (pmc_parents($pmc));
+      $pmc_build .= "$pmc.c pmc_$pmc.h: $parent $pmc.pmc\n";
       $pmc_build .= "\t\$(PMC2C) perlhash.pmc\n" if ($pmc eq 'orderedhash');
       $pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
       $pmc_build .= "\n";
-      $pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers $pmc.h\n";
+      $pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers pmc_$pmc.h\n";
   }
 
   # build list of libraries for link line in Makefile
