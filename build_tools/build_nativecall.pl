@@ -53,6 +53,7 @@ my (%proto_type) = (p => "void *",
 		   );
 
 my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);",
+		    t => "STRING *final_destination;"
 #		    b => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
 #		    B => "Buffer *final_destination = new_buffer_header(interpreter);\nPObj_external_SET(final_destination)",
 		   );
@@ -79,13 +80,14 @@ my (%ret_assign) = (p => "PMC_data(final_destination) = return_data;\nPMC_REG(5)
 		    l => "INT_REG(5) = return_data;",
 		    4 => "INT_REG(5) = *return_data;",
 		    c => "INT_REG(5) = return_data;",
-		    s => "INT_REG(5) = return_data;",
                     2 => "INT_REG(5) = *return_data;",
                     f => "NUM_REG(5) = return_data;",
                     d => "NUM_REG(5) = return_data;",
 		    v => "",
+		    t => "final_destination = string_from_cstring(interpreter, return_data, 0);\nSTR_REG(5) = final_destination;",
 #		    b => "final_destination->bufstart = return_data;\nSTR_REG(5) = final_destination",
 #		    B => "final_destination->bufstart = *return_data;\nSTR_REG(5) = final_destination",
+		    s => "INT_REG(5) = return_data;",
                    );
 
 my (%func_call_assign) = (p => "return_data = ",
@@ -99,8 +101,9 @@ my (%func_call_assign) = (p => "return_data = ",
                           f => "return_data = ",
                           d => "return_data = ",
 			  b => "return_data = ",
+			  t => "return_data = ",
 #			  B => "return_data = ",
-#		          v => "",
+		          v => "",
                           );
 
 open NCI, ">nci.c" or die "Can't open nci.c!";
