@@ -1,3 +1,33 @@
+2004-10-09    leo
+        * Released 0.1.1
+	* Need Perl 5.6 now for building
+	* Basic AST support, PAST file parser, bits of code generation
+	* BigInt PMC using GMP
+	* Complex PMC
+	* Dynamic loading improved including bundles of PMC classes
+	* Experimental support for "make install"
+	* IA64 and hppa JIT supprt
+	* ICU unicode support
+	* IO layer handling code
+	* IO readline and buffered IO fixes
+	* Incremental GC
+	* Internal pythonic functions: filter, map, reduce, max, min ...
+	* Languages updates for m4, tcl, perl6, regex. New parakeet language.
+	* Library updates, Stream and SDL library
+	* MMD - multi method dispatch for binary vtable methods
+	* Many new array PMCs
+	* Method call syntax in PIR obj."meth"(...)
+	* More OS stuff: stat, exec, system, gmtime, piped read and write
+	* New Python PMCs like Enumerate, None
+	* Non-branching compare opcodes
+	* PIR support for += and friends
+	* Python language subdir
+	* Python types mapped to existing PMCs
+	* Slices and range support
+	* Tons of bug fixes, documentation updates, new tests
+	* Win32 COFF exec support
+	* ... and a lot more
+
 2004-02-29    leo
         * Released 0.1.0
         * "Ladies and gentlemen, I give you... objects!"

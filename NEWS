@@ -1,3 +1,18 @@
+New in 0.1.1
+
+Parrot 0.1.1 is an intermediate release with tons of updates and fixes.
+ - Python support: Parrot runs 4/7 of the pie-thon test suite
+ - Better OS support: more platforms, compiler, OS functions
+ - Improved PIR syntax for method calls and <op>= assignment
+ - Dynamic loading reworked including a "make install" target
+ - MMD - multi method dispatch for binary vtable methods
+ - Library improvement and cleanup
+ - BigInt, Complex, *Array, Slice, Enumerate, None PMC classes
+ - IA64 and hppa JIT supprt
+ - Tons of fixes, improvements, new tests, and documentation updates.
+A lot is unfinished and keeps changing. Nethertheless Parrot is stable
+and usable at the surface, while internals are moving.
+
 New in 0.1.0
  - "Ladies and gentlemen, I give you... objects!"
  - Huge documentation overhaul
