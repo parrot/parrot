@@ -55,14 +55,6 @@
 #   define RTYPE_FUNC  3   /* Function */
 #   define RTYPE_DATA1 4   /* 2nd. rellocation for RISC machines */
 
-#   define FIXUP_BYTECODE  1
-#   define FIXUP_OPMAP     2
-
-typedef struct {
-    int                                                 type;
-    void                                               *addr;
-} Parrot_exec_fixup_t;
-
 typedef struct {
     int                                                 offset_list;
     int                                                 type;
@@ -74,7 +66,6 @@ typedef struct {
     int                                                 offset;
     short                                               symbol_number;
     int                                                 type;
-    Parrot_exec_fixup_t                                *fixup;
 } Parrot_exec_rellocation_t;
 
 typedef struct {

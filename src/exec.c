@@ -25,8 +25,6 @@
 static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
 static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
-static void do_fixup(Parrot_exec_objfile_t *obj);
-static Parrot_exec_fixup_t *new_fixup(int type, void *addr);
 
 /*                          
  * Parrot_exec_run is not 0 if the contants are already allocated 
@@ -93,9 +91,6 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     /* PAD */
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
-#if I386
-    do_fixup(obj);
-#endif
     offset_fixup(obj);
     Parrot_exec_save(obj, "exec_output.o");
 }
@@ -129,27 +124,6 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
         memcpy(cp, src, len);
     obj->data_size[obj->data_count++] = len;
     obj->data.size += len;
-}
-
-static void
-do_fixup(Parrot_exec_objfile_t *obj)
-{
-    int i;
-    Parrot_exec_fixup_t *fixup;
-
-    for (i = 0; i < obj->text_rellocation_count; i++)
-        if (obj->text_rellocation_table[i].fixup) {
-            fixup = obj->text_rellocation_table[i].fixup;
-            switch (fixup->type) {
-                case FIXUP_BYTECODE:
-                    *((int *)(fixup->addr)) += obj->bytecode_header_size;
-                    break;
-                case FIXUP_OPMAP:
-                    *((int *)(fixup->addr)) += obj->bytecode_header_size +
-                        obj->text.size + obj->data_size[0]; 
-                    break;
-            }
-        }
 }
 
 /*  exec_init
@@ -259,8 +233,6 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     obj->text_rellocation_table = new_relloc;
     new_relloc = &obj->text_rellocation_table[obj->text_rellocation_count++];
 
-    new_relloc->fixup = NULL;
-
     switch (type) {
         case RTYPE_FUNC:
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_UND);
@@ -271,27 +243,12 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
         case RTYPE_DATA:
         case RTYPE_DATA1:
             symbol_number = Parrot_exec_add_symbol(obj, symbol, STYPE_GDATA);
-            new_relloc->fixup = new_fixup(FIXUP_BYTECODE,(void *)(nptr+disp));
             break;
     }
             
     new_relloc->offset = (int)(nptr - obj->text.code + disp);
     new_relloc->symbol_number = symbol_number;
     new_relloc->type = type;
-}
-
-static Parrot_exec_fixup_t *
-new_fixup(int type, void *addr)
-{
-    Parrot_exec_fixup_t *fixup;
-
-    fixup = (Parrot_exec_fixup_t *)
-        mem_sys_allocate_zeroed(sizeof(Parrot_exec_fixup_t));
-    
-    fixup->type = type;
-    fixup->addr = addr;
-    
-    return fixup;
 }
 
 static int

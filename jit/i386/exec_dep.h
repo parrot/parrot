@@ -77,7 +77,9 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
         emitm_pushl_i(jit_info->native_ptr, 0x0);
         Parrot_exec_add_text_rellocation(jit_info->objfile, 
             jit_info->native_ptr, RTYPE_COM, "interpre", -4);
-        emitm_pushl_i(jit_info->native_ptr, jit_info->op_i * sizeof(opcode_t));
+        emitm_pushl_i(jit_info->native_ptr,
+            jit_info->objfile->bytecode_header_size +
+                jit_info->op_i * sizeof(opcode_t));
         Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
 
@@ -99,7 +101,9 @@ void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-    emitm_pushl_i(jit_info->native_ptr, jit_info->op_i * sizeof(opcode_t));
+    emitm_pushl_i(jit_info->native_ptr,
+        jit_info->objfile->bytecode_header_size +
+            jit_info->op_i * sizeof(opcode_t));
     Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr,
         RTYPE_DATA, "program_code", -4);
 

@@ -1720,7 +1720,8 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
     }
 #  if EXEC_CAPABLE
     else {
-        emitm_subl_i_r(jit_info->native_ptr, 0x0 ,emit_EAX);
+        emitm_subl_i_r(jit_info->native_ptr,
+            jit_info->objfile->bytecode_header_size, emit_EAX);
         Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
         jit_emit_mov_ri_i(jit_info->native_ptr,emit_EDX,
