@@ -31,7 +31,7 @@ sub output_is() {
     my $pir_out_f = "$pir_f.out";
     my $parrotdir = dirname $self->{parrot};
 
-    $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+    $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '-j -Oc';
     my $args = $TEST_PROG_ARGS;
 
     Parrot::Test::generate_pbc_for( $code, $parrotdir, $count, $lang_f );

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -42,4 +42,17 @@ CODE
 test(<<'CODE', 'str.lower()');
 if __name__ == '__main__':
     print "AbCYZ".lower()
+CODE
+
+test(<<'CODE', 'object attr');
+class C(object):
+    def f(self):
+	print self.i
+
+def main():
+    c = C()
+    c.i=2
+    c.f()
+
+main()
 CODE

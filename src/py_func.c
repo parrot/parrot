@@ -896,6 +896,74 @@ Parrot_py_get_slice(Interp *interpreter, PMC *self, PMC *key)
     }
     return res;
 }
+
+void
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object);
+
+static PMC*
+parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
+{
+    /*
+     * data attributes override method attributes
+     */
+    Hash *h;
+    HashBucket *b;
+    PMC *p, *class;
+    STRING *class_name;
+    INTVAL offs;
+    SLOTTYPE *class_array;
+    /*
+     * 1) look at props
+     */
+    if ( (p = PMC_metadata(object)) ) {
+        h = PMC_struct_val(p);
+        b = hash_get_bucket(interpreter, h, name);
+        if (b) {
+            return b->value;
+        }
+    }
+    /*
+     * check attributes
+     */
+
+    class = GET_CLASS((SLOTTYPE *)PMC_data(object), object);
+    class_array = (SLOTTYPE *)PMC_data(class);
+    p = get_attrib_num(class_array, PCD_ATTRIBUTES);
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(p), name);
+    if (b) {
+        offs = PMC_int_val( (PMC*) b->value);
+        return Parrot_get_attrib_by_num(interpreter, object, offs);
+    }
+    /*
+     * 3) try method
+     */
+    p = Parrot_find_method_with_cache(interpreter, class, name);
+    if (p)
+        return p;
+    /*
+     * pitch a fit
+     */
+    real_exception(interpreter, NULL, E_AttributeError,
+            "'%Ss' object has no attribute '%Ss'",
+            class, /* TODO demangle */
+            name);
+
+    return PMCNULL;
+}
+
+static void
+parrot_py_set_attr_str(Interp* interpreter, PMC *obj, STRING *name, PMC *v)
+{
+    Parrot_default_setprop(interpreter, obj, name, v);
+}
+
+void
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object)
+{
+    object->vtable->get_attr_str = parrot_py_get_attr_str;
+    object->vtable->set_attr_str = parrot_py_set_attr_str;
+}
 /*
 
 =back

@@ -195,7 +195,7 @@ Invokes the subroutine.
         struct Parrot_sub * sub = PMC_sub(SELF);
         if (++interpreter->ctx.recursion_depth >
                 interpreter->recursion_limit) {
-            real_exception(interpreter, next, 100,
+            real_exception(interpreter, next, E_RuntimeError,
                     "maximum recursion depth exceeded");
         }
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {

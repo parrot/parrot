@@ -9,7 +9,7 @@ use strict;
 use Getopt::Std;
 
 my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count,
-   %main_names);
+   %main_names, %namespace);
 $DIS = 'python mydis.py';
 $DEFVAR = 'PerlInt';
 
@@ -212,9 +212,16 @@ EOC
 
 sub New_func {
     my ($n, $arg, $cmt) = @_;
+    my $nst = "";
+    my $ns = $namespace{$arg};
+    if ($ns) {
+	$nst = qq!.namespace [$ns]!;
+    }
     print <<EOC;
 .end		# $cur_func
+.namespace [""]
 
+$nst
 .sub $arg prototyped $cmt
 EOC
     my (@params, $k, $v, $params);
@@ -315,9 +322,9 @@ EOC
 		    $func_info{$cur_f}{'args'} = $args;
 		    $func_info{$cur_f}{'ar'} = $ar;
 		    $func_info{$cur_f}{'kw'} = $kw;
-		    if ($cur_f =~ /^Build::(\w+)/) {
-			$classes{$cur_f} = 1;
-		    }
+		    #if ($cur_f =~ /^Build::(\w+)/) {
+		    # $classes{$cur_f} = 1;
+		    # }
 		}
 		elsif (/# flags\s+(\S*)/) {
 		    my $f = eval($1);
@@ -525,7 +532,7 @@ EOC
 	    print <<EOC;
 	store_lex -1, $n, $p $cmt
 EOC
-    }
+	}
     }
     $names{$c} = $p;
     $lexicals{$c} = $p;
@@ -691,7 +698,16 @@ EOC
 	    unshift @{$def_args{$f}}, $gn;
 	}
     }
-    $pir_functions{$f} = 1;
+    if ($cur_func =~ /Build::(\w+)/) {
+	$namespace{$f} = $classes{$1};
+	print <<EOC;
+	# $namespace{$f}
+	# addattribute P5, "$f"
+EOC
+    }
+    else {
+	$pir_functions{$f} = 1;
+    }
     $make_f = 1 unless $f =~ /lambda/;
 }
 
@@ -1514,12 +1530,14 @@ sub BUILD_CLASS
     my $tos = pop @stack;
     my $cl = temp('P');
     my $name = $tos->[1];
-    $classes{$name} = 1;
     $n = $name;
     $n =~ s/["]//g;
+    my $mangle = qq!"py::$n"!;
+    $classes{$n} = $mangle;
     print <<EOC;
-	$cl = subclass $parent_tuple->[1], $name $cmt
-	# Build::$n()
+	$cl = subclass $parent_tuple->[1], $mangle $cmt
+	global $name = $cl
+	Build::$n($cl)
 EOC
     push @stack, ["class $tos->[1]", $cl, 'P'];
 }
@@ -1554,10 +1572,10 @@ EOC
 sub STORE_ATTR
 {
     my ($n, $c, $cmt) = @_;
-    my $attr = pop @stack;
     my $obj = pop @stack;  # object
+    my $val = promote(pop @stack);
     print <<EOC;
-	# setattribute $obj->[1], .$attr->[1] $cmt
+	setattribute $obj->[1], "$c", $val $cmt
 EOC
 }
 

@@ -531,6 +531,9 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
     return Parrot_find_method_with_cache(interpreter, class, meth);
 }
 
+extern void
+parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object);
+
 static void
 do_py_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
 {
@@ -750,6 +753,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
         /*
          * we are coming from Python
          */
+        parrot_py_set_vtable(interpreter, class, object);
         do_py_initcall(interpreter, class, object);
 
     }

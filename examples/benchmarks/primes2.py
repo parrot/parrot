@@ -19,7 +19,7 @@ of primes and the last one found.
 
 """
 
-import os,sys
+# import os,sys
 def isprime1(input):
     if input < 1:
 	return 0

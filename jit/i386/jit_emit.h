@@ -11,7 +11,7 @@
 
 #include <assert.h>
 
-#define USE_CGP
+/* #define USE_CGP */
 
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && defined USE_CGP
 #  define JIT_CGP
