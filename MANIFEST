@@ -168,6 +168,8 @@ examples/assembly/io1.pasm
 examples/assembly/io2.pasm
 examples/assembly/jump.pasm
 examples/assembly/lexical.pasm
+examples/assembly/lexical2.pasm
+examples/assembly/lexical3.pasm
 examples/assembly/life.pasm
 examples/assembly/local_label.pasm
 examples/assembly/mandel.pasm
