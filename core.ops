@@ -198,12 +198,8 @@ AUTO_OP print(s|sc) {
 
 AUTO_OP print(p) {
   PMC *p = $1;
-  if (p->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
-    printf("%li",(long)(p->vtable->get_integer(interpreter, p)));
-  } else if (p->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
-    printf("%f",(p->vtable->get_number(interpreter, p)));
-  } else if (p->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
-    STRING* s = p->vtable->get_string(interpreter, p);
+  STRING *s = (p->vtable->get_string(interpreter, p));
+  if (s) {
     printf("%.*s",(int)string_length(s),(char *) s->bufstart);
   }
 }
