@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+#
+# $Id$
+#
 
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
@@ -16,9 +19,9 @@ use Getopt::Std;
 my $VERSION = "0.0.1";
 
 my %std_to = 
-  ( bugs => 'parrotbug@parrotcode.org',
-    ok   => 'parrotstatus-ok@parrotcode.org',
-    nok  => 'parrotstatus-nok@parrotcode.org'
+  ( bug => 'parrotbug@parrotcode.org',
+    ok  => 'parrotstatus-ok@parrotcode.org',
+    nok => 'parrotstatus-nok@parrotcode.org'
   );
 
 my $updir = File::Spec->updir();
@@ -65,8 +68,8 @@ A program to help generate bug reports about parrot, and mail them.
 
 Usage:
 
+ $0 [-s subject] [-b body] [-ok|-nok]
  $0 {-h|-V}
- $0 [-a address] [-r returnaddress] {-ok|-nok}
 
 Options:
   -h    Print this help message.
@@ -124,7 +127,6 @@ sub init {
 
 
     ## Report to be sent.
-
   sw: {
       opt_o: {
             last opt_o unless defined $opt_o;
@@ -146,11 +148,20 @@ sub init {
 
             # This a nok report, how sad... :-(
             $to = $std_to{nok};
-
+            $subject = "Not OK: parrot $parrot_version "
+              . "on $Config{archname} $Config{osvers}";
+            $body = "";
+            $category = "install";
+            $severity = "none";
             last sw;
         };
 
-        # neither an ok nor a nok.
+        # Neither an ok nor a nok.
+        $to = $std_to{bug};
+        $subject  = $opt_s || "";
+        $body     = $opt_b || "";
+        $category = "";
+        $secerity = "";
     };
 
 
