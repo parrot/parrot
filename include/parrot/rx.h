@@ -17,7 +17,10 @@
 
 #include "parrot/parrot.h"
 
-typedef char* Bitmap;
+typedef struct bitmap_t {
+	char *bmp;
+	STRING *bigchars;
+} * Bitmap;
 
 typedef enum rxflags {
 	enum_rxflags_none=0,
@@ -63,8 +66,10 @@ BOOLVAL  rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
 BOOLVAL  rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
 BOOLVAL  rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
 
-Bitmap make_bitmap(STRING* str);
-BOOLVAL check_bitmap(INTVAL ch, Bitmap bmp);
+Bitmap bitmap_make(struct Parrot_Interp *, STRING*);
+void bitmap_add(struct Parrot_Interp *, Bitmap, INTVAL);
+BOOLVAL bitmap_match(Bitmap, INTVAL);
+void bitmap_destroy(Bitmap);
 
 STRING *rxP_get_substr(struct Parrot_Interp *, STRING *, INTVAL, INTVAL);
 

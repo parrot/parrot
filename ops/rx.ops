@@ -755,38 +755,17 @@ op rx_oneof(in pmc, in str, in int) {
 
 	RxAssertMore(rx, $3);
 	
-	bitmap=make_bitmap($2);	
+	bitmap=bitmap_make(interpreter, $2);	
 	
-	if(!bitmap) {
-		INTVAL i;
-		STRING *ch1;
-		STRING *ch2;
-
-		ch1=RxCurCharS(rx);
+	if(bitmap_match(bitmap, RxCurChar(rx))) {
+		bitmap_destroy(bitmap);
 		
-		for(i=0; i < string_length($2); i++) {
-			ch2=rxP_get_substr(interpreter, $2, i, 1);
-		
-			if(string_compare(interpreter, ch1, ch2)==0) {
-				RxAdvance(rx);
-				goto NEXT();
-			}
-			else if(string_compare(interpreter, ch1, ch2) < 0) {
-				goto OFFSET($3);
-			}
-		}
-
-		goto OFFSET($3);
+		RxAdvance(rx);
+		goto NEXT();
 	}
 	else {
-		if(check_bitmap(RxCurChar(rx), bitmap)) {
-			mem_sys_free(bitmap);
-			RxAdvance(rx);
-			goto NEXT();
-		}
-		else {
-			goto OFFSET($3);
-		}
+		bitmap_destroy(bitmap);
+		goto OFFSET($3);
 	}
 }
 
@@ -805,7 +784,7 @@ op rx_oneof_bmp(in pmc, in pmc, in int) {
 	
 	RxAssertMore(rx, $3);
 	
-	if(check_bitmap(RxCurChar(rx), $2->data)) {
+	if(bitmap_match($2->data, RxCurChar(rx))) {
 		RxAdvance(rx);
 		goto NEXT();
 	}
@@ -829,7 +808,7 @@ whatever character set you're using).  This may change in the future.
 
 op rx_makebmp(out pmc, in str) {
 	$1=pmc_new(interpreter, enum_class_ParrotPointer);
-	$1->data=(void*)make_bitmap($2);
+	$1->data=(void*)bitmap_make(interpreter, $2);
 	
 	goto NEXT();
 }
@@ -855,10 +834,10 @@ op rx_dot(in pmc, in int) {
 	}
 	else {
 		if(!bmp) {
-			bmp=make_bitmap(cstr2pstr("\r\n"));
+			bmp=bitmap_make(interpreter, cstr2pstr("\r\n"));
 		}
 
-		if(!check_bitmap(RxCurChar(rx), bmp)) {
+		if(!bitmap_match(bmp, RxCurChar(rx))) {
 			RxAdvance(rx);
 			goto NEXT();
 		}
