@@ -541,7 +541,12 @@ inline op set(out STR, in PMC) {
   goto NEXT();
 }
 
-inline op set(out STR, in STR) {
+inline op set(out STR, invar STR) {
+  $1 = $2;
+  goto NEXT();
+}
+
+inline op set(out STR, inconst STR) {
   $1 = string_copy(interpreter, $2);
   goto NEXT();
 }
@@ -553,6 +558,11 @@ inline op set(out STR, in INT) {
 
 inline op set(out STR, in NUM) {
   $1 = Parrot_sprintf_c(interpreter, "%f", $2);
+  goto NEXT();
+}
+
+inline op set(out PMC, in PMC) {
+  $1 = $2;
   goto NEXT();
 }
 

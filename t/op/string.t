@@ -33,18 +33,18 @@ CODE
 output_is( <<'CODE', <<OUTPUT, "chopn_s_i|ic" );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
- set S3, S4
+        clone     S3, S4
 	set	S1, "\n"
 	set	I1, 4
 	chopn	S4, 3
 	chopn	S4, 1
- chopn S5, I1
+        chopn S5, I1
 	print	S4
- print S1
+        print S1
 	print	S5
- print S1
+        print S1
 	print	S3
- print S1
+        print S1
 	end
 CODE
 JAPH

@@ -173,7 +173,7 @@ sub read_ops
       my @temp = ();
 
       foreach my $arg (@args) {
-	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst)\s+(INT|NUM|STR|PMC)$/i;
+	my ($use, $type) = $arg =~ m/^(in|out|inout|inconst|invar)\s+(INT|NUM|STR|PMC)$/i;
 
         die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
 
@@ -183,6 +183,10 @@ sub read_ops
           push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
           push @argdirs, 'i';
         }
+	elsif ($use eq 'invar') {
+	  push @temp, $type;
+	  push @argdirs, 'i';
+	}
         elsif ($use eq 'inconst') {
 	  die "Parrot::OpsFile: Arg format 'inconst PMC' is not allowed!"
 		if $type eq 'p';
