@@ -560,7 +560,7 @@ Optional argument IGNORE-LABELP if set, labels are ignored for the purposes of c
 	 ((or (looking-at "\\s<\\s<\\s<\\S<")
 	      (pir-before-magic-comment-p))
 	  (setq icol (list 0 icol)))
-	 ((looking-at "\\s\\S<")
+	 ((looking-at "\\s<\\S<")
 	  (setq icol (list comment-column icol)))))
       icol))
 
