@@ -150,8 +150,6 @@ pmclass TclInt extends TclObject dynpmc group tcl_group {
         }
     }
 
-/*
-
     void subtract_int (INTVAL value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             PMC_int_val(SELF) - value
