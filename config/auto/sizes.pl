@@ -27,7 +27,7 @@ sub runstep {
 	  'hugefloatval'     => 'double',
           'hugefloatvalsize' => 8,
 	  'int2_t'           => 'int',
-	  'int4_t'           => 'int',			     
+	  'int4_t'           => 'int',
 	  'float4_t'         => 'double',
 	  'float8_t'         => 'double',
         );
@@ -105,33 +105,26 @@ Can't find a float type with size 8, conversion ops might fail!
 END
   }
 
-  #Get HUGEINTVAL
-  if(my $size=eval {
-    open(TEST, ">test.c") or die "Can't open test.c: $!";
-    print TEST <<'END';
-#include <stdio.h>
+  #Get HUGEINTVAL, note that we fallback to shorter integers
+  #if we can't get a 64-bit type
+  foreach my $type ('long long', '__int64', 'long', 'int') {
+    my %results;
 
-int main() {
-    long long foo;
-    printf("%u", sizeof(foo));
-    return 0;
-}
-END
-    close TEST;
+    Configure::Data->set('int8_t' => $type);
+    eval {
+      cc_gen('config/auto/sizes/test2_c.in');
+      cc_build();
+      %results=eval cc_run();
+    };
 
-    cc_build();
-    cc_run();
-  }) {
-    Configure::Data->set(
-        'hugeintval'     => 'long long',
-        'hugeintvalsize' => $size
-    );
-  }
-  else {
-    Configure::Data->set(
-        'hugeintval'     => 'long',
-        'hugeintvalsize' => Configure::Data->get('longsize')
-    );
+    # clear int8_t on error
+    if($@) {
+      Configure::Data->set('int8_t' => undef);
+      next;
+    }
+
+    Configure::Data->set(%results);
+    last;
   }
 
   cc_clean();

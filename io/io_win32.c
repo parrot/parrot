@@ -12,10 +12,10 @@
  *      Win32 System Programming, 2nd Edition
  */
 
-#include "parrot/parrot.h"
-
 #ifdef PIO_OS_WIN32
 
+#  include <windows.h>
+#  include "parrot/parrot.h"
 #  include <tchar.h>
 
 /* Defined at bottom */
@@ -246,7 +246,7 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     /* do it by hand, Win32 hasn't any specific flag */
     if (io->flags & PIO_F_APPEND)
     {
-        PIOOFF_T p;
+        LARGE_INTEGER p;
         p.LowPart = 0;
         p.HighPart = 0;
 
@@ -281,7 +281,7 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
     /* do it by hand, Win32 hasn't any specific flag */
     if (io->flags & PIO_F_APPEND)
     {
-        PIOOFF_T p;
+        LARGE_INTEGER p;
         p.LowPart = 0;
         p.HighPart = 0;
 
@@ -306,7 +306,7 @@ INTVAL
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                INTVAL hi, INTVAL lo, INTVAL whence)
 {
-    PIOOFF_T p, offset;
+    LARGE_INTEGER p, offset;
     offset.LowPart = lo;
     offset.HighPart = hi;
     p.LowPart = SetFilePointer(io->fd, offset.LowPart,
@@ -315,7 +315,7 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
         /* Error - exception */
         return -1;
     }
-    io->fpos = p;
+    io->fpos = p.QuadPart;
     return 0;
 }
 
@@ -323,12 +323,13 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 PIOOFF_T
 PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
-    PIOOFF_T p = piooffsetzero;
+    LARGE_INTEGER p;
+    p.QuadPart = piooffsetzero;
     p.LowPart = SetFilePointer(io->fd, 0, &p.HighPart, FILE_CURRENT);
     if (p.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR) {
         /* FIXME: Error - exception */
     }
-    return p;
+    return p.QuadPart;
 }
 
 

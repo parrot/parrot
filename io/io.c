@@ -612,6 +612,26 @@ PIO_seek(theINTERP, ParrotIO *io, INTVAL hi, INTVAL lo, INTVAL w)
 
 
 /*
+ * Iterate down the stack to the first layer implementing "Tell" API
+ */
+PIOOFF_T
+PIO_tell(theINTERP, ParrotIO *io)
+{
+    if (io) {
+        ParrotIOLayer *l = io->stack;
+        while (l) {
+            if (l->api->Tell) {
+                return (*l->api->Tell) (interpreter, l, io);
+            }
+            l = PIO_DOWNLAYER(l);
+        }
+    }
+
+    return -1;
+}
+
+
+/*
  * Iterate down the stack to the first layer implementing "Read" API
  */
 INTVAL

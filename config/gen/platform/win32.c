@@ -4,8 +4,8 @@
 */
 
 #include <time.h>
+#include <windows.h>
 #include "parrot/parrot.h"
-
 
 /*
 ** Parrot_intval_time()

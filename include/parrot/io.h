@@ -114,8 +114,8 @@ struct _ParrotIOBuf {
 
 
 #ifdef PIO_OS_WIN32
-typedef HANDLE PIOHANDLE;
-typedef LARGE_INTEGER PIOOFF_T;
+typedef Parrot_WIN32_HANDLE PIOHANDLE;
+typedef Parrot_OFF_T PIOOFF_T;
 #endif
 #ifdef PIO_OS_UNIX
 typedef int PIOHANDLE;
@@ -328,7 +328,7 @@ extern INTVAL PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...);
 extern INTVAL PIO_printf(theINTERP, const char *s, ...);
 extern INTVAL PIO_eprintf(theINTERP, const char *s, ...);
 extern INTVAL PIO_getfd(theINTERP, ParrotIO *io);
-
+extern PIOOFF_T PIO_tell(theINTERP, ParrotIO *io);
 
 /* Put platform specific macros here if you must */
 #ifdef PIO_OS_WIN32
