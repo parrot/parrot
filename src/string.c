@@ -384,6 +384,9 @@ string_make_empty(Interp *interpreter,
 
     s = new_string_header(interpreter, 0);
 
+    /*
+     * TODO adapt string creation functions
+     */
     if (representation == enum_stringrep_one) {
         s->charset = PARROT_DEFAULT_CHARSET;
         s->encoding = CHARSET_GET_PREFERRED_ENCODING(interpreter, s);;

@@ -165,7 +165,6 @@ cs_rindex(Interp *interpreter, const STRING *source_string,
     return 0;
 }
 
-/* Binary's always valid */
 static UINTVAL
 validate(Interp *interpreter, STRING *source_string)
 {
@@ -287,12 +286,16 @@ find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
-    STRING *return_string;
+    STRING *dest;
+    String_iter iter;
 
-    return_string = string_make(interpreter, "", 1, "unicode", 0);
-    return_string->strlen = 1;
-    ENCODING_SET_CODEPOINT(interpreter, return_string, 0, codepoint);
-    return return_string;
+    dest = string_make(interpreter, "", 1, "unicode", 0);
+    dest->strlen = 1;
+    ENCODING_ITER_INIT(interpreter, dest, &iter);
+    iter.set_and_advance(interpreter, &iter, codepoint);
+    dest->bufused = iter.bytepos;
+
+    return dest;
 }
 
 static size_t

@@ -47,19 +47,13 @@ void *Parrot_utf8_encode(void *ptr, UINTVAL c);
 static size_t
 PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
 {
-    STRING n;
-    size_t idx, length = string_length(interpreter, s);
-    char *buffer = malloc(4*length);
-    char *cursor = buffer;
+    STRING *dest;
 
-    for( idx = 0; idx < length; ++idx )
-    {
-        cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, idx));
-    }
+    if (s->encoding == Parrot_utf8_encoding_ptr)
+        return PIO_write_down(interpreter, l->down, io, s);
 
-    n.strstart = buffer;
-    n.bufused = cursor - buffer;
-    return PIO_write_down(interpreter, l->down, io, &n);
+    dest = Parrot_utf8_encoding_ptr->copy_to_encoding(interpreter, s);
+    return PIO_write_down(interpreter, l->down, io, dest);
 }
 
 static const ParrotIOLayerAPI pio_utf8_layer_api = {

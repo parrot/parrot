@@ -306,23 +306,55 @@ utf8_set_position(Interp *interpreter, String_iter *i, UINTVAL pos)
 
 
 /* This function needs to go through and get all the code points one
-   by one and turn them into a byte */
+   by one and turn them into a utf8 sequence */
 static void
 to_encoding(Interp *interpreter, STRING *src)
 {
+    if (src->encoding == Parrot_utf8_encoding_ptr)
+        return;
     UNIMPL;
 }
 
 static STRING *
 copy_to_encoding(Interp *interpreter, STRING *src)
 {
-    STRING *return_string = NULL;
+    STRING *dest;
+    String_iter src_iter, dest_iter;
+    UINTVAL offs, c;
 
-    UNIMPL;
-    return return_string;
+    if (src->encoding == Parrot_utf8_encoding_ptr)
+        return string_copy(interpreter, src);
+
+    /*
+     * TODO adapt string creation functions
+     */
+    dest = string_make_empty(interpreter, enum_stringrep_one, src->strlen);
+    dest->charset  = Parrot_unicode_charset_ptr;
+    dest->encoding = Parrot_utf8_encoding_ptr;
+    dest->strlen   = src->strlen;
+
+    if (!src->strlen)
+        return dest;
+
+    ENCODING_ITER_INIT(interpreter, src, &src_iter);
+    ENCODING_ITER_INIT(interpreter, dest, &dest_iter);
+
+    for (offs = 0; offs < src->strlen; ++offs) {
+        c = src_iter.get_and_advance(interpreter, &src_iter);
+        if (dest_iter.bytepos >= PObj_buflen(dest) - 4) {
+            UINTVAL need = (src->strlen - offs) * 1.5;
+            if (need < 16)
+                need = 16;
+            Parrot_reallocate_string(interpreter, dest,
+                    PObj_buflen(dest) + need);
+        }
+        dest_iter.set_and_advance(interpreter, &dest_iter, c);
+    }
+    assert(dest->strlen  == dest_iter.charpos);
+    dest->bufused = dest_iter.bytepos;
+    return dest;
 }
 
-/* codepoints are bytes, so delegate */
 static UINTVAL
 get_codepoint(Interp *interpreter, const STRING *src, UINTVAL offset)
 {
@@ -337,9 +369,15 @@ set_codepoint(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL codepoint)
 {
     const void *start;
+    void *p;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     start = utf8_skip_forward(src->strstart, offset);
-    utf8_encode(start, codepoint);
+    p = const_cast(start);
+    utf8_encode(p, codepoint);
 }
 
 static UINTVAL
