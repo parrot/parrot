@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "open/close");
@@ -324,6 +324,20 @@ output_is(<<'CODE', <<'OUTPUT', 'puts method');
 ok1:   print "ok 1\n"
        find_method P0, P5, "puts"
        invoke
+       end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', 'callmeth puts');
+       getstderr P2	# the object
+       set S0, "puts"	# method
+       set P5, P2	# first param
+       set S5, "ok 1\n"	# 2nd param
+       callmeth
+       set S5, "ok 2\n"
+       callmeth
        end
 CODE
 ok 1
