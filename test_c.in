@@ -8,7 +8,8 @@
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-	printf("%d/%d/%d", sizeof(${iv}), sizeof(long), sizeof(${nv}));
+	printf("%d/%d/%d/%d", 
+	    sizeof(${iv}), sizeof(long), sizeof(${nv}), sizeof(${opcode_t}));
 	return 0;
 }
 

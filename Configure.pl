@@ -134,9 +134,10 @@ END
 
 buildfile("test_c");
 system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
-(@c{qw(ivsize longsize nvsize)})=split('/', `./test_siz$c{exe}`);
+(@c{qw(ivsize longsize nvsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
 die "Something wicked happened!" 
-    unless defined $c{ivsize} and defined $c{longsize} and defined $c{nvsize};
+    unless defined $c{ivsize} and defined $c{longsize} and 
+	   defined $c{nvsize} and defined $c{opcode_t_size};
 unlink('test.c', "test_siz$c{exe}", "test$c{o}");
 
 print <<"END";
@@ -145,20 +146,23 @@ Done. Now I'm figuring out what formats to pass to pack() for the
 various Parrot internal types.
 END
 
-my %pack_type;
+
 # Alas perl5.7.2 doesn't have an IV flag for pack().
 # The ! modifier only works for perl 5.6.x or greater.
-if (($] >= 5.006) && ($c{ivsize} == $c{longsize}) ) {
-    $c{packtype_i} = 'l!';
-    $c{packtype_op} = 'l!';
-}
-elsif ($c{ivsize} == 4) {
-    $c{packtype_i} = 'l';
-    $c{packtype_op} = 'l';
-}
-elsif ($c{ivsize} == 8) {
-    $c{packtype_i} = 'q';
-    $c{packtype_op} = 'l';
+foreach ('ivsize', 'opcode_t_size') {
+    my $which = $_ eq 'ivsize' ? 'packtype_i' : 'packtype_op';
+    if (($] >= 5.006) && ($c{$_} == $c{longsize}) ) {
+	$c{$which} = 'l!';
+    }
+    elsif ($c{$_} == 4) {
+	$c{$which} = 'l';
+    }
+    elsif ($c{$_} == 8) {
+	$c{$which} = 'q';
+    }
+    else {
+	die "Configure.pl:  Unable to find a suitable packtype for $_.\n";
+    }
 }
 
 $c{packtype_n} = 'd';
