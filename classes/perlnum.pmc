@@ -634,6 +634,37 @@ Decrements the number.
         PMC_num_val(SELF) --;
     }
 
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the number.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_float(INTERP, io, PMC_num_val(SELF));
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the number.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_num_val(SELF) = io->vtable->shift_float(INTERP, io);
+    }
+
 }
 
 /*

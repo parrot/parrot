@@ -16,7 +16,7 @@ Tests the freeze/thaw archiving subsystem.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlInt");
@@ -51,6 +51,21 @@ CODE
 PerlString foo
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlNum");
+    new P1, .PerlNum
+    set P1, 3.14159
+    freeze S0, P1
+    
+    thaw P10, S0
+    typeof S10, P10
+    print S10
+    print " "
+    print P10
+    print "\n"
+    end
+CODE
+PerlNum 3.141590
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "freeze/thaw a PerlArray");
     new P0, .PerlArray

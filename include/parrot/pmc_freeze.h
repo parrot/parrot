@@ -41,11 +41,11 @@ typedef struct _image_funcs {
     push_integer_f      push_integer;
     push_pmc_f          push_pmc;
     push_string_f       push_string;
-    push_number_f       push_number;
+    push_number_f       push_float;
     shift_integer_f     shift_integer;
     shift_pmc_f         shift_pmc;
     shift_string_f      shift_string;
-    shift_number_f      shift_number;
+    shift_number_f      shift_float;
 } image_funcs;
 
 typedef struct _image_io {
