@@ -28,12 +28,16 @@
 #define Parrot_INTERP struct Parrot_Interp *
 #define Parrot_STRING STRING *
 #define Parrot_PMC PMC *
+#define Parrot_Language Parrot_Int
 
 #else
 
 typedef void * Parrot_INTERP;
 typedef void * Parrot_STRING;
 typedef void * Parrot_PMC;
+typedef void * Parrot_Encoding;
+typedef Parrot_Int Parrot_Language;
+typedef void * Parrot_CharType;
 
 #endif
 
@@ -66,6 +70,12 @@ void Parrot_set_intreg(Parrot_INTERP, Parrot_Int, Parrot_Int);
 void Parrot_set_numreg(Parrot_INTERP, Parrot_Int, Parrot_Float);
 void Parrot_set_strreg(Parrot_INTERP, Parrot_Int, Parrot_STRING);
 void Parrot_set_pmcreg(Parrot_INTERP, Parrot_Int, Parrot_PMC);
+
+Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, Parrot_Encoding, Parrot_CharType, Parrot_Language, Parrot_Int);
+
+const Parrot_CharType Parrot_find_chartype(Parrot_INTERP, char*);
+Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
+const Parrot_Encoding Parrot_find_encoding(Parrot_INTERP, char*);
 
 #endif
 

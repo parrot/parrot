@@ -227,7 +227,7 @@ Parrot_PMC Parrot_get_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum) {
 
 /*=for api extend Parrot_set_intreg
  *
- * Set the value of a  register
+ * Set the value of an I register
  */
 void Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Int value) {
     REG_INT(regnum) = value;
@@ -235,7 +235,7 @@ void Parrot_set_intreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Int 
 
 /*=for api extend Parrot_set_numreg
  *
- * Set the value of a  register
+ * Set the value of an N register
  */
 void Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Float value) {
     REG_NUM(regnum) = value;
@@ -243,7 +243,7 @@ void Parrot_set_numreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_Floa
 
 /*=for api extend Parrot_set_strreg
  *
- * Set the value of a  register
+ * Set the value of an S register
  */
 void Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_STRING value) {
     REG_STR(regnum) = value;
@@ -251,12 +251,55 @@ void Parrot_set_strreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_STRI
 
 /*=for api extend Parrot_set_pmcreg
  *
- * Set the value of a  register
+ * Set the value of a P  register
  */
 void Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_PMC value) {
     REG_PMC(regnum) = value;
 }
 
+/*=for api extend Parrot_new_string
+ *
+ * Create a new Parrot string from a passed-in buffer. If the
+ * encoding, charset, or langage are 0, then use the default. Pass in
+ * a 0 for flags for right now.
+ *
+ * A copy of the buffer is made.
+ *
+ */
+Parrot_STRING Parrot_new_string(Parrot_INTERP interpreter,
+                                char *buffer, int length,
+                                Parrot_Encoding encoding,
+                                Parrot_CharType charset,
+                                Parrot_Language language,
+                                Parrot_Int flags) {
+    return string_make(interpreter, buffer, length, encoding, flags, charset);
+}
+
+/*=for api extend Parrot_find_encoding
+ *
+ * Find the magic token for an encoding, by name
+ */
+const Parrot_Encoding Parrot_find_encoding(Parrot_INTERP interpreter, char *encoding_name) {
+    return Parrot_encoding_lookup(encoding_name);
+}
+
+/*=for api extend Parrot_find_language
+ *
+ * Find the magic language token for a language, by language name
+ *
+ */
+Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *langauge) {
+    return 0;
+}
+
+/*=for api extend Parrot_find_chartype
+ *
+ * Find the magic token for a chartype, by name
+ *
+ */
+const Parrot_CharType Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype) {
+    return Parrot_chartype_lookup(chartype);
+}
 /*
  * Local variables:
  * c-indentation-style: bsd
