@@ -1049,6 +1049,13 @@ OK8:	print	"ok 8\\n"
 	print	"not "
 OK9:	print	"ok 9\\n"
 
+# An empty register should be false...
+        clears
+        if      S1, BAD10
+        branch  OK10
+BAD10:	print	"not "
+OK10:	print	"ok 10\\n"
+
 	end
 CODE
 ok 1
@@ -1060,6 +1067,7 @@ ok 6
 ok 7
 ok 8
 ok 9
+ok 10
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "repeat_s_s|sc_i|ic");
