@@ -25,6 +25,10 @@ N: Angel Faus
 N: Ask Bjoern Hansen
 
 N: Brent Dax
+D: Configure, Parrot_sprintf, embedding, early regex engine.
+D: Youngest Parrot hacker to hold a pumpkin (Configure).
+E: brent@brentdax.com
+W: http://www.brentdax.com/
 
 N: Dan Sugalski 
 D: The big cheese 
