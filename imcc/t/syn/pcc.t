@@ -3,7 +3,7 @@
 # $Id$
 
 use strict;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 ##############################
 # Parrot Calling Conventions
@@ -1518,3 +1518,10 @@ new
 ok
 OUT
 
+pir_output_is(<<'CODE', <<'OUT', "multi 1");
+.sub foo @MULTI()
+    print "ok 1\n"
+.end
+CODE
+ok 1
+OUT

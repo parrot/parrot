@@ -211,6 +211,7 @@ SP              [ ]
 "prototyped"    return(PROTOTYPED);
 "non_prototyped"    return(NON_PROTOTYPED);
 "method"        return(METHOD);
+<emit,INITIAL>"@MULTI"   return(MULTI);
 <emit,INITIAL>"@MAIN"    return(MAIN);
 <emit,INITIAL>"@LOAD"    return(LOAD);
 <emit,INITIAL>"@IMMEDIATE"    return(IMMEDIATE);

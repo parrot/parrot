@@ -879,7 +879,7 @@ expand_pcc_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
              * sub->pcc_sub->sub is an actual subroutine name,
              * not a variable.
              */
-            reg = mk_temp_reg(interp, 'P');
+            reg = get_pasm_reg(interp, "P0");
             add_pcc_sub(sub, reg);
             /*
              * insert set_p_pc with the sub as constant
@@ -954,10 +954,12 @@ move_sub:
         /* plain sub call */
         if (arg->color != 0) {
             reg = get_pasm_reg(interp, "P0");
-            regs[0] = reg;
-            regs[1] = arg;
-            arg->want_regno = 0;
-            ins = insINS(interp, unit, ins, "set", regs, 2);
+            if (reg != arg) {
+                regs[0] = reg;
+                regs[1] = arg;
+                arg->want_regno = 0;
+                ins = insINS(interp, unit, ins, "set", regs, 2);
+            }
         }
     }
 

@@ -347,6 +347,7 @@ begin_return_or_yield(Interp *interp, int yield)
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> PROTOTYPED NON_PROTOTYPED MAIN LOAD IMMEDIATE POSTCOMP METHOD ANON
+%token <t> MULTI
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
@@ -360,10 +361,10 @@ begin_return_or_yield(Interp *interp, int yield)
 %type <s> classname relop
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
-%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
+%type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results
 %type <sr> pcc_returns pcc_return pcc_call arg the_sub
 %type <t> pcc_return_many
-%type <t> pcc_proto pcc_sub_proto proto
+%type <t> pcc_proto pcc_sub_proto proto sub_proto multi
 %type <i> instruction assignment if_statement labeled_inst opt_label op_assign
 %type <i> func_assign
 %type <i> opt_invocant
@@ -572,13 +573,16 @@ sub:
            cur_unit = (pragmas.fastcall ? imc_open_unit(interp, IMC_FASTSUB)
                                           : imc_open_unit(interp, IMC_PCCSUB));
         }
-     sub_label_op_c pcc_sub_proto '\n'
+     sub_label_op_c
         {
           Instruction *i = iSUBROUTINE(cur_unit, $3);
+          /*
+           * $<sr>$ is the SymReg value of this action rule
+           */
           i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
           add_namespace(interp, cur_unit);
-          i->r[1]->pcc_sub->pragma = $4;
         }
+     sub_proto '\n' { $<sr>4->pcc_sub->pragma = $5; }
      sub_params
      sub_body  ESUB { $$ = 0; }
    ;
@@ -586,12 +590,23 @@ sub:
 sub_params:
      /* empty */                       { $$ = 0; } %prec LOW_PREC
    | '\n'                              { $$ = 0; }
-   | sub_params sub_param '\n'         { add_pcc_param($<sr>0, $2);}
+   | sub_params sub_param '\n'         { add_pcc_param($<sr>-3, $2);}
    ;
 
 sub_param:
      PARAM                             { is_def=1; }
      type IDENTIFIER          { $$ = mk_ident(interp, $4, $3); is_def=0; }
+   ;
+
+sub_proto:
+     /* empty */    {  $$ = P_NONE; }
+   | sub_proto COMMA proto  { $$ |= $3; }
+   | sub_proto COMMA multi { $$ = $1; }
+   | proto          { $$ |= $1; }
+   | multi          { $$ = P_NONE; }
+   ;
+
+multi: MULTI '(' ')'  { $$ = 0; }
    ;
 
 sub_body:
@@ -601,26 +616,16 @@ sub_body:
 
 pcc_sub:
      PCC_SUB       { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
-     IDENTIFIER pcc_sub_proto '\n'
+     IDENTIFIER
          {
             Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
             i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
             add_namespace(interp, cur_unit);
-            i->r[1]->pcc_sub->pragma = $4;
+
          }
-     pcc_params
+     sub_proto '\n' { $<sr>4->pcc_sub->pragma = $5; }
+     sub_params
      sub_body  ESUB { $$ = 0; }
-   ;
-
-pcc_params:
-     /* empty */                       { $$ = 0; } %prec LOW_PREC
-   | '\n'                              { $$ = 0; }
-   | pcc_params pcc_param '\n'         { add_pcc_param($<sr>0, $2);}
-   ;
-
-pcc_param:
-     PARAM                             { is_def=1; }
-     type IDENTIFIER            { $$ = mk_ident(interp, $4, $3); is_def=0; }
    ;
 
 pcc_sub_call:
