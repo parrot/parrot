@@ -463,8 +463,8 @@ Write $2 to file descriptor $1.
 =cut
 
 op write(i|ic, i|ic) {
-  INTVAL * i = &($2);
-  write($1, i, sizeof(INTVAL));
+  INTVAL i = (INTVAL)$2;
+  write($1, &i, sizeof(INTVAL));
   goto NEXT();
 }
 
