@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -817,3 +817,68 @@ l
 m
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
+    newclass P1, "Foo"
+    find_global P2, "set_i"
+    store_global "Foo", "__set_integer_native", P2
+    find_global P2, "add"
+    store_global "Foo", "__add", P2
+    find_global P2, "get_s"
+    store_global "Foo", "__get_string", P2
+    # must add attributes before object instantiation
+    addattribute P1, ".i"
+
+    find_type I1, "Foo"
+    new P3, I1
+    set P3, 1
+    new P4, I1
+    set P4, 1
+    new P5, I1
+
+    add P5, P3, P4
+    # the print below calls __get_string
+    print P5
+    print "\n"
+    set P4, 41
+    add P5, P3, P4
+    print P5
+    print "\n"
+    end
+
+.pcc_sub set_i:
+    print "in set_integer\n"
+    classoffset I0, P2, "Foo"
+    new P6, .PerlInt
+    set P6, I5
+    setattribute P2, I0, P6
+    invoke P1
+.pcc_sub add:
+    print "in add\n"
+    classoffset I0, P2, "Foo"
+    getattribute P10, P2, I0
+    getattribute P11, P5, I0
+    new P12, .PerlInt
+    add P12, P10, P11
+    setattribute P6, I0, P12
+    invoke P1
+.pcc_sub get_s:
+    print "in get_string\n"
+    classoffset I0, P2, "Foo"
+    getattribute P10, P2, I0
+    set S5, P10
+    set I0, P10
+    ne I0, 2, no_2
+    set S5, "two"
+no_2:
+    invoke P1
+CODE
+in set_integer
+in set_integer
+in add
+in get_string
+two
+in set_integer
+in add
+in get_string
+42
+OUTPUT
