@@ -162,6 +162,15 @@ BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 
+INTVAL
+PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream);
+
+FLOATVAL
+PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream);
+
+void
+PackFile_assign_transforms(struct PackFile *pf);
+
 /*
 ** Byte Ordering Functions (byteorder.c)
 */

@@ -131,9 +131,9 @@ PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream) {
 
 /***************************************
 
-=item fetch_iv
+=item fetch_nv
 
-Fetch an INTVAL from the stream, converting
+Fetch a FLOATVAL from the stream, converting
 byteorder if needed.
 
 =cut
