@@ -183,7 +183,7 @@ chartype_create_from_mapping(const char *name)
 
     while (!feof(f)) {
         char *p = fgets(line, 80, f);
-        if (line[0] != '#') {
+        if (p && *p != '#') {
             int n = sscanf(line, "%li\t%li", &typecode, &unicode);
             if (n == 2 && typecode >= 0) {
                 if (typecode < 256 && typecode == one2one && 
