@@ -495,7 +495,7 @@ Assuming we want an object of class C<Foo>:
 
   .local int FooType
   .local pmc MyObject
-  findtype FooType, "Foo"
+  find_type FooType, "Foo"
   new MyObject, FooType
 
 =head2 Calling a method on an object
