@@ -712,6 +712,24 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     return ret;
 }
 
+INTVAL
+PIO_getfd(theINTERP, ParrotIO *io)
+{
+    INTVAL i;
+    ParrotIOTable table = ((ParrotIOData*)interpreter->piodata)->table;
+
+    for(i = 0; i < PIO_NR_OPEN; i++) {
+        if (table[i] == io) return i;
+        if (table[i] == NULL) {
+            table[i] = io;
+            return i;
+        }
+    }
+
+    /* XXX boe: increase size of the fdtable */
+    return -1;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

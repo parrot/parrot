@@ -127,8 +127,8 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
     flags |= PIO_F_FILE;
 
     /* Try open with no create first */
-    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR), mode)) < 0
-           && errno == EINTR)
+    while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR | O_APPEND), mode)) 
+           < 0 && errno == EINTR)
         errno = 0;
 
     /* File open */

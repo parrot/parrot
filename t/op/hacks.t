@@ -1,7 +1,10 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 9;
 use Test::More;
+
+TODO: {
+  local $TODO = "readline not yet ported to PIO";
 
 # It would be very embarrassing if these didn't work...
 open FOO, ">temp.file";
@@ -20,9 +23,6 @@ CODE
 1
 2
 OUTPUT
-
-SKIP: {
-  skip("open not already ported to PIO", 1);
 
 open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
@@ -53,8 +53,8 @@ OUTPUT
 
 open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
-}
 
+# This one passes, but for the wrong reason
 output_is(<<'CODE', <<'OUTPUT', "3-arg open");
        open I1, "temp.file", "w"
        print "Foobar\n"
@@ -69,5 +69,57 @@ output_is(<<'CODE', <<'OUTPUT', "3-arg open");
 CODE
 Foobar
 OUTPUT
+}
 unlink("temp.file");
+
+output_is(<<'CODE', <<'OUTPUT', 'open and close');
+       open I1, "temp.file"
+       print I1, "Hello, World!\n"
+       close I1
+       print "done\n"
+       end
+CODE
+done
+OUTPUT
+
+$/=undef; # slurp mode
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'file contents');
+Hello, World!
+OUTPUT
+
+close FOO;
+
+output_is(<<'CODE', '', 'append');
+       open I1, "temp.file", ">>"
+       print I1, "Parrot flies\n"
+       close I1
+       end
+CODE
+
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'append file contents');
+Hello, World!
+Parrot flies
+OUTPUT
+
+close FOO;
+
+output_is(<<'CODE', '', 'write to file');
+       open I1, "temp.file", ">"
+       print I1, "Parrot overwrites\n"
+       close I1
+       end
+CODE
+
+open FOO, "temp.file";
+
+is(<FOO>, <<'OUTPUT', 'file contents');
+Parrot overwrites
+OUTPUT
+         
+unlink("temp.file");
+
 1; # HONK
