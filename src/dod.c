@@ -371,7 +371,14 @@ trace_children(Interp *interpreter, PMC *current)
             return 0;
         }
         arena_base->dod_trace_ptr = current;
-        if (!PObj_needs_early_DOD_TEST(current))
+        /*
+         * clearing the flag is much more expensive then testing
+         */
+        if (!PObj_needs_early_DOD_TEST(current)
+#if ARENA_DOD_FLAGS
+                && PObj_high_priority_DOD_TEST(current)
+#endif
+                )
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark properties */
@@ -388,7 +395,7 @@ trace_children(Interp *interpreter, PMC *current)
 
                 if (data) {
                     for (i = 0; i < PMC_int_val(current); i++) {
-                        if (!PMC_IS_NULL(data[i])) {
+                        if (data[i]) {
                             pobject_lives(interpreter, (PObj *)data[i]);
                         }
                     }
