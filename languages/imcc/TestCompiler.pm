@@ -77,19 +77,20 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+	my $IMCC = $ENV{IMCC} || './imcc';
 
 	if ($gen_pasm) {
 	    $TEST_PROG_ARGS =~ s/-O.//;
-	    system("./imcc ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
+	    system("$IMCC ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
 	}
 	elsif ($TEST_PROG_ARGS =~ /-c/) {
 	    my $pbc_f = per_test('.pbc',$count);
 	    $TEST_PROG_ARGS =~ s/-c//;
-	    system("./imcc ${TEST_PROG_ARGS} -o $pbc_f $by_f");
-	    system("./imcc -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
+	    system("$IMCC ${TEST_PROG_ARGS} -o $pbc_f $by_f");
+	    system("$IMCC -r ${TEST_PROG_ARGS} $pbc_f >$out_f");
 	}
 	else {
-	    system("./imcc -r ${TEST_PROG_ARGS} $by_f >$out_f");
+	    system("$IMCC -r ${TEST_PROG_ARGS} $by_f >$out_f");
 	}
 
 	my $meth = $Test_Map{$func};

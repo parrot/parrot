@@ -22,7 +22,7 @@ typedef struct _basic_block {
     int flag;
 } Basic_block;
 
-enum {
+EXTERN enum {
 	BB_IS_SUB = 1 << 0
 } block_enum_flags;
 

@@ -85,7 +85,7 @@ EXTERN int has_compile;
 EXTERN int allocated;
 
 
-enum {
+EXTERN enum {
 	OPT_NONE,
 	OPT_PRE,
 	OPT_CFG = 	0x002,

@@ -209,6 +209,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
                 tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
                 debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
+                ins = tmp;
                 found = 1;
                 break;
             }
@@ -236,6 +237,7 @@ static void strength_reduce(struct Parrot_Interp *interp)
             tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
             debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
             subst_ins(ins, tmp, 1);
+            ins = tmp;
             continue;
         }
         /*
@@ -254,7 +256,8 @@ set_it:
             debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
             if (ins->opsize == 3) {
                 /* mul Ix, 1 */
-                delete_ins(ins, 1);
+                ins = delete_ins(ins, 1);
+                ins = ins->prev ? ins->prev : instructions;
                 debug(DEBUG_OPT1, "deleted\n");
                 continue;
             }
@@ -268,6 +271,7 @@ set_it:
             tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
             debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
             subst_ins(ins, tmp, 1);
+            ins = tmp;
             continue;
         }
         /*
@@ -319,6 +323,7 @@ subst_constants_mix(struct Parrot_Interp *interp)
                 tmp = INS(interp, ins->op, "", ins->r, 3, 0, 0);
                 debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
+                ins = tmp;
             }
         }
     }
@@ -357,6 +362,7 @@ subst_constants_umix(struct Parrot_Interp *interp)
                 tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
                 debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
+                ins = tmp;
             }
         }
     }
@@ -505,6 +511,7 @@ subst_constants(struct Parrot_Interp *interp)
         tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
         debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
         subst_ins(ins, tmp, 1);
+        ins = tmp;
     }
     mem_sys_memcopy(&interp->ctx, ctx, sizeof(struct Parrot_Context));
     mem_sys_free(ctx);
@@ -545,10 +552,12 @@ do_res:
                                             1, 0, 0);
                                     debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                                     subst_ins(ins, tmp, 1);
+                                    ins = tmp;
                                 }
                                 else {
                                     debug(DEBUG_OPT1, "deleted\n");
-                                    delete_ins(ins, 1);
+                                    ins = delete_ins(ins, 1);
+                                    ins = ins->prev ? ins->prev : instructions;
                                 }
                                 break;
                             case 'N':
@@ -683,10 +692,12 @@ do_res:
                                             1, 0, 0);
                                     debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                                     subst_ins(ins, tmp, 1);
+                                    ins = tmp;
                                 }
                                 else {
                                     debug(DEBUG_OPT1, "deleted\n");
-                                    delete_ins(ins, 1);
+                                    ins = delete_ins(ins, 1);
+                                    ins = ins->prev ? ins->prev : instructions;
                                 }
                                 break;
                             case 'N':
@@ -801,7 +812,7 @@ static int unused_label()
                 ostat.deleted_labels++;
                 debug(DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
-                delete_ins(ins, 1);
+                ins = delete_ins(ins, 1);
                 changed = 1;
             }
 
@@ -882,7 +893,8 @@ static int used_once()
             continue;
         if (r->use_count == 1 && r->lhs_use_count == 1) {
             debug(DEBUG_OPT2, "used once »%s« deleted\n", ins_string(ins));
-            delete_ins(ins, 1);
+            ins = delete_ins(ins, 1);
+            ins = ins->prev ? ins->prev : instructions;
             ostat.deleted_ins++;
             ostat.used_once++;
             opt++;
