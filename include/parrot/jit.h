@@ -53,7 +53,7 @@ typedef struct Parrot_jit_optimizer_section {
     Parrot_jit_register_count_t int_reg_count[NUM_REGISTERS];
     Parrot_jit_optimizer_section_ptr prev;
     Parrot_jit_optimizer_section_ptr next;
-    int jit_op_count; /* Number of jitted ops */
+    char has_jit_op;
 } Parrot_jit_optimizer_section_t;
 
 typedef struct {
