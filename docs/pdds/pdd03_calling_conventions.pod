@@ -110,6 +110,10 @@ with callcc. Otherwise NULL.
 
 Holds the object the sub was called on. (For method calls)
 
+=item S0
+
+The fully qualified name of the method or sub being called
+
 =item I0
 
 True if the sub is being called with prototyped parameters.
@@ -142,10 +146,6 @@ through P31.
 =item I5 through I31
 
 The first 26 integer parameters.
-
-=item S0
-
-The name of the method or sub being called
 
 =item S5 through S31
 
