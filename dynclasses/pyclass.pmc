@@ -8,7 +8,8 @@ classes/pyclass.pmc - Python Class
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Python Class base class
+These are the vtable functions for the Python Class base class (i.e., 
+methods you would expect to see on python objects).
 
 =head2 Methods
 
@@ -23,10 +24,11 @@ These are the vtable functions for the Python Class base class
 /* cache of classes referenced */
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
+static STRING *ITER;
 static STRING *NAME;
 static STRING *REPR;
 
-pmclass PyClass extends ParrotObject dynpmc group python_group {
+pmclass PyClass dynpmc group python_group {
 
 /*
 
@@ -43,6 +45,7 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = const_string(INTERP, "__class__");
+            ITER = const_string(INTERP, "__iter__");
             NAME = const_string(INTERP, "__name__");
             REPR = const_string(INTERP, "__repr__");
         }
@@ -50,23 +53,30 @@ they will be used frequently here.
 
 /*
 
+=item C<void destroy()>
+
+Destroys the object.
+
+=cut
+
+*/
+
+    void destroy () {
+    }
+
+/*
+
 =item C<PMC *find_method(STRING *method_name)>
 
-Looks up the method for C<*method_name> and returns it. If no method is
-found then lookup an attribute by this name, and return it.  If all else
-fails, return null.
+Looks up the method for C<*method_name> and returns it.
 
 =cut
 
 */
 
     PMC* find_method(STRING* method_name) {
-        PMC * method = SUPER(method_name);
+        PMC *method = VTABLE_getprop(INTERP, SELF, method_name);
         if (method && VTABLE_defined(INTERP, method)) return method;
-
-        method = VTABLE_getprop(INTERP, REG_PMC(0), method_name);
-        if (method && VTABLE_defined(INTERP, method)) return method;
-
         return 0;
     }
 
@@ -81,21 +91,18 @@ Return attribute named C<name>.
 */
 
     PMC* get_attr_str(STRING* idx) {
+        PMC *parent;
         STRING *message;
 
-        /* XXX: should test SUPER(idx) first, but for now we receive:
-           "Can't set non-core object attribs yet"
-        PMC *attr = SUPER(idx);
-        if (attr && VTABLE_defined(INTERP, attr)) return attr;
-        */
-
         PMC *attr = VTABLE_getprop(INTERP, SELF, idx);
-        if (attr && VTABLE_defined(INTERP, attr)) return attr;
 
-        message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
-            string_to_cstring(INTERP, idx));
-        real_exception(INTERP, NULL, E_AttributeError,
-            string_to_cstring(INTERP, message));
+        if (!attr || !VTABLE_defined(INTERP, attr)) {
+            message = Parrot_sprintf_c(INTERP, "AttributeError: %s",
+                string_to_cstring(INTERP, idx));
+            real_exception(INTERP, NULL, E_AttributeError,
+                string_to_cstring(INTERP, message));
+        }
+
         return attr;
     }
 
@@ -116,6 +123,25 @@ Return the class of this object.
 
 /*
 
+=item C<PMC *get_iter()>
+
+Return an iterator for this object.
+
+=cut
+
+*/
+
+    PMC* get_iter() {
+        PMC *iter = VTABLE_find_method(INTERP, SELF, ITER);
+        if (!iter || !VTABLE_defined(INTERP, iter))
+           real_exception(INTERP, NULL, E_TypeError,
+                   "TypeError: iteration over non-sequence");
+        return (PMC*) Parrot_run_meth_fromc_args(INTERP, iter, SELF,
+            REPR, "P");
+    }
+
+/*
+
 =item C<PMC *get_repr()>
 
 Return the representation of this object.
@@ -126,7 +152,8 @@ Return the representation of this object.
 
     STRING* get_repr() {
         PMC *repr = VTABLE_find_method(INTERP, SELF, REPR);
-        if (!repr) return VTABLE_get_string(INTERP, SELF);
+        if (!repr || !VTABLE_defined(INTERP, repr))
+            return VTABLE_get_string(INTERP, SELF);
         return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
             REPR, "S");
     }
@@ -171,26 +198,6 @@ Returns the name of this class.
         PMC *name = VTABLE_getprop(INTERP, class, NAME);
         if (!name) return CLASS;
         return VTABLE_get_string(INTERP, name);
-    }
-
-/*
-
-=item C<PMC* subclass(STRING *name)>
-
-Create a subclass of the given class.
-
-=cut
-
-*/
-
-    PMC* subclass(STRING* name) {
-        /* XXX: Ideally, we would have metaclasses (and C<subclass> would
-           be a method on the metaclass itself and could be set
-           up to create a PMC of the proper type, but for now, we create
-           a ParrotClass and morph it */
-        PMC *ret = SUPER(name);
-        ret->vtable = Parrot_base_vtables[dynclass_PyType];
-        return ret;
     }
 
 /*

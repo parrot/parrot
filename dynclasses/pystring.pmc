@@ -304,6 +304,7 @@ Interpolates a formatstring with a set of values.
         /*
          * SELF is formatstring, value = argument array or item
          */
+        /* TODO: figure out why C<DOES> doesn't work for dynclasses */
         if (value->vtable->base_type != enum_class_FixedPMCArray) {
             /* not a tuple - make one */
             ar = pmc_new(INTERP, dynclass_PyTuple);

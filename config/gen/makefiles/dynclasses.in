@@ -11,9 +11,9 @@ tclobject tclstring tclint tclfloat \
 tcllist tclarray \
 match matchrange \
 pybuiltin \
+pyclass \
 pyobject \
   pyboolean \
-  pyclass \
   pycomplex \
   pydict \
   pyexception \

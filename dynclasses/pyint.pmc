@@ -556,6 +556,36 @@ Returns a unique hash for this value
 
 /*
 
+=item C<void* invoke(void *next)>
+
+Create a new dictionary from a sequence
+
+=cut
+
+TODO: move this to the int type as this is meant to be a class method
+not an instance method.
+
+*/
+
+    void* invoke(void *next) {
+        INTVAL argc = REG_INT(3);
+        PMC *source = REG_PMC(5);
+
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+
+        REG_INT(3) = 1;
+        REG_PMC(5) = ret;
+
+        if (argc > 0) {
+            INTVAL ivalue = VTABLE_get_integer(INTERP, source);
+            VTABLE_set_integer_native(INTERP, ret, ivalue);
+        }
+
+        return next;
+    }
+
+/*
+
 =item C<INTVAL is_equal (PMC* value)>
 
 The C<==> operation.

@@ -375,7 +375,7 @@ Returns the big number value for the element at C<*key>.
 
 /*
 
-=item C<PMC* "dict"(PMC *list)>
+=item C<void* invoke(void *next)>
 
 Create a new dictionary from a sequence
 

@@ -51,7 +51,9 @@ static STRING* __xor__;
         REG_PMC(2) = SELF; \
         return REG_PMC(5);
 
-pmclass PyObject dynpmc group python_group {
+extern PMC* Parrot_PyType_subclass(Interp* interpreter, PMC *pmc, STRING* name);
+
+pmclass PyObject extends PyClass dynpmc group python_group {
 
 /*
 
@@ -744,6 +746,47 @@ according to the type of C<*value>.
                    string_to_cstring(INTERP, VTABLE_name(INTERP, pmc)));
 
         }
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it. If no method is
+found then lookup an attribute by this name, and return it.  If all else
+fails, return null.
+
+=cut
+
+TODO: create separate type objects for each builtin type which has
+direct pointer to the global hash for this particular class.
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        return Parrot_default_find_method(INTERP, SELF, method_name);
+    }
+
+/*
+
+=item C<PMC* subclass(STRING *name)>
+
+Create a subclass of the given class.  Note that this merely creates
+a new PyType... all the interesting details that make it a subclass
+need to be filled in.
+
+=cut
+
+TODO: create separate type objects for each builtin type and replace
+this logic with a TypeError.
+
+*/
+
+    PMC* subclass(STRING* name) {
+        PMC *ret = Parrot_PyType_subclass(INTERP, SELF, name);
+        INTVAL dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
+        ret->vtable = Parrot_base_vtables[dynclass_PyType];
+        return ret;
     }
 
 /*

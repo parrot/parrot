@@ -72,6 +72,7 @@ Destroys the array.
 */
 
     void destroy () {
+        SUPER();
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
         PMC_data(SELF) = NULL;

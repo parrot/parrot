@@ -8,7 +8,8 @@ classes/pytype.pmc - Python Class
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Python Class base class
+These are the vtable functions for the Python Type base class (i.e.,
+methods you would expect to see on Python Classes
 
 =head2 Methods
 
@@ -22,10 +23,15 @@ These are the vtable functions for the Python Class base class
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyClass;
+static INTVAL dynclass_PyString;
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
+static STRING *INIT;
+static STRING *NAME;
+static STRING *BASES;
+static STRING *PYTYPE;
 
-pmclass PyType extends ParrotClass dynpmc group python_group {
+pmclass PyType dynpmc group python_group {
 
 /*
 
@@ -41,8 +47,13 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
+            dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = const_string(INTERP, "__class__");
+            INIT = const_string(INTERP, "__init__");
+            NAME = const_string(INTERP, "__name__");
+            BASES = const_string(INTERP, "__bases__");
+            PYTYPE = const_string(INTERP, "PyType");
         }
     }
 
@@ -77,6 +88,31 @@ Return attribute named C<name>.
 
 /*
 
+=item C<PMC *getprop(STRING *key)>
+
+Returns the property for C<*key>. If the property is not defined then for
+the instance, try the class.  If still no luck, return None.
+
+=cut
+
+*/
+
+    PMC* getprop(STRING* key) {
+        PMC * prop = SUPER(key);
+        PMC * parent;
+
+        if (prop && VTABLE_defined(INTERP, prop)) return prop;
+
+        parent = SUPER(BASES);
+        if (parent && VTABLE_defined(INTERP, parent)) {
+            prop = VTABLE_getprop(INTERP, parent, key);
+        }
+
+        return prop;
+    }
+
+/*
+
 =item C<void* invoke(void* next)>
 
 Pythonic object constructor.
@@ -86,12 +122,18 @@ Pythonic object constructor.
 */
 
     void* invoke(void* next) {
-        REG_PMC(5) = pmc_new(interpreter, REG_PMC(0)->vtable->base_type);
+        PMC *object, *init;
 
-        REG_PMC(5)->vtable = Parrot_base_vtables[dynclass_PyClass];
+        object = pmc_new(interpreter, dynclass_PyClass);
+        VTABLE_setprop(INTERP, object, CLASS, REG_PMC(0));
 
-        VTABLE_setprop(INTERP, REG_PMC(5), CLASS, REG_PMC(0));
+        init = VTABLE_find_method(INTERP, object, INIT);
+        if (init) {
+            REG_PMC(2) = object;
+            Parrot_runops_fromc(INTERP, init);
+        }
 
+        REG_PMC(5) = object;
         return next;
     }
 
@@ -99,19 +141,20 @@ Pythonic object constructor.
 
 =item C<PMC* subclass(STRING *name)>
 
-Create a subclass of the given class.
+Create a subclass of the given class.  Note that this merely creates
+a new PyType... all the interesting details that make it a subclass
+need to be filled in.
 
 =cut
 
 */
 
     PMC* subclass(STRING* name) {
-        /* XXX: Ideally, we would have metaclasses (and C<subclass> would
-           be a method on the metaclass itself and could be set
-           up to create a PMC of the proper type, but for now, we create
-           a ParrotClass and morph it */
-        PMC *ret = SUPER(name);
-        ret->vtable = Parrot_base_vtables[dynclass_PyType];
+        PMC *ret = pmc_new(INTERP, dynclass_PyType);
+        PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, nameprop, name);
+        VTABLE_setprop(INTERP, ret, NAME, nameprop);
+        VTABLE_setprop(INTERP, ret, BASES, SELF);
         return ret;
     }
 

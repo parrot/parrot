@@ -23,7 +23,7 @@ output_is(<< 'CODE', << 'OUTPUT', "attribute");
 .sub main @MAIN
     loadlib $P0, "python_group"
 
-    getclass $P1, 'PyClass'
+    getclass $P1, 'PyType'
     subclass $P2, $P1, 'c'
 
     find_type $I2, "PyInt"
@@ -46,7 +46,7 @@ output_is(<< 'CODE', << 'OUTPUT', "method");
 .sub __main__
     loadlib $P0, "python_group"
 
-    getclass $P1, 'PyClass'
+    getclass $P1, 'PyType'
     subclass $P2, $P1, 'c'
 
     find_type $I2, "PyFunc"
@@ -76,7 +76,7 @@ output_is(<< 'CODE', << 'OUTPUT', "classname");
 .sub main @MAIN
     loadlib $P0, "python_group"
 
-    getclass $P1, 'PyClass'
+    getclass $P1, 'PyType'
     subclass $P2, $P1, 'c'
 
     find_type $I2, "PyString"
@@ -100,7 +100,7 @@ output_is(<< 'CODE', << 'OUTPUT', "delprop");
 .sub main @MAIN
     loadlib $P0, "python_group"
 
-    getclass $P1, 'PyClass'
+    getclass $P1, 'PyType'
     subclass $P2, $P1, 'c'
     subclass $P3, $P2, 'd'
 
@@ -135,14 +135,12 @@ CODE
 AttributeError: x
 OUTPUT
 
-SKIP: {
-skip("need to implement properties in nested subclasses", 1);
 output_is(<< 'CODE', << 'OUTPUT', "nested subclasses");
 ##PIR##
 .sub main @MAIN
     loadlib $P0, "python_group"
 
-    getclass $P1, 'PyClass'
+    getclass $P1, 'PyType'
     subclass $P2, $P1, 'c'
 
     find_type $I2, "PyInt"
@@ -178,4 +176,3 @@ CODE
 1
 2
 OUTPUT
-}
