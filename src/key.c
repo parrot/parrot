@@ -141,6 +141,7 @@ key_new_pmc(Interp *interpreter, PMC *value)
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
+    internal_exception(1, "this is broken - see slice.pmc");
     PMC_pmc_val(key) = value;
 
     return key;
@@ -248,6 +249,11 @@ key_set_pmc(Interp *interpreter, PMC *key, PMC *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
+    /*
+     * XXX leo
+     * what for is this indirection?
+     */
+    internal_exception(1, "this is broken - see slice.pmc");
     PMC_pmc_val(key) = value;
 
     return;
@@ -321,8 +327,8 @@ key_number(Interp *interpreter, PMC *key)
     case KEY_number_FLAG | KEY_register_FLAG:
         return interpreter->num_reg.registers[PMC_int_val(key)];
     case KEY_pmc_FLAG:
-        return VTABLE_get_number(interpreter,
-                                                      PMC_pmc_val(key));
+        return VTABLE_get_number(interpreter, key);
+                                                 /*  PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_number(interpreter, reg);
@@ -352,8 +358,8 @@ key_string(Interp *interpreter, PMC *key)
     case KEY_string_FLAG | KEY_register_FLAG:
         return interpreter->string_reg.registers[PMC_int_val(key)];
     case KEY_pmc_FLAG:
-        return VTABLE_get_string(interpreter,
-                                                      PMC_pmc_val(key));
+        return VTABLE_get_string(interpreter, key);
+                                                   /*   PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_string(interpreter, reg);
@@ -379,13 +385,10 @@ PMC *
 key_pmc(Interp *interpreter, PMC *key)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-    case KEY_pmc_FLAG:
-        return PMC_pmc_val(key);
     case KEY_pmc_FLAG | KEY_register_FLAG:
         return interpreter->pmc_reg.registers[PMC_int_val(key)];
     default:
-        internal_exception(INVALID_OPERATION, "Key not a PMC!\n");
-        return 0;
+        return key; /* PMC_pmc_val(key); */
     }
 }
 

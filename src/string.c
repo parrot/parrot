@@ -3178,6 +3178,34 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)
 
 /*
 
+=item C<STRING *string_increment(struct Parrot_Interp *, const STRING *)>
+
+Perl5ish increment the string. Currently single char only.
+
+=cut
+
+*/
+
+STRING *
+string_increment(Interp *interpreter, const STRING *s)
+{
+    INTVAL o;
+
+    if (string_length(interpreter, s) != 1)
+        internal_exception(1, "increment only for length=1 done");
+    o = string_ord(interpreter, s, 0);
+    if ((o >= 'A' && o < 'Z') ||
+            (o >= 'a' && o < 'z')) {
+        ++o;
+        /* TODO increment in place */
+        return string_chr(interpreter, o);
+    }
+    internal_exception(1, "increment out of range - unimplemented");
+    return NULL;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

@@ -35,6 +35,7 @@ STRING *string_printf(struct Parrot_Interp *interpreter,
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_equal(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_bool(struct Parrot_Interp *, const STRING *);
+STRING *string_increment(struct Parrot_Interp *, const STRING *);
 const char *Parrot_string_cstring(const STRING *);
 
 /* Declarations of other functions */

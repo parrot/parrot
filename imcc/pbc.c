@@ -680,7 +680,7 @@ build_key(Interp *interpreter, SymReg *reg)
                 if (r->set == 'I')
                     *pc++ = PARROT_ARG_I | slice_bits;    /* register type */
                 else if (r->set == 'S')
-                    *pc++ = PARROT_ARG_S;
+                    *pc++ = PARROT_ARG_S | slice_bits;
                 else
                     fatal(1, "build_key", "wrong register set\n");
                 /* don't emit mapped regs in key parts */

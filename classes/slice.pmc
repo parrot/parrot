@@ -68,9 +68,14 @@ set_slice_start(Interp *interpreter, PMC *self)
         }
     }
     else {
+        if (PObj_get_FLAGS(range) & KEY_inf_slice_FLAG) {
+            internal_exception(1,
+                    "unlimited slice range for hash not implemented");
+        }
+
         /*
          * string assumed
-         * - no ranges yet, start at value
+         * start at value
          */
         PMC_struct_val(self) = key_string(interpreter, range);
     }
@@ -84,17 +89,18 @@ static void
 set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 {
     PMC* range = PMC_pmc_val(self);
-            INTVAL cur, end;
 
     if (key_type(interpreter, range) & KEY_integer_FLAG) {
+        INTVAL cur, end;
+
         if ((PObj_get_FLAGS(range) &
-                (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
+                    (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
             /* start = end, single element */
             goto next_range;
         }
         if ((PObj_get_FLAGS(range) &
-                (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
+                    (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) ==
                 (KEY_inf_slice_FLAG|KEY_end_slice_FLAG)) {
             /* first range is ".. end" */
             cur = (INTVAL)PMC_struct_val(self);
@@ -108,7 +114,7 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
         }
 
         if ((PObj_get_FLAGS(range) &
-                (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
+                    (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) ==
                 (KEY_inf_slice_FLAG|KEY_start_slice_FLAG)) {
             /* last range "start .." */
             cur = (INTVAL)PMC_struct_val(self);
@@ -143,7 +149,7 @@ set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 
 next_range:
         range = PMC_pmc_val(self) = PMC_data(range);
-        if (!PMC_pmc_val(self)) {
+        if (!range) {
             /*
              * this denotes the end of iteration
              */
@@ -157,6 +163,7 @@ next_range:
         }
     }
     else {
+        STRING *cur, *end;
         /*
          * string assumed
          */
@@ -164,17 +171,41 @@ next_range:
                     (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) ==
                 (KEY_start_slice_FLAG|KEY_end_slice_FLAG)) {
             /*
-             * only single values for now - no ranges
+             * only single values or limited ranges - no
+             * ..end or start.. range for hash
              */
-            range = PMC_pmc_val(self) = PMC_data(range);
-            if (!PMC_pmc_val(self))
-                PMC_int_val(self) = -1;
-            else
-                PMC_struct_val(self) = key_string(interpreter, range);
+            goto next_str_range;
         }
-        else {
-            internal_exception(1, "slices ranges for hash not implemented");
+        if (PObj_get_FLAGS(range) & KEY_inf_slice_FLAG) {
+            internal_exception(1,
+                    "unlimited slice range for hash not implemented");
         }
+        if (PObj_get_FLAGS(range) & KEY_start_slice_FLAG) {
+            /*
+             * start ... end range
+             * end is in the next range in the Key chain
+             */
+            PMC *end_range = PMC_data(range);
+            if (!end_range)
+                internal_exception(1, "No end range found");
+            cur = (STRING *)PMC_struct_val(self);
+            end = key_string(interpreter, end_range);
+            if (string_compare(interpreter, cur, end) < 0) {
+                cur = string_increment(interpreter, cur);
+                PMC_struct_val(self) = (void *)cur;
+                return;
+            }
+            /* skip end range */
+            PMC_pmc_val(self) = end_range;
+            range = end_range;
+            /* go on with next_range */
+        }
+next_str_range:
+        range = PMC_pmc_val(self) = PMC_data(range);
+        if (!range)
+            PMC_int_val(self) = -1;
+        else
+            PMC_struct_val(self) = key_string(interpreter, range);
     }
 }
 
@@ -215,12 +246,11 @@ Get the next string key from the current slice range.
 
     INTVAL get_integer() {
         INTVAL v = (INTVAL)PMC_struct_val(SELF);
-        /* printf("Slice_get_integer %d\n", (int)v); */
         return v;
     }
 
     STRING* get_string() {
-        STRING *s  = (STRING *)PMC_struct_val(SELF);
+        STRING *s = (STRING *)PMC_struct_val(SELF);
         return s;
     }
 

@@ -599,18 +599,7 @@ Perl 5 like string increment/decrement.
 
     void increment () {
         STRING* s = PMC_str_val(SELF);
-	INTVAL o;
-        if (string_length(INTERP, s) != 1)
-	    internal_exception(1, "increment only for length=1 done");
-	o = string_ord(INTERP, s, 0);
-	if ((o >= 'A' && o < 'Z') ||
-	    (o >= 'a' && o < 'z')) {
-	    ++o;
-	    /* TODO increment in place */
-	    PMC_str_val(SELF) = string_chr(INTERP, o);
-	    return;
-	}
-	internal_exception(1, "increment out of range - unimplemented");
+	PMC_str_val(SELF) = string_increment(INTERP, s);
     }
 
     void decrement () {

@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 29;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -881,5 +881,104 @@ CODE
 100
 100
 500
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter range");
+    .include "iterator.pasm"
+	new P2, .PerlHash
+	set P2["a"], 10
+	set P2["b"], 20
+	set P2["c"], 30
+	set P2["d"], 40
+	set P2["e"], 50
+	slice P1, P2["a".. "c"]
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+CODE
+10
+20
+30
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter range 2");
+    .include "iterator.pasm"
+	new P2, .PerlHash
+	set P2["a"], 10
+	set P2["b"], 20
+	set P2["c"], 30
+	set P2["d"], 40
+	set P2["e"], 50
+	set P2["A"], 11
+	set P2["B"], 21
+	set P2["C"], 31
+	set P2["D"], 41
+	set P2["E"], 51
+	slice P1, P2["a".. "c", 'C' .. 'E']
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S1, P1
+	print S1
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+CODE
+10
+20
+30
+31
+41
+51
+ok
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "slice iter range - vars");
+    .include "iterator.pasm"
+	new P2, .PerlHash
+	set P2["a"], 10
+	set P2["b"], 20
+	set P2["c"], 30
+	set P2["d"], 40
+	set P2["e"], 50
+	set P2["A"], 11
+	set P2["B"], 21
+	set P2["C"], 31
+	set P2["D"], 41
+	set P2["E"], 51
+	set S0, 'a'
+	set S1, 'c'
+	set S2, 'C'
+	set S3, 'E'
+	slice P1, P2[S0 .. S1, S2 .. S3, 'A']
+	set P1, .ITERATE_FROM_START
+iter_loop:
+        unless P1, iter_end
+	shift S10, P1
+	print S10
+	print "\n"
+	branch iter_loop
+iter_end:
+	print "ok\n"
+	end
+CODE
+10
+20
+30
+31
+41
+51
+11
 ok
 OUTPUT
