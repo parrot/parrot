@@ -780,7 +780,7 @@ $(SRC)/inter_create$(O) : $(SRC)/inter_create.c $(GENERAL_H_FILES)
 
 $(SRC)/inter_run$(O) : $(SRC)/inter_run.c $(GENERAL_H_FILES)
 
-$(SRC)/py_func$(O) : $(SRC)/inter_cb.c $(GENERAL_H_FILES) \
+$(SRC)/py_func$(O) : $(SRC)/py_func.c $(GENERAL_H_FILES) \
     $(SRC)/py_func.str classes/pmc_default.h
 
 io/io$(O) : $(GENERAL_H_FILES) io/io_private.h
