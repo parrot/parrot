@@ -85,7 +85,7 @@ typedef void *DummyCodeRef;
 
 
 struct _ParrotIOBuf {
-    UINTVAL flags;              /* Buffer specific flags        */
+    INTVAL flags;               /* Buffer specific flags        */
     size_t size;
     unsigned char *startb;      /* Start of buffer              */
     unsigned char *endb;        /* End of buffer                */
@@ -113,8 +113,8 @@ typedef struct _ParrotIO **ParrotIOTable;
 
 struct _ParrotIO {
     PIOHANDLE fd;               /* Low level OS descriptor      */
-    UINTVAL mode;               /* Read/Write/etc.              */
-    UINTVAL flags;              /* Da flags                     */
+    INTVAL mode;                /* Read/Write/etc.              */
+    INTVAL flags;               /* Da flags                     */
     PIOOFF_T fsize;             /* Current file size            */
     PIOOFF_T fpos;              /* Current real file pointer    */
     PIOOFF_T lpos;              /* Last file position           */
@@ -126,7 +126,7 @@ struct _ParrotIO {
 struct _ParrotIOLayer {
     void *this;                 /* Instance specific data       */
     const char *name;
-    UINTVAL flags;
+    INTVAL flags;
     ParrotIOLayerAPI *api;
     ParrotIOLayer *up;
     ParrotIOLayer *down;
@@ -190,14 +190,14 @@ struct _ParrotIOLayerAPI {
     INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
     INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io); 
     ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
-                            const char * name, UINTVAL flags);
+                            const char * name, INTVAL flags);
     ParrotIO *      (*Open2_Unused)(theINTERP);
     ParrotIO *      (*Open3_Unused)(theINTERP);
     ParrotIO *      (*Open_ASync)(theINTERP, ParrotIOLayer * l,
                                   const char * name, const char * mode,
                                   DummyCodeRef *);
     ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
-                              PIOHANDLE fd, UINTVAL flags);
+                              PIOHANDLE fd, INTVAL flags);
     INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
                                 ParrotIO * io); 
     size_t          (*Write)(theINTERP, ParrotIOLayer * l,
@@ -236,11 +236,11 @@ struct _ParrotIOLayerAPI {
  * doesn't like conversions between function and non-function pointers. */
 #define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_open (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char*, UINTVAL))0
+#define PIO_null_open (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char*, INTVAL))0
 #define PIO_null_open2 (ParrotIO * (*)(theINTERP))0
 #define PIO_null_open3 (ParrotIO * (*)(theINTERP))0
 #define PIO_null_open_async (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
-#define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, UINTVAL))0
+#define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
 #define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
 #define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
@@ -273,13 +273,13 @@ extern void free_io_header(ParrotIO *);
 extern ParrotIOTable alloc_pio_array(int);
 extern int realloc_pio_array(ParrotIOTable *, int);
 extern ParrotIO *PIO_new(struct Parrot_Interp *, ParrotIO *,
-                         INTVAL, UINTVAL, UINTVAL);
+                         INTVAL, INTVAL, INTVAL);
 
 extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);
 extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
 extern void PIO_base_delete_layer(ParrotIOLayer *proto);
 
-extern UINTVAL PIO_parse_open_flags(const char *flagstr);
+extern INTVAL PIO_parse_open_flags(const char *flagstr);
 extern ParrotIO *PIO_open(theINTERP, const char *, const char *);
 extern ParrotIO *PIO_fdopen(theINTERP, PIOHANDLE, const char *);
 extern INTVAL PIO_close(theINTERP, ParrotIO *);
