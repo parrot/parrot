@@ -15,6 +15,14 @@ You can get the latest version of Pirate from:
 
     http://pirate.tangentcode.com/
 
+Outstanding Parrot archicture/design issues:
+
+  Keyword/Default arguments
+  Hash VTABLE entry
+  POW MMD
+  MMD Inheritance
+  Anonymous Classes
+
 - Sam Ruby
 
 Below is the previous contents of this README:
