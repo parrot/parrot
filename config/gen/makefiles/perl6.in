@@ -7,7 +7,10 @@ compile=$(myperl) prd-perl6.pl --batch --imc
 imcc=..${slash}imcc${slash}imcc
 asm=$(PERL) ..${slash}..${slash}assemble.pl
 
-all: imcc
+all: imcc perl6-config
+
+perl6-config: ../../Makefile pconfig.pl
+       $(myperl) pconfig.pl ../../Makefile perl6-config
 
 test:
 	$(PERL) t/harness
