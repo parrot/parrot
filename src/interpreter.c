@@ -1147,7 +1147,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
         STRING *cb_signature)
 {
     PMC* interp_pmc, *cb, *cb_sig;
-    int type;
+    int type = '?';     /* avoid -Ox warning */
     char * sig_str;
     /*
      * we stuff all the information into the user_data PMC and pass that
@@ -1344,7 +1344,7 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
     char *p;
     char pasm_sig[4];
     INTVAL   i_param;
-    void*    param;
+    void*    param = NULL;      /* avoid -Ox warning */
 
     sub = VTABLE_getprop(interpreter, cbi,
             const_string(interpreter, "_sub"));
