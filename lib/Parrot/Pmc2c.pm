@@ -1577,6 +1577,7 @@ sub write_all_files {
     my %opt = %{$self->{opt}};
     my $library = $opt{library} ? 1 : 0;
 
+    if (!$library) {
     while (my @fc = each %{$self->{pmcs}}) {
         my ($file, $generator) = @fc;
 	print Data::Dumper->Dump([$generator]) if $opt{debug} > 1;
@@ -1600,7 +1601,8 @@ sub write_all_files {
         close C;
     }
 
-    if ($library) {
+    }
+    else {
 	my $hout = $self->gen_h($opt{library});
         my $h = "$opt{library}.h";
         print "Writing $h\n" if $opt{verbose};

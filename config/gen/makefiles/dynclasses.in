@@ -14,10 +14,10 @@ match matchrange
 BUILD = ${perl} build.pl
 
 all :
-	$(BUILD) generate $(PMCS)
-	$(BUILD) compile $(PMCS)
-	$(BUILD) linklibs $(PMCS)
-	$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
+	@$(BUILD) generate $(PMCS)
+	@$(BUILD) compile $(PMCS)
+	@$(BUILD) linklibs $(PMCS)
+	@$(BUILD) copy --destination=$(DESTDIR) $(PMCS)
 
 clean :
 	$(RM_F) *.c *.h *$(LOAD_EXT) *.dump lib-* *$(O)

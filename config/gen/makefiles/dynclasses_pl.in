@@ -43,9 +43,11 @@ if ($mode eq 'generate') {
     my ($group_files, $pmc_group) = gather_groups(@pmcs);
 
     while (my ($group, $pmcs) = each %$group_files) {
-        my $pmcfiles = join(" ", map { "$_.pmc" } @$pmcs);
-        run("$PMC2C --library $group --c $pmcfiles")
-          or die "pmc2c library creation failed ($?)\n";
+        my @pmcfiles = map { "$_.pmc" } @$pmcs;
+        if (needs_build("$group.c", @pmcfiles)) {
+            run("$PMC2C --library $group --c " . join(" ",@pmcfiles))
+              or die "pmc2c library creation failed ($?)\n";
+        }
     }
 } elsif ($mode eq 'compile') {
     my ($group_files, $pmc_group) = gather_groups(@pmcs);
@@ -123,7 +125,7 @@ sub needs_build {
     my $target_mod = modtime($target)
       or return 1;
     for my $source (@sources) {
-        return 1 if modtime($source) >= $target_mod;
+        return 1 if modtime($source) > $target_mod;
     }
     return 0;
 }
@@ -134,8 +136,6 @@ sub generate_dump {
     if (needs_build("$pmc.dump", "$pmc.pmc")) {
         run("$PMC2C --dump $pmc.pmc")
           or die "pmc2c dump failed ($?)\n";
-    } else {
-        print "$pmc.dump is up to date\n";
     }
 }
 
@@ -155,6 +155,9 @@ sub compile {
         run(compile_cmd("$dest_stem$O", "$src_stem.c"))
           or die "compile $src_stem.c failed ($?)\n";
     }
+    else {
+        1;
+    }
 }
 
 sub partial_link {
@@ -163,5 +166,8 @@ sub partial_link {
     if (needs_build("$group$LOAD_EXT", @sources)) {
         run(partial_link_cmd("$group$LOAD_EXT", @sources))
           or die "partial link $group$LOAD_EXT failed ($?)\n";
+    }
+    else {
+        1;
     }
 }

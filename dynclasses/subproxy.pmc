@@ -55,7 +55,7 @@ pmclass SubProxy dynpmc need_ext extends Sub {
 	    ((parrot_sub_t)(PMC_sub(SELF))) ->end =
 		    ((parrot_sub_t)(PMC_sub(rsub))) ->end;
 	}
-	SUPER(next);
+	return SUPER(next);
     }
 }
 
