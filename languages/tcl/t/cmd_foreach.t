@@ -3,7 +3,6 @@
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 9;
-use vars qw/$TODO/;
 
 language_output_is("tcl",<<'TCL',<<OUT,"bad args 1");
   foreach
@@ -25,12 +24,10 @@ b
 c
 OUT
 
-TODO: {
-local $TODO="can only do one list at a time at the moment, apparently";
 language_output_is("tcl",<<'TCL',<<OUT,"double foreach string");
-  foreach a "a b c" b "d e f" {puts "$a $b"}
+  foreach a {a b c} b {d e f} {puts "$a $b"}
 TCL
-a d 
+a d
 b e
 c f
 OUT
@@ -38,7 +35,7 @@ OUT
 language_output_is("tcl",<<'TCL',<<OUT,"double foreach uneven string");
   foreach a {a b c} b {d e f g h} {puts "$a $b"}
 TCL
-a d 
+a d
 b e
 c f
  g
@@ -48,12 +45,10 @@ OUT
 language_output_is("tcl",<<'TCL',<<OUT,"double foreach list");
   foreach a [list a b c] b [list d e f] {puts "$a $b"}
 TCL
-a d 
+a d
 b e
 c f
 OUT
-
-}
 
 language_output_is("tcl",<<'TCL',<<OUT,"simple foreach list");
   foreach a [list a b c] {puts $a}
