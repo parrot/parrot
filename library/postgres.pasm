@@ -1,7 +1,7 @@
 # For postgres 7.3
 
 saveall
-loadlib P1, 'libpq'
+loadlib P1, '/usr/local/pgsql/lib/libpq.so'
 dlfunc P2, P1, 'PQconnectStart', 'pt'
 store_global 'PostgreSQL::PQconnectStart', P2
 dlfunc P2, P1, 'PQconnectPoll', 'ip'

@@ -46,6 +46,7 @@
 #Return params
 #p	b
 c	v
+c	p
 c
 d	d
 d	v
@@ -106,6 +107,7 @@ i	pppp
 i	psp
 i	pt
 i	pti
+i	pitl
 i	s
 i	s22
 i	s222
@@ -132,9 +134,13 @@ p	ii
 p	iiii
 p	iiiiii
 p	p
+p	pt
+p	pi
 p	pii
 p	piiii
 p	tpp
+p	t
+p	ttttttt
 p	v
 p
 p	B
@@ -142,7 +148,11 @@ s	v
 t	i
 t	ii
 t	pi
+t	pii
 t	t
+t	tl4
+t	t4
+t	p
 t	v
 t
 v	i
@@ -150,6 +160,7 @@ v	ii
 v	illllllll
 v	l
 v	p
+v	pp
 v	pi
 v	piiii
 v	pl
@@ -181,6 +192,7 @@ P	Ii
 
 # Oddball ones for postgres
 p	ptiLTLLi
+p	pi33ipi
 
 # The following are used by library/pcre.imc
 p	tiB3P
