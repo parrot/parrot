@@ -1710,6 +1710,7 @@ string.c
 sub.c
 testyamd
 t/harness
+t/op/arithmetics.t
 t/op/basic.t
 t/op/bitwise.t
 t/op/comp.t
