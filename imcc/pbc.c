@@ -281,7 +281,7 @@ store_bsr(SymReg * r, int pc, int offset)
     /* This is hackish but its better to have it here than in the
      * fixup code until we decide if we need the _globallabel semantic.
      */
-    if (r->name[0] == '_')
+    if (r->name[0] == '_' || (r->usage & U_FIXUP))
        bsr->usage |= U_FIXUP;
 }
 
