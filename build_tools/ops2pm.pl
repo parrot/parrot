@@ -225,6 +225,10 @@ close MODULE;
 # finally create an include file with opcode number
 
 my $inc_f = "include/parrot/oplib/ops.h";
+my $inc_dir = "include/parrot/oplib";
+if (! -d $inc_dir) {
+    mkdir($inc_dir, 0755) or die "ops2pm.pl: Could not mkdir $inc_dir: $!\n";
+}
 open OUT, ">$inc_f" or die "Can't write $inc_f: $!";
 
 print OUT <<END_C;
