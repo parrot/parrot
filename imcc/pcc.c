@@ -107,48 +107,84 @@ overflow:
 void
 expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins)
 {
-    SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS];
+    SymReg *arg, *sub, *reg, *regs[IMCC_MAX_REGS], *p3;
     int next[4], i, j, n;
     char types[] = "ISPN";
+    Instruction *tmp;
+    char buf[128];
+    int n_p3;
 
     for (i = 0; i < 4; i++)
         next[i] = 5;
+    p3 = NULL;
+    n_p3 = 0;
     /* the first ins holds the sub SymReg */
     sub = instructions->r[1];
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
-        /* if arg is constant, set register */
-        switch (arg->type) {
-            case VT_CONSTP:
-                arg = arg->reg;
-                /* goon */
-            case VTCONST:
+        if (sub->pcc_sub->prototyped ||
+                (arg->set == 'P' && next[2] < 15)) {
+            /*
+             * unprototyped
+             */
+            /* if arg is constant, set register */
+            switch (arg->type) {
+                case VT_CONSTP:
+                    arg = arg->reg;
+                    /* goon */
+                case VTCONST:
 lazy:
-                for (j = 0; j < 4; j++) {
-                    if (arg->set == types[j]) {
-                        char buf[128];
-                        if (arg->color == next[j]) {
-                            next[j]++;
+                    for (j = 0; j < 4; j++) {
+                        if (arg->set == types[j]) {
+                            if (next[j] == 15)
+                                goto overflow;
+                            if (arg->color == next[j]) {
+                                next[j]++;
+                                break;
+                            }
+                            sprintf(buf, "%c%d", arg->set, next[j]++);
+                            reg = mk_pasm_reg(str_dup(buf));
+                            regs[0] = reg;
+                            regs[1] = arg;
+                            ins = insINS(interpreter, ins, "set", regs, 2);
                             break;
                         }
-                        sprintf(buf, "%c%d", arg->set, next[j]++);
-                        reg = mk_pasm_reg(str_dup(buf));
-                        regs[0] = reg;
-                        regs[1] = arg;
-                        ins = insINS(interpreter, ins, "set", regs, 2);
-                        break;
                     }
-                }
-                break;
-            default:
-                if (arg->type & VTREGISTER) {
-                    /* TODO for now just emit a register move */
-                    goto lazy;
-                }
+                    break;
+                default:
+                    if (arg->type & VTREGISTER) {
+                        /* TODO for now just emit a register move */
+                        goto lazy;
+                    }
+            }
+        }
+        else {
+            /* non prototyped or overflow */
+overflow:
+            if (!p3) {
+                p3 = mk_pasm_reg(str_dup("P3"));
+                tmp = iNEW(interpreter, p3, str_dup("SArray"), NULL, 0);
+                insert_ins(ins, tmp);
+                ins = tmp;
+                sprintf(buf, "%d", n);
+                regs[0] = p3;
+                regs[1] = mk_const(str_dup(buf), 'I');
+                ins = insINS(interpreter, ins, "set", regs, 2);
+            }
+            regs[0] = p3;
+            regs[1] = arg;
+            ins = insINS(interpreter, ins, "push", regs, 2);
+            n_p3++;
         }
 
     }
+    /*
+     * setup I regs
+     */
+    ins = set_I_const(interpreter, ins, 0, sub->pcc_sub->prototyped);
+    for (i = 0; i < 4; i++)
+        ins = set_I_const(interpreter, ins, i + 1, next[i] - 5);
     /*
      * insert return invoke
      */
@@ -229,7 +265,7 @@ overflow:
                 ins = insINS(interpreter, ins, "set", regs, 2);
             }
             regs[0] = p3;
-            regs[1] = sub->pcc_sub->args[i];
+            regs[1] = arg;
             ins = insINS(interpreter, ins, "push", regs, 2);
             n_p3++;
         }
@@ -277,6 +313,16 @@ move_cc:
     ins = set_I_const(interpreter, ins, 1, n_p3);
     /* set items in PRegs: I2 */
     ins = set_I_const(interpreter, ins, 2, next[2] - 5);
+    /* return type 0=void, or -n-1: I3 */
+    ins = set_I_const(interpreter, ins, 3,
+            sub->pcc_sub->nret ? -1 - sub->pcc_sub->nret : 0);
+#if 0
+    /* TODO method calls */
+    /* meth hash value: I4 */
+    ins = set_I_const(interpreter, ins, 4, 0);
+    /* meth name: S0 */
+    /* object: P2 */
+#endif
     /*
      * if we reuse the continuation, update it
      */
@@ -296,26 +342,36 @@ move_cc:
     ins = insINS(interpreter, ins, "restoretop", regs, 0);
     /*
      * handle return results
-     * TODO: overflow, non prototyped
+     * TODO: overflow
      */
     for (i = 0; i < 4; i++)
         next[i] = 5;
     n = sub->pcc_sub->nret;
     for (i = 0; i < n; i++) {
         arg = sub->pcc_sub->ret[i];
-        for (j = 0; j < 4; j++) {
-            if (arg->set == types[j]) {
-                if (arg->reg->color == next[j]) {
-                    next[j]++;
+        if (sub->pcc_sub->prototyped == 1 ||
+                (arg->set == 'P' && next[2] < 15)) {
+            for (j = 0; j < 4; j++) {
+                if (arg->set == types[j]) {
+                    if (arg->reg->color == next[j]) {
+                        next[j]++;
+                        break;
+                    }
+                    sprintf(buf, "%c%d", arg->set, next[j]++);
+                    reg = mk_pasm_reg(str_dup(buf));
+                    regs[0] = arg;
+                    regs[1] = reg;
+                    ins = insINS(interpreter, ins, "set", regs, 2);
                     break;
                 }
-                sprintf(buf, "%c%d", arg->set, next[j]++);
-                reg = mk_pasm_reg(str_dup(buf));
-                regs[0] = arg;
-                regs[1] = reg;
-                ins = insINS(interpreter, ins, "set", regs, 2);
-                break;
             }
+        }
+        else {
+            if (!p3)
+                p3 = mk_pasm_reg(str_dup("P3"));
+            regs[0] = arg;
+            regs[1] = p3;
+            ins = insINS(interpreter, ins, "shift", regs, 2);
         }
     }
 }

@@ -30,6 +30,7 @@ CODE
   set I0, 1
   set I1, 0
   set I2, 0
+  set I3, 0
   savetop
   invokecc
 ret:
@@ -51,6 +52,8 @@ output_like(<<'CODE', <<'OUT', "basic syntax - constants");
     .arg 20
     .pcc_call sub, cc
     ret:
+    .local int k
+    .result k
     .pcc_end
     end
 .end
@@ -75,16 +78,23 @@ CODE
   set I0, 1
   set I1, 0
   set I2, 0
+  set I3, -2
   updatecc
   savetop
   invoke
 ret:
   restoretop
+  set I16, I5
   end
 _sub:
   add I16, I5, I6
-#pcc_sub_ret_19:
+#pcc_sub_ret_\d+:
   set I5, I16
+  set I0, 1
+  set I1, 1
+  set I2, 0
+  set I3, 0
+  set I4, 0
   invoke P1
 /
 OUT
@@ -114,6 +124,7 @@ _main:
   set I0, 1
   set I1, 0
   set I2, 0
+  set I3, -2
   updatecc
   savetop
   invoke
@@ -155,6 +166,7 @@ _main:
   set I0, 1
   set I1, 0
   set I2, 0
+  set I3, -2
   updatecc
   savetop
   invoke
@@ -174,6 +186,8 @@ output_like(<<'CODE', <<'OUT', "non prototyped, I,S");
     .arg $S0
     .pcc_call sub
     ret:
+    .local int k
+    .result k
     .pcc_end
     end
 .end
@@ -189,10 +203,12 @@ CODE
   set I0, 0
   set I1, 2
   set I2, 0
+  set I3, -2
   savetop
   invokecc
 ret:
   restoretop
+  shift I16, P3
   end/
 OUT
 
@@ -205,6 +221,8 @@ output_like(<<'CODE', <<'OUT', "non prototyped, P");
     .arg $P1
     .pcc_call sub
     ret:
+    .local PerlUndef k
+    .result k
     .pcc_end
     end
 .end
@@ -218,10 +236,12 @@ CODE
   set I0, 0
   set I1, 0
   set I2, 2
+  set I3, -2
   savetop
   invokecc
 ret:
   restoretop
+  set P16, P5
   end/
 OUT
 
@@ -252,6 +272,7 @@ CODE
   set I0, 0
   set I1, 1
   set I2, 0
+  set I3, 0
   savetop
   invokecc
 ret:
@@ -288,6 +309,7 @@ CODE
   set I0, 1
   set I1, 0
   set I2, 0
+  set I3, 0
   savetop
   invokecc
 ret:
@@ -326,6 +348,7 @@ CODE
   set I0, 1
   set I1, 0
   set I2, 1
+  set I3, 0
   savetop
   invokecc
 ret:
