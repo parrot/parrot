@@ -179,9 +179,14 @@ static void
 init_prederef(struct Parrot_Interp *interpreter, int cgp)
 {
 
+#ifdef HAVE_COMPUTED_GOTO
     oplib_init_f init_func = cgp ?
         Parrot_DynOp_core_cgp_0_0_9 :
         PARROT_CORE_PREDEREF_OPLIB_INIT;
+#else
+    oplib_init_f init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;
+    UNUSED(cgp);
+#endif
     interpreter->op_lib = init_func(1);
     interpreter->op_lib->op_code = PARROT_CORE_OPLIB_INIT(1)->op_code;
     if (interpreter->op_lib->op_count != interpreter->op_count)
@@ -200,6 +205,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
+#ifdef HAVE_COMPUTED_GOTO
         if (cgp) {
             opcode_t *pc = interpreter->code->cur_cs->base.data;
             size_t n;
@@ -212,7 +218,7 @@ init_prederef(struct Parrot_Interp *interpreter, int cgp)
                 temp += n;
             }
         }
-
+#endif
     }
 }
 
