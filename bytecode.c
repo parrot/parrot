@@ -1,7 +1,17 @@
 /* bytecode.c
- *
- *  Bytecode Manipulation Functions
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     The bytecode api constructs data from the bytecode...see below for
+ *     a full description.
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
 
+/*
 =pod
 
 =head1 Bytecode Manipulation Functions
@@ -17,7 +27,7 @@ structure of the frozen bycode.
 
 =cut
 
- */
+*/
 
 #include "parrot/parrot.h"
 
@@ -49,8 +59,6 @@ check_magic(void** program_code) {
 
     Args: void** program_code
 
-B<UNIMPLEMENTED>.
-
 Reads the constants segment from C<*program_code>, and
 creates the referenced constants. See L<parrotbyte/Constants Segment>
 for the structure of the constants segment. Advances
@@ -68,8 +76,9 @@ read_constants_table(void** program_code)
     IV i = 0;
 
     Parrot_num_string_constants = len;
-    if (len == 0) 
+    if (len == 0) {
        return;
+    }
 
     num = GRAB_IV(program_code);
     len -= sizeof(IV);
@@ -91,7 +100,7 @@ read_constants_table(void** program_code)
 
         /* Padding */
 	pad=buflen % sizeof(IV);
-	if(pad) {
+	if (pad) {
 	  pad=sizeof(IV)-pad;
 	  len -= pad;
 	  (char*)*program_code += pad;       
@@ -159,4 +168,14 @@ init_bytecode(void* program_code)
 
 =back
 
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
 */

@@ -1,18 +1,31 @@
 /* string.c
- *
- * String handling code
- *
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the api definitions for the string subsystem
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
  */
 
 #include "parrot/parrot.h"
 
 /* Basic string stuff - creation, enlargement, destruction, etc. */
 
+/*=for api string string_init
+ * set up the native string vtable
+ */
 void
 string_init(void) {
     Parrot_string_vtable[enc_native] = string_native_vtable();
 }
 
+/*=for api string string_make
+ * allocate memory for the string, copy information into it
+ * and compute its string length
+ */
 STRING *
 string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
     STRING *s = mem_sys_allocate(sizeof(STRING));
@@ -26,14 +39,21 @@ string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type) {
     return s;
 }
 
+/*=for api string string_grow
+ * reallocate memory for the string if it is too small
+ */
 void
 string_grow(STRING* s, IV newsize) {
     IV newsize_in_bytes = string_max_bytes(s, newsize);
-    if (s->buflen < newsize_in_bytes)
+    if (s->buflen < newsize_in_bytes) {
         mem_sys_realloc(s->bufstart, newsize_in_bytes);
+    }
     s->buflen = newsize_in_bytes;
 }
 
+/*=for api string string_destroy
+ * free the strings memory
+ */
 void
 string_destroy(STRING *s) {
     mem_sys_free(s->bufstart);
@@ -42,11 +62,17 @@ string_destroy(STRING *s) {
 
 /* Ordinary user-visible string operations */
 
+/*=for api string string_length
+ * return the length of the string
+ */
 IV
 string_length(STRING* s) {
     return s->strlen;
 }
 
+/*=for api string string_copy
+ * create a copy of the argument passed in
+ */
 STRING*
 string_copy(STRING *s) {
     return string_make(s->bufstart, s->buflen, s->encoding->which, s->flags, s->type);
@@ -56,38 +82,69 @@ string_copy(STRING *s) {
 
 #define ENC_VTABLE(x) x->encoding
 
+/*=for api string string_compute_strlen
+ * get the string length of the string
+ */
 IV
 string_compute_strlen(STRING* s) {
     return (s->strlen = (ENC_VTABLE(s)->compute_strlen)(s));
 }
 
+/*=for api string string_max_bytes
+ * get the maximum number of bytes needed by iv characters
+ */
 IV
 string_max_bytes(STRING* s, IV iv) {
     return (ENC_VTABLE(s)->max_bytes)(iv);
 }
 
+/*=for api string string_concat
+ * concatenate two strings
+ */
 STRING* 
 string_concat(STRING* a, STRING* b, IV flags) {
     return (ENC_VTABLE(a)->concat)(a, b, flags);
 }
 
+/*=for api string string_substr
+ * substr out the offset of src for length and store it in d.  Also return d.
+ * Allocate memory for d if necessary.
+ */
 STRING*
 string_substr(STRING* src, IV offset, IV length, STRING** d) {
     STRING *dest;
-    if (offset < 0)
+    if (offset < 0) {
         offset = src->strlen - offset;
-    if (length < 0)
+    }
+    if (length < 0) {
         length = 0;
-    if (!d || !*d)
+    }
+    if (!d || !*d) {
         dest = string_make(NULL, 0, src->encoding->which, 0, 0);
-    else
+    }
+    else {
         dest = *d;
+    }
     return (ENC_VTABLE(src)->substr)(src, offset, length, dest);   
 }
 
+/*=for api string string_chopn
+ * chop the last n bytes off of s.
+ */
 STRING*
 string_chopn(STRING* s, IV n) {
-    if (n > s->strlen)
+    if (n > s->strlen) {
         n = s->strlen;
+    }
     return (ENC_VTABLE(s)->chopn)(s, n);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

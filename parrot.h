@@ -1,7 +1,13 @@
 /* parrot.h
- *
- * General header file includes for the parrot interpreter
- *
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     General header file includes for the parrot interpreter    
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
  */
 
 #if !defined(PARROT_PARROT_H_GUARD)
@@ -58,3 +64,13 @@ typedef void STRING_FUNCS;
 #include "parrot/events.h"
 
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

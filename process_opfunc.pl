@@ -153,7 +153,7 @@ sub emit_auto_header {
     $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
     
     print OUTPUT ("IV *$opcodes{$name}{FUNC}".
-		  "(IV cur_opcode[], struct Perl_Interp *interpreter) {\n");
+		  "(IV cur_opcode[], struct Parrot_Interp *interpreter) {\n");
     return($name, "  return cur_opcode + " . $return_offset . ";\n}\n");
 }
 
@@ -162,7 +162,7 @@ sub emit_manual_header {
     my ($name) = $line =~ /MANUAL_OP\s+(\w+)/;
     
     print OUTPUT ("IV *$opcodes{$name}{FUNC}".
-		  "(IV cur_opcode[], struct Perl_Interp *interpreter) {\n");
+		  "(IV cur_opcode[], struct Parrot_Interp *interpreter) {\n");
     print OUTPUT "  IV return_offset = 1;\n";
     return($name, "  return cur_opcode + return_offset;\n}\n");
 }

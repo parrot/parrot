@@ -1,11 +1,17 @@
 /* string.h
- *
- * String data info
- *
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This is the api header for the string subsystem
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
  */
 
 #if !defined(PARROT_STRING_H_GUARD)
-#define PARROT_STRING_H_GUARD 1
+#define PARROT_STRING_H_GUARD
 
 typedef struct parrot_string STRING;
 typedef struct string_vtable STRING_VTABLE;
@@ -38,33 +44,53 @@ struct string_vtable {
 };
 
 struct parrot_string {
-  void *bufstart;
-  IV buflen;
-  IV bufused;
-  IV flags;
-  IV strlen;
-  STRING_VTABLE* encoding;
-  IV type;
-  IV unused;
+    void *bufstart;
+    IV buflen;
+    IV bufused;
+    IV flags;
+    IV strlen;
+    STRING_VTABLE* encoding;
+    IV type;
+    IV unused;
 };
 
 
 /* Declarations of accessors */
 
-IV string_compute_strlen(STRING*);
-IV string_max_bytes(STRING*, IV);
-STRING* string_concat(STRING*, STRING*, IV);
-STRING* string_chopn(STRING*, IV);
-STRING* string_substr(STRING*, IV, IV, STRING**);
+IV
+string_compute_strlen(STRING*);
+IV
+string_max_bytes(STRING*, IV);
+STRING*
+string_concat(STRING*, STRING*, IV);
+STRING*
+string_chopn(STRING*, IV);
+STRING*
+string_substr(STRING*, IV, IV, STRING**);
 
 /* Declarations of other functions */
-IV string_length(STRING*);
-void string_grow(STRING* s, IV newsize);
-void string_destroy(STRING* s);
-STRING* string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type);
-void string_init(void);
+IV
+string_length(STRING*);
+void
+string_grow(STRING* s, IV newsize);
+void
+string_destroy(STRING* s);
+STRING*
+string_make(void *buffer, IV buflen, IV encoding, IV flags, IV type);
+void
+string_init(void);
 
 STRING_VTABLE Parrot_string_vtable[enc_max];
 
 #include "parrot/strnative.h"
 #endif
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

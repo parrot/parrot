@@ -1,23 +1,42 @@
 /* strnative.c
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     This defines the native string routines.
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
 
-   Functions for handling strings in native byte format
+#include "parrot/parrot.h"
+
+/* Functions for handling strings in native byte format
    "Native" in this context means the equivalent of "LANG=C": No
    fancy multi-byte stuff, this is plain old byte-at-a-time. But
    we don't make any assumptions about what those bytes *mean*.
 */
 
-#include "parrot/parrot.h"
-
+/*=for api string_native string_native_compute_strlen
+   return the length of s
+*/
 static IV 
 string_native_compute_strlen (STRING *s) {
     return s->buflen;
 }
 
+/*=for api string_native string_native_max_bytes
+   return the max bytes needed for x characters.
+*/
 static IV 
 string_native_max_bytes (IV x) {
     return x;
 }
 
+/*=for api string_native string_native_concat
+   concatenate two strings
+*/
 static STRING*
 string_native_concat(STRING* a, STRING* b, IV flags) {
     if (flags && a->encoding != b->encoding) {
@@ -31,6 +50,9 @@ string_native_concat(STRING* a, STRING* b, IV flags) {
     return a;
 }
 
+/*=for api string_native string_native_chopn
+   remove the last n characters from s
+*/
 static STRING*
 string_native_chopn(STRING* s, IV n) {
     s->bufused -= n;
@@ -38,12 +60,17 @@ string_native_chopn(STRING* s, IV n) {
     return s;
 }
 
+/*=for api string_native string_native_substr
+   substring out length characters from src starting from offset
+   and store in dest.  Grow dest if needed.  Return dest
+*/
 static STRING*
 string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
 {
-	if (dest->encoding->which != enc_native)
-	    /* It is now, matey. */
-	    dest->encoding = &(Parrot_string_vtable[enc_native]);
+    if (dest->encoding->which != enc_native) {
+        /* It is now, matey. */
+        dest->encoding = &(Parrot_string_vtable[enc_native]);
+    }
     
     /* Offset and length have already been "normalized" */
     string_grow(dest, length);
@@ -53,6 +80,9 @@ string_native_substr(STRING* src, IV offset, IV length, STRING* dest)
     return dest;
 }
 
+/*=for api string_native string_native_vtable
+   return the vtable for the native string
+*/
 STRING_VTABLE 
 string_native_vtable (void) {
     STRING_VTABLE sv = {
@@ -65,3 +95,13 @@ string_native_vtable (void) {
     };
     return sv;
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil 
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

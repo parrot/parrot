@@ -1,9 +1,7 @@
-/* Memory.c
+/* memory.c
  *  Copyright: (When this is determined...it will go here)
  *  CVS Info
- *     $RCSfile$
- *     $Revision$
- *     $Date$
+ *     $Id$
  *  Overview:
  *     The memory (mem) API handles memory allocation
  *  Data Structure and Algorithms:
@@ -55,7 +53,7 @@ mem_sys_allocate(IV size) {
    initializes the allocator
 */
 void
-mem_setup_allocator(struct Perl_Interp *interpreter) {
+mem_setup_allocator(struct Parrot_Interp *interpreter) {
 }
 
 /*

@@ -7,7 +7,7 @@ use Parrot::Opcode;
 my %opcodes = Parrot::Opcode::read_ops();
 for my $name (sort {$opcodes{$a}{CODE} <=> $opcodes{$b}{CODE}} keys %opcodes) {
     print "#define $name Parrot_op_$name\n";
-    print "IV *$name(IV *, struct Perl_Interp *);\n";
+    print "IV *$name(IV *, struct Parrot_Interp *);\n";
 }
 
 BEGIN {
