@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 16;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -103,6 +103,14 @@ ok 4
 ok 5
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "Setting negative array size");
+	new P0, .ResizablePMCArray
+        set P0, -1
+        end
+CODE
+/ResizablePMCArray: Can't resize!/
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizablePMCArray
         set P0, 1
@@ -160,6 +168,36 @@ ok 2
 ok 3
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "Setting last element");
+        new P0, .ResizablePMCArray
+        set P0, 10
+        new P1, .Integer
+        set P1, 1234
+	set P0[-1], P1
+        new P2, .Integer        
+        set P2, P0[9]
+        print P2
+        print "\n"
+	end
+CODE
+1234
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Getting last element");
+        new P0, .ResizablePMCArray
+        set P0, 100
+        new P1, .Integer
+        set P1, 4321
+	set P0[99], P1
+        new P2, .Integer        
+        set P2, P0[-1]
+        print P2
+        print "\n"
+	end
+CODE
+4321
+OUTPUT
+
 # TODO: Rewrite these properly when we have exceptions
 
 output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
@@ -174,6 +212,18 @@ CODE
 ok 1
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "Setting -ve out-of-bounds elements");
+        new P0, .ResizablePMCArray
+        set P0, 1
+        new P1, .Integer
+        set P1, 12345
+
+	set P0[-10], P1
+	end
+CODE
+/ResizablePMCArray: index out of bounds!/
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizablePMCArray
         set P0, 1
@@ -185,6 +235,15 @@ CODE
 ok 1
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "Getting -ve out-of-bounds elements");
+        new P0, .ResizablePMCArray
+        set P0, 1
+        new P1, .Integer
+	set P1, P0[-10]
+	end
+CODE
+/ResizablePMCArray: index out of bounds!/
+OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
@@ -199,6 +258,11 @@ output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 
      set P1, 2
      set P0[P1], "bleep"
+
+     new P2, .String
+     set P2, "Bloop"
+     set P1, 3
+     set P0[P1], P2
 
      set I0, P0[0]
      eq I0, 25, OK1
@@ -215,11 +279,19 @@ OK2: print "ok 2\\n"
      print "not "
 OK3: print "ok 3\\n"
 
+     new P3, .Undef
+     set P3, P0[3]
+     set S0, P3
+     eq S0, "Bloop", OK4
+     print "not "
+OK4: print "ok 4\\n"
+
      end
 CODE
 ok 1
 ok 2
 ok 3
+ok 4
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
