@@ -207,7 +207,7 @@ all : flags_dummy $(TEST_PROG) $(IMCC_PROG) docs
 
 flags_dummy:
 	echo Compiling with:
-	echo $(CC) $(CFLAGS) xx$(O) -c xx.c
+	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CFLAGS) xx$(O) -c xx.c
 
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}

@@ -50,7 +50,7 @@ all : flags_dummy imcc${exe}
 
 flags_dummy:
 	echo Compiling with:
-	echo $(CC) $(CFLAGS) xx$(O) -c xx.c
+	@$(PERL) ../../tools/dev/cc_flags.pl ./CFLAGS echo $(CFLAGS) xx$(O) -c xx.c
 
 ../../$(PARROTLIB):
 	cd ..${slash}.. && $(MAKE) $(PARROTLIB) && cd languages${slash}imcc
