@@ -2843,13 +2843,13 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
         switch (*sig) {
             /* I have no idea how to handle these */
             case '2':
-                /* This might be right. Or not... */
-                emitm_movsbl_r_m(pc, emit_EAX, 0, 0, 2, &INT_REG(count_regs(sig, signature->strstart)));
-                emitm_pushl_r(pc, emit_EAX);
-                break;
             case '3':
             case '4':
-                abort();
+                /* This might be right. Or not... */
+                jit_emit_mov_ri_i(pc, emit_EAX,
+                    &INT_REG(count_regs(sig, signature->strstart)));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
             case 'f':
                 /* get a double from next num reg and push it on stack */
                 jit_emit_fload_m_n(pc,
