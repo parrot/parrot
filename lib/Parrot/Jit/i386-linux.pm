@@ -168,7 +168,7 @@ sub disassemble($$$$) {
 	my $objdump = new IO::File OBJDUMP." $obj |"
 		or die "Could not run ".OBJDUMP." $obj: $!";
 
-	while (<$objdump>) { last if /<\_main>:$/ }
+	while (<$objdump>) { last if /<_main>:$/ }
 
     $ln = 0;
 	while (<$objdump>) {
