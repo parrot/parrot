@@ -31,6 +31,10 @@ pmclass Float extends mmd_default {
       SELF->cache.num_val = string_to_num(value);
     }
 
+    void set_pmc(PMC *value) {
+      SELF->cache.num_val = VTABLE_get_number(INTERP, value);
+    }
+
     FLOATVAL get_number() {
       return SELF->cache.num_val;
     }

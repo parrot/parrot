@@ -47,6 +47,10 @@ pmclass Integer extends mmd_default {
       SELF->cache.int_val = string_to_num(value);
     }
 
+    void set_pmc(PMC *value) {
+      SELF->cache.int_val = VTABLE_get_integer(INTERP, value);
+    }
+
     FLOATVAL get_number() {
       return SELF->cache.int_val;
     }
