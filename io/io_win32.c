@@ -61,8 +61,6 @@ static size_t    PIO_win32_read(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, void *buffer, size_t len);
 static size_t    PIO_win32_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, const void *buffer, size_t len);
-static INTVAL    PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                                const char *s);
 static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T off, INTVAL whence);
 static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
@@ -179,6 +177,7 @@ INTVAL
 PIO_win32_getblksize(PIOHANDLE fd)
 {
     /* Hard coded for now */
+    UNUSED(fd);
     return PIO_BLKSIZE;
 }
 
@@ -203,6 +202,9 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
     int type;
     DWORD fAcc, fShare, fCreat;
     PIOHANDLE fd;
+
+    UNUSED(layer);
+
     type = PIO_TYPE_FILE;
 #  if 0
     if ((Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) != 0) {
@@ -252,6 +254,9 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
     INTVAL mode;
     mode = 0;
 
+    UNUSED(fdopen);
+    UNUSED(layer);
+
     if (PIO_win32_isatty(fd))
         flags |= PIO_F_CONSOLE;
 
@@ -277,6 +282,9 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 static INTVAL
 PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     if (io && io->fd != INVALID_HANDLE_VALUE) {
         CloseHandle(io->fd);
         io->fd = INVALID_HANDLE_VALUE;
@@ -318,6 +326,8 @@ Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 static INTVAL
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
+    UNUSED(interpreter);
+    UNUSED(layer);
     /*
      * FlushFileBuffers won't work for console handles. From the MS help file:
      *
@@ -348,6 +358,10 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                void *buffer, size_t len)
 {
     DWORD countread;
+
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL)) {
         if (countread > 0)
             return (size_t)countread;
@@ -380,6 +394,10 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 const void *buffer, size_t len)
 {
     DWORD countwrote = 0;
+
+    UNUSED(interpreter);
+    UNUSED(layer);
+
     /* do it by hand, Win32 hasn't any specific flag */
     if (io->flags & PIO_F_APPEND)
     {
@@ -404,46 +422,6 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 /*
 
-=item C<static INTVAL
-PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)>
-
-C<PIO_win32_puts()> tries C<WriteConsole()> first, then C<WriteFile()>,
-whereas C<write()> calls C<WriteFile()> only. I've also read that
-C<WriteFile()> will call C<WriteConsole()> if the handle is the right
-type (console) so I suppose this is saving a function call since "puts"
-is probably used for consoles a lot.
-
-=cut
-
-*/
-
-static INTVAL
-PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
-{
-    DWORD len, countwrote;
-    len = _tcslen((LPCSTR) s);
-    /* do it by hand, Win32 hasn't any specific flag */
-    if (io->flags & PIO_F_APPEND)
-    {
-        LARGE_INTEGER p;
-        p.LowPart = 0;
-        p.HighPart = 0;
-
-        p.LowPart = SetFilePointer(io->fd, p.LowPart,
-                                   &p.HighPart, FILE_END);
-        if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
-            /* Error - exception */
-            return -1;
-        }
-    }
-
-    if (WriteFile(io->fd, (LPCSTR) s, len, &countwrote, NULL))
-        return countwrote;
-    return -1;
-}
-
-/*
-
 =item C<static PIOOFF_T
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T off, INTVAL whence)>
@@ -463,6 +441,10 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T off, INTVAL whence)
 {
     LARGE_INTEGER offset;
+
+    UNUSED(interpreter);
+    UNUSED(l);
+
     offset.QuadPart = off;
     /* offset.HighPart gets overwritten */
     offset.LowPart = SetFilePointer(io->fd, offset.LowPart,
@@ -490,6 +472,10 @@ static PIOOFF_T
 PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     LARGE_INTEGER p;
+
+    UNUSED(interpreter);
+    UNUSED(l);
+
     p.QuadPart = piooffsetzero;
     p.LowPart = SetFilePointer(io->fd, 0, &p.HighPart, FILE_CURRENT);
     if (p.LowPart == 0xFFFFFFFF && GetLastError() != NO_ERROR) {
@@ -529,9 +515,13 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     if(!packed)
         PANIC("unix_sockaddr: failed to create string");
     return packed;
+#else
+    UNUSED(interpreter);
+    UNUSED(port);
+    UNUSED(addr);
 #endif
     return NULL;
-}   
+}
 
 
 ParrotIOLayerAPI pio_win32_layer_api = {
@@ -550,7 +540,7 @@ ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_null_write_async,
     PIO_win32_read,
     PIO_null_read_async,
-    PIO_null_flush,
+    PIO_win32_flush,
     0, /* no peek */
     PIO_win32_seek,
     PIO_win32_tell,
