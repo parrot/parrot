@@ -827,7 +827,7 @@ Look for NCI methods and propertys.
         if (PMC_IS_NULL(p)) {
             /* TODO AttributeError */
         }
-        else if (p->vtable->base_type == enum_class_NCI) {
+        else if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
             PMC *bound_meth = VTABLE_clone(INTERP, p);
             bound_meth->vtable = Parrot_base_vtables[enum_class_Bound_NCI];
             VTABLE_set_pmc(INTERP, bound_meth, SELF);
