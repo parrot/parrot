@@ -840,7 +840,8 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1");
   dlfunc P0, P1, "nci_cb_C1", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data - the Sub
+  # P6 is user_data
+  set P6, P7
   invoke
   # call_back will be called at any time
   # so spin a bit
@@ -897,7 +898,8 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D1");
   dlfunc P0, P1, "nci_cb_D1", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data - the Sub
+  # P6 is user_data
+  set P6, P7
   invoke
   # call_back will be called at any time
   # so spin a bit
@@ -953,7 +955,8 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C2");
   dlfunc P0, P1, "nci_cb_C2", "vpP"
   print "ok 2\n"
   # P5 is the cb
-  # P6 is user_data - the Sub
+  # P6 is user_data
+  set P6, P7
   invoke
   # call_back will be called at any time
   # so spin a bit

@@ -41,8 +41,7 @@ typedef struct {
 } parrot_timer_event;
 
 typedef struct {
-    PMC*                        sub;
-    PMC*                        user_data;
+    PMC*                        cbi;    /* callback info */
     void*                       external_data;
 } _call_back_info;
 
@@ -79,8 +78,8 @@ void Parrot_new_terminate_event(Parrot_Interp);
 void disable_event_checking(Parrot_Interp);
 void enable_event_checking(Parrot_Interp);
 
-void Parrot_new_cb_event(Parrot_Interp, PMC*sub, void*ext);
-void Parrot_run_callback(Parrot_Interp, PMC*sub, void*ext);
+void Parrot_new_cb_event(Parrot_Interp, PMC* cbi, void*ext);
+void Parrot_run_callback(Parrot_Interp, PMC* cbi, void*ext);
 
 void Parrot_kill_event_loop(void);
 void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);

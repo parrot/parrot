@@ -1150,17 +1150,17 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
     int type;
     char * sig_str;
     /*
-     * we stuff all the information into the Sub PMC and pass that
+     * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
      */
     interp_pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
-    VTABLE_setprop(interpreter, sub,
+    VTABLE_setprop(interpreter, user_data,
             const_string(interpreter, "_interpreter"),
             interp_pmc);
-    VTABLE_setprop(interpreter, sub,
-            const_string(interpreter, "_user_data"),
-            user_data);
+    VTABLE_setprop(interpreter, user_data,
+            const_string(interpreter, "_sub"),
+            sub);
     /* only ASCII sigs supported */
     sig_str = cb_signature->strstart;
     if (*sig_str == 'U') {
@@ -1179,7 +1179,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
 
     cb_sig = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, cb_sig, cb_signature);
-    VTABLE_setprop(interpreter, sub,
+    VTABLE_setprop(interpreter, user_data,
             const_string(interpreter, "_signature"),
             cb_sig);
     /*
@@ -1189,7 +1189,7 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
      *
      * so anchor the PMC
      */
-    dod_register_pmc(interpreter, sub);
+    dod_register_pmc(interpreter, user_data);
 
     /*
      * finally the external lib awaits a function pointer
@@ -1258,6 +1258,7 @@ verify_CD(void *external_data, PMC *callback_info)
         PANIC("interpreter not found for callback");
 
     /*
+     * 2) some more checks
      * now we should have the interpreter where that callback
      * did originate - do some further checks on the PMC
      */
@@ -1266,14 +1267,8 @@ verify_CD(void *external_data, PMC *callback_info)
     if (!PObj_is_PMC_TEST(callback_info))
         PANIC("callback_info isn't a PMC");
 
-    /*
-     * 2) some more checks: callback info is a Sub PMC
-     *    we have passed a Sub PMC as user_data so check that
-     */
     if (!callback_info->vtable)
         PANIC("callback_info hasn't a vtable");
-    if (callback_info->vtable->base_type != enum_class_Sub)
-        PANIC("callback_info isn't a Sub PMC");
     /*
      * ok fine till here
      */
@@ -1298,7 +1293,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
     PMC *passed_interp;         /* the interp that originated the CB */
     int async = 1;              /* cb is hitting this sub somewhen inmidst */
     /*
-     * 3) extract user_data, func signature, check interpreter ...
+     * 3) check interpreter ...
      */
     passed_interp = VTABLE_getprop(interpreter, callback_info,
             const_string(interpreter, "_interpreter"));
@@ -1313,7 +1308,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
 
     if (async) {
         /*
-         * create a CB_EVENT, put Sub and data inside and finito
+         * create a CB_EVENT, put user_data and data inside and finito
          *
          * *if* this function is finally no void, i.e. the calling
          * C program awaits a return result from the callback,
@@ -1329,10 +1324,22 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
     }
 }
 
+/*
+
+=item C<void
+Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)>
+
+Run a callback function. The PMC* cbi (callback_info) holds all
+necessary items in its props.
+
+=cut
+
+*/
+
 void
-Parrot_run_callback(Parrot_Interp interpreter, PMC* sub, void* ext)
+Parrot_run_callback(Parrot_Interp interpreter, PMC* cbi, void* ext)
 {
-    PMC* user_data, *sig;
+    PMC* user_data, *sig, *sub;
     STRING* sig_str;
     char *p;
     char pasm_sig[4];
@@ -1340,10 +1347,12 @@ Parrot_run_callback(Parrot_Interp interpreter, PMC* sub, void* ext)
     INTVAL   i_param;
     void*    param;
 
-    user_data = VTABLE_getprop(interpreter, sub,
-            const_string(interpreter, "_user_data"));
-    sig = VTABLE_getprop(interpreter, sub,
+    sub = VTABLE_getprop(interpreter, cbi,
+            const_string(interpreter, "_sub"));
+    sig = VTABLE_getprop(interpreter, cbi,
             const_string(interpreter, "_signature"));
+    user_data = cbi;
+
     sig_str = VTABLE_get_string(interpreter, sig);
     p = sig_str->strstart;
 
