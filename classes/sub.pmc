@@ -109,12 +109,12 @@ Initializes the subroutine.
      * see also the enum in include/parrot/sub.h
      *
      * Data used:
-     *   PMC_struct_val ... unused
-     *   PMC_pmc_val    ... Parrot_Sub structure
+     *   PMC_struct_val ... Parrot_Sub structure
+     *   PMC_pmc_val    ... unused / bound object in Bound_Meth PMC
      */
     void init () {
         PMC_sub(SELF) = new_sub(INTERP);
-        PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = NULL;
         PObj_active_destroy_SET(SELF);
 #if 0
         if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
@@ -351,7 +351,7 @@ Creates and returns a clone of the subroutine.
         sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_sub));
         memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_sub));
         sub->name = string_copy(INTERP, sub->name);
-        PMC_struct_val(ret) = NULL;
+        PMC_pmc_val(ret) = NULL;
         return ret;
     }
 

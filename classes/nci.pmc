@@ -39,6 +39,7 @@ Initializes the NCI with a C<NULL> function pointer.
 
     void init() {
         PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = NULL;
     }
 
 /*
@@ -85,6 +86,7 @@ Creates and returns a clone of the NCI.
     PMC* clone () {
         PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
+        PMC_pmc_val(ret) = NULL;
         /* FIXME if data is malloced (JIT/i386!) then we need
          * the length of data here, to memcpy it
          * ManagedStruct or Buffer?

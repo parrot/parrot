@@ -76,7 +76,7 @@ Initializes the co-routine.
 
     void init () {
         PMC_coro(SELF) = new_coroutine(INTERP);
-        PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 

@@ -281,6 +281,7 @@ new_continuation(Interp *interp)
     struct Parrot_cont *cc = mem_sys_allocate(sizeof(struct Parrot_cont));
     save_context(interp, &cc->ctx);
     cc->seg = interp->code->cur_cs;
+    cc->address = NULL;
     return cc;
 }
 
@@ -356,7 +357,7 @@ new_coroutine(Interp *interp)
  * Return continuation PMCs are re-used.
  * In the cache they are chained together by this pointer:
  */
-#  define PREV_RETC(p) PMC_struct_val(p)
+#  define PREV_RETC(p) PMC_pmc_val(p)
 
 /*
 

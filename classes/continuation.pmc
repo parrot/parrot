@@ -58,7 +58,7 @@ Initializes the continuation.
 
     void init () {
         PMC_cont(SELF) = new_continuation(INTERP);
-        PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         /*
          * Whenever we create a continuation, all return continuations
@@ -116,7 +116,7 @@ Creates and returns a clone of the continuation.
         sub = PMC_cont(ret) = mem_sys_allocate(sizeof(struct Parrot_cont));
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
 
-        PMC_struct_val(ret) = PMC_struct_val(SELF);
+        PMC_pmc_val(ret) = PMC_pmc_val(SELF);
         return ret;
     }
 
@@ -134,7 +134,7 @@ Assign context.
         struct Parrot_cont *cc_src  = PMC_cont(src);
 
         memcpy(cc_self, cc_src, sizeof(struct Parrot_cont));
-        PMC_struct_val(SELF) = PMC_struct_val(src);
+        PMC_pmc_val(SELF) = PMC_pmc_val(src);
     }
 /*
 
@@ -148,7 +148,7 @@ Sets the pointer to the actual subroutine.
 
     void set_pointer (void* value) {
         PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
-        PMC_struct_val(SELF) = value;
+        PMC_cont(SELF)->address = value;
     }
 
 /*
@@ -162,7 +162,7 @@ Returns the pointer to the actual subroutine.
 */
 
     void* get_pointer () {
-        return PMC_struct_val(SELF);
+        return PMC_cont(SELF)->address;
     }
 /*
 
@@ -177,11 +177,11 @@ Returns whether the subroutine is defined.
 */
 
     INTVAL defined () {
-        return PMC_struct_val(SELF) != NULL;
+        return PMC_cont(SELF)->address != NULL;
     }
 
     INTVAL get_bool () {
-        return PMC_struct_val(SELF) != NULL;
+        return PMC_cont(SELF)->address != NULL;
     }
 
 /*
@@ -208,7 +208,7 @@ destination to continue execution.
                 sub && PMC_sub(sub) && PMC_sub(sub)->name ?
                 PMC_sub(sub)->name : unk);
         }
-        if (PMC_struct_val(SELF))
+        if (cc->address)
             copy_regs(INTERP, caller_regs);
         else if (!cc->seg) {
             /* no address and no segment */
@@ -217,7 +217,7 @@ destination to continue execution.
         if (INTERP->code->cur_cs != cc->seg) {
             Parrot_switch_to_cs(INTERP, cc->seg, 1);
         }
-        return PMC_struct_val(SELF);
+        return cc->address;
     }
 
 /*
