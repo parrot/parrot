@@ -425,22 +425,40 @@ PIO_parse_open_flags(const char *flagstr)
     flags = 0;
     s = flagstr;
     /* Set mode flags - <, >, >>, +<, +> */
-    /* add ? and ! for block/non-block */
-    switch (*s) {
+    switch (*s++) {
     case '+':
         flags |= (PIO_F_WRITE | PIO_F_READ);
+        switch (*s++) {
+        case '<':
+            break;
+        case '>':
+            flags |= PIO_F_TRUNC;
+            break;
+        default:
+            return 0;
+        }
         break;
     case '<':
         flags |= PIO_F_READ;
         break;
     case '>':
         flags |= PIO_F_WRITE;
-        if (*(++s) == '>') {
+        if (*s == '>') {
             flags |= PIO_F_APPEND;
+            s++;
         }
         else {
             flags |= PIO_F_TRUNC;
         }
+        break;
+    default:
+        return 0;
+    }
+
+    /* TODO: add ? and ! for block/non-block */
+    switch (*s++) {
+    case '\0':
+        /* No extra arguments */
         break;
     default:
         return 0;
