@@ -229,7 +229,7 @@ scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
         if (!name) {
             /* no name for new variable, give it a default name of "" */
             /* XXX JPS: is this the way to make an empty string? */
-            name = string_make(interp, "", 9,0,0,0);
+            name = string_make(interp, "        ", 9,0,0,0);
         }
         list_assign(interp, lex->names, position, name, enum_type_STRING);
     }
