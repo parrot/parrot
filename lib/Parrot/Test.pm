@@ -48,6 +48,7 @@ sub _run_command {
 
 sub per_test {
   my ($ext,$count) = @_;
+  $ext =~ s/^\.//;
   my $t = $0;
   $t =~ s/\.t$/_$count\.$ext/;
   return $t;
@@ -146,13 +147,17 @@ sub generate_functions {
     no strict 'refs';
 
     *{'Parrot::Test::'.$func} = sub ($$;$) {
-      ++$count;
       my( $source, $output, $desc ) = @_;
+
+      ++$count;
+
       $output =~ s/\cM\cJ/\n/g;
       local( *SOURCE );
-      my( $source_f, $obj_f, $exe_f, $out_f ) = map {
-        my $t = $0; $t =~ s/\.t$/$count$_/; $t
-      } ('.c', $PConfig{o}, $PConfig{exe}, '.out');
+      my $source_f = per_test('c',$count);
+      my $obj_f = per_test($PConfig{o},$count);
+      my $exe_f = per_test($PConfig{exe},$count);
+      $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
+      my $out_f = per_test('out',$count);
 
       open SOURCE, "> $source_f" or die "Unable to open '$source_f'";
       binmode SOURCE;
@@ -162,9 +167,9 @@ sub generate_functions {
       _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{ld_out}$obj_f $source_f");
       _run_command("$PConfig{ld} $PConfig{ldflags} $obj_f $PConfig{cc_exe_out}$exe_f $PConfig{libs} -L. -lparrot");
 
-      _run_command("./$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
-
       my $prog_output;
+      _run_command(".$PConfig{slash}$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+
       open OUTPUT, "< $out_f";
       {
         local $/ = undef;
@@ -177,9 +182,8 @@ sub generate_functions {
       my $pass = $Builder->$meth( $prog_output, $output, $desc );
 
       unless($ENV{POSTMORTEM}) {
-        unlink $source_f, $obj_f, $exe_f, $out_f;
+        unlink $out_f;
       }
- 
       return $pass;
     }
   }
