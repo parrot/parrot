@@ -51,15 +51,15 @@ pmclass PerlHash {
 	return size;
     }
 
-    INTVAL get_integer_index ( INTVAL index ) {
+    INTVAL get_integer_index ( INTVAL idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
 	return key_pair->cache.int_val;
     }
 
-    INTVAL get_integer_index_s ( STRING* index ) {
+    INTVAL get_integer_index_s ( STRING* idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,idx);
 	return key_pair->cache.int_val;
     }
 
@@ -69,15 +69,15 @@ pmclass PerlHash {
 	return (FLOATVAL)size;
     }
 
-    FLOATVAL get_number_index ( INTVAL index ) {
+    FLOATVAL get_number_index ( INTVAL idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
 	return key_pair->cache.int_val;
     }
 
-    FLOATVAL get_number_index_s ( STRING* index ) {
+    FLOATVAL get_number_index_s ( STRING* idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,idx);
 	return key_pair->cache.num_val;
     }
 
@@ -85,15 +85,15 @@ pmclass PerlHash {
 	return (STRING*)SELF->cache.struct_val;
     }
 
-    STRING* get_string_index ( INTVAL index ) {
+    STRING* get_string_index ( INTVAL idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_i(INTERP,key,idx);
 	return key_pair->cache.struct_val;
     }
 
-    STRING* get_string_index_s ( STRING* index ) {
+    STRING* get_string_index_s ( STRING* idx ) {
 	KEY* key = SELF->cache.struct_val;
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,index);
+	KEY_PAIR* key_pair = key_element_value_s(INTERP,key,idx);
 	return key_pair->cache.struct_val;
     }
 
@@ -131,23 +131,23 @@ pmclass PerlHash {
 	key_set_size(INTERP,key,size);
     }
 
-    void set_integer_index (INTVAL value, INTVAL index) {
+    void set_integer_index (INTVAL value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index+1);
+	if(idx >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,idx+1);
 	}
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;
-	key_set_element_value_i(INTERP,key,index,&key_pair);
+	key_set_element_value_i(INTERP,key,idx,&key_pair);
     }
 
-    void set_integer_index_s (INTVAL value, STRING* index) {
+    void set_integer_index_s (INTVAL value, STRING* idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_int;
 	key_pair.cache.int_val = value;
-	key_set_element_value_s(INTERP,key,index,&key_pair);
+	key_set_element_value_s(INTERP,key,idx,&key_pair);
     }
 
     void set_number (PMC * value) {
@@ -170,23 +170,23 @@ pmclass PerlHash {
 	key_set_size(INTERP,key,size);
     }
 
-    void set_number_index (FLOATVAL value, INTVAL index) {
+    void set_number_index (FLOATVAL value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	if(idx >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,idx);
 	}
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
-	key_set_element_value_i(INTERP,key,index,&key_pair);
+	key_set_element_value_i(INTERP,key,idx,&key_pair);
     }
 
-    void set_number_index_s (FLOATVAL value, STRING* index) {
+    void set_number_index_s (FLOATVAL value, STRING* idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_num;
 	key_pair.cache.num_val = value;
-	key_set_element_value_s(INTERP,key,index,&key_pair);
+	key_set_element_value_s(INTERP,key,idx,&key_pair);
     }
 
     void set_string (PMC * value) {
@@ -204,23 +204,23 @@ pmclass PerlHash {
     void set_string_same (PMC * value) {
     }
 
-    void set_string_index (STRING * value, INTVAL index) {
+    void set_string_index (STRING * value, INTVAL idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
-	if(index >= key_size(INTERP,key)) {
-	    key_set_size(INTERP,key,index);
+	if(idx >= key_size(INTERP,key)) {
+	    key_set_size(INTERP,key,idx);
 	}
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
-	key_set_element_value_i(INTERP,key,index,&key_pair);
+	key_set_element_value_i(INTERP,key,idx,&key_pair);
     }
 
-    void set_string_index_s (STRING * value, STRING* index) {
+    void set_string_index_s (STRING * value, STRING* idx) {
 	KEY* key = SELF->cache.struct_val;
 	KEY_PAIR key_pair;
 	key_pair.type = enum_key_string;
 	key_pair.cache.struct_val = value;
-	key_set_element_value_s(INTERP,key,index,&key_pair);
+	key_set_element_value_s(INTERP,key,idx,&key_pair);
     }
 
     void set_value (void* value) {

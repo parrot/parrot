@@ -185,7 +185,10 @@ sub filter {
   my @methods;
 
   my $OUT = '';
-  my $HOUT = '';
+  my $HOUT = <<"EOC";
+ /* Do not edit - automatically generated from '$pmcfile' by $0 */
+
+EOC
   my %defaulted;
 
   while ($classblock =~ s/($signature_re)//) {
@@ -228,9 +231,12 @@ sub filter {
 
   my $includes = '';
   foreach my $class (keys %visible_supers) {
-      next if $class eq $classname;
+      # No, include yourself to check your headers match your bodies
+      # (and gcc -W... is happy then)
+      # next if $class eq $classname;
       $includes .= qq(#include "\L$class.h"\n);
   }
+
 
   $OUT = <<EOC . $OUT;
  /* Do not edit - automatically generated from '$pmcfile' by $0 */

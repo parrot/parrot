@@ -54,7 +54,7 @@ pmclass ParrotPointer {
       return (FLOATVAL)(INTVAL)SELF->data;
    }
 
-   FLOATVAL get_number_index (INTVAL index) {
+   FLOATVAL get_number_index (INTVAL idx) {
    }
 
    STRING* get_string () {
@@ -99,7 +99,7 @@ pmclass ParrotPointer {
       POINTER_ERROR;
    }
 
-   void set_integer_index (INTVAL value, INTVAL index) {
+   void set_integer_index (INTVAL value, INTVAL idx) {
       POINTER_ERROR;
    }
 
@@ -119,7 +119,7 @@ pmclass ParrotPointer {
       POINTER_ERROR;
    }
 
-   void set_number_index (FLOATVAL value, INTVAL index) {
+   void set_number_index (FLOATVAL value, INTVAL idx) {
       POINTER_ERROR;
    }
 
@@ -143,7 +143,7 @@ pmclass ParrotPointer {
       POINTER_ERROR;
    }
 
-   void set_string_index (STRING* value, INTVAL index) {
+   void set_string_index (STRING* value, INTVAL idx) {
       POINTER_ERROR;
    }
    

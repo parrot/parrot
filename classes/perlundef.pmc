@@ -48,14 +48,14 @@ pmclass PerlUndef {
       return 0;
    }
 
-   INTVAL get_integer_index (INTVAL index) {
+   INTVAL get_integer_index (INTVAL idx) {
    }
 
    FLOATVAL get_number () {
       return 0;
    }
 
-   FLOATVAL get_number_index (INTVAL index) {
+   FLOATVAL get_number_index (INTVAL idx) {
       return 0;
    }
 
@@ -63,7 +63,7 @@ pmclass PerlUndef {
       return string_make(INTERP,NULL,0,NULL,0,NULL);
    }
 
-   STRING* get_string_index (INTVAL index) {
+   STRING* get_string_index (INTVAL idx) {
       return NULL;
    }
 
@@ -98,7 +98,7 @@ pmclass PerlUndef {
       /* Do nothing; Can't happen? */ 
    }
 
-   void set_integer_index (INTVAL value, INTVAL index) {
+   void set_integer_index (INTVAL value, INTVAL idx) {
    }
 
    void set_number (PMC * value) {
@@ -120,7 +120,7 @@ pmclass PerlUndef {
       /* Do nothing; Can't happen? */ 
    }
 
-   void set_number_index (FLOATVAL value, INTVAL index) {
+   void set_number_index (FLOATVAL value, INTVAL idx) {
    }
 
    void set_string (PMC * value) {
@@ -147,7 +147,7 @@ pmclass PerlUndef {
       /* Do nothing; Can't happen? */ 
    }
 
-   void set_string_index (STRING * value, INTVAL index) {
+   void set_string_index (STRING * value, INTVAL idx) {
    }
 
    void set_value (void* value) {

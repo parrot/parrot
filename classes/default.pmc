@@ -41,20 +41,20 @@ pmclass default noinit {
      return SELF->cache.int_val;
    }
 
-   INTVAL get_integer_index (INTVAL index) {
+   INTVAL get_integer_index (INTVAL idx) {
    }
 
-   INTVAL get_integer_index_s (STRING* index) {
+   INTVAL get_integer_index_s (STRING* idx) {
    }
 
    FLOATVAL get_number () {
      return SELF->cache.num_val;
    }
 
-   FLOATVAL get_number_index (INTVAL index) {
+   FLOATVAL get_number_index (INTVAL idx) {
    }
 
-   FLOATVAL get_number_index_s (STRING* index) {
+   FLOATVAL get_number_index_s (STRING* idx) {
    }
 
    STRING* get_string () {
@@ -62,10 +62,10 @@ pmclass default noinit {
      return s;
    }
 
-   STRING* get_string_index (INTVAL index) {
+   STRING* get_string_index (INTVAL idx) {
    }
 
-   STRING* get_string_index_s (STRING* index) {
+   STRING* get_string_index_s (STRING* idx) {
    }
 
    BOOLVAL get_bool () {
@@ -112,10 +112,10 @@ pmclass default noinit {
      SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
    }
 
-   void set_integer_index (INTVAL value, INTVAL index) {
+   void set_integer_index (INTVAL value, INTVAL idx) {
    }
 
-   void set_integer_index_s (INTVAL value, STRING* index) {
+   void set_integer_index_s (INTVAL value, STRING* idx) {
    }
 
    void set_number (PMC * value) {
@@ -135,10 +135,10 @@ pmclass default noinit {
      SELF->cache.num_val = value->vtable->get_number(INTERP, value);
    }
 
-   void set_number_index (FLOATVAL value, INTVAL index) {
+   void set_number_index (FLOATVAL value, INTVAL idx) {
    }
 
-   void set_number_index_s (FLOATVAL value, STRING* index) {
+   void set_number_index_s (FLOATVAL value, STRING* idx) {
    }
 
    void set_string (PMC * value) {
@@ -161,10 +161,10 @@ pmclass default noinit {
      SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
    }
 
-   void set_string_index (STRING * string, INTVAL index) {
+   void set_string_index (STRING * string, INTVAL idx) {
    }
 
-   void set_string_index_s (STRING * string, STRING* index) {
+   void set_string_index_s (STRING * string, STRING* idx) {
    }
 
    void set_value (void* value) {

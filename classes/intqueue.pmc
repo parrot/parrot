@@ -120,14 +120,14 @@ pmclass IntQueue {
 	return dequeue((CONTAINER*)SELF->cache.struct_val);
     }
 
-    INTVAL get_integer_index (INTVAL index) {
+    INTVAL get_integer_index (INTVAL idx) {
     }
 
     FLOATVAL get_number () {
         return (FLOATVAL)SELF->cache.int_val;
     }
 
-    FLOATVAL get_number_index (INTVAL index) {
+    FLOATVAL get_number_index (INTVAL idx) {
     }
 
     STRING* get_string () {
@@ -143,7 +143,7 @@ pmclass IntQueue {
 	return s;
     }
 
-    STRING* get_string_index (INTVAL index) {
+    STRING* get_string_index (INTVAL idx) {
     }
 
     BOOLVAL get_bool () {
@@ -177,7 +177,7 @@ pmclass IntQueue {
         SELF->cache.int_val = value->cache.int_val;
     }
 
-    void set_integer_index (INTVAL value, INTVAL index) {
+    void set_integer_index (INTVAL value, INTVAL idx) {
     }
 
     void set_number (PMC * value) {
@@ -199,7 +199,7 @@ pmclass IntQueue {
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
     }
 
-    void set_number_index (FLOATVAL value, INTVAL index) {
+    void set_number_index (FLOATVAL value, INTVAL idx) {
     }
 
     void set_string (PMC * value) {
@@ -227,7 +227,7 @@ pmclass IntQueue {
 	SELF->cache.struct_val = value->cache.struct_val;
     }
 
-    void set_string_index (STRING * value, INTVAL index) {
+    void set_string_index (STRING * value, INTVAL idx) {
     }
 
     void set_value (void* value) {
