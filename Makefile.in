@@ -407,28 +407,28 @@ languages.dummy :
 test : $(TEST_PROG) assemble.pl test_dummy
 
 test_dummy :
-	$(PERL) t/harness
+	$(PERL) t/harness $(TEST_PROG_ARGS)
 
 testp : $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
 
 test_dummy_p :
-	$(PERL) t/harness -P
+	$(PERL) t/harness $(TEST_PROG_ARGS) -P
 
 testj : $(TEST_PROG) assemble.pl test_dummy_j
 
 test_dummy_j :
-	$(PERL) t/harness -j
+	$(PERL) t/harness $(TEST_PROG_ARGS) -j
 
 quicktest : $(TEST_PROG) assemble.pl quicktest_dummy
 
 quicktest_dummy :
-	$(PERL) t/harness quick
+	$(PERL) t/harness $(TEST_PROG_ARGS) quick
 
 mopstest : $(TEST_PROG) examples/assembly/mops.pbc
-	$(TEST_PROG) examples/assembly/mops.pbc
+	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pbc
 
 lifetest : $(TEST_PROG) examples/assembly/life.pbc
-	$(TEST_PROG) examples/assembly/life.pbc
+	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/life.pbc
 
 
 ###############################################################################
@@ -485,7 +485,7 @@ status :
 lint : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
-	
+
 lint2 : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS2) test_main.c	
