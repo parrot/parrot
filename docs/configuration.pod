@@ -155,14 +155,14 @@ C<Parrot::Configure::Step> module.
 A template for a new step might look like this:
 
     package Configure::Step;
-    
+
     use strict;
     use vars qw($description @args);
     use Parrot::Configure::Step;
-    
+
     $description="<description>";
     @args=qw(<args>);
-    
+
     sub runstep {
         <code>
     }
