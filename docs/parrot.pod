@@ -32,19 +32,22 @@ run them.
 
 The Parrot FAQ.
 
-=item F<core_ops.pod>
+=item F<ops/*.pod>
 
-Description of the core opcodes in the Parrot assembly language.
+Each opcode file in the main directory creates a correspoding documentation
+file in the ops subdirectory at build time. These files describe what each
+opcode does and specify what arguments they take. 
+
+=item F<pmc/*.pod>
+
+Documentation on several of the PMC types available to Parrot. Currently
+rather incomplete. (Patches welcome!)
 
 =item F<parrot_assembly.pod>
 
 The master list of Parrot assembly operations; not all of these have
-been implemented, so you should stick to F<core_ops> when writing
-your assembly programs.
-
-=item F<io_ops.pod>
-
-Description of the opcodes used in Parrot's IO subsystem.
+been implemented, so you should stick to those listed in the documentation
+in F<ops/> when writing Parrot assembly.
 
 =item F<vtables.pod>
 
@@ -74,6 +77,14 @@ A description of the string implementation.
 =item F<tests.pod>
 
 Hints on writing tests for the Parrot interpreter.
+
+=item F<debug.pod>
+
+A beginner's guide to debugging the Parrot executable.
+
+=item F<debugger.pod>
+
+Documentation for C<pdb>, the Parrot debugger.
 
 =back
 
