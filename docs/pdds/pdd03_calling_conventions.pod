@@ -64,11 +64,15 @@ The caller is responsible for preserving any environment it is
 interested in keeping. This includes any and all registers, lexical
 scoping and scratchpads, opcode libraries, and so forth.
 
-Use of the C<savetop> opcode is recommended if the caller wishes to
-save everything, and the C<restoretop> opcode to restore everything
-C<savetop> saved. This saves off the top 16 of each register type,
-leaving the bottom 16 registers, which generally contain the return
-values, intact.
+But due to the nature of the calling scheme (CPS - continuation
+passing style) these duties are handled by the implementation itself.
+The invocation of a continuation swaps in the context that was
+captured, when the continuation was created, which restores e.g. the
+lexical pad stack or the register frame pointer.
+
+But please note, that because of the register usage in function
+returns, all registers not used as return values should be considered
+as volatile.
 
 =head2 Calling conventions
 
@@ -208,7 +212,7 @@ None.
 
 =head1 VERSION
 
-1.4
+1.5
 
 =head2 CURRENT
 
@@ -224,6 +228,10 @@ None.
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.5
+
+16 November 2004
 
 =item Version 1.4
 
@@ -250,6 +258,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.5
+
+Removed necessity of C<savetop> / C<restoretop>.
 
 =item Version 1.4
 
