@@ -21,7 +21,8 @@ pmclass PerlString extends perlscalar {
     }
 
     void mark () {
-	pobject_lives(INTERP, (PObj *)SELF->cache.string_val);
+	if (SELF->cache.string_val)
+	    pobject_lives(INTERP, (PObj *)SELF->cache.string_val);
     }
 
     STRING* name() {
