@@ -763,7 +763,7 @@ sub to_bytecode {
           print STDERR "Caught out-of-bounds register $1 at line $_->[1].\n";
           last;
         }
-        $suffixes .= "_k";
+        $suffixes .= "_s";
         _to_keyed($_);
         push @{$_->[0]}, ['s',$1];
       }
@@ -782,7 +782,7 @@ sub to_bytecode {
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
       elsif($temp=~s/^\[($str_re)\]//) {
-        $suffixes .= "_kc";
+        $suffixes .= "_sc";
         _to_keyed($_);
         push @{$_->[0]}, $self->_string_constant($1);
       }

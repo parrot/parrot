@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 14;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -304,5 +304,113 @@ CODE
 string
 OUTPUT
 }
+
+output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with integers at a time");
+      new P0, .PerlHash
+
+      set P0["foo"],37
+      set P0["bar"],-15
+
+      set I0,P0["foo"]
+      eq I0,37,OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set I0,P0["bar"]
+      eq I0,-15,OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set S1,"foo"
+      set I0,P0[S1]
+      eq I0,37,OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set S1,"bar"
+      set I0,P0[S1]
+      eq I0,-15,OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with numbers at a time");
+      new P0, .PerlHash
+
+      set P0["foo"],37.100000
+      set P0["bar"],-15.100000
+
+      set N0,P0["foo"]
+      eq N0,37.100000,OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set N0,P0["bar"]
+      eq N0,-15.100000,OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set S1,"foo"
+      set N0,P0[S1]
+      eq N0,37.100000,OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set S1,"bar"
+      set N0,P0[S1]
+      eq N0,-15.100000,OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Testing two hash indices with strings at a time");
+      new P0, .PerlHash
+
+      set P0["foo"],"baz"
+      set P0["bar"],"qux"
+
+      set S0,P0["foo"]
+      eq S0,"baz",OK_1
+      print "not "
+OK_1: print "ok 1\n"
+
+      set S0,P0["bar"]
+      eq S0,"qux",OK_2
+      print "not "
+OK_2: print "ok 2\n"
+
+      set S1,"foo"
+      set S0,P0[S1]
+      eq S0,"baz",OK_3
+      print "not "
+OK_3: print "ok 3\n"
+
+      set S1,"bar"
+      set S0,P0[S1]
+      eq S0,"qux",OK_4
+      print "not "
+OK_4: print "ok 4\n"
+
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
 
 1;

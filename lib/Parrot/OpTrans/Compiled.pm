@@ -119,8 +119,7 @@ my %arg_maps = (
   'n'  => "interpreter->num_reg.registers[%ld]",
   'p'  => "interpreter->pmc_reg.registers[%ld]",
   's'  => "interpreter->string_reg.registers[%ld]",
-  'k'  => "interpreter->string_reg.registers[%ld]",
-#  'k'  => "interpreter->int_reg.registers[%ld]",
+  'k'  => "interpreter->int_reg.registers[%ld]",
 
   'ic' => "%ld",
   'nc' => "interpreter->code->const_table->constants[%ld]->number",

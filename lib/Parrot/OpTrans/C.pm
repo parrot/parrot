@@ -57,7 +57,6 @@ sub expr_pop {
   'n'  => "interpreter->num_reg.registers[cur_opcode[%ld]]",
   'p'  => "interpreter->pmc_reg.registers[cur_opcode[%ld]]",
   's'  => "interpreter->string_reg.registers[cur_opcode[%ld]]",
-#  'k'  => "interpreter->string_reg.registers[cur_opcode[%ld]]",
   'k'  => "interpreter->int_reg.registers[cur_opcode[%ld]]",
   
   'ic' => "cur_opcode[%ld]",
