@@ -24,6 +24,7 @@ This class implements the Python "builtin" Functions.
 static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyList;
 
 static STRING *HEX;
 static STRING *OCT;
@@ -47,6 +48,7 @@ they will be used frequently here.
             dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
+            dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
 
             HEX = string_from_cstring(INTERP, "__hex__", 0);
             OCT = string_from_cstring(INTERP, "__oct__", 0);
@@ -199,6 +201,52 @@ Returns the octal representation of C<value>.
         REG_PMC(2) = value;
         VTABLE_invoke(INTERP, meth, REG_PMC(1));
         return REG_PMC(5);
+    }
+
+/*
+
+=item C<PMC* "range"(PMC *pstart, PMC *pend, PMC *pstep)>
+
+Returns a list of integers ranging from C<pstart> to C<pend> with
+an increment of C<pstep>
+
+=cut
+
+*/
+
+    METHOD PMC* range(PMC *pstart, PMC *pend, PMC *pstep) {
+        PMC *ar = pmc_new(interpreter, dynclass_PyList);
+        INTVAL start = 0, end = 0, step = 1;
+        int i, k, argcP;
+
+        argcP = REG_INT(3);
+        if (argcP == 1) {
+            end = VTABLE_get_integer(interpreter, pstart);
+        }
+        else if (argcP == 2) {
+            start = VTABLE_get_integer(interpreter, pstart);
+            end =  VTABLE_get_integer(interpreter, pend);
+        }
+        else if (argcP == 3) {
+            start = VTABLE_get_integer(interpreter, pstart);
+            end =  VTABLE_get_integer(interpreter, pend);
+            step =  VTABLE_get_integer(interpreter, pstep);
+            if (step == 0)
+                real_exception(interpreter, NULL, E_ValueError,
+                        "range() step argument must not be zero");
+        }
+        else {
+            /* TODO err */
+        }
+        if (step < 0) {
+            for (i = start, k = 0; i > end; i += step, ++k)
+                VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+        }
+        else {
+            for (i = start, k = 0; i < end; i += step, ++k)
+                VTABLE_set_integer_keyed_int(interpreter, ar, k, i);
+        }
+        return ar;
     }
 
 /*

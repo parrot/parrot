@@ -16,9 +16,9 @@ Tests the Python Builtins.
 
 =cut
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
-output_is(<< 'CODE', << 'OUTPUT', "attribute");
+output_is(<< 'CODE', << 'OUTPUT', "delegating");
 ##PIR##
 .sub main @MAIN
     new_pad 0
@@ -70,4 +70,59 @@ CODE
 0x1f
 31
 037
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "range");
+##PIR##
+.sub main @MAIN
+    new_pad 0
+    loadlib $P0, "python_group"
+    find_global P0, "PyBuiltin", "__load__"
+    invoke
+
+    find_type $I0, "PyInt"
+    new $P0, $I0
+    new $P1, $I0
+    new $P2, $I0
+    new $P3, $I0
+    new $P4, $I0
+
+    set $P0, 0
+    set $P1, 1
+    set $P2, 2
+    set $P3, 3
+    set $P4, -2
+
+    find_lex $P5, "range"
+    $P6 = $P5($P0,$P0,$P1)
+    print $P6
+    print "\n"
+
+    $P6 = $P5($P0,$P3,$P1)
+    print $P6
+    print "\n"
+
+    $P6 = $P5($P0,$P3,$P2)
+    print $P6
+    print "\n"
+
+    $P6 = $P5($P3,$P0,$P4)
+    print $P6
+    print "\n"
+
+    $P6 = $P5($P0,$P3)
+    print $P6
+    print "\n"
+
+    $P6 = $P5($P2)
+    print $P6
+    print "\n"
+.end
+CODE
+[]
+[0, 1, 2]
+[0, 2]
+[3, 1]
+[0, 1, 2]
+[0, 1]
 OUTPUT

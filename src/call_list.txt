@@ -249,4 +249,5 @@ v	Iiiip
 
 # PyBuiltins
 P	IOPP
+P	IOPPP
 
