@@ -7,7 +7,7 @@
 
 #include "imc.h"
 
-void fatal(int code, char *func, char *fmt, ...)
+void fatal(int code, const char *func, const char *fmt, ...)
 {
     va_list ap;
 
@@ -19,7 +19,7 @@ void fatal(int code, char *func, char *fmt, ...)
 }
 
 
-void fataly(int code, char *func, int line, char *fmt, ...)
+void fataly(int code, const char *func, int line, const char *fmt, ...)
 {
     va_list ap;
 
@@ -31,7 +31,7 @@ void fataly(int code, char *func, int line, char *fmt, ...)
 }
 
 
-void warning(char *func, char *fmt, ...)
+void warning(const char *func, const char *fmt, ...)
 {
     va_list ap;
 
@@ -41,7 +41,7 @@ void warning(char *func, char *fmt, ...)
     va_end(ap);
 }
 
-void info(int level, char *fmt, ...)
+void info(int level, const char *fmt, ...)
 {
     va_list ap;
 
@@ -53,7 +53,7 @@ void info(int level, char *fmt, ...)
     va_end(ap);
 }
 
-void debug(int level, char *fmt, ...)
+void debug(int level, const char *fmt, ...)
 {
     va_list ap;
 
