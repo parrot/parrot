@@ -372,12 +372,13 @@ Gets the start and end indices of the group indicated by the fourth parameter.
 =cut
 
 op rx_info_getgroup(in pmc, out int, out int, in int) {
+        KEY_PAIR key_p;
+        KEY key;
 	RX_dUNPACK($1);
 
-    /* Delayed XXX
-	$2=rx->groupstart->vtable->get_integer_index(interpreter, rx->groupstart, $4);
-	$3=rx->groupend->vtable->get_integer_index(interpreter, rx->groupend, $4);
-    */
+        MAKE_KEY(key, key_p, $4, enum_key_int, int_val);
+	$2=rx->groupstart->vtable->get_integer_keyed(interpreter, rx->groupstart, &key);
+	$3=rx->groupend->vtable->get_integer_keyed(interpreter, rx->groupend, &key);
 	
 	goto NEXT();
 }
@@ -635,11 +636,12 @@ the second parameter.
 =cut
 
 op rx_startgroup(in pmc, in int) {
+        KEY_PAIR key_p;
+        KEY key;
 	RX_dUNPACK($1);
 	
-    /* XXX Delayed
-	rx->groupstart->vtable->set_integer_index(interpreter, rx->groupstart, rx->index, $2);
-    */
+        MAKE_KEY(key, key_p, $2, enum_key_int, int_val);
+	rx->groupstart->vtable->set_integer_keyed(interpreter, rx->groupstart, &key, rx->index);
 	
 	goto NEXT();
 }
@@ -654,13 +656,14 @@ the second parameter.
 =cut
 
 op rx_endgroup(in pmc, in int) {
-	RX_dUNPACK($1);
+    KEY_PAIR key_p;
+    KEY key;
+    RX_dUNPACK($1);
 	
-    /* XXX Delayed
-	rx->groupend->vtable->set_integer_index(interpreter, rx->groupend, rx->index, $2);
-    */
+    MAKE_KEY(key, key_p, $2, enum_key_int, int_val);        
+    rx->groupend->vtable->set_integer_keyed(interpreter, rx->groupend, &key, rx->index);
 	
-	goto NEXT();
+    goto NEXT();
 }
 
 ########################################
