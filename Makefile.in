@@ -22,7 +22,7 @@ PDUMP = pdump${exe}
 .c$(O):
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} Parrot/OpLib/core.pm
+all : $(TEST_PROG) $(PDUMP) Parrot/OpLib/core.pm examples/assembly/mops${exe} 
 
 #XXX This target is not portable to Win32
 
@@ -101,6 +101,9 @@ clean:
 	$(RM_F) $(INC)/vtable.h
 	$(RM_F) $(INC)/oplib/core_ops.h
 	$(RM_F) $(TEST_PROG) $(PDISASM) $(PDUMP)
+	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
+	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
+	$(RM_F) Parrot/OpLib/core.pm
 	cd docs; make clean
 
 test: $(TEST_PROG) assemble.pl .test_dummy
