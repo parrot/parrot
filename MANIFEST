@@ -110,8 +110,6 @@ pbc2c.pl
 pdump.c
 platforms/generic.c
 platforms/generic.h
-platforms/linux.c
-platforms/linux.h
 platforms/win32.c
 platforms/win32.h
 README
