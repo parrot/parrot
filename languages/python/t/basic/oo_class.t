@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -32,6 +32,22 @@ class C(int):
 def main():
     i = C(2)
     print i
+
+if __name__ == '__main__':
+    main()
+CODE
+
+test(<<'CODE', 'object init from int grandparent class');
+class C(int):
+    def foo(self): return 'foo'
+
+class D(C):
+    def foo(self): return 'foo'
+    def bar(self): return 'bar'
+
+def main():
+    i = D(2)
+    print i, i.foo(), i.bar()
 
 if __name__ == '__main__':
     main()

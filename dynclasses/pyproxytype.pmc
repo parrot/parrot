@@ -64,9 +64,12 @@ While this seems like a lot of work, lets consider all the cases:
 #include "parrot/parrot.h"
 
 static INTVAL dynclass_PyClass;
+static INTVAL dynclass_PyString;
+static INTVAL dynclass_PyProxyType;
 static STRING *BASES;
 static STRING *CLASS;
 static STRING *INIT;
+static STRING *NAME;
 static STRING *PROXY;
 
 pmclass PyProxyType extends PyType dynpmc group python_group {
@@ -84,10 +87,13 @@ they will be used frequently here.
 
     void class_init() {
         if (pass) {
+            dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
             dynclass_PyClass = Parrot_PMC_typenum(INTERP, "PyClass");
+            dynclass_PyString = Parrot_PMC_typenum(INTERP, "PyString");
             BASES = const_string(INTERP, "__bases__");
             CLASS = const_string(INTERP, "__class__");
             INIT  = const_string(INTERP, "__init__");
+            NAME  = const_string(INTERP, "__name__");
             PROXY = const_string(INTERP, "__proxy__");
         }
     }
@@ -112,6 +118,12 @@ TODO: reconcile this with Parrot's instantiate VTABLE entry.
 
         proxy_class = VTABLE_getprop(INTERP, SELF, BASES);
         object_class = VTABLE_getprop(INTERP, proxy_class, BASES);
+        while (1) {
+            PMC *parent_class = VTABLE_getprop(INTERP, object_class, BASES);
+            if (!parent_class || !VTABLE_defined(INTERP, parent_class))
+                break;
+            object_class = parent_class;
+        }
 
         object = pmc_new(INTERP, object_class->vtable->base_type);
 
@@ -132,6 +144,27 @@ TODO: reconcile this with Parrot's instantiate VTABLE entry.
 
         REG_PMC(5) = proxy;
         return next;
+    }
+
+/*
+
+=item C<PMC* subclass(STRING *name)>
+
+Create a subclass of the given class.  Note that this merely creates
+a new PyType... all the interesting details that make it a subclass
+need to be filled in.
+
+=cut
+
+*/
+
+    PMC* subclass(STRING* name) {
+        PMC *ret = pmc_new(INTERP, dynclass_PyProxyType);
+        PMC *nameprop = pmc_new(INTERP, dynclass_PyString);
+        VTABLE_set_string_native(INTERP, nameprop, name);
+        VTABLE_setprop(INTERP, ret, NAME, nameprop);
+        VTABLE_setprop(INTERP, ret, BASES, SELF);
+        return ret;
     }
 
 /*

@@ -408,7 +408,7 @@ Divides C<*value> by C<SELF> and returns the result.
 
 /*
 
-=item C<void "__repr__"(PMC *value)>
+=item C<PMC* "__repr__"(PMC *value)>
 
 Return the string representation of this PMC.
 
@@ -798,14 +798,14 @@ this logic with a TypeError.
 
     PMC* subclass(STRING* name) {
         INTVAL dynclass_PyProxyType, dynclass_PyProxyClass;
-        PMC *proxy_type, *adaptor_class, *nameprop;
+        PMC *proxy_type, *proxy_class, *nameprop;
         STRING *NAME, *BASES;
 
         dynclass_PyProxyClass = Parrot_PMC_typenum(INTERP, "PyProxyClass");
-        adaptor_class = pmc_new(INTERP, dynclass_PyProxyClass);
+        proxy_class = pmc_new(INTERP, dynclass_PyProxyClass);
 
         BASES = const_string(INTERP, "__bases__");
-        VTABLE_setprop(INTERP, adaptor_class, BASES, SELF);
+        VTABLE_setprop(INTERP, proxy_class, BASES, SELF);
 
         dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
         proxy_type = pmc_new(INTERP, dynclass_PyProxyType);
@@ -815,7 +815,7 @@ this logic with a TypeError.
         VTABLE_setprop(INTERP, proxy_type, NAME, nameprop);
         VTABLE_set_string_native(INTERP, nameprop, name);
 
-        VTABLE_setprop(INTERP, proxy_type, BASES, adaptor_class);
+        VTABLE_setprop(INTERP, proxy_type, BASES, proxy_class);
 
         return proxy_type;
     }
