@@ -9,10 +9,10 @@ io/io_unix.c - UNIX IO layer
 =head1 DESCRIPTION
 
 This is the Parrot UNIX IO layer. It implements unbuffered, low-level,
-UNIX-specifc functionality.
+UNIX-specific functionality.
 
-As "UNIX" is already a generalization, it may be necessary to create a
-separate OS-specific layers for UNIX flavours, to avoid
+As "UNIX" is already a generalization, it may be necessary to create
+separate OS-specific layers for UNIX flavors, to avoid
 over-complicating this file.
 
 =head2 References:

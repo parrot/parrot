@@ -456,7 +456,7 @@ F<io/io_private.h>.
 
 =head1 HISTORY
 
-Adapted from io_unix.c by Josh WIlmes (josh@hitchhiker.org).
+Adapted from io_unix.c by Josh Wilmes (josh@hitchhiker.org).
 
 =cut
 
