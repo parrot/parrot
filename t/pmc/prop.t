@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set/getprop");
@@ -26,6 +26,34 @@ CODE
 ten
 zehn
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Property values are references");
+    new P0, .PerlString
+    set P0, "Dog"
+
+    set S0, "Brown"
+    set P1, "Yes"
+    setprop P0, S0, P1
+
+    set S0, "Black"
+    set P1, "No"
+    setprop P0, S0, P1
+
+    new P2, .PerlString
+    getprop P2, "Black", P1
+    print P2
+    print "\n" 
+
+    getprop P2, "Brown", P1
+    print P2
+    print "\n" 
+
+    end
+CODE
+No
+No
+OUTPUT
+
 
 output_is(<<'CODE', <<'OUTPUT', "delprop");
     new P0, .PerlInt
