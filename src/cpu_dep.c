@@ -12,6 +12,8 @@
 
 #include "parrot/parrot.h"
 
+void flush_register_windows(void);
+
 void
 flush_register_windows(void)
 {
