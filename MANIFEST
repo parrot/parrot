@@ -1,3 +1,4 @@
+Configure.in
 MANIFEST
 Makefile
 README
@@ -7,7 +8,7 @@ basic_opcodes.ops
 build_interp_starter.pl
 bytecode.c
 bytecode.h
-config.h
+config.h.in
 disassemble.pl
 docs/opcodes.pod
 docs/overview.pod

@@ -6,8 +6,8 @@
 
 #if !defined(PARROT_CONFIG_H_GUARD)
 #define PARROT_CONFIG_H_GUARD 
-typedef long IV;
-typedef long double NV;
+typedef ${iv} IV;
+typedef ${iv} double NV;
 
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
@@ -23,5 +23,9 @@ typedef void SYNC;
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
 #define MASK_CHUNK_LOW_BITS 0xfffff000
+
+
+${headers}
+
 
 #endif

@@ -43,5 +43,8 @@ basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
 op.h: opcode_table make_op_header.pl
 	perl make_op_header.pl opcode_table > op.h
 
+config.h: Configure.pl config.h.in
+	perl Configure.pl
+
 clean:
 	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog
