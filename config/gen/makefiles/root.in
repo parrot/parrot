@@ -931,7 +931,7 @@ ${TEMP_icu_make}
 # to disable GC_DEBUG.
 EXTRA_TEST_ARGS = --gc-debug --running-make-test
 IMCC_TEST_FILES = imcc/t/*/*.t
-TEST_FILES      = t/op/*.t t/pmc/*.t t/native_pbc/*.t $(IMCC_TEST_FILES)
+TEST_FILES      = t/library/*.t t/op/*.t t/pmc/*.t t/native_pbc/*.t $(IMCC_TEST_FILES)
 SRC_TEST_FILES  = t/src/*.t
 
 # Run test cases with a single call of t/harness
