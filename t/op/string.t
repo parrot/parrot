@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 119;
+use Parrot::Test tests => 120;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2041,6 +2041,23 @@ output_is( <<'CODE', <<OUTPUT, "transcode to utf8");
 CODE
 ASCII is the same as UTF8
 ASCII is the same as UTF8
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "string_chartype");
+    set S0, "Test String"
+    find_chartype I0, "usascii"
+    set_chartype S0, I0  
+    string_chartype I1, S0  
+    eq I1, I0, OK
+    print I0
+    print "\n"
+    print I1
+    print "\n"
+    print "not "
+OK: print "ok\n"
+    end
+CODE
+ok
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
