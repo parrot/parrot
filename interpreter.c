@@ -21,11 +21,13 @@
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
+#include "parrot/method_util.h"
 
 #define ATEXIT_DESTROY
 
 extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
+static void setup_default_compreg(Parrot_Interp interpreter);
 
 /*=for api interpreter runops_generic
  * TODO: Not really part of the API, but here's the docs.
@@ -512,6 +514,10 @@ make_interpreter(Interp_flags flags)
     SET_NULL_P(interpreter->prederef_code, void **);
     SET_NULL(interpreter->jit_info);
 
+    SET_NULL_P(interpreter->Parrot_compreg_hash, PMC *);
+    /* register assembler/compilers */
+    setup_default_compreg(interpreter);
+
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
@@ -686,6 +692,40 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
     }
     return ret;
 }
+
+/*=for api interpreter Parrot_compreg
+ * register a parser/compiler function
+ */
+
+void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
+{
+    PMC* key, *hash;
+    if (!interpreter->Parrot_compreg_hash) {
+        hash = interpreter->Parrot_compreg_hash =
+            pmc_new_noinit(interpreter, enum_class_PerlHash);
+        hash->vtable->init(interpreter, hash);
+    }
+    else
+        hash = interpreter->Parrot_compreg_hash;
+    key = key_new_string(interpreter, type);
+    hash->vtable->set_pmc_keyed(interpreter, hash, key, func, NULL);
+}
+
+
+static void setup_default_compreg(Parrot_Interp interpreter)
+{
+    STRING *pasm1 = string_make(interpreter, "PASM1", 5, NULL,0,NULL);
+    PMC * nci;
+    Parrot_csub_t p = (Parrot_csub_t) F2DPTR(PDB_compile);
+    nci = pmc_new(interpreter, enum_class_Compiler);
+    /* register the nci ccompiler object */
+    Parrot_compreg(interpreter, pasm1, nci);
+    /* build native call interface */
+    nci->vtable->set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p),
+            string_make(interpreter, "pIt", 3, NULL,0,NULL));
+}
+
+
 /*
  * Local variables:
  * c-indentation-style: bsd

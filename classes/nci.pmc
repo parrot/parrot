@@ -20,15 +20,16 @@ pmclass NCI {
     	PObj_custom_mark_SET(SELF);
     }
 
+    void set_string_keyed (PMC* func, STRING* value) {
+	/* key = func_ptr, value = signature */
+	SELF->cache.struct_val = (DPOINTER *)func;
+	SELF->data = build_call_func(INTERP, SELF, value);
+    }
 
     void mark () {
 	PMC *f = SELF->cache.struct_val;
 	if (f)
 	    pobject_lives(INTERP, (PObj *)f);
-    }
-
-    INTVAL type () {
-        return enum_class_NCI;
     }
 
     STRING* name () {
@@ -37,7 +38,7 @@ pmclass NCI {
 
     void destroy() {
 	if (SELF->data)
-	    free(SELF->data);
+	    mem_sys_free(SELF->data);
     }
 
     void clone (PMC *ret) {
@@ -48,25 +49,6 @@ pmclass NCI {
 	 * ManagedStruct or Buffer?
 	 */
 	ret->data = SELF->data;
-    }
-
-    PMC* get_pmc () {
-        return SELF;
-    }
-
-    INTVAL is_same (PMC* value) {
-        return SELF == value;
-    }
-
-    void set_same (PMC* value) {
-        SELF->cache.struct_val = value->cache.struct_val;
-	SELF->data = value->data;
-    }
-
-    INTVAL is_equal (PMC* value) {
-        return (SELF->vtable == value->vtable
-                && SELF->cache.struct_val == value->cache.struct_val
-		&& SELF->data == value->data);
     }
 
     INTVAL defined () {

@@ -27,7 +27,6 @@ void Parrot_push_proto(struct Parrot_Interp * interp,
 
 typedef INTVAL (*Parrot_csub_t)(struct Parrot_Interp * , PMC * );
 PMC * Parrot_new_csub(struct Parrot_Interp * interp, Parrot_csub_t func);
-PMC * Parrot_new_nci(struct Parrot_Interp * interp, Parrot_csub_t func, String *signature);
 
 struct method_rec_t {
     char * name;

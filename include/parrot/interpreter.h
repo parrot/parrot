@@ -169,6 +169,7 @@ typedef struct Parrot_Interp {
     INTVAL world_inited;        /* Parrot_init is done */
     PMC *mark_ptr;             /* last PMC marked used in DOD runs */
     PMC *Parrot_base_classname_hash;    /* hash containing name->base_type */
+    PMC *Parrot_compreg_hash;   /* hash containing assembler/compilers */
 } Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
@@ -189,6 +190,7 @@ void runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
 VAR_SCOPE opcode_t *(*run_native)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,
                                   opcode_t * start_code);
+void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func);
 
 #endif   /* Parrot core */
 

@@ -55,7 +55,7 @@ typedef struct PDB_condition {
     PDB_condition_ptr       next;
 } PDB_condition_t;
 
-/*  PDB_label_t 
+/*  PDB_label_t
  *      A label in the source file.
  *
  *  opcode:         The pointer to the bytecode where the label is.
@@ -71,7 +71,7 @@ typedef struct PDB_label {
 } PDB_label_t;
 
 /*  PDB_line_t
- *      A line in the source file. 
+ *      A line in the source file.
  *
  *  opcode:         A pointer to the opcode in the bytecode correspoinding to
  *                  this line.
@@ -173,6 +173,7 @@ void PDB_next(struct Parrot_Interp *interpreter, const char *command);
 void PDB_trace(struct Parrot_Interp *interpreter, const char *command);
 
 void PDB_eval(struct Parrot_Interp *interpreter, const char *command);
+opcode_t * PDB_compile(struct Parrot_Interp *, const char *command);
 
 int PDB_extend_const_table(struct Parrot_Interp *interpreter);
 
@@ -182,7 +183,7 @@ void PDB_continue(struct Parrot_Interp *interpreter, const char *command);
 
 char PDB_break(struct Parrot_Interp *interpreter);
 
-void PDB_delete_breakpoint(struct Parrot_Interp *interpreter, 
+void PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     const char *command);
 
 void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
@@ -212,7 +213,7 @@ void PDB_set_break(struct Parrot_Interp *interpreter, const char *command);
 PDB_condition_t *PDB_cond(struct Parrot_Interp *interpreter,
     const char *command);
 
-char PDB_check_condition(struct Parrot_Interp *interpreter, 
+char PDB_check_condition(struct Parrot_Interp *interpreter,
     PDB_condition_t *condition);
 
 void PDB_watchpoint(struct Parrot_Interp *interpreter,

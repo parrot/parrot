@@ -139,7 +139,7 @@ Changes made to reflect that.
 
 =over 4
 
-=item * Added in object 
+=item * Added in object
 
 =item * Changed remnants of "perl" to "Parrot"
 
@@ -638,11 +638,11 @@ handler is in scope.
 
 =item clear_eh
 
-Clear out the most recently placed exception 
+Clear out the most recently placed exception
 
 =item throw Px
 
-Throw an exception represented by the object in PMC register x. 
+Throw an exception represented by the object in PMC register x.
 
 =item rethrow Px
 
@@ -718,7 +718,7 @@ name in X.
 
 =head2 I/O operations
 
-Reads and writes read and write records, for some value of record. 
+Reads and writes read and write records, for some value of record.
 
 =over 4
 
@@ -892,7 +892,7 @@ variable.  This is done to allow for opaque, packed, and
 multidimensional aggregate types.
 
 A key entry may be an integer, string, or PMC. Integers are used for
-array lookups, strings for hash lookups, and PMCs for either. 
+array lookups, strings for hash lookups, and PMCs for either.
 
 =over 4
 
@@ -1034,7 +1034,7 @@ rest are the parameters. The types are:
 
 =over 4
 
-=item v 
+=item v
 
 Void. As a return type indicates that there I<is> no return type. As
 a parameter indicates that there are no parameters. Can't be mixed
@@ -1114,19 +1114,27 @@ of source code.
 
 =over 4
 
-=item compile Px, sy, sz
+=item compile Px, Py, Sz
 
-Compile source string Y, with compiler unit Z, and stick a handle to
+Compile source string Z, with compiler unit Y, and stick a handle to
 a subroutine for the resulting bytecode segment (already loaded into
 the current interpreter) into X.
 
-Z will be the name of a compiler module of some sort, as registered
-with the compiler unit. This will be something like "Perl5", "Perl6",
-"Perl5RE", "Perl6RE", "Python", "Ruby"... you get the picture. 
+Y is a assembler/compiler object of some sort, as registered with the
+B<compreg> opcode or the Parrot_compreg function. This will be something
+like "Perl5", "Perl6", "Perl5RE", "Perl6RE", "Python", "Ruby"... you get
+the picture.
+
+Parrot knows of a "PASM1" compiler, i.e. a one statement PASM compiler
+implemented as PDB_eval. Imcc registers "PASM" and "PIR" compilers.
 
 This is a high-level op, with the assumption that the resulting sub
 will be called. It's the equivalent of perl 5's string eval, except
 for the actual execution of the resulting code.
+
+=item compreg Px, Sy
+
+Get a compiler for source type Y.
 
 =item compreg Sx, Py
 

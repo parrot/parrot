@@ -4485,6 +4485,24 @@ can build or find an appropriate thunking function.
 
 Call the subroutine in P0, as described in PDD03.
 
+=item B<compile>(out PMC, in PMC, in STR)
+
+Compile source code $3 with compiler $2 into PMC $1.
+
+=item B<compreg>(out PMC, in STR)
+
+Get a compiler for source type $2.
+
+=item B<compreg>(in STR, in PMC)
+
+Register the sub $2 as a compiler for source type $1.
+XXX: leo: N/Y how would we get the C-subroutine?
+
+=item B<compreg>(in STR, in INT)
+
+Register the PASM sub at address $2 as a compiler for source type $1.
+XXX: leo N/Y
+
 =cut
 
 inline op loadext(in STR, in STR) {
@@ -4524,6 +4542,7 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc (out PMC, in PMC, in STR, in STR) {
   char * name = string_to_cstring(interpreter, ($3));
+  PMC *nci;
 
   Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(($2)->data, name));
   free(name);
@@ -4534,8 +4553,8 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
      }
      PANIC("Failed to link native method");
   }
-
-  $1 = Parrot_new_nci(interpreter, p, $4);
+  $1 = nci = pmc_new(interpreter, enum_class_NCI);
+  nci->vtable->set_string_keyed(interpreter, nci, (PMC*)F2DPTR(p), $4);
   goto NEXT();
 }
 
@@ -4546,6 +4565,18 @@ inline op invoke() {
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 
   goto ADDRESS(dest);
+}
+
+inline op compile(OUT PMC, in PMC, in STR) {
+  $1 = $2->vtable->invoke(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op compreg(OUT PMC, in STR) {
+  PMC *key = key_new_string(interpreter, $2);
+  $1 = interpreter->Parrot_compreg_hash->vtable->get_pmc_keyed(
+    interpreter, interpreter->Parrot_compreg_hash, key);
+  goto NEXT();
 }
 
 =item B<find_method>(out PMC, in PMC, in STR)

@@ -104,6 +104,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)current);
 
+    if (interpreter->Parrot_compreg_hash)
+        pobject_lives(interpreter, (PObj *)interpreter->Parrot_compreg_hash);
     /* Now, go run through the PMC registers and mark them as live */
     /* First mark the current set. */
     for (i = 0; i < NUM_REGISTERS; i++) {

@@ -311,13 +311,8 @@ pmclass default abstract noinit {
         return DYNSELF.get_pmc_keyed(r_key);
     }
 
-    INTVAL is_same (PMC* pmc2) {
-        /* I think this should cover this correctly, is_same implies that
-        same B<data> used by each, but as meaning of data is a little
-        vtable reliant, I include that test as well */
-        return (INTVAL)(SELF->vtable == pmc2->vtable &&
-		&SELF->cache == &pmc2->cache &&
-		&SELF->data == &pmc2->data);
+    INTVAL is_same (PMC* value) {
+        return SELF == value;
     }
 
     INTVAL is_same_keyed (PMC* key, PMC* value, PMC* value_key) {
@@ -466,7 +461,8 @@ pmclass default abstract noinit {
     }
 
     void set_same (PMC* value) {
-        SELF->cache = value->cache;
+        SELF->cache.struct_val = value->cache.struct_val;
+	SELF->data = value->data;
     }
 
     void set_same_keyed (PMC* dest_key, PMC* src, PMC* src_key) {
@@ -1312,10 +1308,9 @@ pmclass default abstract noinit {
     }
 
     INTVAL is_equal (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"is_equal() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
+        return (SELF->vtable == value->vtable
+                && SELF->cache.struct_val == value->cache.struct_val
+		&& SELF->data == value->data);
     }
 
     INTVAL is_equal_keyed (PMC* key, PMC* value, PMC* value_key) {

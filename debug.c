@@ -1504,11 +1504,24 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
+    opcode_t *run;
+    run = PDB_compile(interpreter, command);
+    if (run)
+        DO_OP(run,interpreter);
+}
+
+/* PDB_compile
+ * compiles one instruction with fully qualified opcode name
+ * and valid arguments, NO error checking.
+ */
+opcode_t *
+PDB_compile(struct Parrot_Interp *interpreter, const char *command)
+{
     char buf[256];
     char s[1], *c = buf;
     op_info_t *op_info;
     /* Opcodes can't have more that 10 arguments */
-    opcode_t eval[10],*run;
+    static opcode_t eval[11];
     int op_number,i,k,l,j = 0;
 
     /* find_op needs a string with only the opcode name */
@@ -1519,7 +1532,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     op_number = interpreter->op_lib->op_code(buf, 1);
     if (op_number < 0) {
         PIO_eprintf(interpreter, "Invalid opcode '%s'\n", buf);
-        return;
+        return NULL;
     }
     /* Start generating the bytecode */
     eval[j++] = (opcode_t)op_number;
@@ -1575,9 +1588,8 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
                 break;
         }
     }
-
-    run = eval;
-    DO_OP(run,interpreter);
+    eval[j++] = 0;      /* append end op */
+    return eval;
 }
 
 /* PDB_extend_const_table

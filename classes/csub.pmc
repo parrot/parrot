@@ -49,7 +49,7 @@ pmclass CSub {
         return SELF->cache.struct_val != NULL;
     }
 
-    void * invoke (void * next) {
+    void* invoke (void * next) {
         Parrot_csub_t func = (Parrot_csub_t)SELF->cache.struct_val;
         func(INTERP, SELF);
         return next;

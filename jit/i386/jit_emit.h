@@ -2137,6 +2137,9 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 emitm_addb_i_r(pc, 8, emit_ESP);
                 emitm_pushl_r(pc, emit_EAX);
                 break;
+            case 'I':
+                emitm_pushl_i(pc, interpreter);
+                break;
             default:
                 internal_exception(1,
                         "Parrot_jit_build_call_func: unimp argument\n");

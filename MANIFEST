@@ -1394,6 +1394,7 @@ languages/imcc/t/imcpasm/opt2.t
 languages/imcc/t/imcpasm/sub.t
 languages/imcc/t/syn/clash.t
 languages/imcc/t/syn/const.t
+languages/imcc/t/syn/eval.t
 languages/imcc/t/syn/labels.t
 languages/imcc/t/syn/namespace.t
 languages/imcc/t/syn/scope.t
@@ -1737,6 +1738,7 @@ t/op/trans.t
 t/op/types.t
 t/pmc/array.t
 t/pmc/boolean.t
+t/pmc/eval.t
 t/pmc/intlist.t
 t/pmc/multiarray.t
 t/pmc/nci.t

@@ -15,11 +15,6 @@
 
 pmclass Sub {
 
-   INTVAL type () {
-       return enum_class_Sub;
-   }
-
-
    STRING* name () {
 	return whoami;
    }
