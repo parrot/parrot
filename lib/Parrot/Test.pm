@@ -37,7 +37,7 @@ sub _run_command {
     $redir_string .= "open $from, $to;"
   }
 
-  system "mcr $^X -e \"$redir_string;system q{$command};\"";
+  system "$^X -e \"$redir_string;system q{$command};\"";
 }
 
 my $count;
@@ -59,8 +59,8 @@ foreach my $i ( qw(is isnt like) ) {
     print ASSEMBLY $assembly;
     close ASSEMBLY;
 
-    _run_command( "perl assemble.pl $as_f --output $by_f" );
-    _run_command( "[]test_prog $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+    _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
+    _run_command( "./test_prog $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;
     open OUTPUT, "< $out_f";
