@@ -41,7 +41,7 @@ $LIBPA =~ s/\$\(A\)/$LIB/;
 #
 # imported meth's for Test::More
 $TEST_IMPORT = 'skip is';
- 
+
 use vars '%OPT';
 
 sub usage($) {
@@ -111,7 +111,7 @@ Parser options:
         --trace      set $::RD_TRACE (or construct trace-enabled parser)
         --grammar NAME
                      use precompiled grammar NAME (default = Perl6grammar)
-  
+
           only useful when constructing parser:
         --hitem      keep track of %item hash
         --force-grammar
@@ -163,6 +163,7 @@ GetOptions(\%OPT,qw{
     warnings|w+
     parrot-options|R=s
     compile-pbc|C quick|q ignore-exitcode rm-exe shared
+    output|o=s
     runpbc|r
     optimize|O=s
     pbc|B pasm|S imc|I
@@ -335,13 +336,21 @@ sub output_tree {
 	verbose(2, "compiling tree");
 	warnings(sub { P6C::IMCC::compile($x) }, $fw);
 	my $f = "$filebase.imc";
-	verbose(2, "Writing '$f'");
-	open(OOUT, '>&STDOUT');
-	open(STDOUT, ">$f");
+	if ($OPT{output} eq '-') {
+	    verbose(2, "Writing to STDOUT");
+	    $OPT{imc} = 1;	# stop after pipeing output to imcc
+	}
+	else {
+	    verbose(2, "Writing '$f'");
+	    open(OOUT, '>&STDOUT');
+	    open(STDOUT, ">$f");
+	}
 	warnings(sub { P6C::IMCC::emit() }, $fw);
-	close(STDOUT);
-	open(STDOUT, '>&OOUT');
-	close(OOUT);
+	if ($OPT{output} ne '-') {
+	    close(STDOUT);
+	    open(STDOUT, '>&OOUT');
+	    close(OOUT);
+	}
 	return if ($OPT{imc});
 	push(@temp_files, $f);
 	pass2($f, $fw);
@@ -439,7 +448,12 @@ sub run {
         if ($f eq '-') {
             $filebase = 'a';
         } else {
-            ($filebase = $f) =~ s/\.[^.]*$//;
+	    if ($OPT{output} && $OPT{output} ne '-') {
+		($filebase = $OPT{output}) =~ s/\.[^.]*$//;
+	    }
+	    else {
+		($filebase = $f) =~ s/\.[^.]*$//;
+	    }
         }
 	# special, clean all generated files
         if ($OPT{clean}) {
