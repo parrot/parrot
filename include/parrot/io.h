@@ -17,8 +17,6 @@
 #if !defined(PARROT_IO_H_GUARD)
 #define PARROT_IO_H_GUARD
 
-/*#include "parrot/parrot.h"*/
-
 #ifndef SSIZE_MAX
 #define SSIZE_MAX 8192
 #endif

@@ -86,11 +86,11 @@ INTVAL PIO_unix_init(theINTERP, ParrotIOLayer * layer) {
         ParrotIOData * d = GET_INTERP_IOD(interpreter);
         if(d != NULL && d->table != NULL ) {
                 if((PIO_STDIN(interpreter) =
-                        PIO_fdopen(interpreter, PIO_STDIN_FILENO, "<"))
+                        PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, "<"))
                         &&(PIO_STDOUT(interpreter) =
-                                PIO_fdopen(interpreter, STDOUT_FILENO, ">"))
+                                PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO, ">"))
                         &&(PIO_STDERR(interpreter) =
-                                PIO_fdopen(interpreter, STDERR_FILENO, ">"))
+                                PIO_unix_fdopen(interpreter, layer, STDERR_FILENO, ">"))
                 )
                 return 0;
         }
@@ -170,7 +170,7 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
                  * STDIN, STDOUT, STDERR would be in this case
                  * so we would setup linebuffering.
                  */
-                if( PIO_unix_isatty(fd) )
+                if(PIO_unix_isatty(fd))
                         flags |= PIO_F_CONSOLE;
                 io = PIO_new(interpreter, NULL, type, flags, mode);
                 io->fd = fd;
@@ -200,7 +200,7 @@ ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
         } 
 #endif
 
-        if( PIO_unix_isatty(fd) )
+        if(PIO_unix_isatty(fd))
                 flags |= PIO_F_CONSOLE;
         io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
         io->fd = fd;
