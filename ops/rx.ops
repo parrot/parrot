@@ -85,8 +85,8 @@ Perl 5 had one opcode for each operation in the regular expression.  For example
 	size 15 first at 1
 	   1: EXACT <a>(3)
 	   3: PLUS(6)
-       4:   EXACT <b>(0)
-       6: ANYOF[cd](15)
+           4:   EXACT <b>(0)
+           6: ANYOF[cd](15)
 	  15: END(0)
 	anchored `ab' at 0 floating `b' at 1..2147483647 (checking anchored) minlen 3
 	Freeing REx: `ab+[cd]'
@@ -178,7 +178,9 @@ The documentation for each opcode follows.
 
 ########################################
 
-=item C<rx_allocateinfo>(p, p|s|sc)
+=item C<rx_allocateinfo>(out pmc, in str)
+
+=item C<rx_allocateinfo>(out pmc, in pmc)
 
 Allocates a new info structure and puts it into the first parameter.  The second parameter
 is the string to match against.
@@ -207,7 +209,7 @@ op rx_allocinfo(out pmc, in pmc) {
 
 ########################################
 
-=item C<rx_freeinfo>(p)
+=item C<rx_freeinfo>(inout pmc)
 
 Deallocates the info structure in the first parameter and nulls out the handle.
 
@@ -222,7 +224,7 @@ op rx_freeinfo(inout pmc) {
 
 ########################################
 
-=item C<rx_cloneinfo>(p)
+=item C<rx_cloneinfo>(inout pmc)
 
 Clones the info structure in the first parameter.  Make sure to save the original 
 structure in another register, the stack, or a symbol table entry before calling this
@@ -240,7 +242,7 @@ op rx_cloneinfo(inout pmc) {
 
 ########################################
 
-=item C<rx_compile>(i, s|sc, s|sc)
+=item C<rx_compile>(out str, in str, in str)
 
 Provides a built-in regular expression compiler.  The first parameter is set to the
 address of the newly-compiled regex, which can then be C<jsr>'ed to; the second 
@@ -268,7 +270,7 @@ op rx_compile(out str, in str, in str) {
 
 ########################################
 
-=item C<rx_info_successful>(p, i)
+=item C<rx_info_successful>(in pmc, out int)
 
 If the info structure indicates the match was successful, sets the second parameter
 to true; otherwise sets it to false.
@@ -285,7 +287,7 @@ op rx_info_successful(in pmc, out int) {
 
 ########################################
 
-=item C<rx_info_getindex>(p, i)
+=item C<rx_info_getindex>(in pmc, out int)
 
 Retrieves the current index stored in the info structure.  If the match has already
 finished successfully, this will be the index of the end of the match.
@@ -302,7 +304,7 @@ op rx_info_getindex(in pmc, out int) {
 
 ########################################
 
-=item C<rx_info_getstartindex>(p, i)
+=item C<rx_info_getstartindex>(in pmc, out int)
 
 Gets the index the match started at.
 
@@ -348,7 +350,7 @@ op rx_info_getgroup(in pmc, out int, out int, in int) {
 
 ########################################
 
-=item C<rx_pushindex>(p)
+=item C<rx_pushindex>(in pmc)
 
 Pushes the current index onto the stack contained in the info structure.
 
@@ -364,7 +366,7 @@ op rx_pushindex(in pmc) {
 
 ########################################
 
-=item C<rx_pushmark>(p)
+=item C<rx_pushmark>(in pmc)
 
 Pushes a 'mark' onto the stack contained in the info structure.  Marks are used
 to indicate where one operation's backtrack information ends and another's begins.
@@ -382,7 +384,7 @@ op rx_pushmark(in pmc) {
 
 ########################################
 
-=item C<rx_popindex>(p, ic)
+=item C<rx_popindex>(in pmc, in int)
 
 Pops an index off the stack.  If it pops a mark off instead, it branches to the 
 second parameter.
@@ -416,7 +418,7 @@ op rx_popindex(in pmc, in int) {
 
 ########################################
 
-=item C<rx_forwards>(p)
+=item C<rx_forwards>(in pmc)
 
 Indicates that the regex should increment the index as it moves through the string.
 
@@ -433,7 +435,7 @@ op rx_forwards(in pmc) {
 
 ########################################
 
-=item C<rx_backwards>(p)
+=item C<rx_backwards>(in pmc)
 
 Indicates that the regex should decrement the index as it moves through the string.
 This is different from reversed regexes (see L</"rx_setprops(p, sc, ic)">); reversed
@@ -461,7 +463,7 @@ op rx_backwards(in pmc) {
 
 ########################################
 
-=item C<rx_advance>(p, ic)
+=item C<rx_advance>(in pmc, in int)
 
 Increments (or decrements, if the C<r> modifier is used) the start index one
 character.  Branches to the second parameter if it goes past the end of the string.
@@ -493,7 +495,7 @@ op rx_advance(in pmc, in int) {
 
 ########################################
 
-=item C<rx_incrindex>(p, ic)
+=item C<rx_incrindex>(in pmc, in int)
 
 Increments the current index (or decrements, if C<rx_backwards> is used) by the 
 amount in the second parameter.  Does I<not> check if it's gone past the end of the
@@ -510,7 +512,7 @@ op rx_incrindex(in pmc, in int) {
 
 ########################################
 
-=item C<rx_setprops>(p, sc, ic)
+=item C<rx_setprops>(in pmc, in str, in int)
 
 Sets certain properties in the info structure.  The second parameter is a string
 containing one or more of the following characters:
@@ -574,7 +576,7 @@ op rx_setprops(in pmc, in str, in int) {
 
 ########################################
 
-=item C<rx_startgroup>(p, ic)
+=item C<rx_startgroup>(in pmc, in int)
 
 Indicates that the current index is the start index of the group number indicated in
 the second parameter.
@@ -591,7 +593,7 @@ op rx_startgroup(in pmc, in int) {
 
 ########################################
 
-=item C<rx_endgroup>(p, ic)
+=item C<rx_endgroup>(in pmc, in int)
 
 Indicates that the current index is the end index of the group number indicated in
 the second parameter.
@@ -608,7 +610,7 @@ op rx_endgroup(in pmc, in int) {
 
 ########################################
 
-=item C<rx_literal>(p, in str, ic)
+=item C<rx_literal>(in pmc, in str, in int)
 
 Matches the exact string (sensitive to the C<i> modifier) passed in the second
 parameter.
@@ -639,7 +641,7 @@ op rx_literal(in pmc, in str, in int) {
 
 ########################################
 
-=item C<rx_is_w>(p, ic)
+=item C<rx_is_w>(in pmc, in int)
 
 Matches a word character (usually C<\w>).
 
@@ -661,7 +663,7 @@ op rx_is_w(in pmc, in int) {
 
 ########################################
 
-=item C<rx_is_n>(p, ic)
+=item C<rx_is_n>(in pmc, in int)
 
 Matches a number character (usually C<\n>).
 
@@ -683,7 +685,7 @@ op rx_is_n(in pmc, in int) {
 
 ########################################
 
-=item C<rx_is_s>(p, ic)
+=item C<rx_is_s>(in pmc, in int)
 
 Matches a whitespace character (usually C<\s>).
 
@@ -706,7 +708,7 @@ op rx_is_s(in pmc, in int) {
 
 ########################################
 
-=item C<rx_oneof>(p, sc, ic)
+=item C<rx_oneof>(in pmc, in str, in int)
 
 Matches if the current character is one of the characters in the second parameter.
 Sensitive to the C<i> modifier.
@@ -782,7 +784,7 @@ op rx_oneof(in pmc, in str, in int) {
 
 ########################################
 
-=item C<rx_dot>(p, ic)
+=item C<rx_dot>(in pmc, in int)
 
 Matches any character except a newline (C<\n>).  (If the C<s> modifier is used, 
 matches any character at all.)
@@ -814,7 +816,7 @@ op rx_dot(in pmc, in int) {
 
 ########################################
 
-=item C<rx_zwa_boundary>(p, ic)
+=item C<rx_zwa_boundary>(in pmc, in int)
 
 Matches if the one of the previous character and the next character is a word
 character, and the other one is not (usually C<\b>).
@@ -839,7 +841,7 @@ op rx_zwa_boundary(in pmc, in int) {
 
 ########################################
 
-=item C<rx_zwa_atbeginning>(p, ic)
+=item C<rx_zwa_atbeginning>(in pmc, in int)
 
 Matches at the beginning of the string.  If the C<m> modifier is used, matches at the
 beginning of any line.
@@ -860,7 +862,7 @@ op rx_zwa_atbeginning(in pmc, in int) {
 
 ########################################
 
-=item C<rx_zwa_atend>(p, ic)
+=item C<rx_zwa_atend>(in pmc, in int)
 
 Matches at the end of the string.  If the C<m> modifier is used, matches at the
 end of any line.
@@ -881,7 +883,7 @@ op rx_zwa_atend(in pmc, in int) {
 
 ########################################
 
-=item C<rx_succeed>(p)
+=item C<rx_succeed>(in pmc)
 
 Modifies the info structure to indicate that the match succeeded.
 
@@ -897,7 +899,7 @@ op rx_succeed(in pmc) {
 
 ########################################
 
-=item C<rx_fail>(p)
+=item C<rx_fail>(in int)
 
 Modifies the info structure to indicate that the match failed.
 
@@ -1158,7 +1160,6 @@ The list below gives simple templates for common quantifiers operations.
 		branch $loop
 	$back:
 		rx_popindex P0, $lastback
-		branch $next
 
 =item C<x+>
 
@@ -1171,7 +1172,6 @@ The list below gives simple templates for common quantifiers operations.
 		branch $loop
 	$back:
 		rx_popindex P0, $lastback
-		branch $next
 
 =item C<x?>
 
@@ -1182,7 +1182,6 @@ The list below gives simple templates for common quantifiers operations.
 		branch $next
 	$back:
 		rx_popindex P0, $lastback
-		branch $next
 
 =item C<x*?>
 
@@ -1190,7 +1189,6 @@ The list below gives simple templates for common quantifiers operations.
 		branch $next
 	$back:
 		rx_literal P0, "x", $lastback
-		branch $next
 
 =item C<x+?>
 
@@ -1199,7 +1197,6 @@ The list below gives simple templates for common quantifiers operations.
 		branch $next
 	$back:
 		rx_literal P0, "x", $lastback
-		branch $next
 
 =item C<x??>
 
@@ -1209,7 +1206,6 @@ The list below gives simple templates for common quantifiers operations.
 	$back:
 		if I0, $lastback
 		rx_literal P0, "x", $lastback
-		branch $next
 
 =item C<x|y>
 
@@ -1223,8 +1219,7 @@ The list below gives simple templates for common quantifiers operations.
 		rx_literal P0, "x", $back	#no, that's not a typo
 		branch $next
 	$back:
-		rx_popmark P0
-		branch $lastback
+		rx_popindex P0, $lastback	#this WILL fail
 
 =item C<(?=x)>
 
@@ -1234,6 +1229,25 @@ The list below gives simple templates for common quantifiers operations.
 		rx_literal P0, "x", $lastback
 		
 		set P0, P1
+
+=item C<x{m,n}>
+
+	$top_m:
+		inc I0
+		eq I0, m, $n
+		rx_literal P0, "x", $lastback
+		branch $top_m
+	$n:
+		rx_pushmark P0
+	$top_n:
+		inc I1
+		eq I1, n, $out
+		rx_literal P0, "x", $next
+		rx_pushindex P0
+		branch $top_n
+	$back:
+		rx_popindex P0, $lastback
+		
 
 =back
 
