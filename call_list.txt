@@ -6,3 +6,11 @@ d	d
 i	p
 v	v
 p	p
+p	i
+i	v
+f	v
+l	v
+s	v
+c	v
+d	v
+p	v
