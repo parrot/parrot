@@ -134,8 +134,17 @@ a small C program.  This could take a bit...
 END
 
 buildfile("test_c");
-system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
-(@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
+if ($^O eq 'VMS') {
+  system("$c{cc} $c{ccflags} test.c") and die "C compiler died!";
+  system("link/exe=test_siz test") and die "Link failed!";
+} else {
+  system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
+}
+if ($^O eq 'VMS') {
+  (@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `mcr []test_siz`);
+} else {
+  (@c{qw(intvalsize longsize numvalsize opcode_t_size)})=split('/', `./test_siz$c{exe}`);
+}
 die "Something wicked happened!" 
     unless defined $c{intvalsize} and defined $c{longsize} and 
 	   defined $c{numvalsize} and defined $c{opcode_t_size};
