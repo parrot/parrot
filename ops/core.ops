@@ -2227,22 +2227,22 @@ Save register or constant $1 onto the stack.
 
 inline op save(in INT) {
   INTVAL i = $1;
-  stack_push(interpreter, interpreter->user_stack, &i, STACK_ENTRY_INT, NULL);
+  stack_push(interpreter, interpreter->user_stack, &i, STACK_ENTRY_INT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in NUM) {
-  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, NULL);
+  stack_push(interpreter, interpreter->user_stack, &($1), STACK_ENTRY_FLOAT, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in PMC) {
-  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_PMC, NULL);
+  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
 inline op save(in STR) {
-  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_STRING, NULL);
+  stack_push(interpreter, interpreter->user_stack, $1, STACK_ENTRY_STRING, STACK_CLEANUP_NULL);
   goto NEXT();
 }
 
@@ -2339,7 +2339,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, NULL);
+  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
   goto OFFSET($1);
 }
 

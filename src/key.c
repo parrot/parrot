@@ -121,7 +121,7 @@ KEY* key_new(struct Parrot_Interp *interpreter) {
   UNUSED (interpreter);
 
   key->size = 0;
-  key->keys = 0;
+  key->keys = NULL;
 
   return key;
 }

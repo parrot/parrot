@@ -88,7 +88,7 @@ runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *),
  */
 
 static void *       prederef_oplib_handle = NULL;
-static oplib_init_f prederef_oplib_init   = NULL;
+static oplib_init_f prederef_oplib_init   = (oplib_init_f)NULLfunc;
 static op_lib_t *   prederef_oplib        = NULL;
 static INTVAL       prederef_op_count     = 0;
 static op_info_t *  prederef_op_info      = NULL;
@@ -195,7 +195,7 @@ stop_prederef(void)
   Parrot_dlclose(prederef_oplib_handle);
 
   prederef_oplib        = NULL;
-  prederef_oplib_init   = NULL;
+  prederef_oplib_init   = (oplib_init_f)NULLfunc;
   prederef_oplib_handle = NULL;
 }
 
@@ -466,8 +466,8 @@ make_interpreter(INTVAL flags) {
     
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
-	interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
-	PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
+    interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
+    PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     interpreter->pmc_count = 0;
     interpreter->string_count = 0;

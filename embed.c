@@ -129,7 +129,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
 
     pf = PackFile_new();
 
-    if(!PackFile_unpack(interpreter, pf, program_code, (unsigned)program_size) ) {
+    if(!PackFile_unpack(interpreter, pf, (opcode_t*)program_code, (unsigned)program_size) ) {
         fprintf(stderr, "Parrot VM: Can't unpack packfile %s.\n", filename);
         return NULL;
     }

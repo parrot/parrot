@@ -277,6 +277,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    info.phase = PHASE_WIDTH;
 			    goto AGAIN;
 			}
+                        break;
 
 		    case PHASE_WIDTH:
 			switch (ch) {
@@ -301,6 +302,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    info.phase = PHASE_PREC;
 			    goto AGAIN;
 			}
+                        break;
 
 		    case PHASE_PREC:
 			switch (ch) {
@@ -321,6 +323,7 @@ STRING *Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING * pat,
 			    info.phase = PHASE_TYPE;
 			    goto AGAIN;
 			}
+                        break;
 
 		    case PHASE_TYPE:
 			switch (ch) {

@@ -187,7 +187,7 @@ END_C
 print SOURCE @op_func_table;
 
 print SOURCE <<END_C;
-  NULL
+  (op_func${suffix}_t)0  /* NULL function pointer */
 };
 
 

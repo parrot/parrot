@@ -189,7 +189,7 @@ pmclass Array {
         PMC* mypmc;
 
         if (!key) {
-            return 0;
+            return;
         }
 
         kp = (key->keys)[0];
@@ -226,7 +226,7 @@ pmclass Array {
         PMC* mypmc;
 
         if (!key) {
-            return 0;
+            return;
         }
 
         kp = (key->keys)[0];
@@ -261,7 +261,7 @@ pmclass Array {
         PMC* mypmc;
 
         if (!key) {
-            return 0;
+            return;
         }
 
         kp = (key->keys)[0];

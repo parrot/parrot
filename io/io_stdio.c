@@ -231,7 +231,6 @@ size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
         size_t  avail;
         long    wrote;
-        ParrotIOLayer * l;
 
         if(len <= 0)
                 return 0;

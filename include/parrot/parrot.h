@@ -73,6 +73,26 @@ typedef void REGEX;
 typedef void* BIGINT;
 typedef void* BIGFLOAT;
 
+/* define some shortcuts for dealing with function pointers */
+/* according to ANSI C, casting between function and non-function pointers is
+ * no good.  So we should use "funcptr_t" in place of void* when dealing with
+ * function pointers and NULLfunc in place of NULL */
+typedef void (*funcptr_t)(void);
+#define NULLfunc (funcptr_t)0
+
+/* Provide support for inline keyword where available.  Just make sure to use
+ * "INLINE" instead and it will DTRT. */
+#ifdef __cplusplus
+    #define INLINE inline
+#else
+    #ifdef __GNUC__
+        #define INLINE __inline__
+    #else 
+        #define INLINE
+    #endif
+#endif
+
+
 /* define a macro to acknowledge an unused argument, and silence a "helpful"
    compiler warning. gcc will emit a warning on an empty if body unless {} is
    used to make an empty block.  */

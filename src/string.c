@@ -151,8 +151,8 @@ string_transcode(struct Parrot_Interp *interpreter,
                  const CHARTYPE *type, STRING **dest_ptr) {
 
     STRING *dest;
-    CHARTYPE_TRANSCODER transcoder1 = NULL;
-    CHARTYPE_TRANSCODER transcoder2 = NULL;
+    CHARTYPE_TRANSCODER transcoder1 = (CHARTYPE_TRANSCODER)NULLfunc;
+    CHARTYPE_TRANSCODER transcoder2 = (CHARTYPE_TRANSCODER)NULLfunc;
     char *srcstart;
     char *srcend;
     char *deststart;

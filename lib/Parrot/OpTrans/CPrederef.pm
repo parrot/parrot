@@ -25,7 +25,7 @@ sub defines
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
-static inline opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
+static INLINE opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
                                            void** prederef_addr)
 {
     ssize_t offset_in_ops;
@@ -34,7 +34,7 @@ static inline opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
     return (opcode_t*) interpreter->code->byte_code + offset_in_ops;
 }
 
-static inline void** opcode_to_prederef(struct Parrot_Interp* interpreter,
+static INLINE void** opcode_to_prederef(struct Parrot_Interp* interpreter,
                                         opcode_t* opcode_addr)
 {
     ssize_t offset_in_ops;

@@ -108,7 +108,6 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
         UINTVAL mode;
         INTVAL oflags, type;
         PIOHANDLE fd;
-        const char * modeptr;
         type = PIO_TYPE_FILE;
         mode = DEFAULT_OPEN_MODE;
 
@@ -183,13 +182,16 @@ ParrotIO * PIO_unix_open(theINTERP, ParrotIOLayer * layer,
 ParrotIO * PIO_unix_fdopen(theINTERP, ParrotIOLayer * layer,
 		        PIOHANDLE fd, UINTVAL flags) {
         ParrotIO * io;
-        UINTVAL oflags, rflags, mode;
+        UINTVAL oflags, mode;   
         mode = 0;
+#ifdef HAS_HEADER_FCNTL
+        UNITVAL rflags;
+#endif   
 
         oflags = flags_to_unix(flags);
 
         /* FIXME - Check file handle flags, validity */
-#ifdef HAD_HEADER_FCNTL
+#ifdef HAS_HEADER_FCNTL
         /* Get descriptor flags */
         if((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
                 /*int accmode = rflags & O_ACCMODE;*/

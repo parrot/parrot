@@ -39,6 +39,9 @@ typedef struct Stack_chunk_t {
 
 typedef Stack_Chunk Stack;
 
+typedef void (*stack_cleanup_method_t)(Stack_Entry);
+#define STACK_CLEANUP_NULL (stack_cleanup_method_t)NULLfunc
+
 Stack
 new_stack(struct Parrot_Interp *);
 
@@ -53,7 +56,7 @@ rotate_entries(struct Parrot_Interp *, Stack, INTVAL depth);
 
 void
 stack_push(struct Parrot_Interp *, Stack,
-           void *thing, INTVAL type, void (*cleanup)(Stack_Entry));
+           void *thing, INTVAL type, stack_cleanup_method_t cleanup);
 
 void *
 stack_pop(struct Parrot_Interp *, Stack, void *where, INTVAL type);

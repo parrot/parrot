@@ -66,11 +66,6 @@ typedef struct rxinfo {
         rxStack stack;
 } rxinfo;
 
-#if __cplusplus
-	#define INLINE inline
-#else
-	#define INLINE 
-#endif /* __cplusplus */
 
 rxinfo * rx_allocate_info(struct Parrot_Interp *, STRING *);
 

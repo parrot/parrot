@@ -97,7 +97,7 @@ rotate_entries(struct Parrot_Interp *interpreter, Stack stack, INTVAL depth)
  */
 void
 stack_push(struct Parrot_Interp *interpreter, Stack stack,
-           void *thing, INTVAL type, void (*cleanup)(Stack_Entry))
+           void *thing, INTVAL type, stack_cleanup_method_t cleanup)
 {
     Stack_Chunk chunk = stack->prev;
     Stack_Entry entry = &chunk->entry[chunk->used];

@@ -1328,7 +1328,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
             break;
 
         default:
-            fprintf(stderr, "PackFile_Constant_clear: Unrecognized type '%c' during unpack!\n", (int) type);
+            fprintf(stderr, "PackFile_Constant_clear: Unrecognized type '%c' during unpack!\n", (char) type);
             return 0;
             break;
     }
@@ -1584,7 +1584,6 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 void
 PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed) {
     opcode_t * cursor;
-    FLOATVAL *   nv_ptr;
     char *     charcursor;
     size_t       i;
     opcode_t     padded_size;
@@ -1729,7 +1728,7 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
 
         case PFC_STRING:
             printf("    [ 'PFC_STRING', {\n");
-            printf("        FLAGS    => 0x%04lx,\n", (long) self->string->flags);
+            printf("        FLAGS    => 0x%04lx,\n", (unsigned long) self->string->flags);
             printf("        ENCODING => %s,\n",
                     self->string->encoding->name);
             printf("        TYPE     => %s,\n",
