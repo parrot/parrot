@@ -6,8 +6,6 @@
 eval 'exec perl -w -S $0 ${1+"$@"}'
   if $running_under_some_shell;
 
-die "work in progress... nothing ready yet!\n";
-
 #
 # This utility borrows heavily from perlbug.
 #
@@ -24,12 +22,12 @@ my %std_to =
     nok => 'parrotstatus-nok@parrotcode.org'
   );
 
-my $updir = File::Spec->updir();
-my $parrotdir = File::Spec->catfile( File::Spec->curdir() );
+my $parrotdir = File::Spec->curdir();
 
+my ( $user, $domain );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
-my ( $is_linux, $is_macos, $is_mswin32, $is_vms );
+my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
 my ( $parrot_version, $parrot_myconfig ) ;
 
 
@@ -44,8 +42,10 @@ BEGIN {
 init();
 help()    if $opt_h;
 version() if $opt_V;
-
 query_info();
+
+die "work in progress... nothing ready yet!\n";
+
 edit_info();
 ask_for_action();
 send_msg();
@@ -58,6 +58,7 @@ exit;
 #               Subs.               #
 
 
+# Print synopsis + help message and exit.
 sub help {
     print <<EOF;
 
@@ -87,14 +88,22 @@ Options:
   -V    Print version information and exit.
 
 EOF
+#'
     exit;
 }
 
+
+# Initialize prog:
+#  - get parrot information
+#  - process options
+#  - create the message information (subject, to, body, etc.)
+#    depending on the type of report (ok, nok or bug report)
 sub init {
-    $is_mswin32 = $^O eq 'MSWin32';
-    $is_vms     = $^O eq 'VMS';
     $is_linux   = lc($^O) eq 'linux';
     $is_macos   = $^O eq 'MacOS';
+    $is_mswin32 = $^O eq 'MSWin32';
+    $is_os2     = $^O eq 'os2';
+    $is_vms     = $^O eq 'VMS';
 
     ##
     ## Fetch Parrot information.
@@ -186,12 +195,16 @@ sub init {
     ## Mail information.
     ## 
 
+    # Username.
+    $user = $is_mswin32 ? $ENV{'USERNAME'}
+	    : $is_os2   ? $ENV{'USER'} || $ENV{'LOGNAME'}
+	    : $is_macos ? $ENV{'USER'}
+	    : eval { getpwuid($<) };	# May be missing
+
     # User address, used in message and in Reply-To header.
     $from = $opt_r || "";
 
     # Message-Id.
-    my $domain;
-
     eval "use Mail::Util;";
     if ( $@ eq "" ) {
         $domain = Mail::Util::maildomain();
@@ -205,8 +218,66 @@ sub init {
 }
 
 
+# Query missing information in order to have a complete report.
+# The information collected are:
+#  
 sub query_info {
+    ##
+    ## Explain what parrotbug is.
+    ##
+    print <<EOF;
 
+This program provides an easy way to create a message reporting a bug
+in parrot, and e-mail it to parrot developpers.
+
+It is *NOT* intended for:
+  - sending test messages,
+  - or reporting bugs in languages targetting parrot,
+  - or reporting bugs in some library bindings for parrot,
+  - or simply verifying that parrot works.
+
+It is *ONLY* a mean of reporting verifiable problems with the core
+parrot distribution, and any solutions to such problems, to parrot
+developpers.
+
+If you're just looking for help with parrot, subscribe to the parrot
+mailing list, perl6-internals<at>perl.org.
+
+EOF
+#'
+
+    ##
+    ## Prompt for subject of message, if needed.
+    ##
+    $subject = "" if trivial_subject( $subject );
+    unless ( $subject ) {
+        print <<EOF;
+
+First of all, please provide a subject for the message. It should be a
+concise description of the bug or problem. "parrot bug" or "parrot
+problem" is not a concise description.
+
+EOF
+
+        my $err = 0;
+        do {
+            $err and print "\nThat doesn't look like a good subject. "
+              . "Please be more verbose.\n";
+            print "Subject: ";
+            $subject = <>;
+            chomp $subject;
+            die "Aborting.\n" if $err++ == 5;
+        } while ( trivial_subject($subject) );
+    }
+
+
+    ##
+    ## Prompt for return address, if needed.
+    ## 
+    unless ( $from ) {
+        print "blah";
+    }
+    
 }
 
 
@@ -244,7 +315,7 @@ I can't send your bug report. We apologize for the inconvenience.
 So you may attempt to find some way of sending your message, it has
 been left in the file '$filename'.
 EOF
-        # '
+# '
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
 
 	print SENDMAIL "To: $address\n";
@@ -263,6 +334,25 @@ EOF
 }
 
 
+# Check whether a subject is trivial. A subject is not considered
+# trivial if it's an ok or a nok report.
+# Return 1 if trivial, 0 otherwise (subject acceptable).
+sub trivial_subject {
+    my $subject = shift;
+
+    return 0 if $opt_o || $opt_f;
+
+    if ( $subject =~
+         /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
+         length($subject) < 4 ||
+         $subject !~ /\s/ ) {
+        return 1;
+    } else {
+	return 0;
+    }
+}
+
+# Print version information (of the parrotbug program) and exit.
 sub version {
     print <<"EOF";
 
