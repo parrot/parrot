@@ -809,6 +809,17 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         }
 
     }
+    else {
+        /* Report an appropriate error */
+        if (*command) {
+            PIO_eprintf(interpreter, "Not a valid breakpoint");
+            return;
+        }
+        else {
+            PIO_eprintf(interpreter, "No breakpoint specified");
+            return;
+        }
+    }
 }
 
 /* PDB_delete_condition
@@ -2074,7 +2085,8 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
         if (s) {
             PIO_eprintf(interpreter, " [%S]\n", s);
         }
-        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Stringified: %PS\n", pmc);
+        PIO_fprintf(interpreter, PIO_STDERR(interpreter),"Stringified: %PS\n",
+                    VTABLE_get_string(interpreter, pmc));
     }
     else {
         PIO_eprintf(interpreter, "<null pmc>\n");
