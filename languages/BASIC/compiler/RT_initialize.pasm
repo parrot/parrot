@@ -15,6 +15,7 @@
     
     new P24, .PerlHash	# Platform-specific storage
 	bsr PLATFORM_SETUP
+    new P25, .PerlHash	# Debugger's space
         
     new P15, .PerlArray	# Read/Data information
     new P16, .PerlHash	# Index for Read/Data RESTORE
@@ -27,6 +28,7 @@
 	set I12, 20021107	# Random number generator seed (unfair intentionally)
         
 	bsr DATA_SETUP
+	bsr DEBUG_INIT
     bsr NEWFRAME
     branch MAIN
     

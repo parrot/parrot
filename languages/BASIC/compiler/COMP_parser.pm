@@ -74,6 +74,7 @@ sub runtime_shutdown {
 .include "RT_support.pasm"
 .include "RT_io.pasm"
 .include "RT_platform.pasm"
+.include "RT_debugger.pasm"
 	# 
 	# Pull in user-defined functions
 	#
@@ -103,6 +104,11 @@ sub parse {
 	my $elseline="a";
 	my (@ifstack);
 	my(@lhs, @rhs);
+
+	print CODE "set .LINE, $sourceline\n";
+	trace() if $opts{trace};
+	debug() if $opts{debug};
+
 	
 PARSE:
 	1;
@@ -112,6 +118,7 @@ PARSE_NOFEED:
 		unless ($type[PREV] eq "STMT") {
 			print CODE "set .LINE, $sourceline\n";
 			trace() if $opts{trace};
+			debug() if $opts{debug};
 		}
 	}
 	feedme;
@@ -386,6 +393,7 @@ FINISH
 		parse_struct_copy_dispatch();
 		parse_data_setup();
 		check_branches();
+		debug_init($opts{debug});
 		
 		return;
 	}
@@ -401,6 +409,11 @@ print 2, .LINE
 print 2, "\\n"
 TRACE
 }
+sub debug {
+	print CODE<<DEBUG;
+	bsr DEBUGGER
+DEBUG
+}
 
 sub english_func {
 	local $_=$_[0];
@@ -414,6 +427,23 @@ sub english_func {
 my %labdef;
 sub label_defined {
 	$labdef{$_[0]}++;
+}
+sub debug_init {
+	if (! $_[0]) {
+		print CODE "DEBUG_INIT:\n\tret\n";
+		return;
+	}
+	print CODE "DEBUG_INIT:\n\tnew P0, .PerlArray\n";
+	foreach(0..@main::basic) {
+		my $line=$main::basic[$_];
+		$line=~s/"/'/g;
+		print CODE "\tset P0[",$_+1,"], \"$line\"\n";
+	}
+	print CODE<<DEBEND;
+	set P25["code"], P0
+	ret
+DEBEND
+
 }
 sub check_branches {
 	foreach(keys %labels) {

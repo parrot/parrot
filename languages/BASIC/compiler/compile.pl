@@ -1,3 +1,4 @@
+
 #!/usr/bin/perl -w
 
 # Remember, this is BAD PERL later to be translated to PASM
@@ -5,6 +6,7 @@
 #          @tokens and @tokdsc
 # Then compile.
 use strict;
+our @basic=();
 
 require "COMP_toker.pm";
 require "COMP_parser.pm";
@@ -13,6 +15,9 @@ require "COMP_expressions.pm";
 
 if (@ARGV) {
 	open(D, $ARGV[0]) || die;
+	@basic=<D>;
+	chomp(@basic);
+	seek D, 0, 0 or warn "Cannot reseek: $!";
 } else {
 	open(D, "<&DATA") || die;
 }
