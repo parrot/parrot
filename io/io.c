@@ -367,7 +367,7 @@ layers (OS-specific first).
 INTVAL
 PIO_init_stacks(theINTERP)
 {
-    ParrotIOLayer *p, *bottom;
+    ParrotIOLayer *p, *bottom = NULL;
     int fill, n, i;
 
     /* First push the platform specific OS layer */

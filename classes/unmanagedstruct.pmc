@@ -303,7 +303,7 @@ ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
 {
     char *cstr;
     size_t len;
-    PMC *ret, *init, *ptr;
+    PMC *ret = NULL, *init, *ptr;
 
     switch (type) {
         case enum_type_func_ptr:

@@ -47,7 +47,7 @@ complex_parse_string (Parrot_Interp interp,
     char *str;
     INTVAL first_num_length, second_num_length;
     INTVAL first_num_minus, second_num_minus, i;
-    char *first_num_offset, *second_num_offset, *t;
+    char *first_num_offset, *second_num_offset = NULL, *t;
     STRING *S;
 
     t = str = string_to_cstring(interp, value);

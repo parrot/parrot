@@ -48,7 +48,7 @@ static PMC*
 fromkeys(Interp *interpreter, PMC *dict, PMC *keys)
 {
     INTVAL elems, dod_disabled, i;
-    PMC *iter, *value, *self;
+    PMC *iter = NULL, *value, *self;
 
     /*
      * if the number of keys is bigger then the current PMC

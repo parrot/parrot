@@ -93,8 +93,7 @@ C<int> object according to 2.1. Built-in Functions.
             REG_PMC(5) = pmc_new(INTERP, enum_class_PerlInt);
             return next;
         }
-        if (argcP == 1)
-            base = 10;
+        base = 10;
         if (argcP == 2)
             base = VTABLE_get_integer(INTERP, REG_PMC(6));
         arg = REG_PMC(5);
