@@ -460,7 +460,7 @@ INTVALS.
 op seek(in PMC, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset($2), $3) < 0) {
-      /* XXX: seek error */
+      real_exception(interpreter, NULL, PIO_ERROR, "seek failed (32bit)");
     }
   }
   goto NEXT();
@@ -469,7 +469,7 @@ op seek(in PMC, in INT, in INT) :base_io {
 op seek(in PMC, in INT, in INT, in INT) :base_io {
   if ($1) {
     if (PIO_seek(interpreter, $1, PIO_make_offset32($2, $3), $4) < 0) {
-      /* XXX: seek error */
+      real_exception(interpreter, NULL, PIO_ERROR, "seek failed (64bit)");
     }
   }
   goto NEXT();

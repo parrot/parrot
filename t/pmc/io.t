@@ -8,7 +8,7 @@ t/pmc/io.t - IO Ops
 
 =head1 SYNOPSIS
 
-	% perl t/pmc/io.t
+	% perl t/harness t/pmc/io.t
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 use Test::More;
 
 sub file_content_is {
@@ -392,6 +392,26 @@ output_is(<<'CODE', <<'OUTPUT', 'seek/tell');
 CODE
 ok 1
 Hello Parrot!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '32bit seek: exception');
+       open P0, "temp.file", ">"
+       seek P0, -1, 0
+       print "error!\n"
+       end
+CODE
+seek failed (32bit)
+	in file '(unknown file)' near line -1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', '64bit seek: exception');
+       open P0, "temp.file", ">"
+       seek P0, -1, -1, 0
+       print "error!\n"
+       end
+CODE
+seek failed (64bit)
+	in file '(unknown file)' near line -1
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "peek");
