@@ -77,8 +77,6 @@ void more_non_traceable_objects(struct Parrot_Interp *interpreter,
 
 void add_free_object(struct Parrot_Interp *,
                      struct Small_Object_Pool *, void *);
-void *get_free_object(struct Parrot_Interp *,
-                      struct Small_Object_Pool *);
 
 void alloc_objects(struct Parrot_Interp *, struct Small_Object_Pool *);
 

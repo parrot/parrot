@@ -20,19 +20,6 @@
 /* XXX Temporary alignment hack.  See mem_allocate in resources.c */
 #define STRING_ALIGNMENT 16 /* was 4 */
 
-/** Header Management Functions **/
-
-/* pmc header small-object methods */
-void *get_free_pmc(struct Parrot_Interp *interpreter,
-                   struct Small_Object_Pool *pool);
-void alloc_pmcs(struct Parrot_Interp *interpreter,
-                     struct Small_Object_Pool *pool);
-
-/* buffer header small-object methods */
-void *get_free_buffer(struct Parrot_Interp *interpreter,
-                      struct Small_Object_Pool *pool);
-void alloc_buffers(struct Parrot_Interp *interpreter,
-                        struct Small_Object_Pool *pool);
 
 /* pool creation and access functions */
 struct Small_Object_Pool *new_pmc_pool(struct Parrot_Interp *interpreter);
@@ -43,7 +30,7 @@ struct Small_Object_Pool *get_bufferlike_pool(struct Parrot_Interp *interpreter,
 
 struct Small_Object_Pool *make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t unit_size);
 /* header creation functions */
-PMC *new_pmc_header(struct Parrot_Interp *interpreter);
+PMC *new_pmc_header(struct Parrot_Interp *interpreter, UINTVAL flags);
 void add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc);
 STRING *new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags);
 Buffer *new_buffer_header(struct Parrot_Interp *interpreter);

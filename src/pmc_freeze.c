@@ -620,15 +620,36 @@ cleanup_next_for_GC_pool(Parrot_Interp interpreter,
 {
     struct Small_Object_Arena *arena;
 
+#if ARENA_DOD_FLAGS
+    UINTVAL *dod_flags;
+    UINTVAL nm;
+#endif
+
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         PMC *p = arena->start_objects;
         UINTVAL i;
 
+#if ARENA_DOD_FLAGS
+        dod_flags = arena->dod_flags - 1;
+        nm = 0;
+#endif
         for (i = 0; i < arena->used; i++) {
-            if (PObj_on_free_list_TEST(p)) /* TODO used dod flags */
-                continue;
-            if (p->pmc_ext)
-                PMC_next_for_GC(p) = NULL;
+#if ARENA_DOD_FLAGS
+            if (! (i & ARENA_FLAG_MASK)) {
+                ++dod_flags;
+                nm = 0;
+            }
+            else
+                nm += 4;
+            if (!(*dod_flags & (PObj_on_free_list_FLAG << nm)))
+                if (p->pmc_ext)
+                    PMC_next_for_GC(p) = NULL;
+#else
+            if (!PObj_on_free_list_TEST(p)) {
+                if (p->pmc_ext)
+                    PMC_next_for_GC(p) = NULL;
+            }
+#endif
             p = (PMC *)((char *)p + sizeof(PMC));
         }
     }
@@ -1424,7 +1445,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
     /*
      * create first PMC, we want to return it
      */
-    n = new_pmc_header(interpreter);
+    n = new_pmc_header(interpreter, 0);
     info.thaw_ptr = &n;
     /*
      * run thaw loop

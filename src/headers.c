@@ -33,59 +33,26 @@ Handles getting of various headers, and pool creation.
 
 /*
 
-=head2 PMC Header Functions for small-object lookup table
-
-=over 4
-
-=item C<void *
-get_free_pmc(struct Parrot_Interp *interpreter,
-             struct Small_Object_Pool *pool)>
-
-Gets a free PMC from C<pool> and returns it.
-
-=cut
-
-*/
-
-void *
-get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
-{
-    PMC *pmc = get_free_object(interpreter, pool);
-
-    /* clear flags, set is_PMC_FLAG */
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
-    ((PMC *)pmc)->vtable = NULL;
-#if ! PMC_DATA_IN_EXT
-    PMC_data((PMC *)pmc) = NULL;
-#endif
-    ((PMC *)pmc)->pmc_ext = NULL;
-    /* TODO check PMCs init method, if they clear the cache */
-    return pmc;
-}
-
-/*
-
-=back
 
 =head2 Buffer Header Functions for small-object lookup table
 
 =over 4
 
-=item C<void *
+=item C<static void *
 get_free_buffer(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
-Gets a free C<Buffer> from C<pool> and returns it.
+Gets a free C<Buffer> from C<pool> and returns it. Memory is cleared.
 
 =cut
 
 */
 
-void *
+static void *
 get_free_buffer(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
-    Buffer *buffer = get_free_object(interpreter, pool);
+    Buffer *buffer = pool->get_free_object(interpreter, pool);
 
     memset(buffer, 0, pool->object_size);
     SET_NULL(PObj_bufstart(buffer));
@@ -117,7 +84,6 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
     struct Small_Object_Pool *pmc_pool =
         new_small_object_pool(interpreter, sizeof(PMC), num_headers);
 
-    pmc_pool->get_free_object = get_free_pmc;
     pmc_pool->more_objects = more_traceable_objects;
     pmc_pool->mem_pool = NULL;
     return pmc_pool;
@@ -147,7 +113,6 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool =
             new_small_object_pool(interpreter, buffer_size, num_headers);
 
-    pool->get_free_object = get_free_buffer;
     pool->more_objects = more_traceable_objects;
     pool->mem_pool = interpreter->arena_base->memory_pool;
     pool->align_1 = BUFFER_ALIGNMENT - 1;
@@ -269,9 +234,23 @@ Get a header.
 */
 
 PMC *
-new_pmc_header(struct Parrot_Interp *interpreter)
+new_pmc_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 {
-    return get_free_pmc(interpreter, interpreter->arena_base->pmc_pool);
+    struct Small_Object_Pool *pool;
+    PMC *pmc;
+
+    pool = flags ?
+        interpreter->arena_base->constant_pmc_pool :
+        interpreter->arena_base->pmc_pool;
+    pmc = pool->get_free_object(interpreter, pool);
+    /* clear flags, set is_PMC_FLAG */
+    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+    pmc->vtable = NULL;
+#if ! PMC_DATA_IN_EXT
+    PMC_data(pmc) = NULL;
+#endif
+    pmc->pmc_ext = NULL;
+    return pmc;
 }
 
 /*
@@ -289,7 +268,15 @@ static PARROT_INLINE PMC_EXT *
 new_pmc_ext(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;
-    void *ptr = get_free_object(interpreter, pool);
+    void *ptr;
+    /*
+     * can't use normall get_free_object--PMC_EXT doesn't have flags
+     * it isn't a Buffer
+     */
+    if (!pool->free_list)
+        (*pool->more_objects) (interpreter, pool);
+    ptr = pool->free_list;
+    pool->free_list = *(void **)ptr;
     memset(ptr, 0, sizeof(PMC_EXT));
     return ptr;
 }

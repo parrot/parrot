@@ -87,7 +87,6 @@ static PMC*
 get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
     int constant)
 {
-    struct Small_Object_Pool *pool;
     PMC *pmc;
 
     if (Parrot_base_vtables[base_type]->flags & VTABLE_IS_CONST_FLAG) {
@@ -98,11 +97,8 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
         constant = 1;
         --base_type;
     }
-    pool = constant ?
-        interpreter->arena_base->constant_pmc_pool :
-        interpreter->arena_base->pmc_pool;
 
-    pmc = get_free_pmc(interpreter, pool);
+    pmc = new_pmc_header(interpreter, constant);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
                 "Parrot VM: PMC allocation failed!\n");

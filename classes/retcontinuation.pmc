@@ -69,8 +69,12 @@ Initializes the continuation.
 
     void* invoke (void* next) {
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
-        if (PObj_on_free_list_TEST(SELF))
+#if ! DISABLE_GC_DEBUG
+        if (GC_DEBUG(interpreter)) {
+            if (PObj_on_free_list_TEST(SELF))
                 internal_exception(1, "recycled retc %p invoked", SELF);
+        }
+#endif
         restore_context(interpreter, &cc->ctx);
         if (interpreter->code->cur_cs != cc->seg) {
             Parrot_switch_to_cs(interpreter, cc->seg, 1);

@@ -146,7 +146,7 @@ add_free_object(struct Parrot_Interp *interpreter,
 
 Add an unused object back to the free pool for later reuse.
 
-=item C<void *
+=item C<static void *
 get_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
@@ -165,7 +165,7 @@ add_free_object(struct Parrot_Interp *interpreter,
 }
 
 
-void *
+static void *
 get_free_object(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
@@ -176,22 +176,37 @@ get_free_object(struct Parrot_Interp *interpreter,
         (*pool->more_objects) (interpreter, pool);
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-#if ARENA_DOD_FLAGS
-    if (pool->object_size >= sizeof(Dead_PObj)) {
-        *((Dead_PObj*)ptr)->arena_dod_flag_ptr &=
-            ~ (PObj_on_free_list_FLAG << ((Dead_PObj*)ptr)->flag_shift);
-    }
-    else {
-        PObj_on_free_list_CLEAR((PObj*) ptr);
-    }
-#endif
+    PObj_on_free_list_CLEAR((PObj*) ptr);
 #if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter) && pool !=
-            interpreter->arena_base->pmc_ext_pool)
-        PObj_version((Buffer*)ptr)++;
+    if (GC_DEBUG(interpreter))
+        PObj_version((Buffer*)ptr) = interpreter->dod_runs;
 #endif
     return ptr;
 }
+
+#if ARENA_DOD_FLAGS
+static void *
+get_free_object_df(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)
+{
+    void *ptr;
+
+    /* if we don't have any objects */
+    if (!pool->free_list)
+        (*pool->more_objects) (interpreter, pool);
+    ptr = pool->free_list;
+    pool->free_list = *(void **)ptr;
+    *((Dead_PObj*)ptr)->arena_dod_flag_ptr &=
+        ~ (PObj_on_free_list_FLAG << ((Dead_PObj*)ptr)->flag_shift);
+#if ! DISABLE_GC_DEBUG
+    if (GC_DEBUG(interpreter))
+        PObj_version((Buffer*)ptr) = interpreter->dod_runs;
+#endif
+    return ptr;
+}
+
+
+#endif
 
 /*
 
@@ -425,6 +440,10 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     pool->objects_per_alloc = objects_per_alloc;
     pool->add_free_object = add_free_object;
     pool->get_free_object = get_free_object;
+#if ARENA_DOD_FLAGS
+    if (object_size >= sizeof(Dead_PObj))
+        pool->get_free_object = get_free_object_df;
+#endif
     pool->alloc_objects = alloc_objects;
     return pool;
 }
