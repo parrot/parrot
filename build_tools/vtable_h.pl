@@ -32,5 +32,7 @@ print OUT "\n";
 
 print OUT vtbl_struct($vtable);
 
+print OUT vtbl_macros($vtable);
+
 print OUT "\n#endif\n";
 
