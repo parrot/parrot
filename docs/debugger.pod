@@ -77,7 +77,7 @@ And the debugger is case sensitive.
 A blank line always repeats the last command entered.
 
 Also note that at this point in its development, F<pdb> has very poor
-error checking on commands and their argument, so type carefully or
+error checking on commands and their arguments, so type carefully or
 something bad will happen. Feel free to report bugs, or better yet
 patch the source code (see L</FILES> below).
 
