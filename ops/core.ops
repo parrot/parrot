@@ -731,6 +731,8 @@ met, the branch happens, otherwise control falls to the next operation.
 
 =item B<eq>(in PMC, in PMC, inconst INT)
 
+=item B<eq>(in PMC, in INT, inconst INT)
+
 Branch if $1 is equal to $2.
 
 =cut
@@ -758,6 +760,13 @@ op eq(in STR, in STR, inconst INT) {
 
 op eq (in PMC, in PMC, inconst INT) {
   if ($1->vtable->is_equal(interpreter, $1, $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq (in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -815,6 +824,8 @@ op ne(in PMC, in PMC, inconst INT) {
 
 =item B<lt>(in PMC, in PMC, inconst INT)
 
+=item B<lt>(in PMC, in INT, inconst INT)
+
 Branch if $1 is less than $2.
 
 =cut
@@ -847,6 +858,13 @@ op lt (in PMC, in PMC, inconst INT) {
   goto NEXT();
 }
 
+op lt (in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) < $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<le>(in INT, in INT, inconst INT)
@@ -856,6 +874,8 @@ op lt (in PMC, in PMC, inconst INT) {
 =item B<le>(in STR, in STR, inconst INT)
 
 =item B<le>(in PMC, in PMC, inconst INT)
+
+=item B<le>(in PMC, in INT, inconst INT)
 
 Branch if $1 is less than or equal to $2.
 
@@ -884,6 +904,13 @@ op le(in STR, in STR, inconst INT) {
 
 op le(in PMC, in PMC, inconst INT) {
   if ($1->vtable->cmp(interpreter, $1, $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op le(in PMC, in INT, inconst INT) {
+  if ($1->vtable->get_integer(interpreter, $1) <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -1277,6 +1304,12 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 inline op cmod(out INT, in INT, in INT) {
   $1 = $2 % $3;
+  goto NEXT();
+}
+
+
+inline op cmod(out PMC, in PMC, in PMC) {
+  $2->vtable->modulus(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
