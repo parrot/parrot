@@ -15,6 +15,7 @@
 
 enum {
     enum_class_Array,
+    enum_class_Boolean,
     enum_class_PerlUndef,
     enum_class_PerlInt,
     enum_class_PerlNum,

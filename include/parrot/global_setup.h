@@ -22,6 +22,7 @@ void Parrot_PerlInt_class_init(INTVAL);
 void Parrot_PerlNum_class_init(INTVAL);
 void Parrot_PerlString_class_init(INTVAL);
 void Parrot_Array_class_init(INTVAL);
+void Parrot_Boolean_class_init(INTVAL);
 void Parrot_PerlArray_class_init(INTVAL);
 void Parrot_PerlHash_class_init(INTVAL);
 void Parrot_Pointer_class_init(INTVAL);

@@ -160,18 +160,19 @@ sub new {
   #
   bless $self,$class;
   $self->{constants}{Array} = 0;
-  $self->{constants}{PerlUndef} = 1;
-  $self->{constants}{PerlInt} = 2;
-  $self->{constants}{PerlNum} = 3;
-  $self->{constants}{PerlString} = 4;
-  $self->{constants}{PerlArray} = 5;
-  $self->{constants}{PerlHash} = 6;
-  $self->{constants}{Pointer} = 7;
-  $self->{constants}{IntQueue} = 8;
-  $self->{constants}{Sub} = 9;
-  $self->{constants}{Coroutine} = 10;
-  $self->{constants}{Continuation} = 11;
-  $self->{constants}{CSub} = 12;
+  $self->{constants}{Boolean} = 1;
+  $self->{constants}{PerlUndef} = 2;
+  $self->{constants}{PerlInt} = 3;
+  $self->{constants}{PerlNum} = 4;
+  $self->{constants}{PerlString} = 5;
+  $self->{constants}{PerlArray} = 6;
+  $self->{constants}{PerlHash} = 7;
+  $self->{constants}{Pointer} = 8;
+  $self->{constants}{IntQueue} = 9;
+  $self->{constants}{Sub} = 10;
+  $self->{constants}{Coroutine} = 11;
+  $self->{constants}{Continuation} = 12;
+  $self->{constants}{CSub} = 13;
   $self;
 }
 

@@ -16,6 +16,7 @@ chartype.c
 chartypes/unicode.c
 chartypes/usascii.c
 classes/array.pmc
+classes/boolean.pmc
 classes/continuation.pmc
 classes/coroutine.pmc
 classes/csub.pmc
@@ -463,6 +464,7 @@ t/op/string.t
 t/op/time.t
 t/op/trans.t
 t/pmc/array.t
+t/pmc/boolean.t
 t/pmc/perlarray.t
 t/pmc/perlhash.t
 t/pmc/perlstring.t

@@ -22,6 +22,7 @@ init_world(void)
 
     /* Call base vtable class constructor methods! */
     Parrot_Array_class_init(enum_class_Array);
+    Parrot_Boolean_class_init(enum_class_Boolean);
     Parrot_PerlUndef_class_init(enum_class_PerlUndef);
     Parrot_PerlInt_class_init(enum_class_PerlInt);
     Parrot_PerlNum_class_init(enum_class_PerlNum);
@@ -43,13 +44,14 @@ init_world(void)
     /* Now start filling the hash */
 
     /* Array */
+    Parrot_Array_class_init(enum_class_Array);
     MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Array].name(NULL,NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
                                                           Parrot_base_classname_hash, &key, enum_class_Array);
 
-    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlUndef].name(NULL, NULL));
+    MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_Array].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
-                                                          Parrot_base_classname_hash, &key, enum_class_PerlUndef);
+                                                          Parrot_base_classname_hash, &key, enum_class_Boolean);
 
     MAKE_KEY_STRING(key, Parrot_base_vtables[enum_class_PerlInt].name(NULL, NULL));
     Parrot_base_classname_hash->vtable->set_integer_keyed(NULL,
