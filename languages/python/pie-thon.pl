@@ -486,6 +486,17 @@ EOC
     }
 }
 
+sub YIELD_VALUE
+{
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    print <<EOC;
+    	.pcc_begin_yield $cmt
+	.return $tos->[1]
+	.pcc_end_yield
+EOC
+}
+
 sub MAKE_FUNCTION
 {
     my ($n, $c, $cmt) = @_;
@@ -1057,8 +1068,9 @@ sub BINARY_SUBSCR
     my $w = pop @stack;
     my $v = pop @stack;
     my $x = temp('P');
+    my $agg = promote($v);
     print <<EOC;
-	$x = $v->[1]\[$w->[1]\] $cmt
+	$x = $agg\[$w->[1]\] $cmt
 EOC
     push @stack, [-1, $x, 'P'];
 }

@@ -16,7 +16,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 12;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Coroutine 1");
@@ -566,3 +566,49 @@ catch coro
 catch main
 OUTPUT
 
+
+output_is(<<'CODE', 'Coroutine', "Coro new - type");
+##PIR##
+.sub main @MAIN
+    .local pmc c
+    c = global "coro"
+    typeof S0, c
+    print S0
+.end
+.sub coro
+    .local pmc x
+    x = new PerlInt
+    x = 0
+    iloop:
+        .pcc_begin_yield
+        .return x
+        .pcc_end_yield
+        x = x + 1
+    if x <= 4 goto iloop
+.end
+CODE
+
+output_is(<<'CODE', '01234', "Coro new - yield");
+##PIR##
+.sub main @MAIN
+    .local pmc c
+    c = global "coro"
+loop:
+    $P0 = c()
+    unless argcP goto ex
+    print $P0
+    goto loop
+ex:
+.end
+.sub coro
+    .local pmc x
+    x = new PerlInt
+    x = 0
+    iloop:
+        .pcc_begin_yield
+        .return x
+        .pcc_end_yield
+        x = x + 1
+    if x <= 4 goto iloop
+.end
+CODE

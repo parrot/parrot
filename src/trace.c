@@ -113,8 +113,6 @@ trace_key_dump(Interp *interpreter, PMC *key)
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-        case 0:
-            break;
         case KEY_integer_FLAG:
             PIO_eprintf(interpreter, "%vi", PMC_int_val(key));
             break;
@@ -151,9 +149,12 @@ trace_key_dump(Interp *interpreter, PMC *key)
             break;
         default:
             PIO_eprintf(interpreter, "??");
+            key = NULL;
+            break;
         }
 
-        key = PMC_data(key);
+        if (key)
+            key = PMC_data(key);
 
         if (key) PIO_eprintf(interpreter, ";");
     }

@@ -295,15 +295,11 @@ key_integer(Interp *interpreter, PMC *key)
         return PMC_int_val(key);
     case KEY_integer_FLAG | KEY_register_FLAG:
         return interpreter->int_reg.registers[PMC_int_val(key)];
-    case KEY_pmc_FLAG:
-        return VTABLE_get_integer(interpreter,  key);
-                                                  /*     PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         reg = interpreter->pmc_reg.registers[PMC_int_val(key)];
         return VTABLE_get_integer(interpreter, reg);
     default:
-        internal_exception(INVALID_OPERATION, "Key not an integer!\n");
-        return 0;
+        return VTABLE_get_integer(interpreter,  key);
     }
 }
 

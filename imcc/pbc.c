@@ -545,7 +545,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     SymReg *ns;
     int ns_const = -1;
     char *real_name;
-
+    char *class;
 
     if (r->pcc_sub->namespace) {
         ns = r->pcc_sub->namespace->reg;
@@ -570,7 +570,10 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
      *      for now:
      * "Class name offs end flags namespace#"
      */
-    sprintf(buf, "Sub %s %d %d %d %d",  real_name, offs, len,
+    class = "Sub";
+    if (r->pcc_sub->calls_a_sub & ITPCCYIELD)
+        class = "Coroutine";
+    sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, len,
             r->pcc_sub->pragma, ns_const);
     pfc = malloc(sizeof(struct PackFile_Constant));
 
