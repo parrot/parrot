@@ -1347,3 +1347,13 @@ foldup_p_i	1319
 foldup_p_ic	1320
 register_p	1321
 unregister_p	1322
+ceil_n  1323
+ceil_i_n        1324
+ceil_i_nc       1325
+ceil_n_n        1326
+ceil_n_nc       1327
+floor_n 1328
+floor_i_n       1329
+floor_i_nc      1330
+floor_n_n       1331
+floor_n_nc      1332

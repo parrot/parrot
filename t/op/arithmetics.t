@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 20;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -281,6 +281,142 @@ CODE
 0.000000
 123.456789
 123.456789
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "ceil of a native number");
+       set N0, 0
+       ceil N0
+       print N0
+       print "\n"
+       set N0, 123.45678901
+       ceil N0
+       print N0
+       print "\n"
+       set N0, -123.45678901
+       ceil N0
+       print N0
+       print "\n"
+       set N0, 0
+       set N1, 1
+       ceil N1, N0
+       print N1
+       print "\n"
+       set N0, 0.0
+       set N1, 1
+       ceil N1, N0
+       print N1
+       print "\n"
+       set N0, 123.45678901
+       set N1, 1
+       ceil N1, N0
+       print N1
+       print "\n"
+       set N0, -123.45678901
+       set N1, 1
+       ceil N1, N0
+       print N1
+       print "\n"
+       set N0, 0
+       set I1, 1
+       ceil I1, N0
+       print I1
+       print "\n"
+       set N0, 0.0
+       set I1, 1
+       ceil I1, N0
+       print I1
+       print "\n"
+       set N0, 123.45678901
+       set I1, 1
+       ceil I1, N0
+       print I1
+       print "\n"
+       set N0, -123.45678901
+       set I1, 1
+       ceil I1, N0
+       print I1
+       print "\n"
+       end
+CODE
+0.000000
+124.000000
+-123.000000
+0.000000
+0.000000
+124.000000
+-123.000000
+0
+0
+124
+-123
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "floor of a native number");
+       set N0, 0
+       floor N0
+       print N0
+       print "\n"
+       set N0, 123.45678901
+       floor N0
+       print N0
+       print "\n"
+       set N0, -123.45678901
+       floor N0
+       print N0
+       print "\n"
+       set N0, 0
+       set N1, 1
+       floor N1, N0
+       print N1
+       print "\n"
+       set N0, 0.0
+       set N1, 1
+       floor N1, N0
+       print N1
+       print "\n"
+       set N0, 123.45678901
+       set N1, 1
+       floor N1, N0
+       print N1
+       print "\n"
+       set N0, -123.45678901
+       set N1, 1
+       floor N1, N0
+       print N1
+       print "\n"
+       set N0, 0
+       set I1, 1
+       floor I1, N0
+       print I1
+       print "\n"
+       set N0, 0.0
+       set I1, 1
+       floor I1, N0
+       print I1
+       print "\n"
+       set N0, 123.45678901
+       set I1, 1
+       floor I1, N0
+       print I1
+       print "\n"
+       set N0, -123.45678901
+       set I1, 1
+       floor I1, N0
+       print I1
+       print "\n"
+       end
+CODE
+0.000000
+123.000000
+-124.000000
+0.000000
+0.000000
+123.000000
+-124.000000
+0
+0
+123
+-124
 OUTPUT
 
 #

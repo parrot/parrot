@@ -413,6 +413,64 @@ inline op div (in PMC, in PMC, in PMC) {
 
 ########################################
 
+=item B<ceil>(inout NUM)
+
+Set $1 to the smallest integral value greater than or equal to $1.
+
+=item B<ceil>(out INT, in NUM)
+
+=item B<ceil>(out NUM, in NUM)
+
+Set $1 to the smallest integral value greater than or equal to $2.
+
+=cut
+
+inline op ceil(inout NUM) {
+  $1 = ceil( $1 );
+  goto NEXT();
+}
+
+inline op ceil(out INT, in NUM) {
+  $1 = (INTVAL)ceil($2);
+  goto NEXT();
+}
+
+inline op ceil(out NUM, in NUM) {
+  $1 = ceil($2);
+  goto NEXT();
+}
+
+########################################
+
+=item B<floor>(inout NUM)
+
+Set $1 to the largest integral value less than or equal to $1.
+
+=item B<floor>(out INT, in NUM)
+
+=item B<floor>(out NUM, in NUM)
+
+Set $1 to the largest integral value less than or equal to $2.
+
+=cut
+
+inline op floor(inout NUM) {
+  $1 = floor( $1 );
+  goto NEXT();
+}
+
+inline op floor(out INT, in NUM) {
+  $1 = (INTVAL)floor($2);
+  goto NEXT();
+}
+
+inline op floor(out NUM, in NUM) {
+  $1 = floor($2);
+  goto NEXT();
+}
+
+########################################
+
 =item B<inc>(inout INT)
 
 =item B<inc>(inout NUM)
