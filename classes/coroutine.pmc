@@ -53,10 +53,14 @@ Swaps the "context".
 */
 
     void* invoke (void* next) {
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         void * dest = PMC_struct_val(SELF);
         PMC_struct_val(SELF) = next;
         swap_context(interpreter, SELF);
 
+        if (interpreter->code->cur_cs != sub->seg) {
+            Parrot_switch_to_cs(interpreter, sub->seg, 1);
+        }
         return dest;
     }
 
