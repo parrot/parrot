@@ -47,7 +47,7 @@ int yylex(YYSTYPE*, YYLTYPE*, Interp*);
 %token <s> STRINGC INTC FLOATC USTRINGC NAME
 %token <t> IDENTIFIER MODULE FUNCTION
 
-%type <n> program nodes nodes0 node const var
+%type <n> program nodes nodes0 node const var opcode
 %type <t> type
 
 %pure_parser
@@ -68,6 +68,7 @@ nodes: node
      | nodes node       { $$ = IMCC_append_node(interp, $1, $2, &@1); }
      | const
      | var
+     | opcode
      ;
 
 node: IDENTIFIER '(' nodes0 ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
@@ -91,6 +92,9 @@ var: type NAME          { $$ = IMCC_new_var_node(interp, $2, $1, &@2); }
 
 type: ':' 		{ $$ = 'P'; }
     ;
+
+opcode:  NAME          { $$ = IMCC_new_const_node(interp, $1, 'o', &@1); }
+   ;
 
 %%
 

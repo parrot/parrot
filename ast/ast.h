@@ -5,7 +5,7 @@
 #include "astparser.h"
 
 typedef enum {
-    UNK_CTX
+    UNK_CTX		/* unknown context */
 } context_type;
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
@@ -15,48 +15,35 @@ typedef struct nodeType_t* (*node_create_t) (int, struct nodeType_t*,
 typedef void               (*node_dump_t)   (struct nodeType_t*, int level);
 typedef context_type       (*node_context_t)(struct nodeType_t*, context_type);
 
+/* imcc forward declarations */
 struct _SymReg;
 struct _IMC_Unit;
 
+typedef enum {
+	NODE_HAS_CHILD
+} node_flags_enum;
+
 typedef struct nodeType_t {
-    node_expand_t expand;
-    node_opt_t    opt;
-    node_dump_t   dump;
-    node_context_t context;
-    context_type up_ctx;	/* ctx coming from upper */
-    context_type ctx;
-    const char* d;
-    struct nodeType_t *up;	/* parent */
+    node_expand_t expand;	/* create code for node */
+    node_opt_t    opt;		/* optimize node */
+    node_dump_t   dump;		/* debug dump node */
+    node_context_t context;	/* TODO create register type context */
+    context_type up_ctx;	/* context coming from upper node */
+    context_type ctx;		/* context of this node */
+    const char* description;	/* visible name of the node */
+    struct nodeType_t *parent;	/* parent of node */
     struct nodeType_t *next;	/* next statement */
     struct nodeType_t *dest;	/* destination or result */
-    struct _IMC_Unit *unit;
-    YYLTYPE loc;
+    struct _IMC_Unit *unit;	/* IMCC compilation unit to place code */
+    YYLTYPE loc;		/* yacc/bison code location */
+    node_flags_enum flags;	/* NODE_HAS_CHILD ... */
     union {
-	    struct _SymReg *r;
-	    struct nodeType_t *child;
+	struct _SymReg *r;	/* var, temp, const node */
+	struct nodeType_t *child;	/* contained node */
     } u;
 } nodeType;
 
-#define NODE0(p) (p)->u.child
-#define NODE1(p) (p)->u.child->u.child
-
-#ifdef AST_TEST
-enum VARTYPE {		/* variable type can be */
-    VTCONST 	= 1 << 0,	/* constant */
-    VTREG	= 1 << 1,	/* register */
-    VT_UNICODE  = 1 << 16       /* unicode string constant */
-};
-
-typedef struct _SymReg {
-    char * name;
-    enum VARTYPE type;       /* Variable type */
-    int set;                /* Which register set/file it belongs to */
-    struct _SymReg * next;   /* used in the symbols hash */
-} SymReg;
-SymReg * mk_const(char * name, int t);
-SymReg * mk_symreg(char * name, int t);
-
-#endif
+#define CHILD(p) (p)->u.child
 
 nodeType * IMCC_new_const_node(Interp*, char *name, int set, YYLTYPE *loc);
 nodeType * IMCC_new_var_node(Interp*, char *name, int set, YYLTYPE *loc);

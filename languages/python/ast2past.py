@@ -156,7 +156,7 @@ class PirateVisitor(object):
 	# .left .right
 	self.set_lineno(node)
 	self.begin("Binary(")
-	self.append("Op('%s')" % op)
+	self.append("Op(%s)" % op)
 	self.visit(node.left)
 	self.visit(node.right)
 	self.end(") # Binary")
@@ -170,7 +170,7 @@ class PirateVisitor(object):
 	l = nodes[0]
 	r = nodes[1]
 	if op:
-	    self.append("Op(%s)" % `op`)
+	    self.append("Op(%s)" % op)
 	self.visit(l)
 	n = nodes[1:]
 	if len(n) >= 2:
@@ -280,10 +280,14 @@ class PirateVisitor(object):
 	    self.begin("Star_Args(")
 	    self.visit(node.star_args)
 	    self.end(") # StarArgs")
+	else:
+	    self.append("_()")
 	if node.dstar_args:
 	    self.begin("DStar_Args(")
 	    self.visit(node.dstar_args)
 	    self.end(") # DStarArgs")
+	else:
+	    self.append("_()")
 	self.end(") # Py_Call")
 
     def visitClass(self, node):
@@ -397,8 +401,12 @@ class PirateVisitor(object):
 	self.end(") # Defaults")
 	if node.varargs:
 	    self.append("py_var_args(1)")
+	else:
+	    self.append("_()")
 	if node.kwargs:
 	    self.append("py_kw_args(1)")
+	else:
+	    self.append("_()")
 	self.end(") # Params")
 	self.find_locals(node.code)
 	self.visit(node.code)
@@ -453,7 +461,7 @@ class PirateVisitor(object):
 	# .expr
 	self.set_lineno(node)
 	self.begin("Unary(")
-	self.append("Op('~')")
+	self.append("Op(bnot)")
 	self.visit(node.expr)
 	self.end(") # Unary")
 
@@ -515,7 +523,7 @@ class PirateVisitor(object):
 	# .expr
 	self.set_lineno(node)
 	self.begin("Unary(")
-	self.append("Op('!')")
+	self.append("Op(not)")
 	self.visit(node.expr)
 	self.end(") # Unary")
 
@@ -649,7 +657,7 @@ class PirateVisitor(object):
 	# .expr
 	self.set_lineno(node)
 	self.begin("Unary(")
-	self.append("Op('+')")
+	self.append("Op(add)")
 	self.visit(node.expr)
 	self.end(") # UnaryAdd")
 
@@ -657,7 +665,7 @@ class PirateVisitor(object):
 	# .expr
 	self.set_lineno(node)
 	self.begin("Unary(")
-	self.append("Op('-')")
+	self.append("Op(sub)")
 	self.visit(node.expr)
 	self.end(") # UnarySub")
 
