@@ -147,6 +147,7 @@ $(LIBICUCORE) $(LIBICUDATA) :
 	msdev icu\source\allinone\allinone.dsw /MAKE "stubdata - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "common - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "i18n - Win32 Debug"
+	xcopy icu\source\common icu\include
 	msdev icu\source\allinone\allinone.dsw /MAKE "ctestfw - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "decmn - Win32 Debug"
 	msdev icu\source\allinone\allinone.dsw /MAKE "gencmn - Win32 Debug"
