@@ -3,7 +3,7 @@
 
 * Get python bytecode translator done
 
-* Get hash (probably SHA1) added to bytecode segments
+* Get digest (probably SHA1) added to bytecode segments
 
 * Spec out bytecode metadata system and introspection/modification
   system
