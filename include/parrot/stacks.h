@@ -40,7 +40,7 @@ struct StackChunk {
 
 INTVAL stack_depth(struct Parrot_Interp *,struct StackChunk *chunk);
 struct Stack_Entry *stack_entry(struct Parrot_Interp *, struct StackChunk *chunk,INTVAL);
-void rotate_stack(struct Parrot_Interp *, INTVAL);
+void rotate_entries(struct Parrot_Interp *, struct StackChunk *, struct Stack_Entry *, INTVAL);
 
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *));
 void *pop_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *where, INTVAL type);

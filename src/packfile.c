@@ -1711,9 +1711,9 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
             printf("    [ 'PFC_STRING', {\n");
             printf("        FLAGS    => 0x%04x,\n", self->string->flags);
             printf("        ENCODING => %s,\n",
-                    (long) self->string->encoding->name);
+                    self->string->encoding->name);
             printf("        TYPE     => %s,\n",
-                    (long) self->string->type->name);
+                    self->string->type->name);
             printf("        SIZE     => %ld,\n",
                     (long) self->string->bufused);
             /* TODO: Won't do anything reasonable for most encodings */
