@@ -1,5 +1,54 @@
-This is not yet ready for public consumption; this is just
-my working copy of Parrot so that there's *something* here.
+This is Parrot, version 0.0.1
+-----------------------------
 
+Parrot is Copyright (C) 2001 Yet Another Society. All Rights Reserved.
 
+LICENSE INFORMATION
+-------------------
 
+This code is distributed under the same license as Perl 5; you can
+redistribute it and/or modify it under the terms of either:
+
+    a) the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+    b) the "Artistic License" which can be found in the file "LICENSE"
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.
+
+IMPORTANT! IMPORTANT! IMPORTANT!
+
+The final license for Parrot has not yet been decided, and hence you
+should *NOT* use this code in any other product or project until a final
+license is determined. By submitting code you agree to the above, as
+well as agreeing to relicense any submitted code under whatever final
+license is chosen.
+
+INSTRUCTIONS
+------------
+
+For now, unpack your Parrot tarball, (if you're reading this, you've
+probably already done that) type
+
+    make test_prog
+
+and the test interpreter should build.
+
+test_prog is a Parrot interpreter which can read in bytecode from a
+file. To assemble Parrot assembly into bytecode, type
+
+    perl assemble.pl test.pasm > test.pbc
+
+You can then execute the compiled bytecode with
+
+    ./test_prog test.pbc
+
+There is some documentation in docs/, but this is a very early alpha
+release, so for the most part, you're on your own.
+
+Have fun,
+The Parrot team.
