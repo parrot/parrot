@@ -330,16 +330,15 @@ pmclass PerlInt {
 	    }
 	}
 	else {
-	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
-            dest->vtable->set_integer_native(INTERP, dest, 
-		SELF->cache.int_val /
-                value->vtable->get_integer(INTERP, value)
-            );
+            /* Interesting race condition if SELF == dest */
+            FLOATVAL result = SELF->cache.int_val / (FLOATVAL)value->vtable->get_integer(INTERP, value);
+	    dest->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+            dest->vtable->set_number_native(INTERP, dest, result);
 	}
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-        dest->vtable->set_integer_native(INTERP, dest, 
+        dest->vtable->set_number_native(INTERP, dest, 
             SELF->cache.int_val / value
         );
     }

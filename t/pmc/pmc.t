@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -109,7 +109,7 @@ output_is(<<'CODE', <<OUTPUT, "divide integer by self");
 	print "\n"
 	end
 CODE
-1
+1.000000
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "add integer to other");
@@ -161,7 +161,7 @@ output_is(<<'CODE', <<OUTPUT, "divide integer by other");
 	print "\n"
 	end
 CODE
-2
+2.000000
 OUTPUT
 
 #
@@ -728,5 +728,21 @@ output_is(<<CODE, <<OUTPUT, "p =  p % p (int % int)");
 CODE
 1
 OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "(int / int) -> float");
+	new 	P0, PerlInt
+	new	P1, PerlInt
+	new	P2, PerlInt
+	set	P0, 1
+	set	P1, 2
+	div		P2, P0, P1
+	print	P2
+	print	"\\n"
+	end
+CODE
+0.500000
+OUTPUT
+
+1;
 
 1;
