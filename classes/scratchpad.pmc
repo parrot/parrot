@@ -1,16 +1,17 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
 
-classes/scratchpad.pmc - Lexical Scrachpad
+classes/scratchpad.pmc - Lexical Scratchpad
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Scratchpad base class.
+These are the vtable functions for the Scratchpad PMC. 
 
-A ScratchPad PMC is a FixedPMCArray of OrderedHashes.
+A ScratchPad PMC is a FixedPMCArray of OrderedHashes. It is used in the implementation
+of the opcodes in F<ops/var.ops>. 
 
 =head2 Methods
 
@@ -103,6 +104,8 @@ A scope, and a lexical position in that scope.
     PMC* get_pmc_keyed_str (STRING* key) {
         return scratchpad_find(INTERP, SELF, key);
     }
+
+
 /*
 
 =item C<void set_pmc_keyed(PMC *key, PMC *value)>
@@ -192,6 +195,11 @@ Deletes the lexical variable for C<*key>.
 /*
 
 =back
+
+=head1 SEE ALSO
+
+F<ops/var.ops> 
+F<src/lexical.c>
 
 =cut
 

@@ -316,6 +316,7 @@ scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)
 =head1 SEE ALSO
 
 F<include/parrot/lexical.h>.
+F<classes/scratchpad.pmc>.
 
 =head1 HISTORY
 
