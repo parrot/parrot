@@ -45,13 +45,13 @@ Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
                   va_list args)
 {
     STRING *realpat, *ret;
-    if (interpreter)
-        Parrot_block_DOD(interpreter);
+        
+    Parrot_block_DOD(interpreter);
     realpat = string_make(interpreter, pat, strlen(pat),
                                   NULL, PObj_external_FLAG, NULL);
     ret = Parrot_vsprintf_s(interpreter, realpat, args);
-    if (interpreter)
-        Parrot_unblock_DOD(interpreter);
+    Parrot_unblock_DOD(interpreter);
+
     return ret;
 }
 
