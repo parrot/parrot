@@ -174,7 +174,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
      * XXX create mem for regs - intermediate step
      *     to check indirect accressing
      */
-    interpreter->ctx.bp = mem_sys_allocate(sizeof(struct parrot_regs_t));
+    interpreter->ctx.bp =
+        mem_sys_allocate_zeroed(sizeof(struct parrot_regs_t));
 #endif
 
     /* Set up the initial register chunks */

@@ -233,21 +233,14 @@ mark_saved_regs(Parrot_Interp interpreter)
     regsave *p = interpreter->caches->regs_cache.reg_save_mark;
     int j;
     PObj *reg;
-    size_t offs;
 
     for (; p; p = p->next) {
         struct PReg *pf = &p->regs.pmc_reg;
         struct SReg *sf = &p->regs.string_reg;
         for (j = 0; j < NUM_REGISTERS; j++) {
-            offs = REG_OFFS_PMC(j);
-            if (offs >= p->size)
-                break;
             reg = (PObj*) pf->registers[j];
             if (reg)
                 pobject_lives(interpreter, reg);
-            offs = REG_OFFS_STR(j);
-            if (offs >= p->size)
-                break;
             reg = (PObj*) sf->registers[j];
             if (reg)
                 pobject_lives(interpreter, reg);
