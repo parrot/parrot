@@ -55,7 +55,7 @@ GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 	languages/scheme/Makefile languages/befunge/Makefile \
 	languages/bf/Makefile languages/imcc/Makefile \
 	languages/ook/Makefile languages/perl6/Makefile \
-	languages/urm/Makefile
+	languages/urm/Makefile languages/tcl/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
 	include/parrot/platform_interface.h \
