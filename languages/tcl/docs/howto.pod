@@ -1,0 +1,103 @@
+=head1 contributing to tcl/parrot
+
+a brief overview on how to help out, if you're interested. In general, 
+it's ok to send patches for tcl to the RT system for anything that isn't
+"BIG STUFF" - those, please bounce off me first. I'd prefer C<diff -u>
+patches, but am happy to take complete files as well.
+
+Most of this is mentioned in the TODO - in fact, this document probably
+should merge with the TODO to avoid redundancy.
+
+=head1 BIG STUFF
+
+=over 4
+
+=item speed
+
+We're currently a bit slow, compared to tclsh. Switching over to a compiler
+instead of an interpreter might help here, though I'm having a hard time
+envisioning a compiler that doesn't have to do all the things we already do
+as an interpreter. 
+
+There are some calculations that are done in both parse
+and interpret that could probably be moved into parse, which would give us
+an improvement - especially in loops, as the interpret step is called each
+time through the loop, but the parse is only done once. (See the TODO for
+my current ramblings on this.)
+
+We could rewrite parse/interpret/compile in C, either as an NCI or behind
+a PMC object - this would I<possibly> give us an improvement in speed also.
+
+=item features
+
+We're currently missing a lot of stuff that requires support from parrot
+before we can continue, like Unicode for the C<\u> escapes. I've tried to
+start documenting these in the TODO with sections like C<given Unicode>, 
+then listing the things that we can do once we have that. 
+
+=back 4
+
+=head1 DOCUMENTATION
+
+=over 4
+
+=item pod 
+
+Every PIR .sub that's defined should probably have some POD to go along
+with it to document the arguments and return values.
+
+=item big picture docs.
+
+Are the docs in C<docs/> useful? Could use someone to proof them, and
+verify that there are no missing chunks (if missing, write them, or 
+get them added to the C<TODO>), and that they are coherent.
+
+=item TODO
+
+Clean up the TODO formatting, esp. the "given" sections, and come up
+with a list of any other missing features that aren't listed there.
+
+=back 4
+
+=head1 PIR
+
+=over 4
+
+=item Missing Commands
+
+Every builtin command corresponds to a file with an appropriately named
+sub in C<lib/commands> - Each of these subs takes a PerlArray of strings
+as a single argument, so C<puts -nonewline "hello">  can be thought of 
+as being called this way:
+
+	$P0 = new PerlArray
+	$P0[0] = "-nonewline"
+	$P0[1] = "hello"
+	($I0,$S0) = __cmd_puts($P0)
+
+Note that there are two return values - C<$I0> and C<$S0> - $I0 contains
+the tcl return value for that command. So, in this example, it returns 
+C<TCL_OK> ( a global constant). C<$S0> contains the result of the puts,
+which is the empty string.
+
+NOTE! For now, the return value is a string. One of the BIG todo items is
+to be able to pass around arbitrary values, so that we can avoid converting
+back and forth to strings all the time. (for example, so that if C<expr>
+returns an integer - we pass it around as an integer, so that if we have
+another command that requires an integer, we don't have to convert it - For
+now, however, we can ignore this and just return strings everywhere.)
+
+Once you write a command (or add a subcommand), you need to add a test file (
+or a test in an existing) file in C<t/> - tests for C<puts>, for example,
+go in C<t/cmd_puts.t> - we use the C<Test::Harness> framework, via 
+C<Parrot::Test>. To run your test, just say C<make test> in the top level
+tcl directory. Be sure to test each of the subcommands. While our eventual
+goal is to pass the tcl test suite, we really need to maintain a good one
+on our own in the meantime.
+
+To find a command to work on, just check out the TODO - several commands
+are currently not implemented, and others are missing various subcommands.
+
+=back 4
+
+=cut
