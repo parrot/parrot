@@ -1061,6 +1061,8 @@ const char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
 
+#if 0
+
     if (s->buflen == s->bufused) {
         string_grow(interpreter, s, 1);
     }
@@ -1081,6 +1083,16 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
     ((char *)s->strstart)[s->bufused] = 0;
     /* don't return local vars, return the right thing */
     return (char*)s->strstart;
+#else
+    /* TODO XXX FIXME ;-) non ascii & memory leak  -leo
+     * the real solution WRT leak is this:
+     * the caller of this function has to free this cstring that's all
+     */
+    char *p = malloc(s->bufused + 1);
+    memcpy(p, s->strstart, s->bufused);
+    p[s->bufused] = 0;
+    return p;
+#endif
 }
 
 
