@@ -3537,6 +3537,8 @@ inline op shift (out PMC, inout PMC) {
 =item B<splice>(inout PMC, in PMC, in INT, in INT)
 
 Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+The values are put into the aggregate by a shallow copy. If the values would
+be reused, they have to be B<clone>d.
 
 =cut
 

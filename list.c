@@ -20,6 +20,7 @@
  *      1.7     19.10.2002 set intial length (new_init)
  *      1.8     21.10.2002 gc_debug stuff
  *      1.9     21.10.2002 splice
+ *      1.10    22.10.2002 update comment WRT clone in splice
  *
  *  Data Structure and Algorithms:
  *  ==============================
@@ -1305,10 +1306,11 @@ list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
     /* replace count items at offset with values */
     for (i = j = 0; i < count && j < value_length; i++, j++) {
         void * val = list_get(interpreter, value_list, j, type);
-        /* XXX should we clone PMC's here? */
+        /* no clone here, if the HL want's to reuse the values,
+         * the HL has to clone the values
+         */
         if (type == enum_type_PMC)
             val = *(PMC**) val;
-        /* and string_copy here? */
         else if (type == enum_type_STRING)
             val = *(STRING**) val;
         list_assign(interpreter, list, offset + i, val, type);
@@ -1319,7 +1321,6 @@ list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
         list_insert(interpreter, list, offset + i, value_length - j);
         for (; j < value_length; i++, j++) {
             void * val = list_get(interpreter, value_list, j, type);
-            /* XXX s. above */
             if (type == enum_type_PMC)
                 val = *(PMC**) val;
             else if (type == enum_type_STRING)
