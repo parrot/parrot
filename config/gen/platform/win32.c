@@ -66,9 +66,11 @@ Parrot_getenv(const char *name, int *free_it)
     DWORD size = GetEnvironmentVariable(name, NULL, 0);
     char *buffer;
 
-    *free_it = 1;
-    if (size == 0) return NULL;
-
+    if (size == 0) {
+        *free_it = 0;
+        return NULL;
+    } else
+        *free_it = 1;
     buffer = mem_sys_allocate(size);
     GetEnvironmentVariable(name, buffer, size);
 

@@ -233,6 +233,6 @@ OUT
 
 END {
   unlink $file;
-  #unlink "temp.imc";
-  #unlink "temp.pbc";
+  unlink "temp.imc";
+  unlink "temp.pbc";
 }
