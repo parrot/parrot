@@ -150,7 +150,7 @@ class PirateVisitor(object):
         lnf = compiler.visitor.walk(node, LocalNameFinder())
 	for n in lnf.getLocals():
 	    self.locals[n] = n
-	    self.append("Py_Local(%s)" % n)
+	    self.append("Py_Local(:%s)" % n)
 
     def binary(self, node, op):
 	# .left .right
@@ -197,7 +197,7 @@ class PirateVisitor(object):
     def visitAssName(self, node):
 	# .name .flags TODO
 	self.set_lineno(node)
-	self.append("AssName(" + node.name + ")")
+	self.append("AssName(:" + node.name + ")")
 
     def visitAssList(self, node):
 	# .nodes
@@ -354,6 +354,10 @@ class PirateVisitor(object):
 	self.visit(node.expr)
 	self.end(") # Exec")
 
+    def visitFloorDiv(self, node):
+	# .left .right
+	self.binary(node, 'fdiv')
+
     def visitFor(self, node):
 	# .assign .list .body .else_
 	self.set_lineno(node)
@@ -386,7 +390,7 @@ class PirateVisitor(object):
 		self.append("Py_doc(" + `node.doc` + ")")
 	self.begin("Params(")
 	for n in node.argnames:
-	    self.append("Name(%s)" % n)
+	    self.append("Name(:%s)" % n)
 	self.begin("Defaults(")
 	for n in node.defaults:
 	    self.visit(n)
@@ -419,7 +423,7 @@ class PirateVisitor(object):
 	self.set_lineno(node)
 	self.begin("Global(")
         for n in node.names:
-	    self.append("Name(%s)" % n)
+	    self.append("Name(:%s)" % n)
 	self.end(") # Global")
 
     def visitIf(self, node):
@@ -458,7 +462,7 @@ class PirateVisitor(object):
 	# f(x=y)
 	self.set_lineno(node)
 	self.begin("Kw_arg(")
-	self.append("Name(%s)" % node.name)
+	self.append("Name(:%s)" % node.name)
 	self.visit(node.expr)
 	self.end(") # Kw_arg")
 
@@ -505,7 +509,7 @@ class PirateVisitor(object):
     def visitName(self, node):
 	# .name
 	self.set_lineno(node)
-	self.append("Name(" + node.name + ")")
+	self.append("Name(:" + node.name + ")")
 
     def visitNot(self, node):
 	# .expr

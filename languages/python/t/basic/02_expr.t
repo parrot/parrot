@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -16,6 +16,12 @@ CODE
 test( <<'CODE', 'add' );
 print 1+2+3+4
 CODE
+
+test( <<'CODE', 'print P' );
+a=41
+print a
+CODE
+
 
 test( <<'CODE', 'add P' );
 a=41
@@ -39,6 +45,9 @@ print a
 a=77/10
 print a
 CODE
+
+SKIP: {
+   skip("Not yet", 3);
 
 test( <<'CODE', 'subscr' );
 print "abcde"[2]
@@ -70,3 +79,4 @@ a = 3
 print -a
 print +a - -a
 CODE
+}

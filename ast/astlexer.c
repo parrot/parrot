@@ -743,32 +743,34 @@ YY_RULE_SETUP
 #line 81 "ast/ast.l"
 {
 			valp->t = IMCC_find_node_type(yytext);
-			return IDENTIFIER;
+			if (valp->t)
+			    return IDENTIFIER;
+			DUP_AND_RET(valp, NAME);
 		   }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 85 "ast/ast.l"
+#line 87 "ast/ast.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 86 "ast/ast.l"
+#line 88 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 87 "ast/ast.l"
+#line 89 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 88 "ast/ast.l"
+#line 90 "ast/ast.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 90 "ast/ast.l"
+#line 92 "ast/ast.l"
 {
 	valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
@@ -777,7 +779,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 96 "ast/ast.l"
+#line 98 "ast/ast.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
@@ -785,7 +787,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 101 "ast/ast.l"
+#line 103 "ast/ast.l"
 {
         char *p = strchr(yytext, '"');
 	valp->s = str_dup(p);    /* enc:"..." */
@@ -795,7 +797,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 107 "ast/ast.l"
+#line 109 "ast/ast.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
@@ -803,19 +805,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 112 "ast/ast.l"
+#line 114 "ast/ast.l"
 return *yytext;
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 114 "ast/ast.l"
+#line 116 "ast/ast.l"
 yyterminate();
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 116 "ast/ast.l"
+#line 118 "ast/ast.l"
 ECHO;
 	YY_BREAK
-#line 819 "ast/astlexer.c"
+#line 821 "ast/astlexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1699,7 +1701,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 116 "ast/ast.l"
+#line 118 "ast/ast.l"
 
 
 int yywrap(void) { return 1; }

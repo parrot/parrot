@@ -50,8 +50,10 @@ IMCC_ast_compile(Interp *interpreter, FILE *fp)
     ASTin = fp;
     ASTparse(interpreter);
     top_node = IMCC_expand_nodes(interpreter, top_node);
-    /* IMCC_dump_nodes(top_node); TODO commandline switches */
-    IMCC_free_nodes(interpreter, top_node);
+    if (top_node) {
+        /* IMCC_dump_nodes(top_node); TODO commandline switches */
+        IMCC_free_nodes(interpreter, top_node);
+    }
 }
 
 static void

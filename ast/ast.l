@@ -80,7 +80,9 @@ SP              [ ]
 {WS}+		/* eat white space */ ;
 {ID}		   {
 			valp->t = IMCC_find_node_type(yytext);
-			return IDENTIFIER;
+			if (valp->t)
+			    return IDENTIFIER;
+			DUP_AND_RET(valp, NAME);
 		   }
 {FLOATNUM}         DUP_AND_RET(valp, FLOATC);
 {SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);

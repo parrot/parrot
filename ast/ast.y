@@ -46,10 +46,11 @@ extern struct nodeType_t *top_node;
     struct nodeType_t *n;
 }
 
-%token <s> STRINGC INTC FLOATC USTRINGC
+%token <s> STRINGC INTC FLOATC USTRINGC NAME
 %token <t> IDENTIFIER
 
-%type <n> program nodes node term
+%type <n> program nodes node const var
+%type <t> type
 
 %pure_parser
 
@@ -63,17 +64,25 @@ program: nodes          { top_node = $$; }
      ;
 nodes: node
      | nodes node       { $$ = IMCC_append_node(interp, $1, $2, &@1); }
-     | term
+     | const
+     | var
+     | /* empty */	{ $$ = 0; }
      ;
 
 node: IDENTIFIER '(' nodes ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
 	;
 
-term: /* empty */	{ $$ = 0; }
-    | STRINGC		{ $$ = IMCC_new_const_node(interp, $1, 'S', &@1); }
+const:
+      STRINGC		{ $$ = IMCC_new_const_node(interp, $1, 'S', &@1); }
     | INTC              { $$ = IMCC_new_const_node(interp, $1, 'I', &@1); }
     | FLOATC            { $$ = IMCC_new_const_node(interp, $1, 'N', &@1); }
     | USTRINGC          { $$ = IMCC_new_const_node(interp, $1, 'U', &@1); }
+    ;
+
+var: type NAME          { $$ = IMCC_new_var_node(interp, $2, $1, &@2); }
+   ;
+
+type: ':' 		{ $$ = 'P'; }
     ;
 
 %%

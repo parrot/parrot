@@ -36,14 +36,16 @@
      INTC = 259,
      FLOATC = 260,
      USTRINGC = 261,
-     IDENTIFIER = 262
+     NAME = 262,
+     IDENTIFIER = 263
    };
 #endif
 #define STRINGC 258
 #define INTC 259
 #define FLOATC 260
 #define USTRINGC 261
-#define IDENTIFIER 262
+#define NAME 262
+#define IDENTIFIER 263
 
 
 
@@ -56,7 +58,7 @@ typedef union {
     struct nodeType_t *n;
 } yystype;
 /* Line 1281 of /usr/share/bison/yacc.c.  */
-#line 60 "ast/astparser.h"
+#line 62 "ast/astparser.h"
 # define YYSTYPE yystype
 #endif
 

@@ -146,6 +146,25 @@ insINS(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     insert_ins(unit, ins, tmp);
     return tmp;
 }
+
+static Instruction *
+insert_new(Interp* interpreter, nodeType *var, const char *name)
+{
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS], *r;
+    int type = pmc_type(interpreter, const_string(interpreter, name));
+    char ireg[8];
+
+    cur_unit = interpreter->imc_info->last_unit;
+    ins = cur_unit->last_ins;
+    sprintf(ireg, "%d", type);
+    r = mk_const(str_dup(ireg), 'I');
+
+    regs[0] = var->u.r;
+    regs[1] = r;
+    return insINS(interpreter, cur_unit, ins, "new", regs, 2);
+}
+
 /*
  * node expand aka code creation functions
  */
@@ -154,6 +173,12 @@ static nodeType*
 exp_Var(Interp* interpreter, nodeType *p)
 {
     return p;
+}
+
+static nodeType*
+exp_Name(Interp* interpreter, nodeType *p)
+{
+    return NODE0(p);
 }
 
 static nodeType*
@@ -179,6 +204,24 @@ exp_next(Interp* interpreter, nodeType *p)
 }
 
 static nodeType*
+exp_Assign(Interp* interpreter, nodeType *p)
+{
+    IMC_Unit *unit;
+    Instruction *ins;
+    SymReg *regs[IMCC_MAX_REGS], *r;
+    nodeType *var = NODE0(p);
+    nodeType *rhs = var->next;
+
+    rhs = rhs->expand(interpreter, rhs);
+    unit = interpreter->imc_info->last_unit;
+    ins = unit->last_ins;
+    regs[0] = NODE0(var)->u.r;
+    regs[1] = rhs->u.r;
+    insINS(interpreter, unit, ins, "assign", regs, 2);
+    return exp_next(interpreter, p);
+}
+
+static nodeType*
 exp_Binary(Interp* interpreter, nodeType *p)
 {
     nodeType *op, *left, *right, *dest;
@@ -193,7 +236,11 @@ exp_Binary(Interp* interpreter, nodeType *p)
     right = right->expand(interpreter, right);
     unit = interpreter->imc_info->last_unit;
     ins = unit->last_ins;
-    dest = IMCC_new_temp_node(interpreter, left->u.r->set, &p->loc);
+    if (!p->dest) {
+        dest = IMCC_new_temp_node(interpreter, left->u.r->set, &p->loc);
+        if (dest->u.r->set == 'P')
+            ins = insert_new(interpreter, dest, "Undef");
+    }
     p->dest = dest;
     regs[0] = dest->u.r;
     regs[1] = left->u.r;
@@ -202,26 +249,36 @@ exp_Binary(Interp* interpreter, nodeType *p)
     return dest;
 }
 
+
+static nodeType*
+exp_Py_Local(Interp* interpreter, nodeType *p)
+{
+    nodeType *var = NODE0(p);
+
+    insert_new(interpreter, var, "Undef");
+    return exp_next(interpreter, p);
+}
+
 static nodeType*
 exp_Py_Module(Interp* interpreter, nodeType *p)
 {
     nodeType *doc;
+    SymReg *sub;
+    Instruction *i;
     /*
      * this is the main init code
-     * (Py_doc, Stmts)
+     * (Py_doc, Py_local, Stmts)
      */
-    IMC_Unit *unit = cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
-    SymReg *sub = mk_sub_address(str_dup("__main__"));
-    Instruction *i = INS_LABEL(cur_unit, sub, 1);
+    cur_unit = interpreter->imc_info->last_unit;
+    if (!cur_unit)
+        cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
+    sub = mk_sub_address(str_dup("__main__"));
+    i = INS_LABEL(cur_unit, sub, 1);
 
     i->r[1] = mk_pcc_sub(str_dup(i->r[0]->name), 0);
     add_namespace(interpreter, i->r[1]);
     i->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
-    /*
-     * Py_Module has a Py_doc node and Stmts
-     */
-    doc = NODE0(p);
-    /* TODO */
+    doc = NODE0(p);      /* TODO */
     return exp_default(interpreter, doc);
 }
 
@@ -288,10 +345,13 @@ typedef struct {
 
 static node_names ast_list[] = {
     { "-no-node-", 	NULL, NULL, NULL, NULL },
+    { "AssName", 	create_1, exp_Name, NULL, NULL },
+    { "Assign", 	create_1, exp_Assign, NULL, NULL },
     { "Binary", 	create_1, exp_Binary, NULL, NULL },
-    { "Const", 		NULL, exp_Const, NULL, dump_Const },
-#define CONST_NODE 2
+    { "Const", 		NULL,     exp_Const, NULL, dump_Const },
+    { "Name",           create_1, exp_Name, NULL, NULL },
     { "Op",             create_Op, NULL, NULL, dump_Op },
+    { "Py_Local", 	create_1, exp_Py_Local, NULL, NULL },
     { "Py_Module", 	create_1, exp_Py_Module, NULL, NULL },
     { "Py_Print" , 	create_1, exp_Py_Print, NULL, NULL },
     { "Py_Print_nl",	create_0, exp_Py_Print_nl, NULL, NULL },
@@ -299,6 +359,7 @@ static node_names ast_list[] = {
     { "Src_Line",    	create_1, exp_Src_Lines, NULL, NULL },
     { "Stmts",          create_1, exp_default, NULL, NULL },
     { "_",              create_0, exp_next, NULL, NULL }
+#define CONST_NODE 4
 };
 
 static int
@@ -363,7 +424,7 @@ IMCC_find_node_type(const char *name)
 		sizeof(ast_list[0]), ast_comp);
 
     if (!r) {
-	fatal(1, "IMCC_find_node_type", "Unknown astnode '%s'\n", name);
+	return 0;
     }
     return r - ast_list;
 }
@@ -394,6 +455,19 @@ IMCC_new_const_node(Interp* interp, char *name, int set, YYLTYPE *loc)
     nodeType *p = new_con(loc);
     SymReg *r = mk_const(name, set);
     p->u.r = r;
+    return p;
+}
+
+nodeType *
+IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
+{
+    nodeType *p = new_node(loc);
+    cur_unit = interpreter->imc_info->last_unit;
+    if (!cur_unit)
+        cur_unit = imc_open_unit(interpreter, IMC_PCCSUB);
+    p->u.r = mk_ident(name, set);
+    p->expand = exp_Var;
+    p->dump   = dump_Var;
     return p;
 }
 

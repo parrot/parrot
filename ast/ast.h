@@ -8,13 +8,6 @@ typedef enum {
     UNK_CTX
 } context_type;
 
-/* As is, this is a definition, not just a declaration, and so it is created
-in all object files. This confuses some linkers (eg OS X)
-
-YYLTYPE noloc;
-
-*/
-
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
 typedef struct nodeType_t* (*node_expand_t) (Interp*, struct nodeType_t*);
 typedef struct nodeType_t* (*node_create_t) (int, struct nodeType_t*,
@@ -64,6 +57,7 @@ SymReg * mk_symreg(char * name, int t);
 #endif
 
 nodeType * IMCC_new_const_node(Interp*, char *name, int set, YYLTYPE *loc);
+nodeType * IMCC_new_var_node(Interp*, char *name, int set, YYLTYPE *loc);
 nodeType * IMCC_new_node(Interp*, int nr, nodeType *child, YYLTYPE *loc);
 nodeType * IMCC_append_node(Interp*, nodeType *head, nodeType *tail,
 		YYLTYPE *loc);
