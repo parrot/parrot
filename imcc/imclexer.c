@@ -283,110 +283,110 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 138
-#define YY_END_OF_BUFFER 139
+#define YY_NUM_RULES 139
+#define YY_END_OF_BUFFER 140
 static yyconst short int yy_accept[909] =
     {   0,
         0,    0,    0,    0,    0,    0,   16,   16,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,  139,  127,
-      126,    8,  126,  127,  127,    9,  127,  127,  127,  127,
-      127,  127,  110,  127,   88,  127,  115,  115,   79,  127,
-       81,  113,  113,  113,  113,  113,  113,  113,  113,  113,
-      113,  113,  113,  113,  113,  127,  127,    9,   88,   14,
-      126,  126,  127,  127,  113,  127,   14,  137,  134,  129,
-      134,  137,  137,  137,  137,  137,  115,  115,  135,  135,
-      135,  133,  133,  137,   14,   16,   17,   16,   16,   16,
-       16,   16,   16,   16,   16,   16,   16,   16,   16,  138,
+        0,    0,    0,    0,    0,    0,    0,    0,  140,  128,
+      127,    8,  127,  128,  128,    9,  128,  128,  128,  128,
+      128,  128,  111,  128,   89,  128,  116,  116,   80,  128,
+       82,  114,  114,  114,  114,  114,  114,  114,  114,  114,
+      114,  114,  114,  114,  114,  128,  128,    9,   89,   14,
+      127,  127,  128,  128,  114,  128,   14,  138,  135,  130,
+      135,  138,  138,  138,  138,  138,  116,  116,  136,  136,
+      136,  134,  134,  138,   14,   16,   17,   16,   16,   16,
+       16,   16,   16,   16,   16,   16,   16,   16,   16,  139,
 
-      127,    6,    6,  127,  127,  127,  127,    2,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    3,  127,
-        7,  127,  127,  127,  127,  127,  115,  115,  127,  127,
-      127,  127,  127,   10,  127,  127,  127,  127,  127,  115,
-      115,  127,  127,  127,  127,  126,    0,    8,   84,    0,
-      119,    0,    0,    0,    0,    0,   94,   76,   97,    0,
-      121,   85,   92,    0,  115,   90,   91,   86,   89,  114,
-      103,  112,  112,  112,  112,  112,  112,  112,  112,  112,
-      112,  112,  112,  112,  112,   95,   93,  114,    0,    0,
-      118,    0,   73,   80,   83,   82,   74,  109,    0,  113,
+      128,    6,    6,  128,  128,  128,  128,    2,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    3,  128,
+        7,  128,  128,  128,  128,  128,  116,  116,  128,  128,
+      128,  128,  128,   10,  128,  128,  128,  128,  128,  116,
+      116,  128,  128,  128,  128,  127,    0,    8,   85,    0,
+      120,    0,    0,    0,    0,    0,   95,   77,   98,    0,
+      122,   86,   93,    0,  116,   91,   92,   87,   90,  115,
+      104,  113,  113,  113,  113,  113,  113,  113,  113,  113,
+      113,  113,  113,  113,  113,   96,   94,  115,    0,    0,
+      119,    0,   74,   81,   84,   83,   75,  110,    0,  114,
 
-      111,  113,  113,  113,  113,  113,   13,  113,  113,  113,
-      113,  113,   57,  113,  113,  113,  113,  113,  113,  113,
-      113,  113,  113,  113,   98,   77,   99,   78,    0,  112,
-      126,  112,  112,  112,  112,  112,  112,  134,  129,  134,
-        0,    0,  136,  136,  136,  136,  136,  135,    0,   13,
-      135,  133,  133,   16,   17,   16,   16,   16,   16,   16,
+      112,  114,  114,  114,  114,  114,   13,  114,  114,  114,
+      114,  114,   58,  114,  114,  114,  114,  114,  114,  114,
+      114,  114,  114,  114,   99,   78,  100,   79,    0,  113,
+      127,  113,  113,  113,  113,  113,  113,  135,  130,  135,
+        0,    0,  137,  137,  137,  137,  137,  136,    0,   13,
+      136,  134,  134,   16,   17,   16,   16,   16,   16,   16,
        16,   16,   16,   16,   16,   16,   16,   16,   16,   16,
        16,   16,   13,   16,   16,   16,    0,    0,    6,    0,
        13,    0,    2,    2,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
 
-        0,    7,    0,    0,    0,  119,    0,    0,    0,  121,
-        0,  115,  114,    0,    0,  114,    0,    0,  118,    0,
+        0,    7,    0,    0,    0,  120,    0,    0,    0,  122,
+        0,  116,  115,    0,    0,  115,    0,    0,  119,    0,
         0,    0,   13,    0,    0,    0,   10,    0,    0,    0,
-      119,    0,    0,    0,  121,    0,  115,  114,    0,    0,
-      114,    0,    0,  118,    0,    0,    0,   13,    0,    0,
-       87,  119,  122,  123,  125,  124,    0,  112,  112,  112,
-      112,  112,  112,  112,  112,  112,  112,  112,  112,  112,
-      112,  112,  112,  112,  112,  112,  112,  112,   96,  114,
-      117,    0,  114,  116,  101,  100,   75,  108,    0,  113,
-      113,  113,  113,  113,  113,   13,  113,  113,  113,  113,
+      120,    0,    0,    0,  122,    0,  116,  115,    0,    0,
+      115,    0,    0,  119,    0,    0,    0,   13,    0,    0,
+       88,  120,  123,  124,  126,  125,    0,  113,  113,  113,
+      113,  113,  113,  113,  113,  113,  113,  113,  113,  113,
+      113,  113,  113,  113,  113,  113,  113,  113,   97,  115,
+      118,    0,  115,  117,  102,  101,   76,  109,    0,  114,
+      114,  114,  114,  114,  114,   13,  114,  114,  114,  114,
 
-      113,   59,  113,   62,  113,   60,  113,   70,  113,  113,
-      113,  113,    0,  112,  112,  112,  112,  112,    0,  130,
-      132,  136,    0,  136,  136,  136,  136,  135,   13,  135,
+      114,   60,  114,   63,  114,   61,  114,   71,  114,  114,
+      114,  114,    0,  113,  113,  113,  113,  113,    0,  131,
+      133,  137,    0,  137,  137,  137,  137,  136,   13,  136,
        16,   16,   16,   16,   16,   16,   16,   16,   16,   16,
        13,   16,   16,   16,    0,    0,   13,    0,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,  119,
-        0,    0,    0,  114,  117,    0,  114,  116,    0,   13,
-        0,    0,  119,    0,    0,    0,  114,  117,    0,  114,
-      116,    0,   13,    0,    0,    0,  114,   19,  112,  112,
-       22,  112,  112,  112,  112,  112,  112,  112,  112,  112,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,  120,
+        0,    0,    0,  115,  118,    0,  115,  117,    0,   13,
+        0,    0,  120,    0,    0,    0,  115,  118,    0,  115,
+      117,    0,   13,    0,    0,    0,  115,   19,  113,  113,
+       23,  113,  113,  113,  113,  113,  113,  113,  113,  113,
 
-      112,  112,  112,  112,  112,  112,   21,   18,  112,  102,
-        0,  120,    0,  111,  113,  113,  113,  113,  113,   67,
-       72,  113,  113,   56,  113,  113,  113,  113,  113,  113,
-      113,  113,  113,  113,    0,  112,  112,  112,  112,  132,
-        0,  136,  136,  136,  136,    0,  135,  135,   16,   16,
+      113,  113,  113,  113,  113,  113,   22,   18,  113,  103,
+        0,  121,    0,  112,  114,  114,  114,  114,  114,   68,
+       73,  114,  114,   57,  114,  114,  114,  114,  114,  114,
+      114,  114,  114,  114,    0,  113,  113,  113,  113,  133,
+        0,  137,  137,  137,  137,    0,  136,  136,   16,   16,
        16,   16,   16,   16,   16,   16,   16,   16,   16,    0,
         0,    0,    0,    2,    2,    2,    2,    2,    2,    2,
-        0,  114,    0,    0,    0,    0,  120,    0,    0,    0,
-        0,    0,  114,    0,    0,    0,    0,  120,    0,    0,
-        0,    0,  112,  112,  112,  112,  112,  112,  112,  112,
+        0,  115,    0,    0,    0,    0,  121,    0,    0,    0,
+        0,    0,  115,    0,    0,    0,    0,  121,    0,    0,
+        0,    0,  113,  113,  113,  113,  113,  113,  113,  113,
 
-      112,  112,  112,  112,  112,  112,  112,  112,  112,  112,
-      112,  112,  120,   41,  113,   38,   37,  113,   61,  113,
       113,  113,  113,  113,  113,  113,  113,  113,  113,  113,
-      113,    0,  112,  112,  112,   12,  128,  136,  136,  136,
-      135,  135,   16,   16,   16,   16,   16,   16,   15,   16,
+      113,  113,  121,   42,  114,   39,   38,  114,   62,  114,
+      114,  114,  114,  114,  114,  114,  114,  114,  114,  114,
+      114,    0,  113,  113,  113,   12,  129,  137,  137,  137,
+      136,  136,   16,   16,   16,   16,   16,   16,   15,   16,
         0,    0,    0,    0,    2,    2,    2,    2,    2,    0,
-        0,  120,    0,    0,    0,    0,    0,  120,    0,    0,
-        0,   45,   53,  112,  112,   49,  112,  112,  112,  112,
-       51,  104,  112,  112,  112,  112,   55,  112,  112,  112,
-      112,  112,  112,  112,   43,  113,  113,   68,   36,  113,
+        0,  121,    0,    0,    0,    0,    0,  121,    0,    0,
+        0,   46,   54,  113,  113,   50,  113,  113,  113,  113,
+       52,  105,  113,  113,  113,  113,   56,  113,  113,  113,
+      113,  113,  113,  113,   44,  114,  114,   69,   37,  114,
 
-      113,   65,   66,  113,   69,  113,  113,  113,   71,   58,
-        0,   11,   53,  136,  136,  136,  135,  135,   16,   16,
+      114,   66,   67,  114,   70,  114,  114,  114,   72,   59,
+        0,   11,   54,  137,  137,  137,  136,  136,   16,   16,
        16,   16,   16,    0,    0,    0,    0,    2,    2,    2,
         2,    2,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,  112,  112,  112,   52,  112,  112,  112,   50,
-      112,  112,  112,  112,  112,  112,  106,   42,   44,  113,
-      113,  113,   64,  113,  113,  113,  113,    0,  112,  136,
-      131,  106,  135,  135,   16,   16,   16,   16,   16,    0,
-      106,    0,    0,    2,    2,    2,    2,    2,    0,  106,
-        0,    0,    0,    0,  106,    0,    0,    0,  112,  112,
+        0,    0,  113,  113,  113,   53,  113,  113,  113,   51,
+      113,  113,  113,  113,  113,  113,  107,   43,   45,  114,
+      114,  114,   65,  114,  114,  114,  114,    0,  113,  137,
+      132,  107,  136,  136,   16,   16,   16,   16,   16,    0,
+      107,    0,    0,    2,    2,    2,    2,    2,    0,  107,
+        0,    0,    0,    0,  107,    0,    0,    0,  113,  113,
 
-      112,  112,  107,  112,  112,  112,  112,  112,  112,   24,
-       29,  113,  113,  113,  113,  113,    0,    5,    0,  112,
-      107,   16,   16,    5,   16,  107,    2,    2,    2,    2,
-      107,    0,    5,    0,  107,    0,    5,    0,   46,  112,
-      112,  112,   28,  112,  112,   26,  112,   25,  112,  113,
-       40,  113,  113,  113,    4,    1,  105,    4,    1,    4,
-        1,    4,    1,  112,  112,  112,   27,   47,   23,  112,
-      112,   39,   63,  113,   34,  112,  112,  112,  112,  112,
-      112,  113,  112,   20,   54,  112,  112,  112,  112,  113,
-       48,  112,  112,  112,  112,  113,  112,  112,  112,   33,
+       20,  113,  108,  113,  113,  113,  113,  113,  113,   25,
+       30,  114,  114,  114,  114,  114,    0,    5,    0,  113,
+      108,   16,   16,    5,   16,  108,    2,    2,    2,    2,
+      108,    0,    5,    0,  108,    0,    5,    0,   47,  113,
+      113,  113,   29,  113,  113,   27,  113,   26,  113,  114,
+       41,  114,  114,  114,    4,    1,  106,    4,    1,    4,
+        1,    4,    1,  113,  113,  113,   28,   48,   24,  113,
+      113,   40,   64,  114,   35,  113,  113,  113,  113,  113,
+      113,  114,  113,   21,   55,  113,  113,  113,  113,  114,
+       49,  113,  113,  113,  113,  114,  113,  113,  113,   34,
 
-       35,  112,  112,   31,  112,   32,   30,    0
+       36,  113,  113,   32,  113,   33,   31,    0
     } ;
 
 static yyconst int yy_ec[256] =
@@ -1971,207 +1971,207 @@ return(ARG);
 case 20:
 YY_RULE_SETUP
 #line 196 "imcc/imcc.l"
-return(FLATTEN_ARG);
+return(FLATTEN);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 197 "imcc/imcc.l"
-return(SUB);
+return(FLATTEN_ARG);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 198 "imcc/imcc.l"
-return(ESUB);
+return(SUB);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 199 "imcc/imcc.l"
-return(PCC_BEGIN);
+return(ESUB);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 200 "imcc/imcc.l"
-return(PCC_END);
+return(PCC_BEGIN);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 201 "imcc/imcc.l"
-return(PCC_CALL);
+return(PCC_END);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 202 "imcc/imcc.l"
-return(NCI_CALL);
+return(PCC_CALL);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 203 "imcc/imcc.l"
-return(METH_CALL);
+return(NCI_CALL);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 204 "imcc/imcc.l"
-return(INVOCANT);
+return(METH_CALL);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 205 "imcc/imcc.l"
-return(PCC_SUB);
+return(INVOCANT);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 206 "imcc/imcc.l"
-return(PCC_BEGIN_RETURN);
+return(PCC_SUB);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 207 "imcc/imcc.l"
-return(PCC_END_RETURN);
+return(PCC_BEGIN_RETURN);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 208 "imcc/imcc.l"
-return(PCC_BEGIN_YIELD);
+return(PCC_END_RETURN);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 209 "imcc/imcc.l"
-return(PCC_END_YIELD);
+return(PCC_BEGIN_YIELD);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 210 "imcc/imcc.l"
-return(PROTOTYPED);
+return(PCC_END_YIELD);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 211 "imcc/imcc.l"
-return(NON_PROTOTYPED);
+return(PROTOTYPED);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 212 "imcc/imcc.l"
-return(METHOD);
+return(NON_PROTOTYPED);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 213 "imcc/imcc.l"
-return(MAIN);
+return(METHOD);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 214 "imcc/imcc.l"
-return(LOAD);
+return(MAIN);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 215 "imcc/imcc.l"
-return(IMMEDIATE);
+return(LOAD);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 216 "imcc/imcc.l"
-return(POSTCOMP);
+return(IMMEDIATE);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 217 "imcc/imcc.l"
-return(ANON);
+return(POSTCOMP);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 219 "imcc/imcc.l"
-return(RESULT);
+#line 218 "imcc/imcc.l"
+return(ANON);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 220 "imcc/imcc.l"
-return(YIELDT);
+return(RESULT);
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 221 "imcc/imcc.l"
-return(RETURN);
+return(YIELDT);
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 222 "imcc/imcc.l"
-return(CLASS);
+return(RETURN);
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 223 "imcc/imcc.l"
-return(ENDCLASS);
+return(CLASS);
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 224 "imcc/imcc.l"
-return(NAMESPACE);
+return(ENDCLASS);
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 225 "imcc/imcc.l"
-return(ENDNAMESPACE);
+return(NAMESPACE);
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 226 "imcc/imcc.l"
-return(FIELD);
+return(ENDNAMESPACE);
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 227 "imcc/imcc.l"
-return(DOT_METHOD);
+return(FIELD);
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 228 "imcc/imcc.l"
-return(LOCAL);
+return(DOT_METHOD);
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 229 "imcc/imcc.l"
-return(GLOBAL);
+return(LOCAL);
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 230 "imcc/imcc.l"
-return(CONST);
+return(GLOBAL);
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 231 "imcc/imcc.l"
-return(GLOBAL_CONST);
+return(CONST);
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 232 "imcc/imcc.l"
-return(PARAM);
+return(GLOBAL_CONST);
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 233 "imcc/imcc.l"
-return(GOTO);
+return(PARAM);
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 234 "imcc/imcc.l"
-return(IF);
+return(GOTO);
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 235 "imcc/imcc.l"
-return(UNLESS);
+return(IF);
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 236 "imcc/imcc.l"
-return(INTV);
+return(UNLESS);
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 237 "imcc/imcc.l"
-return(FLOATV);
+return(INTV);
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
@@ -2181,223 +2181,228 @@ return(FLOATV);
 case 62:
 YY_RULE_SETUP
 #line 239 "imcc/imcc.l"
-return(NEW);
+return(FLOATV);
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
 #line 240 "imcc/imcc.l"
-return(NEWCLOSURE);
+return(NEW);
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
 #line 241 "imcc/imcc.l"
-return(NEWCONT);
+return(NEWCLOSURE);
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 242 "imcc/imcc.l"
-return(NEWCOR);
+return(NEWCONT);
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
 #line 243 "imcc/imcc.l"
-return(NEWSUB);
+return(NEWCOR);
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
 #line 244 "imcc/imcc.l"
-return(ADDR);
+return(NEWSUB);
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
 #line 245 "imcc/imcc.l"
-return(GLOBALOP);
+return(ADDR);
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
 #line 246 "imcc/imcc.l"
-return(OBJECTV);
+return(GLOBALOP);
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
 #line 247 "imcc/imcc.l"
-return(PMCV);
+return(OBJECTV);
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
 #line 248 "imcc/imcc.l"
-return(STRINGV);
+return(PMCV);
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
 #line 249 "imcc/imcc.l"
-return(CALL);
+return(STRINGV);
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
 #line 250 "imcc/imcc.l"
-return(SHIFT_LEFT);
+return(CALL);
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
 #line 251 "imcc/imcc.l"
-return(SHIFT_RIGHT);
+return(SHIFT_LEFT);
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
 #line 252 "imcc/imcc.l"
-return(SHIFT_RIGHT_U);
+return(SHIFT_RIGHT);
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
 #line 253 "imcc/imcc.l"
-return(LOG_AND);
+return(SHIFT_RIGHT_U);
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
 #line 254 "imcc/imcc.l"
-return(LOG_OR);
+return(LOG_AND);
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
 #line 255 "imcc/imcc.l"
-return(LOG_XOR);
+return(LOG_OR);
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
 #line 256 "imcc/imcc.l"
-return(RELOP_LT);
+return(LOG_XOR);
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
 #line 257 "imcc/imcc.l"
-return(RELOP_LTE);
+return(RELOP_LT);
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
 #line 258 "imcc/imcc.l"
-return(RELOP_GT);
+return(RELOP_LTE);
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
 #line 259 "imcc/imcc.l"
-return(RELOP_GTE);
+return(RELOP_GT);
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
 #line 260 "imcc/imcc.l"
-return(RELOP_EQ);
+return(RELOP_GTE);
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
 #line 261 "imcc/imcc.l"
-return(RELOP_NE);
+return(RELOP_EQ);
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
 #line 262 "imcc/imcc.l"
-return(POW);
+return(RELOP_NE);
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
 #line 263 "imcc/imcc.l"
-return(POINTY);
+return(POW);
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
 #line 264 "imcc/imcc.l"
-return(CONCAT);
+return(POINTY);
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
 #line 265 "imcc/imcc.l"
-return(DOT);
+return(CONCAT);
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
 #line 266 "imcc/imcc.l"
-return(DOTDOT);
+return(DOT);
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
 #line 267 "imcc/imcc.l"
-return(PLUS_ASSIGN);
+return(DOTDOT);
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
 #line 268 "imcc/imcc.l"
-return(MINUS_ASSIGN);
+return(PLUS_ASSIGN);
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
 #line 269 "imcc/imcc.l"
-return(MUL_ASSIGN);
+return(MINUS_ASSIGN);
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
 #line 270 "imcc/imcc.l"
-return(DIV_ASSIGN);
+return(MUL_ASSIGN);
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
 #line 271 "imcc/imcc.l"
-return(MOD_ASSIGN);
+return(DIV_ASSIGN);
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
 #line 272 "imcc/imcc.l"
-return(FDIV);
+return(MOD_ASSIGN);
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
 #line 273 "imcc/imcc.l"
-return(FDIV_ASSIGN);
+return(FDIV);
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
 #line 274 "imcc/imcc.l"
-return(BAND_ASSIGN);
+return(FDIV_ASSIGN);
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
 #line 275 "imcc/imcc.l"
-return(BOR_ASSIGN);
+return(BAND_ASSIGN);
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
 #line 276 "imcc/imcc.l"
-return(BXOR_ASSIGN);
+return(BOR_ASSIGN);
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
 #line 277 "imcc/imcc.l"
-return(SHR_ASSIGN);
+return(BXOR_ASSIGN);
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
 #line 278 "imcc/imcc.l"
-return(SHL_ASSIGN);
+return(SHR_ASSIGN);
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
 #line 279 "imcc/imcc.l"
-return(SHR_U_ASSIGN);
+return(SHL_ASSIGN);
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
 #line 280 "imcc/imcc.l"
-return(CONCAT_ASSIGN);
+return(SHR_U_ASSIGN);
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 282 "imcc/imcc.l"
+#line 281 "imcc/imcc.l"
+return(CONCAT_ASSIGN);
+	YY_BREAK
+case 105:
+YY_RULE_SETUP
+#line 283 "imcc/imcc.l"
 {
         return read_macro(valp, interp);
     }
 	YY_BREAK
-case 105:
+case 106:
 YY_RULE_SETUP
-#line 286 "imcc/imcc.l"
+#line 287 "imcc/imcc.l"
 {
         int c;
 	char *name;
@@ -2426,9 +2431,9 @@ YY_RULE_SETUP
 	return MACRO;
     }
 	YY_BREAK
-case 106:
+case 107:
 YY_RULE_SETUP
-#line 314 "imcc/imcc.l"
+#line 315 "imcc/imcc.l"
 {
         int tok = yylex(valp, interp);
         if(tok == STRINGC) {
@@ -2440,9 +2445,9 @@ YY_RULE_SETUP
         }
     }
 	YY_BREAK
-case 107:
+case 108:
 YY_RULE_SETUP
-#line 325 "imcc/imcc.l"
+#line 326 "imcc/imcc.l"
 {
         int c;
 
@@ -2453,9 +2458,9 @@ YY_RULE_SETUP
 	include_file(interp, str_dup(yytext + 1));
     }
 	YY_BREAK
-case 108:
+case 109:
 YY_RULE_SETUP
-#line 335 "imcc/imcc.l"
+#line 336 "imcc/imcc.l"
 {
         char *label;
 
@@ -2474,9 +2479,9 @@ YY_RULE_SETUP
         return LABEL;
     }
 	YY_BREAK
-case 109:
+case 110:
 YY_RULE_SETUP
-#line 353 "imcc/imcc.l"
+#line 354 "imcc/imcc.l"
 {
         char *label;
 
@@ -2496,22 +2501,22 @@ YY_RULE_SETUP
 	return IDENTIFIER;
     }
 	YY_BREAK
-case 110:
-YY_RULE_SETUP
-#line 372 "imcc/imcc.l"
-return(COMMA);
-	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 374 "imcc/imcc.l"
+#line 373 "imcc/imcc.l"
+return(COMMA);
+	YY_BREAK
+case 112:
+YY_RULE_SETUP
+#line 375 "imcc/imcc.l"
 {
 	YYCHOP();  /* trim last ':' */
 	DUP_AND_RET(valp,LABEL);
     }
 	YY_BREAK
-case 112:
+case 113:
 YY_RULE_SETUP
-#line 379 "imcc/imcc.l"
+#line 380 "imcc/imcc.l"
 {
         int type = pmc_type(interp, string_from_cstring(interp, yytext+1, 0));
 
@@ -2527,9 +2532,9 @@ YY_RULE_SETUP
         }
     }
 	YY_BREAK
-case 113:
+case 114:
 YY_RULE_SETUP
-#line 394 "imcc/imcc.l"
+#line 395 "imcc/imcc.l"
 {
 	if (!is_def) {
 		SymReg *r = find_sym(interp, yytext);
@@ -2572,15 +2577,10 @@ YY_RULE_SETUP
         return(!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 	YY_BREAK
-case 114:
-YY_RULE_SETUP
-#line 436 "imcc/imcc.l"
-DUP_AND_RET(valp, FLOATC);
-	YY_BREAK
 case 115:
 YY_RULE_SETUP
 #line 437 "imcc/imcc.l"
-DUP_AND_RET(valp, INTC);
+DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
@@ -2594,73 +2594,78 @@ DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 441 "imcc/imcc.l"
+#line 440 "imcc/imcc.l"
+DUP_AND_RET(valp, INTC);
+	YY_BREAK
+case 119:
+YY_RULE_SETUP
+#line 442 "imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
         valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
         return(STRINGC); /* no BIGINT native format yet */
     }
 	YY_BREAK
-case 119:
+case 120:
 YY_RULE_SETUP
-#line 447 "imcc/imcc.l"
+#line 448 "imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);
         return(STRINGC); /* XXX delete quotes, -> emit, pbc */
     }
 	YY_BREAK
-case 120:
+case 121:
 YY_RULE_SETUP
-#line 452 "imcc/imcc.l"
+#line 453 "imcc/imcc.l"
 {
 	valp->s = str_dup(yytext);    /* charset:"..." */
         /* this is actually not unicode but a string with a charset */
         return(USTRINGC);
     }
 	YY_BREAK
-case 121:
+case 122:
 YY_RULE_SETUP
-#line 457 "imcc/imcc.l"
+#line 458 "imcc/imcc.l"
 {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
         return(STRINGC);
     }
 	YY_BREAK
-case 122:
-YY_RULE_SETUP
-#line 462 "imcc/imcc.l"
-DUP_AND_RET(valp, IREG);
-	YY_BREAK
 case 123:
 YY_RULE_SETUP
 #line 463 "imcc/imcc.l"
-DUP_AND_RET(valp, NREG);
+DUP_AND_RET(valp, IREG);
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
 #line 464 "imcc/imcc.l"
-DUP_AND_RET(valp, SREG);
+DUP_AND_RET(valp, NREG);
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
 #line 465 "imcc/imcc.l"
-DUP_AND_RET(valp, PREG);
+DUP_AND_RET(valp, SREG);
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 467 "imcc/imcc.l"
-/* skip */;
+#line 466 "imcc/imcc.l"
+DUP_AND_RET(valp, PREG);
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 469 "imcc/imcc.l"
+#line 468 "imcc/imcc.l"
+/* skip */;
+	YY_BREAK
+case 128:
+YY_RULE_SETUP
+#line 470 "imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 474 "imcc/imcc.l"
+#line 475 "imcc/imcc.l"
 {
         BEGIN (INITIAL);
         if (frames->pasm_file) {
@@ -2671,30 +2676,30 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 483 "imcc/imcc.l"
+#line 484 "imcc/imcc.l"
 yyterminate();
-	YY_BREAK
-case 128:
-YY_RULE_SETUP
-#line 485 "imcc/imcc.l"
-DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 487 "imcc/imcc.l"
+#line 486 "imcc/imcc.l"
+DUP_AND_RET(valp, ENDM);
+	YY_BREAK
+case 130:
+YY_RULE_SETUP
+#line 488 "imcc/imcc.l"
 {
         line++;
         DUP_AND_RET(valp, '\n');
     }
 	YY_BREAK
-case 130:
-YY_RULE_SETUP
-#line 492 "imcc/imcc.l"
-return LABEL;
-	YY_BREAK
 case 131:
 YY_RULE_SETUP
 #line 493 "imcc/imcc.l"
+return LABEL;
+	YY_BREAK
+case 132:
+YY_RULE_SETUP
+#line 494 "imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -2714,9 +2719,9 @@ YY_RULE_SETUP
 	return LABEL;
     }
 	YY_BREAK
-case 132:
+case 133:
 YY_RULE_SETUP
-#line 512 "imcc/imcc.l"
+#line 513 "imcc/imcc.l"
 {
         char *label;
 	char *name = macros[num_macros].name;
@@ -2731,41 +2736,41 @@ YY_RULE_SETUP
 	return IDENTIFIER;
     }
 	YY_BREAK
-case 133:
-YY_RULE_SETUP
-#line 526 "imcc/imcc.l"
-/* skip leading ws */;
-	YY_BREAK
 case 134:
 YY_RULE_SETUP
 #line 527 "imcc/imcc.l"
-DUP_AND_RET(valp, ' ');
+/* skip leading ws */;
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
 #line 528 "imcc/imcc.l"
-DUP_AND_RET(valp, IDENTIFIER);
+DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
 #line 529 "imcc/imcc.l"
-DUP_AND_RET(valp, MACRO);
+DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
 #line 530 "imcc/imcc.l"
-DUP_AND_RET(valp, yytext[0]);
-	YY_BREAK
-case YY_STATE_EOF(macro):
-#line 531 "imcc/imcc.l"
-yyterminate();
+DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 533 "imcc/imcc.l"
+#line 531 "imcc/imcc.l"
+DUP_AND_RET(valp, yytext[0]);
+	YY_BREAK
+case YY_STATE_EOF(macro):
+#line 532 "imcc/imcc.l"
+yyterminate();
+	YY_BREAK
+case 139:
+YY_RULE_SETUP
+#line 534 "imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 2769 "imcc/imclexer.c"
+#line 2774 "imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -3658,7 +3663,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 533 "imcc/imcc.l"
+#line 534 "imcc/imcc.l"
 
 
 #ifdef yywrap
