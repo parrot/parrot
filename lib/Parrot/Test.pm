@@ -152,6 +152,11 @@ require Test::More;
               skip );
 @ISA = qw(Exporter);
 
+# tell parrot it's being tested.  this disables searching of installed libraries
+# (see Parrot_get_runtime_prefix in src/library.c).
+$ENV{PARROT_TEST} = 1
+    unless defined($ENV{PARROT_TEST});
+
 my $builder = Test::Builder->new();
 
 sub import {
