@@ -310,7 +310,7 @@ Returns the offset of the first attribute for class Sz in object Py.
 Returns attribute Iz of object Py and puts it in Px. Note that the
 attribute number is an absolute offset.
 
-=item getattribute Px, Py, Sz
+=item getattribute Px, Py, Sz (Unimplemented)
 
 Get the attribute with the fully qualified name Sz from object Py and
 put it in Px.
@@ -319,7 +319,7 @@ put it in Px.
 
 Set the attribute Iy of object Px to Pz
 
-=item setattribute Px, Sy, Pz
+=item setattribute Px, Sy, Pz (Unimplemented)
 
 Set the attribute of object Px with the fully qualified name Sy to Pz
 
@@ -369,7 +369,7 @@ Add class Py to the end of the list of immediate parents of class
 Px. Adds any attributes of Py (and its parent classes) that aren't
 already in Px.
 
-=item removeparent Px, Py
+=item removeparent Px, Py (Unimplemented)
 
 Remove class Py from the parent list of Px. All parent classes of Py
 which aren't parent classes of what remains of Px's parent list are
@@ -381,12 +381,12 @@ Add attribute Sy to class Px. This will add the attribute slot to all
 objects of class Px and children of class Px, with a default value of
 C<Null>.
 
-=item removeattribute Px, Sy
+=item removeattribute Px, Sy (Unimplemented)
 
 Remove the attribute Sy from class Px, all objects of class Px, and
 all objects of a child of class Px.
 
-=item instantiate Px, Py, Sz
+=item instantiate Px, Py, Sz (Unimplemented)
 
 Instantiate a brand new class, based on the metadata in Py, named Sz. 
 
