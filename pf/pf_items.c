@@ -588,7 +588,7 @@ PackFile_assign_transforms(struct PackFile *pf) {
     if(pf->header->byteorder != PARROT_BIGENDIAN) {
         pf->need_endianize = 1;
         if (pf->header->wordsize == sizeof(opcode_t))
-            pf->fetch_op = (opcode_t (*)unsigned char*)fetch_op_le;
+            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_le;
         else {
             pf->need_wordsize = 1;
             pf->fetch_op = fetch_op_mixed;
