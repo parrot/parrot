@@ -19,9 +19,9 @@
 pmclass perlscalar abstract noinit extends scalar {
 
     void morph (INTVAL type) {
+	if (SELF->vtable->base_type == type)
+	    return;
 	if (SELF->vtable->base_type == enum_class_PerlString) {
-	    if (type == enum_class_PerlString)
-		return;
 	    PObj_custom_mark_CLEAR(SELF);
 	    SELF->vtable = Parrot_base_vtables[type];
 	    return;
