@@ -440,6 +440,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
+    new_vtable->init_pmc = Parrot_instantiate_object_init;
     new_class->vtable = new_vtable;
 
     /* Put our new vtable in the global table */
@@ -458,30 +459,105 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     return new_type;
 }
 
+static PMC*
+get_init_meth(Parrot_Interp interpreter, PMC *class,
+        const char * init_name, STRING **meth_str)
+{
+    PMC *prop;
+    STRING *prop_str, *meth;
+#if 0
+    prop_str = const_string(interpreter, init_name);
+    prop = VTABLE_getprop(interpreter, class, prop_str);
+    if (!VTABLE_defined(interpreter, prop))
+        return NULL;
+    meth = VTABLE_get_string(interpreter, prop);
+#else
+    HashBucket *b;
+    PMC *props;
+    if ( !(props = PMC_metadata(class)))
+        return NULL;
+    prop_str = const_string(interpreter, init_name);
+    b = hash_get_bucket(interpreter,
+                (Hash*) PMC_struct_val(props), prop_str);
+    if (!b)
+        return NULL;
+    meth = PMC_str_val((PMC*) b->value);
+#endif
+    *meth_str = meth;
+    return Parrot_find_method_with_cache(interpreter, class, meth);
+}
 
 static void
-do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object)
+do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
 {
-
     SLOTTYPE *class_data = PMC_data(class);
     PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
     PMC *parent_class;
     INTVAL i, nparents;
+    int free_it;
+    /*
+     * XXX compat mode
+     */
 
-    nparents = VTABLE_elements(interpreter, classsearch_array);
-    for (i = nparents - 1; i >= 0; --i) {
-        parent_class = VTABLE_get_pmc_keyed_int(interpreter,
-                classsearch_array, i);
-        Parrot_base_vtables[enum_class_delegate]->init_pmc(interpreter,
-                object, parent_class);
+    if (!Parrot_getenv("CALL__BUILD", &free_it)) {
+        nparents = VTABLE_elements(interpreter, classsearch_array);
+        for (i = nparents - 1; i >= 0; --i) {
+            parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                    classsearch_array, i);
+            Parrot_base_vtables[enum_class_delegate]->init_pmc(interpreter,
+                    object, parent_class);
+        }
+        Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
     }
-    Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
+    else {
+        /*
+         * 1) if class has a CONSTRUCT property run it on the object
+         *    no redispatch
+         */
+        STRING *meth_str;
+        PMC *meth = get_init_meth(interpreter, class, "CONSTRUCT", &meth_str);
+        if (meth) {
+            if (init)
+                Parrot_run_meth_fromc_args_save(interpreter, meth,
+                        object, meth_str, "vP", init);
+            else
+                Parrot_run_meth_fromc_save(interpreter, meth,
+                        object, meth_str);
+        }
+        /*
+         * 2. if class has a BUILD property call it for all classes
+         *    in reverse search order - this class last.
+         */
+        nparents = VTABLE_elements(interpreter, classsearch_array);
+        for (i = nparents - 1; i >= 0; --i) {
+            parent_class = VTABLE_get_pmc_keyed_int(interpreter,
+                    classsearch_array, i);
+            meth = get_init_meth(interpreter, parent_class, "BUILD", &meth_str);
+            if (meth) {
+                if (init)
+                    Parrot_run_meth_fromc_args_save(interpreter, meth,
+                            object, meth_str, "vP", init);
+                else
+                    Parrot_run_meth_fromc_save(interpreter, meth,
+                            object, meth_str);
+            }
+        }
+        meth = get_init_meth(interpreter, class, "BUILD", &meth_str);
+        if (meth) {
+            if (init)
+                Parrot_run_meth_fromc_args_save(interpreter, meth,
+                        object, meth_str, "vP", init);
+            else
+                Parrot_run_meth_fromc_save(interpreter, meth,
+                        object, meth_str);
+        }
+    }
 }
 
 /*
 
 =item C<void
-Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)>
+Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)>
 
 Creates a Parrot object. Takes a passed-in class PMC that has sufficient
 information to describe the layout of the object and, well, makes the
@@ -491,8 +567,23 @@ darned object.
 
 */
 
+static void instantiate_object(Parrot_Interp, PMC *object, PMC *init);
+
+void
+Parrot_instantiate_object_init(Parrot_Interp interpreter,
+        PMC *object, PMC *init)
+{
+    instantiate_object(interpreter, object, init);
+}
+
 void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
+{
+    instantiate_object(interpreter, object, NULL);
+}
+
+static void
+instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
 {
     SLOTTYPE *new_object_array;
     INTVAL attrib_count;
@@ -536,7 +627,7 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
     /* We really ought to call the class init routines here...
      * this assumes that an object isa delegate
      */
-    do_initcall(interpreter, class, object);
+    do_initcall(interpreter, class, object, init);
 }
 
 /*

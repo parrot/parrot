@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -604,3 +604,85 @@ done
 OUTPUT
 };
 
+$ENV{"CALL__BUILD"} = "1";
+
+output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
+    new P10, .PerlString
+    set P10, "_new"
+    newclass P1, "Foo"
+    setprop P1, "BUILD", P10
+    subclass P2, P1, "Bar"
+    setprop P2, "BUILD", P10
+    subclass P3, P2, "Baz"
+    setprop P3, "BUILD", P10
+    find_type I1, "Baz"
+    new P3, I1
+    find_type I1, "Bar"
+    new P3, I1
+    find_global P0, "_sub"
+    invokecc
+    print "done\n"
+    end
+
+    .namespace ["Foo"]
+.pcc_sub _new:
+    print "foo_init\n"
+    classname S0, P2
+    print S0
+    print "\n"
+    invoke P1
+
+    .namespace ["Bar"]
+.pcc_sub _new:
+    print "bar_init\n"
+    invoke P1
+
+    .namespace ["Baz"]
+.pcc_sub _new:
+    print "baz_init\n"
+    invoke P1
+
+    .namespace [""]	# main again
+.pcc_sub _sub:
+    print "in sub\n"
+    invoke P1
+
+CODE
+foo_init
+Baz
+bar_init
+baz_init
+foo_init
+Bar
+bar_init
+in sub
+done
+OUTPUT
+
+delete $ENV{"CALL__BUILD"};
+
+output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
+##PIR##
+.namespace ["A"]
+.sub foo method
+    .param int i
+
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.namespace ["B"]
+.sub foo method
+    .param int i
+
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.namespace [""]
+.sub _main @MAIN
+    print "ok\n"
+.end
+CODE
+ok
+OUTPUT
