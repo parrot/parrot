@@ -16,6 +16,7 @@ output_is(<<'CODE', <<'OUT', "namespace 1");
     .endnamespace A
     print x
     print "\n"
+    end
 .end
 CODE
 3
@@ -41,6 +42,7 @@ output_is(<<'CODE', <<'OUT', "namespace 2");
     print "\n"
     print y
     print "\n"
+    end
 .end
 CODE
 3
@@ -92,6 +94,7 @@ output_is(<<'CODE', <<'OUT', "namespace 3");
     print "\n"
     print z
     print "\n"
+    end
 .end
 CODE
 3
