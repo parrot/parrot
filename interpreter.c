@@ -452,6 +452,11 @@ make_interpreter(INTVAL flags) {
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
+    /* Need an empty stash */
+    interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));
+    interpreter->perl_stash->stash_hash = 
+    	        pmc_new(interpreter, enum_class_PerlHash);
+    
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
 
@@ -530,9 +535,6 @@ make_interpreter(INTVAL flags) {
 
     interpreter->prederef_code = (void **)NULL;
 
-    /* Need an empty stash */
-    interpreter->perl_stash = pmc_new(interpreter, enum_class_PerlHash);
-    
     return interpreter;   
 }
 
