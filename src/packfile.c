@@ -103,7 +103,7 @@ PackFile_fetch_op(struct PackFile *pf, opcode_t **stream) {
     PIO_eprintf(NULL, "PackFile_fetch_op: Reordering.\n");
 #endif
     o = (pf->fetch_op)(**stream);
-    ((unsigned char *) (*stream)) += pf->header->wordsize;
+    *((unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
 
@@ -127,7 +127,7 @@ PackFile_fetch_iv(struct PackFile *pf, opcode_t **stream) {
     /* XXX assume sizeof(opcode_t) == sizeof(INTVAL) on the
      * machine producing this PBC
      */
-    ((unsigned char *) (*stream)) += pf->header->wordsize;
+    *((unsigned char **) (stream)) += pf->header->wordsize;
     return i;
 }
 
@@ -250,11 +250,11 @@ PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream) {
     /* Here is where the size transforms get messy */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == 1) {
         (pf->fetch_nv)((unsigned char *)&f, (unsigned char *) *stream);
-        ((unsigned char *) (*stream)) += 12;
+        *((unsigned char **) (stream)) += 12;
     }
     else {
         (pf->fetch_nv)((unsigned char *)&d, (unsigned char *) *stream);
-        ((unsigned char *) (*stream)) += 8;
+        *((unsigned char **) (stream)) += 8;
         f = d;
     }
     return f;
@@ -544,7 +544,7 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         }
 
         /* Segment size is in bytes */
-        (char *)cursor += header->const_ss;
+        ((unsigned char *)cursor) += header->const_ss;
 
         /*
          * Unpack the Byte Code Segment:
