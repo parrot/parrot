@@ -348,7 +348,7 @@ a sleep opcode.
  * each ALLOCATIONS_INIT allocations of any object an incremental
  * step is triggered
  */
-#define ALLOCATIONS_INIT      1024*2
+#define ALLOCATIONS_INIT      1024*4
 
 /*
  * a mark step does allocations * throttle work

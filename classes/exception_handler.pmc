@@ -23,7 +23,7 @@ exception object's C<_P5> attribute.
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
-pmclass Exception_Handler extends Continuation {
+pmclass Exception_Handler extends Continuation need_ext {
 
 /*
 

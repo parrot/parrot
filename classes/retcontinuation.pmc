@@ -25,7 +25,7 @@ because that's just some previous state of the interpreter.
 #include "parrot/method_util.h"
 
 
-pmclass RetContinuation extends Continuation {
+pmclass RetContinuation extends Continuation need_ext {
 
 /*
 

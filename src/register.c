@@ -111,27 +111,32 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
     }
 }
 
+/*
+
+=item C<void
+mark_reg_stack(Inter*, Stack_Chunk_t* chunk)>
+
+Marks one chunk of the register frame stack. Previous chunks are marked
+by marking the continuation of this frame.
+
+ */
 void
 mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
     UINTVAL j;
     PObj *obj;
 
-    for ( ; ; chunk = chunk->prev) {
-        struct parrot_regs_t *regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
+    struct parrot_regs_t *regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
 
-        pobject_lives(interpreter, (PObj*)chunk);
+    pobject_lives(interpreter, (PObj*)chunk);
 
-        for (j = 0; j < NUM_REGISTERS; j++) {
-            obj = (PObj*) BP_REG_PMC(regs, j);
-            if (obj)
-                pobject_lives(interpreter, obj);
-            obj = (PObj*) BP_REG_STR(regs, j);
-            if (obj)
-                pobject_lives(interpreter, obj);
-        }
-        if (chunk == chunk->prev)
-            break;
+    for (j = 0; j < NUM_REGISTERS; j++) {
+        obj = (PObj*) BP_REG_PMC(regs, j);
+        if (obj)
+            pobject_lives(interpreter, obj);
+        obj = (PObj*) BP_REG_STR(regs, j);
+        if (obj)
+            pobject_lives(interpreter, obj);
     }
 }
 
