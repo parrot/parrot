@@ -73,12 +73,17 @@ write_types(FILE *stabs)
                 "bufused:(0,12),%d,%d;"
                 "strstart:(0,15),%d,%d;"        /* fake a char* */
                 ";\""
-                ",128,0,0,0\n", i++, sizeof(STRING),
-                offsetof(STRING, bufstart) * 8, sizeof(void *) * 8,
-                offsetof(STRING, buflen) * 8, sizeof(size_t) * 8,
-                offsetof(STRING, obj.flags) * 8, sizeof(UINTVAL) * 8,
-                offsetof(STRING, bufused) * 8, sizeof(UINTVAL) * 8,
-                offsetof(STRING, strstart) * 8, sizeof(void *) * 8
+                ",128,0,0,0\n", i++, (int) sizeof(STRING),
+                (int)(offsetof(STRING, bufstart) * 8),
+                (int)(sizeof(void *)* 8),
+                (int)(offsetof(STRING, buflen) * 8), 
+                (int)(sizeof(size_t) * 8),
+                (int)(offsetof(STRING, obj.flags) * 8), 
+                (int)(sizeof(UINTVAL) * 8),
+                (int)(offsetof(STRING, bufused) * 8), 
+                (int)(sizeof(UINTVAL) * 8),
+                (int)(offsetof(STRING, strstart) * 8), 
+                (int)(sizeof(void *) * 8)
                 );
 
 }
@@ -173,8 +178,8 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
                 line = (int)interpreter->code->cur_cs->debug->base.data[lc++];
             }
             fprintf(stabs, ".stabn 68,0,%d,%d\n", line,
-                    (char *)jit_info->arena.op_map[i].ptr -
-                    (char *)jit_info->arena.start);
+                    (int)((char *)jit_info->arena.op_map[i].ptr -
+                          (char *)jit_info->arena.start));
             line++;
         }
     }
