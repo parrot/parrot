@@ -343,6 +343,7 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
+    STRING *name;
 
     ft = cs->fixups;
     if (!ft)
@@ -357,7 +358,9 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
                 ci = ft->fixups[i]->offset;
                 sub_pmc = ct->constants[ci]->u.key;
                 pobject_lives(interpreter, (PObj *)sub_pmc);
-                pobject_lives(interpreter, (PObj *)PMC_sub(sub_pmc)->name);
+                name = PMC_sub(sub_pmc)->name;
+                if (name)
+                    pobject_lives(interpreter, (PObj *)name);
                 break;
         }
     }
