@@ -1,0 +1,492 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/fixedstringarray.pmc - fixed size array for strings only
+
+=head1 DESCRIPTION
+
+This class, FixedStringArray, implements an array of fixed size, which stored STRING*
+TODO: it uses PerlString's internally to perform conversion, but it should use String PMCs
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass FixedStringArray need_ext does array {
+    
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void init()>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    void init () {
+        PMC_int_val(SELF) = 0;
+        PMC_data(SELF) = NULL;
+    }
+
+/*
+
+=item C<void morph(INTVAL type)>
+
+Const classes must have a C<morph()>.
+
+=cut
+
+*/
+
+    void morph(INTVAL type) {
+        SUPER(type);
+    }
+
+
+/*
+
+=item C<void destroy()>
+
+Destroys the array.
+
+=cut
+
+*/
+
+    void destroy () {
+        if (PMC_data(SELF))
+            mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
+        PMC_int_val(SELF) = 0;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a copy of the array.
+
+=cut
+
+*/
+
+    PMC* clone () {
+        INTVAL size;
+        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+    
+        if (!PMC_data(SELF))
+            return dest;
+        size = PMC_int_val(SELF);
+        PMC_int_val(dest) = size;
+        
+        PMC_data(dest) = mem_sys_allocate(size * sizeof(STRING*));
+        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(STRING*));
+        PObj_custom_mark_destroy_SETALL(dest);
+        return dest;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the array as live.
+
+=cut
+
+*/
+
+    void mark () {
+        int i, end;
+        STRING **data;
+        if (!PMC_data(SELF))
+            return;
+        data = (STRING **) PMC_data(SELF);
+        end = PMC_int_val(SELF);
+        for(i = 0; i < end; i++) {
+            if(data[i]) {
+                pobject_lives(INTERP, (PObj *) data[i]);
+            }
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the array has any elements (meaning been initialized, for a
+fixed sized array).
+
+=cut
+
+*/
+    INTVAL get_bool () {
+        INTVAL size = DYNSELF.elements();
+        return (INTVAL)(size != 0);
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+=cut
+
+*/
+
+    INTVAL elements () {
+        return PMC_int_val(SELF);
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        return DYNSELF.elements();
+    }
+
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Returns the integer value of the element at index C<key>.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        PMC *tempPMC = SELF.get_pmc_keyed_int(key);
+        return VTABLE_get_integer(INTERP, tempPMC);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value of the element at index C<*key>.
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed (PMC* key) {
+        /* simple int keys only */
+        INTVAL k = key_integer(INTERP, key);
+        return SELF.get_integer_keyed_int(k);
+    }
+
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Returns the floating-point value of the element at index C<key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        PMC *tempPMC = SELF.get_pmc_keyed_int(key);
+        return VTABLE_get_number(INTERP, tempPMC);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed (PMC* key)>
+
+Returns the floating-point value of the element at index C<*key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        INTVAL k = key_integer(INTERP, key);
+        return SELF.get_number_keyed_int(k);
+    }
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+Returns the Parrot string value of the element at index C<key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed_int (INTVAL key) {
+        STRING **data;
+        if (key < 0 || key >= PMC_int_val(SELF))
+            internal_exception(OUT_OF_BOUNDS, 
+                "FixedStringArray: index out of bounds!\n");
+        
+        data = (STRING **)PMC_data(SELF);
+        return data[key];
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the Parrot string value of the element at index C<*key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed(PMC* key) {
+        INTVAL k = key_integer(INTERP, key);
+        return SELF.get_string_keyed_int(k);
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_PerlString);
+        val = SELF.get_string_keyed_int(key);
+        VTABLE_set_string_native(INTERP, ret, val);
+        return ret;
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the PMC value of the element at index C<*key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed(PMC* key) {
+        INTVAL k = key_integer(INTERP, key);
+        return SELF.get_pmc_keyed_int(k);
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    void set_integer_native (INTVAL size) {
+        if (PMC_int_val(SELF) || size < 1)
+            internal_exception(OUT_OF_BOUNDS, "FixedStringArray: Can't resize!\n");
+        PMC_int_val(SELF) = size;
+        PMC_data(SELF) = mem_sys_allocate_zeroed(size * sizeof(STRING*));
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Sets the integer value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_PerlString);
+        VTABLE_set_integer_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        SELF.set_string_keyed_int(key, val);
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVAL value)>
+
+Sets the integer value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_integer_keyed (PMC *key, INTVAL value) {
+        INTVAL k;
+        k = key_integer(INTERP, key);
+        SELF.set_integer_keyed_int(k, value);
+    }
+
+/*
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+Sets the floating-point value of the element at index C<key> to
+C<value>.
+
+=cut
+
+*/
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        PMC *ret;
+        STRING *val;
+
+        ret = pmc_new(INTERP, enum_class_PerlString);
+        VTABLE_set_number_native(INTERP, ret, value);
+        val = VTABLE_get_string(INTERP, ret);
+        SELF.set_string_keyed_int(key, val);
+    }
+
+/*
+
+=item C<void set_number_keyed(PMC *key, FLOATVAL value)>
+
+Sets the floating-point value of the element at index C<key> to
+C<value>.
+
+=cut
+
+*/
+
+    void set_number_keyed(PMC *key, FLOATVAL value) {
+        INTVAL k;
+        k = key_integer(INTERP, key);
+        SELF.set_number_keyed_int(k, value);
+    }
+    
+/*
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+Sets the Parrot string value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        STRING **data;
+        if (key < 0 || key >= PMC_int_val(SELF))
+            internal_exception(OUT_OF_BOUNDS, 
+                "FixedStringArray: index out of bounds!\n");
+
+        data = (STRING**)PMC_data(SELF);
+        data[key] = value;
+    }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING* value)>
+
+Sets the string value of the element at index C<key> to
+C<value>.
+
+=cut
+
+*/
+
+    void set_string_keyed(PMC *key, STRING* value) {
+        INTVAL k;
+        k = key_integer(INTERP, key);
+        SELF.set_string_keyed_int(k, value);
+    }
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *src)>
+
+Sets the PMC value of the element at index C<key> to C<*src>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed_int (INTVAL key, PMC* src) {
+        STRING *temp;
+
+        temp = VTABLE_get_string(INTERP, src);
+        SELF.set_string_keyed_int(key, temp);
+    }
+
+/*
+
+=item C<void set_pmc_keyed(PMC *key, PMC* value)>
+
+Sets the string value of the element at index C<key> to
+C<value>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed(PMC *key, PMC* value) {
+        INTVAL k;
+        k = key_integer(INTERP, key);
+        SELF.set_pmc_keyed_int(k, value);
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial version 2004.06.11 by Matt Fowles
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -291,8 +291,6 @@ Associates C<value> with C<*key>.
 
 /*
 
-/*
-
 =item C<INTVAL exists_keyed(PMC *key)>
 
 =cut
