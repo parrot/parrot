@@ -24,7 +24,7 @@ unicode_transcode_to(const char *to) {
 
 static BOOLVAL
 unicode_is_digit(UINTVAL c) {
-    return (BOOLVAL)(isdigit(c) ? 1 : 0); /* FIXME - Other code points are also digits */
+    return (BOOLVAL)(isdigit((int) c) ? 1 : 0); /* FIXME - Other code points are also digits */
 }
 
 static INTVAL
