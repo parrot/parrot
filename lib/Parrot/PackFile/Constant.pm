@@ -113,7 +113,9 @@ sub unpack
   my $type = shift_op($string);
   my $size = shift_op($string);
 
-  my $under      = ($size % 4) ? 4 - ($size % 4) : 0;
+  my $align = sizeof("op");
+
+  my $under      = ($size % $align) ? $align - ($size % $align) : 0;
   my $block_size = $size + $under;
   my $data       = substr($string, 0, $block_size);
 
@@ -135,8 +137,10 @@ sub pack
 {
   my $self = shift;
   
+  my $align = sizeof("op");
+
   my $size  = $self->size;
-  my $under = ($size % 4) ? 4 - ($size % 4) : 0;
+  my $under = ($size % $align) ? $align - ($size % $align) : 0;
   my $block = $self->data . ("\0" x $under);
 
   return pack_op($self->flags).

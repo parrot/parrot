@@ -348,7 +348,7 @@ my $output;
 # build file in memory
 
 # MAGIC COOKIE
-$output=pack_arg('i',0x13155a1);
+$output=pack_op(0x13155a1);
 
 
 # FIXUP (also, dump listing symbols)
@@ -375,7 +375,7 @@ if(keys(%fixup)) {
     exit;  # some day, unresolved symbols won't be an error!
 } else {
     # dump empty header
-    $output.=pack_arg('i',0);
+    $output.=pack_op(0);
 }
 
 # CONSTANTS
