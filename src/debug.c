@@ -2141,21 +2141,25 @@ Print the integer register stack.
 
 */
 
+#define valid_chunk(interp, com, chunk, d, i) do { \
+    d = atol(com); \
+    PIO_eprintf(interp, "%s_ stack depth %li\n", chunk->name, d); \
+    i = stack_height(interp, chunk); \
+    if (d > i) { \
+        PIO_eprintf(interp, "There are only %li frames\n", i); \
+        return; \
+    } \
+    while (d--) \
+        chunk = chunk->prev; \
+} while (0)
+
 void
 PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.int_reg_stack;
 
-    internal_exception(1, "TODO");
-    if (!chunk) {
-        i = depth / FRAMES_PER_INT_REG_CHUNK;
-        PIO_eprintf(interpreter, "There are only %li frames\n",i);
-        return;
-    }
-
-    PIO_eprintf(interpreter, "Integer stack, frame %li, depth %li\n",
-                i, depth);
+    valid_chunk(interpreter, command, chunk, depth, i);
 
     na(command);
     PDB_print_int_frame(interpreter,
@@ -2180,14 +2184,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.num_reg_stack;
 
-    internal_exception(1, "TODO");
-    if (!chunk) {
-        i = depth / FRAMES_PER_NUM_REG_CHUNK;
-        PIO_eprintf(interpreter, "There are only %li frames\n",i);
-        return;
-    }
-
-    PIO_eprintf(interpreter, "Float stack, frame %li, depth %li\n", i, depth);
+    valid_chunk(interpreter, command, chunk, depth, i);
 
     na(command);
     PDB_print_num_frame(interpreter,
@@ -2212,15 +2209,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.string_reg_stack;
 
-    internal_exception(1, "TODO");
-    if (!chunk) {
-        i = depth / FRAMES_PER_STR_REG_CHUNK;
-        PIO_eprintf(interpreter, "There are only %li frames\n",i);
-        return;
-    }
-
-    PIO_eprintf(interpreter, "String stack, frame %li, depth %li\n",
-                i, depth);
+    valid_chunk(interpreter, command, chunk, depth, i);
 
     na(command);
     PDB_print_string_frame(interpreter,
@@ -2245,20 +2234,15 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.pmc_reg_stack;
 
-    internal_exception(1, "TODO");
-    if (!chunk) {
-        i = depth / FRAMES_PER_PMC_REG_CHUNK;
-        PIO_eprintf(interpreter, "There are only %li frames\n",i);
-        return;
-    }
-
-    PIO_eprintf(interpreter, "PMC stack, frame %li, depth %li\n", i, depth);
+    valid_chunk(interpreter, command, chunk, depth, i);
 
     na(command);
     PDB_print_pmc_frame(interpreter,
                 (struct PRegFrame*)STACK_DATAP(chunk),
                 atoi(command), NULL);
 }
+
+#undef valid_chunk
 
 /*
 

@@ -277,17 +277,6 @@ void PDB_info(struct Parrot_Interp *interpreter);
 
 void PDB_help(struct Parrot_Interp *interpreter, const char *command);
 
-#define valid_chunk(chunk,c,d,s,i) { \
-    if (*c) { \
-        d = atol(c); \
-        if (d > s) { \
-            i = d / s; \
-            d = d % s; \
-            while (i-- && chunk) \
-                chunk = chunk->next; \
-        } \
-    } \
-}
 
 #define c_b             25245
 #define c_c             25500
