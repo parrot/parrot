@@ -26,23 +26,43 @@ static int run_pbc, write_pbc;
 static char optimizer_opt[20];
 extern FILE *yyin;
 
-static void usage(FILE *fp)
+static void usage(FILE* fp)
 {
-    fprintf(fp, "imcc\t[-h|--help] [-V|--version] [-v|--verbose] "
-	    "[-<parrot-switch>] \n"
-	    "\t[-d|--debug [hexlevel]] [-y|--yydebug] [-a|--pasm]\n"
-	    "\t[-c|--pbc] [-r|--run-pbc] [-O[012]]\n"
-	    "\t[-o outfile] infile [arguments ...]\n");
-    fprintf(fp, "\n\tlong options N/Y\n");
-    fprintf(fp, "\n\ts. docs/running.pod for more.\n");
+    fprintf(fp,
+    "imcc -[abcgGhjpPrStvVwy.] [-d FLAGS] [-o FILE] [-O level] <file>\n");
 }
-
 
 static void help(void)
 {
-    usage(stdout);
-    exit(0);
+    printf(
+    "imcc [Options] <file>\n"
+    "  Options:\n"
+    "    -h --help\n"
+    "    -V --version\n"
+    "   <VM options>\n"
+    "    -b --bounds\n"
+    "    -j --jit\n"
+    "    -p --profile\n"
+    "    -P --prederefrenced-core\n"
+    "    -S --switched-core\n"
+    "    -g --no-computed-goto\n"
+    "    -t --tracing\n"
+    "    -d --debug=HEXFLAGS\n"
+    "    -w --warnings\n"
+    "    -G --no-gc\n"
+    "       --gc-debug\n"
+    "    -.           Read a keystroke before starting\n"
+    "   <Compiler options>\n"
+    "    -v --verbose\n"
+    "    -o --output=FILE\n"
+    "    -O --optimize=LEVEL\n"
+    "    -a --pasm\n"
+    "    -c --pbc\n"
+    "    -r --run-pbc\n"
+    "    -y --yydebug\n"
+    "see docs/running.pod for more\n");
 }
+
 
 static void imcc_version(void)
 {
@@ -55,28 +75,28 @@ static void imcc_version(void)
 
 #define OPT_GC_DEBUG 128
 static struct longopt_opt_decl options[] = {
-    { 'b', 'b', 0, { "--bounds", NULL } },
-    { 'j', 'j', 0, { "--jit", NULL } },
-    { 'p', 'p', 0, { "--profile", NULL } },
-    { 'P', 'P', 0, { NULL } },
-    { 'S', 'S', 0, { NULL } },
-    { 'g', 'g', 0, { NULL } },
-    { 't', 't', 0, { NULL } },
-    { 'd', 'd', OPTION_required_FLAG, { "--debug", NULL } },
-    { 'w', 'w', 0, { NULL } },
-    { 'G', 'G', 0, { NULL } },
-    { '.', '.', 0, { NULL } },
-    { 'a', 'a', 0, { "--pasm", NULL } },
-    { 'h', 'h', 0, { "--help", NULL } },
-    { 'V', 'V', 0, { "--version", NULL } },
-    { 'r', 'r', 0, { "--run-pbc", NULL } },
-    { 'c', 'c', 0, { "--pbc", NULL } },
-    { 'v', 'v', 0, { "--verbose", NULL } },
-    { 'y', 'y', 0, { "--yydebug", NULL } },
-    { 'o', 'o', OPTION_required_FLAG, { NULL } },
-    { 'O', 'O', OPTION_required_FLAG, { NULL } },
-    { OPT_GC_DEBUG, OPT_GC_DEBUG, 0, { "--gc-debug", NULL } },
-    { 0, 0, 0, { NULL } }
+    { 'b', 'b', 0, { "--bounds" } },
+    { 'j', 'j', 0, { "--jit" } },
+    { 'p', 'p', 0, { "--profile" } },
+    { 'P', 'P', 0, { "--prederefrenced-core" } },
+    { 'S', 'S', 0, { "--switched-core" } },
+    { 'g', 'g', 0, { "--no-computed-goto" } },
+    { 't', 't', 0, { "--tracing" } },
+    { 'd', 'd', OPTION_required_FLAG, { "--debug" } },
+    { 'w', 'w', 0, { "--warnings" } },
+    { 'G', 'G', 0, { "--no-gc" } },
+    { '.', '.', 0, { } },
+    { 'a', 'a', 0, { "--pasm" } },
+    { 'h', 'h', 0, { "--help" } },
+    { 'V', 'V', 0, { "--version" } },
+    { 'r', 'r', 0, { "--run-pbc" } },
+    { 'c', 'c', 0, { "--pbc" } },
+    { 'v', 'v', 0, { "--verbose" } },
+    { 'y', 'y', 0, { "--yydebug" } },
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    { 'O', 'O', OPTION_required_FLAG, { "--optimize" } },
+    { OPT_GC_DEBUG, '\0', 0, { "--gc-debug" } },
+    { 0, 0, 0, { } }
 };
 
 /* most stolen from test_main.c */

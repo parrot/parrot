@@ -21,19 +21,19 @@
 char *parseflags(Parrot_Interp interpreter, int *argc, char **argv[]);
 
 static struct longopt_opt_decl options[] = {
-    { 'b', 'b', 0,       { "--bounds-checks", NULL } },
-    { 'd', 'd', 0,       { "--debugging", NULL } },
-    { 'h', 'h', 0,       { "--help", NULL } },
-    { 'j', 'j', 0,       { "--jit", NULL } },
-    { 'p', 'p', 0,       { "--profiling", NULL } },
-    { 'P', 'P', 0,       { "--predereferencing", NULL } },
-    { 'S', 'S', 0,       { "--switched_core", NULL } },
-    { 'g', 'g', 0,       { "--no-computed-goto", NULL } },
-    { 't', 't', 0,       { "--tracing", NULL } },
-    { 'v', 'v', 0,       { "--version", NULL } },
-    { '.', '.', 0,       { "--wait", NULL } },
-    {'\0', 128, 0,       { "--gc-debug", NULL } },
-    {'\0',   0, 0,       { NULL } }
+    { 'b', 'b', 0,       { "--bounds-checks" } },
+    { 'd', 'd', 0,       { "--debugging" } },
+    { 'h', 'h', 0,       { "--help" } },
+    { 'j', 'j', 0,       { "--jit" } },
+    { 'p', 'p', 0,       { "--profiling" } },
+    { 'P', 'P', 0,       { "--predereferencing" } },
+    { 'S', 'S', 0,       { "--switched-core" } },
+    { 'g', 'g', 0,       { "--no-computed-goto" } },
+    { 't', 't', 0,       { "--tracing" } },
+    { 'v', 'v', 0,       { "--version" } },
+    { '.', '.', 0,       { "--wait" } },
+    {'\0', 128, 0,       { "--gc-debug" } },
+    {'\0',   0, 0,       { } }
 };
 
 static void usage(void);
