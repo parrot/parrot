@@ -320,8 +320,6 @@ use Class::Struct P6C::scope_class => { qw(scope $ class $) };
 use Class::Struct P6C::decl => { qw(qual $ vars $ props @) };
 use Class::Struct P6C::property => { qw(name $ args $) };
 
-=item
-
 =item B<but>
 
 A node representing a "but" clause, e.g. C<$foo = 23 but false but Inf>.
@@ -744,3 +742,7 @@ sub P6C::compare::size {
 }
 
 "Yep.";
+
+=back
+
+=cut

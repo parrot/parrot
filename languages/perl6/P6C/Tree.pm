@@ -1185,4 +1185,8 @@ sub P6C::rx_cc_neg::tree {
     }
 }
 
+=back
+
+=cut
+
 1;

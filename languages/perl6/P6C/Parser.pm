@@ -1025,4 +1025,8 @@ sub P6C::'.$rulename.'::tree {
     $WANT{$name} = $rulename;
 }
 
+=back
+
+=cut
+
 1;
