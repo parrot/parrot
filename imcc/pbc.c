@@ -68,17 +68,17 @@ static struct globals {
 } globals;
 
 
-static int add_const_str(struct Parrot_Interp *, char *str);
+static int add_const_str(Interp *, char *str);
 
 static void imcc_globals_destroy(int ex, void *param);
-static opcode_t build_key(struct Parrot_Interp *interpreter, SymReg *reg);
+static opcode_t build_key(Interp *interpreter, SymReg *reg);
 
 static void
 imcc_globals_destroy(int ex, void *param)
 {
     struct cs_t *cs, *prev_cs;
     struct subs *s, *prev_s;
-    struct Parrot_Interp *interp = (struct Parrot_Interp *)param;
+    Interp *interp = (Interp *)param;
 
     UNUSED(ex);
     UNUSED(interp);
@@ -139,7 +139,7 @@ int
 e_pbc_open(void *param)
 {
     struct cs_t *cs;
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
 
     /* make a new code segment
      */
@@ -188,7 +188,7 @@ old_blocks(void)
 }
 
 opcode_t *
-make_jit_info(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+make_jit_info(Interp *interpreter, IMC_Unit * unit)
 {
     char *name;
     size_t size, old;
@@ -214,7 +214,7 @@ make_jit_info(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 
 /* allocate a new globals.cs->subs structure */
 static void
-make_new_sub(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+make_new_sub(Interp *interpreter, IMC_Unit * unit)
 {
     struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
     if (!s)
@@ -239,7 +239,7 @@ make_new_sub(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 
 /* get size/line of bytecode in ops till now */
 static int
-get_old_size(struct Parrot_Interp *interpreter, int *ins_line)
+get_old_size(Interp *interpreter, int *ins_line)
 {
     size_t size;
     struct subs *s;
@@ -297,7 +297,7 @@ store_key_const(char * str, int idx)
 /* find a label in interpreters fixup table
  */
 static int
-find_label_cs(struct Parrot_Interp *interpreter, char *name)
+find_label_cs(Interp *interpreter, char *name)
 {
     struct PackFile_FixupEntry *fe =
         PackFile_find_fixup_entry(interpreter, enum_fixup_label, name);
@@ -308,7 +308,7 @@ find_label_cs(struct Parrot_Interp *interpreter, char *name)
  * return size in ops
  */
 static int
-store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
+store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
 {
     Instruction * ins;
     int code_size;
@@ -449,7 +449,7 @@ find_global_label(char *name, int *pc)
 
 /* fix global branches */
 void
-fixup_bsrs(struct Parrot_Interp *interpreter)
+fixup_bsrs(Interp *interpreter)
 {
     int i, pc, addr;
     SymReg * bsr, *lab;
@@ -489,7 +489,7 @@ fixup_bsrs(struct Parrot_Interp *interpreter)
 
 /* add constant string to constant_table */
 static int
-add_const_str(struct Parrot_Interp *interpreter, char *str)
+add_const_str(Interp *interpreter, char *str)
 {
     int k;
     char *buf = str;
@@ -519,7 +519,7 @@ add_const_str(struct Parrot_Interp *interpreter, char *str)
 }
 
 static int
-add_const_num(struct Parrot_Interp *interpreter, char *buf)
+add_const_num(Interp *interpreter, char *buf)
 {
     int k;
     STRING *s;
@@ -535,7 +535,7 @@ add_const_num(struct Parrot_Interp *interpreter, char *buf)
 }
 
 static int
-add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
+add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int len)
 {
     int k;
@@ -596,7 +596,7 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
 
 /* add constant key to constant_table */
 static int
-add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
+add_const_key(Interp *interpreter, opcode_t key[],
         int size, char *s_key)
 {
     int k;
@@ -633,7 +633,7 @@ add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
  */
 
 static opcode_t
-build_key(struct Parrot_Interp *interpreter, SymReg *reg)
+build_key(Interp *interpreter, SymReg *reg)
 {
 #define KEYLEN 21
     opcode_t key[KEYLEN], *pc, size;
@@ -708,7 +708,7 @@ build_key(struct Parrot_Interp *interpreter, SymReg *reg)
 }
 
 static void
-add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
+add_1_const(Interp *interpreter, SymReg *r)
 {
     if (r->color >= 0)
         return;
@@ -744,7 +744,7 @@ add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
 
 /* store a constants idx for later reuse */
 static void
-constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+constant_folding(Interp *interpreter, IMC_Unit * unit)
 {
     SymReg * r;
     int i;
@@ -774,7 +774,7 @@ constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 int
 e_pbc_new_sub(void *param, IMC_Unit * unit)
 {
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
 
     if (!unit->instructions)
         return 0;
@@ -789,7 +789,7 @@ e_pbc_new_sub(void *param, IMC_Unit * unit)
 int
 e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
 {
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
     int ok = 0;
     static opcode_t * pc, npc;
     op_info_t *op_info;
@@ -923,7 +923,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
 int
 e_pbc_close(void *param)
 {
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
 
     fixup_bsrs(interpreter);
     clear_globals();

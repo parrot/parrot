@@ -55,7 +55,7 @@ efficiency on reading non native PBCs.
 /*
 
 =item C<static void
-const_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)>
+const_dump(Interp *interpreter, struct PackFile_Segment *segp)>
 
 Dump the constant table.
 
@@ -64,7 +64,7 @@ Dump the constant table.
 */
 
 static void
-const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
+const_dump (Interp *interpreter, struct PackFile_Segment *segp)
 {
     PIO_printf(interpreter, "%s => [\n", segp->name);
     PackFile_ConstTable_dump(interpreter,
@@ -75,7 +75,7 @@ const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 /*
 
 =item C<static void
-fixup_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)>
+fixup_dump(Interp *interpreter, struct PackFile_Segment *segp)>
 
 Dump the fix-up table.
 
@@ -84,7 +84,7 @@ Dump the fix-up table.
 */
 
 static void
-fixup_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
+fixup_dump (Interp *interpreter, struct PackFile_Segment *segp)
 {
     PIO_printf(interpreter, "%s => [\n", segp->name);
     PackFile_Fixup_dump(interpreter,
@@ -95,7 +95,7 @@ fixup_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 /*
 
 =item C<static void
-disas_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *self)>
+disas_dump(Interp *interpreter, struct PackFile_Segment *self)>
 
 Disassemble and dump.
 
@@ -104,7 +104,7 @@ Disassemble and dump.
 */
 
 static void
-disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
+disas_dump (Interp *interpreter, struct PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i;
@@ -129,7 +129,7 @@ disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
 /*
 
 =item C<static void
-PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)>
+PackFile_header_dump(Interp *interpreter, struct PackFile *pf)>
 
 Dump the header.
 
@@ -138,7 +138,7 @@ Dump the header.
 */
 
 static void
-PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
+PackFile_header_dump(Interp *interpreter, struct PackFile *pf)
 {
     PIO_printf(interpreter, "HEADER => [\n");
     PIO_printf(interpreter, "\twordsize  = %d", pf->header->wordsize);
@@ -208,7 +208,7 @@ int
 main(int argc, char **argv)
 {
     struct PackFile *pf;
-    struct Parrot_Interp *interpreter;
+    Interp *interpreter;
     int terse = 0;
     int disas = 0;
     int convert = 0;

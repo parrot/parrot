@@ -23,12 +23,12 @@ src/resources.c - Allocate and deallocate tracked resources
 #define MINIMUM_MEMPOOL_SIZE  1
 #define MAXIMUM_MEMPOOL_SIZE  8
 #define WE_WANT_EVER_GROWING_ALLOCATIONS
-typedef void (*compact_f) (struct Parrot_Interp *, struct Memory_Pool *);
+typedef void (*compact_f) (Interp *, struct Memory_Pool *);
 
 /*
 
 =item C<static void *
-alloc_new_block(struct Parrot_Interp *interpreter,
+alloc_new_block(Interp *interpreter,
         size_t size, struct Memory_Pool *pool)>
 
 Allocate a new memory block. We allocate the larger of however much was
@@ -39,7 +39,7 @@ asked for or the default size, whichever's larger.
 */
 
 static void *
-alloc_new_block(struct Parrot_Interp *interpreter,
+alloc_new_block(Interp *interpreter,
         size_t size, struct Memory_Pool *pool)
 {
     size_t alloc_size;
@@ -87,7 +87,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void *
-mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
+mem_allocate(Interp *interpreter, size_t *req_size,
         struct Memory_Pool *pool, size_t align_1)>
 
 Allocates memory for headers.
@@ -124,7 +124,7 @@ aligned_size(size_t size, size_t align)
 }
 
 static void *
-mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
+mem_allocate(Interp *interpreter, size_t *req_size,
         struct Memory_Pool *pool, size_t align_1)
 {
     char *return_val;
@@ -230,7 +230,7 @@ profile_gc_end(Parrot_Interp interpreter)
 =over
 
 =item C<static void
-compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)>
+compact_pool(Interp *interpreter, struct Memory_Pool *pool)>
 
 Compact the buffer pool.
 
@@ -239,7 +239,7 @@ Compact the buffer pool.
 */
 
 static void
-compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
+compact_pool(Interp *interpreter, struct Memory_Pool *pool)
 {
     UINTVAL total_size;
     struct Memory_Block *new_block;     /* A pointer to our working block */
@@ -414,7 +414,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 /*
 
 =item C<void
-Parrot_go_collect(struct Parrot_Interp *interpreter)>
+Parrot_go_collect(Interp *interpreter)>
 
 Go do a GC run. This only scans the string pools and compacts them, it
 doesn't check for string liveness.
@@ -424,7 +424,7 @@ doesn't check for string liveness.
 */
 
 void
-Parrot_go_collect(struct Parrot_Interp *interpreter)
+Parrot_go_collect(Interp *interpreter)
 {
     compact_pool(interpreter, interpreter->arena_base->memory_pool);
 }
@@ -438,7 +438,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
 =over 4
 
 =item C<void *
-Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)>
+Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)>
 
 Takes an interpreter, a buffer pointer, and a new size. The buffer
 pointer is in as a C<void *> because we may take a C<STRING> or
@@ -449,7 +449,7 @@ something, and C doesn't subclass.
 */
 
 void *
-Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
+Parrot_reallocate(Interp *interpreter, void *from, size_t tosize)
 {
     /* Put our void * pointer into something we don't have to cast around with
      */
@@ -512,7 +512,7 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 /*
 
 =item C<void *
-Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
+Parrot_reallocate_string(Interp *interpreter, STRING *str,
         size_t tosize)>
 
 Takes an interpreter, a C<STRING> pointer, and a new size. The
@@ -523,7 +523,7 @@ destination may be bigger, since we round up to the allocation quantum.
 */
 
 void *
-Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
+Parrot_reallocate_string(Interp *interpreter, STRING *str,
         size_t tosize)
 {
     size_t copysize;
@@ -585,7 +585,7 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
 /*
 
 =item C<void *
-Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)>
+Parrot_allocate(Interp *interpreter, void *buffer, size_t size)>
 
 Allocate exactly as much memory as they asked for.
 
@@ -594,7 +594,7 @@ Allocate exactly as much memory as they asked for.
 */
 
 void *
-Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
+Parrot_allocate(Interp *interpreter, void *buffer, size_t size)
 {
     size_t req_size = size;
 
@@ -609,7 +609,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 /*
 
 =item C<void *
-Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
+Parrot_allocate_zeroed(Interp *interpreter,
         void *buffer, size_t size)>
 
 Just calls C<Parrot_allocate()>, which also returns zeroed memory.
@@ -619,7 +619,7 @@ Just calls C<Parrot_allocate()>, which also returns zeroed memory.
 */
 
 void *
-Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
+Parrot_allocate_zeroed(Interp *interpreter,
         void *buffer, size_t size)
 {
     return Parrot_allocate(interpreter, buffer, size);
@@ -628,7 +628,7 @@ Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void *
-Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
+Parrot_allocate_string(Interp *interpreter, STRING *str,
         size_t size)>
 
 Allocate at least as much memory as they asked for. We round the amount
@@ -639,7 +639,7 @@ up to the allocation quantum.
 */
 
 void *
-Parrot_allocate_string(struct Parrot_Interp *interpreter, STRING *str,
+Parrot_allocate_string(Interp *interpreter, STRING *str,
         size_t size)
 {
     size_t req_size = size;
@@ -694,7 +694,7 @@ new_memory_pool(size_t min_block, compact_f compact)
 /*
 
 =item C<void
-Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)>
+Parrot_initialize_memory_pools(Interp *interpreter)>
 
 Initialize the managed memory pools.
 
@@ -704,7 +704,7 @@ Initialize the managed memory pools.
 
 #define POOL_SIZE 65536*2
 void
-Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
+Parrot_initialize_memory_pools(Interp *interpreter)
 {
     /* Buffers */
     /* setting min_size to 16384 makes this assert: assert(new_block->size >=

@@ -36,7 +36,7 @@ then undefines the macros at the end of the file.
 /*
 
 =item C<void
-REG_PUSH(struct Parrot_Interp *interpreter, void *where)>
+REG_PUSH(Interp *interpreter, void *where)>
 
 Pushes a new register frame onto the corresponding frame stack.
 
@@ -45,7 +45,7 @@ Pushes a new register frame onto the corresponding frame stack.
 */
 
 void
-REG_PUSH(struct Parrot_Interp *interpreter, void *where)
+REG_PUSH(Interp *interpreter, void *where)
 {
     void* top;
     top = stack_prepare_push(interpreter, &interpreter->ctx.REG_STACK);
@@ -55,7 +55,7 @@ REG_PUSH(struct Parrot_Interp *interpreter, void *where)
 /*
 
 =item C<void
-REG_POP(struct Parrot_Interp *interpreter, void *where)>
+REG_POP(Interp *interpreter, void *where)>
 
 Pops a register frame from the corresponding frame stack.
 
@@ -64,7 +64,7 @@ Pops a register frame from the corresponding frame stack.
 */
 
 void
-REG_POP(struct Parrot_Interp *interpreter, void *where)
+REG_POP(Interp *interpreter, void *where)
 {
     void* top;
     top = stack_prepare_pop(interpreter, &interpreter->ctx.REG_STACK);
@@ -74,7 +74,7 @@ REG_POP(struct Parrot_Interp *interpreter, void *where)
 /*
 
 =item C<void
-REG_CLEAR(struct Parrot_Interp *interpreter)>
+REG_CLEAR(Interp *interpreter)>
 
 Sets each register in the current set to C<REG_NULL>.
 
@@ -83,7 +83,7 @@ Sets each register in the current set to C<REG_NULL>.
 */
 
 void
-REG_CLEAR(struct Parrot_Interp *interpreter)
+REG_CLEAR(Interp *interpreter)
 {
     int i;
     for (i = 0; i < NUM_REGISTERS; i++) {

@@ -70,7 +70,7 @@ extern int jit_op_count(void);
 #endif
 
 #if defined __GNUC__ || defined __IBMC__
-void Parrot_jit_debug(struct Parrot_Interp* interpreter);
+void Parrot_jit_debug(Interp* interpreter);
 #endif
 
 char **Parrot_exec_rel_addr;
@@ -79,7 +79,7 @@ int Parrot_exec_rel_count;
 /*
 
 =item C<static void
-insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
+insert_fixup_targets(Interp* interpreter, char *branch,
         size_t limit)>
 
 Look at fixups, mark all fixup entries as branch target.
@@ -93,7 +93,7 @@ inserted.
 */
 
 static void
-insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
+insert_fixup_targets(Interp* interpreter, char *branch,
         size_t limit)
 {
     struct PackFile_FixupTable *ft = interpreter->code->cur_cs->fixups;
@@ -114,7 +114,7 @@ insert_fixup_targets(struct Parrot_Interp* interpreter, char *branch,
 /*
 
 =item C<static void
-make_branch_list(struct Parrot_Interp *interpreter,
+make_branch_list(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)>
 
@@ -139,7 +139,7 @@ got mapped
 */
 
 static void
-make_branch_list(struct Parrot_Interp *interpreter,
+make_branch_list(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)
 {
@@ -257,7 +257,7 @@ make_branch_list(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-set_register_usage(struct Parrot_Interp *interpreter,
+set_register_usage(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)>
@@ -269,7 +269,7 @@ Sets the register usage counts.
 */
 
 static void
-set_register_usage(struct Parrot_Interp *interpreter,
+set_register_usage(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         Parrot_jit_optimizer_section_ptr cur_section,
         op_info_t *op_info, opcode_t *cur_op, opcode_t *code_start)
@@ -350,7 +350,7 @@ set_register_usage(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-make_sections(struct Parrot_Interp *interpreter,
+make_sections(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)>
 
@@ -367,7 +367,7 @@ This C<Parrot_jit_vtable_n_op()> does use register mappings.
 #endif
 
 static void
-make_sections(struct Parrot_Interp *interpreter,
+make_sections(Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)
 {
@@ -479,7 +479,7 @@ make_sections(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-make_branch_targets(struct Parrot_Interp *interpreter,
+make_branch_targets(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Makes the branch targets.
@@ -489,7 +489,7 @@ Makes the branch targets.
 */
 
 static void
-make_branch_targets(struct Parrot_Interp *interpreter,
+make_branch_targets(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section, t_section;
@@ -527,7 +527,7 @@ make_branch_targets(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-sort_registers(struct Parrot_Interp *interpreter,
+sort_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Sorts the Parrot registers prior to mapping them to actual hardware registers.
@@ -537,7 +537,7 @@ Sorts the Parrot registers prior to mapping them to actual hardware registers.
 */
 
 static void
-sort_registers(struct Parrot_Interp *interpreter,
+sort_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section, next, prev;
@@ -628,7 +628,7 @@ sort_registers(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-assign_registers(struct Parrot_Interp *interpreter,
+assign_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)>
@@ -641,7 +641,7 @@ hardware registers.
 */
 
 static void
-assign_registers(struct Parrot_Interp *interpreter,
+assign_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer,
         Parrot_jit_optimizer_section_ptr cur_section,
         opcode_t * code_start, int from_imcc)
@@ -697,7 +697,7 @@ assign_registers(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-map_registers(struct Parrot_Interp *interpreter,
+map_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Maps the most used Parrot registers to hardware registers.
@@ -707,7 +707,7 @@ Maps the most used Parrot registers to hardware registers.
 */
 
 static void
-map_registers(struct Parrot_Interp *interpreter,
+map_registers(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section;
@@ -732,7 +732,7 @@ map_registers(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-debug_sections(struct Parrot_Interp *interpreter,
+debug_sections(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)>
 
 Prints out debugging info.
@@ -742,7 +742,7 @@ Prints out debugging info.
 */
 
 static void
-debug_sections(struct Parrot_Interp *interpreter,
+debug_sections(Interp *interpreter,
         Parrot_jit_optimizer_t *optimizer, opcode_t * code_start)
 {
     Parrot_jit_optimizer_section_ptr cur_section;
@@ -823,7 +823,7 @@ debug_sections(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
+optimize_jit(Interp *interpreter, opcode_t *cur_op,
              opcode_t *code_start, opcode_t *code_end)>
 
 Called by C<build_asm()> to initialize the optimizer.
@@ -833,7 +833,7 @@ Called by C<build_asm()> to initialize the optimizer.
 */
 
 static Parrot_jit_optimizer_t *
-optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
+optimize_jit(Interp *interpreter, opcode_t *cur_op,
              opcode_t *code_start, opcode_t *code_end)
 {
     Parrot_jit_optimizer_t *optimizer;
@@ -870,7 +870,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 /*
 
 =item C<static Parrot_jit_optimizer_t *
-optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
+optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
              opcode_t *code_start, opcode_t *code_end,
              struct PackFile_Segment *jit_seg)>
 
@@ -881,7 +881,7 @@ Generate optimizer stuff from the C<_JIT> section in the packfile.
 */
 
 static Parrot_jit_optimizer_t *
-optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
+optimize_imcc_jit(Interp *interpreter, opcode_t *cur_op,
              opcode_t *code_start, opcode_t *code_end,
              struct PackFile_Segment *jit_seg)
 {
@@ -952,7 +952,7 @@ optimize_imcc_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
 /*
 
 =item C<static char *
-reg_addr(struct Parrot_Interp * interpreter, int typ, int i)>
+reg_addr(Interp * interpreter, int typ, int i)>
 
 Returns the address of register C<typ[i]>.
 
@@ -961,7 +961,7 @@ Returns the address of register C<typ[i]>.
 */
 
 static char *
-reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
+reg_addr(Interp * interpreter, int typ, int i)
 {
 #ifdef PARROT_I386
     if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE))
@@ -993,7 +993,7 @@ reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
 
 =item C<static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)>
+                          Interp * interpreter)>
 
 Load registers for the current section from parrot to processor registers.
 
@@ -1003,12 +1003,12 @@ Load registers for the current section from parrot to processor registers.
 
 static void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)
+                          Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    void (*mov_f[4])(struct Parrot_Interp *, int, char *)
+    void (*mov_f[4])(Interp *, int, char *)
         = { Parrot_jit_emit_mov_rm, 0, 0, Parrot_jit_emit_mov_rm_n};
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
@@ -1046,7 +1046,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
 
 =item C<static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)>
+                          Interp * interpreter)>
 
 Save registers for the current section.
 
@@ -1056,12 +1056,12 @@ Save registers for the current section.
 
 static void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
-                          struct Parrot_Interp * interpreter)
+                          Interp * interpreter)
 {
     Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
     Parrot_jit_register_usage_t *ru = sect->ru;
     int i, typ;
-    void (*mov_f[4])(struct Parrot_Interp * , char *, int)
+    void (*mov_f[4])(Interp * , char *, int)
         = { Parrot_jit_emit_mov_mr, 0, 0, Parrot_jit_emit_mov_mr_n};
     int lasts[] = { PRESERVED_INT_REGS, 0,0,  PRESERVED_FLOAT_REGS };
     char * maps[] = {0, 0, 0, 0};
@@ -1137,7 +1137,7 @@ Parrot_destroy_jit(void *ptr)
 /*
 
 =item C<jit_f
-build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
+build_asm(Interp *interpreter, opcode_t *pc,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile)>
 
@@ -1155,7 +1155,7 @@ program counters values to hardware program counter values.
 */
 
 jit_f
-build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
+build_asm(Interp *interpreter, opcode_t *pc,
           opcode_t *code_start, opcode_t *code_end,
           void *objfile)
 {

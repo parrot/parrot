@@ -1215,7 +1215,7 @@ static void include_file (char *file_name);
 static int in_pod;
 static int prev_state;
 
-#define YY_DECL int yylex(YYSTYPE *valp, struct Parrot_Interp *interp)
+#define YY_DECL int yylex(YYSTYPE *valp, Interp *interp)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
 #define DUP_AND_RET(valp, token)             \

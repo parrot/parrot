@@ -613,7 +613,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 struct Parrot_Interp * interpreter)
+                 Interp * interpreter)
 {
     jit_emit_mflr(jit_info->native_ptr, r0);
     jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_REGISTER_SAVE_SPACE, r1);
@@ -644,7 +644,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     struct Parrot_Interp * interpreter)
+                     Interp * interpreter)
 {
     add_disp(jit_info->native_ptr, r3,
         ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
@@ -674,7 +674,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   struct Parrot_Interp * interpreter)
+                   Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
 
@@ -686,13 +686,13 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     jit_emit_branch_to_opcode(jit_info->native_ptr, r3);
 }
 
-static void Parrot_end_jit(Parrot_jit_info_t *, struct Parrot_Interp * );
+static void Parrot_end_jit(Parrot_jit_info_t *, Interp * );
 
 #undef Parrot_jit_restart_op
 /* Parrot_jit_restart_op is based on the i386 version */
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                      struct Parrot_Interp * interpreter)
+                      Interp * interpreter)
 {
     char *jmp_ptr, *sav_ptr;
 
@@ -721,7 +721,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                   struct Parrot_Interp * interpreter)
+                   Interp * interpreter)
 {
     Parrot_jit_fixup_t *fixup;
     char *fixup_ptr;
@@ -771,7 +771,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
     jit_emit_mov_mr_i(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
@@ -779,7 +779,7 @@ Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
     jit_emit_mov_rm_i(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
@@ -787,7 +787,7 @@ Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
+Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
 {
     jit_emit_mov_mr_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
@@ -795,7 +795,7 @@ Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
+Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg,char *mem)
 {
     jit_emit_mov_rm_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);

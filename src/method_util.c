@@ -24,7 +24,7 @@ Utility functions to handle Parrot calling conventions, lookup methods, etc.
 /*
 
 =item C<PMC *
-Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)>
+Parrot_new_csub(Interp *interp, Parrot_csub_t func)>
 
 Create a new native sub.
 
@@ -36,7 +36,7 @@ F<src/interpreter.c:Parrot_compreg()> for examples.
 */
 
 PMC *
-Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)
+Parrot_new_csub(Interp *interp, Parrot_csub_t func)
 {
     PMC *ret = pmc_new(interp, enum_class_CSub);
     PMC_struct_val(ret) = (DPOINTER *)F2DPTR(func);
@@ -46,7 +46,7 @@ Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)
 /*
 
 =item C<void
-Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])>
+Parrot_push_argv(Interp *interp, INTVAL argc, PMC *argv[])>
 
 Push non-prototyped arguments.
 
@@ -55,7 +55,7 @@ Push non-prototyped arguments.
 */
 
 void
-Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])
+Parrot_push_argv(Interp *interp, INTVAL argc, PMC *argv[])
 {
     interp->int_reg.registers[0] = 0;       /* no prototype */
     interp->int_reg.registers[1] = argc;
@@ -68,7 +68,7 @@ Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])
 /*
 
 =item C<INTVAL
-Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)>
+Parrot_pop_argv(Interp *interp, PMC ***argv)>
 
 Pop non-prototyped arguments.
 
@@ -77,7 +77,7 @@ Pop non-prototyped arguments.
 */
 
 INTVAL
-Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
+Parrot_pop_argv(Interp *interp, PMC ***argv)
 {
     INTVAL i;
     INTVAL nret = interp->int_reg.registers[1];
@@ -94,7 +94,7 @@ Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
 /*
 
 =item C<void
-Parrot_push_proto(struct Parrot_Interp *interp,
+Parrot_push_proto(Interp *interp,
                   INTVAL intc, INTVAL *intv,
                   INTVAL numc, FLOATVAL *numv,
                   INTVAL strc, STRING **strv, INTVAL pmcc, PMC **pmcv)>
@@ -120,7 +120,7 @@ Push prototyped arguments.
 }
 
 void
-Parrot_push_proto(struct Parrot_Interp *interp,
+Parrot_push_proto(Interp *interp,
                   INTVAL intc, INTVAL *intv,
                   INTVAL numc, FLOATVAL *numv,
                   INTVAL strc, STRING **strv, INTVAL pmcc, PMC **pmcv)
@@ -143,7 +143,7 @@ Parrot_push_proto(struct Parrot_Interp *interp,
 /*
 
 =item C<void
-Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
+Parrot_init_stash(Interp *interp, struct method_rec_t *recp,
                   struct Stash *stash)>
 
 Initialize a method stash.
@@ -153,7 +153,7 @@ Initialize a method stash.
 */
 
 void
-Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
+Parrot_init_stash(Interp *interp, struct method_rec_t *recp,
                   struct Stash *stash)
 {
     PMC *k;
@@ -177,7 +177,7 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
 /*
 
 =item C<PMC *
-Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash,
+Parrot_find_method(Interp *interp, struct Stash *stash,
                    PMC *key)>
 
 Lookup a method in a method stash.
@@ -187,7 +187,7 @@ Lookup a method in a method stash.
 */
 
 PMC *
-Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
+Parrot_find_method(Interp *interp, struct Stash *stash, PMC *key)
 {
     while (stash) {
         PMC *meth =

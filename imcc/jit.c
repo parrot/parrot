@@ -110,7 +110,7 @@ min_used(IMC_Unit * unit, int bbi, char t, int typ,
 }
 
 void
-allocate_jit(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+allocate_jit(Interp *interpreter, IMC_Unit * unit)
 {
     int c, i, j, k, typ;
     int to_map[4] = {0,0,0,0};

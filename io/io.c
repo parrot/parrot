@@ -905,7 +905,7 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 */
 
 /* temporary */
-void Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+void Parrot_string_downscale(Interp *interpreter, STRING *s,
 				parrot_string_representation_t representation);
 
 STRING *

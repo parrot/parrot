@@ -47,7 +47,7 @@ http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
 #define C_BSTAT		"0x8f"
 #define C_ESTAT		"0x90"
 
-void Parrot_jit_debug(struct Parrot_Interp* interpreter);
+void Parrot_jit_debug(Interp* interpreter);
 
 #  define BIT_SIZE(t) ((int)(sizeof(t)*8))
 #  define BYTE_SIZE(t) ((int)sizeof(t))
@@ -183,7 +183,7 @@ write_types(FILE *stabs)
 /*
 
 =item C<static void
-write_vars(FILE *stabs, struct Parrot_Interp *interpreter)>
+write_vars(FILE *stabs, Interp *interpreter)>
 
 Writes the contents of the registers to C<stabs>.
 
@@ -192,7 +192,7 @@ Writes the contents of the registers to C<stabs>.
 */
 
 static void
-write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
+write_vars(FILE *stabs, Interp *interpreter)
 {
     int i;
     /* fake static var stabs */
@@ -213,7 +213,7 @@ write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
 /*
 
 =item C<static STRING *
-debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)>
+debug_file(Interp *interpreter, STRING *file, const char *ext)>
 
 Returns C<file> with C<ext> appended.
 
@@ -222,7 +222,7 @@ Returns C<file> with C<ext> appended.
 */
 
 static STRING *
-debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
+debug_file(Interp *interpreter, STRING *file, const char *ext)
 {
     STRING *ret;
     ret = string_copy(interpreter, file);
@@ -236,7 +236,7 @@ debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
 /*
 
 =item C<static void
-Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)>
+Parrot_jit_debug_stabs(Interp *interpreter)>
 
 Writes the JIT debugging stabs.
 
@@ -245,7 +245,7 @@ Writes the JIT debugging stabs.
 */
 
 static void
-Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
+Parrot_jit_debug_stabs(Interp *interpreter)
 {
     Parrot_jit_info_t *jit_info = interpreter->jit_info;
     STRING *file = interpreter->current_file;
@@ -343,7 +343,7 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-Parrot_jit_debug(struct Parrot_Interp* interpreter)>
+Parrot_jit_debug(Interp* interpreter)>
 
 Writes the JIT debugging stabs. Just calls C<Parrot_jit_debug_stabs()>.
 
@@ -352,7 +352,7 @@ Writes the JIT debugging stabs. Just calls C<Parrot_jit_debug_stabs()>.
 */
 
 void
-Parrot_jit_debug(struct Parrot_Interp* interpreter)
+Parrot_jit_debug(Interp* interpreter)
 {
     Parrot_jit_debug_stabs(interpreter);
 }

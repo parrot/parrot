@@ -23,7 +23,7 @@ The base vtable calling functions.
 /*
 
 =item C<PMC *
-key_new(struct Parrot_Interp *interpreter)>
+key_new(Interp *interpreter)>
 
 Returns a new C<Key> PMC.
 
@@ -32,7 +32,7 @@ Returns a new C<Key> PMC.
 */
 
 PMC *
-key_new(struct Parrot_Interp *interpreter)
+key_new(Interp *interpreter)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
@@ -42,7 +42,7 @@ key_new(struct Parrot_Interp *interpreter)
 /*
 
 =item C<PMC *
-key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)>
+key_new_integer(Interp *interpreter, INTVAL value)>
 
 Returns a new integer C<Key> PMC with value C<value>.
 
@@ -51,7 +51,7 @@ Returns a new integer C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
+key_new_integer(Interp *interpreter, INTVAL value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
@@ -64,7 +64,7 @@ key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
 /*
 
 =item C<PMC *
-key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value)>
+key_new_number(Interp *interpreter, FLOATVAL value)>
 
 Returns a new number C<Key> PMC with value C<value>.
 
@@ -73,7 +73,7 @@ Returns a new number C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value)
+key_new_number(Interp *interpreter, FLOATVAL value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
@@ -86,7 +86,7 @@ key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value)
 /*
 
 =item C<PMC *
-key_new_string(struct Parrot_Interp *interpreter, STRING *value)>
+key_new_string(Interp *interpreter, STRING *value)>
 
 Returns a new string C<Key> PMC with value C<value>.
 
@@ -95,7 +95,7 @@ Returns a new string C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_string(struct Parrot_Interp *interpreter, STRING *value)
+key_new_string(Interp *interpreter, STRING *value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
@@ -108,7 +108,7 @@ key_new_string(struct Parrot_Interp *interpreter, STRING *value)
 /*
 
 =item C<PMC *
-key_new_cstring(struct Parrot_Interp *interpreter, const char *value)>
+key_new_cstring(Interp *interpreter, const char *value)>
 
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
@@ -118,7 +118,7 @@ C<STRING>.
 */
 
 PMC *
-key_new_cstring(struct Parrot_Interp *interpreter, const char *value)
+key_new_cstring(Interp *interpreter, const char *value)
 {
     return key_new_string(interpreter,
             string_from_cstring(interpreter, value, 0));
@@ -127,7 +127,7 @@ key_new_cstring(struct Parrot_Interp *interpreter, const char *value)
 /*
 
 =item C<PMC *
-key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)>
+key_new_pmc(Interp *interpreter, PMC *value)>
 
 Returns a new PMC C<Key> PMC with value C<value>.
 
@@ -136,7 +136,7 @@ Returns a new PMC C<Key> PMC with value C<value>.
 */
 
 PMC *
-key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
+key_new_pmc(Interp *interpreter, PMC *value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
@@ -149,7 +149,7 @@ key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
 /*
 
 =item C<void
-key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)>
+key_set_integer(Interp *interpreter, PMC *key, INTVAL value)>
 
 Set the integer C<value> in C<key>.
 
@@ -158,7 +158,7 @@ Set the integer C<value> in C<key>.
 */
 
 void
-key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
+key_set_integer(Interp *interpreter, PMC *key, INTVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -170,7 +170,7 @@ key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
 /*
 
 =item C<void
-key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
+key_set_register(Interp *interpreter, PMC *key, INTVAL value,
                  INTVAL flag)>
 
 Set the register C<value> in C<key>.
@@ -180,7 +180,7 @@ Set the register C<value> in C<key>.
 */
 
 void
-key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
+key_set_register(Interp *interpreter, PMC *key, INTVAL value,
                  INTVAL flag)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
@@ -193,7 +193,7 @@ key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
 /*
 
 =item C<void
-key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)>
+key_set_number(Interp *interpreter, PMC *key, FLOATVAL value)>
 
 Set the number C<value> in C<key>.
 
@@ -202,7 +202,7 @@ Set the number C<value> in C<key>.
 */
 
 void
-key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)
+key_set_number(Interp *interpreter, PMC *key, FLOATVAL value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -214,7 +214,7 @@ key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)
 /*
 
 =item C<void
-key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)>
+key_set_string(Interp *interpreter, PMC *key, STRING *value)>
 
 Set the string C<value> in C<key>.
 
@@ -223,7 +223,7 @@ Set the string C<value> in C<key>.
 */
 
 void
-key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)
+key_set_string(Interp *interpreter, PMC *key, STRING *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -235,7 +235,7 @@ key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)
 /*
 
 =item C<void
-key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)>
+key_set_pmc(Interp *interpreter, PMC *key, PMC *value)>
 
 Set the PMC C<value> in C<key>.
 
@@ -244,7 +244,7 @@ Set the PMC C<value> in C<key>.
 */
 
 void
-key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)
+key_set_pmc(Interp *interpreter, PMC *key, PMC *value)
 {
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -256,7 +256,7 @@ key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)
 /*
 
 =item C<INTVAL
-key_type(struct Parrot_Interp *interpreter, PMC *key)>
+key_type(Interp *interpreter, PMC *key)>
 
 Returns the type of C<key>.
 
@@ -265,7 +265,7 @@ Returns the type of C<key>.
 */
 
 INTVAL
-key_type(struct Parrot_Interp *interpreter, PMC *key)
+key_type(Interp *interpreter, PMC *key)
 {
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
@@ -273,14 +273,14 @@ key_type(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<INTVAL
-key_integer(struct Parrot_Interp *interpreter, PMC *key)>
+key_integer(Interp *interpreter, PMC *key)>
 
 =cut
 
 */
 
 INTVAL
-key_integer(struct Parrot_Interp *interpreter, PMC *key)
+key_integer(Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
@@ -304,14 +304,14 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<FLOATVAL
-key_number(struct Parrot_Interp *interpreter, PMC *key)>
+key_number(Interp *interpreter, PMC *key)>
 
 =cut
 
 */
 
 FLOATVAL
-key_number(struct Parrot_Interp *interpreter, PMC *key)
+key_number(Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
@@ -335,14 +335,14 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<STRING *
-key_string(struct Parrot_Interp *interpreter, PMC *key)>
+key_string(Interp *interpreter, PMC *key)>
 
 =cut
 
 */
 
 STRING *
-key_string(struct Parrot_Interp *interpreter, PMC *key)
+key_string(Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
@@ -366,7 +366,7 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<PMC *
-key_pmc(struct Parrot_Interp *interpreter, PMC *key)>
+key_pmc(Interp *interpreter, PMC *key)>
 
 These functions return the integer/number/string/PMC values of C<key> if
 possible. Otherwise they throws an exceptions.
@@ -376,7 +376,7 @@ possible. Otherwise they throws an exceptions.
 */
 
 PMC *
-key_pmc(struct Parrot_Interp *interpreter, PMC *key)
+key_pmc(Interp *interpreter, PMC *key)
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG:
@@ -392,7 +392,7 @@ key_pmc(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<PMC *
-key_next(struct Parrot_Interp *interpreter, PMC *key)>
+key_next(Interp *interpreter, PMC *key)>
 
 Returns the next key if C<key> is in a sequence of linked keys.
 
@@ -401,7 +401,7 @@ Returns the next key if C<key> is in a sequence of linked keys.
 */
 
 PMC *
-key_next(struct Parrot_Interp *interpreter, PMC *key)
+key_next(Interp *interpreter, PMC *key)
 {
     return PMC_data(key);
 }
@@ -409,7 +409,7 @@ key_next(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<PMC *
-key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)>
+key_append(Interp *interpreter, PMC *key1, PMC *key2)>
 
 Appends C<key2> to C<key1>.
 
@@ -423,7 +423,7 @@ Returns C<key1>.
 */
 
 PMC *
-key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)
+key_append(Interp *interpreter, PMC *key1, PMC *key2)
 {
     PMC *tail = key1;
 
@@ -439,7 +439,7 @@ key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)
 /*
 
 =item C<void
-key_mark(struct Parrot_Interp *interpreter, PMC *key)>
+key_mark(Interp *interpreter, PMC *key)>
 
 Marks C<key> as live.
 
@@ -448,7 +448,7 @@ Marks C<key> as live.
 */
 
 void
-key_mark(struct Parrot_Interp *interpreter, PMC *key)
+key_mark(Interp *interpreter, PMC *key)
 {
     pobject_lives(interpreter, (PObj *) key);
     if ( ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_string_FLAG) ||

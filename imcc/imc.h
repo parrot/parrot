@@ -67,17 +67,17 @@
 /*
  * imc.c
  */
-void imc_compile_all_units(struct Parrot_Interp *);
-void imc_compile_unit(struct Parrot_Interp *, IMC_Unit * unit);
-void imc_close_unit(struct Parrot_Interp *, IMC_Unit *);
-void imc_free_unit(struct Parrot_Interp *, IMC_Unit *);
-void imc_cleanup(struct Parrot_Interp *);
+void imc_compile_all_units(Interp *);
+void imc_compile_unit(Interp *, IMC_Unit * unit);
+void imc_close_unit(Interp *, IMC_Unit *);
+void imc_free_unit(Interp *, IMC_Unit *);
+void imc_cleanup(Interp *);
 void imc_pragma(char * str);
 
 /*
  * instructions.c
  */
-void imcc_init_tables(struct Parrot_Interp * interp);
+void imcc_init_tables(Interp * interp);
 
 /*
  * optimizer.c
@@ -87,16 +87,16 @@ const char * get_neg_op(char *op, int *nargs);
 /*
  * reg_alloc.c
  */
-void imc_reg_alloc(struct Parrot_Interp *, IMC_Unit * unit);
+void imc_reg_alloc(Interp *, IMC_Unit * unit);
 void free_reglist(IMC_Unit *);
 
 /*
  * parser_util.c
  */
 int get_keyvec(Parrot_Interp, int opnum);
-int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[],
+int check_op(Interp *, char * fullname, char *op, SymReg *r[],
     int narg, int keyvec);
-int is_op(struct Parrot_Interp *, char *);
+int is_op(Interp *, char *);
 char *str_dup(const char *);
 char *str_cat(const char *, const char *);
 int imcc_vfprintf(FILE *fd, const char *format, va_list ap);

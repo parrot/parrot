@@ -33,7 +33,7 @@ the faster dispatch of operations.
 /*
 
 =item C<opcode_t *
-runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_fast_core(Interp *interpreter, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.
@@ -45,7 +45,7 @@ No bounds checking, profiling or tracing is performed.
 */
 
 opcode_t *
-runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_fast_core(Interp *interpreter, opcode_t *pc)
 {
     while (pc) {
         DO_OP(pc, interpreter);
@@ -56,7 +56,7 @@ runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_cgoto_core(Interp *interpreter, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core.
@@ -70,7 +70,7 @@ If computed C<goto> is not available then Parrot exits with exit code 1.
 */
 
 opcode_t *
-runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_cgoto_core(Interp *interpreter, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interpreter);
@@ -86,7 +86,7 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_slow_core(Interp *interpreter, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
@@ -99,7 +99,7 @@ because C<Parrot_destroy()> fails to cleanup of C<ctx> correctly.
 */
 
 opcode_t *
-runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_slow_core(Interp *interpreter, opcode_t *pc)
 {
 #ifdef USE_TRACE_INTERP
     Interp * trace_i;
@@ -185,7 +185,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<opcode_t *
-runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_profile_core(Interp *interpreter, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking and profiling enabled.
@@ -195,7 +195,7 @@ operations, with tracing, bounds checking and profiling enabled.
 */
 
 opcode_t *
-runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_profile_core(Interp *interpreter, opcode_t *pc)
 {
     opcode_t cur_op, old_op;
     RunProfile *profile = interpreter->profile;

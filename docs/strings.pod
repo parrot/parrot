@@ -46,7 +46,7 @@ actually means.
 The most basic way of creating a string is through the function
 C<string_make>:
 
-    STRING* string_make(struct Parrot_Interp *, const void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
+    STRING* string_make(Interp *, const void *buffer, INTVAL buflen, INTVAL encoding, INTVAL flags, INTVAL type)
 
 In here you pass a pointer to a buffer of a given encoding, and the
 number of bytes in that buffer to examine, the encoding, (see below for
@@ -67,7 +67,7 @@ I<Hint>: Nothing stops you doing
 
 If you already have a string, you can make a copy of it by calling
 
-    STRING* string_copy(struct Parrot_Interp *, STRING* s)
+    STRING* string_copy(Interp *, STRING* s)
 
 This is itself implemented in terms of C<string_make>.
 
@@ -87,7 +87,7 @@ useful operation.
 To concatenate two strings - that is, to add the contents of string
 C<b> to the end of string C<a>, use:
 
-    STRING* string_concat(struct Parrot_Interp *, STRING* a, STRING *b, INTVAL flag)
+    STRING* string_concat(Interp *, STRING* a, STRING *b, INTVAL flag)
 
 C<a> is updated, and is also returned as a convenience. If the flag is
 set to a non-zero value, then C<b> will be transcoded to C<a>'s encoding
@@ -97,7 +97,7 @@ a Big-5 string.
 
 To repeat a string, (ie, turn 'xyz' into 'xyzxyzxyz') use:
 
-    STRING* string_repeat(struct Parrot_Interp *, const STRING* s, UINTVAL n, STRING** d)
+    STRING* string_repeat(Interp *, const STRING* s, UINTVAL n, STRING** d)
 
 Which will repeat string I<s> n times and store the result into I<d>, which it
 also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated
@@ -111,7 +111,7 @@ unlikely-sounding
 
 To retrieve a substring of the string, call
 
-    STRING* string_substr(struct Parrot_Interp *, STRING* src, INTVAL offset, INTVAL length, STRING** dest)
+    STRING* string_substr(Interp *, STRING* src, INTVAL offset, INTVAL length, STRING** dest)
 
 The result will be placed in C<dest>.
 (Passing in C<dest> avoids allocating a new string at runtime. If
@@ -133,7 +133,7 @@ of range, it also throws an exception.
 
 To compare two strings, use:
 
-    INTVAL string_compare(struct Parrot_Interp *, STRING* s1, STRING* s2)
+    INTVAL string_compare(Interp *, STRING* s1, STRING* s2)
 
 The value returned will be less than, equal to, or greater than zero
 depending on whether C<s1> is less than, equal to, or greater than C<s2>.
@@ -157,7 +157,7 @@ Otherwise the string will be true.
 
 To format output into a string, use
 
-    STRING* string_nprintf(struct Parrot_Interp *, STRING* dest, INTVAL len, char* format, ...)
+    STRING* string_nprintf(Interp *, STRING* dest, INTVAL len, char* format, ...)
 
 C<dest> may be a null pointer, in which case a new string will be created. If
 C<len> is zero, the behaviour becomes more C<sprintf>ish than C<snprintf>-like.
@@ -275,7 +275,7 @@ to three bytes.
 
 To grow a string to a specified size, use
 
-    void string_grow(struct Parrot_Interp *, STRING *s, INTVAL newsize)
+    void string_grow(Interp *, STRING *s, INTVAL newsize)
 
 The size is given in characters; C<string_max_bytes()> is called to turn
 this into a size in bytes, and then the buffer is grown to accomodate

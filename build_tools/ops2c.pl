@@ -297,9 +297,9 @@ my ($prev_source, $prev_func_name, $prev_def);
 
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name($trans);
-    my $arg_types  = "$opsarraytype *, struct Parrot_Interp *";
+    my $arg_types  = "$opsarraytype *, Interp *";
     my $prototype  = "$opsarraytype * $func_name ($arg_types)";
-    my $args       = "$opsarraytype *cur_opcode, struct Parrot_Interp * interpreter";
+    my $args       = "$opsarraytype *cur_opcode, Interp * interpreter";
     my $definition;
     my $comment = '';
     $prev_def = '';

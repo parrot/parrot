@@ -100,7 +100,7 @@ sub vtbl_defs {
     my $entry;
 
     for $entry (@{$vtable}) {
-        my $args = join(", ", 'struct Parrot_Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
+        my $args = join(", ", 'Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
 

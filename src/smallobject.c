@@ -32,7 +32,7 @@ Handles the accessing of small object pools (header pools).
 /*
 
 =item C<INTVAL
-contained_in_pool(struct Parrot_Interp *interpreter,
+contained_in_pool(Interp *interpreter,
         struct Small_Object_Pool *pool, void *ptr)>
 
 Returns whether C<pool> contains C<*ptr>.
@@ -42,7 +42,7 @@ Returns whether C<pool> contains C<*ptr>.
 */
 
 INTVAL
-contained_in_pool(struct Parrot_Interp *interpreter,
+contained_in_pool(Interp *interpreter,
         struct Small_Object_Pool *pool, void *ptr)
 {
     struct Small_Object_Arena *arena;
@@ -91,7 +91,7 @@ Parrot_is_const_pmc(Parrot_Interp interpreter, PMC *pmc)
 /*
 
 =item C<void
-more_traceable_objects(struct Parrot_Interp *interpreter,
+more_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 We're out of traceable objects. Try a DOD, then get some more if needed.
@@ -101,7 +101,7 @@ We're out of traceable objects. Try a DOD, then get some more if needed.
 */
 
 void
-more_traceable_objects(struct Parrot_Interp *interpreter,
+more_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     if (pool->skip)
@@ -122,7 +122,7 @@ more_traceable_objects(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-more_non_traceable_objects(struct Parrot_Interp *interpreter,
+more_non_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 We're out of non-traceable objects. Get some more.
@@ -132,7 +132,7 @@ We're out of non-traceable objects. Get some more.
 */
 
 void
-more_non_traceable_objects(struct Parrot_Interp *interpreter,
+more_non_traceable_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     (*pool->alloc_objects) (interpreter, pool);
@@ -141,13 +141,13 @@ more_non_traceable_objects(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-add_free_object(struct Parrot_Interp *interpreter,
+add_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)>
 
 Add an unused object back to the free pool for later reuse.
 
 =item C<static void *
-get_free_object(struct Parrot_Interp *interpreter,
+get_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 Get a new object from the free pool and return it.
@@ -157,7 +157,7 @@ Get a new object from the free pool and return it.
 */
 
 void
-add_free_object(struct Parrot_Interp *interpreter,
+add_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
     *(void **)to_add = pool->free_list;
@@ -166,7 +166,7 @@ add_free_object(struct Parrot_Interp *interpreter,
 
 
 static void *
-get_free_object(struct Parrot_Interp *interpreter,
+get_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     void *ptr;
@@ -186,7 +186,7 @@ get_free_object(struct Parrot_Interp *interpreter,
 
 #if ARENA_DOD_FLAGS
 static void *
-get_free_object_df(struct Parrot_Interp *interpreter,
+get_free_object_df(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     void *ptr;
@@ -207,7 +207,7 @@ get_free_object_df(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-add_to_free_list(struct Parrot_Interp *interpreter,
+add_to_free_list(Interp *interpreter,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -220,7 +220,7 @@ Adds the memory between C<start> and C<end> to the free list.
 */
 
 static void
-add_to_free_list(struct Parrot_Interp *interpreter,
+add_to_free_list(Interp *interpreter,
         struct Small_Object_Pool *pool,
         struct Small_Object_Arena *arena,
         UINTVAL start,
@@ -277,7 +277,7 @@ add_to_free_list(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-alloc_objects(struct Parrot_Interp *interpreter,
+alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 We have no more headers on the free header pool. Go allocate more
@@ -288,7 +288,7 @@ and put them on.
 */
 
 void
-alloc_objects(struct Parrot_Interp *interpreter,
+alloc_objects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
@@ -413,7 +413,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
 /*
 
 =item C<struct Small_Object_Pool *
-new_small_object_pool(struct Parrot_Interp *interpreter,
+new_small_object_pool(Interp *interpreter,
         size_t object_size, size_t objects_per_alloc)>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
@@ -423,7 +423,7 @@ Creates a new C<Small_Object_Pool> and returns a pointer to it.
 */
 
 struct Small_Object_Pool *
-new_small_object_pool(struct Parrot_Interp *interpreter,
+new_small_object_pool(Interp *interpreter,
         size_t object_size, size_t objects_per_alloc)
 {
     struct Small_Object_Pool *pool;

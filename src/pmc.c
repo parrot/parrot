@@ -27,7 +27,7 @@ Parrot_mutex init_null_mutex;
 /*
 
 =item C<PMC *
-pmc_init_null(struct Parrot_Interp * interpreter)>
+pmc_init_null(Interp * interpreter)>
 
 Initializes C<PMCNULL>, C<Null> PMC.
 
@@ -36,7 +36,7 @@ Initializes C<PMCNULL>, C<Null> PMC.
 */
 
 PMC *
-pmc_init_null(struct Parrot_Interp * interpreter)
+pmc_init_null(Interp * interpreter)
 {
     LOCK(init_null_mutex);
     if(!PMCNULL)
@@ -51,7 +51,7 @@ pmc_init_null(struct Parrot_Interp * interpreter)
 /*
 
 =item C<PMC *
-pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)>
+pmc_new(Interp *interpreter, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<Parrot_base_vtables> in
@@ -64,7 +64,7 @@ any other necessary initialization.
 */
 
 PMC *
-pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
+pmc_new(Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc = pmc_new_noinit(interpreter, base_type);
     VTABLE_init(interpreter, pmc);
@@ -74,7 +74,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<static PMC*
-get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
+get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     UINTVAL flags)>
 
 Gets a new PMC header.
@@ -84,7 +84,7 @@ Gets a new PMC header.
 */
 
 static PMC*
-get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
+get_new_pmc_header(Interp *interpreter, INTVAL base_type,
     UINTVAL flags)
 {
     PMC *pmc;
@@ -136,7 +136,7 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 /*
 
 =item C<PMC *
-pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)>
+pmc_new_noinit(Interp *interpreter, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list
 of PMC types declared in C<Parrot_base_vtables> in
@@ -149,7 +149,7 @@ initialization for continuations.
 */
 
 PMC *
-pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
+pmc_new_noinit(Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc;
     /* we only have one global Env object, living in the interpreter */
@@ -191,7 +191,7 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<PMC *
-constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)>
+constant_pmc_new_noinit(Interp *interpreter, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>.
 
@@ -200,7 +200,7 @@ Creates a new constant PMC of type C<base_type>.
 */
 
 PMC *
-constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
+constant_pmc_new_noinit(Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc = get_new_pmc_header(interpreter, base_type,
             PObj_constant_FLAG);
@@ -210,7 +210,7 @@ constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<PMC *
-constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)>
+constant_pmc_new(Interp *interpreter, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>, the call C<init>.
 
@@ -219,7 +219,7 @@ Creates a new constant PMC of type C<base_type>, the call C<init>.
 */
 
 PMC *
-constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
+constant_pmc_new(Interp *interpreter, INTVAL base_type)
 {
     PMC *pmc = get_new_pmc_header(interpreter, base_type,
             PObj_constant_FLAG);
@@ -230,7 +230,7 @@ constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 /*
 
 =item C<PMC *
-pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)>
+pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)>
 
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 
@@ -239,7 +239,7 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> method.
 */
 
 PMC *
-pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
+pmc_new_init(Interp *interpreter, INTVAL base_type, PMC *init)
 {
     PMC *pmc = pmc_new_noinit(interpreter, base_type);
 
@@ -251,7 +251,7 @@ pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type, PMC *init)
 /*
 
 =item C<PMC *
-constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
+constant_pmc_new_init(Interp *interpreter, INTVAL base_type,
         PMC *init)>
 
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
@@ -261,7 +261,7 @@ As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> method.
 */
 
 PMC *
-constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
+constant_pmc_new_init(Interp *interpreter, INTVAL base_type,
         PMC *init)
 {
     PMC *pmc = get_new_pmc_header(interpreter, base_type, 1);

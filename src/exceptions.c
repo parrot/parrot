@@ -68,7 +68,7 @@ internal_exception(int exitcode, const char *format, ...)
 /*
 
 =item C<void
-do_panic(struct Parrot_Interp *interpreter, const char *message,
+do_panic(Interp *interpreter, const char *message,
          const char *file, int line)>
 
 Panic handler.
@@ -78,7 +78,7 @@ Panic handler.
 */
 
 void
-do_panic(struct Parrot_Interp *interpreter, const char *message,
+do_panic(Interp *interpreter, const char *message,
          const char *file, int line)
 {
     /* Note: we can't format any floats in here--Parrot_sprintf
@@ -543,7 +543,7 @@ do_exception(Parrot_Interp interpreter,
 /*
 
 =item C<void
-real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
+real_exception(Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)>
 
 Unlike C<internal_exception()> this throws a real exception.
@@ -553,7 +553,7 @@ Unlike C<internal_exception()> this throws a real exception.
 */
 
 void
-real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
+real_exception(Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
     STRING *msg;

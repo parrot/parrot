@@ -33,7 +33,7 @@
  * into the current block in one call.
  */
 static Instruction *
-insINS(struct Parrot_Interp *interpreter, IMC_Unit * unit, Instruction *ins,
+insINS(Interp *interpreter, IMC_Unit * unit, Instruction *ins,
         char *name, SymReg **regs, int n)
 {
     Instruction *tmp = INS(interpreter, unit, name, NULL, regs, n, 0, 0);

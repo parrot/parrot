@@ -62,8 +62,8 @@ Marks the pointer as live.
 */
 
     void mark () {
-        void (*mark_function)(struct Parrot_Interp*, void*) =
-            (void (*)(struct Parrot_Interp*, void*))
+        void (*mark_function)(Interp*, void*) =
+            (void (*)(Interp*, void*))
             D2FPTR(PMC_struct_val(SELF));
         if (PMC_data(SELF) == NULL)
             return;

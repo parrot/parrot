@@ -499,7 +499,7 @@ Parrot_srand(INTVAL seed)
 =over
 
 =item C<void *
-Parrot_make_la(struct Parrot_Interp *interpreter, PMC *array)>
+Parrot_make_la(Interp *interpreter, PMC *array)>
 
 Creates a C array of C<long>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
@@ -512,7 +512,7 @@ Used in C<src/nci.c>.
 */
 
 void *
-Parrot_make_la(struct Parrot_Interp *interpreter, PMC *array) {
+Parrot_make_la(Interp *interpreter, PMC *array) {
     INTVAL arraylen = VTABLE_elements(interpreter, array);
     long *out_array = NULL;
     INTVAL cur = 0;
@@ -551,7 +551,7 @@ Parrot_destroy_la(long *array) {
 /*
 
 =item C<void *
-Parrot_make_cpa(struct Parrot_Interp *interpreter, PMC *array)>
+Parrot_make_cpa(Interp *interpreter, PMC *array)>
 
 Creates a C array of C<char *>s with one more element than the number of
 elements in C<*array>. The elements are then copied from C<*array> to
@@ -564,7 +564,7 @@ Currently unused.
 */
 
 void *
-Parrot_make_cpa(struct Parrot_Interp *interpreter, PMC *array) {
+Parrot_make_cpa(Interp *interpreter, PMC *array) {
     INTVAL arraylen = VTABLE_elements(interpreter, array);
     char **out_array = NULL;
     INTVAL cur = 0;

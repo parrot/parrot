@@ -31,13 +31,13 @@ executables.
 #include "parrot/jit_emit.h"
 #include "parrot/embed.h"
 
-opcode_t* run_compiled(struct Parrot_Interp *interpreter,
+opcode_t* run_compiled(Interp *interpreter,
     opcode_t *cur_opcode, opcode_t *code_start);
 
 /*
 
 =item C<static void
-setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)>
+setup_argv(Interp *interpreter, int argc, char ** argv)>
 
 Stolen from F<embed.c>.
 
@@ -46,7 +46,7 @@ Stolen from F<embed.c>.
 */
 
 static void
-setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
+setup_argv(Interp *interpreter, int argc, char ** argv)
 {
     INTVAL i;
     PMC *userargv;
@@ -92,7 +92,7 @@ int
 main(int argc, char **argv) {
     long *opp;
     int dummy_var;
-    struct Parrot_Interp *     interpreter;
+    Interp *     interpreter;
     struct PackFile *          pf;
     opcode_t *code_start;
     INTVAL i;

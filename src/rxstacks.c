@@ -25,7 +25,7 @@ don't have cleanup routines.
 /*
 
 =item C<IntStack
-intstack_new(struct Parrot_Interp *interpreter)>
+intstack_new(Interp *interpreter)>
 
 Creates and returns a new stack.
 
@@ -34,7 +34,7 @@ Creates and returns a new stack.
 */
 
 IntStack
-intstack_new(struct Parrot_Interp *interpreter)
+intstack_new(Interp *interpreter)
 {
     IntStack stack = mem_sys_allocate(sizeof(struct IntStack_chunk_t));
     stack->used = 0;
@@ -46,7 +46,7 @@ intstack_new(struct Parrot_Interp *interpreter)
 /*
 
 =item C<INTVAL
-intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)>
+intstack_depth(Interp *interpreter, IntStack stack)>
 
 Returns the depth of the stack.
 
@@ -55,7 +55,7 @@ Returns the depth of the stack.
 */
 
 INTVAL
-intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)
+intstack_depth(Interp *interpreter, IntStack stack)
 {
     IntStack_Chunk chunk;
     INTVAL depth = stack->used;
@@ -69,7 +69,7 @@ intstack_depth(struct Parrot_Interp *interpreter, IntStack stack)
 /*
 
 =item C<void
-intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)>
+intstack_push(Interp *interpreter, IntStack stack, INTVAL data)>
 
 Pushes C<data> onto the stack.
 
@@ -78,7 +78,7 @@ Pushes C<data> onto the stack.
 */
 
 void
-intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
+intstack_push(Interp *interpreter, IntStack stack, INTVAL data)
 {
     IntStack_Chunk chunk = stack->prev;
     IntStack_Entry entry = &chunk->entry[chunk->used];
@@ -107,7 +107,7 @@ intstack_push(struct Parrot_Interp *interpreter, IntStack stack, INTVAL data)
 /*
 
 =item C<INTVAL
-intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)>
+intstack_pop(Interp *interpreter, IntStack stack)>
 
 Pops the top value off the stack and returns it.
 
@@ -116,7 +116,7 @@ Pops the top value off the stack and returns it.
 */
 
 INTVAL
-intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
+intstack_pop(Interp *interpreter, IntStack stack)
 {
     IntStack_Chunk chunk = stack->prev;
     IntStack_Entry entry;
@@ -156,7 +156,7 @@ intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
 /*
 
 =item C<void
-intstack_free(struct Parrot_Interp *interpreter, IntStack stack)>
+intstack_free(Interp *interpreter, IntStack stack)>
 
 Frees all the memory used by the stack.
 
@@ -165,7 +165,7 @@ Frees all the memory used by the stack.
 */
 
 void
-intstack_free(struct Parrot_Interp *interpreter, IntStack stack)
+intstack_free(Interp *interpreter, IntStack stack)
 {
     IntStack chunk, temp;
 

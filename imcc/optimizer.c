@@ -48,28 +48,28 @@
 /* buggy - turned off */
 #define  DO_LOOP_OPTIMIZATION 0
 
-static void if_branch(struct Parrot_Interp *, IMC_Unit *);
+static void if_branch(Interp *, IMC_Unit *);
 
-static int branch_branch(struct Parrot_Interp *interpreter, IMC_Unit *);
-static int unused_label(struct Parrot_Interp *interpreter, IMC_Unit *);
-static int dead_code_remove(struct Parrot_Interp *interpreter, IMC_Unit *);
+static int branch_branch(Interp *interpreter, IMC_Unit *);
+static int unused_label(Interp *interpreter, IMC_Unit *);
+static int dead_code_remove(Interp *interpreter, IMC_Unit *);
 
-static void strength_reduce(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants_c(struct Parrot_Interp *interpreter, IMC_Unit *);
-static void subst_constants_if (struct Parrot_Interp *interpreter, IMC_Unit *);
+static void strength_reduce(Interp *interpreter, IMC_Unit *);
+static void subst_constants_mix(Interp *interpreter, IMC_Unit *);
+static void subst_constants_umix(Interp *interpreter, IMC_Unit *);
+static void subst_constants(Interp *interpreter, IMC_Unit *);
+static void subst_constants_c(Interp *interpreter, IMC_Unit *);
+static void subst_constants_if (Interp *interpreter, IMC_Unit *);
 
-static int constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit *);
-static int used_once(struct Parrot_Interp *, IMC_Unit *);
+static int constant_propagation(Interp *interpreter, IMC_Unit *);
+static int used_once(Interp *, IMC_Unit *);
 #if DO_LOOP_OPTIMIZATION
-static int loop_optimization(struct Parrot_Interp *, IMC_Unit *);
+static int loop_optimization(Interp *, IMC_Unit *);
 #endif
-static int clone_remove(struct Parrot_Interp *, IMC_Unit *);
+static int clone_remove(Interp *, IMC_Unit *);
 
 void
-pre_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+pre_optimize(Interp *interpreter, IMC_Unit * unit)
 {
     if (optimizer_level & OPT_PRE) {
         info(interpreter, 2, "pre_optimize\n");
@@ -85,7 +85,7 @@ pre_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 }
 
 int
-cfg_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+cfg_optimize(Interp *interpreter, IMC_Unit * unit)
 {
     UNUSED(interpreter);
 
@@ -105,7 +105,7 @@ cfg_optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 }
 
 int
-optimize(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+optimize(Interp *interpreter, IMC_Unit * unit)
 {
     int any = 0;
     if (optimizer_level & OPT_CFG) {
@@ -154,7 +154,7 @@ get_neg_op(char *op, int *n)
  * L1:                  L2:
  */
 static void
-if_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+if_branch(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *last;
     int reg;
@@ -205,7 +205,7 @@ if_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
  * guaranteed, that one operand is non constant, if opsize == 4
  */
 static void
-strength_reduce(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+strength_reduce(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "add", "sub", "mul", "div" };
@@ -319,7 +319,7 @@ set_it:
  */
 
 static int
-constant_propagation(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+constant_propagation(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *ins2;
     int op;
@@ -386,7 +386,7 @@ next_constant:;
  * rewrite e.g. add_n_nc_ic => add_n_nc_nc
  */
 static void
-subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants_mix(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -425,7 +425,7 @@ subst_constants_mix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
  * rewrite e.g. add_n_ic => add_n_nc
  */
 static void
-subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants_umix(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -461,7 +461,7 @@ subst_constants_umix(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 }
 
 static void
-eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
+eval_ins(Interp *interpreter, Instruction *ins, size_t ops)
 {
     opcode_t eval[4];
     char op[20];
@@ -517,7 +517,7 @@ eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
  *          or  abs_i_ic => set_i_ic
  */
 static void
-subst_constants(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = {
@@ -613,7 +613,7 @@ subst_constants(struct Parrot_Interp *interpreter, IMC_Unit * unit)
  * rewrite e.g. eq_ic_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_c(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants_c(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "eq", "ne", "gt", "ge", "lt", "le" };
@@ -752,7 +752,7 @@ do_res:
  * rewrite e.g. if_ic_ic => branch_ic/nothing
  */
 static void
-subst_constants_if (struct Parrot_Interp *interpreter, IMC_Unit * unit)
+subst_constants_if (Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "if", "unless" };
@@ -824,7 +824,7 @@ do_res:
  *
  */
 static int
-branch_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+branch_branch(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins, *next;
     SymReg * r;
@@ -856,7 +856,7 @@ branch_branch(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 }
 
 static int
-unused_label(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+unused_label(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins;
     int used;
@@ -919,7 +919,7 @@ unused_label(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 }
 
 static int
-dead_code_remove(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+dead_code_remove(Interp *interpreter, IMC_Unit * unit)
 {
     Basic_block *bb;
     int i;
@@ -1162,7 +1162,7 @@ find_outer(IMC_Unit * unit, Basic_block * blk)
 
 /* move the instruction ins before loop in bb */
 static int
-move_ins_out(struct Parrot_Interp *interpreter, IMC_Unit * unit,
+move_ins_out(Interp *interpreter, IMC_Unit * unit,
                      Instruction **ins, Basic_block *bb)
 {
     Basic_block *pred;
@@ -1204,7 +1204,7 @@ move_ins_out(struct Parrot_Interp *interpreter, IMC_Unit * unit,
 }
 
 static int
-loop_one(struct Parrot_Interp *interpreter, IMC_Unit * unit, int bnr)
+loop_one(Interp *interpreter, IMC_Unit * unit, int bnr)
 {
     Basic_block *bb = unit->bb_list[bnr];
     Instruction *ins;
@@ -1232,7 +1232,7 @@ loop_one(struct Parrot_Interp *interpreter, IMC_Unit * unit, int bnr)
 }
 
 static int
-loop_optimization(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+loop_optimization(Interp *interpreter, IMC_Unit * unit)
 {
     int l, bb, loop_depth;
     int changed = 0;

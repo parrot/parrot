@@ -41,7 +41,7 @@ over the hash doesn't show these values.
 
 /*
 
-=item C<static PMC *undef(struct Parrot_Interp *interpreter)>
+=item C<static PMC *undef(Interp *interpreter)>
 
 Returns the C<PerlUndef> PMC.
 
@@ -49,7 +49,7 @@ Returns the C<PerlUndef> PMC.
 
 */
 
-static PMC* undef(struct Parrot_Interp* interpreter)
+static PMC* undef(Interp* interpreter)
 {
     return pmc_new(interpreter, enum_class_PerlUndef);
 }

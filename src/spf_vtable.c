@@ -28,7 +28,7 @@ retrieve arguments.
 /*
 
 =item C<static STRING *
-getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getchr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<char> out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -40,7 +40,7 @@ C<size> is unused.
 */
 
 static STRING *
-getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getchr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -53,7 +53,7 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEINTVAL
-getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an integer out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -66,7 +66,7 @@ of the integer.
 */
 
 static HUGEINTVAL
-getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -106,7 +106,7 @@ getint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static UHUGEINTVAL
-getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an unsigned integer out of the C<va_list> in C<obj> and returns it
 as a Parrot C<STRING>.
@@ -119,7 +119,7 @@ of the integer.
 */
 
 static UHUGEINTVAL
-getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getuint_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -162,7 +162,7 @@ getuint_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEFLOATVAL
-getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an floating-point number out of the C<va_list> in C<obj> and
 returns it as a Parrot C<STRING>.
@@ -175,7 +175,7 @@ the number.
 */
 
 static HUGEFLOATVAL
-getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -211,7 +211,7 @@ getfloat_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static STRING *
-getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets an string out of the C<va_list> in C<obj> and returns it as a
 Parrot C<STRING>.
@@ -224,7 +224,7 @@ of the string.
 */
 
 static STRING *
-getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getstring_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -262,7 +262,7 @@ getstring_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static void *
-getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Gets a C<void *> out of the C<va_list> in C<obj> and returns it.
 
@@ -273,7 +273,7 @@ C<size> is unused.
 */
 
 static void *
-getptr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getptr_va(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     va_list *arg = (va_list *)(obj->data);
 
@@ -294,7 +294,7 @@ SPRINTF_OBJ va_core = {
 =over 4
 
 =item C<static STRING *
-getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getchr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -304,7 +304,7 @@ from C<obj>.
 */
 
 static STRING *
-getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getchr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
@@ -320,7 +320,7 @@ getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEINTVAL
-getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -330,7 +330,7 @@ from C<obj>.
 */
 
 static HUGEINTVAL
-getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEINTVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
@@ -358,7 +358,7 @@ getint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static UHUGEINTVAL
-getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getuint_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -368,7 +368,7 @@ from C<obj>.
 */
 
 static UHUGEINTVAL
-getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getuint_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     UHUGEINTVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
@@ -395,7 +395,7 @@ getuint_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static HUGEFLOATVAL
-getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getfloat_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -405,7 +405,7 @@ from C<obj>.
 */
 
 static HUGEFLOATVAL
-getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getfloat_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     HUGEFLOATVAL ret;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
@@ -430,7 +430,7 @@ getfloat_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static STRING *
-getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getstring_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -440,7 +440,7 @@ from C<obj>.
 */
 
 static STRING *
-getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getstring_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     STRING *s;
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
@@ -455,7 +455,7 @@ getstring_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 /*
 
 =item C<static void *
-getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
+getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)>
 
 Same as C<getptr_va()> except that a vtable is used to get the value
 from C<obj>.
@@ -465,7 +465,7 @@ from C<obj>.
 */
 
 static void *
-getptr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
+getptr_pmc(Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
 {
     PMC *tmp = VTABLE_get_pmc_keyed_int(interpreter,
             ((PMC *)obj->data),

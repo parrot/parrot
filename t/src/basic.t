@@ -50,7 +50,7 @@ static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int main(int argc, char* argv[])
 {
-    struct Parrot_Interp *     interpreter;
+    Interp *     interpreter;
 
     interpreter = Parrot_new(NULL);
     if (!interpreter) {
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 }
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     UNUSED(cur_op);

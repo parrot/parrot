@@ -347,7 +347,7 @@ static int cnr;
  *
  */
 static Instruction *
-MK_I(struct Parrot_Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
+MK_I(Interp *interpreter, IMC_Unit * unit, const char * fmt, int n, ...)
 {
     char opname[64];
     char *p;
@@ -441,7 +441,7 @@ static Instruction * iSUBROUTINE(IMC_Unit * unit, SymReg * r0) {
  * substr or X = Pkey
  */
 static Instruction *
-iINDEXFETCH(struct Parrot_Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
+iINDEXFETCH(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
     SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
@@ -457,7 +457,7 @@ iINDEXFETCH(struct Parrot_Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg *
  */
 
 static Instruction *
-iINDEXSET(struct Parrot_Interp *interp, IMC_Unit * unit,
+iINDEXSET(Interp *interp, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {

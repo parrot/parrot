@@ -68,7 +68,7 @@ CODE
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "hello world");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     PIO_printf(interpreter, "Hello, World!\n");
@@ -83,7 +83,7 @@ OUTPUT
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "write");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -114,7 +114,7 @@ close FILE;
 
 c_output_is($main . <<'CODE', <<'OUTPUT', 'read');
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -156,7 +156,7 @@ OUTPUT
 
 c_output_is($main . <<'CODE', '', 'append');
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -180,7 +180,7 @@ close FILE;
 
 c_output_is($main . <<'CODE', <<'OUTPUT', 'readline');
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -212,7 +212,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_parse_open_flags");
 #include "../io/io_private.h"
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     char *flags[] = {"<", ">", ">>", "+<", "+>",
@@ -250,7 +250,7 @@ setup();
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_open");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     char *file[] = {"", "temp.file", "does_not_exist"};
@@ -291,7 +291,7 @@ setup("temp.file", "This is a test.");
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     int len[] = {0, 9, 5, 100};
@@ -344,7 +344,7 @@ setup("temp.file", ("x" x 65533) . "yz");
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger file");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -377,7 +377,7 @@ setup("temp.file", ("x" x 65536) . "yz");
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_read larger chunk when the buffer is not-empty");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -411,7 +411,7 @@ setup("temp.file", "words\n" x 10000);
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_tell: read larger chunk when the buffer is not-empty");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -446,7 +446,7 @@ teardown();
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_write");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -474,7 +474,7 @@ setup();
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_close");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     PMC *io;
@@ -500,7 +500,7 @@ teardown;
 
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_make_offset");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     INTVAL intval[] = {0, 1, -1, 100, -100};
@@ -534,7 +534,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_seek");
 #include "../io/io_private.h"
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     INTVAL fixture[][3] = {
@@ -589,7 +589,7 @@ SKIP: {
     skip ("fdopen does not handle illegal modes correct", 1);
 c_output_is($main . <<'CODE', <<'OUTPUT', "PIO_fdopen");
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     char *flags[] = {"<", ">", ">>", "+<", "+>", "", ";-)"};
@@ -626,7 +626,7 @@ OUTPUT
 
 c_output_is($main . <<'CODE', <<'OUTPUT', 'stdio-layer');
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
     extern ParrotIOLayer pio_stdio_layer;
@@ -649,7 +649,7 @@ setup("temp.file", "Hello World!");
 
 c_output_is($main . <<'CODE', <<'OUTPUT', 'peek');
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     ParrotIO *io;

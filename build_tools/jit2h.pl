@@ -307,7 +307,7 @@ print JITCPU $header if ($header);
 my $njit = scalar keys(%core_ops);
 
 my $jit_fn_retn = "void";
-my $jit_fn_params = "(Parrot_jit_info_t *jit_info, struct Parrot_Interp * interpreter)";
+my $jit_fn_params = "(Parrot_jit_info_t *jit_info, Interp * interpreter)";
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]}[0];

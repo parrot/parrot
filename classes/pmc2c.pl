@@ -520,7 +520,7 @@ sub standard_body($$$$$$$) {
     my $ret = $type eq 'void' ? '' : "return $retval;" ;
     my $ln = 1 + ($OUT =~ tr/\n/\n/);
     my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
-    my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+    my $decl = "$type Parrot_${classname}_${methodname} (Interp *interpreter, PMC* pmc$parameters)";
     $$HOUT .= "extern $decl;\n";
     return <<EOC;
 $line
@@ -544,7 +544,7 @@ sub standard_ref_body($$$$$$) {
     my $ret = $type eq 'void' ? "$body;" : "return $body;" ;
     my $ln = 1 + ($OUT =~ tr/\n/\n/);
     my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
-    my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+    my $decl = "$type Parrot_${classname}_${methodname} (Interp *interpreter, PMC* pmc$parameters)";
     $$HOUT .= "extern $decl;\n";
     return <<EOC;
 $line
@@ -690,7 +690,7 @@ EOC
      # now create the function prototype based on the class name,
      # method name, and parameters make it extern in the .h file and
      # add the actual code for the .c file
-     my $decl = "$type Parrot_${classname}_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+     my $decl = "$type Parrot_${classname}_${methodname} (Interp *interpreter, PMC* pmc$parameters)";
      $HOUT .= "extern $decl;\n";
 
      $methodbody{ $methodname } =

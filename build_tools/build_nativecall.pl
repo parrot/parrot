@@ -79,7 +79,7 @@ my (%proto_type) = (p => "void *",
 		    d => "double",
 		    t => "char *",
 		    v => "void",
-		    I => "struct Parrot_Interp *",
+		    I => "Interp *",
 		    P => "PMC *",
 		    O => "PMC *",
 		    b => "void *",
@@ -188,7 +188,7 @@ print NCI <<'HEAD';
    hackish, but that's just fine */
 
 static void
-set_return_val(struct Parrot_Interp *interpreter, int stack, int ints,
+set_return_val(Interp *interpreter, int stack, int ints,
                int strings, int pmcs, int nums) {
     REG_INT(0) = stack;
     REG_INT(1) = ints;
@@ -237,7 +237,7 @@ print NCI <<TAIL;
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
 void *
-build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
+build_call_func(Interp *interpreter, PMC *pmc_nci,
                 STRING *signature)
 {
     STRING *ns;
@@ -377,7 +377,7 @@ sub generate_func_header {
     $extra_postamble = join("", @extra_postamble);
     print NCI <<HEADER;
 static void
-pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
+pcf_${return}_$params(Interp *interpreter, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
@@ -394,7 +394,7 @@ HEADER
   else {
     print NCI <<HEADER;
 static void
-pcf_${return}(struct Parrot_Interp *interpreter, PMC *self)
+pcf_${return}(Interp *interpreter, PMC *self)
 {
     $ret_type (*pointer)(void);
     $ret_type_decl return_data;
@@ -430,7 +430,7 @@ CALL
 
 This is the template thing
 
-static void pcf_$funcname(struct Parrot_Interp *interpreter, PMC *self) {
+static void pcf_$funcname(Interp *interpreter, PMC *self) {
     $ret_type (*pointer)();
     $ret_type return_data;
 

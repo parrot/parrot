@@ -28,7 +28,7 @@ src/test_main.c
 /*
 
 =item C<void
-trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)>
+trace_pmc_dump(Interp *interpreter, PMC* pmc)>
 
 Prints a PMC to C<stderr>.
 
@@ -37,7 +37,7 @@ Prints a PMC to C<stderr>.
 */
 
 void
-trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
+trace_pmc_dump(Interp *interpreter, PMC* pmc)
 {
     char *escaped;
     if (pmc && pmc != PMCNULL) {
@@ -92,7 +92,7 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
 /*
 
 =item C<void
-trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)>
+trace_key_dump(Interp *interpreter, PMC *key)>
 
 Prints a key to C<stderr>.
 
@@ -101,7 +101,7 @@ Prints a key to C<stderr>.
 */
 
 void
-trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
+trace_key_dump(Interp *interpreter, PMC *key)
 {
     char *escaped;
     STRING *s;
@@ -161,7 +161,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
 /*
 
 =item C<void
-trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
+trace_op_dump(Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
@@ -173,7 +173,7 @@ Prints the PC, OP and ARGS. Used by C<trace_op()>.
 */
 
 void
-trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
+trace_op_dump(Interp *interpreter, opcode_t *code_start,
               opcode_t *pc)
 {
     INTVAL i;
@@ -295,7 +295,7 @@ done:
 /*
 
 =item C<void
-trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
+trace_op(Interp *interpreter, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)>
 
 TODO: This isn't really part of the API, but here's its documentation.
@@ -308,7 +308,7 @@ checking.
 */
 
 void
-trace_op(struct Parrot_Interp *interpreter, opcode_t *code_start,
+trace_op(Interp *interpreter, opcode_t *code_start,
          opcode_t *code_end, opcode_t *pc)
 {
     if (!pc) {

@@ -49,7 +49,7 @@ the type for the format.
 /*
 
 =item C<STRING *
-Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat, va_list args)>
+Parrot_vsprintf_s(Interp *interpreter, STRING *pat, va_list args)>
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
@@ -60,7 +60,7 @@ in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 */
 
 STRING *
-Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat, va_list args)
+Parrot_vsprintf_s(Interp *interpreter, STRING *pat, va_list args)
 {
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
@@ -71,7 +71,7 @@ Parrot_vsprintf_s(struct Parrot_Interp *interpreter, STRING *pat, va_list args)
 /*
 
 =item C<STRING *
-Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
+Parrot_vsprintf_c(Interp *interpreter, const char *pat,
                   va_list args)>
 
 C string version of C<Parrot_vsprintf_s()>.
@@ -81,7 +81,7 @@ C string version of C<Parrot_vsprintf_s()>.
 */
 
 STRING *
-Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
+Parrot_vsprintf_c(Interp *interpreter, const char *pat,
                   va_list args)
 {
     STRING *realpat, *ret;
@@ -99,7 +99,7 @@ Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
 /*
 
 =item C<void
-Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
+Parrot_vsnprintf(Interp *interpreter, char *targ,
                  size_t len, const char *pat, va_list args)>
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
@@ -110,7 +110,7 @@ Similar to C<Parrot_vsprintf()> but with an option to specify the length
 */
 
 void
-Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
+Parrot_vsnprintf(Interp *interpreter, char *targ,
                  size_t len, const char *pat, va_list args)
 {
     STRING *ret;
@@ -134,7 +134,7 @@ Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
 /*
 
 =item C<STRING *
-Parrot_sprintf_s(struct Parrot_Interp *interpreter, STRING *pat, ...)>
+Parrot_sprintf_s(Interp *interpreter, STRING *pat, ...)>
 
 Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
@@ -143,7 +143,7 @@ Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 */
 
 STRING *
-Parrot_sprintf_s(struct Parrot_Interp *interpreter, STRING *pat, ...)
+Parrot_sprintf_s(Interp *interpreter, STRING *pat, ...)
 {
     STRING *ret;
     va_list args;
@@ -160,7 +160,7 @@ Parrot_sprintf_s(struct Parrot_Interp *interpreter, STRING *pat, ...)
 /*
 
 =item C<STRING *
-Parrot_sprintf_c(struct Parrot_Interp *interpreter, const char *pat, ...)>
+Parrot_sprintf_c(Interp *interpreter, const char *pat, ...)>
 
 C string version of C<Parrot_sprintf_s()>.
 
@@ -169,7 +169,7 @@ C string version of C<Parrot_sprintf_s()>.
 */
 
 STRING *
-Parrot_sprintf_c(struct Parrot_Interp *interpreter, const char *pat, ...)
+Parrot_sprintf_c(Interp *interpreter, const char *pat, ...)
 {
     STRING *ret;
     va_list args;
@@ -186,7 +186,7 @@ Parrot_sprintf_c(struct Parrot_Interp *interpreter, const char *pat, ...)
 /*
 
 =item C<void
-Parrot_snprintf(struct Parrot_Interp *interpreter, char *targ, size_t len,
+Parrot_snprintf(Interp *interpreter, char *targ, size_t len,
                 const char *pat, ...)>
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
@@ -197,7 +197,7 @@ Similar to C<Parrot_sprintf()> but with an option to specify the length
 */
 
 void
-Parrot_snprintf(struct Parrot_Interp *interpreter, char *targ, size_t len,
+Parrot_snprintf(Interp *interpreter, char *targ, size_t len,
                 const char *pat, ...)
 {
     va_list args;
@@ -212,7 +212,7 @@ Parrot_snprintf(struct Parrot_Interp *interpreter, char *targ, size_t len,
 /*
 
 =item C<STRING *
-Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat, PMC *ary)>
+Parrot_psprintf(Interp *interpreter, STRING *pat, PMC *ary)>
 
 Calls C<Parrot_sprintf_format()> with the insertion arguments in an
 C<Array> PMC.
@@ -222,7 +222,7 @@ C<Array> PMC.
 */
 
 STRING *
-Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat, PMC *ary)
+Parrot_psprintf(Interp *interpreter, STRING *pat, PMC *ary)
 {
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;

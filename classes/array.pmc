@@ -22,7 +22,7 @@ These are the vtable functions for the Array base class.
 
 /*
 
-=item C<static PMC* undef(struct Parrot_Interp* interpreter)>
+=item C<static PMC* undef(Interp* interpreter)>
 
 Returns a C<PerlUndef> PMC.
 
@@ -30,7 +30,7 @@ Returns a C<PerlUndef> PMC.
 
 */
 
-static PMC* undef(struct Parrot_Interp* interpreter)
+static PMC* undef(Interp* interpreter)
 {
     return pmc_new(interpreter, enum_class_PerlUndef);
 }

@@ -46,7 +46,7 @@ int Parrot_exec_run = 0;
 /*
 
 =item C<void
-Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
+Parrot_exec(Interp *interpreter, opcode_t *pc,
         opcode_t *code_start, opcode_t *code_end)>
 
 Call the jit to get the program code. Adds the members of the data
@@ -57,7 +57,7 @@ section. And emits the executable.
 */
 
 void
-Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
+Parrot_exec(Interp *interpreter, opcode_t *pc,
         opcode_t *code_start, opcode_t *code_end)
 {
     int i, j, *k;

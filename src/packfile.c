@@ -43,9 +43,9 @@ static void default_destroy (struct PackFile_Segment *self);
 static size_t default_packed_size (struct PackFile_Segment *self);
 static opcode_t * default_pack (struct PackFile_Segment *self,
                             opcode_t *dest);
-static opcode_t * default_unpack (struct Parrot_Interp *,
+static opcode_t * default_unpack (Interp *,
         struct PackFile_Segment *self, opcode_t *dest);
-static void default_dump (struct Parrot_Interp *,
+static void default_dump (Interp *,
         struct PackFile_Segment *self);
 
 static struct PackFile_Segment *directory_new (struct PackFile *,
@@ -53,14 +53,14 @@ static struct PackFile_Segment *directory_new (struct PackFile *,
 static void directory_destroy (struct PackFile_Segment *self);
 static size_t directory_packed_size (struct PackFile_Segment *self);
 static opcode_t * directory_pack (struct PackFile_Segment *, opcode_t *dest);
-static opcode_t * directory_unpack (struct Parrot_Interp *,
+static opcode_t * directory_unpack (Interp *,
         struct PackFile_Segment *, opcode_t *cursor);
-static void directory_dump (struct Parrot_Interp *, struct PackFile_Segment *);
+static void directory_dump (Interp *, struct PackFile_Segment *);
 
 static struct PackFile_Segment *fixup_new (struct PackFile *, const char *, int);
 static size_t fixup_packed_size (struct PackFile_Segment *self);
 static opcode_t * fixup_pack (struct PackFile_Segment * self, opcode_t *dest);
-static opcode_t * fixup_unpack (struct Parrot_Interp *,
+static opcode_t * fixup_unpack (Interp *,
         struct PackFile_Segment*, opcode_t *cursor);
 static void fixup_destroy (struct PackFile_Segment *self);
 
@@ -77,7 +77,7 @@ static struct PackFile_Segment * pf_debug_new (struct PackFile *,
         const char *, int);
 static size_t pf_debug_packed_size (struct PackFile_Segment *self);
 static opcode_t * pf_debug_pack (struct PackFile_Segment *self, opcode_t *);
-static opcode_t * pf_debug_unpack (struct Parrot_Interp *,
+static opcode_t * pf_debug_unpack (Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (struct PackFile_Segment *self);
 
@@ -399,7 +399,7 @@ mark_const_subs(Parrot_Interp interpreter)
 /*
 
 =item C<static void
-fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self,
+fixup_subs(Interp *interpreter, struct PackFile *self,
    int action)>
 
 Fixes up the constant subroutine objects. B<action> is one of
@@ -410,7 +410,7 @@ B<PBC_PBC>, B<PBC_LOADED>, or B<PBC_MAIN>.
 */
 
 static void
-fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
+fixup_subs(Interp *interpreter, struct PackFile *self, int action)
 {
     opcode_t i, ci;
     struct PackFile_FixupTable *ft;
@@ -483,7 +483,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
 /*
 
 =item C<opcode_t
-PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
+PackFile_unpack(Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)>
 
 Unpack a C<PackFile> from a block of memory. The format is:
@@ -525,7 +525,7 @@ Returns size of unpacked if everything is OK, else zero (0).
 */
 
 opcode_t
-PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
+PackFile_unpack(Interp *interpreter, struct PackFile *self,
                 opcode_t *packed, size_t packed_size)
 {
     struct PackFile_Header *header = self->header;
@@ -948,7 +948,7 @@ INTVAL PackFile_funcs_register(struct PackFile *pf, UINTVAL type,
 
 /*
 
-=item C<static opcode_t * default_unpack (struct Parrot_Interp *interpreter,
+=item C<static opcode_t * default_unpack (Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)>
 
 The default unpack function.
@@ -957,7 +957,7 @@ The default unpack function.
 
 */
 
-static opcode_t * default_unpack (struct Parrot_Interp *interpreter,
+static opcode_t * default_unpack (Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)
 {
     if (self->pf->header->dir_format) {
@@ -1225,7 +1225,7 @@ PackFile_Segment_pack(struct PackFile_Segment * self, opcode_t *cursor)
 /*
 
 =item C<opcode_t *
-PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
+PackFile_Segment_unpack(Interp *interpreter,
         struct PackFile_Segment * self, opcode_t *cursor)>
 
 All all these functions call the related C<default_*> function.
@@ -1237,7 +1237,7 @@ If a special is defined this gets called after.
 */
 
 opcode_t *
-PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
+PackFile_Segment_unpack(Interp *interpreter,
         struct PackFile_Segment * self, opcode_t *cursor)
 {
     PackFile_Segment_unpack_func_t f =
@@ -1258,7 +1258,7 @@ PackFile_Segment_unpack(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PackFile_Segment_dump(struct Parrot_Interp *interpreter,
+PackFile_Segment_dump(Interp *interpreter,
         struct PackFile_Segment *self)>
 
 Dumps the segment C<self>.
@@ -1268,7 +1268,7 @@ Dumps the segment C<self>.
 */
 
 void
-PackFile_Segment_dump(struct Parrot_Interp *interpreter,
+PackFile_Segment_dump(Interp *interpreter,
         struct PackFile_Segment *self)
 {
     self->pf->PackFuncs[self->type].dump(interpreter, self);
@@ -1307,7 +1307,7 @@ directory_new (struct PackFile *pf, const char *name, int add)
 /*
 
 =item C<static void
-directory_dump(struct Parrot_Interp *interpreter,
+directory_dump(Interp *interpreter,
                 struct PackFile_Segment *self)>
 
 Dumps the directory C<self>.
@@ -1317,7 +1317,7 @@ Dumps the directory C<self>.
 */
 
 static void
-directory_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
+directory_dump (Interp *interpreter, struct PackFile_Segment *self)
 {
     struct PackFile_Directory *dir = (struct PackFile_Directory *) self;
     size_t i;
@@ -1344,7 +1344,7 @@ directory_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self
 /*
 
 =item C<static opcode_t *
-directory_unpack(struct Parrot_Interp *interpreter,
+directory_unpack(Interp *interpreter,
         struct PackFile_Segment *segp, opcode_t * cursor)>
 
 Unpacks the directory.
@@ -1354,7 +1354,7 @@ Unpacks the directory.
 */
 
 static opcode_t *
-directory_unpack (struct Parrot_Interp *interpreter,
+directory_unpack (Interp *interpreter,
         struct PackFile_Segment *segp, opcode_t * cursor)
 {
     size_t i;
@@ -1899,7 +1899,7 @@ pf_debug_pack (struct PackFile_Segment *self, opcode_t *cursor)
 /*
 
 =item C<static opcode_t *
-pf_debug_unpack(struct Parrot_Interp *interpreter,
+pf_debug_unpack(Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)>
 
 I<What does this do?>
@@ -1909,7 +1909,7 @@ I<What does this do?>
 */
 
 static opcode_t *
-pf_debug_unpack (struct Parrot_Interp *interpreter,
+pf_debug_unpack (Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
@@ -1941,7 +1941,7 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
 /*
 
 =item C<struct PackFile_Debug *
-Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
+Parrot_new_debug_seg(Interp *interpreter,
         struct PackFile_ByteCode *cs, const char *filename, size_t size)>
 
 Create and append (or resize) a new debug seg for a code segment.
@@ -1951,7 +1951,7 @@ Create and append (or resize) a new debug seg for a code segment.
 */
 
 struct PackFile_Debug *
-Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
+Parrot_new_debug_seg(Interp *interpreter,
         struct PackFile_ByteCode *cs, const char *filename, size_t size)
 {
     struct PackFile_Debug *debug;
@@ -1984,7 +1984,7 @@ Parrot_new_debug_seg(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)>
+Parrot_switch_to_cs_by_nr(Interp *interpreter, opcode_t seg)>
 
 Switch to byte code segment number C<seg>.
 
@@ -1993,7 +1993,7 @@ Switch to byte code segment number C<seg>.
 */
 
 void
-Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
+Parrot_switch_to_cs_by_nr(Interp *interpreter, opcode_t seg)
 {
     struct PackFile_Directory *dir = &interpreter->code->directory;
     size_t i, num_segs;
@@ -2017,7 +2017,7 @@ Parrot_switch_to_cs_by_nr(struct Parrot_Interp *interpreter, opcode_t seg)
 /*
 
 =item C<struct PackFile_ByteCode *
-Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
+Parrot_switch_to_cs(Interp *interpreter,
     struct PackFile_ByteCode *new_cs, int really)>
 
 Switch to a byte code segment C<new_cs>, returning the old segment.
@@ -2027,7 +2027,7 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 */
 
 struct PackFile_ByteCode *
-Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
+Parrot_switch_to_cs(Interp *interpreter,
     struct PackFile_ByteCode *new_cs, int really)
 {
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
@@ -2058,7 +2058,7 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-Parrot_pop_cs(struct Parrot_Interp *interpreter)>
+Parrot_pop_cs(Interp *interpreter)>
 
 Destroy current byte code segment and switch to previous.
 
@@ -2067,7 +2067,7 @@ Destroy current byte code segment and switch to previous.
 */
 
 void
-Parrot_pop_cs(struct Parrot_Interp *interpreter)
+Parrot_pop_cs(Interp *interpreter)
 {
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
     struct PackFile_ByteCode *new_cs = cur_cs->prev;
@@ -2234,7 +2234,7 @@ fixup_new (struct PackFile *pf, const char *name, int add)
 /*
 
 =item C<static opcode_t *
-fixup_unpack(struct Parrot_Interp *interpreter,
+fixup_unpack(Interp *interpreter,
         struct PackFile_Segment *seg, opcode_t *cursor)>
 
 Unpack a PackFile FixupTable from a block of memory.
@@ -2246,7 +2246,7 @@ Returns one (1) if everything is OK, else zero (0).
 */
 
 static opcode_t *
-fixup_unpack(struct Parrot_Interp *interpreter,
+fixup_unpack(Interp *interpreter,
         struct PackFile_Segment *seg, opcode_t *cursor)
 {
     opcode_t i;
@@ -2298,7 +2298,7 @@ fixup_unpack(struct Parrot_Interp *interpreter,
 
 /*
 
-=item C<void PackFile_FixupTable_new_entry(struct Parrot_Interp *interpreter,
+=item C<void PackFile_FixupTable_new_entry(Interp *interpreter,
         char *label, enum_fixup_t type, opcode_t offs)>
 
 I<What does this do?>
@@ -2307,7 +2307,7 @@ I<What does this do?>
 
 */
 
-void PackFile_FixupTable_new_entry(struct Parrot_Interp *interpreter,
+void PackFile_FixupTable_new_entry(Interp *interpreter,
         char *label, enum_fixup_t type, opcode_t offs)
 {
     struct PackFile_FixupTable *self = interpreter->code->cur_cs->fixups;
@@ -2394,7 +2394,7 @@ find_fixup_iter(struct PackFile_Segment *seg, void *user_data)
 /*
 
 =item C<struct PackFile_FixupEntry *
-PackFile_find_fixup_entry(struct Parrot_Interp *interpreter, enum_fixup_t type,
+PackFile_find_fixup_entry(Interp *interpreter, enum_fixup_t type,
         char * name)>
 
 I<What does this do?>
@@ -2404,7 +2404,7 @@ I<What does this do?>
 */
 
 struct PackFile_FixupEntry *
-PackFile_find_fixup_entry(struct Parrot_Interp *interpreter, enum_fixup_t type,
+PackFile_find_fixup_entry(Interp *interpreter, enum_fixup_t type,
         char * name)
 {
     /* TODO make a hash of all fixups */
@@ -2469,7 +2469,7 @@ struct PackFile_Constant *exec_const_table;
 /*
 
 =item C<opcode_t *
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+PackFile_ConstTable_unpack(Interp *interpreter,
         struct PackFile_Segment *seg,
         opcode_t *cursor)>
 
@@ -2485,7 +2485,7 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 opcode_t *
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+PackFile_ConstTable_unpack(Interp *interpreter,
         struct PackFile_Segment *seg,
         opcode_t *cursor)
 {
@@ -2701,7 +2701,7 @@ PackFile_Constant_pack_size(struct PackFile_Constant *self)
 /*
 
 =item C<opcode_t *
-PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack(Interp *interpreter,
                          struct PackFile_ConstTable *constt,
                          struct PackFile_Constant *self, opcode_t *cursor)>
 
@@ -2717,7 +2717,7 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 opcode_t *
-PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack(Interp *interpreter,
                          struct PackFile_ConstTable *constt,
                          struct PackFile_Constant *self, opcode_t *cursor)
 {
@@ -2764,7 +2764,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack_pmc(Interp *interpreter,
                          struct PackFile_ConstTable *constt,
                          struct PackFile_Constant *self,
                          opcode_t *cursor)>
@@ -2852,7 +2852,7 @@ global_ns:
 }
 
 opcode_t *
-PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack_pmc(Interp *interpreter,
                          struct PackFile_ConstTable *constt,
                          struct PackFile_Constant *self,
                          opcode_t *cursor)
@@ -2942,7 +2942,7 @@ PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
 /*
 
 =item C<opcode_t *
-PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack_key(Interp *interpreter,
                              struct PackFile_ConstTable *constt,
                              struct PackFile_Constant *self,
                              opcode_t *cursor)>
@@ -2960,7 +2960,7 @@ Returns cursor if everything is OK, else zero (0).
 */
 
 opcode_t *
-PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
+PackFile_Constant_unpack_key(Interp *interpreter,
                              struct PackFile_ConstTable *constt,
                              struct PackFile_Constant *self,
                              opcode_t *cursor)
@@ -3024,7 +3024,7 @@ PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static struct PackFile *
-PackFile_append_pbc(struct Parrot_Interp *interpreter, char *filename)>
+PackFile_append_pbc(Interp *interpreter, char *filename)>
 
 Read a PBC and append it to the current directory
 Fixup local label and sub addresses in newly loaded bytecode.
@@ -3034,7 +3034,7 @@ Fixup local label and sub addresses in newly loaded bytecode.
 */
 
 static struct PackFile *
-PackFile_append_pbc(struct Parrot_Interp *interpreter, char *filename)
+PackFile_append_pbc(Interp *interpreter, char *filename)
 {
     struct PackFile * pf = Parrot_readbc(interpreter, filename);
     if (!pf)
@@ -3047,7 +3047,7 @@ PackFile_append_pbc(struct Parrot_Interp *interpreter, char *filename)
 /*
 
 =item C<void
-Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)>
+Parrot_load_bytecode(Interp *interpreter, char *filename)>
 
 Load and append a bytecode, IMC or PASM file into interpreter.
 
@@ -3059,7 +3059,7 @@ directory.
 */
 
 void
-Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
+Parrot_load_bytecode(Interp *interpreter, char *filename)
 {
     char *ext;
 
@@ -3105,7 +3105,7 @@ Parrot_load_bytecode(struct Parrot_Interp *interpreter, char *filename)
 /*
 
 =item C<void
-PackFile_fixup_subs(struct Parrot_Interp *interpreter)>
+PackFile_fixup_subs(Interp *interpreter)>
 
 I<What does this do?>
 
@@ -3114,7 +3114,7 @@ I<What does this do?>
 */
 
 void
-PackFile_fixup_subs(struct Parrot_Interp *interpreter)
+PackFile_fixup_subs(Interp *interpreter)
 {
     fixup_subs(interpreter, interpreter->code, PBC_MAIN);
 }

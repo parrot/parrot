@@ -37,7 +37,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-int do_test(struct Parrot_Interp* interpreter) {
+int do_test(Interp* interpreter) {
     STRING *S;
     PMC *pmc;
     INTVAL ival;
@@ -168,7 +168,7 @@ int do_test(struct Parrot_Interp* interpreter) {
 }
 
 int main(int argc, char* argv[]) {
-    struct Parrot_Interp * interpreter;
+    Interp * interpreter;
 
     interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
@@ -214,7 +214,7 @@ c_output_like (<<'CODE', "/[0-9a-f]*\nok\n/", "many printfs");
 int main ()
 {
     INTVAL i;
-    struct Parrot_Interp *interp = NULL;
+    Interp *interp = NULL;
 
     interp = Parrot_new (NULL);
     Parrot_init(interp);

@@ -78,7 +78,7 @@ void ex3(int x, void*p)
 
 int main(int argc, char* argv[])
 {
-    struct Parrot_Interp *     interpreter;
+    Interp *     interpreter;
 
     interpreter = Parrot_new(NULL);
     if (!interpreter) {

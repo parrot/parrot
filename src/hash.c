@@ -872,7 +872,7 @@ hash_delete(Interp *interpreter, Hash *hash, void *okey)
 /*
 
 =item C<void
-hash_clone(struct Parrot_Interp *interp, Hash *hash, Hash **dest)>
+hash_clone(Interp *interp, Hash *hash, Hash **dest)>
 
 Clones C<hash> to C<dest>.
 
@@ -881,7 +881,7 @@ Clones C<hash> to C<dest>.
 */
 
 void
-hash_clone(struct Parrot_Interp *interp, Hash *hash, Hash **dest)
+hash_clone(Interp *interp, Hash *hash, Hash **dest)
 {
     HashIndex i;
 

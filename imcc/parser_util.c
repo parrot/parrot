@@ -37,7 +37,7 @@ void imcc_init(Parrot_Interp interpreter);
  * best would be to have a flag in core.ops, where a PMC type is expected
  */
 Instruction *
-iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0,
+iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
         char * type, SymReg *init, int emit)
 {
     char fmt[256];
@@ -88,7 +88,7 @@ iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0,
  */
 
 Instruction *
-iNEWSUB(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0,
+iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
         int type, SymReg *subinit, SymReg *retinit, int emit)
 {
     char fmt[256];
@@ -241,7 +241,7 @@ get_keyvec(Parrot_Interp interpreter, int op)
  * Return opcode value for op name
  */
 int
-check_op(struct Parrot_Interp *interpreter, char *fullname,
+check_op(Interp *interpreter, char *fullname,
         char *name, SymReg *r[], int narg, int keyvec)
 {
     int op;
@@ -255,7 +255,7 @@ check_op(struct Parrot_Interp *interpreter, char *fullname,
  * Is instruction a parrot opcode?
  */
 int
-is_op(struct Parrot_Interp *interpreter, char *name)
+is_op(Interp *interpreter, char *name)
 {
     return interpreter->op_lib->op_code(name, 0) >= 0
         || interpreter->op_lib->op_code(name, 1) >= 0;
@@ -272,7 +272,7 @@ is_op(struct Parrot_Interp *interpreter, char *name)
  * s. e.g. imc.c for usage
  */
 Instruction *
-INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
+INS(Interp *interpreter, IMC_Unit * unit, char *name,
         const char *fmt, SymReg **r, int n, int keyvec, int emit)
 {
     char fullname[64];
@@ -667,7 +667,7 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name,
 }
 
 Instruction *
-multi_keyed(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
+multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
             SymReg ** r, int nr, int keyvec, int emit)
 {
     int i, keyf, kv, n;

@@ -12,14 +12,14 @@
 #include "optimizer.h"
 
 
-void imc_check_units(struct Parrot_Interp *interp, char * caller);
+void imc_check_units(Interp *interp, char * caller);
 
 /*
  * A sanity checking function used for debugging only.
  * Useful for tracking down memory corruptions by inserting
  * validation calls between compilation steps.
  */
-void imc_check_units(struct Parrot_Interp *interp, char * caller)
+void imc_check_units(Interp *interp, char * caller)
 {
 #if IMC_TRACE
     IMC_Unit * unit, *unit_next;
@@ -49,7 +49,7 @@ void imc_check_units(struct Parrot_Interp *interp, char * caller)
 
 
 void
-imc_compile_all_units(struct Parrot_Interp *interp)
+imc_compile_all_units(Interp *interp)
 {
     IMC_Unit *unit, *unit_next;
     Instruction *ins, *ins_next;
@@ -99,7 +99,7 @@ imc_compile_all_units(struct Parrot_Interp *interp)
  * on a single compilation unit at a time.
  */
 void
-imc_compile_unit(struct Parrot_Interp *interp, IMC_Unit * unit)
+imc_compile_unit(Interp *interp, IMC_Unit * unit)
 {
     /* Not much here for now except the allocator */
     cur_unit = unit;
@@ -117,7 +117,7 @@ imc_compile_unit(struct Parrot_Interp *interp, IMC_Unit * unit)
  * ready for a new compiler invokation goes here.
  */
 void
-imc_cleanup(struct Parrot_Interp *interp)
+imc_cleanup(Interp *interp)
 {
      UNUSED(interp);
      clear_globals();

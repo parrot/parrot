@@ -84,7 +84,7 @@ static int r_special[5];
 static int w_special[1+4*3];
 
 void
-imcc_init_tables(struct Parrot_Interp * interpreter)
+imcc_init_tables(Interp * interpreter)
 {
     size_t i;
     const char *reads[] = {
@@ -474,7 +474,7 @@ e_file_open(void *param)
 static int
 e_file_close(void *param)
 {
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
     printf("\n\n");
     fclose(stdout);
     info(interpreter, 1, "assembly module %s written.\n", output);
@@ -514,7 +514,7 @@ int
 emit_flush(void *param, IMC_Unit * unit)
 {
     Instruction * ins;
-    struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+    Interp *interpreter = (Interp *)param;
     UNUSED(unit);
 #if IMC_TRACE
     fprintf(stderr, "instructions.c: emit_flush\n");

@@ -118,19 +118,19 @@ you. That'd be no fun. Use the following routines to control GC:
 
 =over 4
 
-=item Parrot_block_DOD(struct Parrot_Interp *interpreter)
+=item Parrot_block_DOD(Interp *interpreter)
 
 Block DOD for the passed interpreter. (But B<not> GC)
 
-=item Parrot_block_GC(struct Parrot_Interp *interpreter)
+=item Parrot_block_GC(Interp *interpreter)
 
 Block GC for the passed interpreter. (But B<not> DOD)
 
-=item Parrot_unblock_DOD(struct Parrot_Interp *interpreter)
+=item Parrot_unblock_DOD(Interp *interpreter)
 
 Unblock DOD for the passed interpreter. (But not GC)
 
-=item Parrot_unblock_GC(struct Parrot_Interp *interpreter)
+=item Parrot_unblock_GC(Interp *interpreter)
 
 Unblock GC for the passed interpreter. (But not DOD)
 

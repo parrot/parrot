@@ -27,7 +27,7 @@ messages.
 =over 4
 
 =item C<static int
-find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)>
+find_line(Interp *interpreter, struct PackFile_Debug * debug)>
 
 Find the line number.
 
@@ -40,7 +40,7 @@ I<What does returning -1 mean?>
 */
 
 static int
-find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)
+find_line(Interp *interpreter, struct PackFile_Debug * debug)
 {
     size_t offs, i, n;
     op_info_t *op_info;
@@ -121,7 +121,7 @@ print_pbc_location_stdio(Parrot_Interp interpreter)
 /*
 
 =item C<static INTVAL
-print_warning(struct Parrot_Interp *interpreter, STRING *msg)>
+print_warning(Interp *interpreter, STRING *msg)>
 
 Prints the warning message and the bytecode location.
 
@@ -130,7 +130,7 @@ Prints the warning message and the bytecode location.
 */
 
 static INTVAL
-print_warning(struct Parrot_Interp *interpreter, STRING *msg)
+print_warning(Interp *interpreter, STRING *msg)
 {
 
     if (!msg)
@@ -153,7 +153,7 @@ print_warning(struct Parrot_Interp *interpreter, STRING *msg)
 =over
 
 =item C<INTVAL
-Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
+Parrot_warn(Interp *interpreter, INTVAL warnclass,
             const char *message, ...)>
 
 The Parrot C string warning/error reporter.
@@ -167,7 +167,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 */
 
 INTVAL
-Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
+Parrot_warn(Interp *interpreter, INTVAL warnclass,
             const char *message, ...)
 {
     STRING *targ;
@@ -188,7 +188,7 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
 /*
 
 =item C<INTVAL
-Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
+Parrot_warn_s(Interp *interpreter, INTVAL warnclass,
               STRING *message, ...)>
 
 The Parrot C<STRING> warning/error reporter.
@@ -202,7 +202,7 @@ C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
 */
 
 INTVAL
-Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
+Parrot_warn_s(Interp *interpreter, INTVAL warnclass,
               STRING *message, ...)
 {
     STRING *targ;

@@ -65,7 +65,7 @@ int
 main(int argc, char **argv)
 {
     struct PackFile *pf;
-    struct Parrot_Interp *interpreter;
+    Interp *interpreter;
     struct PackFile_Segment *seg;
 
     interpreter = make_interpreter(NULL, NO_FLAGS);

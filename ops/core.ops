@@ -820,8 +820,8 @@ Get the current ParrotInterpreter.
 =cut
 
 op runinterp(in PMC, label INT) {
-  struct Parrot_Interp * new_interp =
-      (struct Parrot_Interp *)PMC_data($1);
+  Interp * new_interp =
+      (Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
   runops(new_interp, REL_PC + $2);

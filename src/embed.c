@@ -45,7 +45,7 @@ extern void Parrot_initialize_core_pmcs(Interp *interp);
 
 /*
 
-=item C<void Parrot_init(struct Parrot_Interp *interpreter)>
+=item C<void Parrot_init(Interp *interpreter)>
 
 Initializes the new interpreter. This function only has effect the first
 time it is called.
@@ -55,7 +55,7 @@ time it is called.
 */
 
 void
-Parrot_init(struct Parrot_Interp *interpreter)
+Parrot_init(Interp *interpreter)
 {
 
     if (!interpreter->world_inited) {
@@ -71,14 +71,14 @@ Parrot_init(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)>
+Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)>
 
 =cut
 
 */
 
 void
-Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)
+Parrot_set_flag(Interp *interpreter, Parrot_Interp_flag flag)
 {
     /* These two macros (from interpreter.h) do exactly what they look like. */
 
@@ -129,7 +129,7 @@ Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
 /*
 
 =item C<void
-Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)>
+Parrot_set_run_core(Interp *interpreter, Parrot_Run_core_t core)>
 
 Sets the specified run core.
 
@@ -138,7 +138,7 @@ Sets the specified run core.
 */
 
 void
-Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)
+Parrot_set_run_core(Interp *interpreter, Parrot_Run_core_t core)
 {
     Interp_core_SET(interpreter, core);
 }
@@ -146,7 +146,7 @@ Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)
 /*
 
 =item C<void
-Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)>
+Parrot_setwarnings(Interp *interpreter, Parrot_warnclass wc)>
 
 Activates the given warnings.
 
@@ -155,7 +155,7 @@ Activates the given warnings.
 */
 
 void
-Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
+Parrot_setwarnings(Interp *interpreter, Parrot_warnclass wc)
 {
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interpreter, wc);
@@ -164,7 +164,7 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 /*
 
 =item C<struct PackFile *
-Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)>
+Parrot_readbc(Interp *interpreter, const char *filename)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure and do fixups.
 
@@ -173,7 +173,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure and do fixups.
 */
 
 struct PackFile *
-Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)
+Parrot_readbc(Interp *interpreter, const char *filename)
 {
 #if PARROT_HAS_HEADER_UNISTD
     off_t program_size, wanted;
@@ -366,7 +366,7 @@ again:
 /*
 
 =item C<void
-Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)>
+Parrot_loadbc(Interp *interpreter, struct PackFile *pf)>
 
 Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
@@ -375,7 +375,7 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 */
 
 void
-Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
+Parrot_loadbc(Interp *interpreter, struct PackFile *pf)
 {
     interpreter->code = pf;
 }
@@ -383,7 +383,7 @@ Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 /*
 
 =item C<static void
-setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)>
+setup_argv(Interp *interpreter, int argc, char ** argv)>
 
 Sets up the C<ARGV> array in P5.
 
@@ -392,7 +392,7 @@ Sets up the C<ARGV> array in P5.
 */
 
 static void
-setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
+setup_argv(Interp *interpreter, int argc, char ** argv)
 {
     INTVAL i;
     PMC *userargv;
@@ -427,7 +427,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 /*
 
 =item C<void
-Parrot_setup_opt(struct Parrot_Interp *interpreter, int n, char *argv)>
+Parrot_setup_opt(Interp *interpreter, int n, char *argv)>
 
 XXX This allows a command line option to be visible from inside the
 Parrot core, this is done using the pointers in the interpreter
@@ -439,7 +439,7 @@ before running.
 */
 
 void
-Parrot_setup_opt(struct Parrot_Interp *interpreter, int n, char *argv)
+Parrot_setup_opt(Interp *interpreter, int n, char *argv)
 {
     interpreter->string_reg.registers[n] = (STRING *)argv;
 }
@@ -622,7 +622,7 @@ print_debug(int status, void *p)
 /*
 
 =item C<void
-Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])>
+Parrot_runcode(Interp *interpreter, int argc, char *argv[])>
 
 Sets up C<ARGV> and runs the ops.
 
@@ -631,7 +631,7 @@ Sets up C<ARGV> and runs the ops.
 */
 
 void
-Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
+Parrot_runcode(Interp *interpreter, int argc, char *argv[])
 {
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
@@ -735,7 +735,7 @@ argv_join(char ** argv)
 /*
 
 =item C<void
-Parrot_debug(struct Parrot_Interp *interpreter, int argc, char **argv)>
+Parrot_debug(Interp *interpreter, int argc, char **argv)>
 
 Runs the interpreter's bytecode in debugging mode.
 
@@ -744,7 +744,7 @@ Runs the interpreter's bytecode in debugging mode.
 */
 
 void
-Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
+Parrot_debug(Interp *interpreter, int argc, char ** argv)
 {
     PDB_t *pdb;
     const char *command;
@@ -767,7 +767,7 @@ Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
 /*
 
 =item C<void
-Parrot_disassemble(struct Parrot_Interp *interpreter)>
+Parrot_disassemble(Interp *interpreter)>
 
 Disassembles and prints out the interpreter's bytecode.
 
@@ -778,7 +778,7 @@ This is used by the Parrot disassembler.
 */
 
 void
-Parrot_disassemble(struct Parrot_Interp *interpreter)
+Parrot_disassemble(Interp *interpreter)
 {
     PDB_t *pdb;
     PDB_line_t *line;

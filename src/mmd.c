@@ -36,15 +36,15 @@ them, with default behaviour.
 */
 
 #include "parrot/parrot.h"
-typedef void (*pmc_mmd_f)(struct Parrot_Interp *, PMC *, PMC *, PMC *);
-typedef STRING *(*string_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
-typedef INTVAL (*intval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
-typedef FLOATVAL (*floatval_mmd_f)(struct Parrot_Interp *, PMC *, PMC *);
+typedef void (*pmc_mmd_f)(Interp *, PMC *, PMC *, PMC *);
+typedef STRING *(*string_mmd_f)(Interp *, PMC *, PMC *);
+typedef INTVAL (*intval_mmd_f)(Interp *, PMC *, PMC *);
+typedef FLOATVAL (*floatval_mmd_f)(Interp *, PMC *, PMC *);
 
 /*
 
 =item C<void
-mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
+mmd_dispatch_pmc(Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)>
 
 Dispatch to a multimethod that "returns" a PMC. C<left>, C<right>, and
@@ -63,7 +63,7 @@ return a PMC" vtable functions do.
 */
 
 void
-mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
+mmd_dispatch_pmc(Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)
 {
     pmc_mmd_f real_function;
@@ -94,7 +94,7 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-mmd_dispatch_string(struct Parrot_Interp *interpreter,
+mmd_dispatch_string(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)>
 
 Dispatch to a multimethod that returns a string. left and right are PMC
@@ -107,7 +107,7 @@ string.
 */
 
 STRING *
-mmd_dispatch_string(struct Parrot_Interp *interpreter,
+mmd_dispatch_string(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     string_mmd_f real_function;
@@ -129,7 +129,7 @@ mmd_dispatch_string(struct Parrot_Interp *interpreter,
 /*
 
 =item C<INTVAL
-mmd_dispatch_intval(struct Parrot_Interp *interpreter,
+mmd_dispatch_intval(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)>
 
 Like C<mmd_dispatch_string()>, only it returns an C<INTVAL>.
@@ -139,7 +139,7 @@ Like C<mmd_dispatch_string()>, only it returns an C<INTVAL>.
 */
 
 INTVAL
-mmd_dispatch_intval(struct Parrot_Interp *interpreter,
+mmd_dispatch_intval(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     intval_mmd_f real_function;
@@ -161,7 +161,7 @@ mmd_dispatch_intval(struct Parrot_Interp *interpreter,
 /*
 
 =item C<FLOATVAL
-mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
+mmd_dispatch_floatval(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)>
 
 Like C<mmd_dispatch_string()>, only it returns a C<FLOATVAL>.
@@ -171,7 +171,7 @@ Like C<mmd_dispatch_string()>, only it returns a C<FLOATVAL>.
 */
 
 FLOATVAL
-mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
+mmd_dispatch_floatval(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
 
@@ -194,7 +194,7 @@ mmd_dispatch_floatval(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-mmd_add_function(struct Parrot_Interp *interpreter,
+mmd_add_function(Interp *interpreter,
         INTVAL funcnum, funcptr_t function)>
 
 Add a new binary MMD function to the list of functions the MMD system knows
@@ -208,7 +208,7 @@ installed that matches the left and right types for a call).
 */
 
 void
-mmd_add_function(struct Parrot_Interp *interpreter,
+mmd_add_function(Interp *interpreter,
         INTVAL funcnum, funcptr_t function)
 {
     UINTVAL func_count = funcnum + 1;
@@ -263,7 +263,7 @@ mmd_add_function(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)>
+mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)>
 
 Expands the function table in the X dimension to include C<new_x>.
 
@@ -272,7 +272,7 @@ Expands the function table in the X dimension to include C<new_x>.
 */
 
 static void
-mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
+mmd_expand_x(Interp *interpreter, INTVAL function, INTVAL new_x)
 {
     funcptr_t *new_table;
     UINTVAL x;
@@ -321,7 +321,7 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x)
 /*
 
 =item C<static void
-mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)>
+mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)>
 
 Expands the function table in the Y direction.
 
@@ -330,7 +330,7 @@ Expands the function table in the Y direction.
 */
 
 static void
-mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
+mmd_expand_y(Interp *interpreter, INTVAL function, INTVAL new_y)
 {
     funcptr_t *new_table;
     UINTVAL x;
@@ -371,7 +371,7 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 /*
 
 =item C<void
-mmd_add_by_class(struct Parrot_Interp *interpreter,
+mmd_add_by_class(Interp *interpreter,
              INTVAL functype,
              STRING *left_class, STRING *right_class,
              funcptr_t funcptr)>
@@ -401,7 +401,7 @@ automatically be expanded.
 */
 
 void
-mmd_add_by_class(struct Parrot_Interp *interpreter,
+mmd_add_by_class(Interp *interpreter,
              INTVAL functype,
              STRING *left_class, STRING *right_class,
              funcptr_t funcptr)
@@ -423,7 +423,7 @@ mmd_add_by_class(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-mmd_register(struct Parrot_Interp *interpreter,
+mmd_register(Interp *interpreter,
              INTVAL type,
              INTVAL left_type, INTVAL right_type,
              funcptr_t funcptr)>
@@ -453,7 +453,7 @@ future.
 */
 
 void
-mmd_register(struct Parrot_Interp *interpreter,
+mmd_register(Interp *interpreter,
              INTVAL type,
              INTVAL left_type, INTVAL right_type,
              funcptr_t funcptr)

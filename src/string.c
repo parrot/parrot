@@ -49,12 +49,12 @@ strings.
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
 /* statics */
-static void _string_upscale(struct Parrot_Interp *interpreter, STRING *s,
+static void _string_upscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation, UINTVAL capacity);
-static void _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+static void _string_downscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation);
 static parrot_string_representation_t _string_smallest_representation(
-    struct Parrot_Interp *interpreter, STRING *s);
+    Interp *interpreter, STRING *s);
 
 /*
 
@@ -65,7 +65,7 @@ static parrot_string_representation_t _string_smallest_representation(
 =over 4
 
 =item C<static void
-unmake_COW(struct Parrot_Interp *interpreter, STRING *s)>
+unmake_COW(Interp *interpreter, STRING *s)>
 
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
@@ -75,7 +75,7 @@ copied over and the copy-on-write flag is cleared.
 */
 
 static void
-unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
+unmake_COW(Interp *interpreter, STRING *s)
 {
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
@@ -111,7 +111,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<static void
-copy_string_header(struct Parrot_Interp *interpreter, String *dest, String *src)>
+copy_string_header(Interp *interpreter, String *dest, String *src)>
 
 Copies the string header from the first Parrot string to the second.
 
@@ -120,7 +120,7 @@ Copies the string header from the first Parrot string to the second.
 */
 
 static void
-copy_string_header(struct Parrot_Interp *interpreter, String *dest, String *src)
+copy_string_header(Interp *interpreter, String *dest, String *src)
 {
 #if ! DISABLE_GC_DEBUG
     UINTVAL vers;
@@ -135,7 +135,7 @@ copy_string_header(struct Parrot_Interp *interpreter, String *dest, String *src)
 /*
 
 =item C<static STRING *
-make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)>
+make_COW_reference(Interp *interpreter, STRING *s)>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer.
@@ -145,7 +145,7 @@ allocating a new buffer.
 */
 
 static STRING *
-make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
+make_COW_reference(Interp *interpreter, STRING *s)
 {
     STRING *d;
     if (s == NULL) {
@@ -169,7 +169,7 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<static void
-make_COW_reference_from_header(struct Parrot_Interp *interpreter,
+make_COW_reference_from_header(Interp *interpreter,
         STRING *s, STRING *d)>
 
 Makes the second Parrot string a copy-on-write reference to first.
@@ -179,7 +179,7 @@ Makes the second Parrot string a copy-on-write reference to first.
 */
 
 static void
-make_COW_reference_from_header(struct Parrot_Interp *interpreter,
+make_COW_reference_from_header(Interp *interpreter,
         STRING *s, STRING *d)
 {
     if (PObj_constant_TEST(s)) {
@@ -196,7 +196,7 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)>
+string_set(Interp *interpreter, STRING *dest, STRING *src)>
 
 Makes the contents of first Parrot string a copy of the contents of
 second.
@@ -206,7 +206,7 @@ second.
 */
 
 STRING *
-string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
+string_set(Interp *interpreter, STRING *dest, STRING *src)
 {
     if (!src)
         return NULL;
@@ -280,7 +280,7 @@ string_init(Parrot_Interp interpreter)
 /*
 
 =item C<UINTVAL
-string_capacity(struct Parrot_Interp *interpreter, STRING *s)>
+string_capacity(Interp *interpreter, STRING *s)>
 
 Returns the capacity of the specified Parrot string.
 
@@ -289,7 +289,7 @@ Returns the capacity of the specified Parrot string.
 */
 
 UINTVAL
-string_capacity(struct Parrot_Interp *interpreter, STRING *s)
+string_capacity(Interp *interpreter, STRING *s)
 {
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
         (ptrcast_t)s->strstart) / (s->representation);
@@ -298,7 +298,7 @@ string_capacity(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_make_empty(struct Parrot_Interp *interpreter,
+string_make_empty(Interp *interpreter,
     parrot_string_representation_t representation, UINTVAL capacity)>
 
 Creates and returns an empty Parrot string.
@@ -308,7 +308,7 @@ Creates and returns an empty Parrot string.
 */
 
 STRING *
-string_make_empty(struct Parrot_Interp *interpreter,
+string_make_empty(Interp *interpreter,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
     STRING *s;
@@ -325,7 +325,7 @@ string_make_empty(struct Parrot_Interp *interpreter,
 
 /* downscale would need checks? */
 static void
-_string_upscale(struct Parrot_Interp *interpreter, STRING *s,
+_string_upscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
     if (s->representation >= representation) {
@@ -359,7 +359,7 @@ _string_upscale(struct Parrot_Interp *interpreter, STRING *s,
 /* currently, doesn't do any checks to see if the downscale should be allowed.
    thus, assumes caller has already checked. */
 static void
-_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+_string_downscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation)
 {
     if (s->representation <= representation) {
@@ -406,18 +406,18 @@ _string_downscale(struct Parrot_Interp *interpreter, STRING *s,
 }
 
 /* temporary */
-void Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+void Parrot_string_downscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation);
 
 void
-Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+Parrot_string_downscale(Interp *interpreter, STRING *s,
     parrot_string_representation_t representation)
 {
     _string_downscale(interpreter, s, representation);
 }
 
 static parrot_string_representation_t
-_string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
+_string_smallest_representation(Interp *interpreter, STRING *s)
 {
     if (s->representation == enum_stringrep_one) {
         return enum_stringrep_one;
@@ -465,7 +465,7 @@ _string_smallest_representation(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_append(struct Parrot_Interp *interpreter,
+string_append(Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)>
 
 Take in two Parrot strings and append the second to the first.
@@ -475,7 +475,7 @@ Take in two Parrot strings and append the second to the first.
 */
 
 STRING *
-string_append(struct Parrot_Interp *interpreter,
+string_append(Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)
 {
     UINTVAL a_capacity;
@@ -610,7 +610,7 @@ string_append(struct Parrot_Interp *interpreter,
 
 =item C<
 STRING *
-string_from_cstring(struct Parrot_Interp *interpreter,
+string_from_cstring(Interp *interpreter,
     const void *buffer, UINTVAL len)>
 
 Make a Parrot string from a specified C string.
@@ -620,7 +620,7 @@ Make a Parrot string from a specified C string.
 */
 
 STRING *
-string_from_cstring(struct Parrot_Interp *interpreter,
+string_from_cstring(Interp *interpreter,
     const void *buffer, UINTVAL len)
 {
     return string_make(interpreter, buffer, len ? len :
@@ -631,7 +631,7 @@ string_from_cstring(struct Parrot_Interp *interpreter,
 /*
 
 =item C<const char*
-string_primary_encoding_for_representation(struct Parrot_Interp *interpreter,
+string_primary_encoding_for_representation(Interp *interpreter,
     parrot_string_representation_t representation)>
 
 Returns the primary encoding for the specified representation.
@@ -644,7 +644,7 @@ or BOCU.
 */
 
 const char*
-string_primary_encoding_for_representation(struct Parrot_Interp *interpreter,
+string_primary_encoding_for_representation(Interp *interpreter,
     parrot_string_representation_t representation)
 {
     switch (representation) {
@@ -669,7 +669,7 @@ string_primary_encoding_for_representation(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-const_string(struct Parrot_Interp *interpreter, const char *buffer)>
+const_string(Interp *interpreter, const char *buffer)>
 
 Creates and returns a constant Parrot string.
 
@@ -678,7 +678,7 @@ Creates and returns a constant Parrot string.
 */
 
 STRING *
-const_string(struct Parrot_Interp *interpreter, const char *buffer)
+const_string(Interp *interpreter, const char *buffer)
 {
     /* TODO cache the strings */
     return string_make(interpreter, buffer, strlen(buffer),
@@ -688,7 +688,7 @@ const_string(struct Parrot_Interp *interpreter, const char *buffer)
 /*
 
 =item C<STRING *
-string_make(struct Parrot_Interp *interpreter, const void *buffer,
+string_make(Interp *interpreter, const void *buffer,
     UINTVAL len, const char *encoding_name, UINTVAL flags)>
 
 Creates and returns a new Parrot string using C<len> bytes of string
@@ -712,7 +712,7 @@ together.
 */
 
 STRING *
-string_make(struct Parrot_Interp *interpreter, const void *buffer,
+string_make(Interp *interpreter, const void *buffer,
     UINTVAL len, const char *encoding_name, UINTVAL flags)
 {
     STRING *s = NULL;
@@ -789,7 +789,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
 /*
 
 =item C<STRING *
-string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen)>
+string_grow(Interp * interpreter, STRING * s, INTVAL addlen)>
 
 Grows the Parrot string's buffer by the specified number of characters.
 
@@ -798,7 +798,7 @@ Grows the Parrot string's buffer by the specified number of characters.
 */
 
 STRING *
-string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen)
+string_grow(Interp * interpreter, STRING * s, INTVAL addlen)
 {
     unmake_COW(interpreter,s);
 
@@ -817,7 +817,7 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen)
 =over 4
 
 =item C<UINTVAL
-string_length(struct Parrot_Interp * interpreter, const STRING *s)>
+string_length(Interp * interpreter, const STRING *s)>
 
 Returns the number of characters in the specified Parrot string.
 
@@ -826,14 +826,14 @@ Returns the number of characters in the specified Parrot string.
 */
 
 UINTVAL
-string_length(struct Parrot_Interp * interpreter, const STRING *s)
+string_length(Interp * interpreter, const STRING *s)
 {
     return s ? s->strlen : 0;
 }
 
 /* XXX Is this right? */
 void *
-string_pointer_to_index(struct Parrot_Interp * interpreter,
+string_pointer_to_index(Interp * interpreter,
     const STRING *s, UINTVAL idx)
 {
     switch (s->representation) {
@@ -857,7 +857,7 @@ string_pointer_to_index(struct Parrot_Interp * interpreter,
 /*
 
 =item C<INTVAL
-string_index(struct Parrot_Interp * interpreter, const STRING *s, UINTVAL idx)>
+string_index(Interp * interpreter, const STRING *s, UINTVAL idx)>
 
 Returns the character (or glyph, depending upon the string's encoding)
 This is to abstract the process of finding the Nth character in a
@@ -872,7 +872,7 @@ Note that this is not range-checked.
 */
 
 INTVAL
-string_index(struct Parrot_Interp * interpreter, const STRING *s, UINTVAL idx)
+string_index(Interp * interpreter, const STRING *s, UINTVAL idx)
 {
     switch (s->representation) {
         case enum_stringrep_one:
@@ -895,7 +895,7 @@ string_index(struct Parrot_Interp * interpreter, const STRING *s, UINTVAL idx)
 /*
 
 =item C<static INTVAL
-string_str_index_twobyte(struct Parrot_Interp *interpreter,
+string_str_index_twobyte(Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)>
 
 Helper function for C<string_str_index()>. This is optimized for the
@@ -907,7 +907,7 @@ implements the Boyer-Moore string search algorithm.
 */
 
 static INTVAL
-string_str_index_twobyte(struct Parrot_Interp *interpreter,
+string_str_index_twobyte(Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
     const Parrot_UInt2* const find_strstart = find->strstart;
@@ -964,7 +964,7 @@ string_str_index_twobyte(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static INTVAL
-string_str_index_singlebyte(struct Parrot_Interp *interpreter,
+string_str_index_singlebyte(Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)>
 
 Helper function for C<string_str_index()>. This is optimized for the
@@ -977,7 +977,7 @@ algorithm.
 */
 
 static INTVAL
-string_str_index_singlebyte(struct Parrot_Interp *interpreter,
+string_str_index_singlebyte(Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
     const unsigned char* const find_strstart = find->strstart;
@@ -1032,7 +1032,7 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
 /*
 
 =item C<INTVAL
-string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
+string_str_index(Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start)>
 
 Returns the character position of the second Parrot string in the first
@@ -1045,7 +1045,7 @@ characters, not bytes. If second string is not specified, then return
 */
 
 INTVAL
-string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
+string_str_index(Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start)
 {
     union {
@@ -1096,7 +1096,7 @@ string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
 /*
 
 =item C<INTVAL
-string_ord(struct Parrot_Interp *interpreter, const STRING *s, INTVAL idx)>
+string_ord(Interp *interpreter, const STRING *s, INTVAL idx)>
 
 Returns the codepoint at a given index into a string. Negative indexes
 are treated as counting from the end of the string.
@@ -1106,7 +1106,7 @@ are treated as counting from the end of the string.
 */
 
 INTVAL
-string_ord(struct Parrot_Interp *interpreter, const STRING *s, INTVAL idx)
+string_ord(Interp *interpreter, const STRING *s, INTVAL idx)
 {
     UINTVAL len = 0;
 
@@ -1145,7 +1145,7 @@ string_ord(struct Parrot_Interp *interpreter, const STRING *s, INTVAL idx)
 /*
 
 =item C<STRING *
-string_chr(struct Parrot_Interp *interpreter, UINTVAL character)>
+string_chr(Interp *interpreter, UINTVAL character)>
 
 Returns a single character Parrot string.
 
@@ -1156,7 +1156,7 @@ TODO - Allow this to take an array of characters?
 */
 
 STRING *
-string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
+string_chr(Interp *interpreter, UINTVAL character)
 {
     if (character <= 0xFF) {
         Parrot_UInt1 c = (Parrot_UInt1)character;
@@ -1179,7 +1179,7 @@ string_chr(struct Parrot_Interp *interpreter, UINTVAL character)
 /*
 
 =item C<STRING *
-string_copy(struct Parrot_Interp *interpreter, STRING *s)>
+string_copy(Interp *interpreter, STRING *s)>
 
 Creates and returns a copy of the specified Parrot string.
 
@@ -1188,7 +1188,7 @@ Creates and returns a copy of the specified Parrot string.
 */
 
 STRING *
-string_copy(struct Parrot_Interp *interpreter, STRING *s)
+string_copy(Interp *interpreter, STRING *s)
 {
     return make_COW_reference(interpreter, s);
 }
@@ -1203,7 +1203,7 @@ string_copy(struct Parrot_Interp *interpreter, STRING *s)
 =over 4
 
 =item C<INTVAL
-string_compute_strlen(struct Parrot_Interp *interpreter, STRING *s)>
+string_compute_strlen(Interp *interpreter, STRING *s)>
 
 Calculates and returns the number of characters in the specified Parrot
 string.
@@ -1213,7 +1213,7 @@ string.
 */
 
 INTVAL
-string_compute_strlen(struct Parrot_Interp *interpreter, STRING *s)
+string_compute_strlen(Interp *interpreter, STRING *s)
 {
     /* taking advantage of int value of the enum */
     s->strlen = ((ptrcast_t)PObj_bufstart(s) + s->bufused -
@@ -1225,7 +1225,7 @@ string_compute_strlen(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<INTVAL
-string_max_bytes(struct Parrot_Interp *interpreter, STRING *s, INTVAL nchars)>
+string_max_bytes(Interp *interpreter, STRING *s, INTVAL nchars)>
 
 Returns the number of bytes required to safely contain the specified number
 of characters in the specified Parrot string's representation.
@@ -1235,7 +1235,7 @@ of characters in the specified Parrot string's representation.
 */
 
 INTVAL
-string_max_bytes(struct Parrot_Interp *interpreter, STRING *s, INTVAL nchars)
+string_max_bytes(Interp *interpreter, STRING *s, INTVAL nchars)
 {
 /* XXXX: here (and a couple of other places) we are taking advantage the
     numerical value of s->representation being equal to sizeof(relevant
@@ -1246,7 +1246,7 @@ string_max_bytes(struct Parrot_Interp *interpreter, STRING *s, INTVAL nchars)
 /*
 
 =item C<STRING *
-string_concat(struct Parrot_Interp *interpreter,
+string_concat(Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)>
 
 Concatenates two Parrot string. If necessary, converts the second
@@ -1260,7 +1260,7 @@ created and returned.
 */
 
 STRING *
-string_concat(struct Parrot_Interp *interpreter,
+string_concat(Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)
 {
     if (a != NULL && a->strlen != 0) {
@@ -1293,7 +1293,7 @@ string_concat(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-string_repeat(struct Parrot_Interp *interpreter, const STRING *s,
+string_repeat(Interp *interpreter, const STRING *s,
     UINTVAL num, STRING **d)>
 
 Repeats the specified Parrot string I<num> times and stores the result
@@ -1305,7 +1305,7 @@ necessary.
 */
 
 STRING *
-string_repeat(struct Parrot_Interp *interpreter, const STRING *s,
+string_repeat(Interp *interpreter, const STRING *s,
     UINTVAL num, STRING **d)
 {
     STRING *dest;
@@ -1337,7 +1337,7 @@ string_repeat(struct Parrot_Interp *interpreter, const STRING *s,
 /*
 
 =item C<STRING *
-string_substr(struct Parrot_Interp *interpreter, STRING *src,
+string_substr(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING **d, int replace_dest)>
 
 Copies the substring of length C<length> from C<offset> from the
@@ -1349,7 +1349,7 @@ necessary. The substring is also returned.
 */
 
 STRING *
-string_substr(struct Parrot_Interp *interpreter, STRING *src,
+string_substr(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING **d, int replace_dest)
 {
     STRING *dest;
@@ -1403,7 +1403,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
 /*
 
 =item C<STRING *
-string_replace(struct Parrot_Interp *interpreter, STRING *src,
+string_replace(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING *rep, STRING **d)>
 
 This should follow the Perl semantics for:
@@ -1427,7 +1427,7 @@ A negative offset is allowed to replace from the end.
 */
 
 STRING *
-string_replace(struct Parrot_Interp *interpreter, STRING *src,
+string_replace(Interp *interpreter, STRING *src,
     INTVAL offset, INTVAL length, STRING *rep, STRING **d)
 {
     STRING *dest = NULL;
@@ -1562,7 +1562,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 /*
 
 =item C<STRING *
-string_chopn(struct Parrot_Interp *interpreter, STRING *s, INTVAL n)>
+string_chopn(Interp *interpreter, STRING *s, INTVAL n)>
 
 Chops off the last C<n> characters of the specified Parrot string. If
 C<n> is negative, cuts the string after C<+n> characters.
@@ -1572,7 +1572,7 @@ C<n> is negative, cuts the string after C<+n> characters.
 */
 
 STRING *
-string_chopn(struct Parrot_Interp *interpreter, STRING *s, INTVAL n)
+string_chopn(Interp *interpreter, STRING *s, INTVAL n)
 {
     UINTVAL new_length;
     struct string_iterator_t it;
@@ -1632,7 +1632,7 @@ do { \
 /*
 
 =item C<INTVAL
-string_compare(struct Parrot_Interp *interpreter,
+string_compare(Interp *interpreter,
     STRING *s1, STRING *s2)>
 
 Compares two Parrot strings, performing type and encoding conversions if
@@ -1689,7 +1689,7 @@ cmp_diff_repr(STRING *s1, STRING *s2)
 }
 
 INTVAL
-string_compare(struct Parrot_Interp *interpreter,
+string_compare(Interp *interpreter,
     STRING *s1, STRING *s2)
 {
     INTVAL cmp = 0;    /* gcc -O3 warning */
@@ -1738,7 +1738,7 @@ string_compare(struct Parrot_Interp *interpreter,
 /*
 
 =item C<INTVAL
-string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)>
+string_equal(Interp *interpreter, STRING *s1, STRING *s2)>
 
 Compares two Parrot strings, performing type and encoding conversions if
 necessary.
@@ -1751,7 +1751,7 @@ otherwise.
 */
 
 INTVAL
-string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
+string_equal(Interp *interpreter, STRING *s1, STRING *s2)
 {
     if ( (s1 == s2) || (!s1 && !s2) ) {
         return 0;
@@ -1810,7 +1810,7 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
 /*
 
 =item C<static void
-make_writable(struct Parrot_Interp *interpreter, STRING **s,
+make_writable(Interp *interpreter, STRING **s,
     const size_t len, parrot_string_representation_t representation)>
 
 Makes the specified Parrot string writable with minimum length C<len>.
@@ -1822,7 +1822,7 @@ has to be created.
 */
 
 static void
-make_writable(struct Parrot_Interp *interpreter, STRING **s,
+make_writable(Interp *interpreter, STRING **s,
     const size_t len, parrot_string_representation_t representation)
 {
     if (!*s)
@@ -1847,7 +1847,7 @@ do { \
 /*
 
 =item C<STRING *
-string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
+string_bitwise_and(Interp *interpreter, STRING *s1,
     STRING *s2, STRING **dest)>
 
 Performs a bitwise C<AND> on two Parrot string, performing type and
@@ -1859,7 +1859,7 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
+string_bitwise_and(Interp *interpreter, STRING *s1,
     STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
@@ -2005,7 +2005,7 @@ do { \
 /*
 
 =item C<STRING *
-string_bitwise_or(struct Parrot_Interp *interpreter,
+string_bitwise_or(Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)>
 
 Performs a bitwise C<OR> on two Parrot string, performing type and
@@ -2017,7 +2017,7 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_or(struct Parrot_Interp *interpreter,
+string_bitwise_or(Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
@@ -2118,7 +2118,7 @@ string_bitwise_or(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-string_bitwise_xor(struct Parrot_Interp *interpreter,
+string_bitwise_xor(Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)>
 
 Performs a bitwise C<XOR> on two Parrot strings, performing type and
@@ -2130,7 +2130,7 @@ then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_xor(struct Parrot_Interp *interpreter,
+string_bitwise_xor(Interp *interpreter,
     STRING *s1, STRING *s2, STRING **dest)
 {
     STRING *res = NULL;
@@ -2267,7 +2267,7 @@ do { \
 /*
 
 =item C<STRING *
-string_bitwise_not(struct Parrot_Interp *interpreter,
+string_bitwise_not(Interp *interpreter,
     STRING *s, STRING **dest)>
 
 Performs a bitwise C<NOT> on a Parrot string. If the second string is
@@ -2278,7 +2278,7 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 */
 
 STRING *
-string_bitwise_not(struct Parrot_Interp *interpreter,
+string_bitwise_not(Interp *interpreter,
     STRING *s, STRING **dest)
 {
     STRING *res = NULL;
@@ -2333,7 +2333,7 @@ string_bitwise_not(struct Parrot_Interp *interpreter,
 /*
 
 =item C<INTVAL
-string_bool(struct Parrot_Interp *interpreter, const STRING *s)>
+string_bool(Interp *interpreter, const STRING *s)>
 
 Returns whether the specified Parrot string is true. A string is true
 if it is equal to anything other than C<0>, C<""> or C<"0">.
@@ -2343,7 +2343,7 @@ if it is equal to anything other than C<0>, C<""> or C<"0">.
 */
 
 INTVAL
-string_bool(struct Parrot_Interp *interpreter, const STRING *s)
+string_bool(Interp *interpreter, const STRING *s)
 {
     INTVAL len;
     if (s == NULL) {
@@ -2374,7 +2374,7 @@ string_bool(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<STRING*
-string_nprintf(struct Parrot_Interp *interpreter,
+string_nprintf(Interp *interpreter,
     STRING *dest, INTVAL bytelen, const char *format, ...)>
 
 This is like C<Parrot_snprintf()> except that it writes to and returns a
@@ -2391,7 +2391,7 @@ encoding of C<*dest>.
 */
 
 STRING*
-string_nprintf(struct Parrot_Interp *interpreter,
+string_nprintf(Interp *interpreter,
     STRING *dest, INTVAL bytelen, const char *format, ...)
 {
     STRING *output;
@@ -2417,7 +2417,7 @@ string_nprintf(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING*
-string_printf(struct Parrot_Interp *interpreter, const char *format, ...)>
+string_printf(Interp *interpreter, const char *format, ...)>
 
 Writes and returns a Parrot string.
 
@@ -2426,7 +2426,7 @@ Writes and returns a Parrot string.
 */
 
 STRING*
-string_printf(struct Parrot_Interp *interpreter, const char *format, ...)
+string_printf(Interp *interpreter, const char *format, ...)
 {
     STRING *output;
     va_list args;
@@ -2442,7 +2442,7 @@ string_printf(struct Parrot_Interp *interpreter, const char *format, ...)
 /*
 
 =item C<INTVAL
-string_to_int(struct Parrot_Interp *interpreter, const STRING *s)>
+string_to_int(Interp *interpreter, const STRING *s)>
 
 Converts a numeric Parrot string to an integer value.
 
@@ -2464,7 +2464,7 @@ number, rounding towards zero.
 */
 
 INTVAL
-string_to_int(struct Parrot_Interp *interpreter, const STRING *s)
+string_to_int(Interp *interpreter, const STRING *s)
 {
 #if 0
     INTVAL i = 0;
@@ -2510,7 +2510,7 @@ string_to_int(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<FLOATVAL
-string_to_num(struct Parrot_Interp *interpreter, const STRING *s)>
+string_to_num(Interp *interpreter, const STRING *s)>
 
 Same as C<string_to_int()> except that a floating-point value is
 returned.
@@ -2520,7 +2520,7 @@ returned.
 */
 
 FLOATVAL
-string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
+string_to_num(Interp *interpreter, const STRING *s)
 {
     FLOATVAL f = 0.0;
 
@@ -2637,7 +2637,7 @@ string_to_num(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<STRING *
-string_from_int(struct Parrot_Interp * interpreter, INTVAL i)>
+string_from_int(Interp * interpreter, INTVAL i)>
 
 Returns a Parrot string representation of the specified integer value.
 
@@ -2646,7 +2646,7 @@ Returns a Parrot string representation of the specified integer value.
 */
 
 STRING *
-string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
+string_from_int(Interp * interpreter, INTVAL i) {
     char buf[128];
     return int_to_str(interpreter, buf, i, 10);
 }
@@ -2654,7 +2654,7 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
 /*
 
 =item C<STRING *
-string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)>
+string_from_num(Interp * interpreter, FLOATVAL f)>
 
 Returns a Parrot string representation of the specified floating-point
 value.
@@ -2664,7 +2664,7 @@ value.
 */
 
 STRING *
-string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
+string_from_num(Interp * interpreter, FLOATVAL f)
 {
     /* Too damn hard--hand it off to Parrot_sprintf, which'll probably
        use the system sprintf anyway, but has gigantic buffers that are
@@ -2675,7 +2675,7 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 /*
 
 =item C<char *
-string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)>
+string_to_cstring(Interp * interpreter, STRING * s)>
 
 Returns a C string for the specified Parrot string. Use
 C<string_cstring_free()> to free the string. Failure to do this will
@@ -2686,7 +2686,7 @@ result in a memory leak.
 */
 
 char *
-string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
+string_to_cstring(Interp * interpreter, STRING * s)
 {
 #if 0
     if (PObj_buflen(s) == s->bufused) {
@@ -2751,7 +2751,7 @@ string_cstring_free(void *ptr) {
 /*
 
 =item C<void
-string_pin(struct Parrot_Interp * interpreter, STRING * s)>
+string_pin(Interp * interpreter, STRING * s)>
 
 Replace the apecified Parrot string's managed buffer memory by system
 memory.
@@ -2761,7 +2761,7 @@ memory.
 */
 
 void
-string_pin(struct Parrot_Interp * interpreter, STRING * s) {
+string_pin(Interp * interpreter, STRING * s) {
     void *memory;
     INTVAL size;
 
@@ -2791,7 +2791,7 @@ string_pin(struct Parrot_Interp * interpreter, STRING * s) {
 /*
 
 =item C<void
-string_unpin(struct Parrot_Interp * interpreter, STRING * s)>
+string_unpin(Interp * interpreter, STRING * s)>
 
 Undo a C<string_pin()> so that the string once again uses managed
 memory.
@@ -2801,7 +2801,7 @@ memory.
 */
 
 void
-string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
+string_unpin(Interp * interpreter, STRING * s) {
     void *memory;
     INTVAL size;
 
@@ -2848,7 +2848,7 @@ do { \
 /*
 
 =item C<size_t
-string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)>
+string_hash(Interp * interpreter, Hash *hash, STRING *s)>
 
 Returns the hash value for the specified Parrot string, caching it in
 C<s->hashval>.
@@ -2858,7 +2858,7 @@ C<s->hashval>.
 */
 
 size_t
-string_hash(struct Parrot_Interp * interpreter, STRING *s)
+string_hash(Interp * interpreter, STRING *s)
 {
     register size_t h;
 
@@ -2892,7 +2892,7 @@ string_hash(struct Parrot_Interp * interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_unescape_cstring(struct Parrot_Interp * interpreter,
+string_unescape_cstring(Interp * interpreter,
     char *cstring, char delimiter)>
 
 Unescapes the specified C string. These sequences are covered:
@@ -2984,7 +2984,7 @@ set_char_getter(STRING *s)
 }
 
 STRING *
-string_unescape_cstring(struct Parrot_Interp * interpreter,
+string_unescape_cstring(Interp * interpreter,
     char *cstring, char delimiter)
 {
     size_t clength = strlen(cstring);
@@ -3048,7 +3048,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
 /*
 
 =item C<STRING *
-string_upcase(struct Parrot_Interp *interpreter, const STRING *s)>
+string_upcase(Interp *interpreter, const STRING *s)>
 
 Returns a copy of the specified Parrot string converted to upper case.
 Non-caseable characters are left unchanged.
@@ -3061,7 +3061,7 @@ TODO - Not yet implimented.
 
 
 STRING *
-string_upcase(struct Parrot_Interp *interpreter, const STRING *s)
+string_upcase(Interp *interpreter, const STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");
@@ -3071,7 +3071,7 @@ string_upcase(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<void
-string_upcase_inplace(struct Parrot_Interp *interpreter, STRING *s)>
+string_upcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to upper case.
 
@@ -3082,7 +3082,7 @@ TODO - Not yet implimented.
 */
 
 void
-string_upcase_inplace(struct Parrot_Interp *interpreter, STRING *s)
+string_upcase_inplace(Interp *interpreter, STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");
@@ -3091,7 +3091,7 @@ string_upcase_inplace(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_downcase(struct Parrot_Interp *interpreter, const STRING *s)>
+string_downcase(Interp *interpreter, const STRING *s)>
 
 Returns a copy of the specified Parrot string converted to lower case.
 Non-caseable characters are left unchanged.
@@ -3103,7 +3103,7 @@ TODO - Not yet implimented.
 */
 
 STRING *
-string_downcase(struct Parrot_Interp *interpreter, const STRING *s)
+string_downcase(Interp *interpreter, const STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");
@@ -3113,7 +3113,7 @@ string_downcase(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<void
-string_downcase_inplace(struct Parrot_Interp *interpreter, STRING *s)>
+string_downcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to lower case.
 
@@ -3124,7 +3124,7 @@ TODO - Not yet implimented.
 */
 
 void
-string_downcase_inplace(struct Parrot_Interp *interpreter, STRING *s)
+string_downcase_inplace(Interp *interpreter, STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");
@@ -3133,7 +3133,7 @@ string_downcase_inplace(struct Parrot_Interp *interpreter, STRING *s)
 /*
 
 =item C<STRING *
-string_titlecase(struct Parrot_Interp *interpreter, const STRING *s)>
+string_titlecase(Interp *interpreter, const STRING *s)>
 
 Returns a copy of the specified Parrot string converted to title case.
 Non-caseable characters are left unchanged.
@@ -3145,7 +3145,7 @@ TODO - Not yet implimented.
 */
 
 STRING *
-string_titlecase(struct Parrot_Interp *interpreter, const STRING *s)
+string_titlecase(Interp *interpreter, const STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");
@@ -3155,7 +3155,7 @@ string_titlecase(struct Parrot_Interp *interpreter, const STRING *s)
 /*
 
 =item C<void
-string_titlecase_inplace(struct Parrot_Interp *interpreter, STRING *s)>
+string_titlecase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to title case.
 
@@ -3166,7 +3166,7 @@ TODO - Not yet implimented.
 */
 
 void
-string_titlecase_inplace(struct Parrot_Interp *interpreter, STRING *s)
+string_titlecase_inplace(Interp *interpreter, STRING *s)
 {
     internal_exception(INTERNAL_NOT_IMPLEMENTED,
         "Case mangling not yet implemented");

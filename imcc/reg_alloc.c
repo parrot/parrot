@@ -47,7 +47,7 @@ static int simplify (IMC_Unit *);
 #endif
 static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (IMC_Unit *);
-static void spill (struct Parrot_Interp *, IMC_Unit * unit, int);
+static void spill (Interp *, IMC_Unit * unit, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
 static void restore_interference_graph(IMC_Unit *);
 #if 0
@@ -68,7 +68,7 @@ static int n_symbols;
  * on a single compilation unit at a time.
  */
 void
-imc_reg_alloc(struct Parrot_Interp *interpreter, IMC_Unit * unit)
+imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
     int to_spill;
     int todo, first;
@@ -1020,7 +1020,7 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
  */
 
 static void
-spill(struct Parrot_Interp *interpreter, IMC_Unit * unit, int spilled)
+spill(Interp *interpreter, IMC_Unit * unit, int spilled)
 {
     Instruction * tmp, *ins;
     int i, n, dl;

@@ -79,13 +79,13 @@ Instruction * _mk_instruction(const char *,const char *, SymReg **, int);
 #else
 #define _mk_instruction(a,b,c,d) dont_use(a,b)
 #endif
-Instruction * INS(struct Parrot_Interp *, struct _IMC_Unit *, char * name,
+Instruction * INS(Interp *, struct _IMC_Unit *, char * name,
 	const char *fmt, SymReg **regs, int nargs, int keyv, int emit);
 Instruction * INS_LABEL(struct _IMC_Unit *, SymReg * r0, int emit);
 
-Instruction * iNEW(struct Parrot_Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
+Instruction * iNEW(Interp *, struct _IMC_Unit *, SymReg * r0, char * type,
 	SymReg *init, int emit);
-Instruction * iNEWSUB(struct Parrot_Interp *, struct _IMC_Unit *, SymReg * r0, int type,
+Instruction * iNEWSUB(Interp *, struct _IMC_Unit *, SymReg * r0, int type,
 	SymReg *init, SymReg *retcont, int emit);
 Instruction * emitb(struct _IMC_Unit *, Instruction *);
 

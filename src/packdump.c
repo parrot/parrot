@@ -28,17 +28,17 @@ This is only used by the PBC dumper C<pdump>.
 ** For now just remove some warnings
 */
 
-void PackFile_ConstTable_dump(struct Parrot_Interp *,
+void PackFile_ConstTable_dump(Interp *,
                                      struct PackFile_ConstTable *);
-static void PackFile_Constant_dump(struct Parrot_Interp *,
+static void PackFile_Constant_dump(Interp *,
                                    struct PackFile_Constant *);
-void PackFile_Fixup_dump(struct Parrot_Interp *,
+void PackFile_Fixup_dump(Interp *,
                          struct PackFile_FixupTable *ft);
 
 /*
 
 =item C<void
-PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
+PackFile_ConstTable_dump(Interp *interpreter,
                          struct PackFile_ConstTable *self)>
 
 Dumps the constant table C<self>.
@@ -48,7 +48,7 @@ Dumps the constant table C<self>.
 */
 
 void
-PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
+PackFile_ConstTable_dump(Interp *interpreter,
                          struct PackFile_ConstTable *self)
 {
     opcode_t i;
@@ -62,7 +62,7 @@ PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PackFile_Constant_dump(struct Parrot_Interp *interpreter,
+PackFile_Constant_dump(Interp *interpreter,
                        struct PackFile_Constant *self)>
 
 Dumps the constant C<self>.
@@ -72,7 +72,7 @@ Dumps the constant C<self>.
 */
 
 void
-PackFile_Constant_dump(struct Parrot_Interp *interpreter,
+PackFile_Constant_dump(Interp *interpreter,
                        struct PackFile_Constant *self)
 {
     switch (self->type) {
@@ -139,7 +139,7 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PackFile_Fixup_dump(struct Parrot_Interp *interpreter, 
+PackFile_Fixup_dump(Interp *interpreter, 
                     struct PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
@@ -149,7 +149,7 @@ Dumps the fix-up table C<ft>.
 */
 
 void
-PackFile_Fixup_dump(struct Parrot_Interp *interpreter, 
+PackFile_Fixup_dump(Interp *interpreter, 
                     struct PackFile_FixupTable *ft)
 {
     opcode_t i;

@@ -406,7 +406,7 @@ main(int argc, char * argv[])
     struct PackFile *pf;
     int obj_file;
 
-    struct Parrot_Interp *interpreter = Parrot_new(NULL);
+    Interp *interpreter = Parrot_new(NULL);
 
     Parrot_init(interpreter);
 

@@ -107,7 +107,7 @@ mem_sys_free(void *from)
 /*
 
 =item C<void
-mem_setup_allocator(struct Parrot_Interp *interpreter)>
+mem_setup_allocator(Interp *interpreter)>
 
 Initializes the allocator.
 
@@ -116,7 +116,7 @@ Initializes the allocator.
 */
 
 void
-mem_setup_allocator(struct Parrot_Interp *interpreter)
+mem_setup_allocator(Interp *interpreter)
 {
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
     interpreter->arena_base->sized_header_pools = NULL;

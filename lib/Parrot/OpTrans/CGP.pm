@@ -75,7 +75,7 @@ sub defines
 
 
 PARROT_INLINE static void**
-opcode_to_prederef(struct Parrot_Interp* interpreter,
+opcode_to_prederef(Interp* interpreter,
                                         opcode_t* opcode_addr)
 {
     return interpreter->prederef.code +

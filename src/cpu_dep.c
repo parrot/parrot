@@ -36,11 +36,11 @@ extern void *flush_reg_store(void);
 
 #endif
 
-static void trace_system_stack(struct Parrot_Interp *interpreter);
+static void trace_system_stack(Interp *interpreter);
 
 /*
 
-=item C<void trace_system_areas(struct Parrot_Interp *interpreter)>
+=item C<void trace_system_areas(Interp *interpreter)>
 
 Traces the system stack and any additional CPU-specific areas.
 
@@ -49,7 +49,7 @@ Traces the system stack and any additional CPU-specific areas.
 */
 
 void
-trace_system_areas(struct Parrot_Interp *interpreter)
+trace_system_areas(Interp *interpreter)
 {
 #if defined(__sparc) /* Flush register windows */
     static union {
@@ -101,7 +101,7 @@ trace_system_areas(struct Parrot_Interp *interpreter)
 /*
 
 =item C<static void
-trace_system_stack(struct Parrot_Interp *interpreter)>
+trace_system_stack(Interp *interpreter)>
 
 Traces the memory block starting at C<< interpreter->lo_var_ptr >>.
 
@@ -110,7 +110,7 @@ Traces the memory block starting at C<< interpreter->lo_var_ptr >>.
 */
 
 static void
-trace_system_stack(struct Parrot_Interp *interpreter)
+trace_system_stack(Interp *interpreter)
 {
     size_t lo_var_ptr = (size_t)interpreter->lo_var_ptr;
 

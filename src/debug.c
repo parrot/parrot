@@ -124,7 +124,7 @@ parse_int(const char* str, int* intP)
 /*
 
 =item C<static const char*
-parse_string(struct Parrot_Interp *interpreter,
+parse_string(Interp *interpreter,
              const char* str, STRING** strP)>
 
 Parse a double-quoted string out of a C string and return a pointer to
@@ -136,7 +136,7 @@ C<STRING>.
 */
 
 static const char*
-parse_string(struct Parrot_Interp *interpreter,
+parse_string(Interp *interpreter,
              const char* str, STRING** strP)
 {
     const char* string;
@@ -162,7 +162,7 @@ parse_string(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static const char*
-parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)>
+parse_key(Interp *interpreter, const char* str, PMC** keyP)>
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
@@ -172,7 +172,7 @@ after the key. Currently only string and integer keys are allowed.
 */
 
 static const char*
-parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)
+parse_key(Interp *interpreter, const char* str, PMC** keyP)
 {
     *keyP = NULL;
     if (*str != '[')
@@ -234,7 +234,7 @@ parse_command(const char* command, unsigned long* cmdP)
 
 /*
 
-=item C<void PDB_get_command(struct Parrot_Interp *interpreter)>
+=item C<void PDB_get_command(Interp *interpreter)>
 
 Get a command from the user input to execute.
 
@@ -252,7 +252,7 @@ The input is saved in C<< pdb->cur_command >>.
 */
 
 void
-PDB_get_command(struct Parrot_Interp *interpreter)
+PDB_get_command(Interp *interpreter)
 {
     unsigned int i;
     char *c;
@@ -311,7 +311,7 @@ PDB_get_command(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-PDB_run_command(struct Parrot_Interp *interpreter, const char *command)>
+PDB_run_command(Interp *interpreter, const char *command)>
 
 Run a command.
 
@@ -322,7 +322,7 @@ Hash the command to make a simple switch calling the correct handler.
 */
 
 void
-PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
+PDB_run_command(Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long c;
@@ -420,7 +420,7 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_next(struct Parrot_Interp *interpreter, const char *command)>
+PDB_next(Interp *interpreter, const char *command)>
 
 Execute the next N operation(s).
 
@@ -431,7 +431,7 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 */
 
 void
-PDB_next(struct Parrot_Interp *interpreter, const char *command)
+PDB_next(Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
@@ -466,7 +466,7 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_trace(struct Parrot_Interp *interpreter,
+PDB_trace(Interp *interpreter,
           const char *command)>
 
 Execute the next N operations; if no number is specified, it defaults to
@@ -477,7 +477,7 @@ Execute the next N operations; if no number is specified, it defaults to
 */
 
 void
-PDB_trace(struct Parrot_Interp *interpreter,
+PDB_trace(Interp *interpreter,
           const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
@@ -512,7 +512,7 @@ PDB_trace(struct Parrot_Interp *interpreter,
 /*
 
 =item C<PDB_condition_t *
-PDB_cond(struct Parrot_Interp *interpreter, const char *command)>
+PDB_cond(Interp *interpreter, const char *command)>
 
 Analyzes a condition from the user input.
 
@@ -521,7 +521,7 @@ Analyzes a condition from the user input.
 */
 
 PDB_condition_t *
-PDB_cond(struct Parrot_Interp *interpreter, const char *command)
+PDB_cond(Interp *interpreter, const char *command)
 {
     PDB_condition_t *condition;
     int i, reg_number;
@@ -703,7 +703,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
 /*
 
 =item C<void
-PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)>
+PDB_watchpoint(Interp *interpreter, const char *command)>
 
 Set a watchpoint.
 
@@ -712,7 +712,7 @@ Set a watchpoint.
 */
 
 void
-PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
+PDB_watchpoint(Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_condition_t *condition;
@@ -730,7 +730,7 @@ PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_set_break(struct Parrot_Interp *interpreter, const char *command)>
+PDB_set_break(Interp *interpreter, const char *command)>
 
 Set a break point, the source code file must be loaded.
 
@@ -739,7 +739,7 @@ Set a break point, the source code file must be loaded.
 */
 
 void
-PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
+PDB_set_break(Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_breakpoint_t *newbreak = NULL, *sbreak;
@@ -831,7 +831,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_init(struct Parrot_Interp *interpreter, const char *command)>
+PDB_init(Interp *interpreter, const char *command)>
 
 Init the program.
 
@@ -842,7 +842,7 @@ Init the program.
 extern void imcc_init(Parrot_Interp interpreter);
 
 void
-PDB_init(struct Parrot_Interp *interpreter, const char *command)
+PDB_init(Interp *interpreter, const char *command)
 {
     PMC *userargv;
     char c[256];
@@ -907,7 +907,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_continue(struct Parrot_Interp *interpreter,
+PDB_continue(Interp *interpreter,
              const char *command)>
 
 Continue running the program. If a number is specified, skip that many
@@ -918,7 +918,7 @@ breakpoints.
 */
 
 void
-PDB_continue(struct Parrot_Interp *interpreter,
+PDB_continue(Interp *interpreter,
              const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
@@ -948,7 +948,7 @@ PDB_continue(struct Parrot_Interp *interpreter,
 /*
 
 =item C<PDB_breakpoint_t *
-PDB_find_breakpoint(struct Parrot_Interp *interpreter,
+PDB_find_breakpoint(Interp *interpreter,
                       const char *command)>
 
 Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
@@ -959,7 +959,7 @@ exist or if no breakpoint was specified.
 */
 
 PDB_breakpoint_t *
-PDB_find_breakpoint(struct Parrot_Interp *interpreter,
+PDB_find_breakpoint(Interp *interpreter,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
@@ -991,7 +991,7 @@ PDB_find_breakpoint(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+PDB_disable_breakpoint(Interp *interpreter,
                        const char *command)>
 
 Disable a breakpoint; it can be reenabled with the enable command.
@@ -1001,7 +1001,7 @@ Disable a breakpoint; it can be reenabled with the enable command.
 */
 
 void
-PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+PDB_disable_breakpoint(Interp *interpreter,
                        const char *command)
 {
     PDB_breakpoint_t *breakpoint;
@@ -1018,7 +1018,7 @@ PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+PDB_enable_breakpoint(Interp *interpreter,
                       const char *command)>
 
 Reenable a disabled breakpoint; if the breakpoint was not disabled, has
@@ -1029,7 +1029,7 @@ no effect.
 */
 
 void
-PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+PDB_enable_breakpoint(Interp *interpreter,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
@@ -1044,7 +1044,7 @@ PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+PDB_delete_breakpoint(Interp *interpreter,
                       const char *command)>
 
 Delete a breakpoint.
@@ -1054,7 +1054,7 @@ Delete a breakpoint.
 */
 
 void
-PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+PDB_delete_breakpoint(Interp *interpreter,
                       const char *command)
 {
     PDB_breakpoint_t *breakpoint;
@@ -1095,7 +1095,7 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_delete_condition(struct Parrot_Interp *interpreter,
+PDB_delete_condition(Interp *interpreter,
                      PDB_breakpoint_t *breakpoint)>
 
 Delete a condition associated with a breakpoint.
@@ -1105,7 +1105,7 @@ Delete a condition associated with a breakpoint.
 */
 
 void
-PDB_delete_condition(struct Parrot_Interp *interpreter,
+PDB_delete_condition(Interp *interpreter,
                      PDB_breakpoint_t *breakpoint)
 {
     if (breakpoint->condition->value) {
@@ -1127,7 +1127,7 @@ PDB_delete_condition(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)>
+PDB_skip_breakpoint(Interp *interpreter, long i)>
 
 Skip C<i> times all breakpoints.
 
@@ -1136,7 +1136,7 @@ Skip C<i> times all breakpoints.
 */
 
 void
-PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
+PDB_skip_breakpoint(Interp *interpreter, long i)
 {
     if (i == 0) {
         interpreter->pdb->breakpoint_skip = i;
@@ -1149,7 +1149,7 @@ PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
 /*
 
 =item C<char
-PDB_program_end(struct Parrot_Interp *interpreter)>
+PDB_program_end(Interp *interpreter)>
 
 End the program.
 
@@ -1158,7 +1158,7 @@ End the program.
 */
 
 char
-PDB_program_end(struct Parrot_Interp *interpreter)
+PDB_program_end(Interp *interpreter)
 {
     PDB_t *pdb = interpreter->pdb;
 
@@ -1171,7 +1171,7 @@ PDB_program_end(struct Parrot_Interp *interpreter)
 /*
 
 =item C<char
-PDB_check_condition(struct Parrot_Interp *interpreter,
+PDB_check_condition(Interp *interpreter,
     PDB_condition_t *condition)>
 
 Returns true if the condition was met.
@@ -1181,7 +1181,7 @@ Returns true if the condition was met.
 */
 
 char
-PDB_check_condition(struct Parrot_Interp *interpreter,
+PDB_check_condition(Interp *interpreter,
     PDB_condition_t *condition)
 {
     INTVAL i,j;
@@ -1244,7 +1244,7 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
 
 /*
 
-=item C<char PDB_break(struct Parrot_Interp *interpreter)>
+=item C<char PDB_break(Interp *interpreter)>
 
 Returns true if we have to stop running.
 
@@ -1253,7 +1253,7 @@ Returns true if we have to stop running.
 */
 
 char
-PDB_break(struct Parrot_Interp *interpreter)
+PDB_break(Interp *interpreter)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
@@ -1419,7 +1419,7 @@ PDB_unescape(char *string)
 /*
 
 =item C<size_t
-PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
+PDB_disassemble_op(Interp *interpreter, char* dest, int space,
                    op_info_t* info, opcode_t* op,
                    PDB_file_t *file, opcode_t* code_start, int full_name)>
 
@@ -1430,7 +1430,7 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
+PDB_disassemble_op(Interp *interpreter, char* dest, int space,
                    op_info_t* info, opcode_t* op,
                    PDB_file_t *file, opcode_t* code_start, int full_name)
 {
@@ -1619,7 +1619,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
 /*
 
 =item C<void
-PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)>
+PDB_disassemble(Interp *interpreter, const char *command)>
 
 Disassemble the bytecode.
 
@@ -1628,7 +1628,7 @@ Disassemble the bytecode.
 */
 
 void
-PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
+PDB_disassemble(Interp *interpreter, const char *command)
 {
     PDB_t *pdb = interpreter->pdb;
     PDB_file_t *pfile;
@@ -1747,7 +1747,7 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 
 /*
 
-=item C<void PDB_free_file(struct Parrot_Interp *interpreter)>
+=item C<void PDB_free_file(Interp *interpreter)>
 
 Frees any allocated source files.
 
@@ -1756,7 +1756,7 @@ Frees any allocated source files.
 */
 
 void
-PDB_free_file(struct Parrot_Interp *interpreter)
+PDB_free_file(Interp *interpreter)
 {
     PDB_line_t *nline, *line;
     PDB_label_t *nlabel, *label;
@@ -1796,7 +1796,7 @@ PDB_free_file(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-PDB_load_source(struct Parrot_Interp *interpreter, const char *command)>
+PDB_load_source(Interp *interpreter, const char *command)>
 
 Load a source code file.
 
@@ -1805,7 +1805,7 @@ Load a source code file.
 */
 
 void
-PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
+PDB_load_source(Interp *interpreter, const char *command)
 {
     FILE *file;
     char f[255];
@@ -1914,7 +1914,7 @@ PDB_hasinstruction(char *c)
 /*
 
 =item C<void
-PDB_list(struct Parrot_Interp *interpreter, const char *command)>
+PDB_list(Interp *interpreter, const char *command)>
 
 Show lines from the source code file.
 
@@ -1923,7 +1923,7 @@ Show lines from the source code file.
 */
 
 void
-PDB_list(struct Parrot_Interp *interpreter, const char *command)
+PDB_list(Interp *interpreter, const char *command)
 {
     char *c;
     long line_number;
@@ -1989,7 +1989,7 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_eval(struct Parrot_Interp *interpreter, const char *command)>
+PDB_eval(Interp *interpreter, const char *command)>
 
 C<eval>s an instruction.
 
@@ -1998,7 +1998,7 @@ C<eval>s an instruction.
 */
 
 void
-PDB_eval(struct Parrot_Interp *interpreter, const char *command)
+PDB_eval(Interp *interpreter, const char *command)
 {
     opcode_t *run;
     struct PackFile *eval_pf;
@@ -2018,7 +2018,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<struct PackFile *
-PDB_compile(struct Parrot_Interp *interpreter, const char *command)>
+PDB_compile(Interp *interpreter, const char *command)>
 
 Compiles instructions with the PASM compiler.
 
@@ -2032,7 +2032,7 @@ which generates a malloced string.
 */
 
 struct PackFile *
-PDB_compile(struct Parrot_Interp *interpreter, const char *command)
+PDB_compile(Interp *interpreter, const char *command)
 {
     STRING *buf;
     const char *end = "\nend\n";
@@ -2055,7 +2055,7 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<int
-PDB_extend_const_table(struct Parrot_Interp *interpreter)>
+PDB_extend_const_table(Interp *interpreter)>
 
 Extend the constant table.
 
@@ -2064,7 +2064,7 @@ Extend the constant table.
 */
 
 int
-PDB_extend_const_table(struct Parrot_Interp *interpreter)
+PDB_extend_const_table(Interp *interpreter)
 {
     int k;
 
@@ -2082,7 +2082,7 @@ PDB_extend_const_table(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_stack(Interp *interpreter, const char *command)>
 
 Print entries in the stack.
 
@@ -2091,7 +2091,7 @@ Print entries in the stack.
 */
 
 void
-PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_stack(Interp *interpreter, const char *command)
 {
     unsigned long c = 0;
 
@@ -2133,7 +2133,7 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_stack_int(Interp *interpreter, const char *command)>
 
 Print the integer register stack.
 
@@ -2154,7 +2154,7 @@ Print the integer register stack.
 } while (0)
 
 void
-PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_stack_int(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.int_reg_stack;
@@ -2170,7 +2170,7 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_stack_num(Interp *interpreter, const char *command)>
 
 Print the float register stack.
 
@@ -2179,7 +2179,7 @@ Print the float register stack.
 */
 
 void
-PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_stack_num(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.num_reg_stack;
@@ -2195,7 +2195,7 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_stack_string(Interp *interpreter, const char *command)>
 
 Print the string register stack.
 
@@ -2204,7 +2204,7 @@ Print the string register stack.
 */
 
 void
-PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_stack_string(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.string_reg_stack;
@@ -2220,7 +2220,7 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_stack_pmc(Interp *interpreter, const char *command)>
 
 Print the pmc register stack.
 
@@ -2229,7 +2229,7 @@ Print the pmc register stack.
 */
 
 void
-PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_stack_pmc(Interp *interpreter, const char *command)
 {
     unsigned long depth = 0, i = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.pmc_reg_stack;
@@ -2247,7 +2247,7 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<static void
-dump_string(struct Parrot_Interp *interpreter, STRING* s)>
+dump_string(Interp *interpreter, STRING* s)>
 
 Description.
 
@@ -2256,7 +2256,7 @@ Description.
 */
 
 static void
-dump_string(struct Parrot_Interp *interpreter, STRING* s)
+dump_string(Interp *interpreter, STRING* s)
 {
     if (s) {
         PIO_eprintf(interpreter, "\tBuflen  =\t%12ld\n",PObj_buflen(s));
@@ -2272,7 +2272,7 @@ dump_string(struct Parrot_Interp *interpreter, STRING* s)
 /*
 
 =item C<void
-PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print_user_stack(Interp *interpreter, const char *command)>
 
 Print an entry from the user stack.
 
@@ -2281,7 +2281,7 @@ Print an entry from the user stack.
 */
 
 void
-PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
+PDB_print_user_stack(Interp *interpreter, const char *command)
 {
     long depth = 0;
     Stack_Chunk_t *chunk = interpreter->ctx.user_stack;
@@ -2329,7 +2329,7 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print(struct Parrot_Interp *interpreter, const char *command)>
+PDB_print(Interp *interpreter, const char *command)>
 
 Print interpreter registers.
 
@@ -2338,7 +2338,7 @@ Print interpreter registers.
 */
 
 void
-PDB_print(struct Parrot_Interp *interpreter, const char *command)
+PDB_print(Interp *interpreter, const char *command)
 {
     unsigned long c = 0;
     PMC* key = NULL;
@@ -2393,7 +2393,7 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
 /*
 
 =item C<void
-PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
+PDB_print_int(Interp *interpreter, struct IReg *int_reg,
               int regnum)>
 
 Print the whole or a specific value of a integer register structure.
@@ -2403,7 +2403,7 @@ Print the whole or a specific value of a integer register structure.
 */
 
 void
-PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
+PDB_print_int(Interp *interpreter, struct IReg *int_reg,
               int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2429,7 +2429,7 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
 /*
 
 =item C<void
-PDB_print_int_frame(struct Parrot_Interp *interpreter,
+PDB_print_int_frame(Interp *interpreter,
                     struct IRegFrame *int_reg, int regnum)>
 
 Print the whole or a specific value of a integer register frame
@@ -2440,7 +2440,7 @@ structure.
 */
 
 void
-PDB_print_int_frame(struct Parrot_Interp *interpreter,
+PDB_print_int_frame(Interp *interpreter,
                     struct IRegFrame *int_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2466,7 +2466,7 @@ PDB_print_int_frame(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
+PDB_print_num(Interp *interpreter, struct NReg *num_reg,
               int regnum)>
 
 Print the whole or a specific value of a float register structure.
@@ -2476,7 +2476,7 @@ Print the whole or a specific value of a float register structure.
 */
 
 void
-PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
+PDB_print_num(Interp *interpreter, struct NReg *num_reg,
               int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2505,7 +2505,7 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
 /*
 
 =item C<void
-PDB_print_num_frame(struct Parrot_Interp *interpreter,
+PDB_print_num_frame(Interp *interpreter,
                     struct NRegFrame *num_reg, int regnum)>
 
 Print the whole or a specific value of a float register frame structure.
@@ -2515,7 +2515,7 @@ Print the whole or a specific value of a float register frame structure.
 */
 
 void
-PDB_print_num_frame(struct Parrot_Interp *interpreter,
+PDB_print_num_frame(Interp *interpreter,
                     struct NRegFrame *num_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2541,7 +2541,7 @@ PDB_print_num_frame(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
+PDB_print_string(Interp *interpreter, struct SReg *string_reg,
                  int regnum)>
 
 Print the whole or a specific value of a string register structure.
@@ -2551,7 +2551,7 @@ Print the whole or a specific value of a string register structure.
 */
 
 void
-PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
+PDB_print_string(Interp *interpreter, struct SReg *string_reg,
                  int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2577,7 +2577,7 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
 /*
 
 =item C<void
-PDB_print_string_frame(struct Parrot_Interp *interpreter,
+PDB_print_string_frame(Interp *interpreter,
                        struct SRegFrame *string_reg, int regnum)>
 
 Print the whole or a specific value of a string register frame structure.
@@ -2587,7 +2587,7 @@ Print the whole or a specific value of a string register frame structure.
 */
 
 void
-PDB_print_string_frame(struct Parrot_Interp *interpreter,
+PDB_print_string_frame(Interp *interpreter,
                        struct SRegFrame *string_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2613,7 +2613,7 @@ PDB_print_string_frame(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)>
+print_pmc(Interp *interpreter, PMC* pmc)>
 
 Prints out a human-readable description of C<pmc>.
 
@@ -2622,7 +2622,7 @@ Prints out a human-readable description of C<pmc>.
 */
 
 static void
-print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
+print_pmc(Interp *interpreter, PMC* pmc)
 {
     if (pmc && pmc->vtable) {
         STRING* s = VTABLE_name(interpreter, pmc);
@@ -2640,7 +2640,7 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
 /*
 
 =item C<void
-PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
+PDB_print_pmc(Interp *interpreter, struct PReg *pmc_reg,
               int regnum, PMC* key)>
 
 Print the whole or a specific value of a PMC register structure.
@@ -2650,7 +2650,7 @@ Print the whole or a specific value of a PMC register structure.
 */
 
 void
-PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
+PDB_print_pmc(Interp *interpreter, struct PReg *pmc_reg,
               int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS;
@@ -2682,7 +2682,7 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
 /*
 
 =item C<void
-PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
+PDB_print_pmc_frame(Interp *interpreter,
                     struct PRegFrame *pmc_reg, int regnum, PMC* key)>
 
 Print the whole or a specific value of a PMC register frame structure.
@@ -2692,7 +2692,7 @@ Print the whole or a specific value of a PMC register frame structure.
 */
 
 void
-PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
+PDB_print_pmc_frame(Interp *interpreter,
                     struct PRegFrame *pmc_reg, int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
@@ -2723,7 +2723,7 @@ PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
 
 /*
 
-=item C<void PDB_info(struct Parrot_Interp *interpreter)>
+=item C<void PDB_info(Interp *interpreter)>
 
 Print the interpreter info.
 
@@ -2732,7 +2732,7 @@ Print the interpreter info.
 */
 
 void
-PDB_info(struct Parrot_Interp *interpreter)
+PDB_info(Interp *interpreter)
 {
     PIO_eprintf(interpreter, "Total memory allocated = %d\n",
             interpinfo(interpreter, TOTAL_MEM_ALLOC));
@@ -2759,7 +2759,7 @@ PDB_info(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-PDB_help(struct Parrot_Interp *interpreter, const char *command)>
+PDB_help(Interp *interpreter, const char *command)>
 
 Print the help text. "Help" with no arguments prints a list of commands.
 "Help xxx" prints information on command xxx.
@@ -2769,7 +2769,7 @@ Print the help text. "Help" with no arguments prints a list of commands.
 */
 
 void
-PDB_help(struct Parrot_Interp *interpreter, const char *command)
+PDB_help(Interp *interpreter, const char *command)
 {
     unsigned long c;
     const char* temp;

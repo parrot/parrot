@@ -43,7 +43,7 @@ const char *RX_NEWLINES = "\r\n";       /* XXX Unicode defines a few more. */
 /*
 
 =item C<INTVAL
-rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)>
+rx_is_word_character(Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied char is a word character.  It uses the
 constant C<RX_WORDCHARS> to create a bitmap.  Please see
@@ -54,7 +54,7 @@ F<docs/dev/rx.dev> for a detailed explanation of bitmap.
 */
 
 INTVAL
-rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
+rx_is_word_character(Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;
 
@@ -68,7 +68,7 @@ rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
 /*
 
 =item C<INTVAL
-rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)>
+rx_is_number_character(Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied character is a number character.  This
 function breaks abstraction to gain speed.  It's just a speed hack for
@@ -80,7 +80,7 @@ support/character encoding).
 */
 
 INTVAL
-rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
+rx_is_number_character(Interp *interpreter, INTVAL ch)
 {
     /* faster to do less-than/greater-than */
 
@@ -95,7 +95,7 @@ rx_is_number_character(struct Parrot_Interp *interpreter, INTVAL ch)
 /*
 
 =item C<INTVAL
-rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)>
+rx_is_whitespace_character(Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied character is a whitespace character.
 
@@ -104,7 +104,7 @@ Checks to see if supplied character is a whitespace character.
 */
 
 INTVAL
-rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
+rx_is_whitespace_character(Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;
 
@@ -118,7 +118,7 @@ rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
 /*
 
 =item C<INTVAL
-rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)>
+rx_is_newline(Interp *interpreter, INTVAL ch)>
 
 Checks to see if supplied character is a newline.
 
@@ -127,7 +127,7 @@ Checks to see if supplied character is a newline.
 */
 
 INTVAL
-rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
+rx_is_newline(Interp *interpreter, INTVAL ch)
 {
     static Bitmap bmp = NULL;
 
@@ -141,7 +141,7 @@ rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
 /*
 
 =item C<Bitmap
-bitmap_make(struct Parrot_Interp *interpreter, STRING *str)>
+bitmap_make(Interp *interpreter, STRING *str)>
 
 Creates a bitmap from supplied string.  Please see F<docs/dev/rx.dev>
 for more information on bitmaps.
@@ -151,7 +151,7 @@ for more information on bitmaps.
 */
 
 Bitmap
-bitmap_make(struct Parrot_Interp *interpreter, STRING *str)
+bitmap_make(Interp *interpreter, STRING *str)
 {
     UINTVAL i, ch;
     Bitmap bmp = mem_sys_allocate(sizeof(struct bitmap_t));
@@ -182,7 +182,7 @@ bitmap_make(struct Parrot_Interp *interpreter, STRING *str)
 /*
 
 =item C<Bitmap
-bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)>
+bitmap_make_cstr(Interp *interpreter, const char *str)>
 
 Same as C<bitmap_make()>, except passed a C<const char*> arg.
 
@@ -191,7 +191,7 @@ Same as C<bitmap_make()>, except passed a C<const char*> arg.
 */
 
 Bitmap
-bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)
+bitmap_make_cstr(Interp *interpreter, const char *str)
 {
     UINTVAL i, ch;
     Bitmap bmp = mem_sys_allocate(sizeof(struct bitmap_t));
@@ -214,7 +214,7 @@ bitmap_make_cstr(struct Parrot_Interp *interpreter, const char *str)
 /*
 
 =item C<void
-bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)>
+bitmap_add(Interp *interpreter, Bitmap bmp, INTVAL ch)>
 
 Appends supplied character to supplied bitmap.
 
@@ -223,7 +223,7 @@ Appends supplied character to supplied bitmap.
 */
 
 void
-bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
+bitmap_add(Interp *interpreter, Bitmap bmp, INTVAL ch)
 {
     if (ch > 255) {
         bmp->bigchars =
@@ -248,7 +248,7 @@ Checks if supplied character is in supplied bitmap.
 */
 
 INTVAL
-bitmap_match(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
+bitmap_match(Interp *interpreter, Bitmap bmp, INTVAL ch)
 {
     if (ch > 255) {
         UINTVAL i;
@@ -277,7 +277,7 @@ Frees up memory the bitmap allocated.
 */
 
 void
-bitmap_destroy(struct Parrot_Interp *interpreter, Bitmap bmp)
+bitmap_destroy(Interp *interpreter, Bitmap bmp)
 {
     /* XXX */
     if (bmp->bigchars && PObj_bufstart(bmp->bigchars))

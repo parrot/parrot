@@ -201,7 +201,7 @@ FINDENTERN:
     }
 
     print<<END_C;
-static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
+static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
 
 #include "parrot/embed.h"
 
@@ -226,7 +226,7 @@ END_C
 int
 main(int argc, char **argv) {
     int dummy_var;
-    struct Parrot_Interp *     interpreter;
+    Interp *     interpreter;
     struct PackFile *          pf;
     INTVAL i;
     PMC *userargv;
@@ -272,7 +272,7 @@ main(int argc, char **argv) {
     exit(0);
 }
 
-static opcode_t* run_compiled(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
+static opcode_t* run_compiled(Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code){
 
 switch_label:
     switch(cur_opcode - start_code) {

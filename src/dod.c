@@ -119,7 +119,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 
 /*
 
-=item C<void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)>
+=item C<void pobject_lives(Interp *interpreter, PObj *obj)>
 
 Tag C<obj> as alive.
 
@@ -131,7 +131,7 @@ ones.
 
 */
 
-void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
+void pobject_lives(Interp *interpreter, PObj *obj)
 {
 
     struct Small_Object_Arena *arena = GET_ARENA(obj);
@@ -174,7 +174,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 
 #else
 
-void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
+void pobject_lives(Interp *interpreter, PObj *obj)
 {
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
@@ -216,7 +216,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 /*
 
 =item C<static int
-trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)>
+trace_active_PMCs(Interp *interpreter, int trace_stack)>
 
 Do a full trace run and mark all the PMCs as active if they are. Returns
 whether the run wasn't aborted; i.e. whether it's safe to proceed with
@@ -230,7 +230,7 @@ GC.
 void mark_object_cache(Parrot_Interp);
 
 static int
-trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
+trace_active_PMCs(Interp *interpreter, int trace_stack)
 {
     PMC *current;
     /* Pointer to the currently being processed PMC
@@ -306,7 +306,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 /*
 
 =item C<static int
-trace_children(struct Parrot_Interp *interpreter, PMC *current)>
+trace_children(Interp *interpreter, PMC *current)>
 
 Returns whether the tracing process wasn't aborted.
 
@@ -315,7 +315,7 @@ Returns whether the tracing process wasn't aborted.
 */
 
 static int
-trace_children(struct Parrot_Interp *interpreter, PMC *current)
+trace_children(Interp *interpreter, PMC *current)
 {
     PMC *prev = NULL;
     unsigned i = 0;
@@ -396,7 +396,7 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
 /*
 
 =item C<static void
-trace_active_buffers(struct Parrot_Interp *interpreter)>
+trace_active_buffers(Interp *interpreter)>
 
 Scan any buffers in string registers and other non-PMC places and mark
 them as active.
@@ -406,7 +406,7 @@ them as active.
 */
 
 static void
-trace_active_buffers(struct Parrot_Interp *interpreter)
+trace_active_buffers(Interp *interpreter)
 {
     UINTVAL i;
 
@@ -432,7 +432,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)>
 
 Clear the COW ref count.
@@ -442,7 +442,7 @@ Clear the COW ref count.
 */
 
 void
-clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+clear_cow(Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)
 {
     UINTVAL object_size = pool->object_size;
@@ -482,7 +482,7 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 /*
 
 =item C<void
-used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+used_cow(Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)>
 
 Find other users of COW's C<bufstart>.
@@ -492,7 +492,7 @@ Find other users of COW's C<bufstart>.
 */
 
 void
-used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+used_cow(Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)
 {
     UINTVAL object_size = pool->object_size;
@@ -527,7 +527,7 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 /*
 
 =item C<static void
-clear_live_counter(struct Parrot_Interp *interpreter,
+clear_live_counter(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 Clear the live counter.
@@ -537,7 +537,7 @@ Clear the live counter.
 */
 
 static void
-clear_live_counter(struct Parrot_Interp *interpreter,
+clear_live_counter(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *arena;
@@ -567,7 +567,7 @@ clear_live_counter(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-reduce_arenas(struct Parrot_Interp *interpreter,
+reduce_arenas(Interp *interpreter,
         struct Small_Object_Pool *pool, UINTVAL free_arenas)>
 
 Reduce the number of memory arenas by freeing any that have no live
@@ -578,7 +578,7 @@ objects.
 */
 
 static void
-reduce_arenas(struct Parrot_Interp *interpreter,
+reduce_arenas(Interp *interpreter,
         struct Small_Object_Pool *pool, UINTVAL free_arenas)
 {
     struct Small_Object_Arena *arena, *next, *prev;
@@ -620,7 +620,7 @@ reduce_arenas(struct Parrot_Interp *interpreter,
 /*
 
 =item C<void
-free_unused_pobjects(struct Parrot_Interp *interpreter,
+free_unused_pobjects(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 Put any buffers/PMCs that are now unused onto the pool's free list. If
@@ -632,7 +632,7 @@ are immune from collection (i.e. constant).
 */
 
 void
-free_unused_pobjects(struct Parrot_Interp *interpreter,
+free_unused_pobjects(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *cur_arena;
@@ -845,7 +845,7 @@ find_common_mask(size_t val1, size_t val2)
 /*
 
 =item C<void
-trace_mem_block(struct Parrot_Interp *interpreter,
+trace_mem_block(Interp *interpreter,
                 size_t lo_var_ptr, size_t hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
@@ -855,7 +855,7 @@ Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
 */
 
 void
-trace_mem_block(struct Parrot_Interp *interpreter,
+trace_mem_block(Interp *interpreter,
                 size_t lo_var_ptr, size_t hi_var_ptr)
 {
     size_t prefix, tmp_ptr;
@@ -996,7 +996,7 @@ profile_dod_end(Parrot_Interp interpreter, int what)
 /*
 
 =item C<void
-Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)>
+Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)>
 
 See if we can find some unused headers.
 
@@ -1005,7 +1005,7 @@ See if we can find some unused headers.
 */
 
 void
-Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
+Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
 {
     struct Small_Object_Pool *header_pool;
     int j;

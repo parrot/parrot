@@ -33,7 +33,7 @@ and its utility functions.
 /*
 
 =item C<static STRING*
-uint_to_str(struct Parrot_Interp *interpreter,
+uint_to_str(Interp *interpreter,
             char *tc, UHUGEINTVAL num, char base, int minus)>
 
 Returns C<num> converted to a Parrot C<STRING>.
@@ -47,7 +47,7 @@ If C<minus> is true then C<-> is prepended to the string representation.
 */
 
 static STRING*
-uint_to_str(struct Parrot_Interp *interpreter,
+uint_to_str(Interp *interpreter,
             char *tc, UHUGEINTVAL num, char base, int minus)
 {
     char cur;
@@ -72,7 +72,7 @@ uint_to_str(struct Parrot_Interp *interpreter,
 /*
 
 =item C<STRING *
-int_to_str(struct Parrot_Interp *interpreter,
+int_to_str(Interp *interpreter,
            char *tc, HUGEINTVAL num, char base)>
 
 Returns C<num> converted to a Parrot C<STRING>.
@@ -86,7 +86,7 @@ If C<num < 0> then C<-> is prepended to the string representation.
 */
 
 STRING *
-int_to_str(struct Parrot_Interp *interpreter,
+int_to_str(Interp *interpreter,
            char *tc, HUGEINTVAL num, char base)
 {
     int minus = 0;
@@ -101,7 +101,7 @@ int_to_str(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static STRING *
-handle_flags(struct Parrot_Interp *interpreter,
+handle_flags(Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
@@ -111,7 +111,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 */
 
 static STRING *
-handle_flags(struct Parrot_Interp *interpreter,
+handle_flags(Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
 {
     UINTVAL len = string_length(interpreter, str);
@@ -196,7 +196,7 @@ handle_flags(struct Parrot_Interp *interpreter,
 /*
 
 =item C<static void
-gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
+gen_sprintf_call(Interp *interpreter, char *out,
                  SpfInfo info, int thingy)>
 
 Turn the info structure back into an sprintf format. Far from being
@@ -208,7 +208,7 @@ a float.
 */
 
 static void
-gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
+gen_sprintf_call(Interp *interpreter, char *out,
                  SpfInfo info, int thingy)
 {
     int i = 0;
@@ -269,7 +269,7 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
 /*
 
 =item C<STRING *
-Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
+Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                       SPRINTF_OBJ * obj)>
 
 This is the engine that does all the formatting.
@@ -279,7 +279,7 @@ This is the engine that does all the formatting.
 */
 
 STRING *
-Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
+Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                       SPRINTF_OBJ * obj)
 {
     INTVAL i, len, old;

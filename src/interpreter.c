@@ -64,7 +64,7 @@ static void setup_event_func_ptrs(Parrot_Interp interpreter);
 /*
 
 =item C<static void
-prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
+prederef_args(void **pc_prederef, Interp *interpreter,
         opcode_t *pc, op_info_t *opinfo)>
 
 Called from C<do_prederef()> to deal with any arguments.
@@ -76,7 +76,7 @@ C<pc_prederef> is the current opcode.
 */
 
 static void
-prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
+prederef_args(void **pc_prederef, Interp *interpreter,
         opcode_t *pc, op_info_t *opinfo)
 {
     struct PackFile_ConstTable * const_table
@@ -325,7 +325,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
 /*
 
 =item C<static void
-load_prederef(struct Parrot_Interp *interpreter, int which)>
+load_prederef(Interp *interpreter, int which)>
 
 C<< interpreter->op_lib >> = prederefed oplib.
 
@@ -334,7 +334,7 @@ C<< interpreter->op_lib >> = prederefed oplib.
 */
 
 static void
-load_prederef(struct Parrot_Interp *interpreter, int which)
+load_prederef(Interp *interpreter, int which)
 {
     oplib_init_f init_func = get_op_lib_init(1, which, NULL);
     int (*get_op)(const char * name, int full);
@@ -352,7 +352,7 @@ load_prederef(struct Parrot_Interp *interpreter, int which)
 /*
 
 =item C<static void
-init_prederef(struct Parrot_Interp *interpreter, int which)>
+init_prederef(Interp *interpreter, int which)>
 
 Initialize: load prederef C<func_table>, file prederef.code.
 
@@ -361,7 +361,7 @@ Initialize: load prederef C<func_table>, file prederef.code.
 */
 
 static void
-init_prederef(struct Parrot_Interp *interpreter, int which)
+init_prederef(Interp *interpreter, int which)
 {
     load_prederef(interpreter, which);
     if (!interpreter->prederef.code) {
@@ -395,7 +395,7 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
 /*
 
 =item C<static void
-stop_prederef(struct Parrot_Interp *interpreter)>
+stop_prederef(Interp *interpreter)>
 
 Restore the interpreter's op function tables to their initial state.
 
@@ -404,7 +404,7 @@ Restore the interpreter's op function tables to their initial state.
 */
 
 static void
-stop_prederef(struct Parrot_Interp *interpreter)
+stop_prederef(Interp *interpreter)
 {
     if (interpreter->resume_flag & RESUME_RESTART) {
         interpreter->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
@@ -421,7 +421,7 @@ stop_prederef(struct Parrot_Interp *interpreter)
 /*
 
 =item C<void
-exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)>
+exec_init_prederef(Interp *interpreter, void *prederef_arena)>
 
 C<< interpreter->op_lib >> = prederefed oplib
 
@@ -434,7 +434,7 @@ C<op_info_table>
 */
 
 void
-exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
+exec_init_prederef(Interp *interpreter, void *prederef_arena)
 {
     load_prederef(interpreter, PARROT_CGP_CORE);
 
@@ -455,7 +455,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 /*
 
 =item C<void *
-init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)>
+init_jit(Interp *interpreter, opcode_t *pc)>
 
 Initializes JIT function for the specified opcode and returns it.
 
@@ -464,7 +464,7 @@ Initializes JIT function for the specified opcode and returns it.
 */
 
 void *
-init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
+init_jit(Interp *interpreter, opcode_t *pc)
 {
 #if JIT_CAPABLE
     opcode_t *code_start;
@@ -528,7 +528,7 @@ extern void* aix_get_toc( );
 /*
 
 =item C<static opcode_t *
-runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_jit(Interp *interpreter, opcode_t *pc)>
 
 Runs the JIT code for the specified opcode.
 
@@ -537,7 +537,7 @@ Runs the JIT code for the specified opcode.
 */
 
 static opcode_t *
-runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_jit(Interp *interpreter, opcode_t *pc)
 {
 #if JIT_CAPABLE
 #  ifdef PARROT_EXEC_OS_AIX
@@ -563,7 +563,7 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<static opcode_t *
-runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_exec(Interp *interpreter, opcode_t *pc)>
 
 Runs the native executable version of the specified opcode.
 
@@ -572,7 +572,7 @@ Runs the native executable version of the specified opcode.
 */
 
 static opcode_t *
-runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_exec(Interp *interpreter, opcode_t *pc)
 {
 #if EXEC_CAPABLE
     opcode_t *code_start;
@@ -609,7 +609,7 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<static opcode_t *
-runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_prederef(Interp *interpreter, opcode_t *pc)>
 
 This runops core is used when we are in prederef mode. It works just
 like the basic fast core, except it uses C<pc_prederef> instead of pc,
@@ -631,7 +631,7 @@ implementation that only occurs for interpreter flag changing ops).
 */
 
 static opcode_t *
-runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_prederef(Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
@@ -652,7 +652,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<static opcode_t *
-runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_cgp(Interp *interpreter, opcode_t *pc)>
 
 Runs the C C<goto>, predereferenced core.
 
@@ -661,7 +661,7 @@ Runs the C C<goto>, predereferenced core.
 */
 
 static opcode_t *
-runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_cgp(Interp *interpreter, opcode_t *pc)
 {
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
@@ -682,7 +682,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<static opcode_t *
-runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)>
+runops_switch(Interp *interpreter, opcode_t *pc)>
 
 Runs the C<switch> core.
 
@@ -691,7 +691,7 @@ Runs the C<switch> core.
 */
 
 static opcode_t *
-runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
+runops_switch(Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
@@ -705,7 +705,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
 /*
 
 =item C<void
-runops_int(struct Parrot_Interp *interpreter, size_t offset)>
+runops_int(Interp *interpreter, size_t offset)>
 
 Run parrot operations of loaded code segment until an end opcode is
 reached run core is selected depending on the C<Interp_flags> when a
@@ -717,12 +717,12 @@ evaluation of opcode continues.
 */
 
 void
-runops_int(struct Parrot_Interp *interpreter, size_t offset)
+runops_int(Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
     void *old_lo_var_ptr;
-    opcode_t *(*core) (struct Parrot_Interp *, opcode_t *) =
-        (opcode_t *(*) (struct Parrot_Interp *, opcode_t *)) 0;
+    opcode_t *(*core) (Interp *, opcode_t *) =
+        (opcode_t *(*) (Interp *, opcode_t *)) 0;
 
     /*
      * setup event function ptrs and set the stack limit
@@ -828,7 +828,7 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 /*
 
 =item C<void
-runops(struct Parrot_Interp *interpreter, size_t offset)>
+runops(Interp *interpreter, size_t offset)>
 
 Run parrot ops. Set exception handler and/or resume after exception.
 
@@ -839,7 +839,7 @@ Run parrot ops. Set exception handler and/or resume after exception.
 #define STACKED_EXCEPTIONS 1
 
 void
-runops(struct Parrot_Interp *interpreter, size_t offset)
+runops(Interp *interpreter, size_t offset)
 {
     /*
      * having stacked exceptions for each runlevel didn't work always
@@ -1658,7 +1658,7 @@ void Parrot_really_destroy(int exit_code, void *interpreter);
 Parrot_Interp
 make_interpreter(Parrot_Interp parent, Interp_flags flags)
 {
-    struct Parrot_Interp *interpreter;
+    Interp *interpreter;
 #if EXEC_CAPABLE
     extern int Parrot_exec_run;
 #endif
@@ -1842,7 +1842,7 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 /*
 
 =item C<void
-Parrot_destroy(struct Parrot_Interp *interpreter)>
+Parrot_destroy(Interp *interpreter)>
 
 Does nothing if C<ATEXIT_DESTROY> is defined. Otherwise calls
 C<Parrot_really_destroy()> with exit code 0.
@@ -1854,7 +1854,7 @@ This function is not currently used.
 */
 
 void
-Parrot_destroy(struct Parrot_Interp *interpreter)
+Parrot_destroy(Interp *interpreter)
 {
 #ifdef ATEXIT_DESTROY
     UNUSED(interpreter);
@@ -2000,7 +2000,7 @@ extern struct mallinfo mallinfo(void);
 /*
 
 =item C<INTVAL
-interpinfo(struct Parrot_Interp *interpreter, INTVAL what)>
+interpinfo(Interp *interpreter, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -2010,7 +2010,7 @@ interpreter.
 */
 
 INTVAL
-interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
+interpinfo(Interp *interpreter, INTVAL what)
 {
     INTVAL ret = 0;
     struct Small_Object_Pool *header_pool;

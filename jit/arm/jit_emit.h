@@ -609,7 +609,7 @@ static void emit_jump_to_op(Parrot_jit_info_t *jit_info, arm_cond_t cond,
 
 static char *
 emit_load_constant_from_pool (char *pc,
-                              struct Parrot_Interp *interpreter,
+                              Interp *interpreter,
                               arm_cond_t cond,
                               int value,
                               arm_register_t hwreg)
@@ -635,7 +635,7 @@ emit_load_constant_from_pool (char *pc,
 
 static char *
 emit_load_constant (char *pc,
-                    struct Parrot_Interp *interpreter,
+                    Interp *interpreter,
                     arm_cond_t cond,
                     int value,
                     arm_register_t hwreg)
@@ -660,7 +660,7 @@ emit_load_constant (char *pc,
 
 static void
 Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
-                    struct Parrot_Interp *interpreter,
+                    Interp *interpreter,
                     arm_cond_t cond,
                     int param,
                     arm_register_t hwreg)
@@ -704,7 +704,7 @@ Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
-                     struct Parrot_Interp *interpreter,
+                     Interp *interpreter,
                      arm_cond_t cond,
                      int param,
                      arm_register_t hwreg)
@@ -743,7 +743,7 @@ Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
-                                  struct Parrot_Interp *interpreter,
+                                  Interp *interpreter,
                                   arm_cond_t cond,
                                   enum constant_state alternate_on,
                                   alu_op_t normal, alu_op_t alternative,
@@ -804,7 +804,7 @@ Parrot_jit_arith_const_alternate (Parrot_jit_info_t *jit_info,
 */
 static void
 Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
-                         struct Parrot_Interp *interpreter,
+                         Interp *interpreter,
                          int src, int const_val, int where_to,
                          arm_cond_t when)
 {
@@ -834,7 +834,7 @@ Parrot_jit_jumpif_const (Parrot_jit_info_t *jit_info,
 
 static void
 Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
-                         struct Parrot_Interp * interpreter,
+                         Interp * interpreter,
                          arm_register_t reg)
 {
     /* This is effectively the pseudo-opcode ldr - ie load relative to PC.
@@ -859,7 +859,7 @@ Parrot_jump_to_op_in_reg(Parrot_jit_info_t *jit_info,
 #if JIT_EMIT == 2
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp * interpreter)
+                        Interp * interpreter)
 {
     Parrot_jit_fixup_t *fixup = jit_info->arena.fixups;
 
@@ -894,7 +894,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
-                 struct Parrot_Interp * interpreter)
+                 Interp * interpreter)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG12_ip, REG13_sp);
     jit_info->native_ptr = emit_ldmstm (jit_info->native_ptr,
@@ -949,7 +949,7 @@ need to adr beyond:
 */
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     struct Parrot_Interp * interpreter)
+                     Interp * interpreter)
 {
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, r1, r4);
 #ifndef ARM_K_BUG
@@ -981,7 +981,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
    We want address of equivalent bit of jit code, which is stored as an
    address at the same offset in a jit table. */
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                        struct Parrot_Interp * interpreter)
+                        Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
     Parrot_jump_to_op_in_reg(jit_info, interpreter, r0);
@@ -989,25 +989,25 @@ void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
 /* move reg to mem (i.e. intreg) */
 void
-Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr(Interp * interpreter, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. intreg) to reg */
 void
-Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm(Interp * interpreter, int reg, char *mem)
 {
 }
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem, int reg)
 {
 }
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_n(Interp * interpreter, int reg, char *mem)
 {
 }
 

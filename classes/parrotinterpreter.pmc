@@ -389,8 +389,8 @@ Runs the interpreter's byte code.
 */
 
     void* invoke (void* next) {
-        struct Parrot_Interp * new_interp =
-            (struct Parrot_Interp *)PMC_data(SELF);
+        Interp * new_interp =
+            (Interp *)PMC_data(SELF);
         /*
          * setup code
          */
@@ -412,8 +412,8 @@ Returns the PMC global value for C<key>.
 */
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-        struct Parrot_Interp * new_interp =
-            (struct Parrot_Interp *)PMC_data(SELF);
+        Interp * new_interp =
+            (Interp *)PMC_data(SELF);
         if (key >= 0 && key < IGLOBALS_SIZE)
             return VTABLE_get_pmc_keyed_int(new_interp,
                 new_interp->iglobals, key);
@@ -434,8 +434,8 @@ Returns the interpreter info for C<key>.
 */
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-        struct Parrot_Interp * new_interp =
-            (struct Parrot_Interp *)PMC_data(SELF);
+        Interp * new_interp =
+            (Interp *)PMC_data(SELF);
         switch (key) {
             case -1:
             return (INTVAL) new_interp->flags;
@@ -455,8 +455,8 @@ Sets the interpreter info for C<key> to C<val>.
 */
 
     void set_integer_keyed_int(INTVAL key, INTVAL val) {
-        struct Parrot_Interp * new_interp =
-            (struct Parrot_Interp *)PMC_data(SELF);
+        Interp * new_interp =
+            (Interp *)PMC_data(SELF);
         INTVAL allowed;
 
         switch (key) {

@@ -45,7 +45,7 @@ new_stack(Interp *interpreter, const char *name)
 /*
 
 =item C<void
-mark_stack(struct Parrot_Interp *interpreter,
+mark_stack(Interp *interpreter,
            Stack_Chunk_t *chunk)>
 
 Mark entries in a stack structure during DOD.
@@ -55,7 +55,7 @@ Mark entries in a stack structure during DOD.
 */
 
 void
-mark_stack(struct Parrot_Interp *interpreter,
+mark_stack(Interp *interpreter,
            Stack_Chunk_t *chunk)
 {
     Stack_Entry_t *entry;

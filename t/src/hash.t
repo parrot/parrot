@@ -46,7 +46,7 @@ CODE
 c_output_is($main . <<'CODE', <<'OUTPUT', "new_hash");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -76,7 +76,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_put");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -114,7 +114,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -151,7 +151,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with NULL key");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -196,7 +196,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with empty string key");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -235,7 +235,7 @@ c_output_is($main . <<'CODE', <<'OUTPUT', "hash_get with big key");
 #define BIGLEN 999999
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -278,7 +278,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_size");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -323,7 +323,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_delete");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -373,7 +373,7 @@ OUTPUT
 c_output_is($main . <<'CODE', <<'OUTPUT', "hash_clone");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
@@ -420,7 +420,7 @@ SKIP: {
 c_output_like($main . <<'CODE', <<'OUTPUT', "dump_hash");
 
 static opcode_t*
-the_test(struct Parrot_Interp *interpreter,
+the_test(Interp *interpreter,
 	opcode_t *cur_op, opcode_t *start)
 {
     Hash *hash;
