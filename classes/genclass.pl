@@ -28,9 +28,10 @@ for (vtbl_enumerate(%vtbl)) {
     print "}\n";
 }
 
+# I am Jack's contorted attempt at portability
 print <<EOF;
 void Parrot_${classname}_init (void) {
-    Parrot_base_vtables[enum_class_$classname] = (struct _vtable) {
+    struct _vtable temp_base_vtable = {
         NULL,
         enum_class_$classname,
         0, /* int_type - change me */
@@ -44,5 +45,6 @@ for (vtbl_enumerate(%vtbl)) {
     print "\t\tParrot_${classname}_$_->[1],\n";
 }
 print "\t};\n";
+print "\tParrot_base_vtables[enum_class_$classname] = temp_base_vtable;\n";
 print "}\n";
 
