@@ -119,12 +119,22 @@ bigint_div_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
     /* this is mpz_fdiv_q */
     mpz_div(BN(dest), BN(self), BN(value));
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
 }
 static void
 bigint_mod_bigint(Interp *interpreter, PMC* self, PMC *value, PMC *dest)
 {
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_mod(BN(dest), BN(self), BN(value));
+    if (mpz_fits_slong_p(BN(dest))) {
+        VTABLE_morph(interpreter, dest, enum_class_PerlInt);
+        VTABLE_set_integer_native(interpreter, dest,
+             mpz_get_si(BN(dest)));
+    }
 }
 
 static void
@@ -173,7 +183,6 @@ bigint_set_str(Interp *interpreter, PMC *self, char* value) {
 static void
 bigint_set_self(Interp *interpreter, PMC *self, BIGNUM *value) {
     internal_exception(1, "no bigint lib loaded");
-    return NULL;
 }
 static BIGNUM*
 bigint_get_self(Interp *interpreter, PMC *self) {
@@ -458,11 +467,6 @@ MMD_DEFAULT: {
     void divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_div_bigint(INTERP, SELF, value, dest);
-                if (mpz_fits_slong_p(BN(dest))) {
-                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
-                    VTABLE_set_integer_native(INTERP, dest,
-                         mpz_get_si(BN(dest)));
-                }
             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp");
@@ -472,11 +476,6 @@ MMD_DEFAULT: {
     void modulus(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
-                if (mpz_fits_slong_p(BN(dest))) {
-                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
-                    VTABLE_set_integer_native(INTERP, dest,
-                         mpz_get_si(BN(dest)));
-                }
             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp");
@@ -486,11 +485,6 @@ MMD_DEFAULT: {
     void cmodulus(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_mod_bigint(INTERP, SELF, value, dest);
-                if (mpz_fits_slong_p(BN(dest))) {
-                    VTABLE_morph(INTERP, dest, enum_class_PerlInt);
-                    VTABLE_set_integer_native(INTERP, dest,
-                         mpz_get_si(BN(dest)));
-                }
             }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp");
