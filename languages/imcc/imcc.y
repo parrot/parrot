@@ -449,6 +449,7 @@ static char * inv_op(char *op) {
 %token <sr> VAR
 %token <t> LINECOMMENT
 %token <s> FILECOMMENT
+%expect 1 /* s/r between empty PARAM and $default in sub_body -> statemen */
 
 %pure_parser
 
@@ -530,7 +531,6 @@ pcc_sub: PCC_SUB   { open_comp_unit(); }
     ;
 
 pcc_params: /* empty */                   { $$ = 0; }
-    | pcc_param '\n'                      { add_pcc_param($<sr>0, $1);}
     | pcc_params pcc_param '\n'           { add_pcc_param($<sr>0, $2);}
     ;
 
@@ -585,7 +585,6 @@ pcc_call: PCC_CALL var COMMA var '\n' {
      ;
 
 pcc_args: /* empty */                   { $$ = 0; }
-    | pcc_arg '\n'                      {  add_pcc_arg($<sr>0, $1);}
     | pcc_args pcc_arg '\n'             {  add_pcc_arg($<sr>0, $2);}
     ;
 
@@ -593,7 +592,6 @@ pcc_arg: ARG var                        { $$ = $2; }
     ;
 
 pcc_results: /* empty */                { $$ = 0; }
-    |       pcc_result '\n'             { if($1) add_pcc_result($<sr>-4, $1); }
     | pcc_results pcc_result '\n'       { if($2) add_pcc_result($<sr>-4, $2); }
     ;
 
