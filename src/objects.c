@@ -21,6 +21,21 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+static PMC *
+clone_array(Parrot_Interp interpreter, PMC *source_array) {
+    PMC *new_array;
+    INTVAL count;
+    INTVAL i;
+    count = VTABLE_elements(interpreter, source_array);
+    new_array = pmc_new(interpreter, enum_class_Array);
+    VTABLE_set_integer_native(interpreter, new_array, count);
+    for (i = 0; i < count; i++) {
+        VTABLE_set_pmc_keyed_int(interpreter, new_array, i,
+                                 VTABLE_get_pmc_keyed_int(interpreter, source_array, i));
+    }
+    return new_array;
+}
+
 /*
 
 =item C<static PMC *
@@ -231,24 +246,24 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     /* Our penultimate parent list is a clone of our parent's parent
        list, with our parent unshifted onto the beginning */
     temp_pmc =
-        VTABLE_clone(interpreter,
-                VTABLE_get_pmc_keyed_int(interpreter,
-                    (PMC *)PMC_data(base_class), PCD_ALL_PARENTS));
+        clone_array(interpreter,
+                   VTABLE_get_pmc_keyed_int(interpreter,
+                       (PMC *)PMC_data(base_class), PCD_ALL_PARENTS));
     VTABLE_unshift_pmc(interpreter, temp_pmc, base_class);
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ALL_PARENTS,
             temp_pmc);
 
     /* Our attribute list is our parent's attribute list */
-    temp_pmc = VTABLE_clone(interpreter,
-            VTABLE_get_pmc_keyed_int(interpreter,
-                (PMC *)PMC_data(base_class), PCD_ATTRIB_OFFS));
+    temp_pmc = clone_array(interpreter,
+                          VTABLE_get_pmc_keyed_int(interpreter,
+                              (PMC *)PMC_data(base_class), PCD_ATTRIB_OFFS));
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ATTRIB_OFFS,
             temp_pmc);
 
     /* And our full keyed attribute list is our parent's */
-    temp_pmc = VTABLE_clone(interpreter,
-            VTABLE_get_pmc_keyed_int(interpreter,
-                (PMC *)PMC_data(base_class), PCD_ATTRIBUTES));
+    temp_pmc = clone_array(interpreter,
+                          VTABLE_get_pmc_keyed_int(interpreter,
+                               (PMC *)PMC_data(base_class), PCD_ATTRIBUTES));
     VTABLE_set_pmc_keyed_int(interpreter, child_class_array, PCD_ATTRIBUTES,
             temp_pmc);
 
@@ -415,8 +430,9 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object) {
     /* put in the real vtable
      * XXX we are leaking ths vtable
      */
+    /*    object->vtable = Parrot_base_vtables[class_enum];*/
     object->vtable = Parrot_clone_vtable(interpreter,
-                Parrot_base_vtables[enum_class_ParrotObject]);
+          Parrot_base_vtables[enum_class_ParrotObject]);
     /* and set type of class */
     object->vtable->base_type = class_enum;
 
