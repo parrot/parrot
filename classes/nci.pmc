@@ -16,6 +16,10 @@
 
 pmclass NCI {
 
+    void init() {
+	SELF->cache.struct_val = NULL;
+    }
+
     void set_string_keyed (PMC* func, STRING* value) {
     	PObj_custom_mark_SET(SELF);
 	/* key = func_ptr, value = signature */
