@@ -108,11 +108,15 @@ sub new {
   # XXX Must be generated from the enum in include/parrot/pmc.h
   #
   bless $self,$class;
-  my $cnt=0;
-  for(qw(Array PerlUndef PerlInt PerlNum PerlString
-         PerlArray PerlHash ParrotPointer IntQueue)) {
-    $self->{constants}{$_} = $cnt++;
-  }
+  $self->{constants}{Array} = 0;
+  $self->{constants}{PerlUndef} = 1;
+  $self->{constants}{PerlInt} = 2;
+  $self->{constants}{PerlNum} = 3;
+  $self->{constants}{PerlString} = 4;
+  $self->{constants}{PerlArray} = 5;
+  $self->{constants}{PerlHash} = 6;
+  $self->{constants}{ParrotPointer} = 7;
+  $self->{constants}{IntQueue} = 8;
   $self;
 }
 
