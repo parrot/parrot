@@ -302,6 +302,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     unsigned int i, j, chunks_traced;
     Stack_chunk *cur_stack, *start_stack;
     struct PRegChunk *cur_chunk;
+    Stack_entry *entry;
 
     /* We have to start somewhere, and the global stash is a good
      * place */
@@ -336,10 +337,15 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     chunks_traced = 0;
     /* The general stack's circular, so we need to be careful */
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
-        for (i = 0; i < cur_stack->used; i++) {
-            if (STACK_ENTRY_PMC == cur_stack->entry[i].entry_type &&
-                cur_stack->entry[i].entry.pmc_val) {
-                last = mark_used(cur_stack->entry[i].entry.pmc_val, last);
+        if(cur_stack->buffer){
+            buffer_lives(cur_stack->buffer);
+
+            entry = (Stack_entry *)(cur_stack->buffer->bufstart);
+            for (i = 0; i < cur_stack->used; i++) {
+                if (STACK_ENTRY_PMC == entry[i].entry_type &&
+                    entry[i].entry.pmc_val) {
+                    last = mark_used(entry[i].entry.pmc_val, last);
+                }
             }
         }
 
@@ -398,6 +404,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     UINTVAL i, j, chunks_traced;
     Stack_chunk *cur_stack, *start_stack;
     struct SRegChunk *cur_chunk;
+    Stack_entry *entry;
 
     /* First mark the current set. We assume that all pointers in S
      * registers are pointing to valid buffers. This is not a good
@@ -426,10 +433,14 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     chunks_traced = 0;
     /* The general stack's circular, so we need to be careful */
     while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
-        for (i = 0; i < cur_stack->used; i++) {
-            if (STACK_ENTRY_STRING == cur_stack->entry[i].entry_type &&
-                cur_stack->entry[i].entry.string_val) {
-                buffer_lives((Buffer *)cur_stack->entry[i].entry.string_val);
+        if(cur_stack->buffer){ 
+            buffer_lives(cur_stack->buffer);
+            entry = (Stack_entry *)(cur_stack->buffer->bufstart);
+            for (i = 0; i < cur_stack->used; i++) {
+                if (STACK_ENTRY_STRING == entry[i].entry_type &&
+                    entry[i].entry.string_val) {
+                    buffer_lives((Buffer *)entry[i].entry.string_val);
+                }
             }
         }
 

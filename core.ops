@@ -6,7 +6,7 @@
  * of KEY structures, and can be used in an expression.
  */
 
-#define MAKE_KEY(k,v,c,t) (k.atom.type = c, k.atom.val.t = v, k.next = NULL, &k)
+#define MAKE_KEY(k,v,c,t) (k.atom.type = c, k.atom.val.t = v, k.next = NULL, k.flags = BUFFER_sysmem_FLAG, &k)
 
 VERSION = PARROT_VERSION;
 
@@ -1545,6 +1545,8 @@ inline op inc(inout PMC) {
 
 =item B<inc>(inout NUM, in INT)
 
+=item B<inc>(inout NUM, in NUM)
+
 Increase $1 by the amount in $2.
 
 =cut
@@ -1554,7 +1556,7 @@ inline op inc(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op inc(inout NUM, in INT) {
+inline op inc(inout NUM, in NUM) {
   $1 += $2;
   goto NEXT();
 }

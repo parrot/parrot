@@ -21,15 +21,22 @@ new_stack(Interp *interpreter)
 {
 #ifdef TIDY
     int i;
+    Stack_entry *entry;
 #endif
+
     Stack_chunk *stack = mem_allocate_aligned(sizeof(Stack_chunk));
     
     stack->used = 0;
     stack->next = stack;
     stack->prev = stack;
+    stack->buffer = new_buffer_header(interpreter);
+    Parrot_allocate(interpreter, stack->buffer,
+                    sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
+
 #ifdef TIDY
+    entry = (Stack_entry *)stack->buffer->bufstart;
     for (i = 0; i < STACK_CHUNK_DEPTH; i++)
-        stack->entry[i].flags = NO_STACK_ENTRY_FLAGS;
+        entry[i].flags = NO_STACK_ENTRY_FLAGS;
 #endif
     return stack;
 }
@@ -56,7 +63,7 @@ Stack_entry *
 stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
 {
     Stack_chunk *chunk;
-    Stack_entry *entry = NULL;
+    Stack_entry *entry;
     size_t offset = (size_t)depth;
     
     /* For negative depths, look from the bottom of the stack up. */
@@ -68,7 +75,7 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
             chunk  = chunk->next;
         }
         if (offset < chunk->used) {
-            entry = &chunk->entry[offset - 1];
+            entry = (Stack_entry *)chunk->buffer->bufstart + offset - 1;
         }
     }
     else {
@@ -78,7 +85,8 @@ stack_entry(Interp *interpreter, Stack_chunk *stack_base, Intval depth)
             chunk  = chunk->prev;
         }
         if (offset < chunk->used) {
-            entry = &chunk->entry[chunk->used - offset - 1];
+            entry = (Stack_entry *)chunk->buffer->bufstart +
+                                                    chunk->used - offset - 1;
         }
     }
     return entry;
@@ -152,15 +160,23 @@ stack_push(Interp *interpreter, Stack_chunk *stack_base,
     if (chunk->used == STACK_CHUNK_DEPTH) {
         /* Need to add a new chunk */
         Stack_chunk *new_chunk = mem_allocate_aligned(sizeof(Stack_chunk));
+
         new_chunk->used = 0;
         new_chunk->next = stack_base;
         new_chunk->prev = chunk;
         chunk->next = new_chunk;
         stack_base->prev = new_chunk;
         chunk = new_chunk;
+
+        /* Need to initialize this pointer before the collector sees it */
+        chunk->buffer = NULL;
+        chunk->buffer = new_buffer_header(interpreter);
+
+        Parrot_allocate(interpreter, chunk->buffer,
+                        sizeof(Stack_entry) * STACK_CHUNK_DEPTH);
     }
 
-    entry = &chunk->entry[chunk->used];
+    entry = (Stack_entry *)(chunk->buffer->bufstart) + chunk->used;
 
     /* Remember the type */
     entry->entry_type = type;
@@ -227,7 +243,7 @@ stack_pop(Interp *interpreter, Stack_chunk *stack_base,
     /* Now decrement the SP */
     chunk->used--;
 
-    entry = &chunk->entry[chunk->used];
+    entry = (Stack_entry *)(chunk->buffer->bufstart) + chunk->used;
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type) {

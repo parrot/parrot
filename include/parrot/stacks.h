@@ -50,7 +50,7 @@ typedef struct stack_chunk {
     size_t used;
     struct stack_chunk *next;
     struct stack_chunk *prev;
-    struct stack_entry  entry[STACK_CHUNK_DEPTH];
+    Buffer *buffer;
 } Stack_chunk;
 
 typedef void (*Stack_cleanup_method)(Stack_entry *);

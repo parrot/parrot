@@ -348,7 +348,6 @@ lib/Parrot/PakFile2.pm
 lib/Parrot/PakFile2.xs
 lib/Parrot/String.pm
 lib/Parrot/Test.pm
-lib/Parrot/Types.pm
 lib/Parrot/Vtable.pm
 lib/Test/Builder.pm
 lib/Test/More.pm
