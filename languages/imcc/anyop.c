@@ -65,7 +65,7 @@ op_t
 op_find_exact(const char * name) {
     short i;
     for (i = 0; i < lastlib; i++) {
-	short opnum = oplibs[i].oplib->op_code(name);
+	short opnum = oplibs[i].oplib->op_code(name, 1);
 	if (opnum >= 0) {
 	    op_t ret;
 	    ret.lib = i;

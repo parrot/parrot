@@ -1494,7 +1494,7 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
         *(c++) = *(command++);
     *c = '\0';
     /* Find the opcode number */
-    op_number = interpreter->op_lib->op_code(buf);
+    op_number = interpreter->op_lib->op_code(buf, 1);
     if (op_number < 0) {
         fprintf(stderr, "Invalid opcode '%s'\n", buf);
         return;

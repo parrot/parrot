@@ -72,7 +72,7 @@ PXS_shiftp(Parrot_Interp_t interp) {
 }
 
 INTVAL PXS_findop(Parrot_Interp_t interp, const char * opname) {
-    int op = interp->op_lib->op_code(opname);
+    int op = interp->op_lib->op_code(opname, 1);
     return op;
 }
 
