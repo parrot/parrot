@@ -290,3 +290,5 @@ CODE
 ok 1
 Hello Parrot!
 OUTPUT
+
+unlink "temp.file";
