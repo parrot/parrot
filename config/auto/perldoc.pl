@@ -24,13 +24,17 @@ $description="Determining if your system has perldoc installed...";
 sub runstep {
     
     my $a = `perldoc perldoc`;
+    my $test;
     unless ($a =~ m/perldoc/) {
 	Configure::Data->set(perldoc => 0);
 	Configure::Data->set(notperldoc => 1);
     } else {
+        $test = 1;
         Configure::Data->set(perldoc => 1);
 	Configure::Data->set(notperldoc => 0);
     }
+
+    $Configure::Step::result = $test ? 'yes' : 'no';
 }
 
 1;
