@@ -1034,7 +1034,7 @@ OK5:	print	"ok 5\\n"
 	print	"not "
 OK6:	print	"ok 6\\n"
 
-	set	S0, "\0"
+	set	S0, "\\x0"
 	if	S0, OK7
 	print	"not "
 OK7:	print	"ok 7\\n"
@@ -1092,7 +1092,7 @@ output_is(<<CODE, <<OUTPUT, "repeat_s_s|sc_i|ic");
 	repeat S6, "***", 0
 	print S6
 	print "< done\\n"
-	
+
 	end
 CODE
 x
@@ -1237,7 +1237,7 @@ CODE
 OUTPUT
 
 output_is(<<'CODE',<<OUTPUT,"num to string");
-    set N0, 80.43 
+    set N0, 80.43
     set S0, N0
     print S0
     print "\n"
@@ -1403,7 +1403,7 @@ OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "sprintf");
     branch MAIN
-    
+
 NEWARYP:
     new P1, .PerlArray
     set P1[0], P0
@@ -1424,39 +1424,39 @@ PRINTF:
     sprintf S2, S1, P1
     print S2
     ret
-    
+
 MAIN:
     set S1, "Hello, %s\n"
     set S0, "Parrot!"
     bsr NEWARYS
     bsr PRINTF
-    
+
     set S1, "PerlHash[0x%x]\n"
     set I0, 256
     bsr NEWARYI
     bsr PRINTF
-    
+
     set S1, "PerlHash[0x%lx]\n"
     set I0, 256
     bsr NEWARYI
     bsr PRINTF
-	        
+
     set S1, "Hello, %.2s!\n"
     set S0, "Parrot"
     bsr NEWARYS
     bsr PRINTF
-	        
+
     set S1, "Hello, %Ss"
     set S0, S2
     bsr NEWARYS
     bsr PRINTF
-    
+
     set S1, "1 == %Pd\n"
     new P0, .PerlInt
     set P0, 1
     bsr NEWARYP
     bsr PRINTF
-	        
+
     set S1, "-255 == %vd\n"
     set I0, -255
     bsr NEWARYI
@@ -1480,13 +1480,13 @@ MAIN:
     set S1, "001 == %0.3u\n"
     set I0, 1
     bsr NEWARYI
-    bsr PRINTF    
+    bsr PRINTF
 
     set S1, "+001 == %+0.3u\n"
     set I0, 1
     bsr NEWARYI
     bsr PRINTF
-    	
+
     set S1, "0.500000 == %f\n"
     set N0, 0.5
     bsr NEWARYN
@@ -1496,32 +1496,32 @@ MAIN:
     set N0, 0.5
     bsr NEWARYN
     bsr PRINTF
-		
+
     set S1, "0.001 == %g\n"
     set N0, 0.001
     bsr NEWARYN
     bsr PRINTF
-		
+
     set S1, "1e+06 == %g\n"
     set N0, 1.0e6
     bsr NEWARYN
     bsr PRINTF
-    
+
     set S1, "0.5 == %3.3g\n"
     set N0, 0.5
     bsr NEWARYN
-    bsr PRINTF	
+    bsr PRINTF
 
     set S1, "%% == %%\n"
     set I0, 0
     bsr NEWARYI
-    bsr PRINTF   
+    bsr PRINTF
 
     set S1, "That's all, %s\n"
     set S0, "folks!"
     bsr NEWARYS
     bsr PRINTF
-    
+
     end
 CODE
 Hello, Parrot!

@@ -47,7 +47,6 @@ struct macro_frame_t *frames = NULL;
 
 /* static function declariations */
 static struct macro_frame_t *new_frame (void);
-/*static void add_param_to_frame (const char *param, const char *expansion); */
 static void scan_string (struct macro_frame_t *frame, const char *expansion);
 static void scan_file (struct macro_frame_t *frame, FILE *);
 static void destroy_frame (struct macro_frame_t *frame);
@@ -129,7 +128,7 @@ WS              [\t\f\r ]
 	return EOM;
     }
 
-<emit,INITIAL>[ISNP]{DIGIT}{DIGIT}? {
+<*>[ISNP]{DIGIT}{DIGIT}? {
 	valp->s = str_dup(yytext);
 	return REG;
 	}
@@ -180,6 +179,37 @@ WS              [\t\f\r ]
 
 <emit>".macro" {
         return read_macro(valp, interp);
+    }
+
+<INITIAL>".macro" {
+        fataly (EX_SOFTWARE, "", line, "Macros only allowed in assembly mode");
+    }
+
+<emit>".constant" {
+        int c;
+	char *name;
+	struct macro_t *m;
+
+	BEGIN(macro);
+	c = yylex_skip(valp, interp, " ");
+	if (c != IDENTIFIER)
+	    fataly(EX_SOFTWARE, ".constant", line,
+		   "Constant names must be identifiers");
+
+	name = str_dup(valp->s);
+
+	c = yylex_skip(valp, interp, " ");
+        if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
+        fataly(EX_SOFTWARE, name, line, "Constant value must be a number, "
+            "stringliteral or register");
+
+	m = macros + num_macros++;
+	m->name = name;
+	m->expansion = str_dup (valp->s);
+	m->params.num_param = 0;
+
+	BEGIN (emit);
+	return MACRO;
     }
 
 <emit>".include" {
@@ -303,7 +333,8 @@ WS              [\t\f\r ]
         char *label;
 	char *name = macros[num_macros].name;
 
-	if (yylex(valp, interp) != LABEL) yyerror("LABEL expected");
+	if (yylex(valp, interp) != LABEL) 
+	    fataly(EX_SOFTWARE, "", line, "LABEL expected");
 
 	if (valp) {
 	    YYCHOP();
@@ -408,7 +439,7 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip)
     const char *p;
 
     do {
-        c = yylex(NULL, interp);
+        c = yylex(valp, interp);
         p = skip;
 	while (*p && c != *p) p++;
     } while (*p != '\0');
@@ -418,7 +449,7 @@ yylex_skip (YYSTYPE *valp, void *interp, const char *skip)
 
 static int
 read_params (YYSTYPE *valp, void *interp, struct params_t *params,
-	     int need_id)
+	     const char *macro_name, int need_id)
 {
     int c;
     YYSTYPE val;
@@ -429,7 +460,9 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
     c = yylex_skip(&val, interp, " \n");
 
     while(c != ')') {
-	if (c == 0) yyerror ("Unexpected end of file");
+	if (c == 0) 
+	    fataly(EX_SOFTWARE, macro_name, line, 
+		   "End of file reached while reading arguments");
 	else if (c == ',') {
 	    params->name[params->num_param++] = current;
 	    current = strdup("");
@@ -437,7 +470,8 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
 	    c = yylex_skip(&val, interp, " \n");
 	}
 	else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
-	    yyerror("macro parameter error");
+	    fataly(EX_SOFTWARE, macro_name, line,
+		   "Parameter definition must be IDENTIFIER");
 	}
 	else {
 	    if (!need_id || c != ' ') {
@@ -469,11 +503,9 @@ read_macro (YYSTYPE *valp, void *interp)
     start_cond = YY_START;
     BEGIN(macro);
 
-    c = yylex(NULL, interp);
-    if (c != ' ') yyerror("macro error");
-
-    c = yylex(valp, interp);
-    if (c != IDENTIFIER) yyerror("macro error");
+    c = yylex_skip(valp, interp, " ");
+    if (c != IDENTIFIER)
+	fataly(EX_SOFTWARE, ".macro", line, "Macro names must be identifiers");
 
     m->name = valp->s;
 
@@ -483,14 +515,15 @@ read_macro (YYSTYPE *valp, void *interp)
     if (c == '(') {
 	free(valp->s);
 
-	c = read_params(NULL, interp, &m->params, 1);
-	if (c != ')') yyerror("macro parameter: \")\" expected");
+	c = read_params(NULL, interp, &m->params, m->name, 1);
 
 	c = yylex(valp, interp);
     }
 
     while (c != ENDM) {
-	if (c == 0) yyerror("file ended before macro complete");
+	if (c == 0)
+	    fataly (EX_SOFTWARE, m->name, line,
+		    "File ended before macro was complete");
 
 	strcat(temp_buffer, valp->s);
 	free(valp->s);
@@ -559,13 +592,15 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     frame->params = &m->params;
     if (m) {
 	/* whitespace can be savely ignored */
-	do {
+	do { 
 	    c = input();
 	} while (c == ' ' || c == '\t');
 
 	if (c != '(') {
 	    unput(c);
-	    if (m->params.num_param != 0) yyerror ("Missing macro parameter");
+	    if (m->params.num_param != 0)
+		fataly (EX_SOFTWARE, m->name, line,
+			"macro needs %d parameters", m->params.num_param);
 	    scan_string(frame, m->expansion);
 	    return 1;
 	}
@@ -573,7 +608,7 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	start_cond = YY_START;
 	BEGIN(macro);
 
-	read_params (NULL, interp, &frame->expansion, 0);
+	read_params (NULL, interp, &frame->expansion, m->name, 0);
 
 	BEGIN(start_cond);
 
@@ -583,7 +618,9 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 	}
 
 	if (frame->expansion.num_param != m->params.num_param) {
-	    yyerror ("Wrong number of macro arguments");
+	    fataly(EX_SOFTWARE, m->name, line, 
+		   "Macro requires %d arguments, but %d given",
+		   frame->expansion.num_param, m->params.num_param);
 	}
 
 	scan_string(frame, m->expansion);
@@ -602,7 +639,8 @@ include_file (const char *file_name)
     frame = new_frame();
 
     file = fopen(file_name, "r");
-    if (!file) yyerror ("file not found");
+    if (!file) 
+	fataly(EX_SOFTWARE, file_name, line, strerror(errno));
 
     scan_file (frame, file);
 }

@@ -1045,7 +1045,7 @@ OK5:	print	"ok 5\\n"
 	print	"not "
 OK6:	print	"ok 6\\n"
 
-	set	P0, "\0"
+	set	P0, "\\x0"
 	if	P0, OK7
 	print	"not "
 OK7:	print	"ok 7\\n"
@@ -2047,7 +2047,7 @@ output_is(<<'CODE', <<OUTPUT, "exchange");
         exchange P4, P5
         set S0, P4["2"]
         print S0
-        set S0, P5[2]         
+        set S0, P5[2]
         print S0
 	end
 CODE

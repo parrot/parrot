@@ -1364,6 +1364,7 @@ languages/imcc/cfg.h
 languages/imcc/debug.c
 languages/imcc/debug.h
 languages/imcc/docs/imcc.pod
+languages/imcc/docs/macros.pod
 languages/imcc/docs/operation.pod
 languages/imcc/docs/parsing.pod
 languages/imcc/docs/running.pod

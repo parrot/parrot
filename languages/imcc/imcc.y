@@ -169,31 +169,6 @@ iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
     return 0;
 }
 
-#if 0
-/* return the index of a PMC class */
-static int
-get_pmc_num(struct Parrot_Interp *interpreter, char *pmc_type)
-{
-    STRING * s = string_make(interpreter, pmc_type,
-            (UINTVAL) strlen(pmc_type), NULL, 0, NULL);
-    PMC * key = key_new_string(interpreter, s);
-    return interpreter->Parrot_base_classname_hash->vtable->get_integer_keyed(
-            interpreter, interpreter->Parrot_base_classname_hash, key);
-}
-
-/* only .PmcType */
-SymReg *
-macro(struct Parrot_Interp *interp, char *name)
-{
-    SymReg * r;
-    char buf[16];
-    int type = get_pmc_num(interp, name);
-    sprintf(buf, "%d", type);
-    r =  mk_const(str_dup(buf), 'I');
-    return r;
-}
-#endif
-
 static Instruction *
 multi_keyed(struct Parrot_Interp *interpreter,char *name,
 SymReg ** r, int nr, int emit)
@@ -410,7 +385,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 
 %token <t> CALL GOTO ARG IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
-%token <t> CONSTANT INC DEC
+%token <t> INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
@@ -427,7 +402,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist newtype
 %type <sr> vars _vars var_or_i _var_or_i
-%type <i> pasmcode pasmline pasm_inst constant_def
+%type <i> pasmcode pasmline pasm_inst
 %type <sr> pasm_args lhs
 %token <sr> VAR
 
@@ -451,7 +426,6 @@ pasmcode: pasmline
 
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
     | MACRO '\n'                  { $$ = 0; }
-    | constant_def
     ;
 
 pasm_inst: {clear_state();}
@@ -460,9 +434,6 @@ pasm_inst: {clear_state();}
     ;
 pasm_args:
     vars
-    ;
-
-constant_def: CONSTANT IDENTIFIER const { /* printf ("%s\n", $1); */ }
     ;
 
 emit:
