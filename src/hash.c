@@ -446,6 +446,7 @@ hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
     STRING *key;
     IMAGE_IO *io = info->image_io;
     HashBucket *b;
+    BucketIndex bi;
     int freezing =
         info->what == VISIT_FREEZE_NORMAL ||
         info->what == VISIT_FREEZE_AT_DESTRUCT;
@@ -467,12 +468,16 @@ hash_visit(Interp *interpreter, Hash *hash, void* pinfo)
             break;
         default:
             for (i = 0; i <= hash->max_chain; i++) {
-                b = lookupBucket(hash, i);
-                while (b) {
+                bi = lookupBucketIndex(hash, i);
+                while (bi != NULLBucketIndex) {
+                    b = getBucket(hash, bi);
                     if (freezing)
                         io->vtable->push_string(interpreter, io, b->key);
+                    /* must refetch bucket GC might have run */
+                    b = getBucket(hash, bi);
                     (info->visit_pmc_now)(interpreter, b->value, info);
-                    b = getBucket(hash, b->next);
+                    b = getBucket(hash, bi);
+                    bi = b->next;
                 }
             }
     }

@@ -326,6 +326,9 @@ op_check_size(Parrot_Interp interpreter, STRING *s, size_t len)
         Parrot_reallocate_string(interpreter, s, new_size);
         assert(PObj_buflen(s) - used - len >= 15);
     }
+#ifndef DISABLE_GC_DEBUG
+    Parrot_go_collect(interpreter);
+#endif
 }
 
 /*
