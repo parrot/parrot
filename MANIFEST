@@ -362,7 +362,6 @@ languages/parrot_compiler/gentable.pl
 languages/parrot_compiler/parrot.pasm
 languages/parrot_compiler/sample.pasm
 languages/perl6/ChangeLog
-languages/perl6/MANIFEST
 languages/perl6/P6C/Addcontext.pm
 languages/perl6/P6C/Builtins.pm
 languages/perl6/P6C/Context.pm
