@@ -8,6 +8,8 @@ TODO tests would also suffice, where possible.
 
 =item update docs/* 
 
+=item add pod to all .imc
+
 =back
 
 =head1 Programming Issues
@@ -16,7 +18,7 @@ TODO tests would also suffice, where possible.
 
 =over 4
 
-=item List to String [ Assigned to KJ ] 
+=item List to String (KJ?)
 
 The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
 to properly escape string elements.
@@ -49,6 +51,12 @@ hex.
 
 =over 4
 
+=item globals vs. lexicals
+
+Right now, globals are done with lexicals. get_var/set_var needs to be 
+updated to check the call_level - if we're at 0, then use a global. [global]
+and [upvar] may need attention once this is done.
+
 =item interactive tclsh
 
 interactive tclsh mode currently only waits for EOF and then runs all
@@ -65,8 +73,7 @@ source per-user settings. L<tclsh>
 
 =item misc
 
-octal and hex escapes are not supported. (Not sure parrot is
-ready for this yet) in C<lib/parser.imc>
+hex & unicode escapes are not supported in C<lib/parser.imc>
 
 =item unimplemented commands/subcommands
 
@@ -76,7 +83,7 @@ ready for this yet) in C<lib/parser.imc>
 [case] [clock] [close] [cd] [dde] [encoding] [eof] [exec]
 [fblocked] [fconfigure] [fcopy] [file] [fileevent]
 [flush] [gets] [glob] [http] [info] [interp] [library]
-[lindex] [load] [lreplace] [lsearch] [lset] [lsort] 
+[lindex] [load] [lreplace] [lsearch]* [lset] [lsort] 
 [memory] [msgcat] [namespace] [open] [package] [pid] [pwd]
 [read] [registry] [regexp] [regsub] [resource] 
 [safe] [scan] [seek] [socket] [subst]
@@ -121,14 +128,6 @@ C<tclobject> is an abstract object, it doesn't have a vtable. But the
 bundling code *does* C<pmc_register> this PMC. This leads to an empty
 vtable slot, dereferencing that NULL is an operation, which many systems
 don't like.
-
-I'd first reduce C<TclArray> to a bare minimum. Specifically the creation
-functions (init, clone) should be inherited (or follow the C<PerlHash>
-conventions). The same applies to any PMC that can hold pointers to
-other PMCs.
-
-These changes are necessary to make a PMC compliant with incremental GC.
-Please grep through the docs and the sources for DOD_WRITE_BARRIER.
 
 =item Remove Perl*
 
@@ -238,6 +237,16 @@ PMCs and putting the logic in there hidden under MMD}
 =item misc
 
 complete [error] (need global var support)
+
+=back
+
+=head2 BUGS
+
+=over 4
+
+=item bench.tcl ...
+
+Currently generates a bus error on OS X.
 
 =back
 
