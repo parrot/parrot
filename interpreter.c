@@ -205,7 +205,7 @@ get_op_lib_init(int core_op, int which, PMC *lib)
             internal_exception(1, "Couldn't find init_func");
         return init_func;
     }
-    return lib->cache.struct_val;
+    return (oplib_init_f) D2FPTR(lib->cache.struct_val);
 }
 
 /*=for api interpreter load_prederef
@@ -313,8 +313,7 @@ init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_end;
     jit_f jit_code;
     if (interpreter->jit_info)
-        return (jit_f)D2FPTR(
-                ((Parrot_jit_info_t *)interpreter->jit_info)->arena.start);
+        return ((Parrot_jit_info_t *)interpreter->jit_info)->arena.start;
 
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
@@ -329,7 +328,7 @@ init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 
     jit_code = build_asm(interpreter, pc, code_start, code_end, NULL);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
-    return jit_code;
+    return F2DPTR(jit_code);
 #else
     return NULL;
 #endif
@@ -356,7 +355,7 @@ static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
 #if JIT_CAPABLE
-    jit_f jit_code = init_jit(interpreter, pc);
+    jit_f jit_code = (jit_f) D2FPTR(init_jit(interpreter, pc));
     (jit_code) (interpreter, pc);
 #endif
     return NULL;
