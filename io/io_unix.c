@@ -193,7 +193,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, UINTVAL flags)
     ParrotIO *io;
     UINTVAL oflags, mode;
 #ifdef HAS_HEADER_FCNTL
-    UINTVAL rflags;
+    INTVAL rflags;
 #endif
     mode = 0;
 
@@ -203,7 +203,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, UINTVAL flags)
         /* FIXME - Check file handle flags, validity */
 #ifdef HAS_HEADER_FCNTL
         /* Get descriptor flags */
-        if (((INTVAL)rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
+        if ((rflags = fcntl(fd, F_GETFL, 0)) >= 0) {
         /*int accmode = rflags & O_ACCMODE; */
         /* Check other flags (APPEND, ASYNC, etc) */
     }
