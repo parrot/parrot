@@ -133,6 +133,10 @@ struct Parrot_Interp {
                                  * anything */
     UINTVAL memory_collected;   /* Total amount of memory copied
                                    during collection */
+    UINTVAL DOD_block_level;    /* How many outstanding DOD block
+                                   requests are there? */
+    UINTVAL GC_block_level;     /* How many outstanding GC block
+                                   requests are there? */
 };
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

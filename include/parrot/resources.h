@@ -28,6 +28,11 @@ void free_bigint(void);
 
 PMC *mark_used(struct Parrot_Interp *, PMC *, PMC *);
 
+void Parrot_block_DOD(struct Parrot_Interp *);
+void Parrot_block_GC(struct Parrot_Interp *);
+void Parrot_unblock_DOD(struct Parrot_Interp *);
+void Parrot_unblock_GC(struct Parrot_Interp *);
+
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 

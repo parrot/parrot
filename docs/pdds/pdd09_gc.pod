@@ -148,6 +148,36 @@ needing GC. Bad, very very bad.
 
 =head1 IMPLEMENTATION
 
+=head2 Blocking GC
+
+Being able to block GC and DOD is important--you'd hate to have the
+newly allocated Buffers or PMCs you've got yanked out from underneath
+you. That'd be no fun. Use the following routines to control GC:
+
+=over 4
+
+=item Parrot_block_DOD(struct Parrot_Interp *interpreter)
+
+Block DOD for the passed interpreter. (But B<not> GC)
+
+=item Parrot_block_GC(struct Parrot_Interp *interpreter)
+
+Block GC for the passed interpreter. (But B<not> DOD)
+
+=item Parrot_unblock_DOD(struct Parrot_Interp *interpreter)
+
+Unblock DOD for the passed interpreter. (But not GC)
+
+=item Parrot_unblock_GC(struct Parrot_Interp *interpreter)
+
+Unblock GC for the passed interpreter. (But not DOD)
+
+=back
+
+Note that the blocking is recursive--if you call Parrot_block_DOD()
+three times in succession, you need to call Parrot_unblock_DOD() three
+times to re-enable DOD.
+
 =head2 Important flags
 
 For PMCs and Buffers to be collected properly, you B<must> get the

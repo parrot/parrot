@@ -18,6 +18,27 @@
 static void add_header_to_free(struct Parrot_Interp *interpreter,
                                struct free_pool *pool, void *to_add);
 
+void
+Parrot_block_DOD(struct Parrot_Interp *interpreter) {
+    interpreter->DOD_block_level++;
+}
+
+void Parrot_block_GC(struct Parrot_Interp *interpreter) {
+    interpreter->GC_block_level++;
+}
+
+void Parrot_unblock_DOD(struct Parrot_Interp *interpreter) {
+    if (interpreter->DOD_block_level) {
+        interpreter->DOD_block_level--;
+    }
+}
+
+void Parrot_unblock_GC(struct Parrot_Interp *interpreter) {
+    if (interpreter->GC_block_level) {
+        interpreter->GC_block_level--;
+    }
+}
+
 /* Add a string header to the free string header pool */
 static void
 add_pmc_to_free(struct Parrot_Interp *interpreter, struct free_pool *pool, void
@@ -568,6 +589,11 @@ free_unused_buffers(struct Parrot_Interp *interpreter)
 void
 Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 {
+    /* Just return if we're blocked */
+    if (interpreter->DOD_block_level) {
+        return;
+    }
+
     /* First go mark all PMCs as unused */
     mark_PMCs_unused(interpreter);
 
@@ -711,6 +737,11 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
     char *cur_spot;             /* Where we're currently copying to */
     UINTVAL cur_size;           /* How big our chunk is going to be */
     struct STRING_Arena *cur_arena;     /* The string arena we're working on */
+
+    /* Just return if we're blocked */
+    if (interpreter->GC_block_level) {
+        return;
+    }
 
     /* We're collecting */
     interpreter->mem_allocs_since_last_collect = 0;

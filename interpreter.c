@@ -491,6 +491,8 @@ make_interpreter(Interp_flags flags)
     interpreter->total_Buffers = 0;
     interpreter->memory_allocated = 0;
     interpreter->memory_collected = 0;
+    interpreter->DOD_block_level = 0;
+    interpreter->GC_block_level = 0;
 
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
