@@ -830,6 +830,7 @@ output_like(<<'CODE',  $output_re , "float attributes");
    set  P4, P1[P2]
    print P4
    print "\n"
+   end
 
 
 CODE

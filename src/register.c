@@ -24,22 +24,22 @@ setup_register_stacks(struct Parrot_Interp* interpreter)
     Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct IRegChunkBuf));
     interpreter->ctx.int_reg_stack.top = buf;
     interpreter->ctx.int_reg_stack.chunk_size = sizeof(struct IRegChunkBuf);
-    
+
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct SRegChunkBuf));
     interpreter->ctx.string_reg_stack.top = buf;
     interpreter->ctx.string_reg_stack.chunk_size = sizeof(struct SRegChunkBuf);
-    
+
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct NRegChunkBuf));
     interpreter->ctx.num_reg_stack.top = buf;
     interpreter->ctx.num_reg_stack.chunk_size = sizeof(struct NRegChunkBuf);
-    
+
     buf = new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     Parrot_allocate_zeroed(interpreter, (PObj*)buf, sizeof(struct PRegChunkBuf));
     interpreter->ctx.pmc_reg_stack.top = buf;
     interpreter->ctx.pmc_reg_stack.chunk_size = sizeof(struct PRegChunkBuf);
-    
+
     Parrot_unblock_DOD(interpreter);
 }
 
@@ -99,19 +99,21 @@ mark_register_stack_cow(struct Parrot_Interp* interpreter, struct RegStack* stac
     }
 }
 
-static struct RegisterChunkBuf* 
-regstack_copy_chunk(struct Parrot_Interp* interpreter, 
+static struct RegisterChunkBuf*
+regstack_copy_chunk(struct Parrot_Interp* interpreter,
                     struct RegisterChunkBuf* chunk,
                     struct RegStack* stack)
 {
-    struct RegisterChunkBuf* buf = 
+    struct RegisterChunkBuf* buf =
             new_bufferlike_header(interpreter, sizeof(struct RegisterChunkBuf));
     *buf = *chunk;
-    
+
+    PObj_COW_CLEAR((PObj*) buf);
+
     Parrot_block_DOD(interpreter);
-    Parrot_allocate_zeroed(interpreter, (PObj*)buf, stack->chunk_size);
+    Parrot_allocate(interpreter, buf, stack->chunk_size);
     Parrot_unblock_DOD(interpreter);
-    
+
     memcpy(buf->data.bufstart, chunk->data.bufstart, stack->chunk_size);
     return buf;
 }
@@ -128,13 +130,13 @@ regstack_push_entry(struct Parrot_Interp* interpreter, struct RegStack* stack)
         top->used++;
     }
     else {
-        struct RegisterChunkBuf* buf = new_bufferlike_header(interpreter, 
+        struct RegisterChunkBuf* buf = new_bufferlike_header(interpreter,
                                 sizeof(struct RegisterChunkBuf));
 
         Parrot_block_DOD(interpreter);
         Parrot_allocate_zeroed(interpreter, (PObj*)buf, stack->chunk_size);
         Parrot_unblock_DOD(interpreter);
-        
+
         buf->used = 1;
         buf->next = top;
 
@@ -171,7 +173,7 @@ regstack_pop_entry(struct Parrot_Interp* interpreter, struct RegStack* stack)
 */
 void
 Parrot_push_i(struct Parrot_Interp *interpreter, void *where)
-{    
+{
     struct RegisterChunkBuf* top;
     regstack_push_entry(interpreter, &interpreter->ctx.int_reg_stack);
     top = interpreter->ctx.int_reg_stack.top;
@@ -189,7 +191,7 @@ Parrot_pop_i(struct Parrot_Interp *interpreter, void *where)
     struct RegisterChunkBuf* top = interpreter->ctx.int_reg_stack.top;
     /* Do we even have anything? */
     if (top->used > 0) {
-        memcpy(where, 
+        memcpy(where,
                &((struct IRegChunkBuf*)top->data.bufstart)->IRegFrame[top->used-1],
                sizeof(struct IRegFrame));
         regstack_pop_entry(interpreter, &interpreter->ctx.int_reg_stack);
@@ -217,7 +219,7 @@ Parrot_clear_i(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_s(struct Parrot_Interp *interpreter, void *where)
-{    
+{
     struct RegisterChunkBuf* top;
     regstack_push_entry(interpreter, &interpreter->ctx.string_reg_stack);
     top = interpreter->ctx.string_reg_stack.top;
@@ -237,8 +239,8 @@ Parrot_pop_s(struct Parrot_Interp *interpreter, void *where)
     if (top->used > 0) {
         struct SRegFrame* irf = &((struct SRegChunkBuf*)top->data.bufstart)->
                     SRegFrame[top->used-1];
-        memcpy(where, 
-               &irf->registers, 
+        memcpy(where,
+               &irf->registers,
                sizeof(struct SRegFrame));
         regstack_pop_entry(interpreter, &interpreter->ctx.string_reg_stack);
     }
@@ -265,7 +267,7 @@ Parrot_clear_s(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_n(struct Parrot_Interp *interpreter, void *where)
-{    
+{
     struct RegisterChunkBuf* top;
     regstack_push_entry(interpreter, &interpreter->ctx.num_reg_stack);
     top = interpreter->ctx.num_reg_stack.top;
@@ -285,8 +287,8 @@ Parrot_pop_n(struct Parrot_Interp *interpreter, void *where)
     if (top->used > 0) {
         struct NRegFrame* irf = &((struct NRegChunkBuf*)top->data.bufstart)->
                     NRegFrame[top->used-1];
-        memcpy(where, 
-               &irf->registers, 
+        memcpy(where,
+               &irf->registers,
                sizeof(struct NRegFrame));
         regstack_pop_entry(interpreter, &interpreter->ctx.num_reg_stack);
     }
@@ -313,7 +315,7 @@ Parrot_clear_n(struct Parrot_Interp *interpreter)
 */
 void
 Parrot_push_p(struct Parrot_Interp *interpreter, void *where)
-{    
+{
     struct RegisterChunkBuf* top;
     regstack_push_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
     top = interpreter->ctx.pmc_reg_stack.top;
@@ -333,8 +335,8 @@ Parrot_pop_p(struct Parrot_Interp *interpreter, void *where)
     if (top->used > 0) {
         struct PRegFrame* irf = &((struct PRegChunkBuf*)top->data.bufstart)->
                     PRegFrame[top->used-1];
-        memcpy(where, 
-               &irf->registers, 
+        memcpy(where,
+               &irf->registers,
                sizeof(struct PRegFrame));
         regstack_pop_entry(interpreter, &interpreter->ctx.pmc_reg_stack);
     }
