@@ -28,54 +28,6 @@ use Pod::Simple::HTML;
 # This is just here to keep Pod::Simple::HTML's version_tag_comment() happy.
 $Parrot::Docs::POD2HTML::VERSION = '1.0';
 
-=item C<get_title()>
-
-Looks for a POD heading called NAME, or TITLE (aka TITEL), and returns
-its text.
-
-=cut
-
-sub get_title
-{
-	my $self = shift;
-	my $title;
-	
-	# Once this is standardized it shouldn't be needed.
-	foreach my $name (qw(NAME TITLE TITEL))
-	{
-		last if $title = $self->_get_titled_section($name, max_token => 50, 
-			desperate => 1, @_);
-	}
-	
-	return $title;
-}
-
-=item C<get_short_title()>
-
-Returns the short description from the document's title.
-
-=cut
-
-sub get_short_title
-{
-	my $self = shift;
-	my $title = $self->get_title(@_);
-	
-	if ( $title =~ m/^(\S{1,60})\s+--?\s+./s )
-	{
-		$title = $1;
-	}
-	else
-	{
-		# It's non-standard. Tidy it up a bit.
-		$title =~ s/^\s+//o;
-		$title =~ s/\s+$//o;
-		$title =~ s/-$//o;
-	}
-	
-	return $title;
-}
-
 =item C<do_beginning()>
 
 Reimplements the C<Pod::Simple::HTML> method to add a header to the start
@@ -87,17 +39,17 @@ sub do_beginning
 {
 	my $self = shift;
 
-	# This has the side effect of setting content_seen.
-	my $title = $self->get_short_title() || 'Untitled';
+	# We have to do this because it has the side effect of setting
+	# content_seen.
+	$self->get_short_title();
 	
 	return unless $self->content_seen;
 
-	$self->{'Title'} = $title;
-	
 	# Suppress the warning in the tests.
 	$self->{RESOURCES_URL} = '' unless $self->{RESOURCES_URL};
 	$self->{NAV_BAR} = '' unless $self->{NAV_BAR};
 	
+	my $title = $self->{'Title'};
 	Pod::Simple::HTML::esc($title);
 
 	# It's not nice that the header and footer are duplicated
@@ -213,6 +165,9 @@ sub write_html
 	my $file = $source->file_with_relative_path($rel_path);
 	
 	return unless $file->contains_pod;
+	
+	# Use our own method for consistency.
+	$self->{'Title'} = $file->short_description;
 	
 	$rel_path = $self->append_html_suffix($rel_path);
 		

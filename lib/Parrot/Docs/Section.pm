@@ -158,7 +158,7 @@ sub write_html
     return '' unless $index_html;
     
     $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
-    $index_html = "<h1>$self->{NAME}</h1>\n\n" . $index_html;
+    $index_html = "<h1>$self->{NAME}\n\n" . $index_html;
 
     my $index = $target->file_with_name($self->{INDEX_PATH});
     

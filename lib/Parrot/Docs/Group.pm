@@ -120,7 +120,7 @@ sub write_html
 		}
 		
 		$index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
-		$index_html = "<h2>$self->{NAME}</h2>\n\n" . $index_html;
+		$index_html = qq(<h2>$self->{NAME}  <a href="#_top"><img alt="^" border=0 src="../resources/up.gif"></a></h2>\n\n) . $index_html;
 	}
 	
 	return $index_html;

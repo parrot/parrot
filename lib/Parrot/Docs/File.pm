@@ -308,7 +308,12 @@ sub is_docs_link
 {
 	my $self = shift;
 
-	# TODO This needs more thought.
+	# TODO - This needs more thought. I'm trying to work out which files
+	# it's sensible to link directly to. Suffixes other than txt are a
+	# problem (for me at least) because the browser thinks it should
+	# downloat the file.
+	
+	return 0 if $self->has_suffix and $self->suffix !~ m/[Tt][Xx][Tt]/o;
 	
 	return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
 }
@@ -336,6 +341,9 @@ sub short_description
 	$text =~ s/^\s+//o;
 	$text =~ s/\s+$//o;
 	$text =~ s/\s*-$//o;
+	
+	# There was not text, just another POD command (=head2 probably).
+	return '' if $text =~ /^=\w/o;
 	
 	return $text unless $text =~ /-/o;
 	
