@@ -38,9 +38,9 @@ struct StackChunk {
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
-void push_entry(struct Parrot_Interp *, struct Stack_Entry *);
-void pop_entry(struct Parrot_Interp *,  struct Stack_Entry *);
-void swap_entry(struct Parrot_Interp *);
+INTVAL stack_depth(struct Parrot_Interp *);
+struct Stack_Entry *stack_entry(struct Parrot_Interp *, INTVAL);
+void rotate_stack(struct Parrot_Interp *, INTVAL);
 
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, void *thing, INTVAL type, void *cleanup);
 void *pop_generic_entry(struct Parrot_Interp *, void *where, INTVAL type);
@@ -58,6 +58,7 @@ void toss_generic_entry(struct Parrot_Interp *, INTVAL type);
 #define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
 
 #define ERROR_STACK_EMPTY 1
+#define ERROR_STACK_SHALLOW 1
 #define ERROR_BAD_STACK_TYPE 1
 
 #endif

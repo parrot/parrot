@@ -12,68 +12,63 @@
 
 #include "parrot/parrot.h"
 
-/* Push an already formed entry on the generic stack. Return a pointer to the entry */
-void push_entry(struct Parrot_Interp *interpreter, struct Stack_Entry * entry) {
-    struct StackChunk *chunk_base;
-    
-    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
-    /* Do we have any slots left in the current chunk? */
-    if (chunk_base->free) {
-        chunk_base->used++;
-        chunk_base->free--;
-        interpreter->stack_top = &chunk_base->entry[chunk_base->used-1];
-    }
-    /* Nope, so plan B time. Allocate a new chunk of stack entries */
-    else {
-        struct StackChunk *new_chunk;
-        new_chunk = mem_allocate_aligned(sizeof(struct StackChunk));
-        new_chunk->used = 1;
-        new_chunk->free = STACK_CHUNK_DEPTH - 1;
-        new_chunk->next = NULL;
-        new_chunk->prev = chunk_base;
-        chunk_base->next = new_chunk;
-        interpreter->stack_top = &new_chunk->entry[0];
-    }
+INTVAL
+stack_depth(struct Parrot_Interp *interpreter) {
+  struct StackChunk * chunk;
+  INTVAL               depth;
 
-    /* Copy the entry */
+  chunk = interpreter->stack_base;
+  depth = chunk->used;
 
-    chunk_base->entry[chunk_base->used-1] = *entry;
+  while (chunk->next) {
+    chunk = chunk->next;
+    depth += chunk->used;
+  }
+
+  return depth;
 }
 
-/* Pop off an entry, copying it over an existing Stack_Entry structure */
-void pop_entry(struct Parrot_Interp *interpreter, struct Stack_Entry * entry) {
-    struct StackChunk *chunk_base;
+struct Stack_Entry *
+stack_entry(struct Parrot_Interp *interpreter, INTVAL depth) {
+    struct StackChunk * chunk;
     
-    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
-    /* Quick sanity check */
-    if (chunk_base->used == 0) {
-        INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
+    chunk = interpreter->stack_base;
+    while (chunk->next) {
+      chunk = chunk->next;
     }
 
-    *entry = *(interpreter->stack_top);
-
-    /* Now decrement the SP */
-    chunk_base->used--;
-    chunk_base->free++;
-    /* Can we toss a whole chunk? */
-    if (0 == chunk_base->used && chunk_base->prev) {
-        chunk_base = chunk_base->prev;
-    } 
-    if (chunk_base->used) {
-        interpreter->stack_top = &chunk_base->entry[chunk_base->used - 1];
+    while (depth > chunk->used - 1) {
+      depth -= chunk->used;
+      chunk = chunk->prev; /* Expect caller to have checked bounds */
     }
+
+    return &(chunk->entry[chunk->used - depth - 1]);
 }
 
-/* Swap the top two entries on the stack */
-void swap_entry(struct Parrot_Interp *interpreter) {
-    struct Stack_Entry top;
-    struct Stack_Entry next;
+/* Rotate the top N entries by one */
+void rotate_entries(struct Parrot_Interp *interpreter, INTVAL depth) {
+    struct Stack_Entry temp;
+    INTVAL i;
 
-    pop_entry(interpreter, &top);
-    pop_entry(interpreter, &next);
+    if (depth <= 0) {
+        return;
+    }
 
-    push_entry(interpreter, &top);
-    push_entry(interpreter, &next);
+    if (stack_depth(interpreter) < depth) {
+        INTERNAL_EXCEPTION(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
+    }
+
+    if (depth == 1) {
+        return;
+    }
+
+    temp = *(interpreter->stack_top);
+
+    for(i = 0; i < depth - 1; i++) {
+      *stack_entry(interpreter, i) = *stack_entry(interpreter, i + 1);
+    }
+
+    *stack_entry(interpreter, depth - 1) = temp;
 }
 
 /* Push something on the generic stack. Return a pointer to the entry */

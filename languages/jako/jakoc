@@ -1273,12 +1273,10 @@ sub assign_func
 
     #
     # Our calling convention dictates that upon return from the subroutine,
-    # the result will be in the zero register of the appropriate type.
-    # Therefore, we need to copy the result from there to its final resting
-    # place.
+    # the result will be on the top of the stack.
     #
 
-    emit_code('set', [ $dest, uc $subs{$name}{RETURN} . "0" ]);
+    emit_code('restore', [ $dest ]);
   } else {
     printf(STDERR "jakoc: Call to unrecognized assign function '%s' on line %d (Not in {%s}).\n",
       $name, $line, join(", ", sort keys %assign_funcs));
@@ -1441,15 +1439,17 @@ sub begin_sub_block
   #
   # Generate code to load the arguments into their registers:
   #
+  # First, we rotate the stack so that the return address which starts out on
+  # the top ends up on the bottom of the portion of the stack relevant to this
+  # call.
+  #
   # NOTE: We restore them in their order of declaration, which means they must
   # be saved in reverse order. This will come in handy later for being able to
   # handle variable numbers of arguments, since we'll be able to restore an
   # arg count before having to restore the variable args themselves.
   #
-  # TODO: This sucks. Destinations being on the same stack as args is a pain.
-  # We have to swap the top two stack entries to move the return address down
-  # and expose the argument, then retore the argument off the stack.
-  #
+
+  emit_code 'rotate', [ scalar(@formal_args) + 1];
 
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
@@ -1459,7 +1459,6 @@ sub begin_sub_block
 
     push_comment "(argument " . $arg_name . ")";
 
-    emit_code 'swap', [ ];
     emit_code 'restore', [ $ident_info->{REG} ];
   }
 }
@@ -1854,12 +1853,14 @@ sub do_return
   }
 
   #
-  # According to our calling conventions, any return value gets put into
-  # the zero register of the appropriate type.
+  # According to our calling conventions, the return value ends up on the
+  # stack, below the return address so the caller can restore it off.
   #
 
   if (defined $return) {
     emit_code('set', [ uc $return . "0", $arg ]);
+    emit_code('save', [ uc $return . "0" ]);
+    emit_code('rotate', [ 2 ]);
   }
 
   #

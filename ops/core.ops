@@ -1757,15 +1757,17 @@ MANUAL_OP ret() {
 
 ########################################
 
-=item B<swap>()
+=item B<rotate>(i)
 
-Swap the top two stack entries. Used to get at arguments below the return
-address in the stack.
+=item B<rotate>(ic)
+
+Rotate the top $1 stack entries so that the top entry becomes the bottom
+entry in that range.
 
 =cut
 
-AUTO_OP swap() {
-  swap_entry(interpreter);
+AUTO_OP rotate(i|ic) {
+  rotate_entries(interpreter, $1);
 } 
 
 
