@@ -11,6 +11,7 @@ tclobject tclstring tclint tclfloat \
 tcllist tclarray \
 match matchrange \
 pybuiltin \
+pynci \
 pyclass \
 pyobject \
   pyboolean \

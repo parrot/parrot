@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-classes/nci.pmc - Naitive Call Interface
+classes/nci.pmc - Native Call Interface
 
 =head1 DESCRIPTION
 
@@ -149,30 +149,6 @@ Returns the boolean value of the pointer.
 
     INTVAL get_bool () {
         return(0 != (INTVAL)PMC_data(SELF));
-    }
-
-/*
-
-=item C<PMC* get_attr_str(STRING *name)>
-
-Return attribute named C<name>.
-
-=cut
-
-TODO: refactor into a separate subclass, and either modify Pmc2c.pm and
-enter_nci_method to directly build this subclass, or add code to morph
-NCI instances into the correct subclass later.
-
-The line of code in test case t/pie/b3 that motivates this is:
-
-  print "using", cmp.__name__
-
-Where cmp may be a NCI subroutine.
-
-*/
-
-    PMC* get_attr_str(STRING* idx) {
-        return VTABLE_getprop(INTERP, SELF, idx);
     }
 
 }

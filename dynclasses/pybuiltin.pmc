@@ -30,6 +30,7 @@ static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyLong;
+static INTVAL dynclass_PyNCI;
 static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyProxyType;
 static INTVAL dynclass_PyString;
@@ -70,6 +71,14 @@ static PMC* make_type(Interp* interpreter, INTVAL class, STRING* name) {
     for (j = 0; j < n; ++j) {
         key = VTABLE_shift_string(interpreter, iter);
         item = VTABLE_get_pmc_keyed_str(interpreter, stash, key);
+
+        if (item->vtable->base_type == enum_class_NCI) {
+            PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
+            VTABLE_set_string_native(interpreter, nameprop, key);
+            VTABLE_setprop(interpreter, item, NAME, nameprop);
+            item->vtable = Parrot_base_vtables[dynclass_PyNCI];
+        }
+
         VTABLE_add_method(interpreter, type, key, item);
     }
 
@@ -102,6 +111,7 @@ they will be used frequently here.
             dynclass_PyFloat     = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyList      = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyLong      = Parrot_PMC_typenum(INTERP, "PyLong");
+            dynclass_PyNCI       = Parrot_PMC_typenum(INTERP, "PyNCI");
             dynclass_PyNone      = Parrot_PMC_typenum(INTERP, "PyNone");
             dynclass_PyProxyType = Parrot_PMC_typenum(INTERP, "PyProxyType");
             dynclass_PyString    = Parrot_PMC_typenum(INTERP, "PyString");
@@ -160,11 +170,16 @@ enter_nci_method should create these as locals to begin with.
         iter = Parrot_Hash_get_iter(INTERP, stash);
         n = VTABLE_elements(INTERP, stash);
         for (j = 0; j < n; ++j) {
-            PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
             key = VTABLE_shift_string(INTERP, iter);
             item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
-            VTABLE_set_string_native(interpreter, nameprop, key);
-            VTABLE_setprop(interpreter, item, NAME, nameprop);
+
+            if (item->vtable->base_type == enum_class_NCI) {
+                PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
+                VTABLE_set_string_native(interpreter, nameprop, key);
+                VTABLE_setprop(interpreter, item, NAME, nameprop);
+                item->vtable = Parrot_base_vtables[dynclass_PyNCI];
+            }
+
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
         }
 

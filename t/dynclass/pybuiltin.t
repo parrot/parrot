@@ -16,7 +16,7 @@ Tests the Python Builtins.
 
 =cut
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 pir_output_is(<< 'CODE', << 'OUTPUT', "autoload");
@@ -191,4 +191,19 @@ output_is(<< 'CODE', << 'OUTPUT', "boolean");
 .end
 CODE
 False True
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "boolean");
+##PIR##
+.sub main @MAIN
+    new_pad 0
+    loadlib $P0, "python_group"
+
+    find_lex $P1, "cmp"
+    getattribute $P2, $P1, '__name__'
+    print $P2
+    print "\n"
+.end
+CODE
+cmp
 OUTPUT
