@@ -773,42 +773,61 @@ sub P6C::debug_info::ctx_right { }
 ##############################
 sub P6C::rule::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
     $x->pat->ctx_right($ctx);
     # XXX: need to do context for mod, probably process it as well,
     # but that's non-trivial.
-    $x->{ctx} = $ctx;
 }
 
 sub P6C::rx_alt::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
     my $rectx = new P6C::Context type => 'str';	# XXX: should be regex context?
-    $_->ctx_right($rectx) for @{$x->branches};
-    $x->{ctx} = $ctx;
+    for (@{$x->branches}) {
+	$_->ctx_right($rectx);
+	for (@{$_->things}) {
+	    if ($_->isa('P6C::rx_cut') && $_->level == 2) {
+		$_->{ctx}{rx_unwind} = $x;
+		$x->{ctx}{rx_canfail} = 1;
+	    }
+	}
+    }
 }
 
 sub P6C::rx_seq::ctx_right {
     my ($x, $ctx) = @_;
+    my $prev;
+    $x->{ctx} = $ctx->copy;
     for (@{$x->things}) {
 	$_->ctx_right($ctx);
+	if ($prev && $_->isa('P6C::rx_cut') && $_->level == 1) {
+	    $_->{ctx}{rx_unwind} = $prev;
+	    $prev->{ctx}{rx_canfail} = 1;
+	}
+	$prev = $_;
     }
-    $x->{ctx} = $ctx;
 }
 
 sub P6C::rx_hypo::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
     $x->var->ctx_left($x->val);
     $x->var->ctx_right($ctx);
-    $x->{ctx} = $ctx->copy;
 }
 
 sub P6C::rx_beg::ctx_right { }
 sub P6C::rx_end::ctx_right { }
-sub P6C::rx_cut::ctx_right { }
+sub P6C::rx_cut::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
+}
 sub P6C::rx_meta::ctx_right { }
+sub P6C::rx_any::ctx_right { }
 sub P6C::rx_oneof::ctx_right { }
 
 sub P6C::rx_atom::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
 
     if (ref($x->atom) eq 'ARRAY') {
 	P6C::Context::block_ctx($x->atom, $ctx);
@@ -822,28 +841,31 @@ sub P6C::rx_atom::ctx_right {
     } else {
 	$x->atom->ctx_right($ctx);
     }
-    $x->{ctx} = $ctx;
 }
 
 sub P6C::rx_repeat::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
     my $numctx = new P6C::Context type => 'int';
     $x->min->ctx_right($numctx) if ref $x->min;
     $x->max->ctx_right($numctx) if ref $x->max;
     $x->thing->ctx_right($ctx);
-    $x->{ctx} = $ctx;
 }
 
 sub P6C::rx_assertion::ctx_right {
     my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
     my $strctx = new P6C::Context type => 'str';
     $x->thing->ctx_right($strctx);
 }
 
 sub P6C::rx_call::ctx_right {
     my ($x, $ctx) = @_;
-    $x->args->ctx_right(arg_context($x->name, $ctx));
+    if (ref $x->name) {
+	$x->name->ctx_right(new P6C::Context type => 'PerlUndef');
+    }
     $x->{ctx} = $ctx->copy;
+    $x->args->ctx_right(arg_context($x->name, $ctx));
 }
 
 1;

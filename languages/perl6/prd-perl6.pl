@@ -10,7 +10,7 @@ use P6C::IMCC ':external';
 # Interaction
 my %o;
 (GetOptions(\%o,qw(imc silent
-		   hitem usere trace score
+		   hitem usere trace score raw
 		   batch:s rule=s grammar=s force help))
  && !$o{help})
     || die <<END;
@@ -18,6 +18,7 @@ Usage: $0 [options]
     Output options:
 	--silent	don't do any output (not too useful)
 	--imc		emit IMC code
+	--raw		raw parse tree
 
     Parse::RecDescent control:
 	--trace		set \$::RD_TRACE
@@ -72,7 +73,12 @@ if (!$o{force} && eval("require $o{grammar}")) {
 }
 
 sub output_tree {
-    my $x = shift->tree;
+    my $x = shift;
+    if ($o{raw}) {
+	print Dumper($x);
+	return;
+    }
+    $x = $x->tree;
     if ($o{imc}) {
 	if (!defined $o{batch}) {
 	    P6C::IMCC::add_function('main');

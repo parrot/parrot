@@ -23,7 +23,8 @@ use strict;
 use Carp 'confess';
 use P6C::Nodes;
 use Data::Dumper;
-use P6C::Util qw(unimp flatten_leftop);
+use P6C::Util qw(unimp flatten_leftop error);
+use P6C::Tree::String qw(concat_string);
 
 ######################################################################
 
@@ -226,8 +227,7 @@ sub P6C::sv_literal::tree {
 	}
 	$val = $x->[1];
     } else {
-	$type = 'str';
-	$val = qq{"$x->[1][2]"};	# XXX: they're all just strings.
+        return concat_string($x);
     }
     return new P6C::sv_literal type => $type, lval => $val;
 }
@@ -280,6 +280,37 @@ sub P6C::scalar_var::tree {
 }
 
 *P6C::nonscalar_var::tree = *P6C::scalar_var::tree;
+
+sub P6C::interpolated_value::tree {
+    my $x = shift;
+    my $sigil = $x->[1]->tree;
+    my @values;
+    if ($sigil eq '$') {
+        push (@values, $x->[5]->tree);
+    }
+
+# XXX: @ context needs to join with $" (or its perl6 equiv)
+
+    elsif ($sigil eq '@') {
+        if (@{$x->[5][1]} > 1) {
+            my $space = new P6C::sv_literal type => 'PerlString',
+		lval => '" "';
+            my $args  = new P6C::ValueList vals => [$space, $x->[5]->tree ];
+            push (@values, new P6C::prefix name => 'join', args => $args);
+        }
+        else {
+            push (@values, $x->[5]->tree);
+        }
+    }
+
+# XXX: Unsure of how hashes are supposed to interpolate.
+#      Data::Dumper style, perahps?
+
+    elsif ($sigil eq '%') { unimp qq("%()"\n); }
+    elsif ($sigil eq '&') { unimp qq("&()"\n); }
+    else { error qq( attempted interpolation of unknown type.\n) }
+    return @values;
+}
 
 ######################################################################
 # Operators
@@ -756,7 +787,9 @@ sub P6C::closure::tree {
     $block = $x->[$#{$x}]->tree;
     if (@$x == 2) {		# bare block
 	return new P6C::closure params => undef, block => $block, bare => 1;
-    } if (@$x == 5) {		# no parens
+    } elsif (@$x == 4) {	# 'sub', no args
+	return new P6C::closure params => undef, block => $block;
+    } elsif (@$x == 5) {	# no parens
 	$arg_index = 3;
     } else {			# with parens
 	$arg_index = 4;
@@ -827,10 +860,21 @@ sub P6C::rule::tree {
 sub P6C::pattern::tree {
     my $x = shift;
     if (@$x == 4) {
-	return new P6C::rule pat => $x->[2]->tree;
+	if ($x->[1] eq '/') {	# /foo/
+	    return new P6C::rule pat => $x->[2]->tree;
+	} else {		# rule { ... }
+	    my $rule = $x->[3]->tree;
+	    return new P6C::closure params => undef, block => $rule;
+	}
+    } else {
+	my $rule = new P6C::rule mod => maybe_tree($x->[3]),
+	    pat => $x->[5]->tree;
+	if ($x->[1] eq 'm') {
+	    return $rule;
+	} else {
+	    return new P6C::closure params => undef, block => $rule;
+	}
     }
-    return new P6C::rule mod => maybe_tree($x->[3]), pat => $x->[5]->tree,
-	immediate => ($x->[1] eq 'm');
 }
 
 sub P6C::rx_alt::tree {
@@ -909,11 +953,20 @@ sub P6C::rx_atom::tree {
 	}
 	return $ret;
     } elsif (ref $x->[1]) {
-	# variable
-	$atom = $x->[1]->tree;
+	# Variable, maybe with subscripts
+	if (@{$x->[2]} > 0) {
+	    my @subsc;
+	    foreach (@{$x->[2]}) {
+		push @subsc, $_->tree;
+	    }
+	    $atom = new P6C::subscript_exp thing => $x->[1]->tree,
+		subscripts => [@subsc];
+	} else {
+	    $atom = $x->[1]->tree;
+	}
     } elsif ($x->[1] eq '.') {
 	# metachar
-	$atom = new P6C::rx_meta name => '.';
+	$atom = new P6C::rx_any;
 
     } elsif ($x->[1] =~ /^\\(.+)/) {
 	# metachar
@@ -973,10 +1026,10 @@ sub P6C::rx_repeat::tree {
 sub P6C::rx_assertion::tree {
     my $x = shift;
     if (@$x == 2) {
-	if (ref $x->[1]) {
-	    # Variable, subrule, or character class
-	    return $x->[1]->tree;
-	} elsif ($x->[1] eq '.') {
+ 	if (ref $x->[1]) {
+ 	    # Variable, subrule, or character class
+  	    return $x->[1]->tree;
+ 	} elsif ($x->[1] eq '.') {
 	    # Single grapheme
 	    unimp "Logical grapheme";
 	} elsif ($x->[1] =~ /^'/) {

@@ -271,9 +271,28 @@
 2002-09-04
 
 	* Fixes:
-	    - corrected
+	    - corrected t/rx/basic_6
 	
 	* Additions:
 	    - more builtin functions: index, reverse, join (coming soon:
 	      grep and map) (Joseph Ryan)
 
+2002-09-05
+
+	* Fixes:
+	    - Backtracking into named rules
+	    - rule parsing tweaks
+	    - eliminate harmful context aliasing in regexes.
+	    - hack for forward labels.
+	    - /./ vs. /\./
+	    - disallow alphanumeric delims for regexes
+	    - allow 'sub' in place of '->' for anon subs
+	    - subscripting on variables in regexes
+	    - ++@x[$i] (Leo Toetsch)
+
+	* Additions:
+	    - String interpolation (Joseph Ryan)
+
+	* Test-failures:
+	    - t/rx/call_2 -- backtracking bug.  Hopefully I'll track this
+	      down soon.

@@ -296,8 +296,10 @@ sub sm_expr_pattern {
     my $pos = $r->{ctx}{rx_pos} = gentmp 'int';
     my $basepos = gentmp 'int';
     my $fail = genlabel 'rx_fail';
-    $r->{ctx}{rx_inline} = 1;	# don't pop args.
+    my $ret = newtmp 'PerlUndef';
     code(<<END);
+	rx_clearstack		# XXX: good old non-reentrant engine.
+	rx_initstack
 	$str = $val
 	$pos = 0
 	$basepos = 0
@@ -308,8 +310,12 @@ $adv:
 	inc $basepos
 $begin:
 END
-    my $ret = $r->val;
+    $r->{ctx}{rx_pos} = $pos;
+    $r->{ctx}{rx_thing} = $str;
+    $r->{ctx}{rx_fail} = $adv;
+    P6C::IMCC::rule::rx_val($r);
     code(<<END);
+	$ret = 1
 $fail:
 END
     return scalar_in_context($ret, $ctx);

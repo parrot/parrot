@@ -25,15 +25,6 @@ Branch destination on success, or C<undef> for fallthrough.
 
 Branch destination on failure, or C<undef> for fallthrough.
 
-=item failatom, failgroup, failrule
-
-Branch destination for a failed atom, group, or rule, to be used by
-backtracking control ops (currently broken).
-
-=item failatom_depth, failgroup_depth, failrule_depth
-
-Number of marks pushed since the start of the current atom, group, or rule.
-
 =back
 
 =cut
@@ -59,23 +50,16 @@ sub P6C::IMCC::rule::rx_val {
     my $thing = $x->{ctx}{rx_thing};
     my $fail = $x->{ctx}{rx_fail} || genlabel 'endrule_no';
     my $ret = newtmp 'PerlUndef';
-    $x->pat->rx_val({ succ => undef,
-		      fail => $fail,
-		      failgroup => $fail,
-		      failgroup_depth => 0,
-		      failrule => $fail,
-		      failrule_depth => 0,
-		      failatom => $fail,
-		      failatom_depth => 0,
-		      pos => $pos,
-		      str => $thing });
-    code(<<END); # Success
-	$ret = 1
-END
+    my $isback = gentmp 'int';
+    my $init = genlabel;
+    my $back = $x->pat->rx_val({ succ => undef,
+				 fail => $fail,
+				 pos => $pos,
+				 str => $thing });
     code(<<END) unless $x->{ctx}{rx_fail};
 $fail:
 END
-    return $ret;
+    return $back;
 }
 
 # Alternation
@@ -83,10 +67,12 @@ END
 #   Code for an alternation looks like this:
 #	    push offset
 #	    <code for alt 1, fail => goto fail1>
-#	    push 1	(== last branch)
+#	    push 1	(== last successful branch)
 #	    goto succ
 #	fail1:
 #	    <code for alt 2, fail => goto fail2>
+#	    push 2
+#	    goto succ
 #	    ...
 #	failN:		(== fail alt)
 #	    pop offset
@@ -109,12 +95,21 @@ sub P6C::rx_alt::rx_val {
     my $which = gentmp 'int';
     my $bt = genlabel 'alt_back';
     my $need_endlabel;
+    my $startdepth;
 
     # We need a success label, so define one if we're expected to fall
     # through.
     if (!defined($ctx->{succ})) {
 	$need_endlabel = 1;
 	$ctx->{succ} = genlabel 'alt_succ';
+    }
+
+    if ($x->{ctx}{rx_canfail}) {
+	$x->{ctx}{rx_fail_label} = genlabel 'failalt';
+	$startdepth = gentmp 'int';
+	code(<<END);
+	rx_stackdepth $startdepth
+END
     }
 
     # setup -- push our index onto the intstack.
@@ -126,11 +121,7 @@ END
     my @bt_labels;
     my %subctx = %$ctx;
     $subctx{succ} = undef;
-    $subctx{failalt} = $subctx{fail};
-    $subctx{failalt_depth} = 0;
     for my $i (0..$#{$x->branches}) {
-	$subctx{failatom} = $subctx{fail};
-	$subctx{failatom_depth} = 0;
 	$subctx{fail} = $nextlabel[$i];
 	$bt_labels[$i] = $x->branches($i)->rx_val({ %subctx });
 	code(<<END);
@@ -145,6 +136,14 @@ END
 	rx_popindex $ctx->{pos}, $ctx->{fail}	# won't fail
 	goto $ctx->{fail}
 END
+
+    if ($x->{ctx}{rx_fail_label}) {
+	code(<<END);
+$x->{ctx}{rx_fail_label}:
+	rx_stackchop $startdepth
+	goto $ctx->{fail}
+END
+    }
     
     # Backtracking target:
     code(<<END);
@@ -179,8 +178,6 @@ sub P6C::rx_seq::rx_val {
     my %ctx = %$ctx;
     $ctx{succ} = undef;
     for my $i (0..$#{$x->things}) {
-	$ctx{failatom} = $ctx{fail};
-	$ctx{failatom_depth} = 0;
 	$ctx{fail} = $x->things($i)->rx_val({ %ctx });
     }
     maybe_fallthrough($ctx->{succ});
@@ -210,19 +207,25 @@ sub rx_alt_array {
     my $lit = gentmp 'str';
     my $things = $x->atom->val;
     my $bt = genlabel 'alt_back';
+    my $again = genlabel 'alt_next';
+    my $start = gentmp 'int';
     my $need_endlabel;
 
     code(<<END);
-	rx_pushindex $ctx->{pos}
-	$which = -1
+	$which = 0
 	$num = $things
+	goto $again
 $bt:
-	inc $which
+	rx_popindex $which, $ctx->{fail} # XXX: shouldn't fail
 	rx_popindex $ctx->{pos}, $ctx->{fail}
+$again:
 	if $which == $num goto $ctx->{fail}
-	rx_pushindex $ctx->{pos}
 	$lit = $things\[$which]
-	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $bt
+	inc $which
+	$start = $ctx->{pos}
+	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $again
+	rx_pushindex $start
+	rx_pushindex $which
 END
     maybe_fallthrough($ctx->{succ});
     return $bt;    
@@ -240,10 +243,20 @@ sub P6C::rx_atom::rx_val {
 	unimp "Capturing group";
     }
 
+    my $startdepth;
+    if ($x->{ctx}{rx_canfail}) {
+	$x->{ctx}{rx_fail_label} = genlabel 'failatom';
+	$startdepth = gentmp 'int';
+	code(<<END);
+	rx_stackdepth $startdepth
+$x->{ctx}{rx_fail_label}:
+	rx_stackchop $startdepth
+	goto $ctx->{fail}
+END
+    }
+
     my %ctx = %$ctx;
     if (UNIVERSAL::can($x->atom, 'rx_val')) {	# XXX: blech
-	$ctx{failatom} = $ctx{fail};
-	$ctx{failatom_depth} = 0;
 	$ctx{fail} = $x->atom->rx_val({ %ctx });
     } elsif (ref($x->atom) eq 'ARRAY') {
 	# codeblock
@@ -251,8 +264,7 @@ sub P6C::rx_atom::rx_val {
 
     } else {
 	my $lit;
-	if (ref($x->atom) eq 'ARRAY') {
-	} elsif ($x->atom->isa('P6C::sv_literal') && is_string($x->atom->type)) {
+	if ($x->atom->isa('P6C::sv_literal') && is_string($x->atom->type)) {
 	    # Literal string => avoid going through temporaries.
 	    $lit = $x->atom->lval;
 
@@ -274,7 +286,7 @@ END
 END
     }
     maybe_fallthrough($ctx->{succ});
-    return $ctx{fail};		# can't backtrack
+    return $startdepth ? $x->{ctx}{rx_fail_label} : $ctx{fail};
 }
 
 # Greedy repeat with runtime limits.
@@ -392,8 +404,6 @@ END
 #
 sub do_frugal_rep {
     my ($x, $ctx) = @_;
-#	unimp 'Frugal quantifier {'.$x->min.','.$x->max.'}';
-    # XXX: need to add failatom here...
     my $bt = genlabel 'frugal_bt';
     my $needend;
     if (ref($x->min) || ref($x->max)) {
@@ -554,8 +564,6 @@ sub P6C::rx_repeat::rx_val {
 	$bt = do_var_repeat($x, $ctx);
     } elsif (!defined($x->max)) {
 	# Star or plus
-	$ctx{failatom} = $ctx{fail};
-	$ctx{failatom_depth} = 1;
 	if ($x->min == 1) {
 	    $ctx{fail} = $x->thing->rx_val({ %ctx });
 	}
@@ -572,8 +580,6 @@ END
 	my %loopctx = %$ctx;
 	$loopctx{succ} = $loop;
 	$loopctx{fail} = $loopfail;
-	$loopctx{failatom} = $loopfail;
-	$loopctx{failatom_depth} = 0;
 	$bt = $x->thing->rx_val({ %loopctx });
 	code(<<END);
 $loopfailex:
@@ -596,8 +602,6 @@ END
 	    $ctx->{succ} = genlabel 'repeat';
 	}
 
-	$ctx{failatom} = $ctx{fail};
-	$ctx{failatom_depth} = 1;
 	$ctx{fail} = genlabel 'opt';
 	$ctx{succ} = $ctx->{succ};
 	code(<<END);
@@ -615,8 +619,6 @@ END
 	    $needend = 1;
 	    $ctx->{succ} = genlabel 'repeat';
 	}
-	$ctx{failatom} = $ctx{fail};
-	$ctx{failatom_depth} = 1;
 	my $n = $x->min;
 	my $btfirst;
 	my $loop = genlabel 'fixrep';
@@ -720,17 +722,21 @@ sub rx_not_char {
 END
 }
 
+sub P6C::rx_any::rx_val {
+    my ($x, $ctx) = @_;    
+    code(<<END);
+	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
+END
+    maybe_fallthrough($ctx->{succ});
+    return $ctx->{fail};
+}
+
 # - meta-characters
 # - escaped characters
 sub P6C::rx_meta::rx_val {
     my ($x, $ctx) = @_;    
     my $op = $x->name;
-    if ($op eq '.') {
-	code(<<END);
-	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
-END
-
-    } elsif (length $op == 1) {
+    if (length $op == 1) {
 	# XXX: '\n' is supposed to be a _logical_ newline.
 	my %rx_esc = (n => ord("\n"), t => ord("\t"),
 		      r => ord("\r"), f => ord("\f"),
@@ -873,52 +879,42 @@ END
 # Call another rule
 sub P6C::rx_call::rx_val {
     my ($x, $ctx) = @_;
-    unimp "Call to non-static rule" if ref $x->name;
 
-    $x->{ctx}{rx_thing} = $ctx->{str};
-    $x->{ctx}{rx_pos} = $ctx->{pos};
+    my $bt = genlabel 'call_back';
+    my $start = genlabel 're_call';
     code(<<END);
+	rx_pushindex $ctx->{pos}
+	goto $start
+$bt:
+#	print $ctx->{pos}
+#	print " CALL BACK\\n"
+	rx_pushmark
+$start:
 	push $ctx->{str}
-	push $ctx->{pos}
 END
-    my $ret = gen_sub_call($x);
+    if (ref $x->name) {
+	call_closure($x->name, $x->args);
+    } else {
+	gen_sub_call($x);
+    }
     code(<<END);
-	pop $ctx->{pos}
-	pop $ctx->{str}
-	unless $ret goto $ctx->{fail}
+	rx_popindex $ctx->{pos}, $ctx->{fail}
 END
     maybe_fallthrough($ctx->{succ});
-    return $ctx->{fail};	# XXX: can't backtrack into called rule
+    return $bt;
 }
 
 ############################################################
 # backtrack-limiting operators
-# XXX: this needs to be redone.  Don't use these yet.
-
-sub rx_unwind {
-    my ($label, $level, $ctx) = @_;
-    my $cnt = gentmp 'int';
-    my $endloop = genlabel 'rx_unwind';
-    my $start = genlabel 'rx_unwind';
-    my $inner = genlabel;
-    code(<<END);
-	$cnt = $level
-$start:
-	rx_popindex $ctx->{pos}, $endloop
-	goto $start		# rx_unwind
-$endloop:
-	dec $cnt
-	if $cnt > 0 goto $start
-	goto $label		# rx_unwind
-END
-    undef;
-}
 
 sub P6C::rx_cut::rx_val {
-    # XXX: This does not work.
     my ($x, $ctx) = @_;
+    die $x->level if $x->level != 1 && $x->level != 2;
+
     my $bt = genlabel 'cut_'.$x->level;
     my $needsucc;
+    my $unwind = $x->{ctx}{rx_unwind}->{ctx}{rx_fail_label};
+
     unless (defined $ctx->{succ}) {
 	$needsucc = 1;
 	$ctx->{succ} = genlabel;
@@ -926,16 +922,8 @@ sub P6C::rx_cut::rx_val {
     code(<<END);
 	goto $ctx->{succ}	# rx_cut
 $bt:
+	goto $unwind
 END
-    if ($x->level == 1) {
-	rx_unwind($ctx->{failatom}, $ctx->{failatom_depth}, $ctx);
-    } elsif ($x->level == 2) {
-	rx_unwind($ctx->{failalt}, $ctx->{failalt_depth}, $ctx);
-    } elsif ($x->level == 3) {
-	rx_unwind($ctx->{failrule}, $ctx->{failrule_depth}, $ctx);
-    } else {
-	die $x->level;
-    }
     code(<<END) if $needsucc;
 $ctx->{succ}:
 END

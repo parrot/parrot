@@ -214,7 +214,8 @@ $grammar = <<'ENDSUPPORT';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS $RXODELIM
+		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS
+ 		$SPECIAL_DELIM
 		$RXESCAPED $HEXCHAR $RXASSERTION);
     use vars '%CDELIM';
 
@@ -251,7 +252,7 @@ BEGIN {
     $RXASSERTION= qr/:{1,3}|\^{1,2}|\${1,2}/;
     $RXATOM	= qr/(?:[\w_]|\\.)+/;
     $RXCHARCLASS= qr/\[(?:[^\]\\]|\\.)+\]/;
-    $RXODELIM	= qr/[\[{(<\/!?=>)}\]#]|\s+\S/;
+    $SPECIAL_DELIM = qr/[^\w\s]/;
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -266,6 +267,9 @@ BEGIN {
 BEGIN {
     %CDELIM = qw|( )  { }  [ ]  < >
 		 ) (  } {  ] [  > <|;
+    # Those weird French quotes from E5:
+    $CDELIM{"\xAB"} = "\xBB";
+    $CDELIM{"\xBB"} = "\xAB";
 }
 
 # (see Parse::RecDescent::Consumer)
@@ -369,7 +373,7 @@ $grammar .= <<'ENDGRAMMAR';
 sv_literal:	  /(?:$NUMPART(?:\.$NUMPART)?|\.$NUMPART)(?:[Ee]-?$NUMPART)?/o
 		| '{' <commit> hv_seq '}'
 		| '[' <commit> av_seq(?) ']'
-		| <perl_quotelike>
+		| quoted_string
 
 av_seq:		  semi /[;,]?/
 
@@ -668,10 +672,9 @@ block:		  start_block '...' <commit> '}'
 
 start_block:	  <skip:''> /$SOB/o
 
-closure:	  '->' '(' <commit> _closure_args(?) ')'
-			<matchrule:@{[$item[1] eq 'rule'?'rule':'block']}>
-		| '->' <commit> _closure_args(?)
-			<matchrule:@{[$item[1] eq 'rule'?'rule':'block']}>
+closure:	  /sub\b|->/ '(' <commit> _closure_args(?) ')' block
+		| '->' <commit> _closure_args(?) block
+		| /sub\b/ <commit> block
 		| block
 
 _closure_args:	  <leftop: comma['variable'] semi_op comma['variable']>
@@ -698,16 +701,64 @@ nothing:	  ''
 no_args:	  ...!'('
 
 ##############################
+# Strings:
+
+quoted_string:	  double_quoted_string { $return = $item[1] }
+		| single_quoted_string { $return = $item[1] }
+
+double_quoted_string: <rulevar:$delim>
+double_quoted_string:
+		  double_quoted_string_head <skip:''>
+		  { $delim = $CDELIM{$item[1]} || $item[1] }
+		  double_quoted_string_body[$delim](s)
+		  "$delim" <skip:$item[2]> { $item[-3] }
+
+double_quoted_string_head:
+		  '"' { $return = '"' }
+		| /qq$SPECIAL_DELIM/o { substr($item[1],2) }
+
+double_quoted_string_body:
+		  m/\\(?=q\{|Q\[)/ <commit> single_quoted_string { $item[-1] }
+		| m/\\./ { $item[1] }
+		| interpolated_value { $item[1] }
+		| variable str_subscript(s?) ...!/[\[\{\(]/ { [@item[1,2]] }
+		| m/[^\\\$\@\%\&$arg[0]]*/ { $item[1] }
+
+str_subscript:	  <skip:$Parse::RecDescent::skip> ...!/\s/ subscript
+			<skip:$item[1]> { $item[3] }
+
+interpolated_value: sigil <skip:''>
+			'(' <skip:$Parse::RecDescent::skip> comma ')'
+			<skip:$item[2]>
+
+single_quoted_string: <rulevar:$delim>
+single_quoted_string:
+		  single_quoted_string_head <skip:''>
+		  { $delim = $CDELIM{$item[1]} || $item[1] }
+		  single_quoted_string_body[$delim](s)
+		  "$delim" <skip:$item[2]> { $item[-3] }
+
+single_quoted_string_head:
+		  "'" { "'" }
+		| /q$SPECIAL_DELIM/o { substr($item[1],1) }
+		| 'Q[' { '[' }
+
+single_quoted_string_body:
+		  m/\\(?=qq\{)/ <commit> double_quoted_string { $item[-1] }
+		| m/\\./ { quotemeta($item[-1]) }
+		| m/[^\\$arg[0]]*/ { $item[-1] }
+
+##############################
 # Regexes:
 
 rule:	 	  rx_mod(s?) start_block rx_alt '}'
 			{ mark_end('block', $text);1; } ''
 
 pattern:	  <rulevar:$cdelim>
-pattern:	  /(?:m|qr)\b/ <commit> rx_mod(s?) <skip:''> /$RXODELIM/o
-			<skip:$item[-2]> rx_alt
-			{ $item[-2] =~ s/^\s*//;
-			  $cdelim = $CDELIM{$item[-2]} || $item[-2] } "$cdelim"
+pattern:	  /(?:m|rx)\b/ <commit> rx_mod(s?) /$SPECIAL_DELIM/o rx_alt
+			{ $cdelim = $CDELIM{$item[4]} || $item[4] }
+			"$cdelim"
+		| /rule\b/ <commit> rule
 		| '/' rx_alt '/'
 
 rx_alt:		  <leftop: rx_seq '|' rx_seq>
@@ -728,7 +779,7 @@ rx_atom:	  '(' <commit> rx_alt ')'
 		| '<' <commit> /!?/ rx_assertion '>'
 		| '.'
 		| /$RXESCAPED/o
-		| variable
+		| variable subscript(s?)
 		| /$RXATOM/o
 
 rx_mod:		  /:[\w_]+/ ( '(' maybe_comma ')' )(?)
@@ -744,12 +795,12 @@ _rx_repitem:	  scalar_var
 _rx_repspec:	  _rx_repitem ',' _rx_repitem
 		| /\d+/
 
-rx_assertion:	  variable
-		| '.'
+rx_assertion:	  '.'
 		| /'(?:[^']|\\.)*'/
 		| '(' <commit> expr ')'
 		| '{' <commit> expr '}'
 		| rx_call
+		| nonscalar_var
 		| rx_charclass
 
 rx_charclass:	  <leftop: rx_cc_neg /[+\-]/ rx_cc_neg>

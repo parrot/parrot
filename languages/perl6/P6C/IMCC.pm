@@ -94,12 +94,12 @@ sub import {
 		  push_scope pop_scope
 		  set_topic topic
 		  gentmp genlabel newtmp mangled_name
-		  code
+		  code fixup_label
 		  add_function set_function exists_function_def
 		  exists_function_decl set_function_params set_function_return
 		  gen_counted_loop scalar_in_context do_flatten_array
 		  array_in_context tuple_in_context undef_in_context
-		  primitive_in_context);
+		  primitive_in_context call_closure);
     my @external = qw(init compile emit);
     my $caller = caller;
     no strict 'refs';
@@ -223,6 +223,12 @@ parameter-passing scheme, not just this interface.
 sub code {			# add code to current function
     die "Code must live within a function" unless defined $curfunc;
     $funcs{$curfunc}->{code} .= join "\n", @_;
+}
+
+sub fixup_label {
+    my ($from, $to) = @_;
+    die "Code must live within a function" unless defined $curfunc;
+    $funcs{$curfunc}->{code} =~ s/\b$from\b/$to/g;
 }
 
 sub add_function($) {
@@ -789,6 +795,20 @@ END
     return $tmp;
 }
 
+sub call_closure {
+    my ($thing, $args) = @_;
+    my $argval = $args ? $args->val : newtmp('PerlArray');
+    my $func = $thing->val;
+    my $ret = gentmp 'pmc';
+    code(<<END);
+	.arg	$argval
+	.arg	$func
+	call	__CALL_CLOSURE
+	.result $ret
+END
+    return $ret;
+}
+
 =head2 P6C::IMCC::Sub
 
 Stores IMCC code for a subroutine.
@@ -1203,7 +1223,7 @@ END
 END
 	} else {
 	    $op = $outaplace_op{$x->op};
-	    $ret = gentmp 'PerlUndef';
+	    $ret = newtmp 'PerlUndef';
 	    code(<<END);
 	$ret = $tmp $op
 END
@@ -1762,20 +1782,6 @@ BEGIN {
 %temptype = qw(PerlArray int PerlHash str);
 }
 
-sub call_closure {
-    my ($thing, $args) = @_;
-    my $argval = $args ? $args->val : newtmp('PerlArray');
-    my $func = $thing->val;
-    my $ret = gentmp 'pmc';
-    code(<<END);
-	.arg	$argval
-	.arg	$func
-	call	__CALL_CLOSURE
-	.result $ret
-END
-    return $ret;
-}
-
 # Slice value.  Probably doesn't handle every single case, but it
 # should handle most.
 sub val {
@@ -1983,23 +1989,31 @@ use P6C::IMCC ':all';
 
 sub val {
     my $x = shift;
-    unless ($x->{ctx}{rx_inline}) {
-	my $rxstr = gentmp 'str';
-	my $rxpos = gentmp 'int';
-	code(<<END);
-	pop $rxpos 
+    my $fail = genlabel 'match_failed';
+    my $precode;
+    my $rxstr = gentmp 'str';
+    my $rxpos = gentmp 'int';
+    my $isback = gentmp 'int';
+    my $fake_back = genlabel 'XXX';
+    code(<<END);
 	pop $rxstr
+	rx_popindex $rxpos, $fake_back
 END
-	$x->{ctx}{rx_pos} = $rxpos;
-	$x->{ctx}{rx_thing} = $rxstr;
-    }
-    my $ret = P6C::IMCC::rule::rx_val($x);
-    unless ($x->{ctx}{rx_inline}) {
-	code(<<END);
-	push $x->{ctx}{rx_thing}
-	push $x->{ctx}{rx_pos}
+    $x->{ctx}{rx_pos} = $rxpos;
+    $x->{ctx}{rx_thing} = $rxstr;
+    $x->{ctx}{rx_fail} = $fail;
+    my $ret = newtmp 'PerlUndef';
+    my $back = P6C::IMCC::rule::rx_val($x);
+    my $end = genlabel 'end';
+    fixup_label($fake_back, $back);
+    code(<<END);
+	rx_pushindex $rxpos
+	$ret = $rxpos
+	goto $end
+$fail:
+	rx_pushmark
+$end:
 END
-    }
     return scalar_in_context($ret, $x->{ctx});
 }
 
