@@ -36,6 +36,20 @@ Prints a PMC to C<stderr>.
 
 */
 
+static STRING*
+trace_class_name(Interp *interpreter, PMC* pmc)
+{
+    STRING *class_name;
+    if (PObj_is_class_TEST(pmc)) {
+        SLOTTYPE *class_array = PMC_data(pmc);
+        PMC *class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        class_name = PMC_str_val(class_name_pmc);
+    }
+    else
+        class_name = pmc->vtable->whoami;
+    return class_name;
+}
+
 void
 trace_pmc_dump(Interp *interpreter, PMC* pmc)
 {
@@ -43,8 +57,9 @@ trace_pmc_dump(Interp *interpreter, PMC* pmc)
     if (pmc && pmc != PMCNULL) {
         if(pmc->vtable) {
             if (pmc->vtable->data == pmc) {
-                PIO_eprintf(interpreter, "%S=Class:PMC(%#p)",
-                        VTABLE_name(interpreter, pmc), pmc);
+                STRING *name = trace_class_name(interpreter, pmc);
+                PIO_eprintf(interpreter, "%S=%Ss:PMC(%#p)",
+                        VTABLE_name(interpreter, pmc), name, pmc);
             }
             else if (pmc->vtable->base_type == enum_class_PerlString) {
                 STRING *s = VTABLE_get_string(interpreter, pmc);

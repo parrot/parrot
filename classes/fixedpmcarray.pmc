@@ -69,6 +69,7 @@ static void array_sort(Interp *interpreter, PMC *self, PMC *cmp_func)
     if (REG_INT(3) == 0) {
 default_sort:
         func = sort_compare;
+use_func:
         the_interp = interpreter;
         qsort(PMC_data(self), PMC_int_val(self), sizeof(PMC *),
                 (int (*)(const void*, const void*))func);
@@ -85,6 +86,19 @@ default_sort:
             /* a NULL or None PMC was passed
             */
             goto default_sort;
+        }
+        else {
+            if (cmp_func->vtable->base_type == enum_class_NCI) {
+                /* the C function inside is at struct_val
+                 * hopefully this function does compare
+                 */
+                func = (int (*)(void*, void*)) PMC_struct_val(cmp_func);
+                /*
+                 * XXX not yet -cmp doesn't take an interpreter arg
+                 */
+                /* goto use_func; */
+                goto default_sort;
+            }
         }
         /*
          * save registers once, as the compare function will be called

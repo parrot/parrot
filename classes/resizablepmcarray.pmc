@@ -102,7 +102,7 @@ Resizes the array to C<size> elements.
             else {
                 needed = size - cur;
                 cur += needed + 4096;
-                cur &= 0xfff;
+                cur &= ~0xfff;
             }
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
                     cur * sizeof(PMC*));

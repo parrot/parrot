@@ -28,6 +28,8 @@ Python Library Reference 2.1 Built-in Functions
 
 */
 
+static PMC* parrot_py_get_attr_str(Interp*, PMC *object, STRING *name);
+
 static PMC *
 parrot_py_callable(Interp *interpreter, PMC *pmc)
 {
@@ -59,6 +61,12 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
     PMC_str_val(s) = string_chr(interpreter, (UINTVAL)i);
     PObj_custom_mark_SET(s);
     return s;
+}
+
+static INTVAL
+parrot_py_cmp(Interp *interpreter, PMC *left, PMC *right)
+{
+    return mmd_dispatch_i_pp(interpreter, left, right, MMD_CMP);
 }
 
 static void
@@ -511,7 +519,7 @@ parrot_py_assert_e(Interp *interpreter, PMC *pmc)
     return ex;
 }
 
-static void
+static PMC*
 parrot_py_object(Interp *interpreter, STRING *class, void *func,
         STRING *name, STRING *sig)
 {
@@ -519,13 +527,14 @@ parrot_py_object(Interp *interpreter, STRING *class, void *func,
     method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interpreter, method, sig, func);
     Parrot_store_global(interpreter, class, name, method);
+    return method;
 }
 
-static void
+static PMC*
 parrot_py_global(Interp *interpreter, void *func,
         STRING *name, STRING *sig)
 {
-    parrot_py_object(interpreter, NULL, func, name, sig);
+    return parrot_py_object(interpreter, NULL, func, name, sig);
 }
 
 /*
@@ -542,11 +551,13 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *ip   =     CONST_STRING(interpreter, "iP");
     STRING *pip   =    CONST_STRING(interpreter, "PIP");
     STRING *pipp   =   CONST_STRING(interpreter, "PIPP");
+    STRING *iipp   =   CONST_STRING(interpreter, "iIPP");
     STRING *pippp   =  CONST_STRING(interpreter, "PIPPP");
 
     STRING *assert_e = CONST_STRING(interpreter, "AssertionError");
     STRING *callable = CONST_STRING(interpreter, "callable");
     STRING *chr      = CONST_STRING(interpreter, "chr");
+    STRING *cmp      = CONST_STRING(interpreter, "cmp");
     STRING *divmod   = CONST_STRING(interpreter, "divmod");
     STRING *enumerate= CONST_STRING(interpreter, "enumerate");
     STRING *filter   = CONST_STRING(interpreter, "filter");
@@ -560,6 +571,8 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *range    = CONST_STRING(interpreter, "range");
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
     STRING *repr   =   CONST_STRING(interpreter, "repr");
+
+    STRING *name_ =    CONST_STRING(interpreter, "__name__");
 
     /* types */
     STRING *Py_bool  = CONST_STRING(interpreter, "Py_bool");
@@ -579,7 +592,7 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *Py_object = CONST_STRING(interpreter, "Py_object");
     STRING *Py_type   = CONST_STRING(interpreter, "Py_type");
 
-    PMC* class;
+    PMC* class, *m;
     /*
      * new types interface, just place a class object as global
      * this is invocable and returns a new instance
@@ -618,6 +631,16 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
+
+    m = parrot_py_global(interpreter, F2DPTR(parrot_py_cmp), cmp, iipp);
+    {
+        PMC* cmp_name = pmc_new(interpreter, enum_class_PerlString);
+        VTABLE_assign_string_native(interpreter, cmp_name, cmp);
+        VTABLE_setprop(interpreter, m, name_, cmp_name);
+        m->vtable = Parrot_clone_vtable(interpreter, m->vtable);
+        m->vtable->get_attr_str = parrot_py_get_attr_str;
+    }
+
     parrot_py_global(interpreter, F2DPTR(parrot_py_divmod), divmod, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
@@ -759,6 +782,10 @@ parrot_py_create_default_meths(Interp *interpreter)
     mmd_register(interpreter, MMD_DIVIDE_INT,
             enum_class_PerlInt, 0,
             (funcptr_t)integer_divide_int);
+    /*
+     * Sub PMCs have an atribute __name__ - redirect __get_attr
+     */
+    Parrot_base_vtables[enum_class_Sub]->get_attr_str = parrot_py_get_attr_str;
 }
 /*
 
@@ -957,11 +984,20 @@ parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
     /*
      * 1) look at props
      */
-    if ( (p = PMC_metadata(object)) ) {
+    if (object->pmc_ext && (p = PMC_metadata(object)) ) {
         h = PMC_struct_val(p);
         b = hash_get_bucket(interpreter, h, name);
         if (b) {
             return b->value;
+        }
+    }
+    if (object->vtable->base_type == enum_class_Sub) {
+        STRING *name_ =    CONST_STRING(interpreter, "__name__");
+        if (!string_equal(interpreter, name, name_)) {
+            parrot_sub_t sub = PMC_sub(object);
+            PMC *n = pmc_new(interpreter, enum_class_PerlString);
+            VTABLE_assign_string_native(interpreter, n, sub->name);
+            return n;
         }
     }
     /*
@@ -982,6 +1018,11 @@ parrot_py_get_attr_str(Interp* interpreter, PMC *object, STRING *name)
          * 3) try method
          */
         p = Parrot_find_method_with_cache(interpreter, class, name);
+        if (p)
+            return p;
+    }
+    else if (PObj_is_class_TEST(object)) {
+        p = Parrot_find_method_with_cache(interpreter, object, name);
         if (p)
             return p;
     }
@@ -1008,6 +1049,16 @@ parrot_py_set_attr_str(Interp* interpreter, PMC *obj, STRING *name, PMC *v)
     Parrot_default_setprop(interpreter, obj, name, v);
 }
 
+static PMC*
+parrot_py_get_attr_num(Interp* interpreter, PMC *object, INTVAL nr)
+{
+    return PMCNULL;
+}
+static void
+parrot_py_set_attr_num(Interp* interpreter, PMC *obj, INTVAL nr, PMC *v)
+{
+
+}
 /*
  * TODO self.super()
  * for now use delegate directly
@@ -1044,6 +1095,8 @@ parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class)
 
     vtable->get_attr_str = parrot_py_get_attr_str;
     vtable->set_attr_str = parrot_py_set_attr_str;
+    vtable->get_attr     = parrot_py_get_attr_num;
+    vtable->set_attr     = parrot_py_set_attr_num;
     vtable->get_iter     = parrot_py_get_iter;
 
     class->vtable->get_attr_str = parrot_py_get_attr_str;

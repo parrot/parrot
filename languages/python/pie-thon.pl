@@ -55,7 +55,7 @@ my %vtables = (
     __iter__ => '__get_iter',
     __repr__ => '__get_repr',
     __str__ => '__get_string',
-    __cmp__ => 'MMD_CMP',
+    __cmp__ => 41,		# MMD_CMP
 );
 
 # the new way type system
@@ -1671,8 +1671,15 @@ EOC
     if ($vtables{$c}) {
 	$c = $vtables{$c};
     }
+    my $cc;
+    if ($c =~ /^\d+$/) {	# MMD
+	$cc = "-$c";
+    }
+    else {
+	$cc = qq!"$c"!;
+    }
     print <<EOC;
-	$attr = getattribute $obj, "$c" $cmt
+	$attr = getattribute $obj, $cc $cmt
 EOC
     push @stack, ["obj $obj attr $c", $attr, 'P'];
 }
@@ -1682,8 +1689,18 @@ sub STORE_ATTR
     my ($n, $c, $cmt) = @_;
     my $obj = pop @stack;  # object
     my $val = promote(pop @stack);
+    if ($vtables{$c}) {
+	$c = $vtables{$c};
+    }
+    my $cc;
+    if ($c =~ /^\d+$/) {	# MMD
+	$cc = "-$c";
+    }
+    else {
+	$cc = qq!"$c"!;
+    }
     print <<EOC;
-	setattribute $obj->[1], "$c", $val $cmt
+	setattribute $obj->[1], $cc, $val $cmt
 EOC
 }
 

@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -120,6 +120,22 @@ def main():
     print i, `i`
     i = Int()
     print i, `i`
+
+main()
+
+CODE
+
+test(<<'CODE', 'data slice');
+def main():
+    a = []
+    N = 20000
+    K = 1
+    for i in range(N):
+	a.append(i)
+    for i in range(N):
+	if a[i] != i:
+	    print a[i]
+    print "A", a[:K], a[N//2:N//2+K], a[-K:]
 
 main()
 
