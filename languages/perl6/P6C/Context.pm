@@ -188,6 +188,10 @@ sub block_ctx {
 	    $voidctx->{label} = $stmt->name;
 	    $stmt->ctx_right($voidctx);
 	    next;
+        } elsif ($stmt->isa('P6C::debug_info')) {
+            # Need to skip debug_info nodes so that labels will land
+            # on the correct statement
+            next;
 	} elsif ($stmt->isa('P6C::prefix') && $stmt->name eq 'CATCH') {
 	    $stmt->ctx_right($ctx->copy);
 	} else {
