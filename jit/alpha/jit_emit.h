@@ -465,9 +465,9 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 {
     Parrot_jit_normal_op(jit_info,interpreter);
 
-    jit_emit_sub_rrr(jit_info->native_ptr, SR1, REG10_s1, SR1); 
-    jit_emit_add_rrr(jit_info->native_ptr, SR1, REG11_s2, SR1);
-    emit_ldq_b(jit_info->native_ptr, SR1, 0, SR1);
+    jit_emit_sub_rrr(jit_info->native_ptr, ISR1, REG10_s1, ISR1); 
+    jit_emit_add_rrr(jit_info->native_ptr, ISR1, REG11_s2, ISR1);
+    emit_ldq_b(jit_info->native_ptr, ISR1, 0, ISR1);
     /* XXX this is incorrect, might blow the stack, use jmp instead */
     emit_jsr(jit_info->native_ptr);
 } 
