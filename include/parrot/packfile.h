@@ -84,8 +84,7 @@ struct PackFile {
 
 struct PackFile *PackFile_new(void);
 
-void
-PackFile_destroy(struct PackFile * self);
+void PackFile_destroy(struct PackFile * self);
 
 opcode_t PackFile_pack_size(struct PackFile *self);
 
@@ -99,11 +98,9 @@ opcode_t PackFile_unpack(struct Parrot_Interp *interpreter,
 ** PackFile_FixupTable Functions:
 */
 
-void
-PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
+void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
 
-BOOLVAL
-PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
+BOOLVAL PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, opcode_t * packed, opcode_t packed_size);
 
 opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 
@@ -113,21 +110,18 @@ void PackFile_FixupTable_pack(struct PackFile_FixupTable * self, opcode_t * pack
 ** PackFile_ConstTable Functions:
 */
 
-void
-PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
+void PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
 
 opcode_t PackFile_ConstTable_pack_size(struct PackFile_ConstTable * self);
 
-void
-PackFile_ConstTable_pack(struct PackFile * pf,
-                            struct PackFile_ConstTable * self,
-                            opcode_t * packed);
+void PackFile_ConstTable_pack(struct PackFile * pf,
+                              struct PackFile_ConstTable * self,
+                              opcode_t * packed);
 
-BOOLVAL
-PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
-                        struct PackFile * pf,
-                        struct PackFile_ConstTable * self,
-                        opcode_t * packed, opcode_t packed_size);
+BOOLVAL PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
+                                   struct PackFile * pf,
+                                   struct PackFile_ConstTable * self,
+                                   opcode_t * packed, opcode_t packed_size);
 
 /*
 ** PackFile_Constant Functions:
@@ -135,41 +129,34 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 
 struct PackFile_Constant *PackFile_Constant_new(void);
 
-opcode_t
-PackFile_Constant_pack_size(struct PackFile_Constant * self);
+opcode_t PackFile_Constant_pack_size(struct PackFile_Constant * self);
 
-void
-PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
+void PackFile_Constant_pack(struct PackFile_Constant * self, opcode_t * packed);
 
-void
-PackFile_Constant_destroy(struct PackFile_Constant * self);
+void PackFile_Constant_destroy(struct PackFile_Constant * self);
 
 BOOLVAL PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
-                                  struct PackFile *packfile,
-                                  struct PackFile_Constant *self,
-                                  opcode_t *packed, opcode_t packed_size);
+                                 struct PackFile *packfile,
+                                 struct PackFile_Constant *self,
+                                 opcode_t *packed, opcode_t packed_size);
 
-BOOLVAL
-PackFile_Constant_unpack_number(struct PackFile * pf,
-                                struct PackFile_Constant * self,
-                                opcode_t * packed, opcode_t packed_size);
+BOOLVAL PackFile_Constant_unpack_number(struct PackFile * pf,
+                                        struct PackFile_Constant * self,
+                                        opcode_t * packed, opcode_t packed_size);
 
 BOOLVAL PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
-                                         struct PackFile * pf,
-                                         struct PackFile_Constant *self,
-                                         opcode_t *packed,
-                                         opcode_t packed_size);
+                                        struct PackFile * pf,
+                                        struct PackFile_Constant *self,
+                                        opcode_t *packed,
+                                        opcode_t packed_size);
 
 opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t *stream);
 
-INTVAL
-PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream);
+INTVAL PackFile_fetch_iv(struct PackFile *pf, opcode_t *stream);
 
-FLOATVAL
-PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream);
+FLOATVAL PackFile_fetch_nv(struct PackFile *pf, opcode_t *stream);
 
-void
-PackFile_assign_transforms(struct PackFile *pf);
+void PackFile_assign_transforms(struct PackFile *pf);
 
 /*
 ** Byte Ordering Functions (byteorder.c)
