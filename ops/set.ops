@@ -290,7 +290,7 @@ inline op setp_ind(in INT, in PMC) {
 
 =item B<setn_ind>(in INT, in NUM)
 
-Set the PMC in register $1 to $2.
+Set the number in register $1 to $2.
 Please note, that the register allocator doesn't track the usage of the
 affected register - handle with care.
 
