@@ -16,12 +16,6 @@ This is a baseclass that provides some essential functions necessary
 for dumping data structures. It is subclassed by C<Data::Dumper::Default>,
 which implements the methods that are finally doing the output.
 
-=head1 METHODS
-
-A Data::Dumper::Default object has the following methods:
-
-=over 4
-
 =cut
 
 .sub __library_data_dumper_default_onload @LOAD

@@ -283,8 +283,6 @@ inline op delete(in PMC, in INTKEY) {
   goto NEXT();
 }
 
-=back
-
 =cut
 
 ########################################

@@ -76,7 +76,7 @@ C<bool> object according to 2.1. Built-in Functions.
     }
 /*
 
-=item C<STRING* get_string ()
+=item C<STRING* get_string ()>
 
 Return "True" or "False" if python_mode is true.
 

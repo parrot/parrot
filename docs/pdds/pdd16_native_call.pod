@@ -251,7 +251,7 @@ various places, and generally dealing with the bookkeeping.
 
 =head1 REFERENCES
 
-L<docs/pdds/pdd06_pasm.pod>
+L<pdd06_pasm.pod>
 
 =head1 VERSION
 

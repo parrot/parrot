@@ -283,7 +283,7 @@ Functions to call Parrot subroutines and methods
 
 Calls a Parrot subroutine, with C<argcount> PMC parameters. This function
 sets up Parrot's registers in line with the Parrot calling conventions;
-see L<docs/pdds/pdd03_calling_conventions.pod> for more details.
+see L<pdd03_calling_conventions.pod> for more details.
 
 =item C<Parrot_call_method(interp, 
 Parrot_PMC sub, Parrot_STRING method, Parrot_Int argcount, ...)>
@@ -321,7 +321,7 @@ Return the value of a numeric register.
 
 Return the value of a string register. 
 
-=item C<C<Parrot_get_pmcreg(interp, Parrot_Int regnum)>
+=item C<Parrot_get_pmcreg(interp, Parrot_Int regnum)>
 
 Return the value of a PMC register. 
 
@@ -356,7 +356,7 @@ F<docs/glossary.pod>
 
 =over 4
 
-=item C<version 1
+=item Version 1
 
 None. First version
 
@@ -366,7 +366,7 @@ None. First version
 
 =over 4
 
-=item C<Version 1.0
+=item Version 1.0
 
 None. First version
 

@@ -104,8 +104,6 @@ END_CODE
 
 END_OUT
 
-=back
-
 =head1 AUTHOR
 
 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
