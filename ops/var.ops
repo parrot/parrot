@@ -167,48 +167,48 @@ otherwise, count up from the outermost scope.
 =cut
 
 op find_lex(out PMC, in STR) {
-    opcode_t * resume;
+    opcode_t * next;
     if (!$2)
         internal_exception(1, "Tried to get null lexical.");
     $1 = scratchpad_get(interpreter, scratchpad_get_current(interpreter), $2, 0);
-    resume = expr NEXT();
+    next = expr NEXT();
     if (!$1)
-        real_exception(interpreter, resume, LEX_NOT_FOUND,
-            "Lexical '%s' not found", string_to_cstring(interpreter, $2));
-    restart ADDRESS(resume);
+        real_exception(interpreter, next, LEX_NOT_FOUND,
+            "Lexical '%Ss' not found", $2);
+    goto ADDRESS(next);
 }
 
 op find_lex(out PMC, in INT) {
     PMC * pad = scratchpad_get_current(interpreter);
     PMC * lex = $1 = scratchpad_get(interpreter, pad, NULL, $2);
-    opcode_t *resume = expr NEXT();
+    opcode_t *next = expr NEXT();
     if (!lex)
-        real_exception(interpreter, resume, LEX_NOT_FOUND,
+        real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $2);
-    restart ADDRESS(resume);
+    goto ADDRESS(next);
 }
 
 op find_lex(out PMC, in INT, in STR) {
-    opcode_t * resume;
+    opcode_t * next;
     if (!$3)
         internal_exception(1, "Tried to get null lexical.");
     $1 = scratchpad_get_index(interpreter, scratchpad_get_current(interpreter),
                               $2, $3, 0);
-    resume = expr NEXT();
+    next = expr NEXT();
     if (!$1)
-        real_exception(interpreter, resume, LEX_NOT_FOUND,
-            "Lexical '%s' not found", string_to_cstring(interpreter, $3));
-    restart ADDRESS(resume);
+        real_exception(interpreter, next, LEX_NOT_FOUND,
+            "Lexical '%Ss' not found", $3);
+    goto ADDRESS(next);
 }
 
 op find_lex(out PMC, in INT, in INT) {
     PMC * pad = scratchpad_get_current(interpreter);
     PMC *lex = $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
-    opcode_t *resume = expr NEXT();
+    opcode_t *next = expr NEXT();
     if (!lex)
-        real_exception(interpreter, resume, LEX_NOT_FOUND,
+        real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $3);
-    restart ADDRESS(resume);
+    goto ADDRESS(next);
 }
 
 =back
@@ -250,19 +250,19 @@ Find the global named $2 and store it in $1
 
 op find_global(out PMC, in STR) {
     /* XXX: All globals should go through an API */
-    opcode_t * resume;
+    opcode_t * next;
     PMC * globals = interpreter->globals->stash_hash;
     if (!$2)
         internal_exception(1, "Tried to get null global.");
 
-    resume = expr NEXT();
+    next = expr NEXT();
     if (!VTABLE_exists_keyed_str(interpreter, globals, $2))
-        real_exception(interpreter, resume, GLOBAL_NOT_FOUND,
-                "Global '%s' not found\n", string_to_cstring(interpreter, $2));
+        real_exception(interpreter, next, GLOBAL_NOT_FOUND,
+                "Global '%Ss' not found\n", $2);
 
     $1 = VTABLE_get_pmc_keyed_str(interpreter, globals, $2);
 
-    restart ADDRESS(resume);
+    goto ADDRESS(next);
 }
 
 =back

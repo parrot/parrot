@@ -355,12 +355,17 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name, const char *
         if (op_info->jump) {
 
             /* XXX: assume the jump is relative and to the last arg.
-             * usually true.
+             * usually true - but not for ops, that throw an exception
+             *
+             * TODO mark labels in the ops files
              */
             if (op_info->jump & PARROT_JUMP_RESTART)
                 ins->type = ITBRANCH;
-            else
+            else if (n && (r[n-1]->set == 'I' || r[n-1]->type == VTADDRESS) &&
+                    strcmp(name, "find_lex"))
                 ins->type = ITBRANCH | (1 << (n-1));
+            else
+                ins->type = ITBRANCH;
             if (!strcmp(name, "branch"))
                 ins->type |= IF_goto;
             if (!strcmp(fullname, "jump_i") ||
