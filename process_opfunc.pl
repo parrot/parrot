@@ -126,7 +126,7 @@ while (<INPUT>) {
 
     s/NUM_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->number/g;
     s/STR_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->string/g;
-    s/INT_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->string/g;
+    s/INT_CONST\(([^)]+)\)/interpreter->code->const_table->constants[$1]->integer/g;
 
     if (/^}/) {
         print OUTPUT $footer, "\n";
