@@ -64,7 +64,7 @@ my(%c)=(
 	nv =>			($Config{nvtype}||'double'),
 	cc =>			$Config{cc},
 	#ADD C COMPILER FLAGS HERE
-	ccflags =>		$Config{ccflags}." -I.. -I./include",
+	ccflags =>		$Config{ccflags}." -I./include",
 	libs =>			$Config{libs},
   	perl =>			$^X,
 	cc_debug =>		'-g',
