@@ -117,8 +117,8 @@ extern const char *datatype_names[];
 #endif
 
 
-INTVAL Parrot_get_datatype_enum(Interp * interpreter, STRING *typename);
-STRING * Parrot_get_datatype_name(Interp * interpreter, INTVAL type);
+INTVAL Parrot_get_datatype_enum(Parrot_Interp, STRING *);
+STRING * Parrot_get_datatype_name(Parrot_Interp, INTVAL );
 
 #endif /* PARROT_DATATYPES_H_GUARD */
 
