@@ -690,7 +690,7 @@ sub handle_asm_directive {
   if( $line =~ /^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i ) {
     my( $name, $data ) = ($1, $2);
     $equate{$name} = $data;
-    return 0;
+    return 1;
   }
   elsif( $line =~ /^([_a-zA-Z]\w*)\s+macro\s+(.+)$/i ) {
     # a macro definition
@@ -699,7 +699,7 @@ sub handle_asm_directive {
     $macros{$name} = [ [split( /,\s*/, $args)], [] ];
     while( 1 ) {
       if( !scalar( @program ) ) {
-        error( "The end of the macro was never seen", $file, $line);
+        error( "The end of the macro '$name' was never seen", $file, $line);
       }
       my $l = shift( @program );
       ($file, $line, $pline, $sline) = @$l;
@@ -1032,6 +1032,21 @@ sub handle_arguments {
 
   foreach (0..$#args) {
     my $rtype = $opcodes{$opcode}{TYPES}[$_];
+
+    #
+    # Make any replacements due to 'equates':
+    #
+    # NOTE: We don't process the equate expansions recursively.
+    #
+
+    if (exists $equate{$args[$_]}) { # substitute the equate value
+      if(ref($equate{$args[$_]})) {
+        $args[$_] = &{$equate{$args[$_]}};
+      } else {
+        $args[$_] = $equate{$args[$_]};
+      }
+      $args[$_] = replace_constants($args[$_]);
+    }
 
     #
     # Register arguments:
