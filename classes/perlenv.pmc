@@ -13,7 +13,20 @@
 
 #include "parrot/parrot.h"
 
-pmclass PerlEnv extends Env {
+static PMC * Env_PMC;
+
+pmclass PerlEnv singleton extends Env {
+    /*
+     * singleton creation interface s. pmc.c
+     */
+    void* get_pointer() {
+	return Env_PMC;
+    }
+
+    void set_pointer(void* ptr) {
+	Env_PMC = (PMC*) ptr;
+    }
+
     PMC* get_pmc_keyed (PMC* key) {
 	STRING* string = DYNSELF.get_string_keyed(key);
 	PMC * ret = pmc_new(INTERP, enum_class_PerlString);
