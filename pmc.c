@@ -267,12 +267,9 @@ register_fallback_methods(Parrot_Interp interp) {
 void
 mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    puts("Here");
     FLOATVAL result = (VTABLE_get_number(interp, left) +
                        VTABLE_get_number(interp, right));
-    puts("there");
     VTABLE_set_number_native(interp, dest, result);
-    puts("Everywhere");
 }
 
 void
