@@ -330,6 +330,8 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
       current_offset += (4 - s % 4); \
    }
 
+#  define SHSTRTABSIZE 0x48
+
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 {
@@ -340,7 +342,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     Elf32_Off current_offset;
     FILE *fp;
     int i;
-    char shst[72], *shste;
+    char shst[SHSTRTABSIZE], *shste;
 
     fp = fopen(file, "w");
     
@@ -381,13 +383,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     current_offset = sizeof(Elf32_Ehdr) + 10 * sizeof(Elf32_Shdr);
 
     /* Sections */
-    bzero(&shst, 72);
+    bzero(&shst, SHSTRTABSIZE);
     shste = shst + 1;
     /* NULL */
     bzero(&sechdr, sizeof(Elf32_Ehdr));
     save_struct(fp, &sechdr, sizeof(Elf32_Shdr));
     /* Section Header String Table */
-    sh_add(".shstrtab", SHT_STRTAB, 0, 0x48, 0, 0, 1, 0);
+    sh_add(".shstrtab", SHT_STRTAB, 0, SHSTRTABSIZE, 0, 0, 1, 0);
     /* Text */
     sh_add(".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, obj->text.size,
         0, 0, 4, 0);
@@ -420,7 +422,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     sh_add(".comment", SHT_PROGBITS, 0, 0x28, 0, 0, 1, 0);
 
     /* Section header string table */
-    save_struct(fp, &shst, 72);
+    save_struct(fp, &shst, SHSTRTABSIZE);
     save_struct(fp, obj->text.code, obj->text.size); /* Text */
     save_struct(fp, obj->data.code, obj->data.size); /* Data */
     /* Text rellocations */
