@@ -31,6 +31,13 @@ typedef void (*encoding_become_encoding_t)(Interp*, STRING *src);
 typedef UINTVAL (*encoding_codepoints_t)(Interp*, STRING *src);
 typedef UINTVAL (*encoding_bytes_t)(Interp*, STRING *src);
 
+/* iterator support */
+
+struct string_iterator_t;       /* s. parrot/string.h */
+
+typedef void    (*encoding_iter_init_t)(Interp *, STRING *src,
+        struct string_iterator_t *);
+
 struct _encoding {
     const char *name;
     UINTVAL max_bytes_per_codepoint;
@@ -49,6 +56,7 @@ struct _encoding {
     encoding_become_encoding_t  become_encoding;
     encoding_codepoints_t  codepoints;
     encoding_bytes_t  bytes;
+    encoding_iter_init_t     iter_init;
 };
 
 typedef struct _encoding ENCODING;
@@ -104,6 +112,8 @@ encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENC
     ((ENCODING *)src->encoding)->codepoints(i, src)
 #define ENCODING_BYTES(i, src) \
     ((ENCODING *)src->encoding)->bytes(i, src)
+#define ENCODING_ITER_INIT(i, src, iter) \
+    ((ENCODING *)src->encoding)->iter_init(i, src, iter)
 
 #endif /* PARROT_ENCODING_H_GUARD */
 /*

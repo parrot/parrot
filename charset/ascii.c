@@ -107,13 +107,16 @@ static STRING *
 from_charset(Interp *interpreter, STRING *src, STRING *dest)
 {
     UINTVAL offs, c;
+    String_iter iter;
+
     if (dest) {
         Parrot_reallocate_string(interpreter, dest, src->strlen);
         dest->bufused = src->strlen;
         dest->strlen  = src->strlen;
     }
+    ENCODING_ITER_INIT(interpreter, src, &iter);
     for (offs = 0; offs < src->strlen; ++offs) {
-        c = ENCODING_GET_CODEPOINT(interpreter, src, offs);
+        c = iter.get_and_advance(interpreter, &iter);
         if (c >= 0x80) {
             EXCEPTION(LOSSY_CONVERSION, "lossy conversion to ascii");
         }
@@ -142,7 +145,8 @@ ascii_to_unicode(Interp *interpreter, STRING *source_string, STRING *dest)
 }
 
 STRING *
-ascii_to_charset(Interp *interpreter, STRING *src, CHARSET *new_charset, STRING *dest)
+ascii_to_charset(Interp *interpreter, STRING *src,
+        CHARSET *new_charset, STRING *dest)
 {
     charset_converter_t conversion_func;
 
@@ -265,6 +269,7 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 {
     INTVAL retval;
     UINTVAL offs, l_len, r_len, min_len;
+    String_iter iter;
 
     l_len = lhs->strlen;
     r_len = rhs->strlen;
@@ -276,9 +281,10 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
     }
     else {
         UINTVAL cl, cr;
+        ENCODING_ITER_INIT(interpreter, rhs, &iter);
         for (offs = 0; offs < min_len; ++offs) {
             cl = ENCODING_GET_BYTE(interpreter, lhs, offs);
-            cr = ENCODING_GET_CODEPOINT(interpreter, rhs, offs);
+            cr = iter.get_and_advance(interpreter, &iter);
             retval = cl - cr;
             if (retval)
                 break;
@@ -336,9 +342,11 @@ static UINTVAL
 validate(Interp *interpreter, STRING *src)
 {
     UINTVAL codepoint, offset;
+    String_iter iter;
 
+    ENCODING_ITER_INIT(interpreter, src, &iter);
     for (offset = 0; offset < string_length(interpreter, src); ++offset) {
-        codepoint = ENCODING_GET_CODEPOINT(interpreter, src, offset);
+        codepoint = iter.get_and_advance(interpreter, &iter);
         if (codepoint >= 0x80)
             return 0;
     }

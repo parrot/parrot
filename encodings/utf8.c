@@ -215,14 +215,18 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
 
 =head2 Iterator Functions
 
-String iteration is currently only used in C<hash_string_equal()>.
-
 =over 4
 
 =item C<static UINTVAL
-utf8_decode_and_advance(struct string_iterator_t *i)>
+utf8_decode_and_advance(Interp *, String_iter *i)>
 
-The UTF-8 implementation of the string iterator's C<decode_and_advance>
+The UTF-8 implementation of the string iterator's C<get_and_advance>
+function.
+
+=item C<static void
+utf8_encode_and_advance(Interp *, String_iter *i, UINTVAL c)>
+
+The UTF-8 implementation of the string iterator's C<set_and_advance>
 function.
 
 =cut
@@ -230,7 +234,7 @@ function.
 */
 
 static UINTVAL
-utf8_decode_and_advance(struct string_iterator_t *i)
+utf8_decode_and_advance(Interp *interpreter, String_iter *i)
 {
     const utf8_t *u8ptr = (utf8_t *)((char *)i->str->strstart + i->bytepos);
     UINTVAL c = *u8ptr;
@@ -263,6 +267,19 @@ utf8_decode_and_advance(struct string_iterator_t *i)
     return c;
 }
 
+static void
+utf8_encode_and_advance(Interp *interpreter, String_iter *i, UINTVAL c)
+{
+    const STRING *s = i->str;
+    unsigned char *new_pos, *pos;
+
+    assert(i->bytepos < PObj_buflen(s) - 4);
+    pos = (unsigned char *)s->strstart + i->bytepos;
+    new_pos = utf8_encode(pos, c);
+    i->bytepos += (new_pos - pos);
+    i->charpos++;
+}
+
 /*
 
 =item C<func>
@@ -276,7 +293,7 @@ function.
 
 /* XXX Should use quickest direction */
 static void
-utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
+utf8_set_position(Interp *interpreter, String_iter *i, UINTVAL pos)
 {
     const utf8_t *u8ptr = (utf8_t *)i->str->strstart;
 
@@ -426,6 +443,16 @@ bytes(Interp *interpreter, STRING *src)
     return src->bufused;
 }
 
+static void
+iter_init(Interp *interpreter, String *src, String_iter *iter)
+{
+    iter->str = src;
+    iter->bytepos = iter->charpos = 0;
+    iter->get_and_advance = utf8_decode_and_advance;
+    iter->set_and_advance = utf8_encode_and_advance;
+    iter->set_position =    utf8_set_position;
+}
+
 ENCODING *
 Parrot_encoding_utf8_init(Interp *interpreter)
 {
@@ -448,7 +475,8 @@ Parrot_encoding_utf8_init(Interp *interpreter)
 	set_bytes,
 	become_encoding,
 	codepoints,
-	bytes
+	bytes,
+        iter_init
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
     Parrot_register_encoding(interpreter, "utf8", return_encoding);

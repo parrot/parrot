@@ -164,6 +164,43 @@ bytes(Interp *interpreter, STRING *source_string)
     return source_string->bufused;
 }
 
+/*
+ * iterator functions
+ */
+
+static UINTVAL
+fixed8_get_next(Interp *interpreter, String_iter *iter)
+{
+    UINTVAL c = get_byte(interpreter, iter->str, iter->charpos++);
+    iter->bytepos++;
+    return c;
+}
+
+static void
+fixed8_set_next(Interp *interpreter, String_iter *iter, UINTVAL c)
+{
+    set_byte(interpreter, iter->str, iter->charpos++, c);
+    iter->bytepos++;
+}
+
+static void
+fixed8_set_position(Interp *interpreter, String_iter *iter, UINTVAL pos)
+{
+    iter->bytepos = iter->charpos = pos;
+    assert(pos < PObj_buflen(iter->str));
+}
+
+
+static void
+iter_init(Interp *interpreter, String *src, String_iter *iter)
+{
+    iter->str = src;
+    iter->bytepos = iter->charpos = 0;
+    iter->get_and_advance = fixed8_get_next;
+    iter->set_and_advance = fixed8_set_next;
+    iter->set_position =    fixed8_set_position;
+}
+
 ENCODING *
 Parrot_encoding_fixed_8_init(Interp *interpreter)
 {
@@ -186,7 +223,9 @@ Parrot_encoding_fixed_8_init(Interp *interpreter)
 	set_bytes,
 	become_encoding,
 	codepoints,
-	bytes
+	bytes,
+	iter_init
+
     };
     memcpy(return_encoding, &base_encoding, sizeof(ENCODING));
     Parrot_register_encoding(interpreter, "fixed_8", return_encoding);

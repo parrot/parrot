@@ -900,9 +900,7 @@ string.
 INTVAL
 string_compute_strlen(Interp *interpreter, STRING *s)
 {
-    /* taking advantage of int value of the enum */
     s->strlen = CHARSET_CODEPOINTS(interpreter, s);
-
     return s->strlen;
 }
 
