@@ -1,0 +1,188 @@
+use strict;
+use File::Copy qw(copy move);
+
+# Config stuff
+our $CC = "${cc} -c";
+our $LD = "${ld}";
+our $LD_SHARED = "${ld_shared}";
+our $LD_SHARED_FLAGS = "${ld_shared_flags}";
+our $LDFLAGS = "${ldflags}";
+our $PERL = "${perl}";
+our $SO = "${so}";
+our $O = "${o}";
+our $CFLAGS = "${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}";
+our $PMC2C = "$PERL ${build_dir}${slash}classes${slash}pmc2c2.pl";
+
+# Actual commands
+sub compile_shared_cmd {
+    my ($target, $source) = @_;
+    "$LD $CFLAGS $LD_SHARED $LD_SHARED_FLAGS $LDFLAGS " .
+    "${cc_o_out}" . $target . " " .
+    "-I${build_dir}${slash}include -I${build_dir}${slash}classes " .
+    "-L${build_dir}${slash}blib${slash}lib -lparrot " .
+    $source;
+};
+
+sub compile_cmd {
+    my ($target, $source) = @_;
+    "$CC $CFLAGS " .
+    "${cc_o_out}" . $target . " " .
+    "-I${build_dir}${slash}include -I${build_dir}${slash}classes " .
+    $source;
+};
+
+sub partial_link_cmd {
+    my ($target, @sources) = @_;
+    "$LD $CFLAGS $LD_SHARED $LD_SHARED_FLAGS $LDFLAGS ".
+    "${cc_o_out}" . $target . " " .
+    join(" ", @sources);
+}
+
+our $NOW = time;
+
+################### MAIN PROGRAM ################
+
+my ($mode, @pmcs) = @ARGV;
+
+if ($mode eq 'generate') {
+    # Convert X.pmc -> X.dump and X.c and also create any lib-GROUP.c files
+
+    generate_dump($_) foreach (@pmcs);
+    generate_c($_) foreach (@pmcs);
+
+    my ($group_files, $pmc_group) = gather_groups(@pmcs);
+
+    while (my ($group, $pmcs) = each %$group_files) {
+        my $pmcfiles = join(" ", map { "$_.pmc" } @$pmcs);
+        run("$PMC2C --library $group --c $pmcfiles")
+          or die "pmc2c library creation failed ($?)\n";
+    }
+} elsif ($mode eq 'compile') {
+    my ($group_files, $pmc_group) = gather_groups(@pmcs);
+
+    my @grouped_pmcs = grep { exists $pmc_group->{$_} } @pmcs;
+    my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
+
+    # Convert X.c -> X.so for all non-grouped X.c
+    compile_shared($_) foreach (@ungrouped_pmcs);
+
+    # Convert X.c -> X.o for all grouped X.c
+    compile($_) foreach (@grouped_pmcs);
+
+    # lib-GROUP.c
+    for my $group (keys %$group_files) {
+        compile("$group", "lib-$group")
+          or die "compile $group.c failed ($?)\n";
+    }
+} elsif ($mode eq 'linklibs') {
+    my ($group_files, $pmc_group) = gather_groups(@pmcs);
+
+    # Convert lib-GROUP.so + A.so + B.so ... -> GROUP.so
+    while (my ($group, $pmcs) = each %$group_files) {
+        partial_link($group, "lib-$group", @$pmcs)
+          or die "partial link of $group failed ($?)\n";
+    }
+} elsif ($mode eq 'copy') {
+    # Copy *.so -> destination, where destination is the first
+    # argument, given as --destination=DIRECTORY
+    shift(@pmcs) =~ /--destination=(.*)/
+      or die "copy command requires destination";
+    my $dest = $1;
+
+    my ($group_files, $pmc_group) = gather_groups(@pmcs);
+
+    foreach (@pmcs, keys %$group_files) {
+        copy("$_$SO", $dest) or die "Copy $_$SO failed ($?)\n";
+    }
+} else {
+    die "invalid command '$mode'\nmust be one of generate, compile, linklibs, or copy\n";
+}
+
+sub run {
+    print join(" ", @_), "\n";
+    return system(@_) == 0;
+}
+
+sub gather_groups {
+    my %group_files;
+    my %pmc_group;
+    for my $pmc (@_) {
+        our $class;
+        require "$pmc.dump";
+        my $group = $class->{flags}{group}
+          or next;
+        ($group) = keys %$group;
+        $pmc_group{$pmc} = $group;
+        push @{ $group_files{$group} }, $pmc;
+    }
+
+    return (\%group_files, \%pmc_group);
+}
+
+sub modtime {
+    my $ago = (-M shift);
+    if (defined $ago) {
+        return $NOW - $ago;
+    } else {
+        return;
+    }
+}
+
+sub needs_build {
+    my ($target, @sources) = @_;
+    my $target_mod = modtime($target)
+      or return 1;
+    for my $source (@sources) {
+        return 1 if modtime($source) >= $target_mod;
+    }
+    return 0;
+}
+
+sub generate_dump {
+    my ($pmc) = @_;
+
+    if (needs_build("$pmc.dump", "$pmc.pmc")) {
+        run("$PMC2C --dump $pmc.pmc")
+          or die "pmc2c dump failed ($?)\n";
+    } else {
+        print "$pmc.dump is up to date\n";
+    }
+}
+
+sub generate_c {
+    my ($pmc) = @_;
+
+    if (needs_build("$pmc.c", "$pmc.pmc")) {
+        run("$PMC2C --c $pmc.pmc")
+          or die "pmc2c code generation failed ($?)\n";
+    }
+}
+
+sub compile {
+    my ($src_stem, $dest_stem) = @_;
+    $dest_stem ||= $src_stem;
+    if (needs_build("$dest_stem$O", "$src_stem.c")) {
+        run(compile_cmd("$dest_stem$O", "$src_stem.c"))
+          or die "compile $src_stem.c failed ($?)\n";
+    }
+}
+
+sub compile_shared {
+    my ($src_stem, $dest_stem) = @_;
+    $dest_stem ||= $src_stem;
+    if (needs_build("$dest_stem$SO", "$src_stem.c")) {
+        run(compile_shared_cmd("$dest_stem$SO", "$src_stem.c"))
+          or die "compile $src_stem.c failed ($?)\n";
+    } else {
+        print "$dest_stem$SO is up to date\n";
+    }
+}
+
+sub partial_link {
+    my ($group, @stems) = @_;
+    my @sources = map { "$_$O" } @stems;
+    if (needs_build("$group$SO", @sources)) {
+        run(partial_link_cmd("$group$SO", @sources))
+          or die "partial link $group$SO failed ($?)\n";
+    }
+}

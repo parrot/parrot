@@ -32,6 +32,7 @@ sub runstep {
   package Configure::Data;
   use Config;
   use Data::Dumper;
+  use FindBin; # see build_dir
 
   # We need a Glossary somewhere!
 
@@ -39,6 +40,8 @@ sub runstep {
     debugging     => $debugging ? 1 : 0,
     optimize      => $optimize ? $Config{optimize} : '',
     verbose       => $verbose,
+
+    build_dir     => $FindBin::Bin,
 
     # Compiler -- used to turn .c files into object files.
     # (Usually cc or cl, or something like that.)
@@ -104,6 +107,7 @@ sub runstep {
     ar_out        => '',                  # for Win32
     ar_extra      => '',                  # for Borland C
     ranlib        => $Config{ranlib},
+    rpath         => '-Wl,-rpath=',
     make          => $Config{make},
     make_set_make => $Config{make_set_make},
     make_and      => '&&',
@@ -125,6 +129,7 @@ sub runstep {
 
     configdate    => scalar localtime,
     PQ            => "'",
+    dquote        => "\\\"",
 
     # yacc = Automatic parser generator
     # lex  = Automatic lexer  generator

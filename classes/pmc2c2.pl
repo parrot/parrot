@@ -135,12 +135,6 @@ case class names in the class tree.
 
 Used with C<abstract>: No C<class_init> code is generated.
 
-=item C<dynpmc>
-
-The class is a dynamic class. These have a special C<class_init>
-routine suitable for dynamic loading at runtime. See the F<dynclasses>
-directory for an example.
-
 =item C<const_too>
 
 Classes with this flag get 2 vtables and 2 enums, one pair with
@@ -163,6 +157,18 @@ The default is "scalar". Other currently used interfaces are:
     hash
     library
     ref
+
+=item C<dynpmc>
+
+The class is a dynamic class. These have a special C<class_init>
+routine suitable for dynamic loading at runtime. See the F<dynclasses>
+directory for an example.
+
+=item C<group GROUP>
+
+The class is part of a group of interrelated PMCs that should be
+compiled together into a single shared library of the given name. Only
+valid for dynamic PMCs.
 
 =back
 
@@ -318,7 +324,7 @@ sub parse_flags {
     my $c = shift;
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
     my ($pre, $classname) = ($1, $2);
-    my %has_value = ( does => 1, extends => 1 );
+    my %has_value = ( does => 1, extends => 1, group => 1 );
 
     my %flags;
     # look through the pmc declaration header for flags such as noinit

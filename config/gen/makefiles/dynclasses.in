@@ -1,41 +1,27 @@
-#
-# sample Makefile
-#
-LD = ${ld}
-LD_SHARED = ${ld_shared}
 PERL = ${perl}
 RM_F = ${rm_f}
 SO = ${so}
-CFLAGS = ${ccflags} ${cc_debug} ${ccwarn} ${cc_hasjit} ${cg_flag} ${gc_flag}
-
 
 # add your dynamic pmcs here
 
-all: foo$(SO) subproxy$(SO)  \
-tclobject$(SO) tclstring$(SO) tclint$(SO) tclfloat$(SO) \
-tcllist$(SO) tclarray$(SO)
+PMCS = foo subproxy \
+tclobject tclstring tclint tclfloat \
+tcllist tclarray \
+match matchrange
 
-.SUFFIXES: .pmc .c $(SO)
+BUILD = ${perl} build.pl
 
-# preserve .c if needed
-.PRECIOUS: %.c
-
-%.c  : %.pmc
-	$(PERL) ..${slash}classes${slash}pmc2c2.pl --dump $<
-	$(PERL) ..${slash}classes${slash}pmc2c2.pl --c $<
-
-%$(SO) : %.c
-	$(LD) $(CFLAGS) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) \
-	${cc_o_out}$@ \
-		-I..${slash}include -I..${slash}classes \
-		-L..${slash}blib${slash}lib -lparrot $<
-	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|$@|, q|../runtime/parrot/dynext/$@|${PQ}
+all :
+	$(BUILD) generate $(PMCS)
+	$(BUILD) compile $(PMCS)
+	$(BUILD) linklibs $(PMCS)
+	$(BUILD) copy --destination=../runtime/parrot/dynext $(PMCS)
 
 clean :
-	$(RM_F) *.c *.h *$(SO) *.dump
+	$(RM_F) *.c *.h *$(SO) *.dump lib-*
 
 realclean: clean
-	$(RM_F) Makefile
+	$(RM_F) Makefile build.pl
 
 distclean: realclean
 
