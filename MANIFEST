@@ -69,6 +69,7 @@ docs/running.pod
 docs/strings.pod
 docs/tests.pod
 docs/vtables.pod
+embed.c
 encoding.c
 encodings/singlebyte.c
 encodings/utf16.c
@@ -106,6 +107,7 @@ hints/os2.pl
 hints/vms.pl
 include/parrot/chartype.h
 include/parrot/encoding.h
+include/parrot/embed.h
 include/parrot/events.h
 include/parrot/exceptions.h
 include/parrot/global_setup.h

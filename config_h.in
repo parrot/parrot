@@ -6,7 +6,11 @@
 
 #if !defined(PARROT_CONFIG_H_GUARD)
 #define PARROT_CONFIG_H_GUARD
+
+#if defined(PARROT_IN_CORE)
+
 #include <stddef.h>
+
 typedef ${iv} INTVAL;
 typedef unsigned ${iv} UINTVAL;
 typedef ${nv} FLOATVAL;
@@ -41,11 +45,6 @@ typedef void SYNC;
 #define JIT_ARCHNAME "${jitarchname}"
 #define JIT_CAPABLE  ${jitcapable}
 
-#define PARROT_VERSION         "${VERSION}"
-#define PARROT_MAJOR_VERSION   ${MAJOR}
-#define PARROT_MINOR_VERSION   ${MINOR}
-#define PARROT_PATCH_VERSION   ${PATCH}
-
 #define PARROT_CORE_OPLIB_NAME "core"
 #define PARROT_CORE_OPLIB_INIT Parrot_DynOp_core_${MAJOR}_${MINOR}_${PATCH}
 
@@ -54,5 +53,12 @@ typedef void SYNC;
 
 ${headers}
 
+#endif
+
+#define PARROT_VERSION         "${VERSION}"
+#define PARROT_MAJOR_VERSION   ${MAJOR}
+#define PARROT_MINOR_VERSION   ${MINOR}
+#define PARROT_PATCH_VERSION   ${PATCH}
+#define PARROT_ARCHNAME        "${jitarchname}"
 
 #endif

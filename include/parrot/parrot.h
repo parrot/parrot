@@ -24,6 +24,8 @@
 #define VAR_SCOPE extern
 #endif
 
+#define PARROT_IN_CORE
+
 #include "parrot/config.h"
 
 #include <stdlib.h>
