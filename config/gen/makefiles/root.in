@@ -557,24 +557,28 @@ nokfile:
 #
 ###############################################################################
 
-clean : testclean
+clean : testclean progclean
 	${cg_r}
-	$(RM_F) $(O_FILES)
 	$(RM_F) *.s
 	$(RM_F) $(FLUID_FILES)
-	$(RM_F) $(TEST_PROG) test_main$(O) $(PDUMP) pdump$(O)
 	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
-	$(RM_RF) blib
 	$(RM_F) *~
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..
 
+progclean:
+	$(RM_F) $(O_FILES)
+	$(RM_F) $(TEST_PROG) test_main$(O) $(PDUMP) pdump$(O)
+	$(RM_RF) blib
+	cd classes && $(MAKE) progclean && cd ..
+
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
 	$(RM_F) t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out
+	$(RM_F) t/stress/*.pasm t/stress/*.pbc t/stress/*.out
 	$(RM_F) t/src/*.o t/src/*.c
 
 realclean : clean

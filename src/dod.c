@@ -541,7 +541,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     /* Note it */
     interpreter->dod_runs++;
     /* if we don't have more free objects then last, skip next DOD run */
-    if (total_free <= last_total_free)
+    if (total_free < last_total_free)
         skip = 1;
     last_total_free = total_free;
     Parrot_unblock_DOD(interpreter);

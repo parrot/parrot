@@ -4523,9 +4523,10 @@ inline op loadlib(out PMC, in STR) {
 }
 
 op dlfunc (out PMC, in PMC, in STR, in STR) {
-  const char * name = string_to_cstring(interpreter, ($3));
+  char * name = string_to_cstring(interpreter, ($3));
 
   Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(($2)->data, name));
+  free(name);
   if(p == NULL) {
      const char * err = Parrot_dlerror();
      if(err != NULL) {

@@ -27,8 +27,11 @@ all : $(O_FILES)
 
 ${pmc_build}
 
-clean:
-	$(RM_F) *.c *$(O) *.h
+clean:	progclean
+	$(RM_F) *.c *.h
+
+progclean:
+	$(RM_F) *$(O)
 
 update:
 	cvs -q update -dP
