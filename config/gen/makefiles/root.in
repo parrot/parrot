@@ -194,7 +194,7 @@ ${make_set_make}
 .c$(O) :
 	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
-all : $(TEST_PROG) docs $(IMCC_PROG)
+all : $(TEST_PROG) $(IMCC_PROG) docs
 
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
