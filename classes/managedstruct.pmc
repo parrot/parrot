@@ -1,4 +1,4 @@
-/* NCI.pmc
+/* 
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -31,33 +31,29 @@ pmclass ManagedStruct extends UnManagedStruct {
         return whoami;
     }
 
-    /* For out of bounds gets, will return -1 */
+    /* Returns -1 for out-of-bounds access */
     INTVAL get_integer_keyed(PMC* key) {
 	INTVAL ix;
 
 	if (!key)
             return -1;
         ix = key_integer(INTERP, key);
-        if (ix < 0)
-            return -1;
-	if (ix >= SELF->cache.int_val)
+        if (ix < 0 || ix >= SELF->cache.int_val)
 	    return -1;
 	return  (unsigned char)((char *)PMC_data(SELF))[ix];
 
     }
 
-    /* For out of bounds sets, will do noop */
+    /* Does nothing for out-of-bound access */
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL ix;
 
         if (!key)
             return;
         ix = key_integer(INTERP, key);
-        if (ix < 0)
+        if (ix < 0 || ix >= SELF->cache.int_val)
             return;
-        if (ix >= SELF->cache.int_val)
-	    return;
-        ((char *)PMC_data(SELF))[ix]=(0xff & value);
+        ((char *)PMC_data(SELF))[ix] = (0xff & value);
         return;
     }
 
@@ -66,18 +62,20 @@ pmclass ManagedStruct extends UnManagedStruct {
     }
 
     void set_integer_native (INTVAL value) {
-		if (PMC_data(SELF) && (! value)) {
-			mem_sys_free(PMC_data(SELF));
-			PMC_data(SELF)=NULL;
-			SELF->cache.int_val = 0;
-		} else if (value && (! PMC_data(SELF))) {
-			PMC_data(SELF)=mem_sys_allocate_zeroed(value);
-			SELF->cache.int_val=value;
-		} else if (value && PMC_data(SELF)) {
-			PMC_data(SELF)=mem_sys_realloc(PMC_data(SELF), value);
-			SELF->cache.int_val=value;
-		}
-		return;
-	}
+        if (PMC_data(SELF) && (! value)) {
+            mem_sys_free(PMC_data(SELF));
+            PMC_data(SELF) = NULL;
+            SELF->cache.int_val = 0;
+        } 
+        else if (value && (! PMC_data(SELF))) {
+            PMC_data(SELF) = mem_sys_allocate_zeroed(value);
+            SELF->cache.int_val = value;
+        } 
+        else if (value && PMC_data(SELF)) {
+            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), value);
+            SELF->cache.int_val = value;
+        }
+        return;
+    }
 
 }

@@ -1,4 +1,4 @@
-/* NCI.pmc
+/* 
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -43,9 +43,11 @@ pmclass UnManagedStruct {
     INTVAL get_integer_keyed(PMC* key) {
 	INTVAL ix;
 
-	if (!key) return -1;
+	if (!key) 
+            return -1;
 	ix = key_integer(INTERP, key);
-	if (ix < 0) return -1;
+	if (ix < 0) 
+            return -1;
 	return  (unsigned char)((char *)PMC_data(SELF))[ix];
 
     }
@@ -54,9 +56,11 @@ pmclass UnManagedStruct {
     void set_integer_keyed (PMC* key, INTVAL value) {
 	INTVAL ix;
 
-	if (!key) return;
+	if (!key) 
+            return;
 	ix = key_integer(INTERP, key);
-	if (ix < 0) return;
+	if (ix < 0) 
+            return;
 	((char *)PMC_data(SELF))[ix]=(0xff & value);
 	return;
     }
