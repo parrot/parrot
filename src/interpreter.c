@@ -62,7 +62,7 @@ static void
 runops_generic (opcode_t * (*core)(struct Parrot_Interp *, opcode_t *), 
                 struct Parrot_Interp *interpreter, opcode_t * pc) {
     opcode_t * code_start;
-    INTVAL         code_size;
+    UINTVAL    code_size;
     opcode_t * code_end;
 
     check_fingerprint(interpreter);
@@ -273,7 +273,7 @@ static void
 runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 #ifdef HAS_JIT
     opcode_t * code_start;
-    INTVAL     code_size;
+    UINTVAL    code_size;
     opcode_t * code_end;
     jit_f      jit_code;
 
@@ -285,9 +285,9 @@ runops_jit (struct Parrot_Interp *interpreter, opcode_t * pc) {
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     (jit_code)();
-#else
-    return;
 #endif
+    return;
+
 }
 
 
@@ -297,7 +297,7 @@ static void
 runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, 
                  void ** pc_prederef) {
     opcode_t * code_start;
-    INTVAL     code_size;
+    UINTVAL    code_size;
     opcode_t * code_end;
     void **    code_start_prederef;
 
@@ -416,7 +416,7 @@ struct Parrot_Interp *
 make_interpreter(INTVAL flags) {
     struct Parrot_Interp *interpreter;
     /* Get an empty interpreter from system memory */
-    interpreter = mem_sys_allocate((INTVAL)sizeof(struct Parrot_Interp));
+    interpreter = mem_sys_allocate((UINTVAL)sizeof(struct Parrot_Interp));
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
