@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 19;
+use TestCompiler tests => 22;
 
 ##############################
 # Parrot Calling Conventions
@@ -801,3 +801,80 @@ CODE
 caught it!
 OUT
 
+    my $template = <<'TEMPLATE';
+.sub _main
+    =LOCALS=
+    =INITS=
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    =ARGS=
+    .pcc_call sub
+ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub prototyped
+    =PARAMS=
+    =TESTS=
+    print "all params ok\n"
+    .pcc_begin_return
+    .pcc_end_return
+fail:
+    print "failed\n"
+    end
+.end
+TEMPLATE
+
+sub repeat {
+    my ($template, $n, %substs) = @_;
+    my $code;
+    foreach (split(/\n/, $template)) {
+        if (/^(.*)=(\w+)=(.*)/) {
+            my ($pre, $key, $post) = ($1, $2, $3);
+            for my $i (0..$n-1) {
+                (my $new = $substs{$key}) =~ s/\<index\>/$i/g;
+                $code .= "$pre$new$post\n";
+            }
+        } else {
+            $code .= "$_\n";
+        }
+    }
+
+    return $code;
+}
+
+my $code = repeat($template, 18,
+                  LOCALS => '.local int a<index>',
+                  INITS => 'a<index> = <index>',
+                  ARGS => '.arg a<index>',
+                  PARAMS => '.param int a<index>',
+                  TESTS => 'ne a<index>, <index>, fail');
+
+output_is($code, <<'OUT', "overflow integers");
+all params ok
+OUT
+
+SKIP: {
+    skip "massive spilling not yet implemented", 1;
+$code = repeat($template, 40,
+               LOCALS => '.local int a<index>',
+               INITS => 'a<index> = <index>',
+               ARGS => '.arg a<index>',
+               PARAMS => '.param int a<index>',
+               TESTS => 'ne a<index>, <index>, fail');
+output_is($code, <<'OUT', "overflowed spilled integers");
+all params ok
+OUT
+}
+
+$code = repeat($template, 18,
+               LOCALS => '.local PerlInt a<index>',
+               INITS => 'a<index> = <index>',
+               ARGS => '.arg a<index>',
+               PARAMS => '.param PerlInt a<index>',
+               TESTS => "set I0, a<index>\nne I0, <index>, fail");
+
+output_is($code, <<'OUT', "overflow pmcs");
+all params ok
+OUT
