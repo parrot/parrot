@@ -146,7 +146,7 @@ print NCI <<'HEAD';
 
 #include "parrot/parrot.h"
 
-#if defined(HAS_JIT) && defined(I386) && defined(threaded_NCI_is_ok)
+#if defined(HAS_JIT) && defined(I386)
 #  include "parrot/exec.h"
 #  include "parrot/jit.h"
 #  define CAN_BUILD_CALL_FRAMES

@@ -236,13 +236,31 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         CLEANUP_PUSH(mutex_unlock, &interpreter_array_mutex);
 
         if (retval) {
-            /* clone the PMC into caller */
-            PMC *parent_ret = VTABLE_clone(parent, (PMC*)retval);
+            PMC *parent_ret;
+            /*
+             * clone the PMC into caller
+             * the PMC is not in the parents root set nor in the
+             * stack so block DOD during clone
+             * XXX should probably aquire the parent's interpreter mutex
+             */
+            Parrot_block_DOD(parent);
+            parent_ret = VTABLE_clone(parent, (PMC*)retval);
+            Parrot_unblock_DOD(parent);
+            /* this PMC is living only in the stack of this currently
+             * dying interpreter, so register it in parents DOD registry
+             */
+            dod_register_pmc(parent, parent_ret);
             retval = parent_ret;
         }
         interpreter_array[tid] = NULL;
         Parrot_really_destroy(0, interpreter);
         CLEANUP_POP(1);
+        /*
+         * interpreter destruction is done - unregister the return
+         * value, caller gets it now
+         */
+        if (retval)
+            dod_unregister_pmc(parent, retval);
         return retval;
     }
     /*

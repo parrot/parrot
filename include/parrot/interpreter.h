@@ -258,8 +258,10 @@ typedef struct Parrot_Interp {
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
-    struct QUEUE* task_queue;       /* per interpreter queue */
-    struct _Thread_data *thread_data;    /* thread specific items */
+    PMC** nci_method_table;       /* Method table PMC for NCI stubs per class */
+    size_t nci_method_table_size;       /* allocated size of this table */
+    struct QUEUE* task_queue;           /* per interpreter queue */
+    struct _Thread_data *thread_data;   /* thread specific items */
 } Interp;
 
 typedef enum {
@@ -347,6 +349,8 @@ void do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type);
 
 void clone_interpreter(PMC* dest, PMC* self);
 
+void enter_nci_method(Parrot_Interp, int type,
+		 void *func, const char *name, const char *proto);
 #else
 
 typedef void * *(*native_func_t)(struct Parrot_Interp *interpreter,

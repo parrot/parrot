@@ -187,15 +187,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
             mark_stack(interpreter, stacks[j]);
 
     }
-    /*
-     * method_table may have PMCs
-     */
-    for (i = 1; i < (UINTVAL)enum_class_max; i++) {
-        pobject_lives(interpreter, (PObj *)Parrot_base_vtables[i]->whoami);
-        if (Parrot_base_vtables[i]->method_table)
-            pobject_lives(interpreter,
-                    (PObj *)Parrot_base_vtables[i]->method_table);
-    }
 
     /* Walk the iodata */
     Parrot_IOData_mark(interpreter, interpreter->piodata);

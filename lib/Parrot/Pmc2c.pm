@@ -340,7 +340,6 @@ Parrot_${classname}_class_init(Parrot_Interp interp, int entry)
         NULL,	/* package */
         enum_class_$classname,	/* base_type */
         NULL,	/* whoami */
-        NULL,	/* method_table */
         $vtbl_flag, /* flags */
         NULL,   /* does_str */
         NULL,   /* isa_str */

@@ -154,10 +154,16 @@ pmclass default abstract noinit {
     }
 
     PMC* find_method(STRING* method_name) {
-	if (SELF->vtable->method_table)
-	    return VTABLE_get_pmc_keyed(INTERP, SELF->vtable->method_table,
-		    key_new_string(INTERP, method_name));
-        return NULL;
+	PMC *meth_hash;
+	int type = SELF->vtable->base_type;
+
+	if (type >= (int)INTERP->nci_method_table_size)
+	    return NULL;
+
+	meth_hash = INTERP->nci_method_table[type];
+	if (!meth_hash)
+	    return NULL;
+	return VTABLE_get_pmc_keyed_str(INTERP, meth_hash, method_name);
     }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
@@ -267,11 +273,16 @@ pmclass default abstract noinit {
     }
 
     INTVAL can (STRING* method) {
-        PMC *key;
-        if (! SELF->vtable->method_table)
+	PMC *meth_hash;
+	int type = SELF->vtable->base_type;
+
+	if (type >= (int)INTERP->nci_method_table_size)
 	    return 0;
-        key = key_new_string(INTERP, method);
-        return VTABLE_exists_keyed(INTERP, SELF->vtable->method_table, key);
+
+	meth_hash = INTERP->nci_method_table[type];
+	if (!meth_hash)
+	    return 0;
+        return VTABLE_exists_keyed_str(INTERP, meth_hash, method);
     }
 
 

@@ -1586,6 +1586,51 @@ enable_event_checking(Parrot_Interp interpreter)
 }
 
 /*
+ * create an entry in the nci_method_table for the given
+ * NCI method of PMC class type
+ */
+void
+enter_nci_method(Parrot_Interp interpreter, int type,
+		 void *func, const char *name, const char *proto)
+{
+    PMC *method, *method_table, **table;
+    int i;
+
+    if (type >= (int)interpreter->nci_method_table_size) {
+        if (!interpreter->nci_method_table_size) {
+            table = interpreter->nci_method_table =
+                mem_sys_allocate_zeroed((enum_class_max) * sizeof(PMC*));
+            for (i = 0; i < enum_class_max; ++i)
+                SET_NULL_P(table[i], PMC*);
+            interpreter->nci_method_table_size = enum_class_max;
+        }
+        else {
+            table = interpreter->nci_method_table =
+                mem_sys_realloc(interpreter->nci_method_table,
+                        (type + 1) * sizeof(PMC*));
+            for (i = interpreter->nci_method_table_size; i < type + 1; ++i)
+                table[i] = NULL;
+            interpreter->nci_method_table_size = type + 1;
+        }
+    }
+    else
+        table = interpreter->nci_method_table;
+    if (!table[type])
+        table[type] = constant_pmc_new(interpreter, enum_class_PerlHash);
+    method_table = table[type];
+
+    method = constant_pmc_new(interpreter, enum_class_NCI);
+    VTABLE_set_string_keyed(interpreter, method, func,
+            string_make(interpreter, proto, strlen(proto),
+                NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
+    VTABLE_set_pmc_keyed_str(interpreter, method_table,
+            string_make(interpreter, name,
+                strlen(name), NULL,
+                PObj_constant_FLAG|PObj_external_FLAG, NULL),
+            method);
+}
+
+/*
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4

@@ -39,8 +39,8 @@ pmclass ParrotThread extends ParrotInterpreter need_ext {
          * inherit interpreter methods - needs interpreter already
          * initialized
          */
-        Parrot_base_vtables[enum_class_ParrotThread]->method_table =
-            Parrot_base_vtables[enum_class_ParrotInterpreter]->method_table;
+        INTERP->nci_method_table[enum_class_ParrotThread] =
+            INTERP->nci_method_table[enum_class_ParrotInterpreter];
     }
 
     void init () {

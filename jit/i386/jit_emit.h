@@ -3049,6 +3049,9 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
             /* fall through */
         case 'v': /* void - do nothing */
             break;
+        case 'P':
+            jit_emit_mov_mr_i(pc, &PMC_REG(next_i++), emit_EAX);
+            break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
             emitm_pushl_r(pc, emit_EAX);
