@@ -25,6 +25,7 @@ JIT
     More instructions needed!
     Finish the register allocator
     Make it work on more architectures
+    Native executables
 
 Configure system
 ----------------
