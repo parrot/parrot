@@ -34,31 +34,61 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
+/* Declarations of structs */
 
-Declarations.
+typedef struct {
+    int y;
+} Nested;
 
-*** If you add a new test function here, please update libnci_test.def too. ***
+typedef struct {
+    int x;
+    Nested *nested;
+} Outer;
+
+typedef struct {
+    int x, y;
+    int w, h;
+} Rect_Like;
+
+/* Function declarations.
+
+*** If you add a new test function here,
+*** please update src/libnci_test.def and src/call_list.txt too. ***
 
 */
 
-double nci_dd(double d);
-short  nci_ssc(short l1, char l2);
-int    nci_csc(short l1, char l2);
-int    nci_isc(short l1, char l2);
-float  nci_fff(float l1, float l2);
-int    nci_ip(void *p);
-int    nci_it(void *p);
-char * nci_tt(void *p);
-char * nci_tb(void *p);
-char * nci_tB(void **p);
-void * nci_pp(void *p);
-int    nci_iiii(int i1, int i2, int i3);
-int    nci_i4i(long * l, int i);
-int    nci_ii3(int a, int *b);
-void * nci_pi(int test);
-void   nci_vP(void *pmc);
-void   nci_dlvar_vv(void);
+char   nci_c(void);
+char   nci_csc(short, char);
+double nci_d(void);
+double nci_dd(double);
+float  nci_f(void);
+float  nci_fff(float, float);
+int    nci_i(void);
+int    nci_ib(int *);
+int    nci_iiii(int, int, int);
+int    nci_ii3(int, int *);
+int    nci_ip(void *);
+int    nci_isc(short, char);
+int    nci_it(void *);
+int    nci_i33(int *, int *);
+int    nci_i4i(long *, int);
+long   nci_l(void);
+int *  nci_p(void);
+void * nci_pi(int);
+void * nci_pii(int, int);
+void * nci_piiii(int, int, int, int);
+void   nci_pip(int, Rect_Like *);
+void * nci_pp(void *);
+short  nci_s(void);
+short  nci_ssc(short, char);
+char * nci_t(void);
+char * nci_tb(void *);
+char * nci_tB(void **);
+char * nci_tt(void *);
+void   nci_v(void);
+void   nci_vP(void *);
+void   nci_vpii(Outer *, int, int);
+void   nci_vv(void);
 
 
 /* Declarations for callback tests */
@@ -84,56 +114,61 @@ void nci_cb_D3(cb_D3_func, void*);
 typedef void (*cb_D4_func)(void*, void*);
 void nci_cb_D4(cb_D4_func, void*);
 
-typedef struct {
-    int y;
-} Nested;
+/* Variable definitions */
 
-typedef struct {
-    int x;
-    Nested *nested;
-} Outer;
+int    nci_dlvar_char      = 22;
+int    nci_dlvar_short     = 333;
+int    nci_dlvar_int       = -4444;
+long   nci_dlvar_long      = -7777777;
+float  nci_dlvar_float     = -333.0;
+double nci_dlvar_double    = -55555.55555;
+char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
-typedef struct {
-    int x, y;
-    int w, h;
-} Rect_Like;
 
-void nci_pip (int count, Rect_Like *rects);
-int nci_i33 (int *double_me, int *triple_me);
-void nci_vpii (Outer *my_data, int my_x, int my_y);
-void * nci_piiii (int alpha, int beta, int gamma, int delta);
-void * nci_pii (int, int);
-int nci_i( void );
+/* Function definitions */
 
-/*
+char
+nci_c() {
+    return nci_dlvar_char;
+}
 
-Definitions
+char
+nci_csc(short l1, char l2) {
+    return l1 * l2;
+}
 
-*/
+double
+nci_d() {
+    nci_dlvar_double *= 10.0;
+
+    return nci_dlvar_double;
+}
 
 double
 nci_dd(double d) {
     return d * 2.0;
 }
 
-short
-nci_ssc(short l1, char l2) {
-    return l1 * l2;
-}
+float
+nci_f() {
+    nci_dlvar_float *= 10.0;
 
-int
-nci_csc(short l1, char l2) {
-    return l1 * l2;
-}
-
-int
-nci_isc(short l1, char l2) {
-    return l1 * l2;
+    return nci_dlvar_float;
 }
 
 float
 nci_fff(float l1, float l2) {
     return l1 / l2;
+}
+
+int
+nci_i( void ) {
+   return nci_dlvar_int;
+}
+
+int
+nci_isc(short l1, char l2) {
+    return l1 * l2;
 }
 
 int
@@ -160,13 +195,19 @@ nci_it(void *p) {
     return 2;
 }
 
-static char s[] = "xx worked\n";
-char *
-nci_tt(void *p) {
-    s[0] = ((char*) p)[1];
-    s[1] = ((char*) p)[0];
+long
+nci_l() {
+    return nci_dlvar_long;
+}
 
-    return s;
+int *
+nci_p() {
+    return &nci_dlvar_int;
+}
+
+char *
+nci_t() {
+    return nci_dlvar_cstring;
 }
 
 static char b[] = "xx worked\n";
@@ -176,6 +217,15 @@ nci_tb(void *p) {
     b[1] = ((char*) p)[0];
 
     return b;
+}
+
+static char s[] = "xx worked\n";
+char *
+nci_tt(void *p) {
+    s[0] = ((char*) p)[1];
+    s[1] = ((char*) p)[0];
+
+    return s;
 }
 
 static char B[] = "xx done\n";
@@ -357,6 +407,16 @@ nci_pi(int test) {
     return NULL;
 }
 
+short
+nci_s() {
+    return nci_dlvar_short;
+}
+
+short
+nci_ssc(short l1, char l2) {
+    return l1 * l2;
+}
+
 void
 nci_vP(void *pmc) {
     if (pmc)
@@ -439,8 +499,8 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data) {
     return;
 }
 
-void
-nci_pip (int count, Rect_Like *rects) {
+void 
+nci_pip(int count, Rect_Like *rects) {
     int i;
     printf( "Count: %d\n", count);
     for (i = 0; i < 4; ++i)
@@ -449,7 +509,7 @@ nci_pip (int count, Rect_Like *rects) {
 }
 
 int
-nci_i33 (int *double_me, int *triple_me) {
+nci_i33(int *double_me, int *triple_me) {
     *double_me *= 2;
     *triple_me *= 3;
 
@@ -457,14 +517,14 @@ nci_i33 (int *double_me, int *triple_me) {
 }
 
 void
-nci_vpii (Outer *my_data, int my_x, int my_y) {
+nci_vpii(Outer *my_data, int my_x, int my_y) {
     my_data->x            = my_x;
     my_data->nested->y    = my_y;
 }
 
 static int my_array[4];
 void *
-nci_piiii (int alpha, int beta, int gamma, int delta) {
+nci_piiii(int alpha, int beta, int gamma, int delta) {
     static struct array_container
     {
         int   x;
@@ -482,32 +542,21 @@ nci_piiii (int alpha, int beta, int gamma, int delta) {
     return &container;
 }
 
-static int my_product;
 void *
-nci_pii (int fac1, int fac2) {
-   my_product = fac1 * fac2;
+nci_pii(int fac1, int fac2) {
+   nci_dlvar_int = fac1 * fac2;
 
-   return &my_product;
+   return &nci_dlvar_int;
 }
 
-int
-nci_i( void ) {
-
-   return my_product;
-}
-
-/*
-
-=head1 Variables used for testing the opcode 'dlvar'
-
-=cut
-
-*/
-
-int nci_dlvar_int = -4444;
 
 void
-nci_dlvar_vv( void ) {
+nci_v( ) {
+    nci_dlvar_int *= 10;
+}
+
+void
+nci_vv( void ) {
     nci_dlvar_int *= 3;
 }
 

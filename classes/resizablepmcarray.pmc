@@ -39,6 +39,7 @@ Return a new C<list> object according to 2.1. Built-in Functions.
         int argcP = REG_INT(3);
         PMC *res = pmc_new(INTERP, enum_class_ResizablePMCArray);
         PMC *arg;
+
         if (argcP) {
             if (argcP > 1) {
                 real_exception(INTERP, NULL, E_TypeError,
@@ -115,6 +116,7 @@ Returns the PMC value of the element at index C<key>.
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC **data;
+
         if (key < 0)
             key += PMC_int_val(SELF);
         if (key < 0)
@@ -144,6 +146,7 @@ If key is a slice, do a splice as set that item.
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         PMC **data;
+
         /*
          * TODO in python mode, only .append is allowed
          */
@@ -187,6 +190,7 @@ the array.
 
     void push_pmc(PMC* value) {
         INTVAL size = PMC_int_val(SELF);
+
         /* let set_integer_native() worry about memory allocation */
         DYNSELF.set_integer_native(size + 1);
         ((PMC**)PMC_data(SELF))[size] = value;
@@ -196,6 +200,30 @@ the array.
 
     METHOD void append(PMC* value) {
         Parrot_ResizablePMCArray_push_pmc(INTERP, SELF, value);
+    }
+
+/*
+
+=item C<void push_integer(INTVAL value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_integer(INTVAL value) {
+        PMC *val;
+        INTVAL size;
+ 
+        size = PMC_int_val(SELF);
+        val = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, val, value);
+        /* let set_pmc_keyed_int() worry about memory allocation */
+        DYNSELF.set_pmc_keyed_int(size, val);
+
+        return;
     }
 
 /*
@@ -210,6 +238,7 @@ Creates and returns a copy of the array.
 
     PMC* clone () {
         PMC *copy = SUPER();
+
         PMC_int_val2(copy) = PMC_int_val(SELF);
         return copy;
     }
@@ -315,10 +344,6 @@ list.elements == 1.
 /*
 
 =back
-
-=head1 TODO
-
-Currently this uses PerlString instead of String PMCs.
 
 =head1 SEE ALSO
 

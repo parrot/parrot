@@ -1,5 +1,6 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -17,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -340,9 +341,9 @@ ok 3
 ok 4
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
 ##PIR##
-.sub _main
+.sub test @MAIN
     .local pmc pmc1
     pmc1 = new ResizablePMCArray
     .local int bool1
@@ -365,7 +366,7 @@ OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "append method");
 ##PIR##
-.sub _main
+.sub test @MAIN
     .local pmc ar
     .local pmc temp
     ar = new ResizablePMCArray
@@ -397,7 +398,7 @@ OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "inherited sort method");
 ##PIR##
-.sub _main
+.sub test @MAIN
     .local pmc ar
     ar = new ResizablePMCArray
 
@@ -430,7 +431,7 @@ OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "push pmc");
 ##PIR##
-.sub _main
+.sub test @MAIN
     .local pmc pmc_arr, pmc_9999, pmc_10000
     pmc_arr = new ResizablePMCArray
     pmc_9999  = new Float
@@ -452,4 +453,30 @@ output_is(<< 'CODE', << 'OUTPUT', "push pmc");
 CODE
 10001
 123.123
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "push integer");
+##PIR##
+.sub test @MAIN
+    .local pmc pmc_arr, pmc_9999
+    .local int int_10000
+    pmc_arr = new ResizablePMCArray
+    pmc_9999  = new Float
+    pmc_9999  = 10000.10000
+    int_10000 = 123
+    pmc_arr[9999] = pmc_9999
+    push pmc_arr, int_10000
+    .local int elements
+    elements = pmc_arr
+    print elements
+    print "\n"
+    .local pmc last
+    last = pmc_arr[10000]
+    print last
+    print "\n"
+    end
+.end
+CODE
+10001
+123
 OUTPUT

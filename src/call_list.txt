@@ -1,62 +1,77 @@
-#
+# Copyright: 2002-2005 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+# Function signature declarations for NCI
+
 # Types
-#
-# INT reg stuff
+
+# INT register stuff
 # c - char
 # s - short
 # i - int
 # l - long
-# NUM reg stuff
+
+# NUM register stuff
 # f - float
 # d - double
-# STR reg stuff
+
+# STR register stuff
 # t - character string
-# PMC reg stuff
+
+# PMC register stuff
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
 # P - pointer to a PMC-register
+# S - pointer to a STRING-register ????
 # O - pointer to PMC-register #2 (object)
 # 2 - pointer to short
 # 3 - pointer to int
 # 4 - pointer to long
+
 # void stuff
 # v - void
+
+# Buffers are not valid return parameters,
+# use 'p' when the native function returns a pointer value 
 # b - void *
 # B - void **
 
 # special stuff
 # 0 - insert a NULL (pointer) - doesn't comsume a register
 # I - Parrot_Interp param
-#
+
 # Arrayish things, terminated with NULL/0
 # L - Long array
 # T - Array of string pointers (Converted to cstrings)
 
-#
 # Callback Things
-#
 # C - Function pointer to call back into Parrot. The signature of
 #     this function is: void (function *)(ExternalThing *, CallbackInfo *)
 #     More docs in PDD 16.
 # D - Function pointer. Like C, only the arg order is reversed:
 #     this function is: void (function *)(CallbackInfo *, ExternalThing *)
-#
+
 # The following parameters must appear in a pair
 # Y - sub PMC to call back into
 # Z - Single PMC parameter to pass into sub Y
 
 #Return params
-#p	b
-c	v
+c                # t/pmc/nci.t
 c	p
 c	pi
-c
+c	v
+
+d                # t/pmc/nci.t
 d	d
+d	IOd      # Parrot builtins
 d	v
+
+f                # t/pmc/nci.t
+f	ff       # t/pmc/nci.t
 f	is
 f	v
-i	4
-i	42p
-i	4i
+
+i
+i       b        # t/pmc/nci.t
 i	d
 i	i
 i	ii
@@ -119,19 +134,29 @@ i	ssss
 i	t
 i	ti
 i	v
-i
-l	33l
+i	4
+i	4i
+i	42p
+
+l               # t/pmc/nci.t
 l	ii
 l	l4
 l	p
-l	p33l
 l	pi
 l	pii
+l	p33l
 l	v
-l
-p	It
+l	33l
+
+P	Ii       # Needed for parrot threads
+P	IOl      # Parrot builtins
+P	IOP      # PerlHash fromkeys, obsolete
 P	It
+
+p
+p	B
 p	b
+p	It
 p	i
 p	ii
 p	iiii
@@ -142,35 +167,39 @@ p	pt
 p	pi
 p	pii
 p	piiii
-p	tpp
 p	t
+p	tpp
 p	ttttttt
 p	v
-p
-p	B
+
+s             # t/pmc/nci.t
 s	v
+
+t             # t/pmc/nci.t
 t	i
 t	ii
+t	p
 t	pi
 t	pii
 t	pt
 t	t
 t	tl4
 t	t4
-t	p
 t	v
-t
+
+v
+v	Iiiip    # examples/japh/japh11.pasm
+v	IOP      # Needed for parrot threads
 v	i
 v	ii
 v	illllllll
 v	l
 v	p
-v	pp
 v	pi
 v	piiii
 v	pl
+v	pp
 v	v
-v
 
 # These are needed for parrotio.pmc
 i	IP
@@ -189,7 +218,6 @@ S	IO
 i       P
 
 # the following are use by t/pmc/nci.t
-f	ff
 i	sc
 s	sc
 c	sc
@@ -198,13 +226,16 @@ i	i3
 t	b
 t	B
 v	P
-
-# Needed for parrot threads
-v	IOP
-P	Ii
-
-# PerlHash fromkeys
-P	IOP
+v	pP
+p	ip
+i	33
+v	pii
+v	IO
+i	IO
+i	IOi
+i	IOt
+i	It
+i	Ii
 
 # Oddball ones for postgres
 p	ptiLTLLi
@@ -224,18 +255,6 @@ p	iiil
 i	ppl
 v	pip
 
-# used by t/pmc/nci.t
-v	pP
-p	ip
-i	33
-v	pii
-v	IO
-i	IO
-i	IOi
-i	IOt
-i	It
-i	Ii
-
 # Used by SDL::Font
 p	ti
 p	ptp
@@ -243,9 +262,6 @@ i	pt33
 
 # For python
 i	IPP
-
-# examples/japh/japh11.pasm
-v	Iiiip
 
 #required for mod_parrot
 i   tp
@@ -259,7 +275,3 @@ v	IOPP
 v	IOPPP
 P	IOPPPP
 P	IOPPPPP
-
-# Parrot builtins
-d	IOd
-P	IOl

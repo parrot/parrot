@@ -1,5 +1,4 @@
 #! perl -w
-
 # Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
@@ -24,7 +23,7 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 
 =cut
 
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 56;
 use Parrot::Config;
 
 SKIP: {
@@ -32,6 +31,326 @@ unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
     skip( "Please make libnci_test$PConfig{load_ext}",
           Test::Builder->expected_tests() );
 }
+
+output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register");
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+  # load library
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
+
+  # calling a function in libnci_test
+  .local pmc nci_c
+  dlfunc nci_c, libnci_test, "nci_c", "c"
+  .local int nci_c_out
+  ( nci_c_out ) = nci_c( )
+  print nci_c_out
+  print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+22
+OUTPUT
+
+
+output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+    # load libnci_test.so
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_double
+    .local pmc nci_dlvar_double
+    nci_dlvar_double = dlvar libnci_test, "nci_dlvar_double"
+
+    # the contained structure pointer
+    .local pmc nci_dlvar_double_decl
+    nci_dlvar_double_decl = new ResizablePMCArray
+    push nci_dlvar_double_decl, .DATATYPE_DOUBLE
+    push nci_dlvar_double_decl, 0
+    push nci_dlvar_double_decl, 0
+    assign nci_dlvar_double, nci_dlvar_double_decl
+
+    N2 = nci_dlvar_double[0]
+    print N2
+    print "\n"
+
+    .local pmc nci_d
+    nci_d = dlfunc libnci_test, "nci_d", "d"
+    .local num nci_d_out
+    ( nci_d_out ) = nci_d( )
+    print nci_d_out
+    print "\n"
+    ( nci_d_out ) = nci_d( )
+    print nci_d_out
+    print "\n"
+    ( nci_d_out ) = nci_d( )
+    print nci_d_out
+    print "\n"
+    ( nci_d_out ) = nci_d( )
+    print nci_d_out
+    print "\n"
+    ( nci_d_out ) = nci_d( )
+    print nci_d_out
+    print "\n"
+
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+-55555.555550
+-555555.555500
+-5555555.555000
+-55555555.550000
+-555555555.500000
+-5555555555.000000
+OUTPUT
+
+output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+    # load libnci_test.so
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_float
+    .local pmc nci_dlvar_float
+    nci_dlvar_float = dlvar libnci_test, "nci_dlvar_float"
+
+    # the contained structure pointer
+    .local pmc nci_dlvar_float_decl
+    nci_dlvar_float_decl = new ResizablePMCArray
+    push nci_dlvar_float_decl, .DATATYPE_FLOAT
+    push nci_dlvar_float_decl, 0
+    push nci_dlvar_float_decl, 0
+    assign nci_dlvar_float, nci_dlvar_float_decl
+
+    N2 = nci_dlvar_float[0]
+    print N2
+    print "\n"
+
+    .local pmc nci_f
+    nci_f = dlfunc libnci_test, "nci_f", "f"
+    .local num nci_f_out
+    ( nci_f_out ) = nci_f( )
+    print nci_f_out
+    print "\n"
+    ( nci_f_out ) = nci_f( )
+    print nci_f_out
+    print "\n"
+    ( nci_f_out ) = nci_f( )
+    print nci_f_out
+    print "\n"
+    ( nci_f_out ) = nci_f( )
+    print nci_f_out
+    print "\n"
+    ( nci_f_out ) = nci_f( )
+    print nci_f_out
+    print "\n"
+
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+-333.000000
+-3330.000000
+-33300.000000
+-333000.000000
+-3330000.000000
+-33300000.000000
+OUTPUT
+
+output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register");
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+  # load library
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
+
+  # calling a function in libnci_test
+  .local pmc nci_l
+  dlfunc nci_l, libnci_test, "nci_l", "l"
+  .local int nci_l_out
+  ( nci_l_out ) = nci_l( )
+  print nci_l_out
+  print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+-7777777
+OUTPUT
+
+output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int");
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+    # load library
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
+    unless libnci_test goto NOT_LOADED
+    print "libnci_test was successfully loaded\n"
+
+    # calling a function in libnci_test
+    .local pmc nci_p
+    dlfunc nci_p, libnci_test, "nci_p", "p"
+    .local pmc nci_p_out
+    ( nci_p_out ) = nci_p( )
+
+    # the contained structure pointer
+    .local pmc nci_p_out_decl
+    nci_p_out_decl = new ResizablePMCArray
+    push nci_p_out_decl, .DATATYPE_INT
+    push nci_p_out_decl, 0
+    push nci_p_out_decl, 0
+    assign nci_p_out, nci_p_out_decl
+
+    I2 = nci_p_out[0]
+    print I2
+    print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+-4444
+OUTPUT
+
+output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string");
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+    # load library
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
+    unless libnci_test goto NOT_LOADED
+    print "libnci_test was successfully loaded\n"
+
+    # calling a function in libnci_test
+    .local pmc nci_t
+    dlfunc nci_t, libnci_test, "nci_t", "t"
+    .local string nci_t_out
+    ( nci_t_out ) = nci_t( )
+    print nci_t_out
+.end
+CODE
+libnci_test was successfully loaded
+This is a C-string.
+OUTPUT
+
+output_is( << 'CODE', << "OUTPUT", "nci_s - return a short in an INTEGER register");
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+  # load library
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto NOT_LOADED
+  print "libnci_test was successfully loaded\n"
+
+  # calling a function in libnci_test
+  .local pmc nci_s
+  dlfunc nci_s, libnci_test, "nci_s", "s"
+  .local int nci_s_out
+  ( nci_s_out ) = nci_s( )
+  print nci_s_out
+  print "\n"
+.end
+CODE
+libnci_test was successfully loaded
+333
+OUTPUT
+
+
+output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub test @MAIN
+
+    # load libnci_test.so
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_int
+    .local pmc nci_dlvar_int
+    nci_dlvar_int = dlvar libnci_test, "nci_dlvar_int"
+
+    # the contained structure pointer
+    .local pmc nci_dlvar_int_decl
+    nci_dlvar_int_decl = new ResizablePMCArray
+    push nci_dlvar_int_decl, .DATATYPE_INT
+    push nci_dlvar_int_decl, 0
+    push nci_dlvar_int_decl, 0
+    assign nci_dlvar_int, nci_dlvar_int_decl
+
+    I2 = nci_dlvar_int[0]
+    print I2
+    print "\n"
+
+    .local pmc nci_v
+    nci_v = dlfunc libnci_test, "nci_v", "v"
+    nci_v()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    nci_v()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    nci_v()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    nci_v()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+-4444
+-44440
+-444400
+-4444000
+-44440000
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - PASM");
   loadlib P1, "libnci_test"
@@ -66,7 +385,7 @@ OUTPUT
 
 output_is( << 'CODE', << 'OUTPUT', "nci_dd - PIR" );
 ##PIR##
-.sub _test @MAIN
+.sub test @MAIN
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -90,7 +409,7 @@ OUTPUT
 
 output_is( << 'CODE', << "OUTPUT", "get_string()" );
 ##PIR##
-.sub _test @MAIN
+.sub test @MAIN
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
@@ -445,7 +764,6 @@ CODE
 4711
 OUTPUT
 
-
 output_is(<<'CODE', <<'OUTPUT', "nci_tb");
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_tb", "tb"
@@ -456,7 +774,6 @@ output_is(<<'CODE', <<'OUTPUT', "nci_tb");
 CODE
 ok worked
 OUTPUT
-
 
 output_is(<<'CODE', <<'OUTPUT', "nci_tB");
   loadlib P1, "libnci_test"
@@ -476,7 +793,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with ints");
   # this test function returns a struct { int[2]; char }
   set I5, 0
   invoke
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
   push P2, 2	# 2 elem array
@@ -508,7 +825,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - struct with floats");
   # this test function returns a struct { float[2]; double }
   set I5, 1
   invoke
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_FLOAT
   push P2, 2	# 2 elem array
@@ -540,7 +857,7 @@ output_like(<<'CODE', <<'OUTPUT', "nci_pi - align");
   # this test function returns a struct { char; int }
   set I5, 2
   invoke
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_CHAR
   push P2, 0
@@ -574,7 +891,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - char*");
   # this test function returns a struct { char*; int }
   set I5, 3
   invoke
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_CSTR
   push P2, 0
@@ -604,7 +921,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
   invoke
 .include "datatypes.pasm"
   # the contained structure
-  new P3, .PerlArray
+  new P3, .ResizablePMCArray
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -616,7 +933,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct *");
   push P3, 0
   new P4, .UnManagedStruct, P3
   # outer structure
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -727,7 +1044,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature");
   # this test function returns a struct { int (*f)(char *) }
   set I5, 5
   invoke
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_FUNC_PTR
   # attach function signature property to this type
@@ -759,7 +1076,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
   invoke
 .include "datatypes.pasm"
   # the nested structure
-  new P3, .PerlArray
+  new P3, .ResizablePMCArray
   push P3, .DATATYPE_INT
   push P3, 0
   push P3, 0
@@ -768,7 +1085,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct aligned");
   push P3, 0
   new P4, .UnManagedStruct, P3
   # outer structure
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -814,7 +1131,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
   invoke
 .include "datatypes.pasm"
   # the nested structure
-  new P3, .PerlArray
+  new P3, .ResizablePMCArray
   push P3, .DATATYPE_CHAR
   push P3, 0
   push P3, 0
@@ -823,7 +1140,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_pi - nested struct unaligned");
   push P3, 0
   new P4, .UnManagedStruct, P3
   # outer structure
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -920,7 +1237,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 ##PIR##
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
   # load library
   .local pmc libnci_test
@@ -936,7 +1253,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 
   # the contained structure pointer
   .local pmc nci_pi_out_decl
-  nci_pi_out_decl = new PerlArray
+  nci_pi_out_decl = new ResizablePMCArray
   push nci_pi_out_decl, .DATATYPE_INT
   push nci_pi_out_decl, 0
   push nci_pi_out_decl, 0
@@ -961,7 +1278,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_ip");
   # this test function wants a struct
   # { double d; float f; int i; char*}
   # and returns the sum of these values
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_DOUBLE
   push P2, 0
@@ -1079,7 +1396,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
 ##PIR##
-.sub _test @MAIN
+.sub test @MAIN
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1215,7 +1532,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
 
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1271,7 +1588,7 @@ ERROR:
   print "\n"
 
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1416,7 +1733,7 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
 ##PIR##
-.sub _test @MAIN
+.sub test @MAIN
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1493,7 +1810,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
 
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # this flag will be set by the callback function
     .local pmc cb_done
@@ -1549,7 +1866,7 @@ ERROR:
   print "\n"
 
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1581,7 +1898,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # turn off JIT or special core - no events yet
     bounds 1
@@ -1598,7 +1915,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
     .local pmc int_cb_D4
     int_cb_D4 = dlvar libnci_test, "int_cb_D4"
     .local pmc int_cb_D4_decl
-    int_cb_D4_decl = new PerlArray
+    int_cb_D4_decl = new ResizablePMCArray
     push int_cb_D4_decl, .DATATYPE_INT
     push int_cb_D4_decl, 0
     push int_cb_D4_decl, 0
@@ -1634,7 +1951,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks");
 
 .sub _call_back
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, .PerlArray
+  new P2, .ResizablePMCArray
   push P2, .DATATYPE_INT
   push P2, 0
   push P2, 0
@@ -1929,7 +2246,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
 ##PIR##
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
   # load library
   .local pmc libnci_test
@@ -1945,7 +2262,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
 
   # the contained structure pointer
   .local pmc product_pointer_decl
-  product_pointer_decl = new PerlArray
+  product_pointer_decl = new ResizablePMCArray
   push product_pointer_decl, .DATATYPE_INT
   push product_pointer_decl, 0
   push product_pointer_decl, 0
@@ -1962,9 +2279,9 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
   product = 4444
   print product
   print "\n"
-  .local pmc get_product
-  dlfunc get_product, libnci_test, "nci_i", "i"
-  ( product ) = get_product()
+  .local pmc nci_i
+  dlfunc nci_i, libnci_test, "nci_i", "i"
+  ( product ) = nci_i()
   print product
   print "\n"
 
@@ -1979,11 +2296,11 @@ libnci_test was successfully loaded
 OUTPUT
 
 
-output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
+output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
 ##PIR##
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # load libnci_test.so
     .local string library_name
@@ -2000,7 +2317,7 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
 
     # the contained structure pointer
     .local pmc nci_dlvar_int_decl
-    nci_dlvar_int_decl = new PerlArray
+    nci_dlvar_int_decl = new ResizablePMCArray
     push nci_dlvar_int_decl, .DATATYPE_INT
     push nci_dlvar_int_decl, 0
     push nci_dlvar_int_decl, 0
@@ -2010,21 +2327,21 @@ output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
     print I2
     print "\n"
 
-    .local pmc thrice
-    thrice = dlfunc libnci_test, "nci_dlvar_vv", "vv"
-    thrice()
+    .local pmc nci_vv
+    nci_vv = dlfunc libnci_test, "nci_vv", "vv"
+    nci_vv()
     I1 = nci_dlvar_int[0]
     print I1
     print "\n"
-    thrice()
+    nci_vv()
     I1 = nci_dlvar_int[0]
     print I1
     print "\n"
-    thrice()
+    nci_vv()
     I1 = nci_dlvar_int[0]
     print I1
     print "\n"
-    thrice()
+    nci_vv()
     I1 = nci_dlvar_int[0]
     print I1
     print "\n"
@@ -2044,7 +2361,7 @@ output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
 ##PIR##
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # load libnci_test.so
     .local string library_name
@@ -2075,7 +2392,7 @@ output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
 ##PIR##
 .include "datatypes.pasm"
 
-.sub _test @MAIN
+.sub test @MAIN
 
     # load libnci_test.so
     .local string library_name
@@ -2125,7 +2442,7 @@ OUTPUT
 
 output_is(<< 'CODE', << 'OUTPUT', "opcode 'does'");
 ##PIR##
-.sub _test @MAIN
+.sub test @MAIN
     .local pmc pmc1
     pmc1 = new ParrotLibrary
     .local int bool1
