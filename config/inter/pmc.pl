@@ -108,7 +108,7 @@ classes/$pmc.c classes/pmc_$pmc.h: \\
 	$parent_dumps classes/$pmc.dump
 
 classes/pmc_$pmc.h: classes/$pmc.pmc
-	\$(PMC2CC) \$<
+	\$(PMC2CC) classes/$pmc.pmc
 
 classes/$pmc\$(O): \$(NONGEN_HEADERS) \\
         $parent_headers
