@@ -527,8 +527,8 @@ statements: statement
     |   statements statement
     ;
 
-statement:  {clear_state(); $$=0; }
-        instruction
+statement:  { clear_state(); }
+        instruction             { $$ = $2; }
     ;
 
 labels:	/* none */         { $$ = NULL; }
