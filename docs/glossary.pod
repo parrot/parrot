@@ -15,14 +15,10 @@ parrot development.
 
 =head1 GLOSSARY
 
-=head2 Co-Routines and Continuations
+=for comment
+Please keep me alphabetical!
 
-Co-routines are virtually identical to normal subroutines, except
-while subroutine's execute from start to finish, and return,
-co-routines may suspend themselves, (or be suspended asynchronously if
-the language permits) and resume later. We can implement things like
-"factories" with co-routines. If the co-routine never returns, every
-time we call it we "resume" the routine.
+=head2 Continuations
 
 Think of continuations as an execution "context". This context includes
 everything local to that execution path, not just stack. It is a
@@ -56,8 +52,62 @@ stacks, stack trees and/or stack copying.
 It is common in a system that supports continuations to implement
 co-routines on top of them.
 
+
+A continuation is a sort of super closure. When you take a 
+continuation, it makes a note of the current call stack and lexical 
+scratchpads, along with the current location in the code. When you 
+invoke a continuation, the system drops what it's doing and puts the 
+call stack and scratchpads back, and jumps to the execution point you 
+were at when the continuation was taken. It is, in effect, like you 
+never left that point in your code.
+
+Note that, like with closures, it only puts the *scratchpads* back in 
+scope--it doesn't do anything with the values in the variables that 
+are in those scratchpads.
+
 =for author
 Melvin Smith <mrjoltcola@mindspring.com>
+Dan Sugalski <dan@sidhe.org>
+
+=head2 Co-Routines 
+
+Co-routines are virtually identical to normal subroutines, except
+while subroutine's execute from start to finish, and return,
+co-routines may suspend themselves, (or be suspended asynchronously if
+the language permits) and resume later. We can implement things like
+"factories" with co-routines. If the co-routine never returns, every
+time we call it we "resume" the routine.
+
+A co-routine is a subroutine that can stop in the middle, but that 
+you can start back up later at the point you stopped. For example:
+
+    sub sample : coroutine {
+       print "A\n";
+       yield;
+       print "B\n";
+       return;
+    }
+
+    sample();
+    print "Foo!\n";
+    sample();
+
+will print
+
+     A
+     Foo!
+     B
+
+Basically the yield keyword says "Stop here, but the next time we're 
+called pick up at the next statement." If you return from a 
+coroutine, the next invocation starts back at the beginning. 
+Coroutines remember all their state, local variables, and suchlike 
+things.
+
+=for author
+Melvin Smith <mrjoltcola@mindspring.com>
+Dan Sugalski <dan@sidhe.org>
+
 
 =head2 Vtable
 
