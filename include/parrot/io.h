@@ -260,8 +260,8 @@ extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
 extern void PIO_base_delete_layer(ParrotIOLayer *proto);
 
 extern INTVAL PIO_parse_open_flags(const char *flagstr);
-extern PMC *PIO_open(theINTERP, const char *, const char *);
-extern PMC *PIO_fdopen(theINTERP, PIOHANDLE, const char *);
+extern PMC *PIO_open(theINTERP, ParrotIOLayer *, const char *, const char *);
+extern PMC *PIO_fdopen(theINTERP, ParrotIOLayer *, PIOHANDLE, const char *);
 extern INTVAL PIO_close(theINTERP, PMC *);
 extern void PIO_flush(theINTERP, PMC *);
 extern INTVAL PIO_read(theINTERP, PMC *, void *, size_t);

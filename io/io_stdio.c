@@ -19,7 +19,8 @@
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-#ifdef PIO_OS_STDIO
+extern INTVAL           PIO_stdio_isatty(PIOHANDLE fd);
+extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 
 /* Defined at bottom */
 extern ParrotIOLayerAPI pio_stdio_layer_api;
@@ -93,6 +94,8 @@ flags_to_stdio(INTVAL flags)
 static INTVAL
 PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
 {
+#ifdef PIO_OS_STDIO
+    /* Only set standard handles if stdio is the OS IO */
     PIO_STDIN(interpreter)
         = new_io_pmc(interpreter,
                      PIO_stdio_fdopen(interpreter, layer, stdin, PIO_F_READ));
@@ -104,7 +107,7 @@ PIO_stdio_init(theINTERP, ParrotIOLayer *layer)
     PIO_STDERR(interpreter)
         = new_io_pmc(interpreter,
                      PIO_stdio_fdopen(interpreter, layer, stderr, PIO_F_WRITE));
-
+#endif /* PIO_OS_STDIO */
     return 0;
 }
 
@@ -140,10 +143,10 @@ PIO_stdio_open(theINTERP, ParrotIOLayer *layer,
 
     /* File open */
     if (fptr != NULL) {
-        if (PIO_isatty(fptr))
+        if (PIO_stdio_isatty((PIOHANDLE)fptr))
             flags |= PIO_F_CONSOLE;
         io = PIO_new(interpreter, type, flags, 0);
-        io->fd = fptr;
+        io->fd = (PIOHANDLE)fptr;
         return io;
     }
     return NULL;
@@ -172,9 +175,10 @@ PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fptr, INTVAL flags)
 static INTVAL
 PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    if (io->fd != NULL)
-        fclose(io->fd);
-    io->fd = NULL;
+    FILE *fptr = (FILE*)io->fd;
+    if (fptr != NULL)
+        fclose(fptr);
+    io->fd = (PIOHANDLE)NULL;
     return 0;
 }
 
@@ -198,7 +202,7 @@ PIO_stdio_getblksize(PIOHANDLE fptr)
 static INTVAL
 PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
-    return fflush(io->fd);
+    return fflush((FILE*)io->fd);
 }
 
 
@@ -207,14 +211,15 @@ PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               void *buffer, size_t len)
 {
     size_t bytes;
+    FILE *fptr = (FILE *)io->fd;
 
     UNUSED(interpreter);
     UNUSED(layer);
 
-    bytes = fread(buffer, 1, len, io->fd);
+    bytes = fread(buffer, 1, len, fptr);
 
     if (bytes != len) {
-        if (feof(io->fd)) {
+        if (feof(fptr)) {
             io->flags |= PIO_F_EOF;
         } 
     }
@@ -230,7 +235,7 @@ PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     UNUSED(interpreter);
     UNUSED(layer);
 
-    return(fwrite(buffer, 1, len, io->fd));
+    return(fwrite(buffer, 1, len, (FILE*)io->fd));
 }
 
 
@@ -244,7 +249,7 @@ PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
     PIOOFF_T pos;
     errno = 0;
 
-    if ((pos = fseek(io->fd, offset, whence)) >= 0) {
+    if ((pos = fseek((FILE*)io->fd, offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
     }
@@ -258,7 +263,7 @@ PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 static PIOOFF_T
 PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
-    return(ftell(io->fd));
+    return(ftell((FILE*)io->fd));
 }
 
 
@@ -294,8 +299,6 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
     0 /* no recv */
 };
 
-#endif /* PIO_OS_STDIO */
-
 /*
  * Local variables:
  * c-indentation-style: bsd
@@ -304,4 +307,4 @@ ParrotIOLayerAPI pio_stdio_layer_api = {
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+ */

@@ -555,24 +555,27 @@ PIO_setlinebuf(theINTERP, PMC *pmc)
 
 
 PMC *
-PIO_open(theINTERP, const char *spath, const char *sflags)
+PIO_open(theINTERP, ParrotIOLayer *layer, const char *spath, 
+         const char *sflags)
 {
     ParrotIO *io;
-    ParrotIOLayer *l = interpreter->piodata->default_stack;
     INTVAL flags = PIO_parse_open_flags(sflags);
 
-    io = PIO_open_down(interpreter, l, spath, flags);
+    if (!layer) {
+        layer = interpreter->piodata->default_stack;
+    }
+
+    io = PIO_open_down(interpreter, layer, spath, flags);
     /* io could be null here but we still have to
      * to create a PMC for the caller, no PMCNULL here
      * as that would cause an exception upon access.
      */
     if (io) {
-        io->stack = l;
+        io->stack = layer;
     }
 
     return new_io_pmc(interpreter, io);
 }
-
 
 /*
  * Create an IO object on an existing, open file descriptor.
@@ -580,20 +583,23 @@ PIO_open(theINTERP, const char *spath, const char *sflags)
  * the OS IO handles (0,1,2).
  */
 PMC *
-PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
+PIO_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, const char *sflags)
 {
     ParrotIO *io;
     INTVAL flags;
-    ParrotIOLayer *l = interpreter->piodata->default_stack;
+    
+    if (!layer) {
+        layer = interpreter->piodata->default_stack;
+    }
 
     flags = PIO_parse_open_flags(sflags);
-    io = PIO_fdopen_down(interpreter, l, fd, flags);
+    io = PIO_fdopen_down(interpreter, layer, fd, flags);
     /* io could be null here but we still have to
      * to create a PMC for the caller, no PMCNULL here
      * as that would cause an exception upon access.
      */
     if (io) {
-        io->stack = l;
+        io->stack = layer;
     }
 
     return new_io_pmc(interpreter, io);

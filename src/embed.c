@@ -139,7 +139,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 #endif  /* PARROT_HAS_HEADER_SYSSTAT */
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
-        io = PIO_open(interpreter, filename, "<");
+        io = PIO_open(interpreter, NULL, filename, "<");
         if (!io) {
             PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
                     filename, errno);
@@ -227,7 +227,7 @@ again:
                     "Parrot VM: Can't mmap file %s, code %i.\n",
                     filename, errno);
             /* try again, now with IO reading the file */
-            io = PIO_open(interpreter, filename, "<");
+            io = PIO_open(interpreter, NULL, filename, "<");
             if (!io) {
                 PIO_eprintf(interpreter,
                         "Parrot VM: Can't open %s, code %i.\n",

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 $/=undef; # slurp mode
@@ -68,7 +68,7 @@ main ()
     io = PIO_STDOUT(interpreter);
     PIO_write(interpreter, io, "Hello, World!\n", 14);
 
-    io = PIO_open(interpreter, "temp.file", ">");
+    io = PIO_open(interpreter, NULL, "temp.file", ">");
     for (p="Hello, World!\n"; *p; p++) {
         PIO_write (interpreter, io, p, 1);
     }
@@ -104,14 +104,14 @@ main ()
     interpreter = Parrot_new();
     Parrot_init(interpreter);
 
-    io = PIO_open(interpreter, "temp.file", "<");
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
     len = PIO_read(interpreter, io, buf, sizeof(buf)-1);
     PIO_close(interpreter, io);
 
     buf[len] = '\0';
     PIO_printf(interpreter, "%s", buf);
 
-    io = PIO_open(interpreter, "temp.file", "<");
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
     /* this is for testing buffers, not for performance */
     PIO_setbuf(interpreter, io, 4);
 
@@ -150,7 +150,7 @@ main ()
     interpreter = Parrot_new();
     Parrot_init(interpreter);
 
-    io = PIO_open(interpreter, "temp.file", ">>");
+    io = PIO_open(interpreter, NULL, "temp.file", ">>");
     PIO_write(interpreter, io, "Parrot flies.\n", 14);
     PIO_close(interpreter, io);
 
@@ -183,7 +183,7 @@ main ()
     interpreter = Parrot_new();
     Parrot_init(interpreter);
 
-    io = PIO_open(interpreter, "temp.file", "<");
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
     PIO_setlinebuf(interpreter, io);
 
     do {
@@ -266,7 +266,7 @@ int main(int argc, char* argv[]) {
 	{
 		for (j = 0; j < 7; j++)
 		{
-			io = PIO_open(interpreter, file[i], flags[j]);
+			io = PIO_open(interpreter, NULL, file[i], flags[j]);
 
 			if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] )
 			{
@@ -309,7 +309,7 @@ int main(int argc, char* argv[]) {
     
     Parrot_init(interpreter);
 
-	io = PIO_open(interpreter, "temp.file", "<");
+	io = PIO_open(interpreter, NULL, "temp.file", "<");
 
 	if ( PIO_eof(interpreter, io) )
 	{
@@ -371,7 +371,7 @@ int main(int argc, char* argv[]) {
     
     Parrot_init(interpreter);
 
-	io = PIO_open(interpreter, "temp.file", "<");
+	io = PIO_open(interpreter, NULL, "temp.file", "<");
 
 	if ( !io )
 	{
@@ -410,7 +410,7 @@ int main(int argc, char* argv[]) {
     
     Parrot_init(interpreter);
 
-	io = PIO_open(interpreter, "temp.file", ">");
+	io = PIO_open(interpreter, NULL, "temp.file", ">");
 
 	if ( !io )
 	{
@@ -446,7 +446,7 @@ int main(int argc, char* argv[]) {
     
     Parrot_init(interpreter);
 
-	io = PIO_open(interpreter, "temp.file", "<");
+	io = PIO_open(interpreter, NULL, "temp.file", "<");
 
 	if ( !io )
 	{
@@ -525,7 +525,7 @@ int main(int argc, char* argv[]) {
     
     Parrot_init(interpreter);
 
-    io = PIO_open(interpreter, "temp.file", "<");
+    io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     if ( !io )
     {
@@ -588,7 +588,7 @@ int main(int argc, char* argv[]) {
     {
         iostdout = PIO_STDOUT(interpreter);
         fd = PIO_getfd(interpreter, iostdout);
-        io = PIO_fdopen(interpreter, fd, flags[i]);
+        io = PIO_fdopen(interpreter, NULL, fd, flags[i]);
     
         if ( ( io != NULL ) != expected[i] )
         {
@@ -607,3 +607,29 @@ OUTPUT
 }
 
 ###############################################################################
+
+c_output_is(<<'CODE', <<'OUTPUT', 'stdio-layer');
+#include "parrot/parrot.h"
+
+extern ParrotIOLayer pio_stdio_layer;
+
+int main()
+{
+    Interp *interpreter;
+    PMC *io;
+
+    interpreter = Parrot_new();
+    
+    if ( interpreter == NULL ) return 1;
+    
+    Parrot_init(interpreter);
+
+    io = PIO_fdopen(interpreter, &pio_stdio_layer, (PIOHANDLE)stdout, ">");
+    PIO_puts(interpreter, io, "Hello, World\n");
+    PIO_flush(interpreter, io);
+
+    return 0;
+}
+CODE
+Hello, World
+OUTPUT

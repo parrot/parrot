@@ -56,7 +56,7 @@ inline op fdopen(out PMC, in INT, in STR) {
   const char * mode;
   mode = string_to_cstring(interpreter, $3);
 
-  $1 = PIO_fdopen(interpreter, (PIOHANDLE)$2, mode);
+  $1 = PIO_fdopen(interpreter, NULL, (PIOHANDLE)$2, mode);
   if (!$1) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
@@ -151,7 +151,7 @@ inline op open(out PMC, in STR, in STR) {
   path = string_to_cstring(interpreter, $2);
   mode = string_to_cstring(interpreter, $3);
 
-  $1 = PIO_open(interpreter, path, mode);
+  $1 = PIO_open(interpreter, NULL, path, mode);
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
   if(!$1) {
@@ -166,7 +166,7 @@ inline op open(out PMC, in STR) {
 
   path = string_to_cstring(interpreter, $2);
 
-  $1 = PIO_open(interpreter, path, "+<");
+  $1 = PIO_open(interpreter, NULL, path, "+<");
   /* string_cstring_free(path); */
   if(!$1) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
