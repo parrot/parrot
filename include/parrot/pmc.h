@@ -19,6 +19,7 @@
 
 #define PARROT_MAX_CLASSES 100
 VAR_SCOPE VTABLE **Parrot_base_vtables;/*[PARROT_MAX_CLASSES];*/
+VAR_SCOPE INTVAL class_table_size;
 VAR_SCOPE INTVAL enum_class_max;
 VAR_SCOPE Parrot_mutex class_count_mutex;
 

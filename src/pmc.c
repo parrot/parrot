@@ -226,6 +226,21 @@ pmc_register(Parrot_Interp interp, STRING *name)
     key = key_new_string(interp, name);
 
     type = enum_class_max++;
+    /* Have we overflowed the table? */
+    if (enum_class_max > class_table_size - 1) {
+        VTABLE **new_vtable_table;
+        /* 10 bigger seems reasonable, though it's only a pointer
+           table and we could get bigger without blowing much memory
+        */
+        INTVAL new_max = class_table_size + 10; 
+        INTVAL new_size = new_max * sizeof(VTABLE *);
+        new_vtable_table = mem_sys_realloc(Parrot_base_vtables, new_size);
+        /* XXX Should set all the empty slots to the null PMC's
+           vtable pointer */
+        Parrot_base_vtables = new_vtable_table;
+        class_table_size = new_max;
+    }
+    
     VTABLE_set_integer_keyed(interp, classname_hash, key, type);
 
     UNLOCK(class_count_mutex);

@@ -158,13 +158,18 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
   return PMCNULL;
 }
 
+/* This is the method to register a new Parrot class as an
+   instantiatable type. Doing this invoves putting it in the class
+   hash, setting its vtable so that the init method inits objects of
+   the class rather than the class itself, and adding it to the
+   interpreter's base type table so you can "new Px, foo" the things.
+*/
 void
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_class)
 {
   VTABLE_set_pmc_keyed(interpreter, interpreter->class_hash,
                        key_new_string(interpreter,class_name), new_class);
 
-  return;
   /* Now build a new vtable for this class and register it in the
      global registry */
   {
@@ -176,10 +181,13 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name, PMC *new_cl
       /* Set the vtable's type to the newly allocated type */
       Parrot_vtable_set_type(interpreter, new_vtable, new_type);
 
-      /* Reset the init method */
-      new_vtable->init = NULL;
+      /* Reset the init method to our instantiation method */
+      new_vtable->init = Parrot_instantiate_object;
       new_class->vtable = new_vtable;
       
+      /* Put our new vtable in the global table */
+      Parrot_base_vtables[new_type] = new_vtable;
+
   }
 
 }
