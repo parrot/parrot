@@ -51,7 +51,7 @@ stack_height(Interp *interpreter, Stack_chunk *stack_base)
 
 /* If depth >= 0, return the entry at that depth from the top of the stack,
    with 0 being the top entry.  If depth < 0, then return the entry |depth|
-   entries from the bottom of the string.
+   entries from the bottom of the stack.
    Returns NULL if |depth| > number of entries in stack 
 */
 Stack_entry *
