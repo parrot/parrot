@@ -52,8 +52,7 @@ Invokes the PMC's code.
 
     void* invoke (void* next) {
         struct PackFile_ByteCode *old_cs;
-        /* invoke on Sub returns the address */
-        struct PackFile *eval_pf = (struct PackFile *)SUPER(next);
+        struct PackFile *eval_pf = (struct PackFile *)PMC_struct_val(SELF);
 #if EXEC_CAPABLE
         extern int Parrot_exec_run;
         if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE)) {

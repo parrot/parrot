@@ -16,7 +16,7 @@ Tests on-the-fly PASM compilation and invocation.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 use Test::More;
 
 # PASM1 is like PASM but appends an C<end> opcode
@@ -168,3 +168,37 @@ ok
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "bug #31467");
+##PIR##
+  .sub main @MAIN
+     $P1 = new PerlHash
+     newsub $P0, .Sub, _builtin
+     $P1['builtin'] = $P0
+
+     $P2 = compreg "PIR"
+     $S0 = ".sub main\nprint \"dynamic\\n\"\nend\n.end"
+     $P0 = compile $P2, $S0
+     $P1['dynamic'] = $P0
+
+     store_global "funcs", $P1
+
+     $S0 = ".sub main\n$P1 = find_global\"funcs\"\n"
+     $S0 .= "$P0 = $P1['dynamic']\n$P0()\n"
+     $S0 .= "$P0 = $P1['builtin']\n$P0()\n"
+     $S0 .= "end\n.end"
+
+     $P2 = compreg "PIR"
+     $P0 = compile $P2, $S0
+     $P0()
+     end
+  .end
+
+  .sub _builtin
+      print "builtin\n"
+      .pcc_begin_return
+      .pcc_end_return
+  .end
+CODE
+dynamic
+builtin
+OUTPUT
