@@ -29,6 +29,11 @@ miniperl
 
 ook
 
+OpenComal	Compiler emiting parrot being added to interpreter
+		Status: Under development; nowhere near anything yet
+		URL: http://www.josvisser.nl/opencomal
+		Parrot Version: 0.0.11
+
 parrot_compiler
 
 Perl6
