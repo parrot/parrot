@@ -37,7 +37,7 @@ sub suffix
 sub defines
 {
   return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef_code))
+#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef.code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
 
@@ -47,7 +47,7 @@ static void** opcode_to_prederef(struct Parrot_Interp* interpreter,
     INTVAL offset_in_ops;
     if (opcode_addr == NULL) return NULL;
     offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
-    return interpreter->prederef_code + offset_in_ops;
+    return interpreter->prederef.code + offset_in_ops;
 }
 
 END

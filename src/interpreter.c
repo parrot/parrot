@@ -150,7 +150,7 @@ prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
 void
 do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
 {
-    size_t offset = pc_prederef - interpreter->prederef_code;
+    size_t offset = pc_prederef - interpreter->prederef.code;
     opcode_t *pc = ((opcode_t *)interpreter->code->byte_code) + offset;
     op_func_t *prederef_op_func = interpreter->op_lib->op_func_table;
 
@@ -234,14 +234,14 @@ load_prederef(struct Parrot_Interp *interpreter, int which)
 
 /*=for api interpreter init_prederef
  *
- * initialize: load prederef func_table, file prederef_code
+ * initialize: load prederef func_table, file prederef.code
  *
  */
 static void
 init_prederef(struct Parrot_Interp *interpreter, int which)
 {
     load_prederef(interpreter, which);
-    if (!interpreter->prederef_code) {
+    if (!interpreter->prederef.code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
         void *pred_func;
@@ -263,8 +263,8 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
             temp[i] = pred_func;
         }
 
-        interpreter->prederef_code = temp;
-        interpreter->code->cur_cs->prederef_code = temp;
+        interpreter->prederef.code = temp;
+        interpreter->code->cur_cs->prederef.code = temp;
 
     }
 }
@@ -294,15 +294,15 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
     load_prederef(interpreter, PARROT_CGP_CORE);
 
-    if (!interpreter->prederef_code) {
+    if (!interpreter->prederef.code) {
         size_t N = interpreter->code->cur_cs->base.size;
         size_t i;
         size_t n;
         void **temp = prederef_arena;
         opcode_t *pc = interpreter->code->cur_cs->base.data;
 
-        interpreter->prederef_code = temp;
-        interpreter->code->cur_cs->prederef_code = temp;
+        interpreter->prederef.code = temp;
+        interpreter->code->cur_cs->prederef.code = temp;
         /* TODO */
     }
 }
@@ -426,7 +426,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     void **pc_prederef;
 
     init_prederef(interpreter, PARROT_PREDEREF_CORE);
-    pc_prederef = interpreter->prederef_code + (pc - code_start);
+    pc_prederef = interpreter->prederef.code + (pc - code_start);
 
     while (pc_prederef) {
         pc_prederef =
@@ -445,7 +445,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
     init_prederef(interpreter, PARROT_CGP_CORE);
-    pc_prederef = interpreter->prederef_code + (pc - code_start);
+    pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
     return pc;
 #else
@@ -462,7 +462,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
     init_prederef(interpreter, PARROT_SWITCH_CORE);
-    pc_prederef = interpreter->prederef_code + (pc - code_start);
+    pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
     return pc;
 }
@@ -992,7 +992,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     SET_NULL_P(interpreter->profile, ProfData *);
 
     /* next two are pointers to the real thing in the current code seg */
-    SET_NULL_P(interpreter->prederef_code, void **);
+    SET_NULL_P(interpreter->prederef.code, void **);
+    SET_NULL_P(interpreter->prederef.branches, Prederef_btanch*);
     SET_NULL(interpreter->jit_info);
 
     /* register assembler/compilers */

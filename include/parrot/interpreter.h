@@ -144,6 +144,18 @@ typedef struct Parrot_Context {
 
 struct _Thread_data;    /* in thread.h */
 
+typedef struct _Prederef_branch {       /* item for recording branches */
+    size_t offs;                        /* offset in code */
+    void  *op;                          /* opcode at that position */
+} Prederef_branch;
+
+typedef struct _Prederef {
+    void **code;                        /* prederefed code */
+    Prederef_branch *branches;          /* list of branches in code */
+    size_t n_branches;                  /* entries in that list */
+    size_t n_allocated;                 /* allocated size of it */
+} Prederef;
+
 /*
  * TODO: Parrot_Interp can use a Parrot_Context inline and we
  * can save/restore context with a single memcpy
@@ -193,8 +205,9 @@ typedef struct Parrot_Interp {
     struct PackFile *code;      /* The code we are executing */
     /* the next items point to the real thngs, which are
      * in the byte_code_segment, that is currently executed */
-    void **prederef_code;       /* The predereferenced code */
+    struct _Prederef prederef;  /* The predereferenced code and info */
     void *jit_info;             /* JITs data */
+
     struct _imc_info_t *imc_info;   /* imcc data */
     size_t current_line;        /* Which line we're executing in the
                                  * source */

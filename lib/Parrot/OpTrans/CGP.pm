@@ -41,7 +41,7 @@ sub core_prefix {
 sub defines
 {
   return <<END;
-#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef_code))
+#define REL_PC ((size_t)((opcode_t*)cur_opcode - (opcode_t*)interpreter->prederef.code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
 
@@ -49,7 +49,7 @@ PARROT_INLINE static void**
 opcode_to_prederef(struct Parrot_Interp* interpreter,
                                         opcode_t* opcode_addr)
 {
-    return interpreter->prederef_code +
+    return interpreter->prederef.code +
         (opcode_addr - (opcode_t*) interpreter->code->byte_code);
 }
 

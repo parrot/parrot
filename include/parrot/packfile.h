@@ -160,7 +160,7 @@ struct PackFile_ConstTable {
 
 struct PackFile_ByteCode {
     struct PackFile_Segment     base;
-    void **prederef_code;       /* The predereferenced code */
+    Prederef prederef;          /* The predereferenced code and info */
     void *jit_info;             /* JITs data */
     struct PackFile_ByteCode  * prev;   /* was executed previous */
     struct PackFile_Debug     * debugs;

@@ -1146,8 +1146,11 @@ byte_code_destroy (struct PackFile_Segment *self)
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
-    if (byte_code->prederef_code)
-        free(byte_code->prederef_code);
+    if (byte_code->prederef.code) {
+        mem_sys_free(byte_code->prederef.code);
+        if (byte_code->prederef.branches)
+            mem_sys_free(byte_code->prederef.branches);
+    }
 }
 
 static struct PackFile_Segment *
@@ -1157,7 +1160,9 @@ byte_code_new (struct PackFile *pf, const char * name, int add)
 
     byte_code = mem_sys_allocate(sizeof(struct PackFile_ByteCode));
 
-    byte_code->prederef_code = NULL;
+    byte_code->prederef.code = NULL;
+    byte_code->prederef.branches = NULL;
+    byte_code->prederef.n_allocated = 0;
     byte_code->jit_info = NULL;
     byte_code->prev = NULL;
     byte_code->debugs = NULL;
@@ -1306,7 +1311,10 @@ Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     interpreter->code->cur_cs = new_cs;
     new_cs->prev = cur_cs;
     interpreter->code->byte_code = new_cs->base.data;
-    interpreter->prederef_code = new_cs->prederef_code;
+    interpreter->prederef.code       = new_cs->prederef.code;
+    interpreter->prederef.branches   = new_cs->prederef.branches;
+    interpreter->prederef.n_branches = new_cs->prederef.n_branches;
+    interpreter->prederef.n_allocated= new_cs->prederef.n_allocated;
     interpreter->jit_info = new_cs->jit_info;
     prepare_for_run(interpreter);
     return cur_cs;

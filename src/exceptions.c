@@ -273,7 +273,7 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
         case PARROT_PREDEREF_CORE:
         case PARROT_SWITCH_CORE:
         case PARROT_CGP_CORE:
-            offset = (void **)dest - interpreter->prederef_code;
+            offset = (void **)dest - interpreter->prederef.code;
         default:
             offset = dest - interpreter->code->byte_code;
     }

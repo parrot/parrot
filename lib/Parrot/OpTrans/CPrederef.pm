@@ -27,7 +27,7 @@ sub prefix { return 'Parrot_pred_'; }
 sub defines
 {
   return <<END;
-#define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
+#define REL_PC ((size_t)(cur_opcode - interpreter->prederef.code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
 static opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
@@ -35,7 +35,7 @@ static opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
 {
     INTVAL offset_in_ops;
     if (prederef_addr == NULL) return NULL;
-    offset_in_ops = prederef_addr - interpreter->prederef_code;
+    offset_in_ops = prederef_addr - interpreter->prederef.code;
     return (opcode_t*) interpreter->code->byte_code + offset_in_ops;
 }
 
@@ -45,7 +45,7 @@ static void** opcode_to_prederef(struct Parrot_Interp* interpreter,
     INTVAL offset_in_ops;
     if (opcode_addr == NULL) return NULL;
     offset_in_ops = opcode_addr - (opcode_t*) interpreter->code->byte_code;
-    return interpreter->prederef_code + offset_in_ops;
+    return interpreter->prederef.code + offset_in_ops;
 }
 
 END
