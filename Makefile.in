@@ -435,10 +435,10 @@ realclean: clean
 	$(RM_F) $(STICKY_FILES)
 
 distclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}
+	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()${PQ}
 
 cvsclean:
-	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
+	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}sub ExtUtils::Manifest::_maniskip{sub{0}};$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
 
 reconfig:
 	$(MAKE) clean; $(PERL) Configure.pl --reconfig
