@@ -32,8 +32,11 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     else
 #endif
     if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
+        /* Change the size of the buffer so that it only
+         * has as much data as we really want to copy.
+         * This avoids wasted data when we un-cow something. */
         s->bufstart = s->strstart;
-        s->buflen = s->strlen;
+        s->buflen = s->bufused;
         /* Create new pool data for this header to use, 
          * independant of the original COW data */
         Parrot_reallocate_string(interpreter, s, s->buflen);
