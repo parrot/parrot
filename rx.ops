@@ -135,11 +135,11 @@ regex compiler total control over what's going on.
 
 There are two basic rules to how the opcodes operate.
 
-The first rule is that the first argument to each opcode is the string where are matching
-against, and the second one is the current index in the string.
+The first rule is that the first argument to each opcode is the string we are 
+matching against, and the second one is the current index in the string.
 
 The second rule pertains to the ops that have an integer constant as their last parameter.
-For the most part, these ops will branch to that parameter if the 'fail'.  For most ops, 
+For the most part, these ops will branch to that parameter if they 'fail'.  For most ops, 
 'fail' means 'fail to match'.
 
 If the documentation for an op doesn't specifically mention the first or last parameter, 
