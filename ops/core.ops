@@ -4317,12 +4317,12 @@ Create a new interpreter and store it in a PMC.
 op newinterp(out PMC, in INT) {
   struct Parrot_Interp *new_interp;
   struct PMC *new_pmc;
+  new_pmc = new_pmc_header(interpreter);
+  $1 = new_pmc;
   new_interp = make_interpreter((Interp_flags)$2);
   new_interp->parent_interpreter = interpreter;
-  new_pmc = new_pmc_header(interpreter);
-  new_pmc->data = new_interp;
+  PMC_data(new_pmc) = new_interp;
   new_pmc->vtable = YOU_LOSE_VTABLE;
-  $1 = new_pmc;
   goto NEXT();
 }
 
@@ -4334,7 +4334,8 @@ Take a built interpreter and run the code starting at offset $2.
 =cut
 
 op runinterp(inout PMC, in INT) {
-  struct Parrot_Interp * new_interp = (struct Parrot_Interp *)$1->data;
+  struct Parrot_Interp * new_interp =
+      (struct Parrot_Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
   runops(new_interp, REL_PC + $2);
@@ -4655,7 +4656,7 @@ inline op loadlib(out PMC, in STR) {
      PANIC("Failed to load native library");
   }
   pmc = new_pmc_header(interpreter);
-  pmc->data = (void *)p;
+  PMC_data(pmc) = (void *)p;
   $1 = pmc;
   goto NEXT();
 }
@@ -4664,7 +4665,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   char * name = string_to_cstring(interpreter, ($3));
   PMC *nci;
 
-  Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(($2)->data, name));
+  Parrot_csub_t p = (Parrot_csub_t)D2FPTR(Parrot_dlsym(PMC_data($2), name));
   free(name);
   if(p == NULL) {
      const char * err = Parrot_dlerror();

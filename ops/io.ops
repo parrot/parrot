@@ -12,14 +12,14 @@ io.ops
 
 =head1 DESCRIPTION
 
-Parrot's IO API 
+Parrot's IO API
 
 =cut
 
 
 ###############################################################################
 
-=head2 Parrot IO API Operations 
+=head2 Parrot IO API Operations
 
 
 =over 4
@@ -36,7 +36,7 @@ Close IO object $1
 =cut
 
 inline op close(inout PMC) {
-	PIO_close(interpreter, (ParrotIO*)(($1)->data));
+	PIO_close(interpreter, (ParrotIO*)(PMC_data($1)));
 	goto NEXT();
 }
 
@@ -258,7 +258,7 @@ Print String $2 on the IO stream object $1.
 
 op print(in PMC, in STR) {
   ParrotIO * io;
-  io = (ParrotIO*)($1->data);
+  io = (ParrotIO*)(PMC_data($1));
   if ($2 && io) {
     PIO_write(interpreter, io, ($2)->strstart, string_length($2));
   }
@@ -333,7 +333,7 @@ Warning: This is a quick hack.
 
 =item B<read>(out STR, in PMC, in INT)
 
-Read up to N bytes from IO PMC stream. 
+Read up to N bytes from IO PMC stream.
 If stream is linebuffered, will return at EOL, for
 files it will read MIN(MAX(avail, N), 65535) bytes.
 Warning: This is a quick hack.
@@ -346,7 +346,7 @@ op read(out STR, in INT) {
   if($2 >= 65535)
     n = 65535;
   else
-    n = $2; 
+    n = $2;
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->strstart, 0, n);
   nr = PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->strstart, (size_t)n);
@@ -363,10 +363,11 @@ op read(out STR, in PMC, in INT) {
   if($3 >= 65535)
     n = 65535;
   else
-    n = $3; 
+    n = $3;
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, (ParrotIO*)($2->data), ($1)->strstart, (size_t)n);
+  nr = PIO_read(interpreter, (ParrotIO*)(PMC_data($2)),
+    ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;
   else
@@ -376,7 +377,7 @@ op read(out STR, in PMC, in INT) {
 
 =item B<readline>(out STR, in INT)
 
-Read a line up to EOL from filehandle $2. 
+Read a line up to EOL from filehandle $2.
 This switches the filehandle to linebuffer-mode.
 
 If for some reason the line's longer than 64K you get only 64K
@@ -416,7 +417,7 @@ indicated by the value in $4.
 
 op seek(out INT, in PMC, in INT, in INT) {
   ParrotIO * io;
-  io = (ParrotIO*)($2->data);
+  io = (ParrotIO*)(PMC_data($2));
   if (io) {
     $1 = (INTVAL)PIO_seek(interpreter, io, 0, $3, $4);
   }
@@ -425,7 +426,7 @@ op seek(out INT, in PMC, in INT, in INT) {
 
 op seek(out INT, in PMC, in INT, in INT, in INT) {
   ParrotIO * io;
-  io = (ParrotIO*)($2->data);
+  io = (ParrotIO*)(PMC_data($2));
   if (io) {
     $1 = (INTVAL)PIO_seek(interpreter, io, $3, $4, $5);
   }
