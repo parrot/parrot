@@ -1,4 +1,5 @@
 O = ${o}
+RM_F = ${rm_f}
 
 INC=include/parrot
 H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/global_setup.h
@@ -18,7 +19,7 @@ PERL = ${perl}
 TEST_PROG = test_prog${exe}
 PDUMP = pdump${exe}
 
-.c.o:
+.c$(O):
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 all : $(TEST_PROG) $(PDUMP)
@@ -63,15 +64,14 @@ basic_opcodes.c: basic_opcodes.ops process_opfunc.pl $(INC)/interp_guts.h
 $(INC)/op.h: opcode_table make_op_header.pl
 	$(PERL) make_op_header.pl opcode_table > $(INC)/op.h
 
-config.h: Configure.pl config_h.in
+$(INC)/config.h: Configure.pl config_h.in
 	$(PERL) Configure.pl
 
 clean:
-	rm -f *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
+	$(RM_F) *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
 
 test:
 	$(PERL) t/harness
 
 update:
 	cvs -q update -dP
-

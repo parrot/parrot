@@ -84,6 +84,7 @@ my(%c)=(
 
   	perl =>			$^X,
 	debugging =>	$opt_debugging,
+	rm_f =>		'rm -f',
 );
 
 #copy the things from --define foo=bar

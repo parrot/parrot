@@ -2,6 +2,8 @@
 	my $is_msvc = grep { $c{cc} eq $_ } ( qw(cl cl.exe) );
 	my $is_mingw = grep { $c{cc} eq $_ } ( qw(gcc gcc.exe) );
 
+	$c{rm_f} = '$(PERL) -MExtUtils::Command -e rm_f';
+
 	if( $is_msvc ) {
 		$c{o} = '.obj';
 		$c{ld_out} = '-out:';
