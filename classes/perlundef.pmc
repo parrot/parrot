@@ -349,14 +349,7 @@ pmclass PerlUndef extends PerlInt {
     INTVAL is_equal (PMC* value) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in equals");
-        if(value->vtable==SELF->vtable) {
-            return 1;
-        }
-        else if(VTABLE_get_integer(INTERP, value) == 0) {
-            return 1;
-        }
-        else if(0==string_compare(INTERP,
-	    VTABLE_get_string(INTERP, value), NULL)) {
+        if (VTABLE_get_bool(INTERP, value) == 0) {
             return 1;
         }
         else {
