@@ -4,15 +4,13 @@ MAKE_C = ${make_c}
 
 all : befunge bf cola m4 ook perl6 regex tcl urm
 	@echo "SKIPPED: scheme: (nothing to make, but should not default to make test)"
-	@echo "SKIPPED: jako:   (fallen behind imcc changes)"
 
 complete-all : all jako scheme
 
-test: regex.test scheme.test befunge.test bf.test m4.test ook.test perl6.test tcl.test urm.test
-	@echo "SKIPPED: jako (fallen behind imcc changes)"
+test : befunge.test bf.test jako.test m4.test ook.test perl6.test regex.test scheme.test tcl.test urm.test
 	@echo "SKIPPED: cola (no make test)"
 
-complete-test: test jako.test cola.test
+complete-test: test cola.test
 
 # This is a listing of all targets, that are meant to be called by users
 help:
