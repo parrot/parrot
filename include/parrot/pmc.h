@@ -118,6 +118,9 @@ PMC *pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type);
 PMC *pmc_new_sized(struct Parrot_Interp *interpreter, INTVAL base_type,
                         INTVAL size);
+PMC *pmc_new_sized_pmc(struct Parrot_Interp *interpreter, INTVAL base_type, 
+                       PMC *p);
+
 
 #endif
 

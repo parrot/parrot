@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 65;
+use Parrot::Test tests => 68;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -1353,6 +1353,7 @@ ok 1
 ok 2
 OUTPUT
 
+
 output_is(<<CODE, <<OUTPUT, "mul_p_p, PerlNum");
 @{[ $fp_equality_macro ]}
         new P0,.PerlNum
@@ -1378,6 +1379,52 @@ CODE
 ok 1
 ok 2
 OUTPUT
+
+
+output_is(<<CODE, <<OUTPUT, "mul_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,8
+        mul P0,2
+        .fp_eq(P0,16,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+
+output_is(<<CODE, <<OUTPUT, "div_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,8
+        div P0,2
+        .fp_eq(P0,4,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+
+output_is(<<CODE, <<OUTPUT, "mod_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,3
+        mod P0,6
+        .fp_eq(P0,3,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
 
 output_is(<<CODE, <<OUTPUT, "typeof");	
     new P0,.PerlInt
