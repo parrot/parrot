@@ -27,9 +27,13 @@ static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
 static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
 
 /*                          
- * Parrot_exec_run is not 0 if the contants are already allocated 
- * this to be able to add a rellocation in generated object files.
- * If 1 make_interpreter will return the address of interpre.
+ * Parrot_exec_run must be 0 while the program runs.
+ * It will be set to 2 inside eval (s. eval.pmc)
+ * to switch to runops_jit (s. interpreter.c:runops_exec()).
+ * Must be 1 while starting the compiled code to have make_interpreter
+ * return the address of the global interpreter (s. interpreter.c) 
+ * and PackFile_ConstTable_unpack use the global const_table (s. packfile.c).
+ * Must also be 1 while generating the executable.
  */
 
 int Parrot_exec_run = 0;
