@@ -123,7 +123,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 }
 
 
-static INTVAL
+INTVAL
 PIO_win32_getblksize(PIOHANDLE fd)
 {
     /* Hard coded for now */
@@ -197,7 +197,7 @@ PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-static INTVAL
+INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
 {
     DWORD ftype = GetFileType(fd);
