@@ -269,7 +269,7 @@ void $initname (INTVAL entry) {
         };
     
    whoami = string_make(NULL, /* DIRTY HACK */
-       "$classname", 7, 0, 0, 0);
+       "$classname", @{[length($classname)]}, 0, 0, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;
 }
