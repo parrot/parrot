@@ -635,9 +635,9 @@ stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)
 		| 'method' <commit> name params props['is'] block
 		| 'loop' <commit>
-			'(' scalar_expr(?)
-			';' scalar_expr(?)
-			';' scalar_expr(?) ')'
+			'(' comma(?)
+			';' comma(?)
+			';' comma(?) ')'
 			block
 		| scope(?) /sub|rule/ <commit> name params
 			{ add_function(@item[4,5], $thisparser);1 }

@@ -512,9 +512,14 @@ sub pass4($$) {
 	if (system($cmd)) {
 	    mydie($?, $cmd);
 	}
-	#my $objs = join" ",map{ s/\$\(O\)/$PConfig{o}/g; $_ } split(/ /,
-	#	$O_FILES);
 	# XXX Configure lacks options for Win
+	#
+	# XXX running --shared needs
+	#
+	# export LD_LIBRARY_PATH=../../blib/lib
+	#
+	# in advance
+	#
 	my $lib = !$o{shared} ? "libparrot$LIB" : '-L blib/lib -lparrot';
 	$cmd = "$CD $PConfig{ld} $PConfig{ldflags} ".
 	"$PConfig{ld_out} $HERE/$filebase $HERE/$filebase$PConfig{'o'} ".
@@ -524,6 +529,7 @@ sub pass4($$) {
 	if (system($cmd)) {
 	    mydie($?,"Linking");
 	}
+	$filebase = "./$filebase" if($filebase !~ m!/!); # XXX and unix
 	verbose(1, "running $filebase @ARGV");
 	if (system($filebase, @ARGV) && !$o{'ignore-exitcode'}) {
 	    mydie($?, $filebase);
@@ -712,8 +718,14 @@ pass option(s) to parrot, s. parrot -h
 Run against shared dynamic libparrot - you must build it currently manually
 in parrot root with:
 
+	cd ../..
 	make libparrot.a	# static lib
 	make shared		# dynamic lib
+	cd -			# back to perl6
+	# and set this LD_LIBRARY_PATH
+	# as libparrot.so is not installed during testing
+	#
+	export LD_LIBRARY_PATH=../../blib/lib
 
 =item --ignore-exitcode
 
