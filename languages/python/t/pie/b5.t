@@ -137,10 +137,8 @@ if __name__ == '__main__':
     main()
 CODE
 
-SKIP: {
-  skip("dictionaries with non-string keys", 1);
 test(<<'CODE', 'check_functions complex, dict');
-show = True
+show = False # order of dictionary keys is non-deterministic
 
 def check(a, b):
     if __debug__:
@@ -164,7 +162,6 @@ def main():
 if __name__ == '__main__':
     main()
 CODE
-}
 
 test(<<'CODE', 'check_functions divmod');
 show = True

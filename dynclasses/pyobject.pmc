@@ -668,7 +668,10 @@ Morphs the scalar to the specified type.
 */
 
     void morph (INTVAL type) {
-        if (type == enum_class_BigInt) type = PyBuiltin_PyLong;
+        switch (type) {
+            case enum_class_BigInt: type = PyBuiltin_PyLong; break;
+            case enum_class_Complex: type = PyBuiltin_PyComplex; break;
+        }
         pmc_reuse(INTERP, SELF, type, 0);
     }
 

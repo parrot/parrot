@@ -794,14 +794,21 @@ Compares the complex number with C<value> and returs true if they are equal.
 */
 
     INTVAL is_equal (PMC* value) {
-        if(value->vtable->base_type == enum_class_Complex)
+MMD_Complex: {
             return (INTVAL)(
                     RE(SELF) == RE(value) &&
                     IM(SELF) == IM(value)
                 );
-        if(IM(SELF) != 0.0)
-            return (INTVAL)0;
-        return (RE(SELF) == VTABLE_get_number(INTERP, value));
+        }
+MMD_Float: {
+/*
+        XXX: the above really should be MMD_DEFAULT, but that causes 
+             t/dynclass/pycomplex.t to fail.
+*/
+            if(IM(SELF) != 0.0)
+                return (INTVAL)0;
+            return (RE(SELF) == VTABLE_get_number(INTERP, value));
+        }
     }
 
 /*
