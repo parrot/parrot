@@ -559,6 +559,13 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
             str, i - 1, NULL, PObj_external_FLAG, NULL);
         condition->type |= PDB_cond_const;
     }
+    else if (condition->type & PDB_cond_pmc) {
+        /* XXX Need to figure out what to do in this case.
+         * For the time being, we just bail. */
+        PIO_eprintf(interpreter, "Can't compare PMC with constant\n");
+        mem_sys_free(condition);
+        return NULL;
+    }
 
     return condition;
 }
