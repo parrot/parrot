@@ -4,7 +4,7 @@
  */
 INTVAL
 Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
-    int status = 0;
+    DWORD status = 0;
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     int free_it = 0;
