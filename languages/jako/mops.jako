@@ -7,8 +7,9 @@ var num end_time;
 var num elapsed_time;
 var num num_ops;
 var num ops_per_sec;
+var num mops;
 
-const int num_iter       = 1000000;
+const int num_iter       = 10000000;
 const int loop_increment = 1;
 const num ops_per_iter   = 3.0;
 
@@ -23,6 +24,7 @@ end_time       = time();
 elapsed_time   = end_time - start_time;
 num_ops        = num_iter * ops_per_iter;
 ops_per_sec    = num_ops / elapsed_time;
+mops           = ops_per_sec / 1000000.0;
 
 print("Iterations:    $num_iter\n");
 print("Start time:    $start_time\n");
@@ -31,5 +33,6 @@ print("Count:         $loop_counter\n");
 print("Elapsed time:  $elapsed_time\n");
 print("Estimated ops: $num_ops\n");
 print("Elapsed time:  $elapsed_time\n");
-print("Ops/sec:       $ops_per_sec\n");
+print("op/s:          $ops_per_sec\n");
+print("Mop/s:         $mops\n");
 

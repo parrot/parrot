@@ -100,17 +100,7 @@ sub.pbc: sub.pasm
 
 
 clean:
-	rm -f bench.pasm bench.pbc \
-euclid.pasm euclid.pbc \
-fact.pasm fact.pbc \
-fib.pasm fib.pbc \
-hello.pasm hello.pbc \
-leibniz.pasm leibniz.pbc \
-mandelbrot.pasm mandelbrot.pbc \
-mops.pasm mops.pbc \
-primes.pasm primes.pbc \
-queens.pasm queens.pbc \
-sub.pasm sub.pbc
+	rm -f *.pasm *.list *.pbc
 
 over:
 	@make clean
