@@ -24,12 +24,12 @@ void Parrot_PerlString_class_init(INTVAL);
 void Parrot_Array_class_init(INTVAL);
 void Parrot_PerlArray_class_init(INTVAL);
 void Parrot_PerlHash_class_init(INTVAL);
-void Parrot_ParrotPointer_class_init(INTVAL);
+void Parrot_Pointer_class_init(INTVAL);
 void Parrot_IntQueue_class_init(INTVAL);
-void Parrot_ParrotSub_class_init(INTVAL);
-void Parrot_ParrotCoroutine_class_init(INTVAL);
-void Parrot_ParrotClosure_class_init(INTVAL);
-void Parrot_ParrotContinuation_class_init(INTVAL);
+void Parrot_Sub_class_init(INTVAL);
+void Parrot_Coroutine_class_init(INTVAL);
+void Parrot_Closure_class_init(INTVAL);
+void Parrot_Continuation_class_init(INTVAL);
 
 void init_world(void);
 

@@ -21,12 +21,12 @@ enum {
     enum_class_PerlString,
     enum_class_PerlArray,
     enum_class_PerlHash,
-    enum_class_ParrotPointer,
+    enum_class_Pointer,
     enum_class_IntQueue,
-    enum_class_ParrotSub,
-    enum_class_ParrotCoroutine,
-    enum_class_ParrotClosure,
-    enum_class_ParrotContinuation,
+    enum_class_Sub,
+    enum_class_Coroutine,
+    enum_class_Closure,
+    enum_class_Continuation,
     enum_class_max = 100
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
