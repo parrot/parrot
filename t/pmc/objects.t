@@ -357,10 +357,10 @@ output_is(<<'CODE', <<'OUTPUT', "set/get object attribs");
 
     new P3, .PerlInt
     set P3, 1024
-    setattribute P2, 0, P3
+    setattribute P2, 2, P3
 
     new P4, .PerlInt
-    getattribute P4, P2, 0
+    getattribute P4, P2, 2
     print P4
     print "\n"
     end
@@ -380,13 +380,13 @@ output_is(<<'CODE', <<'OUTPUT', "set/get multiple object attribs");
     new P4, .PerlHash
     set P4["Key"], "Value" 
 
-    setattribute P2, 0, P3
-    setattribute P2, 1, P4
+    setattribute P2, 2, P3
+    setattribute P2, 3, P4
 
-    getattribute P5, P2, 0
+    getattribute P5, P2, 2
     print P5
     print "\n"
-    getattribute P6, P2, 1
+    getattribute P6, P2, 3
     set S0, P6["Key"]
     print S0
     print "\n"
@@ -427,15 +427,15 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values are specific to objects");
 
     new P4, .PerlInt
     set P4, 100
-    setattribute P2, 0, P4
+    setattribute P2, 2, P4
     new P5, .PerlString
     set P5, "One hundred"
-    setattribute P3, 0, P5
+    setattribute P3, 2, P5
 
-    getattribute P6, P2, 0
+    getattribute P6, P2, 2
     print P6
     print "\n"
-    getattribute P6, P3, 0
+    getattribute P6, P3, 2
     print P6
     print "\n"
     end
@@ -458,57 +458,37 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
  
     new P4, .PerlInt
     set P4, 10
-    setattribute P2, 0, P4
-    inc P4
-    setattribute P2, 1, P4
-    inc P4
     setattribute P2, 2, P4
     inc P4
     setattribute P2, 3, P4
 
-    set P4, 100
-    setattribute P3, 0, P4
-    inc P4
-    setattribute P3, 1, P4
-    inc P4
-    setattribute P3, 2, P4
-    inc P4
-    setattribute P3, 3, P4
+    new P5, .PerlInt
+    set P5, 100
+    setattribute P3, 2, P5
+    inc P5
+    setattribute P3, 3, P5
 
-
-    getattribute P5, P2, 0
+    getattribute P6, P2, 2
     bsr l1
-    getattribute P5, P2, 1
-    bsr l1
-    getattribute P5, P2, 2
-    bsr l1
-    getattribute P5, P2, 3
+    getattribute P6, P2, 3
     bsr l1
 
-    getattribute P5, P3, 0
+    getattribute P6, P3, 2
     bsr l1
-    getattribute P5, P3, 1
-    bsr l1
-    getattribute P5, P3, 2
-    bsr l1
-    getattribute P5, P3, 3
+    getattribute P6, P3, 3
     bsr l1
     branch end
 l1:
-    print P5
+    print P6
     print "\n"
     ret
 end:
     end
 CODE
-10
 11
-12
-13
-100
+11
 101
-102
-103
+101
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "classoffset (single class)");
