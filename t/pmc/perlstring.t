@@ -457,10 +457,22 @@ output_is(<<'CODE', <<OUTPUT, "concat must morph dest to a string");
 	print "\n"
 	print	P1
 	print "\n"
+
+	new P0, .PerlString
+	new P1, .PerlUndef
+	set P0, "bar"
+	concat	P1, P1, P0
+
+	print	P0
+	print "\n"
+	print	P1
+	print "\n"
 	end
 CODE
 foo
 foofoo
+bar
+bar
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "cmp");

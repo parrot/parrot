@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 76;
+use Parrot::Test tests => 79;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -258,6 +258,97 @@ output_is(<<'CODE', <<OUTPUT, "concatenate string to string");
 	end
 CODE
 foobar
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate <foo> to undef");
+	new P0, .PerlUndef
+	new P1, .PerlInt
+	set P1, 10
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "10", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlNum
+	set P1, 1.2
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "1.200000", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlString
+	set P1, "Foo"
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "Foo", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlUndef
+	concat P0, P0, P1
+        set S0, P0
+        eq S0, "", OK4
+        print "not "
+OK4:    print "ok 4\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+
+output_is(<<'CODE', <<OUTPUT, "concatenate undef to <foo>");
+	new P0, .PerlUndef
+	new P1, .PerlInt
+	set P1, 10
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "10", OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlNum
+	set P1, 1.2
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "1.200000", OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+	new P0, .PerlUndef
+	new P1, .PerlString
+	set P1, "Foo"
+	concat P1, P1, P0
+        set S0, P1
+        eq S0, "Foo", OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "concatenate STRING to undef");
+	new P0, .PerlUndef
+	concat P0, P0, "Foo"
+        set S0, P0
+        eq S0, "Foo", OK1
+        print "not "
+OK1:    print "ok 1\n"
+	end
+CODE
+ok 1
 OUTPUT
 
 #
