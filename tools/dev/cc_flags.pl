@@ -67,4 +67,4 @@ foreach my $option (@options) {
 }
 
 print "@ARGV\n";
-exec @ARGV;
+system @ARGV;
