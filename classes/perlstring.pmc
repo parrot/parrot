@@ -758,6 +758,37 @@ Returns the integer value for C<*key>.
             return s->encoding->decode(s->encoding->skip_forward(s->strstart,
                 PMC_int_val(key)));
     }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the string.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        io->vtable->push_string(INTERP, io, PMC_str_val(SELF));
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the string.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL)
+            PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+    }
 }
 
 /*
@@ -777,3 +808,14 @@ Returns the integer value for C<*key>.
  *
  * vim: expandtab shiftwidth=4:
 */
+
+
+
+
+
+
+
+
+
+
+
