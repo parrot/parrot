@@ -136,16 +136,6 @@ fprintf(stderr,"morph not implemented\n");
         SELF->data = value;
     }
 
-    void set_string_unicode (STRING * value) {
-	CHANGE_TYPE(SELF, PerlString);
-        SELF->data = value;
-    }
-
-    void set_string_other (STRING * value) {
-	CHANGE_TYPE(SELF, PerlString);
-        SELF->data = value;
-    }
-
     void set_string_same (PMC * value) {
 	CHANGE_TYPE(SELF, PerlString);
         SELF->data = value->data;
@@ -406,28 +396,6 @@ fprintf(stderr,"modulus_same not implemented\n");
     }
 
     void concatenate_native (STRING* value, PMC* dest) {
-        STRING* s;
-        s = string_concat(INTERP,
-                          SELF->vtable->get_string(INTERP, SELF),
-                          value,
-                          0
-        );
-	CHANGE_TYPE(dest, PerlString);
-        dest->vtable->set_string_native(INTERP,dest,s);
-    }
-
-    void concatenate_unicode (STRING* value, PMC* dest) {
-        STRING* s;
-        s = string_concat(INTERP,
-                          SELF->vtable->get_string(INTERP, SELF),
-                          value,
-                          0
-        );
-	CHANGE_TYPE(dest, PerlString);
-        dest->vtable->set_string_native(INTERP,dest,s);
-    }
-
-    void concatenate_other (STRING* value, PMC* dest) {
         STRING* s;
         s = string_concat(INTERP,
                           SELF->vtable->get_string(INTERP, SELF),
