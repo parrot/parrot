@@ -27,13 +27,17 @@ pmclass perlscalar abstract noinit extends scalar {
 	    return;
 	}
 	if (type == enum_class_PerlString) {
+	    /*
+	     * if we morph to a string, first clear str_val
+	     * so that after changing the vtable a parallel
+	     * reader doesn't get a gargabe pointer
+	     */
+	    PMC_str_val(SELF) = NULL;
+	    PObj_custom_mark_SET(SELF);
 	    SELF->vtable = Parrot_base_vtables[type];
-	    DYNSELF.init();
 	    return;
 	}
-	PObj_custom_mark_CLEAR(SELF);
 	SELF->vtable = Parrot_base_vtables[type];
-
     }
 
     void set_pmc (PMC* value) {
