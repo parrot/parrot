@@ -430,15 +430,22 @@ Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
     struct Memory_Pool *pool;
 
     copysize = (str->buflen > tosize ? tosize : str->buflen);
-    pool = (str->flags & BUFFER_constant_FLAG)
-         ? interpreter->arena_base->constant_string_pool
-         : interpreter->arena_base->memory_pool;
-    if (!(str->flags & BUFFER_COW_FLAG)) {
-        pool->guaranteed_reclaimable += str->buflen;
-    }
-    pool->possibly_reclaimable += str->buflen;
 
-    mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT-1);
+    if (interpreter) {
+        pool = (str->flags & BUFFER_constant_FLAG)
+            ? interpreter->arena_base->constant_string_pool
+            : interpreter->arena_base->memory_pool;
+        if (!(str->flags & BUFFER_COW_FLAG)) {
+            pool->guaranteed_reclaimable += str->buflen;
+        }
+        pool->possibly_reclaimable += str->buflen;
+
+        mem = mem_allocate(interpreter, &alloc_size, pool, STRING_ALIGNMENT-1);
+    }
+    else {
+        mem = mem_allocate(NULL, &alloc_size, NULL, STRING_ALIGNMENT-1);
+    }
+
     if (!mem) {
         return NULL;
     }

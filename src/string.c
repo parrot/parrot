@@ -30,8 +30,10 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
         void *p;
         UINTVAL size;
-        interpreter->GC_block_level++;
-        interpreter->DOD_block_level++;
+        if (interpreter) {
+            interpreter->GC_block_level++;
+            interpreter->DOD_block_level++;
+        }
 
         /* Make the copy point to only the portion of the string that
          * we are actually using. */
@@ -43,8 +45,10 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         Parrot_allocate_string(interpreter, s, size);
         mem_sys_memcopy(s->bufstart, p, size);
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG);
-        interpreter->GC_block_level--;
-        interpreter->DOD_block_level--;
+        if (interpreter) {
+            interpreter->GC_block_level--;
+            interpreter->DOD_block_level--;
+        }
     }
 }
 
@@ -363,8 +367,6 @@ string_transcode(struct Parrot_Interp *interpreter,
          * encoding. So this seems to least bad compromise.
          */
     }
-    interpreter->GC_block_level++;
-    interpreter->DOD_block_level++;
 
     if (src->encoding == encoding && src->type == type) {
         dest = string_copy(interpreter, src);
@@ -372,15 +374,11 @@ string_transcode(struct Parrot_Interp *interpreter,
         if (dest_ptr) {
             *dest_ptr = dest;
         }
-        interpreter->GC_block_level--;
-        interpreter->DOD_block_level--;
         return dest;
     }
 
     dest = string_make(interpreter, NULL, src->strlen * encoding->max_bytes,
                        encoding, 0, type);
-    interpreter->GC_block_level--;
-    interpreter->DOD_block_level--;
 
     if (src->type != dest->type) {
         transcoder1 = chartype_lookup_transcoder(src->type, dest->type);
