@@ -306,7 +306,6 @@ languages/conversion/examples/test.bnf
 languages/conversion/test.pl
 languages/converter.pl
 languages/forth/forth.pasm
-languages/imcc/Makefile
 languages/imcc/README
 languages/imcc/anyop.c
 languages/imcc/anyop.h
