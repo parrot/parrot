@@ -260,7 +260,7 @@ event_thread(void *data)
             }
         } /* while events */
 again:
-
+        ;
     } /* forever */
     /*
      * not reached yet
