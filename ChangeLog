@@ -1,3 +1,6 @@
+2003-10-22    melvin
+        * imcc moved from parrot/languages/ to parrot/
+
 2003-09-20    sfink
 
 	* updated the native_pbc test files (from Leo)
