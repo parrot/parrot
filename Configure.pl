@@ -140,6 +140,7 @@ my(%c)=(
     test_prog     => 'test_parrot' . $Config{_exe},
     debugging     => $opt_debugging,
     rm_f          => 'rm -f',
+    rm_rf         => 'rm -rf',
     stacklow      => '(~0xfff)U',
     intlow        => '(~0xfff)U',
     numlow        => '(~0xfff)U',
@@ -446,6 +447,7 @@ buildfile("config_h", "include/parrot");
 
 buildfile("Makefile");
 buildfile("classes/Makefile");
+buildfile("docs/Makefile");
 buildfile("languages/Makefile");
 buildfile("languages/jako/Makefile");
 buildfile("languages/miniperl/Makefile");

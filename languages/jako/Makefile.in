@@ -10,6 +10,9 @@ ASM=perl -I ../../ ../../assemble.pl
 JAKOC=./jakoc
 INTERP=../../${test_prog}
 
+PERL = ${perl}
+RM_F = ${rm_f}
+
 .SUFFIXES: .jako .pasm .pbc
 
 .jako.pasm:
@@ -68,7 +71,7 @@ sub.pbc: sub.pasm
 #
 
 clean:
-	rm -f *.pasm *.list *.pbc
+	$(RM_F) *.pasm *.list *.pbc
 
 over:
 	@$(MAKE) clean

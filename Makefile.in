@@ -2,7 +2,7 @@ O = ${o}
 SO = .so
 A = .a
 RM_F = ${rm_f}
-RM_RF = ${rm_f} -r
+RM_RF = ${rm_rf}
 AR_CRS = ar crs
 
 INC=include/parrot

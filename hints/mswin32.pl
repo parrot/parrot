@@ -3,6 +3,7 @@
 	my $is_mingw = grep { $c{cc} eq $_ } ( qw(gcc gcc.exe) );
 
 	$c{rm_f} = '$(PERL) -MExtUtils::Command -e rm_f';
+	$c{rm_rf} = '$(PERL) -MExtUtils::Command -e rm_rf';
 
 	if( $is_msvc ) {
 		$c{o} = '.obj';

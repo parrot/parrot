@@ -10,6 +10,9 @@ ASM=./assemble.pl
 SCHEMEC=./schemec
 INTERP=./${test_prog}
 
+PERL = ${perl}
+RM_F = ${rm_f}
+
 #
 # Default target:
 #
@@ -56,7 +59,7 @@ foo.pbc: foo.pasm
 all: test.pbc and.pbc foo.pbc
 
 clean:
-	rm -f \
+	$(RM_F) \
 foo.pasm foo.pbc \
 t/*/*.pasm \
 t/*/*.pbc \
