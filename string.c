@@ -121,12 +121,12 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
             b = string_transcode(interpreter, b, a->encoding, a->type,
                                  NULL);
         }
+        unmake_COW(interpreter, a);
         /* make sure A's big enough for both */
         if (a->buflen < a->bufused + b->bufused) {
             a = string_grow(interpreter, a, ((a->bufused + b->bufused)
                             - a->buflen) + EXTRA_SIZE);
         }
-        unmake_COW(interpreter, a);
 
         /* Tack B on the end of A */
         mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),

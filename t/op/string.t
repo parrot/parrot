@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 90;
+use Parrot::Test tests => 91;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1338,6 +1338,22 @@ output_is( <<'CODE', <<OUTPUT, "COW with chopn leaving original untouched" );
 CODE
 ABC
 ABCD
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "Check that bug #16874 was fixed" );
+  set S0,  "foo     "
+  set S1,  "bar     "
+  set S2,  "quux    "
+  set S15, ""
+  concat S15, S0
+  concat S15, S1
+  concat S15, S2
+  print "["
+  print S15
+  print "]\n"
+  end
+CODE
+[foo     bar     quux    ]
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
