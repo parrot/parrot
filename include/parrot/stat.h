@@ -15,6 +15,8 @@
 
 #include "parrot/config.h"
 
+/* &gen_from_def(stat.pasm) */
+
 #define STAT_EXISTS     0
 #define STAT_FILESIZE   1
 #define STAT_ISDIR      2
@@ -26,6 +28,8 @@
 #define STAT_BACKUPTIME 8
 #define STAT_UID        9
 #define STAT_GID        10
+
+/* &end_gen */
 
 PMC *Parrot_stat_file(Parrot_Interp, STRING *);
 PMC *Parrot_stat_info_pmc(Parrot_Interp, STRING *, INTVAL);

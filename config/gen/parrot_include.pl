@@ -30,6 +30,7 @@ my @files = qw(
     include/parrot/longopt.h
     include/parrot/mmd.h
     include/parrot/resources.h
+    include/parrot/stat.h
     include/parrot/string.h
     include/parrot/vtable.h
     include/parrot/warnings.h
