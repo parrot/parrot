@@ -159,7 +159,7 @@
 
 
 #ifndef YYSTYPE
-#line 382 "imcc.y"
+#line 384 "imcc.y"
 typedef union {
     int t;
     char * s;
