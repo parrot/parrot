@@ -24,7 +24,7 @@ unicode_transcode_to(const char *to)
     return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;  /* NOTE: This cheat silences unused var warnings on gcc */
 }
 
-static Parrot_Bool
+static Parrot_Int
 unicode_is_digit(UINTVAL c)
 {
     return (INTVAL)(isdigit((int)c) ? 1 : 0);  /* FIXME - Other code points are also digits */

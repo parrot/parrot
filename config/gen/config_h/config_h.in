@@ -24,7 +24,6 @@ typedef ${iv}                   Parrot_Int;
 typedef unsigned ${iv}          Parrot_UInt;
 typedef ${nv}                   Parrot_Float;
 typedef ${opcode_t}             Parrot_Opcode;
-typedef unsigned char           Parrot_Bool;
 typedef void *                  Parrot_Pointer;
 typedef void *                  Parrot_Sync;
 

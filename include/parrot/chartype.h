@@ -27,7 +27,7 @@ struct parrot_chartype_t {
     const char *default_encoding;
     Parrot_CharType_Transcoder (*transcode_from)(const char *from);
     Parrot_CharType_Transcoder (*transcode_to)(const char *to);
-    Parrot_Bool (*is_digit)(Parrot_UInt c);
+    Parrot_Int (*is_digit)(Parrot_UInt c);
     Parrot_Int (*get_digit)(Parrot_UInt c);
 };
 

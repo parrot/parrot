@@ -50,7 +50,7 @@ usascii_transcode_to(const char *to)
     }
 }
 
-static Parrot_Bool
+static Parrot_Int
 usascii_is_digit(UINTVAL c)
 {
     return (INTVAL)(isdigit((int)c) ? 1 : 0);

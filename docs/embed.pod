@@ -77,8 +77,6 @@ in C<NULL>.
 
 =item C<Parrot_Opcode>
 
-=item C<Parrot_Bool>
-
 Various Parrot internal types; most are chosen at Configure time.
 
 =back
