@@ -8,7 +8,12 @@ typedef enum {
     UNK_CTX
 } context_type;
 
+/* As is, this is a definition, not just a declaration, and so it is created
+in all object files. This confuses some linkers (eg OS X)
+
 YYLTYPE noloc;
+
+*/
 
 typedef struct nodeType_t* (*node_opt_t)    (struct nodeType_t*);
 typedef struct nodeType_t* (*node_expand_t) (Interp*, struct nodeType_t*);
