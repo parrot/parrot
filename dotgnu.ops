@@ -110,7 +110,7 @@ inline op conv_i8(in PMC, in PMC) {
 }
 
 inline op conv_i8(in PMC, in NUM) {
-  $1->vtable->set_integer_native(interpreter, $1,$2);
+  $1->vtable->set_integer_native(interpreter, $1, (INTVAL)$2);
   goto NEXT();
 }
 
