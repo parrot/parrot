@@ -572,7 +572,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
     jit_emit_mov_ri_i(jit_info->native_ptr, r14, jit_info->arena.op_map);
-    jit_emit_mov_ri_i(jit_info->native_ptr, r15, interpreter->code->byte_code);
+    jit_emit_mov_rr(jit_info->native_ptr, r15, r4);
     /* TODO jit_emit restart code s. i386 */
 }
 
