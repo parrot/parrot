@@ -43,7 +43,7 @@ sub new
 # the literal for you to use in other compilations. But, string
 # literals are subject to interpolation, and so they go through
 # compilation in such a way that a string register value results
-# for use by further compilations. This register values is
+# for use by further compilations. This register value is
 # returned to the caller.
 #
 # Converts a single string argument:
