@@ -261,6 +261,7 @@ INTERP_O_FILES = \
     $(SRC)/rxstacks$(O) \
     $(SRC)/intlist$(O) \
     $(SRC)/list$(O) \
+    $(SRC)/global$(O) \
     $(SRC)/embed$(O) \
     $(SRC)/warnings$(O) \
     $(SRC)/packout$(O) \

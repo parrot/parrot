@@ -1752,6 +1752,7 @@ include/parrot/exec_save.h                        [devel]include
 include/parrot/exit.h                             [devel]include
 include/parrot/extend.h                           [devel]include
 include/parrot/global_setup.h                     [devel]include
+include/parrot/global.h                           [devel]include
 include/parrot/hash.h                             [devel]include
 include/parrot/headers.h                          [devel]include
 include/parrot/interp_guts.h                      [devel]include
@@ -1760,6 +1761,7 @@ include/parrot/intlist.h                          [devel]include
 include/parrot/io.h                               [devel]include
 include/parrot/jit.h                              [devel]include
 include/parrot/key.h                              [devel]include
+include/parrot/library.h                          [devel]include
 include/parrot/list.h                             [devel]include
 include/parrot/longopt.h                          [devel]include
 include/parrot/memory.h                           [devel]include
@@ -2548,6 +2550,7 @@ src/exec_start.c                                  []
 src/exit.c                                        []
 src/extend.c                                      []
 src/generic_register.c                            []
+src/global.c                                      []
 src/global_setup.c                                []
 src/hash.c                                        []
 src/headers.c                                     []
