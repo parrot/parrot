@@ -313,15 +313,23 @@ ISNULL:
     if exist, CALL_HELPER
 
     typeof type_str, dump
-    print "unknown-type(pmc #"
-    print ":"
+    print "PMC '"
     print type_str
-    print type
-    print ")"
+    print "' "
+    can I0, dump, "__dump"
+    if I0 goto CAN_DUMP
+    print "{ ... }"
     branch DONE
+CAN_DUMP:
+    # XXX method calling needs some work
+    P2 = dump
+    find_global cb, type_str, "__dump"
+    branch DO_CALL_HELPER
+    
 
 CALL_HELPER:
     cb = helper[type]
+DO_CALL_HELPER:
     .pcc_begin prototyped
     .arg name
     .arg indent
