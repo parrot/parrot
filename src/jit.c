@@ -486,6 +486,9 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 #ifdef ARM
     arm_sync_d_i_cache (jit_info.arena.start, jit_info.native_ptr);
 #endif
+#ifdef PPC
+    ppc_sync_cache (jit_info.arena.start, jit_info.native_ptr);
+#endif
     return (jit_f)jit_info.arena.start;
 }
 
