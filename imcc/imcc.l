@@ -42,11 +42,11 @@ EOL		\r?\n
         if (expect_pasm == 1) {
 	    expect_pasm = 2;
             BEGIN(emit);
-    }
+	}
 
 <INITIAL,emit>{EOL} {
         if (expect_pasm == 2)
-        BEGIN(INITIAL);
+	  BEGIN(INITIAL);
         expect_pasm = 0;
         line++;
         return '\n';
@@ -54,7 +54,7 @@ EOL		\r?\n
 
 <INITIAL,emit>#.*{EOL} {
         if (expect_pasm == 2)
-        BEGIN(INITIAL);
+	  BEGIN(INITIAL);
         expect_pasm = 0;
         line++;
         return '\n';
@@ -67,7 +67,7 @@ EOL		\r?\n
     }
 
 <emit>^".eom"\n {
-        BEGIN(INITIAL);
+	BEGIN(INITIAL);
 	return EOM;
     }
 
@@ -109,6 +109,9 @@ EOL		\r?\n
 "restoreall"    return(RESTOREALL);
 "<<"            return(SHIFT_LEFT);
 ">>"            return(SHIFT_RIGHT);
+">>>"           return(SHIFT_RIGHT_U);
+"&&"            return(LOG_AND);
+"||"            return(LOG_OR);
 "~~"            return(LOG_XOR);
 "<"             return(RELOP_LT);
 "<="            return(RELOP_LTE);
@@ -189,7 +192,7 @@ EOL		\r?\n
 
 <emit,INITIAL>[\t\f\r ]+        ;
 <emit,INITIAL>.     {
-        return yytext[0];
+       return yytext[0];
     }
 
 %%

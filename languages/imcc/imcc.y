@@ -349,7 +349,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 %token <t> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBAL ADDR CLONE RESULT RETURN POW
+%token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -490,6 +490,7 @@ assignment:
        target '=' var			{ $$ = MK_I("set", R2($1, $3)); }
     |  target '=' '!' var		{ $$ = MK_I("not", R2($1, $4));}
     |  target '=' '-' var		{ $$ = MK_I("neg", R2($1, $4));}
+    |  target '=' '~' var		{ $$ = MK_I("bnot", R2($1, $4));}
     |  target '=' var '+' var		{ $$ = MK_I("add", R3($1, $3, $5)); }
     |  target '=' var '-' var		{ $$ = MK_I("sub", R3($1, $3, $5)); }
     |  target '=' var '*' var		{ $$ = MK_I("mul", R3($1, $3, $5)); }
@@ -499,6 +500,9 @@ assignment:
     |  target '=' var '.' var		{ $$ = MK_I("concat", R3($1,$3,$5)); }
     |  target '=' var SHIFT_LEFT var	{ $$ = MK_I("shl", R3($1, $3, $5)); }
     |  target '=' var SHIFT_RIGHT var	{ $$ = MK_I("shr", R3($1, $3, $5)); }
+    |  target '=' var SHIFT_RIGHT_U var	{ $$ = MK_I("lsr", R3($1, $3, $5)); }
+    |  target '=' var LOG_AND var	{ $$ = MK_I("and", R3($1, $3, $5)); }
+    |  target '=' var LOG_OR var	{ $$ = MK_I("or", R3($1, $3, $5)); }
     |  target '=' var LOG_XOR var	{ $$ = MK_I("xor", R3($1, $3, $5)); }
     |  target '=' var '&' var		{ $$ = MK_I("band", R3($1, $3, $5)); }
     |  target '=' var '|' var		{ $$ = MK_I("bor", R3($1, $3, $5)); }
