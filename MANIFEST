@@ -1843,11 +1843,13 @@ imcc/t/syn/scope.t                                []
 imcc/unit.h                                       []
 include/parrot/autoprefix.h			  [devel]include
 include/parrot/caches.h                           [devel]include
+include/parrot/charset.h			  [devel]include
 include/parrot/datatypes.h                        [devel]include
 include/parrot/debug.h                            [devel]include
 include/parrot/dod.h                              [devel]include
 include/parrot/dynext.h                           [devel]include
 include/parrot/embed.h                            [devel]include
+include/parrot/encoding.h			  [devel]include
 include/parrot/enums.h                            [devel]include
 include/parrot/events.h                           [devel]include
 include/parrot/exceptions.h                       [devel]include
