@@ -1009,8 +1009,12 @@ sub body
         return $self->SUPER::body($self->{methods}[$n]);
     }
     my $decl = $self->decl($self->{class}, $method, 0);
+    my $ret = "";
+    if ($method->{type} ne 'void') {
+        # This cheats, assuming that all return types can be cast from zero.
+        $ret = "return ($method->{type})";
+    }
     my $l = "";
-    my $ret = gen_ret($method);
     unless ($self->{opt}{nolines}) {
         $l = <<"EOC";
 #line $line "default.c"
@@ -1019,8 +1023,7 @@ EOC
     return <<EOC;
 $l
 ${decl} {
-	cant_do_method(interpreter, pmc, "$meth");
-        $ret
+	${ret}cant_do_method(interpreter, pmc, "$meth");
 }
 
 EOC
