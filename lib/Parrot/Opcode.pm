@@ -2,10 +2,14 @@ package Parrot::Opcode;
 
 use strict;
 use Symbol;
+use Parrot::Config;
 
 my %opcode;
 my $fingerprint;
 my $revision;
+
+my $nvivsize;
+$nvivsize = $PConfig{nvsize}/$PConfig{ivsize};
 
 sub _load {
     my $file = @_ ? shift : "opcode_table";
@@ -42,7 +46,7 @@ sub _load {
 
 	my $num_i = () = grep {/i/} @params;
 	my $num_n = () = grep {/n/} @params;
-	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * 2;
+	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * $nvivsize;
     }
 }
 
@@ -145,7 +149,7 @@ sub read_ops {
 
 	my $num_i = () = grep {/i/} @params;
 	my $num_n = () = grep {/n/} @params;
-	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * 2;
+	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * $nvivsize;
     }
 
     return %opcode;

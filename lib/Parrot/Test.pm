@@ -4,6 +4,7 @@ package Parrot::Test;
 
 use strict;
 use vars qw(@EXPORT @ISA);
+use Parrot::Config;
 
 require Exporter;
 require Test::More;
@@ -57,7 +58,7 @@ foreach my $i ( qw(is isnt like) ) {
     print ASSEMBLY $assembly;
     close ASSEMBLY;
 
-    _run_command( "perl assemble.pl $as_f --output $by_f" );
+    _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
     _run_command( "./test_prog $by_f", 'STDOUT' => $out_f );
 
     my $prog_output;
