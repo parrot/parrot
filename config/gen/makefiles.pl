@@ -43,9 +43,9 @@ sub runstep {
 
   # set up docs/Makefile, partly based on the .ops in the root dir
 
-  opendir ROOT, "." or die "opendir .: $!";
-  my @ops = sort grep { -f $_ and /\.ops$/ } readdir ROOT;
-  closedir ROOT;
+  opendir OPS, "ops" or die "opendir ops: $!";
+  my @ops = sort grep { /\.ops$/ } readdir OPS;
+  closedir OPS;
 
   my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
 
@@ -62,8 +62,8 @@ sub runstep {
       my $pod = $ops;
       $pod =~ s/\.ops$/.pod/;
       print MAKEFILE <<"EOM";
-ops/$pod: ../$ops
-	perldoc -u ../$ops > ops/$pod
+ops/$pod: ../ops/$ops
+	perldoc -u ../ops/$ops > ops/$pod
 EOM
   }
 
