@@ -1,0 +1,21 @@
+DESCRIPTION
+
+This is a Brainfuck interpreter for Parrot. Brainfuck is a full
+computer programming language with only eight commands. For more
+information, see http://www.catseye.mb.ca/esoteric/bf/
+
+To compile the files:
+
+  $ make
+
+To check that the compiler is working:
+
+  $ make test
+
+To run an example Brainfuck program:
+
+  $ ../../parrot brainfuck.pbc helloworld.bf
+
+AUTHOR
+
+Leon Brocard <acme@astray.com>
