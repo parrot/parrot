@@ -37,7 +37,7 @@ Parrot_new_vtable(Parrot_Interp interpreter) {
 /*
 
 =item C<VTABLE *
-Parrot_clone_vtable(Parrot_Interp interpreter, VTABLE *base_vtable)>
+Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable)>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -46,7 +46,7 @@ Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 */
 
 VTABLE *
-Parrot_clone_vtable(Parrot_Interp interpreter, VTABLE *base_vtable) {
+Parrot_clone_vtable(Parrot_Interp interpreter, const VTABLE *base_vtable) {
     VTABLE *new_vtable = mem_sys_allocate(sizeof(VTABLE));
     if (new_vtable) {
         memcpy(new_vtable, base_vtable, sizeof(VTABLE));

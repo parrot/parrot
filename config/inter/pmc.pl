@@ -114,6 +114,7 @@ END
 
   # names of class files for classes/Makefile
   (my $TEMP_pmc_o = $pmc_list) =~ s/\.pmc/\$(O)/g;
+  (my $TEMP_pmc_str = $pmc_list) =~ s/\.pmc/\.str/g;
 
   # calls to pmc2c.pl for classes/Makefile
   my $TEMP_pmc_build = <<"E_NOTE";
@@ -145,7 +146,7 @@ classes/$pmc.c classes/pmc_$pmc.h: \\
 classes/pmc_$pmc.h: classes/$pmc.pmc
 	\$(PMC2CC) classes/$pmc.pmc
 
-classes/$pmc\$(O): \$(NONGEN_HEADERS) \\
+classes/$pmc\$(O): classes/$pmc.str \$(NONGEN_HEADERS) \\
         $parent_headers
 
 END
@@ -155,6 +156,7 @@ END
   # build list of libraries for link line in Makefile
   my $slash = Configure::Data->get('slash');
   (my $TEMP_pmc_classes_o   = $TEMP_pmc_o   ) =~ s/^| / classes${slash}/g;
+  (my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / classes${slash}/g;
   (my $TEMP_pmc_classes_pmc = $pmc_list) =~ s/^| / classes${slash}/g;
 
   # Gather the actual names (with MixedCase) of all of the
@@ -191,6 +193,7 @@ END
     TEMP_pmc_o           => $TEMP_pmc_o,
     TEMP_pmc_build       => $TEMP_pmc_build,
     TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,
+    TEMP_pmc_classes_str => $TEMP_pmc_classes_str,
     TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
   );
 }

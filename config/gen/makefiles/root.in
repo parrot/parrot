@@ -279,6 +279,8 @@ CLASS_PMC_FILES = ${TEMP_pmc_classes_pmc}
 
 CLASS_O_FILES = ${TEMP_pmc_classes_o}
 
+CLASS_STR_FILES = ${TEMP_pmc_classes_str}
+
 ENCODING_O_FILES = \
     encodings/utf8$(O)
 
@@ -478,7 +480,7 @@ STR_FILES = \
     $(SRC)/pmc.str \
     $(SRC)/py_func.str \
     $(SRC)/objects.str \
-    classes/delegate.str
+    $(CLASS_STR_FILES)
 
 $(INC)/string_private_cstring.h : $(STR_FILES) build_tools/c2str.pl
 	$(PERL) build_tools/c2str.pl --all

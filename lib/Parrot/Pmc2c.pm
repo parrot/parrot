@@ -378,6 +378,12 @@ sub includes() {
 #include "pmc_$name.h"
 EOC
     }
+    if (!$self->{flags}{dynpmc}) {
+	    my $name = lc $self->{class};
+	    $cout .= <<"EOC";
+#include "$name.str"
+EOC
+    }
     "$cout\n";
 }
 
@@ -714,7 +720,7 @@ sub init_func() {
 void
 Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 {
-    struct _vtable temp_base_vtable = {
+    const struct _vtable temp_base_vtable = {
         NULL,	/* package */
         $enum_name,	/* base_type */
         NULL,	/* whoami */
@@ -728,7 +734,7 @@ EOC
 
     $cout .= <<"EOC";
 
-    MMD_init _temp_mmd_init[] = {
+    const MMD_init _temp_mmd_init[] = {
         $mmd_list
     };
     /*  Dynamic classes need the runtime type
@@ -740,13 +746,6 @@ EOC
         next if $dynclass eq $classname;
         $cout .= <<"EOC";
     int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
-EOC
-    }
-    # init vtable slot
-    if ($self->{flags}{dynpmc}) {
-        $cout .= <<"EOC";
-
-    temp_base_vtable.base_type = entry;
 EOC
     }
     # init MMD "right" slots with the dynpmc types
@@ -772,29 +771,39 @@ EOC
     $cout .= <<"EOC";
     if (pass == 0) {
 EOC
-    # init vtable slot
-    if ($self->{flags}{dynpmc}) {
-        $cout .= <<"EOC";
-        temp_base_vtable.base_type = entry;
-EOC
-    }
     $cout .= <<"EOC";
         /*
          * Parrot_base_vtables is a true global - register just once
          */
         if (!Parrot_base_vtables[entry]) {
-            temp_base_vtable.whoami = string_make(interp,
+            struct _vtable *vt_clone =
+                Parrot_clone_vtable(interp, &temp_base_vtable);
+
+EOC
+    # init vtable slot
+    if ($self->{flags}{dynpmc}) {
+        $cout .= <<"EOC";
+            vt_clone->base_type = entry;
+            vt_clone->whoami = string_make(interp,
                 "$classname", @{[length($classname)]}, "iso-8859-1",
                 PObj_constant_FLAG|PObj_external_FLAG);
-            temp_base_vtable.isa_str = string_make(interp,
+            vt_clone->isa_str = string_make(interp,
                 "$isa", @{[length($isa)]}, "iso-8859-1",
                 PObj_constant_FLAG|PObj_external_FLAG);
-            temp_base_vtable.does_str = string_make(interp,
+            vt_clone->does_str = string_make(interp,
                 "$does", @{[length($does)]}, "iso-8859-1",
                 PObj_constant_FLAG|PObj_external_FLAG);
-
-            Parrot_base_vtables[entry] =
-                Parrot_clone_vtable(interp, &temp_base_vtable);
+EOC
+    }
+    else {
+        $cout .= <<"EOC";
+            vt_clone->whoami = CONST_STRING(interp, "$classname");
+            vt_clone->isa_str = CONST_STRING(interp, "$isa");
+            vt_clone->does_str = CONST_STRING(interp, "$does");
+EOC
+    }
+    $cout .= <<"EOC";
+            Parrot_base_vtables[entry] = vt_clone;
         }
 EOC
     $cout .= <<"EOC";
