@@ -21,12 +21,14 @@ void imc_check_units(struct Parrot_Interp *interp, char * caller);
  */
 void imc_check_units(struct Parrot_Interp *interp, char * caller)
 {
+#if IMC_TRACE
+    IMC_Unit * unit, *unit_next;
+    static int ncheck;
+    int i = 1;
+#endif
     UNUSED(interp);
     UNUSED(caller);
 #if IMC_TRACE
-    IMC_Unit * unit, *unit_next;
-    int i = 1;
-    static int ncheck;
     fprintf(stderr, "imc.c: unit check pass %d from %s\n", ++ncheck, caller);
     for(unit = interp->imc_info->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
