@@ -191,8 +191,8 @@ string_transcode(struct Parrot_Interp *interpreter,
     STRING *dest;
     CHARTYPE_TRANSCODER transcoder1 = (CHARTYPE_TRANSCODER)NULLfunc;
     CHARTYPE_TRANSCODER transcoder2 = (CHARTYPE_TRANSCODER)NULLfunc;
-    char *srcstart;
-    char *srcend;
+    const char *srcstart;
+    const char *srcend;
     char *deststart;
     char *destend;
 
@@ -384,11 +384,11 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
         true_length = (UINTVAL)(src->strlen - true_offset);
     }
 
-    substart_off = (char *)src->encoding->skip_forward(src->bufstart,
+    substart_off = (const char *)src->encoding->skip_forward(src->bufstart,
                                                        true_offset) -
         (char *)src->bufstart;
     subend_off =
-        (char *)src->encoding->skip_forward((char *)src->bufstart +
+        (const char *)src->encoding->skip_forward((char *)src->bufstart +
                                             substart_off,
                                             true_length) -
         (char *)src->bufstart;
@@ -539,8 +539,8 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 STRING *
 string_chopn(STRING *s, INTVAL n)
 {
-    char *bufstart = s->bufstart;
-    char *bufend = bufstart + s->bufused;
+    const char *bufstart = s->bufstart;
+    const char *bufend = bufstart + s->bufused;
     UINTVAL true_n;
 
     true_n = (UINTVAL)n;
@@ -566,10 +566,10 @@ INTVAL
 string_compare(struct Parrot_Interp *interpreter, const STRING *s1,
                const STRING *s2)
 {
-    char *s1start;
-    char *s1end;
-    char *s2start;
-    char *s2end;
+    const char *s1start;
+    const char *s1end;
+    const char *s2start;
+    const char *s2end;
     INTVAL cmp = 0;
 
     if (s1 && !s2) {
@@ -655,8 +655,8 @@ string_to_int(const STRING *s)
     INTVAL i = 0;
 
     if (s) {
-        char *start = s->bufstart;
-        char *end = start + s->bufused;
+        const char *start = s->bufstart;
+        const char *end = start + s->bufused;
         int sign = 1;
         BOOLVAL in_number = 0;
 
@@ -695,8 +695,8 @@ string_to_num(const STRING *s)
     FLOATVAL f = 0.0;
 
     if (s) {
-        char *start = s->bufstart;
-        char *end = start + s->bufused;
+        const char *start = s->bufstart;
+        const char *end = start + s->bufused;
         int sign = 1;
         BOOLVAL seen_dot = 0;
         BOOLVAL seen_e = 0;

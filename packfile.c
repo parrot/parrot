@@ -125,8 +125,8 @@ PackFile_check_segment_size(opcode_t segment_size, const char *debug)
 
     if (segment_size % sizeof(opcode_t)) {
         fprintf(stderr,
-                "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %i)!\n",
-                debug, segment_size, sizeof(opcode_t));
+                "PackFile_unpack: Illegal %s table segment size %ld (must be multiple of %ld)!\n",
+                debug, segment_size, (long)sizeof(opcode_t));
         return 0;
     }
     return 1;

@@ -28,6 +28,7 @@ chartype_lookup(const char *name)
     }
     else {
         internal_exception(INVALID_CHARTYPE, "Invalid chartype '%s'\n", name);
+        return NULL;
     }
 }
 

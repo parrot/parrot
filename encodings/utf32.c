@@ -48,18 +48,18 @@ utf32_encode(void *ptr, UINTVAL c)
     return u32ptr + 1;
 }
 
-static void *
+static const void *
 utf32_skip_forward(const void *ptr, UINTVAL n)
 {
-    utf32_t *u32ptr = (utf32_t *)ptr;
+    const utf32_t *u32ptr = (const utf32_t *)ptr;
 
     return u32ptr + n;
 }
 
-static void *
+static const void *
 utf32_skip_backward(const void *ptr, UINTVAL n)
 {
-    utf32_t *u32ptr = (utf32_t *)ptr;
+    const utf32_t *u32ptr = (const utf32_t *)ptr;
 
     return u32ptr - n;
 }

@@ -107,10 +107,10 @@ utf8_encode(void *ptr, UINTVAL c)
     return u8ptr + len;
 }
 
-static void *
+static const void *
 utf8_skip_forward(const void *ptr, UINTVAL n)
 {
-    utf8_t *u8ptr = (utf8_t *)ptr;
+    const utf8_t *u8ptr = (const utf8_t *)ptr;
 
     while (n-- > 0) {
         u8ptr += UTF8SKIP(u8ptr);
@@ -119,10 +119,10 @@ utf8_skip_forward(const void *ptr, UINTVAL n)
     return u8ptr;
 }
 
-static void *
+static const void *
 utf8_skip_backward(const void *ptr, UINTVAL n)
 {
-    utf8_t *u8ptr = (utf8_t *)ptr;
+    const utf8_t *u8ptr = (const utf8_t *)ptr;
 
     while (n-- > 0) {
         u8ptr--;

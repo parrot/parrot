@@ -43,18 +43,18 @@ singlebyte_encode(void *ptr, UINTVAL c)
     return bptr + 1;
 }
 
-static void *
+static const void *
 singlebyte_skip_forward(const void *ptr, UINTVAL n)
 {
-    byte_t *bptr = (byte_t *)ptr;
+    const byte_t *bptr = (const byte_t *)ptr;
 
     return bptr + n;
 }
 
-static void *
+static const void *
 singlebyte_skip_backward(const void *ptr, UINTVAL n)
 {
-    byte_t *bptr = (byte_t *)ptr;
+    const byte_t *bptr = (const byte_t *)ptr;
 
     return bptr - n;
 }
