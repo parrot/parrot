@@ -15,13 +15,13 @@ var int i =  0;
 var int f =  1;
 
 print("Algorithm F1 (The factorial function)\n");
-print("    Calculating fact(", n, ") = ...\n");
+print("    Calculating fact($n) = ...\n");
 
 while(i <= n) {
   i++;
   f *= i;
 }
 
-print("    ... = ", f, "\n");
+print("    ... = $f\n");
 
 end;

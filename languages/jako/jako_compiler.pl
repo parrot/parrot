@@ -416,6 +416,32 @@ sub do_shift
 
 
 #
+# interpolate_string()
+#
+# Converts a single string argument:
+#
+#     "Foo $a ${b}ar\n"
+#
+# to multiple arguments:
+#
+#     "Foo ", a, " ", b, "ar ", b, "\n"
+#
+# to effect string interpolation.
+#
+
+sub interpolate_string
+{
+  my ($string) = @_;
+
+  return $string unless $string =~ m/[^\\]\$/;
+
+  $string =~ s/([^\\])\$((([A-Za-z][A-Za-z0-9_]*)\b)|({[A-Za-z][A-Za-z0=9_]*}))/$1", $2, "/g;
+
+  return parse_args($string);
+}
+
+
+#
 # parse_args()
 #
 
@@ -428,8 +454,8 @@ sub parse_args
     $args =~ s/^\s+//;
 
     if ($args =~ m/^(\"[^\\\"]*(?:\\.[^\\\"]*)*\")\s*(,\s*(.*))?$/) {
-      push @args, $1;
       $args = $3 || '';
+      push @args, interpolate_string($1);
     } elsif ($args =~ m/^([^,]+)\s*(,\s*(.*))?$/) {
       push @args, $1;
       $args = $3 || '';

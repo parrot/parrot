@@ -21,7 +21,7 @@ var int zero =  0;
 var int r;
 
 print("Algorithm E (Euclid's algorithm)\n");
-print("  Calculating gcd(", m, ", ", n, ") = ...\n");
+print("  Calculating gcd($m, $n) = ...\n");
 
 r = mod(m, n);
 while (r != zero) {
@@ -30,7 +30,7 @@ while (r != zero) {
   r = mod(m, n);
 } 
 
-print("  ... = ", n, "\n");
+print("  ... = $n\n");
 
 end;    
 

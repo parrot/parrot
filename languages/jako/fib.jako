@@ -15,7 +15,7 @@ var int f =  1;
 var int i =  3;
 
 print("Algorithm F2 (Fibonacci's function)\n");
-print("  Calculating fib(", n, ") = ...\n");
+print("  Calculating fib($n) = ...\n");
 
 while (i <= n) {
   f = a + b;
@@ -24,7 +24,7 @@ while (i <= n) {
   i++;
 }
 
-print("  ... = ", f, "\n");
+print("  ... = $f\n");
 
 end;
 
