@@ -72,7 +72,7 @@ So let's get ourselves a copy of Parrot, so that we can start
 investigating how to program in the Parrot assembler.
 
 Periodic, numbered releases will appear on CPAN (we're currently on
-version 0.0.3), but at this stage of the project an awful lot is
+version 0.0.10), but at this stage of the project an awful lot is
 changing between releases. To really keep up to date with Parrot,
 we should get our copy from the CVS repository. Here's how we do that:
 
@@ -102,12 +102,13 @@ Now we have downloaded Parrot, we need to build it; so:
  Perl 5--I'll be pulling some defaults from its configuration.
  ...
 
-
-You'll then be asked a series of questions about your local
-configuration; you can almost always hit return for each one. Finally,
-you'll be told to type C<make>; with any luck, Parrot will
-successfully build the test interpreter. (If it doesn't, the address to
-complain to is at the end of this introduction...)
+The Configure script will then attempt to discover your local
+configuration automatically; you can supply the --ask switch if
+you wish to configure the build manually. Once Configure has
+finished successfully, type C<make> (or the name of your local C<make>
+program). With any luck, Parrot will successfully build the test 
+interpreter. (If it doesn't, the address to complain to is at the
+end of this introduction...)
 
 =head2 The test suite
 
