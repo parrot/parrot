@@ -368,8 +368,11 @@ languages/regex/t/a.t
 languages/regex/t/alt.t
 languages/regex/t/example.t
 languages/regex/t/group.t
+languages/regex/t/literal.t
 languages/regex/t/ngplus.t
+languages/regex/t/optional.t
 languages/regex/t/plus.t
+languages/regex/t/quantindex.t
 languages/regex/t/regress1.t
 languages/regex/t/scanalt.t
 languages/regex/t/scanstar.t

@@ -51,6 +51,23 @@ sub rewrite_group {
     return ($R_back, @ops);
 }
 
+sub rewrite_match {
+    my ($self, $char, $lastback) = @_;
+
+    my $back = $self->mark('undo_match');
+    my $next = $self->mark('after_match');
+
+    return ($back,
+            aop('check', [ 1, $lastback ]),
+            aop('match', [ $char, $lastback ]),
+            aop('increment', [ 1, $lastback ]),
+            aop('goto', [ $next ]),
+   $back => aop('increment', [ -1, $lastback ]),
+            aop('goto', [ $lastback ]),
+   $next =>
+            );
+}
+
 sub rewrite_other {
     my ($self, $op, $lastback) = @_;
     return aop($op->{name}, [ @{ $op->{args} }, $lastback ]);

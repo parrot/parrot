@@ -148,7 +148,7 @@ sub rewrite_greedy_optional {
     my ($R_back, @R_ops) = $self->rewrite($R, $next);
 
     my @ops = (
-                        aop_pushmark("?"),
+                        aop('pushmark', [ "?" ]),
                         @R_ops,
                         aop('pushindex'),
                         aop('goto', [ $next ]),

@@ -30,6 +30,8 @@ use vars qw(@AsmOps @EXPORT);
     [ "terminate()" ],
     [ "atend()" => "return whether at end of input string" ],
     [ "advance(n)" => "advance input <n> chars" ],
+    [ "increment(n)" => "advance input <n> chars" ],
+    [ "check(n)" => "require at least <n> chars remaining" ],
     [ "onfail(R)" ],
     [ "match(b)" => "return if start of input is b, advance 1 char" ],
     [ "classmatch(charclass)" => "return if start of input is charclass, advance 1" ],
@@ -58,13 +60,6 @@ use vars qw(@AsmOps @EXPORT);
     [ "match_succeeded()" ],
     [ "match_failed()" ],
   );
-
-foreach (@AsmOps) {
-    my ($proto, $desc) = @$_;
-    my ($name) = $proto =~ /^(\w+)/;
-    eval "sub aop_$name { bless Regex::Grammar::register(\"$name\", \@_), 'asm_op' }";
-    push @EXPORT, "\&aop_$name";
-}
 
 sub op {
     my ($class, $name, $args, %opts) = @_;

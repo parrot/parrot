@@ -5,19 +5,22 @@ use strict;
 
 my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
+my $R_POS = "I1";
+my $R_LEN = "I2";
+
 sub output_preamble {
     my $self = shift;
 
     return ('new P0, .PerlArray',
             'new P1, .PerlArray',
-            'set I1, 0',
-            'length I2, S0',
+            "set $R_POS, 0",
+            "length $R_LEN, S0",
             'set P0[0], 0');
 }
 
 sub output_match_succeeded {
     return ('set I0, 1',
-            'set P1[0], I1');
+            "set P1[0], $R_POS");
 }
 
 sub output_match_failed {
@@ -30,31 +33,57 @@ sub output_match_failed {
 sub output_advance {
     my ($self, $distance, $failLabel) = @_;
     $failLabel = $self->output_label_use($failLabel);
-    return ("add I1, I1, $distance # pos++",
-            "ge I1, I2, $failLabel # past end of input?",
-            "set P0[0], I1 # group 0 start := pos");
+    return ("add $R_POS, $distance # pos++",
+            "ge $R_POS, $R_LEN, $failLabel # past end of input?",
+            "set P0[0], $R_POS # group 0 start := pos");
 }
 
-# SLOW! Most of the time we probably don't need to check for end of string
+sub output_increment {
+    my ($self, $distance, $failLabel) = @_;
+    return () if $distance == 0;
+
+    my $comment;
+    if ($distance == 1) {
+        $comment = "pos++";
+    } elsif ($distance == -1) {
+        $comment = "pos--";
+    } elsif ($distance > 0) {
+        $comment = "pos += $distance";
+    } elsif ($distance < 0) {
+        $comment = "pos -= ".(-$distance);
+    }
+
+    return "add $R_POS, $distance # $comment";
+}
+
+sub output_check {
+    my ($self, $needed, $failLabel) = @_;
+    my $fail = $self->output_label_use($failLabel);
+    if ($needed == 1) {
+        return "ge $R_POS, $R_LEN, $fail # need $needed more chars";
+    } else {
+        return "sub I0, $R_LEN, $R_POS # need $needed more chars",
+               "le I0, ".($needed+1).", $fail";
+    }
+}
+
 sub output_match {
     my ($self, $code, $failLabel) = @_;
     my $comment = Regex::Ops::Tree::isplain($code) ? " # match '".chr($code)."'" : "";
     return (
-            "ge I1, I2, ".$self->output_label_use($failLabel)." # is there anything left?",
-            "ord I0, S0, I1 # I0 := S0[pos]",
+            "ord I0, S0, $R_POS # I0 := S0[pos]",
             "ne I0, $code, ".$self->output_label_use($failLabel).$comment,
-            "add I1, I1, 1 # pos++"
            );
 }
 
 sub output_start {
     my ($self, $n) = @_;
-    return "set P0[$n], I1 # open group $n";
+    return "set P0[$n], $R_POS # open group $n";
 }
 
 sub output_end {
     my ($self, $n) = @_;
-    return "set P1[$n], I1 # close group $n";
+    return "set P1[$n], $R_POS # close group $n";
 }
 
 sub output_delete {
@@ -64,7 +93,8 @@ sub output_delete {
 
 sub output_atend {
     my ($self, $failLabel) = @_;
-    return ("le I0, I2, ".$self->output_label_use($failLabel)." # at end?");
+    my $fail = $self->output_label_use($failLabel);
+    return ("le I0, $R_LEN, $fail # at end?");
 }
 
 sub output_pushmark {
@@ -85,9 +115,9 @@ sub output_pushmark {
 sub output_pushindex {
     my ($self) = @_;
     if ($self->{DEBUG}) {
-	return ("save I1", 'print "PUSHED: "', 'bsr DUMPSTACK');
+	return ("save $R_POS", 'print "PUSHED: "', 'bsr DUMPSTACK');
     } else {
-	return "save I1 # pushindex";
+	return "save $R_POS # pushindex";
     }
 }
 
@@ -109,14 +139,14 @@ sub output_popindex {
 		"branch ".$self->output_label_use($fallback),
 		$self->output_label_def($index_popped),
 		"restore I0",
-		"set I1, I0",
+		"set $R_POS, I0",
 		"bsr DUMPSTRING",
 		"print \"  \"",
 		"bsr DUMPSTACK");
     } else {
 	return ("restore I0 # popindex",
 		"eq I0, -1, ".$self->output_label_use($fallback)." # was a mark?",
-		"set I1, I0 # nope, set pos := popped index");
+		"set $R_POS, I0 # nope, set pos := popped index");
     }
 }
 
