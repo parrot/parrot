@@ -370,13 +370,10 @@ Returns the capacity of the specified Parrot string.
 UINTVAL
 string_capacity(Interp *interpreter, STRING *s)
 {
-    if (s->encoding) {
+    saneify_string(s);
     return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
-                (ptrcast_t)s->strstart) / ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s);
-    } else {
-        return ((ptrcast_t)PObj_bufstart(s) + PObj_buflen(s) -
-                (ptrcast_t)s->strstart);
-    }
+            (ptrcast_t)s->strstart) /
+        ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s);
 }
 
 /*
@@ -428,12 +425,13 @@ STRING *
 string_append(Interp *interpreter,
     STRING *a, STRING *b, UINTVAL Uflags)
 {
-    UINTVAL a_capacity;
+    UINTVAL a_capacity, b_len;
     UINTVAL total_length;
     UNUSED(Uflags);
 
     /* If B isn't real, we just bail */
-    if (b == NULL || b->strlen == 0) {
+    b_len = string_length(interpreter, b);
+    if (!b_len) {
         return a;
     }
 
@@ -444,10 +442,6 @@ string_append(Interp *interpreter,
     saneify_string(a);
     saneify_string(b);
 
-    a_capacity = string_capacity(interpreter, a);
-    total_length = string_length(interpreter, a) +
-        string_length(interpreter, b);
-
     /* If the destination's constant, then just fall back to
        string_concat */
     if (PObj_constant_TEST(a)) {
@@ -455,33 +449,37 @@ string_append(Interp *interpreter,
     }
 
     a_capacity = string_capacity(interpreter, a);
-    total_length = string_length(interpreter, a)
-        + string_length(interpreter, b);
+    total_length = string_length(interpreter, a) + b_len;
 
-        /* make sure A's big enough for both */
-        if (a_capacity < total_length)
-        {
-            a = string_grow(interpreter, a,
-                    (total_length - a_capacity) + EXTRA_SIZE);
-        }
-        else {
-            Parrot_unmake_COW(interpreter, a);
-        }
+    /* make sure A's big enough for both */
+    if (a_capacity < total_length)
+    {
+        a = string_grow(interpreter, a,
+                (total_length - a_capacity) + EXTRA_SIZE);
+    }
+    else {
+        Parrot_unmake_COW(interpreter, a);
+    }
 
-        /* A is now ready to receive the contents of B */
+    /* A is now ready to receive the contents of B */
 
-        /* if same rep, can memcopy */
+    /* if same rep, can memcopy */
     if (a->encoding == b->encoding && a->charset == b->charset) {
-            /* Tack B on the end of A */
-            mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
-                    b->strstart, b->bufused);
+        /* Tack B on the end of A */
+        mem_sys_memcopy((void *)((ptrcast_t)a->strstart + a->bufused),
+                b->strstart, b->bufused);
 
-            a->bufused += b->bufused;
-            a->strlen += b->strlen;
-            return a;
-        }
-        else {
-        internal_exception(UNIMPLEMENTED, "Cross-type string appending (%s/%s) (%s/%s) unsupported", ((ENCODING *)(a->encoding))->name, ((CHARSET *)(a->charset))->name, ((ENCODING *)(b->encoding))->name, ((CHARSET *)(b->charset))->name);
+        a->bufused += b->bufused;
+        a->strlen += b_len;
+        return a;
+    }
+    else {
+        internal_exception(UNIMPLEMENTED,
+                "Cross-type string appending (%s/%s) (%s/%s) unsupported",
+                ((ENCODING *)(a->encoding))->name,
+                ((CHARSET *)(a->charset))->name,
+                ((ENCODING *)(b->encoding))->name,
+                ((CHARSET *)(b->charset))->name);
     }
 
     return a;
@@ -530,7 +528,8 @@ string_from_const_cstring(Interp *interpreter,
 {
     return string_make_direct(interpreter, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
-                              PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0); /* make this utf-8 eventually? */
+                          PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+    /* make this utf-8 eventually? */
 }
 
 /*
@@ -629,13 +628,16 @@ string_make(Interp *interpreter, const void *buffer,
     else {
         internal_exception(UNIMPLEMENTED, "Can't make non-iso-8859-1 strings");
     }
-    return string_make_direct(interpreter, buffer, len, encoding, charset, flags);
+    return string_make_direct(interpreter, buffer, len,
+            encoding, charset, flags);
 
 }
 
 STRING *
-string_make_direct(Interp *interpreter, const void *buffer, UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags) {
-    STRING *s = NULL;
+string_make_direct(Interp *interpreter, const void *buffer,
+        UINTVAL len, ENCODING *encoding, CHARSET *charset, UINTVAL flags)
+{
+    STRING *s;
     union {
         const void * __c_ptr;
         void * __ptr;
@@ -646,43 +648,43 @@ string_make_direct(Interp *interpreter, const void *buffer, UINTVAL len, ENCODIN
 
     if (len && !buffer) {
         internal_exception(BAD_BUFFER_SIZE,
-            "string_make: buffer pointer NULL, but length nonzero");
+                "string_make: buffer pointer NULL, but length nonzero");
     }
 
-
-        s = new_string_header(interpreter, flags);
+    s = new_string_header(interpreter, flags);
     s->encoding = encoding;
     s->charset = charset;
 
-    if (encoding == Parrot_fixed_8_encoding_ptr && charset == Parrot_iso_8859_1_charset_ptr) {
-            /*
-             * fast path for external (constant) strings - don't allocate
-             * and copy data
-             */
-            if (flags & PObj_external_FLAG) {
-                /* The following cast discards the 'const'.  That raises
-                   a warning with gcc, but is ok since the caller indicated
-                   it was safe by setting PObj_external_FLAG.
-                   (The cast is necessary to pacify TenDRA's tcc.)
-                   */
-                PObj_bufstart(s) = s->strstart = const_cast(buffer);
-                PObj_buflen(s)   = s->strlen = s->bufused = len;
-                PObj_bufstart_external_SET(s);
+    if (encoding == Parrot_fixed_8_encoding_ptr &&
+            charset == Parrot_iso_8859_1_charset_ptr) {
+        /*
+         * fast path for external (constant) strings - don't allocate
+         * and copy data
+         */
+        if (flags & PObj_external_FLAG) {
+            /* The following cast discards the 'const'.  That raises
+               a warning with gcc, but is ok since the caller indicated
+               it was safe by setting PObj_external_FLAG.
+               (The cast is necessary to pacify TenDRA's tcc.)
+               */
+            PObj_bufstart(s) = s->strstart = const_cast(buffer);
+            PObj_buflen(s)   = s->strlen = s->bufused = len;
+            PObj_bufstart_external_SET(s);
 
-                return s;
-            }
+            return s;
         }
+    }
 
-            Parrot_allocate_string(interpreter, s, len);
+    Parrot_allocate_string(interpreter, s, len);
 
-            if (buffer) {
-                mem_sys_memcopy(s->strstart, buffer, len);
-                s->bufused = len;
-                string_compute_strlen(interpreter, s);
-            }
-            else {
-                s->strlen = s->bufused = 0;
-            }
+    if (buffer) {
+        mem_sys_memcopy(s->strstart, buffer, len);
+        s->bufused = len;
+        string_compute_strlen(interpreter, s);
+    }
+    else {
+        s->strlen = s->bufused = 0;
+    }
 
     return s;
 }
@@ -779,32 +781,13 @@ string_str_index(Interp *interpreter, const STRING *s,
         void * __ptr;
     } __ptr_u;
 
-    if (!s || !string_length(interpreter, s))
+    if (!string_length(interpreter, s))
         return -1;
-    if (!s2 || !string_length(interpreter, s2))
+    if (!string_length(interpreter, s2))
         return -1;
 
     saneify_string(s);
-#if 0
-    /* At startup we sometimes get empty strings. Not yet tracked down */
-    if (!s->charset) {
-        s->charset = Parrot_iso_8859_1_charset_ptr;
-    }
-    if (!s2->charset) {
-        s2->charset = Parrot_iso_8859_1_charset_ptr;
-    }
-#endif
-
-/* here, check of the search string has a different rep than the target
-   string. if so, up- or down-size the search string. upsizing is easy.
-   for downsizing, need to check if there are any characters which won't
-   fit in the downsized range--if so, to search would fail, so bail. should
-   do the up- or down-sizing inside of the search helper methods, above, so
-   that we can traverse for prep work just once--building the index and
-   scaling the rep. at the same time. that gives us a bunch of different
-   variants (both size 1, both size 2 or both size 4, and size mismatched
-   with search string smaller rep, and size mismatched with search string
-   larger rep. */
+    saneify_string(s2);
 
     return CHARSET_INDEX(interpreter, s, s2, start);
 }
@@ -824,13 +807,11 @@ are treated as counting from the end of the string.
 INTVAL
 string_ord(Interp *interpreter, const STRING *s, INTVAL idx)
 {
-    UINTVAL len = 0;
+    UINTVAL len;
 
-    if (s != NULL) {
-        len = string_length(interpreter, s);
-    }
+    len = string_length(interpreter, s);
 
-    if ((s == NULL) || (len == 0)) {
+    if (len == 0) {
         internal_exception(ORD_OUT_OF_STRING,
             "Cannot get character of empty string");
     }
@@ -874,7 +855,8 @@ TODO - Allow this to take an array of characters?
 STRING *
 string_chr(Interp *interpreter, UINTVAL character)
 {
-    return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter, character);
+    return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter,
+            character);
 }
 
 
@@ -938,13 +920,8 @@ of characters in the specified Parrot string's representation.
 INTVAL
 string_max_bytes(Interp *interpreter, STRING *s, INTVAL nchars)
 {
-/* XXXX: here (and a couple of other places) we are taking advantage the
-    numerical value of s->representation being equal to sizeof(relevant
-    type), and we probably shouldn't */
-    if (s->encoding) {
-        return (ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s) * nchars);
-    }
-    return (nchars);
+    assert(s->encoding);
+    return ENCODING_MAX_BYTES_PER_CODEPOINT(interpreter, s) * nchars;
 }
 
 /*
@@ -1082,11 +1059,13 @@ string_substr(Interp *interpreter, STRING *src,
 
     /* do in-place i.e. reuse existing header if one */
     if (replace_dest && *d) {
-        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src, *d, true_offset, true_length);
+        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src, *d,
+                true_offset, true_length);
         dest = *d;
     }
     else
-        dest = CHARSET_GET_CODEPOINTS(interpreter, src, true_offset, true_length);
+        dest = CHARSET_GET_CODEPOINTS(interpreter, src, true_offset,
+                true_length);
 
     if (d != NULL) {
         *d = dest;
@@ -1275,39 +1254,6 @@ string_chopn(Interp *interpreter, STRING *s, INTVAL n)
 }
 
 
-#define COMPARE_STRINGS(type1, type2, s1, s2, result) \
-do { \
-    size_t minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen; \
-    size_t _index = 0; \
-    type1 *curr1 = (type1 *)s1->strstart; \
-    type2 *curr2 = (type2 *)s2->strstart; \
-     \
-    while ((_index < minlen) && (*curr1 == *curr2)) \
-    { \
-        ++curr1; \
-        ++curr2; \
-        ++_index; \
-    } \
-    if (_index == minlen && s1->strlen == s2->strlen) { \
-        result = 0; \
-        break; \
-    } \
-    result = *curr1 - *curr2; \
-     \
-    if (!result) \
-    { \
-        if (s1->strlen != s2->strlen) \
-        { \
-            result = s1->strlen > s2->strlen ? 1 : -1; \
-        } \
-    } \
-    else \
-    { \
-        result = result > 0 ? 1 : -1; \
-    } \
-} while(0)
-
-
 INTVAL
 string_compare(Interp *interpreter,
     STRING *s1, STRING *s2)
@@ -1481,7 +1427,8 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
     }
     else {
         if (s1->encoding != s2->encoding || s1->charset != s2->charset) {
-            internal_exception(UNIMPLEMENTED, "Can't do cross-type bitwwise and");
+            internal_exception(UNIMPLEMENTED,
+                    "Can't do cross-type bitwwise and");
         }
     }
 #if ! DISABLE_GC_DEBUG
@@ -1492,8 +1439,8 @@ string_bitwise_and(Interp *interpreter, STRING *s1,
 
     make_writable(interpreter, &res, minlen, enum_stringrep_one);
 
-                BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
-                        Parrot_UInt1, s1, s2, res, minlen);
+    BITWISE_AND_STRINGS(Parrot_UInt1, Parrot_UInt1,
+            Parrot_UInt1, s1, s2, res, minlen);
 
     res->strlen = minlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
@@ -1591,8 +1538,8 @@ string_bitwise_or(Interp *interpreter,
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
 
-                BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
-                        s1, s2, res, maxlen, |);
+    BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
+            s1, s2, res, maxlen, |);
     res->strlen = maxlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
 
@@ -1649,8 +1596,8 @@ string_bitwise_xor(Interp *interpreter,
 
     make_writable(interpreter, &res, maxlen, enum_stringrep_one);
 
-                BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
-                        s1, s2, res, maxlen, ^);
+    BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
+            s1, s2, res, maxlen, ^);
 
     res->strlen = maxlen;
     res->bufused = string_max_bytes(interpreter, res, res->strlen);
@@ -1736,7 +1683,7 @@ string_bitwise_not(Interp *interpreter,
     res->strlen = len;
     res->bufused = string_max_bytes(interpreter, res, len);
 
-            BITWISE_NOT_STRING(Parrot_UInt1, s, res);
+    BITWISE_NOT_STRING(Parrot_UInt1, s, res);
     if (dest)
         *dest = res;
 
@@ -1759,9 +1706,6 @@ INTVAL
 string_bool(Interp *interpreter, const STRING *s)
 {
     INTVAL len;
-    if (s == NULL) {
-        return 0;
-    }
 
     len = string_length(interpreter, s);
 
@@ -1814,6 +1758,9 @@ string_nprintf(Interp *interpreter,
     output = Parrot_vsprintf_c(interpreter, format, args);
     va_end(args);
 
+    /*
+     * XXX -leo: bytelen with strlen compare
+     */
     if (bytelen > 0 && bytelen < (INTVAL)string_length(interpreter, output)) {
         string_substr(interpreter, output, 0, bytelen, &output, 1);
     }
@@ -2301,7 +2248,6 @@ string_hash(Interp * interpreter, STRING *s)
     /* ZZZZZ workaround for something not setting up encodings right */
     saneify_string(s);
 
-    h = 0;
     h = CHARSET_COMPUTE_HASH(interpreter, s);
     s->hashval = h;
 
@@ -2407,8 +2353,6 @@ string_upcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to upper case.
 
-TODO - implemented only for ASCII.
-
 =cut
 
 */
@@ -2431,8 +2375,6 @@ string_downcase(Interp *interpreter, const STRING *s)>
 
 Returns a copy of the specified Parrot string converted to lower case.
 Non-caseable characters are left unchanged.
-
-TODO - Not yet implemented.
 
 =cut
 
@@ -2457,8 +2399,6 @@ string_downcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to lower case.
 
-TODO - Not yet implemented.
-
 =cut
 
 */
@@ -2482,8 +2422,6 @@ string_titlecase(Interp *interpreter, const STRING *s)>
 Returns a copy of the specified Parrot string converted to title case.
 Non-caseable characters are left unchanged.
 
-TODO - Not yet implemented.
-
 =cut
 
 */
@@ -2506,8 +2444,6 @@ string_titlecase(Interp *interpreter, const STRING *s)
 string_titlecase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to title case.
-
-TODO - Not yet implemented.
 
 =cut
 
