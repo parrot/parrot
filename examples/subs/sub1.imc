@@ -1,0 +1,29 @@
+# Simple sub calls with 1 return value
+.sub _main
+  .local int i
+  .local int j
+  .local string s
+  i = 7
+  $I1 = 8
+  s = "nine"
+  I0 = _foo(i, $I1, s)
+  print "return: "
+  print I0
+  print "\n"
+  end
+.end
+
+.sub _foo
+  .param int i
+  .param int j
+  .param string s
+  print i
+  print " "
+  print j
+  print " "
+  print s
+  print "\n"
+  .pcc_begin_return    # This notation is going away soon
+  .return 10
+  .pcc_end_return
+.end

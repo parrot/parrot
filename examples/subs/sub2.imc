@@ -1,0 +1,20 @@
+# Call a sub with multiple return values
+.sub _main
+  (I0, I1, $I99) = _foo(7, 8, "nine")
+  print "return: "
+  print I0
+  print " "
+  print I1
+  print " "
+  print $I99
+  print "\n"
+  end
+.end
+
+.sub _foo
+  .pcc_begin_return
+  .return 10
+  .return 11
+  .return 12
+  .pcc_end_return
+.end

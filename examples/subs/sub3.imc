@@ -1,0 +1,19 @@
+# Call a sub with no return values
+.sub _main
+  _foo(7, 8, "nine")
+  end
+.end
+
+.sub _foo
+  .param int i
+  .param int j
+  .param string s
+  print i
+  print " "
+  print j
+  print " "
+  print s
+  print "\n"
+  .pcc_begin_return   # This syntax is going away soon
+  .pcc_end_return
+.end
