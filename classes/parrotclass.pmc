@@ -31,13 +31,15 @@ pmclass ParrotClass {
 
   void init () {
     /* Hang an array off the data pointer, empty of course */
-    PMC_data(SELF) = pmc_new(interpreter, enum_class_Array);
+    PMC_data(SELF) = pmc_new(interpreter, enum_class_SArray);
+    /* We will have five entries in this array */
+    VTABLE_set_integer_native(interpreter, (PMC*)PMC_data(SELF), (INTVAL)5);
     /* No attributes to start with */
-    SELF->obj.u.int_val = 0;
+    SELF->cache.int_val = 0;
     /* But we are a class, really */
     PObj_is_class_SET(SELF);
-    /* And, coincidentally, a buffer of PMCs. Fancy that... */
-    PObj_get_FLAGS(SELF) |= PObj_is_buffer_of_PMCs_ptr_FLAG;
+    /* And, coincidentally, data points to a PMC. Fancy that... */
+    PObj_get_FLAGS(SELF) |=  PObj_is_PMC_ptr_FLAG;
   }
 
   INTVAL type () {

@@ -126,7 +126,7 @@ Returns 1 if the class exists, 0 if it does not.
 =cut
 
 inline op findclass(out INT, in STR) {
-  if (VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
+  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
     $1 = 1;
   } else {
     $1 = 0;
@@ -144,8 +144,12 @@ character, so Perl's Foo::Bar would be Foo\0Bar.
 
 =cut
 
-inline op findclass(out PMC, in STR) {
-  $1 = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+inline op getclass(out PMC, in STR) {
+  if (VTABLE_exists_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2))) {
+    $1 = VTABLE_get_pmc_keyed(interpreter, interpreter->class_hash, key_new_string(interpreter, $2));
+  } else {
+    internal_exception(NO_CLASS, "Class doesn't exist");
+  }
   goto NEXT();
 }
 
