@@ -177,6 +177,16 @@ string_transcode(struct Parrot_Interp *interpreter,
     char *deststart;
     char *destend;
 
+    if (!encoding) {
+        encoding = encoding_lookup_index(0);
+        /* XXX This is a hack. I had thought it was:
+             encoding = encoding_lookup(src->type->default_encoding); 
+           but that seems really stupid, because transcoding two strings
+           to NULL wouldn't necessarily mean they have the same
+           encoding. So this seems to least bad compromise.
+        */
+    }
+
     if (src->encoding == encoding && src->type == type) {
         dest = string_copy(interpreter, src);
 
