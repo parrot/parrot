@@ -42,6 +42,123 @@ signatures used to describe those functions.
 
 =head1 DESCRIPTION
 
+The NCI is designed to allow Parrot to interface to I<most> of the
+functions in a C library without having to write any C code for that
+interface. It isn't designed to be a universal C-less
+interface--there will always be libraries that have some bizarre
+parameter list that requires that some C be written. It should,
+however, handle all the simple cases.
+
+Using the NCI, parrot automatically wraps the C functions and presents
+them as prototyped subroutines that follow normal parrot calling
+conventions, and can be called like any other parrot subroutine.
+
+The NCI uses the platform native dynamic by-name function loading
+mechanism (dlopen/dlsym on unix and LoadLibrary/GetProcAddress on
+Win32, for example) to get the function pointer, then dymanically
+generates the wrapper based on the signature of that function.
+
+As there is no good platform-independent way to determine function
+signatures (C header files are not always available (certainly not
+for libraries not designed for access from C) and not always
+reasonably parseable anyway, and there is no generic way to query a
+function for its signature) the signature must be passed in when the
+linkage between the C function and parrot is made. 
+
+=head2 Function signatures
+
+The following list are the valid letters in the function signatures
+for Parrot's NCI. Note that only letters and numbers are valid, and
+each letter represents a single parameter passed into the NCI. Note
+that the letters are case-sensitive, and must be within the base
+7-bit ASCII character set.
+
+At some point punctuation may be used as modifiers on the function
+parameters, in which case each parameter may be represented by
+multiple letters.
+
+In I<no> case should the signature letters be separated by
+whitespace. This restriction may be lifted in the future, but for now
+remains as an avenue for adding additional functionality.
+
+=over 4
+
+=item C
+
+This parameter is used for passing in a callback function pointer. It
+refers to the function Parrot_callback_C, which has a signature of:
+
+  void Parrot_callback_C(void *external_data, PMC *callback_info);
+
+More explanation in the L<callbacks> section.
+
+=item D
+
+This parameter is used for passing in a callback function pointer. It
+refers to the function Parrot_callback_C, which has a signature of:
+
+  void Parrot_callback_D(PMC *callback_info, void *external_data);
+
+More explanation in the L<callbacks> section.
+
+=item Y
+
+This parameter is a PMC for the sub which should be called into by
+the callback. Only valid in a signature with a C or D parameter, and
+it I<must> be immediately followed by a parameter of type Z.
+
+=item Z
+
+This parameter is a PMC representing the data to be passed into the
+function being called into. It is only valid when it immediately
+follows a parameter of type Y.
+
+=back
+
+Note that not all types are valid as return types. 
+
+=head2 Examples
+
+Most of the function parameters are reasonably self-evident. Some,
+however, merit additional explanation. The 
+
+=head2 Callbacks
+
+Some libraries, particularly ones implementing more complex
+functionality such as databases or GUIs, want callbacks, that is ways
+to call a function under the control of the library rather than under
+control of the interpreter. These functions must be C functions, and
+generally are passed parameters to indicate what should be done.
+
+Unfortunately there's no good way to generically describe all
+possible callback parameter sets, so in some cases hand-written C
+will be necessary. However, many callback functions share a common
+signature, and parrot provides some ready-made functions for this
+purpose that should serve for most of the callback uses.
+
+There are two callback functions, Parrot_callback_C and
+Parrot_callback_D, corresponding to callback function signature
+letters C and D, respectively. If the callback function is supposed
+to look like:
+
+   void (function *)(void *library_data, void *your_data);
+
+then use type C, where if the function signature is:
+
+   void (function *)(void *library_data, void *your_data);
+
+then use a type of D. The actual pointer types for the parameters
+don't have to be void *, but they must be pointers of some sort.
+
+Since parrot needs more than just a pointer to a generic function to
+figure out what to do, it stuffs all the extra information into the
+C<your_data> pointer, which contains a custom PMC holding all the
+information that Parrot needs. 
+
+The NCI function signature for a callback matching Parrot_callback_C
+is C<vCYZ>, while the function signature for a callback matching
+Parrot_callback_D is C<vDYZ>
+
 =head1 REFERENCES
 
 L<docs/pdds/pdd06_pasm.pod>
