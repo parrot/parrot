@@ -46,7 +46,6 @@ sub add_code {
 
 sub emit {
 
-# -*- pasm -*- 
 print <<'END';
 
 .emit
@@ -169,6 +168,7 @@ popp
 ret
 
 __setup:
+    store_global "_AV_ARGS", P0
     pushp
     new P0, .PerlArray
     store_global "_AV_catchers", P0
@@ -181,17 +181,11 @@ __install_catch:
     pushp
     pushi
     # gross continuation-creating sequence:
-    new P0, .Continuation
-    set_addr I0, __install_catch_endcont
-    set P0, I0
-__install_catch_endcont:
-    find_global P2, "_SV_catch_setup"
-    unless P2, __install_catch_end
+    restore P0
     find_global P2, "_AV_catchers"
     set I1, P2
     set P2[I1], P0
     store_global "_AV_catchers", P2
-__install_catch_end:
     popi
     popp
     ret

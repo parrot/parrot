@@ -517,15 +517,18 @@ END
 
 sub wrap_with_catch {
     my ($block, $catcher) = @_;
-    my $ptmp = newtmp 'PerlInt';
     my $endblock = genlabel 'end_try';
     my $try = genlabel 'try';
+    my $cont = newtmp 'Continuation';
+    my $catch = genlabel 'catch';
+    my $itmp = gentmp 'int';
     code(<<END);
-	$ptmp = 1
-	global "_SV_catch_setup" = $ptmp
+	$itmp = addr $catch
+	$cont = $itmp
+	.arg $cont
 	call __install_catch
-	$ptmp = global "_SV_catch_setup"
-	if $ptmp goto $try
+	goto $try
+$catch:
 END
     if ($catcher) {
 	push_scope ;
@@ -554,16 +557,14 @@ END
 	pop_scope ;
     }
     # Clean catch => reset exception state
+    my $ptmp = newtmp 'PerlUndef';
     code(<<END);
-	$ptmp = new PerlUndef
 	global "_SV__BANG_" = $ptmp
 	goto $endblock
 END
     
     code(<<END);
 $try:
-	$ptmp = new PerlUndef
-	global "_SV_catch_setup" = $ptmp
 END
     val_noarg($block);
     # Reached end of block => no exception.  Pop the continuation.
