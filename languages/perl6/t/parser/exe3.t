@@ -10,7 +10,7 @@ use strict;
 use FindBin;
 use lib $FindBin::Bin;
 
-my @tests = glob "exe3_*.pl";
+my @tests = glob "t/parser/exe3_*.pl";
 
 use P6CTest tests => 1;
 

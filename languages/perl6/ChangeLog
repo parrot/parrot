@@ -131,3 +131,7 @@
 	    - update exception-handling code to work w/ new subs
 	    - update anonymous subs, too
 	
+2002-08-07
+
+	* Fixes:
+	    - clean up bitrot in parser tests (Leo Toetsch)

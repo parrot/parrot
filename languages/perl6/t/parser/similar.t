@@ -11,7 +11,7 @@ use strict;
 use FindBin;
 use lib $FindBin::Bin;
 
-my @tests = glob "similar_*.pl";
+my @tests = glob "t/parser/similar_*.pl";
 
 use P6CTest tests => 6;
 

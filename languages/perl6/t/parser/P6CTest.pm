@@ -23,6 +23,7 @@ $parser_grammar = undef;
 my $do_dump;
 my $parser;
 my $verbose;
+my $timeit;
 my $test = new Test::Builder();
 
 sub time_it;
@@ -34,7 +35,7 @@ sub import {
     # Handle command line args
     my %opt;
     GetOptions(\%opt,qw(grammar:s help dump verbose)) and !$opt{help}
-        or die "Usage: $0 [--force] [--grammar NAME] ".
+        or die "Usage: $0 [--force] [--grammar NAME] [--timeit]".
 	                 "[--dump] [--verbose] [--help]";
 
     if ($opt{force}) {
@@ -44,6 +45,7 @@ sub import {
     }
     $do_dump = $opt{dump};
     $verbose = $opt{verbose};
+    $timeit = $opt{timeit};
 
     # Load the required modules at runtime.
     time_it "Loading P6C::Nodes", sub {
@@ -104,6 +106,9 @@ sub check_parse {
     my $exp = $args->{exp};
     my $exp_files = $args->{exp_files};
     my $exp_errs = $args->{exp_errs};
+    my $skip = $args->{skip};
+
+    die $skip if $skip;
 
     $pgm = contents($pgm);
     $exp = contents($exp, 1);
@@ -129,7 +134,7 @@ sub check_parse {
 	    $i++;
 	}
     } else {
-	die "Neither pgm nor pgm_files defined" if (!$pgm_files);
+	die "Neither pgm nor pgm_files defined" if (!@$pgm_files);
 
 	foreach my $pgm_file (@$pgm_files) {
 	    my $pgm = contents($pgm_file);
@@ -193,6 +198,7 @@ sub _parse_and_check {
 	        $test->ok(1, $tname);
             }
 	} else {
+	    log_it "Comparing trees";
 	    if ($exp_errs) {
                 Test::More::is_deeply(\@errs, $exp_errs, $tname);
 	    } else {
@@ -229,7 +235,7 @@ sub contents {
         $file_contents = eval $file_contents;
 	die "Error eval'ing $what: $@" if ($@);
     }
-    
+
     return $file_contents;
 }
 
@@ -249,7 +255,7 @@ my %BOOLS = map {$_ => 1} qw(
     P6C::variable::topical
     P6C::incr::post
 );
-    
+
 sub _clean {
     my($node) = @_;
 
@@ -278,10 +284,10 @@ sub _clean {
 sub time_it {
     my($what, $code) = @_;
 
-    if ($verbose) {
+    log_it "# $what ...";
+    if ($timeit) {
         require Time::HiRes;
 
-        log_it "# $what ...";
 
         my $t0 = [Time::HiRes::gettimeofday()];
         &$code();
@@ -294,6 +300,7 @@ sub time_it {
         log_it sprintf(" took %d.%03d secs\n", $secs, $msecs);
     } else {
         &$code();
+	print " ..done\n";
     }
 }
 
