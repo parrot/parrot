@@ -431,7 +431,7 @@ OK_3: print "ok 3\n"
 OK_4: print "ok 4\n"
 
       #
-      # Make sure index zero is indeed 7
+      # Make sure index zero is indeed -15
       set   I0, P0[0]
       eq    I0, -15, OK_5
       print "not "
@@ -520,7 +520,7 @@ OK_11: print "ok 11\n"
 OK_12: print "ok 12\n"
 
        #
-       # Make sure index zero is indeed 7
+       # Make sure index zero is indeed -15
        #
        set   I0, P0[I31]
        eq    I0, -15, OK_13
