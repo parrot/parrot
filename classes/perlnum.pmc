@@ -50,6 +50,8 @@ fprintf(stderr,"morph not implemented\n");
     }
 
     BIGNUM* get_bignum () {
+        /* XXX */
+        return NULL;
     }
 
     STRING* get_string () {

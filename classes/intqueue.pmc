@@ -125,6 +125,7 @@ pmclass IntQueue {
     
     BIGNUM* get_bignum () {
         /* XXX */
+        return NULL;
     }
 
     STRING* get_string () {

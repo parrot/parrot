@@ -79,6 +79,8 @@ pmclass PerlArray {
     }
 
     PMC* clone () { 
+        /* XXX */
+        return NULL;
     }
 
     INTVAL get_integer () {

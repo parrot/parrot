@@ -124,6 +124,8 @@ pmclass PerlHash {
     }
 
     BIGNUM* get_bignum () {
+        /* XXX */
+        return NULL;
     }
 
     BIGNUM* get_bignum_keyed (KEY* key) {

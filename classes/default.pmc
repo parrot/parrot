@@ -463,6 +463,7 @@ pmclass default noinit {
 
     BIGNUM* pop_bignum() {
         internal_exception(OUT_OF_BOUNDS, "Pop on something that's not an aggregate!\n");
+        return NULL;
     }
 
     BIGNUM* pop_bignum_keyed(KEY* key) {
@@ -622,6 +623,7 @@ pmclass default noinit {
 
     BIGNUM* shift_bignum() {
         internal_exception(OUT_OF_BOUNDS, "Shift on something that's not an aggregate!\n");
+        return NULL;
     }
 
     BIGNUM* shift_bignum_keyed(KEY* key) {
@@ -2392,6 +2394,7 @@ pmclass default noinit {
 
     INTVAL exists_keyed (KEY* key) {
         internal_exception(OUT_OF_BOUNDS, "Subscript on something that's not an aggregate!\n");
+        return 0;
     }
 
     INTVAL exists_keyed_int (INTVAL* key) {

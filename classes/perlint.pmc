@@ -45,7 +45,8 @@ pmclass PerlInt {
     }
 
     BIGNUM* get_bignum () {
-        /* XXX */
+        /* XXX */      
+        return NULL;
     }
 
     STRING* get_string () {
