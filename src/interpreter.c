@@ -675,6 +675,43 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
     runops(interpreter, offset);
 }
 
+/*
+ * duplicated from delegates.pmc
+ */
+struct regsave {
+    struct IReg int_reg;
+    struct NReg num_reg;
+    struct SReg string_reg;
+    struct PReg pmc_reg;
+} regsave;
+
+PARROT_INLINE static struct regsave *
+save_regs(Parrot_Interp interp) {
+    struct regsave *save;
+    save = mem_sys_allocate(sizeof(struct regsave));
+    if (!save) {
+	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+    }
+    mem_sys_memcopy(save, interp, sizeof(struct regsave));
+    return save;
+}
+
+PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, struct regsave *data) {
+    mem_sys_memcopy(interp, data, sizeof(struct regsave));
+    mem_sys_free(data);
+}
+/*=for api interpreter Parrot_runops_fromc_save
+ * like above but preserve registers
+ */
+void
+Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
+{
+    struct regsave *data = save_regs(interpreter);
+    Parrot_runops_fromc(interpreter, sub);
+    restore_regs(interpreter, data);
+}
+
 /*=for api interpreter Parrot_runops_fromc_args
  * run parrot ops, called from c code
  * function arguments are passed as va_args according to signature

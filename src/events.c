@@ -296,8 +296,8 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore)
 
         switch (event->type) {
             case EVENT_TYPE_TIMER:
-                /* TODO run a variant that saves registers */
-                Parrot_runops_fromc(interpreter, event->u.timer_event.sub);
+                /* run ops, save registers */
+                Parrot_runops_fromc_save(interpreter, event->u.timer_event.sub);
                 break;
             default:
                 fprintf(stderr, "Unhandled event type %d\n", event->type);
