@@ -12,6 +12,20 @@
 
 #include "parrot/parrot.h"
 
+static INTVAL kp2int(struct Parrot_Interp *interpreter, KEY_PAIR kp) {
+    switch ((int)kp.type) {
+        case enum_key_undef:
+        default:
+            return 0;
+        case enum_key_int:
+            return kp.cache.int_val;
+        case enum_key_num:
+            return (INTVAL)kp.cache.num_val;
+        case enum_key_pmc:
+            return kp.cache.pmc_val->vtable->get_integer(interpreter, kp.cache.pmc_val);
+    }
+}
+
 static void resize_array ( PMC* self, INTVAL size ) {
     size++;
     if(self->data != NULL) {
@@ -79,7 +93,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -103,7 +117,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix =kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -127,7 +141,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -179,7 +193,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -216,7 +230,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
@@ -251,7 +265,7 @@ pmclass Array {
         }
 
         kp = (key->keys)[0];
-        ix = kp->cache.int_val;
+        ix = kp2int(INTERP, *kp);
 
         if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
