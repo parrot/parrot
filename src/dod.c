@@ -62,6 +62,23 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 {
     int hi_prio;
 
+    /*
+     * If the object is shared, we have to use the arena and dod
+     * pointers of the originating interpreter.
+     *
+     * We are possibly changing other interpreters data here, so
+     * the mark phase of DOD must run only on one interpreter of a pool
+     * at a time. Freeing unused objects could run as parallel
+     * operations then.
+     * And: to be sure that a shared object is dead, we have to finish
+     * the mark phase of all interpreters in a pool that might reference
+     * the object.
+     */
+    if (PObj_is_PMC_shared_TEST(obj)) {
+        interpreter = PMC_sync(obj)->owner;
+        assert(interpreter);
+    }
+
     if (PObj_needs_early_DOD_TEST(obj))
         ++interpreter->num_early_PMCs_seen;
     if (PObj_high_priority_DOD_TEST(obj) && interpreter->dod_trace_ptr) {
@@ -103,7 +120,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 
 =item C<void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)>
 
-Tag C<obj> as alive. 
+Tag C<obj> as alive.
 
 Used by the GC system when tracing the root set, and used by the PMC GC
 handling routines to tag their individual pieces if they have private
@@ -278,6 +295,17 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
         | PObj_custom_mark_FLAG;
 
     int lazy_dod = interpreter->lazy_dod;
+
+    /*
+     * First phase of mark is finished. Now if we are the owner
+     * of a shared pool, we must run the mark phase of other
+     * interpreters in our pool, so that live shared PMCs in that
+     * interpreter are appended to our mark_ptrs chain
+     *
+     * If there is a count of shared PMCs and we have already seen
+     * all these, we could skip that
+     */
+    pt_DOD_mark_root_finished(interpreter);
 
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
@@ -946,6 +974,10 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
         return;
     }
     Parrot_block_DOD(interpreter);
+    /*
+     * tell the threading system that we gonna DOD mark
+     */
+    pt_DOD_start_mark(interpreter);
 
     interpreter->lazy_dod = flags & DOD_lazy_FLAG;
     interpreter->dod_trace_ptr = NULL;
@@ -967,6 +999,10 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
         /* And the buffers */
         trace_active_buffers(interpreter);
 
+        /*
+         * mark is now finished
+         */
+        pt_DOD_stop_mark(interpreter);
         /* Now put unused PMCs on the free list */
         header_pool = interpreter->arena_base->pmc_pool;
         free_unused_pobjects(interpreter, header_pool);
@@ -991,6 +1027,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
         /* it was an aborted lazy dod run - we should clear
          * the live bits, but e.g. t/pmc/timer_7 succeeds w/o this
          */
+        pt_DOD_stop_mark(interpreter);
 #if 1
         clear_live_bits(interpreter);
 #endif

@@ -14,7 +14,7 @@ handled then by the C<check_event*> opcodes.
 
 IO events and signals are catched in the io_thread, which again
 dispatches these to one or all interpreters.
- 
+
 =cut
 
 */
@@ -23,13 +23,17 @@ dispatches these to one or all interpreters.
 #include <assert.h>
 
 /*
- * event debugging stuff
+ * event debugging stuff - turn it off befreo running tests
  */
 #define EVENT_DEBUG 0
 /*
  * not yet - need to sort out platform code and fix exceptions first
  */
-#define INSTALL_EVENT_HANDLER 0
+#ifdef linux
+#  define INSTALL_EVENT_HANDLER 1
+#else
+#  define INSTALL_EVENT_HANDLER 0
+#endif
 
 #if EVENT_DEBUG
 #  define edebug(x) puts(x)
@@ -110,7 +114,7 @@ Parrot_sigaction(int sig, void (*handler)(int))>
 Signal handlers are common to all threads, signal block masks are
 specific, so we install one handler then block that signal and unblock
 it in the thread, that will receive that signal.
- 
+
 =cut
 
 */
@@ -260,6 +264,8 @@ void
 Parrot_init_events(Parrot_Interp interpreter)
 {
     if (!interpreter->parent_interpreter) {
+        /* add the very first interpreter to the list of interps. */
+        pt_add_to_interpreters(interpreter, NULL);
         init_events_first(interpreter);
     }
     init_events_all(interpreter);
@@ -459,7 +465,7 @@ Broadcast an event.
 void
 Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
 {
-    Parrot_Interp interpreter;
+    Parrot_Interp interp;
     parrot_event* event;
 
     event = entry->data;
@@ -481,8 +487,19 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
              * TODO put first interpreter into interp. array immediately
              *      not only when threads are started
              */
-            mem_sys_free(entry);
-            mem_sys_free(event);
+            switch(event->u.signal) {
+                case SIGINT:
+                    /* for now send an exit event to the
+                     * first interpreter
+                     */
+                    event->type = EVENT_TYPE_TERMINATE;
+                    interp = interpreter_array[0];
+                    Parrot_schedule_interp_qentry(interp, entry);
+                    break;
+                default:
+                    mem_sys_free(entry);
+                    mem_sys_free(event);
+            }
             break;
         default:
             mem_sys_free(entry);
@@ -824,6 +841,8 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
         if (event->type == EVENT_TYPE_SLEEP && event->data == next)
+            sleeping = 0;
+        else if (event->type == EVENT_TYPE_TERMINATE)
             sleeping = 0;
         next = do_event(interpreter, event, next);
     }

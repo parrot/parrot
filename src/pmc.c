@@ -99,8 +99,16 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 static void
 pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
 {
-    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
+    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         add_pmc_ext(interpreter, pmc);
+
+        if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
+            PMC_sync(pmc) = mem_sys_allocate(sizeof(*pmc->synchronize));
+            PMC_sync(pmc)->owner = interpreter;
+            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
+            PObj_is_PMC_shared_SET(pmc);
+        }
+    }
 }
 
 /*

@@ -46,6 +46,10 @@ clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
                  sp->vtable->base_type == enum_class_ParrotThread))
 		d->pmc_reg.registers[i] = dest;
 	    else {
+                /*
+                 * XXX clone isn't quite right here, it can't
+                 * work on self-referential structures
+                 */
 		PMC* dp = VTABLE_clone(d, sp);
 		d->pmc_reg.registers[i] = dp;
 	    }
@@ -100,7 +104,18 @@ clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 	    if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
                  sp->vtable->base_type == enum_class_ParrotThread))
 		d->pmc_reg.registers[i] = dest;
+            else if (PObj_is_PMC_shared_TEST(sp)) {
+                /*
+                 * if PMC is a shared PMC, don't clone it, just
+                 * pass it over
+                 */
+		d->pmc_reg.registers[i] = sp;
+            }
 	    else {
+                /*
+                 * XXX clone isn't quite right here, it can't
+                 * work on self-referential structures
+                 */
 		PMC* dp = VTABLE_clone(d, sp);
 		d->pmc_reg.registers[i] = dp;
 	    }

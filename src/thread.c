@@ -235,6 +235,10 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
          * TODO This is needed for all places holding a lock for
          *      non-trivial tasks
          *      -leo
+         * TODO remove that and replace it with proper exception
+         *      handling, so that a failing clone in the parent
+         *      just stops that thread
+         *      -leo
          */
         LOCK(interpreter_array_mutex);
         CLEANUP_PUSH(mutex_unlock, &interpreter_array_mutex);
@@ -242,13 +246,16 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         if (retval) {
             PMC *parent_ret;
             /*
-             * clone the PMC into caller
+             * clone the PMC into caller, if its not a shared PMC
              * the PMC is not in the parents root set nor in the
              * stack so block DOD during clone
              * XXX should probably aquire the parent's interpreter mutex
              */
             Parrot_block_DOD(parent);
-            parent_ret = VTABLE_clone(parent, (PMC*)retval);
+            if (PObj_is_PMC_shared_TEST((PObj*)retval))
+                parent_ret = retval;
+            else
+                parent_ret = VTABLE_clone(parent, (PMC*)retval);
             /* this PMC is living only in the stack of this currently
              * dying interpreter, so register it in parents DOD registry
              */
@@ -389,31 +396,39 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
 {
     size_t i;
 
-    new_interp->thread_data = mem_sys_allocate_zeroed(sizeof(Thread_data));
-    INTERPRETER_LOCK_INIT(new_interp);
-    if (n_interpreters == 0) {
+    if (!new_interp) {
         /*
-         * first time - add master interpreter and thread
+         * Create an entry for the very first interpreter, event
+         * handling needs it
          */
-        interpreter_array = mem_sys_allocate(2 * sizeof(Parrot_Interp));
+        assert(!interpreter_array);
+        assert(n_interpreters == 0);
+
+        interpreter_array = mem_sys_allocate(sizeof(Parrot_Interp));
         interpreter_array[0] = interpreter;
-        interpreter_array[1] = new_interp;
+        n_interpreters = 1;
+        return;
+    }
+
+    if (n_interpreters == 1) {
+        /*
+         * First time a thread is started, make the first interpreter
+         * a threaded one by attaching thread_data
+         */
+        assert(interpreter == interpreter_array[0]);
         interpreter->thread_data =
             mem_sys_allocate_zeroed(sizeof(Thread_data));
         INTERPRETER_LOCK_INIT(interpreter);
         interpreter->thread_data->tid = 0;
-        new_interp ->thread_data->tid = 1;
-        n_interpreters = 2;
-
-        running_threads = 2;
-        return;
     }
-    /*
-     * look for an empty slot
-     */
+    new_interp->thread_data = mem_sys_allocate_zeroed(sizeof(Thread_data));
+    INTERPRETER_LOCK_INIT(new_interp);
     running_threads++;
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
         fprintf(stderr, "running threads %d\n", running_threads);
+    /*
+     * look for an empty slot
+     */
     for (i = 0; i < n_interpreters; ++i) {
         if (interpreter_array[i] == NULL) {
             interpreter_array[i] = new_interp;
@@ -431,6 +446,65 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
     ++n_interpreters;
 }
 
+/*
+ * DOD sync functions
+ */
+
+/*
+ * DOD is gonna start the mark phase.
+ * In the presence of shared PMCs, we can only run one DOD run at a time
+ * because interpreter->dod_mark_ptr may be changed
+ * TODO have a count of shared PMCs and check it during DOD
+ * TODO evaluate, if a interpreter lock is cheaper, when dod_mark_ptr
+ *      is updated
+ */
+void
+pt_DOD_start_mark(Parrot_Interp interpreter)
+{
+    /* if no other threads are running, we are safe */
+    if (!running_threads)
+        return;
+    /*
+     * TODO now check, if we are the owner of a shared memory pool
+     * if yes:
+     * - suspend all other threads by sending them a suspend event
+     *   (or put a LOCK around updating the mark pointers)
+     * - return and continue the mark phase
+     * - then s. comments below
+     */
+}
+
+/*
+ * DOD is finished for the root set
+ */
+void
+pt_DOD_mark_root_finished(Parrot_Interp interpreter)
+{
+    if (!running_threads)
+        return;
+    /*
+     * TODO now check, if we are the owner of a shared memory pool
+     * if yes:
+     * - now run DOD_mark on all members of our pool
+     * - if all shared PMCs are marked by all threads then
+     *   - we can continue to free unused objects
+     */
+}
+
+/*
+ * DODs mark phase is done
+ */
+void
+pt_DOD_stop_mark(Parrot_Interp interpreter)
+{
+    if (!running_threads)
+        return;
+    /*
+     * normal operation can continue now
+     *   - other threads may or not free unused objects then,
+     *     depending on their resource statistics
+     */
+}
 /*
  * Local variables:
  * c-indentation-style: bsd

@@ -4,7 +4,7 @@ use Parrot::Test;
 use Test::More;
 
 if ($^O eq 'linux' or $^O eq 'darwin') {
-   plan tests => 6;
+   plan tests => 7;
 }
 else {
    plan skip_all => 'No threading yet';
@@ -226,7 +226,7 @@ CODE
 500500
 OUTPUT
 
-output_like(<<'CODE', <<'OUTPUT', "thread - detach");
+output_like(<<'CODE', <<'OUTPUT', "detach");
     find_global P6, "_foo"
     new P5, .ParrotThread
     find_method P0, P5, "thread3"
@@ -246,5 +246,39 @@ output_like(<<'CODE', <<'OUTPUT', "thread - detach");
     invoke P1
 CODE
 /(done\nthread\n)|(thread\ndone\n)/
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "share a PMC");
+    find_global P6, "_foo"
+    new P5, .ParrotThread
+    find_method P0, P5, "thread3"
+    new P20, .PerlInt
+    new P7, .SharedRef, P20
+    set P7, 20
+    set I3, 3   # P5..P7
+    invoke	# start the thread
+    # now sleep a bit, so that the thread runs
+    sleep 0.1
+
+    set I5, P5
+    getinterp P2
+    find_method P0, P2, "join"
+    invoke
+    print "done\n"
+    print P7
+    print "\n"
+    end
+
+.pcc_sub _foo:
+    print "thread\n"
+    print P7
+    print "\n"
+    inc P7
+    invoke P1
+CODE
+thread
+20
+done
+21
 OUTPUT
 

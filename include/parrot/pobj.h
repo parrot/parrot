@@ -178,8 +178,10 @@ typedef enum PObj_enum {
     PObj_is_string_FLAG = 1 << 8,
     /* PObj is a PMC */
     PObj_is_PMC_FLAG = 1 << 9,
+    /* the PMC has a PMC_EXT structure appended */
     PObj_is_PMC_EXT_FLAG = 1 << 10,
-    PObj_is_reserved2_FLAG = 1 << 11,
+    /* the PMC is a shared PMC */
+    PObj_is_PMC_shared_FLAG = 1 << 11,
 
     /* Memory management FLAGs */
 
@@ -435,8 +437,12 @@ typedef enum PObj_enum {
 #define PObj_is_object_CLEAR(o) PObj_flag_CLEAR(is_object, o)
 
 #define PObj_is_PMC_TEST(o) PObj_flag_TEST(is_PMC, o)
+
 #define PObj_is_PMC_EXT_TEST(o) PObj_flag_TEST(is_PMC_EXT, o)
 #define PObj_is_PMC_EXT_SET(o) PObj_special_SET(is_PMC_EXT, o)
+
+#define PObj_is_PMC_shared_TEST(o) PObj_flag_TEST(is_PMC_shared, o)
+#define PObj_is_PMC_shared_SET(o)  PObj_flag_SET(is_PMC_shared, o)
 
 
 /* some combinations */

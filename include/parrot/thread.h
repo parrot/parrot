@@ -129,6 +129,13 @@ void pt_thread_detach(UINTVAL);
 void pt_thread_kill(UINTVAL);
 void pt_join_threads(Parrot_Interp);
 
+/*
+ * DOD interface
+ */
+void pt_DOD_start_mark(Parrot_Interp);
+void pt_DOD_mark_root_finished(Parrot_Interp);
+void pt_DOD_stop_mark(Parrot_Interp);
+
 #endif
 
 /*
