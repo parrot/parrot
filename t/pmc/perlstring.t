@@ -16,7 +16,7 @@ Tests the C<PerlString> PMC. Checks Perl-specific string behaviour.
 
 =cut
 
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 46;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -472,6 +472,83 @@ output_is(<<"CODE", <<OUTPUT, "add str_num, int");
 	new P2, .PerlUndef
 	add P2, P0, P1
         .fp_eq(P2, 25.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "sub str_int, str_int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlString
+	set P1, "2"
+	new P2, .PerlUndef
+	sub P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+21
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "sub str_int, str_num");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlString
+	set P1, "2.5"
+	new P2, .PerlUndef
+	sub P2, P0, P1
+        .fp_eq(P2, 20.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "sub str_int, int");
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	sub P2, P0, P1
+	print P2
+	print "\n"
+	end
+CODE
+21
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "sub str_int, num");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "23"
+	new P1, .PerlNum
+	set P1, 2.5
+	new P2, .PerlUndef
+	sub P2, P0, P1
+        .fp_eq(P2, 20.5, EQ1)
+        print "not "
+EQ1:    print "ok 1\\n"
+	end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "sub str_num, int");
+@{[ $fp_equality_macro ]}
+	new P0, .PerlString
+	set P0, "23.5"
+	new P1, .PerlInt
+	set P1, 2
+	new P2, .PerlUndef
+	sub P2, P0, P1
+        .fp_eq(P2, 21.5, EQ1)
+        print P2
         print "not "
 EQ1:    print "ok 1\\n"
 	end

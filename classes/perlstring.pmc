@@ -158,21 +158,32 @@ Subtracts C<*value> from the string and returns the result in C<*dest>.
 */
 
     void subtract (PMC* value, PMC* dest) {
-        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
-            VTABLE_set_integer_native(INTERP, dest,
-                VTABLE_get_integer(INTERP, SELF) -
-                PMC_int_val(value)
-            );
+MMD_PerlString: {
+            /* work around MMD setup bug */
+	     VTABLE_set_number_native(INTERP, dest,
+		     VTABLE_get_number(INTERP, SELF) -
+		     VTABLE_get_number(INTERP, value));
         }
-        else if(value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
-            VTABLE_set_number_native(INTERP, dest,
-                VTABLE_get_number(INTERP, SELF) -
-                PMC_num_val(value)
-            );
-        }
-        else {
-            SUPER(value, dest);
-        }
+MMD_PerlNum: {
+	     VTABLE_set_number_native(INTERP, dest,
+		     VTABLE_get_number(INTERP, SELF) -
+		     PMC_num_val(value)
+		     );
+	 }
+MMD_DEFAULT: {
+	     FLOATVAL pmcf, valf;
+	     INTVAL  pmci, vali;
+
+	     pmcf = VTABLE_get_number(INTERP, SELF);
+	     pmci = VTABLE_get_integer(INTERP, SELF);
+	     valf = VTABLE_get_number(INTERP, value);
+	     vali = VTABLE_get_integer(INTERP, value);
+
+	     if (pmcf == pmci && valf == vali)
+		 VTABLE_set_integer_native(INTERP, dest, pmci - vali);
+	     else
+		 VTABLE_set_number_native(INTERP, dest, pmcf - valf);
+	 }
     }
 
 /*
