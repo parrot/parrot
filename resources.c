@@ -565,6 +565,10 @@ free_unused_buffers(struct Parrot_Interp *interpreter) {
 void
 Parrot_do_dod_run(struct Parrot_Interp *interpreter) {
 
+  if (interpreter->DOD_block_level) {
+    return;
+  }
+
   /* First go mark all PMCs as unused */
   mark_PMCs_unused(interpreter);  
 
@@ -707,6 +711,11 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
   char *cur_spot;               /* Where we're currently copying to */
   UINTVAL cur_size;     /* How big our chunk is going to be */
   struct STRING_Arena *cur_arena; /* The string arena we're working on */
+
+  /* Bail if we're blocked */
+  if (interpreter->GC_block_level) {
+      return;
+  }
 
   /* We're collecting */
   interpreter->mem_allocs_since_last_collect = 0;

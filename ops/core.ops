@@ -2688,6 +2688,54 @@ op collect() {
   goto NEXT();
 }
 
+=item B<sweepoff>()
+
+Disable DOD sweeps. (Nestable)
+
+=cut
+
+op sweepoff() {
+  interpreter->DOD_block_level++;
+  goto NEXT();
+}
+
+=item B<sweepon>()
+
+Re-enable DOD sweeps
+
+=cut
+
+op sweepon() {
+  if (interpreter->DOD_block_level) {
+    interpreter->DOD_block_level--;
+  }
+  goto NEXT();
+}
+
+=item B<collectoff>()
+
+Disable GC runs (nestable)
+
+=cut
+
+op collectoff() {
+  interpreter->GC_block_level++;
+  goto NEXT();
+}
+
+=item B<collecton>()
+
+Re-enable GC
+
+=back
+
+op collecton() {
+  if (interpreter->GC_block_level) {
+    interpreter->GC_block_level--;
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<interpinfo>(out INT, in INT)
