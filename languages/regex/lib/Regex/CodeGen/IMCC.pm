@@ -8,9 +8,9 @@ my $fail_label = Regex::Ops::Tree::mark('FAIL');
 sub init_context {
     my ($self, $ctx) = @_;
     $self->init_context($ctx);
-    $ctx->{rx_starts} ||= '$P0';
-    $ctx->{rx_ends} ||= '$P1';
-    $ctx->{rx_stack} ||= '$P2';
+    $ctx->{rx_match} ||= '$P0';
+    $ctx->{rx_stack} ||= '$P1';
+    $ctx->{rx_ptmp} ||= '$P2';
     $ctx->{rx_tmp} ||= '$I0';
     $ctx->{rx_pos} ||= '$I1';
     $ctx->{rx_len} ||= '$I2';
@@ -21,30 +21,38 @@ sub pushop { "push" };
 sub popop { "pop" };
 
 sub output_preamble {
-    my $self = shift;
+    my ($self, $num_groups) = @_;
 
     my @ops;
 
-    push @ops, ("length <rx_len>, <rx_input> # cache the length in <rx_len>",
-                "set <rx_starts>[0], 0");
+    push @ops, ('new <rx_match>, .Match',
+                'set <rx_match>["!INPUT"], <rx_input>',
+                "set <rx_match>[\"!GROUPS\"], $num_groups",
+                'set <rx_match>["0"], <rx_ptmp>',
+                "length <rx_len>, <rx_input> # cache the length in <rx_len>",
+               );
 
     return @ops;
 }
 
 sub output_match_succeeded {
-    return ('set <rx_tmp>, 1',
-            "set <rx_ends>[0], <rx_pos>");
+    return ('set <rx_match>["!POS"], <rx_pos>',
+            'set <rx_match>["!RESULT"], 1',
+            'add <rx_tmp>, <rx_pos>, -1',
+            'set <rx_match>["0";1], <rx_tmp>');
 }
 
 sub output_match_failed {
-    return ('set <rx_tmp>, 0',
-            "set <rx_ends>[0], -2");
+    return ('set <rx_match>["!POS"], <rx_pos>',
+            'set <rx_match>["!RESULT"], 0',
+            'set <rx_match>["0";1], -2');
 }
 
 sub value {
     my $name = shift;
     return '<rx_pos>' if $name eq 'pos';
     return '<rx_tmp>' if $name eq 'tmp';
+    return '<rx_ptmp>' if $name eq 'ptmp';
     return $name;
 }
 
@@ -66,7 +74,7 @@ sub output_advance {
     $failLabel = $self->output_label_use($failLabel);
     return ("add <rx_pos>, $distance # pos++",
             "gt <rx_pos>, <rx_len>, $failLabel # past end of input?",
-            "set <rx_starts>[0], <rx_pos> # group 0 start := pos");
+            'set <rx_match>["0";0], <rx_pos> # group 0 start := pos');
 }
 
 sub output_increment {
@@ -218,33 +226,45 @@ sub output_classmatch {
     return @ops;
 }
 
+sub output_initgroup {
+    my ($self, $group) = @_;
+    return ("new <rx_ptmp>, .MatchRange # new group \"$group\"",
+            "set <rx_match>[\"$group\"], <rx_ptmp>");
+}
+
 sub output_setstart {
     my ($self, $group, $value) = @_;
     $value = value($value);
-    return "set <rx_starts>[$group], $value # open group $group";
+    return qq!set <rx_match>["$group";0], $value # open group $group!;
 }
 
 sub output_setend {
-    my ($self, $group, $value) = @_;
+    my ($self, $group, $value, $adj) = @_;
     $value = value($value);
-    return "set <rx_ends>[$group], $value # close group $group";
+    my @ops;
+    if ($adj) {
+        push @ops, "add <rx_tmp>, $value, $adj";
+        $value = "<rx_tmp>";
+    }
+    push @ops, qq!set <rx_match>["$group";1], $value # close group $group!;
+    return @ops;
 }
 
 sub output_getstart {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return "set $reg, <rx_starts>[$group] # get group $group start";
+    return qq!set $reg, <rx_match>["$group";0] # get group $group start!;
 }
 
 sub output_getend {
     my ($self, $reg, $group) = @_;
     $reg = value($reg);
-    return "set $reg, <rx_ends>[$group] # get group $group end";
+    return qq!set $reg, <rx_match>["$group";1] # get group $group end!;
 }
 
 sub output_delete {
     my ($self, $n) = @_;
-    return "set <rx_ends>[$n], -2 # delete group $n";
+    return qq!set <rx_match>["$n";1], -2 # delete group $n!;
 }
 
 sub output_atend {
