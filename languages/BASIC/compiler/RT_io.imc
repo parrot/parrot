@@ -88,16 +88,10 @@ CLOSE_OK:
 .sub _READLINE		# string readline(int fd)
 	saveall
 	.param int fd
-	ne 0, fd, NOTSTDIN
-	call _line_read
-	readline $S0, fd
-	branch ENDREAD
-NOTSTDIN:
 	find_global $P0, "FDS"
 	$P1=$P0[fd]
 	set $S0, ""
-	read $S0, $P1, 255
-ENDREAD:
+	readline $S0, $P1
 	.return $S0
 	restoreall
 	ret
@@ -204,7 +198,7 @@ CHOMPIT:substr line, line, 0, $I0
 CHOMPOK:.return line
 	restoreall
 	ret
-.end	
+.end
 
 #
 #ERR_INPFIELDS:
