@@ -236,7 +236,7 @@ pge_gen_string(PGE_Exp* e, const char* succ)
         emit("    rep = 0\n");
         emit("  R%d_1:\n", e->id);
         if (e->min > 0)
-            emit("    if rep < %d goto R%d_2:\n", e->min, e->id);
+            emit("    if rep < %d goto R%d_2\n", e->min, e->id);
         if (e->iscut) { emit("    goto %s\n", succ); return; }
         if (e->max != PGE_INF) 
             emit("    if rep == %d goto %s\n", e->max, succ);
