@@ -10,6 +10,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/07/31 15:47:17  clintp
+# Fixed errant pointer-copy instead of string-copy
+#
 # Revision 1.3  2002/06/16 21:23:28  clintp
 # Floating Point BASIC
 #
@@ -52,16 +55,18 @@ NORMQ:  eq S1, "'", QUOTE
 QUOTE:  ne I3, 0, EOTOK
 	length I0,S0
 	eq I0, 0, FINQUOT
-	save S0
+	save S0  
 	inc I5
 FINQUOT:set I3, 1
-	set S3, S1
+	#set S3, S1
+	clone S3, S1     # CAP
 	set S0, S1
 	branch TOKLOOP
+
 EOTOK:  set I3, 0
 	set S3, ""
 	concat S0, S1
-	save S0
+	savec S0   
 	inc I5
 	set S0, ""
 	branch TOKLOOP
@@ -76,7 +81,7 @@ NOTQUOTED:
 	ne I2, 1, NOTSPACE  # Spaces will end a token
 	length I0, S0
 	eq I0, 0, TOKLOOP
-	save S0
+	savec S0  
 	inc I5
 	set S0, ""
 	branch TOKLOOP
@@ -95,14 +100,14 @@ NOTEMPTY:
 	concat S0, S1
 	branch TOKLOOP
 TOKCHANGED:
-	save S0
+	savec S0
 	inc I5
 	set S0, S1
 	set I4, I0
 	branch TOKLOOP
 ENDTOK: length I0, S0
 	eq I0, 0, TOKBAIL
-	save S0
+	savec S0
 	inc I5
 TOKBAIL:save I5
 	popi
