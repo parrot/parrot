@@ -1,14 +1,13 @@
-#! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
 
-t/pmc/resizablebooleanarray.t - ResizableBooleanArray PMC
+t/pmc/resizablebooleanarray.t - testing the ResizableBooleanArray PMC
 
 =head1 SYNOPSIS
 
-	% perl -Ilib t/pmc/ResizableBooleanArray.t
+	% perl -Ilib t/pmc/resizablebooleanarray.t
 
 =head1 DESCRIPTION
 
@@ -63,7 +62,7 @@ my $fp_equality_macro = <<'ENDOFMACRO';
 .endm
 ENDOFMACRO
 
-output_is(<<'CODE', <<'OUTPUT', "Setting array size");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting array size");
 	new P0, .ResizableBooleanArray
 
 	set I0,P0
@@ -103,7 +102,7 @@ ok 4
 ok 5
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting first element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .ResizableBooleanArray
         set P0, 1
 
@@ -132,7 +131,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Setting second element");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting second element");
         new P0, .ResizableBooleanArray
         set P0, 2
 
@@ -163,7 +162,7 @@ OUTPUT
 
 # TODO: Rewrite these properly when we have exceptions
 
-output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Setting out-of-bounds elements");
         new P0, .ResizableBooleanArray
 
 	set P0[1], -7
@@ -191,7 +190,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
+pasm_output_is(<<'CODE', <<'OUTPUT', "Getting out-of-bounds elements");
         new P0, .ResizableBooleanArray
         set P0, 1
 
@@ -203,7 +202,7 @@ ok 1
 OUTPUT
 
 
-output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableBooleanArray
      new P1, .Key
@@ -239,7 +238,7 @@ ok 2
 ok 3
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
+pasm_output_is(<<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys");
 @{[ $fp_equality_macro ]}
      new P0, .ResizableBooleanArray
      set P0, 1

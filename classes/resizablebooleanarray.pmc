@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -8,8 +8,10 @@ classes/resizablebooleanarray.pmc - resizable array for booleans only
 
 =head1 DESCRIPTION
 
-This class, ResizableBooleanArray, implements an array of resizable size, which stores booleans.
-It uses Boolean PMCs for all of the conversions,
+The C<ResizableBooleanArray PMC> implements an array of resizable size, 
+which stores booleans.
+It uses the C<Boolean PMC> for all conversions.
+The C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 =head2 Functions
 
@@ -21,14 +23,21 @@ It uses Boolean PMCs for all of the conversions,
 
 #include "parrot/parrot.h"
 
-typedef struct _SizeBooleanData {
-    INTVAL size;
-    INTVAL data[1];
-} SizeBooleanData;
-#define NEEDED_SIZE(n) ((n-1)*sizeof(INTVAL) + sizeof(SizeBooleanData))
+
+#define BITS_PER_CHAR 8
 
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext does array {
     
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+
 /*
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
@@ -40,15 +49,14 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        SizeBooleanData *sd;
+        Parrot_UInt1 *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableBooleanArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        
-        sd = (SizeBooleanData *)PMC_data(SELF);
-        return sd->data[key];
+
+        return SUPER(key); 
     }
 
 /*
@@ -62,31 +70,13 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        SizeBooleanData *sd;
         if (key < 0)
             internal_exception(OUT_OF_BOUNDS, 
                 "ResizableBooleanArray: index out of bounds!");
         if(key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
 
-        sd = (SizeBooleanData *)PMC_data(SELF);
-        sd->data[key] = (value != 0);
-    }
-
-/*
-
-=item C<void push_integer (INTVAL value)>
-
-Extends the array by adding an element of value C<value> to the end of
-the array.
-
-=cut
-
-*/
-
-    void push_integer (INTVAL value) {
-        INTVAL nextix = DYNSELF.elements();
-        DYNSELF.set_integer_keyed_int(nextix, value);
+        SUPER(key, value);
     }
 
 /*
@@ -100,50 +90,25 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        SizeBooleanData *sd;
+        Parrot_UInt1 *sd;
         if (size < 0)
             internal_exception(OUT_OF_BOUNDS, 
                     "ResizableBooleanArray: Can't resize!");
 
-        sd = PMC_data(SELF);
-        PMC_int_val(SELF) = size;
-        if(sd == NULL) {
-            sd = mem_sys_allocate(NEEDED_SIZE(size));
-            sd->size = size;
-        } else if(size >= sd->size) {
-            sd->size = size < 2*sd->size ? sd->size*2 : size;
-            sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+        if ( ! PMC_data(SELF) ) {
+            SUPER(size);
+        } else if ( size > PMC_int_val2(SELF) ) {
+            INTVAL old_size = PMC_int_val2(SELF);
+            PMC_int_val2(SELF) = size < 2*old_size ? 2*old_size : (size/BITS_PER_CHAR+1)*BITS_PER_CHAR;
+            Parrot_UInt1 *sd = PMC_data(SELF);
+            PMC_data(SELF) = mem_sys_realloc(sd, PMC_int_val2(SELF)/BITS_PER_CHAR);
+            PMC_int_val(SELF) = size; 
         } else {
+            PMC_int_val(SELF) = size; 
             return;
         }
 
-        PMC_data(SELF) = sd;
         PObj_active_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a copy of the array.
-
-=cut
-
-*/
-
-    PMC* clone () {
-        SizeBooleanData *sd;
-        PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
-        if (!PMC_data(SELF))
-            return dest;
-        PMC_int_val(dest) = PMC_int_val(SELF);
-        sd = PMC_data(SELF);
-        
-        PMC_data(dest) = mem_sys_allocate(NEEDED_SIZE(sd->size));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), NEEDED_SIZE(sd->size));
-        PObj_active_destroy_SET(dest);
-        return dest;
     }
 
 }

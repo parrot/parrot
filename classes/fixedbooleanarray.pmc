@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -8,8 +8,9 @@ classes/fixedbooleanarray.pmc - fixed size array for booleans only
 
 =head1 DESCRIPTION
 
-This class, FixedBooleanArray, implements an array of fixed size, which stores booleans,
-it uses Boolean PMCs for all of the conversions
+The C<FixedBooleanArray PMC> implements an array of fixed size, which stores booleans.
+It uses the C<Boolean PMC> for all conversions.
+The C<FixedBooleanArray PMC> is extended by the C<ResizableBooleanArray PMC>.
 
 =head2 Functions
 
@@ -20,6 +21,34 @@ it uses Boolean PMCs for all of the conversions
 */
 
 #include "parrot/parrot.h"
+
+
+/*
+ * TODO merge this with functions from BigInt PMC
+ */
+
+#define BITS_PER_CHAR 8
+
+static void
+booleanarray_init(Interp *interpreter, PMC *self) {
+    PMC_int_val2(self) = 0;     
+    PMC_data(self) = NULL;
+}
+
+static void
+booleanarray_clone(Interp *interpreter, PMC *self, PMC *dest) {
+    if (PMC_data(self)) {
+        Parrot_UInt1 *sd = PMC_data(self);
+        PMC_int_val2(dest) = PMC_int_val2(self);
+        PMC_data(dest) = malloc(PMC_int_val2(self) / BITS_PER_CHAR);
+        mem_sys_memcopy(PMC_data(dest), PMC_data(self), PMC_int_val2(self) / BITS_PER_CHAR);
+    }
+}
+
+static void
+booleanarray_clear(Interp *interpreter, PMC *self) {
+    PMC_int_val2(self) = 0;     
+}
 
 pmclass FixedBooleanArray need_ext does array {
     
@@ -40,9 +69,11 @@ Initializes the array.
 */
 
     void init () {
-        PMC_int_val(SELF) = 0;
-        PMC_data(SELF) = NULL;
+        PMC_int_val(SELF) = 0;       /* size of array */
+        booleanarray_init(INTERP, SELF);
+        PObj_active_destroy_SET(SELF);
     }
+
 
 /*
 
@@ -70,6 +101,7 @@ Destroys the array.
 */
 
     void destroy () {
+        booleanarray_clear(INTERP, SELF);
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
         PMC_data(SELF) = NULL;
@@ -89,14 +121,9 @@ Creates and returns a copy of the array.
     PMC* clone () {
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_int_val(dest) = PMC_int_val(SELF);
     
-        if (!PMC_data(SELF))
-            return dest;
-        size = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
-        
-        PMC_data(dest) = mem_sys_allocate(size * sizeof(INTVAL));
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(INTVAL));
+        booleanarray_clone(INTERP, SELF, dest);
         PObj_active_destroy_SET(dest);
         return dest;
     }
@@ -112,8 +139,7 @@ fixed sized array).
 
 */
     INTVAL get_bool () {
-        INTVAL size = SELF.elements();
-        return (INTVAL)(size != 0);
+        return SELF.elements() ? 1 : 0;
     }
 
 /*
@@ -154,13 +180,13 @@ Returns the integer value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        INTVAL *data;
+        Parrot_UInt1 *sd = PMC_data(SELF);
+
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS, 
                 "FixedBooleanArray: index out of bounds!");
         
-        data = (INTVAL *)PMC_data(SELF);
-        return data[key];
+        return ( sd[key/BITS_PER_CHAR] & ( 1 << ( key % BITS_PER_CHAR ) )) ? 1 : 0;
     }
 
 /*
@@ -176,7 +202,7 @@ Returns the integer value of the element at index C<*key>.
     INTVAL get_integer_keyed (PMC* key) {
         /* simple int keys only */
         INTVAL k = key_integer(INTERP, key);
-        return DYNSELF.get_integer_keyed_int(k);
+        return SELF.get_integer_keyed_int(k);
     }
 
 
@@ -220,9 +246,8 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     STRING* get_string_keyed_int (INTVAL key) {
-        PMC *temp;
-        temp = DYNSELF.get_pmc_keyed_int(key);
-        return VTABLE_get_string(INTERP, temp);
+        PMC *val = DYNSELF.get_pmc_keyed_int(key);
+        return VTABLE_get_string(INTERP, val);
     }
 
 /*
@@ -252,11 +277,8 @@ Returns the PMC value of the element at index C<key>.
 */
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        PMC *ret;
-        INTVAL val;
-
-        ret = pmc_new(INTERP, enum_class_Boolean);
-        val = DYNSELF.get_integer_keyed_int(key);
+        PMC *ret = pmc_new(INTERP, enum_class_Boolean);
+        INTVAL val = DYNSELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
     }
@@ -287,10 +309,13 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
+        Parrot_UInt1 *sd;
         if (PMC_int_val(SELF) || size < 1)
             internal_exception(OUT_OF_BOUNDS, "FixedBooleanArray: Can't resize!");
+
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof(INTVAL));
+        PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
+        PMC_data(SELF) = mem_sys_allocate(PMC_int_val2(SELF) / BITS_PER_CHAR);
         PObj_active_destroy_SET(SELF);
     }
 
@@ -305,13 +330,17 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        INTVAL *data;
+        Parrot_UInt1 *sd = PMC_data(SELF);
+
         if (key < 0 || key >= PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS, 
                 "FixedBooleanArray: index out of bounds!");
 
-        data = (INTVAL*)PMC_data(SELF);
-        data[key] = (value != 0);
+        if ( value ) {
+            sd[key/BITS_PER_CHAR] |= ( 1 << ( key % BITS_PER_CHAR ) );
+        } else {
+            sd[key/BITS_PER_CHAR] &= ( ~ ( 1 << ( key % BITS_PER_CHAR ) ) );
+        }
     }
 
 /*
@@ -325,8 +354,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     void set_integer_keyed (PMC *key, INTVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_integer_keyed_int(k, value);
     }
 
@@ -342,7 +370,7 @@ C<value>.
 */
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
-        DYNSELF.set_integer_keyed_int(key, (INTVAL)(value != 0.0));
+        DYNSELF.set_integer_keyed_int(key, ( value ? 1 : 0 ));
     }
 
 /*
@@ -357,8 +385,7 @@ C<value>.
 */
 
     void set_number_keyed(PMC *key, FLOATVAL value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
     
@@ -394,8 +421,7 @@ C<value>.
 */
 
     void set_string_keyed(PMC *key, STRING* value) {
-        INTVAL k;
-        k = key_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         DYNSELF.set_string_keyed_int(k, value);
     }
 
@@ -431,6 +457,22 @@ C<value>.
         INTVAL k;
         k = key_integer(INTERP, key);
         DYNSELF.set_pmc_keyed_int(k, value);
+    }
+
+/*
+
+=item C<void push_integer (INTVAL value)>
+
+Extends the array by adding an element of value C<value> to the end of
+the array.
+
+=cut
+
+*/
+
+    void push_integer (INTVAL value) {
+        INTVAL nextix = DYNSELF.elements();
+        DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
 }
