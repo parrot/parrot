@@ -75,7 +75,7 @@ while (<OPCODE>) {
     my $count = 1;
     $opcode{$name}{PARAMETER_SUB} = ["", 
 				     map {if ($_ eq "n") { 
-					 my $temp = '*(NV *)(cur_opcode[' . $count . '].p)';
+					 my $temp = '*(NV *)(&cur_opcode[' . $count . '])';
 					 $count += 2;
 					 $temp;
 				     } else {
@@ -115,7 +115,7 @@ while (<INPUT>) {
 	my $count = 1;
 	@param_sub = ("",
 		      map {if ($_ eq "n") {
-			  my $temp = '*(NV *)&cur_opcode[' . $count . '].i';
+			  my $temp = '*(NV *)&cur_opcode[' . $count . ']';
 			  $count += 2;
 			  $temp;
 		      } else {
