@@ -51,10 +51,12 @@ pmclass default abstract noinit {
     }
 
     PMC* getprop(STRING* key) {
-        PMC* p_key = key_new_string(interpreter, key);
+        PMC* p_key;
 	if (SELF->pmc_ext && SELF->metadata) {
+          p_key = key_new_string(interpreter, key);
 	  return (VTABLE_get_pmc_keyed(interpreter, SELF->metadata, p_key));
-	} else {
+	} 
+        else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
           PObj_constant_SET(undef);
 	  return undef;
