@@ -118,6 +118,7 @@ Change the example given to one a little more complex, that includes
 precedence (implied and implicit), deferred evaluation, short circuiting.
 
 =cut
+
 __END__
 
 Some more notes that should be integrated at some point.
@@ -144,7 +145,7 @@ push, we get:
 3
 *
 
-which craps out when we go to pop, because by the time we get to the *, we're
+which dies when we go to pop, because by the time we get to the *, we're
 out of operands.
 
 So, the secret is to shift things onto the stack instead of pushing them.
@@ -165,7 +166,7 @@ we get:
 4
 *
 
-This will correctly pop, as 23* -> 6, then 64* -> 24.
+This will correctly pop, as C<2 3 *> -> 6, then C<6 4 *> -> 24.
 
 Does this work with more than 3 items? let's check, and keep our precedence
 straight at the same time.
