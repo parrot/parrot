@@ -25,7 +25,7 @@
   array_name = argv[1]
 
   .local pmc ignore
-  newsub ignore, .Exception_Handler, __default_handler
+  newsub ignore, .Exception_Handler, catch
 
   set_eh ignore
     find_lex the_array, -1, array_name
@@ -115,4 +115,9 @@ error:
 
 done:
   .return(return_type,retval)
+
+catch:
+  P4 = P5["_invoke_cc"]
+  invoke P4
+
 .end

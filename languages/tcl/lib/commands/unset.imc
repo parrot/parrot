@@ -21,7 +21,7 @@
   retval = new String
 
   .local pmc ignore
-  newsub ignore, .Exception_Handler, __default_handler
+  newsub ignore, .Exception_Handler, catch
 
   set_eh ignore
     $P1 = find_lex -1, varname
@@ -43,4 +43,8 @@ error:
 
 done:
   .return(return_type,retval) 
+
+catch:
+  P4=P5["_invoke_cc"]
+  invoke P4
 .end
