@@ -21,8 +21,6 @@ Tests Parrot's unicode string system.
 use Parrot::Test tests => 14;
 use Test::More;
 
-SKIP: {
-skip("No unicode yet", 14);
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
     getstdout P0
     push P0, "utf8"
@@ -37,7 +35,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
     getstdout P0
     push P0, "utf8"
-    set S0, "\x{212b}"
+    set S0, unicode:"\x{212b}"
     print S0
     print "\n"
     end
@@ -48,7 +46,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\x{212b}"
+    set S0, unicode:"aaaaaa\x{212b}"
     print S0
     print "\n"
     end
@@ -59,7 +57,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\x{212b}-aaaaaa"
+    set S0, unicode:"aaaaaa\x{212b}-aaaaaa"
     print S0
     print "\n"
     end
@@ -70,7 +68,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\u212b-aaaaaa"
+    set S0, unicode:"aaaaaa\u212b-aaaaaa"
     print S0
     print "\n"
     end
@@ -81,7 +79,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\x{1d400}-aaaaaa"
+    set S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
     print S0
     print "\n"
     end
@@ -92,7 +90,7 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U');
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\U0001d400-aaaaaa"
+    set S0, unicode:"aaaaaa\U0001d400-aaaaaa"
     print S0
     print "\n"
     end
@@ -103,41 +101,31 @@ OUTPUT
 output_is( <<'CODE', <<OUTPUT, "two upscales");
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
+    set S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
     print S0
     print "\n"
     length I0, S0
-    print I0
-    print "\n"
-    .include "stringinfo.pasm"
-    stringinfo I0, S0, .STRINGINFO_BUFUSED
     print I0
     print "\n"
     end
 CODE
 aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 22
-88
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale");
     getstdout P0
     push P0, "utf8"
-    set S0, "aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
+    set S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
     print S0
     print "\n"
     length I0, S0
-    print I0
-    print "\n"
-    .include "stringinfo.pasm"
-    stringinfo I0, S0, .STRINGINFO_BUFUSED
     print I0
     print "\n"
     end
 CODE
 aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 22
-88
 OUTPUT
 
 output_is( <<'CODE', <<OUTPUT, '\cX, \ooo');
@@ -193,4 +181,4 @@ output_like( <<'CODE', <<OUTPUT, 'illegal \x');
 CODE
 /Illegal escape sequence in/
 OUTPUT
-}
+

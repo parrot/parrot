@@ -842,8 +842,12 @@ TODO - Allow this to take an array of characters?
 STRING *
 string_chr(Interp *interpreter, UINTVAL character)
 {
-    return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter,
-            character);
+    if (character > 0xff)
+        return Parrot_unicode_charset_ptr->string_from_codepoint(interpreter,
+                character);
+    else
+        return Parrot_iso_8859_1_charset_ptr->string_from_codepoint(interpreter,
+                character);
 }
 
 

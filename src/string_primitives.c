@@ -156,60 +156,44 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
     /* Well, not right now */
     codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
     switch (codepoint) {
-    case 'x':
-        ++*offset;
-        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-        if (codepoint >= '0' && codepoint <= '9') {
-            workchar = codepoint - '0';
-        } else if (codepoint >= 'a' && codepoint <= 'f') {
-            workchar = codepoint - 'a' + 10;
-        } else if (codepoint >= 'A' && codepoint <= 'F') {
-            workchar = codepoint - 'A' + 10;
-        } else {
-            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
-        }
-        ++*offset;
-        if (*offset < len) {
-            workchar *= 16;
+        case 'x':
+            ++*offset;
             codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
             if (codepoint >= '0' && codepoint <= '9') {
-                workchar += codepoint - '0';
+                workchar = codepoint - '0';
             } else if (codepoint >= 'a' && codepoint <= 'f') {
-                workchar += codepoint - 'a' + 10;
+                workchar = codepoint - 'a' + 10;
             } else if (codepoint >= 'A' && codepoint <= 'F') {
-                workchar += codepoint - 'A' + 10;
+                workchar = codepoint - 'A' + 10;
+            } else if (codepoint == '{') {
+                int i;
+                ++*offset;
+                workchar = 0;
+                for (i = 0; i < 8 && *offset < len; ++i, ++*offset) {
+                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    if (codepoint == '}') {
+                        ++*offset;
+                        return workchar;
+                    }
+                    workchar *= 16;
+                    if (codepoint >= '0' && codepoint <= '9') {
+                        workchar += codepoint - '0';
+                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                        workchar += codepoint - 'a' + 10;
+                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                        workchar += codepoint - 'A' + 10;
+                    } else {
+                        internal_exception(UNIMPLEMENTED,
+                                "Illegal escape sequence insidde {}");
+                    }
+                }
+                if (*offset == len)
+                    internal_exception(UNIMPLEMENTED,
+                            "Illegal escape sequence no '}'");
             } else {
-                return workchar;
+                internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
             }
-        } else {
-            return workchar;
-        }
-        ++*offset;
-        return workchar;
-    case 'c':
-        ++*offset;
-        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-        if (codepoint >= 'A' && codepoint <= 'Z') {
-            workchar = codepoint - 'A' + 1;
-        } else {
-            internal_exception(UNIMPLEMENTED, "Illegal escape sequence");
-        }
-        ++*offset;
-        return workchar;
-    case 'u':
-        ++*offset;
-        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-        if (codepoint >= '0' && codepoint <= '9') {
-            workchar = codepoint - '0';
-        } else if (codepoint >= 'a' && codepoint <= 'f') {
-            workchar = codepoint - 'a' + 10;
-        } else if (codepoint >= 'A' && codepoint <= 'F') {
-            workchar = codepoint - 'A' + 10;
-        } else {
-            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
-        }
-        ++*offset;
-        for (charcount = 1; charcount < 4; charcount++) {
+            ++*offset;
             if (*offset < len) {
                 workchar *= 16;
                 codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
@@ -226,31 +210,82 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 return workchar;
             }
             ++*offset;
-        }
-        return workchar;
-    case 'U':
-        ++*offset;
-        codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-        if (codepoint >= '0' && codepoint <= '9') {
+            return workchar;
+        case 'c':
+            ++*offset;
+            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+            if (codepoint >= 'A' && codepoint <= 'Z') {
+                workchar = codepoint - 'A' + 1;
+            } else {
+                internal_exception(UNIMPLEMENTED, "Illegal escape sequence");
+            }
+            ++*offset;
+            return workchar;
+        case 'u':
+            ++*offset;
+            workchar = 0;
+            for (charcount = 0; charcount < 4; charcount++) {
+                if (*offset < len) {
+                    workchar *= 16;
+                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    if (codepoint >= '0' && codepoint <= '9') {
+                        workchar += codepoint - '0';
+                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                        workchar += codepoint - 'a' + 10;
+                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                        workchar += codepoint - 'A' + 10;
+                    } else {
+                        internal_exception(UNIMPLEMENTED,
+                                "Illegal escape sequence in uxxx escape");
+                    }
+                } else {
+                    internal_exception(UNIMPLEMENTED,
+                        "Illegal escape sequence in uxxx escape - too short");
+                }
+                ++*offset;
+            }
+            return workchar;
+        case 'U':
+            ++*offset;
+            workchar = 0;
+            for (charcount = 0; charcount < 8; charcount++) {
+                if (*offset < len) {
+                    workchar *= 16;
+                    codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                    if (codepoint >= '0' && codepoint <= '9') {
+                        workchar += codepoint - '0';
+                    } else if (codepoint >= 'a' && codepoint <= 'f') {
+                        workchar += codepoint - 'a' + 10;
+                    } else if (codepoint >= 'A' && codepoint <= 'F') {
+                        workchar += codepoint - 'A' + 10;
+                    } else {
+                        internal_exception(UNIMPLEMENTED,
+                                "Illegal escape sequence in Uxxx escape");
+                    }
+                } else {
+                    internal_exception(UNIMPLEMENTED,
+                        "Illegal escape sequence in uxxx escape - too short");
+                }
+                ++*offset;
+            }
+            return workchar;
+        case 'b':
+            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in ");
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
             workchar = codepoint - '0';
-        } else if (codepoint >= 'a' && codepoint <= 'f') {
-            workchar = codepoint - 'a' + 10;
-        } else if (codepoint >= 'A' && codepoint <= 'F') {
-            workchar = codepoint - 'A' + 10;
-        } else {
-            internal_exception(UNIMPLEMENTED, "Illegal escape sequence in");
-        }
-        ++*offset;
-        for (charcount = 1; charcount < 8; charcount++) {
+            ++*offset;
             if (*offset < len) {
-                workchar *= 16;
+                workchar *= 8;
                 codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-                if (codepoint >= '0' && codepoint <= '9') {
+                if (codepoint >= '0' && codepoint <= '7') {
                     workchar += codepoint - '0';
-                } else if (codepoint >= 'a' && codepoint <= 'f') {
-                    workchar += codepoint - 'a' + 10;
-                } else if (codepoint >= 'A' && codepoint <= 'F') {
-                    workchar += codepoint - 'A' + 10;
                 } else {
                     return workchar;
                 }
@@ -258,69 +293,43 @@ string_unescape_one(Interp *interpreter, UINTVAL *offset,
                 return workchar;
             }
             ++*offset;
-        }
-        return workchar;
-    case 'b':
-        internal_exception(UNIMPLEMENTED, "Illegal escape sequence in ");
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-        workchar = codepoint - '0';
-        ++*offset;
-        if (*offset < len) {
-            workchar *= 8;
-            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-            if (codepoint >= '0' && codepoint <= '7') {
-                workchar += codepoint - '0';
+            if (*offset < len) {
+                workchar *= 8;
+                codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
+                if (codepoint >= '0' && codepoint <= '7') {
+                    workchar += codepoint - '0';
+                } else {
+                    return workchar;
+                }
             } else {
                 return workchar;
             }
-        } else {
+            ++*offset;
             return workchar;
-        }
-        ++*offset;
-        if (*offset < len) {
-            workchar *= 8;
-            codepoint = CHARSET_GET_BYTE(interpreter, string, *offset);
-            if (codepoint >= '0' && codepoint <= '7') {
-                workchar += codepoint - '0';
-            } else {
-                return workchar;
-            }
-        } else {
-            return workchar;
-        }
-        ++*offset;
-        return workchar;
-    case 'a':
-        ++*offset;
-        return 7; /* bell */
-    case 't':
-        ++*offset;
-        return 9;
-    case 'n':
-        ++*offset;
-        return 10;
-    case 'f':
-        ++*offset;
-        return 12;
-    case 'r':
-        ++*offset;
-        return 13;
-    case 'e':
-        ++*offset;
-        return 27;
-    case 92:
-        ++*offset;
-        return 92;
-    case '"':
-        ++*offset;
-        return '"';
+        case 'a':
+            ++*offset;
+            return 7; /* bell */
+        case 't':
+            ++*offset;
+            return 9;
+        case 'n':
+            ++*offset;
+            return 10;
+        case 'f':
+            ++*offset;
+            return 12;
+        case 'r':
+            ++*offset;
+            return 13;
+        case 'e':
+            ++*offset;
+            return 27;
+        case 92:
+            ++*offset;
+            return 92;
+        case '"':
+            ++*offset;
+            return '"';
     }
 
     return 0;

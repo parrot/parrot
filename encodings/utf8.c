@@ -336,7 +336,10 @@ static void
 set_codepoint(Interp *interpreter, STRING *src,
 	UINTVAL offset, UINTVAL codepoint)
 {
-    UNIMPL;
+    const void *start;
+
+    start = utf8_skip_forward(src->strstart, offset);
+    utf8_encode(start, codepoint);
 }
 
 static UINTVAL

@@ -287,9 +287,11 @@ find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
-    STRING *return_string = NULL;
+    STRING *return_string;
 
-    UNIMPL;
+    return_string = string_make(interpreter, "", 1, "unicode", 0);
+    return_string->strlen = 1;
+    ENCODING_SET_CODEPOINT(interpreter, return_string, 0, codepoint);
     return return_string;
 }
 
