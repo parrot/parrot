@@ -37,7 +37,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
          * we are actually using. */
         p = s->strstart;
         size = s->bufused;
-        /* Create new pool data for this header to use, 
+        /* Create new pool data for this header to use,
          * independant of the original COW data */
         s->flags &= ~BUFFER_constant_FLAG;
         Parrot_allocate_string(interpreter, s, size);
@@ -67,7 +67,7 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 {
     STRING *d;
     if (s->flags & BUFFER_constant_FLAG) {
-        d = new_string_header(interpreter, 
+        d = new_string_header(interpreter,
                               s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
         s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
         copy_string_header(d, s);
@@ -266,8 +266,8 @@ INTVAL
 string_index(const STRING *s, UINTVAL idx)
 {
     if (s->encoding->index == enum_encoding_singlebyte) {
-        /* This inlines the computations used for the case that the strings is 
-         * in a singlebyte encoding. 
+        /* This inlines the computations used for the case that the strings is
+         * in a singlebyte encoding.
          * This assumes that any singlebyte encoding uses is us-ascii, which is wrong,
          * but consistent withthe result of calling s->encoding->decode */
         return *((unsigned char*) s->strstart + idx);
@@ -348,12 +348,14 @@ string_transcode(struct Parrot_Interp *interpreter,
     if (!encoding) {
         encoding = encoding_lookup_index(0);
         /* XXX This is a hack. I had thought it was:
-         * encoding = encoding_lookup(src->type->default_encoding); 
+         * encoding = encoding_lookup(src->type->default_encoding);
          * but that seems really stupid, because transcoding two strings
          * to NULL wouldn't necessarily mean they have the same
          * encoding. So this seems to least bad compromise.
          */
     }
+    interpreter->GC_block_level++;
+    interpreter->DOD_block_level++;
 
     if (src->encoding == encoding && src->type == type) {
         dest = string_copy(interpreter, src);
@@ -361,11 +363,15 @@ string_transcode(struct Parrot_Interp *interpreter,
         if (dest_ptr) {
             *dest_ptr = dest;
         }
+        interpreter->GC_block_level--;
+        interpreter->DOD_block_level--;
         return dest;
     }
 
     dest = string_make(interpreter, NULL, src->strlen * encoding->max_bytes,
                        encoding, 0, type);
+    interpreter->GC_block_level--;
+    interpreter->DOD_block_level--;
 
     if (src->type != dest->type) {
         transcoder1 = chartype_lookup_transcoder(src->type, dest->type);
@@ -565,7 +571,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
  * Replacing a slice with a longer string grows the string;
  *      a shorter string shrinks it.
  * Replacing 2 past the end of the string is undefined.
- *      however replacing 1 past does a concat. 
+ *      however replacing 1 past does a concat.
  * A negative offset is allowed to replace from the end.
  */
 STRING *
@@ -580,12 +586,12 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     UINTVAL true_offset;
     UINTVAL true_length;
     INTVAL diff;
-        
+
     true_offset = (UINTVAL)offset;
     true_length = (UINTVAL)length;
 
     if (rep->encoding != src->encoding || rep->type != src->type) {
-        rep = string_transcode(interpreter, rep, src->encoding, src->type, 
+        rep = string_transcode(interpreter, rep, src->encoding, src->type,
                                NULL);
     }
 
@@ -633,9 +639,9 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     if (d != NULL) {
         *d = dest;
     }
- 
+
     /* Now do the replacement */
- 
+
     /*
      * If the replacement string fits inside the original substring
      * don't create a new string, just pack it.
@@ -643,8 +649,8 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     diff = (subend_off - substart_off) - rep->bufused;
 
     if(diff >= 0
-        || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {      
- 
+        || ((INTVAL)src->bufused - (INTVAL)src->buflen) <= diff) {
+
         unmake_COW(interpreter, src);
 
         if(diff != 0) {
@@ -656,8 +662,8 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 
         mem_sys_memcopy((char*)src->strstart + substart_off,
                                 rep->strstart, rep->bufused);
-        if(diff != 0) 
-            (void)string_compute_strlen(src);    
+        if(diff != 0)
+            (void)string_compute_strlen(src);
     }
     /*
      * Replacement is larger than avail buffer, grow the string
@@ -666,7 +672,7 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
         /* diff is negative here, make it positive */
         diff = -(diff);
         string_grow(interpreter, src, diff);
- 
+
         /* Move the end of old string that isn't replaced to new offset
          * first */
         mem_sys_memmove((char*)src->strstart + subend_off + diff,
@@ -677,9 +683,9 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
                                 rep->bufused);
         src->bufused += diff;
         (void)string_compute_strlen(src);
-    } 
+    }
 
-    /* src is modified, now return the original substring */    
+    /* src is modified, now return the original substring */
     return dest;
 }
 
@@ -814,7 +820,7 @@ string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src) {
     else {
         dest=make_COW_reference(interpreter, src);
     }
-    
+
     return dest;
 }
 
@@ -1002,6 +1008,7 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
         string_grow(interpreter, s, 1);
     }
 
+    s->flags |= BUFFER_immobile_FLAG;
     ((char *)s->strstart)[s->bufused] = 0;
     /* don't return local vars, return the right thing */
     return (char*)s->strstart;
