@@ -43,7 +43,9 @@ sub scan_cvs {
   my $file = $_;
 
   if ( $file eq 'CVS') {
-    local *CVS;
+    # Need to localise $_, as the while loop assigns to it, at the end of the
+    # loop it will be undef, and File::Find then does stat tests on $_
+    local (*CVS, $_);
 
     open CVS, 'CVS/Entries';
 
