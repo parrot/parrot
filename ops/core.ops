@@ -73,22 +73,22 @@ environment.
 
 ########################################
 
-=item B<close>(p)
+=item B<close>(inout PMC)
 
 Close IO stream $1.
 
-=item B<close>(i|ic)
+=item B<close>(inout INT)
 
 Close file opened on file descriptor $1.
 
 =cut
 
-inline op close(p) {
+inline op close(inout PMC) {
   PIO_close(interpreter, (ParrotIO*)($1->data));
   goto NEXT();
 }
 
-inline op close(i|ic) {
+inline op close(inout INT) {
   fclose((FILE *)$1);
   goto NEXT();
 }
@@ -96,22 +96,22 @@ inline op close(i|ic) {
 
 ########################################
 
-=item B<err>(i)
+=item B<err>(out INT)
 
 Store the system error code in $1.
 
-=item B<err>(s)
+=item B<err>(out STR)
 
 Store the system error message in $1.
 
 =cut
 
-inline op err(i) {
+inline op err(out INT) {
   $1 = errno;
   goto NEXT();
 }
 
-op err(s) {
+op err(out STR) {
   char *tmp = strerror(errno);
   STRING *s = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
   $1 = s;
@@ -120,24 +120,24 @@ op err(s) {
 
 
 ########################################
-=item B<open>(p, s|sc, s|sc)
+=item B<open>(out PMC, in STR, in STR)
 
 Open file named $2 with Perl style mode string specified in $3, and
 create the IO stream PMC into $1.
 
-=item B<open>(i, s|sc)
+=item B<open>(out INT, in STR)
 
 Open file named $2 for reading and writing and save the file
 descriptor into $1.
 
-=item B<open>(i, s|sc, s|sc)
+=item B<open>(out INT, in STR, in STR)
 
 Open file named $2 with flags $3 and mode 0644 (rw-r--r--), and save the file
 descriptor into $1.
 
 =cut
 
-inline op open(p, s|sc, s|sc) {
+inline op open(out PMC, in STR, in STR) {
   ParrotIO * io;
   STRING *path = $2;
   STRING *mode = $3;
@@ -149,7 +149,7 @@ inline op open(p, s|sc, s|sc) {
   goto NEXT();
 }
 
-inline op open(i, s|sc) {
+inline op open(out INT, in STR) {
   if (! ($1 = (INTVAL)fopen(($2)->bufstart, "r+"))) {
     perror("Can't open");
     exit(1);
@@ -158,14 +158,14 @@ inline op open(i, s|sc) {
   goto NEXT();
 }
 
-inline op open(i, s|sc, s|sc) {
+inline op open(out INT, in STR, in STR) {
   $1 = (INTVAL)fopen(($2)->bufstart, ($3)->bufstart);
   goto NEXT();
 }
 
 ########################################
 
-=item B<readline>(s, i|ic)
+=item B<readline>(out STR, in INT)
 
 Temporary hack op to read in a line from the file opened on the FILE *
 we've evilly put in the integer register $2. If $2 is 0, 1, or 2 we
@@ -178,7 +178,7 @@ If for some reason the line's longer than 64K you get only 64K
 
 =cut
 
-inline op readline(s, i|ic) {
+inline op readline(out STR, in INT) {
   FILE *file;
   switch ($2) {
 	case 0: file = stdin; 
@@ -199,12 +199,12 @@ inline op readline(s, i|ic) {
 
 ########################################
 
-=item B<ord>(i,s|sc)
+=item B<ord>(out INT, in STR)
 
 Two-argument form returns the 0th character of string $2 in register $1.
 If $2 is empty, throws an exception.
 
-=item B<ord>(i,s|sc,i|ic)
+=item B<ord>(out INT, in STR, in INT)
 
 Three-argument form returns character $3 of string $2 in register 1.
 If $2 is empty, throws an exception.
@@ -216,12 +216,12 @@ If $3 is less than the negative of the length, throws an exception.
 
 =cut
 
-inline op ord(i,s|sc) {
+inline op ord (out INT, in STR) {
   $1 = string_ord($2,0);
   goto NEXT();
 }
 
-inline op ord(i,s|sc,i|ic) {
+inline op ord (out INT, in STR, in INT) {
   $1 = string_ord($2,$3);
   goto NEXT();
 }
@@ -229,52 +229,50 @@ inline op ord(i,s|sc,i|ic) {
 
 ########################################
 
-=item B<print>(i|ic)
+=item B<print>(in INT)
 
-=item B<print>(n|nc)
+=item B<print>(in NUM)
 
-=item B<print>(s|sc)
+=item B<print>(in PMC)
 
-=item B<print>(p)
+=item B<print>(in STR)
 
 Print $1 to standard output.
 
-=item B<print>(i|ic, i|ic)
+=item B<print>(in INT, in INT)
 
-=item B<print>(i|ic, n|nc)
+=item B<print>(in INT, in NUM)
 
-=item B<print>(i|ic, s|sc)
+=item B<print>(in INT, in PMC)
 
-=item B<print>(i|ic, p)
-
-=item B<print>(p, s|sc)
+=item B<print>(in PMC, in STR)
 
 Print $2 to the file on $1. (0, 1, and 2 correspond to stdin, stdout,
 and stderr)
 
 =cut
 
-inline op print(i|ic) {
+inline op print(in INT) {
   /* TODO: Configure for format */
   printf("%li", (long) $1);
   goto NEXT();
 }
 
-inline op print(n|nc) {
+inline op print(in NUM) {
   /* TODO: Configure for format */
   printf("%f", $1);
   goto NEXT();
 }
 
-op print(s|sc) {
+op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    printf("%.*s",(int)string_length(s),(char *) s->bufstart);
+    printf("%.*s", (int)string_length(s), (char *) s->bufstart);
   }
   goto NEXT();
 }
 
-op print(p, s|sc) {
+op print(in PMC, in STR) {
   ParrotIO * io;
   STRING *s = $2;
   io = (ParrotIO*)($1->data);
@@ -284,7 +282,7 @@ op print(p, s|sc) {
   goto NEXT();
 }
 
-op print(p) {
+op print(in PMC) {
   PMC *p = $1;
   STRING *s = (p->vtable->get_string(interpreter, p));
   if (s) {
@@ -294,7 +292,7 @@ op print(p) {
 }
 
 
-op print(i|ic, i|ic) {
+op print(in INT, in INT) {
   FILE *file;
   switch ($1) {
 	case 0: file = stdin; 
@@ -310,7 +308,7 @@ op print(i|ic, i|ic) {
   goto NEXT();
 }
 
-op print(i|ic, n|nc) {
+op print(in INT, in NUM) {
   FILE *file;
   switch ($1) {
 	case 0: file = stdin; 
@@ -326,7 +324,7 @@ op print(i|ic, n|nc) {
   goto NEXT();
 }
 
-op print(i|ic, s|sc) {
+op print(in INT, in STR) {
   FILE *file;
   STRING *s = $2;
   switch ($1) {
@@ -344,7 +342,7 @@ op print(i|ic, s|sc) {
   goto NEXT();
 }
 
-op print(i|ic, p) {
+op print(in INT, in PMC) {
   FILE *file;
   PMC *p = $2;
   STRING *s = (p->vtable->get_string(interpreter, p));
@@ -366,13 +364,13 @@ op print(i|ic, p) {
 
 ########################################
 
-=item B<puts>(s|sc)
+=item B<puts>(in STR)
 
 Print $1 to standard output stream
 
 =cut
 
-op puts(s|sc) {
+op puts(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
     PIO_puts(interpreter, pio_stdout, (const char *) s->bufstart);
@@ -383,31 +381,31 @@ op puts(s|sc) {
 
 ########################################
 
-=item B<read>(i, i|ic)
+=item B<read>(out INT, in INT)
 
 Read an INTVAL from file descriptor $2 into $1.
 
-=item B<read>(n, i|ic)
+=item B<read>(out NUM, in INT)
 
 Read a FLOATVAL from file descriptor $2 into $1.
 
-=item B<read>(s, i|ic, i|ic)
+=item B<read>(out STR, in INT, in INT)
 
 Read $3 bytes from file descriptor $2 into string $1.
 
 =cut
 
-inline op read(i, i|ic) {
+inline op read(out INT, in INT) {
   read($2, &($1), sizeof(INTVAL));
   goto NEXT();
 }
 
-inline op read(n, i|ic) {
+inline op read(out NUM, in INT) {
   read($2, &($1), sizeof(FLOATVAL));
   goto NEXT();
 }
 
-op read(s, i|ic, i|ic) {
+op read(out STR, in INT, in INT) {
   STRING *s;
   UINTVAL len = $3;
 
@@ -422,14 +420,14 @@ op read(s, i|ic, i|ic) {
 
 ########################################
 
-=item B<time>(i)
+=item B<time>(out INT)
 
 Puts the current system time (represented as a whole number of seconds)
 in $1.
 
 =cut
 
-inline op time(i) {
+inline op time(out INT) {
   $1 = Parrot_intval_time();
   goto NEXT();
 }
@@ -437,14 +435,14 @@ inline op time(i) {
 
 ########################################
 
-=item B<time>(n)
+=item B<time>(out NUM)
 
 Puts the current system time (represented as a number of seconds, with
 microseconds) in $1.
 
 =cut
 
-inline op time(n) {
+inline op time(out NUM) {
   $1 = Parrot_floatval_time();
   goto NEXT();
 }
@@ -452,29 +450,29 @@ inline op time(n) {
 
 ########################################
 
-=item B<write>(i|ic, i|ic)
+=item B<write>(in INT, in INT)
 
-=item B<write>(i|ic, n|nc)
+=item B<write>(in INT, in NUM)
 
-=item B<write>(i|ic, s|sc)
+=item B<write>(in INT, in STR)
 
 Write $2 to file descriptor $1.
 
 =cut
 
-op write(i|ic, i|ic) {
+op write(in INT, in INT) {
   INTVAL i = (INTVAL)$2;
   write($1, &i, sizeof(INTVAL));
   goto NEXT();
 }
 
-op write(i|ic, n|nc) {
+op write(in INT, in NUM) {
   FLOATVAL * f = &($2);
   write($1, f, sizeof(FLOATVAL));
   goto NEXT();
 }
 
-op write(i|ic, s|sc) {
+op write(in INT, in STR) {
   STRING * s = $2;
   UINTVAL count = string_length(s);
   write($1, s->bufstart, count);
@@ -500,191 +498,182 @@ These operations load registers from constants or other registers.
 
 ########################################
 
-=item B<set>(i, i)
+=item B<set>(out INT, in INT)
 
-=item B<set>(i, ic)
+=item B<set>(out INT, in NUM)
 
-=item B<set>(i, n)
+=item B<set>(out INT, in PMC)
 
-=item B<set>(i, nc)
+=item B<set>(out INT, in STR)
 
-=item B<set>(p, i)
+=item B<set>(out NUM, in INT)
 
-=item B<set>(p, ic)
+=item B<set>(out NUM, in NUM)
 
-=item B<set>(n, n)
+=item B<set>(out NUM, in PMC)
 
-=item B<set>(n, nc)
+=item B<set>(out NUM, in STR)
 
-=item B<set>(n, i)
+=item B<set>(out PMC, in INT)
 
-=item B<set>(n, ic)
+=item B<set>(out PMC, in NUM)
 
-=item B<set>(p, n)
+=item B<set>(out PMC, in PMC)
 
-=item B<set>(p, nc)
+=item B<set>(out PMC, in STR)
 
-=item B<set>(n, p)
+=item B<set>(out STR, in INT)
 
-=item B<set>(s, sc)
+=item B<set>(out STR, in NUM)
 
-=item B<set>(s, s)
+=item B<set>(out STR, in PMC)
 
-=item B<set>(p, s)
-
-=item B<set>(p, sc)
-
-=item B<set>(i, p)
+=item B<set>(out STR, in STR)
 
 Set $1 to $2.
 
-=item B<clone>(p, p)
+=item B<set>(out INT, in PMC, in INT)
 
+=item B<set>(out NUM, in PMC, in INT)
 
-=item B<set>(i, p, i|ic)
+=item B<set>(out STR, in PMC, in INT)
 
-=item B<set>(n, p, i|ic)
+=item B<set>(out PMC, in INT, in INT)
 
-=item B<set>(s, p, i|ic)
+=item B<set>(out PMC, in NUM, in INT)
 
-=item B<set>(p, i|ic, i|ic)
-
-=item B<set>(p, n|nc, i|ic)
-
-=item B<set>(p, s|sc, i|ic)
+=item B<set>(out PMC, in STR, in INT)
 
 Set $1 to index $1 of array $2
 
-=item B<set>(i, p, i|ic)
+=item B<set>(out INT, in PMC, in INT)
 
-=item B<set>(n, p, i|ic)
+=item B<set>(out NUM, in PMC, in INT)
 
-=item B<set>(s, p, i|ic)
+=item B<set>(out STR, in PMC, in INT)
 
-=item B<set>(p, i|ic, i|ic)
+=item B<set>(out PMC, in INT, in INT)
 
-=item B<set>(p, n|nc, i|ic)
+=item B<set>(out PMC, in NUM, in INT)
 
-=item B<set>(p, s|sc, i|ic)
+=item B<set>(out PMC, in STR, in INT)
 
 Set $1 to index $3 of hash $2
 
 =cut
 
 
-inline op set(i, i|ic) {
+inline op set(out INT, in INT) {
   $1 = $2;
   goto NEXT();
 }
 
-op set (i, n|nc) {
-  FLOATVAL number;
-  number = $2;
-  $1 = (INTVAL)number;
+inline op set(out INT, in NUM) {
+  $1 = (INTVAL)($2);
   goto NEXT();
 }
 
-inline op set(n, n|nc) {
+inline op set(out NUM, in NUM) {
   $1 = $2;
   goto NEXT();
 }
 
-inline op set(n, i|ic) {
+inline op set(out NUM, in INT) {
   $1 = (FLOATVAL)$2;
   goto NEXT();
 }
 
-inline op set(n, p) {
+inline op set(out NUM, in PMC) {
   $1 = $2->vtable->get_number(interpreter, $2);
   goto NEXT();
 }
 
-inline op set(s, s|sc) {
+inline op set(out STR, in STR) {
   $1 = string_copy(interpreter, $2);
   goto NEXT();
 }
 
-inline op set(p, i|ic) { 
+inline op set(out PMC, in INT) { 
   $1->vtable->set_integer_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(p, n|nc) { 
+inline op set(out PMC, in NUM) { 
   $1->vtable->set_number_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(p, s|sc) {
+inline op set(out PMC, in STR) {
   $1->vtable->set_string_native(interpreter, $1, $2);
   goto NEXT();
 }
 
-inline op set(i, p) {
+inline op set(out INT, in PMC) {
   $1 = $2->vtable->get_integer(interpreter, $2);
   goto NEXT();
 }
 
-inline op clone(p, p) {
+inline op clone(out PMC, in PMC) {
   $2->vtable->clone(interpreter, $2, $1);
   goto NEXT();
 }
 
-inline op set(p, i|ic, i|ic) {
+inline op set(out PMC, in INT, in INT) {
   $1->vtable->set_integer_index(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(p, n|nc, i|ic) {
+inline op set(out PMC, in NUM, in INT) {
   $1->vtable->set_number_index(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(p, s|sc, i|ic) {
+inline op set(out PMC, in STR, in INT) {
   $1->vtable->set_string_index(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(i, p, i|ic) {
+inline op set(out INT, in PMC, in INT) {
   $1 = $2->vtable->get_integer_index(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op set(n, p, i|ic) {
+inline op set(out NUM, in PMC, in INT) {
   $1 = $2->vtable->get_number_index(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op set(s, p, i|ic) {
+inline op set(out STR, in PMC, in INT) {
   $1 = $2->vtable->get_string_index(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op set(p, i|ic, s|sc) {
+inline op set(out PMC, in INT, in STR) {
   $1->vtable->set_integer_index_s(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(p, n|nc, s|sc) {
+inline op set(out PMC, in NUM, in STR) {
   $1->vtable->set_number_index_s(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(p, s|sc, s|sc) {
+inline op set(out PMC, in STR, in STR) {
   $1->vtable->set_string_index_s(interpreter, $1, $2, $3);
   goto NEXT();
 }
 
-inline op set(i, p, s|sc) {
+inline op set(out INT, in PMC, in STR) {
   $1 = $2->vtable->get_integer_index_s(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op set(n, p, s|sc) {
+inline op set(out NUM, in PMC, in STR) {
   $1 = $2->vtable->get_number_index_s(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op set(s, p, s|sc) {
+inline op set(out STR, in PMC, in STR) {
   $1 = $2->vtable->get_string_index_s(interpreter, $2, $3);
   goto NEXT();
 }
@@ -708,17 +697,17 @@ met, the branch happens, otherwise control falls to the next operation.
 
 ########################################
 
-=item B<eq>(i|ic, i|ic)
+=item B<eq>(in INT, in INT)
 
-=item B<eq>(n|nc, n|nc)
+=item B<eq>(in NUM, in NUM)
 
-=item B<eq>(s|sc, s|sc)
+=item B<eq>(in STR, in STR)
 
-=item B<eq>(i|ic, i|ic, ic)
+=item B<eq>(in INT, in INT, in INT)
 
-=item B<eq>(n|nc, n|nc, ic)
+=item B<eq>(in NUM, in NUM, in INT)
 
-=item B<eq>(s|sc, s|sc, ic)
+=item B<eq>(in STR, in STR, in INT)
 
 Branch if $1 is equal to $2.
 
@@ -726,85 +715,43 @@ Return address is popped off the call stack if no address is supplied.
 
 =cut
 
-inline op eq (i, i|ic) {
+inline op eq (in INT, in INT) {
   if ($1 == $2) {
     goto POP();
   }
   goto NEXT();
 }
 
-inline op eq (ic, i|ic) {
+inline op eq (in NUM, in NUM) {
   if ($1 == $2) {
     goto POP();
   }
   goto NEXT();
 }
 
-inline op eq (n, n|nc) {
-  if ($1 == $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op eq (nc, n|nc) {
-  if ($1 == $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op eq (s, s|sc) {
+op eq (in STR, in STR) {
   if (string_compare (interpreter, $1, $2) == 0) {
     goto POP();
   }
   goto NEXT();
 }
 
-op eq (sc, s|sc) {
-  if (string_compare (interpreter, $1, $2) == 0) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op eq(i, i|ic, ic) {
+inline op eq(in INT, in INT, in INT) {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op eq (ic, i|ic, ic) {
+inline op eq(in NUM, in NUM, in INT) {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op eq(n, n|nc, ic) {
-  if ($1 == $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-inline op eq (nc, n|nc, ic) {
-  if ($1 == $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op eq(s, s|sc, ic) {
+op eq(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) == 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op eq (sc, s|sc, ic) {
-  if (string_compare (interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -813,17 +760,17 @@ op eq (sc, s|sc, ic) {
 
 ########################################
 
-=item B<ne>(i|ic, i|ic)
+=item B<ne>(in INT, in INT)
 
-=item B<ne>(n|nc, n|nc)
+=item B<ne>(in NUM, in NUM)
 
-=item B<ne>(s|sc, s|sc)
+=item B<ne>(in STR, in STR)
 
-=item B<ne>(i|ic, i|ic, ic)
+=item B<ne>(in INT, in INT, in INT)
 
-=item B<ne>(n|nc, n|nc, ic)
+=item B<ne>(in NUM, in NUM, in INT)
 
-=item B<ne>(s|sc, s|sc, ic)
+=item B<ne>(in STR, in STR, in INT)
 
 Branch if $1 is not equal to $2.
 
@@ -831,135 +778,78 @@ Return address is popped off the call stack if no address is supplied.
 
 =cut
 
-inline op ne (i, i|ic) {
+inline op ne (in INT, in INT) {
   if ($1 != $2) {
     goto POP();
   }
   goto NEXT();
 }
 
-inline op ne (ic, i|ic) {
+inline op ne (in NUM, in NUM) {
   if ($1 != $2) {
     goto POP();
   }
   goto NEXT();
 }
 
-inline op ne (n, n|nc) {
-  if ($1 != $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op ne (nc, n|nc) {
-  if ($1 != $2) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-op ne (s, s|sc) {
+op ne (in STR, in STR) {
   if (string_compare (interpreter, $1, $2) != 0) {
     goto POP();
   }
   goto NEXT();
 }
 
-op ne (sc, s|sc) {
-  if (string_compare (interpreter, $1, $2) != 0) {
-    goto POP();
-  }
-  goto NEXT();
-}
-
-inline op ne(i, i|ic, ic) {
+inline op ne(in INT, in INT, in INT) {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ne (ic, i|ic, ic) {
+inline op ne(in NUM, in NUM, in INT) {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ne(n, n|nc, ic) {
-  if ($1 != $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-inline op ne (nc, n|nc, ic) {
-  if ($1 != $2) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op ne(s, s|sc, ic) {
+op ne(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne (sc, s|sc, ic) {
-  if (string_compare (interpreter, $1, $2) != 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
 
 ########################################
 
-=item B<lt>(i, i, ic)
+=item B<lt>(in INT, in INT, in INT)
 
-=item B<lt>(i, ic, ic)
+=item B<lt>(in NUM, in NUM, in INT)
 
-=item B<lt>(n, n, ic)
+=item B<lt>(in PMC, in PMC, in INT)
 
-=item B<lt>(n, nc, ic)
-
-=item B<lt>(s, s, ic)
-
-=item B<lt>(s, sc, ic)
-
-=item B<lt>(sc, s, ic)
-
-=item B<lt>(sc, sc, ic)
+=item B<lt>(in STR, in STR, in INT)
 
 Branch if $1 is less than $2.
 
 =cut
 
-inline op lt(i, i|ic, ic) {
+inline op lt(in INT, in INT, in INT) {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op lt(n, n|nc, ic) {
+inline op lt(in NUM, in NUM, in INT) {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt(s, s|sc, ic) {
-  if (string_compare(interpreter, $1, $2) < 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op lt(sc, s|sc, ic) {
+op lt(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
@@ -969,48 +859,31 @@ op lt(sc, s|sc, ic) {
 
 ########################################
 
-=item B<le>(i, i, ic)
+=item B<le>(in INT, in INT, in INT)
 
-=item B<le>(i, ic, ic)
+=item B<le>(in NUM, in NUM, in INT)
 
-=item B<le>(n, n, ic)
-
-=item B<le>(n, nc, ic)
-
-=item B<le>(s, s, ic)
-
-=item B<le>(s, sc, ic)
-
-=item B<le>(sc, s, ic)
-
-=item B<le>(sc, sc, ic)
+=item B<le>(in STR, in STR, in INT)
 
 Branch if $1 is less than or equal to $2.
 
 =cut
 
-inline op le(i, i|ic, ic) {
+inline op le(in INT, in INT, in INT) {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op le(n, n|nc, ic) {
+inline op le(in NUM, in NUM, in INT) {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(s, s|sc, ic) {
-  if (string_compare(interpreter, $1, $2) <= 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op le(sc, s|sc, ic) {
+op le(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
@@ -1020,48 +893,31 @@ op le(sc, s|sc, ic) {
 
 ########################################
 
-=item B<gt>(i, i, ic)
+=item B<gt>(in INT, in INT, in INT)
 
-=item B<gt>(i, ic, ic)
+=item B<gt>(in NUM, in NUM, in INT)
 
-=item B<gt>(n, n, ic)
-
-=item B<gt>(n, nc, ic)
-
-=item B<gt>(s, s, ic)
-
-=item B<gt>(s, sc, ic)
-
-=item B<gt>(sc, s, ic)
-
-=item B<gt>(sc, sc, ic)
+=item B<gt>(in STR, in STR, in INT)
 
 Branch if $1 is greater than $2.
 
 =cut
 
-inline op gt(i, i|ic, ic) {
+inline op gt(in INT, in INT, in INT) {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op gt(n, n|nc, ic) {
+inline op gt(in NUM, in NUM, in INT) {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(s, s|sc, ic) {
-  if (string_compare(interpreter, $1, $2) > 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op gt(sc, s|sc, ic) {
+op gt(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
@@ -1071,48 +927,31 @@ op gt(sc, s|sc, ic) {
 
 ########################################
 
-=item B<ge>(i, i, ic)
+=item B<ge>(in INT, in INT, in INT)
 
-=item B<ge>(i, ic, ic)
+=item B<ge>(in NUM, in NUM, in INT)
 
-=item B<ge>(n, n, ic)
-
-=item B<ge>(n, nc, ic)
-
-=item B<ge>(s, s, ic)
-
-=item B<ge>(s, sc, ic)
-
-=item B<ge>(sc, s, ic)
-
-=item B<ge>(sc, sc, ic)
+=item B<ge>(in STR, in STR, in INT)
 
 Branch if $1 is greater than or equal to $2.
 
 =cut
 
-inline op ge(i, i|ic, ic) {
+inline op ge(in INT, in INT, in INT) {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ge(n, n|nc, ic) {
+inline op ge(in NUM, in NUM, in INT) {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(s, s|sc, ic) {
-  if (string_compare(interpreter, $1, $2) >= 0) {
-    goto OFFSET($3);
-  }
-  goto NEXT();
-}
-
-op ge(sc, s|sc, ic) {
+op ge(in STR, in STR, in INT) {
   if (string_compare(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
@@ -1122,40 +961,40 @@ op ge(sc, s|sc, ic) {
 
 ########################################
 
-=item B<if>(i, ic)
+=item B<if>(in INT, in INT)
 
-=item B<if>(p, ic)
+=item B<if>(in NUM, in INT)
 
-=item B<if>(n, ic)
+=item B<if>(in PMC, in INT)
 
-=item B<if>(s, ic)
+=item B<if>(in STR, in INT)
 
 Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(i, ic) {
+inline op if(in INT, in INT) {
   if ($1 != 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op if(n, ic) {
+inline op if(in NUM, in INT) {
   if ($1 != 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if (s, ic) {
+op if (in STR, in INT) {
   if (string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if(p, ic) {
+op if(in PMC, in INT) {
   if ($1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -1182,13 +1021,19 @@ constants into their destination register, $1.
 
 ########################################
 
-=item B<abs>(i|n, i|ic|n|nc)
+=item B<abs>(out INT, in INT)
+
+=item B<abs>(out INT, in NUM)
+
+=item B<abs>(out NUM, in INT)
+
+=item B<abs>(out NUM, in NUM)
 
 Set $1 to absolute value of $2.
 
 =cut
 
-inline op abs(i, i|ic|n|nc) {
+inline op abs(out INT, in INT) {
   if ($2 < 0) {
     $1 = - (INTVAL)$2;
   }
@@ -1198,7 +1043,27 @@ inline op abs(i, i|ic|n|nc) {
   goto NEXT();
 }
 
-inline op abs(n, n|nc|i|ic) {
+inline op abs(out INT, in NUM) {
+  if ($2 < 0) {
+    $1 = - (INTVAL)$2;
+  }
+  else {
+    $1 = (INTVAL)$2;
+  }
+  goto NEXT();
+}
+
+inline op abs(out NUM, in INT) {
+  if ($2 < 0) {
+    $1 = - (FLOATVAL)$2;
+  }
+  else {
+    $1 = (FLOATVAL)$2;
+  }
+  goto NEXT();
+}
+
+inline op abs(out NUM, in NUM) {
   if ($2 < 0) {
     $1 = - (FLOATVAL)$2;
   }
@@ -1211,35 +1076,28 @@ inline op abs(n, n|nc|i|ic) {
 
 ########################################
 
-=item B<add>(i, i, i)
+=item B<add>(out INT, in INT, in INT)
 
-=item B<add>(i, i, ic)
-
-=item B<add>(n, n, n)
-
-=item B<add>(n, n, nc)
+=item B<add>(out NUM, in NUM, in NUM)
 
 Set $1 to the sum of $2 and $3.
 
 =cut
 
-inline op add(i, i, i|ic) {
+inline op add(out INT, in INT, in INT) {
   $1 = $2 + $3;
   goto NEXT();
 }
 
-inline op add(n, n, n|nc) {
+inline op add(out NUM, in NUM, in NUM) {
   $1 = $2 + $3;
   goto NEXT();
 }
+
 
 ########################################
 
-=item B<cmod>(i, i, i)
-
-=item B<cmod>(i, i, ic)
-
-=item B<cmod>(i, ic, i)
+=item B<cmod>(out INT, in INT, in INT)
 
 NOTE: This "uncorrected mod" algorithm uses the C language's built-in
 mod operator (x % y), which is
@@ -1274,7 +1132,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-inline op cmod(i, i|ic, i|ic) {
+inline op cmod(out INT, in INT, in INT) {
   $1 = $2 % $3;
   goto NEXT();
 }
@@ -1282,11 +1140,7 @@ inline op cmod(i, i|ic, i|ic) {
 
 ########################################
 
-=item B<cmod>(n, n, n)
-
-=item B<cmod>(n, n, nc)
-
-=item B<cmod>(n, nc, n)
+=item B<cmod>(out NUM, in NUM, in NUM)
 
 NOTE: This "uncorrected mod" algorithm uses the built-in C math library's
 fmod() function, which computes
@@ -1315,7 +1169,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 =cut
 
-inline op cmod(n, n|nc, n|nc) {
+inline op cmod(out NUM, in NUM, in NUM) {
   $1 = fmod($2, $3);
   goto NEXT();
 }
@@ -1323,15 +1177,20 @@ inline op cmod(n, n|nc, n|nc) {
 
 ########################################
 
-=item B<dec>(i)
+=item B<dec>(inout INT)
 
-=item B<dec>(n)
+=item B<dec>(inout NUM)
 
 Decrease $1 by one.
 
 =cut
 
-inline op dec(i|n) {
+inline op dec(inout INT) {
+  $1--;
+  goto NEXT();
+}
+
+inline op dec(inout NUM) {
   $1--;
   goto NEXT();
 }
@@ -1339,20 +1198,20 @@ inline op dec(i|n) {
 
 ########################################
 
-=item B<dec>(i, ic)
+=item B<dec>(inout INT, in INT)
 
-=item B<dec>(n, nc)
+=item B<dec>(inout NUM, in INT)
 
 Decrease $1 by the amount in $2.
 
 =cut
 
-inline op dec(i, ic) {
+inline op dec(inout INT, in INT) {
   $1 -= $2;
   goto NEXT();
 }
 
-inline op dec(n, nc) {
+inline op dec(inout NUM, in NUM) {
   $1 -= $2;
   goto NEXT();
 }
@@ -1360,29 +1219,21 @@ inline op dec(n, nc) {
 
 ########################################
 
-=item B<div>(i, i, i)
+=item B<div>(out INT, in INT, in INT)
 
-=item B<div>(i, i, ic)
-
-=item B<div>(i, ic, i)
-
-=item B<div>(n, n, n)
-
-=item B<div>(n, n, nc)
-
-=item B<div>(n, nc, n)
+=item B<div>(out NUM, in NUM, in NUM)
 
 Set $1 to the quotient of $2 divided by $3. In the case of INTVAL division, the
 result is truncated (NOT rounded or floored).
 
 =cut
 
-inline op div(i, i|ic, i|ic) {
+inline op div(out INT, in INT, in INT) {
   $1 = $2 / $3;
   goto NEXT();
 }
 
-inline op div(n, n|nc, n|nc) {
+inline op div(out NUM, in NUM, in NUM) {
   $1 = $2 / $3;
   goto NEXT();
 }
@@ -1390,15 +1241,20 @@ inline op div(n, n|nc, n|nc) {
 
 ########################################
 
-=item B<inc>(i)
+=item B<inc>(inout INT)
 
-=item B<inc>(n)
+=item B<inc>(inout NUM)
 
 Increase $1 by one.
 
 =cut
 
-inline op inc(i|n) {
+inline op inc(inout INT) {
+  $1++;
+  goto NEXT();
+}
+
+inline op inc(inout NUM) {
   $1++;
   goto NEXT();
 }
@@ -1406,20 +1262,20 @@ inline op inc(i|n) {
 
 ########################################
 
-=item B<inc>(i, ic)
+=item B<inc>(inout INT, in INT)
 
-=item B<inc>(n, nc)
+=item B<inc>(inout NUM, in NUM)
 
 Increase $1 by the amount in $2.
 
 =cut
 
-inline op inc(i, ic) {
+inline op inc(inout INT, in INT) {
   $1 += $2;
   goto NEXT();
 }
 
-inline op inc(n, nc) {
+inline op inc(inout NUM, in NUM) {
   $1 += $2;
   goto NEXT();
 }
@@ -1427,11 +1283,7 @@ inline op inc(n, nc) {
 
 ########################################
 
-=item B<mod>(i, i, i)
-
-=item B<mod>(i, i, ic)
-
-=item B<mod>(i, ic, i)
+=item B<mod>(out INT, in INT, in INT)
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of C's built-in mod operator (%) with
@@ -1453,7 +1305,7 @@ References:
 
 =cut
 
-op mod(i, i|ic, i|ic) {
+op mod(out INT, in INT, in INT) {
   INTVAL y = $2;
   INTVAL z = $3;
   INTVAL s = 0;
@@ -1483,11 +1335,7 @@ op mod(i, i|ic, i|ic) {
 
 ########################################
 
-=item B<mod>(n, n, n)
-
-=item B<mod>(n, n, nc)
-
-=item B<mod>(n, nc, n)
+=item B<mod>(out NUM, in NUM, in NUM)
 
 NOTE: This "corrected mod" algorithm is based on the formula of [1]:
 
@@ -1503,7 +1351,7 @@ References:
 
 =cut
 
-op mod(n, n|nc, n|nc) {
+op mod(out NUM, in NUM, in NUM) {
   $1 = $3
      ? ($2 - $3 * floor($2 / $3))
      : $2;
@@ -1513,11 +1361,9 @@ op mod(n, n|nc, n|nc) {
 
 ########################################
 
-=item B<mul>(i, i, i)
+=item B<mul>(out INT, in INT, in INT)
 
-=item B<mul>(i, i, ic)
-
-=item B<mul>(n, n, n)
+=item B<mul>(out NUM, in NUM, in NUM)
 
 =item B<mul>(n, n, nc)
 
@@ -1525,12 +1371,12 @@ Set $1 to the product of $2 and $3.
 
 =cut
 
-inline op mul(i, i, i|ic) {
+inline op mul(out INT, in INT, in INT) {
   $1 = $2 * $3;
   goto NEXT();
 }
 
-inline op mul(n, n, n|nc) {
+inline op mul(out NUM, in NUM, in NUM) {
   $1 = $2 * $3;
   goto NEXT();
 }
@@ -1538,35 +1384,34 @@ inline op mul(n, n, n|nc) {
 
 ########################################
 
-=item B<pow>(n, i, i)
+=item B<pow>(out NUM, in INT, in INT)
 
-=item B<pow>(n, i, ic)
+=item B<pow>(out NUM, in INT, in NUM)
 
-=item B<pow>(n, ic, i)
+=item B<pow>(out NUM, in NUM, in INT)
 
-=item B<pow>(n, i, n)
-
-=item B<pow>(n, i, nc)
-
-=item B<pow>(n, ic, n)
-
-=item B<pow>(n, n, i)
-
-=item B<pow>(n, n, ic)
-
-=item B<pow>(n, nc, i)
-
-=item B<pow>(n, n, n)
-
-=item B<pow>(n, n, nc)
-
-=item B<pow>(n, nc, n)
+=item B<pow>(out NUM, in NUM, in NUM)
 
 Set $1 to $2 raised to the power $3.
 
 =cut
 
-inline op pow(n, i|ic|n|nc, i|ic|n|nc) {
+inline op pow(out NUM, in INT, in INT) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in INT, in NUM) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in NUM, in INT) {
+   $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(out NUM, in NUM, in NUM) {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
@@ -1574,28 +1419,20 @@ inline op pow(n, i|ic|n|nc, i|ic|n|nc) {
 
 ########################################
 
-=item B<sub>(i, i, i)
+=item B<sub>(out INT, in INT, in INT)
 
-=item B<sub>(i, i, ic)
-
-=item B<sub>(i, ic, i)
-
-=item B<sub>(n, n, n)
-
-=item B<sub>(n, n, nc)
-
-=item B<sub>(n, nc, n)
+=item B<sub>(out NUM, in NUM, in NUM)
 
 Set $1 to $2 minus $3.
 
 =cut
 
-inline op sub(i, i|ic, i|ic) {
+inline op sub(out INT, in INT, in INT) {
   $1 = $2 - $3;
   goto NEXT();
 }
 
-inline op sub(n, n|nc, n|nc) {
+inline op sub(out NUM, in NUM, in NUM) {
   $1 = $2 - $3;
   goto NEXT();
 }
@@ -1619,9 +1456,7 @@ These operations operate on STRINGs.
 
 ########################################
 
-=item B<chopn>(s, ic)
-
-=item B<chopn>(s, i)
+=item B<chopn>(inout STR, in INT)
 
 Remove $2 characters from the end of the string in $1.
 
@@ -1629,7 +1464,7 @@ TODO: Create a three-argument version of this? Don't force in-place modification
 
 =cut
 
-inline op chopn(s, i|ic) {
+inline op chopn(inout STR, in INT) {
   (void)string_chopn($1, $2);
   goto NEXT();
 }
@@ -1637,15 +1472,9 @@ inline op chopn(s, i|ic) {
 
 ########################################
 
-=item B<concat>(s, s)
+=item B<concat>(inout STR, in STR)
 
-=item B<concat>(s, sc)
-
-=item B<concat>(s, s, s)
-
-=item B<concat>(s, s, sc)
-
-=item B<concat>(s, sc, s)
+=item B<concat>(out STR, in STR, in STR)
 
 Append the string in $2 to the string in $1.
 
@@ -1654,25 +1483,25 @@ into $1.
 
 =cut
 
-inline op concat(s, s|sc) {
+inline op concat(inout STR, in STR) {
   $1 = string_concat(interpreter, $1, $2, 1);
   goto NEXT();
 }
 
-inline op concat(s, s|sc, s|sc) {
+inline op concat(out STR, in STR, in STR) {
   $1 = string_concat(interpreter, $2, $3, 1);
   goto NEXT();
 }
 
 #######################################
 
-=item B<repeat>(s, s|sc, i|ic)
+=item B<repeat>(out STR, in STR, in INT)
 
 Repeats string $2 $3 times and stores result in $1.
 
 =cut
 
-inline op repeat(s, s|sc, i|ic) {
+inline op repeat(out STR, in STR, in INT) {
   if ($3 < 0) {
       INTERNAL_EXCEPTION(NEG_REPEAT, "Cannot repeat with negative arg");
   }
@@ -1682,13 +1511,13 @@ inline op repeat(s, s|sc, i|ic) {
 
 ########################################
 
-=item B<length>(i, s)
+=item B<length>(out INT, in STR)
 
 Set $1 to the length (in characters) of the string in $2.
 
 =cut
 
-inline op length(i, s) {
+inline op length(out INT, in STR) {
   $1 = string_length($2);
   goto NEXT();
 }
@@ -1696,26 +1525,14 @@ inline op length(i, s) {
 
 ########################################
 
-=item B<substr>(s, s, i, i)
-
-=item B<substr>(s, s, i, ic)
-
-=item B<substr>(s, s, ic, i)
-
-=item B<substr>(s, s, ic, ic)
-
-=item B<substr>(s, sc, i, i)
-
-=item B<substr>(s, sc, i, ic)
-
-=item B<substr>(s, sc, ic, i)
+=item B<substr>(out STR, in STR, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position $3 and having
 length $4.
 
 =cut
 
-inline op substr(s, s|sc, i|ic, i|ic) {
+inline op substr(out STR, in STR, in INT, in INT) {
   $1 = string_substr(interpreter, $2, $3, $4, &$1);
   goto NEXT();
 }
@@ -1740,15 +1557,20 @@ and trigonometrics.
 
 ########################################
 
-=item B<acos>(n, i)
+=item B<acos>(out NUM, in INT)
 
-=item B<acos>(n, n)
+=item B<acos>(out NUM, in NUM)
 
 Set $1 to the arc cosine (in radians) of $2.
 
 =cut
 
-inline op acos(n, i|n) {
+inline op acos(out NUM, in INT) {
+  $1 = acos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op acos(out NUM, in NUM) {
   $1 = acos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1756,15 +1578,20 @@ inline op acos(n, i|n) {
 
 ########################################
 
-=item B<asec>(n, i)
+=item B<asec>(out NUM, in INT)
 
-=item B<asec>(n, n)
+=item B<asec>(out NUM, in NUM)
 
 Set $1 to the arc secant (in radians) of $2.
 
 =cut
 
-inline op asec(n, i|n) {
+inline op asec(out NUM, in INT) {
+  $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+  goto NEXT();
+}
+
+inline op asec(out NUM, in NUM) {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
   goto NEXT();
 }
@@ -1772,15 +1599,20 @@ inline op asec(n, i|n) {
 
 ########################################
 
-=item B<asin>(n, i)
+=item B<asin>(out NUM, in INT)
 
-=item B<asin>(n, n)
+=item B<asin>(out NUM, in NUM)
 
 Set $1 to the arc sine (in radians) of $2.
 
 =cut
 
-inline op asin(n, i|n) {
+inline op asin(out NUM, in INT) {
+  $1 = asin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op asin(out NUM, in NUM) {
   $1 = asin((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1788,33 +1620,17 @@ inline op asin(n, i|n) {
 
 ########################################
 
-=item B<atan>(n, i)
+=item B<atan>(out NUM, in INT)
 
-=item B<atan>(n, i, i)
+=item B<atan>(out NUM, in NUM)
 
-=item B<atan>(n, i, ic)
+=item B<atan>(out NUM, in INT, in INT)
 
-=item B<atan>(n, ic, i)
+=item B<atan>(out NUM, in INT, in NUM)
 
-=item B<atan>(n, i, n)
+=item B<atan>(out NUM, in NUM, in INT)
 
-=item B<atan>(n, i, nc)
-
-=item B<atan>(n, ic, n)
-
-=item B<atan>(n, n)
-
-=item B<atan>(n, n, i)
-
-=item B<atan>(n, n, ic)
-
-=item B<atan>(n, nc, i)
-
-=item B<atan>(n, n, n)
-
-=item B<atan>(n, n, nc)
-
-=item B<atan>(n, nc, n)
+=item B<atan>(out NUM, in NUM, in NUM)
 
 The two-argument versions set $1 to the arc tangent (in radians) of $2.
 
@@ -1824,12 +1640,32 @@ quadrant of the result.
 
 =cut
 
-inline op atan(n, i|n) {
+inline op atan(out NUM, in INT) {
   $1 = atan((FLOATVAL)$2);
   goto NEXT();
 }
 
-inline op atan(n, i|ic|n|nc, i|ic|n|nc) {
+inline op atan(out NUM, in NUM) {
+  $1 = atan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in INT, in INT) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in INT, in NUM) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in NUM, in INT) {
+  $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op atan(out NUM, in NUM, in NUM) {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
   goto NEXT();
 }
@@ -1837,15 +1673,20 @@ inline op atan(n, i|ic|n|nc, i|ic|n|nc) {
 
 ########################################
 
-=item B<cos>(n, i)
+=item B<cos>(out NUM, in INT)
 
-=item B<cos>(n, n)
+=item B<cos>(out NUM, in NUM)
 
 Set $1 to the cosine of $2 (given in radians).
 
 =cut
 
-inline op cos(n, i|n) {
+inline op cos(out NUM, in INT) {
+  $1 = cos((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op cos(out NUM, in NUM) {
   $1 = cos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1853,15 +1694,20 @@ inline op cos(n, i|n) {
 
 ########################################
 
-=item B<cosh>(n, i)
+=item B<cosh>(out NUM, in INT)
 
-=item B<cosh>(n, n)
+=item B<cosh>(out NUM, in NUM)
 
 Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 =cut
 
-inline op cosh(n, i|n) {
+inline op cosh(out NUM, in INT) {
+  $1 = cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op cosh(out NUM, in NUM) {
   $1 = cosh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1869,15 +1715,20 @@ inline op cosh(n, i|n) {
 
 ########################################
 
-=item B<exp>(n, i)
+=item B<exp>(out NUM, in INT)
 
-=item B<exp>(n, n)
+=item B<exp>(out NUM, in NUM)
 
 Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm.
 
 =cut
 
-inline op exp(n, i|n) {
+inline op exp(out NUM, in INT) {
+  $1 = exp((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op exp(out NUM, in NUM) {
   $1 = exp((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1885,15 +1736,20 @@ inline op exp(n, i|n) {
 
 ########################################
 
-=item B<ln>(n, i)
+=item B<ln>(out NUM, in INT)
 
-=item B<ln>(n, n)
+=item B<ln>(out NUM, in NUM)
 
 Set $1 to the natural (base I<e>) logarithm of $2.
 
 =cut
 
-inline op ln(n, i|n) {
+inline op ln(out NUM, in INT) {
+  $1 = log((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op ln(out NUM, in NUM) {
   $1 = log((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1901,15 +1757,20 @@ inline op ln(n, i|n) {
 
 ########################################
 
-=item B<log10>(n, i)
+=item B<log10>(out NUM, in INT)
 
-=item B<log10>(n, n)
+=item B<log10>(out NUM, in NUM)
 
 Set $1 to the base 10 logarithm of $2.
 
 =cut
 
-inline op log10(n, i|n) {
+inline op log10(out NUM, in INT) {
+  $1 = log10((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op log10(out NUM, in NUM) {
   $1 = log10((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1917,15 +1778,21 @@ inline op log10(n, i|n) {
 
 ########################################
 
-=item B<log2>(n, i)
+=item B<log2>(out NUM, in INT)
 
-=item B<log2>(n, n)
+=item B<log2>(out NUM, in NUM)
 
 Set $1 to the base 2 logarithm of $2.
 
 =cut
 
-op log2(n, i|n) {
+op log2(out NUM, in INT) {
+   FLOATVAL temp = log((FLOATVAL)2.0);
+  $1 = log((FLOATVAL)$2) / temp;
+  goto NEXT();
+}
+
+op log2(out NUM, in NUM) {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
   goto NEXT();
@@ -1934,16 +1801,20 @@ op log2(n, i|n) {
 
 ########################################
 
-=item B<sec>(n, i)
+=item B<sec>(out NUM, in INT)
 
-=item B<sec>(n, n)
+=item B<sec>(out NUM, in NUM)
 
 Set $1 to the secant of $2 (given in radians).
 
 =cut
 
+inline op sec(out NUM, in INT) {
+  $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+  goto NEXT();
+}
 
-inline op sec(n, i|n) {
+inline op sec(out NUM, in NUM) {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1951,15 +1822,20 @@ inline op sec(n, i|n) {
 
 ########################################
 
-=item B<sech>(n, i)
+=item B<sech>(out NUM, in INT)
 
-=item B<sech>(n, n)
+=item B<sech>(out NUM, in NUM)
 
 Set $1 to the hyperbolic secant of $2 (given in radians).
 
 =cut
 
-inline op sech(n, i|n) {
+inline op sech(out NUM, in INT) {
+  $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sech(out NUM, in NUM) {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1967,15 +1843,20 @@ inline op sech(n, i|n) {
 
 ########################################
 
-=item B<sin>(n, i)
+=item B<sin>(out NUM, in INT)
 
-=item B<sin>(n, n)
+=item B<sin>(out NUM, in NUM)
 
 Set $1 to the sine of $2 (given in radians).
 
 =cut
 
-inline op sin(n, i|n) {
+inline op sin(out NUM, in INT) {
+  $1 = sin((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sin(out NUM, in NUM) {
   $1 = sin((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1983,15 +1864,20 @@ inline op sin(n, i|n) {
 
 ########################################
 
-=item B<sinh>(n, i)
+=item B<sinh>(out NUM, in INT)
 
-=item B<sinh>(n, n)
+=item B<sinh>(out NUM, in NUM)
 
 Set $1 to the hyperbolic sine of $2 (given in radians).
 
 =cut
 
-inline op sinh(n, i|n) {
+inline op sinh(out NUM, in INT) {
+  $1 = sinh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op sinh(out NUM, in NUM) {
   $1 = sinh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -1999,14 +1885,20 @@ inline op sinh(n, i|n) {
 
 ########################################
 
-=item B<tan>(n, i)
-=item B<tan>(n, n)
+=item B<tan>(out NUM, in INT)
+
+=item B<tan>(out NUM, in NUM)
 
 Set $1 to the tangent of $2 (given in radians).
 
 =cut
 
-inline op tan(n, i|n) {
+inline op tan(out NUM, in INT) {
+  $1 = tan((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op tan(out NUM, in NUM) {
   $1 = tan((FLOATVAL)$2);
   goto NEXT();
 }
@@ -2014,15 +1906,20 @@ inline op tan(n, i|n) {
 
 ########################################
 
-=item B<tanh>(n, i)
+=item B<tanh>(out NUM, in INT)
 
-=item B<tanh>(n, n)
+=item B<tanh>(out NUM, in NUM)
 
 Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 =cut
 
-inline op tanh(n, i|n) {
+inline op tanh(out NUM, in INT) {
+  $1 = tanh((FLOATVAL)$2);
+  goto NEXT();
+}
+
+inline op tanh(out NUM, in NUM) {
   $1 = tanh((FLOATVAL)$2);
   goto NEXT();
 }
@@ -2046,15 +1943,13 @@ These operations apply  bitwise logical functions to their arguments.
 
 ########################################
 
-=item B<and>(i, i, i)
-
-=item B<and>(i, i, ic)
+=item B<and>(out INT, in INT, in INT)
 
 Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op and(i, i, i|ic) {
+inline op and(out INT, in INT, in INT) {
   $1 = $2 & $3;
   goto NEXT();
 }
@@ -2062,13 +1957,13 @@ inline op and(i, i, i|ic) {
 
 ########################################
 
-=item B<not>(i, i)
+=item B<not>(out INT, in INT)
 
 Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
 
-inline op not(i, i) {
+inline op not(out INT, in INT) {
   $1 = ~ $2;
   goto NEXT();
 }
@@ -2076,32 +1971,26 @@ inline op not(i, i) {
 
 ########################################
 
-=item B<or>(i, i, i)
-
-=item B<or>(i, i, ic)
+=item B<or>(out INT, in INT, in INT)
 
 Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op or(i, i, i|ic) {
+inline op or(out INT, in INT, in INT) {
   $1 = $2 | $3;
   goto NEXT();
 }
 
 ########################################
 
-=item B<shl>(i, i, i)
-
-=item B<shl>(i, i, ic)
-
-=item B<shl>(i, ic, i)
+=item B<shl>(out INT, in INT, in INT)
 
 Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
 
-inline op shl(i, i|ic, i|ic) {
+inline op shl(out INT, in INT, in INT) {
   $1 = $2 << $3;
   goto NEXT();
 }
@@ -2109,17 +1998,13 @@ inline op shl(i, i|ic, i|ic) {
 
 ########################################
 
-=item B<shr>(i, i, i)
-
-=item B<shr>(i, i, ic)
-
-=item B<shr>(i, ic, i)
+=item B<shr>(out INT, in INT, in INT)
 
 Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
 
-inline op shr(i, i|ic, i|ic) {
+inline op shr(out INT, in INT, in INT) {
   $1 = $2 >> $3;
   goto NEXT();
 }
@@ -2127,15 +2012,13 @@ inline op shr(i, i|ic, i|ic) {
 
 ########################################
 
-=item B<xor>(i, i, i)
-
-=item B<xor>(i, i, ic)
+=item B<xor>(out INT, in INT, in INT)
 
 Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and $3.
 
 =cut
 
-inline op xor(i, i, i|ic) {
+inline op xor(out INT, in INT, in INT) {
   $1 = $2 ^ $3;
   goto NEXT();
 }
@@ -2160,13 +2043,13 @@ subsequent operation.
 
 ########################################
 
-=item B<bounds>(ic)
+=item B<bounds>(in INT)
 
 If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 
 =cut
 
-inline op bounds(ic) {
+inline op bounds(in INT) {
   if ($1 != 0) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
   else         { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
   restart NEXT();
@@ -2175,13 +2058,13 @@ inline op bounds(ic) {
 
 ########################################
 
-=item B<profile>(ic)
+=item B<profile>(in INT)
 
 If $1 is zero, turn off profiling. Otherwise turn it on.
 
 =cut
 
-inline op profile(ic) {
+inline op profile(in INT) {
   if ($1 != 0) { interpreter->flags |=  PARROT_PROFILE_FLAG; }
   else         { interpreter->flags &= ~PARROT_PROFILE_FLAG; }
   restart NEXT();
@@ -2190,13 +2073,13 @@ inline op profile(ic) {
 
 ########################################
 
-=item B<trace>(ic)
+=item B<trace>(in INT)
 
 If $1 is zero, turn off tracing. Otherwise turn it on.
 
 =cut
 
-inline op trace(ic) {
+inline op trace(in INT) {
   if ($1 != 0) { interpreter->flags |=  PARROT_TRACE_FLAG; }
   else         { interpreter->flags &= ~PARROT_TRACE_FLAG; }
   restart NEXT();
@@ -2379,13 +2262,13 @@ These operations effect individual registers.
 
 ########################################
 
-=item B<entrytype>(i, i|ic)
+=item B<entrytype>(out INT, in INT)
 
 Gets the type of entry $2 of the stack and puts in in $1
 
 =cut
 
-op entrytype(i, i|ic) {
+op entrytype(out INT, in INT) {
   INTVAL depth;
   struct Stack_Entry *entry;
   depth = stack_depth(interpreter, interpreter->user_stack_base);
@@ -2400,40 +2283,34 @@ op entrytype(i, i|ic) {
 
 ########################################
 
-=item B<save>(i)
+=item B<save>(in INT)
 
-=item B<save>(ic)
+=item B<save>(in NUM)
 
-=item B<save>(n)
+=item B<save>(in STR)
 
-=item B<save>(nc)
-
-=item B<save>(p)
-
-=item B<save>(s)
-
-=item B<save>(sc)
+=item B<save>(in PMC)
 
 Save register or constant $1 onto the stack.
 
 =cut
 
-inline op save(i|ic) {
+inline op save(in INT) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT, NULL);
   goto NEXT();
 }
 
-inline op save(n|nc) {
+inline op save(in NUM) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT, NULL);
   goto NEXT();
 }
 
-inline op save(p) {
+inline op save(in PMC) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, $1, STACK_ENTRY_PMC, NULL);
   goto NEXT();
 }
 
-inline op save(s|sc) {
+inline op save(in STR) {
   push_generic_entry(interpreter,  &interpreter->user_stack_top, $1, STACK_ENTRY_STRING, NULL);
   goto NEXT();
 }
@@ -2441,34 +2318,34 @@ inline op save(s|sc) {
 
 ########################################
 
-=item B<restore>(i)
+=item B<restore>(out INT)
 
-=item B<restore>(n)
+=item B<restore>(out NUM)
 
-=item B<restore>(p)
+=item B<restore>(out PMC)
 
-=item B<restore>(s)
+=item B<restore>(out STR)
 
 Restore register $1 from the appropriate register stack.
 
 =cut
 
-inline op restore(i) {
+inline op restore(out INT) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT);
   goto NEXT();
 }
 
-inline op restore(n) {
+inline op restore(out NUM) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT);
   goto NEXT();
 }
 
-inline op restore(p) {
+inline op restore(out PMC) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_PMC);
   goto NEXT();
 }
 
-inline op restore(s) {
+inline op restore(out STR) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_STRING);
   goto NEXT();
 }
@@ -2476,16 +2353,14 @@ inline op restore(s) {
 
 ########################################
 
-=item B<rotate_up>(i)
-
-=item B<rotate_up>(ic)
+=item B<rotate_up>(in INT)
 
 Rotate the top $1 entries in the user stack so that the top entry
 becomes the bottom entry in that range.
 
 =cut
 
-inline op rotate_up(i|ic) {
+inline op rotate_up(in INT) {
   rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
   goto NEXT();
 }
@@ -2508,29 +2383,27 @@ The control flow opcodes check conditions and manage program flow.
 
 ########################################
 
-=item B<branch>(ic)
+=item B<branch>(in INT)
 
 Branch forward or backward by the amount in $1.
 
 =cut
 
-inline op branch (ic) {
+inline op branch (in INT) {
   goto OFFSET($1);
 }
 
 
 ########################################
 
-=item B<bsr>(i)
-
-=item B<bsr>(ic)
+=item B<bsr>(in INT)
 
 Branch to the location specified by $1. Push the current location onto the call
 stack for later returning.
 
 =cut
 
-inline op bsr (i|ic) {
+inline op bsr (in INT) {
   push_generic_entry(interpreter, &interpreter->control_stack_top, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
   goto OFFSET($1);
 }
@@ -2550,13 +2423,13 @@ TODO: Implement this, or delete the entry.
 
 ########################################
 
-=item B<jump>(i)
+=item B<jump>(out INT)
 
 Jump to the address held in register $1.
 
 =cut
 
-inline op jump(i) {
+inline op jump(out INT) {
   goto OFFSET($1);
 }
 
@@ -2576,13 +2449,13 @@ Opcodes which need to be sorted into better categories.
 
 ########################################
 
-=item B<newinterp>(p, i|ic)
+=item B<newinterp>(out PMC, in INT)
 
 Create a new interpreter and store it in a PMC
 
 =cut
 
-op newinterp(p, i|ic) {
+op newinterp(out PMC, in INT) {
   struct Parrot_Interp *new_interp;
   struct PMC *new_pmc;
   new_interp = make_interpreter($2);
@@ -2594,13 +2467,13 @@ op newinterp(p, i|ic) {
 }
 
 
-=item B<runinterp>(p, i|ic)
+=item B<runinterp>(inout PMC, in INT)
 
 Take a built interpreter and run the code starting at offset $2
 
 =cut
 
-op runinterp(p, i|ic) {
+op runinterp(inout PMC, in INT) {
   struct Parrot_Interp * new_interp = (struct Parrot_Interp *)$1->data;
   runops(new_interp, interpreter->code, REL_PC + $2);
   goto NEXT();
@@ -2608,7 +2481,7 @@ op runinterp(p, i|ic) {
 
 ########################################
 
-=item B<new>(p, i)
+=item B<new>(out PMC, in INT)
 
 Create a new PMC of class C<i>; look in F<pmc.h> for the base
 vtable types. The assembler allows you to specify PMCs by type
@@ -2619,7 +2492,7 @@ to avoid problems if the base types get reassigned. For example:
 
 =cut
 
-op new(p, i|ic) {
+op new(out PMC, in INT) {
   PMC* newpmc;
   if ($2 <0 || $2 >= enum_class_max) {
     abort(); /* Deserve to lose */
@@ -2644,15 +2517,13 @@ inline op ret() {
 
 ########################################
 
-=item B<sleep>(i)
-
-=item B<sleep>(ic)
+=item B<sleep>(in INT)
 
 Sleep for $1 seconds
 
 =cut
 
-inline op sleep(i|ic) {
+inline op sleep(in INT) {
   if ($1 < 0) {
       INTERNAL_EXCEPTION(NEG_SLEEP, "Cannot go back in time");
   }
@@ -2663,70 +2534,68 @@ inline op sleep(i|ic) {
 
 #######################################
 
-=item B<setline>(i)
-
-=item B<setline>(ic)
+=item B<setline>(in INT)
 
 Set the current line number we're executing code for
 
 =cut
 
-inline op setline(i|ic) {
+inline op setline(in INT) {
   interpreter->current_line = $1;
   goto NEXT();
 }
 
-=item B<getline>(i)
+=item B<getline>(out INT)
 
 Get the current line number
 
 =cut
 
-inline op getline(i) {
+inline op getline(out INT) {
   $1 = interpreter->current_line;
   goto NEXT();
 }
 
-=item B<setfile>(s|sc)
+=item B<setfile>(in STR)
 
 Sets the current file we're executing code for
 
 =cut
 
-inline op setfile(s|sc) {
+inline op setfile(in STR) {
   interpreter->current_file = $1;
   goto NEXT();
 }
 
-=item B<getfile>(s)
+=item B<getfile>(out STR)
 
 Gets the current file we're executing code for
 
 =cut
 
-inline op getfile(s) {
+inline op getfile(out STR) {
   $1 = interpreter->current_file;
   goto NEXT();
 }
 
-=item B<setpackage>(s|sc)
+=item B<setpackage>(in STR)
 
 Sets the current package we're executing code for
 
 =cut
 
-inline op setpackage(s|sc) {
+inline op setpackage(in STR) {
   interpreter->current_package = $1;
   goto NEXT();
 }
 
-=item B<getpackage>(s)
+=item B<getpackage>(out STR)
 
 Gets the current package we're executing code for
 
 =cut
 
-inline op getpackage(s) {
+inline op getpackage(out STR) {
   $1 = interpreter->current_package;
   goto NEXT();
 }

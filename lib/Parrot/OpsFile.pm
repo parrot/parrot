@@ -168,6 +168,28 @@ sub read_ops
       $seen_op    = 1;
       $line	      = $.+1;
 
+      my @temp = ();
+
+      foreach my $arg (@args) {
+	my ($use, $type) = $arg =~ m/^(in|out|inout)\s+(INT|NUM|STR|PMC)$/i;
+
+        die "Unrecognized arg format '$arg'!" unless defined($use) and defined($type);
+
+        $type = lc substr($type, 0, 1);
+
+        if ($use eq 'in') {
+          push @temp, ($type eq 'p') ? 'p' : "$type|${type}c";
+        }
+        elsif ($use eq 'inout') {
+          push @temp, $type;
+        }
+        else {
+          push @temp, $type;
+        }
+      }
+
+      @args = @temp;
+
       next;
     }
 

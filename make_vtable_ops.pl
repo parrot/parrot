@@ -33,20 +33,20 @@ sub multimethod {
     my ($name, $count) = @_; 
     my $type = $vtable{$name}{meth_type};
     die "$name not found\n" unless $vtable{$name};
-    my @rv = [(join ",", ("p") x $count), $name];
+    my @rv = [(join ", ", ("out PMC") x $count), $name];
 
     if ($type eq "int") {
         push @rv, 
-            [ (join ",", ("p", ("p") x ($count-2), "i|ic")), $name."_native"];
+            [ (join ", ", ("out PMC", ("out PMC") x ($count-2), "in INT")), $name."_native"];
     }
     if ($type eq "num") {
         push @rv, 
-            [ (join ",", ("p", ("p") x ($count-2), "n|nc")), $name."_float"],
-            [ (join ",", ("p", ("p") x ($count-2), "i|ic")), $name."_int"];
+            [ (join ", ", ("out PMC", ("out PMC") x ($count-2), "in NUM")), $name."_float"],
+            [ (join ", ", ("out PMC", ("out PMC") x ($count-2), "in INT")), $name."_int"];
     }
     if ($type eq "str") {
         push @rv, 
-            [ (join ",", ("p", ("p") x ($count-2), "s")), $name."_native"];
+            [ (join ", ", ("out PMC", ("out PMC") x ($count-2), "in STR")), $name."_native"];
     }
         
     return @rv;
