@@ -513,62 +513,6 @@ inline op set_addr(out INT, in INT) {
 
 Set $1 to $2.
 
-=item B<set>(out PMC, in INT, in INT)
-
-=item B<set>(out PMC, in NUM, in INT)
-
-=item B<set>(out PMC, in STR, in INT)
-
-=item B<set>(out PMC, in INT, in NUM)
-
-=item B<set>(out PMC, in NUM, in NUM)
-
-=item B<set>(out PMC, in STR, in NUM)
-
-=item B<set>(out PMC, in INT, in STR)
-
-=item B<set>(out PMC, in NUM, in STR)
-
-=item B<set>(out PMC, in STR, in STR)
-
-=item B<set>(out PMC, in INT, in PMC)
-
-=item B<set>(out PMC, in NUM, in PMC)
-
-=item B<set>(out PMC, in STR, in PMC)
-
-Set the entry of $1 accessed by $2 to $3, ie:
-
-    $1[$2] = $3;
-
-=item B<set>(out INT, in PMC, in INT)
-
-=item B<set>(out INT, in PMC, in NUM)
-
-=item B<set>(out INT, in PMC, in STR)
-
-=item B<set>(out NUM, in PMC, in INT)
-
-=item B<set>(out NUM, in PMC, in NUM)
-
-=item B<set>(out NUM, in PMC, in STR)
-
-=item B<set>(out STR, in PMC, in INT)
-
-=item B<set>(out STR, in PMC, in NUM)
-
-=item B<set>(out STR, in PMC, in STR)
-
-=item B<set>(out PMC, in PMC, in INT)
-
-=item B<set>(out PMC, in PMC, in NUM)
-
-=item B<set>(out PMC, in PMC, in STR)
-
-Set $1 to the entry of $2 accessed by $3, ie:
-
-    $1 = $2[$3];
-
 =cut
 
 inline op set(out INT, in INT) {
@@ -656,216 +600,6 @@ inline op set(out INT, in PMC) {
   goto NEXT();
 }
 
-inline op set (out PMC, in INT, in INT)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in NUM, in INT)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_num, num_val);
-
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in STR, in INT)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-
-    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in INT, in NUM)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in NUM, in NUM)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_num, num_val);
-
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in STR, in NUM)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in INT, in STR)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in NUM, in STR)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_num, num_val);
-
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in STR, in STR)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-inline op set (out PMC, in INT, in PMC)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-
-    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
-    goto NEXT();
-}
-
-inline op set (out PMC, in NUM, in PMC)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_num, num_val);
-
-    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
-    goto NEXT();
-}
-
-inline op set (out PMC, in STR, in PMC)  {
-    KEY key;
-
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-
-    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
-    goto NEXT();
-}
-
-inline op set(out INT, in PMC, in INT) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_int, int_val);
-  $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out INT, in PMC, in NUM) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_num, num_val);
-  $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out INT, in PMC, in STR) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_string, struct_val);
-  $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out NUM, in PMC, in INT) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_int, int_val);
-  $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out NUM, in PMC, in NUM) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_num, num_val);
-  $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out NUM, in PMC, in STR) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_string, struct_val);
-  $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out STR, in PMC, in INT) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_int, int_val);
-  $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out STR, in PMC, in NUM) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_num, num_val);
-  $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out STR, in PMC, in STR) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_string, struct_val);
-  $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out PMC, in PMC, in INT) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_int, int_val);
-  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out PMC, in PMC, in NUM) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_num, num_val);
-  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-inline op set(out PMC, in PMC, in STR) {
-  KEY key;
-  MAKE_KEY(key, $3, enum_key_string, struct_val);
-  $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
-  goto NEXT();
-}
-
-=item B<set>(out INT, in PMC, in KEY)
-
-Not implemented yet, working on it
-
-=item B<set>(out PMC, in KEY, in INT)
-
-=cut
-
-inline op set(out INT, in PMC, in KEY) {
-  fprintf(stderr,"*** calling keyed set\n");
-  goto NEXT();
-}
-
-inline op set(out PMC, in KEY, in INT) {
-  fprintf(stderr,"*** calling keyed set\n");
-  goto NEXT();
-}
-
 =item B<set>(out PMC, out PMC, in PMC, in PMC)
 
 Set the entry of $1 accessed by $2 to the entry of $3 accessed by
@@ -877,94 +611,60 @@ $4, ie:
 
 inline op set (out PMC, in PMC, in PMC, in PMC)  {
     KEY src_key, dest_key;
-
     MAKE_KEY(src_key, $2, enum_key_pmc, pmc_val);
     MAKE_KEY(dest_key, $4, enum_key_pmc, pmc_val);
-
     $1->vtable->set_pmc_keyed(interpreter, 
                     $1, $2 ? &src_key : NULL, $3, $4 ? &dest_key : NULL);
     goto NEXT();
 }
 
+=head2 Keyed set operations: Px[ Ix|KEY ] = Bx
+
 =item B<set_keyed_integer>(out PMC, in INT, in INT)
+
+=item B<set_keyed_integer>(out PMC, in INT, in NUM)
+
+=item B<set_keyed_integer>(out PMC, in INT, in STR)
+
+=item B<set_keyed_integer>(out PMC, in INT, in PMC)
 
 =cut
 
 inline op set_keyed_integer (out PMC, in INT, in INT)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out INT, in PMC, in INT)
-
-=cut
-
-inline op set_keyed_integer (out INT, in PMC, in INT)  {
-    KEY key;
-
-    MAKE_KEY(key, $3, enum_key_int, int_val);
-
-    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-=item B<set_keyed_integer>(out PMC, in INT, in NUM)
-
-=cut
-
 inline op set_keyed_integer (out PMC, in INT, in NUM)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out NUM, in PMC, in INT)
-
-=cut
-
-inline op set_keyed_integer (out NUM, in PMC, in INT)  {
-    KEY key;
-
-    MAKE_KEY(key, $3, enum_key_int, int_val);
-
-    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
-    goto NEXT();
-}
-
-=item B<set_keyed_integer>(out PMC, in INT, in STR)
-
-=cut
-
 inline op set_keyed_integer (out PMC, in INT, in STR)  {
     KEY key;
-
     MAKE_KEY(key, $2, enum_key_int, int_val);
-
     $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out STR, in PMC, in INT)
-
-=cut
-
-inline op set_keyed_integer (out STR, in PMC, in INT)  {
+inline op set_keyed_integer (out PMC, in INT, in PMC)  {
     KEY key;
-
-    MAKE_KEY(key, $3, enum_key_int, int_val);
-
-    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
+    MAKE_KEY(key, $2, enum_key_int, int_val);
+    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
     goto NEXT();
 }
 
 =item B<set_keyed_integer>(out PMC, in KEY, in INT)
+
+=item B<set_keyed_integer>(out PMC, in KEY, in NUM)
+
+=item B<set_keyed_integer>(out PMC, in KEY, in STR)
+
+=item B<set_keyed_integer>(out PMC, in KEY, in PMC)
 
 =cut
 
@@ -975,7 +675,76 @@ inline op set_keyed_integer (out PMC, in KEY, in INT)  {
     goto NEXT();
 }
 
+inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_int, int_val);
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed_integer (out PMC, in KEY, in STR)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_int, int_val);
+    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed_integer (out PMC, in KEY, in PMC)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_int, int_val);
+    $1->vtable->set_pmc_keyed(interpreter, $1, &key, $3, NULL);
+    goto NEXT();
+}
+
+=head2 Keyed set operations: Ax = Px[ Ix|KEY ]
+
+=cut
+
+=item B<set_keyed_integer>(out INT, in PMC, in INT)
+
+=item B<set_keyed_integer>(out NUM, in PMC, in INT)
+
+=item B<set_keyed_integer>(out STR, in PMC, in INT)
+
+=item B<set_keyed_integer>(out PMC, in PMC, in INT)
+
+=cut
+
+inline op set_keyed_integer (out INT, in PMC, in INT)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed_integer (out NUM, in PMC, in INT)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed_integer (out STR, in PMC, in INT)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed_integer (out PMC, in PMC, in INT) {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
 =item B<set_keyed_integer>(out INT, in PMC, in KEY)
+
+=item B<set_keyed_integer>(out NUM, in PMC, in KEY)
+
+=item B<set_keyed_integer>(out STR, in PMC, in KEY)
+
+=item B<set_keyed_integer>(out PMC, in PMC, in KEY)
 
 =cut
 
@@ -986,42 +755,12 @@ inline op set_keyed_integer (out INT, in PMC, in KEY)  {
     goto NEXT();
 }
 
-=item B<set_keyed_integer>(out PMC, in KEY, in NUM)
-
-=cut
-
-inline op set_keyed_integer (out PMC, in KEY, in NUM)  {
-    KEY key;
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-=item B<set_keyed_integer>(out NUM, in PMC, in KEY)
-
-=cut
-
 inline op set_keyed_integer (out NUM, in PMC, in KEY)  {
     KEY key;
     MAKE_KEY(key, $3, enum_key_int, int_val);
     $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
     goto NEXT();
 }
-
-=item B<set_keyed_integer>(out PMC, in KEY, in STR)
-
-=cut
-
-inline op set_keyed_integer (out PMC, in KEY, in STR)  {
-    KEY key;
-    MAKE_KEY(key, $2, enum_key_int, int_val);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-=item B<set_keyed_integer>(out STR, in PMC, in KEY)
-
-=cut
 
 inline op set_keyed_integer (out STR, in PMC, in KEY)  {
     KEY key;
@@ -1030,7 +769,22 @@ inline op set_keyed_integer (out STR, in PMC, in KEY)  {
     goto NEXT();
 }
 
+inline op set_keyed_integer (out PMC, in PMC, in KEY) {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_int, int_val);
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=head2 Keyed set operations: Px[Sx] = Bx
+
 =item B<set_keyed>(out PMC, in STR, in INT)
+
+=item B<set_keyed>(out PMC, in STR, in NUM)
+
+=item B<set_keyed>(out PMC, in STR, in STR)
+
+=item B<set_keyed>(out PMC, in STR, in PMC)
 
 =cut
 
@@ -1041,7 +795,36 @@ inline op set_keyed (out PMC, in STR, in INT)  {
     goto NEXT();
 }
 
+inline op set_keyed (out PMC, in STR, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in STR, in STR)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
+    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in STR, in PMC)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
+    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
+    goto NEXT();
+}
+
+=head2 Keyed set operations: Ax = Px[Sx]
+
 =item B<set_keyed>(out INT, in PMC, in STR)
+
+=item B<set_keyed>(out NUM, in PMC, in STR)
+
+=item B<set_keyed>(out STR, in PMC, in STR)
+
+=item B<set_keyed>(out PMC, in PMC, in STR)
 
 =cut
 
@@ -1052,21 +835,6 @@ inline op set_keyed (out INT, in PMC, in STR)  {
     goto NEXT();
 }
 
-=item B<set_keyed>(out PMC, in STR, in NUM)
-
-=cut
-
-inline op set_keyed (out PMC, in STR, in NUM)  {
-    KEY key;
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-=item B<set_keyed>(out NUM, in PMC, in STR)
-
-=cut
-
 inline op set_keyed (out NUM, in PMC, in STR)  {
     KEY key;
     MAKE_KEY(key, $3, enum_key_string, struct_val);
@@ -1074,27 +842,100 @@ inline op set_keyed (out NUM, in PMC, in STR)  {
     goto NEXT();
 }
 
-=item B<set_keyed>(out PMC, in STR, in STR)
-
-=cut
-
-inline op set_keyed (out PMC, in STR, in STR)  {
-    KEY key;
-    MAKE_KEY(key, $2, enum_key_string, struct_val);
-    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
-    goto NEXT();
-}
-
-=item B<set_keyed>(out STR, in PMC, in STR)
-
-=cut
-
 inline op set_keyed (out STR, in PMC, in STR)  {
     KEY key;
     MAKE_KEY(key, $3, enum_key_string, struct_val);
     $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
     goto NEXT();
 }
+
+inline op set_keyed (out PMC, in PMC, in STR)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_string, struct_val);
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+=head2 Keyed set operations: Px[Nx] = Bx
+
+=item B<set_keyed>(out PMC, in NUM, in INT)
+
+=item B<set_keyed>(out PMC, in NUM, in NUM)
+
+=item B<set_keyed>(out PMC, in NUM, in STR)
+
+=item B<set_keyed>(out PMC, in NUM, in PMC)
+
+=cut
+
+inline op set_keyed (out PMC, in NUM, in INT)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_num, num_val);
+    $1->vtable->set_integer_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in NUM, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_num, num_val);
+    $1->vtable->set_number_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in NUM, in STR)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_num, num_val);
+    $1->vtable->set_string_keyed(interpreter, $1, &key, $3);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in NUM, in PMC)  {
+    KEY key;
+    MAKE_KEY(key, $2, enum_key_num, num_val);
+    $1->vtable->set_pmc_keyed(interpreter, $1, NULL, $3, &key);
+    goto NEXT();
+}
+
+=head2 Keyed set operations: Ax = Px[Nx]
+
+=item B<set_keyed>(out INT, in PMC, in NUM)
+
+=item B<set_keyed>(out NUM, in PMC, in NUM)
+
+=item B<set_keyed>(out STR, in PMC, in NUM)
+
+=item B<set_keyed>(out PMC, in PMC, in NUM)
+
+=cut
+
+inline op set_keyed (out INT, in PMC, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_num, num_val);
+    $1 = $2->vtable->get_integer_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed (out NUM, in PMC, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_num, num_val);
+    $1 = $2->vtable->get_number_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed (out STR, in PMC, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_num, num_val);
+    $1 = $2->vtable->get_string_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
+inline op set_keyed (out PMC, in PMC, in NUM)  {
+    KEY key;
+    MAKE_KEY(key, $3, enum_key_num, num_val);
+    $1 = $2->vtable->get_pmc_keyed(interpreter, $2, &key);
+    goto NEXT();
+}
+
 
 =item B<clone>(out PMC, in PMC)
 
@@ -2967,6 +2808,8 @@ inline op bor(out PMC, in PMC, in PMC) {
 
 =item B<shl>(out INT, in INT, in INT)
 
+=item B<shl>(out PMC, in PMC, in PMC)
+
 Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
@@ -2976,10 +2819,16 @@ inline op shl(out INT, in INT, in INT) {
   goto NEXT();
 }
 
+inline op shl(out PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_shl(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 
 =item B<shr>(out INT, in INT, in INT)
+
+=item B<shr>(out PMC, in PMC, in PMC)
 
 Set $1 to the value of $2 shifted right by $3 bits.
 
@@ -2990,6 +2839,10 @@ inline op shr(out INT, in INT, in INT) {
   goto NEXT();
 }
 
+inline op shr(out PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_shr(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 
 ########################################
 

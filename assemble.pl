@@ -937,6 +937,11 @@ sub to_bytecode {
         _to_keyed_integer($_);
         push @{$_->[0]}, ['ic',0+$1];
       }
+      elsif($temp=~s/^\[($flt_re)\]//) {
+        $suffixes .= "_nc";
+	_to_keyed($_);
+        push @{$_->[0]}, $self->_numeric_constant($1);
+      }
       elsif($temp=~s/^($bin_re)//) {     # 0b1101
         my $val = $1;$val=~s/0b//;
         $suffixes .= "_ic";
