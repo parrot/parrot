@@ -93,6 +93,7 @@ t/test2.pasm
 t/test3.pasm
 test_c.in
 test_main.c
+testparrotsizes_c.in
 transcode.c
 vtable_h.pl
 vtable.tbl

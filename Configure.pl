@@ -85,6 +85,7 @@ my(%c)=(
   	perl =>			$^X,
 	debugging =>	$opt_debugging,
 	rm_f =>		'rm -f',
+	stacklow => '(~0xfff)',
 );
 
 #copy the things from --define foo=bar
@@ -186,6 +187,30 @@ buildfile("Makefile");
 buildconfigpm();
 # and the types file
 buildfile("Types_pm", "Parrot");
+
+# and now we figure out how big our things are
+print <<"END";
+
+Alright, now I'm gonna check some stuff by compiling and running
+another small C program.  This could take a bit...
+END
+
+{
+	my %newc;
+	
+	buildfile("testparrotsizes_c");
+	compiletestc("testparrotsizes");
+	%newc=eval(runtestc()) or die "Can't run the test program: $!";
+
+	@c{keys %newc}=values %newc;
+
+	@c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
+
+	unlink('testparrotsizes.c', "test_siz$c{exe}", "test$c{o}");
+}
+
+# rewrite the config file with the updated info
+buildfile("config_h", "include/parrot");
 
 print <<"END";
 
@@ -294,9 +319,24 @@ END
 }
 
 sub compiletestc {
-  system("$c{cc} $c{ccflags} -o test_siz$c{exe} test.c") and die "C compiler died!";
+    my $name;
+    $name = shift;
+    $name = "test" unless $name;
+    system("$c{cc} $c{ccflags} -o test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
 sub runtestc {
 	`./test_siz$c{exe}`
+}
+
+# Find the bitmask for the low bits of any passed-in size
+sub lowbitmask {
+    my @returns;
+    foreach (@_) {
+	my $vector = unpack("b*", pack("V", $_));
+	my $offset = rindex($vector, "1")+1;
+	my $mask = 2**$offset - 1;
+	push @returns, "(~0x".sprintf("%x", $mask).")";
+    }
+    return @returns;
 }
