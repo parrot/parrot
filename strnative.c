@@ -14,14 +14,36 @@ string_native_compute_strlen (STRING *s) {
 }
 
 static IV 
-string_native_max_strlen (IV x) {
+string_native_max_bytes (IV x) {
     return x;
+}
+
+static STRING*
+string_native_concat(STRING* a, STRING* b, IV flags) {
+    if (flags && a->encoding != b->encoding) {
+        /* Transcode */
+    }
+
+    /* b is now in native format */
+    string_grow(a, a->strlen + b->strlen);
+    Sys_Memcopy(a->bufstart + a->strlen, b->bufstart, b->strlen);
+    a->strlen = a->buflen = a->bufused = a->strlen + b->strlen;
+    return a;
+}
+
+static STRING*
+string_native_chopn(STRING* s, IV n) {
+    s->bufused -= n;
+    s->strlen -= n;
+    return s;
 }
 
 STRING_VTABLE 
 string_native_vtable (void) {
     return (STRING_VTABLE) {
 	string_native_compute_strlen,
-    string_native_max_strlen,
+    string_native_max_bytes,
+    string_native_concat,
+    string_native_chopn,
 	    };
 }
