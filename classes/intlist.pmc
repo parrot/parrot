@@ -17,7 +17,7 @@
 pmclass IntList {
 
     INTVAL type () {
-        return enum_class_PerlArray;
+        return enum_class_IntList;
     }
 
     STRING* name() {
