@@ -85,7 +85,7 @@ op eq(in STR, in STR, labelconst INT) :base_core {
 }
 
 op eq (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->is_equal(interpreter, $1, $2)) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -114,14 +114,14 @@ op eq (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op eq_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) == 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STREQ) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op eq_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) == 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMEQ) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -206,7 +206,7 @@ op ne(in STR, in STR, labelconst INT) :base_core {
 }
 
 op ne(in PMC, in PMC, labelconst INT) :base_core {
-  if (! $1->vtable->is_equal(interpreter, $1, $2)) {
+  if (! mmd_dispatch_i_pp(interpreter, $1, $2, MMD_EQ)) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -235,14 +235,14 @@ op ne (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op ne_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) != 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op ne_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) != 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -308,7 +308,7 @@ op lt(in STR, in STR, labelconst INT) :base_core {
 }
 
 op lt (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp(interpreter, $1, $2) < 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -337,14 +337,14 @@ op lt (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op lt_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) < 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op lt_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) < 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) < 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -396,7 +396,7 @@ op le(in STR, in STR, labelconst INT) :base_core {
 }
 
 op le(in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp(interpreter, $1, $2) <= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -425,14 +425,14 @@ op le (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op le_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) <= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op le_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) <= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) <= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -484,7 +484,7 @@ op gt(in STR, in STR, labelconst INT) :base_core {
 }
 
 op gt(in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp(interpreter, $1, $2) > 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -513,14 +513,14 @@ op gt (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op gt_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) > 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op gt_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) > 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) > 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -572,7 +572,7 @@ op ge(in STR, in STR, labelconst INT) :base_core {
 }
 
 op ge(in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp(interpreter, $1, $2) >= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_CMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -601,14 +601,14 @@ op ge (in PMC, in STR, labelconst INT) :base_core {
 }
 
 op ge_str (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_string(interpreter, $1, $2) >= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_STRCMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
 op ge_num (in PMC, in PMC, labelconst INT) :base_core {
-  if ($1->vtable->cmp_num(interpreter, $1, $2) >= 0) {
+  if (mmd_dispatch_i_pp(interpreter, $1, $2, MMD_NUMCMP) >= 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -674,7 +674,7 @@ inline op cmp(out INT, in STR, in STR) :base_core {
 }
 
 inline op cmp(out INT, in PMC, in PMC) :base_core {
-  $1 = VTABLE_cmp(interpreter, $2, $3);
+  $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP);
   goto NEXT();
 }
 
@@ -701,12 +701,12 @@ inline op cmp(out INT, in PMC, in STR) :base_core {
 }
 
 inline op cmp_str(out INT, in PMC, in PMC) :base_core {
-  $1 = VTABLE_cmp_string(interpreter, $2, $3);
+  $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_STRCMP);
   goto NEXT();
 }
 
 inline op cmp_num(out INT, in PMC, in PMC) :base_core {
-  $1 = VTABLE_cmp_num(interpreter, $2, $3);
+  $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_NUMCMP);
   goto NEXT();
 }
 
@@ -741,7 +741,6 @@ inline op and(out INT, in INT, in INT) :base_core {
 
 inline op and(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LAND);
-/*  $2->vtable->logical_and(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -782,7 +781,6 @@ inline op or(out INT, in INT, in INT) :base_core {
 
 inline op or(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LOR);
-/*  $2->vtable->logical_or(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -804,7 +802,6 @@ inline op xor(out INT, in INT, in INT) :base_core {
 
 inline op xor(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_LXOR);
-/*  $2->vtable->logical_xor(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 

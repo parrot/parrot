@@ -51,7 +51,6 @@ inline op band(in PMC, in INT) :base_core {
 
 inline op band(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BAND);
-/*  $1->vtable->bitwise_and(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -67,7 +66,6 @@ inline op band(in PMC, in PMC, in INT) :base_core {
 
 inline op band(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BAND);
-/*  $2->vtable->bitwise_and(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -101,7 +99,6 @@ inline op bands(in PMC, in STR) :base_core {
 
 inline op bands(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SAND);
-/*  $1->vtable->bitwise_ands(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -117,7 +114,6 @@ inline op bands(in PMC, in PMC, in STR) :base_core {
 
 inline op bands(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SAND);
-/*  $2->vtable->bitwise_ands(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -191,7 +187,6 @@ inline op bor(in PMC, in INT) :base_core {
 
 inline op bor(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BOR);
-/*  $1->vtable->bitwise_or(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -207,7 +202,6 @@ inline op bor(in PMC, in PMC, in INT) :base_core {
 
 inline op bor(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BOR);
-/*  $2->vtable->bitwise_or(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -241,7 +235,6 @@ inline op bors(in PMC, in STR) :base_core {
 
 inline op bors(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SOR);
-/*  $1->vtable->bitwise_ors(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -257,7 +250,6 @@ inline op bors(in PMC, in PMC, in STR) :base_core {
 
 inline op bors(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SOR);
-/*  $2->vtable->bitwise_ors(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 ########################################
@@ -287,7 +279,6 @@ inline op shl(inout INT, in INT) :base_core {
 
 inline op shl(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BSL);
-/*  $1->vtable->bitwise_shl(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -303,7 +294,6 @@ inline op shl(out INT, in INT, in INT) :base_core {
 
 inline op shl(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BSL);
-/*  $2->vtable->bitwise_shl(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -339,7 +329,6 @@ inline op shr(inout INT, in INT) :base_core {
 
 inline op shr(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BSR);
-/*  $1->vtable->bitwise_shr(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -355,7 +344,6 @@ inline op shr(out INT, in INT, in INT) :base_core {
 
 inline op shr(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BSR);
-/*  $2->vtable->bitwise_shr(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
@@ -412,13 +400,11 @@ inline op bxor(inout INT, in INT) :base_core {
 
 inline op bxor(in PMC, in INT) :base_core {
   mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BXOR_INT);
-  /* $1->vtable->bitwise_xor_int(interpreter, $1, $2, $1); */
   goto NEXT();
 }
 
 inline op bxor(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_BXOR);
-  /* $1->vtable->bitwise_xor(interpreter, $1, $2, $1); */
   goto NEXT();
 }
 
@@ -429,13 +415,11 @@ inline op bxor(out INT, in INT, in INT) :base_core {
 
 inline op bxor(in PMC, in PMC, in INT) :base_core {
   mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BXOR_INT);
-  /* $2->vtable->bitwise_xor_int(interpreter, $2, $3, $1); */
   goto NEXT();
 }
 
 inline op bxor(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_BXOR);
-  /* $2->vtable->bitwise_xor(interpreter, $2, $3, $1); */
   goto NEXT();
 }
 
@@ -469,7 +453,6 @@ inline op bxors(in PMC, in STR) :base_core {
 
 inline op bxors(in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $1, $2, $1, MMD_SXOR);
-/*  $1->vtable->bitwise_xors(interpreter, $1, $2, $1);*/
   goto NEXT();
 }
 
@@ -485,7 +468,6 @@ inline op bxors(in PMC, in PMC, in STR) :base_core {
 
 inline op bxors(in PMC, in PMC, in PMC) :base_core { 
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SXOR);
-/* $2->vtable->bitwise_xors(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
