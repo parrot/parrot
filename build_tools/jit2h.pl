@@ -47,6 +47,8 @@ sub readjit($) {
             $extern = (defined($1))? 1 : 0;
             $function = $2;
             $asm = "";
+            print STDERR "Ignoring JIT definition for non-existent op: $function\n"
+                if defined $function && !grep { $_ eq $function } @core_opfunc;
             next;
         }
         if ($line =~ m/^}/) {
