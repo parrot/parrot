@@ -16,13 +16,43 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 14;
 use Test::More;
 
-output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown");
+output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
     newclass P2, "Foo"
     set S0, "nada"
     callmethod
+    print "nope\n"
+    end
+CODE
+/Method 'nada' not found/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method");
+    newclass P2, "Foo"
+    set S1, "nada"
+    callmethod S1
+    print "nope\n"
+    end
+CODE
+/Method 'nada' not found/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "callmethodcc - unknown method");
+    newclass P2, "Foo"
+    set S0, "nada"
+    callmethodcc
+    print "nope\n"
+    end
+CODE
+/Method 'nada' not found/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method");
+    newclass P2, "Foo"
+    set S1, "nada"
+    callmethodcc S1
     print "nope\n"
     end
 CODE
