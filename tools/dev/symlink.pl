@@ -5,6 +5,11 @@
 # having just one (read-only) copy of the sources but several different
 # build trees.  The -v option displays the created symlinks.
 #
+# Changes:
+# 1.1: Handle also:
+# 	- being called with a relative path
+#	- being called through a symlink
+#
 # jhi@iki.fi
 #
 
@@ -12,9 +17,18 @@ use strict;
 
 use File::Basename;
 use File::Spec;
+use Cwd;
 
-my $toolsrcdir  = dirname($0);
-my $toolsrcbase = basename($0);
+my $self = $0;
+my $cwd  = getcwd();
+
+$self = readlink($self) while -l $self;
+
+$self = File::Spec->catfile($cwd, $self)
+    unless File::Spec->file_name_is_absolute($self);
+
+my $toolsrcdir  = dirname($self);
+my $toolsrcbase = basename($self);
 
 use vars qw($v);
 
@@ -28,9 +42,14 @@ if ($toolsrcdir ne '' && -d $toolsrcdir && lc $toolsrcbase eq 'symlink.pl') {
 }
 
 my @toolsrcdir = File::Spec->splitdir($toolsrcdir);
-my @topsrcdir = @toolsrcdir[0..$#toolsrcdir - 2]; # tools/dev/ assumed!
+die "$self: not in tools/dev\n"
+  unless @toolsrcdir >= 2 &&
+         lc($toolsrcdir[-1]) eq 'dev' &&
+         lc($toolsrcdir[-2]) eq 'tools';
+my @topsrcdir = @toolsrcdir[0..$#toolsrcdir - 2];
 my $topsrcdir = File::Spec->catdir(@topsrcdir);
 my $manifest = File::Spec->catfile($topsrcdir, "MANIFEST");
+my @srcfiles = ();
 if (open(MANIFEST, $manifest)) {
     my %dstdir;
     while (<MANIFEST>) {
@@ -39,16 +58,18 @@ if (open(MANIFEST, $manifest)) {
 	    my $manifile = $1;
 	    my @manifile = split('/', $manifile);
 	    my $dstfile = File::Spec->catfile(@manifile);
-	    unless (-f $manifile) {
+	    my $srcfile = File::Spec->catfile($topsrcdir, @manifile);
+	    unless (-f $srcfile) {
+		warn "$self: cannot find $dstfile\n";
 		next;
-		warn "$0: cannot find $dstfile\n";
 	    }
+	    push @srcfiles, $srcfile;
 	    if (@manifile > 1) {
 		for my $i (0..$#manifile-1) {
 		    my $dstdir  = File::Spec->catdir(@manifile[0..$i]);
 		    if (!-d $dstdir && !$dstdir{$dstdir}++) {
 			unless (mkdir($dstdir, 0755)) {
-			    warn "$0: mkdir $dstdir failed: $!\n";
+			    warn "$self: mkdir $dstdir failed: $!\n";
 			}
 		    }
 		}
@@ -57,29 +78,29 @@ if (open(MANIFEST, $manifest)) {
 	    if (-e $dstfile) {
 		if (-l $dstfile) {
 		    unless(defined($readlink = readlink($dstfile))) {
-			warn "$0: readlink $dstfile failed: $!\n";
+			warn "$self: readlink $dstfile failed: $!\n";
 		    }
 		} else {
-		    warn "$0: $dstfile exists but is not a symlink\n";
+		    warn "$self: $dstfile exists but is not a symlink\n";
 		}
 	    }
-	    my $srcfile = File::Spec->catfile($topsrcdir, @manifile);
 	    if (!defined $readlink || $readlink ne $srcfile) {
 		print "$dstfile\n" if $v;
 		if (defined $readlink) {
 		    unless (unlink($dstfile)) {
-			warn "$0: unlink $dstfile failed: $!\n";
+			warn "$self: unlink $dstfile failed: $!\n";
 		    }
 		}
 		unless (symlink($srcfile, $dstfile)) {
-		    warn "$0: symlink $srcfile $dstfile failed: $!\n";
+		    warn "$self: symlink $srcfile $dstfile failed: $!\n";
 		}
 	    }
 	}
     }
+    warn "$self: could not find any files to symlink\n" unless @srcfiles;
     close(MANIFEST);
 } else {
-    die "$0: Failed to open $manifest: $!\n";
+    die "$self: Failed to open $manifest: $!\n";
 }
 
 exit(0);

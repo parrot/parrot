@@ -84,6 +84,9 @@ Print program version.
 
     .local string program
     shift program, argv
+    .local int argc
+    argc = argv
+    unless argc goto do_help
     .local pmc opt
     opt = new PerlUndef
     opt = _get_options( argv, opt_spec )
@@ -196,7 +199,7 @@ no_v3:
     entry_label = "_entry" . ls
     compreg compiler, "PIR"	# TODO PASM option
     prog = ".sub " . entry_label
-    prog = prog . "\n.param int N\n.local int i\n"
+    prog = prog . "\n.param int N\n.local int i\nnull i\n"
     prog = prog . preops
     prog = prog . "\nloop:\n"
     prog = prog . ops
