@@ -65,6 +65,21 @@ typedef ${hugefloatval} HUGEFLOATVAL;
 #define OPCODE_T_SIZE ${opcode_t_size}
 #define PTR_SIZE ${ptrsize}
 #define LONG_SIZE ${longsize}
+#define HUGEINTVAL_SIZE ${hugeintvalsize}
+
+#if INTVAL_SIZE >= 8
+typedef Parrot_Int   INTVAL64;
+typedef Parrot_Int   Parrot_Int64;
+#else
+#  if HUGEINTVAL_SIZE >= 8
+typedef HUGEINTVAL   INTVAL64;
+typedef HUGEINTVAL   Parrot_Int64;
+#  else
+/* No 64-bit type available? */
+typedef union { unsigned char b[8]; } INTVAL64;
+typedef INTVAL64   Parrot_Int64;
+#  endif
+#endif
 
 typedef Parrot_Opcode opcode_t;
 typedef size_t ptrcast_t;

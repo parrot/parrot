@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 	printf("\tshortsize => %d,\n",		sizeof(short));
 	printf("\tintsize => %d,\n",		sizeof(int));
 	printf("\tlongsize => %d,\n",		sizeof(long));
-	
+	printf("\thugeintvalsize => %d,\n",     sizeof(long long));
 	printf("\tptrsize => %d,\n",		sizeof(void*));
 	
 	printf("\tfloatsize => %d,\n",		sizeof(float));
