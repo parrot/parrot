@@ -6,7 +6,7 @@ if (! -d $parpath) {
 	$parpath='../../..';
 }
 
-unlink "test.pbc";
+unlink "_test.pbc";
 
-#$a=system("perl -I$parpath $parpath/assemble.pl -o _test.pbc TARG_test.pasm");
-system("$parpath @ARGV TARG_test.pasm");
+$a=system("perl -I$parpath $parpath/assemble.pl -o _test.pbc TARG_test.pasm");
+system("$parpath/parrot _test.pbc");
