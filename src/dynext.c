@@ -19,6 +19,7 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
+#if !defined(_PARROTLIB)
 /*
 
 =item C<static void
@@ -191,6 +192,7 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     string_cstring_free(cpath);
     return path;
 }
+#endif
 
 /*
 
@@ -212,6 +214,9 @@ specific setup. In both functions C<%s> is the name of the library.
 PMC *
 Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 {
+#if defined(_PARROTLIB)
+    return Parrot_library_query(interpreter, "load_lib", lib, initializer);
+#else
     STRING *path, *load_func_name, *init_func_name, *type;
     void * handle;
     PMC *(*load_func)(Interp *);
@@ -278,6 +283,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     store_lib_pmc(interpreter, lib_pmc, path, type);
     /* UNLOCK */
     return lib_pmc;
+#endif
 }
 
 /*
