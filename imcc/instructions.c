@@ -512,7 +512,6 @@ int emit_open(int type, void *param)
     has_compile = 0;
     dont_optimize = 0;
     return (emitters[emitter]).open(param);
-    return 0;
 }
 
 int emit_flush(void *param) {

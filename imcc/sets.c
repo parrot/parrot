@@ -70,7 +70,13 @@ void set_add (Set *s, int element) {
 }
 
 int set_contains(Set *s, int element) {
-	return s->bmp[element >> 3] & (1 << (element & 7)); 
+#ifdef __LCC__
+        /* workaround for another lcc bug.. */
+        int tmp = (1 << (element & 7));
+	return s->bmp[element >> 3] & tmp;         
+#else
+	return s->bmp[element >> 3] & (1 << (element & 7));
+#endif   
 }
 
 Set * set_union(Set *s1, Set *s2) {
@@ -88,6 +94,8 @@ Set * set_union(Set *s1, Set *s2) {
 
 	return s;
 }
+
+
 
 Set * set_intersec(Set *s1, Set *s2) {
 	int i;

@@ -89,7 +89,7 @@ SymReg * mk_pasm_reg(char * name) {
 char * _mk_fullname(Namespace * ns, const char * name) {
     char * result;
 
-    if (ns == NULL) return strdup(name);
+    if (ns == NULL) return str_dup(name);
     result = (char *) malloc(strlen(name) + strlen(ns->name) + 3);
     sprintf(result, "%s::%s", ns->name, name);
     return result;

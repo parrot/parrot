@@ -169,7 +169,7 @@ static void if_branch(struct Parrot_Interp *interp)
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
-                    last->op = strdup(neg_op);
+                    last->op = str_dup(neg_op);
                     free_ins(tmp);
 
                     /* delete branch */
@@ -793,12 +793,15 @@ do_res:
                                 goto do_res;
                             case 'S':
                                 break;
+#if 0 
+  /* UNREACHABLE */
                                 /* TODO strings have quote marks around them,
                                  * strip these in lexer
                                  */
                                 s = ins->r[0]->name;
                                 res = *s && (*s != '0' || s[1]);
                                 goto do_res;
+#endif
                         }
                         break;
                 }
@@ -1213,7 +1216,7 @@ loop_one(struct Parrot_Interp *interp, int bnr)
 
 }
 
-int
+static int
 loop_optimization(struct Parrot_Interp *interp)
 {
     int l, bb, loop_depth;
@@ -1251,7 +1254,7 @@ static int check_clone(Instruction *ins)
         is_ins_save(ins, rr, CHK_CLONE)) {
         debug(DEBUG_OPT2, "clone %s removed\n", ins_string(ins));
         free(ins->op);
-        ins->op = strdup("set");
+        ins->op = str_dup("set");
         return 1;
     }
     return 0;

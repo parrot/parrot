@@ -458,7 +458,7 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
 {
     int c;
     YYSTYPE val;
-    char *current = strdup("");
+    char *current = str_dup("");
     int len = 0;
 
     params->num_param = 0;
@@ -470,7 +470,7 @@ read_params (YYSTYPE *valp, void *interp, struct params_t *params,
 		   "End of file reached while reading arguments");
 	else if (c == ',') {
 	    params->name[params->num_param++] = current;
-	    current = strdup("");
+	    current = str_dup("");
 	    len = 0;
 	    c = yylex_skip(&val, interp, " \n");
 	}

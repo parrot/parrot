@@ -56,7 +56,7 @@ typedef enum {
     IF_r0_branch  = (1 << 0),
     IF_r1_branch  = (1 << 1),
     IF_r2_branch  = (1 << 2),
-    IF_goto =       (1 << 15),
+    IF_goto =       (1 << 15)
 } Instruction_Flags;
 
 

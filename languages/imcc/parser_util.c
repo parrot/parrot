@@ -184,8 +184,8 @@ void register_compilers(Parrot_Interp interp)
     STRING *pasm = string_make(interp, "PASM", 4, NULL,0,NULL);
     STRING *pir = string_make(interp, "PIR", 3, NULL,0,NULL);
     PMC * func;
-    Parrot_csub_t pa = (Parrot_csub_t) F2DPTR(imcc_compile_pasm);
-    Parrot_csub_t pi = (Parrot_csub_t) F2DPTR(imcc_compile_pir);
+    Parrot_csub_t pa = (Parrot_csub_t)imcc_compile_pasm;
+    Parrot_csub_t pi = (Parrot_csub_t)imcc_compile_pir;
 
     func = pmc_new(interp, enum_class_Compiler);
     Parrot_compreg(interp, pasm, func);
