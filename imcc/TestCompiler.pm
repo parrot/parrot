@@ -107,7 +107,7 @@ sub generate_functions {
 	}
 	else {
 	    #system("$IMCC -r ${TEST_PROG_ARGS} $by_f >$out_f");
-	    Parrot::Test::_run_command("$IMCC -r ${TEST_PROG_ARGS} $by_f",
+	    Parrot::Test::_run_command("$IMCC ${TEST_PROG_ARGS} $by_f",
 		STDOUT => $out_f, STDERR => $out_f);
 	}
 

@@ -272,55 +272,6 @@ sub2
 back
 OUT
 
-# write sub2
-open FOO, ">temp.imc" or die "Cant write temp.imc\n";
-print FOO <<'ENDF';
-.pcc_sub _sub2 prototyped
-    print "sub2\n"
-   .pcc_begin_return
-   .pcc_end_return
-    end
-.end
-ENDF
-close FOO;
-# compile it
-
-SKIP:
-{
-  skip("multiple loading not speced - failing", 1);
-output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
-.pcc_sub _sub1 prototyped
-    print "sub1\n"
-    load_bytecode "temp.imc"
-    print "loaded\n"
-    $P0 = global "_sub2"
-    .pcc_begin prototyped
-    .pcc_call $P0
-    ret:
-    .pcc_end
-    print "back\n"
-    print "sub1 again\n"
-    load_bytecode "temp.imc"
-    print "loaded again\n"
-    $P0 = global "_sub2"
-    .pcc_begin prototyped
-    .pcc_call $P0
-    ret_again:
-    .pcc_end
-    print "back again\n"
-    end
-.end
-CODE
-sub1
-loaded
-sub2
-back
-sub1 again
-loaded again
-sub2
-back again
-OUT
-}
 
 output_is(<<'CODE', <<'OUT', "call internal sub like external");
 .pcc_sub _sub1 prototyped
@@ -379,6 +330,42 @@ sub2
 back
 OUT
 
+SKIP:
+{
+  skip("multiple loading not speced - failing", 1);
+output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
+.pcc_sub _sub1 prototyped
+    print "sub1\n"
+    load_bytecode "temp.imc"
+    print "loaded\n"
+    $P0 = global "_sub2"
+    .pcc_begin prototyped
+    .pcc_call $P0
+    ret:
+    .pcc_end
+    print "back\n"
+    print "sub1 again\n"
+    load_bytecode "temp.imc"
+    print "loaded again\n"
+    $P0 = global "_sub2"
+    .pcc_begin prototyped
+    .pcc_call $P0
+    ret_again:
+    .pcc_end
+    print "back again\n"
+    end
+.end
+CODE
+sub1
+loaded
+sub2
+back
+sub1 again
+loaded again
+sub2
+back again
+OUT
+}
 
 END {
   unlink $file;
