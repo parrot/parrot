@@ -8,7 +8,7 @@
 # Still to write: tests for (push|pop)_p(_c)?
 #                 tests for warp, unwarp and set_warp
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 output_is( <<"CODE", <<'OUTPUT', "pushi & popi" );
 @{[ set_int_regs( sub { $_[0]} )]}
@@ -193,7 +193,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 0');
     save I0
     set I0, 2
     save I0
-    rotate 0
+    rotate_up 0
     restore I0 
     print I0
     print "\\n"
@@ -207,7 +207,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 1');
     save I0
     set I0, 2
     save I0
-    rotate 1
+    rotate_up 1
     restore I0 
     print I0
     print "\\n"
@@ -221,7 +221,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 2');
     save I0
     set I0, 2
     save I0
-    rotate 2
+    rotate_up 2
     restore I0 
     print I0
     print "\\n"
@@ -237,7 +237,7 @@ output_is(<<"CODE", <<'OUTPUT', 'rotate 3');
     save I0
     set I0, 3
     save I0
-    rotate 3
+    rotate_up 3
     restore I0 
     print I0
     restore I0 

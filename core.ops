@@ -2228,16 +2228,16 @@ MANUAL_OP ret() {
 
 ########################################
 
-=item B<rotate>(i)
+=item B<rotate_up>(i)
 
-=item B<rotate>(ic)
+=item B<rotate_up>(ic)
 
-Rotate the top $1 stack entries so that the top entry becomes the bottom
-entry in that range.
+Rotate the top $1 entries in the user stack so that the top entry
+becomes the bottom entry in that range.
 
 =cut
 
-AUTO_OP rotate(i|ic) {
+AUTO_OP rotate_up(i|ic) {
   rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
 }
 
