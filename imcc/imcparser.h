@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 1.875.  */
+/* A Bison parser, made from imcc/imcc.y, by GNU bison 1.75.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
    Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
@@ -23,6 +23,9 @@
    This special exception was added by the Free Software Foundation
    in version 1.24 of Bison.  */
 
+#ifndef BISON_IMCC_IMCPARSER_H
+# define BISON_IMCC_IMCPARSER_H
+
 /* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
@@ -31,177 +34,179 @@
    enum yytokentype {
      LOW_PREC = 258,
      PARAM = 259,
-     CALL = 260,
-     GOTO = 261,
-     ARG = 262,
-     FLATTEN_ARG = 263,
-     IF = 264,
-     UNLESS = 265,
-     END = 266,
-     SAVEALL = 267,
-     RESTOREALL = 268,
-     NEW = 269,
-     NEWSUB = 270,
-     NEWCLOSURE = 271,
-     NEWCOR = 272,
-     NEWCONT = 273,
-     NAMESPACE = 274,
-     ENDNAMESPACE = 275,
-     CLASS = 276,
-     ENDCLASS = 277,
-     FIELD = 278,
-     METHOD = 279,
-     SUB = 280,
-     SYM = 281,
-     LOCAL = 282,
-     CONST = 283,
-     INC = 284,
-     DEC = 285,
-     GLOBAL_CONST = 286,
-     SHIFT_LEFT = 287,
-     SHIFT_RIGHT = 288,
-     INTV = 289,
-     FLOATV = 290,
-     STRINGV = 291,
-     DEFINED = 292,
-     LOG_XOR = 293,
-     RELOP_EQ = 294,
-     RELOP_NE = 295,
-     RELOP_GT = 296,
-     RELOP_GTE = 297,
-     RELOP_LT = 298,
-     RELOP_LTE = 299,
-     GLOBAL = 300,
-     ADDR = 301,
-     CLONE = 302,
-     RESULT = 303,
-     RETURN = 304,
-     POW = 305,
-     SHIFT_RIGHT_U = 306,
-     LOG_AND = 307,
-     LOG_OR = 308,
-     COMMA = 309,
-     ESUB = 310,
-     PCC_BEGIN = 311,
-     PCC_END = 312,
-     PCC_CALL = 313,
-     PCC_SUB = 314,
-     PCC_BEGIN_RETURN = 315,
-     PCC_END_RETURN = 316,
-     PCC_BEGIN_YIELD = 317,
-     PCC_END_YIELD = 318,
-     NCI_CALL = 319,
-     PROTOTYPED = 320,
-     NON_PROTOTYPED = 321,
-     LABEL = 322,
-     EMIT = 323,
-     EOM = 324,
-     IREG = 325,
-     NREG = 326,
-     SREG = 327,
-     PREG = 328,
-     IDENTIFIER = 329,
-     STRINGC = 330,
-     INTC = 331,
-     FLOATC = 332,
-     REG = 333,
-     MACRO = 334,
-     ENDM = 335,
-     PARROT_OP = 336,
-     VAR = 337,
-     LINECOMMENT = 338,
-     FILECOMMENT = 339
+     PRAGMA = 260,
+     CALL = 261,
+     GOTO = 262,
+     ARG = 263,
+     FLATTEN_ARG = 264,
+     IF = 265,
+     UNLESS = 266,
+     END = 267,
+     SAVEALL = 268,
+     RESTOREALL = 269,
+     NEW = 270,
+     NEWSUB = 271,
+     NEWCLOSURE = 272,
+     NEWCOR = 273,
+     NEWCONT = 274,
+     NAMESPACE = 275,
+     ENDNAMESPACE = 276,
+     CLASS = 277,
+     ENDCLASS = 278,
+     FIELD = 279,
+     METHOD = 280,
+     SUB = 281,
+     SYM = 282,
+     LOCAL = 283,
+     CONST = 284,
+     INC = 285,
+     DEC = 286,
+     GLOBAL_CONST = 287,
+     SHIFT_LEFT = 288,
+     SHIFT_RIGHT = 289,
+     INTV = 290,
+     FLOATV = 291,
+     STRINGV = 292,
+     DEFINED = 293,
+     LOG_XOR = 294,
+     RELOP_EQ = 295,
+     RELOP_NE = 296,
+     RELOP_GT = 297,
+     RELOP_GTE = 298,
+     RELOP_LT = 299,
+     RELOP_LTE = 300,
+     GLOBAL = 301,
+     ADDR = 302,
+     CLONE = 303,
+     RESULT = 304,
+     RETURN = 305,
+     POW = 306,
+     SHIFT_RIGHT_U = 307,
+     LOG_AND = 308,
+     LOG_OR = 309,
+     COMMA = 310,
+     ESUB = 311,
+     PCC_BEGIN = 312,
+     PCC_END = 313,
+     PCC_CALL = 314,
+     PCC_SUB = 315,
+     PCC_BEGIN_RETURN = 316,
+     PCC_END_RETURN = 317,
+     PCC_BEGIN_YIELD = 318,
+     PCC_END_YIELD = 319,
+     NCI_CALL = 320,
+     PROTOTYPED = 321,
+     NON_PROTOTYPED = 322,
+     LABEL = 323,
+     EMIT = 324,
+     EOM = 325,
+     IREG = 326,
+     NREG = 327,
+     SREG = 328,
+     PREG = 329,
+     IDENTIFIER = 330,
+     STRINGC = 331,
+     INTC = 332,
+     FLOATC = 333,
+     REG = 334,
+     MACRO = 335,
+     ENDM = 336,
+     PARROT_OP = 337,
+     VAR = 338,
+     LINECOMMENT = 339,
+     FILECOMMENT = 340
    };
 #endif
 #define LOW_PREC 258
 #define PARAM 259
-#define CALL 260
-#define GOTO 261
-#define ARG 262
-#define FLATTEN_ARG 263
-#define IF 264
-#define UNLESS 265
-#define END 266
-#define SAVEALL 267
-#define RESTOREALL 268
-#define NEW 269
-#define NEWSUB 270
-#define NEWCLOSURE 271
-#define NEWCOR 272
-#define NEWCONT 273
-#define NAMESPACE 274
-#define ENDNAMESPACE 275
-#define CLASS 276
-#define ENDCLASS 277
-#define FIELD 278
-#define METHOD 279
-#define SUB 280
-#define SYM 281
-#define LOCAL 282
-#define CONST 283
-#define INC 284
-#define DEC 285
-#define GLOBAL_CONST 286
-#define SHIFT_LEFT 287
-#define SHIFT_RIGHT 288
-#define INTV 289
-#define FLOATV 290
-#define STRINGV 291
-#define DEFINED 292
-#define LOG_XOR 293
-#define RELOP_EQ 294
-#define RELOP_NE 295
-#define RELOP_GT 296
-#define RELOP_GTE 297
-#define RELOP_LT 298
-#define RELOP_LTE 299
-#define GLOBAL 300
-#define ADDR 301
-#define CLONE 302
-#define RESULT 303
-#define RETURN 304
-#define POW 305
-#define SHIFT_RIGHT_U 306
-#define LOG_AND 307
-#define LOG_OR 308
-#define COMMA 309
-#define ESUB 310
-#define PCC_BEGIN 311
-#define PCC_END 312
-#define PCC_CALL 313
-#define PCC_SUB 314
-#define PCC_BEGIN_RETURN 315
-#define PCC_END_RETURN 316
-#define PCC_BEGIN_YIELD 317
-#define PCC_END_YIELD 318
-#define NCI_CALL 319
-#define PROTOTYPED 320
-#define NON_PROTOTYPED 321
-#define LABEL 322
-#define EMIT 323
-#define EOM 324
-#define IREG 325
-#define NREG 326
-#define SREG 327
-#define PREG 328
-#define IDENTIFIER 329
-#define STRINGC 330
-#define INTC 331
-#define FLOATC 332
-#define REG 333
-#define MACRO 334
-#define ENDM 335
-#define PARROT_OP 336
-#define VAR 337
-#define LINECOMMENT 338
-#define FILECOMMENT 339
+#define PRAGMA 260
+#define CALL 261
+#define GOTO 262
+#define ARG 263
+#define FLATTEN_ARG 264
+#define IF 265
+#define UNLESS 266
+#define END 267
+#define SAVEALL 268
+#define RESTOREALL 269
+#define NEW 270
+#define NEWSUB 271
+#define NEWCLOSURE 272
+#define NEWCOR 273
+#define NEWCONT 274
+#define NAMESPACE 275
+#define ENDNAMESPACE 276
+#define CLASS 277
+#define ENDCLASS 278
+#define FIELD 279
+#define METHOD 280
+#define SUB 281
+#define SYM 282
+#define LOCAL 283
+#define CONST 284
+#define INC 285
+#define DEC 286
+#define GLOBAL_CONST 287
+#define SHIFT_LEFT 288
+#define SHIFT_RIGHT 289
+#define INTV 290
+#define FLOATV 291
+#define STRINGV 292
+#define DEFINED 293
+#define LOG_XOR 294
+#define RELOP_EQ 295
+#define RELOP_NE 296
+#define RELOP_GT 297
+#define RELOP_GTE 298
+#define RELOP_LT 299
+#define RELOP_LTE 300
+#define GLOBAL 301
+#define ADDR 302
+#define CLONE 303
+#define RESULT 304
+#define RETURN 305
+#define POW 306
+#define SHIFT_RIGHT_U 307
+#define LOG_AND 308
+#define LOG_OR 309
+#define COMMA 310
+#define ESUB 311
+#define PCC_BEGIN 312
+#define PCC_END 313
+#define PCC_CALL 314
+#define PCC_SUB 315
+#define PCC_BEGIN_RETURN 316
+#define PCC_END_RETURN 317
+#define PCC_BEGIN_YIELD 318
+#define PCC_END_YIELD 319
+#define NCI_CALL 320
+#define PROTOTYPED 321
+#define NON_PROTOTYPED 322
+#define LABEL 323
+#define EMIT 324
+#define EOM 325
+#define IREG 326
+#define NREG 327
+#define SREG 328
+#define PREG 329
+#define IDENTIFIER 330
+#define STRINGC 331
+#define INTC 332
+#define FLOATC 333
+#define REG 334
+#define MACRO 335
+#define ENDM 336
+#define PARROT_OP 337
+#define VAR 338
+#define LINECOMMENT 339
+#define FILECOMMENT 340
 
 
 
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+#ifndef YYSTYPE
 #line 204 "imcc/imcc.y"
-typedef union YYSTYPE {
+typedef union {
     int t;
     char * s;
     SymReg * sr;
@@ -209,15 +214,14 @@ typedef union YYSTYPE {
     Symbol * sym;
     SymbolList * symlist;
     SymbolTable * symtab;
-} YYSTYPE;
-/* Line 1248 of yacc.c.  */
-#line 214 "imcc/imcparser.h"
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
+} yystype;
+/* Line 1281 of /usr/local/share/bison/yacc.c.  */
+#line 220 "imcc/imcparser.h"
+# define YYSTYPE yystype
 #endif
 
 
 
 
+#endif /* not BISON_IMCC_IMCPARSER_H */
 
