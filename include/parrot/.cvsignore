@@ -1,3 +1,4 @@
+charclass.h
 config.h
 feature.h
 has_header.h
