@@ -154,104 +154,109 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
 {
     INTVAL i;
     char *escaped;
+    int more = 0;
 
-    PIO_eprintf(interpreter, "PC=%vu; OP=%Ou (%s)",
-                (UINTVAL)(pc - code_start), *pc,
-                interpreter->op_info_table[*pc].full_name);
+    PIO_eprintf(interpreter, "%6vu %s",
+                (UINTVAL)(pc - code_start),
+                interpreter->op_info_table[*pc].name);
 
     if (interpreter->op_info_table[*pc].arg_count > 1) {
-        PIO_eprintf(interpreter, "; ARGS=(");
+        PIO_eprintf(interpreter, " ");
+        /* pass 1 print arguments */
         for (i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
+            opcode_t o = *(pc + i);
             if (i > 1) {
                 PIO_eprintf(interpreter, ", ");
             }
             switch (interpreter->op_info_table[*pc].types[i]) {
             case PARROT_ARG_IC:
-                PIO_eprintf(interpreter, "%vd", *(pc + i));
+                PIO_eprintf(interpreter, "%vd", o);
                 break;
             case PARROT_ARG_NC:
                 PIO_eprintf(interpreter, "%vg", interpreter->code->const_table->
-                        constants[*(pc + i)]->u.number);
-                break;
-            case PARROT_ARG_PC:
-                /* what does a PMC constant look like? */
-                PIO_eprintf(interpreter, "PMCc:%vd", *(pc + i));
+                        constants[o]->u.number);
                 break;
             case PARROT_ARG_SC:
                 escaped = PDB_escape(interpreter->code->const_table->
-                                     constants[*(pc + i)]->u.string->strstart,
+                                     constants[o]->u.string->strstart,
                                      interpreter->code->const_table->
-                                     constants[*(pc + i)]->u.string->bufused);
+                                     constants[o]->u.string->bufused);
                 PIO_eprintf(interpreter, "\"%s\"", escaped ? escaped : "(null)");
                 if (escaped)
                     mem_sys_free(escaped);
                 break;
             case PARROT_ARG_KC:
                 trace_key_dump(interpreter, interpreter->code->const_table->
-                        constants[*(pc + i)]->u.key);
+                        constants[o]->u.key);
                 break;
             case PARROT_ARG_KIC:
-                PIO_eprintf(interpreter, "[%vd]", *(pc + i));
+                PIO_eprintf(interpreter, "[%vd]", o);
                 break;
             case PARROT_ARG_I:
-                PIO_eprintf(interpreter, "I%vd=%vd", *(pc + i),
-                        interpreter->int_reg.registers[*(pc + i)]);
+                PIO_eprintf(interpreter, "I%vd", o);
                 break;
             case PARROT_ARG_N:
-                PIO_eprintf(interpreter, "N%vd=%vg", *(pc + i),
-                        interpreter->num_reg.registers[*(pc + i)]);
+                PIO_eprintf(interpreter, "N%vd", o);
                 break;
             case PARROT_ARG_P:
-                /* what does a PMC register look like? */
-                if (i > 1 || interpreter->op_info_table[*pc].dirs[i] ==
-                        PARROT_ARGDIR_IN) {
-                    PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                    trace_pmc_dump(interpreter,
-                            interpreter->pmc_reg.registers[*(pc + i)]);
-                }
-                else
-                    PIO_eprintf(interpreter, "P%vd=PMC(%#p) ",
-                            *(pc + i), REG_PMC(*(pc + i)));
+                PIO_eprintf(interpreter, "P%vd", o);
+                more = 1;
                 break;
             case PARROT_ARG_S:
-                if (interpreter->string_reg.registers[*(pc + i)]) {
-                    escaped = PDB_escape(interpreter->string_reg.
-                                         registers[*(pc + i)]->strstart,
-                                         interpreter->string_reg.
-                                         registers[*(pc + i)]->bufused);
-                    PIO_eprintf(interpreter, "S%vd=\"%s\"", *(pc + i),
+                PIO_eprintf(interpreter, "S%vd", o);
+                more = 1;
+                break;
+            case PARROT_ARG_K:
+                PIO_eprintf(interpreter, "P%vd=",o);
+                more = 1;
+                break;
+            case PARROT_ARG_KI:
+                PIO_eprintf(interpreter, "I%vd", o);
+                more = 1;
+                break;
+            default:
+                internal_exception(1, "unhandled type in trace");
+                break;
+            }
+        }
+        if (!more)
+            goto done;
+        PIO_eprintf(interpreter, "  \t- ");
+        /* pass 2 print argument details if needed */
+        for (i = 1; i < interpreter->op_info_table[*pc].arg_count; i++) {
+            opcode_t o = *(pc + i);
+            if (i > 1) {
+                PIO_eprintf(interpreter, ", ");
+            }
+            switch (interpreter->op_info_table[*pc].types[i]) {
+            case PARROT_ARG_P:
+                PIO_eprintf(interpreter, "P%vd=", o);
+                trace_pmc_dump(interpreter, REG_PMC(o));
+                break;
+            case PARROT_ARG_S:
+                if (REG_STR(*(pc+i))) {
+                    escaped = PDB_escape(REG_STR(o)->strstart,
+                                         REG_STR(o)->bufused);
+                    PIO_eprintf(interpreter, "S%vd=\"%s\"", o,
                             escaped ? escaped : "(null)");
                     if (escaped)
                         mem_sys_free(escaped);
                 }
-                else {
-                    PIO_eprintf(interpreter, "S%vd=(null)", *(pc + i));
-                }
                 break;
             case PARROT_ARG_K:
-                PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                trace_key_dump(interpreter, interpreter->pmc_reg.registers[*(pc + i)]);
+                PIO_eprintf(interpreter, "P%vd=", o);
+                trace_key_dump(interpreter, REG_PMC(*(pc + i)));
                 break;
             case PARROT_ARG_KI:
-                PIO_eprintf(interpreter, "I%vd=[%vd]", *(pc + i),
-                        interpreter->int_reg.registers[*(pc + i)]);
-                break;
-            case PARROT_ARG_OP:
-                /* this isn't handled, so at least report the error
-                 * instead of silently ignoring the problem */
-                internal_exception(ARG_OP_NOT_HANDLED,
-                                   "PARROT_ARG_OP in enumeration not handled in switch");
+                PIO_eprintf(interpreter, "I%vd=[%vd]", o,
+                        REG_INT(o));
                 break;
             default:
-                /* -Wall expects us to cover PARROT_ARG_OP somewhere. */
-                PIO_eprintf(interpreter, "?(%i)%vd=???",
-                        interpreter->op_info_table[*pc].types[i],
-                        *(pc + i));
                 break;
             }
         }
-        PIO_eprintf(interpreter, ")");
     }
+done:
     PIO_eprintf(interpreter, "\n");
 }
 

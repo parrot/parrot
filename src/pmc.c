@@ -119,8 +119,9 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
         PANIC("Null vtable used");
         return NULL;
     }
-#if 1 /*GC_VERBOSE */
+#if GC_VERBOSE
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
+        /* XXX make a more verbose trace flag */
         fprintf(stderr, "\t=> new %p type %d\n", pmc, (int)base_type);
     }
 #endif

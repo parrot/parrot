@@ -105,6 +105,7 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     Interp * trace_i;
     struct Parrot_Context *trace_ctx;
 #endif
+    opcode_t *opc;
 
 #ifdef code_start
 #  undef code_start
@@ -131,15 +132,12 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
                 sizeof(struct Parrot_Context));
         trace_i->code = interpreter->code;
         Interp_flags_SET(trace_i, PARROT_EXTERN_CODE_FLAG);
-        trace_op(trace_i, code_start, code_end, pc);
     }
-#else
-    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
-        trace_op(interpreter, code_start, code_end, pc);
 #endif
 
     while (pc) {/* && pc >= code_start && pc < code_end) {*/
         interpreter->cur_pc = pc;
+        opc = pc;
 
         DO_OP(pc, interpreter);
 
@@ -147,9 +145,9 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #ifdef USE_TRACE_INTERP
             mem_sys_memcopy(&trace_i->ctx, &interpreter->ctx,
                     sizeof(struct Parrot_Context));
-            trace_op(trace_i, code_start, code_end, pc);
+            trace_op(trace_i, code_start, code_end, opc);
 #else
-            trace_op(interpreter, code_start, code_end, pc);
+            trace_op(interpreter, code_start, code_end, opc);
 #endif
         }
     }
