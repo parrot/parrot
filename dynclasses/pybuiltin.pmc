@@ -24,10 +24,12 @@ This class implements the Python "builtin" Functions.
 static INTVAL dynclass_PyObject;
 static INTVAL dynclass_PyBoolean;
 static INTVAL dynclass_PyComplex;
+static INTVAL dynclass_PyDict;
 static INTVAL dynclass_PyInt;
 static INTVAL dynclass_PyFloat;
 static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyLong;
+static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyString;
 static INTVAL dynclass_PyTuple;
 
@@ -35,6 +37,9 @@ static STRING *HEX;
 static STRING *OCT;
 
 extern PMC* Parrot_PerlHash_get_iter(Interp* interpreter, PMC* pmc);
+extern PMC* Parrot_delegate_get_iter(Interp* interpreter, PMC* pmc);
+
+#define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
 
 pmclass PyBuiltin dynpmc group python_group {
 /*
@@ -53,10 +58,12 @@ they will be used frequently here.
             dynclass_PyObject  = Parrot_PMC_typenum(INTERP, "PyObject");
             dynclass_PyBoolean = Parrot_PMC_typenum(INTERP, "PyBoolean");
             dynclass_PyComplex = Parrot_PMC_typenum(INTERP, "PyComplex");
+            dynclass_PyDict    = Parrot_PMC_typenum(INTERP, "PyDict");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
             dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
             dynclass_PyList    = Parrot_PMC_typenum(INTERP, "PyList");
             dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
+            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
             dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
 
@@ -112,7 +119,7 @@ enter_nci_method should create these as locals to begin with.
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
         }
 
-        /* Boolean constants */
+        /* constants */
         key = const_string(INTERP, "False");
         item = pmc_new(INTERP, dynclass_PyBoolean);
         VTABLE_set_integer_native(INTERP, item, 0);
@@ -123,13 +130,16 @@ enter_nci_method should create these as locals to begin with.
         VTABLE_set_integer_native(INTERP, item, 1);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
+        key = const_string(INTERP, "None");
+        item = pmc_new(INTERP, dynclass_PyNone);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
         /* Begin main! */
         item = pmc_new(INTERP, dynclass_PyString);
         VTABLE_set_string_native(INTERP, item,
             const_string(INTERP, "__main__"));
         scratchpad_store_by_name(INTERP, pad, 0, name, item);
     }
-
 
 /*
 
@@ -145,6 +155,48 @@ Returns the absolute value of an object
         PMC * ret = pmc_new(INTERP, dynclass_PyObject);
         VTABLE_absolute(INTERP, object, ret);
         return ret;
+    }
+
+
+/*
+
+=item C<PMC* "callable"(PMC *object)>
+
+Returns the absolute value of an object
+
+=cut
+
+*/
+
+    METHOD PMC* callable(PMC *object) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyBoolean);
+        STRING *sub = Parrot_base_vtables[enum_class_Sub]->whoami;
+        STRING *nci = Parrot_base_vtables[enum_class_NCI]->whoami;
+        INTVAL isa = VTABLE_isa(INTERP, object, sub) ||
+                     VTABLE_isa(INTERP, object, nci);
+        VTABLE_set_integer_native(INTERP, ret, isa);
+        return ret;
+    }
+
+/*
+
+=item C<PMC* "chr"(PMC *value)>
+
+Return a string of one character with ordinal C<*value>.
+
+=cut
+
+*/
+
+    METHOD PMC* chr(PMC *value) {
+        PMC *s = pmc_new_noinit(INTERP, dynclass_PyString);
+        INTVAL i = VTABLE_get_integer(INTERP, value);
+        /*
+         * TODO if i < 0 || > 255 throgh ValueError
+         */
+        PMC_str_val(s) = string_chr(INTERP, (UINTVAL)i);
+        PObj_custom_mark_SET(s);
+        return s;
     }
 
 /*
@@ -186,6 +238,60 @@ Combines a real and imaginary number and returns the result.
 
 /*
 
+=item C<PMC* "dict"(PMC *list)>
+
+Create a new dictionary from a sequence
+
+=cut
+
+*/
+
+    METHOD PMC* dict(PMC *ar) {
+        INTVAL i, el;
+        PMC *dict = pmc_new(INTERP, dynclass_PyDict);
+
+        if (REG_INT(3) == 0) return dict;
+
+        if (ar->vtable->base_type == dynclass_PyDict)
+            return ar;
+
+        /*
+         * ar is an array of tuples which are key/value pairs
+         */
+        el = VTABLE_elements(INTERP, ar);
+        for (i = 0; i < el; ++i) {
+            PMC *tupl = VTABLE_get_pmc_keyed_int(INTERP, ar, i);
+            PMC *key, *value;
+            INTVAL n = VTABLE_elements(INTERP, tupl);
+            if (n != 2)
+                real_exception(INTERP, NULL, E_ValueError,
+                        "dictionary update sequence element #%d "
+                        "has length %d; 2 is required",
+                        (int)i, (int)n);
+            key = VTABLE_get_pmc_keyed_int(INTERP, tupl, 0);
+            value = VTABLE_get_pmc_keyed_int(INTERP, tupl, 1);
+            VTABLE_set_pmc_keyed(INTERP, dict, key, value);
+        }
+        return dict;
+    }
+
+/*
+
+=item C<PMC* "enumerate"(PMC *list)>
+
+Iterator for index, value of iterable.
+
+=cut
+
+*/
+
+    METHOD PMC* enumerate(PMC *list) {
+        PMC *res = pmc_new_init(INTERP, enum_class_Enumerate, list);
+        return res;
+    }
+
+/*
+
 =item C<PMC* "filter"(PMC *func, PMC *list)>
 
 Combines a real and imaginary number and returns the result.
@@ -207,7 +313,7 @@ is a tuple or string, return the same type, else return a list.
         type = list->vtable->base_type;
         iter = NULL;
     
-        if (type == dynclass_PyString || type == dynclass_PyTuple) {
+        if (type == dynclass_PyString) {
             res = pmc_new(INTERP, type);
         }
         else {
@@ -220,7 +326,7 @@ is a tuple or string, return the same type, else return a list.
         VTABLE_set_integer_native(INTERP, iter, 0);
         i = 0;
         none_func = PMC_IS_NULL(func) ||
-            func == Parrot_base_vtables[enum_class_None]->data;
+            func->vtable->base_type == dynclass_PyNone;
         while (VTABLE_get_bool(INTERP, iter)) {
             PMC *item = VTABLE_shift_pmc(INTERP, iter);
             if (none_func) {
@@ -271,6 +377,32 @@ Returns the float value of C<value>.
 
 /*
 
+=item C<PMC* "hash"(PMC *value)>
+
+Returns the hex representation of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* hash(PMC *value) {
+        PMC *h = pmc_new_noinit(INTERP, dynclass_PyInt);
+        INTVAL type = value->vtable->base_type;
+        INTVAL i;
+    
+        if (type == dynclass_PyString)
+            i = string_hash(INTERP, PMC_str_val(value));
+        else if (type == dynclass_PyComplex)
+            i = (INTVAL)VTABLE_get_number_keyed_int(INTERP, value, 0);
+        else
+            i = VTABLE_get_integer(INTERP, value);
+
+        PMC_int_val(h) = i;
+        return h;
+    }
+
+/*
+
 =item C<PMC* "hex"(PMC *value)>
 
 Returns the hex representation of C<value>.
@@ -302,6 +434,35 @@ Returns the integer value of C<value>.
         INTVAL ivalue = VTABLE_get_integer(INTERP, value);
         VTABLE_set_integer_native(INTERP, ret, ivalue);
         return ret;
+    }
+
+/*
+
+=item C<PMC* "iter"(PMC *obj)>
+
+Returns an iterator over a sequence.
+
+=cut
+
+*/
+
+    METHOD PMC* iter(PMC *obj) {
+        /*
+         * need an iterator - that's the original construction code
+         */
+        PMC *iter = pmc_new_init(INTERP, enum_class_Iterator, obj);
+        PMC *next, *obj_iter;
+        STRING *next_meth = const_string(INTERP, "next");
+        STRING *class_name;
+
+        PMC_struct_val(iter) = obj_iter =
+            Parrot_delegate_get_iter(INTERP, obj);
+
+        next = Parrot_find_method_with_cache(INTERP, obj_iter, next_meth);
+        assert(next);
+        class_name = VTABLE_name(INTERP, obj);
+        Parrot_store_global(INTERP, class_name, next_meth, next);
+        return iter;
     }
 
 /*
@@ -365,6 +526,150 @@ Returns the long value of C<value>.
 
 /*
 
+=item C<PMC* "max"(PMC *value)>
+
+Returns the maximum of a set of values.
+
+=cut
+
+*/
+
+    METHOD PMC* max(PMC *argv) {
+        PMC *arg, *max, *iter;
+        INTVAL i, n;
+        /*
+         * no arguments: bail out
+         */
+        if ((n = REG_INT(3)) == 0)
+            real_exception(INTERP, NULL, E_TypeError,
+                    "TypeError: max expected 1 arguments, got 0");
+        if (n == 1) {
+            /* argument must be iterable */
+            arg = REG_PMC(5);
+            iter = pmc_new_init(INTERP, enum_class_Iterator, arg);
+            VTABLE_set_integer_native(INTERP, iter, 0);
+            max = VTABLE_shift_pmc(INTERP, iter);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                PMC *item = VTABLE_shift_pmc(INTERP, iter);
+                if (VTABLE_cmp(INTERP, max, item) < 0)
+                    max = item;
+            }
+            return max;
+        }
+        /* got n items */
+        max = REG_PMC(5);
+        for (i = 1; i < n && i<11; ++i) {
+            PMC *item = REG_PMC(5+i);
+            if (VTABLE_cmp(INTERP, max, item) < 0)
+                max = item;
+        }
+
+        return max;
+    }
+
+/*
+
+=item C<PMC* "map"(PMC *value)>
+
+Return a list of the result s of applying the function to the items of
+the argument sequence(s).
+
+=cut
+
+*/
+
+    METHOD PMC* map(PMC *func, PMC *list) {
+        PMC *res, *iter;
+        INTVAL i, n;
+        STRING *s;
+        INTVAL type;
+        int none_func;
+
+        type = list->vtable->base_type;
+        iter = NULL;
+
+        if (type == dynclass_PyString) {
+            res = pmc_new(INTERP, type);
+        }
+        else {
+            if (type == enum_class_Iterator) iter = list;
+            res = pmc_new(INTERP, dynclass_PyList);
+        }
+
+        if (!iter)
+            iter = pmc_new_init(INTERP, enum_class_Iterator, list);
+        VTABLE_set_integer_native(INTERP, iter, 0);
+
+        i = 0;
+        none_func = PMC_IS_NULL(func) ||
+            func->vtable->base_type == dynclass_PyNone;
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *item = VTABLE_shift_pmc(INTERP, iter);
+            if (!none_func) {
+                /* run filter func -
+                 * TODO save registers once around loop
+                 */
+                if (func->vtable->data == func) {
+                    REG_PMC(5) = item;
+                    REG_INT(3) = 1;
+                    VTABLE_invoke(INTERP, func, 0);
+                    item = REG_PMC(5);
+                    /* an object constructor */
+                }
+                else {
+                item = Parrot_runops_fromc_args(INTERP, func, "PP", item);
+                }
+            }
+            VTABLE_set_pmc_keyed_int(INTERP, res, i++, item);
+        }
+        return res;
+    }
+
+/*
+
+=item C<PMC* "min"(PMC *value)>
+
+Returns the minimum of a set of values.
+
+=cut
+
+*/
+
+    METHOD PMC* min(PMC *argv) {
+        PMC *arg, *min, *iter;
+        INTVAL i, n;
+        /*
+         * no arguments: bail out
+         */
+        if ((n = REG_INT(3)) == 0)
+            real_exception(INTERP, NULL, E_TypeError,
+                    "TypeError: min expected 1 arguments, got 0");
+        if (n == 1) {
+            /* argument must be iterable */
+            arg = REG_PMC(5);
+            iter = pmc_new_init(INTERP, enum_class_Iterator, arg);
+            VTABLE_set_integer_native(INTERP, iter, 0);
+            min = VTABLE_shift_pmc(INTERP, iter);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                PMC *item = VTABLE_shift_pmc(INTERP, iter);
+                if (VTABLE_cmp(INTERP, min, item) > 0)
+                    min = item;
+            }
+            return min;
+        }
+        /* got n items */
+        min = REG_PMC(5);
+        for (i = 1; i < n && i<11; ++i) {
+            PMC *item = REG_PMC(5+i);
+            if (VTABLE_cmp(INTERP, min, item) > 0)
+                min = item;
+        }
+
+        return min;
+    }
+
+/*
+
 =item C<PMC* "oct"(PMC *value)>
 
 Returns the octal representation of C<value>.
@@ -396,31 +701,6 @@ Return the integer ordinal of a one-character string.
         STRING *svalue = VTABLE_get_string(INTERP, value);
         INTVAL ivalue = string_ord(INTERP, svalue, 0);
         VTABLE_set_integer_native(INTERP, ret, ivalue);
-        return ret;
-    }
-
-/*
-
-=item C<PMC* "tuple"(PMC *value)>
-
-Returns the tuple value of C<value>.
-
-=cut
-
-*/
-
-    METHOD PMC* tuple(PMC *value) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyTuple);
-        INTVAL n = VTABLE_elements(INTERP, value);
-        INTVAL j;
-
-        VTABLE_set_integer_native(INTERP, ret, n);
-
-        for (j=0; j<n; j++) {
-            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
-            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
-        }
-
         return ret;
     }
 
@@ -468,6 +748,83 @@ an increment of C<pstep>
                 VTABLE_set_integer_keyed_int(INTERP, ar, k, i);
         }
         return ar;
+    }
+
+/*
+
+=item C<PMC* "reduce"(PMC *func, PMC *list, PMC *init)>
+
+Apply a function of two arguments cumulatively to the items of a sequence,
+from left to right, so as to reduce the sequence to a single value.
+If initial is present, it is placed before the items of the sequence in the
+calculation, and serves as a default whe n the sequence is empty.
+
+=cut
+
+*/
+
+    METHOD PMC* reduce(PMC *func, PMC *list, PMC *init) {
+        PMC *res, *iter;
+        INTVAL i, n;
+        STRING *s;
+        INTVAL type;
+        int none_func;
+
+        type = list->vtable->base_type;
+        iter = NULL;
+        if (type == dynclass_PyString) {
+            res = pmc_new(INTERP, type);
+        }
+        else {
+            if (type == enum_class_Iterator) iter = list;
+            res = pmc_new(INTERP, dynclass_PyList);
+        }
+        if (!iter)
+            iter = pmc_new_init(INTERP, enum_class_Iterator, list);
+        VTABLE_set_integer_native(INTERP, iter, 0);
+        i = 0;
+        none_func = PMC_IS_NULL(func) ||
+            func->vtable->base_type == dynclass_PyNone;
+        if (none_func) {
+            /* TODO TypeError: 'NoneType' object is not callable  */
+        }
+        while (VTABLE_get_bool(INTERP, iter)) {
+            PMC *item = VTABLE_shift_pmc(INTERP, iter);
+                /* run filter func -
+                 * TODO save registers once around loop
+                 */
+            res = Parrot_runops_fromc_args(INTERP, func, "PPP", res, item);
+        }
+
+        if ((REG_INT(3)>2) && 0==VTABLE_elements(INTERP, res))
+            res = init;
+
+        return res;
+    }
+
+/*
+
+=item C<PMC* "tuple"(PMC *value)>
+
+Returns the tuple value of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* tuple(PMC *value) {
+        PMC *ret = pmc_new(INTERP, dynclass_PyTuple);
+        INTVAL n = VTABLE_elements(INTERP, value);
+        INTVAL j;
+
+        VTABLE_set_integer_native(INTERP, ret, n);
+
+        for (j=0; j<n; j++) {
+            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
+            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
+        }
+
+        return ret;
     }
 
 /*

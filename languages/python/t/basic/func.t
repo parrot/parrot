@@ -147,7 +147,7 @@ test(<<'CODE', 'filter no func');
 
 def main():
     for i in filter(None, range(3)):
-	print i
+        print i
 if __name__ == '__main__':
     main()
 CODE
@@ -155,7 +155,7 @@ CODE
 test(<<'CODE', 'filter no func ar');
 def main():
     for i in filter(None, (0,1,2,0,3,0,4,0)):
-	print i
+        print i
 if __name__ == '__main__':
     main()
 CODE
@@ -166,7 +166,7 @@ def f(x):
 
 def main():
     for i in filter(f, range(10)):
-	print i
+        print i
 
 if __name__ == '__main__':
     main()
@@ -175,7 +175,7 @@ CODE
 test(<<'CODE', 'map None');
 def main():
     for i in map(None, range(3)):
-	print i
+        print i
 
 if __name__ == '__main__':
     main()
@@ -187,7 +187,7 @@ def f(x):
 
 def main():
     for i in map(f, range(3)):
-	print i
+        print i
 
 if __name__ == '__main__':
     main()
@@ -207,7 +207,7 @@ CODE
 test(<<'CODE', 'enumerate');
 if __name__ == '__main__':
     for i,j in enumerate("abc"):
-	print i,j
+        print i,j
 CODE
 
 test(<<'CODE', 'enumerate - break');
@@ -330,19 +330,19 @@ CODE
 test(<<'CODE', 'xrange(start)');
 if __name__ == '__main__':
     for i in xrange(5):
-	print i
+        print i
 CODE
 
 test(<<'CODE', 'xrange(start, stop)');
 if __name__ == '__main__':
     for i in xrange(2,5):
-	print i
+        print i
 CODE
 
 test(<<'CODE', 'xrange(star, stop, step)');
 if __name__ == '__main__':
     for i in xrange(2,10,3):
-	print i
+        print i
 CODE
 
 test(<<'CODE', 'xrange(star, stop, -step)');

@@ -149,9 +149,11 @@ Invoke a function.  Defaults are filled in first.
 
             if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
                 INTVAL nd = VTABLE_elements(INTERP, func_defaults);
-                for (j=n-nd+REG_INT(3); j<n && j<11; j++) {
-                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
-                        func_defaults, j+nd-n);
+                for (j=n-nd; j<n && j<11; j++) {
+                    if (j >= REG_INT(3)) {
+                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                            func_defaults, j+nd-n);
+                    }
                 }
 
                 REG_INT(3) = n;
@@ -176,6 +178,21 @@ Invoke a function.  Defaults are filled in first.
 
 /*
 
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL* value)>
+
+Add an argument to the func_args list
+
+=cut
+
+*/
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
+        VTABLE_set_integer_keyed_int(INTERP, func_args, key, value);
+    }
+
+/*
+
 =item C<void set_string_keyed_int(INTVAL key, STRING* value)>
 
 Add an argument to the func_args list
@@ -187,8 +204,6 @@ Add an argument to the func_args list
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
         VTABLE_set_string_keyed_int(INTERP, func_args, key, value);
-        /* INTVAL n = VTABLE_elements(INTERP, func_args); ??? -leo */
-
     }
 
 /*

@@ -62,6 +62,21 @@ When Python mode is enabled does concat :(
 
 /*
 
+=item C<INTVAL cmp(PMC *value)>
+
+Returns the result of comparing the string with C<*value>.
+
+=cut
+
+*/
+
+    INTVAL cmp(PMC* value) {
+        return string_compare(INTERP, PMC_str_val(SELF),
+                  VTABLE_get_string(INTERP, value));
+    }
+
+/*
+
 =item C<void concatenate(PMC *value, PMC *dest)>
 
 Concatenates the string and the stringified form of C<*value> and
