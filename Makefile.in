@@ -28,7 +28,7 @@ libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
 $(TEST_PROG): test_main$(O) $(O_FILES)
-	$(CC) $(C_LIBS) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O)
+	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
 test_main$(O): $(H_FILES)
 
