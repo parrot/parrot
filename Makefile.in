@@ -1,9 +1,9 @@
 O = ${o}
 
 INC=include/parrot
-H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/bytecode.h $(INC)/global_setup.h
+H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h $(INC)/bytecode.h $(INC)/global_setup.h
 
-O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
+O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) packfile$(O) bytecode$(O) string$(O) strnative$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -16,11 +16,12 @@ CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
 TEST_PROG = test_prog${exe}
+PDUMP = pdump${exe}
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-all : $(TEST_PROG)
+all : $(TEST_PROG) $(PDUMP)
 
 #XXX This target is not portable to Win32
 shared: libparrot.so
@@ -29,6 +30,9 @@ libparrot.so: $(O_FILES)
 
 $(TEST_PROG): test_main$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
+
+$(PDUMP): pdump$(O) $(O_FILES)
+	$(CC) $(CFLAGS) -o $(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
 
 test_main$(O): $(H_FILES)
 
@@ -46,6 +50,8 @@ interpreter$(O): interpreter.c $(H_FILES) $(INC)/interp_guts.h
 memory$(O): $(H_FILES)
 
 bytecode$(O): $(H_FILES)
+
+packfile$(0): $(H_FILES)
 
 parrot$(O): $(H_FILES)
 

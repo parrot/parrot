@@ -31,6 +31,7 @@ include/parrot/global_setup.h
 include/parrot/interpreter.h
 include/parrot/io.h
 include/parrot/memory.h
+include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/register.h
 include/parrot/stacks.h
@@ -48,7 +49,9 @@ make_op_header.pl
 memory.c
 opcheck.pl
 opcode_table
+packfile.c
 parrot.c
+pdump.c
 process_opfunc.pl
 register.c
 string.c
