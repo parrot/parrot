@@ -1507,7 +1507,7 @@ sub val {
     set_function_params(@params);
     if ($ctx->{noreturn}) {
 	warn "NORETURN in IMCC\n";
-    } elsif (UNIVERSAL::isa($x->block, 'P6C::regex')) {
+    } elsif (UNIVERSAL::isa($x->block, 'P6C::rule')) {
 	set_function_return('PerlUndef');
     } else {
 	set_function_return('PerlArray');
@@ -1523,13 +1523,12 @@ sub val {
     unless ($ctx->{noreturn}) {
 	declare_label type => 'return';
     }
-    if (UNIVERSAL::isa($x->block, 'P6C::regex')) {
+    if (UNIVERSAL::isa($x->block, 'P6C::rule')) {
 	$ret = $x->block->val;
 	unless ($ctx->{noreturn}) {
 	    code(<<END);
 	.return $ret
 END
-	    set_function_return('PerlUndef');
 	    emit_label type => 'return';
 	}
     } else {
@@ -1558,7 +1557,6 @@ END
 	    code(<<END);
 	.return $ret
 END
-	    set_function_return('PerlArray');
 	    emit_label type => 'return' unless $ctx->{noreturn};
 	}
     }
@@ -1971,6 +1969,33 @@ sub P6C::debug_info::val {
     my $x = shift;
     my ($f, $l, $c, $txt) = @$x;
     code( qq{#line $l "$f"\n#@@@@ $txt\n}) if ($P6C::IMCC::curfunc);
+}
+
+######################################################################
+package P6C::rule;
+use P6C::IMCC::rule;
+use P6C::IMCC ':all';
+
+sub val {
+    my $x = shift;
+    unless ($x->{ctx}{rx_inline}) {
+	my $rxstr = gentmp 'str';
+	my $rxpos = gentmp 'int';
+	code(<<END);
+	pop $rxpos 
+	pop $rxstr
+END
+	$x->{ctx}{rx_pos} = $rxpos;
+	$x->{ctx}{rx_thing} = $rxstr;
+    }
+    my $ret = P6C::IMCC::rule::rx_val($x);
+    unless ($x->{ctx}{rx_inline}) {
+	code(<<END);
+	push $x->{ctx}{rx_thing}
+	push $x->{ctx}{rx_pos}
+END
+    }
+    return $ret;
 }
 
 1;

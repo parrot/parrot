@@ -20,8 +20,10 @@ the grammar rules in Parser.pm.
 =cut
 
 use strict;
+use Carp 'confess';
 use P6C::Nodes;
 use Data::Dumper;
+use P6C::Util 'unimp';
 
 ######################################################################
 
@@ -150,7 +152,7 @@ sub maybe_tree {
     } elsif (ref($x) =~ /^P6C::/) {
 	return $x->tree;
     } else {
-	die "maybe_tree: can't handle $t ($x)";
+	confess "maybe_tree: can't handle $t ($x)";
     }
 }
 
@@ -269,6 +271,15 @@ sub P6C::variable::tree {
 			      topical => $topical,
 			      implicit => $implicit);
 }
+
+sub P6C::scalar_var::tree {
+    my $x = shift;
+    my $sigil = $x->[1];
+    $x->[1] = ['sigil', $sigil];
+    return P6C::variable::tree($x);
+}
+
+*P6C::nonscalar_var::tree = *P6C::scalar_var::tree;
 
 ######################################################################
 # Operators
@@ -664,7 +675,6 @@ sub stmt_guard {
 sub P6C::debug_info::tree {
     my $x = shift;
     my ($file, $l, $c, $stmt, $txt) = @$x;
-    #print "di: $file $l $c '$txt'\n";
     my $di = bless [$file, $l, $c, $txt ], 'P6C::debug_info';
     return ($di, $stmt->tree);
 }
@@ -705,7 +715,7 @@ sub P6C::stmt::tree {
 				   props => maybe_tree($x->[6]),
 				   block => $x->[7]->tree);
 
-    } elsif ($x->[2] eq 'sub') {
+    } elsif ($x->[2] =~ /^(?:sub|rule)$/) {
 	# Make sure we take care of declarations as well as
 	# definitions:
 	my $block = $x->[$#{$x}][1];
@@ -716,6 +726,7 @@ sub P6C::stmt::tree {
 				 name => $x->[4]->tree,
 				 props => maybe_tree($x->[7]),
 				 closure => $sc);
+	
     } elsif ($x->[2] eq ':') {	# label
 	return new P6C::label name => $x->[1]->tree;
 
@@ -803,5 +814,214 @@ sub P6C::nothing::tree {
 }
 
 *P6C::no_args::tree = *P6C::nothing::tree;
+
+##############################
+sub P6C::rule::tree {
+    my $x = shift;
+    return new P6C::rule mod => maybe_tree($x->[1]), pat => $x->[3]->tree;
+}
+
+sub P6C::pattern::tree {
+    my $x = shift;
+    if (@$x == 4) {
+	return new P6C::rule pat => $x->[2]->tree;
+    }
+    return new P6C::rule mod => maybe_tree($x->[3]), pat => $x->[5]->tree,
+	immediate => ($x->[1] eq 'm');
+}
+
+sub P6C::rx_alt::tree {
+    my $x = shift;
+    return new P6C::rx_alt branches => [map { $_->tree } @{$x->[1]} ];
+}
+
+sub P6C::rx_seq::tree {
+    my $x = shift;
+    return new P6C::rx_seq things => [map { $_->tree } @{$x->[1]} ];
+}
+
+sub P6C::rx_maybe_hypo::tree {
+    my $x = shift;
+    if (@$x == 2) {
+	if (ref $x->[1]) {
+	    # rx_element
+	    return $x->[1]->tree;
+	} elsif ($x->[1] eq '^') {
+	    return new P6C::rx_beg;
+	} elsif ($x->[1] eq '$') {
+	    return new P6C::rx_end;
+	} else {
+	    # Cut
+	    return new P6C::rx_cut level => length($x->[1]);
+	}
+    } elsif (@$x == 5) {
+	# Scalar hypo
+	return new P6C::rx_hypo var => $x->[1]->tree,
+	    val => $x->[4]->tree;
+    } else {
+	# array hypo
+	return new P6C::rx_hypo var => $x->[1]->tree,
+	    val => new P6C::rx_atom(repeat => $x->[6]->tree,
+				    atom => $x->[4]->tree);
+    }
+}
+
+sub P6C::rx_element::tree {
+    my $x = shift;
+    my $ret;
+    if (@$x == 4) {
+	# codeblock
+	$ret = new P6C::rx_atom atom => $x->[3]->tree;
+    } else {
+	# atom
+	$ret = $x->[1]->tree;
+	if (@{$x->[2]}) {
+	    my $rep = $x->[2][0]->tree;
+	    $rep->thing($ret);
+	    $ret = $rep;
+	}
+    }
+    return $ret;
+}
+
+sub P6C::rx_atom::tree {
+    my $x = shift;
+    my ($atom, $capture);
+    if (@$x == 4) {
+	if ($x->[1] =~ /\[\(/) {
+	    # group, capturing or otherwise.
+	    $atom = $x->[2]->tree;
+	    $capture = $x->[1] eq '(';
+	} else {
+	    # modifiers
+	    return $x->[3]->tree;
+	}
+    } elsif (@$x == 6) {
+	# assertion
+	my $ret = $x->[4]->tree;
+	if (length($x->[3]) > 0) {
+	    $ret->negated(!$ret->negated);
+	}
+	return $ret;
+    } elsif (ref $x->[1]) {
+	# variable
+	$atom = $x->[1]->tree;
+    } elsif ($x->[1] eq '.') {
+	# metachar
+	$atom = new P6C::rx_meta name => '.';
+
+    } elsif ($x->[1] =~ /^\\(.+)/) {
+	# metachar
+	$atom = new P6C::rx_meta name => $1;
+    } else {
+	$atom = new P6C::sv_literal type => 'PerlString', lval => qq{"$x->[1]"};
+    }
+    return new P6C::rx_atom capture => $capture, atom => $atom;
+}
+
+sub P6C::rx_mod::tree {
+    my $x = shift;
+    my $ret = new P6C::rx_mod mod => $x->[2];
+    if (@{$x->[4]} > 0) {
+	$ret->args($x->[4][2]->tree);
+    }
+    return $ret;
+}
+
+sub P6C::rx_repeat::tree {
+    my $x = shift;
+    my $greedy = length($x->[2]) == 0;
+    my ($min, $max);
+    if (@{$x->[1]} == 2) {
+	my $t = $x->[1][1];
+	if ($t eq '*') {
+	    $min = 0; $max = undef;
+	} elsif ($t eq '+') {
+	    $min = 1; $max = undef;
+	} else {
+	    # '?'
+	    $min = 0; $max = 1;	    
+	}
+    } else {
+	my $repspec = $x->[1][3];
+	if (@$repspec == 5) {
+	    # two scalar vars
+	    $min = $repspec->[1]->tree;
+	    $max = $repspec->[4]->tree;
+	} elsif (@$repspec == 4) {
+	    # two numbers
+	    $min = 0 + $repspec->[1];
+	    $max = 0 + $repspec->[3];
+	} else {
+	    # one number
+	    $min = $max = $repspec->[1];
+	}
+    }
+    return new P6C::rx_repeat min => $min, max => $max, greedy => $greedy;
+}
+
+sub P6C::rx_assertion::tree {
+    my $x = shift;
+    if (@$x == 2) {
+	if (ref $x->[1]) {
+	    # Variable => runtime-interpolated pattern
+	    return $x->[1]->tree;
+	} elsif ($x->[1] eq '.') {
+	    # Single grapheme
+	    unimp "Logical grapheme";
+	} elsif ($x->[1] =~ /^'/) {
+	    return new P6C::rx_assertion
+		thing => P6C::sv_literal->new(type => 'str', lval => $x->[1]);
+	} else {
+	    # Character class.
+	    my $neg;
+	    if (substr($x->[1], 0, 1) eq '-') {
+		$neg = 1;
+		$x->[1] = substr($x->[1], 1);
+	    }
+	    return new P6C::rx_oneof
+			   rep => substr($x->[1], 1, length($x->[1]) - 2),
+			       negated => $neg;
+	}
+    } elsif ($x->[1] eq '-') {
+	# Negated assertion
+	my $thing = $x->[3]->tree;
+	$thing->negated(!$thing->negated);
+	return $thing;
+    } elsif ($x->[1] eq '(') {
+	return new P6C::rx_assertion thing => $x->[2]->tree;
+    } elsif ($x->[1] eq '{') {
+	unimp "runtime-interpolated pattern";
+    } else {
+	die;
+    }
+}
+
+sub P6C::rx_rulename::tree {
+    my $x = shift;
+    return $x->[1]->tree;
+}
+
+sub P6C::rx_call::tree {
+    my $x = shift;
+    my $pat = $x->[1]->tree;
+    if ($x->[2] eq '(') {
+	# Call with args
+	return new P6C::rx_call name => $pat, args => $x->[4]->tree;
+    } elsif ($x->[2] eq ':') {
+	# Call with string
+	my $strval = $x->[4];
+	$strval =~ s/^\s*//;
+	return new P6C::rx_call name => $pat,
+	    args => new P6C::sv_literal type => 'str', lval => $strval;
+    } else {
+	# Call with pattern or no args
+	my $args = maybe_tree($x->[2]);
+	unless (defined $args) {
+	    $args = new P6C::ValueList vals => [];
+	}
+	return new P6C::rx_call name => $pat, args => $args;
+    }
+}
 
 1;

@@ -68,6 +68,7 @@ sub usage($) {
     Parse::RecDescent control:
     --trace          set $::RD_TRACE
     --no-hitem       don't keep track of %item hash
+    --no-trace       don't insert tracing code
     (only useful when constructing parser)
     --force-grammar  Rebuild grammar even if it exists.
     --grammar NAME   use precompiled grammar NAME (default = Perl6grammar)
@@ -117,7 +118,7 @@ use vars '%o';
 Getopt::Long::Configure(qw(bundling));
 GetOptions(\%o,qw{
     test-parser
-    trace no-hitem tree raw-tree
+    trace no-trace no-hitem tree raw-tree
     add-main rule=s grammar=s force-grammar
     debug
     debug-info|g
@@ -136,6 +137,7 @@ usage(\*STDOUT) if ($o{help});
 
 $::RD_TRACE = $o{trace};
 $::RD_NO_HITEM = $o{"no-hitem"};
+$::RD_NO_TRACE = $o{"no-trace"};
 $::rule = $o{rule} || 'prog';
 $o{grammar} ||= 'Perl6grammar';
 $o{'parrot-options'} ||= '';

@@ -38,6 +38,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use Parse::RecDescent;
 use strict;
+require Exporter;
 
 =head2 Internals
 
@@ -199,7 +200,7 @@ my @builtin_types = qw(int num str HASH ARRAY SCALAR Inf NaN
 
 BEGIN {
 # Handle comments:
-    $Parse::RecDescent::skip = '(\s*(#[^\n]*?(\n|\Z))?)+';
+    $Parse::RecDescent::skip = '(?:\s*(#[^\n]*?(\n|\Z))?)+';
     $::RD_AUTOACTION = q { bless [@item], 'P6C::'.$item[0] };
 }
 
@@ -213,7 +214,8 @@ $grammar = <<'ENDSUPPORT';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB $FLUSH $NUMPART);
+		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS $RXODELIM);
+    use vars '%CDELIM';
 
 # Things from P6C::* used during the parse:
 BEGIN {
@@ -243,6 +245,10 @@ BEGIN {
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
+    $RXMETA	= qr/\./;
+    $RXATOM	= qr/(?:[\w_=]|\\.)+/;
+    $RXCHARCLASS= qr/-?\[(?:[^\]\\]|\\.)+\]/;
+    $RXODELIM	= qr/./;
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -251,6 +257,11 @@ BEGIN {
 BEGIN {
     my @kw = qw(my our temp if unless until while for and or xor err);
     @KEYWORDS{@kw} = (1) x @kw;
+}
+
+# Matching delimiters:
+BEGIN {
+    %CDELIM = qw|( ) { } [ ] < >|;
 }
 
 # (see Parse::RecDescent::Consumer)
@@ -363,6 +374,8 @@ hv_seq:		  <leftop: pair ',' pair> /,?/
 ##############################
 # Variables:
 variable:	  sigil <skip:''> varname
+scalar_var:	  '$' <skip:''> varname
+nonscalar_var:	  /[\@\%]/ <skip:''> varname
 
 sigil:		  /[\@\%\$\&]/
 
@@ -372,7 +385,7 @@ varname:	  name
 		| '^' <commit> namepart
 		| ('*')(?) '{' <skip:'\s*'> (scalar_expr | name) '}'
 
-name:		  /(?:::|\.|\*)?$NAMEPART(::$NAMEPART)*/o
+name:		  /(?:::|\.|\*)?$NAMEPART(?:::$NAMEPART)*/o
 
 namepart:	  /$NAMEPART/o
 
@@ -406,6 +419,7 @@ context:	  /$CONTEXT/o
 term:		  '<' <commit> expr(?) '>'
 		| subscriptable <commit> subscript(s?)
 		| /$CONTEXT/o <commit> term
+		| pattern
 		| sv_literal
 		| class
 		| closure
@@ -579,7 +593,7 @@ _stmt:		# Handle valid reason for 'stmt' failing (hit end of block)
 		# or have hit end of file.
 		| /\z/
 		  <commit>
-		  { got_err("Missing }", $text, $thisline) if ($arg[0]) }
+		  { got_err("Missing closing brace.", $text, $thisline) if ($arg[0]) }
 		  <reject>
 
 		# Handle "normal" case.
@@ -625,9 +639,10 @@ stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 			';' scalar_expr(?)
 			';' scalar_expr(?) ')'
 			block
-		| scope(?) 'sub' <commit> name params
+		| scope(?) /sub|rule/ <commit> name params
 			{ add_function(@item[4,5], $thisparser);1 }
-			props['is'] (';' | block)
+			props['is']
+		(';' | <matchrule:@{[$arg[0] eq 'sub'?'block':'rule']}>)[$item[2]]
 		| scope(?) 'class' <commit> name { add_class($item[4]);1 }
 			props['is'] block
 		| expr guard(?)
@@ -649,8 +664,10 @@ block:		  start_block '...' <commit> '}'
 
 start_block:	  <skip:''> /$SOB/o
 
-closure:	  '->' '(' <commit> _closure_args(?) ')' block
-		| '->' <commit> _closure_args(?) block
+closure:	  '->' '(' <commit> _closure_args(?) ')'
+			<matchrule:@{[$item[1] eq 'rule'?'rule':'block']}>
+		| '->' <commit> _closure_args(?)
+			<matchrule:@{[$item[1] eq 'rule'?'rule':'block']}>
 		| block
 
 _closure_args:	  <leftop: comma['variable'] semi_op comma['variable']>
@@ -675,6 +692,64 @@ maybe_decl:	  scope_class <commit> variable props['is']
 		| # nada
 nothing:	  ''
 no_args:	  ...!'('
+
+##############################
+# Regexes:
+
+rule:	 	  rx_mod(?) start_block rx_alt '}'
+			{ mark_end('block', $text);1; } ''
+
+pattern:	  <rulevar:$cdelim>
+pattern:	  /m|qr/ <commit> rx_mod(?) /$RXODELIM/o rx_alt
+			{ $cdelim = $CDELIM{$item[-2]} || $item[-2] } "$cdelim"
+		| '/' rx_alt '/'
+
+rx_alt:		  <leftop: rx_seq '|' rx_seq>
+
+rx_seq:		  rx_maybe_hypo(s?)
+
+rx_maybe_hypo:	  scalar_var    ':=' <commit> rx_element
+		| nonscalar_var ':=' <commit> '[' rx_alt ']' rx_repeat(?)
+		| rx_element
+		| /:{1,3}|\^|\$/
+
+rx_element:	  ...'{' <commit> block
+		| rx_atom rx_repeat(?)
+
+rx_atom:	  '(' <commit> rx_alt ')'
+		| '[' <commit> rx_alt ']'
+		| ...':' <commit> rx_mod
+		| '<' <commit> /!?/ rx_assertion '>'
+		| /$RXMETA/o
+		| variable
+		| /$RXATOM/o
+
+rx_mod:		  <skip:''> /:\S+/ <skip:$item[1]> ( '(' maybe_comma ')' )(?)
+
+rx_repeat:	  _rx_repeat /\??/
+
+_rx_repeat:	  '<' <commit> /!?/ _rx_repspec '>'
+		| /[*+?]/
+
+_rx_repspec:	  scalar_var <commit> ',' scalar_var
+		| /\d+/ ',' /\d+/
+		| /\d+/
+
+rx_assertion:	  variable
+		| '(' expr ')'
+		| '{' expr '}'
+		| /$RXCHARCLASS/o
+		| '-' '<' rx_assertion '>'
+		| /'(?:[^']|\\.)*'/
+		| '.'
+		| rx_call
+
+rx_call:	  rx_rulename '(' <commit> maybe_comma ')'
+		| rx_rulename ':' <commit> /(?:[^>]|\\>)*/
+		| rx_rulename rx_alt(?)
+
+rx_rulename:	  name
+		| scalar_var
 
 ENDGRAMMAR
 

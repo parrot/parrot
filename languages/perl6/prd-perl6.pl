@@ -1,3 +1,5 @@
+#!perl
+
 use Getopt::Long;
 use strict;
 use P6C::Tree;
@@ -8,7 +10,7 @@ use P6C::IMCC ':external';
 # Interaction
 my %o;
 (GetOptions(\%o,qw(imc silent
-		   trace no-hitem
+		   hitem usere trace score
 		   batch:s rule=s grammar=s force help))
  && !$o{help})
     || die <<END;
@@ -19,7 +21,9 @@ Usage: $0 [options]
 
     Parse::RecDescent control:
 	--trace		set \$::RD_TRACE
-	--no-hitem	don't keep track of \%item hash
+	--hitem		keep track of \%item hash
+	--trace		insert tracing code
+	--usere
 
     Misc:
 	--batch		read batch on STDIN, write to STDOUT
@@ -33,7 +37,9 @@ Usage: $0 [options]
 END
 
 $::RD_TRACE = $o{trace};
-$::RD_NO_HITEM = $o{"no-hitem"};
+$::RD_NO_HITEM = !$o{hitem};
+$::RD_NO_TRACE = !$o{trace};
+$::USERE = $o{usere};
 $::rule = $o{rule} || 'prog';
 $o{grammar} ||= 'Perl6grammar';
 

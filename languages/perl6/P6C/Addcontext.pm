@@ -666,10 +666,9 @@ sub P6C::closure::ctx_right {
 	}
     }
 
-    # NOTE: once we get return values in, we're in for serious pain
-    # here, since we have to evaluate the last statement in the
-    # _caller_'s context, which we don't know now.
-    if (defined $x->block) {	# real def.
+    if (!defined $x->block) {
+    } elsif (UNIVERSAL::isa($x->block, 'ARRAY')) {
+	# Sub block
 	# Look for CATCH blocks in the current block:
 	setup_catch_blocks($x);
 
@@ -679,6 +678,10 @@ sub P6C::closure::ctx_right {
 	    P6C::Context::block_ctx($x->block,
 				    new P6C::Context type => 'PerlArray');
 	}
+    } elsif ($x->block->isa('P6C::rule')) {
+	$x->block->ctx_right(new P6C::Context type => 'PerlUndef');
+    } else {
+	die "Internal error: closure body is ", $x->block;
     }
 }
 
@@ -754,5 +757,81 @@ sub P6C::loop::ctx_right {
 ##############################
 sub P6C::label::ctx_right { }
 sub P6C::debug_info::ctx_right { }
+
+##############################
+sub P6C::rule::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->pat->ctx_right($ctx);
+    # XXX: need to do context for mod, probably process it as well,
+    # but that's non-trivial.
+    $x->{ctx} = $ctx;
+}
+
+sub P6C::rx_alt::ctx_right {
+    my ($x, $ctx) = @_;
+    my $rectx = new P6C::Context type => 'str';	# XXX: should be regex context?
+    $_->ctx_right($rectx) for @{$x->branches};
+    $x->{ctx} = $ctx;
+}
+
+sub P6C::rx_seq::ctx_right {
+    my ($x, $ctx) = @_;
+    for (@{$x->things}) {
+	$_->ctx_right($ctx);
+    }
+    $x->{ctx} = $ctx;
+}
+
+sub P6C::rx_hypo::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->var->ctx_left($x->val);
+    $x->var->ctx_right($ctx);
+    $x->{ctx} = $ctx->copy;
+}
+
+sub P6C::rx_beg::ctx_right { }
+sub P6C::rx_end::ctx_right { }
+sub P6C::rx_cut::ctx_right { }
+sub P6C::rx_meta::ctx_right { }
+sub P6C::rx_oneof::ctx_right { }
+
+sub P6C::rx_atom::ctx_right {
+    my ($x, $ctx) = @_;
+
+    if (ref($x->atom) eq 'ARRAY') {
+	P6C::Context::block_ctx($x->atom, $ctx);
+
+    } elsif (UNIVERSAL::can($x->atom, 'type')
+	     && $x->atom->type eq 'PerlArray') {
+	# Arrays interpolate to an alternation of their elements, so
+	# they need to be in array context.
+	$x->atom->ctx_right(new P6C::Context type => 'PerlArray');
+	
+    } else {
+	$x->atom->ctx_right($ctx);
+    }
+    $x->{ctx} = $ctx;
+}
+
+sub P6C::rx_repeat::ctx_right {
+    my ($x, $ctx) = @_;
+    my $numctx = new P6C::Context type => 'int';
+    $x->min->ctx_right($numctx) if ref $x->min;
+    $x->max->ctx_right($numctx) if ref $x->max;
+    $x->thing->ctx_right($ctx);
+    $x->{ctx} = $ctx;
+}
+
+sub P6C::rx_assertion::ctx_right {
+    my ($x, $ctx) = @_;
+    my $strctx = new P6C::Context type => 'str';
+    $x->thing->ctx_right($strctx);
+}
+
+sub P6C::rx_call::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->args->ctx_right(arg_context($x->name, $ctx));
+    $x->{ctx} = $ctx->copy;
+}
 
 1;

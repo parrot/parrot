@@ -210,6 +210,8 @@ sub smartmatch_type {
 	return $x->type;
     } elsif ($x->isa('P6C::Binop') && $x->op eq ',') {
 	return 'list';
+    } elsif ($x->isa('P6C::rule')) {
+	return 'pattern';
     } else {
 	return undef;		# == "expression"
     }
@@ -287,10 +289,42 @@ END
     return $res;
 }
 
+sub sm_expr_pattern {
+    my ($e, $r) = @_;
+    my $val = $e->val;
+    my $begin = genlabel 'startre';
+    my $adv = $r->{ctx}{rx_fail} = genlabel 'advance';
+    my $str = $r->{ctx}{rx_thing} = gentmp 'str';
+    my $pos = $r->{ctx}{rx_pos} = gentmp 'int';
+    my $fail = genlabel 'rx_fail';
+    $r->{ctx}{rx_inline} = 1;	# don't pop args.
+    code(<<END);
+	$str = $val
+	$pos = 0
+	goto $begin
+$adv:
+	rx_advance $str, $pos, $fail
+$begin:
+END
+     my $ret = $r->val;
+    code(<<END);
+$fail:
+END
+    return $ret;
+}
+
+sub sm_array_pattern {
+    my ($a, $r) = @_;
+    unimp '@a =~ /regex/';
+}
+
+sub sm_hash_pattern {
+    my ($h, $r) = @_;
+    unimp '%h =~ /regex/';
+}
+
 sub do_smartmatch {
     my ($a, $b) = @_;
-    confess unless $a;
-    die unless $b;
     my $atype = smartmatch_type $a;
     my $btype = smartmatch_type $b;
     my $val;
@@ -303,6 +337,21 @@ sub do_smartmatch {
 	$val = sm_hash_scalar($a, $b);
     } elsif ($btype eq 'PerlHash' && is_scalar($atype)) {
 	$val = sm_hash_scalar($b, $a);
+
+    } elsif ($atype eq 'PerlHash' && $btype eq 'pattern') {
+	$val = sm_hash_pattern($a, $b);
+    } elsif ($btype eq 'PerlHash' && $atype eq 'pattern') {
+	$val = sm_hash_pattern($b, $a);
+
+    } elsif ($atype eq 'PerlArray' && $btype eq 'pattern') {
+	$val = sm_array_pattern($a, $b);
+    } elsif ($btype eq 'PerlArray' && $atype eq 'pattern') {
+	$val = sm_array_pattern($b, $a);
+
+    } elsif ($btype eq 'pattern') {
+	$val = sm_expr_pattern($a, $b);
+    } elsif ($atype eq 'pattern') {
+	$val = sm_expr_pattern($b, $a);
 
     } elsif (is_numeric($btype)) {
 	$val = sm_expr_num($a, $b);

@@ -573,6 +573,25 @@ Class scope.
 
 use Class::Struct P6C::class_def => { qw(qual $ name $ props @ block $) };
 
+=item B<Regexes or rules>
+
+=cut
+
+use Class::Struct P6C::rule => { qw(pat $ mod $ immediate $) };
+use Class::Struct P6C::rx_alt => { qw(branches @) };
+use Class::Struct P6C::rx_seq => { qw(things @) };
+use Class::Struct P6C::rx_hypo => { qw(var $ val $) };
+use Class::Struct P6C::rx_cut => { qw(level $) };
+use Class::Struct P6C::rx_beg => { qw() };
+use Class::Struct P6C::rx_end => { qw() };
+use Class::Struct P6C::rx_meta => { qw(name $) };
+use Class::Struct P6C::rx_atom => { qw(capture $ atom $) };
+use Class::Struct P6C::rx_mod => { qw(mod $ args $) };
+use Class::Struct P6C::rx_repeat => { qw(min $ max $ greedy $ thing $ negated $) };
+use Class::Struct P6C::rx_assertion => { qw(thing $ negated $) };
+use Class::Struct P6C::rx_call => { qw(name $ args $) };
+use Class::Struct P6C::rx_oneof => { qw(rep $ negated $) };
+
 # These pseudo-types are introduced by the tree manipulation functions:
 
 =item B<P6C::ValueList>
