@@ -5,7 +5,14 @@ to build it? The fields are: (N) Language name, (A) authors/maintainers, (D)
 description, (S) status, (M) maintained, (V) minimum Parrot version required.
 
 
-N: BASIC
+N: BASIC/compiler
+A: Clint Pierce
+D: BASIC Compiler
+S: Functional, includes samples such as Eliza and Hunt the Wumpus
+M: Yes
+V: 0.0.11
+
+N: BASIC/interpreter
 A: Clint Pierce
 D: BASIC Interpreter written in pure Parrot
 S: Functional, includes samples such as Eliza and Hunt the Wumpus
