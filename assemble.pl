@@ -86,6 +86,10 @@ This should eliminate the intermediary .pasm file and speed things up.
   print "\n"
   end
 
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
+
 =cut
 
 #

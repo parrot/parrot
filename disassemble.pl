@@ -4,7 +4,7 @@
 #
 # Turn a parrot bytecode file into text.
 #
-# Copyright (C) 2001-2002 The Parrot Team. All rights reserved.
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # This program is free software. It is subject to the same license
 # as the Parrot interpreter.
 #
@@ -320,10 +320,11 @@ from standard input if no file is named.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001 The Parrot Team. All rights reserved.
+Copyright (C) 2001-2003 The Perl Foundation. All Rights Reserved.
 
 =head1 LICENSE
 
 This program is free software. It is subject to the same license
 as the Parrot interpreter.
 
+=cut
