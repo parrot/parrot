@@ -184,8 +184,6 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
 PMC *
 key_pmc(struct Parrot_Interp *interpreter, PMC *key)
 {
-    PMC *reg;
-
     switch (key->flags & KEY_type_FLAGS) {
     case KEY_pmc_FLAG:
         return key->cache.pmc_val;

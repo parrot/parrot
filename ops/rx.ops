@@ -323,8 +323,6 @@ Matches the char $3 at the position $2 of string $1.
 =cut 
 
 op rx_char(in str, inout int, in int, inconst int) {
-	UINTVAL i;
-
 	if( (INTVAL) string_length($1) <= $2) {
 		goto OFFSET($4);
 	}
@@ -553,7 +551,7 @@ Branches to $4 if the literal is not found.
 
 op rx_search(in str, out int, inout int, in str, inconst int) {
 
-	int literal_length, str_length, i, idx, start;
+	int literal_length, str_length, i, start;
 	
 	str_length = string_length($1);
 	literal_length = string_length($4);

@@ -211,7 +211,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                                  ))) {
                     struct Buffer_Tail *tail = 
                         (struct Buffer_Tail *)((char *)b->bufstart +b->buflen);
-                    ptrdiff_t offset;
+                    ptrdiff_t offset = 0;
                     /* we can't perform the math all the time, 
                      * because strstart might be in unallocated memory */
                     if (b->flags & BUFFER_strstart_FLAG) {
@@ -293,7 +293,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                        (struct Buffer_Tail *)((char *)cur_spot + b->buflen);
                 /* we can't perform the math all the time, 
                  * because strstart might be in unallocated memory */
-                ptrdiff_t offset;
+                ptrdiff_t offset = 0;
                 if (b->flags & BUFFER_strstart_FLAG) {
                     offset = (ptrdiff_t)((STRING*)b)->strstart - 
                         (ptrdiff_t)b->bufstart;
