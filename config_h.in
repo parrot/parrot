@@ -74,12 +74,6 @@ typedef SYNC     Sync;
 #define FRAMES_PER_INT_REG_CHUNK FRAMES_PER_CHUNK
 #define FRAMES_PER_STR_REG_CHUNK FRAMES_PER_CHUNK
 
-#define MASK_STACK_CHUNK_LOW_BITS ${stacklow}
-#define MASK_INT_CHUNK_LOW_BITS ${intlow}
-#define MASK_NUM_CHUNK_LOW_BITS ${numlow}
-#define MASK_STR_CHUNK_LOW_BITS ${strlow}
-#define MASK_PMC_CHUNK_LOW_BITS ${pmclow}
-
 #define JIT_CPUARCH  "${jitcpuarch}"
 #define JIT_OSNAME   "${jitosname}"
 #define JIT_ARCHNAME "${jitarchname}"

@@ -14,8 +14,6 @@
 #include "parrot/parrot.h"
 #include "parrot/rxstacks.h"
 
-#define STACK_CHUNK_BASE(x) (void *)(MASK_STACK_CHUNK_LOW_BITS & (ptrcast_t)x)
-
 IntStack
 intstack_new(struct Parrot_Interp *interpreter)
 {
