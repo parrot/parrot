@@ -1,0 +1,53 @@
+
+=head1 A basic guide to writing tests for Parrot
+
+This is quick and dirty pointer to how tests for Parrot should be
+written.  The testing system is liable to change in the future, but
+tests written following the guidelines below should be easy to port
+into a new test suite.
+
+=head2 How to write a test
+
+First, find an appropriate file in C<t/op/*.t>, or create a new one.
+
+Add a test by:
+
+  incrementing the number of planned tests.
+  putting some code in like this:
+
+	output_is(<<'CODE', <<'OUTPUT', "name for test");
+		*** a big chunk of assembler, eg:
+		print   1
+		print   "\n" # you can even comment it if it's obscure
+		end          # don't forget this...!
+	CODE
+	 *** what you expect the output of the chunk to be, eg.
+	1
+	OUTPUT
+
+=head2 What a test should do
+
+=over 4
+
+=item o
+
+Probe the boundaries (including edge cases, errors thrown etc.) of
+whatever code they've just written.  These should include potentially
+out of band input unless we decide that compilers should check for this
+themselves.
+
+=item o
+
+Are small and self contained, so that if their new feature breaks we
+can identify where and why quickly.
+
+=item o
+
+Are valid, essentially that they conform to the additonal documentation
+that accompanies the feature.  You did write that as well, didn't you?
+
+=item o
+
+Are a chunk of assembler and a chunk of expected output.
+
+=back
