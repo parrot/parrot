@@ -3,7 +3,7 @@
 #
 
 use strict;
-use warnings;
+#use warnings;
 
 package Parrot::OpTrans::CPrederef;
 
