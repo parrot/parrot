@@ -28,7 +28,7 @@ You could also run all the tests with valgrind, by running
 Some of the more frequent and exasperating parrot bugs are related to
 memory management in general, and garbage collection in particular.
 
-=head3 Infant mortality
+Infant mortality
 
 See F<docs/dev/infant.dev> for details of one frequent problem: infant
 mortality. Infant mortality is when you create a Parrot object, but
@@ -122,7 +122,7 @@ At this point, you can step through the instructions, or print out the
 various Parrot registers. GDB will know about I0-I31, N0-N31, S0-S31,
 and P0-P31.
 
-=head3 WARNING: Stepping too far
+WARNING: Stepping too far
 
 One thing to watch out for is that GDB gets confused when attempting
 to step over certain instructions. The only ones that I have noticed

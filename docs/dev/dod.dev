@@ -94,7 +94,9 @@ have been marked live, the collection
 stage is started.  First, PMCs are collected,
 followed by buffers.
 
-=head3 Collecting PMCs
+=over 4
+
+=item Collecting PMCs
 
 To collect PMCs, each PMC arena is examined,
 from the most recently created backwards.
@@ -104,7 +106,7 @@ If it is not, then it is added to the free
 list and marked as being already on the free
 list.
 
-=head3 Collecting buffers
+=item Collecting buffers
 
 To collect buffers, each Buffer arena is
 examined from the most recently created
@@ -112,6 +114,8 @@ backwards.  If the buffer is not live,
 not already on the free list and it is not a constant
 or copy on write, then it is added to the free
 pool for reuse.
+
+=back
 
 In both cases (PMC and buffer), the live flag
 is reset after examination for reclamation.

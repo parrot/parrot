@@ -74,7 +74,7 @@ regular expression opcodes to be built in to the interpreter.  This
 group of opcodes, called the Parrot Regular Expression Engine version
 4.0 (or simply Rx4), is the result.
 
-=head2 Basic Concepts
+=head1 Basic Concepts
 
 Perl 5 had one opcode for each operation in the regular expression.
 For example:
@@ -141,7 +141,7 @@ Bottom line is, Rx4 lays out exactly what's going on.  This is a
 feature.  It gives the regex compiler total control over what's going
 on.
 
-=head2 The Opcodes
+=head1 The Opcodes
 
 There are two basic rules to how the opcodes operate.
 
@@ -159,18 +159,9 @@ or last parameter, that's what they are.
 
 The documentation for each opcode follows.
 
-=cut
-
-###############################################################################
-
-=head3 Preparation
+=head2 Preparation
 
 =over 4
-
-=cut
-
-
-########################################
 
 =item C<rx_compile>(out str, in str, in str)
 
@@ -193,13 +184,9 @@ op rx_compile(out str, in str, in str) {
 
 =back
 
-=head3 Stack manipulation ops
+=head2 Stack manipulation ops
 
 =over 4
-
-=cut
-
-########################################
 
 =item C<rx_pushindex>(in pmc)
 
@@ -222,6 +209,7 @@ op rx_clearstack () {
 	intstack_free(interpreter, interpreter->ctx.intstack);
 	goto NEXT();
 }
+
 ########################################
 
 =item C<rx_pushmark>()
@@ -266,16 +254,12 @@ op rx_popindex(out int, inconst int) {
 
 =back
 
-=head3 Simple matching ops
+=head2 Simple matching ops
 
 This ops match a simple pattern against the string, and branch on their
 last argument when they fail.
 
 =over 4
-
-=cut
-
-########################################
 
 =item C<rx_advance>(in str, inout int, inconst int)
 
@@ -534,7 +518,7 @@ op rx_zwa_atend(in str, in int, inconst int) {
 
 =back
 
-=head3 Optimization ops: searching at the beginning of the string.
+=head2 Optimization ops: searching at the beginning of the string.
 
 This ops combine rx_advance with other ops, with the goal of increasing the
 code density, and saving a few repeated computations.
@@ -547,11 +531,6 @@ Additonally, this ops can be used to optimize matches of the type:
 
 	.*? <pattern>  # non-greedy repetition of dot, followed by
 		       # a known pattern
-
-
-=cut
-
-########################################
 
 =over 4
 
@@ -653,13 +632,9 @@ op rx_search_char (in str, inout int, inout int, in int, inconst int) {
 
 =back
 
-=head3 Optimization ops: combining a simple match with a greedy star.
+=head2 Optimization ops: combining a simple match with a greedy star.
 
 =over 4
-
-=cut
-
-########################################
 
 =item C<rx_literal_all>(in str, inout int, in str)
 
@@ -785,7 +760,7 @@ op rx_oneof_bmp_all (in str, inout int, in pmc) {
 
 =back
 
-=head3 Other ops
+=head2 Other ops
 
 =over 4
 
@@ -820,7 +795,7 @@ op rx_makebmp(out pmc, in str) {
 
 =head2 Using the opcodes
 
-=head3 Tutorial
+=head2 Tutorial
 
 Let's see how simple regexes using the Rx4 engine. This examples will
 show inlined regexes (i.e., regexes that appear on the middle of perl
@@ -953,7 +928,7 @@ From here it is mostly a matter of knowing how to implement the
 various forms of quantifiers and groups. The following section
 explains how the most common constructs can be implemented.
 
-=head3 Common constructs
+=head2 Common constructs
 
 The list below gives simple templates for common quantifiers operations.
 

@@ -211,7 +211,7 @@ the configuration system's data.
 
 =over 4
 
-=item C<Parrot::Configure::RunSteps>
+=item L<Parrot::Configure::RunSteps>
 
 =item L<Parrot::Configure::Step>
 
