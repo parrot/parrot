@@ -861,26 +861,20 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
 #define emitm_fld1(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xe8; }
 
 /* FXCH ST,ST(i) , optimize 2 consecutive fxch with same reg */
-static unsigned char *lastpc;
 #define emitm_fxch(pc, sti) { \
-    if ((unsigned char *)(pc) == (lastpc + 2) && \
-            (int)(*lastpc) == (int)0xD9 && \
-            (int)lastpc[1] == (int)(0xC8+sti)) \
-        pc -= 2; \
-    else { \
-        lastpc = (unsigned char *)pc; \
         emitm_fl_3(pc, emit_b001, emit_b001, sti); \
-    } \
 }
+
 /* FLD ST,ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
-#define emitm_fld(pc, sti) { \
-    if (0&&(unsigned char *)(pc) == (lastpc + 2) && \
+static unsigned char *lastpc;
+#define emitm_fld(pc, sti) do { \
+    if ((unsigned char *)(pc) == (lastpc + 2) && \
             (int)(*lastpc) == (int)0xDD && \
             (int)lastpc[1] == (int)(0xD8+sti+1)) \
         lastpc[1] = 0xD0+sti+1; \
     else \
         emitm_fl_3(pc, emit_b001, emit_b000, sti); \
-}
+} while(0)
 
 /* 0xDA, 0xDB ops */
 /* FCMOV*, FCOMI PPRO */
@@ -922,7 +916,7 @@ static unsigned char *lastpc;
 /* DivR ST(i) = ST(i) / ST(0); POP  */
 #define emitm_fdivrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b110, sti)
 
-/* Add ST(1) = ST(0) / ST(i); POP ST(0) */
+/* Add ST(i) = ST(0) / ST(i); POP ST(0) */
 #define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
 
 /* 0xDF OPS: FCOMIP, FUCOMIP PPRO */
@@ -1205,24 +1199,10 @@ static unsigned char *lastpc;
 
 /* ST(i) op= MEM */
 
-#if NUMVAL_SIZE == 12
 #define jit_emit_xxx_rm_n(op, pc, r, m) { \
-    emitm_fld(pc, (r)); \
     jit_emit_fload_m_n(pc, m); \
-    emitm_f ## op ## p(pc, 1); \
-    emitm_fstp(pc, (r+1)); \
+    emitm_f ## op ## p(pc, (r+1)); \
 }
-#else
-#define jit_emit_xxx_rm_n(op, pc, r, m) { \
-    if (r) { \
-        emitm_fxch(pc, r); \
-        emitm_f ## op ## _m(pc, 0,0,0, m); \
-        emitm_fxch(pc, r); \
-    } else { \
-        emitm_f ## op ## _m(pc, 0,0,0, m); \
-    } \
-}
-#endif
 
 #define jit_emit_add_rm_n(pc, r, m) jit_emit_xxx_rm_n(add, pc, r, m)
 #define jit_emit_sub_rm_n(pc, r, m) jit_emit_xxx_rm_n(sub, pc, r, m)
@@ -1233,19 +1213,8 @@ static unsigned char *lastpc;
 
 /* ST(r1) += ST(r2) */
 #define jit_emit_add_rr_n(pc, r1, r2) { \
-    if (r1 == r2) { \
-        emitm_fld(pc, r1); \
-        emitm_fadd(pc, 0); \
-        emitm_fstp(pc, (r1+1)); \
-    } \
-    else if (r1) { \
-        emitm_fxch(pc, r1); \
-        emitm_fadd(pc, r2); \
-        emitm_fxch(pc, r1); \
-    } \
-    else { \
-        emitm_fadd(pc, r2); \
-    } \
+    emitm_fld(pc, r2); \
+    emitm_faddp(pc, (r1+1)); \
 }
 
 
@@ -1253,19 +1222,8 @@ static unsigned char *lastpc;
 
 /* ST(r1) -= ST(r2) */
 #define jit_emit_sub_rr_n(pc, r1, r2) { \
-    if (r1 == r2) { \
-        emitm_fld(pc, r1); \
-        emitm_fsub(pc, 0); \
-        emitm_fstp(pc, (r1+1)); \
-    } \
-    else if (r1) { \
-        emitm_fxch(pc, r1); \
-        emitm_fsub(pc, r2); \
-        emitm_fxch(pc, r1); \
-    } \
-    else { \
-        emitm_fsub(pc, r2); \
-    } \
+    emitm_fld(pc, r2); \
+    emitm_fsubp(pc, (r1+1)); \
 }
 
 #define jit_emit_inc_r_n(pc, r) { \
@@ -1286,53 +1244,23 @@ static unsigned char *lastpc;
 
 /* ST(r1) *= ST(r2) */
 #define jit_emit_mul_rr_n(pc, r1, r2) { \
-    if (r1 == r2) { \
-        emitm_fld(pc, r1); \
-        emitm_fmul(pc, 0); \
-        emitm_fstp(pc, (r1+1)); \
-    } \
-    else if (r1) { \
-        emitm_fxch(pc, r1); \
-        emitm_fmul(pc, r2); \
-        emitm_fxch(pc, r1); \
-    } \
-    else { \
-        emitm_fmul(pc, r2); \
-    } \
+    emitm_fld(pc, r2); \
+    emitm_fmulp(pc, (r1+1)); \
 }
 
 #define jit_emit_div_ri_n(pc, r, nc) jit_emit_div_rm_n(pc, r, nc)
 
 /* ST(r1) /= ST(r2) */
 #define jit_emit_div_rr_n(pc, r1, r2) { \
-    if (r1 == r2) { \
-        emitm_fld(pc, r1); \
-        emitm_fdiv(pc, 0); \
-        emitm_fstp(pc, (r1+1)); \
-    } \
-    else if (r1) { \
-        emitm_fxch(pc, r1); \
-        emitm_fdiv(pc, r2); \
-        emitm_fxch(pc, r1); \
-    } \
-    else { \
-        emitm_fdiv(pc, r2); \
-    } \
+    emitm_fld(pc, r2); \
+    emitm_fdivp(pc, (r1+1)); \
 }
 
-/* ST(i) %= MEM */
-/* XXX do we need the test for zero ??? */
+/* ST(i) %= MEM
+ * please note the hardccded jumps */
 #define jit_emit_cmod_rm_n(pc, r, mem) { \
     if (r)  \
         emitm_fxch(pc, r); \
-    emitm_ftst(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-    if (r) { \
-        emitm_jxs(pc, emitm_jnz, 4); \
-        emitm_fxch(pc, r); \
-        emitm_jumps(pc, 13); \
-    } \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fxch(pc, 1); \
     emitm_fprem(pc); \
@@ -1349,11 +1277,7 @@ static unsigned char *lastpc;
     if (r1)  \
         emitm_fxch(pc, r1); \
     emitm_fld(pc, r2); \
-    emitm_ftst(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
     emitm_fxch(pc, 1); \
-    emitm_jxs(pc, emitm_jz, 7); \
     emitm_fprem(pc); \
     emitm_fstw(pc); \
     emitm_sahf(pc); \
@@ -1370,6 +1294,8 @@ static unsigned char *lastpc;
     emitm_fstw(pc); \
     emitm_sahf(pc); \
 }
+
+#define jit_emit_cmp_ri_n(pc, r, nc) jit_emit_cmp_rm_n(pc, r, nc)
 
 /* compare mem <-> ST(r) */
 #define jit_emit_cmpr_mr_n(pc, mem, r) { \
@@ -1408,13 +1334,6 @@ static unsigned char *lastpc;
     } \
 }
 
-#define jit_emit_cmp_ri_n(pc, r, mem) { \
-    jit_emit_fload_m_n(pc, mem); \
-    emitm_fld(pc, (r+1)); \
-    emitm_fcompp(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-}
 
 #define jit_emit_neg_m_i(pc, address) \
   emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
