@@ -890,8 +890,6 @@ op if(in PMC, in INT) {
 }
 
 
-=back
-
 =cut
 
 
@@ -2184,6 +2182,9 @@ inline op pushp() {
   goto NEXT();
 }
 
+=back
+
+=cut
 
 ###############################################################################
 
@@ -2448,7 +2449,7 @@ op collect() {
 Fetch some piece of information about the interpreter and put it in $1
 
 =cut
- 
+
 op interpinfo(out INT, in INT) {
   switch ($2) {
     case TOTAL_MEM_ALLOC: $1 = interpreter->memory_allocated;
