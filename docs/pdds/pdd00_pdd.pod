@@ -1,105 +1,88 @@
 =head1 TITLE
 
-Perl Design Documents
+Parrot Design Documents
 
 =head1 VERSION
 
 =head2 CURRENT
 
-    Maintainer: Bryan C. Warnock <bwarnock@capita.com>
+    Maintainer: Simon Glover <scog@amnh.org>
     Class: Meta
     PDD Number: 0 
     Version: 2
     Status: Developing
-    Last Modified:  4 March 2001
-    PDD Format: 0
+    Last Modified:  20 February 2004
+    PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
+    v2 substantially rewritten on 20 Feb 2004 by Simon Glover
     v1 created on 7 Dec 2000 by BCWarnock <bwarnock@capita.com>
     v1 promoted to Developing as PDD 0 on 20 February 2001 by Dan Sugalski.
 
 =head1 CHANGES
 
-CURRENT and HISTORY updated for standardization.
+    Substantially rewritten to reflect what the PDDs actually are (rather
+    than what we hoped they would be 3+ years ago). 
 
 =head1 ABSTRACT
 
-This document defines the standard format for documenting Perl
-development decisions - the how and why of Perl internals and the detailed
-expected behavior of new language constructs, as well as
-the surrounding ethos and culture of the development community.  This
-document identifies Perl Design Document Standard 6.0.
+This document defines the standard format for the Parrot Design Documents 
+(PDDs) - the basic descriptions/plans for the design of Parrot.
 
 =head1 DESCRIPTION
 
-One of the shortcomings of most long-term development and maintenance
-efforts - and Perl has been no exception - is the lack of readily
-available documentation describing the rationale behind many of the
-implementation decisions.  News archives and mailing archives are
-becoming increasingly difficult to find random information in,
-particularly with the myriad lists that Perl 6 begot.
-
-Although there will always be decisions which are obvious due to a lack
-of alternatives, many design decisions may have multiple technically
-feasible solutions.  Why X instead of Y?  Why this instead of that?  Is
-the decision based on an obscure bit of technical arcana?  Is the
-decision based on Perl culture, which itself is a product of many of
-the undocumented decisions made before?  Or is the decision truly a
-toss-up, with a solution picked pseudo-randomly?
-
-A Perl Design Document (PDD) is a readily available record of the Perl
-community's thought process in regards to a specific structure related
-to Perl development.  As such, it serves three major purposes.
+The original intent of the Parrot Design Documents (which themselves were
+initially Perl Design Documents) was threefold:
 
 =over 4
 
 =item 1
 
-A clear indication of the direction of current development.  A PDD
-provides a road map from abstraction to implementation of an idea. 
+To provide a clear indication of the direction of current development
+(essentially, a road map from an abstract idea to a concrete implementation).
 
 =item 2
 
-An historical record of the rationale behind the decision.  A PDD
-provides context to future developers, who may not have been familiar
-with the original discussion, but are currently involved with the
-resultant implementation.
+To act as a historical record of the rationale behind the decision, in order 
+to provide context to future developers, who may not have been familiar 
+with the original discussion.
 
 =item 3
 
-An historical technical and cultural perspective for future development
-work.  Re-implementation or even tangential tasks need only address what
-has changed since the original PDD.
+To provide a historical, technical and cultural perspective for future 
+development work.  Re-implementation or even tangential tasks need only 
+address what has changed since the original PDD.
 
 =back
 
-It is not a vehicle for brainstorming or creating a wish-list.  PDDs
-are reserved for a concrete snapshot of what B<is>, and what B<will>
-be.
+Needless to say, things didn't work out this way. Some of the context 
+discussed above is now documented in the F<*.dev> documents (see the
+F</docs/dev> directory); much of it remains undocumented. The portions
+that have wound up being documented as PDDs are the basic design of
+the Parrot interpreter. In other words, the PDDs describe the B<features
+that the interpreter should implement>. They B<should not> discuss the
+details of the actual implementation (unless they absolutely have to)
+or the choices leading to that particular implementation; these are
+details that should go in the relevant F<*.dev> file. On the other
+hand, they B<should> detail the trade-offs made in the actual design.
 
 =head1 IMPLEMENTATION
 
 All newly created PDDs will adhere to the PDD standard current as of
-the time of proposal.  In the absence of an accepted standard, the PDD
-will be written in the last generally accepted format, and will
-indicate the S<I<PDD Format>> as 0.  (See L<VERSION|"VERSION:">.) 
-
-All existing PDDs will adhere to the PDD standard current as of the
-time of re-submission.  Existing PDDs need not be modified and
-resubmitted B<solely> for the purpose of adhering to a PDD format
-change.
+the time of proposal. An example of the currently accepted layout is
+given in F<docs/pdds/pdd_template.pod>, which should be used as a 
+template for any future PDDs.
 
 =head2 FORMAT
 
 All PDDs will be written in POD parseable by the current stable release
-of Perl.  Although XML is a viable solution and has its vocal
-supporters within the Perl community, POD is still the traditional
-documentation language for All Things Perl, and PDDs have yet to reach
-the level of complexity that requires some of XML's more powerful
-capabilities, particularly at a trade-off to the legibility of POD's
-simplicity.
+of Perl. Although XML is a viable solution and has its vocal supporters,
+and although Parrot is intended to be used by many groups outside of the
+Perl community, we have chosen POD for its simplicity and ease of 
+reading in plaintext form. Conversion to other formats (e.g. HTML) is
+encouraged, but the POD version should remain the master copy. 
 
 All PDDs will be written in English.  British, American, or Other is
 the choice of the author.  Translation to other languages, like all
@@ -111,21 +94,13 @@ All PDDs will contain the following information:
 
 =item TITLE:
 
-A short, general description of a specific area within Perl.  For
-instance, "Sorting" vice "Sorting with a Heap Sort".  
-
-PDDs should be limited to a specific area of Perl - in the above case,
-sorting - but should be broad enough to include the reasons for and
-against any specific implementation that may be discussed.  Historical
-perspectives can be contrasted and compared through archived versions
-of a PDD, vice multiple searches through archived versions of I<n>
-number of PDDs.
+A short, general description of a specific part of the Parrot design.
+This may be a particular subsystem (e.g. the garbage collector), or a 
+more general topic (e.g. basic Parrot datatypes).
 
 =item VERSION:
 
 Contains current and selected historical metadata on the PDD itself.
-
-=over 4
 
 =item CURRENT:
 
@@ -136,150 +111,73 @@ submission.
 
 =item Maintainer
 
-Required.  The name and current email address for the POC of the PDD. 
-This is to whom questions, comments, and patches are generally
-addressed.  This need not be the author of the document.
+Required.  The name and current email address for the point of 
+contact for the PDD. This is the person to whom questions, comments, 
+and patches should generally be addressed. This need not be the author 
+of the document.
+
+(In practice, non-trivial changes to the PDDs should probably be
+ discussed on the perl6-internals mailing list before they take place).
 
 =item Class
 
-Required.  The area of Perl the PDD covers.  This allows related PDDs
-to be logically grouped.  The current list of valid classes roughly
-mirror the Perl 6 mailing lists, and are:
+Required.  The area of Parrot the PDD covers.  This allows related PDDs
+to be logically grouped. The current list of valid classes is:
 
-    Documentation - on perl documentation.
-	Internals - on the internals of perl components.
-	Language - on Perl linguistic constructs.
-	Meta - on Perl as an entity.
-	Testing - on the testing of perl.
+    Internals     - on the design of the Parrot interpreter
+    Documentation - on Parrot documentation
+    Meta          - on the Parrot project as an entity
+    Testing       - on the testing of Parrot
 
-It is expected that PDDs will be sufficiently detailed to cover but one of
-these areas.  However, as the situation requires, a PDD may belong to more than
-one class.  The classes should then be common separated.  Peripheral
-excursions into the scope of another class does not warrant an actual
-classification.
+It is expected that most PDDs will fit into a single class, but in 
+principle a may belong to more than one class. However, peripheral
+excursions into the scope of another class should not warrant an 
+actual classification (i.e. you shouldn't classify something as 
+C<Testing> simply because you happen to mention potential tests at
+one or two points in the text).
 
 =item PDD Number
 
-Required.  Newly created PDDs should have a PDD Number of I<TBD>.  PDD
-Numbers will be assigned by the Perl Librarian, based on the following
-scheme:
-
-=over 4
-
-=item *
-
-C<Informational> PDDs are given a PDD Number of C<I#>, where C<#> is a
-one-up integer based on order of release by the Perl Librarian.
-
-=item *
-
-C<Experimental> PDDs are given a PDD Number of C<X#>, where C<#> is a
-one-up integer based on order of release by the Perl Librarian.
-
-=item *
-
-C<Proposed> PDDs are B<not> given a PDD Number.  They are given an
-unprefixed one-up integer when promoted to C<Developing>.
-
-=back
-
-Since C<Informational> and C<Experimental> PDDs don't require the same
-approval process as C<Standards>-track PDDs, their PDD Number should
-readily reflect their purpose.  Since C<Proposed> PDDs may be delayed
-or prevented from reaching an inclusive status, withholding a PDD
-Number can prevent gaps in the PDD Number sequence.
+Required.  No two PDDs should have the same number. PDD numbers are
+assigned by whoever commits the PDDs to the repository, subject to
+the approval of the Pumpking.
 
 =item Version
 
-Required.  A one-up integer reflecting each public revision of a PDD.  This 
+Required.  A one-up integer reflecting each public revision of a PDD. This 
 reflects the version of the document itself, and not version of the standard
 the document may provide.
 
 =item Status
 
-Required.  The current state of the PDD.  Currently, there are three
-tracks of PDD, C<Informational>, C<Experimental>, and C<Standards>.
-Each track has its own list of states, which are:
-
-=over 4
-
-=item INFORMATIONAL TRACK
+Required. The current state of the PDD.  Currently, the only 
+classifications in use are C<Informational> and C<Developing>.
+We hope to eventually add C<Standard>. All three are detailed below:
 
 =over 4
 
 =item Informational
 
-Informational PDDs are an objective record of 
-=item Superseded by PDD #
-
-Replaced in whole by another PDD.
-
-=item Obsolete
-
-Naturally obsolete.
-
-=back
-
-=item EXPERIMENTAL TRACK
-
-=over 4
-
-=item Experimental
-
-Documentation on an experimental feature or use of Perl, such as
-porting Perl to a PS2.
-
-=item Superseded by PDD #
-
-Replaced in whole by another PDD.
-
-=item Obsolete
-
-Naturally obsolete.
-
-=back
-
-=item STANDARDS TRACK
-
-=over 4
-
-=item Proposed
-
-A rough draft submitted for consideration from the Perl development
-community at large.  A snapshot of the general discussion
-surrounding issue foo, but may not accurately reflect the true
-direction the community wishes to go.
+A PDD discussing possible design choices for a particular area of Parrot.
+This is non-prescriptive -- the final design may look nothing like the
+suggested one -- but provides a useful way to document detailed design
+concepts for later reference. For a good example, see 
+F</docs/pdds/pdd14_bignum.pod>.
 
 =item Developing
 
-An acceptable (at least, on theory) PDD that needs much further
-fleshing out and fine tuning.  The PDD, as well as the
-implementation it describes, are both under official development by
-the Perl development community.
+An acceptable (at least, in theory) PDD that needs further fleshing out 
+and fine tuning. The PDD, as well as the implementation it describes, are 
+both under official development by the Parrot development community.
 
 =item Standard (Version #)
 
-A frozen snapshot of the issue, as it applies to Perl at the time of
-acceptance.  The version number mirrors the version of perl the standard was
-first applied to.  Should a standard be changed within a perl release cycle,
-the version number will be suffixed with a lower-case letter.  Example
-Standard references are C<Standard 6.0>, C<Standard 6.0a>, C<Standard
-6.0.1>, and C<Standard 6.0.1a>.
-
-=item Superseded by PDD #
-
-Replaced in whole by another PDD.
-
-=item Obsolete
-
-Naturally obsolete.   		
+A frozen snapshot of the design as it applies to Parrot at a particular
+moment in time. The version number should reflect that version number
+of Parrot that the standard was first applied to. C<Developing> PDDs 
+are expected to eventually become C<standard>.
 
 =back
-
-=back
-
-PDDs that switch tracks will always begin at the first stage of the
-track.
 
 =item Last Modified
 
@@ -287,13 +185,13 @@ Required.  The date of the last submission.
 
 =item PDD Format
 
-Required.  The specific PDD Standard the PDD adheres to.  This allows scripts
-to better parse PDDs of multiple aging formats.  In the absence of a
-standard, the PDD Format is 0.
+Required.  The specific PDD Standard that the PDD adheres to. This allows 
+scripts to better parse PDDs of multiple aging formats. The format 
+currently in use is PDD format 1.
 
 =item Language
 
-Optional.  The language the PDD is written in.  
+Optional.  The language that the PDD is written in.  
 
 =back
 
@@ -302,10 +200,8 @@ Optional.  The language the PDD is written in.
 A list of free-flow descriptions of significant metadata changes, such
 as status changes, or change of maintainers.  Each entry should include
 the version, date, and nature of the change.  This provides a quick
-historical glimpse to the major metadata changes of a PDD.  This field is
+historical overview of the major metadata changes of a PDD.  This field is
 not to be used for a comprehensive list of alterations to the document.
-
-=back
 
 =item CHANGES:
 
@@ -319,7 +215,7 @@ A quick blurb explaining the purpose of the PDD.
 =item DESCRIPTION:
 
 A description of the general nature of the PDD and how it relates to
-Perl.  
+Parrot.  
 
 =item IMPLEMENTATION:
 
@@ -349,18 +245,10 @@ The PDD author may add any additional sections he or she wishes.
 
 =head2 SUBMISSION CRITERIA
 
-It is expected that all PDDs submitted as a Proposed will have
-undergone an actual discussion within the applicable group(s). 
-Following a general consensus of the need for a PDD (and, hopefully, a
-general consensus on the particular slant of a PDD proposal), the PDD
-can be submitted to the Perl Librarian.
-
-The Perl Librarian should check the document for format, and either
-return to the PDD to the maintainer for correction, or publish the PDD
-- whatever that actually entails.  (Mailing lists, web site, etc.)
-
-C<Informational> and C<Experimental> PDDs may be submitted on a whim,
-but otherwise require the same submittal process as regular PDDs.
+Proposed PDDs should be submitted to the perl6-internals mailing list
+(located at perl6-internals@perl.org) for discussion, criticism and
+general kibitzing. Acceptance of a particular PDD is ultimately up to
+the current Pumpking and/or the internals chief (a.k.a. Dan).
 
 =head2 PDD TRANSLATIONS
 
@@ -377,7 +265,7 @@ The C<Maintainer> field should reflect who did the translation.
 
 The C<Version> number should match the original document's C<Version>
 number.  Should multiple translated versions of a single original PDD
-be done (to correct spellings, etc), the revision specific to that
+be done (to correct spellings, etc.), the revision specific to that
 document version should be included in parentheses following the
 version number.
 
@@ -389,23 +277,19 @@ Attributions in the C<HISTORY> section should be left alone.
 
 =head2 PDD STATUS CHANGES
 
-Only Larry, a project leader, pumpking, or working group chair may set
-C<Status> to anything other than C<Proposed>, C<Informational>, or
-C<Experimental>.
+Any change to the status of a particular PDD should be approved by
+the current Pumpking and/or the internals chief.
 
 =head2 AVAILABILITY
 
-All C<Proposed>, C<Informational>, and C<Experimental> PDDs should be
-readily available, in a centralized location, to at least the current
-Perl development circles.  All C<Standards>-track PDDs should be
-readily available, in a centralized location, to the general public.
-
-All C<Superseded> PDDs should be available upon request.  All
-historical versions of PDDs should be available upon request.
+All C<Informational>, and C<Developing> PDDs should be readily available, 
+in a centralized location, to at least the current Parrot development 
+circles.  All C<Standard> PDDs should be readily available, in a 
+centralized location, to the general public. 
 
 =head1 ATTACHMENTS
 
-A. F<pddtempl.pod>
+None.
 
 =head1 REFERENCES
 
