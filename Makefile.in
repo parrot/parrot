@@ -133,7 +133,7 @@ all : $(TEST_PROG) $(PDUMP) docs
 
 mops: examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
+$(TEST_PROG): test_main$(O) $(GEN_HEADERS) $(O_FILES) Parrot/OpLib/core.pm Parrot/PMC.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
 
