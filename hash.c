@@ -398,8 +398,31 @@ hash_clone(struct Parrot_Interp * interp, HASH * hash) {
     for (i = 0; i < hash->hash_size; i++) {
         HASHBUCKET * b = lookupBucket(hash, i);
         while (b) {
-            /* XXX: does b->key need to be copied? */
-            hash_put(interp, ret, b->key, &(b->value));
+            KEY_ATOM valtmp;
+            switch (b->value.type) {
+            case enum_key_undef:
+            case enum_key_int:
+            case enum_key_num:
+                valtmp = b->value;
+                break;
+
+            case enum_key_string:
+                valtmp.type = enum_key_string;
+                valtmp.val.string_val
+                    = string_copy(interp, b->value.val.string_val);
+                break;
+
+            case enum_key_pmc:
+                valtmp.type = enum_key_pmc;
+                valtmp.val.pmc_val = b->value.val.pmc_val->vtable->clone(
+                    interp, b->value.val.pmc_val);
+                break;
+
+            default:
+                internal_exception(-1, "hash corruption: type = %d\n",
+                                   b->value.type);
+            };
+            hash_put(interp, ret, b->key, &valtmp);
             b = getBucket(hash, b->next);
         }
     }
