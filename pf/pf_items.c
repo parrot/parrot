@@ -182,6 +182,90 @@ fetch_op_mixed_be(unsigned char *b)
 #endif
 }
 
+static opcode_t
+fetch_op_be_4(unsigned char *b)
+{
+    union {
+        unsigned char buf[4];
+        opcode_t o;
+    } u;
+    fetch_buf_be_4(u.buf, b);
+#if PARROT_BIGENDIAN
+#  if OPCODE_T_SIZE == 8
+    return u.o >> 32;
+#  else
+    return u.o;
+#  endif
+#else
+#  if OPCODE_T_SIZE == 8
+    return (opcode_t)(fetch_iv_le((INTVAL)u.o) & 0xffffffff);
+#  else
+    return (opcode_t) fetch_iv_le((INTVAL)u.o);
+#  endif
+#endif
+}
+
+static opcode_t
+fetch_op_be_8(unsigned char *b)
+{
+    union {
+        unsigned char buf[8];
+        opcode_t o[2];
+    } u;
+    fetch_buf_be_8(u.buf, b);
+#if PARROT_BIGENDIAN
+#  if OPCODE_T_SIZE == 8
+    return u.o[0];
+#  else
+    return u.o[1];
+#  endif
+#else
+    return (opcode_t)fetch_iv_le((INTVAL)u.o[0]);
+#endif
+}
+
+static opcode_t
+fetch_op_le_4(unsigned char *b)
+{
+    union {
+        unsigned char buf[4];
+        opcode_t o;
+    } u;
+    fetch_buf_le_4(u.buf, b);
+#if PARROT_BIGENDIAN
+#  if OPCODE_T_SIZE == 8
+    return u.o >> 32;
+#    else
+    return (opcode_t) fetch_iv_be((INTVAL)u.o);
+#  endif
+#else
+#  if OPCODE_T_SIZE == 8
+    return u.o & 0xffffffff;
+#  else
+    return u.o;
+#  endif
+#endif
+}
+
+static opcode_t
+fetch_op_le_8(unsigned char *b)
+{
+    union {
+        unsigned char buf[8];
+        opcode_t o[2];
+    } u;
+    fetch_buf_le_8(u.buf, b);
+#if PARROT_BIGENDIAN
+#  if OPCODE_T_SIZE == 8
+    return u.o[0];
+#  else
+    return (opcode_t)fetch_op_be((INTVAL)u.o[1]);
+#  endif
+#else
+    return u.o[0];
+#endif
+}
+
 /*
 
 =item C<opcode_t
@@ -201,7 +285,7 @@ PF_fetch_opcode(struct PackFile *pf, opcode_t **stream) {
 #if TRACE_PACKFILE == 2
     PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
 #endif
-    o = (pf->fetch_op)(**((unsigned char ***)stream));
+    o = (pf->fetch_op)(*((unsigned char **)stream));
     *((unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
@@ -327,10 +411,10 @@ PF_fetch_number(struct PackFile *pf, opcode_t **stream) {
     double d;
     if (!pf || !pf->fetch_nv) {
 #if TRACE_PACKFILE
-        PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]..\n",
-                sizeof(FLOATVAL));
+        PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
+		    sizeof(FLOATVAL));
 #endif
-        memcpy(&f, *stream, sizeof(FLOATVAL));
+        memcpy(&f, (char*)*stream, sizeof(FLOATVAL));
         (*stream) += (sizeof(FLOATVAL) + sizeof(opcode_t) - 1)/
             sizeof(opcode_t);
         return f;
@@ -533,10 +617,14 @@ PF_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
 {
     size_t str_len = strlen ((char *)(*cursor)) + 1;
     char *p = mem_sys_allocate(str_len);
-    int wordsize = pf->header->wordsize;
 
-    strcpy(p, (char*) (*cursor));
-    *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
+    if (p) {
+        int wordsize = pf->header->wordsize;
+
+        strcpy(p, (char*) (*cursor));
+        *((unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
+    }
+
     return p;
 }
 
@@ -602,36 +690,40 @@ PackFile_assign_transforms(struct PackFile *pf)
     /*
      * this Parrot is on a BIG ENDIAN machine
      */
-    if (need_endianize || need_wordsize) {
-        if (need_wordsize)
-            pf->fetch_op = fetch_op_mixed_le;
-        else {
-            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_le;
-        }
-    }
     if (need_endianize) {
+        if (pf->header->wordsize == 4)
+            pf->fetch_op = fetch_op_le_4;
+        else
+            pf->fetch_op = fetch_op_le_8;
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_le_8;
         else if (pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8_le;
     }
+    else {
+        if (pf->header->wordsize == 4)
+            pf->fetch_op = fetch_op_be_4;
+        else
+            pf->fetch_op = fetch_op_be_8;
+    }
 #else
     /*
      * this Parrot is on a LITTLE ENDIAN machine
      */
-    if (need_endianize || need_wordsize) {
-        if (need_wordsize)
-            pf->fetch_op = fetch_op_mixed_be;
-        else
-            pf->fetch_op = (opcode_t (*)(unsigned char*))fetch_op_be;
-    }
     if (need_endianize) {
+        if (pf->header->wordsize == 4)
+            pf->fetch_op = fetch_op_be_4;
+        else
+            pf->fetch_op = fetch_op_be_8;
         if (pf->header->floattype == 0)
             pf->fetch_nv = fetch_buf_be_8;
         else if (pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8_be;
-    }
-    else {
+    } else {
+        if (pf->header->wordsize == 4)
+            pf->fetch_op = fetch_op_le_4;
+        else
+            pf->fetch_op = fetch_op_le_8;
         if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
             pf->fetch_nv = cvt_num12_num8;
         else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)

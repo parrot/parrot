@@ -31,7 +31,7 @@ $ mv i.pbc t/native_pbc/integer_1.pbc
 
 EOC
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 output_is(<<CODE, '270544960', "i386 32 bit opcode_t, 32 bit intval");
 # integer_1.pbc
 # HEADER => [
@@ -56,4 +56,14 @@ output_is(<<CODE, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
 # 	dirformat = 1
 # ]
 
+CODE
+
+output_is(<<CODE, '270544960', "little-endian 64-bit tru64");
+#       wordsize  = 8
+#       byteorder = 0
+CODE
+
+output_is(<<CODE, '270544960', "big-endian 64-bit irix");
+#       wordsize  = 8
+#       byteorder = 1
 CODE

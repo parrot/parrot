@@ -351,7 +351,7 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self, int action)
     int again = 0;
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "fixup_subs\n");
+    PIO_eprintf(NULL, "PackFile: fixup_subs\n");
 #endif
 
     ft = self->cur_cs->fixups;
@@ -490,6 +490,11 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_unpack: Wordsize %d.\n", header->wordsize);
+    PIO_eprintf(NULL, "PackFile_unpack: Floattype %d (%s).\n",
+                header->floattype,
+                header->floattype ?
+                  "x86 little endian 12 byte long double" :
+                  "IEEE-754 8 byte double");
     PIO_eprintf(NULL, "PackFile_unpack: Byteorder %d (%sendian).\n",
                 header->byteorder, header->byteorder ? "big " : "little-");
 #endif
@@ -591,6 +596,11 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
         self->is_mmap_ped = 0;
     }
 #endif
+
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PackFile_unpack: Unpack done.\n");
+#endif
+
     return cursor - packed;
 }
 
@@ -1318,14 +1328,22 @@ directory_unpack (struct Parrot_Interp *interpreter,
         seg->file_offset = PF_fetch_opcode(pf, &cursor);
         seg->op_count = PF_fetch_opcode(pf, &cursor);
 
-        pos = pf->src + seg->file_offset;
+        if (pf->need_wordsize) {
+#if OPCODE_T_SIZE == 8
+            if (pf->header->wordsize == 4)
+                pos = pf->src + seg->file_offset / 2;
+#else
+            if (pf->header->wordsize == 8)
+                pos = pf->src + seg->file_offset * 2;
+#endif
+        } else
+            pos = pf->src + seg->file_offset;
         tmp = PF_fetch_opcode (pf, &pos);
         if (seg->op_count != tmp) {
             fprintf (stderr,
-                    "%s: Size in directory %d doesn't match size "
-                    "at offset (0x%x) %d\n", seg->name, (int)seg->op_count,
-                    (int)seg->file_offset,
-                    (int)tmp);
+                     "%s: Size in directory %d doesn't match size %d "
+                     "at offset 0x%x\n", seg->name, (int)seg->op_count,
+                     (int)tmp, (int)seg->file_offset);
         }
         if (i) {
             struct PackFile_Segment *last = dir->segments[i-1];
@@ -1346,20 +1364,32 @@ directory_unpack (struct Parrot_Interp *interpreter,
     for (i = 0; cursor && i < dir->num_segments; i++) {
         opcode_t *csave = cursor;
         size_t tmp = PF_fetch_opcode(pf, &cursor); /* check len again */
+        size_t delta;
+
         cursor = csave;
         pos = PackFile_Segment_unpack (interpreter, dir->segments[i],
-                cursor);
+                                       cursor);
         if (!pos) {
             fprintf (stderr, "PackFile_unpack segment '%s' failed\n",
                     dir->segments[i]->name);
             return 0;
         }
-        if ((size_t)(pos - cursor) != tmp || dir->segments[i]->op_count != tmp)
-            fprintf(stderr, "PackFile_unpack segment '%s' dir len %d "
-                    "len in file %d needed %d for unpack\n",
+        if (pf->need_wordsize) {
+#if OPCODE_T_SIZE == 8
+            if (pf->header->wordsize == 4)
+                delta = (pos - cursor) * 2;
+#else
+            if (pf->header->wordsize == 8)
+                delta = (pos - cursor) / 2;
+#endif
+        } else
+            delta = pos - cursor;
+        if ((size_t)delta != tmp || dir->segments[i]->op_count != tmp)
+            fprintf(stderr, "PackFile_unpack segment '%s' directory length %d "
+                    "length in file %d needed %d for unpack\n",
                     dir->segments[i]->name,
                     (int)dir->segments[i]->op_count, (int)tmp,
-                    (int)(pos-cursor));
+                    (int)delta);
         cursor = pos;
     }
     return cursor;
@@ -2405,7 +2435,7 @@ PackFile_ConstTable_unpack(struct Parrot_Interp *interpreter,
 
 #if TRACE_PACKFILE
     PIO_eprintf(interpreter,
-            "PackFile_ConstTable_unpack(): Unpacking %ld constants\n",
+            "PackFile_ConstTable_unpack: Unpacking %ld constants\n",
             self->const_count);
 #endif
 

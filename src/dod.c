@@ -715,12 +715,19 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                             free((int*)b->bufstart - 1);
                     }
 #else
-                    if (!PObj_COW_TEST(b)) {
+                    /*
+                     * XXX Jarkko did report that on irix pool->mem_pool
+                     *     was NULL, which really shouldn't happen
+                     */
+		    if (pool->mem_pool) {
+                        if (!PObj_COW_TEST(b)) {
+                            ((struct Memory_Pool *)
+                             pool->mem_pool)->guaranteed_reclaimable +=
+                                b->buflen;
+                        }
                         ((struct Memory_Pool *)
-                         pool->mem_pool)->guaranteed_reclaimable += b->buflen;
+                         pool->mem_pool)->possibly_reclaimable += b->buflen;
                     }
-                    ((struct Memory_Pool *)
-                     pool->mem_pool)->possibly_reclaimable += b->buflen;
 #endif
                     b->buflen = 0;
                 }
