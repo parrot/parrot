@@ -224,25 +224,23 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     char *cinit_func_name, *cload_func_name;
     PMC *lib_pmc;
 
-    UNUSED(initializer);
 #if defined(_PARROTLIB)
-    path = Parrot_library_query(interpreter, "dynext_location", lib, initializer);
+    type = const_string(interpreter, PARROT_DLL_EXTENSION);
+    path = Parrot_library_query(interpreter, "dynext_location", lib, type, initializer);
+    if (path) {
+	char* cpath = string_to_cstring(interpreter, path);
+	handle = Parrot_dlopen(cpath);
+    }
 #else
+    UNUSED(initializer);
     path = get_path(interpreter, lib, &handle);
 #endif
-    if (!path) {
+    if (!path || !handle) {
         /*
          * XXX internal_exception? return a PerlUndef?
          */
         return PMCNULL;
     }
-
-#if defined(_PARROTLIB)
-    {
-	char* cpath = string_to_cstring(interpreter, path);
-	handle = Parrot_dlopen(cpath);
-    }
-#endif
 
     /*
      * TODO move the class_count_mutex here

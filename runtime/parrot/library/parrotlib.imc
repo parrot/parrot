@@ -62,7 +62,7 @@ LOOP:
     # setup the signatures
     set_signature( "include_file_location", "SS" )
     set_signature( "bytecode_location", "SS" )
-    set_signature( "dynext_location", "SS" )
+    set_signature( "dynext_location", "SSSP" )
 .end
 
 =item STRING = include_file_location( STRING )
@@ -113,12 +113,9 @@ Returns the location of a dynamic extension.
 
 .sub dynext_location
     .param string request
+    .param string ext
     .local string name
-    .local string ext
-    
-    # XXX: how can I get "PARROT_DLL_EXTENSION"?
-    ext = ".so"
-        
+
     name = request
     stat $I0, name, 0
     if $I0 goto END
@@ -139,11 +136,10 @@ Returns the location of a dynamic extension.
     stat $I0, name, 0
     if $I0 goto END
 
-    print "Couldn't load '"
-    print request
-    print "'\n"
-    null name
-    
+    # file not found, give the OS a chance to locate it
+    name = clone request
+    concat name, ext
+        
 END:
     .pcc_begin_return
     .return name
