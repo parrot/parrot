@@ -1042,7 +1042,7 @@ int main(int argc, char * argv[])
     if(main_method) {
         printf(".sub _MAIN\n\t.arg \"\"\n\tcall %s__%s\n",
             main_method->namespace->name, main_method->name);
-        printf("\tend\n\tret\n");
+        printf("\tend\n\tret\n\.end\n");
 #if 0
         printf("\n__END:\n\tend\n\n");
 #endif
@@ -1056,9 +1056,8 @@ int main(int argc, char * argv[])
     gen_bootstrap();
     fflush(stdout);
     fprintf(stderr, "%ld lines compiled.\n", line);
-    fprintf(stderr, "Compiling assembly module a.pasm\n");
     fprintf(stderr, "Execing IMCC\n");
-    system("./imcc a.imc");
+    system("../imcc/imcc a.imc -o a.pasm");
     /*system("perl int2pasm.pl a.imc > a.pasm");*/
     return 0;
 }
