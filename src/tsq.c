@@ -23,11 +23,20 @@ pop_entry(QUEUE *queue) {
     return returnval;
 }
 
+/*
+ * this does not locking, so the result might have changed already
+ * but the synched pop_entry checks again and returns NULL, if
+ * queue is empty
+ */
+PARROT_INLINE QUEUE_ENTRY *
+peek_entry(QUEUE *queue) {
+    return queue->head;
+}
+
 /* Grab an entry off the queue with no synchronization. Internal only,
    because it's darned evil and shouldn't be used outside the
    module. It's in here so we don't have to duplicate pop code */
-static
-QUEUE_ENTRY *
+static QUEUE_ENTRY *
 nosync_pop_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
     if (!queue->head) {
@@ -91,6 +100,27 @@ queue_signal(QUEUE *queue) {
 void
 queue_wait(QUEUE *queue) {
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
+}
+
+QUEUE*
+queue_init(UINTVAL prio)
+{
+    QUEUE *queue = mem_sys_allocate(sizeof(QUEUE));
+    queue->head = queue->tail = NULL;
+    queue->max_prio = prio;
+    COND_INIT(queue->queue_condition);
+    MUTEX_INIT(queue->queue_mutex);
+    return queue;
+}
+
+void
+queue_destroy(QUEUE *queue)
+{
+    if (peek_entry(queue))
+        internal_exception(1, "Queue not emty on destroy");
+    COND_DESTROY(queue->queue_condition);
+    MUTEX_DESTROY(queue->queue_mutex);
+    mem_sys_free(queue);
 }
 
 /*

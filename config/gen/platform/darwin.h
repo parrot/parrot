@@ -3,15 +3,7 @@
 */
 
 #ifdef PARROT_HAS_HEADER_PTHREAD
-#  include <pthread.h>
-#  define PARROT_SYNC_PRIMITIVES_DEFINED
-#  define LOCK(m) pthread_mutex_lock(&m)
-#  define UNLOCK(m) pthread_mutex_unlock(&m)
-#  define COND_WAIT(c,m) pthread_cond_wait(&c, &m)
-#  define COND_SIGNAL(c) pthread_cond_signal(&c)
-#  define COND_BROADCAST(c) pthread_cond_broadcast(&c)
-typedef pthread_mutex_t Parrot_mutex;
-typedef pthread_cond_t Parrot_cond;
+#  include "parrot/thr_pthread.h"
 #endif
 
 

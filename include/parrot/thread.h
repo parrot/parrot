@@ -16,14 +16,23 @@
 #include "parrot/parrot.h"
 
 #ifndef PARROT_SYNC_PRIMITIVES_DEFINED
-#define LOCK(x)
-#define UNLOCK(x)
-#define COND_WAIT(x, y)
-#define COND_SIGNAL(x)
-#define COND_BROADCAST(x)
 
-#define Parrot_mutex INTVAL
-#define Parrot_cond INTVAL
+#  define LOCK(m)
+#  define UNLOCK(m)
+#  define COND_WAIT(c, m)
+#  define COND_TIMED_WAIT(c, m, t)
+#  define COND_SIGNAL(c)
+#  define COND_BROADCAST(c)
+
+#  define MUTEX_INIT(m)
+#  define MUTEX_DESTROY(m)
+
+#  define COND_INIT(c)
+#  define COND_DESTROY(c)
+
+#  define Parrot_mutex int
+#  define Parrot_cond int
+
 #endif
 
 #endif

@@ -209,11 +209,7 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
         /* its a C exception handler */
         Parrot_exception *jb = (Parrot_exception *) handler->cache.struct_val;
-#ifdef PARROT_HAS_HEADER_SETJMP
         longjmp(jb->destination, 1);
-#else
-        return NULL; /* we are lost */
-#endif
     }
     /* return the address of the handler */
     return handler->cache.struct_val;
@@ -236,15 +232,6 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
     return handler->cache.struct_val;
 }
 
-#ifndef PARROT_HAS_HEADER_SETJMP
-void
-rethrow_c_exception(Parrot_Interp interpreter)
-{
-}
-#endif
-
-#ifdef PARROT_HAS_HEADER_SETJMP
-/* XXX s. interpreter.c */
 Parrot_exception the_exception;
 
 /*
@@ -274,6 +261,7 @@ rethrow_c_exception(Parrot_Interp interpreter)
     the_exception.msg = VTABLE_get_string_keyed_int(interpreter, exception, 0);
     longjmp(the_exception.destination, 1);
 }
+
 static size_t
 dest2offset(Parrot_Interp interpreter, opcode_t *dest)
 {
@@ -343,7 +331,6 @@ do_exception(exception_severity severity, long error)
     the_exception.resume = NULL;
     longjmp(the_exception.destination, 1);
 }
-#endif
 
 /*
  * instead of internal_exception this throws a real exception
@@ -352,7 +339,6 @@ void
 real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
         int exitcode,  const char *format, ...)
 {
-#ifdef PARROT_HAS_HEADER_SETJMP
     STRING *msg;
 
 
@@ -393,15 +379,6 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
      * reenter runloop
      */
     longjmp(the_exception.destination, 1);
-#else
-    va_list arglist;
-    UNUSED(interpreter);
-    UNUSED(ret_addr);
-    va_start(arglist, format);
-    vfprintf(stderr, format, arglist);
-    va_end(arglist);
-    Parrot_exit(exitcode);
-#endif
 }
 
 /*

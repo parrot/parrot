@@ -155,7 +155,12 @@ typedef struct Parrot_Interp {
     size_t     op_count;                /* The number of ops */
     op_info_t *op_info_table; /* Opcode info table (name, nargs, arg types) */
 
-    op_func_t *op_func_table;
+    op_func_t *op_func_table;   /* opcode dispatch table (functios, labels,
+                                   or nothing (e.g. switched core), which
+                                   the interpreter is currently running */
+    op_func_t *evc_func_table;  /* opcode dispatch for event checking */
+    op_func_t *save_func_table; /* for restoring op_func_table */
+
     int         n_libs;                  /* count of libs below */
     op_lib_t  **all_op_libs;             /* all loaded opcode libraries */
 

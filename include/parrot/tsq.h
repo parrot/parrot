@@ -35,12 +35,15 @@ struct QUEUE {
 };
 
 QUEUE_ENTRY *pop_entry(QUEUE *);
+PARROT_INLINE QUEUE_ENTRY *peek_entry(QUEUE *);
 QUEUE_ENTRY *wait_for_entry(QUEUE *);
 void push_entry(QUEUE *, QUEUE_ENTRY *);
 void queue_lock(QUEUE *);
 void queue_unlock(QUEUE *);
 void queue_signal(QUEUE *);
 void queue_wait(QUEUE *);
+QUEUE* queue_init(UINTVAL prio);
+void queue_destroy(QUEUE *);
 
 
 #endif /* PARROT_TSQ_H_GUARD */

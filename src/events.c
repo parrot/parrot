@@ -12,22 +12,14 @@
 
 #include "parrot/parrot.h"
 
-#ifdef PARROT_HAS_HEADER_SETJMP
-/* XXX s. exceptions.c */
-void do_exception(exception_severity severity, long error);
-void Parrot_init_signals(void);
-#endif
-
 static void
 sig_handler(int signum)
 {
     switch (signum) {
         default:
-#ifdef PARROT_HAS_HEADER_SETJMP
             /* quick hack to test signals and exceptions
              */
             do_exception(0, -signum);
-#endif
             break;
     }
 }
@@ -39,6 +31,36 @@ Parrot_init_signals(void)
      * s. t/op/hacks_4.pasm
      */
     /*    Parrot_set_sighandler(SIGFPE, sig_handler);*/
+}
+
+/*
+ * initialize the event system
+ */
+void
+Parrot_init_events(Parrot_Interp interpreter)
+{
+    /*
+     * remember op_func_table
+     */
+    interpreter->save_func_table = interpreter->op_func_table;
+}
+
+/*
+ * insert event into task queue
+ */
+void
+Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
+{
+}
+
+void
+Parrot_do_check_events(Parrot_Interp interpreter)
+{
+}
+
+void
+Parrot_do_handle_events(Parrot_Interp interpreter)
+{
 }
 
 /*
