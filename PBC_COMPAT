@@ -1,0 +1,24 @@
+# This file shows the history of incompatible changes to
+# Parrot that invalidated existing PBC (Parrot Byte Code) files.
+#
+# The text in this file is also the base of the
+# fingerprint inside PBCs and Parrot which is used
+# for validation.
+#
+# Its pobably not complete or out of date - but a start
+# to get less restrictive fingerprint tests.
+#
+# Currently known actions that should be entered here
+#   (and invalidate PBC are):
+#
+# - deleting/changing/inserting existing ops in ops.num
+# - changing operands of existing ops
+# - adding/deleting/renaming a PMC to classes
+# - changes in the packfile format itself
+# - other core changes that invalidate byte code :)
+
+# please insert tab separated entries at the top of the list
+
+2003.10.22	dan	add delegates.pmc
+2003.10.21	dan	delete instantiate op
+2003.10.21	leo	start this file

@@ -11,6 +11,7 @@ MANIFEST                                          []
 MANIFEST.SKIP                                     []
 MANIFEST.generated                                []
 NEWS                                              [main]doc
+PBC_COMPAT                                        [main]doc
 README                                            [main]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
