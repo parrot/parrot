@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 57;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -1869,4 +1869,11 @@ ok 1
 ok 2
 ok 2
 ok 3
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Wrong way to create new objects");
+    new P0, .ParrotObject
+    end
+CODE
+Can't create new ParrotObject; use the registered class instead
 OUTPUT
