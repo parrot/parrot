@@ -858,7 +858,7 @@ PackFile_ConstTable_unpack(PackFile_ConstTable * self, char * packed, IV packed_
         cursor += PackFile_Constant_pack_size(self->constants[i]);
     }
     
-    return;
+    return 1;
 }
 
 
@@ -1259,7 +1259,7 @@ PackFile_Constant_unpack(PackFile_Constant * self, char * packed, IV packed_size
 
     mem_sys_memcopy(self->data, cursor, self->size);
 
-    return;
+    return 1;
 }
 
 
