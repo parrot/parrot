@@ -24,6 +24,8 @@ Handles class and object manipulation.
 
 #include "objects.str"
 
+static void* instantiate_py_object(Interp*, PMC*, void*);
+
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array)
 {
@@ -179,6 +181,10 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
     int i;
     const char *meth;
     STRING meth_str;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
 
     vtable_pmc = get_attrib_num((SLOTTYPE *)PMC_data(class), PCD_OBJECT_VTABLE);
     vtable = PMC_struct_val(vtable_pmc);
@@ -191,7 +197,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
     for (i = 0; (meth = Parrot_vtable_slot_names[i]); ++i) {
         if (!*meth)
             continue;
-        meth_str.strstart = meth;
+        meth_str.strstart = const_cast(meth);
         meth_str.strlen = strlen(meth);
         meth_str.hashval = 0;
         if (Parrot_find_global(interpreter, class_name, &meth_str)) {
@@ -247,6 +253,23 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     PMC *classname_pmc;
     PMC *parents, *temp_pmc;
     int parent_is_class;
+
+    if (base_class->vtable->base_type == enum_class_FixedPMCArray) {
+        PMC *tuple = base_class;
+        /* got a tuple holding parents - Python!
+         */
+        INTVAL n = VTABLE_elements(interpreter, tuple);
+        if (!n) {
+            PMC* class = pmc_new(interpreter, enum_class_ParrotClass);
+            Parrot_new_class(interpreter, class, child_class_name);
+            return class;
+        }
+        if (n > 1)
+            internal_exception(1, "subclass: unimp multiple parents");
+        base_class = VTABLE_get_pmc_keyed_int(interpreter, tuple, 0);
+        if (0&&PMC_struct_val(base_class) == (void*)0xdeadbeef)
+            base_class = pmc_new(interpreter, base_class->vtable->base_type);
+    }
 
     parent_is_class = PObj_is_class_TEST(base_class);
 
@@ -446,6 +469,7 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
     /* Reset the init method to our instantiation method */
     new_vtable->init = Parrot_instantiate_object;
     new_vtable->init_pmc = Parrot_instantiate_object_init;
+    new_vtable->invoke  = instantiate_py_object;
     new_class->vtable = new_vtable;
 
     /* Put our new vtable in the global table */
@@ -624,6 +648,16 @@ void
 Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
 {
     instantiate_object(interpreter, object, NULL);
+}
+
+static void*
+instantiate_py_object(Interp* interpreter, PMC* class, void* next)
+{
+    INTVAL type = class->vtable->base_type;
+    PMC *object = pmc_new_noinit(interpreter, type);
+    VTABLE_init(interpreter, object);
+    REG_PMC(5) = object;
+    return next;
 }
 
 static void

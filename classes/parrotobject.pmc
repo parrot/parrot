@@ -66,6 +66,15 @@ C<Parrot_instantiate_object()>.
             "use the registered class instead");
     }
 
+    void init_pmc() {
+        SELF.init();
+    }
+
+    void* invoke(void* next) {
+        SELF.init();
+        return next;
+    }
+
     void mark() {
         SLOTTYPE *attrib_array = PMC_data(SELF);
         UINTVAL i;

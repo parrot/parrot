@@ -8,7 +8,8 @@
 use strict;
 use Getopt::Std;
 
-my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count);
+my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count,
+   %main_names);
 $DIS = 'python mydis.py';
 $DEFVAR = 'PerlInt';
 
@@ -215,12 +216,13 @@ EOC
 	$params
 EOC
     print <<EOC;
-	new_pad 0
+	new_pad -1
 	.local pmc None
 	None = new .None
 EOC
-    $names{None} = 1;
-    $globals{None} = 1;
+    %globals = ();
+    $names{None} = 'None';
+    $globals{None} = 'None';
     if ($def_args{$arg}) {
 	my ($i, $n, $defs);
 	$n = $arg_count{$arg};
@@ -261,13 +263,14 @@ sub gen_code {
     print <<EOC;
 .sub $cur_func \@MAIN
     .param pmc sys::argv
+    new_pad 0
     .local pmc __name__
     __name__ = new $DEFVAR
     __name__ = '__main__'
     .local pmc None
     None = new .None
 EOC
-    $globals{'__name__'} = 1;
+    $globals{'__name__'} = '__name__';
     $code_l = 0;
     for (@dis) {
 	next if /^\s*$/;
@@ -433,64 +436,45 @@ sub STORE_NAME {
     my ($n, $c, $cmt) = @_;
     if ($make_f) {
 	$make_f = 0;
-	print "\t\t$cmt\n";
+	print "# make_f t$cmt\n";
 	return;
     }
     my $tos = pop @stack;
-    my $pmc;
-    print "\t\t$cmt\n";
-    unless ($names{$c}) {
-	print <<"EOC";
-	.local pmc $c \t# case 0
+    my $p = $tos->[1];
+    if ($names{$c}) {
+	my $pmc = $names{$c};
+	print <<EOC;
+	assign $pmc, $p $cmt
 EOC
-	if ($tos->[2] eq 'P' && $tos->[1] =~ /^\$/) {
-	    $pmc = $tos->[1];
-	}
-	elsif ($builtins{$tos->[1]}) {
-	    $pmc = $tos->[1];
-	}
-	else {
-	    print <<"EOC";
-	$c = new $DEFVAR \t# case 1
-EOC
-	    $pmc = $c
-	}
-    }
-    if ($tos->[2] eq 'P') {
-	$pmc = $tos->[1];
+	$p = $pmc;
     }
     else {
-	$pmc = promote($tos);
-    }
-    $globals{$c} = 1;
-    $names{$c} = 1;
-    if ($builtins{$pmc}) {
-	print <<"EOC";
-	global "$c" = $pmc \t# case 2b
-	$c = $pmc
-EOC
-	return;
-    }
-    # a temp - store it - XXX or a global dunno
-    if (1||$pmc =~ /^\$/) {
-	print <<"EOC";
-	global "$c" = $pmc \t# case 2
-	$c = $pmc
+	$p = promote($tos);
+	if ($cur_func eq 'test::main') {
+	    $main_names{$c} = $p;
+	}
+	print <<EOC;
+	store_lex -1, $n, $p $cmt
 EOC
     }
-    else {
-	print <<"EOC";
-	assign $c, $pmc \t# case 3
-EOC
-    }
+    $names{$c} = $p;
 }
 
 sub STORE_GLOBAL {
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
-    print <<EOC;
-	global "$c" = $tos->[1] $cmt
+    my $p = $tos->[1];
+    if ($globals{$c}) {
+	print <<EOC;
+	assign $c, $p;
 EOC
+    }
+    else {
+	print <<EOC;
+	global "$c" = $p $cmt
+EOC
+    }
+    $globals{$c} = $p;
 }
 
 
@@ -504,10 +488,25 @@ sub LOAD_GLOBAL {
     if (is_opcode($c) || $builtins{$c}) {
 	return LOAD_NAME(@_);
     }
-    my $p = temp('P');
-    print <<"EOC";
+    my $p;
+    if (($p = $globals{$c})) {
+	print <<EOC;
+	# $p = global "$c" $cmt
+EOC
+    }
+    elsif ($main_names{$c}) {
+	$p = temp('P');
+	print <<EOC;
+	$p = find_lex -1, $n $cmt
+EOC
+    }
+    else {
+	$p = temp('P');
+	$globals{$c} = $p;
+	print <<"EOC";
 	$p = global "$c" $cmt
 EOC
+    }
     push @stack, [$c, $p, 'P'];
     # print_stack();
 }
@@ -516,6 +515,7 @@ EOC
 sub LOAD_NAME() {
     my ($n, $c, $cmt) = @_;
     my ($o);
+    my $p;
     if (($o = is_opcode($c))) {
 	print <<EOC;
 	# builtin $c $cmt $o
@@ -523,22 +523,33 @@ EOC
 	push @stack, [$c, $c, $o];
 	return;
     }
-    if ($globals{$c}) {
+    # params TODO
+    if ($names{$c}) {
+	$p = $names{$c};
+	print <<"EOC";
+	# lexical $n '$c' := $p $cmt
+EOC
+    }
+    elsif ($globals{$c}) {
+	$p = $globals{$c};
 	print <<"EOC";
 	# $c = global "$c" $cmt
 EOC
     }
     else {
-	$c = type_map($c);
-	$globals{$c} = 1;
 	my $type = 'pmc';
-	$type = 'NCI' if ($builtins{$c});
+	$p = $c;
+	if ($type_map{$c}) {
+	    $c = $p = $type_map{$c};
+	    $type = 'NCI';
+	}
+	$globals{$c} = $c;
 	print <<"EOC";
 	.local $type $c $cmt
 	$c = global "$c"
 EOC
     }
-    push @stack, [$c, $c, 'P'];
+    push @stack, [$c, $p, 'P'];
 }
 
 sub PRINT_ITEM
@@ -929,9 +940,9 @@ sub CALL_FUNCTION
     if ($make_f) {
 	$make_f = 0;
 	print <<EOC;
-	\t$cmt
+	# make_f \t$cmt
 EOC
-	pop @stack;
+	# pop @stack;
 	return;
     }
     my $func;
@@ -1051,9 +1062,9 @@ EOC
     }
     else {
 	my $p = 5 + keys %params;
-	$params{$c} = 1;
-	$lexicals{$c} = 1;
-	$names{$c} = 1;
+	$params{$c} = $c;
+	$lexicals{$c} = $c;
+	$names{$c} = $c;
 	print <<EOC;
 	# .param pmc $c $cmt
 	#.local pmc $c
@@ -1320,11 +1331,12 @@ EOC
 sub BUILD_CLASS
 {
     my ($n, $c, $cmt) = @_;
+    my $parent_tuple = pop @stack;
     my $tos = pop @stack;
     my $cl = temp('P');
     $classes{$tos->[1]} = 1;
     print <<EOC;
-	$cl = newclass $tos->[1] $cmt
+	$cl = subclass $parent_tuple->[1], $tos->[1] $cmt
 EOC
     push @stack, ["class $tos->[1]", $cl, 'P'];
 }
