@@ -283,7 +283,7 @@ WS              [\t\f\r ]
 		}
 	}
         valp->s = str_dup(yytext);
-        return(is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
+        return(!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 
 <*>{FLOATNUM}         DUP_AND_RET(valp, FLOATC);

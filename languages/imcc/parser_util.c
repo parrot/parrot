@@ -188,12 +188,12 @@ void register_compilers(Parrot_Interp interp)
 
     func = pmc_new(interp, enum_class_Compiler);
     Parrot_compreg(interp, pasm, func);
-    func->vtable->set_string_keyed(interp, func, (PMC*)F2DPTR(pa),
+    VTABLE_set_string_keyed(interp, func, (PMC*)F2DPTR(pa),
           string_make(interp, "pIt", 3, NULL,0,NULL));
 
     func = pmc_new(interp, enum_class_Compiler);
     Parrot_compreg(interp, pir, func);
-    func->vtable->set_string_keyed(interp, func, (PMC*)F2DPTR(pi),
+    VTABLE_set_string_keyed(interp, func, (PMC*)F2DPTR(pi),
           string_make(interp, "pIt", 3, NULL,0,NULL));
 }
 
@@ -205,7 +205,7 @@ int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type)
     PMC * key = key_new_string(interp, s);
     PMC * cnames = interp->Parrot_base_classname_hash;
 
-    return cnames->vtable->get_integer_keyed(interp, cnames, key);
+    return VTABLE_get_integer_keyed(interp, cnames, key);
 }
 
 /*

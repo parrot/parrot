@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 5;
+use TestCompiler tests => 6;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -78,7 +78,6 @@ CODE
 OUT
 
 ##############################
-
 output_is(<<'CODE', <<'OUT', "defined keyed");
 .sub _test
 	$P1 = new PerlHash
@@ -102,6 +101,22 @@ CODE
 0
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "parrot op as identifier");
+.sub _test
+	.local int set
+	set = 5
+	print set
+	print "\n"
+	inc set
+	print set
+	print "\n"
+	end
+.end
+CODE
+5
+6
+OUT
 
 1;
 
