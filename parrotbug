@@ -15,7 +15,7 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.4.0";
+my $VERSION = "0.4.1";
 
 # These are the standard addresses for reporting bugs.
 my %std_to = 
@@ -48,7 +48,7 @@ exit;
 
 # Explain what C<parrotbug> is.
 sub explain_parrotbug {
-    print <<EOF;
+    print <<EOT;
 
 This program provides an easy way to create a message reporting a bug
 in parrot, and e-mail it to parrot developpers.
@@ -68,7 +68,7 @@ mailing list, perl6-internals<at>perl.org.
 
 
 
-EOF
+EOT
 }
 
 
@@ -281,11 +281,11 @@ sub query_missing_info {
 sub ask_for_alternative {
     my ( $what, $choices, $default ) = @_;
 
-    print <<EOF;
+    print <<EOT;
 Please pick a $what from the following:
   @{$choices}
 
-EOF
+EOT
 
     $default ||= $choices->[0];
     my $alt;
@@ -305,7 +305,7 @@ EOF
 
 # Prompt for a body, through an external editor.
 sub ask_for_body {
-    print <<EOF;
+    print <<EOT;
 Now you need to supply the bug report. Try to make the report concise
 but descriptive. Include any relevant detail. If you are reporting
 something that does not work as you think it should, please try to
@@ -316,7 +316,7 @@ automatically be included at the end of the report. If you are using
 any unusual version of parrot, please try and confirm exactly which
 versions are relevant.
 
-EOF
+EOT
 
     print "Press 'Enter' to continue...\n";
     scalar <STDIN>;
@@ -326,12 +326,12 @@ EOF
         $editor = $opts{editor};
 
     } else {
-        ask_for_editor(<<EOF) unless $opts{editor};
+        ask_for_editor(<<EOT) unless $opts{editor};
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
 would like to use.
-EOF
+EOT
     }
 
     # Launch editor.
@@ -370,11 +370,11 @@ sub ask_for_editor {
 
 # Prompt for return address, return it.
 sub ask_for_return_address {
-    print <<EOF;
+    print <<EOT;
 Your e-mail address will be useful if you need to be contacted. If the
 default shown below is not your full internet e-mail address, please
 correct it.
-EOF
+EOT
     
     # Try and guess return address
     my ($from, $guess);
@@ -411,12 +411,12 @@ EOF
 # 
 # Die if more than 5 wrong subjects.
 sub ask_for_subject {
-    print <<EOF;
+    print <<EOT;
 First of all, please provide a subject for the message. It should be a
 concise description of the bug or problem. "parrot bug" or "parrot
 problem" is not a concise description.
 
-EOF
+EOT
 
     my $subject;
     my $err = 0;
@@ -449,11 +449,11 @@ sub edit_bug_report {
     }
 
     # Check whether editor run was successful.
-    die <<EOF if $retval;
+    die <<EOT if $retval;
 The editor you chose ('$editor') could apparently not be run! Did you
 mistype the name of your editor?
 
-EOF
+EOT
 
 }
 
@@ -475,24 +475,24 @@ sub format_message {
     my $report = "";
 
     # OS, arch, compiler...
-    $report .= <<EOF;
+    $report .= <<EOT;
 ---
 osname= $Config{osname}
 osvers= $Config{osvers}
 arch=   $Config{archname}
-EOF
+EOT
 
     my $cc = $Config{cc};
     $report .= "cc=     $cc $Config{${cc}.'version'}\n";
 
 
     # ... flags...
-    $report .= <<EOF;
+    $report .= <<EOT;
 ---
 Flags:
     category=$report{category}
     severity=$report{severity}
-EOF
+EOT
     $report .= "    ack=no\n" if ! $opts{ack};
 
     # ... bug report ...
@@ -518,7 +518,7 @@ EOF
 
 # Print synopsis + help message and exit.
 sub help {
-    print <<EOF;
+    print <<EOT;
 
 A program to help generate bug reports about parrot, and mail them.
 It is designed to be used interactively. Normally no arguments will
@@ -552,7 +552,7 @@ Actions:
   --help           Print this help message and exit.
   --version        Print version information and exit.
 
-EOF
+EOT
     exit;
 }
 
@@ -598,14 +598,14 @@ sub send_message {
 	    $sendmail = $_, last if -e $_;
 	}
 
-	die <<EOF if $sendmail eq "";
+	die <<EOT if $sendmail eq "";
 I am terribly sorry, but I cannot find sendmail, or a close
 equivalent, and the perl package Mail::Send has not been installed, so
 I can't send your bug report. We apologize for the inconvenience.
 
 So you may attempt to find some way of sending your message, it has
 been left in the file '$tmpfile'.
-EOF
+EOT
 
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
 
@@ -629,11 +629,11 @@ EOT
 
 # Print version information (of the parrotbug program) and exit.
 sub version {
-    print <<"EOF";
+    print <<"EOT";
 
 This is $0, version $VERSION.
 
-EOF
+EOT
     exit;
 }
 
@@ -673,7 +673,8 @@ parrotbug - Parrot Bug Reporter
 
 =head1 SYNOPSIS
 
-    % ./parrotbug [options]
+    % ./parrotbug [options] [actions]
+
 
 =head1 DESCRIPTION
 
@@ -681,62 +682,100 @@ A program to help generate bug reports about parrot, and mail them.
 It is designed to be used interactively. Normally no arguments will
 be needed.
 
-=head2 Command-line Options
+
+=head1 Command-line switches
+
+
+=head2 Options
+
+Note: you will be prompted if the program miss some information.
 
 =over 4
 
-=item C<-A>
+=item C<--nok>
 
-Don't send a bug received acknowledgement to the return address.
+Report unsuccessful build on this system to parrot developpers.
 
-=item C<-b>
+=item C<--ok>
 
-Body of the report. If not included on the command line, or in a file
-with C<-f>, you will get a chance to edit the message.
+Report successful build on this system to parrot developpers Only use
+C<-ok> if B<everything> was ok; if there were B<any> problems at all,
+use C<--nok>.
 
-=item C<-d>
+=item C<--subject>
 
-Dump mode. This prints out your configuration data, without mailing
-anything.
+Subject of the report. You will be prompted if you don't supply one on
+the command-line.
 
-=item C<-e>
+=item C<--category>
 
-Editor to use.
+Category of the bug report. You will be prompted if you don't supply
+one on the command-line.
 
-=item C<-f>
+=item C<--severity>
+
+Severity of the bug report. You will be prompted if you don't supply
+one on the command-line.
+
+=item C<--address>
+
+Your email address. The program will try to guess one if you don't
+provide one, but you'll still need to validate it.
+
+=item C<--editor>
+
+Editor to use for editing the bug report.
+
+=item  C<--ack>, C<--noack>
+
+Don't send a bug received acknowledgement.
+
+=item C<--input-file>
 
 File containing the body of the report. Use this to quickly send a
 prepared message.
 
-=item C<-h>
+=item C<--output-file>
 
-Print this help message and exit.
+File where parrotbug will save its bug report, if you ask it to do so.
 
-=item C<-nok>
+=item C<--to>
 
-Report unsuccessful build on this system to parrot developpers
+Email adress to send report to. (for testing purposes only)
 
-=item C<-ok>
+=back
 
-Report successful build on this system to parrot developpers Only use
-C<-ok> if B<everything> was ok; if there were B<any> problems at all,
-use C<-nok>.
 
-=item C<-r>
+=head2 Actions
 
-Your return address. The program will ask you to confirm this if you
-don't give it here.
+You can provide more than one action on the command-line. If none is
+supplied, then you will be prompted for what to do.
 
-=item C<-s>
+=over 4
 
-Subject to include with the message. You will be prompted if you don't
-supply one on the command line.
+=item C<--dump>
 
-=item C<-V>
+Dump formatted report on standard output.
+
+=item C<--save>
+
+Save message to a file, in order for you to send it later from your
+own. See C<--output> flag.
+
+=item C<--send>
+
+Try to send a mail with the report.
+
+=item C<--help>
+
+Print a short synopsis and exit.
+
+=item C<--version>
 
 Print version information and exit.
 
 =back
+
 
 =head1 HISTORY
 
