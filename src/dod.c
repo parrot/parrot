@@ -22,13 +22,12 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
-static void trace_system_stack(struct Parrot_Interp *);
 
-
+/* Tag a buffer header as alive. Used by the GC system when tracing
+ * the root set, and used by the PMC GC handling routines to tag their
+ * individual pieces if they have private ones */
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
-    UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
-            | PObj_custom_mark_FLAG;
 
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
@@ -40,6 +39,8 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
      * the PMC to the chained mark list
      */
     if (PObj_is_PMC_TEST(obj)) {
+        UINTVAL mask = PObj_is_PMC_ptr_FLAG | PObj_is_buffer_ptr_FLAG
+            | PObj_custom_mark_FLAG;
         if ( (PObj_get_FLAGS(obj) & mask) || ((PMC*)obj)->metadata) {
             /* put it on the end of the list */
             interpreter->mark_ptr->next_for_GC = (PMC *)obj;
@@ -49,7 +50,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
         }
         return;
     }
-#if ! DISABLE_GC_DEBUG
+#if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
     if (! GC_DEBUG(interpreter))
         return;
@@ -61,9 +62,6 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 #endif
 }
 
-/* Tag a buffer header as alive. Used by the GC system when tracing
- * the root set, and used by the PMC GC handling routines to tag their
- * individual pieces if they have private ones */
 
 /* Do a full trace run and mark all the PMCs as active if they are */
 static void
@@ -93,7 +91,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 1;
 #endif
-    trace_system_areas(interpreter);
+    /* trace_system_areas(interpreter); */
 #if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 0;
 #endif
@@ -369,7 +367,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                     /*
                      * clean memory for buffer_likes
                      * this is the slow thing in the whole sub, so PMCs
-                     * have there own add_free function, which clears
+                     * have their own add_free function, which clears
                      * PMC specific data members
                      */
                     memset(b + 1, 0, wash_size);
@@ -489,8 +487,16 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Pool *header_pool;
     int j;
+    /* XXX these should go into the interpreter */
+    static int skip = 0;
+    static int last_total_free = 0;
+    int total_free = 0;
 
     if (interpreter->DOD_block_level) {
+        return;
+    }
+    if (skip) {
+        skip = 0;
         return;
     }
     Parrot_block_DOD(interpreter);
@@ -508,6 +514,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     free_unused_pobjects(interpreter, header_pool);
     interpreter->active_PMCs =
         header_pool->total_objects - header_pool->num_free_objects;
+    total_free += header_pool->num_free_objects;
 
     /* And unused buffers on the free list */
     for (j = 0; j < (INTVAL)interpreter->arena_base->num_sized; j++) {
@@ -519,6 +526,7 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
             free_unused_pobjects(interpreter, header_pool);
             interpreter->active_Buffers +=
                 header_pool->total_objects - header_pool->num_free_objects;
+            total_free += header_pool->num_free_objects;
 #ifdef GC_IS_MALLOC
             clear_cow(interpreter, header_pool, 0);
 #endif
@@ -534,7 +542,10 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
 #endif
     /* Note it */
     interpreter->dod_runs++;
-
+    /* if we don't have more free objects then last, skip next DOD run */
+    if (total_free <= last_total_free)
+        skip = 1;
+    last_total_free = total_free;
     Parrot_unblock_DOD(interpreter);
     return;
 }

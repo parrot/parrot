@@ -350,6 +350,10 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         /* Give the souls brave enough to activate debugging an earful
          * about GC. */
+
+        interpreter->active_PMCs =
+            interpreter->arena_base->pmc_pool->total_objects -
+            interpreter->arena_base->pmc_pool->num_free_objects;
         PIO_eprintf(interpreter, "\
 *** Parrot VM: Dumping GC info ***\n\
 \tTotal memory allocated: %d\n\

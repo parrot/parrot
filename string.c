@@ -244,7 +244,12 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
         PObj_bufstart_external_SET(s);
     }
     else {
+        /* allocate_string can trigger DOD, which destroys above allocated
+         * string header w/o stack_walk
+         */
+        Parrot_block_DOD(interpreter);
         Parrot_allocate_string(interpreter, s, len);
+        Parrot_unblock_DOD(interpreter);
     }
     s->encoding = encoding;
     s->type = type;

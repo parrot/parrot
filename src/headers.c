@@ -19,7 +19,7 @@
 #define GC_DEBUG_BUFFER_HEADERS_PER_ALLOC 1
 #define GC_DEBUG_STRING_HEADERS_PER_ALLOC 1
 #ifndef GC_IS_MALLOC
-#    define PMC_HEADERS_PER_ALLOC 256
+#    define PMC_HEADERS_PER_ALLOC 512
 #    define BUFFER_HEADERS_PER_ALLOC 256
 #    define STRING_HEADERS_PER_ALLOC 256
 #else /* GC_IS_MALLOC */
@@ -44,6 +44,7 @@ add_free_pmc(struct Parrot_Interp *interpreter,
     /* Copied from add_free_object */
     *(void **)pmc = pool->free_list;
     pool->free_list = pmc;
+    pool->num_free_objects++;
 }
 
 void *
@@ -63,6 +64,8 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     SET_NULL(pmc->data);
     SET_NULL(pmc->metadata);
     SET_NULL(pmc->synchronize);
+
+    pool->num_free_objects--;
 
     return pmc;
 }
@@ -99,6 +102,7 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     if (GC_DEBUG(interpreter))
         buffer->version++;
 #endif
+    pool->num_free_objects--;
     return buffer;
 }
 

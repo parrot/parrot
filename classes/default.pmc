@@ -65,7 +65,8 @@ pmclass default abstract noinit {
 			  SELF->metadata, p_key, value, NULL);
 	} else {
           /* first make new hash */
-	  SELF->metadata = pmc_new(interpreter, enum_class_PerlHash);
+	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
+	  SELF->metadata->vtable->init(interpreter, SELF->metadata);
 	  /* then the key, else it vanishes with --gc-debug */
           p_key = key_new_string(interpreter, key);
 	  SELF->metadata->vtable->set_pmc_keyed(interpreter,

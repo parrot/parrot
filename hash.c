@@ -418,6 +418,8 @@ void
 hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
 {
     HashIndex i;
+
+    Parrot_block_DOD(interp);
     new_hash(interp, dest);
     for (i = 0; i <= hash->max_chain; i++) {
         BucketIndex bi = lookupBucketIndex(hash, i);
@@ -456,6 +458,7 @@ hash_clone(struct Parrot_Interp *interp, HASH *hash, HASH **dest)
             bi = b->next;
         }
     }
+    Parrot_unblock_DOD(interp);
 }
 
 /*

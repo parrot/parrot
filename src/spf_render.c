@@ -228,6 +228,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
+    Parrot_block_DOD(interpreter);
     for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
         if (string_ord(pat, i) == '%') {        /* % */
             if (len) {
@@ -663,6 +664,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
         string_append(interpreter, targ, substr, 0);
     }
 
+    Parrot_unblock_DOD(interpreter);
     return targ;
 }
 

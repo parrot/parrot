@@ -17,7 +17,10 @@
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
 #define REPLENISH_LEVEL_FACTOR 0.3
-#define UNITS_PER_ALLOC_GROWTH_FACTOR 4
+/* this factor is totally arbitrary, but gives good timings for stress.pasm */
+#define UNITS_PER_ALLOC_GROWTH_FACTOR 1.75
+
+#define POOL_MAX_BYTES 65536*128
 
 INTVAL
 contained_in_pool(struct Parrot_Interp *interpreter,
@@ -67,6 +70,7 @@ add_free_object(struct Parrot_Interp *interpreter,
     PObj_flags_SETTO((PObj *)to_add, PObj_on_free_list_FLAG);
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
+    pool->num_free_objects++;
 }
 
 /* Get a new object from the free pool and return it */
@@ -125,7 +129,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
     /* Move all the new objects into the free list */
     object = new_arena->start_objects;
     for (i = 0; i < pool->objects_per_alloc; i++) {
-        (*pool->add_free_object) (interpreter, pool, object);
+        add_free_object (interpreter, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
 
@@ -141,6 +145,12 @@ alloc_objects(struct Parrot_Interp *interpreter,
         pool->objects_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
         pool->replenish_level =
                 (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
+    }
+    /* check alloc size agains maximum and set new allocation data */
+    size = pool->object_size * pool->objects_per_alloc;
+
+    if (size > POOL_MAX_BYTES) {
+        pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
     }
 }
 

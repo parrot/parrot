@@ -45,6 +45,8 @@ alloc_new_block(struct Parrot_Interp *interpreter,
     new_block = mem_sys_allocate_zeroed(sizeof(struct Memory_Block) +
             alloc_size + 32);
     if (!new_block) {
+        fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size+32);
+        exit(1);
         return NULL;
     }
 
@@ -103,32 +105,34 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         alloc_new_block(interpreter, size, pool);
         interpreter->mem_allocs_since_last_collect++;
     }
-    if (GC_DEBUG(interpreter)) {
+    if (0 && GC_DEBUG(interpreter)) {
         Parrot_do_dod_run(interpreter);
         if (pool->compact) {
             (*pool->compact) (interpreter, pool);
         }
     }
     if (pool->top_block->free < size) {
+        Parrot_do_dod_run(interpreter);
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
             /* don't bother reclaiming if its just chicken feed */
-            if ((pool->possibly_reclaimable + pool->guaranteed_reclaimable) / 2
-                    > (size_t)(pool->total_allocated * pool->reclaim_factor)
+            if (pool->possibly_reclaimable * pool->reclaim_factor
+                    > size
                     /* don't bother reclaiming if it won't even be enough */
-                    && (pool->guaranteed_reclaimable > size)
+                    || (pool->guaranteed_reclaimable > size)
                     ) {
                 (*pool->compact) (interpreter, pool);
-            }
-            else {
-                Parrot_do_dod_run(interpreter);
             }
 
         }
         if (pool->top_block->free < size) {
+            if (pool->minimum_block_size < 65536*16)
+                pool->minimum_block_size *= 2;
             alloc_new_block(interpreter, size, pool);
             interpreter->mem_allocs_since_last_collect++;
             if (pool->top_block->free < size) {
+                fprintf(stderr, "out of mem\n");
+                exit(1);
                 return NULL;
             }
         }
@@ -498,6 +502,7 @@ new_memory_pool(size_t min_block, compact_f compact)
 }
 
 /* Initialize the managed memory pools */
+#define POOL_SIZE 65536*2
 void
 Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 {
@@ -508,8 +513,8 @@ Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
      * breaks 2 tests: t/op/string_29 and _94, when run with --gc-debug */
 
     interpreter->arena_base->memory_pool =
-            new_memory_pool(32768, &compact_pool);
-    alloc_new_block(interpreter, 32768, interpreter->arena_base->memory_pool);
+            new_memory_pool(POOL_SIZE, &compact_pool);
+    alloc_new_block(interpreter, POOL_SIZE, interpreter->arena_base->memory_pool);
 
     /* Constant strings - not compacted */
     interpreter->arena_base->constant_string_pool =

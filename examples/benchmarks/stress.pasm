@@ -35,6 +35,11 @@ ol2:	bsr buildarray
 #	print "\n"
 	if I0, ol2
 
+	interpinfo I1, 2
+	print "A total of "
+	print I1
+	print " DOD runs were made\n"
+
 	end
 
 
