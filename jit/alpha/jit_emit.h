@@ -364,8 +364,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     emit_ldah(jit_info->native_ptr,REG15_s6, -1, REG15_s6);
     */
     emit_lda_b(jit_info->native_ptr, REG15_s6, -0x7ff8, REG15_s6); 
-    emit_lc(jit_info->native_ptr, REG10_s1, &interpreter->code->byte_code); 
-    emit_lc(jit_info->native_ptr, REG11_s2, &jit_info->arena.op_map); 
+    emit_lc(jit_info->native_ptr, REG10_s1, interpreter->code->byte_code); 
+    emit_lc(jit_info->native_ptr, REG11_s2, jit_info->arena.op_map); 
 }
 
 void
@@ -460,6 +460,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 
     emit_subq(jit_info->native_ptr, REG0_v0, REG10_s1, REG0_v0); 
     emit_addq(jit_info->native_ptr, REG0_v0, REG11_s2, REG0_v0);
+    emit_ldq_b(jit_info->native_ptr, REG0_v0, 0, REG0_v0);
     /* XXX this is incorrect, might blow the stack, use jmp instead */
     emit_jsr(jit_info->native_ptr);
 } 
