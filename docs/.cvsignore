@@ -1,4 +1,5 @@
 Makefile
 core_ops.pod
+io_ops.pod
 packfile-c.pod
 packfile-perl.pod

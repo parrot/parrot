@@ -37,6 +37,10 @@ The master list of Parrot assembly operations; not all of these have
 been implemented, so you should stick to F<core_ops> when writing
 your assembly programs.
 
+=item F<io_ops.pod>
+
+A description of the operations used in Parrot's IO subsystem.
+
 =item F<vtables.pod>
 
 Describes what PMCs are and how they work.
