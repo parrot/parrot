@@ -36,6 +36,8 @@ string_max_bytes(STRING*, INTVAL);
 STRING*
 string_concat(struct Parrot_Interp *, STRING*, STRING*, INTVAL);
 STRING*
+string_repeat(struct Parrot_Interp *, STRING* , INTVAL, STRING**);
+STRING*
 string_chopn(STRING*, INTVAL);
 STRING*
 string_substr(struct Parrot_Interp *interpreter, STRING*, INTVAL, INTVAL, STRING**);

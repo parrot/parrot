@@ -308,6 +308,10 @@ Put the length of string y into integer register x.
 
 Add string y to the end of string x.
 
+=item repeat Sx, Sy, Iz
+
+Copies string y z times into string x.
+
 =back
 
 =head2 Transcendental operations

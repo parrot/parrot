@@ -126,23 +126,25 @@ pmclass PerlString {
     }
 
     void set_string (PMC * value) {
-	SELF->cache.struct_val = (STRING*)value->cache.struct_val;
+	SELF->cache.struct_val =
+               string_copy(INTERP, (STRING*)value->cache.struct_val);
     }
 
     void set_string_native (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
+	SELF->cache.struct_val = string_copy(INTERP, value);
     }
 
     void set_string_unicode (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
+	SELF->cache.struct_val = string_copy(INTERP, value);
     }
 
     void set_string_other (STRING * value) {
-	SELF->cache.struct_val = (STRING*)value;
+	SELF->cache.struct_val = string_copy(INTERP, value);
     }
 
     void set_string_same (PMC * value) {
-	SELF->cache.struct_val = (STRING*)value->cache.struct_val;
+	SELF->cache.struct_val =
+               string_copy(INTERP, (STRING*)value->cache.struct_val);
     }
 
     void set_string_index (STRING* value, INTVAL index) {
@@ -361,39 +363,47 @@ pmclass PerlString {
     }
 
     void concatenate (PMC * value, PMC* dest) {
+	STRING* s = string_copy(INTERP, (STRING*)SELF->cache.struct_val);
 	dest->cache.struct_val =
 	    string_concat(INTERP,
-			  SELF->cache.struct_val,
+	                  s,
 			  value->vtable->get_string(INTERP, value),
 			  0
 			 );
+	/* don't destroy s, as it is dest->cache.struct_val */
     }
 
     void concatenate_native (STRING * value, PMC* dest) {
+	STRING* s = string_copy(INTERP, (STRING*)SELF->cache.struct_val);
 	dest->cache.struct_val =
 	    string_concat(INTERP,
-			  SELF->cache.struct_val,
+			  s,
 			  value,
 			  0
 			 );
+	/* don't destroy s, as it is dest->cache.struct_val */
     }
 
     void concatenate_unicode (STRING * value, PMC* dest) {
+	STRING* s = string_copy(INTERP, (STRING*)SELF->cache.struct_val);
 	dest->cache.struct_val =
 	    string_concat(INTERP,
-			  SELF->cache.struct_val,
+	                  s,
 			  value,
 			  0
 			 );
+            /* don't destroy s, as it is dest->cache.struct_val */
     }
 
     void concatenate_other (STRING * value, PMC* dest) {
+	STRING* s = string_copy(INTERP, (STRING*)SELF->cache.struct_val);
 	dest->cache.struct_val =
 	    string_concat(INTERP,
 			  SELF->cache.struct_val,
 			  value,
 			  0
 			 );
+	/* don't destroy s, as it is dest->cache.struct_val */
     }
 
     void concatenate_same (PMC * value, PMC* dest) {
@@ -434,17 +444,42 @@ pmclass PerlString {
     }
 
     void repeat (PMC * value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->cache.struct_val,
+	                 value->vtable->get_integer(INTERP, value), NULL
+	                 );
     }
 
     void repeat_native (STRING * value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->cache.struct_val,
+	                 string_to_int(interpreter, value), NULL
+	                 );
     }
 
     void repeat_unicode (STRING * value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->cache.struct_val,
+	                 string_to_int(interpreter, value), NULL
+	                 );
     }
 
     void repeat_other (STRING * value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->cache.struct_val,
+	                 string_to_int(interpreter, value), NULL
+	                 );
     }
 
     void repeat_same (PMC * value, PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->cache.struct_val,
+	                 value->vtable->get_integer(INTERP, value), NULL
+	                 );
     }
 }

@@ -75,6 +75,15 @@ before concatenation if the strings are of different encodings. You
 almost certainly don't want to stick, say, a UTF-32 string on the end of
 a Big-5 string.
 
+To repeat a string, (ie, turn 'xyz' into 'xyzxyzxyz') use:
+
+    STRING* string_repeat(struct Parrot_Interp *, STRING* s, INTVAL n, STRING** d)
+
+Which will repeat string I<s> n times and store the result into I<d>, which it
+also returns.  If I<*d> or I<**d> is NULL, a new string will be allocated
+to hold the result.  I<s> is not modified by this operation.  If I<d> is
+not of the same type as I<s>, it will be upgraded appropiately.
+
 Chopping C<n> characters off the end of a string is achieved with the
 unlikely-sounding
 
@@ -82,7 +91,7 @@ unlikely-sounding
 
 To retrieve a substring of the string, call
 
-    STRING* string_substr(STRING* src, INTVAL offset, INTVAL length, STRING** dest)
+    STRING* string_substr(struct Parrot_Interp *, STRING* src, INTVAL offset, INTVAL length, STRING** dest)
 
 The result will be placed in C<dest>.
 (Passing in C<dest> avoids allocating a new string at runtime. If
@@ -104,7 +113,7 @@ of range, it also throws an exception.
 
 To compare two strings, use:
 
-    INTVAL string_compare(STRING* s1, STRING* s2)
+    INTVAL string_compare(struct Parrot_Interp *, STRING* s1, STRING* s2)
 
 The value returned will be less than, equal to, or greater than zero
 depending on whether C<s1> is less than, equal to, or greater than C<s2>.
@@ -112,6 +121,19 @@ depending on whether C<s1> is less than, equal to, or greater than C<s2>.
 Strings whose encodings are not the same can be compared - in this
 case a UTF-32 copy will be made of each string and these copies will
 be compared.
+
+To test a string for truth, use:
+
+    BOOLVAL string_bool(struct Parrot_Interp *, STRING* s);
+
+A string is false if it
+
+ o  is not yet allocated
+ o  has zero length
+ o  consists of one digit character whose numeric value (as
+    decided by its character type) is zero.
+
+Otherwise the string will be true.
 
 B<Not implemented>: 
 To format output into a string, use

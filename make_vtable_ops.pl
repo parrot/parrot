@@ -62,5 +62,6 @@ __DATA__
 3 concat concatenate
 3 and logical_and
 3 or logical_or
+3 repeat repeat
 # Unary functions
 2 not logical_not

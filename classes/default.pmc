@@ -256,6 +256,11 @@ pmclass default noinit {
    }
 
    void repeat (PMC * value,  PMC* dest) {
+	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+	                 value->vtable->get_integer(INTERP, value), NULL
+	                 );
    }
 
    void repeat_native (STRING * value,  PMC* dest) {
@@ -268,6 +273,11 @@ pmclass default noinit {
    }
 
    void repeat_same (PMC * value,  PMC* dest) {
-   }
+ 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
+	dest->cache.struct_val =
+           string_repeat(INTERP, SELF->vtable->get_string(INTERP,SELF),
+	                 value->vtable->get_integer(INTERP, value), NULL
+	                 );
+  }
 
 }

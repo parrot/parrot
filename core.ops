@@ -1439,6 +1439,18 @@ inline op concat(s, s|sc, s|sc) {
   goto NEXT();
 }
 
+#######################################
+
+=item B<repeat>(s, s|sc, i|ic)
+
+Repeats string $2 $3 times and stores result in $1.
+
+=cut
+
+inline op repeat(s, s|sc, i|ic) {
+  $1 = string_repeat(interpreter, $2, $3, NULL);
+  goto NEXT();
+}
 
 ########################################
 

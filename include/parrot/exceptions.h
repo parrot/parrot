@@ -22,6 +22,7 @@
 #define MALFORMED_UTF16 1
 #define MALFORMED_UTF32 1
 #define INVALID_CHARACTER 1
+#define NEG_REPEAT 1
 
 #endif
 

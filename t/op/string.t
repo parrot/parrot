@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
 	set	S4, "JAPH\n"
@@ -552,6 +552,48 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "repeat");
+	set S0, "x"
+
+	repeat S1, S0, 12
+	print S0
+	print "\\n"
+	print S1
+	print "\\n"
+
+	set I0, 12
+	set S2, "X"
+
+	repeat S3, S2, I0
+	print S2
+	print "\\n"
+	print S3
+	print "\\n"
+
+	repeat S4, "~", 12
+	print S4
+	print "\\n"
+
+	repeat S5, "~", I0
+	print S5
+	print "\\n"
+
+	print ">"
+	repeat S6, "***", 0
+	print S6
+	print "< done\\n"
+	
+	end
+CODE
+x
+xxxxxxxxxxxx
+X
+XXXXXXXXXXXX
+~~~~~~~~~~~~
+~~~~~~~~~~~~
+>< done
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)

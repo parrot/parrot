@@ -238,6 +238,50 @@ string_concat(struct Parrot_Interp *interpreter, STRING* a, STRING* b, INTVAL fl
     return a;
 }
 
+/*=for api string string_repeat
+ * repeat the string I<s> I<num> times, storing result in I<d>.
+ * Allocates I<d> if needed, also returns d.
+*/
+STRING*
+string_repeat(struct Parrot_Interp *interpreter, STRING* s, INTVAL num, STRING** d) {
+    STRING* dest;
+    INTVAL i;
+
+    if (num < 0) {
+        INTERNAL_EXCEPTION(NEG_REPEAT, "Cannot repeat with negative arg");
+    }
+
+    if (!d || !*d) {
+        dest = string_make(interpreter,
+                           NULL, 0, s->encoding,
+                           0, s->type);
+    }
+    else {
+        dest = *d;
+    }
+    string_grow(dest, s->strlen * num);
+    if (num == 0) {
+        dest->strlen = 0;
+        return dest;
+    }
+
+    /* copy s into dest */
+    mem_sys_memcopy(dest->bufstart, s->bufstart, s->bufused);
+
+    /* copy from start of dest to later part of dest n times */
+    for (i = 1; i< num; i++) {
+        mem_sys_memcopy((void*)((ptrcast_t)dest->bufstart+s->bufused * i),
+                        dest->bufstart, s->bufused);
+    }
+
+    dest->type = s->type;
+    dest->encoding = s->encoding;
+    dest->language = s->language;
+    dest->bufused = s->bufused * num;
+    string_compute_strlen(dest);
+    return dest;
+}
+
 /*=for api string string_substr
  * substr out the offset of src for length and store it in d.  Also return d.
  * Allocate memory for d if necessary.
@@ -356,7 +400,7 @@ BOOLVAL string_bool (struct Parrot_Interp *interpreter, STRING* s) {
 
 /* A number is such that:
   sign           =  '+' | '-'
-  digit          =  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+  digit          =  "Any code point considered a digit by the chartype"
   indicator      =  'e' | 'E'
   digits         =  digit [digit]...
   decimal-part   =  digits '.' [digits] | ['.'] digits
