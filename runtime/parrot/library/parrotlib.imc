@@ -61,7 +61,7 @@ LOOP:
 
     # setup the signatures
     set_signature( "include_file_location", "SS" )
-    set_signature( "bytecode_location", "SS" )
+    set_signature( "imcc_compile_file_location", "SS" )
     set_signature( "dynext_location", "SSSP" )
 .end
 
@@ -94,7 +94,7 @@ This function returns the absolute filename of the requested file.
 
 =cut
 
-.sub bytecode_location
+.sub imcc_compile_file_location
     .param string name
 
     find_global $P0, "_parrotlib", "include_paths"

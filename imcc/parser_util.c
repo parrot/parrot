@@ -526,7 +526,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
 #if defined(_PARROTLIB)
     STRING *str = string_from_cstring(interp, s, strlen(s));
-    STRING *path = Parrot_library_query(interp, "imcc_compile_file_location", str);
+    str = Parrot_library_query(interp, "imcc_compile_file_location", str);
 #else
     STRING *str = Parrot_library_fallback_locate(interp, s, Parrot_imcc_include_paths);
 #endif
