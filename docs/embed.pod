@@ -7,6 +7,7 @@ embed.pod - Parrot embedding system
 
 =head1 SYNOPSIS
 
+    #include "parrot/parrot.h"
     #include "parrot/embed.h"
     
     int main(int argc, char *argv[]) {
@@ -20,7 +21,7 @@ embed.pod - Parrot embedding system
         Parrot_init(interp);
 
         if(PARROT_JIT_CAPABLE) {
-            Parrot_setflags(interp, PARROT_JIT_FLAG, NULL); /* activate JIT */
+            Parrot_set_run_core(interp, PARROT_JIT_CORE);  /* activate JIT */
         }
 
         pf=Parrot_readbc(interp, bcfile);
@@ -86,7 +87,34 @@ Various Parrot internal types; most are chosen at Configure time.
 
 =head2 Constants
 
-B<Interpreter flags:>
+B<interpreter core setting> is done by a call of C<Parrot_set_run_core()> like:
+
+  Parrot_set_run_core(interp, PARROT_JIT_CORE);
+
+See F</include/parrot/interpreter.h> for a list of available cores
+beside PARROT_PREDEREF_CORE, PARROT_JIT_CORE.
+
+
+=item C<PARROT_PREDEREF_CORE>
+
+This flag turns on predereferencing.  Parrot will transform many offsets 
+in the opcode stream to absolute pointers.  
+
+=item C<PARROT_JIT_CORE>
+
+This flag turns on just-in-time compilation.  Parrot will convert the 
+bytecode file into native machine code and run it, usually resulting in 
+substantial speedup. 
+
+=back
+
+B<Interpreter flags setting> is done by a call of
+C<Parrot_set_flag()> like>:
+
+
+    Parrot_set_flag(interp, PARROT_TRACE_FLAG, NULL);
+
+See F</include/parrot/interpreter.h> for an up to date list.
 
 =over 4
 
@@ -115,17 +143,14 @@ called, the number of times it was called, the average time it took to run,
 and the total time it took over the life of the program.  This flag does
 not take any parameters.
 
-=item C<PARROT_PREDEREF_FLAG>
+=item C<PARROT_THR_TYPE_1>, C<PARROT_THR_TYPE_2>, C<PARROT_THR_TYPE_3>
 
-This flag turns on predereferencing.  Parrot will transform many offsets 
-in the opcode stream to absolute pointers.  This flag does not take any 
-parameters.
-
-=item C<PARROT_JIT_FLAG>
-
-This flag turns on just-in-time compilation.  Parrot will convert the 
-bytecode file into native machine code and run it, usually resulting in 
-substantial speedup.  This flag does not take any parameters.
+This flags control the threading behavior. With
+C<PARROT_THR_TYPE_1>, threads runs without sharing variables and
+do not communicate, With C<PARROT_THR_TYPE_2>, threads shares no
+variables and communicate by sending messages. With
+C<PARROT_THR_TYPE_3>, threads share variables See
+F<t/pmc/threads.t> for examples.
 
 =back
 
