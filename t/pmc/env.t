@@ -1,10 +1,10 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 use Parrot::Config;
 SKIP: {
-    skip("no setenv", 2) unless $PConfig{"setenv"};
+    skip("no setenv", 3) unless $PConfig{"setenv"};
 $ENV{"PARROT_TMP"} = "riding a ponie";
 output_like(<<'CODE', <<OUT, "getenv");
     new P0, .Env
@@ -25,6 +25,23 @@ CODE
 /hello polly/i
 OUT
 }
+
+output_is(<<'CODE', <<OUT, "envs are all the same");
+    new P0, .Env
+    set P0["PARROT_TMP"], "hello polly"
+    set S0, P0["PARROT_TMP"]
+    new P1, .Env
+    set S1, P1["PARROT_TMP"]
+    eq S0, S1, ok
+    print "not ok\n"
+    end
+ok:
+    print "ok\n"
+    end
+CODE
+ok
+OUT
+
 
 SKIP: {
     skip("no unsetenv", 1) unless $PConfig{"unsetenv"};
