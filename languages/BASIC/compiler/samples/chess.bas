@@ -78,7 +78,7 @@ end sub
 sub drawboard()
 	locate 0,0
 	c=0
-	piece$=".P"
+	piece$=".."
 	for i = 0 to 7
 	for j = 0 to 7
 		call drawsquare( i, j, c mod 2, piece$ )
@@ -88,14 +88,15 @@ sub drawboard()
 	next i
 end sub
 sub clearscreen(normalfore, normalback)
-	cls
 	color normalfore, normalback
 	for i=1 to 24
 	locate i, 41
 	print string$(38, " ");
 	next i
-	locate 23,42 
+	locate 22,42 
 	print "LV = Change Levels, NG = New Game";
+	locate 23,42
+	print "AV = Calc Move, AP = Autoplay (20)";
 	locate 24,42 
 	print "Col/row for moves.  e.g. A2A3";
 end sub
@@ -106,7 +107,7 @@ end sub
 30 REM "  ****************************"
 40 REM "     par Dieter Steinwender"
 50 REM
-60 DEFINT A-L, N-Z
+60 REM DEFINT A-L, N-Z
 70 DIM B(119), S(10, 4)
 71 DIM M(10), A$(10), U(10), F$(10)
 72 DIM R1(4), R2(4), R3(4), R4(4), R5(4), R6(4), R7(4), G1(10)
@@ -115,7 +116,12 @@ end sub
 90 DIM ZT(9, 8), BV(8), BL(2, 9), TL(2, 9)
 100 DIM T7(2), BA(2), KR(2), KL(2)
 110 et = 0
-200 call clearscreen(normalfore, normalback)
+200 cls
+    call clearscreen(normalfore, normalback)
+    locate 9,42 
+    print "Chess logic: Dieter Steinwender"
+    locate 10,42
+    print "     Modified by Clinton Pierce"
     RESTORE
 210 REM: initialisation
 270 FOR I = 0 TO 119
@@ -185,14 +191,27 @@ end sub
      next i
 2020 locate 12, 42
      color normalfore, normalback
-     PRINT "   Your move"; : INPUT E$
-     locate 11, 42
-     print string$(25, " ");
+     if autoplay > 0 then
+	     E$="AV"
+	     autoplay=autoplay+1
+	     if autoplay > 20 then
+	        	autoplay=0
+             end if
+     else 
+	     PRINT "   Your move"; : INPUT E$
+	     for i = 9 to 11
+	     	     locate i, 42
+     	     	     print string$(31, " ");
+	     next i
+     end if
 2050 IF E$ <> "NG" THEN 2070
 2060 GOTO 200
 2070 IF E$ <> "FI" THEN 2090
 2080 GOTO 15000
-2090 IF E$ <> "PO" THEN 2120
+2090 IF E$ <> "AP" THEN 2095
+     autoplay=1
+     GOTO 2000
+2095 IF E$ <> "PO" THEN 2120
 2100 GOSUB 4000
 2110 GOTO 2000
 2120 IF E$ <> "PB" THEN 2150
@@ -278,12 +297,15 @@ _ENDASM
 3595 IF W = -2 THEN 3660
 3600 IF W < 32765 THEN 3670
 3610 PRINT "  ECHEC ET MAT!"	' Check and mate.
+     autoplay=0
 3620 GOTO 3670
 3630 PRINT "  DAMNED, VOUS AVEZ GAGNE!"
+     autoplay=0
 3640 GOTO 3670
 3650 IF T0 = 0 THEN 3670
 3660 locate 6,42
      PRINT "  PAT: PARTIE NULLE!"
+     autoplay=0
 3670 locate 7,42
      PRINT "Positions Analyzed="; C1
 3680 GOTO 2000
