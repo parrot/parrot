@@ -14,18 +14,19 @@ tools/dev/parrot_api.pl - Display Parrot API (symbols)
 
 Displays the API (the visible symbols, code or data) of the Parrot lib.
 
-First lists the Parrot public embedding API as described in the
-F<include/parrot/embed.h> (using pattern C</^\w+\s+(Parrot_\w+)\(/>),
-then finds out the visible symbols in the Parrot lib (by default
+First lists the Parrot public embedding API as described in the public
+headers F<include/parrot/embed.h> and F<include/parrot/extend.h> (the
+API is detected using pattern C</^\w+\s+(Parrot_\w+)\(/>), then finds
+out the visible symbols in the Parrot lib (by default
 F<blib/lib/libparrot.a>), and then cross-references the dubious API
-symbols according to the below categories.  Each symbol is listed
-with the object file it was found in.
+symbols according to the below categories.  Each symbol is listed with
+the object file it was found in.
 
 =over 4
 
 =item Missing Parrot API
 
-API listed in F<include/parrot/embed.h> but not defined in the Parrot lib.
+API listed in the public headers or but not defined in the Parrot lib.
 
 Either the API listing is wrong or the implementation is missing.
 
@@ -42,7 +43,7 @@ accessible only through a real API.
 
 =item No Parrot API
 
-API implemented in the lib but not defined in F<inlucde/parrot/embed.h>.
+API implemented in the lib but not defined in the public headers.
 
 If code, consider making the API private (local) or splitting
 it off to a Parrot-private library.
@@ -90,23 +91,26 @@ my %ParrotAPI;
 
 $| = 1;
 
-my $H = "include/parrot/embed.h";
-if (open(H, $H)) {
-    while (<H>) {
-	if (/^\w+\s+(Parrot_\w+)\(/) {
-	    $ParrotAPI{$1}++;
+my @H = qw(include/parrot/embed.h include/parrot/extend.h);
+
+for my $h (@H) {
+    if (open(H, $h)) {
+	while (<H>) {
+	    if (/^\w+\s+(Parrot_\w+)\(/) {
+		$ParrotAPI{$1}++;
+	    }
 	}
+	close(H);
+    } else {
+	die "$0: Header '$h': $!\n";
     }
-    close(H);
-} else {
-    die "$0: Header '$H': $!\n";
 }
 
 my @ParrotAPI = sort keys %ParrotAPI;
 
-die "$0: No API found in '$H'\n" unless @ParrotAPI;
+die "$0: No API found in @H\n" unless @ParrotAPI;
 
-printf "=== $H: %d interfaces ===\n", scalar @ParrotAPI;
+printf "=== @H: %d interfaces ===\n", scalar @ParrotAPI;
 
 my %Code;
 my %DataB;
