@@ -1,0 +1,111 @@
+	Following in the steps of other open source projects that
+	eventually take over the world, here is the partial list
+	of people who have contributed to Parrot and its supporting
+	works.  It is sorted by name and formatted to allow easy
+	grepping and beautification by scripts.
+	The fields are: name (N), email (E), web-address
+        (W), PGP key ID and fingerprint (P), description (D), and
+        snail-mail address (S).
+
+        Thanks,
+
+		Melvin
+		PS: Yes, this looks remarkably like the Linux CREDITS format
+
+----------
+
+N: Aldo Calpini
+
+N: Andy Dougherty
+
+N: Alex Gough
+
+N: Angel Faus
+
+N: Ask Bjoern Hansen
+
+N: Brent Dax
+
+N: Dan Sugalski 
+D: The big cheese 
+
+N: Brian Wheeler
+
+N: Bruce Gray
+
+N: Bryan C. Warnock
+
+N: Chip Salzenberg
+
+N: Clinton A. Piercec
+
+N: Daniel Grunblatt
+
+N: David M. Loyd
+
+N: Gregory Purdy
+
+N: Jason Gloudon
+
+N: Jeff Goff
+
+N: Jerome Quelin
+
+N: Jonathan Sillito
+
+N: Jonathan Stowe
+
+N: Josh Wilmes
+
+N: Juergen Boemmels
+
+N: Kevin Falcone
+
+N: Leon Brocard
+
+N: Leopold Toetsch
+D: Patchmonster
+
+N: Luke Palmer
+
+N: Mattia Barbon
+
+N: Melvin Smith
+D: Parrot core, various ops, IO, subs, continuations, COW stacks
+D: IMCC, Cola
+E: melvin.smith@mindspring.com
+E: melvins@us.ibm.com
+S: Atlanta, GA
+
+N: Michael G. Schwern
+
+N: Mike Lambert
+
+N: Nicholas Clark
+
+N: Peter Gibbs
+
+N: Piers Cawley
+
+N: Ritz Daniel
+
+N: Robert Spier
+
+N: Sean O'Rourke
+D: Original Perl6 compiler
+
+N: Steve Fink
+
+N: Simon Glover
+
+N: Simon Cozens
+
+N: Tom Hughes
+
+N: Will Coleda
+
+N: Uri Guttman
+
+N: Zach Lipton
+
+
