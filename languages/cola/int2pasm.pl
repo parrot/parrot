@@ -155,6 +155,9 @@ sub reg_assign {
 	my $lexical = shift;
 	my $type = shift;
 	#print "reg_assign($lexical,$type)\n";
+	# Literal
+	if($lexical =~ /^(\d|[.+-]|\"|\')/) {return $lexical;}
+
 	# Map symbolic to Parrot reg
 	# For now temporary symbolics are treated
 	# as named vars.
@@ -172,8 +175,6 @@ sub reg_assign {
 		}
 		die "Don't know how to assign register to type $type\n";
 	}
-	# Literal
-	if($lexical =~ /^(\d|[.+-]|\"|\')/) {return $lexical;}
 
 	die("Use of undeclared lexical [$lexical]");
 }
@@ -398,7 +399,8 @@ sub assign_expr {
 	# hand of assignments. This is a simple little technique
 	# which is easier than doing correct register allocation
 	# via graph coloring.
-	if( $right =~ m{^(\S+|"[^"\n]*["\n])\s+([-+*/%])\s+(\S+|"[^"\n"]*["\n])} ) {
+    # FIXME: This regex has outlived its usefulness!
+	if( $right =~ m{^("[^"\n]*["\n]|[^"]+)\s+([-+*/%])\s+("[^"\n"]*["\n]|[^"]+)} ) {
 		my ($arg2, $arg3) = (&reg_assign($1, $type), &reg_assign($3, $type));
 		$op = &op_to_parrot($targ, $2);
 		print "\t$op $targ, $arg2, $arg3\n";
