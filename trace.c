@@ -60,7 +60,8 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 break;
             case PARROT_ARG_P:
                 /* what does a PMC constant look like? */
-                fprintf(stderr, "P%ld=???", (long)*(pc + i));
+                fprintf(stderr, "P%ld=%p", (long)*(pc + i),
+                        interpreter->pmc_reg.registers[*(pc + i)]);
                 break;
             case PARROT_ARG_S:
                 if (interpreter->string_reg.registers[*(pc + i)]) {
