@@ -97,23 +97,23 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 {
     HANDLE h;
     if ((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDIN(interpreter) =
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_READ);
+        PIO_STDIN(interpreter) = new_io_pmc(interpreter, 
+            PIO_win32_fdopen(interpreter, layer, h, PIO_F_READ));
     }
     else {
         return -1;
     }
     if ((h = GetStdHandle(STD_OUTPUT_HANDLE))
         != INVALID_HANDLE_VALUE) {
-        PIO_STDOUT(interpreter) =
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE);
+        PIO_STDOUT(interpreter) = new_io_pmc(interpreter,
+            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE));
     }
     else {
         return -2;
     }
     if ((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-        PIO_STDERR(interpreter) =
-            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE);
+        PIO_STDERR(interpreter) = new_io_pmc(interpreter,
+            PIO_win32_fdopen(interpreter, layer, h, PIO_F_WRITE));
     }
     else {
         return -3;
