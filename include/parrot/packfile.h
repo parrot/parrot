@@ -79,7 +79,7 @@ struct PackFile_Segment {
     PackFile_Segment_pack_func_t         pack;
 };
 
-enum {
+typedef enum {
     PF_FIXUP_SEG = 0x01,
     PF_CONST_SEG = 0x02,
     PF_BYTEC_SEG = 0x04,
