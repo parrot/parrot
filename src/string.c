@@ -588,20 +588,20 @@ const_string(Interp *interpreter, const char *buffer)
 
 =item C<STRING *
 string_make(Interp *interpreter, const void *buffer,
-    UINTVAL len, const char *encoding_name, UINTVAL flags)>
+    UINTVAL len, const char *charset, UINTVAL flags)>
 
 Creates and returns a new Parrot string using C<len> bytes of string
 data read from C<buffer>.
 
-The value of C<encoding_name> specifies the string's representation.
+The value of C<charset> specifies the string's representation.
 The currently recognised values are:
 
-    'iso-8859-1'  =  enum_stringrep_one
-    'ucs-2'       =  enum_stringrep_two
-    'utf-32'      =  enum_stringrep_four
+    'iso-8859-1'
+    'ascii'
+    'binary'
 
-If C<encoding_name> is unspecified the the string reperesentation will default
-to C<enum_stringrep_unknown>.
+If C<charset> is unspecified the default charset 'iso-8859-1' will be
+used.
 
 The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
 together.
@@ -612,21 +612,30 @@ together.
 
 STRING *
 string_make(Interp *interpreter, const void *buffer,
-    UINTVAL len, const char *encoding_name, UINTVAL flags)
+    UINTVAL len, const char *charset_name, UINTVAL flags)
 {
     ENCODING *encoding;
     CHARSET *charset;
-    if (!encoding_name) {
+    if (!charset_name) {
         internal_exception(MISSING_ENCODING_NAME,
-            "string_make: no encoding name specified");
+            "string_make: no charset name specified");
     }
 
-    if (strcmp(encoding_name, "iso-8859-1") == 0 ) {
+    if (strcmp(charset_name, "iso-8859-1") == 0 ) {
         encoding = Parrot_fixed_8_encoding_ptr;
         charset = Parrot_iso_8859_1_charset_ptr;
     }
+    else if (strcmp(charset_name, "ascii") == 0 ) {
+        encoding = Parrot_fixed_8_encoding_ptr;
+        charset = Parrot_ascii_charset_ptr;
+    }
+    else if (strcmp(charset_name, "binary") == 0 ) {
+        encoding = Parrot_fixed_8_encoding_ptr;
+        charset = Parrot_binary_charset_ptr;
+    }
     else {
-        internal_exception(UNIMPLEMENTED, "Can't make non-iso-8859-1 strings");
+        internal_exception(UNIMPLEMENTED,
+                "Can't make '%s' charset strings", charset_name);
     }
     return string_make_direct(interpreter, buffer, len,
             encoding, charset, flags);
@@ -644,7 +653,7 @@ string_make_direct(Interp *interpreter, const void *buffer,
     } __ptr_u;
 
     /*    PIO_eprintf(NULL, "string_make(): length = %ld, encoding name = %s, buffer = %s\n",
-          len, encoding_name, (const char *)buffer); */
+          len, charset, (const char *)buffer); */
 
     if (len && !buffer) {
         internal_exception(BAD_BUFFER_SIZE,

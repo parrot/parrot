@@ -25,7 +25,7 @@ static ENCODING *preferred_encoding;
 #define PUNCTUATION 3
 #define DIGIT 4
 
-static unsigned char typetable[256] = {
+static const unsigned char typetable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
     1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 32-47 */
@@ -122,9 +122,14 @@ from_unicode(Interp *interpreter, STRING *source_string)
 static void
 to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset)
 {
-    void *conversion_func;
+    charset_converter_t conversion_func;
     if ((conversion_func = Parrot_find_charset_converter(interpreter,
                     source_string->charset, new_charset))) {
+        /*
+         * XXX conversion_func has wrong signature ?
+         *
+         * conversion_func(interpreter, new_charset, source_string);
+         */
     }
     else {
         to_unicode(interpreter, source_string);

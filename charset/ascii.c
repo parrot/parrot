@@ -20,7 +20,7 @@ This file implements the charset functions for ascii data
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
 
-static char typetable[256] = {
+static const unsigned char typetable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
     1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 32-47 */

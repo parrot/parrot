@@ -25,6 +25,7 @@ extern CHARSET *Parrot_iso_8859_1_charset_ptr;
 extern CHARSET *Parrot_binary_charset_ptr;
 extern CHARSET *Parrot_default_charset_ptr;
 extern CHARSET *Parrot_unicode_charset_ptr;
+extern CHARSET *Parrot_ascii_charset_ptr;
 #endif
 
 #define PARROT_DEFAULT_CHARSET Parrot_iso_8859_1_charset_ptr

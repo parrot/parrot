@@ -511,16 +511,19 @@ IMCC_string_from_reg(Interp *interpreter, SymReg *r)
     STRING *s = NULL;
     char *charset = NULL;
     /*
-     * TODO strip delimiters in lexer, this needs adjustment in printint strings
+     * VT_UNICODE should better be VT_CHARSET
      */
-    if (*buf == '"') {
+    if (r->type & VT_UNICODE) {
+        char *p;
+        p = strchr(r->name, ':');
+        assert(p);
+        *p = 0;
+        charset = r->name;
+        buf = p + 2;        /* past delim */
+        s = string_unescape_cstring(interpreter, buf, '"', charset);
+    }
+    else if (*buf == '"') {
         buf++;
-        if (r->type & VT_UNICODE) {
-            /*
-             * not really a charset but our reprensentation
-             */
-            charset = "iso-8859-1"; /* still begin with ascii */
-        }
         s = string_unescape_cstring(interpreter, buf, '"', charset);
     }
     else if (*buf == '\'') {   /* TODO handle python raw strings */

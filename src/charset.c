@@ -19,6 +19,7 @@ CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;
 CHARSET *Parrot_default_charset_ptr;
 CHARSET *Parrot_unicode_charset_ptr;
+CHARSET *Parrot_ascii_charset_ptr;
 
 CHARSET *
 Parrot_new_charset(Interp *interpreter)
@@ -66,6 +67,10 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
     }
     if (!strcmp("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
+        return 1;
+    }
+    if (!strcmp("ascii", charsetname)) {
+        Parrot_ascii_charset_ptr = charset;
         return 1;
     }
     return 0;

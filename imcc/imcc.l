@@ -450,10 +450,9 @@ SP              [ ]
     }
 
 <*>{UNICODE} {
-        char *p = strchr(yytext, '"');
-	valp->s = str_dup(p);    /* enc:"..." */
-        /* TODO pass charset */
-        return(USTRINGC); /* XXX delete quotes, -> emit, pbc */
+	valp->s = str_dup(yytext);    /* charset:"..." */
+        /* this is actually not unicode but a string with a charset */
+        return(USTRINGC);
     }
 <*>{CHARCONSTANT} {
         valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */

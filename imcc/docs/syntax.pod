@@ -85,6 +85,11 @@ A local B<identifier> or a B<reg> or a constant (when allowed).
 Are delimited by B<">. A B<"> inside a string must be escaped by
 B<\">.
 
+=item charset:"string constant"
+
+Like above with a charset attached to the string. Valid charset are
+currently: C<ascii>, C<binary>, and the default C<iso-8859-1>.
+
 =item 'char constant'
 
 Are delimited by B<'>.
