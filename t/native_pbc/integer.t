@@ -31,7 +31,7 @@ $ mv i.pbc t/native_pbc/integer_1.pbc
 
 EOC
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 output_is(<<CODE, '270544960', "i386 32 bit opcode_t, 32 bit intval");
 # integer_1.pbc
 # HEADER => [
@@ -41,6 +41,19 @@ output_is(<<CODE, '270544960', "i386 32 bit opcode_t, 32 bit intval");
 #        floattype = 0   (interpreter's NUMVAL_SIZE = 8)
 #        no endianize, no opcode, no numval transform
 #        dirformat = 1
-#]                #'
+# ]
+
+CODE
+
+output_is(<<CODE, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
+# integer_1.pbc
+# HEADER => [
+# 	wordsize  = 4	(interpreter's wordsize    = 4)
+# 	int_size  = 4	(interpreter's INTVAL size = 4)
+# 	byteorder = 1	(interpreter's byteorder   = 1)
+# 	floattype = 0	(interpreter's NUMVAL_SIZE = 8)
+# 	no endianize, no opcode, no numval transform
+# 	dirformat = 1
+# ]
 
 CODE

@@ -122,12 +122,11 @@ CODE
 OUTPUT
 }
 
-SKIP: {
-skip("outdated", 1);
-output_is(<<CODE, <<OUTPUT, "SPARC double float 32 bit opcode_t");
+output_is(<<CODE, <<OUTPUT, "PPC double float 32 bit BE opcode_t");
 # number_3.pbc
 #HEADER => [
 #	wordsize  = 4	(interpreter's wordsize    = 4)
+# 	int_size  = 4	(interpreter's INTVAL size = 4)
 #	byteorder = 1	(interpreter's byteorder   = 1)
 #	floattype = 0	(interpreter's NUMVAL_SIZE = 8)
 #	no endianize, no opcode, no numval transform
@@ -161,4 +160,4 @@ CODE
 281474976710656.000000
 1125899906842620.000000
 OUTPUT
-}
+
