@@ -294,8 +294,8 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
         op = try_find_op(interpreter, unit, name, r, n, keyvec, emit);
     if (op >= 0) {
         op_info_t * op_info = &interpreter->op_info_table[op];
-	char format[128];
-	int len;
+        char format[128];
+        int len;
 
         *format = '\0';
         /* info->arg_count is offset by one, first is opcode
@@ -303,8 +303,8 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
          * set LV_in / out flags */
         if (n != op_info->arg_count-1)
             fataly(EX_SOFTWARE, sourcefile, line,
-                "arg count mismatch: op #%d '%s' needs %d given %d",
-                op, fullname, op_info->arg_count-1, n);
+                    "arg count mismatch: op #%d '%s' needs %d given %d",
+                    op, fullname, op_info->arg_count-1, n);
         for (i = 0; i < op_info->arg_count-1; i++) {
             switch (op_info->dirs[i+1]) {
                 case PARROT_ARGDIR_INOUT:
@@ -329,11 +329,11 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
             }
             else
                 strcat(format, "%s, ");
-	}
-	len = strlen(format);
-	if (len >= 2)
-	    len -= 2;
-	format[len] = '\0';
+        }
+        len = strlen(format);
+        if (len >= 2)
+            len -= 2;
+        format[len] = '\0';
         if (fmt && *fmt)
             strcpy(format, fmt);
         memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
@@ -358,33 +358,27 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
         else if (!strcmp(name, "loadlib")) {
             SymReg *r1 = r[1];   /* lib name */
             STRING *lib = string_from_cstring(interpreter, r1->name + 1,
-                strlen(r1->name) - 2);
+                    strlen(r1->name) - 2);
             Parrot_load_lib(interpreter, lib, NULL);
         }
-        else if (!strcmp(name, "invoke")) {
+        else if (!memcmp(name, "invoke", 6) ||
+                !memcmp(name, "callmethod", 10)) {
             if (cur_unit->type == IMC_PCCSUB)
                 cur_unit->instructions->r[1]->pcc_sub->calls_a_sub = 1;
         }
         /* set up branch flags */
+        /*
+         * mark registers that are labels
+         */
+        for (i = 0; i < op_info->arg_count-1; i++) {
+            if (op_info->labels[i+1])
+                ins->type |= ITBRANCH | (1 << i);
+        }
         if (op_info->jump) {
-
-            /* XXX: assume the jump is relative and to the last arg.
-             * usually true - but not for ops, that throw an exception
-             *
-             * TODO mark labels in the ops files
-             */
-            if (op_info->jump & PARROT_JUMP_RESTART)
-                ins->type = ITBRANCH;
-            else if (n && (r[n-1]->set == 'I' || r[n-1]->type == VTADDRESS)
-                    && strcmp(name, "find_lex")
-                    && strcmp(name, "sleep")
-                    )
-                ins->type = ITBRANCH | (1 << (n-1));
-            else
-                ins->type = ITBRANCH;
+            ins->type |= ITBRANCH;
             if (!strcmp(name, "branch"))
                 ins->type |= IF_goto;
-            if (!strcmp(fullname, "jump_i") ||
+            else if (!strcmp(fullname, "jump_i") ||
                     !strcmp(fullname, "jsr_i") ||
                     !strcmp(fullname, "branch_i") ||
                     !strcmp(fullname, "bsr_i"))
@@ -395,21 +389,11 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
             if (r[0]->set == 'P' && r[1]->set == 'P')
                 ins->type |= ITALIAS;
         }
-        else if (!strcmp(name, "set_addr")) {
-            /* mark this as branch, because it needs fixup */
-            ins->type = ITADDR | IF_r1_branch | ITBRANCH;
-        }
-        else if (!strcmp(name, "newsub")) {
-            if (ins->opsize == 4)
-                ins->type = ITADDR | IF_r2_branch | ITBRANCH;
-            else
-                ins->type = ITADDR | IF_r2_branch | IF_r3_branch | ITBRANCH;
-        }
         else if (!strcmp(name, "compile"))
             ++has_compile;
 
         if (emit)
-             emitb(unit, ins);
+            emitb(unit, ins);
     } else {
         fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, n);

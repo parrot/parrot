@@ -46,7 +46,7 @@ Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
 
 =cut
 
-inline op end() {
+inline op end() :base_core,check_event {
   HALT();
 }
 
@@ -100,7 +100,7 @@ to locate the file.
 
 =cut
 
-inline op noop() {
+inline op noop() :base_core {
   goto NEXT();
 }
 
@@ -113,7 +113,7 @@ inline op cpu_ret() {
   goto NEXT();
 }
 
-inline op check_events() {
+inline op check_events() :base_core {
   opcode_t *next = expr NEXT();
   next = CHECK_EVENTS(interpreter, next);
   goto ADDRESS(next);	/* force this being a branch op */
@@ -174,13 +174,13 @@ inline op branch (label INT) :base_loop {
 }
 
 
-=item B<branch_cs>(label STR)
+=item B<branch_cs>(in STR)
 
 Intersegment branch to location in fixup table named $1.
 
 =cut
 
-inline op branch_cs (label STR) :base_loop,check_event {
+inline op branch_cs (in STR) :base_loop,check_event {
     char * label = string_to_cstring(interpreter, $1);
     struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
 	    enum_fixup_label, label);
@@ -197,7 +197,7 @@ inline op branch_cs (label STR) :base_loop,check_event {
 
 ########################################
 
-=item B<bsr>(in INT)
+=item B<bsr>(label INT)
 
 Branch to the location specified by $1. Push the current location onto the call
 stack for later returning.
@@ -280,40 +280,40 @@ met, the branch happens, otherwise control falls to the next operation.
 
 ########################################
 
-=item B<if>(in INT, inconst INT)
+=item B<if>(in INT, labelconst INT)
 
-=item B<if>(in NUM, inconst INT)
+=item B<if>(in NUM, labelconst INT)
 
-=item B<if>(in PMC, inconst INT)
+=item B<if>(in PMC, labelconst INT)
 
-=item B<if>(in STR, inconst INT)
+=item B<if>(in STR, labelconst INT)
 
 Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(in INT, inconst INT) {
+inline op if(in INT, labelconst INT) {
   if ($1 != 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op if(in NUM, inconst INT) {
+inline op if(in NUM, labelconst INT) {
   if ($1 != 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if (in STR, inconst INT) {
+op if (in STR, labelconst INT) {
   if (string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if(in PMC, inconst INT) {
+op if(in PMC, labelconst INT) {
   if ($1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -322,40 +322,40 @@ op if(in PMC, inconst INT) {
 
 ########################################
 
-=item B<unless>(in INT, inconst INT)
+=item B<unless>(in INT, labelconst INT)
 
-=item B<unless>(in NUM, inconst INT)
+=item B<unless>(in NUM, labelconst INT)
 
-=item B<unless>(in PMC, inconst INT)
+=item B<unless>(in PMC, labelconst INT)
 
-=item B<unless>(in STR, inconst INT)
+=item B<unless>(in STR, labelconst INT)
 
 Check register $1. If false, branch by $2.
 
 =cut
 
-inline op unless(in INT, inconst INT) {
+inline op unless(in INT, labelconst INT) {
   if ($1 == 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op unless(in NUM, inconst INT) {
+inline op unless(in NUM, labelconst INT) {
   if ($1 == 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless (in STR, inconst INT) {
+op unless (in STR, labelconst INT) {
   if (!string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless(in PMC, inconst INT) {
+op unless(in PMC, labelconst INT) {
   if (!$1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -451,15 +451,15 @@ inline op updatecc() {
 
 ########################################
 
-=item B<set_addr>(out INT, inconst INT)
+=item B<set_addr>(out INT, labelconst INT)
 
 Sets register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(in PMC, inconst INT)
+=item B<set_addr>(in PMC, labelconst INT)
 
 Sets PMC in register $1 to the current address plus the offset $2.
 
-=item B<set_addr>(in PMC, invar INT)
+=item B<set_addr>(in PMC, labelvar INT)
 
 Sets PMC in register $1 to the absolut address $2 obtained from B<get_addr>.
 
@@ -469,17 +469,17 @@ Sets $1 to the absolute address of the Sub-PMC $2.
 
 =cut
 
-inline op set_addr(out INT, inconst INT) {
+inline op set_addr(out INT, labelconst INT) {
   $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
   goto NEXT();
 }
 
-inline op set_addr(in PMC, inconst INT) {
+inline op set_addr(in PMC, labelconst INT) {
   $1->vtable->set_pointer(interpreter, $1, (CUR_OPCODE + $2));
   goto NEXT();
 }
 
-inline op set_addr(in PMC, invar INT) {
+inline op set_addr(in PMC, labelvar INT) {
   $1->vtable->set_pointer(interpreter, $1, (void* )$2);
   goto NEXT();
 }
@@ -489,18 +489,18 @@ inline op get_addr(out INT, in PMC) {
   goto NEXT();
 }
 
-=item B<newsub>(out PMC, in INT, inconst INT)
+=item B<newsub>(out PMC, in INT, labelconst INT)
 
 Generate a new subroutine object in $1 of class $2 and label $3.
 
-=item B<newsub>(in INT, in INT, inconst INT, inconst INT)
+=item B<newsub>(in INT, in INT, labelconst INT, labelconst INT)
 
 Generate a new subroutine object in P0 of class $1 subroutine label $3 and
 a return continuation in P1 of class $2 and return address $4.
 
 =cut
 
-inline op newsub(out PMC, in INT, inconst INT) {
+inline op newsub(out PMC, in INT, labelconst INT) {
   if ($2 <= 0 || $2 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$2);
     abort(); /* Deserve to lose */
@@ -511,7 +511,7 @@ inline op newsub(out PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
-inline op newsub(in INT, in INT, inconst INT, inconst INT) {
+inline op newsub(in INT, in INT, labelconst INT, labelconst INT) {
   if ($1 <= 0 || $1 >= enum_class_max) {
     internal_exception(1, "Illegal PMC enum (%d) in newsub\n", (int)$1);
     abort(); /* Deserve to lose */
@@ -809,7 +809,7 @@ inline op errorsoff(in INT) {
 
 ########################################
 
-=item B<runinterp>(in PMC, in INT)
+=item B<runinterp>(in PMC, label INT)
 
 Run the code starting at offset $2 within interpreter $1.
 
@@ -819,7 +819,7 @@ Get the current ParrotInterpreter.
 
 =cut
 
-op runinterp(in PMC, in INT) {
+op runinterp(in PMC, label INT) {
   struct Parrot_Interp * new_interp =
       (struct Parrot_Interp *)PMC_data($1);
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
