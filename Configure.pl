@@ -26,7 +26,7 @@ my %args;
 for(@ARGV) {
   my($key, $value)=/--(\w+)(?:=(.*))?/;
   $value = 1 unless defined $value;
-  
+
   for($key) {
     /version/ && do {
       my $cvsid='$Id$';
@@ -43,7 +43,7 @@ $0 - Parrot Configure 2.0
 Options:
    --help               Show this text
    --version            Show version information
-   
+
    Steps may take additional options of the form --name or --name=value.
    Popular ones include:
 
@@ -53,6 +53,7 @@ Options:
                         :rem{-g} :add{-O2}
    --nomanicheck        Don't check the MANIFEST
    --debugging          Enable debugging
+   --optimize           Optimized compile
    --cc=(compiler)      Use the given compiler
    --ld=(linker)        Use the given linker
    --intval=(type)      Use the given type for INTVAL
@@ -72,12 +73,12 @@ print <<"END";
 Parrot Version $parrot_version Configure 2.0
 Copyright (C) 2001-2002 Yet Another Society
 
-Hello, I'm Configure.  My job is to poke and prod your system to figure out 
+Hello, I'm Configure.  My job is to poke and prod your system to figure out
 how to build Parrot.  The process is completely automated, unless you passed in
 the `--ask' flag on the command line, in which case it'll prompt you for a few
 pieces of info.
 
-Since you're running this script, you obviously have Perl 5--I'll be pulling 
+Since you're running this script, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
 
@@ -115,7 +116,7 @@ equivalent) at a command line prompt.
 
 B<I<U<THIS NEEDS TO BE UPDATED!!!>>>
 
-Configure is broken up into I<steps>.  Each step contains several related I<prompts>, 
+Configure is broken up into I<steps>.  Each step contains several related I<prompts>,
 I<probes>, or I<generations>.  Steps should be mostly of a single type, though some overlap
 is allowed (for example, allowing a probe to ask the user what to do in an exceptional
 situation).
@@ -135,15 +136,15 @@ what dynaloading capabilities are available, you should create a new step.
 
 I<Initialization steps> are run before any other steps.  They do tasks such as preparing
 Configure's data structures and checking the MANIFEST.  These will rarely be added; when
-they are, it usually means that Configure is getting significant new capabilities.  
+they are, it usually means that Configure is getting significant new capabilities.
 They're kept in the directory F<config/init>.
 
 Initialization steps usually do not output anything under normal circumstances.
 
 =head2 Prompts
 
-Prompts ask the user for some information.  These should be used sparingly.  A step 
-containing prompts is an I<interactive step>.  Interactive steps should be in the 
+Prompts ask the user for some information.  These should be used sparingly.  A step
+containing prompts is an I<interactive step>.  Interactive steps should be in the
 F<config/inter> folder.
 
 Interactive steps often include simple probes to determine good guesses of what the user
@@ -177,7 +178,7 @@ if that command is connected to a specific compiler (like gcc) would be an autom
 
 =head2 Adding Steps
 
-New steps should be added in one of the three folders mentioned above.  They should include the 
+New steps should be added in one of the three folders mentioned above.  They should include the
 C<Parrot::Configure::Step> module, described below.
 
 All steps are really modules; they should start with a declaration setting the current package
@@ -259,7 +260,7 @@ the dashes.
 
 =head2 Building Up Configuration Data
 
-The second step is F<config/init/data.pl>, which sets up a C<Configure::Data> package.  You get and set 
+The second step is F<config/init/data.pl>, which sets up a C<Configure::Data> package.  You get and set
 Configure's data by calling methods on this package.  The methods are listed below.
 
 =over 4
@@ -311,7 +312,7 @@ Cleans up all files in the root folder that match the glob I<test.*>.
 
 =item C<genfile(infile, outfile)>
 
-Takes the given I<infile>, substitutes any sequences matching C</\$\{\w+\}/> for the given key's value in 
+Takes the given I<infile>, substitutes any sequences matching C</\$\{\w+\}/> for the given key's value in
 Configure's data, and writes the results to I<outfile>.
 
 =back

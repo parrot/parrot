@@ -10,11 +10,11 @@ $description="Enabling debugging...";
 
 sub runstep {
   if (Configure::Data->get('debugging')) {
-    my($ccflags, $linkflags, $ldflags) = 
-      Configure::Data->get(qw(ccflags linkflags ldflags));
-    my($cc_debug, $link_debug, $ld_debug) = 
+    my($ccflags, $linkflags, $ldflags, $optimize) =
+      Configure::Data->get(qw(ccflags linkflags ldflags optimize));
+    my($cc_debug, $link_debug, $ld_debug) =
       Configure::Data->get(qw(cc_debug link_debug ld_debug));
-    $ccflags .= " $cc_debug";
+    $ccflags .= " $cc_debug $optimize";
     $linkflags .= " $link_debug";
     $ldflags .= " $ld_debug";
 
