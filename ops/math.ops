@@ -146,7 +146,7 @@ inline op add(inout NUM, in NUM) :base_core {
 }
 
 inline op add(in PMC, in INT) :base_core {
-  $1->vtable->add_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_ADD_INT);
   goto NEXT();
 }
 
@@ -247,7 +247,7 @@ inline op cmod(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op cmod(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->cmodulus_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_CMOD_INT);
   goto NEXT();
 }
 
@@ -373,7 +373,7 @@ inline op div (in PMC, in PMC) :base_core {
 }
 
 inline op div (in PMC, in INT) :base_core {
-  $1->vtable->divide_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_DIVIDE_INT);
   goto NEXT();
 }
 
@@ -398,7 +398,7 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op div (in PMC, in PMC, in INT) :base_core {
-  $2->vtable->divide_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_DIVIDE_INT);
   goto NEXT();
 }
 
@@ -545,12 +545,12 @@ inline op mod (in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op mod (in PMC, in INT ) :base_core {
-  $1->vtable->modulus_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MOD_INT);
   goto NEXT();
 }
 
 inline op mod(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->modulus_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MOD_INT);
   goto NEXT();
 }
 
@@ -632,7 +632,7 @@ inline op mul(inout NUM, in NUM) :base_core {
 }
 
 inline op mul ( in PMC, in INT ) :base_core {
-  $1->vtable->multiply_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_MULTIPLY_INT);
   goto NEXT();
 }
 
@@ -662,7 +662,7 @@ inline op mul(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op mul (in PMC, in PMC, in INT) :base_core {
-  $2->vtable->multiply_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_MULTIPLY_INT);
   goto NEXT();
 }
 
@@ -808,7 +808,7 @@ inline op sub(inout NUM, in NUM) :base_core {
 }
 
 inline op sub(in PMC, in INT) :base_core {
-  $1->vtable->subtract_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_SUBTRACT_INT);
   goto NEXT();
 }
 
@@ -838,7 +838,7 @@ inline op sub(out NUM, in NUM, in NUM) :base_core {
 }
 
 inline op sub(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->subtract_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_SUBTRACT_INT);
   goto NEXT();
 }
 

@@ -45,7 +45,7 @@ inline op band(inout INT, in INT) :base_core {
 }
 
 inline op band(in PMC, in INT) :base_core {
-  $1->vtable->bitwise_and_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BAND_INT);
   goto NEXT();
 }
 
@@ -60,7 +60,7 @@ inline op band(out INT, in INT, in INT) :base_core {
 }
 
 inline op band(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->bitwise_and_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BAND_INT);
   goto NEXT();
 }
 
@@ -181,7 +181,7 @@ inline op bor(inout INT, in INT) :base_core {
 }
 
 inline op bor(in PMC, in INT) :base_core {
-  $1->vtable->bitwise_or_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BOR_INT);
   goto NEXT();
 }
 
@@ -196,7 +196,7 @@ inline op bor(out INT, in INT, in INT) :base_core {
 }
 
 inline op bor(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->bitwise_or_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BOR_INT);
   goto NEXT();
 }
 
@@ -283,7 +283,7 @@ inline op shl(in PMC, in PMC) :base_core {
 }
 
 inline op shl(in PMC, in INT) :base_core {
-  $1->vtable->bitwise_shl_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSL_INT);
   goto NEXT();
 }
 
@@ -298,7 +298,7 @@ inline op shl(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op shl(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->bitwise_shl_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSL_INT);
   goto NEXT();
 }
 
@@ -333,7 +333,7 @@ inline op shr(in PMC, in PMC) :base_core {
 }
 
 inline op shr(in PMC, in INT) :base_core {
-  $1->vtable->bitwise_shr_int(interpreter, $1, $2, $1);
+  mmd_dispatch_v_pip(interpreter, $1, $2, $1, MMD_BSR_INT);
   goto NEXT();
 }
 
@@ -348,7 +348,7 @@ inline op shr(in PMC, in PMC, in PMC) :base_core {
 }
 
 inline op shr(in PMC, in PMC, in INT) :base_core {
-  $2->vtable->bitwise_shr_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_BSR_INT);
   goto NEXT();
 }
 
@@ -466,7 +466,7 @@ inline op bxors(in PMC, in PMC, in STR) :base_core {
   goto NEXT();
 }
 
-inline op bxors(in PMC, in PMC, in PMC) :base_core { 
+inline op bxors(in PMC, in PMC, in PMC) :base_core {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_SXOR);
   goto NEXT();
 }

@@ -142,12 +142,11 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
 
 inline op repeat (in PMC, in PMC, in PMC) :base_mem {
   mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_REPEAT);
-/*  $2->vtable->repeat(interpreter, $2, $3, $1);*/
   goto NEXT();
 }
 
 inline op repeat (in PMC, in PMC, in INT) :base_mem {
-  $2->vtable->repeat_int(interpreter, $2, $3, $1);
+  mmd_dispatch_v_pip(interpreter, $2, $3, $1, MMD_REPEAT_INT);
   goto NEXT();
 }
 

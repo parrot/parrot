@@ -143,32 +143,32 @@ void splice(PMC* value, INTVAL offset, INTVAL count)
 
 [MATH]
 void add(PMC* value, PMC* dest)             MMD_ADD
-void add_int(INTVAL value, PMC* dest)
+void add_int(INTVAL value, PMC* dest)       MMD_ADD_INT
 void add_bignum(BIGNUM* value, PMC* dest)
 void add_float(FLOATVAL value, PMC* dest)
 
 void subtract(PMC* value, PMC* dest)        MMD_SUBTRACT
-void subtract_int(INTVAL value, PMC* dest)
+void subtract_int(INTVAL value, PMC* dest)  MMD_SUBTRACT_INT
 void subtract_bignum(BIGNUM* value, PMC* dest)
 void subtract_float(FLOATVAL value, PMC* dest)
 
 void multiply(PMC* value, PMC* dest)        MMD_MULTIPLY
-void multiply_int(INTVAL value, PMC* dest)
+void multiply_int(INTVAL value, PMC* dest)  MMD_MULTIPLY_INT
 void multiply_bignum(BIGNUM* value, PMC* dest)
 void multiply_float(FLOATVAL value, PMC* dest)
 
 void divide(PMC* value, PMC* dest)           MMD_DIVIDE
-void divide_int(INTVAL value, PMC* dest)
+void divide_int(INTVAL value, PMC* dest)     MMD_DIVIDE_INT
 void divide_bignum(BIGNUM* value, PMC* dest)
 void divide_float(FLOATVAL value, PMC* dest)
 
 void modulus(PMC* value, PMC* dest)         MMD_MOD
-void modulus_int(INTVAL value, PMC* dest)
+void modulus_int(INTVAL value, PMC* dest)   MMD_MOD_INT
 void modulus_bignum(BIGNUM* value, PMC* dest)
 void modulus_float(FLOATVAL value, PMC* dest)
 
 void cmodulus(PMC* value, PMC* dest)        MMD_CMOD
-void cmodulus_int(INTVAL value, PMC* dest)
+void cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
 void cmodulus_bignum(BIGNUM* value, PMC* dest)
 void cmodulus_float(FLOATVAL value, PMC* dest)
 
@@ -176,13 +176,13 @@ void neg(PMC* dest)
 
 [BITWISE]
 void bitwise_or(PMC* value, PMC* dest)       MMD_BOR
-void bitwise_or_int(INTVAL value, PMC* dest)
+void bitwise_or_int(INTVAL value, PMC* dest) MMD_BOR_INT
 
-void bitwise_and(PMC* value, PMC* dest)      MMD_BAND
-void bitwise_and_int(INTVAL value, PMC* dest)
+void bitwise_and(PMC* value, PMC* dest)         MMD_BAND
+void bitwise_and_int(INTVAL value, PMC* dest)   MMD_BAND_INT
 
-void bitwise_xor(PMC* value, PMC* dest)      MMD_BXOR
-void bitwise_xor_int(INTVAL value, PMC* dest) MMD_BXOR_INT
+void bitwise_xor(PMC* value, PMC* dest)        MMD_BXOR
+void bitwise_xor_int(INTVAL value, PMC* dest)  MMD_BXOR_INT
 
 void bitwise_ors(PMC* value, PMC* dest)      MMD_SOR
 void bitwise_ors_str(STRING* value, PMC* dest)
@@ -197,11 +197,11 @@ void bitwise_not(PMC* dest)
 
 void bitwise_nots(PMC* dest)
 
-void bitwise_shl(PMC* value, PMC* dest)      MMD_BSL
-void bitwise_shl_int(INTVAL value, PMC* dest)
+void bitwise_shl(PMC* value, PMC* dest)        MMD_BSL
+void bitwise_shl_int(INTVAL value, PMC* dest)  MMD_BSL_INT
 
-void bitwise_shr(PMC* value, PMC* dest)      MMD_BSR
-void bitwise_shr_int(INTVAL value, PMC* dest)
+void bitwise_shr(PMC* value, PMC* dest)        MMD_BSR
+void bitwise_shr_int(INTVAL value, PMC* dest)  MMD_BSR_INT
 
 [STRING]
 void concatenate(PMC* value, PMC* dest)      MMD_CONCAT
@@ -227,7 +227,7 @@ void logical_xor(PMC* value, PMC* dest)      MMD_LXOR
 void logical_not(PMC* dest)
 
 void repeat(PMC* value, PMC* dest)           MMD_REPEAT
-void repeat_int(INTVAL value, PMC* dest)
+void repeat_int(INTVAL value, PMC* dest)     MMD_REPEAT_INT
 
 [MATH]
 void increment()

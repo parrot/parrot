@@ -482,6 +482,8 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
         void * __ptr;
     } __ptr_u;
     STRING *meth;
+    HashBucket *b;
+    PMC *props;
     *meth_str = NULL;
 #if 0
     prop = VTABLE_getprop(interpreter, class, prop_str);
@@ -489,8 +491,6 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
         return NULL;
     meth = VTABLE_get_string(interpreter, prop);
 #else
-    HashBucket *b;
-    PMC *props;
     if ( !(props = PMC_metadata(class)))
         return NULL;
     b = hash_get_bucket(interpreter,
