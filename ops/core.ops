@@ -104,7 +104,7 @@ inline op err(i) {
 
 op err(s) {
   char *tmp = strerror(errno);
-  STRING *s = string_make(interpreter, tmp, strlen(tmp), 0, 0, 0);
+  STRING *s = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
   $1 = s;
   goto NEXT();
 }
@@ -165,10 +165,10 @@ inline op readline(s, i|ic) {
 	default: file = (FILE *)$2;
   }
 
-  string_grow($1, 65535);
+  $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
   memset(($1)->bufstart, 0, 65535);
   fgets(($1)->bufstart, 65534, file);
-  ($1)->strlen = strlen(($1)->bufstart);
+  ($1)->strlen = ($1)->bufused = strlen(($1)->bufstart);
   goto NEXT();
 }
 
@@ -359,11 +359,10 @@ op read(s, i|ic, i|ic) {
   INTVAL len = $3;
 
   string_destroy($1);
-  tmp = malloc(len + 1);
-  read($2, tmp, len);
-  s = string_make(interpreter, tmp, len, 0, 0, 0);
+  s = string_make(interpreter, NULL, len, NULL, 0, NULL);
+  read($2, s->bufstart, len);
+  s->bufused = s->buflen;
   $1 = s;
-  free(tmp);
   goto NEXT();
 }
 
@@ -860,6 +859,10 @@ op ne (sc, s|sc, ic) {
 
 =item B<lt>(s, sc, ic)
 
+=item B<lt>(sc, s, ic)
+
+=item B<lt>(sc, sc, ic)
+
 Branch if $1 is less than $2.
 
 =cut
@@ -885,6 +888,13 @@ op lt(s, s|sc, ic) {
   goto NEXT();
 }
 
+op lt(sc, s|sc, ic) {
+  if (string_compare(interpreter, $1, $2) < 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 
 ########################################
 
@@ -899,6 +909,10 @@ op lt(s, s|sc, ic) {
 =item B<le>(s, s, ic)
 
 =item B<le>(s, sc, ic)
+
+=item B<le>(sc, s, ic)
+
+=item B<le>(sc, sc, ic)
 
 Branch if $1 is less than or equal to $2.
 
@@ -925,6 +939,13 @@ op le(s, s|sc, ic) {
   goto NEXT();
 }
 
+op le(sc, s|sc, ic) {
+  if (string_compare(interpreter, $1, $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 
 ########################################
 
@@ -939,6 +960,10 @@ op le(s, s|sc, ic) {
 =item B<gt>(s, s, ic)
 
 =item B<gt>(s, sc, ic)
+
+=item B<gt>(sc, s, ic)
+
+=item B<gt>(sc, sc, ic)
 
 Branch if $1 is greater than $2.
 
@@ -965,6 +990,13 @@ op gt(s, s|sc, ic) {
   goto NEXT();
 }
 
+op gt(sc, s|sc, ic) {
+  if (string_compare(interpreter, $1, $2) > 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 
 ########################################
 
@@ -979,6 +1011,10 @@ op gt(s, s|sc, ic) {
 =item B<ge>(s, s, ic)
 
 =item B<ge>(s, sc, ic)
+
+=item B<ge>(sc, s, ic)
+
+=item B<ge>(sc, sc, ic)
 
 Branch if $1 is greater than or equal to $2.
 
@@ -999,6 +1035,13 @@ inline op ge(n, n|nc, ic) {
 }
 
 op ge(s, s|sc, ic) {
+  if (string_compare(interpreter, $1, $2) >= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ge(sc, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
@@ -1035,7 +1078,7 @@ inline op if(n, ic) {
 }
 
 op if (s, ic) {
-  if (string_bool(interpreter, $1)) {
+  if (string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
@@ -1117,7 +1160,6 @@ inline op add(n, n, n|nc) {
   $1 = $2 + $3;
   goto NEXT();
 }
-
 
 ########################################
 

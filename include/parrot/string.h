@@ -16,7 +16,6 @@
 #include "parrot/parrot.h"
 
 typedef struct {
-    void *bufstart;
     INTVAL buflen;
     INTVAL flags;
     INTVAL bufused;
@@ -24,6 +23,7 @@ typedef struct {
     const ENCODING *encoding;
     const CHARTYPE *type;
     INTVAL language;
+    char bufstart[1];
 } STRING;
 
 
@@ -31,42 +31,46 @@ typedef struct {
 
 INTVAL
 string_compute_strlen(STRING*);
-INTVAL
-string_max_bytes(STRING*, INTVAL);
 STRING*
-string_concat(struct Parrot_Interp *, STRING*, STRING*, INTVAL);
+string_concat(struct Parrot_Interp *interpreter, const STRING*, const STRING*,
+              INTVAL);
 STRING*
-string_repeat(struct Parrot_Interp *, STRING* , INTVAL, STRING**);
+string_repeat(struct Parrot_Interp *interpreter, const STRING* , INTVAL,
+              STRING**);
 STRING*
 string_chopn(STRING*, INTVAL);
 STRING*
-string_substr(struct Parrot_Interp *interpreter, STRING*, INTVAL, INTVAL, STRING**);
+string_substr(struct Parrot_Interp *interpreter, const STRING*, INTVAL,
+              INTVAL, STRING**);
 INTVAL
-string_compare(struct Parrot_Interp *, STRING*, STRING*);
+string_compare(struct Parrot_Interp *interpreter, const STRING*, const STRING*);
 BOOLVAL
-string_bool(struct Parrot_Interp *, STRING*);
+string_bool(const STRING*);
 
 /* Declarations of other functions */
 INTVAL
-string_length(STRING*);
+string_length(const STRING*);
 INTVAL
-string_ord(STRING* s, INTVAL index);
+string_ord(const STRING* s, INTVAL index);
 FLOATVAL
-string_to_num (struct Parrot_Interp *interpreter, STRING *s);
+string_to_num (const STRING *s);
 INTVAL
-string_to_int (struct Parrot_Interp *interpreter, STRING *s);
-void
-string_grow(STRING* s, INTVAL newsize);
+string_to_int (const STRING *s);
 void
 string_destroy(STRING* s);
 STRING*
-string_make(struct Parrot_Interp *interpreter, void *buffer, INTVAL buflen, const ENCODING *encoding, INTVAL flags, const CHARTYPE *type);
+string_make(struct Parrot_Interp *interpreter, const void *buffer,
+            INTVAL buflen, const ENCODING *encoding, INTVAL flags,
+            const CHARTYPE *type);
 STRING*
-string_copy(struct Parrot_Interp *interpreter, STRING *i);
+string_copy(struct Parrot_Interp *interpreter, const STRING *i);
 STRING*
-string_transcode(struct Parrot_Interp *interpreter, STRING *src, const ENCODING *encoding, const CHARTYPE *type, STRING *dest);
+string_transcode(struct Parrot_Interp *interpreter, const STRING *src,
+                 const ENCODING *encoding, const CHARTYPE *type, STRING **d);
 void
 string_init(void);
+static INTVAL
+string_index(const STRING* s, INTVAL index);
 
 #endif
 

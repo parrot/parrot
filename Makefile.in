@@ -44,7 +44,7 @@ all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} examples/mops/mops${exe
 
 #XXX This target is not portable to Win32
 
-shared: libparrot.so libcore_prederef_0_3.so
+shared: Libparrot.so libcore_prederef_0_3.so
 
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
@@ -173,6 +173,7 @@ clean:
 	$(RM_F) Parrot/Jit.pm
 	$(RM_F) include/parrot/jit_struct.h
 	$(RM_F) libparrot.so libcore_prederef_0_3.so
+ $(RM_F) *~
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..

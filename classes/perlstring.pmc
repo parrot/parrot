@@ -47,7 +47,7 @@ pmclass PerlString {
 
     INTVAL get_integer () {
 	STRING* s = (STRING*) SELF->cache.struct_val;
-	return string_to_int(interpreter, s);
+ return string_to_int(s);
     }
 
     INTVAL get_integer_index (INTVAL index) {
@@ -55,7 +55,7 @@ pmclass PerlString {
 
     FLOATVAL get_number () {
 	STRING* s = (STRING*) SELF->cache.struct_val;
-	return string_to_num(interpreter, s);
+ return string_to_num(s);
     }
 
     FLOATVAL get_number_index (INTVAL index) {
@@ -69,7 +69,7 @@ pmclass PerlString {
     }
 
     BOOLVAL get_bool () {
-	return string_bool(interpreter, SELF->cache.struct_val);
+ return string_bool(SELF->cache.struct_val);
     }
 
     void* get_value () {
@@ -455,7 +455,7 @@ pmclass PerlString {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-	                 string_to_int(interpreter, value), NULL
+                  string_to_int(value), NULL
 	                 );
     }
 
@@ -463,7 +463,7 @@ pmclass PerlString {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-	                 string_to_int(interpreter, value), NULL
+                  string_to_int(value), NULL
 	                 );
     }
 
@@ -471,7 +471,7 @@ pmclass PerlString {
 	dest->vtable = &Parrot_base_vtables[enum_class_PerlString];
 	dest->cache.struct_val =
            string_repeat(INTERP, SELF->cache.struct_val,
-	                 string_to_int(interpreter, value), NULL
+                  string_to_int(value), NULL
 	                 );
     }
 

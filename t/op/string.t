@@ -1,12 +1,15 @@
 #! perl -w
 
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 63;
 
-output_is( <<'CODE', <<OUTPUT, "set_s_sc" );
+output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
+ set S5, S4
 	print	S4
+ print S5
 	end
 CODE
+JAPH
 JAPH
 OUTPUT
 
@@ -18,21 +21,26 @@ output_is( <<'CODE', '4', "length_i_s" );
 	end
 CODE
 
-output_is( <<'CODE', <<OUTPUT, "chopn_s_ic" );
+output_is( <<'CODE', <<OUTPUT, "chopn_s_i|ic" );
 	set	S4, "JAPHxyzw"
 	set	S5, "japhXYZW"
-	set	S3, "\n"
+ set S3, S4
+ set S1  "\n"
+ set I1  4
 	chopn	S4, 3
 	chopn	S4, 1
-	chopn	S5, 4
+ chopn S5, I1
 	print	S4
-	print	S3
+ print S1
 	print	S5
+ print S1
 	print	S3
+ print S1
 	end
 CODE
 JAPH
 japh
+JAPHxyzw
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "chopn, OOB values");
@@ -57,25 +65,42 @@ A string of lengt
 ** nothing **
 OUTPUT
 
-output_is( <<'CODE', 'JAPH', "substr_s_s_i_i" );
+output_is( <<'CODE', <<'OUTPUT', "substr_s_s|sc_i|ic_i|ic" );
 	set	S4, "12345JAPH01"
 	set	I4, 5
 	set	I5, 4
 	substr	S5, S4, I4, I5
 	print	S5
+ substr S5, S4, I4, 4
+ print S5
+ substr S5, S4, 5, I5
+ print S5
+ substr S5, S4, 5, 4
+ print S5
+ substr S5, "12345JAPH01", I4, I5
+ print S5
+ substr S5, "12345JAPH01", I4, 4
+ print S5
+ substr S5, "12345JAPH01", 5, I5
+ print S5
+ substr S5, "12345JAPH01", 5, 4
+ print S5
+ print "\n"
 	end
 CODE
+JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
+OUTPUT
 
 # negative offsets
 output_is(<<'CODE', <<'OUTPUT', "neg substr offset");
 	set	S0, "A string of length 21"
-	set I0, -9
-	set I1, 6
-	substr_s_s_i S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
+ set I0, -9
+ set I1, 6
+ substr S1, S0, I0, I1
+ print S0
+ print "\n"
+ print S1
+ print "\n"
 	end
 CODE
 A string of length 21
@@ -83,28 +108,33 @@ length
 OUTPUT
 
 # This asks for substring it shouldn't be allowed...
-output_is(<<'CODE', 'Cannot take substr outside string', "sub err:OOR");
+output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
 	set	S0, "A string of length 21"
-	set I0, -99
-	set I1, 6
-	substr_s_s_i S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
+ set I0, -99
+ set I1, 6
+ substr S1, S0, I0, I1
+ end
+CODE
+
+# This asks for substring it shouldn't be allowed...
+output_is(<<'CODE', 'Cannot take substr outside string', "substr OOB");
+ set S0, "A string of length 21"
+ set I0, 99
+ set I1, 6
+ substr S1, S0, I0, I1
 	end
 CODE
 
 # This asks for substring much greater than length of original string
 output_is(<<'CODE', <<'OUTPUT', "len>strlen");
 	set	S0, "A string of length 21"
-	set I0, 12
-	set I1, 1000
-	substr_s_s_i S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
+ set I0, 12
+ set I1, 1000
+ substr S1, S0, I0, I1
+ print  S0
+ print "\n"
+ print S1
+ print "\n"
 	end
 CODE
 A string of length 21
@@ -114,55 +144,87 @@ OUTPUT
 # The same, with a negative offset
 output_is(<<'CODE', <<'OUTPUT', "len>strlen, -ve os");
 	set	S0, "A string of length 21"
-	set I0, -9
-	set I1, 1000
-	substr_s_s_i S1, S0, I0, I1
-	print S0
-	print "\n"
-	print S1
-	print "\n"
+ set I0, -9
+ set I1, 1000
+ substr S1, S0, I0, I1
+ print S0
+ print "\n"
+ print S1
+ print "\n"
 	end
 CODE
 A string of length 21
 length 21
 OUTPUT
 
-output_is( <<'CODE', '<><', "2-param concat, null onto null" );
-    print "<>"
-    concat S0,S0
-    print "<"
-    end
+output_is( <<'CODE', '<><', "concat_s_s|sc, null onto null" );
+ print "<>"
+ concat S0, S0
+ concat S1, ""
+ print "<"
+ end
 CODE
 
-output_is( <<'CODE', <<OUTPUT, '2-param concat, "foo1" onto null' );
-    concat S0,"foo1"
-    print S0
-    print "\n"
-    end
+output_is( <<'CODE', <<OUTPUT, 'concat_s_s|sc, "foo1" onto null' );
+ concat S0, "foo1"
+ set S1, "foo2"
+ concat S2, S1
+ print S0
+ print "\n"
+ print S2
+ print "\n"
+ end
 CODE
 foo1
-OUTPUT
-
-output_is( <<'CODE', <<OUTPUT, '2-param concat, "foo2" onto null' );
-    set S1,"foo2"
-    concat S0,S1
-    print S0
-    print "\n"
-    end
-CODE
 foo2
 OUTPUT
 
-output_is( <<'CODE', <<OUTPUT, "concat" );
-    set S1, "fish"
-    set S2, "bone"
-    concat S1, S2
-    print S1
-    set S2, "\n"
-    print S2
+output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc" );
+ set S1, "fish"
+ set S2, "bone"
+ concat S1, S2
+ print S1
+ concat S1, "\n"
+ print S1
     end
 CODE
-fishbone
+fishbonefishbone
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "concat_s_s|sc_s|sc" );
+ set S1, "japh"
+ set S2, "JAPH"
+ concat S0, "japh", "JAPH"
+ print S0
+ print "\n"
+ concat S0, S1, "JAPH"
+ print S0
+ print "\n"
+ concat S0, "japh", S2
+ print S0
+ print "\n"
+ concat S0, S1, S2
+ print S0
+ print "\n"
+    end
+CODE
+japhJAPH
+japhJAPH
+japhJAPH
+japhJAPH
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "concat - ensure copy is made" );
+ set S2, "JAPH"
+ concat S0, S2, ""
+ concat S1, "", S2
+ chopn S0, 1
+ chopn S1, 1
+ print S2
+ print "\n"
+ end
+CODE
+JAPH
 OUTPUT
 
 
@@ -201,7 +263,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "eq_sc_s_ic");
 @{[ compare_strings( 1, "eq", @strings ) ]}
     print "ok\\n"
     end
@@ -212,60 +274,26 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "eq_sc_s_ic");
-	set	S0, "I am legion"
-
-	eq	"I am legion", S0, GOOD1
-	print	"not "
-GOOD1:	print	"ok 1\\n"
-
-	eq	"I am legend", S0, BAD1
-	branch	GOOD2
-BAD1:	print	"not "
-GOOD2:	print	"ok 2\\n"
-	end
+output_is(<<CODE, <<OUTPUT, "eq_s_sc_ic");
+@{[ compare_strings( 2, "eq", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
 CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_sc_s_ic");
-	set	S0, "I am legion"
-
-	ne	"I am legend", S0, GOOD1
-	print	"not "
-GOOD1:	print	"ok 1\\n"
-
-	ne	"I am legion", S0, BAD1
-	branch	GOOD2
-BAD1:	print	"not "
-GOOD2:	print	"ok 2\\n"
-	end
+output_is(<<CODE, <<OUTPUT, "eq_sc_sc_ic");
+@{[ compare_strings( 3, "eq", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
 CODE
-ok 1
-ok 2
-OUTPUT
-
-output_is(<<CODE, <<OUTPUT, "eq_sc_s");
-
-	set	S0, "Sparticus"
-	bsr	TEST1
-	print	"ok 1\\n"
-	bsr	TEST2
-	print	"ok 2\\n"
-	end
-
-TEST1:	eq	"Sparticus", S0
-	print	"not "
-	ret
-
-TEST2:	ne	"Spartisnt", S0
-	print	"not "
-	ret
-
-CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_s_s_ic");
@@ -279,7 +307,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ne_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "ne_sc_s_ic");
 @{[ compare_strings( 1, "ne", @strings ) ]}
     print "ok\\n"
     end
@@ -288,6 +316,64 @@ ERROR:
     end
 CODE
 ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ne_s_sc_ic");
+@{[ compare_strings( 2, "ne", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ne_sc_sc_ic");
+@{[ compare_strings( 3, "ne", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "eq_s|sc_s|sc");
+
+	set	S0, "Sparticus"
+	bsr	TEST1
+	print	"ok 1\\n"
+	bsr	TEST2
+	print	"ok 2\\n"
+ bsr TEST3
+ print "ok 3\\n"
+ bsr TEST4
+ print "ok 4\\n"
+	end
+
+TEST1:	eq	"Sparticus", S0
+	print	"not "
+	ret
+
+TEST2: eq S0, "Sparticus"
+ print "not "
+ ret
+
+TEST3: eq S0, S0
+ print "not "
+ ret
+
+TEST4: eq "Sparticus", "Sparticus"
+	print	"not "
+	ret
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_s_s_ic");
@@ -301,8 +387,30 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "lt_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "lt_sc_s_ic");
 @{[ compare_strings( 1, "lt", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "lt_s_sc_ic");
+@{[ compare_strings( 2, "lt", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "lt_sc_sc_ic");
+@{[ compare_strings( 3, "lt", @strings ) ]}
     print "ok\\n"
     end
 ERROR:
@@ -323,8 +431,30 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "le_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "le_sc_s_ic");
 @{[ compare_strings( 1, "le", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "le_s_sc_ic");
+@{[ compare_strings( 2, "le", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "le_sc_sc_ic");
+@{[ compare_strings( 3, "le", @strings ) ]}
     print "ok\\n"
     end
 ERROR:
@@ -345,8 +475,30 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "gt_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "gt_sc_s_ic");
 @{[ compare_strings( 1, "gt", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "gt_s_sc_ic");
+@{[ compare_strings( 2, "gt", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "gt_sc_sc_ic");
+@{[ compare_strings( 3, "gt", @strings ) ]}
     print "ok\\n"
     end
 ERROR:
@@ -367,8 +519,30 @@ CODE
 ok
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "ge_s_sc_ic");
+output_is(<<CODE, <<OUTPUT, "ge_sc_s_ic");
 @{[ compare_strings( 1, "ge", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ge_s_sc_ic");
+@{[ compare_strings( 2, "ge", @strings ) ]}
+    print "ok\\n"
+    end
+ERROR:
+    print "bad\\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ge_sc_sc_ic");
+@{[ compare_strings( 3, "ge", @strings ) ]}
     print "ok\\n"
     end
 ERROR:
@@ -419,6 +593,12 @@ output_is(<<'CODE',ord('a'),'2-param ord, one-character string');
 	ord I0,"a"
 	print I0
 	end
+CODE
+
+output_is(<<'CODE',ord('a'),'2-param ord, multi-character string');
+ ord I0,"abc"
+ print I0
+ end
 CODE
 
 output_is(<<'CODE',ord('a'),'2-param ord, one-character string register');
@@ -493,6 +673,13 @@ output_is(<<'CODE',ord('b'),'3-param ord, multi-character string register, from 
 	end
 CODE
 
+output_is(<<'CODE','Cannot get character past end of string','3-param ord, multi-character string register, from end, OOB');
+ set S0,"ab"
+ ord I0,S0,-3
+ print I0
+ end
+CODE
+
 output_is(<<CODE, <<OUTPUT, "if_s_ic");
 	set	S0, "I've told you once, I've told you twice..."
 	if	S0, OK1
@@ -554,7 +741,7 @@ ok 8
 ok 9
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "repeat");
+output_is(<<CODE, <<OUTPUT, "repeat_s_s|sc_i|ic");
 	set S0, "x"
 
 	repeat S1, S0, 12
@@ -596,6 +783,12 @@ XXXXXXXXXXXX
 >< done
 OUTPUT
 
+output_is(<<'CODE','Cannot repeat with negative arg','repeat OOB');
+ repeat S0, "japh", -1
+ end
+CODE
+
+
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {
   my $code = shift;
@@ -623,21 +816,34 @@ sub compare_strings {
   while (@strings) {
     my $s1 = shift @strings;
     my $s2 = shift @strings;
-    my $arg;
-    $rt .= "    set S0, \"$s1\"\n";
-    if ($const) {
-      $arg = "\"$s2\"";
+    my $arg1;
+    my $arg2;
+    if ($const == 3) {
+ $arg1 = "\"$s1\"";
+ $arg2 = "\"$s2\"";
+    }
+    elsif ($const == 2) {
+ $rt .= "    set S0, \"$s1\"\n";
+ $arg1 = "S0";
+ $arg2 = "\"$s2\"";
+    }
+    elsif ($const == 1) {
+ $rt .= "    set S0, \"$s2\"\n";
+ $arg1 = "\"$s1\"";
+ $arg2 = "S0";
     }
     else {
-      $rt .= "    set S1, \"$s2\"\n";
-      $arg = "S1";
+ $rt .= "    set S0, \"$s1\"\n";
+ $rt .= "    set S1, \"$s2\"\n";
+ $arg1 = "S0";
+ $arg2 = "S1";
     }
     if (eval "\"$s1\" $op \"$s2\"") {
-      $rt .= "    $op S0, $arg, OK$i\n";
+      $rt .= "    $op $arg1, $arg2, OK$i\n";
       $rt .= "    branch ERROR\n";
     }
     else {
-      $rt .= "    $op S0, $arg, ERROR\n";
+      $rt .= "    $op $arg1, $arg2, ERROR\n";
     }
     $rt .= "OK$i:\n";
     $i++;

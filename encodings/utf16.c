@@ -77,8 +77,8 @@ utf16_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-utf16_skip_forward (void *ptr, INTVAL n) {
-    utf16_t *u16ptr = ptr;
+utf16_skip_forward (const void *ptr, INTVAL n) {
+    utf16_t *u16ptr = (utf16_t*)ptr;
 
     while (n-- > 0) {
       if (UNICODE_IS_HIGH_SURROGATE(*u16ptr)) {
@@ -100,8 +100,8 @@ utf16_skip_forward (void *ptr, INTVAL n) {
 }
 
 static void *
-utf16_skip_backward (void *ptr, INTVAL n) {
-    utf16_t *u16ptr = ptr;
+utf16_skip_backward (const void *ptr, INTVAL n) {
+    utf16_t *u16ptr = (utf16_t*)ptr;
 
     while (n--> 0) {
         u16ptr--;

@@ -44,15 +44,15 @@ utf32_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-utf32_skip_forward (void *ptr, INTVAL n) {
-    utf32_t *u32ptr = ptr;
+utf32_skip_forward (const void *ptr, INTVAL n) {
+    utf32_t *u32ptr = (utf32_t*)ptr;
 
     return u32ptr + n;
 }
 
 static void *
-utf32_skip_backward (void *ptr, INTVAL n) {
-    utf32_t *u32ptr = ptr;
+utf32_skip_backward (const void *ptr, INTVAL n) {
+    utf32_t *u32ptr = (utf32_t*)ptr;
 
     return u32ptr - n;
 }

@@ -41,15 +41,15 @@ singlebyte_encode (void *ptr, INTVAL c) {
 }
 
 static void *
-singlebyte_skip_forward (void *ptr, INTVAL n) {
-    byte_t *bptr = ptr;
+singlebyte_skip_forward (const void *ptr, INTVAL n) {
+    byte_t *bptr = (byte_t*)ptr;
 
     return bptr + n;
 }
 
 static void *
-singlebyte_skip_backward (void *ptr, INTVAL n) {
-    byte_t *bptr = ptr;
+singlebyte_skip_backward (const void *ptr, INTVAL n) {
+    byte_t *bptr = (byte_t*)ptr;
 
     return bptr - n;
 }

@@ -1484,10 +1484,13 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter, struct PackFi
 
     self->type   = PFC_STRING;
     if (encoding == 0) {
-        self->string = string_make(interpreter, cursor, size, NULL, flags, NULL); /* fixme */
+        self->string = string_make(interpreter, cursor, size, NULL, flags,
+                                   NULL); /* fixme */
     }
     else if (encoding == 3) {
-        self->string = string_make(interpreter, cursor, size, encoding_lookup("utf32"), flags, chartype_lookup("unicode")); /* fixme */
+        self->string = string_make(interpreter, cursor, size,
+                                   encoding_lookup("utf32"), flags,
+                                   chartype_lookup("unicode")); /* fixme */
     }
     else {
       return 0;
