@@ -34,13 +34,13 @@ Initializes the closure.
 
 */
 
-	void init () {
-		PMC_sub(SELF) = new_closure(INTERP);
-		PMC_struct_val(SELF) = NULL;
-		PObj_custom_mark_destroy_SETALL(SELF);
-		if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
-			printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
-	}
+    void init () {
+        PMC_sub(SELF) = new_closure(INTERP);
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+            printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+    }
 
 /*
 
@@ -52,11 +52,11 @@ Marks the closure as live.
 
 */
 
-	void mark () {
-		struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-		mark_stack(INTERP, sub->ctx.pad_stack);
-		SUPER();	/* mark warns ... in class Sub */
-	}
+    void mark () {
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        mark_stack(INTERP, sub->ctx.pad_stack);
+        SUPER();    /* mark warns ... in class Sub */
+    }
 
 
 /*
@@ -69,11 +69,11 @@ Invokes the closure.
 
 */
 
-	void* invoke (void* next) {
-		struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-		INTERP->ctx.pad_stack = sub->ctx.pad_stack;
-		return SUPER(next);
-	}
+    void* invoke (void* next) {
+        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+        INTERP->ctx.pad_stack = sub->ctx.pad_stack;
+        return SUPER(next);
+    }
 
 /*
 
@@ -85,14 +85,14 @@ Creates a clone of the closure and returns it.
 
 */
 
-	PMC* clone () {
-		struct Parrot_Sub * sub;
-		PMC* ret = SUPER();
-		sub = PMC_sub(ret);
-	        sub->ctx.pad_stack = stack_copy(interpreter,
-				PMC_sub(SELF)->ctx.pad_stack);
-		return ret;
-	}
+    PMC* clone () {
+        struct Parrot_Sub * sub;
+        PMC* ret = SUPER();
+        sub = PMC_sub(ret);
+        sub->ctx.pad_stack = stack_copy(interpreter,
+            PMC_sub(SELF)->ctx.pad_stack);
+        return ret;
+    }
 
 /*
 
@@ -104,10 +104,10 @@ Makes the closure the same as C<*value>.
 
 */
 
-	void set_same (PMC* value) {
-		PMC_sub(SELF) = PMC_sub(value);
-		PMC_struct_val(SELF) = PMC_struct_val(value);
-	}
+    void set_same (PMC* value) {
+        PMC_sub(SELF) = PMC_sub(value);
+        PMC_struct_val(SELF) = PMC_struct_val(value);
+    }
 
 /*
 
@@ -119,14 +119,14 @@ Returns whether the closure is the same as C<*value>.
 
 */
 
-	INTVAL is_equal (PMC* value) {
-		return (SELF->vtable == value->vtable &&
-		PMC_struct_val(SELF) == PMC_struct_val(value)
-		/* XXX -lt why?
-		 * && memcmp(PMC_sub(value), PMC_sub(SELF) ,
-		sizeof(struct Parrot_Sub)) == 0 */
-		);
-	}
+    INTVAL is_equal (PMC* value) {
+        return (SELF->vtable == value->vtable &&
+        PMC_struct_val(SELF) == PMC_struct_val(value)
+        /* XXX -lt why?
+         * && memcmp(PMC_sub(value), PMC_sub(SELF) ,
+        sizeof(struct Parrot_Sub)) == 0 */
+        );
+    }
 
 }
 
