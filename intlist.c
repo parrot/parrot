@@ -77,8 +77,10 @@
 #include "parrot/parrot.h"
 #include "parrot/intlist.h"
 
+static size_t rebuild_chunk_list(Interp *interpreter, IntList *list);
+
 IntList*
-intlist_new(Interp *interpreter)
+intlist_new(Interp *interpreter, int initial)
 {
     IntList* list;
 
@@ -93,6 +95,13 @@ intlist_new(Interp *interpreter)
     interpreter->GC_block_level++;
     Parrot_allocate(interpreter, (Buffer*) list,
                     INTLIST_CHUNK_SIZE * sizeof(INTVAL));
+    if (initial) {
+        /* XXX managed memory or custom destroy? */
+        list->chunk_list = mem_sys_allocate(sizeof(IntList_Chunk *));
+        list->n_chunks = 1;
+        list->collect_runs = interpreter->dod_runs;
+        list->chunk_list[0] = (IntList_Chunk*) list;
+    }
     interpreter->DOD_block_level--;
     interpreter->GC_block_level--;
     return list;
@@ -136,6 +145,26 @@ intlist_dump(FILE* fp, IntList* list, int verbose)
     fprintf(fp, "\n");
 }
 
+static size_t
+rebuild_chunk_list(Interp *interpreter, IntList *list)
+{
+    IntList_Chunk* chunk = (IntList_Chunk*) list;
+    IntList_Chunk* lastChunk = list->prev;
+    size_t len = 0;
+    while (1) {
+        if (len >= list->n_chunks)
+            list->chunk_list = mem_sys_realloc(list->chunk_list,
+                    (len + 1)* sizeof(IntList_Chunk *));
+        list->chunk_list[len] = chunk;
+        len++;
+        if (chunk == lastChunk) break;
+        chunk = chunk->next;
+    }
+    list->collect_runs = interpreter->dod_runs;
+    list->n_chunks = len;
+    return len;
+}
+
 static void
 add_chunk(Interp* interpreter, IntList* list)
 {
@@ -143,7 +172,7 @@ add_chunk(Interp* interpreter, IntList* list)
 
     if (chunk->next == list) {
         /* Need to add a new chunk */
-        IntList_Chunk* new_chunk = intlist_new(interpreter);
+        IntList_Chunk* new_chunk = intlist_new(interpreter, 0);
         new_chunk->next = list;
         new_chunk->prev = chunk;
         chunk->next = new_chunk;
@@ -161,6 +190,7 @@ push_chunk(Interp* interpreter, IntList* list)
     add_chunk(interpreter, list);
     list->prev->start = 0;
     list->prev->end = 0;
+    rebuild_chunk_list(interpreter, list);
 }
 
 static void
@@ -192,12 +222,17 @@ intlist_unshift(Interp *interpreter, IntList** list, INTVAL data)
     IntList_Chunk* chunk = (IntList_Chunk *) *list;
     INTVAL length = chunk->length + 1;
     INTVAL offset;
+    IntList_Chunk * o = chunk;
+    size_t n = chunk->n_chunks;
 
     /* Add on a new chunk if necessary */
     if (chunk->start == 0) {
         unshift_chunk(interpreter, *list);
         chunk = chunk->prev;
         *list = chunk;
+        (*list)->chunk_list = o->chunk_list;
+        (*list)->n_chunks = n;
+        rebuild_chunk_list(interpreter, *list);
     }
 
     ((INTVAL*)chunk->buffer.bufstart)[--chunk->start] = data;
@@ -211,6 +246,8 @@ intlist_shift(Interp *interpreter, IntList** list)
     IntList_Chunk* chunk = (IntList_Chunk *) *list;
     INTVAL length = chunk->length - 1;
     INTVAL value;
+    IntList_Chunk * o = chunk;
+    size_t n = chunk->n_chunks;
 
     if (chunk->start >= chunk->end) {
         internal_exception(OUT_OF_BOUNDS, "No entries on list!\n");
@@ -225,6 +262,9 @@ intlist_shift(Interp *interpreter, IntList** list)
         chunk->next->prev = chunk->prev;
         chunk->prev->next = chunk;
         *list = chunk->next;
+        (*list)->chunk_list = o->chunk_list;
+        (*list)->n_chunks = n;
+        rebuild_chunk_list(interpreter, *list);
     }
 
     (*list)->length = length;
@@ -245,6 +285,7 @@ intlist_pop(Interp *interpreter, IntList* list)
         chunk->next = list;
         list->prev = chunk->prev;
         chunk = chunk->prev;
+        list->n_chunks--;
     }
 
     /* Quick sanity check */
@@ -265,6 +306,13 @@ find_chunk(Interp* interpreter, IntList* list, INTVAL idx)
     IntList_Chunk* chunk = list;
     UNUSED(interpreter);
 
+#if 1
+    if (list->collect_runs != interpreter->dod_runs)
+        rebuild_chunk_list(interpreter, list);
+    idx +=  chunk->start;
+
+    return list->chunk_list[idx / INTLIST_CHUNK_SIZE];
+#else
     /* Possible optimization: start from the closer end of the chunk list */
 
     /* Find the chunk containing the requested element */
@@ -274,6 +322,7 @@ find_chunk(Interp* interpreter, IntList* list, INTVAL idx)
     }
 
     return chunk;
+#endif
 }
 
 INTVAL
@@ -347,7 +396,9 @@ intlist_assign(Interp* interpreter, IntList* list, INTVAL idx, INTVAL val)
 
     chunk = find_chunk(interpreter, list, idx);
 
-    ((INTVAL*)chunk->buffer.bufstart)[idx] = val;
+    if (idx >= list->end - list->start) idx -= list->end - list->start;
+    idx = idx % INTLIST_CHUNK_SIZE;
+    ((INTVAL*)chunk->buffer.bufstart)[idx + chunk->start] = val;
 }
 
 /*

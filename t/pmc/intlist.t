@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "creation");
@@ -145,3 +145,87 @@ info:
 CODE
 I need a shower.
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "direct access");
+        new P0, .IntList
+	set S0, ""
+	set S1, "abcdefghijklmnopqrst"
+        set I10, 100000
+	set I0, 0
+lp:
+	set P0[I0], I0
+	inc I0
+	mod I9, I0, 100
+	ne I9, 0, lp1
+	# force GC => 142 DOD + 142 collects / 10^5 accesses
+	new P1, .PerlArray
+	set P1[I0], I0
+	concat S0, S1, S1
+	set S2, S0
+	set S0, S1
+	set S2, ""
+lp1:
+	le I0, I10, lp
+
+	set I0, 0
+lp2:
+	set I1, P0[I0]
+	ne I0, I1, err
+	inc I0
+	le I0, I10, lp2
+	print "ok\n"
+	end
+err:
+        print "err: wanted "
+	print I0
+	print " got "
+	print I1
+	print "\n"
+	end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "shift/unshift");
+        new P0, .IntList
+	set I10, 100000
+	set S0, ""
+	set S1, "abcdefghijklmnopqrst"
+	set I0, 0
+lp:
+        unshift P0, I0
+	inc I0
+	mod I9, I0, 100
+	ne I9, 0, lp1
+	# force GC => 124 DOD + 124 collects / 10^5 accesses
+	new P1, .PerlArray
+	set P1[I0], I0
+	concat S0, S1, S1
+	set S2, S0
+	set S0, S1
+	set S2, ""
+lp1:
+	ne I0, I10, lp
+lp2:
+	dec I0
+	shift I1, P0
+	ne I0, I1, err
+	ne I0, 0, lp2
+	print "ok 1\n"
+	set I1, P0
+	set I0, 0
+	ne I0, 0, err
+	print "ok 2\n"
+	end
+err:
+        print "err: wanted "
+	print I0
+	print " got "
+	print I1
+	print "\n"
+	end
+CODE
+ok 1
+ok 2
+OUTPUT
+

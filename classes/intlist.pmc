@@ -30,7 +30,7 @@ pmclass IntList {
     }
 
     void init () {
-        SELF->data = intlist_new(INTERP);
+        SELF->data = intlist_new(INTERP, 1);
         SELF->cache.int_val = 0;
         SELF->flags |= PMC_custom_mark_FLAG;
     }
@@ -170,4 +170,13 @@ pmclass IntList {
         THROW_UNSUPPORTED;
         return 0;
     }
+
+    void unshift_integer (INTVAL value) {
+        intlist_unshift(INTERP, (IntList**) &SELF->data, value);
+    }
+
+    INTVAL shift_integer() {
+        return intlist_shift(INTERP, (IntList**) &SELF->data);
+    }
+
 }
