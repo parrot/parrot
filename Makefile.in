@@ -31,7 +31,7 @@ C_LIBS = ${libs}
 CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
-TEST_PROG = parrot${exe}
+TEST_PROG = test_parrot${exe}
 PDUMP = pdump${exe}
 MAKE_F = ${make}
 
