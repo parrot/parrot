@@ -12,7 +12,10 @@ OPS2C = -I..${slash}lib ..${slash}build_tools${slash}ops2c.pl
 # add your dynamic oplibs here
 
 all: myops_ops$(SO) myops_ops_cg$(SO) myops_ops_cgp$(SO) \
-    myops_ops_prederef$(SO) myops_ops_switch$(SO)
+     myops_ops_prederef$(SO) myops_ops_switch$(SO) \
+     \
+     dan_ops$(SO) dan_ops_cg$(SO) dan_ops_cgp$(SO) \
+     dan_ops_prederef$(SO) dan_ops_switch$(SO)
 
 .SUFFIXES: .ops .c $(SO)
 

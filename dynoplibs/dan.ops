@@ -1,0 +1,36 @@
+/*
+** dan.ops
+*/
+
+#include "parrot/dynext.h"
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+dan.ops - Parrot ops emitted by Dan's compiler
+
+=head1 DESCRIPTION
+
+A dynamic oplib loadable at demand.
+
+=over 4
+
+=item B<concat>(in PMC, in STR, in PMC)
+
+=cut
+
+inline op concat (in PMC, in STR, in PMC) :base_mem {
+  $1->vtable->set_string_native(interpreter, $1, string_concat(interpreter, $2, $3->vtable->get_string(interpreter, $1), 1));
+  goto NEXT();
+}
+
+=item B<mul>(out INT, in INT, in NUM)
+
+=cut
+
+inline op mul(out INT, in INT, in NUM) :base_core {
+  $1 = $2 * $3;
+  goto NEXT();
+}
+
+=back

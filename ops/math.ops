@@ -601,8 +601,6 @@ Set $1 to the product of $1 and $2.
 
 =item B<mul>(out INT, in INT, in INT)
 
-=item B<mul>(out INT, in INT, in NUM)
-
 =item B<mul>(out NUM, in NUM, in INT)
 
 =item B<mul>(out NUM, in NUM, in NUM)
@@ -648,11 +646,6 @@ inline op mul (in PMC, in PMC) :base_core {
 }
 
 inline op mul(out INT, in INT, in INT) :base_core {
-  $1 = $2 * $3;
-  goto NEXT();
-}
-
-inline op mul(out INT, in INT, in NUM) :base_core {
   $1 = $2 * $3;
   goto NEXT();
 }
