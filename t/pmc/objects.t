@@ -456,6 +456,9 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
     new P2, I0
     new P3, I0
  
+# Note that setattribute holds the actual PMC, not a copy, so
+# in this test both attributes get the PMC from P4, and should
+# both have the same value, despite the C<inc>.
     new P4, .PerlInt
     set P4, 10
     setattribute P2, 2, P4
