@@ -216,6 +216,18 @@ Parrot_band_i_i {
     Parrot_binop_x_x s/<op>/band/ s/<_N>/_i/
 }
 
+Parrot_shl_i_i {
+    Parrot_binop_x_x s/<op>/shl/ s/<_N>/_i/
+}
+
+Parrot_shr_i_i {
+    Parrot_binop_x_x s/<op>/shr/ s/<_N>/_i/
+}
+
+Parrot_lsr_i_i {
+    Parrot_binop_x_x s/<op>/lsr/ s/<_N>/_i/
+}
+
 Parrot_mul_n_n {
     Parrot_binop_x_x s/<op>/mul/ s/<_N>/_n/ s/ISR/FSR/ s/INT_R/NUM_R/
 }
@@ -341,6 +353,18 @@ Parrot_band_i_ic {
 
 Parrot_bxor_i_ic {
     Parrot_binop_x_xc s/<_N>/_i/ s/<op>/bxor/ s/<typ>/*INT/
+}
+
+Parrot_shl_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/shl/ s/<typ>/*INT/
+}
+
+Parrot_shr_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/shr/ s/<typ>/*INT/
+}
+
+Parrot_lsr_i_ic {
+    Parrot_binop_x_xc s/<_N>/_i/ s/<op>/lsr/ s/<typ>/*INT/
 }
 
 Parrot_sub_n_nc {
@@ -1357,6 +1381,7 @@ TEMPLATE Parrot_ifunless_sx_ic {
 #undef push_c
 }
 
+
 Parrot_if_s_ic {
     Parrot_ifunless_sx_ic s/<typ>/r/ s/<op>/emitm_jnz/
 }
@@ -1373,7 +1398,35 @@ Parrot_unless_sc_ic {
     Parrot_ifunless_sx_ic s/<typ>/c/ s/<op>/emitm_jz/
 }
 
-; TODO or,and,not
+TEMPLATE Parrot_ord_i_sx {
+# define push_r(i) \
+    jit_emit_mov_rm_i(NATIVECODE, emit_EAX, &SREG(i)); \
+        emitm_pushl_r(NATIVECODE, emit_EAX)
+# define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
+
+    emitm_pushl_i(NATIVECODE, 0);
+    push_<typ>(2);
+    emitm_pushl_i(NATIVECODE, interpreter);
+    call_func(jit_info, (void*)string_ord);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    if (MAP[1]) {
+        jit_emit_mov_rr_i(NATIVECODE, MAP[1], ISR1);
+    }
+    else {
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+#undef push_r
+#undef push_c
+}
+Parrot_ord_i_s {
+    Parrot_ord_i_sx s/<typ>/r/
+}
+
+Parrot_ord_i_sc {
+    Parrot_ord_i_sx s/<typ>/c/
+}
+
+; TODO or,and,not,cmp
 
 
 /*

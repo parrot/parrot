@@ -34,6 +34,12 @@ to get destroyed.
 
 */
 
+#ifdef JIT_CAPABLE
+#if EXEC_CAPABLE
+#  include "parrot/exec.h"
+#endif /* EXEC_CAPABLE */
+#include "parrot/jit.h"
+#endif
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)
 {
@@ -546,6 +552,7 @@ print_profile(int status, void *p)
     if (interpreter->profile != NULL) {
         UINTVAL j;
         int k;
+        int jit;
         UINTVAL op_count = 0;
         UINTVAL call_count = 0;
         FLOATVAL sum_time = 0.0;
@@ -554,8 +561,8 @@ print_profile(int status, void *p)
 
         PIO_printf(interpreter, "\n");
         PIO_printf(interpreter, "                   OPERATION PROFILE                 \n\n");
-        PIO_printf(interpreter, " CODE  OP FULL NAME            CALLS  TOTAL TIME   AVG T. ms\n");
-        PIO_printf(interpreter, " ----  -----------------    --------  ----------  ----------\n");
+        PIO_printf(interpreter, " CODE J OP FULL NAME            CALLS  TOTAL TIME   AVG T. ms\n");
+        PIO_printf(interpreter, " ---- - -----------------    --------  ----------  ----------\n");
 
         for (j = 0; j < interpreter->op_count + PARROT_PROF_EXTRA; j++) {
             UINTVAL n = profile->data[j].numcalls;
@@ -575,8 +582,15 @@ print_profile(int status, void *p)
                 sum_time += t;
 
                 k = profile->data[j].op;
-                PIO_printf(interpreter, " %4d  %-20s %8vu  %10vf  %10.4vf\n",
+                jit = ' ';
+#ifdef JIT_CAPABLE
+                if (k >= PARROT_PROF_EXTRA)
+                    jit = op_jit[k - PARROT_PROF_EXTRA].extcall != 1 ?
+                        'j' : ' ';
+#endif
+                PIO_printf(interpreter, " %4d %c %-20s %8vu  %10vf  %10.4vf\n",
                         k - PARROT_PROF_EXTRA,
+                        jit,
                         op_name(interpreter, k),
                         n,
                         t,
@@ -585,8 +599,8 @@ print_profile(int status, void *p)
             }
         }
 
-        PIO_printf(interpreter, " ----  -----------------    --------  ----------  ----------\n");
-        PIO_printf(interpreter, " %4vu  %-20s %8vu  %10vf  %10.4vf\n",
+        PIO_printf(interpreter, " ---- - -----------------    --------  ----------  ----------\n");
+        PIO_printf(interpreter, " %4vu   %-20s %8vu  %10vf  %10.4vf\n",
                 op_count,
                 "",
                 call_count,
