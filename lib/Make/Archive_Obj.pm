@@ -1,11 +1,11 @@
-package Make::Link_Obj;
+package Make::Archive_Obj;
 use Exporter;
 
 use vars qw(@ISA @EXPORT_OK);
 @ISA=qw(Make::Dependency);
-@EXPORT_OK = qw(Link);
+@EXPORT_OK = qw(Archive);
 
-my $program = "cc";
+my $program = "ar";
 sub program { $program = shift; }
 
 my @flags = ();
@@ -14,12 +14,15 @@ sub flags { @flags = @_ }
 my @libraries = ();
 sub libraries { @libraries = @_ }
 
-sub Link {
-  my $class = 'Make::Link_Obj';
+my @library_paths = ();
+sub library_paths { @library_paths = @_ }
+
+sub Archive {
+  my $class = 'Make::Archive_Obj';
   my %args = @_;
   unless(exists $args{input} and
          exists $args{dependsOn}) {
-    my $target = "*** make.pl: Link() called from line ".(caller(0))[2];
+    my $target = "*** make.pl: Archive() called from line ".(caller(0))[2];
     unless(exists $args{input}) {
       print STDERR "$target had no input specified.\n";
     }
@@ -40,20 +43,26 @@ sub Link {
     dependsOn => $args{dependsOn},
     input => $args{input},
     output => $args{output},
-    type => 'Link',
+    type => 'Archive',
   }, $class;
   $self;
 }
 
 sub build {
   my ($self) = @_;
+  my $return_val = undef;
   my $flags = $self->_flags_string();
-  my $libraries = $self->_library_string();
-  my $library_paths = $self->_library_path_string();
+#  my $libraries = $self->_library_string();
+#  my $library_paths = $self->_library_path_string();
 
-  { action =>
-      "$program $flags $library_paths $libraries -o $self->{output} ".join ' ',@{$self->{input}},
-  };
+  # XXX Only run if under UNIX
+
+  unless($^O =~ /Win/) {
+    $return_val = { action =>
+      "$program crs $flags -o $self->{output} ".join ' ',@{$self->{input}},
+    };
+  }
+  return $return_val;
 }
 
 1;

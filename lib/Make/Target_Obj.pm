@@ -22,6 +22,7 @@ sub Target {
   $args{dependsOn} = [$args{dependsOn}]
     unless ref($args{dependsOn}) eq 'ARRAY';
   my $self = bless {
+    action => $args{action} || undef,
     dependsOn => $args{dependsOn},
     input => $args{input},
     output => '', # No real 'output' here, I think.
@@ -32,10 +33,13 @@ sub Target {
 
 sub build {
   my ($self) = @_;
+  my $return_val = undef;
 
-#  { action => "cc -o $self->{output} $self->{input}",
-#  };
-  undef;
+  if(defined $self->{action}) {
+    $return_val = $self->{action}
+  }
+
+  $return_val;
 }
 
 1;

@@ -1,12 +1,12 @@
-package Make::Link_Obj;
+package Make::Link_Shared_Obj;
 use Exporter;
 
 use vars qw(@ISA @EXPORT_OK);
 @ISA=qw(Make::Dependency);
-@EXPORT_OK = qw(Link);
+@EXPORT_OK = qw(Link_Shared);
 
 my $program = "cc";
-sub program { $program = shift; }
+sub program { $program = shift }
 
 my @flags = ();
 sub flags { @flags = @_ }
@@ -14,12 +14,15 @@ sub flags { @flags = @_ }
 my @libraries = ();
 sub libraries { @libraries = @_ }
 
-sub Link {
-  my $class = 'Make::Link_Obj';
+my @library_paths = ();
+sub library_paths { @library_paths = @_ }
+
+sub Link_Shared {
+  my $class = 'Make::Link_Shared_Obj';
   my %args = @_;
   unless(exists $args{input} and
          exists $args{dependsOn}) {
-    my $target = "*** make.pl: Link() called from line ".(caller(0))[2];
+    my $target = "*** make.pl: Link_Shared() called from line ".(caller(0))[2];
     unless(exists $args{input}) {
       print STDERR "$target had no input specified.\n";
     }
@@ -33,14 +36,10 @@ sub Link {
   $args{input} = [$args{input}]
     unless ref($args{input}) eq 'ARRAY';
   my $self = bless {
-    local_flags => $args{flags} || undef,
-    local_libraries => $args{libraries} || undef,
-    local_library_paths => $args{library_paths} || undef,
-
     dependsOn => $args{dependsOn},
     input => $args{input},
     output => $args{output},
-    type => 'Link',
+    type => 'Link_Shared',
   }, $class;
   $self;
 }
@@ -52,7 +51,8 @@ sub build {
   my $library_paths = $self->_library_path_string();
 
   { action =>
-      "$program $flags $library_paths $libraries -o $self->{output} ".join ' ',@{$self->{input}},
+      "$program @flags -shared -o $self->{output} " .
+        join ' ',@{$self->{input}},
   };
 }
 

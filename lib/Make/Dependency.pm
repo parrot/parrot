@@ -2,7 +2,7 @@ package Make::Dependency;
 
 use vars qw(@ISA @EXPORT_OK);
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(Object Executable);
+@EXPORT_OK = qw(Object Shared_Object Executable);
 
 sub DEBUG () { 1 }
 
@@ -18,6 +18,19 @@ sub Object {
   $args{input};
 }
 
+sub Shared_Object {
+  my %args = @_;
+  unless(exists $args{input}) {
+    my $target =
+      "*** make.pl: Shared_Object() called from line ".(caller(0))[2];
+    unless(exists $args{input}) {
+      print STDERR "$target had no input specified.\n";
+    }
+  }
+  $args{input} .= $^O =~ /Win/ ? '.dll' : '.so';
+  $args{input};
+}
+
 sub Executable {
   my %args = @_;
   unless(exists $args{input}) {
@@ -28,6 +41,24 @@ sub Executable {
   }
   $args{input} .= $^O =~ /Win/ ? '.exe' : '';
   $args{input};
+}
+
+sub _library_path_string {
+  my $self = shift;
+  my $lib_path_string;
+  $lib_path_string .= join ' ', @{$self->{library_paths}};
+  $lib_path_string .= join ' ', @{$self->{local_library_paths}};
+
+  $lib_path_string;
+}
+
+sub _library_string {
+  my $self = shift;
+  my $lib_string;
+  $lib_string .= join ' ', @{$self->{libraries}};
+  $lib_string .= join ' ', @{$self->{local_libraries}};
+
+  $lib_string;
 }
 
 sub satisfied {

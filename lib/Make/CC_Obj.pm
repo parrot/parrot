@@ -6,6 +6,18 @@ use vars qw(@ISA @EXPORT_OK);
 @ISA=("Make::Dependency",'Exporter');
 @EXPORT_OK = qw(CC);
 
+my $program = $^O=~/Win/ ? 'cl' : 'cc';
+sub program { $program = shift }
+
+my @flags = ();
+sub flags { @flags = @_ }
+
+my @libraries = ();
+sub libraries { @libraries = @_ }
+
+my @library_paths = ();
+sub library_paths { @library_paths = @_ }
+
 sub CC {
   my $class = 'Make::CC_Obj';
   my %args = @_;
@@ -33,8 +45,11 @@ sub CC {
 
 sub build {
   my ($self) = @_;
+  my $flags = $self->_flags_string();
+  my $libraries = $self->_library_string();
+  my $library_paths = $self->_library_path_string();
 
-  { action => "cc -c $self->{input}",
+  { action => "$program $flags $library_paths $libraries -c $self->{input}",
   };
 }
 
