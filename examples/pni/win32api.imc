@@ -1,0 +1,42 @@
+# This example calls the MessageBoxA Win32 API using the Parrot Native
+# Call Interface.  The function is defined as:-
+# 
+# int MessageBox(
+#     HWND hWnd,
+#     LPCTSTR lpText,
+#     LPCTSTR lpCaption,
+#     UINT uType
+# );
+
+# This is the entry point.
+.sub _MAIN
+	# Load user32.dll library and the MessageBoxA API.
+	.sym var libuser32
+	.sym var MessageBoxA
+	loadlib libuser32, "user32"
+	dlfunc MessageBoxA, libuser32, "MessageBoxA", "llttl"
+	
+	# Set up parameters for the message box.
+	.sym int phWnd
+	.sym string message
+	.sym string caption
+	.sym int style
+	phWnd = 0	# Parent window handle - we have none.
+	message = "This is a message from Parrot!"
+	caption = "Hey, you!"
+	style = 64  # This gives us a nice i in a speech bubble icon.
+	
+	# Invoke MessageBoxA.
+	.sym int retVal
+	.pcc_begin prototyped
+		.arg phWnd
+		.arg message
+		.arg caption
+		.arg style
+		.nci_call MessageBoxA
+		.result retVal
+	.pcc_end
+	
+	# That's all, folks.
+	end
+.end
