@@ -783,7 +783,7 @@ string_from_int(struct Parrot_Interp * interpreter, INTVAL i) {
 
     if(i < 0) {
         neg = 1;
-        i = abs(i);
+        i = -i;
     }
 
     /* Dangerous looking but no 32/64/128/.... bit int
