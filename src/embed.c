@@ -54,7 +54,18 @@ extern void Parrot_initialize_core_pmcs(Interp *interp);
 =item C<void Parrot_init(Interp *interpreter)>
 
 Initializes the new interpreter. This function only has effect the first
-time it is called.
+time it is called. Use this function, when you intend to enter the run loop,
+which automatically sets the top of stack pointer.
+
+=item C<void Parrot_init_stacktop(Interp *interpreter, void *stack_top)>
+
+Like above. Additionally sets the stack top, so that Parrot objects created
+in inner stack frames will be visible during DODs stack walking code.
+B<stack_top> should be the address of an automatic variable in the callers
+stack frame. All unachored Parrot objects (PMCs) must live in inner stack
+frames so that they are not destroyed during DOD runs.
+
+Use this function, when you call into Parrot before entering a run loop.
 
 =cut
 
@@ -72,6 +83,14 @@ Parrot_init(Interp *interpreter)
         interpreter->world_inited = 1;
         init_world(interpreter);
     }
+}
+
+void
+Parrot_init_stacktop(Interp *interpreter, void *stack_top)
+{
+    interpreter->lo_var_ptr = stack_top;
+    interpreter->resume_flag &= ~RESUME_INITIAL;
+    Parrot_init(interpreter);
 }
 
 /*

@@ -24,6 +24,7 @@ typedef int Parrot_warnclass;
 Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 void Parrot_init(Parrot_Interp);
+void Parrot_init_stacktop(Parrot_Interp, void *);
 
 void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
 void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);

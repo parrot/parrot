@@ -724,15 +724,18 @@ runops_int(Interp *interpreter, size_t offset)
     opcode_t *(*core) (Interp *, opcode_t *) =
         (opcode_t *(*) (Interp *, opcode_t *)) 0;
 
-    /*
-     * setup event function ptrs and set the stack limit
-     */
     if (interpreter->resume_flag & RESUME_INITIAL) {
-        setup_event_func_ptrs(interpreter);
         /*
          * if we are entering the run loop the first time
          */
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+    }
+
+    /*
+     * setup event function ptrs
+     */
+    if (!interpreter->save_func_table) {
+        setup_event_func_ptrs(interpreter);
     }
 
     interpreter->resume_offset = offset;
