@@ -604,8 +604,8 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name, SymReg ** r,
         }
     }
     else if (n == 3 &&
-            !strcmp(name, "cmp_str") ||
-            !strcmp(name, "cmp_num")) {
+            (!strcmp(name, "cmp_str") ||
+            !strcmp(name, "cmp_num"))) {
         name = "cmp";
         changed = 1;
     }
