@@ -401,7 +401,7 @@ output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute");
     find_type I0, "Foo"
     new P2, I0
     new P3, .PerlInt
-    setattribute P2, 0, P3
+    setattribute P2, 8, P3
     end
 CODE
 /No such attribute/
@@ -411,7 +411,7 @@ output_like(<<'CODE', <<'OUTPUT', "getting non-existant attribute");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
-    getattribute P3, P2, 0
+    getattribute P3, P2, 8
     end
 CODE
 /No such attribute/

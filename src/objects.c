@@ -104,7 +104,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
                 /* Note the current offset as where this class'
                    attributes start */
                 VTABLE_set_integer_keyed_str(interpreter,
-                                             attr_offset_hash,
+                                             class_offset_hash,
                                              parent_name, cur_offset);
                 partial_name = string_concat(interpreter, parent_name,
                                              string_from_cstring(interpreter, "\0", 1),
@@ -127,7 +127,7 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
        child class works better */
     classname = VTABLE_get_string_keyed_int(interpreter, obj_array,
                                             PCD_CLASS_NAME);
-    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, classname,
+    VTABLE_set_integer_keyed_str(interpreter, class_offset_hash, classname,
                                  cur_offset);
     {
         PMC *attribs;
@@ -141,14 +141,15 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
             partial_name = string_concat(interpreter, classname,
                                          string_from_cstring(interpreter, "\0", 1),
                                          0);
-
-            for (offset = 0; offset < attr_count; offset++) {
-                STRING *attr_name;
-                STRING *full_name;
-                attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
-                                                        offset);
-                full_name = string_concat(interpreter, partial_name, attr_name, 0);
-                VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
+            if (attr_count) {
+                for (offset = 0; offset < attr_count; offset++) {
+                    STRING *attr_name;
+                    STRING *full_name;
+                    attr_name = VTABLE_get_string_keyed_int(interpreter, attribs,
+                                                            offset);
+                    full_name = string_concat(interpreter, partial_name, attr_name, 0);
+                    VTABLE_set_integer_keyed_str(interpreter, attr_offset_hash, full_name, cur_offset++);
+                }
             }
         }
     }
@@ -159,15 +160,14 @@ rebuild_attrib_stuff(Parrot_Interp interpreter, PMC *class) {
     VTABLE_set_pmc_keyed_int(interpreter, obj_array, PCD_ATTRIB_OFFS,
                              class_offset_hash);
     /* And note the totals */
-    class->cache.int_val = cur_offset;
-
+    class->cache.int_val = cur_offset - POD_FIRST_ATTRIB;
     return;
 }
 
 /*
 
 =item C<PMC *
-Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
+Parrot_single_subclass(Parrot_Interp ointerpreter, PMC *base_class,
                        STRING *child_class_name)>
 
 Subclass a class. Single parent class, nice and straightforward. If
@@ -258,6 +258,8 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
 
     Parrot_class_register(interpreter, child_class_name, child_class);
 
+    rebuild_attrib_stuff(interpreter, child_class);
+
     return child_class;
 }
 
@@ -302,6 +304,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
             classname_pmc);
 
     Parrot_class_register(interpreter, class_name, class);
+    rebuild_attrib_stuff(interpreter, class);
 }
 
 /*
@@ -810,7 +813,12 @@ Parrot_get_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib)
 {
     PMC *attrib_array;
     if (PObj_is_object_TEST(object)) {
+        INTVAL attrib_count;
         attrib_array = PMC_data(object);
+        attrib_count = VTABLE_elements(interpreter, attrib_array);
+        if (attrib > attrib_count || attrib < 0) {
+            internal_exception(OUT_OF_BOUNDS, "No such attribute");
+        }
         return VTABLE_get_pmc_keyed_int(interpreter, attrib_array, attrib);
     }
     else {
@@ -823,7 +831,12 @@ void
 Parrot_set_attrib_by_num(Parrot_Interp interpreter, PMC *object, INTVAL attrib, PMC *value) {
     PMC *attrib_array;
     if (PObj_is_object_TEST(object)) {
+        INTVAL attrib_count;
         attrib_array = PMC_data(object);
+        attrib_count = VTABLE_elements(interpreter, attrib_array);
+        if (attrib > attrib_count || attrib < 0) {
+            internal_exception(OUT_OF_BOUNDS, "No such attribute");
+        }
         VTABLE_set_pmc_keyed_int(interpreter, attrib_array, attrib, value);
     }
     else {
