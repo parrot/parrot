@@ -41,8 +41,9 @@
         ((interpreter)->arena_base->GC_block_level)
 
 enum {
-    DOD_trace_stack_FLAG = 1 << 0,
-    DOD_lazy_FLAG        = 1 << 1
+    DOD_trace_stack_FLAG = 1 << 0,      /* trace system areads and stack */
+    DOD_lazy_FLAG        = 1 << 1,      /* timely destruction run */
+    DOD_finish_FLAG      = 1 << 2       /* run async past sweep */
 };
 
 void Parrot_do_dod_run(struct Parrot_Interp *, UINTVAL flags);
@@ -69,10 +70,13 @@ extern int CONSERVATIVE_POINTER_CHASING;
 int Parrot_dod_trace_root(Interp *, int trace_stack);
 int Parrot_dod_trace_children(Interp *, size_t how_many);
 void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
+void Parrot_dod_ms_run_init(Interp *interpreter);
 
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);
+/* synchron entry point, mainly for lazy sweeps */
+void Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags);
 
 #endif /* PARROT_DOD_H_GUARD */
 

@@ -91,6 +91,7 @@ struct Arenas {
                                    requests are there? */
     UINTVAL num_early_DOD_PMCs; /* how many PMCs want immediate destruction */
     UINTVAL num_early_PMCs_seen;/* how many such PMCs has DOD seen */
+    UINTVAL num_extended_PMCs;  /* active PMCs having pmc_ext */
     PMC* dod_mark_ptr;          /* last PMC marked during a DOD run */
     PMC* dod_trace_ptr;         /* last PMC trace_children was called on */
     int lazy_dod;               /* flag that indicates whether we should stop

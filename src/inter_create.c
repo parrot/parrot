@@ -308,8 +308,11 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     }
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
-     * no DOD run, so everything is considered dead
+     *
+     * Be sure that an async collector hasn't live bits set now, so
+     * trigger a finish run
      */
+    Parrot_do_dod_run(interpreter, DOD_finish_FLAG);
 
     Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
 

@@ -42,6 +42,8 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 static size_t find_common_mask(size_t val1, size_t val2);
 static void profile_dod_end(Parrot_Interp, int what);
 static void trace_active_buffers(Interp *interpreter);
+static void profile_dod_start(Parrot_Interp interpreter);
+static void profile_dod_end(Parrot_Interp interpreter, int what);
 
 /*
 
@@ -93,6 +95,7 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         hi_prio = 0;
 
     if (obj->pmc_ext) {
+        ++arena_base->num_extended_PMCs;
         /*
          * XXX this basically invalidates the high-priority marking
          *     of PMCs by putting all PMCs onto the front of the list
@@ -240,6 +243,12 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)>
 Trace the root set. Returns 0 if its a lazy DOD run and all objects
 that need timely destruction were found.
 
+C<trace_stack> can have these values:
+
+ 0 ... trace normal roots, no system areas
+ 1 ... trace whole root set
+ 2 ... trace system areas only
+
 =cut
 
 */
@@ -253,6 +262,7 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     struct Arenas *arena_base = interpreter->arena_base;
     PMC *current;
+
     /* Pointer to the currently being processed PMC
      *
      * initialize locals to zero, so no garbage is on stack
@@ -262,6 +272,12 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     unsigned int i = 0;
     struct Stash *stash = 0;
 
+    if (trace_stack == 2) {
+        trace_system_areas(interpreter);
+        return 0;
+    }
+    if (interpreter->profile)
+        profile_dod_start(interpreter);
     /* We have to start somewhere, the interpreter globals is a good place */
     arena_base->dod_trace_ptr = arena_base->dod_mark_ptr = current =
         interpreter->iglobals;
@@ -334,6 +350,8 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 
     /* And the buffers */
     trace_active_buffers(interpreter);
+    if (interpreter->profile)
+        profile_dod_end(interpreter, PARROT_PROF_DOD_p1);
     return 1;
 }
 
@@ -379,7 +397,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
      * all these, we could skip that
      */
     if (interpreter->profile)
-        profile_dod_end(interpreter, PARROT_PROF_DOD_p1);
+        profile_dod_start(interpreter);
     pt_DOD_mark_root_finished(interpreter);
 
     for (; current != prev; current = PMC_next_for_GC(current)) {
@@ -434,6 +452,8 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
         }
     }
     arena_base->dod_trace_ptr = current;
+    if (interpreter->profile)
+        profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
     return 1;
 }
 
@@ -1054,14 +1074,44 @@ profile_dod_end(Parrot_Interp interpreter, int what)
 =item C<void
 Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)>
 
-See if we can find some unused headers.
+Call the configured garbage collector to reclaim unused headers.
+
+=item C<static void
+parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)>
+
+Run the stop-the-world mark & sweep collector.
+
+
+=item C<void
+Parrot_dod_ms_run_init(Interp *interpreter, UINTVAL flags)>
+
+Prepare for a mark & sweep DOD run.
 
 =cut
 
 */
 
 void
-Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
+Parrot_dod_ms_run_init(Interp *interpreter)
+{
+    struct Arenas *arena_base = interpreter->arena_base;
+    int j;
+
+    arena_base->dod_trace_ptr = NULL;
+    arena_base->num_early_PMCs_seen = 0;
+    arena_base->num_extended_PMCs = 0;
+#if ARENA_DOD_FLAGS
+    clear_live_counter(interpreter, arena_base->pmc_pool);
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        header_pool = arena_base->sized_header_pools[j];
+        if (header_pool)
+            clear_live_counter(interpreter, header_pool);
+    }
+#endif
+}
+
+static void
+parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
 {
     struct Arenas *arena_base = interpreter->arena_base;
     struct Small_Object_Pool *header_pool;
@@ -1072,35 +1122,26 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
     if (arena_base->DOD_block_level) {
         return;
     }
-    pt_DOD_start_mark(interpreter);
+    /*
+     * the sync sweep is always at the end, so that
+     * the live bits are cleared
+     */
+    if (flags & DOD_finish_FLAG)
+        return;
     ++arena_base->DOD_block_level;
+    arena_base->lazy_dod = flags & DOD_lazy_FLAG;
     /*
      * tell the threading system that we gonna DOD mark
      */
+    pt_DOD_start_mark(interpreter);
+    Parrot_dod_ms_run_init(interpreter);
 
-    arena_base->lazy_dod = flags & DOD_lazy_FLAG;
-    arena_base->dod_trace_ptr = NULL;
-    arena_base->num_early_PMCs_seen = 0;
-
-    if (interpreter->profile)
-        profile_dod_start(interpreter);
-
-#if ARENA_DOD_FLAGS
-    clear_live_counter(interpreter, arena_base->pmc_pool);
-    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-        header_pool = arena_base->sized_header_pools[j];
-        if (header_pool)
-            clear_live_counter(interpreter, header_pool);
-    }
-#endif
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interpreter, flags & DOD_trace_stack_FLAG)) {
 
         /*
          * mark is now finished
          */
-        if (interpreter->profile)
-            profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
         /* pt_DOD_stop_mark(interpreter); */
         /* Now put unused PMCs on the free list */
         header_pool = arena_base->pmc_pool;
@@ -1142,6 +1183,17 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
     arena_base->dod_trace_ptr = NULL;
     --arena_base->DOD_block_level;
     return;
+}
+
+void
+Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
+{
+#if PARROT_GC_MS
+    parrot_dod_ms_run(interpreter, flags);
+#endif
+#if PARROT_GC_IMS
+    Parrot_dod_ims_run(interpreter, flags);
+#endif
 }
 
 /*
