@@ -36,7 +36,7 @@ Initialises the PMC with a default value of C<0.0>.
     void init() {
         PMC_num_val(SELF) = 0.0;
     }
-    
+
 /*
 
 =item C<void add(PMC *value, PMC *dest)>
@@ -50,7 +50,7 @@ Returns in C<*dest> the result of adding the PMC to C<*value>.
     void add(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_ADD);
     }
-    
+
 /*
 
 =item C<void subtract(PMC *value, PMC *dest)>
@@ -64,7 +64,7 @@ Returns in C<*dest> the result of subtracting C<*value> from the PMC.
     void subtract(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SUBTRACT);
     }
-    
+
 /*
 
 =item C<void multiply(PMC *value, PMC *dest)>
@@ -78,7 +78,7 @@ Returns in C<*dest> the result of multiplying the PMC by C<*value>.
     void multiply(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MULTIPLY);
     }
-    
+
 /*
 
 =item C<void divide(PMC *value, PMC *dest)>
@@ -92,7 +92,7 @@ Returns in C<*dest> the result of dividing the PMC by C<*value>.
     void divide(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_DIVIDE);
     }
-    
+
 /*
 
 =item C<void modulus(PMC *value, PMC *dest)>
@@ -106,7 +106,7 @@ Returns in C<*dest> the result of PMC modulo C<*value>.
     void modulus(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_MOD);
     }
-    
+
 /*
 
 =item C<void cmodulus(PMC *value, PMC *dest)>
@@ -120,7 +120,7 @@ Returns in C<*dest> the result of PMC C-style modulo C<*value>.
     void cmodulus(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CMOD);
     }
-    
+
 /*
 
 =item C<void bitwise_and(PMC *value, PMC *dest)>
@@ -135,7 +135,7 @@ PMC and C<*value>.
     void bitwise_and(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BAND);
     }
-    
+
 /*
 
 =item C<void bitwise_or(PMC *value, PMC *dest)>
@@ -150,7 +150,7 @@ PMC and C<*value>.
     void bitwise_or(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BOR);
     }
-    
+
 /*
 
 =item C<void bitwise_xor(PMC *value, PMC *dest)>
@@ -165,7 +165,7 @@ PMC and C<*value>.
     void bitwise_xor(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BXOR);
     }
-    
+
 /*
 
 =item C<void bitwise_shl(PMC *value, PMC *dest)>
@@ -180,7 +180,7 @@ Returns in C<*dest> the result of applying a bitwise shift left
     void bitwise_shl(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSL);
     }
-    
+
 /*
 
 =item C<void bitwise_shr(PMC *value, PMC *dest)>
@@ -195,7 +195,7 @@ Returns in C<*dest> the result of applying a bitwise shift right
     void bitwise_shr(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_BSR);
     }
-    
+
 /*
 
 =item C<void concatenate(PMC *value, PMC *dest)>
@@ -209,7 +209,7 @@ Returns in C<*dest> the result of concatenating the PMC with C<*value>.
     void concatenate(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_CONCAT);
     }
-    
+
 /*
 
 =item C<void logical_and(PMC *value, PMC *dest)>
@@ -224,7 +224,7 @@ PMC and C<*value>.
     void logical_and(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LAND);
     }
-    
+
 /*
 
 =item C<void logical_or(PMC *value, PMC *dest)>
@@ -239,7 +239,7 @@ PMC and C<*value>.
     void logical_or(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LOR);
     }
-    
+
 /*
 
 =item C<void logical_xor(PMC *value, PMC *dest)>
@@ -254,7 +254,7 @@ PMC and C<*value>.
     void logical_xor(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_LXOR);
     }
-    
+
 /*
 
 =item C<void repeat(PMC *value, PMC *dest)>
@@ -268,7 +268,7 @@ Returns in C<*dest> the result of repeating the PMC C<*value> times.
     void repeat(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_REPEAT);
     }
-    
+
 /*
 
 =item C<INTVAL is_equal(PMC *value)>
@@ -282,10 +282,12 @@ Returns whether the PMC is equal to C<*value>.
     INTVAL is_equal(PMC* value) {
         return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMEQ);
     }
-    
+
 /*
 
-=item C<INTVAL cmp(PMC *value)>
+=item C<INTVAL cmp_num(PMC *value)>
+
+=item C<INTVAL cmp_string(PMC *value)>
 
 Returns a comparison result (i.e. one of C<{-1, 0, 1}>) for the PMC and
 C<*value>.
@@ -295,9 +297,18 @@ C<*value>.
 */
 
     INTVAL cmp(PMC* value) {
+        /* XXX */
         return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMCMP);
     }
-    
+
+    INTVAL cmp_num(PMC* value) {
+        return mmd_dispatch_intval(INTERP, SELF, value, MMD_NUMCMP);
+    }
+
+    INTVAL cmp_string(PMC* value) {
+        return mmd_dispatch_intval(INTERP, SELF, value, MMD_STRCMP);
+    }
+
 /*
 
 =item C<void bitwise_ors(PMC *value, PMC *dest)>
@@ -312,7 +323,7 @@ and C<*value>.
     void bitwise_ors(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SOR);
     }
-    
+
 /*
 
 =item C<void bitwise_ands(PMC *value, PMC *dest)>
@@ -327,7 +338,7 @@ and C<*value>.
     void bitwise_ands(PMC* value, PMC* dest) {
         mmd_dispatch_pmc(INTERP, SELF, value, dest, MMD_SAND);
     }
-    
+
 /*
 
 =item C<void bitwise_xors(PMC *value, PMC *dest)>

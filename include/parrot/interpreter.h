@@ -348,6 +348,10 @@ void Parrot_runops_fromc(Parrot_Interp, PMC *sub);
 void Parrot_runops_fromc_save(Parrot_Interp, PMC *sub);
 void* Parrot_runops_fromc_args(Parrot_Interp, PMC *sub, const char *sig, ...);
 void* Parrot_runops_fromc_args_save(Parrot_Interp, PMC *, const char *, ...);
+INTVAL Parrot_runops_fromc_args_save_reti(Parrot_Interp, PMC *,
+        const char *, ...);
+FLOATVAL Parrot_runops_fromc_args_save_retf(Parrot_Interp, PMC *,
+        const char *, ...);
 
 void Parrot_run_meth_fromc_save(Parrot_Interp, PMC *sub,
         PMC* obj, STRING *meth);

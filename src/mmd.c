@@ -36,10 +36,58 @@ them, with default behaviour.
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
+
 typedef void (*pmc_mmd_f)(Interp *, PMC *, PMC *, PMC *);
 typedef STRING *(*string_mmd_f)(Interp *, PMC *, PMC *);
 typedef INTVAL (*intval_mmd_f)(Interp *, PMC *, PMC *);
 typedef FLOATVAL (*floatval_mmd_f)(Interp *, PMC *, PMC *);
+
+static funcptr_t
+get_mmd_dispatcher(Interp *interpreter, PMC *left, PMC *right,
+        INTVAL function, int *is_pmc)
+{
+    funcptr_t func;
+    UINTVAL left_type, right_type;
+    UINTVAL offset;
+    MMD_table *table = interpreter->binop_mmd_funcs;
+
+    left_type = VTABLE_type(interpreter, left);
+    right_type = VTABLE_type(interpreter, right);
+    if (left_type > table->x[function] || right_type > table->y[function]) {
+        func = table->default_func[function];
+    } else {
+        offset = table->x[function] * right_type + left_type;
+        func = table->mmd_funcs[function][offset];
+    }
+    /*
+     * empty slots are filled with the default function, so we really
+     * shouldn't have a NULL function pointer
+     */
+    assert(func);
+#ifdef PARROT_HAS_ALIGNED_FUNCPTR
+    if ((UINTVAL)func & 1) {
+        *is_pmc = 1;
+        func = (funcptr_t)((UINTVAL)func & ~1);
+    }
+    else {
+        *is_pmc = 0;
+    }
+    return func;
+#else
+    {
+        void *sub = (void*)((UINTVAL)func & ~1);
+        if (is_pmc_ptr(interpreter, sub)) {
+            *is_pmc = 1;
+            return (funcptr_t) sub;
+        }
+        else {
+            *is_pmc = 0;
+        }
+        return func;
+    }
+#endif
+}
 
 /*
 
@@ -68,25 +116,13 @@ mmd_dispatch_pmc(Interp *interpreter,
 {
     pmc_mmd_f real_function;
     PMC *sub;
-    UINTVAL left_type, right_type;
-    UINTVAL offset;
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
-    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
-        (right_type > interpreter->binop_mmd_funcs->y[function])) {
-        real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[
-            function];
-    } else {
-        offset = interpreter->binop_mmd_funcs->x[function] *
-            right_type + left_type;
-        real_function = (pmc_mmd_f)*(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
-        if (NULL == real_function) {
-            real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[function];
-        }
-    }
+    int is_pmc;
 
-    if ((UINTVAL)real_function & 1) {
-        sub = (PMC*)((UINTVAL)real_function & ~1);
+    real_function = (pmc_mmd_f)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
         Parrot_runops_fromc_args_save(interpreter, sub, "vPPP",
                 left, right, dest);
     }
@@ -115,19 +151,26 @@ mmd_dispatch_string(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     string_mmd_f real_function;
-    UINTVAL left_type, right_type;
-    UINTVAL offset;
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
-    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
-        (right_type > interpreter->binop_mmd_funcs->y[function])) {
-        real_function = (string_mmd_f)interpreter->binop_mmd_funcs->default_func[
-            function];
-    } else {
-        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-        real_function = (string_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    PMC *sub;
+    int is_pmc;
+    STRING *ret;
+    /*
+     * XXX actually we don't have a MMD function matching this signature
+     * -leo
+     */
+
+    real_function = (string_mmd_f)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        ret = Parrot_runops_fromc_args_save(interpreter, sub, "SPP",
+                left, right);
     }
-    return (*real_function)(interpreter, left, right);
+    else {
+        ret = (*real_function)(interpreter, left, right);
+    }
+    return ret;
 }
 
 /*
@@ -147,19 +190,22 @@ mmd_dispatch_intval(Interp *interpreter,
 		 PMC *left, PMC *right, INTVAL function)
 {
     intval_mmd_f real_function;
-    UINTVAL left_type, right_type;
-    UINTVAL offset;
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
-    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
-        (right_type > interpreter->binop_mmd_funcs->y[function])) {
-        real_function = (intval_mmd_f)interpreter->binop_mmd_funcs->default_func[
-            function];
-    } else {
-        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-        real_function = (intval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    PMC *sub;
+    int is_pmc;
+    INTVAL ret;
+
+    real_function = (intval_mmd_f)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        ret = Parrot_runops_fromc_args_save_reti(interpreter, sub, "IPP",
+                left, right);
     }
-    return (*real_function)(interpreter, left, right);
+    else {
+        ret = (*real_function)(interpreter, left, right);
+    }
+    return ret;
 }
 
 /*
@@ -180,19 +226,26 @@ mmd_dispatch_floatval(Interp *interpreter,
 {
 
     floatval_mmd_f real_function;
-    UINTVAL left_type, right_type;
-    UINTVAL offset;
-    left_type = VTABLE_type(interpreter, left);
-    right_type = VTABLE_type(interpreter, right);
-    if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
-        (right_type > interpreter->binop_mmd_funcs->y[function])) {
-        real_function = (floatval_mmd_f)interpreter->binop_mmd_funcs->default_func[
-            function];
-    } else {
-        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-        real_function = (floatval_mmd_f)D2FPTR((interpreter->binop_mmd_funcs->mmd_funcs[function] + offset));
+    PMC *sub;
+    int is_pmc;
+    FLOATVAL ret;
+
+    /*
+     * XXX actually we don't have a MMD function matching this signature
+     * -leo
+     */
+    real_function = (floatval_mmd_f)get_mmd_dispatcher(interpreter,
+            left, right, function, &is_pmc);
+
+    if (is_pmc) {
+        sub = (PMC*)real_function;
+        ret = Parrot_runops_fromc_args_save_reti(interpreter, sub, "NPP",
+                left, right);
     }
-    return (*real_function)(interpreter, left, right);
+    else {
+        ret = (*real_function)(interpreter, left, right);
+    }
+    return ret;
 }
 
 /*

@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 output_is(<<'CODE', <<'OUTPUT', "built in");
     new P0, .Integer
@@ -66,6 +66,7 @@ output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 CODE
 3
 OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "1+1=3");
 ##PIR##
 .sub _main
@@ -132,4 +133,36 @@ output_is(<<'CODE', <<'OUTPUT', "PASM divide - override builtin");
 .end
 CODE
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "INTVAL return numeq");
+##PIR##
+.sub _main
+
+.include "pmctypes.pasm"
+.include "vtable_constants.pasm"
+
+    .local pmc comp
+    comp = global "Float_cmp_Integer"
+    mmdvtregister .VTABLE_NUMCMP, .Float, .Integer, comp
+
+    $P1 = new Float
+    $P2 = new Integer
+    $P1 = 47.11
+    $P2 = 47
+    $I0 = cmp $P1, $P2   # XXX cmp calls cmp_num
+    print $I0
+    print "\n"
+    end
+.end
+
+.sub Float_cmp_Integer
+    .param pmc left
+    .param pmc right
+    .pcc_begin_return
+    .return -42
+    .pcc_end_return
+.end
+CODE
+-42
 OUTPUT

@@ -1080,6 +1080,14 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
 Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         const char *sig, ...)>
 
+=item C<INTVAL
+Parrot_runops_fromc_args_save_reti(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)>
+
+=item C<FLOATVAL
+Parrot_runops_fromc_args_save_retf(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)>
+
 =item C<void *
 Parrot_run_meth_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
         PMC* obj, STRING* meth, const char *sig, ...)>
@@ -1211,8 +1219,6 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
     regsave *data = save_regs(interpreter);
     va_list args;
     void *ret;
-    INTVAL ri;
-    FLOATVAL rf;
 
     va_start(args, sig);
     runops_args(interpreter, sub, sig, args);
@@ -1220,6 +1226,42 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
     ret = set_retval(interpreter, *sig);
     restore_regs(interpreter, data);
     return ret;
+}
+
+INTVAL
+Parrot_runops_fromc_args_save_reti(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    regsave *data = save_regs(interpreter);
+    va_list args;
+    void *ret;
+    INTVAL ri;
+
+    va_start(args, sig);
+    runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    ret = set_retval(interpreter, *sig);
+    ri = *(INTVAL*) ret;
+    restore_regs(interpreter, data);
+    return ri;
+}
+
+FLOATVAL
+Parrot_runops_fromc_args_save_retf(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)
+{
+    regsave *data = save_regs(interpreter);
+    va_list args;
+    void *ret;
+    FLOATVAL rf;
+
+    va_start(args, sig);
+    runops_args(interpreter, sub, sig, args);
+    va_end(args);
+    ret = set_retval(interpreter, *sig);
+    rf = *(FLOATVAL*) ret;
+    restore_regs(interpreter, data);
+    return rf;
 }
 
 void*
