@@ -31,7 +31,7 @@ as code structure, naming conventions, comments etc.
 
 =head1 DESCRIPTION
 
-One of the criticisms of Perl 5 is that it's source code is
+One of the criticisms of Perl 5 is that its source code is
 impenetrable to newcomers, due to such things as inconsistent or
 obscure variable naming conventions, lack of comments in the source
 code, and so on.  Hence this document.
@@ -40,8 +40,8 @@ We define three classes of conventions. Those that say I<must> are
 mandatory, and code will not be accepted (apart from in exceptional
 circumstances) unless it follows these rules. Those that say I<should>
 are strong guidelines that should normally be be followed unless there
-is a sensible reason to do otherwise.  Finally, where it says I<may>,
-this is tentative suggestion to be used at your discretion.
+is a sensible reason to do otherwise.  Finally, those that say I<may>,
+are tentative suggestions to be used at your discretion.
 
 Note this this particular PDD makes some recommendations that are
 specific to the C programming language. This does not preclude Perl
@@ -58,7 +58,7 @@ The following I<must> apply:
 
 =item *
 
-4-wide indents for code and 2-wide indents for nested CPP #directives.
+4 column indents for code and 2 column indents for nested CPP #directives.
 All indentation must consist of spaces, no tabs (for ease of patching).
 
 To ensure that tabs aren't inadvertently used for indentation, the following
@@ -91,12 +91,12 @@ line up with the opening C<if> etc.
 
 =item *
 
-When a conditional spans multiple lines, the opening brace must line up
-with the "if" or "while", or be at the end-of-line otherwise.
+When a conditional spans multiple lines, the opening C<{> must line up
+with the C<if> or C<while>, or be at the end-of-line otherwise.
 
 =item *
 
-Uncuddled elses: ie avoid  C<} else {>
+Uncuddled C<else>s: ie avoid  C<} else {>
 
 =item *
 
@@ -110,7 +110,7 @@ initials too), and revisit often!
 =item *
 
 In function definitions, the name starts in column 0, with the
-return type on the previous line
+return type on the previous line.
 
 =item *
 
@@ -120,12 +120,13 @@ on the same line.
 =item *
 
 Variable names should be included for all function parameters in the
-function declarations.
+function declarations.  These names should match the parameters in the
+function definition.
 
 =item *
 
-Single space after keywords that are followed by parens, eg
-C<return (x+y)*2>, but no space between function name and following paren,
+Single space after keywords that are followed by C<()>, eg
+C<return (x+y)*2>, but no space between function name and following C<()>,
 eg C<z = foo(x+y)*2>
 
 =back
@@ -157,7 +158,7 @@ Avoid double negatives, eg C<#ifndef NO_FEATURE_FOO>
 
 =item *
 
-binary operators should have a space on either side; parentheses should
+Binary operators should have a space on either side; parentheses should
 not have space immediately after the opening paren nor immediately before
 the closing paren, commas should have space after but not before, eg
 
@@ -175,12 +176,10 @@ and/or split on matching parens, with the content on separate line(s) and
 with one extra indent:
 
     do_arbitrary_function(
-	list_of_parameters_with_long_names, or_complex_subexpression(
-	    of_more_params, or_expressions + 1
-	)
+        list_of_parameters_with_long_names, or_complex_subexpression(
+            of_more_params, or_expressions + 1
+        )
     );
-
-
 
 =back
 
@@ -232,7 +231,7 @@ This expands out to:
 Please note that it is also necessary to include all typedef types
 with the "-T" option to ensure that everything is formatted properly.
 
-A script (run_indent.pl) is be provided which runs indent properly for
+A script (F<run_indent.pl>) is provided which runs F<indent> properly 
 automatically.
 
 =head2 Naming conventions
@@ -243,18 +242,18 @@ automatically.
 
 Perl core will be split into a number of subsystems, each with an
 associated API. For the purposes of naming files, data structures, etc,
-each subsystem will be assigned a short nickname, eg pmc, gc, io.  All
-code within the core will belong to a subsystem; miscellaneous code
+each subsystem will be assigned a short nickname, eg I<pmc>, I<gc>, I<io>.
+All code within the core will belong to a subsystem; miscellaneous code
 with no obvious home will be placed in the special subsystem called
-misc.
+I<misc>.
 
 =item Filenames
 
 Filenames must be assumed to be case-insensitive, in the sense that
-that you may not have two different files called Foo and foo. Normal
+that you may not have two different files called F<Foo> and F<foo>. Normal
 source-code filenames should be all lower-case; filenames with
 upper-case letters in them are reserved for notice-me-first files such
-as README, and for files which need some sort of pre-processing applied
+as F<README>, and for files which need some sort of pre-processing applied
 to them or which do the preprocessing - eg a script F<foo.SH> might
 read F<foo.TEMPLATE> and output F<foo.c>.
 
@@ -268,7 +267,6 @@ filename must still be unique if the main part is truncated to 8
 characters and any suffix truncated to 3 characters. Ideally, filenames
 should restricted to 8.3 in the first place, but this is not
 essential.
-
 
 Each subsystem I<foo> should supply the following files. This arrangement
 is based on the assumption that each subsystem will - as far as is
@@ -284,13 +282,13 @@ API (and nothing more), ie it defines the API. It is permissible for
 the API to include different or extra functionality when used by other
 parts of the core, compared with its use in extensions and embeddings.
 In this case, the extra stuff within the file is enabled by testing for
-the macro PERL_IN_CORE.
+the macro C<PERL_IN_CORE>.
 
 =item foo_private.h
 
 This contains declarations used internally by that subsystem, and which
 must only be included within source files associated the subsystem.
-This file defines the macro PERL_IN_FOO so that code knows when it is
+This file defines the macro C<PERL_IN_FOO> so that code knows when it is
 being used within that subsystem. The file will also contain all the
 'convenience' macros used to define shorter working names for functions
 without the perl prefix (see below).
@@ -339,14 +337,14 @@ plus others as it becomes necessary.
 All .h files should include the following "guards" to prevent
 multiple-inclusion: 
 
- /* file header comments */
-
- #if !defined(PARROT_<FILENAME>_H_GUARD)
- #define PARROT_<FILENAME>_H_GUARD
-
- /* body of file */
-
- #endif /* PARROT_<FILENAME>_H_GUARD */
+    /* file header comments */
+    
+    #if !defined(PARROT_<FILENAME>_H_GUARD)
+    #define PARROT_<FILENAME>_H_GUARD
+    
+    /* body of file */
+    
+    #endif /* PARROT_<FILENAME>_H_GUARD */
 
 =item Names of code entities
 
@@ -394,7 +392,7 @@ Variables and structure names should be all lower-case, eg C<pmc_foo>.
 
 =item *
 
-structure elements should be all lower-case, and the first component of
+Structure elements should be all lower-case, and the first component of
 the name should incorporate the structure's name or an abbreviation of it.
 
 =item *
@@ -499,7 +497,7 @@ required.
 per-interpreter and per-thread variables.]
 
 Within an individual subsystem, macros are defined for each global
-variable of the form GLOBAL_foo (the name being deliberately clunky).
+variable of the form C<GLOBAL_foo> (the name being deliberately clunky).
 So we might for example have the following macros:
 
 	/* perl_core.h or similar */
@@ -629,7 +627,6 @@ entity names can be provided.
 
 TBC ...
 
-
 =item Optimisations
 
 Whenever code has deliberately been written in an odd way for
@@ -669,7 +666,7 @@ of each major branch, eg
 If Perl 5 is anything to go by, the lifetime of Perl 6 will be at least
 seven years. During this period, the source code will undergo many
 major changes never envisaged by its original authors - cf threads,
-unicode in perl 5. To this end, Your code should balance out the
+unicode in perl 5. To this end, your code should balance out the
 assumptions that make things possible, fast or small, with the
 assumptions that make it difficult to change things in future. This is
 especially important for parts of the code which are exposed through
@@ -757,9 +754,9 @@ simply swapping C<i> and C<j>.
     
     int i,j,k;
     for (i=0; i<1000; i++) {
-	for (j=0; j<1000; j++) {
-	    k += a[j][i];
-	}
+        for (j=0; j<1000; j++) {
+            k += a[j][i];
+        }
     }
 
 This all boils down to: keep things near to each other that get
