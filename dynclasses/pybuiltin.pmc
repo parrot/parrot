@@ -18,6 +18,7 @@ This class implements the Python "builtin" Functions.
 
 */
 
+#define INSIDE_PYBUILTIN
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 

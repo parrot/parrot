@@ -1,57 +1,63 @@
+#if defined(INSIDE_PYBUILTIN)
+#  define VAR_SCOPE
+#else
+#  define VAR_SCOPE extern
+#endif /* INSIDE_PYBUILTIN */
+
 /* Python class types */
 
-INTVAL PyBuiltin_PyObject;
-INTVAL PyBuiltin_PyBoolean;
-INTVAL PyBuiltin_PyClass;
-INTVAL PyBuiltin_PyComplex;
-INTVAL PyBuiltin_PyDict;
-INTVAL PyBuiltin_PyException;
-INTVAL PyBuiltin_PyInt;
-INTVAL PyBuiltin_PyIter;
-INTVAL PyBuiltin_PyFloat;
-INTVAL PyBuiltin_PyList;
-INTVAL PyBuiltin_PyLong;
-INTVAL PyBuiltin_PyNCI;
-INTVAL PyBuiltin_PyNone;
-INTVAL PyBuiltin_PyProxyClass;
-INTVAL PyBuiltin_PyProxyType;
-INTVAL PyBuiltin_PySlice;
-INTVAL PyBuiltin_PyStaticMeth;
-INTVAL PyBuiltin_PyString;
-INTVAL PyBuiltin_PyTuple;
-INTVAL PyBuiltin_PyType;
+VAR_SCOPE INTVAL PyBuiltin_PyObject;
+VAR_SCOPE INTVAL PyBuiltin_PyBoolean;
+VAR_SCOPE INTVAL PyBuiltin_PyClass;
+VAR_SCOPE INTVAL PyBuiltin_PyComplex;
+VAR_SCOPE INTVAL PyBuiltin_PyDict;
+VAR_SCOPE INTVAL PyBuiltin_PyException;
+VAR_SCOPE INTVAL PyBuiltin_PyInt;
+VAR_SCOPE INTVAL PyBuiltin_PyIter;
+VAR_SCOPE INTVAL PyBuiltin_PyFloat;
+VAR_SCOPE INTVAL PyBuiltin_PyList;
+VAR_SCOPE INTVAL PyBuiltin_PyLong;
+VAR_SCOPE INTVAL PyBuiltin_PyNCI;
+VAR_SCOPE INTVAL PyBuiltin_PyNone;
+VAR_SCOPE INTVAL PyBuiltin_PyProxyClass;
+VAR_SCOPE INTVAL PyBuiltin_PyProxyType;
+VAR_SCOPE INTVAL PyBuiltin_PySlice;
+VAR_SCOPE INTVAL PyBuiltin_PyStaticMeth;
+VAR_SCOPE INTVAL PyBuiltin_PyString;
+VAR_SCOPE INTVAL PyBuiltin_PyTuple;
+VAR_SCOPE INTVAL PyBuiltin_PyType;
 
 /* Python class objects */
 
-PMC *PyBuiltin_PyBoolean_class;
-PMC *PyBuiltin_PyComplex_class;
-PMC *PyBuiltin_PyDict_class;
-PMC *PyBuiltin_PyException_class;
-PMC *PyBuiltin_PyInt_class;
-PMC *PyBuiltin_PyFloat_class;
-PMC *PyBuiltin_PyList_class;
-PMC *PyBuiltin_PyLong_class;
-PMC *PyBuiltin_PySlice_class;
-PMC *PyBuiltin_PyStaticMeth_class;
-PMC *PyBuiltin_PyTuple_class;
-PMC *PyBuiltin_PyType_class;
+VAR_SCOPE PMC *PyBuiltin_PyBoolean_class;
+VAR_SCOPE PMC *PyBuiltin_PyComplex_class;
+VAR_SCOPE PMC *PyBuiltin_PyDict_class;
+VAR_SCOPE PMC *PyBuiltin_PyException_class;
+VAR_SCOPE PMC *PyBuiltin_PyInt_class;
+VAR_SCOPE PMC *PyBuiltin_PyFloat_class;
+VAR_SCOPE PMC *PyBuiltin_PyList_class;
+VAR_SCOPE PMC *PyBuiltin_PyLong_class;
+VAR_SCOPE PMC *PyBuiltin_PySlice_class;
+VAR_SCOPE PMC *PyBuiltin_PyStaticMeth_class;
+VAR_SCOPE PMC *PyBuiltin_PyTuple_class;
+VAR_SCOPE PMC *PyBuiltin_PyType_class;
 
 /* constant strings */
 
-STRING *PyString_bases;
-STRING *PyString_call;
-STRING *PyString_class;
-STRING *PyString_cmp;
-STRING *PyString_hex;
-STRING *PyString_init;
-STRING *PyString_int;
-STRING *PyString_iter;
-STRING *PyString_name;
-STRING *PyString_new;
-STRING *PyString_oct;
-STRING *PyString_proxy;
-STRING *PyString_repr;
-STRING *PyString_str;
+VAR_SCOPE STRING *PyString_bases;
+VAR_SCOPE STRING *PyString_call;
+VAR_SCOPE STRING *PyString_class;
+VAR_SCOPE STRING *PyString_cmp;
+VAR_SCOPE STRING *PyString_hex;
+VAR_SCOPE STRING *PyString_init;
+VAR_SCOPE STRING *PyString_int;
+VAR_SCOPE STRING *PyString_iter;
+VAR_SCOPE STRING *PyString_name;
+VAR_SCOPE STRING *PyString_new;
+VAR_SCOPE STRING *PyString_oct;
+VAR_SCOPE STRING *PyString_proxy;
+VAR_SCOPE STRING *PyString_repr;
+VAR_SCOPE STRING *PyString_str;
 
 /* utility functions */
 
