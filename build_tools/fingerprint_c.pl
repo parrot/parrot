@@ -55,7 +55,7 @@ EOF
 } else { # !DEVELOPING  
 
   print << "EOF";
-/* fingerprint checking is only in enabled in development versions */
+/* fingerprint checking is only enabled in development versions */
 
 int
 PackFile_check_fingerprint (void *cursor)
