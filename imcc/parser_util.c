@@ -78,7 +78,7 @@ iNEW(struct Parrot_Interp *interpreter, IMC_Unit * unit, SymReg * r0, char * typ
  *   P0 = newclosure _clos, _ret  ::=   newsub, .Closure, .RetContinuation, _clos, _ret
  *
  * XXX: Currently the 3 arg version of newsub ignores the Px target on the assign.
- *      Fix the PASM opcode. 
+ *      Fix the PASM opcode.
  */
 
 Instruction *
@@ -567,9 +567,54 @@ try_find_op(Parrot_Interp interpreter, IMC_Unit * unit, char *name, SymReg ** r,
     char fullname[64];
     SymReg *s;
     int changed = 0;
+    /*
+     * eq_str, eq_num => eq
+     * ...
+     */
+    if (n == 3 && r[2]->type == VTADDRESS) {
+        if (!strcmp(name, "eq_str") ||
+                !strcmp(name, "eq_num")) {
+            name = "eq";
+            changed = 1;
+        }
+        else if (!strcmp(name, "ne_str") ||
+                !strcmp(name, "ne_num")) {
+            name = "ne";
+            changed = 1;
+        }
+        else if (!strcmp(name, "le_str") ||
+                !strcmp(name, "le_num")) {
+            name = "le";
+            changed = 1;
+        }
+        else if (!strcmp(name, "lt_str") ||
+                !strcmp(name, "lt_num")) {
+            name = "lt";
+            changed = 1;
+        }
+        else if (!strcmp(name, "ge_str") ||
+                !strcmp(name, "ge_num")) {
+            name = "ge";
+            changed = 1;
+        }
+        else if (!strcmp(name, "gt_str") ||
+                !strcmp(name, "gt_num")) {
+            name = "gt";
+            changed = 1;
+        }
+    }
+    else if (n == 3 &&
+            !strcmp(name, "cmp_str") ||
+            !strcmp(name, "cmp_num")) {
+        name = "cmp";
+        changed = 1;
+    }
+    /*
+     * TODO handle eq_i_n_ic too
+     */
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I' && (r[2]->set == 'N' ||
-            (r[2]->type == VTADDRESS))) {
+                    (r[2]->type == VTADDRESS))) {
             if (!strcmp(name, "add") ||
                     !strcmp(name, "mul")
                ) {
@@ -806,8 +851,8 @@ str_dup(const char * old)
     debug(interpreter, 1,"line %d str_dup %s [%x]\n", line, old, copy);
 #endif
     return copy;
-}       
-    
+}
+
 char *
 str_cat(const char * s1, const char * s2)
 {
@@ -819,7 +864,7 @@ str_cat(const char * s1, const char * s2)
     strcpy(s3, s1);
     strcat(s3, s2);
     return s3;
-}   
+}
 
 
 

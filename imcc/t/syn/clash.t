@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 11;
+use TestCompiler tests => 13;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -195,4 +195,35 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "eq_num => eq");
+.sub _main
+    .local int i
+    .local int j
+    i = 1
+    j = 1
+    eq_num i, j, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    end
+.end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "eq_num => eq mixed => eq_n_n");
+.sub _main
+    .local int i
+    .local float j
+    i = 1
+    j = 1.0
+    eq_num j, i, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    end
+.end
+CODE
+ok 1
+OUTPUT
 1;
