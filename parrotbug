@@ -15,7 +15,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.1.1";
+my $VERSION = "0.2.0";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -26,7 +26,7 @@ my %std_to =
 my $parrotdir = File::Spec->curdir();
 
 my %opts;
-my ( $user, $domain, $editor, $use_file, $report_file );
+my ( $user, $domain, $editor, $use_file );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
@@ -42,10 +42,6 @@ version() if $opts{V};
 if ( $opts{d} ) { dump_info(*STDOUT); exit; }
 explain_parrotbug();
 query_info();
-
-die "work in progress... nothing ready yet!\n";
-
-ask_for_action();
 send_msg();
 exit;
 
@@ -395,8 +391,8 @@ EOF
     }
 
     # Launch editor.
-    $report_file = generate_filename();
-    edit_bug_report( $report_file );
+    $opts{f} = generate_filename();
+    edit_bug_report( $opts{f} );
 }
 
 
@@ -529,62 +525,71 @@ EOF
 }
 
 
+#----
+# Send message to final recipient.
 sub send_msg {
-
-=pod
-
-    # Message has been accepted for transmission -- Send the message
-    if ($outfile) {
-	open SENDMAIL, ">$outfile" or die "Couldn't open '$outfile': $!\n";
-	goto sendout;
+    # Get the body.
+    if ( $opts{f} ) {
+        open BODY, "<$opts{f}" or die "Can't open '$opts{f}': $!";
+        local $/;
+        $body = <BODY>;
+        close BODY or  die "Can't close '$opts{f}': $!";
     }
-
-    # on linux certain mail implementations won't accept the subject
+    
+    # On linux certain mail implementations won't accept the subject
     # as "~s subject" and thus the Subject header will be corrupted
     # so don't use Mail::Send to be safe
+    eval "require Mail::Send";
     if ( $@ eq "" && !$is_linux) {
-	my $msg = new Mail::Send Subject => $subject, To => $address;
-	$msg->add("Reply-To",$from) if $from;
+	my $msg = new Mail::Send Subject => $subject, To => $to;
+	$msg->add( "Reply-To", $from );
 
-	$fh = $msg->open;
-        print $fh $body;
+	my $fh = $msg->open;
+        print $fh <<EOF;
+-----------------------------------------------------------------
+$body
+-----------------------------------------------------------------
+EOF
+        dump_msg($fh);
 	$fh->close;
 
 	print "\nMessage sent.\n";
 
     } else {
 	my $sendmail = "";
-	for (qw(/usr/lib/sendmail /usr/sbin/sendmail /usr/ucblib/sendmail)) {
+	for ( qw[ /usr/lib/sendmail /usr/sbin/sendmail /usr/ucblib/sendmail ] ) {
 	    $sendmail = $_, last if -e $_;
 	}
 
-	die <<"EOF" if $sendmail eq "";
+	die <<EOF if $sendmail eq "";
 I am terribly sorry, but I cannot find sendmail, or a close
 equivalent, and the perl package Mail::Send has not been installed, so
 I can't send your bug report. We apologize for the inconvenience.
 
 So you may attempt to find some way of sending your message, it has
-been left in the file '$filename'.
+been left in the file '$opts{f}'.
 EOF
 # '
 	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
 
-	print SENDMAIL "To: $address\n";
-	print SENDMAIL "Subject: $subject\n";
-	print SENDMAIL "Reply-To: $from\n" if $from;
-	print SENDMAIL "Message-Id: $messageid\n" if $messageid;
-	print SENDMAIL "\n\n";
-        print SENDMAIL $body;
+	print SENDMAIL <<EOT;
+To: $to
+Subject: $subject
+Reply-To: $from
+Message-Id: $msgid
 
+-----------------------------------------------------------------
+$body
+-----------------------------------------------------------------
+EOT
+
+        dump_info( *SENDMAIL );
 	if (close(SENDMAIL)) {
 	    printf "\nMessage sent.\n";
 	} else {
 	    warn "\nSendmail returned status '", $? >> 8, "'\n";
 	}
     }
-
-=cut
-
 }
 
 __END__
