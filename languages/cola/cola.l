@@ -70,6 +70,7 @@ RANKSPEC        \[[,]*\]
 "short"         return(SHORT);
 "static"        return(STATIC);
 "string"        return(STRING);
+"this"          return(THIS);
 "true"          return(TRUE);
 "uint"          return(UINT);
 "ulong"         return(ULONG);

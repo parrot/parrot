@@ -6,6 +6,10 @@
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
  *
+ * Borrows heavily from Java and C#
+ *     Java is a registered trademark of Sun Microsystems
+ *     C# is a registered trademark of Microsoft Corporation
+ *
  * The parser. Grammar for Bison.
  */
 
@@ -37,12 +41,18 @@ AST         *ast_start = NULL;
 
 %token ASM
 
-%token USING NAMESPACE CLASS MODIFIER CONST REF OUT READONLY
-%token VOID BOOL CHAR STRING INT SBYTE BYTE UINT SHORT USHORT LONG ULONG
-%token FLOAT DOUBLE DECIMAL TRUE FALSE OBJECT STRING
-%token NEW PUBLIC PROTECTED INTERNAL PRIVATE ABSTRACT STATIC SEALED VIRTUAL
-%token OVERRIDE EXTERN GET SET
-%token IF ELSE WHILE FOR RETURN BREAK CONTINUE GOTO NULLVAL TYPE
+%token ABSTRACT BOOL BREAK BYTE CHAR CLASS CONST
+%token CONTINUE
+%token DOUBLE DECIMAL ELSE EXTERN
+%token FALSE FLOAT FOR
+%token GET GOTO
+%token IF INT INTERNAL
+%token LONG METHOD MODIFIER NEW NAMESPACE NULLVAL 
+%token OUT OVERRIDE OBJECT PRIVATE PROTECTED PUBLIC
+%token REF READONLY RETURN
+%token SBYTE SEALED SET SHORT STRING STATIC
+%token THIS TRUE TYPE
+%token UINT USHORT ULONG USING VIRTUAL VOID WHILE
 %token <sym> IDENTIFIER LITERAL RANKSPEC
 %token <ival> INC DEC LOGICAL_AND LOGICAL_OR LOGICAL_EQ LOGICAL_NE
 %token <ival> LOGICAL_LTE LOGICAL_GTE
@@ -50,9 +60,9 @@ AST         *ast_start = NULL;
 
 %token TYPE METHOD
 
-%type <sym> type_name type return_type array_type
-%type <sym> primitive_type integral_type
-%type <sym> member_name qualified_identifier
+%type <sym> type array_type
+%type <sym> predefined_type integral_type
+%type <sym> qualified_name member_access
 %type <sym> namespace_scope_start class_scope_start 
 %type <sym> formal_param_list fixed_params fixed_param
 %type <ast> var_declarator var_declarators
@@ -61,7 +71,7 @@ AST         *ast_start = NULL;
 %type <ast> namespace_decl class_decl namespace_body
 %type <ast> return_statement jump_statement asm_block
 %type <ast> statement statement_list
-%type <ast> decl_statement method_decl
+%type <ast> decl_statement method_decl field_decl
 %type <ast> class_decl
 %type <ast> class_body class_member_decl_list class_member_decl
 %type <ast> local_var_decl
@@ -79,8 +89,8 @@ AST         *ast_start = NULL;
 %type <ast> shift_expr exclusive_or_expr relational_expr
 %type <ast> unary_expr add_expr mult_expr
 %type <ast> equality_expr relational_expr
-%type <ast> method_call arg arg_list member_access
-%type <ival> class_modifier class_modifiers method_modifiers method_modifier
+%type <ast> method_call arg arg_list
+%type <ival> modifier modifiers opt_modifiers
 %type <ival> relational_op
 %type <sym> rank_specifiers
 
@@ -144,7 +154,7 @@ namespace_decl:
     ;
 
 namespace_scope_start:
-    NAMESPACE qualified_identifier
+    NAMESPACE qualified_name
         {
             Symbol *n, *t, *last = current_namespace;
             if(lookup_type_symbol($2)) {
@@ -158,24 +168,17 @@ namespace_scope_start:
                 last = n;
             }
             push_namespace(t);
-/*
-            push_scope();
-*/
             $$ = t;
         }
     ;
-    
-qualified_identifier:
+
+qualified_name:
     IDENTIFIER
-        {
-            $$ = $1;
-#if DEBUG
-            fprintf(stderr, "qualified_identifier <- IDENTIFIER(%s)\n", NAME($1));
-#endif
-        }
-    |   qualified_identifier '.' IDENTIFIER
+        { $$ = $1; fprintf(stderr, "qualified_name <- IDENTIFIER\n"); }
+    |   qualified_name '.' IDENTIFIER
         {
             $$ = symbol_join3($1, new_symbol("."), $3);
+            fprintf(stderr, "qualified_name <- qualified_name . IDENTIFIER\n");
         }
     ;
 
@@ -205,7 +208,7 @@ namespace_member_decl:
     ;
 
 class_decl:
-    class_modifiers class_scope_start class_body optional_semi
+    opt_modifiers class_scope_start class_body optional_semi
         {
             pop_namespace();
             $$ = new_ast(KIND_DECL, ASTT_CLASS_DECL, NULL, NULL);
@@ -215,13 +218,18 @@ class_decl:
         }
     ;
 
-class_modifiers:
+opt_modifiers:
         { $$ = 0; }
-    |   class_modifiers class_modifier
+    |   modifiers
+    ;
+
+modifiers:
+    modifiers modifier
         { $$ = $1 | $2; }
+    |   modifier
     ;
     
-class_modifier:
+modifier:
     PUBLIC
         { $$ = MOD_PUBLIC; }
     |   PRIVATE
@@ -244,12 +252,6 @@ class_scope_start:
         {
             /* Create a new namespace for class and put it in effect */
             Symbol * c;
-/*
-            if(lookup_type($2->name)) {
-                printf("Error, redefinition of type [%s]\n", $2->name);
-                exit(0);
-            }
-*/
 #if DEBUG
             fprintf(stderr, "\nclass_scope_start <- CLASS IDENTIFIER (%s)\n", $2->name);
 #endif
@@ -263,8 +265,8 @@ class_scope_start:
     ;
     
 class_member_decl_list:
-        {    $$ = NULL;    }
-    |        class_member_decl_list class_member_decl
+        { $$ = NULL; }
+    |   class_member_decl_list class_member_decl
         {
             $$ = $1;
             unshift_ast(&($$), $2);
@@ -272,12 +274,10 @@ class_member_decl_list:
     ;
 
 class_member_decl:
-    decl_statement
-        { $$ = $1; }
+    field_decl
     |   method_decl
-        {    $$ = $1; }
 /*
-    |        property_decl
+    |   property_decl
     |        event_decl
     |        indexer_decl
     |        operator_decl
@@ -310,9 +310,6 @@ decl_statement:
 local_var_decl:
     type var_declarators
         {
-            /* Insert symbols into symbol table, collect any initializer
-             * statement exprs, then discard symbol list.
-             */
             AST * decl;
             if($1 == NULL) {
                 printf("Internal compiler error: local_var_decl: type is NULL\n");
@@ -328,7 +325,26 @@ local_var_decl:
             $$ = $2;
         }
     ;
-    
+
+field_decl:
+    opt_modifiers type var_declarators ';'
+        {
+            AST * decl;
+            if($2 == NULL) {
+                printf("Internal compiler error: field_decl: type is NULL\n");
+                abort();
+            }
+            for(decl=$3; decl; decl = decl->next) {
+#if DEBUG
+                fprintf(stderr, "field: [%s] typename [%s]\n",
+                        decl->arg1->sym->name, $2->name);
+#endif
+                decl->arg1->sym->typename = $2;
+            }
+            $$ = $3;
+        }
+    ;
+
 var_declarators:
     var_declarator
     |   var_declarators ',' var_declarator
@@ -339,16 +355,7 @@ var_declarators:
     ;
     
 var_declarator:
-    IDENTIFIER
-    {
-        AST * decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
-        decl->sym = $1;
-        $$ = new_statement(ASTT_FIELD_DECL, decl, NULL); 
-#if DEBUG
-        fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
-#endif
-    }
-    |   IDENTIFIER '=' expr
+   IDENTIFIER '=' expr
         {
             AST * decl, * init;
             decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
@@ -356,12 +363,18 @@ var_declarator:
             init = new_expr(ASTT_ASSIGN, decl, $3);
             $$ = new_statement(ASTT_FIELD_DECL, decl, init); 
 #if DEBUG
-            fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
+        fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
 #endif
         }
-/*
-    |   IDENTIFIER '=' array_initializer
-*/
+    |   IDENTIFIER
+        {
+            AST * decl = new_expr(ASTT_IDENTIFIER, NULL, NULL);
+            decl->sym = $1;
+            $$ = new_statement(ASTT_FIELD_DECL, decl, NULL); 
+#if DEBUG
+        fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
+#endif
+        }
     ;
     
 method_decl:
@@ -373,7 +386,7 @@ method_decl:
     ;
 
 method_header:
-    method_modifiers return_type member_name '(' formal_param_list ')'
+    opt_modifiers type IDENTIFIER '(' formal_param_list ')'
         {
             Symbol * param;
             $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
@@ -395,26 +408,31 @@ method_header:
                 }
             }
         }
+    |   opt_modifiers VOID IDENTIFIER '(' formal_param_list ')'
+        {
+            Symbol * param;
+            $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
+            $3->kind = METHOD;
+            $3->typename = new_type_symbol("void");
+            $3->flags = $1;
+            $$->sym = $3;
+            $$->Attr.Method.params = $5;
+            /* Methods/Fields stored at scope 0 of class namespace.
+             * We can store these at parse time.
+             */
+            store_symbol(current_symbol_table, $$->sym);
+            if($1 & MOD_STATIC) {
+                if(!strcmp($3->name, "Main")) {
+                    if(main_method)
+                        fprintf(stderr,
+                        "Warning: multiple definitions of a static Main()\n");
+                    main_method = $3;
+                }
+            }
+        }
+
     ;
 
-method_modifiers:
-        { $$ = 0; }
-    |   method_modifiers method_modifier
-        { $$ = $1 | $2; }
-    ;
-
-method_modifier:
-    PUBLIC
-        { $$ = MOD_PUBLIC; }
-    |   PRIVATE
-        { $$ = MOD_PRIVATE; }
-    |   PROTECTED
-        { $$ = MOD_PROTECTED; }
-    |   STATIC
-        { $$ = MOD_STATIC; }
-    |   VIRTUAL
-        { $$ = MOD_VIRTUAL; }
-    ;
 
 formal_param_list:    /*NULL*/
         { $$ = NULL; }
@@ -457,24 +475,6 @@ param_array:
     ;
 */
     
-member_name:
-    IDENTIFIER
-        {
-#if DEBUG
-            fprintf(stderr, " member_name <- IDENTIFIER (%s)\n", $1->name);
-#endif
-            $$ = $1;
-            check_id_redecl(current_symbol_table, $1->name);
-            if(lookup_symbol_in_tab(current_symbol_table, $1->name)) {
-                    printf("Warning: declaration of '%s' shadows previous instance.\n",
-                            $1->name);
-            }
-        }
-/*
-    |   interface_type '.' IDENTIFIER
-*/
-    ;
-
 method_body:
     block
         { $$ = $1; }
@@ -485,9 +485,9 @@ block:
         {
             $$ = $3;
             if($$) {
-                $$->locals = pop_scope();
+                $$->vars = pop_scope();
             } else {
-                pop_scope();
+                discard_scope();
             }
         }
     ;
@@ -627,44 +627,17 @@ for_statement:
         }
     ;
 
-return_type:
-    type
-        {
-            if($1 == NULL) {
-                printf("Internal compiler error, NULL type.\n");
-                exit(0);
-            }
-            $$ = $1;
-        }
-    |   VOID
-        {
-            $$ = new_type_symbol("void");
-            if($$ == NULL) {
-                printf("Internal compiler error, NULL type for VOID.\n");
-                exit(0);
-            }
-        }
-    ;
-
-type_name:
-    qualified_identifier
-        {
-            fprintf(stderr, "type_name <- qualified_identifier\n");
-            $$ = $1;
-        }
-    ;
-
 type:
-    type_name
+    qualified_name
         {
             fprintf(stderr, "!TYPE[%s]\n", $1->name);
             $$ = $1;
         }
-    |   primitive_type
+    |   predefined_type
     |   array_type
     ;
 
-primitive_type:
+predefined_type:
     BOOL
         { $$ = new_type_symbol("bool"); }
     |   STRING
@@ -729,13 +702,9 @@ assignment:
     */
     ;
 
-member_access:
-    primary_expr '.' IDENTIFIER
 /*
-    |   predefined_type '.' IDENTIFIER
-*/
-    ;
-
+ * Expressions
+ */
 pre_inc_expr:
     INC unary_expr
         {
@@ -796,23 +765,13 @@ primary_expr:
             fprintf(stderr, " primary_expr <- LITERAL(%s)\n", $1->name);
 #endif
         }
-    |   qualified_identifier
+    |   IDENTIFIER
         {
             Symbol * orig;
             $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL);
-/*
-            orig = lookup_symbol($1->name);
-            if(orig == NULL) {
-                fprintf(stderr, "error (line %ld): undeclared identifier %s.\n", line, $1->name);
-                exit(0);
-            }
-            if(orig)
-                $$->sym = orig;
-            else
-*/
-                $$->sym = $1;
+            $$->sym = $1;
 #if DEBUG
-            fprintf(stderr, "primary_expr <- qualified_identifier_expr\n");
+            fprintf(stderr, " primary_expr <- IDENTIFIER(%s)\n", $1->name);
 #endif
         }
     |   '(' expr ')'
@@ -824,9 +783,8 @@ primary_expr:
     |   post_inc_expr
     |   post_dec_expr
     |   new_expr
-/*
     |   member_access
-*/
+        { $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL); $$->sym = $1; }
     ;
  
 unary_expr:
@@ -848,7 +806,7 @@ method_call:
     primary_expr '(' arg_list ')'
         {
             if($1->asttype != ASTT_IDENTIFIER) {
-                fprintf(stderr, "Error (line %d), method call must be a simple name.\n", line);
+                fprintf(stderr, "Error (line %d), method call must be a simple name or member access.\n", line);
                 exit(0);
             }
             $$ = new_expr(ASTT_METHOD_CALL, $1, $3);
@@ -856,6 +814,15 @@ method_call:
             fprintf(stderr, " method_call <- primary_expr ( arg_list )\n");
 #endif
         }
+    ;
+
+member_access:
+    qualified_name
+    { $$ = $1;
+#if DEBUG
+            fprintf(stderr, " member_access <- qualified_name\n");
+#endif
+    }
     ;
 
 element_access:
@@ -1066,16 +1033,19 @@ int main(int argc, char * argv[])
 
     freopen("a.imc", "w", stdout);
     fprintf(stderr, "Compiling intermediate code to a.imc\n");      
-
-    printf( "Dump of global namespace:\n" );
+/*
+    printf( "#Dump of global namespace:\n" );
     indent = 0;
     dump_namespace(current_namespace);
-    printf("\n<program>\n");
+*/
     printf("# Cola (%s) generated\n#\n", COLA_VERSION);
     if(main_method) {
-        printf("_START:\n\tpusharg \"\"\n\tcall %s__%s\n",
+        printf(".sub _MAIN\n\t.arg \"\"\n\tcall %s__%s\n",
             main_method->namespace->name, main_method->name);
-        printf("__END:\n\tend\n\n");
+        printf("\tend\n\tret\n");
+#if 0
+        printf("\n__END:\n\tend\n\n");
+#endif
     }
     fprintf(stderr, "Pass 4: Code generation...\n");
 
@@ -1084,17 +1054,20 @@ int main(int argc, char * argv[])
     }
 
     gen_bootstrap();
-    printf("</program>\n");
-    fclose(stdout);
+    fflush(stdout);
     fprintf(stderr, "%ld lines compiled.\n", line);
     fprintf(stderr, "Compiling assembly module a.pasm\n");
-    system("perl int2pasm.pl a.imc > a.pasm");
+    fprintf(stderr, "Execing IMCC\n");
+    system("./imcc a.imc");
+    /*system("perl int2pasm.pl a.imc > a.pasm");*/
     return 0;
 }
 
 int yyerror(char * s)
 {
-    fprintf(stderr, "last token = [%s]\n", yytext); 
+/*
+    fprintf(stderr, "last token = [%s]\n", yylval.sym->name); 
+*/
     fprintf(stderr, "(error) line %ld: %s\n", line, s );
     fprintf(stderr, "Didn't create output asm.\n" );
     exit(0);

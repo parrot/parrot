@@ -17,7 +17,7 @@ my $class;
 open(OUT, ">$file.colacctmp");
 
 foreach my $line (@file) {
-    if(($using, $class) = $line =~ m/^(using\s+(\w+));/) {
+    if(($using, $class) = $line =~ m/^(using\s+(\w+);)/) {
         open(USE, "<$class.cola") or die("Error: can't include $class.cola\n");
         {
             local $/;
@@ -32,5 +32,7 @@ foreach my $line (@file) {
 close(OUT);
 
 system("./colacc $file.colacctmp");
+#system("cp a.pasm ../parrot; cd ../parrot; perl assemble.pl a.pasm > a.pbc");
+#system("cd ../parrot; ./parrot a.pbc");
 
 

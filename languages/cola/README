@@ -1,6 +1,6 @@
 "Cola" - A compiler for the Parrot/Perl6 VM
 
-  V0.0.6.0
+  V0.0.6.1
 
   I've started this compiler (I call it Cola) to simultaneously
   teach myself how to write a compiler (ok I admit I squeaked
@@ -18,7 +18,7 @@
   also includes a few directives that Parrot currently
   lacks. The parser leaves register allocation/spill control,
   optimization and a few other specifics to the intermediate
-  compiler (int2pasm.pl).
+  compiler (imcc).
 
 Where to Get the Latest Compiler
 
@@ -29,6 +29,11 @@ Where to Get the Latest Compiler
 
     http://cpan.org/authors/id/M/ME/MELVIN
 
+  If you get it separate from the Parrot dist, you'll also need
+  imcc from the same download site. imcc is the intermediate
+  language (PIR) compiler; currently Cola is the only language targetting
+  PIR. Just unpack imcc, build it, and copy the exe into the
+  cola directory.
 
 The Syntax
 
@@ -78,7 +83,7 @@ Supported Constructs
 
     The following works:
 
-        puts("Hello Mr " + name + "\n");
+        Console.WriteLine("Hello Mr " + name + "\n");
     
     There is no support for concatenation with non-strings yet.    
     Need to whip up a few conversion routines.
@@ -170,6 +175,10 @@ Using the Compiler
 
 	make
 
+  Build imcc:
+
+        cd ../imcc ; make ; cp imcc ../cola
+
   Usage:
 
 	colac examples/mandelbrot.cola
@@ -186,10 +195,9 @@ Using the Compiler
   is the raw compiler which ignores 'using' directives.
 
   Also, if you look in "a.imc" you will see an intermediate
-  language, delimited by tags (<program>....</program>) with some
-  debug info outside of those tags. Debugging the compiler is easier
-  by looking at the intermediate code. This language can be
-  piped through int2pasm.pl to re-generate the .pasm file.
+  language. Debugging the compiler is easier by looking at the
+  intermediate code. This language can be piped through imcc to
+  re-generate the .pasm file, however this is done by default.
 
   Currently the compiler is very limited with a few warnings and
   a few simple type coercions.
@@ -200,31 +208,8 @@ Using the Compiler
  
 Intermediate Code
 
-  NOTE: The translator is very simple, mostly it just pre-processes
-    code that it understands and leaves the bulk of the work to
-    the Parrot assembler.
 
-  The intermediate code output supports 3 primary types of statements.
-
-    Assignment statements, Branch statements, and Stack manipulation
-
-  It additionally supports:
-
-    Labels (Parrot style), Directives (.foo), Line comments (# ...),
-      and Here documents (for emitting code that skips through the
-      intermediate translator). The compiler uses the here document
-      to emit a few support routines (puts, substr). I'm working on
-      moving this stuff into System.cola.
-
-    Limited type checking. Each assignment has a type associated
-      with it, in the same syntax as a C-style cast.
-
-      Example:
-        (i32)$R12 = $N7 * 0.1
-
-        A floating point expression coerced to a integer.
-
-      The compiler will check for bad assignments such as int to string, etc.
+  Please see the README in the parrot/languages/imcc directory.
 
   For a nice sample of intermediate code, compile mandelbrot.cola or
   calc.cola which actually does a limited form of parsing with Parrot!
@@ -232,27 +217,7 @@ Intermediate Code
 
 Register Allocation
 
-  The register tracker took about 30 minutes to hack out and is
-  good enough for now. Temporaries from the compiler are either named
-  $LN or $RN (where N is an integer indicating the temporary). The
-  translator will assign registers from a register stack in "first
-  come first serve" fashion, and upon each line translation, it
-  will return any registers to the stack that were used for rvalues
-  on the right hand side of an assignment.
-  Rvalues are indicated by $RN. Named variables and $L (lvalues)
-  will currently hold their register for the scope of the method.
-
-  This is quick and dirty. I plan to implement a flavor of the
-  graph coloring algorithm for the final translator.
-
-  For now, if the translator runs out of registers, it will simply exit.
-  Parrot has 32 registers each of string, int, float and pmc so
-  it takes quite a number of local variables and/or quite a complex
-  expression to hold 32 live registers at any one point.
-
-  Mandelbrot currently uses 9 of 32 float registers and 6 of 32 int
-  registers to get its work done.
-
+  See imcc/README
 
 Optimization
 
@@ -284,17 +249,15 @@ Gaping Holes
 
   Arrays
     Strings can be treated as arrays, thats it for now.
-    Parrot still needs keyed aggregates finished to do this.
+    Will be adding full array support soon.
  
   Class/Struct instantiation
     Lotta work involved here, I won't go there for now.
-    Currently you can define multiple Cola classes per file, but cannot
-    instantiate any of them. Parrot currently does not
-    have an adequate bytecode "class format" in which to write
-    symbol table information. This should change soon; at least
-    thats what Dan says. :)
+    Parrot currently does not have an adequate bytecode "class format"
+    in which to write symbol table information. This will change soon.
 
   Object Methods and Field references
-    Again, a lot of work, but on the list.
+    Again, a lot of work, but on the list. I'm sort of faking
+    method calls for now, no instance calls.
 
 

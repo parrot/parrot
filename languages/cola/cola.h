@@ -11,7 +11,7 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.6.0"
+#define COLA_VERSION "0.0.6.1"
 
 #define DEBUG 0
 
@@ -105,8 +105,7 @@ typedef struct _Symbol {
     Type            *type;
     int             is_lval;
     struct _Symbol  *namespace; /* What namespace or class owns me */
-    SymbolTable     *table;     /* For functions/procs, redundant now */
-                                /* that I added namespace */
+    SymbolTable     *table;     /* If I'm a namespace/class, this is my symbol table */
     struct _Symbol  *literal;
     int             line;
 } Symbol;
@@ -133,7 +132,7 @@ struct _AST {
     Symbol          *sym;
     /* Expression generic nodes */
     Symbol          *targ;
-    Symbol          *locals;
+    Symbol          *vars;
     /* Conditional specific nodes
      * Reuse above nodes for if_then_else
      * arg1 = _then_ branch
@@ -184,17 +183,14 @@ struct _Type {
     Node            *next,
                     *tnext;
     unsigned long   flags;
-    enum TYPES      kind;       /* scalar, array, class, pointer/reference */
+    enum TYPES      kind;       /* class, array, pointer/reference */
+    int             size;
+/*
     int             typeid;
     int             parentid;
-    int             size;
-    Symbol          *sym;       /* Pointer to symbol representing name of type */
-    /* Array or reference specific infu */
+*/
+    Symbol          *sym;       /* symbol representing name of type */
     Type            *type;      /* Element or referenced type */
-    /* Array specific info */
-    Rank            *rank;
-    int             dim;        /* Total dim, can be derived from evaluating rank list */
-    int             **bounds;   /* N x 2 dimensional array of bounds where N = dimensions */        
 };
 
 typedef struct _Array {
@@ -283,6 +279,7 @@ Symbol              *pop_namespace();
 void                init_symbol_tables();
 void                init_builtin_types();
 Symbol              *split(const char *, const char *);
+unsigned int         hash_str(const char * str);
 Symbol              *lookup_symbol(const char *);
 Symbol              *lookup_symbol_in_tab(SymbolTable *, const char *);
 Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
@@ -359,11 +356,12 @@ void                gen_ast(AST * ast);
 void                gen_namespace_decl(AST *);
 void                gen_class_decl(AST *);
 void                gen_class_body(AST * ast);
-void                gen_local_decl(AST * ast);
+void                gen_field_decl(AST * ast);
 void                gen_constant_decl(AST * ast);
 void                gen_method_decl(AST * ast);
 void                gen_block(AST * ast);
 void                gen_statement(AST * ast);
+void                gen_var_decl(AST * ast);
 void                gen_assign(AST * ast);
 void                gen_expr(AST * ast, Symbol * lval, Type * t);
 void                gen_method_call(AST *);
@@ -376,8 +374,11 @@ void                gen_boolean(AST *, const char * true_label, const char * fal
 void                emit_op_expr(Symbol * res, Symbol * arg1, char * op, Symbol * arg2);
 void                emit_unary_expr(Symbol * res, Symbol * arg1, char * op);
 
-char                *new_rval();
-Symbol              *make_rval(Type * t);
+char                *new_itemp();
+char                *new_ntemp();
+char                *new_stemp();
+char                *new_ptemp();
+Symbol              *new_temp(Type * t);
 
 void                reset_temps();
 char                *get_label();

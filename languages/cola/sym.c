@@ -173,7 +173,7 @@ AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
     ast->arg2 = arg2;
     ast->sym = NULL;
     ast->targ = NULL;
-    ast->locals = NULL;
+    ast->vars = NULL;
     ast->up = NULL;
     ast->next = NULL;
     memset(&ast->Attr, 0, sizeof(ast->Attr));
@@ -537,6 +537,9 @@ Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
     return s;
 }
 
+/*
+ * Method locals
+ */
 void declare_local(Symbol * s) {
     fprintf(stderr, "declare_local[%s]\n", s->name);
     store_symbol(current_symbol_table, s);
@@ -555,23 +558,49 @@ void declare_local(Symbol * s) {
     }
 }
 
+/*
+ * Class fields
+ */
+void declare_field(Symbol * s) {
+    fprintf(stderr, "declare_field[%s]\n", s->name);
+    if(!current_namespace->type || current_namespace->type->kind != CLASS) {
+        fprintf(stderr, "Internal Error: field declarations only valid for classes.\n");
+        fprintf(stderr, "Current namespace is [%s]\n", current_namespace->name);
+        abort();
+    }
+    store_symbol(current_symbol_table, s);
+    if(s->typename) {
+        s->type = lookup_type_symbol(s->typename);
+        if(!s->type) {
+            fprintf(stderr, "declare_local: NULL type for ident [%s] typename [%s]\n",
+                s->name, s->typename->name);
+            abort();
+        }
+    }
+    else {
+        fprintf(stderr, "declare_local: NULL typename for ident [%s]\n",
+                s->name);
+        abort();
+    }
+}
+
 void dump_namespace(Symbol * ns) {
     if(ns->kind == CLASS) {
-        printf("<class %s>\n", ns->name);
+        printf("#<class %s>\n", ns->name);
         if(ns->table)
             dump_symbol_table(ns->table);
-        printf("</class>\n");    
+        printf("#</class>\n");    
     } else if(ns->kind == NAMESPACE) {
-        printf("<namespace %s>\n", ns->name);
+        printf("#<namespace %s>\n", ns->name);
         dump_symbol_table(ns->table);
-        printf("</namespace>\n");    
+        printf("#</namespace>\n");    
     }
 }
 
 void dump_symbol_table(SymbolTable * tab) {
     Symbol * sym;
     int i;
-    printf(" <symbol table>\n");
+    printf("#  <symbol table>\n");
     for(i = 0; i < HASH_SIZE; i++) {
         for(sym = tab->table[i]; sym; sym = sym->next) {
             switch(sym->kind) {
@@ -587,15 +616,15 @@ void dump_symbol_table(SymbolTable * tab) {
                             }
                     break;
                 case METHOD:
-                            printf("\tmethod:  \"%s\"\n", sym->name);
+                            printf("#\tmethod:  \"%s\"\n", sym->name);
                     break;
                 case IDENTIFIER:
-                            printf("\tid:      \"%s\"\n", sym->name);
+                            printf("#\tid:      \"%s\"\n", sym->name);
                     break;
                 case LITERAL:
-                            printf("\tliteral: \"%s\"\n", sym->name);
+                            printf("#\tliteral: \"%s\"\n", sym->name);
                     break;
-                case TYPE:  printf("\ttype:    \"%s\"\n", sym->name);
+                case TYPE:  printf("#\ttype:    \"%s\"\n", sym->name);
                             if(sym->table) {
                                 if(sym->table == tab) {
                                     printf("Internal error, namespace->symbol table loop.\n");
@@ -605,12 +634,12 @@ void dump_symbol_table(SymbolTable * tab) {
                                 dump_namespace(sym);
                             }
                     break;
-                default:    printf("unknown:   \"%s\"\n", sym->name);
+                default:    printf("#\tunknown:   \"%s\"\n", sym->name);
                     break;
             }
         }
     }
-    printf(" </symbol table>\n");
+    printf("#  </symbol table>\n");
 }
 
 Symbol * check_id_redecl(SymbolTable * table, const char * name) {

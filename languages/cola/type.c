@@ -55,18 +55,17 @@ void init_builtin_types() {
 Type * store_type(const char * name, int size) {
     Type * t = (Type *)malloc(sizeof(*t));
     Symbol * s = store_symbol(current_symbol_table, new_symbol(name));
+    t->type = NULL;
     s->type = t;
     s->kind = TYPE;
     t->size = size;
     t->kind = TYPE_SCALAR;
+/* 
     t->typeid = 0;
     t->parentid = 0;
+    t->flags = 0;
+*/
     t->sym = s; /* Circular reference */
-    /* Arrays and references */
-    t->type = 0;
-    t->rank = 0;
-    t->dim = 0;
-    t->bounds = 0;
     return t;
 }
 
