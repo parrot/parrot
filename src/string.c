@@ -251,15 +251,33 @@ string_init(Parrot_Interp interpreter)
         void * __ptr;
     } __ptr_u;
 
-    /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
-       set through the $PARROT_ICU_DATA_DIR environment variable. Need
-       a way to specify this via the command line as well. */
-    data_dir = Parrot_getenv("PARROT_ICU_DATA_DIR", &free_data_dir);
-    if (data_dir == NULL)
-        data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
-    string_set_data_directory(data_dir);
-    if (free_data_dir)
-        mem_sys_free((void*)data_dir); /* cast away the constness */
+    if (!interpreter->parent_interpreter) {
+        /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
+           set through the $PARROT_ICU_DATA_DIR environment variable. Need
+           a way to specify this via the command line as well. */
+        data_dir = Parrot_getenv("PARROT_ICU_DATA_DIR", &free_data_dir);
+        if (data_dir == NULL) {
+            const char *prefix;
+            char *p, *build_path;
+            build_path = data_dir = const_cast(DEFAULT_ICU_DATA_DIR);
+            /*
+             * if the installed --prefix directory exists then use it
+             */
+            prefix = Parrot_get_runtime_prefix(interpreter, NULL);
+            if (prefix) {
+                p = strstr(build_path, "blib");        /* .../blib/lib/... */
+                assert(p);
+                --p;        /* slash or backslash */
+                data_dir = mem_sys_allocate(strlen(prefix) + strlen(p) + 1);
+                strcpy(data_dir, prefix);
+                strcat(data_dir, p);
+                free_data_dir = 1;
+            }
+        }
+        string_set_data_directory(data_dir);
+        if (free_data_dir)
+            mem_sys_free((void*)data_dir); /* cast away the constness */
+    }
 /*
     encoding_init();
     chartype_init();
