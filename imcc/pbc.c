@@ -591,13 +591,15 @@ static int
 add_const_num(struct Parrot_Interp *interpreter, char *buf)
 {
     int k;
+    STRING *s;
 
     k = PDB_extend_const_table(interpreter);
 
     interpreter->code->const_table->constants[k]->type =
         PFC_NUMBER;
+    s = string_from_cstring(interpreter, buf, 0);
     interpreter->code->const_table->constants[k]->u.number =
-        (FLOATVAL)atof(buf);
+        string_to_num(s);
     return k;
 }
 

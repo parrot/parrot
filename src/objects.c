@@ -266,10 +266,10 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
                 child_class_name, child_class);
     }
     else {
+        child_class_name = string_make(interpreter,
+                "\0\0anonymous", 11, NULL, 0, NULL);
         VTABLE_set_string_native(interpreter, classname_pmc,
-                string_make(interpreter,
-                    "\0\0anonymous",
-                    11, NULL, 0, NULL));
+                child_class_name );
     }
 
     set_attrib_num(child_class_array, PCD_CLASS_NAME, classname_pmc);

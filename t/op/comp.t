@@ -16,7 +16,7 @@ Tests various conditional branch operations.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 # some of these were failing with JIT/i386
 
@@ -180,6 +180,19 @@ CODE
 0
 -1
 1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "eq_num");
+        new P0, .PerlNum
+        set P0, -1.2
+        new P1, .PerlString
+        set P1, "-1.2"
+        eq_num P0, P1, OK
+        print "not "
+OK:     print "ok\n"
+        end
+CODE
+ok
 OUTPUT
 
 1;

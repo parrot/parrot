@@ -1836,9 +1836,10 @@ string_to_num(const STRING *s)
         int exp_sign = 0;
         INTVAL in_exp = 0;
         INTVAL in_number = 0;
-        FLOATVAL exponent = 0;
+        INTVAL exponent = 0;
         INTVAL fake_exponent = 0;
         INTVAL digit_family = 0;
+        FLOATVAL exp_log=10.0, exp_val=1.0;
 
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
@@ -1849,7 +1850,7 @@ string_to_num(const STRING *s)
 
             if (df && df == digit_family) {
                 if (in_exp) {
-                    exponent = exponent * 10 + s->type->get_digit(s->type,c);
+                    exponent = exponent*10 + s->type->get_digit(s->type,c);
                     if (!exp_sign) {
                         exp_sign = 1;
                     }
@@ -1906,7 +1907,30 @@ string_to_num(const STRING *s)
 
         exponent = fake_exponent + exponent * exp_sign;
 
-        f = f * sign * pow(10.0, exponent);     /* ugly, oh yeah */
+        if(exponent < 0) {
+            exponent = -exponent; 
+            exp_sign=-1;
+        }
+
+        for (;;) {
+            if (exponent & 1) {
+                exp_val *= exp_log;
+                exponent--;
+            }
+            if (!exponent)
+                break;
+            exp_log *= exp_log;
+            exponent >>= 1;
+        }
+        
+        if(exp_sign < 0)
+            f /= exp_val;
+        else
+            f *= exp_val;
+
+        
+        if(sign < 0)
+            f = -f;
     }
 
     return f;

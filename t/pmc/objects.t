@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -997,7 +997,7 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existant class");
     subclass P1, "Character", "Nemo"
     print "Uh-oh...\n"
-    end 
+    end
 CODE
 /Class doesn't exist/
 OUTPUT
@@ -1005,10 +1005,20 @@ OUTPUT
 output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
     subclass P1, "Character"
     print "Uh-oh...\n"
-    end 
+    end
 CODE
 /Class doesn't exist/
 OUTPUT
 
-1;
+output_like(<<'CODE', <<'OUTPUT', "anon. subclass classname");
+    newclass P0, "City"
+    subclass P1, P0
+    classname S0, P1
+    print S0
+    print "\n"
+    end
+CODE
+/anonymous/
+OUTPUT
+
 
