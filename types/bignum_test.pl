@@ -5,7 +5,7 @@
 # This allows a single bignum test to be run directly through the C
 # library.  Usage available by getting the args wrong.
 
-use Inline C => Config => CCFLAGS => '-I/usr/home/alex/perl6/alex-bcd/';
+use Inline C => Config => CCFLAGS => '-I/usr/home/alex/perl6/parrot/types';
 use Inline C => <<'END_OF_C_SECTION';
 #include "bignum.c"
 

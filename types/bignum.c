@@ -47,6 +47,8 @@ Parrot string playing, exception raising
 
 */
 
+/* * This lot wants to go in a (bignum specific seperate header file * */
+
 /* Access digits, macros assume length given */
 /*=head1 Access macros
 
@@ -79,13 +81,13 @@ char* lazygdbprint(BIGNUM* foo) {
 }
 
 /* Internal functions + types */
-typedef enum {
+typedef enum {   /* Indicate to idivide when to stop */
   BN_DIV_DIVIDE,
   BN_DIV_DIVINT,
   BN_DIV_REMAIN
 } BN_DIV_ENUM;
 
-typedef struct {
+typedef struct { /* Used to restore INTENT(IN) arguments to functions */
   BIGNUM one;
   BIGNUM two;
 } BN_SAVE_PREC;
@@ -142,10 +144,10 @@ BIGNUM* BN_new(PINTD_ INTVAL length) {
 Grows in so that it can contain length I<decimal> digits.
 
 =cut*/
-int BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
+void BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
   assert(in != NULL);
-  if (length <= in->nibs * 8)
-    return 0;
+  if (length <= in->nibs * BN_D_PER_NIB)
+    return;
 
   if (length > BN_MAX_DIGITS)
     BN_EXCEPT(PINT_ BN_OVERFLOW, "Attempt to grow BIGNUM beyond limits");
@@ -154,7 +156,7 @@ int BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
   in->buffer = (BN_NIB*)BN_realloc(PINT_ in->buffer, sizeof(BN_NIB)* (in->nibs) );
   if (NULL==in->buffer)
     BN_EXCEPT(PINT_ BN_INSUFFICIENT_STORAGE, "Cannot grow BIGNUM");
-  return 0;
+  return;
 }
 
 /*=head2 int BN_destroy(BIGNUM *bn)
@@ -162,39 +164,48 @@ int BN_grow(PINTD_ BIGNUM *in, INTVAL length) {
 Frees the memory used by the BIGNUM.
 
 =cut*/
-int BN_destroy(PINTD_ BIGNUM *bn) {
+void BN_destroy(PINTD_ BIGNUM *bn) {
   assert(bn!=NULL);
 
   BN_free(PINT_ bn->buffer);
   BN_free(PINT_ bn);
-  return 0;
+  return;
 }
 
 /*=head1 Getting data into a bignum
 
+These functions are exported for code outside the library to use if it
+wants.
+
 =head2 BN_set_digit(BIGNUM* bn, INTVAL pos, int value)
 
-Sets digit at pos to value.  Extends if needed.
+Sets digit at pos (zero based) to value.  Number is grown if digits >
+allocated space are accessed, but intermediate digits do not have
+their value set to anything.  If I<pos> is beyond I<digits> then
+I<digits> is also updated.
 
 =cut*/
-int BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, int value) {
+INTVAL BN_set_digit(PINT_ BIGNUM* bn, INTVAL pos, INTVAL value) {
   assert(bn != NULL);
   if (pos > bn->nibs * BN_D_PER_NIB)
     BN_grow(bn, pos);
   assert(value < 10);
+  assert(value > -1);
   BN_setd(bn, pos, value);
   if (bn->digits < pos+1)
     bn->digits = pos+1;
   return value;
 }
 
-/*=head2 int BN_get_digit(BIGNUM* bn, INTVAL pos)
+/*=head2 INTVAL BN_get_digit(BIGNUM* bn, INTVAL pos)
 
-Get the value of the decimal digit at pos.
+Get the value of the decimal digit at pos, returns -1 if pos is out of
+bounds.
 
 =cut*/
-int BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
+INTVAL BN_get_digit(PINTD_ BIGNUM* bn, INTVAL pos) {
   assert(bn != NULL);
+  if (pos > bn->digits || pos < 0) return -1;
   return BN_getd(bn, pos);
 }
 
@@ -237,12 +248,12 @@ BIGNUM* BN_new_from_int(PINTD_ INTVAL value) {
     value = value / 10;
     i++;
   }
-  new->digits = i; /* As BN_new returns `0', which has one digit */
+  new->digits = i;
   new->expn = 0;
   return new;
 }
 
-/*=head2 BN_PRINT_DEBUG
+/*=head2 BN_PRINT_DEBUG(BIGNUM *bn, char *mesg)
 
 Dump the bignum for testing (should the to_*_string versions be broked).
 
@@ -253,7 +264,8 @@ void BN_PRINT_DEBUG (BIGNUM *bn, char* mesg) {
 	 bn->nibs, bn->digits, bn->sign, bn->expn);
   for (i=bn->digits-1; i>-1; i--) {
     printf("%d", BN_getd(bn, i));
-    if (!(i%4)) printf(" ");
+    if (!(i%5)) printf(" ");
+    if (!(i%70)) printf("\n");
   }
   printf("\n");
 }
@@ -279,7 +291,12 @@ Converts bn into a scientific representation, stored in dest.
 Converts bn into a engineering representation, stored in dest.
 
 These functions return char* strings only, parrot may want to
-reimplement these so that locals and the like are nicely coped with.
+reimplement these so that locales and the like are nicely coped with.
+
+Any reimplementation should be in a seperate file, this section of
+the main file can be #ifdef'd out if this is done.
+
+Memory pointed to by dest is not freed by this function.
 
 =cut*/
 
@@ -292,7 +309,7 @@ INTVAL BN_to_engineering_string(PINTD_ BIGNUM*bn, char **dest) {
 
 INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
   char* cur;
-  INTVAL adj_exp = 0;
+  INTVAL adj_exp = 0; /* as bn->expn is relative to 0th digit */
   INTVAL cur_dig = 0;
   assert(bn!=NULL);
   *dest = (char*)BN_alloc(PINT_ bn->digits + 5 + BN_D_PER_INT);
@@ -313,7 +330,7 @@ INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     if (bn->digits + bn->expn <= 0) {
       int i;
       *cur++ = '0';
-      if (bn->digits+bn->expn<0) *cur++ = '.'; /*XXX: locales */
+      if (bn->digits+bn->expn<0) *cur++ = '.';
       for (i=1; i <= -(bn->digits + bn->expn); i++) *cur++ = '0';
     }
     for (cur_dig = bn->digits-1; cur_dig >-1; cur_dig--) {
@@ -323,7 +340,7 @@ INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
     *cur = 0;
   }
   else { /* Use exponential notation, different for sci and eng */
-    if (bn->sign) *cur++ = '-';
+    if (bn->sign) *cur++ = '-'; /* We don't prefix '+' */
     
     if (eng) {
       int deficit;
@@ -369,14 +386,14 @@ INTVAL BN_to_scieng_string(PINTD_ BIGNUM* bn, char **dest, int eng) {
       }
 
       *cur++ = 'E';
-      sprintf(cur, "%i", adj_exp);
+      sprintf(cur, "%+i", adj_exp);
 
     }
     else { /* Scientific */
-      if (bn->digits == 1) {
+      if (bn->digits == 1) { /* We don't want 1.E+7 */
 	*cur++ = '0'+ BN_getd(bn, 0);
       }
-      else {
+      else { /* We have x.xE */
 	*cur++ = '0' + BN_getd(bn, bn->digits-1);
 	*cur++ = '.';
 	for (cur_dig = bn->digits-2; cur_dig > -1; cur_dig--) {
@@ -407,23 +424,24 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
   BIGNUM *result;
   BIGNUM *temp;
 
-  INTVAL pos = 0;
-  INTVAL negative = 0;
-  INTVAL seen_dot = 0;
-  INTVAL seen_e = 0;
-  INTVAL exp_sign = 0;
-  INTVAL in_exp = 0;
-  INTVAL in_number = 0;
-  INTVAL exponent = 0;
-  INTVAL fake_exponent = 0;
-  INTVAL i = 0;
-  INTVAL non_zero_digits = 0;
-  INTVAL seen_plus = 0;
+  INTVAL pos = 0;             /* current digit in buffer */
+  INTVAL negative = 0;        /* is it negative */
+  INTVAL seen_dot = 0;        /* have we seen a '.' */
+  INTVAL seen_e = 0;          /* have we seen an 'E' or 'e' */
+  INTVAL exp_sign = 0;        /* is the exponent negative */
+  INTVAL in_exp = 0;          /* are we reading exponent digits */
+  INTVAL in_number = 0;       /* are we reading coeff digits */
+  INTVAL exponent = 0;        /* the exponent */
+  INTVAL fake_exponent = 0;   /* adjustment for digits after a '.' */
+  INTVAL i = 0;               
+  INTVAL non_zero_digits = 0; /* have we seen *any* digits */
+  INTVAL seen_plus = 0;       /* was number prefixed with '+' */
 
-  temp = BN_new(PINT_ 1);
+  temp = BN_new(PINT_ 1);     /* We store coeff reversed in temp */
   
   while (*s2) { /* charge through the string */
     if (isdigit(*s2) && !in_exp) {
+      /* We're somewhere in the main string of numbers */
       int digit = *s2 - '0'; /* byte me! */
       if (digit ==0 && !non_zero_digits) { /* ignore leading zeros */
 	in_number = 1;
@@ -434,7 +452,6 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
       else {
 	non_zero_digits = 1;
       }
-      /* We're somewhere in the main string of numbers */
       in_number = 1;
       BN_grow(PINT_ temp, pos+10);
       BN_setd(temp, pos, digit);
@@ -449,7 +466,7 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
     else if (!in_number) {
       /* we've not yet seen any digits */
       if (*s2 == '-') {
-	if (seen_plus || negative)
+	if (seen_plus || negative || seen_dot)
 	  BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "Incorrect number format");
 	negative = 1;
       }
@@ -457,7 +474,7 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
 	seen_dot = 1;
       }
       else if (*s2 == '+') {
-	if (seen_plus || negative)
+	if (seen_plus || negative || seen_dot)
 	  BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "Incorrect number format");
 	seen_plus = 1; /* be very quiet */
       }
@@ -485,7 +502,7 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
 	  BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "b Incorrect number format");
 	}
       }
-      else {
+      else { /* We fall through here if we don't recognise something */
 	BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "c Incorrect number format");
       }
     }
@@ -497,11 +514,11 @@ BIGNUM* BN_from_string(PINTD_ char* s2) {
     BN_setd(temp, 0, 0);
   }
 
-  if (pos==0) {
+  if (pos==0) { /* This includes ".e+20" */
     BN_EXCEPT(PINT_ BN_CONVERSION_SYNTAX, "no digits in string");
   }
 
-
+  /* copy reversed string of digits backwards into result */
   temp->digits = pos;
   result = BN_new(pos+1);
 
@@ -556,6 +573,7 @@ void BN_strip_lead_zeros(PINTD_ BIGNUM* bn) {
 /*=item BN_strip_tail_zeros(BIGNUM *victim)
 
 Removes trailing zeros and increases the exponent appropriately.
+Does not remove zeros before the decimal point.
 
 =cut*/
 
@@ -609,6 +627,8 @@ void BN_make_integer(PINTD_ BIGNUM* bn, BN_CONTEXT* context) {
 
 Sets any number which should be zero to a cannonical zero.
 
+To check if a number is equal to zero, use BN_is_zero.
+
 =cut*/
 void BN_really_zero(PINTD_ BIGNUM* bn) {
   INTVAL i;
@@ -623,7 +643,15 @@ void BN_really_zero(PINTD_ BIGNUM* bn) {
 
 /*=item BN_round(BIGNUM *victim, BN_CONTEXT* context)
 
-Rounds victim according to context;
+Rounds victim according to context.
+
+If I<precision> is negative 0, numbers are rounded at their decimal
+point (this is *not* specified in the sda, but is useful for parrot).
+If this would cause digits to be lost, and I<lost_digits> is true,
+an appropriate exception is generated.
+
+Round assumes that any leading zeros are significant (after an
+addition operation, for instance).
 
 =cut*/
 
@@ -631,9 +659,12 @@ int BN_round (PINTD_ BIGNUM *bn, BN_CONTEXT* context) {
   assert(bn!= NULL);
   assert(context != NULL);
 
-  /* BN_strip_lead_zeros(PINT_ bn); */
-  if (context->precision < 0) return 1; /* As is a bigint, no rounding */
-
+  if (context->precision < 0) { /* Rounding a BigInt */
+    BN_round_as_integer(PINT_ bn, context);
+    return;
+  }
+  
+  /* Rounding a BigNum or sdaNum*/
   if (bn->digits > context->precision) {
     if (context->lost_digits) {
       INTVAL digit;
@@ -734,6 +765,47 @@ int BN_round_down(PINT_ BIGNUM *bn, BN_CONTEXT* context) {
 }
 
 /*=back*/
+
+/*=head2 BN_round_as_integer(BIGNUM* bn, BN_CONTEXT* context)
+
+Removes any digits after the decimal point, warns if lost_digits.
+
+=cut*/
+void BN_round_as_integer(PINTD_ BIGNUM *bn, BN_CONTEXT *context) {
+  INTVAL i;
+  BN_CONTEXT temp_context;
+
+  if (bn->expn < 0) {
+    if (context->lost_digits) {
+      /* Are we losing information? */
+      for (i=0; i<-bn->expn && i<bn->digits; i++) {
+	if (BN_getd(bn, i) != 0)
+	  BN_EXCEPT(BN_LOST_DIGITS, "truncating IntVal");
+      }
+    }
+
+    /* We'll cheat by passing a false context to the normal rounding.
+       If "precision" < 1, we add a false zero to front and set p to 1 */
+    temp_context = *context;
+    temp_context.precision = bn->digits + bn->expn;
+    if (temp_context.precision < 1) {
+      temp_context.precision = 1;
+      BN_grow(bn, bn->digits + 1);
+      BN_setd(bn, bn->digits, 0);
+      bn->digits++;
+      BN_round(PINT_ bn, &temp_context);
+    }
+    else {
+      BN_round(PINT_ bn, &temp_context);
+    }
+    BN_really_zero(PINT_ bn);
+
+    /* XXX: if using warning flags on context, | with temp context here */
+  }
+
+  return;
+}
+
 
 /*=head1 Arithmetic operations 
 
@@ -1198,13 +1270,20 @@ BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *contex
   
   result->sign = 1 & (one->sign ^ two->sign);
 
+  BN_strip_lead_zeros(PINT_ result);
   BN_arith_cleanup(PINT_ result, one, two, context, NULL);
+
 }
 
 /*=head2 BN_divide(result, one, two, context)
 
 Divide two into one, storing up to I<precision> digits in result.
-Performs own rounding.
+Performs own rounding.  We also assume that this function B<will not
+be used> to produce a BigInt.  That is the job of divide_integer.
+
+If you want to divide two integers to produce a float, you must
+do so with I<precision> greater than the number of significant
+digits in either operand.
 
 =cut*/
 
@@ -1218,7 +1297,7 @@ void BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *cont
 
   BN_strip_lead_zeros(PINT_ result);
 
-  if (context->precision == ROUND_HALF_EVEN) {
+  if (context->rounding == ROUND_HALF_EVEN) {
     if (result->digits > context->precision) {
       if (context->lost_digits) {
 	BN_EXCEPT(PINT_ BN_LOST_DIGITS, "digits lost after division");
@@ -1282,7 +1361,7 @@ void BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *cont
 
 /*=head2 BN_divide_integer(result, one, two, context)
 
-places the integer part of one / two into result.
+Places the integer part of one / two into result.
 
 =cut*/
 void
@@ -1292,7 +1371,7 @@ BN_divide_integer (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *
   BN_idivide(PINT_ result, one, two, context, BN_DIV_DIVINT, rem);
   
   BN_really_zero(PINT_ rem);
-  if (result->expn >0 && 
+  if (result->expn >0 && context->precision > 0 &&
       result->expn + result->digits > context->precision &&
       !(rem->digits == 0 && BN_getd(rem, 0) == 0)) {
     BN_EXCEPT(PINT_ BN_DIVISION_IMPOSSIBLE,
@@ -1337,7 +1416,7 @@ BN_remainder (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *conte
   BN_idivide(PINT_ fake, one, two, context, BN_DIV_REMAIN, result);
 
   BN_really_zero(PINT_ result);
-  if (fake->expn >0 && 
+  if (fake->expn >0 && context->precision > 0 &&
       fake->expn + result->digits > context->precision &&
       !(result->digits == 0 && BN_getd(result, 0) == 0)) {
     BN_EXCEPT(PINT_ BN_DIVISION_IMPOSSIBLE,
@@ -1432,7 +1511,7 @@ BN_idivide (PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     }
     /* Are we done yet? */
     if (value && rem->digits ==1 && BN_getd(rem, 0)==0) break;
-    if (t2->digits == context->precision +1) break;
+    if (t2->digits == context->precision +1 && context->precision >0) break;
     if (operation == BN_DIV_DIVINT|| operation == BN_DIV_REMAIN) {
       if (t1->expn ==0) break;
     }
@@ -1553,6 +1632,7 @@ INTVAL BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
   INTVAL result = 0;
   INTVAL maxdigs = BN_D_PER_INT < context->precision ?
                    BN_D_PER_INT : context->precision;
+  if (context->precision < 0) maxdigs = BN_D_PER_INT;
 
 
   BN_strip_lead_zeros(PINT_ bn);
@@ -1572,7 +1652,7 @@ INTVAL BN_to_int(PINT_ BIGNUM* bn, BN_CONTEXT* context) {
     BN_EXCEPT(PINT_ BN_LOST_DIGITS, "digits lost in conv -> int");
   }
 
-  if (bn->digits + bn->expn > context->precision) {
+  if (bn->digits + bn->expn > context->precision && context->precision > 0) {
     BN_EXCEPT(PINT_ BN_LOST_DIGITS, "digits lost in conv -> int");
   }
 
