@@ -187,7 +187,7 @@ sub disassemble($$$$) {
 	print STDERR "\n\n" if DEBUG;
 
     # FIXME
-    $result =~ s/\\x00 \\x00 $//;
+    $result =~ s/\\x00 \\x00 $// unless $result =~ m/\\x0f \\x82 \\x00 \\x00 \\x00 \\x00/;
     # These 2 are OK by now.
     $result =~ s/\\x\w\w \\xff \\xff \\xff JUMP/JUMP/g;
     $result =~ s/\\x00 JUMP/JUMP/g;

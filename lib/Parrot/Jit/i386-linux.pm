@@ -48,7 +48,7 @@ sub system_call($$$) {
     }
         
     $sc .= "mov \$" . $syscall_number{$sys_n} . ",\%eax\n";
-    $sc .= "int \$0x80\njb 0\n";
+    $sc .= "int \$0x80\njb 4\n";
     return $sc;
 }
 
