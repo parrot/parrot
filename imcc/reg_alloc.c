@@ -329,6 +329,8 @@ sort_reglist(IMC_Unit *unit)
 
 /*
  * regs are sorted now according to their start line of usage
+ * which means they are sorted by basic block numbers too
+ *
  * run through them and allocate all that don't overlap
  * in one bunch
  *
@@ -336,77 +338,86 @@ sort_reglist(IMC_Unit *unit)
  * get allocate immediately
  */
 
-
 #define ALLOCATE_HACK
 
 #ifdef ALLOCATE_HACK
 
-#define SHORT_RANGE 5
 static void
-allocate_non_interfering(Parrot_Interp interpreter, SymReg ** reglist, int n)
+allocate_non_interfering(Parrot_Interp interpreter, IMC_Unit *unit, int n)
 {
     int i, t;
-    int first_color, last_line, bb_index;
+    int first_color, last_line, b, first_reg;
     SymReg *r;
+    SymReg ** reglist = unit->reglist;
 
     for (t = 0; t < 4; t++) {
         int typ = "INSP"[t];
-        first_color = 30;
-        /* scan reglist if this color is unused */
-        while (first_color >= 28) {  /* 28..30 for 3 temps */
-            for (i = 0; i < n; i++) {
-                r = reglist[i];
-                if (r->set != typ || (r->type & VT_REGP) ||
-                        r->want_regno >= 0 || r->color >= 0)
-                    continue;
-                if (r->color == first_color) {
-                    warning(interpreter, "allocate_non_interfering",
-                            "color %d for register type %c in use",
-                            first_color, typ);
-                    goto out;
+        i = 0;
+        for (b = 0; b < unit->n_basic_blocks; b++) {
+            first_color = 30;
+            last_line = -1;
+            first_reg = -1;
+            while (first_color >= 28) {  /* 28..30 for 3 temps */
+                for (; i < n; ++i) {
+                    r = reglist[i];
+                    /*
+                     * if we didn't reach this basic block, continue
+                     */
+                    if (r->first_ins->bbindex < b)
+                        continue;
+                    /* remember first register in this block */
+                    if (first_reg == -1)
+                        first_reg = i;
+                    /*
+                     * register set must match and not already allocated
+                     */
+                    if (r->set != typ || (r->type & VT_REGP) ||
+                            r->want_regno >= 0 || r->color >= 0)
+                        continue;
+                    if (r->color == first_color) {
+                        warning(interpreter, "allocate_non_interfering",
+                                "color %d for register type %c in use",
+                                first_color, typ);
+                        goto next_color;
+                    }
+                    /* at end of block start over, try next color */
+                    if (r->first_ins->bbindex > b)
+                        goto next_color;
+                    /* if this register spans more then one block
+                     * try next one
+                     */
+                    if (r->last_ins->bbindex > b)
+                        continue;
+                    /*
+                     * if it interfers with the previous allocated reg
+                     * try next one
+                     */
+                    if (r->first_ins->index <= last_line)
+                        continue;
+                    assert(r->first_ins->bbindex == r->last_ins->bbindex);
+                    break;
                 }
-            }
-            /*
-             * now scan reglist for small ranged non-interfering regs
-             * of that typ
-             */
-            bb_index = last_line = -1;
-            for (i = 0; i < n; i++) {
-                r = reglist[i];
-                if (r->set != typ || (r->type & VT_REGP) ||
-                        r->want_regno >= 0 || r->color >= 0)
-                    continue;
-                if (r->last_ins->index - r->first_ins->index > SHORT_RANGE)
-                    continue;
-                /*
-                 * if reg is used outside of this basic block continue
-                 */
-                if (r->first_ins->bbindex != r->last_ins->bbindex)
-                    continue;
-                /* found a short ranged reg
-                 *
-                 * if this is used before the previous one ended, they overlap
-                 */
-                if (r->first_ins->index <= last_line)
-                    continue;
-                /*
-                 * if this is not the same basic block, they might interfer
-                 * due to a branch
-                 */
-                if (r->first_ins->bbindex != bb_index && bb_index >= 0)
-                    continue;
+                if (i == n)
+                    goto next_block;
                 last_line = r->last_ins->index;
-                bb_index = r->last_ins->bbindex;
                 r->color = first_color;
                 r->type = VTPASM;
-                debug(interpreter, DEBUG_IMC, "coloring '%s' %d\n",
-                        r->name, r->color);
+                debug(interpreter, DEBUG_IMC, "block %d coloring '%s' %d\n",
+                        b, r->name, r->color);
+                continue;
+next_color:
+                if (first_reg >= 0)
+                    i = first_reg;
+                else
+                    i = 0;
+                /* reset, color is decremented, so no interfernce */
+                last_line = -1;
+                --first_color;
             }
-            first_color--;
-        }
-out:
-        ;
-    }
+next_block:
+            ;
+        } /* for b */
+    } /* for t */
 }
 #endif
 
@@ -488,7 +499,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     if (first) {
 #ifdef ALLOCATE_HACK
         info(interpreter, 1, "build_reglist: %d symbols\n", n_symbols);
-        allocate_non_interfering(interpreter, unit->reglist, n_symbols);
+        allocate_non_interfering(interpreter, unit, n_symbols);
         build_reglist(interpreter, unit, 0);
         info(interpreter, 1, "allocate_non_interfering, now: %d symbols\n",
                 unit->n_symbols);
