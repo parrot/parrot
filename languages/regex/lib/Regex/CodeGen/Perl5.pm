@@ -460,4 +460,10 @@ sub output_call_result {
     return (@ops, "goto $fail_label if ! \$$uid\->{'!RESULT'};");
 }
 
+sub output_code {
+    my ($self, $code) = @_;
+    # Assume, for now, that the code is Perl5 code
+    return ("# START EMBEDDED CODE", $code, "# END EMBEDDED CODE");
+}
+
 1;

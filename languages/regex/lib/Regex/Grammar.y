@@ -5,20 +5,46 @@ use constant FALSE => 0;
 
 sub tokenize {
     my $data = shift;
-    my @tokens = $data =~ /(\\.|.)/g;
+
+    my @tokens;
     my @types;
-    foreach (@tokens) {
-        if (/^\\(.)/) {
-            $_ = $1;
+    my $state = 0;
+    my $depth = 0;
+    for my $c (split(//, $data)) {
+        if ($state == 0) {
+            if ($c eq '\\') {
+                $state = 1;
+            } elsif ($c eq '{') {
+                push @tokens, '{';
+                push @types, 'CODE';
+                $state = 2;
+                $depth = 1;
+            } else {
+                push @tokens, $c;
+                if ($c =~ /\d/) {
+                    push @types, 'NUM';
+                } elsif ($c =~ /[\w\s]/) {
+                    push @types, 'CHAR';
+                } else {
+                    push @types, $c;
+                }
+            }
+        } elsif ($state == 1) {
+            push @tokens, $c;
             push @types, 'CHAR';
-        } elsif (/\d/) {
-            push @types, 'NUM';
-        } elsif (/[\w\s]/) {
-            push @types, 'CHAR';
+            $state = 0;
         } else {
-            push @types, $_;
+            if ($c eq '{') {
+                ++$depth;
+            } elsif ($c eq '}') {
+                if (--$depth == 0) {
+                    $state = 0;
+                }
+            }
+            $tokens[-1] .= $c;
         }
     }
+
     return \@tokens, \@types;
 }
 
@@ -39,7 +65,7 @@ $::paren = 0;
 
 rules : rules rule
   { return [ @{ $_[1] }, $_[2] ] }
-      | 
+      |
   { return []; }
 ;
 
@@ -105,6 +131,8 @@ expr : expr '|' expr
    { return op('call' => [ $_[2], 0 ]) }
      | '<' '?' rulename '>'
    { return op('group', [ op('call' => [ $_[3], 1 ]), ++$::paren ]) }
+     | CODE
+   { return op('code' => [ $_[1] ]) }
 ;
 
 rulename : rulename CHAR

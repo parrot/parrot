@@ -109,6 +109,16 @@ END
 package Regex::Driver::PIR;
 our @ISA = qw(Regex::Driver);
 
+# sub output_header {
+#     my ($self, $fh) = @_;
+#     print $fh <<'END';
+# .sub __init_regex @LOAD
+#   loadlib $P0, "match_group"
+#   .return ()
+# .end
+# END
+# }
+
 sub output_rule_body {
     my ($self, $fh, $subname, $rule, $ctx, $instructions) = @_;
     print $fh join("\n", @$instructions), "\n";

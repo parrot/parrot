@@ -477,4 +477,12 @@ sub output_call_result {
             "unless <rx_tmp>, $fail_label");
 }
 
+sub output_code {
+    my ($self, $code) = @_;
+    # Assume, for now, that the code is PIR code
+    return ("# START EMBEDDED CODE",
+            split(/\n/, substr($code, 1, -1)),
+            "# END EMBEDDED CODE");
+}
+
 1;

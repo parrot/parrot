@@ -22,6 +22,7 @@ use Carp qw(confess);
 # scan : Scan through input until R matches
 # atend : At the end of the input?
 # advance : Unconditionally advance 1 char
+# code : Embedded code, in some language
 
 # Stuff that is used for optimization
 # -----------------------------------
@@ -48,6 +49,7 @@ use Carp qw(confess);
 @Regex::Ops::Tree::check::ISA        = qw(Regex::Ops::Tree);
 
 @Regex::Ops::Tree::call::ISA         = qw(Regex::Ops::Tree);
+@Regex::Ops::Tree::code::ISA         = qw(Regex::Ops::Tree);
 
 # Construct a new op
 sub op {
@@ -340,6 +342,16 @@ sub minlen { 0 }
 sub maxlen { undef }
 sub dfa_safe { 0 }
 sub hasback { 1 }
+sub startset { undef }
+
+# Embedded code is truly unpredictable. Although there will probably
+# be pragmata for allowing code to specify that it won't muck with
+# things.
+package Regex::Ops::Tree::code;
+sub minlen { 0 }
+sub maxlen { undef }
+sub dfa_safe { 0 }
+sub hasback { 0 } # FIXME! code should be allowed to have BACK{} blocks
 sub startset { undef }
 
 ########################################################################
