@@ -696,6 +696,19 @@ op split(out PMC, in STR, in STR) :base_core {
     goto NEXT();
 }
 
+=item B<isnull>(in STR, labelconst INT)
+
+Branch to $2 if $1 is a NULL string.
+
+=cut
+
+op isnull(in STR, labelconst INT) :base_core {
+  if ($1 == NULL) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
 =back
 
 =head1 COPYRIGHT

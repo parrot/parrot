@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 130;
+use Parrot::Test tests => 131;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2397,6 +2397,21 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "isnull_sc_ic");
+	set S0, "foo"
+	isnull S0, ERROR
+	print "ok 1\n"
+	null S0
+	isnull S0, OK
+ERROR:	print "error\n"
+	end
+OK:	print "ok 2\n"
+	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 1;
