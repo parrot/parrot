@@ -440,6 +440,7 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 
     /* return if no more arguments */
     if (!(command && *command)) {
+        PIO_eprintf(interpreter, "No condition specified\n");
         mem_sys_free(condition);
         return NULL;
     }
@@ -531,14 +532,40 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
 
     /* return if no more arguments */
     if (!(command && *command)) {
+        PIO_eprintf(interpreter, "Can't compare a register with nothing\n");
         mem_sys_free(condition);
         return NULL;
     }
 
-    if (!((isdigit((int)*command)) || (*command == '"'))) {
-    /* It's a register - we check and store the register number
-       XXX  We don't currently check that the register type
-       XXX  matches that of the first register */
+    if (isalpha((int)*command)) {
+        /* It's a register - we first check that it's the correct type */
+        switch (*command) {
+            case 'i':
+            case 'I':
+                if (!(condition->type & PDB_cond_int))
+                    goto WRONG_REG;
+                break;
+            case 'n':
+            case 'N':
+                if (!(condition->type & PDB_cond_num))
+                    goto WRONG_REG;
+                break;
+            case 's':
+            case 'S':
+                if (!(condition->type & PDB_cond_str))
+                    goto WRONG_REG;
+                break;
+            case 'p':
+            case 'P':
+                if (!(condition->type & PDB_cond_pmc))
+                    goto WRONG_REG;
+                break;
+            default:
+WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
+                mem_sys_free(condition);
+                return NULL;
+        }
+        /* Now we check and store the register number */
         reg_number = (int)atoi(++command);
         if (reg_number >= (int) NUM_REGISTERS || reg_number < 0) {
             PIO_eprintf(interpreter, "Out-of-bounds register\n");
@@ -576,6 +603,9 @@ INV_COND:   PIO_eprintf(interpreter, "Invalid condition\n");
         return NULL;
     }
 
+    /* We're not part of a list yet */ 
+    condition->next = NULL;
+
     return condition;
 }
 
@@ -588,14 +618,13 @@ PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
     PDB_t *pdb = interpreter->pdb;
     PDB_condition_t *condition;
 
-    na(command);
-
     if (!(condition = PDB_cond(interpreter, command)))
         return;
 
     /* Add it to the head of the list */
     if (pdb->watchpoint)
         condition->next = pdb->watchpoint;
+
     pdb->watchpoint = condition;
 }
 
