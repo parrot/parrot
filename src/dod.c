@@ -1140,11 +1140,30 @@ Parrot_dod_ms_run_init(Interp *interpreter)
 #endif
 }
 
+static int
+sweep_cb(Interp *interpreter, struct Small_Object_Pool *pool, int flag,
+        void *arg)
+{
+    int *total_free = (int *) arg;
+#ifdef GC_IS_MALLOC
+    if (flag & POOL_BUFFER)
+        used_cow(interpreter, pool, 0);
+#endif
+    Parrot_dod_sweep(interpreter, pool);
+#ifdef GC_IS_MALLOC
+    if (flag & POOL_BUFFER)
+        clear_cow(interpreter, pool, 0);
+#endif
+    if (interpreter->profile && (flag & POOL_PMC))
+        Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
+    *total_free += pool->num_free_objects;
+    return 0;
+}
+
 void
 Parrot_dod_ms_run(Interp *interpreter, int flags)
 {
     struct Arenas *arena_base = interpreter->arena_base;
-    struct Small_Object_Pool *header_pool;
     int j;
     /* XXX these should go into the interpreter */
     int total_free = 0;
@@ -1175,27 +1194,10 @@ Parrot_dod_ms_run(Interp *interpreter, int flags)
          * mark is now finished
          */
         /* pt_DOD_stop_mark(interpreter); */
-        /* Now put unused PMCs on the free list */
-        header_pool = arena_base->pmc_pool;
-        Parrot_dod_sweep(interpreter, header_pool);
-        total_free += header_pool->num_free_objects;
-        if (interpreter->profile)
-            Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cp);
 
-        /* And unused buffers on the free list */
-        for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-            header_pool = arena_base->sized_header_pools[j];
-            if (header_pool) {
-#ifdef GC_IS_MALLOC
-                used_cow(interpreter, header_pool, 0);
-#endif
-                Parrot_dod_sweep(interpreter, header_pool);
-                total_free += header_pool->num_free_objects;
-#ifdef GC_IS_MALLOC
-                clear_cow(interpreter, header_pool, 0);
-#endif
-            }
-        }
+        /* Now put unused PMCs and Buffers on the free list */
+        Parrot_forall_header_pools(interpreter, POOL_BUFFER | POOL_PMC,
+            (void*)&total_free, sweep_cb);
         if (interpreter->profile)
             Parrot_dod_profile_end(interpreter, PARROT_PROF_DOD_cb);
     }
