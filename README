@@ -1,7 +1,7 @@
 This is Parrot, version 0.0.13
 ------------------------------
 
-Parrot is Copyright (C) 2001-2003 The Perl Foundation. All Rights Reserved.
+Parrot is Copyright (C) 2001-2004 The Perl Foundation. All Rights Reserved.
 
 LICENSE INFORMATION
 -------------------
@@ -15,34 +15,23 @@ redistribute it and/or modify it under the terms of either:
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either
 the GNU General Public License or the Artistic License for more details.
 
 PREREQUISITES
 -------------
 
-You'll need a compiler and linker, of course.  A make program
-is currently encouraged, but we have had difficulties with some
-versions (like nmake), so we do have a primitive script
-that attempts to emulate it.
+You'll need a compiler a linker and a make program of course.
 
-You'll also need Perl 5.005 or above, compiled to support
-the types you wish to support in Parrot.  (Parrot will
-make, but you'll be unable to assemble anything.)  You can find
-what types are support by typing 'perl -V', and examining the
-values for ivtype and nvtype.  Parrot should work with INTVALs
-and FLOATVALs up to those types.
+You'll also need Perl 5.005 or above to run the config scripts.
 
 For most of the platforms that we are supporting initially,
-Parrot should build out of the box.  We do not have,
-however, native dynamic loading ready for OS X, and are
-currently using Fink (http://fink.sourceforge.net) to fill
-that gap.  Other solutions may also work.  The list of
-targetted platforms can be found in docs/parrot.pod.
+Parrot should build out of the box.
+The list of targetted platforms can be found in PLATFORMS.
 
 The current configure system is primitive, as it's only
-a temporary solution.  It will be happy with most any answers
-you decide to feed it.  Garbage In, Garbage Out.
+a temporary solution. It will be happy with most any answers
+you decide to feed it. Garbage In, Garbage Out.
 
 You may want to peruse the list of KNOWN_ISSUES to see
 what other things may be unexpected.
@@ -57,22 +46,28 @@ probably already done that) and type
 
 to run the Configure script. The Configure.pl script extracts configuration
 from the running perl5 program. If you have a non-standard setup (like "long
-long" integers on a 32-bit system), you might consider to run:
+long" integers on a 32-bit system), you should run:
 
     perl Configure.pl --intval=int --opcode=int
 
 See "perl Configure.pl --help" for more options.
 
-This will generate a config.h header, a Parrot::Config module, and a Makefile.
+This will generate a config.h header, a Parrot::Config module, platform
+files and some Makefiles.
+
 The file "myconfig" has an overview of configure settings.
 
 Next type
 
     make
 
+or
+
+    nmake
+
 and the interpreter should build.
 
-You can test the assembler and interpreter by running
+You can test parrot by running
 
     make test
 
@@ -84,23 +79,23 @@ NOTES
 -----
 
 On some older computers with little RAM, the computed-goto dispatch core
-(core_ops_cg.c) may take a while to compile or may fail to compile at all.
-You can pass a flag to Configure (--cgoto=0) to disable the computed-goto
+(ops/core_ops_cg.c) may take a while to compile or may fail to compile at all.
+You can pass a flag to Configure.pl (--cgoto=0) to disable the computed-goto
 core, at a slight cost in runtime speed.
 
 CHANGES
 -------
 
 For documentation on the user-visible changes between this version and
-previous versions, please see NEWS. The full changelog is available
-as ChangeLog.
+previous versions, please see NEWS. The full changelog is (or should be)
+available as ChangeLog.
 
 MAILING LISTS
 -------------
 
-The mailing list for parrot is currently perl6-internals.  Subscribe
-by sending mail to perl6-internals-subscribe@perl.org.
-It is archived at http://nntp.perl.org/group/perl.perl6.internals
+The mailing list for parrot is perl6-internals.  Subscribe by sending mail to
+perl6-internals-subscribe@perl.org. It is archived at
+http://nntp.perl.org/group/perl.perl6.internals
 
 WEB SITES
 ---------
