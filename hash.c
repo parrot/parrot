@@ -428,6 +428,22 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     fprintf(stderr, "*** hash_delete given nonexistent key\n");
 }
 
+HASH *
+hash_clone(struct Parrot_Interp * interp, HASH * hash) {
+    HASH * ret = new_hash(interp);
+    HASHBUCKET ** table = (HASHBUCKET **)hash->buffer.bufstart;
+    int i;
+    for (i = 0; i < hash->num_buckets; i++) {
+        HASHBUCKET * b = table[i];
+        while (b) {
+            /* XXX: does b->key need to be copied? */
+            hash_put(interp, ret, b->key, key_clone(interp, &(b->value)));
+            b = b->next;
+        }
+    }
+    return ret;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

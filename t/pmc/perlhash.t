@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is(<<'CODE', <<OUTPUT, "simple set / get");
@@ -406,6 +406,50 @@ OK_3: print "ok 3\n"
 OK_4: print "ok 4\n"
 
       end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "Testing clone");
+    new P0, .PerlHash
+    set S0, "a"
+    set P0[S0], 1
+    set S1, "b"
+    set P0[S1], 2
+    	
+    clone P1, P0
+    set P1["a"], 3
+    set P0["c"], 4
+    set P1["d"], 5
+    
+    set I0, P0["a"]
+    eq I0, 1, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    
+    set I0, P1["a"]
+    eq I0, 3, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    
+    set P2, P1["c"]
+    unless P2, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    
+    set P2, P0["d"]
+    unless P2, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    end
+
 CODE
 ok 1
 ok 2
