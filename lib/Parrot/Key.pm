@@ -56,7 +56,7 @@ sub components
   }
 }
 
-=item C<unpack()
+=item C<unpack()>
 
 Unpack from the string and return the number of characters that should
 be removed from the packed string.
@@ -109,7 +109,7 @@ sub pack
   return $packed;
 }
 
-=item C<dump().
+=item C<dump()>
 
 =cut
 
