@@ -569,15 +569,14 @@ sub read_dump {
 }
 
 sub print_tree {
-    my $include = shift;
-    my ($depth, @files) = @_;
+    my ($include,$depth, @files) = @_;
+
     foreach my $file (@files) {
 	my $class = read_dump($include, $file);
-	my $name = $class->{class};
-	print "    " x $depth, $name, "\n";
+	print "    " x $depth, $class->{class}, "\n";
 	foreach my $parent (keys %{$class->{flags}{extends}}) {
-	    my $pmc = "classes/" . lc($parent) . ".pmc";
-	    print_tree($depth + 1, $pmc);
+	    my $pmc = lc($parent) . '.pmc';
+	    print_tree($include, $depth + 1, $pmc);
 	}
     }
 }
