@@ -3596,8 +3596,10 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     return 0;
 }
 
-/*#define _PARROTLIB*/
+/* _PARROTLIB is now the default */
+#define _PARROTLIB
 
+/* XXX: use this code for miniparrot */
 #if !defined(_PARROTLIB)
 static FILE*
 open_file (char *file_name, const char **incl)

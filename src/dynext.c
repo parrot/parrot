@@ -19,8 +19,8 @@ src/dynext.c - Dynamic extensions to Parrot
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
-/* use parrotlib for dynext finding? */
-/*#define _PARROTLIB*/
+/* _PARROTLIB is now the default */
+#define _PARROTLIB
 
 /*
 
