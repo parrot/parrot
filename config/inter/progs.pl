@@ -24,7 +24,7 @@ sub runstep {
   my $debug='n';
 
   $libs=join ' ',
-  grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm|dbm|ndbm|db)$/ }
+  grep { $^O=~/VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
   split(' ', $libs);
 
   # Try each alternative, until one works.
