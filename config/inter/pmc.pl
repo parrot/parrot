@@ -75,7 +75,7 @@ END
       $pmc_build .= "$pmc.c $pmc.h: $parent $pmc.pmc\n";
       $pmc_build .= "\t\$(PMC2C) $pmc.pmc\n";
       $pmc_build .= "\n";
-      $pmc_build .= "$pmc\$(O): \$(H_FILES) $parent_headers $pmc.h\n";
+      $pmc_build .= "$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers $pmc.h\n";
   }
 
   # build list of libraries for link line in Makefile

@@ -20,8 +20,9 @@ LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
 LD_SHARED_FLAGS=${ld_shared_flags}
 
-INC=include/parrot
+INC=./${inc}
 
+NONGEN_HEADERS = ${nongen_headers}
 
 ###############################################################################
 #
@@ -84,25 +85,7 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 #
 ###############################################################################
 
-GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
-	$(INC)/register.h $(INC)/string.h $(INC)/events.h \
-	$(INC)/interpreter.h $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h \
-	$(INC)/packfile.h $(INC)/global_setup.h $(INC)/vtable.h \
-	$(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h  $(INC)/enums.h \
-	$(INC)/runops_cores.h $(INC)/trace.h $(INC)/pmc.h $(INC)/key.h \
-	$(INC)/hash.h $(INC)/resources.h $(INC)/core_pmcs.h \
-	$(INC)/platform.h ${cg_h} $(INC)/interp_guts.h $(INC)/rx.h \
-	$(INC)/rxstacks.h $(INC)/intlist.h $(INC)/embed.h $(INC)/warnings.h \
-	$(INC)/misc.h $(INC)/pmc.h $(INC)/key.h $(INC)/hash.h \
-	$(INC)/smallobject.h $(INC)/headers.h $(INC)/dod.h \
-	$(INC)/method_util.h $(INC)/list.h $(INC)/datatypes.h \
-	$(INC)/regfuncs.h $(INC)/string_funcs.h $(INC)/encoding.h \
-	$(INC)/chartype.h $(INC)/oplib.h $(INC)/sub.h $(INC)/unicode.h \
-	$(INC)/perltypes.h $(INC)/exit.h $(INC)/nci.h $(INC)/pobj.h \
-	$(INC)/thread.h $(INC)/tsq.h $(INC)/longopt.h $(INC)/objects.h \
-	$(INC)/dynext.h
-
+GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${cg_h}
 
 
 ALL_H_FILES = $(GENERAL_H_FILES)
@@ -543,7 +526,7 @@ languages.dummy :
 
 # If anything in the classes directory is out of date,
 # then run `make` in sub-dir to rebuild only the out of date files.
-$(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(INC)/vtable.h
+$(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 	cd classes && $(MAKE) && cd ..
 
 

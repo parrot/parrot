@@ -3,7 +3,7 @@ RM_F = ${rm_f}
 
 INC=../include/parrot
 
-H_FILES = $(INC)/parrot.h default.h
+NONGEN_HEADERS = ${nongen_headers}
 
 
 O_FILES = ${pmc_o}

@@ -9,7 +9,8 @@ use vars qw(@steps);
 	init/data.pl
 	init/miniparrot.pl
 	init/hints.pl
-        init/optimize.pl
+	init/optimize.pl
+	init/headers.pl
 	inter/progs.pl
 	inter/types.pl
 	inter/ops.pl
@@ -39,7 +40,7 @@ use vars qw(@steps);
 	gen/myconfig.pl
 	gen/platform.pl
 	gen/libparrot_def.pl
-        gen/core_pmcs.pl
+	gen/core_pmcs.pl
 	gen/parrot_include.pl
 );
 
