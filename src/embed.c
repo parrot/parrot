@@ -417,7 +417,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
                 k = interpreter->profile->data[j].op;
                 PIO_printf(interpreter, "  %5d  %-20s  %7vu  %10vf  %10vf\n",
                         k,
-                        k == interpreter->op_count ?
+                        k == (int)interpreter->op_count ?
                         "Exception" :
                         interpreter->op_info_table[k].full_name,
                         n,
