@@ -55,6 +55,10 @@ pmclass Integer extends mmd_default {
       return (INTVAL)SELF->cache.int_val;
    }
 
+   INTVAL get_bool() {
+      return(SELF->cache.int_val != 0);
+   }
+
    STRING* get_string() {
       return string_from_num(INTERP, SELF->cache.int_val);
    }

@@ -33,6 +33,19 @@
 
 # This may move elsewhere, hence the indirection
 .constant NestLevel	I14
+.constant PendingElse   I15
+
+.macro GetNestLevel
+  noop
+.endm
+
+.macro IncNestLevel
+  inc I14
+.endm
+
+.macro DecNestLevel
+  dec I14
+.endm
 
 .constant IntStack      I31
 
@@ -71,6 +84,7 @@ VeryBeginning:
 
     # We need a PMC for the compiler
     compreg .PASMCompiler, "PASM"
+
     bsr InitializeCoreOps
 
     set .Mode, .InterpretMode
@@ -163,6 +177,9 @@ InitializeCoreOps:
     new .CoreOps, .PerlHash
     new .UserOps, .PerlHash
     new .SpecialWords, .PerlHash
+
+    set .SpecialWords["if"], 1
+    set .SpecialWords["then"], 2
 
     .AddCoreOp(Int_Dot,".")
     .AddCoreOp(Int_Dot_Stack,".s")
@@ -1142,11 +1159,28 @@ CheckForString:
 # Control flow and such, where a simple substitution won't do
 AddSpecialWord:
     ne .CurrentWord, "if", NotIf
+    .IncNestLevel
+    .GetNestLevel
+    concat .NewBodyString, "restore P27\n"
+    concat .NewBodyString, "unless P27, endif"
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, "\n" 
+    branch EndSpecWord
   NotIf:
     ne .CurrentWord, "then", NotThen
+    .GetNestLevel
+    concat .NewBodyString, "endif"
+    set .TempString, .NestLevel
+    concat .NewBodyString, .TempString
+    concat .NewBodyString, ":\n" 
+    .DecNestLevel
+    branch EndSpecWord
   NotThen:
     ne .CurrentWord, "else", NotElse
   NotElse:
+    branch EndSpecWord    
+EndSpecWord:
     ret
 
 AddIntConstant:
