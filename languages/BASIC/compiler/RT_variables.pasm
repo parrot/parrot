@@ -360,10 +360,8 @@ SETREFERENCE:
 	set P0["ref"], S0
 	
 SETEND:	set P1[S1], P0
-	#print " Setting variable "
-	#print S1
-	#print "\n"
 	ret
+
 ERRREFTYPEMISMATCH:
 	print "Attempted to set a reference from type "
 	print S5

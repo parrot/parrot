@@ -1212,8 +1212,10 @@ sub parse_next_helper {
 	set P0, P2["variable"]
 	bsr ASSIGNMENT		# P0 = P6
 
+	new P6, .PerlHash
+	set P6["type"], "BARE"
+	set P6["value"], "$var"	# Where we are, P6
 
-	set P6, P0		# Where we are, P6
 	set S2, "$vartype"
 	set S1, "$var"
 	set S0, "finish"
