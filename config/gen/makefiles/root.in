@@ -724,7 +724,8 @@ testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out t/op/*.o t/op/*.stabs.s \
 	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s \
 	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out t/stress/*.o t/stress/*.stabs.s \
-	        t/src/*_*
+	        t/src/*_* \
+		t/op/*.imc t/pmc/*.imc
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
