@@ -484,6 +484,51 @@ inline op set_addr(out INT, in INT) {
   goto NEXT();
 }
 
+########################################
+
+=item B<exchange>(out INT, out INT)
+
+=item B<exchange>(out NUM, out NUM)
+
+=item B<exchange>(out PMC, out PMC)
+
+=item B<exchange>(out STR, out STR)
+
+Exchange the contents of registers $1 and $2
+
+=cut
+
+op exchange(out INT, out INT) {
+   INTVAL temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(out PMC, out PMC) {
+   PMC *temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(out NUM, out NUM) {
+   FLOATVAL temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
+
+op exchange(out STR, out STR) {
+   STRING *temp;
+   temp = $1;
+   $1 = $2;
+   $2 = temp;
+   goto NEXT();
+}
 
 ########################################
 

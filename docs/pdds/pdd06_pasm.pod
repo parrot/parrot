@@ -273,6 +273,12 @@ pointer, so if you do something like:
 this will copy the pointer in S1 into S0, leaving B<both> registers
 pointing at the same string.
 
+=item exchange tx, ty
+
+Exchange the contents of registers X and Y, which must be of the same
+type. (Generally cheaper than using the stack as an intermediary when
+setting up registers for function calls)
+
 =item assign Px, ty
 
 Takes the contents of Y and assigns them into the existing PMC in X.
