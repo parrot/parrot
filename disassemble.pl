@@ -91,8 +91,8 @@ sub dump_const_table {
     #
 
     print "#\n";
-    print "# Constant  Type          Data\n"; 
-    print "# --------  ------------  ------------------------------\n"; 
+    print "# Constant  Type          Data\n";
+    print "# --------  ------------  ------------------------------\n";
 
     my $constant_num = 0;
 
@@ -268,22 +268,23 @@ sub disassemble_file {
     printf "#\n";
     printf "# Segments:\n";
     printf "#\n";
-    printf "#   * Wordsize: %8d bytes\n", sizeof('byte');
-    printf "#   * Byteorder: %8d bytes\n", sizeof('byte');
-    printf "#   * Major: %8d bytes\n", sizeof('byte');
-    printf "#   * Minor: %8d bytes\n", sizeof('byte');
-    printf "#   * Flags: %8d bytes\n", sizeof('byte');
-    printf "#   * FloatType: %8d bytes\n", sizeof('byte');
-    printf "#   * Unused: %8d bytes\n", length($pf->pad);
-    printf "#   * Magic Number: %8d bytes\n", sizeof('op');
-    printf "#   * Opcode Type: %8d bytes\n", sizeof('op');
+    printf "#   * Wordsize:     %8d bytes (%d)\n", sizeof('byte'), $pf->wordsize;
+    printf "#   * Byteorder:    %8d bytes (%d)\n", sizeof('byte'), $pf->byteorder;
+    printf "#   * Major:        %8d bytes (%d)\n", sizeof('byte'), $pf->major;
+    printf "#   * Minor:        %8d bytes (%d)\n", sizeof('byte'), $pf->minor;
+    printf "#   * Flags:        %8d bytes (%d)\n", sizeof('byte'), $pf->flags;
+    printf "#   * FloatType:    %8d bytes (%d)\n", sizeof('byte'), $pf->floattype;
+    printf "#   * Fingerprint:  %8d bytes (". "0x%02x," x9 . "0x%02x)\n", length($pf->pad),
+        unpack("C10", $pf->pad);
+    printf "#   * Magic Number: %8d bytes (0x%08x)\n", sizeof('op'), $pf->magic;
+    printf "#   * Opcode Type:  %8d bytes (0x%08x)\n", sizeof('op'), $pf->opcodetype;
     printf "#   * Fixup Table:  %8d bytes\n", $pf->fixup_table->packed_size;
     printf "#   * Const Table:  %8d bytes\n", $pf->const_table->packed_size;
     printf "#   * Byte Code:    %8d bytes (%d opcode_ts)\n", length($pf->byte_code), length($pf->byte_code) / sizeof('op');
 
     dump_const_table($pf);
     disassemble_byte_code($pf);
- 
+
     undef $pf;
 
     return;
