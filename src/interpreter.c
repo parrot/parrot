@@ -56,7 +56,7 @@ load_oplib(struct Parrot_Interp * interpreter,
     op_lib_t *oplib;
 
     if (!handle)
-        internal_exception(1, "Could't load oplib file '%s': %s\n",
+        internal_exception(1, "Couldn't load oplib file '%s': %s\n",
                 file, Parrot_dlerror());
     init_func =
         (oplib_init_f)(ptrcast_t)Parrot_dlsym(handle, init_func_name);
