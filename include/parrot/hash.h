@@ -15,10 +15,10 @@
 
 /* Prototypes */
 
-typedef struct _hashbucket HASHBUCKET;
+typedef struct _hashbucket HashBucket;
 
-/* HASH is really a hashtable, but 'hash' is standard perl nomenclature. */
-typedef struct _hash HASH;
+/* Hash is really a hashtable, but 'hash' is standard perl nomenclature. */
+typedef struct _hash Hash;
 
 typedef enum {
     enum_hash_undef,
@@ -26,15 +26,15 @@ typedef enum {
     enum_hash_num = enum_type_FLOATVAL,
     enum_hash_string = enum_type_STRING,
     enum_hash_pmc = enum_type_PMC
-} HASH_ENTRY_TYPE;
+} HashEntryType;
 
 /*
  * hash_entry is currently unused
  */
 typedef struct _hash_entry {
-    HASH_ENTRY_TYPE type;
+    HashEntryType type;
     UnionVal val;
-} HASH_ENTRY;
+} HashEntry;
 
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
@@ -64,19 +64,21 @@ struct _hash {
     hash_mark_key_fn mark_key;
 };
 
-HASH * new_hash(Interp * interpreter);
-HASH * new_hash_x(Interp * interpreter,
+Hash * new_hash(Interp * interpreter);
+Hash * new_hash_x(Interp * interpreter,
         hash_comp_fn, hash_hash_key_fn, hash_mark_key_fn);
-HASH * new_cstring_hash(Interp *interpreter);
-HASH * hash_clone(Interp * interpreter, HASH * src);
-INTVAL hash_size(Interp * interpreter, HASH *hash);
-void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
-void hash_destroy(Interp * interpreter, HASH *hash);
-HASHBUCKET *hash_get(Interp * interpreter, HASH *hash, void *key);
-void hash_put(Interp * interpreter, HASH *hash, void *key, void *value);
-void hash_delete(Interp * interpreter, HASH *hash, void *key);
-void mark_hash(Interp * interpreter, HASH *hash);
-void dump_hash(Interp * interpreter, HASH *hash);
+Hash * new_cstring_hash(Interp *interpreter);
+Hash * hash_clone(Interp * interpreter, Hash * src);
+INTVAL hash_size(Interp * interpreter, Hash *hash);
+void hash_set_size(Interp * interpreter, Hash *hash, UINTVAL size);
+void hash_destroy(Interp * interpreter, Hash *hash);
+HashBucket *hash_get_bucket(Interp * interpreter, Hash *hash, void *key);
+void *hash_get(Interp * interpreter, Hash *hash, void *key);
+INTVAL hash_exists(Interp * interpreter, Hash *hash, void *key);
+void hash_put(Interp * interpreter, Hash *hash, void *key, void *value);
+void hash_delete(Interp * interpreter, Hash *hash, void *key);
+void mark_hash(Interp * interpreter, Hash *hash);
+void dump_hash(Interp * interpreter, Hash *hash);
 
 #endif
 

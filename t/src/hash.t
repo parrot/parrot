@@ -11,9 +11,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "new_hash");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -47,9 +47,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_destroy");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -84,9 +84,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_put");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -123,10 +123,10 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
+    HashEntry _value;
+    HashEntry *value = &_value;
 
     interpreter = Parrot_new();
 
@@ -164,10 +164,10 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get with NULL key");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
+    HashEntry _value;
+    HashEntry *value = &_value;
 
     interpreter = Parrot_new();
 
@@ -213,10 +213,10 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_get with empty string key");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
+    HashEntry _value;
+    HashEntry *value = &_value;
 
     interpreter = Parrot_new();
 
@@ -268,10 +268,10 @@ int main(int argc, char* argv[]) {
 
 int do_test(Interp *interpreter)
 {
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
+    HashEntry _value;
+    HashEntry *value = &_value;
     char *big;
 
     hash = new_hash(interpreter);
@@ -308,9 +308,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_size");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -359,9 +359,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_set_size");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -396,9 +396,9 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_delete");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
@@ -450,11 +450,11 @@ c_output_is(<<'CODE', <<'OUTPUT', "hash_clone");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
-    HASH *hash2;
+    Hash *hash;
+    Hash *hash2;
     STRING *key;
-    HASH_ENTRY _value;
-    HASH_ENTRY *value = &_value;
+    HashEntry _value;
+    HashEntry *value = &_value;
 
     interpreter = Parrot_new();
 
@@ -500,9 +500,9 @@ c_output_like(<<'CODE', <<'OUTPUT', "dump_hash");
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    HASH *hash;
+    Hash *hash;
     STRING *key;
-    HASH_ENTRY value;
+    HashEntry value;
 
     interpreter = Parrot_new();
 
