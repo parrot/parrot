@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 90;
+use Parrot::Test tests => 91;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2372,4 +2372,13 @@ output_like(<<"CODE", <<OUTPUT, "undef warning");
 CODE
 /Use of uninitialized.*pasm/i
 OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "find_method");
+	new P1, .PerlInt
+	find_method P0, P1, "no_such_meth"
+	end
+CODE
+Method 'no_such_meth' not found
+OUTPUT
+
 1;

@@ -185,7 +185,7 @@ PMC in $1.
 op find_method(out PMC, in PMC, in STR) {
     opcode_t * resume = expr NEXT();
     $1 = $2->vtable->find_method(interpreter, $2, $3);
-    if (!$1)
+    if (!$1 || !VTABLE_defined(interpreter, $1))
         real_exception(interpreter, resume, METH_NOT_FOUND,
             "Method '%s' not found", string_to_cstring(interpreter, $3));
     restart ADDRESS(resume);

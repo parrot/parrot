@@ -536,25 +536,6 @@ EOC
      push @methods, $methodname;
   };
 
-  # now lets set up the vtable for insertion into the Parrot core (if
-  # necessary) after this insane line of code @methods will have the
-  # correct function name for each of the methods listed in the
-  # vtable.tbl file.
-
-  @methods = ();
-  for (@$default)
-  {
-      my $methodname = $_->[1];
-      push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
-      $OUT .= $methodbody{ $methodname } . "\n\n"
-          if exists $methodbody{ $methodname };
-  }
-
-  # this collapses the array and makes sure the spacing is right for
-  # the vtable
-  my $methodlist = join (",\n        ", @methods);
-  my $initname = "Parrot_$classname" . "_class_init";
-
   # generate the #include directives for each of the superclasses. We
   # get superclasses from the %methodloc hash, however, we have to
   # remove duplicates.
@@ -581,6 +562,48 @@ $pre
 ${includes}
 
 EOC
+
+  # now lets set up the vtable for insertion into the Parrot core (if
+  # necessary) after this insane line of code @methods will have the
+  # correct function name for each of the methods listed in the
+  # vtable.tbl file.
+
+  @methods = ();
+  for (@$default)
+  {
+      my $methodname = $_->[1];
+      push @methods, "Parrot_$methodloc->{$methodname}_$methodname";
+      if (exists $methodbody{ $methodname }) {
+	    $OUT .= $methodbody{ $methodname } . "\n\n"
+      }
+      elsif ($classname eq 'default') {
+	# generate default body
+        my $type = $_->[0];
+        my $parameters = $_->[2];
+	$parameters = ", $parameters" if $parameters;
+	my $retval = "($type) 0";
+	my $ret = $type eq 'void' ? '' : "return $retval;" ;
+	my $ln = 1 + ($OUT =~ tr/\n/\n/);
+	my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";
+	my $decl = "$type Parrot_default_${methodname} (struct Parrot_Interp *interpreter, PMC* pmc$parameters)";
+	$HOUT .= "extern $decl;\n";
+	$OUT .= <<EOC;
+$line
+    $decl {
+	internal_exception(ILL_INHERIT,
+		"$methodname() not implemented in class '%s'",
+		caller(interpreter, pmc));
+	$ret
+    }
+EOC
+
+      }
+  }
+
+  # this collapses the array and makes sure the spacing is right for
+  # the vtable
+  my $methodlist = join (",\n        ", @methods);
+  my $initname = "Parrot_$classname" . "_class_init";
 
   unless (exists $flags{noinit}) {
       my $initline = 1+count_newlines($OUT)+1;

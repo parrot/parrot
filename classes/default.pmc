@@ -6,6 +6,8 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *    All methods which are not defined here get a default implementaion
+ *    generate  from vtable.tbl by classes/pmc2c.pl
  *  References:
  */
 
@@ -17,7 +19,7 @@ static const char * caller(Parrot_Interp interp, PMC * pmc);
 
 static const char * caller(Parrot_Interp interp, PMC * pmc)
 {
-    return pmc && pmc->vtable && pmc->vtable->name ?
+    return pmc && pmc->vtable && pmc->vtable->whoami ?
 	VTABLE_name(interp, pmc)->strstart : "(null)";
 }
 
@@ -34,20 +36,9 @@ pmclass default abstract noinit {
         DYNSELF.init();
     }
 
-    void morph (INTVAL type) {
-	internal_exception(ILL_INHERIT,
-		"morph() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
 
     void mark () {
         PANIC("custom_mark flag set but no custom mark routine defined");
-    }
-
-    void destroy () {
-        internal_exception(ILL_INHERIT,
-		"custom_destroy flag set but no custom destroy routine defined"
-		" in class '%s'\n", caller(INTERP, SELF));
     }
 
     PMC* getprop(STRING* key) {
@@ -105,31 +96,12 @@ pmclass default abstract noinit {
         return SELF->vtable->base_type;
     }
 
-    INTVAL type_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"type_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     INTVAL type_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.type_keyed(r_key);
     }
 
-    UINTVAL subtype (INTVAL type) {
-	internal_exception(ILL_INHERIT,
-		"subtype() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    UINTVAL subtype_keyed (PMC* key, INTVAL type) {
-	internal_exception(ILL_INHERIT,
-		"subtype_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     UINTVAL subtype_keyed_int (INTVAL key, INTVAL type) {
         PMC* r_key = INT2KEY(INTERP, key);
@@ -140,28 +112,9 @@ pmclass default abstract noinit {
         return SELF->vtable->whoami;
     }
 
-    STRING* name_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"name_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
     STRING* name_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.name_keyed(r_key);
-    }
-
-    void clone (PMC *dest) {
-	internal_exception(ILL_INHERIT,
-		"clone() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void clone_keyed (PMC* key, PMC *dest) {
-	internal_exception(ILL_INHERIT,
-		"clone_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
     }
 
     void clone_keyed_int (INTVAL key, PMC *dest) {
@@ -176,30 +129,9 @@ pmclass default abstract noinit {
         return NULL;
     }
 
-    PMC* find_method_keyed(PMC* key, STRING* method_name) {
-	internal_exception(ILL_INHERIT,
-		"find_method_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
     PMC* find_method_keyed_int(INTVAL key, STRING* method_name) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.find_method_keyed(r_key, method_name);
-    }
-
-    INTVAL get_integer () {
-	internal_exception(ILL_INHERIT,
-		"get_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-	return 0;
-    }
-
-    INTVAL get_integer_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
     }
 
     INTVAL get_integer_keyed_int (INTVAL key) {
@@ -207,56 +139,15 @@ pmclass default abstract noinit {
         return DYNSELF.get_integer_keyed(r_key);
     }
 
-    FLOATVAL get_number () {
-	internal_exception(ILL_INHERIT,
-		"get_number() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-	return 0.0;
-    }
-
-    FLOATVAL get_number_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_number_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0.0;
-    }
-
     FLOATVAL get_number_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_number_keyed(r_key);
     }
 
-    BIGNUM* get_bignum () {
-	internal_exception(ILL_INHERIT,
-		"get_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    BIGNUM* get_bignum_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
 
     BIGNUM* get_bignum_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bignum_keyed(r_key);
-    }
-
-    STRING* get_string () {
-	internal_exception(ILL_INHERIT,
-		"get_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* get_string_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
     }
 
     STRING* get_string_keyed_int (INTVAL key) {
@@ -264,37 +155,10 @@ pmclass default abstract noinit {
         return DYNSELF.get_string_keyed(r_key);
     }
 
-    INTVAL get_bool () {
-	internal_exception(ILL_INHERIT,
-		"get_bool() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL get_bool_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_bool_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     INTVAL get_bool_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bool_keyed(r_key);
-    }
-
-    INTVAL elements () {
-	internal_exception(ILL_INHERIT,
-		"elements() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL elements_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"elements_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
     }
 
     INTVAL elements_keyed_int (INTVAL key) {
@@ -306,13 +170,6 @@ pmclass default abstract noinit {
         return SELF;
     }
 
-    PMC* get_pmc_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"get_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_pmc_keyed(r_key);
@@ -322,40 +179,9 @@ pmclass default abstract noinit {
         return SELF == value;
     }
 
-    INTVAL is_same_keyed (PMC* key, PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"is_same_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
     INTVAL is_same_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.is_same_keyed(r_key, value);
-    }
-
-    void set_integer (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_integer_native (INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"set_integer_native() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_integer_same (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_integer_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_integer_keyed (PMC* key, INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"set_integer_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
     }
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
@@ -363,86 +189,15 @@ pmclass default abstract noinit {
         VTABLE_set_integer_keyed(INTERP, SELF, r_key, value);
     }
 
-    void set_number (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_number() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_number_native (FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"set_number_native() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_number_same (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_number_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_number_keyed (PMC* key, FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"set_number_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_number_keyed(INTERP, SELF, r_key, value);
     }
 
-    void set_bignum (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_bignum_native (BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"set_bignum_native() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_bignum_same (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_bignum_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_bignum_keyed (PMC* key, BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"set_bignum_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
     void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         VTABLE_set_bignum_keyed(INTERP, SELF, r_key, value);
-    }
-
-    void set_string (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_string_native (STRING* value) {
-	internal_exception(ILL_INHERIT,
-		"set_string_native() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_string_same (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_string_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void set_string_keyed (PMC* key, STRING* string) {
-	internal_exception(ILL_INHERIT,
-		"set_string_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
     }
 
     void set_string_keyed_int (INTVAL key, STRING* string) {
@@ -455,12 +210,6 @@ pmclass default abstract noinit {
 	    VTABLE_get_pmc(INTERP, value)->cache.struct_val;
     }
 
-    void set_pmc_keyed (PMC* key, PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"set_pmc_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_pmc_keyed(r_key, value);
@@ -471,481 +220,11 @@ pmclass default abstract noinit {
 	PMC_data(SELF) = PMC_data(value);
     }
 
-    void set_same_keyed (PMC* dest_key, PMC* src) {
-	internal_exception(ILL_INHERIT,
-		"set_keyed_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
     void set_same_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_same_keyed(r_key, value);
     }
 
-    INTVAL pop_integer() {
-	internal_exception(ILL_INHERIT,
-		"pop_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-
-    FLOATVAL pop_float() {
-	internal_exception(ILL_INHERIT,
-		"pop_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0.0;
-    }
-
-    BIGNUM* pop_bignum() {
-	internal_exception(ILL_INHERIT,
-		"pop_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* pop_string() {
-	internal_exception(ILL_INHERIT,
-		"pop_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    PMC* pop_pmc() {
-	internal_exception(ILL_INHERIT,
-		"pop_pmc() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-
-    void push_integer (INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"push_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-
-    void push_float (FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"push_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_bignum (BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"push_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_string (STRING* value) {
-	internal_exception(ILL_INHERIT,
-		"push_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void push_pmc (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"push_pmc() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    INTVAL shift_integer() {
-	internal_exception(ILL_INHERIT,
-		"shift_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    FLOATVAL shift_float() {
-	internal_exception(ILL_INHERIT,
-		"shift_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0.0;
-    }
-
-    BIGNUM* shift_bignum() {
-	internal_exception(ILL_INHERIT,
-		"shift_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    STRING* shift_string() {
-	internal_exception(ILL_INHERIT,
-		"shift_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    PMC* shift_pmc() {
-	internal_exception(ILL_INHERIT,
-		"shift_pmc() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    void unshift_integer (INTVAL value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_integer() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_float (FLOATVAL value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_bignum (BIGNUM* value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_string (STRING* value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void unshift_pmc (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"unshift_pmc() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void splice(PMC* value, INTVAL offset, INTVAL count) {
-	internal_exception(ILL_INHERIT,
-		"splice() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"add() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"add_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add_bignum (BIGNUM* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"add_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add_float (FLOATVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"add_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void add_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"add_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"subtract() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract_int (INTVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"subtract_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract_bignum (BIGNUM* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"subtract_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract_float (FLOATVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"subtract_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void subtract_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"subtract_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"multiply() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply_int (INTVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"multiply_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply_bignum (BIGNUM* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"multiply_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply_float (FLOATVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"multiply_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void multiply_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"multiply_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"divide() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide_int (INTVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"divide_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide_bignum (BIGNUM* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"divide_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide_float (FLOATVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"divide_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void divide_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"divide_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void modulus (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"modulus() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void modulus_int (INTVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"modulus_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void modulus_bignum (BIGNUM* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"modulus_bignum() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void modulus_float (FLOATVAL value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"modulus_float() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void modulus_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"modulus_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void neg (PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"neg() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_or (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_or() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_or_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_or_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_or_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_or_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ors (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ors() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ors_str (STRING* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ors_str() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ors_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ors_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_and (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_and() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_and_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_and_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_and_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_and_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ands (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ands() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ands_str (STRING* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ands_str() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_ands_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_ands_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xor (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xor() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xor_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xor_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xor_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xor_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-
-    void bitwise_xors (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xors() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xors_str (STRING* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xors_str() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_xors_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_xors_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_not (PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_not() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shr (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shr() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shr_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shr_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shr_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shr_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-
-    void bitwise_shl (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shl() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shl_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shl_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void bitwise_shl_same (PMC* value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"bitwise_shl_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void concatenate (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"concatenate() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void concatenate_native (STRING* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"concatenate_native() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void concatenate_same (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"concatenate_same() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
 
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
@@ -953,83 +232,6 @@ pmclass default abstract noinit {
 		&& PMC_data(SELF) == PMC_data(value));
     }
 
-    INTVAL cmp (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"cmp() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-
-    INTVAL cmp_num (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"cmp_num() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-
-    INTVAL cmp_string (PMC* value) {
-	internal_exception(ILL_INHERIT,
-		"cmp_string() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    void logical_or (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"logical_or() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_and (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"logical_and() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_xor (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"logical_xor() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void logical_not (PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"logical_not() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void repeat (PMC* value,  PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"repeat() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void repeat_int (INTVAL value, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"repeat_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void increment () {
-	internal_exception(ILL_INHERIT,
-		"increment() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    void decrement () {
-	internal_exception(ILL_INHERIT,
-		"decrement() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    INTVAL exists_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"exists_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     INTVAL exists_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
@@ -1040,22 +242,10 @@ pmclass default abstract noinit {
         return 1;
     }
 
-    INTVAL defined_keyed (PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"defined_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     INTVAL defined_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.defined_keyed(r_key);
-    }
-
-    void delete_keyed(PMC* key) {
-	internal_exception(ILL_INHERIT,
-		"delete_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
     }
 
     void delete_keyed_int(INTVAL key) {
@@ -1063,12 +253,6 @@ pmclass default abstract noinit {
         DYNSELF.delete_keyed(r_key);
     }
 
-    PMC* nextkey_keyed (PMC* key, INTVAL w) {
-	internal_exception(ILL_INHERIT,
-		"nextkey_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
 
     PMC* nextkey_keyed_int (INTVAL key, INTVAL w) {
         /* XXX - Something's not right with this method */
@@ -1076,71 +260,18 @@ pmclass default abstract noinit {
         return DYNSELF.nextkey_keyed(r_key, w);
     }
 
-    void substr(INTVAL offset, INTVAL length, PMC* dest) {
-	internal_exception(ILL_INHERIT,
-		"substr() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-    }
-
-    STRING* substr_str(INTVAL offset, INTVAL length) {
-	internal_exception(ILL_INHERIT,
-		"substr_str() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-	return NULL;
-    }
-
-    void* invoke (void* next) {
-	internal_exception(ILL_INHERIT,
-		"invoke() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
-    void* invoke_pmc (PMC* sub, void* next) {
-	internal_exception(ILL_INHERIT,
-		"invoke() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return NULL;
-    }
-
     INTVAL can (STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"can() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
+        PMC *key;
+        if (! SELF->vtable->method_table)
+	    return 0;
+        key = key_new_string(INTERP, method);
+        return VTABLE_exists_keyed(INTERP, SELF->vtable->method_table, key);
     }
 
-    INTVAL can_keyed (PMC* key, STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"can_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL can_keyed_int (INTVAL key, STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"can_keyed_int() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
 
     INTVAL does (STRING* method) {
 	internal_exception(ILL_INHERIT,
 		"does() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL does_keyed (PMC* key, STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"does_keyed() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
-    }
-
-    INTVAL does_keyed_int (INTVAL key, STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"does_keyed_int() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
         return 0;
     }
