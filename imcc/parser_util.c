@@ -68,6 +68,8 @@ op_fullname(char * dest, const char * name, SymReg * args[], int narg) {
                 *dest++ = 'c';
                 continue;
             }
+            else if (args[i]->set == 'P')
+                continue;
         }
         *dest++ = tolower(args[i]->set);
         if (args[i]->type & (VTCONST|VT_CONSTP))

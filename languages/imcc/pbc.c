@@ -799,6 +799,7 @@ e_pbc_emit(void *param, Instruction * ins)
                 case PARROT_ARG_N:
                 case PARROT_ARG_S:
                 case PARROT_ARG_P:
+                case PARROT_ARG_K:
                 case PARROT_ARG_KI:
                 case PARROT_ARG_KIC:
                 case PARROT_ARG_IC:
