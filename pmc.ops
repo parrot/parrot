@@ -173,9 +173,9 @@ A few simple and common PMC operations.
 
 Looks up method $3 in $2's vtable, placing the corresponding method
 PMC in $1.
- 
- =cut
- 
+
+=cut
+
 op find_method(out PMC, in PMC, in STR) {
     $1 = $2->vtable->find_method(interpreter, $2, $3);
     goto NEXT();

@@ -16,6 +16,8 @@ object.ops
 
 Parrot's library of object ops
 
+=over 4
+
 =cut
 
 =item B<callmeth>()
@@ -80,8 +82,11 @@ inline op newclass(out PMC, in STR) {
 }
 
 =item B<subclass>(out PMC, in PMC)
+
 =item B<subclass>(out PMC, in PMC, in STR)
+
 =item B<subclass>(out PMC, in STR)
+
 =item B<subclass>(out PMC, in STR, in STR)
 
 Create a new class, put in $1, that is a subclass of $2. $3, if available,
@@ -194,6 +199,10 @@ inline op classname(out STR, in PMC) {
 
   goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 

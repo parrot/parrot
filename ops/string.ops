@@ -11,7 +11,7 @@ string.ops - String Operations
 =head1 DESCRIPTION
 
 Operations that work on strings, whether constructing, modifying 
-or examining them.  See also rx.ops.
+or examining them.  See also F<rx.ops>.
 
 =over 4
 
@@ -477,8 +477,6 @@ op find_encoding(out INT, in STR) {
 
 Find the encoding type for $2 and put it in $1
 
-=back
-
 =cut
 
 op string_encoding(out INT, in STR) {
@@ -527,6 +525,10 @@ inline op stringinfo(out INT, in STR, in INT) {
   }
   goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 

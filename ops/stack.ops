@@ -614,6 +614,10 @@ inline op intdepth(out INT) {
   goto NEXT();
 }
 
+=back
+
+=cut
+
 ###############################################################################
 
 =head1 COPYRIGHT

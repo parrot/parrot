@@ -190,6 +190,10 @@ op find_lex(out PMC, in INT, in INT) {
     goto NEXT();
 }
 
+=back
+
+=cut
+
 ###############################################################################
 
 =head2 Global variable ops

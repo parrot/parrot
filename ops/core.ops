@@ -208,7 +208,7 @@ inline op jump(in INT) {
 
 ########################################
 
-=item enternative()
+=item B<enternative>()
 
 Internal opcode used to jump from normal bytecode into a JITted version.
 
@@ -462,6 +462,10 @@ inline op newsub(in INT, in INT, inconst INT, inconst INT) {
   goto NEXT();
 }
 
+=back
+
+=cut
+
 ########################################
 
 =head2 Exception handling
@@ -605,8 +609,6 @@ inline op gc_debug(in INT) {
   else         { Interp_flags_CLEAR(interpreter, PARROT_GC_DEBUG_FLAG); }
   goto NEXT();
 }
-
-=back
 
 =cut
 
@@ -782,6 +784,10 @@ inline op getpackage(out STR) {
   $1 = interpreter->current_package;
   goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 

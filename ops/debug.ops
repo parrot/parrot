@@ -24,7 +24,7 @@ Initial version by Daniel Grunblatt on 2002.5.19
 
 ###############################################################################
 
-=head3 Parrot debug operations
+=head2 Parrot debug operations
 
 =over 4
 
@@ -128,3 +128,7 @@ op debug_print() {
 }
     
 ########################################
+
+=back
+
+=cut

@@ -69,8 +69,6 @@ inline op time(out NUM) {
   goto NEXT();
 }
 
-=back
-
 =cut
 
 ########################################
@@ -155,6 +153,10 @@ inline op sleep(in INT) {
   Parrot_sleep((UINTVAL)$1);
   goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 
