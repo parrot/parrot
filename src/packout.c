@@ -175,56 +175,6 @@ PackFile_ConstTable_pack(struct PackFile_ConstTable * self, opcode_t * packed) {
 }
 
 /***************************************
-Determine the size of the buffer needed in order to pack a PackFile Constant 
-into a contiguous region of memory.
-***************************************/
-
-opcode_t
-PackFile_Constant_pack_size(struct PackFile_Constant * self) {
-    opcode_t packed_size;
-    opcode_t padded_size;
-
-    if (!self) {
-        /* TODO: OK to gloss over this? */
-        return (opcode_t) 0;
-    }
-
-    switch(self->type) {
-        case PFC_NONE:
-            packed_size = 0;
-            break;
-
-        case PFC_NUMBER:
-            packed_size = sizeof(FLOATVAL); /* XXX need to pad this? */
-            break;
-
-        case PFC_STRING:
-            padded_size = self->string->bufused;
-
-            if (padded_size % sizeof(opcode_t)) {
-                padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
-            }
-
-	    /* Include space for flags, encoding, type, and size fields.  */
-            packed_size = 4 * sizeof(opcode_t) + padded_size;
-            break;
-
-        default:
-            packed_size = 0;
-            break;
-    }
-
-    /* Tack on space for the initial type and size fields */
-    if (packed_size) {
-        return packed_size + 2 * sizeof(opcode_t);
-    }
-    else {
-        return 0;
-    }
-}
-
-
-/***************************************
 Pack a PackFile Constant into a contiguous region of memory. NOTE: The memory
 block had better have at least the amount of memory indicated by
 PackFile_Constant_pack_size()!
