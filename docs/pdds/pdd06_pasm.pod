@@ -926,6 +926,16 @@ figure out how to treat the key entry.
 
 =back
 
+=head2 Properties
+
+Properties are a sort of runtime note attached to a PMC. Any PMC can
+have properties on it. Properties live in a flat namespace, and they
+are not in any way associated with the class of the PMC that they are
+attached to.
+
+Properties may be used for runtime notes on variables, or other
+metadata that may change. They are not for object attributes.
+
 =head2 Symbolic support for HLLs
 
 =over 4
@@ -1052,7 +1062,10 @@ registers used (and in the same order).
 =item invoke
 
 Invoke a subroutine in P0. Presumes that all the registers are set up
-right for the call.
+right for the call. The invoked subroutine I<must> preserve any
+registers that are not explicitly return parameters or calling
+convention metadata parameters. (Such as the number of I reg
+parameters, for example)
 
 =head1 ATTACHMENTS
 
