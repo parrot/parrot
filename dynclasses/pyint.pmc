@@ -666,6 +666,22 @@ Create a new integer
 
 /*
 
+=item C<INTVAL is_same(PMC *value)>
+
+Returns whether the PMC is numerically equal to C<value>.
+
+=cut
+
+*/
+
+    INTVAL is_same (PMC* value) {
+        if (value->vtable != SELF->vtable) return 0;
+        return (INTVAL)(PMC_int_val(SELF) ==
+            VTABLE_get_integer(INTERP, value));
+    }
+
+/*
+
 =item C<INTVAL is_equal (PMC* value)>
 
 The C<==> operation.

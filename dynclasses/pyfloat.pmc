@@ -20,7 +20,58 @@ These are the vtable functions for the PyFloat base class
 
 #include "parrot/parrot.h"
 
+/* cache of classes referenced */
+static INTVAL dynclass_PyFloat;
+static INTVAL dynclass_PyInt;
+
 pmclass PyFloat extends Float extends PyObject dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of various PMCs because
+they will be used frequently here.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            dynclass_PyInt   = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyFloat = Parrot_PMC_typenum(INTERP, "PyFloat");
+        }
+    }
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *source)>
+
+Create a new floating point number
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class, PMC *value) {
+        INTVAL argc = REG_INT(3);
+
+        PMC * ret = pmc_new(INTERP, dynclass_PyFloat);
+
+        if (argc > 1) {
+            if (value->vtable->base_type == dynclass_PyInt) {
+                FLOATVAL fvalue = VTABLE_get_number(INTERP, value);
+                VTABLE_set_number_native(INTERP, ret, fvalue);
+            }
+            else {
+                STRING *svalue = VTABLE_get_string(INTERP, value);
+                VTABLE_set_string_native(INTERP, ret, svalue);
+            }
+        }
+
+        return ret;
+    }
 
 /*
 
@@ -52,6 +103,33 @@ Returns an integer representation of the number (by casting).
    INTVAL get_integer() {
         return (INTVAL) PMC_num_val(SELF);
    }
+
+/*
+
+=item C<STRING *get_repr()>
+
+Returns the number as a Parrot string.
+
+=cut
+
+*/
+
+    STRING* get_repr () {
+        double d = (double) PMC_num_val(SELF);
+        const char *sign = "-";
+        STRING *s;
+        if (!signbit(PMC_num_val(SELF)))
+            sign = "";
+        d = fabs(d);
+        /* XXX make a Python format string */
+        s = Parrot_sprintf_c(interpreter, "%s%.17g", sign, d);
+        if (string_str_index(interpreter, s,
+                    const_string(interpreter, "."), 0) == -1 &&
+                string_str_index(interpreter, s,
+                    const_string(interpreter, "e"), 0) == -1)
+            string_append(INTERP, s, const_string(INTERP, ".0"), 0);
+        return s;
+    }
 
 /*
 

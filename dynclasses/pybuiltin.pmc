@@ -223,6 +223,16 @@ enter_nci_method should create these as locals to begin with.
         key = const_string(INTERP, "object");
         parent = make_type(INTERP, dynclass_PyObject, key);
 
+        key = const_string(INTERP, "bool");
+        item = make_type(INTERP, dynclass_PyBoolean, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "complex");
+        item = make_type(INTERP, dynclass_PyComplex, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
         key = const_string(INTERP, "dict");
         item = make_type(INTERP, dynclass_PyDict, key);
         VTABLE_setprop(INTERP, item, BASES, parent);
@@ -230,6 +240,26 @@ enter_nci_method should create these as locals to begin with.
 
         key = const_string(INTERP, "int");
         item = make_type(INTERP, dynclass_PyInt, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "float");
+        item = make_type(INTERP, dynclass_PyFloat, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "list");
+        item = make_type(INTERP, dynclass_PyList, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "long");
+        item = make_type(INTERP, dynclass_PyLong, key);
+        VTABLE_setprop(INTERP, item, BASES, parent);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        key = const_string(INTERP, "tuple");
+        item = make_type(INTERP, dynclass_PyTuple, key);
         VTABLE_setprop(INTERP, item, BASES, parent);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
@@ -326,21 +356,27 @@ Returns the result of comparing C<*value1> with C<*value2>).
 
 /*
 
-=item C<PMC* "complex"()>
+=item C<PMC* "divmod"(PMC *value1, PMC *value2)>
 
-Combines a real and imaginary number and returns the result.
+Returns both the floordiv and mod of C<*value1> with C<*value2>).
 
 =cut
 
 */
 
-    METHOD PMC* complex(PMC *real, PMC *imag) {
-        FLOATVAL fvalue;
-        PMC * ret = pmc_new(INTERP, dynclass_PyComplex);
-        fvalue = VTABLE_get_number(INTERP, real);
-        VTABLE_set_number_keyed_int(INTERP, ret, 0, fvalue);
-        fvalue = VTABLE_get_number(INTERP, imag);
-        VTABLE_set_number_keyed_int(INTERP, ret, 1, fvalue);
+    METHOD PMC* divmod(PMC *value1, PMC *value2) {
+        PMC *ret, *temp;
+
+        ret = pmc_new(INTERP, dynclass_PyTuple);
+        VTABLE_set_integer_native(INTERP, ret, 2);
+
+        temp = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_FLOOR_DIVIDE);
+        VTABLE_set_pmc_keyed_int(INTERP, ret, 0, temp);
+
+        temp = pmc_new(INTERP, dynclass_PyObject);
+        mmd_dispatch_v_ppp(INTERP, value1, value2, temp, MMD_MOD);
+        VTABLE_set_pmc_keyed_int(INTERP, ret, 1, temp);
         return ret;
     }
 
@@ -419,35 +455,6 @@ is a tuple or string, return the same type, else return a list.
             VTABLE_set_pmc_keyed_int(INTERP, res, i++, item);
         }
         return res;
-    }
-
-/*
-
-=item C<PMC* "float"()>
-
-Returns the float value of C<value>.
-
-=cut
-
-*/
-
-    METHOD PMC* float(PMC *value) {
-        PMC * ret;
-
-        if (value->vtable->base_type == dynclass_PyFloat)
-            return value;
-
-        ret = pmc_new(INTERP, dynclass_PyFloat);
-        if (value->vtable->base_type == dynclass_PyInt) {
-            FLOATVAL fvalue = VTABLE_get_number(INTERP, value);
-            VTABLE_set_number_native(INTERP, ret, fvalue);
-        }
-        else {
-            STRING *svalue = VTABLE_get_string(INTERP, value);
-            VTABLE_set_string_native(INTERP, ret, svalue);
-        }
-
-        return ret;
     }
 
 /*
@@ -546,65 +553,6 @@ Returns an iterator over a sequence.
          * need an iterator - that's the original construction code
          */
         return VTABLE_get_iter(INTERP, obj);
-    }
-
-/*
-
-=item C<PMC* "list"(PMC *value)>
-
-Returns the list value of C<value>.
-
-=cut
-
-*/
-
-    METHOD PMC* list(PMC *value) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyList);
-        INTVAL n = VTABLE_elements(INTERP, value);
-        INTVAL j;
-
-        for (j=0; j<n; j++) {
-            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
-            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
-        }
-
-        VTABLE_set_integer_native(INTERP, ret, n);
-        return ret;
-    }
-
-/*
-
-=item C<PMC* "long"(PMC *value)>
-
-Returns the long value of C<value>.
-
-=cut
-
-*/
-
-    METHOD PMC* long(PMC *value, PMC *base) {
-        PMC *ret;
-
-        if (value->vtable->base_type == dynclass_PyLong)
-            return value;
-
-        ret = pmc_new(INTERP, dynclass_PyLong);
-        if (value->vtable->base_type == dynclass_PyInt) {
-            INTVAL ivalue = VTABLE_get_integer(INTERP, value);
-            VTABLE_set_integer_native(INTERP, ret, ivalue);
-        }
-        else {
-            INTVAL argcP = REG_INT(3);
-            STRING *svalue = VTABLE_get_string(INTERP, value);
-            if (argcP == 1)
-                VTABLE_set_string_native(INTERP, ret, svalue);
-            else {
-                INTVAL key = VTABLE_get_integer(INTERP, base);
-                VTABLE_set_string_keyed_int(INTERP, ret, key, svalue);
-            }
-        }
-
-        return ret;
     }
 
 /*
@@ -885,31 +833,6 @@ calculation, and serves as a default whe n the sequence is empty.
             res = init;
 
         return res;
-    }
-
-/*
-
-=item C<PMC* "tuple"(PMC *value)>
-
-Returns the tuple value of C<value>.
-
-=cut
-
-*/
-
-    METHOD PMC* tuple(PMC *value) {
-        PMC *ret = pmc_new(INTERP, dynclass_PyTuple);
-        INTVAL n = VTABLE_elements(INTERP, value);
-        INTVAL j;
-
-        VTABLE_set_integer_native(INTERP, ret, n);
-
-        for (j=0; j<n; j++) {
-            PMC *item = VTABLE_get_pmc_keyed_int(INTERP, value, j);
-            VTABLE_set_pmc_keyed_int(INTERP, ret, j, item);
-        }
-
-        return ret;
     }
 
 /*

@@ -804,7 +804,10 @@ Sets $1 to 1 or 0, depending on whether $2 is false or not
 =cut
 
 inline op issame(out INT, in PMC, in PMC) {
-    $1 = $2 == $3;
+    if ($2 == $3)
+        $1 = 1;
+    else
+        $1 = VTABLE_is_same(interpreter, $2, $3);
     goto NEXT();
 }
 
@@ -814,7 +817,10 @@ inline op issame(out INT, in STR, in STR) {
 }
 
 inline op isntsame(out INT, in PMC, in PMC) {
-    $1 = $2 != $3;
+    if ($2 == $3)
+        $1 = 0;
+    else
+        $1 = !VTABLE_is_same(interpreter, $2, $3);
     goto NEXT();
 }
 

@@ -26,6 +26,7 @@ C<PyLong> provides arbitray precision integer mathematic functions.
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyLong;
 
 pmclass PyLong extends BigInt dynpmc group python_group {
 
@@ -43,7 +44,42 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyLong    = Parrot_PMC_typenum(INTERP, "PyLong");
         }
+    }
+
+/*
+
+=item C<PMC* "__new__"(PMC *class, PMC *value, PMC *base)>
+
+Create a new long.
+
+=cut
+
+*/
+
+    METHOD PMC* __new__(PMC *class, PMC *value, PMC *base) {
+        INTVAL argc = REG_INT(3);
+
+        PMC * ret = pmc_new(INTERP, dynclass_PyLong);
+
+        if (argc > 1) {
+            if (value->vtable->base_type == dynclass_PyInt) {
+                INTVAL ivalue = VTABLE_get_integer(INTERP, value);
+                VTABLE_set_integer_native(INTERP, ret, ivalue);
+            }
+            else {
+                STRING *svalue = VTABLE_get_string(INTERP, value);
+                if (argc < 3)
+                    VTABLE_set_string_native(INTERP, ret, svalue);
+                else {
+                    INTVAL key = VTABLE_get_integer(INTERP, base);
+                    VTABLE_set_string_keyed_int(INTERP, ret, key, svalue);
+                }
+            }
+        }
+
+        return ret;
     }
 
 /*
