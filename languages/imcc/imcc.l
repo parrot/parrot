@@ -43,6 +43,7 @@ struct macro_frame_t {
     struct params_t expansion;
     int label;
     int line;
+    int pasm_file;      /* pasm_file mode of previous frame */
 };
 
 struct macro_frame_t *frames = NULL;
@@ -383,10 +384,13 @@ int yywrap() {
     */
     yy_delete_buffer(YY_CURRENT_BUFFER);
 
-    /* pop old frames */
+    /* pop old frame */
     if (frames) {
 	struct macro_frame_t *tmp;
 	tmp = frames;
+        pasm_file = frames->pasm_file;
+        if (YYSTATE == INITIAL || YYSTATE == emit)
+            BEGIN(pasm_file ? emit : INITIAL);
 	frames = frames->next;
 	destroy_frame(tmp);
 	return 0;
@@ -404,6 +408,7 @@ new_frame (void)
     tmp = mem_sys_allocate_zeroed(sizeof(struct macro_frame_t));
     tmp->label = ++label;
     tmp->line = line;
+    tmp->pasm_file = pasm_file;
 
     return tmp;
 }
@@ -643,12 +648,24 @@ include_file (const char *file_name)
 {
     struct macro_frame_t *frame;
     FILE *file;
+    char *ext;
 
     frame = new_frame();
 
     file = fopen(file_name, "r");
     if (!file)
-	fataly(EX_SOFTWARE, file_name, line, strerror(errno));
+        fataly(EX_SOFTWARE, file_name, line, strerror(errno));
+    ext = strrchr(file_name, '.');
+    if (ext) {
+        if (strcmp (ext, ".pasm") == 0) {
+            pasm_file = 1;
+            BEGIN(emit);
+        }
+        else if (strcmp (ext, ".imc") == 0) {
+            pasm_file = 0;
+            BEGIN(INITIAL);
+        }
+    }
 
     scan_file (frame, file);
 }

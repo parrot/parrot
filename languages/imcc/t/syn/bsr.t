@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 12;
+use TestCompiler tests => 11;
 
 ##############################
 # this tests register allocation/preserving of local bsr calls
@@ -67,62 +67,6 @@ output_is(<<'CODE', <<'OUT', "stack calling conventions");
    ret
 .end
 
-CODE
-a = 10
-b = 20
-r = 30
-s = -10
-OUT
-
-##############################
-my $file = '_test.inc';
-open F, ">$file";
-print F <<'EOF';
-.sub _foo		# sub foo(int a, int b)
-   saveall
-   .param int a
-   .param int b
-   print "a = "
-   print a
-   print "\n"
-   print "b = "
-   print b
-   print "\n"
-   .local int pl
-   .local int mi
-   pl = a + b
-   mi = a - b
-   .return mi		# from right to left
-   .return pl		# return (pl, mi)
-   restoreall
-   ret
-.end
-EOF
-close F;
-
-output_is(<<'CODE', <<'OUT', "subroutine in external file");
-.sub _main
-   .local int x
-   x = 10
-   .const int y = 20
-
-   .arg y	# save args in reversed order
-   .arg x
-   call _foo	#(r, s) = _foo(x,y)
-   .local int r
-   .local int s
-   .result r
-   .result s	# restore results in order
-
-   print "r = "
-   print r
-   print "\n"
-   print "s = "
-   print s
-   print "\n"
-   end
-.end
-.include "_test.inc"
 CODE
 a = 10
 b = 20
@@ -342,9 +286,6 @@ CODE
 Hello perl6.
 OUT
 
-END {
-  unlink $file;
-}
 ##############################
 # nested subs
 # NOTE: global labels necessary

@@ -487,6 +487,7 @@ statements: statement
 
 statement:  { clear_state(); }
         instruction             { $$ = $2; }
+        | MACRO '\n'                  { $$ = 0; }
     ;
 
 labels:	/* none */         { $$ = NULL; }
