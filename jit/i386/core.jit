@@ -179,9 +179,6 @@ Parrot_bxor_i_ic_ic {
                    emit_None, emit_None, emit_None, &INT_REG[1]);
 }
 
-Parrot_bnot_i {
-    emitm_notl_m(NATIVECODE, emit_None, emit_None, emit_None, &INT_REG[1]);
-}
 Parrot_bnot_i_i {
     emitm_movl_m_r(NATIVECODE, emit_EAX, emit_None, emit_None, emit_None, &INT_REG[2]);
     emitm_notl_r(NATIVECODE, emit_EAX);
