@@ -1,54 +1,77 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-# Simple XML Parser
-#    (First Parrot Assembler Program)
-#    Clinton A. Pierce  3/13/2002
-#    clintp@geeksalad.org
-#    Freely Redistributable
-#
-# This is a rudimentary XML-ish parser in PASM. It currently handles
-# only well-formed XML, doesn't throw errors, etc...  Limitations:
-#
-#    * validation?  check for well formedness?  Dream on.
-#    * elements like &lt; aren't handled yet
-#    * bugs-a-plenty, I'm sure.
-#
-# This is more of a proof-of-concept than anything else.  Try putting
-# this in a file:
-# <xml version='1.0'>
-# <top>
-# <inner foo='bar' narf='poit'>
-# <junk>Hello</junk>
-# <empty/>
-# </inner>
-# </top>
-# And see what it does.  :)
-#
-# See the notes near the read() for IO problem notes.
-#
-# Register Usage:
-#   S0, S1, S2, S5   -- Temporary Registers
-#     S7             -- Current token in procintags()
-#     S10            -- HACK for broken I/O
-#     S11	     -- Character being processed
-#   I0, I1, I2	     -- Temporary Registers
-#     I7	     -- Type of current element
-#     I8             -- "In Quotes" flag
-#     I13            -- Type of the last token
-#
-# The stack is used all to hell.  :)
-#
-# Data is stored on the stack in type/value pairs:
-#   -1  ""  (uninitialized slot)
-#    0  Element Name
-#    1  Attribute Name
-#    2  Attribute Value
-#    5  Close of Element (no data)
-#    6  Close of Element, also start (no data)
-#    99 Data associated with this element
-#    1000 (no data) sentinel for the bottom of the stack
-#
+=head1 NAME
 
-	# A functions-first kinda guy
+examples/assembly/xml_parser.pasm - Simple XML Parser
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/xml_parser.pasm examples/assembly/small.xml
+
+Note that this example currently seems to be broken:
+
+    Couldn't open small.xml
+    
+=head1 DESCRIPTION
+
+This is a rudimentary XML-ish parser in PASM. It currently handles only
+well-formed XML, doesn't throw errors, etc...
+ 
+Limitations:
+
+=over 4
+
+=item * validation? check for well formedness? Dream on.
+
+=item * elements like C<&lt;> aren't handled yet
+
+=item * bugs-a-plenty, I'm sure.
+
+=back
+
+This is more of a proof-of-concept than anything else. Try putting this
+in a file:
+
+    <xml version='1.0'>
+    <top>
+    <inner foo='bar' narf='poit'>
+    <junk>Hello</junk>
+    <empty/>
+    </inner>
+    </top>
+
+And see what it does.  :)
+
+See the notes near the C<read()> for IO problem notes.
+
+Register Usage:
+
+    S0, S1, S2, S5 -- Temporary Registers
+    S7             -- Current token in procintags()
+    S10            -- HACK for broken I/O
+    S11            -- Character being processed
+    I0, I1, I2     -- Temporary Registers
+    I7             -- Type of current element
+    I8             -- "In Quotes" flag
+    I13            -- Type of the last token
+
+The stack is used all to hell.  :)
+
+Data is stored on the stack in type/value pairs:
+ 
+      -1 ""  (uninitialized slot)
+       0 Element Name
+       1 Attribute Name
+       2 Attribute Value
+       5 Close of Element (no data)
+       6 Close of Element, also start (no data)
+      99 Data associated with this element
+    1000 (no data) sentinel for the bottom of the stack
+
+=cut
+
+# A functions-first kinda guy
 	branch MAIN
 
 # Test for alphabeticness (7-bit ASCII only)
@@ -435,3 +458,15 @@ BAIL:
 	close P0
 	end
 
+=head1 SEE ALSO
+
+F<examples/assembly/small.xml>.
+
+=head1 HISTORY
+
+    (First Parrot Assembler Program)
+    Clinton A. Pierce  3/13/2002
+    clintp@geeksalad.org
+    Freely Redistributable
+
+=cut

@@ -1,17 +1,30 @@
-#
-# fact.pasm
-#
 # Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
 # $Id$
-#
-# compute the factorial recursively for 0 to 6 and print the results.
-#
-# 20020316 bdwheele@indiana.edu 
-#   changed local labels to global for new assembler
-#   use pushi instead of the now missing 'clonei'
+
+=head1 NAME
+
+examples/assembly/fact.pasm - Mmmm, beer good
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/fact.pasm
+
+=head1 DESCRIPTION
+
+Compute the factorial recursively for 0! to 6! and print the results.
+
+=head1 HISTORY
+
+=over 4
+
+=item 20020316 bdwheele@indiana.edu 
+
+Changed local labels to global for new assembler. Use C<pushi> instead
+of the now missing C<clonei>.
+
+=back
+
+=cut
 
 main:
 	set 	I1,0

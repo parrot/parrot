@@ -1,12 +1,19 @@
-#
-# stack.pasm
-#
 # Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/stack.pasm - User Stack
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/stack.pasm
+
+=head1 DESCRIPTION
+
+Shows you how to C<set>, C<save>, C<restore> and C<print>.
+
+=cut
 
 	set I1, 0
 	save I1

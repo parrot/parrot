@@ -1,12 +1,20 @@
-#
-# pmcmops.pasm
-#
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/pmcmops.pasm - Calculate a benchmark
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/pmcmops.pasm
+
+=head1 DESCRIPTION
+
+Calculates a value for M ops/s (million operations per second) using
+C<PerlInt> PMCs.
+
+=cut
 
         new    P2, .PerlInt
         set    P2, 0
@@ -51,3 +59,9 @@ DONE:   time   N5
         print  "\n"
 
         end
+
+=head1 SEE ALSO
+
+F<examples/assembly/mops.pasm>, F<examples/assembly/mops_p.pasm>.
+
+=cut

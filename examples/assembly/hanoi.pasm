@@ -1,67 +1,88 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/hanoi.pasm - Towers of hanoi
+
+=head1 SYNOPSIS
+
+You have to pass in the height of the tower:
+
+    % ./parrot examples/assembly/hanoi.pasm 5
+
+=head1 DESCRIPTION
+
+Towers of Hanoi (http://www.cut-the-knot.org/recurrence/hanoi.shtml) is
+a combinatorial puzzle. The PASM shows manipulation of arrays of
+integers.
+
+=head1 Data Structure
+
+C<P0> is a C<PerlArray> PMC with three entries.  Each entry is a
+C<PerlArray> PMC which represents a tower (column) of Hanoi.
+
+The towers are arrays of integers. 0 indicates no disk is present. A
+positive integer indicates the diameter of the disk occupying the
+indicated slot.
+
+So this setup
+
+      ||    ||   ||
+     ====   ||   ||
+    ======  ||   ==
+
+is represented as
+
+    [[0, 2, 3], [0, 0, 0], [0, 0, 1]]
+
+In pseudocode:
+
+    main() {
+        size = argv[0]
+        int arr[] = [[], [], []]
+        arr[0] = [1..size]
+        arr[1] = [(0) x size]
+        arr[2] = [(0) x size]
+        move_stack(arr, size, size, 0, 2, 1)
+    }
+
+    move_stack(array, size, num, start, target, storage) {
+        if(num == 1) {
+         move(array, size, start, target)
+    } else {
+        # move all but the largest disk to storage
+        move_stack(array, size, num-1, start, storage, target)
+        # move the largest disk to target
+        move(array, size, start, target)
+        # move all but the largest disk from storage to target
+        move_stack(array, size, num-1, storage, target, start)
+    }
+    
+    move(array, size, start, target) {
+        /* okay, so it's not pseudocode... */
+        # find the first non-empty slot on the start column (smallest disk)
+        for(i=0; i<size; i++) if(array[start_col][i]) break;
+        start_row = i;
+        
+        # find the last empty slot on the target column
+        for(i=1; i<size; i++) if(array[dest_col][i]) break;
+        dest_row  = i - 1;
+        
+        # do the move
+        array[dest_col][dest_row] = array[start_col][start_row];
+        array[start_col][start_row] = 0;
+        
+        #print the results
+        print(array, size);
+    }
+
+=cut
+
 #
 # Towers of hanoi in parrot assembler
 #
-# Author: Tony Payne
-# Date: 05/15/2002
 #
-# Data structure:
-#
-# P0 is a PerlArray with three entries.  Each entry is a PerlArray PMC
-#   which represents a tower (column) of hanoi
-#
-# The towers are arrays of integers.  0 indicates no disk is present
-#   A positive integer indicates the diameter of the disk occupying
-#   the indicated slot.
-#
-# So this setup
-#
-#    ||    ||   ||
-#   ====   ||   ||
-#  ======  ||   ==
-#
-# is represented as
-# [[0, 2, 3], [0, 0, 0], [0, 0, 1]]
-#
-# In pseudocode:
-#
-# main() {
-#   size = argv[0]
-#   int arr[] = [[], [], []]
-#   arr[0] = [1..size]
-#   arr[1] = [(0) x size]
-#   arr[2] = [(0) x size]
-#   move_stack(arr, size, size, 0, 2, 1)
-# }
-#
-# move_stack(array, size, num, start, target, storage) {
-#   if(num == 1) {
-#     move(array, size, start, target)
-#   } else {
-#     # move all but the largest disk to storage
-#     move_stack(array, size, num-1, start, storage, target)
-#     # move the largest disk to target
-#     move(array, size, start, target)
-#     # move all but the largest disk from storage to target
-#     move_stack(array, size, num-1, storage, target, start)
-#   }
-#
-# move(array, size, start, target) {
-#     /* okay, so it's not pseudocode... */
-#     # find the first non-empty slot on the start column (smallest disk)
-#     for(i=0; i<size; i++) if(array[start_col][i]) break;
-#     start_row = i;
-#
-#     # find the last empty slot on the target column
-#     for(i=1; i<size; i++) if(array[dest_col][i]) break;
-#     dest_row  = i - 1;
-#
-#     # do the move
-#     array[dest_col][dest_row] = array[start_col][start_row];
-#     array[start_col][start_row] = 0;
-#
-#     #print the results
-#     print(array, size);
-# }
 
 MAIN:
         set I0, P5
@@ -205,4 +226,9 @@ move_multiple:
 ERROR:  print "Error: no size specified for tower\n"
         end
 
+=head1 HISTORY
+
+First version Tony Payne 05/15/2002.
+
+=cut
 

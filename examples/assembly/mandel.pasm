@@ -1,30 +1,46 @@
-# Print the Mandlebrot set
-#
-# Translated from C code by Glenn Rhoads into Parrot assembler
-# by Leon Brocard <acme@astray.com>
-#
-# The C code is:
-#
-# main(){
-#
-#  int x, y, k;
-#  char *b = " .:,;!/>)|&IH%*#";
-#  float r, i, z, Z, t, c, C;
-#  for (y=30; puts(""), C = y*0.1 - 1.5, y--;){
-#     for (x=0; c = x*0.04 - 2, z=0, Z=0, x++ < 75;){
-#        for (r=c, i=C, k=0; t = z*z - Z*Z + r, Z = 2*z*Z + i, z=t, k<112; k++)
-#           if (z*z + Z*Z > 10) break;
-#        printf ("%c", b[k%16]);
-#        }
-#     }
-# }
-#
-# We store the following variables in these registers:
-#  x,  y, k
-# I1, I2, I3
-#
-#  r,  i,  z,  Z,  t,  c, C
-# N1, N2, N3, N4, N5, N6, N7
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/mandel.pasm - Print the Mandlebrot set
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/mandel.pasm
+
+=head1 DESCRIPTION
+
+This really does something - prints an ASCII-art representation of the
+Mandlebrot set.
+
+Translated from C code by Glenn Rhoads into Parrot assembler by Leon
+Brocard <acme@astray.com>.
+
+The C code is:
+
+    main() {
+        int x, y, k;
+        char *b = " .:,;!/>)|&IH%*#";
+        float r, i, z, Z, t, c, C;
+        for (y=30; puts(""), C = y*0.1 - 1.5, y--;) {
+            for (x=0; c = x*0.04 - 2, z=0, Z=0, x++ < 75;) {
+                for (r=c, i=C, k=0; t = z*z - Z*Z + r, Z = 2*z*Z + i, z=t, k<112; k++)
+                    if (z*z + Z*Z > 10) break;
+                printf ("%c", b[k%16]);
+            }
+        }
+    }
+
+We store the following variables in these registers:
+
+     x,  y, k
+    I1, I2, I3
+
+     r,  i,  z,  Z,  t,  c, C
+    N1, N2, N3, N4, N5, N6, N7
+
+=cut
 
 	set S1, " .:,;!/>)|&IH%*#"
 	set I2, 30

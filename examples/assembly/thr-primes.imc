@@ -1,41 +1,55 @@
-=pod
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-From perldoc perlthrtut
+=head1 NAME
 
-       1  #!/usr/bin/perl -w
-       2  # prime-pthread, courtesy of Tom Christiansen
-       3
-       4  use strict;
-       5
-       6  use threads;
-       7  use Thread::Queue;
-       8
-       9  my $stream = new Thread::Queue;
-       10 my $kid    = new threads(\&check_num, $stream, 2);
-       11
-       12 for my $i ( 3 .. 1000 ) {
-       13     $stream->enqueue($i);
-       14 }
-       15
-       16 $stream->enqueue(undef);
-       17 $kid->join;
-       18
-       19 sub check_num {
-       20     my ($upstream, $cur_prime) = @_;
-       21     my $kid;
-       22     my $downstream = new Thread::Queue;
-       23     while (my $num = $upstream->dequeue) {
-       24         next unless $num % $cur_prime;
-       25         if ($kid) {
-       26            $downstream->enqueue($num);
-       27                  } else {
-       28            print "Found prime $num\n";
-       29                $kid = new threads(\&check_num, $downstream, $num);
-       30         }
-       31     }
-       32     $downstream->enqueue(undef) if $kid;
-       33     $kid->join           if $kid;
-       34 }
+examples/assembly/thr-primes.imc - Threads
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/thr-primes.imc
+
+=head1 DESCRIPTION
+
+A threaded primes example.
+
+From C<perldoc perlthrtut>:
+
+    1  #!/usr/bin/perl -w
+    2  # prime-pthread, courtesy of Tom Christiansen
+    3
+    4  use strict;
+    5
+    6  use threads;
+    7  use Thread::Queue;
+    8
+    9  my $stream = new Thread::Queue;
+    10 my $kid    = new threads(\&check_num, $stream, 2);
+    11
+    12 for my $i ( 3 .. 1000 ) {
+    13     $stream->enqueue($i);
+    14 }
+    15
+    16 $stream->enqueue(undef);
+    17 $kid->join;
+    18
+    19 sub check_num {
+    20     my ($upstream, $cur_prime) = @_;
+    21     my $kid;
+    22     my $downstream = new Thread::Queue;
+    23     while (my $num = $upstream->dequeue) {
+    24         next unless $num % $cur_prime;
+    25         if ($kid) {
+    26            $downstream->enqueue($num);
+    27                  } else {
+    28            print "Found prime $num\n";
+    29                $kid = new threads(\&check_num, $downstream, $num);
+    30         }
+    31     }
+    32     $downstream->enqueue(undef) if $kid;
+    33     $kid->join           if $kid;
+    34 }
+       
 =cut
 
 # translate to PIR by leo

@@ -1,12 +1,20 @@
-#
-# mops.pasm
-#
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/mops.pasm - Calculate a benchmark
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/mops.pasm
+
+=head1 DESCRIPTION
+
+Calculates a value for M ops/s (million operations per second) using
+integer arithmetic.
+
+=cut
 
         set    I2, 0
         set    I3, 1
@@ -51,3 +59,10 @@ DONE:   time   N5
 
 BUG:    print "This can't happen\n"
         end
+
+=head1 SEE ALSO
+
+F<examples/assembly/mops_p.pasm>.
+
+=cut
+

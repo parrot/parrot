@@ -1,4 +1,22 @@
-# experimental string match with pcre
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/pcre.imc - String matching
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/pcre.imc string pattern
+
+=head1 DESCRIPTION
+
+Experimental string matching with PCRE (http://www.pcre.org/).
+
+Note that PCRE must be installed for this to work.
+
+=cut
+
 .pcc_sub _main prototyped
     .param pmc argv
 .include "library/pcre.imc"
@@ -59,3 +77,8 @@ usage:
     exit 1
 .end
 
+=head1 SEE ALSO
+
+F<library/libpcre.imc>, F<library/pcre.imc>.
+
+=cut

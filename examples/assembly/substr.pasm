@@ -1,12 +1,19 @@
-#
-# substr.pasm
-#
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/substr.pasm - Substring
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/substr.pasm
+
+=head1 DESCRIPTION
+
+A C<substr> version of "Hello World".
+
+=cut
 
         set    I2, 1
         set    I1, 0

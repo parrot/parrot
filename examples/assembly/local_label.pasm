@@ -1,12 +1,21 @@
-#
-# local_label.pasm
-#
-# Copyright (C) 2001 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/local_label.pasm - Local labels
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/local_label.pasm
+
+=head1 DESCRIPTION
+
+Show the use of a C<.local> label.
+
+Note that this file contains IMC (PIR) not PASM.
+
+=cut
 
 .macro MAIN ()
               print	"test 1\n"

@@ -1,10 +1,20 @@
-#
-# lexicals.pasm
-#
-# A program to demonstrate lexical scopes.
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/lexical.pasm - Lexical scope
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/lexical.pasm
+
+=head1 DESCRIPTION
+
+A program to demonstrate lexical scopes (C<new_pad>, C<store_lex>,
+C<find_lex>).
+
+=cut
 
 new P0, .PerlInt
 new P1, .PerlInt
@@ -44,4 +54,8 @@ print P3 # prints 0
 print "\n"
 end
 
+=head1 SEE ALSO
 
+F<examples/assembly/lexical2.pasm>, F<examples/assembly/lexical3.pasm>.
+
+=cut

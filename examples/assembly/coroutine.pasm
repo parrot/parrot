@@ -1,7 +1,20 @@
-# Sample co-routines in Parrot
-#
-# Create 2 coroutines
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/coroutine.pasm - Sample co-routines in Parrot
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/coroutine.pasm
+
+=head1 DESCRIPTION
+
+This shows you how to create two coroutines and C<invoke> them.
+
+=cut
+
 set_addr I0, MYCOROUTINE
 new P0, .Coroutine
 set P0, I0

@@ -1,12 +1,19 @@
-#
-# bsr.pasm
-#
 # Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
 # $Id$
-#
+
+=head1 NAME
+
+examples/assembly/bsr.pasm - Branch to location
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/bsr.pasm
+
+=head1 DESCRIPTION
+
+Shows branching and returning to a location saved on the call stack.
+
+=cut
 
 MAIN:	print "Main\n"
 	bsr TESTSUB 

@@ -1,4 +1,20 @@
-# Mmmm, beer good
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/99beer.pasm - Mmmm, beer good
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/99beer.pasm
+
+=head1 DESCRIPTION
+
+An eager beer drinking loop, which shows you how to set variables, do
+conditional branching and decrementing.
+
+=cut
 
 set I1, 99 # bottles of beer
 set I2, 1  # single bottle

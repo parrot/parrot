@@ -1,14 +1,60 @@
-#
-# ncurses_life.imc
-#
-# Play conway's (no, not *him*. The other conway) game of life
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
 
-# this version can load life.l files (#P, #A, #R formats only)
-# you get a lot of .l files by installing xlife
-#
-# parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
-#
-# for command keys please consult the pod at the of the file
+=head1 NAME
+
+examples/assembly/ncurses_life.imc - Conway's Life (ncurses version)
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
+
+=head1 DESCRIPTION
+
+An C<ncurses> version of Conway's Life. F<acorn.l> is a I<life> file.
+
+This version can load F<life.l> files (#P, #A, #R formats only). You get
+a lot of .l files by installing C<xlife>.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<q>, C<Q>
+
+Quit.
+
+=item C<8>, C<2>, C<UP>, C<DOWN>
+
+Move world up or down.
+
+=item C<4>, C<6>, C<LEFT>, C<RIGHT>
+
+Move world left or right
+
+=item C<5>, C<HOME>
+
+Center world.
+
+=item C<g>
+
+Toggle running the game.
+
+=item C<o>
+
+Single step one generation.
+
+=item C<s>
+
+Run slower.
+
+=item C<f>
+
+Run faster.
+
+=back
+
+=cut
 
 .pcc_sub _MAIN prototyped
 	.param pmc argv
@@ -866,53 +912,10 @@ key_done:
 	.return delay
 	.pcc_end_return
 .end
-=head1 NAME
 
-ncurses_life - Play conway's (no, not *him*. The other conway) game
-of life
+=head1 SEE ALSO
 
-=head1 SYNOPSIS
-
-  parrot examples/assembly/ncurses_life.imc examples/assembly/acorn.l
-
-  parrot examples/assembly/ncurses_life.imc
-
-=head1 COMMANDS
-
-=over 4
-
-=item B<q>, B<Q>
-
-Quit.
-
-=item B<8>, B<2>, B<UP>, B<DOWN>
-
-Move world up or down.
-
-=item B<4>, B<6>, B<LEFT>, B<RIGHT>
-
-Move world left or right
-
-=item B<5>, B<HOME>
-
-Center world.
-
-=item B<g>
-
-Toggle running the game.
-
-=item B<o>
-
-Single step one generation.
-
-=item B<s>
-
-Run slower.
-
-=item B<f>
-
-Run faster.
-
-=back
+F<examples/assembly/acorn.l>, F<examples/assembly/life.pasm>,
+F<library/ncurses.pasm>, F<library/ncurses.declarations>.
 
 =cut

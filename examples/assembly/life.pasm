@@ -1,9 +1,22 @@
-#
-# life.pasm
-#
-# Play conway's (no, not *him*. The other conway) game
-# of life
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/life.pasm - Conway's Life
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/life.pasm
+
+=head1 DESCRIPTION
+
+Runs Conway's Life cellular automata
+(http://ddi.cs.uni-potsdam.de/HyFISCH/Produzieren/lis_projekt/
+proj_gamelife/ConwayScientificAmerican.htm).
+
+=cut
+
 	# First the generation count
 	set I2, 5000
 	# Note the time
@@ -228,3 +241,9 @@ printloop:
 	sleep 1
 dumpend:
 	ret
+
+=head1 SEE ALSO
+
+F<examples/assembly/ncurses_life.imc>.
+
+=cut

@@ -1,18 +1,25 @@
-###############################################################################
-# This Parrot assembler file was produced by the Jako compiler.               #
-# Initial comments from the source code are reproduced below.                 #
-###############################################################################
-
-#
-# queens.jako
-#
-# A program to find solutions to the 8-queens problem.
-#
 # Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 # This program is free software. It is subject to the same
 # license as Perl itself.
-#
+# $Id$
 
+=head1 NAME
+
+examples/assembly/queens.pasm - 8-Queens Problem
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/queens.pasm
+
+=head1 DESCRIPTION
+
+A program to find solutions to the 8-queens problem
+(http://burks.brighton.ac.uk/burks/foldoc/7/37.htm).
+
+Note that this Parrot assembler file was produced by the Jako compiler
+(F<languages/jako>).
+
+=cut
 
 # 4 bits per file, represent the rank of the queen, 0xf for none
 

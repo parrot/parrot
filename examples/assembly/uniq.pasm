@@ -1,23 +1,41 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
-# uniq - Remove duplicate lines from a sorted file
-#
-#   % ./parrot uniq.pasm -o uniq.pbc
-#   % ./parrot uniq.pbc data.txt
-#   % ./parrot uniq.pbc -c data.txt
-#
-# Takes options and a filename as argument:
-#
-# -c
-#   Precede each output line with the count of the number of times the
-#   line occurred in the input, followed by a single space
-#
-# -d
-#   Don't output lines that are not repeated in the input
-#
-# -u
-#   Don't output lines that are repeated in the input
-#
-# By Leon Brocard <acme@astray.com>
+
+=head1 NAME
+
+examples/assembly/uniq.pasm - Remove duplicate lines from a sorted file
+
+=head1 SYNOPSIS
+
+    % ./parrot uniq.pasm -o uniq.pbc
+    % ./parrot uniq.pbc data.txt
+    % ./parrot uniq.pbc -c data.txt
+
+=head1 DESCRIPTION
+
+Parrot implementation of C<uniq>. Removes duplicate lines from a sorted
+file. You'll have to create a suitable file to "de-dup".
+
+=head2 Command-line Options
+
+=over 4
+
+=item C<-c>
+
+Precede each output line with the count of the number of times the
+   line occurred in the input, followed by a single space
+
+=item C<-d>
+
+Don't output lines that are not repeated in the input
+
+=item C<-u>
+
+Don't output lines that are repeated in the input
+
+=back
+
+=cut
 
   set I0, P5
   shift S0, P5
@@ -116,3 +134,9 @@ LOOP:
   close P1
 
   end
+
+=head1 HISTORY
+
+By Leon Brocard <acme@astray.com>
+
+=cut

@@ -1,28 +1,32 @@
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
 # $Id$
 
 =head1 NAME
 
-getopt_demo.imc - demonstrating Getopt_Long.imc
-
-=head1 DESCRIPTION
-
-This demo program shows how to handle command line arguments 
-with the PIR library 'Getopt_Long.imc'.
-'Getopt_Long.imc' is a library file that needs to be present in your
-library search path. Right now the parrot library search path consists of
-'.' and './runtime/parrot/include'.
+examples/assembly/getopt_demo.imc - demonstrating Getopt_Long.imc
 
 =head1 SYNOPSIS
 
-  ./parrot examples/assembly/getopt_demo.imc --help
-  ./parrot examples/assembly/getopt_demo.imc --version
-  ./parrot examples/assembly/getopt_demo.imc --string=asdf --bool --integer=42 some thing
+    % ./parrot examples/assembly/getopt_demo.imc --help
+    % ./parrot examples/assembly/getopt_demo.imc --version
+    % ./parrot examples/assembly/getopt_demo.imc --string=asdf --bool --integer=42 some thing
+
+=head1 DESCRIPTION
+
+This demo program shows how to handle command line arguments with the
+PIR library F<runtime/parrot/include/Getopt_Long.imc>.
+
+F<Getopt_Long.imc> is a library file that needs to be present in your
+library search path. Currently the Parrot library search path consists
+of '.' and './runtime/parrot/include'.
 
 =head1 SUBROUTINES
 
-=head2 _main
+=over 4
 
-This is executed when you call getopt_demo.imc
+=item C<_main>
+
+This is executed when you call F<getopt_demo.imc>.
 
 =cut
 
@@ -150,8 +154,7 @@ This is executed when you call getopt_demo.imc
   end
 .end
 
-
-=head2 _usage
+=item C<_usage>
 
 Print the usage message.
 
@@ -183,18 +186,12 @@ TODO: Pass a flag for EXIT_FAILURE and EXIT_SUCCESS
 # A dummy implementation of Getopt::Long
 .include "Getopt_Long.imc"
 
+=back
+
 =head1 AUTHOR
 
 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
 
 =head1 SEE ALSO
 
-L<Getopt_Long.imc>
-
-=head1 COPYRIGHT
-
-Copyright (C) 2003 The Perl Foundation.  All rights reserved.
-This program is free software. It is subject to the same
-license as The Parrot Interpreter.
-
-
+F<runtime/parrot/include/Getopt_Long.imc>

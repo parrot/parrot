@@ -1,5 +1,23 @@
-# Sample sub-routines in Parrot
-#
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/sub.pasm - Subroutines
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/sub.pasm
+
+=head1 DESCRIPTION
+
+Sample subroutines in Parrot. 
+
+Shows you how to create a C<.Sub> and C<save> it, create a 2nd C<.Sub>
+and C<invoke> it, and then C<restore> the 1st C<.Sub> and C<invoke> it.
+
+=cut
+
 # Create 2 subroutines
 #
 set_addr I0, SUB

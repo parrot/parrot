@@ -1,5 +1,24 @@
-# Simple cat util to test PIO read/write
-# This does not use STDIO
+# Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
+# $Id$
+
+=head1 NAME
+
+examples/assembly/cat.pasm - cat-like utility
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/assembly/cat.pasm
+
+=head1 DESCRIPTION
+
+Simple C<cat>-like utility to test PIO read/write. Does not use STDIO.
+
+Echoes what you type once you hit return. 
+
+You'll have to Ctl-C to exit.
+
+=cut
+
 	getstdin P0
 	getstdout P1
 REDO:
