@@ -68,8 +68,8 @@ typedef unsigned long utf32_t;
 #define UTF8_IS_CONTINUATION(c)         ((c) >= 0x80u && (c) <= 0xBFu)
 #define UTF8_IS_CONTINUED(c)            ((c) &  0x80u)
 
-#define UTF8_START_MARK(len) (0xFEu << (7-len))
-#define UTF8_START_MASK(len) (0x1Fu >> (len-2))
+#define UTF8_START_MARK(len) (len == 1 ? 0 : 0x7Eu << (7-len))
+#define UTF8_START_MASK(len) (len == 1 ? 0x7Fu : 0x1Fu >> (len-2))
 
 #define UTF8_CONTINUATION_MARK           0x80u
 #define UTF8_ACCUMULATION_SHIFT          6

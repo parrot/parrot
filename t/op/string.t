@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 116;
+use Parrot::Test tests => 117;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1976,6 +1976,18 @@ Dw
 ABCY
 abc
    Y
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "transcode to utf8");
+  set S1, "ASCII is the same as UTF8\n"
+  find_encoding I1, "utf8"
+  transcode S2, S1, I1
+  print S1
+  print S2
+  end
+CODE
+ASCII is the same as UTF8
+ASCII is the same as UTF8
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
