@@ -16,7 +16,7 @@ Tests the multi-method dispatch.
 
 =cut
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 18;
 
 pir_output_is(<<'CODE', <<'OUTPUT', "PASM divide");
 
@@ -405,3 +405,263 @@ CODE
 ok 1
 42
 OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types");
+.namespace ["main"]
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = subclass "PerlString", "Xstring"
+    $P0 = new "Xstring"
+    $P0 = "ok 3\n"
+    $P1 = subclass "String", "Ystring"
+    $P1 = new "Ystring"
+    $P1 = "ok 4\n"
+    p($P0)
+    p($P1)
+.end
+
+.namespace [""]
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+CODE
+String ok 1
+PerlSt ok 2
+PerlSt ok 3
+String ok 4
+OUT
+
+pir_output_like(<<'CODE', <<'OUT', "MMD on PMC types, invalid");
+.namespace ["main"]
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = subclass "PerlString", "Xstring"
+    $P0 = new "Xstring"
+    $P0 = "ok 3\n"
+    $P1 = subclass "String", "Ystring"
+    $P1 = new "Ystring"
+    $P1 = "ok 4\n"
+    p($P0)
+    p($P1)
+    $P0 = new Integer
+    p($P0)
+.end
+
+.namespace [""]
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+CODE
+/String ok 1
+PerlSt ok 2
+PerlSt ok 3
+String ok 4
+Name 'p' not found/
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types 3");
+.namespace ["main"]
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = subclass "PerlString", "Xstring"
+    $P0 = new "Xstring"
+    $P0 = "ok 3\n"
+    $P1 = subclass "String", "Ystring"
+    $P1 = new "Ystring"
+    $P1 = "ok 4\n"
+    p($P0)
+    p($P1)
+    $P0 = new PerlInt
+    $P0 = 42
+    p($P0)
+.end
+
+.namespace [""]
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+
+.sub p @MULTI(Integer)
+    .param pmc p
+    print "Intege "
+    print p
+    print "\n"
+.end
+
+CODE
+String ok 1
+PerlSt ok 2
+PerlSt ok 3
+String ok 4
+Intege 42
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, global namespace");
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = subclass "PerlString", "Xstring"
+    $P0 = new "Xstring"
+    $P0 = "ok 3\n"
+    $P1 = subclass "String", "Ystring"
+    $P1 = new "Ystring"
+    $P1 = "ok 4\n"
+    p($P0)
+    p($P1)
+.end
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+CODE
+String ok 1
+PerlSt ok 2
+PerlSt ok 3
+String ok 4
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types, package namespace");
+
+.namespace ["Some"]
+
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = subclass "PerlString", "Xstring"
+    $P0 = new "Xstring"
+    $P0 = "ok 3\n"
+    $P1 = subclass "String", "Ystring"
+    $P1 = new "Ystring"
+    $P1 = "ok 4\n"
+    p($P0)
+    p($P1)
+.end
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+CODE
+String ok 1
+PerlSt ok 2
+PerlSt ok 3
+String ok 4
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', "MMD on PMC types - Any");
+
+.sub main @MAIN
+    $P0 = new String
+    $P0 = "ok 1\n"
+    $P1 = new PerlString
+    $P1 = "ok 2\n"
+    p($P0)
+    p($P1)
+    $P0 = new PerlInt
+    $P0 = 42
+    p($P0)
+    $P0 = new PerlInt
+    $P0 = 43
+    q($P0)
+.end
+
+.namespace [""]
+
+.sub p @MULTI(String)
+    .param pmc p
+    print "String "
+    print p
+.end
+
+.sub p @MULTI(PerlString)
+    .param pmc p
+    print "PerlSt "
+    print p
+.end
+
+.sub p @MULTI(_)
+    .param pmc p
+    print "Any    "
+    print p
+    print "\n"
+.end
+
+.sub q @MULTI(pmc)
+    .param pmc p
+    print "Any    "
+    print p
+    print "\n"
+.end
+
+CODE
+String ok 1
+PerlSt ok 2
+Any    42
+Any    43
+OUT
+

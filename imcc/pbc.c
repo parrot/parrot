@@ -467,6 +467,9 @@ fixup_bsrs(Interp *interpreter)
                 }
                 addr = jumppc + bsr->color;
                 if (bsr->set == 'p') {
+                    Instruction *ins;
+                    SymReg *r1;
+                    struct pcc_sub_t *pcc_sub;
                     /*
                      * check in matching namespace
                      */
@@ -474,7 +477,19 @@ fixup_bsrs(Interp *interpreter)
                     /*
                      * if failed change opcode:
                      * set_p_pc  => find_name p_sc
+                     * the the sub is a multi too
                      */
+                    assert(s1->unit);
+                    if (lab && (s1->unit->type & IMC_PCCSUB)) {
+                        ins = s1->unit->instructions;
+                        assert(ins);
+                        r1 = ins->r[1];
+                        assert(r1);
+                        pcc_sub = r1->pcc_sub;
+                        assert(pcc_sub);
+                        if (pcc_sub->nmulti)
+                            lab = NULL;
+                    }
                     if (!lab) {
                         int op, col;
                         SymReg *nam;

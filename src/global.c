@@ -200,10 +200,17 @@ PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
 PMC *
 Parrot_get_name(Interp* interpreter, STRING *name)
 {
-    PMC *g, *pad;
+    PMC *g, *pad, *current_sub, *name_space;
 
     pad = scratchpad_get_current(interpreter);
     g = scratchpad_find(interpreter, pad, name);
+    if (!g) {
+        current_sub = interpreter->ctx.current_sub;
+        if (current_sub &&
+                (name_space = PMC_sub(current_sub)->name_space))
+
+            g = Parrot_find_global_p(interpreter, name_space, name);
+    }
     if (!g)
         g = Parrot_find_global(interpreter, NULL, name);
     if (!g)

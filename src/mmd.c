@@ -884,6 +884,9 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
      */
     if (n > 1)
         mmd_sort_candidates(interpreter, arg_tuple, candidate_list);
+    n = VTABLE_elements(interpreter, candidate_list);
+    if (!n)
+        return NULL;
     /*
      * 6) Uff, return first one
      */
@@ -982,8 +985,8 @@ mmd_cvt_to_types(Interp* interpreter, PMC *multi_sig)
 static UINTVAL
 mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
 {
-    PMC *multi_sig;
-    INTVAL i, n, args, dist;
+    PMC *multi_sig, *mro;
+    INTVAL i, n, args, dist, j, m;
     INTVAL type_sig, type_call;
 
     multi_sig = PMC_sub(pmc)->multi_signature;
@@ -1014,12 +1017,33 @@ mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
         type_call = VTABLE_get_integer_keyed_int(interpreter, arg_tuple, i);
         if (type_sig == type_call)
             continue;
-        /* different native types are very different */
-        if (type_sig <= 0 || type_call <= 0) {
+        /*
+         * different native types are very different, except a PMC
+         * which matches any PMC
+         */
+        if ((type_sig <= 0 && type_sig != enum_type_PMC) || type_call <= 0) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
-        /* TODO now consider MRO of types */
+        /*
+         * now consider MRO of types the signature type has to be somewhere
+         * int the MRO of the type_call
+         */
+        mro = Parrot_base_vtables[type_call]->mro;
+        m = VTABLE_elements(interpreter, mro);
+        for (j = 0; j < m; ++j) {
+            PMC *cl = VTABLE_get_pmc_keyed_int(interpreter, mro, j);
+            if (cl->vtable->base_type == type_sig)
+                break;
+            ++dist;
+        }
+        /*
+         * if the type wasn't in MRO check, if any PMC matches
+         * in that case use the distance + 1 (of an any PMC parent)
+         */
+        if (j == m && type_sig != enum_type_PMC)
+            return MMD_BIG_DISTANCE;
+        ++dist;
     }
     return dist;
 }
@@ -1075,6 +1099,13 @@ mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
     data = PMC_data(cl);
     for (i = 0; i < n; ++i) {
         INTVAL idx = helper[i] >> 16;
+        /*
+         * if the distance is big stop
+         */
+        if ((helper[i] & 0xffff) == MMD_BIG_DISTANCE) {
+            PMC_int_val(cl) = i;
+            break;
+        }
         LVALUE_CAST(PMC*, helper[i]) = data[idx];
     }
     /*
@@ -1231,12 +1262,18 @@ the MMD search should stop.
 static int
 mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 {
-    STRING *name_space = interpreter->ctx.current_package;
+    /* STRING *name_space = interpreter->ctx.current_package; */
     PMC *pmc;
+    PMC *current_sub;
+    PMC *name_space;
 
+    current_sub = interpreter->ctx.current_sub;
+    if (!current_sub)
+        return 0;
+    name_space = PMC_sub(current_sub)->name_space;
     if (!name_space)
         return 0;
-    pmc = Parrot_find_global(interpreter, name_space, meth);
+    pmc = Parrot_find_global_p(interpreter, name_space, meth);
     if (pmc) {
         if (mmd_maybe_candidate(interpreter, pmc, arg_tuple, cl))
             return 1;

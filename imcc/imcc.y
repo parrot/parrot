@@ -620,8 +620,16 @@ multi_type:
    | FLOATV           { $$ = mk_const(interp, str_dup("FLOATVAL"), 'S'); }
    | PMCV             { $$ = mk_const(interp, str_dup("PMC"), 'S'); }
    | STRINGV          { $$ = mk_const(interp, str_dup("STRING"), 'S'); }
-   | '_'              { $$ = mk_const(interp, str_dup("PMC"), 'S'); }
-   | IDENTIFIER       { $$ = mk_const(interp, $1, 'S'); }
+   | IDENTIFIER       {
+                          SymReg *r;
+                          if (strcmp($1, "_"))
+                              r = mk_const(interp, $1, 'S');
+                          else {
+                              free($1),
+                              r = mk_const(interp, str_dup("PMC"), 'S');
+                           }
+                           $$ = r;
+                       }
    ;
 
 sub_body:
