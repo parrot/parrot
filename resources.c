@@ -360,7 +360,7 @@ mark_buffers_unused(struct Parrot_Interp *interpreter) {
   }
 }
 
-static PMC *
+PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list) {
 
 
@@ -452,34 +452,30 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
             if (bits == PMC_is_PMC_ptr_FLAG) {
                 last = mark_used(current->data, last);
             }
-            else {
-                if (bits == PMC_is_buffer_ptr_FLAG) {
-                    if (current->data) {
-                        buffer_lives(current->data);
-                    }
+            else if (bits == PMC_is_buffer_ptr_FLAG) {
+                if (current->data) {
+                    buffer_lives(current->data);
                 }
-                else {
-                    if (bits == (PMC_is_buffer_ptr_FLAG &
-                        PMC_is_PMC_ptr_FLAG)) {
-                        /* buffer of PMCs */
-                        Buffer *trace_buf = current->data;
-                        PMC **cur_pmc = trace_buf->bufstart;
-                        /* Mark the damn buffer as used! */
-                        trace_buf->flags |= BUFFER_live_FLAG;
-                        for (i = 0; i < trace_buf->buflen; i++) {
-                            if (cur_pmc[i]) {
-                                last = mark_used(cur_pmc[i], last);
-                            }
-                        }
-                    }
-                    else {
-                        /* All that's left is the custom */
-                        last = current->vtable->mark(interpreter,
-                                                     current, last);
+            }
+            else if (bits == (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG))
+            {
+                /* buffer of PMCs */
+                Buffer *trace_buf = current->data;
+                PMC **cur_pmc = trace_buf->bufstart;
+                /* Mark the damn buffer as used! */
+                trace_buf->flags |= BUFFER_live_FLAG;
+                for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+                    if (cur_pmc[i]) {
+                        last = mark_used(cur_pmc[i], last);
                     }
                 }
             }
+            else {
+                /* All that's left is the custom */
+                last = current->vtable->mark(interpreter, current, last);
+            }
         }
+
         prev = current;
     }
 }
