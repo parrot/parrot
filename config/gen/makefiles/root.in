@@ -488,6 +488,7 @@ clean : testclean
 
 testclean :
 	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
+	$(RM_F) t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)
