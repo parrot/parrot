@@ -1,0 +1,2 @@
+#!/bin/sh
+perl -I lib jakoc $@ | ../../parrot -
