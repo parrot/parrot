@@ -6,21 +6,22 @@ Intermediate Language (PIR).
 
 Why? Writing a compiler is a large undertaking. We are trying
 to take some of the load off of potential language designers,
-including the Perl6 compiler itself. We can provide a
+including the designers of the Perl6 compiler. We can provide a
 common back-end for Parrot that does:
 
    Register Allocation and Spillage
    Constant folding and expression evaluation
-   Instruction selection.
-   Optimization.
+   Instruction selection
+   Optimization
+   Bytecode generation
 
 This way, language designers can get right to work on
 
    Tokenizing, parsing, type checking AST/DAG production
 
 Then they can simply feed PIR to imcc which will compile
-directly to Parrot bytecode, potentially skipping the
-assembler altogether.
+directly to Parrot bytecode, altogether skipping the reference
+assembler.
 
 So far, all the compiler does (besides translating the PIR to pasm) is
 register allocation and spilling. I like Steve Muchnick's MIR language,
@@ -29,14 +30,10 @@ and I'm taking a few things from it.
 Presently you can write code with unlimited symbolics or named
 locals and imcc will translate to pasm.
 
-I expect the IR compiler to focus on staying FAST, simple, and
-maintainable, and never develop featuritis, however I want it to be
-adequate for all languages targetting parrot. Did I mention that
-it needs to be FAST?
-
-We have other options like having imcc to become an assembler in its
-own right, which is fine by me, but for now, I think Parrot is changing way
-too fast to have another assembler branch.
+I expect the IR compiler to be FAST, simple, and maintainable,
+and never develop featuritis; however I want it to be adequate
+for all languages targetting parrot. Did I mention that it
+needs to be FAST?
 
 
 Register Allocation
@@ -65,7 +62,7 @@ Optimization
 
 Why C and Bison?
 
-  Until Perl6 compiles itself and is fast, a Bison parser is
+  Until Perl6 compiles itself (and does it fast), a Bison parser is
 the easiest to maintain. An additional, important benefit, is
 C-based parsers are pretty darn fast. Currently assembling
 Parrot on the fly is still relatively slow.
@@ -221,8 +218,9 @@ Contributing Authors:
 
 Angel Faus <afaus@corp.vlex.com> ... CFG, life analysis
 Sean O'Rourke <seano@cpan.org>   ... anyop, iANY
-Leopold Toetsch <lt@toetsch.at>  ... numerous bugfixes/cleanup/rewrite
+Leopold Toetsch <lt@toetsch.at>  ... major rewrite
+                                     numerous bugfixes/cleanup/rewrite
                                      optimizer.c
-				     run parrot code inside imcc
+                                     run parrot code inside imcc
 Juergen Boemmels <boemmels@physik.uni-kl.de> Macro preprocessor
 
