@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 # It would be very embarrassing if these didn't work...
 output_is(<<'CODE', '', "noop, end");
@@ -99,5 +99,11 @@ BAR:
 CODE
 ok 1
 OUTPUT
+
+output_is(<<'CODE', 32, "Predeclared opcodes");
+     set_i_ic I0,32
+     print I0
+     end
+CODE
 
 1; # HONK

@@ -679,6 +679,7 @@ sub to_bytecode {
     # Collect the operator
     #
     my $temp = $_->[0];
+    my $suffixes = '';
     $temp=~s/^(\w+)\s*//;
     $_->[0] = [$1];
 
@@ -688,49 +689,49 @@ sub to_bytecode {
         # Skip flying comments.
       }
       elsif($temp=~s/^($reg_re)//) {
-        $_->[0][0] .= "_".lc(substr($1,0,1));
+        $suffixes .= "_".lc(substr($1,0,1));
         push @{$_->[0]}, [lc(substr($1,0,1)),$1];
       }
       elsif($temp=~s/^\[(S\d+)\]//) { # The only key register should be Sn
-        $_->[0][0] .= "_s";
+        $suffixes .= "_s";
         push @{$_->[0]}, ['s',$1];
       }
       elsif($temp=~s/^($flt_re)//) {
-        $_->[0][0] .= "_nc";
+        $suffixes .= "_nc";
         push @{$_->[0]}, $self->_numeric_constant($1);
       }
       elsif($temp=~s/^\[($str_re)\]//) {
-        $_->[0][0] .= "_sc";
+        $suffixes .= "_sc";
         push @{$_->[0]}, $self->_string_constant($1);
       }
       elsif($temp=~s/^\[($bin_re)\]//) { # P3[0b11101]
         my $val = $1;$val=~s/0b//;
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
       elsif($temp=~s/^\[($hex_re)\]//) { # P7[0x1234]
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
       elsif($temp=~s/^\[($dec_re)\]//) { # P14[3]
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',0+$1];
       }
       elsif($temp=~s/^($bin_re)//) {     # 0b1101
         my $val = $1;$val=~s/0b//;
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
       }
       elsif($temp=~s/^($hex_re)//) {     # 0x12aF
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
       }
       elsif($temp=~s/^($dec_re)//) {     # -32
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['ic',0+$1];
       }
       elsif($temp=~s/^($str_re)//) {     # "Hello World"
-        $_->[0][0] .= "_sc";
+        $suffixes .= "_sc";
         push @{$_->[0]}, $self->_string_constant($1);
       }
       elsif($temp=~s/^($label_re)//) {
@@ -738,7 +739,7 @@ sub to_bytecode {
           print STDERR "Couldn't find global label '$1' at line $_->[1].\n";
           last;
         }
-        $_->[0][0] .= "_ic";
+        $suffixes .= "_ic";
         push @{$_->[0]}, ['label',$1];
       }
       else {
@@ -746,6 +747,8 @@ sub to_bytecode {
         last;
       }
     }
+    $_->[0][0] .= $suffixes
+      unless defined $self->{fullops}{$_->[0][0]};
     $self->{line_to_pc}{$_->[1]}=$pc;
     $pc += scalar @{$_->[0]};
   }
