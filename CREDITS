@@ -159,7 +159,7 @@ N: Marcus Thiesen
 D: URM language, bugfixes
 
 N: Mattia Barbon
-D: Win32 fixes
+D: Win32 fixes, dynamic PMC creation and loading
 
 N: Melvin Smith
 D: Parrot core, various ops, IO, subs, continuations, COW stacks

@@ -118,10 +118,6 @@ foldup(Parrot_Interp interpreter, INTVAL skip)>
 Take all the PMCs in register P3, starting at offset C<skip> and return
 them in an C<Array> PMC.
 
-TODO - IMCC and PDD 3 aren't yet in conformance. This uses the current
-IMCC setup, but should be changed as soon as IMCC modified to the
-correct calling conventions.
-
 =cut
 
 */
@@ -129,7 +125,6 @@ correct calling conventions.
 PMC*
 foldup(Parrot_Interp interpreter, INTVAL skip)
 {
-    /* Should be I3 when we're done */
     INTVAL max_used_reg = REG_INT(3) + 5;
     INTVAL reg;
     INTVAL elems_in_array = 0;
@@ -147,7 +142,6 @@ foldup(Parrot_Interp interpreter, INTVAL skip)
             VTABLE_type(interpreter, overflow) != enum_class_Null) {
         elems_in_array = VTABLE_get_integer(interpreter, overflow);
     }
-    /* XXX This needs fixing when IMCC does calling conventions right */
     total_size = REG_INT(3) + elems_in_array - skip;
 
     VTABLE_set_integer_native(interpreter, destination_pmc, total_size);
