@@ -10,14 +10,14 @@
   .local string code
   code = S5
 
-  .local int pid
+  .local int uniq
   .local string imcfile
   .local string pir_data
   .local string cmdline
 
-  pid = getpid
+  uniq = time
   imcfile = "/tmp/regex-"
-  $S0 = pid
+  $S0 = uniq
   imcfile = concat $S0
   imcfile = concat ".imc"
   
