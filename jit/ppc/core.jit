@@ -6,10 +6,10 @@
 ;
 
 Parrot_end {
-    jit_emit_add_rri_i(NATIVECODE, r1, r1, 64);
+    jit_emit_lwz(NATIVECODE, r1, 0, r1);
     jit_emit_lwz(NATIVECODE, r0, 8, r1);
     jit_emit_mtlr(NATIVECODE, r0);
-;    jit_emit_lmw(NATIVECODE, r30, -8, r1);
+    jit_emit_lmw(NATIVECODE, r13, -PPC_JIT_REGISTER_SAVE_SPACE, r1);
     jit_emit_blr(NATIVECODE);
 }
 
@@ -540,11 +540,11 @@ TEMPLATE Parrot_ifunless_n_ic {
 }
 
 Parrot_if_n_ic {
-    Parrot_ifunless_i_ic s/<COND>/BNE/
+    Parrot_ifunless_n_ic s/<COND>/BNE/
 }
 
 Parrot_unless_n_ic {
-    Parrot_ifunless_i_ic s/<COND>/BEQ/
+    Parrot_ifunless_n_ic s/<COND>/BEQ/
 }
 
 TEMPLATE Parrot_branch_i_i_ic {

@@ -1,6 +1,6 @@
 #! perl -w
 # test WRT JIT register allocation
-use Parrot::Test tests => 57;
+use Parrot::Test tests => 58;
 
 output_is(<<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped");
 set I0,0
@@ -1119,3 +1119,21 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+
+my $code;
+for (0..4096)
+{
+	$code .= qq{   set S0, "hello"\n};
+}
+$code .= <<CODE;
+   print S0
+   print "\\ndone\\n"
+   end
+CODE
+
+output_is($code, <<OUTPUT, "large code" );
+hello
+done
+OUTPUT
+
+1;

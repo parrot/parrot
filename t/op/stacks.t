@@ -241,9 +241,10 @@ for (0..1024) {
 for (0..1024) {
    $code .= "   popi\n";
    $code .= "   print I0\n";
+   $code .= "   print \",\"\n";
    $code .= "   print I31\n";
    $code .= "   print \"\\n\"\n";
-   $output .= (1024-$_) . "$_\n";
+   $output .= (1024-$_) . ",$_\n";
 }
 $code .= "      end\n";
 output_is($code, $output, "pushi & popi (deep)" );

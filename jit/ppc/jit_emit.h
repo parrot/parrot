@@ -202,7 +202,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_bcctrx(pc, bo, bi, type, lk) \
     *(pc++) = 19 << 2 | bo >> 3; \
     *(pc++) = (char)(bo << 5 | bi); \
-    *(pc++) = type >> 8; \
+    *(pc++) = type >> 7; \
     *(pc++) = (char)(type << 1| lk)
 
 #  define jit_emit_bcctr(pc, bo, bi) \
@@ -391,9 +391,12 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
 #  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
 #  define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+#  define jit_emit_fsel(pc, D, A, B, C) jit_emit_3a(pc, 63, D, A, B, C, 23, 0)
 
 #  define jit_emit_fabs_rrr(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
 #  define jit_emit_fneg_rrr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
+
+#  define jit_emit_fmr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 72, 0)
 
 /* not in core.ops, but probably should be: */
 #  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
@@ -558,8 +561,9 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
       jit_emit_oris(pc, D, D, (long)imm >> 16); }
 
 #  define add_disp(pc, D, disp) \
-    jit_emit_addis(pc, D, r15, (long)disp >> 16); \
-    jit_emit_add_rri_i(pc, D, D, (long)disp & 0xffff)
+    jit_emit_mov_ri_i(pc, ISR1, disp); \
+    jit_emit_add_rrr(pc, D, r15, ISR1)
+
 
 #  if EXEC_CAPABLE
 #   define load_nc(pc, D, disp) \
@@ -572,6 +576,10 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 #endif /* EXEC_CAPABLE */
 
 #endif /* JIT_EMIT */
+
+#define PPC_JIT_REGISTER_SAVE_SPACE (4*19)
+#define PPC_JIT_FRAME_SIZE (PPC_JIT_REGISTER_SAVE_SPACE + 68)
+
 #if JIT_EMIT == 2
 
 void
@@ -579,9 +587,9 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  struct Parrot_Interp * interpreter)
 {
     jit_emit_mflr(jit_info->native_ptr, r0);
-/*    jit_emit_stmw(jit_info->native_ptr, r30, -8, r1); */
+    jit_emit_stmw(jit_info->native_ptr, r13, -PPC_JIT_REGISTER_SAVE_SPACE, r1);
     jit_emit_stw(jit_info->native_ptr, r0, 8, r1);
-    jit_emit_stwu(jit_info->native_ptr, r1, -64, r1);
+    jit_emit_stwu(jit_info->native_ptr, r1, -PPC_JIT_FRAME_SIZE, r1);
     jit_emit_xor_rrr(jit_info->native_ptr, r31, r31, r31);
     jit_emit_mov_rr(jit_info->native_ptr, r13, r3);
     if (!jit_info->objfile) {
@@ -609,6 +617,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         ((long)jit_info->cur_op - (long)interpreter->code->byte_code));
     jit_emit_mov_rr(jit_info->native_ptr, r4, r13);
 
+    /*
     Parrot_jit_newfixup(jit_info);
 
     jit_info->arena.fixups->type = JIT_PPC_CALL;
@@ -616,6 +625,12 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         (void (*)(void))interpreter->op_func_table[*(jit_info->cur_op)];
 
     _emit_bx(jit_info->native_ptr, 1, 0);
+    */
+
+    jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, 
+            (long)(interpreter->op_func_table[*(jit_info->cur_op)]));
+    jit_emit_mtctr(jit_info->native_ptr, ISR1);
+    jit_emit_bctrl(jit_info->native_ptr);
 }
 
 void
