@@ -347,8 +347,13 @@ emit_pushl_m(char *pc, int base, int i, int scale, long disp)
 static char *
 emit_popl_r(char *pc, int reg)
 {
+#if 0
+    /* valgrind doesn't like this and the version below is smaller anyway */
     *(pc++) = (char) 0x8f;
     *(pc++) = (char) emit_alu_X_r(emit_b000, reg);
+#else
+    *(pc++) = (char) 0x58 | (reg - 1);
+#endif
     return pc;
 }
 
