@@ -5,8 +5,8 @@
  *  Overview:
  *     Supporting file for the regular expression engine
  *  Data Structure and Algorithms:
- *	   rxinfo is the main structure involved in regular expressions; it's stuffed 
- *     into a Handle PMC and passed to all regular expression opcodes.
+ *     rxinfo is the main structure involved in regular expressions; it's
+ *     stuffed into a Handle PMC and passed to all regular expression opcodes.
  *  History:
  *  Notes:
  *  References:
