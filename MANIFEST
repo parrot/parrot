@@ -1534,6 +1534,7 @@ languages/scheme/t/io/basic.t
 languages/scheme/t/logic/basic.t
 languages/scheme/t/logic/lists.t
 lib/Class/Struct.pm
+lib/Digest/Perl/MD5.pm
 lib/Make.pm
 lib/Parrot/BuildUtil.pm
 lib/Parrot/Configure/RunSteps.pm

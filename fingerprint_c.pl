@@ -2,7 +2,7 @@
 
 use strict;
 use lib 'lib';
-use Digest::MD5 qw(md5_hex);
+use Digest::Perl::MD5 qw(md5_hex);
 use Data::Dumper;
 use Parrot::OpLib::core;
 

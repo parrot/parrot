@@ -427,7 +427,7 @@ use lib "$FindBin::Bin/lib";
 use Parrot::Types; # For pack_op()
 use Parrot::OpLib::core;
 use Parrot::Config;
-use Digest::MD5 qw(md5_hex);
+use Digest::Perl::MD5 qw(md5_hex);
 
 =head2 Assembler class
 
