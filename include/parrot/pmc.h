@@ -51,7 +51,7 @@ typedef enum {
 
     /* The rest of the flags are for use by Parrot */
 
-    PMC_tba_FLAG        = 2 << 8, /* XXX none yet, just an example... */
+    PMC_tba_FLAG        = 2 << 8 /* XXX none yet, just an example... */
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */
