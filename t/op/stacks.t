@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
 # where * != p.
@@ -86,10 +86,9 @@ CODE
 3031
 OUTPUT
 
-SKIP: {skip("push_i_c not implemented",1);
-output_is(<<"CODE", <<'OUTPUT', "push_i_c & popi");
+output_is(<<"CODE", <<'OUTPUT', "clonei & popi");
 @{[ set_int_regs( sub {$_[0]}) ]}
-	push_i_c
+	clonei
 @{[ print_int_regs() ]}
 @{[ set_int_regs( sub {-$_[0]}) ]}
 @{[ print_int_regs() ]}
@@ -119,7 +118,6 @@ CODE
 2526272829
 3031
 OUTPUT
-}
 
 output_is(<<"CODE", <<'OUTPUT', 'pushs & pops');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
@@ -136,10 +134,9 @@ CODE
 01010101010101010101010101010101
 OUTPUT
 
-SKIP: {skip("push_s_c not implemented", 1);
-output_is(<<"CODE", <<'OUTPUT', 'push_s_c & pops');
+output_is(<<"CODE", <<'OUTPUT', 'clones & pops');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
-	push_s_c
+	clones
 @{[ print_str_regs() ]}
 	print "\\n"
 @{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
@@ -154,7 +151,6 @@ CODE
 10101010101010101010101010101010
 01010101010101010101010101010101
 OUTPUT
-}
 
 output_is(<<"CODE", <<'OUTPUT', 'pushn & popn');
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
@@ -187,14 +183,64 @@ CODE
 THERE'LL BE NO BUTTER IN HELL!
 OUTPUT
 
+output_is(<<CODE, <<OUTPUT, "clonep & popp");
+	new	P0, PerlString
+	new	P1, PerlString
+	new	P2, PerlString
+	new	P3, PerlString
+	new	P4, PerlString
+	new	P5, PerlString
 
+	set	P0, "Quarantine\\n"
+	set	P1, "Permutation City\\n"
+	set	P2, "Axiomatic\\n"
+	set	P3, "Distress\\n"
+	set	P4, "Diaspora\\n"
+	set	P5, "Luminous\\n"
 
-SKIP: { skip("push_n_c not yet implemented",1);
-output_is(<<"CODE", <<'OUTPUT', 'push_n_c & popn');
+	clonep
+
+	print	P0
+	print	P1
+	print	P2
+	print	P3
+	print	P4
+	print	P5
+
+	set	P5, "Greg Egan\\n" 	# this should modify the saved P5
+					# as well
+	new	P4, PerlString
+	set	P4, "HONK if you like\\n" # this won't
+	popp
+
+	print	P0
+	print	P1
+	print	P2
+	print	P3
+	print	P4
+	print	P5
+
+	end
+CODE
+Quarantine
+Permutation City
+Axiomatic
+Distress
+Diaspora
+Luminous
+Quarantine
+Permutation City
+Axiomatic
+Distress
+Diaspora
+Greg Egan
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'clonen & popn');
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
-	push_n_c
+	clonen
 @{[ cgt_num_regs() ]}
-	print "Seem to have positive Nx before push\\n"
+	print "Seem to have positive Nx before clone\\n"
 @{[ set_num_regs( sub { "-1.0".$_} ) ]}
 @{[ clt_num_regs() ]}
 	print "Seem to have negative Nx\\n"
@@ -205,11 +251,10 @@ output_is(<<"CODE", <<'OUTPUT', 'push_n_c & popn');
 ERROR:	print "not ok\\n"
 ALLOK:	end
 CODE
-Seem to have positive Nx before push
+Seem to have positive Nx before clone
 Seem to have negative Nx
 Seem to have positive Nx after pop
 OUTPUT
-}
 
 # Test proper stack chunk handling
 output_is(<<CODE, <<'OUTPUT', 'save_i & restore_i');
