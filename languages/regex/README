@@ -1,0 +1,25 @@
+languages/regex: Compile regular expressions into optimized bytecode.
+
+CURRENT STATUS
+==============
+
+This won't work very well without a couple of other patches that I'll
+be sending to the list Real Soon Now.
+
+Somewhat buggy. The 're' style regular expressions are less buggy, but
+also useless to anyone else because the supporting code isn't in the
+tree (and probably never will be; if anything, I'll merge it in with
+the rx code. Copies available on request, though.)
+
+Alternation does not work for complex expressions.
+
+The test harness depends on more of those patches I talked about.
+
+DEVELOPER NOTES
+===============
+
+If you make changes to Grammar.y, you'll need Parse::Yapp to
+regenerate Grammar.pm. Run 'make' with no options to pass the correct
+command-line parameters.
+
+Original author: Steve Fink <steve@fink.com>
