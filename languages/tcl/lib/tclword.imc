@@ -1,54 +1,89 @@
-###
-# TclWord
-#
-# This object holds the result of parsing a tcl command. Internally,
-# It represents a word as discrete chunks, which are either finalized
-# or require interpolation. Each chunk is marked as such. When the
-# word is /used/ (at interpretation or at execution time), 
-#
-# Attributes:
-#   Each TclWord has the following attributes:
-#   chunks: an array of pairs of (type, content), where type/content ==
-#     CONST    - a string
-#     VARIABLE - a perlArray suitable for passing to _get_var
-#     COMMAND  - the result of a the parse step for a [] command, i.e.
-#                a PerlArray of TclWords. 
+=head1 TclWord
 
-# XXX how do I get at global constants like TCL_OK from this namespace?
+This object holds the result of parsing a tcl command. Internally,
+It represents a word as discrete chunks, which are either finalized
+or require interpolation. Each chunk is marked as such. When the
+word is I<used> (at interpretation or at execution time), the required
+interpolation occurs (either variable or command)
 
-# Methods:
-#   __get_string - automatically stringify, evaluating code and interpolating
-#                   as necessary.
-#   __set_ - takes a string (can we do this on the initializer, or do we
-#            need a separate setup). This automagically breaks up the
-#            string into the various components.
-#   concat_variable, concat_const, concat_command
+=head1 Attributes
+
+Each TclWord has the following attributes:
+
+=head2 chunks
+
+an array of pairs of (type, content), where type/content is
+
+=over 4
+
+=item CONST 
+
+a string
+
+=item VARIABLE
+
+a perlArray suitable for passing to C<_Tcl::_get_var>
+
+=item COMMAND
+
+the result of a the parse step for a [] command, i.e.
+a PerlArray of TclWords. 
+
+=back
+
+=head2 constant
+
+An Integer PMC flag representing whether or not the value we hold is
+constant. I<Used as a hint at compile time.>
+
+=cut
 
 # XXX - figure out how to get namespace-mangled constants, to replace:
 #      - const   - 0
 #      - var     - 1
 #      - command - 2
+# XXX how do I get at global constants like TCL_OK from this namespace?
 
-.namespace ["TclWord"]
-
-.sub __class_init @LOAD
-  newclass $P1, "TclWord"
-  addattribute $P1, "chunks"
-.end
-
-.sub __init
-  $P1 = new PerlArray
-  # P2 is our instance
-  setattribute P2, "TclWord\x00chunks", $P1
-.end
+.namespace [ "TclWord" ]
 
 =head1 Methods
 
 TclWord defines the following methods:
 
+=head2 __class_init
+
+Define the attributes required for the class.
+
+=cut
+
+.sub __class_init @LOAD
+  newclass $P1, "TclWord"
+  addattribute $P1, "chunks"
+  addattribute $P1, "constant"
+.end
+
+=head2 __init
+
+Initialize the attributes for an instance of the class
+
+=cut
+
+.sub __init
+  .local pmc emptyArray
+  .local pmc constant
+  emptyArray = new PerlArray
+  # P2 is our instance
+  setattribute P2, "TclWord\x00chunks", emptyArray
+  constant = new PerlInt
+  constant = 1
+  setattribute P2, "TclWord\x00constant", constant
+.end
+
 =head2 concat_words
 
 Given an array of words, append the chunks of a given word to the existing word 
+
+XXX - need to make this respect the constant attribute.
 
 =cut
 
@@ -94,7 +129,6 @@ inner_loop_done:
 outer_loop_done:
 .end
 
-
 =head2 concat_char
 
 Add a constant character to a TclWord
@@ -117,7 +151,6 @@ Add a constant character to a TclWord
   chunks = getattribute self, "TclWord\x00chunks"
   push chunks, chunk
 .end
-
 
 =head2 concat_const
 
@@ -145,7 +178,7 @@ end:
 =head2 concat_variable
 
 Add the name of a variable to be interpolated to a TclWord. Takes the name
-of the var, and an optional index.
+of the var, and an optional index for array variables.
 
 =cut
 
@@ -155,16 +188,19 @@ of the var, and an optional index.
 
   .local pmc chunk
   .local pmc chunks
-
+  .local pmc constant
 
   chunk = new PerlArray
   chunk[0] = 1
   chunk[1] = var
-  if idx == "" goto no_index
+  # I2 == # string params.
+  if I2 == 1 goto no_index
   chunk[2] = idx
 
 no_index:
   chunks = getattribute self, "TclWord\x00chunks"
+  constant = getattribute self, "TclWord\x00constant"
+  constant = 0
   push chunks, chunk
 .end
 
@@ -172,7 +208,7 @@ no_index:
 
 Add a command to be interpolated to a TclWord. Takes the
 text of the command, and stores the parsed version for
-later.
+later interpretation.
 
 =cut
 
@@ -186,7 +222,7 @@ later.
   # XXX I'd really rather not have to lug around another global
   #     to call 
 
-  $P1 = find_global "__parse"
+  $P1 = find_global "_Tcl", "__parse"
   parsed_cmd  = $P1(cmd)
 
   chunk = new PerlArray
@@ -226,6 +262,10 @@ resulting string, (assuming values of 1 and 2 for a and b, respectively) is
 
 	"1 + 2 = 3"
 
+NB: This isn't quite the normal C<__get_string> method, and should probably be
+renamed - it is returning a tcl exit code in addition to the normal string
+result.
+
 =cut
 
 .sub __get_string method
@@ -240,8 +280,8 @@ resulting string, (assuming values of 1 and 2 for a and b, respectively) is
   .local pmc interpret 
   .local pmc get_var
 
-  interpret = global "__interpret"
-  get_var = global "__get_var"
+  interpret = find_global "_Tcl", "__interpret"
+  get_var = find_global "_Tcl", "__get_var"
 
   .local string retval
   retval = ""
@@ -272,8 +312,6 @@ variable:
   #print "RETURNING VARIABLE\n"
   $P1 = new PerlArray
   $S1 = $P0[1]
-  #$P9 = global "_dumper"
-  #$P9($P0)
   $P1[0] = $S1
   #print "$S1 is"
   #print $S1
@@ -411,5 +449,32 @@ Return the number of chunks in this tclword.
 
   .pcc_begin_return
     .return size
+  .pcc_end_return
+.end
+
+=head2 XXX __freeze
+
+Not implemented yet, pending delegation of C<freeze> to objects.
+
+=head2 XXX __thaw
+
+Not implemented yet, pending delegation of C<thaw> to objects.
+
+=cut
+
+=head2 __is_const
+
+Returns an integer, C<1> if this word is constant, C<0> if it requires
+interpolation.
+
+=cut
+
+.sub __is_const method
+  .local pmc constant
+  constant = getattribute self, "TclWord\x00constant"
+  .local int result
+  result = constant
+  .pcc_begin_return
+    .return result
   .pcc_end_return
 .end
