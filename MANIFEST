@@ -199,6 +199,7 @@ config/inter/types.pl                             []
 Configure.pl                                      []
 CREDITS                                           []
 DEVELOPING                                        []
+docs/configuration.pod                            [devel]doc
 docs/debug.pod                                    [devel]doc
 docs/debugger.pod                                 [main]doc
 docs/dev/byteorder.dev                            [main]doc
