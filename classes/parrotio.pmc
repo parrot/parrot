@@ -27,7 +27,7 @@ pmclass ParrotIO {
 
     void destroy () {
 	ParrotIO *io = PMC_data(SELF);
-        if (!(io->flags & PIO_F_SHARED))
+        if (io && !(io->flags & PIO_F_SHARED))
             PIO_close(interpreter, SELF); 
     }
 }

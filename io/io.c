@@ -91,7 +91,8 @@ PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)
 }
 
 /*
- * Destroying the IO-Stream, at the moment only free memory
+ * Destroying the IO-Stream, at the moment only free memory and remove
+ * the pointers from the PMC
  */
 void
 PIO_destroy(theINTERP, PMC *pmc)
@@ -102,6 +103,8 @@ PIO_destroy(theINTERP, PMC *pmc)
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC))
         mem_sys_free(io->b.startb);
     mem_sys_free(io);
+    PMC_data(pmc) = NULL;
+    pmc->cache.struct_val = NULL;
 }
 
 /*
