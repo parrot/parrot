@@ -482,6 +482,7 @@ get_init_meth(Parrot_Interp interpreter, PMC *class,
         void * __ptr;
     } __ptr_u;
     STRING *meth;
+    *meth_str = NULL;
 #if 0
     prop = VTABLE_getprop(interpreter, class, prop_str);
     if (!VTABLE_defined(interpreter, prop))
@@ -509,6 +510,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
     PMC *classsearch_array = get_attrib_num(class_data, PCD_ALL_PARENTS);
     PMC *parent_class;
     INTVAL i, nparents;
+#if 0
     int free_it;
     static void *what = (void*)-1;
     /*
@@ -527,6 +529,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         Parrot_base_vtables[enum_class_delegate]->init(interpreter, object);
     }
     else {
+#endif
         /*
          * 1) if class has a CONSTRUCT property run it on the object
          *    no redispatch
@@ -538,6 +541,7 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
         STRING *meth_str;
         PMC *meth = get_init_meth(interpreter, class,
                 CONST_STRING(interpreter, "CONSTRUCT"), &meth_str);
+	int default_meth;
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -556,6 +560,16 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                     classsearch_array, i);
             meth = get_init_meth(interpreter, parent_class,
                     CONST_STRING(interpreter, "BUILD"), &meth_str);
+	    /* no method found and no BUILD property set? */
+	    if (!meth && meth_str == NULL) {
+		/* use __init as fallback constructor method, if it exists */
+		meth_str = string_from_cstring(interpreter, "__init", 6);
+		meth = Parrot_find_method_with_cache(interpreter,
+		        parent_class, meth_str);
+		default_meth = 1;
+	    }
+	    else
+		default_meth = 0;
             if (meth) {
                 if (init)
                     Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -564,9 +578,23 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                     Parrot_run_meth_fromc_save(interpreter, meth,
                             object, meth_str);
             }
+	    else if (meth_str != NULL &&
+		    string_length(interpreter, meth_str) != 0 && !default_meth) {
+	        real_exception(interpreter, NULL, METH_NOT_FOUND,
+	            "Class BUILD method ('%Ss') not found", meth_str);
+	    }
         }
         meth = get_init_meth(interpreter, class,
                 CONST_STRING(interpreter, "BUILD"), &meth_str);
+	/* no method found and no BUILD property set? */
+	if (!meth && meth_str == NULL) {
+	    /* use __init as fallback constructor method, if it exists */
+	    meth_str = string_from_cstring(interpreter, "__init", 6);
+	    meth = Parrot_find_method_with_cache(interpreter, class, meth_str);
+	    default_meth = 1;
+	}
+	else
+	    default_meth = 0;
         if (meth) {
             if (init)
                 Parrot_run_meth_fromc_args_save(interpreter, meth,
@@ -575,7 +603,14 @@ do_initcall(Parrot_Interp interpreter, PMC* class, PMC *object, PMC *init)
                 Parrot_run_meth_fromc_save(interpreter, meth,
                         object, meth_str);
         }
+	else if (meth_str != NULL && string_length(interpreter, meth_str) != 0
+		&& !default_meth) {
+	    real_exception(interpreter, NULL, METH_NOT_FOUND,
+		"Class BUILD method ('%Ss') not found", meth_str);
+	}
+#if 0
     }
+#endif
 }
 
 /*

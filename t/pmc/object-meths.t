@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -134,6 +134,52 @@ output_is(<<'CODE', <<'OUTPUT', "constructor");
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "disabling the constructor");
+    newclass P1, "Foo"
+    new P0, .PerlString
+    setprop P1, "BUILD", P0
+    find_type I1, "Foo"
+    new P3, I1
+    print "ok 1\n"
+    end
+.namespace ["Foo"]
+.pcc_sub __init:
+    print "nok ok!\n"
+    invoke P1
+CODE
+ok 1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "specified constructor method does not exist");
+    newclass P1, "Foo"
+    new P0, .PerlString
+    set P0, "bar"
+    setprop P1, "BUILD", P0
+
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    
+    find_type I1, "Foo"
+    new P3, I1
+    print "not ok 1\n"
+    end
+
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]      # P5 is the exception object
+    print S0
+    print "\n"
+    end
+
+.namespace ["Foo"]
+.pcc_sub __init:
+    print "nok ok 2!\n"
+    invoke P1
+CODE
+catched it
+Class BUILD method ('bar') not found
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "constructor - init attr");
@@ -604,8 +650,6 @@ done
 OUTPUT
 };
 
-$ENV{"CALL__BUILD"} = "1";
-
 output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
     new P10, .PerlString
     set P10, "_new"
@@ -658,8 +702,6 @@ bar_init
 in sub
 done
 OUTPUT
-
-delete $ENV{"CALL__BUILD"};
 
 output_is(<<'CODE', <<'OUTPUT', "same method name in two namespaces");
 ##PIR##
