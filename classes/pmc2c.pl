@@ -763,14 +763,14 @@ void $initname (Interp * interp, int entry) {
    /* parrotio calls some class_init functions during its class_init
     * code, so some of the slots might already be allocated
     */
-   if (Parrot_base_vtables[entry])
-       return;
-   temp_base_vtable.whoami = string_make(interp,
-       "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
+    if (!Parrot_base_vtables[entry]) {
+	temp_base_vtable.whoami = string_make(interp,
+	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
 
-   Parrot_base_vtables[entry] =
-       Parrot_clone_vtable(interp, &temp_base_vtable);
-   $class_init_code
+	Parrot_base_vtables[entry] =
+	   Parrot_clone_vtable(interp, &temp_base_vtable);
+    }
+    $class_init_code
 }
 EOC
   }
