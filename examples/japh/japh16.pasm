@@ -12,6 +12,4 @@
     # compile program
     compile P0, P1, S6
     # run program
-    invokecc P0
-    print "Still hacking.\n"
-    end
+    tailcall P0

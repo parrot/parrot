@@ -466,7 +466,7 @@ Introspection interface. C<key> can be:
         ctx = &interpreter->ctx;
         for (; level; --level) {
             cont = ctx->current_cont;
-            if (PMC_IS_NULL(cont))
+            if (PMC_IS_NULL(cont) || !PMC_cont(cont)->seg)
                 real_exception(interpreter, NULL, E_ValueError,
                         "No such caller depth");
             ctx = &PMC_cont(cont)->ctx;

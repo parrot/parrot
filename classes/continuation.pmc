@@ -203,6 +203,10 @@ destination to continue execution.
         restore_context(interpreter, &cc->ctx);
         if (PMC_struct_val(SELF))
             copy_regs(interpreter, caller_regs);
+        else if (!cc->seg) {
+            /* no address and no segment */
+            return NULL;
+        }
         if (interpreter->code->cur_cs != cc->seg) {
             Parrot_switch_to_cs(interpreter, cc->seg, 1);
         }

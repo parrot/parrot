@@ -407,10 +407,15 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
         VTABLE_push_string(interpreter, userargv, arg);
     }
     /*
-     * place empty return continuation, so that invoke P1
+     * place empty return continuation in context, so that returncc
      * will terminate the main run loop
+     * XXX for now still place in P1 until return opcodes are everywhere
      */
-    REG_PMC(1) = new_ret_continuation_pmc(interpreter, NULL);
+    REG_PMC(1) =
+        interpreter->ctx.current_cont =
+        new_ret_continuation_pmc(interpreter, NULL);
+    /* clear segment to denote the end of chain */
+    PMC_cont(interpreter->ctx.current_cont)->seg = NULL;
     REG_INT(3) = 1; /* pdd03 - one PMC arg, if code really inspects that */
 }
 
