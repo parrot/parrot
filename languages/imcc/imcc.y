@@ -82,6 +82,10 @@ SymReg * iMUL(SymReg *r0, SymReg*r1, SymReg *r2) {
     return r0;
 }
 
+SymReg * iPOW(SymReg *r0, SymReg*r1, SymReg *r2) {
+    emitb(mk_instruction("pow %s, %s, %s", r0, r1, r2, NULL, IF_binary));
+    return r0;
+}
 SymReg * iDIV(SymReg *r0, SymReg*r1, SymReg *r2) {
     emitb(mk_instruction("div %s, %s, %s", r0, r1, r2, NULL, IF_binary));
     return r0;
@@ -176,6 +180,14 @@ SymReg * iPOP(SymReg * r0) {
     return r0;
 }
 
+SymReg * iRESULT(SymReg * r0) {
+    return iPOP(r0);
+}
+
+SymReg * iRETURN(SymReg * r0) {
+    return iPUSH(r0);
+}
+
 SymReg * iSAVEALL() {
     emitb(mk_instruction("saveall", NULL, NULL, NULL, NULL, 0));
     return 0;
@@ -244,11 +256,11 @@ SymReg * iIF(int relop, SymReg * r0, SymReg * r1, SymReg * r2) {
     return 0;
 }
 
-SymReg * iIF1(SymReg * r0, SymReg * dest)
+SymReg * iIF1(char *f, SymReg * r0, SymReg * dest)
 {
     Instruction * i;
     char op[256];
-    strcpy(op, "if %s, %s");
+    sprintf(op, "%s %%s, %%s", f);
     i = emitb(mk_instruction(op, r0, dest, 0, NULL, IF_r0_read | IF_r1_branch));
     i->type = ITBRANCH;
     return 0;
@@ -358,11 +370,11 @@ void relop_to_op(int relop, char * op) {
     SymReg * sr;
 }
 
-%token <i> CALL GOTO BRANCH ARG RET PRINT IF NEW END SAVEALL RESTOREALL
+%token <i> CALL GOTO BRANCH ARG RET PRINT IF UNLESS NEW END SAVEALL RESTOREALL
 %token <i> SUB NAMESPACE CLASS ENDCLASS SYM LOCAL PARAM PUSH POP INC DEC
 %token <i> SHIFT_LEFT SHIFT_RIGHT INT FLOAT STRING DEFINED LOG_XOR
 %token <i> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <i> GLOBAL ADDR CLONE
+%token <i> GLOBAL ADDR CLONE RESULT RETURN POW
 %token <s> EMIT LABEL
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC
 %type <i> type program subs sub sub_start relop
@@ -434,6 +446,8 @@ instruction:
     |   labels PARAM type IDENTIFIER            { $$ = iPOP(mk_ident($4, $3));}
     |   labels PARAM reg                        { $$ = iPOP($3); }
     |   labels ARG var                          { $$ = iARG($3); }
+    |   labels RESULT var                       { $$ = iRESULT($3); }
+    |   labels RETURN var                       { $$ = iRETURN($3); }
     |   labels CALL IDENTIFIER                  { $$ = iCALL(mk_address($3)); }
     |   labels GOTO IDENTIFIER                  { $$ = iBRANCH(mk_address($3));}
     |   labels PUSH var                         { $$ = iPUSH($3); }
@@ -464,6 +478,7 @@ assignment:
     |  labels target '=' var '+' var            { $$ = iADD($2, $4, $6); } 
     |  labels target '=' var '-' var            { $$ = iSUB($2, $4, $6); } 
     |  labels target '=' var '*' var            { $$ = iMUL($2, $4, $6); } 
+    |  labels target '=' var POW var            { $$ = iPOW($2, $4, $6); }
     |  labels target '=' var '/' var            { $$ = iDIV($2, $4, $6); } 
     |  labels target '=' var '%' var            { $$ = iMOD($2, $4, $6); } 
     |  labels target '=' var '.' var            { $$ = iCONCAT($2, $4, $6); } 
@@ -487,7 +502,9 @@ if_statement:
        labels IF var relop var GOTO IDENTIFIER
        { $$ = iIF($4, $3, $5, mk_address($7)); }
     |  labels IF var GOTO IDENTIFIER
-       { $$ = iIF1($3, mk_address($5)); }
+       { $$ = iIF1("if",$3, mk_address($5)); }
+    |  labels UNLESS var GOTO IDENTIFIER
+       { $$ = iIF1("unless", $3, mk_address($5)); }
     ;
 
 relop:

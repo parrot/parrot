@@ -59,6 +59,8 @@ RANKSPEC        \[[,]*\]
 ".sym"          return(SYM);
 ".arg"          return(ARG);
 ".sub"          return(SUB);
+".result"       return(RESULT);
+".return"       return(RETURN);
 ".class"        return(CLASS);
 ".endclass"     return(ENDCLASS);
 ".namespace"    return(NAMESPACE);
@@ -68,6 +70,7 @@ RANKSPEC        \[[,]*\]
 "end"           return(END);
 "goto"          return(GOTO);
 "if"            return(IF);
+"unless"        return(UNLESS);
 "int"           return(INT);
 "inc"           return(INC);
 "dec"           return(DEC);
@@ -94,6 +97,7 @@ RANKSPEC        \[[,]*\]
 ">="            return(RELOP_GTE);
 "=="            return(RELOP_EQ);
 "!="            return(RELOP_NE);
+"**"            return(POW);
 
 {LETTER}{LETTERDIGIT}*":" {
 	yytext[yyleng-1] = 0;  /* trim last ':' */
