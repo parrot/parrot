@@ -4,7 +4,7 @@ The Parrot Bytecode (PBC) Format
 
 =head1 VERSION
 
-2003.02.04
+2003.11.22
 
 =head1 Format of the Parrot bytecode
 
@@ -13,7 +13,7 @@ The Parrot Bytecode (PBC) Format
   | Wordsize | Byteorder|  Major   |  Minor   |
   +----------+----------+----------+----------+
 
-Wordsize must be at 4 (32-bit) or 8 (64 bit). Loader is
+Wordsize (or opcode_t size) must be at 4 (32-bit) or 8 (64 bit). Loader is
 responsible for transforming the file into the
 VM native wordsize on the fly. For performance,
 a utility F<pdump> is provided to convert PBCs
@@ -24,13 +24,14 @@ Byteorder currently supports two values:
 
   4          5
   +----------+----------+----------+----------+
-  |  Flags   | FloatType|  10 Byte  ...       |
+  | INT size | FloatType|  10 Byte  ...       |
   +----------+----------+----------+----------+
   |           fingerprint for ...             |
   +----------+----------+----------+----------+
   |           core.ops is here                |
   +----------+----------+----------+----------+
 
+INT size (sizeof(INTVAL)) must be 4 or 8.
 FloatType 0 is IEEE 754 8 byte double, FloatType 1 is i386 little
 endian 12 byte long double.
 
@@ -52,14 +53,6 @@ unless otherwise specified.
 
 The asterisk for the offset states, from here we have opcodes. The
 given offsets are for 32 bit opcode types only.
-
-=head1 PBC Format 1 and Format 0
-
-As stated below, after these header bytes the fixup segment size
-follows, which is always zero for the old format, called "Format 0"
-now.
-
-For the current PBC format this field is B<1>.
 
 =head1 PBC FORMAT 1
 
@@ -190,37 +183,6 @@ offset into the bytecode.
 The debug segment has one additional field with the source file name.
 The opcode stream holds one line number per bytecode instruction.
 
-=head2 Constant Table Segment
-
-s. below in the format 0 description.
-
-
-=head1 PBC FORMAT 0
-
-
-  For each segment:
-
-  4, 4 + (4 + S0), 4 + (4 + S0) + (4 + S1)
-  +----------+----------+----------+----------+
-  |       Segment length in bytes (S)         |
-  +----------+----------+----------+----------+
-  |                                           |
-  :        S bytes of segment content         :
-  |                                           |
-  +----------+----------+----------+----------+
-
-Currently there are three segment types defined, and they must occur
-in precisely the order: FIXUP, CONSTANT TABLE, BYTE CODE. Every
-segment must be present, even if empty.
-
-
-=head2 FIXUP SEGMENT
-
-  << The format for the FIXUP segment is not yet defined. >>
-
-The fixup segment length is B<0>.
-
-
 =head2 CONSTANT TABLE SEGMENT
 
   0 (relative)
@@ -232,8 +194,6 @@ For each constant:
 
   +----------+----------+----------+----------+
   |             Constant Type (T)             |
-  +----------+----------+----------+----------+
-  |             Constant Size (S)             |
   +----------+----------+----------+----------+
   |                                           |
   |        S bytes of constant content        |
@@ -329,7 +289,7 @@ now (c. Parrot 0.0.5).
 
 =head1 SEE ALSO
 
-F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c> and the
+F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c>, F<pf/*.c>, and the
 B<pdump> utility F<pdump.c>.
 
 =head1 AUTHOR
