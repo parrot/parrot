@@ -78,6 +78,21 @@ typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef void BIGNUM;
 
+/* weird architectures might need this, s. C-FAQ 5.17
+ *
+ * the SET_NULL macros are only for system, where a NULL pointer
+ * isn't represented by zeroes, so don't use these, for resetting
+ * non-null pointers
+ */
+
+#ifdef HAS_NON_ZERO_NULL
+#  define SET_NULL(x) x = NULL
+#  define SET_NULL_P(x, s) x = (s)NULL
+#else
+#  define SET_NULL(x)
+#  define SET_NULL_P(x, s)
+#endif
+
 /*  Casting between pointers and integers:  If pointers and integers
     are the same size, then direct casting is fine.  If pointers and
     integers are not the same size, then the compiler might complain.

@@ -468,6 +468,21 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.num_reg_base->free = FRAMES_PER_NUM_REG_CHUNK;
     interpreter->ctx.string_reg_base->free = FRAMES_PER_STR_REG_CHUNK;
     interpreter->ctx.pmc_reg_base->free = FRAMES_PER_PMC_REG_CHUNK;
+    /* the SET_NULL macros are only for system, where a NULL pointer
+     * isn't represented by zeroes, so don't use these, for resetting
+     * non-null pointers
+     */
+    SET_NULL(interpreter->ctx.int_reg_base->next);
+    SET_NULL(interpreter->ctx.int_reg_base->prev);
+    SET_NULL(interpreter->ctx.num_reg_base->next);
+    SET_NULL(interpreter->ctx.num_reg_base->prev);
+    SET_NULL(interpreter->ctx.string_reg_base->next);
+    SET_NULL(interpreter->ctx.string_reg_base->prev);
+    SET_NULL(interpreter->ctx.pmc_reg_base->next);
+    SET_NULL(interpreter->ctx.pmc_reg_base->prev);
+
+    Parrot_clear_s(interpreter);
+    Parrot_clear_p(interpreter);
 
     /* Stack for lexical pads */
     interpreter->ctx.pad_stack = new_stack(interpreter);
@@ -497,7 +512,12 @@ make_interpreter(Interp_flags flags)
     interpreter->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
 
+    SET_NULL(interpreter->piodata);
     PIO_init(interpreter);
+
+    SET_NULL_P(interpreter->code, struct PackFile *);
+    SET_NULL_P(interpreter->profile, ProfData *);
+    SET_NULL_P(interpreter->predref_code, void **);
 
     /* Done. Return and be done with it */
 
