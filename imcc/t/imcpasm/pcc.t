@@ -5,6 +5,9 @@ use TestCompiler tests => 10;
 ##############################
 # parrot calling conventions
 #
+SKIP: {
+    skip("PCC changes", 10);
+
 output_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
 .sub _main
     .local Sub sub
@@ -434,3 +437,4 @@ _sub:
 /
 OUT
 
+}

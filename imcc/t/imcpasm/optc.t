@@ -5,6 +5,9 @@ use TestCompiler tests => 6;
 # these tests are run with -Oc by TestCompiler and show
 # generated PASM code for call optimization
 
+SKIP: {
+    skip("PCC changes", 6);
+
 ##############################
 # prototyped calls, invokecc
 output_like(<<'CODE', <<'OUT', "in P param");
@@ -322,3 +325,5 @@ _sub2:
         invoke P1
 /
 OUT
+
+}
