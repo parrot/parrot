@@ -536,18 +536,6 @@ END
        code(<<END);
 $catch:
 END
-
-    my $catch = genlabel 'catch';
-    my $itmp = gentmp 'int';
-    code(<<END);
-	$itmp = addr $catch
-	$cont = $itmp
-	.arg $cont
-	call __install_catch
-	goto $try
-$catch:
-END
-    if ($catcher) {
 	push_scope ;
 	declare_label type => 'break'; # because we're kind of a "given"
 
