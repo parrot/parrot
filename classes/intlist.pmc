@@ -22,7 +22,7 @@ C<IntList> provides an integer-only array.
 
 #define THROW_UNSUPPORTED internal_exception(INTERP_ERROR, "Operation not supported\n")
 
-pmclass IntList need_ext {
+pmclass IntList {
 
 /*
 
@@ -37,7 +37,7 @@ Creates and returns a clone of the list.
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_data(dest) = intlist_clone(INTERP, (IntList *) PMC_data(SELF));
+        PMC_struct_val(dest) = intlist_clone(INTERP, (IntList *) PMC_struct_val(SELF));
         return dest;
     }
 
@@ -52,8 +52,7 @@ Initializes the list.
 */
 
     void init () {
-        PMC_data(SELF) = intlist_new(INTERP);
-        PMC_int_val(SELF) = 0;
+        PMC_struct_val(SELF) = intlist_new(INTERP);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -68,7 +67,7 @@ Marks the list as live.
 */
 
     void mark () {
-        intlist_mark(INTERP, (IntList *) PMC_data(SELF));
+        intlist_mark(INTERP, (IntList *) PMC_struct_val(SELF));
     }
 
 /*
@@ -82,11 +81,11 @@ Sets C<value> at index C<key>.
 */
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), key, value);
+        intlist_assign(INTERP, (IntList*) PMC_struct_val(SELF), key, value);
     }
 
     void set_integer_native(INTVAL len) {
-        list_set_length(INTERP, (List*) PMC_data(SELF), len);
+        list_set_length(INTERP, (List*) PMC_struct_val(SELF), len);
     }
 /*
 
@@ -104,7 +103,7 @@ Sets C<value> at index C<*key>.
         if (!key) return;
 
         ix = key_integer(INTERP, key);
-        intlist_assign(INTERP, (IntList*) PMC_data(SELF), ix, value);
+        intlist_assign(INTERP, (IntList*) PMC_struct_val(SELF), ix, value);
     }
 
 /*
@@ -118,7 +117,7 @@ Returns the number of elements in the list.
 */
 
     INTVAL get_integer () {
-        return intlist_length(INTERP, (IntList*) PMC_data(SELF));
+        return intlist_length(INTERP, (IntList*) PMC_struct_val(SELF));
     }
 
 /*
@@ -132,7 +131,7 @@ Returns the value of the element at index C<key>.
 */
 
     INTVAL get_integer_keyed_int (INTVAL key) {
-        return intlist_get(INTERP, (IntList*) PMC_data(SELF), key);
+        return intlist_get(INTERP, (IntList*) PMC_struct_val(SELF), key);
     }
 
 /*
@@ -149,7 +148,7 @@ Returns the value of the element at index C<*key>.
         INTVAL ix;
         if (!key) return 0;
         ix = key_integer(INTERP, key);
-        return intlist_get(INTERP, (IntList*) PMC_data(SELF), ix);
+        return intlist_get(INTERP, (IntList*) PMC_struct_val(SELF), ix);
     }
 
 /*
@@ -163,7 +162,7 @@ Adds C<value> to the end of the list.
 */
 
     void push_integer (INTVAL value) {
-        intlist_push(INTERP, (IntList*) PMC_data(SELF), value);
+        intlist_push(INTERP, (IntList*) PMC_struct_val(SELF), value);
     }
 
 /*
@@ -177,7 +176,7 @@ Removes and returns the last element in the list.
 */
 
     INTVAL pop_integer() {
-        return intlist_pop(INTERP, (IntList*) PMC_data(SELF));
+        return intlist_pop(INTERP, (IntList*) PMC_struct_val(SELF));
     }
 
 /*
@@ -191,7 +190,7 @@ Adds C<value> to the start of the list.
 */
 
     void unshift_integer (INTVAL value) {
-        intlist_unshift(INTERP, (IntList**) &PMC_data(SELF), value);
+        intlist_unshift(INTERP, (IntList**) &PMC_struct_val(SELF), value);
     }
 
 /*
@@ -205,13 +204,13 @@ Removes and returns the first element in the list.
 */
 
     INTVAL shift_integer() {
-        return intlist_shift(INTERP, (IntList**) &PMC_data(SELF));
+        return intlist_shift(INTERP, (IntList**) &PMC_struct_val(SELF));
     }
 
     void splice(PMC* value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
             internal_exception(1, "Type mismatch in splice\n");
-        list_splice(INTERP, (List*) PMC_data(SELF), value, offset, count);
+        list_splice(INTERP, (List*) PMC_struct_val(SELF), value, offset, count);
     }
 }
 
