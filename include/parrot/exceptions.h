@@ -30,6 +30,8 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define MALFORMED_UTF16 1
 #define MALFORMED_UTF32 1
 #define INVALID_CHARACTER 1
+#define INVALID_CHARTYPE 1
+#define INVALID_ENCODING 1
 #define NEG_REPEAT 1
 #define NEG_SUBSTR 1
 #define NEG_SLEEP 1

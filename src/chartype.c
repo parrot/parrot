@@ -27,7 +27,7 @@ chartype_lookup(const char *name)
         return &unicode_chartype;
     }
     else {
-        return NULL;
+        internal_exception(INVALID_CHARTYPE, "Invalid chartype '%s'\n", name);
     }
 }
 

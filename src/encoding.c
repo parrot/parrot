@@ -35,7 +35,7 @@ encoding_lookup(const char *name)
         return &utf32_encoding;
     }
     else {
-        return NULL;
+        internal_exception(INVALID_ENCODING, "Invalid encoding '%s'\n", name);
     }
 }
 
