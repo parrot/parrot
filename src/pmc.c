@@ -128,7 +128,8 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 =item C<static void
 pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)>
 
-Add a new C<PMC_EXT> to C<*pmc>.
+Add a new C<PMC_EXT> to C<*pmc>. If the C<*pmc> is shared also add
+the C<synchronize> structure and init the mutex.
 
 =cut
 
@@ -139,6 +140,13 @@ pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
 {
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
         add_pmc_ext(interpreter, pmc);
+
+        if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
+            PMC_sync(pmc) = mem_sys_allocate(sizeof(*pmc->synchronize));
+            PMC_sync(pmc)->owner = interpreter;
+            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
+            PObj_is_PMC_shared_SET(pmc);
+        }
 }
 
 /*
@@ -863,7 +871,7 @@ mmd_fallback_strcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right)
 /*
 
 =item C<void
-mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, 
+mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right,
                           PMC *dest)>
 
 Gets strings from C<left> and C<right>, performs a string bitwise C<or>
@@ -882,7 +890,7 @@ mmd_fallback_stringor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest
 
 /*
 
-=item C<mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, 
+=item C<mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left,
                                    PMC *right, PMC *dest)>
 
 Gets strings from C<left> and C<right>, performs a string bitwise C<and>
@@ -901,7 +909,7 @@ mmd_fallback_stringand_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *des
 
 /*
 
-=item C<mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left, 
+=item C<mmd_fallback_stringxor_pmc(Parrot_Interp interp, PMC *left,
                                    PMC *right, PMC *dest)>
 
 Gets strings from C<left> and C<right>, performs a string bitwise C<xor>
