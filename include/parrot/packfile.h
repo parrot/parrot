@@ -117,8 +117,9 @@ struct PackFile_FixupEntry {
     opcode_t type;              /* who knows, what fixups we need */
     union {
         struct t0 {             /* type 0 entries */
-            opcode_t code_seg;  /* segment nr# */
-            opcode_t offset;    /* offset in segment */
+            char *label;        /* name of the label */
+            opcode_t offset;    /* offset in in the byte code stream */
+            struct PackFile_ByteCode *seg;   /* where this belongs to */
         } t0;
     } u;
 };
@@ -264,7 +265,7 @@ void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
 /* create new fixup entry */
-void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *, opcode_t seg,
+void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *, char *label,
                 opcode_t offs);
 
 /*

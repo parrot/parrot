@@ -131,6 +131,37 @@ PackFile_fetch_iv(struct PackFile *pf, opcode_t **stream) {
     return i;
 }
 
+/*
+
+=item fetch_cstring
+
+Fetch a cstring from bytecode and return an allocated copy
+
+=cut
+*/
+char *
+PackFile_fetch_cstring(struct PackFile *pf, opcode_t **cursor)
+{
+    size_t str_len = strlen ((char *)(*cursor)) + 1;
+    char *p = mem_sys_allocate(str_len);
+    int wordsize = pf->header->wordsize;
+
+    strcpy(p, (char*) (*cursor));
+    (*cursor) += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
+    return p;
+}
+
+static size_t cstring_packed_size(const char *s)
+{
+    UINTVAL str_len;
+
+    if (!s)
+        return 0;
+
+    str_len = strlen(s);
+    return ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
+}
+
 /* convert i386 LE 12 byte long double to IEEE 754 8 byte double
  */
 static void cvt_num12_num8(unsigned char *dest, unsigned char *src)
@@ -1026,15 +1057,12 @@ directory_unpack (struct Parrot_Interp *interpreter,
 
     for (i=0; i < dir->num_segments; i++) {
         struct PackFile_Segment *seg;
-        size_t str_len;
         size_t tmp;
         UINTVAL type;
-        const char *name;
+        char *name;
         type = PackFile_fetch_op (self, &cursor);
         /* get name */
-        str_len = strlen ((char *)cursor) + 1;
-        name = (char *)cursor;
-        cursor += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
+        name = PackFile_fetch_cstring(self, &cursor);
 
         switch (type) {
             case PF_CONST_SEG:
@@ -1049,6 +1077,7 @@ directory_unpack (struct Parrot_Interp *interpreter,
                 /* create it */
                 seg = PackFile_Segment_new_seg(self, type, name, 0);
         }
+        mem_sys_free(name);
 
         /* make compat/shorthand pointers */
         switch (type) {
@@ -1306,17 +1335,11 @@ pf_debug_new (struct PackFile *pf, const char * name, int add)
     debug->filename = NULL;
     return (struct PackFile_Segment *)debug;
 }
-
 static size_t
 pf_debug_packed_size (struct PackFile_Segment *self)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
-    size_t size;
-    UINTVAL str_len;
-
-    str_len = strlen (debug->filename);        /* file name */
-    size = ROUND_UP(str_len + 1, sizeof(opcode_t)) / sizeof(opcode_t);
-    return size;
+    return cstring_packed_size(debug->filename);
 }
 
 static opcode_t *
@@ -1324,7 +1347,7 @@ pf_debug_pack (struct PackFile_Segment *self, opcode_t *cursor)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
     strcpy ((char *)cursor, debug->filename);
-    cursor += pf_debug_packed_size(self);
+    cursor += cstring_packed_size(debug->filename);
     return cursor;
 }
 
@@ -1333,15 +1356,15 @@ pf_debug_unpack (struct Parrot_Interp *interpreter,
         struct PackFile_Segment *self, opcode_t *cursor)
 {
     struct PackFile_Debug *debug = (struct PackFile_Debug *) self;
-    size_t str_len = strlen ((char *)cursor) + 1;
-    char *name = (char *)cursor;
-    char *code_name;
+    size_t str_len;
     struct PackFile_ByteCode *code;
-    int wordsize = self->pf->header->wordsize;
+    char *code_name;
 
-    cursor += ROUND_UP(str_len, wordsize) / sizeof(opcode_t);
+    /* get file_name */
+    debug->filename = PackFile_fetch_cstring(self->pf, &cursor);
+
     str_len = strlen(self->name);
-    code_name = mem_sys_allocate(str_len);
+    code_name = mem_sys_allocate(str_len + 1);
     strcpy(code_name, self->name);
     /*
      * find seg e.g. CODE_DB => CODE
@@ -1484,6 +1507,11 @@ PackFile_FixupTable_clear(struct PackFile_FixupTable *self)
     }
 
     for (i = 0; i < self->fixup_count; i++) {
+        switch (self->fixups[i]->type) {
+            case 0:
+                mem_sys_free(self->fixups[i]->u.t0.label);
+                break;
+        }
         mem_sys_free(self->fixups[i]);
     }
 
@@ -1511,12 +1539,13 @@ fixup_packed_size (struct PackFile_Segment *self)
     size_t size;
     opcode_t i;
 
-    size = sizeof(opcode_t); /* fixup_count */
+    size = 1;    /* fixup_count */
     for (i = 0; i < ft->fixup_count; i++) {
-        size += sizeof(opcode_t); /* fixup_entry type */
+        size++;  /* fixup_entry type */
         switch (ft->fixups[i]->type) {
             case 0:
-                size += 2 * sizeof(opcode_t); /* seg, offs */
+                size += cstring_packed_size(ft->fixups[i]->u.t0.label);
+                size ++ ; /* labelname, offs */
                 break;
             default:
                 internal_exception(1, "Unknown fixup type\n");
@@ -1537,7 +1566,8 @@ fixup_pack (struct PackFile_Segment *self, opcode_t *cursor)
         switch (ft->fixups[i]->type) {
             case 0:
                 *cursor++ = 0;   /* type */
-                *cursor++ = ft->fixups[i]->u.t0.code_seg;
+                strcpy ((char *)cursor, ft->fixups[i]->u.t0.label);
+                cursor += cstring_packed_size(ft->fixups[i]->u.t0.label);
                 *cursor++ = ft->fixups[i]->u.t0.offset;
                 break;
             default:
@@ -1612,9 +1642,11 @@ fixup_unpack(struct Parrot_Interp *interpreter,
         self->fixups[i]->type = PackFile_fetch_op(pf, &cursor);
         switch (self->fixups[i]->type) {
             case 0:
-                self->fixups[i]->u.t0.code_seg =
-                    PackFile_fetch_op(pf, &cursor);
+                self->fixups[i]->u.t0.label =
+                    PackFile_fetch_cstring(pf, &cursor);
                 self->fixups[i]->u.t0.offset = PackFile_fetch_op(pf, &cursor);
+                /* XXX remember code segment currently read */
+                self->fixups[i]->u.t0.seg = pf->cur_cs;
                 break;
             default:
                 PIO_eprintf(interpreter,
@@ -1627,7 +1659,7 @@ fixup_unpack(struct Parrot_Interp *interpreter,
 }
 
 void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
-        opcode_t seg, opcode_t offs)
+        char *label, opcode_t offs)
 {
     struct PackFile_FixupTable *self = interpreter->code->fixup_table;
     opcode_t i;
@@ -1645,8 +1677,10 @@ void PackFile_FixupTable_new_entry_t0(struct Parrot_Interp *interpreter,
                          sizeof(struct PackFile_FixupEntry *));
     self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
     self->fixups[i]->type = 0;
-    self->fixups[i]->u.t0.code_seg = seg;
+    self->fixups[i]->u.t0.label = mem_sys_allocate(strlen(label) + 1);
+    strcpy(self->fixups[i]->u.t0.label, label);
     self->fixups[i]->u.t0.offset = offs;
+    self->fixups[i]->u.t0.seg = interpreter->code->cur_cs;
 }
 /*
 

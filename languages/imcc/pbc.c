@@ -201,36 +201,33 @@ static void store_key_const(char * str, int idx)
     c->color = idx;
 }
 
-
-static int find_label_cs(char *name, opcode_t *seg, opcode_t *pc)
+/* find a label in interpreters fixup table */
+static int
+find_label_cs(struct Parrot_Interp *interpreter, char *name)
 {
-    struct cs_t *cs;
-    struct subs *s;
-    SymReg * r;
-    opcode_t n;
+    struct PackFile_FixupTable *ft = interpreter->code->fixup_table;
+    opcode_t i;
 
-    *pc = 0;
-    for (n = 0, cs = globals.first; cs; cs = cs->next, n++) {
-        for (s = cs->first; s; s = s->next) {
-            if ( (r = _get_sym(s->labels, name)) ) {
-                *pc += r->color;    /* here pc was stored */
-                *seg = n;
-                return 1;
-            }
-            *pc += s->size;
+    for (i = 0; i < ft->fixup_count; i++) {
+        switch (ft->fixups[i]->type) {
+            case 0:
+                if (!strcmp(name, ft->fixups[i]->u.t0.label))
+                    return i;
+                break;
         }
     }
-    return 0;
+    return -1;
 }
 /* store global labels and bsr for later fixup
  * return size in ops
  */
 static int
-store_labels(struct Parrot_Interp *interpreter, int *src_lines)
+store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
 {
     Instruction * ins;
     int code_size;
     opcode_t pc;
+    int has_compile = 0;
 
     /* run through instructions,
      * 1. pass
@@ -253,7 +250,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines)
 
     /* 2. pass
      * remember subroutine calls (bsr, addr (closures)) and labels
-     * for fixup */
+     * for fixup
+     * */
     for (pc = 0, ins = instructions; ins ; ins = ins->next) {
         if (ins->type & ITLABEL) {
             store_label(ins->r[0], pc);
@@ -263,6 +261,8 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines)
             store_bsr(ins->r[0], pc, 1);
         else if (!strcmp(ins->op, "set_addr"))
             store_bsr(ins->r[1], pc, 2);
+        else if (!strcmp(ins->op, "compile"))
+            ++has_compile;
         pc += ins->opsize;
     }
 
@@ -271,16 +271,21 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines)
      *
      *   if x, non_local1
      *
-     *   if x, taken1
+     *   if x, #ics_NN
      *   ...
      *   end/ret # after instructions apppend:
-     *   taken1:
-     *     inter_cs fixup_for_non_local1
+     *   #ics_NN:
+     *     branch_cs fixup_entry_nr
      *
-     * and generate a fixup table entry
+     * if a compile command was found, write global fixup records
+     * for all local labels
      */
     for (ins = instructions; ins ; ins = ins->next) {
         SymReg *addr, *label;
+        if ((ins->type & ITLABEL) && has_compile) {
+            PackFile_FixupTable_new_entry_t0(interpreter,
+                    ins->r[0]->name, ins->r[0]->color + oldsize);
+        }
         if (!ins->op || !*ins->op)
             continue;
         /* if no jump */
@@ -296,15 +301,15 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines)
             char buf[64];
             Instruction *il;
             SymReg *r[IMCC_MAX_REGS];
-            opcode_t code_seg, offset;
+            INTVAL fixup_nr;
 
             debug(1, "inter_cs found for '%s'\n", addr->name);
             /* find symbol */
-            if (!find_label_cs(addr->name, &code_seg, &offset))
+            if ((fixup_nr = find_label_cs(interpreter, addr->name)) < 0)
                 fatal(1, "store_labels", "inter_cs label '%s' not found\n",
                         addr->name);
-            debug(1, "inter_cs label '%s' found seg %d ofs %d\n",
-                        addr->name, (int)code_seg, (int)offset);
+            debug(1, "inter_cs label '%s' found fixup_nr %d\n",
+                        addr->name, (int)fixup_nr);
             /* append inter_cs jump */
             free(addr->name);
             sprintf(buf, "#isc_%d", globals.inter_seg_n);
@@ -315,11 +320,9 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines)
             /* increase code_size by 2 ops */
             code_size += 2;
             /* add inter_cs jump */
-            sprintf(buf, "%d", globals.inter_seg_n);
+            sprintf(buf, "%d", (int)fixup_nr);
             r[0] = mk_const(str_dup(buf), 'I');
             INS(interpreter, "branch_cs", "", r, 1, 0, 1);
-            /* finally generate fixup table entry */
-            PackFile_FixupTable_new_entry_t0(interpreter, code_seg, offset);
         }
     }
     /* return code size */
@@ -655,8 +658,8 @@ int e_pbc_emit(void *param, Instruction * ins) {
         int bytes;
 
         make_new_sub();         /* we start a new compilation unit */
-        code_size = store_labels(interpreter, &ins_size);
         oldsize = get_old_size(interpreter, &ins_line);
+        code_size = store_labels(interpreter, &ins_size, oldsize);
         debug(1, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
         constant_folding(interpreter);
         store_sub_size(code_size, ins_size);
