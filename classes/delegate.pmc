@@ -25,39 +25,39 @@
 
 */
 struct regsave {
-  struct IReg int_reg;
-  struct NReg num_reg;
-  struct SReg string_reg;
-  struct PReg pmc_reg;
+    struct IReg int_reg;
+    struct NReg num_reg;
+    struct SReg string_reg;
+    struct PReg pmc_reg;
 } regsave;
 
-inline static struct regsave *
-save_regs(struct Parrot_Interp *interp) {
-  struct regsave *save;
-  save = mem_sys_allocate(sizeof(struct regsave));
-  if (!save) {
-    internal_exception(ALLOCATION_ERROR, "No memory for save struct");
-  }
-  mem_sys_memcopy(save, interp, sizeof(struct regsave));
-  return save;
+PARROT_INLINE static struct regsave *
+save_regs(Parrot_Interp interp) {
+    struct regsave *save;
+    save = mem_sys_allocate(sizeof(struct regsave));
+    if (!save) {
+	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+    }
+    mem_sys_memcopy(save, interp, sizeof(struct regsave));
+    return save;
 }
 
-inline static void
-restore_regs(struct Parrot_Interp *interp, struct regsave *data) {
-  mem_sys_memcopy(interp, data, sizeof(struct regsave));
-  mem_sys_free(data);
+PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, struct regsave *data) {
+    mem_sys_memcopy(interp, data, sizeof(struct regsave));
+    mem_sys_free(data);
 }
 
-inline static PMC *
-find_or_die(struct Parrot_Interp *interp, PMC *pmc, const char *name) {
-  PMC *returnPMC;
-  returnPMC = Parrot_find_method_with_cache(interp, pmc,
-					    string_from_cstring(interp,
-								name, 0));
-  if (!returnPMC) {
-    internal_exception(METH_NOT_FOUND, "Can't find method for object");
-  }
-  return returnPMC;
+PARROT_INLINE static PMC *
+find_or_die(Parrot_Interp interp, PMC *pmc, const char *name) {
+    PMC *returnPMC;
+    returnPMC = Parrot_find_method_with_cache(interp, pmc,
+	    string_from_cstring(interp,
+		name, 0));
+    if (!returnPMC) {
+	internal_exception(METH_NOT_FOUND, "Can't find method for object");
+    }
+    return returnPMC;
 }
 
 /* All these functions to run code can leak a full parrot register
@@ -66,158 +66,166 @@ find_or_die(struct Parrot_Interp *interp, PMC *pmc, const char *name) {
    be caught rather than let flow through.
 */
 
-inline static void
-noarg_noreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
-  struct regsave *data = save_regs(interpreter);
-  REG_PMC(1) = obj;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 0;
-  REG_INT(3) = 0;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  restore_regs(interpreter, data);
+PARROT_INLINE static void
+noarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC *method) {
+    struct regsave *data = save_regs(interpreter);
+    REG_PMC(2) = obj;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 0;
+    REG_INT(3) = 0;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    restore_regs(interpreter, data);
 }
 
-inline static void
-pmcarg_noreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method, PMC *arg) {
-  struct regsave *data = save_regs(interpreter);
-  REG_PMC(1) = obj;
-  REG_PMC(5) = arg;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 1;
-  REG_INT(3) = 0;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  restore_regs(interpreter, data);
+PARROT_INLINE static void
+pmcarg_noreturn(Parrot_Interp interpreter, PMC *obj, PMC *method, PMC *arg) {
+    struct regsave *data = save_regs(interpreter);
+    REG_PMC(2) = obj;
+    REG_PMC(5) = arg;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 1;
+    REG_INT(3) = 0;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    restore_regs(interpreter, data);
 }
 
-inline static PMC *
-noarg_pmcreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
-  struct regsave *data = save_regs(interpreter);
-  PMC *returndata;
-  REG_PMC(1) = obj;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 0;
-  REG_INT(3) = -2;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  if (REG_INT(3) == 1) {
-    returndata = REG_PMC(5);
-  } else {
-    returndata = NULL;
-  }
-  restore_regs(interpreter, data);
+PARROT_INLINE static PMC *
+noarg_pmcreturn(Parrot_Interp interpreter, PMC *obj, PMC *method) {
+    struct regsave *data = save_regs(interpreter);
+    PMC *returndata;
+    REG_PMC(2) = obj;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 0;
+    REG_INT(3) = -2;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    if (REG_INT(3) == 1) {
+	returndata = REG_PMC(5);
+    } else {
+	returndata = NULL;
+    }
+    restore_regs(interpreter, data);
 
-  return returndata;
+    return returndata;
 }
 
-inline static STRING *
-noarg_strreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
-  struct regsave *data = save_regs(interpreter);
-  STRING *returndata;
-  REG_PMC(1) = obj;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 0;
-  REG_INT(3) = -2;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  if (REG_INT(2) == 1) {
-    returndata = REG_STR(5);
-  } else {
-    returndata = NULL;
-  }
-  restore_regs(interpreter, data);
+PARROT_INLINE static STRING *
+noarg_strreturn(Parrot_Interp interpreter, PMC *obj, PMC *method) {
+    struct regsave *data = save_regs(interpreter);
+    STRING *returndata;
+    REG_PMC(2) = obj;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 0;
+    REG_INT(3) = -2;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    if (REG_INT(2) == 1) {
+	returndata = REG_STR(5);
+    } else {
+	returndata = NULL;
+    }
+    restore_regs(interpreter, data);
 
-  return returndata;
+    return returndata;
 }
 
-inline static INTVAL
-noarg_intreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
-  struct regsave *data = save_regs(interpreter);
-  INTVAL returndata;
-  REG_PMC(1) = obj;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 0;
-  REG_INT(3) = -2;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  if (REG_INT(1) == 1) {
-    returndata = REG_INT(5);
-  } else {
-    returndata = 0;
-  }
-  restore_regs(interpreter, data);
+PARROT_INLINE static INTVAL
+noarg_intreturn(Parrot_Interp interpreter, PMC *obj, PMC *method) {
+    struct regsave *data = save_regs(interpreter);
+    INTVAL returndata;
+    REG_PMC(2) = obj;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 0;
+    REG_INT(3) = -2;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    if (REG_INT(1) == 1) {
+	returndata = REG_INT(5);
+    } else {
+	returndata = 0;
+    }
+    restore_regs(interpreter, data);
 
-  return returndata;
+    return returndata;
 }
 
-inline static FLOATVAL
-noarg_numreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
-  struct regsave *data = save_regs(interpreter);
-  FLOATVAL returndata;
-  REG_PMC(1) = obj;
-  REG_INT(0) = 0;
-  REG_INT(1) = 0;
-  REG_INT(2) = 0;
-  REG_INT(3) = -2;
-  REG_INT(4) = 0;
-  Parrot_runops_fromc(interpreter, method);
-  if (REG_INT(4) == 1) {
-    returndata = REG_NUM(5);
-  } else {
-    returndata = 0;
-  }
-  restore_regs(interpreter, data);
+PARROT_INLINE static FLOATVAL
+noarg_numreturn(Parrot_Interp interpreter, PMC *obj, PMC *method) {
+    struct regsave *data = save_regs(interpreter);
+    FLOATVAL returndata;
+    REG_PMC(2) = obj;
+    REG_INT(0) = 0;
+    REG_INT(1) = 0;
+    REG_INT(2) = 0;
+    REG_INT(3) = -2;
+    REG_INT(4) = 0;
+    Parrot_runops_fromc(interpreter, method);
+    if (REG_INT(4) == 1) {
+	returndata = REG_NUM(5);
+    } else {
+	returndata = 0;
+    }
+    restore_regs(interpreter, data);
 
-  return returndata;
+    return returndata;
 }
 
 pmclass delegate {
 
-  void init () {
-    PMC *initPMC = Parrot_find_method_with_cache(INTERP, SELF,
-						 string_from_cstring(INTERP, PARROT_VTABLE_INIT_METHNAME, 0));
-    if (initPMC) {
-      noarg_noreturn(INTERP, SELF, initPMC);
+    void init () {
+	PMC *initPMC = Parrot_find_method_with_cache(INTERP, SELF,
+		string_from_cstring(INTERP, PARROT_VTABLE_INIT_METHNAME, 0));
+	if (initPMC) {
+	    noarg_noreturn(INTERP, SELF, initPMC);
+	}
     }
-  }
 
-  void set_integer(PMC* value) {
-    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_INTEGER_METHNAME), value);
-  }
+    void set_integer(PMC* value) {
+	pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_SET_INTEGER_METHNAME), value);
+    }
 
-  void set_number(PMC* value) {
-    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_NUMBER_METHNAME), value);
-  }
+    void set_number(PMC* value) {
+	pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_SET_NUMBER_METHNAME), value);
+    }
 
-  void set_pmc(PMC* value) {
-    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_PMC_METHNAME), value);
-  }
+    void set_pmc(PMC* value) {
+	pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_SET_PMC_METHNAME), value);
+    }
 
-  void set_string(PMC* value) {
-    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_STRING_METHNAME), value);
-  }
+    void set_string(PMC* value) {
+	pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_SET_STRING_METHNAME), value);
+    }
 
 
-  INTVAL get_integer() {
-    return noarg_intreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_INTEGER_METHNAME));
-  }
+    INTVAL get_integer() {
+	return noarg_intreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_GET_INTEGER_METHNAME));
+    }
 
-  FLOATVAL get_number() {
-    return noarg_numreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_NUMBER_METHNAME));
-  }
+    FLOATVAL get_number() {
+	return noarg_numreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_GET_NUMBER_METHNAME));
+    }
 
-  STRING* get_string() {
-    return noarg_strreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_STRING_METHNAME));
-  }
+    STRING* get_string() {
+	return noarg_strreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_GET_STRING_METHNAME));
+    }
 
-  PMC* get_pmc() {
-    return noarg_pmcreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_PMC_METHNAME));
-  }
+    PMC* get_pmc() {
+	return noarg_pmcreturn(INTERP, SELF, find_or_die(INTERP, SELF,
+		    PARROT_VTABLE_GET_PMC_METHNAME));
+    }
 
 }
