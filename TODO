@@ -34,6 +34,11 @@ Configure system
     
 IO
 --
+    Async IO
+    Full going-over to make sure it works
+    Socket IO
+    Docs!
+    
 
 Regular expression engine
 -------------------------
