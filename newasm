@@ -46,7 +46,7 @@ for (@$Parrot::OpLib::core::ops) {
 #
 my @asm;
 my $pc = 0;
-my $labels;
+my $labels={};
 
 for my $file (@files) {
     open FILE,"<$file" or
@@ -74,8 +74,8 @@ my @const_array;
 for (@asm) {
     $lineno++;
     $_ = replace_labels($lineno,$labels,$_);
-    $_ = expand_op($ops,$lineno,$_);
-    $bc .= emit(\%const_hash,\@const_array,$fullops,$_);
+    $_ = expand_op($ops,$lineno,$_) if $_;
+    $bc .= emit(\%const_hash,\@const_array,$fullops,$_) if $_;
 }
 my $packfile = {
     bytecode => $bc,
