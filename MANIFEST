@@ -41,6 +41,13 @@ docs/ParrotFAQ.htm
 docs/parrot.pod
 docs/parrot_assembly.pod
 docs/parrotbyte.pod
+docs/pdds/pdd0.pod
+docs/pdds/pdd1.pod
+docs/pdds/pdd2.pod
+docs/pdds/pdd4.pod
+docs/pdds/pdd5.pod
+docs/pdds/pdd6.pod
+docs/pdds/pdd7.pod
 docs/running.pod
 docs/strings.pod
 docs/tests.pod
