@@ -625,7 +625,7 @@ inline op downcase(inout STR) {
 
 Titlecase $2 and put the result in $1
 
-=item B<titlease>(inout STR)
+=item B<titlecase>(inout STR)
 
 Titlecase $1 in place
 

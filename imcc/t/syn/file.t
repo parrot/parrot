@@ -340,33 +340,44 @@ sub2
 back
 OUT
 
-
-# include a non-existent file
 {
-  open FOO, ">temp.imc" or die "Cant write temp.imc\n";
-  print FOO << 'END_PIR';
+  # include a non-existent file and catch the error message
+  my $err_msg;
+  {
+    open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+    print FOO << 'END_PIR';
 # Including a non-existent file should produce an error
 .include "non_existent.imc"
 # An error should have been raised
 .sub _main
-# dummy, because a main function is expected
+  # dummy, because a main function is expected
+  end
 .end
 END_PIR
-  close FOO;
-
-  # When Perl5 tries to open a nonexistent file, then
-  # the numeric value ENOENT or the appropriate error message is returned.
-  # Parrot dumps English error messages, so we need to make sure that
-  # Perl5  has an English locale when started.
-  my $ENOENT_msg;
-  {
-    eval { local $ENV{LANG} = 'C';
-      $ENOENT_msg = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print \$!'};
-    };
+    close FOO;
+    $err_msg = qx{$PARROT temp.imc 2>&1}
   }
-  use Test::More;
-  is( qx{$PARROT temp.imc 2>&1}, <<OUT, "including a non-existent file");
-error:imcc:$ENOENT_msg
+
+  # read a non-existent file and catch the error message
+  my $enoent_err_msg;
+  {
+    my $ENOENT = qx{$PERL5 -e 'open FOO, "<non_existent.file"; print( \$! + 0 )'};
+    open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+    print FOO << "END_PIR";
+.sub _main
+  # run a OS command, and get the errmessge for the exit code
+  .local string enoent_err_msg
+  err enoent_err_msg, $ENOENT
+  print enoent_err_msg
+  end
+.end
+END_PIR
+    close FOO;
+    $enoent_err_msg = qx{$PARROT temp.imc}
+  }
+
+  is( $err_msg, << "OUT", "including a non-existent file");
+error:imcc:$enoent_err_msg
 in file 'temp.imc' line 2
 OUT
   unlink "temp.imc";
@@ -375,7 +386,8 @@ OUT
 SKIP:
 {
   skip("multiple loading not speced - failing", 1);
-output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
+
+  output_is(<<'CODE', <<'OUT', "twice call sub in external imc, return");
 .pcc_sub _sub1 prototyped
     print "sub1\n"
     load_bytecode "temp.imc"

@@ -40,6 +40,11 @@ Store the system error code in $1.
 
 Store the system error message in $1.
 
+=item B<err>(out STR, in INT)
+
+Get the system error message for the system error code $2 
+and store it in $1.
+
 =cut
 
 inline op err(out INT) {
@@ -48,7 +53,13 @@ inline op err(out INT) {
 }
 
 op err(out STR) {
-  char *tmp = strerror(errno);
+  const char *tmp = strerror(errno);
+  $1 = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
+  goto NEXT();
+}
+
+op err(out STR, in INT) {
+  const char *tmp = strerror($2);
   $1 = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
   goto NEXT();
 }
