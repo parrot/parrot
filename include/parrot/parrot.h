@@ -66,6 +66,7 @@ typedef void REGEX;
 
 #include "parrot/global_setup.h"
 #include "parrot/string.h"
+#include "parrot/transcode.h"
 #include "parrot/vtable.h"
 #include "parrot/interpreter.h"
 #include "parrot/register.h"

@@ -17,6 +17,7 @@
 void
 init_world() {
     string_init(); /* Set up the string subsystem */ 
+    transcode_init(); /* Set up the transcoding subsystem */
 }
 
 /*

@@ -43,6 +43,11 @@ include/parrot/register.h
 include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/strnative.h
+include/parrot/strutf16.h
+include/parrot/strutf32.h
+include/parrot/strutf8.h
+include/parrot/transcode.h
+include/parrot/unicode.h
 interpreter.c
 languages/jako/Makefile
 languages/jako/bench.jako
@@ -67,6 +72,9 @@ process_opfunc.pl
 register.c
 string.c
 strnative.c
+strutf16.c
+strutf32.c
+strutf8.c
 t/Makefile
 t/euclid.pasm
 t/harness
@@ -85,5 +93,6 @@ t/test2.pasm
 t/test3.pasm
 test_c.in
 test_main.c
+transcode.c
 vtable_h.pl
 vtable.tbl

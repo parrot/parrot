@@ -17,6 +17,9 @@
 
 #define NO_REG_FRAMES 1
 #define SUBSTR_OUT_OF_STRING 1
+#define MALFORMED_UTF8 1
+#define MALFORMED_UTF16 1
+#define MALFORMED_UTF32 1
 
 #endif
 

@@ -85,6 +85,9 @@ string_init(void);
 VAR_SCOPE STRING_VTABLE Parrot_string_vtable[enc_max];
 
 #include "parrot/strnative.h"
+#include "parrot/strutf8.h"
+#include "parrot/strutf16.h"
+#include "parrot/strutf32.h"
 #endif
 
 /*

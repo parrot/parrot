@@ -23,7 +23,7 @@
 */
 static INTVAL 
 string_native_compute_strlen (STRING *s) {
-    return s->buflen;
+    return s->bufused;
 }
 
 /*=for api string_native string_native_max_bytes
@@ -41,6 +41,9 @@ static STRING*
 string_native_concat(STRING* a, STRING* b, INTVAL flags) {
     if (flags && a->encoding != b->encoding) {
 	/* Transcode */
+	STRING* t = b;
+	b = string_make(NULL, 0, enc_native, 0, 0);
+	(Parrot_transcode_table[t->encoding->which][enc_native])(t, b);
     }
     /* b is now in native format */
     string_grow(a, a->strlen + b->strlen);

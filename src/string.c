@@ -20,6 +20,9 @@
 void
 string_init(void) {
     Parrot_string_vtable[enc_native] = string_native_vtable();
+    Parrot_string_vtable[enc_utf8] = string_utf8_vtable();
+    Parrot_string_vtable[enc_utf16] = string_utf16_vtable();
+    Parrot_string_vtable[enc_utf32] = string_utf32_vtable();
 }
 
 /*=for api string string_make
