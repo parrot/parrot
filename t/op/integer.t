@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 30;
 
 output_is(<<CODE, <<OUTPUT, "set_i_ic");
 	# XXX: Need a test for writing outside the set of available
@@ -171,7 +171,7 @@ CODE
 1724724120
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "abs(i, i|ic)");
+output_is(<<'CODE', <<'OUTPUT', "abs(i, i|ic|n|nc)");
 	set	I0, 1
 	abs	I1, -1
 	abs	I0, I0
@@ -183,22 +183,40 @@ output_is(<<'CODE', <<'OUTPUT', "abs(i, i|ic)");
 	print	"\n"	
 	print	I2
 	print	"\n"	
+
+	set	N0, 1.001
+	abs	I0, N0
+	abs	I1, 1.001
+	print	I0
+	print	I1
+	print	"\n"
 	end
 CODE
 1
 1
 1
+11
 OUTPUT
 
-output_is(<<CODE, <<OUTPUT, "sub_i");
+output_is(<<CODE, <<OUTPUT, "sub_(i|ic, i|ic)");
 	set	I0, 0x12345678
 	set	I1, 0x01234567
 	sub	I2, I0, I1
 	print	I2
 	print	"\\n"
+
+	set	I1, 1234
+	sub	I0, I1, 1230
+	print	I0
+	sub	I0, 1244, I1
+	print	I0
+	sub	I0, 13, 12
+	print	I0
+	print	"\\n"
         end
 CODE
 286331153
+4101
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mul_i");
@@ -207,8 +225,13 @@ output_is(<<CODE, <<OUTPUT, "mul_i");
 	mul	I2, I0, I1
 	print	I2
 	print	"\\n"
+
+	mul	I2, I0, 29
+	print	I2
+	print	"\\n"
         end
 CODE
+203
 203
 OUTPUT
 
@@ -230,11 +253,22 @@ output_is(<<CODE, <<OUTPUT, "div_i");
 	div	I2, I0, I1
 	print	I2
 	print	"\\n"
+
+	set	I0, 12
+	div	I1, 144, I0
+	print	I1
+	div	I1, I0, 3
+	print	I1
+	div	I1, 120, 12
+	print	I1
+	print	"\\n"
+
         end
 CODE
 3
 5
 -2
+12410
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mod_i");
@@ -274,6 +308,15 @@ output_is(<<CODE, <<OUTPUT, "mod_i");
 	print	I2
 	print	"\\n"
 
+	set	I0, 12
+	mod	I1, I0, 10
+	print	I1
+	mod	I1, 14, I0
+	print	I1
+	mod	I1, 13, 11
+	print	I1
+	print	"\\n"
+
         end
 CODE
 5
@@ -282,6 +325,7 @@ CODE
 -1
 1
 -2
+222
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "cmod_i");
@@ -294,11 +338,21 @@ output_is(<<CODE, <<OUTPUT, "cmod_i");
 	print	"\\n"
 	print	I1
 	print	"\\n"
+
+	set	I0, 12
+	cmod	I1, I0, 10
+	print	I1
+	cmod	I1, 14, I0
+	print	I1
+	cmod	I1, 13, 11
+	print	I1
+	print	"\\n"
         end
 CODE
 2
 5
 3
+222
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "eq_i_ic");
@@ -343,6 +397,16 @@ ONE:
 
 TWO:
 	print	"ok 2\\n"
+
+	set	I0, 12
+	eq	I0, 12, THREE
+	print	"not good three "
+THREE:	print	"ok 3\\n"
+
+	eq	12, 12, FOUR
+	print	"12 not 12, what? "
+FOUR:	print	"ok 4\\n"
+
 	end
 
 ERROR:
@@ -351,6 +415,40 @@ ERROR:
 CODE
 ok 1
 ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "eq i, i|ic (pop label from stack)");
+	set	I0, 12
+	set	I1, 12
+
+	print	"the word\\n"
+	bsr	BR1
+	print	"done 1\\n"
+	bsr	BR2
+	print	"done 2\\n"
+	bsr	BR3
+	print	"done 3\\n"
+
+	end
+
+BR1:	eq	12, I0
+	print	"not equal, or did not jump "
+	ret
+
+BR2:	eq	10, 10
+	print	"not equal, or did not jump 2 "
+	ret
+
+BR3:	eq	I0, I1
+	print	"not equal, equal int regs "
+
+CODE
+the word
+done 1
+done 2
+done 3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_i_ic");
@@ -403,6 +501,39 @@ ERROR:
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "ne ic, i (pop label off stack)");
+
+	set	I0, 12
+	set	I1, 10
+
+	print	"start\\n"
+	bsr	BR1
+	print	"done 1\\n"
+	bsr	BR2
+	print	"done 2\\n"
+	bsr	BR3
+	print	"done 3\\n"
+
+	end
+
+BR1:	ne	I0, 10
+	print	"bad "
+	ret
+
+BR2:	ne	10, 12
+	print	"10 is 12! "
+	ret
+
+BR3:	ne	I0, I1
+	print	"10 is 12, even when in I reg "
+	ret
+CODE
+start
+done 1
+done 2
+done 3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_i_ic");
