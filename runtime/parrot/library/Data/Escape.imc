@@ -99,7 +99,7 @@ gt30: # ascii codes greater than 30 below
     # "
     ne char, '"', n34
     if c != 34 goto n34
-    set tmp, '\\"'
+    set tmp, "\\\""
     branch DONE
 n34:
 
