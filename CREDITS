@@ -19,18 +19,21 @@ D: Building on various platforms.
 
 N: Aldo Calpini
 
+N: Alex Gough
+
 N: Andy Dougherty
 D: Config and building.
-
-N: Alex Gough
 
 N: Angel Faus
 D: CFG and live analysis.
 
-N: Ask Bjoern Hansen
-
 N: Arthur Bergman
 D: Trying to ride a Ponie - build and compat fixes.
+
+N: Arvindh Rajesh Tamilmani
+D: Buffered IO fix
+
+N: Ask Bjoern Hansen
 
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.

@@ -119,11 +119,16 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
         PIO_buf_flush(interpreter, l, io);
 
     /* Choose an appropriate buffer size for caller */
-    if (bufsize == PIO_UNBOUND) {
-        b->size = PIO_getblksize(io->fd);
-    }
-    else {
-        b->size = (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN);
+    switch (bufsize) {
+        case 0:
+            b->size = 0;
+            break;
+        case PIO_UNBOUND:
+            b->size = PIO_getblksize(io->fd);
+            break;
+        default:
+            b->size = (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN);
+            break;
     }
 
     if (b->startb && (b->flags & PIO_BF_MALLOC)) {
@@ -135,8 +140,10 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
         b->startb = b->next = mem_sys_allocate(b->size);
         b->flags |= PIO_BF_MALLOC;
     }
+    else
+        b->flags &= ~PIO_BF_MALLOC;
 
-    if (bufsize != 0)
+    if (b->size != 0)
         io->flags |= PIO_F_BLKBUF;
     else
         io->flags &= ~(PIO_F_BLKBUF | PIO_F_LINEBUF);
@@ -442,11 +449,13 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
         io->b.flags |= PIO_BF_WRITEBUF;
         /* Fill remainder, flush, then try to buffer more */
-        memcpy(io->b.next, buffer, diff);
+        memcpy(io->b.next, buffer, avail);
+        io->b.next += avail;
+        io->fpos += avail;
         PIO_buf_flush(interpreter, layer, io);
-        memcpy(io->b.startb, ((const char *)buffer + diff), len - diff);
-        io->b.next = io->b.startb + (len - diff);
-        io->fpos += len;
+        memcpy(io->b.startb, ((const char *)buffer + avail), diff);
+        io->b.next += diff;
+        io->fpos += diff;
         return len;
     }
     return (size_t)-1;
