@@ -48,9 +48,14 @@ Initializes the integer with a default value of C<0>.
 */
     void share () {
         /*
-         * assume that the access to an int is atomic
+         * assume that the access to a long is atomic.
+         * Perl integers are most often (1) equal to C longs,
+         * not C ints, and this makes a difference in 64-bit
+         * platforms where longs are 64-bit but ints are 32-bit.
+         * (1) Not equal when Perl integers have been configured
+         *     to be software-emulated long longs.
          */
-        if (sizeof(INTVAL) != sizeof(int))
+        if (sizeof(INTVAL) != sizeof(long))
             SUPER();
     }
 

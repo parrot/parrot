@@ -20,10 +20,12 @@ linux-sparc64-gcc3.3.3  B8   Y    -    -     -   -      Y       -
 linux-x86-gcc2.95.2          Y    Y    Y     Y   Y      Y       Y
 linux-x86-gcc3.3.3           Y    Y    Y     Y   Y      Y       Y
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y      Y       Y*3
+netbsd                                                  Y       Y*1
 openbsd                      Y    Y/5  Y     Y   -      Y       Y
 os2
 solaris8-sparc-cc       B    -    Y/84 -     -   -      Y       Y
-tru64                    8
+tru64-alpha-gcc          8                   Y          Y       Y
+tru64-alpha-dec_c_v5.6   8                              Y       Y/7
 vms
 win32-bcc
 win32-cygwin
@@ -48,5 +50,6 @@ Threads . Parrot is multi-threaded
 Signals . Parrot catches kind of a SIGINT (program termination) signal
 
 Remarks:
-*2 need s/inet_pton/inet_aton/ in io_unix.c:623
+*1 no recent report
+*2 needs Configure.pl --define=inet_aton
 *3 kernel 2.6.1 NPTL: signal_2 and _4 failing due to test script problems

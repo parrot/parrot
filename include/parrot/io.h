@@ -93,7 +93,9 @@ typedef Parrot_WIN32_HANDLE PIOHANDLE;
 typedef Parrot_OFF_T PIOOFF_T;
 #endif
 #ifdef PIO_OS_UNIX
-typedef int PIOHANDLE;
+/* Hopefully INTVAL_SIZE is enough for PTR_SIZE so that
+ * the FILE* of pio_stdio_layers fit into a PIOHANDLE. */
+typedef INTVAL PIOHANDLE;
 typedef off_t PIOOFF_T;
 #endif
 #ifdef PIO_OS_STDIO

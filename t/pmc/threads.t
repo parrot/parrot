@@ -23,6 +23,7 @@ use Test::More;
 my %platforms = map {$_=>1} qw/
     aix
     darwin
+    dec_osf
     freebsd
     hpux
     irix
