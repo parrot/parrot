@@ -276,11 +276,11 @@ Class initialization.
              * thread start methods for threads type 1..3
              */
             enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_1), "thread1", "vIOP");
+                    F2DPTR(pt_thread_run_1), "thread1", "vJOP");
             enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_2), "thread2", "vIOP");
+                    F2DPTR(pt_thread_run_2), "thread2", "vJOP");
             enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_run_3), "thread3", "vIOP");
+                    F2DPTR(pt_thread_run_3), "thread3", "vJOP");
 
             /*
              * TODO unify and fix signatures
@@ -288,7 +288,7 @@ Class initialization.
             enter_nci_method(INTERP, typ,
                     F2DPTR(pt_thread_yield), "yield", "v");
             enter_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_join), "join", "PIi");
+                    F2DPTR(pt_thread_join), "join", "PJi");
             enter_nci_method(INTERP, typ,
                     F2DPTR(pt_thread_detach), "detach", "vi");
             enter_nci_method(INTERP, typ,
@@ -298,7 +298,7 @@ Class initialization.
              * misc functions
              */
             enter_nci_method(INTERP, typ,
-                    F2DPTR(recursion_limit), "recursion_limit", "iIi");
+                    F2DPTR(recursion_limit), "recursion_limit", "iJi");
         }
 
     }
