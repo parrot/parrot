@@ -235,7 +235,7 @@ sub get_parser() {
         verbose(1, "Done");
     }
     if (defined $o{'debug-info'}) {
-        $parser->debug_on;
+        $parser->Debug(1);
     }
     $parser;
 }

@@ -17,6 +17,12 @@ grammar to the file $name.pm.  The resulting parser can then be loaded
 as a module, and instantiated with its B<new> method.  This is much
 faster than re-building the grammar.
 
+=item B<Debug($on)>
+
+If C<$on> is true, generate line-number information.  This actually
+has a surprisingly small impact on performance.  If C<$on> is false,
+turn line-number generation off.
+
 =back
 
 It's been tweaked for speed in a number of ways.  First, the infix
@@ -282,6 +288,15 @@ sub mark_end {
 
 my $seen_err;
 
+sub Debug {
+    my ($parser, $on) = @_;
+    if ($on) {
+	$parser->Replace("\nstmts:            __stmt[\$arg[0]](s?)\n");
+    } else {
+	$parser->Replace("\nstmts:		  _stmt[\$arg[0]](s?)\n");
+    }
+}
+
 sub getl($) {
     my $linenum = shift;
     ref($linenum)? Parse::RecDescent::linenum($linenum) : $linenum;
@@ -292,7 +307,6 @@ sub gett($) {
     $t =~ s/\A($Parse::RecDescent::skip)//o;
     my $matched = $1;
     $::line += $matched =~ s/\n//g;
-    #$::col -= length($matched);
     $t =~ s/\n.*//s;
     $t =~ s/\s*$//;
     return length($t)> 30 ? substr($t,0,30). '...':$t;
@@ -552,11 +566,10 @@ stmts:		  _stmt[$arg[0]](s?)
 
 # collect file,line info
 __stmt:		{ $::line = getl($thisline);
-  		  $::col = $thiscolumn;
                   $::txt = gett($text) } <reject>
 
 __stmt:		  _stmt[$arg[0]] {
-		    bless( [$::file,$::line, $::col,$item[1], $::txt],
+		    bless( [$::file,$::line, '??',$item[1], $::txt],
 		    	'P6C::debug_info') }
 
 # $arg[0] is set to true/false. True == "in block"
