@@ -1476,6 +1476,7 @@
 []		languages/imcc/t/syn/labels.t
 []		languages/imcc/t/syn/namespace.t
 []		languages/imcc/t/syn/scope.t
+[jako]		languages/jako/Curses.jako
 [jako]		languages/jako/docs/future.pod
 [jako]		languages/jako/docs/jako.pod
 [jako]		languages/jako/elem.jako
@@ -1491,6 +1492,7 @@
 [jako]		languages/jako/examples/mandelbrot.jako
 [jako]		languages/jako/examples/mandelzoom.jako
 [jako]		languages/jako/examples/mops.jako
+[jako]		languages/jako/examples/nci.jako
 [jako]		languages/jako/examples/primes.jako
 [jako]		languages/jako/examples/queens.jako
 [jako]		languages/jako/examples/queens_array.jako
@@ -1508,6 +1510,7 @@
 [jako]		languages/jako/lib/Jako/Construct/Block/Loop/Continue.pm
 [jako]		languages/jako/lib/Jako/Construct/Block/Loop/Until.pm
 [jako]		languages/jako/lib/Jako/Construct/Block/Loop/While.pm
+[jako]		languages/jako/lib/Jako/Construct/Block/Module.pm
 [jako]		languages/jako/lib/Jako/Construct/Block/Sub.pm
 [jako]		languages/jako/lib/Jako/Construct/Declaration.pm
 [jako]		languages/jako/lib/Jako/Construct/Declaration/Constant.pm
