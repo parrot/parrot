@@ -621,19 +621,17 @@ _main:
 OUT
 
 ##############################
-SKIP: {
-skip("printf float output is unportable!", 1) if $^O eq 'MSWin32';
-pir_2_pasm_is(<<'CODE', <<'OUT', "constant add big nums");
+
+pir_2_pasm_like(<<'CODE', <<'OUT', "constant add big nums");
 .sub _main
    add N0, 10.0e20, 15.0e21
    end
 .end
 CODE
-_main:
-   set N0, 1.6e+22
-   end
+/^_main:
+   set N0, 1\.6e\+0?22
+   end$/
 OUT
-}
 
 ##############################
 SKIP: {

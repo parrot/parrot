@@ -385,6 +385,7 @@ END_PIR
     $enoent_err_msg = qx{$PARROT temp.imc}
   }
 
+  $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;
   is( $err_msg, << "OUT", "including a non-existent file");
 error:imcc:$enoent_err_msg
 in file 'temp.imc' line 2
