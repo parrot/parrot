@@ -523,7 +523,7 @@ CODE
 -1-1
 OUTPUT
 
-SKIP: { skip("sting->int not finished yet", 1);
+SKIP: { skip("string->int not finished yet", 1);
 output_is(<<CODE, <<OUTPUT, "nasty string -> int");
 	new	P0, PerlInt
 	set	P0, "Z1"
