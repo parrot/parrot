@@ -44,8 +44,69 @@ DEBUG_CHECK_BREAKPOINT_END:
 # stop and interact with user.
 DEBUG_INTERACT:
         bsr DEBUG_PRINT_STATUS
+        print "bef> "
+        readline S10, 0
+        chopn S10, 1
+        length I10, S10
+        eq I10, 0, DEBUG_INTERACT_NEXT
+        substr S11, S10, 0, 4
+        eq S11, "dump", DEBUG_INTERACT_DUMP
+        eq S11, "help", DEBUG_INTERACT_HELP
+        eq S11, "list", DEBUG_INTERACT_LIST
+        eq S11, "next", DEBUG_INTERACT_NEXT
+        eq S11, "quit", DEBUG_INTERACT_QUIT
+        substr S11, S10, 0, 5
+        eq S11, "break", DEBUG_INTERACT_BREAK
+        substr S11, S10, 0, 6
+        eq S11, "status", DEBUG_INTERACT_STATUS
+        substr S11, S10, 0, 7
+        eq S11, "restart", DEBUG_INTERACT_RESTART
+        substr S11, S10, 0, 8
+        eq S11, "continue", DEBUG_INTERACT_CONTINUE
+        print "Unknown instruction. Type help for help.\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_BREAK:
+        print "Not yet implemented...\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_CONTINUE:
+        set P3[0], 0        # do not stop at next instruction
+        branch DEBUG_INTERACT_END
+DEBUG_INTERACT_DUMP:
+        bsr DEBUG_DUMP_PLAYFIELD
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_HELP:
+        print "Available commands are:\n"
+        print " status        - print state of current IP\n"
+        print " dump          - dump playfield\n"
+        print " break char c  - set a breakpoint on character c\n"
+        print " break at x,y  - set a breakpoint at coords (x,y)\n"
+        print " list          - list breakpoints\n"
+        print " next          - step one befunge instruction\n"
+        print " continue      - resume execution\n"
+        print " restart       - restart execution\n"
+        print " quit          - abort execution\n"
+        print " help          - display this message\n"
+        print "\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_LIST:
+        print "Not yet implemented...\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_NEXT:
+        set P3[0], 1        # stop at next instruction
+        branch DEBUG_INTERACT_END
+DEBUG_INTERACT_QUIT:
+        end
+DEBUG_INTERACT_RESTART:
+        #branch MAIN
+        print "Not yet implemented...\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_STATUS:
+        bsr DEBUG_PRINT_STATUS
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_END:     
         ret
 
+                
         
 # Print the status of the instruction pointer:
 # coordinates, current char, direction, flags and stack.

@@ -1,5 +1,11 @@
 Revision history for Befunge-93 interpreter written for Parrot.
 
+0.06  Sun Dec  1 10:00:35 CET 2002
+        - debugger can now interact with user.
+        - debugger can dump playfield.
+        - debugger can print information about current IP.
+        - debugger can execute a befunge program step by step.
+
 0.05  Sat Nov 30 11:31:25 CET 2002
         - new file debug.pasm that will handle all the debugging
           capabilities of the interpreter.
