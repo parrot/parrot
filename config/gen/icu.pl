@@ -62,13 +62,13 @@ sub runstep {
 
   if( defined $icuplatform )
   {
-	  $icu_configure_command = "./runConfigureICU $icuplatform";
+	  $icu_configure_command = "sh ./runConfigureICU $icuplatform";
   }
   else
   {
 	# Try to build ICU with the same compiler as parrot.
 	# Also respect Configure.pl command-line arguments for c++.
-	$icu_configure_command = "./configure";
+	$icu_configure_command = "sh ./configure";
 	my $cc = Configure::Data->get('cc');
 	if ($cc ne '') {
 	  $icu_configure_command = "CC='$cc' $icu_configure_command";

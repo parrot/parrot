@@ -23,6 +23,7 @@ file) is used by F<classes/pmc2c2.pl> to generate C code from PMC files.
 package Parrot::Pmc2c;
 use strict;
 use vars qw(@EXPORT_OK @writes %writes );
+use Parrot::PMC qw(%pmc_types);
 
 use base qw( Exporter );
 @EXPORT_OK = qw(gen_c gen_h gen_ret dynext_load_code);
@@ -125,6 +126,7 @@ sub dynext_load_code {
  */
 #include "parrot/dynext.h"
 
+PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter); /* don't warn */
 PMC* Parrot_lib_${lc_classname}_load(Interp *interpreter)
 {
     STRING *whoami;
@@ -501,6 +503,17 @@ sub lib_load_code() {
     return dynext_load_code($classname, $call_class_init);
 }
 
+=item C<pmc_is_dynpmc>
+
+Determines if a given PMC type is dynamically loaded or not.
+
+=cut
+
+sub pmc_is_dynpmc {
+    # surely core PMCs aren't dynamic
+    return exists($pmc_types{$_[1]}) ? 0 : 1;
+}
+
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
@@ -527,7 +540,7 @@ sub init_func() {
     if (exists $self->{flags}{is_shared}) {
         $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG';
     }
-    my (@meths, @mmds);
+    my (@meths, @mmds, @init_mmds, %init_mmds);
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};
         my $meth_name;
@@ -554,7 +567,14 @@ sub init_func() {
             $right = 0;
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
-                $right = "enum_class_$variant->[0]";
+                if ($self->pmc_is_dynpmc($variant->[0])) {
+                    $right = 'enum_class_default';
+                    push @init_mmds, [$#mmds + 1, $variant->[0]];
+                    $init_mmds{$variant->[0]} = 1;
+                }
+                else {
+                    $right = "enum_class_$variant->[0]";
+                }
                 $meth_name = $variant->[1] . '_' .$variant->[0];
                 push @mmds, [ $func, $left, $right, $meth_name];
             }
@@ -571,13 +591,14 @@ sub init_func() {
                    $self->{has_method}{class_init} : -1;
     my $class_init_code = $n >= 0 ? $self->{methods}[$n]{body} : "";
     $class_init_code =~ s/INTERP/interp/g;
+    my $enum_name = $self->{flags}{dynpmc} ? -1 : "enum_class_$classname";
     $cout .= <<"EOC";
 void
 Parrot_${classname}_class_init(Parrot_Interp interp, int entry, int pass)
 {
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
-        enum_class_$classname,	/* base_type */
+        $enum_name,	/* base_type */
         NULL,	/* whoami */
         $vtbl_flag, /* flags */
         NULL,   /* does_str */
@@ -589,13 +610,47 @@ EOC
 
     $cout .= <<"EOC";
 
-    const MMD_init _temp_mmd_init[] = {
+    MMD_init _temp_mmd_init[] = {
         $mmd_list
     };
     /*  Dynamic classes need the runtime type
 	which is passed in entry to class_init.
     */
 EOC
+    # init vtable slot
+    if ($self->{flags}{dynpmc}) {
+        $cout .= <<"EOC";
+
+    temp_base_vtable.base_type = entry;
+EOC
+    }
+    # declare auxiliary variables for dyncpmc IDs
+    foreach my $dynclass (keys %init_mmds) {
+        next if $dynclass eq $classname;
+        $cout .= <<"EOC";
+    int my_enum_class_$dynclass = Parrot_PMC_typenum(interp, "$dynclass");
+EOC
+    }
+    # init MMD "right" slots with the dynpmc types
+    foreach my $entry (@init_mmds) {
+        if ($entry->[1] eq $classname) {
+            $cout .= <<"EOC";
+    _temp_mmd_init[$entry->[0]].right = entry;
+EOC
+        }
+        else {
+            $cout .= <<"EOC";
+    _temp_mmd_init[$entry->[0]].right = my_enum_class_$entry->[1];
+EOC
+        }
+    }
+    # just to be safe
+    foreach my $dynclass (keys %init_mmds) {
+        next if $dynclass eq $classname;
+        $cout .= <<"EOC";
+    assert(my_enum_class_$dynclass != enum_class_default);
+EOC
+    }
     $cout .= <<"EOC";
     if (!pass) {
         /*
