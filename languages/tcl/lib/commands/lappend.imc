@@ -1,0 +1,30 @@
+##
+# [list]
+
+.namespace [ "Tcl" ]
+
+.sub _lappend
+
+  .local pmc argv
+  argv = foldup  
+
+  # XXX Need error handling.
+
+  .local string listname
+  listname = argv[0]
+
+  .local pmc listvar
+  listvar = find_lex listname
+
+  .local int cnt
+  cnt = 1
+LOOP:
+  if cnt >= I3 goto DONE
+  $P0 = argv[cnt]
+  push listvar, $P0
+  inc cnt
+  goto LOOP
+DONE:
+
+  .return(0,listvar)
+.end

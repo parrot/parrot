@@ -20,6 +20,9 @@ lib/commands/format.imc \
 lib/commands/global.imc \
 lib/commands/if.imc \
 lib/commands/incr.imc \
+lib/commands/lappend.imc \
+lib/commands/list.imc \
+lib/commands/llength.imc \
 lib/commands/proc.imc \
 lib/commands/puts.imc \
 lib/commands/rename.imc \

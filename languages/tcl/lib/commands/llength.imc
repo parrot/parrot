@@ -1,0 +1,22 @@
+##
+# [list]
+
+.namespace [ "Tcl" ]
+
+.sub _llength
+  .param pmc listval
+
+  # XXX Need error handling.
+
+  # Need to convert this to a list if it isn't already.
+
+  $I0 = listval
+
+  $I1 = find_type "TclInt"
+  .local pmc retval
+  retval = new $I1
+
+  retval = $I0
+
+  .return(0,retval)
+.end
