@@ -225,6 +225,7 @@ config/inter/ops.pl                               []
 config/inter/pmc.pl                               []
 config/inter/progs.pl                             []
 config/inter/types.pl                             []
+docs/compiler_faq.pod				  [devel]doc
 docs/configuration.pod                            [devel]doc
 docs/debug.pod                                    [devel]doc
 docs/debugger.pod                                 [main]doc
