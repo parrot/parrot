@@ -13,9 +13,11 @@
 .pcc_sub _th:
     set S5, P6
 l:
-    substr S0, S5, I0, 1
-    print S0
-    inc I0
+    substr S9, S5, I10, 1
+    print S9
+    getstdout P2
+    callmethod "flush"
+    inc I10
     sleep 0.1
-    if S0, l
+    if S9, l
     invoke P1

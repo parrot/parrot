@@ -1,9 +1,9 @@
-# JaPH utilizing delegate
-    new P0, .delegate
-    typeof S0, P0
-    print S0
+# JaPH utilizing a class
+    newclass P0, "Japh"
+    print P0
     end
-.pcc_sub __name:
+.namespace ["Japh"]
+.pcc_sub __get_string:
     set S5, "Just another Parrot Hacker\n"
     invoke P1
 

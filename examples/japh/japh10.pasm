@@ -21,11 +21,15 @@
     defined I1, P7                      # check if queue entry is ...
     unless I1, w1                       # ... defined, yes: it's ours
     set S5, P6                          # get string param
-    substr S0, S5, I0, 1                # extract next char
-    print S0                            # and print it
-    inc I0                              # increment char pointer
+    substr S9, S5, I10, 1               # extract next char
+    print S9                            # and print it
+
+    getstdout P2			# flush output, its line-buffered
+    callmethod "flush"
+
+    inc I10                             # increment char pointer
     shift P8, P7                        # pull item off from queue
-    if S0, w1                           # then wait again, if todo
+    if S9, w1                           # then wait again, if todo
     invoke P1                           # done with string
 
   .pcc_sub _th2:                        # 2nd thread function
@@ -33,11 +37,13 @@
     defined I1, P7                      # if queue entry is defined
     if I1, w2                           # then wait
     set S5, P6
-    substr S0, S5, I0, 1                # if not print next char
-    print S0
-    inc I0
+    substr S9, S5, I10, 1               # if not print next char
+    print S9
+    getstdout P2
+    callmethod "flush"
+    inc I10
     new P8, .PerlInt                    # and put a defined entry
     push P7, P8                         # onto the queue so that
-    if S0, w2                           # the other thread will run
+    if S9, w2                           # the other thread will run
     invoke P1                           # done with string
 
