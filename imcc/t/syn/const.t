@@ -4,10 +4,9 @@ use TestCompiler tests => 4;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "const 1");
-	# file global const N
-	.const int N = 5
 
 .sub __main
+	.globalconst int N = 5
 	call _main
 	end
 .end
@@ -28,10 +27,8 @@ OUT
 
 ##############################
 output_is(<<'CODE', <<'OUT', "const 2");
-	# file global const N
-	.const int N = 5
-
 .sub __main
+	.globalconst int N = 5
 	call _main
 	end
 .end

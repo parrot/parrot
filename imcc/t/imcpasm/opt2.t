@@ -98,6 +98,7 @@ OUT
 
 ##############################
 output_is(<<'CODE', <<'OUT', "constant prop repeated");
+.sub _main
   .local int a
   .local int b
   .local int sum
@@ -106,7 +107,9 @@ output_is(<<'CODE', <<'OUT', "constant prop repeated");
   sum = a + b
   print sum
   end
+.end
 CODE
+_main:
   print 15
   end
 OUT

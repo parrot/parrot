@@ -1,3 +1,10 @@
+- 2003-08-23	leo
+
+	* REMOVE THE DEPRECATED NESTED SUBS FEATURE.
+
+	  All code must be contained now in .sub/.pcc_sub/.emit blocks.
+	  For PASM source files an .emit/.eom is provided by the lexer.
+
 - 2003-08-22	leo
 
 	* HLL line and file information.

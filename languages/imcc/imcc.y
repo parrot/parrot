@@ -432,7 +432,8 @@ static char * inv_op(char *op) {
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
 %type <t> type
-%type <i> program sub sub_start emit nsub pcc_sub sub_body pcc_ret pcc_yield
+%type <i> program sub sub_start emit pcc_sub sub_body pcc_ret pcc_yield
+%type <i> compilation_units compilation_unit
 %type <s> classname relop
 %type <i> labels _labels label statements statement
 %type <i> pcc_sub_call
@@ -455,11 +456,18 @@ static char * inv_op(char *op) {
 
 %%
 
-program:                         { open_comp_unit(); }
-    statements  { $$ = 0;
-	  allocate(interp);
-	  emit_flush(interp);
-        }
+program:                         { open_comp_unit(); $$ = 0;}
+    compilation_units            { close_comp_unit(); $$ = 0; }
+    ;
+
+compilation_unit:    sub
+        | pcc_sub
+        | emit
+        | '\n'  { $$ = 0; }
+    ;
+
+compilation_units: compilation_unit
+    | compilation_units compilation_unit
     ;
 
 
@@ -490,7 +498,7 @@ emit:
                                           emit_flush(interp); $$=0;}
     ;
 
-nsub:	sub_start
+sub:	sub_start
         sub_body
     ;
 
@@ -502,11 +510,6 @@ sub_body:
 	  emit_flush(interp);
         }
      ;
-
-sub:    nsub
-        | pcc_sub
-        | emit
-    ;
 
 sub_start: SUB                           { open_comp_unit(); }
            IDENTIFIER '\n'
@@ -666,7 +669,6 @@ label:  LABEL		{ $$ = iLABEL(mk_address($1, U_add_uniq_label)); }
 
 instruction:
 	labels  labeled_inst '\n'  { $$ = $2; }
-    |  sub
     ;
 labeled_inst:
 	assignment
