@@ -1127,7 +1127,7 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
 {
-    PMC* key, *hash, *nci;
+    PMC *hash, *nci;
     PMC* iglobals = interpreter->iglobals;
     hash = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             IGLOBALS_COMPREG_HASH);
@@ -1138,8 +1138,7 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
                 (INTVAL)IGLOBALS_COMPREG_HASH, hash);
     }
     nci = pmc_new(interpreter, enum_class_Compiler);
-    key = key_new_string(interpreter, type);
-    VTABLE_set_pmc_keyed(interpreter, hash, key, nci);
+    VTABLE_set_pmc_keyed_str(interpreter, hash, type, nci);
     /* build native call interface fir the C sub in "func" */
     VTABLE_set_string_keyed(interpreter, nci, func,
             string_from_cstring(interpreter, "pIt", 0));

@@ -1052,16 +1052,15 @@ op dlvar (out PMC, in PMC, in STR) {
   goto NEXT();
 }
 
-inline op compile(OUT PMC, in PMC, in STR) {
+inline op compile(out PMC, in PMC, in STR) {
   $1 = $2->vtable->invoke(interpreter, $2, $3);
   goto NEXT();
 }
 
-inline op compreg(OUT PMC, in STR) {
-  PMC *key = key_new_string(interpreter, $2);
+inline op compreg(out PMC, in STR) {
   PMC *compreg_hash = VTABLE_get_pmc_keyed_int(interpreter,
       interpreter->iglobals, IGLOBALS_COMPREG_HASH);
-  $1 = VTABLE_get_pmc_keyed(interpreter, compreg_hash, key);
+  $1 = VTABLE_get_pmc_keyed_str(interpreter, compreg_hash, $2);
   goto NEXT();
 }
 

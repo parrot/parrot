@@ -26,11 +26,10 @@ enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
     VTABLE_set_string_keyed(interpreter, method, func,
 	    string_make(interpreter, proto, strlen(proto),
 		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
-    VTABLE_set_pmc_keyed(interpreter, method_table,
-	    key_new_string(interpreter,
-		string_make(interpreter, name,
-		    strlen(name), NULL,
-		    PObj_constant_FLAG|PObj_external_FLAG, NULL)),
+    VTABLE_set_pmc_keyed_str(interpreter, method_table,
+	    string_make(interpreter, name,
+		strlen(name), NULL,
+		PObj_constant_FLAG|PObj_external_FLAG, NULL),
 	    method);
 }
 

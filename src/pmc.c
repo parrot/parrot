@@ -200,7 +200,6 @@ pmc_register(Parrot_Interp interp, STRING *name)
 {
     INTVAL type;
     PMC *classname_hash;
-    PMC *key;
     /* If they're looking to register an existing class, return that
        class' type number */
     if ((type = pmc_type(interp, name)) > enum_type_undef) {
@@ -223,8 +222,6 @@ pmc_register(Parrot_Interp interp, STRING *name)
 
     classname_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                                               IGLOBALS_CLASSNAME_HASH);
-    key = key_new_string(interp, name);
-
     type = enum_class_max++;
     /* Have we overflowed the table? */
     if (enum_class_max > class_table_size - 1) {
@@ -232,7 +229,7 @@ pmc_register(Parrot_Interp interp, STRING *name)
         /* 10 bigger seems reasonable, though it's only a pointer
            table and we could get bigger without blowing much memory
         */
-        INTVAL new_max = class_table_size + 10; 
+        INTVAL new_max = class_table_size + 10;
         INTVAL new_size = new_max * sizeof(VTABLE *);
         new_vtable_table = mem_sys_realloc(Parrot_base_vtables, new_size);
         /* XXX Should set all the empty slots to the null PMC's
@@ -240,8 +237,8 @@ pmc_register(Parrot_Interp interp, STRING *name)
         Parrot_base_vtables = new_vtable_table;
         class_table_size = new_max;
     }
-    
-    VTABLE_set_integer_keyed(interp, classname_hash, key, type);
+
+    VTABLE_set_integer_keyed_str(interp, classname_hash, name, type);
 
     UNLOCK(class_count_mutex);
     return type;
@@ -251,11 +248,10 @@ INTVAL
 pmc_type(Parrot_Interp interp, STRING *name)
 {
     INTVAL return_val;
-    PMC * key = key_new_string(interp, name);
     PMC *classname_hash = VTABLE_get_pmc_keyed_int(interp,
                             interp->iglobals, IGLOBALS_CLASSNAME_HASH);
 
-    return_val = VTABLE_get_integer_keyed(interp, classname_hash, key);
+    return_val = VTABLE_get_integer_keyed_str(interp, classname_hash, name);
     if (return_val == enum_type_undef) {
 	return_val = Parrot_get_datatype_enum(interp, name);
     }
