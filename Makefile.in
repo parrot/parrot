@@ -57,13 +57,14 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
 #
 ###############################################################################
 
-H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
+GENERAL_H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
 $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h \
-$(INC)/interp_guts.h ${jit_h} ${jit_struct_h} $(INC)/rx.h $(INC)/rxstacks.h $(INC)/embed.h
+$(INC)/interp_guts.h ${jit_h} $(INC)/rx.h $(INC)/rxstacks.h $(INC)/embed.h
+ALL_H_FILES = $(GENERAL_H_FILES) ${jit_struct_h}
 
 CLASS_O_FILES = classes/default$(O) classes/array$(O) \
 classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
@@ -207,7 +208,7 @@ $(PDUMP): pdump$(O) $(O_FILES)
 #
 ###############################################################################
 
-test_main$(O): test_main.c $(H_FILES)
+test_main$(O): test_main.c $(GENERAL_H_FILES)
 
 lib/Parrot/Jit.pm: lib/Parrot/Jit/${jitarchname}.pm lib/Parrot/Jit/${jitcpuarch}Generic.pm
 	$(PERL) -MFile::Copy=cp -e ${PQ}cp q|lib/Parrot/Jit/${jitarchname}.pm|, q|lib/Parrot/Jit.pm|${PQ}
@@ -261,70 +262,70 @@ examples/mops/mops${exe}: examples/mops/mops$(O) platform$(O)
 #
 ###############################################################################
 
-global_setup$(O): $(H_FILES)
+global_setup$(O): $(GENERAL_H_FILES)
 
-pmc$(O): $(H_FILES)
+pmc$(O): $(GENERAL_H_FILES)
 
-jit$(O): $(H_FILES)
+jit$(O): $(GENERAL_H_FILES) ${jit_struct_h}
 
-key$(O): $(H_FILES)
+key$(O): $(GENERAL_H_FILES)
 
-resources$(O): $(H_FILES)
+resources$(O): $(GENERAL_H_FILES)
 
-platform$(O): $(H_FILES)
+platform$(O): $(GENERAL_H_FILES)
 
-string$(O): $(H_FILES)
+string$(O): $(GENERAL_H_FILES)
 
-chartype$(O): $(H_FILES)
+chartype$(O): $(GENERAL_H_FILES)
 
-encoding$(O): $(H_FILES)
+encoding$(O): $(GENERAL_H_FILES)
 
-chartype/usascii$(O): $(H_FILES)
+chartype/usascii$(O): $(GENERAL_H_FILES)
 
-chartype/unicode$(O): $(H_FILES)
+chartype/unicode$(O): $(GENERAL_H_FILES)
 
-exceptions$(O): $(H_FILES)
+exceptions$(O): $(GENERAL_H_FILES)
 
-encoding/singlebyte$(O): $(H_FILES)
+encoding/singlebyte$(O): $(GENERAL_H_FILES)
 
-encoding/utf8$(O): $(H_FILES)
+encoding/utf8$(O): $(GENERAL_H_FILES)
 
-encoding/utf16$(O): $(H_FILES)
+encoding/utf16$(O): $(GENERAL_H_FILES)
 
-encoding/utf32$(O): $(H_FILES)
+encoding/utf32$(O): $(GENERAL_H_FILES)
 
-interpreter$(O): interpreter.c $(H_FILES)
+interpreter$(O): interpreter.c $(GENERAL_H_FILES)
 
-io/io$(O): $(H_FILES)
+io/io$(O): $(GENERAL_H_FILES)
 
-io/io_stdio$(O): $(H_FILES)
+io/io_stdio$(O): $(GENERAL_H_FILES)
 
-io/io_unix$(O): $(H_FILES)
+io/io_unix$(O): $(GENERAL_H_FILES)
 
-io/io_win32$(O): $(H_FILES)
+io/io_win32$(O): $(GENERAL_H_FILES)
 
-memory$(O): $(H_FILES)
+memory$(O): $(GENERAL_H_FILES)
 
-packfile$(O): $(H_FILES)
+packfile$(O): $(GENERAL_H_FILES)
 
-parrot$(O): $(H_FILES)
+parrot$(O): $(GENERAL_H_FILES)
 
-register$(O): $(H_FILES)
+register$(O): $(GENERAL_H_FILES)
 
-rx$(O): $(H_FILES)
+rx$(O): $(GENERAL_H_FILES)
 
-rxstacks$(O): $(H_FILES)
+rxstacks$(O): $(GENERAL_H_FILES)
 
-stacks$(O): $(H_FILES)
+stacks$(O): $(GENERAL_H_FILES)
 
-embed$(O): $(H_FILES)
+embed$(O): $(GENERAL_H_FILES)
 
-core_ops$(O): $(H_FILES) core_ops.c
+core_ops$(O): $(GENERAL_H_FILES) core_ops.c
 
 core_ops.c $(INC)/oplib/core_ops.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl C $(OPS_FILES)
 
-core_ops_prederef$(O): $(H_FILES) core_ops_prederef.c
+core_ops_prederef$(O): $(GENERAL_H_FILES) core_ops_prederef.c
 
 core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: $(OPS_FILES) ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
 	$(PERL) ops2c.pl CPrederef $(OPS_FILES)
