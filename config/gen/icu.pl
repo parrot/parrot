@@ -20,14 +20,24 @@ use Cwd qw(cwd);
 
 $description="Configuring ICU if requested...";
 
-@args=qw(buildicu verbose icudatadir);
+@args=qw(buildicu verbose icudatadir icuplatform icuconfigureargs);
 
 sub runstep {
-  my ($buildicu, $verbose, $icudatadir) = @_;
+  my ($buildicu, $verbose, $icudatadir, $icuplatform, $icuconfigureargs) = @_;
+  my $icu_configure_command;
 
   if( !defined $icudatadir )
   {
 	  $icudatadir = 'blib/lib/icu/2.6.1';
+  }
+
+  if( defined $icuplatform )
+  {
+	  $icu_configure_command = "./runConfigureICU $icuplatform";
+  }
+  else
+  {
+	  $icu_configure_command = "./configure";
   }
 
   Configure::Data->set( icudatadir => $icudatadir );
@@ -137,9 +147,14 @@ RULES
     return;
   }
 
-  # Below we use a configure line suggested by icu/README.parrot
+  if( !defined $icuconfigureargs )
+  {
   my $cwd = cwd();
 
+      # Default to a configure line suggested by icu/README.parrot
+	  $icuconfigureargs = "--disable-layout --disable-tests --disable-samples --quiet '--prefix=$cwd/blib' --enable-static --disable-shared --disable-extras '--oldincludedir=$cwd/blib/old' --with-data-packaging=archive";
+  }
+  
   Configure::Data->set(
     buildicu => 1,
     icu_headers => 'blib/include/unicode/ucnv.h blib/include/unicode/utypes.h blib/include/unicode/uchar.h',
@@ -164,7 +179,7 @@ icu.clean :
 \$(ICU_H_FILES) : \$(LIBICUCORE)
 
 \$(LIBICUCORE) \$(LIBICUDATA) :
-	cd icu/source; ./configure --disable-layout --disable-tests --disable-samples --quiet '--prefix=$cwd/blib' --enable-static --disable-shared --disable-extras '--oldincludedir=$cwd/blib/old' --with-data-packaging=archive
+	cd icu/source; $icu_configure_command $icuconfigureargs
 	\$(MAKE_C) icu/source/stubdata install
 	\$(MAKE_C) icu/source/common install
 	\$(MAKE_C) icu/source/i18n

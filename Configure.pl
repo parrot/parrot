@@ -167,9 +167,23 @@ Determine the type of garbage collection. The value for C<type> should
 be one of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is
 C<gc>.
 
+=back
+
+ICU Options
+
+=over
+
+=item C<--icuplatform=(platform)>
+
+Use the given platform name to pass to ICU's runConfigureICU. (See icu/source/runConfigureICU for the list of available "platform" names, which specify both operating system and compiler.)
+
+=item C<--icuconfigureargs=(arguments)>
+
+Pass the given arguments to ICU's configuration script, instead of the default.
+
 =item C<--icudatadir=(path)>
 
-Use the given directory to locate ICU's data file(s)
+Use the given directory to locate ICU's data file(s) at runtime
 
 =back
 
@@ -279,7 +293,11 @@ Parrot Options:
    --gc=(type)          Determine the type of garbage collection
                         type=(gc|libc|malloc|malloc-trace) default is gc
 
-   --icudatadir=(path)  Use the given directory to locate ICU's data file(s)
+ICU Options:
+
+   --icuplatform=(platform)   Platform name to pass to ICU's runConfigureICU
+   --icuconfigureargs=(args)  Arguments to pass to ICU's configuration script
+   --icudatadir=(path)        Directory to locate ICU's data file(s)
 
 Other Options (may not be implemented):
 
