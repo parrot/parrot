@@ -5,7 +5,7 @@
  *  Overview:
  *      This is the Parrot IO subsystem API.  Generic IO stuff
  *      goes here, each specific layer goes in its own file...
- *      (io_os, io_stdio, io_utf8, etc.)
+ *      (io_unix, io_win32, io_stdio, io_utf8, etc.)
  *  Data Structure and Algorithms:
  *      Uses the IO PMC defined in io.h
  *      Uses ParrotIO structs in io.h 
@@ -45,7 +45,7 @@ PMC * new_io_pmc(theINTERP, ParrotIO * io) {
 
 void free_io_header(ParrotIO *io) {
         /* Free buffer if it was malloced */
-        if( io->b.startb && (io->flags&PIO_F_MALLOC) )
+        if( io->b.startb && (io->b.flags&PIO_BF_MALLOC) )
                 free(io->b.startb);
         free(io);
 }
@@ -69,8 +69,6 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
         new_io->mode = mode;
         new_io->stack = pio_default_stack;
         new_io->b.startb = NULL;
-        new_io->b.endw = NULL;
-        new_io->b.endr = NULL;
         new_io->b.endb = NULL;
         new_io->b.next = NULL;
         return new_io;

@@ -56,6 +56,12 @@ INTVAL          PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO * io,
 PIOOFF_T        PIO_stdio_tell(theINTERP, ParrotIOLayer * l,
                         ParrotIO * io);
 
+/* Local util functions */
+size_t          PIO_stdio_writethru(theINTERP, ParrotIOLayer * layer,
+                ParrotIO * io, const void * buffer, size_t len);
+
+
+
 
 INTVAL PIO_stdio_init(theINTERP, ParrotIOLayer * layer) {
         if(pio_stdout)
@@ -107,23 +113,23 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 b->size = PIO_getblksize(io->fd);
         }
         else {
-                b->size = bufsize;
+                b->size = (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN);
         }
 
-        if( b->startb && (io->flags & PIO_F_MALLOC) ) {
+        if( b->startb && (b->flags & PIO_BF_MALLOC) ) {
                 free(b->startb);
-                b->startb = NULL;
+                b->startb = b->next = NULL;
         }
 
         if( b->size > 0 ) {
-                b->startb = b->next = b->endw = b->endr = malloc(bufsize);
-                io->flags |= PIO_F_MALLOC;
+                b->startb = b->next = malloc(b->size);
+                b->flags |= PIO_BF_MALLOC;
         }
 
         if( bufsize != 0 )
-                io->flags |= PIO_F_BUF;
+                io->flags |= PIO_F_BLKBUF;
         else
-                io->flags &= ~(PIO_F_BUF|PIO_F_LINEBUF);
+                io->flags &= ~(PIO_F_BLKBUF|PIO_F_LINEBUF);
 
         return 0;
 }
@@ -135,7 +141,7 @@ INTVAL PIO_stdio_setlinebuf(theINTERP, ParrotIOLayer * l, ParrotIO * io) {
         if((err = PIO_stdio_setbuf(interpreter, l, io,
                         PIO_LINEBUFSIZE)) >= 0) {
                 /* Then switch to linebuf */
-                io->flags &= ~PIO_F_BUF;
+                io->flags &= ~PIO_F_BLKBUF;
                 io->flags |= PIO_F_LINEBUF;
                 return 0;
         }
@@ -177,38 +183,39 @@ INTVAL PIO_stdio_close(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 
 
 void PIO_stdio_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
-        UNUSED (interpreter); UNUSED (layer); UNUSED (io);
-#if 0
-        size_t err;
-        size_t to_write;
-        if( !io->out.buf || io->out.buf == io->out.head )
+        long    wrote;
+        size_t  to_write;
+        /*
+         * Either buffering is null, disabled, or empty.
+         */
+        if(!io->b.startb
+                || (io->flags&(PIO_F_BLKBUF|PIO_F_LINEBUF)) == 0
+                || (io->b.flags&(PIO_BF_WRITEBUF|PIO_BF_READBUF)) == 0)
                 return;
-        if( io->out.head )
-                to_write = io->out.head - io->out.buf;
-        else to_write = io->out.bufsize;
+        /*
+         * Write flush
+         */
+        if(io->b.flags & PIO_BF_WRITEBUF) {
+                ParrotIOLayer * l = layer;
+                to_write = io->b.next - io->b.startb;
 
-        /* Flush to next layer */
-        write_buffer:
-        err = write(io->fd, io->out.buf, to_write);
-#if 0
-        if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                fprintf(stderr, "PIO_flush: Flushed %d bytes\n", to_write);
-        }
-#endif
-        if( err >= 0 ) {
-                io->out.head = io->out.buf;
-                return;
-        }
-        else {
-                switch(errno) {
-                        case EAGAIN:    return;
-#ifdef EINTR
-                        case EINTR:     goto write_buffer;
-#endif
-                        default:        return;
+                /* Flush to next layer */
+                wrote = PIO_stdio_writethru(interpreter, l, io,
+                                                io->b.startb, to_write);
+                if(wrote == (long)to_write) {
+                        io->b.next = io->b.startb;
+                        /* Release buffer */
+                        io->b.flags &= ~PIO_BF_WRITEBUF;
+                        return;
                 }
+                else {
+                        /* FIXME: I/O Error */
+                }
+        } else  {
+                /* Read flush */
+                io->b.flags &= ~PIO_BF_READBUF;
+                io->b.next = io->b.startb;
         }
-#endif
 }
 
 
@@ -222,9 +229,71 @@ size_t PIO_stdio_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 
 size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
-        UNUSED (interpreter); UNUSED (layer); UNUSED (io);
-        UNUSED (buffer); UNUSED (len);
-        return 0;
+        size_t  avail;
+        long    wrote;
+        ParrotIOLayer * l;
+
+        if(len <= 0)
+                return 0;
+        if(io->b.flags & PIO_BF_WRITEBUF) {
+                avail = io->b.size - (io->b.next - io->b.startb);
+        } else if(io->b.flags & PIO_BF_READBUF) {
+                io->b.flags |= ~PIO_BF_READBUF;
+                io->b.next = io->b.startb;
+                avail = io->b.size;
+        } else {
+                avail = io->b.size;
+        }
+
+        /*
+         * Large writes (multiples of blocksize) should write
+         * through generally for best performance, else you are
+         * just doing extra memcpys.
+         * FIXME: This is badly optimized, will fixup later.
+         */
+        if(len >= PIO_BLKSIZE) {
+                /* Write through, skip buffer. */
+                PIO_stdio_flush(interpreter, layer, io);
+                wrote = PIO_stdio_writethru(interpreter, layer, io,
+                                                buffer, len);
+                if(wrote == (long)len)
+                        return wrote; 
+                else {
+                        /* FIXME: Write error */
+                }
+        } else if(avail > len) {
+                memcpy(io->b.next, buffer, len);
+                io->b.next += len;
+        } else {
+                /* Fill remainder, flush, then try to buffer more */
+                unsigned int diff = (int)(len - avail);
+                memcpy(io->b.next, buffer, diff);
+                /* We don't call flush here because it clears flag */
+                wrote = PIO_stdio_writethru(interpreter, layer, io,
+                                                io->b.startb, io->b.size);
+                memcpy(io->b.startb, ((const char *)buffer + diff),
+                                        len - diff);
+                io->b.next = io->b.startb + (len - diff);
+                return len;
+        } 
+        return (size_t)-1;
+}
+
+
+/*
+ * Skip buffers, write through.
+ * PIO_stdio_flush() should directly precede a call to this func.
+ */
+size_t PIO_stdio_writethru(theINTERP, ParrotIOLayer * layer,
+                ParrotIO * io, const void * buffer, size_t len) {
+        ParrotIOLayer * l;
+        l = layer;
+        while((l = PIO_DOWNLAYER(l)) != NULL) {
+                if(l->api->Write)
+                        return (*l->api->Write)(interpreter, l, io,
+                                buffer, len);
+        }
+        return (size_t)-1;
 }
 
 
@@ -245,12 +314,17 @@ INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
         int hardseek = 0;
 
         if( io->flags&PIO_F_SHARED ||
-                !(io->flags&(PIO_F_BUF|PIO_F_LINEBUF))) {
+                !(io->flags&(PIO_F_BLKBUF|PIO_F_LINEBUF))) {
                 hardseek = 1;
         }
 
+        if(io->b.flags & (PIO_BF_READBUF|PIO_BF_WRITEBUF)) {
+                /* FIXME: Flush on seek for now */
+                PIO_stdio_flush(interpreter, l, io);
+        }
+
         /*
-         * Try to satisfy seek request in buffer if possible,
+         * TODO : Try to satisfy seek request in buffer if possible,
          * else make IO request.
          */
         internal_exception(IO_NOT_IMPLEMENTED, "Seek not implemented");

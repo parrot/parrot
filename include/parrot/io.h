@@ -44,9 +44,9 @@
 #else
 # define PIO_BLKSIZE  8192
 #endif
-#define PIO_BUFSIZE 4096
-#define PIO_LINEBUFSIZE 256 
-
+#define PIO_LINEBUFSIZE 256     /* Default linebuffer size */
+#define PIO_GRAIN 2048          /* Smallest size for a block buffer */
+#define PIO_BUFSIZE     (PIO_GRAIN * 2)
 
 enum {
         PIO_TYPE_FILE,
@@ -60,15 +60,19 @@ enum {
 #define PIO_F_WRITE     00000002
 #define PIO_F_APPEND    00000004
 #define PIO_F_TRUNC     00000010
+#define PIO_F_EOF       00000020
 #define PIO_F_FILE      00000100
 #define PIO_F_PIPE      00000200
 #define PIO_F_SOCKET    00000400
 #define PIO_F_CONSOLE   00001000        /* A terminal                   */
 #define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
-#define PIO_F_BUF       00020000
-#define PIO_F_MALLOC    00040000        /* Buffer malloced              */
+#define PIO_F_BLKBUF    00020000
 #define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
-#define PIO_F_EOF       01000000
+
+/* Buffer flags */
+#define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
+#define PIO_BF_READBUF  00000002        /* Buffer is read-buffer        */
+#define PIO_BF_WRITEBUF 00000004        /* Buffer is write-buffer       */
 
 
 #define PIO_ACCMODE     0000003
@@ -86,10 +90,9 @@ typedef void *   DummyCodeRef;
                             
             
 struct _ParrotIOBuf {
+        UINTVAL         flags;          /* Buffer specific flags        */
         size_t          size;
         unsigned char * startb;         /* Start of buffer              */
-        unsigned char * endw;           /* End of write buffer          */
-        unsigned char * endr;           /* End of read buffer           */
         unsigned char * endb;           /* End of buffer                */
         unsigned char * next;           /* Current read/write pointer   */
 };

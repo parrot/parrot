@@ -12,6 +12,8 @@ Localize IO stuff to per-interpreter
 
 Copy-on-write IO stacks
 
+Make IO layer cache the vtable calls to the next layer.
+
 Filters
 
 Portable fcntl() replacement for platforms without it
