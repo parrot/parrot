@@ -162,6 +162,9 @@ clean:
 distclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
 
+cvsclean:
+	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()'
+
 test: $(TEST_PROG) assemble.pl .test_dummy
 
 .test_dummy:
