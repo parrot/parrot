@@ -1479,14 +1479,24 @@ void
 PDB_list(struct Parrot_Interp *interpreter, const char *command)
 {
     char *c;
+    long line_number;
     unsigned long i,n = 10;
     PDB_t *pdb = interpreter->pdb;
     PDB_line_t *line;
 
     /* set the list line if provided */
     if (isdigit((int) *command)) {
-        pdb->file->list_line = atol(command) - 1;
+        line_number = atol(command) - 1;
+        if (line_number < 0) {
+            pdb->file->list_line = 0;
+        }
+        else {
+            pdb->file->list_line = (unsigned long) line_number;
+        }
         na(command);
+    }
+    else {
+        pdb->file->list_line = 0;
     }
 
     /* set the number of lines to print */
@@ -1494,6 +1504,9 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
         n = atol(command);
         na(command);
     }
+
+    /* if n is zero, we simply return, as we don't have to print anything */
+    if (n == 0) return;
 
     line = pdb->file->line;
 
