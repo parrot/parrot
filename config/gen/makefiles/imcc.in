@@ -43,7 +43,7 @@ LINKFLAGS=${linkflags} ${ld_debug}
 all : imcc${exe}
 
 ../../$(PARROTLIB): ../../parrot$(EXE)
-	cd ../.. && $(MAKE) $(PARROTLIB)
+	cd ..${slash}.. && $(MAKE) $(PARROTLIB) && cd languages${slash}imcc
 
 .PHONY : FORCE
 FORCE :

@@ -11,6 +11,7 @@
 #  define EX_SOFTWARE 1
 #  define EX_NOINPUT 1
 #  define EX_IOERR 1
+#  define EX_USAGE 1
 #  define EX_UNAVAILABLE 1
 #endif
 
