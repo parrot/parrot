@@ -18,6 +18,8 @@ pmclass ManagedStruct extends UnManagedStruct {
 
     void init () {
       PObj_active_destroy_SET(SELF);
+      SELF->cache.int_val = 0;
+      SELF->data = NULL;
     }
 
     void destroy () {
@@ -30,4 +32,49 @@ pmclass ManagedStruct extends UnManagedStruct {
         return whoami;
     }
 
+    /* For out of bounds gets, will return -1 */
+    INTVAL get_integer_keyed(PMC* key) {
+		INTVAL ix;
+		
+		if (!key) return -1;
+        ix = key_integer(INTERP, key);
+        if (ix < 0) return -1;
+		if (ix > SELF->cache.int_val) 
+			return -1;
+		return  (unsigned char)((char *)SELF->data)[ix];      
+        
+    }
+    
+    /* For out of bounds sets, will do noop */
+    void set_integer_keyed (PMC* key, INTVAL value) {
+		INTVAL ix;
+		
+        if (!key) return;
+        ix = key_integer(INTERP, key);
+        if (ix < 0) return;
+		if (ix > SELF->cache.int_val)
+			return;
+		((char *)SELF->data)[ix]=(0xff & value);
+		return;
+	}
+   
+ 	INTVAL get_integer () {
+		return(SELF->cache.int_val);
+	}
+
+    void set_integer_native (INTVAL value) {
+		if (SELF->data && (! value)) {
+			free(SELF->data);
+			SELF->data=NULL;
+			SELF->cache.int_val = 0;
+		} else if (value && (! SELF->data)) {
+			SELF->data=mem_sys_allocate_zeroed(value);
+			SELF->cache.int_val=value;
+		} else if (value && SELF->data) {
+			SELF->data=mem_sys_realloc(SELF->data, value);
+			SELF->cache.int_val=value;
+		}	
+		return;
+	}
+    
 }

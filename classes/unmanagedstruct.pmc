@@ -41,65 +41,26 @@ pmclass UnManagedStruct {
         return SELF->data != NULL;
     }
     
-    void destroy () {
-	   if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF))
-			mem_sys_free(SELF->data);
-    }
-    
-    /* For out of bounds gets, will return -1 */
+    /* May cause segfaults if value is out of bounds */
     INTVAL get_integer_keyed(PMC* key) {
 		INTVAL ix;
 		
 		if (!key) return -1;
         ix = key_integer(INTERP, key);
         if (ix < 0) return -1;
-        if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
-			if (ix > SELF->cache.int_val) 
-				return -1;
-		} 
 		return  (unsigned char)((char *)SELF->data)[ix];      
         
     }
     
-    /* For out of bounds sets, will do noop */
+    /* May cause segfaults if value is out of bounds */
     void set_integer_keyed (PMC* key, INTVAL value) {
 		INTVAL ix;
 		
         if (!key) return;
         ix = key_integer(INTERP, key);
         if (ix < 0) return;
-        if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
-			if (ix > SELF->cache.int_val)
-				return;
-		}
 		((char *)SELF->data)[ix]=(0xff & value);
 		return;
 	}
-	INTVAL get_integer () {
-		if (PObj_flag_TEST(UnManagedStruct_my_memory, SELF)) {
-			return(SELF->cache.int_val);
-		}
-		return(0);
-	}
-    
-    void set_integer_native (INTVAL value) {
-		if (SELF->data && (! value)) {
-			free(SELF->data);
-			SELF->data=NULL;
-			PObj_flag_CLEAR(UnManagedStruct_my_memory, SELF);
-			PObj_active_destroy_CLEAR(SELF);
-			SELF->cache.int_val = 0;
-		} else if (value && (! SELF->data)) {
-			SELF->data=mem_sys_allocate_zeroed(value);
-			SELF->cache.int_val=value;
-			PObj_flag_SET(UnManagedStruct_my_memory, SELF);
-			PObj_active_destroy_SET(SELF);
-		} else if (value && SELF->data) {
-			SELF->data=mem_sys_realloc(SELF->data, value);
-			SELF->cache.int_val=value;
-			PObj_flag_SET(UnManagedStruct_my_memory, SELF);
-			PObj_active_destroy_SET(SELF);
-		}	
-		return;
-	}
+  
 }
