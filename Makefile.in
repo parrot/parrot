@@ -63,7 +63,7 @@ $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h $(INC)/oplib/core_ops_prederef.h \
 $(INC)/runops_cores.h $(INC)/trace.h \
 $(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h \
-$(INC)/interp_guts.h ${jit_h} ${jit_struct_h} $(INC)/rx.h
+$(INC)/interp_guts.h ${jit_h} ${jit_struct_h}
 
 CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
 classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O) \
