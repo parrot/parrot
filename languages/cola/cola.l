@@ -27,6 +27,7 @@ LETTERDIGIT     [a-zA-Z0-9_]
 SIGN            [-+]
 STRINGCONSTANT  \"[^"\n]*["\n]
 CHARCONSTANT    \'[^'\n]*\'
+RANKSPEC        \[[,]*\]
 
 %%
 
@@ -79,34 +80,45 @@ CHARCONSTANT    \'[^'\n]*\'
 "while"         return(WHILE);
 
 
-{LETTER}{LETTERDIGIT}*      {
-                                Symbol * s;
-                                s = new_symbol(IDENTIFIER, yytext);
-                                s->line = line;
-                                yylval.sym = s; 
-                                return(IDENTIFIER);
-                            }
+{LETTER}{LETTERDIGIT}* {
+        Symbol * s;
+        s = new_identifier_symbol(yytext);
+        s->line = line;
+        yylval.sym = s; 
+        return(IDENTIFIER);
+    }
 
-{SIGN}?{DIGIT}+"."{DIGIT}+  {    
-                                Symbol * s = new_symbol(LITERAL, yytext);
-                                s->type = t_float;
-                                yylval.sym = s; 
-                                return(LITERAL);
-                            }
+{SIGN}?{DIGIT}+"."{DIGIT}+ {    
+        Symbol * s = new_literal_symbol(yytext);
+        s->type = t_float;
+        yylval.sym = s; 
+        return(LITERAL);
+    }
 
-{SIGN}?{DIGIT}+             {    
-                                Symbol * s = new_symbol(LITERAL, yytext);
-                                s->type = t_int32;
-                                yylval.sym = s; 
-                                return(LITERAL);
-                            }
+{SIGN}?{DIGIT}+ {    
+        Symbol * s = new_literal_symbol(yytext);
+        s->type = t_int32;
+        yylval.sym = s; 
+        return(LITERAL);
+    }
 
-{STRINGCONSTANT}            {
-                                Symbol * s = new_symbol(LITERAL, yytext);
-                                s->type = t_string;
-                                yylval.sym = s;
-                                return(LITERAL);
-                            }
+{STRINGCONSTANT} {
+        Symbol * s = new_literal_symbol(yytext);
+        s->type = t_string;
+        yylval.sym = s;
+        return(LITERAL);
+    }
+
+{RANKSPEC}    {
+        /* 
+         * This might bite me in the butt later, but its easier to offload
+         * this to the lexer. [], [,], etc.
+         */
+        Symbol * s = new_literal_symbol(yytext);
+        fprintf(stderr, "Rank spec /%s/\n", s->name);
+        yylval.sym = s;
+        return(RANKSPEC);
+    }
 
 "++"            return(INC);
 "--"            return(DEC);

@@ -46,7 +46,7 @@ unsigned int hash_str(const char * str) {
 
 void init_symbol_tables() {
     /* The global namespace with no name */
-    global_namespace = new_symbol(NAMESPACE, "");
+    global_namespace = mk_namespace_symbol(new_symbol(""));
     current_namespace = global_namespace;
     current_namespace->table = global_symbol_table = new_symbol_table();
     current_symbol_table = global_symbol_table;
@@ -62,28 +62,47 @@ SymbolTable * new_symbol_table() {
     return tab;
 }
 
-Symbol * new_symbol(int kind, const char * name) {
-    Symbol * ret = malloc(sizeof(Symbol));
-    assert(ret);
-    ret->kind = kind;
-    ret->name = str_dup(name);
-    ret->scope = scope;
-    ret->type = NULL;
-    ret->is_lval = 1;
-    ret->init_expr = NULL;
-    ret->table = NULL;
-    ret->literal = ret->next = ret->tnext = NULL;
-    return ret;
+Symbol * new_symbol(const char * name) {
+    Symbol * s = malloc(sizeof(Symbol));
+    assert(s);
+    s->kind = 0;
+    s->name = str_dup(name);
+    s->scope = scope;
+    s->typename = NULL;
+    s->type = NULL;
+    s->is_lval = 1;
+    s->init_expr = NULL;
+    s->table = NULL;
+    s->literal = s->next = s->tnext = NULL;
+    return s;
 }
 
-Symbol * new_namespace(Symbol * identifier) {
-    Symbol * ns = identifier;    
-    ns->kind = NAMESPACE;
-    ns->table = new_symbol_table();
-    return ns;
+Symbol * new_identifier_symbol(const char * name) {
+    Symbol * s = new_symbol(name);
+    s->kind = IDENTIFIER;
+    return s;
 }
 
-Symbol * new_class(Symbol * identifier) {
+Symbol * new_literal_symbol(const char * name) {
+    Symbol * s = new_symbol(name);
+    s->kind = LITERAL;
+    return s;
+}
+
+Symbol * new_type_symbol(const char * name) {
+    Symbol * s = new_symbol(name);
+    s->kind = TYPE;
+    return s;
+}
+
+Symbol * mk_namespace_symbol(Symbol * identifier) {
+    Symbol * s = identifier;    
+    s->kind = NAMESPACE;
+    s->table = new_symbol_table();
+    return s;
+}
+
+Symbol * mk_class_symbol(Symbol * identifier) {
     Type * t = store_type(identifier->name, 0);
 #if 0
     printf("#new_class(%s)\n", identifier->name);
@@ -93,9 +112,41 @@ Symbol * new_class(Symbol * identifier) {
     return t->sym;
 }
 
-Symbol * new_method(Symbol * rettype, const char * name, const char * sig) {
-    Symbol * ret = new_symbol(METHOD, name);
-    return ret;
+Symbol * mk_method_symbol(Symbol * rettype, const char * name, const char * sig) {
+    Symbol * s = new_symbol(name);
+    s->kind = METHOD;
+    return s;
+}
+
+Symbol * symbol_concat(Symbol * s1, Symbol * s2) {
+    int len = strlen(s1->name) + strlen(s2->name) + 1;
+    Symbol * s = new_symbol("");
+    s->name = malloc(len);
+    strcpy(s->name, s1->name);
+    strcat(s->name, s2->name);
+    return s;
+}
+
+Symbol * symbol_join3(Symbol * s1, Symbol * s2, Symbol * s3) {
+    int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) + 1;
+    Symbol * s = new_symbol("");
+    s->name = malloc(len);
+    strcpy(s->name, s1->name);
+    strcat(s->name, s2->name);
+    strcat(s->name, s3->name);
+    return s;
+}
+
+Symbol * symbol_join4(Symbol * s1, Symbol * s2, Symbol * s3, Symbol * s4) {
+    int len = strlen(s1->name) + strlen(s2->name) + strlen(s3->name) +
+                strlen(s4->name) + 1;
+    Symbol * s = new_symbol("");
+    s->name = malloc(len);
+    strcpy(s->name, s1->name);
+    strcat(s->name, s2->name);
+    strcat(s->name, s3->name);
+    strcat(s->name, s4->name);
+    return s;
 }
 
 AST * new_ast(enum ASTKIND kind, int asttype, AST * arg1, AST * arg2) {
@@ -185,11 +236,17 @@ void tunshift_sym(Symbol ** list, Symbol * p) {
         abort();
     }
     if(l != NULL) {
-        while(l->tnext)
+        fprintf(stderr, "!!sym %s\n", l->name);
+        while(l->tnext) {
             l = l->tnext;
+            fprintf(stderr, "!!sym %s\n", l->name);
+        }
         l->tnext = p;
     }
-    else *list = p;
+    else {
+        fprintf(stderr, "!!tunshift onto null list\n");
+        *list = p;
+    }
 }
 
 /* Return the top symbol on the stack. */
@@ -290,11 +347,58 @@ AST * new_for(AST * init, AST * condition, AST * iteration, AST * block) {
     return p;     
 }
 
-
+/*
+ *  Only using first char of pattern for now.
+ */
+Symbol * split(const char * pattern, const char * s) {
+    char c = pattern[0];
+    Symbol * l = NULL;
+    const char * p;
+    int len;
+    if(!strstr(s, pattern))
+	return new_symbol(s);
+AGAIN:
+    for(p = s, len = 0; p[len] && p[len] != c; p++) {
+        len++;
+    }
+    if(len) {
+        Symbol * n = new_symbol("");
+	n->name = malloc(len+1);
+	strncpy(n->name, p, len);
+	n->name[len] = '\0';
+        tunshift_sym(&l, n);
+    }
+    if(!p[len])
+        return l;
+    else {
+	p += len;
+	goto AGAIN;
+    }
+}
 /*
  * Return first occurence of symbol in surrounding scopes.
  */
-Symbol * lookup_symbol(SymbolTable * tab, const char * name) {
+Symbol * lookup_symbol(const char * name) {
+    Symbol * ns = current_namespace;
+    Symbol * list = split(".", name);
+    Symbol * s;
+    fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name); 
+    for(ns = current_namespace; ns; ) {
+        if((s = lookup_symbol_in_tab(ns->table, list->name))) {
+	    ns = s;
+	    list = list->tnext;
+            if(!list || !s)
+	        return s;
+	}
+	else {
+            ns = ns->tnext;
+	}
+    }
+    
+    return NULL;
+}
+
+Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name) {
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
     for(sym_ptr = tab->table[ index ]; sym_ptr; sym_ptr = sym_ptr->next)    {
@@ -361,10 +465,23 @@ Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     return sym;
 }
 
-Symbol * store_identifier(SymbolTable * tab, const char * name, int kind, Type * type) {
+Symbol * store_identifier(SymbolTable * tab, const char * name, Type * type) {
     Symbol * s;
-    s = new_symbol(kind, name);
+    s = new_symbol(name);
+    s->kind = IDENTIFIER;
     s->type = type;
+    s->typename = type->sym;
+    s->scope = scope;
+    store_symbol(tab, s);
+    return s;
+}
+
+Symbol * store_method(SymbolTable * tab, const char * name, Type * type) {
+    Symbol * s;
+    s = new_symbol(name);
+    s->kind = METHOD;
+    s->type = type;
+    s->typename = type->sym;
     s->scope = scope;
     store_symbol(tab, s);
     return s;
@@ -440,7 +557,7 @@ Symbol * check_id_redecl(SymbolTable * table, const char * name) {
 
 Symbol * check_id_decl(SymbolTable * table, const char * name) {
     Symbol * t;
-    if((t = lookup_symbol(table, name)) == NULL)
+    if((t = lookup_symbol_in_tab(table, name)) == NULL)
         return NULL;
     return t;
 }
@@ -504,15 +621,12 @@ char * str_dup(const char * old) {
     return copy;
 }
 
-/* Take a list of identifiers and convert to a C string.
- * Examples:    System.Types.Foo
- */
-char * symbol_to_str(Symbol * t) {
-    int len;
-    char buf[1024 * 2];
-    len = sprintf(buf, "%s", t->name);
-    for(t = t->tnext; t; t = t->tnext)
-        len += sprintf(buf + len, ".%s", t->name);       
-    return str_dup(buf);
+char * str_cat(const char * s1, const char * s2) {
+    int len = strlen(s1) + strlen(s2) + 1;
+    char * s3 = malloc(len);
+    strcpy(s3, s1);
+    strcat(s3, s2);
+    return s3;
 }
+
 

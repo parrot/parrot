@@ -128,7 +128,7 @@ sub alloc_reg {
             warn "Oops: No more $type registers\n";
             return undef;
         }
-        print STDERR ">>#Allocing reg $type$reg\n";
+        #print STDERR ">>#Allocing reg $type$reg\n";
         return "$type$reg";
     } else {
         die "No register type [$type]\n";
@@ -333,6 +333,7 @@ sub read_program {
     }
 
     print STDERR "int2pasm finished successfully.\n";
+    print STDERR "Compiled to a.pasm\n";
 }
 
 sub directive {

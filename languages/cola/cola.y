@@ -43,15 +43,15 @@ AST         *ast_start = NULL;
 %token NEW PUBLIC PROTECTED INTERNAL PRIVATE ABSTRACT STATIC SEALED VIRTUAL
 %token OVERRIDE EXTERN GET SET
 %token IF ELSE WHILE FOR RETURN BREAK CONTINUE GOTO NULLVAL TYPE
-%token <sym> IDENTIFIER LITERAL
+%token <sym> IDENTIFIER LITERAL RANKSPEC
 %token <ival> INC DEC LOGICAL_AND LOGICAL_OR LOGICAL_EQ LOGICAL_NE
 %token <ival> LOGICAL_LTE LOGICAL_GTE
 %token <ival> LEFT_SHIFT RIGHT_SHIFT INDEX
 
 %token TYPE METHOD
 
-%type <type> type_name type return_type array_type non_array_type
-%type <type> simple_type primitive_type struct_type enum_type
+%type <sym> type_name type return_type array_type
+%type <sym> primitive_type integral_type
 %type <sym> member_name qualified_identifier
 %type <sym> namespace_scope_start class_scope_start 
 %type <sym> var_declarator var_declarators
@@ -81,13 +81,18 @@ AST         *ast_start = NULL;
 %type <ast> equality_expr relational_expr
 %type <ast> call arg arg_list member_access
 %type <ival> relational_op
-%type <p> rank_specifiers
-%type <ival> dim_separators rank_specifier
-
+%type <sym> rank_specifiers
 
 %left '-' '+'
 %left '*' '/'
+%nonassoc IF
+%nonassoc ELSE
+%right '='
 %nonassoc UMINUS INC DEC
+%left '('
+%left '[' '{'
+%left '.'
+
 %start compilation_unit
 
 %%
@@ -97,7 +102,7 @@ optional_semi    :
         ;
 
 compilation_unit:
-        using_directives attribute_list namespace_member_decls
+    using_directives attribute_list namespace_member_decls
         {
             unshift_ast(&ast_start, $1);
             unshift_ast(&ast_start, $2);
@@ -135,15 +140,16 @@ namespace_decl:
         }
     ;
 
-namespace_scope_start:    NAMESPACE qualified_identifier
+namespace_scope_start:
+    NAMESPACE qualified_identifier
         {
             Symbol *n, *t, *last;
             if(lookup_type_symbol($2)) {
-                printf("Error, redefinition of [%s]\n", symbol_to_str($2));
+                printf("Error, redefinition of [%s]\n", $2->name);
                 exit(0);
             }
             for(n = $2, last=current_namespace; n; n = n->tnext) {
-                t = new_namespace(n);
+                t = mk_namespace_symbol(n);
                 store_symbol(last->table, t);
                 last = n;
             }
@@ -157,13 +163,13 @@ qualified_identifier:
     IDENTIFIER
         {
             $$ = $1;
+#if DEBUG
             fprintf(stderr, "qualified_identifier <- IDENTIFIER(%s)\n", NAME($1));
+#endif
         }
     |   qualified_identifier '.' IDENTIFIER
         {
-            $$ = $1;
-            /* Build a list of ('System', 'Console', 'Write') */
-            tunshift_sym(&($$), $3);
+            $$ = symbol_join3($1, new_symbol("."), $3);
         }
     ;
 
@@ -192,7 +198,8 @@ namespace_member_decl:
     |   class_decl
     ;
 
-class_decl:    class_modifiers class_scope_start class_body optional_semi
+class_decl:
+    class_modifiers class_scope_start class_body optional_semi
         {
             /* Collect class members */
             /*$2->members = pop_scope(current_symbol_table);*/
@@ -215,7 +222,8 @@ class_modifier:
     |    VIRTUAL
     ;
 
-class_body:    '{' class_member_decl_list '}'
+class_body:
+    '{' class_member_decl_list '}'
         { $$ = $2; }
     ;
 
@@ -228,8 +236,10 @@ class_scope_start:
                 printf("Error, redefinition of type [%s]\n", $2->name);
                 exit(0);
             }
+#if DEBUG
             fprintf(stderr, "\nclass_scope_start <- CLASS IDENTIFIER (%s)\n", $2->name);
-            c = new_class($2);
+#endif
+            c = mk_class_symbol($2);
             push_namespace(c);
             push_scope();
             $$ = c;
@@ -246,7 +256,7 @@ class_member_decl_list:
     ;
 
 class_member_decl:
-        decl_statement
+    decl_statement
         { $$ = $1; }
     |   method_decl
         {    $$ = $1; }
@@ -363,7 +373,7 @@ arg_list:
 arg:
         { $$ = NULL; }
     |   expr
-        { fprintf(stderr, " arg <- expr\n"); $$ = $1;    }
+        { $$ = $1;   }
     |   REF
         { $$ = NULL; }
     |   OUT
@@ -420,7 +430,7 @@ return_type:
         }
     |   VOID
         {
-            $$ = t_void;
+            $$ = new_type_symbol("void");
             if($$ == NULL) {
                 printf("Internal compiler error, NULL type for VOID.\n");
                 exit(0);
@@ -429,107 +439,84 @@ return_type:
     ;
 
 type_name:
-    IDENTIFIER
+    qualified_identifier
         {
-            Type * t;
-            fprintf(stderr, " type_name <- IDENTIFIER (%s)\n", $1->name);
-            t = lookup_type($1->name);
-            if(t != NULL) {
-                fprintf(stderr, "Kind [%s] found in type list.\n", t->sym->name);
-                $$ = t;
-            }
-            else {
-                printf("Error, undeclared type [%s]\n", $1->name);
-                exit(0);
-            }
+            fprintf(stderr, "type_name <- qualified_identifier\n");
+            $$ = $1;
         }
     ;
-    
+
 type:
-    array_type
-        {
-            $$ = $1;
-        }
-    |   non_array_type
-        {
-            $$ = $1;
-        }
+    type_name
+    |   primitive_type
+    |   array_type
     ;
 
 primitive_type:
-    INT
-        { $$ = lookup_type("int"); }
+    BOOL
+        { $$ = new_type_symbol("bool"); }
     |   STRING
-        { $$ = lookup_type("string"); }
-    |   BYTE
-        { $$ = lookup_type("byte"); }
+        { $$ = new_type_symbol("string"); }
     |   FLOAT
-        { $$ = lookup_type("float"); }
-    ;
-    
-struct_type:
-    type_name
-    |   simple_type
+        { $$ = new_type_symbol("float"); }
+    |   integral_type
     ;
 
-enum_type:
-    type_name
-    ;
-        
-simple_type:
-    primitive_type
-    |   BOOL
-        { $$ = lookup_type("bool"); }
+integral_type:
+    INT
+        { $$ = new_type_symbol("int"); }
+    |   BYTE
+        { $$ = new_type_symbol("byte"); }
     ;
     
 array_type:
-        simple_type rank_specifiers
+    type rank_specifiers 
         {
-            $$ = (void *)new_array($1, $2);
-            fprintf(stderr, " array_type: array of %s\n", type_name($1));
+            $$ = symbol_concat($1, $2);
+#if DEBUG
+            fprintf(stderr, " array_type: %s\n", $1->name);
+#endif
         }
     ;
-        
-non_array_type:
-    simple_type
-        {
-            $$ = $1;
-            fprintf(stderr, " non_array_type <- simple_type\n");
-        }
-    |   type_name
-    ;
-    
+
 rank_specifiers:
-    rank_specifier
+        RANKSPEC
         {
             /* $1 is the dimension of the current rank */
-            $$ = (void *)new_rank($1);
-            fprintf(stderr, " rank_spec %d\n", $1);
-        }
-    |   rank_specifiers rank_specifier
-        {
             $$ = $1;
-            tunshift((Node **)&($$), (Node*)new_rank($2));
+#if DEBUG
+            fprintf(stderr, " rank_spec /%s/\n", $1->name);
+#endif
+        }
+    |   rank_specifiers RANKSPEC
+        {
+            $$ = symbol_concat($1, $2);
         }
     ;
         
+/*
 rank_specifier:
     '[' dim_separators ']'
-        {   $$ = $2 + 1;
+        {   $$ = symbol_join3(new_symbol("["), $2, new_symbol("]"));
+#if DEBUG
             fprintf(stderr, " rank_spec([ dim_separators ])\n");
+#endif
         }
     |   '[' ']'
-        {   $$ = 1;
+        {   $$ = new_symbol("[]");
+#if DEBUG
             fprintf(stderr, " rank_spec([])\n");
+#endif
         }
     ;
 
 dim_separators:
     ','
-        { $$ = 1; }
+        { $$ = new_symbol(","); }
     |   dim_separators ','
-        { $$ = $1 + 1; }
+        { $$ = symbol_concat($1, new_symbol(",")); }
     ; 
+*/
 
 /*
  * Expressions
@@ -593,20 +580,13 @@ post_dec_expr:
         }
     ;
 
-/*
-postfix_expr:
-        primary_expr
-    |   qualified_identifier
-    |   post_inc_expr
-    |   post_dec_expr
-    ;
-*/
-
 expr:
     conditional_expr
         {
             $$ = $1;
+#if DEBUG
             fprintf(stderr, " expr <- conditional_expr\n");
+#endif
         } 
     |   assignment
     ;
@@ -624,22 +604,26 @@ primary_expr:
         LITERAL
         {
             $$ = new_expr(ASTT_LITERAL, NULL, NULL); $$->sym = $1;
+#if DEBUG
             fprintf(stderr, " primary_expr <- LITERAL(%s)\n", $1->name);
+#endif
         }
     |   qualified_identifier
         {
             Symbol * orig;
-            orig = check_id_decl(current_symbol_table, $1->name);
-            if(orig == NULL)
-                orig = check_id_decl(global_symbol_table, $1->name);
+            orig = lookup_symbol($1->name);
             if(orig == NULL) {
                 printf("error (line %ld): undeclared identifier %s.\n", line, $1->name);
                 exit(0);
             }
-
             $$ = new_expr(ASTT_IDENTIFIER, NULL, NULL);
-            $$->sym = orig;
+            if(orig)
+                $$->sym = orig;
+            else
+                $$->sym = $1;
+#if DEBUG
             fprintf(stderr, "primary_expr <- qualified_identifier_expr\n");
+#endif
         }
     |   '(' expr ')'
         {
@@ -650,12 +634,14 @@ primary_expr:
     |   post_inc_expr
     |   post_dec_expr
     |   new_expr
+/*
     |   member_access
+*/
     ;
  
 unary_expr:
     primary_expr 
-        { $$ = $1; }
+    { $$ = $1; }
     |   '+' unary_expr
         { $$ = $2; $$->op = '+'; }
     |   '-' unary_expr
@@ -672,16 +658,20 @@ call:
     primary_expr '(' arg_list ')'
         {
             $$ = new_expr(ASTT_CALL, $1, $3);
+#if DEBUG
             fprintf(stderr, " call <- primary_expr ( arg_list )\n");
+#endif
         }
     ;
 
 element_access:
-        primary_expr '[' expr ']'
+    primary_expr '[' expr ']'
         {
             $$ = new_expr(ASTT_INDEX, $1, $3);
             $$->op = INDEX;
+#if DEBUG
             fprintf(stderr, " element_access <- primary-expr(pex[ex])\n");
+#endif
         }
     ;
     
@@ -697,7 +687,10 @@ new_object_expr:
     NEW type '(' arg_list ')'
         {
             $$ = new_expr(ASTT_NEW_OBJECT, $4, NULL);
-            $$->type = $2;
+            /* $2 is a Symbol of a typename, will resolve to a real type
+             * in semantic pass.
+             */
+            $$->typename = $2;
         }
     ;
 
@@ -830,13 +823,13 @@ decl_statement:
         { $$ = $1;    }
     |   CONST type IDENTIFIER '=' LITERAL ';'
         {
-            $3->type = $2;
+            $3->typename = $2;
             $3->literal = $5;
             check_id_redecl(current_symbol_table, $3->name);
             store_symbol(current_symbol_table, $3); 
             $$ = new_statement(ASTT_CONSTANT_DECL, NULL, NULL);
-            $$->sym = $3;
-            if(lookup_symbol(current_symbol_table, $$->sym->name)) {
+            $$->typename = $3;
+            if(lookup_symbol_in_tab(current_symbol_table, $$->sym->name)) {
                     printf("Warning: declaration of '%s' shadows previous instance.\n",
                             $$->sym->name);
             }
@@ -856,9 +849,9 @@ local_var_decl:
                 abort();
             }
             for(sym=$2; sym; sym=sym->tnext) {
-                sym->type = $1;
+                sym->typename = $1;
                 check_id_redecl(current_symbol_table, sym->name);
-                if(lookup_symbol(current_symbol_table, sym->name)) {
+                if(lookup_symbol(sym->name)) {
                         printf("Warning: declaration of '%s' shadows previous instance.\n",
                                 sym->name);
                 }
@@ -889,12 +882,16 @@ var_declarator:
     IDENTIFIER
     {
         $$ = $1;
+#if DEBUG
         fprintf(stderr, " var_declarator <- IDENTIFIER(%s)\n", $1->name);
+#endif
     }
     |   IDENTIFIER '=' expr
         {
             $$ = $1; $$->init_expr = $3;
+#if DEBUG
             fprintf(stderr, " var_declarator <- IDENTIFER(%s)=init_expr\n", $1->name);
+#endif
         }
 /*
     |   IDENTIFIER '=' array_initializer
@@ -918,7 +915,7 @@ method_header:
             Symbol * param;
             $$ = new_statement(ASTT_METHOD_DECL, NULL, NULL);
             $3->kind = METHOD;
-            $3->type = $2;
+            $3->typename = $2;
             $$->sym = $3;
 
             $$->Attr.Method.params = $5;
@@ -964,8 +961,10 @@ fixed_params:
 fixed_param:
     type IDENTIFIER
         {
+#if DEBUG
             fprintf(stderr, " fixed_param <- type IDENTIFIER(%s)\n", $2->name);
-            $2->type = $1;
+#endif
+            $2->typename = $1;
             $$ = $2;
         }
     ;
@@ -984,10 +983,12 @@ param_array:
 member_name:
     IDENTIFIER
         {
+#if DEBUG
             fprintf(stderr, " member_name <- IDENTIFIER (%s)\n", $1->name);
+#endif
             $$ = $1;
             check_id_redecl(current_symbol_table, $1->name);
-            if(lookup_symbol(current_symbol_table, $1->name)) {
+            if(lookup_symbol_in_tab(current_symbol_table, $1->name)) {
                     printf("Warning: declaration of '%s' shadows previous instance.\n",
                             $1->name);
             }
@@ -1028,21 +1029,27 @@ int main(int argc, char * argv[])
      * and emitting them.
      */
     {
-        store_identifier(current_symbol_table, "puts", METHOD, t_void); 
-        store_identifier(current_symbol_table, "puti", METHOD, t_void);
-        store_identifier(current_symbol_table, "putf", METHOD, t_void);
-        store_identifier(current_symbol_table, "gets", METHOD, t_string);
-        store_identifier(current_symbol_table, "substr", METHOD, t_string);
-        store_identifier(current_symbol_table, "strlen", METHOD, t_int32);
-        store_identifier(current_symbol_table, "strchop", METHOD, t_string);
-        store_identifier(current_symbol_table, "strrep", METHOD, t_string);
-        store_identifier(current_symbol_table, "ord", METHOD, t_int32);
-        store_identifier(current_symbol_table, "sleep", METHOD, t_void);
+        store_method(current_symbol_table, "puts", t_void); 
+        store_method(current_symbol_table, "puti", t_void);
+        store_method(current_symbol_table, "putf", t_void);
+        store_method(current_symbol_table, "gets", t_string);
+        store_method(current_symbol_table, "substr", t_string);
+        store_method(current_symbol_table, "strlen", t_int32);
+        store_method(current_symbol_table, "strchop", t_string);
+        store_method(current_symbol_table, "strrep", t_string);
+        store_method(current_symbol_table, "ord", t_int32);
+        store_method(current_symbol_table, "sleep", t_void);
     }
 
-    printf("#Starting parse...\n");
+    fprintf(stderr, "Pass 1: Starting parse...\n");
     yyparse();
     fclose(yyin);
+
+    fprintf(stderr, "Pass 2: Type checking...\n");
+    do_ast_type_resolution(ast_start);
+
+    fprintf(stderr, "Pass 3: Semantic checking...\n");
+    /*do_semantic_check(ast_start); */
 
     freopen("a.imc", "w", stdout);
     fprintf(stderr, "Compiling intermediate code to a.imc\n");      
@@ -1054,6 +1061,8 @@ int main(int argc, char * argv[])
     printf("# Cola (%s) generated\n#\n", COLA_VERSION);
     printf("_START:\n\tpusharg \"\"\n\tcall __Main\n");
     printf("__END:\n\tend\n\n");
+
+    fprintf(stderr, "Pass 4: Code generation...\n");
 
     if(ast_start) {
         gen_ast(ast_start);

@@ -1,6 +1,6 @@
 "Cola" - A compiler for the Parrot VM
 
-  V0.0.4
+  V0.0.4.6
 
   I've started this compiler (I call it Cola) to simultaneously
   teach myself how to write a compiler (ok I admit I squeaked
@@ -20,11 +20,6 @@
   optimization and a few other specifics to the intermediate
   compiler (int2pasm.pl).
 
-  I will admit, int2pasm.pl is not well written; it was hacked
-  a bit at a time, however it works for the limited time
-  I put into it, and later I'll sit down and redo it with a grammar.
-  To read more about the intermediate code see below.
-
 
 The Syntax
 
@@ -33,9 +28,9 @@ The Syntax
   The easiest way to see what it currently looks like is
   to read the examples.
 
-  I plan to implement a C# imitation library and keep
-  to the C# syntax mainly because I like a few things
-  C# has over Java.
+  I aim to eventually achieve C# source level compliance, targetted
+  to the Parrot runtime. Whether or not we do on the fly bytecode
+  interfacing with .NET later is a whole different rhinoceros.
 
 
 Supported Constructs
@@ -147,8 +142,11 @@ Using the Compiler
 
 	colac examples/mandelbrot.cola
 
-  Then copy "a.pasm" to your Parrot directory and assemble and run
-  as usual.
+  Then copy "a.pasm" to your Parrot directory, assemble it and run
+  as usual. In case you need help there to, try:
+
+        assemble.pl a.pasm > a.pbc
+        parrot a.pbc
 
   Also, if you look in "a.imc" you will see an intermediate
   language, delimited by tags (<program>....</program>) with some
@@ -221,7 +219,7 @@ Register Allocation
 
 Optimization
 
-  There is none.
+  Very limited. No explicit optimization phase yet.
 
   You might see dumb code generated in the form of:
 
@@ -261,17 +259,5 @@ Gaping Holes
 
   Object Methods and Field references
     Again, a lot of work, but on the list.
-
-
-
-Whats Next?
-
-  Now that the toy works, I will go away and rewrite it.
-  It served its purpose; I learned some of what not to
-  do, and hopefully 0.1.0 will have a good, extensible design and
-  by then, Parrot will be further along.
-
-  I'll happily patch in little things on the 0.0.x branch however,
-  if anyone cares. :)
 
 

@@ -11,8 +11,9 @@
 #ifndef _COLA_H
 #define _COLA_H
 
-#define COLA_VERSION "0.0.4.5"
+#define COLA_VERSION "0.0.5.0"
 
+#define DEBUG 1
 
 void abort(void);
 void exit(int status);
@@ -91,6 +92,7 @@ typedef struct _Symbol {
      * one of TYPE, LITERAL, VARIABLE, METHOD, NAMESPACE
      */
     int             kind;
+    struct _Symbol  *typename;
     Type            *type;
     AST *           init_expr;
     int             is_lval;
@@ -116,7 +118,8 @@ struct _AST {
     enum ASTKIND    kind;       /* General node class (STATEMENT) */
     int             asttype;    /* Specific node type (IF|ASSIGN|...)*/
     int             op;         /* Operation */
-    Type            *type;
+    Type            *type;      /* Unresolved until type-check pass */
+    Symbol          *typename;
     Symbol          *sym;
     /* Expression generic nodes */
     Symbol          *targ;
@@ -166,7 +169,7 @@ struct _Type {
     int             typeid;
     int             parentid;
     int             size;
-    Symbol          *sym;       /* Pointer to symbol table representing name of type */
+    Symbol          *sym;       /* Pointer to symbol representing name of type */
     /* Array or reference specific infu */
     Type            *type;      /* Element or referenced type */
     /* Array specific info */
@@ -235,7 +238,17 @@ Node                *pop(Node ** list);
 Node                *tpop(Node ** list);
 
 
-Symbol              *new_symbol(int kind, const char * name);
+Symbol              *new_symbol(const char * name);
+Symbol              *new_identifier_symbol(const char * name);
+Symbol              *new_literal_symbol(const char * name);
+Symbol              *new_type_symbol(const char * name);
+Symbol              *mk_namespace_symbol(Symbol *);
+Symbol              *mk_class_symbol(Symbol *);
+Symbol              *mk_method_symbol(Symbol *, const char *, const char *);
+Symbol              *symbol_concat(Symbol *, Symbol *);
+Symbol              *symbol_join3(Symbol *, Symbol *, Symbol *);
+Symbol              *symbol_join4(Symbol *, Symbol *, Symbol *, Symbol *);
+SymbolTable         *new_symbol_table();
 void                push_sym(Symbol ** list, Symbol * p);
 void                tpush_sym(Symbol ** list, Symbol * p);
 void                tunshift_sym(Symbol ** list, Symbol * p);
@@ -245,15 +258,14 @@ void                push_namespace(Symbol * ns);
 Symbol              *pop_namespace();
 void                init_symbol_tables();
 void                init_builtin_types();
-Symbol              *new_namespace(Symbol *);
-Symbol              *new_class(Symbol *);
-SymbolTable         *new_symbol_table();
-Symbol              *lookup_symbol(SymbolTable *, const char *);
+Symbol              *lookup_symbol(const char *);
+Symbol              *lookup_symbol_in_tab(SymbolTable *, const char *);
 Symbol              *lookup_symbol_scope(SymbolTable *, const char *, int);
 Symbol              *lookup_namespace(SymbolTable * tab, const char * name);
 Symbol              *lookup_class(SymbolTable * tab, const char * name);
 Symbol              *store_symbol(SymbolTable *, Symbol *);
-Symbol              *store_identifier(SymbolTable *, const char * name, int kind, Type * t);
+Symbol              *store_identifier(SymbolTable *, const char * name, Type * t);
+Symbol              *store_method(SymbolTable *, const char * name, Type * t);
 int                 push_scope();
 Symbol              *pop_scope(SymbolTable *);
 
@@ -266,16 +278,17 @@ extern int          type_table_size;
 
 Type                *store_type(const char * name, int size);
 Type                *lookup_type(const char * name);
-Symbol              *lookup_type_symbol(Symbol * id);
+Type                *lookup_type_symbol(Symbol * id);
 const char          *type_name(Type *);
 void                coerce_operands(Type ** t1, Type ** t2);
-Type                *new_array(Type * type, Rank * rank);
+Type                *new_array(Symbol * typename, Rank * rank);
 Rank                *new_rank(int dim);
 Symbol              *array_signature(Type * t);
 
-
+void                do_ast_type_resolution(AST * tree);
+void                do_symbol_type_resolution(Symbol * list);
 char                *str_dup(const char *);
-char                *symbol_to_str(Symbol *);
+char                *str_cat(const char *, const char *);
 void                dump_namespace(Symbol * );
 void                dump_symbol_table(SymbolTable * );
 Symbol              *check_id_redecl(SymbolTable * table, const char * name);

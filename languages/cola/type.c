@@ -54,7 +54,9 @@ void init_builtin_types() {
 /* size is bytes or elements, depending on if type is variable or array */
 Type * store_type(const char * name, int size) {
     Type * t = (Type *)malloc(sizeof(*t));
-    Symbol * s = store_identifier(current_symbol_table, name, TYPE, t);
+    Symbol * s = store_symbol(current_symbol_table, new_symbol(name));
+    s->type = t;
+    s->kind = TYPE;
     t->size = size;
     t->kind = TYPE_SCALAR;
     t->typeid = 0;
@@ -75,7 +77,7 @@ Type * lookup_type(const char * name) {
     Symbol * ns;
     Symbol * s;
     for(ns = current_namespace; ns; ns = ns->tnext) {
-        s = lookup_symbol(ns->table, name);
+        s = lookup_symbol_in_tab(ns->table, name);
         if(s != NULL) {
             if(s->kind != TYPE) {
                 fprintf(stderr, "lookup_type(%s) : Error, symbol not a type\n", name );
@@ -91,20 +93,20 @@ Type * lookup_type(const char * name) {
  * identifier can be a list which would resolve it
  * to nested namespace.
  */
-Symbol * lookup_type_symbol(Symbol * id) {
+Type * lookup_type_symbol(Symbol * id) {
     Symbol * ns = current_namespace;
-    Symbol * t;
+    Symbol * s;
     while(id->tnext) {
         if((ns = lookup_namespace(ns->table, id->name)) == NULL)
             return NULL;
         id = id->tnext;
     }
-    t = lookup_symbol(ns->table, id->name);
-    if(t && t->kind != TYPE) {
+    s = lookup_symbol_in_tab(ns->table, id->name);
+    if(s && s->kind != TYPE) {
         fprintf(stderr, "lookup_type_symbol(%s) : Error, symbol not a type\n", id->name);
         abort();
     }
-    return t;
+    return s->type;
 }
 
 const char * type_name(Type * t) {
@@ -119,28 +121,31 @@ Rank * new_rank(int dim) {
     return ret;
 }
 
-Type * new_array(Type * type, Rank * rank) {
+Type * new_array_type(Symbol * typename, Symbol * sig) {
     Type * ret = malloc(sizeof(*ret));
-    Rank * r;
-    ret->type = type;
+    ret->sym = symbol_concat(typename, sig);
     ret->kind = TYPE_ARRAY;
     ret->next = NULL;
     ret->tnext = NULL;
+/*
     ret->rank = rank;
-    for(ret->dim = 0, r = rank; r; r = (Rank *)r->tnext) {
-        ret->dim += r->dim;
-    } 
+    {
+        Rank * r;
+        for(ret->dim = 0, r = rank; r; r = (Rank *)r->tnext) {
+            ret->dim += r->dim;
+        } 
+    }
     ret->bounds = (int **)malloc(sizeof(int) * ret->dim * 2);
-    ret->sym = array_signature(ret);
+*/
     return ret;
 }
 
-
+/*
 Symbol * array_signature(Type * t) {
     char buf[4096];
     Rank * r;
     int i;
-    Symbol * ret = new_symbol(IDENTIFIER, "");
+    Symbol * ret = new_identifier_symbol("");
     sprintf(buf, "%s", type_name(t->type));
     for(r = t->rank; r; r = (Rank *)r->tnext) {
         strcat(buf, "[");
@@ -148,8 +153,107 @@ Symbol * array_signature(Type * t) {
             sprintf(buf + strlen(buf), "(0..)");
         }
         strcat(buf, "]");
-        /*sprintf(buf + strlen(buf), "%d_", r->dim);   */
     }
     ret->name = str_dup(buf);
     return ret;
 }
+*/
+
+
+void do_symbol_type_resolution(Symbol * list) {
+    Symbol * s = list;
+    if(!s)
+        return;
+    for(; s; s = s->next) {
+        if(s->kind == LITERAL)
+            continue;
+
+        if(!s->typename && !s->type) {
+            /* Resolve symbol */
+            Symbol * t = lookup_symbol(s->name);
+            if(t) {
+                s->type = t->type;
+                s->typename = t->typename;
+            }
+	    else {
+                fprintf(stderr, "Error: [%s] undeclared.\n", s->name);
+		exit(0);
+            }
+        }
+
+        if(s->typename && !s->type) {
+            fprintf(stderr, "Pass 2: Resolving symbol [%s] type [%s]\n", s->name, s->typename->name);
+            if((s->type = lookup_type_symbol(s->typename)) == NULL) {
+                fprintf(stderr, "Internal error: Null type [%s]\n", s->typename->name);
+                abort();
+            }
+        }
+    }
+
+    for(s = list->tnext; s; s = s->tnext) {
+        if(!s->typename && !s->type) {
+            /* Resolve symbol */
+            Symbol * t = lookup_symbol(s->name);
+            if(t) {
+                s->type = t->type;
+                s->typename = t->typename;
+            }
+        }
+
+        if(s->typename && !s->type) {
+            fprintf(stderr, "Pass 2: Resolving symbol [%s] type [%s]\n", s->name, s->typename->name);
+            if((s->type = lookup_type_symbol(s->typename)) == NULL) {
+                fprintf(stderr, "Internal error: Null type [%s]\n", s->typename->name);
+                abort();
+            }
+        }
+    }
+}
+
+void do_ast_type_resolution(AST * tree) {
+    if(!tree || tree->asttype == ASTT_LITERAL)
+        return;
+    if(tree->typename) {
+        fprintf(stderr, "Pass 2: Resolving type symbol [%s]\n", tree->typename->name);
+        tree->type = lookup_type_symbol(tree->typename);
+        if(!tree->type) {
+            fprintf(stderr, "Internal error: Null type [%s]\n", tree->typename->name);
+            abort();
+        }
+    }
+
+    if(tree->sym) {
+        do_symbol_type_resolution(tree->sym);
+    }
+
+    if(tree->locals) {
+        do_symbol_type_resolution(tree->locals);
+    }
+
+    switch(tree->asttype) {
+        case ASTT_IF:
+        case ASTT_CONDITIONAL_EXPR:
+            do_ast_type_resolution(tree->Attr.Conditional.condition);
+            do_ast_type_resolution(tree->Attr.Conditional.end);
+            break;
+        case ASTT_METHOD_DECL:
+            fprintf(stderr, "Pass 2: Method %s\n", tree->sym->name);
+            do_symbol_type_resolution(tree->Attr.Method.params);
+            do_ast_type_resolution(tree->Attr.Method.body);
+            fprintf(stderr, "Pass 2: End Method %s\n", tree->sym->name);
+            break;
+        case ASTT_WHILE:
+        case ASTT_FOR:
+            do_ast_type_resolution(tree->Attr.Loop.init);
+            do_ast_type_resolution(tree->Attr.Loop.iteration);
+            do_ast_type_resolution(tree->Attr.Loop.condition);
+            do_ast_type_resolution(tree->Attr.Loop.body);
+            break;
+    }
+
+    do_ast_type_resolution(tree->arg1);
+    do_ast_type_resolution(tree->arg2);
+    do_ast_type_resolution(tree->next);
+}
+
+
