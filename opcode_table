@@ -29,87 +29,87 @@ end	0
 
 # Integer ops
 
-set_i_ic       2       I i
-set_i  2       I I
-add_i  3       I I I
-sub_i  3       I I I
-mul_i  3       I I I
-div_i  3       I I I
-mod_i  3       I I I
-inc_i  1       I
-inc_i_ic       2       I i
-dec_i  1       I
-dec_i_ic       2       I i
+set_i_ic 	2	I i
+set_i  	2	I I
+add_i	3	I I I
+sub_i	3	I I I
+mul_i	3	I I I
+div_i	3	I I I
+mod_i	3	I I I
+inc_i	1	I
+inc_i_ic	2	I i
+dec_i	1	I
+dec_i_ic	2	I i
 
 # NUM ops
 
-set_n_nc       2       N n
-add_n  3       N N N
-sub_n  3       N N N
-mul_n  3       N N N
-div_n  3       N N N
-inc_n  1       N
-inc_n_nc       2       N n
-dec_n  1       N
-dec_n_nc       2       N n
+set_n_nc	2	N n
+add_n	3	N N N
+sub_n	3	N N N
+mul_n	3	N N N
+div_n	3	N N N
+inc_n	1	N
+inc_n_nc	2	N n
+dec_n	1	N
+dec_n_nc	2	N n
 
 # String ops
 
-set_s_sc       2       S s
-print_s        1       S
+set_s_sc	2	S s
+print_s	1	S
 print_sc	1	s
-length_i_s     2       I S
-chopn_s_ic     2       S i
-substr_s_s_i   4       S S I I
-concat_s       2       S S
+length_i_s	2	I S
+chopn_s_ic	2	S i
+substr_s_s_i	4	S S I I
+concat_s	2	S S
 
 # Comparators (TODO: String comparators)
 
-eq_i_ic        4       I I D D
-eq_ic_ic       4       I i D D
-ne_i_ic        4       I I D D
-ne_ic_ic       4       I i D D
-lt_i_ic        4       I I D D
-lt_ic_ic       4       I i D D
-le_i_ic        4       I I D D
-le_ic_ic       4       I i D D
-gt_i_ic        4       I I D D
-gt_ic_ic       4       I i D D
-ge_i_ic        4       I I D D
-ge_ic_ic       4       I i D D
+eq_i_ic	4	I I D D
+eq_ic_ic	4	I i D D
+ne_i_ic	4	I I D D
+ne_ic_ic	4	I i D D
+lt_i_ic	4	I I D D
+lt_ic_ic	4	I i D D
+le_i_ic	4	I I D D
+le_ic_ic	4	I i D D
+gt_i_ic	4	I I D D
+gt_ic_ic	4	I i D D
+ge_i_ic	4	I I D D
+ge_ic_ic	4	I i D D
 
-eq_n_ic        4       N N D D
-eq_nc_ic       4       N n D D
-ne_n_ic        4       N N D D
-ne_nc_ic       4       N n D D
-lt_n_ic        4       N N D D
-lt_nc_ic       4       N n D D
-le_n_ic        4       N N D D
-le_nc_ic       4       N n D D
-gt_n_ic        4       N N D D
-gt_nc_ic       4       N n D D
-ge_n_ic        4       N N D D
-ge_nc_ic       4       N n D D
+eq_n_ic	4	N N D D
+eq_nc_ic	4	N n D D
+ne_n_ic	4	N N D D
+ne_nc_ic	4	N n D D
+lt_n_ic	4	N N D D
+lt_nc_ic	4	N n D D
+le_n_ic	4	N N D D
+le_nc_ic	4	N n D D
+gt_n_ic	4	N N D D
+gt_nc_ic	4	N n D D
+ge_n_ic	4	N N D D
+ge_nc_ic	4	N n D D
 
 # Flow control
 
-jump_i	1       I
-branch_ic      1       D
-if_i_ic        3       I D D
-if_n_ic        3       N D D
+jump_i	1	I
+branch_ic	1	D
+if_i_ic	3	I D D
+if_n_ic	3	N D D
 
 # Convertors
 
-iton_n_i       2       N I
-ntoi_i_n       2       I N
+iton_n_i	2	N I
+ntoi_i_n	2	I N
 
 # Miscellaneous and debugging ops
 
-time_i 1       I
-print_i        1       I
-print_ic       1	i
-time_n 1       N
-print_n        1       N
+time_i	1	I
+print_i	1	I
+print_ic	1	i
+time_n	1	N
+print_n	1	N
 print_nc	1	n
 noop	0
 
@@ -130,53 +130,53 @@ clear_p	0
 
 # Transcendental Math Ops
 
-sin_n_n        2       N N
-cos_n_n        2       N N
-tan_n_n        2       N N
-sec_n_n        2       N N
-atan_n_n       2       N N
-atan2_n_n_n    3       N N N
-asin_n_n       2       N N
-acos_n_n       2       N N
-asec_n_n       2       N N
-cosh_n_n       2       N N
-sinh_n_n       2       N N
-tanh_n_n       2       N N
-sech_n_n       2       N N
-log2_n_n       2       N N
-log10_n_n      2       N N
-ln_n_n         2       N N
-exp_n_n        2       N N
-pow_n_n_n      3       N N N
-sin_n_i        2       N I
-cos_n_i        2       N I
-tan_n_i        2       N I
-sec_n_i        2       N I
-atan_n_i       2       N I
-atan2_n_n_i    3       N N I
-atan2_n_i_n    3       N I N
-atan2_n_i_i    3       N I I
-asin_n_i       2       N I
-acos_n_i       2       N I
-asec_n_i       2       N I
-cosh_n_i       2       N I
-sinh_n_i       2       N I
-tanh_n_i       2       N I
-sech_n_i       2       N I
-log2_n_i       2       N I
-log10_n_i      2       N I
-ln_n_i         2       N I
-exp_n_i        2       N I
-pow_n_n_i      3       N N I
-pow_n_i_i      3       N I I
-pow_n_i_n      3       N I N
+sin_n_n	2	N N
+cos_n_n	2	N N
+tan_n_n	2	N N
+sec_n_n	2	N N
+atan_n_n	2	N N
+atan2_n_n_n	3	N N N
+asin_n_n	2	N N
+acos_n_n	2	N N
+asec_n_n	2	N N
+cosh_n_n	2	N N
+sinh_n_n	2	N N
+tanh_n_n	2	N N
+sech_n_n	2	N N
+log2_n_n	2	N N
+log10_n_n	2	N N
+ln_n_n	2	N N
+exp_n_n	2	N N
+pow_n_n_n	3	N N N
+sin_n_i	2	N I
+cos_n_i	2	N I
+tan_n_i	2	N I
+sec_n_i	2	N I
+atan_n_i	2	N I
+atan2_n_n_i	3	N N I
+atan2_n_i_n	3	N I N
+atan2_n_i_i	3	N I I
+asin_n_i	2	N I
+acos_n_i	2	N I
+asec_n_i	2	N I
+cosh_n_i	2	N I
+sinh_n_i	2	N I
+tanh_n_i	2	N I
+sech_n_i	2	N I
+log2_n_i	2	N I
+log10_n_i	2	N I
+ln_n_i	2	N I
+exp_n_i	2	N I
+pow_n_n_i	3	N N I
+pow_n_i_i	3	N I I
+pow_n_i_n	3	N I N
 
 # Bitwise Ops
 
-and_i 3   I I I
-not_i 2   I I
-or_i  3   I I I
-shl_i_ic 3    I I i
-shr_i_ic 3    I I i
-xor_i 3   I I I
+and_i	3	I I I
+not_i	2	I I
+or_i	3	I I I
+shl_i_ic	3	I I i
+shr_i_ic	3	I I i
+xor_i	3	I I I
 
