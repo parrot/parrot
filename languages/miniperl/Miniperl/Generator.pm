@@ -122,7 +122,12 @@ sub __assign {
 
   $rhs = $self->__expression($rhs);
 
-  push @{$self->{code}},[ '', 'set', $lhs, $rhs ];
+  if($rhs =~ /^P/) {
+    push @{$self->{code}},[ '', 'clone', $lhs, $rhs ];
+  }
+  else {
+    push @{$self->{code}},[ '', 'set', $lhs, $rhs ];
+  }
 }
 
 sub __binop {
