@@ -77,13 +77,14 @@ static void pf_debug_destroy (struct PackFile_Segment *self);
 
 =head1 PackFile Manipulation Functions
 
-This file, C<packfile.c> contains all the functions required
+This file, F<packfile.c> contains all the functions required
 for the processing of the structure of a PackFile. It is not
 intended to understand the byte code stream itself, but merely
 to dissect and reconstruct data from the various segments.
 See L<parrotbyte> for information about the structure of the
-frozen bycode.
+frozen bytecode.
 
+=over 4
 
 =item fetch_op
 
@@ -430,7 +431,7 @@ Unpack a PackFile from a block of memory. The format is:
 
   All new segments have this common header:
   - op_count    ... total segment size incl. this count
-  - itype        ... internal type of data
+  - itype       ... internal type of data
   - id          ... id of data e.g. byte code nr.
   - size        ... size of data oparray
   - data[size]  ... data array e.g. bytecode
@@ -450,6 +451,8 @@ Checks to see if the magic matches the Parrot magic number for
 Parrot PackFiles.
 
 Returns one (1) if everything is OK, else zero (0).
+
+=back
 
 =cut
 
@@ -669,7 +672,7 @@ PackFile_find_segment (struct PackFile *pf, const char *name)
 /*
 ** PackFile_remove_segment_by_name
 **   finds and removes the segment with name 'name' in the PackFile 'pf'
-**   The segment is returned an must be destroyed by the user
+**   The segment is returned and must be destroyed by the user
 */
 
 struct PackFile_Segment *
@@ -727,9 +730,9 @@ Directory segment:
   |    Size of the segment                    |
   +----------+----------+----------+----------+
 
-name is a NUL-terminated c-string encoded in
+"name" is a NUL-terminated c-string encoded in
 plain ASCII.
-Segment Types  are defined in packfile.h.
+Segment Types  are defined in F<packfile.h>.
 offset and size are in opcode_t
 
 A Segment Header has these entries:
@@ -737,7 +740,7 @@ A Segment Header has these entries:
  - op_count     total ops of segment incl. this count
  - itype        internal type of segment
  - id           internal id e.g code seg nr
- - size         size of following op array, 0 if non
+ - size         size of following op array, 0 if none
  * data         possibly empty data, or e.g. byte code
 
 =cut
@@ -2079,7 +2082,7 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
 =item unpack_key
 
 Unpack a PackFile Constant from a block of memory. The format consists
-of a sequence of key atomes, each with the following format:
+of a sequence of key atoms, each with the following format:
 
   opcode_t type
   opcode_t value
