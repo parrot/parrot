@@ -152,7 +152,18 @@ objects faster than memory)
 
 See also: L<"DOD">
 
+=head2 ICU
+
+International Components for Unicode
+
+ICU is a C and C++ library that provides support for Unicode on a
+variety of platforms.  It was added to Parrot with the 0.0.8 release to
+provide future unicode support.
+
+http://oss.software.ibm.com/developerworks/opensource/icu/project/
+
 =head2 PMC
+
 
 PMC stands for Parrot Magic Cookie. (Or cracker, your choice) It's the 
 
