@@ -1,0 +1,113 @@
+%{
+/*
+ * ast.l
+ *
+ * Ast lexer
+ *
+ * Copyright (C) 2004 by leo
+ *
+ * The tokenizer.
+ */
+
+#include <parrot/parrot.h>
+#include "ast.h"
+
+#define YY_DECL int yylex(YYSTYPE *valp, YYLTYPE *locp, Interp *interp)
+
+YY_DECL yylex;
+
+extern char* str_dup(char *);
+
+#define DUP_AND_RET(valp, token)             \
+  do {                                       \
+      if (valp) (valp)->s = str_dup(yytext); \
+      return token;                          \
+  } while (0)
+
+#define YY_USER_ACTION set_loc(locp, yytext, yyleng);
+static int line, col;
+#define YY_USER_INIT line = col = 1;
+
+static void
+set_loc(YYLTYPE *l, char const *tok, size_t len)
+{
+    l->first_line = line;
+    l->first_column = col;
+    l->last_line = line;
+    col += len;
+    l->last_column = col;
+}
+
+%}
+
+%option outfile="astlexer.c"
+%option nounput
+
+LETTER          [a-zA-Z_@]
+DIGIT           [0-9]
+DIGITS          {DIGIT}+
+HEX		0x[0-9A-Fa-f]+
+BIN             0b[01]+
+DOT		[.]
+SIGN            [-+]
+BIGINT          {SIGN}?{DIGITS}"L"
+FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
+LETTERDIGIT     [a-zA-Z0-9_]
+LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
+ID              {LETTER}{LABELLETTERDIGIT}*
+STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
+ENCCHAR         {LETTER}|{DIGIT}|"-"
+ENCCHARS        {ENCCHAR}*
+ENC             {LETTER}{ENCCHARS}":"
+UNICODE         {ENC}{STRINGCONSTANT}
+CHARCONSTANT    \'[^'\n]*\'
+RANKSPEC        \[[,]*\]
+EOL		\r?\n
+WS              [\t\f\r\x1a ]
+SP              [ ]
+
+
+%%
+
+"#".*{EOL}	/* skip comments */ {++line; col=1; }
+{EOL}             { ++line; col=1; }
+
+{WS}+		/* eat white space */ ;
+{ID}		   {
+			valp->t = find_node_type(yytext);
+			return IDENTIFIER;
+		   }
+{FLOATNUM}         DUP_AND_RET(valp, FLOATC);
+{SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);
+{HEX}              DUP_AND_RET(valp, INTC);
+{BIN}              DUP_AND_RET(valp, INTC);
+
+{BIGINT}         {
+	valp->s = str_dup(yytext);
+        valp->s[strlen(valp->s) - 1] = '\0'; /* trailing 'L' */
+        return(STRINGC); /* no BIGINT native format yet */
+    }
+
+{STRINGCONSTANT} {
+	valp->s = str_dup(yytext);
+        return(STRINGC); /* XXX delete quotes, -> emit, pbc */
+    }
+
+{UNICODE} {
+        char *p = strchr(yytext, '"');
+	valp->s = str_dup(p);    /* enc:"..." */
+        /* TODO pass charset */
+        return(USTRINGC); /* XXX delete quotes, -> emit, pbc */
+    }
+{CHARCONSTANT} {
+        valp->s = str_dup(yytext); /* XXX delete quotes, -> emit, pbc */
+        return(STRINGC);
+    }
+
+.	return *yytext;
+
+<<EOF>>           yyterminate();
+
+%%
+
+int yywrap(void) { return 1; }

@@ -20,6 +20,13 @@ RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
 TODO.win32                                        [main]doc
 VERSION                                           [main]doc
+ast/ast.h                                         []
+ast/ast.l                                         []
+ast/ast.y                                         []
+ast/astlexer.c                                    []
+ast/astparser.c                                   []
+ast/astparser.h                                   []
+ast/node.c                                        []
 build_tools/build_nativecall.pl                   []
 build_tools/c2str.pl                              []
 build_tools/fingerprint_c.pl                      []

@@ -23,8 +23,9 @@ INCLUDEDIR  = $(EXEC_PREFIX)/include
 #
 ###############################################################################
 
-# imcc dir
+# imcc, ast dir
 IMCC_DIR = imcc
+AST_DIR = ast
 
 # source dir
 SRC = src
@@ -217,6 +218,15 @@ IMCC_O_FILES = \
     $(IMCC_DIR)/fastcall$(O) \
     $(IMCC_DIR)/pcc$(O)
 
+AST_H_FILES = \
+    $(AST_DIR)/ast.h \
+    $(AST_DIR)/astparser.h
+
+AST_O_FILES = \
+    $(AST_DIR)/astparser$(O) \
+    $(AST_DIR)/astlexer$(O) \
+    $(AST_DIR)/node$(O)
+
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
 
 ICU_H_FILES = ${icu_headers}
@@ -314,7 +324,8 @@ O_FILES = \
     $(INTERP_O_FILES) \
     $(IO_O_FILES) $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
-    $(IMCC_O_FILES)
+    $(IMCC_O_FILES) \
+    $(AST_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
@@ -907,6 +918,18 @@ $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
 	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
 
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
+
+# ast files
+
+$(AST_DIR)/ast.y.flag $(AST_DIR)/astparser.c $(AST_DIR)/astparser.h : $(AST_DIR)/ast.y
+	$(YACC) $(AST_DIR)/ast.y -d -o $(AST_DIR)/astparser.c -p AST
+	$(TOUCH) $(AST_DIR)/ast.y.flag $(AST_DIR)/astparser.c $(AST_DIR)/astparser.h
+
+$(AST_DIR)/ast.l.flag $(AST_DIR)/astlexer.c : $(AST_DIR)/ast.l
+	$(LEX) -o$(AST_DIR)/astlexer.c $(AST_DIR)/ast.l
+	$(TOUCH) $(AST_DIR)/ast.l.flag $(AST_DIR)/astlexer.c
+
+$(AST_O_FILES) : $(IMCC_H_FILES) $(AST_H_FILES) $(ALL_H_FILES)
 
 
 ###############################################################################
