@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 answer	macro
@@ -47,19 +47,19 @@ CODE
 42
 OUTPUT
 
-#
-# Can't test because I can't capture errors
-#
-#output_is( <<'CODE', <<OUTPUT, "macro, one parameter in call, not in def" );
-#answer	macro
-#	print A
-#endm
-#	answer 42
-#	print "\n"
-#end
-#CODE
-#42
-#OUTPUT
+SKIP: { skip("Await exceptions", 1);
+
+output_is( <<'CODE', <<OUTPUT, "macro, one parameter in call, not in def" );
+answer	macro
+	print A
+endm
+	answer 42
+	print "\n"
+end
+CODE
+42
+OUTPUT
+}
 
 output_is( <<'CODE', <<OUTPUT, "macro, one used parameter, register" );
 answer	macro	A
