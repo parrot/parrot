@@ -1,5 +1,8 @@
+=head1 TITLE
 
-=head1 An overview of the Parrot intepreter
+A Parrot Overview
+
+=head1 The Parrot Intepreter
 
 This document is an introduction to the structure of and the concepts 
 used by the Parrot shared bytecode compiler/interpreter system. We will

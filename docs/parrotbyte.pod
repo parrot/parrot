@@ -1,3 +1,7 @@
+=head1 TITLE
+
+The Parrot Bytecode Format
+
 =head1 Format of the Parrot bytecode
 
   0          1          2          3

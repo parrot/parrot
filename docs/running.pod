@@ -1,3 +1,7 @@
+=head1 TITLE
+
+Running Parrot
+
 =head1 Running Parrot code
 
 This file briefly describes the current set of executables and what

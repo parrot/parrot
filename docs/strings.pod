@@ -1,3 +1,6 @@
+=head1 TITLE
+
+Parrot Strings
 
 =head1 The Parrot String API
 

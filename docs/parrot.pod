@@ -1,5 +1,6 @@
-# This file is in POD format; if you're not used to reading POD,
-# you can run the file through "perldoc" for a plain text version.
+=head1 TITLE
+
+Parrot
 
 =head1 The Parrot Bytecode Interpreter
 

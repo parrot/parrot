@@ -1,3 +1,6 @@
+=head1 TITLE
+
+Parrot Vtables
 
 =head1 Implementing Variable Types with Vtables
 

@@ -1,4 +1,8 @@
-=head1 The Parrot Primer
+=head1 TITLE
+
+The Parrot Primer
+
+=head1 Welcome to Parrot
 
 This is an update to the article 'Parrot: Some Assembly Required'
 which appeared on http://www.perl.com for the 0.0.2 release of Parrot. It's
