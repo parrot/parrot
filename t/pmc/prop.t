@@ -41,11 +41,11 @@ output_is(<<'CODE', <<'OUTPUT', "Property values are references");
     setprop P0, S0, P1
 
     new P2, .PerlString
-    getprop P2, "Black", P1
+    getprop P2, "Black", P0
     print P2
     print "\n" 
 
-    getprop P2, "Brown", P1
+    getprop P2, "Brown", P0
     print P2
     print "\n" 
 
