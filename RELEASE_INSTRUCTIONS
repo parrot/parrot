@@ -34,6 +34,8 @@ To prepare a release:
 	    perl Configure.pl ...
 	    make -s all fulltest
 
+	j.  [ leo: check that .skip-diffit is empty ]
+
     3.  cvs commit.
 
     4.  make release VERSION=<version>
