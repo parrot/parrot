@@ -52,17 +52,17 @@ typedef unsigned char utf8_t;
 =item C<static UINTVAL
 utf8_characters(const void *ptr, UINTVAL bytes)>
 
-Returns the number of characters in the C<bytes> bytes from C<*ptr>.
+Returns the number of characters in the C<byte_len> bytes from C<*ptr>.
 
 =cut
 
 */
 
 static UINTVAL
-utf8_characters(const void *ptr, UINTVAL byte_offs)
+utf8_characters(const void *ptr, UINTVAL byte_len)
 {
     const utf8_t *u8ptr = ptr;
-    const utf8_t *u8end = u8ptr + byte_offs;
+    const utf8_t *u8end = u8ptr + byte_len;
     UINTVAL characters = 0;
 
     while (u8ptr < u8end) {
@@ -376,7 +376,7 @@ get_bytes(Interp *interpreter, STRING *src,
 
 static STRING *
 get_codepoints_inplace(Interp *interpreter, STRING *src,
-	STRING *dest_string, UINTVAL offset, UINTVAL count)
+	UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
 
     UNIMPL;
@@ -433,7 +433,7 @@ Parrot_encoding_utf8_init(Interp *interpreter)
 
     static const ENCODING base_encoding = {
 	"utf8",
-	6, /* Max bytes per codepoint */
+	4, /* Max bytes per codepoint 0 .. 0x10ffff */
 	to_encoding,
 	copy_to_encoding,
 	get_codepoint,

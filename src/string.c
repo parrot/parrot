@@ -23,12 +23,6 @@ strings.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-#include "../encodings/fixed_8.h"
-#include "../charset/ascii.h"
-#include "../charset/binary.h"
-#include "../charset/iso-8859-1.h"
-
-
 /*
  * this extra size is in the hope, that some concat ops might
  * follow in a sequence.
@@ -289,17 +283,9 @@ string_init(Parrot_Interp interpreter)
 
     if (!interpreter->parent_interpreter) {
         /* Load in the basic encodings and charsets
-         *
-         * the order is crucial here:
-         * 1) default encoding = fixed_8
-         * 2) default charset  = iso-8859-1
          */
-        Parrot_encoding_fixed_8_init(interpreter);
-        Parrot_encoding_utf8_init(interpreter);
+        Parrot_charsets_encodings_init(interpreter);
 
-        Parrot_charset_iso_8859_1_init(interpreter);
-        Parrot_charset_binary_init(interpreter);
-        Parrot_charset_ascii_init(interpreter);
 
         /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
            set through the $PARROT_ICU_DATA_DIR environment variable. Need
@@ -361,7 +347,7 @@ string_deinit(Parrot_Interp interpreter)
 {
     mem_sys_free(interpreter->const_cstring_table);
     interpreter->const_cstring_table = NULL;
-    Parrot_deinit_charsets(interpreter);
+    Parrot_charsets_encodings_deinit(interpreter);
 }
 
 /*
@@ -1074,8 +1060,8 @@ string_substr(Interp *interpreter, STRING *src,
 
     /* do in-place i.e. reuse existing header if one */
     if (replace_dest && *d) {
-        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src, *d,
-                true_offset, true_length);
+        CHARSET_GET_CODEPOINTS_INPLACE(interpreter, src,
+                true_offset, true_length, *d);
         dest = *d;
     }
     else

@@ -14,8 +14,14 @@ These are parrot's generic charset handling functions
 
 #define PARROT_NO_EXTERN_CHARSET_PTRS
 #include "parrot/parrot.h"
-#include "../charset/iso-8859-1.h"
+
+#include "../encodings/fixed_8.h"
+#include "../encodings/utf8.h"
+
 #include "../charset/ascii.h"
+#include "../charset/binary.h"
+#include "../charset/iso-8859-1.h"
+#include "../charset/unicode.h"
 
 CHARSET *Parrot_iso_8859_1_charset_ptr;
 CHARSET *Parrot_binary_charset_ptr;
@@ -54,7 +60,7 @@ Parrot_new_charset(Interp *interpreter)
 }
 
 void
-Parrot_deinit_charsets(Interp *interpreter)
+Parrot_charsets_encodings_deinit(Interp *interpreter)
 {
     int i, n;
 
@@ -67,19 +73,19 @@ Parrot_deinit_charsets(Interp *interpreter)
     mem_sys_free(all_charsets->set);
     mem_sys_free(all_charsets);
     all_charsets = NULL;
+    /* TODO free encodings */
 }
 
 CHARSET *
 Parrot_find_charset(Interp *interpreter, const char *charsetname)
 {
-    if (!strcmp("iso-8859-1", charsetname)) {
-        return Parrot_iso_8859_1_charset_ptr;
-    }
-    if (!strcmp("unicode", charsetname)) {
-        return Parrot_unicode_charset_ptr;
-    }
-    if (!strcmp("binary", charsetname)) {
-        return Parrot_binary_charset_ptr;
+    int i, n;
+
+    n = all_charsets->n_charsets;
+    for (i = 0; i < n; ++i) {
+        if (!strcmp(all_charsets->set[i].charset->name, charsetname)) {
+            return all_charsets->set[i].charset;
+        }
     }
     return NULL;
 }
@@ -164,6 +170,11 @@ register_charset(Interp *interpreter, const char *charsetname,
         if (!strcmp(all_charsets->set[i].charset->name, charsetname))
             return 0;
     }
+    /*
+     * TODO
+     * this needs either a LOCK or we just forbid dynamic
+     * loading of charsets from inside threads
+     */
     if (!n)
         all_charsets->set = mem_sys_allocate(sizeof(One_charset));
     else
@@ -220,18 +231,31 @@ Parrot_register_charset(Interp *interpreter, const char *charsetname,
         return register_charset(interpreter, charsetname, charset);
     }
     if (!strcmp("ascii", charsetname)) {
-        INTVAL result;
 
         Parrot_ascii_charset_ptr = charset;
-        result = register_charset(interpreter, charsetname, charset);
-        /*
-         * ascii is currently the last charset - so we can
-         * now install charset converters
-         */
-        register_static_converters(interpreter);
-        return result;
+        return register_charset(interpreter, charsetname, charset);
     }
     return 0;
+}
+
+void
+Parrot_charsets_encodings_init(Interp *interpreter)
+{
+    /* the order is crucial here:
+     * 1) encodings, default = fixed_8
+     * 2) charsets   default = iso-8859-1
+     */
+    Parrot_encoding_fixed_8_init(interpreter);
+    Parrot_encoding_utf8_init(interpreter);
+
+    Parrot_charset_iso_8859_1_init(interpreter);
+    Parrot_charset_binary_init(interpreter);
+    Parrot_charset_ascii_init(interpreter);
+    Parrot_charset_unicode_init(interpreter);
+    /*
+     * now install charset converters
+     */
+    register_static_converters(interpreter);
 }
 
 INTVAL

@@ -26,7 +26,7 @@ ascii_find_not_thing(Interp *interpreter, STRING *string, UINTVAL start,
 STRING *ascii_get_graphemes(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count);
 STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
-        STRING *dest_string, UINTVAL offset, UINTVAL count);
+        UINTVAL offset, UINTVAL count, STRING *dest_string);
 INTVAL ascii_is_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_newline(Interp *, STRING *source_string, UINTVAL offset);
 INTVAL ascii_find_not_newline(Interp *, STRING *source_string, UINTVAL offset);

@@ -20,7 +20,6 @@ static void set_codepoint(Interp *interpreter, STRING *source_string, UINTVAL of
 static UINTVAL get_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset);
 static void set_byte(Interp *interpreter, const STRING *source_string, UINTVAL offset, UINTVAL byte);
 static STRING *get_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
-static STRING *get_codepoints_inplace(Interp *interpreter, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
 static STRING *get_bytes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
 static STRING *get_bytes_inplace(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
 static void set_codepoints(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_codepoints);

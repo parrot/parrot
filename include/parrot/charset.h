@@ -33,7 +33,7 @@ extern CHARSET *Parrot_ascii_charset_ptr;
 #define PARROT_UNICODE_CHARSET Parrot_unicode_charset_ptr
 
 typedef STRING *(*charset_get_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*charset_get_graphemes_inplace_t)(Interp *, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*charset_get_graphemes_inplace_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
 typedef void (*charset_set_graphemes_t)(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 
 typedef STRING * (*charset_to_charset_t)(Interp *, STRING *source_string,
@@ -85,7 +85,9 @@ charset_converter_t Parrot_find_charset_converter(Interp *, CHARSET *lhs, CHARSE
 void Parrot_register_charset_converter(Interp *,
         CHARSET *lhs, CHARSET *rhs, charset_converter_t func);
 
-void Parrot_deinit_charsets(Interp *);
+void Parrot_charsets_encodings_init(Interp *);
+void Parrot_charsets_encodings_deinit(Interp *);
+
 INTVAL Parrot_charset_number(Interp *, STRING *charsetname);
 STRING* Parrot_charset_name(Interp *, INTVAL);
 const char* Parrot_charset_c_name(Interp *, INTVAL);

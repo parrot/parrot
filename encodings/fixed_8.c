@@ -105,7 +105,7 @@ get_bytes(Interp *interpreter, STRING *source_string,
 /* Delegate to get_bytes */
 static STRING *
 get_codepoints_inplace(Interp *interpreter, STRING *source_string,
-	STRING *dest_string, UINTVAL offset, UINTVAL count)
+	UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
 
     return get_bytes_inplace(interpreter, source_string, offset,

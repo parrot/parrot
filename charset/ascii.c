@@ -96,7 +96,7 @@ set_graphemes(Interp *interpreter, STRING *source_string,
 
 STRING *
 ascii_get_graphemes_inplace(Interp *interpreter, STRING *source_string,
-        STRING *dest_string, UINTVAL offset, UINTVAL count)
+        UINTVAL offset, UINTVAL count, STRING *dest_string)
 {
     return ENCODING_GET_BYTES_INPLACE(interpreter, source_string,
             offset, count, dest_string);
