@@ -1,0 +1,192 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/nci.pmc - Python Native Call Interface Functions
+
+=head1 DESCRIPTION
+
+Extends Parrot's NCI to include attributes, implemented as properties.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "pyconsts.h"
+
+pmclass PyBoundMeth dynpmc group python_group {
+
+/*
+
+=item C<void init()>
+
+Initializes the key.
+
+=cut
+
+*/
+
+    void init () {
+        PObj_custom_mark_SET(SELF);
+        PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = SELF;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))   /* bound object */
+            pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
+        if (PMC_pmc_val(SELF))      /* real sub */
+             pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+    }
+
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Find a method call on the indicated object.
+
+=cut
+
+*/
+
+    PMC* find_method(STRING* method_name) {
+        if (0 == string_compare(INTERP, method_name, PyString_call)) {
+            int i = REG_INT(3)++;
+            while (i--)
+                REG_PMC(6+i)=REG_PMC(5+i);
+            REG_PMC(5) = PMC_struct_val(SELF); 
+        }
+        return VTABLE_find_method(INTERP, PMC_pmc_val(SELF), method_name);
+    }
+/*
+
+=item C<PMC* get_attr_str(STRING *name)>
+
+Return attribute named C<name>.
+
+=cut
+
+*/
+
+    PMC* get_attr_str(STRING* idx) {
+        return VTABLE_get_attr_str(INTERP, PMC_pmc_val(SELF), idx);
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Return the representation of this object.
+
+=cut
+
+*/
+
+    STRING* get_string() {
+        STRING *res;
+        STRING *name = const_string(INTERP, "(unnamed)");
+        PMC *ret = VTABLE_getprop(INTERP, PMC_pmc_val(SELF), PyString_name);
+        if (ret && VTABLE_defined(INTERP, ret))
+            name = VTABLE_get_string(INTERP, ret);
+
+        res = string_from_cstring(INTERP, "<bound method ", 0);
+        res = string_append(INTERP, res, name, 0);
+        res = string_append(INTERP, res, const_string(INTERP, " of "), 0);
+        res = string_append(INTERP, res,
+             VTABLE_get_string(INTERP, PMC_pmc_val(SELF)), 0);
+        res = string_append(INTERP, res, const_string(INTERP, ">"), 0);
+
+        return res;
+    }
+
+
+/*
+
+=item C<void* invoke(void* next)>
+
+Invoke a method call on the indicated object.
+
+=cut
+
+*/
+
+    void* invoke(void* next) {
+        int i = REG_INT(3)++;
+        while (i--)
+            REG_PMC(6+i)=REG_PMC(5+i);
+        REG_PMC(5) = PMC_struct_val(SELF); 
+        return VTABLE_invoke(INTERP, PMC_pmc_val(SELF), next);
+    }
+
+/*
+
+=item C<void set_pointer(void *value)>
+
+Sets the pointer to the actual subroutine.
+
+=cut
+
+*/
+
+    void set_pointer (void* value) {
+        PMC_pmc_val(SELF) = value;
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the pointer to the "bound" object.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        PMC_struct_val(SELF) = value;
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

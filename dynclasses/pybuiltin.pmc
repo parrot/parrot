@@ -517,13 +517,13 @@ Return whether the object has an attribute with the given name.
 
 */
 
-    METHOD PMC* hasattr(PMC *object, PMC *value) {
+    METHOD PMC* hasattr(PMC *object, PMC *name) {
         PMC *ret = pmc_new(INTERP, PyBuiltin_PyBoolean);
         new_internal_exception(INTERP);
         push_new_c_exception_handler(INTERP, INTERP->exceptions);
         if (!setjmp(INTERP->exceptions->destination)) {
             VTABLE_get_attr_str(INTERP, object,
-                VTABLE_get_string(INTERP, value));
+                VTABLE_get_string(INTERP, name));
             VTABLE_set_integer_native(INTERP, ret, 1);
         } else {
             Parrot_exception *exception = INTERP->exceptions;
@@ -533,6 +533,35 @@ Return whether the object has an attribute with the given name.
             VTABLE_set_integer_native(INTERP, ret, 0);
         }
         return ret;
+    }
+
+/*
+
+=item C<PMC* "getattr"(PMC *object, PMC *name)>
+
+Get the attribute with the given name.
+
+=cut
+
+*/
+
+    METHOD PMC* getattr(PMC *object, PMC *name) {
+        return VTABLE_get_attr_str(INTERP, object,
+            VTABLE_get_string(INTERP, name));
+    }
+
+/*
+
+=item C<PMC* "setattr"(PMC *object, PMC *name, PMC *value)>
+
+Sets the attribute with the given name.
+
+=cut
+
+*/
+
+    METHOD void setattr(PMC *object, PMC *name, PMC *value) {
+        VTABLE_setprop(INTERP, object, VTABLE_get_string(INTERP, name), value);
     }
 
 /*

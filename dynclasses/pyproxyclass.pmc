@@ -37,8 +37,23 @@ Initializes the instance.
 */
 
     void init () {
-        PMC_pmc_val(SELF) = 0;
+        PObj_custom_mark_SET(SELF);
         PMC_struct_val(SELF) = 0;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))   /* forwarder */
+            pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
     }
 
 /*

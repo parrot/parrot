@@ -15,6 +15,7 @@ pynci \
 pyclass \
 pyobject \
   pyboolean \
+  pyboundmeth \
   pycomplex \
   pydict \
   pyexception \
