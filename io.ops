@@ -46,6 +46,9 @@ inline op close(inout PMC) {
 
 Create ParrotIO object as $1 as a copy of file descriptor $2.
 
+XXX: integral file descriptors may not exist outside of the UNIX
+     platform.  This op needs work.
+
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) {
@@ -53,6 +56,7 @@ inline op fdopen(out PMC, in INT, in STR) {
   /* These char * need to go away soon */
   const char * mode;
   mode = string_to_cstring(interpreter, $3);
+#ifdef IO_OS_UNIX
   io = PIO_fdopen(interpreter, $2, mode);
   if(io) {
     $1 = new_io_pmc(interpreter, io);
@@ -60,6 +64,9 @@ inline op fdopen(out PMC, in INT, in STR) {
   else {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
+#else
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+#endif
   goto NEXT();
 }
 
