@@ -1,0 +1,949 @@
+/* Null.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the Null PMC
+ *     This simply creates a way of catching NULL register accesses without
+ *     really slowing down the bytecode execution.
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Upon adding new methods to Parrot PMCs, we manually regenerate the Null PMC
+ *     for now.
+ *     XXX FIXME: Integrate this into the configure/build process to autogen null.pmc
+ *                so we don't need a seperate null.pl script.
+ *     (perl ./null.pl Null > null.pmc)
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass Null {
+
+    void init () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::init)!\n");
+        return (void)0;
+    }
+
+    void init_pmc (PMC* initializer) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::init_pmc)!\n");
+        return (void)0;
+    }
+
+    void morph (INTVAL type) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::morph)!\n");
+        return (void)0;
+    }
+
+    void mark () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::mark)!\n");
+        return (void)0;
+    }
+
+    void destroy () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::destroy)!\n");
+        return (void)0;
+    }
+
+    INTVAL type_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::type_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL type_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::type_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    UINTVAL subtype (INTVAL type) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtype)!\n");
+        return (UINTVAL)0;
+    }
+
+    UINTVAL subtype_keyed (PMC* key, INTVAL type) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtype_keyed)!\n");
+        return (UINTVAL)0;
+    }
+
+    UINTVAL subtype_keyed_int (INTVAL key, INTVAL type) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtype_keyed_int)!\n");
+        return (UINTVAL)0;
+    }
+
+    STRING* name_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::name_keyed)!\n");
+        return (STRING*)0;
+    }
+
+    STRING* name_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::name_keyed_int)!\n");
+        return (STRING*)0;
+    }
+
+    void clone (PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::clone)!\n");
+        return (void)0;
+    }
+
+    void clone_keyed (PMC* key, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::clone_keyed)!\n");
+        return (void)0;
+    }
+
+    void clone_keyed_int (INTVAL key, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::clone_keyed_int)!\n");
+        return (void)0;
+    }
+
+    PMC* find_method (STRING* method_name) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::find_method)!\n");
+        return (PMC*)0;
+    }
+
+    PMC* find_method_keyed (PMC* key, STRING* method_name) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::find_method_keyed)!\n");
+        return (PMC*)0;
+    }
+
+    PMC* find_method_keyed_int (INTVAL key, STRING* method_name) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::find_method_keyed_int)!\n");
+        return (PMC*)0;
+    }
+
+    INTVAL get_integer () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_integer)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL get_integer_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_integer_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_integer_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    FLOATVAL get_number () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_number)!\n");
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_number_keyed)!\n");
+        return (FLOATVAL)0;
+    }
+
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_number_keyed_int)!\n");
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* get_bignum () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bignum)!\n");
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* get_bignum_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bignum_keyed)!\n");
+        return (BIGNUM*)0;
+    }
+
+    BIGNUM* get_bignum_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bignum_keyed_int)!\n");
+        return (BIGNUM*)0;
+    }
+
+    STRING* get_string () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_string)!\n");
+        return (STRING*)0;
+    }
+
+    STRING* get_string_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_string_keyed)!\n");
+        return (STRING*)0;
+    }
+
+    STRING* get_string_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_string_keyed_int)!\n");
+        return (STRING*)0;
+    }
+
+    INTVAL get_bool () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bool)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL get_bool_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bool_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL get_bool_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_bool_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    PMC* get_pmc () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pmc)!\n");
+        return (PMC*)0;
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pmc_keyed)!\n");
+        return (PMC*)0;
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::get_pmc_keyed_int)!\n");
+        return (PMC*)0;
+    }
+
+    void set_integer (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer)!\n");
+        return (void)0;
+    }
+
+    void set_integer_native (INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer_native)!\n");
+        return (void)0;
+    }
+
+    void set_integer_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer_same)!\n");
+        return (void)0;
+    }
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_integer_keyed_int (INTVAL key, INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_integer_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_number (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_number)!\n");
+        return (void)0;
+    }
+
+    void set_number_native (FLOATVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_number_native)!\n");
+        return (void)0;
+    }
+
+    void set_number_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_number_same)!\n");
+        return (void)0;
+    }
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_number_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_number_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_bignum (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bignum)!\n");
+        return (void)0;
+    }
+
+    void set_bignum_native (BIGNUM* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bignum_native)!\n");
+        return (void)0;
+    }
+
+    void set_bignum_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bignum_same)!\n");
+        return (void)0;
+    }
+
+    void set_bignum_keyed (PMC* key, BIGNUM* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bignum_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bignum_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_string (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_string)!\n");
+        return (void)0;
+    }
+
+    void set_string_native (STRING* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_string_native)!\n");
+        return (void)0;
+    }
+
+    void set_string_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_string_same)!\n");
+        return (void)0;
+    }
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_string_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_string_keyed_int (INTVAL key, STRING* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_string_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_bool (INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bool)!\n");
+        return (void)0;
+    }
+
+    void set_bool_keyed (PMC* key, INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bool_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_bool_keyed_int (INTVAL key, INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_bool_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_pmc (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pmc)!\n");
+        return (void)0;
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pmc_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_pmc_keyed_int (INTVAL key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_pmc_keyed_int)!\n");
+        return (void)0;
+    }
+
+    void set_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_same)!\n");
+        return (void)0;
+    }
+
+    void set_same_keyed (PMC* key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_same_keyed)!\n");
+        return (void)0;
+    }
+
+    void set_same_keyed_int (INTVAL key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::set_same_keyed_int)!\n");
+        return (void)0;
+    }
+
+    INTVAL elements () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::elements)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL elements_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::elements_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL elements_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::elements_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL pop_integer () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::pop_integer)!\n");
+        return (INTVAL)0;
+    }
+
+    FLOATVAL pop_float () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::pop_float)!\n");
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* pop_bignum () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::pop_bignum)!\n");
+        return (BIGNUM*)0;
+    }
+
+    STRING* pop_string () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::pop_string)!\n");
+        return (STRING*)0;
+    }
+
+    PMC* pop_pmc () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::pop_pmc)!\n");
+        return (PMC*)0;
+    }
+
+    void push_integer (INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::push_integer)!\n");
+        return (void)0;
+    }
+
+    void push_float (FLOATVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::push_float)!\n");
+        return (void)0;
+    }
+
+    void push_bignum (BIGNUM* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::push_bignum)!\n");
+        return (void)0;
+    }
+
+    void push_string (STRING* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::push_string)!\n");
+        return (void)0;
+    }
+
+    void push_pmc (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::push_pmc)!\n");
+        return (void)0;
+    }
+
+    INTVAL shift_integer () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::shift_integer)!\n");
+        return (INTVAL)0;
+    }
+
+    FLOATVAL shift_float () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::shift_float)!\n");
+        return (FLOATVAL)0;
+    }
+
+    BIGNUM* shift_bignum () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::shift_bignum)!\n");
+        return (BIGNUM*)0;
+    }
+
+    STRING* shift_string () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::shift_string)!\n");
+        return (STRING*)0;
+    }
+
+    PMC* shift_pmc () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::shift_pmc)!\n");
+        return (PMC*)0;
+    }
+
+    void unshift_integer (INTVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::unshift_integer)!\n");
+        return (void)0;
+    }
+
+    void unshift_float (FLOATVAL value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::unshift_float)!\n");
+        return (void)0;
+    }
+
+    void unshift_bignum (BIGNUM* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::unshift_bignum)!\n");
+        return (void)0;
+    }
+
+    void unshift_string (STRING* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::unshift_string)!\n");
+        return (void)0;
+    }
+
+    void unshift_pmc (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::unshift_pmc)!\n");
+        return (void)0;
+    }
+
+    void splice (PMC* value, INTVAL offset, INTVAL count) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::splice)!\n");
+        return (void)0;
+    }
+
+    void add (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::add)!\n");
+        return (void)0;
+    }
+
+    void add_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::add_int)!\n");
+        return (void)0;
+    }
+
+    void add_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::add_bignum)!\n");
+        return (void)0;
+    }
+
+    void add_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::add_float)!\n");
+        return (void)0;
+    }
+
+    void add_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::add_same)!\n");
+        return (void)0;
+    }
+
+    void subtract (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtract)!\n");
+        return (void)0;
+    }
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtract_int)!\n");
+        return (void)0;
+    }
+
+    void subtract_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtract_bignum)!\n");
+        return (void)0;
+    }
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtract_float)!\n");
+        return (void)0;
+    }
+
+    void subtract_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::subtract_same)!\n");
+        return (void)0;
+    }
+
+    void multiply (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::multiply)!\n");
+        return (void)0;
+    }
+
+    void multiply_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::multiply_int)!\n");
+        return (void)0;
+    }
+
+    void multiply_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::multiply_bignum)!\n");
+        return (void)0;
+    }
+
+    void multiply_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::multiply_float)!\n");
+        return (void)0;
+    }
+
+    void multiply_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::multiply_same)!\n");
+        return (void)0;
+    }
+
+    void divide (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::divide)!\n");
+        return (void)0;
+    }
+
+    void divide_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::divide_int)!\n");
+        return (void)0;
+    }
+
+    void divide_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::divide_bignum)!\n");
+        return (void)0;
+    }
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::divide_float)!\n");
+        return (void)0;
+    }
+
+    void divide_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::divide_same)!\n");
+        return (void)0;
+    }
+
+    void modulus (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::modulus)!\n");
+        return (void)0;
+    }
+
+    void modulus_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::modulus_int)!\n");
+        return (void)0;
+    }
+
+    void modulus_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::modulus_bignum)!\n");
+        return (void)0;
+    }
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::modulus_float)!\n");
+        return (void)0;
+    }
+
+    void modulus_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::modulus_same)!\n");
+        return (void)0;
+    }
+
+    void cmodulus (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmodulus)!\n");
+        return (void)0;
+    }
+
+    void cmodulus_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmodulus_int)!\n");
+        return (void)0;
+    }
+
+    void cmodulus_bignum (BIGNUM* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmodulus_bignum)!\n");
+        return (void)0;
+    }
+
+    void cmodulus_float (FLOATVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmodulus_float)!\n");
+        return (void)0;
+    }
+
+    void cmodulus_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmodulus_same)!\n");
+        return (void)0;
+    }
+
+    void neg (PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::neg)!\n");
+        return (void)0;
+    }
+
+    void bitwise_or (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_or)!\n");
+        return (void)0;
+    }
+
+    void bitwise_or_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_or_int)!\n");
+        return (void)0;
+    }
+
+    void bitwise_or_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_or_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_and (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_and)!\n");
+        return (void)0;
+    }
+
+    void bitwise_and_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_and_int)!\n");
+        return (void)0;
+    }
+
+    void bitwise_and_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_and_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xor (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xor)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xor_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xor_int)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xor_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xor_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ors (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ors)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ors_str (STRING* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ors_str)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ors_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ors_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ands (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ands)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ands_str (STRING* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ands_str)!\n");
+        return (void)0;
+    }
+
+    void bitwise_ands_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_ands_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xors (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xors)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xors_str (STRING* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xors_str)!\n");
+        return (void)0;
+    }
+
+    void bitwise_xors_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_xors_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_not (PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_not)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shl (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shl)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shl_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shl_int)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shl_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shl_same)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shr (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shr)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shr_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shr_int)!\n");
+        return (void)0;
+    }
+
+    void bitwise_shr_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::bitwise_shr_same)!\n");
+        return (void)0;
+    }
+
+    void concatenate (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::concatenate)!\n");
+        return (void)0;
+    }
+
+    void concatenate_native (STRING* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::concatenate_native)!\n");
+        return (void)0;
+    }
+
+    void concatenate_same (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::concatenate_same)!\n");
+        return (void)0;
+    }
+
+    INTVAL is_equal (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::is_equal)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL is_same (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::is_same)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL is_same_keyed (PMC* key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::is_same_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL is_same_keyed_int (INTVAL key, PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::is_same_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL cmp (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmp)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL cmp_num (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmp_num)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL cmp_string (PMC* value) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::cmp_string)!\n");
+        return (INTVAL)0;
+    }
+
+    void logical_or (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::logical_or)!\n");
+        return (void)0;
+    }
+
+    void logical_and (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::logical_and)!\n");
+        return (void)0;
+    }
+
+    void logical_xor (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::logical_xor)!\n");
+        return (void)0;
+    }
+
+    void logical_not (PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::logical_not)!\n");
+        return (void)0;
+    }
+
+    void repeat (PMC* value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::repeat)!\n");
+        return (void)0;
+    }
+
+    void repeat_int (INTVAL value, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::repeat_int)!\n");
+        return (void)0;
+    }
+
+    void increment () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::increment)!\n");
+        return (void)0;
+    }
+
+    void decrement () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::decrement)!\n");
+        return (void)0;
+    }
+
+    INTVAL exists_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::exists_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL exists_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::exists_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL defined () {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::defined)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL defined_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::defined_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL defined_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::defined_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    void delete_keyed (PMC* key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::delete_keyed)!\n");
+        return (void)0;
+    }
+
+    void delete_keyed_int (INTVAL key) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::delete_keyed_int)!\n");
+        return (void)0;
+    }
+
+    PMC* nextkey_keyed (PMC* key, INTVAL what) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::nextkey_keyed)!\n");
+        return (PMC*)0;
+    }
+
+    PMC* nextkey_keyed_int (INTVAL key, INTVAL what) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::nextkey_keyed_int)!\n");
+        return (PMC*)0;
+    }
+
+    void substr (INTVAL offset, INTVAL length, PMC* dest) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::substr)!\n");
+        return (void)0;
+    }
+
+    STRING* substr_str (INTVAL offset, INTVAL length) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::substr_str)!\n");
+        return (STRING*)0;
+    }
+
+    void* invoke (void* next) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::invoke)!\n");
+        return (void*)0;
+    }
+
+    void* invoke_pmc (PMC* sub, void* next) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::invoke_pmc)!\n");
+        return (void*)0;
+    }
+
+    INTVAL can (STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::can)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL can_keyed (PMC* key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::can_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL can_keyed_int (INTVAL key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::can_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL does (STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::does)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL does_keyed (PMC* key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::does_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL does_keyed_int (INTVAL key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::does_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL isa (STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::isa)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL isa_keyed (PMC* key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::isa_keyed)!\n");
+        return (INTVAL)0;
+    }
+
+    INTVAL isa_keyed_int (INTVAL key, STRING* method) {
+        internal_exception(NULL_REG_ACCESS, "Fatal exception: Null PMC access (PMC::isa_keyed_int)!\n");
+        return (INTVAL)0;
+    }
+
+}
