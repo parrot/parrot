@@ -18,6 +18,7 @@
 PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_new_class(Parrot_Interp, STRING *);
 PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
+PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
 
 #endif
