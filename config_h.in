@@ -8,6 +8,7 @@
 #define PARROT_CONFIG_H_GUARD
 #include <stddef.h>
 typedef ${iv} INTVAL;
+typedef unsigned ${iv} UINTVAL;
 typedef ${nv} FLOATVAL;
 
 typedef ${opcode_t} opcode_t;
