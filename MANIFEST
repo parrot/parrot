@@ -218,6 +218,15 @@ languages/regex/lib/Regex/Rewrite/Re.pm
 languages/regex/lib/Regex/Rewrite/Rx.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/regex.pl
+languages/regex/t/alt.t
+languages/regex/t/group.t
+languages/regex/t/ngplus.t
+languages/regex/t/plus.t
+languages/regex/t/regress1.t
+languages/regex/t/scanalt.t
+languages/regex/t/scanstar.t
+languages/regex/t/star.t
+languages/regex/t/staralt.t
 languages/regex/test.pl
 languages/scheme/Makefile.in
 languages/scheme/Scheme.pm
