@@ -1380,25 +1380,6 @@ Parrot_shr_i_ic_ic {
     }
 }
 
-;Parrot_index_i_s_s {
-;    PUSH_MAPPED_REG(0);
-;    emit_movl_m_r(NATIVECODE, emit_EAX, &STR_REG[1]);
-;    emit_movl_m_r(NATIVECODE, emit_ECX, &STR_REG[2]);
-;    emitm_cmpl_i_r(NATIVECODE, 0, emit_EAX);
-;    JUMP(EXIT);
-;    emitm_cmpl_i_r(NATIVECODE, 0, emit_ECX);
-;    JUMP(EXIT);
-; This is very sensible to the size of UINTVAL
-;    emit_movb_i_r_r(NATIVECODE, 20, emit_EAX, emit_EDX);
-;    emitm_cmpl_i_r(NATIVECODE, 0, emit_EDX);
-;    JUMP(EXIT);
-;    emit_movb_i_r_r(NATIVECODE, 20, emit_ECX, emit_EBX);
-;    emitm_cmpl_i_r(NATIVECODE, 0, emit_EBX);
-;    JUMP(EXIT);
-;    emit_pushl_r(NATIVECODE, emit_EAX);
-;    emit_pushl_r(NATIVECODE, emit_ECX);
-;}
-
 /*
  * Local variables:
  * c-indentation-style: bsd
