@@ -327,17 +327,17 @@ static INTVAL
 string_str_index_multibyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
-    const void* const lastmatch =
-        str->encoding->skip_backward((char*)str->strstart + str->strlen,
-                            find->encoding->characters(find, find->strlen));
-    const void* const lastfind  = (char*)find->strstart + find->strlen;
+    const void* const lastmatch = str->encoding->skip_backward(
+            (char*)str->strstart + str->buflen,  find->strlen);
+    const void* const lastfind  = find->encoding->skip_forward(
+            find->strstart, find->strlen);
     const void* sp;
     const void* fp;
     const void* ip;
     INTVAL pos = start;
 
     sp = str->encoding->skip_forward(str->strstart, start);
-    while (sp < lastmatch) {
+    while (sp <= lastmatch) {
         fp = find->strstart;
         ip = sp;
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 117;
+use Parrot::Test tests => 119;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1294,6 +1294,57 @@ LOOP:
 CODE
 46368
 -1
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, multibyte matching");
+    set S0, "\xAB"
+    find_chartype I0, "usascii"
+    set_chartype S0, I0
+    find_encoding I0, "singlebyte"
+    set_encoding S0, I0
+
+    find_encoding I0, "utf8"
+    find_chartype I1, "unicode"
+    transcode S1, S0, I0, I1
+
+    eq S0, S1, equal
+    print "not "
+equal:
+    print "equal\n"
+
+    index I0, S0, S1
+    print I0
+    print "\n"
+    index I0, S1, S0
+    print I0
+    print "\n"
+CODE
+equal
+0
+0
+OUTPUT
+
+output_is(<<'CODE',<<OUTPUT,"index, multibyte matching 2");
+    set S0, "\xAB\xBA"
+    set S1, "foo\xAB\xAB\xBAbar"
+    find_chartype I0, "usascii"
+    set_chartype S0, I0
+    find_encoding I0, "singlebyte"
+    set_encoding S0, I0
+
+    find_chartype I0, "unicode"
+    find_encoding I1, "utf8"
+    transcode S1, S1, I1, I0
+
+    index I0, S0, S1
+    print I0
+    print "\n"
+    index I0, S1, S0
+    print I0
+    print "\n"
+CODE
+-1
+4
 OUTPUT
 
 output_is(<<'CODE',<<OUTPUT,"num to string");
