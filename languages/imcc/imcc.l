@@ -2,11 +2,11 @@
 /*
  * imc.l
  *
- * Intermediate Language compiler for Parrot
+ * Intermediate Code Compiler for Parrot
  *
  * Copyright (C) 2002 Melvin Smith
  *
- * Tokenizer for the intermediate compiler/code generator
+ * The tokenizer.
  */
 
 

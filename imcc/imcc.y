@@ -2,11 +2,11 @@
 /*
  * imcc.y
  *
- * Intermediate language compiler for Parrot.
+ * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
  *
- * The intermediate language compiler. Grammar for the Parrot VM target.
+ * Grammar for the parser.
  */
 
 #include <string.h>
