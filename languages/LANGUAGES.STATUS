@@ -88,13 +88,6 @@ S: Largely functional, but changing rapidly
 M: Yes
 V: 0.0.11
 
-N: plot
-A: Piers Cawley
-S: An attempt to get a Scheme like REP Loop up during OSCON.
-S: A failed attempt.
-M: No
-V: 0.0.11
-
 N: Python
 A: Michal J Wallace
 S: Mostly working except for classes/exec/import. For licensing
