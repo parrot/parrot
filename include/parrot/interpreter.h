@@ -125,7 +125,9 @@ typedef struct _RunProfile {
     ProfData *data;
 } RunProfile;
 
-/* Forward decl for imc_info_t */
+/* Forward declaration for imc_info_t -- the actual struct is 
+ * defined in imcc/imc.h 
+ */
 struct _imc_info_t;
 
 /*
