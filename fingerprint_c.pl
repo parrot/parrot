@@ -54,7 +54,7 @@ EOF
 
 } else { # !DEVELOPING  
 
-  print << 'EOF';
+  print << "EOF";
 /* fingerprint checking is only in enabled in development versions */
 
 int
