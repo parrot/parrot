@@ -1,96 +1,475 @@
 #!/usr/bin/perl -w
 
-use strict;
+=head2 New Assembler
+
+This passes all of the tests except those involving macros and local labels.
+Those features will be provided by a macro processing layer, soon to be written.
+Pretty much every other feature is supported, along with a new hidden feature.
+When the Compiler class is separated out, tests can use the Compiler class to
+accept a simple array of instructions and generate bytecode directly from that.
+This should eliminate the intermediary .pasm file and speed things up.
+
+=head2 NEWS
+
+Keyed access. We now support the following (tested) code:
+
+  new P0, 6 # Index of PerlHash. Clumsy, but necessary until the macro processor
+            # layer is added.
+  set S0, "one"
+  set_keyed P0[S0],1
+  get_keyed I0,P0[S0]
+  print I0
+  print "\n"
+  end
+
+Local labels. Not supported yet. The macro processor layer probably will do this
+for us, once it's added.
+
+=cut
+
+#
+# XXX Feel free to move this to an appropriate file when the necessary features
+# XXX have been added, and features -will- need to be added.
+#
+
+package Compiler;
+
+use POSIX; # Needed for strtol()
+
 use lib './lib';
+use Parrot::Types; # For pack_op()
+use Parrot::OpLib::core;
+
 use lib './lib/Parrot/blib/lib';
 use lib './lib/Parrot/blib/arch/auto/Parrot/PakFile2';
 use Parrot::PakFile2;
-use Parrot::Assembler::Utils;
-use strict;
-use Parrot::OpLib::core;
-use Parrot::Types;
 
+=head2 Compiler class
+
+=item new
+
+Create a new Compiler instance.
+
+  To compile a list of files: 
+    $compiler = Compiler->new(-files=>[qw(foo.pasm bar.pasm)]);
+
+  To compile an array of instructions:
+    $compiler = Compiler->new(-contents=>['set S0,"foo"','print S0','end']);
+
+=cut
+
+sub new {
+  my $class = shift;
+  my %args = @_;
+  my $self = {
+    contents          => [ ],
+    num_constants     => 0,
+    ordered_constants => [ ],
+  };
+  if(exists $args{-files}) {
+    $self->{files} = $args{-files};
+  }
+  elsif(exists $args{-contents}) {
+    for(@{$args{-contents}}) {
+      _annotate_contents($self,$_);
+    }
+  }
+  bless _init($self),$class;
+}
+
+=item _annotate_contents
+
+Process the array C<$self->{contents}>, and make the appropriate annotations
+in the array. For instance, it slightly munges global and local labels to make
+sure the statements fall where they should. Also, annotates the array into an
+AoA of [$statement,$lineno]. A later pass changes $lineno to $pc, once the
+arguments have been appropriately analyzed.
+
+=cut
+
+sub _annotate_contents {
+  my ($self,$line) = @_;
+
+  $self->{pc}++;
+  return if $line=~/^\s*$/ or $line=~/^\s*#/; # Filter out the comments and blank lines
+  $line=~s/#[^'"]+$//;               # Remove trailing comments
+  $line=~s/(^\s+|\s+$)//g;           # Remove leading and trailing whitespace
+  #
+  # Accumulate lines that only have labels until an instruction is found.
+  # XXX This could fail if a label occurs at the end of a file.
+  #
+  if(@{$self->{contents}} and
+     $self->{contents}[-1][0] =~ /:$/) {
+    $self->{contents}[-1][0] .= $line;
+  }
+  else {
+    push @{$self->{contents}},[$line,$self->{pc}];
+  }
+}
+
+=item _init
+
+Process files of assembly code, should they have been passed in. Also,
+regardless of the input to C<new()>, take the arrays of operators and load
+them into a form appropriate to parsing.
+
+=cut
+
+sub _init {
+  my $self = shift;
+
+  for(@$Parrot::OpLib::core::ops) {
+    my $argtype = join '_',@{$_->{ARGS}}[1..$#{$_->{ARGS}}];
+    $self->{fullops}->{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
+  }
+
+  if(defined $self->{files}) {
+    for my $file (@{$self->{files}}) {
+      open FILE,"< $file" or
+        die "Couldn't read from '$file': $!";
+      while(<FILE>) {
+        _annotate_contents($self,$_);
+      }
+      close FILE;
+    }
+  }
+  $self;
+}
+
+=item _collect_labels
+
+Collect labels, remove their definition, and save the appropriate line numbers.
+Local labels aren't given special treatment yet.
+
+=cut
+
+sub _collect_labels {
+  my $self = shift;
+
+  my $label_re = qr([a-zA-Z0-9_]+);
+
+  #
+  # Collect label definition points first
+  #
+  for(@{$self->{contents}}) {
+    #
+    # If there's a local label, collect it
+    #
+    if($_->[0]=~s/^(\$$label_re)\s*:\s*,?//) {
+      push @{$self->{local_labels}{$1}},$_->[1];
+    }
+    #
+    # Same for a global label
+    #
+    elsif($_->[0]=~s/^($label_re)\s*:\s*,?//) {
+      $self->{global_labels}{$1} = $_->[1];
+    }
+  }
+}
+
+=item _generate_bytecode
+
+Start out by walking the C<$self->{contents}> array. On the first pass, make
+sure that the operation requested exists. If it doesn't, yell on STDERR.
+If it does, replace the text version of the operator with its numeric index,
+and pack it into C<$self->{bytecode}>.
+
+The inner loop walks through the arguments nested within the C<$op> arrayref,
+determining what type the argument is (C<$_->[0]>), and packing in the
+appropriate code. Note that labels are precalculated, and constants have been
+packed into the appropriate areas.
+
+=cut
+
+sub _generate_bytecode {
+  my $self = shift;
+
+  for my $op (@{$self->{contents}}) {
+    if(defined $self->{fullops}{$op->[0][0]}) {
+      $op->[0][0] = $self->{fullops}{$op->[0][0]};
+
+      $self->{bytecode} .= pack_op($op->[0][0]);
+
+      for(@{$op->[0]}) {
+        next unless ref($_) eq 'ARRAY'; # XXX Probably should loop smarter than this
+        if ($_->[0] =~ /^[ispn]$/) {      # Register
+          $_->[1] =~ /(\d+)/;
+          $self->{bytecode} .= pack_op($1);
+        }
+        elsif ($_->[0] =~ /^([spn])c$/) { # String/num/PMC constant
+          $self->{bytecode} .= pack_op($_->[1]);
+        }
+        elsif ($_->[0] eq "ic") {          # Integer constant
+          $self->{bytecode} .= pack_op($_->[1]);
+        }
+        #
+        # Not sure if this is actually used...
+        #
+        elsif ($_->[0] eq "r") {
+          my %r_types = ("I" => 0, "N"=>1, "S"=>2, "P"=>3);
+          $_->[1]=~/([PSNI])(\d+)/i;
+          $self->{bytecode} .= pack_op($r_types{uc $1} >> 6 + $2);
+        }
+      }
+    }
+    else {
+      print STDERR "Couldn't find operator '$op->[0][0]' on line $op->[1].\n";
+    }
+  }
+}
+
+=item adjust_labels
+
+This works primarily on C<$self->{global_labels}>, computing offsets and getting
+things ready for the final shift. Since the values of C<$self->{global_labels}>
+correspond to line numbers, we replace the line numbers with program counter
+indices.
+
+The next pass walks the C<$self->{contents}> array, replacing the label names
+with the difference between the current PC and the label PC. Label names are
+preserved in the previous pass, which makes this possible.
+
+=cut
+
+sub _adjust_labels {
+  my $self = shift;
+
+  for(keys %{$self->{global_labels}}) { # XXX This probably can be moved
+    $self->{global_labels}{$_} =        # XXX elsewhere.
+      $self->{line_to_pc}{$self->{global_labels}{$_}};
+  }
+
+  for my $line (@{$self->{contents}}) {
+    my $cur_pc = $self->{line_to_pc}{$line->[1]};
+    for(@{$line->[0]}) {
+      next unless ref($_) eq 'ARRAY'; # XXX Probably should loop smarter than this
+      next unless $_->[0] eq 'label';
+      $_->[0] = 'ic'; # Now is an integer constant.
+      $_->[1] = $self->{global_labels}{$_->[1]} - $cur_pc;
+    }
+  }
+}
+
+=item _string_constant
+
+Unescape special characters in the constant and add them to not one but two
+data structures. C<$self->{constants}{s}> is for fast lookup when time comes
+to substitute constants for their indices, and C<$self->{ordered_constants}>
+keeps track of numeric and string constants in order of occurrence, so they
+can be packed directly into the binary format.
+
+=cut
+
+sub _string_constant {
+  my ($self,$constant) = @_;
+  $constant=~s/\\n/\n/;
+  $constant=~s/\\t/\t/;
+
+  my $value = substr($constant,1,length($constant)-2);
+  unless(defined $self->{constants}{s}{$value}) {
+    $self->{constants}{s}{$value} = $self->{num_constants}++;
+    push @{$self->{ordered_constants}},['S',$value];
+  }
+  return ['sc',$self->{constants}{s}{$value}];
+}
+
+=item _numeric_constant
+
+Take the numeric constant and place it into both C<$self->{constants}{n}> and
+C<$self->{ordered_constants}>. The first hash lets us do fast lookup when time
+comes to replace a constant with its value. The second array maintains the
+various string and numeric constants in order of first occurrence, and is ready
+to pack into the bytecode.
+
+=cut
+
+sub _numeric_constant {
+  my ($self,$constant) = @_;
+
+  unless(defined $self->{constants}{n}{$constant}) {
+    $self->{constants}{n}{$constant} = $self->{num_constants}++;
+    push @{$self->{ordered_constants}},['N',$constant];
+  }
+  return ['nc',$self->{constants}{n}{$constant}];
+}
+
+=item to_bytecode
+
+Take the content array ref and turn it into a ragged AoAoA of operations with
+attached processed arguments. This is the core of the assembler.
+
+  The transformation looks roughly like this:
+
+  [ [ 'if I0,BLAH', 3],
+    [ 'set P1[S5],P0["foo"]', 5],
+    [ 'BLAH: end', 6],
+  ]
+
+  into:
+
+  [ [ [ 'if_i_ic',
+        ['i','I0'],
+        ['label','BLAH'], # Leave the name here so we can resolve backward refs.
+      ],
+      3, # Line number
+    ],
+    [ [ 'set_p_s_p_sc',
+        ['p','P1'],
+        ['s','S5'],
+        ['p','P0'],
+        ['sc',0],    # String constant number 0
+      ]
+      5,
+    ],
+    [ [ 'end',
+      ],
+      6,
+  ]
+
+The first pass collects labels, so we can resolve forward label references
+(That is, labels used before they're defined). References to labels aren't yet
+expanded.
+
+The second pass takes the arguments in each line (C<$_->[0]>) and breaks them
+into their components. It does this by passing each line through a loop of REs
+to break lines into each argument type. The individual REs break down the
+arguments into an array ref C<[$type,$argument]>. Constants are collected and
+replaced with indices, and the number of arguments is counted and added to the
+internal PC tracking.
+
+The third pass takes labels and replaces them with the PC offset to the actual
+instruction, and generates bytecode. It returns the bytecode, and we're done.
+
+=cut
+
+sub to_bytecode {
+  my $self = shift;
+
+  my $reg_re = qr([INPS]\d+);
+  my $bin_re = qr([-+]?0[bB][01]+);
+  my $dec_re = qr([-+]?\d+);
+  my $hex_re = qr([-+]?0[xX][0-9a-fA-F]+);
+  my $flt_re = qr([-+]?\d+\.\d+([eE][-+]?\d+)?);
+  my $str_re = qr(\"(?:[^\\\"]*(?:\\.[^\\\"]*)*)\" |
+                  \'(?:[^\\\']*(?:\\.[^\\\']*)*)\'
+                 )x;
+  my $label_re = qr([a-zA-Z][a-zA-Z0-9_]*);
+  my $pc = 0;
+
+  $self->_collect_labels(); # Collect labels in a separate pass
+
+  for(@{$self->{contents}}) {
+    #
+    # Collect the operator
+    #
+    my $temp = $_->[0];
+    $temp=~s/^(\w+)\s*//;
+    $_->[0] = [$1];
+
+    while($temp ne '') {
+      $temp=~s/^\s*(,\s*)?//;
+      if($temp=~s/^($reg_re)//) {
+        $_->[0][0] .= "_".lc(substr($1,0,1));
+        push @{$_->[0]}, [lc(substr($1,0,1)),$1];
+      }
+      elsif($temp=~s/^\[($reg_re)\]//) {
+        $_->[0][0] .= "_".lc(substr($1,0,1));
+        push @{$_->[0]}, [lc(substr($1,0,1)),$1];
+      }
+      elsif($temp=~s/^($flt_re)//) {
+        $_->[0][0] .= "_nc";
+        push @{$_->[0]}, $self->_numeric_constant($1);
+      }
+      elsif($temp=~s/^\[($str_re)\]//) {
+        $_->[0][0] .= "_sc";
+        push @{$_->[0]}, $self->_string_constant($1);
+      }
+      elsif($temp=~s/^($bin_re)//) {
+        my $val = $1;$val=~s/0b//;
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',(strtol($val,2))[0]];
+      }
+      elsif($temp=~s/^($hex_re)//) {
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',(strtol($1,16))[0]];
+      }
+      elsif($temp=~s/^($dec_re)//) {
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['ic',0+$1];
+      }
+      elsif($temp=~s/^($str_re)//) {
+        $_->[0][0] .= "_sc";
+        push @{$_->[0]}, $self->_string_constant($1);
+      }
+      elsif($temp=~s/^($label_re)//) {
+        unless(defined $self->{global_labels}{$1}) {
+          print STDERR "Couldn't find global label '$1' at line $_->[1].\n";
+          last;
+        }
+        $_->[0][0] .= "_ic";
+        push @{$_->[0]}, ['label',$1];
+      }
+      else {
+        print STDERR "Couldn't parse argument '$temp' at line $_->[1].\n";
+        last;
+      }
+    }
+    $self->{line_to_pc}{$_->[1]}=$pc;
+    $pc += scalar @{$_->[0]};
+  }
+  $self->_adjust_labels(); # XXX It's possible that these passes could be
+  $self->_generate_bytecode(); # XXX merged, but I'm not going to worry about
+                               # XXX it right now.
+
+  return Parrot::PakFile2::output_bytecode({
+    bytecode  => $self->{bytecode},
+    constants => $self->{ordered_constants}
+  });
+}
+
+package main;
+
+use strict;
+
+my %args;
+my $files;
+
+#
+# Process command-line arguments without involving Getopt::{whatever}.
+#
 unless(@ARGV) {
     Usage();
 }
 Usage() if $ARGV[0] eq '-h';
 Usage() if $ARGV[0] eq '--help';
 
-my %args;
-my @files;
-#
-# Process arguments
-#
 for(my $i=0;$i<@ARGV;$i++) {
-    if($ARGV[$i] eq '--output') {
-        $args{output} = $ARGV[++$i];
-    }
-    elsif($ARGV[$i] eq '--checksyntax') {
-        $args{checksyntax} = 1;
-    }
-    else {
-        push @files,$ARGV[$i];
-    }
-}
-
-my $ops;
-my $fullops;
-for (@$Parrot::OpLib::core::ops) {
-    my $argtype = join "_", @{$_->{ARGS}}[1..$#{$_->{ARGS}}];
-    ${$ops->{$_->{NAME}}}{$argtype} = $_->{CODE};
-    $fullops->{$_->{NAME}.($argtype &&"_$argtype") } = $_->{CODE};
+  if($ARGV[$i] eq '--output') {
+    $args{output} = $ARGV[++$i];
+  }
+  elsif($ARGV[$i] eq '--checksyntax') {
+    $args{checksyntax} = 1;
+  }
+  else {
+    push @$files,$ARGV[$i];
+  }
 }
 
 #
-# Open all of the files in a row and add them to @asm, stripping keys and labels
+# Compile the files, and handle the output.
 #
-my @asm;
-my $pc = 0;
-my $labels={};
-
-for my $file (@files) {
-    open FILE,"<$file" or
-        die "Couldn't read from '$file': $!";
-    while (<FILE>) {
-        next if /^\s*#/;
-        chomp;
-        $_ = detach_key($_);
-        s/,\s*$//; # In case of comments, trailing commas, etc.
-        push @asm, $_;
-        define_labels($labels,$_);
-    }
-    close FILE;
-}
-
-# Reset variables
-$pc = 0;
-my $lineno = 0;
-my $bc;
-my %const_hash;
-my @const_array;
-
-# The second pass expands labels and ops, removes constants and emits
-# bytecode
-for (@asm) {
-    $lineno++;
-    $_ = replace_labels($lineno,$labels,$_);
-    $_ = expand_op($ops,$lineno,$_) if $_;
-    $bc .= emit(\%const_hash,\@const_array,$fullops,$_) if $_;
-}
-my $packfile = {
-    bytecode => $bc,
-    constants => \@const_array
-};
+my $compiler = Compiler->new('-files' => $files);
+my $bytecode = $compiler->to_bytecode();
 
 exit if exists $args{checksyntax};
 if(exists $args{output}) {
-    open FILE,">$args{output}"
-      or die "Could not write to '$args{output}': $!";
-    print FILE Parrot::PakFile2::output_bytecode($packfile);
-    close FILE;
+  open FILE,">$args{output}"
+    or die "Could not write to '$args{output}': $!";
+  print FILE $bytecode;
+  close FILE;
 }
 else {
-    print Parrot::PakFile2::output_bytecode($packfile);
+  print $bytecode;
 }
 
 exit;
@@ -107,150 +486,4 @@ usage: $0 [-h] [--help] [--checksyntax] [--output=file] file ...
     
 _EOF_
     exit;
-}
-
-sub detach_key {
-    local $_ = shift;
-    my $output = "";
-    s/^(\s*\w+:)// and $output .= $1; # label
-    s/^(\s*)// and $output .= $1;
-    return $output unless $_;
-    s/(\w+\s*)// and $output .= $1;   # Op
-
-    # Run through the args looking for keys
-    my @args;
-    Parrot::Assembler::Utils::map_args {
-        my ($arg_t, $arg, $extra) = @_;
-        push @args, $arg;
-        if ($arg_t eq "key") {
-            $extra =~ s/\[/[k:/;
-            push @args, $extra;
-        }
-    } $_;
-    return $output." ".join ", ",@args;
-}
-
-sub define_labels {
-    my $labels = shift;
-    local $_ = shift;
-
-    # If we find a label, store its PC
-    if (s/^(\s*(\w+):)//) {
-        die "Redefined label '$2' at line $.\n" if exists $labels->{$2};
-        $labels->{$2} = $pc;
-    }
-
-    s/^(\s*)//;
-    return unless $_;
-
-    # Count the op
- 
-    s/(\w+\s*)//;
-    $pc++;
-
-    # Now count the number of args
-    Parrot::Assembler::Utils::map_args {
-        $pc++;
-    } $_;
-}
-
-sub replace_labels {
-    my $lineno = shift;
-    my $labels = shift;
-    local $_ = shift;
-    my $output;
-
-    s/^(\s*(\w+):)//;
-    s/^(\s*)// and $output .= $1;
-    return unless $_;
-
-    # Count the op
-    s/(\w+\s*)// and $output .= $1;
-    my $ops_pc = $pc;
-    $pc++;
-
-    my @args;
-    Parrot::Assembler::Utils::map_args {
-        my ($arg_t, $arg, $extra) = @_;
-        $pc++;
-        if ($arg_t eq "label") {
-            if (defined $labels->{$arg}) {
-                push @args, $labels->{$arg} - $ops_pc;
-            } else {
-                die "Undefined label '$arg' used at line $lineno\n";
-            }
-        } else {
-            push @args, $arg;
-        }
-    } $_;
-    return $output." ".join ", ",@args;
-}
-
-sub expand_op {
-    my $ops = shift;
-    my $lineno = shift;
-    local $_ = shift;
-    s/^\s*//;
-    return unless $_;
-
-    s/(\w+)\s*//;
-    die "Don't know op $1" unless $ops->{$1};
-    my $op = $1;
-
-    # Now let's look at the arguments
-    my @args;
-    my @arg_t;
-    Parrot::Assembler::Utils::map_args {
-        push @arg_t, $_[0];
-        push @args, $_[1];
-    } $_;
-    my $type_specifier = join "_", @arg_t;
-    my $complete = $op;
-    $complete .="_$type_specifier" if $type_specifier;
-    warn "Can't find op '$complete' at line $lineno\n" 
-        unless exists $ops->{$op}{$type_specifier};
-    return $complete." ".join ",",@args;
-}
-
-sub emit {
-    my $const_href = shift;
-    my $const_aref = shift;
-    my $fullops = shift;
-    local $_ = shift;
-    my $rv;
-    s/^\s*//;
-    return unless $_;
-
-    s/(\w+)\s*//;
-    die "Can't find op '$1'\n" unless exists $fullops->{$1};
-    $rv .= pack_op($fullops->{$1}); 
-    Parrot::Assembler::Utils::map_args {
-        my ($arg_t, $arg) = @_;
-        if ($arg_t =~ /^[ispn]$/) {
-            $arg =~ /(\d+)/;
-            $rv .= pack_op($1);
-        } elsif ($arg_t =~ /^([spn])c$/) {
-            my $type = $1;
-            if ($type eq "s") {
-                $arg = eval $arg;
-            }
-            $rv .= pack_op(constantize($const_href,$const_aref,$arg, $type));
-        } elsif ($arg_t eq "ic") {
-            $rv .= pack_op($arg);
-        } elsif ($arg_t eq "r") {
-            my %r_types = ("I" => 0, "N"=>1, "S"=>2, "P"=>3);
-            $arg=~/([PSNI])(\d+)/i;
-            $rv .= pack_op($r_types{uc $1} >> 6 + $2);
-        }
-    } $_;
-    return $rv;
-}
-
-sub constantize {
-    my $const_href = shift;
-    my $const_aref = shift;
-    my ($arg, $type) = @_;
-    return $const_href->{$type}{$arg} if exists $const_href->{$type}{$arg};
-    push @$const_aref, [uc $type, $arg];
-    return $const_href->{$type}{$arg} = $#{$const_aref};
 }
