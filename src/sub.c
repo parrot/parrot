@@ -388,8 +388,10 @@ new_coroutine(Interp *interp)
     ctx = &co->ctx;
     save_context(interp, ctx);
 
-    /* we have separate register stacks */
-    setup_register_stacks(interp, ctx);
+    /* we have separate register stacks
+     * - or not, with our single item stack
+     */
+    /* setup_register_stacks(interp, ctx); */
 
     /* create new (pad ??) and control stacks,
      * when invoking the coroutine the real stacks are

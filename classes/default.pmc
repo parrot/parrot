@@ -756,11 +756,32 @@ Returns whether the PMC "isa" C<*method>.
 
 Returns SELF. A PMC is it's own class.
 
+=item C<PMC* get_attr_str(STRING* attr)>
+
+Look for NCI methods and propertys.
+
 =cut
 
 */
     PMC* get_class() {
         return SELF;
+    }
+
+    PMC* get_attr_str(STRING* name) {
+        /* lets look for props first */
+        PMC *p;
+        HashBucket* b;
+        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+             b = hash_get_bucket(INTERP, (Hash*) PMC_metadata(SELF), name);
+             if (b)
+                 return b->value;
+        }
+        /* may be NCI? */
+        p = Parrot_find_method_with_cache(INTERP, SELF, name);
+        if (!p) {
+            /* TODO AttributeError */
+        }
+        return p;
     }
 
 /*

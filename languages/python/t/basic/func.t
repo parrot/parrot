@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -201,3 +201,20 @@ def main():
 if __name__ == '__main__':
     main()
 CODE
+
+test(<<'CODE', 'enumerate');
+if __name__ == '__main__':
+    for i,j in enumerate("abc"):
+	print i,j
+CODE
+
+test(<<'CODE', 'enumerate - break');
+if __name__ == '__main__':
+    it = iter("abcdef")
+    for i, c in enumerate(it):
+        print i, c
+        if i == 2:
+            break
+    print "Ok"
+CODE
+

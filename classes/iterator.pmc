@@ -22,6 +22,13 @@ These are the vtable functions for the Iterator base class
 
 pmclass Iterator {
 
+    void class_init() {
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_Iterator,
+                    F2DPTR(Parrot_Iterator_shift_pmc), "next", "PIO");
+        }
+    }
+
 /*
 
 =item C<void init()>
@@ -451,21 +458,23 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         PMC *agg, *key, *res;
         INTVAL ires;
 
-        REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(3) = 0;
+        REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         if (!key)
             return next;
-        if (PMC_int_val(key) == -1)
+        if (PMC_int_val(key) == -1) {
+            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
             return next;
+        }
         key = PMC_struct_val(SELF);
         agg = PMC_pmc_val(SELF);
         switch (agg->vtable->base_type) {
             case enum_class_IntList:
-                ires = SELF.shift_integer();
+                ires = DYNSELF.shift_integer();
                 REG_INT(1) = 1;
                 REG_INT(5) = ires;
                 return next;
             default:
-                res = SELF.shift_pmc();
+                res = DYNSELF.shift_pmc();
                 REG_INT(3) = 1;
                 REG_PMC(5) = res;
                 return next;
@@ -643,6 +652,10 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
         PMC *key = PMC_struct_val(SELF);
         PMC *agg = PMC_pmc_val(SELF);
         return VTABLE_type_keyed_int(INTERP, agg, PMC_int_val(key) + idx );
+    }
+
+    PMC* get_iter () {
+        return SELF;
     }
 }
 

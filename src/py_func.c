@@ -61,6 +61,13 @@ parrot_py_chr(Interp *interpreter, PMC *pmc)
 }
 
 static PMC *
+parrot_py_enumerate(Interp *interpreter, PMC *list)
+{
+    PMC *res = pmc_new_init(interpreter, enum_class_Enumerate, list);
+    return res;
+}
+
+static PMC *
 parrot_py_filter(Interp *interpreter, PMC *func, PMC *list)
 {
     PMC *res, *iter;
@@ -326,23 +333,21 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *pipp = CONST_STRING(interpreter, "PIPP");
     STRING *pippp = CONST_STRING(interpreter, "PIPPP");
 
-    STRING *callable     = CONST_STRING(interpreter, "callable");
-    STRING *chr     = CONST_STRING(interpreter, "chr");
+    STRING *callable = CONST_STRING(interpreter, "callable");
+    STRING *chr      = CONST_STRING(interpreter, "chr");
+    STRING *enumerate= CONST_STRING(interpreter, "enumerate");
+    STRING *filter   = CONST_STRING(interpreter, "filter");
     STRING *hash     = CONST_STRING(interpreter, "hash");
-    STRING *iter     = CONST_STRING(interpreter, "iter");  /* XXX op */
-    STRING *iter_sig = CONST_STRING(interpreter, "PIP");
-    STRING *filter     = CONST_STRING(interpreter, "filter");
-
-    STRING *map     = CONST_STRING(interpreter, "map");
-    STRING *range     = CONST_STRING(interpreter, "range");
-    STRING *reduce     = CONST_STRING(interpreter, "reduce");
-    STRING *tuple     = CONST_STRING(interpreter, "tuple");
+    STRING *map      = CONST_STRING(interpreter, "map");
+    STRING *range    = CONST_STRING(interpreter, "range");
+    STRING *reduce   = CONST_STRING(interpreter, "reduce");
+    STRING *tuple    = CONST_STRING(interpreter, "tuple");
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_chr), chr, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
-    parrot_py_global(interpreter, F2DPTR(parrot_py_iter), iter, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_enumerate), enumerate, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_filter), filter, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
@@ -371,6 +376,10 @@ parrot_py_create_exceptions(Interp *interpreter)
      */
     ex = ex_list[E_Exception];
     s = CONST_STRING(interpreter, "Exception");
+    Parrot_store_global(interpreter, NULL, s, ex);
+
+    ex = ex_list[E_StopIteration];
+    s = CONST_STRING(interpreter, "StopIteration");
     Parrot_store_global(interpreter, NULL, s, ex);
 
     ex = ex_list[E_RuntimeError];

@@ -24,6 +24,7 @@ my %builtins = (
     callable => 1,
     chr => 1,
     hash => 1,
+    enumerate => 1,
     filter => 1,
     map => 1,
     range => 'v', # var args
@@ -124,7 +125,7 @@ sub get_source {
 }
 
 my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
-    @code, %globals, %classes);
+    @code, %globals, %classes, @loops);
 
 sub decode_line {
     my $l = shift;
@@ -1001,8 +1002,13 @@ EOC
 sub SETUP_LOOP
 {
     my ($n, $c, $cmt) = @_;
+    my $targ = "pc_xxx";
+    if ($c =~ /to (\d+)/) {
+	$targ = "pc_$1";
+    }
+    push @loops, $targ;
     print <<EOC;
-	# TODO $cmt
+	# -> $targ $cmt
 EOC
 }
 sub GET_ITER
@@ -1033,20 +1039,36 @@ sub FOR_ITER
 EOC
     push @stack, [-1, $var, 'P']
 }
+
 sub POP_BLOCK
 {
     my ($n, $c, $cmt) = @_;
-    print <<EOC;
-	# TODO $cmt
+    if (@loops) {
+	my $pc = pop @loops;
+	print <<EOC;
+	# $pc  $cmt
 EOC
+    }
+    else {
+	print <<EOC;
+	\t\t$cmt
+EOC
+    }
 }
 
 sub UNPACK_SEQUENCE
 {
     my ($n, $c, $cmt) = @_;
-    print <<EOC;
-	# TODO $cmt
+    my $tos = pop @stack;
+    my $seq = $tos->[1];
+    my ($p, $i);
+    for ($i = $n-1; $i >= 0; $i--) {
+	$p = temp('P');
+	print <<EOC;
+	$p = $seq\[$i\] $cmt
 EOC
+	push @stack, [-1, $p, 'P'];
+    }
 }
 
 sub DUP_TOP
@@ -1131,4 +1153,24 @@ sub BUILD_CLASS
 	$cl = newclass $tos->[1] $cmt
 EOC
     push @stack, ['class $tos->[1]', $cl, 'P'];
+}
+
+sub BREAK_LOOP
+{
+    my ($n, $c, $cmt) = @_;
+    my $pc = pop @loops;
+    print <<EOC;
+	goto $pc $cmt
+EOC
+}
+
+sub LOAD_ATTR
+{
+    my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;  # object
+    my $attr = temp('P');
+    print <<EOC;
+	 $attr = getattribute $tos->[1], "$c" $cmt
+EOC
+    push @stack, [-1, $attr, 'P'];
 }

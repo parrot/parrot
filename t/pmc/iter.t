@@ -16,7 +16,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 43;
 use Test::More qw(skip);
 
 output_is(<<'CODE', <<'OUTPUT', "new iter");
@@ -1371,3 +1371,28 @@ CODE
 ok
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "enumerate class");
+   new P0, .PerlString
+   set P0, "abcdef"
+   new P1, .Enumerate, P0
+   print "ok 1\n"
+lp:unless P1, ex
+   shift P2, P1
+   set P10, P2[0]
+   print P10
+   print " "
+   set P10, P2[1]
+   print P10
+   print "\n"
+   branch lp
+ex:
+   end
+CODE
+ok 1
+0 a
+1 b
+2 c
+3 d
+4 e
+5 f
+OUTPUT
