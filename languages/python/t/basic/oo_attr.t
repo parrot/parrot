@@ -33,7 +33,10 @@ def f(x):
     print x
 if __name__ == '__main__':
     print "a".__repr__()
-    print dict.fromkeys("abc")
+    d = dict.fromkeys("abc")
+    del d['a']
+    del d['c']
+    print d
     it = iter("abcde")
     print it.next()
     print f("Ok")

@@ -94,14 +94,14 @@ enter_nci_method should create these as locals to begin with.
 
     METHOD void __load__() {
         STRING *name, *key;
-        PMC *stash, *iter, *item, *pad, *find;
+        PMC *stash, *iter, *item, *pad, *temp;
         INTVAL j, n;
 
         /* Already init'ed? */
         pad = scratchpad_get_current(INTERP);
         name = const_string(INTERP, "__name__");
-        find = scratchpad_find(INTERP, pad, name);
-        if (find && VTABLE_defined(INTERP, find)) return;
+        temp = scratchpad_find(INTERP, pad, name);
+        if (temp && VTABLE_defined(INTERP, temp)) return;
 
         /* Find all PyBuiltin "nci" methods */
         stash = Parrot_find_global(INTERP,
@@ -147,6 +147,12 @@ enter_nci_method should create these as locals to begin with.
         key = const_string(INTERP, "ValueError");
         item = pmc_new(INTERP, dynclass_PyException);
         VTABLE_set_integer_native(INTERP, item, E_ValueError);
+        scratchpad_store_by_name(INTERP, pad, 0, key, item);
+
+        /* Class objects */
+        /* TODO: convert this to instances of <type> */
+        key = const_string(INTERP, "dict");
+        item = pmc_new(INTERP, dynclass_PyDict);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         /* Begin main! */
@@ -249,45 +255,6 @@ Combines a real and imaginary number and returns the result.
         fvalue = VTABLE_get_number(INTERP, imag);
         VTABLE_set_number_keyed_int(INTERP, ret, 1, fvalue);
         return ret;
-    }
-
-/*
-
-=item C<PMC* "dict"(PMC *list)>
-
-Create a new dictionary from a sequence
-
-=cut
-
-*/
-
-    METHOD PMC* dict(PMC *ar) {
-        INTVAL i, el;
-        PMC *dict = pmc_new(INTERP, dynclass_PyDict);
-
-        if (REG_INT(3) == 0) return dict;
-
-        if (ar->vtable->base_type == dynclass_PyDict)
-            return ar;
-
-        /*
-         * ar is an array of tuples which are key/value pairs
-         */
-        el = VTABLE_elements(INTERP, ar);
-        for (i = 0; i < el; ++i) {
-            PMC *tupl = VTABLE_get_pmc_keyed_int(INTERP, ar, i);
-            PMC *key, *value;
-            INTVAL n = VTABLE_elements(INTERP, tupl);
-            if (n != 2)
-                real_exception(INTERP, NULL, E_ValueError,
-                        "dictionary update sequence element #%d "
-                        "has length %d; 2 is required",
-                        (int)i, (int)n);
-            key = VTABLE_get_pmc_keyed_int(INTERP, tupl, 0);
-            value = VTABLE_get_pmc_keyed_int(INTERP, tupl, 1);
-            VTABLE_set_pmc_keyed(INTERP, dict, key, value);
-        }
-        return dict;
     }
 
 /*
@@ -403,7 +370,7 @@ Returns the float value of C<value>.
 
 =item C<PMC* "hash"(PMC *value)>
 
-Returns the hex representation of C<value>.
+Returns the hash of C<value>.
 
 =cut
 
@@ -431,6 +398,22 @@ Returns the hex representation of C<value>.
         REG_PMC(2) = value;
         VTABLE_invoke(INTERP, meth, REG_PMC(1));
         return REG_PMC(5);
+    }
+
+/*
+
+=item C<PMC* "id"(PMC *value)>
+
+Returns the "identity" of C<value>.
+
+=cut
+
+*/
+
+    METHOD PMC* id(PMC *value) {
+        PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+        VTABLE_set_integer_native(INTERP, ret, (INTVAL)value);
+        return ret;
     }
 
 /*

@@ -22,6 +22,7 @@ C<PyString> extends C<PyObject> to provide Perl string behaviour.
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyString;
+static INTVAL dynclass_PyTuple;
 
 pmclass PyString extends PyObject dynpmc group python_group {
 
@@ -39,6 +40,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
+            dynclass_PyTuple   = Parrot_PMC_typenum(INTERP, "PyTuple");
         }
     }
 
@@ -268,6 +270,48 @@ The C<==> operation.
             PMC_str_val(SELF),
             VTABLE_get_string(INTERP, value)
             ));
+    }
+
+/*
+
+=item C<PMC* "lower"()>
+
+downcase this string
+
+=cut
+
+*/
+
+    METHOD PMC* lower() {
+        STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
+        PMC *ret = pmc_new(interpreter, enum_class_PerlString);
+        string_set(interpreter, PMC_str_val(ret), s);
+        return ret;
+    }
+
+/*
+
+=item C<void modulus(PMC *value, PMC *dest)>
+
+Interpolates a formatstring with a set of values.
+
+=cut
+
+*/
+
+    void modulus (PMC* value, PMC* dest) {
+        PMC *ar = value;
+        /*
+         * SELF is formatstring, value = argument array or item
+         */
+        if (value->vtable->base_type != enum_class_FixedPMCArray) {
+            /* not a tuple - make one */
+            ar = pmc_new(INTERP, dynclass_PyTuple);
+            VTABLE_set_integer_native(INTERP, ar, 1);
+            VTABLE_set_pmc_keyed_int( INTERP, ar, 0, value);
+        }
+        VTABLE_set_string_native(INTERP, dest,
+                Parrot_psprintf(INTERP, PMC_str_val(SELF), ar));
     }
 
 /*

@@ -707,6 +707,23 @@ Sets the floating-point value.
 
 /*
 
+=item C<void set_string_native(STRING *value)>
+
+Sets the string value.
+
+=cut
+
+*/
+
+    void set_string_native (STRING* value) {
+        if (SELF->vtable->base_type != dynclass_PyString) {
+            DYNSELF.morph(dynclass_PyString);
+        }
+        DYNSELF.set_string_native(value);
+    }
+
+/*
+
 =item C<void set_pmc(PMC *value)>
 
 Sets the PMC C<*value>, calling the appropriate C<set_*> method

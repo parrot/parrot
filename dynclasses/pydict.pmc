@@ -23,7 +23,9 @@ These are the vtable functions for the Python Dictionary class
 STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /* cache of classes referenced */
+static INTVAL dynclass_PyDict;
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyString;
 
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
@@ -41,7 +43,9 @@ Class initialization. Allocates the memory for the hash.
     void class_init() {
         /* class_init_code */
         if (pass) {
+            dynclass_PyDict    = Parrot_PMC_typenum(INTERP, "PyDict");
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyNone    = Parrot_PMC_typenum(INTERP, "PyNone");
             dynclass_PyString  = Parrot_PMC_typenum(INTERP, "PyString");
 
             make_bufferlike_pool(INTERP, sizeof(struct _hash));
@@ -139,6 +143,31 @@ Returns whether a key C<*key> exists in the hash.
         if (key == NULL)
             return 1;       /* lookup stops here */
         return VTABLE_exists_keyed(INTERP, (PMC*)b->value, key);
+    }
+
+/*
+
+=item C<PMC* "fromkeys" (PMC* keys, PMC* value)>
+
+Create a new dict with the specified C<keys> and C<value>.  If C<value>
+is not specified, it defaults to C<None>.
+
+=cut
+
+*/
+
+    METHOD PMC* fromkeys (PMC *keys, PMC* value) {
+        PMC *iter = VTABLE_get_iter(INTERP, keys);
+        PMC *ret = pmc_new(INTERP, dynclass_PyDict);
+
+        if (REG_INT(3) < 2) value = pmc_new(INTERP, dynclass_PyNone);
+
+        while (VTABLE_get_bool(INTERP, iter)) {       
+            PMC *key = VTABLE_shift_pmc(INTERP, iter);
+            VTABLE_set_pmc_keyed(INTERP, ret, key, value);
+        }
+
+        return ret;
     }
 
 /*
@@ -342,6 +371,63 @@ Returns the big number value for the element at C<*key>.
         if (!nextkey)
             return VTABLE_get_string(INTERP, valpmc);
         return VTABLE_get_string_keyed(INTERP, valpmc, nextkey);
+    }
+
+/*
+
+=item C<PMC* "dict"(PMC *list)>
+
+Create a new dictionary from a sequence
+
+=cut
+
+TODO: move this to the dict type as this is meant to be a class method
+not an instance method.
+
+*/
+
+    void* invoke(void *next) {
+        PMC *dict = pmc_new(INTERP, dynclass_PyDict);
+        PMC *source = REG_PMC(5);
+        PMC *iter;
+        INTVAL argc = REG_INT(3);
+
+        REG_INT(3) = 1;
+        REG_PMC(5) = dict;
+
+        if (argc == 0) return next;
+
+        if (source->vtable->base_type == dynclass_PyDict) {
+            iter = VTABLE_get_iter(INTERP, source);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                PMC *key = VTABLE_shift_pmc(INTERP, iter);
+                PMC *value = VTABLE_get_pmc_keyed(INTERP, source, key);
+                VTABLE_set_pmc_keyed(INTERP, dict, key, value);
+            }
+        }
+
+        else {
+            /*
+             * source is an array of tuples which are key/value pairs
+             */
+            iter = VTABLE_get_iter(INTERP, source);
+            while (VTABLE_get_bool(INTERP, iter)) {
+                PMC *tupl = VTABLE_shift_pmc(INTERP, iter);
+                PMC *key, *value;
+                INTVAL n = VTABLE_elements(INTERP, tupl);
+                if (n != 2)
+                    real_exception(INTERP, NULL, E_ValueError,
+                            "dictionary update sequence element "
+                            "has length %d; 2 is required",
+                            (int)n);
+                key = VTABLE_get_pmc_keyed_int(INTERP, tupl, 0);
+                value = VTABLE_get_pmc_keyed_int(INTERP, tupl, 1);
+                VTABLE_set_pmc_keyed(INTERP, dict, key, value);
+            }
+        }
+
+
+        return next;
     }
 
 /*

@@ -23,6 +23,8 @@ These are the vtable functions for the Python Class base class
 /* cache of classes referenced */
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
+static STRING *NAME;
+static STRING *REPR;
 
 pmclass PyClass extends ParrotObject dynpmc group python_group {
 
@@ -41,6 +43,8 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = const_string(INTERP, "__class__");
+            NAME = const_string(INTERP, "__name__");
+            REPR = const_string(INTERP, "__repr__");
         }
     }
 
@@ -112,6 +116,23 @@ Return the class of this object.
 
 /*
 
+=item C<PMC *get_repr()>
+
+Return the representation of this object.
+
+=cut
+
+*/
+
+    STRING* get_repr() {
+        PMC *repr = VTABLE_find_method(INTERP, SELF, REPR);
+        if (!repr) return VTABLE_get_string(INTERP, SELF);
+        return (STRING*) Parrot_run_meth_fromc_args(INTERP, repr, SELF,
+            REPR, "S");
+    }
+
+/*
+
 =item C<PMC *getprop(STRING *key)>
 
 Returns the property for C<*key>. If the property is not defined then for
@@ -134,6 +155,22 @@ the instance, try the class.  If still no luck, return None.
         }
 
         return prop;
+    }
+
+/*
+
+=item C<STRING *name()>
+
+Returns the name of this class.
+
+*/
+
+
+    STRING* name() {
+        PMC *class = VTABLE_get_class(INTERP, SELF);
+        PMC *name = VTABLE_getprop(INTERP, class, NAME);
+        if (!name) return CLASS;
+        return VTABLE_get_string(INTERP, name);
     }
 
 /*
