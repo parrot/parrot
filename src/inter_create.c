@@ -220,6 +220,8 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* null out the root set registry */
     SET_NULL_P(interpreter->DOD_registry, PMC *);
 
+    /* create exceptions list */
+    Parrot_init_exceptions(interpreter);
 
     /* register assembler/compilers */
     setup_default_compreg(interpreter);
@@ -228,7 +230,6 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     PIO_init(interpreter);
 
     /* Done. Return and be done with it */
-
 
     /* Okay, we've finished doing anything that might trigger GC.
      * Actually, we could enable DOD/GC earlier, but here all setup is

@@ -278,6 +278,7 @@ typedef struct Parrot_Interp {
     int sleeping;                       /* used during sleep in events */
     struct parrot_exception_t *exceptions; /* internal exception stack */
     struct parrot_exception_t *exc_free_list; /* and free list */
+    PMC ** exception_list;              /* precreated exception objects */
     struct _Thread_data *thread_data;   /* thread specific items */
     UINTVAL recursion_limit;    /* Sub call resursion limit */
 } Interp;

@@ -15,6 +15,8 @@
 
 
 /* Prototypes */
+void Parrot_init_exceptions(Interp *interpreter);
+
 void internal_exception(int exitcode, const char *format, ...);
 void real_exception(struct Parrot_Interp *interpreter,
         void *ret_addr, int exitcode,  const char *format, ...);
@@ -24,57 +26,101 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define PANIC(message)\
         do_panic(interpreter, message, __FILE__, __LINE__)
 
-/* Exception Types */
-/* &gen_from_def(except_types.pasm) prefix(EXCEPTION_) */
+/* Exception Types
+ * the first types are real exceptions and have Python exception
+ * names.
+ */
 
-#define BAD_BUFFER_SIZE 1
-#define MISSING_ENCODING_NAME 1
-#define INVALID_STRING_REPRESENTATION 1
-#define ICU_ERROR 1
-#define UNIMPLEMENTED 1
+/* &gen_from_enum(except_types.pasm) */
+typedef enum {
+    E_Exception,
+      E_SystemExit,
+      E_StopIteration,
+      E_StandardError,
+        E_KeyboardInterrupt,
+        E_ImportError,
+        E_EnvironmentError,
+          E_IOError,
+          E_OSError,
+            E_WindowsError,
+            E_VMSError,
+        E_EOFError,
+        E_RuntimeError,
+          E_NotImplementedError,
+        E_NameError,
+          E_UnboundLocalError,
+        E_AttributeError,
+        E_SyntaxError,
+          E_IndentationError,
+            E_TabError,
+        E_TypeError,
+        E_AssertionError,
+        E_LookupError,
+          E_IndexError,
+          E_KeyError,
+        E_ArithmeticError,
+          E_OverflowError,
+          E_ZeroDivisionError,
+          E_FloatingPointError,
+        E_ValueError,
+          E_UnicodeError,
+            E_UnicodeEncodeError,
+            E_UnicodeDecodeError,
+            E_UnicodeTranslateError,
+        E_ReferenceError,
+        E_SystemError,
+        E_MemoryError,
+        E_LAST_PYTHON_E = E_MemoryError,
 
-#define NULL_REG_ACCESS 1
-#define NO_REG_FRAMES 1
-#define SUBSTR_OUT_OF_STRING 1
-#define ORD_OUT_OF_STRING 1
-#define MALFORMED_UTF8 1
-#define MALFORMED_UTF16 1
-#define MALFORMED_UTF32 1
-#define INVALID_CHARACTER 1
-#define INVALID_CHARTYPE 1
-#define INVALID_ENCODING 1
-#define INVALID_CHARCLASS 1
-#define NEG_REPEAT 1
-#define NEG_SUBSTR 1
-#define NEG_SLEEP 1
-#define NEG_CHOP 1
-#define INVALID_OPERATION 1
-#define ARG_OP_NOT_HANDLED 1
-#define KEY_NOT_FOUND 1
-#define JIT_UNAVAILABLE 1
-#define EXEC_UNAVAILABLE 1
-#define INTERP_ERROR 1
-#define PREDEREF_LOAD_ERROR 1
-#define PARROT_USAGE_ERROR 1
-#define PIO_ERROR 1
-#define PARROT_POINTER_ERROR 1
-#define DIV_BY_ZERO 1
-#define PIO_NOT_IMPLEMENTED 1
-#define ALLOCATION_ERROR 1
-#define INTERNAL_PANIC 1
-#define OUT_OF_BOUNDS 1
-#define JIT_ERROR 1
-#define EXEC_ERROR 1
-#define ILL_INHERIT 2
-#define NO_PREV_CS 3
-#define NO_CLASS 2
-#define LEX_NOT_FOUND 4
-#define GLOBAL_NOT_FOUND 5
-#define METH_NOT_FOUND 6
-#define WRITE_TO_CONSTCLASS 7
-#define NOSPAWN 8
-#define INTERNAL_NOT_IMPLEMENTED 9
-#define ERR_OVERFLOW 10
+        BAD_BUFFER_SIZE,
+        MISSING_ENCODING_NAME,
+        INVALID_STRING_REPRESENTATION,
+        ICU_ERROR,
+        UNIMPLEMENTED,
+
+        NULL_REG_ACCESS,
+        NO_REG_FRAMES,
+        SUBSTR_OUT_OF_STRING,
+        ORD_OUT_OF_STRING,
+        MALFORMED_UTF8,
+        MALFORMED_UTF16,
+        MALFORMED_UTF32,
+        INVALID_CHARACTER,
+        INVALID_CHARTYPE,
+        INVALID_ENCODING,
+        INVALID_CHARCLASS,
+        NEG_REPEAT,
+        NEG_SUBSTR,
+        NEG_SLEEP,
+        NEG_CHOP,
+        INVALID_OPERATION,
+        ARG_OP_NOT_HANDLED,
+        KEY_NOT_FOUND,
+        JIT_UNAVAILABLE,
+        EXEC_UNAVAILABLE,
+        INTERP_ERROR,
+        PREDEREF_LOAD_ERROR,
+        PARROT_USAGE_ERROR,
+        PIO_ERROR,
+        PARROT_POINTER_ERROR,
+        DIV_BY_ZERO,
+        PIO_NOT_IMPLEMENTED,
+        ALLOCATION_ERROR,
+        INTERNAL_PANIC,
+        OUT_OF_BOUNDS,
+        JIT_ERROR,
+        EXEC_ERROR,
+        ILL_INHERIT,
+        NO_PREV_CS,
+        NO_CLASS,
+        LEX_NOT_FOUND,
+        GLOBAL_NOT_FOUND,
+        METH_NOT_FOUND,
+        WRITE_TO_CONSTCLASS,
+        NOSPAWN,
+        INTERNAL_NOT_IMPLEMENTED,
+        ERR_OVERFLOW
+} exception_type_enum;
 
 /* &end_gen */
 
@@ -96,7 +142,7 @@ typedef enum {
 struct parrot_exception_t {
     Parrot_jump_buff destination;       /* jmp_buf */
     exception_severity severity;        /* s. above */
-    long error;                         /* s. above */
+    long error;                         /* exception_type_enum */
     STRING *msg;                        /* may be NULL */
     void *resume;                       /* opcode_t* for resume or NULL */
     struct parrot_exception_t *prev;    /* interpreters handler stack */

@@ -270,6 +270,10 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
             pobject_lives(interpreter, (PObj*)Parrot_base_vtables[i]->data);
     }
 
+    /* mark exception list */
+    for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
+        pobject_lives(interpreter, (PObj*)interpreter->exception_list[i]);
+    }
     /* Walk through the stashes */
     stash = interpreter->globals;
     while (stash) {

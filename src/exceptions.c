@@ -601,6 +601,28 @@ real_exception(Interp *interpreter, void *ret_addr,
 
 /*
 
+=item C<void Parrot_init_exceptions(Interp *interpreter)>
+
+Create exception objects.
+
+*/
+
+void
+Parrot_init_exceptions(Interp *interpreter) {
+    int i;
+    PMC *ex;
+
+    interpreter->exception_list = mem_sys_allocate(
+            sizeof(PMC*) * (E_LAST_PYTHON_E + 1));
+    for (i = 0; i <= E_LAST_PYTHON_E; ++i) {
+        ex = pmc_new(interpreter, enum_class_Exception);
+        interpreter->exception_list[i] = ex;
+        VTABLE_set_integer_keyed_int(interpreter, ex, 1, i);
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

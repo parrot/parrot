@@ -66,20 +66,20 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
   INTVAL r1 = $5 < 0 ? -$5 : $5;
   INTVAL r2 = 0;
   INTVAL q1 = 0;
-  
+
   INTVAL xkm1 = 1;
   INTVAL xk = 0;
   INTVAL xkp1 = 0;
-  
+
   INTVAL ykm1 = 0;
   INTVAL yk = 1;
   INTVAL ykp1 = 0;
-  
+
   INTVAL n = 1;
-  
+
   INTVAL x;
   INTVAL y;
-  
+
   while (1) {
     q1 = r0/r1;
     r2 = r0 - q1*r1;
@@ -88,7 +88,7 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
     }
     r0 = r1;
     r1 = r2;
-    
+
     xkp1 = q1*xk + xkm1;
     xkm1 = xk;
     xk = xkp1;
@@ -103,7 +103,7 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
 
   x = $2 * $4;
   y = $3 * $5;
-  
+
   /* correct the sign (can be wrong because we used abs($4) and abs($5) */
   if ( x + y == r1 ) {
     /* no correction necessary */
@@ -118,7 +118,7 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
   else if ( -x + y == r1 ) {
     $2 = -$2;
   }
-  
+
   goto NEXT();
 }
 
@@ -194,6 +194,7 @@ inline op islt(out INT, in PMC, in PMC) {
 }
 
 =item B<iseq>(out INT, in PMC, in PMC)
+
 =item B<iseq>(out INT, in INT, in INT)
 
 Sets $1 to 1 if $2 is equal to $3
@@ -201,7 +202,7 @@ Sets $1 to 1 if $2 is equal to $3
 =cut
 
 inline op iseq(out INT, in PMC, in PMC) {
-  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) == 0);
+  $1 = mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
   goto NEXT();
 }
 
@@ -211,6 +212,7 @@ inline op iseq(out INT, in INT, in INT) {
 }
 
 =item B<isne>(out INT, in PMC, in PMC)
+
 =item B<isne>(out INT, in INT, in INT)
 
 Sets $1 to 1 if $2 is not equal to $3
@@ -218,7 +220,7 @@ Sets $1 to 1 if $2 is not equal to $3
 =cut
 
 inline op isne(out INT, in PMC, in PMC) {
-  $1 = (mmd_dispatch_i_pp(interpreter, $2, $3, MMD_CMP) != 0);
+  $1 = !mmd_dispatch_i_pp(interpreter, $2, $3, MMD_EQ);
   goto NEXT();
 }
 

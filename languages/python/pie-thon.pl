@@ -542,6 +542,7 @@ sub except_compare
     else {
 	$l = 'P5';
     }
+    push @stack, [-1, 'P5', 'P'];   # simulate the DUP_TOP
     print <<EOC;
 	# except compare '$l' <=> $r->[1]
 	$cmp = iseq $l, $r->[1]
