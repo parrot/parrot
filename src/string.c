@@ -135,6 +135,8 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter,
 STRING *
 string_set(struct Parrot_Interp *interpreter, STRING *dest, STRING *src)
 {
+    if (!src)
+        return NULL;
     if (dest && dest != src) {
         /* they are different, dest is not an external string */
 #ifdef GC_IS_MALLOC

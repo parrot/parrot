@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 29;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -490,7 +490,7 @@ output_is(<<'CODE', <<OUTPUT, "cmp");
         cmp I0, P1, P2
         print I0
         print "\n"
- 
+
         set P1, "abc"
         set P2, "abcde"
         cmp I0, P1, P2
@@ -519,13 +519,13 @@ output_is(<<'CODE', <<OUTPUT, "cmp with PerlInt");
         cmp I0, P1, P2
         print I0
         print "\n"
- 
+
         set P1, 0
         cmp I0, P1, P2
         print I0
         print "\n"
 
-# Str. vs Int. 
+# Str. vs Int.
         set P1, 0
         cmp I0, P2, P1
         print I0
@@ -585,6 +585,348 @@ output_like(<<'CODE', <<'OUTPUT', "Out-of-bounds substr, -ve offset");
         end
 CODE
 /^Cannot take substr outside string$/
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands NULL string");
+        new P1, .PerlString
+	new P2, .PerlString
+	new P3, .PerlString
+	null S1
+	set S2, "abc"
+	set P1, S1
+	set P2, S2
+	bands P1, P2
+	null S3
+	set P3, S3
+	eq P1, P3, ok1
+	print "not "
+ok1:	print "ok 1\n"
+	set P1, ""
+	bands P1, P2
+	unless P1, ok2
+	print "not "
+ok2:	print "ok 2\n"
+
+	null S2
+	set P2, S2
+	set P1, "abc"
+	bands P1, P2
+	null S3
+	set P3, S3
+	eq P1, P3, ok3
+	print "not "
+ok3:	print "ok 3\n"
+	set P2, ""
+	bands P1, P2
+	unless P1, ok4
+	print "not "
+ok4:	print "ok 4\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands 2");
+        new P1, .PerlString
+	new P2, .PerlString
+	set P1, "abc"
+	set P2, "EE"
+	bands P1, P2
+	print P1
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+A@
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands 3");
+        new P1, .PerlString
+	new P2, .PerlString
+	new P0, .PerlString
+	set P1, "abc"
+	set P2, "EE"
+	bands P0, P1, P2
+	print P0
+	print "\n"
+	print P1
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+A@
+abc
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors NULL string");
+        new P1, .PerlString
+	new P2, .PerlString
+	new P3, .PerlString
+	null S1
+	null S2
+	set P1, S1
+	set P2, S2
+	bors P1, P2
+	null S3
+	set P3, S3
+	eq P1, P3, OK1
+	print "not "
+OK1:    print "ok 1\n"
+
+	null S1
+	set P1, S1
+	set P2, ""
+	bors P1, P2
+	null S3
+	set P3, S3
+	eq P1, P3, OK2
+	print "not "
+OK2:    print "ok 2\n"
+        bors P2, P1
+        eq P2, P3, OK3
+        print "not "
+OK3:    print "ok 3\n"
+
+	null S1
+	set P1, S1
+	set P2, "def"
+	bors P1, P2
+	eq P1, "def", OK4
+	print "not "
+OK4:    print "ok 4\n"
+        null S2
+	set P2, S2
+        bors P1, P2
+        eq P1, "def", OK5
+        print "not "
+OK5:    print "ok 5\n"
+
+        null S1
+        null S2
+	set P1, S1
+	set P2, S2
+        bors P3, P1, P2
+        null S4
+        eq P3, S4, OK6
+        print "not "
+OK6:    print "ok 6\n"
+
+        set P1, ""
+        bors P3, P1, P2
+        eq P3, S4, OK7
+        print "not "
+OK7:    print "ok 7\n"
+        bors P3, P2, P1
+        eq P3, S4, OK8
+        print "not "
+OK8:    print "ok 8\n"
+
+        set P1, "def"
+        bors P3, P1, P2
+        eq P3, "def", OK9
+        print "not "
+OK9:    print "ok 9\n"
+        bors P3, P2, P1
+        eq P3, "def", OK10
+        print "not "
+OK10:   print "ok 10\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors 2");
+        new P1, .PerlString
+	new P2, .PerlString
+	set P1, "abc"
+	set P2, "EE"
+	bors P1, P2
+	print P1
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+egc
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors 3");
+        new P1, .PerlString
+	new P2, .PerlString
+	new P0, .PerlString
+	set P1, "abc"
+	set P2, "EE"
+	bors P0, P1, P2
+	print P0
+	print "\n"
+	print P1
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+egc
+abc
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors NULL string");
+     new P1, .PerlString
+     new P2, .PerlString
+     new P3, .PerlString
+     null S1
+     null S2
+     set P1, S1
+     set P2, S2
+     bxors P1, P2
+     null S3
+     eq P1, S3, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     null S1
+     set P1, S1
+     set P2, ""
+     bxors P1, P2
+     null S3
+     eq P1, S3, OK2
+     print "not "
+OK2: print "ok 2\n"
+     bxors P2, P1
+     eq S2, S3, OK3
+     print "not "
+OK3: print "ok 3\n"
+
+     null S1
+     set P1, S1
+     set P2, "abc"
+     bxors P1, P2
+     eq P1, "abc", OK4
+     print "not "
+OK4: print "ok 4\n"
+     null S2
+     set P2, S2
+     bxors P1, P2
+     eq P1, "abc", OK5
+     print "not "
+OK5: print "ok 5\n"
+
+     null S1
+     null S2
+     set P1, S1
+     set P2, S2
+     bxors P3, P1, P2
+     null S4
+     eq P3, S4, OK6
+     print "not "
+OK6: print "ok 6\n"
+
+     set P1, ""
+     bxors P3, P1, P2
+     eq P3, S4, OK7
+     print "not "
+OK7: print "ok 7\n"
+     bxors P3, P2, P1
+     eq P3, S4, OK8
+     print "not "
+OK8: print "ok 8\n"
+
+     set P1, "abc"
+     bxors P3, P1, P2
+     eq P3, "abc", OK9
+     print "not "
+OK9: print "ok 9\n"
+     bxors P3, P2, P1
+     eq P3, "abc", OK10
+     print "not "
+OK10: print "ok 10\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors 2");
+    new P1, .PerlString
+    new P2, .PerlString
+    new P3, .PerlString
+    set P1, "a2c"
+    set P2, "Dw"
+    bxors P1, P2
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    set P1, "abc"
+    set P2, "   X"
+    bxors P1, P2
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
+CODE
+%Ec
+Dw
+ABCX
+   X
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bxors 3");
+    new P1, .PerlString
+    new P2, .PerlString
+    new P0, .PerlString
+    set P1, "a2c"
+    set P2, "Dw"
+    bxors P0, P1, P2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    set P1, "abc"
+    set P2, "   Y"
+    bxors P0, P1, P2
+    print P0
+    print "\n"
+    print P1
+    print "\n"
+    print P2
+    print "\n"
+    end
+CODE
+%Ec
+a2c
+Dw
+ABCY
+abc
+   Y
 OUTPUT
 
 1;

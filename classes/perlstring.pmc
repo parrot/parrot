@@ -176,6 +176,57 @@ pmclass PerlString extends perlscalar {
     }
 
 
+    /*
+     * string bitwise operations
+     */
+    void bitwise_ors (PMC* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_or(interpreter, SELF->cache.string_val,
+		    VTABLE_get_string(INTERP, value), NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
+    void bitwise_ors_str (STRING* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_or(interpreter, SELF->cache.string_val,
+		    value, NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
+    void bitwise_xors (PMC* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_xor(interpreter, SELF->cache.string_val,
+		    VTABLE_get_string(INTERP, value), NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
+    void bitwise_xors_str (STRING* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_xor(interpreter, SELF->cache.string_val,
+		    value, NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
+    void bitwise_ands (PMC* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_and(interpreter, SELF->cache.string_val,
+		    VTABLE_get_string(INTERP, value), NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
+    void bitwise_ands_str (STRING* value, PMC* dest) {
+	STRING* result;
+
+	result = string_bitwise_and(interpreter, SELF->cache.string_val,
+		    value, NULL);
+	VTABLE_set_string_native(INTERP, dest, result);
+    }
+
     void concatenate (PMC* value, PMC* dest) {
         STRING* s = SELF->cache.string_val;
 	VTABLE_morph(INTERP, dest, enum_class_PerlString);
