@@ -18,9 +18,6 @@
 static PMC* undef = NULL;
 STRING * hash_get_idx(Interp *interpreter, HASH *hash, PMC *key);
 
-#define PMC_casv(p) (p)->cache.struct_val
-
-
 static STRING* make_hash_key(Interp* interpreter, PMC * key)
 {
     if (key == NULL) {
@@ -43,18 +40,18 @@ pmclass PerlHash {
             VTABLE_init(INTERP, undef);
         }
         PObj_custom_mark_SET(SELF);
-        new_hash(INTERP, (HASH **)&PMC_casv(SELF));
+        new_hash(INTERP, (HASH **)&PMC_ptr1v(SELF));
     }
 
     void mark () {
-        if (PMC_casv(SELF))
-            mark_hash(INTERP, PMC_casv(SELF));
+        if (PMC_ptr1v(SELF))
+            mark_hash(INTERP, PMC_ptr1v(SELF));
     }
 
     INTVAL type_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             return enum_hash_undef;
         }
@@ -71,17 +68,17 @@ pmclass PerlHash {
 
     void clone (PMC *ret) {
         PObj_custom_mark_SET(ret);
-        hash_clone(INTERP, (HASH *)PMC_casv(SELF), (HASH **)&PMC_casv(ret));
+        hash_clone(INTERP, (HASH *)PMC_ptr1v(SELF), (HASH **)&PMC_ptr1v(ret));
     }
 
     INTVAL get_integer () {
-        return hash_size(INTERP, PMC_casv(SELF));
+        return hash_size(INTERP, PMC_ptr1v(SELF));
     }
 
     INTVAL get_integer_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_integer(INTERP, undef);
@@ -104,7 +101,7 @@ pmclass PerlHash {
     FLOATVAL get_number_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return VTABLE_get_number(INTERP, undef);
@@ -126,7 +123,7 @@ pmclass PerlHash {
     BIGNUM* get_bignum_keyed (PMC* key) {
         PMC* valpmc;
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: Use of uninitialized value */
             return VTABLE_get_bignum(INTERP, undef);
@@ -157,11 +154,11 @@ pmclass PerlHash {
 	switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
 	    case KEY_integer_FLAG:
 		/* called from iterator with an integer idx in key */
-		return hash_get_idx(INTERP, (HASH*) PMC_casv(SELF), key);
+		return hash_get_idx(INTERP, (HASH*) PMC_ptr1v(SELF), key);
 	    default:
 		keystr = make_hash_key(INTERP, key);
 	}
-        entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             /* XXX Warning: use of uninitialized value */
             return VTABLE_get_string(INTERP, undef);
@@ -181,16 +178,16 @@ pmclass PerlHash {
     }
 
     INTVAL get_bool () {
-        return hash_size(INTERP, PMC_casv(SELF)) != 0;
+        return hash_size(INTERP, PMC_ptr1v(SELF)) != 0;
     }
 
     INTVAL elements () {
-        return hash_size(INTERP, PMC_casv(SELF));
+        return hash_size(INTERP, PMC_ptr1v(SELF));
     }
 
     PMC* get_pmc_keyed (PMC* key) {
         STRING* keystr = make_hash_key(INTERP, key);
-        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_casv(SELF), keystr);
+        HASH_ENTRY* entry = hash_get(INTERP, (HASH*) PMC_ptr1v(SELF), keystr);
         if (entry == NULL) {
             PMC *new_undef = pmc_new(INTERP, enum_class_PerlUndef);
             return new_undef;
@@ -211,7 +208,7 @@ pmclass PerlHash {
 
     INTVAL is_same (PMC* other) {
         return (INTVAL)( other->vtable == SELF->vtable &&
-			PMC_casv(other) == PMC_casv(SELF));
+			PMC_ptr1v(other) == PMC_ptr1v(SELF));
     }
 
     void set_integer (PMC* value) {
@@ -231,7 +228,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_int;
         entry.val.int_val = value;
-        hash_put(INTERP, PMC_casv(SELF), keystr, &entry);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
     }
 
     void set_number (PMC* value) {
@@ -251,7 +248,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_num;
         entry.val.num_val = value;
-        hash_put(INTERP, PMC_casv(SELF), keystr, &entry);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
     }
 
     void set_bignum (PMC* value) {
@@ -287,7 +284,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_string;
         entry.val.string_val = value;
-        hash_put(INTERP, PMC_casv(SELF), keystr, &entry);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
     }
 
     void set_pmc_keyed (PMC* dest_key, PMC* value) {
@@ -295,7 +292,7 @@ pmclass PerlHash {
         HASH_ENTRY entry;
         entry.type = enum_hash_pmc;
         entry.val.pmc_val = value;
-        hash_put(INTERP, PMC_casv(SELF), keystr, &entry);
+        hash_put(INTERP, PMC_ptr1v(SELF), keystr, &entry);
     }
 
 
@@ -306,7 +303,7 @@ pmclass PerlHash {
 
     INTVAL exists_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)PMC_casv(SELF);
+	HASH * h = (HASH *)PMC_ptr1v(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
@@ -320,7 +317,7 @@ pmclass PerlHash {
 
     INTVAL defined_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)PMC_casv(SELF);
+	HASH * h = (HASH *)PMC_ptr1v(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
@@ -341,7 +338,7 @@ pmclass PerlHash {
 
     void delete_keyed(PMC* key) {
 	STRING * sx;
-	HASH * h = (HASH *)PMC_casv(SELF);
+	HASH * h = (HASH *)PMC_ptr1v(SELF);
 	HASH_ENTRY * he;
 	sx = key_string(INTERP, key);
 	key = key_next(INTERP, key);
