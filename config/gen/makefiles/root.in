@@ -763,3 +763,9 @@ exec : exec_start$(O) $(LIBPARROT)
 
 exec_so : exec_start$(O) blib/lib/libparrot$(SO)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) exec_start$(O) -lparrot $(C_LIBS) -pthread
+
+###### OS depend targets ##########
+# libnci.so used by t/pmc/nci.t
+
+libnci.so: nci_test.c
+	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $< -o $@

@@ -49,6 +49,11 @@ int nci_iiii(int i1, int i2, int i3) {
     fprintf(stderr, "%d %d %d\n", i1, i2, i3);
     return 2;
 }
+
+int nci_i4i(long * l, int i) {
+    return (int) (*l * i);
+}
+
 #ifdef TEST
 char l2 = 4;
 float f2 = 4.0;

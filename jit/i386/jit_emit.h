@@ -2047,7 +2047,7 @@ store:
                         }
                         else
 #    endif
- 
+
                             jit_emit_mov_mr_i(jit_info->native_ptr,
                                 &INT_REG(us),
                                     jit_info->intval_map[j]);
@@ -2789,7 +2789,7 @@ static int
 count_regs(char *sig, char *sig_start)
 {
     const char *typs[] = {
-        "lisc", /* I */
+        "lisc234", /* I */
         "t",    /* S */
         "pP",   /* P */
         "fd"   /* N */

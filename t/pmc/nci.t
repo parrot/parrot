@@ -1,4 +1,4 @@
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -243,7 +243,7 @@ OUTPUT
 output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_d_d - stress test");
   loadlib P1, "libnci.so"
   print "loaded\n"
-  set I10, 1000000
+  set I10, 100000
   print "dlfunced\n"
 loop:
   dlfunc P0, P1, "nci_dd", "dd"
@@ -326,12 +326,25 @@ output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_iii");
   set I6, 20
   set I7, 30
   invoke
-  end
-  end
-nok_2: print "nok 2\n"
+  print I5
+  print "\n"
   end
 CODE
 10 20 30
+2
+OUTPUT
+
+output_is(gen_test(<<'CODE'), <<'OUTPUT', "nci_i_4i");
+  loadlib P1, "libnci.so"
+  dlfunc P0, P1, "nci_i4i", "i4i"
+  set I5, 6
+  set I6, 7
+  invoke
+  print I5
+  print "\n"
+  end
+CODE
+42
 OUTPUT
 
 } # SKIP

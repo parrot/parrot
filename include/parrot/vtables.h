@@ -13,8 +13,8 @@
 #if !defined(PARROT_VTABLES_H_GUARD)
 #define PARROT_VTABLES_H_GUARD
 
-VTABLE *Parrot_new_vtable(Parrot_Interp *interpreter);
-VTABLE *Parrot_clone_vtable(Parrot_Interp *interpreter, VTABLE *base_vtable);
-void Parrot_destroy_vtable(Parrot_Interp *interpreter, VTABLE *vtable);
+VTABLE *Parrot_new_vtable(Parrot_Interp);
+VTABLE *Parrot_clone_vtable(Parrot_Interp, VTABLE *base_vtable);
+void Parrot_destroy_vtable(Parrot_Interp, VTABLE *vtable);
 
 #endif

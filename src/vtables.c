@@ -13,12 +13,12 @@
 #include "parrot/parrot.h"
 
 VTABLE *
-Parrot_new_vtable(Parrot_Interp *interpreter) {
+Parrot_new_vtable(Parrot_Interp interpreter) {
   return mem_sys_allocate_zeroed(sizeof(VTABLE));
 }
 
 VTABLE *
-Parrot_clone_vtable(Parrot_Interp *interpreter, VTABLE *base_vtable) {
+Parrot_clone_vtable(Parrot_Interp interpreter, VTABLE *base_vtable) {
   VTABLE *new_vtable = mem_sys_allocate(sizeof(VTABLE));
   if (new_vtable) {
     memcpy(new_vtable, base_vtable, sizeof(VTABLE));
@@ -27,6 +27,6 @@ Parrot_clone_vtable(Parrot_Interp *interpreter, VTABLE *base_vtable) {
 }
 
 void
-Parrot_destroy_vtable(Parrot_Interp *interpreter, VTABLE *vtable) {
+Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable) {
   mem_sys_free(vtable);
 }
