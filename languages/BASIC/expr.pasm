@@ -8,6 +8,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.6  2002/06/03 14:33:05  clintp
+# More assembler changes
+#
 # Revision 1.5  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -46,7 +49,7 @@ PUSHOPSTACK:
         get_keyed I0, P25, 0
         inc I0
         restore S0
-        set_keyed P25[I0], S0
+        set_keyed P25, I0, S0
         set_keyed P25, 0, I0
         popi
         pops
@@ -55,7 +58,7 @@ POPOPSTACK:
         pushi
         pushs
         get_keyed I0, P25, 0
-        get_keyed S0, P25[I0]
+        get_keyed S0, P25, I0
         save S0
         dec I0
         set_keyed P25, 0, I0

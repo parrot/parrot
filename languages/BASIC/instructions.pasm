@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.7  2002/06/03 14:33:05  clintp
+# More assembler changes
+#
 # Revision 1.6  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -885,7 +888,7 @@ I_LIST:
 
 
 LIST_ONE_LINE:
-	get_keyed S0, P22[I2]
+	get_keyed S0, P22, I2
 	print S0
 	print "\n"
 	branch END_LIST
@@ -903,8 +906,8 @@ LIST_RANGE:
 	#  If I3 is -1 then no range applies.
 DO_I_LIST:  set I0, 0
 DOLISTL: gt I0, I28, END_LIST
-        get_keyed I1, P24[I0]   # Get the next line
-        get_keyed S0, P22[I1]   # Get the line code itself
+        get_keyed I1, P24, I0   # Get the next line
+        get_keyed S0, P22, I1   # Get the line code itself
 	eq I3, -1, LIST_SHOW
 	lt I2, I1, LIST_NEXT
 	gt I3, I1, LIST_NEXT

@@ -14,6 +14,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.7  2002/06/03 14:33:05  clintp
+# More assembler changes
+#
 # Revision 1.6  2002/06/01 18:23:01  clintp
 # For new assembler
 #
@@ -159,31 +162,31 @@ CFETCH: pushi
         restore I0            # Line number to fetch.
         set I2, I0
         eq I0, -1, CFETCHSTART
-        get_keyed S0, P22[I0]
+        get_keyed S0, P22, I0
         ne S0, "", CFETCHEND
 
         # Not found.  Let's see if this is a +1
         dec I0
-        get_keyed S0, P22[I0]
+        get_keyed S0, P22, I0
         ne S0, "", CFETCHNEXT
         branch CNOTFOUND
 
 CFETCHNEXT:
-        get_keyed I1, P23[I0]  # Okay, got the line before
+        get_keyed I1, P23, I0  # Okay, got the line before
         inc I1
         gt I1, I28, COVERFLOW
-        get_keyed I0, P24[I1]  # Next line number is...
+        get_keyed I0, P24, I1  # Next line number is...
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22[I0]  # Fetch it.
+        get_keyed S0, P22, I0  # Fetch it.
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
 CFETCHSTART:
         set I6, 0    # Line position to fetch
         gt I6, I28, COVERFLOW
-        get_keyed I0, P24[I6]
+        get_keyed I0, P24, I6
         eq I0, 0, COVERFLOW
-        get_keyed S0, P22[I0]  # Fetch line
+        get_keyed S0, P22, I0  # Fetch line
         ne S0, "", CFETCHEND
         branch CNOTFOUND       # This is a should-not-happen, I think.
 
@@ -233,8 +236,8 @@ ONELNCK:
 
 CLOAD:  set I0, 0
 CNEXT:  gt I0, I28, CEND
-        get_keyed I3, P24[I0]   # Get the next line
-        get_keyed S1, P22[I3]   # Get the line code itself
+        get_keyed I3, P24, I0   # Get the next line
+        get_keyed S1, P22, I3   # Get the line code itself
 	inc I0
 	eq I3, I1, CNEXT	# Skip this, it's being replaced.
 	save S1
@@ -264,10 +267,10 @@ STOREC: eq I5, 0, DONEADD
         restore S0              # Code line
         set I1, S0              # Line Number
 
-        set_keyed P22[I1], S0   # The line itself
+        set_keyed P22, I1, S0   # The line itself
         inc I28
-        set_keyed P23[I1], I28   # Index back to array
-        set_keyed P24[I28], I1
+        set_keyed P23, I1, I28   # Index back to array
+        set_keyed P24, I28, I1
         dec I5
         branch STOREC
 
