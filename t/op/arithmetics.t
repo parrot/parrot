@@ -117,7 +117,7 @@ CODE
 -492000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native integer by native integer"); 
+output_is(<<'CODE', <<OUTPUT, "divide native integer by native integer");
 	set I0, 4000
 	set I1, -123
 	div I2, I0, I1
@@ -180,7 +180,7 @@ CODE
 -492492.000000
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native number by native integer"); 
+output_is(<<'CODE', <<OUTPUT, "divide native number by native integer");
 	set I0, 4000
 	set N0, -123.123
 	div N1, N0, I0
@@ -243,7 +243,7 @@ CODE
 -492522.288258
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "divide native number by native number"); 
+output_is(<<'CODE', <<OUTPUT, "divide native number by native number");
 	set N2, 4000.246
 	set N0, -123.123
 	div N1, N0, N2
@@ -342,6 +342,7 @@ output_is(<<'CODE', <<OUTPUT, "add native number to integer");
 	add P0, P0, N0
 	print P1
 	print "\n"
+	end
 CODE
 4123.040000
 4123.040000
