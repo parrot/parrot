@@ -65,6 +65,8 @@ MAINLOOPNR:
 	eq I1, 1, MAINLOOPR
 	save S0
 	bsr STRIPSPACE
+	restore S0	# Mystery bug.
+	save S0		# CAP 7/31/02
 	bsr TOKENIZER
 	bsr REVERSESTACK
 	restore I5
