@@ -79,6 +79,18 @@ void
 mem_setup_allocator(struct Parrot_Interp *interpreter) {
 }
 
+void *
+mem_realloc(void *from, UINTVAL fromsize, UINTVAL tosize) {
+    INTVAL copysize = (fromsize > tosize ? tosize : fromsize);
+    void *mem;
+    mem = mem_sys_allocate(copysize);
+    if (!mem) {
+        return NULL;
+    }
+    memcpy(mem, from, copysize);
+    return mem;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

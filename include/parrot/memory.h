@@ -19,6 +19,9 @@ mem_allocate_aligned(UINTVAL);
 void *
 mem_sys_allocate(UINTVAL);
 
+void *
+mem_realloc(void *, UINTVAL, UINTVAL);
+
 void
 mem_setup_allocator(struct Parrot_Interp *);
 
