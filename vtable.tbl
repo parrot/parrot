@@ -35,7 +35,7 @@ num	void subtract		PMC* left	 PMC* right
 num	void multiply		PMC* left	 PMC* right 
 num	void divide		PMC* left	 PMC* right 
 num	void modulus		PMC* left	 PMC* right 
-num	void concatenate	PMC* left	 PMC* right 
+str	void concatenate	PMC* left	 PMC* right 
 unique	void is_equal		PMC* left 
 unique	void logical_or		PMC* left	 PMC* right 
 unique	void logical_and	PMC* left	 PMC* right 
