@@ -32,6 +32,7 @@ LD = ${ld}
 PERL = ${perl}
 TEST_PROG = parrot${exe}
 PDUMP = pdump${exe}
+MAKE_F = ${make}
 
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
@@ -141,8 +142,9 @@ clean:
 	$(RM_F) examples/assembly/mops$(EXE) examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) Parrot/OpLib/core.pm
-	$(MAKE) -C clean
-	$(MAKE) -C clean
+	$(MAKE) -C docs clean
+	$(MAKE) -C classes clean
+
 
 distclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
