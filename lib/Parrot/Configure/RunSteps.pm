@@ -35,13 +35,13 @@ use vars qw(@steps);
 	gen/config_h.pl
 	gen/feature_h.pl
 	gen/config_pm.pl
+	gen/core_pmcs.pl
 	gen/parrot_include.pl
 	gen/makefiles.pl
 	gen/cflags.pl
 	gen/myconfig.pl
 	gen/platform.pl
 	gen/libparrot_def.pl
-	gen/core_pmcs.pl
 );
 
 sub runsteps {
