@@ -120,7 +120,7 @@ main(int argc, char **argv) {
 
     run_native = run_compiled;
     /* TODO make also a shared variant of PackFile_new */
-    pf = PackFile_new(0);
+    pf = PackFile_new(interpreter, 0);
 
     if (!PackFile_unpack(interpreter, pf, (opcode_t *)(&program_code),
         sizeof(&program_code)))
