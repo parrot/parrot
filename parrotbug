@@ -14,7 +14,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.0.1";
+my $VERSION = "0.0.2";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -24,7 +24,7 @@ my %std_to =
 
 my $parrotdir = File::Spec->curdir();
 
-my ( $user, $domain, $editor );
+my ( $user, $domain, $editor, $use_file );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
@@ -41,6 +41,7 @@ BEGIN {
 init();
 help()    if $opt_h;
 version() if $opt_V;
+explain_parrotbug();
 query_info();
 
 die "work in progress... nothing ready yet!\n";
@@ -55,6 +56,42 @@ exit;
 
 #------------------------------------------------------------#
 #                           Subs.                            #
+
+# Explain what parrotbug is.
+sub explain_parrotbug {
+    print <<EOF;
+
+This program provides an easy way to create a message reporting a bug
+in parrot, and e-mail it to parrot developpers.
+
+It is *NOT* intended for:
+  - sending test messages,
+  - or reporting bugs in languages targetting parrot,
+  - or reporting bugs in some library bindings for parrot,
+  - or simply verifying that parrot works.
+
+It is *ONLY* a mean of reporting verifiable problems with the core
+parrot distribution, and any solutions to such problems, to parrot
+developpers.
+
+If you're just looking for help with parrot, subscribe to the parrot
+mailing list, perl6-internals<at>perl.org.
+
+
+
+EOF
+#'
+}
+
+
+# Generate random filename to edit report.
+sub generate_filename {
+    my $dir = File::Spec->tmpdir();
+    my $filename = "bugrep0$$";
+    $filename++ while -e File::Spec->catfile($dir, $filename);
+    $filename = File::Spec->catfile($dir, $filename);
+    return $filename;
+}
 
 
 # Print synopsis + help message and exit.
@@ -91,7 +128,6 @@ EOF
 #'
     exit;
 }
-
 
 # Initialize prog:
 #  - get parrot information
@@ -157,15 +193,10 @@ sub init {
         # Ok reports do not need body, but nok and bug reports do need
         # a body. It can be done with either -f or -b flag.
         if ( $opt_f ) {
-            # A file was provided.
-            open(BODY, "<$opt_f") or die "Cannot open '$opt_f': $!";
-            {
-                local $/;
-                $body = <BODY>;
-            }
-            close(BODY) or die "Cannot close '$opt_f': $!";
+            $use_file = 1;
         } else {
             # No file provided...
+            $use_file = 0;
             $body = $opt_b || "";
         }
             
@@ -234,100 +265,16 @@ sub init {
 # The information collected are:
 #  
 sub query_info {
-    ##
-    ## Explain what parrotbug is.
-    ##
-    print <<EOF;
 
-This program provides an easy way to create a message reporting a bug
-in parrot, and e-mail it to parrot developpers.
-
-It is *NOT* intended for:
-  - sending test messages,
-  - or reporting bugs in languages targetting parrot,
-  - or reporting bugs in some library bindings for parrot,
-  - or simply verifying that parrot works.
-
-It is *ONLY* a mean of reporting verifiable problems with the core
-parrot distribution, and any solutions to such problems, to parrot
-developpers.
-
-If you're just looking for help with parrot, subscribe to the parrot
-mailing list, perl6-internals<at>perl.org.
-
-
-
-EOF
-#'
-
-    ##
-    ## Prompt for subject of message, if needed.
-    ##
     $subject = "" if trivial_subject( $subject );
-    unless ( $subject ) {
-        print <<EOF;
-First of all, please provide a subject for the message. It should be a
-concise description of the bug or problem. "parrot bug" or "parrot
-problem" is not a concise description.
+    query_subject()        unless $subject;
+    query_return_address() unless $from;
+    query_body()           unless $use_file || $body;
+}
 
-EOF
-
-        my $err = 0;
-        do {
-            $err and print "\nThat doesn't look like a good subject. "
-              . "Please be more verbose.\n";
-            print "Subject: ";
-            $subject = <>;
-            chomp $subject;
-            die "Aborting.\n" if $err++ == 5;
-        } while ( trivial_subject($subject) );
-        print "\n\n\n";
-    }
-
-
-    ##
-    ## Prompt for return address, if needed.
-    ## 
-    unless ( $from ) {
-        print <<EOF;
-Your e-mail address will be useful if you need to be contacted. If the
-default shown below is not your full internet e-mail address, please
-correct it.
-EOF
-
-	# Try and guess return address
-        my $guess;
-        if ( $is_macos ) {
-            require Mac::InternetConfig;
-            $guess = $Mac::InternetConfig::InternetConfig{
-                Mac::InternetConfig::kICEmail()
-            };
-        } else {
-            $guess = $ENV{REPLY-TO} || $ENV{REPLYTO} || "";
-        }
-
-	if ( ! $guess ) {
-            # Use $domain if we can.
-            if ( $domain ) {
-                $guess = $is_vms && !$Config{d_socket} ?
-                  "$domain\:\:$user" : "$user\@$domain";
-	    }
-	}
-
-        # Verify our guess.
-        print "Your address [$guess]: ";
-        $from = <>;
-        chomp $from;
-        $from = $guess if $from eq "";
-        print "\n\n\n";
-    }
-
-
-    ##
-    ## Prompt for body, if needed.
-    ##
-    unless ( $body ) {
-        print <<EOF;
+# Prompt for body, through an external editor.
+sub query_body {
+    print <<EOF;
 Now you need to supply the bug report. Try to make the report concise
 but descriptive. Include any relevant detail. If you are reporting
 something that does not work as you think it should, please try to
@@ -338,20 +285,83 @@ automatically be included at the end of the report. If you are using
 any unusual version of parrot, please try and confirm exactly which
 versions are relevant.
 
+EOF
+
+    # Prompt for editor to use if none supplied.
+    query_editor(<<EOF) unless $opt_e;
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
 would like to use.
+EOF
+
+
+}
+
+# Prompt for editor to use.
+sub query_editor {
+    print shift() . "Editor [$editor]: ";
+    my $entry = <>;
+    chomp $entry;
+    $editor = $entry if $entry ne "";
+}
+
+# Prompt for return address.
+sub query_return_address {
+    print <<EOF;
+Your e-mail address will be useful if you need to be contacted. If the
+default shown below is not your full internet e-mail address, please
+correct it.
+EOF
+    
+    # Try and guess return address
+    my $guess;
+    if ( $is_macos ) {
+        require Mac::InternetConfig;
+        $guess = $Mac::InternetConfig::InternetConfig{
+                   Mac::InternetConfig::kICEmail()
+                 };
+    } else {
+        $guess = $ENV{REPLY-TO} || $ENV{REPLYTO} || "";
+    }
+
+    if ( ! $guess ) {
+        # Use $domain if we can.
+        if ( $domain ) {
+            $guess = $is_vms && !$Config{d_socket} ?
+              "$domain\:\:$user" : "$user\@$domain";
+        }
+    }
+
+    # Verify our guess.
+    print "Your address [$guess]: ";
+    $from = <>;
+    chomp $from;
+    $from = $guess if $from eq "";
+    print "\n\n\n";
+}
+
+
+# Prompt for subject of message.
+sub query_subject {
+    print <<EOF;
+First of all, please provide a subject for the message. It should be a
+concise description of the bug or problem. "parrot bug" or "parrot
+problem" is not a concise description.
 
 EOF
 
-	print "Editor [$editor]: ";
-	my $entry = <>;
-	chomp $entry;
-        $editor = $entry if $entry eq "";
-    }
+    my $err = 0;
+    do {
+        $err and print "\nThat doesn't look like a good subject. "
+          . "Please be more verbose.\n";
+        print "Subject: ";
+        $subject = <>;
+        chomp $subject;
+        die "Aborting.\n" if $err++ == 5;
+    } while ( trivial_subject($subject) );
+    print "\n\n\n";
 }
-
 
 sub send_msg {
     # Message has been accepted for transmission -- Send the message
