@@ -81,78 +81,133 @@ foreach my $file (@ARGV) {
 # assemble
 my $pc=0; my $op_pc=0;
 my ($bytecode,%label,%fixup,%constants,@constants);
-my (%local_label, %local_fixup, $last_label);
+my (%local_label, %local_fixup, $last_label, %macros);
 my $line=0;
 my %equate=('*'=>sub { return $pc },
 	    '__DATE__'=>'"'.scalar(localtime).'"',
 	    '__VERSION__'=>'" $Revision$ "',
 	    '__LINE__' => sub { return $line });
-foreach my $l (@program) {
+my($code,$in_macro,$cur_macro);
+while(my $l=shift(@program)) {
     my($file,$line,$pline,$sline)=@$l;
-    if($pline=~m/^\#/ || $pline eq "") {
-	if($options{'listing'}) {
-	    $listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, '',$sline);
+    if($in_macro) {
+	if($pline=~m/^endm$/i) {
+	    # end of the macro
+	    $in_macro=0;
+	} else {
+	    push(@{$macros{$cur_macro}[1]},$l);
 	}
+	$pline="";
+    }
+    if($pline=~m/^\#/ || $pline eq "") {
+	# its a comment, do nothing
+	$code=undef;
+    } else {
+	my($label);
+	if($pline=~m/^(\S+):\s*(.+)?/) {
+	    ($label,$code)=($1,$2);
+	    if(defined($label) && $label ne "") {
+		if($label=~m/^\$/) {
+		    # a local label
+		    if(exists($local_label{$label})) {
+			error("local label '$label' already defined in $last_label!",$file,$line);
+		    }
+		    if(exists($local_fixup{$label})) {
+			# backpatch everything with this PC.
+			while(scalar(@{$local_fixup{$label}})) {
+			    my $op_pc=shift(@{$local_fixup{$label}});
+			    my $offset=shift(@{$local_fixup{$label}});
+			    substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
+			}
+			delete($local_fixup{$label});  
+		    }
+		    $local_label{$label}=$pc;
+		} else {
+		    # a global label
+		    if(exists($label{$label})) {
+			error("'$label' already defined!",$file,$line);
+		    }
+		    if(exists($fixup{$label})) {
+			# backpatch everything with this PC.
+			while(scalar(@{$fixup{$label}})) {
+			    my $op_pc=shift(@{$fixup{$label}});
+			    my $offset=shift(@{$fixup{$label}});
+			    substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
+			}
+			delete($fixup{$label});  
+		    }
+		    
+		    # clear out any local labels
+		    %local_label = ();
+		    if(keys(%local_fixup)) {
+			# oops, some local labels are unresolved
+			error("These local labels were undefined in $last_label: ".
+			      join(",",sort(keys(%local_fixup))),$file,$line);
+		    }
+		    $label{$label}=$pc; # store it.
+		    $last_label=$label;
+		}
+	    } 
+	} else {
+	    # here's where we can catch assembler directives!
+	    if($pline=~m/^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i) {
+		my($name,$data)=($1,$2);
+		$equate{$name}=$data;
+	    } elsif($pline=~m/^([_a-zA-Z]\w*)\s+macro\s+(.+)$/i) {
+		# a macro definition
+		my($name,$args)=($1,$2);
+		$cur_macro=$name;
+		$macros{$name}=[[split(/,\s*/,$args)],[]];
+		$in_macro=1;
+	    } else {
+		$code=$pline;
+	    }
+	}
+    }
+    if(!defined($code)) {
+	$listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, '',$sline)
+	    if($options{'listing'});
 	next;
     }
-    my($label,$code);
-    if($pline=~m/^(\S+):\s*(.+)?/) {
-        ($label,$code)=($1,$2);
-	if(defined($label) && $label ne "") {
-	    if($label=~m/^\$/) {
-		# a local label
-		if(exists($local_label{$label})) {
-		    error("local label '$label' already defined in $last_label!",$file,$line);
-		}
-		if(exists($local_fixup{$label})) {
-		    # backpatch everything with this PC.
-		    while(scalar(@{$local_fixup{$label}})) {
-			my $op_pc=shift(@{$local_fixup{$label}});
-			my $offset=shift(@{$local_fixup{$label}});
-			substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
-		    }
-		    delete($local_fixup{$label});  
-		}
-		$local_label{$label}=$pc;
-	    } else {
-		# a global label
-		if(exists($label{$label})) {
-		    error("'$label' already defined!",$file,$line);
-		}
-		if(exists($fixup{$label})) {
-		    # backpatch everything with this PC.
-		    while(scalar(@{$fixup{$label}})) {
-			my $op_pc=shift(@{$fixup{$label}});
-			my $offset=shift(@{$fixup{$label}});
-			substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
-		    }
-		    delete($fixup{$label});  
-		}
 
-		# clear out any local labels
-		%local_label = ();
-		if(keys(%local_fixup)) {
-		    # oops, some local labels are unresolved
-		    error("These local labels were undefined in $last_label: ".
-			  join(",",sort(keys(%local_fixup))),$file,$line);
-		}
-		$label{$label}=$pc; # store it.
-		$last_label=$label;
-	    }
-	} 
-    } else {
-	# here's where we can catch assembler directives!
-	if($pline=~m/^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i) {
-	    my($name,$data)=($1,$2);
-	    $equate{$name}=$data;
-	} else {
-	    $code=$pline;
-	}
-    }
-    next if(!defined($code));
     1 while $code=~s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize($1)/eg;
     $code=~s/,/ /g;
-    my($opcode,@args)=split(/\s+/,$code);
+    my($opcode,@args)=split(/\s+/,$code);    
+    if(exists($macros{$opcode})) {
+	# found a macro
+	my(@margs)=@{$macros{$opcode}[0]};
+	my(@macro);
+	# we have to make sure to copy the macro, to avoid mangling the
+	# original macro definition.
+	foreach (@{$macros{$opcode}[1]}) {
+	    push(@macro,[@$_]);
+	}
+	if(scalar(@margs) != scalar(@args)) {
+	    error("Wrong number of arguments to macro '$opcode'",$file,$line);
+	}
+	# fixup parameters.
+	while(my $marg=shift(@margs)) {
+	    my $param=shift(@args);
+	    foreach (@macro) {
+		$_->[2]=~s/([\s,])$marg\b/$1$param/g;
+		$_->[3]=~s/([\s,])$marg\b/$1$param/g;
+	    }
+	}
+
+	# fixup file, line number, listing
+	foreach (@macro) {
+	    $_->[0]=$file;
+	    $_->[1]=$line;
+	    $_->[3]="> ".$_->[3];
+	}
+	unshift(@program,@macro);
+
+	# make it come out correctly on the listing.
+	$l->[2]='';
+	unshift(@program,$l);
+	next;
+    }
+    
     $opcode=lc($opcode);
     if (!exists $opcodes{$opcode}) {
 	# try to determine _real_ opcode.
@@ -311,7 +366,7 @@ $output=pack($pack_type{i},0x13155a1);
 
 # FIXUP (also, dump listing symbols)
 if($options{'listing'}) {
-    $listing.="DEFINED SYMBOLS:\n";
+    $listing.="\nDEFINED SYMBOLS:\n";
     foreach (sort(keys(%label))) {
 	$listing.=sprintf("\t%08x   %s\n",$label{$_},$_);
     }
