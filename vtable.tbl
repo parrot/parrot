@@ -6,6 +6,11 @@ void morph(INTVAL type)
 PMC* mark(PMC* tail)
 void destroy()
 
+PMC* getprop(STRING* key)
+PMC* setprop(STRING* key, PMC* value)
+void delprop(STRING* key)
+PMC* getprops()
+
 INTVAL type()
 INTVAL type_keyed(PMC* key)
 INTVAL type_keyed_int(INTVAL* key)

@@ -48,6 +48,30 @@ pmclass default abstract noinit {
         PANIC("custom_destroy flag set but no custom destroy routine defined");
     }
 
+    PMC* getprop(STRING* key) {
+        internal_exception(ILL_INHERIT,
+			   "getprop() not implemented in class '%s'\n",
+			   caller(INTERP, SELF));
+    }
+
+    PMC* setprop(STRING* key, PMC* value) {
+        internal_exception(ILL_INHERIT,
+			   "setprop() not implemented in class '%s'\n",
+			   caller(INTERP, SELF));
+    }
+
+    void delprop(STRING* key) {
+        internal_exception(ILL_INHERIT,
+			   "delprop() not implemented in class '%s'\n",
+			   caller(INTERP, SELF));
+    }
+
+    PMC* getprops() {
+        internal_exception(ILL_INHERIT,
+			   "getprops() not implemented in class '%s'\n",
+			   caller(INTERP, SELF));
+    }
+
     INTVAL type () {
         return SELF->vtable->base_type;
     }

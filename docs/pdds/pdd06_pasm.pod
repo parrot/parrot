@@ -944,7 +944,8 @@ Set the property named Y of PMC X to the PMC in Z
 
 =item getprop Px, Sy, Pz
 
-Get the property named Y from PMC Z and put the result in register X
+Get the property named Y from PMC Z and put the result in register
+X. Returns a NULL if the property doesn't exist.
 
 =item delprop Px, Sy
 
