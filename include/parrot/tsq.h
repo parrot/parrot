@@ -45,6 +45,8 @@ QUEUE_ENTRY *nosync_pop_entry(QUEUE *queue);
 PARROT_INLINE QUEUE_ENTRY *peek_entry(QUEUE *);
 QUEUE_ENTRY *wait_for_entry(QUEUE *);
 void push_entry(QUEUE *, QUEUE_ENTRY *);
+void nosync_insert_entry(QUEUE *, QUEUE_ENTRY *);
+void insert_entry(QUEUE *, QUEUE_ENTRY *);
 void queue_lock(QUEUE *);
 void queue_unlock(QUEUE *);
 void queue_signal(QUEUE *);

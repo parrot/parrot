@@ -47,10 +47,19 @@ inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
 
 Call alarm handler sub $2 after $1 time has elapsed.
 
+=item B<alarm>(in NUM, in NUM, in PMC)
+
+Call alarm handler sub $3 after $1 time has elapsed, repeat after $2.
+
 =cut
 
 op alarm(in NUM, in PMC) {
      Parrot_new_timer_event(interpreter, $1, 0.0, $2);
+    goto NEXT();
+}
+
+op alarm(in NUM, in NUM, in PMC) {
+     Parrot_new_timer_event(interpreter, $1, $2, $3);
     goto NEXT();
 }
 

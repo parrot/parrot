@@ -30,8 +30,12 @@
 #  define COND_INIT(c)
 #  define COND_DESTROY(c)
 
+#  define THREAD_CREATE_DETACHED(t, func, arg)
+#  define THREAD_CREATE_JOINABLE(t, func, arg)
+
 #  define Parrot_mutex int
 #  define Parrot_cond int
+#  define Parrot_thread int
 
 #  ifndef _STRUCT_TIMESPEC
 #  define _STRUCT_TIMESPEC

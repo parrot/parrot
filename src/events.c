@@ -70,11 +70,7 @@ Parrot_init_signals(void)
 static void
 init_events_first(Parrot_Interp interpreter)
 {
-#if defined(PARROT_HAS_HEADER_PTHREAD) && defined(PARROT_HAS_HEADER_LIB_PTHREAD)
-    pthread_attr_t      attr;
-    static pthread_t    the_thread;
-    int rc;
-#endif
+    Parrot_thread    the_thread;
     /*
      * init event queue - be sure its done only once
      * we could use pthread_once for queue_init
@@ -84,23 +80,7 @@ init_events_first(Parrot_Interp interpreter)
     /*
      * we start an event_handler thread
      */
-#if defined(PARROT_HAS_HEADER_PTHREAD) && defined(PARROT_HAS_HEADER_LIB_PTHREAD)
-    /* TODO use some macros */
-
-    /* init thread attributes */
-    rc = pthread_attr_init(&attr);
-    assert(rc == 0);
-    /* we want a detached - non joinable thread */
-    rc = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    assert(rc == 0);
-
-    /* now create the task thread */
-    rc = pthread_create(&the_thread, &attr, event_thread, event_queue);
-    assert(rc == 0);
-
-    /* destroy the thread attribute structure */
-    pthread_attr_destroy(&attr);
-#endif
+    THREAD_CREATE_DETACHED(the_thread, event_thread, event_queue);
     /*
      * now set some sig handlers
      */
@@ -139,16 +119,18 @@ Parrot_schedule_event(Parrot_Interp interpreter, parrot_event* ev)
 {
     QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
     entry->next = NULL;
+    ev->interp = interpreter;
+    entry->data = ev;
     switch (ev->type) {
         case EVENT_TYPE_TIMER:
             entry->type = QUEUE_ENTRY_TYPE_TIMED_EVENT;
+            insert_entry(event_queue, entry);
             break;
         default:
             entry->type = QUEUE_ENTRY_TYPE_EVENT;
+            push_entry(event_queue, entry);
+            break;
     }
-    ev->interp = interpreter;
-    entry->data = ev;
-    push_entry(event_queue, entry);
 }
 
 /*
@@ -176,6 +158,24 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
     enable_event_checking(interpreter);
 }
 
+/*
+ * duplicate timed entry and add interval to abstime
+ */
+static QUEUE_ENTRY*
+dup_entry_interval(QUEUE_ENTRY* entry, FLOATVAL now)
+{
+    parrot_event *event;
+    QUEUE_ENTRY *new_entry;
+
+    new_entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    new_entry->next = NULL;
+    new_entry->type = entry->type;
+    new_entry->data = mem_sys_allocate(sizeof(parrot_event));
+    mem_sys_memcopy(new_entry->data, entry->data, sizeof(parrot_event));
+    event = new_entry->data;
+    event->u.timer_event.abs_time = now + event->u.timer_event.interval;
+    return new_entry;
+}
 /*
  * The event_thread is started by the first interpreter.
  * It handles all events for all interpreters.
@@ -227,14 +227,19 @@ event_thread(void *data)
                     now = Parrot_floatval_time();
                     /*
                      * if the timer_event isn't due yet, ignore the event
-                     * (we where signalled on insert of the event)
+                     * (we were signalled on insert of the event)
                      * wait until we get at it again when time has elapsed
                      */
                     if (now < event->u.timer_event.abs_time)
                         goto again;
                     entry = nosync_pop_entry(event_q);
-                    /* TODO if event is repeated dup and reinsert it
-                    */
+                    /*
+                     * if event is repeated dup and reinsert it
+                     */
+                    if (event->u.timer_event.interval) {
+                        nosync_insert_entry(event_q,
+                                dup_entry_interval(entry, now));
+                    }
                     break;
                 default:
                     internal_exception(1, "Unknown queue entry");

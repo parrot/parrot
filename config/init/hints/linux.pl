@@ -1,6 +1,6 @@
 my $libs = Configure::Data->get('libs');
 if ($libs !~ /-lpthread/) {
-    $libs .= ' -pthread';
+    $libs .= ' -lpthread';
 }
 
 Configure::Data->set(

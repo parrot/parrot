@@ -35,8 +35,23 @@
 #  define COND_INIT(c)    pthread_cond_init(&c, NULL);
 #  define COND_DESTROY(c) pthread_cond_destroy(&c)
 
+#  define THREAD_CREATE_DETACHED(t, func, arg) do { \
+        pthread_attr_t      attr;   \
+        int rc = pthread_attr_init(&attr);      \
+        assert(rc == 0);    \
+        rc = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);   \
+        assert(rc == 0);    \
+        rc = pthread_create(&t, &attr, func, arg); \
+        assert(rc == 0);    \
+        pthread_attr_destroy(&attr);        \
+   } while (0)
+
+#  define THREAD_CREATE_JOINABLE(t, func, arg) \
+        pthread_create(&t, NULL, func, arg)
+
 typedef pthread_mutex_t Parrot_mutex;
 typedef pthread_cond_t Parrot_cond;
+typedef pthread_t Parrot_thread;
 
 #endif
 

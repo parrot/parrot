@@ -78,8 +78,6 @@ all cores execept switched and JIT.
 
 =item Insert timed events accoring to their abstime
 
-=item Reinsert repeated events
-
 =item Synchronous event API
 
 Sync events could be placed directly into the interpreters task queue.

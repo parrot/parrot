@@ -11,6 +11,7 @@
  */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 /* A synchronized entry popper */
 QUEUE_ENTRY *
@@ -77,6 +78,58 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
         queue->tail = entry;
     }
     queue_signal(queue);
+    queue_unlock(queue);
+}
+
+/*
+ * insert a timed event according to abstime
+ * caller has to hold the queue mutex
+ */
+void
+nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+{
+    QUEUE_ENTRY *cur = queue->head, *prev;
+    parrot_event *event, *cur_event;
+    FLOATVAL abs_time;
+
+    assert(entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT);
+    /*
+     * empty queue - just insert
+     */
+    if (!cur) {
+        queue->head = entry;
+        queue->tail = entry;
+        return;
+    }
+
+    prev = NULL;
+    event = entry->data;
+    abs_time = event->u.timer_event.abs_time;
+    while (cur && cur->type == QUEUE_ENTRY_TYPE_TIMED_EVENT) {
+        cur_event = cur->data;
+        if (abs_time > cur_event->u.timer_event.abs_time) {
+            prev = cur;
+            cur = cur->next;
+        }
+        else
+            break;
+    }
+    if (!prev)
+        queue->head = entry;
+    else {
+        prev->next = entry;
+        if (prev == queue->tail)
+            queue->tail = entry;
+    }
+    entry->next = cur;
+    queue_signal(queue);
+}
+
+void
+insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
+{
+    queue_lock(queue);
+    nosync_insert_entry(queue, entry);
     queue_unlock(queue);
 }
 
