@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 3;
+use TestCompiler tests => 4;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "goto 1");
@@ -61,3 +61,23 @@ ok 1
 ok 2
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "local labels 2");
+.sub _realmain
+         bsr FOO
+         call _function
+         end
+
+FOO:    print "in main\n"
+         ret
+.end
+.sub _function
+         bsr FOO
+         ret
+FOO:    print "in function\n"
+         ret
+.end
+CODE
+in main
+in function
+OUT
