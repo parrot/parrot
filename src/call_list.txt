@@ -193,6 +193,9 @@ v	P
 v	IOP
 P	Ii
 
+# PerlHash fromkeys
+v	IOPP
+
 # Oddball ones for postgres
 p	ptiLTLLi
 p	pi33ipi

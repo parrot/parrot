@@ -32,6 +32,44 @@ in as value.
 static void
 fromkeys(Interp *interpreter, PMC *self, PMC *keys, PMC *value)
 {
+    INTVAL elems, dod_disabled, i;
+    PMC *iter;
+
+    if (PMC_IS_NULL(value))
+        value = pmc_new(interpreter, enum_class_None);
+
+    /*
+     * if the number of keys is bigger then the current PMC
+     * count, we do one DOD run and then disable DOD/GC
+     */
+    dod_disabled = 0;
+    elems = 999999; /* TODO VTABLE_elements(interpreter, keys); */
+    if (elems > (INTVAL)interpreter->arena_base->pmc_pool->total_objects) {
+        Parrot_do_dod_run(interpreter, 0);
+        Parrot_block_DOD(interpreter);
+        Parrot_block_GC(interpreter);
+        dod_disabled = 1;
+    }
+    /*
+     * keys should be able to iterate
+     * TODO check that
+     */
+    if (keys->vtable->base_type == enum_class_Iterator ||
+            VTABLE_isa(interpreter, keys,
+                const_string(interpreter, "Iterator"))) {
+        iter = keys;
+    }
+    else
+        iter = pmc_new_init(interpreter, enum_class_Iterator, keys);
+    VTABLE_set_integer_native(interpreter, iter, ITERATE_FROM_START);
+    for (; VTABLE_get_bool(interpreter, iter); ) {
+        STRING *s = VTABLE_shift_string(interpreter, iter);
+        VTABLE_set_pmc_keyed_str(interpreter, self, s, value);
+    }
+    if (dod_disabled) {
+        Parrot_unblock_DOD(interpreter);
+        Parrot_unblock_GC(interpreter);
+    }
 }
 
 
@@ -76,6 +114,10 @@ Class initialization. Allocates the memory for the hash.
     void class_init() {
         /* class_init_code */
         make_bufferlike_pool(INTERP, sizeof(struct _hash));
+        if (pass) {
+            enter_nci_method(INTERP, enum_class_PerlHash,
+                    F2DPTR(fromkeys), "fromkeys", "vIOPP");
+        }
     }
 /*
 
