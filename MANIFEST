@@ -65,14 +65,13 @@ config/gen/libparrot_def/libparrot_def.in
 config/gen/makefiles.pl
 config/gen/makefiles/classes.in
 config/gen/makefiles/docs.in
-config/gen/makefiles/jako.in
 config/gen/makefiles/imcc.in
+config/gen/makefiles/jako.in
 config/gen/makefiles/languages.in
 config/gen/makefiles/miniperl.in
 config/gen/makefiles/perl6.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
-config/gen/makefiles/imcc.in
 config/gen/myconfig.pl
 config/gen/myconfig/myconfig.in
 config/gen/platform.pl
@@ -89,10 +88,8 @@ config/init/debug.pl
 config/init/hints.pl
 config/init/hints/cygwin.pl
 config/init/hints/darwin.pl
-config/init/hints/dec_osf.pl
 config/init/hints/mswin32.pl
 config/init/hints/os2.pl
-config/init/hints/unicosmk.pl
 config/init/hints/vms.pl
 config/init/manifest.pl
 config/init/miniparrot.pl
@@ -207,9 +204,9 @@ include/parrot/exceptions.h
 include/parrot/global_setup.h
 include/parrot/hash.h
 include/parrot/headers.h
-include/parrot/intlist.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
+include/parrot/intlist.h
 include/parrot/io.h
 include/parrot/jit.h
 include/parrot/key.h
@@ -237,8 +234,8 @@ include/parrot/sub.h
 include/parrot/trace.h
 include/parrot/unicode.h
 include/parrot/warnings.h
-intlist.c
 interpreter.c
+intlist.c
 io.ops
 io/TODO
 io/io.c
