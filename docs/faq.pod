@@ -401,6 +401,76 @@ scheme is actually more expensive, since partial schemes check to see
 whether refcounts need twiddling, and checks are more expensive than
 you might think)
 
+=head2 Why are there so many opcodes?
+
+Whether we have a lot or not actually depends on how you count.  In absolute,
+unique op numbers we have more than pretty much any other processor, but that
+is in part because we have *no* runtime op variance.
+
+It's also important to note that there's no less code involved (or, for the
+hardware, complexity) doing it our way or the decode-at-runtime way -- all the
+code is still there in every case, since we all have to do the same things
+(add a mix of ints, floats, and objects, with a variety of ways of finding
+them) so there's no real penalty to doing it our way. It actually simplifies
+the JIT some (no need to puzzle out the parameter types), so in that we get a
+win over other platforms since JIT expenses are paid by the user every run,
+while our form of decoding's only paid when you compile.
+
+Finally, there's the big "does it matter, and to whom?" question. As someone
+actually writing parrot assembly, it looks like parrot only has one "add" op
+-- when emitting pasm or pir you use the "add" mnemonic. That it gets
+qualified and assembles down to one variant or another based on the (fixed at
+assemble time) parameters is just an implementation detail. For those of us
+writing op bodies, it just looks like we've got an engine with full
+signature-based dispatching (which, really, we do -- it's just a static
+variant), so rather than having to have a big switch statement or chain of ifs
+at the beginning of the add op we just write the specific variants identified
+by function prototype and leave it to the engine to choose the right variant.
+
+Heck, we could, if we chose, switch over to a system with a single 
+add op with tagged parameter types and do runtime decoding without 
+changing the source for the ops at all -- the op preprocessor could 
+glom them all together and autogenerate the big switch/if ladder at 
+the head of the function. (We're not going to, of course, but we 
+could.)
+
+=head2 What are the criteria for adding and deleting opcodes?
+
+As for what the rationale is... well, it's a combination of whim and 
+necessity for adding them, and brutal reality for deleting them.
+
+Our ops fall into two basic categories. The first, like add, are just 
+basic operations that any engine has to perform. The second, like 
+time, are low-level library functions.
+
+For something like hardware, splitting standard library from the CPU makes
+sense -- often the library requires resources that the hardware doesn't have
+handy.  Hardware is also often bit-limited -- opcodes need to fit in 8 or 9
+bits.
+
+Parrot, on the other hand, *isn't* bit-limited, since our ops are 32 
+bits. (A more efficient design on RISC systems where byte-access is 
+expensive.) That opens things up a bunch.
+
+If you think about it, the core opcode functions and the core 
+low-level libraries are *always* available. Always. The library 
+functions also have a very fixed parameter list. Fixed parameter 
+list, guaranteed availability... looks like an opcode function to me. 
+So they are. We could make them library functions instead, but all 
+that'd mean would be that they'd be more expensive to call (our 
+sub/method call is a bit heavyweight) and that you'd have to do more 
+work to find and call the functions. Seemed silly.
+
+Or, I suppose, you could think of it as if we had *no* opcodes at all 
+other than end and loadoplib. Heck, we've a loadable opcode 
+system -- it'd not be too much of a stretch to consider all the opcode 
+functions other than those two as just functions with a fast-path 
+calling system. The fact that a while bunch of 'em are available when 
+you start up's just a convenience for you.
+
+See L<http://www.nntp.perl.org/group/perl.perl6.internals/22003> for more
+details.
+
 =head1 LINKS
 
 April Fool's Joke: http://www.perl.com/pub/a/2001/04/01/parrot.htm
