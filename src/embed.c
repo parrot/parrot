@@ -343,24 +343,24 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
         }
     }
 
-#if !defined(JIT_CAPABLE) || !JIT_CAPABLE
+#if !defined(PARROT_JIT_CAPABLE) || !PARROT_JIT_CAPABLE
 
     /* No JIT here--make sure they didn't ask for it. */
 
     if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-        PIO_eprintf(interpreter, "Parrot VM: Platform " JIT_ARCHNAME
+        PIO_eprintf(interpreter, "Parrot VM: Platform " PARROT_ARCHNAME
                 " is not JIT-capable.\n");
         Parrot_exit(1);
     }
 
 #endif
 
-#if !EXEC_CAPABLE
+#if !PARROT_EXEC_CAPABLE
 
     /* No EXEC here--make sure they didn't ask for it. */
 
     if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
-        PIO_eprintf(interpreter, "Parrot VM: Platform " JIT_ARCHNAME
+        PIO_eprintf(interpreter, "Parrot VM: Platform " PARROT_ARCHNAME
                 " is not EXEC-capable.\n");
         Parrot_exit(1);
     }
