@@ -1703,21 +1703,29 @@ Set $1 to the negative of $2.
 =cut
 
 inline op neg(inout INT) {
-  $1 = -($1);
+  if($1) {
+	  $1 = -($1);
+  }
   goto NEXT();
 }
 
 inline op neg(inout NUM) {
+  if($1 == 0.0)
+    goto NEXT();
   $1 = -($1);
   goto NEXT();
 }
 
 inline op neg(out INT, in INT) {
-  $1 = -($2);
+  if($2) {
+  	$1 = -($2);
+  }
   goto NEXT();
 }
 
 inline op neg(out NUM, in NUM) {
+  if($2 == 0.0)
+    goto NEXT();
   $1 = -($2);
   goto NEXT();
 }
