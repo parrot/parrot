@@ -4,31 +4,49 @@ my %vtable = parse_vtable();
 while (<DATA>) {
     next if /^#/ or /^$/;
     my @params = split;
+    my $argc = $params[0];
     my $op = $params[1];
     my $vtable_entry = $params[2] || $op;
     die "Can't find $vtable_entry in vtable, line $.\n"
         unless exists $vtable{$vtable_entry};
-    print "AUTO_OP $params[1] (".(join ", ", ("p")x$params[0]).") {\n";
-    print "\t(\$2->vtable->$vtable_entry";
-    print multimethod($vtable_entry);
-    print ")(interpreter, ";
-    if ($params[0] == 3) {
-        # Three-address function
-        print '$2,$3,$1';
-    } elsif ($params[0] == 2) {
-        # Unary function
-        print '$2,$1';
+    for (multimethod($vtable_entry, $argc)) {
+        my $args  = $_->[0];
+        my $entry = $_->[1];
+        print "AUTO_OP $params[1] ($args) {\n";
+        print "\t(\$2->vtable->$entry";
+        print ")(interpreter, ";
+        if ($params[0] == 3) {
+            # Three-address function
+            print '$2,$3,$1';
+        } elsif ($params[0] == 2) {
+            # Unary function
+            print '$2,$1';
+        }
+        print ");\n}\n";
     }
-    print ");\n}\n";
 }
 
 sub multimethod {
-    my $type = $vtable{$_[0]}{meth_type};
-    return ""               if $type eq "unique";
-    return ""; # Spike it for now, until I'm convinced of how to do this
-    return '[$3->vtable->num_type]' if $type eq "num";
-    return '[$3->vtable->string_type]' if $type eq "str";
-    die "Coding error - undefined type $type\n";
+    my ($name, $count) = @_; 
+    my $type = $vtable{$name}{meth_type};
+    die "$name not found\n" unless $vtable{$name};
+    my @rv = [(join ",", ("p") x $count), $name];
+
+    if ($type eq "int") {
+        push @rv, 
+            [ (join ",", ("p", ("p") x ($count-2), "i")), $name."_native"];
+    }
+    if ($type eq "num") {
+        push @rv, 
+            [ (join ",", ("p", ("p") x ($count-2), "n")), $name."_float"],
+            [ (join ",", ("p", ("p") x ($count-2), "i")), $name."_int"];
+    }
+    if ($type eq "str") {
+        push @rv, 
+            [ (join ",", ("p", ("p") x ($count-2), "s")), $name."_native"];
+    }
+        
+    return @rv;
 }
 
 

@@ -39,10 +39,13 @@ sub parse_vtable {
 
             # If we're in a multimethod, we need to expand the name if
             # it's not the default argument type of "object".
-            $expand_name .= "_".$expand{$meth_type}[$i] 
-                unless $meth_type eq "unique"
-                    or $expand{$meth_type}[$i] eq "object"; # as a default
-
+            if ($meth_type ne "unique") { 
+                if ($expand{$meth_type}[$i] eq "object") {
+                    $vtbl{$expand_name}{meth_type} = $meth_type; # For reference
+                } else {
+                    $expand_name .= "_".$expand{$meth_type}[$i] 
+                }
+            }
             $vtbl{$expand_name}{type} = $type;
             $vtbl{$expand_name}{proto} = "$type (*$expand_name)(struct Parrot_Interp *interpreter, PMC* pmc";
 
