@@ -499,6 +499,75 @@ AGAIN:
     return 0;
 }
 
+/*
+ * Bind the socket to a local address & port
+ */
+static INTVAL
+PIO_unix_bind(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *l)
+{
+    struct sockaddr_in sa;
+    if(!l) return -1;
+
+    memcpy(&sa, l->bufstart, sizeof(struct sockaddr));
+    io->local.sin_addr.s_addr = sa.sin_addr.s_addr;
+    io->local.sin_port = sa.sin_port;
+
+    if((bind(io->fd, (struct sockaddr *)&io->local, sizeof(struct sockaddr))) == -1)
+    { 
+        fprintf(stderr, "bind: errno= ret=%d fd = %d port = %d\n",
+             errno, io->fd, ntohs(io->local.sin_port));
+        return -1;
+    } 
+
+    return 0;    
+}
+
+/*
+ * Listen for new connections. This is only applicable to STREAM or SEQ sockets
+ */
+static INTVAL
+PIO_unix_listen(theINTERP, ParrotIOLayer *layer, ParrotIO *io, INTVAL sec)
+{
+    if((listen(io->fd, sec)) == -1) {
+        fprintf(stderr, "listen: errno= ret=%d fd = %d port = %d\n",
+             errno, io->fd, ntohs(io->local.sin_port));
+        return -1;
+    }
+    return 0;
+}
+
+/*
+ * Accept new connection and return a newly created ParrotIO Socket
+ */
+static ParrotIO *
+PIO_unix_accept(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
+{
+    int newsock;
+    int newsize;
+    ParrotIO *newio;
+    newio = PIO_new(interpreter, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
+
+    if((newsock = accept(io->fd, (struct sockaddr *)&newio->remote,
+                                  (socklen_t *)&newsize)) == -1)
+    {                       
+        fprintf(stderr, "accept: errno=%d", errno);                             
+        /* Didn't get far enough, free the io */
+        mem_sys_free(newio); 
+        return NULL;
+    }                   
+
+    newio->fd = newsock;
+
+    /* XXX FIXME: Need to do a getsockname and getpeername here to
+     * fill in the sockaddr_in structs for local and peer */
+
+    /* Optionally do a gethostyaddr() to resolve remote IP address.
+     * This should be based on an option set in the master socket
+     */
+
+    return newio;
+}
+
 
 static INTVAL
 PIO_unix_send(theINTERP, ParrotIOLayer *layer, ParrotIO * io, STRING *s)
