@@ -27,6 +27,9 @@ new_stack(Interp *interpreter)
     Stack_Chunk_t *stack = mem_sys_allocate_zeroed(sizeof(Stack_Chunk_t));
 
     stack->flags = NO_STACK_CHUNK_FLAGS;
+    SET_NULL(stack->next);
+    SET_NULL(stack->prev);
+    SET_NULL(stack->buffer);
     stack->buffer = new_buffer_header(interpreter);
 
     /* Block DOD from murdering our newly allocated stack->buffer. */
@@ -229,9 +232,11 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
             /* Need to add a new chunk */
             Stack_Chunk_t *new_chunk = mem_sys_allocate_zeroed(
                     sizeof(Stack_Chunk_t));
+            SET_NULL(new_chunk->next);
             new_chunk->prev = chunk;
             chunk->next = new_chunk;
             *stack_p = chunk = new_chunk;
+            SET_NULL(new_chunk->buffer);
             new_chunk->buffer = new_buffer_header(interpreter);
 
             Parrot_allocate(interpreter, new_chunk->buffer,

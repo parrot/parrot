@@ -50,6 +50,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
 
     new_block->free = alloc_size;
     new_block->size = alloc_size;
+    SET_NULL(new_block->next);
     new_block->start = (char *)new_block + sizeof(struct Memory_Block);
     new_block->top = new_block->start;
 

@@ -150,6 +150,9 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool;
 
     pool = mem_sys_allocate_zeroed(sizeof(struct Small_Object_Pool));
+    SET_NULL(pool->last_Arena);
+    SET_NULL(pool->free_list);
+    SET_NULL(pool->mem_pool);
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
     pool->add_free_object = add_free_object;
