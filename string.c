@@ -36,6 +36,8 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             const CHARTYPE *type) {
     STRING *s;
 
+    UNUSED (interpreter);
+
     if (!type) {
       type = string_native_type;
     }
@@ -217,6 +219,8 @@ STRING*
 string_concat(struct Parrot_Interp *interpreter, const STRING* a,
               const STRING* b, UINTVAL Uflags) {
     STRING *result;
+
+    UNUSED (Uflags);
 
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {

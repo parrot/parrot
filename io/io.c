@@ -55,6 +55,9 @@ void free_io_header(ParrotIO *io) {
 ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
                         UINTVAL flags, UINTVAL mode) {
         ParrotIO * new_io;
+
+        UNUSED (interpreter); UNUSED (iotype);
+
         if( old ) {
                 /* FIXME: Reuse old IO */
         }
@@ -106,6 +109,7 @@ void PIO_init(theINTERP) {
  * IO system destructor, flush streams, free structures, etc.
  */
 void PIO_atexit(theINTERP) {
+        UNUSED (interpreter);
 #if 0
         PIO_flush(interpreter, pio_stdout);
 #endif
@@ -152,6 +156,7 @@ INTVAL PIO_init_stacks(theINTERP) {
  * time. This is similar to a Perl module INIT {} block.
  */
 INTVAL PIO_base_init(theINTERP, ParrotIOLayer * l) {
+        UNUSED (interpreter); UNUSED (l);
         return 0;
 }
 

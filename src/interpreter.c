@@ -26,7 +26,7 @@
 static void
 check_fingerprint(struct Parrot_Interp *interpreter) {
 /*    if (PNCONST == 0) { */
-
+    UNUSED (interpreter);
     return;
 
 #if 0
@@ -100,6 +100,8 @@ init_prederef(struct Parrot_Interp * interpreter)
 {
   char file_name[50];
   char func_name[50];
+
+  UNUSED (interpreter);
 
   sprintf(file_name, "lib%s_prederef.so.%s", PARROT_CORE_OPLIB_NAME,
     PARROT_VERSION);

@@ -16,6 +16,8 @@ typedef unsigned char byte_t;
 
 static UINTVAL
 singlebyte_characters (const void *ptr, UINTVAL bytes) {
+    UNUSED (ptr); 
+
     return bytes;
 }
 

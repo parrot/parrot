@@ -87,6 +87,7 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         size_t size;
         ParrotIOLayer * l = layer;
         ParrotIOBuf * b = &io->b;
+        UNUSED (size);
         /* If there is a buffer, make sure we flush before
          * dinking around with the buffer.
          */
@@ -168,6 +169,7 @@ INTVAL PIO_stdio_close(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 
 
 void PIO_stdio_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
+        UNUSED (interpreter); UNUSED (layer); UNUSED (io);
 #if 0
         size_t err;
         size_t to_write;
@@ -204,12 +206,16 @@ void PIO_stdio_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 
 size_t PIO_stdio_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 		                void * buffer, size_t len) {
+        UNUSED (interpreter); UNUSED (layer); UNUSED (io);
+        UNUSED (buffer); UNUSED (len);
         return 0;
 }
 
 
 size_t PIO_stdio_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 			const void * buffer, size_t len) {
+        UNUSED (interpreter); UNUSED (layer); UNUSED (io);
+        UNUSED (buffer); UNUSED (len);
         return 0;
 }
 

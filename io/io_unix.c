@@ -248,6 +248,9 @@ void PIO_unix_flush(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
 size_t PIO_unix_read(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 		                void * buffer, size_t len) {
         int bytes;
+
+        UNUSED (interpreter); UNUSED (layer);
+
         for(;;) {
                 bytes = read(io->fd, buffer, len);
                 if( bytes > 0 )
@@ -272,6 +275,9 @@ size_t PIO_unix_write(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         size_t bytes;
         size_t to_write;
         const char * ptr;
+
+        UNUSED (interpreter); UNUSED (layer);
+
 #if 0
         if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
                 fprintf(stderr, "PIO_unix_write(fd=%d): %d bytes\n",

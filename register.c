@@ -427,6 +427,7 @@ Parrot_clear_p(struct Parrot_Interp *interpreter) {
 */
 void
 Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type) {
+    UNUSED (thing); UNUSED (size); UNUSED (type);
 }
 
 /*=for api register Parrot_pop_off_stack
@@ -434,6 +435,7 @@ Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type) {
 */
 void
 Parrot_pop_off_stack(void *thing, INTVAL type) {
+    UNUSED (thing); UNUSED (type);
 }
 
 /*

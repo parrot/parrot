@@ -96,6 +96,8 @@ static INTVAL key_hash(struct Parrot_Interp *interpreter, STRING* value) {
   INTVAL len    = value->bufused;
   INTVAL hash   = 5893;
 
+  UNUSED (interpreter);
+
   while(len--) {
     hash = hash * 33 + *buffptr++;
   }
@@ -115,6 +117,9 @@ Return a pointer to a new KEY structure
 
 KEY* key_new(struct Parrot_Interp *interpreter) {
   KEY* key = mem_sys_allocate(sizeof(KEY));
+
+  UNUSED (interpreter);
+
   key->size = 0;
   return key;
 }
@@ -146,6 +151,8 @@ return the size of KEY <key>
 */
 
 INTVAL key_size(struct Parrot_Interp *interpreter, KEY* key) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     return key->size;
   }
@@ -163,6 +170,8 @@ Set the size of KEY <key> to <size>.
 */
 
 void key_set_size(struct Parrot_Interp *interpreter, KEY* key, INTVAL size) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if(size < 0) {
       fprintf(stderr,"*** key_set_size asked to resize below zero\n");
@@ -203,6 +212,8 @@ Destroy KEY <key>
 */
 
 void key_destroy(struct Parrot_Interp *interpreter, KEY* key) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     INTVAL i;
     for(i=0;i<key->size;i++) {
@@ -224,6 +235,8 @@ return the type of element <idx> of KEY <key>
 
 INTVAL key_element_type(struct Parrot_Interp *interpreter, KEY* key, 
                         INTVAL idx) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];
@@ -247,6 +260,8 @@ return the value of index <idx> of KEY <key>
 
 KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
                               INTVAL idx) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];
@@ -296,6 +311,8 @@ Set the value of index <idx> of key <key> to integer <value>
 
 void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY* key, 
                              INTVAL idx, KEY_PAIR* value) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
       memcpy(&key->keys[idx],value,sizeof(KEY_PAIR));
@@ -364,6 +381,8 @@ Remove the last element of key <key>
 */
 
 void key_chop(struct Parrot_Interp *interpreter, KEY* key) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if(key->size > 0) {
       /* Memory leak in the making */
@@ -392,6 +411,8 @@ Increment the type of index <idx> of key <key>
 */
 
 void key_inc(struct Parrot_Interp *interpreter, KEY* key, INTVAL idx) {
+  UNUSED (interpreter);
+
   if(key != NULL) {
     if((idx >= 0) && (idx < key->size)) {
       KEY_PAIR* pair = &key->keys[idx];

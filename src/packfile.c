@@ -649,6 +649,7 @@ Returns one (1) if everything is OK, else zero (0).
 
 opcode_t
 PackFile_FixupTable_unpack(struct PackFile_FixupTable * self, char * packed, opcode_t packed_size) {
+    UNUSED (self); UNUSED (packed); UNUSED (packed_size);
     return 1;
 }
 
@@ -666,6 +667,7 @@ contiguous region of memory.
 
 opcode_t
 PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self) {
+    UNUSED (self);
     return 0;
 }
 
@@ -684,6 +686,7 @@ PackFile_FixupTable_pack_size()!
 
 void
 PackFile_FixupTable_pack(struct PackFile_FixupTable * self, char * packed) {
+    UNUSED (self); UNUSED (packed);
     return;
 }
 
@@ -700,6 +703,7 @@ Dump the PackFile FixupTable to standard output.
 
 void
 PackFile_FixupTable_dump(struct PackFile_FixupTable * self) {
+    UNUSED (self);
     return;
 }
 
@@ -1283,6 +1287,8 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter, struct PackFile_Cons
     opcode_t     type;
     opcode_t     size;
 
+    UNUSED (packed_size);
+
     if (!self) {
         return 0;
     }
@@ -1360,6 +1366,8 @@ PackFile_Constant_unpack_integer(struct PackFile_Constant * self, char * packed,
     char * cursor;
     opcode_t     value;
 
+    UNUSED (packed_size);
+
     if (!self) {
         return 0;
     }
@@ -1400,6 +1408,8 @@ opcode_t
 PackFile_Constant_unpack_number(struct PackFile_Constant * self, char * packed, opcode_t packed_size) {
     char * cursor;
     FLOATVAL     value;
+
+    UNUSED (packed_size);
 
     if (!self) {
         return 0;
@@ -1448,6 +1458,8 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     opcode_t encoding;
     opcode_t type;
     size_t   size;
+
+    UNUSED (packed_size);
 
     if (!self) {
         return 0;

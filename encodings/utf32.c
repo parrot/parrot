@@ -19,6 +19,8 @@ typedef unsigned long utf32_t;
 
 static UINTVAL
 utf32_characters (const void *ptr, UINTVAL bytes) {
+    UNUSED (ptr); 
+
     return bytes / 4;
 }
 

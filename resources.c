@@ -16,6 +16,8 @@
 #include "assert.h"
 
 PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
+  UNUSED (interpreter);
+
   return mem_sys_allocate(sizeof(PMC));
 }
 
@@ -24,6 +26,8 @@ void free_pmc(PMC *pmc) {
 }
 
 STRING *new_string_header(struct Parrot_Interp *interpreter) {
+  UNUSED (interpreter);
+
   return mem_sys_allocate(sizeof(STRING));
 }
 static void

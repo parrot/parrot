@@ -68,6 +68,11 @@ typedef void REGEX;
 typedef void* BIGINT;
 typedef void* BIGFLOAT;
 
+/* define a macro to acknowledge an unused argument, and silence a "helpful"
+   compiler warning. gcc will emit a warning on an empty if body unless {} is
+   used to make an empty block.  */
+#define UNUSED(a) if (0 || a) {}
+
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"
 #include "parrot/encoding.h"
