@@ -1,0 +1,99 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/bound_nci.pmc - Bound internal method
+
+=head1 DESCRIPTION
+
+A bound internal method is a NCI method call, where the object is
+bound to this call instance.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/method_util.h"
+
+pmclass Bound_NCI extends NCI need_ext {
+
+/*
+
+=item C<void set_pmc(PMC *obj)>
+
+Bind the object C<obj> to this call instance.
+
+=item C<PMC* get_pmc(void)>
+
+Return the bound object.
+
+=item C<void *invoke(void *next)>
+
+Calls the associated C method, returning C<*next>.
+
+=item C<void mark()>
+
+Set the bound object live.
+
+=cut
+
+*/
+
+    void set_pmc(PMC *obj) {
+        PMC_pmc_val(SELF) = obj;
+        if (!PMC_IS_NULL(obj))
+            PObj_custom_mark_SET(SELF);
+    }
+
+    PMC* get_pmc() {
+        return PMC_pmc_val(SELF);
+    }
+
+    void* invoke (void * next) {
+        Parrot_csub_t func = (Parrot_csub_t)D2FPTR(PMC_data(SELF));
+        PMC *p2 = REG_PMC(2);
+        REG_PMC(2) = PMC_pmc_val(SELF);
+        func(INTERP, SELF);
+        REG_PMC(2) = p2;
+        return next;
+    }
+
+    void mark() {
+        if (PMC_pmc_val(SELF))
+            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+    }
+
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<classes/nci.pmc>
+
+=head1 HISTORY
+
+Initial revision by leo 2005.01.31.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

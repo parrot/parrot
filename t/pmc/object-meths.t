@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -872,5 +872,22 @@ main
 in meth
 meth
 back
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "bound NCI method");
+.sub main @MAIN
+    .local pmc s, l, f
+    s = new String
+    s = "ABC\n"
+    f = getattribute s, "lower"
+    typeof $S0, f
+    print $S0
+    print "\n"
+    l = f()
+    print l
+.end
+CODE
+Bound_NCI
+abc
 OUTPUT
 
