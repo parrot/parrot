@@ -54,6 +54,7 @@ include/parrot/global_setup.h
 include/parrot/interp_guts.h
 include/parrot/interpreter.h
 include/parrot/io.h
+include/parrot/key.h
 include/parrot/memory.h
 include/parrot/op.h
 include/parrot/packfile.h
@@ -67,6 +68,7 @@ include/parrot/string.h
 include/parrot/trace.h
 include/parrot/unicode.h
 interpreter.c
+key.c
 languages/jako/bench.jako
 languages/jako/euclid.jako
 languages/jako/fact.jako
@@ -140,6 +142,7 @@ t/op/basic.t
 t/op/bitwise.t
 t/op/integer.t
 t/op/interp.t
+t/op/key.t
 t/op/macro.t
 t/op/number.t
 t/op/pmc.t
