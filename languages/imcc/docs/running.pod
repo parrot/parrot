@@ -69,8 +69,10 @@ handy to check various optimizations including B<-Op>.
 
 =item -v, --verbose
 
-One I<-v> shows, which files are worked on, two give you a summary
+One B<-v> shows, which files are worked on and prints a summary
 over register usage and optimization stats perl I<compilation unit>.
+With two B<-v> switches IMCC prints a line per individual processing
+step too.
 
 =item -y, --yydebug
 

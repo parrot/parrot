@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 4;
+use TestCompiler tests => 10;
 use Test::More qw(skip);
 
 ##############################
@@ -25,39 +25,6 @@ CODE
 OUT
 
 ##############################
-# this is considered a non local bsr
-#
-output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
-.sub _test
-   $I0 = 5
-   $I1 = $I0
-   bsr _fact
-   print $I1
-   print "\n"
-   end
-_fact:
-   save $I0
-   save $I1
-   saveall
-   restore $I1
-   restore $I0
-   if $I0 <= 1 goto fin
-   dec $I0
-   $I1 = $I1 * $I0
-   bsr _fact
-fin:
-   save $I1
-   restoreall
-   restore $I1
-   ret
-.end
-
-CODE
-120
-OUT
-
-
-##############################
 output_is(<<'CODE', <<'OUT', "stack calling conventions");
 .sub _main
    .local int x
@@ -69,8 +36,8 @@ output_is(<<'CODE', <<'OUT', "stack calling conventions");
    call _foo	#(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result s	# restore results in reversed order
-   .result r
+   .result r	# restore results in order
+   .result s
 
    print "r = "
    print r
@@ -95,8 +62,8 @@ output_is(<<'CODE', <<'OUT', "stack calling conventions");
    .local int mi
    pl = a + b
    mi = a - b
+   .return mi		# from right to left
    .return pl		# return (pl, mi)
-   .return mi
    restoreall
    ret
 .end
@@ -126,8 +93,8 @@ print F <<'EOF';
    .local int mi
    pl = a + b
    mi = a - b
+   .return mi		# from right to left
    .return pl		# return (pl, mi)
-   .return mi
    restoreall
    ret
 .end
@@ -144,8 +111,8 @@ output_is(<<'CODE', <<'OUT', "subroutine in external file");
    call _foo	#(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result s	# restore results in reversed order
    .result r
+   .result s	# restore results in order
 
    print "r = "
    print r
@@ -161,6 +128,218 @@ a = 10
 b = 20
 r = 30
 s = -10
+OUT
+
+##############################
+#
+output_is(<<'CODE', <<'OUT', "fact with stack calling conventions");
+.sub _main
+    .local int counter
+    counter = 5
+    .arg counter
+    call _fact
+    .local int product
+    .result product
+    print product
+    print "\n"
+    end
+.end
+
+.sub _fact
+    saveall
+    .param int N
+    .local int prod
+    prod = 1
+L1:
+    prod = prod * N
+    dec N
+    if N > 0 goto L1
+    .return prod
+    restoreall
+    ret
+.end
+CODE
+120
+OUT
+
+
+##############################
+# this is considered a non local bsr
+#
+output_is(<<'CODE', <<'OUT', "recursive bsr with saveall");
+.sub _test
+   $I0 = 5	# count
+   $I1 = 1	# product
+   save $I0
+   save $I1
+   bsr _fact
+   restore $I1
+   print $I1
+   print "\n"
+   end
+_fact:
+   saveall
+   restore $I1
+   restore $I0
+   if $I0 <= 1 goto fin
+   $I1 = $I1 * $I0
+   dec $I0
+   save $I0
+   save $I1
+   bsr _fact
+   restore $I1
+fin:
+   save $I1
+   restoreall
+   ret
+.end
+
+CODE
+120
+OUT
+
+##############################
+# tail recursion - caller saves
+output_is(<<'CODE', <<'OUT', "tail recursive bsr");
+.sub _test
+   $I0 = 5	# count
+   $I1 = 1	# product
+   saveall
+   bsr _fact
+   save $I1
+   restoreall
+   restore $I1
+   print $I1
+   print "\n"
+   end
+_fact:
+   if $I0 <= 1 goto fin
+   $I1 = $I1 * $I0
+   dec $I0
+   saveall
+   bsr _fact
+   save $I1
+   restoreall
+   restore $I1
+fin:
+   ret
+.end
+
+CODE
+120
+OUT
+
+##############################
+# tail recursion - caller saves
+output_is(<<'CODE', <<'OUT', "tail recursive bsr 2");
+.sub _test
+   $I0 = 5	# count
+   $I1 = 1	# product
+   saveall
+   bsr _fact
+   save $I1
+   restoreall
+   restore $I1
+   print $I1
+   print "\n"
+   end
+_fact:
+   if $I0 <= 1 goto fin
+   $I1 = $I1 * $I0
+   dec $I0
+   bsr _fact
+fin:
+   ret
+.end
+
+CODE
+120
+OUT
+
+##############################
+# tail recursion - caller saves
+output_is(<<'CODE', <<'OUT', "tail recursive bsr - opt");
+.sub _test
+   $I0 = 5	# count
+   $I1 = 1	# product
+   saveall
+   bsr _fact
+   save $I1
+   restoreall
+   restore $I1
+   print $I1
+   print "\n"
+   end
+_fact:
+   if $I0 <= 1 goto fin
+   $I1 = $I1 * $I0
+   dec $I0
+   branch _fact
+fin:
+   ret
+.end
+
+CODE
+120
+OUT
+
+##############################
+# tail recursion - caller saves - parrot calling convention
+output_is(<<'CODE', <<'OUT', "tail recursive bsr, parrot cc");
+.sub _test
+   I6 = 5	# count
+   I5 = 1	# product
+   P0 = new Sub
+   $I0 = addr _fact
+   set P0, $I0
+   saveall
+   invoke
+   save I5
+   restoreall
+   restore $I0
+   print $I0
+   print "\n"
+   end
+# the callers args I5, I6 are used to do the calculation and have
+# the same state after, so instead of calling again the sub, just
+# a branch to the entry is done
+_fact:
+   if I6 <= 1 goto fin
+   I5 = I5 * I6
+   dec I6
+   branch _fact
+fin:
+   ret
+.end
+
+CODE
+120
+OUT
+
+##############################
+# coroutine
+output_is(<<'CODE', <<'OUT', "coroutine");
+.sub _main
+    .local Coroutine co
+    co = new Coroutine
+    $I0 = addr _routine
+    co = $I0
+    print "Hello"
+    invoke co
+    print "perl6"
+    invoke co
+    print "\n"
+    end
+
+_routine:
+    print " "
+    invoke co
+    print "."
+    invoke co
+
+.end
+CODE
+Hello perl6.
 OUT
 
 END {

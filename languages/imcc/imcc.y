@@ -524,10 +524,8 @@ labeled_inst:
     |   RESULT var			{ $$ = MK_I(interp, "restore", R1($2)); }
     |   ARG var				{ $$ = MK_I(interp, "save", R1($2)); }
     |   RETURN var			{ $$ = MK_I(interp, "save", R1($2)); }
-    |   CALL IDENTIFIER			{ $$ = MK_I(interp, "bsr",
-                                              R1(mk_address($2, U_add_once)));}
-    |   GOTO IDENTIFIER			{ $$ = MK_I(interp, "branch",
-                                              R1(mk_address($2, U_add_once)));}
+    |   CALL var_or_i			{ $$ = MK_I(interp, "bsr",  R1($2)); }
+    |   GOTO var_or_i			{ $$ = MK_I(interp, "branch",R1($2)); }
     |   INC var				{ $$ = MK_I(interp, "inc",R1($2)); }
     |   DEC var				{ $$ = MK_I(interp, "dec",R1($2)); }
     |   SAVEALL				{ $$ = MK_I(interp, "saveall" ,R0()); }

@@ -301,10 +301,10 @@ WS              [\t\f\r ]
         return(STRINGC);
     }
 
-<*>\$I[0-9]+          DUP_AND_RET(valp, IREG);
-<*>\$N[0-9]+          DUP_AND_RET(valp, NREG);
-<*>\$S[0-9]+          DUP_AND_RET(valp, SREG);
-<*>\$P[0-9]+          DUP_AND_RET(valp, PREG);
+<INITIAL>\$I[0-9]+          DUP_AND_RET(valp, IREG);
+<INITIAL>\$N[0-9]+          DUP_AND_RET(valp, NREG);
+<INITIAL>\$S[0-9]+          DUP_AND_RET(valp, SREG);
+<INITIAL>\$P[0-9]+          DUP_AND_RET(valp, PREG);
 
 <emit,INITIAL>{WS}+ /* skip */;
 

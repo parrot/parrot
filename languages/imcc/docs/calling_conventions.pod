@@ -31,26 +31,32 @@ Arguments are B<save>d in reverse order onto the user stack:
    call _foo	#(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result s	# restore results in reversed order
-   .result r	# [1]
+   .result r	# restore results in order
+   .result s	#
 
-and return values are B<restore>d in reversed order from there.
+and return values are B<restore>d in argument order from there.
 
 The subroutine is responsible for preserving registers.
 
  .sub _foo		# sub foo(int a, int b)
    saveall
-   .param int a
+   .param int a         # receive arguments from left to right
    .param int b
    ...
 
-   .return pl		# return (pl, mi)
-   .return mi		# [1]
+   .return mi		# return (pl, mi), push results
+   .return pl		# in reverse order
    restoreall
    ret
  .end
 
-[1] or vice versa?
+=head2 Rational
+
+Pushing arguments in reversed order on the user stack makes the left
+most argument the top of stack entry. This allows for a variable
+amount of function arguments (and return values), where the left most
+argument before a variable amount of following arguments is the
+argument count.
 
 =head2 Status
 
