@@ -36,7 +36,7 @@ Close IO object $1
 =cut
 
 inline op close(in PMC) {
-	PIO_close(interpreter, (ParrotIO*)(PMC_data($1)));
+	PIO_close(interpreter, $1);
 	goto NEXT();
 }
 
@@ -58,20 +58,15 @@ inline op fdopen(out PMC, in INT, in STR) {
   ParrotIO *io;
   mode = string_to_cstring(interpreter, $3);
 
-  io = PIO_fdopen(interpreter, $2, mode);
+  $1 = PIO_fdopen(interpreter, $2, mode);
+  if (!$1) {
+    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+  }
   /* string_cstring_free(mode); */
   /* TODO all results from sring_to_cstring() need freeing
      but this generates ugly warnings WRT discarding the const
      qualifier -lt
    */
-  if (io) {
-    $1 = pmc_new_noinit(interpreter, enum_class_ParrotIO);
-    VTABLE_init(interpreter, $1);
-    PMC_data($1) = io;
-  }
-  else {
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
-  }
 #else
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
 #endif
@@ -88,22 +83,16 @@ Perl style mode string in $3 and create an IO object in $1.
 =cut
 
 inline op open(out PMC, in STR, in STR) {
-  ParrotIO * io;
   /* These char * need to go away soon */
   const char * path, * mode;
 
   path = string_to_cstring(interpreter, $2);
   mode = string_to_cstring(interpreter, $3);
 
-  io = PIO_open(interpreter, path, mode);
+  $1 = PIO_open(interpreter, path, mode);
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
-  if(io) {
-    $1 = pmc_new_noinit(interpreter, enum_class_ParrotIO);
-    VTABLE_init(interpreter, $1);
-    PMC_data($1) = io;
-  }
-  else {
+  if(!$1) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
   goto NEXT();
@@ -123,7 +112,7 @@ descriptor into $1.
 
 op open(out INT, in STR) {
   char *path = string_to_cstring(interpreter, $2);
-  ParrotIO *io = PIO_open(interpreter, path, "+<");
+  PMC *io = PIO_open(interpreter, path, "+<");
   /* string_cstring_free(path); */
   if (io) {
     $1 = PIO_getfd(interpreter, io);
@@ -137,7 +126,7 @@ op open(out INT, in STR) {
 op open(out INT, in STR, in STR) {
   char *path = string_to_cstring(interpreter, $2);
   char *mode = string_to_cstring(interpreter, $3);
-  ParrotIO *io = PIO_open(interpreter, path, mode);
+  PMC *io = PIO_open(interpreter, path, mode);
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
   if (io) {
@@ -151,7 +140,7 @@ op open(out INT, in STR, in STR) {
 
 ########################################
 
-=item B<close>(out INT)
+=item B<close>(inout INT)
 
 Close file opened on file descriptor $1.
 
@@ -165,7 +154,7 @@ inline op close(inout INT) {
     table = ((ParrotIOData*)interpreter->piodata)->table;
     io = table[$1];
     table[$1] = NULL;
-    PIO_close(interpreter, io);
+    PIO_close(interpreter, new_io_pmc(interpreter, io));
   }
   goto NEXT();
 }
@@ -208,16 +197,18 @@ inline op print(in NUM) {
 op print(in STR) {
   STRING *s = $1;
   if (s && string_length(s)) {
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
+              s);
   }
   goto NEXT();
 }
 
 op print(in PMC) {
   PMC *p = $1;
-  STRING *s = (p->vtable->get_string(interpreter, p));
+  STRING *s = (VTABLE_get_string(interpreter, p));
   if (s) {
-    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
+              s);
   }
   goto NEXT();
 }
@@ -226,14 +217,14 @@ op print(in PMC) {
 op print(in INT, in INT) {
   ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
   STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
-  PIO_putps(interpreter, io, s);
+  PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
   goto NEXT();
 }
 
 op print(in INT, in NUM) {
   ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
   STRING *s = Parrot_sprintf_c(interpreter, "%f", (double)$2);
-  PIO_putps(interpreter, io, s);
+  PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
   goto NEXT();
 }
 
@@ -241,7 +232,7 @@ op print(in INT, in STR) {
   STRING *s = $2;
   ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
   if (s && string_length(s)) {
-    PIO_putps(interpreter, io, s);
+    PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
   }
   goto NEXT();
 }
@@ -251,14 +242,14 @@ op print(in INT, in PMC) {
   ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
   STRING *s = (p->vtable->get_string(interpreter, p));
   if (s) {
-    PIO_putps(interpreter, io, s);
+    PIO_putps(interpreter, new_io_pmc(interpreter, io), s);
   }
   goto NEXT();
 }
 
 op flush(in INT) {
   ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
-  PIO_flush(interpreter, io);
+  PIO_flush(interpreter, new_io_pmc(interpreter, io));
   goto NEXT();
 }
 
@@ -271,10 +262,8 @@ Print String $2 on the IO stream object $1.
 =cut
 
 op print(in PMC, in STR) {
-  ParrotIO * io;
-  io = (ParrotIO*)(PMC_data($1));
-  if ($2 && io) {
-    PIO_write(interpreter, io, ($2)->strstart, string_length($2));
+  if ($2 && $1) {
+    PIO_write(interpreter, $1, ($2)->strstart, string_length($2));
   }
   goto NEXT();
 }
@@ -289,8 +278,8 @@ Print $1 to interp.stderr IO stream (unbuffered)
 
 op printerr(in STR) {
   if ($1) {
-    PIO_write(interpreter, PIO_STDERR(interpreter), ($1)->strstart,
-			string_length($1));
+    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)),
+              $1);
   }
   goto NEXT();
 }
@@ -311,28 +300,22 @@ not stable enough to replace STDIO.
 =cut
 
 op puts(in STR) {
-  if (($1) && string_length($1)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), ($1)->strstart,
-			string_length($1));
+  if ($1) {
+    PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)),
+             $1);
   }
   goto NEXT();
 }
 
 op puts(in INT) {
   STRING * s = string_from_int(interpreter, $1);
-  if (string_length(s)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart,
-			string_length(s));
-  }
+  PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)), s);
   goto NEXT();
 }
 
 op puts(in NUM) {
   STRING * s = Parrot_sprintf_c(interpreter, "%f", $1);
-  if (string_length(s)) {
-    PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart,
-			string_length(s));
-  }
+  PIO_putps(interpreter, new_io_pmc(interpreter, PIO_STDOUT(interpreter)), s);
   goto NEXT();
 }
 
@@ -363,7 +346,8 @@ op read(out STR, in INT) {
     n = $2;
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, PIO_STDIN(interpreter), ($1)->strstart, (size_t)n);
+  nr = PIO_read(interpreter, new_io_pmc(interpreter, PIO_STDIN(interpreter)),
+                ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;
   else
@@ -380,8 +364,7 @@ op read(out STR, in PMC, in INT) {
     n = $3;
   $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
   memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, (ParrotIO*)(PMC_data($2)),
-    ($1)->strstart, (size_t)n);
+  nr = PIO_read(interpreter, $2, ($1)->strstart, (size_t)n);
   if(nr > 0)
     ($1)->strlen = ($1)->bufused = nr;
   else
@@ -405,9 +388,11 @@ inline op readline(out STR, in INT) {
   memset(($1)->strstart, 0, 65535);
 
   if ($2 >= 0) {
+    PMC *pmc;
     io = ((ParrotIOData*)interpreter->piodata)->table[$2];
-    PIO_setlinebuf(interpreter, io);
-    len = PIO_read(interpreter, io, ($1)->strstart, 65534);
+    pmc = new_io_pmc(interpreter, io);
+    PIO_setlinebuf(interpreter, pmc);
+    len = PIO_read(interpreter, pmc, ($1)->strstart, 65534);
     ($1)->strlen = ($1)->bufused = len;
   }
   goto NEXT();
@@ -430,19 +415,15 @@ indicated by the value in $4.
 =cut
 
 op seek(out INT, in PMC, in INT, in INT) {
-  ParrotIO * io;
-  io = (ParrotIO*)(PMC_data($2));
-  if (io) {
-    $1 = (INTVAL)PIO_seek(interpreter, io, 0, $3, $4);
+  if ($2) {
+    $1 = (INTVAL)PIO_seek(interpreter, $2, 0, $3, $4);
   }
   goto NEXT();
 }
 
 op seek(out INT, in PMC, in INT, in INT, in INT) {
-  ParrotIO * io;
-  io = (ParrotIO*)(PMC_data($2));
-  if (io) {
-    $1 = (INTVAL)PIO_seek(interpreter, io, $3, $4, $5);
+  if ($2) {
+    $1 = (INTVAL)PIO_seek(interpreter, $2, $3, $4, $5);
   }
   goto NEXT();
 }

@@ -71,7 +71,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
     off_t program_size, wanted;
     char *program_code;
     struct PackFile *pf;
-    ParrotIO * io = NULL;
+    PMC * io = NULL;
     INTVAL is_mapped = 0;
 
 #ifdef HAS_HEADER_SYSSTAT
@@ -84,7 +84,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
-        io = PIO_STDIN(interpreter);
+        io = new_io_pmc(interpreter, PIO_STDIN(interpreter));
         /* read 1k at a time */
         program_size = 0;
     }

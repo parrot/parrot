@@ -40,16 +40,15 @@ ParrotIOLayer   * pio_default_stack;
 
 PIOOFF_T piooffsetzero;
 
-#if 0
-void
-free_io_header(ParrotIO *io)
+PMC *
+new_io_pmc(theINTERP, ParrotIO *io)
 {
-    /* Free buffer if it was malloced */
-    if (io->b.startb && (io->b.flags & PIO_BF_MALLOC))
-        free(io->b.startb);
-    free(io);
+    PMC *new_pmc;
+    new_pmc = pmc_new(interpreter, enum_class_ParrotIO);
+    PMC_data(new_pmc) = io;
+    new_pmc->cache.struct_val = io->stack;
+    return new_pmc;
 }
-#endif
 
 ParrotIOTable
 alloc_pio_array(int numhandles)
@@ -69,18 +68,15 @@ realloc_pio_array(ParrotIOTable *table, int numhandles)
 }
 
 /*
- * Create a new IO stream, optionally reusing old structure.
+ * Create a new IO stream,
  */
 ParrotIO *
-PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
+PIO_new(theINTERP, INTVAL iotype, INTVAL flags, INTVAL mode)
 {
     ParrotIO *new_io;
 
     UNUSED(iotype);
 
-    if (old) {
-        /* FIXME: Reuse old IO */
-    }
     new_io = (ParrotIO *)mem_sys_allocate(sizeof(ParrotIO));
     new_io->fpos = new_io->lpos = piooffsetzero;
     new_io->flags = flags;
@@ -98,8 +94,9 @@ PIO_new(theINTERP, ParrotIO *old, INTVAL iotype, INTVAL flags, INTVAL mode)
  * Destroying the IO-Stream, at the moment only free memory
  */
 void
-PIO_destroy(theINTERP, ParrotIO *io)
+PIO_destroy(theINTERP, PMC *pmc)
 {
+    ParrotIO *io = PMC_data(pmc);
     UNUSED(interpreter);
 
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC))
@@ -137,7 +134,7 @@ PIO_init(theINTERP)
     }
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        PIO_puts(interpreter, PIO_STDERR(interpreter),
+        PIO_puts(interpreter, new_io_pmc(interpreter, PIO_STDERR(interpreter)),
                  "PIO: IO system initialized.\n");
     }
 }
@@ -156,7 +153,7 @@ PIO_finish(theINTERP)
 
     for (i = 0 ; i < PIO_NR_OPEN; i++) {
         if ( (io = GET_INTERP_IOD(interpreter)->table[i]) ) {
-            PIO_close(interpreter, io);
+            PIO_close(interpreter, new_io_pmc(interpreter, io));
         }
     }
     for (p = GET_INTERP_IO(interpreter); p; ) {
@@ -275,12 +272,15 @@ PIO_base_delete_layer(ParrotIOLayer *layer)
  * Push a layer onto an IO object or the default stack
  */
 INTVAL
-PIO_push_layer(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
+PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
 {
     ParrotIOLayer *t;
+
     if (layer == NULL)
         return -1;
-    if (io != NULL) {
+    if (pmc != NULL) {
+        ParrotIO *io = PMC_data(pmc);
+
         if (io->stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
             /* Error( 1st layer must be terminal) */
             return -1;
@@ -328,9 +328,11 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
  * Pop a layer from an IO object or the default stack
  */
 ParrotIOLayer *
-PIO_pop_layer(theINTERP, ParrotIO *io)
+PIO_pop_layer(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *layer;
+    ParrotIO *io = PMC_data(pmc);
+
     if (io) {
         layer = io->stack;
         if (layer) {
@@ -437,12 +439,14 @@ PIO_parse_open_flags(const char *flagstr)
  * API for controlling buffering specifics on an IO stream
  */
 INTVAL
-PIO_setbuf(theINTERP, ParrotIO *io, size_t bufsize)
+PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
-    ParrotIOLayer *l = io->stack;
-    PIO_flush(interpreter, io);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    PIO_flush(interpreter, pmc);
     while (l) {
         if (l->api->SetBuf) {
+            ParrotIO *io = PMC_data(pmc);
             return (*l->api->SetBuf) (interpreter, l, io, bufsize);
         }
         l = PIO_DOWNLAYER(l);
@@ -453,12 +457,13 @@ PIO_setbuf(theINTERP, ParrotIO *io, size_t bufsize)
 
 
 INTVAL
-PIO_setlinebuf(theINTERP, ParrotIO *io)
+PIO_setlinebuf(theINTERP, PMC *pmc)
 {
-    ParrotIOLayer *l = io->stack;
+    ParrotIOLayer *l = pmc->cache.struct_val;
 
     while (l) {
         if (l->api->SetLineBuf) {
+            ParrotIO *io = PMC_data(pmc);            
             return (*l->api->SetLineBuf) (interpreter, l, io);
         }
         l = PIO_DOWNLAYER(l);
@@ -468,18 +473,19 @@ PIO_setlinebuf(theINTERP, ParrotIO *io)
 }
 
 
-ParrotIO *
+PMC *
 PIO_open(theINTERP, const char *spath, const char *sflags)
 {
     ParrotIO *io;
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
     INTVAL flags = PIO_parse_open_flags(sflags);
+
     while (l) {
         if (l->api->Open) {
             io = (*l->api->Open) (interpreter, l, spath, flags);
             if (io) {
                 io->stack = GET_INTERP_IO(interpreter);
-                return io;
+                return new_io_pmc(interpreter, io);
             }
             else {
                 return NULL;
@@ -496,18 +502,24 @@ PIO_open(theINTERP, const char *spath, const char *sflags)
  * This is particularly used to init Parrot Standard IO onto
  * the OS IO handles (0,1,2).
  */
-ParrotIO *
+PMC *
 PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 {
     ParrotIO *io;
     INTVAL flags;
     ParrotIOLayer *l = GET_INTERP_IO(interpreter);
+
     flags = PIO_parse_open_flags(sflags);
     while (l) {
         if (l->api->FDOpen) {
             io = (*l->api->FDOpen) (interpreter, l, fd, flags);
-            io->stack = GET_INTERP_IO(interpreter);
-            return io;
+            if (io) {
+                io->stack = GET_INTERP_IO(interpreter);
+                return new_io_pmc(interpreter, io);
+            }
+            else {
+                return NULL;
+            }
         }
         l = PIO_DOWNLAYER(l);
     }
@@ -516,37 +528,38 @@ PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 
 
 INTVAL
-PIO_close(theINTERP, ParrotIO *io)
+PIO_close(theINTERP, PMC *pmc)
 {
     INTVAL res;
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Close) {
-                PIO_flush(interpreter, io);
-                res =  (*l->api->Close) (interpreter, l, io);
-                PIO_destroy(interpreter, io);
-                return res;
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Close) {
+            ParrotIO *io = PMC_data(pmc);
+            PIO_flush(interpreter, pmc);
+            res =  (*l->api->Close) (interpreter, l, io);
+            PIO_destroy(interpreter, pmc);
+            return res;
         }
+        l = PIO_DOWNLAYER(l);
     }
+
     return 0;
 }
 
 
 void
-PIO_flush(theINTERP, ParrotIO *io)
+PIO_flush(theINTERP, PMC *pmc)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Flush) {
-                (*l->api->Flush) (interpreter, l, io);
-                return;
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Flush) {
+            ParrotIO *io = PMC_data(pmc);
+            (*l->api->Flush) (interpreter, l, io);
+            return;
         }
+        l = PIO_DOWNLAYER(l);
     }
 }
 
@@ -555,16 +568,16 @@ PIO_flush(theINTERP, ParrotIO *io)
  * Iterate down the stack to the first layer implementing "Read" API
  */
 INTVAL
-PIO_read(theINTERP, ParrotIO *io, void *buffer, size_t len)
+PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Read) {
-                return (*l->api->Read) (interpreter, l, io, buffer, len);
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Read) {
+            ParrotIO *io = PMC_data(pmc);
+            return (*l->api->Read) (interpreter, l, io, buffer, len);
         }
+        l = PIO_DOWNLAYER(l);
     }
 
     return 0;
@@ -575,16 +588,16 @@ PIO_read(theINTERP, ParrotIO *io, void *buffer, size_t len)
  * Iterate down the stack to the first layer implementing "Write" API
  */
 INTVAL
-PIO_write(theINTERP, ParrotIO *io, void *buffer, size_t len)
+PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Write) {
-                return (*l->api->Write) (interpreter, l, io, buffer, len);
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Write) {
+            ParrotIO *io = PMC_data(pmc);
+            return (*l->api->Write) (interpreter, l, io, buffer, len);
         }
+        l = PIO_DOWNLAYER(l);
     }
 
     return 0;
@@ -597,17 +610,18 @@ PIO_write(theINTERP, ParrotIO *io, void *buffer, size_t len)
  * a 1 and 2 arg version of seek opcode.
  */
 INTVAL
-PIO_seek(theINTERP, ParrotIO *io, INTVAL hi, INTVAL lo, INTVAL w)
+PIO_seek(theINTERP, PMC *pmc, INTVAL hi, INTVAL lo, INTVAL w)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Seek) {
-                return (*l->api->Seek) (interpreter, l, io, hi, lo, w);
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Seek) {
+            ParrotIO *io = PMC_data(pmc);
+            return (*l->api->Seek) (interpreter, l, io, hi, lo, w);
         }
+        l = PIO_DOWNLAYER(l);
     }
+
     return -1;
 }
 
@@ -616,16 +630,16 @@ PIO_seek(theINTERP, ParrotIO *io, INTVAL hi, INTVAL lo, INTVAL w)
  * Iterate down the stack to the first layer implementing "Tell" API
  */
 PIOOFF_T
-PIO_tell(theINTERP, ParrotIO *io)
+PIO_tell(theINTERP, PMC *pmc)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->Tell) {
-                return (*l->api->Tell) (interpreter, l, io);
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->Tell) {
+            ParrotIO *io = PMC_data(pmc);
+            return (*l->api->Tell) (interpreter, l, io);
         }
+        l = PIO_DOWNLAYER(l);
     }
 
     return -1;
@@ -636,8 +650,10 @@ PIO_tell(theINTERP, ParrotIO *io)
  * Iterate down the stack to the first layer implementing "Read" API
  */
 INTVAL
-PIO_eof(theINTERP, ParrotIO *io)
+PIO_eof(theINTERP, PMC *pmc)
 {
+    ParrotIO *io = PMC_data(pmc);
+
     if (io) {
         return (io->flags & (PIO_F_EOF)) != 0;
     }
@@ -649,38 +665,41 @@ PIO_eof(theINTERP, ParrotIO *io)
  * PIO_putps is for.
  */
 INTVAL
-PIO_puts(theINTERP, ParrotIO *io, const char *s)
+PIO_puts(theINTERP, PMC *pmc, const char *s)
 {
-    if (io) {
-        ParrotIOLayer *l = io->stack;
-        while (l) {
-            if (l->api->PutS) {
-                return (*l->api->PutS) (interpreter, l, io, s);
-            }
-            l = PIO_DOWNLAYER(l);
+    ParrotIOLayer *l = pmc->cache.struct_val;
+
+    while (l) {
+        if (l->api->PutS) {
+            ParrotIO *io = PMC_data(pmc);
+            return (*l->api->PutS) (interpreter, l, io, s);
         }
+        l = PIO_DOWNLAYER(l);
     }
 
     return -1;
 }
 
 INTVAL
-PIO_putps(theINTERP, ParrotIO *io, STRING *s) {
+PIO_putps(theINTERP, PMC *pmc, STRING *s) 
+{
     INTVAL retVal;
+
     char *temp = string_to_cstring(interpreter, s);
-    retVal = PIO_puts(interpreter, io, temp);
+    retVal = PIO_puts(interpreter, pmc, temp);
     free(temp);
     return retVal;
 }
 
 INTVAL
-PIO_fprintf(theINTERP, ParrotIO *io, const char *s, ...) {
+PIO_fprintf(theINTERP, PMC *pmc, const char *s, ...)
+{
     va_list args;
     INTVAL ret=-1;
 
     va_start(args, s);
 
-    ret=PIO_putps(interpreter, io, Parrot_vsprintf_c(interpreter, s, args));
+    ret=PIO_putps(interpreter, pmc, Parrot_vsprintf_c(interpreter, s, args));
 
     va_end(args);
 
@@ -698,7 +717,8 @@ PIO_printf(theINTERP, const char *s, ...) {
     str=Parrot_vsprintf_c(interpreter, s, args);
 
     if(interpreter) {
-        ret=PIO_putps(interpreter, PIO_STDOUT(interpreter), str);
+        ret=PIO_putps(interpreter, 
+                      new_io_pmc(interpreter, PIO_STDOUT(interpreter)), str);
     }
     else {
         /* Be nice about this...
@@ -725,7 +745,8 @@ PIO_eprintf(theINTERP, const char *s, ...) {
     if(interpreter) {
         str=Parrot_vsprintf_c(interpreter, s, args);
 
-        ret=PIO_putps(interpreter, PIO_STDERR(interpreter), str);
+        ret=PIO_putps(interpreter, 
+                      new_io_pmc(interpreter, PIO_STDERR(interpreter)), str);
     }
     else {
         /* Be nice about this...
@@ -740,9 +761,11 @@ PIO_eprintf(theINTERP, const char *s, ...) {
 }
 
 INTVAL
-PIO_getfd(theINTERP, ParrotIO *io)
+PIO_getfd(theINTERP, PMC *pmc)
 {
     INTVAL i;
+    ParrotIO *io = PMC_data(pmc);
+
     ParrotIOTable table = ((ParrotIOData*)interpreter->piodata)->table;
 
     for(i = 0; i < PIO_NR_OPEN; i++) {

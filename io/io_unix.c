@@ -89,13 +89,14 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
     ParrotIOData *d = GET_INTERP_IOD(interpreter);
     if (d != NULL && d->table != NULL) {
         if ((PIO_STDIN(interpreter) =
-             PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, PIO_F_READ))
+             PIO_unix_fdopen(interpreter, layer, STDIN_FILENO, 
+                             PIO_F_READ | PIO_F_SHARED))
             && (PIO_STDOUT(interpreter) =
                 PIO_unix_fdopen(interpreter, layer, STDOUT_FILENO,
-                                PIO_F_WRITE))
+                                PIO_F_WRITE | PIO_F_SHARED))
             && (PIO_STDERR(interpreter) =
                 PIO_unix_fdopen(interpreter, layer, STDERR_FILENO,
-                                PIO_F_WRITE))
+                                PIO_F_WRITE | PIO_F_SHARED))
             )
             return 0;
     }
@@ -178,7 +179,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
          */
         if (PIO_unix_isatty(fd))
             flags |= PIO_F_CONSOLE;
-        io = PIO_new(interpreter, NULL, type, flags, mode);
+        io = PIO_new(interpreter, type, flags, mode);
         io->fd = fd;
         return io;
     }
@@ -215,7 +216,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 
     if (PIO_unix_isatty(fd))
         flags |= PIO_F_CONSOLE;
-    io = PIO_new(interpreter, NULL, PIO_F_FILE, flags, mode);
+    io = PIO_new(interpreter, PIO_F_FILE, flags, mode);
     io->fd = fd;
     return io;
 }
