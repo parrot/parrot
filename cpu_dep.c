@@ -25,7 +25,6 @@ static void trace_system_stack(struct Parrot_Interp *interpreter);
 void
 trace_system_areas(struct Parrot_Interp *interpreter)
 {
-
 #if defined(__sparc) /* Flush register windows */
     static union {
 	int insns[4];

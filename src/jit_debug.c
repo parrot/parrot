@@ -62,13 +62,13 @@
 #ifdef __GNUC__
 void Parrot_jit_debug(struct Parrot_Interp* interpreter);
 
-#define BIT_SIZE(t) ((int)(sizeof(t)*8))
-#define BYTE_SIZE(t) ((int)sizeof(t))
-#define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
+#  define BIT_SIZE(t) ((int)(sizeof(t)*8))
+#  define BYTE_SIZE(t) ((int)sizeof(t))
+#  define BIT_OFFSET(str, field) ((int)(offsetof(str, field) * 8))
 
 typedef struct {
-	const char *name;
-	const char *spec;
+    const char *name;
+    const char *spec;
 } BaseTypes;
 static void
 write_types(FILE *stabs)
@@ -88,16 +88,16 @@ write_types(FILE *stabs)
             {"Single", "r(0,8);4;0;"},
             {"Double", "r(0,8);8;0;"},  /* 10 */
             {"LongDouble", "r(0,8);12;0;"},
-#if INTVAL_SIZE == 4
+#  if INTVAL_SIZE == 4
             {"INTVAL", "(0,5);"},       /* 12 */
-#else
+#  else
             {"INTVAL", "(0,7);"},
-#endif
-#if NUMVAL_SIZE == 8
+#  endif
+#  if NUMVAL_SIZE == 8
             {"FLOATVAL", "(0,10);"},    /* 13 */
-#else
+#  else
             {"FLOATVAL", "(0,11);"},
-#endif
+#  endif
             {"Ptr", "*(0,0);"},
             {"CharPtr", "*(0,1);"},     /* 15 */
             {0, 0}
@@ -108,7 +108,8 @@ write_types(FILE *stabs)
         fprintf (stabs, ".stabs \"%s:t(0,%d)=", base_types[i].name, i);
         if (base_types[i].spec [0] == ';') {
             fprintf (stabs, "r(0,%d)%s\"", i, base_types[i].spec);
-        } else {
+        }
+        else {
             fprintf (stabs, "%s\"", base_types[i].spec);
         }
         fprintf (stabs, "," N_LSYM ",0,0,0\n");
@@ -302,7 +303,6 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
 void
 Parrot_jit_debug(struct Parrot_Interp* interpreter)
 {
-
     Parrot_jit_debug_stabs(interpreter);
 }
 

@@ -16,7 +16,8 @@ if ($files[0] eq "all_source") {
     # do a little "find" action for now.
     @files = ();
     File::Find::find({wanted => sub {
-                          if ($File::Find::dir =~ /(languages|icu|miniparrot)$/) {
+                          if ($File::Find::dir =~ m:(languages/[^/]+|icu|examples|miniparrot)$: &&
+			      $File::Find::dir !~ m:languages/imcc$:) {
                               $File::Find::prune = 1;	
 			      return;
                           }
@@ -140,7 +141,7 @@ sub check_comments {
     foreach (@$source) {
         $line++;
 
-        if (/\/\//) {
+        if (/\/\// && ! /http:\/\//) {
             error($file, $line, "Possible C++ comment detected.");
         }
 
@@ -249,7 +250,7 @@ sub check_cpp_indents {
 
             next;
         }
-        if (/^\s*\#(\s*)(else)/) {
+        if (/^\s*\#(\s*)(else|elif)/) {
             # stay where we are, but indenting should be 
             # back even with the opening brace.
             my $indent = "  " x (@stack-1);

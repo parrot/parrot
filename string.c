@@ -1203,9 +1203,7 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
 char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
-
 #if 0
-
     if (s->buflen == s->bufused) {
         string_grow(interpreter, s, 1);
     }

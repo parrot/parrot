@@ -21,16 +21,16 @@ typedef struct QUEUE_ENTRY QUEUE_ENTRY;
 typedef struct QUEUE QUEUE;
 
 struct QUEUE_ENTRY {
-  volatile Buffer *entry;
-  volatile INTVAL type;
-  volatile QUEUE_ENTRY *next;
+    volatile Buffer *entry;
+    volatile INTVAL type;
+    volatile QUEUE_ENTRY *next;
 };
 
 struct QUEUE {
-  volatile QUEUE_ENTRY *head;
-  volatile QUEUE_ENTRY *tail;
-  volatile INTVAL queue_in_use;
-  Parrot_mutex queue_mutex;
+    volatile QUEUE_ENTRY *head;
+    volatile QUEUE_ENTRY *tail;
+    volatile INTVAL queue_in_use;
+    Parrot_mutex queue_mutex;
 };
 
 void Parrot_ins_queue_interrupt(QUEUE *queue, QUEUE_ENTRY *entry);

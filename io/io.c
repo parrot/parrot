@@ -674,8 +674,8 @@ PIO_puts(theINTERP, ParrotIO *io, const char *s)
 
 INTVAL
 PIO_putps(theINTERP, ParrotIO *io, STRING *s) {
-	INTVAL retVal;
-	char *temp = string_to_cstring(interpreter, s);
+    INTVAL retVal;
+    char *temp = string_to_cstring(interpreter, s);
     retVal = PIO_puts(interpreter, io, temp);
     free(temp);
     return retVal;

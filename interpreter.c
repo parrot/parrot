@@ -180,7 +180,6 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 static void
 init_prederef(struct Parrot_Interp *interpreter, int cgp)
 {
-
 #ifdef HAVE_COMPUTED_GOTO
     oplib_init_f init_func = cgp ?
         PARROT_CORE_CGP_OPLIB_INIT :
@@ -259,13 +258,13 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
     code_start = interpreter->code->byte_code;
     code_size = interpreter->code->cur_cs->base.size;
     code_end = interpreter->code->byte_code + code_size;
-#ifdef HAVE_COMPUTED_GOTO
-# ifdef __GNUC__
-#  ifdef I386
+#  ifdef HAVE_COMPUTED_GOTO
+#    ifdef __GNUC__
+#      ifdef I386
     init_prederef(interpreter, 1);
+#      endif
+#    endif
 #  endif
-# endif
-#endif
 
     jit_code = build_asm(interpreter, pc, code_start, code_end);
     interpreter->code->cur_cs->jit_info = interpreter->jit_info;
@@ -692,7 +691,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 }
 
 #ifdef GC_IS_MALLOC
-#if 0
+#  if 0
 struct mallinfo {
     int arena;                  /* non-mmapped space allocated from system */
     int ordblks;                /* number of free chunks */
@@ -706,7 +705,7 @@ struct mallinfo {
     int keepcost;               /* top-most, releasable (via malloc_trim)
                                  * space */
 };
-#endif
+#  endif
 extern struct mallinfo mallinfo(void);
 #endif /* GC_IS_MALLOC */
 INTVAL

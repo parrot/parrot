@@ -52,7 +52,8 @@ do_panic(struct Parrot_Interp *interpreter, const char *message,
     if (interpreter) {
         PIO_printf(interpreter, "Parrot file %Ss, line %d\n",
                    interpreter->current_file, interpreter->current_line);
-    } else {
+    }
+    else {
         PIO_printf(interpreter, "Parrot file (not available), ");
         PIO_printf(interpreter, "line (not available)\n");
     }

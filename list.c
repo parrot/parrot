@@ -342,7 +342,8 @@ rebuild_other(Interp *interpreter, List *list)
                         (chunk->items - (MAX_ITEMS - prev->items)) * list->item_size);
                 chunk->items = chunk->items - (MAX_ITEMS - prev->items);
                 prev->items = MAX_ITEMS;
-            } else {
+            }
+            else {
                 Parrot_reallocate(interpreter, (Buffer *)prev,
                         (prev->items + chunk->items) * list->item_size);
                 mem_sys_memmove(

@@ -1483,7 +1483,6 @@ struct PackFile_ByteCode *
 Parrot_switch_to_cs(struct Parrot_Interp *interpreter,
     struct PackFile_ByteCode *new_cs)
 {
-
     struct PackFile_ByteCode *cur_cs = interpreter->code->cur_cs;
     interpreter->code->cur_cs = new_cs;
     new_cs->prev = cur_cs;
@@ -2002,14 +2001,14 @@ PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
         struct PackFile * pf,
         struct PackFile_Constant *self, opcode_t *cursor)
 {
-/*
+    /*
     union F {
         FLOATVAL value;
         opcode_t b[sizeof(FLOATVAL)/sizeof(opcode_t)];
     } f;
 
     int i;
-*/
+    */
 
     /* We need to do a memcpy from the packed area to the value
      * because we can't guarantee that the packed area (which is

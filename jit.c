@@ -16,38 +16,38 @@
  */
 
 #ifndef INT_REGISTERS_TO_MAP
-# define INT_REGISTERS_TO_MAP 0
+#  define INT_REGISTERS_TO_MAP 0
   char *intval_map = 0;
 #endif
 
 #ifndef FLOAT_REGISTERS_TO_MAP
-# define FLOAT_REGISTERS_TO_MAP 0
+#  define FLOAT_REGISTERS_TO_MAP 0
   char *floatval_map = 0;
 #endif
 
 #ifndef ALLOCATE_REGISTERS_PER_SECTION
-# define ALLOCATE_REGISTERS_PER_SECTION 1
+#  define ALLOCATE_REGISTERS_PER_SECTION 1
 #endif
 
 #if ALLOCATE_REGISTERS_PER_SECTION
-# undef PRESERVED_INT_REGS
-# undef PRESERVED_FLOAT_REGS
+#  undef PRESERVED_INT_REGS
+#  undef PRESERVED_FLOAT_REGS
 #endif
 
 #ifndef PRESERVED_INT_REGS
-# if ALLOCATE_REGISTERS_PER_SECTION
-#   define PRESERVED_INT_REGS INT_REGISTERS_TO_MAP
-# else
-#   define PRESERVED_INT_REGS 0
-# endif
+#  if ALLOCATE_REGISTERS_PER_SECTION
+#    define PRESERVED_INT_REGS INT_REGISTERS_TO_MAP
+#  else
+#    define PRESERVED_INT_REGS 0
+#  endif
 #endif
 
 #ifndef PRESERVED_FLOAT_REGS
-# if ALLOCATE_REGISTERS_PER_SECTION
-#   define PRESERVED_FLOAT_REGS FLOAT_REGISTERS_TO_MAP
-# else
-#   define PRESERVED_FLOAT_REGS 0
-# endif
+#  if ALLOCATE_REGISTERS_PER_SECTION
+#    define PRESERVED_FLOAT_REGS FLOAT_REGISTERS_TO_MAP
+#  else
+#    define PRESERVED_FLOAT_REGS 0
+#  endif
 #endif
 
 #ifdef __GNUC__
@@ -95,7 +95,6 @@ make_branch_list(struct Parrot_Interp *interpreter,
         Parrot_jit_optimizer_t * optimizer,
         opcode_t *cur_op, opcode_t *code_start, opcode_t *code_end)
 {
-
     op_info_t *op_info;
     char *branch;
 
@@ -591,9 +590,9 @@ debug_sections(struct Parrot_Interp *interpreter,
     Parrot_jit_optimizer_section_ptr cur_section;
     op_info_t *op_info;
     opcode_t * cur_op;
-#if JIT_DEBUG > 1
+#  if JIT_DEBUG > 1
     char * map = optimizer->map_branch;
-#endif
+#  endif
     int i, typ;
     unsigned int j;
     const char *types = "IPSN";
@@ -614,12 +613,12 @@ debug_sections(struct Parrot_Interp *interpreter,
                     op_info, cur_op, NULL, code_start, 0);
             PIO_eprintf(interpreter, "\t\tOP%vu: ext %3d\t%s\n",
                     cur_op - code_start, op_jit[*cur_op].extcall, instr);
-#if JIT_DEBUG > 1
+#  if JIT_DEBUG > 1
             PIO_eprintf(interpreter, "\t\t\tmap_branch: ");
             for (i = 0; i < op_info->arg_count; i++)
                 PIO_eprintf(interpreter, "%02x ", map[cur_op-code_start+i]);
             PIO_eprintf(interpreter, "\n");
-#endif
+#  endif
 
             cur_op += op_info->arg_count;
         }

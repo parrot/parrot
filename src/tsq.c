@@ -60,38 +60,38 @@
 */
 
 #if defined(__GNUC__)
-#if defined(__OPTIMIZE__)
-#error "Can't compile this with optimizations of any sort"
-#endif
+#  if defined(__OPTIMIZE__)
+#    error "Can't compile this with optimizations of any sort"
+#  endif
 #endif
 
 /* Insert an entry to the passed in queue. Callable only from within
    interrupt code */
 void Parrot_ins_queue_interrupt(QUEUE *queue, QUEUE_ENTRY *entry) {
-  /* entry's next pointer is always NULL */
-  entry->next = NULL;
+    /* entry's next pointer is always NULL */
+    entry->next = NULL;
 
-  /* Is something using us? If not, just go do this */
-  if (!queue->queue_in_use) {
-    /* Is there a tail entry? */
-    if (queue->tail) {
-      entry->next = NULL;
-      queue->tail->next = entry;
-      queue->tail = entry;
-    } else {
-      /* If no tail, then no head. Empty queue */
-      queue->head = entry;
-      queue->tail = entry;
+    /* Is something using us? If not, just go do this */
+    if (!queue->queue_in_use) {
+        /* Is there a tail entry? */
+        if (queue->tail) {
+            entry->next = NULL;
+            queue->tail->next = entry;
+            queue->tail = entry;
+        }
+        else {
+            /* If no tail, then no head. Empty queue */
+            queue->head = entry;
+            queue->tail = entry;
+        }
     }
-  } else {
-    /* This is the tricky bit. The queue is in use, which means
-       something is mutating it. That means the queue header or
-       entries could be in an inconsistent state. We need to tread
-       really carefully here */
-  }
-  
+    else {
+        /* This is the tricky bit. The queue is in use, which means
+           something is mutating it. That means the queue header or
+           entries could be in an inconsistent state. We need to tread
+           really carefully here */
+    }
 }
-
 
 
 /*
