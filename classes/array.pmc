@@ -9,9 +9,6 @@
  *  Notes:
  *     TODO: Create global immutable undef object
  *     TODO: PerlUndef should really be just Undef
- *     TODO: Array should not autocreate something called a PerlInt,
- *           PerlString, etc. Either nothing should get autocreated,
- *           or * those should all lose the Perl prefix.
  *  References:
  */
 
