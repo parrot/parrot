@@ -184,6 +184,18 @@ void bitwise_xor(PMC* value, PMC* dest)
 void bitwise_xor_int(INTVAL value, PMC* dest)
 void bitwise_xor_same(PMC* value, PMC* dest)
 
+void bitwise_ors(PMC* value, PMC* dest)
+void bitwise_ors_str(STRING* value, PMC* dest)
+void bitwise_ors_same(PMC* value, PMC* dest)
+
+void bitwise_ands(PMC* value, PMC* dest)
+void bitwise_ands_str(STRING* value, PMC* dest)
+void bitwise_ands_same(PMC* value, PMC* dest)
+
+void bitwise_xors(PMC* value, PMC* dest)
+void bitwise_xors_str(STRING* value, PMC* dest)
+void bitwise_xors_same(PMC* value, PMC* dest)
+
 void bitwise_not(PMC* dest)
 
 void bitwise_shl(PMC* value, PMC* dest)

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 107;
+use Parrot::Test tests => 113;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -1769,6 +1769,130 @@ output_is( <<'CODE', <<OUTPUT, "assign & globber 2" );
 CODE
 Parrot
 Parrot
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands NULL string");
+	null S1
+	set S2, "abc"
+	bands S1, S2
+	null S3
+	eq S1, S3, ok1
+	print "not "
+ok1:	print "ok 1\n"
+	set S1, ""
+	bands S1, S2
+	unless S1, ok2
+	print "not "
+ok2:	print "ok 2\n"
+
+	null S2
+	set S1, "abc"
+	bands S1, S2
+	null S3
+	eq S1, S3, ok3
+	print "not "
+ok3:	print "ok 3\n"
+	set S2, ""
+	bands S1, S2
+	unless S1, ok4
+	print "not "
+ok4:	print "ok 4\n"
+	end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands 2");
+	set S1, "abc"
+	set S2, "EE"
+	bands S1, S2
+	print S1
+	print "\n"
+	print S2
+	print "\n"
+	end
+CODE
+A@
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bands 3");
+	set S1, "abc"
+	set S2, "EE"
+	bands S0, S1, S2
+	print S0
+	print "\n"
+	print S1
+	print "\n"
+	print S2
+	print "\n"
+	end
+CODE
+A@
+abc
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors NULL string");
+	null S1
+	set S2, "abc"
+	bors S1, S2
+ 	print S1
+ 	print "\n"
+	set S1, ""
+	bors S1, S2
+ 	print S1
+ 	print "\n"
+
+	null S2
+	set S1, "abc"
+	bors S1, S2
+ 	print S1
+ 	print "\n"
+	set S2, ""
+	bors S1, S2
+ 	print S1
+ 	print "\n"
+	end
+CODE
+abc
+abc
+abc
+abc
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors 2");
+	set S1, "abc"
+	set S2, "EE"
+	bors S1, S2
+	print S1
+	print "\n"
+	print S2
+	print "\n"
+	end
+CODE
+egc
+EE
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "bors 3");
+	set S1, "abc"
+	set S2, "EE"
+	bors S0, S1, S2
+	print S0
+	print "\n"
+	print S1
+	print "\n"
+	print S2
+	print "\n"
+	end
+CODE
+egc
+abc
+EE
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)

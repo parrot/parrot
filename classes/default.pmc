@@ -795,6 +795,24 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
+    void bitwise_ors (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ors() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_ors_str (STRING* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ors_str() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_ors_same (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ors_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
     void bitwise_and (PMC* value, PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"bitwise_and() not implemented in class '%s'\n",
@@ -810,6 +828,24 @@ pmclass default abstract noinit {
     void bitwise_and_same (PMC* value, PMC* dest) {
 	internal_exception(ILL_INHERIT,
 		"bitwise_and_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_ands (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ands() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_ands_str (STRING* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ands_str() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_ands_same (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_ands_same() not implemented in class '%s'\n",
 		caller(INTERP, SELF));
     }
 
@@ -831,6 +867,24 @@ pmclass default abstract noinit {
 		caller(INTERP, SELF));
     }
 
+
+    void bitwise_xors (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_xors() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_xors_str (STRING* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_xors_str() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
+
+    void bitwise_xors_same (PMC* value, PMC* dest) {
+	internal_exception(ILL_INHERIT,
+		"bitwise_xors_same() not implemented in class '%s'\n",
+		caller(INTERP, SELF));
+    }
 
     void bitwise_not (PMC* dest) {
 	internal_exception(ILL_INHERIT,

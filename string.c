@@ -991,6 +991,150 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
     return cmp;
 }
 
+/*=for api string string_bitwise_and
+ * and two strings, performing type and encoding conversions if
+ * necessary. If *dest != NULL reuse dest, else create a new result
+ */
+STRING *
+string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest)
+{
+    const char *s1start;
+    const char *s2start;
+    char *dp;
+    STRING *res;
+    size_t len;
+
+    len = s1 ? s1->bufused : 0;
+    if (s2 && s2->bufused < len)
+        len = s2->bufused;
+
+    if (dest && *dest)
+        res = *dest;
+    else if (!s1 || !s2)
+        res = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+
+    if (!s1 || !s2) {
+        res->bufused = 0;
+        res->strlen = 0;
+        return res;
+    }
+
+    /* trigger GC for debug */
+    if (interpreter && GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter, 1);
+
+    if (s1->type != s2->type || s1->encoding != s2->encoding) {
+        s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
+                NULL);
+        s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
+                NULL);
+    }
+    /* get the real len after trancode */
+    len = s1 ? s1->bufused : 0;
+    if (s2 && s2->bufused < len)
+        len = s2->bufused;
+    if (!dest || *dest)
+        res = string_make(interpreter, NULL, len, s1->encoding, 0, s1->type);
+
+    s1start = s1->strstart;
+    s2start = s2->strstart;
+    dp = res->strstart;
+    res->bufused = len;
+
+    for ( ; len ; ++s1start, ++s2start, ++dp, --len)
+        *dp = *s1start & *s2start;
+    res->strlen = s1->strlen;
+    if (s2->strlen < s1->strlen)
+        res->strlen = s2->strlen;
+
+    if (dest)
+        *dest = res;
+    return res;
+}
+
+/*=for api string string_bitwise_or
+ * or two strings, performing type and encoding conversions if
+ * necessary. If *dest != NULL reuse dest, else create a new result
+ */
+STRING *
+string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest)
+{
+    const char *s1start;
+    const char *s2start;
+    const char *s1end;
+    const char *s2end;
+    char *dp;
+    STRING *res;
+    size_t len;
+
+    len = s1 ? s1->bufused : 0;
+    if (s2 && s2->bufused > len)
+        len = s2->bufused;
+
+    if (dest && *dest)
+        res = *dest;
+    else if (len == 0)
+        res = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+    if (!len) {
+        res->bufused = 0;
+        res->strlen = 0;
+        return res;
+    }
+
+    /* trigger GC for debug */
+    if (interpreter && GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter, 1);
+
+    if (s1 && s2) {
+        if (s1->type != s2->type || s1->encoding != s2->encoding) {
+            s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
+                    NULL);
+            s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
+                    NULL);
+        }
+    }
+    len = s1 ? s1->bufused: 0;
+    if (s2 && s2->bufused > len)
+        len = s2->bufused;
+    if (!dest || !*dest)
+        res = string_make(interpreter, NULL, len,
+                s1 ? s1->encoding : NULL, 0, s1 ? s1->type : NULL);
+    else if (res->bufused < len)
+        string_grow(interpreter, res, len - res->bufused);
+
+    if (s1) {
+        s1start = s1->strstart;
+        s1end = s1start + s1->bufused;
+        res->strlen = s1->strlen;
+    }
+    else
+        s1start = s1end = NULL;
+    if (s2) {
+        s2start = s2->strstart;
+        s2end = s2start + s2->bufused;
+        if ((s1 && s2->strlen > s1->strlen) || !s1)
+            res->strlen = s2->strlen;
+    }
+    else
+        s2start = s2end = NULL;
+    dp = res->strstart;
+    res->bufused = len;
+
+    for ( ; len ; ++s1start, ++s2start, ++dp, --len) {
+        if (s1start < s1end && s2start < s2end)
+            *dp = *s1start | *s2start;
+        else if (s1start < s1end)
+            *dp = *s1start;
+        else
+            *dp = *s2start;
+    }
+    if (dest)
+        *dest = res;
+
+    return res;
+}
 /* A string is "true" if it is equal to anything but "" and "0" */
 INTVAL
 string_bool(const STRING *s)

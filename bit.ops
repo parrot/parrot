@@ -10,8 +10,10 @@ bit.ops - Bitwise Operations
 
 =head1 DESCRIPTION
 
-Operations that deal with bits directly, either individually 
+Operations that deal with bits directly, either individually
 or in groups.
+
+The variant with an appended B<s> like B<bands> work on strings.
 
 =over 4
 
@@ -64,6 +66,54 @@ inline op band(in PMC, in PMC, in INT) {
 
 inline op band(in PMC, in PMC, in PMC) {
   $2->vtable->bitwise_and(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+=item B<bands>(inout STR, in STR)
+
+=item B<bands>(in PMC, in STR)
+
+=item B<bands>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $1 and $2.
+
+=item B<bands>(out STR, in STR, in STR)
+
+=item B<bands>(in PMC, in PMC, in STR)
+
+=item B<bands>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<and> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op bands(inout STR, in STR) {
+  string_bitwise_and(interpreter, $1, $2, &$1);
+  goto NEXT();
+}
+
+inline op bands(in PMC, in STR) {
+  $1->vtable->bitwise_ands_str(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bands(in PMC, in PMC) {
+  $1->vtable->bitwise_ands(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bands(out STR, in STR, in STR) {
+  $1 = string_bitwise_and(interpreter, $2, $3, NULL);
+  goto NEXT();
+}
+
+inline op bands(in PMC, in PMC, in STR) {
+  $2->vtable->bitwise_ands_str(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bands(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_ands(interpreter, $2, $3, $1);
   goto NEXT();
 }
 
@@ -137,6 +187,53 @@ inline op bor(in PMC, in PMC, in PMC) {
   goto NEXT();
 }
 
+=item B<bors>(inout STR, in STR)
+
+=item B<bors>(in PMC, in STR)
+
+=item B<bors>(in PMC, in PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $1 and $2.
+
+=item B<bors>(out STR, in STR, in STR)
+
+=item B<bors>(in PMC, in PMC, in STR)
+
+=item B<bors>(in PMC, in PMC, in PMC)
+
+Set the bits of $1 according to the B<or> of the corresponding bits from $2 and $3.
+
+=cut
+
+inline op bors(inout STR, in STR) {
+  string_bitwise_or(interpreter, $1, $2, &$1);
+  goto NEXT();
+}
+
+inline op bors(in PMC, in STR) {
+  $1->vtable->bitwise_ors_str(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bors(in PMC, in PMC) {
+  $1->vtable->bitwise_ors(interpreter, $1, $2, $1);
+  goto NEXT();
+}
+
+inline op bors(out STR, in STR, in STR) {
+  $1 = string_bitwise_or(interpreter, $2, $3, NULL);
+  goto NEXT();
+}
+
+inline op bors(in PMC, in PMC, in STR) {
+  $2->vtable->bitwise_ors_str(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
+inline op bors(in PMC, in PMC, in PMC) {
+  $2->vtable->bitwise_ors(interpreter, $2, $3, $1);
+  goto NEXT();
+}
 ########################################
 
 =item B<shl>(out INT, in INT, in INT)

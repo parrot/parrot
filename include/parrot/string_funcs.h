@@ -61,6 +61,12 @@ char *string_to_cstring(struct Parrot_Interp *, STRING *);
 void string_cstring_free(void *);
 void string_pin(struct Parrot_Interp *, STRING *);
 void string_unpin(struct Parrot_Interp *, STRING *);
+STRING *string_bitwise_and(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest);
+STRING *string_bitwise_or(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest);
+STRING *string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
+               STRING *s2, STRING **dest);
 
 #endif
 
