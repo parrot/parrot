@@ -16,7 +16,7 @@ Contains a lot of Perl PMC related tests.
 
 =cut
 
-use Parrot::Test tests => 92;
+use Parrot::Test tests => 93;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -658,7 +658,6 @@ output_is(<<'CODE', <<OUTPUT, "p =  p % p (int % numeric string)");
 	new 	P0, .PerlInt
 	new	P1, .PerlString
 	new	P2, .PerlInt
-        new     P3, .PerlNum
 	set	P0, 11
 	set	P1, "10"
 	mod	P2, P0, P1
@@ -1285,6 +1284,21 @@ output_is(<<CODE, <<OUTPUT, "mod_p_i, PerlInt");
         set P0,3
         mod P0,6
         .fp_eq(P0,3,EQ1)
+        print "not "
+EQ1:    print "ok 1"
+        print "\\n"
+        end
+CODE
+ok 1
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "mod_p_p_i, PerlInt");
+@{[ $fp_equality_macro ]}
+        new P0,.PerlInt
+        set P0,7
+        new P1,.PerlInt
+        mod P1, P0, 6
+        .fp_eq(P1,1,EQ1)
         print "not "
 EQ1:    print "ok 1"
         print "\\n"
