@@ -665,7 +665,11 @@ PIO_puts(theINTERP, ParrotIO *io, const char *s)
 
 INTVAL
 PIO_putps(theINTERP, ParrotIO *io, STRING *s) {
-    return PIO_puts(interpreter, io, string_to_cstring(interpreter, s));
+	INTVAL retVal;
+	char *temp = string_to_cstring(interpreter, s);
+    retVal = PIO_puts(interpreter, io, temp);
+    free(temp);
+    return retVal;
 }
 
 INTVAL
@@ -699,7 +703,9 @@ PIO_printf(theINTERP, const char *s, ...) {
         /* Be nice about this...
         **   XXX BD Should this use the default PIO_STDOUT or something?
         */
-        ret=printf("%s", string_to_cstring(interpreter, str));
+        char *temp = string_to_cstring(interpreter, str);
+        ret=printf("%s", temp);
+        free(temp);
     }
 
     va_end(args);

@@ -244,13 +244,20 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     }
     stabsfile = debug_file(interpreter, file, "stabs.s");
     ofile = debug_file(interpreter, file, "o");
-    stabs = fopen(string_to_cstring(interpreter,stabsfile), "w");
+    {
+    	char *temp = string_to_cstring(interpreter,stabsfile);
+        stabs = fopen(temp, "w");
+        free(temp);
+    }
     if (stabs == NULL)
         return;
 
-    /* filename info */
-    fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",
-            string_to_cstring(interpreter, pasmfile));
+    {
+    	char *temp = string_to_cstring(interpreter, pasmfile);
+        /* filename info */
+        fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",temp);
+        free(temp);
+    }
     /* jit_func start addr */
     fprintf(stabs, ".stabs \"jit_func:F(0,1)\"," N_FUN ",0,1,%p\n",
             jit_info->arena.start);
@@ -284,7 +291,12 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     fclose(stabs);
     /* run the stabs file through C<as> generating file.o */
     cmd = Parrot_sprintf_c(interpreter, "as %Ss -o %Ss", stabsfile, ofile);
-    system(string_to_cstring(interpreter, cmd));
+    
+    {
+    	char *temp = string_to_cstring(interpreter, cmd);
+    	system(temp);
+    	free(temp);
+    }
 }
 
 void
