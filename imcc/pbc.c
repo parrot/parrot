@@ -878,7 +878,11 @@ e_pbc_end_sub(Interp *interpreter, void *param, IMC_Unit * unit)
      * up, e.g. when that sub start loading bytecode
      */
     ins = unit->instructions;
+    /* we run only PCC subs */
     if (!ins->r[1] || !ins->r[1]->pcc_sub)
+        return 0;
+    /* if we are compiling, we don't run it */
+    if (interpreter->imc_info->write_pbc)
         return 0;
     pragma = ins->r[1]->pcc_sub->pragma;
     if (pragma & P_IMMEDIATE) {

@@ -492,6 +492,8 @@ main(int argc, char * argv[])
                 "main: outputfile is sourcefile\n");
     }
 
+    interp->imc_info->write_pbc = write_pbc;
+
     if (interp->imc_info->verbose) {
         IMCC_info(interp, 1,"debug = 0x%x\n", interp->imc_info->debug);
         IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);

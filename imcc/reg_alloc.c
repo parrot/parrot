@@ -40,7 +40,7 @@ static void build_reglist(Parrot_Interp, IMC_Unit * unit, int first);
 static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
-static int interferes(IMC_Unit *, SymReg * r0, SymReg * r1);
+static int interferes(Interp *, IMC_Unit *, SymReg * r0, SymReg * r1);
 static int map_colors(IMC_Unit *, int x, unsigned int * graph, int colors[], int typ);
 #ifdef DO_SIMPLIFY
 static int simplify (IMC_Unit *);
@@ -49,12 +49,11 @@ static void compute_spilling_costs (Parrot_Interp, IMC_Unit *);
 static void order_spilling (IMC_Unit *);
 static void spill (Interp *, IMC_Unit * unit, int);
 static int try_allocate(Parrot_Interp, IMC_Unit *);
-static void restore_interference_graph(IMC_Unit *);
+static void restore_interference_graph(Interp *, IMC_Unit *);
 #if 0
 static int neighbours(int node);
 #endif
 
-extern int pasm_file;
 /* XXX FIXME: Globals: */
 
 static IMCStack nodeStack;
@@ -96,7 +95,7 @@ static unsigned int* ig_allocate(int N)
      */
     int need_bits = N * N;
     int num_words = (need_bits + sizeof(int) - 1) / sizeof(int);
-    return (unsigned int*) calloc(num_words, sizeof(int));
+    return (unsigned int*) mem_sys_allocate_zeroed(num_words * sizeof(int));
 }
 
 /* imc_reg_alloc is the main loop of the allocation algorithm. It operates
@@ -108,14 +107,16 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     int to_spill;
     int todo, first;
     int loop_counter;
+    char *function;
 
     if (!unit)
         return;
-    if (!(optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM)) && pasm_file)
+    if (!(IMCC_INFO(interpreter)->optimizer_level &
+                (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
         return;
 
     imcc_init_tables(interpreter);
-    allocated = 0;
+    IMCC_INFO(interpreter)->allocated = 0;
     if (!unit->instructions)
         return;
 
@@ -128,16 +129,16 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 #endif
 
     function = unit->instructions->r[0]->name;
-    debug(interpreter, DEBUG_IMC, "\n------------------------\n");
-    debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
-    debug(interpreter, DEBUG_IMC, "------------------------\n\n");
+    IMCC_debug(interpreter, DEBUG_IMC, "\n------------------------\n");
+    IMCC_debug(interpreter, DEBUG_IMC, "processing sub %s\n", function);
+    IMCC_debug(interpreter, DEBUG_IMC, "------------------------\n\n");
     if (IMCC_INFO(interpreter)->verbose ||
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
         imc_stat_init(unit);
 
     /* consecutive labels, if_branch, unused_labels ... */
     pre_optimize(interpreter, unit);
-    if (optimizer_level == OPT_PRE && pasm_file)
+    if (IMCC_INFO(interpreter)->optimizer_level == OPT_PRE && unit->pasm_file)
         return;
 
     nodeStack = imcstack_new();
@@ -171,7 +172,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         build_reglist(interpreter, unit, 1);
         life_analysis(interpreter, unit);
         /* optimize, as long as there is something to do */
-        if (dont_optimize)
+        if (IMCC_INFO(interpreter)->dont_optimize)
             todo = 0;
         else {
             todo = optimize(interpreter, unit);
@@ -189,7 +190,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 #if DOIT_AGAIN_SAM
         build_interference_graph(interpreter, unit);
 #endif
-        if (optimizer_level & OPT_SUB)
+        if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
             allocate_wanted_regs(unit);
         compute_spilling_costs(interpreter, unit);
 #ifdef DO_SIMPLIFY
@@ -199,10 +200,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         order_spilling(unit);          /* put the remaining items on stack */
 
         to_spill = try_allocate(interpreter, unit);
-        allocated = 1;
+        IMCC_INFO(interpreter)->allocated = 1;
 
         if ( to_spill >= 0 ) {
-            allocated = 0;
+            IMCC_INFO(interpreter)->allocated = 0;
             spill(interpreter, unit, to_spill);
             /*
              * build the new cfg/reglist on the fly in spill() and
@@ -220,10 +221,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
             todo = 0;
         }
     }
-    if (optimizer_level & OPT_SUB)
+    if (IMCC_INFO(interpreter)->optimizer_level & OPT_SUB)
         sub_optimize(interpreter, unit);
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(unit);
+        dump_instructions(interpreter, unit);
     if (IMCC_INFO(interpreter)->verbose  ||
             (IMCC_INFO(interpreter)->debug & DEBUG_IMC))
         print_stat(interpreter, unit);
@@ -284,22 +285,23 @@ static void print_stat(Parrot_Interp interpreter, IMC_Unit * unit)
 {
     int sets[4] = {0,0,0,0};
     int cols[4] = {-1,-1,-1,-1};
+    char *function = unit->instructions->r[0]->name;
 
     make_stat(unit, sets, cols);
-    info(interpreter, 1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
+    IMCC_info(interpreter, 1, "sub %s:\n\tregisters in .imc:\t I%d, N%d, S%d, P%d\n",
             function, imcsets[0], imcsets[1], imcsets[2], imcsets[3]);
-    info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
+    IMCC_info(interpreter, 1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
-    info(interpreter, 1, "\t%d used once deleted\n",
+    IMCC_info(interpreter, 1, "\t%d used once deleted\n",
             ostat.used_once);
-    info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);
-    info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
+    IMCC_info(interpreter, 1, "\t%d invariants_moved\n", ostat.invariants_moved);
+    IMCC_info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
-    info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
+    IMCC_info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
             cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
             unit->n_spilled);
-    info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
+    IMCC_info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
             unit->n_basic_blocks, edge_count(unit));
 
 }
@@ -375,7 +377,7 @@ allocate_non_interfering(Parrot_Interp interpreter, IMC_Unit *unit, int n)
                             r->want_regno >= 0 || r->color >= 0)
                         continue;
                     if (r->color == first_color) {
-                        warning(interpreter, "allocate_non_interfering",
+                        IMCC_warning(interpreter, "allocate_non_interfering"
                                 "color %d for register type %c in use",
                                 first_color, typ);
                         goto next_color;
@@ -402,7 +404,7 @@ allocate_non_interfering(Parrot_Interp interpreter, IMC_Unit *unit, int n)
                 last_line = r->last_ins->index;
                 r->color = first_color;
                 r->type = VTPASM;
-                debug(interpreter, DEBUG_IMC, "block %d coloring '%s' %d\n",
+                IMCC_debug(interpreter, DEBUG_IMC, "block %d coloring '%s' %d\n",
                         b, r->name, r->color);
                 continue;
 next_color:
@@ -433,7 +435,7 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 {
     int i, count, unused, n_symbols;
 
-    info(interpreter, 2, "build_reglist\n");
+    IMCC_info(interpreter, 2, "build_reglist\n");
     /* count symbols */
     if (unit->reglist)
         free_reglist(unit);
@@ -451,12 +453,9 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     if (count == 0)
         return;
     if (count >= HASH_SIZE)
-        warning(interpreter, "build_reglist", "probably too small HASH_SIZE"
+        IMCC_warning(interpreter, "build_reglist: probably too small HASH_SIZE"
                 " (%d symbols)\n", count);
-    unit->reglist = calloc(count, sizeof(SymReg*));
-    if (unit->reglist == NULL) {
-        fatal(1, "build_reglist","Out of mem\n");
-    }
+    unit->reglist = mem_sys_allocate(count * sizeof(SymReg*));
 
     for (i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = unit->hash[i];
@@ -486,10 +485,10 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
     sort_reglist(unit);
     if (first) {
 #ifdef ALLOCATE_HACK
-        info(interpreter, 1, "build_reglist: %d symbols\n", n_symbols);
+        IMCC_info(interpreter, 1, "build_reglist: %d symbols\n", n_symbols);
         allocate_non_interfering(interpreter, unit, n_symbols);
         build_reglist(interpreter, unit, 0);
-        info(interpreter, 1, "allocate_non_interfering, now: %d symbols\n",
+        IMCC_info(interpreter, 1, "allocate_non_interfering, now: %d symbols\n",
                 unit->n_symbols);
 #endif
     }
@@ -519,8 +518,6 @@ build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
      * This piece can be rewritten without the N x N array
      */
     interference_graph = ig_allocate(n_symbols);
-    if (interference_graph == NULL)
-        fatal(1, "build_interference_graph","Out of mem\n");
     unit->interference_graph = interference_graph;
 
     /* Calculate interferences between each chain and populate the the Y-axis */
@@ -531,7 +528,8 @@ build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
         for (y = x + 1; y < n_symbols; y++) {
             if (!unit->reglist[y]->first_ins)
                 continue;
-            if (interferes(unit, unit->reglist[x], unit->reglist[y])) {
+            if (interferes(interpreter, unit,
+                        unit->reglist[x], unit->reglist[y])) {
                 ig_set(x, y, n_symbols, interference_graph);
                 ig_set(y, x, n_symbols, interference_graph);
             }
@@ -673,7 +671,7 @@ done:
  */
 
 static int
-interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1)
+interferes(Interp *interpreter, IMC_Unit * unit, SymReg * r0, SymReg * r1)
 {
 
     int i;
@@ -697,7 +695,7 @@ interferes(IMC_Unit * unit, SymReg * r0, SymReg * r1)
     /* Now: */
 
     if (r0->life_info == NULL || r1->life_info == NULL) {
-        fatal(1, "interferes", "INTERNAL ERROR: Life range is NULL\n");
+        PANIC("interferes: INTERNAL ERROR: Life range is NULL\n");
     }
 
     for (i=0; i < unit->n_basic_blocks; i++) {
@@ -774,7 +772,7 @@ simplify (IMC_Unit * unit)
 	}
 
 	if ( neighbours(x) < MAX_COLOR) {
-            debug(interpreter, DEBUG_IMC, "#simplifying [%s]\n", g[x]->name);
+            IMCC_debug(interpreter, DEBUG_IMC, "#simplifying [%s]\n", g[x]->name);
 
 	    imcstack_push(nodeStack, x);
 
@@ -852,11 +850,12 @@ order_spilling (IMC_Unit * unit)
 
 
 static void
-restore_interference_graph(IMC_Unit * unit)
+restore_interference_graph(Interp *interpreter, IMC_Unit * unit)
 {
     int i;
     for (i=0; i < unit->n_symbols; i++) {
-        if ((unit->reglist[i]->type & VTPASM) && !(optimizer_level & OPT_PASM))
+        if ((unit->reglist[i]->type & VTPASM) &&
+                !(IMCC_INFO(interpreter)->optimizer_level & OPT_PASM))
             continue;
 	unit->reglist[i]->color = -1;
 	unit->reglist[i]->simplified = 0;
@@ -925,7 +924,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 			if (!colors[c]) {
 			    reglist[x]->color = c;
 
-                            debug(interpreter, DEBUG_IMC,
+                            IMCC_debug(interpreter, DEBUG_IMC,
                                     "#[%s] provisionally gets color [%d]"
                                      "(%d free colors, score %d)\n",
 					reglist[x]->name, c,
@@ -936,14 +935,14 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 		}
 
 		if (reglist[x]->color == -1) {
-                    debug(interpreter, DEBUG_IMC,
+                    IMCC_debug(interpreter, DEBUG_IMC,
                             "# no more colors free = %d\n", free_colors);
 
 		    /* It has been impossible to assign a color
                      * to this node, return it so it gets spilled
                      */
 
-		    restore_interference_graph(unit);
+		    restore_interference_graph(interpreter, unit);
 		    /* clean stack */
 		    while ((imcstack_depth(nodeStack) > 0) )
 			imcstack_pop(nodeStack);
@@ -1048,7 +1047,7 @@ update_life(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     l->first_ins = r->first_ins;
     l->last_ins = r->last_ins;
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC) {
-        dump_instructions(unit);
+        dump_instructions(interpreter, unit);
         dump_symreg(unit);
     }
 }
@@ -1086,7 +1085,7 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
         for (y = x + 1; y < n_symbols; y++) {
             if (reglist[x] == old || reglist[x] == new ||
                     reglist[y] == old || reglist[y] == new) {
-                if (interferes(unit, reglist[x], reglist[y])) {
+                if (interferes(interpreter, unit, reglist[x], reglist[y])) {
                     ig_set(x, y, n_symbols, interference_graph);
                     ig_set(y, x, n_symbols, interference_graph);
                 }
@@ -1120,16 +1119,14 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
     SymReg *regs[IMCC_MAX_REGS];
     SymReg **reglist = unit->reglist;
 
-    buf = malloc(256 * sizeof(char));
-    if (buf == NULL) {
-	fatal(1, "spill","Out of mem\n");
-    }
+    buf = mem_sys_allocate(256 * sizeof(char));
 
-    debug(interpreter, DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
+    IMCC_debug(interpreter, DEBUG_IMC, "#Spilling [%s]:\n", reglist[spilled]->name);
 
     new_sym = old_sym = reglist[spilled];
     if (old_sym->usage & U_SPILL)
-        fatal(1, "spill", "double spill - program too complex\n");
+        IMCC_fatal(interpreter, 1,
+                "spill: double spill - program too complex\n");
     new_sym->usage |= U_SPILL;
 
     unit->n_spilled++;
@@ -1145,7 +1142,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
     if (!unit->p31) {
         Instruction *spill_ins;
 
-        p31 = unit->p31 = mk_pasm_reg(str_dup("P31"));
+        p31 = unit->p31 = mk_pasm_reg(interpreter, str_dup("P31"));
         ins = unit->instructions;
         while (ins
                 && (strncmp(ins->fmt, "push", 4) == 0
@@ -1174,7 +1171,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
 	    regs[0] = new_sym;
             regs[1] = p31;
             sprintf(buf, "%d", unit->n_spilled);
-            regs[2] = mk_const(str_dup(buf), 'I');
+            regs[2] = mk_const(interpreter, str_dup(buf), 'I');
 	    sprintf(buf, "%%s, %%s[%%s]   #FETCH %s", old_sym->name);
 	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 4, 0);
 	    tmp->bbindex = ins->bbindex;
@@ -1193,7 +1190,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
 	if (needs_store) {
             regs[0] = p31;
             sprintf(buf, "%d", unit->n_spilled);
-            regs[1] = mk_const(str_dup(buf), 'I');
+            regs[1] = mk_const(interpreter, str_dup(buf), 'I');
 	    regs[2] = new_sym;
 	    sprintf(buf, "%%s[%%s], %%s   #SPILL %s", old_sym->name);
 	    tmp = INS(interpreter, unit, "set", buf, regs, 3, 2, 0);
@@ -1218,7 +1215,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
              * is necessary.
              */
             sprintf(buf, "%s_%d", old_sym->name, n++);
-            new_sym = mk_symreg(str_dup(buf), old_sym->set);
+            new_sym = mk_symreg(interpreter, str_dup(buf), old_sym->set);
             new_sym->usage |= U_SPILL;
             if (needs_store)    /* advance past store */
                 ins = tmp;
@@ -1234,7 +1231,7 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
     }
 #endif
     if (IMCC_INFO(interpreter)->debug & DEBUG_IMC)
-        dump_instructions(unit);
+        dump_instructions(interpreter, unit);
 
 }
 

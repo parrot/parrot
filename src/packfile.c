@@ -204,7 +204,7 @@ static int
 sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
         int action, PMC *sub_pmc)
 {
-    int pragmas = PObj_get_FLAGS(sub_pmc) & 0xf0;
+    int pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK;
     int todo = 0;
 
     switch (action) {
@@ -222,7 +222,7 @@ sub_pragma(Parrot_Interp interpreter, struct PackFile *pf,
                 todo = 1;
             break;
     }
-    if (pragmas & SUB_FLAG_PF_IMMEDIATE) /* symreg.h:P_IMMEDIATE */
+    if (pragmas & (SUB_FLAG_PF_IMMEDIATE | SUB_FLAG_PF_POSTCOMP))
         todo = 1;
     return todo;
 }
@@ -271,20 +271,34 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
 
     size_t start_offs;
     struct Parrot_sub * sub = PMC_sub(sub_pmc);
-    /*
-     * run IMMEDIATE sub
-     */
-    if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
-        PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
-        run_sub(interpreter, sub_pmc);
-        /*
-         * reset initial flag so MAIN detection works
-         */
-        interpreter->resume_flag = RESUME_INITIAL;
-        return;
-    }
-
     switch (action) {
+        case PBC_IMMEDIATE:
+            /*
+             * run IMMEDIATE sub
+             */
+            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
+                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
+                run_sub(interpreter, sub_pmc);
+                /*
+                 * reset initial flag so MAIN detection works
+                 */
+                interpreter->resume_flag = RESUME_INITIAL;
+                return;
+            }
+        case PBC_POSTCOMP:
+            /*
+             * run POSTCOMP sub
+             */
+            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_POSTCOMP) {
+                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_POSTCOMP;
+                run_sub(interpreter, sub_pmc);
+                /*
+                 * reset initial flag so MAIN detection works
+                 */
+                interpreter->resume_flag = RESUME_INITIAL;
+                return;
+            }
+
         case PBC_LOADED:
             if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_LOAD) {
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;

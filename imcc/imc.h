@@ -194,6 +194,7 @@ typedef struct _imc_info_t {
     int debug;
     int IMCC_DEBUG;
     int gc_off;
+    int write_pbc;
     char* output;
     SymReg* sr_return;
     AsmState asm_state;

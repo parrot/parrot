@@ -1268,9 +1268,12 @@ caller 1 main
 ok
 OUTPUT
 
+# the test is failing when run with --run-pbc (make testr)
+# actually the POSTCOMP is run and "initial" is printed, but
+# its not captured by the test system
 output_is(<<'CODE', <<'OUTPUT', '@IMMEDIATE');
 ##PIR##
-.sub optc @IMMEDIATE
+.sub optc @IMMEDIATE, @POSTCOMP
     print "initial\n"
 .end
 .sub _main @MAIN
