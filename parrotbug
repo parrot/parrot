@@ -15,12 +15,12 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.2.0";
+my $VERSION = "0.2.1";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
     ok  => 'parrotstatus-ok@parrotcode.org',
-    nok => 'parrotstatus-nok@parrotcode.org'
+    nok => 'parrotstatus-nok@parrotcode.org',
   );
 
 my $parrotdir = File::Spec->curdir();
@@ -500,7 +500,19 @@ EOF
 sub dump_info {
     local (*OUT) = @_;
 
-    # Flags...
+    # OS, arch, compiler...
+    print OUT <<EOF;
+---
+osname= $Config{osname}
+osvers= $Config{osvers}
+arch=   $Config{archname}
+EOF
+
+    my $cc = $Config{cc};
+    print OUT "cc=     $cc $Config{${cc}.'version'}\n";
+
+
+    # ... flags...
     print OUT <<EOF;
 ---
 Flags:
@@ -550,7 +562,7 @@ sub send_msg {
 $body
 -----------------------------------------------------------------
 EOF
-        dump_msg($fh);
+        dump_info($fh);
 	$fh->close;
 
 	print "\nMessage sent.\n";
