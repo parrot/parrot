@@ -5,13 +5,43 @@
 # Brian Wheeler (bdwheele@indiana.edu)
 
 use strict;
+use Getopt::Long;
 
-my $opt_c;
-if (@ARGV and $ARGV[0] eq "-c") {
-    shift @ARGV;
-    $opt_c = 1;
+my %options;
+GetOptions(\%options,('checksyntax',
+		      'help',
+		      'version',
+		      'verbose',
+		      'output=s',
+		      'listing=s'));
+
+if($options{'version'}) {
+    print $0,'Version $Id$ ',"\n";
+    exit;
 }
 
+if($options{'help'}) {
+    print "$0 - Parrot Assembler
+Options:
+   --checksyntax        Check assembler syntax only, no output
+   --help               This text
+   --listing            Dump assembly listing to file
+   --output             File to dump bytecode into
+   --verbose            Show what's going on
+   --version            Show assembler version
+";
+    exit;
+}
+
+if(exists($options{'output'}) && $options{'output'} eq "") {
+    print STDERR "You must provide a file with --output flag!\n";
+    exit;
+}
+
+if(exists($options{'listing'}) && $options{'listing'} eq "") {
+    print STDERR "You must provide a file with --listing flag!\n";
+    exit;
+}
 
 # define data types
 my(%pack_type)=('i'=>'l','n'=>'d');
@@ -52,6 +82,9 @@ while (<OPCODES>) {
 }
 close OPCODES;
 
+my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
+
+
 
 # read source and assemble
 my $pc=0; my $op_pc=0;
@@ -60,9 +93,15 @@ my $line=0;
 while(<>) {
     $line++;
     chomp;
+    my $sline=$_;
     s/^\s*//;
     s/\s*$//;
-    next if(/^\#/ || $_ eq "");
+    if(/^\#/ || $_ eq "") {
+	if($options{'listing'}) {
+	    $listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, '',$sline);
+	}
+	next;
+    }
     if(m/^((\S+):)?\s*(.+)?/) {
         my($label,$code)=($2,$3);
         if(defined($label) && $label ne "") {
@@ -119,6 +158,7 @@ while(<>) {
 	    my($found_op)=0;
 	    foreach my $op (grep($_=~/^$opcode/,keys(%opcodes))) {
 		if($op eq $test) {
+		    log_message("substituting $op for $opcode");
 		    $opcode=$op;
 		    $found_op=1;
 		    last;
@@ -159,8 +199,17 @@ while(<>) {
             }
             $bytecode .= pack $type, $args[$_];
         }
+	if($options{'listing'}) {
+	    # add line to listing.
+	    my $odata;
+	    foreach (unpack('l*',substr($bytecode,$op_pc))) {
+		$odata.=sprintf("%08x ",$_);
+	    }
+	    $listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, $odata,$sline);
+	}
     }
 }
+$listing.="\n" if($options{'listing'});
 
 my $output;
 
@@ -170,7 +219,14 @@ my $output;
 $output=pack($pack_type{i},0x13155a1);
 
 
-# FIXUP
+# FIXUP (also, dump listing symbols)
+if($options{'listing'}) {
+    $listing.="DEFINED SYMBOLS:\n";
+    foreach (sort(keys(%label))) {
+	$listing.=sprintf("\t%08x   %s\n",$label{$_},$_);
+    }
+}
+
 if(keys(%fixup)) {
     print STDERR "SQUAWK!  These symbols were referenced but not
 defined:\n";
@@ -181,7 +237,11 @@ defined:\n";
         }
         print STDERR "\n";
     }
-    exit;
+    $listing.="\nUNDEFINED SYMBOLS:\n";
+    foreach (sort(keys(%fixup))) {
+	$listing.="\t$_\n";
+    }
+    exit;  # some day, unresolved symbols won't be an error!
 } else {
     # dump empty header
     $output.=pack($pack_type{i},0);
@@ -193,7 +253,11 @@ if(@constants) {
     # Then spit out how many constants there are, so we can allocate
     $const .= pack($pack_type{i}, scalar @constants);
 
+    if($options{'listing'}) {
+	$listing.="\nSTRING CONSTANTS\n";
+    }
     # Now emit each constant
+    my $counter=0;
     for (@constants) {
         $const .= pack($pack_type{i},0) x 3; # Flags, encoding, type
         $const .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
@@ -201,7 +265,10 @@ if(@constants) {
         my $pad=(length($_) % $sizeof{i});
         if($pad) {
             $const .= "\0" x ($sizeof{i}-(length($_) % $sizeof{i})); # Padding;
-       }
+	}
+	$listing.=sprintf("\t%04x %08x [[%s]]\n",$counter,length($_),$_) 
+	    if($options{'listing'});
+	$counter++;
     }
 
     $output.=pack($pack_type{i},length($const));
@@ -214,14 +281,34 @@ if(@constants) {
 ## BYTECODE
 $output.=$bytecode;
 
-if(!$opt_c) {
-    print $output;
+if(!$options{'checksyntax'}) {
+    if($options{'output'} ne "") {
+	open O,">$options{'output'}" || die $!;
+	print O $output;
+	close O;
+    } else {
+	print $output;
+    }
+}
+
+
+if($options{'listing'}) {
+    open L,">$options{'listing'}" || die $!;
+    print L $listing;
+    close L;
 }
 
 sub error {
     my($message)=@_;
     print STDERR "Error ($line): $message\n";
     exit;
+}
+
+sub log_message {
+    my($message)=@_;
+    if($options{'verbose'}) {
+	print STDERR "INFO ($line): $message\n";
+    }
 }
 
 
