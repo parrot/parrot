@@ -103,7 +103,7 @@ while(<>) {
 		    while(scalar(@{$local_fixup{$label}})) {
 			my $op_pc=shift(@{$local_fixup{$label}});
 			my $offset=shift(@{$local_fixup{$label}});
-			substr($bytecode,$offset,$sizeof{'i'})=pack('l',($pc-$op_pc)/$sizeof{'i'});
+			substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
 		    }
 		    delete($local_fixup{$label});  
 		}
@@ -118,7 +118,7 @@ while(<>) {
 		    while(scalar(@{$fixup{$label}})) {
 			my $op_pc=shift(@{$fixup{$label}});
 			my $offset=shift(@{$fixup{$label}});
-			substr($bytecode,$offset,$sizeof{'i'})=pack('l',($pc-$op_pc)/$sizeof{'i'});
+			substr($bytecode,$offset,$sizeof{'i'})=pack($pack_type{'i'},($pc-$op_pc)/$sizeof{'i'});
 		    }
 		    delete($fixup{$label});  
 		}
@@ -211,7 +211,7 @@ while(<>) {
     if (@args != $opcodes{$opcode}{ARGS}) {
 	error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS});
     }
-    $bytecode .= pack "l", $opcodes{$opcode}{CODE};
+    $bytecode .= pack $pack_type{'i'}, $opcodes{$opcode}{CODE};
     $op_pc=$pc;
     $pc+=$sizeof{'i'};
     
