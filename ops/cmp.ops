@@ -41,7 +41,25 @@ their operands.
 
 =item B<eq>(in PMC, in INT, inconst INT)
 
-Branch if $1 is equal to $2.
+=item B<eq>(in PMC, in NUM, inconst INT)
+
+=item B<eq>(in PMC, in STR, inconst INT)
+
+=item B<eq_str>(in PMC, in PMC, inconst INT)
+
+=item B<eq_num>(in PMC, in PMC, inconst INT)
+
+=item B<eq_addr>(in STR, in STR, inconst INT)
+
+=item B<eq_addr>(in PMC, in PMC, inconst INT)
+
+Branch if $1 is equal to $2. For PMCs this does a generic comparison,
+whatever that is for the involved PMCs. Mixed PMC number/string
+operands do a numeric or string comparison respectively.
+
+B<eq_str> and B<eq_num> enforce string or number comparisons.
+
+B<eq_addr> compares the address of the objects or strings.
 
 =cut
 
@@ -60,7 +78,7 @@ inline op eq(in NUM, in NUM, inconst INT) {
 }
 
 op eq(in STR, in STR, inconst INT) {
-  if (string_compare(interpreter, $1, $2) == 0) {
+  if (string_equal(interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -80,6 +98,64 @@ op eq (in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op eq (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) == $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq (in PMC, in STR, inconst INT) {
+  if (0 == string_equal(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) == 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) == 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq_addr(in STR, in STR, inconst INT) {
+  if ($1 == $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op eq_addr(in PMC, in PMC, inconst INT) {
+  if ($1 == $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+########################################
+
+=item B<isnull>(in PMC, inconst INT)
+
+Branch to $2 if $1 is a NULL PMC.
+
+=cut
+
+op isnull(in PMC, inconst INT) {
+  if (PMC_IS_NULL($1)) {
+    goto OFFSET($2);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<ne>(in INT, in INT, inconst INT)
@@ -91,6 +167,18 @@ op eq (in PMC, in INT, inconst INT) {
 =item B<ne>(in PMC, in PMC, inconst INT)
 
 =item B<ne>(in PMC, in INT, inconst INT)
+
+=item B<ne>(in PMC, in NUM, inconst INT)
+
+=item B<ne>(in PMC, in STR, inconst INT)
+
+=item B<ne_str>(in PMC, in PMC, inconst INT)
+
+=item B<ne_num>(in PMC, in PMC, inconst INT)
+
+=item B<ne_addr>(in STR, in STR, inconst INT)
+
+=item B<ne_addr>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is not equal to $2.
 
@@ -111,7 +199,7 @@ inline op ne(in NUM, in NUM, inconst INT) {
 }
 
 op ne(in STR, in STR, inconst INT) {
-  if (string_compare(interpreter, $1, $2) != 0) {
+  if (string_equal(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
   goto NEXT();
@@ -131,6 +219,49 @@ op ne (in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op ne (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) != $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne (in PMC, in STR, inconst INT) {
+  if (0 != string_equal(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2)) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) != 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) != 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne_addr(in STR, in STR, inconst INT) {
+  if ($1 != $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ne_addr(in PMC, in PMC, inconst INT) {
+  if ($1 != $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<lt>(in INT, in INT, inconst INT)
@@ -142,6 +273,14 @@ op ne (in PMC, in INT, inconst INT) {
 =item B<lt>(in PMC, in PMC, inconst INT)
 
 =item B<lt>(in PMC, in INT, inconst INT)
+
+=item B<lt>(in PMC, in NUM, inconst INT)
+
+=item B<lt>(in PMC, in STR, inconst INT)
+
+=item B<lt_str>(in PMC, in PMC, inconst INT)
+
+=item B<lt_num>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is less than $2.
 
@@ -182,6 +321,35 @@ op lt (in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op lt (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) < $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op lt (in PMC, in STR, inconst INT) {
+  if (string_compare(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2) < 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op lt_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) < 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op lt_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) < 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<le>(in INT, in INT, inconst INT)
@@ -193,6 +361,14 @@ op lt (in PMC, in INT, inconst INT) {
 =item B<le>(in PMC, in PMC, inconst INT)
 
 =item B<le>(in PMC, in INT, inconst INT)
+
+=item B<le>(in PMC, in NUM, inconst INT)
+
+=item B<le>(in PMC, in STR, inconst INT)
+
+=item B<le_str>(in PMC, in PMC, inconst INT)
+
+=item B<le_num>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is less than or equal to $2.
 
@@ -233,6 +409,35 @@ op le(in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op le (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) <= $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op le (in PMC, in STR, inconst INT) {
+  if (string_compare(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op le_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op le_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) <= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<gt>(in INT, in INT, inconst INT)
@@ -244,6 +449,14 @@ op le(in PMC, in INT, inconst INT) {
 =item B<gt>(in PMC, in PMC, inconst INT)
 
 =item B<gt>(in PMC, in INT, inconst INT)
+
+=item B<gt>(in PMC, in NUM, inconst INT)
+
+=item B<gt>(in PMC, in STR, inconst INT)
+
+=item B<gt_str>(in PMC, in PMC, inconst INT)
+
+=item B<gt_num>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is greater than $2.
 
@@ -284,6 +497,35 @@ op gt(in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op gt (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) > $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op gt (in PMC, in STR, inconst INT) {
+  if (string_compare(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2) > 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op gt_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) > 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op gt_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) > 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 ########################################
 
 =item B<ge>(in INT, in INT, inconst INT)
@@ -295,6 +537,14 @@ op gt(in PMC, in INT, inconst INT) {
 =item B<ge>(in PMC, in PMC, inconst INT)
 
 =item B<ge>(in PMC, in INT, inconst INT)
+
+=item B<ge>(in PMC, in NUM, inconst INT)
+
+=item B<ge>(in PMC, in STR, inconst INT)
+
+=item B<ge_str>(in PMC, in PMC, inconst INT)
+
+=item B<ge_num>(in PMC, in PMC, inconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
@@ -335,6 +585,35 @@ op ge(in PMC, in INT, inconst INT) {
   goto NEXT();
 }
 
+op ge (in PMC, in NUM, inconst INT) {
+  if ($1->vtable->get_number(interpreter, $1) >= $2) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ge (in PMC, in STR, inconst INT) {
+  if (string_compare(interpreter,
+      $1->vtable->get_string(interpreter, $1), $2) >= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ge_str (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_string(interpreter, $1, $2) >= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
+op ge_num (in PMC, in PMC, inconst INT) {
+  if ($1->vtable->cmp_num(interpreter, $1, $2) >= 0) {
+    goto OFFSET($3);
+  }
+  goto NEXT();
+}
+
 =back
 
 =cut
@@ -361,6 +640,15 @@ their operands.
 =item B<cmp>(out INT, in PMC, in PMC)
 
 =item B<cmp>(out INT, in PMC, in INT)
+
+=item B<cmp>(out INT, in PMC, in NUM)
+
+=item B<cmp>(out INT, in PMC, in STR)
+
+=item B<cmp_str>(out INT, in PMC, in PMC)
+
+=item B<cmp_num>(out INT, in PMC, in PMC)
+
 
 Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
 
@@ -395,6 +683,30 @@ inline op cmp(out INT, in PMC, in INT) {
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
        0;
+  goto NEXT();
+}
+
+inline op cmp(out INT, in PMC, in NUM) {
+  FLOATVAL l = VTABLE_get_number(interpreter, $2);
+  $1 = l < $3 ? -1 :
+       l > $3 ? +1 :
+       0;
+  goto NEXT();
+}
+
+inline op cmp(out INT, in PMC, in STR) {
+  STRING* l = VTABLE_get_string(interpreter, $2);
+  $1 = string_compare(interpreter, l, $3);
+  goto NEXT();
+}
+
+inline op cmp_str(out INT, in PMC, in PMC) {
+  $1 = VTABLE_cmp_string(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op cmp_num(out INT, in PMC, in PMC) {
+  $1 = VTABLE_cmp_num(interpreter, $2, $3);
   goto NEXT();
 }
 
