@@ -1743,15 +1743,15 @@ AUTO_OP save(i) {
 }
 
 AUTO_OP save(n) {
-  push_generic_entry(interpreter, &($1), STACK_ENTRY_INT, NULL);
+  push_generic_entry(interpreter, &($1), STACK_ENTRY_FLOAT, NULL);
 }
 
 AUTO_OP save(p) {
-  push_generic_entry(interpreter, $1, STACK_ENTRY_INT, NULL);
+  push_generic_entry(interpreter, $1, STACK_ENTRY_PMC, NULL);
 }
 
 AUTO_OP save(s) {
-  push_generic_entry(interpreter,  $1, STACK_ENTRY_INT, NULL);
+  push_generic_entry(interpreter,  $1, STACK_ENTRY_STRING, NULL);
 }
 
 
@@ -1774,15 +1774,15 @@ AUTO_OP restore(i) {
 }
 
 AUTO_OP restore(n) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
+  pop_generic_entry(interpreter, &($1), STACK_ENTRY_FLOAT);
 }
 
 AUTO_OP restore(p) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
+  pop_generic_entry(interpreter, &($1), STACK_ENTRY_PMC);
 }
 
 AUTO_OP restore(s) {
-  pop_generic_entry(interpreter, &($1), STACK_ENTRY_INT);
+  pop_generic_entry(interpreter, &($1), STACK_ENTRY_STRING);
 }
 
 
