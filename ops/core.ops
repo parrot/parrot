@@ -1085,10 +1085,10 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc (out PMC, in PMC, in STR, in STR) {
   char * name = string_to_cstring(interpreter, ($3));
-  PMC *nci;
 
   Parrot_csub_t p = (Parrot_csub_t)D2FPTR(
 	  Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name));
+  string_cstring_free(name);
   if (p == NULL) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
@@ -1096,33 +1096,29 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
       $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
   else {
-      $1 = nci = pmc_new(interpreter, enum_class_NCI);
-      nci->vtable->set_pointer_keyed_str(interpreter, nci, $4, F2DPTR(p));
+      $1 = pmc_new(interpreter, enum_class_NCI);
+      $1->vtable->set_pointer_keyed_str(interpreter, $1, $4, F2DPTR(p));
   }
-  string_cstring_free(name);
   goto NEXT();
 }
 
 op dlvar (out PMC, in PMC, in STR) {
   char * name = string_to_cstring(interpreter, ($3));
 
-  PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);
-
   void *p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
   string_cstring_free(name);
-  if(p == NULL) {
-    const char * err = Parrot_dlerror();
-    if(err != NULL) {
-      fprintf(stderr, "%s\n", err);
-    }
-    PANIC("Failed to link native method");
+  if (p == NULL) {
+      const char * err = Parrot_dlerror();
+      Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
+	 "Symbol '%s' not found: %s\n", name, err ? err : "unkown reason");
+      $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
-
-  /* At this point we have the symbol's address. We just need to build
-     a PMC with it so we can get and set the value */
-
-  PMC_data(final_destination) = p;
-  $1 = final_destination;
+  else {
+      /* At this point we have the symbol's address. We just need to build
+         a PMC with it so we can get and set the value */
+      $1 = pmc_new(interpreter, enum_class_UnManagedStruct);
+      PMC_data($1) = p;
+  }
   goto NEXT();
 }
 

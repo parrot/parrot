@@ -20,6 +20,7 @@ The resulting shared library should be copied to a location like:
 
 At that location the shared library is loadable with the opcode 'loadlib'. 
 The functions in the library are available with the opcode 'dlfunc'.
+The variables in the library are available with the opcode 'dlvar'.
 
 =head1 Functions
 
@@ -363,6 +364,8 @@ nci_vP(void *pmc) {
 
 =head1 Functions used for pdd16 tests
 
+=cut
+
 */
 
 void
@@ -461,6 +464,21 @@ int
 nci_i( void ) {
 
    return my_product;
+}
+
+/*
+
+=head1 Variables used for testing the opcode 'dlvar' 
+
+=cut
+
+*/
+
+int nci_dlvar_int = -4444;
+
+void 
+nci_dlvar_vv( void ) {
+    nci_dlvar_int *= 3;
 }
 
 #ifdef TEST

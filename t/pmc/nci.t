@@ -24,7 +24,7 @@ Most tests are skipped when the F<libnci.so> library is not found.
 
 =cut
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 46;
 use Parrot::Config;
 
 SKIP: {
@@ -1880,6 +1880,128 @@ libnci was successfully loaded
 333
 OUTPUT
 
+
+output_is( << 'CODE', << 'OUTPUT', "nci_dlvar_int - thrice" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # load libnci.so
+    .local string library_name
+    library_name = 'libnci'
+    .local pmc libnci
+    libnci = loadlib library_name
+    unless libnci goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_int
+    .local pmc nci_dlvar_int
+    nci_dlvar_int = dlvar libnci, "nci_dlvar_int"
+
+    # the contained structure pointer
+    .local pmc nci_dlvar_int_decl
+    nci_dlvar_int_decl = new PerlArray
+    push nci_dlvar_int_decl, .DATATYPE_INT
+    push nci_dlvar_int_decl, 0
+    push nci_dlvar_int_decl, 0
+    assign nci_dlvar_int, nci_dlvar_int_decl
+
+    I2 = nci_dlvar_int[0]
+    print I2
+    print "\n"
+
+    .local pmc thrice
+    thrice = dlfunc libnci, "nci_dlvar_vv", "vv"
+    thrice()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    thrice()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    thrice()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+    thrice()
+    I1 = nci_dlvar_int[0]
+    print I1
+    print "\n"
+NOT_LOADED:
+.end
+CODE
+libnci was successfully loaded
+-4444
+-13332
+-39996
+-119988
+-359964
+OUTPUT
+
+
+output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # load libnci.so
+    .local string library_name
+    library_name = 'libnci'
+    .local pmc libnci
+    libnci = loadlib library_name
+    unless libnci goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_int
+    .local pmc non_existing
+    non_existing = dlvar libnci, "non_existing"
+    .local int is_defined
+    is_defined = defined non_existing
+    if is_defined goto IS_DEFINED
+    print "'non_existing' is not defined\n"
+IS_DEFINED:
+NOT_LOADED:
+.end
+CODE
+libnci was successfully loaded
+'non_existing' is not defined
+OUTPUT
+
+
+output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
+##PIR##
+.include "datatypes.pasm"
+
+.sub _test @MAIN
+
+    # load libnci.so
+    .local string library_name
+    library_name = 'libnci'
+    .local pmc libnci
+    libnci = loadlib library_name
+    unless libnci goto NOT_LOADED
+    print library_name
+    print " was successfully loaded\n"
+
+    # address of nci_dlvar_int
+    .local pmc non_existing
+    non_existing = dlfunc libnci, "non_existing", "iiii"
+    .local int is_defined
+    is_defined = defined non_existing
+    if is_defined goto IS_DEFINED
+    print "'non_existing' is not defined\n"
+IS_DEFINED:
+NOT_LOADED:
+.end
+CODE
+libnci was successfully loaded
+'non_existing' is not defined
+OUTPUT
 
 } # SKIP
 
