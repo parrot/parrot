@@ -401,10 +401,12 @@ static op_info_t op_info_table\[$num_entries] = {
 END_C
 
     $index = 0;
+    my (%names, $tot);
 
     foreach my $op ($ops->ops) {
 	my $type       = sprintf("PARROT_%s_OP", uc $op->type);
 	my $name       = $op->name;
+	$names{$name} = 1;
 	my $full_name  = $op->full_name;
 	my $func_name  = $op->func_name;
 	my $body       = $op->body;
@@ -430,6 +432,12 @@ END_C
 	$index++;
     }
 
+    my $hash_size = 2011;
+    $tot = $index + scalar keys(%names);
+    if ($hash_size < $tot * 1.2) {
+	    print STDERR "please increase hash_size ($hash_size) in ops2c.pl\n";
+    }
+
     print SOURCE <<END_C;
 };
 
@@ -439,7 +447,7 @@ END_C
 
 #define NUM_OPS $num_ops
 
-#define OP_HASH_SIZE 1511
+#define OP_HASH_SIZE $hash_size
 
 /* we could calculate a prime somewhat bigger than
  * n of fullnames + n of names
