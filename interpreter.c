@@ -335,8 +335,6 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             core = runops_fast_core;
 
         if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-            unsigned int i;
-
             if (interpreter->profile == NULL) {
                 interpreter->profile = (ProfData *)
                     mem_sys_allocate_zeroed(interpreter->op_count *

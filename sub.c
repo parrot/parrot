@@ -174,7 +174,6 @@ void
 scratchpad_store(struct Parrot_Interp * interp, PMC * pad, 
                  STRING * name, INTVAL position, PMC* value)
 {
-    INTVAL i;
     struct Parrot_Lexicals * lex;
 
     if (name) { 
@@ -195,7 +194,6 @@ scratchpad_store_index(struct Parrot_Interp * interp, PMC * pad,
                        INTVAL scope_index, STRING * name, INTVAL position, 
                        PMC* value)
 {
-    INTVAL i;
     struct Parrot_Lexicals * lex;
 
     lex = scratchpad_index(interp, pad, scope_index);
@@ -220,7 +218,6 @@ PMC *
 scratchpad_get(struct Parrot_Interp * interp, PMC * pad, STRING * name, 
                INTVAL position)
 {
-    INTVAL i;
     struct Parrot_Lexicals * lex = NULL;
 
     if (name) lex = scratchpad_find(interp, pad, name, &position);
