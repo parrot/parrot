@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 27;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -639,41 +639,302 @@ CODE
 4143
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "or_p_p_p");
+output_is(<<'CODE', <<OUTPUT, "logical or");
         new P0, .PerlInt
         new P1, .PerlInt
         new P2, .PerlInt
         set P0, 10
         set P1, 20
         or P2, P1, P0
+        eq P2, 20, OK1
         print P2
-        print "\n"
+        print "not "
+OK1:    print "ok 1\n"
         set P1, 0
         or P2, P1, P0
+        eq P2, 10, OK2
         print P2
-        print "\n"
+        print "not "
+OK2:    print "ok 2\n"
         end
 CODE
-20
-10
+ok 1
+ok 2
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "or_p_p_p with Num value");
+output_is(<<"CODE", <<OUTPUT, "logical or with Num/Str/Undef");
+@{[ $fp_equality_macro ]}
         new P0, .PerlNum
         new P1, .PerlInt
         new P2, .PerlInt
         set P0, 10.5
         set P1, 20
         or P2, P1, P0
+        eq P2, 20, OK1
         print P2
-        print "\n"
+        print "not "
+OK1:    print "ok 1\\n"
         set P1, 0
         or P2, P1, P0
+        .fp_eq(P2, 10.5, OK2) 
         print P2
-        print "\n"
+        print "not "
+OK2:    print "ok 2\\n"
+
+        new P0, .PerlString
+        set P0, "ND3"
+        set P1, 30
+        or P2, P1, P0
+        eq P2, 30, OK3
+        print P2
+        print "not "
+OK3:    print "ok 3\\n"
+        set P1, 0
+        or P2, P1, P0
+        set S2, P2
+        eq S2, "ND3", OK4
+        print P2
+        print "not "
+OK4:    print "ok 4\\n"
+
+        new P0, .PerlUndef
+        set P1, 40
+        or P2, P1, P0
+        eq P2, 40, OK5
+        print P2
+        print "not "
+OK5:    print "ok 5\\n"
+        set P1, 0
+        or P2, P1, P0
+        defined I2, P2
+        eq I2, 0, OK6 
+        print P2
+        print "not "
+OK6:    print "ok 6\\n"
         end
 CODE
-20
-10.500000
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "logical xor");
+        new P0, .PerlInt
+        new P1, .PerlInt
+        new P2, .PerlInt
+        set P0, 0
+        set P1, 20
+        xor P2, P1, P0
+        eq P2, 20, OK1
+        print P2
+        print "not "
+OK1:    print "ok 1\n"
+        set P0, 10
+        set P1, 0
+        xor P2, P1, P0
+        eq P2, 10, OK2
+        print P2
+        print "not "
+OK2:    print "ok 2\n"
+        set P0, 0
+        set P1, 0
+        xor P2, P1, P0
+        unless P2, OK3
+        print P2
+        print "not "
+OK3:    print "ok 3\n"
+        set P0, 1
+        set P1, 1
+        xor P2, P1, P0
+        unless P2, OK4
+        print P2
+        print "not "
+OK4:    print "ok 4\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "logical xor with Num/Str/Undef");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlInt
+        new P2, .PerlInt
+        set P0, 0.0
+        set P1, 20
+        xor P2, P1, P0
+        eq P2, 20, OK1
+        print P2
+        print "not "
+OK1:    print "ok 1\\n"
+        set P0, 12.5
+        set P1, 0
+        xor P2, P1, P0
+        .fp_eq(P2, 12.5, OK2)
+        print P2
+        print "not "
+OK2:    print "ok 2\\n"
+        set P0, 0.0
+        set P1, 0
+        xor P2, P1, P0
+        unless P2, OK3
+        print P2
+        print "not "
+OK3:    print "ok 3\\n"
+        set P0, 10.0
+        set P1, 10
+        xor P2, P1, P0
+        unless P2, OK4
+        print P2
+        print "not "
+OK4:    print "ok 4\\n"
+
+        new P0, .PerlString
+        set P0, ""
+        set P1, 20
+        xor P2, P1, P0
+        eq P2, 20, OK5
+        print P2
+        print "not "
+OK5:    print "ok 5\\n"
+        set P0, "non-zero"
+        set P1, 0
+        xor P2, P1, P0
+        set S2, P2
+        eq S2, "non-zero", OK6
+        print P2
+        print "not "
+OK6:    print "ok 6\\n"
+        set P0, ""
+        set P1, 0
+        xor P2, P1, P0
+        unless P2, OK7
+        print P2
+        print "not "
+OK7:    print "ok 7\\n"
+        set P0, "non-zero"
+        set P1, 10
+        xor P2, P1, P0
+        unless P2, OK8
+        print P2
+        print "not "
+OK8:    print "ok 8\\n"
+
+        new P0, .PerlUndef
+        set P1, 20
+        xor P2, P1, P0
+        eq P2, 20, OK9
+        print P2
+        print "not "
+OK9:    print "ok 9\\n"
+        set P1, 0
+        xor P2, P1, P0
+        eq P2, 0, OK10
+        print P2
+        print "not "
+OK10:   print "ok 10\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "logical and");
+        new P0, .PerlInt
+        new P1, .PerlInt
+        new P2, .PerlInt
+        set P0, 10
+        set P1, 20
+        and P2, P1, P0
+        eq P2, 10, OK1
+        print P2
+        print "not "
+OK1:    print "ok 1\n"
+        set P1, 0
+        and P2, P1, P0
+        eq P2, 0, OK2
+        print P2
+        print "not "
+OK2:    print "ok 2\n"
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "logical and with Num/Str/Undef");
+@{[ $fp_equality_macro ]}
+        new P0, .PerlNum
+        new P1, .PerlInt
+        new P2, .PerlInt
+        set P0, 10.0
+        set P1, 20
+        and P2, P1, P0
+        .fp_eq(P2, 10.0, OK1)
+        print P2
+        print "not "
+OK1:    print "ok 1\\n"
+        set P1, 0
+        and P2, P1, P0
+        eq P2, 0, OK2
+        print P2
+        print "not "
+OK2:    print "ok 2\\n"
+
+        new P0, .PerlString
+        set P0, "kjuh"
+        set P1, 20
+        and P2, P1, P0
+        set S2, P2
+        eq S2, "kjuh", OK3
+        print P2
+        print "not "
+OK3:    print "ok 3\\n"
+        set P1, 0
+        and P2, P1, P0
+        eq P2, 0, OK4
+        print P2
+        print "not "
+OK4:    print "ok 4\\n"
+
+        new P0, .PerlUndef
+        set P1, 20
+        and P2, P1, P0
+        defined I2, P2
+        eq I2, 0, OK5
+        print P2
+        print "not "
+OK5:    print "ok 5\\n"
+        set P1, 0
+        and P2, P1, P0
+        defined I2, P2
+        ne I2, 1, BAD6
+        set I3, P2
+        ne I3, 0, BAD6
+        branch OK6
+BAD6:   print P2
+        print "not "
+OK6:    print "ok 6\\n"
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+OUTPUT

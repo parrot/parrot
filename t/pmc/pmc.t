@@ -1006,6 +1006,11 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print P0
         print "b"
 
+#undef xor undef = 0
+        xor P0, P1, P1
+	print P0
+        print "c"
+
 # undef or foo = foo
 	set P2, 349
 	or P0, P1, P2
@@ -1015,6 +1020,11 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	and P0, P1, P2
 	print P0
         print "c"
+
+#undef xor foo = foo
+        set P2, 910
+	xor P0, P1, P2
+	print P0
 
 # not undef = 1
 	not P0, P1
@@ -1026,7 +1036,7 @@ output_is(<<"CODE", <<'OUTPUT', "undef-logical");
 	print "\\n"
 	end
 CODE
-ab349cxy1z
+abc349c910xy1z
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-add");
