@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 28;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -881,4 +881,38 @@ in set_integer
 in add
 in get_string
 42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "typeof classes");
+    newclass P0, "A"
+    newclass P1, "B"
+
+    typeof S0, P0
+    typeof S1, P1
+    print S0
+    print "\n"
+    print S1
+CODE
+A
+B
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "typeof objects");
+    newclass P0, "A"
+    newclass P1, "B"
+
+    find_type I0, "A"
+    find_type I1, "B"
+    new P0, I0
+    new P1, I1
+
+    typeof S0, P0
+    typeof S1, P1
+    print S0
+    print "\n"
+    print S1
+    end
+CODE
+A
+B
 OUTPUT
