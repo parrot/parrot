@@ -406,6 +406,7 @@ main(int argc, char * argv[])
     interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
 
     interpreter->DOD_block_level++;
+    interpreter->GC_block_level++;
 
     sourcefile = parseflags(interpreter, &argc, &argv);
     /* register PASM and PIR compilers to parrot core */
@@ -537,8 +538,10 @@ main(int argc, char * argv[])
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         else
             PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
-        if (!gc_off)
+        if (!gc_off) {
             interpreter->DOD_block_level--;
+            interpreter->GC_block_level--;
+        }
         if (obj_file)
             info(interpreter, 1, "Writing %s\n", output);
         else

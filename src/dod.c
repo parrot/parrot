@@ -51,7 +51,8 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
         PObj_high_priority_DOD_SET(interpreter->dod_trace_ptr);
         hi_prio = 1;
     }
-    hi_prio = 0;
+    else
+        hi_prio = 0;
 
     if (obj->pmc_ext) {
         if (hi_prio) {

@@ -57,14 +57,13 @@ mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
 {
     struct RegisterChunkBuf* chunk;
     UINTVAL i, j;
-    for (chunk = stack->top; chunk;
-            chunk = chunk->next) {
+    for (chunk = stack->top; chunk; chunk = chunk->next) {
+        struct PRegChunkBuf* pc = chunk->data.bufstart;
         pobject_lives(interpreter, (PObj*)chunk);
         for (i = 0; i < chunk->used; i++) {
-            struct PRegFrame *pf =
-                ((struct PRegChunkBuf*)chunk->data.bufstart)->PRegFrame;
+            struct PRegFrame *pf = &pc->PRegFrame[i];
             for (j = 0; j < NUM_REGISTERS/2; j++) {
-                PObj* reg = (PObj*) pf[i].registers[j];
+                PObj* reg = (PObj*) pf->registers[j];
                 if (reg)
                     pobject_lives(interpreter, reg);
             }
@@ -78,12 +77,12 @@ mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
     struct RegisterChunkBuf* chunk;
     UINTVAL i, j;
     for (chunk = stack->top; chunk; chunk = chunk->next) {
+        struct SRegChunkBuf* sc = chunk->data.bufstart;
         pobject_lives(interpreter, (PObj*)chunk);
         for (i = 0; i < chunk->used; i++) {
-            struct SRegFrame *sf =
-                ((struct SRegChunkBuf*)chunk->data.bufstart)->SRegFrame;
+            struct SRegFrame *sf = &sc->SRegFrame[i];
             for (j = 0; j < NUM_REGISTERS/2; j++) {
-                PObj* reg = (PObj*) sf[i].registers[j];
+                PObj* reg = (PObj*) sf->registers[j];
                 if (reg)
                     pobject_lives(interpreter, reg);
             }
