@@ -1397,6 +1397,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 
     pfile->source = (char *)mem_sys_allocate(default_size);
     pfile->line = pline;
+    pfile->label = NULL;
+    pfile->size = 0;
     pline->number = 1;
 
     code_end = pc + interpreter->code->cur_cs->base.size;
