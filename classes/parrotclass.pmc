@@ -121,70 +121,9 @@ Returns whether the class can perform C<*method>.
         return VTABLE_find_method(interpreter, SELF, method) != NULL;
     }
 
-/*
-
-=item C<INTVAL elements()>
-
-=cut
-
-*/
-
-    INTVAL elements() {
-        PMC* class_array = (PMC*) PMC_data(SELF);
-        PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-            class_array, PCD_ATTRIBUTES);
-        return VTABLE_elements(interpreter, attr_hash);
-    }
-
-/*
-
-=item C<INTVAL get_integer()>
-
-Returns the attribute count.
-
-=cut
-
-*/
-
-    INTVAL get_integer() {
-        return SELF.elements();
-    }
-
-/*
-
-=item C<INTVAL get_integer_keyed_str(STRING *attr)>
-
-=cut
-
-*/
-
-    INTVAL get_integer_keyed_str (STRING* attr) {
-        PMC* class_array = (PMC*) PMC_data(SELF);
-        PMC* attr_hash = VTABLE_get_pmc_keyed_int(interpreter,
-            class_array, PCD_ATTRIBUTES);
-        if (VTABLE_exists_keyed_str(interpreter, attr_hash, attr))
-            return VTABLE_get_integer_keyed_str(interpreter,
-                attr_hash, attr);
-        return -1;
-    }
-
-/*
-
-=item C<INTVAL get_integer_keyed(PMC *attr)>
-
-Attribute accessor methods.
-
-=cut
-
-*/
-
-    INTVAL get_integer_keyed (PMC* attr) {
-        return SELF.get_integer_keyed_str(key_string(interpreter, attr));
-    }
 }
 
 /*
-
 =back
 
 =cut

@@ -96,6 +96,146 @@ inline op time(out NUM) {
 
 ########################################
 
+=item B<gmtime>(out STR, in INT)
+
+Take the integer, which represents GMT epoch-seconds, and turn it into a
+formatted string. 
+
+=item B<localtime>(out STR, in INT)
+
+Take the integer, which represents GMT epoch-seconds, and turn it into a
+formatted string. The time is adjusted to localtime before formatting.
+
+=item B<decodetime>(out PMC, in INT)
+
+Take the integer, which represents GMT epoch-seconds, and return an Array
+PMC which represents the decoded time The array elements are:
+
+=over 4
+
+=item 0
+
+Seconds (0-60)
+
+=item 1
+
+Minutes (0-59)
+
+=item 2
+
+Hours (0-23)
+
+=item 3
+
+Day of month (1-31)
+
+=item 4
+
+Month of year (0-11)
+
+=item 5
+
+Year (note, B<actual> year. The year 2004 comes back as 2004, not 104)
+
+=item 6
+
+Day of week. Sunday is day 0
+
+=item 7
+
+Day of year (0-365)
+
+=item 8
+
+Daylight savings/summer time in effect
+
+=item 9
+
+Timezone name
+
+=item 10
+
+Offset from UTC in seconds
+
+=back
+
+Timezone name will be GMT and offset will be 0, since the time is taken and
+decoded as GMT.
+
+=item B<decodelocaltime>(out PMC, in INT)
+
+Take the passed in  integer, which represents GMT epoch-seconds, and return
+an array as in decodetime. The time is first shifted to localtime before
+decoding.
+
+=cut
+
+op gmtime(out STR, in INT) {
+  struct tm tm;
+  char resultbuffer[26];
+  gmtime_r(&($2), &tm);
+  asctime_r(&tm, resultbuffer);
+  $1 = string_from_cstring(interpreter, resultbuffer, 26);
+  goto NEXT();
+}
+
+op localtime(out STR, in INT) {
+  struct tm tm;
+  char resultbuffer[26];
+  localtime_r(&($2), &tm);
+  asctime_r(&tm, resultbuffer);
+  $1 = string_from_cstring(interpreter, resultbuffer, 26);
+  goto NEXT();
+}
+
+op decodetime(out PMC, in INT) {
+  struct tm tm;
+  char resultbuffer[26];
+  PMC *Array;
+  gmtime_r(&($2), &tm);
+  Array = pmc_new(interpreter, enum_class_Array);
+  VTABLE_set_integer_native(interpreter, Array, 12);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 0, tm.tm_sec);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 1, tm.tm_min);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 2, tm.tm_hour);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 3, tm.tm_mday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 4, tm.tm_mon);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 5, tm.tm_year + 1900);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm.tm_wday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm.tm_yday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm.tm_isdst);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 9, tm.tm_sec);
+  VTABLE_set_string_keyed_int(interpreter, Array, 10, string_from_cstring(interpreter, tm.tm_zone, 0));
+  VTABLE_set_integer_keyed_int(interpreter, Array, 11, tm.tm_gmtoff);
+  $1 = Array;
+  goto NEXT();
+}
+
+op decodelocaltime(out PMC, in INT) {
+  struct tm tm;
+  char resultbuffer[26];
+  PMC *Array;
+  localtime_r(&($2), &tm);
+  Array = pmc_new(interpreter, enum_class_Array);
+  VTABLE_set_integer_native(interpreter, Array, 12);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 0, tm.tm_sec);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 1, tm.tm_min);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 2, tm.tm_hour);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 3, tm.tm_mday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 4, tm.tm_mon);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 5, tm.tm_year + 1900);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 6, tm.tm_wday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 7, tm.tm_yday);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 8, tm.tm_isdst);
+  VTABLE_set_integer_keyed_int(interpreter, Array, 9, tm.tm_sec);
+  VTABLE_set_string_keyed_int(interpreter, Array, 10, string_from_cstring(interpreter, tm.tm_zone, 0));
+  VTABLE_set_integer_keyed_int(interpreter, Array, 11, tm.tm_gmtoff);
+  $1 = Array;
+  goto NEXT();
+}
+
+########################################
+
 =item B<sysinfo>(out STR, in INT)
 
 =item B<sysinfo>(out INT, in INT)
