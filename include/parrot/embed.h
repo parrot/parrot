@@ -21,7 +21,7 @@
 
 typedef int Parrot_warnclass;
 
-Parrot_Interp Parrot_new(void);
+Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 void Parrot_init(Parrot_Interp);
 

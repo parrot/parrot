@@ -400,7 +400,7 @@ main(int argc, char * argv[])
     struct PackFile *pf;
     int obj_file;
 
-    struct Parrot_Interp *interpreter = Parrot_new();
+    struct Parrot_Interp *interpreter = Parrot_new(NULL);
 
     Parrot_init(interpreter);
     interpreter->imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));

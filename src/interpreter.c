@@ -474,26 +474,26 @@ void
 runops_int(struct Parrot_Interp *interpreter, size_t offset)
 {
     int lo_var_ptr;
+    void *old_lo_var_ptr;
     opcode_t *(*core) (struct Parrot_Interp *, opcode_t *) =
         (opcode_t *(*) (struct Parrot_Interp *, opcode_t *)) 0;
 
+    /*
+     * if we are entering the run-loop first-time, set the stack limit
+     */
+    if (interpreter->resume_flag & RESUME_INITIAL) {
+        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+    }
     interpreter->resume_offset = offset;
-    interpreter->resume_flag = 1;
+    interpreter->resume_flag |= RESUME_RESTART;
 
-    while (interpreter->resume_flag & 1) {
+    while (interpreter->resume_flag & RESUME_RESTART) {
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 
-        /*
-         * if we are reentering the run-loop, offset will be non-zero
-         * e.g. from delegate.pmc
-         * This might be of course wrong, when a new segment is run
-         * TODO have some flag for this case
-         */
-        if (!offset)
-            interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+        old_lo_var_ptr = interpreter->lo_var_ptr;
         interpreter->resume_offset = 0;
-        interpreter->resume_flag = 0;
+        interpreter->resume_flag &= ~(RESUME_RESTART | RESUME_INITIAL);
         switch (interpreter->run_core) {
             case PARROT_SLOW_CORE:
 
@@ -517,10 +517,11 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 #ifdef HAVE_COMPUTED_GOTO
                 /* clear stacktop, it gets set in runops_cgoto_core beyond the
                  * opfunc table again, if the compiler supports nested funcs
+                 * - but only, if we are the top running loop
                  */
                 /* #ifdef HAVE_NESTED_FUNC */
 #  ifdef __GNUC__
-                if (!offset)
+                if (old_lo_var_ptr == interpreter->lo_var_ptr)
                     interpreter->lo_var_ptr = 0;
 #  endif
                 core = runops_cgoto_core;
@@ -566,9 +567,8 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
          * the stacktop again to a sane value, so that restarting the runloop
          * is ok.
          */
-        if (!offset)
-            interpreter->lo_var_ptr = (void *)&lo_var_ptr;
-        if ((interpreter->resume_flag & 1) &&
+        interpreter->lo_var_ptr = old_lo_var_ptr;
+        if ((interpreter->resume_flag & RESUME_RESTART) &&
                 (int)interpreter->resume_offset < 0)
                 internal_exception(1, "branch_cs: illegal resume offset");
     }
@@ -580,13 +580,13 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 static void
 runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 {
-    interpreter->resume_flag = 2;
+    interpreter->resume_flag |= RESUME_ISJ;
 
-    while (interpreter->resume_flag & 2) {
-        interpreter->resume_flag = 0;
+    while (interpreter->resume_flag & RESUME_ISJ) {
+        interpreter->resume_flag &= ~RESUME_ISJ;
         runops_int(interpreter, offset);
 
-        if (interpreter->resume_flag & 2) {
+        if (interpreter->resume_flag & RESUME_ISJ) {
             /* inter segment jump
              * resume_offset = entry of name in current const_table
              */
@@ -789,8 +789,8 @@ void Parrot_really_destroy(int exit_code, void *interpreter);
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
 
-struct Parrot_Interp *
-make_interpreter(Interp_flags flags)
+Parrot_Interp
+make_interpreter(Parrot_Interp parent, Interp_flags flags)
 {
     struct Parrot_Interp *interpreter;
 #if EXEC_CAPABLE
@@ -805,8 +805,18 @@ make_interpreter(Interp_flags flags)
 #endif
         interpreter = mem_sys_allocate_zeroed(sizeof(struct Parrot_Interp));
 
-    /* must be set after if this is not the first interpreter */
-    SET_NULL(interpreter->parent_interpreter);
+    /*
+     * the last interpreter (w/o) parent has to cleanup globals
+     * so remember parent if any
+     */
+    if (parent) {
+        interpreter->parent_interpreter = parent;
+        interpreter->lo_var_ptr = parent->lo_var_ptr;
+    }
+    else {
+        interpreter->resume_flag = RESUME_INITIAL;
+        SET_NULL(interpreter->parent_interpreter);
+    }
 
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;

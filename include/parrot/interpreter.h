@@ -229,6 +229,13 @@ typedef struct Parrot_Interp {
     struct MMD_table *binop_mmd_funcs; /* Table of MMD function pointers */
 } Interp;
 
+typedef enum {
+    RESUME_NONE         = 0x00,
+    RESUME_RESTART      = 0x01,
+    RESUME_ISJ          = 0x02,
+    RESUME_INITIAL      = 0x04
+} resume_flag_enum;
+
 /* &gen_from_enum(iglobals.pasm) */
 typedef enum {
     IGLOBALS_CLASSNAME_HASH,
@@ -277,7 +284,7 @@ extern PMC * PMCNULL;                     /* Holds single Null PMC         */
 
 /* &end_gen */
 
-struct Parrot_Interp *make_interpreter(Interp_flags);
+struct Parrot_Interp *make_interpreter(Parrot_Interp parent, Interp_flags);
 void Parrot_init(Parrot_Interp);
 void Parrot_destroy(Parrot_Interp);
 INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);

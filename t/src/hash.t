@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
     HashEntry _value;
     HashEntry *value = &_value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -218,7 +218,7 @@ int do_test(Interp *interpreter);
 
 int main(int argc, char* argv[]) {
     Interp* interpreter;
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
     interpreter->lo_var_ptr = &interpreter;
@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -322,7 +322,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     PMC *value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -377,7 +377,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     PMC *value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 
@@ -425,7 +425,7 @@ int main(int argc, char* argv[]) {
     STRING *key;
     HashEntry value;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
 
     if ( interpreter == NULL ) return 1;
 

@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     Parrot_Int parrot_reg, value, new_value;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     Parrot_Float value, new_value;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     Parrot_STRING output;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
     Parrot_STRING value, new_value;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
     Parrot_PMC testpmc;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
     Parrot_PMC testpmc, newpmc;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
     Parrot_PMC testpmc;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -230,7 +230,7 @@ int main(int argc, char* argv[]) {
     Parrot_PMC testpmc;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -262,7 +262,7 @@ int main(int argc, char* argv[]) {
     char* new_value;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -296,7 +296,7 @@ int main(int argc, char* argv[]) {
     char* new_value;
 
     /* Interpreter set-up */
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
     struct PackFile *pf;
     PMC *key, *sub, *arg;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");
@@ -414,7 +414,7 @@ int main(int argc, char* argv[]) {
     PMC *key, *sub;
     Parrot_exception jb;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     pf = Parrot_readbc(interpreter, "temp.pbc");
     Parrot_loadbc(interpreter, pf);
     key = key_new_cstring(interpreter, "_sub1");

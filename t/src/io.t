@@ -9,11 +9,11 @@ sub setup
 {
 	my $name = @_ ? shift : "temp.file";
 	my $content = @_ ? shift : "This is a test\n";
-	
+
 	open(FILE, ">$name") or die "Failed to create $name";
 	print FILE $content;
 	close(FILE);
-	
+
 	unlink("does_not_exist") if -e "does_not_exist";
 }
 
@@ -37,7 +37,7 @@ main ()
 {
     struct Parrot_Interp *interpreter;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     PIO_printf(interpreter, "Hello, World!\n");
@@ -62,7 +62,7 @@ main ()
     ParrotIO *io;
     char *p;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     io = PIO_STDOUT(interpreter);
@@ -101,7 +101,7 @@ main ()
     char buf[1024];
     UINTVAL len;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -118,7 +118,8 @@ main ()
     do {
         len = PIO_read(interpreter, io, buf, 3);
         buf[len] = '\0';
-        PIO_printf(interpreter, "%d: %s\n", len, buf);
+	/* dont write trailing spaces */
+        PIO_printf(interpreter, "%d: %s\n", len, len ? buf : "EOF");
     } while (len > 0);
 
     return 0;
@@ -131,7 +132,7 @@ Hello, World!
 3: rld
 2: !
 
-0: 
+0: EOF
 OUTPUT
 
 ###############################################################################
@@ -147,7 +148,7 @@ main ()
     struct Parrot_Interp *interpreter;
     ParrotIO *io;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", ">>");
@@ -180,7 +181,7 @@ main ()
     size_t len;
     char buf[1024];
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -189,7 +190,7 @@ main ()
     do {
         len = PIO_read(interpreter, io, buf, sizeof(buf)-1);
         buf[len] = '\0';
-        PIO_printf(interpreter, "%d: %s", len, buf);
+        PIO_printf(interpreter, "%d: %s", len, len ? buf : "EOF");
     } while (len > 0);
 
    PIO_printf(interpreter, "\n");
@@ -199,7 +200,7 @@ main ()
 CODE
 14: Hello, World!
 14: Parrot flies.
-0: 
+0: EOF
 OUTPUT
 
 ###############################################################################
@@ -215,18 +216,18 @@ int main(int argc, char* argv[]) {
     INTVAL expected[] = {PIO_F_READ, (PIO_F_WRITE | PIO_F_TRUNC), (PIO_F_WRITE | PIO_F_APPEND), (PIO_F_WRITE | PIO_F_READ), (PIO_F_WRITE | PIO_F_READ | PIO_F_TRUNC), 0, 0, 0, 0, 0};
     INTVAL got;
     int i;
-	
+
 	for (i = 0; i < 10; i++)
 	{
 		got = PIO_parse_open_flags(flags[i]);
 
 		if ( got != expected[i] )
 		{
-			printf("\"%s\" should have parsed to %i not %i\n", 
+			printf("\"%s\" should have parsed to %i not %i\n",
 				flags[i], expected[i], got);
 		}
 	}
-	
+
     printf("done\n");
 
     return 0;
@@ -255,11 +256,11 @@ int main(int argc, char* argv[]) {
     Interp* interpreter;
     PMC *io;
     int i, j;
-	
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
 	for (i = 0; i < 3; i++)
@@ -270,12 +271,12 @@ int main(int argc, char* argv[]) {
 
 			if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] )
 			{
-				printf("\"%s\" \"%s\" should%s have opened\n", 
+				printf("\"%s\" \"%s\" should%s have opened\n",
 					file[i], flags[j], expected[i][j] ? "" : " not");
 			}
 		}
 	}
-    
+
     printf("done\n");
 
     return 0;
@@ -302,11 +303,11 @@ int main(int argc, char* argv[]) {
     Interp* interpreter;
     PMC *io;
     char *buffer;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
 	io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -316,7 +317,7 @@ int main(int argc, char* argv[]) {
 		printf("PIO_open failed\n");
 		return 1;
 	}
-	
+
     for (i = 0; i < 4; i++)	{
         /* alloc enough space including '\0' */
         buffer = malloc((len[i] + 1) * sizeof(char));
@@ -327,7 +328,7 @@ int main(int argc, char* argv[]) {
         if ( n != strlen(str[i]) ) {
             printf("read: %i expected: %i\n", n, strlen(str[i]));
         }
-        
+
         if ( strcmp(buffer, str[i]) ) {
             printf("should have read \"%s\" not \"%s\"", str[i], buffer);
         }
@@ -335,7 +336,7 @@ int main(int argc, char* argv[]) {
         /* buffer no longer needed */
         free(buffer);
     }
-	
+
     printf("done\n");
 
 	return 0;
@@ -359,11 +360,11 @@ int main(int argc, char* argv[]) {
     Interp* interpreter;
     PMC *io;
     char *buffer;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
 	io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -373,12 +374,12 @@ int main(int argc, char* argv[]) {
 		printf("PIO_open failed\n");
 		return 1;
 	}
-	
-	buffer = malloc(65536 * sizeof(char));	
+
+	buffer = malloc(65536 * sizeof(char));
 	buffer[65535] = '\0';
 	printf("%i\n", PIO_read(interpreter, io, buffer, 65535));
 	printf("%s\n", &buffer[65532]);
-	
+
     return 0;
 }
 CODE
@@ -398,11 +399,11 @@ c_output_is(<<'CODE', <<'OUTPUT', "PIO_write");
 int main(int argc, char* argv[]) {
     Interp* interpreter;
     PMC *io;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
 	io = PIO_open(interpreter, NULL, "temp.file", ">");
@@ -412,7 +413,7 @@ int main(int argc, char* argv[]) {
 		printf("PIO_open failed\n");
 		return 1;
 	}
-	
+
     printf("%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
 
     return 0;
@@ -434,11 +435,11 @@ c_output_is(<<'CODE', <<'OUTPUT', "PIO_close");
 int main(int argc, char* argv[]) {
     Interp* interpreter;
     PMC *io;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
 	io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -450,7 +451,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	printf("%i\n", PIO_close(interpreter, io));
-	
+
     return 0;
 }
 CODE
@@ -471,20 +472,20 @@ int main(int argc, char* argv[]) {
     PIOOFF_T expected[] = {0, 1, -1, 100, -100};
     PIOOFF_T offset;
     int i;
-    
+
 	for (i = 0; i < 5; i++)
 	{
         offset = PIO_make_offset(intval[i]);
-	
+
 	    if ( offset != expected[i] )
         {
-            printf("offset for %i should have been %i not %i\n", 
+            printf("offset for %i should have been %i not %i\n",
                 intval[i], (int)expected[i], (int)offset);
         }
     }
-    
+
     printf("done\n");
-    
+
     return 0;
 }
 CODE
@@ -513,11 +514,11 @@ int main(int argc, char* argv[]) {
     char *buffer;
     int i;
     int got;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
@@ -529,9 +530,9 @@ int main(int argc, char* argv[]) {
     }
 
     for (i = 0; i < 4; i++) {
-        got = PIO_seek(interpreter, io, 
-                       PIO_make_offset(fixture[i][0]), fixture[i][1]);	
-		
+        got = PIO_seek(interpreter, io,
+                       PIO_make_offset(fixture[i][0]), fixture[i][1]);
+
         if ( got >= 0 ) {
             buffer = malloc(2 * sizeof(char));
             buffer[1] = '\0';
@@ -572,11 +573,11 @@ int main(int argc, char* argv[]) {
     PMC *iostdout;
     PIOHANDLE fd;
     PMC *io;
-    
-    interpreter = Parrot_new();
-    
+
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
     for (i = 0; i < 7; i++)
@@ -584,14 +585,14 @@ int main(int argc, char* argv[]) {
         iostdout = PIO_STDOUT(interpreter);
         fd = PIO_getfd(interpreter, iostdout);
         io = PIO_fdopen(interpreter, NULL, fd, flags[i]);
-    
+
         if ( ( io != NULL ) != expected[i] )
         {
-            printf("stdout should%s have opened with \"%s\" flags\n", 
+            printf("stdout should%s have opened with \"%s\" flags\n",
                 expected[i] ? "" : " not", flags[i]);
         }
 	}
-	
+
     printf("done\n");
 
     return 0;
@@ -613,10 +614,10 @@ int main()
     Interp *interpreter;
     PMC *io;
 
-    interpreter = Parrot_new();
-    
+    interpreter = Parrot_new(NULL);
+
     if ( interpreter == NULL ) return 1;
-    
+
     Parrot_init(interpreter);
 
     io = PIO_fdopen(interpreter, &pio_stdio_layer, (PIOHANDLE)stdout, ">");

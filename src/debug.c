@@ -738,7 +738,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     /* Destroy the old interpreter FIXME */
     free(interpreter);
     /* Get a new interpreter */
-    interpreter = make_interpreter(NO_FLAGS);
+    interpreter = make_interpreter(interpreter, NO_FLAGS);
     interpreter->code = code;
     interpreter->pdb = pdb;
     interpreter->lo_var_ptr = stacktop;

@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 {
     struct Parrot_Interp *     interpreter;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     if (!interpreter) {
         return 1;
     }

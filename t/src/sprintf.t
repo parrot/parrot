@@ -153,7 +153,7 @@ int do_test(struct Parrot_Interp* interpreter) {
 int main(int argc, char* argv[]) {
     struct Parrot_Interp * interpreter;
 
-    interpreter = Parrot_new();
+    interpreter = Parrot_new(NULL);
     Parrot_init(interpreter);
     do_test(interpreter);
 
@@ -198,7 +198,7 @@ int main ()
     INTVAL i;
     struct Parrot_Interp *interp = NULL;
 
-    interp = Parrot_new ();
+    interp = Parrot_new (NULL);
     Parrot_init(interp);
     interp->lo_var_ptr = &i; /* we don't have a run-loop so ... */
 

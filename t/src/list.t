@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     List* list, *list2;
     PMC *p1, *p2;
 
-    Interp* interpreter = Parrot_new();
+    Interp* interpreter = Parrot_new(NULL);
     if (interpreter == NULL) return 1;
     Parrot_init(interpreter);
 
@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
     char buf[100];
     int i, j, ok;
 
-    Interp* interpreter = Parrot_new();
+    Interp* interpreter = Parrot_new(NULL);
     if (interpreter == NULL) return 1;
     Parrot_init(interpreter);
 

@@ -23,10 +23,10 @@ pmclass ParrotInterpreter need_ext {
 
     void init () {
 	struct Parrot_Interp *new_interp;
-	new_interp = make_interpreter(0);
-	new_interp->parent_interpreter = interpreter;
+	new_interp = make_interpreter(INTERP, 0);
 	PMC_data(SELF) = new_interp;
     }
+
     void set_integer_native (INTVAL value) {
 	SELF->cache.int_val = value;
     }

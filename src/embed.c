@@ -16,11 +16,11 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-struct Parrot_Interp *
-Parrot_new(void)
+Parrot_Interp
+Parrot_new(Parrot_Interp parent)
 {
     /* interpreter.c:make_interpreter builds a new Parrot_Interp. */
-    return make_interpreter(NO_FLAGS);
+    return make_interpreter(parent, NO_FLAGS);
 }
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);

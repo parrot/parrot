@@ -31,7 +31,7 @@ main(int argc, char **argv)
     struct Parrot_Interp *interpreter;
     struct PackFile_Segment *seg;
 
-    interpreter = make_interpreter(NO_FLAGS);
+    interpreter = make_interpreter(NULL, NO_FLAGS);
     Parrot_init(interpreter);
 
     pf = Parrot_readbc(interpreter, argv[1]);
