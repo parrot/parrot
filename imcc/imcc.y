@@ -354,7 +354,10 @@ iANY(struct Parrot_Interp *interpreter, char * name,
                 /* XXX: assume the jump is relative and to the last arg.
                  * usually true.
                  */
-                ins->type = ITBRANCH | (1 << (nargs-1));
+                if (op_info->jump & PARROT_JUMP_RESTART)
+                    ins->type = ITBRANCH;
+                else
+                    ins->type = ITBRANCH | (1 << (nargs-1));
                 if (!strcmp(name, "branch") || !strcmp(name, "end"))
                     ins->type |= IF_goto;
                 if (!strcmp(fullname, "jump_i") ||
