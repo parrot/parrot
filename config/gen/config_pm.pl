@@ -4,11 +4,12 @@
 
 =head1 NAME
 
-config/gen/config_pm.pl - Parrot::Config
+config/gen/config_pm.pl - Record configuration data
 
 =head1 DESCRIPTION
 
-Writes the C<Parrot::Config> Perl module.
+Writes the C<Parrot::Config> Perl module, the F<library/config.fpmc> 
+generator program, and the F<myconfig> file.
 
 =cut
 
@@ -19,11 +20,15 @@ use vars qw($description @args);
 use Parrot::Configure::Step;
 use Data::Dumper;
 
-$description="Writing configuration data modules for Perl 5 and Parrot...";
+$description="Recording configuration data for later retrieval";
 
 @args=();
 
 sub runstep {
+  
+  
+  genfile('config/gen/config_pm/myconfig.in',      'myconfig');
+
   open(IN, "config/gen/config_pm/Config_pm.in") or die "Can't open Config_pm.in: $!";
   open(OUT, ">lib/Parrot/Config.pm") or die "Can't open lib/Parrot/Config.pm: $!";
 

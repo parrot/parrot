@@ -155,6 +155,18 @@ sub runstep {
   *dump=sub {
     Data::Dumper->Dump([\%c], ['*PConfig']);
   };
+  
+  *clean=sub {
+    delete $c{$_} for grep { /^TEMP_/ } keys %c;
+  };
 }
 
 1;
+
+
+
+
+
+
+
+
