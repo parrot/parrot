@@ -240,6 +240,36 @@ inline op classname(out STR, in PMC) {
 
 =cut
 
+##################################################
+
+
+=item B<addparent>(in PMC, in PMC)
+
+Add class $2 to the list of parent classes for $1
+
+=item B<removeparent>(in PMC, in PMC)
+
+Remove class $2 from class $1's list of parents.
+
+=item B<addattrib>(out INT, in PMC, in STR)
+
+Add the attribute named $3 to the class $2. $1 is filled in with the
+offset of the new attribute
+
+=item B<removeattrib>(in PMC, in STR)
+=item B<removeattrib>(in PMC, in INT)
+
+Remove attribute $2 from class $1, specified either by name or offset
+
+
+=item B<adddoes>(in PMC, in STR)
+
+Add $2 to the list of interfaces that this class claims to implement
+
+=item B<removedoes>(in PMC, in STR)
+
+Remove $2 from the list of interfaces that this class claims to
+implement.
 
 
 =back
