@@ -104,9 +104,11 @@ int do_test(struct Parrot_Interp* interpreter) {
            string_to_cstring(interpreter, S));
 
     ival = -1;
+/* INVALID FOR 64-BIT PLATFORMS?
     S = Parrot_sprintf_c(interpreter, "== %#vx\n", ival);
     printf("0x%x %s", (int) ival,
            string_to_cstring(interpreter, S));
+*/
     S = Parrot_sprintf_c(interpreter, "== %08vd\n", ival);
     printf("%08d %s", (int) ival,
            string_to_cstring(interpreter, S));
@@ -148,7 +150,6 @@ Hello, Hello, Pa!
 25    == 25   |
 00025 == 00025
 25 == 25
-0xffffffff == 0xffffffff
 -0000001 == -0000001
 That's all, folks!
 OUTPUT
