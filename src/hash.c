@@ -437,6 +437,17 @@ expand_hash(Interp *interpreter, Hash *hash)
     Parrot_reallocate(interpreter, hash->bucket_pool,
                       new_pool_size * sizeof(HashBucket));
 
+    if (hash->container) {
+        /* resizing an existing hash has the same DOD effect as
+         * storing a new value into a possibly old aggregate
+         *
+         * Yeah, that's ugly. We should get rid of the buffers
+         * in hash and use e.g. perl5's hash scheme
+         */
+        DOD_WRITE_BARRIER(interpreter, hash->container, 0, hash);
+        DOD_WRITE_BARRIER(interpreter, hash->container, 0, hash->bucket_pool);
+    }
+
     /* Add the newly allocated buckets onto the free list */
     for (bi = old_pool_size; bi < new_pool_size; bi++) {
         bucket = getBucket(hash, bi);
