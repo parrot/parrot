@@ -265,11 +265,8 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
             }
             if (next[REGSET_P] == LAST_PARAM_REG) {
                 /* clear P3 */
-                if (!p3)
-                    p3 = get_pasm_reg("P3");
-                regs[0] = p3;
+                regs[0] = get_pasm_reg("P3");
                 ins = insINS(interpreter, unit, ins, "null", regs, 1);
-                p3 = NULL;
             }
             if (next[set] > LAST_PARAM_REG) {
                 goto overflow;
@@ -277,7 +274,7 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
             /*
              * if register number already matches - fine
              */
-            if (arg->color == next[set] && arg->type & VTREGISTER) {
+            if (arg->color == next[set] && (arg->type & VTREGISTER)) {
                 next[set]++;
                 break;
             }
@@ -288,7 +285,7 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
                 arg_reg->want_regno = next[set];
             }
             sprintf(buf, "%c%d", arg_reg->set, next[set]++);
-            reg = mk_pasm_reg(str_dup(buf));
+            reg = get_pasm_reg(buf);
             regs[0] = reg;
             regs[1] = arg_reg;
             ins = insINS(interpreter, unit, ins, "set", regs, 2);
@@ -335,7 +332,7 @@ flatten:
 
     /* set items in PRegs: I3 */
     if (flatten) {
-        regs[0] = mk_pasm_reg(str_dup("I3"));;
+        regs[0] = get_pasm_reg("I3");;
         regs[1] = mk_const(str_dup("5"), 'I');
         ins = insINS(interpreter, unit, ins, "sub", regs, 2);
     }
