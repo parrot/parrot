@@ -145,7 +145,7 @@ clean:
 	cd classes; make clean
 
 distclean:
-	perl -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
+	$(PERL) -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
 
 test: $(TEST_PROG) assemble.pl .test_dummy
 
