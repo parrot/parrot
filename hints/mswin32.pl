@@ -7,7 +7,9 @@
 
 	if( $is_msvc ) {
 		$c{o} = '.obj';
-		$c{ld_out} = '-Fo';
+		$c{cc_o_out} = '-Fo';
+		$c{cc_exe_out} = '-Fe';
+		$c{ld_out} = '/OUT:';
 		$c{cc_debug} = '-Zi';
 		$c{ld_debug} = '-debug';
 		$c{platform} = 'win32';

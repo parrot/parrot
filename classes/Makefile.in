@@ -19,7 +19,7 @@ PERL = ${perl}
 MAKE_F=${make}
 
 .c$(O):
-	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
+	$(CC) $(CFLAGS) ${cc_exe_out}$@ -c $<
 
 all : $(O_FILES)
 

@@ -129,7 +129,7 @@ LINTFLAGS = +showscan +posixlib -weak +longintegral +matchanyintegral -formattyp
 ${make_set_make}
 
 .c$(O):
-	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
+	$(CC) $(CFLAGS) ${cc_o_out}$@ -c $<
 
 all : $(TEST_PROG) $(PDUMP) docs
 

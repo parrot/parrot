@@ -130,7 +130,9 @@ my(%c)=(
     cc_debug      => '-g',
     cc_warn       => '',
     o             => '.o',                # object files extension
-    exe           => $Config{_exe},
+    exe           => $Config{_exe},       # executable files extension
+    cc_o_out      => '-o ',               # cc object output file
+    cc_exe_out    => '-o ',               # cc executable output file (different on Win32)
 
     ld            => $Config{ld},
     ld_out        => '-o ',               # ld output file
@@ -693,7 +695,7 @@ sub compiletestc {
     my $name;
     $name = shift;
     $name = "test" unless $name;
-    system("$c{cc} $c{ccflags} -I./include $c{ld_out}test_siz$c{exe} $name.c") and die "C compiler died!";
+    system("$c{cc} $c{ccflags} -I./include $c{cc_exe_out}test_siz$c{exe} $name.c") and die "C compiler died!";
 }
 
 
