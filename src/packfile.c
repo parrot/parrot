@@ -355,6 +355,7 @@ mark_1_seg(Parrot_Interp interpreter, struct PackFile_ByteCode *cs)
                 ci = ft->fixups[i]->offset;
                 sub_pmc = ct->constants[ci]->u.key;
                 pobject_lives(interpreter, (PObj *)sub_pmc);
+                pobject_lives(interpreter, (PObj *)PMC_sub(sub_pmc)->name);
                 break;
         }
     }

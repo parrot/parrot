@@ -49,6 +49,7 @@ typedef struct Parrot_coro {
     struct Parrot_Context ctx;          /* XXX 2 continuations */
     struct Stack_Chunk *co_control_base;
     struct Stack_Chunk *co_control_stack;  /* control stack top of the cor.*/
+    struct PackFile_ByteCode *caller_seg;      /* bytecode segment */
 } * parrot_coro_t;
 
 #define PMC_coro(pmc) LVALUE_CAST(parrot_coro_t, PMC_pmc_val(pmc))
