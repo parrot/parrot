@@ -1,6 +1,30 @@
-#!/usr/bin/perl
-
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
+################################################################################
+
+=head1 NAME
+
+build_tools/vtable_h.pl - Create the vtable header
+
+=head1 SYNOPSIS
+
+	% perl build_tools/vtable_h.pl
+
+=head1 DESCRIPTION
+
+This script creates F<include/parrot/vtable.h> from F<vtable.tbl>. It
+uses C<Parrot::Vtable>.
+
+=head1 SEE ALSO
+
+C<Parrot::Vtable>.
+
+=cut
+
+################################################################################
+
 use lib 'lib';
 use Parrot::Vtable;
 

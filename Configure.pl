@@ -1,127 +1,167 @@
 #!/usr/bin/perl -w
-#
-# Configure.pl 2.0
-#
 # $Id$
-#
-# Author: Brent Dax
-#
+################################################################################
 
-use 5.005_02;
+=head1 NAME
 
-use strict;
-use vars qw($parrot_version @parrot_version);
-use lib 'lib';
+Configure.pl - Parrot Configure
 
-use Parrot::BuildUtil;
-use Parrot::Configure::RunSteps;
+=head1 SYNOPSIS
 
-$| = 1;
-
-$parrot_version = parrot_version();
-@parrot_version = parrot_version();
-
-# Handle options
-
-my %args;
-
-for(@ARGV) {
-  my($key, $value)=/--(\w+)(?:=(.*))?/;
-  $key   = 'help' unless defined $key;
-  $value = 1      unless defined $value;
-
-  for($key) {
-    /version/ && do {
-      my $cvsid='$Id$';
-      print <<"END";
-Parrot Version $parrot_version Configure 2.0
-$cvsid
-END
-      exit;
-    };
-
-    /help/    && do {
-      print <<"EOT";
-$0 - Parrot Configure 2.0
-General Options:
-   --help               Show this text
-   --version            Show version information
-
-   --nomanicheck        Don't check the MANIFEST
-   --maintainer         Use this option if you are hacking Parrot.
-                        This needs working lex/flex/yacc/bison programs.
-   --verbose            Output extra information
-
-Parrot Configuration Options:
-   --ask                Have Configure ask for commonly-changed info
-                        you can remove parts of a line with :rem{<opt>}
-                        and add options with :add{<opt>} e.g.
-                        :rem{-g} :add{-O2}
-   --debugging=0        Disable debugging, default = 1
-   --optimize           Optimized compile
-   --cc=(compiler)      Use the given compiler
-   --ld=(linker)        Use the given linker
-   --intval=(type)      Use the given type for INTVAL
-   --floatval=(type)    Use the given type for FLOATVAL
-
-   --cgoto=0		Don't build cgoto core - recommended when short of mem
-   --gc=gc|libc|malloc|malloc-trace	determine GC type, default = gc
-
-EOT
-      exit;
-    };
-    $args{$key}=$value;
-  }
-}
-
-$args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
-
-print <<"END";
-Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
-
-Hello, I'm Configure.  My job is to poke and prod your system to figure out
-how to build Parrot.  The process is completely automated, unless you passed in
-the `--ask' flag on the command line, in which case it'll prompt you for a few
-pieces of info.
-
-Since you're running this script, you obviously have Perl 5--I'll be pulling
-some defaults from its configuration.
-END
-
-
-#Run the actual steps
-Parrot::Configure::RunSteps->runsteps(%args);
-
-
-print <<"END";
-
-Okay, we're done!
-
-You can now use `make' (or your platform's equivalent to `make') to build your
-Parrot. After that, you can use `make test' to run the test suite.
-
-Happy Hacking,
-        The Parrot Team
-
-END
-
-exit(0);
-
-
-=head1 TITLE
-
-parrotconfig - Parrot Configure
-
-=head1 NOTE
-
-This document is NOT about how to use Configure--it's about Configure's
-design.  For information on using Configure, type C<perl Configure.pl --help>
-(or your platform's equivalent) at a command line prompt.
+    % perl Configure.pl [options]
 
 =head1 DESCRIPTION
 
-B<I<THIS NEEDS TO BE UPDATED!!!>>
+This is Parrot's configuration script.
+
+=head3 General Options
+
+=over
+
+=item C<--help>
+
+Prints out a description of the options and exits.
+
+=item C<--version>
+
+Prints out the version number of Configure.pl and exits.
+
+=item C<--verbose>
+
+Tells Configure.pl to output extra information about the configuration
+data it is setting.
+
+=item C<--nomanicheck>
+
+Tells Configure.pl not to run the MANIFEST check.
+
+=item C<--maintainer>
+
+Use this option if you want imcc's parser and lexer files to be
+generated. Needs a working parser and lexer.
+
+=item C<--miniparrot>
+
+Build parrot assuming only pure ANSI C is available.
+
+=item C<--buildicu>
+
+Build Parrot and ICU. Runs F<icu/source/configure> with the options in
+F<icu/README.parrot>.
+
+=back
+
+=head3 Parrot Configuration Options
+
+You can add and remove option values with C<<:rem{<opt>}>> and
+C<<:add{<opt>}>>. For example:
+
+    perl Configure.pl --ccflags="rem{-g} :add{-O2}"
+
+=over
+
+=item C<--ask>
+
+This turns on the user prompts.
+
+=item C<--debugging=0>
+
+Debugging is turned on by default. Use this to disable it.
+
+=item C<--optimize>
+
+Tell the compiler to do an optimization phase.
+
+=item C<--inline>
+
+Tell Configure that the compiler supports C<inline>.
+
+=item C<--expnetwork>
+
+Enable experimental networking. This is an unused option and should
+probably be removed.
+   
+=item C<--cc=(compiler)>
+
+Specify which compiler to use.
+
+=item C<--ccflags=(flags)>
+
+Use the given compiler flags.
+
+=item C<--ccwarn=(flags)>
+
+Use the given compiler warning flags.
+
+=item C<--libs=(libs)>
+
+Use the given libraries.
+
+=item C<--link=(linker)>
+
+Specify which linker to use.
+
+=item C<--linkflags=(flags)>
+
+Use the given linker flags
+
+=item C<--ld=(linker)>
+
+Specify which loader to use for shared libraries.
+
+=item C<--ldflags=(flags)>
+
+Use the given loader flags for shared libraries
+
+=item C<--lex=(lexer)>
+
+Specify which lexer to use.
+
+=item C<--yacc=(parser)>
+
+Specify which parser to use.
+   
+=item C<--intval=(type)>
+
+Use the given type for C<INTVAL>.
+
+=item C<--floatval=(type)>
+
+Use the given type for C<FLOATVAL>.
+
+=item C<--opcode=(type)>
+
+Use the given type for opcodes.
+
+=item C<--ops=(files)>
+
+Use the given ops files.
+
+=item C<--pmc=(files)>
+
+Use the given PMC files.
+
+=item C<--cgoto=0>
+
+Don't build cgoto core. This is recommended when you are short of memory.
+
+=item C<--jitcapable>
+
+Use JIT system.
+
+=item C<--execcapable>
+
+Use JIT to emit a native executable.   
+
+=item C<--gc=(type)>
+
+Determine the type of garbage collection. The value for C<type> should
+be one of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is
+C<gc>.
+
+=back
+
+=head2 Parrot Configuration System
 
 Configure is broken up into I<steps>.  Each step contains several related
 I<prompts>, I<probes>, or I<generations>.  Steps should be mostly of a single
@@ -161,6 +201,8 @@ Interactive steps often include simple probes to determine good guesses of
 what the user will answer.  See L</Prompt or Probe?> for more information.
 
 Interactive steps virtually always output something.
+
+Note that, by default, these prompts are turned off. To enable them run Configure with the "--ask" option.
 
 =head2 Probes
 
@@ -211,19 +253,19 @@ Some example descriptions:
 
 =item F<inter/progs.pl>
 
-	Okay, I'm going to start by asking you a couple questions about your
-	compiler and linker.  Default values are in square brackets;
-	you can hit ENTER to accept them.  If you don't understand a question,
-	the default will usually work--they've been intuited from your Perl 5
-	configuration.
+    Okay, I'm going to start by asking you a couple questions about your
+    compiler and linker.  Default values are in square brackets;
+    you can hit ENTER to accept them.  If you don't understand a question,
+    the default will usually work--they've been intuited from your Perl 5
+    configuration.
 
 =item F<auto/cgoto.pl>
 
-	Determining if your compiler supports computed goto...
+    Determining if your compiler supports computed goto...
 
 =item F<gen/config_h.pl>
 
-        Generating config.h...
+    Generating config.h...
 
 =back
 
@@ -231,7 +273,7 @@ Note that on non-interactive steps, the text C<"done."> will be printed after
 the description when the step finishes executing; for example, the user will
 see:
 
-	Determining if your compiler supports computed goto...done.
+    Determining if your compiler supports computed goto...done.
 
 =item C<@args>
 
@@ -253,25 +295,27 @@ Steps are run in the sequence in which they appear in C<@steps>.
 
 A template for a new step might look like this:
 
-	package Configure::Step;
+    package Configure::Step;
 
-	use strict;
-	use vars qw($description @args);
-	use Parrot::Configure::Step;
+    use strict;
+    use vars qw($description @args);
+    use Parrot::Configure::Step;
 
-	$description="<description>";
-	@args=qw(<args>);
+    $description="<description>";
+    @args=qw(<args>);
 
-	sub runstep {
-		<code>
-	}
+    sub runstep {
+        <code>
+    }
 
 =head2 Command-line Arguments
 
 Command-line arguments look like C</--\w+(=.*)?/>; the equals sign separates
 the name and the value. If the value is omitted, it's assumed to be 1. The
-options "--help" and "--version" are built in to Configure; any others are
-defined by steps.  "--help" lists some common options.
+options C<--help> and C<--version> are built in to Configure; any others are
+defined by steps.
+
+If you add a new option, don't forget to add it to this documentation and the "--help" listing in F<Configure.pl>.
 
 Steps use the C<@args> array to list any options they're interested in. They
 should be listed without the dashes.
@@ -339,42 +383,135 @@ I<outfile>.
 
 =back
 
-=head1 MISCELLANEOUS
+=head1 AUTHOR
 
-=head2 Moved Files
-
-Several files have been moved from their original locations to new ones.
-
-=over 4
-
-=item F<*/Makefile.in>
-
-Moved to F<config/gen/makefiles> and renamed appropriately.
-
-=item F<config_h.in>
-
-Moved to F<config/gen/config_h>.
-
-=item F<Config_pm.in>
-
-moved to F<config/gen/config_pm>.
-
-=item F<Types_pm.in>
-
-Deleted; F<lib/Parrot/Types.pm> now doesn't need to be generated.
-
-=item F<hints/*>
-
-Moved to F<config/init/hints> and rewritten.
-
-=item F<platforms/*>
-
-Moved to F<config/gen/platform>.
-
-=item F<test*.c>, F<test*_c.in>
-
-Moved to various subdirectories of F<hints/auto>.
-
-=back
+Brent Dax
 
 =cut
+
+################################################################################
+
+use 5.005_02;
+
+use strict;
+use vars qw($parrot_version @parrot_version);
+use lib 'lib';
+
+use Parrot::BuildUtil;
+use Parrot::Configure::RunSteps;
+
+$| = 1;
+
+$parrot_version = parrot_version();
+@parrot_version = parrot_version();
+
+# Handle options
+
+my %args;
+
+for(@ARGV) {
+  my($key, $value)=/--(\w+)(?:=(.*))?/;
+  $key   = 'help' unless defined $key;
+  $value = 1      unless defined $value;
+
+  for($key) {
+    /version/ && do {
+      my $cvsid='$Id$';
+      print <<"END";
+Parrot Version $parrot_version Configure 2.0
+$cvsid
+END
+      exit;
+    };
+
+    /help/    && do {
+      print <<"EOT";
+$0 - Parrot Configure 2.0
+
+General Options:
+
+   --help               Show this text
+   --version            Show version information
+   --verbose            Output extra information
+   --nomanicheck        Don't check the MANIFEST
+   --maintainer         Create imcc's parser and lexer files. Needs a working
+                        parser and lexer.
+   --miniparrot         Build parrot assuming only pure ANSI C is available
+   --buildicu           Build Parrot and ICU
+
+Parrot Configuration Options:
+
+You can add and remove option values with :rem{<opt>} and :add{<opt>}
+e.g. : --ccflags="rem{-g} :add{-O2}"
+
+   --ask                Have Configure ask for commonly-changed info
+   --debugging=0        Disable debugging, default = 1
+   --optimize           Optimized compile
+   --inline             Compiler supports inline
+   --expnetwork         Enable experimental networking (unused)
+   
+   --cc=(compiler)      Use the given compiler
+   --ccflags=(flags)    Use the given compiler flags
+   --ccwarn=(flags)     Use the given compiler warning flags
+   --libs=(libs)        Use the given libraries
+   --link=(linker)      Use the given linker
+   --linkflags=(flags)  Use the given linker flags
+   --ld=(linker)        Use the given loader for shared libraries
+   --ldflags=(flags)    Use the given loader flags for shared libraries
+   --lex=(lexer)        Use the given lexical analyzer generator
+   --yacc=(parser)       Use the given parser generator
+   
+   --intval=(type)      Use the given type for INTVAL
+   --floatval=(type)    Use the given type for FLOATVAL
+   --opcode=(type)      Use the given type for opcodes
+   --ops=(files)        Use the given ops files
+   --pmc=(files)        Use the given PMC files
+
+   --cgoto=0            Don't build cgoto core - recommended when short of mem
+   --jitcapable         Use JIT     
+   --execcapable        Use JIT to emit a native executable     
+   --gc=(type)          Determine the type of garbage collection
+                        type=(gc|libc|malloc|malloc-trace) default is gc
+
+EOT
+      exit;
+    };
+    $args{$key}=$value;
+  }
+}
+
+$args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
+
+print <<"END";
+Parrot Version $parrot_version Configure 2.0
+Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
+
+Hello, I'm Configure.  My job is to poke and prod your system to figure out
+how to build Parrot.  The process is completely automated, unless you passed in
+the `--ask' flag on the command line, in which case it'll prompt you for a few
+pieces of info.
+
+Since you're running this script, you obviously have Perl 5--I'll be pulling
+some defaults from its configuration.
+END
+
+
+#Run the actual steps
+Parrot::Configure::RunSteps->runsteps(%args);
+
+
+print <<"END";
+
+Okay, we're done!
+
+You can now use `make' (or your platform's equivalent to `make') to build your
+Parrot. After that, you can use `make test' to run the test suite.
+
+Happy Hacking,
+        The Parrot Team
+
+END
+
+exit(0);
+
+

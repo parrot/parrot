@@ -1,4 +1,32 @@
-#!/usr/bin/env perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+tools/dev/run_indent.pl - Check indentation in C files
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/run_indent.pl file1 [file2 ...]
+
+=head1 DESCRIPTION
+
+This script ensures that the specified C source files have correct
+indentation.
+
+You will need to have C<C::Scan> installed to run this. Use the CPAN
+shell:
+
+    perl -MCPAN -e shell 
+    cpan> install C::Scan 
+    ...
+
+=cut
+
+################################################################################
 
 # the following #defined macros are really used as data types, and should
 # be converted to typedefs.

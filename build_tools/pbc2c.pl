@@ -1,15 +1,25 @@
-#! /usr/bin/perl -w
-#
-# pbc2c.pl
-#
-# Turn a parrot bytecode file into a C program.
-#
-# Copyright (C) 2001-2002 The Parrot Team. All rights reserved.
-# This program is free software. It is subject to the same license
-# as the Parrot interpreter.
-#
+#! perl -w
+################################################################################
+# TODO: Resolve copyright. See ADDITIONAL section at end of file.
 # $Id$
-#
+################################################################################
+
+=head1 NAME
+
+build_tools/pbc2c.pl - Parrot byte code compiler
+
+=head1 SYNOPSIS
+
+    perl build_tools/pbc2c foo.pbc > foo.c
+
+=head1 DESCRIPTION
+
+Parse the Parrot PackFile listed on the command line, or from standard
+input if no file is named, and turn it into a C implementation file.
+
+=cut
+
+################################################################################
 
 use strict;
 
@@ -341,18 +351,7 @@ exit 0;
 
 __END__
 
-=head1 NAME
-
-pbc2c - Parrot byte code compiler
-
-=head1 SYNOPSIS
-
-  pbc2c foo.pbc > foo.c
-
-=head1 DESCRIPTION
-
-Compile the Parrot PackFile listed on the command line, or
-from standard input if no file is named.
+=begin ADDITIONAL
 
 =head1 AUTHOR
 
@@ -362,8 +361,13 @@ Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 
 Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 
+Copyright (C) 2001-2002 The Parrot Team. All rights reserved.
+This program is free software. It is subject to the same license
+as the Parrot interpreter.
+
 =head1 LICENSE
 
 This program is free software. It is subject to the same license
 as the Parrot interpreter.
 
+=end ADDITIONAL

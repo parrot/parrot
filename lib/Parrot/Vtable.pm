@@ -113,7 +113,7 @@ EOM
     for my $entry (@{$vtable}) {
 	my @args = split /,\s*/, $entry->[2];
 	unshift @args, "i interp", "p pmc";
-	my $args = join ', ', map { (split / /, $args[$_])[1] } (0..@args);
+	my $args = join ', ', map { (split / /, $args[$_])[1] } (0..$#args);
 	$macros .= <<"EOM";
 #define VTABLE_$entry->[1]($args) \\
     (pmc)->vtable->$entry->[1]($args)

@@ -1,21 +1,63 @@
-#!perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
 =head1 TITLE
 
 tools/dev/mk_manifests.pl - Generate MANIFEST.* files for building RPMs
 
+=head1 SYNOPSIS
+
+    % perl tools/dev/mk_manifests.pl [options]
+
 =head1 DESCRIPTION
 
-This file generates a set of MANIFEST.* files that give the final
+This file generates a set of F<MANIFEST.*> files that give the final
 locations in the file system for all the installable files listed in
-MANIFEST and MANIFEST.generated. It does NOT generate the MANIFEST
-file that Configure.pl checks and the manifest checks use.
+F<MANIFEST> and F<MANIFEST.generated>.
+
+It does NOT generate the F<MANIFEST> file that F<Configure.pl> checks
+and the manifest checks use.
+
+=head2 Options
+
+=over 4
+
+=item C<buildprefix>
+
+The build prefix. Defaults to ''.
+
+=item C<prefix>
+
+The install prefix. Defaults to '/usr'.
+
+=item C<exec_prefix>
+
+The exec prefix. Defaults to '/usr'.
+
+=item C<bindir>
+
+The executables directory. Defaults to '/usr/bin'.
+
+=item C<libdir>
+
+The library directory. Defaults to '/usr/lib'.
+
+=item C<includedir>
+
+The header directory. Defaults to '/usr/include'.
+
+=back
 
 =head1 SEE ALSO
 
-install_files.pl
+F<install_files.pl>
 
 =cut
+
+################################################################################
 
 my %options = ( prefix => '/usr',
                 exec_prefix => '/usr',

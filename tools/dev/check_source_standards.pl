@@ -1,4 +1,34 @@
-#!/usr/bin/perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+tools/dev/check_source_standards.pl - Check source code conforms to PDD 7
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/check_source_standards.pl file1 [file2 ...]
+
+    % perl tools/dev/check_source_standards.pl all_source
+
+=head1 DESCRIPTION
+
+This script checks that the C source code conforms to the standards in
+PDD 7.
+
+To run it on all the C source code files in the distribution pass in
+C<all_source> instead of a list of files.
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd07_codingstd.pod>.
+
+=cut
+
+################################################################################
 
 use Text::Wrap;
 use File::Find;

@@ -1,13 +1,55 @@
-#!perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
 =head1 TITLE
 
 tools/dev/install_files.pl - Copy files to their correct locations
 
+=head1 SYNOPSIS
+
+    % perl tools/dev/install_files.pl [options]
+
 =head1 DESCRIPTION
 
-Use a detailed MANIFEST to install a set of files. The format of the
-MANIFEST (currently MANIFEST and MANIFEST.generated are used) is:
+Use a detailed MANIFEST to install a set of files. 
+
+=head2 Options
+
+=over 4
+
+=item C<buildprefix>
+
+The build prefix. Defaults to ''.
+
+=item C<prefix>
+
+The install prefix. Defaults to '/usr'.
+
+=item C<exec_prefix>
+
+The exec prefix. Defaults to '/usr'.
+
+=item C<bindir>
+
+The executables directory. Defaults to '/usr/bin'.
+
+=item C<libdir>
+
+The library directory. Defaults to '/usr/lib'.
+
+=item C<includedir>
+
+The header directory. Defaults to '/usr/include'.
+
+=back
+
+=head2 MANIFEST Format
+
+The format of the MANIFEST (currently MANIFEST and MANIFEST.generated
+are used) is:
 
     source_path <whitespace> [package]meta1,meta2,...
 
@@ -36,15 +78,15 @@ rpm will put it into a directory of its choosing)
 
 =item C<include>
 
-Write this file to the location given by the --includedir option
+Write this file to the location given by the C<--includedir> option
 
 =item C<lib>
 
-Write this file to the location given by the --libdir option
+Write this file to the location given by the C<--libdir> option
 
 =item C<bin>
 
-Write this file to the location given by the --bindir option
+Write this file to the location given by the C<--bindir> option
 
 =back
 
@@ -62,9 +104,11 @@ parrot-<VERSION>-1.<arch>.rpm file will contain the file
 
 =head1 SEE ALSO
 
-mk_manifests.pl
+F<tools/dev/mk_manifests.pl>
 
 =cut
+
+################################################################################
 
 use File::Basename qw(dirname);
 use strict;

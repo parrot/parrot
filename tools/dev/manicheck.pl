@@ -1,10 +1,27 @@
-#!/usr/bin/perl -w
-#
-# manicheck.pl
-#
-# Check the contents of the MANIFEST file against the files present in
-# this directory tree, accounting for CVS ignore files.
-#
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+tools/dev/manicheck.pl - Check the MANIFEST file
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/manicheck.pl
+
+=head1 DESCRIPTION
+
+Check the contents of the F<MANIFEST> file against the files present in
+this directory tree, accounting for CVS ignore files. Prints out the
+number of I<missing>, I<expected>, I<ignored> and I<extra> files, and
+then any extra files are listed.
+
+=cut
+
+################################################################################
 
 use strict;
 

@@ -1,4 +1,29 @@
 #! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+build_tools/fingerprint_c.pl - Create fingerprint.c
+
+=head1 SYNOPSIS
+
+    % perl build_tools/fingerprint_c.pl > src/fingerprint.c
+
+=head1 DESCRIPTION
+
+The F<PBC_COMPAT> file is used to maintain Parrot bytecode
+compatability. During the build process it is parsed by
+F<fingerprint_c.pl> to produce a fingerprint of the state of Parrot.
+
+Note that this is only done for development versions of Parrot, i.e. the
+file F<DEVELOPING> exists. Releases include a non-dynamic fingerprint.c.
+
+=cut
+
+################################################################################
 
 use strict;
 use lib 'lib';

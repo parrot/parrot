@@ -1,34 +1,54 @@
-#! /usr/bin/perl -w
-#
-# ops2pm.pl
-#
-# Generate a Perl module from the operation definitions in .ops files.
-#
-# The first .ops file on the command line is read in and its name is used to
-# determine the name of the Perl module that will contain the op info.
-#
-# Any remaining .ops files on the command line are read in, and their op
-# info objects are appended, in order, to the op info array obtained from the
-# first .ops file.
-#
-# WARNING: Generating a combined Perl module for a set of .ops files that
-# you do not later turn into a combined opcode table with the same content
-# and order is a recipe for disaster.
-#
-# XXX: The original design of the .ops processing code was intended to be a
-# read-only representation of what was in a particular .ops file. It was
-# not originally intended that it was a mechanism for building a bigger
-# virtual .ops file from multiple physical .ops files. This code does half of
-# that job (the other half is getting them to compile together instead of
-# separately in a *_ops.c file). You can see evidence of this by the way this
-# code reaches in to the internal OPS hash key to do its concatenation, and
-# the way it twiddles each op's CODE hash key after that. If the op and oplib
-# Perl modules are going to be used for modifying information read from .ops
-# files in addition to reading it, they should be changed to make the above
-# operations explicitly supported. Otherwise, the Parrot build and interpreter
-# start-up logic should be modified so that it doesn't need to concatenate
-# separate .ops files.
-#
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+build_tools/ops2pm.pl - Generate Perl module from operation definitions
+
+=head1 SYNOPSIS
+
+    % perl build_tools/ops2pm.pl ops/core.ops ops/bit.ops ...
+
+=head1 DESCRIPTION
+
+The first .ops file on the command line is read in and its name is used
+to determine the name of the Perl module that will contain the op info.
+
+Any remaining .ops files on the command line are read in, and their op
+info objects are appended, in order, to the op info array obtained from
+the first .ops file.
+
+=head2 WARNING
+
+Generating a combined Perl module for a set of .ops files that you do
+not later turn into a combined opcode table with the same content and
+order is a recipe for disaster.
+
+XXX: The original design of the .ops processing code was intended to be
+a read-only representation of what was in a particular .ops file. It was
+not originally intended that it was a mechanism for building a bigger
+virtual .ops file from multiple physical .ops files. This code does half
+of that job (the other half is getting them to compile together instead
+of separately in a *_ops.c file). You can see evidence of this by the
+way this code reaches in to the internal OPS hash key to do its
+concatenation, and the way it twiddles each op's CODE hash key after
+that. If the op and oplib Perl modules are going to be used for
+modifying information read from .ops files in addition to reading it,
+they should be changed to make the above operations explicitly
+supported. Otherwise, the Parrot build and interpreter start-up logic
+should be modified so that it doesn't need to concatenate separate .ops
+files.
+
+=head1 SEE ALSO
+
+F<build_tools/ops2c.pl>.
+
+=cut
+
+################################################################################
 
 use strict;
 use lib 'lib';

@@ -1,13 +1,34 @@
-#!/usr/bin/perl -w
-#
-# genrpt.pl
-#
-# Generate simple OK/Not OK reports for parrot builds.  It was loosely
-# inspired by perl5's perlbug utility.  If we want much more, we
-# should perhaps just use perlbug.
-#
-# The user must still manually edit the Not OK report to explain what
-# went wrong.
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+tools/dev/genrpt.pl - Generate reports for parrot builds
+
+=head1 SYNOPSIS
+
+To make an 'OK' report:
+
+    % perl tools/dev/genrpt.pl --ok --File parrot.ok
+    
+To make an 'Not OK' report:
+
+    % perl tools/dev/genrpt.pl --nok --File parrot.nok
+
+=head1 DESCRIPTION
+
+This script was loosely inspired by perl5's C<perlbug> utility.  If we
+want much more, we should perhaps just use C<perlbug>.
+
+The user must still manually edit the Not OK report to explain what went
+wrong.
+
+=cut
+
+################################################################################
 
 use strict;
 use Getopt::Long;

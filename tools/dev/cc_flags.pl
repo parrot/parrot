@@ -1,4 +1,31 @@
-#!/usr/bin/perl -w
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+tools/dev/cc_flags.pl - Process compiler flags
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/cc_flags.pl transform compiler flags
+
+=head1 DESCRIPTION
+
+This script is used in a F<Makefile> to process the flags to pass to the
+compiler for each C file.
+
+See F<config/gen/cflags/root.in> for the transformation file format.
+
+=head1 SEE ALSO
+
+F<config/gen/cflags/root.in>.
+
+=cut
+
+################################################################################
 
 use strict;
 

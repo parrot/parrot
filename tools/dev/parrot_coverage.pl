@@ -1,7 +1,28 @@
-#!/usr/bin/perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
-# This script (optionally) runs a coverage test, then generates html reports.
-# It requires gcc and gcov to be installed.
+=head1 NAME
+
+tools/dev/parrot_coverage.pl - Run coverage tests and report
+
+=head1 SYNOPSIS
+
+    % mkdir parrot_coverage
+    % perl tools/dev/parrot_coverage.pl recompile
+
+=head1 DESCRIPTION
+
+This script runs a coverage test and then generates HTML reports. It requires
+C<gcc> and C<gcov> to be installed.
+
+The reports start at F<parrot_coverage/index.html>.
+
+=cut
+
+################################################################################
 
 use File::Basename;
 use File::Find;

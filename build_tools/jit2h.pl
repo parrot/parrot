@@ -1,9 +1,25 @@
-#! /usr/bin/perl -w
-#
-# jit2h.pl
-#
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+################################################################################
+
+=head1 NAME
+
+build_tools/jit2h.pl - JIT to C
+
+=head1 SYNOPSIS
+
+    % perl build_tools/jit2h.pl <cpu-architecture-name> jit_cpu.c
+
+=head1 DESCRIPTION
+
+This script creates F<jit_cpu.c>. It parses the JIT file for the
+specified CPU architecture type (F<jit/cpu-architecture-name/core.jit>).
+
+=cut
+
+################################################################################
 
 use strict;
 use lib 'lib';

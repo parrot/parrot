@@ -1,6 +1,34 @@
 #! perl -w
-#
-# Build up the native call routines.
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
+
+=head1 NAME
+
+build_tools/build_nativecall.pl - Build up the native call routines
+
+=head1 SYNOPSIS
+
+    % perl build_tools/build_nativecall.pl call_list.txt
+
+=head1 DESCRIPTION
+
+This script creates the Native Call Interface file F<src/nci.c>. It
+parses a file of function signatures of the form:
+
+    <return-type-specifier><whitespace><parameter-type-specifiers> 
+    ...
+
+The types specifiers are documented in F<src/call_list.txt>.
+
+=head1 SEE ALSO
+
+F<src/call_list.txt>.
+
+=cut
+
+################################################################################
 
 my %ret_count;
 %ret_count = (p => [0,0,0,1,0],        # Returning a pointer that we PMC stuff
@@ -389,7 +417,7 @@ CALL
 }
 
 
-=for comment
+=begin comment
 
 This is the template thing
 

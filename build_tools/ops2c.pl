@@ -1,12 +1,80 @@
-#! /usr/bin/perl -w
-#
-# ops2c.pl
-#
-# Generate a C header and source file from the operation definitions in
-# an .ops file, using a supplied transform.
-#
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
 # $Id$
-#
+################################################################################
+
+=head1 NAME
+
+build_tools/ops2c.pl - Parser for .ops files
+
+=head1 SYNOPSIS
+
+    % perl build_tools/ops2c.pl C --core
+
+    % perl build_tools/ops2c.pl C --dynamic myops.ops
+
+=head1 DESCRIPTION
+
+This script uses a supplied transform to create a pair of C header and
+implementation files from the operation definitions found in one or more
+.ops files.
+
+=head2 Transforms
+
+The first command-line argument is the last package name component of a
+subclass of C<Parrot::OpTrans>. These subclasses all have full names of
+the form C<Parrot::OpTrans::*>. An instance of the class is created and
+later consulted for various bits of information needed to generate the C
+code. Each creates a different type of run loop.
+
+=over
+
+=item C
+
+Create the function-based (slow or fast core) run loop.
+
+=item CGoto
+
+Create the C<goto> run loop.
+
+=item CGP
+
+Create the C<goto> and predereferenced run loop.
+
+=item CSwitch
+
+Create the C<switch>ed and predereferenced run loop.
+
+=item CPrederef
+
+Create the predereferenced run loop.
+
+=back
+
+=head2 Options
+
+=over 4
+
+=item C<--dynamic>
+
+Indicate that the opcode library is dynamic.
+
+=item C<--core>
+
+Build the Parrot core opcode library.
+
+=back
+
+=head1 SEE ALSO
+
+C<Parrot::OpTrans::C>, C<Parrot::OpTrans::CGoto>,
+C<Parrot::OpTrans::CGP>, C<Parrot::OpTrans::CSwitch>,
+C<Parrot::OpTrans::CPrederef>, F<build_tools/ops2pm.pl>.
+
+=cut
+
+################################################################################
 
 use strict;
 use lib 'lib';

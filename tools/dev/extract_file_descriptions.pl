@@ -1,21 +1,67 @@
-#!/usr/bin/perl -w
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
-# This script extracts descriptions from the Parrot source files.
+=head1 NAME
 
-#  Doables:
-#   - Given a directory argument, should recursively descend.
-#   - Should create descriptive hashes earlier, before files are filtered.
-#     So one can skip, say a binary file, but still have it listed in the output.
-#     For instance, it is nice to see where the .pbc's land.
-#   - Allow indescribable heads to be mixed in with rest, for when exploring
-#     a location is more important than big-picture browsing.
-#   - Is absense of "[...]"s in the indescribable listing a ui consistency violation?
-#   - Fragment describe_file() - it shouldn't both `cat` and dispatch on file suffix.
-#   - Finish making this usable as a library.
-#   - It would be nice to have a ParrotSourceFile class of course. ;) (a jest - sort of.)
-#   - Misc: rationalize indent; clarify desc emptiness contract;
-#     review readability of intra-comment blank line elimination; pod handling;
-#     
+tools/dev/extract_file_descriptions.pl - Extract descriptions from files
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/extract_file_descriptions.pl [--plus-misses] [files ...]
+
+=head1 DESCRIPTION
+
+This script extracts descriptions from the Parrot source files. If no
+files are specified on the command-line then the files worth describing
+will be found recursively from the current directory.
+
+=head2 Options
+
+=over 4
+
+=item C<--plus-misses>
+
+This creates a second section, with the heads of any files which had
+familiar types, but from which descriptions were not obtained.
+
+=back
+
+=head1 TO DO
+
+=over
+
+=item * Given a directory argument, should recursively descend.
+
+=item * Should create descriptive hashes earlier, before files are
+filtered. So one can skip, say a binary file, but still have it listed
+in the output. For instance, it is nice to see where the .pbc's land.
+
+=item * Allow indescribable heads to be mixed in with rest, for when
+exploring a location is more important than big-picture browsing.
+
+=item * Is absense of "[...]"s in the indescribable listing a ui
+consistency violation?
+
+=item * Fragment describe_file() - it shouldn't both `cat` and dispatch
+on file suffix.
+
+=item * Finish making this usable as a library.
+
+=item * It would be nice to have a ParrotSourceFile class of course. ;)
+(a jest - sort of.)
+
+=item * Misc: rationalize indent; clarify desc emptiness contract;
+review readability of intra-comment blank line elimination; pod
+handling;
+
+=back
+
+=cut
+
+################################################################################
 
 use Regexp::Common qw/comment/;
 use Getopt::Long;
@@ -201,6 +247,3 @@ sub clip_excess_lines {
     return undef;
 }
 
-
-1;
-__END__

@@ -1,19 +1,45 @@
-#!/usr/bin/perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
-# This script is intended to give us an idea of what libc functions
-# this build depends upon.
-#
-# It supports two modes of operation, "object" and "source".
-#
-# In "object" mode, it expects a list of all parrot's object files.  It runs 
-# nm on each and determines what external functions are being called.  Note 
-# that it assumes a gnu-ish "nm".
-#
-# In "source" mode, it uses a the cxref program
-# (http://www.gedanken.demon.co.uk/cxref/) to extract information from the
-# program source about what functions are being called, what includes are used,
-# etc.  This mode is potentially more thorough, but a bit more magical and
-# therefore less conclusive.
+=head1 NAME
+
+tools/dev/lib_deps.pl - List libc dependencies
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/lib_deps.pl [object | source] file1 [file2 ...]
+
+=head1 DESCRIPTION
+
+This script is intended to give us an idea of what C<libc> functions
+this build depends upon.
+
+=head2 Options
+
+=over 4
+
+=item C<object>
+
+In C<object> mode, it expects a list of all parrot's object files. It
+runs C<nm> on each and determines what external functions are being
+called. Note that it assumes a gnu-ish C<nm>.
+
+=item C<source>
+
+In C<source> mode, it uses a the C<cxref> program
+(L<http://www.gedanken.demon.co.uk/cxref/>) to extract information from
+the program source about what functions are being called, what includes
+are used, etc.  This mode is potentially more thorough, but a bit more
+magical and therefore less conclusive.
+
+=back
+
+=cut
+
+################################################################################
 
 use strict;
 use File::Find;

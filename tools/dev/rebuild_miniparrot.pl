@@ -1,11 +1,40 @@
-#!/usr/bin/perl
+#! perl -w
+################################################################################
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
+################################################################################
 
-# build a new miniparrot distribution in the "miniparrot" directory, along
-# with its build scripts.
-#
-# This script assumes that it will run on a unix box.. it's not particularly
-# necessary to be portable, since this only has to be run when packaging
-# a release, or during development.
+=head1 NAME
+
+tools/dev/rebuild_miniparrot.pl - Rebuild a new miniparrot distribution
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/rebuild_miniparrot.pl [option]
+
+=head1 DESCRIPTION
+
+This script is used to build a new miniparrot distribution in the
+F<miniparrot> directory, along with its build scripts.
+
+It is assumed that it will run on a Unix box. It's not particularly
+necessary to be portable, since it only has to be run when packaging a
+release, or during development.
+
+=head2 Options
+
+=over 4
+
+=item C<--action=sub>
+
+Run the specified subroutine.
+
+=back
+
+=cut
+
+################################################################################
+
 
 use strict;
 no  strict 'refs';
