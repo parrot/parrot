@@ -1,0 +1,55 @@
+%!PS-Adobe
+%
+% mops.ps
+%
+% A PostScript implementation of the mops.pasm example program,
+% for speed comparisons.
+%
+% Copyright (C) 2001 The Parrot Team. All rights reserved.
+% This program is free software. It is subject to the same
+% license as The Parrot Interpreter.
+%
+% $Id$
+%
+
+/I2 0 def                    % set    I2, 0
+/I3 1 def                    % set    I3, 1
+/I4 100000000 def            % set    I4, 100000000
+                             %
+(Iterations:    ) print      % print  "Iterations:    "
+I4 20 string cvs print       % print  I4
+(\n) print                   % print  "\n"
+                             %
+/I1 2 def                    % set    I1, 2
+/I5 I4 I1 mul def            % mul    I5, I4, I1
+                             %
+(Estimated ops: ) print      % print  "Estimated ops: "
+I5 20 string cvs print       % print  I5
+(\n) print                   % print  "\n"
+                             %
+/N1 realtime 1000 div def    % time N1
+                             %
+{ I4 0 eq { exit } if        % REDO:
+  /I4 I4 I3 sub def          % sub    I4, I4, I3
+} loop                       % if     I4, REDO
+                             %
+                             % DONE:
+/N5 realtime 1000 div def    % time   N5
+                             %
+/N2 N5 N1 sub def            % sub    N2, N5, N1
+                             %
+(Elapsed time:  ) print      % print  "Elapsed time:  "
+N2 20 string cvs print       % print  N2
+(\n) print                   % print  "\n"
+                             %
+/N1 I5 def                   % iton   N1, I5
+/N1 N1 N2 div def            % div    N1, N1, N2
+/N2 1000000.0 def            % set    N2, 1000000.0
+/N1 N1 N2 div def            % div    N1, N1, N2
+                             %
+(M op/s:        ) print      % print  "M op/s:        "
+N1 20 string cvs print       % print  N1
+(\n) print                   % print  "\n"
+                             %
+quit                         % end
+
