@@ -26,7 +26,6 @@ typedef struct Stack_Entry {
         void    *generic_pointer;
     } entry;
     Stack_entry_type  entry_type;
-    Stack_entry_flags flags;
     void (*cleanup)(struct Stack_Entry *);
 } Stack_Entry_t;
 

@@ -252,9 +252,6 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
 
     /* Remember the type */
     entry->entry_type = type;
-    /* If we were passed a cleanup function, mark the flag entry
-     * for this as needing cleanup */
-    entry->flags = (cleanup ? STACK_ENTRY_CLEANUP_FLAG : NO_STACK_ENTRY_FLAGS);
     /* Remember the cleanup function */
     entry->cleanup = cleanup;
     /* Store our thing */
@@ -339,7 +336,7 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     }
 
     /* Cleanup routine? */
-    if (entry->flags & STACK_ENTRY_CLEANUP_FLAG) {
+    if (entry->cleanup) {
         (*entry->cleanup) (entry);
     }
 
