@@ -434,15 +434,14 @@ PDB_cond(struct Parrot_Interp *interpreter, const char *command)
     int i, reg_number;
     char str[255];
 
-    /* Allocate new condition */
-    condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
-
-    /* return if no more arguments */
+    /* Return if no more arguments */
     if (!(command && *command)) {
         PIO_eprintf(interpreter, "No condition specified\n");
-        mem_sys_free(condition);
         return NULL;
     }
+
+    /* Allocate new condition */
+    condition = (PDB_condition_t *)mem_sys_allocate(sizeof(PDB_condition_t));
 
     switch (*command) {
         case 'i':
