@@ -68,6 +68,8 @@ sub read_ops
 {
   my ($self, $file) = @_;
 
+  my $ops_file = $file;
+
   open OPS, $file or die "Could not open ops file '$file' ($!)!";
 
   die "Parrot::OpFunc::init(): No file specified!\n" unless defined $file;
@@ -159,7 +161,7 @@ sub read_ops
 
     if (/^(inline\s+)?op\s+([a-zA-Z]\w*)\s*\((.*)\)\s*{/) {
       if ($seen_op) {
-        die "Parrot::OpsFile: Cannot define an op within an op definition!\n";
+        die "$ops_file [$.]: Cannot define an op within an op definition!\n";
       }
 
       $type       = defined($1) ? 'inline' : 'function';
