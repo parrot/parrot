@@ -43,11 +43,7 @@ C<float> object according to 2.1. Built-in Functions.
     }
 
     void class_init () {
-        /* this should be autmatically done - probably */
         if (pass) {
-            enter_nci_method(INTERP, enum_class_PerlNum,
-                    F2DPTR(Parrot_PerlNum_get_repr),
-                    "__repr__", "SIO");
         }
     }
 

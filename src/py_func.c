@@ -354,16 +354,8 @@ static PMC *
 parrot_py_repr(Interp *interpreter, PMC *pmc)
 {
     PMC *res = pmc_new(interpreter, enum_class_PerlString);
-    STRING *repr =  CONST_STRING(interpreter, "__repr__");
-    PMC *meth = VTABLE_find_method(interpreter, pmc, repr);
-    if (!meth) {
-        real_exception(interpreter, NULL, METH_NOT_FOUND,
-                "Method '%Ss' not found", repr);
-    }
-    REG_PMC(2) = pmc;
-    REG_PMC(0) = meth;
-    (void*)VTABLE_invoke(interpreter, meth, NULL);
-    VTABLE_set_string_native(interpreter, res, REG_STR(5));
+    STRING *repr = VTABLE_get_repr(interpreter, pmc);
+    VTABLE_assign_string_native(interpreter, res, repr);
     return res;
 }
 
@@ -715,13 +707,13 @@ integer_divide_int(Interp* interp, PMC* self, INTVAL value, PMC* destination)
 static void
 parrot_py_create_default_meths(Interp *interpreter)
 {
-    STRING *sio = CONST_STRING(interpreter, "SIO");
+    STRING *pio = CONST_STRING(interpreter, "PIO");
     STRING *class = CONST_STRING(interpreter, "object");
 
-    STRING *meth =  CONST_STRING(interpreter, "__repr__");
+    STRING *meth =  CONST_STRING(interpreter, "__get_repr");
 
     parrot_py_object(interpreter, class,
-            F2DPTR(Parrot_default_get_repr), meth, sio);
+            F2DPTR(parrot_py_repr), meth, pio);
 
     mmd_register(interpreter, MMD_DIVIDE,
             enum_class_PerlInt, enum_class_PerlInt,

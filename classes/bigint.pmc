@@ -349,9 +349,6 @@ C<long> object according to 2.1. Built-in Functions.
     void class_init () {
         /* this should be autmatically done - probably */
         if (pass) {
-            enter_nci_method(INTERP, enum_class_BigInt,
-                    F2DPTR(Parrot_BigInt_get_repr),
-                    "__repr__", "SIO");
         }
     }
 

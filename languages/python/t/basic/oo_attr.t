@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -53,6 +53,20 @@ def main():
     c = C()
     c.i=2
     c.f()
+
+main()
+CODE
+
+test(<<'CODE', 'override __repr__');
+
+class C(int):
+    def __repr__(self):
+	return "C(%d)" % self.i
+
+def main():
+    c = C()
+    c.i = 2
+    print `c`
 
 main()
 CODE

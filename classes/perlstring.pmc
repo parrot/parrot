@@ -21,22 +21,23 @@ C<PerlString> extends C<perlscalar> to provide Perl string behaviour.
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
-static STRING*
+static PMC*
 string_lower(Interp *interpreter, PMC *self)
 {
-    return string_downcase(interpreter, PMC_str_val(self));
+    STRING *s = string_downcase(interpreter, PMC_str_val(self));
+    PMC *ret = pmc_new(interpreter, enum_class_PerlString);
+    string_set(interpreter, PMC_str_val(ret), s);
+    return ret;
 }
+
 pmclass PerlString extends perlscalar {
 
     void class_init () {
         /* this should be autmatically done - probably */
         if (pass) {
             enter_nci_method(INTERP, enum_class_PerlString,
-                    F2DPTR(Parrot_PerlString_get_repr),
-                    "__repr__", "SIO");
-            enter_nci_method(INTERP, enum_class_PerlString,
                     F2DPTR(string_lower),
-                    "lower", "SIO");
+                    "lower", "PIO");
         }
     }
 
@@ -415,11 +416,18 @@ When Python mode is enabled does sprintf :(
 
     void modulus (PMC* value, PMC* dest) {
         if (Interp_flags_TEST(INTERP, PARROT_PYTHON_MODE)) {
+            PMC *ar = value;
             /*
-             * SELF is formatstring, value = argument array
+             * SELF is formatstring, value = argument array or item
              */
+            if (value->vtable->base_type != enum_class_FixedPMCArray) {
+                /* not a tuple - make one */
+                ar = pmc_new(INTERP, enum_class_FixedPMCArray);
+                VTABLE_set_integer_native(INTERP, ar, 1);
+                VTABLE_set_pmc_keyed_int( INTERP, ar, 0, value);
+            }
             VTABLE_set_string_native(INTERP, dest,
-                    Parrot_psprintf(INTERP, PMC_str_val(SELF), value));
+                    Parrot_psprintf(INTERP, PMC_str_val(SELF), ar));
             return;
         }
         if (value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {

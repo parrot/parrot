@@ -207,6 +207,7 @@ create_deleg_pmc_vtable(Interp *interpreter, PMC *class, STRING *class_name)
              * slot
              */
             LVALUE_CAST(void **,vtable)[i] = ((void**)object_vtable)[i];
+            /* printf("deleg_pmc found '%s'\n", meth); */
         }
         else {
             /*
@@ -1154,10 +1155,12 @@ find_method_direct(Parrot_Interp interpreter, PMC *class,
             pos = string_str_index(interpreter, isa,
                     CONST_STRING(interpreter, " "), start);
             if (pos == -1) {
-                return Parrot_find_global(interpreter,
+                method = Parrot_find_global(interpreter,
                         string_substr(interpreter, isa, start,
                             isa->strlen - start, NULL, 0),
                         method_name);
+                if (method)
+                    return method;
             }
             /* TODO */
             break;

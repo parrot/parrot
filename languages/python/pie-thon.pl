@@ -51,6 +51,13 @@ my %builtins = (
     tuple => 1,
 );
 
+my %vtables = (
+    __iter__ => '__get_iter',
+    __repr__ => '__get_repr',
+    __str__ => '__get_string',
+    __cmp__ => 'MMD_CMP',
+);
+
 # the new way type system
 my %type_map = (
     bool  => 'Py_bool',
@@ -214,15 +221,19 @@ sub New_func {
     my ($n, $arg, $cmt) = @_;
     my $nst = "";
     my $ns = $namespace{$arg};
+    my $real_name = $arg;
     if ($ns) {
 	$nst = qq!.namespace [$ns]!;
+	if ($vtables{$arg}) {
+	    $real_name = $vtables{$arg};
+	}
     }
     print <<EOC;
 .end		# $cur_func
 .namespace [""]
 
 $nst
-.sub $arg prototyped $cmt
+.sub $real_name prototyped $cmt
 EOC
     my (@params, $k, $v, $params);
     while ( ($k, $v) = each(%{$def_arg_names{$arg}})) {
@@ -700,10 +711,18 @@ EOC
     }
     if ($cur_func =~ /Build::(\w+)/) {
 	$namespace{$f} = $classes{$1};
-	print <<EOC;
+	if ($vtables{$f}) {
+	    print <<EOC;
+	# $namespace{$f} => $vtables{$f}
+EOC
+	    #$namespace{$f} => $vtables{$f}
+	}
+	else {
+	    print <<EOC;
 	# $namespace{$f}
 	# addattribute P5, "$f"
 EOC
+	}
     }
     else {
 	$pir_functions{$f} = 1;
@@ -720,9 +739,11 @@ sub binary
     {
 	my $nl = promote($l);
 	$n = temp($t = 'P');
+	my $nr = $r->[1];
+	$nr = promote($r) if $r->[2] eq 'S';
 	print <<"EOC";
 	$n = new $DEFVAR $cmt
-	$n = $nl $op $r->[1]
+	$n = $nl $op $nr
 EOC
     }
     push @stack, [-1, $n, $t];
@@ -1022,8 +1043,6 @@ sub print_stack {
 sub ret_val {
     my $a = shift;
     my %rets = (
-	'__repr__' => 'S',      # XXX don't - can't be overriden then
-	'lower'    => 'S',
 	'id'       => 'I',
     );
     return $rets{$a} if defined $rets{$a};
@@ -1278,11 +1297,11 @@ sub UNARY_CONVERT
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     my $p = promote($tos);
-    my $s = temp('S');
+    my $s = temp('P');
     print <<EOC;
-	$s = $p."__repr__"() $cmt
+	$s = $p."__get_repr"() $cmt
 EOC
-    push @stack, [-1, $s, 'S'];
+    push @stack, [-1, $s, 'P'];
 }
 
 sub BUILD_TUPLE
@@ -1563,6 +1582,9 @@ EOC
 EOC
 	$obj = $o;
     }
+    if ($vtables{$c}) {
+	$c = $vtables{$c};
+    }
     print <<EOC;
 	$attr = getattribute $obj, "$c" $cmt
 EOC
@@ -1730,3 +1752,5 @@ sub DELETE_FAST {
 	\t $cmt
 EOC
 }
+
+# vim: sw=4 tw=70:

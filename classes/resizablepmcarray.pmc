@@ -29,9 +29,6 @@ pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
         /* this should be autmatically done - probably */
         if (pass) {
             enter_nci_method(INTERP, enum_class_ResizablePMCArray,
-                    F2DPTR(Parrot_ResizablePMCArray_get_string),
-                    "__repr__", "SIO");
-            enter_nci_method(INTERP, enum_class_ResizablePMCArray,
                     F2DPTR(Parrot_ResizablePMCArray_push_pmc),
                     "append", "vIOP");
         }
@@ -198,6 +195,10 @@ Creates and returns a copy of the array.
         PMC *copy = SUPER();
         PMC_int_val2(copy) = PMC_int_val(SELF);
         return copy;
+    }
+
+    STRING* get_repr () {
+        return SELF.get_string();
     }
 
     STRING* get_string () {
