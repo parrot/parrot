@@ -10,17 +10,14 @@ void Parrot_push_i(struct Perl_Interp *interpreter) {
   struct IRegChunk *chunk_base;
 
   chunk_base = CHUNK_BASE(interpreter->int_reg);
-  printf("Chunk base is %x for %x\n", chunk_base, interpreter->int_reg);
   /* Do we have any slots left in the current chunk? */
   if (chunk_base->free) {
-    printf("Free was %i\n", chunk_base->free);
     interpreter->int_reg = &chunk_base->IReg[chunk_base->used++];
     chunk_base->free--;
   }
   /* Nope, so plan B time. Allocate a new chunk of integer register frames */
   else {
     struct IRegChunk *new_chunk;
-    printf("Allocating a new piece\n");
     new_chunk = Allocate_Aligned(sizeof(struct IRegChunk));
     new_chunk->used = 1;
     new_chunk->free = FRAMES_PER_INT_REG_CHUNK - 1;
