@@ -1150,6 +1150,7 @@ testclean :
 	$(RM_F) t/op/*.pasm t/op/*.imc
 	$(RM_F) t/op/*.pbc t/op/*.out
 	$(RM_F) t/op/*.o t/op/*.stabs.s
+	$(RM_F) t/library/*.imc t/library/*.pbc
 	$(RM_F) t/pmc/*.pasm t/pmc/*.imc t/pmc/*.pbc
 	$(RM_F) t/pmc/*.out t/pmc/*.o t/pmc/*.stabs.s
 	$(RM_F) t/stress/*.pasm t/stress/*.pbc
