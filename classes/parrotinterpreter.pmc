@@ -7,6 +7,11 @@
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
+ *     getinterp P0
+ *     set P1, P0[.IGLOBALS_*]	# access interpreter globals
+ *     set I0, P0[x]		# interpinfo I0, x
+ *     set I0, P0[-1]		# get interpreter flags
+ *     set P0[-1], x		# set flags on interpreter
  *  References:
  */
 
@@ -21,7 +26,7 @@ pmclass ParrotInterpreter {
 	PMC_data(SELF) = new_interp;
     }
     void set_integer_native (INTVAL value) {
-        SELF->cache.int_val = value;
+	SELF->cache.int_val = value;
     }
 
     void* invoke (void* next) {
@@ -34,13 +39,49 @@ pmclass ParrotInterpreter {
 	return next;
     }
 
-    INTVAL type () {
-	return enum_class_ParrotInterpreter;
-    }
-
     STRING* name() {
 	return whoami;
     }
 
+    PMC* get_pmc_keyed_int(INTVAL key) {
+	struct Parrot_Interp * new_interp =
+	    (struct Parrot_Interp *)PMC_data(SELF);
+	if (key >= 0 && key < IGLOBALS_SIZE)
+	    return VTABLE_get_pmc_keyed_int(new_interp,
+		    new_interp->iglobals, key);
+	return NULL;
+    }
+    INTVAL get_integer_keyed_int(INTVAL key) {
+	struct Parrot_Interp * new_interp =
+	    (struct Parrot_Interp *)PMC_data(SELF);
+	switch (key) {
+	    case -1:
+		return (INTVAL) new_interp->flags;
+	    default:
+		return interpinfo(new_interp, key);
+	}
+    }
 
+    void set_integer_keyed_int(INTVAL key, INTVAL val) {
+	struct Parrot_Interp * new_interp =
+	    (struct Parrot_Interp *)PMC_data(SELF);
+	INTVAL allowed;
+
+	switch (key) {
+	    case -1:	/* set interpreter flags */
+		allowed =
+		    PARROT_DEBUG_FLAG |
+		    PARROT_TRACE_FLAG |
+		    PARROT_BOUNDS_FLAG |
+		    PARROT_PROFILE_FLAG |
+		    PARROT_PREDEREF_FLAG |
+		    PARROT_JIT_FLAG   |
+		    PARROT_CGOTO_FLAG  |
+		    PARROT_GC_DEBUG_FLAG |
+		    PARROT_SWITCH_FLAG;
+		Interp_flags_CLEAR(new_interp, allowed);
+		Interp_flags_SET(new_interp, val & allowed);
+		break;
+	}
+    }
 }

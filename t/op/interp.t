@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 6;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -47,4 +47,63 @@ output_like(<<'CODE', <<'OUTPUT', "interp - warnings");
 CODE
 /^nada:Use of uninitialized value in integer context at.*/
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "getinterp");
+    .include "interpinfo.pasm"
+    getinterp P0
+    print "ok 1\n"
+    set I0, P0[.INTERPINFO_ACTIVE_PMCS]
+    interpinfo I1, .INTERPINFO_ACTIVE_PMCS
+    eq I0, I1, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "access argv");
+    .include "iglobals.pasm"
+    getinterp P1
+    set P2, P1[.IGLOBALS_ARGV_LIST]
+    set I0, P0
+    set I1, P2
+    eq I0, I1, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    set S0, P0[0]
+    set S1, P2[0]
+    eq S0, S1, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "runinterp - set flags");
+    .include "interpflags.pasm"
+    new P0, .ParrotInterpreter
+    print "calling\n"
+    set P0[-1], .INTERPFLAG_PARROT_TRACE_FLAG
+    runinterp P0, foo
+    print "ending\n"
+    end
+    print "bad things!\n"
+foo:
+    print "In 2\n"
+    end
+CODE
+/calling\n
+PC=\d+.*\n
+In\s2\n
+PC=\d+.*\n
+ending\n/x
+OUTPUT
+
 1;

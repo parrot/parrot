@@ -25,6 +25,7 @@ init_world(Interp *interpreter)
 
     PMC *iglobals;
     PMC *classname_hash;
+    PMC *self;
 
     string_init();              /* Set up the string subsystem */
 
@@ -48,6 +49,10 @@ init_world(Interp *interpreter)
         VTABLE_set_pmc_keyed_int(interpreter, iglobals, i, NULL);
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             (INTVAL)IGLOBALS_CLASSNAME_HASH, classname_hash);
+    self = pmc_new_noinit(interpreter, enum_class_ParrotInterpreter);
+    PMC_data(self) = interpreter;
+    VTABLE_set_pmc_keyed_int(interpreter, iglobals,
+            (INTVAL) IGLOBALS_INTERPRETER, self);
 }
 
 /*

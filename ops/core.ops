@@ -4648,6 +4648,10 @@ inline op stringinfo(out INT, in STR, in INT) {
 
 Run the code starting at offset $2 within interpreter $1.
 
+=item B<getinterp>(out PMC)
+
+Get the current ParrotInterpreter.
+
 =cut
 
 op runinterp(in PMC, in INT) {
@@ -4656,6 +4660,12 @@ op runinterp(in PMC, in INT) {
   Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
   new_interp->code = interpreter->code;
   runops(new_interp, REL_PC + $2);
+  goto NEXT();
+}
+
+op getinterp(out PMC) {
+  $1 = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
+         IGLOBALS_INTERPRETER);
   goto NEXT();
 }
 

@@ -178,17 +178,22 @@ typedef struct Parrot_Interp {
 /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
 /* 2:   PMC *Argv;                   list of argv */
 /* 3:   PMC *Env;                    hash_like Env PMC */
+/* 4:   PMC *ParrotInterpreter       that's me */
     int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
 } Interp;
 
+/* &gen_from_enum(iglobals.pasm) */
 typedef enum {
     IGLOBALS_CLASSNAME_HASH,
     IGLOBALS_COMPREG_HASH,
     IGLOBALS_ARGV_LIST,
     IGLOBALS_ENV_HASH,
+    IGLOBALS_INTERPRETER,
 
     IGLOBALS_SIZE
 } iglobals_enum;
+/* &end_gen */
+
 /*
  * Macros to make accessing registers more convenient/readable.
  */
