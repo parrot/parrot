@@ -10,7 +10,7 @@ asm=$(PERL) ..${slash}..${slash}assemble.pl
 all: imcc
 
 test:
-        $(PERL) t/harness
+	$(PERL) t/harness
 
 imcc:
 	cd ..${slash}imcc && $(MAKE)
