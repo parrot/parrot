@@ -69,13 +69,13 @@ inline op does(out INT, in PMC, in STR) {
 =item B<newclass>(out PMC, in STR)
 
 Creates a new Parrot-style class, named $2, and puts the new PMC for it
-into $1. (This
-is a real out--the contents of $1 is ignored, and the pointer for the new
-PMC is put in there) 
+into $1. (This is a real out--the contents of $1 are ignored and the 
+pointer for the new PMC is put in there). 
 
 =cut
 
 inline op newclass(out PMC, in STR) {
+  $1 = Parrot_new_class(interpreter, $2);
   goto NEXT();
 }
 
@@ -117,16 +117,6 @@ op subclass(out PMC, in STR) {
   }
   $1 = Parrot_single_subclass(interpreter, class, NULL);
   goto NEXT();
-}
-
-=item B<newclass>(out PMC, in STR)
-
-Create a new base class named $2
-
-=cut
-
-inline op newclass(out PMC, in STR) {
-  $1 = Parrot_new_class(interpreter, $2)
 }
 
 =item B<findclass>(out INT, in STR)
