@@ -265,3 +265,5 @@ void freeze(visit_info* info)
 void thaw  (visit_info* info)
 void thawfinish (visit_info* info)
 void visit (visit_info* info)
+
+void share()

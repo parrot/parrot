@@ -99,9 +99,13 @@ pmclass TQueue need_ext {
         QUEUE *queue = PMC_data(SELF);
 
         /*
-         * TODO: if item isn't shared nor const, then make
+         * if item isn't shared nor const, then make
          *       a shared item
          */
+        if (!(item->vtable->flags &
+                    (VTABLE_IS_CONST_FLAG | VTABLE_IS_SHARED_FLAG)))
+            VTABLE_share(INTERP, item);
+
         entry->data = item;
         entry->type = QUEUE_ENTRY_TYPE_NONE;
         /* s. tsq.c:quene_push */

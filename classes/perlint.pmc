@@ -20,6 +20,14 @@ pmclass PerlInt extends perlscalar {
         SELF->cache.int_val = 0;
     }
 
+    void share () {
+	/*
+	 * assume that the access to an int is atomic
+	 */
+	if (sizeof(INTVAL) != sizeof(int))
+	    SUPER();
+    }
+
     FLOATVAL get_number () {
         return (FLOATVAL)SELF->cache.int_val;
     }

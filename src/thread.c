@@ -18,6 +18,7 @@
 #include "parrot/parrot.h"
 #include <assert.h>
 
+static int running_threads;
 
 void Parrot_really_destroy(int exit_code, void *interpreter);
 /*
@@ -256,6 +257,9 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
             retval = parent_ret;
         }
         interpreter_array[tid] = NULL;
+        running_threads--;
+        if (Interp_flags_TEST(parent, PARROT_DEBUG_FLAG))
+            fprintf(stderr, "running threads %d\n", running_threads);
         Parrot_really_destroy(0, interpreter);
         CLEANUP_POP(1);
         /*
@@ -400,11 +404,16 @@ pt_add_to_interpreters(Parrot_Interp interpreter, Parrot_Interp new_interp)
         interpreter->thread_data->tid = 0;
         new_interp ->thread_data->tid = 1;
         n_interpreters = 2;
+
+        running_threads = 2;
         return;
     }
     /*
      * look for an empty slot
      */
+    running_threads++;
+    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+        fprintf(stderr, "running threads %d\n", running_threads);
     for (i = 0; i < n_interpreters; ++i) {
         if (interpreter_array[i] == NULL) {
             interpreter_array[i] = new_interp;
