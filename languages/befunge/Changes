@@ -1,0 +1,15 @@
+Revision history for Befunge-93 interpreter written for Parrot.
+
+0.03  Mon Sep  9 21:26:11 CEST 2002
+        - taking advantage of Parrot's 'chr' instruction, getting rid
+          of Clinton Pierce's hack.
+
+0.02  Mon Aug 19 21:24:05 CEST 2002
+        - fixing bug when loading a file not properly newline-terminated.
+
+0.01  Fri Aug 16 20:59:10 CEST 2002
+	- original version.
+        - every instruction is implemented, and tested.
+        - input instructions ( '&' and '~') are kinda buggy.
+        - a "verbose" flag (-v) can help you debug your Befunge code
+          (as if it were hard to debug Befunge - pfff! :o) )

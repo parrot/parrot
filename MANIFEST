@@ -270,6 +270,7 @@ languages/BASIC/stackops.pasm
 languages/BASIC/tokenize.pasm
 languages/BASIC/wumpus.bas
 languages/Befunge-93/Makefile
+languages/Befunge-93/Changes
 languages/Befunge-93/README
 languages/Befunge-93/befunge.pasm
 languages/Befunge-93/befunge.pbc
@@ -600,6 +601,7 @@ t/pmc/pmc.t
 t/pmc/sub.t
 t/src/basic.t
 t/src/intlist.t
+t/src/sprintf.t
 test_main.c
 tools/dev/check_source_standards.pl
 tools/dev/genrpt.pl

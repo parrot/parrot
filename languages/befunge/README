@@ -1,15 +1,14 @@
 DESCRIPTION
 -----------
-This is a Befunge interpreter written in Parrot assembler, version 0.01
+This is a Befunge interpreter written in Parrot assembler, version 0.03
 
 This interpreter should be Befunge-93 compliant. This means the
 playfield is limited to 80x25 and can hold *only bytes*. This means
 that you can't fetch/store numbers greater than 255 or less than 0 in
-the torus.
+the torus (even if I do not check for over/underflow - for now).
 
 You should compile the files with:
 
-     $ make build
      $ make test
 
 Then you can run your Befunge program with: 
@@ -31,7 +30,8 @@ The files are the following:
                         instructions
         Makefile        a tiny, little Makefile to help (me) during
                         developement
-        test.bef        a befunge script that test almost all the instructions
+        test.bef        a befunge script that test almost all the
+                        instructions (and is even self-modifying!)
 
 
 BUGS
@@ -43,7 +43,7 @@ BUGS
 TODO
 ----
 * more error checking
-* better rand()/chr() methods
+* better rand() methods
 * more tests (with Perl and Test::Harness)
 * debugging options
 * use an array of arrays instead of an array of strings
@@ -72,6 +72,7 @@ COPYRIGHT
 ---------
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
 
 SEE ALSO
 --------

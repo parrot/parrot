@@ -1,19 +1,3 @@
-# Implement the chr() function.
-# Generic method. 
-# Parrot stack: 
-#   before:     ... i
-#   after:      ... c
-# c = chr(i)        
-IO_CHR:
-        pushi
-        pushs
-        restore I10
-        substr S10, S3, I10, 1
-        save S10
-        pops
-        popi
-        ret
-       
 # String mode.
 # Befunge stack:        
 #   before:     ...
@@ -106,11 +90,13 @@ IO_OUTPUT_INT:
 #   after:      ...
 # writechar( chr(i) )
 IO_OUTPUT_CHAR:
+        pushi
         pushs
         bsr POP
-        bsr IO_CHR
-        restore S10
+        restore I10
+        chr S10, I10
         print S10
+        popi
         pops
         branch MOVE_PC
                              
@@ -148,8 +134,8 @@ IO_PUT_VALUE:
         bsr POP
         restore I10             # offset
         bsr POP
-        bsr IO_CHR
-        restore S11             # char to store
+        restore I20
+        chr S11, I20            # char to store
 	length I12, S10
 	set S13, ""             # First part
 	set S12, ""             # Second part
