@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -637,4 +637,23 @@ CODE
 4123
 4123
 4143
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "or_p_p_p");
+        new P0, .PerlInt
+        new P1, .PerlInt
+        new P2, .PerlInt
+        set P0, 10
+        set P1, 20
+        or P2, P1, P0
+        print P2
+        print "\n"
+        set P1, 0
+        or P2, P1, P0
+        print P2
+        print "\n"
+        end
+CODE
+20
+10
 OUTPUT
