@@ -12,14 +12,18 @@
 
 #if !defined(PARROT_INTERPRETER_H_GUARD)
 #define PARROT_INTERPRETER_H_GUARD
+
+#if defined(PARROT_IN_CORE)
+
 #include "parrot/register.h"
 #include "parrot/parrot.h"
 
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
-
-
+typedef struct warnings_t {
+	INTVAL classes;
+} * Warnings;
 
 #if 0
 typedef STRING_FUNCS * (str_func_t)();
@@ -68,6 +72,9 @@ struct Parrot_Interp {
     INTVAL flags;				          /* Various interpreter flagBut whBut what 
                                              that signal that runops
                                              should do something */
+	
+	Warnings warns;						   /* Keeps track of what warnings have been activated */
+
     ProfData* profile;                     /* The array where we keep the profile counters */
 
     INTVAL resume_flag;
@@ -81,13 +88,6 @@ struct Parrot_Interp {
     UINTVAL string_count;
     UINTVAL pmc_count;
 };
-
-#define PARROT_DEBUG_FLAG    0x01  /* We're debugging */
-#define PARROT_TRACE_FLAG    0x02  /* We're tracing execution */
-#define PARROT_BOUNDS_FLAG   0x04  /* We're tracking byte code bounds */
-#define PARROT_PROFILE_FLAG  0x08  /* We're gathering profile information */
-#define PARROT_PREDEREF_FLAG 0x10  /* We're using the prederef runops */
-#define PARROT_JIT_FLAG      0x20  /* We're using the jit runops */
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
@@ -104,6 +104,18 @@ void
 runops(struct Parrot_Interp *, struct PackFile *, size_t offset);
 
 VAR_SCOPE opcode_t* (*run_native)(struct Parrot_Interp *interpreter, opcode_t *cur_opcode, opcode_t *start_code);
+
+#endif
+
+/* These should be visible to embedders. */
+
+/* General flags */
+#define PARROT_DEBUG_FLAG    0x01  /* We're debugging */
+#define PARROT_TRACE_FLAG    0x02  /* We're tracing execution */
+#define PARROT_BOUNDS_FLAG   0x04  /* We're tracking byte code bounds */
+#define PARROT_PROFILE_FLAG  0x08  /* We're gathering profile information */
+#define PARROT_PREDEREF_FLAG 0x10  /* We're using the prederef runops */
+#define PARROT_JIT_FLAG      0x20  /* We're using the jit runops */
 
 #endif
 

@@ -40,6 +40,12 @@ Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_flag flag, Parrot_flag_
     interpreter->flags |= flag;
 }
 
+void
+Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc) {
+	char* msg=mem_sys_allocate(32);
+	PARROT_WARNINGS_on(interpreter, wc);
+}
+
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, char *filename) {
     /* XXX This ugly mess ought to be cleanupable. */

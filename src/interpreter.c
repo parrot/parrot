@@ -466,14 +466,16 @@ make_interpreter(INTVAL flags) {
     
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
+	interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
+	PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     interpreter->pmc_count = 0;
     interpreter->string_count = 0;
 
     /* Set up defaults for line/package/file */
     interpreter->current_line = 0;
-    interpreter->current_file = NULL;
-    interpreter->current_package = NULL;
+    interpreter->current_file = string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
+    interpreter->current_package = string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
     
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));

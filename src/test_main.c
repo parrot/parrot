@@ -73,13 +73,19 @@ parseflags(struct Parrot_Interp *interpreter, int *argc, char **argv[]) {
            case 'P':
                setopt(PARROT_PREDEREF_FLAG); break;
            case 't':
-               setopt(PARROT_TRACE_FLAG); break;
+				setopt(PARROT_TRACE_FLAG); break;
            case 'd':
-               setopt(PARROT_DEBUG_FLAG); break;
+				setopt(PARROT_DEBUG_FLAG); break;
            case 'h':
-               usage(); break;
+				usage(); break;
            case 'v':
-               version(); break;
+				version(); break;
+		   case 'w':
+				Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG); break;
+
+		   case '.':
+			   fgetc(stdin); break;
+				
            case '-':
                (*argc)--;
                (*argv)++;

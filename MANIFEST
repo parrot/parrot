@@ -93,6 +93,7 @@ include/parrot/io.h
 include/parrot/jit.h
 include/parrot/key.h
 include/parrot/memory.h
+include/parrot/misc.h
 include/parrot/op.h
 include/parrot/oplib.h
 include/parrot/packfile.h
@@ -109,6 +110,7 @@ include/parrot/string.h
 include/parrot/string_funcs.h
 include/parrot/trace.h
 include/parrot/unicode.h
+include/parrot/warnings.h
 interpreter.c
 io.ops
 io/TODO
@@ -200,6 +202,7 @@ make.pl
 make_vtable_ops.pl
 manicheck.pl
 memory.c
+misc.c
 obscure.ops
 ops2c.pl
 ops2pm.pl
@@ -250,3 +253,4 @@ testparrotsizes_c.in
 trace.c
 vtable.tbl
 vtable_h.pl
+warnings.c
