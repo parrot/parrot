@@ -67,19 +67,21 @@ C<Parrot_instantiate_object()>.
     }
 
     void mark() {
-        Buffer *trace_buf = PMC_data(SELF);
+        SLOTTYPE *attrib_array = PMC_data(SELF);
         UINTVAL i;
 
         /* mark saved registers area */
         Parrot_delegate_mark(INTERP, SELF);
 
-        if (trace_buf) {
-            PMC **cur_pmc = PObj_bufstart(trace_buf);
+        if (attrib_array) {
+            PMC *cur_pmc;
 
-            pobject_lives(interpreter, trace_buf);
-            for (i = 0; i < ATTRIB_COUNT(SELF); i++) {
-                if (cur_pmc[i]) {
-                    pobject_lives(interpreter, (PObj *)cur_pmc[i]);
+            pobject_lives(interpreter, GET_CLASS(attrib_array, SELF));
+            pobject_lives(interpreter, attrib_array);
+            for (i = 1; i < ATTRIB_COUNT(SELF); i++) {
+                cur_pmc = get_attrib_num(attrib_array, i);
+                if (cur_pmc) {
+                    pobject_lives(interpreter, (PObj *)cur_pmc);
                 }
             }
         }

@@ -517,12 +517,12 @@ Parrot_instantiate_object(Parrot_Interp interpreter, PMC *object)
     /* Build the array that hangs off the new object */
     new_object_array = new_attrib_array();
     PMC_data(object) = new_object_array;
-    /* set_attrib_flags(object); */
-    PObj_custom_mark_SET(object);
 
-    /* Presize it */
+    /* First presize it */
     set_attrib_array_size(new_object_array,
                           attrib_count + POD_FIRST_ATTRIB);
+    /* then activate marking it - set_attrib_flags(object); */
+    PObj_custom_mark_SET(object);
     /* 0 - class PMC, 1 - class name */
     SET_CLASS(new_object_array, object, class);
     set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);

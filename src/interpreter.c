@@ -825,55 +825,6 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
 
 /*
 
-=item C<static void
-runops_ex(struct Parrot_Interp *interpreter, size_t offset)>
-
-Handles intersegment jumps from C<eval>ed code.
-
-=cut
-
-*/
-
-static void
-runops_ex(struct Parrot_Interp *interpreter, size_t offset)
-{
-    interpreter->resume_flag |= RESUME_ISJ;
-
-    while (interpreter->resume_flag & RESUME_ISJ) {
-        interpreter->resume_flag &= ~RESUME_ISJ;
-        runops_int(interpreter, offset);
-
-        if (interpreter->resume_flag & RESUME_ISJ) {
-            /* inter segment jump
-             * resume_offset = entry of name in current const_table
-             */
-            struct PackFile_Constant * c;
-            struct PackFile_FixupEntry *fe;
-            struct PackFile *pf = interpreter->code;
-            char *s;
-
-            if ((int)interpreter->resume_offset >= PF_NCONST(pf) ||
-                (int)interpreter->resume_offset < 0)
-                internal_exception(1, "branch_cs: illegal resume offset");
-            c = PF_CONST(pf, interpreter->resume_offset);
-            if (c->type != PFC_STRING)
-                internal_exception(1, "branch_cs: not a string\n");
-            s = c->u.string->strstart;
-            fe = PackFile_find_fixup_entry(interpreter, enum_fixup_label, s);
-            if (!fe)
-                internal_exception(1, "branch_cs: fixup not found\n");
-            offset = fe->offset;
-            Parrot_switch_to_cs(interpreter, fe->seg, 1);
-            if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
-                PIO_eprintf(interpreter, "*** Resume at seg %s ofs %d\n",
-                        fe->seg->base.name, (int)offset);
-            }
-        }
-    }
-}
-
-/*
-
 =item C<void
 runops(struct Parrot_Interp *interpreter, size_t offset)>
 
@@ -913,7 +864,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
                 Parrot_floatval_time() - profile->starttime;
         }
     }
-    runops_ex(interpreter, offset);
+    runops_int(interpreter, offset);
     /*
      * pop off exception and put it onto the free list
      * s. above

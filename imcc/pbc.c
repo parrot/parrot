@@ -402,7 +402,8 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
             SymReg *r[IMCC_MAX_REGS];
             char *glabel;
 
-            debug(interpreter, DEBUG_PBC_FIXUP, "inter_cs found for '%s'\n", addr->name);
+            debug(interpreter, DEBUG_PBC_FIXUP,
+                    "inter_cs found for '%s'\n", addr->name);
             /* find symbol */
             if (!find_label_cs(interpreter, addr->name))
                 debug(interpreter, DEBUG_PBC_FIXUP,
@@ -410,7 +411,8 @@ store_labels(struct Parrot_Interp *interpreter, IMC_Unit * unit, int *src_lines,
                         addr->name);
             glabel = addr->name;
             /* append inter_cs jump */
-            sprintf(buf, "_%cisc_%d", IMCC_INTERNAL_CHAR, globals.inter_seg_n++);
+            sprintf(buf, "_%cisc_%d", IMCC_INTERNAL_CHAR,
+                    globals.inter_seg_n++);
             addr->name = str_dup(buf);
             INS_LABEL(unit, addr, 1);
             /* this is the new location */

@@ -184,13 +184,13 @@ inline op branch_cs (in STR) :base_loop,check_event {
     char * label = string_to_cstring(interpreter, $1);
     struct PackFile_FixupEntry *fe = PackFile_find_fixup_entry(interpreter,
 	    enum_fixup_label, label);
-    string_cstring_free(label);
     if (!fe)
-	interpreter->resume_offset = -1;
+	internal_exception(1, "branch_cs: fixup for '%s' not found\n", label);
     else {
 	interpreter->resume_offset = fe->offset;
         Parrot_switch_to_cs(interpreter, fe->seg, 1);
     }
+    string_cstring_free(label);
     interpreter->resume_flag = 2;
     goto ADDRESS(0);
 }
