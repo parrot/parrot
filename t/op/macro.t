@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 15;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
@@ -147,3 +147,55 @@ output_is(<<'CODE', 'foo', "constant defined, used in a macro call");
   .answer(.FOO)
   end
 CODE
+
+open FOO, ">macro.tempfile";
+print FOO <<'ENDF';
+  set S0, "Betelgeuse\n"
+ENDF
+close FOO;
+
+output_is(<<"CODE", <<OUTPUT, "basic include macro");
+.include "macro.tempfile"
+  print S0
+
+  set S0, "Rigel"
+.include "macro.tempfile"
+  print S0
+  end
+CODE
+Betelgeuse
+Betelgeuse
+OUTPUT
+
+
+open FOO, ">macro.tempfile";   # Clobber previous
+print FOO <<'ENDF';
+  .macro multiply(A,B) 
+    new P0, .PerlNum
+    set P0, .A
+    new P1, .PerlNum
+    set P1, .B
+    new P2, .PerlNum
+    mul P2, P1, P0
+  .endm
+ENDF
+close FOO;
+
+output_is(<<"CODE", <<OUTPUT, "include a file defining a macro");
+.include "macro.tempfile"
+  .multiply(12,13)
+  print P2
+  print "\\n"
+  end
+CODE
+156
+OUTPUT
+
+open FOO, ">macro.tempfile";   # Clobber previous
+close FOO;
+unlink("macro.tempfile");
+1;
+
+
+
+
