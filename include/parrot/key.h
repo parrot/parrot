@@ -17,6 +17,7 @@ typedef enum {
   enum_key_int,
   enum_key_num,
   enum_key_string,
+  enum_key_pmc,
   enum_key_max
 } KEY_TYPE;
 
@@ -26,6 +27,7 @@ struct _key_pair {
     INTVAL int_val;
     FLOATVAL num_val;
     STRING* struct_val;
+    PMC* pmc_val;
   } cache;
 };
 
@@ -44,12 +46,10 @@ KEY* key_clone(struct Parrot_Interp *interpreter, KEY *key);
 INTVAL key_size(struct Parrot_Interp *interpreter, KEY *key);
 void key_set_size(struct Parrot_Interp *interpreter, KEY *key, INTVAL size);
 void key_destroy(struct Parrot_Interp *interpreter, KEY *key);
-INTVAL   key_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
-FLOATVAL key_element_value_n(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
-STRING*  key_element_value_s(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
-void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, INTVAL value);
-void key_set_element_value_n(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, FLOATVAL value);
-void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, STRING* value);
+KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
+KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* index);
+void key_set_element_value_i(struct Parrot_Interp *interpreter, KEY *key, INTVAL index, KEY_PAIR* value);
+void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY *key, STRING* index, KEY_PAIR* value);
 void key_chop(struct Parrot_Interp *interpreter, KEY *key);
 void key_inc(struct Parrot_Interp *interpreter, KEY *key, INTVAL index);
 
