@@ -24,9 +24,9 @@ To prepare a release:
 
     3.  cvs commit.
 
-    5.  make release VERSION=<version>
+    5.  make release
 
-    6.  untar ../parrot-<version>.tar.gz into another area
+    6.  untar parrot-<version>.tar.gz into another area
 
     7.  Make sure everything works--Configure, make and 
         make fulltest.  Check the Tinderbox and make sure that 
