@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 53;
+use Parrot::Test tests => 58;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -947,6 +947,173 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-logical");
+	new P0, PerlUndef
+	new P1, PerlUndef
+	new P2, PerlInt
+
+# undef or undef = 0
+	or P0, P1, P1
+	print P0
+
+# undef and undef = 0
+	and P0, P1, P1
+	print P0
+
+# undef or 1 = 1
+	set P2, 349
+	or P0, P1, P2
+	print P0
+
+# undef and 1 = 0
+	and P0, P1, P2
+	print P0
+
+# not undef = 1
+	not P0, P1
+	print "x"
+	print P1
+	print "y"
+	print P0
+	print "z"
+	print "\\n" 
+	end
+CODE
+0010xy1z
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-add");
+@{[ $fp_equality_macro ]}
+	new P1, PerlUndef
+
+# undef + perlundef 
+	new P0, PerlUndef
+	add P0, P1, P1
+	print P0
+	print "\\n" 
+
+# undef + perlint 
+
+	new P0, PerlUndef
+	new P2, PerlInt
+	set P2, 947
+	add P0, P1, P2
+	print P0
+	print "\\n" 
+
+# undef + perlnum 
+
+	new P0, PerlUndef
+	new P2, PerlNum
+	set P2, 385.623
+	add P0, P1, P2
+	fp_eq P0, 385.623, OK
+
+	print "not" 
+OK:	print "ok"
+	print "\\n"
+
+	end
+CODE
+0
+947
+ok
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-subtract");
+@{[ $fp_equality_macro ]}
+	new P0, PerlUndef
+	new P1, PerlUndef
+
+# undef - undef
+	sub P0, P1, P1
+	print P0
+	print "\\n"
+
+# undef - perlint 
+	new P2, PerlInt
+	set P2, 947
+	sub P0, P1, P2
+	print P0
+	print "\\n" 
+
+# undef - perlnum 
+
+	new P2, PerlNum
+	set P2, 385.623
+	sub P0, P1, P2
+	fp_eq P0, -385.623, OK2
+
+	print "not" 
+OK2:	print "ok"
+	print "\\n"
+
+
+	end
+CODE
+0
+-947
+ok
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-multiply");
+@{[ $fp_equality_macro ]}
+
+	new P0, PerlUndef
+	new P1, PerlUndef
+	new P2, PerlInt
+
+# Undef * Undef
+	mul P0, P1, P1
+	print P0
+	print "\\n"
+
+# Undef * PerlInt
+	set P2, 983
+	mul P0, P1, P2
+	print P0
+	print "\\n"
+
+# Undef * PerlNum
+	new P2, PerlNum
+	set P2, 983.3
+	mul P0, P1, P2
+	print P0
+	print "\\n"
+
+	end
+CODE
+0
+0
+0
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "undef-divide");
+@{[ $fp_equality_macro ]}
+
+	new P0, PerlUndef
+	new P1, PerlUndef
+	new P2, PerlInt
+
+# Undef / PerlInt
+	set P2, 19
+	div P0, P1, P2
+	print P0
+	print "\\n"
+
+# Undef / PerlNum
+	new P2, PerlNum
+	set P2, 343.8
+	div P0, P1, P2
+	print P0
+	print "\\n"
+
+	end
+CODE
+0
+0
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', "undef-logical");
