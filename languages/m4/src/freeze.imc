@@ -28,7 +28,7 @@ Dump a state file.
 =cut
 
 .sub produce_frozen_state 
-  .param Hash   state
+  .param pmc        state
   .param string     frozen_file    
 
   .local pmc symtab
@@ -79,7 +79,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
 =cut
 
 .sub reload_frozen_state 
-  .param Hash   state    
+  .param pmc        state    
   .param string     frozen_file    
 
   # Read the file into the string file

@@ -28,7 +28,7 @@ Initialise all builtin and predefined macros.
 =cut
 
 .sub builtin_tab_init 
-  .param Hash state
+  .param pmc state
 
   .local pmc builtin_tab, builtin, func
 
@@ -364,7 +364,7 @@ Initialise all builtin and predefined macros.
 =cut
 
 .sub builtin_init 
-  .param Hash state
+  .param pmc state
 
   .local pmc    iterator, builtin, builtin_tab
   .local string name
@@ -394,9 +394,9 @@ Install a builtin macro with name 'name', bound to the function 'bp'.
 =cut
 
 .sub define_builtin 
-  .param Hash  state
+  .param pmc       state
   .param string    name
-  .param Hash  builtin
+  .param pmc       builtin
 
   .local pmc symtab
   symtab = state['symtab']
@@ -431,7 +431,7 @@ This function is also called from main().
 =cut
 
 .sub define_user_macro 
-  .param Hash  state
+  .param pmc       state
   .param string    name     
   .param string    text
 
@@ -459,7 +459,7 @@ symbol table.
 =cut
 
 .sub define_macro 
-  .param Hash  state
+  .param pmc       state
   .param string    name
   .param string    text
 
@@ -477,7 +477,7 @@ TODO: This is broken when the path seperator is not '/'
 =cut
 
 .sub m4___file__ 
-  .param Hash  state
+  .param pmc  state
 
   .local string current_file
   current_file = state['current_file']
@@ -493,7 +493,7 @@ Decrease a number.
 =cut
 
 .sub m4_decr 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local int arg0
@@ -516,7 +516,7 @@ Define a user defined macro.
 =cut
 
 .sub m4_define 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   # right now we handle only TOKEN_TEXT
@@ -539,7 +539,7 @@ The individual arguments are seperated by a blank.
 =cut
 
 .sub m4_errprint 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   # right now we handle only TOKEN_TEXT
@@ -573,7 +573,7 @@ Integer arithmetics.
 =cut
 
 .sub m4_eval 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   # get compiler
@@ -601,7 +601,7 @@ Frontend for printf like formatting.
 =cut
 
 .sub m4_format 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0
@@ -621,7 +621,7 @@ A conditional. Check whether a macro is defined.
 =cut
 
 .sub m4_ifdef 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0
@@ -653,7 +653,7 @@ switch statement.
 =cut
 
 .sub m4_ifelse 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string ret
@@ -689,7 +689,7 @@ Increase a number.
 =cut
 
 .sub m4_incr 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local int arg0
@@ -711,7 +711,7 @@ in the first argument.
 =cut
 
 .sub m4_index 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0, arg1
@@ -736,7 +736,7 @@ Expand to the length of the first argument.
 =cut
 
 .sub m4_len 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0
@@ -762,8 +762,7 @@ substring extends to the end of the first argument.
 =cut
 
 .sub m4_substr 
-
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string ret
@@ -800,7 +799,7 @@ Execute a shell command and don't return the return code.
 =cut
 
 .sub m4_syscmd 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0
@@ -829,7 +828,7 @@ Return the exit status of the last syscmd.
 =cut
 
 .sub m4_sysval 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   # Retrieve it as a global set by m4_sysval
@@ -850,7 +849,7 @@ Define a user defined macro.
 =cut
 
 .sub m4_undefine 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .local string arg0
@@ -872,7 +871,7 @@ A placeholder for unimplemented functions.
 =cut
 
 .sub m4_not_implemented 
-  .param Hash  state
+  .param pmc state
   .param pmc arguments
 
   .return ( 'not implemented yet' )

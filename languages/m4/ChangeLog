@@ -1,5 +1,9 @@
 # $Id$
 
+2005-02-19     Bernhard Schmalhofer
+        * Use '.param pmc' instead of '.param Hash', no type checking 
+        * Add some, yet unused, tests for PGE
+
 2005-01-29     Bernhard Schmalhofer
         * yank it up to revision 0.0.11
         * Use Integer PMC instead of PerlInt PMC

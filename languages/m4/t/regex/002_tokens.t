@@ -5,6 +5,9 @@ use strict;
 use Parrot::Test tests => 5;
 use Parrot::Test::PGE;
 
+#p6rule_is  ($str, '^abc', 'BOS abc');
+#p6rule_isnt($str, '^bc', 'BOS bc');
+#p6rule_like('zzzabcdefzzz', '(a.)..(..)', qr/1: <ab @ 3>/, 'basic $1');
 # Assemble PIR for simple pattern matching
 sub get_pir_pcre
 {
@@ -196,6 +199,38 @@ OUTPUT
 1 match(es):
 `'
 OUTPUT
+}
+
+# Do not use PGE yet
+if ( 0 )
+{
+my %regex = ( word          => q{^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|0|1|2|3|4|5|6|7|8|9)*},
+              quoted_string => q{^`[^`]*'},
+              simple        => q{^[^`#_a-zA-Z]},
+              comment       => q{^#[^\n]*\n},
+            );
+# Test wether words are recognised
+{
+  foreach my $target ( q{foo}, q{_tmp}, q{name} )
+  {
+    p6rule_is( $target, $regex{word}, "'$target' is a word" );
+  }
+}
+
+# TODO: Test wether non-words are not recognised
+
+# Test wether quoted strings are recognised
+{
+  foreach my $target ( q{`quoted'}, q{`'} )
+  {
+    my $code = get_pir_pge( $target, 'quoted_string' );
+  pir_output_is( $code, << "OUTPUT", "'$target' is a quoted string" );
+
+1 match(es):
+$target
+OUTPUT
+  }
+}
 }
 
 # TODO: Test wether non-quoted are not recognised

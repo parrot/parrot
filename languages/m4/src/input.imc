@@ -30,7 +30,7 @@ TODO: recognize nested quoted strings
 .include "datatypes.pasm"
 
 .sub input_init 
-  .param Hash state 
+  .param pmc state 
 
   .local pmc empty_array
 
@@ -103,7 +103,7 @@ TODO: open these files and complain when they don't or pass filehandles
 =cut
 
 .sub push_file 
-  .param Hash state 
+  .param pmc      state 
   .param string   filename    
 
   # This is needed for m4___file__
@@ -160,7 +160,7 @@ Uses regular expressions for finding tokens.
 =cut
 
 .sub next_token 
-  .param Hash state 
+  .param pmc state 
 
   .local pmc input_stack    
   input_stack = state['input_stack']

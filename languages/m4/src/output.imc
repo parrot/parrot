@@ -23,7 +23,7 @@ TODO: Support for sync lines.
 =cut
 
 .sub shipout_text 
-  .param Hash state 
+  .param pmc      state 
   .param string   text 
 
   print text
