@@ -228,16 +228,14 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     DWORD countread;
     if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL))
-        return (size_t)countread;
-    else {
-        if (GetLastError() != NO_ERROR) {
-            /* FIXME : An error occured */
-        }
-        else if (len > 0) {
+        if (countread > 0)
+            return (size_t)countread;
+        else
             /* EOF if read 0 and bytes were requested */
             io->flags |= PIO_F_EOF;
-        }
-    }
+    else if (GetLastError() != NO_ERROR)
+            /* FIXME : An error occured */
+        ;
     return 0;
 }
 

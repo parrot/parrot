@@ -228,6 +228,8 @@ is(<FOO>, <<'OUTPUT', 'file contents');
 Parrot overwrites
 OUTPUT
 
+close FOO;
+
 unlink("temp.file");
 
 output_is(<<'CODE', '012', 'standard file descriptors');
