@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More qw(skip);
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
@@ -66,28 +66,88 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "bor");
     new P0, .PerlInt
-    set P0, 7
-    bor P0, 8
-    set I0, P0
-    eq I0,15,ok_1
-    print "not("
-    print I0
-    print ") "
-ok_1:
-    print "ok 1\n"
+    set P0, 0b11110000
+    bor P0, 0b00001111
+    print P0
+    print "\n"
+
+    new P1, .PerlInt
+    set P0, 0
+    set P1, 12
+    bor P0, P1
+    print P0
+    print "\n"
+
     new P1, .PerlNum
     set P1, 47.11
     set P0, 7
     bor P1, P0, 8
-    set I0, P1
-    eq I0,15,ok_2
-    print "not("
-    print I0
-    print ") "
-ok_2:
-    print "ok 2\n"
+    print P1
+    print "\n"
+
+    new P2, .PerlString
+    set P2, "String"
+    set P0, 128
+    set P1, 1
+    bor P2, P0, P1
+    print P2
+    print "\n"
+
+    new P4, .PerlUndef
+    set P0, 12
+    set P1, 24
+    bor P4, P0, P1
+    print P4
+    print "\n"
     end
 CODE
-ok 1
-ok 2
+255
+12
+15
+129
+28
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "band");
+    new P0, .PerlInt
+    set P0, 0b10101010
+    band P0, 0b10011001
+    print P0
+    print "\n"
+
+    new P1, .PerlInt
+    new P2, .PerlInt
+    set P1, 255
+    set P2, 29
+    band P1, P2
+    print P1
+    print "\n"
+
+    new P3, .PerlNum
+    set P3, 3.14
+    set P1, 0b00001111
+    set P2, 0b00001100
+    band P3, P1, P2
+    print P3
+    print "\n"
+
+    new P3, .PerlString
+    set P3, "Foo"
+    band P3, P1, 0b00001100
+    print P3
+    print "\n"
+
+    new P3, .PerlUndef
+    set P1, 100
+    set P2, 100
+    band P3, P1, P2
+    print P3
+    print "\n"
+    end
+CODE
+136
+29
+12
+12
+100
 OUTPUT
