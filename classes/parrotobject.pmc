@@ -25,7 +25,7 @@
    2+: Attributes.
 
    The object is actually constructed by the instantiation code in
-   objects.c, at least for right now. 
+   objects.c, at least for right now.
 
 */
 
@@ -35,10 +35,12 @@ pmclass ParrotObject need_ext {
 	return SELF->vtable->base_type;
     }
 
-    # Figure out which method PMC we need. By default we just defer to the
-    # system method lookup code
+    /* Figure out which method PMC we need. By default we just defer to the
+     * system method lookup code
+     */
     PMC* find_method(STRING* name) {
-      return Parrot_find_method_with_cache(INTERP, VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0));
+	PMC *class = VTABLE_get_pmc_keyed_int(INTERP, (PMC *)PMC_data(SELF), 0);
+	return Parrot_find_method_with_cache(INTERP, class, name);
     }
 
 }
