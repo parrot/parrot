@@ -62,7 +62,7 @@ inline op fdopen(out PMC, in INT, in STR) {
     $1 = pmc_new(interpreter, enum_class_PerlUndef);
   }
   /* string_cstring_free(mode); */
-  /* TODO all results from sring_to_cstring() need freeing
+  /* TODO all results from string_to_cstring() need freeing
      but this generates ugly warnings WRT discarding the const
      qualifier -lt
    */
