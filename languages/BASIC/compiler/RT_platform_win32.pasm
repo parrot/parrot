@@ -29,15 +29,9 @@ WIN32_CONSOLE_INFO:
 	set I0, 0		# dwSize.X
 	bsr UMS_GET_SHORT
 	set P0["xbuf"], I1
-	print I1
-	print " X "
-
 	set I0, 2		# dwSize.Y
 	bsr UMS_GET_SHORT
 	set P0["ybuf"], I1
-	print I1
-	print " Y \n"
-
 	set I0, 4		# dwCursorPosition.X
 	bsr UMS_GET_SHORT
 	set P0["curx"], I1
