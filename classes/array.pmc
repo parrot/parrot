@@ -49,9 +49,24 @@ pmclass Array {
 	return key_size(INTERP,SELF->data);
     }
 
-    INTVAL get_integer_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.int_val;
+    INTVAL get_integer_keyed(KEY* key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            extend_array(SELF->data, ix);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_integer(INTERP, value);
     }
 
     FLOATVAL get_number () {

@@ -39,7 +39,7 @@ typedef struct _key_pair KEY_PAIR;
 
 struct _key {
   INTVAL size;
-  KEY_PAIR* keys;
+  KEY_PAIR** keys;
 };
 
 typedef struct _key KEY;

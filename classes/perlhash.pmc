@@ -49,7 +49,7 @@ pmclass PerlHash {
 	return key_size(INTERP,SELF->data);
     }
 
-    INTVAL get_integer_index ( INTVAL idx ) {
+    INTVAL get_integer_keyed ( KEY* key ) {
 	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
 	return key_pair->cache.int_val;
     }

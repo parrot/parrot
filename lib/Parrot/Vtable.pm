@@ -119,7 +119,7 @@ sub expand {
         proto => $proto,
     };
     push @{$vtable->{order}},$func_name;
-    if(@args>0) {
+    if(@args>0 or $func_name =~ /keyed/) {
         #
         # Hnadle the special 'value' and '{src,dst}_value' tags.
         #
