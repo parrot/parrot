@@ -37,6 +37,11 @@ do_panic(struct Parrot_Interp *interpreter, const char *message,
     /* Note: we can't format any floats in here--Parrot_sprintf
     ** may panic because of floats.
     */
+    char flag_buffer[40];
+    if (interpreter)
+        Parrot_sprintf(interpreter, flag_buffer, "%#x", interpreter->flags);
+    else
+        strcpy(flag_buffer, "(null interpreter)");
     
     PIO_printf(interpreter, "\
 Parrot VM: PANIC: %s!\n\
@@ -53,7 +58,7 @@ Version     : %s\n\
 Configured  : %s\n\
 Architecture: %s\n\
 JIT Capable : %s\n\
-Interp Flags: %#x\n\
+Interp Flags: %s\n\
 Exceptions  : %s\n\
 \n\
 Dumping Core...\n",
@@ -66,7 +71,7 @@ Dumping Core...\n",
         PARROT_CONFIG_DATE,
         PARROT_ARCHNAME,
         JIT_CAPABLE ? "Yes" : "No",
-        interpreter ? interpreter->flags : -1,
+        flag_buffer,
         "(missing from core)"
     );
     
