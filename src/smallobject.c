@@ -198,10 +198,6 @@ get_free_object_df(struct Parrot_Interp *interpreter,
     pool->free_list = *(void **)ptr;
     *((Dead_PObj*)ptr)->arena_dod_flag_ptr &=
         ~ (PObj_on_free_list_FLAG << ((Dead_PObj*)ptr)->flag_shift);
-#if ! DISABLE_GC_DEBUG
-    if (GC_DEBUG(interpreter))
-        PObj_version((Buffer*)ptr) = interpreter->dod_runs;
-#endif
     return ptr;
 }
 

@@ -613,7 +613,7 @@ instantiate_object(Parrot_Interp interpreter, PMC *object, PMC *init)
     set_attrib_array_size(new_object_array,
                           attrib_count + POD_FIRST_ATTRIB);
     /* then activate marking it - set_attrib_flags(object); */
-    PObj_custom_mark_SET(object);
+    PObj_flag_SET(custom_mark, object);
     /* 0 - class PMC, 1 - class name */
     SET_CLASS(new_object_array, object, class);
     set_attrib_num(new_object_array, POD_CLASS_NAME, class_name);

@@ -17,7 +17,7 @@ src/pmc.c - The base vtable calling functions
 */
 
 #include "parrot/parrot.h"
-static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, int constant);
+static PMC* get_new_pmc_header(Parrot_Interp, INTVAL base_type, UINTVAL flags);
 
 
 #if PARROT_CATCH_NULL
@@ -40,8 +40,8 @@ pmc_init_null(struct Parrot_Interp * interpreter)
 {
     LOCK(init_null_mutex);
     if(!PMCNULL)
-       PMCNULL = get_new_pmc_header(interpreter, enum_class_Null, 1);
-    PMCNULL->pmc_ext = NULL;
+       PMCNULL = get_new_pmc_header(interpreter, enum_class_Null,
+               PObj_constant_FLAG);
     PMCNULL->vtable = Parrot_base_vtables[enum_class_Null];
     UNLOCK(init_null_mutex);
     return PMCNULL;
@@ -75,7 +75,7 @@ pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 
 =item C<static PMC*
 get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
-    int constant)>
+    UINTVAL flags)>
 
 Gets a new PMC header.
 
@@ -85,35 +85,42 @@ Gets a new PMC header.
 
 static PMC*
 get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
-    int constant)
+    UINTVAL flags)
 {
     PMC *pmc;
+    VTABLE *vtable = Parrot_base_vtables[base_type];
 
-    if (Parrot_base_vtables[base_type]->flags & VTABLE_IS_CONST_FLAG) {
+    if (vtable->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
          * to morph the PMC to the const variant
+         * This assumes that a constant PMC enum is one bigger then
+         * the normal one.
          */
-        constant = 1;
+        flags = PObj_constant_FLAG;
         --base_type;
+        vtable = Parrot_base_vtables[base_type];
+    }
+    if (vtable->flags & VTABLE_PMC_NEEDS_EXT) {
+        flags |= PObj_is_PMC_EXT_FLAG;
+        if (vtable->flags & VTABLE_IS_SHARED_FLAG)
+            flags |= PObj_is_PMC_shared_FLAG;
     }
 
-    pmc = new_pmc_header(interpreter, constant);
+    pmc = new_pmc_header(interpreter, flags);
     if (!pmc) {
         internal_exception(ALLOCATION_ERROR,
                 "Parrot VM: PMC allocation failed!\n");
         return NULL;
     }
 
-    if (constant)
-        PObj_constant_SET(pmc);
-    pmc->vtable = Parrot_base_vtables[base_type];
+    pmc->vtable = vtable;
 
-    if (!pmc->vtable || !pmc->vtable->init) {
+    if (!vtable || !vtable->init) {
         /* This is usually because you either didn't call init_world early
          * enough or you added a new PMC class without adding
          * Parrot_(classname)_class_init to init_world. */
-        PANIC("Null vtable used");
+        PANIC("Null vtable used or missing init");
         return NULL;
     }
 #if GC_VERBOSE
@@ -125,32 +132,6 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
     return pmc;
 }
 
-/*
-
-=item C<static void
-pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)>
-
-Add a new C<PMC_EXT> to C<*pmc>. If the C<*pmc> is shared also add
-the C<synchronize> structure and init the mutex.
-
-=cut
-
-*/
-
-static void
-pmc_new_ext(Parrot_Interp interpreter, PMC *pmc, INTVAL base_type)
-{
-    if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT) {
-        add_pmc_ext(interpreter, pmc);
-
-        if (pmc->vtable->flags & VTABLE_IS_SHARED_FLAG) {
-            PMC_sync(pmc) = mem_sys_allocate(sizeof(*PMC_sync(pmc)));
-            PMC_sync(pmc)->owner = interpreter;
-            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
-            PObj_is_PMC_shared_SET(pmc);
-        }
-    }
-}
 
 /*
 
@@ -179,7 +160,8 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
             pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
                     (INTVAL)IGLOBALS_ENV_HASH);
             if (!pmc) {
-                pmc = get_new_pmc_header(interpreter, base_type, 1);
+                pmc = get_new_pmc_header(interpreter, base_type,
+                        PObj_constant_FLAG);
                 VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
                         (INTVAL)IGLOBALS_ENV_HASH, pmc);
             /* UNLOCK */}
@@ -196,13 +178,13 @@ pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
         pmc = (Parrot_base_vtables[base_type]->get_pointer)(interpreter, NULL);
         /* LOCK */
         if (!pmc) {
-            pmc = get_new_pmc_header(interpreter, base_type, 1);
+            pmc = get_new_pmc_header(interpreter, base_type,
+                    PObj_constant_FLAG);
             VTABLE_set_pointer(interpreter, pmc, pmc);
         }
         return pmc;
     }
     pmc = get_new_pmc_header(interpreter, base_type, 0);
-    pmc_new_ext(interpreter, pmc, base_type);
     return pmc;
 }
 
@@ -220,8 +202,8 @@ Creates a new constant PMC of type C<base_type>.
 PMC *
 constant_pmc_new_noinit(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    PMC *pmc = get_new_pmc_header(interpreter, base_type, 1);
-    pmc_new_ext(interpreter, pmc, base_type);
+    PMC *pmc = get_new_pmc_header(interpreter, base_type,
+            PObj_constant_FLAG);
     return pmc;
 }
 
@@ -239,8 +221,8 @@ Creates a new constant PMC of type C<base_type>, the call C<init>.
 PMC *
 constant_pmc_new(struct Parrot_Interp *interpreter, INTVAL base_type)
 {
-    PMC *pmc = get_new_pmc_header(interpreter, base_type, 1);
-    pmc_new_ext(interpreter, pmc, base_type);
+    PMC *pmc = get_new_pmc_header(interpreter, base_type,
+            PObj_constant_FLAG);
     VTABLE_init(interpreter, pmc);
     return pmc;
 }
@@ -283,7 +265,6 @@ constant_pmc_new_init(struct Parrot_Interp *interpreter, INTVAL base_type,
         PMC *init)
 {
     PMC *pmc = get_new_pmc_header(interpreter, base_type, 1);
-    pmc_new_ext(interpreter, pmc, base_type);
     VTABLE_init_pmc(interpreter, pmc, init);
     return pmc;
 }

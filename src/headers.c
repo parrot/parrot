@@ -233,23 +233,40 @@ Get a header.
 
 */
 
+static PMC_EXT * new_pmc_ext(Parrot_Interp);
+
 PMC *
 new_pmc_header(struct Parrot_Interp *interpreter, UINTVAL flags)
 {
     struct Small_Object_Pool *pool;
     PMC *pmc;
 
-    pool = flags ?
+    pool = flags & PObj_constant_FLAG ?
         interpreter->arena_base->constant_pmc_pool :
         interpreter->arena_base->pmc_pool;
     pmc = pool->get_free_object(interpreter, pool);
     /* clear flags, set is_PMC_FLAG */
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+    if (flags & PObj_is_PMC_EXT_FLAG) {
+#if ARENA_DOD_FLAGS
+        *((Dead_PObj*)pmc)->arena_dod_flag_ptr |=
+            (PObj_is_special_PMC_FLAG << ((Dead_PObj*)pmc)->flag_shift);
+#else
+        PObj_is_special_PMC_SET(pmc);
+#endif
+        pmc->pmc_ext = new_pmc_ext(interpreter);
+        if (flags & PObj_is_PMC_shared_FLAG) {
+            PMC_sync(pmc) = mem_sys_allocate(sizeof(*PMC_sync(pmc)));
+            PMC_sync(pmc)->owner = interpreter;
+            MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
+        }
+    }
+    else
+        pmc->pmc_ext = NULL;
+    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG|flags);
     pmc->vtable = NULL;
 #if ! PMC_DATA_IN_EXT
     PMC_data(pmc) = NULL;
 #endif
-    pmc->pmc_ext = NULL;
     return pmc;
 }
 
@@ -264,7 +281,7 @@ Creates a new C<PMC_EXT> and returns it.
 
 */
 
-static PARROT_INLINE PMC_EXT *
+static PMC_EXT *
 new_pmc_ext(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_ext_pool;
