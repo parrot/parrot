@@ -1,0 +1,72 @@
+.include "library/onload.imc"
+.include "library/objects.imc"
+
+.sub __onload
+    load_bytecode "library/Data/Dumper/Default.imc"
+    __new_class( "Data::Dumper" )
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.namespace ["Data::Dumper"]
+
+.sub dumper method
+    .param string nameA
+    .param pmc dumpA
+    .param string indentA
+    .local string name
+    .local pmc dump
+    .local string indent
+    .local pmc style
+
+    name = nameA
+    dump = dumpA
+    indent = indentA
+
+    # check the number of INT args
+    if I1 != 0 goto ERROR
+    # check the number of PMC args
+    if I3 != 1 goto ERROR
+    # check the number of STR args
+    if I2 > 2 goto ERROR
+    if I2 < 0 goto ERROR
+
+    if I2 == 2 goto GO
+    # I2 <= 1; no indent specified
+    set indent, "    "
+    if I2 == 1 goto GO
+    # I2 == 0; no indent and no name
+    # use a default name
+    set name, "VAR1"
+
+GO:
+    # XXX: support different output styles
+    find_type I0, "Data::Dumper::Default"
+    if I0 < 1 goto ERROR2
+    new style, I0
+    
+    style."prepare"( self, indent )
+    style."dumpWithName"( name, name, dump )
+
+    print "\n"
+    
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+
+ERROR2:
+    print "can not find class Data::Dumper::Default!\n"
+    end
+    .pcc_begin_return
+    .return 0
+    .pcc_end_return
+ERROR:
+    print "Syntax:\n"
+    print "Data::Dumper::dumper( pmc )\n"
+    print "Data::Dumper::dumper( name, pmc )\n"
+    print "Data::Dumper::dumper( name, pmc, indent )\n"
+    .pcc_begin_return
+    .return 0
+    .pcc_end_return
+.end
+

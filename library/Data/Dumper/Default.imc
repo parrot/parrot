@@ -1,0 +1,486 @@
+=head1 TITLE
+
+Data::Dumper::Default - The default output module of Data::Dumper.
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+TDB
+
+=head1 DESCRIPTION
+
+This is a baseclass that provides some essential functions necessary
+for dumping data structures. It is subclassed by C<Data::Dumper::Default>,
+which implements the methods that are finally doing the output.
+
+=head1 METHODS
+
+A Data::Dumper::Default object has the following methods:
+
+=over 4
+
+=cut
+
+.include "library/onload.imc"
+.include "library/objects.imc"
+.include "library/sort.imc"
+
+# autoload method
+.sub __onload
+    load_bytecode "library/Data/Dumper/Base.imc"
+    __new_class( "Data::Dumper::Default", "Data::Dumper::Base" )
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+.namespace ["Data::Dumper::Default"]
+
+=head1 METHODS
+
+A Data::Dumper::Default object has the following methods:
+
+=over 4
+
+=item style."dumpWithName"( shortname, name, dump )
+
+=cut
+
+.sub dumpWithName method
+    .param string shortname
+    .param string name
+    .param pmc dump
+    .local int ret
+            
+    print "\""
+    print shortname
+    print "\" => "
+
+    ret = self."dump"( name, dump )
+
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=item style."dumpCached"( name, dump )
+
+=cut
+
+.sub dumpCached method
+    .param string name
+    .param pmc dump
+    
+    print "\\"
+    print name
+    
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+
+=item style."dumpProperties"( name, dump )
+
+=cut
+
+.sub dumpProperties method
+    .param string paramName
+    .param pmc dump
+    .local string name
+    .local pmc prop
+    .local int ret
+    
+    ret = 1
+    isnull dump, END
+    prophash prop, dump
+    unless prop goto END
+
+    print " with-properties: "
+    clone name, paramName
+    concat name, ".properties()"
+    ret = self."dump"( name, prop )
+    
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=item style.dumpHash( name, hash )
+
+Dumps a 'generic' Hash.
+
+=cut
+
+.sub dumpHash method
+    .param string name
+    .param pmc hash
+    .local string indent
+    .local string subindent
+    .local pmc iter
+    .local string key
+    .local pmc val
+    .local pmc keys
+    .local string name2
+
+    (subindent, indent) = self."newIndent"()
+
+    print "{"
+
+    new keys, .PerlArray
+    new iter, .Iterator, hash
+    set iter, 0
+
+iter_loop:
+    unless iter, iter_end
+
+    shift key, iter
+    push keys, key
+    branch iter_loop
+
+iter_end:
+    _sort( keys )
+
+dump_loop:
+    unless keys, dump_end
+
+    print "\n"
+    print subindent
+
+    shift key, keys
+
+    new val, .PerlArray
+    push val, name
+    push val, key
+    sprintf name2, "%s[\"%s\"]", val
+
+    set val, hash[key]
+
+    self."dumpWithName"( key, name2, val )
+
+    unless keys, dump_end
+    print ","
+
+    branch dump_loop
+
+dump_end:
+    print "\n"
+    print indent
+    print "}"
+    self."deleteIndent"()
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."dumpStringEscaped"( string, escapeChar )
+
+Escape any characters in a string so we can re-use it as a literal.
+
+=cut
+
+.sub dumpStringEscaped method
+    .param pmc var
+    .param string char
+
+    .local string copy
+    copy = var
+
+    .local int last_index
+    last_index = 0
+    .local int string_len
+    length string_len, copy
+    .local int position
+    position = 0
+    .local int val
+
+escape_loop:
+    if position >= string_len goto escape_done
+    substr char, copy, position, 1
+    ord val, char
+
+    if val == 34 goto escape_escape
+    if val == 92 goto escape_escape
+    goto escape_next
+
+escape_escape:
+    print "\\"
+
+escape_next:
+    print char
+
+    inc position
+    goto escape_loop
+
+escape_done:
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcDefault"( name, dump )
+
+=cut
+
+.sub pmcDefault method
+    .param string name
+    .param pmc dump
+    .local string type
+    
+    typeof type, dump
+    print "PMC '"
+    print type
+    print "' "
+    
+    can I0, dump, "__dump"
+    if I0 goto CAN_DUMP
+    print "{ ... }"
+    branch END
+CAN_DUMP:
+    dump."__dump"( self, name )
+END:
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcPerlArray"( name, array )
+
+Dumps an Array PMC.
+
+=cut
+
+.sub pmcPerlArray method
+    .param string name
+    .param pmc array
+    .local string indent
+    .local string subindent
+    .local int size
+    .local int pos
+    .local pmc val
+    .local string name2
+    .local int tmp
+
+    (subindent, indent) = self."newIndent"()
+
+    print "PerlArray (size:"
+    print array
+    print ") ["
+
+    set size, array
+    set pos, 0
+
+    unless size, iter_end
+
+iter_loop:
+    print "\n"
+
+    print subindent
+
+    new val, .PerlArray
+    push val, name
+    push val, pos
+    sprintf name2, "%s[%d]", val
+
+    set val, array[pos]
+
+    self."dump"( name2, val )
+
+    # next array member
+    inc pos
+
+    # skip the ',' after the last element
+    if pos >= size goto iter_end
+
+    print ","
+
+    # elements left?
+    branch iter_loop
+
+iter_end:
+    print "\n"
+    print indent
+    print "]"
+
+    self."deleteIndent"()
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcPerlHash"( name, hash )
+
+Dumps a PerlHash PMC.
+
+=cut
+
+.sub pmcPerlHash method
+    .param string name
+    .param pmc hash
+    .local string indent
+
+    print "PerlHash "
+
+    self."dumpHash"( name, hash )
+    
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcPerlString"( name, str )
+
+Dumps a PerlString PMC.
+
+=cut
+
+.sub pmcPerlString method
+    .param string name
+    .param pmc str
+
+    print "\""
+    self."dumpStringEscaped"( str, "\"" )
+    print "\""
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+
+=item style."pmcPerlInt"( name, val )
+
+Dumps a PerlInt PMC.
+
+=cut
+
+.sub pmcPerlInt method
+    .param string name
+    .param pmc val
+
+    print val
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcPerlNum"( name, val )
+
+Dumps a PerlNum PMC.
+
+=cut
+
+.sub pmcPerlNum method
+    .param string name
+    .param pmc val
+
+    print val
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcPerlUndef"( name, val )
+
+Dumps a PerlUndef PMC.
+
+=cut
+
+.sub pmcPerlUndef method
+    print "undef"
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcSub"( name, val )
+
+Dumps a Sub pmc
+
+=cut
+
+.sub pmcSub method
+    print "sub { ... }"
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcNull"( name, val )
+
+Dumps a Null PMC.
+
+=cut
+
+.sub pmcNull method
+    print "null"
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcOrderedHash"( name, val )
+
+Dumps a OrderedHash PMC.
+
+=cut
+
+.sub pmcOrderedHash method
+    print "OrderedHash { ... }"
+
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcManagedStruct"( name, val )
+
+Dumps a ManagedStruct PMC.
+
+=cut
+
+.sub pmcManagedStruct method
+    print "ManagedStruct { ... }"
+    
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=item style."pmcUnManagedStruct"( name, val )
+
+Dumps a UnManagedStruct PMC.
+
+=cut
+
+.sub pmcUnManagedStruct method
+    print "UnManagedStruct { ... }"
+    
+    .pcc_begin_return
+    .return 1
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

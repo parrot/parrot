@@ -392,34 +392,34 @@ output_is(<<'CODE', <<'OUT', "indent string");
 .end
 .include "library/dumper.imc"
 CODE
-|"hash" => PerlHash {
+"hash" => PerlHash {
     |"hash2" => PerlHash {
-        |"array" => PerlArray (size:2) [
-            |1,
-            |PerlArray (size:1) [
-                |"test"
-            |]
-        |],
-        |"test2" => "test2"
+|  |  "array" => PerlArray (size:2) [
+|  |  |  1,
+|  |  |  PerlArray (size:1) [
+|  |  |  |  "test"
+|  |  |  ]
+|  |  ],
+|  |  "test2" => "test2"
     |},
     |"test1" => "test1"
-|} with-properties: PerlHash {
+} with-properties: PerlHash {
     |"array2" => \hash["hash2"]["array"][1]
-|}
-|"hash" => PerlHash {
+}
+"hash" => PerlHash {
     |"hash2" => PerlHash {
-        |"array" => PerlArray (size:2) [
-            |1,
-            |PerlArray (size:1) [
-                |"test"
-            |]
-        |],
-        |"test2" => "test2"
+|  |  "array" => PerlArray (size:2) [
+|  |  |  1,
+|  |  |  PerlArray (size:1) [
+|  |  |  |  "test"
+|  |  |  ]
+|  |  ],
+|  |  "test2" => "test2"
     |},
     |"test1" => "test1"
-|} with-properties: PerlHash {
+} with-properties: PerlHash {
     |"array2" => \hash["hash2"]["array"][1]
-|}
+}
 name = 'hash'
 indent = '|'
 OUT
@@ -537,21 +537,30 @@ output_is(<<'CODE', <<'OUT', "dumping objects");
     end
 .end
 .sub _TestClass::__dump
+    .param pmc dumper
     .param string name
-    .param pmc dump
-    .param pmc cache
-    .param string indent
+    .local pmc self
+    .local string subindent
+    .local string indent
+    .local string name
 
+    self = P2
+    (subindent, indent) = dumper."newIndent"()
     print "{\n"
 
-    print indent
+    print subindent
     print "  this is\n"
     
-    print indent
-    print "  _TestClass::__dump\n"
+    print subindent
+    print "_"
+    classname name, self
+    print name
+    print "::__dump\n"
 
     print indent
     print "}"
+    
+    dumper."deleteIndent"()
     
     .pcc_begin_return
     .pcc_end_return

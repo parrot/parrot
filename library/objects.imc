@@ -1,0 +1,241 @@
+=head1 TITLE
+
+library/objects.imc - This library provides some class and object helper functions.
+
+=head1 SYNOPSIS
+
+=over 4
+
+=item __new_class( "Foo" )
+
+Creates a new class C<Foo> and calls C<_Foo::__register> if it exists.
+It then adds C<_Foo::__init> as the constructor if the sub is found.
+
+=item __new_class( "Foo", "Bar" )
+
+Same as above, but creates Foo as a subclass of Bar.
+
+=item __add_method( "Foo", "bar" ) B<obsolete>
+
+Searches the sub C<_Foo::bar> and stores it as "bar" in namespace "Foo".
+
+=item __add_method( "Baz", "asString", "__get_string" )
+
+Searches the sub '_Baz::asString' and stores it as 'asString' and '__get_string' in namespace 'Baz'.
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item class = __new_class( name, base )
+
+Creates a new class, calls it's __register sub and adds it's __init method as constructor.
+
+=over 4
+
+=item parameter C<name>
+
+The name of the class to create.
+
+=item parameter C<base> B<(PMC|string;optional)>
+
+The (name of the) base class of the class to create.
+
+=back
+
+Returns the created ParrotClass object.
+
+=cut
+
+.sub __new_class
+    .param string name
+    .param string basename
+    .param pmc basepmc
+    .param int twice_ok
+    .local pmc ret
+    .local pmc temp
+
+    find_type I0, name
+    if I0 == 0 goto NAME_OK
+    if twice_ok goto END
+    print " *\n * fatal error: a class with the name '"
+    print name
+    print "' is already registered!\n *\n\n"
+    sleep 1
+    branch END
+NAME_OK:
+    
+    # baseclass specified?
+    if I2 == 2 goto SUBCLASS1
+    if I3 == 1 goto SUBCLASS2
+
+    newclass ret, name
+    branch INIT
+    
+SUBCLASS1:
+    subclass ret, basename, name
+    branch INIT
+    
+SUBCLASS2:
+    subclass ret, basepmc, name
+    
+INIT:
+    temp = __lookup_method( name, "__init", 1 )
+    isnull temp, REGISTER
+    __add_method( name, "__init", temp )
+    
+REGISTER:
+    temp = __lookup_method( name, "__register", 1 )
+    isnull temp, END
+    .pcc_begin prototyped
+	.pcc_call temp
+    .pcc_end
+    
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+
+=item __add_method( class, method, store_as )
+
+Adds a method to a class namespace.
+
+=over 4
+
+=item parameter C<class> B<(string)>
+
+The name of the class to which the method should be added.
+
+=item parameter C<method> B<(string)>
+
+The name of the method to add.
+
+=item parameter C<store_as> B<(string, optional)>
+
+Also store the method under this name.
+
+=back
+
+This function returns nothing.
+
+
+=cut
+
+.sub __add_method
+    .param string class
+    .param string methodName
+    .param string store
+    .param pmc sub2
+    .local pmc sub
+    .local int argc
+    
+    argc = I2
+    sub = sub2
+    if I3 == 1 goto SKIP_SUB
+    sub = __lookup_method( class, methodName )
+SKIP_SUB:
+
+    # store it as the method sub
+    store_global class, methodName, sub
+    if argc < 3 goto END
+    store_global class, store, sub
+END:
+    .pcc_begin_return
+    .pcc_end_return
+.end
+
+=item method = __lookup_method( class, method, nonfatal ) B<(internal)>
+
+Locates a method's sub PMC.
+
+=over 4
+
+=item parameter C<class> B<(string)>
+
+The name of the class.
+
+=item parameter C<method> B<(string)>
+
+The method name.
+
+=item parameter C<nonfatal> B<(integer,optional)>
+
+If set to 1, C<__lookup_method> just returns a null PMC
+if a method was not found. Otherwise it will
+report an error and wait two seconds before continuing.
+
+=back
+
+Returns the method sub for the specified method of the given class.
+
+=cut
+
+.sub __lookup_method
+    .param string class
+    .param string methodName
+    .local string tmp
+    .local pmc ptmp
+    .local pmc sub
+    .local int nonfatal
+    
+    nonfatal = 0
+    if I1 != 1 goto SKIP
+    nonfatal = I5
+SKIP:
+
+    # construct the class'es method name
+    set tmp, "_"
+    concat tmp, class
+    concat tmp, "::"
+    concat tmp, methodName
+
+    # find the sub
+    errorsoff 1
+    find_global sub, tmp
+    errorson 1
+    
+    # check the type
+    typeof I0, sub
+    if I0 != .PerlUndef goto END
+
+    # find the sub
+    errorsoff 1
+    find_global sub, class, methodName
+    errorson 1
+    
+    # check the type
+    typeof I0, sub
+    if I0 != .PerlUndef goto END
+
+    null sub
+    if nonfatal goto END
+    print " *\n * fatal error in __lookup_method: class '"
+    print class
+    print "' has no method '"
+    print methodName
+    print "'\n *\n\n"
+    sleep 2
+END:
+    .pcc_begin_return
+    .return sub
+    .return tmp
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut

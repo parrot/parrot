@@ -4,19 +4,20 @@ dumper.imc - PIR version of Data::Dumper
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 SYNOPSIS
 
 	...
-
+	
 	# dump the P0 register
 	_dumper( "P0", P0 )
-
+	
 	...
-
+	
 	END
 	.include "library/dumper.imc"
+
 
 =head1 DESCRIPTION
 
@@ -24,8 +25,19 @@ version 0.07
 
 =cut
 
-.include "datatypes.pasm"
-.include "library/sort.imc"
+# first method prints usage information
+.sub __library_dumper_onload
+    print "usage:"
+    print "\tload_bytecode \"library/Data/Dumper.imc\"\n"
+    print "\t...\n"
+    print "\tnew dumper, \"Data::Dumper\"\n"
+    print "\tdumper.\"dumper\"( \"foo\", foo )\n\n"
+    end
+.end
+
+#.include "library/onload.imc"
+
+.include "errors.pasm"
 
 =head1 FUNCTIONS
 
@@ -33,64 +45,41 @@ This library provides the following functions:
 
 =over 4
 
-=item _helper()
+=item _dumper( name, pmc[, indent] )
 
-For internal use only. Initializes an array with helper callbacks.
+This is the public (non object) interface to the dumper library.
 
-This function returns the helper array.
+=over 4
+
+=item name
+
+Required. The name of the PMC.
+
+=item pmc
+
+Required. The PMC to dump.
+
+=item indent
+
+Optional. The indent used at the start of each line printed.
+
+=back
+
+B<Note:> This function currently returns nothing. It should return
+the dumped data as a string, like Perl's Data::Dumper. Instead,
+everything is printed out using C<print>.
+
+B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
 
 =cut
 
-.sub _helper
+.sub _dumper
     saveall
-    .local pmc helper
-    .local pmc sub
-    .local int type
-
-    errorsoff 1 # .PARROT_ERRORS_GLOBALS_FLAG
-    helper = global "Data::Dumper::helper"
-    typeof type, helper
-    if type == .PerlArray goto END
-
-    new helper, .PerlArray
-    global "Data::Dumper::helper" = helper
-
-    newsub sub, .Sub, _dump_null
-    _register_dumper( 0, sub )
-
-    newsub sub, .Sub, _dump_PerlArray
-    _register_dumper( .PerlArray, sub )
-
-    newsub sub, .Sub, _dump_PerlHash
-    _register_dumper( .PerlHash, sub )
-
-    newsub sub, .Sub, _dump_PerlString
-    _register_dumper( .PerlString, sub )
-
-    newsub sub, .Sub, _dump_PerlVal
-    _register_dumper( .PerlInt, sub )
-    _register_dumper( .PerlNum, sub )
-
-    newsub sub, .Sub, _dump_PerlUndef
-    _register_dumper( .PerlUndef, sub )
-
-    newsub sub, .Sub, _dump_Sub
-    _register_dumper( .Sub, sub )
-
-    newsub sub, .Sub, _dump_OrderedHash
-    _register_dumper( .OrderedHash, sub )
-
-    newsub sub, .Sub, _dump_ManagedStruct
-    _register_dumper( .ManagedStruct, sub )
-
-    newsub sub, .Sub, _dump_UnManagedStruct
-    _register_dumper( .UnManagedStruct, sub )
-
-END:
+    _global_dumper()
     restoreall
-    .pcc_begin_return
-    .return helper
-    .pcc_end_return
+    find_global P2, "Data::Dumper", "global"
+    S0 = "dumper"
+    callmethod
 .end
 
 =item _register_dumper( id, sub )
@@ -119,552 +108,49 @@ This function returns nothing.
 =cut
 
 .sub _register_dumper
-    .param int id
-    .param pmc sub
-    .local pmc helper
-
-    helper = global "Data::Dumper::helper"
-    set helper[id], sub
-
-    .pcc_begin_return
-    .pcc_end_return
+    saveall
+    _global_dumper()
+    restoreall
+    find_global P2, "Data::Dumper", "global"
+    S0 = "registerDumper"
+    callmethod
 .end
 
-=item _dumper( name, pmc[, indent] )
+=item dumper =_global_dumper() B<(internal)>
 
-This is the public interface to the dumper library.
+Internal helper function.
 
-=over 4
-
-=item name
-
-Required. The name of the PMC.
-
-=item pmc
-
-Required. The PMC to dump.
-
-=item indent
-
-Optional. The indent used at the start of each line printed.
-
-=back
-
-B<Note:> This function currently returns nothing. It should return
-the dumped data as a string, like Perl's Data::Dumper. Instead,
-everything is printed out using C<print>.
-
-B<Note: #2> PerlHash keys are now sorted using C<_sort()> (library/sort.imc)
+Returns the global dumper instance used by the non object interface.
 
 =cut
 
-.sub _dumper
-    .param string name
-    .param pmc dump
-    .param string indent
-    .local pmc cache
-
-    # check the number of INT args
-    if I1 != 0 goto ERROR
-    # check the number of PMC args
-    if I3 != 1 goto ERROR
-    # check the number of STR args
-    if I2 > 2 goto ERROR
-    if I2 < 0 goto ERROR
-
-    if I2 == 2 goto NAMED
-    # I2 <= 1; no indent specified
-    set indent, ""
-    if I2 == 1 goto NAMED
-    # I2 == 0; no indent and no name
-    # use a default name
-    set name, "VAR1"
-
-NAMED:
-    _helper()
-    new cache, .PerlArray
-    _do_dumper_showname( name, name, dump, cache, indent )
-    print "\n"
-    .pcc_begin_return
-    .return 1
-    .pcc_end_return
-
-ERROR:
-    print "_dumper Syntax:\n"
-    print "_dumper( pmc )\n"
-    print "_dumper( name, pmc )\n"
-    print "_dumper( name, pmc, indent )\n\n"
-    .pcc_begin_return
-    .return 0
-    .pcc_end_return
-.end
-
-#
-# caches the already printed PMCs and their names
-#
-.sub _dumper_cache
-    .param pmc cache
-    .param pmc find
-    .param string defname
-    .local int i
-    .local pmc entry
-    .local string name
-    .local pmc pname
-
-    set i, cache
-LOOP:
-    dec i
-    dec i
-    if i < 0 goto NOTFOUND
-    entry = cache[i]
-    ne_addr entry, find, LOOP
-
-    # found entry => get its name
-    inc i
-    name = cache[i]
-    dec i
-    .pcc_begin_return
-    .return i
-    .return name
-    .pcc_end_return
-
-NOTFOUND:
-    set name, defname
-    push cache, find
-    push cache, name
-    .pcc_begin_return
-    .return -1
-    .return name
-    .pcc_end_return
-.end
-
-#
-# internal helper function
-#
-.sub _do_dumper_showname
-    .param string shortname
-    .param string name
-    .param pmc dump
-    .param pmc cache
-    .param string indent
-
-    print indent
-    print "\""
-    print shortname
-    print "\" => "
-
-    # use tail calling instead of
-    # _do_dumper( name, dump, cache, indent )
-    newsub P0, .Sub, _do_dumper
-    set S5, name
-    set P5, dump
-    set P6, cache
-    set S6, indent
-    set I0, 1
-    set I1, 0
-    set I2, 2
-    set I3, 2
-    set I4, 0
-    invoke
-.end
-
-#
-# internal helper function
-#
-.sub _do_dumper
-    .param string name
-    .param pmc dump
-    .param pmc cache
-    .param string indent
-    .local pmc helper
+.sub _global_dumper
+    .local pmc self
+    .local int mytype
     .local int type
-    .local string type_str
-    .local int exist
-    .local pmc cb
-    .local string name2
-    .local pmc ret
-
-    ret = P1
-    newsub helper, .Sub, _dumper_cache
-    .pcc_begin prototyped
-    .arg cache
-    .arg dump
-    .arg name
-    .pcc_call helper
-    .result type
-    .result name
-    .pcc_end
-
-    if type == -1 goto NOT_IN_CACHE
-    # name found in cache:
-    print "\\"
-    print name
-    branch END
-
-NOT_IN_CACHE:
-    # get the global helper hash
-    helper = global "Data::Dumper::helper"
-
-    set type, 0
-    isnull dump, ISNULL
-    typeof type, dump
-ISNULL:
-    exists exist, helper[type]
-    if exist, CALL_HELPER
-
-    typeof type_str, dump
-    print "PMC '"
-    print type_str
-    print "' "
-    can I0, dump, "__dump"
-    if I0 goto CAN_DUMP
-    print "{ ... }"
-    branch DONE
-CAN_DUMP:
-    # XXX method calling needs some work
-    P2 = dump
-    find_global cb, type_str, "__dump"
-    branch DO_CALL_HELPER
     
+    find_type mytype, "Data::Dumper"
+    if mytype != 0 goto TYPE_OK
+    load_bytecode "library/Data/Dumper.imc"
+    find_type mytype, "Data::Dumper"
+    if mytype != 0 goto TYPE_OK
+    print "fatal error: failure while loading library/Data/Dumper.imc\n"
+    end
+TYPE_OK:
 
-CALL_HELPER:
-    cb = helper[type]
-DO_CALL_HELPER:
-    .pcc_begin prototyped
-    .arg name
-    .arg indent
-    .arg dump
-    .arg cache
-    .pcc_call cb
-    .pcc_end
+    errorsoff PARROT_ERRORS_GLOBALS_FLAG
+    find_global self, "Data::Dumper", "global"
+    errorson .PARROT_ERRORS_GLOBALS_FLAG
+    
+    typeof type, self
+    if type == mytype goto END
 
-DONE:
-    isnull dump, END
-    prophash cb, dump
-    unless cb goto END
+    new self, mytype
+    store_global "Data::Dumper", "global", self
 
-    print " with-properties: "
-    clone name2, name
-    concat name2, ".properties()"
-
-    # XXX: use tail calling
-     _do_dumper( name2, cb, cache, indent )
-
-END:
+END:    
     .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a PerlArray pmc
-#
-.sub _dump_PerlArray
-    .param string name
-    .param pmc array
-    .param pmc cache
-    .param string indent
-    .local string subindent
-    .local int size
-    .local int pos
-    .local pmc val
-    .local string name2
-    .local int tmp
-
-    subindent = "    "
-    concat subindent, indent
-
-    print "PerlArray (size:"
-    print array
-    print ") ["
-
-    set size, array
-    set pos, 0
-
-    unless size, iter_end
-
-iter_loop:
-    print "\n"
-
-    print subindent
-
-    new val, .PerlArray
-    push val, name
-    push val, pos
-    sprintf name2, "%s[%d]", val
-
-    set val, array[pos]
-
-    _do_dumper( name2, val, cache, subindent )
-
-    # next array member
-    inc pos
-
-    # skip the ',' after the last element
-    if pos >= size goto iter_end
-
-    print ","
-
-    # elements left?
-    branch iter_loop
-
-iter_end:
-    print "\n"
-    print indent
-    print "]"
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a PerlHash pmc
-#
-.sub _dump_PerlHash
-    .param string name
-    .param pmc hash
-    .param pmc cache
-    .param string indent
-
-    print "PerlHash "
-
-    # use tail calling instead of
-    # _dump_Hash( name, hash, cache, indent )
-    newsub P0, .Sub, _dump_Hash
-    set S5, name
-    set P5, hash
-    set P6, cache
-    set S6, indent
-    set I0, 1
-    set I1, 0
-    set I2, 2
-    set I3, 2
-    set I4, 0
-    invoke
-.end
-
-#
-# Dumps a 'generic' Hash
-#
-.sub _dump_Hash
-    .param string name
-    .param pmc hash
-    .param pmc cache
-    .param string indent
-    .local string subindent
-    .local pmc iter
-    .local string key
-    .local pmc val
-    .local pmc keys
-    .local string name2
-
-    subindent = "    "
-    concat subindent, indent
-
-    print "{"
-
-    new keys, .PerlArray
-    new iter, .Iterator, hash
-    set iter, 0
-
-iter_loop:
-    unless iter, iter_end
-
-    shift key, iter
-    push keys, key
-    branch iter_loop
-
-iter_end:
-    _sort( keys )
-
-dump_loop:
-    unless keys, dump_end
-
-    print "\n"
-
-    shift key, keys
-
-    new val, .PerlArray
-    push val, name
-    push val, key
-    sprintf name2, "%s[\"%s\"]", val
-
-    set val, hash[key]
-
-    _do_dumper_showname( key, name2, val, cache, subindent )
-
-    unless keys, dump_end
-    print ","
-
-    branch dump_loop
-
-dump_end:
-    print "\n"
-    print indent
-    print "}"
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a PerlString pmc
-#
-.sub _dump_PerlString
-    .param string name
-    .param pmc str
-    .param pmc cache
-    .param string indent
-
-    print "\""
-    _dump_escape_string(str,"\"")
-    print "\""
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Escape any characters in a string so we can re-use it as a literal.
-#
-.sub _dump_escape_string
-    .param pmc var
-    .param string char
-
-    .local string copy
-    copy = var
-
-    .local int last_index
-    last_index = 0
-    .local int string_len
-    length string_len, copy
-    .local int position
-    position = 0
-    .local int val
-
-escape_loop:
-    if position >= string_len goto escape_done
-    substr char, copy, position, 1
-    ord val, char
-
-    if val == 34 goto escape_escape
-    if val == 92 goto escape_escape
-    goto escape_next
-
-escape_escape:
-    print "\\"
-
-escape_next:
-    print char
-
-    inc position
-    goto escape_loop
-
-escape_done:
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-
-
-#
-# Dumps a Perl[Num,Int] pmc
-#
-.sub _dump_PerlVal
-    .param string name
-    .param pmc val
-    .param pmc cache
-    .param string indent
-
-    print val
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a PerlUndef pmc
-#
-.sub _dump_PerlUndef
-    .param string name
-    .param pmc val
-    .param pmc cache
-    .param string indent
-
-    print "undef"
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a Sub pmc
-#
-.sub _dump_Sub
-    .param string name
-    .param pmc val
-    .param pmc cache
-    .param string indent
-
-    print "sub { ... }"
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a null pmc
-#
-.sub _dump_null
-    .param string name
-    .param pmc val
-    .param pmc cache
-    .param string indent
-
-    print "null"
-
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a OrderedHash pmc
-#
-.sub _dump_OrderedHash
-    .param string name
-    .param pmc hash
-    .param pmc cache
-    .param string indent
-
-    print "OrderedHash { ... }"
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a ManagedStruct pmc
-#
-.sub _dump_ManagedStruct
-    .param string name
-    .param pmc hash
-    .param pmc cache
-    .param string indent
-
-    print "ManagedStruct { ... }"
-    .pcc_begin_return
-    .pcc_end_return
-.end
-
-#
-# Dumps a UnManagedStruct pmc
-#
-.sub _dump_UnManagedStruct
-    .param string name
-    .param pmc hash
-    .param pmc cache
-    .param string indent
-
-    print "UnManagedStruct { ... }"
-    .pcc_begin_return
+    .return self
     .pcc_end_return
 .end
 
