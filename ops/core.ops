@@ -141,6 +141,34 @@ AUTO_OP open(i, s|sc, i|ic, i|ic) {
 
 ########################################
 
+=item B<ord>(i,s|sc)
+
+Two-argument form returns the 0th character of string $2 in register $1.
+If $2 is empty, throws an exception.
+
+=item B<ord>(i,s|sc,i|ic)
+
+Three-argument form returns character $3 of string $2 in register 1.
+If $2 is empty, throws an exception.
+If $3 is greater than the length of string $2, throws an exception
+If $3 is less then zero but greater than the negative of the length, counts
+backwards through the string, such that -1 is the last character, -2 is the
+second-to-last character, and so on.
+If $3 is less than the negative of the length, throws an exception.
+
+=cut
+
+AUTO_OP ord(i,s|sc) {
+  $1 = string_ord($2,0);
+}
+
+AUTO_OP ord(i,s|sc,i|ic) {
+  $1 = string_ord($2,$3);
+}
+
+
+########################################
+
 =item B<print>(i|ic)
 
 =item B<print>(n|nc)
