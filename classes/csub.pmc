@@ -50,7 +50,8 @@ pmclass CSub {
     }
 
     void* invoke (void * next) {
-        Parrot_csub_t func = (Parrot_csub_t)SELF->cache.struct_val;
+        Parrot_csub_t func =
+		(Parrot_csub_t)D2FPTR(SELF->cache.struct_val);
         func(INTERP, SELF);
         return next;
     }
