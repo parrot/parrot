@@ -552,7 +552,8 @@ pmclass Array need_ext does array {
 	    else
 		child = *(PMC**)ret;
 	    info->thaw_ptr = ret;
-	    (info->visit_child_function)(INTERP, child, info);
+            if(child)
+	        (info->visit_child_function)(INTERP, child, info);
 	}
     }
 
