@@ -17,7 +17,7 @@
 #if !defined(PARROT_IO_H_GUARD)
 #define PARROT_IO_H_GUARD
 
-#include "parrot/parrot.h"
+/*#include "parrot/parrot.h"*/
 
 #ifndef SSIZE_MAX
 #define SSIZE_MAX 8192
@@ -35,6 +35,10 @@
 # define STDERR_FILENO 2
 #endif
 
+#define PIO_STDIN_FILENO 0
+#define PIO_STDOUT_FILENO 1
+#define PIO_STDERR_FILENO 2
+
 #ifndef O_ACCMODE
 # define O_ACCMODE 0003
 #endif
@@ -47,6 +51,8 @@
 #define PIO_LINEBUFSIZE 256     /* Default linebuffer size */
 #define PIO_GRAIN 2048          /* Smallest size for a block buffer */
 #define PIO_BUFSIZE     (PIO_GRAIN * 2)
+
+#define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
 enum {
         PIO_TYPE_FILE,
@@ -79,12 +85,6 @@ enum {
 #define PIO_DEFAULTMODE DEFAULT_OPEN_MODE 
 #define PIO_UNBOUND     (size_t)-1
 
-typedef struct _ParrotIOLayerAPI        ParrotIOLayerAPI;
-typedef struct _ParrotIOLayer           ParrotIOLayer;
-typedef struct _ParrotIOFilter          ParrotIOFilter;
-typedef struct _ParrotIOBuf             ParrotIOBuf;
-typedef struct _ParrotIO                ParrotIO;
-
 /* This is temporary until subs/code refs are done..*/
 typedef void *   DummyCodeRef;
                             
@@ -108,6 +108,14 @@ typedef off_t PIOOFF_T;
 
 extern PIOOFF_T piooffsetzero;
 
+typedef struct _ParrotIOLayerAPI        ParrotIOLayerAPI;
+typedef struct _ParrotIOLayer           ParrotIOLayer;
+typedef struct _ParrotIOFilter          ParrotIOFilter;
+typedef struct _ParrotIOBuf             ParrotIOBuf;
+typedef struct _ParrotIO                ParrotIO;
+typedef struct _ParrotIOData            ParrotIOData;
+typedef struct _ParrotIO **             ParrotIOTable;
+
 struct _ParrotIO {
         PIOHANDLE       fd;             /* Low level OS descriptor      */
         UINTVAL         mode;           /* Read/Write/etc.              */
@@ -129,8 +137,21 @@ struct _ParrotIOLayer {
         ParrotIOLayer           * down;
 };
 
-#define PIO_DOWNLAYER(x)    x->down
-#define PIO_UPLAYER(x)      x->up
+struct _ParrotIOData {
+        ParrotIOTable           table;        
+        ParrotIOLayer           * default_stack;
+};
+
+
+
+
+#define PIO_DOWNLAYER(x)   x->down
+#define PIO_UPLAYER(x)     x->up
+#define GET_INTERP_IO(i)   (((ParrotIOData*)i->piodata)->default_stack)
+#define GET_INTERP_IOD(i)  ((ParrotIOData *)i->piodata)
+#define PIO_STDIN(i)     (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
+#define PIO_STDOUT(i)    (((ParrotIOData*)i->piodata)->table[PIO_STDOUT_FILENO])
+#define PIO_STDERR(i)    (((ParrotIOData*)i->piodata)->table[PIO_STDERR_FILENO])
 
 /*
  * Terminal layer can't be pushed on top of other layers;
@@ -224,13 +245,15 @@ extern INTVAL           pio_errno;
 extern void             PIO_init(theINTERP);
 extern INTVAL           PIO_init_stacks(theINTERP);
 extern void             PIO_atexit(theINTERP);
-extern INTVAL           PIO_push_layer(ParrotIOLayer *, ParrotIO *);
-extern ParrotIOLayer *  PIO_pop_layer(ParrotIO *);
+extern INTVAL           PIO_push_layer(theINTERP, ParrotIOLayer *, ParrotIO *);
+extern ParrotIOLayer *  PIO_pop_layer(theINTERP, ParrotIO *);
 extern ParrotIOLayer *  PIO_copy_stack(ParrotIOLayer *);
 
 
 extern struct PMC *     new_io_pmc(struct Parrot_Interp *, ParrotIO *);
 extern void             free_io_header(ParrotIO *);
+extern ParrotIOTable    alloc_pio_array(int);
+extern int              realloc_pio_array(ParrotIOTable *, int);
 extern ParrotIO *       PIO_new(struct Parrot_Interp *, ParrotIO *,
                                 INTVAL, UINTVAL, UINTVAL);
 

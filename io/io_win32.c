@@ -61,10 +61,10 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
         if((flags&(PIO_F_WRITE|PIO_F_READ)) == (PIO_F_WRITE|PIO_F_READ)) {
                 *fdwAccess = GENERIC_WRITE|GENERIC_READ;
                 *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
-        } else if( flags & PIO_F_WRITE ) {
+        } else if(flags & PIO_F_WRITE) {
                 *fdwAccess = GENERIC_WRITE;
                 *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
-        } else if( flags & PIO_F_READ ) {
+        } else if(flags & PIO_F_READ) {
                 *fdwAccess = GENERIC_READ;
                 *fdwCreate = OPEN_ALWAYS|CREATE_ALWAYS; 
         }
@@ -72,9 +72,9 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
         /* Temporary */
         *fdwShareMode = 0;
 
-        if( (flags & PIO_F_TRUNC) && (flags & PIO_F_WRITE) )
+        if((flags & PIO_F_TRUNC) && (flags & PIO_F_WRITE))
                 *fdwCreate |= TRUNCATE_EXISTING;
-        else if( flags & PIO_F_APPEND ) {
+        else if(flags & PIO_F_APPEND) {
                 /* FIXME - I don't think Win32 has an O_APPEND
                  * so just open then seek to end.
                  */
@@ -90,19 +90,22 @@ UINTVAL flags_to_win32(UINTVAL flags, DWORD * fdwAccess,
 INTVAL PIO_win32_init(theINTERP, ParrotIOLayer * layer) {
         HANDLE h;
         if((h = GetStdHandle(STD_INPUT_HANDLE)) != INVALID_HANDLE_VALUE) {
-                pio_stdin = PIO_fdopen(interpreter, h, "<");
+                PIO_STDIN(interpreter) = PIO_fdopen(interpreter, h, "<");
+        } else {
+                return -1;
         }
         if((h = GetStdHandle(STD_OUTPUT_HANDLE))
                                         != INVALID_HANDLE_VALUE){
-                pio_stdout = PIO_fdopen(interpreter, h, ">");
+                PIO_STDOUT(interpreter) = PIO_fdopen(interpreter, h, ">");
+        } else {
+                return -2;
         }
         if((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
-                pio_stderr = PIO_fdopen(interpreter, h, ">");
+                PIO_STDERR(interpreter) = PIO_fdopen(interpreter, h, ">");
+        } else {
+                return -3;
         }
- 
-        if(pio_stdin && pio_stdout && pio_stderr)
-                 return 0;
-        return -1;
+        return 0;
 }
 
 

@@ -25,13 +25,11 @@
 /* This is list of valid layers */
 ParrotIOLayer   * pio_registered_layers;
 
-/* This is the default stack used for IO */
+/* This is the default stack used for IO. Copy this to each new interp */
+/*
 ParrotIOLayer   * pio_default_stack;
+*/
 
-/* The standard streams */
-ParrotIO * pio_stdin;
-ParrotIO * pio_stdout;
-ParrotIO * pio_stderr;
 
 PIOOFF_T        piooffsetzero;
 
@@ -50,6 +48,17 @@ void free_io_header(ParrotIO *io) {
         free(io);
 }
 
+ParrotIOTable alloc_pio_array(int numhandles) {
+        ParrotIOTable newhandles;
+        unsigned int size = numhandles * sizeof(ParrotIO *);
+        newhandles = (ParrotIOTable)mem_sys_allocate(size);
+        return newhandles;
+}
+
+int realloc_pio_array(ParrotIOTable * table, int numhandles) {
+        UNUSED(table); UNUSED(numhandles);
+        return -1;
+}
 
 /*
  * Create a new IO stream, optionally reusing old structure.
@@ -58,7 +67,7 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
                         UINTVAL flags, UINTVAL mode) {
         ParrotIO * new_io;
 
-        UNUSED (interpreter); UNUSED (iotype);
+        UNUSED (iotype);
 
         if( old ) {
                 /* FIXME: Reuse old IO */
@@ -67,7 +76,7 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
         new_io->fpos = new_io->lpos = piooffsetzero;
         new_io->flags = flags;
         new_io->mode = mode;
-        new_io->stack = pio_default_stack;
+        new_io->stack = GET_INTERP_IO(interpreter);
         new_io->b.startb = NULL;
         new_io->b.endb = NULL;
         new_io->b.next = NULL;
@@ -77,31 +86,35 @@ ParrotIO * PIO_new(theINTERP, ParrotIO * old, INTVAL iotype,
 /*
  * Initialize some stuff.
  */
-INTVAL pio_initialized;
 
 void PIO_init(theINTERP) {
         int err;
-
-        if( pio_initialized != 0 )
+        /* Has interp been initialized already? */
+        if(interpreter->piodata)
                 return;
 
-        /* Init IO stacks.
-         * Side effect of the Init method of the OS stack will
-         * create STDIN, STDOUT, STDERR.
-         */
+        interpreter->piodata = mem_sys_allocate(sizeof(ParrotIOData));
+        if(interpreter->piodata == NULL)
+                internal_exception(PIO_ERROR, "PIO alloc piodata failure.");
+        GET_INTERP_IOD(interpreter)->default_stack = NULL;
+        GET_INTERP_IOD(interpreter)->table = alloc_pio_array(PIO_NR_OPEN);
+        if(GET_INTERP_IOD(interpreter)->table == NULL)
+                internal_exception(PIO_ERROR, "PIO alloc table failure.");
+
+        /* Init IO stacks and handles for interp instance.  */
         if((err = PIO_init_stacks(interpreter)) != 0) {
-                abort();
+                internal_exception(PIO_ERROR, "PIO init stacks failed.");
         }
 
-        if(!pio_stdin || !pio_stderr || !pio_stdout) {
-                abort();
+        if(!PIO_STDIN(interpreter) || !PIO_STDOUT(interpreter)
+                         || !PIO_STDERR(interpreter)) {
+                internal_exception(PIO_ERROR, "PIO init std handles failed.");
         }
 
         if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-                PIO_puts(interpreter, pio_stderr,
+                PIO_puts(interpreter, PIO_STDERR(interpreter),
                         "PIO: IO system initialized.\n");
         }
-        pio_initialized = 1;
 }
 
 
@@ -123,26 +136,29 @@ INTVAL PIO_init_stacks(theINTERP) {
         ParrotIOLayer * p;
 
         /* First push the platform specific OS layer */
+        /* Optimize this to keep a default stack and just
+         * call copy stack.
+         */
 #ifndef WIN32
-        PIO_push_layer(&pio_unix_layer, NULL);
+        PIO_push_layer(interpreter, PIO_base_new_layer(&pio_unix_layer),
+                                NULL);
 #else
-        PIO_push_layer(&pio_win32_layer, NULL);
+        PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer),
+                                NULL);
 #endif
 #if 0
-        PIO_push_layer(&pio_stdio_layer, NULL);
+        PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer),
+                                NULL);
 #endif
 
         /* Note: All layer pushes should be done before init calls */
-        for(p=pio_default_stack; p; p=p->down) {
-                if( p->api->Init ) {
+        for(p=GET_INTERP_IO(interpreter); p; p=p->down) {
+                if(p->api->Init) {
                         if((*p->api->Init)(interpreter, p) != 0) {
-                                if((interpreter->flags & PARROT_DEBUG_FLAG) != 0) {
-#if 0
-                                        fprintf(stderr,
-                                        "Parrot IO: Failed init layer(%s).\n", p->name);
-#endif
-                                        /* abort(); */
-                                }
+                                char buf[1024];
+                                sprintf(buf,
+                                "Parrot IO: Failed init layer(%s).\n", p->name);
+                                internal_exception(PIO_ERROR, buf);
                         }
                 }
         }
@@ -196,12 +212,12 @@ void PIO_base_delete_layer(ParrotIOLayer * layer) {
 /*
  * Push a layer onto an IO object or the default stack
  */
-INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
+INTVAL PIO_push_layer(theINTERP, ParrotIOLayer * layer, ParrotIO * io) {
         ParrotIOLayer * t;
-        if( !layer )
+        if(layer == NULL)
                 return -1;
-        if( io ) {
-                if( !io->stack
+        if(io != NULL) {
+                if(io->stack == NULL
                         && (layer->flags & PIO_L_TERMINAL) == 0 ) {
                         /* Error( 1st layer must be terminal) */
                         return -1;
@@ -223,21 +239,22 @@ INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
                 if( layer->api->Pushed )
                         (*layer->api->Pushed)(layer, io);
         } else {
-                if( !pio_default_stack
+                ParrotIOData * d = (ParrotIOData *)interpreter->piodata;
+                if( d->default_stack == NULL
                         && (layer->flags & PIO_L_TERMINAL) == 0 ) {
                         /* Error( 1st layer must be terminal) */
                         return -1;
                 }
                 /* Sanity check */
-                for(t=pio_default_stack; t; t=t->down) {
+                for(t=d->default_stack; t; t=t->down) {
                         if( t == layer )
                                 return -1;
                 }
 
-                layer->down = pio_default_stack;
-                if( pio_default_stack )
-                        pio_default_stack->up = layer;
-                pio_default_stack = layer;
+                layer->down = d->default_stack;
+                if( d->default_stack )
+                        d->default_stack->up = layer;
+                d->default_stack = layer;
                 return 0;
         }
         return -1;
@@ -247,7 +264,7 @@ INTVAL PIO_push_layer(ParrotIOLayer * layer, ParrotIO * io) {
 /*
  * Pop a layer from an IO object or the default stack
  */
-ParrotIOLayer * PIO_pop_layer(ParrotIO * io) {
+ParrotIOLayer * PIO_pop_layer(theINTERP, ParrotIO * io) {
         ParrotIOLayer * layer;
         if( io ) {
                 layer = io->stack;
@@ -264,10 +281,12 @@ ParrotIOLayer * PIO_pop_layer(ParrotIO * io) {
         }
         /* Null io object - use default stack */
         else {
-                layer = pio_default_stack;
-                if( layer ) {
-                        pio_default_stack = layer->down; 
-                        pio_default_stack->up = NULL;
+                ParrotIOData * d;
+                d = (ParrotIOData *)interpreter->piodata;
+                layer = d->default_stack;
+                if(layer) {
+                        d->default_stack = layer->down; 
+                        d->default_stack->up = NULL;
                         layer->up = 0;
                         layer->down = 0;
                         return layer;
@@ -378,12 +397,12 @@ INTVAL PIO_setlinebuf(theINTERP, ParrotIO * io) {
 
 ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
         ParrotIO * io;
-        ParrotIOLayer * l = pio_default_stack;
+        ParrotIOLayer * l = GET_INTERP_IO(interpreter);
         UINTVAL flags = PIO_parse_open_flags(sflags);
         while(l) {
                 if(l->api->Open) {
                         io = (*l->api->Open)(interpreter, l, spath, flags);
-                        io->stack = pio_default_stack;
+                        io->stack = GET_INTERP_IO(interpreter);
                         return io;
                 }
                 l = PIO_DOWNLAYER(l);
@@ -400,12 +419,12 @@ ParrotIO * PIO_open(theINTERP, const char * spath, const char * sflags) {
 ParrotIO * PIO_fdopen(theINTERP, PIOHANDLE fd, const char * sflags) {
         ParrotIO * io;
         UINTVAL flags;
-        ParrotIOLayer * l = pio_default_stack;
+        ParrotIOLayer * l = GET_INTERP_IO(interpreter);
         flags = PIO_parse_open_flags(sflags);
         while(l) {
                 if(l->api->FDOpen) {
                         io = (*l->api->FDOpen)(interpreter, l, fd, flags);
-                        io->stack = pio_default_stack;
+                        io->stack = GET_INTERP_IO(interpreter);
                         return io;
                 }
                 l = PIO_DOWNLAYER(l);
@@ -415,7 +434,7 @@ ParrotIO * PIO_fdopen(theINTERP, PIOHANDLE fd, const char * sflags) {
 
 
 INTVAL PIO_close(theINTERP, ParrotIO * io) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
                         if(l->api->Close) {
@@ -430,10 +449,10 @@ INTVAL PIO_close(theINTERP, ParrotIO * io) {
 
 
 void PIO_flush(theINTERP, ParrotIO * io) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
-                        if( l->api->Flush ) {
+                        if(l->api->Flush) {
                                 (*l->api->Flush)(interpreter, l, io);
                                 return;
                         }
@@ -447,10 +466,10 @@ void PIO_flush(theINTERP, ParrotIO * io) {
  * Iterate down the stack to the first layer implementing "Read" API
  */
 INTVAL PIO_read(theINTERP, ParrotIO * io, void * buffer, size_t len) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
-                        if( l->api->Read ) {
+                        if(l->api->Read) {
                                 return (*l->api->Read)(interpreter,
                                                 l, io, buffer, len);
                         }
@@ -466,10 +485,10 @@ INTVAL PIO_read(theINTERP, ParrotIO * io, void * buffer, size_t len) {
  * Iterate down the stack to the first layer implementing "Write" API
  */
 INTVAL PIO_write(theINTERP, ParrotIO * io, void * buffer, size_t len) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
-                        if( l->api->Write ) {
+                        if(l->api->Write) {
                                 return (*l->api->Write)(interpreter,
                                                 l, io, buffer, len);
                         }
@@ -488,7 +507,7 @@ INTVAL PIO_write(theINTERP, ParrotIO * io, void * buffer, size_t len) {
  */
 INTVAL PIO_seek(theINTERP, ParrotIO * io, INTVAL hi, INTVAL lo,
                                 INTVAL w) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
                         if( l->api->Seek ) {
@@ -506,7 +525,7 @@ INTVAL PIO_seek(theINTERP, ParrotIO * io, INTVAL hi, INTVAL lo,
  * Iterate down the stack to the first layer implementing "Read" API
  */
 INTVAL PIO_eof(theINTERP, ParrotIO * io) {
-        if( io ) {
+        if(io) {
                 return (io->flags & (PIO_F_EOF)) != 0;
         }
         return 1;
@@ -514,10 +533,10 @@ INTVAL PIO_eof(theINTERP, ParrotIO * io) {
 
 
 INTVAL PIO_puts(theINTERP, ParrotIO * io, const char * s) {
-        if( io ) {
+        if(io) {
                 ParrotIOLayer * l = io->stack;
                 while(l) {
-                        if( l->api->PutS ) {
+                        if(l->api->PutS) {
                                 return (*l->api->PutS)(interpreter,
                                                 l, io, s);
                         }

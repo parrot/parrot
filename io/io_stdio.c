@@ -64,10 +64,10 @@ size_t          PIO_stdio_writethru(theINTERP, ParrotIOLayer * layer,
 
 
 INTVAL PIO_stdio_init(theINTERP, ParrotIOLayer * layer) {
-        if(pio_stdout)
-                PIO_stdio_setlinebuf(interpreter, layer, pio_stdout);
-        if(pio_stdin)
-                PIO_stdio_setbuf(interpreter, layer, pio_stdin, PIO_UNBOUND);
+        if(PIO_STDOUT(interpreter))
+                PIO_stdio_setlinebuf(interpreter, layer, PIO_STDOUT(interpreter));
+        if(PIO_STDIN(interpreter))
+                PIO_stdio_setbuf(interpreter, layer, PIO_STDIN(interpreter), PIO_UNBOUND);
         return 0;
 }
 
@@ -105,7 +105,7 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
         /* If there is a buffer, make sure we flush before
          * dinking around with the buffer.
          */
-        if( b->startb )
+        if(b->startb)
                 PIO_stdio_flush(interpreter, l, io);
 
         /* Choose an appropriate buffer size for caller */
@@ -116,17 +116,17 @@ INTVAL PIO_stdio_setbuf(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                 b->size = (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN);
         }
 
-        if( b->startb && (b->flags & PIO_BF_MALLOC) ) {
+        if(b->startb && (b->flags & PIO_BF_MALLOC)) {
                 free(b->startb);
                 b->startb = b->next = NULL;
         }
 
-        if( b->size > 0 ) {
+        if(b->size > 0) {
                 b->startb = b->next = malloc(b->size);
                 b->flags |= PIO_BF_MALLOC;
         }
 
-        if( bufsize != 0 )
+        if(bufsize != 0)
                 io->flags |= PIO_F_BLKBUF;
         else
                 io->flags &= ~(PIO_F_BLKBUF|PIO_F_LINEBUF);
@@ -328,7 +328,7 @@ INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer * l, ParrotIO * io,
          * TODO : Try to satisfy seek request in buffer if possible,
          * else make IO request.
          */
-        internal_exception(IO_NOT_IMPLEMENTED, "Seek not implemented");
+        internal_exception(PIO_NOT_IMPLEMENTED, "Seek not implemented");
         return -1;
 }
 

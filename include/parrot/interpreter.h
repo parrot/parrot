@@ -49,6 +49,7 @@ struct Parrot_Interp {
                                           /* variable area */
     struct Arenas *arena_base;            /* Pointer to this */
                                           /* interpreter's arena */
+    void *piodata;                      /* interpreter's IO system */
 
     op_lib_t *  op_lib;                   /* Opcode library */
     UINTVAL      op_count;                 /* The number of ops */

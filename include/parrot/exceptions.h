@@ -35,10 +35,10 @@ void internal_exception(int exitcode, const char * format, ... );
 #define INTERP_ERROR 1
 #define PREDEREF_LOAD_ERROR 1
 #define PARROT_USAGE_ERROR 1
-#define IO_ERROR 1
+#define PIO_ERROR 1
 #define PARROT_POINTER_ERROR 1
 #define DIV_BY_ZERO 1
-#define IO_NOT_IMPLEMENTED 1
+#define PIO_NOT_IMPLEMENTED 1
 
 #endif
 

@@ -83,11 +83,17 @@ UINTVAL flags_to_unix(UINTVAL flags) {
  * Setup standard streams, etc.
  */
 INTVAL PIO_unix_init(theINTERP, ParrotIOLayer * layer) {
-        if((pio_stdin=PIO_fdopen(interpreter, STDIN_FILENO, "<"))
-                &&(pio_stdout=PIO_fdopen(interpreter, STDOUT_FILENO, ">"))
-                &&(pio_stderr=PIO_fdopen(interpreter, STDERR_FILENO, ">"))
+        ParrotIOData * d = GET_INTERP_IOD(interpreter);
+        if(d != NULL && d->table != NULL ) {
+                if((PIO_STDIN(interpreter) =
+                        PIO_fdopen(interpreter, PIO_STDIN_FILENO, "<"))
+                        &&(PIO_STDOUT(interpreter) =
+                                PIO_fdopen(interpreter, STDOUT_FILENO, ">"))
+                        &&(PIO_STDERR(interpreter) =
+                                PIO_fdopen(interpreter, STDERR_FILENO, ">"))
                 )
                 return 0;
+        }
         return -1;
 }
 
