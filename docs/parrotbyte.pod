@@ -1,10 +1,55 @@
 =head1 Format of the Parrot bytecode
 
-  0
+  0          1          2          3
+  +----------+----------+----------+----------+
+  | Wordsize |  Major   |  Minor   |  Flags   |
+  +----------+----------+----------+----------+
+
+Wordsize must be at least 4 (32-bit). Loader is
+responsible for transforming the file into the
+VM native wordsize on the fly. For performance,
+a utility should be provided to convert PBCs
+on disk if they cannot be recompiled.
+
+  4 
+  +----------+----------+----------+----------+
+  |           Pad - For future use            |
+  +----------+----------+----------+----------+
+
+Not used yet, there for alignment.
+
+  8 
+  +----------+----------+----------+----------+
+  |    0th    Byte Ordering  2nd        3rd   | 
+  +----------+----------+----------+----------+
+  |    4th   |    5th   |    6th   |    7th   |
+  +----------+----------+----------+----------+
+
+Byteorder that this file is in. Transform the
+file's byteorder matrix (b) with our native (n),
+which results in the transform
+  b by n -> t
+Consider a PDP-11 (2301) reading a Sparc generated (3210).
+The transform matrix (t) is (1032) which passed to
+endian_fetch_* for arbitrary transform by the VM.
+
+  16 
   +----------+----------+----------+----------+
   |         Parrot Magic = 0x 13155a1         |
   +----------+----------+----------+----------+
-  
+
+Magic is stored in native byteorder. The loader
+uses the byteorder header to convert the Magic
+to verify. More specifically, ALL words (non-bytes)
+in the bytecode file are stored in native order,
+unless otherwise specified.
+
+  20
+  +----------+----------+----------+----------+
+  |         Opcode Type (Perl = 0x5045524c)   |
+  +----------+----------+----------+----------+
+
+ 
   For each segment:
 
   4, 4 + (4 + S0), 4 + (4 + S0) + (4 + S1)
@@ -130,7 +175,7 @@ though it is mentioned in some of the early Parrot documents.
 
 Eventually there will be a more complete and useful PackFile
 specification, but this simple format works well enough for
-now (c. Parrot 0.0.2).
+now (c. Parrot 0.0.5).
 
 =head1 AUTHOR
 
