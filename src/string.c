@@ -2817,10 +2817,10 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 
     UNUSED(interpreter);
 
-    if (!s) { return 0; }
+    if (!s)
+        return 0;
 
-    switch (s->representation)
-    {
+    switch (s->representation) {
         case enum_stringrep_one:
             HASH_STRING(Parrot_UInt1, s, h);
             break;
@@ -2838,80 +2838,6 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
     return h;
 }
 
-/*
-
-=item C<static void
-string_append_chr(struct Parrot_Interp * interpreter,
-    STRING *s, UINTVAL character)>
-
-Appends a character to the specified Parrot string.
-
-=cut
-
-*/
-
-static void
-string_append_chr(struct Parrot_Interp * interpreter,
-    STRING *s, UINTVAL character)
-{
-    /* easy way for now; could make it more efficient */
-    string_append(interpreter, s,
-                  string_chr(interpreter, character),
-                  0);
-}
-
-/*
-
-Called from _string_unescape_cstring_large() to parse the hexadecimal
-digits in a non representation one C string.
-
-*/
-
-static UINTVAL
-_parse_hex_digits(char **cstring, int incount)
-{
-    char hexdigits[] = "0123456789abcdef";
-
-    UINTVAL cval = 0;
-    int count = incount;
-
-    while (count-- && (*cstring)[1])
-    {
-        int c1 = tolower((*cstring)[1]);
-        char *p1 = strchr(hexdigits, c1);
-
-        if (p1) {
-            cval = (cval << 4) | (p1-hexdigits);
-            ++(*cstring);
-        }
-        else {
-            /* XXX warning? */
-            break;
-        }
-    }
-
-    return cval;
-}
-
-/*
-
-=item C<static STRING *
-string_constant_copy(struct Parrot_Interp *interpreter, STRING* s)>
-
-Returns a constant copy of the specified Parrot string.
-
-=cut
-
-*/
-
-static STRING *
-string_constant_copy(struct Parrot_Interp *interpreter, STRING* s)
-{
-    return string_make(interpreter, s->strstart, s->bufused,
-            string_primary_encoding_for_representation(interpreter,
-                                                s->representation),
-            (PObj_get_FLAGS(s) | PObj_constant_FLAG) );
-}
 
 /*
 
