@@ -305,8 +305,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     PMC *last, *current, *prev; /* Pointers to the last marked PMC, the
                                  * currently being processed PMC, and in
                                  * the previously processed PMC in a loop. */
-    unsigned int i, j, chunks_traced;
-    Stack_Chunk_t *cur_stack, *start_stack;
+    unsigned int i, j;
+    Stack_Chunk_t *cur_stack;
     struct PRegChunk *cur_chunk;
     Stack_Entry_t *entry;
     struct Stash *stash;
@@ -347,10 +347,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     }
 
     /* Finally the general stack */
-    start_stack = cur_stack = interpreter->user_stack;
-    chunks_traced = 0;
-    /* The general stack's circular, so we need to be careful */
-    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    cur_stack = interpreter->user_stack;
+
+    while (cur_stack) {
         if(cur_stack->buffer){
             buffer_lives(cur_stack->buffer);
 
@@ -363,7 +362,6 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
             }
         }
 
-        chunks_traced++;
         cur_stack = cur_stack->prev;
     }
 
@@ -415,8 +413,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
-    UINTVAL i, j, chunks_traced;
-    Stack_Chunk_t *cur_stack, *start_stack;
+    UINTVAL i, j;
+    Stack_Chunk_t *cur_stack;
     struct SRegChunk *cur_chunk;
     Stack_Entry_t *entry;
 
@@ -443,10 +441,9 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     }
 
     /* Now the general stack */
-    start_stack = cur_stack = interpreter->user_stack;
-    chunks_traced = 0;
+    cur_stack = interpreter->user_stack;
     /* The general stack's circular, so we need to be careful */
-    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    while (cur_stack) {
         if(cur_stack->buffer){ 
             buffer_lives(cur_stack->buffer);
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
@@ -458,20 +455,16 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
             }
         }
 
-        chunks_traced++;
         cur_stack = cur_stack->prev;
     }
 
-   /* Finally the control stack frames must be marked live */
-    start_stack = cur_stack = interpreter->control_stack;
-    chunks_traced = 0;
-    /* This stack, like the general stack is circular */
-    while (cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    /* Finally the control stack frames must be marked live */
+    cur_stack = interpreter->control_stack;
+    while (cur_stack) {
         if(cur_stack->buffer){ 
             buffer_lives(cur_stack->buffer);
         }
 
-        chunks_traced++;
         cur_stack = cur_stack->prev;
     }
 }

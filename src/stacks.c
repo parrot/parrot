@@ -28,8 +28,9 @@ new_stack(Interp *interpreter)
     
     stack->used = 0;
     stack->flags = NO_STACK_CHUNK_FLAGS;
-    stack->next = stack;
-    stack->prev = stack;
+    stack->next = NULL;
+    stack->prev = NULL;
+    /* Set buffer to null before allocation which might call GC */
     stack->buffer = NULL;
     stack->buffer = new_buffer_header(interpreter);
     Parrot_allocate(interpreter, stack->buffer,
@@ -44,44 +45,49 @@ new_stack(Interp *interpreter)
 }
 
 void
-stack_mark_cow(Stack_Chunk_t *stack_base) {
-    Stack_Chunk_t * chunk = stack_base;
+stack_mark_cow(Stack_Chunk_t *stack) {
+    Stack_Chunk_t * chunk = stack;
     chunk->flags |= STACK_CHUNK_COW_FLAG;
-    for (chunk = chunk->next; chunk != stack_base; chunk = chunk->next)
+    for (chunk = chunk->prev; chunk; chunk = chunk->prev)
         chunk->flags |= STACK_CHUNK_COW_FLAG;
 }
 
 /* Returns the height of the stack.  The maximum "depth" is height - 1 */
 size_t
-stack_height(Interp *interpreter, Stack_Chunk_t *stack_base)
+stack_height(Interp *interpreter, Stack_Chunk_t *stack)
 {
     Stack_Chunk_t *chunk;
-    size_t height = stack_base->used;
+    size_t height = stack->used;
 
-    for (chunk = stack_base->next; chunk != stack_base; chunk = chunk->next)
+    for (chunk = stack->prev; chunk; chunk = chunk->prev)
         height += chunk->used;
 
     return height;
 }
 
-/* Copy a stack (probably with COW flag) to a private writable stack */
+/* Copy a stack (probably with COW flag) to a private writable stack.
+ * We currently copy the whole stack. After we get rid of the circular
+ * references, fix this to do COW by chunk.
+ */
 Stack_Chunk_t *
-stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_base) {
-    Stack_Chunk_t *old_chunk = old_base; 
+stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_top) {
+    Stack_Chunk_t *old_chunk = old_top; 
     Stack_Chunk_t *new_chunk;
-    Stack_Chunk_t *new_base = NULL;
+    Stack_Chunk_t *new_top = NULL;
+    Stack_Chunk_t *last = NULL;
     do {
         new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
-        if(new_base == NULL) {
-            new_base = new_chunk;
-            new_base->next = new_base;
-            new_base->prev = new_base;
+        if(new_top == NULL) {
+            new_top = new_chunk;
+            new_top->next = NULL;
+            new_top->prev = NULL;
+            last = new_top;
         }
         else {
-            new_chunk->next = new_base;
-            new_chunk->prev = new_base->prev;
-            new_base->prev->next = new_chunk;
-            new_base->prev = new_chunk;
+            new_chunk->next = last;
+            new_chunk->prev = NULL;
+            last->prev = new_chunk;
+            last = new_chunk;
         }
         new_chunk->used = old_chunk->used;
         new_chunk->flags = old_chunk->flags & ~STACK_CHUNK_COW_FLAG;
@@ -91,10 +97,10 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_base) {
                     sizeof(Stack_Entry_t) * STACK_CHUNK_DEPTH);
         memcpy(new_chunk->buffer->bufstart, old_chunk->buffer->bufstart,
                     old_chunk->buffer->buflen);
-        old_chunk = old_chunk->next;
+        old_chunk = old_chunk->prev;
     }
-    while(old_chunk != old_base);
-    return new_base;
+    while(old_chunk);
+    return new_top;
 }
 
 /* If depth >= 0, return the entry at that depth from the top of the stack,
@@ -103,31 +109,37 @@ stack_copy(struct Parrot_Interp * interp, Stack_Chunk_t *old_base) {
    Returns NULL if |depth| > number of entries in stack 
 */
 Stack_Entry_t *
-stack_entry(Interp *interpreter, Stack_Chunk_t *stack_base, Intval depth)
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
 {
     Stack_Chunk_t *chunk;
-    Stack_Entry_t *entry;
+    Stack_Entry_t *entry = NULL;
     size_t offset = (size_t)depth;
     
     /* For negative depths, look from the bottom of the stack up. */
     if (depth < 0) {
-        chunk = stack_base;
+        /* FIXME: Non-circular stack makes this rare case slow */
+        for(chunk = stack; chunk->prev; chunk = chunk->prev)
+            ;
         offset = (size_t)-depth;
-        while (offset >= chunk->used && chunk != stack_base) {
+        while (chunk != NULL && offset >= chunk->used) {
             offset -= chunk->used;
             chunk  = chunk->next;
         }
-        if (offset < chunk->used) {
+        if(chunk == NULL)
+            return NULL;
+        if(offset < chunk->used) {
             entry = (Stack_Entry_t *)chunk->buffer->bufstart + offset - 1;
         }
     }
     else {
-        chunk = stack_base->prev;    /* Start at top */
-        while (offset >= chunk->used && chunk != stack_base) {
+        chunk = stack;    /* Start at top */
+        while (chunk != NULL && offset >= chunk->used) {
             offset -= chunk->used;
             chunk  = chunk->prev;
         }
-        if (offset < chunk->used) {
+        if(chunk == NULL)
+            return NULL;
+        if(offset < chunk->used) {
             entry = (Stack_Entry_t *)chunk->buffer->bufstart +
                                                     chunk->used - offset - 1;
         }
@@ -140,7 +152,7 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack_base, Intval depth)
    is bubble down, so that the Nth element becomes the top most element.
 */
 void
-rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base, 
+rotate_entries(Interp *interpreter, Stack_Chunk_t *stack, 
                Intval num_entries)
 {
     Stack_Entry_t temp;
@@ -155,31 +167,31 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base,
         num_entries = -num_entries;
         depth = num_entries - 1;
             
-        if (stack_height(interpreter, stack_base) < (size_t)num_entries) {
+        if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
         
-        temp = *stack_entry(interpreter, stack_base, depth);
+        temp = *stack_entry(interpreter, stack, depth);
         for (i = depth; i > 0; i--) {
-            *stack_entry(interpreter, stack_base, i) =
-                *stack_entry(interpreter, stack_base, i - 1);
+            *stack_entry(interpreter, stack, i) =
+                *stack_entry(interpreter, stack, i - 1);
         }
 
-        *stack_entry(interpreter, stack_base, 0) = temp;
+        *stack_entry(interpreter, stack, 0) = temp;
     } 
     else {
         
-        if (stack_height(interpreter, stack_base) < (size_t)num_entries) {
+        if (stack_height(interpreter, stack) < (size_t)num_entries) {
             internal_exception(ERROR_STACK_SHALLOW, "Stack too shallow!\n");
         }
         
-        temp = *stack_entry(interpreter, stack_base, 0);
+        temp = *stack_entry(interpreter, stack, 0);
         for (i = 0; i < depth; i++) {
-            *stack_entry(interpreter, stack_base, i) =
-                *stack_entry(interpreter, stack_base, i + 1);
+            *stack_entry(interpreter, stack, i) =
+                *stack_entry(interpreter, stack, i + 1);
         }
 
-        *stack_entry(interpreter, stack_base, depth) = temp;
+        *stack_entry(interpreter, stack, depth) = temp;
     }
 }
 
@@ -193,32 +205,30 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t *stack_base,
    we're calling it) variable or something
  */
 void
-stack_push(Interp *interpreter, Stack_Chunk_t **stack_base_p,
+stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
 {
-    Stack_Chunk_t *stack_base = *stack_base_p;
+    Stack_Chunk_t *stack = *stack_p;
     Stack_Chunk_t *chunk;
     Stack_Entry_t *entry;
 
     /* If stack is copy-on-write, copy it before we can execute on it */
-    if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
-        *stack_base_p = stack_base = stack_copy(interpreter, stack_base);
+    if (stack->flags & STACK_CHUNK_COW_FLAG) {
+        *stack_p = stack = stack_copy(interpreter, stack);
     }
 
-    chunk = stack_base->prev;
+    chunk = stack;
 
     /* Do we need a new chunk? */
     if (chunk->used == STACK_CHUNK_DEPTH) {
-        if (chunk->next == stack_base) {
+        if (chunk->next == NULL) {
             /* Need to add a new chunk */
-            Stack_Chunk_t *new_chunk = mem_allocate_aligned(sizeof(Stack_Chunk_t));
-
+            Stack_Chunk_t *new_chunk = mem_sys_allocate(sizeof(Stack_Chunk_t));
             new_chunk->used = 0;
-            new_chunk->next = stack_base;
+            new_chunk->next = NULL;
             new_chunk->prev = chunk;
             chunk->next = new_chunk;
-            stack_base->prev = new_chunk;
-            chunk = new_chunk;
+            *stack_p = chunk = new_chunk;
 
             /* Need to initialize this pointer before the collector sees it */
             chunk->buffer = NULL;
@@ -230,7 +240,7 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_base_p,
         else {
             /* Reuse the spare chunk we kept */
             chunk = chunk->next;
-            stack_base->prev = chunk;
+            *stack_p = chunk;
         }
     }
 
@@ -275,36 +285,38 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_base_p,
 
 /* Pop off an entry and return a pointer to the contents */
 void *
-stack_pop(Interp *interpreter, Stack_Chunk_t **stack_base_p,
+stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
           void *where, Stack_entry_type type)
 {
-    Stack_Chunk_t *stack_base = *stack_base_p;
+    Stack_Chunk_t *stack = *stack_p;
     Stack_Entry_t *entry;
     Stack_Chunk_t *chunk;
 
     /* If stack is copy-on-write, copy it before we can execute on it */
-    if (stack_base->flags & STACK_CHUNK_COW_FLAG) {
-        *stack_base_p = stack_base = stack_copy(interpreter, stack_base);
+    if (stack->flags & STACK_CHUNK_COW_FLAG) {
+        *stack_p = stack = stack_copy(interpreter, stack);
     }
 
-    chunk = stack_base->prev;
+    chunk = stack;
 
     /* We may have an empty chunk at the end of the list */
-    if (chunk->used == 0 && chunk != stack_base) {
-        /* That chunk != stack check is just to allow the empty stack case
+    if (chunk->used == 0 && chunk->prev != NULL) {
+        /* That chunk != NULL is just to allow the empty stack case
          * to fall through to the following exception throwing code. */
 
         /* If the chunk that has just become empty is not the last chunk
          * on the stack then we make it the last chunk - the GC will clean
          * up any chunks that are discarded by this operation. */
-        if (chunk->next != stack_base) {
-            chunk->next = stack_base;
+        if (chunk->next) {
+            /* FIXME: Free this while GC isn't collecting stacks */
+            mem_sys_free(chunk->next);
+            chunk->next = NULL;
         }
 
         /* Now back to the previous chunk - we'll keep the one we have
          * just emptied around for now in case we need it again. */
         chunk = chunk->prev;
-        stack_base->prev = chunk;
+        *stack_p = chunk;
     }
 
     /* Quick sanity check */
