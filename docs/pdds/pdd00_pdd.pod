@@ -1,0 +1,243 @@
+
+=head1 TITLE
+
+Perl Design Documents
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Bryan C. Warnock <bwarnock@capita.com>
+    Class: Meta
+    PDD Number: 0
+    Version: 2
+    Status: Proposed
+    Last Modified: 9 February 2001
+    PDD Format: 0
+    Language: English
+
+=head2 HISTORY
+
+    v1 created on 7 Dec 2000 by BCWarnock <bwarnock@capita.com>
+
+=head1 CHANGES
+
+Merged I<pddfield.txt> attachment.  Reproposed.
+
+=head1 ABSTRACT
+
+This document defines a standard format for documenting Perl
+development decisions - the how and why of Perl internals, as well as
+the surrounding ethos and culture of the development community.  This
+document identifies Perl Design Document Format 1.
+
+=head1 DESCRIPTION
+
+One of the shortcomings of most long-term development and maintenance
+efforts - and Perl has been no exception - is the lack of readily
+available documentation describing the rationale behind many of the
+implementation decisions.  News archives and mailing archives are
+becoming increasingly difficult to find random information in,
+particularly with the myriad lists that Perl 6 begot.
+
+Although there will always be decisions which are obvious due to a lack
+of alternatives, many design decisions may have multiple technically
+feasible solutions.  Why X instead of Y?  Why this instead of that?  Is
+the decision based on an obscure bit of technical arcana?  Is the
+decision based on Perl culture, which itself is a product of many of
+the undocumented decisions made before?  Or is the decision truly a
+toss-up, with a solution picked pseudo-randomly?
+
+A Perl Design Document (PDD) is a readily available record of th
+An historical record of the rationale behind the decision.  A PDD
+provides context to future developers, who may not have been familiar
+with the original discussion, but are currently involved with the
+resultant implementation.
+
+=item 3
+
+An historical technical and cultural perspective for future development
+work.  Re-implementation or even tangential tasks need only address what
+has changed since the original PDD.
+
+=back
+
+It is not a vehicle for brainstorming or creating a wish-list.  PDDs
+are reserved for a concrete snapshot of what B<is>, and what B<will>
+be.
+
+=head1 IMPLEMENTATION
+
+All newly created PDDs will adhere to the PDD standard
+PDDs should be limited to a specific area of Perl - in the above case,
+sorting - but should be broad enough to include the reasons for and
+against any specific implementation that may be discussed.  Historical
+perspectives can be contrasted and compared through archived versions
+of a PDD, vice multiple searches through archived versions of I<n>
+number of PDDs.
+
+=item VERSION:
+
+Contains current and selected historical metadata on the PDD itself.
+
+=over 4
+
+=item CURRENT:
+
+Contains the following information, current as of the date of
+submission.
+
+=over 4
+
+=item Maintainer
+
+Required.  The name and current email address for the POC of the PDD. 
+PDDs should be scoped to their lowest level.
+
+=item PDD Number
+
+Required.  Newly created PDDs should have a PDD Number of I<TBD>.  PDD
+Numbers will be assigned by the Perl Librarian, based on the following
+scheme:
+
+=over 4
+
+=item *
+
+C<Informational> PDDs are given a PDD Number of C<I#>, where C<#> is a
+one-up integer based on order of release by the Perl Librarian.
+
+=item *
+
+C<Experimental> PDDs are given a PDD Number of C<X#>, where C<#> is a
+one-up integer based on order of release by the Perl Librarian.
+
+=item *
+
+C<Proposed> PDDs are B<not> given a PDD Number.  They are given an
+unprefixed one-up integer when promoted to C<Developing>.
+Documentation on an experimental feature or use of Perl, such as
+porting Perl to a PS2.
+
+=item Superceded by PDD #
+
+Replaced in whole by another PDD.
+
+=item Obsolete
+
+Naturally obsolete.
+
+=back
+
+=item STANDARD TRACK
+
+=over 4
+
+=item Proposed
+
+A rough draft submitted for consideration from the Perl development
+community at large.  A snapshot of the general discussion
+surrounding issue foo, but may not accurately reflect the true
+direction the community wishes to go.
+
+=item Developing
+
+An acceptable (at least, on theory) PDD that needs much further
+fleshing out and fine tuning.  The PDD, as well as the
+implementation it describes are both unde
+=item Language
+
+Optional.  The language the PDD is written in.  
+
+=back
+
+=item HISTORY:
+
+A list of free-flow descriptions of significant metadata changes, such
+as status changes, or change of maintainers.  Each entry should include
+the version, date, and nature of the change.  This provides a quick
+historical glimpse to the major metadata changes of a PDD.
+
+=back
+
+=item CHANGES:
+
+A summary of the changes since the last version.  A comprehensive
+change log should be kept, but only within a supporting document.
+
+=item ABSTRACT:
+
+A quick blurb explaining the purpose of the PDD.
+
+=item DESCRIPTION:
+
+A description of the general nature of the P=item REFERENCES:
+
+References to additional sources of information, but not those
+necessary for the PDD itself.
+
+=back
+
+The PDD author may add any additional sections he or she wishes.
+
+=head2 SUBMISSION CRITERIA
+
+It is expected that all PDDs submitted as a proposal will have
+undergone an actual discussion within the applicable group(s). 
+Following a general consensus of the need for a PDD (and, hopefully, a
+general consensus on the particular slant of a PDD proposal), the PDD
+can be submitted to the Perl Librarian.
+
+The Perl Librarian should check the document for format, and either
+return to the PDD to the maintainer for correction, or pubut otherwise require the same submittal process as regular PDDs.
+
+=head2 PDD TRANSLATIONS
+
+Should a PDD be translated into another language, the following
+guidelines should be met.
+
+=over 4
+
+=item *
+
+The C<Maintainer> field should reflect who did the translation.
+
+=item *
+
+The C<Version> number should match the original document's C<Version>
+number.  Should multiple translated versions of a single original PDD
+be done (to correct spellings, etc), the revision specific to that
+document version should be included in parentheses following the
+version number.
+
+=item *
+
+Attributions in the C<HISTORY> section should be left alone.
+
+=back
+
+=head2 PDD STATUS CHANGES
+
+Only Larry, a project leader, pumpking, or working group chair may set
+C<Status> to anything other than C<Proposed>, C<Informational>, or
+C<Experimental>.
+
+=head2 AVAILABILITY
+
+All C<Proposed>, C<Informational>, and C<Experimental> PDDs should be
+readily available, in a centralized location, to at least the current
+Perl development circles.  All C<Standard>-track PDDs should be
+readily available, in a centralized location, to the general public.
+
+All C<Superseded> PDDs should be available upon request.  All
+historical versions of PDDs should be available upon request.
+
+=head1 ATTACHMENTS
+
+A. F<pddtempl.pod>
+
+=head1 REFERENCES
+
+Dan Sugalski's original PDD guidelines at
+http://www.mail-archive.com/perl6-internals@perl.org/msg01766.html
+

@@ -1,0 +1,402 @@
+=head1 TITLE
+
+Parrot assembly language
+
+=head1 VERSION
+
+=head2 CURRENT
+
+     Maintainer: Dan Sugalski
+     Class: Internals
+     PDD Number: 6
+     Version: 1.2
+     Status: Developing
+     Last Modified: 25 August 2001
+     PDD Format: 1
+     Language:English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.2
+
+August 25, 2001
+
+=item Version 1.1
+
+August 8, 2001
+
+=item version 1
+
+None. First version
+
+=back
+
+=head1 CHANGES
+
+=over 4
+
+=item Version 1.2
+
+We have an interpreter now! Yay! (Okay, a simple one, but still...)
+Changes made to reflect that.
+
+=item Version 1.1
+
+=over 4
+
+=item * Added in object
+
+=item * Changed remnants of "perl" to "Parrot"
+
+=item * Branch destination may be integer constant
+
+=item * Added L<Assembly Syntax> section
+
+=back
+
+=item Version 1.0
+
+None. First version
+
+=back
+
+=head1 ABSTRACT
+
+This PDD describes the format of Parrot's bytecode assembly language.
+
+=head1 DESCRIPTION
+
+Parrot's's bytecode can be thought of as a form of machine language
+for a virtual super CISC machine. It makes sense, then, to define an
+assembly language for it for those people who may need to generate
+bytecode directly, rather than indirectly via the perl (or any other)
+language.
+
+=head1 IMPLEMENTATION
+
+Parrot opcodes take the format of:
+
+   code destination, dest_key, source1, source1_key, source2, source2_key
+
+Conditional branches take the format:
+
+   code boolean, bool_key, true_dest, false_dest
+
+The key parameters are optional, and may be either an integer or a
+string. If either is passed they are associated with the parameter to
+their left, and are assumed to be either an array/list entry number,
+or a hash key. Any time a source or destination can be a PMC register,
+there may be a key.
+
+Destinations for conditional branches are an integer offset from the
+current PC.
+
+All registers have a type prefix of P, S, I, or N, for PMC, string,
+integer, and number respectively.
+
+=head1 Assembly syntax
+
+All assembly opcodes contain only ASCII lowercase letters and the underscore.
+
+Upper case names are reserved for assembler directives.
+
+Labels all end with a colon. They may have ASCII letters, numbers, and
+underscores in them. Labels that begin with a dollar sign (the only
+valid spot in a label a dollar sign can appear) are private to the
+subroutine they appear in.
+
+Namespaces are noted with the NAMESPACE directive. It takes a single
+parameter, the name of the namespace. Multilevel namespaces are
+supported, and the namespaces should be double-colon separated.
+
+Subroutine names are noted with the SUB directive. It takes a single
+parameter, the name of the subroutine, which is added to the
+namespace's symbol table. Sub names may be any valid Unicode
+alphanumeric character and the underscore.
+
+String and integer constants don't need to be put in a separate
+
+
+=head1 OPCODE LIST
+
+In the following list, there may be multiple (but unlisted) versions
+of an opcode. If an opcode takes a register that might be keyed, the
+keyed version of the opcode has a _k suffix. If an opcode might take
+multiple types of registers for a single parameter, the opcode
+function really has a _x suffix, where x is either P, S, I, or N,
+depending on whether a PMC, string, integer, or numeric register is
+involved. The suffix isn't necessary (though not an error) as the
+assembler can intuit the information from the code.
+
+In those cases where an opcode can take several types of registers,
+and more than one of the sources or destinations are of variable type,
+then the register is passed in extended format. An extended format
+register number is of the form:
+
+      register_number | register_type
+
+where register_type is 0x100, 0x200, 0x400, or 0x800 for PMC, string,
+integer, or number respectively. So N19 would be 0x413.
+
+B<Note>: Instructions tagged with a * will call a vtable method to
+handle the instruction if used on PMC registers.
+
+In all cases, the letters x, y, and z refer to register numbers. The
+letter t refers to a generic register (P, S, I, or N). A lowercase p,
+s, i, or n means either a register or constant of the appropriate type
+(PMC, string, integer, or number)
+
+=head2 Control flow
+
+The control flow opcodes check conditions and manage program flow.
+
+=over 4
+
+=item if tx, X, Y
+
+Check register tx. (Px, Sx, Ix, or Nx) If true, branch by X, otherwise
+branch by Y.
+
+=item jump tx
+
+Jump to the address held in register x (Px, Sx, or Ix).
+
+=item branch tx
+
+Branch forward or backward by the amount in register x. (X may be
+either Ix, Nx, or Px) Branch offset may also be an integer constant.
+
+=back
+
+=head2 Data manipulation
+
+These ops handle manipulating the data in registers
+
+=over 4
+
+=item iton Nx, Iy
+
+Copy the integer value from register y to the numeric register x.
+
+=item ntoi Ix, Ny
+
+Copy the number from register y to register x. Copy is truncated, and
+may be capped if it is too large or small for an integer.
+
+=item tostring Sx, ty, Iz
+
+Take the value in register y and convert it to a string of type z,
+storing the result in string register x.
+
+=item add tx, ty, tz *
+
+Add registers y and z and store the result in register
+x. (x = y + z) The registers must all be the same type, PMC, integer,
+or number.
+
+=item sub tx, ty, tz *
+
+Subtract register z from register y and store the result in register
+x. (x = y - z) The registers must all be the same type, PMC, integer,
+or number.
+
+=item mul tx, ty, tz *
+
+Multiply register y by register z and store the results in register
+x. The registers must be the same type.
+
+=item div tx, ty, tz *
+
+Divide register y by register z, and store the result in register x.
+
+=item inc tx, nn *
+
+Increment register x by nn. nn is an integer constant. If nn is
+omitted, increment is 1.
+
+=item dec tx, nn *
+
+Decrement register x by nn. nn is an integer constant. If nn is
+omitted, decrement by 1.
+
+=item iton Nx, Iy
+
+Copy the integer value from register y to the numeric register x.
+
+=item ntoi Ix, Ny
+
+Copy the number from register y to register x. Copy is truncated, and
+may be capped if it is too large or small for an integer.
+
+=item tostring Sx, ty, Iz
+
+Take the value in register y and convert it to a string of type z,
+storing the result in string register x.
+
+=back
+
+=head2 Register and stack ops
+
+These opcodes deal with registers and stacks
+
+=over 4
+
+=item push_p
+
+Push the current frame of PMC registers onto their stack and start a
+new frame. The new registers are not initialized.
+
+=item push_p_c
+
+Push the current frame of PMC registers onto their stack and start a
+new frame. The new registers are copies of the previous frame.
+
+=item pop_p
+
+Pop the current frame of PMC registers off the stack.
+
+=item push_i
+
+The same as L<push_p>, for the integer register set.
+
+=item push_i_c
+
+The same as L<push_p_c>, for the integer register set.
+
+=item pop_i
+
+The same as L<pop_p>, for the integer register set.
+
+=item push_s
+
+The same as L<push_p>, for the string register set.
+
+=item push_s_c
+
+The same as L<push_p_c>, for the string register set.
+
+=item pop_s
+
+The same as L<pop_p>, for the string register set.
+
+=item push_n
+
+The same as L<push_p>, for the floating-point register set.
+
+=item push_n_c
+
+The same as L<push_p_c>, for the floating-point register set.
+
+=item pop_n
+
+The same as L<pop_p>, for the floating-point register set.
+
+=item set_warp string
+
+Sets a named marker for the stacks for later use.
+
+=item warp [string]
+
+Reset the current register stacks to the state they were in when the
+warp was set. Resets only the frame pointers, doesn't guarantee the
+contents of the registers. Be I<very> careful modifying the frame
+pointers by, for example, pushing register frames.
+
+If a name is passed, warp back to the named point.
+
+=item unwarp
+
+Reset the current register stacks to the state they were in before the
+last warp.
+
+=back
+
+=head2 Names, pads, and globals
+
+These operations are responsible for finding names in lexical or
+global scopes, as well as storing data into those slots and checking
+constraints on those slots. They also allocate and deallocate
+scratchpads and entries in those pads.
+
+=over 4
+
+=item find_lex Px, sy
+
+Find the lexical of name sy and store the PMC pointer in register Px.
+
+=item find_global Px, sy, sz
+
+Find the PMC for the global variable sy from the table sz and store
+the PMC point
+
+=item fetch_lex Px, iy, iz
+
+Fetch the lexical in slot y of scratchpad z. If z is negative, search
+out from the current pad, if positive search inwards from the
+outermost pad. Put the resulting PMC pointer in register x
+
+=item newpad pad_descriptor
+
+=back
+
+=head2 Exceptions
+
+These opcodes deal with exception handling at the lowest
+level. Exception handlers are dynamically scoped, and any exception
+handler set in a scope will be removed when that scope is exited.
+
+=over 4
+
+=item set_eh Px
+
+Sets an exception handler in place. The code referred to by register
+Px will get called if an exception is thrown while the exception
+handler is in scope.
+
+=item clear_eh
+
+Clear out the most recently placed exception
+
+=item throw Px
+
+Throw an exception represented by the object in PMC register x.
+
+=item rethrow Px
+
+Only valid inside an exception handler. Rethrow the exception
+represented by the object in PMC register x. This object may have been
+altered by the exception handler.
+
+=back
+
+=head2 Object things
+
+These opcodes deal with PMCs as objects, rather than as opaque data
+items.
+
+=over 4
+
+=item make_object Px, ty
+
+Make the variable in PMC x an object of type ty. The type can be a
+string
+
+=item find_method Px, Py, tz
+
+=item call_method Px, ty
+
+=item find_attribute Px, sy
+
+=item set_attribute Px, ty, tz
+
+=item can Px, ty
+
+=item isa Px, ty
+
+=back
+
+=head1 ATTACHMENTS
+
+=head1 REFERENCES

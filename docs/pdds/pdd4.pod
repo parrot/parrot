@@ -1,0 +1,244 @@
+=head1 TITLE
+
+Perl's internal data types
+
+=head1 VERSION
+
+1.3
+
+=head2 CURRENT
+
+     Maintainer: Dan Sugalski <dan@sidhe.org>
+     Class: Internals
+     PDD Number: 4
+     Version: 1.3
+     Status: Developing
+     Last Modified: 02 July 2001
+     PDD Format: 1
+     Language: English
+
+=head2 HISTORY
+
+=over 4
+
+=item Version 1.3, 2 July 2001
+
+=item Version 1.2, 2 July 2001
+
+=item Version 1.1, 2 March 2001
+
+=item Version 1, 1 March 2001
+
+=back
+
+=head1 CHANGES
+
+=item Version 1.3
+
+Fixed some silly typos and dropped phrases.
+
+Took all the underscores out of the field names.
+
+=item Version 1.2
+
+The string header format has changed some to allow for type
+tagging. The flags information for strings has changed as well.
+
+=item Version 1.1
+
+INT and NUM are now concepts rather than data structures, as making
+them data structures was a Bad Idea.
+
+=item Version 1
+
+None. First version
+
+=head1 ABSTRACT
+
+This PDD describes perl's known internal data types.
+
+=head1 DESCRIPTION
+
+This PDD details the primitive datatypes that the perl core knows how
+to deal with. These types are lower-level than what's presented to the
+perl programmer.
+
+=head1 IMPLEMENTATION
+
+=head2 Integer data types
+
+Integer data types are generically referred to as C<INT>s. C<INT>s are
+conceptual things, and there is no data structure that corresponds to them.
+
+=over 4
+
+=item Platform-native integer
+
+These are whatever size native integer was chosen at perl
+configuration time. The C-level typedef C<IV> and C<UV> get you a
+platform-native signed and unsigned integer respectively.
+
+=item Arbitrary precision integers
+
+Big integers, or bigints, are arbitrary-length integer numbers. The
+only limit to the number of digits in a bigint is the lesser of the
+amount of memory available or the maximum value that can be
+represented by a C<UV>. This will generally allow at least 4 billion
+digits, which ought to be far more than enough for anyone.
+
+The C structure that represents a bigint is:
+
+   struct bigint {
+     void *buffer;
+     UV length;
+     IV exponent;
+     UV flags;
+   }
+
+=begin question
+
+Should we scrap the buffer pointer and just tack the buffer on the end
+of the structure? Saves a level of indirection, but means if we need
+to make the buffer bigger we have to adjust anything pointing to it.
+
+=end question
+
+The C<num_buffer> pointer points to the buffer holding the actual
+number, C<length> is the length of the buffer, C<exponent> is the base
+10 exponent for the number (so 2e4532 doesn't take up much space), and
+C<flags> are some flags for the bigint.
+
+B<Note:>The flags and exponent fields may be generally unused, but are
+in to make the base structure identical in size and field types to
+other structures. They may be removed before the first release of perl
+6.
+
+=back
+
+=head2 Floating point data types
+
+Floating point data types are generically reffered to as C<NUM>s. Like
+C<INT>s, C<NUM>s are a conceptual things, not a real data structure.
+
+=over 4
+
+=item Platform native float
+
+These are whatever size float was chosen when perl was configured. The
+C level typedef C<NV> will get you one of these.
+
+=item Arbitrary precision decimal numbers
+
+Arbitrary precision decimal numbers, or bignums, can have any number
+of digits before and after the decimal point. They are represented by
+the structure:
+
+   struct bignum {
+     void *buffer;
+     UV length;
+     IV exponent;
+     UV flags;
+   }
+
+and yes, this looks identical to the bigint structure. This isn't
+accidental. Upgrading a bigint to a bignum should be quick.
+
+=begin question
+
+Like the bigint structure, should we toss the data pointer and just
+tack the data on the end?
+
+=end question
+
+=back
+
+=head2 String data types
+
+Perl has a single internal string form:
+
+   struct perl_string {
+     void *buffer;
+     UV allocated;
+     UV bytes;
+     UV flags;
+     UV characters;
+     UV encoding;
+     UV type;
+     UV unused;
+   }
+
+The fields are:
+
+=over 4
+
+=item buffer
+
+Pointer to the start of the string's data.
+
+=item allocated
+
+How many bytes are allocated in the buffer.
+
+=item bytes
+
+How many bytes are used in the buffer.
+
+=item flags
+
+Flags indicating whatever. Bits 0-15 are reserved for perl, bits 16-23
+for the encoding/decoding code, and teh rest for the type code.
+
+=item characters
+
+How many characters are in the buffer. An optional cache field.
+
+=item encoding
+
+How the data is encoded, for example fixed 8-bit characters, utf-8, or
+utf-32. An index into the encoding/decoding function table. Note that
+this specifies encoding only--it's valid to encode EBCDIC characters
+with the utf-8 algorithm. Silly, but valid.
+
+=item type
+
+What sort of string data is in the buffer, for example ASCII, EBCDIC,
+or Unicode. Used to index into the table of string functions.
+
+=item unused
+
+Filler. Here to make sure we're both exactly double the size of a
+bigint/bigfloat header and to make sure we don't cross cache lines on
+any modern processor.
+
+=back
+
+=head1 ATTACHMENTS
+
+None
+
+=head1 REFERENCES
+
+The perl modules Math::BigInt and Math::BigFloat. The Unicode standard
+at http://www.unicode.org.
+
+=head1 GLOSSARY
+
+=over 4
+
+=item Type
+
+Type refers to a low-level perl data type, such as a string or integer.
+
+=item Class
+
+Class refers to a higher-level piece of perl data. Each class has its
+own vtable, which is a class' distinguishing mark. Classes live one
+step below the perl source level, and should not be confused with perl
+packages.
+
+=item Package
+
+A package is a perl source level construct.
+
+=back
+

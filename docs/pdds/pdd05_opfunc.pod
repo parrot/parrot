@@ -1,0 +1,198 @@
+=head1 TITLE
+
+Opcode Function specs
+
+=head1 VERSION
+
+1.0
+
+=head2 CURRENT
+
+    Maintainer: Dan Sugalski <dan@sidhe.org>
+    Class: Internals
+    PDD Number: 5
+    Version: 1.0
+    Status: Developing
+    Last Modified: 16 Jul 2001
+    PDD Format: 1
+    Language: English
+
+=head2 HISTORY
+
+None. First version
+
+=head1 CHANGES
+
+None. First version
+
+=head1 ABSTRACT
+
+This PDD specifies how the opcode functions should behave and how they
+are called by the Parrot interpreter.
+
+=head1 DESCRIPTION
+
+The opcode functions are the workhorse of the Parrot engine. They
+control program flow and do most of the work in a program. (The rest
+being done by the variable vtable functions)
+
+Opcode functions have very few limitations or restrictions on them. In
+particular, opcode functions:
+
+=over 4
+
+=item *
+
+Can assume a working interpreter
+
+=item *
+
+Must leave all interpreter registers the way they were found, unless the 
+opcode signature indicates otherwise
+
+=back
+
+Each opcode has two separate functions. The first function takes two
+parameters, the current interpreter pointer and current interpreter
+PC, and returns the address of the next opcode to execute. The second
+function takes zero or more paramters as addresses, register numbers,
+integers, or floating point numbers and optionally returns either the
+address of the next opcode or the register number holding the address
+of the next opcode. These are referred to as the I<wrapping function>
+and the I<inner function>, respectively.
+
+The I<wrapping function> is required, as this is the code that the
+interpreter will call. Normally this is automatically generated.
+
+The I<inner function> is the code that gets directly executed when
+perl gets TIL-ified. If there is no I<inner function> for some reason,
+then your opcode will likely run slower (as the interpreter would need
+to set up the registers and other stuff that would normally get
+stripped away for speed)
+
+=head2 The wrapping function
+
+This is the function that the interpreter actually executes. It has
+all the intimate knowledge of its parameters embedded in it, and is
+responsible for figuring out what register data it needs and from
+where.
+
+This function is generally created automatically by
+C<opcode_process.pl>, so the programmer doesn't have to create it. If,
+for some reason, you do need or want to write it (for example if you
+have no inner function) that's fine.
+
+=head2 The inner function
+
+The inner function is the code that actually does the work. This is
+generally a chunk of C code, though the interpreter will be able to
+call perl code soon.
+
+=head1 IMPLEMENTATION
+
+=head2 Prototype declaration of inner function
+
+   RETURN function(INPUT[, INPUT[, INPUT...]])
+
+The C<RETURN> type may be one of:
+
+=over 4
+
+=item void
+
+Indicates the function returns nothing. The I<wrapping function> will
+automagically figure out what address to return based on the size of
+the current opcode.
+
+=item void *
+
+Indicates the function returns the address of the next opcode to execute.
+
+=item I
+
+Indicates the function returns the number of the C<PMC> register that
+holds address of the next opcode to be execute.
+
+=back
+
+The C<ITEM> may be one of:
+
+=over 4
+
+=item IV
+
+Indicates the item is an integer
+
+=item IV *
+
+Indicates the item is a pointer to an integer
+
+=item NV
+
+Indicates the item is a float
+
+=item NV *
+
+Indicates the item is a pointer to a float
+
+=item STRING
+
+Indicates the item is a perl string pointer
+
+=item PMC
+
+Indicates the item is a pointer to a PMC
+
+=item INT
+
+Indicates the item is a pointer to an bigint structure
+
+=item NUM
+
+Indicates the item is a pointer to a bignum structure
+
+=item Ix
+
+Indicates the item is an integer register number.
+
+=item Nx
+
+Indicates the item is a float register number.
+
+=item Sx
+
+Indicates the item is a string register number.
+
+=item Px
+
+Indicates the item is a PMC register number.
+
+=back
+
+The function starts with the first open brace, which should generally
+be on the first non-empty line.
+
+For example:
+
+     void addI(Ix out, Ix in1, Ix in2)
+     {
+       INTREG(out) = INTREG(in1) + INTREG(in2);
+     }
+
+is a simple opcode function that corresponds to the C<addI>
+opcode.
+
+=head1 TODO
+
+=over 4
+
+=item write opcode_process.pl
+
+=back
+
+=head1 REFERENCES
+
+Oploop PDD, PDD 4 (Internal types)
+
+=head1 FOOTNOTES
+
