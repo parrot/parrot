@@ -58,13 +58,13 @@ sub _write_a_file($$$) {
     local (*H, *C);
 
     print Data::Dumper->Dump([$generator]) if $opt->{debug} > 1;
-    my $hout = $generator->gen_h();
+    my $hout = $generator->gen_h($h_name);
     print $hout if $opt->{debug};
     print "Writing $h_name\n" if $opt->{verbose};
     open H, ">$h_name" or die "Can't write '$h_name";
     print H $hout;
     close H;
-    my $cout = $generator->gen_c();
+    my $cout = $generator->gen_c($c_name);
     print $cout if $opt->{debug};
     print "Writing $c_name\n" if $opt->{verbose};
     open C, ">$c_name" or die "Can't write '$c_name";

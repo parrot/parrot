@@ -258,6 +258,22 @@ sub line_directive {
     return qq{#line $line\n};
 }
 
+=item C<line_directive_here($self,$output,$file)>
+
+Generates the C pre processor string for a #line directive to reset the
+compiler's line number to the next physical line in the output.
+
+=cut
+
+sub line_directive_here {
+    my ($self, $output, $file) = @_;
+    # Compilers count lines from 1, and on the 1st line there are no preceding
+    # newlines, so *this* line is (number of newlines plus one).
+    # But that's the number for *this* line (the #line directive) and we're
+    # about to set the number for the next line. So + 1 again.
+    return $self->line_directive(1 + 1 + count_newlines($output), $file);
+}
+
 =item C<get_vtable_section()>
 
 Creates a hash of all the method names containing vtable section. Called
@@ -536,9 +552,8 @@ sub body
     my ($self, $method) = @_;
     my $cout = "";
     my $classname = $self->{class};
-    my $pmc = lc($classname) .'.pmc';
     my $meth = $method->{meth};
-    $cout .= $self->line_directive($method->{line}, $pmc);
+    $cout .= $self->line_directive($method->{line}, $self->{file});
     my $body = $method->{body};
     $body =~ s/^\t/        /mg;
     $body =~ s/^[ ]{4}//mg;
@@ -894,17 +909,20 @@ EOC
     $cout;
 }
 
-=item C<gen_c()>
+=item C<gen_c($out_name)>
 
-Generates the C implementation file code for the PMC.
+Generates the C implementation file code for the PMC. C<$out_name> is the name
+of the output file we are generating.
 
 =cut
 
-sub gen_c() {
-    my ($self) = @_;
+sub gen_c {
+    my ($self, $out_name) = @_;
     my $cout = dont_edit($self->{file});
-    $cout .= $self->{pre};
-    $cout .= $self->includes;
+    $cout .= $self->line_directive(1, $self->{file})
+	. $self->{pre};
+    $cout .= $self->line_directive_here($cout, $out_name)
+	. $self->includes;
     my $l = count_newlines($cout);
     $cout .= $self->methods($l);
     $cout .= $self->init_func;
@@ -946,14 +964,15 @@ EOC
     $hout;
 }
 
-=item C<gen_h()>
+=item C<gen_h($out_name)>
 
-Generates the C header file code for the PMC.
+Generates the C header file code for the PMC. C<$out_name> is the name
+of the output file we are generating.
 
 =cut
 
 sub gen_h() {
-    my ($self) = @_;
+    my ($self, $out_name) = @_;
     my $hout = dont_edit($self->{file});
     my $name = uc $self->{class};
     $hout .= <<"EOH";
