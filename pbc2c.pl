@@ -19,6 +19,7 @@ use Parrot::PackFile::ConstTable;
 use Parrot::OpsFile;
 use Parrot::OpTrans::CGoto;
 use Parrot::OpLib::core;
+use Parrot::Config;
 
 my $trans = Parrot::OpTrans::CGoto->new;
 
@@ -27,7 +28,7 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
-my $ops = new Parrot::OpsFile ('core.ops', 'io.ops', 'rx.ops', 'vtable.ops');
+my $ops = new Parrot::OpsFile (split(' ', $PConfig{ops}));
 
 
 #
