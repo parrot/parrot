@@ -27,21 +27,31 @@ The following options can be used to limit the symbols:
 
 =item C<--code>
 
+=item C<-c>
+
 List the code/text symbols.
 
 =item C<--data>
+
+=item C<-d>
 
 List the data symbols.
 
 =item C<--init>
 
+=item C<-i>
+
 List the initialised data symbols.
 
 =item C<--uninit>
 
+=item C<-u>
+
 List the uninitialised data symbols.
 
 =item C<--const>
+
+=item C<-C>
 
 List the constant (read-only) data symbols.
 
@@ -50,13 +60,19 @@ try GNU C<nm> if you want this feature.
 
 =item C<--undef>
 
+=item C<-U>
+
 List the undefined symbols.
 
 =item C<--def>
 
+=item C<-D>
+
 List the defined symbols.
 
 =item C<--file>
+
+=item C<-f>
 
 List the file(name) symbols.
 
@@ -68,6 +84,8 @@ They can also be negated with a "no", for example C<--noconst>.
 =over 4
 
 =item C<--objectname>
+
+=item C<-o>
 
 Prepend the object name before the symbol name.
 
@@ -87,9 +105,13 @@ it is local.
 
 =item C<--type=bsd>
 
+=item C<-B>
+
 The same as C<--t>.
 
 =item C<--type=long>
+
+=item C<-L>
 
 Append a long type (e.g. "global_const_init_data" versus "R") to the
 symbol name.
@@ -141,25 +163,24 @@ print <<__EOF__;
 $ME: Usage: $ME [options] [ foo.o ... | bar.a | other_library_format ]
 Portable frontend for nm(1); by default lists all the code and data symbols
 in the object or archive files.  The options can be used to limit the symbols:
---code		code/text symbols (Tt)
---data		data symbols (Dd, Bb)
---init		initialised data symbols (Dd)
---uninit	uninitialised data symbols (Bb)
---const		const (read-only) data symbols (Rr) [1]
---undef		undefined symbols (Uu)
---def		defined symbols (not Uu)
---file		file(name) symbols (Ff)
+--code|-c	code/text symbols (Tt)
+--data|-d	data symbols (Dd, Bb)
+--init|-i	initialised data symbols (Dd)
+--uninit|-u	uninitialised data symbols (Bb)
+--const|-C	const (read-only) data symbols (Rr) [1]
+--undef|-U	undefined symbols (Uu)
+--def|-D	defined symbols (not Uu)
+--file|-f	file(name) symbols (Ff)
 If more than one of all the above options are given, they are ANDed.
 They can also be negated with a "no", for example --noconst.
 [1] Not all platforms support this, a warning will be given if not.
     You can try GNU nm if you want this feature.
---objectname	prepend the object name before the symbol name
+--objectname|-o	prepend the object name before the symbol name
 --t		append the short BSD-style type (in parentheses above)
---type=bsd	same as --t (also -B works)
---type=long	append a long type (e.g. "global_const_init_data" versus "R")
-                (also -L works)
---help		show this help
---version	show version
+--type=bsd|-B 	same as --t
+--type=long|-L	append a long type (e.g. "global_const_init_data" versus "R")
+--help|-h	show this help
+--version|-v	show version
 All the options can be shortened to their unique prefixes,
 and one leading dash ("-") can be used instead of two ("--").
 __EOF__
@@ -187,23 +208,25 @@ if ($^O eq 'solaris'      && $nm_try =~ /Solaris/) {
     # Hope for BSD-style nm output.
 }
 
-unless (GetOptions('code!'      => \$Code,
-		   'data!'      => \$Data,
-		   'init!'      => \$Init,
-		   'uninit!'    => \$Uninit,
-		   'const!'     => \$Const,
-		   'global!'    => \$Global,
-		   'local!'     => \$Local,
-		   'undef!'     => \$Undef,
-		   'def!'       => \$Def,
-		   'file!'      => \$File,
-		   'objectname' => \$ObjectName,
-		   't'          => \$Type,
-		   'bsd|B'      => \$BSD,
-		   'long|L'     => \$Long,
-		   'type:s'     => \$Type,
-		   'help'       => \$Help,
-		   'version'    => \$Version,
+Getopt::Long::Configure ("bundling");
+
+unless (GetOptions('code|c!'      => \$Code,
+		   'data|d!'      => \$Data,
+		   'init|i!'      => \$Init,
+		   'uninit|u!'    => \$Uninit,
+		   'const|C!'     => \$Const,
+		   'global|g!'    => \$Global,
+		   'local|l!'     => \$Local,
+		   'undef|U!'     => \$Undef,
+		   'def|D!'       => \$Def,
+		   'file|f!'      => \$File,
+		   'objectname|o' => \$ObjectName,
+		   't'            => \$Type,
+		   'bsd|B'        => \$BSD,
+		   'long|L'       => \$Long,
+		   'type:s'       => \$Type,
+		   'help|h'       => \$Help,
+		   'version|v'    => \$Version,
 		  )) {
     show_help();
     exit(1);
