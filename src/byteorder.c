@@ -25,14 +25,21 @@
  */
 void
 endian_matrix(unsigned char * buf) {
-    unsigned long l;
-    unsigned char * c = (unsigned char *)&l;
+    union U {
+        opcode_t op;
+        unsigned char c[sizeof(opcode_t)/sizeof(unsigned char)];
+    } u;
     /* Expect the following to generate warning on 32 bit.*/
-    if(sizeof(long) > 4)
-        l = (0x07060504L << 32) | (0x03020100);    
-    else
-        l = 0x03020100;
-    memcpy(buf, c, sizeof(long));
+    if(sizeof(opcode_t) > 4) {
+        /* Have to do this the long way for tcc */
+        u.op = 0x07060504;
+        u.op <<= 32;
+        u.op |= 0x03020100;
+    }    
+    else {
+        u.op = 0x03020100;
+    }    
+    memcpy(buf, u.c, sizeof(opcode_t));
 }
 
 /*
