@@ -1,0 +1,128 @@
+/* delegate.pmc
+ *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info $Id$
+ *  Overview:
+ *     Delegate each and every function to parrot bytecode
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+/* These need to be elsewhere */
+#define PARROT_VTABLE_INIT_METHNAME "__init"
+#define PARROT_VTABLE_SET_INTEGER_METHNAME "__set_integer"
+#define PARROT_VTABLE_SET_NUMBER_METHNAME "__set_number"
+
+/* The following bit is a fast register save/restore pair. They
+   currently count on the registers in the interpreter structure being
+   in the same order as in the regsave struct, and that the registers
+   are at the beginning of the interpreter structure. 
+   
+   Yes, it's damned evil, but it's what we need, since we have to
+   preserve the registers--vtable methods can't change them.
+*/
+struct regsave {
+  struct IReg int_reg;
+  struct NReg num_reg;
+  struct SReg string_reg;
+  struct PReg pmc_reg;
+} regsave;
+
+inline static struct regsave *
+save_regs(struct Parrot_Interp *interp) {
+  struct regsave *save;
+  save = mem_sys_allocate(sizeof(struct regsave));
+  if (!save) {
+    internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+  }
+  mem_sys_memcopy(save, interp, sizeof(struct regsave));
+  return save;
+}
+
+inline static void
+restore_regs(struct Parrot_Interp *interp, struct regsave *data) {
+  mem_sys_memcopy(interp, data, sizeof(struct regsave));
+  mem_sys_free(data);
+}
+
+inline static PMC *
+find_or_die(struct Parrot_Interp *interp, PMC *pmc, const char *name) {
+  PMC *returnPMC;
+  returnPMC = Parrot_find_method_with_cache(interp, pmc,
+					    string_from_cstring(interp,
+								name, 0));
+  if (!returnPMC) {
+    internal_exception(METH_NOT_FOUND, "Can't find method for object");
+  }
+  return returnPMC;  
+}
+
+inline static void
+noarg_noreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
+  struct regsave *data = save_regs(interpreter);
+  REG_PMC(1) = obj;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 0;
+  REG_INT(3) = 0;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  restore_regs(interpreter, data);
+}
+
+inline static void
+pmcarg_noreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method, PMC *arg) {
+  struct regsave *data = save_regs(interpreter);
+  REG_PMC(1) = obj;
+  REG_PMC(5) = arg;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 1;
+  REG_INT(3) = 0;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  restore_regs(interpreter, data);
+}
+
+inline static PMC *
+noarg_pmcreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
+  struct regsave *data = save_regs(interpreter);
+  PMC *returndata;
+  REG_PMC(1) = obj;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 0;
+  REG_INT(3) = -2;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  if (REG_INT(3) == 1) {
+    returndata = REG_PMC(5);
+  } else {
+    returndata = NULL;
+  }
+  restore_regs(interpreter, data);
+
+  return returndata;
+}
+
+pmclass delegate {
+
+  void init () {
+    PMC *initPMC = Parrot_find_method_with_cache(INTERP, SELF,
+						 string_from_cstring(INTERP, PARROT_VTABLE_INIT_METHNAME, 0));
+    if (initPMC) {
+      noarg_noreturn(INTERP, SELF, initPMC);
+    }
+  }
+
+  void set_integer(PMC* value) {
+    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_INTEGER_METHNAME), value);
+  }
+
+  void set_number(PMC* value) {
+    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_NUMBER_METHNAME), value);
+  }
+}

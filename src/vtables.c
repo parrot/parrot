@@ -27,6 +27,21 @@ Parrot_clone_vtable(Parrot_Interp interpreter, VTABLE *base_vtable) {
 }
 
 void
+Parrot_vtable_set_type(Parrot_Interp interpreter, VTABLE *vtable, INTVAL type) {
+    vtable->base_type = type;
+}
+
+void
+Parrot_vtable_set_name(Parrot_Interp interpreter, VTABLE *vtable, STRING *whoami) {
+    vtable->whoami = whoami;
+}
+
+void
+Parrot_vtable_set_data(Parrot_Interp interpreter, VTABLE *vtable, void *stuff) {
+    vtable->data = stuff;
+}
+
+void
 Parrot_destroy_vtable(Parrot_Interp interpreter, VTABLE *vtable) {
     mem_sys_free(vtable);
 }
