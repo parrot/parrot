@@ -19,7 +19,7 @@ void *Parrot_memalign(size_t align, size_t size);
 void *Parrot_memalign_if_possible(size_t align, size_t size);
 void Parrot_free_memalign(void *);
 void *mem_alloc_executable(struct Parrot_Interp *interpreter, size_t);
-void *mem_realloc_executable(void *, size_t);
+void *mem_realloc_executable(struct Parrot_Interp *interpreter,void *, size_t);
 void mem_free_executable(void *);
 
 #if !defined(PARROT_HAS_MEMALIGN) && !defined(PARROT_HAS_POSIX_MEMALIGN)

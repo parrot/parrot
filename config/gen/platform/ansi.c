@@ -149,7 +149,8 @@ mem_alloc_executable(struct Parrot_Interp *interpreter, size_t size)
 */
 
 void *
-mem_realloc_executable(void* memblock, size_t size)
+mem_realloc_executable(struct Parrot_Interp *interpreter,
+                       void* memblock, size_t size)
 {
 	return mem_sys_realloc(memblock, size);
 }
