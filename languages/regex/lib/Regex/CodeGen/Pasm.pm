@@ -7,7 +7,6 @@ my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
 sub init {
     my $self = shift;
-    $self->SUPER::init();
     $self->{R_STARTS} ||= 'P0';
     $self->{R_ENDS} ||= 'P1';
     $self->{R_STACK} ||= 'P2';
@@ -15,6 +14,7 @@ sub init {
     $self->{R_POS} ||= 'I1';
     $self->{R_LEN} ||= 'I2';
     $self->{R_INPUT} ||= 'S0';
+    $self->SUPER::init();
     return $self;
 }
 
@@ -147,6 +147,19 @@ sub output_increment {
             $self->dbprint("%I1\n"));
 }
 
+sub output_add {
+    my ($self, $var, $amount, $failLabel) = @_;
+    $amount = 1 if ! defined $amount;
+    my $realvar = value($var);
+    return "add $realvar, $amount";
+}
+
+sub output_set {
+    my ($self, $reg, $value) = @_;
+    $reg = value($reg);
+    return "set $reg, $value";
+}
+
 sub output_print {
     my ($self, $what) = @_;
     return ("print $what");
@@ -207,6 +220,8 @@ sub output_check {
     my $fail = $self->output_label_use($failLabel);
     if ($needed eq "1") {
         return "ge ?R_POS, $lenvar, $fail # need $needed more chars";
+    } elsif ($needed eq "0") {
+        return ();
     } else {
         return "sub ?R_TMP, $lenvar, ?R_POS # need $needed more chars",
                "lt ?R_TMP, $needed, $fail";
@@ -225,6 +240,7 @@ sub output_match {
 sub output_classmatch {
     my ($self, $incexc, $failLabel) = @_;
 
+    $DB::single = 1;
     my $passLabel = $self->{state}->genlabel("pass_charclass");
     my @ops = ("ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]");
     my $fail = $self->output_label_use($failLabel);
@@ -239,11 +255,9 @@ sub output_classmatch {
             push @ops, "le ?R_TMP, $last, $pass";
         } else {
             push @ops, "eq ?R_TMP, $first, $pass";
-            if (!defined($last)) {
-                push @ops, "branch $fail";
-            }
         }
     }
+    push @ops, "branch $fail";
 
     push @ops, $self->output_label_def($passLabel);
     return @ops;
@@ -281,7 +295,7 @@ sub output_delete {
 sub output_atend {
     my ($self, $failLabel) = @_;
     my $fail = $self->output_label_use($failLabel);
-    return ("le ?R_TMP, ?R_LEN, $fail # at end?");
+    return ("lt ?R_POS, ?R_LEN, $fail # at end?");
 }
 
 sub output_pushmark {
@@ -310,6 +324,24 @@ sub output_pushint {
                    $self->dbgoto('DUMPSTACK');
     }
     return @ops;
+}
+
+sub output_save {
+    my ($self, $reg) = @_;
+    $reg = value($reg);
+    return ("save $reg");
+}
+
+sub output_restore {
+    my ($self, $reg) = @_;
+    $reg = value($reg);
+    return ("save $reg");
+}
+
+sub output_refresh {
+    my ($self, $reg) = @_;
+    $reg = value($reg);
+    return ("restore $reg", "save $reg");
 }
 
 use vars qw($DEBUG_LABEL);

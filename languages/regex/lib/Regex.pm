@@ -11,9 +11,8 @@ use Regex::State;
 use Regex::Parse;
 use Regex::PreOptimize;
 use Regex::Optimize;
-use Regex::Generate;
 
-use Regex::Rewrite::Stackless;
+use Regex::Rewrite;
 #use Regex::CodeGen::Rx;
 use Regex::CodeGen::Pasm;
 use Regex::CodeGen::IMCC;
@@ -46,7 +45,7 @@ sub tree_to_list {
         $tree = $opt1->optimize_tree($tree);
     }
 
-    my $rewrite = Regex::Rewrite::Stackless->new(%options);
+    my $rewrite = Regex::Rewrite->new(%options);
     my @code = $rewrite->run($tree);
     return @code if $options{'no-list-optimize'};
 

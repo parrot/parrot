@@ -21,6 +21,7 @@ sub render {
     die if $op->{name} eq 'LABEL';
     my $method = "output_$op->{name}";
     $DB::single = 1 if $method =~ /HASH/;
+    $DB::single = 1 if $method eq "output_";
     return $self->$method(@{ $op->{args} });
 }
 

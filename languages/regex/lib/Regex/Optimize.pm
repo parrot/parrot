@@ -33,7 +33,6 @@ sub init {
 
 sub mklabel {
     my ($self) = @_;
-    $DB::single = 1;
     return $self->{state}->genlabel("L");
 }
 

@@ -49,6 +49,10 @@ sub op {
     my ($class, $name, $args, %opts) = @_;
 
     $class = ref($class) if ref $class;
+    while (1) {
+        last if UNIVERSAL::isa("${class}::$name", 'Regex::Ops::Tree');
+        $class =~ s/::\w+$// or die "Called op on invalid class $_[0]";
+    }
     $class = "${class}::$name";
     my $self = bless { name => $name,
                        args => $args || [],
@@ -271,7 +275,9 @@ sub maxlen {
     my $op = shift;
     my ($min, $max, $greedy, $R) = @{ $op->{args} };
     my $sublen = $R->maxlen();
-    if ($max == -1) {
+    if ($max !~ /^-?\d+/) {
+        return undef;
+    } elsif ($max == -1) {
         return undef if ! defined($sublen); # [m..INF]*
         return undef if $sublen > 0;        # [m..sublen]*
         return 0;                           # [0..0]*
@@ -421,6 +427,7 @@ package Regex::Ops::Tree;
 
 sub dump_tree {
     my ($op) = @_;
+    $DB::single = 1;
     my $ref = $op->reftree();
     return dump_ref($ref);
 }

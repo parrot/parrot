@@ -7,7 +7,6 @@ my $fail_label = Regex::Ops::Tree::mark('FAIL');
 
 sub init {
     my $self = shift;
-    $self->SUPER::init();
     $self->{R_STARTS} ||= '$P0';
     $self->{R_ENDS} ||= '$P1';
     $self->{R_STACK} ||= '$P2';
@@ -15,6 +14,7 @@ sub init {
     $self->{R_POS} ||= '$I1';
     $self->{R_LEN} ||= '$I2';
     $self->{R_INPUT} ||= '$S0';
+    $self->SUPER::init();
     return $self;
 }
 
@@ -22,30 +22,35 @@ sub init {
 #    
 #}
 
-sub pushop { "&push" };
-sub popop { "&pop" };
+sub pushop { ".push" };
+sub popop { ".pop" };
 
 sub output_preamble {
     my $self = shift;
 
-    my @ops = ("set ?R_POS, 0 # initialize pos",
-               "length ?R_LEN, ?R_INPUT # cache the length in ?R_LEN",
-               "set ?R_STARTS\[0], 0");
-    unshift(@ops,
-            "set ?R_INPUT, ?R_STARTS\1]",
-            'bsr REGEX',
-            'bsr printResults',
-            'end',
-            result_printer(),
-            ($self->{startLabel} || 'REGEX').":")
-      if $self->{DEBUG} || $self->{definePrintResults};
+    my @ops;
+
+    push @ops, ("set ?R_POS, 0 # initialize pos",
+                "length ?R_LEN, ?R_INPUT # cache the length in ?R_LEN",
+                "set ?R_STARTS[0], 0");
+
+    if ($self->{DEBUG} || $self->{definePrintResults}) {
+        unshift(@ops,
+                "set ?R_INPUT, ?R_STARTS[1]",
+                'bsr REGEX',
+                'bsr printResults',
+                'end',
+                result_printer(),
+                ($self->{startLabel} || 'REGEX').":");
+    }
+
     return @ops;
 }
 
 sub result_printer {
     my $code = <<'END';
 printResults:
-    if $I0, matched
+    if $I0 goto matched
     print "Match failed\n"
     end
 matched:
@@ -61,7 +66,7 @@ printGroup:
     set $I5, $P0
     lt $I0, $I5, groupDefined
     set $I16, 0
-    &ret
+    .ret
 groupDefined:
     set $I3, $P0[I0]
     set $I4, $P1[I0]
@@ -75,7 +80,7 @@ groupDefined:
     print "\n"
 skipPrint:
     set $I16, 1
-    &ret
+    .ret
 END
     return split(/\n/, $code);
 }
@@ -91,8 +96,20 @@ sub output_match_failed {
 }
 
 sub output_terminate {
-#    return "&ret";
+#    return ".ret";
     return "";
+}
+
+sub output_if {
+    my ($self, $reg, $dest) = @_;
+    $reg = Regex::CodeGen::Pasm::value($reg);
+    return "if $reg goto " . $self->output_label_use($dest);
+}
+
+sub output_unless {
+    my ($self, $reg, $dest) = @_;
+    $reg = Regex::CodeGen::Pasm::value($reg);
+    return "unless $reg goto " . $self->output_label_use($dest);
 }
 
 1;
