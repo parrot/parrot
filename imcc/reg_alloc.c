@@ -41,7 +41,7 @@ static void build_interference_graph(Parrot_Interp, IMC_Unit *);
 static void compute_du_chain(IMC_Unit * unit);
 static void compute_one_du_chain(SymReg * r, IMC_Unit * unit);
 static int interferes(IMC_Unit *, SymReg * r0, SymReg * r1);
-static int map_colors(int x, SymReg ** graph, int colors[], int typ);
+static int map_colors(IMC_Unit *, int x, int * graph, int colors[], int typ);
 #ifdef DO_SIMPLIFY
 static int simplify (IMC_Unit *);
 #endif
@@ -58,11 +58,45 @@ extern int pasm_file;
 /* XXX FIXME: Globals: */
 
 static IMCStack nodeStack;
-static SymReg** interference_graph;
-/*
-static SymReg** reglist;
-*/
+static int* interference_graph;
 static int n_symbols;
+
+static int* ig_get_word(int i, int j, int N, int* graph, int* bit_ofs)
+{
+    int bit = i * N + j;
+    *bit_ofs = bit % sizeof(*graph);
+    return &graph[bit / sizeof(*graph)];
+}
+
+static void ig_set(int i, int j, int N, int* graph)
+{
+    int bit_ofs;
+    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    *word |= (1 << bit_ofs);
+}
+
+static void ig_clear(int i, int j, int N, int* graph)
+{
+    int bit_ofs;
+    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    *word &= ~(1 << bit_ofs);
+}
+
+static int ig_test(int i, int j, int N, int* graph)
+{
+    int bit_ofs;
+    int* word = ig_get_word(i, j, N, graph, &bit_ofs);
+    return *word & (1 << bit_ofs);
+}
+
+static int* ig_allocate(int N)
+{
+    // size is N*N bits, but we want don't want to allocate a partial
+    // word, so round up to the nearest multiple of sizeof(int).
+    int need_bits = N * N;
+    int num_words = (need_bits + sizeof(int) - 1) / sizeof(int);
+    return (int*) calloc(num_words, sizeof(int));
+}
 
 /* imc_reg_alloc is the main loop of the allocation algorithm. It operates
  * on a single compilation unit at a time.
@@ -72,6 +106,7 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
 {
     int to_spill;
     int todo, first;
+    int loop_counter;
 
     if (!unit)
         return;
@@ -108,7 +143,9 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
     unit->n_spilled = 0;
 
     todo = first = 1;
+    loop_counter = 0;
     while (todo) {
+        loop_counter++;
         find_basic_blocks(interpreter, unit, first);
         build_cfg(interpreter, unit);
 
@@ -117,9 +154,10 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         first = 0;
         todo = cfg_optimize(interpreter, unit);
     }
-
     todo = first = 1;
+    loop_counter = 0;
     while (todo) {
+        loop_counter++;
         if (!first) {
             find_basic_blocks(interpreter, unit, 0);
             build_cfg(interpreter, unit);
@@ -141,10 +179,12 @@ imc_reg_alloc(Interp *interpreter, IMC_Unit * unit)
         }
     }
     todo = 1;
+    loop_counter = 0;
 #if !DOIT_AGAIN_SAM
     build_interference_graph(interpreter, unit);
 #endif
     while (todo) {
+        loop_counter++;
 #if DOIT_AGAIN_SAM
         build_interference_graph(interpreter, unit);
 #endif
@@ -451,6 +491,12 @@ build_reglist(Parrot_Interp interpreter, IMC_Unit * unit, int first)
 
 /* creates the interference graph between the variables.
  *
+ * data structure is a 2-d array 'interference_graph' where row/column
+ * indices represent the same index in the list of all symbols
+ * (unit->reglist) in the current compilation unit. The value in the
+ * 2-d array interference_graph[i][j] is the symbol unit->reglist[j]
+ * itself.
+ *
  * two variables interfere when they are alive at the
  * same time
  */
@@ -466,7 +512,7 @@ build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
     /* Construct a graph N x N where N = number of symbolics.
      * This piece can be rewritten without the N x N array
      */
-    interference_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
+    interference_graph = ig_allocate(n_symbols);
     if (interference_graph == NULL)
         fatal(1, "build_interference_graph","Out of mem\n");
     unit->interference_graph = interference_graph;
@@ -480,8 +526,8 @@ build_interference_graph(Parrot_Interp interpreter, IMC_Unit * unit)
             if (!unit->reglist[y]->first_ins)
                 continue;
             if (interferes(unit, unit->reglist[x], unit->reglist[y])) {
-                interference_graph[x*n_symbols+y] = unit->reglist[y];
-                interference_graph[y*n_symbols+x] = unit->reglist[x];
+                ig_set(x, y, n_symbols, interference_graph);
+                ig_set(y, x, n_symbols, interference_graph);
             }
         }
     }
@@ -818,8 +864,7 @@ static void
 allocate_wanted_regs(IMC_Unit * unit)
 {
     int i, y, interf;
-    SymReg *r, *s;
-    SymReg ** graph = interference_graph;
+    SymReg *r;
 
     for (i = 0; i < n_symbols; i++) {
         r = unit->reglist[i];
@@ -827,9 +872,13 @@ allocate_wanted_regs(IMC_Unit * unit)
             continue;
         interf = 0;
         for (y = 0; y < n_symbols; y++) {
-            if ((s = graph[i*n_symbols+y])
-                    && s->color == r->want_regno
-                    && s->set == r->set) {
+            SymReg *s;
+            if (! ig_test(i, y, n_symbols, interference_graph))
+                continue;
+            s = unit->reglist[y];
+            if (   s
+                && s->color == r->want_regno
+                && s->set == r->set) {
                 interf = 1;
             }
         }
@@ -852,7 +901,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
     int x = 0;
     int color, colors[MAX_COLOR];
     int free_colors, t;
-    SymReg ** graph = interference_graph;
+    int *graph = interference_graph;
     SymReg ** reglist = unit->reglist;
 
     while ((imcstack_depth(nodeStack) > 0) ) {
@@ -862,7 +911,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
 	    int typ = "INSP"[t];
 	    memset(colors, 0, sizeof(colors));
 	    if (reglist[x]->set == typ && reglist[x]->color == -1) {
-		free_colors = map_colors(x, graph, colors, typ);
+		free_colors = map_colors(unit, x, graph, colors, typ);
 		if (free_colors > 0) {
 		    for (color = 0; color < MAX_COLOR; color++) {
                         int c = (color + MAX_COLOR/2) % MAX_COLOR;
@@ -904,7 +953,7 @@ try_allocate(Parrot_Interp interpreter, IMC_Unit * unit)
  * map_colors: calculates what colors can be assigned to the x-th symbol.
  */
 static int
-map_colors(int x, SymReg ** graph, int colors[], int typ)
+map_colors(IMC_Unit* unit, int x, int *graph, int colors[], int typ)
 {
     int y = 0;
     SymReg * r;
@@ -919,7 +968,10 @@ map_colors(int x, SymReg ** graph, int colors[], int typ)
     colors[30] = 1;     /* for immediate allocation */
 #endif
     for (y = 0; y < n_symbols; y++) {
-        if ((r = graph[x*n_symbols+y])
+        if (! ig_test(x, y, n_symbols, graph))
+            continue;
+        r = unit->reglist[y];
+        if (   r
     	    && r->color != -1
 	    && r->set == typ) {
     	    colors[r->color] = 1;
@@ -1005,13 +1057,15 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
     SymReg ** reglist = unit->reglist;
     if (old != new) {
         /* n_symbols is already increased */
-        SymReg ** new_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
+        int *new_graph = ig_allocate(n_symbols);
         /* old symbols count of previous graph */
         int o = n_symbols - 1;
         for (x = 0; x < o; x++) {
             for (y = x + 1; y < o; y++) {
-                new_graph[x*n_symbols+y] = interference_graph[x*o+y];
-                new_graph[y*n_symbols+x] = interference_graph[y*o+x];
+                if (ig_test(x, y, o, interference_graph)) {
+                    ig_set(x, y, n_symbols, new_graph);
+                    ig_set(y, x, n_symbols, new_graph);
+                }
             }
         }
         free(interference_graph);
@@ -1022,12 +1076,12 @@ update_interference(Parrot_Interp interpreter, IMC_Unit * unit,
             if (reglist[x] == old || reglist[x] == new ||
                     reglist[y] == old || reglist[y] == new) {
                 if (interferes(unit, reglist[x], reglist[y])) {
-                    interference_graph[x*n_symbols+y] = reglist[y];
-                    interference_graph[y*n_symbols+x] = reglist[x];
+                    ig_set(x, y, n_symbols, interference_graph);
+                    ig_set(y, x, n_symbols, interference_graph);
                 }
                 else {
-                    interference_graph[x*n_symbols+y] = NULL;
-                    interference_graph[y*n_symbols+x] = NULL;
+                    ig_clear(x, y, n_symbols, interference_graph);
+                    ig_clear(y, x, n_symbols, interference_graph);
                 }
             }
         }
@@ -1172,27 +1226,6 @@ spill(Interp *interpreter, IMC_Unit * unit, int spilled)
         dump_instructions(unit);
 
 }
-
-#if 0
-static int
-neighbours(int node)
-{
-    int y, cnt;
-    SymReg *r;
-
-    cnt = 0;
-    for (y = 0; y < n_symbols; y++) {
-
-	if ( (r = interference_graph[node*n_symbols + y] ) &&
-			(!r->simplified) ) {
-	     cnt++;
-	}
-    }
-
-    return cnt;
-}
-#endif
-
 
 /*
  * Local variables:

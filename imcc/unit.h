@@ -31,7 +31,7 @@ typedef struct _IMC_Unit {
     /* register allocation */
     int n_spilled;
     SymReg * p31;
-    SymReg** interference_graph;
+    int* interference_graph;
     SymReg** reglist;
     int n_symbols;
     struct _IMC_Unit * prev;
