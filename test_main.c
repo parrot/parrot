@@ -164,6 +164,10 @@ main(int argc, char **argv) {
                 printf("can't stat %s, code %i\n", filename, errno);
                 return 1;
             }
+            if (!S_ISREG(file_stat.st_mode)) {
+                printf("%s is not a regular file\n", filename);
+                return 1;
+            }
             fd = open(filename, O_RDONLY);
             if (!fd) {
                 printf("Can't open, error %i\n", errno);
