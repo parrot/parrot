@@ -299,13 +299,25 @@ to go.
 
 =item classoffset Ix, Py, Sz
 
+Returns the offset of the first attribute for class Sz in object Py.
+
 =item getattr Px, Py, Iz
+
+Returns attribute Iz of object Py and puts it in Px. Note that the
+attribute number is an absolute offset.
 
 =item getattr Px, Py, Sz
 
-=item setattr Px, Py, Iz
+Get the attribute with the fully qualified name Sz from object Py and
+put it in Px.
 
-=item setattr Px, Py, Sz
+=item setattr Px, Iy, Pz
+
+Set the attribute Iy of object Px to Pz
+
+=item setattr Px, Sy, Pz
+
+Set the attribute of obbect Px with the fully qualified name Sy to Pz
 
 =item fetchmethod Px, Py, Sz
 
