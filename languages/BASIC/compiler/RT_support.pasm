@@ -95,23 +95,17 @@ ERR_FORINVALID:
 	#    I1=-1  S0= ">"
 	#    I1=1   S0= "<"
 WHICH_COMPARE:
-	eq I1, -1, WHICH_GT
-	eq I1, 1, WHICH_LT
+	eq I1, -1, EXPR_LE
+	eq I1, 1, EXPR_GE
 	print "Error in for-loop comparison\n"
 	branch GEN_ERROR
-WHICH_LT:
-	set S0, "<="
-	ret
-WHICH_GT:
-	set S0, ">="
-	ret
 	
 	# ###############
 	# Push step/finish
 	#  Set S0 to "step" or "finish"
 	#  Set S1 to the variable
 	#  Set S2 to the type
-	# 
+	# Returns: P7 all set up
 PUSHSTEP:
 	set P1, P11[I25]
 	set P2, P1["FOR"]
@@ -125,13 +119,15 @@ PUSHSTEP:
 	branch GEN_ERROR
 PUSHSTEPINT:
 	set I0, P1["value"]
-	push P9, I0
-	push P9, "FLO"
+	new P7, .PerlHash
+	set P7["type"],"INT"
+	set P7["value"],I0
 	ret
 PUSHSTEPFLO:
 	set N0, P1["value"]
-	push P9, N0
-	push P9, "FLO"
+	new P7, .PerlHash
+	set P7["type"],"FLO"
+	set P7["value"],N0
 	ret
 	
 	# ##########################

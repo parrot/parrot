@@ -1,16 +1,21 @@
 #!/usr/bin/perl -w
 
 use subs qw(fetchvar);
-use vars qw(@builtins @keywords);
+use vars qw(%builtins @keywords);
+use strict;
 
-@builtins=qw( abs asc atn
-		    cdbl chr$ cint clng command$ cos csng csrlin cvd 
-		    	cvdmbf cvi cbl cvs cvsmbf 
-		    date$
-		    environ$ eof erdev erdev$ erl err exp
-		    fileattr fix fre freefile
-		    hex$
-		    inkey$ inp input$ instr int ioctl$
+%builtins=qw( 	abs      	asc      	atn
+	      	cdbl		chr$		cint
+		clng		command$	cos
+		csng		csrlin		cvd
+		cvdmbf		cvi		cbl
+		cvs		cvsmbf		date$
+		environ$	eof		erdev
+		erdev$		erl		err
+		exp	    	fileattr	fix
+		fre		freefile	hex$
+		inkey$		inp		input$
+		instr		int		ioctl$
 		    lbound lcase$ left$ len loc lof log lpos ltrim$
 		    mid$ mkd$ mkdmbf$ mki$ mkl$ mks$ mksmbf$
 		    peek pen play pmap point pos
@@ -54,14 +59,8 @@ sub dumpq {
 	print "Current : $type[1] $syms[1]\n";
 	print "Previous: $type[2] $syms[2]\n";
 }
-sub dumpe {
-	foreach(@evalstack) {
-		print "\t", $_->[0], "\t", $_->[1], " \n";
-	}
-}
 sub isbuiltin {		# Built in functions
-	return 1 if (grep /^\Q$_[0]\E$/i, @builtins);
-		
+	return 1 if (exists $builtins{$_[0]});
 	return 0;
 }
 sub isuserfunc {
@@ -72,12 +71,18 @@ sub isarray {
 	$_ =(grep /^\Q$_[0]\E$/i, keys %arrays );
 	return $_;
 }
+
+sub hasargs {
+	return(isbuiltin($_[0]) or isuserfunc($_[0]) or isarray($_[0]));
+}
+
 sub iskeyword { 
 	return 1 if (grep /^\Q$_[0]\E$/i, @keywords);
 	return 0;
 }
 sub precedence {
 	my ($op, $next)=@_;
+	#print STDERR "Precedence with '$op' and '$next'\n";
 
 	return 5  if ($op eq "and");
 	return 5  if ($op eq "eqv");
@@ -111,209 +116,267 @@ sub precedence {
 	return 0;  # Not an operator
 
 }
-{
-	my @stack;
-	sub SPUSH {
-		push(@stack, $_[0]);
+
+sub convert_to_rpn {
+	my(@expr)=@_;
+
+	#print STDERR "In RPN Convert...\n";
+	# Convert to RPN
+	my (@stack,@stream);
+	my $i=-1;
+	foreach my $item (@expr) {
+		die if $i++ > 20;
+		my($sym,$type)=@$item;
+		#print "Got a $sym...\n";
+		if ($sym eq "(") {
+			push @stack, $item;
+			next;
+		}
+		if ($sym eq ")") {
+			push @stream, pop @stack
+				while(@stack and $stack[-1]->[0] ne "(");
+			pop @stack;
+			next;
+		}
+
+		if (! precedence($sym, exists $expr[$i+1]?$expr[$i+1]->[0]:"NOTARR")) {
+			push @stream, $item;  # Operands, etc..
+			next;
+		}
+		#print "It's an op!\n";
+		$item->[2]="OP";
+		if (! @stack) {
+			push @stack, $item;
+			next;
+		}
+		while(@stack and precedence($stack[-1]->[0]) >= precedence($item->[0])) {
+			push @stream, pop @stack;
+		}
+		push @stack, $item;
+		
 	}
-	sub SPOP {
-		return pop(@stack);
+	push @stream, reverse @stack;	
+	#print STDERR "Outta RPN convert\n";
+	return(@stream);
+}
+sub fixup {
+	my(@expr)=@_;
+
+	# Do the fixup.  Unary minus, functions, etc.
+	my @foo=@expr;
+	@expr=();
+	for my $t (0..@foo-1) {
+		my($unary,$argthing)=(0,0);
+		my($prev, $this, $next)=(
+			(($t-1 >= 0)?$foo[$t-1]:undef),
+			$foo[$t], 
+			(($t+1 <= $#foo)?$foo[$t+1]:undef) );
+		if ($this->[0] eq '-' and $this->[1] eq "PUN") {
+			if (! defined $prev->[0] or $prev->[0] eq "(") {
+				$unary=1;
+			} elsif (precedence($prev->[0],$next->[0])) {
+				$unary=1;
+			} elsif (iskeyword($syms[PREV]) and not isbuiltin($syms[PREV]) ) {
+				$unary=1;
+			}
+		}
+		if ($this->[0] eq "("    and 
+			hasargs($prev->[0])   and 
+			$next->[0] ne ")"  ) {
+			$argthing=1;
+		}
+
+		if ($unary) {
+			push(@expr, [ "-1", "INT" ],
+				    [ "*", "PUN"] );
+			next;
+		}
+
+		push(@expr, $foo[$t]);
+		
+		# Functions, array lookups, and builtins are converted 
+		# from a(b,d) 
+		# to   a(,b,d)
+		# and commas become a low-precedence unary operator that means
+		# "Push the top of the stack onto the function's call stack"
+		# No-arg funcs are simply left alone.
+		if ($argthing) {
+			push(@expr, [ "STARTARG", "STARTARG" ] );
+		}
 	}
-	sub SINIT {
-		$stack=();
+	return(@expr);
+}
+sub get_expression {
+	my(%opts)=@_;
+	my $parens;
+	my @expr;
+
+	goto PROCEXP_NOFEED if $opts{lhs};
+	goto PROCEXP_NOFEED if $opts{nofeed};
+	feedme();
+
+PROCEXP_NOFEED:
+	while(1) {
+		$parens++ if ($syms[CURR] eq "(");
+		$parens-- if ($syms[CURR] eq ")");
+		#print "Read $syms[CURR]...";
+		last if (not $parens  and
+			$syms[CURR] eq "=" and $opts{lhs});
+		#print "ok\n";
+		last if ( $type[CURR] eq "STMT"
+				or
+			$type[CURR] eq "COMP"
+				or
+			$type[CURR] eq "COMM"
+				or
+			($type[CURR] eq "BARE" and (iskeyword($syms[CURR])
+					and !isbuiltin($syms[CURR] ))));
+		last if (not $parens and not $opts{ignorecomma} and 
+			($syms[CURR] eq ',' and $type[CURR] ne "STRING"));
+		last if ($syms[CURR] eq ';');
+		push(@expr, [ $syms[CURR], $type[CURR] ]);
+		feedme();
+	}
+	barf();
+	return(@expr);
+}
+sub pushthing {
+	my($code, $toreg, $sym, $type,$lhs)=@_;
+	my $ts="INVALID";
+
+	if ($type ne "RESULT") {
+		if ($type=~/STRING|INT|FLO|BARE/ or ($type eq "BARE" and $lhs)) {
+			$sym=qq{"$sym"} if $type =~ /BARE|STRING/;
+			push @$code, qq{\tnew $toreg, .PerlHash};
+			push @$code, qq{\tset $toreg\["type"], "$type"};
+			push @$code, qq{\tset $toreg\["value"], $sym};
+		} elsif ($type=~/BARELY/) {
+			push @$code, qq{\tset S0, "$sym"};
+			push @$code, qq{\tbsr VARLOOKUP};
+			push @$code, qq{\tbsr VARSTUFF};
+			push @$code, qq{\tset $toreg, P0};
+		} elsif ($type eq "STARTARG") {
+			return;
+		} else {
+			die "Bad type for $sym?";
+		}
+	} else {
+		if (@$code[-1] eq "\tpush P9, $toreg") {
+			pop @$code;
+		} else {
+			push @$code, qq{\tpop $toreg, P9};
+		}
 	}
 }
+my %opsubs=(
+	'+' => "EXPR_ADD",
+	'-' => "EXPR_SUB",
+	'*' => "EXPR_MUL",
+	'/' => "EXPR_DIV",
+	'=' => "EXPR_EQ",
+	'<=' => "EXPR_LE",
+	'>=' => "EXPR_GE",
+	'<>' => "EXPR_NE",
+	'<' => "EXPR_LT",
+	'>' => "EXPR_LT",
+);
+sub pushargs {
+	my($code,$work)=@_;
 
+	return unless @$work;
+	while($$work[-1]->[0] ne "STARTARG") {
+		my $item=pop @$work;
+		if ($item->[1] eq "RESULT") {
+			push @$code, qq{\tpop P0, P9\t# (arg) Result of $item->[0]};
+			push @$code, qq{\tpush P8, P0};
+		} else {
+			pushthing($code, "P1", @$item);
+			push @$code, qq{\tpush P8, P1\t# (arg) $item->[0]};
+		}
+
+	}
+	pop @$work;  # REmove startarg tag...
+}
+sub generate_code {
+	my($lhs,@stream)=@_;
+	my(@code,@work);
+
+	my $oneop=0;
+	my $result;		# Result from prior operation
+	push @code, "\tbsr EXPRINIT\t# Set P9 properly";
+	foreach my $token (@stream) {
+		my($sym,$type,$op)=@$token;
+		#print "Dealing with $sym $type $op\n";
+
+		if (! $op) {
+			push @work, $token;
+			next;
+		}
+		next if ($sym eq ",");  # Commas get ignored, args to stack
+
+		if (hasargs($sym)) {
+			#print "It has args?\n";
+			pushargs(\@code, \@work);
+			if (isarray($sym)) {
+				push @code, qq{\tset S0, "$sym"};
+				push @code, "\tbsr ARRAY_LOOKUP";
+				push @work, [ "result of $sym()", "RESULT" ];
+				push @code, "\tpush P9, P0\t# Result of $sym()";
+			} elsif (isbuiltin($sym)) {
+				$_=$sym;
+				s/\$//g; tr/a-z/A-Z/;
+				push @code, qq{\tbsr BUILTIN_$_};
+				push @work, [ "result of $sym()", "RESULT" ];
+				push @code, "\tpush P9, P6\t# Result of $sym() ";
+			} else {
+				push @code, qq{set S0, "$sym"};
+				push @code, "\tbsr USERFUNC";
+				push @work, [ "result of $sym()", "RESULT" ];
+				push @code, "\tpush P9, P6\t# Result of $sym()";
+			}
+		} else {
+			my($op1,$op2)=(pop @work, pop @work);
+
+			pushthing(\@code, "P6", @$op1);
+			pushthing(\@code, "P7", @$op2);
+			if (exists $opsubs{$sym}) {
+				push @code, "\tbsr $opsubs{$sym}";
+			} else {
+				die "Op $sym not implemented?";
+			}
+			push @work, [ "($op1->[0] $sym $op2->[0])", "RESULT" ];
+			push @code, "\tpush P9, P6";
+		}
+	}
+	if (@work) {
+		$_=pop @work;
+		pushthing(\@code, "P6", $_->[0], $_->[1],$lhs);
+		push @code, "** Dummy **";
+	}
+	pop @code;
+	push @code, "\t# Result is in P6";
+
+	s/$/\n/ for @code;
+
+	return @code;
+}
 sub EXPRESSION {
 	my(%opts);
 	%opts=%{$_[0]} if @_;
 	
-	@workstack=();
-	@evalstack=();
-	SINIT;
-	my $parens=0;
-	print CODE "\t# Evaluating ";
-	my $feeds=0;
-	goto PROCEXP_NOFEED if $opts{lhs};
-	goto PROCEXP_NOFEED if $opts{nofeed};
-PROCEXP:
-	#print "Expression feed\n";
-	feedme();
-	$feeds++;
-PROCEXP_NOFEED:
+	my(@expr, @stream);
+	@expr=get_expression(%opts);	# Get expression tokens
+	@expr=fixup(@expr);		# Repair unary -, functions, etc...
 
-	#print "Processing $syms[CURR] $type[CURR]\n" unless @ARGV;
-	if ( $opts{lhs} and $syms[CURR] eq "=" and not $parens) {
-		goto ENDEXPR;
-	}
-	
-	if ( $type[CURR] eq "STMT"
-			or
-		$type[CURR] eq "COMP"
-			or
-		$type[CURR] eq "COMM"
-			or
-		($type[CURR] eq "BARE" and (iskeyword($syms[CURR])
-				and !isbuiltin($syms[CURR] )))) {
-		#print "Bailing on $type[CURR] $syms[CURR]\n";
-		goto ENDEXPR;
-	}
-	if (not $opts{ignorecomma} and ($syms[CURR] eq ',' and $type[CURR] ne "STRING") and not $parens) {
-		goto ENDEXPR;
-	}
-	if ($syms[CURR] eq ';') {
-		goto ENDEXPR;
-	}
+	#print "Evaluating: ";foreach(@expr) { print $_->[0];" " } print "\n";
+	#foreach(@expr) { print $_->[1]," " } print "\n";
 
-	print CODE "$syms[CURR]";
-		
+	@stream=convert_to_rpn(@expr);	# Get infix into RPN
 
-	# Handle unary minus
-	if ($syms[CURR] eq '-' and $type[CURR] eq "PUN")  {
-	     if ( precedence($syms[PREV], $syms[NEXT])
-		or $syms[PREV] eq ""
-		or $syms[PREV] eq "("
-		or $feeds < 1 or
-		(iskeyword($syms[PREV]) and not isbuiltin($syms[PREV]) ) ) {
-			push(@workstack, [ ( 'OP', 'UNARYMINUS' ) ]);
-			goto PROCEXP;
-	     }
-	}
+	#print "Evaluation stream: "; foreach(@stream) {	print $_->[0]," "; } print "\n";
 
+	@stream=generate_code($opts{lhs},@stream);	# Generate PASM code stream
 
-	if ($type[CURR] eq 'INT' 
-		     or 
-	    $type[CURR] eq 'FLO'
-		     or
-	    $type[CURR] eq 'STRING')  {
-		push(@evalstack, [ ( $type[CURR], $syms[CURR] ) ]);
-		goto PROCEXP;
-	}
-	if ( $syms[CURR] eq '(') {
-		push(@workstack, [ ( $type[CURR], $syms[CURR] ) ]);
-		$parens++;
-		goto PROCEXP;
-	}
-	if ($syms[CURR] eq ')') {
-		$parens--;
-		while(@workstack) {
-			($type,$op)=@{$workstack[-1]}[0,1];
-			if ($op ne '(') {
-				push(@evalstack, pop @workstack);
-				next;
-			} else {
-				pop @workstack;
-			}
-			while (@workstack) {
-				($type,$op)=@{$workstack[-1]}[0,1];
-				if ($type eq 'FUNC') {
-					push(@evalstack, pop @workstack);
-					next;
-				}
-				last;
-			}
-			last;
-		}
-		goto PROCEXP;
-	}
-	if ($_=precedence($syms[CURR], $syms[NEXT]) and $_ < 100) { # and $type[CURR] ne 'BARE') {
-		if (@workstack) {
-			while(@workstack) {
-				($type,$op)=@{$workstack[-1]}[0,1];
-				if ( $op ne '(' and 
-					precedence($op)>=$_) {
-					push(@evalstack, pop @workstack);
-				} else {
-					last;
-				}
-			}
-		} 
-		push(@workstack, [ ( 'OP', $syms[CURR] ) ] );
-		goto PROCEXP;
-	}
-	my $shuffleargs = sub {
-		while(@workstack) {
-			($type,$op)=@{$workstack[-1]}[0,1];
-			if ($op ne '(' and 
-				precedence($op)>=$_) {
-				push(@evalstack, pop @workstack);
-			} else {
-				last;
-			}
-		}
-	};
-	if ($type[CURR] eq 'BARE') {
-		if (isbuiltin($syms[CURR])) {
-			&$shuffleargs;
-			push(@workstack, [ ( 'FUNC', $syms[CURR] ) ] );
-			push(@evalstack, [ ( 'ARG', 'ARG' ) ] );
-		} elsif (isuserfunc($syms[CURR])) {
-			&$shuffleargs;
-			push(@workstack, [ ( 'FUNC', $syms[CURR] ) ] );
-			push(@evalstack, [ ( 'ARG', 'ARG' ) ] );
-		} elsif ($syms[NEXT] eq '(') {  # Arrays!  TBD...
-			&$shuffleargs;
-			#push(@workstack, [ ( 'PUN', '(' ) ] );
-			push(@workstack, [ ( 'SUBSCRIPT', $syms[CURR] ) ] );
-			push(@evalstack, [ ( 'SUBS', 'SUBS' ) ] );
-		} else {
-			push(@evalstack, [ ( $type[CURR], $syms[CURR] ) ]);
-		}
-		goto PROCEXP;
-	}
-
-ENDEXPR:
-	
-	print CODE "   Options: ", join(',', keys %opts) if keys %opts;
-	print CODE "\n";
-	while(@workstack) {
-		if ($workstack[-1]->[1] ne "(") {
-			push(@evalstack, pop @workstack) 
-		} else {
-			pop @workstack;
-		}
-	}
-	#dumpe;print"\n";
-
-	# Now render the code as instructions
-BUILDCODE:
-	@code=();
-	if (@evalstack==1) {   # Special case, optimize a bit.
-		($type,$sym)=@{$evalstack[-1]};
-		goto NEVERMIND if $type =~ /BARE/;
-		die "Unexpected early termination of expression" unless $type =~ /STRING|INT|FLO/;
-		push(@code, qq{\tnew P6, .PerlHash\t# Optimized, no eval\n});
-		push(@code, qq{\tset P6["type"], "$type"\n});
-		if ($type eq "STRING") {
-			$sym=qq{"$sym"};
-		}
-		push(@code, qq{\tset P6["value"], $sym\n});
-		pop @evalstack;  # Tidy.
-	} else {
-NEVERMIND:	push(@code, "\tbsr EXPRINIT\n");
-		while(@evalstack) {
-			($type,$sym)=@{pop @evalstack};
-			if ($type eq "STRING" or $type eq "OP" or
-				$type eq "BARE" or $type eq "ARG" or
-					$type eq "FUNC" or $type eq "SUBS" or $type eq "SUBSCRIPT") {
-				next if $sym eq "," and $type eq "OP";
-				$sym="\\\\" if $sym eq '\\';
-				push(@code, qq{\tpush P9, '$sym'\n});
-			} else {
-				push(@code, qq{\tpush P9, $sym\n});
-			}
-			push(@code, qq{\tpush P9, "$type"\n});
-		}
-		push(@code, "\tbsr EVALEXPR\n");
-	}
-	
-ENDCOMPILE:
-	#dumps();
-	#print "-" x 70, "\n";
-	barf();        # Move back one token.
-	
-	#dumps();
-	#print "-" x 70, "\n";
-	return @code;
+	return(@stream);
 }
 1;

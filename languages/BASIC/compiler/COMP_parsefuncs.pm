@@ -1127,13 +1127,11 @@ qq{	new P6, .PerlHash
 	set P0, P1["$counttype"]
 	set P2, P0["$counter"]
 	set P2["step"], P6
-	
-	# Set initial variable value as an assignment.
-	bsr EXPRINIT
- 	push P9, '$ocounter'
- 	push P9, "BARE"
- 	bsr EVALEXPR
- 	set P0, P6		# Hold the RHS
+
+	# Set initial values
+ 	new P0, .PerlHash
+ 	set P0["type"], "BARE"
+ 	set P0["value"], "$counter" # ?!?
  	
  	set P1, P11[I25]	# Fetch start
 	set P2, P1["FOR"]
@@ -1196,40 +1194,37 @@ sub parse_next_helper {
 	#
 	# NEXT $ovar
 	#			
-	bsr EXPRINIT
-	push P9, "+"
-	push P9, "OP"
-	push P9, '$ovar'    # The variable
-	push P9, "BARE"
+
+	new P6, .PerlHash
+	set P6["type"], "BARE"
+	set P6["value"], "$ovar"
 	
 	set S0, "step"
 	set S1, "$var"
 	set S2, "$vartype"
-	bsr PUSHSTEP
-	bsr EVALEXPR		# Variable + Step in P6
-	
+	bsr PUSHSTEP		# Creates a reasonable P7
+	bsr EXPR_ADD		# Leaves result in P6
+
 	set P1, P11[I25]
 	set P2, P1["FOR"]
 	set P1, P2["$vartype"]
 	set P2, P1["$var"]
 	set P0, P2["variable"]
 	bsr ASSIGNMENT		# P0 = P6
-	# Do we continue?
-	bsr EXPRINIT
-	push P8, P5		  # Where we're at.
+
+
+	set P6, P0		# Where we are, P6
+	set S2, "$vartype"
+	set S1, "$var"
+	set S0, "finish"
+	bsr PUSHSTEP		# Where we're going, P7
+
 	set P1, P11[I25]
 	set P2, P1["FOR"]
 	set P1, P2["$vartype"]
 	set P2, P1["$var"]
 	set I1, P2["direction"]   # -1/1
-	bsr WHICH_COMPARE	  # Set S0 to comparison operator
-	push P9, S0
-	push P9, "OP"
-	set S2, "$vartype"
-	set S1, "$var"
-	set S0, "finish"
-	bsr PUSHSTEP
-	bsr EVALEXPR		  # Continue is in P6
+	bsr WHICH_COMPARE	  # Actually *do* the comparison, indirectly
 	
 	set I0, P6["value"]
 	eq I0, 1, FOR_LOOP_$ps->{jump}

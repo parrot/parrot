@@ -39,11 +39,11 @@ UF_ARGLOAD:
 	pop S0, P5  # Arg stuff
 	pop S1, P5  # Variable name (here, in this scope)
 		
-	#print "S0="
+	#print "Arg type S0="
 	#print S0
-	#print " S1="
+	#print " arg name S1="
 	#print S1
-	#print " S2="
+	#print " type? S2="
 	#print S2
 	#print "\n"
 	
@@ -78,6 +78,7 @@ UF_LOADBARE:
 	# S1 = Variable name
 	# S2 = Type of current var (BARE)
 UF_LOADBAREVAR:
+	print 2, "Reference?\n"
 	set S2, "REF"
 	restore S0
 	branch UF_ARGLOADPROC

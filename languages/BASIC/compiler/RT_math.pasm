@@ -47,8 +47,7 @@ NOT:	bsr POPZERO
 	set S0, "INT"
 	branch MATHOPEND
 
-GT:     bsr POPZERO
-	bsr POPONE
+EXPR_GT:     bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", GTINT
 	eq S0, "FLO", GTFLO
@@ -65,8 +64,7 @@ GTSTRING:bsr SETUPSTRING
 	branch RETURNBOOL_FALSE
 
 	
-LT:     bsr POPZERO
-	bsr POPONE
+EXPR_LT:     bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", LTINT
 	eq S0, "FLO", LTFLO
@@ -83,8 +81,7 @@ LTSTRING:bsr SETUPSTRING
 	branch RETURNBOOL_FALSE
 
 
-LE:     bsr POPZERO
-	bsr POPONE
+EXPR_LE:bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", LEINT
 	eq S0, "FLO", LEFLO
@@ -100,8 +97,7 @@ LESTRING:bsr SETUPSTRING
 	le S1, S0, RETURNBOOL_TRUE
 	branch RETURNBOOL_FALSE
 
-GE:     bsr POPZERO
-	bsr POPONE
+EXPR_GE:bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", GEINT
 	eq S0, "FLO", GEFLO
@@ -118,8 +114,7 @@ GESTRING:bsr SETUPSTRING
 	branch RETURNBOOL_FALSE
 
 
-EQ:     bsr POPZERO
-	bsr POPONE
+EXPR_EQ:bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", EQINT
 	eq S0, "FLO", EQFLO
@@ -136,8 +131,7 @@ EQSTRING:bsr SETUPSTRING
 	branch RETURNBOOL_FALSE
 
 
-NE:     bsr POPZERO
-	bsr POPONE
+EXPR_NE:bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", NEINT
 	eq S0, "FLO", NEFLO
@@ -154,8 +148,8 @@ NESTRING:bsr SETUPSTRING
 	branch RETURNBOOL_FALSE
 
 
-ADD:	bsr POPZERO
-	bsr POPONE
+EXPR_ADD:
+	bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", ADDINT
 	eq S0, "FLO", ADDFLO
@@ -173,8 +167,8 @@ ADDSTRING:
 	set S0, "STRING"
 	branch MATHOPEND
 	
-MUL:	bsr POPZERO
-	bsr POPONE
+EXPR_MUL: 
+	bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", MULINT
 	eq S0, "FLO", MULFLO
@@ -186,8 +180,7 @@ MULFLO: bsr SETUPFLO
 	mul N5, N0, N1
 	branch MATHOPEND
 
-SUB:	bsr POPZERO
-	bsr POPONE
+EXPR_SUB:bsr SETUP_MATH_BINARY
 	bsr CAST_UP
 	eq S0, "INT", SUBINT
 	eq S0, "FLO", SUBFLO
@@ -200,9 +193,9 @@ SUBFLO: bsr SETUPFLO
 	branch MATHOPEND
 
 	# Divide's weird.  Make 'em both floats
-DIV:	bsr POPZERO
-	bsr POPONE
-	bsr CAST_TO_FLOAT
+EXPR_DIV:
+	bsr SETUP_MATH_BINARY
+        bsr CAST_TO_FLOAT
 	bsr SETUPFLO
 	div N5, N1, N0
 	set S0, "FLO"	# Result is float too!
@@ -225,19 +218,6 @@ POW:	bsr POPZERO
 	set S0, "FLO"
 	branch MATHOPEND
 
-UNARYMINUS:
-	bsr POPZERO
-	set S0, P6["type"]
-	eq S0, "INT", UNARYMINUSINT
-	set N0, P6["value"]
-	neg N5, N0
-	branch UNARYMINUSEND
-UNARYMINUSINT:
-	set I0, P6["value"]
-	neg I5, I0
-UNARYMINUSEND:
-	branch MATHOPEND
-
 SETUPINT:set I0, P6["value"]
 	set I1, P7["value"]
 	ret
@@ -248,6 +228,7 @@ SETUPSTRING:
 	set S0, P6["value"]
 	set S1, P7["value"]
 	ret
+
 	# Take results from math op, push to stack
 	#    Type in S0
 	#    Results in N5/I5
@@ -264,8 +245,9 @@ MATHOPENDINT:
 MATHOPENDSTRING:
 	set P5["value"], S5
 MATHOPEND2:
-	bsr PUSHRESULT
-	branch EVALEXPR	
+	set P6, P5
+	ret
+
 
 	# BOOL returns are INTs
 	#
@@ -279,3 +261,22 @@ RETURNBOOL:
 	set S0, "INT"
 	branch MATHOPEND
 
+	# For binary & unary operators 
+	# make sure we're using STRING/INT/FLO and not 
+	# references or arrays or anything nasty
+SETUP_MATH_BINARY:
+	set S0, P7["type"]
+	ne S0, "BARE", SETUP_MATH_UNARY
+	set S0, P7["value"]
+	bsr VARLOOKUP
+	bsr VARSTUFF
+	set P7, P0
+SETUP_MATH_UNARY:
+	set S0, P6["type"]
+	ne S0, "BARE", SETUP_MATH_DONE
+	set S0, P6["value"]
+	bsr VARLOOKUP
+	bsr VARSTUFF
+	set P6, P0
+SETUP_MATH_DONE:
+	ret	

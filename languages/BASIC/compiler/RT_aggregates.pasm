@@ -10,7 +10,7 @@
 	# ARRAY_LOOKUP
 	# Inputs:  
 	#	S0   Array's name (WITH SIGIL)
-	#	P8 - Stack (back to type SUBS)
+	#	P8 - Stack 
 	#		has subscripts
 	# Returns:
 	#       P0 - Element of the array   { type => USER/INT/FLO/STRING etc...
@@ -100,10 +100,9 @@ ARRAY_BUILDKEY:
 	set S2, ""	
 AL_BUILDKEY:
 	set I0, P8  
-	eq I0, 0, ERR_STACKE
+	eq I0, 0, BUILDKEY_DONE
 	pop P0, P8
 	set S1, P0["type"]
-	eq S1, "SUBS", BUILDKEY_DONE
 	length I0, S2
 	eq I0, 0, AL_DIST
 	concat S2, S2, ","

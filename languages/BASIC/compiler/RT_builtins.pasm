@@ -685,7 +685,6 @@ GETARGS:set I5, P8
 	#print "Pulling a "
 	#print S1
 	#print " as a function argument\n"
-	eq S1, "ARG", ERRBADARGS
 	eq S1, "FLO", GETFLO
 	eq S1, "STRING", GETSTRING
 	eq S1, "INT", GETINT
@@ -735,32 +734,17 @@ MAKEFLO_END:
 	# Clears the ARG marker from the expression stack
 	#
 CLEARARGS:
-	pushs
-	pushi
-	set I0, P8
-	eq I0, 0, ERRBADARGS
-	pop P0, P8
-	set S0, P0["type"]
-	ne S0, "ARG", ERRBADARGS
-	popi
-	pops
+	set P8, 0
 	ret
 
 	# ###################################
 	# ARGCK
 	#   Sets I3 = 1 End of arguments
 	#           = 0 There's more arguments
-ARGCK:pushp
-	pushs
-	set I3, 1   # Assume at end
-	set P0, P8[-1]
-	set S0, P0["type"]
-	eq S0, "ARG", ARGCKEND
-	set I3, 0
-ARGCKEND:
-	pops
-	popp
-	ret
+ARGCK:	set I3, P8
+	eq I3, 0, ARGCKEND
+	set I3, 1
+ARGCKEND:ret
 
 ERRBADARGS:
 	print "Not enough arguments on stack "
@@ -773,8 +757,8 @@ PUSHRET:
  	#print "Pushing result "
  	#print S1
  	#print " back to stack\n"
- 	new P5, .PerlHash
- 	set P5["type"], S1
+ 	new P6, .PerlHash
+ 	set P6["type"], S1
 	eq S1, "INT", BI_PUSHINT
 	eq S1, "FLO", BI_PUSHFLO
 	eq S1, "STRING", BI_PUSHSTRING
@@ -783,11 +767,11 @@ PUSHRET:
 	print "' onto arg stack\n"
 	branch GEN_ERROR
 BI_PUSHINT:
-	set P5["value"], I0
-	branch PUSHRESULT    # Implicit return from here!
+	set P6["value"], I0
+	ret
 BI_PUSHFLO:
-	set P5["value"], N0
-	branch PUSHRESULT
+	set P6["value"], N0
+	ret
 BI_PUSHSTRING:
-	set P5["value"], S0
-	branch PUSHRESULT
+	set P6["value"], S0
+	ret

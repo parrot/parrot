@@ -48,8 +48,12 @@ EXPR_RESTART:
 	set P9, P0["expr"]
 	set P8, P0["exprwork"]
 	ret
+
+
+
+
 	
-PUSHRESULT:
+PUSHRESULT:			# Unneeded?
 	push P8, P5
 	set S0, P5["type"]
 	ret
@@ -68,7 +72,7 @@ PUSHRESULT:
 	#
 	#  If any of the operands is a bareword, then assume it's a variable
 	#  and go fetch a value first.
-POPZERO:#print "WS POPZERO\n"
+POPZERO:#print "WS POPZERO\n"		# Unneeded
 	set I5, P8
 	eq I5, 0, ERRSTACK
 	pop P6, P8	# Type
@@ -93,7 +97,7 @@ POPZERO_CAREFUL:   # Do *not* de-reference variables... unless
 	#print " in P6\n"
 	ret
 	
-POPONE: 
+POPONE: 				# Unneeded
 	#print "WS POPONE of type "
 	set I5, P8
 	eq I5, 0, ERRSTACK
@@ -208,6 +212,9 @@ UNSTUFFUSER:
 	#	etc...
 	#  
 EVALEXPR:
+	print "INVALID NOW"
+	end
+
 	set I5, P9
 	eq I5, 0, STACKE
 	pop S5, P9
@@ -309,18 +316,14 @@ USERFUNC:
 	#print "Trying user defined '"
 	#print S0
 	#print "'...\n"
-	set I5, 0
+	set I5, P8	# Save this for argc
 USERFUNCARGS:
+	set I4, P8
+	eq I4, 0, USERFUNCARGSEND
 	pop P0, P8
 	set S1, P0["type"]
-	#print "---> Passing a "
-	#print S1
-	#print " on the argument stack\n"
-	
 	set S2, P0["parent"]
 	ne S2, "", UF_PASSARR
-	
-	eq S1, "ARG", USERFUNCARGSEND
 	eq S1, "INT", UFAINT
 	eq S1, "FLO", UFAFLO
 	eq S1, "STRING", UFASTRING
@@ -354,7 +357,6 @@ UF_PASSARR:                     # The array was resolved down to a bogus element
 	
 UFAEND:	#print "== Pushing type\n"
 	save S1    # Save the type.
-	inc I5
 	branch USERFUNCARGS
 
 
@@ -372,10 +374,12 @@ USERFUNCARGSEND:
 	#print S1
 	#print "\n"
 	bsr VARSTUFF
-	set P5, P0
+	set P6, P0
 	bsr EXPR_RESTART
-	bsr PUSHRESULT
-	branch EVALEXPR
+#	bsr PUSHRESULT
+
+#	bsr EXPR_RESTART
+	ret
 	
 TRYSUB:
 	bsr SUB_DISPATCH		# If a sub is dispatched,
@@ -397,16 +401,16 @@ OPEVAL:
 	#print S4
 	#print "\n"
 	
-	eq S4, "+", ADD
-	eq S4, "-", SUB
-	eq S4, "*", MUL
-	eq S4, "/", DIV
-	eq S4, ">", GT
-	eq S4, "<", LT
-	eq S4, "=", EQ
-	eq S4, "<=", LE
-	eq S4, ">=", GE
-	eq S4, "<>", NE
+#	eq S4, "+", ADD
+#	eq S4, "-", SUB
+#	eq S4, "*", MUL
+#	eq S4, "/", DIV
+#	eq S4, ">", GT
+#	eq S4, "<", LT
+#	eq S4, "=", EQ
+#	eq S4, "<=", LE
+#	eq S4, ">=", GE
+#	eq S4, "<>", NE
 	eq S4, "and", AND
 	eq S4, "or", OR
 	eq S4, "not", NOT
@@ -416,7 +420,7 @@ OPEVAL:
 	eq S4, "mod", MOD
 	eq S4, "^", POW
 
-	eq S4, "UNARYMINUS", UNARYMINUS
+#	eq S4, "UNARYMINUS", UNARYMINUS
 	eq S4, ".", MEMBER
 	branch ERRILLOP
 
@@ -641,5 +645,3 @@ CTI_CONV:
 	set P6["type"], "INT"
 	set P6["value"], I0
 CTI_RET:ret
-
-	
