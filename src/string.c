@@ -766,6 +766,7 @@ INTVAL
 string_str_index(Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start)
 {
+    STRING *src, *search;
     union {
         const void * __c_ptr;
         void * __ptr;
@@ -778,8 +779,10 @@ string_str_index(Interp *interpreter, const STRING *s,
 
     saneify_string(s);
     saneify_string(s2);
+    src = const_cast(s);
+    search = const_cast(s2);
 
-    return CHARSET_INDEX(interpreter, s, s2, start);
+    return CHARSET_INDEX(interpreter, src, search, start);
 }
 
 /*

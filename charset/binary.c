@@ -116,15 +116,15 @@ compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 }
 
 static INTVAL
-cs_index(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
+cs_index(Interp *interpreter, STRING *source_string,
+        STRING *search_string, UINTVAL offset)
 {
     return -1;
 }
 
 static INTVAL
-cs_rindex(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
+cs_rindex(Interp *interpreter, STRING *source_string,
+        STRING *search_string, UINTVAL offset)
 {
     return -1;
 }

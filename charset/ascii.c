@@ -331,14 +331,47 @@ ascii_compare(Interp *interpreter, STRING *lhs, STRING *rhs)
 }
 
 INTVAL
-ascii_cs_index(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
+mixed_cs_index(Interp *interpreter, STRING *src, STRING *search, UINTVAL offs)
+{
+    String_iter src_iter, search_iter;
+    UINTVAL c1, c2, len;
+    INTVAL start;
+
+    ENCODING_ITER_INIT(interpreter, src, &src_iter);
+    src_iter.set_position(interpreter, &src_iter, offs);
+    ENCODING_ITER_INIT(interpreter, search, &search_iter);
+    len = search->strlen;
+
+    start = -1;
+    for (; len && offs < src->strlen; ++offs) {
+        c1 = src_iter.get_and_advance(interpreter, &src_iter);
+        c2 = search_iter.get_and_advance(interpreter, &search_iter);
+        if (c1 == c2) {
+            --len;
+            if (start == -1)
+                start = offs;
+        }
+        else {
+            len = search->strlen;
+            start = -1;
+            search_iter.set_position(interpreter, &search_iter, 0);
+        }
+    }
+    if (len == 0)
+        return start;
+    return -1;
+}
+
+INTVAL
+ascii_cs_index(Interp *interpreter, STRING *source_string,
+        STRING *search_string, UINTVAL offset)
 {
     UINTVAL base_size, search_size;
     char *base, *search;
     INTVAL retval;
     if (source_string->charset != search_string->charset) {
-        internal_exception(UNIMPLEMENTED, "Cross-charset index not supported");
+        return mixed_cs_index(interpreter, source_string, search_string,
+                offset);
     }
 
     assert(source_string->encoding == Parrot_fixed_8_encoding_ptr);
@@ -348,8 +381,8 @@ ascii_cs_index(Interp *interpreter, const STRING *source_string,
 }
 
 INTVAL
-ascii_cs_rindex(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset) {
+ascii_cs_rindex(Interp *interpreter, STRING *source_string,
+        STRING *search_string, UINTVAL offset) {
     UINTVAL base_size, search_size;
     char *base, *search;
     INTVAL retval;

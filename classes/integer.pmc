@@ -410,7 +410,8 @@ two types.
 
 */
     void add_int (INTVAL b, PMC* dest) {
-        INTVAL a = PMC_int_val(SELF);
+        /* INTVAL a = PMC_int_val(SELF); */
+        INTVAL a = VTABLE_get_integer(INTERP, SELF);
         INTVAL c = a + b;
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, dest, c);

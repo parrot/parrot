@@ -16,6 +16,7 @@ This file implements the charset functions for unicode data
 
 #include "parrot/parrot.h"
 #include "unicode.h"
+#include "ascii.h"
 
 #ifdef EXCEPTION
 #  undef EXCEPTION
@@ -149,17 +150,10 @@ compare(Interp *interpreter, STRING *lhs, STRING *rhs)
     return 0;
 }
 
-static INTVAL
-cs_index(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
-{
-    UNIMPL;
-    return 0;
-}
 
 static INTVAL
-cs_rindex(Interp *interpreter, const STRING *source_string,
-        const STRING *search_string, UINTVAL offset)
+cs_rindex(Interp *interpreter, STRING *source_string,
+        STRING *search_string, UINTVAL offset)
 {
     UNIMPL;
     return 0;
@@ -336,7 +330,7 @@ Parrot_charset_unicode_init(Interp *interpreter)
         downcase_first,
         titlecase_first,
         compare,
-        cs_index,
+        mixed_cs_index,
         cs_rindex,
         validate,
         is_wordchar,

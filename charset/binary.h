@@ -22,8 +22,6 @@ static void upcase_first(Interp *, STRING *source_string);
 static void downcase_first(Interp *, STRING *source_string);
 static void titlecase_first(Interp *, STRING *source_string);
 static INTVAL compare(Interp *, STRING *lhs, STRING *rhs);
-static INTVAL cs_index(Interp *, const STRING *source_string, const STRING *search_string, UINTVAL offset);
-static INTVAL cs_rindex(Interp *, const STRING *source_string, const STRING *search_string, UINTVAL offset);
 static UINTVAL validate(Interp *, STRING *source_string);
 static INTVAL is_wordchar(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_wordchar(Interp *, STRING *source_string, UINTVAL offset);
