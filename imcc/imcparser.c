@@ -2178,7 +2178,7 @@ yyreduce:
 
   case 75:
 #line 558 "imcc/imcc.y"
-    {  yyval.t = P_METHOD; }
+    {  yyval.t = P_METHOD | P_NONE ; }
     break;
 
   case 76:
