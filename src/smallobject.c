@@ -340,7 +340,8 @@ alloc_objects(struct Parrot_Interp *interpreter,
     else {
         /* first arena, start with x objects */
         start = 0;
-        end = 1024*4;
+        end = 1024*2;
+        assert(end < pool->objects_per_alloc);
     }
 #else
     start = 0;

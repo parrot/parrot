@@ -56,9 +56,6 @@ typedef struct {
 void
 stack_system_init(Interp *interpreter)
 {
-    int i;
-
-    make_bufferlike_pool(interpreter, sizeof(Stack_Chunk_t));
     /*
      * TODO cleanup in Parrot_really_destroy
      */
@@ -72,6 +69,7 @@ get_size_class(Parrot_Interp interpreter, size_t item_size)
     int i;
     Stack_cache *sc = interpreter->stack_chunk_cache;
 
+    item_size += offsetof(Stack_Chunk_t, data);
     for (i = 0; i < MAX_CACHED_STACKS; ++i) {
         if (!sc->stack_cache[i].size)
             break;
@@ -80,6 +78,7 @@ get_size_class(Parrot_Interp interpreter, size_t item_size)
     }
     if (i == MAX_CACHED_STACKS)
         PANIC("Too many cached stacks");
+    make_bufferlike_pool(interpreter, item_size);
     sc->stack_cache[i].size = item_size;
     sc->stack_cache[i].free_list = NULL;
     return i;
@@ -104,23 +103,21 @@ mark_stack_chunk_cache(Parrot_Interp interpreter)
 /*
  * s. also STACK_DATAP and mark routines in stacks.c and registers.c
  *
- * It'll be replaced very likely by some more macros in src/generic_register.c
+ * Create a header pool with the payload size attached
  */
 
 Stack_Chunk_t *
 register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 {
-    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter,
-            sizeof(Stack_Chunk_t));
+    Stack_cache *sc = interpreter->stack_chunk_cache;
+    int s = get_size_class(interpreter, item_size);
+    Stack_cache_entry *e = sc->stack_cache + s;
+    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter, e->size);
 
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->free_p = NULL;
     chunk->name = name;
-    chunk->size_class = get_size_class(interpreter, item_size);
-    /* Block DOD from murdering our newly allocated stack buffer. */
-    Parrot_block_DOD(interpreter);
-    Parrot_allocate(interpreter, chunk, item_size);
-    Parrot_unblock_DOD(interpreter);
+    chunk->size_class = s;
     return chunk;
 }
 
@@ -143,12 +140,7 @@ cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
         new_chunk->free_p = NULL;
     }
     else {
-        new_chunk = new_bufferlike_header(interpreter,
-                sizeof(Stack_Chunk_t));
-        /* XXX do we need it */
-        Parrot_block_DOD(interpreter);
-        Parrot_allocate(interpreter, new_chunk, chunk->buflen);
-        Parrot_unblock_DOD(interpreter);
+        new_chunk = new_bufferlike_header(interpreter, e->size);
         new_chunk->size_class = s;
     }
     new_chunk->name = chunk->name;

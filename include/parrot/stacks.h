@@ -29,10 +29,11 @@ typedef struct Stack_Chunk {
     const char * name;
     struct Stack_Chunk *prev;
     struct Stack_Chunk *free_p;
+    void *data;
 } Stack_Chunk_t;
 
-#define STACK_DATAP(chunk)    PObj_bufstart(chunk)
-#define STACK_ITEMSIZE(chunk) PObj_buflen(chunk)
+#define STACK_DATAP(chunk)    &chunk->data
+/* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 
 typedef void (*Stack_cleanup_method)(Stack_Entry_t *);
