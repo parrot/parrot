@@ -1,5 +1,5 @@
 /*
-Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -12,7 +12,7 @@ C<String> extends C<mmd_default> to provide a string for languages
 that want a C<string> type without going to an S register. Acts as a
 wrapper for the functions in /src/string.c
 
-=head2 Functions
+=head2 Methods
 
 =over 4
 
@@ -22,15 +22,9 @@ wrapper for the functions in /src/string.c
 
 #include "parrot/parrot.h"
 
-pmclass String extends mmd_default {
+pmclass String {
 
 /*
-
-=back
-
-=head2 Methods
-
-=over 4
 
 =item C<void init()>
 
@@ -41,8 +35,9 @@ Initializes the string.
 */
 
     void init () {
+        PMC_str_val(SELF) =
+            string_make_empty(INTERP, enum_stringrep_one, 0);
         PObj_custom_mark_SET(SELF);
-        PMC_str_val(SELF) = string_make_empty(INTERP, enum_stringrep_one, 0);
     }
 
 /*
@@ -54,6 +49,7 @@ Marks the string as live.
 =cut
 
 */
+
     void mark () {
         if(PMC_str_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
@@ -68,6 +64,7 @@ Creates a copy of the string.
 =cut
 
 */
+
     PMC* clone () {
         PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
@@ -84,6 +81,7 @@ Returns the integer representation of the string.
 =cut
 
 */
+
     INTVAL get_integer () {
         STRING *s = (STRING*) PMC_str_val(SELF);
         return string_to_int(INTERP, s);
@@ -98,6 +96,7 @@ Returns the floating-point representation of the string.
 =cut
 
 */
+
     FLOATVAL get_number () {
         STRING *s = (STRING*) PMC_str_val(SELF);
         return string_to_num(INTERP, s);
@@ -113,6 +112,7 @@ Returns the big numbers representation of the string.
 =cut
 
 */
+
     BIGNUM* get_bignum () {
         /* XXX */
         return (BIGNUM*)0;
@@ -127,6 +127,7 @@ Returns the string itself.
 =cut
 
 */
+    /* XXX useless? */
     STRING* get_string () {
         return (STRING*) PMC_str_val(SELF);
     }
@@ -140,6 +141,7 @@ Returns the boolean value of the string.
 =cut
 
 */
+
     INTVAL get_bool () {
         STRING *s = (STRING*) PMC_str_val(SELF);
         return string_bool(INTERP, s);
@@ -154,6 +156,7 @@ Sets the value of the string to the integer C<value>.
 =cut
 
 */
+
     void set_integer_native (INTVAL value) {
         PMC_str_val(SELF) = string_from_int(INTERP, value);
     }
@@ -167,6 +170,7 @@ Sets the value of the string to the floating-point C<value>.
 =cut
 
 */
+
     void set_number_native (FLOATVAL value) {
         PMC_str_val(SELF) = string_from_num(INTERP, value);
     }
@@ -181,6 +185,7 @@ Sets the value of the string to the big number C<value>.
 =cut
 
 */
+
     void set_bignum_native (BIGNUM* value) {
         /* XXX */
     }
@@ -194,6 +199,7 @@ Sets the value of the string to that of the specified C<string>.
 =cut
 
 */
+
     void set_string_native (STRING* value) {
         PMC_str_val(SELF) = value;
     }
@@ -207,8 +213,10 @@ Sets the value of the string to a copy of the specified C<string>.
 =cut
 
 */
+
     void assign_string_native (STRING* value) {
-        PMC_str_val(SELF) = string_copy(INTERP, value);
+        PMC_str_val(SELF) =
+            string_set(INTERP, PMC_str_val(SELF), value);
     }
 
 /*
@@ -221,15 +229,17 @@ the specified C<String> PMC.
 =cut
 
 */
+
     void set_string_same (PMC* value) {
-        PMC_str_val(SELF) = PMC_str_val(value);
+        PMC_str_val(SELF) =
+            string_set(INTERP, PMC_str_val(SELF), PMC_str_val(value));
     }
 
 /*
 
 =item C<VOID set_pmc(PMC* value)>
 
-Sets the value of the string to the value of
+Sets the value of the string to the string value of
 the specified C<PMC>.
 
 =cut
@@ -243,7 +253,7 @@ the specified C<PMC>.
 
 =item C<VOID assign_pmc(PMC* value)>
 
-Sets the value of the string to the value of
+Sets the value of the string to the string value of
 the specified C<PMC>.
 
 =cut
@@ -251,7 +261,7 @@ the specified C<PMC>.
 */
     void assign_pmc (PMC* value) {
         STRING *s = VTABLE_get_string(INTERP, value);
-        PMC_str_val(SELF) = string_copy(INTERP, s);
+        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), s);
     }
 
 /*
@@ -275,7 +285,7 @@ the specified C<PMC>.
 =item C<VOID bitwise_xors_str(PMC* value, PMC* dest)>
 =cut
 =item C<VOID bitwise_nots(PMC* value)>
-=cut
+
 These functions perform bitwise operations on entire
 strings, and place the result in C<dest>.
 
@@ -285,68 +295,74 @@ strings, and place the result in C<dest>.
     void bitwise_or (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
     }
 
     void bitwise_and (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_and(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_and(INTERP, s, v, NULL));
     }
 
     void bitwise_xor (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_xor(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_xor(INTERP, s, v, NULL));
     }
 
     void bitwise_ors (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
     }
 
     void bitwise_ors_str (STRING* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_or(INTERP, s, value, 
-NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_or(INTERP, s, value, NULL));
     }
 
     void bitwise_ands (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_or(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_and(INTERP, s, v, NULL));
     }
 
     void bitwise_ands_str (STRING* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_or(INTERP, s, value, 
-NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_and(INTERP, s, value, NULL));
     }
 
     void bitwise_xors (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_xor(INTERP, s, v, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_xor(INTERP, s, v, NULL));
     }
 
     void bitwise_xors_str (STRING* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_xor(INTERP, s, value, 
-NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_xor(INTERP, s, value, NULL));
     }
 
     void bitwise_nots (PMC* dest) {
         STRING *s = PMC_str_val(SELF);
-        VTABLE_set_string_native(INTERP, dest, string_bitwise_not(INTERP, s, NULL));
+        VTABLE_set_string_native(
+            INTERP, dest, string_bitwise_not(INTERP, s, NULL));
     }
 
 /*
 
 =item C<VOID concatenate(PMC* value, PMC* dest)>
 
-Concatenates the string with C<value> and places the result
-in C<dest>.
+Concatenates the string with C<value> and places the result in C<dest>.
 
 =cut
 
@@ -354,22 +370,24 @@ in C<dest>.
     void concatenate (PMC* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        VTABLE_set_string_native(INTERP, dest, string_concat(INTERP, s, v, 0));
+        STRING *o = string_concat(INTERP, s, v, 0);
+        VTABLE_set_string_native(
+            INTERP, dest, o);
     }
 
 /*
 
 =item C<VOID concatenate_str(STRING* value, PMC* dest)>
 
-Concatenates the string with C<value> and places the result
-in C<dest>.
+Concatenates the string with C<value> and places the result in C<dest>.
 
 =cut
 
 */
     void concatenate_str (STRING* value, PMC* dest) {
         STRING *s = PMC_str_val(SELF);
-        VTABLE_set_string_native(INTERP, dest, string_concat(INTERP, s, value, 0));
+        STRING *o = string_concat(INTERP, s, value, 0);
+        VTABLE_set_string_native(INTERP, dest, o);
     }
 
 /*
@@ -398,6 +416,7 @@ C<value>; returns true if they match.
 =cut
 
 */
+
     INTVAL is_equal_num (PMC* value) {
         FLOATVAL sf = string_to_num(INTERP, PMC_str_val(SELF));
         FLOATVAL vf = VTABLE_get_number(INTERP, value);
@@ -408,24 +427,27 @@ C<value>; returns true if they match.
 
 =item C<INTVAL is_equal_str(PMC* value)>
 
-Compares the string with C<value>; returns true if
-they match.
+Compares the string with C<value>; returns FALSE if they match.
 
 =cut
 
 */
+
     INTVAL is_equal_str (PMC* value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == string_equal(INTERP, s, v));
+        return string_equal(INTERP, s, v);
     }
 
 /*
 
 =item C<INTVAL is_same(PMC* value)>
 
-Compares the string PMC with the C<value> PMC and returns
-true if they are identical.
+Compares the string in this PMC with the one in the C<value> PMC.
+Returns true if this PMC and the one in C<value> are of the same PMC
+class and their strings are aliases of the same internal string.
+
+(this can only happen if you use the set_string_native method)
 
 =cut
 
@@ -433,10 +455,9 @@ true if they are identical.
     INTVAL is_same (PMC* value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = PMC_str_val(value);
-        /* XXX is this the right way to check for is_same? */
         return (INTVAL)(
                 value->vtable == SELF->vtable &&
-                string_equal(INTERP, s, v)
+                s == v
             );
     }
 
@@ -499,14 +520,13 @@ is smaller.
 
 =item C<void repeat(PMC* value, PMC* dest)>
 
-Repeats the string C<value> times and places the result
-in C<dest>.
+Repeats the string C<value> times and places the result in C<dest>.
 
 =cut
 
 */
     void repeat (PMC* value, PMC* dest) {
-        INTVAL n = VTABLE_get_integer(INTERP, dest);
+        INTVAL n = VTABLE_get_integer(INTERP, value);
         STRING *s = PMC_str_val(SELF);
         STRING *s2 = string_repeat(INTERP, s, n, NULL);
         VTABLE_set_string_native(INTERP, dest, s2);
@@ -516,8 +536,7 @@ in C<dest>.
 
 =item C<void repeat_int(INTVAL value, PMC* dest)>
 
-Repeats the string C<value> times and places the result
-in C<dest>.
+Repeats the string C<value> times and places the result in C<dest>.
 
 =cut
 
@@ -546,7 +565,7 @@ C<length>, and places it in C<dest>.
 
 /*
 
-=item C<void substr(INTVAL offset, INTVAL length, PMC* dest)>
+=item C<void substr(INTVAL offset, INTVAL length)>
 
 Extracts the substring starting at C<offset>, with size
 C<length>, and returns it.
@@ -557,6 +576,40 @@ C<length>, and returns it.
     STRING* substr_str (INTVAL offset, INTVAL length) {
         STRING *s = PMC_str_val(SELF);
         return string_substr(INTERP, s, offset, length, NULL, 0);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Returns true if the C<key>'th character in the string exists. Negative
+numbers count from the end.
+
+=cut
+
+*/
+
+    INTVAL exists_keyed(PMC* key) {
+        INTVAL n = string_length(INTERP, PMC_str_val(SELF));
+        INTVAL k = VTABLE_get_integer(INTERP, key);
+        return (INTVAL)( (k>=0 && k<=n) || (k<0 && -k<=n) );
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the C<key>'th character in the string. Negative numbers count
+from the end.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed(PMC* key) {
+        STRING *s = PMC_str_val(SELF);
+        INTVAL k = VTABLE_get_integer(INTERP, key);
+        return string_substr(INTERP, s, k, 1, NULL, 0);
     }
 
 /*
@@ -608,3 +661,9 @@ Used to unarchive the string.
  *
  * vim: expandtab shiftwidth=4:
 */
+
+
+
+
+
+
