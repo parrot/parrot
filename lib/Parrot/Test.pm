@@ -278,7 +278,7 @@ sub generate_functions {
         my $exit_code = 0;
 	my $pass = 0;
 
-	$cmd = "(cd $path_to_parrot && $PARROT ${args} $as_f)";
+	$cmd = "(cd $path_to_parrot && $PARROT ${args} \"$as_f\")";
 
 	$exit_code = _run_command($cmd, STDOUT => $out_f, STDERR => $out_f);
 

@@ -1,0 +1,127 @@
+This file is best viewed with "perldoc README.win32".
+
+=head1 NAME
+
+README.win32 - Parrot under Windows
+
+=head1 SYNOPSIS
+
+These are instructions for building the "native" port of Parrot under
+Windows 2000/XP on the Intel x86 architecture.
+
+=head1 DESCRIPTION
+
+Win32 "native" ports require no additional software to run but the
+operating system.  There should be other READMEs for (emulation)
+systems that run on Win32, eg Cygwin.
+
+Native compilers include:
+
+       Borland C++ (bcc)		version xxx or later
+       Microsoft Visual C++ (cl)	version 13.10.3077 or later
+       MinGW32 with GCC (gcc)		version xxx or later
+       Intel C++ (icl)                  version 8.0.48 works
+
+=head2 Setting Up Parrot
+
+=over
+
+=item Make
+
+You need "nmake" to build Parrot under Windows.  It should be
+available via Microsoft Visual Studio .NET 2003 or the Microsoft .NET
+Framework SDK 1.1.  The later can be downloaded from the Microsoft
+.NET Framework Homepage L<http://msdn.microsoft.com/netframework/>.
+
+=item Command Shell
+
+The surest way to build it is on Windows NT/2000/XP, using the cmd shell.
+
+=item ICU
+
+Though Parrot comes with ICU, the build system is rather fragile, and
+will not work for most people.  Currently, the best way to use ICU is
+to download the binary distribution from
+L<http://oss.software.ibm.com/icu/download/2.8/index.html>, unpack
+it (say, into C:\usr\lib), add the bin directory to PATH, and tell
+Configure.pl to use it.
+
+    mkdir C:\usr\lib
+    unzip icu-2.8-Win32_msvc7.zip -d C:\usr\lib
+    set PATH=%PATH%;C:\usr\lib\icu\bin
+    cd <parrot directory>
+    perl Configure.pl --icushared="C:\usr\lib\icu\lib\icudata.lib C:\usr\lib\icu\lib\icuuc.lib" --icuheaders="C:\usr\lib\icu\include"
+
+=item Borland C++
+
+XXX
+
+=item Microsoft Visual C++
+
+Since mid April 2004, Visual C++ comes in two flavors.  Microsoft
+Visual Studio .NET 2003 (L<http://msdn.microsoft.com/visualc/>), which
+includes the full blown IDE, and Microsoft Visual C++ Toolkit 2003
+(L<http://msdn.microsoft.com/visualc/vctoolkit2003/>), which is a free
+(but unsupported) package, containing only the basic compiler and
+linker stuff.
+
+Only Microsoft Visual Studio is currently known to work.  XXX Add
+Microsoft Visual C++ Toolkit instructions here XXX
+
+=item MinGW32 with GCC
+
+XXX
+
+=item Intel C++
+
+XXX
+
+=back
+
+=head2 Building
+
+    nmake
+
+=head2 Testing
+
+    nmake test
+
+=head2 Installation
+
+    nmake install
+
+=head2 Usage Hints
+
+    XXX
+
+=head1 BUGS AND CAVEATS
+
+See L<TODO.win32> for things that are known to broken, or are not
+implemented yet.
+
+=head1 ACKNOWLEDGEMENTS
+
+XXX
+
+=head1 AUTHORS
+
+=over
+
+=item XXX Your Name Here XXX
+
+=back
+
+This document is maintained by XXX Your Name Here XXX.
+
+=head1 SEE ALSO
+
+    L<parrot>
+    L<TODO.win32>
+
+=head1 HISTORY
+
+This document borrows heavily from perl's README.win32.
+
+Last updated: 08 May 2004
+
+=cut
