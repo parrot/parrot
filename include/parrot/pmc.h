@@ -47,30 +47,30 @@ typedef enum {
      * classes. It is suggested that you alias these within an individual
      * class's header file
      */
-    PMC_private0_FLAG   = 2 << 0,
-    PMC_private1_FLAG   = 2 << 1,
-    PMC_private2_FLAG   = 2 << 2,
-    PMC_private3_FLAG   = 2 << 3,
-    PMC_private4_FLAG   = 2 << 4,
-    PMC_private5_FLAG   = 2 << 5,
-    PMC_private6_FLAG   = 2 << 6,
-    PMC_private7_FLAG   = 2 << 7,
+    PMC_private0_FLAG   = 1 << 0,
+    PMC_private1_FLAG   = 1 << 1,
+    PMC_private2_FLAG   = 1 << 2,
+    PMC_private3_FLAG   = 1 << 3,
+    PMC_private4_FLAG   = 1 << 4,
+    PMC_private5_FLAG   = 1 << 5,
+    PMC_private6_FLAG   = 1 << 6,
+    PMC_private7_FLAG   = 1 << 7,
 
     /* The rest of the flags are for use by Parrot */
 
     /* Set if the PMC has a destroy method that must be called */
-    PMC_active_destroy_FLAG = 2 << 8,
+    PMC_active_destroy_FLAG = 1 << 8,
     /* Set if the PMC can hold multiple PMCs. (Hash, array, list,
        whatever) */
-    PMC_is_container_FLAG   = 2 << 9,
+    PMC_is_container_FLAG   = 1 << 9,
     /* Set to true if the PMC data pointer points to something that
        looks like a string or buffer pointer */
-    PMC_is_buffer_ptr_FLAG  = 2 << 10,
+    PMC_is_buffer_ptr_FLAG  = 1 << 10,
     /* Set to true if the data pointer points to a PMC */
-    PMC_is_PMC_ptr_FLAG     = 2 << 11,
+    PMC_is_PMC_ptr_FLAG     = 1 << 11,
     /* Set to true if the PMC has a private GC function. For PMCs the
        GC system can't snoop into */
-    PMC_private_GC_FLAG     = 2 << 12
+    PMC_private_GC_FLAG     = 1 << 12
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */
