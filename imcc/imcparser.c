@@ -2356,27 +2356,27 @@ yyreduce:
 
   case 67:
 #line 619 "imcc/imcc.y"
-    { yyval.sr = mk_const(interp, str_dup("int"), 'S'); }
+    { yyval.sr = mk_const(interp, str_dup("INTVAL"), 'S'); }
     break;
 
   case 68:
 #line 620 "imcc/imcc.y"
-    { yyval.sr = mk_const(interp, str_dup("num"), 'S'); }
+    { yyval.sr = mk_const(interp, str_dup("FLOATVAL"), 'S'); }
     break;
 
   case 69:
 #line 621 "imcc/imcc.y"
-    { yyval.sr = mk_const(interp, str_dup("pmc"), 'S'); }
+    { yyval.sr = mk_const(interp, str_dup("PMC"), 'S'); }
     break;
 
   case 70:
 #line 622 "imcc/imcc.y"
-    { yyval.sr = mk_const(interp, str_dup("string"), 'S'); }
+    { yyval.sr = mk_const(interp, str_dup("STRING"), 'S'); }
     break;
 
   case 71:
 #line 623 "imcc/imcc.y"
-    { yyval.sr = mk_const(interp, str_dup("pmc"), 'S'); }
+    { yyval.sr = mk_const(interp, str_dup("PMC"), 'S'); }
     break;
 
   case 72:
