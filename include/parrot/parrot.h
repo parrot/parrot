@@ -56,14 +56,14 @@
 #  include <fcntl.h>
 #endif
 
-#ifdef HAS_HEADER_ARPAINET
-#  include <arpa/inet.h>
-#endif
-
 #ifdef HAS_HEADER_NETINETTCP
 #  include <sys/socket.h>
 #  include <netinet/in.h>
 #  include <netinet/tcp.h>
+#endif
+
+#ifdef HAS_HEADER_ARPAINET
+#  include <arpa/inet.h>
 #endif
 
 #ifdef HAS_HEADER_NETDB
