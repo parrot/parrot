@@ -2922,6 +2922,14 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                         &STR_REG(count_regs(sig, signature->strstart)));
                 emitm_movl_m_r(pc, emit_EAX, emit_EDX, 0, 1,
                         offsetof(STRING, bufstart));
+                emitm_pushl_r(pc, emit_EAX);
+                break;
+            case 'B':   /* buffer (void**) pass &SReg->bufstart */
+                jit_emit_mov_rm_i(pc, emit_EDX,
+                        &STR_REG(count_regs(sig, signature->strstart)));
+                emitm_lea_m_r (pc, emit_EAX, emit_EDX, 0, 1,
+                        offsetof(STRING, bufstart));
+                emitm_pushl_r(pc, emit_EAX);
                 break;
             case 't':   /* string, pass a cstring */
                 jit_emit_mov_rm_i(pc, emit_EAX,

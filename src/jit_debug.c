@@ -117,6 +117,7 @@ write_types(FILE *stabs)
     }
     fprintf(stabs, ".stabs \"STRING:t(0,%d)=*(0,%d)\""
                 "," N_LSYM ",0,0,0\n", i, i+1);
+    ++i;
     fprintf(stabs, ".stabs \"Parrot_String:T(0,%d)=s%d"
                 "bufstart:(0,14),%d,%d;"
                 "buflen:(0,6),%d,%d;"   /* XXX type */
@@ -134,7 +135,7 @@ write_types(FILE *stabs)
 
     fprintf(stabs, ".stabs \"PMCType:T(0,%d)=e", i++);
     for (j = 0; j < enum_class_max; ++j) {
-        if (Parrot_base_vtables[j]->whoami) {
+        if (Parrot_base_vtables[j] && Parrot_base_vtables[j]->whoami) {
             STRING* name = Parrot_base_vtables[j]->whoami;
             fwrite(name->strstart, name->strlen, 1, stabs);
             fprintf(stabs, ":%d,", j);
@@ -195,7 +196,7 @@ write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
                 (char*)&interpreter->num_reg.registers[i]);
         fprintf(stabs, ".stabs \"S%d:S(0,16)\"," N_STSYM ",0,0,%p\n", i,
                 (char*)&interpreter->string_reg.registers[i]);
-        fprintf(stabs, ".stabs \"P%d:S*(0,18)\"," N_STSYM ",0,0,%p\n", i,
+        fprintf(stabs, ".stabs \"P%d:S*(0,19)\"," N_STSYM ",0,0,%p\n", i,
                 (char*)&interpreter->pmc_reg.registers[i]);
     }
 }
