@@ -26,6 +26,18 @@ my (%ret_type) = (p => "void *",
 		  v => "void",
                  );
 
+my (%proto_type) = (p => "void *",
+		    i => "int",
+		    l => "long",
+		    c => "char",
+		    s => "short",
+		    f => "float",
+		    d => "double",
+		    t => "char *",
+		    v => "void",
+		    I => "struct Parrot_Interp *",
+		   );
+
 my (%other_decl) = (p => "PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);");
 
 my (%ret_type_decl) = (p => "void *",
@@ -108,7 +120,9 @@ print NCI <<'HEAD';
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that's just fine */
 
-static void set_return_val(struct Parrot_Interp *interpreter, int stack, int ints, int strings, int pmcs, int nums) {
+static void 
+set_return_val(struct Parrot_Interp *interpreter, int stack, int ints, 
+               int strings, int pmcs, int nums) {
     INT_REG(0) = stack;
     INT_REG(1) = ints;
     INT_REG(2) = strings;
@@ -135,7 +149,9 @@ while (<>) {
     }
 
     # Header
-    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret}, $ret_type_decl{$ret}, $func_call_assign{$ret}, $other_decl{$ret},  $ret_assign{$ret});
+    generate_func_header($ret, $args, (join ",", @arg), $ret_type{$ret}, 
+			 $ret_type_decl{$ret}, $func_call_assign{$ret}, 
+			 $other_decl{$ret},  $ret_assign{$ret});
 
     # Body
 
@@ -151,8 +167,10 @@ print NCI <<TAIL;
 /* This function serves a single purpose. It takes the function
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
-void *build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
-                      String *signature) {
+void *
+build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
+                String *signature)
+{
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* This would be a good place to put the code that builds the
        frames. Undoubtedly painfully platform-dependent */
@@ -206,33 +224,46 @@ sub make_arg {
 
 sub set_return_count {
     my ($stack, $int, $string, $pmc, $num) = @_;
-    print NCI "  set_return_val(interpreter, $stack, $int, $string, $pmc, $num);\nreturn;\n}\n\n"
+    print NCI <<FOOTER;
+    set_return_val(interpreter, $stack, $int, $string, $pmc, $num);
+    return;
+}
+
+
+FOOTER
 }
 
 sub generate_func_header {
-    my ($return, $params, $call_params, $ret_type, $ret_type_decl, $return_assign, $other_decl, $final_assign) = @_;
+    my ($return, $params, $call_params, $ret_type, $ret_type_decl, 
+	$return_assign, $other_decl, $final_assign) = @_;
     $other_decl ||= "";
 
     if (defined $params) {
+    my $proto = join ', ', map { $proto_type{$_} } split '', $params;
     print NCI <<HEADER;
-static void pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self) {
-    $ret_type (*pointer)();
+static void 
+pcf_${return}_$params(struct Parrot_Interp *interpreter, PMC *self)
+{
+    typedef $ret_type (*func_t)($proto);
+    func_t pointer;
     $ret_type_decl return_data;
     $other_decl
 
-    pointer =  ($ret_type (*)())D2FPTR(self->cache.struct_val);
+    pointer =  (func_t)D2FPTR(self->cache.struct_val);
     $return_assign ($ret_type)(*pointer)($call_params);
     $final_assign
 HEADER
   }
   else {
     print NCI <<HEADER;
-static void pcf_${return}(struct Parrot_Interp *interpreter, PMC *self) {
-    $ret_type (*pointer)();
+static void 
+pcf_${return}(struct Parrot_Interp *interpreter, PMC *self)
+{
+    $ret_type (*pointer)(void);
     $ret_type_decl return_data;
     $other_decl
 
-    pointer =  ($ret_type (*)())D2FPTR(self->cache.struct_val);
+    pointer =  ($ret_type (*)(void))D2FPTR(self->cache.struct_val);
     $return_assign ($ret_type)(*pointer)();
     $final_assign
 HEADER
