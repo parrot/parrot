@@ -130,6 +130,20 @@ TODO: error checking (e.g., missing, duplicate or extra arguments)
 
 /*
 
+=item C<PMC* get_attr_str(STRING *name)>
+
+Return attribute named C<name>.
+
+=cut
+
+*/
+
+    PMC* get_attr_str(STRING* idx) {
+        return VTABLE_getprop(INTERP, SELF, idx);
+    }
+
+/*
+
 =item C<void* invoke(void* next)>
 
 Invoke a function.  Defaults are filled in first.

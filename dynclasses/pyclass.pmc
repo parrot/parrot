@@ -24,6 +24,7 @@ methods you would expect to see on python objects).
 /* cache of classes referenced */
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
+static STRING *CMP;
 static STRING *INT;
 static STRING *ITER;
 static STRING *NAME;
@@ -66,8 +67,8 @@ Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 }
 
 static PMC *
-Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub, PMC *obj,
-        STRING *meth)
+Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub,
+    PMC *obj, STRING *meth)
 {
     /* TODO: optimize for func->vtable->base_type == enum_class_NCI */
 
@@ -81,6 +82,33 @@ Parrot_PyClass_run_meth_fromc_P(Parrot_Interp interpreter, PMC *sub, PMC *obj,
     REG_INT(0) = REG_INT(3) = 1;
     REG_INT(1) = REG_INT(2) = 0;
     REG_PMC(5) = obj;
+    interpreter->ctx.current_object = REG_PMC(2) = obj;
+
+    bp = Parrot_PyClass_runops_fromc(interpreter, sub);
+
+    ret = BP_REG_PMC(bp,5); 
+    restore_context(interpreter, &ctx);
+    return ret;
+}
+
+static PMC *
+Parrot_PyClass_run_meth_fromc_P_P(Parrot_Interp interpreter, PMC *sub,
+    PMC *obj, STRING *meth, PMC* arg1)
+{
+    /* TODO: optimize for func->vtable->base_type == enum_class_NCI */
+
+    struct parrot_regs_t *bp;
+    struct Parrot_Context ctx;
+    PMC *ret;
+
+    save_context(interpreter, &ctx);
+
+    REG_STR(0) = meth;
+    REG_INT(0) = 1;
+    REG_INT(1) = REG_INT(2) = 0;
+    REG_INT(3) = 2;
+    REG_PMC(5) = obj;
+    REG_PMC(6) = arg1;
     interpreter->ctx.current_object = REG_PMC(2) = obj;
 
     bp = Parrot_PyClass_runops_fromc(interpreter, sub);
@@ -107,6 +135,7 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = const_string(INTERP, "__class__");
+            CMP  = const_string(INTERP, "__cmp__");
             INT  = const_string(INTERP, "__int__");
             ITER = const_string(INTERP, "__iter__");
             NAME = const_string(INTERP, "__name__");
@@ -197,6 +226,33 @@ Return the class of this object.
     PMC* get_class() {
         PMC *ret = VTABLE_getprop(INTERP, SELF, CLASS);
         return ret;
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Returns the result of comparing the integer with C<*value>.
+
+=cut
+
+TODO: optimize for NCI, PyProxyClass
+
+*/
+
+    INTVAL cmp(PMC* value) {
+        PMC *cmpsub, *ret;
+
+        if (SELF == value) return 0;
+
+        cmpsub = VTABLE_find_method(INTERP, SELF, CMP);
+        if (!cmpsub || !VTABLE_defined(INTERP, cmpsub))
+            return -1;
+
+        ret = Parrot_PyClass_run_meth_fromc_P_P(INTERP, cmpsub, 
+            SELF, CMP, value);
+
+        return VTABLE_get_integer(INTERP, ret);
     }
 
 /*

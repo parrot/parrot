@@ -160,8 +160,11 @@ enter_nci_method should create these as locals to begin with.
         iter = Parrot_Hash_get_iter(INTERP, stash);
         n = VTABLE_elements(INTERP, stash);
         for (j = 0; j < n; ++j) {
+            PMC *nameprop = pmc_new(interpreter, dynclass_PyString);
             key = VTABLE_shift_string(INTERP, iter);
             item = VTABLE_get_pmc_keyed_str(INTERP, stash, key);
+            VTABLE_set_string_native(interpreter, nameprop, key);
+            VTABLE_setprop(interpreter, item, NAME, nameprop);
             scratchpad_store_by_name(INTERP, pad, 0, key, item);
         }
 

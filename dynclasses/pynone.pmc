@@ -43,6 +43,20 @@ Class initialization. Caches constant strings that will be used later.
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the integer.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return 0;
+    }
+
+/*
+
 =item C<STRING* get_string ()>
 
 Return "None"

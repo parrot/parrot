@@ -27,6 +27,70 @@ static INTVAL dynclass_PyList;
 static INTVAL dynclass_PyNone;
 static INTVAL dynclass_PyString;
 
+struct parrot_regs_t *
+Parrot_PyClass_runops_fromc(Parrot_Interp interpreter, PMC *sub);
+
+static void quicksort(Interp* interpreter, List *list, PMC *cmpsub, 
+    INTVAL left, INTVAL right) 
+{
+    while (right > left) {
+        INTVAL cursor = left;
+        INTVAL index = (left + right) / 2;
+        PMC *pivot = *(PMC**)list_get(interpreter, list, index, enum_type_PMC);
+        PMC *temp = *(PMC**)list_get(interpreter, list, right, enum_type_PMC);
+        list_assign(interpreter, list, index, temp, enum_type_PMC);
+
+        index = right;
+        while (cursor != index) {
+            INTVAL cmp;
+            temp = *(PMC**)list_get(interpreter, list, cursor, enum_type_PMC);
+
+            if (!cmpsub)
+                cmp = mmd_dispatch_i_pp(interpreter, temp, pivot, MMD_CMP);
+            else {
+                struct parrot_regs_t *bp;
+                REG_INT(0) = 1;
+                REG_INT(1) = REG_INT(2) = 0;
+                REG_INT(3) = 2;
+                REG_PMC(5) = temp;
+                REG_PMC(6) = pivot;
+                bp = Parrot_PyClass_runops_fromc(interpreter, cmpsub);
+                cmp = VTABLE_get_integer(interpreter, BP_REG_PMC(bp,5));
+            }
+
+            if (cmp <= 0) {
+               if (cursor > index) {
+                   INTVAL swap = index;
+                   index = cursor;
+                   cursor = swap;
+                   list_assign(interpreter, list, cursor, temp, enum_type_PMC);
+               }
+               cursor++;
+            }
+            else {
+               if (cursor < index) {
+                   INTVAL swap = index;
+                   index = cursor;
+                   cursor = swap;
+                   list_assign(interpreter, list, cursor, temp, enum_type_PMC);
+               }
+               cursor--;
+            }
+        }
+
+        list_assign(interpreter, list, index, pivot, enum_type_PMC);
+
+        if (index*2 < left + right) {
+            quicksort(interpreter, list, cmpsub, left, index-1);
+            left = index+1;
+        }
+        else {
+            quicksort(interpreter, list, cmpsub, index+1, right);
+            right = index-1;
+        }
+    }
+}
+
 pmclass PyList extends PyObject need_ext does array dynpmc group python_group {
 
 /*
@@ -466,6 +530,23 @@ Sets the string value of the PMC at element C<key> to C<value>.
         VTABLE_set_string_native(INTERP, src, value);
         list_assign(INTERP, (List *) PMC_data(SELF), key, src, enum_type_PMC);
     }
+
+/*
+
+=item C<void* "sort"(PMC* cmp_func)>
+
+Sort this array, optionally using the provided cmp_func
+
+=cut
+
+*/
+
+METHOD void sort(PMC *self, PMC *cmp_func) {
+    if (REG_INT(3) < 2 || !VTABLE_get_bool(INTERP, cmp_func)) 
+        cmp_func = NULL;
+    INTVAL n = VTABLE_elements(INTERP, self);
+    quicksort(INTERP, (List *) PMC_data(self), cmp_func, 0, n-1);
+}
 
 /*
 

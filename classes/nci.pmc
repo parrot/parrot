@@ -137,6 +137,34 @@ Returns the function pointer as an integer.
         return((INTVAL)PMC_data(SELF));
     }
 
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the pointer.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return(0 != (INTVAL)PMC_data(SELF));
+    }
+
+/*
+
+=item C<PMC* get_attr_str(STRING *name)>
+
+Return attribute named C<name>.
+
+=cut
+
+*/
+
+    PMC* get_attr_str(STRING* idx) {
+        return VTABLE_getprop(INTERP, SELF, idx);
+    }
+
 }
 
 /*
