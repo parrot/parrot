@@ -29,6 +29,27 @@ int main(int argc, char **argv) {
   if (argc == 1) {
     runops(interpreter, opcodes);
   }
+  else if (argc == 2 && !strcmp(argv[1], "-s")) { /* String tests */
+      STRING *s = string_make("foo", 3, enc_native, 0, 0);
+      STRING *t = string_make("quux", 4, enc_native, 0, 0);
+      int i;
+      time_t foo;
+
+      printf("String %p has length %i: %.*s\n", s, string_length(s), string_length(s), s->bufstart);
+      string_concat(s, t, 0);
+      printf("String %p has length %i: %.*s\n", s, string_length(s), string_length(s), s->bufstart);
+      string_chopn(s, 4);
+      printf("String %p has length %i: %.*s\n", s, string_length(s), string_length(s), s->bufstart);
+      string_chopn(s, 4);
+      printf("String %p has length %i: %.*s\n", s, string_length(s), string_length(s), s->bufstart);
+      foo = time(0);
+      for (i = 0; i < 100000000; i++) {
+            string_concat(s, t, 0);
+            string_chopn(s, 4);
+      }
+      printf("10000000 concats and chops took %i seconds.\n", time(0)-foo);
+      string_destroy(s);
+  }
   /* Otherwise load in the program they gave and try that */
   else {
     void *program_code;
