@@ -100,7 +100,7 @@ sub runstep {
     );
 
     if (($jitcpuarch eq 'i386' && ($osname =~ /bsd$/i || $osname =~ /linux/i))
-     || ($jitcpuarch eq 'ppc')) {
+     || ($jitcpuarch eq 'ppc') || ($jitcpuarch eq 'arm')) {
       $execcapable = 1;
       if ($osname eq 'openbsd') {
         $execos = 1;

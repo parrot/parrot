@@ -176,7 +176,8 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  if EXEC_OS == NETBSD
     header.e_ident[7] = ELFOSABI_NETBSD;
 #  endif
-#  if EXEC_OS == LINUX && defined(ELFOSABI_LINUX) && !defined(PPC)
+#  if EXEC_OS == LINUX && defined(ELFOSABI_LINUX) && \
+     !defined(PPC) && !defined(ARM)
     header.e_ident[7] = ELFOSABI_LINUX;
 #  endif
 
@@ -186,6 +187,10 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 #  endif
 #  if PPC
     header.e_machine = EM_PPC;
+#  endif
+#  if ARM
+    header.e_ident[7] = ELFOSABI_ARM;
+    header.e_machine = EM_ARM;
 #  endif
     header.e_version = EV_CURRENT;
     header.e_entry = 0;
@@ -225,7 +230,7 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
      * Link must be the symtab section header index.
      * Info is the text section header index.
      */
-#  if I386
+#  if I386 || ARM
     sh_add(".rel.text", SHT_REL, 0, obj->text_rellocation_count *
         sizeof(Elf32_Rel), 6, 2, 4, sizeof(Elf32_Rel));
 #  endif
@@ -313,6 +318,27 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
                 break;
         }
         save_struct(fp, &rel_addend, sizeof(Elf32_Rela));
+#  endif
+#  if ARM
+        bzero(&rellocation, sizeof(Elf32_Rel));
+        rellocation.r_offset = obj->text_rellocation_table[i].offset;
+        switch (obj->text_rellocation_table[i].type) {
+            case RTYPE_FUNC:
+                rellocation.r_info =
+                    ELF32_R_INFO(
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_ARM_ABS32);
+                break;
+            case RTYPE_DATA:
+                rellocation.r_info =
+                    ELF32_R_INFO(
+                        obj->text_rellocation_table[i].symbol_number + PDFS,
+                            R_ARM_ABS32);
+                break;
+            default:
+                break;
+        }
+        save_struct(fp, &rellocation, sizeof(Elf32_Rel));
 #  endif
     }
     /* Symbol table */
