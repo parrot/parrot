@@ -2,20 +2,19 @@
 # s. docs/pdds/pdd03_calling_conventions.pod
 #
 # You'll need to build libPQt.so for this to work, see
-# pqt.C for more info.
+# PQt.C for more info.
 # Please note: this will either need JIT/i386 for building the
 #              nci-functions on the fly, or adding missing
 #              signatures to call_list.txt and rebuilding parrot/imcc
 #
-# make && make -s -C languages/imcc
-# ln -s languages/imcc imcc
+# make
 # cd examples/pni
 # export LD_LIBRARY_PATH=.
-# ../../imcc QtHelloWorld.pasm
+# ../../parrot QtHelloWorld.pasm
 
 
 # load the shared lib
-    loadlib P1, "libPQt.so"
+    loadlib P1, "libPQt"
     print "Loaded\n"
 
 # get and invoke the QApplication_new function
