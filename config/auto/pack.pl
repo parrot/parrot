@@ -54,7 +54,7 @@ AARGH
 
   Configure::Data->set(
     packtype_b => 'C',
-    packtype_n => 'd'
+    packtype_n => (Configure::Data->get('numvalsize') == 12 ? 'D' : 'd')
   );
 
   #
