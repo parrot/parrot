@@ -17,7 +17,7 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -437,3 +437,40 @@ CODE
 3 * 5 == 15!
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
+##PIR##
+# this did segfault with GC_DEBUG
+
+.sub main @MAIN
+   .local int n
+   $P0 = getinterp
+   $P0."recursion_limit"(10)
+   newclass $P0, "b"
+   $I0 = find_type "b"
+   $P0 = new $I0
+   n = $P0."b11"(0)
+   print "ok 1\n"
+   print n
+   print "\n"
+.end
+.namespace ["b"]
+.sub b11 method
+  .param int n
+  .local int n1
+  n1 = n + 1
+  newsub $P0, .Exception_Handler, _catch
+  set_eh $P0
+  n = self."b11"(n1)
+  clear_eh
+  .pcc_begin_return
+  .return n
+  .pcc_end_return
+.end
+.sub _catch
+    set P2, P5["_invoke_cc"]
+    invoke P2
+.end
+CODE
+ok 1
+10
+OUTPUT

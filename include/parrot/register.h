@@ -48,22 +48,6 @@ struct PRegFrame {
     PMC *registers[NUM_REGISTERS/2];
 };
 
-struct IRegChunkBuf {
-    struct IRegFrame IRegFrame[FRAMES_PER_CHUNK];
-};
-
-struct NRegChunkBuf {
-    struct NRegFrame NRegFrame[FRAMES_PER_CHUNK];
-};
-
-struct SRegChunkBuf {
-    struct SRegFrame SRegFrame[FRAMES_PER_CHUNK];
-};
-
-struct PRegChunkBuf {
-    struct PRegFrame PRegFrame[FRAMES_PER_CHUNK];
-};
-
 struct Stack_Chunk;
 struct Parrot_Context;
 

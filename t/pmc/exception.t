@@ -16,7 +16,7 @@ Tests C<Exception> and C<Exception_Handler> PMCs.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 23;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
@@ -525,42 +525,10 @@ output_is(<<'CODE', '', "exit exception");
     end
 CODE
 
-output_is(<<'CODE', <<'OUTPUT', "recursion limit RuntimeException");
-##PIR##
-.sub main @MAIN
-   .local int n
-   sweepoff	# XXX DOD troubles
-   n = b11(0)
-   print "ok 1\n"
-   print n
-   print "\n"
-.end
-.sub b11
-  .param int n
-  .local int n1
-  n1 = n + 1
-  newsub $P0, .Exception_Handler, _catch
-  set_eh $P0
-  n = P0(n1)
-  clear_eh
-  .pcc_begin_return
-  .return n
-  .pcc_end_return
-.end
-.sub _catch
-    set P2, P5["_invoke_cc"]
-    invoke P2
-.end
-CODE
-ok 1
-1000
-OUTPUT
-
 output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
 ##PIR##
 .sub main @MAIN
    .local int n
-   sweepoff	# XXX DOD troubles
    $P0 = getinterp
    $P0."recursion_limit"(100)
    newclass $P0, "b"
@@ -576,17 +544,14 @@ output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
   .param int n
   .local int n1
   n1 = n + 1
-  newsub $P0, .Exception_Handler, _catch
+  newsub $P0, .Exception_Handler, catch
   set_eh $P0
   n = self."b11"(n1)
   clear_eh
+catch:
   .pcc_begin_return
   .return n
   .pcc_end_return
-.end
-.sub _catch
-    set P2, P5["_invoke_cc"]
-    invoke P2
 .end
 CODE
 ok 1

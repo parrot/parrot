@@ -27,7 +27,7 @@ Last index, for C<push>.
 Data.
 
 =back
-    
+
 This is the Simple (or Static) Array class for parameter
 passing according to PDD 3.
 
@@ -221,7 +221,7 @@ get_entry(PMC *self, INTVAL key)
 }
 
 pmclass SArray const_too need_ext does array {
-    
+
 /*
 
 =back
@@ -323,7 +323,7 @@ Creates and returns a copy of the array.
         int i, start, end;
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         size = PMC_int_val(SELF);
@@ -825,7 +825,7 @@ specified in C<what>.
         e = (HashEntry *) PMC_data(SELF);
             start_index = UVal_int(e[0].val);
             end_index   = UVal_int(e[1].val);
-    
+
         switch (what) {
             case ITERATE_FROM_START:    /* reset key, iterate from start */
                 PMC_int_val(ret) = start_index;

@@ -59,7 +59,7 @@ The PASM/PIR/Perl file in which the exception was raised.
 =item 8 C<_P_line>
 
 The line of PASM/PIR/Perl code on which the exception was raised.
-    
+
 =item ...
 
 Any information attached by the HL. This shouldn't start with an
@@ -100,7 +100,7 @@ Initializes the exception with default values.
 
     void init() {
         SUPER();
-        DYNSELF.set_integer_native(9);
+        DYNSELF.set_integer_native(5);
         DYNSELF.set_string_keyed_int(0, NULL);
         DYNSELF.set_integer_keyed_int(1, 0);
         DYNSELF.set_integer_keyed_int(2, 0);

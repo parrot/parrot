@@ -310,6 +310,8 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     if (!handler)
         return NULL;
     cc = (struct Parrot_Sub*)PMC_sub(handler);
+    /* put the continuation ctx in the interpreter */
+    restore_context(interpreter, &cc->ctx);
     /* preserve P5 register */
     VTABLE_set_pmc_keyed_int(interpreter, exception, 3, REG_PMC(5));
 #if 0
@@ -322,8 +324,6 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
         VTABLE_set_pmc_keyed_int(interpreter, exception, 4,
                 new_ret_continuation_pmc(interpreter, dest));
     }
-    /* put the continuation ctx in the interpreter */
-    restore_context(interpreter, &cc->ctx);
     /* put exception object in P5 */
     REG_PMC(5) = exception;
     if (PObj_get_FLAGS(handler) & PObj_private0_FLAG) {
