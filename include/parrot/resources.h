@@ -21,6 +21,9 @@ void free_pmc(PMC *);
 STRING *new_string_header(struct Parrot_Interp *);
 void free_string(STRING *);
 
+Buffer *new_tracked_header(struct Parrot_Interp *, UINTVAL size);
+void free_tracked(Buffer *);
+
 void *new_bigint_header(struct Parrot_Interp *);
 void free_bigint(void);
 

@@ -25,10 +25,27 @@ void free_pmc(PMC *pmc) {
   free(pmc);
 }
 
+Buffer *new_tracked_header(struct Parrot_Interp *interpreter, UINTVAL size) {
+  UNUSED (interpreter);
+  return( (Buffer *)mem_sys_allocate(size));
+}
+
+void free_tracked(Buffer *thing) {
+  mem_sys_free(thing);
+}
+
 STRING *new_string_header(struct Parrot_Interp *interpreter) {
   UNUSED (interpreter);
 
   return mem_sys_allocate(sizeof(STRING));
+}
+
+void free_string(STRING *string) {
+  if (string) {
+    string->bufstart = NULL;
+    string->buflen = 0;
+  }
+  mem_sys_free(string);
 }
 static void
 go_collect(struct Parrot_Interp *interpreter) {
@@ -105,11 +122,4 @@ Parrot_allocate(struct Parrot_Interp *interpreter, UINTVAL size) {
   return((void *)return_val);
 }
 
-
-void free_string(STRING *string) {
-  if (string) {
-    string->bufstart = NULL;
-    string->buflen = 0;
-  }
-}
 
