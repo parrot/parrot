@@ -102,10 +102,10 @@ pmclass Sub {
 	 * if sub addresses are absolute, the flag is set
 	 */
 	if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
-	    start_offs = (ptrdiff_t) SELF->cache.struct_val -
-		(ptrdiff_t) sub->seg->base.pf->byte_code;
-	    end_offs = (ptrdiff_t)sub->end -
-		(ptrdiff_t) sub->seg->base.pf->byte_code;
+	    ptrdiff_t code = (ptrdiff_t) sub->seg->base.pf->byte_code;
+
+	    start_offs = (ptrdiff_t) SELF->cache.struct_val - code;
+	    end_offs = (ptrdiff_t)sub->end - code;
 	}
 	else {
 	    start_offs = (size_t)SELF->cache.struct_val;
@@ -117,14 +117,16 @@ pmclass Sub {
 
     void thaw(visit_info *info) {
 	IMAGE_IO *io = info->image_io;
-	size_t start_offs, end_offs;
-	/*
-	 * we get relative offsets
-	 */
-	PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 	SUPER(info);
 
-	start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
-	end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
+	if (info->extra_flags == EXTRA_IS_NULL) {
+	    size_t start_offs, end_offs;
+	    /*
+	     * we get relative offsets
+	     */
+	    PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
+	    start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
+	    end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
+	}
     }
 }
