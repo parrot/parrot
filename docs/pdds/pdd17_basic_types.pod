@@ -83,6 +83,36 @@ functions to the referred-to PMC.
 
 =head2 Array types
 
+Note that for the following types you can set the size of the array by
+using the VTABLE_set_integer_native() method. Assigning an integer to
+the array as a whole sets the array to that size.
+
+=over 4
+
+=item FixedBooleanArray
+
+A statically sized array which holds only Boolean values.
+
+=item ResizeableBooleanArray
+
+A dynamically sized array which holds only Boolean values.
+
+=item FixedIntegerArray
+
+=item ResizeableIntegerArray
+
+=item FixedFloatArray
+
+=item ResizeableFloatArray
+
+=item FixedPMCArray
+
+=item ResizeablePMCArray
+
+=item FixedStringArray
+
+=item ResizeableStringArray
+
 =head2 Hash types
 
 =over 4
