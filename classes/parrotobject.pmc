@@ -175,7 +175,8 @@ This holds true for all plain C<_keyed get_> and C<set_> variants.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         return SELF.get_integer_keyed_int(idx);
     }
 
@@ -228,7 +229,8 @@ Sets C<*value> as the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         SELF.set_integer_keyed_int(idx, value);
     }
 
@@ -282,7 +284,8 @@ Returns the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         return SELF.get_number_keyed_int(idx);
     }
 
@@ -335,7 +338,8 @@ Sets C<*value> as the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         SELF.set_number_keyed_int(idx, value);
     }
 
@@ -388,7 +392,8 @@ Returns the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         return SELF.get_string_keyed_int(idx);
     }
 
@@ -441,7 +446,8 @@ Sets C<*value> as the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         SELF.set_string_keyed_int(idx, value);
     }
 
@@ -494,7 +500,8 @@ Returns the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         return SELF.get_pmc_keyed_int(idx);
     }
 
@@ -547,7 +554,8 @@ Sets C<*value> as the value of attribute C<idx>.
             POD_CLASS);
         INTVAL idx = VTABLE_get_integer_keyed_str(interpreter, class, attr);
         if (idx < 0)
-            internal_exception(1, "No such attribute");
+            internal_exception(1, "No such attribute: %s\n",
+				string_to_cstring( interpreter, attr ));
         SELF.set_pmc_keyed_int(idx, value);
     }
 
