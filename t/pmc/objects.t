@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 25;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -715,3 +715,105 @@ k
 in Bar::get
 l
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "attribute values, inherited access meths");
+    newclass P1, "Foo"
+    # must add attributes before object instantiation
+    addattribute P1, ".i"
+    addattribute P1, ".j"
+    # define attrib access functions
+    find_global P5, "set"
+    store_global "Foo", "set", P5
+    find_global P5, "get"
+    store_global "Foo", "get", P5
+
+    subclass P2, P1, "Bar"
+    addattribute P2, ".k"
+    addattribute P2, ".l"
+    addattribute P2, ".m"
+
+    # subclass is prefered for the SI case over
+    #   newclass P2, "Bar"
+    #   addattrib ...
+    #   addparent P2, P1
+    # which is suitable for adding multiple parents to one class
+
+    # instantiate a Bar object
+    find_type I1, "Bar"
+    new P3, I1
+
+    # Foo and Bar have attribute accessor methods
+    set S0, "set"		# the meth   s. pdd03
+    set P2, P3			# the object s. pdd03
+    new P5, .PerlString		# set attribute values
+    set P5, "i\n"		# attribute slots have reference semantics
+    set S5, "Foo"
+    set I5, 0			# set first attrib
+    # register preserving is optimized away :)
+    callmethodcc
+    new P5, .PerlString
+    set P5, "j\n"
+    set I5, 1			# set 2nd attrib
+    callmethodcc
+
+    new P5, .PerlString
+    set P5, "k\n"
+    set S5, "Bar"
+    set I5, 0			# set first attrib
+    callmethodcc
+    new P5, .PerlString
+    set P5, "l\n"
+    set I5, 1			# set 2nd attrib
+    callmethodcc
+    new P5, .PerlString
+    set P5, "m\n"
+    set I5, 2			# set 3rd attrib
+    callmethodcc
+
+    # now retrieve attributes
+    set S0, "get"
+    set S5, "Foo"
+    set I5, 0			# get first attrib
+    callmethodcc
+    print P5			# return result
+    set I5, 1			# get 2nd attrib
+    callmethodcc
+    print P5			# return result
+
+    set S5, "Bar"
+    set I5, 0			# get first attrib
+    callmethodcc
+    print P5			# return result
+    set I5, 1			# get 2nd attrib
+    callmethodcc
+    print P5			# return result
+    set I5, 2			# get 3rd attrib
+    callmethodcc
+    print P5			# return result
+    end
+
+# Foo provides accessor functions which Bar inherits
+# they take an additional classname argument SClass
+
+# set(obj: Pvalue, SClass, Iattr_idx)
+.pcc_sub set:
+    classoffset I3, P2, S5
+    add I4, I3, I5
+    setattribute P2, I4, P5
+    invoke P1
+
+# Pattr = get(obj: SClass, Iattr_idx)
+.pcc_sub get:
+    classoffset I3, P2, S5
+    add I4, I3, I5
+    getattribute P5, P2, I4
+    invoke P1
+
+CODE
+i
+j
+k
+l
+m
+OUTPUT
+
