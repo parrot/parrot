@@ -49,7 +49,7 @@ chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
 
     if ((transcoder = from->transcode_to(to->name)) == NULL) {
         transcoder = to->transcode_from(from->name);
-    }
+    } 
 
     return transcoder;
 }

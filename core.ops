@@ -113,8 +113,7 @@ inline op err(out INT) {
 
 op err(out STR) {
   char *tmp = strerror(errno);
-  STRING *s = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
-  $1 = s;
+  $1 = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
   goto NEXT();
 }
 
@@ -362,7 +361,6 @@ op read(out STR, in INT, in INT) {
   STRING *s;
   UINTVAL len = $3;
 
-  string_destroy($1);
   s = string_make(interpreter, NULL, len, NULL, 0, NULL);
   read($2, s->bufstart, len);
   s->bufused = len;
@@ -2216,9 +2214,7 @@ inline op pack(inout STR, in INT, in INT) {
     STRING *s;
 
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
-    s->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, s, 1);
-    string_destroy(s);
 
     goto NEXT();
 }
@@ -2228,9 +2224,7 @@ inline op pack(inout STR, in INT, in NUM) {
     STRING *s;
 
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
-    s->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, s, 1);
-    string_destroy(s);
 
     goto NEXT();
 }
@@ -2246,9 +2240,7 @@ inline op pack(inout STR, in INT, in STR) {
     } else {
         t = string_make(interpreter, s->bufstart, (UINTVAL)len, NULL, 0, NULL); 
     }
-    t->flags |= BUFFER_neonate_FLAG;
     $1 = string_concat(interpreter, $1, t, 1);
-    string_destroy(t);
 
     goto NEXT();
 }
@@ -2262,7 +2254,6 @@ inline op pack(inout STR, in INT, in INT, in INT) {
     int i;
     
     s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
-    s->flags |= BUFFER_neonate_FLAG;
     ln = string_length($1);
     if (ln < $4 + $2)
     {
@@ -2273,10 +2264,9 @@ inline op pack(inout STR, in INT, in INT, in INT) {
 
     /* XXX this is EVIL, use string_replace */
     n = $1->bufstart;
-    t = string_to_cstring(interpreter, (s));
+    t = string_to_cstring(interpreter, s);
     for (i = $4; i < $4 + $2; i++)
         n[i] = t[i - $4]; 
-    string_destroy(s);
     
 
     goto NEXT();

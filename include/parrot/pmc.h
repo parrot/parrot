@@ -110,10 +110,7 @@ typedef enum {
     /* Our refcount */
     PMC_refcount_field = 1 << 16 | 1 << 17,
     /* Constant flag */
-    PMC_constant_FLAG = 1 << 18,
-    /* Immunity flag, for ensuring a PMC survives DOD. Used internally
-     * by the GC: should not be used in PMC code. */
-    PMC_immune_FLAG = 1 << 19
+    PMC_constant_FLAG = 1 << 18
 } PMC_flags;
 
 /* XXX add various bit test macros once we have need of them */

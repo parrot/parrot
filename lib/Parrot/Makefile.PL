@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 my $ext = $^O =~ /Win/ ? 'obj' : 'o';
 my $objects = join ' ',
               map { "../../$_.$ext" }
-              qw(byteorder string encoding encodings/singlebyte encodings/utf16 encodings/utf32 encodings/utf8 chartype chartypes/unicode chartypes/usascii exceptions resources memory packfile packout);
+              qw(byteorder string encoding encodings/singlebyte encodings/utf16 encodings/utf32 encodings/utf8 chartype chartypes/unicode chartypes/usascii exceptions resources memory packfile packout dod headers smallobject);
 $objects .= ' $(BASEEXT)$(OBJ_EXT)';
 
 WriteMakefile(

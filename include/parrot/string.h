@@ -75,10 +75,8 @@ typedef enum BUFFER_flag {
     BUFFER_constant_FLAG = 1 << 15,
     /* For debugging, report when this buffer gets moved around */
     BUFFER_report_FLAG = 1 << 16,
-    /* Mark buffer as immune from deletion during DOD/GC */
-    BUFFER_immune_FLAG = 1 << 17,
-    /* Mark buffer as newborn; temporarily protected from DOD/GC */
-    BUFFER_neonate_FLAG = 1 << 18
+    /* Generation in the GC pools */
+    BUFFER_generation_FLAG = 1 << 17 | 1 << 18
 } BUFFER_flags;
 
 /* stringinfo parameters */

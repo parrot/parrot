@@ -175,6 +175,7 @@ typedef struct Parrot_Interp {
                                    requests are there? */
 
     PDB_t *pdb;                 /* Debug system */
+    void *lo_var_ptr;           /* Pointer to memory on runops system stack */
 } Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

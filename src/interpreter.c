@@ -404,11 +404,13 @@ void
 runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
 {
     opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
+    void *dummy_ptr;
+    interpreter->lo_var_ptr = &dummy_ptr;
 
     interpreter->code = code;
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
-
+    
     while (interpreter->resume_flag) {
         unsigned int which = 0;
         opcode_t *pc = (opcode_t *)

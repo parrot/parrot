@@ -56,7 +56,6 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
         if (a->type != b->type || a->encoding != b->encoding) {
             b = string_transcode(interpreter, b, a->encoding, a->type,
                                  NULL);
-            b->flags |= BUFFER_neonate_FLAG;
         }
         /* make sure A's big enough for both */
         if (a->buflen < a->bufused + b->bufused) {
@@ -66,7 +65,6 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
         /* Tack B on the end of A */
         mem_sys_memcopy((void *)((ptrcast_t)a->bufstart + a->bufused),
                         b->bufstart, b->bufused);
-        b->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
         a->bufused += b->bufused;
         a->strlen += b->strlen;
         return a;
@@ -342,14 +340,12 @@ string_concat(struct Parrot_Interp *interpreter, STRING *a,
             if (a->type != b->type || a->encoding != b->encoding) {
                 b = string_transcode(interpreter, b, a->encoding, a->type,
                                      NULL);
-                b->flags |= BUFFER_neonate_FLAG;
             }
             result = string_make(interpreter, NULL, a->bufused + b->bufused,
                                  a->encoding, 0, a->type);
             mem_sys_memcopy(result->bufstart, a->bufstart, a->bufused);
             mem_sys_memcopy((void *)((ptrcast_t)result->bufstart + a->bufused),
-                            b->bufstart, b->bufused);
-            b->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
+                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
         }
@@ -500,7 +496,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
     if (rep->encoding != src->encoding || rep->type != src->type) {
         rep = string_transcode(interpreter, rep, src->encoding, src->type, 
                                NULL);
-        rep->flags |= BUFFER_neonate_FLAG;
     }
 
     /* abs(-offset) may not be > strlen-1 */
@@ -589,7 +584,6 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
         src->bufused += diff;
         (void)string_compute_strlen(src);
     } 
-    rep->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
 
     /* src is modified, now return the original substring */    
     return dest;
@@ -647,10 +641,8 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,
                               NULL);
-        s1->flags |= BUFFER_neonate_FLAG;
         s2 = string_transcode(interpreter, s2, NULL, string_unicode_type,
                               NULL);
-        s2->flags |= BUFFER_neonate_FLAG;
     }
 
     s1start = s1->bufstart;
@@ -667,8 +659,6 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
         s1start = s1->encoding->skip_forward(s1start, 1);
         s2start = s2->encoding->skip_forward(s2start, 1);
     }
-    s1->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
-    s2->flags &= ~(UINTVAL)BUFFER_neonate_FLAG;
 
     if (cmp == 0 && s1start < s1end)
         cmp = 1;

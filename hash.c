@@ -309,7 +309,7 @@ find_bucket(Interp *interpreter, HASHBUCKET *head, STRING *key)
 HASH *
 new_hash(Interp *interpreter)
 {
-    HASH *hash = (HASH *)new_tracked_header(interpreter, sizeof(*hash));
+    HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
 /*      hash->buffer.flags |= BUFFER_report_FLAG; */
     hash->num_buckets = 0;
     hash->entries = 0;

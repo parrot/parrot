@@ -50,7 +50,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
     interpreter->arena_base->num_sized = 0;
 
     Parrot_initialize_memory_pools(interpreter);
-    Parrot_initialize_resource_pools(interpreter);
+    Parrot_initialize_header_pools(interpreter);
 }
 
 /*
