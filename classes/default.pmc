@@ -45,6 +45,23 @@ static const char * caller(Parrot_Interp interp, PMC * pmc)
 
 /*
 
+=item C<static void cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)>
+
+Throws an exception "$methnme() not implemented in class '$class'", used by
+all unimplemented messages.
+
+*/
+
+static void
+cant_do_method(Parrot_Interp interpreter, PMC * pmc, const char *methname)
+{
+    internal_exception(ILL_INHERIT,
+                       "%s() not implemented in class '%s'\\n", methname,
+        	       caller(interpreter, pmc));
+}
+
+/*
+
 =item C<static void
 check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)>
 

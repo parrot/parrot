@@ -1019,9 +1019,7 @@ EOC
     return <<EOC;
 $l
 ${decl} {
-	internal_exception(ILL_INHERIT,
-		"$meth() not implemented in class '%s'\\n",
-		caller(interpreter, pmc));
+	cant_do_method(interpreter, pmc, "$meth");
         $ret
 }
 
