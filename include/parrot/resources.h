@@ -107,7 +107,7 @@ struct Stash {
 #define TOTAL_BUFFERS 7
 #define HEADERS_ALLOC_SINCE_COLLECT 8
 #define MEM_ALLOCS_SINCE_COLLECT 9
-
+#define TOTAL_COPIED 10
 
 #endif /* PARROT_RESOURCES_H */
 
