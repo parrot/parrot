@@ -175,6 +175,7 @@ print NCI <<'HEAD';
  *  References:
  */
 #include "parrot/parrot.h"
+#include "parrot/hash.h"
 
 /*
  * if the architecture can build some or all of these signatures
@@ -245,10 +246,19 @@ void *
 build_call_func(Interp *interpreter, PMC *pmc_nci,
                 STRING *signature)
 {
-    STRING *ns;
-    STRING *message;
-    char   *c;
-    void   *result = NULL;
+    char       *c;
+    STRING     *ns, *message;
+    HashBucket *b;
+    PMC        *iglobals;
+
+    void       *result        = NULL;
+    Hash       *known_frames  = NULL;
+    PMC        *HashPointer   = NULL;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+
 #if defined(CAN_BUILD_CALL_FRAMES)
 
     /* Try if JIT code can build that signature,
@@ -260,12 +270,41 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
 #endif
     if (result)
         return result;
+
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     UNUSED(pmc_nci);
     if (0 == string_length(interpreter, signature)) return F2DPTR(pcf_v_v);
-    $icky_global_bit
 
+    iglobals = interpreter->iglobals;
+
+    if (iglobals)
+        HashPointer = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
+            IGLOBALS_NCI_FUNCS);
+
+    if (HashPointer)
+        known_frames = PMC_struct_val(HashPointer);
+
+    if (known_frames == NULL)
+    {
+        new_cstring_hash( interpreter, &known_frames );
+
+$icky_global_bit
+
+        if (iglobals)
+        {
+            HashPointer = pmc_new(interpreter, enum_class_Pointer);
+            VTABLE_set_pmc_keyed_int(interpreter, iglobals, IGLOBALS_NCI_FUNCS,
+                HashPointer);
+            PMC_struct_val(HashPointer) = known_frames;
+        }
+    }
+
+    b = hash_get_bucket(interpreter, known_frames,
+        string_to_cstring(interpreter, signature));
+
+    if (b)
+        return F2DPTR( b->value );
 
     /*
       These three lines have been added to aid debugging. I want to be able to
@@ -437,21 +476,12 @@ pcf_${return}(Interp *interpreter, PMC *self)
 HEADER
   }
 
-  if (defined $params) {
-  push @icky_global_variable, <<CALL;
-    if (!string_compare(interpreter, signature,
-      string_from_cstring(interpreter, "$return$params", 0)))
-          return F2DPTR(pcf_${return}_$params);
-CALL
-  }
-  else {
-  push @icky_global_variable, <<CALL;
-    if (!string_compare(interpreter, signature,
-      string_from_cstring(interpreter, "$return", 0)))
-          return F2DPTR(pcf_${return});
-CALL
-  }
+  my ($key, $value) = (defined $params ?
+    ( "$return$params", "pcf_${return}_$params" ) :
+    ( "$return", "pcf_${return}" ));
 
+  push @icky_global_variable,
+        qq|        hash_put( interpreter, known_frames, const_cast("$key"), $value );|;
 }
 
 

@@ -234,7 +234,7 @@ typedef struct Parrot_Interp {
 /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
 /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */
 /* 2:   PMC *Argv;                   list of argv */
-/* 3:   PMC *Env;                    hash_like Env PMC */
+/* 3:   PMC *NCI func hash           hash of NCI funcs */
 /* 4:   PMC *ParrotInterpreter       that's me */
 /* 5:   PMC *Dyn_libs           Array of dynamically loaded ParrotLibrary  */
     PMC* DOD_registry;          /* registered PMCs added to the root set */
@@ -263,7 +263,7 @@ typedef enum {
     IGLOBALS_CLASSNAME_HASH,
     IGLOBALS_COMPREG_HASH,
     IGLOBALS_ARGV_LIST,
-    IGLOBALS_ENV_HASH,
+    IGLOBALS_NCI_FUNCS,
     IGLOBALS_INTERPRETER,
     IGLOBALS_DYN_LIBS,
     IGLOBALS_RUNTIME_LIBRARY,
