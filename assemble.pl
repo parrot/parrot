@@ -172,6 +172,7 @@ sub _expand_macro {
 Preprocesses constants, macros, include statements, and eventually conditional
 compilation. 
 
+  .constant name {register}
   .constant name {signed_integer}
   .constant name {signed_float}
   .constant name {"string constant"}
@@ -221,6 +222,8 @@ sub preprocess {
   my $line = 0;
   my $in_macro;
   my $label_re = qr([a-zA-Z_][a-zA-Z0-9_]*);
+  my $reg_re   = qr([INSP]\d+);
+  my $num_re   = qr([-+]?\d+(\.\d+([eE][-+]?\d+)?)?);
 
   for(@{$self->{cur_contents}}) {
     $line++;
@@ -240,7 +243,12 @@ sub preprocess {
 
     if(/^\.constant \s+
         ($label_re) \s+
-        ([-+]?\d+(\.\d+([eE][-+]?\d+)?)?)/x) { # .constant {name} {number}
+        ([INSP]\d+)/x) { # .constant {name} {register}
+      $self->{constants}{$1} = $2;
+    }
+    elsif(/^\.constant \s+
+        ($label_re) \s+
+        ($num_re)/x) { # .constant {name} {number}
       $self->{constants}{$1} = $2;
     }
     elsif(/^\.constant \s+
