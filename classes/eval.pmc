@@ -100,17 +100,17 @@ pmclass Eval extends Closure {
             return;
 
         if (cur_cs->consts)
-            PackFile_ConstTable_clear(cur_cs->consts);
+            PackFile_ConstTable_clear(INTERP, cur_cs->consts);
         cur_cs->consts = NULL;
         seg = (struct PackFile_Segment *)cur_cs->debugs;
         if (seg)
-            PackFile_Segment_destroy(seg);
+            PackFile_Segment_destroy(INTERP, seg);
         cur_cs->debugs = NULL;
         if (cur_cs->fixups)
-            PackFile_FixupTable_clear(cur_cs->fixups);
+            PackFile_FixupTable_clear(INTERP, cur_cs->fixups);
         cur_cs->fixups = NULL;
         seg = (struct PackFile_Segment *)cur_cs;
-        PackFile_Segment_destroy(seg);
+        PackFile_Segment_destroy(INTERP, seg);
         sub_data->seg = NULL;
         PMC_sub(SELF) = NULL;
     }

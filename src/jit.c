@@ -1310,8 +1310,8 @@ build_asm(Interp *interpreter, opcode_t *pc,
      */
     name = mem_sys_allocate(strlen(interpreter->code->cur_cs->base.name) + 5);
     sprintf(name, "%s_JIT", interpreter->code->cur_cs->base.name);
-    jit_seg = PackFile_find_segment(interpreter->code->cur_cs->base.dir,
-            name, 0);
+    jit_seg = PackFile_find_segment(interpreter,
+            interpreter->code->cur_cs->base.dir, name, 0);
     mem_sys_free(name);
     if (jit_seg)
         jit_info->optimizer =

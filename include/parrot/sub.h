@@ -49,10 +49,11 @@ typedef struct Parrot_sub {
     opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;              /* end of bytecode */
     STRING   *name;             /* name of the sub */
+    STRING *name_space;         /* where this Sub is in */
+    PMC *multi_signature;       /* list of types for MMD */
     char *packed;               /* to simplify packing Constant Subs
                                    that's a hack, until we use freeze
                                 */
-    size_t use_reg_offs;        /* offset of highest changed register*/
     struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 
@@ -66,8 +67,9 @@ typedef struct Parrot_coro {
     opcode_t *address;          /* start of bytecode, addr to continue */
     opcode_t *end;
     STRING   *name;
+    STRING *name_space;         /* where this Sub is in */
+    PMC *multi_signature;       /* list of types for MMD */
     char *packed;
-    size_t use_reg_offs;
     /* - end common */
     struct Parrot_Context ctx;          /* XXX 2 continuations */
     struct Stack_Chunk *co_control_base;

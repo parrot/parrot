@@ -55,12 +55,13 @@ struct PackFile_Header {
 struct PackFile_Segment;
 
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
-    (struct PackFile *, const char *, int add);
-typedef void   (*PackFile_Segment_destroy_func_t) (struct PackFile_Segment *);
-typedef size_t (*PackFile_Segment_packed_size_func_t)(
+    (Interp *, struct PackFile *, const char *, int add);
+typedef void   (*PackFile_Segment_destroy_func_t) (Interp *,
         struct PackFile_Segment *);
-typedef opcode_t * (*PackFile_Segment_pack_func_t) (struct PackFile_Segment *,
-        opcode_t *dest);
+typedef size_t (*PackFile_Segment_packed_size_func_t)(Interp *,
+        struct PackFile_Segment *);
+typedef opcode_t * (*PackFile_Segment_pack_func_t) (Interp *,
+        struct PackFile_Segment *, opcode_t *dest);
 typedef opcode_t * (*PackFile_Segment_unpack_func_t) (Interp *,
         struct PackFile_Segment *, opcode_t *packed);
 typedef void  (*PackFile_Segment_dump_func_t) (Interp *,
@@ -75,7 +76,7 @@ struct PackFile_funcs {
     PackFile_Segment_dump_func_t dump;
 };
 
-INTVAL PackFile_funcs_register(struct PackFile *, UINTVAL type,
+INTVAL PackFile_funcs_register(Interp*, struct PackFile *, UINTVAL type,
         struct PackFile_funcs);
 
 typedef enum {
@@ -91,8 +92,8 @@ typedef enum {
 
 #define PF_DIR_FORMAT 1
 
-typedef INTVAL (*PackFile_map_segments_func_t) (struct PackFile_Segment *seg,
-                                                void *user_data);
+typedef INTVAL (*PackFile_map_segments_func_t) (Interp *,
+        struct PackFile_Segment *seg, void *user_data);
 
 struct PackFile_Segment {
     struct PackFile     * pf;
@@ -222,13 +223,13 @@ struct PackFile {
 ** PackFile Functions:
 */
 
-struct PackFile *PackFile_new(INTVAL is_mapped);
+struct PackFile *PackFile_new(Interp *, INTVAL is_mapped);
 
-void PackFile_destroy(struct PackFile * self);
+void PackFile_destroy(Interp *, struct PackFile * self);
 
-opcode_t PackFile_pack_size(struct PackFile *self);
+opcode_t PackFile_pack_size(Interp *, struct PackFile *self);
 
-void PackFile_pack(struct PackFile * self, opcode_t * packed);
+void PackFile_pack(Interp *, struct PackFile * self, opcode_t * packed);
 
 opcode_t PackFile_unpack(Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
@@ -247,21 +248,21 @@ void PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t);
  * directory functions
  */
 
-INTVAL PackFile_add_segment (struct PackFile_Directory *,
+INTVAL PackFile_add_segment (Interp *, struct PackFile_Directory *,
         struct PackFile_Segment *);
 
-struct PackFile_Segment * PackFile_find_segment (struct PackFile_Directory *,
-                                             const char *name, int recurse);
+struct PackFile_Segment * PackFile_find_segment (Interp *,
+        struct PackFile_Directory *, const char *name, int recurse);
 
 struct PackFile_Segment *
-PackFile_remove_segment_by_name (struct PackFile_Directory *, const char *);
+PackFile_remove_segment_by_name (Interp *, struct PackFile_Directory *, const char *);
 
-INTVAL PackFile_map_segments (struct PackFile_Directory *dir,
+INTVAL PackFile_map_segments (Interp *, struct PackFile_Directory *dir,
                               PackFile_map_segments_func_t callback,
                               void* usr_data);
 
-struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile_Directory *,
-        UINTVAL type, const char *name, int add);
+struct PackFile_Segment * PackFile_Segment_new_seg(Interp *,
+        struct PackFile_Directory *, UINTVAL type, const char *name, int add);
 
 struct PackFile_ByteCode * PF_create_default_segs(Interp*,
         const char *file_name, int add);
@@ -271,15 +272,15 @@ void Parrot_load_bytecode(Interp *, const char *filename);
 ** PackFile_Segment Functions:
 */
 
-void PackFile_Segment_destroy(struct PackFile_Segment * self);
-size_t PackFile_Segment_packed_size(struct PackFile_Segment * self);
-opcode_t * PackFile_Segment_pack(struct PackFile_Segment *, opcode_t *);
+void PackFile_Segment_destroy(Interp *, struct PackFile_Segment * self);
+size_t PackFile_Segment_packed_size(Interp *, struct PackFile_Segment * self);
+opcode_t * PackFile_Segment_pack(Interp *, struct PackFile_Segment *, opcode_t *);
 opcode_t * PackFile_Segment_unpack(Interp *interpreter,
         struct PackFile_Segment * self, opcode_t *cursor);
 void PackFile_Segment_dump(Interp *, struct PackFile_Segment *);
 void default_dump_header (Interp *, struct PackFile_Segment *);
 
-struct PackFile_Segment *PackFile_Segment_new(struct PackFile *pf, const char*,
+struct PackFile_Segment *PackFile_Segment_new(Interp *, struct PackFile *pf, const char*,
         int);
 
 /* fingerprint functions */
@@ -290,14 +291,15 @@ size_t PackFile_write_fingerprint (void *cursor);
 ** PackFile_FixupTable Functions:
 */
 
-void PackFile_FixupTable_clear(struct PackFile_FixupTable * self);
+void PackFile_FixupTable_clear(Interp *,struct PackFile_FixupTable * self);
 
 INTVAL PackFile_FixupTable_unpack(Interp *,
         struct PackFile_FixupTable * self, opcode_t * , opcode_t );
 
-opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
+opcode_t PackFile_FixupTable_pack_size(Interp
+        *,struct PackFile_FixupTable * self);
 
-void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
+void PackFile_FixupTable_pack(Interp *, struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
 void PackFile_Fixup_dump(Interp *,
@@ -326,14 +328,14 @@ struct PackFile_Debug * Parrot_new_debug_seg(Interp *,
 ** PackFile_ConstTable Functions:
 */
 
-void mark_const_subs(Parrot_Interp interpreter);
-void PackFile_ConstTable_clear(struct PackFile_ConstTable * self);
+void mark_const_subs(Interp* interpreter);
+void PackFile_ConstTable_clear(Interp *, struct PackFile_ConstTable * self);
 
 void PackFile_ConstTable_dump(Interp *,
                               struct PackFile_ConstTable *);
-size_t PackFile_ConstTable_pack_size(struct PackFile_Segment * self);
+size_t PackFile_ConstTable_pack_size(Interp *, struct PackFile_Segment * self);
 
-opcode_t * PackFile_ConstTable_pack(struct PackFile_Segment *, opcode_t *);
+opcode_t * PackFile_ConstTable_pack(Interp *, struct PackFile_Segment *, opcode_t *);
 
 opcode_t * PackFile_ConstTable_unpack(Interp *interpreter,
                                    struct PackFile_Segment * self,
@@ -343,13 +345,13 @@ opcode_t * PackFile_ConstTable_unpack(Interp *interpreter,
 ** PackFile_Constant Functions:
 */
 
-struct PackFile_Constant *PackFile_Constant_new(void);
+struct PackFile_Constant *PackFile_Constant_new(Interp *);
 
-size_t PackFile_Constant_pack_size(struct PackFile_Constant * self);
+size_t PackFile_Constant_pack_size(Interp *, struct PackFile_Constant * self);
 
-opcode_t * PackFile_Constant_pack(struct PackFile_Constant *, opcode_t *);
+opcode_t * PackFile_Constant_pack(Interp *, struct PackFile_Constant *, opcode_t *);
 
-void PackFile_Constant_destroy(struct PackFile_Constant * self);
+void PackFile_Constant_destroy(Interp *, struct PackFile_Constant * self);
 
 opcode_t * PackFile_Constant_unpack(Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
@@ -366,7 +368,7 @@ opcode_t * PackFile_Constant_unpack_pmc(Interp *interpreter,
 opcode_t PF_fetch_opcode(struct PackFile *pf, opcode_t **stream);
 INTVAL   PF_fetch_integer(struct PackFile *pf, opcode_t **stream);
 FLOATVAL PF_fetch_number(struct PackFile *pf, opcode_t **stream);
-STRING*  PF_fetch_string(Parrot_Interp, struct PackFile *pf, opcode_t **stream);
+STRING*  PF_fetch_string(Interp*, struct PackFile *pf, opcode_t **stream);
 char *   PF_fetch_cstring(struct PackFile *pf, opcode_t **stream);
 
 size_t   PF_size_opcode(void);

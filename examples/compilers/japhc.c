@@ -20,7 +20,7 @@
 #  define cdebug(x)
 #endif
 
-void* japh_compiler(Parrot_Interp interpreter, const char *s);
+PMC* japh_compiler(Parrot_Interp interpreter, const char *s);
 
 /*
  * loadlib calls the load and init hooks
@@ -34,7 +34,7 @@ Parrot_lib_japhc_init(Parrot_Interp interpreter, PMC* lib)
 
     cdebug((stderr, "japhc_init\n"));
     cmp = const_string(interpreter, "JaPH_Compiler");
-    Parrot_compreg(interpreter, cmp, (PMC*)F2DPTR(japh_compiler));
+    Parrot_compreg(interpreter, cmp, japh_compiler);
 }
 
 /*
@@ -42,10 +42,11 @@ Parrot_lib_japhc_init(Parrot_Interp interpreter, PMC* lib)
  * XXX should make some public util functions
  */
 static struct PackFile_Segment *
-create_seg(struct PackFile_Directory *dir, pack_file_types t, const char *name)
+create_seg(Interp* interpreter, struct PackFile_Directory *dir,
+		pack_file_types t, const char *name)
 {
     struct PackFile_Segment *seg;
-    seg = PackFile_Segment_new_seg(dir, t, name, 1);
+    seg = PackFile_Segment_new_seg(interpreter, dir, t, name, 1);
     return seg;
 }
 
@@ -56,10 +57,10 @@ create_pf_segs(Parrot_Interp interpreter)
     struct PackFile_Segment *seg;
     struct PackFile_ByteCode *cur_cs;
 
-    seg = create_seg(&pf->directory, PF_BYTEC_SEG, "JaPHc_bc");
+    seg = create_seg(interpreter, &pf->directory, PF_BYTEC_SEG, "JaPHc_bc");
     cur_cs = (struct PackFile_ByteCode*)seg;
 
-    seg = create_seg(&pf->directory, PF_CONST_SEG, "JaPHc_const");
+    seg = create_seg(interpreter, &pf->directory, PF_CONST_SEG, "JaPHc_const");
     cur_cs->consts = (struct PackFile_ConstTable*) seg;
     cur_cs->consts->code = cur_cs;
     return cur_cs;
@@ -126,7 +127,7 @@ add_const_str(Parrot_Interp interpreter,
 		k * sizeof(struct PackFile_Constant *));
 
     /* Allocate a new constant */
-    consts->constants[--k] = PackFile_Constant_new();
+    consts->constants[--k] = PackFile_Constant_new(interpreter);
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string =
 	string_make(interpreter, buf, (UINTVAL) l, "iso-8859-1", 0 );
@@ -137,7 +138,7 @@ add_const_str(Parrot_Interp interpreter,
 /*
  * simple compiler - no error checking
  */
-void*
+PMC*
 japh_compiler(Parrot_Interp interpreter, const char *program)
 {
     struct PackFile_ByteCode *cur_cs, *old_cs;

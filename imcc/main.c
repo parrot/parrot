@@ -517,7 +517,7 @@ main(int argc, char * argv[])
         int per_pbc = (write_pbc | run_pbc) != 0;
         IMCC_info(interp, 1, "using optimization '%s' (%x) \n", optimizer_opt,
                 IMCC_INFO(interp)->optimizer_level);
-        pf = PackFile_new(0);
+        pf = PackFile_new(interp, 0);
         Parrot_loadbc(interp, pf);
 
         IMCC_push_parser_state(interp);
@@ -551,10 +551,10 @@ main(int argc, char * argv[])
         FILE *fp;
         IMCC_info(interp, 1, "Writing %s\n", output);
 
-        size = PackFile_pack_size(interp->code) * sizeof(opcode_t);
+        size = PackFile_pack_size(interp, interp->code) * sizeof(opcode_t);
         IMCC_info(interp, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp->code, packed);
+        PackFile_pack(interp, interp->code, packed);
         if (strcmp (output, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(output, "wb")) == 0)

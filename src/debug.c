@@ -2084,7 +2084,8 @@ PDB_extend_const_table(Interp *interpreter)
     }
 
     /* Allocate a new constant */
-    interpreter->code->const_table->constants[--k] = PackFile_Constant_new();
+    interpreter->code->const_table->constants[--k] =
+        PackFile_Constant_new(interpreter);
     return k;
 }
 

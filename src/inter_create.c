@@ -364,7 +364,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     if (!Interp_flags_TEST(interpreter, PARROT_EXTERN_CODE_FLAG))  {
         struct PackFile *pf = interpreter->code;
         if (pf)
-            PackFile_destroy(pf);
+            PackFile_destroy(interpreter, pf);
     }
 
     /* walk and free the stash, pmc's are already dead */

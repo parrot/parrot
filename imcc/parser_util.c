@@ -659,7 +659,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
-    pf = PackFile_new(0);
+    pf = PackFile_new(interp, 0);
     interp->code = pf;  /* put new packfile in place */
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = s;

@@ -34,6 +34,8 @@
  *
  */
 
+#define PF_USE_FREEZE_THAW 0
+
 /*
  * globals store the state between individual e_pbc_emit calls
  */
@@ -164,8 +166,8 @@ make_jit_info(Interp *interpreter, IMC_Unit * unit)
         name = malloc(strlen(globals.cs->seg->base.name) + 5);
         sprintf(name, "%s_JIT", globals.cs->seg->base.name);
         globals.cs->jit_info =
-            PackFile_Segment_new_seg(&interpreter->code->directory,
-                    PF_UNKNOWN_SEG, name, 1);
+            PackFile_Segment_new_seg(interpreter,
+                    &interpreter->code->directory, PF_UNKNOWN_SEG, name, 1);
         free(name);
     }
     size = unit->n_basic_blocks + (old = old_blocks());
@@ -601,6 +603,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     int ns_const = -1;
     char *real_name;
     char *class;
+    struct PackFile_ConstTable *ct;
 
     if (globals.cs->subs->unit->namespace) {
         ns = globals.cs->subs->unit->namespace->reg;
@@ -620,6 +623,33 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     else
         real_name = r->name;
 
+    ct = interpreter->code->const_table;
+    k = PDB_extend_const_table(interpreter);
+    pfc = ct->constants[k];
+
+#if PF_USE_FREEZE_THAW
+    {
+        INTVAL type;
+        STRING *name_space;
+        PMC *sub;
+
+        type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
+            enum_class_Sub : enum_class_Coroutine;
+        /* TODO constant - see also src/packfile.c
+        */
+        sub = pmc_new(interpreter, type);
+        PObj_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
+        PMC_sub(sub)->name = const_string(interpreter, real_name);
+        name_space = ns_const >= 0 ?
+            string_copy(interpreter, ct->constants[ns_const]->u.string) : NULL;
+        PMC_sub(sub)->name_space = name_space;
+        PMC_sub(sub)->address = (void*)offs;
+        PMC_sub(sub)->end = (void*)len;
+
+        pfc->type = PFC_PMC;
+        pfc->u.key = sub;
+    }
+#else
     /*
      * TODO use serialize api if that is done
      *      for now:
@@ -630,11 +660,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
         class = "Coroutine";
     sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, len,
             r->pcc_sub->pragma, ns_const);
-
-    k = PDB_extend_const_table(interpreter);
-    pfc = interpreter->code->const_table->constants[k];
-    rc = PackFile_Constant_unpack_pmc(interpreter,
-            interpreter->code->const_table, pfc, (opcode_t*)buf);
+    rc = PackFile_Constant_unpack_pmc(interpreter, ct, pfc, (opcode_t*)buf);
     if (!rc)
         IMCC_fatal(interpreter, 1,
             "add_const_pmc: PackFile_Constant error\n");
@@ -643,6 +669,7 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n\t%s\n",
             r->name, real_name, r->pcc_sub->pragma, k, buf);
+#endif
     /*
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub

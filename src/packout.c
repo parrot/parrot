@@ -29,12 +29,14 @@ contiguous region of memory.
 
 #define TRACE_PACKFILE_PMC 0
 
-extern struct PackFile_Directory *directory_new (struct PackFile *pf);
+#define PF_USE_FREEZE_THAW 0
+
+extern struct PackFile_Directory *directory_new (Interp*, struct PackFile *pf);
 
 /*
 
 =item C<opcode_t
-PackFile_pack_size(struct PackFile *self)>
+PackFile_pack_size(Interp*, struct PackFile *self)>
 
 Description.
 
@@ -43,7 +45,7 @@ Description.
 */
 
 opcode_t
-PackFile_pack_size(struct PackFile *self)
+PackFile_pack_size(Interp* interpreter, struct PackFile *self)
 {
     opcode_t size;
     struct PackFile_Directory *dir = &self->directory;
@@ -55,7 +57,8 @@ PackFile_pack_size(struct PackFile *self)
     ++size;     /* pad */
 
     dir->base.file_offset = size;
-    size += PackFile_Segment_packed_size((struct PackFile_Segment *) dir);
+    size += PackFile_Segment_packed_size(interpreter,
+            (struct PackFile_Segment *) dir);
 
     return size;
 }
@@ -63,7 +66,7 @@ PackFile_pack_size(struct PackFile *self)
 /*
 
 =item C<void
-PackFile_pack(struct PackFile *self, opcode_t *cursor)>
+PackFile_pack(Interp*, struct PackFile *self, opcode_t *cursor)>
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -80,7 +83,7 @@ Other pack routines are in F<src/packfile.c>.
 */
 
 void
-PackFile_pack(struct PackFile *self, opcode_t *cursor)
+PackFile_pack(Interp* interpreter, struct PackFile *self, opcode_t *cursor)
 {
     opcode_t *ret;
 
@@ -102,7 +105,7 @@ PackFile_pack(struct PackFile *self, opcode_t *cursor)
     seg = (struct PackFile_Segment *) dir;
     /* dir size */
     size = seg->op_count;
-    ret = PackFile_Segment_pack (seg, cursor);
+    ret = PackFile_Segment_pack (interpreter, seg, cursor);
     if ((size_t)(ret - cursor) != size) {
         fprintf(stderr, "PackFile_pack segment '%s' used size %d "
                 "but reported %d\n", seg->name, (int)(ret-cursor), (int)size);
@@ -122,21 +125,21 @@ constant table into a contiguous region of memory.
 */
 
 size_t
-PackFile_ConstTable_pack_size(struct PackFile_Segment *seg)
+PackFile_ConstTable_pack_size(Interp *interpreter, struct PackFile_Segment *seg)
 {
     opcode_t i;
     struct PackFile_ConstTable *self = (struct PackFile_ConstTable *) seg;
     size_t size = 1;    /* const_count */
 
     for (i = 0; i < self->const_count; i++)
-        size += PackFile_Constant_pack_size(self->constants[i]);
+        size += PackFile_Constant_pack_size(interpreter, self->constants[i]);
     return size;
 }
 
 /*
 
 =item C<opcode_t *
-PackFile_ConstTable_pack(struct PackFile_Segment *seg, opcode_t *cursor)>
+PackFile_ConstTable_pack(Interp *, struct PackFile_Segment *seg, opcode_t *cursor)>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -153,7 +156,8 @@ C<PackFile_ConstTable_pack()>
 static struct PackFile_ConstTable *ct;
 
 opcode_t *
-PackFile_ConstTable_pack(struct PackFile_Segment *seg, opcode_t *cursor)
+PackFile_ConstTable_pack(Interp *interpreter,
+        struct PackFile_Segment *seg, opcode_t *cursor)
 {
     struct PackFile_ConstTable *self = (struct PackFile_ConstTable *)seg;
     opcode_t i;
@@ -164,7 +168,7 @@ PackFile_ConstTable_pack(struct PackFile_Segment *seg, opcode_t *cursor)
     *cursor++ = self->const_count;
 
     for (i = 0; i < self->const_count; i++) {
-        cursor = PackFile_Constant_pack(self->constants[i], cursor);
+        cursor = PackFile_Constant_pack(interpreter, self->constants[i], cursor);
     }
 
     return cursor;
@@ -201,7 +205,7 @@ find_in_const(PMC *key, int type)
 /*
 
 =item C<opcode_t *
-PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)>
+PackFile_Constant_pack(Interp*, struct PackFile_Constant *self, opcode_t *cursor)>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
@@ -219,7 +223,8 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 */
 
 opcode_t *
-PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
+PackFile_Constant_pack(Interp* interpreter,
+        struct PackFile_Constant *self, opcode_t *cursor)
 {
     struct PMC *key;
     size_t i;
@@ -239,6 +244,13 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
 
     case PFC_PMC:
         key = self->u.key;      /* the (Sub) PMC */
+#if  PF_USE_FREEZE_THAW
+        {
+            STRING *image;
+            image = Parrot_freeze(interpreter, key);
+            cursor = PF_store_string(cursor, image);
+        }
+#else
         switch (key->vtable->base_type) {
             case enum_class_Sub:
             case enum_class_Closure:
@@ -255,6 +267,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
                 internal_exception(1, "pack_size: Unknown PMC constant");
                 break;
         }
+#endif
         break;
 
     case PFC_KEY:

@@ -335,7 +335,7 @@ again:
 
     /* Now that we have the bytecode, let's unpack it. */
 
-    pf = PackFile_new(is_mapped);
+    pf = PackFile_new(interpreter, is_mapped);
 
     if (!PackFile_unpack
         (interpreter, pf, (opcode_t *)program_code, program_size)) {
@@ -899,9 +899,9 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
 
     program_code[0] = interpreter->op_lib->op_code("enternative", 0);
     program_code[1] = 0; /* end */
-    pf = PackFile_new(0);
+    pf = PackFile_new(interpreter, 0);
     pf->cur_cs = (struct PackFile_ByteCode *)
-	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(pf, "code", 1);
+	(pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interpreter, pf, "code", 1);
     pf->byte_code = pf->cur_cs->base.data = program_code;
     pf->cur_cs->base.size = 2;
     Parrot_loadbc(interpreter, pf);
