@@ -1,10 +1,3 @@
-2003-11-27
-	* Patch #24559 (Allison Randal)
-		- update vector operators
-	* Test Failures (failed before patch):
-		- t/rx/basic.t    1   256     7    1  14.29%  4
-		- t/rx/call.t     1   256     2    1  50.00%  2
-		
 2002-07-??    (Parrot 0.0.7)
 
 	* Initial CVS revision, modified from "V.00I_0I" on
@@ -390,4 +383,40 @@
 2003-08-19
 
 	* Fixes:
-	    - use CPS (Allison Randal)
+	    - use current parrot calling conventions (CPS) (Allison Randal)
+	    - fixed t/compiler/2.t 3-5 and t/rx/basic.t 6
+
+2003-10-13
+
+	* Fixes:
+	    - rewrote the subroutine calling to match Apocalypse 6 (Steve Fink)
+	      - optional params do not work
+	      - non-PMC parameters will not work in all but trivial cases
+	      - *%rest_named probably won't work
+	      - all types passed by value, so the effect is something like
+	        all non-pmc types using "is copy", and all pmc types using
+	        "is rw"
+	      - lightly tested, so many other things will not work
+	    - sprinkled a little more documentation through the code
+	    - named all of the compiler tests (they used to be numbered)
+	    - beefed up the string interpolation code a bit
+	    - added a --timings flag to perl6 to track how much time is spent
+	      in the different phases. Summary of findings: loading in a
+	      Parse::RecDescent grammar is SLOW!
+	    - a few small pieces of my regex changes slipped in, but nothing
+	      that should change existing behavior.
+	* Test Failures:
+	    - t/rx/basic.t    1   256     7    1  14.29%  4
+	    - t/rx/call.t     1   256     2    1  50.00%  2
+
+2003-11-27
+	* Patch #24559 (Allison Randal)
+	    - update vector operators
+	* Test Failures:
+	    - still t/rx/basic.t (4) and t/rx/call.t (2)
+		
+2003-12-17
+	* Fixes:
+	    - update concatenation and bitwise operators (Allison Randal)
+	* Test Failures:
+	    - still t/rx/basic.t (4) and t/rx/call.t (2)
