@@ -34,6 +34,11 @@ Or you can have it render the tree back to a regular expression:
 
 All of this really ought to be in a usage message.
 
+To run any of the generated code, you now need the Match and
+MatchRange PMCs. Run 'make' in parrot/dynclasses/ to generate these.
+It will probably only work on Linux and similar architectures
+currently; sorry.
+
 New stuff: now you can use the compiler as an embedded Parrot compiler.
 Run 'make regex-compiler.pbc' to generate regex-compiler.pbc. Then run
 ../../parrot 01_basic.imc, ../../parrot 02_date.imc, etc. These will
@@ -187,6 +192,8 @@ If you make changes to Grammar.y, you'll need Parse::Yapp to
 regenerate Grammar.pm. Run 'make' with no options to pass the correct
 command-line parameters.
 
-For a painfully detailed, blow-by-blow description of the latter part of the development of this compiler, see http://0xdeadbeef.net/wiki/wiki.pl?FinkBlog
+For a painfully detailed, blow-by-blow description of the latter part
+of the development of this compiler, see
+http://0xdeadbeef.net/wiki/wiki.pl?FinkBlog
 
 Original author: Steve Fink <steve@fink.com>
