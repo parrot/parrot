@@ -118,25 +118,38 @@ Can't find a float type with size 8, conversion ops might fail!
 END
   }
 
-  #Get HUGEINTVAL, note that we prefer standard types
+  my %hugeintval;
+  my $intval     = Configure::Data->get('iv');
+  my $intvalsize = Configure::Data->get('intvalsize');
+  # Get HUGEINTVAL, note that we prefer standard types
   foreach my $type ('long', 'int', 'long long', '__int64') {
-    my %results;
 
     Configure::Data->set('int8_t' => $type);
     eval {
       cc_gen('config/auto/sizes/test2_c.in');
       cc_build();
-      %results=eval cc_run();
+      %hugeintval=eval cc_run();
     };
 
     # clear int8_t on error
-    if($@ || !exists $results{hugeintval}) {
+    if($@ || !exists $hugeintval{hugeintval}) {
       Configure::Data->set('int8_t' => undef);
       next;
     }
 
-    Configure::Data->set(%results);
-    last;
+    if ($hugeintval{hugeintvalsize} > $intvalsize) {
+        # We found something bigger than intval.
+        Configure::Data->set(%hugeintval);
+        last;
+    }
+  }
+  if (!defined($hugeintval{hugeintvalsize}) ||
+      $hugeintval{hugeintvalsize} == $intvalsize) {
+      # Could not find anything bigger than intval. 
+      Configure::Data->set(
+          hugeintval     => $intval,
+          hugeintvalsize => $intvalsize,
+      );
   }
 
   cc_clean();
