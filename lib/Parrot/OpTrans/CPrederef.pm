@@ -25,6 +25,11 @@ sub defines
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
 #define CUR_OPCODE (interpreter->code->byte_code + REL_PC)
 
+#ifdef _MSC_VER
+#define inline __inline
+typedef int ssize_t;
+#endif
+
 static INLINE opcode_t* prederef_to_opcode(struct Parrot_Interp* interpreter,
                                            void** prederef_addr)
 {
