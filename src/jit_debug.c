@@ -285,6 +285,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     size_t i;
     int line;
     opcode_t lc;
+    struct PackFile_Debug *debug;
 
     if (interpreter->code->cur_cs->debugs) {
         char *ext;
@@ -322,6 +323,7 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     {
     	char *temp = string_to_cstring(interpreter, pasmfile);
         /* filename info */
+        fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
         fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n",temp);
         free(temp);
     }
@@ -339,11 +341,15 @@ Parrot_jit_debug_stabs(Interp *interpreter)
     fprintf(stabs, ".stabn " N_SLINE ",0,1,0\n");
     line = 1;
     lc = 0;
+    debug = interpreter->code->cur_cs->debugs;
     for (i = 0; i < jit_info->arena.map_size; i++) {
         if (jit_info->arena.op_map[i].ptr) {
-            op_info_t* op = &interpreter->op_info_table[interpreter->code->byte_code[i]];
+            op_info_t* op = &interpreter->op_info_table[
+                interpreter->code->byte_code[i]];
             if (interpreter->code->cur_cs->debugs) {
-                line = (int)interpreter->code->cur_cs->debugs->base.data[lc++];
+                if (lc >= (int)(debug->base.size))
+                    break;
+                line = (int)debug->base.data[lc++];
             }
             fprintf(stabs, ".stabn " N_SLINE ",0,%d,%d /* %s */\n", line,
                     (int)((char *)jit_info->arena.op_map[i].ptr -
