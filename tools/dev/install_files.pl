@@ -134,13 +134,24 @@ foreach (@ARGV) {
     }
 }
 
+# We'll report multiple occurrences of the same file
+my %seen;
+
 my @files;
 my %directories;
 @ARGV = @manifests;
 while(<>) {
     chomp;
+
+    s/\#.*//; # Ignore comments
+    next if /^\s*$/; # Skip blank lines
+
     my ($src, $meta, $dest) = split(/\s+/, $_);
     $dest ||= $src;
+
+    if ($seen{$src}++) {
+        print STDERR "$ARGV:$.: Duplicate entry $src\n";
+    }
 
     # Parse out metadata
     my $generated = $meta =~ s/^\*//;
@@ -166,6 +177,8 @@ while(<>) {
 
     $directories{dirname($dest)} = 1;
     push(@files, [ $src => $dest ]);
+} continue {
+    close ARGV if eof; # Reset line numbering for each input file
 }
 
 for my $dir (keys %directories) {
