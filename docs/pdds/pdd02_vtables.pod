@@ -341,16 +341,28 @@ Autodecrement the PMC.
 
 Returns 0 on exception.
 
-=item exists(PMC, key)
+=item INTVAL exists(PMC, key)
 
-=item defined
+This is only valid for keyed access. Returns PARROT_TRUE or
+PARROT_FALSE if the key exists or doesn't in the aggregate being
+queried.
 
-=item nextkey
+Returns 0 on exception.
 
-=item nextvalue
+=item INTVAL defined(PMC)
 
+Checks to see if the PMC is defined. Returns PARROT_TRUE or
+PARROT_FALSE, or 0 if an exception is thrown.
 
+=item KEY *nextkey(PMC, key)
 
+Given the passed in key for the PMC, return the next key.
+
+=item PMC *substr(PMC, offset, length)
+=item STRING *substr_str(PMC, offset, length)
+
+Return a substring of the passed in PMC. Returns a substring, either
+as a PMC or a STRING, or NULL if an exception has been thrown.
 
 =back
 
