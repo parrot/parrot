@@ -95,6 +95,37 @@ type of the C<init> function to return C<struct _vtable>, and then
 return C<temp_base_vtable> instead of assigning to the
 C<Parrot_base_vtables> array.
 
+To finish up adding a built-in class:
+
+=over 4
+
+=item 1.
+
+Add classes/YOURCLASS.pmc to MANIFEST.
+
+=item 2.
+
+Add classes/YOURCLASS$(O) to $(CLASS_O_FILES) in Makefile.in.
+
+=item 3.
+
+Add YOURCLASS$(O) to $(O_FILES) in classes/Makefile.in.
+
+=item 4.
+
+Add YOURCLASS.c and YOURCLASS$(O) targets to classes/Makefile.in.
+
+=item 5.
+
+Add enum_class_YOURCLASS to the enumeration in pmc.h.
+
+=item 6.
+
+Add a call to Parrot_YOURCLASS_class_init() to init_world() in
+global_setup.c.
+
+=back
+
 =head2 What You Can and Cannot Do
 
 The usual way to continue from the F<genclass.pl>-generated skeleton
