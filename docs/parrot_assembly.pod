@@ -9,15 +9,19 @@ Parrot assembly language
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 6
-    Version: 1.5
+    Version: 1.6
     Status: Developing
-    Last Modified: 12 October 2001
+    Last Modified: 05 November 2001
     PDD Format: 1
     Language:English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.6
+
+November 05, 2001
 
 =item Version 1.5
 
@@ -48,6 +52,14 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.6
+
+=over 4
+
+=item * Added GC opcodes
+
+=back
 
 =item Version 1.5
 
@@ -721,6 +733,30 @@ Create a new interpreter in X, using the passed flags.
 Call routine Y in interpreter x, passing it the list of parameters
 Z. V is a synchronization object returned. It can be waited on like
 the sync objects returned from async I/O routines.
+
+=back
+
+=head2 Garbage collection
+
+=over 4
+
+=item sweep
+
+Fire off a dead object sweep
+
+=item collect
+
+Fire off a garbage collection sweep
+
+=item pausecollect
+
+Pause the garbage collector. No collections will be done for this interpreter
+until the collector is unpaused.
+
+=item resumecollect
+
+Unpause the collector. This doesn't necessarily do a GC run, merely
+allows the interpreter to fire one off when it deems it necessary.
 
 =back
 
