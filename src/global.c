@@ -243,12 +243,15 @@ Parrot_store_global(Interp *interpreter, STRING *class,
 }
 
 void
-Parrot_store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
-        PMC* sub_pmc, STRING* sub_name, PMC *name_space)
+Parrot_store_sub_in_namespace(Parrot_Interp interpreter, PMC* sub_pmc)
 {
     PMC *globals = interpreter->globals->stash_hash;
     INTVAL type, class_type;
+    STRING* sub_name;
+    PMC *name_space;
 
+    sub_name = PMC_sub(sub_pmc)->name;
+    name_space = PMC_sub(sub_pmc)->name_space;
 #if DEBUG_GLOBAL
     fprintf(stderr, "PMC_CONST: store_global: name '%s' ns %s\n",
             (char*)sub_name->strstart,

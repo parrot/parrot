@@ -29,8 +29,6 @@ contiguous region of memory.
 
 #define TRACE_PACKFILE_PMC 0
 
-#define PF_USE_FREEZE_THAW 1
-
 extern struct PackFile_Directory *directory_new (Interp*, struct PackFile *pf);
 
 /*
@@ -229,6 +227,7 @@ PackFile_Constant_pack(Interp* interpreter,
     struct PMC *key;
     size_t i;
     opcode_t type, slice_bits;
+    STRING *image;
 
     *cursor++ = self->type;
 
@@ -244,30 +243,8 @@ PackFile_Constant_pack(Interp* interpreter,
 
     case PFC_PMC:
         key = self->u.key;      /* the (Sub) PMC */
-#if  PF_USE_FREEZE_THAW
-        {
-            STRING *image;
-            image = Parrot_freeze(interpreter, key);
-            cursor = PF_store_string(cursor, image);
-        }
-#else
-        switch (key->vtable->base_type) {
-            case enum_class_Sub:
-            case enum_class_Closure:
-            case enum_class_Coroutine:
-                {
-                    char *s = (PMC_sub(key))->packed;
-#if TRACE_PACKFILE_PMC
-                    fprintf(stderr, "PMC_packed '%s'\n", (char*) cursor);
-#endif
-                    cursor = PF_store_cstring(cursor, s);
-                }
-                break;
-            default:
-                internal_exception(1, "pack_size: Unknown PMC constant");
-                break;
-        }
-#endif
+        image = Parrot_freeze(interpreter, key);
+        cursor = PF_store_string(cursor, image);
         break;
 
     case PFC_KEY:

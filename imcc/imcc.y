@@ -616,11 +616,11 @@ multi_types:
    ;
 
 multi_type:
-     INTV             { $$ = mk_const(interp, str_dup("int"), 'S'); }
-   | FLOATV           { $$ = mk_const(interp, str_dup("num"), 'S'); }
-   | PMCV             { $$ = mk_const(interp, str_dup("pmc"), 'S'); }
-   | STRINGV          { $$ = mk_const(interp, str_dup("string"), 'S'); }
-   | '_'              { $$ = mk_const(interp, str_dup("pmc"), 'S'); }
+     INTV             { $$ = mk_const(interp, str_dup("INTVAL"), 'S'); }
+   | FLOATV           { $$ = mk_const(interp, str_dup("FLOATVAL"), 'S'); }
+   | PMCV             { $$ = mk_const(interp, str_dup("PMC"), 'S'); }
+   | STRINGV          { $$ = mk_const(interp, str_dup("STRING"), 'S'); }
+   | '_'              { $$ = mk_const(interp, str_dup("PMC"), 'S'); }
    | IDENTIFIER       { $$ = mk_const(interp, $1, 'S'); }
    ;
 

@@ -51,9 +51,7 @@ typedef struct Parrot_sub {
     STRING   *name;             /* name of the sub */
     PMC *name_space;            /* where this Sub is in */
     PMC *multi_signature;       /* list of types for MMD */
-    char *packed;               /* to simplify packing Constant Subs
-                                   that's a hack, until we use freeze
-                                */
+    /* - end common */
     struct Stack_Chunk *pad_stack;      /* only for closure */
 } * parrot_sub_t;
 
@@ -69,7 +67,6 @@ typedef struct Parrot_coro {
     STRING   *name;
     PMC *name_space;         /* where this Sub is in */
     PMC *multi_signature;       /* list of types for MMD */
-    char *packed;
     /* - end common */
     struct Parrot_Context ctx;          /* XXX 2 continuations */
     struct Stack_Chunk *co_control_base;

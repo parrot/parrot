@@ -34,8 +34,6 @@
  *
  */
 
-#define PF_USE_FREEZE_THAW 1
-
 /*
  * globals store the state between individual e_pbc_emit calls
  */
@@ -591,16 +589,34 @@ add_const_num(Interp *interpreter, char *buf)
     return k;
 }
 
+static PMC*
+mk_multi_sig(Interp* interpreter, SymReg *r)
+{
+    INTVAL i, n;
+    STRING *sig;
+    PMC *multi_sig;
+    struct pcc_sub_t *pcc_sub;
+
+    pcc_sub = r->pcc_sub;
+    multi_sig = pmc_new(interpreter, enum_class_FixedStringArray);
+    n = pcc_sub->nmulti;
+    VTABLE_set_integer_native(interpreter, multi_sig, n);
+    for (i = 0; i < n; ++i) {
+        sig = string_from_cstring(interpreter, pcc_sub->multi[i]->name, 0);
+        VTABLE_set_string_keyed_int(interpreter, multi_sig, i, sig);
+    }
+    return multi_sig;
+}
+
 static int
 add_const_pmc_sub(Interp *interpreter, SymReg *r,
         int offs, int end)
 {
     int k;
-#if ! PF_USE_FREEZE_THAW
-    char buf[256];
-    opcode_t *rc;
-    char *class;
-#endif
+    INTVAL type;
+    PMC *name_space;
+    PMC *sub_pmc;
+    struct Parrot_sub *sub;
     struct PackFile_Constant *pfc;
     SymReg *ns;
     int ns_const = -1;
@@ -632,70 +648,49 @@ add_const_pmc_sub(Interp *interpreter, SymReg *r,
     pfc = ct->constants[k];
     globals.cs->subs->pmc_const = k;
 
-#if PF_USE_FREEZE_THAW
-    {
-        INTVAL type;
-        PMC *name_space;
-        PMC *sub_pmc;
-        struct Parrot_sub *sub;
 
-        type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
-             enum_class_Coroutine : enum_class_Sub;
-        /* TODO constant - see also src/packfile.c
-        */
-        sub_pmc = pmc_new(interpreter, type);
-        PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
-        sub = PMC_sub(sub_pmc);
-        sub->name = string_from_cstring(interpreter, real_name, 0);
+    type = (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
+        enum_class_Coroutine : enum_class_Sub;
+    /* TODO constant - see also src/packfile.c
+    */
+    sub_pmc = pmc_new(interpreter, type);
+    PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
+    sub = PMC_sub(sub_pmc);
+    sub->name = string_from_cstring(interpreter, real_name, 0);
 
-        name_space = NULL;
-        if (ns_const >= 0 && ns_const < ct->const_count) {
-            switch (ct->constants[ns_const]->type) {
-                case PFC_KEY:
-                    name_space = ct->constants[ns_const]->u.key;
-                    break;
-                case PFC_STRING:
-                    name_space = constant_pmc_new(interpreter,
-                            enum_class_String);
-                    PMC_str_val(name_space) =
-                            ct->constants[ns_const]->u.string;
-                    break;
-            }
+    name_space = NULL;
+    if (ns_const >= 0 && ns_const < ct->const_count) {
+        switch (ct->constants[ns_const]->type) {
+            case PFC_KEY:
+                name_space = ct->constants[ns_const]->u.key;
+                break;
+            case PFC_STRING:
+                name_space = constant_pmc_new(interpreter,
+                        enum_class_String);
+                PMC_str_val(name_space) =
+                    ct->constants[ns_const]->u.string;
+                break;
         }
-        sub->name_space = name_space;
-        sub->address = (opcode_t*)(long)offs;
-        sub->end = (opcode_t*)(long)end;
-
-        if (!(r->pcc_sub->pragma & SUB_FLAG_PF_ANON)) {
-            Parrot_store_sub_in_namespace(interpreter, pf,
-                    sub_pmc, sub->name, name_space);
-        }
-        pfc->type = PFC_PMC;
-        pfc->u.key = sub_pmc;
-        IMCC_debug(interpreter, DEBUG_PBC_CONST,
-                "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n",
-                r->name, real_name, r->pcc_sub->pragma, k);
     }
-#else
+    sub->name_space = name_space;
+    sub->address = (opcode_t*)(long)offs;
+    sub->end = (opcode_t*)(long)end;
     /*
-     * TODO use serialize api if that is done
-     *      for now:
-     * "Class name offs end flags namespace#"
+     * check if it's declared multi
      */
-    class = "Sub";
-    if (r->pcc_sub->calls_a_sub & ITPCCYIELD)
-        class = "Coroutine";
-    sprintf(buf, "%s %s %d %d %d %d", class, real_name, offs, end,
-            r->pcc_sub->pragma, ns_const);
-    rc = PackFile_Constant_unpack_pmc(interpreter, ct, pfc, (opcode_t*)buf);
-    if (!rc)
-        IMCC_fatal(interpreter, 1,
-            "add_const_pmc: PackFile_Constant error\n");
+    if (r->pcc_sub->nmulti)
+        sub->multi_signature = mk_multi_sig(interpreter, r);
+    else
+        sub->multi_signature = NULL;
 
+    if (!(r->pcc_sub->pragma & SUB_FLAG_PF_ANON)) {
+        Parrot_store_sub_in_namespace(interpreter, sub_pmc);
+    }
+    pfc->type = PFC_PMC;
+    pfc->u.key = sub_pmc;
     IMCC_debug(interpreter, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n\t%s\n",
-            r->name, real_name, r->pcc_sub->pragma, k, buf);
-#endif
+            "add_const_pmc_sub '%s' -> '%s' flags %d color %d\n",
+            r->name, real_name, r->pcc_sub->pragma, k);
     /*
      * create entry in our fixup (=symbol) table
      * the offset is the index in the constant table of this Sub

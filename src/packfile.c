@@ -33,8 +33,6 @@ structure of the frozen bytecode.
 #define TRACE_PACKFILE 0
 #define TRACE_PACKFILE_PMC 0
 
-#define PF_USE_FREEZE_THAW 1
-
 /*
 ** Static functions
 */
@@ -2779,31 +2777,28 @@ PackFile_Constant_pack_size(Interp* interpreter, struct PackFile_Constant *self)
 {
     size_t packed_size;
     PMC *component;
+    STRING *image;
 
     switch (self->type) {
 
-    case PFC_NUMBER:
-        packed_size = PF_size_number();
-        break;
+        case PFC_NUMBER:
+            packed_size = PF_size_number();
+            break;
 
-    case PFC_STRING:
-        packed_size = PF_size_string(self->u.string);
-        break;
+        case PFC_STRING:
+            packed_size = PF_size_string(self->u.string);
+            break;
 
-    case PFC_KEY:
-        packed_size = 1;
+        case PFC_KEY:
+            packed_size = 1;
 
-        for (component = self->u.key; component;
-                component = PMC_data(component))
-            packed_size += 2;
-        break;
+            for (component = self->u.key; component;
+                    component = PMC_data(component))
+                packed_size += 2;
+            break;
 
-    case PFC_PMC:
-        component = self->u.key; /* the pmc (Sub, ...) */
-
-#if  PF_USE_FREEZE_THAW
-        {
-            STRING *image;
+        case PFC_PMC:
+            component = self->u.key; /* the pmc (Sub, ...) */
 
             /*
              * TODO create either
@@ -2812,30 +2807,13 @@ PackFile_Constant_pack_size(Interp* interpreter, struct PackFile_Constant *self)
              */
             image = Parrot_freeze(interpreter, component);
             packed_size = PF_size_string(image);
-        }
-#else
-        /*
-         * TODO use serialize api if that is done
-         */
-        switch (component->vtable->base_type) {
-            case enum_class_Sub:
-            case enum_class_Closure:
-            case enum_class_Coroutine:
-                packed_size = PF_size_cstring(
-                        (PMC_sub(component))->packed);
-                break;
-            default:
-                PIO_eprintf(NULL, "pack_size: Unknown PMC constant");
-                return 0;
-        }
-#endif
-        break;
+            break;
 
-    default:
-        PIO_eprintf(NULL,
-                "Constant_packed_size: Unrecognized type '%c'!\n",
-                (char)self->type);
-        return 0;
+        default:
+            PIO_eprintf(NULL,
+                    "Constant_packed_size: Unrecognized type '%c'!\n",
+                    (char)self->type);
+            return 0;
     }
 
     /* Tack on space for the initial type field */
@@ -2919,7 +2897,6 @@ Unpack a constant PMC (currently Subs only).
 
 */
 
-#if PF_USE_FREEZE_THAW
 opcode_t *
 PackFile_Constant_unpack_pmc(Interp *interpreter,
                          struct PackFile_ConstTable *constt,
@@ -2957,15 +2934,7 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
          * XXX place this code in Sub.thaw ?
          */
         if (!(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_ANON)) {
-            STRING *name;
-            INTVAL type;
-            PMC *class, *name_space;
-            VTABLE *vtable;
-
-            name_space = PMC_sub(pmc)->name_space;
-            name       = PMC_sub(pmc)->name;
-            Parrot_store_sub_in_namespace(interpreter, pf,
-                pmc, name, name_space);
+            Parrot_store_sub_in_namespace(interpreter, pmc);
         }
     }
     /*
@@ -2974,116 +2943,6 @@ PackFile_Constant_unpack_pmc(Interp *interpreter,
     interpreter->code = pf_save;
     return cursor;
 }
-
-#else
-
-opcode_t *
-PackFile_Constant_unpack_pmc(Interp *interpreter,
-                         struct PackFile_ConstTable *constt,
-                         struct PackFile_Constant *self,
-                         opcode_t *cursor)
-{
-    struct PackFile *pf = constt->base.pf;
-    char * pmcs;
-    char class[32], name[128];
-    int start, end, flag;
-    int rc, pmc_num;
-    PMC *sub_pmc;
-    struct Parrot_sub *sub;
-    struct PackFile *pf_save;
-    int ns_const;
-    PMC *name_space = NULL;
-
-#if TRACE_PACKFILE_PMC
-    fprintf(stderr, "PMC_CONST '%s'\n", (char*)cursor);
-#endif
-    pmcs = PF_fetch_cstring(pf, &cursor);
-    /*
-     * TODO use serialize api if that is done
-     *
-     * TODO first get classname, then get rest according to PMC type
-     */
-    rc = sscanf(pmcs, "%31s %127s %d %d %d %d",
-            class, name, &start, &end, &flag, &ns_const);
-    if (rc != 6) {
-        fprintf(stderr, "PMC_CONST ERR RC '%d'\n", rc);
-    }
-
-#if TRACE_PACKFILE_PMC
-    fprintf(stderr,
-            "PMC_CONST: class '%s', name '%s', start %d end %d flag %d ns %d\n",
-            class, name, start, end, flag, ns_const);
-#endif
-    /*
-     * make a constant subroutine object of the desired class
-     */
-    pmc_num = pmc_type(interpreter, string_from_cstring(interpreter, class, 0));
-    /*
-     * should be constant but that doesn't work, if
-     * properties get attached to the sub
-     */
-    sub_pmc = pmc_new_noinit(interpreter, pmc_num);
-    /*
-     * this places the current bytecode segment in the Parrot_Sub
-     * structure, which needs interpreter->code
-     */
-    pf_save = interpreter->code;
-    interpreter->code = pf;
-    VTABLE_init(interpreter, sub_pmc);
-#if 0
-    PObj_report_SET(sub_pmc);
-#endif
-
-    /* both start and end are relative, so are small -
-     * cast for 64-bit compilers where sizeof(int)=4, sizeof(long)=8
-     */
-    sub = PMC_sub(sub_pmc);
-    sub->address = (void *)(long) start;
-    sub->end = (opcode_t*)(long)end;
-    sub->packed = pmcs;
-    sub->name = string_from_cstring(interpreter, name, 0);
-    /*
-     * if the Sub has some special pragmas in flag (LOAD, MAIN...)
-     * then set private flags of that PMC
-     */
-    if (flag) {
-        PObj_get_FLAGS(sub_pmc) |= (flag & SUB_FLAG_PF_MASK);
-    }
-
-    /*
-     * place item in const_table
-     */
-    self->type = PFC_PMC;
-    self->u.key = sub_pmc;
-    /*
-     * finally place the sub in the global stash
-     */
-    if (ns_const >= 0 && ns_const < constt->const_count) {
-        switch (constt->constants[ns_const]->type) {
-            case PFC_KEY:
-                name_space = constt->constants[ns_const]->u.key;
-                break;
-            case PFC_STRING:
-                name_space = constant_pmc_new(interpreter,
-                        enum_class_String);
-                PMC_str_val(name_space) =
-                    constt->constants[ns_const]->u.string;
-                break;
-        }
-    }
-    sub->name_space = name_space;
-    if (!(flag & SUB_FLAG_PF_ANON)) {
-        Parrot_store_sub_in_namespace(interpreter, pf,
-                sub_pmc, sub->name, name_space);
-    }
-
-    /*
-     * restore interpreters packfile
-     */
-    interpreter->code = pf_save;
-    return cursor;
-}
-#endif
 
 /*
 

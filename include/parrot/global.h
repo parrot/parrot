@@ -17,8 +17,7 @@ PMC *Parrot_find_global(Interp *, STRING *class, STRING *name);
 PMC *Parrot_get_global(Interp *, STRING *class,  STRING *name, void *next);
 PMC *Parrot_global_namespace(Interp *, PMC *globals, STRING *ns);
 void Parrot_store_global(Interp *, STRING *class, STRING *globalname, PMC *pmc);
-void Parrot_store_sub_in_namespace(Interp*, struct PackFile *pf,
-        PMC* sub_pmc, STRING* sub_name, PMC *name_space);
+void Parrot_store_sub_in_namespace(Interp*, PMC* sub_pmc);
 
 PMC *Parrot_get_name(Interp *, STRING *name);
 #endif /* PARROT_GLOBAL_H_GUARD */
