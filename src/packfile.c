@@ -2737,6 +2737,23 @@ Unpack a constant PMC (currently Subs only).
 
 */
 
+static PMC*
+add_global(Parrot_Interp interpreter, PMC *globals, STRING *names)
+{
+    PMC *stash;
+
+    if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
+        stash = pmc_new(interpreter, enum_class_OrderedHash);
+        VTABLE_set_pmc_keyed_str(interpreter, globals, names,
+                stash);
+    }
+    else {
+        stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
+                names);
+    }
+    return stash;
+}
+
 static void
 store_sub_in_namespace(Parrot_Interp interpreter, struct PackFile *pf,
         PMC* sub_pmc,
@@ -2760,7 +2777,7 @@ global_ns:
     }
     else {
         STRING *names;
-        PMC * stash;
+        PMC * stash, *part;
         struct PackFile_Constant *pfc_const;
 
         assert(ns < pf->const_table->const_count);
@@ -2770,14 +2787,18 @@ global_ns:
                 names = pfc_const->u.string;
                 if (!string_length(names))
                     goto global_ns;
-                if (!VTABLE_exists_keyed_str(interpreter, globals, names)) {
-                    stash = pmc_new(interpreter, enum_class_OrderedHash);
-                    VTABLE_set_pmc_keyed_str(interpreter, globals, names,
-                            stash);
-                }
-                else {
-                    stash = VTABLE_get_pmc_keyed_str(interpreter, globals,
-                            names);
+                stash = add_global(interpreter, globals, names);
+                VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);
+                break;
+            case PFC_KEY:
+                part = pfc_const->u.key;
+                for (; part; part = PMC_data(part)) {
+                    STRING *s = key_string(interpreter, part);
+#if TRACE_PACKFILE_PMC
+                    PIO_printf(interpreter, "key part %Ss\n", s);
+#endif
+                    stash = add_global(interpreter, globals, s);
+                    globals = stash;
                 }
                 VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);
                 break;

@@ -62,6 +62,10 @@ find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
      * hash lookup duplication
      */
     HashBucket *b;
+#ifdef FIND_DEBUG
+    PIO_printf(interpreter, "find_global class '%Ss' meth '%Ss\n",
+            class, globalname);
+#endif
     stash = interpreter->globals->stash_hash;
     if (class) {
         b = hash_get_bucket(interpreter,

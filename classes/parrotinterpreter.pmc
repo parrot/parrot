@@ -79,7 +79,7 @@ clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 =item C<static int
 need_reg(Parrot_Interp s, int i, int i3)>
 
-Called from C<clone_regs_thread()>. Currently commented out. 
+Called from C<clone_regs_thread()>. Currently commented out.
 
 =cut
 
@@ -421,6 +421,9 @@ Returns the PMC global value for C<key>.
         if (key >= 0 && key < IGLOBALS_SIZE)
             return VTABLE_get_pmc_keyed_int(new_interp,
                 new_interp->iglobals, key);
+        /* quick hack to get the global stash */
+        if (key == -1)
+            return new_interp->globals->stash_hash;
         return NULL;
     }
 
@@ -459,7 +462,7 @@ Sets the interpreter info for C<key> to C<val>.
         struct Parrot_Interp * new_interp =
             (struct Parrot_Interp *)PMC_data(SELF);
         INTVAL allowed;
-    
+
         switch (key) {
             case -1:    /* set interpreter flags */
             allowed =

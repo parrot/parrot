@@ -331,7 +331,7 @@ static char *
 add_ns(char *name)
 {
     int len, l;
-    char *ns_name;
+    char *ns_name, *p;
 
     if (!cur_namespace || (l = strlen(cur_namespace->name)) <= 2)
         return name;
@@ -344,6 +344,14 @@ add_ns(char *name)
     strcat(ns_name, "::");
     strcat(ns_name, name);
     mem_sys_free(name);
+    p = strstr(ns_name, "\";\"");   /* Foo";"Bar  -> Foo::Bar */
+    while (p) {
+        p[0] = ':';
+        p[1] = ':';
+        l = strlen(p+2);
+        memmove(p+2, p+3, l);
+        p = strstr(ns_name, "\";\")");
+    }
     return ns_name;
 }
 
