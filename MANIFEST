@@ -79,6 +79,8 @@ examples/assembly/substr.pasm
 examples/assembly/trace.pasm
 examples/mops/README
 examples/mops/mops.c
+examples/mops/mops.cs
+examples/mops/mops.il
 examples/mops/mops.pl
 examples/mops/mops.ps
 examples/mops/mops.py
