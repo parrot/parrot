@@ -25,6 +25,8 @@ sub output_is() {
 
     my $lang_f = Parrot::Test::per_test('.py',$count);
     my $pir_f = Parrot::Test::per_test('.pir',$count);
+    # need .py file in current dir for import
+    $lang_f = (File::Spec->splitpath($lang_f))[2];
     my $py_out_f = "$lang_f.out";
     my $pir_out_f = "$pir_f.out";
     my $parrotdir = dirname $self->{parrot};
@@ -66,7 +68,7 @@ sub output_is() {
 	unlink $lang_f;
 	unlink $py_out_f;
 	unlink $pir_out_f;
-	# unlink $pir_f;
+	unlink $pir_f;
     }
 
     return $pass;

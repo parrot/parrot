@@ -1416,10 +1416,14 @@ PIO_softspace(theINTERP, PMC *pmc, int new)
     ParrotIO *io = PMC_data(pmc);
     int ret;
 
+    UNUSED(interpreter);
     if (!io)
         return 0;
     ret = io->flags & PIO_F_SOFT_SP ? 1 : 0;
-    io->flags |= new ? PIO_F_SOFT_SP : 0;
+    if (new)
+        io->flags |= PIO_F_SOFT_SP;
+    else
+        io->flags &= ~PIO_F_SOFT_SP;
     return ret;
 }
 
