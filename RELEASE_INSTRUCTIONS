@@ -32,11 +32,16 @@ To prepare a release:
         CVS and getting a DEVELOPING file.)
         
     5.  make distclean.
+
+    5.5. This should really be fixed in distclean, but you'll
+        also need to delete all of the empty CVS subdirectories.
+        On Unix, 'find . -name CVS | xargs rmdir' should do the
+        trick safely enough.
     
     6.  Run tools/dev/manicheck.pl and fix any errors it finds.
         
     7.  Make sure everything works--Configure, make and 
-        make test.  Check the Tinderbox and make sure that 
+        make fulltest.  Check the Tinderbox and make sure that 
         everything's green (or that any yellows and reds are
         due to problems with the particular box, like a
         botched compiler upgrade).

@@ -1,3 +1,5 @@
-LAST RELEASE: Parrot 0.0.5, 17 April 2002
+LAST RELEASE: Parrot 0.0.9, 18 December 2002
 
-This file should only exist in development distributions.  Delete it (and its entry in the MANIFEST) before packaging Parrot up for a CPAN or other release distribution.
+This file should only exist in development distributions. Delete it
+(and its entry in the MANIFEST) before packaging Parrot up for a CPAN
+or other release distribution.
