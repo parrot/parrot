@@ -76,6 +76,29 @@ Parrot_dlopen(const char *filename)
     NSModule handle = NULL;
 
     dyld_result = NSCreateObjectFileImageFromFile(filename, &ofile);
+    if (NSObjectFileImageSuccess != dyld_result) {
+        switch(dyld_result) {
+        case NSObjectFileImageFailure:
+            fprintf(stderr, "open result was Failure (%i)\n", dyld_result);
+            break;
+        case NSObjectFileImageInappropriateFile:
+            fprintf(stderr, "open result was InappropriateFile (%i)\n", dyld_result);
+            break;
+        case NSObjectFileImageArch:
+            fprintf(stderr, "open result was Arch (%i)\n", dyld_result);
+            break;
+        case NSObjectFileImageFormat:
+            fprintf(stderr, "open result was Format (%i)\n", dyld_result);
+            break;
+        case NSObjectFileImageAccess:
+            fprintf(stderr, "open result was Access (%i)\n", dyld_result);
+            break;
+        default:
+            fprintf(stderr, "open result was unknown (%i)\n", dyld_result);
+            break;
+        }
+        exit(1);
+    }
     handle = NSLinkModule(ofile, filename, TRUE);
     NSDestroyObjectFileImage(ofile);
 
