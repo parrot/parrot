@@ -177,9 +177,10 @@ void
 PDB_next(struct Parrot_Interp *interpreter,
          const char *command)
 {
+    PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
 
-    if (!(interpreter->pdb->state & PDB_RUNNING))
+    if (!(pdb->state & PDB_RUNNING))
     {
         PDB_init(interpreter,command);
     }
@@ -187,11 +188,15 @@ PDB_next(struct Parrot_Interp *interpreter,
     if (command && isdigit(*command))
         n = atol(command);
 
-    for ( ; n && interpreter->pdb->cur_opcode; n--)
-        DO_OP(interpreter->pdb->cur_opcode,interpreter);
+    pdb->state &= ~PDB_STOPPED;
+
+    for ( ; n && pdb->cur_opcode; n--)
+        DO_OP(pdb->cur_opcode,interpreter);
+
+    pdb->state |= PDB_STOPPED;
 
     /* If program ended */
-    if (!interpreter->pdb->cur_opcode)
+    if (!pdb->cur_opcode)
         PDB_program_end(interpreter);
 }
 
@@ -202,9 +207,10 @@ void
 PDB_trace(struct Parrot_Interp *interpreter,
           const char *command)
 {
+    PDB_t *pdb = interpreter->pdb;
     unsigned long n = 1;
  
-    if (!(interpreter->pdb->state & PDB_RUNNING))
+    if (!(pdb->state & PDB_RUNNING))
     {
         PDB_init(interpreter,command);
     }
@@ -212,17 +218,21 @@ PDB_trace(struct Parrot_Interp *interpreter,
     if (command && isdigit(*command))
         n = atol(command);
 
-    for ( ; n && interpreter->pdb->cur_opcode; n--) {
+    pdb->state &= ~PDB_STOPPED;
+
+    for ( ; n && pdb->cur_opcode; n--) {
         trace_op(interpreter, 
                 interpreter->code->byte_code,
                 interpreter->code->byte_code + 
                 interpreter->code->byte_code_size / sizeof(opcode_t),
                 interpreter->pdb->cur_opcode);
-        DO_OP(interpreter->pdb->cur_opcode,interpreter);
+        DO_OP(pdb->cur_opcode,interpreter);
     }
 
+    pdb->state |= PDB_STOPPED;
+
     /* If program ended */
-    if (!interpreter->pdb->cur_opcode)
+    if (!pdb->cur_opcode)
         PDB_program_end(interpreter);
 }
 
