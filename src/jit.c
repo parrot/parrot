@@ -15,12 +15,12 @@
 
 #ifndef INT_REGISTERS_TO_MAP
 # define INT_REGISTERS_TO_MAP 0
-# define intval_map 0
+  char *intval_map = 0;
 #endif
 
 #ifndef FLOAT_REGISTERS_TO_MAP
 # define FLOAT_REGISTERS_TO_MAP 0
-# define floatval_map 0
+  char *floatval_map = 0;
 #endif
 
 #ifndef ALLOCATE_REGISTERS_PER_SECTION

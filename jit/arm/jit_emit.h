@@ -987,7 +987,6 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 
 #  define REQUIRES_CONSTANT_POOL 0
 #  define INT_REGISTERS_TO_MAP 10
-#  define FLOAT_REGISTERS_TO_MAP 0
 
 /* XXX NOTE before actually mapping things
 
@@ -1003,8 +1002,6 @@ Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
 */
 char intval_map[INT_REGISTERS_TO_MAP] =
     { r0, r1, r2, r3, r4, r5, r6, r7, r8, r12 };
-
-char *floatval_map = 0;
 
 static void
 arm_sync_d_i_cache (void *start, void *end) {
