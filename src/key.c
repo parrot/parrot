@@ -291,6 +291,7 @@ key_integer(Interp *interpreter, PMC *key)
     PMC *reg;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+    case KEY_integer_FLAG|KEY_number_FLAG:
     case KEY_integer_FLAG:
         return PMC_int_val(key);
     case KEY_integer_FLAG | KEY_register_FLAG:

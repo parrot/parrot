@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -1213,6 +1213,21 @@ CODE
 0
 1
 0
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "iter");
+##PIR##
+.sub __main__ @MAIN
+    new P0, .PerlHash
+    set P0['a'], 'x'
+    iter P1, P0
+    shift P2, P1
+    print P2
+    print "\n"
+    end
+.end
+CODE
+a
 OUTPUT
 
 1;
