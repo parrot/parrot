@@ -65,6 +65,11 @@ Parrot_getenv(const char *name)
 {
     return getenv(name);
 }
+void
+Parrot_unsetenv(const char *name)
+{
+    unsetenv(name);
+}
 /*
 ** Parrot_dlopen()
 */

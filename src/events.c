@@ -38,7 +38,7 @@ Parrot_init_signals(void)
     /* quick hack to test signals and exceptions
      * s. t/op/hacks_4.pasm
      */
-    Parrot_set_sighandler(SIGFPE, sig_handler);
+    /*    Parrot_set_sighandler(SIGFPE, sig_handler);*/
 }
 
 /*

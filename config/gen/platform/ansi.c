@@ -55,6 +55,14 @@ Parrot_setenv(const char *name, const char *value)
     return;
 }
 
+void
+Parrot_unsetenv(const char *name)
+{
+    Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
+            "Parrot_unsetenv not implemented");
+    return;
+}
+
 char *
 Parrot_getenv(const char *name)
 {

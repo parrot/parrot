@@ -29,6 +29,7 @@ void Parrot_sleep(unsigned int seconds);
 INTVAL Parrot_intval_time(void);
 FLOATVAL Parrot_floatval_time(void);
 void Parrot_setenv(const char *name, const char *value);
+void Parrot_unsetenv(const char *name);
 char * Parrot_getenv(const char *name);
 
 /*

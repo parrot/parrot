@@ -61,6 +61,12 @@ Parrot_setenv(const char *name, const char *value)
     setenv(name, value, 1);
 }
 
+void
+Parrot_unsetenv(const char *name)
+{
+    unsetenv(name);
+}
+
 char *
 Parrot_getenv(const char *name)
 {
