@@ -54,7 +54,7 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     fflush(stdout);
 
     /* not used any more */ 
-    if (pdb->last_command && *pdb->last_command)
+    if (pdb->last_command && *pdb->cur_command)
         mem_sys_free(pdb->last_command);
 
     /* update the last command */
