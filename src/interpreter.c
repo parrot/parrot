@@ -14,6 +14,7 @@
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
 #include "parrot/oplib/core_ops.h"
+#include "parrot/oplib/core_ops_prederef.h"
 #include "parrot/runops_cores.h"
 #ifdef HAS_JIT
 #  include "parrot/jit.h"
@@ -25,7 +26,6 @@
 
 #define ATEXIT_DESTROY
 
-extern op_lib_t *PARROT_CORE_PREDEREF_OPLIB_INIT(void);
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
@@ -78,7 +78,7 @@ load_oplib(struct Parrot_Interp * interpreter,
     if (!init_func)
         internal_exception(1, "Invalid oplib, '%s' not exported\n",
                 init_func_name);
-    oplib = init_func();
+    oplib = init_func(1);
     /* XXX now what
      * if oplib is a prederefed oplib, and matches the current
      * oplib, we would run it */
@@ -200,7 +200,7 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 static void
 init_prederef(struct Parrot_Interp *interpreter)
 {
-    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT();
+    interpreter->op_lib = PARROT_CORE_PREDEREF_OPLIB_INIT(1);
     if (interpreter->op_lib->op_count != interpreter->op_count)
         internal_exception(PREDEREF_LOAD_ERROR,
                 "Illegal op count (%d) in prederef oplib\n",
@@ -226,7 +226,8 @@ init_prederef(struct Parrot_Interp *interpreter)
 static void
 stop_prederef(struct Parrot_Interp *interpreter)
 {
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
+    (void) PARROT_CORE_PREDEREF_OPLIB_INIT(0);
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
 }
 
 static void
@@ -485,7 +486,7 @@ make_interpreter(Interp_flags flags)
     interpreter->ctx.intstack = intstack_new(interpreter);
 
     /* Load the core op func and info tables */
-    interpreter->op_lib = PARROT_CORE_OPLIB_INIT();
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
     interpreter->op_count = interpreter->op_lib->op_count;
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
@@ -559,6 +560,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         free(interpreter->prederef_code);
 
     mem_sys_free(interpreter->warns);
+
+    /* deinit op_lib */
+    interpreter->op_lib = PARROT_CORE_OPLIB_INIT(0);
 
     /* XXX move this to register.c */
     {

@@ -128,7 +128,7 @@ print HEADER <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-extern op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(void);
+extern op_lib_t *Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init);
 
 END_C
 
@@ -374,11 +374,12 @@ static void hop_deinit(void)
 {
     HOP *p, *next;
     size_t i;
-    for (i = 0; i < OP_HASH_SIZE; i++)
-        for(p = hop[i]; p; ) {
-            next = p->next;
-            free(p);
-            p = next;
+    if (hop)
+	for (i = 0; i < OP_HASH_SIZE; i++)
+	    for(p = hop[i]; p; ) {
+		next = p->next;
+		free(p);
+		p = next;
         }
     free(hop);
     hop = 0;
@@ -404,8 +405,14 @@ static op_lib_t op_lib = {
   get_op
 };
 
-op_lib_t * Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(void) {
-  return &op_lib;
+op_lib_t *
+Parrot_DynOp_${base}${suffix}_${major_version}_${minor_version}_${patch_version}(int init) {
+    if (init)
+	return &op_lib;
+    else {
+	hop_deinit();
+	return NULL;
+    }
 }
 
 END_C

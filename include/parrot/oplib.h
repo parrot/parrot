@@ -32,7 +32,8 @@ typedef struct {
     int (*op_code)(const char * name, int full);
 } op_lib_t;
 
-typedef op_lib_t *(*oplib_init_f)(void);
+/* when init = true initialize, else de_initialize */
+typedef op_lib_t *(*oplib_init_f)(int init);
 
 #endif
 
@@ -40,7 +41,7 @@ typedef op_lib_t *(*oplib_init_f)(void);
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
