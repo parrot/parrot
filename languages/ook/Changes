@@ -1,5 +1,9 @@
 Revision history for a Ook! compiler written in Parrot and targeting Parrot.
 
+0.1.0 Thu Feb 19 21:31:28 CET 2004
+        - use of eval to avoid temp file (courtesy of Leopold Toetsch)
+        - updated (after 1 year...) the README to reflect this use of eval
+
 0.0.2 Tue Dec 31 18:02:01 CET 2002
         - Nicholas Clark reported a bug when there's a complex nesting
           of while instructions in the ook source. This version fixes
