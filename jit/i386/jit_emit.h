@@ -1023,6 +1023,10 @@ static unsigned char *lastpc;
     if (r) { \
       emitm_fld(pc, r); \
     } \
+    emitm_ftst(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+    emitm_jxs(pc, emitm_jz, 2); \
     emitm_fchs(pc); \
     if (r) { \
       emitm_fstp(pc, (r+1)); \
@@ -1031,6 +1035,10 @@ static unsigned char *lastpc;
 
 #  define jit_emit_neg_m_n(pc, mem) { \
     jit_emit_fload_m_n(pc, mem); \
+    emitm_ftst(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+    emitm_jxs(pc, emitm_jz, 2); \
     emitm_fchs(pc); \
     jit_emit_fstore_m_n(pc, mem); \
 }
