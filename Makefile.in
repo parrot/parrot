@@ -31,7 +31,7 @@ PDUMP = pdump${exe}
 .c$(O):
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} 
+all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe}
 
 #XXX This target is not portable to Win32
 
@@ -40,11 +40,11 @@ shared: libparrot.so
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
-$(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm 
+$(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
-$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) 
-	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) $(C_LIBS)
+$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
+	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) resources$(O) $(C_LIBS)
 
 test_main$(O): $(H_FILES)
 
