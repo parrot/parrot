@@ -21,7 +21,6 @@
 #define PARROT_MISC_H_GUARD
 
 #include "parrot/parrot.h"
-#include <stdarg.h>
 
 /*
  * utils.c
