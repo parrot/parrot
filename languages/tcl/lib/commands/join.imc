@@ -7,31 +7,35 @@
   .local string retval
   .local int return_type
 
-  print "JOINED\n"
-
   if argcP == 0 goto bad_args
   if argcP > 2 goto bad_args
+  .local pmc a_list,joiner_pmc
+  .local string a_joiner
+  a_list = P5
+  joiner_pmc = P6
   return_type = TCL_OK
 
   .local pmc results
-  .local string joiner
-  joiner = " "
+  # We expect a list here. We should take one if we get it,
+  # otherwise, convert it to a string value, and then convert that to a list.
+  # XXX evilly just using Tcl* variants here.
+  .local int TclList
+  TclList = find_type "TclList"
+  $I0 = typeof a_list
+  if $I0 == TclList goto got_list  
+ 
   .local pmc string2list
   string2list = find_global "_Tcl", "__stringToList"
-  .local string list
-  list = P5
-  print "list is "
-  print list
-  print "\n"
-  results = string2list(list)
+  a_list = string2list(a_list)
 
-  if argcP != 2 goto got_joiner
-  joiner = P6 
-  print "joiner is '"
-  print joiner
-  print "'\n"
+got_list:
+  if argcP == 2 goto got_joiner
+  a_joiner = " "
+  goto doit
 got_joiner: 
-  retval = join joiner, results 
+  a_joiner=joiner_pmc
+doit:
+  retval = join a_joiner, a_list
   goto done
 
 bad_args:
@@ -39,5 +43,8 @@ bad_args:
   retval = "wrong # args: should be \"join list ?joinString?\"\n"
 
 done:
-  .return(return_type,retval)
+  .local pmc rv
+  rv = new String
+  rv = retval
+  .return(return_type,rv)
 .end
