@@ -480,7 +480,7 @@ mmd_register(Interp *interpreter,
 =item C<void
 mmd_destroy(Parrot_Interp interpreter)>
 
-Frees all the memmory allocated used the MMD subsystem.
+Frees all the memory allocated used the MMD subsystem.
 
 =cut
 
@@ -504,6 +504,20 @@ mmd_destroy(Parrot_Interp interpreter)
     }
     mem_sys_free(interpreter->binop_mmd_funcs);
 }
+
+
+/*
+
+=item C<void
+mmd_vtregister(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right, PMC *subroutine)>
+
+Register a new mmd function. Type indicates which MMD function is
+being registered, left and right are the left and right PMC types, and
+subroutine is a subroutine pointer.
+
+=cut
+
+*/
 
 void
 mmd_vtregister(Parrot_Interp interpreter, INTVAL type, INTVAL left, INTVAL right, PMC *subroutine) {
