@@ -24,7 +24,7 @@ Handles class and object manipulation.
 /*
 
 =item C<static PMC *
-find_global(Parrot_Interp interpreter, STRING *globalname)>
+find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
 This should be public, but for right now it's internal.
 
@@ -33,14 +33,26 @@ This should be public, but for right now it's internal.
 */
 
 static PMC *
-find_global(Parrot_Interp interpreter, STRING *globalname) {
-    if (!VTABLE_exists_keyed_str(interpreter,
-                interpreter->globals->stash_hash, globalname)) {
+find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname) {
+    PMC *stash;
+    if (NULL != class) {
+        if (!VTABLE_exists_keyed_str(interpreter,
+                                     interpreter->globals->stash_hash,
+                                     class)) {
+            return NULL;
+        }
+        stash = VTABLE_get_pmc_keyed_str(interpreter,
+                                         interpreter->globals->stash_hash,
+                                         class);
+    }
+    else {
+        stash = interpreter->globals->stash_hash;
+    }
+    if (!VTABLE_exists_keyed_str(interpreter, stash, globalname)) {
         return NULL;
     }
-
     return VTABLE_get_pmc_keyed_str(interpreter,
-            interpreter->globals->stash_hash, globalname);
+            stash, globalname);
 }
 
 /*
@@ -460,23 +472,13 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
     INTVAL searchoffset = 0; /* Where in that array we are */
     INTVAL classcount = 0;   /* The number of classes we need to
                                 search */
-    STRING *FQ_method;   /* The fully qualified name of the method
-                            that we're going to look for, rebuilt for
-                            each class we search */
-    STRING *shortcut_name; /* The method name with the separator
-                              prepended */
 
     /* if its a non-classes, just return the sub */
     if (!PObj_is_class_TEST(class)) {
-        return find_global(interpreter, method_name);
+        return find_global(interpreter,
+                           NULL,
+                           method_name);
     }
-
-    /* We're going to make this over and over, so get it once and
-       skip the repeated string makes */
-    shortcut_name = string_concat(interpreter,
-            string_from_cstring(interpreter, PARROT_NAMESPACE_SEPARATOR,
-                PARROT_NAMESPACE_SEPARATOR_LENGTH),
-            method_name, 0);
 
     /* The order of operations:
      *
@@ -488,12 +490,10 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
      */
 
     /* See if we get lucky and its in the class of the PMC */
-    FQ_method = string_concat(interpreter,
-            VTABLE_get_string_keyed_int(interpreter,
-                    (PMC *)PMC_data(class), PCD_CLASS_NAME),
-            shortcut_name, 0);
-
-    method = find_global(interpreter, FQ_method);
+    method = find_global(interpreter,
+                         VTABLE_get_string_keyed_int(interpreter,
+                               (PMC *)PMC_data(class), PCD_CLASS_NAME),
+                         method_name);
 
     /* Bail immediately if we got something */
     if (NULL != method) {
@@ -510,13 +510,13 @@ Parrot_find_method_with_cache(Parrot_Interp interpreter, PMC *class,
             searchoffset++) {
         curclass = VTABLE_get_pmc_keyed_int(interpreter,
                 classsearch_array, searchoffset);
-
-        FQ_method = string_concat(interpreter,
-                VTABLE_get_string_keyed_int(interpreter,
-                        (PMC *)PMC_data(curclass), PCD_CLASS_NAME),
-                shortcut_name, 0);
-        method = find_global(interpreter, FQ_method);
-        Parrot_note_method_offset(interpreter, searchoffset, method);
+        method = find_global(interpreter,
+                             VTABLE_get_string_keyed_int(interpreter,
+                                (PMC *)PMC_data(curclass), PCD_CLASS_NAME),
+                             method_name);
+        if (method) {
+            Parrot_note_method_offset(interpreter, searchoffset, method);
+        }
     }
     return method;
 }

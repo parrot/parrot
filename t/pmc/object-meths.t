@@ -36,7 +36,7 @@ output_is(<<'CODE', <<'OUTPUT', "callmeth 1");
     # cant mangle method names yet
     find_global P3, "meth"
     # so store ref to the sub with the real name
-    store_global "Foo\x0meth", P3
+    store_global "Foo", "meth", P3
 
     print "main\n"
     callmethcc
@@ -62,7 +62,7 @@ output_is(<<'CODE', <<'OUTPUT', "can class");
 
     new P3, .Sub
     # store the sub with the real name
-    store_global "Foo\x0meth", P3
+    store_global "Foo", "meth", P3
 
     can I0, P2, "meth"
     print I0
@@ -85,7 +85,7 @@ output_is(<<'CODE', <<'OUTPUT', "can object");
 
     new P3, .Sub
     # store the sub with the real name
-    store_global "Foo\x0meth", P3
+    store_global "Foo", "meth", P3
 
     can I0, P2, "meth"
     print I0
