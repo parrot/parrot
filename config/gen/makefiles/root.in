@@ -741,7 +741,7 @@ clean : testclean progclean
 
 progclean:
 	$(RM_F) $(O_FILES) \
-	        $(TEST_PROG) $(PARROT_MAIN)$(O) $(PARROT_MAIN)$(EXE) \
+	        $(TEST_PROG) $(PARROT_MAIN)$(O) \
 	        $(PDUMP) $(SRC)/pdump$(O) $(SRC)/packdump$(O) $(SRC)/pbc_info$(O) $(PINFO) \
 	        $(PDB) $(SRC)/pdb$(O) \
 	        $(DIS) $(SRC)/disassemble$(O)
@@ -855,7 +855,7 @@ exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
 
-libnci$(SO): $(SRC)/nci_test.c parrot$(EXE)
+libnci$(SO): $(SRC)/nci_test.c parrot${exe}
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $< -o $@
 
 # ctags
