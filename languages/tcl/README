@@ -4,7 +4,8 @@ To run an example, cd to examples, and type "make" for instructions
 
 To run the test suite, type "make test".
 
-To run the test suite with TODOs failing, type "make devtest"
+#To run the test suite with TODOs failing, type "make devtest"
+#(This doesn't currently do anything, as todo tests are failing.)
 
 Look in the docs directory.
 
