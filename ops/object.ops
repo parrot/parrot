@@ -190,7 +190,7 @@ inline op subclass(out PMC, in PMC) {
 op subclass(out PMC, in STR, in STR) {
   PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
       interpreter->class_hash, $2);
-  if (!class) {
+  if (!class || !PObj_is_class_TEST(class)) {
     internal_exception(NO_CLASS, "Class doesn't exist");
   }
   $1 = Parrot_single_subclass(interpreter, class, $3);
@@ -200,7 +200,7 @@ op subclass(out PMC, in STR, in STR) {
 op subclass(out PMC, in STR) {
   PMC *class = VTABLE_get_pmc_keyed_str(interpreter,
       interpreter->class_hash, $2);
-  if (!class) {
+  if (!class || !PObj_is_class_TEST(class)) {
     internal_exception(NO_CLASS, "Class doesn't exist");
   }
   $1 = Parrot_single_subclass(interpreter, class, NULL);
