@@ -76,14 +76,17 @@ pmclass Array {
     
     INTVAL type_keyed (KEY* key) {
         /* XXX - Do this */
+        return 0;
     }
     
     UINTVAL subtype (INTVAL type) {
         /* XXX */
+        return 0;
     }
     
     UINTVAL subtype_keyed (KEY* key, INTVAL type) {
         /* XXX */
+        return 0;
     }
 
     STRING* name () {
@@ -92,6 +95,7 @@ pmclass Array {
     
     STRING* name_keyed (KEY* key) {
         /* XXX */
+        return NULL;
     }
 
     PMC* clone () {
@@ -100,6 +104,7 @@ pmclass Array {
     
     PMC* clone_keyed (KEY* key) {
         /* XXX */
+        return NULL;
     }
     
     PMC* find_method (STRING* method_name) {
@@ -161,6 +166,7 @@ pmclass Array {
 
     BIGNUM* get_bignum () {
         /* XXX - Cast cache.int_val to BIGNUM and return it */
+        return NULL;
     }
     
     BIGNUM* get_bignum_keyed (KEY* key) {
@@ -287,6 +293,7 @@ pmclass Array {
     
     INTVAL is_same_keyed (KEY* key, PMC* pmc2, KEY* pmc2_key) {
         /* XXX */
+        return 0;
     }
 
     void set_integer (PMC* value) {
