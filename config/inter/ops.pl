@@ -36,7 +36,7 @@ END
     {
       $ops=prompt('Which opcode files would you like?', $ops);
 
-      if($ops !~ m{^\s*core\.ops}) {
+      if($ops !~ m{\bcore\.ops}) {
         print "core.ops must be the first selection.\n";
         redo;
       }
