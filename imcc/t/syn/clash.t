@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 13;
+use TestCompiler tests => 15;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -226,4 +226,22 @@ ok1:
 CODE
 ok 1
 OUTPUT
-1;
+
+output_like(<<'CODE', <<'OUT', "undefined ident");
+.sub _main @MAIN
+    print no_such
+.end
+CODE
+/error.*undefined.*'no_such'/
+OUT
+
+output_is(<<'CODE', <<'OUT', "label ident");
+.sub _main @MAIN
+    branch no_such
+    end
+no_such:
+    print "ok\n"
+.end
+CODE
+ok
+OUT

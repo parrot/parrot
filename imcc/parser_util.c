@@ -373,6 +373,11 @@ INS(struct Parrot_Interp *interpreter, IMC_Unit * unit, char *name,
         for (i = 0; i < op_info->arg_count-1; i++) {
             if (op_info->labels[i+1])
                 ins->type |= ITBRANCH | (1 << i);
+            else {
+                if (r[i]->type == VTADDRESS)
+                    fataly(EX_SOFTWARE, sourcefile, line,
+                            "undefined identifier '%s'\n", r[i]->name);
+            }
         }
         if (op_info->jump) {
             ins->type |= ITBRANCH;
