@@ -1,0 +1,22 @@
+#
+# io.jako
+#
+# Input/Output ops.
+#
+
+sub obj open     {op} (str name, str mode);
+sub obj fdopen   {op} (int fd, str mode);
+sub     close    {op} (obj io);
+
+sub     print    {op} (obj io, str s);
+sub     printerr {op} (str s);
+sub     puts     {op} (str s);
+sub     puts     {op} (int i);
+sub     puts     {op} (num n);
+
+sub str read     {op} (int l);
+sub str read     {op} (obj io, int l);
+
+sub int seek     {op} (obj io, int offset, int whence);
+sub int seek     {op} (obj io, int high, int low, int whence);
+
