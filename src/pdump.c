@@ -14,17 +14,17 @@
 
 int
 main(int argc, char **argv) {
-    struct stat       file_stat;
-    int               fd;
-    char *            packed;
-    long              packed_size;
-    struct PackFile * pf;
+    struct stat            file_stat;
+    int                    fd;
+    char *                 packed;
+    long                   packed_size;
+    struct PackFile *      pf;
+    struct Parrot_Interp * interpreter;
 
     if (argc != 2) {
         fprintf(stderr, "pdump: usage: pdump FILE\n");
         return 1;
     }
-
 
     if (stat(argv[1], &file_stat)) {
         printf("can't stat %s, code %i\n", argv[1], errno);
@@ -35,8 +35,10 @@ main(int argc, char **argv) {
         printf("Can't open, error %i\n", errno);
         return 1;
     }
-    
+
     init_world();
+  
+    interpreter = make_interpreter();
 
     packed_size = file_stat.st_size;
 
@@ -60,7 +62,7 @@ main(int argc, char **argv) {
 
     pf = PackFile_new();
 
-    PackFile_unpack(pf, packed, packed_size);
+    PackFile_unpack(interpreter, pf, packed, packed_size);
     PackFile_dump(pf);
     PackFile_DELETE(pf);
 

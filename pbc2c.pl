@@ -121,7 +121,7 @@ END_C
         $data = '"' . $data . '"' unless $data =~ m/^"/;
 
         print <<END_C;
-    c = PackFile_Constant_new_string(string_make($data, $size, $encoding, $flags, $type));
+    c = PackFile_Constant_new_string(interpreter, string_make(interpreter, $data, $size, $encoding, $flags, $type));
 END_C
       } else {
         die;

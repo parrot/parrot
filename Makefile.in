@@ -43,8 +43,8 @@ libparrot.so: $(O_FILES)
 $(TEST_PROG): test_main$(O) $(O_FILES) Parrot/OpLib/core.pm
 	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
 
-$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O)
-	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) resources$(O) $(C_LIBS)
+$(PDUMP): pdump$(O) $(O_FILES)
+	$(CC) $(CFLAGS) -o $(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
 
 test_main$(O): $(H_FILES)
 
