@@ -16,7 +16,7 @@ Tests the Complex PMC.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 24;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -154,6 +154,29 @@ CODE
 -13+2i
 OUTPUT
 
+output_like(<<'CODE', <<'OUTPUT', "Malformed string: real part");
+    new P0, .Complex
+    set P0, "q + 3i"
+    end
+CODE
+/Complex: malformed string/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Malformed string: imaginary part");
+    new P0, .Complex
+    set P0, "1 + ij"
+    end
+CODE
+/Complex: malformed string/
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "Malformed string: missing +/-");
+    new P0, .Complex
+    set P0, "1 * i"
+CODE
+/Complex: malformed string/
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "add");
 	new P0, .Complex
 	new P1, .Complex
@@ -208,7 +231,7 @@ CODE
 0+2i
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "substract");
+output_is(<<'CODE', <<'OUTPUT', "subtract");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
@@ -448,6 +471,24 @@ N0 N1 N2 OK
 1
 OUTPUT
 
+output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid string key");
+    new P0, .Complex
+    set P0, "5 + 3.5i"
+    set N0, P0["Foo"]
+    end
+CODE
+/Complex: key is neither 'real' or 'imag'/
+OUTPUT
+
+output_like(<<"CODE", <<'OUTPUT', "get keyed: invalid numeric key");
+    new P0, .Complex
+    set P0, "5 + 3.5i"
+    set N0, P0[2]
+    end
+CODE
+/Complex: key must be 0 or 1/
+OUTPUT
+
 output_is(<<'CODE', <<'OUTPUT', "set int/num");
     new P0, .Complex
 
@@ -495,6 +536,14 @@ CODE
 1+4i
 3.2-2.3i
 0.5+6i
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "set keyed: invalid key");
+    new P0, .Complex
+    set P0[2], 12.5
+    end
+CODE
+/Complex: key must be 0 or 1/
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "is_equal");
@@ -610,4 +659,48 @@ output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, S");
 .end
 CODE
 2+3i
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "neg");
+@{[ $fp_equality_macro ]}
+     new P0, .Complex
+     set P0, "1.3 + 1.7i"
+     new P1, .Integer
+     neg P1, P0
+     set N0, P1[0]
+     set N1, P1[1]
+     .fp_eq(N0, -1.3, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+     .fp_eq(N1, -1.7, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+     end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "clone");
+@{[ $fp_equality_macro ]}
+     new P0, .Complex
+     set P0, "1 - 3i"
+     clone P1, P0
+     eq P0, P1, OK1
+     print "not "
+OK1: print "ok 1\\n"
+     set P0, "0 + 0i"
+     set N0, P1[0]
+     set N1, P1[1]
+     .fp_eq(N0, 1.0, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+     .fp_eq(N1, -3.0, OK3)
+     print "not "
+OK3: print "ok 3\\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
