@@ -7,6 +7,7 @@
 use strict;
 use Getopt::Long;
 use Parrot::Opcode;
+use Symbol;
 
 my %options;
 GetOptions(\%options,('checksyntax',
@@ -70,9 +71,14 @@ constantize(Parrot::Opcode::fingerprint()); # Make it constant zero.
 my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 
 
+# read source/include processing
+my(@program);
+foreach my $file (@ARGV) {
+    push(@program,read_source($file));
+}
 
 
-# read source and assemble
+# assemble
 my $pc=0; my $op_pc=0;
 my ($bytecode,%label,%fixup,%constants,@constants);
 my (%local_label, %local_fixup, $last_label);
@@ -81,26 +87,22 @@ my %equate=('*'=>sub { return $pc },
 	    '__DATE__'=>'"'.scalar(localtime).'"',
 	    '__VERSION__'=>'" $Revision$ "',
 	    '__LINE__' => sub { return $line });
-while(<>) {
-    $line++;
-    chomp;
-    my $sline=$_;
-    s/^\s*//;
-    s/\s*$//;
-    if(/^\#/ || $_ eq "") {
+foreach my $l (@program) {
+    my($file,$line,$pline,$sline)=@$l;
+    if($pline=~m/^\#/ || $pline eq "") {
 	if($options{'listing'}) {
 	    $listing.=sprintf("%4d %08x %-44s %s\n", $line, $op_pc, '',$sline);
 	}
 	next;
     }
     my($label,$code);
-    if(m/^(\S+):\s*(.+)?/) {
+    if($pline=~m/^(\S+):\s*(.+)?/) {
         ($label,$code)=($1,$2);
 	if(defined($label) && $label ne "") {
 	    if($label=~m/^\$/) {
 		# a local label
 		if(exists($local_label{$label})) {
-		    error("local label '$label' already defined in $last_label!");
+		    error("local label '$label' already defined in $last_label!",$file,$line);
 		}
 		if(exists($local_fixup{$label})) {
 		    # backpatch everything with this PC.
@@ -115,7 +117,7 @@ while(<>) {
 	    } else {
 		# a global label
 		if(exists($label{$label})) {
-		    error("'$label' already defined!");
+		    error("'$label' already defined!",$file,$line);
 		}
 		if(exists($fixup{$label})) {
 		    # backpatch everything with this PC.
@@ -132,7 +134,7 @@ while(<>) {
 		if(keys(%local_fixup)) {
 		    # oops, some local labels are unresolved
 		    error("These local labels were undefined in $last_label: ".
-			  join(",",sort(keys(%local_fixup))));
+			  join(",",sort(keys(%local_fixup))),$file,$line);
 		}
 		$label{$label}=$pc; # store it.
 		$last_label=$label;
@@ -140,11 +142,11 @@ while(<>) {
 	} 
     } else {
 	# here's where we can catch assembler directives!
-	if(m/^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i) {
+	if($pline=~m/^([_a-zA-Z]\w*)\s+equ\s+(.+)$/i) {
 	    my($name,$data)=($1,$2);
 	    $equate{$name}=$data;
 	} else {
-	    $code=$_;
+	    $code=$pline;
 	}
     }
     next if(!defined($code));
@@ -235,17 +237,17 @@ while(<>) {
         }
 
         if ($ambiguous) {
-          error( "Ambiguous operator $old_op matches $opcode and $match_level_2\n" );
+          error("Ambiguous operator $old_op matches $opcode and $match_level_2\n",$file,$line);
         }
     
-	if ($found_op) {
-	    log_message("substituting $opcode for $old_op" . (scalar(@tests) ? (" ( tried " . join(', ', @tests) . ")") : ''));
+        if ($found_op) {
+	    log_message("substituting $opcode for $old_op" . (scalar(@tests) ? (" ( tried " . join(', ', @tests) . ")") : ''),$file,$line);
 	} else {
-	    error("No opcode $opcode ( tried " . join(', ', @tests) . ") in <$_>");
+	    error("No opcode $opcode ( tried " . join(', ', @tests) . ") in <$pline>",$file,$line);
 	}
     }
     if (@args != $opcodes{$opcode}{ARGS}) {
-      error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS}." in <$_>" );
+      error("Wrong arg count--got ".scalar(@args)." needed ".$opcodes{$opcode}{ARGS}." in <$_>" ,$file,$line);
     }
     $bytecode .= pack $pack_type{'i'}, $opcodes{$opcode}{CODE};
     $op_pc=$pc;
@@ -387,16 +389,20 @@ if($options{'listing'}) {
     close L;
 }
 
+###############################
+# Helper Subroutines
+###############################
+
 sub error {
-    my($message)=@_;
-    print STDERR "Error ($line): $message\n";
+    my($message,$file,$Line)=@_;
+    print STDERR "Error ($file:$line): $message\n";
     exit;
 }
 
 sub log_message {
-    my($message)=@_;
+    my($message,$file,$line)=@_;
     if($options{'verbose'}) {
-	print STDERR "INFO ($line): $message\n";
+	print STDERR "INFO ($file:$line): $message\n";
     }
 }
 
@@ -413,3 +419,29 @@ sub constantize {
     return "[".$constants{$s}."]";
 }
 
+sub read_source {
+    my($file,$ofile,$oline)=@_;
+    my($line)=1;
+    my(@lines);
+    my($handle)=gensym;
+    open($handle,$file) || error("Cannot open $file for input!",$ofile,$oline);
+    while(<$handle>) {
+	chomp;
+	my($sline)=$_;
+	s/^\s*//;
+	s/\s*$//;
+	push(@lines,[$file,$line,$_,$sline]);
+	if(m/^INCLUDE\s+['"](.+)["']/i) {
+	    my $newfile=$1;
+	    # this is an include directive.
+	    $lines[-1][2]="";
+	    # include the file
+	    push(@lines,[$file,$line,'',"#<<<< Start of $newfile >>>>"]);
+	    push(@lines,read_source($newfile,$file,$line));
+	    push(@lines,[$file,$line,'',"#<<<< End of $newfile >>>>"]);
+	}
+	$line++;
+    }
+    close($handle);
+    return @lines;
+}
