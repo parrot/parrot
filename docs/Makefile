@@ -1,3 +1,5 @@
+RM_F=rm -f
+PERL=perl
 
 all: packfile-c.pod packfile-perl.pod core_ops.pod
 
@@ -11,5 +13,5 @@ core_ops.pod: ../core.ops
 	perldoc -u ../core.ops > core_ops.pod
 
 clean:
-	rm -f packfile-c.pod packfile-perl.pod
+	$(RM_F) packfile-c.pod packfile-perl.pod
 
