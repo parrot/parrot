@@ -176,16 +176,16 @@ loop_start:
 	.local int y
 	y = args['y']
 
-	set dest_rect['w'], width
-	set dest_rect['h'], height
+	set dest_rect['width'], width
+	set dest_rect['height'], height
 	set dest_rect['x'], x
 	set dest_rect['y'], y
 
 	.local object src_rect
 	src_rect = _new_SDL_Rect()
 
-	set src_rect['w'], width
-	set src_rect['h'], height
+	set src_rect['width'], width
+	set src_rect['height'], height
 	set src_rect['x'], 0
 	set src_rect['y'], 0
 

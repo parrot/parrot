@@ -192,10 +192,10 @@ For example:
 	set layout['y'], .DATATYPE_INT16
 	push layout, 0
 	push layout, 0
-	set layout['w'], .DATATYPE_UINT16
+	set layout['width'], .DATATYPE_UINT16
 	push layout, 0
 	push layout, 0
-	set layout['h'], .DATATYPE_UINT16
+	set layout['height'], .DATATYPE_UINT16
 	push layout, 0
 	push layout, 0
 

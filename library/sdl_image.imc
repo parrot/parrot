@@ -79,6 +79,7 @@ wrong.  I'm working on this with Leo, or vice versa.
 	.sym   pmc    old_rect
 	.sym   pmc    src_rect
 	.sym   pmc    rect
+
 	.sym   int    width
 	.sym   int    height
 
@@ -86,15 +87,16 @@ wrong.  I'm working on this with Leo, or vice versa.
 	old_rect = _new_SDL_Rect()
 	src_rect = _new_SDL_Rect()
 	rect     = _new_SDL_Rect()
+
 	width    = _SDL_Surface_width( image )
 	height   = _SDL_Surface_height( image )
 
-	set rect['w'],     width
-	set src_rect['w'], width
-	set old_rect['w'], width
-	set rect['h'],     height
-	set src_rect['h'], height
-	set old_rect['h'], height
+	set rect['width'],      width
+	set src_rect['width'],  width
+	set old_rect['width'],  width
+	set rect['height'],     height
+	set src_rect['height'], height
+	set old_rect['height'], height
 
 	.sym int class_type
 	find_type class_type, 'SDL_Image' 
@@ -123,26 +125,27 @@ Update the appropriate surface with these rects if you want to see the image.
 =cut
 
 .sub _SDL_Image_draw prototyped
+	.param pmc image
 	.param pmc screen
-	.param pmc surface
 	.param int bg_color
 
 	.sym   pmc rect
 	.sym   pmc old_rect
-	.sym   pmc image
+	.sym   pmc surface
 	.sym   pmc src_rect
 	.sym   pmc previous_rect
 
-	set rect,     surface["SDL_Image\x00rect"]
-	set old_rect, surface["SDL_Image\x00old_rect"]
-	set image,    surface["SDL_Image\x00image"]
-	set src_rect, surface["SDL_Image\x00src_rect"]
+	set rect,     image["SDL_Image\x00rect"]
+	set old_rect, image["SDL_Image\x00old_rect"]
+	set surface,  image["SDL_Image\x00image"]
+	set src_rect, image["SDL_Image\x00src_rect"]
 
 	previous_rect = _new_SDL_Rect()
-	set $I0, old_rect['w']
-	set previous_rect['w'], $I0
-	set $I0, old_rect['h']
-	set previous_rect['h'], $I0
+
+	set $I0, old_rect['width']
+	set previous_rect['width'],  $I0
+	set $I0, old_rect['height']
+	set previous_rect['height'], $I0
 	set $I0, old_rect['x']
 	set previous_rect['x'], $I0
 	set $I0, old_rect['y']
@@ -168,10 +171,10 @@ Update the appropriate surface with these rects if you want to see the image.
 
 	set old_rect['x'], x
 	set old_rect['y'], y
-	set surface["SDL_Image\x00old_rect"], old_rect
+	set image["SDL_Image\x00old_rect"], old_rect
 
 	.pcc_begin prototyped
-		.arg image
+		.arg surface
 		.arg src_rect
 		.arg screen
 		.arg rect

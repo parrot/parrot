@@ -261,8 +261,8 @@ x_okay:
 
 	set x, old_rect['x']
 	set y, old_rect['y']
-	set w, old_rect['w']
-	set h, old_rect['h']
+	set w, old_rect['width']
+	set h, old_rect['height']
 
 	.pcc_begin prototyped
 		.arg screen
@@ -275,8 +275,8 @@ x_okay:
 
 	set x, new_rect['x']
 	set y, new_rect['y']
-	set w, new_rect['w']
-	set h, new_rect['h']
+	set w, new_rect['width']
+	set h, new_rect['height']
 
 	.pcc_begin prototyped
 		.arg screen
