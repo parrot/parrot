@@ -42,6 +42,9 @@ An SDL::Image object has the following methods:
 .sub _initialize prototyped, @LOAD
 	.local pmc surface_type
 	.local pmc image_class
+	
+	$I0 = find_type 'SDL::Image'
+	if $I0 > 1 goto END
 
 	.local pmc init_image
 	init_image = find_global 'SDL', '_init_image'
@@ -54,6 +57,7 @@ An SDL::Image object has the following methods:
 	new initializer, .PerlString
 	set initializer, 'BUILD'
 	setprop image_class, 'BUILD', initializer
+END:
 
 .end
 
@@ -80,18 +84,7 @@ The name of this method may change, per discussion on p6i.
 
 	image = IMG_Load( filename )
 
-	.local pmc  fetch_layout
-	find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
-
-	.local pmc layout
-	layout = fetch_layout( 'Surface' )
-
-	assign image, layout
-
-	.local int offset
-	classoffset offset, self, 'SDL::Surface'
-	setattribute self, offset, image
-
+	self.'wrap_surface'( image )
 .end
 
 =back
