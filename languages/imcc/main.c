@@ -13,9 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sysexits.h>
 
 #include "imc.h"
 #include "parrot/embed.h"
+#include "parrot/longopt.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -52,26 +54,48 @@ static void imcc_version(void)
 #define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2)
 #define unsetopt(flag) Parrot_setflag(interp, flag, 0)
 
+static struct longopt_opt_decl options[] = {
+    { 'b', 'b', 0, { "--bounds", NULL } },
+    { 'j', 'j', 0, { "--jit", NULL } },
+    { 'p', 'p', 0, { "--profile", NULL } },
+    { 'P', 'P', 0, { NULL } },
+    { 'S', 'S', 0, { NULL } },
+    { 'g', 'g', 0, { NULL } },
+    { 't', 't', 0, { NULL } },
+    { 'd', 'd', OPTION_required_FLAG, { "--debug", NULL } },
+    { 'w', 'w', 0, { NULL } },
+    { 'G', 'G', 0, { NULL } },
+    { '.', '.', 0, { NULL } },
+    { 'a', 'a', 0, { "--pasm", NULL } },
+    { 'h', 'h', 0, { "--help", NULL } },
+    { 'V', 'V', 0, { "--version", NULL } },
+    { 'r', 'r', 0, { "--run-pbc", NULL } },
+    { 'c', 'c', 0, { "--pbc", NULL } },
+    { 'v', 'v', 0, { "--verbose", NULL } },
+    { 'y', 'y', 0, { "--yydebug", NULL } },
+    { 'o', 'o', OPTION_required_FLAG, { NULL } },
+    { 'O', 'O', OPTION_required_FLAG, { NULL } },
+    { 0, 0, 0, { NULL } }
+};
+
 /* most stolen from test_main.c */
 static char *
 parseflags(Parrot_Interp interp, int *argc, char **argv[])
 {
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    int status;
     if (*argc == 1) {
 	usage(stderr);
 	exit(1);
     }
     run_pbc = 1;
 
-    /* skip the program name arg */
-    (*argc)--;
-    (*argv)++;
-
 #ifdef HAVE_COMPUTED_GOTO
     setopt(PARROT_CGOTO_FLAG);
 #endif
 
-    while ((*argc) && (*argv)[0][0] == '-') {
-	switch ((*argv)[0][1]) {
+    while ((status = longopt_get(interp, *argc, *argv, options, &opt)) > 0) {
+	switch (opt.opt_id) {
             case 'b':
                 setopt(PARROT_BOUNDS_FLAG);
                 break;
@@ -95,13 +119,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'd':
                 IMCC_DEBUG++;
-                if ((*argv)[0][2])
-                    IMCC_DEBUG = strtoul((*argv)[0] + 2, 0, 16);
-                else if (*argc > 1 && isdigit(*(*argv)[1])) {
-                    (*argc)--;
-                    (*argv)++;
-                    IMCC_DEBUG = strtoul((*argv)[0], 0, 16);
-                }
+                IMCC_DEBUG = strtoul(opt.opt_arg, 0, 16);
                 if (IMCC_DEBUG & 1)
                     setopt(PARROT_DEBUG_FLAG);
                 break;
@@ -121,6 +139,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'h':
                 help();
+                exit(EX_USAGE);
                 break;
             case 'V':
                 imcc_version();
@@ -139,21 +158,11 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'o':
                 run_pbc = 0;
-                if ((*argv)[0][2])
-                    output = str_dup((*argv)[0]+2);
-                else {
-                    (*argc)--;
-                    if (*argc)
-                        output = str_dup((++(*argv))[0]);
-                    else {
-                        fatal(1, "main", "Missing output arg\n");
-                        goto DONE;
-                    }
-                }
+                output = str_dup(opt.opt_arg);
                 break;
 
             case 'O':
-                strncpy(optimizer_opt, (*argv)[0]+2,sizeof(optimizer_opt));
+                strncpy(optimizer_opt, opt.opt_arg, sizeof(optimizer_opt));
                 optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
                 if (strchr(optimizer_opt, '1'))
                     optimizer_level |= OPT_PRE;
@@ -168,34 +177,17 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     optimizer_level |= OPT_PASM;
 
                 break;
-            case '-':
-                if ((*argv)[0][2] == '\0') {
-                    (*argc)--;
-                    (*argv)++;
-                    goto DONE;
-                } else if (strncmp((*argv)[0], "--gc-debug", 10) == 0) {
-#if DISABLE_GC_DEBUG
-                    Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                            "PARROT_GC_DEBUG is set but the binary was "
-                            "compiled with DISABLE_GC_DEBUG.");
-#endif
-                    setopt(PARROT_GC_DEBUG_FLAG);
-                    break;
-                }
-
-                /* XXX long options */
-            case '\0':             /* bare '-' means read from stdin */
-                goto DONE;
             default:
                 fatal(1, "main", "Invalid flag '%s' used."
                         "\n\nhelp: imcc -h\n", (*argv)[0]);
 	}
-
-	(*argc)--;
-	(*argv)++;
     }
-
-DONE:
+    if (status == -1) {
+        usage(stderr);
+        exit(EX_USAGE);
+    }
+    *argc -= opt.opt_index;
+    *argv += opt.opt_index;
 
     return (*argv)[0];
 }
