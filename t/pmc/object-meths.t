@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -935,3 +935,24 @@ class method  0.540302
 bound class m 0.540302
 bound obj met 0.540302
 OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "ParrotIO.puts");
+.sub main @MAIN
+    .local pmc o, m, cl
+    o = getstdout
+    $I0 = o."puts"("ok 1\n")
+    puts $I0, o, "ok 2\n"
+    $I0 = "puts"(o, "ok 3\n")
+    m = getattribute o, "puts"
+    $I0 = m("ok 4\n")
+    cl = getclass "ParrotIO"
+    $I0 = cl."puts"(o, "ok 5\n")
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+

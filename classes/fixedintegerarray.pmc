@@ -22,7 +22,7 @@ it uses Integer PMCs for all of the conversions
 #include "parrot/parrot.h"
 
 pmclass FixedIntegerArray need_ext does array {
-    
+
 /*
 
 =back
@@ -89,12 +89,12 @@ Creates and returns a copy of the array.
     PMC* clone () {
         INTVAL size;
         PMC * dest = pmc_new(INTERP, SELF->vtable->base_type);
-    
+
         if (!PMC_data(SELF))
             return dest;
         size = PMC_int_val(SELF);
         PMC_int_val(dest) = size;
-        
+
         PMC_data(dest) = mem_sys_allocate(size * sizeof(INTVAL));
         mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size*sizeof(INTVAL));
         PObj_active_destroy_SET(dest);
@@ -156,9 +156,9 @@ Returns the integer value of the element at index C<key>.
     INTVAL get_integer_keyed_int (INTVAL key) {
         INTVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
-        
+
         data = (INTVAL *)PMC_data(SELF);
         return data[key];
     }
@@ -288,9 +288,10 @@ Resizes the array to C<size> elements.
 
     void set_integer_native (INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            internal_exception(OUT_OF_BOUNDS, "FixedIntegerArray: Can't resize!");
+            internal_exception(OUT_OF_BOUNDS,
+                "FixedIntegerArray: Can't resize!");
         PMC_int_val(SELF) = size;
-        PMC_data(SELF) = mem_sys_allocate(size * sizeof(INTVAL));
+        PMC_data(SELF) = mem_sys_allocate_zeroed(size * sizeof(INTVAL));
         PObj_active_destroy_SET(SELF);
     }
 
@@ -307,7 +308,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         INTVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            internal_exception(OUT_OF_BOUNDS, 
+            internal_exception(OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
 
         data = (INTVAL*)PMC_data(SELF);
@@ -361,7 +362,7 @@ C<value>.
         k = key_integer(INTERP, key);
         DYNSELF.set_number_keyed_int(k, value);
     }
-    
+
 /*
 
 =item C<void set_string_keyed_int(INTVAL key, STRING *value)>

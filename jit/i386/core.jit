@@ -1257,13 +1257,50 @@ TEMPLATE Parrot_ord_i_sx {
 #undef push_r
 #undef push_c
 }
-;Parrot_ord_i_s {
-;    Parrot_ord_i_sx s/<typ>/r/
-;}
 
-;Parrot_ord_i_sc {
-;    Parrot_ord_i_sx s/<typ>/c/
-;}
+Parrot_ord_i_s {
+    Parrot_ord_i_sx s/<typ>/r/
+}
+
+Parrot_ord_i_sc {
+    Parrot_ord_i_sx s/<typ>/c/
+}
+
+TEMPLATE Parrot_ord_i_sx_i {
+# define push_r(i) \
+    jit_emit_mov_RM_i(NATIVECODE, emit_EAX, ROFFS_STR(i)); \
+        emitm_pushl_r(NATIVECODE, emit_EAX)
+# define push_c(i) emitm_pushl_i(NATIVECODE, CONST(i)->u.string)
+
+    if (MAP[3]) {
+        emitm_pushl_r(NATIVECODE, MAP[3]);
+    }
+    else {
+        jit_emit_mov_RM_i(NATIVECODE, ISR1, ROFFS_INT(3));
+        emitm_pushl_r(NATIVECODE, ISR1);
+    }
+    push_<typ>(2);
+    Parrot_jit_emit_get_INTERP(jit_info->native_ptr, emit_EAX);
+    emitm_pushl_r(NATIVECODE, emit_EAX);
+    CALL_FUNCTION(jit_info, (void*)string_ord);
+    emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
+    if (MAP[1]) {
+        jit_emit_mov_rr_i(NATIVECODE, MAP[1], ISR1);
+    }
+    else {
+        jit_emit_mov_MR_i(NATIVECODE, ROFFS_INT(1), ISR1);
+    }
+#undef push_r
+#undef push_c
+}
+
+Parrot_ord_i_s_i {
+    Parrot_ord_i_sx_i s/<typ>/r/
+}
+
+Parrot_ord_i_sc_i {
+    Parrot_ord_i_sx_i s/<typ>/c/
+}
 
 ; TODO or,and,not,cmp
 
