@@ -39,6 +39,21 @@ over the hash doesn't show these values.
 #include "parrot/parrot.h"
 #include "pmc_perlhash.h"
 
+/*
+
+=item C<static PMC *undef(struct Parrot_Interp *interpreter)>
+
+Returns the C<PerlUndef> PMC.
+
+=cut
+
+*/
+
+static PMC* undef(struct Parrot_Interp* interpreter)
+{
+    return pmc_new(interpreter, enum_class_PerlUndef);
+}
+
 pmclass OrderedHash extends PerlArray need_ext does array does hash {
 
 /*
@@ -355,9 +370,15 @@ Deletes the key C<*key> from the hash.
             SUPER(key);
         }
         else {
+            /* fetch index into the PerlArray 
+               and delete the key in the PerlHash afterward */
             INTVAL n = PerlHash.SELF.get_integer_keyed(key);
             PerlHash.SUPER(key);
-            DYNSELF.delete_keyed_int(n);
+            /* remove the value from the PerlArray,
+               but don't splice the PerlArray. We don't want to mess up
+               the mapping from the PerlHash to the PerlArray */
+            PMC *new_undef = undef(INTERP);
+            DYNSELF.set_pmc_keyed_int(n,new_undef);
         }
     }
 

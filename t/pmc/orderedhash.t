@@ -16,7 +16,7 @@ Tests the C<OrderedHash> PMC.
 
 =cut
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Test::More;
 
 output_is(<<'CODE', <<OUT, "init");
@@ -479,3 +479,28 @@ CODE
 3
 OUTPUT
 
+
+output_is(<<'CODE', <<'OUTPUT', "delete and access remaining");
+    new P0, .OrderedHash
+    new P1, .PerlString
+    set P1, "A"
+    set P0["a"], P1
+    new P1, .PerlString
+    set P1, "B"
+    set P0["b"], P1
+
+    set P3, P0["b"]
+    print 'P0["b"]: '
+    print P3
+    print "\n"
+    delete P0["a"]
+    set P4, P0["b"]
+    print 'P0["b"]: '
+    print P4
+    print "\n"
+
+    end
+CODE
+P0["b"]: B
+P0["b"]: B
+OUTPUT
