@@ -8,11 +8,12 @@ classes/undef.pmc - Generic undefined value
 
 =head1 DESCRIPTION
 
-Parrot's generic undef type. This pmc has no defined value. It returns a
-numeric value of 0, a boolean of false, and an empty string. When assigned
-a number, integer, or string it morphs to a Number, Integer, or String PMC
-respectively, and when assigned a generic PMC it morphs into a PMC of the
-passed-in type and does a same-type assignment from there.
+This is Parrot's generic undef type. This PMC has no defined value.
+It returns a numeric value of 0, a boolean of false, and an empty string.
+When assigned a number, integer, or string it morphs to a Number,
+Integer, or String PMC respectively, and when assigned a generic PMC 
+it morphs into a PMC of the passed-in type and does a same-type assignment 
+from there.
 
 =head2 Methods
 
@@ -72,16 +73,12 @@ pmclass Undef extends default {
     VTABLE_set_string_native(INTERP, SELF, value);
   }
 
-  BOOLVAL get_boolean() {
+  INTVAL get_bool() {
     return 0;
   }
 
-  void set_boolean(BOOLVAL value) {
-    VTABLE_morph(INTERP, SELF, enum_class_Boolean);
-    VTABLE_set_boolean(INTERP, SELF, value);
-  }
-
 }
+
 /*
 
 =back
