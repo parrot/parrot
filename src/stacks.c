@@ -1,40 +1,58 @@
-/* stacks.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Stack handling routines for Parrot
- *  Data Structure and Algorithms:
- *     The stack is stored as a doubly-linked list of
- *     chunks, where each chunk has room for STACK_CHUNK_DEPTH
- *     entries. The invariant maintained is that there is always room
- *     for another entry; if a chunk is filled, a new chunk is added
- *     onto the list before returning.
- *
- *     We use "tree-stacks" and COW (copy-on-write) semantics in order
- *     to make continuations easy. A stack chunk is a bufferlike structure
- *     and may be GCed or COWed. As top chunks are COWed on usage, its only
- *     safe to walk the stack from top down via the prev pointers.
- *     stack_chunk->prev->next may not equal stack_chunk if prev is
- *     COWed and not copied yet.
- *
- *     COWed chunks are NOT magically copied, so any attempts to write should
- *     take care that the chunk may be shared. "Write" in this case is not only
- *     limited to pushing an item on. ANY change to the stack state, including
- *     a pop, is a "write". Think "write" in terms of changing any execution
- *     context, not values.
- *
- *     However:
- *     API calls stack_push, stack_pop and rotate_entries will take care of
- *     COW semantics themselves.
- *     
- *
- *  History:
- *  Notes:
- * References: */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/stacks.c - Stack handling routines for Parrot
+
+=head1 DESCRIPTION
+
+The stack is stored as a doubly-linked list of chunks (C<Stack_Chunk>),
+where each chunk has room for C<STACK_CHUNK_DEPTH> entries. The
+invariant maintained is that there is always room for another entry; if
+a chunk is filled, a new chunk is added onto the list before returning.
+
+Each chunk contains a C<Buffer> which contains, via C<obj.u>, a void
+pointer C<bufstart> to the start of the actual memory.
+
+We use "tree-stacks" and COW (copy-on-write) semantics in order to make
+continuations easy. A stack chunk is a bufferlike structure and may be
+GCed or COWed. As top chunks are COWed on usage, its only safe to walk
+the stack from top down via the prev pointers.
+C<<stack_chunk->prev->next>> may not equal C<stack_chunk> if C<prev> is
+COWed and not copied yet.
+
+COWed chunks are NOT magically copied, so any attempts to write should
+take care that the chunk may be shared. "Write" in this case is not only
+limited to pushing an item on. ANY change to the stack state, including
+a pop, is a "write". Think "write" in terms of changing any execution
+context, not values.
+
+Note, however, that API calls C<stack_push>, C<stack_pop> and
+C<rotate_entries> will take care of COW semantics themselves.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
+
+/*
+
+=item C<void stack_system_init(Interp *interpreter)>
+
+Called from C<make_interpreter()> to initialize the interpreter's
+register stacks.
+
+=cut
+
+*/
 
 void stack_system_init(Interp *interpreter)
 {
@@ -42,9 +60,17 @@ void stack_system_init(Interp *interpreter)
 }
 
 /*
- * Create a new stack and name it. stack->name is used
- * for debugging/error reporting.
- */
+
+=item C<Stack_Chunk_t *
+new_stack(Interp *interpreter, const char *name)>
+
+Create a new stack and name it. C<<stack->name>> is used for
+debugging/error reporting.
+
+=cut
+
+*/
+
 Stack_Chunk_t *
 new_stack(Interp *interpreter, const char *name)
 {
@@ -68,13 +94,34 @@ new_stack(Interp *interpreter, const char *name)
     return chunk;
 }
 
+/*
+
+=item C<void 
+stack_destroy(Stack_Chunk_t * top)>
+
+GC does it all.
+
+=cut
+
+*/
+
 void
 stack_destroy(Stack_Chunk_t * top)
 {
    /* GC does it all */
 }
 
-/* mark a stack COW */
+/*
+
+=item C<void 
+stack_mark_cow(Stack_Chunk_t *top)>
+
+Mark a stack COW.
+
+=cut
+
+*/
+
 void
 stack_mark_cow(Stack_Chunk_t *top)
 {
@@ -82,7 +129,17 @@ stack_mark_cow(Stack_Chunk_t *top)
         PObj_COW_SET( (Buffer *) top);
 }
 
-/* Returns the height of the stack.  The maximum "depth" is height - 1 */
+/*
+
+=item C<size_t
+stack_height(Interp *interpreter, Stack_Chunk_t *top)>
+
+Returns the height of the stack. The maximum "depth" is height - 1.
+
+=cut
+
+*/
+
 size_t
 stack_height(Interp *interpreter, Stack_Chunk_t *top)
 {
@@ -97,9 +154,17 @@ stack_height(Interp *interpreter, Stack_Chunk_t *top)
     return height;
 }
 
-/* Copy COWed chunk(s) from top down depth entries
- * return new top of stack
- */
+/*
+
+=item C<static Stack_Chunk_t *
+chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)>
+
+Copy COWed chunk(s) from top down depth entries return new top of stack.
+
+=cut
+
+*/
+
 static Stack_Chunk_t *
 chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)
 {
@@ -139,11 +204,20 @@ chunk_copy(struct Parrot_Interp *interp, Stack_Chunk_t *old_top, int depth)
     return new_top;
 }
 
-/* If depth >= 0, return the entry at that depth from the top of the stack,
-   with 0 being the top entry.  If depth < 0, then return the entry |depth|
-   entries from the bottom of the stack.
-   Returns NULL if |depth| > number of entries in stack
+/*
+
+=item C<Stack_Entry_t *
+stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)>
+
+If C<depth >= 0>, return the entry at that depth from the top of the
+stack, with 0 being the top entry. If C<depth < 0>, then return the
+entry C<|depth|> entries from the bottom of the stack. Returns C<NULL>
+if C<|depth| > number> of entries in stack.
+
+=cut
+
 */
+
 Stack_Entry_t *
 stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
 {
@@ -172,10 +246,21 @@ stack_entry(Interp *interpreter, Stack_Chunk_t *stack, Intval depth)
     return entry;
 }
 
-/* Rotate the top N entries by one.  If N > 0, the rotation is bubble up,
-   so the top most element becomes the Nth element.  If N < 0, the rotation
-   is bubble down, so that the Nth element becomes the top most element.
+/*
+
+=item C<void
+rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, 
+               Intval num_entries)>
+
+Rotate the top N entries by one.  If C<N > 0>, the rotation is bubble
+up, so the top most element becomes the Nth element.  If C<N < 0>, the
+rotation is bubble down, so that the Nth element becomes the top most
+element.
+
+=cut
+
 */
+
 void
 rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
 {
@@ -225,15 +310,25 @@ rotate_entries(Interp *interpreter, Stack_Chunk_t **stack_p, Intval num_entries)
     }
 }
 
-/* Push something on the generic stack.
+/*
 
-   Note that the cleanup pointer, if non-NULL, points to a routine
-   that'll be called when the entry is removed from the stack. This is
-   handy for those cases where you need some sort of activity to take
-   place when an entry is removed, such as when you push a lexical
-   lock onto the call stack, or localize (or tempify, or whatever
-   we're calling it) variable or something
- */
+=item C<void
+stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
+           void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)>
+
+Push something on the generic stack.
+
+Note that the cleanup pointer, if non-C<NULL>, points to a routine
+that'll be called when the entry is removed from the stack. This is
+handy for those cases where you need some sort of activity to take place
+when an entry is removed, such as when you push a lexical lock onto the
+call stack, or localize (or tempify, or whatever we're calling it)
+variable or something.
+
+=cut
+
+*/
+
 void
 stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
            void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)
@@ -308,7 +403,18 @@ stack_push(Interp *interpreter, Stack_Chunk_t **stack_p,
     }
 }
 
-/* Pop off an entry and return a pointer to the contents */
+/*
+
+=item C<void *
+stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
+          void *where, Stack_entry_type type)>
+
+Pop off an entry and return a pointer to the contents.
+
+=cut
+
+*/
+
 void *
 stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
           void *where, Stack_entry_type type)
@@ -397,7 +503,17 @@ stack_pop(Interp *interpreter, Stack_Chunk_t **stack_p,
     return where;
 }
 
-/* Pop off a destination entry and return a pointer to the contents*/
+/*
+
+=item C<void *
+pop_dest(Interp *interpreter)>
+
+Pop off a destination entry and return a pointer to the contents.
+
+=cut
+
+*/
+
 void *
 pop_dest(Interp *interpreter)
 {
@@ -410,8 +526,17 @@ pop_dest(Interp *interpreter)
 }
 
 /*
- * Peek at stack and return pointer to entry and the type of the entry
- */
+
+=item C<void *
+stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
+           Stack_entry_type *type)>
+
+Peek at stack and return pointer to entry and the type of the entry.
+
+=cut
+
+*/
+
 void *
 stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
            Stack_entry_type *type)
@@ -434,11 +559,34 @@ stack_peek(Interp *interpreter, Stack_Chunk_t *stack_base,
     }
 }
 
+/*
+
+=item C<Stack_entry_type
+get_entry_type(Interp *interpreter, Stack_Entry_t *entry)>
+
+Returns the stack entry type of C<entry>.
+
+=cut
+
+*/
+
 Stack_entry_type
 get_entry_type(Interp *interpreter, Stack_Entry_t *entry)
 {
     return entry->entry_type;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/stacks.h> and F<include/parrot/enums.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

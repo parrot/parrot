@@ -1,14 +1,25 @@
-/* runops_cores.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The switchable runops cores.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/runops_cores.c - Run Loops
+
+=head1 DESCRIPTION
+
+This file implements the various run loops for the interpreter. A slow
+one with bounds checking, tracing and (optional) profiling, and a fast
+one without. There's also one which uses computed computed C<goto>,
+which enables the faster dispatch of operations.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/runops_cores.h"
 #include "parrot/trace.h"
@@ -19,13 +30,19 @@
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-/*=for api interpreter runops_fast_core
- * run parrot operations until the program is complete
- *
- * No bounds checking.
- * No profiling.
- * No tracing.
- */
+/*
+
+=item C<opcode_t *
+runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the Parrot operations starting at C<pc> until there are no more
+operations.
+
+No bounds checking, profiling or tracing is performed.
+
+=cut
+
+*/
 
 opcode_t *
 runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -36,14 +53,21 @@ runops_fast_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 }
 
-/*=for api interpreter runops_cgoto_core
- * run parrot operations until the program is complete, using the computed
- * goto core (if available).
- *
- * No bounds checking.
- * No profiling.
- * No tracing.
- */
+/*
+
+=item C<opcode_t *
+runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the Parrot operations starting at C<pc> until there are no more
+operations, using the computed C<goto> core.
+
+No bounds checking, profiling or tracing is performed.
+
+If computed C<goto> is not available then Parrot exits with exit code 1.
+
+=cut
+
+*/
 
 opcode_t *
 runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -59,15 +83,20 @@ runops_cgoto_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 }
 
-/*=for api interpreter runops_slow_core
- *
- * With tracing.
- * With bounds checking.
- */
+/*
 
-/* using an extern interpreter for tracing is broken due
- * to Parrot_destroy: cleanup of ctx fails
- */
+=item C<opcode_t *
+runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the Parrot operations starting at C<pc> until there are no more
+operations, with tracing and bounds checking enabled.
+
+Note that using an C<extern> interpreter for tracing is currently broken
+because C<Parrot_destroy()> fails to cleanup of C<ctx> correctly.
+
+=cut
+
+*/
 
 opcode_t *
 runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -143,6 +172,18 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 }
 
+/*
+
+=item C<opcode_t *
+runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the Parrot operations starting at C<pc> until there are no more
+operations, with tracing, bounds checking and profiling enabled.
+
+=cut
+
+*/
+
 opcode_t *
 runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -164,6 +205,18 @@ runops_profile_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 }
 
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/runops_cores.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,15 +1,23 @@
 /*
-** packdump.c
-**
-** Functions for dumping packfile structures
-**
-** Copyright (C) 2001-2002 Gregor N. Purdy. All rights reserved.
-** This program is free software. It is subject to the same
-** license as Parrot itself.
-**
-** $Id$
-*
-* Note: more dump functions are in packfile.c and pdump.c
+Copyright (C) 2001-2002 Gregor N. Purdy. All rights reserved.
+This program is free software. It is subject to the same license as
+Parrot itself.
+$Id$
+
+=head1 NAME
+
+src/packdump.c - Functions for dumping packfile structures
+
+=head1 DESCRIPTION
+
+This is only used by the PBC dumper C<pdump>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
 */
 
 #include "parrot/parrot.h"
@@ -27,6 +35,18 @@ static void PackFile_Constant_dump(struct Parrot_Interp *,
 void PackFile_Fixup_dump(struct Parrot_Interp *,
                          struct PackFile_FixupTable *ft);
 
+/*
+
+=item C<void
+PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
+                         struct PackFile_ConstTable *self)>
+
+Dumps the constant table C<self>.
+
+=cut
+
+*/
+
 void
 PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
                          struct PackFile_ConstTable *self)
@@ -38,6 +58,18 @@ PackFile_ConstTable_dump(struct Parrot_Interp *interpreter,
         PackFile_Constant_dump(interpreter, self->constants[i]);
     }
 }
+
+/*
+
+=item C<void
+PackFile_Constant_dump(struct Parrot_Interp *interpreter,
+                       struct PackFile_Constant *self)>
+
+Dumps the constant C<self>.
+
+=cut
+
+*/
 
 void
 PackFile_Constant_dump(struct Parrot_Interp *interpreter,
@@ -106,6 +138,18 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
     }
 }
 
+/*
+
+=item C<void
+PackFile_Fixup_dump(struct Parrot_Interp *interpreter, 
+                    struct PackFile_FixupTable *ft)>
+
+Dumps the fix-up table C<ft>.
+
+=cut
+
+*/
+
 void
 PackFile_Fixup_dump(struct Parrot_Interp *interpreter, 
                     struct PackFile_FixupTable *ft)
@@ -130,6 +174,19 @@ PackFile_Fixup_dump(struct Parrot_Interp *interpreter,
         }
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/pdump.c>.
+
+=cut
+
+*/
+
 /*
 * Local variables:
 * c-indentation-style: bsd

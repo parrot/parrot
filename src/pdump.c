@@ -1,17 +1,67 @@
-/* pdump.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     A program to dump pack files to human readable form.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/pdump.c - Dump or convert Parrot bytecode (PBC) files
+
+=head1 SYNOPSIS
+
+	% make pdump
+
+	% ./pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc
+
+	% ./pdump -o converted.pbc file.pbc
+
+=head1 DESCRIPTION
+
+A program to dump pack files to human readable form.
+
+=head2 Command-Line Options
+
+=over 4
+
+=item C<-d>
+
+Disassemble bytecode segments.
+
+=item C<-h>
+
+Dump the bytecode header only.
+
+=item C<-t>
+
+Terse output.
+
+=item C<-o converted.pbc>
+
+Repacks a PBC file into platforms native binary format for better
+efficiency on reading non native PBCs.
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+
+/*
+
+=item C<static void
+const_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)>
+
+Dump the constant table.
+
+=cut
+
+*/
 
 static void
 const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
@@ -22,6 +72,17 @@ const_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
     PIO_printf(interpreter, "],\n");
 }
 
+/*
+
+=item C<static void
+fixup_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)>
+
+Dump the fix-up table.
+
+=cut
+
+*/
+
 static void
 fixup_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
 {
@@ -30,6 +91,18 @@ fixup_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *segp)
             (struct PackFile_FixupTable *)segp);
     PIO_printf(interpreter, "],\n");
 }
+
+/*
+
+=item C<static void
+disas_dump(struct Parrot_Interp *interpreter, struct PackFile_Segment *self)>
+
+Disassemble and dump.
+
+=cut
+
+*/
+
 static void
 disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
 {
@@ -52,6 +125,17 @@ disas_dump (struct Parrot_Interp *interpreter, struct PackFile_Segment *self)
     }
     PIO_printf(interpreter, "]\n");
 }
+
+/*
+
+=item C<static void
+PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)>
+
+Dump the header.
+
+=cut
+
+*/
 
 static void
 PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
@@ -76,6 +160,16 @@ PackFile_header_dump(struct Parrot_Interp *interpreter, struct PackFile *pf)
     PIO_printf(interpreter, "]\n");
 }
 
+/*
+
+=item C<static void help(void)>
+
+Print out the user help info.
+
+=cut
+
+*/
+
 static void help(void)
 {
     printf("pdump - dump or convert parrot bytecode (PBC) files\n");
@@ -98,6 +192,17 @@ static struct longopt_opt_decl options[] = {
     { 'd', 'd', 0, { "--disassemble" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
+
+/*
+
+=item C<int
+main(int argc, char **argv)>
+
+The run loop. Process the command-line arguments and dumps accordingly.
+
+=cut
+
+*/
 
 int
 main(int argc, char **argv)
@@ -197,6 +302,18 @@ main(int argc, char **argv)
     Parrot_exit(0);
     return 0;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/packdump.c>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

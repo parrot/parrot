@@ -1,16 +1,25 @@
-/*  exit.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Parrot's version of exit(), on_exit(), and friends.
- *  Data Structure and Algorithms:
- *
- *  History:
- *     Initial version by Josh Wilmes
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/exit.c - Exit Handling
+
+=head1 DESCRIPTION
+
+Parrot's version of C<exit()>, C<on_exit()>, and friends.
+
+C<Parrot_on_exit()> allows you register exit handlers which will be
+called by C<Parrot_exit()> when the interpreter exits.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <stdlib.h>
 
@@ -26,6 +35,16 @@ typedef struct _handler_node_t {
 static handler_node_t *exit_handler_list;
 
 
+/*
+
+=item C<int Parrot_on_exit(void (*function)(int , void *), void *arg)>
+
+Register the specified function to be called on exit.
+
+=cut
+
+*/
+
 int
 Parrot_on_exit(void (*function)(int , void *), void *arg) {
     /* XXX  we might want locking around the list access.   I'm sure this
@@ -39,6 +58,15 @@ Parrot_on_exit(void (*function)(int , void *), void *arg) {
     return 0;
 }
 
+/*
+
+=item C<void Parrot_exit(int status)>
+
+Exit, calling any registered exit handlers.
+
+=cut
+
+*/
 
 void Parrot_exit(int status) {
     handler_node_t *node, *next_node;
@@ -53,6 +81,22 @@ void Parrot_exit(int status) {
 
     exit(status);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/exit.h> and F<t/src/exit.t>.
+
+=head1 HISTORY
+
+Initial version by Josh Wilmes.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,36 +1,44 @@
-/*  byteorder.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Byteordering functions
- *     These are assigned to a vtable in PackFile at each load.
- *     If the vtable method is called for conversion from the
- *     native byteorder, it is a noop and will work, but the
- *     caller should know if the PackFile byteorder is native
- *     and skip the conversion and just map it in.
- *  Data Structure and Algorithms:
- *  History:
- *     Initial version by Melvin on 2002/05/1
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/byteorder.c - Byteordering functions
+
+=head1 DESCRIPTION
+
+These are assigned to a vtable when the PBC file is loaded. 
+
+If the vtable method for conversion from the native byteorder is called,
+it is a I<no op> and will work, but the caller should know if the
+byteorder in the PBC file is native and skip the conversion and just map
+it in.
+
+=head2 Byte order handlers
+
+Configure will have checked for supported word sizes.
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
 /*
- * Byte order handlers.
- */
 
-/*
- * Configure should have checked for supported word sizes
- */
+=item C<INTVAL fetch_iv_le(INTVAL w)>
 
-/* fetch_iv_le
- *   This function converts a 4 or 8 byte INTVAL into little
- *   endian format.  If the native format is already little
- *   endian, then no conversion is done.
- */
+This function converts a 4 or 8 byte C<INTVAL> into little endian
+format. If the native format is already little endian, then no
+conversion is done.
+
+=cut
+
+*/
+
 INTVAL
 fetch_iv_le(INTVAL w)
 {
@@ -54,11 +62,17 @@ fetch_iv_le(INTVAL w)
 #endif
 }
 
-/* fetch_iv_be
- *   This function converts a 4 or 8 byte INTVAL into big
- *   endian format.  If the native format is already big
- *   endian, then no conversion is done.
- */
+/*
+
+=item C<INTVAL fetch_iv_be(INTVAL w)>
+
+This function converts a 4 or 8 byte C<INTVAL> into big endian format.
+If the native format is already big endian, then no conversion is done.
+
+=cut
+
+*/
+
 INTVAL
 fetch_iv_be(INTVAL w)
 {
@@ -81,10 +95,18 @@ fetch_iv_be(INTVAL w)
 #endif
 }
 
-
 /*
- * Same as above for opcode_t
- */
+
+=item C<opcode_t fetch_op_be(opcode_t w)>
+
+=item C<opcode_t fetch_op_le(opcode_t w)>
+
+Same as above for C<opcode_t>.
+
+=cut
+
+*/
+
 opcode_t
 fetch_op_be(opcode_t w)
 {
@@ -134,10 +156,31 @@ fetch_op_le(opcode_t w)
 }
 
 /*
- * Unrolled routines for swapping various sizes from 32-128 bits
- * These should only be used if alignment is unknown or we are
- * pulling something out of a padded buffer.
- */
+
+=item C<void fetch_buf_be_4(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_le_4(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_be_8(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_le_8(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_le_12(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_be_12(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_le_16(unsigned char *rb, unsigned char *b)>
+
+=item C<void fetch_buf_be_16(unsigned char *rb, unsigned char *b)>
+
+Unrolled routines for swapping various sizes from 32-128 bits. These
+should only be used if alignment is unknown or we are pulling something
+out of a padded buffer.
+
+=cut
+
+*/
+
 void
 fetch_buf_be_4(unsigned char *rb, unsigned char *b)
 {
@@ -290,6 +333,17 @@ fetch_buf_be_16(unsigned char *rb, unsigned char *b)
 #endif
 }
 
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version by Melvin on 2002/05/1
+
+=cut
+
+*/
 
 /*
  * Local variables:

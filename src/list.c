@@ -1,164 +1,186 @@
 /*
- * list.c
- *  Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
- *  License:  Artistic/GPL, see README and LICENSES for details
- *  CVS Info
- *     $Id$
- *  Overview:
- *     list aka array routines for Parrot
- *  History:
- *      1.1     10.10.2002 initial
- *      1.2     11.10.2002 more docu, optimized irregular chunk blocks
- *                         fixed indexed access WRT list->start
- *                         cosmetics
- *      1.3     13.10.2002 put intlist_length into intlist.c
- *      1.4     16.10.2002 integrated list in parrot/arrays
- *      1.5     17.10.2002 clone integral data (intlist)
- *      1.6     18.10.2002 moved tests to t/src/list.t
- *      1.7     19.10.2002 set intial length (new_init)
- *      1.8     21.10.2002 gc_debug stuff
- *      1.9     21.10.2002 splice
- *      1.10    22.10.2002 update comment WRT clone in splice
- *      1.11    26.10.2002 user_data
- *    - 1.18               fixes
- *      1.19    08.11.2002 arbitrary sized items (enum_type_sized)
- *      1.26    08.01.2003 move Chunk_list flags out of buffer header
- *      1.29               join chunks > MAX_ITEMS (Matt Fowles)
- *      1.30               greater threshold befor do_sparse
- *                         setting initial size to avoid sparse
- *      1.33    04.07.2003 use a SArray for user_data
- *
- *  Data Structure and Algorithms:
- *  ==============================
- *
- * List is roughly based on concepts of IntList (thanks to Steve),
- * so I don't repeat them here.
- *
- * Especially the same invariants hold, except an empty list
- * is really empty, meaning, push does first check for space.
- *
- * The main differences are:
- *  - List can hold items of different size, it's suitable for ints
- *    and PMCs ..., calculations are still done in terms of items.
- *    The item_size is specified at list creation time with the "type"
- *    argument.
- *
- *    If you later store different item types in the list, as stated
- *    initially, you'll get probably not what you want - so don't do this.
- *
- *  - List does auto grow. The caller may implement a different behaviour
- *    if she likes.
- *
- *  - Error checking for out of bounds access is minimal, caller knows
- *    better, what should be done.
- *
- * - List structure itself is different from List_chunk, implying:
- *   - end of list is not list->prev but list->end
- *   - start of list is list->first
- *   - the list of chunks is not closed, detecting the end is more simple
- *   - no spare is keeped, didn't improve due to size constraints
- *   - the List object itself doesn't move around for shift/unshift
- *
- *  - list chunks don't have ->start and ->end fields. Instead the list has
- *    ->start, which is start of first chunk, and ->cap, the total usable
- *    capacity in the list.
- *
- *  - number of items in chunks are not fixed, but there is a mode
- *    using same sized chunks
- *
- *
- *    Grow policy
- *    -----------
- *
- *    enum_grow_fixed:
- *    All chunks are of MAX_ITEMS size, chosen, when the first access to
- *    the array is indexed and beyond MIN_ITEMS and below 10 *
- *    MAX_ITEMS
- *    If the first access is beyond 10 * MAX_ITEMS a sparse chunk will
- *    be created.
- *    To avoid this - and the performance penalty - set the array size
- *    before setting elements.
- *
- *      new P0, .PerlArray
- *      set P0, 100000  # sets fixed sized, no sparse
- *
- *    This is only meaningful, if a lot of the entries are used too
- *
- *    enum_grow_growing:
- *    chunk sizes grow from MIN_ITEMS to MAX_ITEMS, this will be selected
- *    for pushing data on an empty array
- *
- *    enum_grow_mixed:
- *    mixture of above chunk types and when sparse chunks are present, or
- *    after insert and delete.
- *
- *    The chunks hold the information, how many chunks are of the same
- *    type, beginning from the current, and how many items are
- *    included in this range. s. get_chunk below for details.
- *
- *    Sparse lists
- *    ------------
- *
- *    To save memory, List can handle sparse arrays. This code snippet:
- *
- *      new P0, .IntList
- *      set P0[1000000], 42
- *
- *    generates 3 List_chunks, one at the beginning of the array, a
- *    big sparse chunk and a chunk for the actual data.
- *
- *    Setting values inside sparse chunks changes them to real chunks.
- *    For poping/shifting inside sparse chunks, s. return value below.
- *
- *    Chunk types
- *    -----------
- *
- *    fixed_items  ... have allocated space, size is a power of 2,
- *                     consecutive chunks are same sized
- *    grow_items   ... same, but consecutive chunks are growing
- *    no_power_2   ... have allocated space but any size
- *    sparse       ... only dummy allocation, chunk->items holds
- *                     the items of this sparse hole
- *
- *    Data types
- *    ----------
- *    A List can hold various datatypes. See datatypes.h for the enumeration
- *    of types.
- *    Not all are yet implemented in list_set/list_item, s. the switch().
- *
- *    Arbitrary length data:
- *    construct initializer with:
- *     - enum_type_sized
- *     - item_size (in bytes)
- *     - items_per_chunk (rounded up to power of 2, default MAX_ITEMS)
- *
- *    In list_assign the values are copied into the array, list_get returns
- *    a pointer as for all other data types.
- *    s. src/list_2.t and list_new_init()
- *
- *
- *    Return value
- *    ------------
- *
- *    List get functions return a (void*) pointer to the location of the
- *    stored data. The caller has to extract the value from this
- *    pointer.
- *
- *    For non existent data beyond the dimensions of the
- *    array a NULL pointer is returned.
- *
- *    For non existing data inside sparse holes, a pointer (void*)-1
- *    is returned.
- *    The caller can decide to assume these data as undef or 0 or
- *    whatever is appropriate.
- *
- *
- *    Testing:
- *    --------
- *    s. t/src/{int,}list.c and t/pmc/{int,}list.t
- *    also all array usage depends on list
- *
- */
+Copyright: (c) 2002 Leopold Toetsch <lt@toetsch.at>
+License:  Artistic/GPL, see README and LICENSES for details
+$Id$
+
+=head1 NAME
+
+src/list.c - List aka array routines
+
+=head1 DESCRIPTION
+
+List is roughly based on concepts of IntList (thanks to Steve),
+so I don't repeat them here.
+
+Especially the same invariants hold, except an empty list is really
+empty, meaning, push does first check for space.
+
+The main differences are:
+
+- List can hold items of different size, it's suitable for ints and PMCs
+..., calculations are still done in terms of items. The item_size is
+specified at list creation time with the "type" argument.
+
+If you later store different item types in the list, as stated
+initially, you'll get probably not what you want - so don't do this.
+
+- List does auto grow. The caller may implement a different behaviour if
+she likes.
+
+- Error checking for out of bounds access is minimal, caller knows
+better, what should be done.
+
+- List structure itself is different from List_chunk, implying:
+
+=over 4
+
+=item * end of list is not C<<list->prev>> but C<<list->end>>
+
+=item * start of list is list->first
+
+=item * the list of chunks is not closed, detecting the end is more simple
+
+=item * no spare is keeped, didn't improve due to size constraints
+
+=item * the List object itself doesn't move around for shift/unshift
+
+=back
+
+- list chunks don't have C<<->start>> and C<<->end>> fields. Instead the list has
+C<<->start>>, which is start of first chunk, and C<<->cap>>, the total usable
+capacity in the list.
+
+- number of items in chunks are not fixed, but there is a mode
+using same sized chunks
+
+=head2 Grow policy
+
+=over 4
+
+=item C<enum_grow_fixed>
+
+All chunks are of C<MAX_ITEMS> size, chosen, when the first access to
+the array is indexed and beyond C<MIN_ITEMS> and below 10 *
+C<MAX_ITEMS>
+
+If the first access is beyond 10 * C<MAX_ITEMS> a sparse chunk will
+be created.
+
+To avoid this - and the performance penalty - set the array size
+before setting elements.
+
+    new P0, .PerlArray
+    set P0, 100000  # sets fixed sized, no sparse
+
+This is only meaningful, if a lot of the entries are used too.
+
+=item C<enum_grow_growing>
+
+Chunk sizes grow from C<MIN_ITEMS> to C<MAX_ITEMS>, this will be selected
+for pushing data on an empty array.
+
+=item C<enum_grow_mixed>
+
+Mixture of above chunk types and when sparse chunks are present, or
+after insert and delete.
+
+The chunks hold the information, how many chunks are of the same type,
+beginning from the current, and how many items are included in this
+range. See C<get_chunk> below for details.
+
+=back
+
+=head2 Sparse lists
+
+
+To save memory, List can handle sparse arrays. This code snippet:
+
+new P0, .IntList
+set P0[1000000], 42
+
+generates 3 List_chunks, one at the beginning of the array, a
+big sparse chunk and a chunk for the actual data.
+
+Setting values inside sparse chunks changes them to real chunks.
+For poping/shifting inside sparse chunks, s. return value below.
+
+=head2 Chunk types
+
+=over 4
+
+=item C<fixed_items>
+
+Have allocated space, size is a power of 2, consecutive chunks are same sized.
+
+=item C<grow_items>
+
+Same, but consecutive chunks are growing.
+
+=item C<no_power_2>
+
+Have allocated space but any size.
+
+=item C<sparse>
+
+Only dummy allocation, C<<chunk->items>> holds the items of this sparse
+hole.
+
+=back
+
+=head2 Data types
+
+A List can hold various datatypes. See F<src/datatypes.h> for the
+enumeration of types.
+
+Not all are yet implemented in C<list_set>/C<list_item>, see the
+C<switch()>.
+
+Arbitrary length data:
+
+Construct initializer with:
+
+=over 4
+
+=item C<enum_type_sized>
+
+=item C<item_size> (in bytes)
+
+=item C<items_per_chunk> (rounded up to power of 2, default C<MAX_ITEMS>)
+
+=back
+
+In C<list_assign> the values are copied into the array, C<list_get>
+returns a pointer as for all other data types.
+
+See F<src/list_2.t> and C<list_new_init()>.
+
+=head2 Return value
+
+List get functions return a C<(void*)> pointer to the location of the
+stored data. The caller has to extract the value from this pointer.
+
+For non existent data beyond the dimensions of the array a C<NULL>
+pointer is returned.
+
+For non existing data inside sparse holes, a pointer C<(void*)-1> is
+returned.
+
+The caller can decide to assume these data as undef or 0 or whatever is
+appropriate.
+
+=head2 Testing
+
+See F<t/src/{int,}list.c> and F<t/pmc/{int,}list.t>.
+
+Also all array usage depends on list.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
@@ -191,7 +213,17 @@ static void list_append(Interp *interpreter, List *list, void *item,
 #define chunk_list_ptr(list, idx) \
         ((List_chunk**)list->chunk_list.bufstart)[idx]
 
-/* make a new chunk, size bytes big, holding items items */
+/*
+
+=item C<static List_chunk *
+allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)>
+
+Make a new chunk, size bytes big, holding items items.
+
+=cut
+
+*/
+
 static List_chunk *
 allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
 {
@@ -211,9 +243,19 @@ allocate_chunk(Interp *interpreter, List *list, UINTVAL items, UINTVAL size)
     return chunk;
 }
 
-
 #ifdef LIST_DEBUG
-/* only char and int are supported currently */
+
+/*
+
+=item C<static void
+list_dump(FILE *fp, List *list, INTVAL type)>
+
+Only char and int are supported currently.
+
+=cut
+
+*/
+
 static void
 list_dump(FILE *fp, List *list, INTVAL type)
 {
@@ -249,10 +291,19 @@ list_dump(FILE *fp, List *list, INTVAL type)
 }
 #endif
 
-/* rebuild chunk_list and update/optimize chunk usage,
- * helper functions */
+/*
 
-/* delete empty chunks, count chunks and fix prev pointers */
+=item C<static void
+rebuild_chunk_ptrs(List *list, int cut)>
+
+Rebuild chunk_list and update/optimize chunk usage, helper functions.
+
+Delete empty chunks, count chunks and fix prev pointers.
+
+=cut
+
+*/
+
 static void
 rebuild_chunk_ptrs(List *list, int cut)
 {
@@ -292,7 +343,17 @@ rebuild_chunk_ptrs(List *list, int cut)
     list->n_chunks = len;
 }
 
-/* coalesce adjacent sparse chunks */
+/*
+
+=item C<static void
+rebuild_sparse(List *list)>
+
+Coalesce adjacent sparse chunks.
+
+=cut
+
+*/
+
 static void
 rebuild_sparse(List *list)
 {
@@ -313,7 +374,17 @@ rebuild_sparse(List *list)
         rebuild_chunk_ptrs(list, 0);
 }
 
-/* coalesce adjacent irregular chunks */
+/*
+
+=item C<static void
+rebuild_other(Interp *interpreter, List *list)>
+
+Coalesce adjacent irregular chunks.
+
+=cut
+
+*/
+
 static void
 rebuild_other(Interp *interpreter, List *list)
 {
@@ -363,6 +434,17 @@ rebuild_other(Interp *interpreter, List *list)
         rebuild_chunk_ptrs(list, 0);
 }
 
+/*
+
+=item C<static void
+rebuild_fix_ends(Interp *interpreter, List *list)>
+
+Called by C<rebuild_chunk_list()>.
+
+=cut
+
+*/
+
 static void
 rebuild_fix_ends(Interp *interpreter, List *list)
 {
@@ -381,6 +463,17 @@ rebuild_fix_ends(Interp *interpreter, List *list)
     /* XXX - still needed? - if last is empty and last->prev not full then
      * delete last - combine small chunks if list is big */
 }
+
+/*
+
+=item C<static UINTVAL
+rebuild_chunk_list(Interp *interpreter, List *list)>
+
+Called to optimise the list when modifying it in some way.
+
+=cut
+
+*/
 
 static UINTVAL
 rebuild_chunk_list(Interp *interpreter, List *list)
@@ -480,9 +573,17 @@ rebuild_chunk_list(Interp *interpreter, List *list)
     return len;
 }
 
-/* calculate size and items for next chunk and
- * allocate it
- */
+/*
+
+=item C<static List_chunk *
+alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)>
+
+Calculate size and items for next chunk and allocate it.
+
+=cut
+
+*/
+
 static List_chunk *
 alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
 {
@@ -570,7 +671,17 @@ alloc_next_size(Interp *interpreter, List *list, int where, UINTVAL idx)
     return new_chunk;
 }
 
-/* add chunk at start or end */
+/*
+
+=item C<static List_chunk *
+add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)>
+
+Add chunk at start or end.
+
+=cut
+
+*/
+
 static List_chunk *
 add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)
 {
@@ -596,8 +707,18 @@ add_chunk(Interp *interpreter, List *list, int where, UINTVAL idx)
     return new_chunk;
 }
 
-/* stolen from malloc.c
- * calc log2(x) */
+/*
+
+=item C<UINTVAL
+ld(UINTVAL x)>
+
+Calculates log2(x).
+
+Stolen from F<src/malloc.c>.
+
+=cut
+
+*/
 
 UINTVAL
 ld(UINTVAL x)
@@ -631,53 +752,65 @@ ld(UINTVAL x)
     return m;
 }
 
-/* get the chunk for idx, also update the idx to point into the chunk
- *
- * this routine will be called for every operation on list, so its
- * optimized to be fast and needs an up to date chunk statistic, that
- * rebuild_chunk_list does provide.
- *
- * The scheme of operations is:
- *
- *   if all_chunks_are_MAX_ITEMS
- *      chunk = chunk_list[ idx / MAX_ITEMS ]
- *      idx =   idx % MAX_ITEMS
- *      done.
- *
- *   chunk = first
- *   repeat
- *      if (index < chunk->items)
- *          done.
- *
- *      if (index >= items_in_chunk_block)
- *          index -= items_in_chunk_block
- *          chunk += chunks_in_chunk_block
- *          continue
- *
- *      calc chunk and index in this block
- *      done.
- *
- *  One chunk_block consists of chunks of the same type: fixed, growing
- *  or other. So the time to look up a chunk doesn't depend on the array
- *  length, but on the complexity of the array. rebuild_chunk_list tries
- *  to reduce the complexity, but may fail, if you e.g. do a prime sieve
- *  by actually list_delet-ing the none prime numbers.
- *
- *  The complexity of the array is how many different chunk_blocks are
- *  there. They come from:
- *  - initially fixed: 1
- *  - initially growing: 2
- *  - first unshift: 1 except for initially fixed arrays
- *  - insert: 1 - 3
- *  - delete: 1 - 2
- *  - sparse hole: 3 (could be 2, code assumes access at either end now)
- *
- *  There could be some optimizer, that, after detecting almost only
- *  indexed access after some time, does reorganize the array to be
- *  all MAX_ITEMS sized, when this would improve performance.
- *
- *  Here we go
- */
+/*
+
+=item C<static List_chunk *
+get_chunk(Interp *interpreter, List *list, UINTVAL *idx)>
+
+Get the chunk for C<idx>, also update the C<idx> to point into the chunk.
+
+This routine will be called for every operation on list, so its
+optimized to be fast and needs an up to date chunk statistic, that
+C<rebuild_chunk_list> does provide.
+
+The scheme of operations is:
+
+    if all_chunks_are_MAX_ITEMS
+         chunk = chunk_list[ idx / MAX_ITEMS ]
+         idx =   idx % MAX_ITEMS
+         done.
+    
+    chunk = first
+    repeat
+         if (index < chunk->items)
+             done.
+    
+     if (index >= items_in_chunk_block)
+         index -= items_in_chunk_block
+         chunk += chunks_in_chunk_block
+         continue
+    
+     calc chunk and index in this block
+     done.
+
+One chunk_block consists of chunks of the same type: fixed, growing or
+other. So the time to look up a chunk doesn't depend on the array
+length, but on the complexity of the array. C<rebuild_chunk_list> tries
+to reduce the complexity, but may fail, if you e.g. do a prime sieve by
+actually C<list_delet>ing the none prime numbers.
+
+The complexity of the array is how many different C<chunk_blocks> are
+there. They come from:
+
+- initially fixed: 1
+
+- initially growing: 2
+
+- first unshift: 1 except for initially fixed arrays
+
+- insert: 1 - 3
+
+- delete: 1 - 2
+
+- sparse hole: 3 (could be 2, code assumes access at either end now)
+
+There could be some optimizer, that, after detecting almost only indexed
+access after some time, does reorganize the array to be all C<MAX_ITEMS>
+sized, when this would improve performance.
+
+=cut
+
+*/
 
 static List_chunk *
 get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
@@ -769,13 +902,25 @@ get_chunk(Interp *interpreter, List *list, UINTVAL *idx)
     return 0;
 }
 
-/* split a sparse chunk, so that we have
- * - allocated space at idx
- *   if sparse is big:
- *   - MAX_ITEMS near idx and if there is still sparse space after
- *     the real chunk, this also n*MAX_ITEMS sized, so that
- *     consecutive writing would make MAX_ITEMS sized real chunks
- */
+/*
+
+=item C<static void
+split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)>
+
+Split a sparse chunk, so that we have
+
+- allocated space at C<idx>
+
+if sparse is big:
+
+- C<MAX_ITEMS> near C<idx> and if there is still sparse space after the
+real chunk, this also C<n*MAX_ITEMS> sized, so that consecutive writing
+would make C<MAX_ITEMS> sized real chunks.
+
+=cut
+
+*/
+
 static void
 split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
 {
@@ -825,7 +970,17 @@ split_chunk(Interp *interpreter, List *list, List_chunk *chunk, UINTVAL ix)
     rebuild_chunk_list(interpreter, list);
 }
 
-/* set item of type in chunk at idx */
+/*
+
+=item C<static void
+list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)>
+
+Set C<item> of type C<type> in chunk at C<idx>.
+
+=cut
+
+*/
+
 static void
 list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
 {
@@ -878,7 +1033,17 @@ list_set(Interp *interpreter, List *list, void *item, INTVAL type, INTVAL idx)
     }
 }
 
-/* get pointer to item of type in chunk at idx */
+/*
+
+=item C<static void *
+list_item(Interp *interpreter, List *list, int type, INTVAL idx)>
+
+Get the pointer to the item of type C<type> in the chunk at C<idx>.
+
+=cut
+
+*/
+
 static void *
 list_item(Interp *interpreter, List *list, int type, INTVAL idx)
 {
@@ -930,7 +1095,17 @@ list_item(Interp *interpreter, List *list, int type, INTVAL idx)
 
 }
 
-/* add one or more chunks at end of list */
+/*
+
+=item C<static void
+list_append(Interp *interpreter, List *list, void *item, int type, UINTVAL idx)>
+
+Add one or more chunks to end of list.
+
+=cut
+
+*/
+
 static void
 list_append(Interp *interpreter, List *list, void *item, int type, UINTVAL idx)
 {
@@ -943,7 +1118,22 @@ list_append(Interp *interpreter, List *list, void *item, int type, UINTVAL idx)
         add_chunk(interpreter, list, enum_add_at_end, 0);
 }
 
-/* public interface functions */
+/*
+
+=back
+
+=head2 Public Interface Functions
+
+=over 4
+
+=item C<List *
+list_new(Interp *interpreter, INTVAL type)>
+
+Returns a new list of type C<type>.
+
+=cut
+
+*/
 
 List *
 list_new(Interp *interpreter, INTVAL type)
@@ -983,18 +1173,25 @@ list_new(Interp *interpreter, INTVAL type)
 }
 
 /*
- * list_new_init uses these initializers:
- * 0 ... size (set initial size of list)
- * 1 ... array dimensions (multiarray)
- * 2 ... type (overriding type parameter)
- * 3 ... item_size for enum_type_sized
- * 4 ... items_per_chunk
- *
- * after getting these values out of the key/value pairs, a new
- * array with these values is stored in user_data, where the keys
- * are explicit.
- *
- */
+
+=item C<List *
+list_new_init(Interp *interpreter, INTVAL type, PMC *init)>
+
+C<list_new_init()> uses these initializers:
+
+    0 ... size (set initial size of list)
+    1 ... array dimensions (multiarray)
+    2 ... type (overriding type parameter)
+    3 ... item_size for enum_type_sized
+    4 ... items_per_chunk
+
+After getting these values out of the key/value pairs, a new array with
+these values is stored in user_data, where the keys are explicit.
+
+=cut
+
+*/
+
 List *
 list_new_init(Interp *interpreter, INTVAL type, PMC *init)
 {
@@ -1064,9 +1261,19 @@ list_new_init(Interp *interpreter, INTVAL type, PMC *init)
     return list;
 }
 
+/*
 
-/* barely tested: clone */
-/* TODO optimize new array structure, fixed if big */
+=item C<List *
+list_clone(Interp *interpreter, List *other)>
+
+Return a clone of the list.
+
+TODO - Barely tested. Optimize new array structure, fixed if big.
+
+=cut
+
+*/
+
 List *
 list_clone(Interp *interpreter, List *other)
 {
@@ -1130,6 +1337,16 @@ list_clone(Interp *interpreter, List *other)
     return l;
 }
 
+/*
+
+=item C<void
+list_mark(Interp *interpreter, List *list)>
+
+Mark the list and its contents as live.
+
+=cut
+
+*/
 
 void
 list_mark(Interp *interpreter, List *list)
@@ -1155,6 +1372,19 @@ list_mark(Interp *interpreter, List *list)
     if (list->user_data)
         pobject_lives(interpreter, (PObj *) list->user_data);
 }
+
+/*
+
+=item C<void
+list_visit(Interp *interpreter, List *list, void *pinfo)>
+
+This is used by freeze/thaw to visit the contents of the list.
+
+C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
+
+=cut
+
+*/
 
 void
 list_visit(Interp *interpreter, List *list, void *pinfo)
@@ -1182,12 +1412,34 @@ list_visit(Interp *interpreter, List *list, void *pinfo)
     }
 }
 
+/*
+
+=item C<INTVAL
+list_length(Interp *interpreter, List *list)>
+
+Returns the length of the list.
+
+=cut
+
+*/
+
 INTVAL
 list_length(Interp *interpreter, List *list)
 {
     UNUSED(interpreter);
     return list->length;
 }
+
+/*
+
+=item C<void
+list_set_length(Interp *interpreter, List *list, INTVAL len)>
+
+Sets the length of the list to C<len>.
+
+=cut
+
+*/
 
 void
 list_set_length(Interp *interpreter, List *list, INTVAL len)
@@ -1219,7 +1471,17 @@ list_set_length(Interp *interpreter, List *list, INTVAL len)
     }
 }
 
-/* make room for n_items at idx */
+/*
+
+=item C<void
+list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)>
+
+Make room for C<n_items> at C<idx>.
+
+=cut
+
+*/
+
 void
 list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
 {
@@ -1279,7 +1541,17 @@ list_insert(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
     rebuild_chunk_list(interpreter, list);
 }
 
-/* delete n_items at idx */
+/*
+
+=item C<void
+list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)>
+
+Delete C<n_items> at C<idx>.
+
+=cut
+
+*/
+
 void
 list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
 {
@@ -1351,6 +1623,17 @@ list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items)
     rebuild_chunk_list(interpreter, list);
 }
 
+/*
+
+=item C<void
+list_push(Interp *interpreter, List *list, void *item, int type)>
+
+Pushes C<item> of type C<type> on to the end of the list.
+
+=cut
+
+*/
+
 void
 list_push(Interp *interpreter, List *list, void *item, int type)
 {
@@ -1358,6 +1641,17 @@ list_push(Interp *interpreter, List *list, void *item, int type)
 
     list_append(interpreter, list, item, type, idx);
 }
+
+/*
+
+=item C<void
+list_unshift(Interp *interpreter, List *list, void *item, int type)>
+
+Pushes C<item> of type C<type> on to the start of the list.
+
+=cut
+
+*/
 
 void
 list_unshift(Interp *interpreter, List *list, void *item, int type)
@@ -1373,6 +1667,17 @@ list_unshift(Interp *interpreter, List *list, void *item, int type)
     list_set(interpreter, list, item, type, --list->start);
     list->length++;
 }
+
+/*
+
+=item C<void *
+list_pop(Interp *interpreter, List *list, int type)>
+
+Removes and returns the last item of type C<type> from the end of the list.
+
+=cut
+
+*/
 
 void *
 list_pop(Interp *interpreter, List *list, int type)
@@ -1401,6 +1706,17 @@ list_pop(Interp *interpreter, List *list, int type)
     return ret;
 }
 
+/*
+
+=item C<void *
+list_shift(Interp *interpreter, List *list, int type)>
+
+Removes and returns the first item of type C<type> from the start of the list.
+
+=cut
+
+*/
+
 void *
 list_shift(Interp *interpreter, List *list, int type)
 {
@@ -1427,6 +1743,17 @@ list_shift(Interp *interpreter, List *list, int type)
     return ret;
 }
 
+/*
+
+=item C<void
+list_assign(Interp *interpreter, List *list, INTVAL idx, void *item, int type)>
+
+Assigns C<item> of type C<type> to index C<idx>.
+
+=cut
+
+*/
+
 void
 list_assign(Interp *interpreter, List *list, INTVAL idx, void *item, int type)
 {
@@ -1445,6 +1772,17 @@ list_assign(Interp *interpreter, List *list, INTVAL idx, void *item, int type)
     }
 }
 
+/*
+
+=item C<void *
+list_get(Interp *interpreter, List *list, INTVAL idx, int type)>
+
+Returns the item of type C<type> at index C<idx>.
+
+=cut
+
+*/
+
 void *
 list_get(Interp *interpreter, List *list, INTVAL idx, int type)
 {
@@ -1459,6 +1797,20 @@ list_get(Interp *interpreter, List *list, INTVAL idx, int type)
     idx += list->start;
     return list_item(interpreter, list, type, idx);
 }
+
+/*
+
+=item C<void
+list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
+        INTVAL count)>
+
+Replaces C<count> items starting at C<offset> with the items in C<value>.
+
+If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
+
+=cut
+
+*/
 
 void
 list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
@@ -1515,6 +1867,90 @@ list_splice(Interp *interpreter, List *list, PMC *value, INTVAL offset,
         list_delete(interpreter, list, offset + i, count - i);
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+=over 4
+
+=item * 1.1
+
+10.10.2002 Initial version.
+
+=item * 1.2
+
+11.10.2002 More documentation, optimized irregular chunk blocks,
+fixed indexed access WRT C<<list->start>>, cosmetics.
+
+=item * 1.3
+
+13.10.2002 Put C<intlist_length> into F<src/intlist.c>.
+
+=item * 1.4
+
+16.10.2002 Integrated list in parrot/arrays.
+
+=item * 1.5
+
+17.10.2002 Clone integral data (intlist).
+
+=item * 1.6
+
+18.10.2002 Moved tests to C<t/src/list.t>.
+
+=item * 1.7
+
+19.10.2002 Set intial length (C<new_init>).
+
+=item * 1.8
+
+21.10.2002 C<gc_debug> stuff.
+
+=item * 1.9
+
+21.10.2002 splice.
+
+=item * 1.10
+
+22.10.2002 Update comment WRT clone in splice.
+
+=item * 1.11
+
+26.10.2002 C<user_data>
+
+=item * 1.18
+
+Fixes.
+
+=item * 1.19
+
+08.11.2002 arbitrary sized items (C<enum_type_sized>).
+
+=item * 1.26
+
+08.01.2003 move C<Chunk_list> flags out of buffer header.
+
+=item * 1.29
+
+Join chunks > C<MAX_ITEMS> (Matt Fowles)
+
+=item * 1.30
+
+Greater threshold before C<do_sparse()>. Setting initial size to avoid
+sparse
+
+=item * 1.33 
+
+04.07.2003 Use a SArray for user_data
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

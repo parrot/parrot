@@ -1,7 +1,43 @@
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/warnings.c - Warning and error reporting
+
+=head1 DESCRIPTION
+
+Parrot <STRING> and C string versions of a function to print warning/error
+messages.
+ 
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 #include <stdarg.h>
 #include <assert.h>
+
+/*
+
+=head2 Internal Functions
+
+=over 4
+
+=item C<static int
+find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)>
+
+Find the line number.
+
+Returns -2 if the interpreter has no current profile counter.
+
+I<What does returning -1 mean?>
+
+=cut
+
+*/
 
 static int
 find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)
@@ -25,9 +61,18 @@ find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)
 }
 
 /*
- * print warning/error location in PBC to stderr
- * use fprintf only - may called from exceptions
- */
+
+=item C<void
+print_pbc_location(Parrot_Interp interpreter)>
+
+Prints the bytecode location of the warning or error to C<stderr>.
+
+Uses C<fprintf()> only. This may be called from exceptions.
+
+=cut
+
+*/
+
 void
 print_pbc_location(Parrot_Interp interpreter)
 {
@@ -45,6 +90,17 @@ print_pbc_location(Parrot_Interp interpreter)
     fprintf(stderr, "\tin file '%s' near line %d\n", file, line);
 }
 
+/*
+
+=item C<static INTVAL
+print_warning(struct Parrot_Interp *interpreter, STRING *msg)>
+
+Prints the warning message and the bytecode location.
+
+=cut
+
+*/
+
 static INTVAL
 print_warning(struct Parrot_Interp *interpreter, STRING *msg)
 {
@@ -59,6 +115,28 @@ print_warning(struct Parrot_Interp *interpreter, STRING *msg)
     print_pbc_location(interpreter);
     return 1;
 }
+
+/*
+
+=back
+
+=head2 Parrot Warnings Interface
+
+=over
+
+=item C<INTVAL
+Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
+            const char *message, ...)>
+
+The Parrot C string warning/error reporter.
+
+Returns 2 on error, 1 on success.
+
+C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
+
+=cut
+
+*/
 
 INTVAL
 Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
@@ -79,6 +157,22 @@ Parrot_warn(struct Parrot_Interp *interpreter, INTVAL warnclass,
 
 }
 
+/*
+
+=item C<INTVAL
+Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
+              STRING *message, ...)>
+
+The Parrot C<STRING> warning/error reporter.
+
+Returns 2 on error, 1 on success.
+
+C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
               STRING *message, ...)
@@ -96,6 +190,18 @@ Parrot_warn_s(struct Parrot_Interp *interpreter, INTVAL warnclass,
 
     return print_warning(interpreter, targ);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/warnings.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

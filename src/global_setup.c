@@ -1,15 +1,25 @@
-/* global_setup.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *      Performs all the global setting up of things. This includes the
- *      (very few) global variables that Parrot totes around
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/global_setup.c - Global setup
+
+=head1 DESCRIPTION
+
+Performs all the global setting up of things. This includes the (very
+few) global variables that Parrot totes around.
+
+I<What are these global variables?>
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
@@ -17,6 +27,23 @@
 /* These functions are defined in the auto-generated file core_pmcs.c */
 extern void Parrot_initialize_core_pmcs(Interp *interp);
 extern void Parrot_register_core_pmcs(Interp *interp, PMC *registry);
+
+/*
+
+=item C<void init_world(Interp *interpreter)>
+
+This is the actual initialization code called by C<Parrot_init()>. 
+
+It sets up the Parrot system, running any platform-specific init code if
+necessary, then initializing the string subsystem, and setting up the
+base vtables and core PMCs.
+
+C<interpreter> should be the root interpreter returned by
+C<Parrot_new(NULL)>.
+
+=cut
+
+*/
 
 void
 init_world(Interp *interpreter)
@@ -70,6 +97,18 @@ init_world(Interp *interpreter)
     VTABLE_set_pmc_keyed_int(interpreter, iglobals,
             (INTVAL) IGLOBALS_INTERPRETER, self);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/global_setup.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,20 +1,38 @@
-/* embed.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The Parrot embedding interface.
- *  Data Structure and Algorithms:
- *     See include/parrot/embed.h and docs/embed.pod.
- *  History:
- *     Initial version by Brent Dax on 2002.1.28
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
 
+=head1 NAME
+
+src/embed.c - The Parrot embedding interface
+
+=head1 DESCRIPTION
+
+This file implements the Parrot embedding interface.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+
+/*
+
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
+
+Returns a new Parrot interpreter. 
+
+The first created interpreter (C<parent> is C<NULL>) is the last one
+to get destroyed.
+
+=cut
+
+*/
 
 Parrot_Interp
 Parrot_new(Parrot_Interp parent)
@@ -24,6 +42,17 @@ Parrot_new(Parrot_Interp parent)
 }
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
+
+/*
+
+=item C<void Parrot_init(struct Parrot_Interp *interpreter)>
+
+Initializes the new interpreter. This function only has effect the first
+time it is called.
+
+=cut
+
+*/
 
 void
 Parrot_init(struct Parrot_Interp *interpreter)
@@ -38,6 +67,15 @@ Parrot_init(struct Parrot_Interp *interpreter)
         init_world(interpreter);
     }
 }
+
+/*
+
+=item C<void
+Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)>
+
+=cut
+
+*/
 
 void
 Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)
@@ -56,11 +94,31 @@ Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)
     }
 }
 
+/*
+
+=item C<void
+Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
+
+=cut
+
+*/
+
 void
 Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
 {
     Interp_flags_CLEAR(interpreter, flag);
 }
+
+/*
+
+=item C<Parrot_Int
+Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)>
+
+Set, clear or test the interpreter flags specified in C<flag>.
+
+=cut
+
+*/
 
 Parrot_Int
 Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
@@ -68,11 +126,33 @@ Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
     return Interp_flags_TEST(interpreter, flag);
 }
 
+/*
+
+=item C<void
+Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)>
+
+Sets the specified run core.
+
+=cut
+
+*/
+
 void
 Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)
 {
     Interp_core_SET(interpreter, core);
 }
+
+/*
+
+=item C<void
+Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)>
+
+Activates the given warnings.
+
+=cut
+
+*/
 
 void
 Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
@@ -82,9 +162,16 @@ Parrot_setwarnings(struct Parrot_Interp *interpreter, Parrot_warnclass wc)
 }
 
 /*
- * Read in a bytecode, unpack it into a PackFile structure
- * and do fixups.
- */
+
+=item C<struct PackFile *
+Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)>
+
+Read in a bytecode, unpack it into a C<PackFile> structure and do fixups.
+
+=cut
+
+*/
+
 struct PackFile *
 Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)
 {
@@ -275,11 +362,33 @@ again:
     return pf;
 }
 
+/*
+
+=item C<void
+Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)>
+
+Loads the C<PackFile> returned by C<Parrot_readbc()>.
+
+=cut
+
+*/
+
 void
 Parrot_loadbc(struct Parrot_Interp *interpreter, struct PackFile *pf)
 {
     interpreter->code = pf;
 }
+
+/*
+
+=item C<static void
+setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)>
+
+Sets up the C<ARGV> array in P5.
+
+=cut
+
+*/
 
 static void
 setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
@@ -314,16 +423,36 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     }
 }
 
-/* XXX This allows a command line option to be visible from inside the
- * Parrot core, this is done using the pointers in the interpreter structure,
- * and the subsystems using this arguments must clear them before running.
- */
+/*
+
+=item C<void
+Parrot_setup_opt(struct Parrot_Interp *interpreter, int n, char *argv)>
+
+XXX This allows a command line option to be visible from inside the
+Parrot core, this is done using the pointers in the interpreter
+structure, and the subsystems using this arguments must clear them
+before running.
+
+=cut
+
+*/
 
 void
 Parrot_setup_opt(struct Parrot_Interp *interpreter, int n, char *argv)
 {
     interpreter->string_reg.registers[n] = (STRING *)argv;
 }
+
+/*
+
+=item C<static int
+prof_sort_f(const void *a, const void *b)>
+
+Sort function for profile data. Sorts by time.
+
+=cut
+
+*/
 
 static int
 prof_sort_f(const void *a, const void *b)
@@ -336,6 +465,17 @@ prof_sort_f(const void *a, const void *b)
         return -1;
     return 0;
 }
+
+/*
+
+=item C<static const char *
+op_name(Parrot_Interp interpreter, int k)>
+
+Returns the name of the opcode.
+
+=cut
+
+*/
 
 static const char *
 op_name(Parrot_Interp interpreter, int k)
@@ -354,9 +494,16 @@ op_name(Parrot_Interp interpreter, int k)
 }
 
 /*
- * with this calibration reported times of parrot -p
- * match almost these measured with time parrot -b
- */
+
+=item C<static FLOATVAL
+calibrate(Parrot_Interp interpreter)>
+
+With this calibration reported times of C<parrot -p> match almost these
+measured with time C<parrot -b>.
+
+=cut
+
+*/
 
 static FLOATVAL
 calibrate(Parrot_Interp interpreter)
@@ -373,6 +520,16 @@ calibrate(Parrot_Interp interpreter)
     }
     return empty;
 }
+
+/*
+
+=item C<static void print_profile(int status, void *p)>
+
+Prints out a profile listing.
+
+=cut
+
+*/
 
 static void
 print_profile(int status, void *p)
@@ -432,6 +589,16 @@ print_profile(int status, void *p)
     }
 }
 
+/*
+
+=item C<static void print_debug(int status, void *p)>
+
+Prints out GC info.
+
+=cut
+
+*/
+
 static void
 print_debug(int status, void *p)
 {
@@ -444,6 +611,17 @@ print_debug(int status, void *p)
         PDB_info(interpreter);
     }
 }
+
+/*
+
+=item C<void
+Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])>
+
+Sets up C<ARGV> and runs the ops.
+
+=cut
+
+*/
 
 void
 Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
@@ -514,7 +692,16 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 }
 
 
-/* XXX Doesn't handle arguments with spaces */
+/*
+
+=item C<static char *argv_join(char **argv)>
+
+XXX Doesn't handle arguments with spaces.
+
+=cut
+
+*/
+
 static char*
 argv_join(char ** argv)
 {
@@ -538,6 +725,17 @@ argv_join(char ** argv)
     return command;
 }
 
+/*
+
+=item C<void
+Parrot_debug(struct Parrot_Interp *interpreter, int argc, char **argv)>
+
+Runs the interpreter's bytecode in debugging mode.
+
+=cut
+
+*/
+
 void
 Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
 {
@@ -558,6 +756,19 @@ Parrot_debug(struct Parrot_Interp *interpreter, int argc, char ** argv)
         PDB_run_command(interpreter, command);
     }
 }
+
+/*
+
+=item C<void
+Parrot_disassemble(struct Parrot_Interp *interpreter)>
+
+Disassembles and prints out the interpreter's bytecode.
+
+This is used by the Parrot disassembler.
+
+=cut
+
+*/
 
 void
 Parrot_disassemble(struct Parrot_Interp *interpreter)
@@ -587,13 +798,22 @@ Parrot_disassemble(struct Parrot_Interp *interpreter)
     return;
 }
 
-/*=for api embed Parrot_run_native(Parrot_Interp, native_func_t func)
+/*
 
-Run the C function B<func> through the program [enternative, end].
+=item C<void
+Parrot_run_native(Parrot_Interp interpreter, native_func_t func)>
+
+Run the C function C<func> through the program C<[enternative, end]>.
 This ensures that the function is run with the same setup as in other
 run loops.
 
+This function is used in some of the source tests in F<t/src> which use
+the interpreter outside a runloop.
+
+=cut
+
 */
+
 void
 Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
 {
@@ -611,6 +831,23 @@ Parrot_run_native(Parrot_Interp interpreter, native_func_t func)
     run_native = func;
     runops(interpreter, 0);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/embed.h> and F<docs/embed.pod>.     
+
+=head1 HISTORY
+
+Initial version by Brent Dax on 2002.1.28.
+
+=cut
+
+*/
+
 /*
  * Local variables:
  * c-indentation-style: bsd

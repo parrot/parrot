@@ -1,13 +1,22 @@
-/* longopt.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+longopt.c - Command-line option parsing
+
+=head1 DESCRIPTION
+
+This is used by C<parrot>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/longopt.h"
@@ -22,13 +31,28 @@ static int longopt_get_shortopt(Parrot_Interp, int argc, char* argv[],
 
 static char longopt_error_buffer[512];
 
-/* longopt_get:  Gets long or short options, specified
- * in options[] (see longopt.dev).  Call it iteratively
- * with the same info_buf until it returns 0 or -1.
- * 0  means end of options.
- * -1 means error, with error put in info_buf->opt_error
- * Any other value is a valid option id.
- */
+/*
+
+=item C<int
+longopt_get(Parrot_Interp interp, int argc, char* argv[],
+            const struct longopt_opt_decl options[],
+            struct longopt_opt_info* info_buf)>
+
+Gets long or short options, specified in C<options[]> (see
+F<docs/dev/longopt.dev>).
+
+Call it iteratively with the same C<info_buf> until it returns 0 or -1.
+
+0  means you have reached the end of options. 
+
+-1 means a parse error, with error put in C<<info_buf->opt_error>>.
+
+Any other value is a valid option identifier.
+
+=cut
+
+*/
+
 int
 longopt_get(Parrot_Interp interp, int argc, char* argv[],
             const struct longopt_opt_decl options[],
@@ -63,12 +87,24 @@ longopt_get(Parrot_Interp interp, int argc, char* argv[],
     }
 }
 
+/*
 
-/* longopt_get_longopt: Find the option id of a long option.
- * Fill info_buf appropriately, and return the option id.
- * argv[info_buf->opt_index] is guaranteed to have at least
- * three characters and start with --.
- */
+=item C<static int
+longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
+                    const struct longopt_opt_decl options[],
+                    struct longopt_opt_info* info_buf)>
+
+Find the option identifier of a long option. 
+
+Fill C<info_buf> appropriately, and return the option identifier.
+
+C<argv[info_buf->opt_index]> is guaranteed to have at least three
+characters and start with C<-->.
+
+=cut
+
+*/
+
 static int
 longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
                     const struct longopt_opt_decl options[],
@@ -147,12 +183,25 @@ longopt_get_longopt(Parrot_Interp interp, int argc, char* argv[],
     return -1;
 }
 
-/* longopt_get_shortopt: Find the option id of the next short option.
- * This next short option may be in the middle of a bundle (-abcd),
- * and info_buf->_shortopt_pos maintains a pointer into that bundle.
- * argv[info_buf->opt_index] is guaranteed to be at least two characters
- * long and start with a dash.
- */
+/*
+
+=item C<static int
+longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
+                     const struct longopt_opt_decl options[],
+                     struct longopt_opt_info* info_buf)>
+
+Find the option identifier of the next short option.
+
+This next short option may be in the middle of a bundle (C<-abcd>), and
+C<<info_buf->_shortopt_pos>> maintains a pointer into that bundle.
+
+C<<argv[info_buf->opt_index]>> is guaranteed to be at least two
+characters long and start with a dash.
+
+=cut
+
+*/
+
 static int
 longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
                      const struct longopt_opt_decl options[],
@@ -228,6 +277,17 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
     return -1;
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/longopt.h> and F<docs/dev/longopt.dev>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,14 +1,39 @@
-/* interpreter.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The interpreter api handles running the operations
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+################################################################################
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+################################################################################
+
+=head1 NAME
+
+src/interpreter.c - Parrot Interpreter
+
+=head1 DESCRIPTION
+
+The interpreter API handles running the operations.
+
+The predereferenced code chunk is pre-initialized with the opcode
+function pointers, addresses, or opnumbers of the C<prederef__>
+opcode. This opcode then calls the C<do_prederef()> function, which then
+fills in the real function, address or op number.
+
+Since the C<prederef__> opcode returns the same C<pc_prederef> it was
+passed, the runops loop will re-execute the same location, which will
+then have the pointer to the real C<prederef> opfunc and C<prederef>
+args.
+
+Pointer arithmetic is used to determine the index into the bytecode
+corresponding to the currect opcode. The bytecode and prederef arrays
+have the same number of elements since there is a one-to-one mapping.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+################################################################################
+*/
 
 #include <assert.h>
 #include "parrot/parrot.h"
@@ -37,25 +62,21 @@ struct Parrot_Interp interpre;
 static void setup_default_compreg(Parrot_Interp interpreter);
 static void setup_event_func_ptrs(Parrot_Interp interpreter);
 
-/*=for api interpreter prederef
- *
- * Predereference the current opcode.
- *
- * The prederef code chunk is pre-initialized with opcode function
- * pointers (or addresses or opnumbers) of the prederef__ opcode.
- * This opcode call the do_prederef function, which fills in the
- * real function (address/op number)
- *
- * Since the prederef__ opcode returns the
- * same pc_prederef it was passed, the runops loop will re-execute
- * the same location, which will then have the pointer to the real
- * prederef opfunc and prederef args.
- *
- * The initial few lines of pointer arithmetic are used to determine
- * the index into the bytecode corresponding to the currect pc_prederef.
- * The bytecode and prederef arrays have the same number of elements
- * since there is a one-to-one mapping.
- */
+/*
+################################################################################
+
+=item C<static void
+prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
+        opcode_t *pc, op_info_t *opinfo)>
+
+Called from C<do_prederef()> to deal with any arguments.
+
+C<pc_prederef> is the current opcode.
+
+=cut
+
+################################################################################
+*/
 
 static void
 prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
@@ -144,8 +165,21 @@ prederef_args(void **pc_prederef, struct Parrot_Interp *interpreter,
 }
 
 /*
- * this is called from inside the run cores
- */
+################################################################################
+
+=item C<void
+do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)>
+
+This is called from within the run cores to predereference the current
+opcode.
+
+C<pc_prederef> is the current opcode, and C<type> is the run core type.
+
+=cut
+
+################################################################################
+*/
+
 void
 do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
 {
@@ -205,13 +239,24 @@ do_prederef(void **pc_prederef, Parrot_Interp interpreter, int type)
 }
 
 /*
- * turn on or off event checking for prederefed cores
- * this is: fill in the event_checker opcode or restore original
- * op in all branch locations of the opcode stream
- *
- * NOTE: when on == true, this is called from the event handler
- *       thread
- */
+################################################################################
+
+=item C<static void
+turn_ev_check(Parrot_Interp interpreter, int on)>
+
+Turn on or off event checking for prederefed cores.
+
+Fills in the C<event_checker> opcode, or restores original op in all
+branch locations of the opcode stream.
+
+Note that when C<on> is true, this is being called from the event
+handler thread.
+
+=cut
+
+################################################################################
+*/
+
 static void
 turn_ev_check(Parrot_Interp interpreter, int on)
 {
@@ -232,10 +277,25 @@ turn_ev_check(Parrot_Interp interpreter, int on)
     }
 }
 
-/*=for api interpreter get_op_lib_init
- *
- * return an  opcode's library op_lib init func
- */
+/*
+################################################################################
+
+=item C<static oplib_init_f
+get_op_lib_init(int core_op, int which, PMC *lib)>
+
+Returns an opcode's library C<op_lib> init function.
+
+C<core_op> indicates whether the opcode represents a core Parrot operation.
+
+C<which> is the run core type.
+
+For dynamic oplibs C<core_op> will be 0 and C<lib> will be a
+C<ParrotLibrary> PMC.
+
+=cut
+
+################################################################################
+*/
 
 static oplib_init_f
 get_op_lib_init(int core_op, int which, PMC *lib)
@@ -271,11 +331,19 @@ get_op_lib_init(int core_op, int which, PMC *lib)
     return (oplib_init_f) D2FPTR(lib->cache.struct_val);
 }
 
-/*=for api interpreter load_prederef
- *
- * interpreter->op_lib = prederefed oplib
- *
- */
+/*
+################################################################################
+
+=item C<static void
+load_prederef(struct Parrot_Interp *interpreter, int which)>
+
+C<<interpreter->op_lib>> = prederefed oplib.
+
+=cut
+
+################################################################################
+*/
+
 static void
 load_prederef(struct Parrot_Interp *interpreter, int which)
 {
@@ -292,11 +360,19 @@ load_prederef(struct Parrot_Interp *interpreter, int which)
                 (int)interpreter->op_lib->op_count);
 }
 
-/*=for api interpreter init_prederef
- *
- * initialize: load prederef func_table, file prederef.code
- *
- */
+/*
+################################################################################
+
+=item C<static void
+init_prederef(struct Parrot_Interp *interpreter, int which)>
+
+Initialize: load prederef C<func_table>, file prederef.code.
+
+=cut
+
+################################################################################
+*/
+
 static void
 init_prederef(struct Parrot_Interp *interpreter, int which)
 {
@@ -329,10 +405,18 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
     }
 }
 
-/*=for api interpreter stop_prederef
- *
- * Restore func tables to initial state
- */
+/*
+################################################################################
+
+=item C<static void
+stop_prederef(struct Parrot_Interp *interpreter)>
+
+Restore the interpreter's op function tables to their initial state.
+
+=cut
+
+################################################################################
+*/
 
 static void
 stop_prederef(struct Parrot_Interp *interpreter)
@@ -348,14 +432,24 @@ stop_prederef(struct Parrot_Interp *interpreter)
 }
 
 #if EXEC_CAPABLE
-/*=for api interpreter exec_init_prederef
- *
- * interpreter->op_lib = prederefed oplib
- *
- * the "normal" op_lib has a copy in the interpreter structure
- * - but get the op_code lookup function from standard core
- *   prederef has no op_info_table
- */
+
+/*
+################################################################################
+
+=item C<void
+exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)>
+
+C<<interpreter->op_lib>> = prederefed oplib
+
+The "normal" C<op_lib> has a copy in the interpreter structure - but get
+the C<op_code> lookup function from standard core prederef has no
+C<op_info_table>
+
+=cut
+
+################################################################################
+*/
+
 void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
@@ -374,6 +468,17 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
     }
 }
 #endif
+
+/*
+
+=item C<void *
+init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Initializes JIT function for the specified opcode and returns it.
+
+=cut
+
+*/
 
 void *
 init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -405,6 +510,17 @@ init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 }
 
+/*
+
+=item C<void
+prepare_for_run(Parrot_Interp interpreter)>
+
+Prepares to run the interpreter's run core.
+
+=cut
+
+*/
+
 void
 prepare_for_run(Parrot_Interp interpreter)
 {
@@ -422,6 +538,17 @@ prepare_for_run(Parrot_Interp interpreter)
     }
 }
 
+/*
+
+=item C<static opcode_t *
+runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the JIT code for the specified opcode.
+
+=cut
+
+*/
+
 static opcode_t *
 runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -431,6 +558,17 @@ runops_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
     return NULL;
 }
+
+/*
+
+=item C<static opcode_t *
+runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the native executable version of the specified opcode.
+
+=cut
+
+*/
 
 static opcode_t *
 runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -467,25 +605,30 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
     return NULL;
 }
 
+/*
 
-/*=for api interpreter runops_prederef
- *
- * This runops core is used when we are in prederef mode. It works
- * just like the basic fast core, except it uses pc_prederef instead
- * of pc, and calls prederef opfuncs instead of regular opfuncs.
- *
- * There is code after the main while loop to resynchronize pc with
- * pc_prederef in case we have exited the loop under restart
- * conditions (such as with interpreter flag changing ops).
- *
- * TODO: The calls to init_prederef() and stop_prederef() would be
- * best placed elsewhere, since we would re-pay the costs of loading
- * the prederef oplib every time we dropped out of and back into
- * this core. For now, however, this implementation should do fine.
- * Since dropping out of and back into cores is expected to be rare
- * (at the time of implementation that only occurs for interpreter
- * flag changing ops).
- */
+=item C<static opcode_t *
+runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+This runops core is used when we are in prederef mode. It works just
+like the basic fast core, except it uses C<pc_prederef> instead of pc,
+and calls prederef opfuncs instead of regular opfuncs.
+
+There is code after the main while loop to resynchronize pc with
+C<pc_prederef> in case we have exited the loop under restart conditions
+(such as with interpreter flag changing ops).
+
+TODO: The calls to C<init_prederef()> and C<stop_prederef()> would be
+best placed elsewhere, since we would re-pay the costs of loading the
+prederef oplib every time we dropped out of and back into this core. For
+now, however, this implementation should do fine. Since dropping out of
+and back into cores is expected to be rare (at the time of
+implementation that only occurs for interpreter flag changing ops).
+
+=cut
+
+*/
+
 static opcode_t *
 runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -504,6 +647,17 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     stop_prederef(interpreter);
     return 0;
 }
+
+/*
+
+=item C<static opcode_t *
+runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the C C<goto>, predereferenced core.
+
+=cut
+
+*/
 
 static opcode_t *
 runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
@@ -524,6 +678,17 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 #endif
 }
 
+/*
+
+=item C<static opcode_t *
+runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)>
+
+Runs the C<switch> core.
+
+=cut
+
+*/
+
 static opcode_t *
 runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
@@ -536,12 +701,20 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
     return pc;
 }
 
-/*=for api interpreter runops_int
- * run parrot operations of loaded code segment until an end opcode is reached
- * run core is selected depending on the Interp_flags
- * when a restart opcode is encountered a different core my be selected
- * and evaluation of opcode continues
- */
+/*
+
+=item C<void
+runops_int(struct Parrot_Interp *interpreter, size_t offset)>
+
+Run parrot operations of loaded code segment until an end opcode is
+reached run core is selected depending on the C<Interp_flags> when a
+C<restart> opcode is encountered a different core my be selected and
+evaluation of opcode continues.
+
+=cut
+
+*/
+
 void
 runops_int(struct Parrot_Interp *interpreter, size_t offset)
 {
@@ -646,9 +819,17 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
     }
 }
 
-/*=for api interpreter runops_ex
- * handles intersegment jumps from eval'ed code
- */
+/*
+
+=item C<static void
+runops_ex(struct Parrot_Interp *interpreter, size_t offset)>
+
+Handles intersegment jumps from C<eval>ed code.
+
+=cut
+
+*/
+
 static void
 runops_ex(struct Parrot_Interp *interpreter, size_t offset)
 {
@@ -687,10 +868,17 @@ runops_ex(struct Parrot_Interp *interpreter, size_t offset)
     }
 }
 
-/*=for api interpreter runops
- * run parrot ops
- * set exception handler and/or resume after exception
- */
+/*
+
+=item C<void
+runops(struct Parrot_Interp *interpreter, size_t offset)>
+
+Run parrot ops. Set exception handler and/or resume after exception.
+
+=cut
+
+*/
+
 void
 runops(struct Parrot_Interp *interpreter, size_t offset)
 {
@@ -717,11 +905,18 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 #endif
 }
 
-/*=for api interpreter Parrot_runops_fromc
- * run parrot ops, called from c code
- * function arguments are already setup according to PCC
- * the sub argument is an invocable Sub PMC
- */
+/*
+
+=item C<void
+Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)>
+
+Runs the Parrot ops, called from C code. The function arguments are
+already setup according to Parrot calling conventions, the C<sub> argument
+is an invocable C<Sub> PMC.
+
+=cut
+
+*/
 
 void
 Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
@@ -746,8 +941,16 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
 }
 
 /*
- * duplicated from delegates.pmc
- */
+
+=item C<PARROT_INLINE static struct regsave *
+save_regs(Parrot_Interp interp)>
+
+Duplicated from F<classes/delegates.pmc>.
+
+=cut
+
+*/
+
 static struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
@@ -766,14 +969,34 @@ save_regs(Parrot_Interp interp) {
     return save;
 }
 
+/*
+
+=item C<PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, struct regsave *data)>
+
+Restores the registers.
+
+=cut
+
+*/
+
 PARROT_INLINE static void
 restore_regs(Parrot_Interp interp, struct regsave *data) {
     mem_sys_memcopy(interp, data, sizeof(struct regsave));
     mem_sys_free(data);
 }
-/*=for api interpreter Parrot_runops_fromc_save
- * like above but preserve registers
- */
+
+/*
+
+=item C<void
+Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)>
+
+Like above but preserve registers.
+
+=cut
+
+*/
+
 void
 Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
 {
@@ -782,20 +1005,29 @@ Parrot_runops_fromc_save(Parrot_Interp interpreter, PMC *sub)
     restore_regs(interpreter, data);
 }
 
-/*=for api interpreter Parrot_runops_fromc_args
- * run parrot ops, called from c code
- * function arguments are passed as va_args according to signature
- * the sub argument is an invocable Sub PMC
- *
- * signatures are similar to NCI:
- * v ... void return
- * I ... INTVAL (not Interpreter)
- * N ... NUMVAL
- * S ... STRING*
- * P ... PMC*
- *
- * return value, if any is passed as (void*)ptr or (void*)&val
- */
+/*
+
+=item C<void *
+Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
+        const char *sig, ...)>
+
+Run parrot ops, called from C code, function arguments are passed as
+C<va_args> according to signature the C<sub> argument is an invocable
+C<Sub> PMC.
+
+Signatures are similar to NCI:
+
+    v ... void return
+    I ... INTVAL (not Interpreter)
+    N ... NUMVAL
+    S ... STRING*
+    P ... PMC*
+
+Return value, if any is passed as C<(void *)ptr> or C<(void *)&val>.
+ 
+=cut
+
+*/
 
 void *
 Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
@@ -871,6 +1103,16 @@ Parrot_runops_fromc_args(Parrot_Interp interpreter, PMC *sub,
     return retval;
 }
 
+/*
+
+=item C<static int is_env_var_set(const char* var)>
+
+Checks whether the specified environment variable is set.
+
+=cut
+
+*/
+
 static int
 is_env_var_set(const char* var)
 {
@@ -888,11 +1130,19 @@ is_env_var_set(const char* var)
 }
 
 /*
- * setup a func_table containing ptrs (or addresses) of the
- * check_event__ opcode
- * TODO free it at destroy
- * TODO handle run-core changes
- */
+
+=item C<static void
+setup_event_func_ptrs(Parrot_Interp interpreter)>
+
+Setup a C<func_table> containing pointers (or addresses) of the
+C<check_event__> opcode.
+
+TODO: Free it at destroy. Handle run-core changes.
+
+=cut
+
+*/
+
 static void
 setup_event_func_ptrs(Parrot_Interp interpreter)
 {
@@ -914,11 +1164,18 @@ setup_event_func_ptrs(Parrot_Interp interpreter)
     }
 }
 
-void Parrot_really_destroy(int exit_code, void *interpreter);
+/*
 
-/*=for api interpreter make_interpreter
- *  Create the Parrot interpreter.  Allocate memory and clear the registers.
- */
+=item C<Parrot_Interp
+make_interpreter(Parrot_Interp parent, Interp_flags flags)>
+
+Create the Parrot interpreter. Allocate memory and clear the registers.
+
+=cut
+
+*/
+
+void Parrot_really_destroy(int exit_code, void *interpreter);
 
 Parrot_Interp
 make_interpreter(Parrot_Interp parent, Interp_flags flags)
@@ -1100,6 +1357,20 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     return interpreter;
 }
 
+/*
+
+=item C<void
+Parrot_destroy(struct Parrot_Interp *interpreter)>
+
+Does nothing if C<ATEXIT_DESTROY> is defined. Otherwise calls
+C<Parrot_really_destroy()> with exit code 0.
+
+This function is not currently used.
+
+=cut
+
+*/
+
 void
 Parrot_destroy(struct Parrot_Interp *interpreter)
 {
@@ -1109,6 +1380,20 @@ Parrot_destroy(struct Parrot_Interp *interpreter)
     Parrot_really_destroy(0, (void*) interpreter);
 #endif
 }
+
+/*
+
+=item C<void
+Parrot_really_destroy(int exit_code, void *vinterp)>
+
+Waits for any threads to complete, then frees all allocated memory, and
+closes any open file handles, etc.
+
+Note that C<exit_code> is ignored.
+
+=cut
+
+*/
 
 void
 Parrot_really_destroy(int exit_code, void *vinterp)
@@ -1227,6 +1512,19 @@ struct mallinfo {
 #  endif
 extern struct mallinfo mallinfo(void);
 #endif /* GC_IS_MALLOC */
+
+/*
+
+=item C<INTVAL
+interpinfo(struct Parrot_Interp *interpreter, INTVAL what)>
+
+C<what> specifies the type of information you want about the
+interpreter.
+
+=cut
+
+*/
+
 INTVAL
 interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 {
@@ -1289,9 +1587,16 @@ interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
     return ret;
 }
 
-/*=for api interpreter Parrot_compreg
- * register a parser/compiler function
- */
+/*
+
+=item C<void 
+Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)>
+
+Register a parser/compiler function.
+
+=cut
+
+*/
 
 void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
 {
@@ -1312,10 +1617,16 @@ void Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
             string_from_cstring(interpreter, "pIt", 0));
 }
 
-
 /*
- * setup default compiler for PASM
- */
+
+=item C<static void setup_default_compreg(Parrot_Interp interpreter)>
+
+Setup default compiler for PASM.
+
+=cut
+
+*/
+
 static void setup_default_compreg(Parrot_Interp interpreter)
 {
     STRING *pasm1 = string_from_cstring(interpreter, "PASM1", 0);
@@ -1324,6 +1635,25 @@ static void setup_default_compreg(Parrot_Interp interpreter)
     /* register the nci ccompiler object */
     Parrot_compreg(interpreter, pasm1, (PMC*)F2DPTR(p));
 }
+
+/*
+
+=item C<INTVAL
+sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted)>
+
+Returns the system info.
+
+C<info_wanted> is one of:
+
+    PARROT_INTSIZE
+    PARROT_FLOATSIZE
+    PARROT_POINTERSIZE
+
+In unknown info is requested then -1 is returned.
+
+=cut
+
+*/
 
 INTVAL
 sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted)
@@ -1339,6 +1669,27 @@ sysinfo_i(Parrot_Interp interpreter, INTVAL info_wanted)
         return -1;
     }
 }
+
+/*
+
+=item C<STRING *
+sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)>
+
+Returns the system info string.
+
+C<info_wanted> is one of:
+
+    PARROT_OS
+    PARROT_OS_VERSION
+    PARROT_OS_VERSION_NUMBER
+    CPU_ARCH
+    CPU_TYPE
+
+If unknown info is requested then and empty string is returned.
+
+=cut
+
+*/
 
 STRING *
 sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
@@ -1356,17 +1707,31 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
 }
 
 /*
- * dynamic loading stuff
- */
+
+=back
+
+=head2 Dynamic Loading Functions
+
+=over 4
+
+=cut
+
+*/
+ 
 static void dynop_register_xx(Parrot_Interp, PMC*, size_t, size_t,
         oplib_init_f init_func);
 static void dynop_register_switch(Parrot_Interp, PMC*, size_t, size_t);
 
+/*
 
-/*=for api interpreter dynop_register
- *
- * register a dynamic oplib
- */
+=item C<void
+dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)>
+
+Register a dynamic oplib.
+
+=cut
+
+*/
 
 void
 dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
@@ -1461,8 +1826,17 @@ dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
 }
 
 /*
- * register op_lib with other cores
- */
+
+=item C<static void
+dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
+        size_t n_old, size_t n_new, oplib_init_f init_func)>
+
+Register C<op_lib> with other cores.
+
+=cut
+
+*/
+
 static void
 dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
         size_t n_old, size_t n_new, oplib_init_f init_func)
@@ -1524,6 +1898,18 @@ dynop_register_xx(Parrot_Interp interpreter, PMC* lib_pmc,
     init_func((int) ops_addr);
 }
 
+/*
+
+=item C<static void
+dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
+        size_t n_old, size_t n_new)>
+
+Description.
+
+=cut
+
+*/
+
 static void
 dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
         size_t n_old, size_t n_new)
@@ -1533,8 +1919,16 @@ dynop_register_switch(Parrot_Interp interpreter, PMC* lib_pmc,
 }
 
 /*
- * tell running core about new func table
- */
+
+=item C<static void
+notify_func_table(Parrot_Interp interpreter, void* table, int on)>
+
+Tell the interpreter's running core about the new function table.
+
+=cut
+
+*/
+
 static void
 notify_func_table(Parrot_Interp interpreter, void* table, int on)
 {
@@ -1556,9 +1950,18 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
 }
 
 /*
- * restore old func table
- * XXX function core only by now
- */
+
+=item C<void
+disable_event_checking(Parrot_Interp interpreter)>
+
+Restore old function table.
+
+XXX This is only implemented for the function core at present.
+
+=cut
+
+*/
+
 void
 disable_event_checking(Parrot_Interp interpreter)
 {
@@ -1569,13 +1972,21 @@ disable_event_checking(Parrot_Interp interpreter)
 }
 
 /*
- * replace func table with one that does event checking for all
- * opcodes
- * NOTE: enable_event_checking is called async by the event handler
- *       thread. All action done from here has to be async safe.
- *
- * XXX plain core only
- */
+
+=item C<void
+enable_event_checking(Parrot_Interp interpreter)>
+
+Replace func table with one that does event checking for all opcodes.
+
+NOTE: C<enable_event_checking()> is called async by the event handler
+thread. All action done from here has to be async safe.
+
+XXX This is only implemented for the function core at present.
+
+=cut
+
+*/
+
 void
 enable_event_checking(Parrot_Interp interpreter)
 {
@@ -1586,9 +1997,18 @@ enable_event_checking(Parrot_Interp interpreter)
 }
 
 /*
- * create an entry in the nci_method_table for the given
- * NCI method of PMC class type
- */
+
+=item C<void
+enter_nci_method(Parrot_Interp interpreter, int type,
+		 void *func, const char *name, const char *proto)>
+
+Create an entry in the C<nci_method_table> for the given NCI method of PMC
+class C<type>.
+
+=cut
+
+*/
+
 void
 enter_nci_method(Parrot_Interp interpreter, int type,
 		 void *func, const char *name, const char *proto)
@@ -1629,6 +2049,18 @@ enter_nci_method(Parrot_Interp interpreter, int type,
                 PObj_constant_FLAG|PObj_external_FLAG, NULL),
             method);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/interpreter.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

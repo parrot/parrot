@@ -1,16 +1,76 @@
-/* register.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Register handling routines
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/register.c - Register handling routines
+
+=head1 DESCRIPTION
+
+Parrot has 4 register sets, one for each of its basic types. There are
+32 registers in each set.
+
+Each register set has a register frame stack for saving and restoring
+its contents. Note that, whereas the C<push{i,n,s,p}> opcodes push all
+32 registers on to the stack, in the C implementation a register frame
+is actually only I<half> the register set. The opcode calls the the
+C<Parrot_push_{i,n,s,p}()> function twice, once for each half of the
+set.
+
+=head2 C Implementation
+
+As the registers and register frame stacks for the various types share
+essentially the same structure we'll take as our example the integer
+registers and their register frame stack.
+
+Each instance of C<Parrot_Interp> contains an C<IReg> which in turn
+contains an array of 32 (i.e. C<NUM_REGISTER>) C<INTVAL>s. This array is
+the integer register set.
+
+The register frame stacks are contained within the interpreter's
+C<Parrot_Context>. This context contains a pointer to an C<IRegChunk>
+which is the top of the integer register frame stack. The C<IRegChunk>
+contains an array of 16 (i.e. C<FRAMES_PER_CHUNK>) C<IRegFrame>s, with
+each C<IRegFrame> containing an array of 16 (i.e. C<NUM_REGISTER / 2>)
+C<INTVAL>s.
+
+The top frame is always C<used - 1>. When C<used> indicates that a new
+C<IRegChunk> should be created, it is allocated with
+C<mem_sys_allocate()> and the C<int_reg_top>, C<previous>, C<next>
+pointers set accordingly. Popping register frames from the stack
+decrements C<used>. Chunks are reclaimed with C<mem_sys_free()>.
+
+Note that C<int_reg_top>'s C<next> is always empty - it I<is> the top of
+the stack.
+
+In the cases of C<STRING> and C<PMC> the C<registers> arrays contain
+pointers.
+
+=head2 Functions
+
+Note that the API header for this file is F<include/parrot/regfuncs.h>
+not F<include/parrot/register.h> - that contains the various registers
+and register frame stacks.
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
+
+/*
+
+=item C<void
+setup_register_stacks(Parrot_Interp interpreter)>
+
+Sets up the register stacks.
+
+=cut
+
+*/
 
 void
 setup_register_stacks(Parrot_Interp interpreter)
@@ -43,6 +103,17 @@ setup_register_stacks(Parrot_Interp interpreter)
     Parrot_unblock_DOD(interpreter);
 }
 
+/*
+
+=item C<void
+mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Marks the contents of the register stacks as live.
+
+=cut
+
+*/
+
 void
 mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
 {
@@ -51,6 +122,17 @@ mark_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
         pobject_lives(interpreter, (PObj*)chunk);
     }
 }
+
+/*
+
+=item C<void
+mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Marks the PMC register stack as live.
+
+=cut
+
+*/
 
 void
 mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
@@ -71,6 +153,17 @@ mark_pmc_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
+/*
+
+=item C<void
+mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Mark the contents of the string register stack as live.
+
+=cut
+
+*/
+
 void
 mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
 {
@@ -90,6 +183,17 @@ mark_string_register_stack(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
+/*
+
+=item C<void
+mark_register_stack_cow(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Marks the contents of the register stacks as Copy on Write.
+
+=cut
+
+*/
+
 void
 mark_register_stack_cow(Parrot_Interp interpreter, struct RegStack* stack)
 {
@@ -98,6 +202,19 @@ mark_register_stack_cow(Parrot_Interp interpreter, struct RegStack* stack)
         PObj_COW_SET((PObj*)chunk);
     }
 }
+
+/*
+
+=item C<static struct RegisterChunkBuf*
+regstack_copy_chunk(Parrot_Interp interpreter,
+                    struct RegisterChunkBuf* chunk,
+                    struct RegStack* stack)>
+
+Copies the specified register stack chunk.
+
+=cut
+
+*/
 
 static struct RegisterChunkBuf*
 regstack_copy_chunk(Parrot_Interp interpreter,
@@ -118,6 +235,17 @@ regstack_copy_chunk(Parrot_Interp interpreter,
                 stack->frame_size * chunk->used);
     return buf;
 }
+
+/*
+
+=item C<static struct RegisterChunkBuf*
+regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Pushes the entry on the specified register stack.
+
+=cut
+
+*/
 
 static struct RegisterChunkBuf*
 regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)
@@ -148,6 +276,17 @@ regstack_push_entry(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
+/*
+
+=item C<static void
+regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)>
+
+Pushes the entry on the specified register stack.
+
+=cut
+
+*/
+
 static void
 regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)
 {
@@ -174,9 +313,17 @@ regstack_pop_entry(Parrot_Interp interpreter, struct RegStack* stack)
     }
 }
 
-/*=for api register Parrot_push_on_stack
-   pushes something on the parrot stack
+/*
+
+=item C<void
+Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)>
+
+Unimplemented at present.
+
+=cut
+
 */
+
 void
 Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)
 {
@@ -185,9 +332,17 @@ Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type)
     UNUSED(type);
 }
 
-/*=for api register Parrot_pop_off_stack
-   pops something off the parrot stack
+/*
+
+=item C<void
+Parrot_pop_off_stack(void *thing, INTVAL type)>
+
+Unimplemented at present.
+
+=cut
+
 */
+
 void
 Parrot_pop_off_stack(void *thing, INTVAL type)
 {
@@ -239,6 +394,18 @@ Parrot_pop_off_stack(void *thing, INTVAL type)
 #define REG_NULL PMCNULL
 #include "generic_register.c"
 
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/register.h> and F<include/parrot/regfuncs.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:
