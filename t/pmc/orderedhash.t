@@ -10,13 +10,13 @@ t/pmc/orderedhash.t - Ordered Hash
 
 	% perl t/pmc/orderedhash.t
 
-=head1 DECSRIPTION
+=head1 DESCRIPTION
 
 Tests the C<OrderedHash> PMC.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 17;
 use Test::More;
 
 output_is(<<'CODE', <<OUT, "init");
@@ -322,4 +322,160 @@ ok \d
 ok \d/
 OUT
 
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    .local pmc val_in
+    val_in = new PerlString
+    val_in = "U"
+    hash1["X"] = val_in
+
+    .local pmc val_out
+    val_out = hash1['X']
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+U
+OUTPUT
+
+
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    hash1["X"] = 14
+
+    .local pmc val_out
+    val_out = hash1['X']
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+14
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    .local string val1
+    val1 = 'U'
+    set hash1["X"], val1
+
+    .local pmc val_out
+    val_out = hash1['X']
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+U
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    hash1["X"] = '14'
+
+    .local pmc val_out
+    val_out = hash1['X']
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+14
+OUTPUT
+
+
+# actually Parrot_OrderedHash_set_string_keyed is used, why ?
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    .local string key1
+    key1 = 'X'
+
+    hash1[key1] = '15'
+
+    .local pmc val_out
+    val_out = hash1[key1]
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+15
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+    .local string key1
+    key1 = 'X'
+
+    hash1[key1] = -16.16
+
+    .local pmc val_out
+    val_out = hash1[key1]
+    print val_out
+    print "\n"
+
+    end
+.end
+CODE
+-16.160000
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "OrderedHash get_integer");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new OrderedHash
+
+    .local int hash_size
+    hash_size = hash1
+    print hash_size
+    print "\n"
+
+    hash1['X'] = 'U'
+    hash_size = hash1
+    print hash_size
+    print "\n"
+
+    hash1['Y'] = 'V'
+    hash_size = hash1
+    print hash_size
+    print "\n"
+
+    hash1['size'] = hash_size
+    hash_size = hash1
+    print hash_size
+    print "\n"
+
+    end
+.end
+CODE
+0
+1
+2
+3
+OUTPUT
 

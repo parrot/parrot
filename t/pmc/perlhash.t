@@ -18,7 +18,9 @@ well.
 
 =cut
 
-use Parrot::Test tests => 31;
+# $Id$
+
+use Parrot::Test tests => 32;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -995,6 +997,19 @@ currency
 euro
 OUTPUT
 
-
-1;
+output_is(<< 'CODE', << 'OUTPUT', "PerlHash in PIR");
+##PIR##
+.sub _main
+    .local pmc hash1
+    hash1 = new PerlHash
+    hash1['X'] = 'U'
+    .local string val1
+    val1 = hash1['X']
+    print val1
+    print "\n"
+    end
+.end
+CODE
+U
+OUTPUT
 

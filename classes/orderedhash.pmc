@@ -153,6 +153,21 @@ Returns the integer value associated with C<*key>.
     
 /*
 
+=item C<FLOATVAL get_number_keyed(PMC *key)>
+
+Returns the floating-point value for the element at C<*key>.
+
+=cut
+
+*/
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        INTVAL n = PerlHash.SELF.get_integer_keyed(key);
+        return DYNSELF.get_number_keyed_int(n);
+    }
+
+/*
+
 =item C<void set_pmc_keyed(PMC *key, PMC *value)>
 
 Associates C<*value> with C<*key>.
@@ -180,6 +195,22 @@ Associates C<value> with C<*key>.
     void set_integer_keyed (PMC* key, INTVAL value) {
         INTVAL n = DYNSELF.elements();
         DYNSELF.set_integer_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+Associates C<value> with C<*key>.
+
+=cut
+
+*/
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_string_keyed_int(n, value);
         PerlHash.SELF.set_integer_keyed(key, n);
     }
 
@@ -214,6 +245,36 @@ Associates C<value> with C<*key>.
         DYNSELF.set_integer_keyed_int(n, value);
         PerlHash.SELF.set_integer_keyed_str(key, n);
     }
+
+/*
+
+=item C<void set_number_keyed (PMC *key, FLOATVAL value)>
+
+=cut
+
+*/
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_number_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed(key, n);
+    }
+
+/*
+
+=item C<void set_string_keyed_str(STRING *key, STRING *value)>
+
+=cut
+
+*/
+
+    void set_string_keyed_str (STRING* key, STRING* value) {
+        INTVAL n = DYNSELF.elements();
+        DYNSELF.set_string_keyed_int(n, value);
+        PerlHash.SELF.set_integer_keyed_str(key, n);
+    }
+
+/*
 
 /*
 

@@ -104,6 +104,8 @@ Marks the hash as live.
 
 =item C<INTVAL type_keyed_str(STRING *key)>
 
+Returns the type of the element for C<*key>.
+
 =cut
 
 */
