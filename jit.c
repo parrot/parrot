@@ -83,25 +83,28 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
            so mark this opcode as a branch source */
         if (op_info->jump)
             branch[cur_op - code_start] = JIT_BRANCH_SOURCE;
-        /* The branch target is relative, the offset is in last argument */
-        if (op_info->jump & PARROT_JUMP_RELATIVE) {
-            /* Set the branch target */
-            optimizer->branch_list[cur_op - code_start] =
-                cur_op + cur_op[op_info->arg_count - 1];
-            branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] = 
-                JIT_BRANCH_TARGET;
-        }
-        /* The branch target is absolute, the address is in last argument */
-        if (op_info->jump & PARROT_JUMP_ADDRESS) {
-            /* Set the branch target */
-            optimizer->branch_list[cur_op - code_start] =
-                cur_op + cur_op[op_info->arg_count - 1];
-            branch[cur_op[op_info->arg_count - 1]] = JIT_BRANCH_TARGET; 
+        /* If it's not a constant, no joy*/
+        if (op_info->types[op_info->arg_count - 1] == PARROT_ARG_IC) {
+            /* The branch target is relative, the offset is in last argument */
+            if (op_info->jump & PARROT_JUMP_RELATIVE) {
+                /* Set the branch target */
+                optimizer->branch_list[cur_op - code_start] =
+                    cur_op + cur_op[op_info->arg_count - 1];
+                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] = 
+                    JIT_BRANCH_TARGET;
+            }
+            /* The branch target is absolute, the address is in last argument */
+            if (op_info->jump & PARROT_JUMP_ADDRESS) {
+                /* Set the branch target */
+                optimizer->branch_list[cur_op - code_start] =
+                    cur_op + cur_op[op_info->arg_count - 1];
+                branch[cur_op[op_info->arg_count - 1]] = JIT_BRANCH_TARGET; 
+            }
         }
         /* The address of the next opcode */
         if ((op_info->jump & PARROT_JUMP_ENEXT) || 
             (op_info->jump & PARROT_JUMP_GNEXT))
-            branch[next_op - code_start] = JIT_BRANCH_TARGET;
+            branch[cur_op + op_info->arg_count - code_start] = JIT_BRANCH_TARGET;
         if (op_info->jump & PARROT_JUMP_UNPREDICTABLE)
             optimizer->has_unpredictable_jump = 1;
         /* Move to the next opcode */
