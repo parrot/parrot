@@ -8,7 +8,7 @@ t/library/dumper.t - Data Dumping
 
 =head1 SYNOPSIS
 
-	% perl t/library/dumper.t
+	% perl t/harness t/library/dumper.t
 
 =head1 DESCRIPTION
 
