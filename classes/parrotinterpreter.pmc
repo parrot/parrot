@@ -55,6 +55,17 @@ clone_regs(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 }
 
 /*
+ * copy / clone interpreter packfile / code
+ * all resources are created in the destination interpreter
+ */
+static void
+clone_code(Parrot_Interp d, Parrot_Interp s)
+{
+    Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
+    d->code = s->code;
+}
+
+/*
  * copied from parrotio.pmc - this ought to be a global
  * helper function
  */
@@ -89,6 +100,19 @@ thread_func(void *arg)
     return NULL;
 }
 
+static void
+thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s)
+{
+    PMC *ret_c;
+    clone_code(d, s);
+    /*
+     * provide a return continuation, so that CPS returns
+     * are working - create it in the new interpreters mem space
+     */
+    ret_c = pmc_new(d, enum_class_RetContinuation);
+    d->pmc_reg.registers[1] = ret_c;
+}
+
 /*
  * run the sub PMC in a separate thread using interpreter in dest_interp
  */
@@ -99,8 +123,7 @@ thread_run(Parrot_Interp interp, PMC* dest_interp, PMC* sub)
     Parrot_Interp interpreter = PMC_data(dest_interp);
 
     dest_interp->cache.struct_val = sub->cache.struct_val;
-    Interp_flags_SET(interpreter, PARROT_EXTERN_CODE_FLAG);
-    interpreter->code = interp->code;
+    thread_prepare_for_run(interpreter, interp);
     /*
      * for now create a detached thread - enough for testing
      */
@@ -149,16 +172,9 @@ pmclass ParrotInterpreter need_ext {
 	struct Parrot_Interp * new_interp =
 	    (struct Parrot_Interp *)PMC_data(SELF);
 	/*
-	 * provide a return continuation, so that CPS returns
-	 * are working
-	 */
-	PMC *ret_c = pmc_new(interpreter, enum_class_RetContinuation);
-	new_interp->pmc_reg.registers[1] = ret_c;
-	/*
 	 * setup code
 	 */
-	Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-	new_interp->code = interpreter->code;
+	thread_prepare_for_run(new_interp, interpreter);
 	/* calculate offset and run */
 	runops(new_interp, (opcode_t *)SELF->cache.struct_val -
 		(opcode_t *)interpreter->code->byte_code);
@@ -230,6 +246,9 @@ pmclass ParrotInterpreter need_ext {
 	 * for multi-threading we have to generate separate
 	 * profile, prederef, and JIT data
 	 */
+#if 0
+	clone_code(d, s);
+#endif
 	/*
 	 * set flags and run core
 	 */

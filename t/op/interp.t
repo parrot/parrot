@@ -282,7 +282,8 @@ output_is(<<'CODE', <<'OUTPUT', "thread 1");
     typeof S0, P6
     print S0
     print "\n"
-    end
+    invoke P1	# ret and be done with thread
+
 # output from threads could be reversed
 CODE
 ok 1
