@@ -171,6 +171,7 @@ TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
 LIBPARROT = ${blib_lib_libparrot_a}
 PDUMP = pdump${exe}
+PINFO = pbc_info${exe}
 IMCC_PROG = languages/imcc/imcc${exe}
 
 # lclint has changed name to splint at v3.0
@@ -306,6 +307,10 @@ $(DIS) : disassemble$(O) $(LIBPARROT)
 $(PDUMP) : pdump$(O) packdump$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(PDUMP) pdump$(O) packdump$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
 
+
+# pbc_info
+$(PINFO) : pbc_info$(O) $(LIBPARROT)
+	$(LINK) ${ld_out}$(PINFO) pbc_info$(O) $(LINKFLAGS) $(LIBPARROT) $(C_LIBS)
 
 ###############################################################################
 #
@@ -640,7 +645,7 @@ clean : testclean progclean
 progclean:
 	$(RM_F) $(O_FILES) \
 	        $(TEST_PROG) test_main$(O) test_main$(EXE) \
-	        $(PDUMP) pdump$(O) packdump$(O) \
+	        $(PDUMP) pdump$(O) packdump$(O) pbc_info$(O) $(PINFO) \
 	        $(PDB) pdb$(O) \
 	        $(DIS) disassemble$(O)
 	$(RM_RF) blib
