@@ -169,7 +169,7 @@ sub decode_line {
 	$l =~ s/>>//;
     }
     my $source = undef;
-    if ($l =~ /^\s+	     # intial space
+    if ($l =~ /^\s*	     # intial space
 	(?:(\d+)\s+)?   # optional line
 	(\d+)\s+        # PC
 	([\w+]+)\s+      # opcode e.g. SLICE+3
@@ -457,6 +457,9 @@ sub typ {
     elsif (is_num($c)) {        # num
 	$t = 'N';
     }
+    elsif ($c =~ /^\(/) {
+	$t = 'u'; # unimp
+    }
     $t;
 }
 
@@ -552,7 +555,7 @@ sub STORE_NAME {
     if ($make_f) {
 	$make_f = 0;
 	print_stack();
-	print "# make_f t$cmt\n";
+	print "# make_f \t$cmt\n";
 	return;
     }
     my $tos = pop @stack;
@@ -731,7 +734,7 @@ sub MAKE_FUNCTION
     my $f;
     $tos->[1] =~ /<code> (\S+)/;
     $f = $1;
-    print "\t\t$cmt\n";
+    print "\t\t$cmt $f\n";
     if ($n) {
 	for (my $i=0; $i < $n; ++$i) {
 	    my $arg = pop @stack;
@@ -1856,6 +1859,22 @@ sub DELETE_FAST {
     print <<EOC;
 	\t $cmt
 EOC
+}
+
+sub IMPORT_NAME {
+    my ($n, $c, $cmt) = @_;
+    pop @stack;
+    print <<EOC;
+	\t $cmt XXX
+EOC
+}
+sub IMPORT_FROM {
+    my ($n, $c, $cmt) = @_;
+    print <<EOC;
+	\t $cmt XXX
+EOC
+    # push @stack, [-1, 'time', 'P'];
+    $code_l++;
 }
 
 # vim: sw=4 tw=70:
