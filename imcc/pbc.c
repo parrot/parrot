@@ -504,8 +504,7 @@ add_const_str(struct Parrot_Interp *interpreter, char *str)
     }
     else if (*buf == '\'') {
         buf++;
-        buf[strlen(buf) - 1] = '\0'; /* get rid of trailing quote */
-        s = string_make(interpreter, buf, strlen(buf), "iso-8859-1",
+        s = string_make(interpreter, buf, strlen(buf) - 1, "iso-8859-1",
 						PObj_constant_FLAG);
     }
     else {
@@ -513,8 +512,7 @@ add_const_str(struct Parrot_Interp *interpreter, char *str)
     }
 
     k = PDB_extend_const_table(interpreter);
-    interpreter->code->const_table->constants[k]->type =
-        PFC_STRING;
+    interpreter->code->const_table->constants[k]->type = PFC_STRING;
     interpreter->code->const_table->constants[k]->u.string = s;
 
     return k;
