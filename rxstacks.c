@@ -75,9 +75,9 @@ intstack_pop(struct Parrot_Interp *interpreter, IntStack stack)
          * to fall through to the following exception throwing code. */
 
         /* If the chunk that has just become empty is not the last chunk
-         * on the stack then we make it the last chunk - the GC will clean
-         * up any chunks that are discarded by this operation. */
+         * on the stack then we make it the last chunk */
         if (chunk->next != stack) {
+            mem_sys_free(chunk->next);
             chunk->next = stack;
         }
 
@@ -119,7 +119,7 @@ intstack_free(struct Parrot_Interp *interpreter, IntStack stack)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

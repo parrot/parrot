@@ -49,10 +49,11 @@ pmclass Sub {
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
 		  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
        return ((struct Parrot_Sub*)SELF->data)->init;
-   } 
+   }
 
    PMC* clone () {
 	PMC * ret = new_pmc_header(INTERP);
+        ret->flags |= PMC_active_destroy_FLAG;
 	ret->vtable = &Parrot_base_vtables[enum_class_Sub];
 	ret->data = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(ret->data, SELF->data, sizeof(struct Parrot_Sub));

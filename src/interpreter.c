@@ -655,16 +655,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
         }
     }
     /* intstack */
-    {
-        IntStack top, next, chunk;
-        chunk = top = interpreter->ctx.intstack;
-        while(chunk != top) {
-            next = chunk->prev;
-            mem_sys_free(chunk);
-            chunk = next;
-        }
-        mem_sys_free(top);
-    }
+    intstack_free(interpreter, interpreter->ctx.intstack);
 
     PIO_destroy(interpreter);
 
