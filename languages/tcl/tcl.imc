@@ -1,0 +1,44 @@
+#
+# _main
+#
+# Setup the information the interpreter needs to run, 
+# then parse and interpret the tcl code we were passed.
+
+.sub _main @MAIN
+  .param pmc argv
+
+  load_bytecode "languages/tcl/lib/tcllib.pbc"
+
+  .local pmc filename,retval,math_funcs,source
+  .local string mode,chunk,contents
+  .local int argc,retcode
+
+  # start with a new pad...
+  new_pad 0
+
+  source = find_global "Tcl", "_source"
+
+  # If no file was specified, read from stdin.
+  argc = argv
+  if argc > 1 goto open_file
+  getstdin $P1
+  (retcode,retval) = source($P1)
+  close $P1
+  goto done
+
+open_file: 
+  filename = new String
+  filename = argv[1]
+  (retcode,retval) = source(filename)
+
+done:
+  # XXX 1 == TCL_ERROR
+  if retcode != 1 goto realdone
+  print retval
+  exit 1
+
+realdone:
+  # don't fall off the end of main, it's rude.
+  end
+ 
+.end
