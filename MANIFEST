@@ -35,6 +35,7 @@ string.c
 string.h
 strnative.c
 strnative.h
-test.pasm
-test2.pasm
+t/test.pasm
+t/test2.pasm
+t/test3.pasm
 test_main.c
