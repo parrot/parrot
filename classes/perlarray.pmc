@@ -595,6 +595,11 @@ pmclass PerlArray {
             );
         }
         else {
+            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+                SELF->vtable->get_integer(INTERP, SELF) +
+		value->vtable->get_integer(INTERP, value)
+            );
         }
     }
 
@@ -644,6 +649,11 @@ pmclass PerlArray {
             );
         }
         else {
+            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+                SELF->vtable->get_integer(INTERP, SELF) -
+		value->vtable->get_integer(INTERP, value)
+            );
         }
     }
 
@@ -693,6 +703,11 @@ pmclass PerlArray {
             );
         }
         else {
+            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+                SELF->vtable->get_integer(INTERP, SELF) *
+		value->vtable->get_integer(INTERP, value)
+            );
         }
     }
 
@@ -742,6 +757,11 @@ pmclass PerlArray {
             );
         }
         else {
+            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+                SELF->vtable->get_integer(INTERP, SELF) /
+		value->vtable->get_integer(INTERP, value)
+            );
         }
     }
 
@@ -784,6 +804,11 @@ pmclass PerlArray {
             );
         }
         else {
+            dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+            dest->vtable->set_integer_native(INTERP, dest, 
+                SELF->vtable->get_integer(INTERP, SELF) %
+		value->vtable->get_integer(INTERP, value)
+            );
         }
     }
 

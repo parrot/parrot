@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -914,6 +914,50 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "Math on two PerlArrays");
+    new P0, .PerlArray
+    new P1, .PerlArray
+    set P0, 3
+    set P1, 6
+    new P2, .PerlInt
+    add P2, P0, P1
+    set I0, P2
+    eq I0, 9, ok1
+    print "not "
+ok1:
+    print "ok 1\n"
+    sub P2, P1, P0
+    set I0, P2
+    eq I0, 3, ok2
+    print "not "
+ok2:
+    print "ok 2\n"
+    mul P2, P0, P1
+    set I0, P2
+    eq I0, 18, ok3
+    print "not "
+ok3:
+    print "ok 3\n"
+    div P2, P1, P0
+    set I0, P2
+    eq I0, 2, ok4
+    print "not "
+ok4:
+    print "ok 4\n"
+    mod P2, P0, P1
+    set I0, P2
+    eq I0, 3, ok5
+    print "not "
+ok5:
+    print "ok 5\n"
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 1;
