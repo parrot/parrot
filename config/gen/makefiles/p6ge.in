@@ -52,7 +52,7 @@ help:
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
-	@echo "                     (Doesn't work yet.)"
+	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
@@ -64,9 +64,12 @@ help:
 	@echo ""
 
 test: all
-	@echo "make test not supported yet."
+	cd ../..; $(PERL) -Ilib t/harness t/p6rules/*.t
 
-clean:
+testclean:
+	$(RM_RF) ../../t/p6rules/*.imc ../../t/p6rules/*.pasm
+
+clean: testclean
 	$(RM_RF) *$(O) p6ge$(SO)
 
 realclean: clean
