@@ -59,8 +59,8 @@ typedef struct Stack_Chunk {
 } Stack_Chunk_t;
 
 typedef struct Stack {
-    struct Stack_Chunk * base;
-    struct Stack_Chunk * top;
+    Stack_Chunk_t * base;
+    Stack_Chunk_t * top;
 } Stack_t;
 
 

@@ -89,8 +89,8 @@ typedef struct Parrot_Context {
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
 
-    struct stack_chunk *user_stack;     /* Base of the scratch stack */
-    struct stack_chunk *control_stack;  /* Base of the flow control stack */
+    struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
+    struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
 
 } * parrot_context_t;
 
@@ -114,8 +114,8 @@ typedef struct Parrot_Interp {
     struct SRegChunk *string_reg_base;  /* Base of the string stack */
     struct PRegChunk *pmc_reg_base;     /* Base of the PMC stack */
 
-    struct stack_chunk *user_stack;     /* Base of the scratch stack */
-    struct stack_chunk *control_stack;  /* Base of the flow control stack */
+    struct Stack_Chunk *user_stack;     /* Base of the scratch stack */
+    struct Stack_Chunk *control_stack;  /* Base of the flow control stack */
     IntStack intstack;                  /* Base of the regex stack */
 
     struct Stash *perl_stash;           /* Pointer to the global variable
