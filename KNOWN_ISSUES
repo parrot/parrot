@@ -44,9 +44,13 @@ Tests
 - ~1/3 of opcodes are uncovered by tests
 - src/tests are not supported on all platforms
 
+Miniparrot
+
+- Building miniparrot is broken
+
 Utilities
 
-- lib/Parrot/PackFile.pm is outdated and unused
+- lib/Parrot/PackFile* is outdated and unused
 
 Classes
 
