@@ -57,7 +57,7 @@ static void subst_constants(struct Parrot_Interp *interp);
 static void subst_constants_c(struct Parrot_Interp *interp);
 static void subst_constants_if(struct Parrot_Interp *interp);
 
-/* static void constant_propagation(struct Parrot_Interp *interp); */
+static void constant_propagation(struct Parrot_Interp *interp);
 static int used_once(void);
 static int loop_optimization(struct Parrot_Interp *);
 static int clone_remove(void);
@@ -97,7 +97,7 @@ int optimize(struct Parrot_Interp *interp) {
 
     if (optimizer_level & OPT_CFG) {
         info(2, "optimize\n");
-        /* constant_propagation(interp); */
+        constant_propagation(interp);
         if (clone_remove())
             return 1;
         if (used_once())
@@ -292,32 +292,11 @@ set_it:
     }
 }
 
-#if 0
+
 /*
- * Patch #22387 modified so that its working -- somehow
- * BUT: a register might get different constant values in different code
- *      paths, there may be loops and so on
- *
- *    ...
- *    set I2, 10
- *    set I1, P0["key"]         # some value coming out of the aggregate
- *    if I1, nxt
- * add:
- *    add I0, I2, I2
- *    print I0
- *    end
- * nxt:
- *    set I2, 20
- *    branch add
- *
- *    now I0 is what?
- *
- * The patch could be ok inside one basic block.
- *
- * So this patch is left here to show just the necessary code piese
- * how to substitute the constant.
- *
- * This code is only for documentation -lt
+ * does conservative constant propogation
+ * this code will not propogate constants past labels or saves
+ * even though sometimes it may be safe
  */
 
 static void
@@ -340,7 +319,9 @@ constant_propagation(struct Parrot_Interp *interp)
 
             debug(DEBUG_OPT1, "propagating constant %s => \n", ins_string(ins));
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
-                if (ins2->type & ITSAVES)
+                if (ins2->type & ITSAVES ||
+                    /* restrict to within a basic block */
+                    ins2->bbindex != ins->bbindex)
                     goto next_constant;
                 /* parrot opsize has opcode too, so argument count is
                  * opsize - 1
@@ -361,7 +342,7 @@ constant_propagation(struct Parrot_Interp *interp)
                                 debug(DEBUG_OPT2," - no %s\n", fullname);
                             }
                             else {
-                                --ins2->r[i]->use_count;
+                                --old->use_count;
                                 ins2->opnum = op;
                                 debug(DEBUG_OPT2," -> %s\n", ins_string(ins2));
                             }
@@ -376,7 +357,6 @@ next_constant:;
     }/*for(ins ... )*/
 }
 
-#endif
 
 /*
  * rewrite e.g. add_n_nc_ic => add_n_nc_nc
@@ -754,7 +734,6 @@ subst_constants_if(struct Parrot_Interp *interp)
     const char *ops[] = { "if", "unless" };
     size_t i;
     int res;
-    char *s;
 
     info(2, "\tsubst_constants_if\n");
     for (ins = instructions; ins; ins = ins->next) {
@@ -793,7 +772,7 @@ do_res:
                                 goto do_res;
                             case 'S':
                                 break;
-#if 0 
+#if 0
   /* UNREACHABLE */
                                 /* TODO strings have quote marks around them,
                                  * strip these in lexer
