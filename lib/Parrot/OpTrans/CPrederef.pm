@@ -19,7 +19,6 @@ use vars qw(@ISA);
 sub defines
 {
   return <<END;
-#define opcode_t void *
 #define REL_PC ((size_t)(cur_opcode - interpreter->prederef_code))
 #define CUR_OPCODE (((opcode_t *)interpreter->code->byte_code) + REL_PC)
 END
@@ -34,6 +33,8 @@ sub suffix
 {
   return "_prederef";
 }
+
+sub opsarraytype { return 'void *' };
 
 
 #

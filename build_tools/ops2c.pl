@@ -33,6 +33,7 @@ my $trans = $trans_class->new;
 my $prefix  = $trans->prefix;
 my $suffix  = $trans->suffix;
 my $defines = $trans->defines;
+my $opsarraytype = $trans->opsarraytype;
 
 my $file = shift @ARGV;
 
@@ -132,10 +133,10 @@ my $index = 0;
 
 foreach my $op ($ops->ops) {
     my $func_name  = $op->func_name;
-    my $arg_types  = "opcode_t *, struct Parrot_Interp *";
-    my $prototype  = "opcode_t * $func_name ($arg_types)";
-    my $args       = "opcode_t cur_opcode[], struct Parrot_Interp * interpreter";
-    my $definition = "static opcode_t *\n$func_name ($args)";
+    my $arg_types  = "$opsarraytype *, struct Parrot_Interp *";
+    my $prototype  = "$opsarraytype * $func_name ($arg_types)";
+    my $args       = "$opsarraytype *cur_opcode, struct Parrot_Interp * interpreter";
+    my $definition = "static $opsarraytype *\n$func_name ($args)";
     my $source     = $op->source($trans);
 
 #    print HEADER "$prototype;\n";
