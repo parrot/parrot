@@ -7,22 +7,55 @@ retrospect, I really wish I had kept with the bootstrapping effort, as I think
 it would have generated usable results sooner. Ah well, I now know more than
 I want to about IMCC. =-)
 
-This is a from-scratch implementation, based on the tcl man page(s). Another
-interesting project would have been to modify the tcl source and have it
-generate parrot directly. For some reason, I thought this would be more fun.
+This is a from-scratch implementation, based only on the tcl man page(s).
+Another interesting project would have been to modify the tcl source and 
+have it generate parrot directly. Many people smarter than I am have
+declared this I<hard>, so I'm rather happy I'm working on it this way.  
 
-This may explain the several months between each time I poked my head out 
-on the p6i list.
+(Apparently Tcl's bytecode engine is very optimized for Tcl (big surprise).
+So, converting the tcl-specific bytecodes there to parrot would apparently
+be a big deal.)
 
 =head1 RUNNING TCL
 
-A perl script called C<tcl.pl> grabs all the various PIR source files and
-generates a single PIR file, C<tcl.imc>. We then compile this to C<tcl.pbc>.
+When you make tcl, you're generating three files. 
+
+=over 4
+
+=item lib/tclword.pbc
+
+This is a parrot class that is used by the parser as the intermediate
+representation after parsing. So, for example, a line like
+
+ set a "$b " 
+
+would, after parsing, be comprised of three tclwords. The first, the
+constant C<set>, the second, the constant C<a>, and the third would
+consist of two elements: the variable reference for C<b>, followed
+by the constant C< >.
+
+=item lib/tcllib.pbc
+
+This .imc file is used to load all the various commands, ops, etc. into
+the appropriate namespaces, as well as declare and register the TCL
+compiler for the C<compile> opcode.
+
+=item tcl.pbc
+
+This is roughly equivalent to C<tclsh> - It takes the command line argument
+(currently, the name of the file you wish to parse), and reads in the file,
+and uses the tcl library to parse those contents as tcl.
+
+=back 4
+
+=head1 TESTS
 
 To run the test suite, C<make test>. If you want to also get output from the
 TODO tests, C<make devtest> instead. This is NOT the tcl test suite, it's
 a very small subset of features that I was sick of fixing everytime I made
 a small change to the parser.
+
+=head1 EXAMPLES
 
 There are examples in the C<examples> directory that are vaguely more
 interesting. To run one of the C<foo.tcl> files in that directory, type
