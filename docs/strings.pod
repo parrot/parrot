@@ -17,6 +17,24 @@ Revised to reflect changes since Buffer/PMC unification.
 This document describes how Parrot abstracts the programmer's interface
 to string types.
 
+=head1 ABSTRACT
+
+Parrot Strings are chunked international strings.
+
+=head1 OVERVIEW
+
+For various reasons, some of which relate to the sequence-of-integer
+abstraction, and some of which relate to "infinite" strings and arrays,
+Parrot Strings are represented by a list of chunks, where each chunk
+is a sequence of integers of the same size or representation,
+but different chunks can have different integer sizes or representations.
+The Parrot String API hides this from any module that wishes to work
+at the abstract string level.  In particular, it must hide this from
+the regex engine, which works on pure sequences in the abstract.
+
+So Parrot Strings are a wizzy internationalized equivalent of the
+old standard C library's string.h functions.
+
 =head1 The Parrot String API
 
 All strings used in the Parrot core should use the
