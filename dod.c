@@ -39,7 +39,6 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
 
     struct Small_Object_Arena *arena = GET_ARENA(obj);
-    PMC *children = NULL;
     size_t n = GET_OBJ_N(arena, obj);
     size_t ns = n >> ARENA_FLAG_SHIFT;
     UINTVAL nm = (n & ARENA_FLAG_MASK) << 2;
@@ -52,22 +51,15 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (*dod_flags & (PObj_is_special_PMC_FLAG << nm)) {
         if (((PMC*)obj)->pmc_ext) {
             /* put it on the end of the list */
-            if (interpreter->mark_ptr)
-                interpreter->mark_ptr->next_for_GC = (PMC *)obj;
-            else
-                children = (PMC *)obj;
+            interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+
             /* Explicitly make the tail of the linked list be
              * self-referential */
             interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
         }
         else if (PObj_custom_mark_TEST(obj))
             VTABLE_mark(interpreter, (PMC *) obj);
-    }
-
-    /* children is only set if there isn't already a children trace active */
-    if (children) {
-        trace_children(interpreter, children);
-        interpreter->mark_ptr = NULL;
+        return;
     }
 }
 
@@ -78,8 +70,6 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
  * individual pieces if they have private ones */
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
-    PMC *children = NULL;
-
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj)) {
         return;
@@ -102,10 +92,8 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
     if (PObj_is_special_PMC_TEST(obj)) {
         if (((PMC*)obj)->pmc_ext) {
             /* put it on the end of the list */
-            if (interpreter->mark_ptr)
-                interpreter->mark_ptr->next_for_GC = (PMC *)obj;
-            else
-                children = (PMC *)obj;
+            interpreter->mark_ptr->next_for_GC = (PMC *)obj;
+
             /* Explicitly make the tail of the linked list be
              * self-referential */
             interpreter->mark_ptr = ((PMC*)obj)->next_for_GC = (PMC *)obj;
@@ -124,12 +112,6 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
                 obj, ((Buffer*)obj)->bufstart);
     }
 #endif
-
-    /* children is only set if there isn't already a children trace active */
-    if (children) {
-        trace_children(interpreter, children);
-        interpreter->mark_ptr = NULL;
-    }
 }
 
 #endif
