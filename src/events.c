@@ -132,7 +132,7 @@ sig_handler(int signum)
             sig_int = 1;
             break;
         case SIGHUP:
-            sig_int = 1;
+            sig_hup = 1;
             break;
     }
 }

@@ -475,8 +475,6 @@ close S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-SKIP: {
-  skip("until the semantics of exceptions are done", 1);
 c_output_is(<<'CODE', <<'OUTPUT', "call a parrot sub, catch exception");
 
 #include <parrot/parrot.h>
@@ -531,7 +529,6 @@ in sub1
 caught
 back
 OUTPUT
-}
 
 unlink "$temp.pasm", "$temp.pbc";
 

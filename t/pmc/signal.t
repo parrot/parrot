@@ -60,7 +60,7 @@ sub send_SIGHUP {
 
 sub check_running {
     select undef, undef, undef, 0.1;
-    my @ps = `ps | grep [p]arrot`;
+    my @ps = `ps -C parrot -o pid`;
     my $thread = pop @ps;
     if ($thread =~ /^\s*(\d+)/ && $1 == $pid) {
 	ok(0, "parrot $pid still running");
