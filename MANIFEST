@@ -1535,7 +1535,6 @@ include/parrot/parrot.h                           [devel]include
 include/parrot/perltypes.h                        [devel]include
 include/parrot/pmc.h                              [devel]include
 include/parrot/pobj.h                             [devel]include
-include/parrot/pxs.h                              [devel]include
 include/parrot/regfuncs.h                         [devel]include
 include/parrot/register.h                         [devel]include
 include/parrot/resources.h                        [devel]include
@@ -2121,7 +2120,6 @@ pdb.c                                             []
 pdump.c                                           []
 pmc.c                                             []
 pmc.ops                                           []
-pxs.c                                             []
 register.c                                        []
 res_lea.c                                         []
 resources.c                                       []
