@@ -451,12 +451,13 @@ static void propagate_alias(void)
 
 void life_analysis(Parrot_Interp interpreter) {
     int i;
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
     info(interpreter, 2, "life_analysis\n");
 #ifdef ALIAS
     propagate_alias();
 #endif
-    for(i = 0; i < n_symbols; i++)
+    for(i = 0; i < IMCC_INFO(interpreter)->n_symbols; i++)
         analyse_life_symbol(interpreter, reglist[i]);
 }
 

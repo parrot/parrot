@@ -65,10 +65,12 @@
  * check life range of all symbols, find the max used mapped
  */
 static int
-max_used(int bbi, char t, int typ, int mapped[])
+max_used(Parrot_Interp interpreter, int bbi, char t, int typ, int mapped[])
 {
     int max, j, c;
-    for (j = 0, max = 0; j < n_symbols; j++) {
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+
+    for (j = 0, max = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
         SymReg * r = reglist[j];
         if (r->set != t)
             continue;
@@ -87,10 +89,13 @@ max_used(int bbi, char t, int typ, int mapped[])
  * if none found, don't emit load/store for preserved regs
  */
 static int
-min_used(int bbi, char t, int typ, int preserved[], int mapped[])
+min_used(Parrot_Interp interpreter, int bbi, char t, int typ,
+        int preserved[], int mapped[])
 {
     int max, j, c;
-    for (j = 0, max = mapped[typ]; j < n_symbols; j++) {
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+
+    for (j = 0, max = mapped[typ]; j < IMCC_INFO(interpreter)->n_symbols; j++) {
         SymReg * r = reglist[j];
         if (r->set != t)
             continue;
@@ -124,6 +129,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
     opcode_t pc;
     static int nsubs;
     opcode_t * jit_info_ptr;
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
     assert(INT_REGISTERS_TO_MAP < MAX_MAPPED);
     assert(FLOAT_REGISTERS_TO_MAP < MAX_MAPPED);
@@ -150,7 +156,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
      * compiled code - so track PMCs and invokes too
      */
     if (!has_compile && !dont_optimize) {
-        for (j = 0; j < n_symbols; j++) {
+        for (j = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
             r = reglist[j];
             if (r->set == 'K')
                 continue;
@@ -192,7 +198,8 @@ allocate_jit(struct Parrot_Interp *interpreter)
             for (typ = 0; ins != instructions && typ < 4; typ++)
                 for (k = 0; k < to_map[typ]; k++) {
                     reads[typ][k] = writes[typ][k] =
-                        k >= min_used(i, types[typ], typ, preserved, to_map);
+                        k >= min_used(interpreter, i, types[typ], typ,
+                                preserved, to_map);
                 }
             /* if extern, go through regs and check the usage */
             if (ins->opnum >= 0 && EXTCALL(&ins->opnum)) {
@@ -209,7 +216,7 @@ allocate_jit(struct Parrot_Interp *interpreter)
                      * if a reg was writen, we reload it after the
                      * extern code block
                      */
-                    for (j = 0; j < n_symbols; j++) {
+                    for (j = 0; j < IMCC_INFO(interpreter)->n_symbols; j++) {
                         r = reglist[j];
                         if (r->set == 'K')
                             continue;
@@ -221,7 +228,8 @@ allocate_jit(struct Parrot_Interp *interpreter)
                                 (ins->type & ITSAVES)) {
                             int bb_sub =
                                 find_sym(ins->r[0]->name)->first_ins->bbindex;
-                            if (max_used(bb_sub, types[typ], typ, to_map))
+                            if (max_used(interpreter, bb_sub, types[typ],
+                                        typ, to_map))
                                 reads[typ][c] = writes[typ][c] = nr = nw = 1;
                         }
                         if (instruction_reads(ins, r) ||

@@ -145,4 +145,3 @@ void pop_namespace(char * name);
 /* globals */
 
 EXTERN SymReg * hash[HASH_SIZE], *ghash[HASH_SIZE];
-EXTERN int n_symbols;

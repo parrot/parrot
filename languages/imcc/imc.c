@@ -52,6 +52,9 @@ extern int pasm_file;
 /* Globals: */
 
 static IMCStack nodeStack;
+static SymReg** interference_graph;
+static SymReg** reglist;
+static int n_symbols;
 
 /* allocate is the main loop of the allocation algorithm */
 void allocate(struct Parrot_Interp *interpreter) {
@@ -79,7 +82,7 @@ void allocate(struct Parrot_Interp *interpreter) {
         return;
 
     nodeStack = imcstack_new();
-    n_spilled = 0;
+    IMCC_INFO(interpreter)->n_spilled = 0;
 
     todo = first = 1;
     while (todo) {
@@ -167,15 +170,15 @@ void
 free_reglist(Parrot_Interp interpreter) {
     if (interference_graph) {
         free(interference_graph);
-        interference_graph = 0;
+        IMCC_INFO(interpreter)->interference_graph = interference_graph = 0;
     }
     if (reglist) {
         int i;
         for (i = 0; i < n_symbols; i++)
             free_life_info(interpreter, reglist[i]);
         free(reglist);
-        reglist = NULL;
-        n_symbols = 0;
+        IMCC_INFO(interpreter)->reglist = reglist = NULL;
+        IMCC_INFO(interpreter)->n_symbols = n_symbols = 0;
     }
 }
 
@@ -225,7 +228,8 @@ static void print_stat(Parrot_Interp interpreter)
     info(interpreter, 1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
     info(interpreter, 1, "\tregisters in .pasm:\t I%d, N%d, S%d, P%d - %d spilled\n",
-            cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1, n_spilled);
+            cols[0]+1, cols[1]+1, cols[2]+1, cols[3]+1,
+            IMCC_INFO(interpreter)->n_spilled);
     info(interpreter, 1, "\t%d basic_blocks, %d edges\n",
             IMCC_INFO(interpreter)->n_basic_blocks, edge_count(interpreter));
 
@@ -276,6 +280,7 @@ build_reglist(Parrot_Interp interpreter) {
     if (reglist == NULL) {
         fatal(1, "build_reglist","Out of mem\n");
     }
+    IMCC_INFO(interpreter)->reglist = reglist;
 
     for(i = count = 0; i < HASH_SIZE; i++) {
         SymReg * r = hash[i];
@@ -307,6 +312,7 @@ build_reglist(Parrot_Interp interpreter) {
             reglist[count++] = reglist[i];
     }
     n_symbols -= unused;
+    IMCC_INFO(interpreter)->n_symbols = n_symbols;
     sort_reglist();
 }
 
@@ -330,6 +336,7 @@ build_interference_graph(Parrot_Interp interpreter)
     interference_graph = calloc(n_symbols * n_symbols, sizeof(SymReg*));
     if (interference_graph == NULL)
         fatal(1, "build_interference_graph","Out of mem\n");
+    IMCC_INFO(interpreter)->interference_graph = interference_graph;
 
     /* Calculate interferences between each chain and populate the the Y-axis */
     for (x = 0; x < n_symbols; x++) {
@@ -709,7 +716,8 @@ try_allocate(Parrot_Interp interpreter) {
 			if (!colors[c]) {
 			    reglist[x]->color = c;
 
-                            debug(interpreter, DEBUG_IMC, "#[%s] provisionally gets color [%d]"
+                            debug(interpreter, DEBUG_IMC,
+                                    "#[%s] provisionally gets color [%d]"
                                      "(%d free colors, score %d)\n",
 					reglist[x]->name, c,
                                         free_colors, reglist[x]->score);
@@ -887,15 +895,34 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
     if (old_symbol->usage & U_SPILL)
         fatal(1, "spill", "double spill - program too complex\n");
     new_symbol->usage |= U_SPILL;
-    p31 = mk_pasm_reg(str_dup("P31"));
 
-    n_spilled++;
+    IMCC_INFO(interpreter)->n_spilled++;
     n = 0;
     dl = 0;     /* line corr */
     tmp = NULL;
 
-    for(ins = instructions; ins; ins = ins->next) {
 
+    /* first instruction should be ".sub" -- make sure we allocate P31
+     * _after_ subroutine entry.  And after the "saveall", or any
+     * other assortment of pushes. */
+
+    if (!IMCC_INFO(interpreter)->p31) {
+        Instruction *spill_ins;
+
+        p31 = IMCC_INFO(interpreter)->p31 = mk_pasm_reg(str_dup("P31"));
+        ins = instructions;
+        while (ins
+                && (strncmp(ins->fmt, "push", 4) == 0
+                    || strcmp(ins->fmt, "saveall") == 0)) {
+            ins = ins->next;
+        }
+        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), NULL, 0);
+        insert_ins(ins, spill_ins);
+    }
+    else
+        p31 = IMCC_INFO(interpreter)->p31;
+
+    for(ins = instructions; ins; ins = ins->next) {
 	needs_store = 0;
 	needs_fetch = 0;
 
@@ -910,7 +937,7 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
 	if (needs_fetch) {
 	    regs[0] = new_symbol;
             regs[1] = p31;
-            sprintf(buf, "%d", n_spilled);
+            sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
             regs[2] = mk_const(str_dup(buf), 'I');
 	    sprintf(buf, "%%s, %%s[%%s] #FETCH %s", old_symbol->name);
 	    tmp = INS(interpreter, "set", buf, regs, 3, 4, 0);
@@ -929,7 +956,7 @@ spill(struct Parrot_Interp *interpreter, int spilled) {
                 ins->r[i] = new_symbol;
 	if (needs_store) {
             regs[0] = p31;
-            sprintf(buf, "%d", n_spilled);
+            sprintf(buf, "%d", IMCC_INFO(interpreter)->n_spilled);
             regs[1] = mk_const(str_dup(buf), 'I');
 	    regs[2] = new_symbol;
 	    sprintf(buf, "%%s[%%s], %%s #STORE %s", old_symbol->name);

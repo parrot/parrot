@@ -455,23 +455,6 @@ int emit_flush(void *param) {
 
     Instruction * ins, *next;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
-    /* first instruction should be ".sub" -- make sure we allocate P31
-     * _after_ subroutine entry.  And after the "saveall", or any
-     * other assortment of pushes. */
-
-    if (n_spilled > 0 && instructions) {
-        SymReg *p31;
-        Instruction *spill_ins;
-        p31 = mk_pasm_reg(str_dup("P31"));
-        ins = instructions;
-        while (ins
-                && (strncmp(ins->fmt, "push", 4) == 0
-                    || strcmp(ins->fmt, "saveall") == 0)) {
-            ins = ins->next;
-        }
-        spill_ins = iNEW(interpreter, p31, str_dup("PerlArray"), NULL, 0);
-        insert_ins(ins, spill_ins);
-    }
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(param);
     for (ins = instructions; ins; ins = ins->next) {

@@ -160,20 +160,19 @@ dump_labels(Parrot_Interp interpreter)
     fprintf(stderr, "\n");
 }
 
-extern int n_comp_units;
 void dump_symreg(Parrot_Interp interpreter) {
     int i;
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
     if (!reglist)
         return;
     fprintf(stderr,
-            "\nSymbols: n_comp_units %d"
-            "\n----------------------------------------------\n",
-            n_comp_units);
+            "\nSymbols:"
+            "\n----------------------------------------------\n");
     fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \tscore\t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
-    for(i = 0; i <n_symbols; i++) {
+    for(i = 0; i < IMCC_INFO(interpreter)->n_symbols; i++) {
         SymReg * r = reglist[i];
         if(!(r->type & VTREGISTER))
             continue;
@@ -197,9 +196,10 @@ void dump_symreg(Parrot_Interp interpreter) {
 
 void dump_liveness_status(Parrot_Interp interpreter) {
     int i;
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
 
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
-    for(i = 0; i <n_symbols; i++) {
+    for(i = 0; i <IMCC_INFO(interpreter)->n_symbols; i++) {
         SymReg * r = reglist[i];
         if (r->type & VTREGISTER )
             dump_liveness_status_var(interpreter, r);
@@ -213,7 +213,6 @@ void dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r) {
     int i;
     Life_range *l;
 
-    UNUSED(interpreter);
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info==NULL) return;
     for (i=0; i<IMCC_INFO(interpreter)->n_basic_blocks; i++) {
@@ -250,8 +249,10 @@ void dump_liveness_status_var(Parrot_Interp interpreter, SymReg* r) {
 void dump_interference_graph(Parrot_Interp interpreter) {
     int x, y, cnt;
     SymReg *r;
+    SymReg** reglist = IMCC_INFO(interpreter)->reglist;
+    SymReg** interference_graph = IMCC_INFO(interpreter)->interference_graph;
+    int n_symbols = IMCC_INFO(interpreter)->n_symbols;
 
-    UNUSED(interpreter);
     fprintf(stderr, "\nDumping the Interf. graph:"
             "\n-------------------------------\n");
     for (x = 0; x < n_symbols; x++) {

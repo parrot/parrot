@@ -73,9 +73,6 @@ char *str_cat(const char *, const char *);
 /* globals */
 
 
-EXTERN int n_spilled;
-EXTERN SymReg** interference_graph;
-EXTERN SymReg** reglist;
 
 EXTERN char * sourcefile;	/* current file */
 EXTERN char * function;	/* current function */
@@ -118,6 +115,12 @@ typedef struct {
     int n_loops;
     Loop_info ** loop_info;
     Edge * edge_list;
+    /* register allocation */
+    int n_spilled;
+    SymReg * p31;
+    SymReg** interference_graph;
+    SymReg** reglist;
+    int n_symbols;
 } imcc_info_t;
 
 #define IMCC_INFO(i) ((imcc_info_t*) (i)->imcc_info)
