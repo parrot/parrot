@@ -23,7 +23,7 @@
 
 use sys;
 
-const int N = 100;
+const int N = 1000;
 var   int q = 1;
 
 var num start_time;

@@ -22,6 +22,7 @@ use Jako::Construct::Block::Bare;
 use Jako::Construct::Block::Conditional::Else;
 use Jako::Construct::Block::Conditional::If;
 use Jako::Construct::Block::Conditional::Unless;
+use Jako::Construct::Block::File;
 use Jako::Construct::Block::Module;
 use Jako::Construct::Block::Sub;
 use Jako::Construct::Block::Loop::Continue;
@@ -58,7 +59,7 @@ sub new
 {
   my $class = shift;
 
-  my $root = Jako::Construct::Block::Bare->new(
+  my $root = Jako::Construct::Block::File->new(
     undef,  # No parent
     'file', # File scope
     undef,  # No return type

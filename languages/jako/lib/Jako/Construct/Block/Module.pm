@@ -82,11 +82,11 @@ sub compile
   }
 
   if ($self->content) {
-    $compiler->emit(".namespace ${namespace}");
-    $compiler->indent;
+#    $compiler->emit(".namespace ${namespace}");
+#    $compiler->indent;
     $self->SUPER::compile($compiler);
-    $compiler->outdent;
-    $compiler->emit(".endnamespace ${namespace}");
+#    $compiler->outdent;
+#    $compiler->emit(".endnamespace ${namespace}");
   }
 
   return 1;

@@ -226,21 +226,13 @@ sub push_content
 sub compile
 {
   my $self = shift;
-  my ($compiler) = @_;
-
-  if ($self->kind eq 'file') {
-    $compiler->emit(".sub ___MAIN");
-    $compiler->emit("  call __MAIN");
-    $compiler->emit("  end");
-    $compiler->emit(".end");
-    $compiler->emit("__MAIN:");
-  }
+  my ($compiler, $filter) = @_;
 
   foreach my $construct ($self->content) {
+    next if $filter and not &$filter($construct);
+
     $construct->compile($compiler);
   }
-
-  $compiler->emit("  ret") if $self->kind eq 'file';
 }
 
 
