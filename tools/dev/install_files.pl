@@ -185,4 +185,6 @@ for my $dir (keys %directories) {
 foreach (@files) {
     my ($src, $dest) = @$_;
     copy($src, $dest) or die "copy $src to $dest: $!\n";
+    my $mode = (stat($src))[2];
+    chmod $mode, $dest;
 }
