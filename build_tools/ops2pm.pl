@@ -252,7 +252,8 @@ for(@{$real_ops->{OPS}}) {
 }
 
 print OUT <<END_C;
-}
+} parrot_opcode_enums;
+
 #endif
 
 END_C

@@ -13,6 +13,7 @@
 #include <string.h>
 #include "imc.h"
 #include "optimizer.h"
+#include "parrot/oplib/ops.h"
 
 /* #define ALIAS */
 
@@ -600,8 +601,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
          * if we have a setp_ind opcode, it may write all PMC
          * registers from 5..15
          */
-        if (ins->opnum == 921 && r->set == 'P') {
-            assert(strcmp(ins->op, "setp_ind") == 0);
+        if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P') {
             r->usage |= U_NON_VOLATILE;
         }
 

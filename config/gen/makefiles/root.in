@@ -159,6 +159,7 @@ GEN_OPSFILES =
 GEN_HEADERS = \
     $(INC)/vtable.h \
     $(INC)/oplib/core_ops.h \
+    $(INC)/oplib/ops.h \
     $(SRC)/parrot_config.h \
     $(INC)/oplib/core_ops_switch.h
 
