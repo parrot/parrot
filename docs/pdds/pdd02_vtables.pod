@@ -55,7 +55,8 @@ generally referred to as a PMC, or Perl Magic Cookie. Nothing outside
 the core of perl (in fact, nothing outside the data type's vtable
 routines) should infer anything about a PMC. (hence the Magic part)
 
-The first parameter to all of these should be the destination PMC.
+The first parameter to all of these should be the destination PMC.  The
+second parameeter should be the current interpreter.
 
 vtables are neat because they decouple the interface and
 implementation of various object functions. This does mean, though,
@@ -72,13 +73,13 @@ versions of these)
 
 =over 4
 
-=item void init(PMC)
+=item void init(INTERP, PMC)
 
 The init vtable method takes an unused PMC as a parameter, and turns
 it into a PMC appropriate for the class owning the vtable. Called as a
 class method.
 
-=item void morph(PMC, type)
+=item void morph(INTERP, PMC, type)
 
 turns the PMC into a PMC of type C<type>. If the morphing can't be
 reasonably done, for example if an integer is asked to turn into a
@@ -90,7 +91,7 @@ coercing a PMC to a particular type, and isn't meant as a general
 purpose casting tool. Compilers should only emit valid
 transformations.
 
-=item PMC mark(PMC, PMC)
+=item PMC *mark(INTERP, PMC, PMC)
 
 Called by the DOD when its sweeping through the PMCs and has detected
 that this PMC is both alive and has a custom mark routine. The second
@@ -109,7 +110,7 @@ C level either.
 
 This routine may B<not> throw an exception.
 
-=item void destroy(PMC)
+=item void destroy(INTERP, PMC)
 
 This method is called by the DOD when it determines that a PMC is
 dead, and that PMC has marked itself as having a destroy method.
@@ -127,63 +128,63 @@ form. The keyed form takes a KEY for I<each> PMC parameter.
 
 =over 4
 
-=item INTVAL type(PMC) 
+=item INTVAL type(INTERP, PMC) 
 
 Return the type of the PMC. Type is a unique tag associated with the
 PMC when the PMC's class is loaded. Negative numbers are considered
 interpreter-specific, non-public types.
 
-=item UINTVAL subtype(PMC, type)
+=item UINTVAL subtype(INTERP, PMC, type)
 
 Returns the subtype of a PMC. (Note that this may be unimplemented,
 and may go away) This is intended to return information about the
 PMC--what type of number or string it is, whether it's a scalar, hash,
 array, or list, and suchlike things.
 
-=item STRING *name(PMC) 
+=item STRING *name(INTERP, PMC) 
 
 Return the name of the class for the PMC.
 
-=item PMC *clone(PMC) 
+=item PMC *clone(INTERP, PMC) 
 
 Return a clone of the specified PMC. If the PMC is fake, for example
 we're asking for a clone of an element of an integer array, this must
 return an appropriate real  PMC that holds the fake information.
 
-=item PMC *find_method(PMC, string) 
+=item PMC *find_method(INTERP, PMC, string) 
 
 Returns a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
 
-=item INTVAL get_integer(PMC) 
+=item INTVAL get_integer(INTERP, PMC) 
 
 Returns the native integer value of the PMC.
 
-=item NUMVAL get_number(PMC) 
+=item NUMVAL get_number(INTERP, PMC) 
 
 Returns the native float value of the PMC.
 
-=item BIGNUM *get_bignum(PMC) 
+=item BIGNUM *get_bignum(INTERP, PMC) 
 
 Returns the value of the PMC as a bignum.
 
-=item STRING *get_string(PMC) 
+=item STRING *get_string(INTERP, PMC) 
 
 Returns the native string value of the PMC. This may be in the
 encoding of the PMC's choice.
 
-=item INTVAL get_bool(PMC) 
+=item INTVAL get_bool(INTERP, PMC) 
 
 Returns the constant TRUE if the PMC is true, or FALSE if the PMC is
 false.
 
-=item INTVAL elements(PMC)
+=item INTVAL elements(INTERP, PMC)
 
 Returns the number of elements in the PMC.
 
-=item PMC *get_pmc(PMC)
+=item PMC *get_pmc(INTERP, PMC)
 
 Returns the PMC for this PMC. While this may seem nonsensical, it's
 useful in several circumstances. If the PMC is being accessed with a
@@ -192,34 +193,34 @@ being accessed may return something odd, for example a reference, it
 may return a value different than the PMC that get_pmc is being called
 on.
 
-=item INTVAL is_same(PMC, PMC)
+=item INTVAL is_same(INTERP, PMC, PMC)
 
 Returns TRUE if the PMCs are the same, and FALSE if
 they're not. In this case, "the same" means identical at a low
 level. For plain equality, use the is_equal method.
 
-=item void set_integer(PMC, INTVAL)
+=item void set_integer(INTERP, PMC, INTVAL)
 
 Sets the PMC to the integer value passed. What the PMC does with the
 passed in integer depends on the class.
 
-=item void set_number(PMC, NUMVAL)
+=item void set_number(INTERP, PMC, NUMVAL)
 
 Sets the PMC to the numeric value passed in.
 
-=item void set_bignum(PMC, BIGNUM *)
+=item void set_bignum(INTERP, PMC, BIGNUM *)
 
 Sets the PMC to the passed in bignum value.
 
-=item void set_string(PMC, STRING *)
+=item void set_string(INTERP, PMC, STRING *)
 
 Sets the PMC to the passed in string value.
 
-=item void set_pmc(PMC, PMC)
+=item void set_pmc(INTERP, PMC, PMC)
 
 Assigns the source PMC to the destination PMC. 
 
-=item void set_same(PMC, PMC)
+=item void set_same(INTERP, PMC, PMC)
 
 A shortcut version of C<set_pmc> in those cases where the interpreter
 knows the source and destination PMCs are of the same type.
@@ -230,20 +231,20 @@ The following vtable functions come in multiple flavors, one for each
 numeric type (INTVAL, NUMVAL, BIGNUM) and a PMC. Each flavor has a
 keyed and non-keyed version.
 
-Each function does what its name implies and returns a PMC with the
-result.
+Each function does what its name implies and puts the result in
+dest.
 
 =over 4
 
-=item PMC *add(PMC, value)
+=item void add(INTERP, PMC, value, dest)
 
-=item PMC *subtract(PMC, value)
+=item void subtract(INTERP, PMC, value, dest)
 
-=item PMC *multiply(PMC, value)
+=item void multiply(INTERP, PMC, value, dest)
 
-=item PMC *divide(PMC, value)
+=item void divide(INTERP, PMC, value, dest)
 
-=item PMC *modulus(PMC, value)
+=item void modulus(INTERP, PMC, value, dest)
 
 =back
 
@@ -251,78 +252,82 @@ The following vtable functions all have a keyed and non-keyed version.
 
 =over 4
 
-=item PMC *concatenante(PMC, value)
+=item void concatenante(INTERP, PMC, value, dest)
 
 There are two forms of this, where value is a STRING and where it's a
 PMC. In either case, a PMC representing the two source values
-concatenated together is returned.
+concatenated together is placed in dest.
 
-=item INTVAL is_equal(PMC, PMC)
+=item INTVAL is_equal(INTERP, PMC, PMC)
 
 Returns TRUE if the two PMCs are generically equivalent, or
 FALSE if they aren't. 
 
-=item INTVAL cmp(PMC, PMC)
-=item INTVAL cmp_num(PMC, PMC)
-=item INTVAL cmp_string(PMC, PMC)
+=item INTVAL cmp(INTERP, PMC, PMC)
+
+=item INTVAL cmp_num(INTERP, PMC, PMC)
+
+=item INTVAL cmp_string(INTERP, PMC, PMC)
 
 Compares the two PMCs. Returns -1 if the left PMC is smaller, 0 if they
 are equal, and 1 if the right PMC is smaller. C<cmp> compares the
 two as PMCs (whatever that means for the class), C<cmp_num> compares
 them numerically, and C<cmp_string> compares them as strings.
 
-=item PMC *logical_or(PMC, PMC)
+=item void logical_or(INTERP, PMC, value, dest)
 
-Does a short-circuiting logical or, and returns the PMC that
-wins. 
+Does a short-circuiting logical or, storing the winner in
+dest. 
 
-=item PMC *logical_and(PMC, PMC)
+=item void logical_and(INTERP, PMC, value, dest)
 
-Does a short-circuiting logical and and returns the PMC that
-wins.
+Does a short-circuiting logical and, storing the winner in
+dest. 
 
-=item  PMC *logical_xor(PMC, PMC)
+=item void logical_xor(INTERP, PMC, value, dest)
 
-Does a logical xor on the two parameters and returns a PMC
-representing the result.
+Does a logical xor on the two parameters, storing the result in
+dest.
 
-=item PMC *repeat(PMC, value)
+=item void repeat(INTERP, PMC, value, dest)
 
-Where value can be either an INTVAL or a PMC. Returns a PMC that
-represents the leftmost PMC repeated value times.
+Where value can be either an INTVAL or a PMC. Updates dest with
+the value of the leftmost PMC repeated value times.
 
-=item void increment(PMC)
+=item void increment(INTERP, PMC)
 
 Autoincrement the PMC.
 
-=item void decrement(PMC)
+=item void decrement(INTERP, PMC)
 
 Autodecrement the PMC.
 
-=item INTVAL exists(PMC, key)
+=item INTVAL exists(INTERP, PMC, key)
 
 This is only valid for keyed access. Returns TRUE or
 FALSE if the key exists or doesn't in the aggregate being
 queried.
 
-=item INTVAL defined(PMC)
+=item INTVAL defined(INTERP, PMC)
 
 Checks to see if the PMC is defined. Returns TRUE or
 FALSE.
 
-=item void delete(PMC, key)
+=item void delete(INTERP, PMC, key)
 
 Delete the specified entry from the aggregate.
 
-=item KEY *nextkey(PMC, key)
+=item KEY *nextkey(INTERP, PMC, key)
 
 Given the passed in key for the PMC, return the next key.
 
-=item PMC *substr(PMC, offset, length)
-=item STRING *substr_str(PMC, offset, length)
+=item void substr(INTERP, PMC, offset, length, dest)
 
-Return a substring of the passed in PMC. Returns a substring, either
-as a PMC or a STRING.
+Place the value of the substring of PMC into dest.
+
+=item STRING *substr_str(INTERP, PMC, offset, length)
+
+Return a substring of the passed in PMC.
 
 =back
 
