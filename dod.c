@@ -221,6 +221,10 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     for (; current != prev; current = current->next_for_GC) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
+        /* mark properties */
+        if (current->metadata) {
+            last = mark_used(current->metadata, last);
+        }
         /* Start by checking if there's anything at all. This assumes that the
          * largest percentage of PMCs won't have anything in their data
          * pointer that we need to trace */

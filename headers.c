@@ -40,6 +40,7 @@ add_free_pmc(struct Parrot_Interp *interpreter,
 
     /* Don't let it point to garbage memory */
     ((PMC *)pmc)->data = NULL;
+    ((PMC *)pmc)->metadata = NULL;
 
     /* Copied from add_free_object */
     *(void **)pmc = pool->free_list;
