@@ -246,20 +246,6 @@ omitted, increment is 1.
 Decrement register x by nn. nn is an integer constant. If nn is
 omitted, decrement by 1.
 
-=item iton Nx, Iy
-
-Copy the integer value from register y to the numeric register x.
-
-=item ntoi Ix, Ny
-
-Copy the number from register y to register x. Copy is truncated, and
-may be capped if it is too large or small for an integer.
-
-=item tostring Sx, ty, Iz
-
-Take the value in register y and convert it to a string of type z,
-storing the result in string register x.
-
 =back
 
 =head2 Transcendental operations
