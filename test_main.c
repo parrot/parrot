@@ -151,7 +151,7 @@ main(int argc, char **argv) {
             }
 
             if (read_result < 0) {
-                internal_exception(IO_ERROR,"Problem reading from stdin\n");
+                internal_exception(PIO_ERROR,"Problem reading from stdin\n");
             }
         }
         else { /* read from file */
