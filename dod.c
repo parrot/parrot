@@ -145,7 +145,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         cur_stack = cur_stack->prev;
     }
 
-    cur_stack = interpreter->ctx.intstack;
+    cur_stack = (Stack_Chunk_t *)interpreter->ctx.intstack;
 
     while (cur_stack) {
         if(cur_stack->buffer){
