@@ -177,15 +177,15 @@ sub unpack
 {
   my ($self, $string) = @_;
 
-  my $type = shift_intval($string);
-  my $size = shift_intval($string);
+  my $type = shift_op($string);
+  my $size = shift_op($string);
 
   my $value;
 
   if ($type == $type_codes{'PFC_NONE'}) {
     $value = undef;
   } elsif ($type == $type_codes{'PFC_INTEGER'}) {
-    $value = shift_intval($string);
+    $value = shift_op($string);
   } elsif ($type == $type_codes{'PFC_NUMBER'}) {
     $value = shift_floatval($string);
   } elsif ($type == $type_codes{'PFC_STRING'}) {
@@ -197,7 +197,7 @@ sub unpack
   $self->{TYPE}  = $type;
   $self->{VALUE} = $value;
 
-  return $size + 2 * sizeof('intval');
+  return $size + 2 * sizeof('op');
 }
 
 
@@ -209,12 +209,12 @@ sub packed_size
 {
   my $self = shift;
 
-  my $size = 2 * sizeof('intval'); # For type and size
+  my $size = 2 * sizeof('op'); # For type and size
 
   if ($self->type == $type_codes{'PFC_NONE'}) {
     $size += 0;
   } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
-    $size += sizeof('intval');
+    $size += sizeof('op');
   } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
     $size += sizeof('floatval');
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
@@ -237,18 +237,18 @@ sub pack
   my $self = shift;
   my $packed = '';
   
-  $packed .= pack_intval($self->type);
+  $packed .= pack_op($self->type);
 
   if ($self->type == $type_codes{'PFC_NONE'}) {
-    $packed .= pack_intval(0);
+    $packed .= pack_op(0);
   } elsif ($self->type == $type_codes{'PFC_INTEGER'}) {
-    $packed .= pack_intval(sizeof("intval"));
-    $packed .= pack_intval($self->value);
+    $packed .= pack_op(sizeof("op"));
+    $packed .= pack_op($self->value);
   } elsif ($self->type == $type_codes{'PFC_NUMBER'}) {
-    $packed .= pack_intval(sizeof("floatval"));
+    $packed .= pack_op(sizeof("floatval"));
     $packed .= pack_floatval($self->value);
   } elsif ($self->type == $type_codes{'PFC_STRING'}) {
-    $packed .= pack_intval($self->value->packed_size);
+    $packed .= pack_op($self->value->packed_size);
     $packed .= pack_sv($self->value);
   } else {
     die;

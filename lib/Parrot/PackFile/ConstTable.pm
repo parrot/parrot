@@ -91,7 +91,7 @@ sub packed_size
 {
   my $self = shift;
 
-  my $size = sizeof('intval');
+  my $size = sizeof('op');
 
   foreach (@{$self->{CONST}}) {
     $size += $_->packed_size;
@@ -110,7 +110,7 @@ sub pack
   my $self = shift;
   my $packed = '';
 
-  $packed .= pack_intval($self->const_count);
+  $packed .= pack_op($self->const_count);
 
   foreach (@{$self->{CONST}}) {
     $packed .= $_->pack;
