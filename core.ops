@@ -452,6 +452,8 @@ These operations load registers from constants or other registers.
 Make a clone of $2, and put it in $1. Doesn't affect what was in
 $1. Removes the constant flag on the copy, if there was one.
 
+=cut
+
 inline op clone(out STR, in STR) {
   $1 = string_copy(interpreter, $2);
   goto NEXT();
@@ -463,6 +465,8 @@ inline op clone(out STR, in STR) {
 =item B<set_addr>(out INT, in INT)
 
 Sets register $1 to the current address plus the offset $2
+
+=cut
 
 inline op set_addr(out INT, in INT) {
   $1 = (INTVAL) (CUR_OPCODE + $2);
@@ -1159,10 +1163,6 @@ op if(in PMC, inconst INT) {
   }
   goto NEXT();
 }
-
-
-=cut
-
 
 
 ###############################################################################
