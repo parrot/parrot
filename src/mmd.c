@@ -367,6 +367,7 @@ mmd_add_function(Interp *interpreter,
             MMD_table *table = interpreter->binop_mmd_funcs + i;
             table->x = table->y = 0;
             table->mmd_funcs = NULL;
+            table->default_func = NULL;
         }
         interpreter->n_binop_mmd_funcs = func_nr + 1;
     }
