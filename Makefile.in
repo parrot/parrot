@@ -4,7 +4,7 @@ H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpret
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
 
-C_FLAGS = ${ccflags}
+C_FLAGS = ${ccflags} -I..
 
 C_LIBS = ${libs}
 

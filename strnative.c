@@ -6,7 +6,7 @@
    we don't make any assumptions about what those bytes *mean*.
 */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 static IV 
 string_native_compute_strlen (STRING *s) {

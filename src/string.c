@@ -4,7 +4,7 @@
  *
  */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 /* Basic string stuff - creation, enlargement, destruction, etc. */
 

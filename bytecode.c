@@ -19,7 +19,7 @@ structure of the frozen bycode.
 
  */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 #define GRAB_IV(x) *((IV*)*x)++
 

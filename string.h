@@ -66,5 +66,5 @@ void string_init(void);
 
 STRING_VTABLE Parrot_string_vtable[enc_max];
 
-#include "strnative.h"
+#include "parrot/strnative.h"
 #endif

@@ -4,8 +4,8 @@
  *
  */
 
-#include "parrot.h"
-#include "math.h"
+#include "parrot/parrot.h"
+#include <math.h>
 
 /* SET Ix, CONSTANT */
 AUTO_OP set_i_ic {

@@ -4,7 +4,7 @@
  *
  */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 IV opcodes[] = {3, 1,                /* put the time in reg 1 */
                 0, 2, 0,             /* Set reg 2 to 0 */

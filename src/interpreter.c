@@ -5,8 +5,8 @@
  */
 
 
-#include "parrot.h"
-#include "interp_guts.h"
+#include "parrot/parrot.h"
+#include "parrot/interp_guts.h"
 
 void
 runops (struct Perl_Interp *interpreter, IV *code) {

@@ -4,7 +4,7 @@
  *
  */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 /* Allocate a chunk of memory aligned on a power-of-2 boundary */
 void *

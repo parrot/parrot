@@ -13,7 +13,7 @@
 #define VAR_SCOPE extern
 #endif
 
-#include "config.h"
+#include "parrot/config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,15 +46,15 @@ typedef struct PMC PMC;
 
 typedef void STRING_FUNCS;
 
-#include "global_setup.h"
-#include "string.h"
-#include "interpreter.h"
-#include "register.h"
-#include "exceptions.h"
-#include "memory.h"
-#include "bytecode.h"
-#include "io.h"
-#include "op.h"
-#include "events.h"
+#include "parrot/global_setup.h"
+#include "parrot/string.h"
+#include "parrot/interpreter.h"
+#include "parrot/register.h"
+#include "parrot/exceptions.h"
+#include "parrot/memory.h"
+#include "parrot/bytecode.h"
+#include "parrot/io.h"
+#include "parrot/op.h"
+#include "parrot/events.h"
 
 #endif

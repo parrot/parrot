@@ -9,7 +9,7 @@
 #if !defined(PARROT_INTERPRETER_H_GUARD)
 #define PARROT_INTERPRETER_H_GUARD
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 struct Perl_Interp {
   struct IReg *int_reg;            /* Current top of int reg stack */

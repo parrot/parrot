@@ -7,7 +7,7 @@
 #if !defined(__PARROT_REGISTER_H_GUARD)
 #define __PARROT_REGISTER_H_GUARD
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 struct IReg {
   IV registers[NUM_REGISTERS];

@@ -4,7 +4,7 @@
  *
  */
 
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 void
 Parrot_push_i(struct Perl_Interp *interpreter) {

@@ -7,7 +7,7 @@
  */
 
 #define INSIDE_GLOBAL_SETUP
-#include "parrot.h"
+#include "parrot/parrot.h"
 
 void
 init_world() {
