@@ -1,10 +1,10 @@
 =head1 TITLE
 
-dod
+Dead object detection (DOD)
 
 =head1 Overview
 
-The dod code performs dead object detection and reclamation, thereby
+The DOD code performs dead object detection and reclamation, thereby
 implementing a mark and copy garbage collector.  The official
 garbage collection PDD is PDD 9 and is located in the
 docs/pdds directory of the parrot distribution.  This .dev

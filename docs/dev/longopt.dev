@@ -1,12 +1,12 @@
 =head1 TITLE
 
-    longopt.h / longopt.c
+    Long option parsing
 
 =head1 SUMMARY
 
-These two files implement rudimentary long option parsing.  They have
-little to do with Parrot itself, other than that the parrot binary and
-imcc both needed long options.  So this gives it to them.
+The files F<longopt.c> and F<longopt.h> implement rudimentary long option 
+parsing.  They have little to do with Parrot itself, other than that the 
+parrot binary and imcc both needed long options. So this gives it to them.
 
 =head1 USAGE
 
