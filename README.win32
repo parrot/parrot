@@ -33,6 +33,11 @@ available via Microsoft Visual Studio .NET 2003 or the Microsoft .NET
 Framework SDK 1.1.  The later can be downloaded from the Microsoft
 .NET Framework Homepage L<http://msdn.microsoft.com/netframework/>.
 
+nmake should also be available at:
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+or
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
 =item Command Shell
 
 The surest way to build it is on Windows NT/2000/XP, using the cmd shell.
