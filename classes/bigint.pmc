@@ -198,6 +198,13 @@ bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
     VTABLE_morph(interpreter, dest, enum_class_BigInt);
     mpz_abs(BN(dest), BN(self));
 }
+
+static void
+bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
+{
+    VTABLE_morph(interpreter, dest, enum_class_BigInt);
+    mpz_neg(BN(dest), BN(self));
+}
 #else
 
 static void
@@ -307,6 +314,11 @@ bigint_cmp_int(Interp *interpreter, PMC* self, INTVAL value)
 }
 static void
 bigint_abs(Interp *interpreter, PMC* self, PMC *dest)
+{
+    internal_exception(1, "no bigint lib loaded");
+}
+static void
+bigint_neg(Interp *interpreter, PMC* self, PMC *dest)
 {
     internal_exception(1, "no bigint lib loaded");
 }
@@ -687,6 +699,21 @@ Sets C<dest> to the absolute value of SELF.
     void absolute(PMC *dest) {
         bigint_abs(INTERP, SELF, dest);
     }
+
+/*
+
+=item C<void neg(PMC *dest)>
+
+Set C<dest> to the negated value of C<SELF>.
+
+=cut
+
+*/
+
+    void neg (PMC* dest) {
+        bigint_neg(INTERP, SELF, dest);
+    }
+
 }
 
 /*

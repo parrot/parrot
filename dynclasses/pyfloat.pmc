@@ -24,6 +24,23 @@ pmclass PyFloat extends PyObject dynpmc group python_group {
 
 /*
 
+=item C<void add(PMC *value, PMC *dest)>
+
+Adds C<*value> to the number and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+MMD_PyFloat: {
+        VTABLE_set_number_native(INTERP, dest,
+            PMC_num_val(SELF) + PMC_num_val(value));
+        }
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns an integer representation of the number (by casting).
@@ -89,6 +106,19 @@ Returns a unique hash for this value
 
     INTVAL hash () {
         return VTABLE_get_integer(INTERP, SELF);
+    }
+
+/*
+
+=item C<void modulus_float(FLOATVAL value, PMC *dest)>
+
+=cut
+
+*/
+
+    void modulus_float (FLOATVAL value, PMC* dest) {
+        VTABLE_set_number_native(INTERP, dest,
+            floatval_mod(PMC_num_val(SELF), value));
     }
 
 /*

@@ -495,6 +495,22 @@ MMD_PyFloat: {
 
 /*
 
+=item C<void divide_float(FLOAT value, PMC *dest)>
+
+Divides the integer by C<value> and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void divide_float (FLOATVAL value, PMC* dest) {
+        FLOATVAL pmcn = VTABLE_get_number(INTERP, SELF);
+        VTABLE_morph(INTERP, dest, dynclass_PyFloat);
+        VTABLE_set_number_native(INTERP, dest, pmcn / value);
+    }
+
+/*
+
 =item C<void divide_int(INTVAL value, PMC *dest)>
 
 Divides the integer by C<value> and returns the result in C<*dest>.

@@ -24,6 +24,7 @@ methods you would expect to see on python objects).
 /* cache of classes referenced */
 static INTVAL dynclass_PyType;
 static STRING *CLASS;
+static STRING *INT;
 static STRING *ITER;
 static STRING *NAME;
 static STRING *REPR;
@@ -46,6 +47,7 @@ they will be used frequently here.
         if (pass) {
             dynclass_PyType = Parrot_PMC_typenum(INTERP, "PyType");
             CLASS = const_string(INTERP, "__class__");
+            INT  = const_string(INTERP, "__int__");
             ITER = const_string(INTERP, "__iter__");
             NAME = const_string(INTERP, "__name__");
             REPR = const_string(INTERP, "__repr__");
@@ -139,6 +141,26 @@ Return the class of this object.
 
 /*
 
+=item C<INTVAL get_integer()>
+
+Returns the integer value of the object.
+
+=cut
+
+*/
+
+    INTVAL get_integer () {
+        PMC *getint = VTABLE_find_method(INTERP, SELF, INT);
+        PMC *ret;
+        if (!getint || !VTABLE_defined(INTERP, getint))
+           real_exception(INTERP, NULL, E_TypeError,
+                   "TypeError: int() argument must be a string or a number");
+        ret = Parrot_run_meth_fromc_args(INTERP, getint, SELF, INT, "P");
+        return VTABLE_get_integer(INTERP, ret);
+    }
+
+/*
+
 =item C<PMC *get_iter()>
 
 Return an iterator for this object.
@@ -170,9 +192,11 @@ Return the representation of this object.
         PMC *repr = VTABLE_find_method(INTERP, SELF, REPR);
 
         if (repr) {
-            PMC *ret;
-            ret = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
-            return VTABLE_get_string(INTERP, ret);
+            PMC *temp;
+            STRING *ret;
+            temp = Parrot_run_meth_fromc_args(INTERP, repr, SELF, REPR, "P");
+            ret = VTABLE_get_string(INTERP, temp);
+            return ret;
         }
         else {
             STRING *res;

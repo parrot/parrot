@@ -125,7 +125,7 @@ enter_nci_method should create these as locals to begin with.
         /* constants */
         key = const_string(INTERP, "__debug__");
         item = pmc_new(INTERP, dynclass_PyBoolean);
-        VTABLE_set_integer_native(INTERP, item, 0);
+        VTABLE_set_integer_native(INTERP, item, 1);
         scratchpad_store_by_name(INTERP, pad, 0, key, item);
 
         key = const_string(INTERP, "False");

@@ -48,6 +48,23 @@ they will be used frequently here.
 
 /*
 
+=item C<void add(PMC *value, PMC *dest)>
+
+Add C<*value> to the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_ADD_INT);
+        }
+    }
+
+/*
+
 =item C<void morph(INTVAL type)>
 
 Morphs the scalar to the specified type.
@@ -59,6 +76,23 @@ Morphs the scalar to the specified type.
     void morph (INTVAL type) {
         if (type == enum_class_Integer) type = dynclass_PyInt;
         pmc_reuse(INTERP, SELF, type, 0);
+    }
+
+/*
+
+=item C<void multiply(PMC *value, PMC *dest)>
+
+Multiplies C<*value> with the integer and returns the result in C<*dest>.
+
+=cut
+
+*/
+
+    void multiply (PMC* value, PMC* dest) {
+MMD_PyInt: {
+            INTVAL vali = VTABLE_get_integer(INTERP, value);
+            mmd_dispatch_v_pip(INTERP, SELF, vali, dest, MMD_MULTIPLY_INT);
+        }
     }
 
 /*
