@@ -1253,6 +1253,7 @@ include/parrot/stacks.h
 include/parrot/string.h
 include/parrot/string_funcs.h
 include/parrot/sub.h
+include/parrot/thread.h
 include/parrot/trace.h
 include/parrot/unicode.h
 include/parrot/warnings.h
@@ -1534,7 +1535,6 @@ languages/regex/lib/Regex/Parse.pm
 languages/regex/lib/Regex/Parse/P6C.pm
 languages/regex/lib/Regex/PreOptimize.pm
 languages/regex/lib/Regex/Rewrite.pm
-languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/lib/Regex/State.pm
 languages/regex/regex.pl
 languages/regex/t/a.t
