@@ -1,0 +1,1269 @@
+/*
+** rx.ops
+*/
+
+#include "parrot/rx.h"
+
+#define RxAssertMore(rx, branchto) if(rx->index >= string_length(rx->string)) { goto OFFSET(branchto); }
+
+VERSION = PARROT_VERSION;
+
+=head1 NAME
+
+rx.ops - Parrot Regular Expression Engine, version 3.0
+
+=head1 SYNOPSIS
+
+	# NOTE: This looks a LOT scarier than it really is
+	# "zzabbBBBBBBcdcdcdzz" =~ /ab*[cd]+/i
+		rx_allocateinfo P0, "zzabbBBBBBBcdcdcdzz"
+		bsr RX_0
+		rx_info_successful P0, I0
+		rx_freeinfo P0
+		if I0, $match
+		print "no "
+	$match:
+		print "match"
+		end
+
+	RX_0:
+		rx_setprops P0, "i", 2
+		branch $start0
+	$advance:
+		rx_advance P0, $fail
+	$start0:
+		rx_literal P0, "a", $advance
+
+	$start1:
+		rx_pushmark P0
+	$top1:
+		rx_literal P0, "b", $start2
+		rx_pushindex P0
+		branch $top1
+	$back1:
+		rx_popindex P0, $advance
+
+	$start2:
+		rx_literal P0, "cd", $back1
+	$top2:
+		rx_oneof P0, "cd", $succeed
+		branch $top2
+
+	$succeed:
+		rx_succeed P0
+		ret
+	$fail:
+		rx_fail P0
+		ret
+
+
+=head1 DESCRIPTION
+
+The Perl 5 regular expression engine was state-of-the-art.  It was the fastest and 
+most featureful implementation available.  Everybody used Perl 5's regular expression
+syntax wherever possible.
+
+The Perl 5 regular expression engine was also a mess.
+
+The engine was like a separate interpreter unto itself.  Few understood its dark magic, 
+and fewer worked on its baroque source.  It was a black box, sealed off from the outside 
+world with only a couple opcodes to show in other files.  It was the slowest part of Perl 
+to adapt to new features--it was one of the last to get threadsafety and full Unicode 
+support--because so few people understood it.  Larry Wall once said that three people 
+understood the regex engine, give or take four.
+
+Because of these issues, the design documents for Parrot called for regular expression 
+opcodes to be built in to the interpreter.  This group of opcodes, called the Parrot 
+Regular Expression Engine version 3.0 (or simply Rx3), is the result.
+
+=head2 Basic Concepts
+
+Perl 5 had one opcode for each operation in the regular expression.  For example:
+
+	>perl -mre=debug -e '/ab+[cd]/'
+	Compiling REx `ab+[cd]'
+	size 15 first at 1
+	   1: EXACT <a>(3)
+	   3: PLUS(6)
+       4:   EXACT <b>(0)
+       6: ANYOF[cd](15)
+	  15: END(0)
+	anchored `ab' at 0 floating `b' at 1..2147483647 (checking anchored) minlen 3
+	Freeing REx: `ab+[cd]'
+
+(The C<re> pragma with the 'debug' switch displays the compiled version of the regex.
+The numbers in parenthesis represent where to jump to on success; 0 is a
+special value meaning "this part of the regex is done".)
+
+In Rx3, that regular expression would be something like:
+
+	$advance:
+		rx_advance P0, $fail
+	$start:
+		rx_literal P0, "ab", $advance
+		rx_pushmark P0
+	$top:
+		rx_pushindex P0
+		rx_literal P0, "b", $next
+		branch $top
+	$backtrack:
+		rx_popindex P0, $advance
+	$next:
+		rx_oneof P0, "cd", $backtrack
+		branch $success
+
+(In Rx3, the last parameter is a label to branch to on I<failure>, not success.)
+
+If you were insane enough to convert the labels to offsets, you'd get something like:
+
+		rx_advance P0, $fail
+	$start:
+		rx_literal P0, "ab", -6
+		rx_pushmark P0
+		rx_pushindex P0
+		rx_literal P0, "b", 6
+		branch -7
+		rx_popindex P0, -19
+		rx_oneof P0, "cd", -6
+		branch $success
+
+9 operations in Rx3 to 5 in Perl 5.  I can already hear the cynicism: "how could
+that be BETTER?!?"  Well, there's several reasons.
+
+The first is that it frees us to use normal ops, and in fact they're used all the 
+time.  C<branch> is a normal op; so is C<bsr>, the normal way to call a regular
+expression.  Things like C<(?{CODE})> can be implemented with relative ease--simply
+put the normal opcodes in the appropriate place in the regex.  If you're debugging
+a regex, you can simply sprinkle output messages liberally throughout the regex.
+
+The second is opcode dispatch.  Parrot has very fast opcode dispatch, and we can use
+that to our advantage.
+
+Finally, there's the matter of optimizations.  As an example, take C</a+bc+/>.  The
+most efficient way to look for that is probably to look for the constant string 'abc'
+and expand outwards from there--especially if you use Boyer-Moore or another fast
+search algorithm.  It means that the code generator can decide whether to optimize
+for success or failure, for compilation or execution speed.  You get the idea.
+
+Bottom line is, Rx3 lays out exactly what's going on.  This is a feature.  It gives the
+regex compiler total control over what's going on.
+
+=head2 The Opcodes
+
+There are two basic rules to how the opcodes operate.
+
+The first involves the PMC that most take as their first parameter.  This is a handle for 
+an 'info' structure.  The info structure accumulates data as it churns through the regex, 
+such as the start and current indices and the start and end of each group.  It also keeps
+track of things like the string we're matching against.
+
+The second rule pertains to the ops that have an integer constant as their last parameter.
+For the most part, these ops will branch to that parameter if the 'fail'.  For most ops, 
+'fail' means 'fail to match'.
+
+If the documentation for an op doesn't specifically mention the first or last parameter, 
+that's what they are.
+
+The documentation for each opcode follows.
+
+=cut
+
+###############################################################################
+
+=head3 Preparation
+
+=over 4
+
+=cut
+
+########################################
+
+=item C<rx_allocateinfo>(p, p|s|sc)
+
+Allocates a new info structure and puts it into the first parameter.  The second parameter
+is the string to match against.
+
+=cut
+
+op rx_allocinfo(out pmc, in str) {
+	rxinfo *rx=rx_allocate_info(interpreter, $2);
+
+	$1=pmc_new(interpreter, enum_class_ParrotPointer);
+
+	$1->data=(void*)rx;
+
+	goto NEXT();
+}
+
+op rx_allocinfo(out pmc, in pmc) {
+	rxinfo *rx=rx_allocate_info(interpreter, $2->vtable->get_string(interpreter, $2));
+	
+	$1=pmc_new(interpreter, enum_class_ParrotPointer);
+
+	$1->data=(void*)rx;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_freeinfo>(p)
+
+Deallocates the info structure in the first parameter and nulls out the handle.
+
+=cut
+
+op rx_freeinfo(inout pmc) {
+	mem_sys_free($1->data);
+	$1->data=NULL;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_cloneinfo>(p)
+
+Clones the info structure in the first parameter.  Make sure to save the original 
+structure in another register, the stack, or a symbol table entry before calling this
+opcode.
+
+B<XXX> Currently this op has not been implemented.
+
+=cut
+
+op rx_cloneinfo(inout pmc) {
+	RX_dUNPACK($1);
+
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_compile>(i, s|sc, s|sc)
+
+Provides a built-in regular expression compiler.  The first parameter is set to the
+address of the newly-compiled regex, which can then be C<jsr>'ed to; the second 
+parameter is the regex itself; and the third parameter is the modifiers on the regex.
+
+B<XXX> Currently this op has not been implemented.
+
+=cut
+
+op rx_compile(out str, in str, in str) {
+	$1=0;
+	
+	goto NEXT();
+}
+
+###############################################################################
+
+=back
+
+=head3 Info accessor ops
+
+=over 4
+
+=cut
+
+########################################
+
+=item C<rx_info_successful>(p, i)
+
+If the info structure indicates the match was successful, sets the second parameter
+to true; otherwise sets it to false.
+
+=cut
+
+op rx_info_successful(in pmc, out int) {
+	RX_dUNPACK($1);
+
+	$2=rx->success;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_info_getindex>(p, i)
+
+Retrieves the current index stored in the info structure.  If the match has already
+finished successfully, this will be the index of the end of the match.
+
+=cut
+
+op rx_info_getindex(in pmc, out int) {
+	RX_dUNPACK($1);
+	
+	$2=rx->index;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_info_getstartindex>(p, i)
+
+Gets the index the match started at.
+
+Note that if a regex uses the C<rx_backwards(p)> op, the start and end indices may be
+reversed.
+
+=cut
+
+op rx_info_getstartindex(in pmc, out int) {
+	RX_dUNPACK($1);
+
+	$2=rx->startindex;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_info_getgroup>(in pmc, out int, out int, in int)
+
+Gets the start and end indices of the group indicated by the fourth parameter.
+
+=cut
+
+op rx_info_getgroup(in pmc, out int, out int, in int) {
+	RX_dUNPACK($1);
+
+	$2=rx->groupstart->vtable->get_integer_index(interpreter, rx->groupstart, $4);
+	$3=rx->groupend->vtable->get_integer_index(interpreter, rx->groupend, $4);
+	
+	goto NEXT();
+}
+
+###############################################################################
+
+=back
+
+=head3 Stack manipulation ops
+
+=over 4
+
+=cut
+
+########################################
+
+=item C<rx_pushindex>(p)
+
+Pushes the current index onto the stack contained in the info structure.
+
+=cut
+
+op rx_pushindex(in pmc) {
+	RX_dUNPACK($1);
+
+	push_generic_entry(interpreter, &rx->stack_top, &rx->index, STACK_ENTRY_INT, NULL);
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_pushmark>(p)
+
+Pushes a 'mark' onto the stack contained in the info structure.  Marks are used
+to indicate where one operation's backtrack information ends and another's begins.
+
+=cut
+
+op rx_pushmark(in pmc) {
+	RX_dUNPACK($1);
+
+	/* Don't worry about the const warning from the next line */
+	push_generic_entry(interpreter, &rx->stack_top, &RX_MARK, STACK_ENTRY_INT, NULL);
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_popindex>(p, ic)
+
+Pops an index off the stack.  If it pops a mark off instead, it branches to the 
+second parameter.
+
+=cut
+
+op rx_popindex(in pmc, in int) {
+	RX_dUNPACK($1);
+	int i;
+	
+	pop_generic_entry(interpreter, &rx->stack_top, &i, STACK_ENTRY_INT);
+
+	if(i==RX_MARK) {
+		goto OFFSET($2);
+	}
+	else {
+		rx->index=i;
+		goto NEXT();
+	}
+}
+
+###############################################################################
+
+=back
+
+=head3 Directional ops
+
+=over 4
+
+=cut
+
+########################################
+
+=item C<rx_forwards>(p)
+
+Indicates that the regex should increment the index as it moves through the string.
+
+=cut
+
+op rx_forwards(in pmc) {
+	RX_dUNPACK($1);
+
+	rx->whichway=enum_rxdirection_forwards;
+	
+	goto NEXT();
+}
+
+
+########################################
+
+=item C<rx_backwards>(p)
+
+Indicates that the regex should decrement the index as it moves through the string.
+This is different from reversed regexes (see L</"rx_setprops(p, sc, ic)">); reversed
+affects the start index, while backwards affects the end index.
+
+=cut
+
+op rx_backwards(in pmc) {
+	RX_dUNPACK($1);
+
+	rx->whichway=enum_rxdirection_backwards;
+	
+	goto NEXT();
+}
+
+###############################################################################
+
+=back
+
+=head3 Matching ops
+
+=over 4
+
+=cut
+
+########################################
+
+=item C<rx_advance>(p, ic)
+
+Increments (or decrements, if the C<r> modifier is used) the start index one
+character.  Branches to the second parameter if it goes past the end of the string.
+
+=cut
+
+op rx_advance(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	if(!RxReverse_test(rx)) {
+		if(++rx->startindex + rx->minlength > string_length(rx->string)) {
+			goto OFFSET($2);
+		}
+	}
+	else {
+		if(--rx->startindex < 0) {
+			goto OFFSET($2);
+		}
+	}
+
+	rx->index=rx->startindex;
+	
+	while(stack_depth(interpreter, rx->stack_base)) {
+		pop_generic_entry(interpreter, &rx->stack_top, NULL, STACK_ENTRY_INT);
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_incrindex>(p, ic)
+
+Increments the current index (or decrements, if C<rx_backwards> is used) by the 
+amount in the second parameter.  Does I<not> check if it's gone past the end of the
+string.
+
+=cut
+
+op rx_incrindex(in pmc, in int) {
+	RX_dUNPACK($1);
+	RxAdvanceX(rx, $2);
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_setprops>(p, sc, ic)
+
+Sets certain properties in the info structure.  The second parameter is a string
+containing one or more of the following characters:
+
+=over 4
+
+=item C<i>
+
+Sets case-insensitive matching.
+
+=item C<s>
+
+Sets single-line matching; the C<rx_dot> op will match newlines with this turned on.
+
+=item C<m>
+
+Sets multiline matching; the C<rx_zwa_atbeginning> and C<rx_zwa_atend> opcodes will
+match the beginning and end of lines.
+
+=item C<r>
+
+Sets reverse or right matching; match starts at the end of the string and inches
+towards the beginning.
+
+=back
+
+The third parameter is the minimum length the string would need to be for a match to
+be possible.  For example, in the match C</ba*r+/>, the minimum length is 2.
+
+=cut
+
+op rx_setprops(in pmc, in str, in int) {
+	int i;
+	RX_dUNPACK($1);
+
+	rx->minlength=$3;
+
+	for(i=0; i < string_length($2); i++) {
+		switch(((char *)$2->bufstart)[i]) {
+			case 'i':
+				RxCaseInsensitive_on(rx);
+				break;
+			case 's':
+				RxSingleLine_on(rx);
+				break;
+			case 'm':
+				RxMultiline_on(rx);
+				break;
+			case 'r':
+				RxReverse_on(rx);
+				rx->index=rx->startindex=string_length(rx->string);
+				break;
+			default:
+				fprintf(stderr, "Unknown regular expression option '%c'.", ((char*)$2->bufstart)[i]);
+				HALT();
+		}
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_startgroup>(p, ic)
+
+Indicates that the current index is the start index of the group number indicated in
+the second parameter.
+
+=cut
+
+op rx_startgroup(in pmc, in int) {
+	RX_dUNPACK($1);
+	
+	rx->groupstart->vtable->set_integer_index(interpreter, rx->groupstart, rx->index, $2);
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_endgroup>(p, ic)
+
+Indicates that the current index is the end index of the group number indicated in
+the second parameter.
+
+=cut
+
+op rx_endgroup(in pmc, in int) {
+	RX_dUNPACK($1);
+	
+	rx->groupend->vtable->set_integer_index(interpreter, rx->groupend, rx->index, $2);
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_literal>(p, in str, ic)
+
+Matches the exact string (sensitive to the C<i> modifier) passed in the second
+parameter.
+
+B<XXX> Currently does not honor the C<i> modifier.
+
+=cut
+
+op rx_literal(in pmc, in str, in int) {
+	RX_dUNPACK($1);
+	STRING *targ;
+
+	if(string_length(rx->string) < rx->index+string_length($2)) {
+		goto OFFSET($3);
+	}
+	
+	targ=rxP_get_substr(interpreter, rx->string, rx->index, string_length($2));
+	
+	if(string_compare(interpreter, $2, targ)==0) {
+		RxAdvanceX(rx, string_length($2));
+	}
+	else {
+		goto OFFSET($3);
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_is_w>(p, ic)
+
+Matches a word character (usually C<\w>).
+
+=cut
+
+op rx_is_w(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	RxAssertMore(rx, $2);
+
+	if(rx_is_word_character(RxCurChar(rx))) {
+		RxAdvance(rx);
+		goto NEXT();
+	}
+	else {
+		goto OFFSET($2);
+	}
+}
+
+########################################
+
+=item C<rx_is_n>(p, ic)
+
+Matches a number character (usually C<\n>).
+
+=cut
+
+op rx_is_n(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	RxAssertMore(rx, $2);
+
+	if(rx_is_number_character(RxCurChar(rx))) {
+		RxAdvance(rx);
+		goto NEXT();
+	}
+	else {
+		goto OFFSET($2);
+	}
+}
+
+########################################
+
+=item C<rx_is_s>(p, ic)
+
+Matches a whitespace character (usually C<\s>).
+
+=cut
+
+op rx_is_s(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	RxAssertMore(rx, $2);
+
+	if(rx_is_whitespace_character(RxCurChar(rx))) {
+		RxAdvance(rx);
+		goto NEXT();
+	}
+	else {
+		goto OFFSET($2);
+	}
+
+}
+
+########################################
+
+=item C<rx_oneof>(p, sc, ic)
+
+Matches if the current character is one of the characters in the second parameter.
+Sensitive to the C<i> modifier.
+
+This op requires that its input be sorted for efficiency.  Further, it requires that all
+ranges (C<a-z>) be expanded by the regex compiler.
+
+B<XXX> Currently does not honor the C<i> modifier.
+
+=cut
+
+op rx_oneof(in pmc, in str, in int) {
+	RX_dUNPACK($1);
+	STRING *ch1;
+	STRING *ch2;
+	INTVAL i;
+	
+	/* XXX In the future, this ought to use bitmaps. */
+	
+	RxAssertMore(rx, $3);
+	
+	ch1=RxCurCharS(rx);
+	
+	if(string_length($2) < 8) { /* XXX run benchmarks to find a good value */
+		/* modified linear search--slow, but zero overhead */
+		for(i=0; i < string_length($2); i++) {
+			ch2=rxP_get_substr(interpreter, $2, i, 1);
+		
+			if(string_compare(interpreter, ch1, ch2)==0) {
+				RxAdvance(rx);
+				goto NEXT();
+			}
+			else if(string_compare(interpreter, ch1, ch2) < 0) {
+				goto OFFSET($3);
+			}
+		}
+	}
+	else {
+		/* binary search--fast but complicated */
+		INTVAL upper, lower=0, index=0, lastindex=-1, cmp;
+
+		upper=string_length($2);
+		
+		while(upper > lower) {
+			index=(upper+lower)/2;
+			
+			if(index==lastindex) {
+				goto OFFSET($3);	
+			}
+			else if(index==string_length($2)) {
+				goto OFFSET($3);
+			}
+		
+			cmp=string_compare(interpreter, RxCurCharS(rx), rxP_get_substr(interpreter, $2, index, 1));
+			
+			if(0==cmp) {
+				RxAdvance(rx);
+				goto NEXT();
+			}
+			else if(0 > cmp) {
+				upper=index;
+			}
+			else {
+				lower=index;
+			}
+			
+			lastindex=index;
+		}
+	}
+	
+	goto OFFSET($3);
+}
+
+########################################
+
+=item C<rx_dot>(p, ic)
+
+Matches any character except a newline (C<\n>).  (If the C<s> modifier is used, 
+matches any character at all.)
+
+=cut
+
+op rx_dot(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	RxAssertMore(rx, $2);
+
+	if(RxSingleLine_test(rx)) {
+		RxAdvance(rx);
+		goto NEXT();
+	}
+	else {
+		STRING *ch=RxCurCharS(rx);
+		STRING *nl=string_make(interpreter, "\n", 1, 0, 0, 0);
+
+		if(string_compare(interpreter, ch, nl)!=0) {
+			RxAdvance(rx);
+			goto NEXT();
+		}
+		else {
+			goto OFFSET($2);
+		}
+	}
+}
+
+########################################
+
+=item C<rx_zwa_boundary>(p, ic)
+
+Matches if the one of the previous character and the next character is a word
+character, and the other one is not (usually C<\b>).
+
+=cut
+
+op rx_zwa_boundary(in pmc, in int) {
+	RX_dUNPACK($1);
+	char ch1, ch2;
+
+	ch1=RxCurChar(rx);
+	RxAdvanceX(rx, -1);
+	ch2=RxCurChar(rx);
+	RxAdvance(rx);
+
+	if(rx_is_word_character(ch1) == rx_is_word_character(ch2)) {
+		goto OFFSET($2);
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_zwa_atbeginning>(p, ic)
+
+Matches at the beginning of the string.  If the C<m> modifier is used, matches at the
+beginning of any line.
+
+B<XXX> Currently does not honor the C<m> modifier.
+
+=cut
+
+op rx_zwa_atbeginning(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	if(rx->index != 0) {
+		goto OFFSET($2);
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_zwa_atend>(p, ic)
+
+Matches at the end of the string.  If the C<m> modifier is used, matches at the
+end of any line.
+
+B<XXX> Currently does not honor the C<m> modifier.
+
+=cut
+
+op rx_zwa_atend(in pmc, in int) {
+	RX_dUNPACK($1);
+
+	if(rx->index != string_length(rx->string)) {
+		goto OFFSET($2);
+	}
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_succeed>(p)
+
+Modifies the info structure to indicate that the match succeeded.
+
+=cut
+
+op rx_succeed(in pmc) {
+	RX_dUNPACK($1);
+
+	rx->success=1;
+	
+	goto NEXT();
+}
+
+########################################
+
+=item C<rx_fail>(p)
+
+Modifies the info structure to indicate that the match failed.
+
+=cut
+
+op rx_fail(in pmc) {
+	RX_dUNPACK($1);
+
+	rx->success=0;
+	
+	goto NEXT();
+}
+
+###############################################################################
+
+=back
+
+=head2 Using the opcodes
+
+=head3 Tutorial
+
+Now that you've seen all the opcodes available, you'll probably want to know how to use
+them.
+
+To do so, we'll walk you through the building of a regular expression.  For this example,
+we'll use the expression C</ab*[cd]+/i>.  (This is the same expression written out in 
+L</SYNOPSIS>.)
+
+The first step is to break it up into term-quantifier pairs.  In this case:
+
+	RX_0:
+		a
+		b*
+		[cd]+
+
+
+Next, we'll figure out how to match each term.
+
+	RX_0:
+		rx_literal P0, "a", ...
+		rx_literal P0, "b", ...
+		rx_oneof P0, "cd", ...
+
+The elipses will be filled in later.
+
+Now, we need to figure out how to represent the quantifiers.  We end up with something 
+like this:
+
+	RX_0:
+		rx_literal P0, "a", ...
+
+	$top1:
+		rx_literal P0, "b", ...
+		branch $top1
+
+		rx_oneof P0, "cd", ...
+	$top2:
+		rx_oneof P0, "cd", ...
+		branch $top2
+
+Note that C<[cd]+> is equivalent to C<[cd][cd]*>.  We take advantage of this fact.
+
+Next, we add C<rx_pushmark> ops at the boundaries between quantifiers, and 
+C<rx_pushindex> ops within the quantifiers themselves.
+
+	RX_0:
+		rx_literal P0, "a", ...
+
+		rx_pushmark P0		
+	$top1:
+		rx_literal P0, "b", ...
+		rx_pushindex P0
+		branch $top1
+
+		rx_pushmark P0
+	$top2:
+		rx_oneof P0, "cd", ...
+		rx_pushindex P0
+		branch $top2
+
+Next, we add the backtracking code.  Backtracking is usually done one way.
+
+	RX_0:
+		rx_literal P0, "a", ...
+	$back0:
+		branch ...
+
+		rx_pushmark P0		
+	$top1:
+		rx_literal P0, "b", ...
+		rx_pushindex P0
+		branch $top1
+	$back1:
+		rx_popindex P0, ...
+
+		rx_pushmark P0
+	$top2:
+		rx_oneof P0, "cd", ...
+		rx_pushindex P0
+		branch $top2
+	$back2:
+		rx_popindex P0, ...
+
+After that, we'll add some skeleton code.
+
+	RX_0:
+		rx_setprops P0, "i", 2
+		branch $start0
+	$advance:
+		rx_advance P0, ...
+
+	$start0:
+		rx_literal P0, "a", ...
+	$back0:
+		branch ...
+		#if there's no quantifier, you just fall back to the
+		# previous backtrack
+
+		rx_pushmark P0		
+	$top1:
+		rx_literal P0, "b", ...
+		rx_pushindex P0
+		branch $top1
+	$back1:
+		rx_popindex P0, ...
+
+		rx_pushmark P0
+		rx_oneof P0, "cd", ...
+	$top2:
+		rx_oneof P0, "cd", ...
+		rx_pushindex P0
+		branch $top2
+	$back2:
+		rx_popindex P0, ...
+
+		rx_succeed P0
+		ret
+	$fail:
+		rx_fail P0
+		ret
+
+Now that that's done, we'll connect the dots (literally).
+
+	RX_0:
+		rx_setprops P0, "i", 2
+		branch $start0
+	$advance:
+		rx_advance P0, $fail
+	$start0:
+		rx_literal P0, "a", $advance
+	$back0:
+		branch $advance
+
+	$start1:
+		rx_pushmark P0
+	$top1:
+		#when you're looping in a quantifier and a match operation fails,
+		# you should simply move on to the next step of the match.
+		rx_literal P0, "b", $start2
+		rx_pushindex P0
+		branch $top1
+	$back1:
+		rx_popindex P0, $back0
+
+	$start2:
+		rx_literal P0, "cd", $back1
+		rx_pushmark P0
+	$top2:
+		rx_oneof P0, "cd", $succeed
+		rx_pushindex P0
+		branch $top2
+	$back2:
+		rx_popindex P0, $back1
+
+	$succeed:
+		rx_succeed P0
+		ret
+	$fail:
+		rx_fail P0
+		ret
+
+Notice how C<$advance> serves as a sort of C<$back-1>--it serves as the default
+"backtracker".  Note also how only the C<rx_advance> uses the C<$fail> label--that's how 
+it backtracks.
+
+The final step is optimization.  In this case, there are two things we can optimize.
+First of all, that C<$back0> is pointless--we're better off just deleting it and branching
+to C<$advance> directly.  Second, C<$back2> will I<never> be called, so we can get rid of 
+it too.
+
+	RX_0:
+		rx_setprops P0, "i", 2
+		branch $start0
+	$advance:
+		rx_advance P0, $fail
+	$start0:
+		rx_literal P0, "a", $advance
+
+	$start1:
+		rx_pushmark P0
+	$top1:
+		rx_literal P0, "b", $start2
+		rx_pushindex P0
+		branch $top1
+	$back1:
+		rx_popindex P0, $advance
+
+	$start2:
+		rx_literal P0, "cd", $back1
+	$top2:
+		rx_oneof P0, "cd", $succeed
+		branch $top2
+
+	$succeed:
+		rx_succeed P0
+		ret
+	$fail:
+		rx_fail P0
+		ret
+
+We've now written the regular expression itself; the one thing left to do is write the 
+code that calls it.  Let's say the Perl code looks like this:
+
+	unless("zzabbBBBBBBcdcdcdzz" =~ /ab*[cd]+/i) {
+		print "no ";
+	}
+
+	print "match";
+
+Then the Parrot code would be something like this:
+
+		rx_allocateinfo P0, "zzabbBBBBBBcdcdcdzz"
+		bsr RX_0
+		rx_info_successful P0, I0
+		rx_freeinfo P0
+		if I0, $match
+		print "no "
+	$match:
+		print "match"
+		end
+
+Congratulations--you've now written your first regular expression with Rx3.  That wasn't
+so hard, now was it?
+
+=head3 Common constructs
+
+The list below gives simple templates for common quantifiers operations.
+
+=over 4
+
+=item C<x*>
+
+	$start:
+		rx_pushmark P0
+	$loop:
+		rx_pushindex P0
+		rx_literal P0, "x", $next
+		branch $loop
+	$back:
+		rx_popindex P0, $lastback
+		branch $next
+
+=item C<x+>
+
+	$start:
+		rx_literal P0, "x", $lastback
+		rx_pushmark P0
+	$loop:
+		rx_pushindex P0
+		rx_literal P0, $next
+		branch $loop
+	$back:
+		rx_popindex P0, $lastback
+		branch $next
+
+=item C<x?>
+
+	$start:
+		rx_pushmark P0
+		rx_literal P0, "x", $next
+		rx_pushindex P0
+		branch $next
+	$back:
+		rx_popindex P0, $lastback
+		branch $next
+
+=item C<x*?>
+
+	$start:
+		branch $next
+	$back:
+		rx_literal P0, "x", $lastback
+		branch $next
+
+=item C<x+?>
+
+	$start:
+		rx_literal P0, "x", $lastback
+		branch $next
+	$back:
+		rx_literal P0, "x", $lastback
+		branch $next
+
+=item C<x??>
+
+	$start:
+		set I0, 0	#I0 used to make sure we haven't backtracked before
+		branch $next
+	$back:
+		if I0, $lastback
+		rx_literal P0, "x", $lastback
+		branch $next
+
+=item C<x|y>
+
+	$start:
+		rx_pushmark P0
+		rx_pushindex P0
+		rx_literal P0, "x", $nextalt
+		branch $next
+	$nextalt:
+		rx_popindex P0
+		rx_literal P0, "x", $back	#no, that's not a typo
+		branch $next
+	$back:
+		rx_popmark P0
+		branch $lastback
+
+=item C<(?=x)>
+
+		set P1, P0
+		rx_cloneinfo P0
+
+		rx_literal P0, "x", $lastback
+		
+		set P0, P1
+
+=back
+
+B<XXX> Finish this documentation.
+
+=head1 BUGS
+
+=over 4
+
+=item *
+
+This code currently requires everything to be in an eight-bit encoding compatible 
+with ASCII.
+
+=item *
+
+Many modifiers are not currently respected.
+
+=item *
+
+There are undoubtably many more in code this complicated.
+
+=back
+
+=head1 AUTHORS
+
+Copyright (C) 2001-2002 The Parrot Team <perl6-internals@perl.org>.
+
+Initial version by Brent Dax <brentdax@cpan.org>; special thanks to Angel
+Faus <afaus@corp.vlex.com> and Jeff 'japhy' Pinyan <japhy@pobox.com> for major help, 
+especially with decisions on the architecture of the engine.
+
+=cut
