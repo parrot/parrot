@@ -30,6 +30,55 @@ enum {
 
 /* &end_gen */
 
+/* 
+ * Character classifications 
+ */
+/* 
+ &gen_from_template(include/parrot/charclass.h)
+  match{enum_charclass_(\w+)}
+  eval{{
+    if ($1 eq 'SLOW') {
+        $var{slow} = 1;
+    }
+    elsif ($1 eq 'MAX') {
+    }
+    elsif ($var{slow}) {
+      print "#define Parrot_char_is_$1(ct,c) \\\n";
+      print " ct->is_charclass[enum_charclass_SLOW](ct,c,enum_charclass_$1)\n";
+    }
+    else {
+      print "#define Parrot_char_is_$1(ct,c) \\\n";
+      print " ct->is_charclass[enum_charclass_$1](ct,c,enum_charclass_$1)\n";
+    }
+  }}
+ */
+enum {
+    enum_charclass_digit,
+    enum_charclass_SLOW,
+    enum_charclass_alnum,
+    enum_charclass_alpha,
+    enum_charclass_ascii,
+    enum_charclass_blank,
+    enum_charclass_cntrl,
+    enum_charclass_graph,
+    enum_charclass_lower,
+    enum_charclass_print,
+    enum_charclass_punct,
+    enum_charclass_space,
+    enum_charclass_upper,
+    enum_charclass_xdigit,
+    enum_charclass_MAX
+};
+/* &end_gen */
+
+/* Generated file containing access macros */
+#include "parrot/charclass.h"
+
+typedef Parrot_Int (*Parrot_is_charclass)
+           (const struct parrot_chartype_t *type,
+            const Parrot_UInt c,
+            const unsigned int charclass);
+
 /*
  * Character code to digit value translation map
  */
@@ -59,8 +108,7 @@ struct parrot_chartype_t {
     Parrot_Int index;
     const char *name;
     const char *default_encoding;
-    Parrot_Int (*is_digit)
-        (const struct parrot_chartype_t *type, Parrot_UInt c);
+    Parrot_is_charclass is_charclass[enum_charclass_SLOW+1];
     Parrot_Int (*get_digit)
         (const struct parrot_chartype_t *type, Parrot_UInt c);
     const struct chartype_digit_map_t *digit_map;
@@ -83,9 +131,11 @@ void chartype_destroy(void);
 const CHARTYPE * chartype_lookup_index(INTVAL n);
 INTVAL chartype_find_chartype(const char *name);
 
-Parrot_Int chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c);
+Parrot_Int chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c,
+                                  const unsigned int class);
+Parrot_Int chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c,
+                                  const unsigned int class);
 Parrot_Int chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c);
-Parrot_Int chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c);
 Parrot_Int chartype_get_digit_mapn(const CHARTYPE* type, const UINTVAL c);
 Parrot_UInt chartype_transcode_nop(const struct parrot_chartype_t *from,
                                    const struct parrot_chartype_t *to,

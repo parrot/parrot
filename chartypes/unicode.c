@@ -46,12 +46,27 @@ static struct chartype_transcoder_entry_t unicode_transcoders[] = {
     { NULL, NULL, NULL }
 };
 
+static INTVAL
+unicode_is_charclass(const struct parrot_chartype_t *type, const Parrot_UInt c, 
+                     const unsigned int class)
+{
+    switch (class) {
+        case enum_charclass_digit:
+            return chartype_is_digit_mapn(type, c, class);
+    }
+    internal_exception(INVALID_CHARCLASS, "Unknown character class <%d>\n", 
+                       class);
+    return 0;
+}
 
 CHARTYPE unicode_chartype = {
     enum_chartype_unicode,
     "unicode",
     "utf32",
-    chartype_is_digit_mapn,          /* is_digit() */
+    { 
+        chartype_is_digit_mapn,      /* is_digit() */
+        unicode_is_charclass         /* is_charclass() - slow version */
+    },
     chartype_get_digit_mapn,         /* get_digit() */
     unicode_digit_map,               /* digit_map */
     NULL,                            /* unicode_map */

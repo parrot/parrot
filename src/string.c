@@ -1232,7 +1232,7 @@ string_bool(const STRING *s)
 
         UINTVAL c = s->encoding->decode(s->strstart);
 
-        if (s->type->is_digit(s->type,c)
+        if (Parrot_char_is_digit(s->type,c)
          && s->type->get_digit(s->type,c) == 0) {
             return 0;
         }
@@ -1305,7 +1305,7 @@ string_to_int(const STRING *s)
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
 
-            if (s->type->is_digit(s->type,c)) {
+            if (Parrot_char_is_digit(s->type,c)) {
                 in_number = 1;
                 i = i * 10 + (c - '0');
             }
@@ -1354,7 +1354,7 @@ string_to_num(const STRING *s)
 
         while (start < end) {
             UINTVAL c = s->encoding->decode(start);
-            INTVAL df = s->type->is_digit(s->type,c);
+            INTVAL df = Parrot_char_is_digit(s->type,c);
 
             if (df && !digit_family)
                 digit_family = df;

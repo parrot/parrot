@@ -121,6 +121,25 @@ chartype_from_unicode_cparray(const CHARTYPE *from, const CHARTYPE *to,
 }
 
 /*
+ * Digit mapping via translation to Unicode
+ * XXX Replace by generation of custom digit mapping table
+ */
+static Parrot_Int
+chartype_is_digit_Unicode(const CHARTYPE* type, const UINTVAL c, 
+                          unsigned int class)
+{
+    UINTVAL uc = chartype_to_unicode_cparray(type, NULL, c);
+    return chartype_is_digit_mapn(&unicode_chartype, uc, enum_charclass_digit);
+}
+
+static Parrot_Int
+chartype_get_digit_Unicode(const CHARTYPE* type, const UINTVAL c)
+{
+    UINTVAL uc = chartype_to_unicode_cparray(type, NULL, c);
+    return chartype_get_digit_mapn(&unicode_chartype, uc);
+}
+
+/*
  * Create chartype from mapping file
  * Still TODO:
  *   Handle more encodings (singlebyte & dbcs implemented so far)
@@ -195,9 +214,11 @@ chartype_create_from_mapping(const char *name)
     }
     type->from_unicode = chartype_from_unicode_cparray;
     type->to_unicode = chartype_to_unicode_cparray;
-    type->is_digit = chartype_is_digit_map1;
-    type->get_digit = chartype_get_digit_map1;
-    type->digit_map = &default_digit_map;
+    /* XXX Should generate a custom digit mapping table */
+    if (enum_charclass_digit < enum_charclass_SLOW)
+        type->is_charclass[enum_charclass_digit] = chartype_is_digit_Unicode;
+    type->get_digit = chartype_get_digit_Unicode;
+    type->digit_map = NULL;
     map = mem_sys_allocate(sizeof(struct chartype_unicode_map_t));
     map->n1 = one2one;
     map->cparray = cparray;
@@ -258,7 +279,8 @@ chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to)
  * Generic versions of the digit handling functions
  */
 Parrot_Int
-chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c)
+chartype_is_digit_map1(const CHARTYPE* type, const UINTVAL c, 
+                       unsigned int class)
 {
     return c >= type->digit_map->first_code && c <= type->digit_map->last_code;
 }
@@ -275,7 +297,8 @@ chartype_get_digit_map1(const CHARTYPE* type, const UINTVAL c)
 }
 
 Parrot_Int
-chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c)
+chartype_is_digit_mapn(const CHARTYPE* type, const UINTVAL c,
+                       unsigned int class)
 {
     const struct chartype_digit_map_t *map = type->digit_map;
     while (map->first_value >= 0) {
