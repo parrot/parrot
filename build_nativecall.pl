@@ -185,7 +185,7 @@ sub make_arg {
 	       return "(double)NUM_REG($regnum)";
               };
     /t/ && do {my $regnum = $reg_ref->{s}++;
-	       return "string_to_c_string(interpreter, STR_REG($regnum))";
+	       return "string_to_cstring(interpreter, STR_REG($regnum))";
               };
 
 }

@@ -182,7 +182,11 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
             info->width = PARROT_SPRINTF_BUFFER_SIZE;
         }
         ts = uint_to_str(interpreter, tc, info->width, 10, 0);
-        strcpy(out + i, string_to_cstring(interpreter, ts));
+        {
+            char *tempstr = string_to_cstring(interpreter, ts);
+            strcpy(out + i, tempstr);
+            free(tempstr);
+        }
         i = strlen(out);
     }
 
@@ -193,7 +197,11 @@ gen_sprintf_call(struct Parrot_Interp *interpreter, char *out,
 
         out[i++] = '.';
         ts = uint_to_str(interpreter, tc, info->prec, 10, 0);
-        strcpy(out + i, string_to_cstring(interpreter, ts));
+        {
+            char *tempstr = string_to_cstring(interpreter, ts);
+            strcpy(out + i, tempstr);
+            free(tempstr);
+        }
         i = strlen(out);
     }
 
@@ -565,10 +573,17 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                                 (interpreter, info.type, obj);
                             gen_sprintf_call(interpreter, tc, &info, ch);
                             ts = cstr2pstr(tc);
-                            /* XXX lost precision if %Hg or whatever */
-                            snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
-                                     string_to_cstring(interpreter, ts),
-                                     (double)thefloat);
+                            /* XXX lost precision if %Hg or whatever
+                               */
+                            {
+                                char *tempstr = string_to_cstring(interpreter,
+                                                                  ts);
+
+                                snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
+                                         tempstr,
+                                         (double)thefloat);
+                                free(tempstr);
+                            }
 
 #if _WIN32
                             /* Microsoft uses a retarded, broken, nonstandard

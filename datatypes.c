@@ -23,6 +23,9 @@ Parrot_get_datatype_enum(Interp *interpreter, STRING *typename)
         if (!strcmp(datatype_names[i - enum_first_type], type))
             return i;
     }
+
+    free(type);
+
     return enum_type_undef;
 }
 

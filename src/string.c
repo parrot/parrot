@@ -1057,7 +1057,7 @@ string_from_num(struct Parrot_Interp * interpreter, FLOATVAL f)
     return Parrot_sprintf_c(interpreter, "%vg", f);
 }
 
-const char *
+char *
 string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
 {
 
