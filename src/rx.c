@@ -37,7 +37,7 @@ rxinfo * rx_allocate_info(struct Parrot_Interp *interpreter, STRING *string) {
 	rx->groupstart=pmc_new(interpreter, enum_class_PerlArray);
 	rx->groupend=pmc_new(interpreter, enum_class_PerlArray);
 
-	rx->stack = new_stack(interpreter);
+	rx->stack = rxstack_new(interpreter);
 	
 	string_transcode(interpreter, rx->string, encoding_lookup("utf32"), rx->string->type, &rx->string);
 
@@ -75,18 +75,6 @@ INLINE BOOLVAL rx_is_whitespace_character(struct Parrot_Interp *interpreter, INT
 	return bitmap_match(bmp, ch);
 }
 
-STRING *rxP_get_substr(struct Parrot_Interp *interpreter, STRING * source, INTVAL startindex, INTVAL length) {
-	STRING *ret;
-	
-	/*printf("rxP_get_substr(%p, %p(%d), %d, %d)", interpreter, source, -1, startindex, length);*/
-
-	ret=string_make(interpreter, NULL, 0, NULL, 0, NULL);
-
-	string_substr(interpreter, source, startindex, length, &ret);
-
-	return ret;
-}
-
 Bitmap bitmap_make(struct Parrot_Interp *interpreter, STRING* str) {
 	UINTVAL i, ch;
 	Bitmap bmp=mem_sys_allocate(sizeof(struct bitmap_t));
@@ -98,7 +86,7 @@ Bitmap bitmap_make(struct Parrot_Interp *interpreter, STRING* str) {
 	}
 	
 	for(i=0; i < string_length(str); i++) {
-		ch=string_ord(str, i);
+		ch=string_ord(str, (INTVAL)i);
 
 		if(ch > 255) {
 			bmp->bigchars=string_concat(interpreter, bmp->bigchars, string_make(interpreter, (void*)&ch, 1, 0, 0, 0), 0);
@@ -145,7 +133,7 @@ BOOLVAL bitmap_match(Bitmap bmp, INTVAL ch) {
 		UINTVAL i;
 		
 		for(i=0; i < string_length(bmp->bigchars); i++) {
-			if(string_ord(bmp->bigchars, i) == ch) {
+			if(string_ord(bmp->bigchars, (INTVAL)i) == ch) {
 				return 1;
 			}
 		}

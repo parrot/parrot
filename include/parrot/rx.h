@@ -16,6 +16,7 @@
 #define PARROT_RX_H_GUARD
 
 #include "parrot/parrot.h"
+#include "parrot/rxstacks.h"
 
 typedef struct bitmap_t {
 	char *bmp;
@@ -57,7 +58,7 @@ typedef struct rxinfo {
 
 	opcode_t *substfunc;
 
-        struct Stack_chunk_t* stack;
+        rxStack stack;
 } rxinfo;
 
 #if __cplusplus
