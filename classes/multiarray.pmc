@@ -10,7 +10,7 @@
  *   (y-1)X0+x   
  *
  *   Where X0 is the length of X-base (fig 1.1). We use this equation in 
- *   calc_offset to get offset from the buffer we store our data in. 
+ *   calc_offset_multi to get offset from the buffer we store our data in. 
  *   Lets say we want to store (2,2) in a buffer. We then take values and do:
  *   (2-1)3 + 2 = 5. 
  * 
@@ -36,12 +36,12 @@
  *      Current code has complexity: 
  *
  *        O(1) writing.                                                  
- *        O(1) reading.
+ *        O(?) reading.
  *  History:
- *        Initial revision by Josef Hˆˆk
+ *        Initial revision by Josef Hook <joh@stacken.kth.se>
  *  Notes:
- *        Future plan is to make calc_offset_multi polymorphic 
- *        and to make it handle multidimensions: done
+ *        Future plan is to handle multidimensions: done
+ *        Move code into vtable functions:
  *  References:
  */
 
@@ -100,15 +100,16 @@ static INTVAL calc_offset_multi(struct Parrot_Interp *interpreter, void *base, P
     INTVAL loop_i;
     INTVAL inner_loop_i;
     dim_key = cell_data->dimension;
-    
-    my_key = key_next(interpreter, k);
+    my_key = k;
 
     if(cell_data->cell_buffer != NULL && dim_key != NULL && my_key != NULL ) {
 
 /* first part of alg.
  * (i + (j-1)*Ni
  */ 
-	offset = key_integer(interpreter, k) + key_integer(interpreter, my_key) * key_integer(interpreter, dim_key);
+	offset = key_integer(interpreter, k);
+	k = key_next(interpreter, k);
+	offset += key_integer(interpreter, k) * key_integer(interpreter, dim_key);
 
 /* add the rest of algoritm 
  * ...  + (k-1)*Ni*Nj + (l-1)*Ni*Nj*Nk ...
@@ -120,20 +121,19 @@ static INTVAL calc_offset_multi(struct Parrot_Interp *interpreter, void *base, P
  *
  */
 	loop_i = 2;
-        my_key = key_next(interpreter, my_key);
-	while ( my_key != NULL ) {
-	    inner_loop_i = loop_i;
-	    
+
+	while ( key_next(interpreter, key_next(interpreter, my_key)) != NULL ) {
+		inner_loop_i = loop_i;
 	    
 	    while ( inner_loop_i > 0 && key_next(interpreter, dim_key) != NULL ) {
 		
 		prod_of_dims *= key_integer(interpreter, dim_key);
 		dim_key = key_next(interpreter, dim_key);
 		inner_loop_i--;
+
 	    }
 	    
-	    offset += key_integer(interpreter, my_key) * prod_of_dims;
-
+	    offset += key_integer(interpreter, key_next(interpreter, key_next(interpreter, my_key))) * prod_of_dims;
 	    my_key = key_next(interpreter, my_key);
 	    loop_i++;
 	}		 
@@ -141,6 +141,7 @@ static INTVAL calc_offset_multi(struct Parrot_Interp *interpreter, void *base, P
 	/* only 1 dim */
 	offset = key_integer(interpreter, k);
     }
+
     return offset;
 }
 
@@ -184,8 +185,6 @@ static CELL *new_cell( struct Parrot_Interp *interpreter, void *data )
 }
 
 
-
-
 static CELL_B *new_marray( Interp *interpreter ) 
 {
     CELL_B *b = (CELL_B *)new_bufferlike_header(interpreter, sizeof(*b));    
@@ -217,12 +216,11 @@ static void init_marray( Interp *interpreter, PMC *self, PMC *key )
     oldkey = key;
     size = 1;
 
-    
-    while (key_next(interpreter, key) != NULL) {
-      
-      size *= key_integer(interpreter, key);
-      key = key_next(interpreter, key);
-      
+    while (key != NULL) {
+	
+        size *= key_integer(interpreter, key);
+        key = key_next(interpreter, key);
+
     }
 
     marray->size = size;
@@ -230,7 +228,7 @@ static void init_marray( Interp *interpreter, PMC *self, PMC *key )
     Parrot_reallocate(interpreter, marray->cell_buffer, marray->size * sizeof(CELL));
     memset(marray->cell_buffer->bufstart, 0, marray->size * sizeof(CELL));
     marray->dimension = oldkey;
-    
+
 }
 
 
@@ -245,6 +243,10 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, PMC *key
     
     INTVAL offs = 0;
     INTVAL ret_val = 0;
+    INTVAL dead_val = 0;    
+    INTVAL my_val = 0;    
+    INTVAL iterate_count = 0;
+
     
     offs = calc_offset_multi(interpreter, mg_marray, key);
     base = (CELL *)mg_marray->cell_buffer->bufstart;
@@ -261,7 +263,48 @@ static INTVAL get_marray_keyed( Interp *interpreter, CELL_B *mg_marray, PMC *key
         if(virtual_addr == buffer_ptr_virt) {
    	ret_val = buffer_ptr->data.int_val;
 	} else {
-           /* PANIC */
+       /* OK here's the deal. We should never come to this point BUT if we have
+        * something must have happened to our cell buffer. Code below is
+        * a cut-paste from my matrix code though structures differs 
+	* it should work anyway. TODO: verify its validity
+	*/
+
+		dead_val = buffer_ptr->virtual_addr; // save our begin value
+		while(buffer_ptr->virtual_addr != offs && (buffer_ptr != NULL)) {
+
+                       /* my_val = (offs - (buffer_ptr->sparse_offset)); */
+			my_val = (offs);
+                        /* outside rand we dont have any value to collect */
+			if(my_val < 0) {
+				ret_val = 0;
+				break;
+			}
+                        /* outside rand we dont have any value to collect */
+			if(my_val > buffer_ptr->virtual_addr) { 
+				ret_val = 0;
+				break;
+			} 
+                        /* possible deadlock should never occur */
+			if(iterate_count > 100000) {
+				printf("AAYIE: possible deadlock in get_matrix_keyed(), recovering\n");
+				ret_val = 0;
+				break;
+			}
+                        /* do some walking among our cells */
+			buffer_ptr = &base[my_val];
+                       /* 
+			* if true we have walked our way around 
+			* which means no value to collect 
+			*/
+			if(buffer_ptr->virtual_addr == dead_val) {
+				ret_val = 0;
+				break;
+			}
+			ret_val = buffer_ptr->data.int_val;
+			iterate_count += 1;
+		}
+
+    
         }	
     }
 
@@ -275,7 +318,6 @@ static void set_marray_keyed( Interp *interpreter, CELL_B *sik_marray, PMC *key,
   CELL *my_cell;
   CELL *base;
   INTVAL offs = 0;
-  
   offs = calc_offset_multi(interpreter, sik_marray, key);
   base = (CELL *)sik_marray->cell_buffer->bufstart;
   my_cell = &base[offs];
@@ -299,14 +341,22 @@ pmclass MultiArray {
 	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
 	SELF->data = NULL;
 	SELF->cache.int_val = 0;
-	/* I use a PMC key class  as wrapper to pass initialvalues to our multi array
-	 *  OBS OBS OBS this dont work since we dont have a multidim key standard yet
-	 *if((initializer->vtable->type(INTERP, SELF)) == enum_class_Key) {
-	 *    init_marray(INTERP, SELF, initializer->data);
-	 *} else{
-	 *   init_marray(INTERP, SELF, NULL);
-	 *}
-        */
+
+	if((initializer->vtable->type(INTERP, initializer)) == enum_class_Key){
+
+            init_marray(INTERP, SELF, initializer);
+
+	} else if ((initializer->vtable->type(INTERP, initializer)) == 
+		   enum_class_PerlInt) {
+		/* 
+		 * we have probably been called from 
+		 * new(out PMC, in INT, in INT) do something usefull.
+		 */
+
+	} else {
+		init_marray(INTERP, SELF, NULL); //no size
+	}
+	
     }
 
     void morph (INTVAL type) {
