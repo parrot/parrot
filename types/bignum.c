@@ -1321,6 +1321,50 @@ BN_align(PINTD_ BIGNUM* one, BIGNUM* two) {
 void
 BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context) {
     BN_SAVE_PREC restore;
+    /* Special values */
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in add");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* Otherwise an infinity */
+        if (am_INF(one) && am_INF(two)) {
+            if (one->sign != two->sign) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "addition of +Inf and -Inf");
+                BN_set_qNAN(PINT_ result);
+                return;
+            }
+            else {
+                BN_set_inf(PINT_ result);
+                result->sign = one->sign;
+                return;
+            }
+        }
+        /* So we've only got one infinity... */
+        BN_set_inf(PINT_ result);
+        result->sign = am_INF(one) ? one->sign : two->sign;
+        return;
+    }
+
+    /* Be careful to do 0 + -0 and -0 + 0 correctly*/
+    if (BN_is_zero(PINT_ one, context) && BN_is_zero(PINT_ two, context)) {
+        result->digits = 1;
+        result->expn = 0;
+        BN_setd(result, 0, 0);
+        if (one->sign & two->sign) {
+            result->sign = 1;
+        }
+        else {
+            result->sign = 0;
+        }
+        return;
+    }
+
 
     BN_arith_setup(PINT_ result, one, two, context, &restore);
 
@@ -1392,6 +1436,50 @@ void
 BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	    BN_CONTEXT *context) {
     BN_SAVE_PREC restore;
+    /* Special values, like addition but careful with those signs eugene */
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in subtract");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* Otherwise an infinity */
+        if (am_INF(one) && am_INF(two)) {
+            if (one->sign == two->sign) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "subtraction of Inf and Inf");
+                BN_set_qNAN(PINT_ result);
+                return;
+            }
+            else {
+                BN_set_inf(PINT_ result);
+                result->sign = one->sign;
+                return;
+            }
+        }
+        /* So we've only got one infinity... */
+        BN_set_inf(PINT_ result);
+        result->sign = am_INF(one) ? one->sign : (1 & (1 ^ two->sign));
+        return;
+    }
+
+    /* Be careful to do 0 + -0 and -0 + 0 correctly*/
+    if (BN_is_zero(PINT_ one, context) && BN_is_zero(PINT_ two, context)) {
+        result->digits = 1;
+        result->expn = 0;
+        BN_setd(result, 0, 0);
+        if (one->sign && !two->sign) {
+            result->sign = 1;
+        }
+        else {
+            result->sign = 0;
+        }
+        return;
+    }
+
     BN_arith_setup(PINT_ result, one, two, context, &restore);
 
     /* Do we mean subtract, or do we mean add? */
@@ -1602,6 +1690,30 @@ Multiplies one and two, storing the result in result.
 void 
 BN_multiply (PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
 	     BN_CONTEXT *context) {
+
+    if (one->digits == 0 || two->digits == 0) {
+        if (am_NAN(one) || am_NAN(two)) {
+            if (am_sNAN(one) || am_sNAN(two)) {
+                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                            "sNAN in multiply");
+            }
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+        /* We've got at least one infinity */
+        /* 0 * Inf => NaN */
+        if (BN_is_zero(PINT_ one, context) || BN_is_zero(PINT_ two, context)) {
+            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                        "Attempt to multiply 0 and Infinity");
+            BN_set_qNAN(PINT_ result);
+            return;
+        }
+
+        /* (anything but 0) * Inf => Inf */
+        BN_set_inf(PINT_ result);
+        result->sign = 1 & (one->sign ^ two->sign);
+        return;
+    }
 
     BN_arith_setup(PINT_ result, one, two, context, NULL);
 
