@@ -498,9 +498,6 @@ OUTPUT
 
 ###############################################################################
 
-SKIP: {
-    skip ("Problems with seek and buffered io", 1);
-
 setup("temp.file", "abcdefg");
 
 c_output_is(<<'CODE', <<'OUTPUT', "PIO_seek");
@@ -536,27 +533,24 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    for (i = 0; i < 4; i++)
-	{
-        got = PIO_seek(interpreter, 
-		    io, PIO_make_offset(fixture[i][0]), fixture[i][1]);	
+    for (i = 0; i < 4; i++) {
+        got = PIO_seek(interpreter, io, 
+                       PIO_make_offset(fixture[i][0]), fixture[i][1]);	
 		
-        if ( got == 0 )
-		{
+        if ( got >= 0 ) {
             buffer = malloc(2 * sizeof(char));
             buffer[1] = '\0';
             PIO_read(interpreter, io, buffer, 1);
             printf("%s", buffer);
             free(buffer);
-		}
-		else
-		{
+        }
+        else {
             printf("seek %i %i failed\n", fixture[i][0], fixture[i][1]);
-		}
-	}
-	
-	printf("\ndone\n");
-	
+        }
+    }
+
+    printf("\ndone\n");
+
     return 0;
 }
 CODE
@@ -565,7 +559,6 @@ done
 OUTPUT
 
 teardown();
-}
 
 ###############################################################################
 

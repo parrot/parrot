@@ -122,7 +122,7 @@ size_t    PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 size_t    PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                               void * buf, size_t len, DummyCodeRef *);
 INTVAL    PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
-INTVAL    PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
+PIOOFF_T  PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                         PIOOFF_T offset, INTVAL whence);
 PIOOFF_T  PIO_tell_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 INTVAL    PIO_setbuf_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,

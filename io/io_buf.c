@@ -48,8 +48,8 @@ static size_t    PIO_buf_write(theINTERP, ParrotIOLayer *l,
                                ParrotIO *io, const void *buffer, size_t len);
 static INTVAL    PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                               const char *s);
-static INTVAL    PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                              INTVAL hi, INTVAL lo, INTVAL whence);
+static PIOOFF_T  PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                              PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static size_t    PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *l,
                                       ParrotIO *io, ParrotIOBuf *b);
@@ -236,8 +236,10 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
             /* FIXME: I/O Error */
         }
     }
-    else {
-        /* Read flush */
+    /*
+     * Read flush
+     */
+    else if (io->b.flags & PIO_BF_READBUF) {
         io->b.flags &= ~PIO_BF_READBUF;
         io->b.next = io->b.startb;
     }
@@ -250,8 +252,12 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                      ParrotIOBuf *b)
 {
     size_t got;
+    PIOOFF_T pos = io->fpos;
+
     got = PIO_read_down(interpreter, PIO_DOWNLAYER(layer), 
                         io, b->startb, b->size);
+    /* buffer-filling does not change fileposition */
+    io->fpos = pos;
  
     /* nothing to get */
     if (got == 0)
@@ -294,6 +300,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         current = avail < len ? avail : len;
         memcpy(out_buf, b->next, current);
         b->next += current;
+        io->fpos += current;
 
         /* buffer completed */
         if (current == avail) {
@@ -329,6 +336,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     /* read from the read_buffer */
     memcpy(out_buf, io->b.next, len);
     io->b.next += len;
+    io->fpos += len;
 
     /* is the buffer is completely empty ? */
     if (io->b.next == io->b.endb) {
@@ -416,8 +424,10 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         PIO_buf_flush(interpreter, layer, io);
         wrote = PIO_write_down(interpreter, PIO_DOWNLAYER(layer), io, buffer, 
                                len);
-        if (wrote == (long)len)
+        if (wrote == (long)len) {
+            io->fpos += wrote;
             return wrote;
+        }
         else {
             /* FIXME: Write error */
         }
@@ -426,6 +436,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         io->b.flags |= PIO_BF_WRITEBUF;
         memcpy(io->b.next, buffer, len);
         io->b.next += len;
+        io->fpos += len;
         return len;
     }
     else {
@@ -437,35 +448,51 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         PIO_buf_flush(interpreter, layer, io);
         memcpy(io->b.startb, ((const char *)buffer + diff), len - diff);
         io->b.next = io->b.startb + (len - diff);
+        io->fpos += len;
         return len;
     }
     return (size_t)-1;
 }
 
 
-static INTVAL
+static PIOOFF_T
 PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-               INTVAL hi, INTVAL lo, INTVAL whence)
+               PIOOFF_T offset, INTVAL whence)
 {
-    int hardseek = 0;
-    UNUSED(hardseek)
+    PIOOFF_T newpos;
 
-        if (io->flags & PIO_F_SHARED ||
-            !(io->flags & (PIO_F_BLKBUF | PIO_F_LINEBUF))) {
-        hardseek = 1;
+    switch (whence) {
+    case SEEK_SET:
+        newpos = offset;
+        break;
+    case SEEK_CUR:
+        newpos = io->fpos + offset;
+        break;
+    case SEEK_END:
+        newpos = PIO_seek_down(interpreter, PIO_DOWNLAYER(l), io, offset,
+                               whence);
+        if (newpos == -1)
+            return -1;
+
+        break;
+    default:
+        /* XXX: somehow report the illegal whence value */
+        return -1;
     }
 
-    if (io->b.flags & (PIO_BF_READBUF | PIO_BF_WRITEBUF)) {
-        /* FIXME: Flush on seek for now */
+    if ((newpos < io->fpos - (io->b.next - io->b.startb))
+        || (newpos >= io->fpos + (io->b.endb - io->b.next))) {
         PIO_buf_flush(interpreter, l, io);
+        PIO_seek_down(interpreter, PIO_DOWNLAYER(l), io, newpos, SEEK_SET);
+    }
+    else {
+        io->b.next += newpos - io->fpos;
     }
 
-    /*
-     * TODO : Try to satisfy seek request in buffer if possible,
-     * else make IO request.
-     */
-    internal_exception(PIO_NOT_IMPLEMENTED, "Seek not implemented");
-    return -1;
+    io->lpos = io->fpos;
+    io->fpos = newpos;
+
+    return io->fpos;
 }
 
 
@@ -494,8 +521,8 @@ ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_buf_read,
     PIO_null_read_async,
     PIO_buf_flush,
-    PIO_null_seek,
-    PIO_null_tell,
+    PIO_buf_seek,
+    PIO_buf_tell,
     PIO_buf_setbuf,
     PIO_buf_setlinebuf,
     PIO_null_getcount,

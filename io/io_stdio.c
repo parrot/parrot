@@ -52,7 +52,7 @@ static size_t    PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, const void *buffer, size_t len);
 static INTVAL    PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 const char *s);
-static INTVAL    PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+static PIOOFF_T  PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
@@ -237,7 +237,7 @@ PIO_stdio_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 /*
  * Hard seek
  */
-static INTVAL
+static PIOOFF_T
 PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
 {
@@ -251,7 +251,7 @@ PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 
     /* Seek clears EOF */
     io->flags &= ~PIO_F_EOF;
-    return (((INTVAL)pos != -1) ? 0 : -1);
+    return pos;
 }
 
 

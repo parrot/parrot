@@ -53,7 +53,7 @@ static size_t    PIO_win32_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, const void *buffer, size_t len);
 static INTVAL    PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 const char *s);
-static INTVAL    PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                                 PIOOFF_T off, INTVAL whence);
 static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
@@ -309,7 +309,7 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 /*
  * Hard seek
  */
-static INTVAL
+static PIOOFF_T
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T off, INTVAL whence)
 {
@@ -323,7 +323,7 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
         return -1;
     }
     io->fpos = offset.QuadPart;
-    return 0;
+    return io->fpos;
 }
 
 

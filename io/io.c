@@ -642,7 +642,7 @@ PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
 /*
  * Iterate down the stack to the first layer implementing "Seek" API
  */
-INTVAL
+PIOOFF_T
 PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;

@@ -157,7 +157,7 @@ PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io)
     return 0;
 }
 
-INTVAL
+PIOOFF_T
 PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, PIOOFF_T offset,
               INTVAL whence)
 {
