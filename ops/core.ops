@@ -1890,6 +1890,12 @@ inline op mul (out PMC, out PMC, out PMC) {
 
 ########################################
 
+=item B<neg>(inout INT)
+
+=item B<neg>(inout NUM)
+
+Set $1 to it's negative.
+
 =item B<neg>(out INT, in INT)
 
 =item B<neg>(out NUM, in NUM)
@@ -1897,6 +1903,16 @@ inline op mul (out PMC, out PMC, out PMC) {
 Set $1 to the negative of $2.
 
 =cut
+
+inline op neg(inout INT) {
+  $1 = -($1);
+  goto NEXT();
+}
+
+inline op neg(inout NUM) {
+  $1 = -($1);
+  goto NEXT();
+}
 
 inline op neg(out INT, in INT) {
   $1 = -($2);

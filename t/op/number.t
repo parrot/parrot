@@ -883,11 +883,12 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "neg_n");
     neg N0,3.0
     neg N0,N0
+    neg N0
     print N0
     print "\\n"
     end
 CODE
-3.000000
+-3.000000
 OUTPUT
 
 

@@ -1027,11 +1027,12 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "neg_i");
     neg I0,3
     neg I0,I0
+    neg I0
     print I0
     print "\\n"
     end
 CODE
-3
+-3
 OUTPUT
 
 1;
