@@ -32,45 +32,57 @@ contained_in_pool(struct Parrot_Interp *interpreter,
     return 0;
 }
 
+/* We're out of traceable objects. Try a DOD, then get some more if needed */
+void
+more_traceable_objects(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool)
+{
+    Parrot_do_dod_run(interpreter);
+    /* requires that num_free_objects be updated in Parrot_do_dod_run */
+    if (pool->num_free_objects <= pool->replenish_level) {
+        (*pool->alloc_objects)(interpreter, pool);
+    }
+}
+
+/* We're out of non-traceable objects. Get some more */
+void
+more_non_traceable_objects(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool)
+{
+    (*pool->alloc_objects)(interpreter, pool);
+}
+
+/* Add an unused object back to the free pool for later reuse */
 void
 add_free_object(struct Parrot_Interp *interpreter,
                  struct Small_Object_Pool *pool, void *to_add)
 {
-    /* Okay, so there's space. Add the header on */
+    /* This code is copied to add_free_pmc and add_free_buffer */
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
-    pool->num_free_objects++;
 }
 
+/* Get a new object from the free pool and return it */
 void *
 get_free_object(struct Parrot_Interp *interpreter,
                    struct Small_Object_Pool *pool)
 {
+    /* This code is copied to get_free_pmc and get_free_buffer */
     void *ptr;
     
-    if (!pool->num_free_objects) {
-        if (pool->free_objects) {
-            (*pool->free_objects)(interpreter, pool);
-        }
-        if (pool->num_free_objects <= pool->replenish_level) {
-            (*pool->more_objects)(interpreter, pool);
-        }
-    }
-
-    if (!pool->num_free_objects) {
-        return NULL;
-    }
+    /* if we don't have any objects */
+    if (!pool->free_list)
+        (*pool->more_objects)(interpreter, pool);
 
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
-    pool->num_free_objects--;
     return ptr;
 }
 
 /* We have no more headers on the free header pool. Go allocate more
  * and put them on */
 void
-alloc_more_objects(struct Parrot_Interp *interpreter,
+alloc_objects(struct Parrot_Interp *interpreter,
                           struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
@@ -123,13 +135,11 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool;
 
     pool = mem_sys_allocate(sizeof(struct Small_Object_Pool));
-    pool->num_free_objects = 0;
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
     pool->add_free_object = add_free_object;
     pool->get_free_object = get_free_object;
-    pool->free_objects = NULL;
-    pool->more_objects = alloc_more_objects;
+    pool->alloc_objects = alloc_objects;
     pool->replenish_level = 0;
     pool->free_list = NULL;
     return pool;

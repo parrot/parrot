@@ -220,8 +220,8 @@ static void
 free_unused_PMCs(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Arena *cur_arena;
-    UINTVAL i;
-
+    UINTVAL i, total_used = 0;
+    
     /* Run through all the buffer header pools and mark */
     for (cur_arena = interpreter->arena_base->pmc_pool->last_Arena;
          NULL != cur_arena;
@@ -234,13 +234,16 @@ free_unused_PMCs(struct Parrot_Interp *interpreter)
                 add_free_pmc(interpreter,
                                 interpreter->arena_base->pmc_pool,
                                 &pmc_array[i]);
-            }
-            else {
+            } else if(!(pmc_array[i].flags & PMC_on_free_list_FLAG)) {
+                total_used++;
                 pmc_array[i].flags &= ~PMC_live_FLAG;
                 pmc_array[i].next_for_GC = NULL;
             }
         }
     }
+    interpreter->active_PMCs += total_used;
+    interpreter->arena_base->pmc_pool->num_free_objects = 
+        interpreter->arena_base->pmc_pool->total_objects - total_used;
 }
 
 /* Put any free buffers that aren't on the free list on the free list 
@@ -251,7 +254,8 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                     struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *cur_arena;
-    UINTVAL i;
+    UINTVAL i, total_used = 0;
+    UINTVAL object_size = pool->object_size;
 
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
@@ -268,13 +272,15 @@ free_unused_buffers(struct Parrot_Interp *interpreter,
                     ((struct Memory_Pool *)pool->mem_pool)->reclaimable += b->buflen;
                 }
                 add_free_buffer(interpreter, pool, b);
+            } else if (!(b->flags & BUFFER_on_free_list_FLAG)) {
+                total_used++;
             }
-            else {
-                b->flags &= ~BUFFER_live_FLAG;
-            }
-            b = (Buffer *)((char *)b + pool->object_size);
+            b->flags &= ~BUFFER_live_FLAG;
+            b = (Buffer *)((char *)b + object_size);
         }
     }
+    interpreter->active_Buffers += total_used;
+    pool->num_free_objects = pool->total_objects - total_used;
 }
 
 #ifndef PLATFORM_STACK_WALK
@@ -319,6 +325,9 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     }
     interpreter->DOD_block_level++;
     
+    interpreter->active_PMCs = 0; 
+    interpreter->active_Buffers = 0;
+
     /* Now go trace the PMCs */
     trace_active_PMCs(interpreter);
 

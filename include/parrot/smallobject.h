@@ -27,12 +27,12 @@ struct Small_Object_Pool {
     /* gets and removes a free object from the pool's free list */
     void *(*get_free_object)(struct Parrot_Interp *,
                              struct Small_Object_Pool *);
-    /* frees up objects. can perform a DOD. Can optionally be set to NULL */
-    void  (*free_objects)   (struct Parrot_Interp *,
-                             struct Small_Object_Pool *);
     /* allocates more objects */
-    void  (*more_objects)   (struct Parrot_Interp *,
-                             struct Small_Object_Pool *);
+    void  (*alloc_objects)(struct Parrot_Interp *,
+                           struct Small_Object_Pool *);
+    /* makes more objects available. can call alloc_more_objects */
+    void  (*more_objects)(struct Parrot_Interp *,
+                              struct Small_Object_Pool *);
     void *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
@@ -44,6 +44,12 @@ size_t get_max_pool_address(struct Parrot_Interp *interpreter,
                             struct Small_Object_Pool *pool);
 size_t get_min_pool_address(struct Parrot_Interp *interpreter,
                             struct Small_Object_Pool *pool);
+
+
+void more_traceable_objects(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool);
+void more_non_traceable_objects(struct Parrot_Interp *interpreter, 
+                struct Small_Object_Pool *pool);
 
 void add_free_object(struct Parrot_Interp *,
                      struct Small_Object_Pool *, void *);

@@ -20,7 +20,7 @@
                                   * parentheses' warnings triggered in VC98 
                                   * include files */
 #pragma warning( disable: 4505 ) /* disables 'unreferenced local function has
-								  * been removed' warnings in header files */
+                                  * been removed' warnings in header files */
 /*
 ** Miscellaneous:
 */

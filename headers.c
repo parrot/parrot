@@ -19,44 +19,42 @@
 #define BUFFER_HEADERS_PER_ALLOC 256
 #define STRING_HEADERS_PER_ALLOC 256
 
-static void
-do_pool_dod_run(struct Parrot_Interp *interpreter, 
-                struct Small_Object_Pool *pool)
-{
-    Parrot_do_dod_run(interpreter);
-}
-
 /** PMC Header Functions for small-object lookup table **/
 
 void
 add_free_pmc(struct Parrot_Interp *interpreter, 
              struct Small_Object_Pool *pool, void *pmc)
 {
-    interpreter->active_PMCs--;
     ((PMC *)pmc)->flags = PMC_on_free_list_FLAG;
-    add_free_object(interpreter,pool,pmc);
+    /* Don't let it point to garbage memory */
+    ((PMC *)pmc)->data = NULL;
+
+    /* Copied from add_free_object */
+    *(void **)pmc = pool->free_list;
+    pool->free_list = pmc;
 }
 void *
 get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 {
-    PMC *pmc = get_free_object(interpreter,pool);
-    /* Count that we've allocated it */
-    interpreter->active_PMCs++;
+    /* Copied from get_free_object */
+    PMC *pmc;
+    if (!pool->free_list)
+        (*pool->more_objects)(interpreter, pool);
+    pmc = pool->free_list;
+    pool->free_list = *(void **)pmc;
+    
     pmc->flags = 0;
-    /* Don't let it point to garbage memory */
-    pmc->data = NULL;
     /* Make sure it doesn't seem to be on the GC list */
     pmc->next_for_GC = NULL;
     
     return pmc;
 }
 void 
-alloc_more_pmcs(struct Parrot_Interp *interpreter, 
+alloc_pmcs(struct Parrot_Interp *interpreter, 
                 struct Small_Object_Pool *pool)
 {
-    interpreter->active_PMCs += pool->objects_per_alloc;
     interpreter->total_PMCs += pool->objects_per_alloc;
-    alloc_more_objects(interpreter, pool);
+    alloc_objects(interpreter, pool);
 }
 
 
@@ -66,32 +64,37 @@ void
 add_free_buffer(struct Parrot_Interp *interpreter, 
                 struct Small_Object_Pool *pool, void *buffer)
 {
-    interpreter->active_Buffers--;
     ((Buffer *)buffer)->flags = BUFFER_on_free_list_FLAG;
-    add_free_object(interpreter,pool,buffer);
+    /* Use the right length */
+    ((Buffer *)buffer)->buflen = 0;
+
+    /* Copied from add_free_object */
+    *(void **)buffer = pool->free_list;
+    pool->free_list = buffer;
 }
 void *
 get_free_buffer(struct Parrot_Interp *interpreter, 
                 struct Small_Object_Pool *pool)
 {
-    Buffer *buffer = get_free_object(interpreter,pool);
-    /* Count that we've allocated it */
-    interpreter->active_Buffers++;
-    buffer->flags = 0;
+    /* Copied from get_free_object */
+    Buffer *buffer;
+    if (!pool->free_list)
+        (*pool->more_objects)(interpreter, pool);
+    buffer = pool->free_list;
+    pool->free_list = *(void **)buffer;
+    
     /* Don't let it point to garbage memory */
     buffer->bufstart = NULL;
-    /* Use the right length */
-    buffer->buflen = 0;
+    buffer->flags = 0;
     
     return buffer;
 }
 void 
-alloc_more_buffers(struct Parrot_Interp *interpreter, 
+alloc_buffers(struct Parrot_Interp *interpreter, 
                    struct Small_Object_Pool *pool)
 {
-    interpreter->active_Buffers += pool->objects_per_alloc;
     interpreter->total_Buffers += pool->objects_per_alloc;
-    alloc_more_objects(interpreter, pool);
+    alloc_objects(interpreter, pool);
 }
 
 
@@ -103,10 +106,10 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
 {
     struct Small_Object_Pool *pmc_pool = new_small_object_pool(
                       interpreter, sizeof(PMC), PMC_HEADERS_PER_ALLOC);
-    pmc_pool->free_objects = do_pool_dod_run;
     pmc_pool->add_free_object = add_free_pmc;
     pmc_pool->get_free_object = get_free_pmc;
-    pmc_pool->more_objects = alloc_more_pmcs;
+    pmc_pool->alloc_objects = alloc_pmcs;
+    pmc_pool->more_objects = more_traceable_objects;
     pmc_pool->mem_pool = interpreter->arena_base->memory_pool;
     
     return pmc_pool;
@@ -123,10 +126,10 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Pool *pool = 
         new_small_object_pool(interpreter, buffer_size,
                           BUFFER_HEADERS_PER_ALLOC);
-    pool->free_objects = do_pool_dod_run;
     pool->add_free_object = add_free_buffer;
     pool->get_free_object = get_free_buffer;
-    pool->more_objects = alloc_more_buffers;
+    pool->alloc_objects = alloc_buffers;
+    pool->more_objects = more_traceable_objects;
     pool->mem_pool = interpreter->arena_base->memory_pool;
     pool->align_1 = BUFFER_ALIGNMENT-1;
     return pool;

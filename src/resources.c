@@ -137,7 +137,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
     struct Small_Object_Arena *cur_buffer_arena;
     struct Small_Object_Pool *header_pool;
     INTVAL j;
-
+    UINTVAL object_size;
     /* Bail if we're blocked */
     if (interpreter->GC_block_level) {
         return;
@@ -167,7 +167,9 @@ static void compact_pool(struct Parrot_Interp *interpreter,
         else if (j == -1) header_pool = interpreter->arena_base->string_header_pool;
         else header_pool = interpreter->arena_base->sized_header_pools[j];
         if (header_pool == NULL) continue;
-                 
+        
+        object_size = header_pool->object_size;
+        
         for (cur_buffer_arena = header_pool->last_Arena;
              NULL != cur_buffer_arena;
              cur_buffer_arena = cur_buffer_arena->prev)
@@ -188,7 +190,7 @@ static void compact_pool(struct Parrot_Interp *interpreter,
                         cur_spot += cur_size;
                     }
                 }
-                b = (Buffer *)((char *)b + header_pool->object_size);
+                b = (Buffer *)((char *)b + object_size);
             }
         }
     }
