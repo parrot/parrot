@@ -198,7 +198,7 @@ static opcode_t*
 the_test(struct Parrot_Interp *interpreter,
 	 opcode_t *cur_op, opcode_t *start)
 {
-    char *flags[] = {"<", ">", ">>", "+<", "+>", 
+    char *flags[] = {"<", ">", ">>", "+<", "+>",
 		     "", ";-)", "<<<<<<<<<", "+", "<-:"};
     INTVAL expected[] = {PIO_F_READ,
 			 (PIO_F_WRITE | PIO_F_TRUNC),
@@ -211,7 +211,7 @@ the_test(struct Parrot_Interp *interpreter,
 
     for (i = 0; i < 10; i++) {
 	got = PIO_parse_open_flags(flags[i]);
-	
+
 	if ( got != expected[i] ) {
 	    PIO_printf(interpreter,
 		       "\"%s\" should have parsed to %i not %i\n",
@@ -249,15 +249,15 @@ the_test(struct Parrot_Interp *interpreter,
     for (i = 0; i < 3; i++) {
 	for (j = 0; j < 7; j++) {
 	    io = PIO_open(interpreter, NULL, file[i], flags[j]);
-	    
+
 	    if ( (PIO_eof(interpreter, io) ? 0:1) != expected[i][j] ) {
-		PIO_printf(interpreter, 
+		PIO_printf(interpreter,
 			   "\"%s\" \"%s\" should%s have opened\n",
 			   file[i], flags[j], expected[i][j] ? "" : " not");
 	    }
 	}
     }
-    
+
     PIO_printf(interpreter, "done\n");
 
     return NULL;
@@ -298,7 +298,7 @@ the_test(struct Parrot_Interp *interpreter,
         buffer[n] = '\0';
 
         if ( n != strlen(str[i]) ) {
-            PIO_printf(interpreter, 
+            PIO_printf(interpreter,
 		       "read: %i expected: %i\n", n, strlen(str[i]));
         }
 
@@ -409,11 +409,11 @@ the_test(struct Parrot_Interp *interpreter,
 
     buf = malloc(65536 * sizeof(char));
 
-    printf("%d\n", PIO_tell(interpreter, io));
+    printf("%d\n", (int)PIO_tell(interpreter, io));
     PIO_read(interpreter, io, buf, 6);
-    printf("%d\n", PIO_tell(interpreter, io));
+    printf("%d\n", (int)PIO_tell(interpreter, io));
     PIO_read(interpreter, io, buf, 65535);
-    printf("%d\n", PIO_tell(interpreter, io));
+    printf("%d\n", (int)PIO_tell(interpreter, io));
 
     return NULL;
 }
@@ -441,7 +441,7 @@ the_test(struct Parrot_Interp *interpreter,
 	return NULL;
     }
 
-    PIO_printf(interpreter, 
+    PIO_printf(interpreter,
 	       "%i\n", PIO_write(interpreter, io, "This is a test\n", 15));
 
     return NULL;
@@ -550,7 +550,7 @@ the_test(struct Parrot_Interp *interpreter,
             free(buffer);
         }
         else {
-            PIO_printf(interpreter, 
+            PIO_printf(interpreter,
 		       "seek %i %i failed\n", fixture[i][0], fixture[i][1]);
         }
     }
@@ -590,7 +590,7 @@ the_test(struct Parrot_Interp *interpreter,
 
         if ( ( io != NULL ) != expected[i] )
         {
-            PIO_printf(interpreter, 
+            PIO_printf(interpreter,
 		       "stdout should%s have opened with \"%s\" flags\n",
 		       expected[i] ? "" : " not", flags[i]);
         }
