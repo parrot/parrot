@@ -37,7 +37,7 @@ sub _run_command {
     $redir_string .= "open $from, $to;"
   }
 
-  system "$^X -e \"$redir_string;system qq{$command};\"";
+  system "$^X -e \"$redir_string;system q{$command};\"";
 }
 
 my $count;
