@@ -4309,6 +4309,7 @@ inline op callcc(in PMC) {
   else {
     abort();
   }
+  return 0;
 }
 
 =item B<warningson>(in INT)
