@@ -104,14 +104,14 @@ Instruction * INS(char * name, char *fmt, SymReg **regs, int n,
     return iANY(name, fmt, regs, emit);
 }
 
-/* imcc_eval(interp*, const char*)
+/* imcc_compile(interp*, const char*)
  *
- * evaluate a pasm or imcc string
+ * compile a pasm or imcc string
  *
  */
 extern void* yy_scan_string(const char *);
 
-static void *imcc_eval(Parrot_Interp interpreter, const char *s)
+static void *imcc_compile(Parrot_Interp interpreter, const char *s)
 {
     /* imcc always compiles to interp->code->byte_code
      * save old pointer, make new
@@ -143,18 +143,18 @@ static void *imcc_eval(Parrot_Interp interpreter, const char *s)
     return pc;
 }
 
-void *imcc_eval_pasm(Parrot_Interp interpreter, const char *s)
+void *imcc_compile_pasm(Parrot_Interp interpreter, const char *s)
 {
     pasm_file = 1;
     expect_pasm = 0;
-    return imcc_eval(interpreter, s);
+    return imcc_compile(interpreter, s);
 }
 
-void *imcc_eval_pir (Parrot_Interp interpreter, const char *s)
+void *imcc_compile_pir (Parrot_Interp interpreter, const char *s)
 {
     pasm_file = 0;
     expect_pasm = 0;
-    return imcc_eval(interpreter, s);
+    return imcc_compile(interpreter, s);
 }
 
 /* tell the parrot core, which compilers we provide */
@@ -163,8 +163,8 @@ void register_compilers(Parrot_Interp interpreter)
     STRING *pasm = string_make(interpreter, "PASM", 4, NULL,0,NULL);
     STRING *pir = string_make(interpreter, "PIR", 3, NULL,0,NULL);
     PMC * func;
-    Parrot_csub_t pa = (Parrot_csub_t) F2DPTR(imcc_eval_pasm);
-    Parrot_csub_t pi = (Parrot_csub_t) F2DPTR(imcc_eval_pir);
+    Parrot_csub_t pa = (Parrot_csub_t) F2DPTR(imcc_compile_pasm);
+    Parrot_csub_t pi = (Parrot_csub_t) F2DPTR(imcc_compile_pir);
 
     func = pmc_new(interpreter, enum_class_Compiler);
     Parrot_compreg(interpreter, pasm, func);
