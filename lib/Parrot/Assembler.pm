@@ -1074,6 +1074,8 @@ sub handle_operator {
 
   $opcode = lc $opcode;
 
+  $seen_end = 1 if $opcode eq 'end';
+
   if (!exists $opcodes{$opcode}) {
     $opcode = find_correct_opcode($opcode, @args);
   }
