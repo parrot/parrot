@@ -1122,13 +1122,13 @@ Within:
     restore .TempPMC3
     restore .TempPMC2
     restore .TempPMC
-    gt .TempPMC3, .TempPMC2, three_two
+    le .TempPMC3, .TempPMC2, three_two
  two_three:
-    lt .TempPMC2, .TempPMC, Is_not_within
+    lt .TempPMC, .TempPMC2, Is_not_within
     ge .TempPMC, .TempPMC3, Is_not_within
     branch Is_within
  three_two:
-    le .TempPMC2, .TempPMC, Is_within
+    le .TempPMC2, .TempPMC, Is_within 
     lt .TempPMC, .TempPMC3, Is_within
     branch Is_not_within
  Is_within:
