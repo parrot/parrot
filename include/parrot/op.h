@@ -41,7 +41,7 @@ typedef enum {
 /* NOTE: Sure wish we could put the types here... */
 
 typedef opcode_t *(*op_func_t)();
-typedef void **(*prederef_op_func_t)();
+typedef void **(*op_func_prederef_t)();
 
 
 /*

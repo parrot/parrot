@@ -1,0 +1,115 @@
+#
+# C.pm
+#
+# $Id$
+#
+
+use strict;
+use warnings;
+
+package Parrot::OpTrans::C;
+
+use Parrot::OpTrans;
+use vars qw(@ISA);
+@ISA = qw(Parrot::OpTrans);
+
+
+#
+# defines()
+#
+
+sub defines
+{
+  return <<END;
+#define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interpreter->code->byte_code))
+#define CUR_OPCODE cur_opcode
+END
+}
+
+
+#
+# goto_address()
+#
+
+sub goto_address
+{
+  my ($self, $addr) = @_;
+  return "return $addr";
+}
+
+
+#
+# goto_offset()
+#
+
+sub goto_offset
+{
+  my ($self, $offset) = @_;
+  return "return cur_opcode + $offset";
+}
+
+
+#
+# goto_pop()
+#
+
+sub goto_pop
+{
+  my ($self) = @_;
+  return "return pop_dest(interpreter)";
+}
+
+
+#
+# access_arg()
+#
+
+my %arg_maps = (
+  'op' => "cur_opcode[%ld]",
+
+  'i'  => "interpreter->int_reg->registers[cur_opcode[%ld]]",
+  'n'  => "interpreter->num_reg->registers[cur_opcode[%ld]]",
+  'p'  => "interpreter->pmc_reg->registers[cur_opcode[%ld]]",
+  's'  => "interpreter->string_reg->registers[cur_opcode[%ld]]",
+  
+  'ic' => "cur_opcode[%ld]",
+  'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
+  'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
+  'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
+);
+
+sub access_arg
+{
+  my ($self, $type, $num, $op) = @_;
+
+  die "Unrecognized type '$type' for num '$num' in opcode @{[$op->full_name]}"
+    unless exists $arg_maps{$type};
+
+  return sprintf($arg_maps{$type}, $num);
+}
+
+
+#
+# restart_offset()
+#
+
+sub restart_offset
+{
+  my ($self, $offset) = @_;
+  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
+}
+
+
+#
+# restart_address()
+#
+
+sub restart_address
+{
+  my ($self, $addr) = @_;
+  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
+}
+
+
+1;
+

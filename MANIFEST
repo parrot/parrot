@@ -122,7 +122,6 @@ memory.c
 NEWS
 obscure.ops
 ops2c.pl
-ops2c-prederef.pl
 ops2pm.pl
 packfile.c
 Parrot/Assembler.pm
@@ -130,9 +129,12 @@ parrot.c
 Parrot/Jit/i386-bsd.pm
 Parrot/Jit/i386-linux.pm
 Parrot/Jit/i386-nojit.pm
-Parrot/Opcode.pm
 Parrot/Op.pm
 Parrot/OpsFile.pm
+Parrot/OpTrans/C.pm
+Parrot/OpTrans/CGoto.pm
+Parrot/OpTrans/CPrederef.pm
+Parrot/OpTrans.pm
 Parrot/PackFile/Constant.pm
 Parrot/PackFile/ConstTable.pm
 Parrot/PackFile/FixupTable.pm

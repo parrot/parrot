@@ -17,7 +17,9 @@ use Parrot::Types;
 use Parrot::PackFile;
 use Parrot::PackFile::ConstTable;
 use Parrot::OpsFile;
+use Parrot::OpTrans::CGoto;
 
+my $trans = Parrot::OpTrans::CGoto->new;
 
 use Data::Dumper;
 $Data::Dumper::Useqq  = 1;
@@ -158,7 +160,9 @@ END_C
             push @args, $arg;
         }
 
-        my $source = $op->source(\&map_ret_abs, \&map_ret_rel, \&map_arg, \&map_res_abs, \&map_res_rel);
+        $trans->pc($pc);
+        $trans->args(@args);
+        my $source = $op->source($trans);
 
         printf("PC_%d: { /* %s */\n%s}\n\n", $pc, $op->full_name, $source);
     }
@@ -176,78 +180,6 @@ END_C
 
     return 0;
 }
-
-
-#
-# map_ret_abs()
-#
-
-sub map_ret_abs
-{
-  my ($addr) = @_;
-#print STDERR "pbcc: map_ret_abs($addr)\n";
-  return sprintf("goto PC_%d", $addr);
-}
-
-
-#
-# map_ret_rel()
-#
-
-sub map_ret_rel
-{
-  my ($offset) = @_;
-#print STDERR "pbcc: map_ret_rel($offset)\n";
-  return sprintf("goto PC_%d", $pc + $offset);
-}
-
-
-#
-# map_arg()
-#
-
-my %arg_maps = (
-  'i'  => "interpreter->int_reg->registers[%ld]",
-  'n'  => "interpreter->num_reg->registers[%ld]",
-  'p'  => "interpreter->pmc_reg->registers[%ld]",
-  's'  => "interpreter->string_reg->registers[%ld]",
-
-  'ic' => "%ld",
-  'nc' => "interpreter->code->const_table->constants[%ld]->number",
-  'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-  'sc' => "interpreter->code->const_table->constants[%ld]->string",
-);
-
-sub map_arg
-{
-  my ($type, $num) = @_;
-#print STDERR "pbcc: map_arg($type, $num)\n";
-  return sprintf($arg_maps{$type}, $args[$num - 1]);
-}
-
-
-#
-# map_res_abs()
-#
-
-sub map_res_abs
-{
-  my ($addr) = @_;
-  die "pbc2c.pl: Cannot handle RESUME ops!";
-}
-
-
-#
-# map_res_rel()
-#
-
-sub map_res_rel
-{
-  my ($offset) = @_;
-  die "pbc2c.pl: Cannot handle RESUME ops!";
-}
-
-
 
 
 #

@@ -199,15 +199,19 @@ sub make_op
       #
       # We convert the following notations:
       #
-      #   .ops file   Op body  Meaning       Comment
-      #   ----------  -------  ------------  ----------------------------------
-      #   AUTO        {{+=S}}  PC' = PC + S  Where S is op size; for auto ops
-      #   HALT        {{=0}}   PC' = 0       Halts run_ops loop, no resume
-      #   RESTART(X)  {{=0}}   PC' = 0       Restarts at PC + X
-      #   RESTART(*)  {{=0}}   PC' = 0       Restarts at PC + S
-      #   RETREL(X)   {{+=X}}  PC' = PC + X  Used for branches
-      #   RETABS(X)   {{=X}}   PC' = X       Used for absolute jumps
-      #   $X          {{@X}}   Argument X    $0 is opcode, $1 is first arg
+      #   .ops file          Op body  Meaning       Comment
+      #   -----------------  -------  ------------  ----------------------------------
+      #   goto OFFSET(X)     {{+=X}}  PC' = PC + X  Used for branches
+      #   goto NEXT()        {{+=S}}  PC' = PC + S  Where S is op size
+      #   goto ADDRESS(X)    {{=X}}   PC' = X       Used for absolute jumps
+      #   goto POP()         {{=*}}   PC' = <pop>   Pop address off control stack
+      #
+      #   HALT()             {{=0}}   PC' = 0       Halts run_ops loop, no resume
+      #
+      #   restart OFFSET(X)  {{=0,+=X}}   PC' = 0       Restarts at PC + X
+      #   restart NEXT()     {{=0,+=S}}   PC' = 0       Restarts at PC + S
+      #
+      #   $X                 {{@X}}   Argument X    $0 is opcode, $1 is first arg
       #
       # Later transformations turn the Op body notations into C code, based
       # on the mode of operation (function calls, switch statements, gotos
@@ -216,16 +220,15 @@ sub make_op
       # TODO: Complain about using, e.g. $3 in an op with only 2 args.
       #
 
-      $body =~ s/return\s+AUTO/{{+=$op_size}}/mg;
+      $body =~ s/goto\s+OFFSET\((.*)\)/{{+=$1}}/mg;
+      $body =~ s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;
+      $body =~ s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
+      $body =~ s/goto\s+POP\(\)/{{=*}}/mg;
 
-      $body =~ s/return\s+HALT/{{=0}}/mg;
+      $body =~ s/HALT\(\)/{{=0}}/mg;
       
-      $body =~ s/return\s+RESTART\(\*\)/{{=0,+=$op_size}}/mg;
-      $body =~ s/return\s+RESTART\((.*)\)/{{=0,+=$1}}/mg;
-      
-      $body =~ s/return\s+RETREL\((.*)\)/{{+=$1}}/mg;
-      
-      $body =~ s/return\s+RETABS\((.*)\)/{{=$1}}/mg;
+      $body =~ s/restart\s+OFFSET\((.*)\)/{{=0,+=$1}}/mg;
+      $body =~ s/restart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
       
       $body =~ s/\$(\d+)/{{\@$1}}/mg;
       

@@ -180,7 +180,7 @@ runops_prederef (struct Parrot_Interp *interpreter, opcode_t * pc, void ** pc_pr
     code_start_prederef = pc_prederef;
 
     while (pc_prederef) {
-      pc_prederef = ((prederef_op_func_t)*pc_prederef)(pc_prederef, interpreter);
+      pc_prederef = ((op_func_prederef_t)*pc_prederef)(pc_prederef, interpreter);
     }
 
     if (pc_prederef == 0) {

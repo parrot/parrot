@@ -35,7 +35,7 @@ Halts the interpreter.
 =cut
 
 inline op end() {
-  return HALT;
+  HALT();
 }
 
 
@@ -48,7 +48,7 @@ Does nothing other than waste an iota of time and 32 bits of bytecode space.
 =cut
 
 inline op noop() {
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -79,7 +79,7 @@ Close file opened on file descriptor $1.
 
 inline op close(i|ic) {
   close($1);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -97,14 +97,14 @@ Store the system error message in $1.
 
 inline op err(i) {
   $1 = errno;
-  return AUTO;
+  goto NEXT();
 }
 
 op err(s) {
   char *tmp = strerror(errno);
   STRING *s = string_make(interpreter, tmp, strlen(tmp), 0, 0, 0);
   $1 = s;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -129,17 +129,17 @@ into $1.
 
 inline op open(i, s|sc) {
   $1 = open(($2)->bufstart, O_WRONLY | O_CREAT | O_TRUNC, DEFAULT_OPEN_MODE);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op open(i, s|sc, i|ic) {
   $1 = open(($2)->bufstart, $3, DEFAULT_OPEN_MODE);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op open(i, s|sc, i|ic, i|ic) {
   $1 = open(($2)->bufstart, $3, $4);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -164,12 +164,12 @@ If $3 is less than the negative of the length, throws an exception.
 
 inline op ord(i,s|sc) {
   $1 = string_ord($2,0);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ord(i,s|sc,i|ic) {
   $1 = string_ord($2,$3);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -190,13 +190,13 @@ Print $1 to standard output.
 inline op print(i|ic) {
   /* TODO: Configure for format */
   printf("%li", (long) $1);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op print(n|nc) {
   /* TODO: Configure for format */
   printf("%f", $1);
-  return AUTO;
+  goto NEXT();
 }
 
 op print(s|sc) {
@@ -204,7 +204,7 @@ op print(s|sc) {
   if (s && string_length(s)) {
     printf("%.*s",(int)string_length(s),(char *) s->bufstart);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op print(p) {
@@ -213,7 +213,7 @@ op print(p) {
   if (s) {
     printf("%.*s",(int)string_length(s),(char *) s->bufstart);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -235,12 +235,12 @@ Read $3 bytes from file descriptor $2 into string $1.
 
 inline op read(i, i|ic) {
   read($2, &($1), sizeof(INTVAL));
-  return AUTO;
+  goto NEXT();
 }
 
 inline op read(n, i|ic) {
   read($2, &($1), sizeof(FLOATVAL));
-  return AUTO;
+  goto NEXT();
 }
 
 op read(s, i|ic, i|ic) {
@@ -254,7 +254,7 @@ op read(s, i|ic, i|ic) {
   s = string_make(interpreter, tmp, len, 0, 0, 0);
   $1 = s;
   free(tmp);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -269,7 +269,7 @@ in $1.
 
 inline op time(i) {
   $1 = Parrot_intval_time();
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -284,7 +284,7 @@ microseconds) in $1.
 
 inline op time(n) {
   $1 = Parrot_floatval_time();
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -303,20 +303,20 @@ Write $2 to file descriptor $1.
 op write(i|ic, i|ic) {
   INTVAL * i = &($2);
   write($1, i, sizeof(INTVAL));
-  return AUTO;
+  goto NEXT();
 }
 
 op write(i|ic, n|nc) {
   FLOATVAL * f = &($2);
   write($1, f, sizeof(FLOATVAL));
-  return AUTO;
+  goto NEXT();
 }
 
 op write(i|ic, s|sc) {
   STRING * s = $2;
   INTVAL count = string_length(s);
   write($1, s->bufstart, count);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -389,77 +389,77 @@ Set $1 to $2.
 
 inline op set(i, i|ic) {
   $1 = $2;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(n, n|nc) {
   $1 = $2;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(n, p) {
   $1 = $2->vtable->get_number(interpreter, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(s, s|sc) {
   $1 = string_copy(interpreter, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, i|ic) { 
   $1->vtable->set_integer_native(interpreter, $1, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, n|nc) { 
   $1->vtable->set_number_native(interpreter, $1, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, s|sc) {
   $1->vtable->set_string_native(interpreter, $1, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(i, p) {
   $1 = $2->vtable->get_integer(interpreter, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clone(p, p) {
   $2->vtable->clone(interpreter, $2, $1);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, i|ic, i|ic) {
   $1->vtable->set_integer_index(interpreter, $1, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, n|nc, i|ic) {
   $1->vtable->set_number_index(interpreter, $1, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(p, s|sc, i|ic) {
   $1->vtable->set_string_index(interpreter, $1, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(i, p, i|ic) {
   $1 = $2->vtable->get_integer_index(interpreter, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(n, p, i|ic) {
   $1 = $2->vtable->get_number_index(interpreter, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op set(s, p, i|ic) {
   $1 = $2->vtable->get_string_index(interpreter, $2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 =back
@@ -489,7 +489,7 @@ Load $1 with the FLOATVAL corresponding to the INTVAL from $2.
 
 inline op iton(n, i) {
   $1 = (FLOATVAL)$2;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -505,7 +505,7 @@ op ntoi(i, n) {
   FLOATVAL number;
   number = $2;
   $1 = (INTVAL)number;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -546,118 +546,88 @@ Return address is popped off the call stack if no address is supplied.
 
 =cut
 
-op eq (i, i|ic) {
-  opcode_t *dest;
+inline op eq (i, i|ic) {
   if ($1 == $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op eq (ic, i|ic) {
-  opcode_t *dest;
+inline op eq (ic, i|ic) {
   if ($1 == $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op eq (n, n|nc) {
-  opcode_t *dest;
+inline op eq (n, n|nc) {
   if ($1 == $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op eq (nc, n|nc) {
-  opcode_t *dest;
+inline op eq (nc, n|nc) {
   if ($1 == $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op eq (s, s|sc) {
-  opcode_t *dest;
   if (string_compare (interpreter, $1, $2) == 0) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op eq (sc, s|sc) {
-  opcode_t *dest;
   if (string_compare (interpreter, $1, $2) == 0) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op eq(i, i|ic, ic) {
   if ($1 == $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op eq (ic, i|ic, ic) {
   if ($1 == $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op eq(n, n|nc, ic) {
   if ($1 == $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op eq (nc, n|nc, ic) {
   if ($1 == $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op eq(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) == 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op eq (sc, s|sc, ic) {
   if (string_compare (interpreter, $1, $2) == 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -681,118 +651,88 @@ Return address is popped off the call stack if no address is supplied.
 
 =cut
 
-op ne (i, i|ic) {
-  opcode_t *dest;
+inline op ne (i, i|ic) {
   if ($1 != $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op ne (ic, i|ic) {
-  opcode_t *dest;
+inline op ne (ic, i|ic) {
   if ($1 != $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op ne (n, n|nc) {
-  opcode_t *dest;
+inline op ne (n, n|nc) {
   if ($1 != $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
-op ne (nc, n|nc) {
-  opcode_t *dest;
+inline op ne (nc, n|nc) {
   if ($1 != $2) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op ne (s, s|sc) {
-  opcode_t *dest;
   if (string_compare (interpreter, $1, $2) != 0) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op ne (sc, s|sc) {
-  opcode_t *dest;
   if (string_compare (interpreter, $1, $2) != 0) {
-    pop_generic_entry (
-      interpreter, &interpreter->control_stack_top,
-      &dest, STACK_ENTRY_DESTINATION
-    );
-    return RETABS(dest);
+    goto POP();
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ne(i, i|ic, ic) {
   if ($1 != $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ne (ic, i|ic, ic) {
   if ($1 != $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ne(n, n|nc, ic) {
   if ($1 != $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ne (nc, n|nc, ic) {
   if ($1 != $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op ne(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) != 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op ne (sc, s|sc, ic) {
   if (string_compare (interpreter, $1, $2) != 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -816,23 +756,23 @@ Branch if $1 is less than $2.
 
 inline op lt(i, i|ic, ic) {
   if ($1 < $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op lt(n, n|nc, ic) {
   if ($1 < $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op lt(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) < 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -856,23 +796,23 @@ Branch if $1 is less than or equal to $2.
 
 inline op le(i, i|ic, ic) {
   if ($1 <= $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op le(n, n|nc, ic) {
   if ($1 <= $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op le(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) <= 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -896,23 +836,23 @@ Branch if $1 is greater than $2.
 
 inline op gt(i, i|ic, ic) {
   if ($1 > $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op gt(n, n|nc, ic) {
   if ($1 > $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op gt(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) > 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -936,23 +876,23 @@ Branch if $1 is greater than or equal to $2.
 
 inline op ge(i, i|ic, ic) {
   if ($1 >= $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op ge(n, n|nc, ic) {
   if ($1 >= $2) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op ge(s, s|sc, ic) {
   if (string_compare(interpreter, $1, $2) >= 0) {
-    return RETREL($3);
+    goto OFFSET($3);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -970,23 +910,23 @@ Check register $1. If true, branch by $2.
 
 inline op if(i, ic) {
   if ($1 != 0) {
-    return RETREL($2);
+    goto OFFSET($2);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op if(n, ic) {
   if ($1 != 0.0) {
-    return RETREL($2);
+    goto OFFSET($2);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 op if(p, ic) {
   if ($1->vtable->get_bool(interpreter, $1)) {
-    return RETREL($2);
+    goto OFFSET($2);
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1021,7 +961,7 @@ inline op abs(i, i|ic|n|nc) {
   else {
     $1 = (INTVAL)$2;
   }
-  return AUTO;
+  goto NEXT();
 }
 
 inline op abs(n, n|nc|i|ic) {
@@ -1031,7 +971,7 @@ inline op abs(n, n|nc|i|ic) {
   else {
     $1 = (FLOATVAL)$2;
   }
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1051,12 +991,12 @@ Set $1 to the sum of $2 and $3.
 
 inline op add(i, i, i|ic) {
   $1 = $2 + $3;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op add(n, n, n|nc) {
   $1 = $2 + $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1102,7 +1042,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 inline op cmod(i, i|ic, i|ic) {
   $1 = $2 % $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1143,7 +1083,7 @@ TODO: Doesn't the Parrot interpreter need to catch the exception?
 
 inline op cmod(n, n|nc, n|nc) {
   $1 = fmod($2, $3);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1159,7 +1099,7 @@ Decrease $1 by one.
 
 inline op dec(i|n) {
   $1--;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1175,12 +1115,12 @@ Decrease $1 by the amount in $2.
 
 inline op dec(i, ic) {
   $1 -= $2;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op dec(n, nc) {
   $1 -= $2;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1205,12 +1145,12 @@ result is truncated (NOT rounded or floored).
 
 inline op div(i, i|ic, i|ic) {
   $1 = $2 / $3;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op div(n, n|nc, n|nc) {
   $1 = $2 / $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1226,7 +1166,7 @@ Increase $1 by one.
 
 inline op inc(i|n) {
   $1++;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1242,12 +1182,12 @@ Increase $1 by the amount in $2.
 
 inline op inc(i, ic) {
   $1 += $2;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op inc(n, nc) {
   $1 += $2;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1303,7 +1243,7 @@ op mod(i, i|ic, i|ic) {
   }
 
   $1 = r;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1333,7 +1273,7 @@ op mod(n, n|nc, n|nc) {
   $1 = $3
      ? ($2 - $3 * floor($2 / $3))
      : $2;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1353,12 +1293,12 @@ Set $1 to the product of $2 and $3.
 
 inline op mul(i, i, i|ic) {
   $1 = $2 * $3;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op mul(n, n, n|nc) {
   $1 = $2 * $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1394,7 +1334,7 @@ Set $1 to $2 raised to the power $3.
 
 inline op pow(n, i|ic|n|nc, i|ic|n|nc) {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1418,12 +1358,12 @@ Set $1 to $2 minus $3.
 
 inline op sub(i, i|ic, i|ic) {
   $1 = $2 - $3;
-  return AUTO;
+  goto NEXT();
 }
 
 inline op sub(n, n|nc, n|nc) {
   $1 = $2 - $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1455,7 +1395,7 @@ TODO: Create a three-argument version of this? Don't force in-place modification
 
 inline op chopn(s, i|ic) {
   (void)string_chopn($1, $2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1480,12 +1420,12 @@ into $1.
 
 inline op concat(s, s|sc) {
   $1 = string_concat(interpreter, $1, $2, 1);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op concat(s, s|sc, s|sc) {
   $1 = string_concat(interpreter, $2, $3, 1);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1499,7 +1439,7 @@ Set $1 to the length (in characters) of the string in $2.
 
 inline op length(i, s) {
   $1 = string_length($2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1526,7 +1466,7 @@ length $4.
 
 inline op substr(s, s|sc, i|ic, i|ic) {
   $1 = string_substr(interpreter, $2, $3, $4, &$1);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1559,7 +1499,7 @@ Set $1 to the arc cosine (in radians) of $2.
 
 inline op acos(n, i|n) {
   $1 = acos((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1575,7 +1515,7 @@ Set $1 to the arc secant (in radians) of $2.
 
 inline op asec(n, i|n) {
   $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1591,7 +1531,7 @@ Set $1 to the arc sine (in radians) of $2.
 
 inline op asin(n, i|n) {
   $1 = asin((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1635,12 +1575,12 @@ quadrant of the result.
 
 inline op atan(n, i|n) {
   $1 = atan((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op atan(n, i|ic|n|nc, i|ic|n|nc) {
   $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1656,7 +1596,7 @@ Set $1 to the cosine of $2 (given in radians).
 
 inline op cos(n, i|n) {
   $1 = cos((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1672,7 +1612,7 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 
 inline op cosh(n, i|n) {
   $1 = cosh((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1688,7 +1628,7 @@ Set $1 to I<e> raised to the power $2. I<e> is the base of the natural logarithm
 
 inline op exp(n, i|n) {
   $1 = exp((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1704,7 +1644,7 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 
 inline op ln(n, i|n) {
   $1 = log((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1720,7 +1660,7 @@ Set $1 to the base 10 logarithm of $2.
 
 inline op log10(n, i|n) {
   $1 = log10((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1737,7 +1677,7 @@ Set $1 to the base 2 logarithm of $2.
 op log2(n, i|n) {
    FLOATVAL temp = log((FLOATVAL)2.0);
   $1 = log((FLOATVAL)$2) / temp;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1754,7 +1694,7 @@ Set $1 to the secant of $2 (given in radians).
 
 inline op sec(n, i|n) {
   $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1770,7 +1710,7 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 
 inline op sech(n, i|n) {
   $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1786,7 +1726,7 @@ Set $1 to the sine of $2 (given in radians).
 
 inline op sin(n, i|n) {
   $1 = sin((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1802,7 +1742,7 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 
 inline op sinh(n, i|n) {
   $1 = sinh((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1817,7 +1757,7 @@ Set $1 to the tangent of $2 (given in radians).
 
 inline op tan(n, i|n) {
   $1 = tan((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1833,7 +1773,7 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 
 inline op tanh(n, i|n) {
   $1 = tanh((FLOATVAL)$2);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1865,7 +1805,7 @@ Set the bits of $1 according to the B<and> of the corresponding bits from $2 and
 
 inline op and(i, i, i|ic) {
   $1 = $2 & $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1879,7 +1819,7 @@ Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 inline op not(i, i) {
   $1 = ~ $2;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1895,7 +1835,7 @@ Set the bits of $1 according to the B<or> of the corresponding bits from $2 and 
 
 inline op or(i, i, i|ic) {
   $1 = $2 | $3;
-  return AUTO;
+  goto NEXT();
 }
 
 ########################################
@@ -1912,7 +1852,7 @@ Set $1 to the value of $2 shifted left by $3 bits.
 
 inline op shl(i, i|ic, i|ic) {
   $1 = $2 << $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1930,7 +1870,7 @@ Set $1 to the value of $2 shifted right by $3 bits.
 
 inline op shr(i, i|ic, i|ic) {
   $1 = $2 >> $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1946,7 +1886,7 @@ Set the bits of $1 according to the B<xor> of the corresponding bits from $2 and
 
 inline op xor(i, i, i|ic) {
   $1 = $2 ^ $3;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -1978,7 +1918,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 inline op bounds(ic) {
   if ($1 != 0) { interpreter->flags |=  PARROT_BOUNDS_FLAG; }
   else         { interpreter->flags &= ~PARROT_BOUNDS_FLAG; }
-  return RESTART(*);
+  restart NEXT();
 }
 
 
@@ -1993,7 +1933,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 inline op profile(ic) {
   if ($1 != 0) { interpreter->flags |=  PARROT_PROFILE_FLAG; }
   else         { interpreter->flags &= ~PARROT_PROFILE_FLAG; }
-  return RESTART(*);
+  restart NEXT();
 }
 
 
@@ -2008,7 +1948,7 @@ If $1 is zero, turn off tracing. Otherwise turn it on.
 inline op trace(ic) {
   if ($1 != 0) { interpreter->flags |=  PARROT_TRACE_FLAG; }
   else         { interpreter->flags &= ~PARROT_TRACE_FLAG; }
-  return RESTART(*);
+  restart NEXT();
 }
 
 =back
@@ -2047,22 +1987,22 @@ PMC ('p') and STRING ('s') registers clear to NULL.
 
 inline op cleari() {
   Parrot_clear_i(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clearn() {
   Parrot_clear_n(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clears() {
   Parrot_clear_s(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clearp() {
   Parrot_clear_p(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2083,22 +2023,22 @@ from the most recently B<push>ed copies.
 
 inline op popi() {
   Parrot_pop_i(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op popn() {
   Parrot_pop_n(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op pops() {
   Parrot_pop_s(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op popp() {
   Parrot_pop_p(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2118,22 +2058,22 @@ Save all the registers of the type indicated in the name of the operation.
 
 inline op pushi() {
   Parrot_push_i(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op pushn() {
   Parrot_push_n(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op pushs() {
   Parrot_push_s(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op pushp() {
   Parrot_push_p(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 ########################################
@@ -2152,22 +2092,22 @@ Save all the registers of the type indicated in the name of the operation.
 
 inline op clonei() {
   Parrot_clone_i(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clonen() {
   Parrot_clone_n(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clones() {
   Parrot_clone_s(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op clonep() {
   Parrot_clone_p(interpreter);
-  return AUTO;
+  goto NEXT();
 }
 
 =back
@@ -2204,7 +2144,7 @@ op entrytype(i, i|ic) {
 
   entry = stack_entry(interpreter, interpreter->user_stack_base, $2);
   $1 = get_entry_type(interpreter, entry);
-  return AUTO;
+  goto NEXT();
 }
 
 ########################################
@@ -2229,22 +2169,22 @@ Save register or constant $1 onto the stack.
 
 inline op save(i|ic) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT, NULL);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op save(n|nc) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT, NULL);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op save(p) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, $1, STACK_ENTRY_PMC, NULL);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op save(s|sc) {
   push_generic_entry(interpreter,  &interpreter->user_stack_top, $1, STACK_ENTRY_STRING, NULL);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2264,22 +2204,22 @@ Restore register $1 from the appropriate register stack.
 
 inline op restore(i) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op restore(n) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op restore(p) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_PMC);
-  return AUTO;
+  goto NEXT();
 }
 
 inline op restore(s) {
   pop_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_STRING);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2306,7 +2246,7 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch (ic) {
-  return RETREL($1);
+  goto OFFSET($1);
 }
 
 
@@ -2323,7 +2263,7 @@ stack for later returning.
 
 inline op bsr (i|ic) {
   push_generic_entry(interpreter, &interpreter->control_stack_top, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
-  return RETREL($1);
+  goto OFFSET($1);
 }
 
 
@@ -2348,7 +2288,7 @@ Jump to the address held in register $1.
 =cut
 
 inline op jump(i) {
-  return RETREL($1);
+  goto OFFSET($1);
 }
 
 ########################################
@@ -2367,7 +2307,7 @@ op newinterp(p, i|ic) {
   new_pmc->data = new_interp;
   new_pmc->vtable = YOU_LOSE_VTABLE;
   $1 = new_pmc;
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2380,7 +2320,7 @@ Take a built interpreter and run the code starting at offset $2
 op runinterp(p, i|ic) {
   struct Parrot_Interp * new_interp = (struct Parrot_Interp *)$1->data;
   runops(new_interp, interpreter->code, REL_PC + $2);
-  return AUTO;
+  goto NEXT();
 }
 
 ########################################
@@ -2403,7 +2343,7 @@ op new(p, i|ic) {
   }
   newpmc = pmc_new(interpreter, $2);
   $1 = newpmc;
-  return AUTO;
+  goto NEXT();
 }
 
 ########################################
@@ -2414,10 +2354,8 @@ Pop the location off the top of the stack and go there.
 
 =cut
 
-op ret() {
-  opcode_t *dest;
-  pop_generic_entry(interpreter, &interpreter->control_stack_top, &dest, STACK_ENTRY_DESTINATION);
-  return RETABS(dest);
+inline op ret() {
+  goto POP();
 }
 
 
@@ -2434,7 +2372,7 @@ becomes the bottom entry in that range.
 
 inline op rotate_up(i|ic) {
   rotate_entries(interpreter, interpreter->user_stack_base, interpreter->user_stack_top, $1);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2454,7 +2392,7 @@ Sleep for $1 seconds
 
 inline op sleep(i|ic) {
   Parrot_sleep($1);
-  return AUTO;
+  goto NEXT();
 }
 
 
@@ -2470,7 +2408,7 @@ Set the current line number we're executing code for
 
 inline op setline(i|ic) {
   interpreter->current_line = $1;
-  return AUTO;
+  goto NEXT();
 }
 
 =item B<getline>(i)
@@ -2481,7 +2419,7 @@ Get the current line number
 
 inline op getline(i) {
   $1 = interpreter->current_line;
-  return AUTO;
+  goto NEXT();
 }
 
 =item B<setfile>(s|sc)
@@ -2492,7 +2430,7 @@ Sets the current file we're executing code for
 
 inline op setfile(s|sc) {
   interpreter->current_file = $1;
-  return AUTO;
+  goto NEXT();
 }
 
 =item B<getfile>(s)
@@ -2503,7 +2441,7 @@ Gets the current file we're executing code for
 
 inline op getfile(s) {
   $1 = interpreter->current_file;
-  return AUTO;
+  goto NEXT();
 }
 
 =item B<setpackage>(s|sc)
@@ -2514,7 +2452,7 @@ Sets the current package we're executing code for
 
 inline op setpackage(s|sc) {
   interpreter->current_package = $1;
-  return AUTO;
+  goto NEXT();
 }
 
 =item B<getpackage>(s)
@@ -2525,7 +2463,7 @@ Gets the current package we're executing code for
 
 inline op getpackage(s) {
   $1 = interpreter->current_package;
-  return AUTO;
+  goto NEXT();
 }
 
 ###############################################################################

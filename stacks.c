@@ -183,6 +183,50 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **
     return where;
 }
 
+/* Pop off a destination entry and return a pointer to the contents*/
+void *pop_dest(struct Parrot_Interp *interpreter) {
+#if 0
+    /* If we didn't mind the extra call, we'd do this: */
+    void * dest;
+    pop_generic_entry(interpreter, &interpreter->control_stack_top, &dest, STACK_ENTRY_DESTINATION)
+    return dest;
+#endif
+
+    struct StackChunk *chunk_base;
+    struct Stack_Entry **top = &interpreter->control_stack_top;
+    void * dest;
+
+    chunk_base = STACK_CHUNK_BASE(*top);
+    /* Quick sanity check */
+    if (chunk_base->used == 0) {
+        INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
+    }
+
+    if ((*top)->entry_type != STACK_ENTRY_DESTINATION) {
+        INTERNAL_EXCEPTION(ERROR_BAD_STACK_TYPE, "Wrong type on top of stack!\n");
+    }
+
+    dest = (*top)->entry.generic_pointer;
+
+    /* Cleanup routine? */
+    if ((*top)->flags && STACK_ENTRY_CLEANUP) {
+        ((*top)->cleanup)(*top);
+    }
+
+    /* Now decrement the SP */
+    chunk_base->used--;
+    chunk_base->free++;
+    /* Can we toss a whole chunk? */
+    if (0 == chunk_base->used && chunk_base->prev) {
+        chunk_base = chunk_base->prev;
+    } 
+    if (chunk_base->used) {
+        *top = &chunk_base->entry[chunk_base->used - 1];
+    }
+    
+    return dest;
+}
+
 /* Pop off an entry and throw it out */
 void toss_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, INTVAL type) {
     void *foo;

@@ -3,7 +3,9 @@
 # ops2c.pl
 #
 # Generate a C header and source file from the operation definitions in
-# an .ops file.
+# an .ops file, using a supplied transform.
+#
+# $Id$
 #
 
 use strict;
@@ -11,7 +13,7 @@ use Parrot::OpsFile;
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 input.ops [input2.ops ...]\n";
+usage: $0 trans input.ops [input2.ops ...]\n";
 _EOF_
     exit 1;
 }
@@ -20,7 +22,17 @@ _EOF_
 # Process command-line argument:
 #
 
-Usage() unless @ARGV;
+Usage() unless @ARGV >= 2;
+
+my $trans_class = "Parrot::OpTrans::" . shift @ARGV;
+
+eval "require $trans_class";
+
+my $trans = $trans_class->new;
+
+my $prefix  = $trans->prefix;
+my $suffix  = $trans->suffix;
+my $defines = $trans->defines;
 
 my $file = 'core.ops';
 
@@ -28,9 +40,9 @@ my $base = $file;
 $base =~ s/\.ops$//;
 
 my $incdir  = "include/parrot/oplib";
-my $include = "parrot/oplib/${base}_ops.h";
+my $include = "parrot/oplib/${base}_ops${suffix}.h";
 my $header  = "include/$include";
-my $source  = "${base}_ops.c";
+my $source  = "${base}_ops${suffix}.c";
 
 
 #
@@ -90,13 +102,10 @@ print HEADER $preamble;
 print HEADER <<END_C;
 #include "parrot/parrot.h"
 
-#define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interpreter->code->byte_code))
-#define CUR_OPCODE cur_opcode
+extern INTVAL    ${base}_numops${suffix};
 
-extern INTVAL    ${base}_numops;
-
-extern op_func_t ${base}_opfunc[$num_entries];
-extern op_info_t ${base}_opinfo[$num_entries];
+extern op_func${suffix}_t ${base}_opfunc${suffix}\[$num_entries];
+extern op_info_t ${base}_opinfo${suffix}\[$num_entries];
 
 END_C
 
@@ -124,7 +133,7 @@ foreach my $op ($ops->ops) {
     my $prototype  = "opcode_t * $func_name ($arg_types)";
     my $args       = "opcode_t cur_opcode[], struct Parrot_Interp * interpreter";
     my $definition = "static opcode_t *\n$func_name ($args)";
-    my $source     = $op->source(\&map_ret_abs, \&map_ret_rel, \&map_arg, \&map_res_abs, \&map_res_rel);
+    my $source     = $op->source($trans);
 
 #    print HEADER "$prototype;\n";
 
@@ -133,6 +142,8 @@ foreach my $op ($ops->ops) {
 }
 
 print SOURCE <<END_C;
+
+${defines}
 
 /*
 ** Op Function Definitions:
@@ -148,13 +159,13 @@ print SOURCE @op_funcs;
 
 print SOURCE <<END_C;
 
-INTVAL ${base}_numops = $num_ops;
+INTVAL ${base}_numops${suffix} = $num_ops;
 
 /*
 ** Op Function Table:
 */
 
-op_func_t ${base}_opfunc[$num_entries] = {
+op_func${suffix}_t ${base}_opfunc${suffix}\[$num_entries] = {
 END_C
 
 print SOURCE @op_func_table;
@@ -177,7 +188,7 @@ print SOURCE <<END_C;
 ** Op Info Table:
 */
 
-op_info_t ${base}_opinfo[$num_entries] = {
+op_info_t ${base}_opinfo${suffix}\[$num_entries] = {
 END_C
 
 $index = 0;
@@ -212,77 +223,4 @@ print SOURCE <<END_C;
 END_C
 
 exit 0;
-
-
-#
-# map_ret_abs()
-#
-
-sub map_ret_abs
-{
-  my ($addr) = @_;
-  return "return $addr";
-}
-
-
-#
-# map_ret_rel()
-#
-
-sub map_ret_rel
-{
-  my ($offset) = @_;
-  return "return cur_opcode + $offset";
-}
-
-
-#
-# map_arg()
-#
-
-sub map_arg
-{
-  my ($type, $num, $self) = @_;
-
-  my %arg_maps = (
-    'op' => "cur_opcode[%ld]",
-
-    'i'  => "interpreter->int_reg->registers[cur_opcode[%ld]]",
-    'n'  => "interpreter->num_reg->registers[cur_opcode[%ld]]",
-    'p'  => "interpreter->pmc_reg->registers[cur_opcode[%ld]]",
-    's'  => "interpreter->string_reg->registers[cur_opcode[%ld]]",
-  
-    'ic' => "cur_opcode[%ld]",
-    'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
-    'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
-    'sc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->string",
-  );
-
-  die "Unrecognized type '$type' for num '$num' in opcode @{[$self->full_name]}" unless exists $arg_maps{$type};
-
-  return sprintf($arg_maps{$type}, $num);
-}
-
-
-#
-# map_res_rel()
-#
-
-sub map_res_rel
-{
-  my ($offset) = @_;
-  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
-}
-
-
-#
-# map_res_abs()
-#
-
-sub map_res_abs
-{
-  my ($addr) = @_;
-  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
-}
-
 

@@ -150,19 +150,21 @@ sub full_body
 
 sub source
 {
-  my ($self, $ret_sub_abs, $ret_sub_rel, $arg_sub, $res_sub_abs, $res_sub_rel) = @_;
+  my ($self, $trans) = @_;
 
   my $full_body = $self->full_body;
 
-  $full_body =~ s/{{\@(.*?)}}/ &$arg_sub($self->arg_type($1), $1, $self); /mge;
+  $full_body =~ s/{{\@(.*?)}}/ $trans->access_arg($self->arg_type($1), $1, $self); /mge;
 
-  $full_body =~ s/{{=0,=(.*?)}}/   &$res_sub_abs($1)  . "; " . &$ret_sub_abs(0); /mge;
-  $full_body =~ s/{{=0,\+=(.*?)}}/ &$res_sub_rel($1)  . "; " . &$ret_sub_abs(0); /mge;
-  $full_body =~ s/{{=0,-=(.*?)}}/  &$res_sub_rel(-$1) . "; " . &$ret_sub_abs(0); /mge;
+  $full_body =~ s/{{=0,=(.*?)}}/   $trans->restart_address($1) . "; " . $trans->goto_address(0); /mge;
+  $full_body =~ s/{{=0,\+=(.*?)}}/ $trans->restart_offset($1)  . "; " . $trans->goto_address(0); /mge;
+  $full_body =~ s/{{=0,-=(.*?)}}/  $trans->restart_offset(-$1) . "; " . $trans->goto_address(0); /mge;
 
-  $full_body =~ s/{{=(.*?)}}/   &$ret_sub_abs($1); /mge;
-  $full_body =~ s/{{\+=(.*?)}}/ &$ret_sub_rel($1); /mge;
-  $full_body =~ s/{{-=(.*?)}}/  &$ret_sub_rel(-$1); /mge;
+  $full_body =~ s/{{=\*}}/      $trans->goto_pop();       /mge; # NOTE: MUST BE FIRST
+
+  $full_body =~ s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
+  $full_body =~ s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
+  $full_body =~ s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
 
   return $full_body;
 }

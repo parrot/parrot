@@ -22,7 +22,7 @@ while (<DATA>) {
             # Unary function
             print '$2,$1';
         }
-        print ");\n  return AUTO;\n}\n\n";
+        print ");\n  goto NEXT();\n}\n\n";
     }
 }
 

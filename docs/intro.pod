@@ -425,10 +425,10 @@ very simple op function, which for JIT or other optimizations might
 be able to be converted inline. Non-inline op functions might
 require more work.
 
-There are special C<return> "macros", the most important of which is
-C<AUTO>. The statement C<return AUTO> means that the return address
+There are special patterns, the most important of which is
+C<goto NEXT()>. The statement C<goto NEXT()> means that the address
 of the next op should be worked out automatically during real C
-code generation.
+code generation based on the size of the current op.
 
 Arguments are denoted by C<$1>, C<$2> and so on - they aren't actual
 arguments to the C function, but are pulled out of the bytecode
@@ -439,7 +439,7 @@ parameter, C<$1>, and pass it to C<sleep>:
 
  inline op sleep (i|ic) {
    sleep($1);
-   return AUTO;
+   goto NEXT();
  }
 
 That works for both integer constant and integer register argument

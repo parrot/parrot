@@ -120,12 +120,12 @@ stacks$(O): $(H_FILES)
 core_ops$(O): $(H_FILES) core_ops.c
 
 core_ops.c $(INC)/oplib/core_ops.h: core.ops vtable.ops ops2c.pl
-	$(PERL) ops2c.pl core.ops vtable.ops
+	$(PERL) ops2c.pl C core.ops vtable.ops
 
 core_ops_prederef$(O): $(H_FILES) core_ops_prederef.c
 
-core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: core.ops vtable.ops ops2c-prederef.pl
-	$(PERL) ops2c-prederef.pl core.ops vtable.ops
+core_ops_prederef.c $(INC)/oplib/core_ops_prederef.h: core.ops vtable.ops ops2c.pl
+	$(PERL) ops2c.pl CPrederef core.ops vtable.ops
 
 vtable.ops: make_vtable_ops.pl
 	$(PERL) make_vtable_ops.pl > vtable.ops
