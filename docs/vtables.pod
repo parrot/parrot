@@ -4,22 +4,22 @@ Parrot Vtables
 
 =head1 Implementing Variable Types with Vtables
 
-This is a guide to creating your own PMC (Parrot Magic Cookie) classes;
-it tells you what you need to write in order to add new variable types
+This is a guide to creating your own PMC (Parrot Magic Cookie) classes.
+It tells you what you need to write in order to add new variable types
 to Parrot.
 
 =head2 Overview
 
-The guts of the Parrot interpreter are, by design, ignorant (or, if you
+The guts of the Parrot interpreter are by design ignorant (or, if you
 want to be less disparaging, agnostic) of the intricacies of variable
 type behaviour. The standard example is the difference between Perl
 scalars and Python scalars. In Perl, if you have
 
-    $a = "1a";
+    $a = "a9";
     $a++;
 
-you end up with C<$a> being C<1b>. This is a factor of the way Perl
-scalars increment themselves. In Python, on the other hand, you'd get a
+you end up with C<$a> being C<b0>. This is because of the magic of the Perl
+increment operator. In Python, on the other hand, you'd get a
 runtime error.
 
 =over 3
@@ -37,7 +37,7 @@ from incrementing a C<PerlScalar>
 
 Since the behaviour is a function of the "type" of the PMC, it's
 natural to consider the various different types of PMC as classes
-in an object-oriented system whereby the interpreter calls methods on
+in an object-oriented system. The Parrot interpreter calls methods on
 the individual PMC objects to manipulate them. So the example above
 would translate to something like:
 
@@ -49,7 +49,7 @@ Construct a new PMC in the PerlScalar class.
 
 =item 2.
 
-Call a method setting its string value to C<"a1">.
+Call a method setting its string value to C<"a9">.
 
 =item 3.
 
@@ -83,10 +83,8 @@ generate a number type for the beautifully non-existant Fooby language:
     perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
-F<pmc2c.pl> program) with stubs for all the methods you need to fill in;
-the final function in the file, C<Parrot_FoobyNumber_init>, allows you
-to set up anything you need to set up, and creates the vtable structure
-containing all the methods.
+F<pmc2c.pl> program) with stubs for all the methods you need to fill in.
+The function C<init> allows you to set up anything you need to set up.
 
 Now you'll have to do something a little different depending on whether
 you're writing a built-in class or an extension class. If you're writing
@@ -123,15 +121,15 @@ type needs to use that, and then also define some user-defined flags.
 Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word
 are reserved for use by parrot itself, but a number of them have been
 assigned for general use by individual classes. These are referred to as
-C<PMC_private0_FLAG> .. C<PMC_private7_FLAG>. (The '7' may change during the
+C<Pobj_private0_FLAG> .. C<Pobj_private7_FLAG>. (The '7' may change during the
 early development of parrot, but will become pretty fixed at some point.)
 
 Normally, you will want to alias these generic bit names to something
 more meaningful within your class:
 
     enum {
-        Foobynumber_is_bignum = PMC_private0_FLAG,
-        Foobynumber_is_bigint = PMC_private1_FLAG,
+        Foobynumber_is_bignum = Pobj_private0_FLAG,
+        Foobynumber_is_bigint = Pobj_private1_FLAG,
         ....
     };
 
@@ -203,7 +201,7 @@ Turn yourself into the specified type.
 =item C<destroy>
 
 Do any data shut-down and finalization you need to do. To have this
-method called, you must set the C<PMC_active_destroy_FLAG>.
+method called, you must set the C<Pobj_active_destroy_FLAG>.
 
 =item C<get_integer>
 
