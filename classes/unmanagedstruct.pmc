@@ -323,6 +323,28 @@ ret_pmc(Parrot_Interp interpreter, PMC* pmc, char *p, int type, INTVAL idx)
                 }
             }
             return ret;
+		case enum_type_struct_ptr:
+
+			/* check the metadata for an initializer */
+			init = PMC_pmc_val( pmc ); 
+           ptr  = VTABLE_get_pmc_keyed_int( interpreter, init, idx * 3 );
+
+			/* grab the struct from the metadata */
+           if (ptr->pmc_ext && PMC_metadata( ptr ))
+			{
+                ret = VTABLE_getprop( interpreter, ptr,
+                    string_from_cstring(interpreter, "_struct", 0 ));
+			}
+			else
+			{
+            	internal_exception( 1,
+					"no initializer available for nested struct\n" );
+			}
+
+			/* assign the pointer */
+			PMC_data( ret ) = *(void**)p;
+
+			return ret;
         default:
             internal_exception(1, "returning unhandled pmc type in struct");
     }

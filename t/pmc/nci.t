@@ -17,7 +17,7 @@ i386 and the F<libnci.so> library is found.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Config;
 
 SKIP: {
@@ -584,6 +584,75 @@ CODE
 100
 77
 200.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct * w named access");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  set I5, 8  # test fun number
+  invoke
+.include "datatypes.pasm"
+  # the contained structure pointer
+  new  P6, .OrderedHash
+  set  P6[ 'i' ], .DATATYPE_INT
+  push P6, 0
+  push P6, 0
+  set  P6[ 'j' ], .DATATYPE_INT
+  push P6, 0
+  push P6, 0
+  new P7, .UnManagedStruct, P6
+  # the contained structure
+  new  P3, .OrderedHash
+  set  P3[ 'i'  ], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  set  P3[ 'j'  ], .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  set  P3[ '_z' ], .DATATYPE_STRUCT_PTR
+  set  P1, P3[-1]
+  setprop P1, "_struct", P7
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .OrderedHash
+  set  P2[ 'x'  ], .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  set  P2[ '_y' ], .DATATYPE_STRUCT
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  set  P2[ 'z'  ], .DATATYPE_INT
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  assign P5, P2
+  set I0, P5[ 'x' ]
+  print I0
+  print "\n"
+  set I0, P5[ '_y'; 'i' ]
+  print I0
+  print "\n"
+  set I0, P5[ '_y'; 'j' ]
+  print I0
+  print "\n"
+  set I0, P5[ '_y'; '_z'; 'i' ]
+  print I0
+  print "\n"
+  set I0, P5[ '_y'; '_z'; 'j' ]
+  print I0
+  print "\n"
+  end
+CODE
+32
+127
+12345
+100
+77
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_p_i - func_ptr*");
@@ -1196,19 +1265,25 @@ output_is(<<'CODE', <<'OUTPUT', 'nested structs');
   invoke
 
   set I0, P5[ 'x' ]
-  set I1, P5[ 'nested'; 'y' ]
+  set P6, P5[ 'nested' ]
+  set I1, P6[ 'y' ]
   print "X: "
   print I0
   print "\nY: "
   print I1
   print "\n"
-
+  # extract struct
+  set P6, P5[ 'nested' ]
+  set I1, P6[ 'y' ]
+  print I1
+  print "\n"
   end
 CODE
 Old X: 100
 Old Y: 200
 X: 1
 Y: 2
+2
 OUTPUT
 
 } # SKIP

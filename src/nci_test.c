@@ -239,6 +239,25 @@ void * nci_pi(int test) {
                 };
                 return &_x;
             }
+		case 8:
+            {
+                static struct _z {
+                    int i;
+                    int j;
+                } zz = { 100, 77 };
+                static struct xt {
+                    int x;
+                    struct yt {
+                        int i;
+                        int j;
+                    	struct _z *z;
+                    } _y;
+                } _x = {
+                    32,
+                    { 127, 12345, &zz },
+                };
+                return &_x;
+            }
         default:
             fprintf(stderr, "unknown test number\n");
     }
