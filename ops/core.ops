@@ -3318,8 +3318,11 @@ These operations effect entire sets of registers.
 ########################################
 
 =item B<null>(out STR)
+
 =item B<null>(out INT)
+
 =item B<null>(out PMC)
+
 =item B<null>(out NUM)
 
 Set register $1 to a null value, or zero for the numeric registers
