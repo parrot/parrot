@@ -1228,11 +1228,14 @@ Outputs and error message and exits.
 sub error {
     my ($message, $file, $line) = @_;
 
-    die("\$message undefined!") unless defined $message;
-    die("\$file undefined!")    unless defined $file;
-    die("\$line undefined!")    unless defined $line;
+    $message="Something went wrong" unless defined $message;
 
-    print STDERR "Error ($file:$line): $message\n";
+    if(defined $file and defined $line) {
+        warn "Error ($file:$line) $message\n";
+    }
+    else {
+	warn "Error: $message\n"
+    }
 
     exit 1;
 }
@@ -1350,11 +1353,17 @@ sub read_source {
     if( $options{'include'} ) {
       unshift( @include, @{$options{'include'}} );
     }
-    foreach my $path (@include) {
-	open($handle,"$path/$file") && do {
-	    $found=1;
-	    last;
-	}
+
+    if(open($handle, "<$file")) {
+        $found=1;
+    }
+    else {
+        foreach my $path (@include) {
+            open($handle,"$path/$file") && do {
+	        $found=1;
+	        last;
+	    }
+        }
     }
     error("Cannot open $file for input!",$ofile,$oline) if(!$found);
     while(<$handle>) {
