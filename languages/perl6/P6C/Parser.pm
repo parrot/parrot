@@ -320,7 +320,7 @@ sub mark_end {
 
 my $seen_err;
 
-sub Debug {
+sub Parse::RecDescent::Debug {
     my ($parser, $on) = @_;
     if ($on) {
 	$parser->Replace("\nstmts:            __stmt[\$arg[0]](s?)\n");
@@ -593,7 +593,7 @@ prog:		  {%since=(); $seen_err=undef; $::file = $arg[0] || ''} <reject>
 		| /\A/ stmts[0] /\z/ <commit> {$seen_err ? undef : 1} ''
 		| {got_err("Invalid statement", $text, $thisline); undef;}
 
-# this rule get's substiuted by »-g« switch in perl6
+# this rule gets substituted by »-g« switch in perl6
 # so that __stmt is used.
 stmts:		  _stmt[$arg[0]](s?)
 
