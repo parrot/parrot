@@ -24,7 +24,7 @@ Most tests are skipped when the F<libnci.so> library is not found.
 
 =cut
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 
 SKIP: {
@@ -2099,6 +2099,26 @@ NOT_LOADED:
 CODE
 libnci was successfully loaded
 'non_existing' is not defined
+OUTPUT
+
+output_is( << 'CODE', << 'OUTPUT', "loading same library twice" );
+      loadlib P1, "libnci"
+      if P1, OK1
+      print "not "
+OK1:  print "ok 1\n"
+      loadlib P2, "libnci"
+      if P2, OK2
+      print "not "
+OK2:  print "ok 2\n"
+      issame I0, P1, P2
+      if I0, OK3
+      print "not "
+OK3:  print "ok 3\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 } # SKIP
