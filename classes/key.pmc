@@ -221,7 +221,6 @@ Appends C<*value> to the key.
         key_append(INTERP, SELF, value);
     }
 
-     */
 /*
 
 =item C<PMC *shift_pmc()>
