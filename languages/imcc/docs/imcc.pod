@@ -12,16 +12,16 @@ IMCC - documentation
 
 =head1 OVERVIEW
 
-Imcc is the Intermediate Code Compiler for Parrot.  The language it
-compiles is currently termed Parrot Intermediate Language (PIR).
+IMCC is the Intermediate Code Compiler for Parrot.  The language it
+compiles is termed Parrot Intermediate Language (PIR).
 
-This document describes available imcc documentation.
+This document describes available IMCC documentation.
 
 =head1 DESCRIPTION
 
 =head2 running.pod
 
-Imcc's command line options.
+IMCC's command line options.
 
 =head2 parsing.pod
 
@@ -33,11 +33,11 @@ The syntax of B<.imc> files.
 
 =head2 operation.pod
 
-Imcc operation basics.
+IMCC operation basics.
 
 =head2 README
 
-Summary of imcc features and syntax.
+Summary of IMCC features and syntax.
 
 =head2 *.[chly]
 
