@@ -1,3 +1,4 @@
+PERL = ${perl}
 RM_F = ${rm_f}
 PARROT = ../../parrot
 
