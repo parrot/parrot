@@ -52,17 +52,17 @@ pmclass PerlNum extends scalar {
 
     void set_integer (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value->cache.int_val;
+        DYNSELF.set_integer(value);
     }
 
     void set_integer_native (INTVAL value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value;
+        DYNSELF.set_integer_native(value);
     }
 
     void set_integer_same (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value->cache.int_val;
+        DYNSELF.set_integer_same(value);
     }
 
     void set_number (PMC* value) {
@@ -88,17 +88,17 @@ pmclass PerlNum extends scalar {
 
     void set_string (PMC* value) {
 	CHANGE_TYPE(SELF, PerlString);
-        SELF->data = value->data;
+        DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING * value) {
 	CHANGE_TYPE(SELF, PerlString);
-        SELF->data = value;
+        DYNSELF.set_string_native(value);
     }
 
     void set_string_same (PMC * value) {
 	CHANGE_TYPE(SELF, PerlString);
-        SELF->data = value->data;
+        DYNSELF.set_string_same(value);
     }
 
     void add (PMC* value, PMC* dest) {

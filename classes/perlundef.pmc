@@ -60,13 +60,13 @@ pmclass PerlUndef extends PerlInt {
     }
 
     void set_integer (PMC * value) {
-	CHANGE_TYPE(pmc, PerlInt);
-        pmc->vtable->set_integer(interpreter, pmc, value);
+	CHANGE_TYPE(SELF, PerlInt);
+        DYNSELF.set_integer(value);
     }
 
     void set_integer_native (INTVAL value) {
-	CHANGE_TYPE(pmc, PerlInt);
-        pmc->vtable->set_integer_native(interpreter, pmc, value);
+	CHANGE_TYPE(SELF, PerlInt);
+        DYNSELF.set_integer_native(value);
     }
 
     void set_integer_same (PMC* value) {
@@ -77,19 +77,18 @@ pmclass PerlUndef extends PerlInt {
 
     void set_string (PMC* value) {
 	CHANGE_TYPE(pmc, PerlString);
-        pmc->vtable->set_string(interpreter, pmc, value);
+        DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
 	CHANGE_TYPE(pmc, PerlString);
-        pmc->vtable->set_string_native(interpreter, pmc, value);
+        DYNSELF.set_string_native(value);
     }
 
     void add (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in addition");
 	SUPER(value, dest);
-
     }
 
     void add_int (INTVAL value,  PMC* dest) {

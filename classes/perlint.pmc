@@ -46,17 +46,17 @@ pmclass PerlInt extends scalar {
 
     void set_number (PMC* value) {
 	CHANGE_TYPE(pmc, PerlNum);
-        pmc->vtable->set_number(interpreter, pmc, value);
+        DYNSELF.set_number(value);
     }
 
     void set_number_native (FLOATVAL value) {
 	CHANGE_TYPE(pmc, PerlNum);
-	SELF->cache.num_val = value;
+        DYNSELF.set_number_native(value);
     }
 
     void set_number_same (PMC * value) {
 	CHANGE_TYPE(pmc, PerlNum);
-	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
+        DYNSELF.set_number_same(value);
     }
 
     void set_bignum (PMC* value) {
@@ -79,19 +79,17 @@ pmclass PerlInt extends scalar {
 
     void set_string (PMC* value) {
 	CHANGE_TYPE(pmc, PerlString);
-	/* XXX string_copy like PerlUndef or not */
-	SELF->data = value->data;
+        DYNSELF.set_string(value);
     }
 
     void set_string_native (STRING* value) {
 	CHANGE_TYPE(pmc, PerlString);
-	/* XXX string_copy like PerlUndef or not */
-	SELF->data = value;
+        DYNSELF.set_string_native(value);
     }
 
     void set_string_same (PMC* value) {
 	CHANGE_TYPE(pmc, PerlString);
-	SELF->data = value->data;
+        DYNSELF.set_string_same(value);
     }
 
     void add (PMC* value, PMC* dest) {

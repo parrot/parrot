@@ -71,32 +71,32 @@ pmclass PerlString extends scalar {
 
     void set_integer (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
+        DYNSELF.set_integer(value);
     }
 
     void set_integer_native (INTVAL value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value;
+        DYNSELF.set_integer_native(value);
     }
 
     void set_integer_same (PMC* value) {
 	CHANGE_TYPE(SELF, PerlInt);
-        SELF->cache.int_val = value->vtable->get_integer(INTERP,value);
+        DYNSELF.set_integer_same(value);
     }
 
     void set_number (PMC * value) {
 	CHANGE_TYPE(SELF, PerlNum);
-        SELF->cache.num_val = value->vtable->get_number(INTERP,value);
+        DYNSELF.set_number(value);
     }
 
     void set_number_native (FLOATVAL value) {
 	CHANGE_TYPE(SELF, PerlNum);
-        SELF->cache.num_val = value;
+        DYNSELF.set_number_native(value);
     }
 
     void set_number_same (PMC * value) {
 	CHANGE_TYPE(SELF, PerlNum);
-        SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
+        DYNSELF.set_number_same(value);
     }
 
     void set_string (PMC * value) {
