@@ -49,7 +49,7 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 #
 
 if (! -d $moddir) {
-    mkdir $moddir or die "ops2pm.pl: Could not mkdir $moddir: $!!\n";
+    mkdir($moddir, 0755) or die "ops2pm.pl: Could not mkdir $moddir: $!!\n";
 }
 open MODULE, ">$module"
   or die "ops2pm.pl: Could not open module file '$module' for writing: $!!\n";

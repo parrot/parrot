@@ -42,10 +42,10 @@ test_main$(O): $(H_FILES)
 examples/assembly/mops.pbc: examples/assembly/mops.pasm assemble.pl
 	cd examples/assembly; make mops.pbc PERL=$(PERL)
 
-Parrot/OpLib/core.pm: core.ops
+Parrot/OpLib/core.pm: core.ops ops2pm.pl
 	$(PERL) ops2pm.pl core.ops
 
-examples/assembly/mops.c: examples/assembly/mops.pbc
+examples/assembly/mops.c: examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
 examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)

@@ -77,7 +77,11 @@ sub compile_byte_code {
     print <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/string.h"
-#include <math.h>
+END_C
+
+    print $ops->preamble;
+
+    print <<END_C;
 
 int
 main(int argc, char **argv) {

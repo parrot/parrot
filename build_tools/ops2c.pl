@@ -46,7 +46,7 @@ my $num_entries = $num_ops + 1; # For trailing NULL
 #
 
 if (! -d $incdir) {
-    mkdir $incdir or die "ops2cpl: Could not mkdir $incdir $!!\n";
+    mkdir($incdir, 0755) or die "ops2c.pl: Could not mkdir $incdir $!!\n";
 }
 
 open HEADER, ">$header"
