@@ -1946,52 +1946,12 @@ If the substring is not found, returns "-1".
 =cut
 
 inline op index(out INT, in STR, in STR) {
-    STRING *s = $2;
-    STRING *p = $3;
-    INTVAL i,j,ls,lp;
-    const char *cs, *cp;
-
-    ls = string_length(s);
-    lp = string_length(p);
-    if (s && ls && lp) {
-        cs = string_to_cstring(interpreter, (s));
-        cp = string_to_cstring(interpreter, (p));
-        for(i = 0; i <= ls - lp; i++) {
-            for(j = 0; j < lp; j++)
-                if (cs[i + j] != cp[j])
-                    break;
-            if (j == lp) {
-                $1 = i;
-                goto NEXT();
-            }
-        }
-    }
-    $1 = -1;
+    $1 = string_str_index(interpreter, $2, $3, 0);
     goto NEXT();
 }
 
 inline op index(out INT, in STR, in STR, in INT) {
-    STRING *s = $2;
-    STRING *p = $3;
-    INTVAL i,j,ls,lp;
-    const char *cs, *cp;
-
-    ls = string_length(s);
-    lp = string_length(p);
-    if (s && ls && lp) {
-        cs = string_to_cstring(interpreter, (s));
-        cp = string_to_cstring(interpreter, (p));
-        for(i = $4; i <= ls - lp; i++) {
-            for(j = 0; j < lp; j++)
-                if (cs[i + j] != cp[j])
-                    break;
-            if (j == lp) {
-                $1 = i;
-                goto NEXT();
-            }
-        }
-    }
-    $1 = -1;
+    $1 = string_str_index(interpreter, $2, $3, $4);
     goto NEXT();
 }
 

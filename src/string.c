@@ -290,6 +290,39 @@ string_index(const STRING *s, UINTVAL idx)
     }
 }
 
+/*=for api string string_str_index
+ * return the character position of s2 in s at or after start
+ * the return value is a (0 based) offset in characters, not bytes.
+ * if not found, -1 is returned
+ */
+INTVAL
+string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
+        const STRING *s2, UINTVAL start)
+{
+    INTVAL i,j,ls,lp;
+
+    if (!s || !string_length(s))
+        return -1;
+    if (!s2 || !string_length(s2))
+        return -1;
+
+    /* if different transcode to s */
+    if (s->encoding != s2->encoding || s->type != s2->type)
+        s2 = string_transcode(interpreter, (STRING*)s2, s->encoding,
+                s->type, NULL);
+
+    ls = string_length(s);
+    lp = string_length(s2);
+
+    for(i = start; i <= ls - lp; i++) {
+        for(j = 0; j < lp; j++)
+            if (string_ord(s, i + j) != string_ord(s2, j))
+                break;
+        if (j == lp)
+            return i;
+    }
+    return -1;
+}
 
 
 /*=for api string string_ord
