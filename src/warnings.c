@@ -65,6 +65,34 @@ find_line(struct Parrot_Interp *interpreter, struct PackFile_Debug * debug)
 =item C<void
 print_pbc_location(Parrot_Interp interpreter)>
 
+Prints the bytecode location of the warning or error to C<PIO_STDERR>.
+
+=cut
+
+*/
+
+void
+print_pbc_location(Parrot_Interp interpreter)
+{
+    const char *file;
+    int line;
+    struct PackFile_Debug * debugs = interpreter->code->cur_cs->debugs;
+    if (debugs) {
+        file = debugs->filename;
+        line = find_line(interpreter, debugs);
+    }
+    else {
+        file = "(unknown file)";
+        line = -1;
+    }
+    PIO_eprintf(interpreter, "\tin file '%s' near line %d\n", file, line);
+}
+
+/*
+
+=item C<void
+print_pbc_location_stdio(Parrot_Interp interpreter)>
+
 Prints the bytecode location of the warning or error to C<stderr>.
 
 Uses C<fprintf()> only. This may be called from exceptions.
@@ -74,7 +102,7 @@ Uses C<fprintf()> only. This may be called from exceptions.
 */
 
 void
-print_pbc_location(Parrot_Interp interpreter)
+print_pbc_location_stdio(Parrot_Interp interpreter)
 {
     const char *file;
     int line;
@@ -106,11 +134,11 @@ print_warning(struct Parrot_Interp *interpreter, STRING *msg)
 {
 
     if (!msg)
-        fprintf(stderr, "Unknown warning\n");
+        PIO_puts(interpreter, PIO_STDERR(interpreter), "Unknown warning\n");
     else {
         PIO_putps(interpreter, PIO_STDERR(interpreter), msg);
         if (string_ord(msg, -1) != '\n')
-            fprintf(stderr, "%c", '\n');
+            PIO_eprintf(interpreter, "%c", '\n');
     }
     print_pbc_location(interpreter);
     return 1;

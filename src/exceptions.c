@@ -203,7 +203,7 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
     if (m)
         string_cstring_free(m);
     if (print_location)
-        print_pbc_location(interpreter);
+        print_pbc_location_stdio(interpreter);
     /*
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
@@ -227,7 +227,8 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
 
 /*
 
-=item C<void pop_exception(Parrot_Interp interpreter)>
+=item C<void
+pop_exception(Parrot_Interp interpreter)>
 
 Pops the topmost exception handler off the stack.
 
@@ -364,7 +365,8 @@ rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 
 /*
 
-=item C<void rethrow_c_exception(Parrot_Interp interpreter)>
+=item C<void
+rethrow_c_exception(Parrot_Interp interpreter)>
 
 Return back to runloop, assumes exception is still in C<REG_PMC(5)> and
 that this is called from within a handler setup with C<new_c_exception>
@@ -515,7 +517,8 @@ new_internal_exception(Parrot_Interp interpreter)
 /*
 
 =item C<void
-do_exception(exception_severity severity, long error)>
+do_exception(Parrot_Interp interpreter,
+        exception_severity severity, long error)>
 
 Called from interrupt code. Does a C<longjmp> in front of the runloop,
 which calls C<handle_exception()>, returning the handler address where

@@ -49,6 +49,7 @@ typedef enum {
 #include "parrot/parrot.h"
 
 void print_pbc_location(Parrot_Interp);
+void print_pbc_location_stdio(Parrot_Interp);
 
 INTVAL Parrot_warn(Parrot_Interp, INTVAL warnclass, const char *message, ...);
 
