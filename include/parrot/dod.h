@@ -15,7 +15,6 @@
 #if !defined(PARROT_DOD_H_GUARD)
 #define PARROT_DOD_H_GUARD
 
-#include <assert.h>
 #include "parrot/parrot.h"
 
 void Parrot_do_dod_run(struct Parrot_Interp *);
@@ -25,15 +24,29 @@ PMC *trace_system_stack(struct Parrot_Interp *, PMC *);
 
 PMC * mark_used(PMC *used_pmc, PMC *current_end_of_list);
 
-#if GC_DEBUG
+#if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */
 extern int CONSERVATIVE_POINTER_CHASING; 
 #endif
 
+#if DISABLE_GC_DEBUG
 static void
-buffer_lives(Buffer *buffer)
+buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
 {
-#if GC_DEBUG
+    UNUSED(interpreter);
+    buffer->flags |= BUFFER_live_FLAG;
+}
+#else
+static void
+buffer_lives(struct Parrot_Interp *interpreter, Buffer *buffer)
+{
+    buffer->flags |= BUFFER_live_FLAG;
+    if (! GC_DEBUG(interpreter)) return;
+
+    if (buffer->flags & BUFFER_report_FLAG) {
+        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
+                buffer, buffer->bufstart);
+    }
 
     if (buffer->flags & BUFFER_on_free_list_FLAG) {
         /* If a live buffer is found on the free list, warn. Note that
@@ -47,17 +60,15 @@ buffer_lives(Buffer *buffer)
          * If it *is* a bug, you may want to read the notes in
          * get_free_buffer() in headers.c for tips on debugging using
          * gdb with this pointer and version number. */
-#if ! GC_VERBOSE
+#if ! DISABLE_GC_DEBUG
+#    if ! GC_VERBOSE
         if (! CONSERVATIVE_POINTER_CHASING)
+#    endif
 #endif
         fprintf(stderr, "GC Warning! Live buffer %p version " INTVAL_FMT " found on free list\n", buffer, buffer->version);
-
-        assert(CONSERVATIVE_POINTER_CHASING);
     }
-#endif    
-    buffer->flags |= BUFFER_live_FLAG;
 }
-
+#endif
 
 #endif /* PARROT_DOD_H */
 

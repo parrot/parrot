@@ -48,14 +48,16 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
     }
 }
 
-static void copy_string_header(String *dest, String *src)
+static void copy_string_header(struct Parrot_Interp *interpreter,
+                               String *dest, String *src)
 {
-#if GC_DEBUG
-    UINTVAL version = dest->version;
+    UINTVAL version;
+#if ! DISABLE_GC_DEBUG
+    version = dest->version;
+#endif
     memcpy(dest, src, sizeof(String));
+#if ! DISABLE_GC_DEBUG
     dest->version = version;
-#else
-    memcpy(dest, src, sizeof(String));
 #endif
 }
 
@@ -70,13 +72,13 @@ make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
         d = new_string_header(interpreter,
                               s->flags & ~(UINTVAL)BUFFER_constant_FLAG);
         s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
-        copy_string_header(d, s);
+        copy_string_header(interpreter, d, s);
         d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
     }
     else {
         d = new_string_header(interpreter, s->flags);
         s->flags |= BUFFER_COW_FLAG;
-        copy_string_header(d, s);
+        copy_string_header(interpreter, d, s);
     }
     return d;
 }
@@ -85,12 +87,12 @@ static void
 make_COW_reference_from_header(struct Parrot_Interp *interpreter, STRING *s, STRING *d) {
     if (s->flags & BUFFER_constant_FLAG) {
         s->flags |= BUFFER_COW_FLAG|BUFFER_external_FLAG;
-        copy_string_header(d, s);
+        copy_string_header(interpreter, d, s);
         d->flags &= ~(UINTVAL)(BUFFER_constant_FLAG);
     }
     else {;
         s->flags |= BUFFER_COW_FLAG;
-        copy_string_header(d, s);
+        copy_string_header(interpreter, d, s);
     }
 }
 
@@ -752,10 +754,9 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
         return 0;
     }
 
-#if GC_DEBUG
     /* It's easy to forget that string comparison can trigger GC */
-    if (interpreter) Parrot_do_dod_run(interpreter);
-#endif
+    if (interpreter && GC_DEBUG(interpreter))
+        Parrot_do_dod_run(interpreter);
 
     if (s1->type != s2->type || s1->encoding != s2->encoding) {
         s1 = string_transcode(interpreter, s1, NULL, string_unicode_type,

@@ -71,26 +71,35 @@ To convert the generated foo.c file to a binary, do (on Unix only):
 =item B<make test>
 
 C<make test> will compile anything that needs to be compiled and run
-all standard regression tests. To look at a test more closely, run the
-appropriate test file in the t/ directory:
+all standard regression tests, with garbage collection/memory
+management debugging enabled. (Collectively called GC_DEBUG, this is
+accomplished by either passing the --gc-debug flag to the parrot
+binary, or setting the environment variable $PARROT_GC_DEBUG.)
+
+To look at a test more closely, run the appropriate test file in the
+t/ directory:
 
   perl -Ilib t/op/basic.t
 
-To keep a copy of all of the test C<.pasm> and C<.pbc> files
-generated, set the environment variable POSTMORTEM to 1 (THIS IS NOW
-THE DEFAULT):
+To avoid keeping copies of all of the test C<.pasm> and C<.pbc> files
+generated, set the environment variable $POSTMORTEM to 0:
 
-  env POSTMORTEM=1 perl -Ilib t/op/basic.t
+  env POSTMORTEM=0 perl -Ilib t/op/basic.t
   ls t/op/basic*
 
-To run makefile tests with a different dispatcher, set the TEST_PROG_ARGS
+To run makefile tests with a different dispatcher, set the $TEST_PROG_ARGS
 variable:
 
   make test TEST_PROG_ARGS=-P # Use prederef mode
 
-For running individual tests, set the environment variable TEST_PROG_ARGS:
+For running individual tests, set the environment variable $TEST_PROG_ARGS:
 
   env TEST_PROG_ARGS=-j perl -Ilib t/op/basic.t
+
+To run the tests under all available dispatchers, use the 'fulltest'
+target:
+
+  make fulltest
 
 =item B<make quicktest>
 
@@ -113,5 +122,9 @@ C<make quicktest> can fail under the following circumstances:
 
 If C<make quicktest> fails to work properly, C<make test> is always
 available as a fallback.
+
+C<make quickfulltest> may be used to run all tests under all available
+dispatchers. This actually doesn't take all that long, since the *.pbc
+files are guaranteed to be reused after the first complete test pass.
 
 =back

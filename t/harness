@@ -9,10 +9,11 @@ use Test::Harness qw(runtests);
 # Suck the switches into the TEST_PROG_ARGS evar:
 #
 
-use Getopt::Std;
-my %opts;
-getopts('gjP', \%opts);
-$ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
+$ENV{RUNNING_MAKE_TEST} = grep { $_ eq '--running-make-test' } @ARGV;
+@ARGV = grep { $_ ne '--running-make-test' } @ARGV;
+
+$ENV{TEST_PROG_ARGS} = join(' ', grep { /^-/ } @ARGV);
+@ARGV = grep { ! /^-/ } @ARGV;
 
 $ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;
 @ARGV = grep $_ ne 'quick', @ARGV;

@@ -14,6 +14,8 @@ CODE
 Created IntList with 0 elements to start with.
 OUTPUT
 
+# This test just runs way too slowly with GC_DEBUG turned on, so let's
+# turn it off for make test runs.
 output_is(<<'CODE', <<'OUTPUT', "aerobics");
         new P0, .IntList
         set I10, 10000
@@ -146,7 +148,8 @@ CODE
 I need a shower.
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "direct access");
+my $SPEEDUP = $ENV{RUNNING_MAKE_TEST} ? "gc_debug 0\n" : "";
+output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "direct access");
         new P0, .IntList
 	set S0, ""
 	set S1, "abcdefghijklmnopqrst"
@@ -186,7 +189,7 @@ CODE
 ok
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "shift/unshift");
+output_is($SPEEDUP . <<'CODE', <<'OUTPUT', "shift/unshift");
         new P0, .IntList
 	set I10, 100000
 	set S0, ""

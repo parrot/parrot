@@ -131,10 +131,10 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
 {
     HashIndex i;
 
-    buffer_lives((Buffer *)hash);
+    buffer_lives(interpreter, (Buffer *)hash);
 
     if(hash->bucket_pool) {
-        buffer_lives(hash->bucket_pool);
+        buffer_lives(interpreter, hash->bucket_pool);
     }
 
     if (hash->buffer.bufstart == NULL || hash->bucket_pool->bufstart == NULL) {
@@ -144,9 +144,9 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET *bucket = lookupBucket(hash, i);
         while (bucket) {
-            buffer_lives((Buffer *)bucket->key);
+            buffer_lives(interpreter, (Buffer *)bucket->key);
             if (bucket->value.type == enum_hash_string)
-                buffer_lives((Buffer *)bucket->value.val.string_val);
+                buffer_lives(interpreter, (Buffer *)bucket->value.val.string_val);
             else if (bucket->value.type == enum_hash_pmc)
                 end_of_used_list = mark_used(bucket->value.val.pmc_val,
                                              end_of_used_list);

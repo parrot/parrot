@@ -19,7 +19,8 @@
  */
 
 void
-dump_pmc(struct Parrot_Interp *interpreter, PMC* pmc) {
+trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
+{
     if(pmc) {
         if(pmc->vtable) {
             if (pmc->vtable == Parrot_base_vtables + enum_class_PerlString) {
@@ -95,7 +96,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "P%vd=", key->cache.int_val);
-            dump_pmc(interpreter, interpreter->ctx.pmc_reg.registers[key->cache.int_val]);
+            trace_pmc_dump(interpreter, interpreter->ctx.pmc_reg.registers[key->cache.int_val]);
             break;
         default:
             PIO_eprintf(interpreter, "??");
@@ -169,7 +170,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                 /* what does a PMC register look like? */
                 if (i > 1) {
                     PIO_eprintf(interpreter, "P%vd=", *(pc + i));
-                    dump_pmc(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
+                    trace_pmc_dump(interpreter, interpreter->ctx.pmc_reg.registers[*(pc + i)]);
                 }
                 else
                     PIO_eprintf(interpreter, "P%vd", *(pc + i));

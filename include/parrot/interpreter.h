@@ -24,7 +24,8 @@ typedef enum {
     PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
     PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
     PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
-    PARROT_CGOTO_FLAG    = 0x40   /* We're using the computed goto runops */
+    PARROT_CGOTO_FLAG    = 0x40,  /* We're using the computed goto runops */
+    PARROT_GC_DEBUG_FLAG = 0x80   /* We're debugging memory management */
 } Parrot_Interp_flag;
 
 struct Parrot_Interp;

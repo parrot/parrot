@@ -131,6 +131,8 @@
  *
  */
 
+#include <assert.h>
+
 /* internals */
 static List_chunk* allocate_chunk(Interp *interpreter, List *list,
         UINTVAL items, UINTVAL size);
@@ -920,7 +922,8 @@ List *
 list_new_init(Interp *interpreter, INTVAL type, PMC * init)
 {
     List * list = list_new(interpreter, type);
-    INTVAL i, len, size, key;
+    INTVAL i, len, key;
+    INTVAL size = 0;
 
     if (!init->vtable || init->vtable != Parrot_base_vtables +
             enum_class_PerlArray)
@@ -1014,7 +1017,7 @@ list_mark(Interp* interpreter, List* list, PMC* last)
     UINTVAL i;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
-        buffer_lives((Buffer *) chunk);
+        buffer_lives(interpreter, (Buffer *) chunk);
         if (list->item_type == enum_type_PMC && !(chunk->data.flags & sparse))
             for (i = 0; i < chunk->items; i++) {
                 p = ((PMC**) chunk->data.bufstart) [i];
@@ -1022,7 +1025,7 @@ list_mark(Interp* interpreter, List* list, PMC* last)
                     last = mark_used(p, last);
             }
     }
-    buffer_lives((Buffer *) list);
+    buffer_lives(interpreter, (Buffer *) list);
     return last;
 }
 

@@ -381,6 +381,15 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
     }
 }
 
+static int
+env_var_set(const char* var)
+{
+    char* value = getenv(var);
+    if (value == NULL) return 0;
+    if (*value == '\0') return 0;
+    return ! (strcmp(value, "0") == 0);
+}
+
 /*=for api interpreter make_interpreter
  *  Create the Parrot interpreter.  Allocate memory and clear the registers.
  */
@@ -406,6 +415,19 @@ make_interpreter(Interp_flags flags)
     interpreter->DOD_block_level = 1;
     interpreter->GC_block_level = 1;
 
+    /* Must initialize flags here so the GC_DEBUG stuff is available before
+     * mem_setup_allocator() is called. */
+    interpreter->flags = flags;
+
+    if (env_var_set("PARROT_GC_DEBUG")) {
+#if ! DISABLE_GC_DEBUG
+        Interp_flags_SET(interpreter, PARROT_GC_DEBUG_FLAG);
+#else
+        fprintf(stderr, "PARROT_GC_DEBUG is set but the binary was compiled "
+                "with DISABLE_GC_DEBUG.\n");
+#endif
+    }
+
     /* Set up the memory allocation system */
     mem_setup_allocator(interpreter);
 
@@ -416,7 +438,6 @@ make_interpreter(Interp_flags flags)
     interpreter->perl_stash->parent_stash = NULL;
 
     /* Initialize interpreter's flags */
-    interpreter->flags = flags;
     interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
     memset(interpreter->warns, 0, sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);

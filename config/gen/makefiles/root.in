@@ -462,46 +462,50 @@ languages.dummy :
 #
 ###############################################################################
 
+# The --running-make-test argument is currently used by long-running tests
+# to disable GC_DEBUG.
+EXTRA_TEST_ARGS = --gc-debug --running-make-test
+
 test : $(TEST_PROG) test_prep test_dummy
 
 fulltest : $(TEST_PROG) test_prep fulltest_dummy
 
 .PHONY: fulltest_dummy
 fulltest_dummy :
-	$(PERL) t/harness $(TEST_PROG_ARGS)
-	$(PERL) t/harness -j $(TEST_PROG_ARGS)
-	$(PERL) t/harness -P $(TEST_PROG_ARGS)
-	$(PERL) t/harness -g $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(TEST_PROG_ARGS)
 
 quickfulltest : $(TEST_PROG) test_prep quickfulltest_dummy
 
 .PHONY: quickfulltest_dummy
 quickfulltest_dummy :
-	$(PERL) t/harness $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness -j $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness -P $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness -g $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
 test_prep : ${blib_lib_libparrot_a} assemble.pl
 
 test_dummy :
-	$(PERL) t/harness $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
 
 testp : $(TEST_PROG) test_prep blib/lib/libcore_prederef$(SO) blib/lib/libparrot$(SO) $(TEST_PROG_SO) test_dummy_p
 
 test_dummy_p :
-	$(PERL) t/harness $(TEST_PROG_ARGS) -P
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -P
 
 testj : $(TEST_PROG) test_prep test_dummy_j
 
 test_dummy_j :
-	$(PERL) t/harness $(TEST_PROG_ARGS) -j
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) -j
 
 quicktest : $(TEST_PROG) test_prep quicktest_dummy
 
 quicktest_dummy :
-	$(PERL) t/harness $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) quick
 
 mopstest : $(TEST_PROG) examples/assembly/mops.pbc
 	$(TEST_PROG) $(TEST_PROG_ARGS) examples/assembly/mops.pbc

@@ -2919,6 +2919,20 @@ inline op trace(in INT) {
   restart NEXT();
 }
 
+########################################
+
+=item B<gc_debug>(in INT)
+
+If $1 is zero, turn off GC_DEBUG. Otherwise turn it on.
+
+=cut
+
+inline op gc_debug(in INT) {
+  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_GC_DEBUG_FLAG); }
+  else         { Interp_flags_CLEAR(interpreter, PARROT_GC_DEBUG_FLAG); }
+  goto NEXT();
+}
+
 =back
 
 =cut

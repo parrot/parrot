@@ -143,27 +143,27 @@ Parrot_find_method(struct Parrot_Interp * interp, struct Stash * stash,
  * Mark entries in a stack structure during GC.
  */
 PMC *
-mark_stack(Stack_Chunk_t * cur_stack, PMC * end_of_used_list)
+mark_stack(struct Parrot_Interp* interpreter,
+           Stack_Chunk_t * cur_stack, PMC * end_of_used_list)
 {
     Stack_Entry_t *entry;
     size_t i;
 
-    while (cur_stack) {
-        if(cur_stack->buffer){
-            buffer_lives(cur_stack->buffer);
-            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-            for (i = 0; i < cur_stack->used; i++) {
-                if (STACK_ENTRY_PMC == entry[i].entry_type &&
-                    entry[i].entry.pmc_val) {
-                    end_of_used_list = mark_used(entry[i].entry.pmc_val,
-                                                 end_of_used_list);
-                } else if (STACK_ENTRY_STRING == entry[i].entry_type &&
-                           entry[i].entry.string_val) {
-                    buffer_lives((Buffer *)entry[i].entry.string_val);
-                }
+    for ( ; cur_stack; cur_stack = cur_stack->prev) {
+        if (cur_stack->buffer == NULL) continue;
+
+        buffer_lives(interpreter, cur_stack->buffer);
+        entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
+        for (i = 0; i < cur_stack->used; i++) {
+            if (STACK_ENTRY_PMC == entry[i].entry_type &&
+                entry[i].entry.pmc_val) {
+                end_of_used_list = mark_used(entry[i].entry.pmc_val,
+                                             end_of_used_list);
+            } else if (STACK_ENTRY_STRING == entry[i].entry_type &&
+                       entry[i].entry.string_val) {
+                buffer_lives(interpreter, (Buffer *)entry[i].entry.string_val);
             }
         }
-        cur_stack = cur_stack->prev;
     }
     return end_of_used_list;
 }

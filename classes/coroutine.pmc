@@ -39,6 +39,7 @@ pmclass Coroutine {
     PMC* mark (PMC* end_of_used_list) {
         /* XXX: need to do pads as well. */
         return mark_stack(
+            INTERP,
             ((struct Parrot_Coroutine *)SELF->data)->ctx.user_stack,
             end_of_used_list
             );

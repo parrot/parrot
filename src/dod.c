@@ -14,7 +14,7 @@
 
 #include "parrot/parrot.h"
 
-#if GC_DEBUG
+#if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack */
 int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
@@ -72,12 +72,12 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     last = mark_used(current, last);
 
     /* Find important stuff on the system stack */
-#if GC_DEBUG
+#if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 1;
+#endif
     last = trace_system_stack(interpreter,last);
+#if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 0;
-#else
-    last = trace_system_stack(interpreter,last);
 #endif
 
     /* Now, go run through the PMC registers and mark them as live */
@@ -112,7 +112,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.pad_stack;
     while (cur_stack) {
         if (cur_stack->buffer) {
-            buffer_lives(cur_stack->buffer);
+            buffer_lives(interpreter, cur_stack->buffer);
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
                 if (STACK_ENTRY_PMC == entry[i].entry_type &&
@@ -129,7 +129,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 
     while (cur_stack) {
         if(cur_stack->buffer){
-            buffer_lives(cur_stack->buffer);
+            buffer_lives(interpreter, cur_stack->buffer);
 
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
@@ -147,7 +147,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
 
     while (cur_stack) {
         if(cur_stack->buffer){
-            buffer_lives(cur_stack->buffer);
+            buffer_lives(interpreter, cur_stack->buffer);
 
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
@@ -180,7 +180,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
             }
             else if (bits == PMC_is_buffer_ptr_FLAG) {
                 if (current->data) {
-                    buffer_lives(current->data);
+                    buffer_lives(interpreter, current->data);
                 }
             }
             else if (bits == (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG)) {
@@ -189,7 +189,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
                 if (trace_buf) {
                     PMC **cur_pmc = trace_buf->bufstart;
                     /* Mark the damn buffer as used! */
-                    buffer_lives(trace_buf);
+                    buffer_lives(interpreter, trace_buf);
                     for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++){
                         if (cur_pmc[i]) {
                             last = mark_used(cur_pmc[i], last);
@@ -221,16 +221,15 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
      * registers are pointing to valid buffers. This is not a good
      * assumption, but it'll do for now */
     for (i = 0; i < NUM_REGISTERS; i++) {
-        if (interpreter->ctx.string_reg.registers[i]) {
-            buffer_lives((Buffer *)interpreter->ctx.string_reg.registers[i]);
-        }
+        Buffer* reg = (Buffer *) interpreter->ctx.string_reg.registers[i];
+        if (reg) buffer_lives(interpreter, reg);
     }
 
     /* The interpreter has a few strings of its own */
     if (interpreter->current_file)
-        buffer_lives((Buffer*)interpreter->current_file);
+        buffer_lives(interpreter, (Buffer*)interpreter->current_file);
     if (interpreter->current_package)
-        buffer_lives((Buffer*)interpreter->current_package);
+        buffer_lives(interpreter, (Buffer*)interpreter->current_package);
 
     /* Now walk the string stack. Make sure to walk from top down
      * since stack may have segments above top that we shouldn't walk. */
@@ -238,9 +237,8 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
          cur_chunk; cur_chunk = cur_chunk->prev) {
         for (j = 0; j < cur_chunk->used; j++) {
             for (i = 0; i < NUM_REGISTERS; i++) {
-                if (cur_chunk->SReg[j].registers[i]) {
-                    buffer_lives((Buffer *)cur_chunk->SReg[j].registers[i]);
-                }
+                Buffer* reg = (Buffer *) cur_chunk->SReg[j].registers[i];
+                if (reg) buffer_lives(interpreter, reg);
             }
         }
     }
@@ -250,12 +248,13 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     /* The general stack's circular, so we need to be careful */
     while (cur_stack) {
         if(cur_stack->buffer){ 
-            buffer_lives(cur_stack->buffer);
+            buffer_lives(interpreter, cur_stack->buffer);
             entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
             for (i = 0; i < cur_stack->used; i++) {
                 if (STACK_ENTRY_STRING == entry[i].entry_type &&
                     entry[i].entry.string_val) {
-                    buffer_lives((Buffer *)entry[i].entry.string_val);
+                    buffer_lives(interpreter,
+                                 (Buffer *)entry[i].entry.string_val);
                 }
             }
         }
@@ -267,7 +266,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.control_stack;
     while (cur_stack) {
         if(cur_stack->buffer){ 
-            buffer_lives(cur_stack->buffer);
+            buffer_lives(interpreter, cur_stack->buffer);
         }
 
         cur_stack = cur_stack->prev;
@@ -503,7 +502,7 @@ trace_system_stack(struct Parrot_Interp *interpreter, PMC *last)
             {
                 /* ...and since buffer_lives doesn't care about bufstart, 
                  * it doesn't really matter if it sets a flag */
-                buffer_lives((Buffer *)ptr);
+                buffer_lives(interpreter, (Buffer *)ptr);
             }
         }
     }

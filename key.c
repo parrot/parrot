@@ -230,7 +230,7 @@ PMC *
 key_mark(struct Parrot_Interp *interpreter, PMC *key, PMC *end_of_used_list)
 {
     if ((key->flags & KEY_type_FLAGS) == KEY_string_FLAG)
-        buffer_lives((Buffer *)key->cache.string_val);
+        buffer_lives(interpreter, (Buffer *)key->cache.string_val);
     else if ((key->flags & KEY_type_FLAGS) == KEY_pmc_FLAG)
         end_of_used_list = mark_used(key->cache.pmc_val, end_of_used_list);
 

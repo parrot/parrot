@@ -15,11 +15,9 @@
 
 #include "parrot/parrot.h"
 
-#if GC_DEBUG
-#    define PMC_HEADERS_PER_ALLOC 1
-#    define BUFFER_HEADERS_PER_ALLOC 1
-#    define STRING_HEADERS_PER_ALLOC 1
-#else
+#define GC_DEBUG_PMC_HEADERS_PER_ALLOC 1
+#define GC_DEBUG_BUFFER_HEADERS_PER_ALLOC 1
+#define GC_DEBUG_STRING_HEADERS_PER_ALLOC 1
 #ifndef GC_IS_MALLOC
 #    define PMC_HEADERS_PER_ALLOC 256
 #    define BUFFER_HEADERS_PER_ALLOC 256
@@ -29,7 +27,6 @@
 #    define BUFFER_HEADERS_PER_ALLOC 512
 #    define STRING_HEADERS_PER_ALLOC 512
 #endif /* GC_IS_MALLOC */
-#endif
 
 /** PMC Header Functions for small-object lookup table **/
 
@@ -53,12 +50,9 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
 {
     /* Copied from get_free_object */
     PMC *pmc;
-    if (!pool->free_list)
+    if (!pool->free_list || GC_DEBUG(interpreter))
         (*pool->more_objects)(interpreter, pool);
-#if GC_DEBUG
-    else
-        (*pool->more_objects)(interpreter, pool);
-#endif
+
     pmc = pool->free_list;
     pool->free_list = *(void **)pmc;
 
@@ -82,21 +76,26 @@ alloc_pmcs(struct Parrot_Interp *interpreter,
 
 void
 add_free_buffer(struct Parrot_Interp *interpreter,
-                struct Small_Object_Pool *pool, void *buffer)
+                struct Small_Object_Pool *pool, void *vp_buffer)
 {
+    Buffer *buffer = (Buffer *)vp_buffer;
+
+    if (GC_DEBUG(interpreter) && (buffer->flags & BUFFER_report_FLAG))
+        fprintf(stderr, "Freeing buffer %p -> %p\n", buffer, buffer->bufstart);
+
 #ifdef GC_IS_MALLOC
     /* free allocated space at bufstart, but not if it is used
      * COW or it is external
      */
-    if (((Buffer *)buffer)->bufstart &&
-            !(((Buffer *)buffer)->flags &
-                (BUFFER_COW_FLAG|BUFFER_external_FLAG))) {
-        free(((Buffer *)buffer)->bufstart);
+    if (buffer->bufstart &&
+        !(buffer->flags & (BUFFER_COW_FLAG|BUFFER_external_FLAG)))
+    {
+        free(buffer->bufstart);
     }
 #endif /* GC_IS_MALLOC */
-    ((Buffer *)buffer)->flags = BUFFER_on_free_list_FLAG;
+    buffer->flags = BUFFER_on_free_list_FLAG;
     /* Use the right length */
-    ((Buffer *)buffer)->buflen = 0;
+    buffer->buflen = 0;
 
     /* Copied from add_free_object */
     *(void **)buffer = pool->free_list;
@@ -108,12 +107,8 @@ get_free_buffer(struct Parrot_Interp *interpreter,
 {
     /* Copied from get_free_object */
     Buffer *buffer;
-    if (!pool->free_list)
+    if (!pool->free_list || GC_DEBUG(interpreter))
         (*pool->more_objects)(interpreter, pool);
-#if GC_DEBUG
-    else
-        (*pool->more_objects)(interpreter, pool);
-#endif
     buffer = pool->free_list;
     pool->free_list = *(void **)buffer;
 
@@ -121,8 +116,8 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     buffer->bufstart = NULL;
     /* Clear the flagpole (especially BUFFER_on_free_list_FLAG) */
     buffer->flags = 0;
-#if GC_DEBUG
-    buffer->version++;
+#if ! DISABLE_GC_DEBUG
+    if (GC_DEBUG(interpreter)) buffer->version++;
 #endif
 
     /* If you get the "Live buffer 0xnnnnnnn version m found on free
@@ -152,8 +147,10 @@ alloc_buffers(struct Parrot_Interp *interpreter,
 struct Small_Object_Pool *
 new_pmc_pool(struct Parrot_Interp *interpreter)
 {
-    struct Small_Object_Pool *pmc_pool = new_small_object_pool(
-                      interpreter, sizeof(PMC), PMC_HEADERS_PER_ALLOC);
+    int num_headers = GC_DEBUG(interpreter) ?
+        GC_DEBUG_PMC_HEADERS_PER_ALLOC : PMC_HEADERS_PER_ALLOC;
+    struct Small_Object_Pool *pmc_pool =
+        new_small_object_pool(interpreter, sizeof(PMC), num_headers);
     pmc_pool->add_free_object = add_free_pmc;
     pmc_pool->get_free_object = get_free_pmc;
     pmc_pool->alloc_objects = alloc_pmcs;
@@ -168,11 +165,12 @@ struct Small_Object_Pool *
 new_bufferlike_pool(struct Parrot_Interp *interpreter,
                         size_t actual_buffer_size)
 {
+    int num_headers = GC_DEBUG(interpreter) ?
+        GC_DEBUG_BUFFER_HEADERS_PER_ALLOC : BUFFER_HEADERS_PER_ALLOC;
     size_t buffer_size =
         (actual_buffer_size + sizeof(void*) - 1) & ~(sizeof(void*) - 1);
     struct Small_Object_Pool *pool =
-        new_small_object_pool(interpreter, buffer_size,
-                          BUFFER_HEADERS_PER_ALLOC);
+        new_small_object_pool(interpreter, buffer_size, num_headers);
     pool->add_free_object = add_free_buffer;
     pool->get_free_object = get_free_buffer;
     pool->alloc_objects = alloc_buffers;
@@ -195,7 +193,8 @@ new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)
 {
     struct Small_Object_Pool *pool =
         new_bufferlike_pool(interpreter, sizeof(STRING));
-    pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
+    pool->objects_per_alloc = GC_DEBUG(interpreter) ?
+        GC_DEBUG_STRING_HEADERS_PER_ALLOC : STRING_HEADERS_PER_ALLOC;
     pool->align_1 = STRING_ALIGNMENT-1;
     if (constant) {
         pool->mem_pool = interpreter->arena_base->constant_string_pool;

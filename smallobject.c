@@ -14,13 +14,10 @@
 
 #include "parrot/parrot.h"
 
-#if GC_DEBUG
-#    define REPLENISH_LEVEL_FACTOR 0.0
-#    define UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#else
-#    define REPLENISH_LEVEL_FACTOR 0.2
-#    define UNITS_PER_ALLOC_GROWTH_FACTOR 4
-#endif
+#define GC_DEBUG_REPLENISH_LEVEL_FACTOR 0.0
+#define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
+#define REPLENISH_LEVEL_FACTOR 0.2
+#define UNITS_PER_ALLOC_GROWTH_FACTOR 4
 
 INTVAL
 contained_in_pool(struct Parrot_Interp *interpreter,
@@ -77,12 +74,8 @@ get_free_object(struct Parrot_Interp *interpreter,
     void *ptr;
     
     /* if we don't have any objects */
-    if (!pool->free_list)
+    if (!pool->free_list || GC_DEBUG(interpreter))
         (*pool->more_objects)(interpreter, pool);
-#if GC_DEBUG
-    else
-        (*pool->more_objects)(interpreter, pool);
-#endif
 
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
@@ -93,7 +86,7 @@ get_free_object(struct Parrot_Interp *interpreter,
  * and put them on */
 void
 alloc_objects(struct Parrot_Interp *interpreter,
-                          struct Small_Object_Pool *pool)
+              struct Small_Object_Pool *pool)
 {
     struct Small_Object_Arena *new_arena;
     void *object;
@@ -137,8 +130,15 @@ alloc_objects(struct Parrot_Interp *interpreter,
 
     /* Allocate more next time */
     pool->total_objects += pool->objects_per_alloc;
-    pool->objects_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
-    pool->replenish_level = (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
+    if (GC_DEBUG(interpreter)) {
+        pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
+        pool->replenish_level =
+            (size_t)(pool->total_objects * GC_DEBUG_REPLENISH_LEVEL_FACTOR);
+    } else {
+        pool->objects_per_alloc *= UNITS_PER_ALLOC_GROWTH_FACTOR;
+        pool->replenish_level =
+            (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
+    }
 }
 
 struct Small_Object_Pool *

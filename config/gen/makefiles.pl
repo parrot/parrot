@@ -9,6 +9,8 @@ $description="Generating Makefiles...";
 @args=();
 
 sub runstep {
+  genfile('config/gen/makefiles/common.in',    'Make.rules',
+          commentType => '#');
   genfile('config/gen/makefiles/root.in',      'Makefile',
           commentType => '#');
   genfile('config/gen/makefiles/classes.in',   'classes/Makefile',

@@ -187,7 +187,8 @@ for (0..1024) {
    $output .= (1024-$_) . "$_\n";
 }
 $code .= "      end\n";
-output_is($code, $output, "pushp & popp (deep)" );
+my $SPEEDUP = $ENV{RUNNING_MAKE_TEST} ? "gc_debug 0\n" : "";
+output_is($SPEEDUP . $code, $output, "pushp & popp (deep)" );
 
 
 # Test proper stack chunk handling

@@ -12,6 +12,7 @@
 #include "parrot/embed.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define setopt(flag) Parrot_setflag(interpreter, flag, (*argv)[0]+2);
 #define unsetopt(flag) Parrot_setflag(interpreter, flag, 0)
@@ -106,9 +107,19 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
             fgetc(stdin);
             break;
         case '-':
-            (*argc)--;
-            (*argv)++;
-            goto OUT;
+            if ((*argv)[0][2] == '\0') {
+                (*argc)--;
+                (*argv)++;
+                goto OUT;
+            } else if (strncmp((*argv)[0], "--gc-debug", 10) == 0) {
+#if DISABLE_GC_DEBUG
+                Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG,
+                            "PARROT_GC_DEBUG is set but the binary was "
+                            "compiled with DISABLE_GC_DEBUG.");
+#endif
+                setopt(PARROT_GC_DEBUG_FLAG);
+                break;
+            }
         case '\0':             /* bare '-' means read from stdin */
             goto OUT;
         default:
@@ -146,7 +157,11 @@ usage(void)
   -g    %s\n\
   -t    Activate tracing\n\
   -v    Display version information\n\
-  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\n",
+  -.    Wait for a keypress (gives Windows users time to attach a debugger)\n\
+  --gc-debug\n\
+        Enable garbage collection debugging mode. This may also be enabled\n\
+        by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
+\n",
             cgoto_info
     );
 
