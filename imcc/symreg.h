@@ -3,7 +3,7 @@
 
 /* constants */
 
-#define HASH_SIZE 1109
+#define HASH_SIZE 25013
 
 
 /* types */
