@@ -386,7 +386,9 @@ mark_const_subs(Parrot_Interp interpreter)
     /*
      * locate top level dir
      */
-    for (dir = &self->directory; dir->base.dir ; dir = dir->base.dir)
+    for (dir = &self->directory;
+            self != (struct PackFile *)&self->directory ;
+            dir = dir->base.dir)
         ;
     /*
      * iterate over all dir/segs
@@ -2812,7 +2814,7 @@ global_ns:
     }
     else {
         STRING *names;
-        PMC * stash, *part;
+        PMC * stash = NULL, *part;
         struct PackFile_Constant *pfc_const;
 
         if (ns >= pf->const_table->const_count) {
