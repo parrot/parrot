@@ -16,20 +16,20 @@ my %pack_type;
 	      n => 'd',
 	  );
 
-my %real_type=('i'=>'i',
-              'n'=>'n',
-              'N'=>'i',
-              'I'=>'i',
-              'S'=>'i',
-              's'=>'i',
-              'D'=>'i');
+my %real_type=('i'=>'l',
+              'n'=>'d',
+              'N'=>'l',
+              'I'=>'l',
+              'S'=>'l',
+              's'=>'l',
+              'D'=>'l');
 
 my $sizeof_packi = length(pack($pack_type{i},1024));
 
 open GUTS, "interp_guts.h";
 my $opcode;
 while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
+    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
     $opcodes{$2}{CODE} = $1;
 }
 

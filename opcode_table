@@ -103,3 +103,45 @@ clear_s	0
 clear_n	0
 clear_p	0
 
+# Transcendental Math Ops
+
+sin_n_n        2       N N
+cos_n_n        2       N N
+tan_n_n        2       N N
+sec_n_n        2       N N
+atan_n_n       2       N N
+atan2_n_n_n    3       N N N
+asin_n_n       2       N N
+acos_n_n       2       N N
+asec_n_n       2       N N
+cosh_n_n       2       N N
+sinh_n_n       2       N N
+tanh_n_n       2       N N
+sech_n_n       2       N N
+log2_n_n       2       N N
+log10_n_n      2       N N
+ln_n_n         2       N N
+exp_n_n        2       N N
+pow_n_n_n      3       N N N
+sin_n_i        2       N I
+cos_n_i        2       N I
+tan_n_i        2       N I
+sec_n_i        2       N I
+atan_n_i       2       N I
+atan2_n_n_i    3       N N I
+atan2_n_i_n    3       N I N
+atan2_n_i_i    3       N I I
+asin_n_i       2       N I
+acos_n_i       2       N I
+asec_n_i       2       N I
+cosh_n_i       2       N I
+sinh_n_i       2       N I
+tanh_n_i       2       N I
+sech_n_i       2       N I
+log2_n_i       2       N I
+log10_n_i      2       N I
+ln_n_i         2       N I
+exp_n_i        2       N I
+pow_n_n_i      3       N N I
+pow_n_i_i      3       N I I
+pow_n_i_n      3       N I N

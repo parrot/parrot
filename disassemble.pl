@@ -28,7 +28,7 @@ my %unpack_size = (i => 4,
 open GUTS, "interp_guts.h";
 my $opcode;
 while (<GUTS>) {
-    next unless /\tx\[(\d+)\] = ([a-z_]+);/;
+    next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
     $opcodes{$2}{CODE} = $1;
 }
 

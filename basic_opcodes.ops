@@ -5,6 +5,7 @@
  */
 
 #include "parrot.h"
+#include "math.h"
 
 // SET Ix, CONSTANT
 AUTO_OP set_i_ic {
@@ -208,7 +209,7 @@ AUTO_OP time_n {
 
 // PRINT Nx
 AUTO_OP print_n {
-  printf("N reg %li is %Lf\n", P1, NUM_REG(P1));
+  printf("N reg %li is %f\n", P1, NUM_REG(P1));
 }
  
 // INC Nx
@@ -334,4 +335,206 @@ AUTO_OP substr_s_s_i {
 
 // NOOP
 AUTO_OP noop {
+}
+
+// TRANSCENDENTAL MATH FUNCTIONS
+
+// sin_n_n
+AUTO_OP sin_n_n {
+   NUM_REG(P1) = sin(NUM_REG(P2));
+}
+
+// cos_n_n
+AUTO_OP cos_n_n {
+   NUM_REG(P1) = cos(NUM_REG(P2));
+}
+
+// tan_n_n
+AUTO_OP tan_n_n {
+   NUM_REG(P1) = tan(NUM_REG(P2));
+}
+
+// sec_n_n
+AUTO_OP sec_n_n {
+   NUM_REG(P1) = ((NV)1) / cos(NUM_REG(P2));
+}
+
+// atan_n_n
+AUTO_OP atan_n_n {
+   NUM_REG(P1) = atan(NUM_REG(P2));
+}
+
+// atan2_n_n_n
+AUTO_OP atan2_n_n_n {
+   NUM_REG(P1) = atan2(NUM_REG(P2), NUM_REG(P3));
+}
+
+// asin_n_n
+AUTO_OP asin_n_n {
+   NUM_REG(P1) = asin(NUM_REG(P2));
+}
+
+// acos_n_n
+AUTO_OP acos_n_n {
+   NUM_REG(P1) = acos(NUM_REG(P2));
+}
+
+// asec_n_n
+AUTO_OP asec_n_n {
+   NUM_REG(P1) = acos(((NV)1) / NUM_REG(P2));
+}
+
+// cosh_n_n
+AUTO_OP cosh_n_n {
+   NUM_REG(P1) = cosh(NUM_REG(P2));
+}
+
+// sinh_n_n
+AUTO_OP sinh_n_n {
+   NUM_REG(P1) = sinh(NUM_REG(P2));
+}
+
+// tanh_n_n
+AUTO_OP tanh_n_n {
+   NUM_REG(P1) = tanh(NUM_REG(P2));
+}
+
+// sech_n_n
+AUTO_OP sech_n_n {
+   NUM_REG(P1) = ((NV)1) / cosh(NUM_REG(P2));
+}
+
+// log2_n_n
+AUTO_OP log2_n_n {
+   NUM_REG(P1) = log(NUM_REG(P2)) / log((NV)2);
+}
+
+// log10_n_n
+AUTO_OP log10_n_n {
+   NUM_REG(P1) = log10(NUM_REG(P2));
+}
+
+// ln_n_n
+AUTO_OP ln_n_n {
+   NUM_REG(P1) = log(NUM_REG(P2));
+}
+
+// exp_n_n
+AUTO_OP exp_n_n {
+   NUM_REG(P1) = exp(NUM_REG(P2));
+}
+
+// pow_n_n_n
+AUTO_OP pow_n_n_n {
+   NUM_REG(P1) = pow(NUM_REG(P2), NUM_REG(P3));
+}
+
+// sin_n_i
+AUTO_OP sin_n_i {
+   NUM_REG(P1) = sin(INT_REG(P2));
+}
+
+// cos_n_i
+AUTO_OP cos_n_i {
+   NUM_REG(P1) = cos(INT_REG(P2));
+}
+
+// tan_n_i
+AUTO_OP tan_n_i {
+   NUM_REG(P1) = tan(INT_REG(P2));
+}
+
+// sec_n_i
+AUTO_OP sec_n_i {
+   NUM_REG(P1) = ((NV)1) / cos(INT_REG(P2));
+}
+
+// atan_n_i
+AUTO_OP atan_n_i {
+   NUM_REG(P1) = atan(INT_REG(P2));
+}
+
+// atan2_n_n_i
+AUTO_OP atan2_n_n_i {
+   NUM_REG(P1) = atan2(NUM_REG(P2), INT_REG(P3));
+}
+
+// atan2_n_i_n
+AUTO_OP atan2_n_i_n {
+   NUM_REG(P1) = atan2(INT_REG(P2), NUM_REG(P3));
+}
+
+// atan2_n_i_i
+AUTO_OP atan2_n_i_i {
+   NUM_REG(P1) = atan2(INT_REG(P2), INT_REG(P3));
+}
+
+// asin_n_i
+AUTO_OP asin_n_i {
+   NUM_REG(P1) = asin(INT_REG(P2));
+}
+
+// acos_n_i
+AUTO_OP acos_n_i {
+   NUM_REG(P1) = acos(INT_REG(P2));
+}
+
+// asec_n_i
+AUTO_OP asec_n_i {
+   NUM_REG(P1) = acos(((NV)1) / ((NV)INT_REG(P2)));
+}
+
+// cosh_n_i
+AUTO_OP cosh_n_i {
+   NUM_REG(P1) = cosh(INT_REG(P2));
+}
+
+// sinh_n_i
+AUTO_OP sinh_n_i {
+   NUM_REG(P1) = sinh(INT_REG(P2));
+}
+
+// tanh_n_i
+AUTO_OP tanh_n_i {
+   NUM_REG(P1) = tanh(INT_REG(P2));
+}
+
+// sech_n_i
+AUTO_OP sech_n_i {
+   NUM_REG(P1) = ((NV)1) / cosh(INT_REG(P2));
+}
+
+// log2_n_i
+AUTO_OP log2_n_i {
+   NUM_REG(P1) = log(INT_REG(P2)) / log((NV)2);
+}
+
+// log10_n_i
+AUTO_OP log10_n_i {
+   NUM_REG(P1) = log10(INT_REG(P2));
+}
+
+// ln_n_i
+AUTO_OP ln_n_i {
+   NUM_REG(P1) = log(INT_REG(P2));
+}
+
+// exp_n_i
+AUTO_OP exp_n_i {
+   NUM_REG(P1) = exp(INT_REG(P2));
+}
+
+// pow_n_n_i
+AUTO_OP pow_n_n_i {
+   NUM_REG(P1) = pow(NUM_REG(P2), INT_REG(P3));
+}
+
+// pow_n_i_i
+AUTO_OP pow_n_i_i {
+   NUM_REG(P1) = pow(INT_REG(P2), INT_REG(P3));
+}
+
+// pow_n_n_i
+AUTO_OP pow_n_i_n {
+   NUM_REG(P1) = pow(INT_REG(P2), NUM_REG(P3));
 }
