@@ -2,22 +2,6 @@
 
 =over 4
 
-=item upvar, uplevel
-
-set a global lexical level (_Tcl::call_level) - normally inc'd whenever a UDF proc is called, (done)
-dec'd whenever a UDF is exited.  (done)
-
-Then, anything that set/get's a lexical should do so from the global level
-that we're using. (done)
-
-This will make writing uplevel simple. upvar needs to work like 'global'.
-
-All done except for proper handling of ?level? in uplevel. once that's done,
-steal that code for upvar's level handling.
-
-	uplevel ?level? arg ?arg ...?
-	upvar ?level? otherVar myVar ?otherVar myVar ...?
-
 =item PMC based parser -
 
 Instead of the current PIR level parsing, we should instead use
