@@ -14,20 +14,30 @@
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
+/*
+ * set a property
+ */
+static void
+set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
+        STRING *name)
+{
+    PMC *prop;
+    STRING *key;
+
+    prop = pmc_new(interpreter, enum_class_PerlString);
+    VTABLE_set_string_native(interpreter, prop, name);
+    key = string_from_cstring(interpreter, what, 0);
+    VTABLE_setprop(interpreter, lib_pmc, key, prop);
+}
 
 /*
- * dynamic library loader
- * the initializer is currently unused
- *
- * calls Parrot_lib_load_%s which performs the registration of the lib once
- *       Parrot_lib_init_%s gets called (if exists) to perform thread specific setup
+ * store a library PMC in interpreter iglobals
  */
-
 static void
-store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path)
+store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
+        STRING *type)
 {
-    PMC *iglobals, *dyn_libs, *prop;
-    STRING *key;
+    PMC *iglobals, *dyn_libs;
 
     iglobals = interpreter->iglobals;
     dyn_libs = VTABLE_get_pmc_keyed_int(interpreter, iglobals,
@@ -40,14 +50,17 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path)
     /*
      * remember path/file in props
      */
-    prop = pmc_new(interpreter, enum_class_PerlString);
-    VTABLE_set_string_native(interpreter, prop, path);
-    key = string_from_cstring(interpreter, "_filename", 0);
-    VTABLE_setprop(interpreter, lib_pmc, key, prop);
+    set_cstring_prop(interpreter, lib_pmc, "_filename", path);
+    set_cstring_prop(interpreter, lib_pmc, "_type", type);
 
     VTABLE_push_pmc(interpreter, dyn_libs, lib_pmc);
 }
 
+/*
+ * check if a library PMC with the filename path exists
+ * if yes return it
+ *
+ */
 static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)
 {
@@ -76,7 +89,7 @@ is_loaded(Parrot_Interp interpreter, STRING *path)
 /*
  * return path and handle of a dynamic lib
  */
-STRING *
+static STRING *
 get_path(Interp *interpreter, STRING *lib, void **handle)
 {
     char *cpath;
@@ -125,10 +138,19 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
     return path;
 }
 
+/*
+ * dynamic library loader
+ * the initializer is currently unused
+ *
+ * calls Parrot_lib_load_%s which performs the registration of the lib once
+ *       Parrot_lib_init_%s gets called (if exists) to perform
+ *                          thread specific setup
+ */
+
 PMC *
 Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 {
-    STRING *path, *load_func_name, *init_func_name;
+    STRING *path, *load_func_name, *init_func_name, *type;
     void * handle;
     PMC *(*load_func)(Interp *);
     void (*init_func)(Interp *, PMC *);
@@ -137,9 +159,15 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
 
     UNUSED(initializer);
     path = get_path(interpreter, lib, &handle);
+    /*
+     * TODO move the class_count_mutex here
+     *
+     * LOCK()
+     */
     lib_pmc = is_loaded(interpreter, path);
     if (lib_pmc) {
         Parrot_dlclose(handle);
+        /* UNLOCK */
         return lib_pmc;
     }
     load_func_name = Parrot_sprintf_c(interpreter, "Parrot_lib_%Ss_load", lib);
@@ -150,9 +178,15 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     if (!load_func) {
         /* seems to be a native/NCI lib */
         lib_pmc = pmc_new(interpreter, enum_class_ConstParrotLibrary);
+        type = string_from_cstring(interpreter, "NCI", 0);
     }
     else {
         lib_pmc = (*load_func)(interpreter);
+        /* we could set a private flag in the PMC header too
+         * but currently only ops files have struct_val set
+         */
+        type = string_from_cstring(interpreter,
+                lib_pmc->cache.struct_val ? "Ops" : "PMC", 0);
         /*
          * TODO call init, if it exists
          */
@@ -161,7 +195,8 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     /*
      * remember lib_pmc in iglobals
      */
-    store_lib_pmc(interpreter, lib_pmc, path);
+    store_lib_pmc(interpreter, lib_pmc, path, type);
+    /* UNLOCK */
     return lib_pmc;
 }
 

@@ -38,8 +38,8 @@ inline op fortytwo(out INT) {
     goto NEXT();
 }
 
-inline op what_do_you_get_if_you_multiply_six_by_nine(out INT) {
-    $1 = 42;
+inline op what_do_you_get_if_you_multiply_six_by_nine(out STR) {
+    $1 = string_from_cstring(interpreter, "fortytwo", 0);
     goto NEXT();
 }
 

@@ -769,6 +769,7 @@ make_interpreter(Interp_flags flags)
     interpreter->op_count = interpreter->op_lib->op_count;
     interpreter->op_func_table = interpreter->op_lib->op_func_table;
     interpreter->op_info_table = interpreter->op_lib->op_info_table;
+    SET_NULL_P(interpreter->all_op_libs, op_lib_t **);
 
     /* Set up defaults for line/package/file */
     interpreter->current_file =
@@ -1053,6 +1054,60 @@ sysinfo_s(Parrot_Interp interpreter, INTVAL info_wanted)
     }
 }
 
+/*
+ * dynamic loading stuff
+ */
+
+/*=for api interpreter dynop_register
+ *
+ * register a dynamic oplib
+ */
+
+void
+dynop_register(Parrot_Interp interpreter, PMC* lib_pmc)
+{
+    op_lib_t *lib, *core;
+    oplib_init_f init_func;
+    op_func_t *new_func_table;
+    op_info_t *new_info_table;
+    size_t i, n_old, n_new;
+
+    interpreter->all_op_libs = mem_sys_realloc(interpreter->all_op_libs,
+            sizeof(op_lib_t *) * (interpreter->n_libs + 1));
+
+    init_func = get_op_lib_init(0, 0, lib_pmc);
+    lib = init_func(1);
+
+    interpreter->all_op_libs[interpreter->n_libs++] = lib;
+    n_old = interpreter->op_count;
+    n_new = lib->op_count;
+
+    /*
+     * allocate new op_func and info tables
+     */
+    new_func_table = mem_sys_allocate(sizeof (void *) * (n_old + n_new));
+    new_info_table = mem_sys_allocate(sizeof (op_info_t) * (n_old + n_new));
+    /* copy old */
+    for (i = 0; i < n_old; ++i) {
+        new_func_table[i] = interpreter->op_func_table[i];
+        new_info_table[i] = interpreter->op_info_table[i];
+    }
+    /* add new */
+    for (i = n_old; i < n_old + n_new; ++i) {
+        new_func_table[i] = ((op_func_t*)lib->op_func_table)[i - n_old];
+        new_info_table[i] = lib->op_info_table[i - n_old];
+    }
+    core = PARROT_CORE_OPLIB_INIT(1);
+    /*
+     * deinit core, so that it gets rehashed
+     */
+    (void) PARROT_CORE_OPLIB_INIT(0);
+    /* set table */
+    core->op_func_table = interpreter->op_func_table = new_func_table;
+    core->op_info_table = interpreter->op_info_table = new_info_table;
+    core->op_count = interpreter->op_count = n_old + n_new;
+    /* done for plain core */
+}
 
 /*
  * Local variables:

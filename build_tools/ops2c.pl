@@ -398,7 +398,7 @@ END_C
 
 }
 
-if ($suffix eq '' && !$dynamic) {
+if ($suffix eq '') {
     $op_info = 'op_info_table';
     $getop = 'get_op';
 #
@@ -481,6 +481,7 @@ static HOP **hop;
 static void hop_init(void);
 static size_t hash_str(const char * str);
 static void store_op(op_info_t *info, int full);
+static op_lib_t op_lib;
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -524,18 +525,18 @@ static int get_op(const char * name, int full) {
     }
     for(p = hop[hidx]; p; p = p->next) {
 	if(!strcmp(name, full ? p->info->full_name : p->info->name))
-	    return p->info - op_info_table;
+	    return p->info - op_lib.op_info_table;
     }
     return -1;
 }
 static void hop_init() {
     size_t i;
-    op_info_t * info = op_info_table;
+    op_info_t * info = op_lib.op_info_table;
     /* store full names */
-    for (i = 0; i < NUM_OPS; i++)
+    for (i = 0; i < op_lib.op_count; i++)
 	store_op(info + i, 1);
     /* plus one short name */
-    for (i = 0; i < NUM_OPS; i++)
+    for (i = 0; i < op_lib.op_count; i++)
 	if (get_op(info[i].name, 0) == -1)
 	    store_op(info + i, 0);
 }
@@ -602,7 +603,7 @@ print SOURCE <<END_C;
 
 END_C
 if ($dynamic) {
-    my $load_func = "Parrot_lib_load_${base}${suffix}_ops";
+    my $load_func = "Parrot_lib_${base}${suffix}_ops_load";
     print SOURCE <<END_C;
 /*
  * dynamic lib load function - called once
@@ -613,6 +614,7 @@ $load_func(Parrot_Interp interpreter)
 {
     PMC *lib = pmc_new(interpreter, enum_class_ConstParrotLibrary);
     lib->cache.struct_val = (void *) $init_func;
+    dynop_register(interpreter, lib);
     return lib;
 }
 END_C

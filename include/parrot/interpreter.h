@@ -130,6 +130,8 @@ typedef struct Parrot_Interp {
     op_info_t *op_info_table; /* Opcode info table (name, nargs, arg types) */
 
     op_func_t *op_func_table;
+    int         n_libs;                  /* count of libs below */
+    op_lib_t  **all_op_libs;             /* all loaded opcode libraries */
 
 #if 0
     str_func_t *string_funcs;
@@ -261,6 +263,7 @@ void exec_init_prederef(struct Parrot_Interp *interpreter,
 
 void prepare_for_run(Parrot_Interp interpreter);
 void *init_jit(Parrot_Interp interpreter, opcode_t *pc);
+void dynop_register(Parrot_Interp interpreter, PMC* op_lib);
 
 #else
 
