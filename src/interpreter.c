@@ -9,13 +9,15 @@
 #include "interp_guts.h"
 
 void runops (struct Perl_Interp *interpreter, IV *code) {
-  while (code) {
-    IV *(*func)();
-    void **foo;
+  /* Move these out of the inner loop. No need to redeclare 'em each
+     time through */
+  IV *(*func)();
+  void **foo;
+  while (*code) {
     foo = (void *)interpreter->opcode_funcs;
     (void *)func = foo[*code];
     //    printf("code %i\n", *code);
-    code = func(code, interpreter)
+    code = func(code, interpreter);
     CHECK_EVENTS(interpreter);
   }
 }

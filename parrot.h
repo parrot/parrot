@@ -43,6 +43,7 @@ struct PMC {
 
 typedef struct PMC PMC;
 
+#include "global_setup.h"
 #include "string.h"
 #include "interpreter.h"
 #include "register.h"

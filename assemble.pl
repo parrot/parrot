@@ -13,6 +13,7 @@ open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
     next if /^\s*#/;
     chomp;
+    next unless $_;
     my ($code, $name, $args, @types) = split /\s+/, $_;
     $opcodes{$name} = {CODE => $code,
 		       ARGS => $args,

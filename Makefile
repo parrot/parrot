@@ -1,38 +1,41 @@
-H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpreter.h memory.h parrot.h stacks.h bytecode.h
+O = .o
 
-O_FILES = global_setup.o interpreter.o parrot.o register.o basic_opcodes.o memory.o bytecode.o string.o strnative.o
+H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpreter.h memory.h parrot.h stacks.h bytecode.h global_setup.h
 
-C_FLAGS = -Wall
+O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
+
+C_FLAGS = -Wall -o $@
+
 
 CC = gcc $(C_FLAGS)
 
 all : $(O_FILES)
 
-test_prog: test_main.o $(O_FILES)
-	gcc -o test_prog $(O_FILES) test_main.o
+test_prog: test_main$(O) $(O_FILES)
+	gcc -o test_prog $(O_FILES) test_main$(O)
 
-driver.o: $(H_FILES)
+test_main$(O): $(H_FILES)
 
-global_setup.o: $(H_FILES)
+global_setup$(O): $(H_FILES)
 
-string.o: $(H_FILES)
+string$(O): $(H_FILES)
 
-strnative.o: $(H_FILES)
+strnative$(O): $(H_FILES)
 
 interp_guts.h: opcode_table
 	perl build_interp_starter.pl
 
-interpreter.o: $(H_FILES) interp_guts.h
+interpreter$(O): interpreter.c $(H_FILES) interp_guts.h
 
-memory.o: $(H_FILES)
+memory$(O): $(H_FILES)
 
-bytecode.o: $(H_FILES)
+bytecode$(O): $(H_FILES)
 
-parrot.o: $(H_FILES)
+parrot$(O): $(H_FILES)
 
-register.o: $(H_FILES)
+register$(O): $(H_FILES)
 
-basic_opcodes.o: $(H_FILES) basic_opcodes.c
+basic_opcodes$(O): $(H_FILES) basic_opcodes.c
 
 basic_opcodes.c: basic_opcodes.ops
 	perl process_opfunc.pl basic_opcodes.ops

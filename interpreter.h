@@ -32,4 +32,6 @@ struct Perl_Interp {
 
 struct Perl_Interp *make_interpreter();
 
+void runops(struct Perl_Interp *, IV *);
+
 #endif

@@ -11,7 +11,7 @@
 
 # Integer ops
 
-0	set_i_ic	2	i i
+6	set_i_ic	2	i i
 1	add_i	3	i i i
 7	sub_i	3	i i i
 8	mul_i	3	i i i
@@ -40,7 +40,7 @@
 
 # Flow control
 
-6	end	0
+0	end	0
 15	jump_i	1	i
 5	branch_ic	1	i
 10	if_i_ic	3	i i i
