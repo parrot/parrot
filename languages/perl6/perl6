@@ -487,49 +487,55 @@ sub run {
 
 # run tests like "make test"
 sub output_is($$;$);
+sub output_like($$;$);
+
 sub run_tests {
     my @testfiles = @ARGV ? @ARGV : grep !m{t/parser/}, glob 't/*/*.t';
+    my %map = ( 'output_is' => 'is', 'output_like' => 'like' );
     undef $/;
     my ($ntot, $len);
     my $BS = "\cH";
     my $parser = get_parser() unless ($OPT{"parrot-test"});
-    *output_is = sub($$;$) {
-	my ($test, $out, $desc) = @_;
-	my $n = Test::Builder->current_test+1;
-	my $t = "$n/$ntot";
-	print STDERR $BS x length($t), $t;
-	$filebase =~ s/(?:_\d+)?$/_$n/;
-	my $fw = "$filebase.warn";
-	my $file = "$filebase.p6";
-	my $outf = "$filebase.out";
-	$ARGV[0] = "> $outf";
-	if ($OPT{quick} && -e "$filebase.pbc" &&
-	    -e "$filebase.p6" &&
-	    p6_is_newer($filebase) &&
-	    pbc_is_newer($filebase)) {
-	    pass4("$filebase.pbc", $fw);
-	}
-	else {
-	    # reinit IMCC
-	    P6C::IMCC::init();
-	    my $result = warnings(sub {
-		$parser->$::rule($test,0,'-')}, $fw);
-	    # write .p6 file for reuse
-	    # XXX if --keep only ??
-	    open(OUT, ">$file");
-	    print OUT $test;
-	    close(OUT);
-	    # run all steps
-	    output_tree($result, $file, $fw);
-	}
-	# XXX should we delete test.out, test.warn?
-	open(IN, $outf) or warn("Can't read '$outf': $!");
-	my $res = <IN>;
-	close(IN);
-	$res =~ s/\cM//g;
-	$out =~ s/\cM//g;
-	# send result to Test::Builder
-	is ($res, $out, $desc);
+    foreach my $meth (keys(%map)) {
+	no strict 'refs';
+	*{$meth} = sub($$;$) {
+	    my ($test, $out, $desc) = @_;
+	    my $n = Test::Builder->current_test+1;
+	    my $t = "$n/$ntot";
+	    print STDERR $BS x length($t), $t;
+	    $filebase =~ s/(?:_\d+)?$/_$n/;
+	    my $fw = "$filebase.warn";
+	    my $file = "$filebase.p6";
+	    my $outf = "$filebase.out";
+	    $ARGV[0] = "> $outf";
+	    if ($OPT{quick} && -e "$filebase.pbc" &&
+		-e "$filebase.p6" &&
+		p6_is_newer($filebase) &&
+		pbc_is_newer($filebase)) {
+		pass4("$filebase.pbc", $fw);
+	    }
+	    else {
+		# reinit IMCC
+		P6C::IMCC::init();
+		my $result = warnings(sub {
+		    $parser->$::rule($test,0,'-')}, $fw);
+		# write .p6 file for reuse
+		# XXX if --keep only ??
+		open(OUT, ">$file");
+		print OUT $test;
+		close(OUT);
+		# run all steps
+		output_tree($result, $file, $fw);
+	    }
+	    # XXX should we delete test.out, test.warn?
+	    open(IN, $outf) or warn("Can't read '$outf': $!");
+	    my $res = <IN>;
+	    close(IN);
+	    $res =~ s/\cM//g;
+	    $out =~ s/\cM//g;
+	    # send result to Test::Builder
+	    &{$map{$meth}} ($res, $out, $desc);
+	};
     };
     $|=1;
     my $Test;
