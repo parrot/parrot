@@ -732,16 +732,15 @@ trace_mem_block(struct Parrot_Interp *interpreter,
 }
 #endif
 
+/* Run through all PMC arenas and clear live bits */
 static void
 clear_live_bits(Parrot_Interp interpreter)
 {
-    struct Small_Object_Pool *pool;
+    struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
     struct Small_Object_Arena *arena;
     UINTVAL i;
     UINTVAL object_size = pool->object_size;
 
-    pool = interpreter->arena_base->pmc_pool;
-    /* Run through all the buffer header pools and mark */
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
 #if ARENA_DOD_FLAGS
         UINTVAL * dod_flags = arena->dod_flags;
