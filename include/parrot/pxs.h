@@ -8,6 +8,10 @@
  *  History:
  *      Originally written by Melvin Smith
  *  Notes:
+ *      PXS is essentilly obsolete, and has been replaced with
+ *      Native Call Interface (NCI).  I think we're keeping this
+ *      around because something similar may be needed in the 
+ *      future.  Can someone confirm this?
  *  References:
  */
 

@@ -2,6 +2,8 @@
 # You'll need to build libPQt.so for this to work, see
 # pqt.C for more info.
 #
+# NOTE: PXS is essentially obsolete; a similar effect can be
+# achieved with Native Call Interface (NCI) instead.
 loadlib P0, "libpqt.so"
 print "Loaded\n"
 callnative P1, P0, "QApplication_new"
