@@ -4,6 +4,10 @@
 #
 # $Id$
 # $Log$
+# Revision 1.1  2003/03/09 23:08:58  clintp
+# Re-organized the languages\BASIC area into two areas, one for the older
+# interpreted GW-type BASIC and one for the newer compiled QB-like BASIC.
+#
 # Revision 1.4  2002/06/02 02:04:12  clintp
 # Removed constant assignment of register names
 #

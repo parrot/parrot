@@ -1,0 +1,111 @@
+Parrot BASIC 2.0
+
+What is it?
+It's an implementation of BASIC in Parrot.  Unlike version 1, this is modeled
+after Microsoft's QuickBASIC version 4.5.  A quick list of features:
+
+        * It's compiled directly to Parrot Assembly (TARG_test.pasm by default)
+          and not interpreted.
+        * Richer syntax than Parrot BASIC 1.0, which was modeled after 
+          GW-BASIC
+	* Much, much faster than Parrot BASIC 1.0
+	* Support for user-defined types
+	* Support for variable scopes+
+	    (+ QB has bizarre ideas of scope.  Caveat Programmer.)
+
+I couldn't find a proper book on QuickBASIC, and believe it or not Google wasn't
+terribly helpful in finding a good manual.  I did have a QB.exe and a few 
+help files for information.
+
+What's missing?
+The things that are missing fall into three classes.  
+
+	"Someday I'll do these, there's hooks for it but I need a break now."
+	* Keywords: defint const static ubound
+	* SHARED in DIM statements
+	* Exception handling
+	* The keyword USING
+	* The "* length" modifier for strings
+	* Forward-declarations (DECLARE) are missing.  For now, your DIM's and
+	  functions must by defined before they're used.
+	* DEF FN.  It's a special case of FUNCTION.
+
+	"These are *hard* and I may not do them, ever"
+	* Keywords: common chain bload bsave cseg
+	
+	"These are nearly impossible given where Parrot is now.
+	 maybe when the I/O gets rounded out and some libraries
+	 get added.  Like graphics, sound, and filesystem access."
+	* Keywords: screen  pset  preset  line  circle  draw 
+		view  window  pmap  color  palette  paint
+		get put  pcopy  beep  sound locate view
+		width resume pos  poke  peek  rset 
+	* Most directory manipulations
+	* Record (binary) I/O
+
+And I probably have a whacked idea of I/O in QuickBASIC anyway.
+
+What's incomplete?
+Mostly the File I/O stuff.  Surprisingly, basic file I/O is working properly.
+See test #47.
+
+What's a hack?
+Dirty little secrets of PB2:
+	* single/double are simply Parrot Nx registers
+	* int/long are simply Parrot Ix registers
+	* Everything is case insensitive.
+	* Arrays are really hashes.  Yes, "foo(a$)" is now legal BASIC.
+	* Other bad syntax is forgiven or Something Interesting happens
+	* The _STARTASM directive lets you put PASM in your BASIC code.
+	  (see testsuite.pl for an example)
+	* I couldn't wrap my brain around BASIC's scoping to write the 
+	  expression evaluator properly.  It's a kind of dynamic scoping
+	  that hurts my head.  So the expression evaluator is a postfix
+	  machine.
+	* The DIM statement doesn't really need to indicate any kind of
+	  size at all.  DIM a$(1) will set aside a$ as any n-dimension
+	  array of any size.
+Probably many others that I've forgotten about.
+
+How do I get going?  Quickstart?
+	1. Edit "testrun.pl" and change the pathname at the beginning of the
+	   script to wherever parrot is.
+	2. Type   "compile.pl wumpus2.bas"
+	   This produces "TARG_test.pasm" and "TARG_localfuncs.pasm"
+	3. Type   "testrun.pl"  and enjoy.
+eliza2 and wumpus2 are simply ports from the Parrot BASIC 1.0 version.  All
+that had to be done were to add DIM statements and a RANDOMIZE.
+
+Where's the advanced syntax stuff?
+Once you've fixed "testrun.pl" as noted above, the script "testsuite.pl" will
+run BASIC through its self-tests.  If you look through the script there's examples
+of almost every kind of syntax that I've got working.
+
+What are all of these files?
+	RT_*   Runtime Libraries.  Things like the expression evaluator
+               and builtin functions (add, sub, mul, sin, cos, etc..)
+	COMP_* The compiler itself.  Please, oh please don't look at this
+	       Perl code.  It's terrible.  The intention is to re-write the
+	       code in PASM and so it's very wide-open and loose for easier
+	       translation.
+	TARG_* The output from the compiler.  TARG_test.pasm is the main body
+	       of your program. TARG_localfuncs.pasm is any functions and 
+	       subroutines you've declared.
+	compile.pl
+		The Compiler.  Call as "compile.pl filename.bas" to compile
+		a BASIC program.
+	testrun.pl
+		Calls the assembler to put the program together and runs it.
+	testsuite.pl
+		The regression test, to make sure I haven't botched anything.
+	samples/eliza2.bas
+	      wumpus2.bas
+		GW-BASIC programs "ported".
+	      newtrek.bas
+	      	Super Star Trek, demo for PB2 syntax (incomplete implementation)
+	      conn4.bas
+		Connect4 from Creative Computing
+	readme.bas
+		Reads through this readme file
+
+END

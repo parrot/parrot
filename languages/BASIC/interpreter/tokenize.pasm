@@ -10,6 +10,10 @@
 #
 # $Id$
 # $Log$
+# Revision 1.1  2003/03/09 23:08:58  clintp
+# Re-organized the languages\BASIC area into two areas, one for the older
+# interpreted GW-type BASIC and one for the newer compiled QB-like BASIC.
+#
 # Revision 1.4  2002/07/31 15:47:17  clintp
 # Fixed errant pointer-copy instead of string-copy
 #

@@ -1,31 +1,3 @@
-#!/usr/bin/perl -w
-#
-# $Id$
-# $Log: basic.pl,v 
-# Revision 1.11  2002/06/16 21:23:28  clint
-# Floating Point BASI
-#
-# Revision 1.10  2002/06/03 03:51:53  clintp
-# Minor edits for compilation
-#
-# Revision 1.9  2002/06/01 18:23:01  clintp
-# For new assembler
-#
-# Revision 1.8  2002/05/25 02:36:14  clintp
-# Added autorun.bas, removed LOAD message, renamed intermediate compile files
-#
-# Revision 1.7  2002/05/24 03:59:46  clintp
-# Screwed up ID strings
-#
-
-# Loads and runs the BASIC interpreter.
-#
-# Subsequent runs can be done with:
-#    parrot.exe out.pbc
-#
-open(T, ">merged_basic.pasm") || die;
-
-print T <<'EOF';
 	branch MAIN
 
 .include "stackops.pasm"
@@ -96,11 +68,3 @@ ENDMAINLOOP:
 ENDMAINLOOPNR:
 	branch MAINLOOPNR
 
-EOF
-
-# Includes and constant substitutions
-close(T);
-
-unlink "basic.pbc";
-system("perl -I../../lib ../../assemble.pl -o basic.pbc merged_basic.pasm");
-system("../../parrot basic.pbc");
