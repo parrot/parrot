@@ -1,8 +1,7 @@
 # $Id$
 
 use FindBin;
-use lib 'lib';
-use lib "$FindBin::Bin/..";
+use lib "$FindBin::Bin/../lib";
 use Parrot::Vtable;
 my %vtbl = parse_vtable("$FindBin::Bin/../vtable.tbl");
 my $classname = shift;
