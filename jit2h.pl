@@ -95,48 +95,48 @@ sub readjit($) {
             $header .= $line;
             next;
         }
-	# ignore comment and empty lines
+	    # ignore comment and empty lines
         next if (($line =~ m/^;/) || ($line =~ m/^\s*$/));
         if (!defined($function) && !defined($template)) {
-	    if ($line =~ m/TEMPLATE\s+(\w+)\s*{/) { #}
-		$template = $1;
-		$asm = "";
-		next;
-	    }
-	    else {
-               $line =~ m/(extern\s*)?(\w+)\s*{/; #}
-		$extern = (defined($1))? 1 : 0;
-		$function = $2;
-		$asm = "";
-		next;
-	    }
+            if ($line =~ m/TEMPLATE\s+(\w+)\s*{/) { #}
+                $template = $1;
+                $asm = "";
+                next;
+            }
+            else {
+                $line =~ m/(extern\s*)?(\w+)\s*{/; #}
+                $extern = (defined($1))? 1 : 0;
+                $function = $2;
+                $asm = "";
+                next;
+            }
         }
         if ($line =~ m/^}/) { #{
-	    # end of template definition?
-	    if (defined($template)) {
-		$templates{$template} = $asm;
-		$template = undef;
-		next;
-	    }
-	    # no, end of function
-	    # 1. check templates
-	    while (my($t, $body) = each(%templates)) {
-		if ($asm =~ /$t\s+/){
-		    my $tbody = $body;
-		    while ($asm =~ s/\b(s(.).+?\2.*?\2)(?:\s+)?//) {
-			eval "\$tbody =~ ${1}g";
-			if ($@) {
-			    die "error in template subst: $@\n";
-			}
-		    }
-		    $asm = $tbody;
-		    # reset iterator for next run
-		    keys(%templates);
-		    last;
-		}
-	    }
+            # end of template definition?
+            if (defined($template)) {
+                $templates{$template} = $asm;
+                $template = undef;
+                next;
+            }
+            # no, end of function
+            # 1. check templates
+            while (my($t, $body) = each(%templates)) {
+                if ($asm =~ /$t\s+/) {
+                    my $tbody = $body;
+                    while ($asm =~ s/\b(s(.).+?\2.*?\2)(?:\s+)?//) {
+                        eval "\$tbody =~ ${1}g";
+                        if ($@) {
+                            die "error in template subst: $@\n";
+                        }
+                    }
+                    $asm = $tbody;
+                    # reset iterator for next run
+                    keys(%templates);
+                    last;
+                }
+            }
 
-	    # then do other substitutions
+            # then do other substitutions
             $asm =~ s/([\&\*])([a-zA-Z_]+)\[(\d+)\]/make_subs($1,$2,$3)/ge;
             $asm =~ s/NEW_FIXUP/Parrot_jit_newfixup(jit_info)/g;
             $asm =~ s/CUR_FIXUP/jit_info->arena.fixups/g;
@@ -145,15 +145,20 @@ sub readjit($) {
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
             $asm =~ s/MAP\[(\d)\]/MAP($1)/g;
             unless ($jit_cpu) {
+                # no address of
                 $asm =~ s/&([INSP])REG/$1REG/g;
                 $asm =~ s/&CONST/CONST/g;
+                # Use the macro
                 $asm =~ s/call_func\(\s*jit_info\s*,\s*\(void\*\)\s*(.*)\)/CALL("$1")/g;
+                # For every call to the interpreter a rellocation is in place.
                 $asm =~ s/interpreter/Parrot_exec_add_text_rellocation_reg(jit_info->objfile, jit_info->native_ptr, "interpre", 0, 0)/g;
+                # The ->u.(string|float) is unnecessary.
                 $asm =~ s/\)->u\.(\w+)/)/g;
-                foreach my $op (qw(jit_emit_mov_ri_ni jit_emit_mov_rm_n jit_emit_mov_ri_n jit_emit_mov_mi_ni)) {
-                    $asm =~ s/(\n[^\n]*$op[^\n]*CONST[^\n]*)\n/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "const_table", -6);\n/g;
-                }
-                $asm =~ s/([^\n]*CONST[^\n]*)\n[^\t]/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "const_table", -4);\n/g;
+                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*[INSP]REG[^\n]*)/$1\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", DISP_INTERP_$3);/g;
+                $asm =~ s/(\n(\s*)[^\n]*((rm|mr|mi|ri)_(ni|n|i))[^\n]*CONST[^\n]*)/\n$2Parrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "const_table", DISP_CONST_$3);$1/g;
+                $asm =~ s/(\\\n\s*Parrot_exec_add_text_rellocation[^\n]*)/$1\\/g;
+                $asm =~ s/(jit_emit_mov_([mr]i_ni).*)&jit_info->cur_op\[(\d)\]\);/$1(int)&jit_info->cur_op[$3] - (int)interpreter->code->src);\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "program_code", DISP_PC_$2);/g;
+                $asm =~ s/(emitm_pushl_m[^\n]*CONST[^\n]*)/$1\\\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_DATA, "const_table", DISP_CONST_push);/g;
                 $asm =~ s/jit_emit_end/exec_emit_end/;
             }
             if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {
@@ -165,12 +170,6 @@ sub readjit($) {
             $function = undef;
         }
         unless ($jit_cpu) {
-            my $disp = -4;
-            if ($line =~ /jit_emit_mov_ri_ni/ || $line =~ /jit_emit_mov_rm_n/ || $line =~ /jit_emit_mov_ri_n/ || $line =~ /jit_emit_mov_mi_ni/) {
-                $disp -= 2 
-            }
-            $line =~ s/(.*[TGC]_REG[^\\]*(\\?))/$1\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", $disp);$2\n/g;
-            $line =~ s/(.*[INSP]REG[^\\]*(\\?))/$1\n\tParrot_exec_add_text_rellocation(jit_info->objfile, jit_info->native_ptr, RTYPE_COM, "interpre", $disp);$2/g;
             $line =~ s/emitm_pushl_i/emitm_pushl_m/ if ($line =~ /string/);
         }
         $asm .= $line;
@@ -269,6 +268,28 @@ else {
 #define CONST(i) (int *)(jit_info->cur_op[i] * sizeof(struct PackFile_Constant) + 4)
 #define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, jit_info->native_ptr, f); \\
     emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
+
+#define DISP_INTERP_rm_i -4
+#define DISP_INTERP_mr_i -4
+#define DISP_INTERP_mi_i -8
+
+#define DISP_INTERP_rm_n -6
+#define DISP_INTERP_mr_n -4
+#define DISP_INTERP_ri_n -4
+#define DISP_INTERP_mi_n -4
+
+#define DISP_INTERP_ri_ni -6
+#define DISP_INTERP_mi_ni -4
+
+#define DISP_PC_ri_ni -6
+#define DISP_PC_mi_ni -10
+
+#define DISP_CONST_ri_n 2
+#define DISP_CONST_rm_n 2
+#define DISP_CONST_mr_n 4
+#define DISP_CONST_mi_n 2
+
+#define DISP_CONST_push -4
 END_C
 }
 if (($cpuarch eq 'ppc') && ($genfile ne "jit_cpu.c")) {

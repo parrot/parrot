@@ -1861,7 +1861,6 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 }
                 else
 #endif
-
                     jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                         &PMC_REG(p[i]));
                 /* push $i, the left most Pi stays in eax, which is used
@@ -1883,7 +1882,6 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     }
                     else
 #endif
-
                         jit_emit_mov_rm_i(jit_info->native_ptr, emit_EAX,
                             &INT_REG(p[i]));
                     emitm_pushl_r(jit_info->native_ptr, emit_EAX);
@@ -1902,12 +1900,29 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                     emitm_fld(jit_info->native_ptr, MAP(i));
                 }
                 else
-                    jit_emit_fload_m_n(jit_info->native_ptr, &NUM_REG(p[i]));
+#if EXEC_CAPABLE
+                    if (jit_info->objfile) {
+                        jit_emit_fload_m_n(jit_info->native_ptr, NREG(i));
+                        Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_COM, "interpre", -4);
+                    }
+                    else
+#endif
+                        jit_emit_fload_m_n(jit_info->native_ptr,
+                            &NUM_REG(p[i]));
                 goto store;
             case PARROT_ARG_NC:
-                jit_emit_fload_m_n(jit_info->native_ptr,
+#if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    jit_emit_fload_m_n(jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                        jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
+                }
+                else
+#endif
+                    jit_emit_fload_m_n(jit_info->native_ptr,
                         &interpreter->code->const_table->
-                        constants[p[i]]->u.number);
+                            constants[p[i]]->u.number);
 store:
 #    if NUMVAL_SIZE == 8
                 /* make room for double */
@@ -1927,11 +1942,10 @@ store:
                 if (jit_info->objfile) {
                     emitm_pushl_m(jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
-                        jit_info->native_ptr, RTYPE_COM, "const_table", -4);
+                        jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
                 else
 #endif
-
                     emitm_pushl_i(jit_info->native_ptr,
                         interpreter->code->const_table->
                             constants[p[i]]->u.string);
@@ -1947,10 +1961,18 @@ store:
                                 &INT_REG(us),
                                 jit_info->intval_map[j]);
                     }
-
-                    emitm_pushl_i(jit_info->native_ptr,
+#if EXEC_CAPABLE
+                    if (jit_info->objfile) {
+                        emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                        Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_DATA,
+                                "const_table", -4);
+                    }
+                    else
+#endif
+                        emitm_pushl_i(jit_info->native_ptr,
                             interpreter->code->const_table->
-                            constants[p[i]]->u.key);
+                                constants[p[i]]->u.key);
                 }
                 break;
 
@@ -1970,7 +1992,6 @@ store:
     }
     else
 #endif
-
         emitm_pushl_i(jit_info->native_ptr, interpreter);
     /* mov (offs)%eax, %eax i.e. $1->vtable */
     emitm_movl_m_r(jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,

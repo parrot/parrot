@@ -1163,7 +1163,7 @@ Parrot_ne_nc_nc_ic {
 ; string funcs
 ;
 Parrot_set_s_sc {
-    emitm_pushl_i(NATIVECODE, CONST(2)->u.string)
+    emitm_pushl_i(NATIVECODE, CONST(2)->u.string);
     emitm_pushl_i(NATIVECODE, interpreter);
 #if 1
     call_func(jit_info, (void*) string_copy);
