@@ -3,20 +3,19 @@ are admittedly hackish stopgap measures or need to be fixed.
 
 GC issues (copying allocator)
 
-- string_to_cstring returns a cstring, that might move during GC
 - immobile strings/buffers get freed during GC
 
 Packfile
 
-- 'long doubles' don't work. The "floattype" field in the packfile
-  header is ignored.
+- 'long doubles' work only, if "floattype" of interpreter and PBC are the same.
+  The "floattype" field in the packfile header is ignored.
 
 Memory Leaks
 
 - PIO subsystem leaks file handles (ParrotIO structures)
 - regexen leak bitmaps
 - scratchpad
-- jitted nci on i386
+- string_to_cstring returns a malloced string, which isn't freed everywhere
 
 Regexes
 
@@ -25,7 +24,8 @@ Regexes
 JIT
 
 - 64 bit integers on 32 bit machines don't work
-- stabs/gdb support lacks line numbers and parrot register inspection
+- stabs/gdb support lacks line numbers
+- parrot register inspection is incomplete (P-regs)
 
 Configuration
 
