@@ -23,16 +23,21 @@ Handles class and object manipulation.
 
 
 static PMC *
-clone_array(Parrot_Interp interpreter, PMC *source_array) {
+clone_array(Parrot_Interp interpreter, PMC *source_array)
+{
     PMC *new_array;
     INTVAL count;
     INTVAL i;
+
     count = VTABLE_elements(interpreter, source_array);
-    new_array = pmc_new(interpreter, enum_class_Array);
+    /*
+     * preserve type, we have OrderedHash and Array
+     */
+    new_array = pmc_new(interpreter, source_array->vtable->base_type);
     VTABLE_set_integer_native(interpreter, new_array, count);
     for (i = 0; i < count; i++) {
         VTABLE_set_pmc_keyed_int(interpreter, new_array, i,
-                                 VTABLE_get_pmc_keyed_int(interpreter, source_array, i));
+                VTABLE_get_pmc_keyed_int(interpreter, source_array, i));
     }
     return new_array;
 }
