@@ -22,6 +22,9 @@ N: Aldo Calpini
 N: Alex Gough
 D: bignum
 
+A: Andrew Rodland
+D: vim syntax files and editor doc
+
 N: Andy Dougherty
 D: Config and building.
 
