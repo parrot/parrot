@@ -946,6 +946,12 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     /* Save ESI, as it's value is clobbered by jit_cpcf_op */
     emit_pushl_r(jit_info->native_ptr, emit_ESI);
 
+    /* Save EBX and EDI, since they are callee-saved in cdecl (so are
+     * ESI and EBP, but they have already been saved for other
+     * reasons.) */
+    emit_pushl_r(jit_info->native_ptr, emit_EBX);
+    emit_pushl_r(jit_info->native_ptr, emit_EDI);
+
     /* Cheat on op function calls by writing the interpreter arg on the stack
      * just once. If an op function ever modifies the interpreter argument on
      * the stack this will stop working !!! */
@@ -989,17 +995,17 @@ void
 Parrot_jit_load_registers(Parrot_jit_info_t *jit_info, 
                           struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    int i;
 
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_IN)
+    for (i = sect->int_registers_used-1; i >= 0; --i)
+        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_IN)
             emit_movl_m_r(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+               &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
 
     /* The total size of the loads */
-    if (!jit_info->optimizer->cur_section->load_size)
-        jit_info->optimizer->cur_section->load_size =
+    if (!sect->load_size)
+        sect->load_size =
             jit_info->native_ptr -
                 (jit_info->arena.start + 
                     jit_info->arena.op_map[jit_info->op_i].offset); 
@@ -1010,13 +1016,13 @@ void
 Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
-    Parrot_jit_optimizer_section_t *cur_se = jit_info->optimizer->cur_section;
-    int i = cur_se->int_registers_used;
+    Parrot_jit_optimizer_section_t *sect = jit_info->optimizer->cur_section;
+    int i;
 
-    while (i--)
-        if (cur_se->int_reg_dir[cur_se->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
+    for (i = sect->int_registers_used-1; i >= 0; --i)
+        if (sect->int_reg_dir[sect->int_reg_usage[i]] & PARROT_ARGDIR_OUT)
             emit_movl_r_m(jit_info->native_ptr, jit_info->intval_map[i],
-                &interpreter->ctx.int_reg.registers[cur_se->int_reg_usage[i]]);
+                &interpreter->ctx.int_reg.registers[sect->int_reg_usage[i]]);
 }
 
 #else /* JIT_EMIT */

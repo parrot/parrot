@@ -20,7 +20,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     Parrot_jit_optimizer_t *optimizer;
     Parrot_jit_optimizer_section_ptr cur_section,t_section;
     opcode_t section_begin, section_end, *next_op;
-    op_info_t *op_info;
+    op_info_t *op_info = &interpreter->op_info_table[*cur_op];
     char *branch, *map;
     int i,j,k,argn,section_size,op_arg;
 
@@ -131,7 +131,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     }
     
     cur_op = code_start;
-    while (cur_op < code_end) { 
+    while (cur_section) { 
         /* Predereference the opcode information for this opcode
            early since it's going to be used many times */
         op_info = &interpreter->op_info_table[*cur_op];
@@ -174,67 +174,71 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
             }
             /* If we are here means the current section is jitted, so if the
                next opcode is not end the section. */
-            if (next_op < code_end && op_jit[*next_op].extcall) {
-                cur_section->type = 0;
+            if (next_op < code_end && op_jit[*next_op].extcall)
                 goto END_SECTION;
-            }
         }
         else
             /* The current section is not jitted, end it if the next opcode 
                is. */
-            if (next_op < code_end && !op_jit[*next_op].extcall) {
-                cur_section->type = 1;
+            if (next_op < code_end && !op_jit[*next_op].extcall)
                 goto END_SECTION;
-            }
 
         /* The section ends when the current opcode is a branch source,
            in other words if the opcode jumps, or if the next opcode is
            a branch target, allocate a new section only if it's not the
            last opcode */
-        if ((branch[cur_op - code_start] == JIT_BRANCH_SOURCE) || 
-            (next_op < code_end &&
-                (branch[next_op - code_start] == JIT_BRANCH_TARGET)))
+        if ((branch[cur_op - code_start] == JIT_BRANCH_SOURCE)
+            || (next_op < code_end &&
+                (branch[next_op - code_start] == JIT_BRANCH_TARGET))
+            || (next_op >= code_end))
         {
+END_SECTION:
+            /* Set the type, depending on whether the current
+             * instruction is external or jitted. */
+            cur_section->type = !op_jit[*cur_op].extcall;
+
             /* Save the address where the section ends */
-END_SECTION:cur_section->end = cur_op;
-            /* Allocate a new section */
-            t_section = (Parrot_jit_optimizer_section_t *) 
-                mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
-            /* Add it to the double linked list */
-            cur_section->next = t_section;
-            t_section->prev = cur_section;
-            /* Make the new section be the current one */
-            cur_section = t_section; 
-            /* Save the address where the section begins */
-            cur_section->begin = next_op;
-            /* Set to 0 the register count, just in case ... */
-            memset(cur_section->int_reg_count, 0, 
-                NUM_REGISTERS * sizeof(INTVAL));
+            cur_section->end = cur_op;
+
+            if (next_op < code_end) {
+                /* Allocate a new section */
+                t_section = (Parrot_jit_optimizer_section_t *) 
+                    mem_sys_allocate(sizeof(Parrot_jit_optimizer_section_t));
+                /* Add it to the double linked list */
+                cur_section->next = t_section;
+                t_section->prev = cur_section;
+                /* Make the new section be the current one */
+                cur_section = t_section;
+                /* Save the address where the section begins */
+                cur_section->begin = next_op;
+                /* Set to 0 the register count, just in case ... */
+                memset(cur_section->int_reg_count, 0, 
+                       NUM_REGISTERS * sizeof(INTVAL));
 #if FLOAT_REGISTERS_TO_MAP
-            memset(cur_section->float_reg_count, 0, 
-                NUM_REGISTERS * sizeof(INTVAL));
+                memset(cur_section->float_reg_count, 0, 
+                       NUM_REGISTERS * sizeof(INTVAL));
 #endif
-            /* No next section yet */
-            cur_section->next=NULL;
-            /* 0 jitted opcodes  */
-            cur_section->jit_op_count = 0;
-            /* Init the register usage */ 
-            for (i = 0; i < NUM_REGISTERS; i++) {
-                cur_section->int_reg_usage[i] = i;
+                /* No next section yet */
+                cur_section->next=NULL;
+                /* 0 jitted opcodes  */
+                cur_section->jit_op_count = 0;
+                /* Init the register usage */ 
+                for (i = 0; i < NUM_REGISTERS; i++) {
+                    cur_section->int_reg_usage[i] = i;
 #if FLOAT_REGISTERS_TO_MAP
-                cur_section->float_reg_usage[i] = i;
+                    cur_section->float_reg_usage[i] = i;
 #endif
+                }
+            } else {
+                cur_section = NULL;
             }
         } 
        
         /* Move to the next opcode */
         cur_op = next_op;
     }
-    /* Set the end of the last section since we check for < and not <= 
-       to know when we should create a new section. */
-    cur_section->end = cur_op - op_info->arg_count;
 
-    /* This is where we start deciding which Parrot registers get's 
+    /* This is where we start deciding which Parrot registers get
        mapped to a hardware one in each different section. */
 
     /* Start from the first section */
@@ -378,6 +382,15 @@ END_SECTION:cur_section->end = cur_op;
     while (cur_section) {
         PIO_eprintf(interpreter, "\nSection:\n");
         PIO_eprintf(interpreter, "%s\n", (cur_section->type) ? "JITTED" : "NOT JITTED");
+        for (cur_op = cur_section->begin; cur_op <= cur_section->end; ) {
+            char instr[256];
+            op_info = &interpreter->op_info_table[*cur_op];
+            PDB_disassemble_op(interpreter, instr, sizeof(instr),
+                               op_info, cur_op, NULL, code_start, 0);
+            PIO_eprintf(interpreter, "\t\tOP%vu: %s\n",
+                        cur_op - code_start, instr);
+            cur_op += op_info->arg_count;
+        }
         PIO_eprintf(interpreter, "\tbegin:\t%#p\t(%Ou)\n", 
             cur_section->begin, *cur_section->begin);
         PIO_eprintf(interpreter, "\tend:\t%#p\t(%Ou)\n",
@@ -477,7 +490,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 
     while (jit_info.optimizer->cur_section) {
         /* Load mapped registers for this section */
-        if (!jit_info.optimizer->cur_section->type)
+        if (jit_info.optimizer->cur_section->type)
             Parrot_jit_load_registers(&jit_info, interpreter);
 
         /* The first opcode for this section */
@@ -534,7 +547,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
         }
 
         /* Save mapped registers back to the Parrot registers */
-        if (!jit_info.optimizer->cur_section->type)
+        if (jit_info.optimizer->cur_section->type)
             Parrot_jit_save_registers(&jit_info, interpreter);
 
         /* update the offset */
