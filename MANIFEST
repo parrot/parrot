@@ -76,8 +76,10 @@ languages/jako/fib.jako
 languages/jako/hello.jako
 languages/jako/jakoc
 languages/jako/leibniz.jako
+languages/jako/MAINTAINER
 languages/jako/Makefile
 languages/jako/mandelbrot.jako
+languages/jako/mandelzoom.jako
 languages/jako/mops.jako
 languages/jako/primes.jako
 languages/jako/queens.jako
