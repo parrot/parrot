@@ -41,7 +41,7 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
     struct Small_Object_Pool *pool;
     PMC *pmc;
 
-    if (Parrot_base_vtables[base_type].flags & VTABLE_IS_CONST_FLAG) {
+    if (Parrot_base_vtables[base_type]->flags & VTABLE_IS_CONST_FLAG) {
         /* put the normal vtable in, so that the pmc can be initialized first
          * parrot or user code has to set the _ro property then,
          * to morph the PMC to the const variant
@@ -62,7 +62,7 @@ get_new_pmc_header(struct Parrot_Interp *interpreter, INTVAL base_type,
 
     if (constant)
         PObj_constant_SET(pmc);
-    pmc->vtable = &(Parrot_base_vtables[base_type]);
+    pmc->vtable = Parrot_base_vtables[base_type];
 
     if (!pmc->vtable || !pmc->vtable->init) {
         /* This is usually because you either didn't call init_world early

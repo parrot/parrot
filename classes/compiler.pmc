@@ -45,7 +45,7 @@ pmclass Compiler extends NCI need_ext {
 
 	eval_pf = (struct PackFile *) PMC_data(code_seg);
 	/* morph the Byte_cointer *pointer in code_seg to an invokable sub */
-	code_seg->vtable = &Parrot_base_vtables[enum_class_Eval];
+	code_seg->vtable = Parrot_base_vtables[enum_class_Eval];
 	VTABLE_init(interpreter, code_seg);
 	VTABLE_set_integer_native(interpreter, code_seg,
 		(INTVAL) eval_pf);

@@ -25,14 +25,14 @@ Parrot_dynext_setup_pmc(Interp *interp, dynext_pmc_info_t *info)
 
     for (i = 1; i < (int)enum_class_max; i++) {
         if (!string_compare(interp, info->class_name,
-                    Parrot_base_vtables[i].whoami)) {
+                    Parrot_base_vtables[i]->whoami)) {
             info->class_enum = i;
             return DYNEXT_INIT_EXISTS;
         }
     }
 #if 0
     Parrot_base_vtables = mem_sys_realloc(
-            Parrot_base_vtables, sizeof(VTABLE) * (enum_class_max + 1));
+            Parrot_base_vtables, sizeof(VTABLE *) * (enum_class_max + 1));
 #endif
     info->class_enum = (*info->class_max)++;
 

@@ -122,13 +122,13 @@ pmclass PerlString extends perlscalar {
 
 
     void subtract (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                 VTABLE_get_integer(INTERP, SELF) -
                 value->cache.int_val
             );
         }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+        else if(value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
             VTABLE_set_number_native(INTERP, dest,
                 VTABLE_get_number(INTERP, SELF) -
                 value->cache.num_val
@@ -141,13 +141,13 @@ pmclass PerlString extends perlscalar {
 
 
     void multiply (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                 VTABLE_get_integer(INTERP, SELF) *
                 value->cache.int_val
             );
         }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+        else if(value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
             VTABLE_set_number_native(INTERP, dest,
                 VTABLE_get_number(INTERP, SELF) *
                 value->cache.num_val
@@ -159,13 +159,13 @@ pmclass PerlString extends perlscalar {
     }
 
     void divide (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                 VTABLE_get_integer(INTERP, SELF) /
                 value->cache.int_val
             );
         }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+        else if(value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
             VTABLE_set_number_native(INTERP, dest,
                 VTABLE_get_number(INTERP, SELF) /
                 value->cache.num_val
@@ -178,7 +178,7 @@ pmclass PerlString extends perlscalar {
 
 
     void modulus (PMC* value, PMC* dest) {
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             VTABLE_set_integer_native(INTERP, dest,
                 VTABLE_get_integer(INTERP, SELF) %
                 value->cache.int_val

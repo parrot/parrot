@@ -116,7 +116,7 @@ Return the (native) parrot type of datatype $2.
 
 inline op typeof(out STR, in INT) {
     if ($2 > 0 && $2 < enum_class_max)
-		$1 = Parrot_base_vtables[$2].whoami;
+		$1 = Parrot_base_vtables[$2]->whoami;
     else
 		$1 = Parrot_get_datatype_name(interpreter, $2);
     goto NEXT();

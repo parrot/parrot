@@ -27,7 +27,7 @@ typedef struct {
     STRING *class_name;
     PMC *initializer;
     INTVAL *class_max;
-    VTABLE *base_vtable;
+    VTABLE **base_vtable;
 } dynext_pmc_info_t;
 
 /* dynamic PMC loading */

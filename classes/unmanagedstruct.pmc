@@ -24,7 +24,13 @@ enum {
     PObj_UnManagedStruct_my_memory_FLAG = PObj_private0_FLAG
 };
 
-pmclass UnManagedStruct need_ext {
+pmclass UnManagedStruct extends default need_ext {
+
+    /* Initialize the struct with some data. This should be an array
+       of triples
+    void init_pmc (PMC* value) {
+      
+    }
 
     INTVAL is_equal (PMC* value) {
 	return (SELF->vtable == value->vtable

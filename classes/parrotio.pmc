@@ -69,7 +69,7 @@ pmclass ParrotIO need_ext {
         enter_nci_method(INTERP, method_table,
                          F2DPTR(PIO_eof), "eof", "iIP");
 
-        Parrot_base_vtables[enum_class_ParrotIO].method_table = method_table;
+        Parrot_base_vtables[enum_class_ParrotIO]->method_table = method_table;
     }
 
     void init () {

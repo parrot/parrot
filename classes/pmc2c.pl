@@ -756,6 +756,7 @@ void $initname (Interp * interp, int entry) {
         NULL,	/* method_table */
         $vtbl_flag, /* flags */
         0, /* reserved */
+        0, /* extra data */
         $methodlist
         };
 
@@ -763,7 +764,7 @@ void $initname (Interp * interp, int entry) {
        temp_base_vtable.whoami = string_make(interp,
 	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
 
-   Parrot_base_vtables[entry] = temp_base_vtable;
+   Parrot_base_vtables[entry] = Parrot_clone_vtable(interp, &temp_base_vtable);
    $class_init_code
 }
 EOC
@@ -790,6 +791,7 @@ void $initname (Interp * interp, int entry) {
         NULL,	/* method_table */
         $vtbl_flag, /* flags */
         0, /* reserved */
+        0, /* extra data */
         $cmethodlist
         };
 
@@ -797,7 +799,7 @@ void $initname (Interp * interp, int entry) {
        temp_base_vtable.whoami = string_make(interp,
 	   "Const$classname", @{[length("Const$classname")]}, 0, PObj_constant_FLAG, 0);
 
-   Parrot_base_vtables[entry] = temp_base_vtable;
+   Parrot_base_vtables[entry] = Parrot_clone_vtable(interp, &temp_base_vtable);
    $class_init_code
 }
 EOC
@@ -839,11 +841,11 @@ int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
 	    if (ok == DYNEXT_INIT_OK) {
 		$initname(interp, info->class_enum);
 		/* set our class enum */
-		Parrot_base_vtables[info->class_enum].base_type =
+		Parrot_base_vtables[info->class_enum]->base_type =
 		    info->class_enum;
 		/* copy vtable back to caller */
 		info->base_vtable[info->class_enum] =
-		    Parrot_base_vtables[info->class_enum];
+		    *Parrot_base_vtables[info->class_enum];
 	    }
 	    return ok;
 	case DYNEXT_INIT_PMC:

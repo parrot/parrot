@@ -72,17 +72,18 @@ sub vtbl_struct {
 typedef enum {
     VTABLE_IS_CONST_FLAG = 0x01,
     VTABLE_HAS_CONST_TOO = 0x02,
-    VTABLE_PMC_NEEDS_EXT = 0x04
+    VTABLE_PMC_NEEDS_EXT = 0x04,
+    VTABLE_DATA_IS_PMC   = 0x08,
 } vtable_flags_t;
 
-struct _vtable {
-    /* XXX - What on earth are these for??? */
-    struct PACKAGE *package;
-    INTVAL base_type;
-    STRING* whoami;
-    PMC* method_table;
-    UINTVAL flags;
-    INTVAL reserved;
+struct _vtable {    
+    struct PACKAGE *package; /* Pointer to package this vtable belongs to */
+    INTVAL base_type;        /* 'type' value for MMD */
+    STRING* whoami;          /* Name of class this vtable is for */
+    PMC* method_table;       /* Method table PMC (?) */
+    UINTVAL flags;           /* Flags. Duh */
+    INTVAL reserved;         /* For later use */
+    void *data;              /* To hang data off this vtable */
 
     /* Vtable Functions */
 

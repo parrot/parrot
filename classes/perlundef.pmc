@@ -173,10 +173,10 @@ pmclass PerlUndef extends PerlInt {
     void divide (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in division");
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlUndef]) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        else if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             if(VTABLE_get_integer(INTERP, value) == 0) {
                 internal_exception(DIV_BY_ZERO, "division by zero!\n");
             }
@@ -222,10 +222,10 @@ pmclass PerlUndef extends PerlInt {
     void modulus (PMC* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
 	    "Use of uninitialized value in modulus");
-        if(value->vtable == &Parrot_base_vtables[enum_class_PerlUndef]) {
+        if(value->vtable == Parrot_base_vtables[enum_class_PerlUndef]) {
             internal_exception(DIV_BY_ZERO, "division by zero!\n");
         }
-        else if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
+        else if(value->vtable == Parrot_base_vtables[enum_class_PerlInt]) {
             if(VTABLE_get_integer(INTERP, value) == 0) {
                 internal_exception(DIV_BY_ZERO, "division by zero!\n");
             }

@@ -50,13 +50,13 @@ pmclass PerlInt extends perlscalar {
     void set_bignum (PMC* value) {
         /* XXX not sure if this can be optimized further safely */
         SELF->cache.struct_val = (DPOINTER*)VTABLE_get_bignum(INTERP, value);
-	/* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBigNum]); */
+	/* SELF->vtable = Parrot_base_vtables[enum_class_PerlBigNum]; */
     }
 
     void set_bignum_native (BIGNUM* value) {
         /* XXX Some of this bignum stuff is starting to look pretty redundant -DML */
         SELF->cache.struct_val = value; /* Maybe we need a copy */
-        /* SELF->vtable = &(Parrot_base_vtables[enum_class_PerlBignum]); */
+        /* SELF->vtable = Parrot_base_vtables[enum_class_PerlBignum]; */
     }
 
     void set_string (PMC* value) {
@@ -385,7 +385,7 @@ pmclass PerlInt extends perlscalar {
     }
 
     INTVAL cmp(PMC* value) {
-	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
+	if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
 	    FLOATVAL fdiff = SELF->cache.int_val
 		- VTABLE_get_number(INTERP, value);
 	    if (fdiff == 0) {
@@ -396,7 +396,7 @@ pmclass PerlInt extends perlscalar {
 		return fdiff > 0 ? 1 : -1;
 	    }
 	}
-	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
 	    FLOATVAL diff;
 	    diff = (FLOATVAL)SELF->cache.int_val
 		- VTABLE_get_number(INTERP, value);
@@ -411,7 +411,7 @@ pmclass PerlInt extends perlscalar {
     }
 
     INTVAL cmp_num(PMC* value) {
-	if (value->vtable == &Parrot_base_vtables[enum_class_PerlString]) {
+	if (value->vtable == Parrot_base_vtables[enum_class_PerlString]) {
 	    FLOATVAL fdiff = SELF->cache.int_val
 		- VTABLE_get_number(INTERP, value);
 	    if (fdiff == 0) {
@@ -422,7 +422,7 @@ pmclass PerlInt extends perlscalar {
 		return fdiff > 0 ? 1 : -1;
 	    }
 	}
-	else if (value->vtable == &Parrot_base_vtables[enum_class_PerlNum]) {
+	else if (value->vtable == Parrot_base_vtables[enum_class_PerlNum]) {
 	    FLOATVAL diff;
 	    diff = (FLOATVAL)SELF->cache.int_val
 		- VTABLE_get_number(INTERP, value);
