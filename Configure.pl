@@ -474,6 +474,13 @@ END
 
 buildfile("config_h", "include/parrot");
 
+# Toss old .o files
+foreach my $dir ("./", "classes/", "encodings/", "chartypes/") {
+    foreach my $file (glob($dir . "*". $c{o})) {
+	1 while unlink $file;
+    }
+}
+
 
 #
 # Wrap up:
