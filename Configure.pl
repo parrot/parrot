@@ -33,7 +33,8 @@ my(%c)=(
 	nv =>		($Config{nvtype}||'long double'),
 	cc =>		$Config{cc},
 	ccflags =>	$Config{ccflags},
-	libs =>		$Config{libs}
+	libs =>		$Config{libs},
+  	perl =>		$^X,
 );
 
 #ask questions

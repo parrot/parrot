@@ -1,6 +1,6 @@
 package Parrot::Opcode;
 
-use 5.6;
+use 5.6.0;
 use strict;
 use Symbol;
 use Digest::MD5 qw(&md5_hex);
