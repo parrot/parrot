@@ -23,8 +23,9 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
     }
 
     void init_pmc (PMC* value) {
-	SUPER(value);
+
 	SELF.init();
+	SUPER(value);
     }
 
     void destroy () {
@@ -40,14 +41,14 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
 	if (!key)
             return -1;
         ix = key_integer(INTERP, key);
-        if (ix < 0 || ix >= SELF->cache.int_val)
+        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
 	    return -1;
 	return SUPER(key);
 
     }
 
     INTVAL get_integer_keyed_int(INTVAL ix) {
-        if (ix < 0 || ix >= SELF->cache.int_val)
+        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
 	    return -1;
 	return SUPER(ix);
     }
@@ -59,13 +60,13 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
         if (!key)
             return;
         ix = key_integer(INTERP, key);
-        if (ix < 0 || ix >= SELF->cache.int_val)
+        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
             return;
         SUPER(key, value);
     }
 
     void set_integer_keyed_int (INTVAL ix, INTVAL value) {
-        if (ix < 0 || ix >= SELF->cache.int_val)
+        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
             return;
         SUPER(ix, value);
     }

@@ -159,15 +159,19 @@ pmclass UnManagedStruct extends default need_ext {
 
 	    if (type < enum_first_type || type >= enum_last_type)
 		internal_exception(1, "Illegal type in initializer for struct");
-	    if (count == 0)
-		++count;
-	    if (offs == 0) {
+	    if (count <= 0) {
+		count = 1;
+		VTABLE_set_integer_keyed_int(interpreter, value, i+1, count);
+	    }
+	    if (offs <= 0) {
 		offs = toff;
 		VTABLE_set_integer_keyed_int(interpreter, value, i+2, offs);
-		toff += count * (data_types[type - enum_first_type].size);
 	    }
 	    else
 		toff = offs;
+	    toff += count * (data_types[type - enum_first_type].size);
+	    if (i == n - 3)
+		DYNSELF.set_integer_native(toff);
 	}
 	PObj_custom_mark_SET(SELF);
     }
