@@ -2823,7 +2823,7 @@ op collectoff() {
 
 Re-enable GC
 
-=back
+=cut
 
 op collecton() {
   if (interpreter->GC_block_level) {
