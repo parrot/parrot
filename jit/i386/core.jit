@@ -305,8 +305,8 @@ TEMPLATE Parrot_binop_x_xc {
         jit_emit_<op>_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
     }
     else {
-# ifdef jit_emit_<op>_mi_<_N>
-        jit_emit_<op>_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
+# ifdef jit_emit_<op>_MI_<_N>
+        jit_emit_<op>_MI<_N>(NATIVECODE, ROFFS_INT(1), <typ>_CONST[2]);
 # else
         jit_emit_mov_RM<_N>(NATIVECODE, ISR1, ROFFS_INT(1));
         jit_emit_<op>_ri<_N>(NATIVECODE, ISR1, <typ>_CONST[2]);

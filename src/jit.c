@@ -1045,7 +1045,7 @@ Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
                         (ru[typ].reg_dir[us] & PARROT_ARGDIR_IN)) {
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
-                                interpreter);
+                                jit_info->native_ptr);
                         first = 0;
                     }
                     offs = reg_offs(interpreter, typ, us);
@@ -1099,7 +1099,7 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
                     ru[typ].reg_dir[us] & PARROT_ARGDIR_OUT) {
                     if (first) {
                         base_reg = Parrot_jit_emit_get_base_reg_no(
-                                interpreter);
+                                jit_info->native_ptr);
                         first = 0;
                     }
                     offs = reg_offs(interpreter, typ, us);

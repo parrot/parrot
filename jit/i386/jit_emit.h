@@ -888,6 +888,11 @@ opt_mul(char *pc, int dest, INTVAL imm, int src)
 #  define jit_emit_xchg_rm_i(pc, r, m) { \
     emitm_alul_r_m((pc), 0x87, (r), emit_None, emit_None, emit_None, (m)) \
 }
+#  define jit_emit_xchg_RM_i(pc, r, offs) { \
+    emitm_alul_r_m((pc), 0x87, (r), emit_EBX, emit_None, 1, (offs)) \
+}
+#  define jit_emit_xchg_MR_i(pc, offs, r) jit_emit_xchg_RM_i(pc, r, offs)
+
 /* SHL */
 
 #  define jit_emit_shl_ri_i(pc, reg, imm) \
@@ -1479,8 +1484,8 @@ static unsigned char *lastpc;
 #  define jit_emit_sub_MR_i(pc, offs, reg) \
     emitm_subl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
-#  define jit_emit_sub_mi_i(pc, address, imm) \
-    emitm_subl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
+#  define jit_emit_sub_MI_i(pc, offs, imm) \
+    emitm_subl_i_m(pc, imm, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_add_rm_i(pc, reg, address) \
     emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
@@ -1488,8 +1493,8 @@ static unsigned char *lastpc;
 #  define jit_emit_add_MR_i(pc, offs, reg) \
     emitm_addl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
 
-#  define jit_emit_add_mi_i(pc, address, imm) \
-    emitm_addl_i_m(pc, imm, emit_None, emit_None, emit_None, address)
+#  define jit_emit_add_MI_i(pc, offs, imm) \
+    emitm_addl_i_m(pc, imm, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_cmp_rm_i(pc, reg, address) \
     emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
@@ -1580,8 +1585,13 @@ static unsigned char *lastpc;
     jit_emit_fstore_m_n(pc, mem); \
 }
 
+#  define jit_emit_xchg_MR_n(pc, r, offs) { \
+    emitm_fld((pc), r); \
+    jit_emit_fload_mb_n(pc, emit_EBX, offs); \
+    emitm_fstp((pc), (r+2)); \
+    jit_emit_fstore_mb_n(pc, emit_EBX, offs); \
+}
 
-#  define jit_emit_xchg_mr_i(pc, m, r) jit_emit_xchg_rm_i((pc), (r), (m))
 
 #  define jit_emit_finit(pc) { *((pc)++) = (char) 0xdb; *((pc)++) = (char) 0xe3; }
 
@@ -1743,8 +1753,8 @@ static unsigned char *lastpc;
 #  define jit_emit_band_rm_i(pc, reg, d) \
     emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define jit_emit_band_mi_i(pc, d, imm) \
-    emitm_andl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define jit_emit_band_MI_i(pc, offs, imm) \
+    emitm_andl_i_m(pc, imm, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_bor_MR_i(pc, offs, reg) \
     emitm_orl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
@@ -1752,8 +1762,8 @@ static unsigned char *lastpc;
 #  define jit_emit_bor_rm_i(pc, reg, d) \
     emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define jit_emit_bor_mi_i(pc, d, imm) \
-    emitm_orl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bor_MI_i(pc, offs, imm) \
+    emitm_orl_i_m(pc, imm, emit_EBX, emit_None, 1, offs)
 
 #  define jit_emit_bxor_MR_i(pc, offs, reg) \
     emitm_xorl_r_m(pc, reg, emit_EBX, emit_None, 1, offs)
@@ -1761,8 +1771,8 @@ static unsigned char *lastpc;
 #  define jit_emit_bxor_rm_i(pc, reg, d) \
     emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#  define jit_emit_bxor_mi_i(pc, d, imm) \
-    emitm_xorl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bxor_MI_i(pc, offs, imm) \
+    emitm_xorl_i_m(pc, imm, emit_EBX, emit_None, 1, offs)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
@@ -2480,13 +2490,6 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 #  endif
 
 
-void
-Parrot_jit_emit_mov_mr_n(Interp * interpreter, char *mem,int reg)
-{
-    jit_emit_mov_mr_n(
-        ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
-}
-
 
 void
 Parrot_jit_emit_mov_mr_n_offs(Interp *interpreter,
@@ -3134,11 +3137,22 @@ char floatval_map[] = { 1,2,3,4 };
 #  endif
 
 /*
- * just return the interpreter for now
+ * get the register frame pointer
  */
-#  define Parrot_jit_emit_get_base_reg_no(interp) \
+#  define Parrot_jit_emit_get_base_reg_no(pc) \
     emit_EBX
 
+/*
+ * get the *runtime* interpreter
+ */
+#if 0
+#  define Parrot_jit_emit_get_INTERP(pc) \
+    (emitm_movl_m_r(pc, emit_EAX, emit_EBP, emit_None, 1, INTERP_BP_OFFS), \
+    emit_EAX
+#else
+#  define Parrot_jit_emit_get_INTERP(pc) \
+    emit_EBX
+#endif
 
 
 #endif /* JIT_EMIT */

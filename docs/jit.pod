@@ -194,17 +194,15 @@ be redefined like so:
     #undef MAP
     #define MAP(i) (i) >= 0 : 0 ? OMAP(i)
 
-=item EXTCALL
+=item Parrot_jit_emit_get_base_reg_no(pc)
 
-This macro, if defined can override, what is to be considered an
-external function. The default definition is:
+This macro, when implemented, should return the register number of the register
+base pointer. This is currently the C<interpreter> itself, but will change soon
+into a distinct frame pointer.
 
-    #  define EXTCALL(op) (op_jit[*(op)].extcall)
-
-JIT/i386 has jitted vtable functions, where extcall is the vtable
-entry number and redefines B<EXTCALL> to:
-
-    #  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
+Additionally, if this macro is implemented, the register preserving code is
+calling the register save functions with the C<_offs> suffix. These functions
+get the offsets of the registers as arguments.
 
 =back
 
@@ -247,6 +245,13 @@ Gets replaced by the C<FLOATVAL> register specified in the I<n>th argument.
 B<STRING_REG[n]>
 
 Gets replaced by the C<STRING> register specified in the I<n>th argument.
+
+To obtain register offsets, another set of macros exists, that have C<OFFS>
+in their names:
+
+B<REG_OFFS_INT(reg_no)> ...
+
+B<ROFFS_INT(n)> ...
 
 B<INT_CONST[n]>
 
@@ -425,13 +430,14 @@ $7,0($27)>.
 
 Only 32 bit INTVALs are supported. Long double FLOATVALs are ok.
 
-There are four mapped integer registers B<%edi>, B<%ebx>, B<%esi> and
-B<%edx>. The first 3 of these are callee saved, they preserve their
+There are four mapped integer registers B<%edi>, B<%esi>, B<%ecx>, and
+B<%edx>. The first 2 of these are callee saved, they preserve their
 value around extern function calls.
 
 Four floating point operations the registers B<ST1> ... B<ST4> are
 mapped and considered as preserved over function calls.
 
+The register C<%ebx> holds the register frame pointer.
 
 =head1 EXAMPLE
 
