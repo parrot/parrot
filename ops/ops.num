@@ -1448,3 +1448,5 @@ getattribute_p_p_s      1420
 getattribute_p_p_sc     1421
 setattribute_p_s_p      1422
 setattribute_p_sc_p     1423
+fetchmethod_p_p_s       1424
+fetchmethod_p_p_sc      1425

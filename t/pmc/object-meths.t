@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 16;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -421,5 +421,45 @@ in __init
 eh!
 back in __init
 back in main
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "fetchmethod");
+    newclass P3, "Foo"
+    find_type I0, "Foo"
+    new P2, I0
+
+    set S0, "meth"
+    fetchmethod P0, P2, S0
+    print "main\n"
+    # P2, S0 are as in callmethod
+    invokecc
+    print "back\n"
+    # check class
+    fetchmethod P0, P3, S0
+    set P2, P3
+    invokecc
+    print "back\n"
+    end
+
+.namespace ["Foo"]
+.pcc_sub meth:
+    print "in meth\n"
+    invoke P1
+CODE
+main
+in meth
+back
+in meth
+back
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "fetchmethod - unknown method");
+    newclass P2, "Foo"
+    set S0, "nada"
+    fetchmethod P0, P2, S0
+    print "nope\n"
+    end
+CODE
+/Method 'nada' not found/
 OUTPUT
 
