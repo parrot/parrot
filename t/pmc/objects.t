@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 24;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -565,3 +565,271 @@ CODE
 130
 140
 OUTPUT
+
+
+output_is(<<'CODE',  (join '', map { "$_\n" }42..65), "attributes");
+   newclass P0, "Foo"
+   find_type I1, "Foo"
+   addattrib I0, P0, "b"
+   addattrib I0, P0, "l"
+   addattrib I0, P0, "a"
+   new P1, I1
+
+   set  P1["Foo\x00a"], 42
+   set  I2, P1["Foo\x00a"]
+   print I2
+   print "\n"
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], 43
+   set  I2, P1[S0]
+   print I2
+   print "\n"
+
+   set  P1[2], 44
+   set  I2, P1[2]
+   print I2
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], 45
+   set  I2, P1[I3]
+   print I2
+   print "\n"
+
+
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+
+   set  P1[P2], 46
+   set  I2, P1[P2]
+   print I2
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+
+   set  P1[P2], 47
+   set  I2, P1[P2]
+   print I2
+   print "\n"
+
+
+
+# strings
+
+   set  P1["Foo\x00a"], "48"
+   set  S2, P1["Foo\x00a"]
+   print S2
+   print "\n"
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], "49"
+   set  S2, P1[S0]
+   print S2
+   print "\n"
+
+   set  P1[2], "50"
+   set  S2, P1[2]
+   print S2
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], "51"
+   set  S2, P1[I3]
+   print S2
+   print "\n"
+
+
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+
+   set  P1[P2], "52"
+   set  S2, P1[P2]
+   print S2
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+
+   set  P1[P2], "53"
+   set  S2, P1[P2]
+   print S2
+   print "\n"
+
+# pmc
+
+
+   set  P1["Foo\x00a"], 54
+   set  P4, P1["Foo\x00a"]
+   print P4
+   print "\n"
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], 55
+   set  P4, P1[S0]
+   print P4
+   print "\n"
+
+   set  P1[2], 56
+   set  P4, P1[2]
+   print P4
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], 57
+   set  P4, P1[I3]
+   print P4
+   print "\n"
+
+
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+
+   set  P1[P2], 58
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+
+   set  P1[P2], 59
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+
+
+   set  P1["Foo\x00a"], "60"
+   set  P4, P1["Foo\x00a"]
+   print P4
+   print "\n"
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], "61"
+   set  P4, P1[S0]
+   print P4
+   print "\n"
+
+   set  P1[2], "62"
+   set  P4, P1[2]
+   print P4
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], "63"
+   set  P4, P1[I3]
+   print P4
+   print "\n"
+
+
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+
+   set  P1[P2], "64"
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+
+   set  P1[P2], "65"
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+   end
+CODE
+
+my $output_re = join '', map {  "$_.00.*[\\n\\r]+" } 4..15;
+$output_re = qr/^$output_re$/;
+output_like(<<'CODE',  $output_re , "float attributes");
+   newclass P0, "Foo"
+   find_type I1, "Foo"
+   addattrib I0, P0, "b"
+   addattrib I0, P0, "l"
+   addattrib I0, P0, "a"
+   new P1, I1
+
+
+   set  P1["Foo\x00a"], 4.00001
+   set  N2, P1["Foo\x00a"]
+   print N2
+   print "\n"
+
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], 5.00001
+   set  N2, P1[S0]
+   print N2
+   print "\n"
+
+
+   set  P1[2], 6.00001
+   set  N2, P1[2]
+   print N2
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], 7.00001
+   set  N2, P1[I3]
+   print N2
+   print "\n"
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+   set  P1[P2], 8.00001
+   set  N2, P1[P2]
+   print N2
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+   set  P1[P2], 9.00001
+   set  N2, P1[P2]
+   print N2
+   print "\n"
+
+   set  P1["Foo\x00a"], 10.00001
+   set  P4, P1["Foo\x00a"]
+   print P4
+   print "\n"
+
+   set  S0, "Foo\x00a"
+   set  P1[S0], 11.00001
+   set  P4, P1[S0]
+   print P4
+   print "\n"
+
+   set  P1[2], 12.00001
+   set  P4, P1[2]
+   print P4
+   print "\n"
+
+   set I3, 2
+   set  P1[I3], 13.00001
+   set  P4, P1[I3]
+   print P4
+   print "\n"
+
+
+   new P2, .Key
+   set P2, "Foo\x00a"
+   set  P1[P2], 14.00001
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+
+   new P2, .Key
+   set P2, 0
+   set  P1[P2], 15.00001
+   set  P4, P1[P2]
+   print P4
+   print "\n"
+
+
+CODE
