@@ -49,8 +49,7 @@ string_set_data_directory(const char *dir)
        source code file isn't an issue.... (Don't want to get bitten by
        EBCDIC.) */
 
-    if( !u_isdigit(57) || (u_charDigitValue(57) != 9) )
-    {
+    if (!u_isdigit(57) || (u_charDigitValue(57) != 9)) {
             internal_exception(ICU_ERROR,
                 "string_set_data_directory: ICU data files not found"
                 "(apparently) for directory [%s]", dir);
@@ -81,62 +80,65 @@ string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
     const char *source = NULL;
     const char *source_limit = NULL;
 
-	assert(buffer); assert(encoding_name);
+    assert(buffer); assert(encoding_name);
 
-	if( s && !len ) /* XXXX: I _guess_ this is always an empty string--is that right? */
-	{
-		s->bufused = 0;
-		s->strlen = 0;
-		return;
-	}
+    if (s && !len) {
+        /* XXX: I _guess_ this is always an empty string--is that right? */
+        s->bufused = 0;
+        s->strlen = 0;
+        return;
+    }
 
-	/* big guess--allocate same space for string as buffer needed.
-	   may be able to make a more educated guess based on the encoding. */
-	Parrot_allocate_string(interpreter, s, len);
+    /* big guess--allocate same space for string as buffer needed.
+       may be able to make a more educated guess based on the encoding. */
+    Parrot_allocate_string(interpreter, s, len);
 
     conv = ucnv_open(encoding_name, &icuError);
 
-	if( !conv || icuError != U_ZERO_ERROR )
-	{
-		/* unknown encoding??? */
-		internal_exception(ICU_ERROR,
-				"string_fill_from_buffer: ICU error from ucnv_open()");
+    if (!conv || icuError != U_ZERO_ERROR) {
+        /* unknown encoding??? */
+        internal_exception(ICU_ERROR,
+                "string_fill_from_buffer: ICU error from ucnv_open()");
 
-	}
+    }
 
-	target = s->strstart;
-	 /* buflen may be larger than what we asked for, so take advantage of the space */
-	target_limit = (UChar *)((char *)PObj_bufstart(s) + PObj_buflen(s) - 1);
-	source = buffer;
-	source_limit = source + len;
+    target = s->strstart;
+    /* buflen may be larger than what we asked for,
+     * so take advantage of the space
+     */
+    target_limit = (UChar *)((char *)PObj_bufstart(s) + PObj_buflen(s) - 1);
+    source = buffer;
+    source_limit = source + len;
 
-	ucnv_toUnicode(conv, &target, target_limit, &source, source_limit, NULL, TRUE, &icuError);
+    ucnv_toUnicode(conv, &target, target_limit, &source,
+            source_limit, NULL, TRUE, &icuError);
 
-	while( icuError == U_BUFFER_OVERFLOW_ERROR )
-	{
-		size_t consumed_length = (char *)target - (char *)(s->strstart);
+    while (icuError == U_BUFFER_OVERFLOW_ERROR) {
+        size_t consumed_length = (char *)target - (char *)(s->strstart);
 
-		Parrot_reallocate_string(interpreter, s, 2 * PObj_buflen(s)); /* double size, at least */
+        /* double size, at least */
+        Parrot_reallocate_string(interpreter, s, 2 * PObj_buflen(s));
 
-		target = (UChar *)((char *)s->strstart + consumed_length);
-		target_limit = (UChar *)((char *)PObj_bufstart(s) + PObj_buflen(s) - 1);
+        target = (UChar *)((char *)s->strstart + consumed_length);
+        target_limit = (UChar *)((char *)PObj_bufstart(s) + PObj_buflen(s) - 1);
 
-		icuError = U_ZERO_ERROR;
-		ucnv_toUnicode(conv, &target, target_limit, &source, source_limit, NULL, TRUE, &icuError);
-	}
+        icuError = U_ZERO_ERROR;
+        ucnv_toUnicode(conv, &target, target_limit, &source,
+                source_limit, NULL, TRUE, &icuError);
+    }
 
-	ucnv_close(conv);
+    ucnv_close(conv);
 
-	if( icuError != U_ZERO_ERROR )
-	{
-		//handle error
-		internal_exception(ICU_ERROR,
-				"string_fill_from_buffer: ICU error from ucnv_toUnicode()");
-	}
+    if (icuError != U_ZERO_ERROR) {
+        //handle error
+        internal_exception(ICU_ERROR,
+                "string_fill_from_buffer: ICU error from ucnv_toUnicode()");
+    }
 
-	s->representation = enum_stringrep_two; /* temporary; need to promote to rep 4 if has non-BMP characters*/
-	s->bufused = (char *)target - (char *)s->strstart;
-	string_compute_strlen(interpreter, s);
+    s->representation = enum_stringrep_two;
+    /* temporary; need to promote to rep 4 if has non-BMP characters*/
+    s->bufused = (char *)target - (char *)s->strstart;
+    string_compute_strlen(interpreter, s);
 }
 
 
@@ -169,9 +171,10 @@ C<Parrot_char_is_digit()> returns false.
 
 */
 
-UINTVAL Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)
+UINTVAL
+Parrot_char_digit_value(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_charDigitValue(character);
+    return u_charDigitValue(character);
 }
 
 /*
@@ -188,7 +191,7 @@ Returns whether the specified character is an alphanumeric character.
 INTVAL
 Parrot_char_is_alnum(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isalnum(character);
+    return u_isalnum(character);
 }
 
 /*
@@ -205,7 +208,7 @@ Returns whether the specified character is an letter character.
 INTVAL
 Parrot_char_is_alpha(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isalpha(character);
+    return u_isalpha(character);
 }
 
 /*
@@ -222,7 +225,7 @@ Returns whether the specified character is an ASCII character.
 INTVAL
 Parrot_char_is_ascii(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return (character < 128);
+    return character < 128;
 }
 
 /*
@@ -240,7 +243,7 @@ space", a character that visibly separates words on a line.
 INTVAL
 Parrot_char_is_blank(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isblank(character);
+    return u_isblank(character);
 }
 
 /*
@@ -257,7 +260,7 @@ Returns whether the specified character is a control character.
 INTVAL
 Parrot_char_is_cntrl(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_iscntrl(character);
+    return u_iscntrl(character);
 }
 
 /*
@@ -274,7 +277,7 @@ Returns whether the specified character is a digit character.
 INTVAL
 Parrot_char_is_digit(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isdigit(character);
+    return u_isdigit(character);
 }
 
 /*
@@ -309,7 +312,7 @@ Returns whether the specified character is a lowercase letter.
 INTVAL
 Parrot_char_is_lower(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_islower(character);
+    return u_islower(character);
 }
 
 /*
@@ -343,7 +346,7 @@ Returns whether the specified character is a punctuation character.
 INTVAL
 Parrot_char_is_punct(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_ispunct(character);
+    return u_ispunct(character);
 }
 
 /*
@@ -360,7 +363,7 @@ Returns whether the specified character is a space character.
 INTVAL
 Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isspace(character);
+    return u_isspace(character);
 }
 
 /*
@@ -377,7 +380,7 @@ Returns whether the specified character is an uppercase character.
 INTVAL
 Parrot_char_is_upper(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isupper(character);
+    return u_isupper(character);
 }
 
 /*
@@ -394,7 +397,7 @@ Returns whether the specified character is a hexadecimal digit character.
 INTVAL
 Parrot_char_is_xdigit(struct Parrot_Interp *interpreter, UINTVAL character)
 {
-	return u_isxdigit(character);
+    return u_isxdigit(character);
 }
 
 /*
