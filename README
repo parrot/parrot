@@ -1,4 +1,4 @@
-This is Parrot, version 0.0.2
+This is Parrot, version 0.0.3
 -----------------------------
 
 Parrot is Copyright (C) 2001 Yet Another Society. All Rights Reserved.
@@ -43,9 +43,9 @@ probably already done that) type
 to run the Configure script.  This will generate a config.h header, a
 Parrot::Config module, and a Makefile.  Next type
 
-    make test_prog
+    make 
 
-and the test interpreter should build.
+and the interpreter should build.
 
 You can test the assembler and interpreter by running
 

@@ -30,7 +30,7 @@ C_LIBS = ${libs}
 CC = ${cc}
 LD = ${ld}
 PERL = ${perl}
-TEST_PROG = test_prog${exe}
+TEST_PROG = parrot${exe}
 PDUMP = pdump${exe}
 
 .c$(O):

@@ -60,7 +60,7 @@ foreach my $i ( qw(is isnt like) ) {
     close ASSEMBLY;
 
     _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
-    _run_command( "./test_prog $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+    _run_command( "./parrot $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;
     open OUTPUT, "< $out_f";

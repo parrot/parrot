@@ -238,7 +238,7 @@ buildfile("config_h", "include/parrot");
 print <<"END";
 
 Okay, we're done!
-You can now use `make test_prog' (or your platform's equivalent to `make')
+You can now use `make parrot' (or your platform's equivalent to `make')
 to build your Parrot.
 
 Happy Hacking,

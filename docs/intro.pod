@@ -98,7 +98,7 @@ Now we have downloaded Parrot, we need to build it; so:
 
 You'll then be asked a series of questions about your local
 configuration; you can almost always hit return for each one. Finally,
-you'll be told to type C<make test_prog>; with any luck, Parrot will
+you'll be told to type C<make parrot>; with any luck, Parrot will
 successfully build the test interpreter. (If it doesn't, the address to
 complain to is at the end of the article...)
 
@@ -385,7 +385,7 @@ C<languages> subdirectory:
 
   % perl languages/jakoc fib.jako > fib.pasm
   % perl assemble.pl fib.pasm > fib.pbc
-  % ./test_prog fib.pbc
+  % ./parrot fib.pbc
  The first 20 fibonacci numbers are:
  1
  2

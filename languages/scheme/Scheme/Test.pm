@@ -61,7 +61,7 @@ foreach my $i ( qw(is isnt like) ) {
 
     _run_command("./schemec $scheme_f >$as_f"); # JMG
     _run_command("(cd ../.. ; $PConfig{perl} assemble.pl languages/scheme/$as_f --output languages/scheme/$by_f)"); # JMG
-    _run_command( "(cd ../.. ; ./test_prog languages/scheme/$by_f)", 'STDOUT' => $out_f, 'STDERR' => $out_f); # JMG
+    _run_command( "(cd ../.. ; ./parrot languages/scheme/$by_f)", 'STDOUT' => $out_f, 'STDERR' => $out_f); # JMG
 
     my $prog_output;
     open OUTPUT, "< $out_f";

@@ -8,7 +8,7 @@ DIR=languages/jako
 TOOL_DIR=../..
 ASM=./assemble.pl
 JAKOC=./jakoc
-INTERP=./test_prog
+INTERP=./parrot
 
 
 #
