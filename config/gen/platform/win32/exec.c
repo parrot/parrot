@@ -10,9 +10,11 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     int free_it = 0;
     char* cmd = mem_sys_allocate( command->strlen + 4 );
     char* shell = Parrot_getenv( "ComSpec", &free_it );
+    char* cmdin = string_to_cstring(interpreter, command);
 
     strcpy( cmd, "/c " );
-    strcat( cmd, string_to_cstring(interpreter, command) );
+    strcat( cmd, cmdin );
+    string_cstring_free( cmdin );
 
     memset( &si, 0, sizeof(si) );
     si.cb = sizeof(si);
@@ -36,7 +38,7 @@ Parrot_Run_OS_Command(Parrot_Interp interpreter, STRING *command) {
     CloseHandle( pi.hProcess );
     CloseHandle( pi.hThread );
     if( free_it ) free( shell );
-    free( cmd );
+    mem_sys_free( cmd );
 
     return status;
 }
