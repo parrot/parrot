@@ -350,7 +350,7 @@ clean: testclean
 	$(RM_F) $(O_FILES)
 	$(RM_F) *.s
 	$(RM_F) $(FLUID_FILES)
-	$(RM_F) $(TEST_PROG) $(PDUMP)
+	$(RM_F) $(TEST_PROG) $(PDUMP) pdump$(O)
 	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
 	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
 	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
