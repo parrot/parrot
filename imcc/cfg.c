@@ -486,7 +486,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
 {
     int i;
 
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
 #endif
 
@@ -524,7 +524,7 @@ void
 free_life_info(IMC_Unit * unit, SymReg *r)
 {
     int i;
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {

@@ -35,8 +35,10 @@ void imc_check_units(struct Parrot_Interp *interp, char * caller)
         {
             Instruction *ins = unit->instructions;
             if(ins->r[1] && ins->r[1]->pcc_sub) {
+#if IMC_TRACE_HIGH
                 fprintf(stderr, "UNIT[%d] : pcc_sub %s (nargs=%d)\n",
                      i, ins->r[1]->name, ins->r[1]->pcc_sub->nargs);
+#endif
             }
         }
 
@@ -183,7 +185,7 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
     imc_info_t *imc = interp->imc_info;
 
-#if IMC_TRACE
+#if IMC_TRACE_HIGH
     fprintf(stderr, "imc_free_unit()\n");
 #endif
 
