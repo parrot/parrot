@@ -404,6 +404,13 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
             &interpreter->arena_base->extra_buffer_headers, 0);
     add_extra_buffer_header(interpreter,
             &interpreter->arena_base->extra_buffer_headers);
+#else
+    interpreter->arena_base->extra_buffer_headers.bufstart  = NULL;
+    interpreter->arena_base->extra_buffer_headers.buflen    = 0;
+    interpreter->arena_base->extra_buffer_headers.obj.flags = 0;
+# if ! DISABLE_GC_DEBUG
+    interpreter->arena_base->extra_buffer_headers.version   = 0;
+# endif
 #endif
     /* Init the constant string header pool */
     interpreter->arena_base->constant_string_header_pool =
