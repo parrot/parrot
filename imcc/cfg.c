@@ -2,7 +2,7 @@
  * cfg.c
  *
  * A basic block is the longest sequence of instructions that we are
- * sure will be executed sequentally: no branches, no labels.
+ * sure will be executed sequentially: no branches, no labels.
  *
  * The control-flow graph is a directed graph that reflects the
  * flow of execution between blocks.
@@ -16,6 +16,7 @@
 #include "parrot/oplib/ops.h"
 
 /* #define ALIAS */
+/* Currently unused -- see propagate_alias below */
 
 static void add_instruct_reads(Interp *, Instruction *ins, SymReg *r0);
 static void add_instruct_writes(Interp *, Instruction *ins, SymReg *r0);
@@ -99,7 +100,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
         bb->end = ins;
         ins->bbindex = unit->n_basic_blocks - 1;
         /* invoke and newsub have implicit args (P0, P1) so mark it as doing so
-         * XXX Needs to be done in the parser or instruction creation api
+         * XXX Needs to be done in the parser or instruction creation API
          */
         if ( !strcmp(ins->op, "invoke") || !strcmp(ins->op, "invokecc")) {
             if (ins->opsize == 1) {
@@ -146,7 +147,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
             bb = make_basic_block(interpreter, unit, ins);
         }
         /* a branch is the end of a basic block
-         * so start a new with the next ins */
+         * so start a new one with the next instruction */
         if (ins->type & ITBRANCH) {
             SymReg * addr = get_branch_reg(bb->end);
             int found = 1;
@@ -203,7 +204,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
 }
 
 /* Once the basic blocks have been computed, build_cfg computes
-   the dependences between them. */
+   the dependencies between them. */
 
 void
 build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
@@ -538,7 +539,7 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
                 r->usage |= U_NON_VOLATILE;
 
 	    /* This block uses r, so it must be live at
-	       the beggining */
+	       the beginning */
 	    r->life_info[i]->flags |= LF_lv_in;
 
 	    /* propagate this info to every predecessor */
@@ -626,7 +627,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
                 }
                 else {
                     /* we read before having written before, so the var was
-                     * live at the beggining of the block */
+                     * live at the beginning of the block */
                     l->first_ins = bb->start;
                     l->flags |= LF_use;
                 }
@@ -650,8 +651,8 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
     if (!l->last_ins)
 	l->last_ins = l->first_ins;
 
-    /* l->last can latter be extended if it turns out
-     * that another block needs the value resulting of this
+    /* l->last can later be extended if it turns out
+     * that another block needs the value resulting from this
      * computation */
 
 }
@@ -716,7 +717,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
 
 /*
  * Computes the dominators tree of the CFG.
- * Basic block A dominates B, if each path to B passes trough A
+ * Basic block A dominates B, if each path to B passes through A
  *
  * s. gcc:flow.c compute_dominators
  */
@@ -910,7 +911,7 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
         dump_loops(unit);
 }
 
-/* Incresases the loop_depth of all the nodes in a loop */
+/* Increases the loop_depth of all the nodes in a loop */
 
 static void
 mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
