@@ -24,7 +24,7 @@ These are the vtable functions for the Array base class.
 
 =item C<static PMC* undef(struct Parrot_Interp* interpreter)>
 
-Returns the C<PerlUndef> PMC.
+Returns a C<PerlUndef> PMC.
 
 =cut
 
@@ -119,8 +119,10 @@ Parrot_Array_shift_pmc_ptr(Interp *interp, List *list)
 =item C<static PMC*
 Parrot_Array_set_pmc_ptr(Interp *interp, List *list, INTVAL key)>
 
-Makes the element at index C<key> in C<*list> an "undef" PMC, and
-returns it.
+Returns a pointer to the element at index C<key> of C<*list>. If 
+this element was previously empty, then this function also creates
+and assigns an "undef" PMC (currently a C<PerlUndef>, but this may 
+change) to that element.
 
 =cut
 
@@ -206,7 +208,7 @@ size, number of dimensions, etc.
 
 =item C<void mark()>
 
-Mark the array and its contents as live
+Mark the array and its contents as live.
 
 =cut
 
@@ -220,7 +222,7 @@ Mark the array and its contents as live
 
 =item C<PMC* clone()>
 
-Return a clone of the array
+Return a clone of the array.
 
 =cut
 
@@ -308,7 +310,7 @@ Returns a string representation of the array.
 
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
-Returns the result integer value of the element at index C<key>.
+Returns the integer value of the element at index C<key>.
 
 =cut
 
@@ -365,6 +367,8 @@ Returns the integer value of the element at index C<key>.
 
 =item C<FLOATVAL get_number_keyed_int(INTVAL key)>
 
+Returns the float value of the element at index C<key>.
+
 =cut
 
 */
@@ -406,6 +410,8 @@ Returns the float value of the element at index C<key>.
 
 =item C<STRING* get_string_keyed_int(INTVAL key)>
 
+Returns the string value of the element at index C<key>.
+
 =cut
 
 */
@@ -445,6 +451,8 @@ Returns the string value of the element at index C<key>.
 /*
 
 =item C<PMC* get_pmc_keyed_int(INTVAL key)>
+
+Returns the PMC value of the element at index C<key>.
 
 =cut
 
@@ -513,7 +521,7 @@ Sets the length of the array to the number of elements in C<*value>.
 
 =item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
 
-Sets the length of the sub-array at C<key> to C<value>.
+Sets the integer value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -530,7 +538,7 @@ Sets the length of the sub-array at C<key> to C<value>.
 
 =item C<void set_integer_keyed (PMC* key, INTVAL value)>
 
-Sets the length of the sub-array at C<*key> to C<value>.
+Sets the integer value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -561,7 +569,7 @@ Sets the length of the sub-array at C<*key> to C<value>.
 
 =item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
-Sets the length of the sub-array at C<key> to C<value>.
+Sets the numeric value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -578,7 +586,7 @@ Sets the length of the sub-array at C<key> to C<value>.
 
 =item C<void set_number_keyed(PMC* key, FLOATVAL value)>
 
-Sets the length of the sub-array at C<*key> to C<value>.
+Sets the numeric value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -608,7 +616,7 @@ Sets the length of the sub-array at C<*key> to C<value>.
 
 =item C<void set_string_keyed_int(INTVAL key, STRING* value)>
 
-Sets the length of the sub-array at C<key> to C<*value>.
+Sets the string value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -625,8 +633,7 @@ Sets the length of the sub-array at C<key> to C<*value>.
 
 =item C<void set_string_keyed(PMC* key, STRING* value)>
 
-Sets the length of the sub-array at C<*key> to C<*value>.
-
+Sets the string value of the PMC at element C<key> to C<value>.
 
 =cut
 
@@ -656,8 +663,7 @@ Sets the length of the sub-array at C<*key> to C<*value>.
 
 =item C<void set_pmc_keyed_int(INTVAL idx, PMC* src)>
 
-Sets the length of the sub-array at C<idx> to C<*src>.
-
+Sets the PMC at element C<idx> to C<*src>. 
 
 =cut
 
@@ -678,7 +684,7 @@ Sets the length of the sub-array at C<idx> to C<*src>.
 
 =item C<void set_pmc_keyed (PMC* key, PMC* value)>
 
-Sets the length of the sub-array at C<*key> to C<*value>.
+Sets the PMC at element C<key> to C<*value>. 
 
 =cut
 
@@ -706,6 +712,9 @@ Sets the length of the sub-array at C<*key> to C<*value>.
 
 =item C<void push_integer (INTVAL value)>
 
+Extends the array by adding an element of value C<value> to the end of
+the array.
+
 =cut
 
 */
@@ -722,7 +731,6 @@ Sets the length of the sub-array at C<*key> to C<*value>.
 Extends the array by adding an element of value C<value> to the end of
 the array.
 
-
 =cut
 
 */
@@ -735,6 +743,9 @@ the array.
 /*
 
 =item C<void push_string (STRING* value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
 
 =cut
 
@@ -764,6 +775,9 @@ the array.
 /*
 
 =item C<void unshift_integer(INTVAL value)>
+
+Extends the array by adding an element of value C<value> to the start
+of the array.
 
 =cut
 
@@ -796,7 +810,8 @@ of the array.
 
 =item C<void unshift_string(STRING *value)>
 
-
+Extends the array by adding an element of value C<*value> to the start
+of the array.
 
 =cut
 
@@ -965,7 +980,7 @@ C<offset>.
 
 =item C<INTVAL defined_keyed_int(INTVAL key)>
 
-Returns whether the element at C<key> is defined.
+Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 =cut
 
@@ -988,7 +1003,7 @@ Returns whether the element at C<key> is defined.
 
 =item C<INTVAL defined_keyed(PMC* key)>
 
-Returns whether the element at C<*key> is defined.
+Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 =cut
 
@@ -1014,7 +1029,7 @@ Returns whether the element at C<*key> is defined.
 
 =item C<INTVAL exists_keyed_int(INTVAL key)>
 
-Returns whether an element exists at C<key>.
+Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 =cut
 
@@ -1033,7 +1048,7 @@ Returns whether an element exists at C<key>.
 
 =item C<INTVAL exists_keyed(PMC* key)>
 
-Returns whether an element exists at C<*key>.
+Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 =cut
 
@@ -1086,7 +1101,7 @@ Removes the element at C<*key>.
 
 /*
 
-=item C<>
+=item C<INTVAL is_equal (PMC* value)>
 
 The C<==> operation. Currently just returns C<0>.
 
