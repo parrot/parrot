@@ -243,9 +243,18 @@ void
 string_init(Parrot_Interp interpreter)
 {
     size_t i;
-/* DEFAULT_ICU_DATA_DIR is configured at build time. Need a way to
-    specify this at runtime as well. */
-    string_set_data_directory(DEFAULT_ICU_DATA_DIR);
+    char *data_dir;
+    int free_data_dir = 0;
+
+    /* DEFAULT_ICU_DATA_DIR is configured at build time, or it may be
+       set through the $ICU_DATA_DIR environment variable. Need a way
+       to specify this via the command line as well. */
+    data_dir = Parrot_getenv("ICU_DATA_DIR", &free_data_dir);
+    if (data_dir == NULL)
+        data_dir = DEFAULT_ICU_DATA_DIR;
+    string_set_data_directory(data_dir);
+    if (free_data_dir)
+        mem_sys_free(data_dir);
 /*
     encoding_init();
     chartype_init();
