@@ -59,12 +59,42 @@ sub alloc_temp_int {
     return $register;
 }
 
+# This implementation should be overridden by the host language,
+# because it's not a very good one.
 sub new_local {
-    my ($self, $name) = @_;
+    my ($self, $name, $type) = @_;
+    $type ||= 'int';
+    die "cannot handle type '$type'" if $type ne 'int';
+
     # Bad implementation -- does not handle recursion. Actual
     # instances should probably be subclasses that use something like
     # IMCC's facilities for creating local vars.
     return $self->alloc_temp_int($name);
+}
+
+sub new_rxlocal {
+    my ($self, $name, $type) = @_;
+    my $var = $self->new_local($name, $type);
+
+    # Mark this variable as needing to be preserved across rule calls
+    push @{ $self->{rxlocals} }, $var;
+
+    return $var;
+}
+
+sub save_rxlocals {
+    my ($self) = @_;
+
+    return aop(comment => [ "save rxlocals" ]),
+           map { aop('pushint' => [ $_, "rxlocal $_" ]) }
+             @{ $self->{rxlocals} };
+}
+
+sub restore_rxlocals {
+    my ($self) = @_;
+    return aop(comment => [ "restore rxlocals" ]),
+           map { aop('popint' => [ $_, "rxlocal $_" ]) }
+             reverse @{ $self->{rxlocals} };
 }
 
 sub get_temp {
@@ -209,9 +239,9 @@ sub rewrite_group {
                         aop('setend', [ $group, 'pos' ]),
                         aop('goto', [ $next ]),
               $rfail => $self->dbprint("R in group failed\n"),
-                        aop('popint', [ 'I0' ]),
+                        aop('popint', [ 'I0', 'group end' ]),
                         aop('setend', [ $group, 'I0' ] ),
-                        aop('popint', [ 'I0' ]),
+                        aop('popint', [ 'I0', 'group start' ]),
                         aop('setstart', [ $group, 'I0' ] ),
                         aop('goto', [ $lastback ] ),
                $next =>
@@ -328,7 +358,7 @@ sub rewrite_scan {
     my @ops = (
                   $scan => @R_body,
                            aop('goto', [ $next ]),
-               $advance => $self->dbprint("advancing\n"),
+               $advance => $self->dbprint("scan advancing\n"),
                            aop('advance', [ 1, $lastback ]),
                            aop('goto', [ $scan ]),
                   $next =>
@@ -402,7 +432,7 @@ sub rewrite_alternate {
         push @ops, aop('goto', [ $next ]);
     }
 
-    push @ops, $back => aop('popint', [ 'tmp' ]);
+    push @ops, $back => aop('popint', [ 'tmp', 'branch marker' ]);
 
     for my $i (0..$#args-1) {
 #        $DB::single = 1;
@@ -419,7 +449,7 @@ sub rewrite_alternate {
 # turn, but the exact alternatives are unknown (eg because they're
 # coming from an array.)
 #
-# @R ->          .local $counter
+# @R ->          .local $counter # NOT rxlocal var
 #                $counter = 0
 #           try: R[$counter] or goto fail
 #                push $counter
@@ -448,16 +478,16 @@ sub rewrite_dynamic_alternate {
 
 #    $DB::single = 1;
     my @ops =  ( aop('assign', [ $counter, 0 ]),
-         $try => $self->dbprint("matching dynalt[%$counter]\n"),
+         $try => $self->dbprint("matching dynalt[%<$counter>]\n"),
                  @R_ops,
 		 aop('pushint', [ $counter, "dynamic alt counter" ]),
 		 aop('goto', [ $next ]),
-	$fail => $self->dbprint("failed dynalt, advancing from %$counter\n"),
+	$fail => $self->dbprint("failed dynalt, advancing from dynalt[%<$counter>]/%<$N>\n"),
                  aop('add', [ $counter, 1 ]),
 		 aop('ge', [ $counter, $N, $lastback ]),
 		 aop('goto', [ $try ]),
-	$back => aop('popint', [ $counter ]),
-                 $self->dbprint("backtracking into dynalt with %$counter matches left\n"),
+	$back => aop('popint', [ $counter, 'dynamic alt counter' ]),
+                 $self->dbprint("backtracking into dynalt's index %<$counter> match\n"),
 		 aop('goto', [ $R_back ]),
 	$next =>
 		 );
@@ -487,7 +517,7 @@ sub rewrite_greedy_range {
     my ($loop, $back, $check, $next) =
      map { $self->genlabel("gr_$_") } qw(loop back check next);
 
-    my $matchcount = $self->new_local("matchcount");
+    my $matchcount = $self->new_rxlocal("matchcount");
 
     my ($R_back, @R_ops) = $self->rewrite($R, $check);
     my @ops = (
@@ -536,7 +566,7 @@ sub rewrite_nongreedy_range {
     my ($rfail, $back, $check, $next) =
       map { $self->genlabel("ngr_$_") } qw(rfail back check next);
 
-    my $matchcount = $self->new_local("matchcount");
+    my $matchcount = $self->new_rxlocal("matchcount");
 
     my ($R_back, @R_ops) = $self->rewrite($R, $rfail);
     my @ops = (
@@ -706,7 +736,7 @@ sub rewrite_greedy_optional {
                         @R_ops,
                         aop('pushint', [ 1 ]),
                         aop('goto', [ $next ]),
-               $back => aop('popint', [ 'tmp' ]),
+               $back => aop('popint', [ 'tmp', 'optional marker' ]),
                         aop('if', [ 'tmp', $R_back ]),
                         aop('goto', [ $lastback ]),
               $rfail => aop('pushint', [ 0 ]),
@@ -808,11 +838,11 @@ sub wrap {
     my $db_back = $self->genlabel($op->{name}."_back");
     my $db_start = $self->genlabel($op->{name}."_enter");
     return ( $db_back,
-                       $self->dbprint("-> $desc ENTER\n"),
                        aop('goto', [ $db_start ]),
            $db_back => $self->dbprint("<- $desc BACK\n"),
                        aop('goto', [ $back ]),
-          $db_start => @ops,
+          $db_start => $self->dbprint("-> $desc ENTER\n"),
+                       @ops,
                        $self->dbprint(".. $desc NEXT\n"),
            );
 }
@@ -840,36 +870,50 @@ sub rewrite {
 }
 
 sub run {
-    my ($self, $orig_tree, $ctx, $pass_label, $fail_label) = @_;
+    my ($self, $tree, $ctx, $pass_label, $fail_label) = @_;
     die "Wrong #args" if @_ != 5;
 
     my $FAIL = $self->{_labels}{'fail'};
-
-    # Set up the success/failure handling
-    my $tree = rop('seq', [ $orig_tree,
-                            aop('match_succeeded'),
-                            aop('literal', [ "branch", $pass_label ]),
-                   $FAIL => aop('match_failed'),
-                            aop('literal', [ "branch", $fail_label ]),
-                          ]);
+    my $back = $self->genlabel('regex_back');
 
     # Generate the main regular expression code
     my ($backtrack, @ops) = $self->rewrite($tree, $FAIL);
 
+    # Generate code for saving/restoring the "rxlocals" gathered while
+    # rewriting the regex
+    my @save_rxlocals;
+    my @restore_rxlocals;
+    if ($ctx->{preserve_state}) {
+        @save_rxlocals = $self->save_rxlocals();
+        @restore_rxlocals = $self->restore_rxlocals();
+    }
+
+    # Set up the success/failure handling
+    my $post_tree = rop('seq', [ aop('match_succeeded'),
+                                 @save_rxlocals,
+                                 aop('literal', [ "branch", $pass_label ]),
+                        $FAIL => aop('match_failed'),
+                                 aop('literal', [ "branch", $fail_label ]),
+                        $back => @restore_rxlocals,
+                                 aop('goto' => [ $backtrack ])
+                               ]);
+    my (undef, @post_ops) = $self->rewrite($post_tree, $back);
+
     # Set up the full preamble, including stuff gathered from
     # rewriting the expression.
-    my $pretree = rop('seq', [ aop('preamble'), $self->startup() ] );
-    my (undef, @preops) = $self->rewrite($pretree, $FAIL);
+    my $pre_tree = rop('seq', [ aop('preamble'), $self->startup() ] );
+    my (undef, @pre_ops) = $self->rewrite($pre_tree, $FAIL);
 
     # Glue them together
-    unshift(@ops, @preops);
+    @ops = (@pre_ops, @ops, @post_ops);
 
     foreach my $temp_reg (values %{ $self->{_temps} }) {
+        warn "temp register $temp_reg: I'm not sure this is supported anymore";
         unshift @ops, aop('push_reg', [ $temp_reg ]);
         push @ops, aop('pop_reg', [ $temp_reg ]);
     }
 
-    return { lastback => $backtrack, code => \@ops };
+    return { lastback => $back, code => \@ops };
 }
 
 sub startup {
