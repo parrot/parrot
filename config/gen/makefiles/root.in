@@ -292,6 +292,8 @@ global_setup$(O) : $(GENERAL_H_FILES)
 
 pmc$(O) : $(GENERAL_H_FILES)
 
+hash$(O) : $(GENERAL_H_FILES)
+
 jit$(O) : $(GENERAL_H_FILES)
 
 jit_cpu$(O): $(GENERAL_H_FILES) $(INC)/jit_emit.h
