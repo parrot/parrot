@@ -29,7 +29,8 @@ pmclass Eval extends Sub {
 	   ((struct Parrot_Sub *)SELF->data)->init;
 
        if (pad) {
-	   /* put the correct pad in place */
+	   /* put the correct pad in place
+	    * XXX leo: do we need this? */
 	   stack_push(INTERP, &INTERP->ctx.pad_stack, pad,
 		   STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
        }
@@ -48,6 +49,11 @@ pmclass Eval extends Sub {
 	   PIO_eprintf(interpreter, "*** back from %s\n",
 		   eval_cs->base.name);
        }
+       if (pad)
+	    stack_pop(interpreter, &interpreter->ctx.pad_stack,
+		NULL, STACK_ENTRY_PMC);
+       /* if code jumped to different code segment, go out of runloop
+	* which then actually will switch segments */
        if (interpreter->resume_flag & 2)
 	   next = 0;
        else
