@@ -1707,7 +1707,7 @@ inline op mul (inout PMC, in PMC, in PMC) {
 
 =item B<neg>(inout NUM)
 
-Set $1 to it's negative.
+Set $1 to its negative.
 
 =item B<neg>(out INT, in INT)
 
@@ -3565,6 +3565,10 @@ inline op shift (out PMC, inout PMC) {
     $1 = $2->vtable->shift_pmc(interpreter, $2);
     goto NEXT();
 }
+
+=back
+
+=cut
 
 ###############################################################################
 
