@@ -1336,16 +1336,12 @@ languages/BASIC/compiler/COMP_toker.pm
 languages/BASIC/compiler/RT_aggregates.pasm
 languages/BASIC/compiler/RT_builtins.pasm
 languages/BASIC/compiler/RT_debugger.pasm
-languages/BASIC/compiler/RT_expr.pasm
 languages/BASIC/compiler/RT_initialize.pasm
 languages/BASIC/compiler/RT_io.pasm
-languages/BASIC/compiler/RT_math.pasm
 languages/BASIC/compiler/RT_platform.pasm
 languages/BASIC/compiler/RT_platform_ANSIscreen.pasm
 languages/BASIC/compiler/RT_platform_win32.pasm
 languages/BASIC/compiler/RT_support.pasm
-languages/BASIC/compiler/RT_userfunc.pasm
-languages/BASIC/compiler/RT_variables.pasm
 languages/BASIC/compiler/compile.pl
 languages/BASIC/compiler/readme.bas
 languages/BASIC/compiler/samples/conn4.bas
