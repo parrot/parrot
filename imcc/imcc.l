@@ -215,6 +215,7 @@ SP              [ ]
 "int"           return(INTV);
 "inc"           return(INC);
 "dec"           return(DEC);
+"num"           return(FLOATV);
 "float"         return(FLOATV);
 "new"           return(NEW);
 "newclosure"    return(NEWCLOSURE);
