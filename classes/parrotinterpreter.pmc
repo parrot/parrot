@@ -434,6 +434,56 @@ Returns the PMC global value for C<key>.
 
 /*
 
+=item C<PMC *get_pmc_keyed_str(STRING* key)>
+
+Introspection interface. C<key> can be:
+
+  "sub"            ... return Sub object of this subroutine
+  "continuation"   ... return Continuation PMC
+  "pad"            ... return scratchpad PMC for this sub
+  ["<item>"; level ] ... same for caller <level>
+
+  "globals"        ... return global stash
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed(PMC * key) {
+        int level = 0;
+        PMC* nextkey;
+        STRING *item, *s;
+        struct Parrot_Context *ctx;
+        PMC *cont;
+
+        item =  key_string(interpreter, key);
+        s = CONST_STRING(interpreter, "globals");
+        if (string_equal(interpreter, item, s) == 0)
+            return interpreter->globals->stash_hash;
+        nextkey = key_next(INTERP, key);
+        if (nextkey)
+            level = key_integer(interpreter, nextkey);
+        ctx = &interpreter->ctx;
+        for (; level; --level) {
+            cont = ctx->current_cont;
+            if (PMC_IS_NULL(cont))
+                real_exception(interpreter, NULL, E_ValueError,
+                        "No such caller depth");
+            ctx = &PMC_cont(cont)->ctx;
+        }
+        s = CONST_STRING(interpreter, "sub");
+        if (string_equal(interpreter, item, s) == 0)
+            return ctx->current_sub;
+        s = CONST_STRING(interpreter, "pad");
+        if (string_equal(interpreter, item, s) == 0)
+            return stack_peek(interpreter, ctx->pad_stack, NULL);
+        s = CONST_STRING(interpreter, "continuation");
+        if (string_equal(interpreter, item, s) == 0)
+            return VTABLE_clone(interpreter, ctx->current_cont);
+        return PMCNULL;
+    }
+/*
+
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
 Returns the interpreter info for C<key>.

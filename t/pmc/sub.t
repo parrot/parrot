@@ -17,7 +17,7 @@ C<Continuation> PMCs.
 
 =cut
 
-use Parrot::Test tests => 77;
+use Parrot::Test tests => 78;
 use Test::More;
 use Parrot::Config;
 
@@ -1316,4 +1316,60 @@ output_is(<<'CODE', <<'OUTPUT', "sub names w newsub");
 .end
 CODE
 mainfoobarfoo
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "caller introspection");
+##PIR##
+.sub main @MAIN
+.include "interpinfo.pasm"
+    foo()
+    $P0 = find_global "Bar", "foo"
+    $P0()
+    print "ok\n"
+.end
+.sub foo
+    print "main foo\n"
+    $P0 = find_global "Bar", "bar"
+    $P0()
+.end
+.namespace ["Bar"]
+.sub bar
+    print "Bar bar\n"
+    $P1 = getinterp
+    $P0 = $P1["sub"]
+    print "caller: "
+    print $P0
+    print "\n"
+    foo()
+.end
+.sub foo
+    print "Bar foo\n"
+    $P1 = getinterp
+    $I0 = 0
+    newsub $P2, .Exception_Handler, tb_end
+    set_eh $P2
+tb_loop:
+    $P0 = $P1["sub"; $I0]
+    print "caller "
+    print $I0
+    print " "
+    print $P0
+    print "\n"
+    inc $I0
+    goto tb_loop
+tb_end:
+.end
+CODE
+main foo
+Bar bar
+caller: bar
+Bar foo
+caller 0 foo
+caller 1 bar
+caller 2 foo
+caller 3 main
+Bar foo
+caller 0 foo
+caller 1 main
+ok
 OUTPUT
