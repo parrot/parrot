@@ -56,6 +56,7 @@ docs/pdds/pdd10_embedding.pod
 docs/pdds/pdd11_extending.pod
 docs/pdds/pdd12_assembly.pod
 docs/pdds/pdd13_bytecode.pod
+docs/pdds/pdd14_bignum.pod
 docs/pdds/pdd_template.pod
 docs/running.pod
 docs/strings.pod
@@ -74,6 +75,7 @@ examples/assembly/call.pasm
 examples/assembly/euclid.pasm
 examples/assembly/fact.pasm
 examples/assembly/io1.pasm
+examples/assembly/io2.pasm
 examples/assembly/jump.pasm
 examples/assembly/life.pasm
 examples/assembly/local_label.pasm
