@@ -330,7 +330,7 @@ up to the class that provides the PMC.
 
 =item callmeth Sz
 
-call a method. If the method name is provided, we find the PMC for the named
+Call a method. If the method name is provided, we find the PMC for the named
 method and put it in the sub/method slot. If no name is provided we
 assume that all the calling conventions have already been set up and
 the method PMC is already in the proper place.
