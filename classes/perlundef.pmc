@@ -53,7 +53,7 @@ pmclass PerlUndef {
 
    STRING* get_string () {
       Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in string context");
-      return NULL;
+      return string_make(interpreter,  NULL, 0, NULL, 0, NULL);
    }
 
    PMC* get_pmc() {
