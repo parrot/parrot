@@ -67,6 +67,7 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)
 {
     pmc_mmd_f real_function;
+    PMC *sub;
     UINTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
@@ -80,7 +81,14 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
             right_type + left_type;
         real_function = (pmc_mmd_f)*(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
     }
-    (*real_function)(interpreter, left, right, dest);
+    if (real_function) {
+        (*real_function)(interpreter, left, right, dest);
+    } else {
+        /* Didn't find it. Go look for a bytecode version */
+        offset = interpreter->binop_mmd_funcs->x[function] *
+            right_type + left_type;
+        sub = (pmc_mmd_f)*(interpreter->bytecode_binop_mmd_funcs->mmd_funcs[function] + offset);
+    }
 }
 
 /*
