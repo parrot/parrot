@@ -97,7 +97,7 @@ FLOATNUM        {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS
 LETTERDIGIT     [a-zA-Z0-9_]
 LABELLETTERDIGIT     ([a-zA-Z0-9_@]|"::")
 ID              {LETTER}{LABELLETTERDIGIT}*
-STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
+STRINGCONSTANT  \"(\\.|[^"\\\n])*\"
 ENCCHAR         {LETTER}|{DIGIT}|"-"
 ENCCHARS        {ENCCHAR}*
 ENC             {LETTER}{ENCCHARS}":"
