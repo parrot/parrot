@@ -391,12 +391,12 @@ ins_print(FILE *fd, Instruction * ins)
         if (p->type & (VT_REGP | VT_CONSTP))
             p = p->reg;
 	if (p->color >= 0 && (p->type & VTREGISTER)) {
-	    sprintf(regb[i], "%c%d", p->set, p->color);
+	    sprintf(regb[i], "%c%d", p->set, (int)p->color);
 	    regstr[i] = regb[i];
 	}
         else if (allocated && (optimizer_level & OPT_J) && p->set != 'K' &&
                 p->color < 0 && (p->type & VTREGISTER)) {
-	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - p->color);
+	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - (int)p->color);
 	    regstr[i] = regb[i];
 	}
         else if (p->type & VTREGKEY) {
@@ -404,11 +404,11 @@ ins_print(FILE *fd, Instruction * ins)
             for (*regb[i] = '\0'; k; k = k->nextkey) {
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
-                            k->reg->set, k->reg->color);        /* XXX */
+                            k->reg->set, (int)k->reg->color);    /* XXX */
                 else if (allocated && (optimizer_level & OPT_J) &&  k->reg &&
                         k->reg->color < 0)
                     sprintf(regb[i]+strlen(regb[i]), "r%c%d",
-                            tolower(k->reg->set), -1 - k->reg->color);
+                            tolower(k->reg->set), -1 - (int)k->reg->color);
                 else
                     strcat(regb[i], k->name);   /* XXX */
                 if (k->nextkey)

@@ -56,9 +56,9 @@ typedef struct _SymReg {
     enum VARTYPE type;       /* Variable type */
     enum USAGE usage;	     /* s. USAGE above */
     int set;                /* Which register set/file it belongs to */
-    int color;               /* Color: parrot register number
-    				and parrot const table index of VTCONST */
     int want_regno;	     /* wanted register number */
+    INTVAL color;             /* Color: parrot register number
+    				and parrot const table index of VTCONST */
     int score;               /* How costly is to spill this symbol */
     int use_count;	     /* how often is this sym used */
     int lhs_use_count;	     /* how often is this sym written to */

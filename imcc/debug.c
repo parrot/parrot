@@ -193,7 +193,7 @@ dump_symreg(IMC_Unit * unit)
 		    r->first_ins->index, r->last_ins->index,
 		    r->first_ins->bbindex, r->last_ins->bbindex,
 		    r->set,
-                r->color, r->want_regno, r->score,
+                (int)r->color, r->want_regno, r->score,
                 r->use_count, r->lhs_use_count,
                 r->reg ? r->reg->name : "",
                 r->usage

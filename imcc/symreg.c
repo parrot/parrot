@@ -98,7 +98,7 @@ symreg_to_str(SymReg * s)
 {
     char buf[8192];
     int t = s->type;
-    sprintf(buf, "symbol [%s]  set [%c]  color [%d]  type [",
+    sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
                  s->name, s->set, s->color);
     if (t & VTCONST)      { strcat(buf, "VTCONST ");      }
     if (t & VTREG)        { strcat(buf, "VTREG ");        }

@@ -671,9 +671,9 @@ build_key(Interp *interpreter, SymReg *reg)
                     *pc++ = -1 - r->color;
                 else
                     *pc++ = r->color;
-                sprintf(s+strlen(s), "%c%d", r->set, r->color);
+                sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
                 debug(interpreter, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
-                        r->name, r->set, r->color);
+                        r->name, r->set, (int)r->color);
                 break;
             case VTCONST:
                 switch (r->set) {
@@ -685,13 +685,13 @@ build_key(Interp *interpreter, SymReg *reg)
                         break;
                     case 'I':                       /* P[;42;..] */
                         *pc++ = PARROT_ARG_IC;      /* int constant */
-                        *pc++ = r->color = atoi(r->name);   /* value */
+                        *pc++ = r->color = atol(r->name);   /* value */
                         debug(interpreter, DEBUG_PBC_CONST, " keypart IC %s #%d\n", r->name, r->color);
                         break;
                     default:
                         fatal(1,"build_key", "unknown set\n");
                 }
-                sprintf(s+strlen(s), "%cc%d", r->set, r->color);
+                sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
                 break;
             default:
                 fatal(1,"build_key", "unknown type 0x%x on %s\n",
@@ -721,7 +721,7 @@ add_1_const(Interp *interpreter, SymReg *r)
             else if (r->name[0] == '0' && r->name[1] == 'b')
                 r->color = strtoul(r->name+2, 0, 2);
             else
-                r->color = atoi(r->name);
+                r->color = atol(r->name);
             break;
         case 'S':
             r->color = add_const_str(interpreter, r->name);
