@@ -33,7 +33,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl5 (Nick Ing-Simmons)
 #ifdef PIO_OS_UNIX
 
 /* Defined at bottom */
-extern ParrotIOLayerAPI pio_unix_layer_api;
+extern const ParrotIOLayerAPI pio_unix_layer_api;
 
 ParrotIOLayer pio_unix_layer = {
     NULL,
@@ -1133,7 +1133,7 @@ PIO_unix_pipe(theINTERP, ParrotIOLayer *l, const char *cmd, int flags)
 
 
 
-ParrotIOLayerAPI pio_unix_layer_api = {
+const ParrotIOLayerAPI pio_unix_layer_api = {
     PIO_unix_init,
     PIO_base_new_layer,
     PIO_base_delete_layer,

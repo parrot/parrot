@@ -27,7 +27,7 @@ representation.
 #include "io_private.h"
 
 /* Defined at bottom */
-static ParrotIOLayerAPI pio_utf8_layer_api;
+static const ParrotIOLayerAPI pio_utf8_layer_api;
 
 ParrotIOLayer pio_utf8_layer = {
     NULL,
@@ -62,7 +62,7 @@ PIO_utf8_write(theINTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)
     return PIO_write_down(interpreter, l->down, io, &n);
 }
 
-static ParrotIOLayerAPI pio_utf8_layer_api = {
+static const ParrotIOLayerAPI pio_utf8_layer_api = {
     PIO_null_init,
     PIO_base_new_layer,
     PIO_base_delete_layer,

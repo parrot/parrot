@@ -34,7 +34,7 @@ Win32 System Programming, 2nd Edition.
 #  include <tchar.h>
 
 /* Defined at bottom */
-extern ParrotIOLayerAPI pio_win32_layer_api;
+extern const ParrotIOLayerAPI pio_win32_layer_api;
 
 ParrotIOLayer pio_win32_layer = {
     NULL,
@@ -725,7 +725,7 @@ AGAIN:
 /************************************************************************************************************/
 
 
-ParrotIOLayerAPI pio_win32_layer_api = {
+const ParrotIOLayerAPI pio_win32_layer_api = {
     PIO_win32_init,
     PIO_base_new_layer,
     PIO_base_delete_layer,

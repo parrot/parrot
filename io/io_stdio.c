@@ -28,7 +28,7 @@ Win32), this is I<buffered> IO, out of necessity.
 extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 
 /* Defined at bottom */
-extern ParrotIOLayerAPI pio_stdio_layer_api;
+extern const ParrotIOLayerAPI pio_stdio_layer_api;
 
 ParrotIOLayer pio_stdio_layer = {
     NULL,
@@ -445,7 +445,7 @@ PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return(ftell((FILE*)io->fd));
 }
 
-ParrotIOLayerAPI pio_stdio_layer_api = {
+const ParrotIOLayerAPI pio_stdio_layer_api = {
     PIO_stdio_init,
     PIO_base_new_layer,
     PIO_base_delete_layer,

@@ -23,7 +23,7 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 #include <assert.h>
 
 /* Defined at bottom */
-extern ParrotIOLayerAPI pio_buf_layer_api;
+extern const ParrotIOLayerAPI pio_buf_layer_api;
 
 ParrotIOLayer pio_buf_layer = {
     NULL,
@@ -789,7 +789,7 @@ PIO_buf_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return io->fpos;
 }
 
-ParrotIOLayerAPI pio_buf_layer_api = {
+const ParrotIOLayerAPI pio_buf_layer_api = {
     PIO_buf_init,
     PIO_base_new_layer,
     PIO_base_delete_layer,
