@@ -1,0 +1,120 @@
+/*
+ * feature.h - arch specific defines resulting from some tests
+ */
+
+
+#if !defined(PARROT_FEATURE_H_GUARD)
+#define PARROT_FEATURE_H_GUARD
+
+#perl - all below here gets evaled by perl, OUT is the filehandle
+
+if(${miniparrot}) {
+  print OUT <<'END';
+#define MINIPARROT 1
+END
+}
+
+	print OUT <<EOP;
+/* from config/auto/memalign */
+EOP
+if (${memalign} eq 'posix_memalign') {
+  print OUT <<'END'
+#define PARROT_HAS_POSIX_MEMALIGN
+#define PARROT_HAS_SOME_MEMALIGN
+
+END
+}
+elsif (${memalign} eq 'memalign') {
+  print OUT <<'END'
+#define PARROT_HAS_MEMALIGN
+#define PARROT_HAS_SOME_MEMALIGN
+
+END
+}
+
+	print OUT <<EOP;
+/* from config/auto/isreg */
+EOP
+unless (${isreg}) {
+	print OUT <<EOP;
+#define PARROT_HAS_BROKEN_ISREG 1
+EOP
+}
+
+print OUT "\n/* from config/auto/jit */\n";
+print OUT "#define PARROT_HAS_EXEC_PROTECT\n" if ${has_exec_protect};
+
+if (${jit_i386} && ${jit_i386} eq 'fcomip') {
+    print OUT <<'END';
+#ifdef I386
+#  define PARROT_HAS_JIT_FCOMIP
+#endif
+END
+}
+
+    print OUT <<'END';
+
+#ifdef __powerpc__
+#  define PARROT_VA_TO_VAPTR(x) (x)
+#else
+#  define PARROT_VA_TO_VAPTR(x) (&(x))
+#endif
+END
+
+    print OUT <<'END';
+
+/* signal stuff from config/auto/signal */
+END
+
+if (${has_sigaction}) {
+    print OUT <<'END';
+#define PARROT_HAS_SIGACTION 1
+END
+}
+
+if (${has___sighandler_t}) {
+    print OUT <<'END';
+#define PARROT_HAS___SIGHANDLER_T 1
+END
+}
+
+if (${has_setitimer}) {
+    print OUT <<'END';
+#define PARROT_HAS_SETITIMER 1
+#define PARROT_HAS_SOME_SYS_TIMER 1
+END
+}
+
+print OUT <<EOP;
+
+/* from config/auto/env */
+EOP
+if (${setenv}) {
+	print OUT <<EOP;
+#define PARROT_HAS_SETENV 1
+EOP
+}
+if (${unsetenv}) {
+	print OUT <<EOP;
+#define PARROT_HAS_UNSETENV 1
+EOP
+}
+
+print OUT <<EOP;
+
+/* from config/auto/inline */
+EOP
+if (${inline} ne '') {
+    my $inl = ${inline};
+    print OUT <<EOP;
+#define PARROT_INLINE $inl
+#define PARROT_HAS_INLINE
+EOP
+}
+else {
+    print OUT <<EOP;
+#define PARROT_INLINE
+EOP
+}
+#endif guard
+print OUT "\n\n#endif\n"
