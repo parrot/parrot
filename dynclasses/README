@@ -1,21 +1,73 @@
+=pod
+
+=head1 OVERVIEW
+
 This is a build directory for custom PMCs with a sample foo.pmc
-providing the Foo pmc class.
+providing the Foo PMC class.
 
-1) edit/create your foo.pmc source (s. also classes/genclass.pl)
+=head1 CREATING A DYNAMIC PMC
 
-2) edit Makefile and append your pmc
+=over 4
 
-$ export LD_LIBRARY_PATH=.:blib/lib
-$ make -s
-$ make shared
-$ make -C dynclasses
+=item 1
 
-$ ./parrot dynclasses/dynfoo.pasm
-ok 1
-41
-ok 2
-42
+Edit/create your foo.pmc source - For details on creating PMCs, see L<../classes/genclass.pl>
 
-4) If anything changes inside parrot don't forget:
+There are some differences you have to be aware of when creating dynamic PMCs.
 
-$ make -C dynclasses clean
+When declaring the dynamic pmc, you must specify  the C<dynpmc> flag, as in:
+
+	pmclass TclString extends tclobject dynpmc { ... }
+
+Currently, it is also required that you generate a placeholder C<#define>
+for your class so that the construct C file can compile. For example, the
+PMC C<TclString> requires a C<#define TclString -1> in the PMC file. This is
+a result of using the same PMC generation code for both static and dynamic
+PMCs. (For static PMCs, this constant is generated at compile-time.) 
+
+Since this value is just a placeholder, a different value is assigned at
+runtime - so, when you refer to the type of the class , you must dynamically
+determine the PMC type. So, while C<perlscalar> (a bultin) has the
+luxury of knowing at compile time what the class number of its
+child C<PerlString> is, for example:
+
+	if (type == enum_class_PerlString) {
+
+A dynamic PMC such as C<tclobject> must instead perform a runtime lookup
+of its corresponding C<TclString> PMC, resulting in the more complicated:
+
+	if (type == pmc_type(
+	        interpreter,
+	        string_from_cstring(interpreter, "TclString", 9))
+	   )
+
+A final note - there's currently no easy easy to deal with dynamic PMCs
+that are indeterdependant. See the various Tcl PMCs for an example of
+a workaround.
+
+=item 2
+
+edit C<../config/gen/makefiles/dynclasses.in> and append your PMC(s) to 
+the build target.
+
+	$ export LD_LIBRARY_PATH=.:blib/lib
+	$ make -s
+	$ make shared
+	$ make -C dynclasses
+
+=item 3
+
+Try the sample dynamic class, Foo. Note that the numbers listed here will
+change over time.
+
+	$ ./parrot dynclasses/dynfoo.pasm
+	ok 1
+	41
+	ok 2
+	42
+
+=item 4
+
+If anything changes inside parrot, be sure to:
+
+	$ make -C dynclasses clean
