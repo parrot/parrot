@@ -158,6 +158,52 @@ Describe the components of a C<struct PMC_EXT>. L<PDD04>
 
 =item *
 
+IO: Add IO tables, right now IO's just float around.
+
+=item *
+
+Finish PMC for IO object
+
+=item *
+
+IO's "stdio" layer: buffering, seek/random access, shared streams, thread safe
+
+=item *
+
+Copy-on-write IO stacks
+
+=item *
+
+Make IO layer cache the vtable calls to the next layer.
+
+=item *
+
+IO Filters
+
+=item *
+
+IO mmap support
+
+=item *
+
+Bottom level socket/pipe/process support in API
+
+=item *
+
+UTF layers (or should we not bother and do as a filter?)
+
+=item *
+
+Sample programs and test suite
+
+=item *
+
+AIO - On many platforms we must fake async IO, are we doing a background
+thread/interp or an inline event queue function that is called
+every N ops?
+
+=item *
+
 Get digest (probably SHA1) added to bytecode segments
 
 =item *
@@ -307,6 +353,10 @@ L<embed.pod>
 =head2 PORTABILITY
 
 =over 4
+
+=item *
+
+Portable fcntl() replacement for platforms without it
 
 =item *
 
