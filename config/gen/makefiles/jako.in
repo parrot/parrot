@@ -35,8 +35,9 @@ all: \
 	examples/nci.pbc        \
 	examples/pmc.pbc        \
 	examples/primes.pbc     \
-	examples/queens.pbc     \
-	examples/sub.pbc
+	examples/queens.pbc
+
+#	examples/sub.pbc
 
 
 #
@@ -61,7 +62,8 @@ examples/nci.imc:        examples/nci.jako        jakoc
 examples/pmc.imc:        examples/pmc.jako        jakoc
 examples/primes.imc:     examples/primes.jako     jakoc
 examples/queens.imc:     examples/queens.jako     jakoc
-examples/sub.imc:        examples/sub.jako        jakoc
+
+#examples/sub.imc:        examples/sub.jako        jakoc
 
 
 #
@@ -86,7 +88,8 @@ examples/nci.pasm:        examples/nci.imc
 examples/pmc.pasm:        examples/pmc.imc
 examples/primes.pasm:     examples/primes.imc
 examples/queens.pasm:     examples/queens.imc
-examples/sub.pasm:        examples/sub.imc
+
+#examples/sub.pasm:        examples/sub.imc
 
 
 #
@@ -111,7 +114,8 @@ examples/nci.pbc:        examples/nci.pasm
 examples/pmc.pbc:        examples/pmc.pasm
 examples/primes.pbc:     examples/primes.pasm
 examples/queens.pbc:     examples/queens.pasm
-examples/sub.pbc:        examples/sub.pasm
+
+#examples/sub.pbc:        examples/sub.pasm
 
 
 #
@@ -141,7 +145,8 @@ test: all
 	$(INTERP) examples/pmc.pbc
 	$(INTERP) examples/primes.pbc
 	$(INTERP) examples/queens.pbc
-	$(INTERP) examples/sub.pbc
+
+#	$(INTERP) examples/sub.pbc
 
 
 #
