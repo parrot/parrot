@@ -107,6 +107,7 @@ $ENV{TEST_PROG_ARGS} = $args;
 my @default_tests = ( ( map { glob( "t/$_/*.t" ) } qw(op pmc native_pbc) ),
                       glob( "imcc/t/*/*.t" ),
                       glob( "t/src/*.t" ),
+                      glob( "t/library/*.t" ),
                     );
 my @tests = @ARGV ? map { glob( $_ ) } @ARGV : @default_tests;
 runtests(@tests);
