@@ -403,6 +403,11 @@ testj: $(TEST_PROG) assemble.pl .test_dummy_j
 .test_dummy_j:
 	$(PERL) t/harness -j
 
+quicktest: $(TEST_PROG) assemble.pl .quicktest_dummy
+
+.quicktest_dummy:
+	$(PERL) t/harness quick
+
 mopstest: $(TEST_PROG) examples/assembly/mops.pbc
 	$(TEST_PROG) examples/assembly/mops.pbc
 

@@ -64,12 +64,27 @@ foreach my $func ( keys %Test_Map ) {
       my $t = $0; $t =~ s/\.t$/$count\.$_/; $t
     } ( qw(pasm pbc out) );
 
-    open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
-    binmode ASSEMBLY;
-    print ASSEMBLY $assembly;
-    close ASSEMBLY;
+    my $can_skip_compile = $ENV{PARROT_QUICKTEST};
+    if ($can_skip_compile)
+    {
+      open INASSEMBLY, "$as_f" or $can_skip_compile = 0;
+      if ($can_skip_compile) {
+        local $/ = undef;
+        my $inassembly = <INASSEMBLY>;
+        close INASSEMBLY;
+        $can_skip_compile = 0 if ($assembly ne $inassembly);
+        $can_skip_compile = 0 if (not -e $by_f);
+      }
+    }
 
-    _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
+    if (!$can_skip_compile) {
+      open ASSEMBLY, "> $as_f" or die "Unable to open '$as_f'";
+      binmode ASSEMBLY;
+      print ASSEMBLY $assembly;
+      close ASSEMBLY;
+
+      _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
+    }
     $TEST_PROG_ARGS = "" unless defined $TEST_PROG_ARGS;
     _run_command( "./$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
@@ -86,9 +101,7 @@ foreach my $func ( keys %Test_Map ) {
     my $pass = $Builder->$meth( $prog_output, $output, $desc );
 
     unless($ENV{POSTMORTEM}) {
-      foreach my $i ( $as_f, $by_f, $out_f ) {
-        unlink $i;
-      }
+      unlink $out_f;
     }
 
     return $pass;
