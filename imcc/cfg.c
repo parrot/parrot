@@ -704,7 +704,7 @@ propagate_need(Basic_block *bb, SymReg* r, int i)
                     for ( ; ins && ins->bbindex == bbi; ins = ins->next)
                         if (instruction_reads(ins, r))
                             break;
-                    warning("propagate_need",
+                    IMCC_warning("propagate_need",
                             "'%s' might be used uninitialized in %s:%d\n",
                             r->name, function, ins->line);
                 }
