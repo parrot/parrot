@@ -3718,8 +3718,7 @@ Find the global named $2 and store it in $1
 
 op new_pad(in INT) {
     PMC * pad;
-    PMC * parent = (PMC *)stack_peek(interpreter,
-				     interpreter->ctx.pad_stack, NULL);
+    PMC * parent = scratchpad_get_current(interpreter);
     pad = scratchpad_new(interpreter, parent, $1);
     stack_push(interpreter, &interpreter->ctx.pad_stack, pad,
                STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
@@ -3727,8 +3726,7 @@ op new_pad(in INT) {
 }
 
 op new_pad(out PMC, in INT) {
-    PMC * parent = (PMC *)stack_peek(interpreter, 
-                                     interpreter->ctx.pad_stack, NULL);
+    PMC * parent = scratchpad_get_current(interpreter);
     $1 = scratchpad_new(interpreter, parent, $2);
     goto NEXT();
 }
@@ -3746,56 +3744,48 @@ op pop_pad() {
 }
 
 op peek_pad(out PMC) {
-    $1 = (PMC*)stack_peek(interpreter, 
-                          interpreter->ctx.pad_stack, NULL);
+    $1 = scratchpad_get_current(interpreter);
     goto NEXT();
 }
 
 op store_lex(in STR, in PMC) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-                                  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     scratchpad_store(interpreter, pad, $1, 0, $2);
     goto NEXT();
 }
 
 op store_lex(in INT, in STR, in PMC) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-                                  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     scratchpad_store_index(interpreter, pad, $1, $2, 0, $3);
     goto NEXT();
 }
 
 op store_lex(in INT, in INT, in PMC) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-                                  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     scratchpad_store_index(interpreter, pad, $1, NULL, $2, $3);
     goto NEXT();
 }
 
 op find_lex(out PMC, in STR) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-				  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_get(interpreter, pad, $2, 0);
     goto NEXT();
 }
 
 op find_lex(out PMC, in INT) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-				  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_get(interpreter, pad, NULL, $2);
     goto NEXT();
 }
 
 op find_lex(out PMC, in INT, in STR) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-				  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_get_index(interpreter, pad, $2, $3, 0);
     goto NEXT();
 }
 
 op find_lex(out PMC, in INT, in INT) {
-    PMC * pad = (PMC *)stack_peek(interpreter,
-				  interpreter->ctx.pad_stack, NULL);
+    PMC * pad = scratchpad_get_current(interpreter);
     $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
     goto NEXT();
 }

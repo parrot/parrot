@@ -5,8 +5,8 @@
  *  Overview:
  *     These are the vtable functions for the Coroutine base class
  *  Data Structure and Algorithms:
- *     Initial version by Melvin on 2002/06/6
  *  History:
+ *     Initial version by Melvin on 2002/06/6
  *  Notes:
  *  References:
  */
@@ -76,9 +76,17 @@ pmclass Coroutine {
     }
 
     void* invoke (void* next) {
+        PMC * pad = ((struct Parrot_Coroutine *)SELF->data)->lex_pad;
         struct Parrot_Coroutine* co = (struct Parrot_Coroutine*)SELF->data;
         void * dest = co->resume;
         co->resume = (opcode_t *)next;
+
+        if (pad) {
+           /* put the correct pad in place */
+           stack_push(INTERP, &INTERP->ctx.pad_stack, pad, 
+                      STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+        }
+
         return dest;
     }
 

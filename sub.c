@@ -18,6 +18,7 @@ void
 save_context(struct Parrot_Interp *interp, struct Parrot_Context *ctx)
 {
     memcpy(ctx, &interp->ctx, sizeof(*ctx));
+    stack_mark_cow(ctx->pad_stack);
     stack_mark_cow(ctx->user_stack);
     stack_mark_cow(ctx->control_stack);
 }
@@ -34,10 +35,9 @@ new_sub(struct Parrot_Interp *interp, opcode_t *address)
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub *newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
     newsub->init = address;
-    newsub->lex_pad = NULL;
+    newsub->lex_pad = scratchpad_get_current(interp);
     return newsub;
 }
-
 
 struct Parrot_Coroutine *
 new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
@@ -49,7 +49,7 @@ new_coroutine(struct Parrot_Interp *interp, opcode_t *address)
     newco->resume = NULL;
     newco->ctx.user_stack = new_stack(interp);
     newco->ctx.control_stack = new_stack(interp);
-    newco->lex_pad = NULL;
+    newco->lex_pad = scratchpad_get_current(interp);
     return newco;
 }
 
@@ -80,6 +80,15 @@ scratchpad_index(struct Parrot_Interp* interpreter, PMC* pad,
     }
 
     return ((struct Parrot_Lexicals **)pad->data)[scope_index];
+}
+
+/*
+ * Returns a pointer to the current scratchpad.
+ */
+PMC * 
+scratchpad_get_current(struct Parrot_Interp * interp)
+{
+    return (PMC *)stack_peek(interp, interp->ctx.pad_stack, NULL);
 }
 
 /* 

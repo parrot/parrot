@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs");
@@ -149,3 +149,72 @@ back  2b
 back  1
 done
 OUTPUT
+
+
+
+output_is(<<'CODE', <<'OUTPUT', "PASM sub as closure");
+    # sub foo {
+    #     my ($n) = @_;
+    #     sub {$n += shift}
+    # }
+main:
+    new P0, .Sub
+    set_addr I3, foo
+    set P0, I3
+    set I5, 3
+
+    new P1, .PerlInt
+    set P1, 5
+
+    invoke
+
+    new P1, .PerlInt
+    set P1, 3
+    set P0, P2 # move sub to P0 for invoke
+
+    saveall
+    invoke
+    print P2
+    print "\n"
+    restoreall
+
+    saveall
+    invoke
+    print P2
+    print "\n"
+    restoreall
+
+    saveall
+    invoke
+    print P2
+    print "\n"
+    restoreall
+
+    end
+
+# foo takes a number n (P1) and returns a sub (in P2) that takes 
+# a number i (P1) and returns n incremented by i.
+foo:
+    new_pad 0
+    store_lex 0, "n", P1
+    new P2, .Sub
+    set_addr I3, accumulator
+    set P2, I3
+    pop_pad
+    ret
+
+# expects arg in P1, returns incremented result in P2
+accumulator: 
+    find_lex P2, "n"
+    new P3, .PerlInt
+    add P2, P1
+    pop_pad
+    ret
+
+CODE
+8
+11
+14
+OUTPUT
+
+1;

@@ -29,7 +29,17 @@ pmclass Sub {
                             * parameter, but that's not valid.  So
                             * this is totally broken now. */
        SELF->data = new_sub(INTERP, (opcode_t*)address);
-       SELF->flags |= PMC_active_destroy_FLAG;
+       SELF->flags |= PMC_custom_mark_FLAG | PMC_active_destroy_FLAG;
+   }
+
+   PMC* mark (PMC *end_of_used_list) {
+       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+       if (pad) {
+           return mark_used(pad, end_of_used_list);
+       }
+       else {
+           return end_of_used_list;
+       }
    }
 
    void destroy () {
@@ -45,9 +55,18 @@ pmclass Sub {
    }
 
    void* invoke (void* next) {
+       PMC * pad = ((struct Parrot_Sub *)SELF->data)->lex_pad;
+
+       if (pad) {
+           /* put the correct pad in place */
+           stack_push(INTERP, &INTERP->ctx.pad_stack, pad, 
+                      STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
+       }
+
        /* return address that the interpreter should jump to */
        stack_push(INTERP, &(INTERP->ctx.control_stack), next,
 		  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+
        return ((struct Parrot_Sub*)SELF->data)->init;
    }
 

@@ -59,6 +59,8 @@ void restore_context(struct Parrot_Interp * interp,
 
 PMC * scratchpad_new(struct Parrot_Interp * interp, PMC * base, INTVAL depth);
 
+PMC * scratchpad_get_current(struct Parrot_Interp * interp);
+
 void scratchpad_store(struct Parrot_Interp * interp, PMC * pad, 
                       STRING * name, INTVAL position, PMC* value);
 
