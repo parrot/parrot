@@ -456,6 +456,7 @@ make_interpreter(INTVAL flags) {
     interpreter->perl_stash = mem_sys_allocate(sizeof(struct Stash));
     interpreter->perl_stash->stash_hash = 
     	        pmc_new(interpreter, enum_class_PerlHash);
+    interpreter->perl_stash->parent_stash = NULL;
     
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
