@@ -211,7 +211,7 @@ Holds the number of return values in PMC registers.
 
 =item I4
 
-Holds the number of return valies in numeric registers.
+Holds the number of return values in numeric registers.
 
 =item P5-P15
 
