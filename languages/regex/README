@@ -187,4 +187,6 @@ If you make changes to Grammar.y, you'll need Parse::Yapp to
 regenerate Grammar.pm. Run 'make' with no options to pass the correct
 command-line parameters.
 
+For a painfully detailed, blow-by-blow description of the latter part of the development of this compiler, see http://0xdeadbeef.net/wiki/wiki.pl?FinkBlog
+
 Original author: Steve Fink <steve@fink.com>
