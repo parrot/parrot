@@ -4,9 +4,7 @@ ABI_CHANGES                                       []
 CREDITS                                           []
 ChangeLog                                         []
 Configure.pl                                      []
-DESIGN_TODO					  []
 DEVELOPING                                        []
-KNOWN_ISSUES                                      [main]doc
 LICENSES/Artistic                                 [main]doc
 LICENSES/gpl.txt                                  [main]doc
 MANIFEST                                          []
@@ -20,7 +18,6 @@ README.win32                                      [main]doc
 RELEASE_INSTRUCTIONS                              []
 RESPONSIBLE_PARTIES                               [main]doc
 TODO                                              [main]doc
-TODO.win32                                        [main]doc
 VERSION                                           [main]doc
 ast/ast.h                                         []
 ast/ast.l                                         []
