@@ -16,7 +16,7 @@ Tests PMC object methods.
 
 =cut
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Test::More;
 
 output_like(<<'CODE', <<'OUTPUT', "callmethod - unknown method");
@@ -462,4 +462,145 @@ output_like(<<'CODE', <<'OUTPUT', "fetchmethod - unknown method");
 CODE
 /Method 'nada' not found/
 OUTPUT
+
+TODO: {
+  #local $TODO = "wrong init order?";
+
+output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
+#
+# A   B A   E
+#  \ /   \ /
+#   C     D
+#    \   /
+#     \ /
+#      F
+    newclass P1, "A"
+    newclass P2, "B"
+    subclass P3, P1, "C"
+    addparent P3, P2
+
+    subclass P4, P1, "D"
+    newclass P5, "E"
+    addparent P4, P5
+
+    subclass P6, P3, "F"
+    addparent P6, P4
+    bsr _check_isa
+
+    print "new F\n"
+    find_type I1, "F"
+    new P16, I1
+    print "done\n"
+    end
+
+_check_isa:
+    print "F isa D "
+    isa I0, P6, "D"
+    print I0
+    print "\n"
+    print "D isa F "
+    isa I0, P4, "F"
+    print I0
+    print "\n"
+    print "F isa C "
+    isa I0, P6, "C"
+    print I0
+    print "\n"
+    print "C isa F "
+    isa I0, P3, "F"
+    print I0
+    print "\n"
+    print "F isa E "
+    isa I0, P6, "E"
+    print I0
+    print "\n"
+    print "E isa F "
+    isa I0, P5, "F"
+    print I0
+    print "\n"
+    print "F isa A "
+    isa I0, P6, "A"
+    print I0
+    print "\n"
+    print "A isa F "
+    isa I0, P1, "F"
+    print I0
+    print "\n"
+    print "F isa B "
+    isa I0, P6, "B"
+    print I0
+    print "\n"
+    print "B isa F "
+    isa I0, P2, "F"
+    print I0
+    print "\n"
+
+    print "C isa A "
+    isa I0, P3, "A"
+    print I0
+    print "\n"
+    print "A isa C "
+    isa I0, P1, "C"
+    print I0
+    print "\n"
+    print "D isa A "
+    isa I0, P4, "A"
+    print I0
+    print "\n"
+    print "A isa D "
+    isa I0, P1, "D"
+    print I0
+    print "\n"
+    ret
+
+
+.namespace ["A"]
+.pcc_sub __init:
+    print "A init\n"
+    invoke P1
+.namespace ["B"]
+.pcc_sub __init:
+    print "B init\n"
+    invoke P1
+.namespace ["C"]
+.pcc_sub __init:
+    print "C init\n"
+    invoke P1
+.namespace ["D"]
+.pcc_sub __init:
+    print "D init\n"
+    invoke P1
+.namespace ["E"]
+.pcc_sub __init:
+    print "E init\n"
+    invoke P1
+.namespace ["F"]
+.pcc_sub __init:
+    print "F init\n"
+    invoke P1
+CODE
+F isa D 1
+D isa F 0
+F isa C 1
+C isa F 0
+F isa E 1
+E isa F 0
+F isa A 1
+A isa F 0
+F isa B 1
+B isa F 0
+C isa A 1
+A isa C 0
+D isa A 1
+A isa D 0
+new F
+E init
+A init
+D init
+B init
+C init
+F init
+done
+OUTPUT
+};
 
