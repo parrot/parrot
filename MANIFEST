@@ -339,6 +339,7 @@ examples/benchmarks/arriter_o1.imc                [main]doc
 examples/benchmarks/bench_newp.pasm               [main]doc
 examples/benchmarks/fib.imc                       [main]doc
 examples/benchmarks/fib.pl                        [main]doc
+examples/benchmarks/fib.py                        [main]doc
 examples/benchmarks/fib.rb                        [main]doc
 examples/benchmarks/freeze.pasm                   [main]doc
 examples/benchmarks/freeze.pl                     [main]doc
@@ -368,6 +369,7 @@ examples/benchmarks/primes.pasm                   [main]doc
 examples/benchmarks/primes.pl                     [main]doc
 examples/benchmarks/primes2.c                     [main]doc
 examples/benchmarks/primes2.pasm                  [main]doc
+examples/benchmarks/primes2.pl                    [main]doc
 examples/benchmarks/primes2.py                    [main]doc
 examples/benchmarks/primes2.rb                    [main]doc
 examples/benchmarks/primes2_i.pasm                [main]doc
@@ -385,6 +387,7 @@ examples/benchmarks/stress2.rb                    [main]doc
 examples/benchmarks/stress3.pasm                  [main]doc
 examples/benchmarks/vpm.imc                       [main]doc
 examples/benchmarks/vpm.pl                        [main]doc
+examples/benchmarks/vpm.py                        [main]doc
 examples/benchmarks/vpm.rb                        [main]doc
 examples/benchmarks/vpm1.imc                      [main]doc
 examples/benchmarks/vpm2.imc                      [main]doc
