@@ -197,7 +197,7 @@ is a tuple or string, return the same type, else return a list.
 
 */
 
-    METHOD PMC* Filter(PMC *func, PMC *list) {
+    METHOD PMC* filter(PMC *func, PMC *list) {
         PMC *res, *iter;
         INTVAL i, n;
         STRING *s;

@@ -21,8 +21,10 @@ This class implements a Python Function, i.e. a Parrot Closure.
 #include "parrot/parrot.h"
 
 static INTVAL dynclass_PyList;
+static INTVAL dynclass_PyTuple;
 static STRING *FUNC_ARGS;
 static STRING *FUNC_DEFAULTS;
+static STRING *FUNC_VARARGS;
 static STRING *__CALL__;
 
 pmclass PyFunc extends Closure dynpmc group python_group {
@@ -41,7 +43,9 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyList = Parrot_PMC_typenum(INTERP, "PyList");
+            dynclass_PyTuple = Parrot_PMC_typenum(INTERP, "PyTuple");
             FUNC_ARGS = const_string(INTERP, "func_args");
+            FUNC_VARARGS = const_string(INTERP, "func_varargs");
             FUNC_DEFAULTS = const_string(INTERP, "func_defaults");
             __CALL__ = const_string(INTERP, "__call__");
         }
@@ -136,22 +140,34 @@ Invoke a function.  Defaults are filled in first.
 
     void* invoke(void* next) {
         PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
+        PMC *func_varargs = VTABLE_getprop(INTERP, SELF, FUNC_VARARGS);
+        INTVAL n = VTABLE_elements(INTERP, func_args);
+        INTVAL j;
 
-        if (func_args && VTABLE_defined(INTERP, func_args)) {
-            INTVAL n = VTABLE_elements(INTERP, func_args);
-            if (n > REG_INT(3)) {
-                PMC *func_defaults = VTABLE_getprop(INTERP,SELF,FUNC_DEFAULTS);
+        if (n > REG_INT(3)) {
+            PMC *func_defaults = VTABLE_getprop(INTERP,SELF,FUNC_DEFAULTS);
 
-                if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
-                    INTVAL nd = VTABLE_elements(INTERP, func_defaults);
-                    INTVAL j;
-                    for (j=n-nd+REG_INT(3); j<n && j<11; j++) {
-                        REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
-                            func_defaults, j+nd-n);
-                    }
-
-                    REG_INT(3) = n;
+            if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
+                INTVAL nd = VTABLE_elements(INTERP, func_defaults);
+                for (j=n-nd+REG_INT(3); j<n && j<11; j++) {
+                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                        func_defaults, j+nd-n);
                 }
+
+                REG_INT(3) = n;
+            }
+        }
+
+        if (func_varargs && VTABLE_defined(INTERP, func_varargs)) {
+            PMC *varargs = pmc_new(INTERP, dynclass_PyTuple);
+            VTABLE_set_integer_native(INTERP, varargs, REG_INT(3)+1-n);
+            for (j=n-1; j<REG_INT(3) && j<11; j++) {
+                VTABLE_set_pmc_keyed_int(INTERP,varargs,j+1-n,REG_PMC(5+j));
+            }
+
+            if (n<11) {
+                REG_PMC(5+n-1) = varargs;
+                REG_INT(3) = n;
             }
         }
 
@@ -171,6 +187,8 @@ Add an argument to the func_args list
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
         VTABLE_set_string_keyed_int(INTERP, func_args, key, value);
+        INTVAL n = VTABLE_elements(INTERP, func_args);
+
     }
 
 /*
