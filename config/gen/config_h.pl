@@ -9,7 +9,7 @@ $description="Generating config.h...";
 @args=();
 
 sub runstep {
-  genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h');
+  genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h', '#');
 
   open(HH, ">include/parrot/has_header.h") or die "Can't open has_header.h: $!";
 
