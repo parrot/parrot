@@ -168,12 +168,12 @@ Set the value of an object's attribute slot
 
 =item get attribute catalog
 
-Get the catalog of attrbutes. This is a hash of classes and attribute
+Get the catalog of attributes. This is a hash of classes and attribute
 offsets for the fixed attributes, and a hash of fully qualified
 attribute name and offset pairs. (A fully qualified attribute name is
 of the form CLASS::ATTRIBUTE) Generally the class base offset is used
 most often, as most attributes are created at compile time for a
-class. The fully qualified form is indended mostly for attributes
+class. The fully qualified form is intended mostly for attributes
 added to classes at runtime.
 
 =item get class base offset
