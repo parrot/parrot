@@ -185,7 +185,7 @@ stuff.
 
 Those VMs are designed for statically typed languages. That's fine, 
 since Java, C#, and lots of other languages are statically typed. Perl isn't. 
-For a variety of reasons, it means that perl would run more slowly there than on 
+For a variety of reasons, it means that Perl would run more slowly there than on 
 an interpreter geared towards dynamic languages.
 
 =head2 So you won't run on JVM/.NET?
@@ -196,7 +196,7 @@ ends.
 
 =head2 Why is the development list called perl6-internals?
 
-The mailing list preceeds the Parrot joke and subsequent unveiling of
+The mailing list precedes the Parrot joke and subsequent unveiling of
 the True Grand Project by a number of months. We've just not gotten
 around to renaming the mailing list.
 
