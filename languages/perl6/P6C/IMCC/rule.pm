@@ -175,7 +175,7 @@ $x->{ctx}{rx_fail_label}:
 	goto $ctx->{fail}
 END
     }
-    
+
     # Backtracking target:
     code(<<END);
 $bt:
@@ -268,7 +268,7 @@ END
 	rx_pushindex $which
 END
     maybe_fallthrough($ctx->{succ});
-    return $bt;    
+    return $bt;
 }
 
 sub begin_capture {
@@ -654,7 +654,7 @@ sub P6C::rx_repeat::rx_val {
     } elsif ($x->negated) {
 	unimp 'Negated repetition specifier';
     }
-    
+
     my %ctx = %$ctx;
     unless ($ctx->{succ}) {
 	$needend = 1;
@@ -748,7 +748,7 @@ END
 $ctx->{succ}:
 END
     rxdebug $x, $ctx, 'star succ';
-    
+
     return $bt;
 }
 
@@ -801,7 +801,7 @@ END
 }
 
 sub P6C::rx_any::rx_val {
-    my ($x, $ctx) = @_;    
+    my ($x, $ctx) = @_;
     code(<<END);
 	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
@@ -812,7 +812,7 @@ END
 # - meta-characters
 # - escaped characters
 sub P6C::rx_meta::rx_val {
-    my ($x, $ctx) = @_;    
+    my ($x, $ctx) = @_;
     my $op = $x->name;
     if (length $op == 1) {
 	# XXX: '\n' is supposed to be a _logical_ newline.
@@ -851,15 +851,15 @@ END
     } elsif ($op =~ /^X\{?([\da-fA-F0-9]+)/) {
 	# Negated hex
 	rx_not_char($ctx, hex $1);
-	
+
     } elsif ($x->name =~ /^x\{?([\da-fA-F0-9]+)/) {
 	# Normal hex
 	rx_char($ctx, hex $1);
-	
+
     } elsif ($op =~ /^0([0-7]+)/) {
 	# octal
 	rx_char($ctx, oct $1);
-	
+
     } else {
 	unimp "Regex meta-sequence `\\$op'";
     }
@@ -906,7 +906,7 @@ END
 $succ:
 END
 	return $ctx->{fail};
-	
+
     } elsif ($x->name eq '$$') {
 	# end of line:
 	# pos == length || str[pos+1] == '\n'
@@ -956,7 +956,7 @@ sub P6C::rx_oneof::rx_val {
     my $bmp = $x->{ctx}{rx_bmp_name}
 	|| die "Internal error: can't find regex bitmap.";
     if ($x->negated) {
-	rx_not_one($ctx, sub { 
+	rx_not_one($ctx, sub {
 		       code(<<END);
 	rx_oneof_bmp $ctx->{str}, $ctx->{pos}, $bmp, $ctx->{fail}
 END
@@ -1014,7 +1014,7 @@ sub P6C::rx_call::rx_val {
 $bt:
 	rx_pushmark
 $start:
-	push $ctx->{str}
+	save $ctx->{str}
 END
     rxdebug $x, $ctx, "before call @{[$x->name]}";
     if (ref $x->name) {

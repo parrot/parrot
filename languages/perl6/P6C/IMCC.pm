@@ -165,7 +165,7 @@ sub emit {			# emit all code
 	call __setup
 	call _main
 	end
-	ret
+.end
 END
     P6C::Builtins::add_code(\%funcs);
     while (my ($name, $sub) = each %funcs) {
@@ -177,6 +177,7 @@ END
 	$name = mangled_name($name);
 	print ".sub $name\n";
 	$sub->emit;
+	print ".end\n";
     }
     P6C::Builtins::emit;
 }
@@ -1764,7 +1765,7 @@ sub assign {
 	$x->vars->assign($thing);
 	return undef;
     }
-    
+
     my $tmpv = $thing->val;
 
     if (ref $x->vars ne 'ARRAY') {
@@ -2055,7 +2056,7 @@ sub val {
     my $isback = gentmp 'int';
     my $fake_back = genlabel 'XXX';
     code(<<END);
-	pop $rxstr
+	restore $rxstr
 	rx_popindex $rxpos, $fake_back
 END
     $x->{ctx}{rx_pos} = $rxpos;
