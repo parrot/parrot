@@ -999,7 +999,7 @@ sub clt_num_regs {
 }
 
 # first half like clt_num_regs, second half like cgt_num_regs
-# (for testing halfpopn op)
+# (for testing poptopn op)
 sub check_num_regs {
   my $rt;
   for (0..15) {
