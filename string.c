@@ -120,7 +120,7 @@ make_COW_reference_from_header(struct Parrot_Interp *interpreter,
     }
 }
 
-/*for api string string_set
+/*=for api string string_set
  * set the contents of dest to the contents of src
  */
 STRING *
@@ -288,7 +288,7 @@ string_grow(struct Parrot_Interp * interpreter, STRING * s, INTVAL addlen) {
 /* Ordinary user-visible string operations */
 
 /*=for api string string_length
- * return the length of the string
+ * Return the length of the string (in characters)
  */
 UINTVAL
 string_length(const STRING *s)
@@ -416,9 +416,9 @@ string_str_index_singlebyte(struct Parrot_Interp *interpreter,
 }
 
 /*=for api string string_str_index
- * return the character position of s2 in s at or after start
- * the return value is a (0 based) offset in characters, not bytes.
- * if not found, -1 is returned
+ * Return the character position of s2 in s at or after start.
+ * The return value is a (0 based) offset in characters, not bytes.
+ * If s2 is not found, then return -1 
  */
 INTVAL
 string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
@@ -519,7 +519,7 @@ string_transcode(struct Parrot_Interp *interpreter,
          * encoding = encoding_lookup(src->type->default_encoding);
          * but that seems really stupid, because transcoding two strings
          * to NULL wouldn't necessarily mean they have the same
-         * encoding. So this seems to least bad compromise.
+         * encoding. So this seems to be the least bad compromise.
          */
     }
 
@@ -587,7 +587,7 @@ string_compute_strlen(STRING *s)
 
 /*=for api string string_max_bytes
  * returns the number of bytes required to safely contain
- * n characters in the string's encoding
+ * nchars characters in the string's encoding
  */
 INTVAL
 string_max_bytes(STRING *s, INTVAL nchars)
@@ -596,7 +596,10 @@ string_max_bytes(STRING *s, INTVAL nchars)
 }
 
 /*=for api string string_concat
- * concatenate two strings
+ * Concatenate two strings. If necessary, convert the second string's
+ * encoding and/or type to match those of the first string. If either
+ * string is NULL, return a copy of the non-NULL string. If both 
+ * strings are NULL, create and return a new zero-length string.
  */
 STRING *
 string_concat(struct Parrot_Interp *interpreter, STRING *a,
