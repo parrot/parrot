@@ -42,6 +42,7 @@ t/test.pasm
 t/test2.pasm
 t/test3.pasm
 t/euclid.pasm
+t/jump.pasm
 test_main.c
 little_languages/euclid.jako
 little_languages/jakoc
