@@ -14,7 +14,7 @@ use Config;
 use File::Spec;
 use Getopt::Std;
 
-my $VERSION = "0.0.3";
+my $VERSION = "0.0.4";
 
 my %std_to = 
   ( bug => 'parrotbug@parrotcode.org',
@@ -24,7 +24,7 @@ my %std_to =
 
 my $parrotdir = File::Spec->curdir();
 
-my ( $user, $domain, $editor, $use_file );
+my ( $user, $domain, $editor, $use_file, $report_file );
 my ( $to, $cc, $from, $subject, $msgid, $body );
 my ( $category, $severity );
 my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
@@ -157,7 +157,7 @@ sub generate_filename {
 sub trivial_subject {
     my $subject = shift;
 
-    return 0 if $opt_o || $opt_f;
+    return 0 if $opt_o || $opt_n;
     if ( $subject =~
          /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
          length($subject) < 4 ||
@@ -282,7 +282,7 @@ sub init {
     $from = $opt_r || "";
 
    # Editor
-    $editor = $opt_e || $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
+    $editor = $ENV{VISUAL} || $ENV{EDITOR} || $ENV{EDIT}
 	|| ( $is_vms && "edit/tpu" )
 	|| ( $is_mswin32 && "notepad" )
 	|| ( $is_macos && "" )
@@ -376,14 +376,23 @@ versions are relevant.
 EOF
 
     # Prompt for editor to use if none supplied.
-    ask_for_editor(<<EOF) unless $opt_e;
+    if ( $opt_e ) {
+        $editor = $opt_e;
+        print "Press 'Enter' to continue...\n";
+        scalar <>;
+
+    } else {
+        ask_for_editor(<<EOF) unless $opt_e;
 You will probably want to use an editor to enter the report. If the
 default editor proposed below is the editor you want to use, then just
 press the 'Enter' key, otherwise type in the name of the editor you
 would like to use.
 EOF
+    }
 
-
+    # Launch editor.
+    $report_file = generate_filename();
+    edit_bug_report( $report_file );
 }
 
 
@@ -454,6 +463,31 @@ EOF
         die "Aborting.\n" if $err++ == 5;
     } while ( trivial_subject($subject) );
     print "\n\n\n";
+}
+
+
+#----
+sub edit_bug_report {
+    my $filename = shift;
+
+    # Launch editor.
+    my $retval;
+    if ($is_macos) {
+        require ExtUtils::MakeMaker;
+        ExtUtils::MM_MacOS::launch_file($filename);
+        print "Press Enter when done.\n";
+        scalar <>;
+    } else {
+        $retval = system("$editor $filename");
+    }
+
+    # Check whether editor run was successful.
+    die <<EOF if $retval;
+The editor you chose ('$editor') could apparently not be run! Did you
+mistype the name of your editor?
+
+EOF
+
 }
 
 
