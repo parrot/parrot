@@ -112,7 +112,7 @@ add_pcc_result(SymReg *r, SymReg * arg)
         r->pcc_sub->ret[n]->type = VT_REGP;
     }
     else
-        fataly(EX_SOFTWARE, "add_pcc_result", line,
+        fataly(EX_SOFTWARE, sourcefile, line,
                 "result is not a variable '%s'\n", arg->name);
     r->pcc_sub->nret++;
 }
@@ -148,7 +148,7 @@ SymReg * mk_pasm_reg(char * name) {
     r->type = VTPASM;
     r->color = atoi(name+1);
     if (r->color < 0 || r->color > 31)
-        fataly(1, "mk_pasm_reg", line,
+        fataly(1, sourcefile, line,
                 "register number out of range '%s'\n", name);
     return r;
 }
@@ -226,11 +226,11 @@ SymReg * _mk_address(SymReg *hsh[], char * name, int uniq) {
             r->lhs_use_count            /* we use this for labes/subs */
       ) {
         if (uniq == U_add_uniq_label) {
-            fataly(1, "mk_address", line,
+            fataly(1, sourcefile, line,
                    "Label '%s' already defined\n", name);
         }
         else if (uniq == U_add_uniq_sub)
-            fataly(1, "mk_address", line,
+            fataly(1, sourcefile, line,
                     "Subroutine '%s' already defined\n", name);
     }
     r = _mk_symreg(hsh, name, 0);

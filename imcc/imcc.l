@@ -779,7 +779,11 @@ print_inc(void)
 
     for (f = frames; f; f = f->next) {
         if (f->file && strcmp(f->file, sourcefile))
-            fprintf(stderr, "\tcalled from '%s' line %d\n", f->file, f->line);
+            f->next ?
+            fprintf(stderr, "\tincluded from '%s' line %d\n",
+                f->file, f->line) :
+            fprintf(stderr, "\tincluded from '%s' sub '%s' line %d\n",
+                f->file, function, f->line);
     }
 }
 

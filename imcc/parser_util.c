@@ -23,7 +23,11 @@
 #include "parser.h"
 
 /*
- * new P, .SomeThing
+ * P = new type, [init]
+ * PASM like:
+ *   new P, .SomeThing
+ * is done in the lexer, this is a mess
+ * best would be to have a flag in core.ops, where a PMC type is expected
  */
 Instruction *
 iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
@@ -31,11 +35,13 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
 {
     char fmt[256];
     SymReg *pmc;
-    int pmc_num = Parrot_get_pmc_num(interpreter, type);
+    int pmc_num = Parrot_get_pmc_num(interpreter,
+            *type == '.' ?type+1:type);
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
-    /* XXX check, if type exists, but aove keyed search
-     * gives 0 for non existing  PMCs */
+
+    if (pmc_num == 0)
+        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", type);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage = U_NEW;
     if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
@@ -208,7 +214,7 @@ static void *imcc_compile_pir (Parrot_Interp interp, const char *s)
 static void *imcc_compile_file (Parrot_Interp interp, const char *s)
 {
     struct PackFile *pf_save = interp->code;
-    struct PackFile *pf = PackFile_new(0);
+    struct PackFile *pf;
     char *source = sourcefile;
     char *ext;
     int pasm = pasm_file;
@@ -219,8 +225,11 @@ static void *imcc_compile_file (Parrot_Interp interp, const char *s)
     } __ptr_u;
 #define const_cast(b) (__ptr_u.__c_ptr = (b), __ptr_u.__ptr)
 
-    if(!(new = fopen(s, "r")))
+    if(!(new = fopen(s, "r"))) {
+        fatal(1, "imcc_compile_file", "couldn't open '%s'\n", s);
         return NULL;
+    }
+    pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
     ext = strrchr(s, '.');
@@ -339,7 +348,7 @@ SymReg ** r, int nr, int emit)
     kv = keyvec;
     for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
         if (kv & 1) {
-            fataly(EX_SOFTWARE, "multi_keyed", line,"illegal key operand\n");
+            fataly(EX_SOFTWARE, sourcefile, line,"illegal key operand\n");
         }
         /* make a new P symbol */
         while (1) {
@@ -352,7 +361,7 @@ SymReg ** r, int nr, int emit)
         if (kv & 1) {
             /* we have a keyed operand */
             if (r[i]->set != 'P') {
-                fataly(EX_SOFTWARE, "multi_keyed", line,"not an aggregate\n");
+                fataly(EX_SOFTWARE, sourcefile, line,"not an aggregate\n");
             }
             nargs = 3;
             /* don't emit LHS yet */

@@ -19,7 +19,7 @@ void fatal(int code, const char *func, const char *fmt, ...)
 }
 
 
-void fataly(int code, const char *func, int lin, const char *fmt, ...)
+void fataly(int code, const char *file, int lin, const char *fmt, ...)
 {
     va_list ap;
 
@@ -27,7 +27,7 @@ void fataly(int code, const char *func, int lin, const char *fmt, ...)
     fprintf(stderr, "error:imcc:");
     vfprintf(stderr, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "in file '%s' line %d\n", func, lin);
+    fprintf(stderr, "in file '%s' line %d\n", file, lin);
     print_inc();
     /* TODO through compiler exception */
     exit(code);
