@@ -53,8 +53,10 @@ foreach my $file (sort(@cmd_includes, @libs, @op_includes, @math_includes)) {
   $includes .= "  .include \"languages/tcl/$file\"\n";
 }
 
-$contents =~ s/\${COMMANDS}/$commands/;
-$contents =~ s/\${INCLUDES}/$includes/;
-$contents =~ s/\${FUNCTIONS}/$functions/;
+$contents =~ s/\${COMMANDS}/$commands/g;
+$contents =~ s/\${INCLUDES}/$includes/g;
+$contents =~ s/\${FUNCTIONS}/$functions/g;
+$contents =~ s/\${HEADER}/This file automatically generated, do not edit./g;
+$contents =~s/\${XXX.*}//g;
 
 print $contents;
