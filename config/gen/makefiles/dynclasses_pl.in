@@ -65,7 +65,12 @@ sub compile_cmd {
 sub partial_link_cmd {
     my ($target, $libs, $sources) = @_;
 
-    my $liblist = join( ' ', map { "-l$_" } keys %$libs );
+    my $liblist;
+    if ($^O =~ /mswin32/i) {
+      $liblist = join( ' ', map { "$_.lib" } keys %$libs );
+    } else {
+      $liblist = join( ' ', map { "-l$_" } keys %$libs );
+    }
 
     return
         "$LD $LDFLAGS $LD_LOAD_FLAGS $liblist $LIBPARROT ".
