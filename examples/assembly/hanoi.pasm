@@ -11,7 +11,7 @@
 #
 # The towers are arrays of integers.  0 indicates no disk is present
 #   A positive integer indicates the diameter of the disk occupying
-#   the inicated slot.
+#   the indicated slot.
 #
 # So this setup
 #
@@ -64,7 +64,11 @@
 # }
 
 MAIN:
-	set I5, P0[1]           #I5 = argv[0]
+        set I0, P0
+        lt I0, 2, ERROR
+
+	set S5, P0[1]           # S5 = argv[0]
+        set I5, S5              # Convert to an int
 	new P0, .PerlArray
 	new P1, .PerlArray
 	new P2, .PerlArray
@@ -197,4 +201,8 @@ move_multiple:
 	restore I4
 	restore I1
 	ret
+
+ERROR:  print "Error: no size specified for tower\n"
+        end
+
 

@@ -47,7 +47,7 @@ loop:	ge I0, I2, getout
 	inc I0
 	mod I31,I0,100
 	if I31, skip
-	print 2,"."
+	printerr "."
 skip:
 
 	bsr generate

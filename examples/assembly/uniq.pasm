@@ -19,8 +19,8 @@
 #
 # By Leon Brocard <acme@astray.com>
 
-  set S0, P0[1]
-  if S0, SOURCE
+  set I0, P0
+  ne I0, 1, SOURCE
   set S0, P0[0]
   print "usage: parrot "
   print S0
@@ -106,6 +106,6 @@ MATCH:
 LOOP:
   set S2, S1
   if S1, SOURCE_LOOP
-  close I0
+  close P1
 
   end
