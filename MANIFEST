@@ -87,6 +87,7 @@ disassemble.c
 disassemble.pl
 docs/embed.pod
 docs/faq.pod
+docs/glossary.pod
 docs/intro.pod
 docs/jit.pod
 docs/overview.pod
@@ -250,6 +251,7 @@ languages/cola/gen.c
 languages/cola/semant.c
 languages/cola/sym.c
 languages/cola/type.c
+languages/forth/forth.pasm
 languages/imcc/Makefile
 languages/imcc/README
 languages/imcc/cfg.c
