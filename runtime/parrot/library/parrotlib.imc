@@ -63,9 +63,6 @@ LOOP:
     set_signature( "include_file_location", "SS" )
     set_signature( "bytecode_location", "SS" )
     set_signature( "dynext_location", "SS" )
-
-    # XXX: turn off DOD runs; does not work with DOD yet :-(
-    sweepoff
 .end
 
 =item STRING = include_file_location( STRING )
@@ -123,23 +120,23 @@ Returns the location of a dynamic extension.
     ext = ".so"
         
     name = request
-    $I0 = file_exists( name )
+    stat $I0, name, 0
     if $I0 goto END
 
     name = clone request
     concat name, ext
-    $I0 = file_exists( name )
+    stat $I0, name, 0
     if $I0 goto END
 
     name = "runtime/parrot/dynext/"
     concat name, request
-    $I0 = file_exists( name )
+    stat $I0, name, 0
     if $I0 goto END
 
     name = "runtime/parrot/dynext/"
     concat name, request
     concat name, ext
-    $I0 = file_exists( name )
+    stat $I0, name, 0
     if $I0 goto END
 
     print "Couldn't load '"
@@ -178,23 +175,6 @@ END:
     .pcc_end_return
 .end
 
-# XXX: use stat op
-.sub file_exists
-    .param string name
-    .local int ret
-    
-    ret = 0
-    open $P0, name, "<"
-    $I0 = typeof $P0
-    if $I0 == .PerlUndef goto END
-    ret = 1
-    close $P0
-END:
-    .pcc_begin_return
-    .return ret
-    .pcc_end_return
-.end
-
 .sub handle_directory
     .param string name
     .local string path
@@ -204,7 +184,7 @@ END:
     
     $S0 = clone path
     concat $S0, name
-    $I0 = file_exists( $S0 )
+    stat $I0, $S0, 0
     if $I0 goto OK
     null $S0
 OK:
