@@ -87,18 +87,18 @@ typedef enum {
 
 /* Scratch registers. */
 
-#define ISR1 r12
-#define ISR2 r11
-#define FSR1 f12
-#define FSR2 f11
+#  define ISR1 r12
+#  define ISR2 r11
+#  define FSR1 f12
+#  define FSR2 f11
 
 enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 
-#define emit_op(op) (op << 2)
+#  define emit_op(op) (op << 2)
 
-#define emit_r3(reg) (reg >> 3)
+#  define emit_r3(reg) (reg >> 3)
 
-#define emit_l5(reg) (reg << 5)
+#  define emit_l5(reg) (reg << 5)
 
 /* Move (mr).
  *
@@ -109,11 +109,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *  +-----------------------------------+
  * 0    5 6                     29 30 31
  * */
-#define jit_emit_mov_rr(pc, dst, src) \
-  *(pc++) = emit_op(31) | emit_r3(src); \
-  *(pc++) = (char)(emit_l5(src) | dst); \
-  *(pc++) = (char)(0x3 | src * 8); \
-  *(pc++) = 0x78
+#  define jit_emit_mov_rr(pc, dst, src) \
+    *(pc++) = emit_op(31) | emit_r3(src); \
+    *(pc++) = (char)(emit_l5(src) | dst); \
+    *(pc++) = (char)(0x3 | src * 8); \
+    *(pc++) = 0x78
 
 /* Move from/to special purpose register.
  *
@@ -134,20 +134,20 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * mtctr rS == mtspr 9,rS
  *
  */
-#define jit_emit_mxspr(pc, S, spr, type) \
-  *(pc++) = 31 << 2 | S >> 3; \
-  *(pc++) = (char)(S << 5 | spr); \
-  *(pc++) = type >> 7; \
-  *(pc++) = (char)type << 1
+#  define jit_emit_mxspr(pc, S, spr, type) \
+    *(pc++) = 31 << 2 | S >> 3; \
+    *(pc++) = (char)(S << 5 | spr); \
+    *(pc++) = type >> 7; \
+    *(pc++) = (char)type << 1
 
-#define jit_emit_mtlr(pc, S) \
-  jit_emit_mxspr(pc, S, 8, 467)
+#  define jit_emit_mtlr(pc, S) \
+    jit_emit_mxspr(pc, S, 8, 467)
 
-#define jit_emit_mtctr(pc, S) \
-  jit_emit_mxspr(pc, S, 9, 467)
+#  define jit_emit_mtctr(pc, S) \
+    jit_emit_mxspr(pc, S, 9, 467)
 
-#define jit_emit_mflr(pc, D) \
-  jit_emit_mxspr(pc, D, 8, 339)
+#  define jit_emit_mflr(pc, D) \
+    jit_emit_mxspr(pc, D, 8, 339)
 
 /* Branches (b/bl/ba/bla) with 24 bits literal.
  *
@@ -170,23 +170,23 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  */
 
 
-#define _emit_bx(pc, type, disp) \
-  *(pc++) = (char)(18 << 2 | disp >> 24); \
-  *(pc++) = (char)(disp >> 16); \
-  *(pc++) = (char)(disp >> 8); \
-  *(pc++) = (char)(disp | type)
+#  define _emit_bx(pc, type, disp) \
+    *(pc++) = (char)(18 << 2 | disp >> 24); \
+    *(pc++) = (char)(disp >> 16); \
+    *(pc++) = (char)(disp >> 8); \
+    *(pc++) = (char)(disp | type)
 
-#define jit_emit_b(pc, disp) \
-  jit_emit_bx(pc, 0, disp)
+#  define jit_emit_b(pc, disp) \
+    jit_emit_bx(pc, 0, disp)
 
-#define jit_emit_bl(pc, disp) \
-  jit_emit_bx(pc, 1, disp)
+#  define jit_emit_bl(pc, disp) \
+    jit_emit_bx(pc, 1, disp)
 
-#define jit_emit_ba(pc, disp) \
-  jit_emit_bx(pc, 2, disp)
+#  define jit_emit_ba(pc, disp) \
+    jit_emit_bx(pc, 2, disp)
 
-#define jit_emit_bla(pc, disp) \
-  jit_emit_bx(pc, 3, disp)
+#  define jit_emit_bla(pc, disp) \
+    jit_emit_bx(pc, 3, disp)
 
 /* Branch conditional to count register or link register.
  *
@@ -199,29 +199,29 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * lr [type = 16]
  */
 
-#define jit_emit_bcctrx(pc, bo, bi, type, lk) \
-  *(pc++) = 19 << 2 | bo >> 3; \
-  *(pc++) = (char)(bo << 5 | bi); \
-  *(pc++) = type >> 8; \
-  *(pc++) = (char)(type << 1| lk)
+#  define jit_emit_bcctrx(pc, bo, bi, type, lk) \
+    *(pc++) = 19 << 2 | bo >> 3; \
+    *(pc++) = (char)(bo << 5 | bi); \
+    *(pc++) = type >> 8; \
+    *(pc++) = (char)(type << 1| lk)
 
-#define jit_emit_bcctr(pc, bo, bi) \
-  jit_emit_bcctrx(pc, bo, bi, 528, 0)
+#  define jit_emit_bcctr(pc, bo, bi) \
+    jit_emit_bcctrx(pc, bo, bi, 528, 0)
 
-#define jit_emit_bcctrl(pc, bo, bi) \
-  jit_emit_bcctrx(pc, bo, bi, 528, 1)
+#  define jit_emit_bcctrl(pc, bo, bi) \
+    jit_emit_bcctrx(pc, bo, bi, 528, 1)
 
-#define jit_emit_bctrl(pc) \
-  jit_emit_bcctrl(pc, 20, 0)
+#  define jit_emit_bctrl(pc) \
+    jit_emit_bcctrl(pc, 20, 0)
 
-#define jit_emit_blr(pc) \
-  jit_emit_bcctrx(pc, 20, 0, 16, 0)
+#  define jit_emit_blr(pc) \
+    jit_emit_bcctrx(pc, 20, 0, 16, 0)
 
-#define jit_emit_bclr(pc, bo, bi) \
-  jit_emit_bcctrx(pc, bo, bi, 16, 0)
+#  define jit_emit_bclr(pc, bo, bi) \
+    jit_emit_bcctrx(pc, bo, bi, 16, 0)
 
-#define jit_emit_bclrl(pc, bo, bi) \
-  jit_emit_bcctrx(pc, bo, bi, 16, 1)
+#  define jit_emit_bclrl(pc, bo, bi) \
+    jit_emit_bcctrx(pc, bo, bi, 16, 1)
 
 /* 3 register operation.
  *
@@ -232,11 +232,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *
  */
 
-#define jit_emit_3reg(pc, opcode, D, A, B, OE, type, Rc) \
-  *(pc++) = opcode << 2 | D >> 3; \
-  *(pc++) = (char)(D << 5 | A); \
-  *(pc++) = B << 3 | OE | type >> 7; \
-  *(pc++) = (char)(type << 1 | Rc);
+#  define jit_emit_3reg(pc, opcode, D, A, B, OE, type, Rc) \
+    *(pc++) = opcode << 2 | D >> 3; \
+    *(pc++) = (char)(D << 5 | A); \
+    *(pc++) = B << 3 | OE | type >> 7; \
+    *(pc++) = (char)(type << 1 | Rc);
 
 /* 3 register operation (without OE bit)
  *
@@ -247,42 +247,42 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *
  */
 
-#define jit_emit_3reg_x(pc, opcode, D, A, B, type, Rc) \
-  *(pc++) = opcode << 2 | D >> 3; \
-  *(pc++) = (char)(D << 5 | A); \
-  *(pc++) = B << 3 | type >> 7; \
-  *(pc++) = (char)(type << 1 | Rc);
+#  define jit_emit_3reg_x(pc, opcode, D, A, B, type, Rc) \
+    *(pc++) = opcode << 2 | D >> 3; \
+    *(pc++) = (char)(D << 5 | A); \
+    *(pc++) = B << 3 | type >> 7; \
+    *(pc++) = (char)(type << 1 | Rc);
 
 /* Add [type = 266, OE = 0, Rc = 0]
  *
  * adds rA and rB and place the result in rD.
  */
 
-#define jit_emit_add_rrr(pc, D, A, B) \
-  jit_emit_3reg(pc, 31, D, A, B, 0, 266, 0);
+#  define jit_emit_add_rrr(pc, D, A, B) \
+    jit_emit_3reg(pc, 31, D, A, B, 0, 266, 0);
 
-#define jit_emit_subf(pc, D, A, B) \
-  jit_emit_3reg(pc, 31, D, B, A, 0, 40, 0);
+#  define jit_emit_subf(pc, D, A, B) \
+    jit_emit_3reg(pc, 31, D, B, A, 0, 40, 0);
 
-#define jit_emit_sub_rrr jit_emit_subf
+#  define jit_emit_sub_rrr jit_emit_subf
 
-#define jit_emit_neg_rr(pc, D, A) \
-  jit_emit_3reg(pc, 31, D, A, 0, 0, 104, 0);
+#  define jit_emit_neg_rr(pc, D, A) \
+    jit_emit_3reg(pc, 31, D, A, 0, 0, 104, 0);
 
-#define jit_emit_mul_rrr(pc, D, A, B) \
-  jit_emit_3reg(pc, 31, D, A, B, 0, 235, 0);
+#  define jit_emit_mul_rrr(pc, D, A, B) \
+    jit_emit_3reg(pc, 31, D, A, B, 0, 235, 0);
 
-#define jit_emit_div_rrr(pc, D, A, B) \
-  jit_emit_3reg(pc, 31, D, A, B, 0, 491, 0);
+#  define jit_emit_div_rrr(pc, D, A, B) \
+    jit_emit_3reg(pc, 31, D, A, B, 0, 491, 0);
 
-#define jit_emit_and_rrr(pc, D, A, B) \
-  jit_emit_3reg_x(pc, 31, A, D, B, 28, 0)
+#  define jit_emit_and_rrr(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 28, 0)
 
-#define jit_emit_or_rrr(pc, D, A, B) \
-  jit_emit_3reg_x(pc, 31, A, D, B, 444, 0)
+#  define jit_emit_or_rrr(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 444, 0)
 
-#define jit_emit_xor_rrr(pc, D, A, B) \
-  jit_emit_3reg_x(pc, 31, A, D, B, 316, 0)
+#  define jit_emit_xor_rrr(pc, D, A, B) \
+    jit_emit_3reg_x(pc, 31, A, D, B, 316, 0)
 
 /* 2 register and immediate operation.
  *
@@ -325,46 +325,46 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * stfdu frS,d(rA) [op = 55]
  */
 
-#define jit_emit_2reg(pc, opcode, D, A, immediate) \
-  *(pc++) = opcode << 2 | D >> 3; \
-  *(pc++) = (char)(D << 5 | A); \
-  *(pc++) = ((immediate) >> 8); \
-  *(pc++) = (char)(immediate)
+#  define jit_emit_2reg(pc, opcode, D, A, immediate) \
+    *(pc++) = opcode << 2 | D >> 3; \
+    *(pc++) = (char)(D << 5 | A); \
+    *(pc++) = ((immediate) >> 8); \
+    *(pc++) = (char)(immediate)
 
-#define jit_emit_add_rri_i(pc, D, A, immediate) \
-  jit_emit_2reg(pc, 14, D, A, immediate)
+#  define jit_emit_add_rri_i(pc, D, A, immediate) \
+    jit_emit_2reg(pc, 14, D, A, immediate)
 
-#define jit_emit_addis(pc, D, A, immediate) \
-  jit_emit_2reg(pc, 15, D, A, immediate)
+#  define jit_emit_addis(pc, D, A, immediate) \
+    jit_emit_2reg(pc, 15, D, A, immediate)
 
-#define jit_emit_andil(pc, S, A, uimm) \
-  jit_emit_2reg(pc, 28, S, A, uimm)
+#  define jit_emit_andil(pc, S, A, uimm) \
+    jit_emit_2reg(pc, 28, S, A, uimm)
 
-#define jit_emit_subfic(pc, D, A, immediate) \
-  jit_emit_2reg(pc, 8, D, A, immediate)
+#  define jit_emit_subfic(pc, D, A, immediate) \
+    jit_emit_2reg(pc, 8, D, A, immediate)
 
-#define jit_emit_subi jit_emit_subfic
+#  define jit_emit_subi jit_emit_subfic
 
-#define jit_emit_lwz(pc, D, disp, A) \
-  jit_emit_2reg(pc, 32, D, A, disp)
+#  define jit_emit_lwz(pc, D, disp, A) \
+    jit_emit_2reg(pc, 32, D, A, disp)
 
-#define jit_emit_stw(pc, S, disp, A) \
-  jit_emit_2reg(pc, 36, S, A, disp)
+#  define jit_emit_stw(pc, S, disp, A) \
+    jit_emit_2reg(pc, 36, S, A, disp)
 
-#define jit_emit_stwu(pc, S, disp, A) \
-  jit_emit_2reg(pc, 37, S, A, disp)
+#  define jit_emit_stwu(pc, S, disp, A) \
+    jit_emit_2reg(pc, 37, S, A, disp)
 
-#define jit_emit_stmw(pc, S, disp, A) \
-  jit_emit_2reg(pc, 47, S, A, disp)
+#  define jit_emit_stmw(pc, S, disp, A) \
+    jit_emit_2reg(pc, 47, S, A, disp)
 
-#define jit_emit_lmw(pc, D, disp, A) \
-  jit_emit_2reg(pc, 46, D, A, disp)
+#  define jit_emit_lmw(pc, D, disp, A) \
+    jit_emit_2reg(pc, 46, D, A, disp)
 
-#define jit_emit_lfd(pc, D, disp, A) \
-  jit_emit_2reg(pc, 50, D, A, disp)
+#  define jit_emit_lfd(pc, D, disp, A) \
+    jit_emit_2reg(pc, 50, D, A, disp)
 
-#define jit_emit_stfd(pc, S, disp, A) \
-  jit_emit_2reg(pc, 54, S, A, disp)
+#  define jit_emit_stfd(pc, S, disp, A) \
+    jit_emit_2reg(pc, 54, S, A, disp)
 
 /* A-format operation.
  *
@@ -375,32 +375,32 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *
  */
 
-#define jit_emit_3a(pc, opcode, D, A, B, C, type, Rc) \
-  *(pc++) = opcode << 2 | D >> 3; \
-  *(pc++) = (char)(D << 5 | A); \
-  *(pc++) = (char)(B << 3 | C >> 2); \
-  *(pc++) = (char)(C << 6 | type << 1 | Rc)
+#  define jit_emit_3a(pc, opcode, D, A, B, C, type, Rc) \
+    *(pc++) = opcode << 2 | D >> 3; \
+    *(pc++) = (char)(D << 5 | A); \
+    *(pc++) = (char)(B << 3 | C >> 2); \
+    *(pc++) = (char)(C << 6 | type << 1 | Rc)
 
-#define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
-#define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
-#define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
-#define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
+#  define jit_emit_fadd_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 21, 0)
+#  define jit_emit_fsub_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 20, 0)
+#  define jit_emit_fmul_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, 0, B, 25, 0)
+#  define jit_emit_fdiv_rrr(pc, D, A, B) jit_emit_3a(pc, 63, D, A, B, 0, 18, 0)
 
-#define jit_emit_fabs_rrr(pc, D, A)    jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
-#define jit_emit_fneg_rrr(pc, D, A)    jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
+#  define jit_emit_fabs_rrr(pc, D, A)  jit_emit_3reg_x(pc, 63, D, 0, A, 264, 0)
+#  define jit_emit_fneg_rrr(pc, D, A)   jit_emit_3reg_x(pc, 63, D, 0, A, 40, 0)
 
 /* not in core.ops, but probably should be: */
-#define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
+#  define jit_emit_fsqrt(pc, D, A) jit_emit_3reg(pc, 63, D, 0, A, 0, 18, 0)
 
 /* Load a CPU register from a Parrot register. */
 
-#define jit_emit_mov_rm_i(pc, reg, addr) \
-  jit_emit_lwz(pc, reg, (((char *)addr) - \
-    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+#  define jit_emit_mov_rm_i(pc, reg, addr) \
+    jit_emit_lwz(pc, reg, (((char *)addr) - \
+      ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
-#define jit_emit_mov_rm_n(pc, reg, addr) \
-  jit_emit_lfd(pc, reg, (((char *)addr) - \
-    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+#  define jit_emit_mov_rm_n(pc, reg, addr) \
+    jit_emit_lfd(pc, reg, (((char *)addr) - \
+      ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
 /* compare operation.
  *
@@ -413,14 +413,14 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * bf is the comparison result field to use (we just always use 0)
  */
 
-#define _emit_cmp(pc, t, bf, ra, rb) \
-  *(pc++) = t << 2 | ((int)bf) >> 1; \
-  *(pc++) = (char)(bf << 7 | ra); \
-  *(pc++) = (char)(rb << 3); \
-  *(pc++) = 0
+#  define _emit_cmp(pc, t, bf, ra, rb) \
+    *(pc++) = t << 2 | ((int)bf) >> 1; \
+    *(pc++) = (char)(bf << 7 | ra); \
+    *(pc++) = (char)(rb << 3); \
+    *(pc++) = 0
 
-#define jit_emit_cmp_rr(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
-#define jit_emit_fcmp_rr(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
+#  define jit_emit_cmp_rr(pc, ra, rb) _emit_cmp(pc, 31, 0, ra, rb)
+#  define jit_emit_fcmp_rr(pc, ra, rb) _emit_cmp(pc, 63, 0, ra, rb)
 
 /* compare immediate operation.
  *
@@ -431,14 +431,14 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  *
  */
 
-#define _emit_cmpi(pc, t, bf, ra, simm) \
-  *(pc++) = t << 2 | ((int)bf) >> 1; \
-  *(pc++) = (char)(bf << 7 | ra); \
-  *(pc++) = simm >> 8; \
-  *(pc++) = (char)simm
+#  define _emit_cmpi(pc, t, bf, ra, simm) \
+    *(pc++) = t << 2 | ((int)bf) >> 1; \
+    *(pc++) = (char)(bf << 7 | ra); \
+    *(pc++) = simm >> 8; \
+    *(pc++) = (char)simm
 
-#define jit_emit_cmp_ri(pc, ra, simm) \
-  _emit_cmpi(pc, 11, 0, ra, simm);
+#  define jit_emit_cmp_ri(pc, ra, simm) \
+    _emit_cmpi(pc, 11, 0, ra, simm);
 
 /* Branch conditional to immediate
  *
@@ -453,11 +453,11 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * divided by four.
  */
 
-#define _BLT 0
-#define _BGT 1
-#define _BEQ 2
-#define _BYES (12 << 5)
-#define _BNO (4 << 5)
+#  define _BLT 0
+#  define _BGT 1
+#  define _BEQ 2
+#  define _BYES (12 << 5)
+#  define _BNO (4 << 5)
 
 typedef enum {
     BLT = _BYES | _BLT,
@@ -468,11 +468,11 @@ typedef enum {
     BNE = _BNO | _BEQ
 } branch_t;
 
-#define _emit_bc(pc, opt, bd, aa, lk) \
-  *(pc++) = 16 << 2 | ((int)opt) >> 8; \
-  *(pc++) = (char)(opt&0xff); \
-  *(pc++) = (char)(bd >> 8); \
-  *(pc++) = (char)(bd | aa << 1 | lk)
+#  define _emit_bc(pc, opt, bd, aa, lk) \
+    *(pc++) = 16 << 2 | ((int)opt) >> 8; \
+    *(pc++) = (char)(opt&0xff); \
+    *(pc++) = (char)(bd >> 8); \
+    *(pc++) = (char)(bd | aa << 1 | lk)
 
 static void
 jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
@@ -485,7 +485,8 @@ jit_emit_bc(Parrot_jit_info_t *jit_info, branch_t cond, opcode_t disp) {
             jit_info->optimizer->cur_section)
                 offset +=
                     jit_info->optimizer->cur_section->branch_target->load_size;
-    } else {
+    }
+    else {
         offset = 0;
         Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_PPC_BRANCH;
@@ -513,7 +514,8 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
             jit_info->optimizer->cur_section)
                 offset +=
                     jit_info->optimizer->cur_section->branch_target->load_size;
-    } else {
+    }
+    else {
         offset = 0;
         Parrot_jit_newfixup(jit_info);
         jit_info->arena.fixups->type = JIT_PPC_UBRANCH;
@@ -531,25 +533,25 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 /* Store a CPU register back to a Parrot register. */
 
-#define jit_emit_mov_mr_i(pc, addr, reg) \
-  jit_emit_stw(pc, reg, (((char *)addr) - \
-    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+#  define jit_emit_mov_mr_i(pc, addr, reg) \
+    jit_emit_stw(pc, reg, (((char *)addr) - \
+      ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
-#define jit_emit_mov_mr_n(pc, addr, reg) \
-  jit_emit_stfd(pc, reg, (((char *)addr) - \
-    ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
+#  define jit_emit_mov_mr_n(pc, addr, reg) \
+    jit_emit_stfd(pc, reg, (((char *)addr) - \
+      ((char *)&interpreter->ctx.int_reg.registers[0])), r13)
 
 /*
  * Load a 32-bit immediate value.  If the lower 16 bits are bigger than
  * 0x8000 we clear the higher 16 bits.  If the immediate only uses the
  * lower 16 bits, the third instruction is not necessary.
  */
-#define jit_emit_mov_ri_i(pc, D, imm) \
-  jit_emit_add_rri_i(pc, D, 0, (long)imm & 0xffff); \
-  if (((long)imm & 0xffff) > 0x8000) { \
-    jit_emit_andil(pc, D, D, 0xffff); } \
-  if ((long)imm >> 16 != 0) { \
-    jit_emit_addis(pc, D, D, (long)imm >> 16); }
+#  define jit_emit_mov_ri_i(pc, D, imm) \
+    jit_emit_add_rri_i(pc, D, 0, (long)imm & 0xffff); \
+      if (((long)imm & 0xffff) > 0x8000) { \
+        jit_emit_andil(pc, D, D, 0xffff); } \
+      if ((long)imm >> 16 != 0) { \
+        jit_emit_addis(pc, D, D, (long)imm >> 16); }
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -661,7 +663,7 @@ Parrot_jit_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
 
 /* move reg to mem (i.e. numreg) */
 void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
 {
     jit_emit_mov_mr_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
@@ -669,7 +671,7 @@ Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
 
 /* move mem (i.e. numreg) to reg */
 void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
 {
     jit_emit_mov_rm_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);

@@ -25,57 +25,57 @@
 
 /* Scratch register. */
 
-#define ISR1 emit_EAX
-#define FSR1 0
+#  define ISR1 emit_EAX
+#  define FSR1 0
 
 
-#define emit_b00 0
-#define emit_b01 1
-#define emit_b10 2
-#define emit_b11 3
+#  define emit_b00 0
+#  define emit_b01 1
+#  define emit_b10 2
+#  define emit_b11 3
 
-#define emit_b000 0
-#define emit_b001 1
-#define emit_b010 2
-#define emit_b011 3
-#define emit_b100 4
-#define emit_b101 5
-#define emit_b110 6
-#define emit_b111 7
+#  define emit_b000 0
+#  define emit_b001 1
+#  define emit_b010 2
+#  define emit_b011 3
+#  define emit_b100 4
+#  define emit_b101 5
+#  define emit_b110 6
+#  define emit_b111 7
 
 /* Mod R/M byte */
-#define emit_reg(x) ((x) << 3)
-#define emit_Mod(Mod) ((Mod) << 6)
-#define emit_reg_rm(x) ((x)-1)
+#  define emit_reg(x) ((x) << 3)
+#  define emit_Mod(Mod) ((Mod) << 6)
+#  define emit_reg_rm(x) ((x)-1)
 
 /* Mod values for Mod R/M Byte */
-#define emit_Mod_b00 emit_Mod(emit_b00)
-#define emit_Mod_b01 emit_Mod(emit_b01)
-#define emit_Mod_b10 emit_Mod(emit_b10)
+#  define emit_Mod_b00 emit_Mod(emit_b00)
+#  define emit_Mod_b01 emit_Mod(emit_b01)
+#  define emit_Mod_b10 emit_Mod(emit_b10)
 
 /* special R/M values */
-#define emit_rm_b101 emit_b101
-#define emit_rm_b100 emit_b100
+#  define emit_rm_b101 emit_b101
+#  define emit_rm_b100 emit_b100
 
-#define emit_r_m(pc, reg1, b, i, s, d) \
-  emit_r_X((pc), emit_reg((reg1)-1), (b), (i), (s), (d))
+#  define emit_r_m(pc, reg1, b, i, s, d) \
+    emit_r_X((pc), emit_reg((reg1)-1), (b), (i), (s), (d))
 
 /* ESIB byte */
-#define emit_Scale(scale) ((scale) << 6)
-#define emit_reg_Index(x) (((x)-1) << 3)
-#define emit_reg_Base(x) ((x)-1)
+#  define emit_Scale(scale) ((scale) << 6)
+#  define emit_reg_Index(x) (((x)-1) << 3)
+#  define emit_reg_Base(x) ((x)-1)
 
 /* Scale factor values */
-#define emit_Scale_1 emit_Scale(0)
-#define emit_Scale_2 emit_Scale(1)
-#define emit_Scale_4 emit_Scale(2)
-#define emit_Scale_8 emit_Scale(3)
+#  define emit_Scale_1 emit_Scale(0)
+#  define emit_Scale_2 emit_Scale(1)
+#  define emit_Scale_4 emit_Scale(2)
+#  define emit_Scale_8 emit_Scale(3)
 
-#define emit_Index_None ((emit_b100) << 3)
+#  define emit_Index_None ((emit_b100) << 3)
 
-#define emit_alu_X_r(X, reg) ((emit_b11 << 6) | ((X) << 3) | ((reg) - 1))
+#  define emit_alu_X_r(X, reg) ((emit_b11 << 6) | ((X) << 3) | ((reg) - 1))
 
-#define emit_alu_r_r(reg1,reg2) emit_alu_X_r((reg1 - 1), (reg2))
+#  define emit_alu_r_r(reg1,reg2) emit_alu_X_r((reg1 - 1), (reg2))
 
 static int
 emit_is8bit(long disp)
@@ -260,23 +260,23 @@ emit_shift_r_m(char *pc, int opcode, int reg,
 
 
 /* CDQ - need this to do multiply */
-#define emitm_cdq(pc) *((pc)++) = 0x99
+#  define emitm_cdq(pc) *((pc)++) = 0x99
 
 /* RET */
-#define emitm_ret(pc) *((pc)++) = 0xc3
+#  define emitm_ret(pc) *((pc)++) = 0xc3
 
 /* NOP */
-#define emit_nop(pc) *((pc)++) = 0x90
+#  define emit_nop(pc) *((pc)++) = 0x90
 
 /* PUSHes */
 
-#define emitm_pushl_r(pc, reg) \
-  *(pc++) = 0x50 | (reg - 1)
+#  define emitm_pushl_r(pc, reg) \
+    *(pc++) = 0x50 | (reg - 1)
 
-#define emitm_pushl_i(pc, imm) { \
-  *(pc++) = 0x68; \
-  *(long *)pc = (long)imm; \
-  (pc) += 4; }
+#  define emitm_pushl_i(pc, imm) { \
+    *(pc++) = 0x68; \
+    *(long *)pc = (long)imm; \
+    (pc) += 4; }
 
 static char *
 emit_pushl_m(char *pc, int base, int i, int scale, long disp)
@@ -311,9 +311,9 @@ emit_movb_r_r(char *pc, int reg1, int reg2)
     *(pc++) = emit_alu_r_r(reg1, reg2);
     return pc;
 }
-#define jit_emit_mov_rr_i(pc, reg2, reg1) if (reg1 != reg2) { \
-  *(pc++) = 0x89; \
-  *(pc++) = emit_alu_r_r(reg1, reg2); }
+#  define jit_emit_mov_rr_i(pc, reg2, reg1) if (reg1 != reg2) { \
+    *(pc++) = 0x89; \
+    *(pc++) = emit_alu_r_r(reg1, reg2); }
 
 static char *
 emit_movb_i_r(char *pc, char imm, int reg)
@@ -323,51 +323,51 @@ emit_movb_i_r(char *pc, char imm, int reg)
     return pc;
 }
 
-#define jit_emit_mov_ri_i(pc, reg, imm) { \
-  *(pc++) = 0xb8 | (reg - 1); \
-  *(long *)pc = (long)imm; (pc) += 4; }
+#  define jit_emit_mov_ri_i(pc, reg, imm) { \
+    *(pc++) = 0xb8 | (reg - 1); \
+    *(long *)pc = (long)imm; (pc) += 4; }
 
-#define emitm_movX_Y_Z(op, pc, reg1, b, i, s, d) { \
-  *(pc++) = op; \
-  (pc) = emit_r_m(pc, reg1, b, i, s, (long)d); }
+#  define emitm_movX_Y_Z(op, pc, reg1, b, i, s, d) { \
+    *(pc++) = op; \
+    (pc) = emit_r_m(pc, reg1, b, i, s, (long)d); }
 
-#define emitm_movb_r_m(pc, reg1, b, i, s, d) \
-  emitm_movX_Y_Z(0x88, pc, reg1, b, i, s, d)
+#  define emitm_movb_r_m(pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z(0x88, pc, reg1, b, i, s, d)
 
-#define emitm_movl_r_m(pc, reg1, b, i, s, d) \
-  emitm_movX_Y_Z(0x89, pc, reg1, b, i, s, d)
+#  define emitm_movl_r_m(pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z(0x89, pc, reg1, b, i, s, d)
 
 /* move byte/word with sign extension */
-#define emitm_movsbl_r_m(pc, reg1, b, i, s, d) { \
-  *(pc++) = 0x0f; \
-  emitm_movX_Y_Z(0xBE, pc, reg1, b, i, s, d); \
+#  define emitm_movsbl_r_m(pc, reg1, b, i, s, d) { \
+    *(pc++) = 0x0f; \
+    emitm_movX_Y_Z(0xBE, pc, reg1, b, i, s, d); \
 }
 
-#define emitm_movswl_r_m(pc, reg1, b, i, s, d) { \
-  *(pc++) = 0x0f; \
-  emitm_movX_Y_Z(0xBF, pc, reg1, b, i, s, d); \
+#  define emitm_movswl_r_m(pc, reg1, b, i, s, d) { \
+    *(pc++) = 0x0f; \
+    emitm_movX_Y_Z(0xBF, pc, reg1, b, i, s, d); \
 }
 
-#define emitm_movsbl_r_r(pc, reg1, reg2) { \
-  *(pc++) = 0x0f; \
-  *(pc++) = 0xbe; \
-  *(pc++) = emit_alu_r_r(reg1, reg2); \
+#  define emitm_movsbl_r_r(pc, reg1, reg2) { \
+    *(pc++) = 0x0f; \
+    *(pc++) = 0xbe; \
+    *(pc++) = emit_alu_r_r(reg1, reg2); \
 }
 
-#define emitm_movswl_r_r(pc, reg1, reg2) { \
-  *(pc++) = 0x0f; \
-  *(pc++) = 0xbf; \
-  *(pc++) = emit_alu_r_r(reg1, reg2); \
+#  define emitm_movswl_r_r(pc, reg1, reg2) { \
+    *(pc++) = 0x0f; \
+    *(pc++) = 0xbf; \
+    *(pc++) = emit_alu_r_r(reg1, reg2); \
 }
 
-#define emitm_movb_m_r(pc, reg1, b, i, s, d) \
-  emitm_movX_Y_Z(0x8a, pc, reg1, b, i, s, d)
+#  define emitm_movb_m_r(pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z(0x8a, pc, reg1, b, i, s, d)
 
-#define emitm_movl_m_r(pc, reg1, b, i, s, d) \
-  emitm_movX_Y_Z(0x8b, pc, reg1, b, i, s, d)
+#  define emitm_movl_m_r(pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z(0x8b, pc, reg1, b, i, s, d)
 
-#define emitm_lea_m_r(pc, reg1, b, i, s, d) \
-  emitm_movX_Y_Z(0x8d, pc, reg1, b, i, s, d)
+#  define emitm_lea_m_r(pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z(0x8d, pc, reg1, b, i, s, d)
 
 static char *
 emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
@@ -378,532 +378,541 @@ emit_movb_i_m(char *pc, char imm, int base, int i, int scale, long disp)
     return pc;
 }
 
-#define emitm_movl_i_m(pc, imm, b, i, s, d) { \
-  *(pc++) = 0xc7; \
-  (pc) = emit_r_X(pc, emit_reg(emit_b000), b, i, s, (long)d); \
-  *(long *)(pc) = (long)imm; (pc) += 4; }
+#  define emitm_movl_i_m(pc, imm, b, i, s, d) { \
+    *(pc++) = 0xc7; \
+    (pc) = emit_r_X(pc, emit_reg(emit_b000), b, i, s, (long)d); \
+    *(long *)(pc) = (long)imm; (pc) += 4; }
 
 /* Various ALU formats */
 
-#define emitm_alul_r_r(pc, op, reg1, reg2) { \
-  *(pc++) = op; *(pc++) = emit_alu_r_r(reg1, reg2); }
+#  define emitm_alul_r_r(pc, op, reg1, reg2) { \
+    *(pc++) = op; *(pc++) = emit_alu_r_r(reg1, reg2); }
 
-#define emitm_alub_i_r(pc, op1, op2, imm, reg) { \
-  *(pc++) = op1; *(pc++) = emit_alu_X_r(op2, reg); *(pc++) = (char)(imm); }
+#  define emitm_alub_i_r(pc, op1, op2, imm, reg) { \
+    *(pc++) = op1; *(pc++) = emit_alu_X_r(op2, reg); *(pc++) = (char)(imm); }
 
-#define emitm_alul_i_r(pc, op1, op2, imm, reg) { \
-  *(pc++) = op1; \
-  *(pc++) = emit_alu_X_r(op2, reg); \
-  *(long *)((pc)) = (long)(imm); (pc) += 4; }
+#  define emitm_alul_i_r(pc, op1, op2, imm, reg) { \
+    *(pc++) = op1; \
+    *(pc++) = emit_alu_X_r(op2, reg); \
+    *(long *)((pc)) = (long)(imm); (pc) += 4; }
 
-#define emitm_alul_i_m(pc, op1, op2, imm, b, i, s, d) { \
-  *(pc++) = op1; \
-  (pc) = emit_r_X(pc, emit_reg(op2), b, i, s, d); \
-  *(long *)(pc) = (long)imm; (pc) += 4; }
+#  define emitm_alul_i_m(pc, op1, op2, imm, b, i, s, d) { \
+    *(pc++) = op1; \
+    (pc) = emit_r_X(pc, emit_reg(op2), b, i, s, d); \
+    *(long *)(pc) = (long)imm; (pc) += 4; }
 
-#define emitm_alul_r_m(pc, op, reg, b, i, s, d) { \
-  *(pc++) = op; \
-  pc = emit_r_X(pc, emit_reg(reg-1), b, i, s, (long)d); }
+#  define emitm_alul_r_m(pc, op, reg, b, i, s, d) { \
+    *(pc++) = op; \
+    pc = emit_r_X(pc, emit_reg(reg-1), b, i, s, (long)d); }
 
 
 /* ADDs */
 
-#define emitm_addb_r_r(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x00, reg1, reg2)
+#  define emitm_addb_r_r(pc, reg1, reg2) \
+    emitm_alul_r_r(pc, 0x00, reg1, reg2)
 
-#define emitm_addb_i_r(pc, imm, reg) \
-  emitm_alub_i_r(pc, 0x83, emit_b000, imm, reg)
+#  define emitm_addb_i_r(pc, imm, reg) \
+    emitm_alub_i_r(pc, 0x83, emit_b000, imm, reg)
 
-#define jit_emit_add_rr_i(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x01, reg2, reg1)
+#  define jit_emit_add_rr_i(pc, reg1, reg2) \
+    emitm_alul_r_r(pc, 0x01, reg2, reg1)
 
-#define jit_emit_add_ri_i(pc, reg, imm)   \
-  emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
+#  define jit_emit_add_ri_i(pc, reg, imm)   \
+    emitm_alul_i_r(pc, 0x81, emit_b000, imm, reg)
 
-#define emitm_addl_i_m(pc, imm, b, i, s, d) \
-  emitm_alul_i_m(pc, 0x81, emit_b000, imm, b, i, s, d)
+#  define emitm_addl_i_m(pc, imm, b, i, s, d) \
+    emitm_alul_i_m(pc, 0x81, emit_b000, imm, b, i, s, d)
 
-#define emitm_addl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x01, reg, b, i, s, d)
+#  define emitm_addl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x01, reg, b, i, s, d)
 
-#define emitm_addl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x03, reg, b, i, s, d)
+#  define emitm_addl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x03, reg, b, i, s, d)
 
 /* SUBs */
 
-#define jit_emit_sub_rr_i(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x29, reg2, reg1)
+#  define jit_emit_sub_rr_i(pc, reg1, reg2) \
+    emitm_alul_r_r(pc, 0x29, reg2, reg1)
 
-#define emitm_subl_i_r(pc, imm, reg) \
-  emitm_alul_i_r(pc, 0x81, emit_b101, imm, reg)
-#define jit_emit_sub_ri_i(pc, r, i) emitm_subl_i_r(pc, i, r)
+#  define emitm_subl_i_r(pc, imm, reg) \
+    emitm_alul_i_r(pc, 0x81, emit_b101, imm, reg)
+#  define jit_emit_sub_ri_i(pc, r, i) emitm_subl_i_r(pc, i, r)
 
-#define emitm_subl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x29, reg, b, i, s, d)
+#  define emitm_subl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x29, reg, b, i, s, d)
 
-#define emitm_subl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x2b, reg, b, i, s, d)
+#  define emitm_subl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x2b, reg, b, i, s, d)
 
-#define emitm_subl_i_m(pc, imm, b, i, s, d) \
-  emitm_alul_i_m(pc, 0x81, emit_b101, imm, b, i, s, d)
+#  define emitm_subl_i_m(pc, imm, b, i, s, d) \
+    emitm_alul_i_m(pc, 0x81, emit_b101, imm, b, i, s, d)
 
 /* These are used by both signed and unsigned EDIV, but only unsigned MUL */
-#define emitm_alu_imp_r(pc, op, reg) { \
-  *((pc)++) = 0xf7; \
-  *((pc)++) = emit_alu_X_r(op, reg); }
+#  define emitm_alu_imp_r(pc, op, reg) { \
+    *((pc)++) = 0xf7; \
+    *((pc)++) = emit_alu_X_r(op, reg); }
 
-#define emitm_alu_imp_m(pc, op, b, i, s, d) { \
-  *((pc)++) = 0xf7; \
-  (pc) = emit_r_X(pc, emit_reg(op), b, i, s, d); }
+#  define emitm_alu_imp_m(pc, op, b, i, s, d) { \
+    *((pc)++) = 0xf7; \
+    (pc) = emit_r_X(pc, emit_reg(op), b, i, s, d); }
 
 /* Unsigned MUL and EDIV */
 /* EAX implicit destination in multiply and divide */
 
-#define emitm_umull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b100, (reg2))
+#  define emitm_umull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b100, (reg2))
 
-#define emitm_udivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b110, (reg2))
+#  define emitm_udivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b110, (reg2))
 
-#define emitm_umull_m(pc, b, i, s, d) \
-  emitm_alu_imp_m(pc, emit_b100, b, i, s, d)
+#  define emitm_umull_m(pc, b, i, s, d) \
+    emitm_alu_imp_m(pc, emit_b100, b, i, s, d)
 
-#define emitm_udivl_m(pc, b, i, s, d) \
-  emitm_alu_imp_m(pc, emit_b110, b, i, s, d)
+#  define emitm_udivl_m(pc, b, i, s, d) \
+    emitm_alu_imp_m(pc, emit_b110, b, i, s, d)
 
 /* Signed MUL and EDIV */
 
-#define emitm_sdivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b111, (reg2))
+#  define emitm_sdivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b111, (reg2))
 
-#define emitm_sdivl_m(pc, b, i, s, d) \
-  emitm_alu_imp_m((pc), emit_b111, b, i, s, d)
+#  define emitm_sdivl_m(pc, b, i, s, d) \
+    emitm_alu_imp_m((pc), emit_b111, b, i, s, d)
 
-#define jit_emit_cdq(pc) *(pc)++ = 0x99
+#  define jit_emit_cdq(pc) *(pc)++ = 0x99
 
-#define jit_emit_div_rr_i(pc, r1, r2) { \
+#  define jit_emit_div_rr_i(pc, r1, r2) { \
     if (r1 == r2) { \
-        jit_emit_mov_ri_i(pc, r1, 1); \
+      jit_emit_mov_ri_i(pc, r1, 1); \
     } \
     else { \
-        if (r1 != emit_EAX) { \
-            jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-        } \
-        jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-        jit_emit_cdq(pc); \
-        if (r2 == emit_EDX) { \
-            emitm_sdivl_r(pc, emit_ECX); \
-        } \
-        else { \
-            emitm_sdivl_r(pc, r2); \
-        } \
-        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-        if (r1 != emit_EAX) { \
-            jit_emit_mov_rr_i(pc, r1, emit_EAX); \
-        } \
-    } \
-}
-
-#define jit_emit_cmod_rr_i(pc, r1, r2) { \
-    if (r1 == r2) { \
-        jit_emit_mov_ri_i(pc, r1, 0); \
-    } \
-    else { \
-        if (r1 != emit_EAX) { \
-            jit_emit_mov_rr_i(pc, emit_EAX, r1); \
-        } \
-        jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
-        jit_emit_cdq(pc); \
-        if (r2 == emit_EDX) { \
-            emitm_sdivl_r(pc, emit_ECX); \
-        } \
-        else { \
-            emitm_sdivl_r(pc, r2); \
-        } \
-        if (r1 != emit_EDX) { \
-            jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
-        } \
-    } \
-}
-
-#define jit_emit_div_ri_i(pc, r1, imm) { \
-    if (r1 != emit_EAX) { \
+      if (r1 != emit_EAX) { \
         jit_emit_mov_rr_i(pc, emit_EAX, r1); \
+      } \
+      jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
+      jit_emit_cdq(pc); \
+      if (r2 == emit_EDX) { \
+        emitm_sdivl_r(pc, emit_ECX); \
+      } \
+      else { \
+        emitm_sdivl_r(pc, r2); \
+      } \
+      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
+      if (r1 != emit_EAX) { \
+        jit_emit_mov_rr_i(pc, r1, emit_EAX); \
+      } \
+    } \
+}
+
+#  define jit_emit_cmod_rr_i(pc, r1, r2) { \
+    if (r1 == r2) { \
+      jit_emit_mov_ri_i(pc, r1, 0); \
+    } \
+    else { \
+      if (r1 != emit_EAX) { \
+        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
+      } \
+      jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
+      jit_emit_cdq(pc); \
+      if (r2 == emit_EDX) { \
+        emitm_sdivl_r(pc, emit_ECX); \
+      } \
+      else { \
+        emitm_sdivl_r(pc, r2); \
+      } \
+      if (r1 != emit_EDX) { \
+        jit_emit_mov_rr_i(pc, r1, emit_EDX); \
+        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
+      } \
+    } \
+}
+
+#  define jit_emit_div_ri_i(pc, r1, imm) { \
+    if (r1 != emit_EAX) { \
+      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
     } \
     jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
     jit_emit_cdq(pc); \
     if (r1 != emit_EBX) { \
-        emitm_pushl_r(pc, emit_EBX); \
-        jit_emit_mov_ri_i(pc, emit_EBX, imm); \
-        emitm_sdivl_r(pc, emit_EBX); \
-        emitm_popl_r(pc, emit_EBX); \
+      emitm_pushl_r(pc, emit_EBX); \
+      jit_emit_mov_ri_i(pc, emit_EBX, imm); \
+      emitm_sdivl_r(pc, emit_EBX); \
+      emitm_popl_r(pc, emit_EBX); \
     } \
     else { \
-        emitm_pushl_r(pc, emit_EDI); \
-        jit_emit_mov_ri_i(pc, emit_EDI, imm); \
-        emitm_sdivl_r(pc, emit_EDI); \
-        emitm_popl_r(pc, emit_EDI); \
+      emitm_pushl_r(pc, emit_EDI); \
+      jit_emit_mov_ri_i(pc, emit_EDI, imm); \
+      emitm_sdivl_r(pc, emit_EDI); \
+      emitm_popl_r(pc, emit_EDI); \
     } \
     jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
     if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EAX); \
+      jit_emit_mov_rr_i(pc, r1, emit_EAX); \
     } \
 }
 
-#define jit_emit_cmod_ri_i(pc, r1, imm) { \
+#  define jit_emit_cmod_ri_i(pc, r1, imm) { \
     if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
+      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
     } \
     jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
     jit_emit_cdq(pc); \
     if (r1 != emit_EBX) { \
-        emitm_pushl_r(pc, emit_EBX); \
-        jit_emit_mov_ri_i(pc, emit_EBX, imm); \
-        emitm_sdivl_r(pc, emit_EBX); \
-        emitm_popl_r(pc, emit_EBX); \
+      emitm_pushl_r(pc, emit_EBX); \
+      jit_emit_mov_ri_i(pc, emit_EBX, imm); \
+      emitm_sdivl_r(pc, emit_EBX); \
+      emitm_popl_r(pc, emit_EBX); \
     } \
     else { \
-        emitm_pushl_r(pc, emit_EDI); \
-        jit_emit_mov_ri_i(pc, emit_EDI, imm); \
-        emitm_sdivl_r(pc, emit_EDI); \
-        emitm_popl_r(pc, emit_EDI); \
+      emitm_pushl_r(pc, emit_EDI); \
+      jit_emit_mov_ri_i(pc, emit_EDI, imm); \
+      emitm_sdivl_r(pc, emit_EDI); \
+      emitm_popl_r(pc, emit_EDI); \
     } \
     if (r1 != emit_EDX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
+      jit_emit_mov_rr_i(pc, r1, emit_EDX); \
+      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
     } \
 }
 
-#define jit_emit_div_rm_i(pc, r1, mem) { \
+#  define jit_emit_div_rm_i(pc, r1, mem) { \
     if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
+      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
     } \
     jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
     jit_emit_cdq(pc); \
     emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
     jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
     if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EAX); \
+      jit_emit_mov_rr_i(pc, r1, emit_EAX); \
     } \
 }
 
-#define jit_emit_cmod_rm_i(pc, r1, mem) { \
+#  define jit_emit_cmod_rm_i(pc, r1, mem) { \
     if (r1 != emit_EAX) { \
-        jit_emit_mov_rr_i(pc, emit_EAX, r1); \
+      jit_emit_mov_rr_i(pc, emit_EAX, r1); \
     } \
     jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX); \
     jit_emit_cdq(pc); \
     emitm_sdivl_m(pc, 0,0,0, (long)(mem)); \
     if (r1 != emit_EDX) { \
-        jit_emit_mov_rr_i(pc, r1, emit_EDX); \
-        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
+      jit_emit_mov_rr_i(pc, r1, emit_EDX); \
+      jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX); \
     } \
 }
 
-#define emitm_smull_op(pc) { *((pc)++) = 0x0f; *((pc)++) = 0xaf; }
+#  define emitm_smull_op(pc) { *((pc)++) = 0x0f; *((pc)++) = 0xaf; }
 
-#define emitm_smull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b101, (reg2))
+#  define emitm_smull_r(pc, reg2) emitm_alu_imp_r((pc), emit_b101, (reg2))
 
-#define jit_emit_mul_rr_i(pc, reg1, reg2) { \
-  emitm_smull_op(pc); \
-  *((pc)++) = emit_alu_r_r(reg1, reg2); }
+#  define jit_emit_mul_rr_i(pc, reg1, reg2) { \
+    emitm_smull_op(pc); \
+    *((pc)++) = emit_alu_r_r(reg1, reg2); }
 
-#define emitm_smull_r_m(pc, reg1, b, i, s, d) { \
-  emitm_smull_op(pc); \
-  (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
+#  define emitm_smull_r_m(pc, reg1, b, i, s, d) { \
+    emitm_smull_op(pc); \
+    (pc) = emit_r_X((pc), emit_reg(reg1 - 1), b, i, s, (long)d); }
 
-#define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
-  *(pc++) = 0x69; \
-  *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
-  *(long *)(pc) = (long)imm; \
-  pc += 4
+#  define jit_emit_mul_rir_i(pc, reg2, imm, reg1) \
+    *(pc++) = 0x69; \
+    *(pc++) = 0xc0 | (reg1 - 1) | (reg2 - 1) << 3; \
+    *(long *)(pc) = (long)imm; \
+    pc += 4
 
-#define jit_emit_mul_ri_i(pc, r, imm) jit_emit_mul_rir_i(pc, r, imm, r)
+#  define jit_emit_mul_ri_i(pc, r, imm) jit_emit_mul_rir_i(pc, r, imm, r)
 
-#define jit_emit_mul_rim_ii(pc, dst, imm, add) \
-  *(pc++) = 0x69; \
-  *(pc++) = 0x05 | (dst - 1) << 3; \
-  *(long *)(pc) = (long)add; \
-  pc += 4; \
-  *(long *)(pc) = imm; \
-  pc += 4
+#  define jit_emit_mul_rim_ii(pc, dst, imm, add) \
+    *(pc++) = 0x69; \
+    *(pc++) = 0x05 | (dst - 1) << 3; \
+    *(long *)(pc) = (long)add; \
+    pc += 4; \
+    *(long *)(pc) = imm; \
+    pc += 4
 
 
 /* NEG */
 
-#define jit_emit_neg_r_i(pc, reg) emitm_alu_imp_r(pc, emit_b011, reg)
+#  define jit_emit_neg_r_i(pc, reg) emitm_alu_imp_r(pc, emit_b011, reg)
 
-#define emitm_negl_m(pc, b, i, s, d) emitm_alu_imp_m(pc, emit_b011, b, i, s, d)
+#  define emitm_negl_m(pc, b, i, s, d) \
+    emitm_alu_imp_m(pc, emit_b011, b, i, s, d)
 
 /* AND */
 
-#define emit_andl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x21, reg1, reg2)
-#define jit_emit_band_rr_i(pc, r1, r2) emit_andl_r_r(pc, r2, r1)
+#  define emit_andl_r_r(pc, reg1, reg2) emitm_alul_r_r(pc, 0x21, reg1, reg2)
+#  define jit_emit_band_rr_i(pc, r1, r2) emit_andl_r_r(pc, r2, r1)
 
-#define jit_emit_band_ri_i(pc, reg, imm)  \
-  emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
+#  define jit_emit_band_ri_i(pc, reg, imm)  \
+    emitm_alul_i_r(pc, 0x81, emit_b100, imm, reg)
 
-#define emitm_andl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x21, reg, b, i, s, d)
+#  define emitm_andl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x21, reg, b, i, s, d)
 
-#define emitm_andl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x23, reg, b, i, s, d)
+#  define emitm_andl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x23, reg, b, i, s, d)
 
-#define emitm_andl_i_m(pc, imm, b, i, s, d) \
-  emitm_alul_i_m(pc, 0x81, emit_b100, imm, b, i, s, d)
+#  define emitm_andl_i_m(pc, imm, b, i, s, d) \
+    emitm_alul_i_m(pc, 0x81, emit_b100, imm, b, i, s, d)
 
 /* TEST for zero */
-#define jit_emit_test_r_i(pc, reg1) emitm_alul_r_r(pc, 0x85, reg1, reg1)
+#  define jit_emit_test_r_i(pc, reg1) emitm_alul_r_r(pc, 0x85, reg1, reg1)
 
 /* OR */
 
-#define jit_emit_bor_rr_i(pc, reg1, reg2) emitm_alul_r_r(pc, 0x9, reg2, reg1)
+#  define jit_emit_bor_rr_i(pc, reg1, reg2) emitm_alul_r_r(pc, 0x9, reg2, reg1)
 
-#define jit_emit_bor_ri_i(pc, reg, imm) \
-  emitm_alul_i_r(pc, 0x81, emit_b001, imm, reg)
+#  define jit_emit_bor_ri_i(pc, reg, imm) \
+    emitm_alul_i_r(pc, 0x81, emit_b001, imm, reg)
 
-#define emitm_orl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x09, reg, b, i, s, d)
+#  define emitm_orl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x09, reg, b, i, s, d)
 
-#define emitm_orl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x0b, reg, b, i, s, d)
+#  define emitm_orl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x0b, reg, b, i, s, d)
 
-#define emitm_orl_i_m(pc, imm, b, i, s, d) \
-  emitm_alul_i_m(pc, 0x81, emit_b001, imm, b, i, s, d)
+#  define emitm_orl_i_m(pc, imm, b, i, s, d) \
+    emitm_alul_i_m(pc, 0x81, emit_b001, imm, b, i, s, d)
 
 /* XOR */
 
-#define jit_emit_bxor_rr_i(pc, reg1, reg2) emitm_alul_r_r(pc, 0x31, reg2, reg1)
+#  define jit_emit_bxor_rr_i(pc, reg1, reg2) \
+    emitm_alul_r_r(pc, 0x31, reg2, reg1)
 
-#define jit_emit_bxor_ri_i(pc, reg, imm) \
-  emitm_alul_i_r(pc, 0x81, emit_b110, imm, reg)
+#  define jit_emit_bxor_ri_i(pc, reg, imm) \
+    emitm_alul_i_r(pc, 0x81, emit_b110, imm, reg)
 
-#define emitm_xorl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x31, reg, b, i, s, d)
+#  define emitm_xorl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x31, reg, b, i, s, d)
 
-#define emitm_xorl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x33, reg, b, i, s, d)
+#  define emitm_xorl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x33, reg, b, i, s, d)
 
-#define emitm_xorl_i_m(pc, imm, b, i, s, d) \
-  emitm_alul_i_m(pc, 0x81, emit_b110, imm, b, i, s, d)
+#  define emitm_xorl_i_m(pc, imm, b, i, s, d) \
+    emitm_alul_i_m(pc, 0x81, emit_b110, imm, b, i, s, d)
 
 /* NOT */
 
-#define jit_emit_not_r_i(pc, reg) emitm_alu_imp_r(pc, emit_b010, reg)
-#define emitm_notl_m(pc, b, i, s, d) emitm_alu_imp_m(pc, emit_b010, b, i, s, d)
+#  define jit_emit_not_r_i(pc, reg) emitm_alu_imp_r(pc, emit_b010, reg)
+#  define emitm_notl_m(pc, b, i, s, d) \
+    emitm_alu_imp_m(pc, emit_b010, b, i, s, d)
 
 /* SHL */
 
-#define jit_emit_shl_ri_i(pc, reg, imm) \
-  { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
+#  define jit_emit_shl_ri_i(pc, reg, imm) \
+    { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
 
-#define emitm_shll_i_m(pc, imm, b, i, s, d) \
-  { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
+#  define emitm_shll_i_m(pc, imm, b, i, s, d) \
+    { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
 
-#define emitm_shll_r_r(pc, reg1, reg2) \
-  { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
+#  define emitm_shll_r_r(pc, reg1, reg2) \
+    { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
 
-#define emitm_shll_r_m(pc, reg, b, i, s, d) \
-  { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
+#  define emitm_shll_r_m(pc, reg, b, i, s, d) \
+    { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
 
 /* SHR */
 
-#define jit_emit_shr_ri_i(pc, reg, imm) \
-  { pc = emit_shift_i_r(pc, emit_b101, imm, reg); }
+#  define jit_emit_shr_ri_i(pc, reg, imm) \
+    { pc = emit_shift_i_r(pc, emit_b101, imm, reg); }
 
-#define emitm_shrl_i_m(pc, imm, b, i, s, d) \
-  { pc = emit_shift_i_m(pc, emit_b101, imm, b, i, s, d); }
+#  define emitm_shrl_i_m(pc, imm, b, i, s, d) \
+    { pc = emit_shift_i_m(pc, emit_b101, imm, b, i, s, d); }
 
-#define emitm_shrl_r_r(pc, reg1, reg2) \
-  { pc = emit_shift_r_r(pc, emit_b101, reg1, reg2); }
+#  define emitm_shrl_r_r(pc, reg1, reg2) \
+    { pc = emit_shift_r_r(pc, emit_b101, reg1, reg2); }
 
-#define emitm_shrl_r_m(pc, reg, b, i, s, d) \
-  { pc = emit_shift_r_m(pc, emit_b101, reg, b, i, s, d); }
+#  define emitm_shrl_r_m(pc, reg, b, i, s, d) \
+    { pc = emit_shift_r_m(pc, emit_b101, reg, b, i, s, d); }
 
 /* SAL */
 
-#define emitm_sall_i_r(pc, imm, reg) \
-  { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
+#  define emitm_sall_i_r(pc, imm, reg) \
+    { pc = emit_shift_i_r(pc, emit_b100, imm, reg); }
 
-#define emitm_sall_i_m(pc, imm, b, i, s, d) \
-  { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
+#  define emitm_sall_i_m(pc, imm, b, i, s, d) \
+    { pc = emit_shift_i_m(pc, emit_b100, imm, b, i, s, d); }
 
-#define emitm_sall_r_r(pc, reg1, reg2) \
-  { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
+#  define emitm_sall_r_r(pc, reg1, reg2) \
+    { pc = emit_shift_r_r(pc, emit_b100, reg1, reg2); }
 
-#define emitm_sall_r_m(pc, reg, b, i, s, d) \
- { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
+#  define emitm_sall_r_m(pc, reg, b, i, s, d) \
+    { pc = emit_shift_r_m(pc, emit_b100, reg, b, i, s, d); }
 
 /* SAR */
 
-#define jit_emit_lsr_ri_i(pc, reg, imm) \
-  { pc = emit_shift_i_r(pc, emit_b111, imm, reg); }
+#  define jit_emit_lsr_ri_i(pc, reg, imm) \
+    { pc = emit_shift_i_r(pc, emit_b111, imm, reg); }
 
-#define emitm_sarl_i_m(pc, imm, b, i, s, d) \
-  { pc = emit_shift_i_m(pc, emit_b111, imm, b, i, s, d); }
+#  define emitm_sarl_i_m(pc, imm, b, i, s, d) \
+    { pc = emit_shift_i_m(pc, emit_b111, imm, b, i, s, d); }
 
-#define emitm_sarl_r_r(pc, reg1, reg2) \
-  { pc = emit_shift_r_r(pc, emit_b111, reg1, reg2); }
+#  define emitm_sarl_r_r(pc, reg1, reg2) \
+    { pc = emit_shift_r_r(pc, emit_b111, reg1, reg2); }
 
-#define emitm_sarl_r_m(pc, reg, b, i, s, d) \
-  { pc = emit_shift_r_m(pc, emit_b111, reg, b, i, s, d); }
+#  define emitm_sarl_r_m(pc, reg, b, i, s, d) \
+    { pc = emit_shift_r_m(pc, emit_b111, reg, b, i, s, d); }
 
 /* interface, shift r1 by r2 bits */
 
-#define jit_emit_shl_rr_i(pc, r1, r2) { \
+#  define jit_emit_shl_rr_i(pc, r1, r2) { \
     jit_emit_mov_rr_i(pc, emit_ECX, r2); \
     emitm_shll_r_r(pc, emit_ECX, r1); \
 }
 
-#define jit_emit_shl_rm_i(pc, r1, m) { \
+#  define jit_emit_shl_rm_i(pc, r1, m) { \
     jit_emit_mov_rm_i(pc, emit_ECX, m); \
     emitm_shll_r_r(pc, emit_ECX, r1); \
 }
 
 /* shr seems to be the arithmetic shift */
-#define jit_emit_shr_rr_i(pc, r1, r2) { \
+#  define jit_emit_shr_rr_i(pc, r1, r2) { \
     jit_emit_mov_rr_i(pc, emit_ECX, r2); \
     emitm_sarl_r_r(pc, emit_ECX, r1); \
 }
 
-#define jit_emit_shr_rm_i(pc, r1, m) { \
+#  define jit_emit_shr_rm_i(pc, r1, m) { \
     jit_emit_mov_rm_i(pc, emit_ECX, m); \
     emitm_sarl_r_r(pc, emit_ECX, r1); \
 }
 
-#define jit_emit_lsr_rr_i(pc, r1, r2) { \
+#  define jit_emit_lsr_rr_i(pc, r1, r2) { \
     jit_emit_mov_rr_i(pc, emit_ECX, r2); \
     emitm_shrl_r_r(pc, emit_ECX, r1); \
 }
 
-#define jit_emit_lsr_rm_i(pc, r1, m) { \
+#  define jit_emit_lsr_rm_i(pc, r1, m) { \
     jit_emit_mov_rm_i(pc, emit_ECX, m); \
     emitm_shrl_r_r(pc, emit_ECX, r1); \
 }
 /* MOV (reg),reg */
-#define emit_movm_r_r(pc, src, dest) \
-  *(pc++) = 0x8b; \
-  *(pc++) = src | dest << 3
+#  define emit_movm_r_r(pc, src, dest) \
+    *(pc++) = 0x8b; \
+    *(pc++) = src | dest << 3
 
 /* MOV X(reg),reg */
-#define emit_movb_i_r_r(pc, imm, src, dest) \
-  *(pc++) = 0x8b; \
-  *(pc++) = 0x40 | (src - 1) | (dest - 1) << 3; \
-  *(pc++) = imm
+#  define emit_movb_i_r_r(pc, imm, src, dest) \
+    *(pc++) = 0x8b; \
+    *(pc++) = 0x40 | (src - 1) | (dest - 1) << 3; \
+    *(pc++) = imm
 
 /* INC / DEC */
-#define jit_emit_inc_r_i(pc, reg) *(pc++) = 0x40 | (reg - 1)
-#define jit_emit_dec_r_i(pc, reg) *(pc++) = 0x48 | (reg - 1)
+#  define jit_emit_inc_r_i(pc, reg) *(pc++) = 0x40 | (reg - 1)
+#  define jit_emit_dec_r_i(pc, reg) *(pc++) = 0x48 | (reg - 1)
 
 /* Floating point ops */
 
-#define emitm_floatop 0xd8  /* 11011000 */
-#define jit_emit_dec_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF6; }
-#define jit_emit_inc_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF7; }
+#  define emitm_floatop 0xd8  /* 11011000 */
+#  define jit_emit_dec_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF6; }
+#  define jit_emit_inc_fsp(pc) { *((pc)++) = 0xD9; *((pc)++) = 0xF7; }
 
-#define emitm_fl_2(pc, mf, opa, opb, b, i, s, d) { \
-  *((pc)++) = emitm_floatop | (mf << 1) | opa; \
-  (pc) = emit_r_X(pc, emit_reg(opb), b, i, s, (long)d); }
+#  define emitm_fl_2(pc, mf, opa, opb, b, i, s, d) { \
+    *((pc)++) = emitm_floatop | (mf << 1) | opa; \
+    (pc) = emit_r_X(pc, emit_reg(opb), b, i, s, (long)d); }
 
-#define emitm_fl_3(pc, d_p_opa, opb_r, sti) { \
-  *((pc)++) = emitm_floatop | d_p_opa; \
-  *((pc)++) = 0xc0 | (opb_r << 3) | sti; }
+#  define emitm_fl_3(pc, d_p_opa, opb_r, sti) { \
+    *((pc)++) = emitm_floatop | d_p_opa; \
+    *((pc)++) = 0xc0 | (opb_r << 3) | sti; }
 
-#define emitm_fl_4(pc, op) { \
-  *((pc)++) = emitm_floatop | emit_b001; \
-  *((pc)++) = 0xe0 | op; }
+#  define emitm_fl_4(pc, op) { \
+    *((pc)++) = emitm_floatop | emit_b001; \
+    *((pc)++) = 0xe0 | op; }
 
 /* Integer loads and stores */
-#define emitm_fildl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b01, 1, emit_b000, b, i, s, d)
+#  define emitm_fildl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b01, 1, emit_b000, b, i, s, d)
 
-#define emitm_fistpl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b01, 1, emit_b011, b, i, s, d)
+#  define emitm_fistpl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b01, 1, emit_b011, b, i, s, d)
 
-#define emitm_fistl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b01, 1, emit_b010, b, i, s, d)
+#  define emitm_fistl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b01, 1, emit_b010, b, i, s, d)
 
 /* long long integer load/store */
-#define emitm_fildll(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b11, 1, emit_b101, b, i, s, d)
+#  define emitm_fildll(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b11, 1, emit_b101, b, i, s, d)
 
-#define emitm_fistpll(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b11, 1, emit_b111, b, i, s, d)
+#  define emitm_fistpll(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b11, 1, emit_b111, b, i, s, d)
 
 /* Double loads and stores */
-#define emitm_fldl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b10, 1, emit_b000, b, i, s, d)
+#  define emitm_fldl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b10, 1, emit_b000, b, i, s, d)
 
-#define emitm_fstpl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b10, 1, emit_b011, b, i, s, d)
+#  define emitm_fstpl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b10, 1, emit_b011, b, i, s, d)
 
-#define emitm_fstl(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b10, 1, emit_b010, b, i, s, d)
+#  define emitm_fstl(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b10, 1, emit_b010, b, i, s, d)
 
 /* long double load / store */
-#define emitm_fldt(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b01, 1, emit_b101, b, i, s, d)
+#  define emitm_fldt(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b01, 1, emit_b101, b, i, s, d)
 
-#define emitm_fstpt(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b01, 1, emit_b111, b, i, s, d)
+#  define emitm_fstpt(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b01, 1, emit_b111, b, i, s, d)
 
 /* short float load / store */
-#define emitm_flds(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b00, 1, emit_b000, b, i, s, d)
+#  define emitm_flds(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b00, 1, emit_b000, b, i, s, d)
 
-#define emitm_fstps(pc, b, i, s, d) \
-  emitm_fl_2(pc, emit_b00, 1, emit_b010, b, i, s, d)
+#  define emitm_fstps(pc, b, i, s, d) \
+    emitm_fl_2(pc, emit_b00, 1, emit_b010, b, i, s, d)
 
-#if NUMVAL_SIZE == 8
+#  if NUMVAL_SIZE == 8
 
-#define jit_emit_fload_m_n(pc, address) \
-  emitm_fldl(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fload_m_n(pc, address) \
+      emitm_fldl(pc, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_fstore_m_n(pc, address) \
-  emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fstore_m_n(pc, address) \
+      emitm_fstpl(pc, emit_None, emit_None, emit_None, address)
 
-#else
+#  else /* NUMVAL_SIZE */ 
 
-#define jit_emit_fload_m_n(pc, address) \
-  emitm_fldt(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fload_m_n(pc, address) \
+      emitm_fldt(pc, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_fstore_m_n(pc, address) \
-  emitm_fstpt(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fstore_m_n(pc, address) \
+      emitm_fstpt(pc, emit_None, emit_None, emit_None, address)
 
-#endif
-#if INTVAL_SIZE == 4
-#define jit_emit_fload_m_i(pc, address) \
-  emitm_fildl(pc, emit_None, emit_None, emit_None, address)
-#define jit_emit_fstore_m_i(pc, m) \
-  emitm_fistpl(pc, emit_None, emit_None, emit_None, m)
-#else
-#define jit_emit_fload_m_i(pc, address) \
-  emitm_fildll(pc, emit_None, emit_None, emit_None, address)
-#define jit_emit_fstore_m_i(pc, m) \
-  emitm_fistpll(pc, emit_None, emit_None, emit_None, m)
-#endif
+#  endif /* NUMVAL_SIZE */
+
+#  if INTVAL_SIZE == 4
+
+#    define jit_emit_fload_m_i(pc, address) \
+      emitm_fildl(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fstore_m_i(pc, m) \
+      emitm_fistpl(pc, emit_None, emit_None, emit_None, m)
+
+#  else /* INTVAL_SIZE */
+
+#    define jit_emit_fload_m_i(pc, address) \
+      emitm_fildll(pc, emit_None, emit_None, emit_None, address)
+#    define jit_emit_fstore_m_i(pc, m) \
+      emitm_fistpll(pc, emit_None, emit_None, emit_None, m)
+
+#  endif /* INTVAL_SIZE */
+
 /* 0xD8 ops */
-#define emitm_fadd(pc, sti) emitm_fl_3(pc, emit_b000, emit_b000, sti)
-#define emitm_fmul(pc, sti) emitm_fl_3(pc, emit_b000, emit_b001, sti)
-#define emitm_fsub(pc, sti) emitm_fl_3(pc, emit_b000, emit_b100, sti)
-#define emitm_fdiv(pc, sti) emitm_fl_3(pc, emit_b000, emit_b110, sti)
+#  define emitm_fadd(pc, sti) emitm_fl_3(pc, emit_b000, emit_b000, sti)
+#  define emitm_fmul(pc, sti) emitm_fl_3(pc, emit_b000, emit_b001, sti)
+#  define emitm_fsub(pc, sti) emitm_fl_3(pc, emit_b000, emit_b100, sti)
+#  define emitm_fdiv(pc, sti) emitm_fl_3(pc, emit_b000, emit_b110, sti)
 
 /* 0xD9 ops */
-#define emitm_fldz(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xee; }
-#define emitm_fld1(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xe8; }
+#  define emitm_fldz(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xee; }
+#  define emitm_fld1(pc) { *((pc)++) = 0xd9; *((pc)++) = 0xe8; }
 
 /* FXCH ST,ST(i) , optimize 2 consecutive fxch with same reg */
-#define emitm_fxch(pc, sti) { \
-        emitm_fl_3(pc, emit_b001, emit_b001, sti); \
+#  define emitm_fxch(pc, sti) { \
+    emitm_fl_3(pc, emit_b001, emit_b001, sti); \
 }
 
 /* FLD ST,ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
 static unsigned char *lastpc;
-#define emitm_fld(pc, sti) do { \
+#  define emitm_fld(pc, sti) do { \
     if ((unsigned char *)(pc) == (lastpc + 2) && \
-            (int)(*lastpc) == (int)0xDD && \
-            (int)lastpc[1] == (int)(0xD8+sti+1)) \
-        lastpc[1] = 0xD0+sti+1; \
+      (int)(*lastpc) == (int)0xDD && \
+      (int)lastpc[1] == (int)(0xD8+sti+1)) \
+      lastpc[1] = 0xD0+sti+1; \
     else \
-        emitm_fl_3(pc, emit_b001, emit_b000, sti); \
+      emitm_fl_3(pc, emit_b001, emit_b000, sti); \
 } while(0)
 
 /* 0xDA, 0xDB ops */
@@ -913,116 +922,116 @@ static unsigned char *lastpc;
 
 /* 0xDD ops */
 /* FFree ST(i) */
-#define emitm_ffree(pc, sti) emitm_fl_3(pc, emit_b101, emit_b000, sti)
+#  define emitm_ffree(pc, sti) emitm_fl_3(pc, emit_b101, emit_b000, sti)
 
 /* FST ST(i) = ST */
-#define emitm_fst(pc, sti) emitm_fl_3(pc, emit_b101, emit_b010, sti)
+#  define emitm_fst(pc, sti) emitm_fl_3(pc, emit_b101, emit_b010, sti)
 
 /* FSTP ST(i) = ST, POP */
-#define emitm_fstp(pc, sti) { \
+#  define emitm_fstp(pc, sti) { \
     lastpc = (unsigned char*) pc; \
     emitm_fl_3(pc, emit_b101, emit_b011, sti); \
 }
 
 /* FUCOM ST(i) <=> ST  unordered compares */
-#define emitm_fucom(pc, sti) emitm_fl_3(pc, emit_b101, emit_b100, sti)
+#  define emitm_fucom(pc, sti) emitm_fl_3(pc, emit_b101, emit_b100, sti)
 
 /* FUCOMP ST(i) <=> ST, POP */
-#define emitm_fucomp(pc, sti) emitm_fl_3(pc, emit_b101, emit_b101, sti)
+#  define emitm_fucomp(pc, sti) emitm_fl_3(pc, emit_b101, emit_b101, sti)
 
 /* 0xDE ops */
 /* Add ST(i) = ST + ST(i); POP  */
-#define emitm_faddp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b000, sti)
+#  define emitm_faddp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b000, sti)
 
 /* Mul ST(i) = ST * ST(i); POP  */
-#define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
+#  define emitm_fmulp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b001, sti)
 
 /* SubR ST(i) = ST(i) / ST; POP  */
-#define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
+#  define emitm_fsubrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b100, sti)
 
 /* Sub ST(i) = ST - ST(i); POP  */
-#define emitm_fsubp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b101, sti)
+#  define emitm_fsubp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b101, sti)
 
 /* DivR ST(i) = ST(i) / ST(0); POP  */
-#define emitm_fdivrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b110, sti)
+#  define emitm_fdivrp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b110, sti)
 
 /* Add ST(i) = ST(0) / ST(i); POP ST(0) */
-#define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
+#  define emitm_fdivp(pc, sti) emitm_fl_3(pc, emit_b110, emit_b111, sti)
 
 /* 0xDF OPS: FCOMIP, FUCOMIP PPRO */
 
 /* Negate - called change sign */
-#define emitm_fchs(pc) emitm_fl_4(pc, 0)
+#  define emitm_fchs(pc) emitm_fl_4(pc, 0)
 
 /* ABS - ST(0) = ABS(ST(0)) */
-#define emitm_fabs(pc) emitm_fl_4(pc, 1)
+#  define emitm_fabs(pc) emitm_fl_4(pc, 1)
 
 /* Comparisions */
 
-#define emitm_fcom(pc, sti) emitm_fl_3(pc, emit_b000, emit_b010, sti)
-#define emitm_fcomi(pc, sti) emitm_fl_3(pc, emit_b011, emit_b110, sti)
-#define emitm_fcomip(pc, sti) emitm_fl_3(pc, emit_b111, emit_b110, sti)
+#  define emitm_fcom(pc, sti) emitm_fl_3(pc, emit_b000, emit_b010, sti)
+#  define emitm_fcomi(pc, sti) emitm_fl_3(pc, emit_b011, emit_b110, sti)
+#  define emitm_fcomip(pc, sti) emitm_fl_3(pc, emit_b111, emit_b110, sti)
 
-#define emitm_fcomp(pc, sti) emitm_fl_3(pc, emit_b000, emit_b011, sti)
+#  define emitm_fcomp(pc, sti) emitm_fl_3(pc, emit_b000, emit_b011, sti)
 
-#define emitm_fcompp(pc) { *((pc)++) = 0xde; *((pc)++) = 0xd9; }
+#  define emitm_fcompp(pc) { *((pc)++) = 0xde; *((pc)++) = 0xd9; }
 
-#define emitm_fcom_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b010, b, i, s, d)
+#  define emitm_fcom_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b010, b, i, s, d)
 
-#define emitm_fcomp_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b011, b, i, s, d)
+#  define emitm_fcomp_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b011, b, i, s, d)
 
 /* ST -= real64 */
-#define emitm_fsub_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b100, b, i, s, d)
-#define emitm_fadd_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b000, b, i, s, d)
+#  define emitm_fsub_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b100, b, i, s, d)
+#  define emitm_fadd_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b000, b, i, s, d)
 
 /* ST *= real64 */
-#define emitm_fmul_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b001, b, i, s, d)
+#  define emitm_fmul_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b001, b, i, s, d)
 /* ST /= real64 */
-#define emitm_fdiv_m(pc,b,i,s,d) \
-  emitm_fl_2(pc, emit_b10, 0, emit_b110, b, i, s, d)
+#  define emitm_fdiv_m(pc,b,i,s,d) \
+    emitm_fl_2(pc, emit_b10, 0, emit_b110, b, i, s, d)
 
 /* Ops Needed to support loading EFLAGs for conditional branches */
-#define emitm_fstw(pc) emitm_fl_3(pc, emit_b111, emit_b100, emit_b000)
+#  define emitm_fstw(pc) emitm_fl_3(pc, emit_b111, emit_b100, emit_b000)
 
-#define emitm_sahf(pc) *((pc)++) = 0x9e
+#  define emitm_sahf(pc) *((pc)++) = 0x9e
 
 /* misc float */
-#define emitm_ftst(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xE4; }
-#define emitm_fprem(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF8; }
-#define emitm_fprem1(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF5; }
+#  define emitm_ftst(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xE4; }
+#  define emitm_fprem(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF8; }
+#  define emitm_fprem1(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF5; }
 
-#define jit_emit_neg_r_n(pc, r) { \
+#  define jit_emit_neg_r_n(pc, r) { \
     if (r) { \
-        emitm_fld(pc, r); \
+      emitm_fld(pc, r); \
     } \
     emitm_fchs(pc); \
     if (r) { \
-        emitm_fstp(pc, (r+1)); \
+      emitm_fstp(pc, (r+1)); \
     } \
 }
 
-#define jit_emit_neg_m_n(pc, mem) { \
+#  define jit_emit_neg_m_n(pc, mem) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fchs(pc); \
     jit_emit_fstore_m_n(pc, mem); \
 }
 
-#define jit_emit_abs_r_n(pc, r) { \
+#  define jit_emit_abs_r_n(pc, r) { \
     if (r) { \
-        emitm_fld(pc, r); \
+      emitm_fld(pc, r); \
     } \
     emitm_fabs(pc); \
     if (r) { \
-        emitm_fstp(pc, (r+1)); \
+      emitm_fstp(pc, (r+1)); \
     } \
 }
 
-#define jit_emit_abs_r_i(pc, r) { \
+#  define jit_emit_abs_r_i(pc, r) { \
     jit_emit_test_r_i(pc, r); \
     emitm_jxs(pc, emitm_jns, 3); \
     jit_emit_not_r_i(pc, r); \
@@ -1030,115 +1039,115 @@ static unsigned char *lastpc;
 }
 
 
-#define jit_emit_abs_m_n(pc, mem) { \
+#  define jit_emit_abs_m_n(pc, mem) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fabs(pc); \
     jit_emit_fstore_m_n(pc, mem); \
 }
 
 /* Integer comparisions */
-#define jit_emit_cmp_rr(pc, reg1, reg2) \
-  emitm_alul_r_r(pc, 0x39, reg2, reg1)
-#define jit_emit_cmp_rr_i(pc, r1, r2) jit_emit_cmp_rr(pc, r1, r2)
+#  define jit_emit_cmp_rr(pc, reg1, reg2) \
+    emitm_alul_r_r(pc, 0x39, reg2, reg1)
+#  define jit_emit_cmp_rr_i(pc, r1, r2) jit_emit_cmp_rr(pc, r1, r2)
 
-#define emitm_cmpl_r_m(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x3b, reg, b, i, s, d)
+#  define emitm_cmpl_r_m(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x3b, reg, b, i, s, d)
 
-#define emitm_cmpl_m_r(pc, reg, b, i, s, d) \
-  emitm_alul_r_m(pc, 0x39, reg, b, i, s, d)
+#  define emitm_cmpl_m_r(pc, reg, b, i, s, d) \
+    emitm_alul_r_m(pc, 0x39, reg, b, i, s, d)
 
-#define jit_emit_cmp_ri_i(pc, reg, imm) \
-  emitm_alul_i_r(pc, 0x81, emit_b111, imm, reg)
+#  define jit_emit_cmp_ri_i(pc, reg, imm) \
+    emitm_alul_i_r(pc, 0x81, emit_b111, imm, reg)
 
 /* Unconditional Jump/Call */
 
-#define emitm_calll(pc, disp) { \
-  *((pc)++) = 0xe8; \
-  *(long *)(pc) = disp; (pc) += 4; }
+#  define emitm_calll(pc, disp) { \
+    *((pc)++) = 0xe8; \
+    *(long *)(pc) = disp; (pc) += 4; }
 
-#define emitm_callr(pc, reg) { \
-  *((pc)++) = 0xff; \
-  *((pc)++) = 0xd0 | (reg - 1); }
+#  define emitm_callr(pc, reg) { \
+    *((pc)++) = 0xff; \
+    *((pc)++) = 0xd0 | (reg - 1); }
 
-#define emitm_callm(pc, b, i, s, d) { \
+#  define emitm_callm(pc, b, i, s, d) { \
  *((pc)++) = 0xff; \
  (pc) = emit_r_X(pc, emit_reg(emit_b010), b, i, s, d); }
 
-#define emitm_jumps(pc, disp) { \
-  *((pc)++) = 0xeb; \
-  *((pc)++) = disp; }
+#  define emitm_jumps(pc, disp) { \
+    *((pc)++) = 0xeb; \
+    *((pc)++) = disp; }
 
-#define emitm_jumpl(pc, disp) { \
-  *((pc)++) = 0xe9; \
-  *(long *)(pc) = disp; (pc) += 4; }
+#  define emitm_jumpl(pc, disp) { \
+    *((pc)++) = 0xe9; \
+    *(long *)(pc) = disp; (pc) += 4; }
 
-#define emitm_jumpr(pc, reg) { \
-  *((pc)++) = 0xff; \
-  *((pc)++) = 0xe0 | (reg - 1); }
+#  define emitm_jumpr(pc, reg) { \
+    *((pc)++) = 0xff; \
+    *((pc)++) = 0xe0 | (reg - 1); }
 
-#define emitm_jumpm(pc, b, i, s, d) { \
-  *((pc)++) = 0xff; \
-  (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); }
+#  define emitm_jumpm(pc, b, i, s, d) { \
+    *((pc)++) = 0xff; \
+    (pc) = emit_r_X(pc, emit_reg(emit_b100), b, i, s, d); }
 
 /* Conditional jumps */
 
 /* Short jump - 8 bit disp */
-#define emitm_jxs(pc, code, disp) { \
-  *((pc)++) = 0x70 | (code); \
-  *((pc)++) = (char)disp; }
+#  define emitm_jxs(pc, code, disp) { \
+    *((pc)++) = 0x70 | (code); \
+    *((pc)++) = (char)disp; }
 
 /* Long jump - 32 bit disp */
-#define emitm_jxl(pc, code, disp) { \
-  *((pc)++) = 0x0f; \
-  *((pc)++) = 0x80 | code;  \
-  *(long *)(pc) = disp; (pc) += 4; }
+#  define emitm_jxl(pc, code, disp) { \
+    *((pc)++) = 0x0f; \
+    *((pc)++) = 0x80 | code;  \
+    *(long *)(pc) = disp; (pc) += 4; }
 
-#define emitm_jo   0
-#define emitm_jno  1
-#define emitm_jb   2
-#define emitm_jnb  3
-#define emitm_jz   4
-#define emitm_je emitm_jz
-#define emitm_jnz  5
-#define emitm_jne emitm_jnz
-#define emitm_jbe  6
-#define emitm_ja   7
-#define emitm_js   8
-#define emitm_jns  9
-#define emitm_jp  10
-#define emitm_jnp 11
-#define emitm_jl  12
-#define emitm_jnl 13
-#define emitm_jle 14
-#define emitm_jg  15
+#  define emitm_jo   0
+#  define emitm_jno  1
+#  define emitm_jb   2
+#  define emitm_jnb  3
+#  define emitm_jz   4
+#  define emitm_je emitm_jz
+#  define emitm_jnz  5
+#  define emitm_jne emitm_jnz
+#  define emitm_jbe  6
+#  define emitm_ja   7
+#  define emitm_js   8
+#  define emitm_jns  9
+#  define emitm_jp  10
+#  define emitm_jnp 11
+#  define emitm_jl  12
+#  define emitm_jnl 13
+#  define emitm_jle 14
+#  define emitm_jg  15
 
 /* Shortcuts */
-#define jit_emit_mov_mi_i(pc, dest, immediate) \
-  emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
+#  define jit_emit_mov_mi_i(pc, dest, immediate) \
+    emitm_movl_i_m(pc, immediate, emit_None, emit_None, emit_None, dest)
 
-#define jit_emit_mov_rm_i(pc, reg, address) \
-  emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_mov_rm_i(pc, reg, address) \
+    emitm_movl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_mov_mr_i(pc, address, reg) \
-  emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_mov_mr_i(pc, address, reg) \
+    emitm_movl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_mul_rm_i(pc, reg, address) \
-  emitm_smull_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_mul_rm_i(pc, reg, address) \
+    emitm_smull_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_sub_rm_i(pc, reg, address) \
-  emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_sub_rm_i(pc, reg, address) \
+    emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define emit_subl_m_r(pc, reg, address) \
-  emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define emit_subl_m_r(pc, reg, address) \
+    emitm_subl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_add_rm_i(pc, reg, address) \
-  emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_add_rm_i(pc, reg, address) \
+    emitm_addl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_cmp_rm_i(pc, reg, address) \
-  emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_cmp_rm_i(pc, reg, address) \
+    emitm_cmpl_r_m(pc, reg, emit_None, emit_None, emit_None, address)
 
-#define jit_emit_cmpr_mr_i(pc, address, reg) \
-  emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
+#  define jit_emit_cmpr_mr_i(pc, address, reg) \
+    emitm_cmpl_m_r(pc, reg, emit_None, emit_None, emit_None, address)
 
 
 /* high level routines, behave like real 2 register FP */
@@ -1148,149 +1157,149 @@ static unsigned char *lastpc;
  */
 
 /* ST(i) <- numvar */
-#define jit_emit_mov_rm_n(pc, r, d) { \
+#  define jit_emit_mov_rm_n(pc, r, d) { \
     jit_emit_fload_m_n((pc), d); \
     emitm_fstp((pc), (r+1)); \
 }
 
 /* ST(i) <= NUM_CONST */
-#define jit_emit_mov_ri_n(pc, r, i) { \
+#  define jit_emit_mov_ri_n(pc, r, i) { \
     jit_emit_fload_m_n(pc, i); \
     emitm_fstp((pc), (r+1)); \
 }
 
 /* ST(i) <= &INT_CONST */
-#define jit_emit_mov_ri_ni(pc, r, i) { \
+#  define jit_emit_mov_ri_ni(pc, r, i) { \
     jit_emit_fload_m_i(pc, i); \
     emitm_fstp((pc), (r+1)); \
 }
 /* NUM_REG(i) <= INT_CONST */
-#define jit_emit_mov_mi_ni(pc, mem, i) { \
+#  define jit_emit_mov_mi_ni(pc, mem, i) { \
     jit_emit_fload_m_i(pc, i); \
     jit_emit_fstore_m_n(pc, mem); \
 }
 /* INT_REG <= ST(i) */
-#define jit_emit_mov_mr_in(pc, mem, r) { \
+#  define jit_emit_mov_mr_in(pc, mem, r) { \
     emitm_fld(pc, r); \
     jit_emit_fstore_m_i(pc, mem); \
 }
 
 /* numvar <- ST(i) */
-#define jit_emit_mov_mr_n(pc, d, r) { \
+#  define jit_emit_mov_mr_n(pc, d, r) { \
     emitm_fld((pc), r); \
     jit_emit_fstore_m_n((pc), d); \
 }
 
 /* ST(r1) <= ST(r2) */
-#define jit_emit_mov_rr_n(pc, r1, r2) { \
+#  define jit_emit_mov_rr_n(pc, r1, r2) { \
     if (r1 != r2) { \
-        if (r2) { \
-            emitm_fld((pc), r2); \
-            emitm_fstp((pc), (r1+1)); \
-        } \
-        else { \
-            emitm_fst((pc),r1); \
-        } \
+      if (r2) { \
+        emitm_fld((pc), r2); \
+        emitm_fstp((pc), (r1+1)); \
+      } \
+      else { \
+        emitm_fst((pc),r1); \
+      } \
     } \
 }
 
 /* ST(r1) xchg ST(r2) */
-#define jit_emit_xchg_rr_n(pc, r1, r2) { \
+#  define jit_emit_xchg_rr_n(pc, r1, r2) { \
     if (r1 != r2) { \
-        emitm_fld((pc), r1); \
-        emitm_fld((pc), (r2+1)); \
-        emitm_fstp((pc), (r1+2)); \
-        emitm_fstp((pc), (r2+1)); \
+      emitm_fld((pc), r1); \
+      emitm_fld((pc), (r2+1)); \
+      emitm_fstp((pc), (r1+2)); \
+      emitm_fstp((pc), (r2+1)); \
     } \
 }
 
-#define jit_emit_xchg_rm_n(pc, r, mem) { \
+#  define jit_emit_xchg_rm_n(pc, r, mem) { \
     emitm_fld((pc), r); \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fstp((pc), (r+2)); \
     jit_emit_fstore_m_n(pc, mem); \
 }
 
-#define jit_emit_xchg_rr_i(pc, r1, r2) { \
+#  define jit_emit_xchg_rr_i(pc, r1, r2) { \
     if (r1 != r2) { \
-        jit_emit_mov_rr_i(pc, emit_ECX, r1); \
-        jit_emit_mov_rr_i(pc, r1, r2); \
-        jit_emit_mov_rr_i(pc, r2, emit_ECX); \
+      jit_emit_mov_rr_i(pc, emit_ECX, r1); \
+      jit_emit_mov_rr_i(pc, r1, r2); \
+      jit_emit_mov_rr_i(pc, r2, emit_ECX); \
     } \
 }
 
-#define jit_emit_xchg_rm_i(pc, r, m) { \
+#  define jit_emit_xchg_rm_i(pc, r, m) { \
     jit_emit_mov_rr_i(pc, emit_ECX, r); \
     jit_emit_mov_rm_i(pc, r, m); \
     jit_emit_mov_mr_i(pc, m, emit_ECX); \
 }
 
-#define jit_emit_finit(pc) { *((pc)++) = 0xdb; *((pc)++) = 0xe3; }
+#  define jit_emit_finit(pc) { *((pc)++) = 0xdb; *((pc)++) = 0xe3; }
 
 /* ST(i) op= MEM */
 
-#define jit_emit_xxx_rm_n(op, pc, r, m) { \
+#  define jit_emit_xxx_rm_n(op, pc, r, m) { \
     jit_emit_fload_m_n(pc, m); \
     emitm_f ## op ## p(pc, (r+1)); \
 }
 
-#define jit_emit_add_rm_n(pc, r, m) jit_emit_xxx_rm_n(add, pc, r, m)
-#define jit_emit_sub_rm_n(pc, r, m) jit_emit_xxx_rm_n(sub, pc, r, m)
-#define jit_emit_mul_rm_n(pc, r, m) jit_emit_xxx_rm_n(mul, pc, r, m)
-#define jit_emit_div_rm_n(pc, r, m) jit_emit_xxx_rm_n(div, pc, r, m)
+#  define jit_emit_add_rm_n(pc, r, m) jit_emit_xxx_rm_n(add, pc, r, m)
+#  define jit_emit_sub_rm_n(pc, r, m) jit_emit_xxx_rm_n(sub, pc, r, m)
+#  define jit_emit_mul_rm_n(pc, r, m) jit_emit_xxx_rm_n(mul, pc, r, m)
+#  define jit_emit_div_rm_n(pc, r, m) jit_emit_xxx_rm_n(div, pc, r, m)
 
-#define jit_emit_add_ri_n(pc, r, nc) jit_emit_add_rm_n(pc, r, nc)
+#  define jit_emit_add_ri_n(pc, r, nc) jit_emit_add_rm_n(pc, r, nc)
 
 /* ST(r1) += ST(r2) */
-#define jit_emit_add_rr_n(pc, r1, r2) { \
+#  define jit_emit_add_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_faddp(pc, (r1+1)); \
 }
 
 
-#define jit_emit_sub_ri_n(pc, r, nc) jit_emit_sub_rm_n(pc, r, nc)
+#  define jit_emit_sub_ri_n(pc, r, nc) jit_emit_sub_rm_n(pc, r, nc)
 
 /* ST(r1) -= ST(r2) */
-#define jit_emit_sub_rr_n(pc, r1, r2) { \
+#  define jit_emit_sub_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_fsubp(pc, (r1+1)); \
 }
 
-#define jit_emit_inc_r_n(pc, r) { \
+#  define jit_emit_inc_r_n(pc, r) { \
     emitm_fld(pc, r); \
     emitm_fld1(pc); \
     emitm_faddp(pc, 1); \
     emitm_fstp(pc, (r+1)); \
 }
 
-#define jit_emit_dec_r_n(pc, r) { \
+#  define jit_emit_dec_r_n(pc, r) { \
     emitm_fld(pc, r); \
     emitm_fld1(pc); \
     emitm_fsubp(pc, 1); \
     emitm_fstp(pc, (r+1)); \
 }
 
-#define jit_emit_mul_ri_n(pc, r, nc) jit_emit_mul_rm_n(pc, r, nc)
+#  define jit_emit_mul_ri_n(pc, r, nc) jit_emit_mul_rm_n(pc, r, nc)
 
 /* ST(r1) *= ST(r2) */
-#define jit_emit_mul_rr_n(pc, r1, r2) { \
+#  define jit_emit_mul_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_fmulp(pc, (r1+1)); \
 }
 
-#define jit_emit_div_ri_n(pc, r, nc) jit_emit_div_rm_n(pc, r, nc)
+#  define jit_emit_div_ri_n(pc, r, nc) jit_emit_div_rm_n(pc, r, nc)
 
 /* ST(r1) /= ST(r2) */
-#define jit_emit_div_rr_n(pc, r1, r2) { \
+#  define jit_emit_div_rr_n(pc, r1, r2) { \
     emitm_fld(pc, r2); \
     emitm_fdivp(pc, (r1+1)); \
 }
 
 /* ST(i) %= MEM
  * please note the hardccded jumps */
-#define jit_emit_cmod_rm_n(pc, r, mem) { \
+#  define jit_emit_cmod_rm_n(pc, r, mem) { \
     if (r)  \
-        emitm_fxch(pc, r); \
+      emitm_fxch(pc, r); \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fxch(pc, 1); \
     emitm_fprem(pc); \
@@ -1300,12 +1309,12 @@ static unsigned char *lastpc;
     emitm_fstp(pc, (r+1)); \
 }
 
-#define jit_emit_cmod_ri_n(pc, r, nc) jit_emit_cmod_rm_n(pc, r, nc)
+#  define jit_emit_cmod_ri_n(pc, r, nc) jit_emit_cmod_rm_n(pc, r, nc)
 
 /* ST(r1) %= ST(r2) */
-#define jit_emit_cmod_rr_n(pc, r1, r2) { \
+#  define jit_emit_cmod_rr_n(pc, r1, r2) { \
     if (r1)  \
-        emitm_fxch(pc, r1); \
+      emitm_fxch(pc, r1); \
     emitm_fld(pc, r2); \
     emitm_fxch(pc, 1); \
     emitm_fprem(pc); \
@@ -1317,7 +1326,7 @@ static unsigned char *lastpc;
 
 /* TODO config option, if fcomi* is available */
 /* compare ST(r) <-> mem */
-#define jit_emit_cmp_rm_n(pc, r, mem) { \
+#  define jit_emit_cmp_rm_n(pc, r, mem) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fld(pc, (r+1)); \
     emitm_fcompp(pc); \
@@ -1325,84 +1334,84 @@ static unsigned char *lastpc;
     emitm_sahf(pc); \
 }
 
-#define jit_emit_cmp_ri_n(pc, r, nc) jit_emit_cmp_rm_n(pc, r, nc)
+#  define jit_emit_cmp_ri_n(pc, r, nc) jit_emit_cmp_rm_n(pc, r, nc)
 
 /* compare mem <-> ST(r) */
-#define jit_emit_cmpr_mr_n(pc, mem, r) { \
+#  define jit_emit_cmpr_mr_n(pc, mem, r) { \
     jit_emit_fload_m_n(pc, mem); \
     emitm_fcomip(pc, (r+1)); \
 }
 
 /* compare ST(r1) <-> ST(r2) test FCOMI (=fcom,fstw,sahf) */
-#define jit_emit_cmp_rr_n(pc, r1, r2) { \
+#  define jit_emit_cmp_rr_n(pc, r1, r2) { \
     if (!r2 || (r1==r2)) { \
-        emitm_fld(pc, r1); \
-        emitm_fcomip(pc, (r2+1)); \
+      emitm_fld(pc, r1); \
+      emitm_fcomip(pc, (r2+1)); \
     } \
     else { \
-        if (r1) { \
-            emitm_fxch(pc, r1); \
-            emitm_fcomi(pc, r2); \
-            emitm_fxch(pc, r1); \
-        } \
-        else { \
-            emitm_fcomi(pc, r2); \
-        } \
+      if (r1) { \
+        emitm_fxch(pc, r1); \
+        emitm_fcomi(pc, r2); \
+        emitm_fxch(pc, r1); \
+      } \
+      else { \
+        emitm_fcomi(pc, r2); \
+      } \
     } \
 }
 
 /* test r for zero */
-#define jit_emit_test_r_n(pc, r) { \
+#  define jit_emit_test_r_n(pc, r) { \
     if (r) { \
-        emitm_fxch(pc, r); \
+      emitm_fxch(pc, r); \
     } \
     emitm_ftst(pc); \
     emitm_fstw(pc); \
     emitm_sahf(pc); \
     if (r) { \
-        emitm_fxch(pc, r); \
+      emitm_fxch(pc, r); \
     } \
 }
 
 
-#define jit_emit_neg_m_i(pc, address) \
-  emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
+#  define jit_emit_neg_m_i(pc, address) \
+    emitm_negl_m(pc, emit_None, emit_None, emit_None, (long)address)
 
-#define emit_shrl_r_m(pc, reg, d) \
-  emitm_shrl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define emit_shrl_r_m(pc, reg, d) \
+    emitm_shrl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_shrl_i_m(pc, imm, d) \
-  emitm_shrl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define emit_shrl_i_m(pc, imm, d) \
+    emitm_shrl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#define emit_andl_r_m(pc, reg, d) \
-  emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define emit_andl_r_m(pc, reg, d) \
+    emitm_andl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define jit_emit_band_rm_i(pc, reg, d) \
-  emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_band_rm_i(pc, reg, d) \
+    emitm_andl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_andl_i_m(pc, imm, d) \
-  emitm_andl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define emit_andl_i_m(pc, imm, d) \
+    emitm_andl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#define emit_orl_r_m(pc, reg, d) \
-  emitm_orl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define emit_orl_r_m(pc, reg, d) \
+    emitm_orl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define jit_emit_bor_rm_i(pc, reg, d) \
-  emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bor_rm_i(pc, reg, d) \
+    emitm_orl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_orl_i_m(pc, imm, d) \
-  emitm_orl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define emit_orl_i_m(pc, imm, d) \
+    emitm_orl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#define emit_xorl_r_m(pc, reg, d) \
-  emitm_xorl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
+#  define emit_xorl_r_m(pc, reg, d) \
+    emitm_xorl_r_m(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define jit_emit_bxor_rm_i(pc, reg, d) \
-  emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
+#  define jit_emit_bxor_rm_i(pc, reg, d) \
+    emitm_xorl_m_r(pc, reg, emit_None, emit_None, emit_None, d)
 
-#define emit_xorl_i_m(pc, imm, d) \
-  emitm_xorl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
+#  define emit_xorl_i_m(pc, imm, d) \
+    emitm_xorl_i_m(pc, imm, emit_None, emit_None, emit_None, d)
 
-#define emitm_popl_r(pc, reg) \
-  pc = emit_popl_r(pc, reg)
+#  define emitm_popl_r(pc, reg) \
+    pc = emit_popl_r(pc, reg)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
@@ -1524,9 +1533,8 @@ static void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
 {
-
     /* This calculates (INDEX into op_map * 4) */
-    emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
+    emitm_subl_i_r(jit_info->native_ptr,interpreter->code->byte_code,emit_EAX);
 
     /* This jumps to the address in op_map[EBP + sizeof(void *) * INDEX] */
     *jit_info->native_ptr++ = 0x3e;     /* DS:0(EBP, EAX, 1) */
@@ -1534,12 +1542,12 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
 }
 
-#define jit_emit_stack_frame_enter(pc) do { \
+#  define jit_emit_stack_frame_enter(pc) do { \
     emitm_pushl_r(pc, emit_EBP); \
     jit_emit_mov_rr_i(pc, emit_EBP, emit_ESP); \
 } while(0)
 
-#define jit_emit_stack_frame_leave(pc) do { \
+#  define jit_emit_stack_frame_leave(pc) do { \
     jit_emit_mov_rr_i(pc, emit_ESP, emit_EBP); \
     emitm_popl_r(pc, emit_EBP); \
 } while(0)
@@ -1584,7 +1592,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interpreter);
 }
 
-#define jit_emit_end(pc) { \
+#  define jit_emit_end(pc) { \
     jit_emit_add_ri_i(pc, emit_ESP, 4); \
     emitm_popl_r(pc, emit_EDI); \
     emitm_popl_r(pc, emit_EBX); \
@@ -1595,7 +1603,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 
 
 void
-Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem, int reg)
+Parrot_jit_emit_mov_mr_n(struct Parrot_Interp * interpreter, char *mem,int reg)
 {
     jit_emit_mov_mr_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, mem, reg);
@@ -1609,7 +1617,7 @@ Parrot_jit_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem, int reg)
 }
 
 void
-Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg, char *mem)
+Parrot_jit_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,char *mem)
 {
     jit_emit_mov_rm_n(
         ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr, reg, mem);
@@ -1628,31 +1636,31 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
     jit_emit_finit(jit_info->native_ptr);
 }
 
-#if !defined(INT_REG)
-#define INT_REG(x) interpreter->ctx.int_reg.registers[x]
-#endif
-#if !defined(NUM_REG)
-#define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
-#endif
-#if !defined(STR_REG)
-#define STR_REG(x) interpreter->ctx.string_reg.registers[x]
-#endif
-#if !defined(PMC_REG)
-#define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
-#endif
+#  if !defined(INT_REG)
+#    define INT_REG(x) interpreter->ctx.int_reg.registers[x]
+#  endif
+#  if !defined(NUM_REG)
+#    define NUM_REG(x) interpreter->ctx.num_reg.registers[x]
+#  endif
+#  if !defined(STR_REG)
+#    define STR_REG(x) interpreter->ctx.string_reg.registers[x]
+#  endif
+#  if !defined(PMC_REG)
+#    define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
+#  endif
 
-#ifndef NO_JIT_VTABLE_OPS
+#  ifndef NO_JIT_VTABLE_OPS
 
-#undef Parrot_jit_vtable1_op
-#undef Parrot_jit_vtable1r_op
-#undef Parrot_jit_vtable2_op
-#undef Parrot_jit_vtable2rk_op
-#undef Parrot_jit_vtable3_op
-#undef Parrot_jit_vtable31_op
-#undef Parrot_jit_vtable3k_op
-#undef Parrot_jit_vtable_ifp_op
-#undef Parrot_jit_vtable_unlessp_op
-#undef Parrot_jit_vtable_newp_ic_op
+#    undef Parrot_jit_vtable1_op
+#    undef Parrot_jit_vtable1r_op
+#    undef Parrot_jit_vtable2_op
+#    undef Parrot_jit_vtable2rk_op
+#    undef Parrot_jit_vtable3_op
+#    undef Parrot_jit_vtable31_op
+#    undef Parrot_jit_vtable3k_op
+#    undef Parrot_jit_vtable_ifp_op
+#    undef Parrot_jit_vtable_unlessp_op
+#    undef Parrot_jit_vtable_newp_ic_op
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, ...) (ret == 0)
@@ -1750,17 +1758,17 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                         &interpreter->code->const_table->
                         constants[p[i]]->number);
 store:
-#if NUMVAL_SIZE == 8
+#    if NUMVAL_SIZE == 8
                 /* make room for double */
                 emitm_addb_i_r(jit_info->native_ptr, -8, emit_ESP);
                 emitm_fstpl(jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
                 /* additional stack adjustment */
                 st += 4;
-#else
+#    else
                 emitm_addb_i_r(jit_info->native_ptr, -12, emit_ESP);
                 emitm_fstpt(jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
                 st += 8;
-#endif
+#    endif
                 break;
             case PARROT_ARG_SC:
                 emitm_pushl_i(jit_info->native_ptr,
@@ -1839,7 +1847,6 @@ static void
 Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-
     Parrot_jit_vtable_n_op(jit_info, interpreter, 2, 0x80);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
@@ -1851,7 +1858,6 @@ static void
 Parrot_jit_vtable2rk_op(Parrot_jit_info_t *jit_info,
                      struct Parrot_Interp * interpreter)
 {
-
     Parrot_jit_vtable_n_op(jit_info, interpreter, 3, 0x83);
     Parrot_jit_store_retval(jit_info, interpreter);
 }
@@ -1965,7 +1971,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
 }
 
-#endif
+#  endif /* NO_JIT_VTABLE_OPS */
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -1993,7 +1999,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
 }
 
 
-#undef Parrot_jit_restart_op
+#  undef Parrot_jit_restart_op
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
                    struct Parrot_Interp * interpreter)
@@ -2024,7 +2030,6 @@ void *
 Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
         String *signature)
 {
-
     Parrot_jit_info_t jit_info;
     char *sig, *pc;
     int next_n = 5;
@@ -2150,7 +2155,7 @@ char intval_map[] =
  * not changed around external calls
  */
 
-#define PRESERVED_INT_REGS 3
+#  define PRESERVED_INT_REGS 3
 
 /* ST(0) is used as a scratch register,
  * using more then 4 registers breaks C<time N0>
@@ -2165,16 +2170,16 @@ char floatval_map[] = { 1,2,3,4 };
  * (loop is at 200 instead of 196 ???)
  *
  * FAST:
- * 0x818100a <jit_func+194>:	sub    %edi,%ebx
- * 0x818100c <jit_func+196>:	jne    0x818100a <jit_func+194)
+ * 0x818100a <jit_func+194>:    sub    %edi,%ebx
+ * 0x818100c <jit_func+196>:    jne    0x818100a <jit_func+194)
  *
  * Same fast speed w/o 2nd register
- * 0x8181102 <jit_func+186>:	sub    0x8164c2c,%ebx
- * 0x8181108 <jit_func+192>:	jne    0x8181102 <jit_func+186>
+ * 0x8181102 <jit_func+186>:    sub    0x8164c2c,%ebx
+ * 0x8181108 <jit_func+192>:    jne    0x8181102 <jit_func+186>
  *
  * SLOW (same slow with register or odd aligned)
- * 0x818118a <jit_func+194>:	sub    0x8164cac,%ebx
- * 0x8181190 <jit_func+200>:	jne    0x818118a <jit_func+194>
+ * 0x818118a <jit_func+194>:    sub    0x8164cac,%ebx
+ * 0x8181190 <jit_func+200>:    jne    0x818118a <jit_func+194>
  *
  */
 
@@ -2188,7 +2193,7 @@ char floatval_map[] = { 1,2,3,4 };
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme
  */
-#define ALLOCATE_REGISTERS_PER_SECTION 1
+#  define ALLOCATE_REGISTERS_PER_SECTION 1
 
 #endif /* JIT_EMIT */
 
