@@ -738,6 +738,7 @@ hash_clone(struct Parrot_Interp *interp, Hash *hash, Hash **dest)
             default:
                 internal_exception(-1, "hash corruption: type = %d\n",
                                    hash->entry_type);
+                valtmp = NULL; /* avoid warning */
             };
             hash_put(interp, *dest, key, valtmp);
             /*

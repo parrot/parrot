@@ -102,7 +102,7 @@
 		Configure::Data->set(
 			link      => 'gcc',
 			libs      => $libs,
-			slash     => '\\',
+			slash     => '/',
 			ar        => 'ar',
 		);
 	}

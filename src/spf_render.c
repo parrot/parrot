@@ -603,12 +603,12 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                              */
 
                             if(tolower(ch) == 'g') {
-                                UINTVAL i;
-                                for(i=0; i < strlen(tc); i++) {
-                                    if(tolower(tc[i]) == 'e' &&
-                                        (tc[i+1] == '+' || tc[i+1] == '-')) {
-                                        tc[i+2]='\0';
-                                        strcat(tc, &(tc[i+3]));
+                                UINTVAL j;
+                                for(j=0; j < strlen(tc); j++) {
+                                    if(tolower(tc[j]) == 'e' &&
+                                        (tc[j+1] == '+' || tc[j+1] == '-')) {
+                                        tc[j+2]='\0';
+                                        strcat(tc, &(tc[j+3]));
                                     }
                                 }
                             }

@@ -223,7 +223,7 @@ pt_thread_join(Parrot_Interp parent, UINTVAL tid)
         do_panic(parent, "Can't join self", __FILE__, __LINE__);
     if (interpreter->thread_data->state == THREAD_STATE_JOINABLE ||
             interpreter->thread_data->state == THREAD_STATE_FINISHED) {
-        void *retval;
+        void *retval = NULL;
         interpreter->thread_data->state |= THREAD_STATE_JOINED;
         UNLOCK(interpreter_array_mutex);
         JOIN(interpreter->thread_data->thread, retval);

@@ -20,6 +20,7 @@ typedef HUGEINTVAL Parrot_OFF_T;
 
 void Parrot_platform_init_code(void);
 
+#ifdef _MSC_VER
 /* These disable certain Level 4 Warnings */
 #pragma warning( disable: 4100 ) /* disables 'unreferenced formal parameter'
                                   * warnings */
@@ -28,6 +29,8 @@ void Parrot_platform_init_code(void);
                                   * include files */
 #pragma warning( disable: 4505 ) /* disables 'unreferenced local function has
                                   * been removed' warnings in header files */
+#endif /* defined(_MSC_VER) */
+
 /*
 ** Miscellaneous:
 */
