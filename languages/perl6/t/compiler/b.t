@@ -67,7 +67,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 3");
+output_is(<<'CODE', <<'OUT', "string interpolation 4");
 sub main() {
     print "\c[^J]"; # Control-Char
     print "\c[REVERSE SOLIDUS]\n"; # Named Unicode
@@ -84,7 +84,7 @@ CODE
 OUT
 
 ##############################
-output_is(<<'CODE', <<'OUT', "string interpolation 4");
+output_is(<<'CODE', <<'OUT', "string interpolation 5");
 sub main() {
     print "\ux\n"; # Uppercase Single
     print "\lX\n"; # Lowercase Single
