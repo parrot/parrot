@@ -12,7 +12,6 @@ IMCC_fatal(Interp *interp, int code, const char *fmt, ...)
 {
     va_list ap;
 
-    UNUSED(interp);
     va_start(ap, fmt);
     imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
