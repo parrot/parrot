@@ -336,7 +336,16 @@ is a tuple or string, return the same type, else return a list.
                 /* run filter func -
                  * TODO save registers once around loop
                  */
-                PMC *t = Parrot_runops_fromc_args(INTERP, func, "PP", item);
+                PMC *t;
+                if (func->vtable->base_type == enum_class_NCI) {
+                    REG_PMC(5) = item;
+                    REG_INT(3) = 1;
+                    Parrot_runops_fromc(INTERP, func);
+                    t = REG_PMC(5);
+                }
+                else {
+                    t = Parrot_runops_fromc_args(INTERP, func, "PP", item);
+                }
                 if (!VTABLE_get_bool(INTERP, t))
                     continue;
             }
@@ -593,22 +602,19 @@ the argument sequence(s).
         while (VTABLE_get_bool(INTERP, iter)) {
             PMC *item = VTABLE_shift_pmc(INTERP, iter);
             if (!none_func) {
-                /* run filter func -
-                 * TODO save registers once around loop
-                 */
-                if (func->vtable->data == func) {
+                if (func->vtable->base_type == enum_class_NCI) {
                     REG_PMC(5) = item;
                     REG_INT(3) = 1;
-                    VTABLE_invoke(INTERP, func, 0);
+                    Parrot_runops_fromc(INTERP, func);
                     item = REG_PMC(5);
-                    /* an object constructor */
                 }
                 else {
-                item = Parrot_runops_fromc_args(INTERP, func, "PP", item);
+                    item = Parrot_runops_fromc_args(INTERP, func, "PP", item);
                 }
             }
             VTABLE_set_pmc_keyed_int(INTERP, res, i++, item);
         }
+
         return res;
     }
 
@@ -780,7 +786,16 @@ calculation, and serves as a default whe n the sequence is empty.
                 /* run filter func -
                  * TODO save registers once around loop
                  */
-            res = Parrot_runops_fromc_args(INTERP, func, "PPP", res, item);
+            if (func->vtable->base_type == enum_class_NCI) {
+                REG_PMC(5) = res;
+                REG_PMC(6) = item;
+                REG_INT(3) = 2;
+                Parrot_runops_fromc(INTERP, func);
+                res = REG_PMC(5);
+            }
+            else {
+                res = Parrot_runops_fromc_args(INTERP, func, "PPP", res, item);
+            }
         }
 
         if ((REG_INT(3)>2) && 0==VTABLE_elements(INTERP, res))

@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-classes/pymodule.pmc - Python Module
+classes/pygen.pmc - Python Generator
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Python Module base class
+These are the vtable functions for the Python Generator class
 
 =head2 Methods
 
@@ -20,7 +20,60 @@ These are the vtable functions for the Python Module base class
 
 #include "parrot/parrot.h"
 
+static STRING *NEXT;
+static STRING *STOPITERATION;
+
 pmclass PyGen dynpmc group python_group {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization.
+
+=cut
+
+*/
+
+    void class_init() {
+        if (pass) {
+            NEXT = const_string(INTERP, "next");
+            STOPITERATION = const_string(INTERP, "StopIteration");
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the key.
+
+=cut
+
+*/
+
+    void init () {
+        PObj_custom_mark_SET(SELF);
+        PMC_struct_val(SELF) = NULL;
+        PMC_pmc_val(SELF) = NULL;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    void mark () {
+        if (PMC_struct_val(SELF))   /* next value */
+            pobject_lives(INTERP, (PObj *) PMC_struct_val(SELF));
+        if (PMC_pmc_val(SELF))      /* next function */
+             pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
+    }
 
 /*
 
@@ -35,10 +88,104 @@ fails, return null.
 */
 
     PMC* find_method(STRING* method_name) {
-        PMC * method = SUPER(method_name);
+        PMC *method;
+
+        if (0 == string_compare(INTERP, method_name, NEXT))
+            return PMC_pmc_val(SELF);
+
+        method = SUPER(method_name);
         if (!method) method = VTABLE_getprop(INTERP, SELF, method_name);
         return method;
     }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if there are more elements to return
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        /* Do I already know what the next iteration will return? */
+        if (PMC_struct_val(SELF)) return 1;
+
+        /* Peek ahead */
+        new_internal_exception(INTERP);
+        push_new_c_exception_handler(INTERP, INTERP->exceptions);
+        if (!setjmp(INTERP->exceptions->destination)) {
+            PMC_struct_val(SELF) =
+                Parrot_runops_fromc_args(INTERP, PMC_pmc_val(SELF), "P");
+            pop_exception(INTERP);
+        } else {
+            /* TODO: check for something better than the message */
+            PMC *exception = REG_PMC(5);
+            STRING *message = VTABLE_get_string_keyed_int(INTERP, exception, 0);
+            if (0 != string_compare(INTERP, message, STOPITERATION)) {
+                rethrow_exception(INTERP, REG_PMC(5));
+            }
+        }
+
+        if (PMC_struct_val(SELF)) return 1;
+        return 0;
+    }
+
+/*
+
+=item C<PMC* get_iter ()>
+
+Return a new iterator for generator.
+
+=cut
+
+For now, return self.  TODO: revisit this.
+
+*/
+
+    PMC* get_iter () {
+        return SELF;
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the value of the NEXT function.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        PMC_pmc_val(SELF) = value;
+    }
+
+/*
+
+=item C<PMC* shift_pmc()>
+
+Returns the next yielded element.
+
+=cut
+
+*/
+
+    PMC* shift_pmc () {
+        PMC *ret;
+
+        if (PMC_struct_val(SELF)) {
+            ret = PMC_struct_val(SELF);
+            PMC_struct_val(SELF) = NULL;
+        }
+        else {
+            ret = Parrot_runops_fromc_args(INTERP, PMC_pmc_val(SELF), "P");
+        }
+
+        return ret;
+    }
+
 
 /*
 

@@ -24,6 +24,7 @@ TODO currently this uses Perl types.
 
 /* cache of classes referenced */
 static INTVAL dynclass_PyInt;
+static INTVAL dynclass_PyFloat;
 
 pmclass PyTuple extends PyObject need_ext does array dynpmc group python_group {
 
@@ -41,6 +42,7 @@ they will be used frequently here.
     void class_init() {
         if (pass) {
             dynclass_PyInt     = Parrot_PMC_typenum(INTERP, "PyInt");
+            dynclass_PyFloat   = Parrot_PMC_typenum(INTERP, "PyFloat");
         }
     }
 
@@ -101,6 +103,7 @@ Returns the number of elements in the array.
 */
 
     INTVAL elements () {
+        if (PMC_int_val(SELF) < 0)  PMC_int_val(SELF) = 0;
         return PMC_int_val(SELF);
     }
 
@@ -247,6 +250,22 @@ Resizes the array to C<size> elements.
             data[i] = PMCNULL;
         PMC_data(SELF) = data;
         PObj_data_is_PMC_array_SET(SELF);
+    }
+
+/*
+
+=item C<void set_number_keyed(PMC *key, INTVAL value)>
+
+Sets the number value of the element at index C<key> to C<value>.
+
+=cut
+
+*/
+
+    void set_number_keyed (PMC *key, FLOATVAL value) {
+        PMC *val = pmc_new(INTERP, dynclass_PyFloat);
+        VTABLE_set_number_native(INTERP, val, value);
+        DYNSELF.set_pmc_keyed_int(PMC_int_val(key), val);
     }
 
 /*

@@ -87,6 +87,41 @@ Return "True" or "False" if python_mode is true.
 
 /*
 
+=item C<void set_integer_same(PMC *value)>
+
+Sets the value of the integer to the value of the C<PyInt> C<*value>.
+
+=cut
+
+*/
+
+    void set_integer_same (PMC * value) {
+        PMC_int_val(SELF) = PMC_int_val(value);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC C<*value>, calling the appropriate C<set_*> method
+according to the type of C<*value>.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        if (SELF->vtable->base_type == value->vtable->base_type) {
+            DYNSELF.set_integer_same(value);
+        }
+        else {
+            DYNSELF.morph(value->vtable->base_type);
+            DYNSELF.set_pmc(value);
+        }
+    }
+
+/*
+
 =back
 
 =cut

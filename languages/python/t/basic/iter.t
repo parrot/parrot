@@ -12,30 +12,30 @@ sub test {
 test(<<'CODE', 'iter string');
 if __name__ == '__main__':
     for i in "abc":
-	print i
+        print i
 CODE
 
 test(<<'CODE', 'iter tuple');
 if __name__ == '__main__':
     for i in (1,2,3):
-	print i
+        print i
 CODE
 
 test(<<'CODE', 'iter map');
 if __name__ == '__main__':
     for i in {"a":1,"b":2,"c":3}:
-	if i == 'a' or i == 'b' or i == 'c':
-	    print "ok"
+        if i == 'a' or i == 'b' or i == 'c':
+            print "ok"
 CODE
 
 test(<<'CODE', 'generator');
 def foo():
     i=0
     while (1):
-	if i > 5:
-	    return
-	yield "abcdefghi"[i]
-	i = i + 1
+        if i > 5:
+            return
+        yield "abcdefghi"[i]
+        i = i + 1
 
 def main():
     i = foo()
@@ -44,27 +44,27 @@ def main():
     print
 
 if __name__ == "__main__":
-	main()
+    main()
 CODE
 
 test(<<'CODE', 'generator - repeat');
 def foo():
     i=0
     while (1):
-	if i > 5:
-	    return
-	yield "abcdefghi"[i]
-	i = i + 1
+        if i > 5:
+            return
+        yield "abcdefghi"[i]
+        i = i + 1
 
 def main():
     for k in range(2):
-	i = foo()
-	for y in i:
-	    print y,
-	print
+        i = foo()
+        for y in i:
+            print y,
+        print
 
 if __name__ == "__main__":
-	main()
+    main()
 CODE
 
 test(<<'CODE', 'enumerate, it.next');
@@ -88,9 +88,9 @@ if __name__ == '__main__':
     print it.next()
     print it.next()
     try:
-	print it.next()
+        print it.next()
     except StopIteration:
-	pass
+        pass
     print "Ok"
 CODE
 

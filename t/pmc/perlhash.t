@@ -1221,12 +1221,19 @@ output_is(<< 'CODE', << 'OUTPUT', "iter");
     new P0, .PerlHash
     set P0['a'], 'x'
     iter P1, P0
+    if P1 goto ok1
+    print "Not empty?\n"
     shift P2, P1
     print P2
     print "\n"
-    unless P1 goto ok
+ok1:
+    iter P1, P0
+    shift P2, P1
+    print P2
+    print "\n"
+    unless P1 goto ok2
     print "Surprise!\n"
-ok:
+ok2:
     end
 .end
 CODE
