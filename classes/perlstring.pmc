@@ -133,14 +133,9 @@ fprintf(stderr,"Parrot_PerlString_get_bool not yet implemented!\n");
     }
 
     void add (PMC * value, PMC* dest) {
-fprintf(stderr,"perlnum\n");
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val + value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void add_int (INTVAL value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, SELF->cache.int_val + value);
     }
 
     void add_bigint (BIGINT value, PMC* dest) {
@@ -153,19 +148,12 @@ fprintf(stderr,"perlnum\n");
     }
 
     void add_same (PMC * value, PMC* dest) {
-//        dest->cache.int_val = SELF->cache.int_val + value->cache.int_val;
     }
 
     void subtract (PMC * value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val - value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val - value
-//        );
     }
 
     void subtract_bigint (BIGINT value, PMC* dest) {
@@ -178,19 +166,12 @@ fprintf(stderr,"perlnum\n");
     }
 
     void subtract_same (PMC * value, PMC* dest) {
-//        dest->cache.int_val = SELF->cache.int_val - value->cache.int_val;
     }
 
     void multiply (PMC * value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val * value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val * value
-//        );
     }
 
     void multiply_bigint (BIGINT value, PMC* dest) {
@@ -203,19 +184,12 @@ fprintf(stderr,"perlnum\n");
     }
 
     void multiply_same (PMC * value, PMC* dest) {
-//        dest->cache.int_val = SELF->cache.int_val * value->cache.int_val;
     }
 
     void divide (PMC * value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val / value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void divide_int (INTVAL value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val / value
-//        );
     }
 
     void divide_bigint (BIGINT value, PMC* dest) {
@@ -228,19 +202,12 @@ fprintf(stderr,"perlnum\n");
     }
 
     void divide_same (PMC * value, PMC* dest) {
-//        dest->cache.int_val = SELF->cache.int_val / value->cache.int_val;
     }
 
     void modulus (PMC * value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val % value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void modulus_int (INTVAL value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest, 
-//            SELF->cache.int_val % value
-//        );
     }
 
     void modulus_bigint (BIGINT value, PMC* dest) {
@@ -253,7 +220,6 @@ fprintf(stderr,"perlnum\n");
     }
 
     void modulus_same (PMC * value, PMC* dest) {
-//        dest->cache.int_val = SELF->cache.int_val % value->cache.int_val;
     }
 
     void concatenate (PMC * value, PMC* dest) {
@@ -273,26 +239,15 @@ fprintf(stderr,"perlnum\n");
 
     /* == operation */
     BOOLVAL is_equal (PMC* value) {
-//        return SELF->cache.int_val == value->vtable->get_integer(INTERP, value);
     }
 
     void logical_or (PMC* value, PMC* dest) {
-//        /* No set_bool :( */
-//        dest->vtable->set_integer_native(INTERP, dest,
-//            SELF->cache.int_val || 
-//            value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void logical_and (PMC* value, PMC* dest) {
-//        dest->vtable->set_integer_native(INTERP, dest,
-//            SELF->cache.int_val && 
-//            value->vtable->get_integer(INTERP, value)
-//        );
     }
 
     void logical_not (PMC* value) {
-//        SELF->cache.int_val = (INTVAL)(!value->vtable->get_bool(INTERP, value));
     }
 
     void match (PMC * value,REGEX* re) {
