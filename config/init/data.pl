@@ -6,10 +6,10 @@ use Parrot::Configure::Step;
 
 $description="Setting up Configure's data structures...";
 
-@args=('debugging', 'optimize');
+@args=('debugging', 'optimize', 'verbose');
 
 sub runstep {
-  my ($debugging, $optimize) = @_;
+  my ($debugging, $optimize, $verbose) = @_;
 
   package Configure::Data;
   use Config;
@@ -20,6 +20,7 @@ sub runstep {
   my(%c)=(
     debugging     => $debugging ? 1 : 0,
     optimize      => $optimize ? $Config{optimize} : '',
+    verbose       => $verbose,
 
     # Compiler -- used to turn .c files into object files.
     # (Usually cc or cl, or something like that.)
@@ -106,10 +107,21 @@ sub runstep {
     @c{@_};
   };
 
-  *set=sub {
-    shift;
-    %c=(%c, @_);
-  };
+  *set=$verbose 
+    ? sub {
+      shift;
+      return unless (defined ($_[0]));
+      print "Setting Configuration Data:\n(\n";
+      while (my ($key, $val) = splice @_, 0, 2) {
+	print "\t$key => ", defined($val) ? "'$val'" : 'undef', ",\n";
+        $c{$key}=$val;
+      }
+      print ");\n"
+    }
+    : sub {
+      shift;
+      %c=(%c, @_);
+    };
 
   *keys=sub {
     return keys %c;

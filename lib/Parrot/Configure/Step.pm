@@ -19,8 +19,6 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 	gen   => [qw(genfile copy_if_diff move_if_diff)]
 );
 
-my $redir_err = (($ENV{COMSPEC} || "")=~ /command\.com/i) ? "" : "2>&1";
-
 #Configure::Data->get('key')
 #Configure::Data->set('key', 'value')
 #Configure::Data->keys()
@@ -167,6 +165,57 @@ sub genfile {
     move_if_diff("$target.tmp", $target, $options{ignorePattern});
 }
 
+sub _run_command {
+    my ($command, $out, $err) = @_;
+    my $verbose = Configure::Data->get('verbose');
+
+    if ($verbose) {
+      print "$command\n";
+    }
+
+    # Mostly copied from Parrot::Test.pm
+    foreach ($out, $err) {
+        $_ = 'NUL:' if $^O eq 'MSWin32' and $_ eq '/dev/null';
+    }
+
+    if ( $out and $err and $out eq $err ) {
+        $err = "&STDOUT";
+    }
+
+    local *OLDOUT if $out;
+    local *OLDERR if $err;
+
+    # Save the old filehandles; we must not let them get closed.
+    open  OLDOUT, ">&STDOUT" or die "Can't save     stdout" if $out;
+    open  OLDERR, ">&STDERR" or die "Can't save     stderr" if $err;
+
+    open  STDOUT, ">$out"    or die "Can't redirect stdout" if $out;
+    open  STDERR, ">$err"    or die "Can't redirect stderr" if $err;
+
+    system $command;
+    my $exit_code = $? >> 8;
+
+    close STDOUT             or die "Can't close    stdout" if $out;
+    close STDERR             or die "Can't close    stderr" if $err;
+
+    open  STDOUT, ">&OLDOUT" or die "Can't restore  stdout" if $out;
+    open  STDERR, ">&OLDERR" or die "Can't restore  stderr" if $err;
+
+    if ($verbose) {
+        foreach ($out, $err) {
+            if ((defined($_)) && ($_ ne '/dev/null') 
+                 && ($_ ne 'NUL:') && (!m/^&/)) {
+                local *OUT;
+                open OUT, $_;
+                print <OUT>;
+                close OUT;
+            }
+        }
+    }
+
+    return $exit_code;
+}
+
 sub cc_gen {
 	my($source)=@_;
 
@@ -177,36 +226,60 @@ sub cc_build {
 	my($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
 		Configure::Data->get( qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs) );
 
-	system("$cc $ccflags -I./include -c test.c >test.cco $redir_err") and confess "C compiler failed (see test.cco)";
+        _run_command("$cc $ccflags -I./include -c test.c",
+                     'test.cco', 'test.cco')
+            and confess "C compiler failed (see test.cco)";
 
-	system("$link $linkflags test$o ${cc_exe_out}test$exe $libs >test.ldo $redir_err") and confess "Linker failed (see test.ldo)";
+        _run_command("$link $linkflags test$o ${cc_exe_out}test$exe $libs",
+                     'test.ldo', 'test.ldo')
+            and confess "Linker failed (see test.ldo)";
 }
 
 sub cc_run {
 	my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
+
     if (defined($_[0]) && length($_[0])) {
-	    `.${slash}test$exe $_[0]`;
+        local $"=' ';
+        _run_command(".${slash}test${exe} @_", './test.out');
     }
     else {
-	    `.${slash}test$exe`;
+        _run_command(".${slash}test${exe}", './test.out');
     }
+
+    local *OUT;
+    local $/; # enable slurp mode
+    open OUT, './test.out';
+    my $output = <OUT>;
+    close OUT;
+
+    return $output;
 }
 
 sub cc_run_capture {
 	my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
+
     if (defined($_[0]) && length($_[0])) {
-	    `.${slash}test$exe $_[0] $redir_err`;
+        local $"=' ';
+        _run_command(".${slash}test${exe} @_", './test.out', './test.out');
     }
     else {
-	    `.${slash}test$exe $redir_err`;
+        _run_command(".${slash}test${exe}", './test.out', './test.out');
     }
+
+    local *OUT;
+    local $/; # enable slurp mode
+    open OUT, './test.out';
+    my $output = <OUT>;
+    close OUT;
+
+    return $output;
 }
 
 sub cc_clean {
 	unlink map "test$_",
-		qw( .c .cco .ldo ),
+		qw( .c .cco .ldo .out),
 		Configure::Data->get( qw( o exe ) );
 }
 
