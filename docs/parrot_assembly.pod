@@ -162,7 +162,7 @@ current PC.
 All registers have a type prefix of P, S, I, or N, for PMC, string,
 integer, and number respectively.
 
-=head1 Assembly syntax
+=head1 Assembly Syntax
 
 All assembly opcodes contain only ASCII lowercase letters and the underscore.
 

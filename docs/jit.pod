@@ -257,6 +257,8 @@ Call a C function. The idea is to replace all the B<CALL>() with B<FUNC>().
 
 The arguments to CALL and SYSTEMCALL must be preceeded by I<V> to indicate that the value should be taken as an immediate or I<A> to indicate that the value should be dereferenced.
 
+=back
+
 =head1 ALPHA Notes
 
 The access to Parrot registers is done relative to C<$6>, all other memory access is done relative to C<$27>, to access float constants relative to C<$7> so you must preside the instruction with I<ldah $7,0($27)>.
@@ -385,4 +387,3 @@ The same process is done one time per opcode.
 
 This code is ready to be called.
 
-=back

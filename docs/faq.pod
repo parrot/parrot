@@ -12,7 +12,7 @@ Translated to POD and added "Why aren't we using external tool or library I<X>?"
 
 =item Revision 0.2 - 03 December 2001
 
-Added the "Parrot and Perl" section and "Why Reimplement Perl".  Incorporated Dan's Q&A items.
+Added the "Parrot and Perl" section and "Why Re-implement Perl".  Incorporated Dan's Q&A items.
 
 =item Revision 0.1 - 03 December 2001
 
@@ -182,7 +182,7 @@ ends.
 
 =head1 PARROT AND PERL
 
-=head2 Why reimplement Perl?
+=head2 Why re-implement Perl?
 
 Good question.
 
@@ -219,7 +219,7 @@ I<false> on success, and C<localtime> should return the year, not the year - 190
 
 =item *
 
-It would be nice to write the Perl to Bytcode compiler in Perl, instead of 
+It would be nice to write the Perl to Bytecode compiler in Perl, instead of 
 C. That would make it much easier for Perl hackers to hack on Perl. 
 
 =back
@@ -274,7 +274,7 @@ B<What> others?  That's it, unless you count Perl, Python, or Ruby.
 Yeah, right.  You never thought of them as VMs, admit it.  :^)
 
 Seriously, we're already running with a faster opcode dispatch than any of them are, and having registers just 
-decreases the amound of stack thrash we get.
+decreases the amount of stack thrash we get.
 
 =head2 Right, smarty.  Then name a successful register-based VM!
 
