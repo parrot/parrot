@@ -1,1 +1,47 @@
-# missing
+LN_SF  = ln -s -f
+PARROT = ..${slash}..${slash}parrot${exe}
+PERL   = ${perl}
+RM_RF  = ${rm_rf}
+
+all: build 
+
+test: build
+	$(PERL) -MTest::Harness -e 'Test::Harness::runtests( glob( "t/*/*.t" ) )'
+
+build: runtime library m4.pbc 
+
+runtime: 
+	$(LN_SF) ../../runtime
+
+library: 
+	$(LN_SF) ../../library
+
+m4.pbc: src/m4.pbc 
+	$(LN_SF) src/m4.pbc 
+
+src/m4.imc: src/builtin.imc src/macro.imc src/input.imc  
+	touch $@ 
+
+html: 
+	mkdir docs/html 
+	pod2html docs/*.pod -o docs/html
+ 
+clean:
+	$(RM_RF) \
+  *.pbc \
+  src/*.pbc \
+  src/*/*.pbc \
+  src/*~ \
+  t/*/*.m4 \
+  t/*/*.parrot_out \
+  t/*/*.gnu_out \
+  t/*/*.imc \
+  runtime \
+  library
+
+%.pbc: %.imc
+	$(PARROT) -o $@ $< 
+
+distclean: clean
+
+.PRECIOUS: %.imc 
