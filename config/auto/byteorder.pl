@@ -34,12 +34,14 @@ sub runstep {
       byteorder => $byteorder,
       bigendian => 0
     );
+    $Configure::Step::result = 'little-endian';
   }
   elsif($byteorder =~ /^(8765|4321)/) {
     Configure::Data->set(
       byteorder => $byteorder,
       bigendian => 1
     );
+    $Configure::Step::result = 'big-endian';
   }
   else {
     die "Unsupported byte-order [$byteorder]!";

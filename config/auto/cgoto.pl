@@ -56,9 +56,11 @@ EOF
       cg_flag       => '-DHAVE_COMPUTED_GOTO'
     );
     print " (yes) " if $verbose;
+    $Configure::Step::result = 'yes';
   }
   else {
     print " (no) " if $verbose;
+    $Configure::Step::result = 'no';
     Configure::Data->set(
       TEMP_cg_h    => '',
       TEMP_cg_c    => '',

@@ -47,9 +47,11 @@ sub runstep {
 	}
 	if ($test) {
 	    print " ($test) " if $verbose;
+            $Configure::Step::result = 'yes';
 	}
 	else {
 	    print " no " if $verbose;
+            $Configure::Step::result = 'no';
 	    $test = '';
 	}
     }

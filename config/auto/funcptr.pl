@@ -46,6 +46,7 @@ END
     }
     cc_clean();
     print " (yes) " if $_[0];
+    $Configure::Step::result = 'yes';
   }
 }
 

@@ -71,6 +71,7 @@ sub runstep {
             $test  ? 'memalign'       : '';
     Configure::Data->set( memalign => $f );
     print($test ? " (Yep:$f) " : " (no) ") if $verbose;
+    $Configure::Step::result = $test ? 'yes' : 'no';
 }
 
 1;

@@ -85,11 +85,12 @@ sub runsteps {
     my $n = 0;
 
     for(@steps) {
+        undef $Configure::Step::result;
 
         die "No config/$_" unless -e "config/$_";
         require "config/$_";
         print "\n$Configure::Step::description";
-        print '.' x (70-length $Configure::Step::description);
+        print '...';
 	++$n;
 	if ($args{'verbose-step'}) {
 	    if ($args{'verbose-step'} =~ /^\d+$/ &&
@@ -105,7 +106,7 @@ sub runsteps {
 
         print "\n" if $args{verbose} && $args{verbose} == 2;
 
-        $Configure::Step::result='done';
+        $Configure::Step::result ||= 'done';
 
 
         {
@@ -114,6 +115,8 @@ sub runsteps {
         }
 
         print "..." if $args{verbose} && $args{verbose} == 2;
+        print "." x (71 - length($Configure::Step::description) 
+                        - length($Configure::Step::result));
         print "$Configure::Step::result." unless m{^inter/} && $args{ask};
 
 	$args{verbose} = $verbose;

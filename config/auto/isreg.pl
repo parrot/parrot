@@ -35,6 +35,7 @@ sub runstep {
 	isreg  => $test
     );
     print($test ? " (Yep) " : " (no) ") if $_[0];
+    $Configure::Step::result = $test ? 'yes' : 'no';
 }
 
 1;

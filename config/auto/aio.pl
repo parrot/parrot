@@ -37,6 +37,7 @@ sub runstep {
 		INFO=42\n
 		ok/x) {
 	    print " (yes) " if $verbose;
+            $Configure::Step::result = 'yes';
 
 	    Configure::Data->set(
 		aio => 'define',
@@ -50,5 +51,6 @@ sub runstep {
     else {
 	Configure::Data->set('libs', $libs);
 	print " (no) " if $verbose;
+        $Configure::Step::result = 'no';
     }
 }

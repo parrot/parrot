@@ -52,6 +52,7 @@ sub runstep {
 	$test = cc_run();
 	if ($test eq "499999500000\n") {
 	    print " (yes) " if $verbose;
+            $Configure::Step::result = 'yes';
 
 	    Configure::Data->set(
 		gmp => 'define',
@@ -65,6 +66,7 @@ sub runstep {
         Configure::Data->set('ccflags', $ccflags);
         Configure::Data->set('linkflags', $linkflags);
         print " (no) " if $verbose;
+        $Configure::Step::result = 'no';
     }
 }
 
