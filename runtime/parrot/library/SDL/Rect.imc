@@ -46,6 +46,9 @@ An SDL::Rect object has the following methods:
 
 .sub _initialize prototyped, @LOAD
 
+	$I0 = find_type 'SDL::Rect'
+	if $I0 > 1 goto END
+	
 	.local   pmc rect_class
 	newclass     rect_class, 'SDL::Rect'
 	addattribute rect_class, '_rect'
@@ -54,6 +57,7 @@ An SDL::Rect object has the following methods:
 	new initializer, .PerlString
 	initializer = '_new'
 	setprop      rect_class, 'BUILD', initializer
+END:
 
 .end
 
