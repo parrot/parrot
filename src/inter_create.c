@@ -311,7 +311,7 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      * no DOD run, so everything is considered dead
      */
 
-    free_unused_pobjects(interpreter, interpreter->arena_base->pmc_pool);
+    Parrot_dod_sweep(interpreter, interpreter->arena_base->pmc_pool);
 
     /* Now the PIOData gets also cleared */
     PIO_finish(interpreter);

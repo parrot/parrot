@@ -35,10 +35,10 @@
 
 /* Macros for testing if the DOD and GC are blocked */
 #define Parrot_is_blocked_DOD(interpreter) \
-        ((interpreter)->DOD_block_level)
+        ((interpreter)->arena_base->DOD_block_level)
 
 #define Parrot_is_blocked_GC(interpreter) \
-        ((interpreter)->GC_block_level)
+        ((interpreter)->arena_base->GC_block_level)
 
 enum {
     DOD_trace_stack_FLAG = 1 << 0,
@@ -65,6 +65,10 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *buffer);
 /* Set when walking the system stack */
 extern int CONSERVATIVE_POINTER_CHASING;
 #endif
+
+int Parrot_dod_trace_root(Interp *, int trace_stack);
+int Parrot_dod_trace_children(Interp *, size_t how_many);
+void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
 
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);

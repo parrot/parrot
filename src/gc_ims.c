@@ -338,8 +338,13 @@ a sleep opcode.
 
 #include "parrot/parrot.h"
 
+#define ALLOCATION_BLOCK_SIZE 8192
+#define ALLOCATIONS_INIT      1024
+#define THROTTLE              2.0
+
 typedef enum {
     GC_IMS_INITIAL,
+    GC_IMS_STARTING,
     GC_IMS_RE_INIT,
     GC_IMS_MARKING,
     GC_IMS_SWEEP,
@@ -399,9 +404,10 @@ gc_ims_alloc_objects(Interp *interpreter,
     size_t size;
     UINTVAL start, end;
 
+    pool->objects_per_alloc = ALLOCATION_BLOCK_SIZE / pool->object_size;
     /* Setup memory for the new objects */
     new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
-    size = pool->object_size * pool->objects_per_alloc;
+    size = ALLOCATION_BLOCK_SIZE;
     /* could be mem_sys_allocate too, but calloc is fast */
     new_arena->start_objects = mem_sys_allocate_zeroed(size);
 
@@ -434,6 +440,148 @@ Parrot_gc_ims_init(Interp* interpreter)
     add_free_object_fn = gc_ims_add_free_object;
     get_free_object_fn = gc_ims_get_free_object;
     alloc_objects_fn   = gc_ims_alloc_objects;
+    more_objects_fn    = gc_ims_alloc_objects;
+    /*
+     * run init state
+     */
+    parrot_gc_ims_run_increment(interpreter);
+}
+
+/*
+
+=item C<static void parrot_gc_ims_reinit(Interp*)>
+
+Reinitialize the collector for the next collection cycle.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_reinit(Interp* interpreter)
+{
+    Gc_ims_private *g_ims;
+    int lazy;
+
+    g_ims = interpreter->arena_base->gc_private;
+    lazy =  interpreter->arena_base->lazy_dod;
+
+    if (lazy) {
+        /* we don't abort the DOD run that would just waste time
+         */
+        interpreter->arena_base->lazy_dod = 0;
+    }
+
+    Parrot_dod_trace_root(interpreter, 0);
+    interpreter->arena_base->lazy_dod = lazy;
+
+}
+
+/*
+
+=item C<static void parrot_gc_ims_mark(Interp*)>
+
+Mark a bunch of children.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_mark(Interp* interpreter)
+{
+    Gc_ims_private *g_ims;
+    size_t todo;
+    struct Arenas *arena_base;
+    int lazy;
+
+    arena_base = interpreter->arena_base;
+    g_ims = arena_base->gc_private;
+    todo = g_ims->alloc_trigger * g_ims->throttle;
+    lazy =  arena_base->lazy_dod;
+    if (lazy) {
+        /* we don't abort the DOD run that would just waste time
+         */
+        interpreter->arena_base->lazy_dod = 0;
+    }
+    Parrot_dod_trace_children(interpreter, todo);
+    interpreter->arena_base->lazy_dod = lazy;
+    if (arena_base->dod_trace_ptr ==
+            PMC_next_for_GC(arena_base->dod_trace_ptr)) {
+        g_ims->state = GC_IMS_SWEEP;
+    }
+}
+
+/*
+
+=item C<static void parrot_gc_ims_sweep(Interp*)>
+
+Free unused objects in all header pools.
+TODO split work per pool.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_sweep(Interp* interpreter)
+{
+    struct Arenas *arena_base = interpreter->arena_base;
+    struct Small_Object_Pool *header_pool;
+    Gc_ims_private *g_ims;
+    int j;
+
+    g_ims = arena_base->gc_private;
+    /*
+     * as we are now gonna kill objects, make sure that we
+     * have traced the current stack
+     * TODO split the stack trace out from trace_root
+     */
+    Parrot_dod_trace_root(interpreter, 1);
+    /*
+     * mark rest of children
+     */
+    Parrot_dod_trace_children(interpreter, (size_t) -1);
+    /* pmc pool */
+    header_pool = arena_base->pmc_pool;
+    Parrot_dod_sweep(interpreter, header_pool);
+    /* and non-empty sized buffer pools */
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        header_pool = arena_base->sized_header_pools[j];
+        if (header_pool) {
+#ifdef GC_IS_MALLOC
+            used_cow(interpreter, header_pool, 0);
+#endif
+            Parrot_dod_sweep(interpreter, header_pool);
+#ifdef GC_IS_MALLOC
+            clear_cow(interpreter, header_pool, 0);
+#endif
+        }
+    }
+    g_ims->state = GC_IMS_FINISHED;     /* TODO collect */
+}
+
+/*
+
+=item C<static void parrot_gc_ims_collect(Interp*)>
+
+Run the copying collector in memory pools, if it could yield some free
+memory.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_collect(Interp* interpreter)
+{
+    struct Arenas *arena_base = interpreter->arena_base;
+    struct Small_Object_Pool *header_pool;
+    Gc_ims_private *g_ims;
+    int j;
+
+    g_ims = arena_base->gc_private;
+    /* TODO */
 }
 
 /*
@@ -450,6 +598,41 @@ allocation.
 static void
 parrot_gc_ims_run_increment(Interp* interpreter)
 {
+    Gc_ims_private *g_ims;
+    g_ims = interpreter->arena_base->gc_private;
+    g_ims->allocations = 0;
+
+    switch (g_ims->state) {
+        case GC_IMS_INITIAL:
+            g_ims->state = GC_IMS_STARTING;
+            g_ims->alloc_trigger = ALLOCATIONS_INIT;
+            g_ims->throttle = THROTTLE;
+            break;
+        case GC_IMS_STARTING:
+            if (Parrot_is_blocked_DOD(interpreter))
+                break;
+            /* else fall through and start */
+        case GC_IMS_RE_INIT:
+            parrot_gc_ims_reinit(interpreter);
+            g_ims->state = GC_IMS_MARKING;
+            break;
+
+        case GC_IMS_MARKING:
+            parrot_gc_ims_mark(interpreter);
+            break;
+        case GC_IMS_SWEEP:
+            parrot_gc_ims_sweep(interpreter);
+            break;
+        case GC_IMS_COLLECT:
+            parrot_gc_ims_collect(interpreter);
+            break;
+        case GC_IMS_FINISHED:
+            ++interpreter->arena_base->dod_runs;
+            g_ims->state = GC_IMS_RE_INIT;
+            break;
+        default:
+            PANIC("Unknown state in gc_ims");
+    }
 }
 
 

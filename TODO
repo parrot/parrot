@@ -65,8 +65,8 @@ Interpreter
 Opcodes
 -------
 
-Mark branch arguments in ops files, e.g. addr/constaddr INT instead of
-in/inconst INT.
+Mark IN/OUT register usage of ops. This is mainly for stack push/pop
+opcodes that have hidden semantics towards register life-time.
 
 Assembler
 ---------

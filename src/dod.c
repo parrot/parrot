@@ -40,8 +40,8 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 #endif
 
 static size_t find_common_mask(size_t val1, size_t val2);
-static int trace_children(Parrot_Interp , PMC *current);
 static void profile_dod_end(Parrot_Interp, int what);
+static void trace_active_buffers(Interp *interpreter);
 
 /*
 
@@ -234,6 +234,12 @@ Do a full trace run and mark all the PMCs as active if they are. Returns
 whether the run wasn't aborted; i.e. whether it's safe to proceed with
 GC.
 
+=item C<int
+Parrot_dod_trace_root(Interp *interpreter, int trace_stack)>
+
+Trace the root set. Returns 0 if its a lazy DOD run and all objects
+that need timely destruction were found.
+
 =cut
 
 */
@@ -241,9 +247,10 @@ GC.
 /* XXX . objects.c */
 void mark_object_cache(Parrot_Interp);
 
-static int
-trace_active_PMCs(Interp *interpreter, int trace_stack)
+int
+Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
 {
+
     struct Arenas *arena_base = interpreter->arena_base;
     PMC *current;
     /* Pointer to the currently being processed PMC
@@ -324,15 +331,26 @@ trace_active_PMCs(Interp *interpreter, int trace_stack)
     /* Find important stuff on the system stack */
     if (trace_stack)
         trace_system_areas(interpreter);
+
+    /* And the buffers */
+    trace_active_buffers(interpreter);
+    return 1;
+}
+
+static int
+trace_active_PMCs(Interp *interpreter, int trace_stack)
+{
+    if (!Parrot_dod_trace_root(interpreter, trace_stack))
+        return 0;
     /* Okay, we've marked the whole root set, and should have a good-sized
      * list of things to look at. Run through it */
-    return trace_children(interpreter, current);
+    return Parrot_dod_trace_children(interpreter, (size_t) -1);
 }
 
 /*
 
-=item C<static int
-trace_children(Interp *interpreter, PMC *current)>
+=item C<int
+Parrot_dod_trace_children(Interp *interpreter, size_t how_many)>
 
 Returns whether the tracing process wasn't aborted.
 
@@ -340,13 +358,14 @@ Returns whether the tracing process wasn't aborted.
 
 */
 
-static int
-trace_children(Interp *interpreter, PMC *current)
+int
+Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
 {
     PMC *prev = NULL, *next;
     struct Arenas *arena_base = interpreter->arena_base;
     INTVAL i = 0;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
+    PMC *current = arena_base->dod_trace_ptr;
 
     int lazy_dod = arena_base->lazy_dod;
 
@@ -408,7 +427,13 @@ trace_children(Interp *interpreter, PMC *current)
         }
 
         prev = current;
+        if (--how_many == 0) {
+            if (current != PMC_next_for_GC(current))
+                current = PMC_next_for_GC(current);
+            break;
+        }
     }
+    arena_base->dod_trace_ptr = current;
     return 1;
 }
 
@@ -639,7 +664,7 @@ reduce_arenas(Interp *interpreter,
 /*
 
 =item C<void
-free_unused_pobjects(Interp *interpreter,
+Parrot_dod_sweep(Interp *interpreter,
         struct Small_Object_Pool *pool)>
 
 Put any buffers/PMCs that are now unused onto the pool's free list. If
@@ -651,7 +676,7 @@ are immune from collection (i.e. constant).
 */
 
 void
-free_unused_pobjects(Interp *interpreter,
+Parrot_dod_sweep(Interp *interpreter,
         struct Small_Object_Pool *pool)
 {
     struct Arenas *arena_base = interpreter->arena_base;
@@ -1070,8 +1095,6 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
 #endif
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interpreter, flags & DOD_trace_stack_FLAG)) {
-        /* And the buffers */
-        trace_active_buffers(interpreter);
 
         /*
          * mark is now finished
@@ -1081,7 +1104,7 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
         /* pt_DOD_stop_mark(interpreter); */
         /* Now put unused PMCs on the free list */
         header_pool = arena_base->pmc_pool;
-        free_unused_pobjects(interpreter, header_pool);
+        Parrot_dod_sweep(interpreter, header_pool);
         total_free += header_pool->num_free_objects;
         if (interpreter->profile)
             profile_dod_end(interpreter, PARROT_PROF_DOD_cp);
@@ -1093,7 +1116,7 @@ Parrot_do_dod_run(Interp *interpreter, UINTVAL flags)
 #ifdef GC_IS_MALLOC
                 used_cow(interpreter, header_pool, 0);
 #endif
-                free_unused_pobjects(interpreter, header_pool);
+                Parrot_dod_sweep(interpreter, header_pool);
                 total_free += header_pool->num_free_objects;
 #ifdef GC_IS_MALLOC
                 clear_cow(interpreter, header_pool, 0);

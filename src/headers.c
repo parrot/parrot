@@ -684,7 +684,7 @@ Parrot_destroy_header_pools(Interp *interpreter)
             if (pool) {
                 if (j <= -2) {
                     if (i == 2)
-                        free_unused_pobjects(interpreter, pool);
+                        Parrot_dod_sweep(interpreter, pool);
                 }
                 else {
 #ifdef GC_IS_MALLOC
@@ -694,7 +694,7 @@ Parrot_destroy_header_pools(Interp *interpreter)
                         used_cow(interpreter, pool, 1);
                     else
 #endif
-                        free_unused_pobjects(interpreter, pool);
+                        Parrot_dod_sweep(interpreter, pool);
                 }
             }
             if (i == 2 && pool) {
