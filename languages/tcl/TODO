@@ -2,16 +2,6 @@
 
 =over 4
 
-=item release
-
-OK AFTER HERE - ONCE DONE HERE, then update config.in for our Main Makefile -
-delete any crufty files. Do a fresh checkout from CVS - overrwrite all my changes
-in languages/tcl - make sure a fresh build works, following the CVS directions I
-provide for Leo.... then ship it to Leo for publication to the list.
-Put in a version number. put in a CHANGELOG.
-Thank wossisname for the maintenance path, encourage other patches?
-
-
 =item unfinished commands
 
 array, error, and catch are currently not finished, though preliminary 
@@ -36,15 +26,6 @@ TBD: functions that take > 1 arg.
 TBD: Argument type requirements - Currently works ONLY on bitand - esp need
 to get any that require int-only args, as we can now /generate/ floats,
 even if we cannot specify them.
-
-=item release
-
-still missing a few files from the manifest/makefile.in (all the ops,
-the functions, check the new commands)
-
-=item release
-
-Cut a new release for Leo to add to the repo.
 
 =item misc
 
