@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More qw(skip);
 output_is(<<'CODE', <<'OUTPUT', "new iter");
 	new P2, .PerlArray
@@ -230,6 +230,45 @@ CODE
 4
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "string iteration forward");
+	new P2, .PerlString
+	set P2, "parrot"
+	new P1, .Iterator, P2
+	set P1, 0
+iter_loop:
+        unless P1, iter_end		# while (entries) ...
+	shift S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+parrot
+parrot
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "string iteration backward");
+	new P2, .PerlString
+	set P2, "parrot"
+	new P1, .Iterator, P2
+	set P1, 3
+iter_loop:
+        unless P1, iter_end		# while (entries) ...
+	pop S1, P1
+	print S1
+	branch iter_loop
+iter_end:
+	print "\n"
+	print P2
+	print "\n"
+	end
+CODE
+torrap
+parrot
+OUTPUT
 SKIP: {
 skip("N/Y: get_keyed_int gets rest of array", 1);
 output_is(<<'CODE', <<'OUTPUT', "shift + index access");

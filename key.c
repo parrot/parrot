@@ -241,6 +241,8 @@ key_mark(struct Parrot_Interp *interpreter, PMC *key)
     if ( ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_string_FLAG) ||
        ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_pmc_FLAG) )
         pobject_lives(interpreter, (PObj *)key->cache.string_val);
+    if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG)
+        return;
 
     if (PMC_data(key))
         pobject_lives(interpreter, (PObj *)PMC_data(key));
