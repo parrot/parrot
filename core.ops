@@ -86,7 +86,6 @@ environment.
 
 =cut
 
-
 ########################################
 
 =item B<err>(out INT)
@@ -107,47 +106,6 @@ inline op err(out INT) {
 op err(out STR) {
   char *tmp = strerror(errno);
   $1 = string_make(interpreter, tmp, strlen(tmp), NULL, 0, NULL);
-  goto NEXT();
-}
-
-
-########################################
-
-
-########################################
-
-=item B<read>(out INT, in INT)
-
-Read an INTVAL from file descriptor $2 into $1.
-
-=item B<read>(out NUM, in INT)
-
-Read a FLOATVAL from file descriptor $2 into $1.
-
-=item B<read>(out STR, in INT, in INT)
-
-Read $3 bytes from file descriptor $2 into string $1.
-
-=cut
-
-inline op read(out INT, in INT) {
-  read($2, &($1), sizeof(INTVAL));
-  goto NEXT();
-}
-
-inline op read(out NUM, in INT) {
-  read($2, &($1), sizeof(FLOATVAL));
-  goto NEXT();
-}
-
-op read(out STR, in INT, in INT) {
-  STRING *s;
-  UINTVAL len = $3;
-
-  s = string_make(interpreter, NULL, len, NULL, 0, NULL);
-  read($2, s->strstart, len);
-  s->bufused = len;
-  $1 = s;
   goto NEXT();
 }
 
@@ -180,39 +138,6 @@ inline op time(out NUM) {
   $1 = Parrot_floatval_time();
   goto NEXT();
 }
-
-
-########################################
-
-=item B<write>(in INT, in INT)
-
-=item B<write>(in INT, in NUM)
-
-=item B<write>(in INT, in STR)
-
-Write $2 to file descriptor $1.
-
-=cut
-
-op write(in INT, in INT) {
-  INTVAL i = (INTVAL)$2;
-  write($1, &i, sizeof(INTVAL));
-  goto NEXT();
-}
-
-op write(in INT, in NUM) {
-  FLOATVAL * f = &($2);
-  write($1, f, sizeof(FLOATVAL));
-  goto NEXT();
-}
-
-op write(in INT, in STR) {
-  STRING * s = $2;
-  UINTVAL count = string_length(s);
-  write($1, s->strstart, count);
-  goto NEXT();
-}
-
 
 =back
 
