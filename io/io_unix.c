@@ -443,8 +443,23 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     STRING * packed;
     struct sockaddr_in sa;
     /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
-    sa.sin_addr.s_addr =
-                inet_addr(string_to_cstring(interpreter, addr));
+    char * s = string_to_cstring(interpreter, addr);
+    if(inet_aton(s, &sa.sin_addr.s_addr) != 0) {
+        /* Success converting numeric IP */
+    }
+    else {
+        /* Maybe it is a hostname, try to lookup */
+        /* XXX Check PIO option before doing a name lookup,
+         * it may have been toggled off.
+         */
+        struct hostent *he = gethostbyname(s);
+        /* XXX FIXME - Handle error condition better */
+        if(!he) {
+            fprintf(stderr, "gethostbyname failure [%s]\n", s);
+            return packed;
+        }
+        memcpy((char*)&sa.sin_addr, he->h_addr, sizeof(sa.sin_addr));
+    }
     sa.sin_port = htons(port);
 
     fprintf(stderr, "sockaddr_in: port %d\n", port);
