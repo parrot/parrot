@@ -653,7 +653,7 @@ files and then try running Configure again.
 
 END
 
-        exit;
+        exit 1;
     }
     else {
                 print <<"END";
