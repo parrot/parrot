@@ -232,7 +232,7 @@ sub read_ops
     }
 
     #
-    # Accummulate the code into the op's body:
+    # Accumulate the code into the op's body:
     #
 
     if ($seen_op) {
@@ -301,6 +301,7 @@ sub make_op
       #   expr OFFSET(X)     {{^+X}}  PC + X        Relative address
       #   expr NEXT()        {{^+S}}  PC + S        Where S is op size
       #   expr ADDRESS(X)    {{^X}}   X             Absolute address
+      #   OP_SIZE            {{^S}}   S             op size
       #
       #   HALT()             {{=0}}   PC' = 0       Halts run_ops loop, no resume
       #
@@ -327,6 +328,7 @@ sub make_op
       $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
                     $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
                     $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
+                    $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
 
       $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
                     $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;

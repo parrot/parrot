@@ -16,7 +16,6 @@ use vars qw(@ISA);
 sub defines
 {
   return <<END;
-#define CUR_OPCODE cur_opcode
 #define REL_PC (cur_opcode - start_code)
 #define IREG(i) interpreter->ctx.int_reg.registers[i]
 #define NREG(i) interpreter->ctx.num_reg.registers[i]
@@ -85,9 +84,17 @@ sub goto_address
 }
 
 
+#
+# expr_offset()
+#
+# On offset expression is always an offset from start_code, because
+# the 'ret' instruction may be in a different runops core. 'ret' will
+# always treat saved addresses as relative to start_code, because that
+# interpretation is global across all runops cores.
+#
 sub expr_offset {
     my ($self, $offset) = @_;
-    return sprintf("&&PC_%d", $self->pc + $offset);
+    return sprintf("start_code + %d + %s", $self->pc, $offset);
 }
 
 #
