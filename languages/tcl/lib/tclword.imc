@@ -72,6 +72,7 @@ Initialize the attributes for an instance of the class
   .local pmc emptyArray
   .local pmc constant
   .local int TclList,TclInt
+
   TclInt = find_type "TclInt" 
   TclList = find_type "TclList" 
   emptyArray = new TclList
@@ -351,8 +352,11 @@ result.
   retval = ""
 
   $I1 = chunks
-  $I0 = 0   
+  $P11 = new Integer  
+  $P11 = 0 # XXX If we don't use a PMC, this value is discarded because of 
+           # a method call below.
 loop:
+  $I0 = $P11
   if $I0 == $I1 goto loop_done
   $P0 = chunks[$I0]
   $I2 = $P0[0]
@@ -365,9 +369,9 @@ command:
   $P1 = $P0[1]
   $S1 = typeof $P1
   ($I0, $P9) = interpret( $P1 )
-  retval = $P9
+  $S0 = $P9
   if $I0 == 0 goto loop_next
-  # An exception value was returned. abort.
+  # else, an exception value was returned. abort.
   return_type = $I0
   goto loop_done
 
@@ -393,7 +397,7 @@ constant:
 
 loop_next:
   retval .= $S0
-  inc $I0
+  $P11 = $P11 + 1
   goto loop
 
 loop_done:  
