@@ -13,7 +13,7 @@ t/op/jit.t - JIT register allocation
 =head1 DESCRIPTION
 
 Tests JIT register allocation. The tests are written for 4 mapped
-registers per kind, i.e. the crippled x86 architecture. If you are 
+registers per kind, i.e. the crippled x86 architecture. If you are
 experimenting with register allocation please just use settings like
 in jit/i386/jit_emit, i.e. 4 mapped regs, 2 volatile ints ...
 
@@ -1160,6 +1160,7 @@ done
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "volatile clobbered by function call");
+  null I3
   add I4, I5, I6
   add I4, I5, I6
   add I4, I5, I6
