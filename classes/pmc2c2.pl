@@ -87,7 +87,7 @@ sub dump_default {
     my $file = "$FindBin::Bin/../vtable.tbl";
     my $default = parse_vtable($file);
     my $dump;
-    ($dump = $file) =~ s/\.\w+/\.dump/;
+    ($dump = $file) =~ s/\.\w+$/\.dump/;
     print "Writing $dump\n" if $opt{verbose};
     open(VTD, ">$dump") or die "Can't write $dump";
     my %vt;
@@ -248,7 +248,7 @@ sub gen_parent_list {
 
 sub dump_1_pmc {
     my $file = shift;
-    $file =~ s/\.\w+/.pmc/;
+    $file =~ s/\.\w+$/.pmc/;
     print "Reading $file\n" if $opt{verbose};
     open F, "<$file" or die "Can't read '$file'";
     local $/;
@@ -302,7 +302,7 @@ sub dump_pmc {
     foreach my $name (keys %all) {
         my $dump;
         my $file = $all{$name}->{file};
-        ($dump = $file) =~ s/\.\w+/\.dump/;
+        ($dump = $file) =~ s/\.\w+$/\.dump/;
         gen_parent_list($name, \%all);
         my $class = $all{$name};
         gen_super_meths($class, $vt);
@@ -318,7 +318,7 @@ sub dump_pmc {
 sub read_dump {
     my $file = shift;
     my $dump;
-    ($dump = $file) =~ s/\.\w+/.dump/;
+    ($dump = $file) =~ s/\.\w+$/.dump/;
     unless ( -e $dump) {
         if ($dump =~ m!^classes/!) {
             $dump =~ s!^classes/!!;
@@ -365,8 +365,8 @@ sub gen_c {
 	my $hout = $generator->gen_h($file);
         print $hout if $opt{debug};
         my $h;
-        ($h = $file) =~ s/\.\w+/.h/;
-        $h =~ s/(\w+)\.h/pmc_$1.h/;
+        ($h = $file) =~ s/\.\w+$/.h/;
+        $h =~ s/(\w+)\.h$/pmc_$1.h/;
         print "Writing $h\n" if $opt{verbose};
         open H, ">$h" or die "Can't write '$h";
         print H $hout;
@@ -374,7 +374,7 @@ sub gen_c {
 	my $cout = $generator->gen_c($file);
         print $cout if $opt{debug};
         my $c;
-        ($c = $file) =~ s/\.\w+/.c/;
+        ($c = $file) =~ s/\.\w+$/.c/;
         print "Writing $c\n" if $opt{verbose};
         open C, ">$c" or die "Can't write '$c";
         print C $cout;
