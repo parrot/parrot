@@ -53,10 +53,8 @@ Marks the continuation as live.
 */
 
     void mark () {
-#if 1
         struct Parrot_cont * cc = PMC_cont(SELF);
         mark_context(INTERP, &cc->ctx);
-#endif
     }
 
 /*
@@ -90,9 +88,6 @@ Creates and returns a clone of the continuation.
         PObj_custom_mark_destroy_SETALL(ret);
         sub = PMC_cont(ret) = mem_sys_allocate(sizeof(struct Parrot_cont));
         memcpy(sub, cc_self, sizeof(struct Parrot_cont));
-        PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
-        /* be sure its not recycled */
-        assert (!(PObj_get_FLAGS(ret) & PObj_private2_FLAG));
 
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         return ret;

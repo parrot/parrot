@@ -1065,13 +1065,7 @@ static PMC* find_method_direct(Parrot_Interp, PMC *, STRING*);
 void
 mark_object_cache(Parrot_Interp interpreter)
 {
-    Caches *mc = interpreter->caches;
-    PMC *sub;
-    sub = mc->retc_free_list;
-    while (sub) {
-        pobject_lives(interpreter, (PObj*)sub);
-        sub = PMC_struct_val(sub);
-    }
+    /* nothing for now */
 }
 
 void
@@ -1081,7 +1075,6 @@ init_object_cache(Parrot_Interp interpreter)
 
     mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx)
-    SET_NULL(mc->retc_free_list);
 }
 
 

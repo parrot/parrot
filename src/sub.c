@@ -269,23 +269,6 @@ new_closure(Interp *interp)
 }
 /*
 
-=item C<void mark_stack_reusable(Parrot_Interp, struct Parrot_Context *)>
-
-Set continuation context stacks as recyclable.
-
-=cut
-
-*/
-void
-mark_stack_reusable(Parrot_Interp interpreter, struct Parrot_Context *ctx)
-{
-    PObj_get_FLAGS(ctx->int_reg_stack) |= PObj_private2_FLAG;
-    PObj_get_FLAGS(ctx->num_reg_stack) |= PObj_private2_FLAG;
-    PObj_get_FLAGS(ctx->pmc_reg_stack) |= PObj_private2_FLAG;
-    PObj_get_FLAGS(ctx->string_reg_stack) |= PObj_private2_FLAG;
-}
-/*
-
 =item C<struct Parrot_cont *
 new_continuation(Interp *interp)>
 
@@ -372,48 +355,6 @@ new_coroutine(Interp *interp)
     return co;
 }
 
-void
-add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
-{
-    Caches *mc = interpreter->caches;
-    struct Parrot_cont *cc_self = PMC_cont(sub);
-    /* is it created from new_ret_continuation_pmc() i.e.
-     * from invokecc or callmethodcc
-     */
-    if (!(PObj_get_FLAGS(sub) & PObj_private2_FLAG) ||
-            DISABLE_RETC_RECYCLING) {
-        return;
-    }
-    /* fprintf(stderr, "** add %p free = %p\n", sub, mc->retc_free_list); */
-    PMC_struct_val(sub) = mc->retc_free_list;
-    mc->retc_free_list = sub;
-    /* don't mark the continuation context
-     *  -- don't use PObj_custom_mark_* - too expensive and not necessary
-     */
-    PObj_flag_CLEAR(custom_mark, sub);
-    /*
-     * shouldn't be necessary, s. also stack_common.c
-     */
-    /* PObj_on_free_list_SET(sub); */
-    mark_stack_reusable(interpreter, &cc_self->ctx);
-}
-
-PMC *
-get_retc_from_free_list(Parrot_Interp interpreter)
-{
-    Caches *mc = interpreter->caches;
-    PMC *retc;
-
-    if (!mc->retc_free_list)
-        return NULL;
-    retc = mc->retc_free_list;
-    mc->retc_free_list = PMC_struct_val(retc);
-    PObj_flag_SET(custom_mark, retc);
-    /* PObj_on_free_list_CLEAR(retc); */
-    /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list ); */
-    return retc;
-}
-
 /*
 
 =item C<PMC *
@@ -429,28 +370,10 @@ PMC *
 new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 {
     PMC* continuation;
-    PMC *p0;
 
-    continuation = get_retc_from_free_list(interpreter);
-    if (continuation) {
-        /* freshen context */
-        struct Parrot_cont *sub = PMC_cont(continuation);
-        save_context(interpreter, &sub->ctx);
-        sub->seg = interpreter->code->cur_cs;
-    }
-    else {
-        continuation = pmc_new(interpreter, enum_class_RetContinuation);
-        PObj_get_FLAGS(continuation) |= (
-                PObj_private1_FLAG|PObj_private2_FLAG);
-    }
+    continuation = pmc_new(interpreter, enum_class_RetContinuation);
+    PObj_get_FLAGS(continuation) |= PObj_private1_FLAG;
     PMC_struct_val(continuation) = address;
-    p0 = REG_PMC(0);
-    /* don't recylce returncontinuations for coroutines
-     * XXX and continuations?
-     */
-    if (!PMC_IS_NULL(p0) && p0->vtable->base_type == enum_class_Coroutine) {
-        PObj_get_FLAGS(continuation) &= ~PObj_private2_FLAG;
-    }
     return continuation;
 }
 

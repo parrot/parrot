@@ -10,8 +10,8 @@ classes/retcontinuation.pmc - Return Continuation
 
 C<RetContinuation> extends C<Continuation>.
 
-A return continuation doesn't make COWed copies of the context, it just
-has pointers to the context, that are restored on invoke.
+A return continuation is like a Continuation, only its context isn't marked,
+because that's just some previous state of the interpreter.
 
 =head2 Methods
 
@@ -23,9 +23,6 @@ has pointers to the context, that are restored on invoke.
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
-
-/* XXX s. objects.c */
-void add_to_retc_free_list(Parrot_Interp, PMC*);
 
 pmclass RetContinuation extends Continuation {
 
@@ -42,45 +39,7 @@ Initializes the continuation.
     void init () {
         PMC_cont(SELF) = new_ret_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-    void mark () {
-        struct Parrot_cont * cc = PMC_cont(SELF);
-       /*
-        * s. imcc/t/syn/pcc_16 and t/op/gc_12
-        *
-        * marking a RetContinuation context segfaults in these tests
-        * the coroutine has a reference to the return continuation,
-        * which is recreated in main by invokecc. When now this
-        * retcontinuation is marked its context isn't pointing to
-        * the interpreter context anymore - its garbage.
-        *
-        * But if the continuation is a real continuation, we have to
-        * mark its context. s. t/op/gc_13
-        *
-        * -leo
-        */
-        if (!(PObj_get_FLAGS(SELF) & PObj_private2_FLAG)) {
-            SUPER();
-        }
-    }
-
-    void* invoke (void* next) {
-        struct Parrot_cont * cc = PMC_cont(SELF);
-#if ! DISABLE_GC_DEBUG
-        if (GC_DEBUG(interpreter)) {
-            if (PObj_on_free_list_TEST(SELF))
-                internal_exception(1, "recycled retc %p invoked", SELF);
-        }
-#endif
-        restore_context(interpreter, &cc->ctx);
-        if (interpreter->code->cur_cs != cc->seg) {
-            Parrot_switch_to_cs(interpreter, cc->seg, 1);
-        }
-        next = PMC_struct_val(SELF);
-        add_to_retc_free_list(interpreter, SELF);
-        return next;
+        PObj_active_destroy_SET(SELF);
     }
 
 }

@@ -45,6 +45,7 @@ Initializes the exception handler.
          * can only be deeper in the interpreter - so no
          * mark of context is needed
          */
+        PObj_active_destroy_SET(SELF);
     }
 
 }

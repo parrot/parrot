@@ -56,15 +56,12 @@ typedef struct _Caches {
     UINTVAL mc_size;            /* sizeof table */
     Meth_cache_entry ***idx;    /* bufstart idx */
     /* PMC **hash */            /* for non-constant keys */
-    PMC *retc_free_list;        /* recycled return continuations */
     void *stack_chunk_cache;    /* stack chunk recycling */
 
     Regs_cache regs_cache;      /* runops_fromc reg save cache */
 } Caches;
 
 void init_object_cache(Parrot_Interp interpreter);
-void add_to_retc_free_list(Parrot_Interp, PMC*);
-PMC *get_retc_from_free_list(Parrot_Interp);
 void mark_object_cache(Parrot_Interp);
 void mark_stack_reusable(Parrot_Interp, struct Parrot_Context *ctx);
 void mark_saved_regs(Parrot_Interp interpreter);
