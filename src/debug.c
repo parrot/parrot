@@ -94,8 +94,8 @@ parse_int(const char* str, int* intP)
  * to just after the string. The parsed string is converted to a
  * Parrot STRING. */
 static const char*
-parse_string(struct Parrot_Interp *interpreter,
-    const char* str, STRING** strP)
+parse_string(struct Parrot_Interp *interpreter, 
+             const char* str, STRING** strP)
 {
     const char* string;
 
@@ -123,8 +123,7 @@ parse_string(struct Parrot_Interp *interpreter,
  * after the key. Currently only string and integer keys are
  * allowed. */
 static const char*
-parse_key(struct Parrot_Interp *interpreter,
-    const char* str, PMC** keyP)
+parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)
 {
     *keyP = NULL;
     if (*str != '[')
@@ -920,7 +919,7 @@ PDB_delete_condition(struct Parrot_Interp *interpreter,
                      PDB_breakpoint_t *breakpoint)
 {
     if (breakpoint->condition->value) {
-        if (breakpoint->condition->type & 4) {
+        if (breakpoint->condition->type & PDB_cond_str) {
             /* 'value' is a string, so we need to be careful */
             PObj_external_CLEAR((STRING*)breakpoint->condition->value);
             PObj_on_free_list_SET((STRING*)breakpoint->condition->value);
@@ -981,12 +980,12 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
             j = *(INTVAL *)condition->value;
         else
             j = REG_INT(*(int *)condition->value);
-        if (((condition->type & PDB_cond_gt) && (i > j)) ||
+        if (((condition->type & PDB_cond_gt) && (i >  j)) ||
             ((condition->type & PDB_cond_ge) && (i >= j)) ||
             ((condition->type & PDB_cond_eq) && (i == j)) ||
             ((condition->type & PDB_cond_ne) && (i != j)) ||
             ((condition->type & PDB_cond_le) && (i <= j)) ||
-            ((condition->type & PDB_cond_lt) && (i < j)))
+            ((condition->type & PDB_cond_lt) && (i <  j)))
                 return 1;
         return 0;
     }
@@ -996,12 +995,12 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
             l = *(FLOATVAL *)condition->value;
         else
             l = REG_NUM(*(int *)condition->value);
-        if (((condition->type & PDB_cond_gt) && (k > l)) ||
+        if (((condition->type & PDB_cond_gt) && (k >  l)) ||
             ((condition->type & PDB_cond_ge) && (k >= l)) ||
             ((condition->type & PDB_cond_eq) && (k == l)) ||
             ((condition->type & PDB_cond_ne) && (k != l)) ||
             ((condition->type & PDB_cond_le) && (k <= l)) ||
-            ((condition->type & PDB_cond_lt) && (k < l)))
+            ((condition->type & PDB_cond_lt) && (k <  l)))
                 return 1;
         return 0;
     }
@@ -1012,7 +1011,7 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
         else
             n = REG_STR(*(int *)condition->value);
         if (((condition->type & PDB_cond_gt) &&
-                (string_compare(interpreter, m, n) > 0)) ||
+                (string_compare(interpreter, m, n) >  0)) ||
             ((condition->type & PDB_cond_ge) &&
                 (string_compare(interpreter, m, n) >= 0)) ||
             ((condition->type & PDB_cond_eq) &&
@@ -1022,7 +1021,7 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
             ((condition->type & PDB_cond_le) &&
                 (string_compare(interpreter, m, n) <= 0)) ||
             ((condition->type & PDB_cond_lt) &&
-                (string_compare(interpreter, m, n) < 0)))
+                (string_compare(interpreter, m, n) <  0)))
                     return 1;
         return 0;
     }
@@ -1303,7 +1302,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     	char *temp = string_to_cstring(
                     		interpreter,k->cache.string_val);
 	                    strcpy(&dest[size], temp);
-	                    free(temp);
+	                    string_cstring_free(temp);
                     }
                     size += string_length(k->cache.string_val);
                     dest[size++] = '"';
@@ -1381,6 +1380,8 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     PDB_label_t *label;
     opcode_t *code_end,*pc = interpreter->code->byte_code;
 
+    const unsigned int default_size = 32768;
+    const unsigned int regrow_size  = 32668;
     int space = 0;  /* How much space do we have? */
 
     pfile = (PDB_file_t *)mem_sys_allocate(sizeof(PDB_file_t));
@@ -1390,18 +1391,18 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     if (pdb->file)
         PDB_free_file(interpreter);
 
-    pfile->source = (char *)mem_sys_allocate(32768);
+    pfile->source = (char *)mem_sys_allocate(default_size);
     pfile->line = pline;
     pline->number = 1;
 
     code_end = pc + interpreter->code->cur_cs->base.size;
     while (pc != code_end) {
         /* Grow it early*/
-        if (pfile->size % 32768 < 32668 ) {
+        if (pfile->size % default_size < regrow_size) {
             pfile->source = mem_sys_realloc(pfile->source,
-                                            (size_t)pfile->size + 32768);
-
-            space += 32768;
+                                            (size_t)pfile->size 
+                                            + default_size);
+            space += default_size;
         }
 
         pfile->size =

@@ -62,6 +62,7 @@ typedef struct PDB_condition {
  *
  *  opcode:         The pointer to the bytecode where the label is.
  *  number:         Number label.
+ *  next:           The next label.
  */
 
 typedef struct PDB_label *PDB_label_ptr;
@@ -80,6 +81,7 @@ typedef struct PDB_label {
  *  source_offset:  Offset from the source file start.
  *  number:         Line number.
  *  label:          The label if any.
+ *  next:           The next line (if any).
  */
 typedef struct PDB_line *PDB_line_ptr;
 
@@ -95,11 +97,13 @@ typedef struct PDB_line {
  *      A source code file.
  *
  *  sourcefilename: The source code file name.
- *  source:         The file it self.
- *  size:           The size of the file.
+ *  source:         The file itself.
+ *  size:           The size of the file in bytes.
  *  list_line:      The next line to list.
  *  line:           The first line of the source code.
  *  label:          The first label.
+ *  next:           The next file (if any); multiple files are not currently
+ *                  supported
  */
 typedef struct PDB_file *PDB_file_ptr;
 
@@ -116,9 +120,11 @@ typedef struct PDB_file {
 /*  PDB_breakpoint_t
  *      List of breakpoints.
  *
- *  pc:             Where the breakpoint is.
- *  skip:           The number of times to skip this breakpoint.
+ *  pc:             Where the breakpoint is
+ *  id:             The identification number of this breakpoint
+ *  skip:           The number of times to skip this breakpoint
  *  condition:      The condition attached to the breakpoint; may be NULL
+ *  prev, next:     The previous & next breakpoints in the list; may be NULL.
  */
 
 typedef struct PDB_breakpoint *PDB_breakpoint_ptr;
@@ -137,6 +143,7 @@ typedef struct PDB_breakpoint {
  *
  *  file:               Source code file.
  *  breakpoint:         The first breakpoint.
+ *  watchpoint:         The first watchpoint
  *  breakpoint_skip:    Number of breakpoints to skip.
  *  cur_command:        The command being executed.
  *  last_command:       Last command executed.
