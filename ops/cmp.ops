@@ -901,9 +901,9 @@ inline op isle(out INT, in PMC, in PMC) {
 
 =item B<islt>(out INT, in INT, in INT)
 
-=item B<isle>(out INT, in NUM, in NUM)
+=item B<islt>(out INT, in NUM, in NUM)
 
-=item B<isle>(out INT, in STR, in STR)
+=item B<islt>(out INT, in STR, in STR)
 
 =item B<islt>(out INT, in PMC, in PMC)
 
