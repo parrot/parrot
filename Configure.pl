@@ -7,6 +7,8 @@
 # Author: Brent Dax
 #
 
+require 5.005_03;
+
 use strict;
 use lib 'lib';
 
