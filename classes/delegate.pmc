@@ -15,6 +15,12 @@
 #define PARROT_VTABLE_INIT_METHNAME "__init"
 #define PARROT_VTABLE_SET_INTEGER_METHNAME "__set_integer"
 #define PARROT_VTABLE_SET_NUMBER_METHNAME "__set_number"
+#define PARROT_VTABLE_SET_PMC_METHNAME "__set_pmc"
+#define PARROT_VTABLE_SET_STRING_METHNAME "__set_string"
+#define PARROT_VTABLE_GET_STRING_METHNAME "__get_string"
+#define PARROT_VTABLE_GET_NUMBER_METHNAME "__get_number"
+#define PARROT_VTABLE_GET_INTEGER_METHNAME "__get_integer"
+#define PARROT_VTABLE_GET_PMC_METHNAME "__get_pmc"
 
 /* The following bit is a fast register save/restore pair. They
    currently count on the registers in the interpreter structure being
@@ -119,6 +125,69 @@ noarg_pmcreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
   return returndata;
 }
 
+inline static STRING *
+noarg_strreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
+  struct regsave *data = save_regs(interpreter);
+  STRING *returndata;
+  REG_PMC(1) = obj;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 0;
+  REG_INT(3) = -2;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  if (REG_INT(2) == 1) {
+    returndata = REG_STR(5);
+  } else {
+    returndata = NULL;
+  }
+  restore_regs(interpreter, data);
+
+  return returndata;
+}
+
+inline static INTVAL
+noarg_intreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
+  struct regsave *data = save_regs(interpreter);
+  INTVAL returndata;
+  REG_PMC(1) = obj;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 0;
+  REG_INT(3) = -2;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  if (REG_INT(1) == 1) {
+    returndata = REG_INT(5);
+  } else {
+    returndata = 0;
+  }
+  restore_regs(interpreter, data);
+
+  return returndata;
+}
+
+inline static FLOATVAL
+noarg_numreturn(struct Parrot_Interp *interpreter, PMC *obj, PMC *method) {
+  struct regsave *data = save_regs(interpreter);
+  FLOATVAL returndata;
+  REG_PMC(1) = obj;
+  REG_INT(0) = 0;
+  REG_INT(1) = 0;
+  REG_INT(2) = 0;
+  REG_INT(3) = -2;
+  REG_INT(4) = 0;
+  Parrot_runops_fromc(interpreter, method);
+  if (REG_INT(4) == 1) {
+    returndata = REG_NUM(5);
+  } else {
+    returndata = 0;
+  }
+  restore_regs(interpreter, data);
+
+  return returndata;
+}
+
 pmclass delegate {
 
   void init () {
@@ -136,4 +205,30 @@ pmclass delegate {
   void set_number(PMC* value) {
     pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_NUMBER_METHNAME), value);
   }
+
+  void set_pmc(PMC* value) {
+    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_PMC_METHNAME), value);
+  }
+
+  void set_string(PMC* value) {
+    pmcarg_noreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_SET_STRING_METHNAME), value);
+  }
+
+  
+  INTVAL get_integer() {
+    return noarg_intreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_INTEGER_METHNAME));
+  }
+
+  FLOATVAL get_number() {
+    return noarg_numreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_NUMBER_METHNAME));
+  }
+
+  STRING* get_string() {
+    return noarg_strreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_STRING_METHNAME));
+  }
+
+  PMC* get_pmc() {
+    return noarg_pmcreturn(INTERP, SELF, find_or_die(INTERP, SELF, PARROT_VTABLE_GET_PMC_METHNAME));
+  }
+
 }
