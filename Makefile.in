@@ -36,7 +36,7 @@ PDUMP = pdump${exe}
 .c$(O):
 	$(CC) $(CFLAGS) ${ld_out}$@ -c $<
 
-all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe}
+all : $(TEST_PROG) $(PDUMP) examples/assembly/mops${exe} docs
 
 #XXX This target is not portable to Win32
 
