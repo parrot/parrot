@@ -1,82 +1,79 @@
-# Getopt_Long.imc
-#
-# Copyright (C) 2003 The Perl Foundation.  All rights reserved.
-# This program is free software. It is subject to the same
-# license as The Parrot Interpreter.
-#
-#  CVS Info:  $Id$
-#  Overview:
-#     Parsing command line options.
-#  History:
-#     Ported from GNU m4 1.4
-#  Notes:
-#  References:
-#    http://www.gnu.org/software/m4/m4.html
+# $Id$
 
-=head2 void get_options( PerlArray argv, PerlArray spec )
+=head1 NAME
+
+Getopt_Long.imc - parse command line options
+
+=head1 SYNOPSIS
+
+See examples/assembly/getopt_demo.imc
+
+=head1 DESCRIPTION
+
+This PIR library can be used for parsing command line options. 
+A single subroutine, get_options(), is provided.
+
+=head1 SUBROUTINES
+
+=head2 _get_options
 
 This should work like the Perl5 module Getopt::Long.
-TODO: make it work for all cases, short options, long options and bundling
-TODO: regogise type of return value: string, integer, binary, array, hash
-TODO: error reporting, more options
+Takes a format specifier and an argument vector.
 Returns a PerlHash
 
 =cut
-.pcc_sub _get_options prototyped             
+.sub _get_options prototyped             
   .param PerlArray argv    
   .param PerlArray spec    
 
-INIT_PARSE_SPEC:                     # Loop over the array spec and build up two simple hashes
+  # Loop over the array spec and build up two simple hashes
   .sym PerlHash type                 # the type of the option: binary, string, integer 
   type = new PerlHash
   .sym int cnt_spec                  # a counter for looping over the array 'spec'
   cnt_spec = 0
   .sym int len_spec                  # for end condition of loop over 'spec'
   len_spec = spec
-  .sym int spec_index                # searching for patterns in 'spec'
+  .sym int    spec_index             # searching for patterns in 'spec'
   .sym string opt_name               # name of specified option
   .sym string opt_type
   goto CHECK_PARSE_SPEC     
-NEXT_PARSE_SPEC:                     # Look at next element in 'spec'
-  opt_name = spec[cnt_spec]
-  index spec_index, opt_name, '='    # when '=' is not in 'opt_name' then it's binary
-  if spec_index != -1 goto NOT_A_BINARY_OPTION
-  opt_type = 'b'
-  goto OPTION_TYPE_IS_NOW_KNOWN
-NOT_A_BINARY_OPTION:
-  inc spec_index                     # we know where '=', thus the type is one further 
-  substr opt_type, opt_name, spec_index, 1 
-  dec spec_index                     # Go back to the '='
-  substr opt_name, spec_index, 2, '' # The stuff before '=' is the option name
-OPTION_TYPE_IS_NOW_KNOWN:
-  set    type[opt_name], opt_type
-  inc cnt_spec  
-CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
+  NEXT_PARSE_SPEC:                   # Look at next element in 'spec'
+    opt_name = spec[cnt_spec]
+    index spec_index, opt_name, '='  # when '=' is not in 'opt_name' then it's binary
+    if spec_index != -1 goto NOT_A_BINARY_OPTION
+    opt_type = 'b'
+    goto OPTION_TYPE_IS_NOW_KNOWN
+  NOT_A_BINARY_OPTION:
+    inc spec_index                   # we know where '=', thus the type is one further 
+    substr opt_type, opt_name, spec_index, 1 
+    dec spec_index                     # Go back to the '='
+    substr opt_name, spec_index, 2, '' # The stuff before '=' is the option name
+  OPTION_TYPE_IS_NOW_KNOWN:
+    set    type[opt_name], opt_type
+    inc cnt_spec  
+  CHECK_PARSE_SPEC:                    # check wether loop over 'spec' is complete
   if cnt_spec < len_spec goto NEXT_PARSE_SPEC
 
-=head1 commented out
-
-  goto NO_DEBUG
-  $S31 = type['version']
+  # uncomment this if you want debug output
+  goto SKIP_DEBUG_OUTPUT 
+  .sym string debug_var
+  debug_var = type['version']
   print "version: "
-  print $S31
+  print debug_var
   print "\n"
-  $S31 = type['help']
+  debug_var = type['help']
   print "help: "
-  print $S31
+  print debug_var
   print "\n"
-  $S31 = type['freeze-state']
+  debug_var = type['freeze-state']
   print "freeze-state: "
-  print $S31
+  print debug_var
   print "\n"
-  $S31 = type['reload-state']
+  debug_var = type['reload-state']
   print "reload-state: "
-  print $S31
+  print debug_var
   print "\n"
-
-=cut
-
-INIT_PARSE_ARGV:
+  SKIP_DEBUG_OUTPUT:
 
   # Now that we know about the allowed options,
   # we actually parse the argument vector
@@ -90,55 +87,77 @@ INIT_PARSE_ARGV:
   .sym int    arg_index           # holds result if 'index' op
   .sym int    is_known_option     # flag wether the option is known
   goto CHECK_PARSE_ARGV
-NEXT_PARSE_ARGV:
-  # fitst we take a peek at the first remaining element
-  arg = argv[0]
-  # Is arg a option string like '--help'
-  index arg_index, arg, '--'
-  if arg_index > -1 goto HANDLE_OPTION
-  # We are done, and don't want to loose the nonoption argument
-  goto FINISH_PARSE_ARGV
-HANDLE_OPTION:
-  # we take the current option off argv
-  shift arg, argv
-  # get rid of the leading '--'
-  substr arg, arg_index, 2, ''
-  # recover the value if any
-  index arg_index, arg, '='
-  if arg_index > -1 goto VALUE_PASSED
-  opt[arg] = 1
-  goto VALUE_OF_OPTION_IS_NOW_KNOWN
-VALUE_PASSED:
-  inc arg_index    # Go one past the '='
-  .sym int len_value
-  length len_value, arg
-  len_value = len_value - arg_index
-  substr value, arg, arg_index, len_value 
-  # drop the '=file.m4' from '--freeze-state=file.m4'
-  dec arg_index
-  inc len_value
-  substr arg, arg_index, len_value, ''
-  opt[arg] = value
-VALUE_OF_OPTION_IS_NOW_KNOWN:
-  # Is this a known option?
-  # TODO: make this work for nonbinary options
-  defined is_known_option, type[arg]
-  unless is_known_option goto UNKNOWN_OPTION
-  # Tell the caller that the option 'arg' has been passed
-  goto CHECK_PARSE_ARGV 
-UNKNOWN_OPTION:
-  # TODO: handle unknown options
-  print 'unknown option: !'
-  print arg
-  print "!\n"
+  NEXT_PARSE_ARGV:
+    # first we take a peek at the first remaining element
+    arg = argv[0]
+    # Is arg a option string like '--help'
+    index arg_index, arg, '--'
+    if arg_index > -1 goto HANDLE_OPTION
+    # We are done, and don't want to loose the nonoption argument
+    goto FINISH_PARSE_ARGV
+    HANDLE_OPTION:
+    # we take the current option off argv
+    shift arg, argv
+    # get rid of the leading '--'
+    substr arg, arg_index, 2, ''
+    # recover the value if any
+    index arg_index, arg, '='
+    if arg_index > -1 goto VALUE_PASSED
+    opt[arg] = 1
+    goto VALUE_OF_OPTION_IS_NOW_KNOWN
+    VALUE_PASSED:
+    inc arg_index    # Go one past the '='
+    .sym int len_value
+    length len_value, arg
+    len_value = len_value - arg_index
+    substr value, arg, arg_index, len_value 
+    # drop the '=file.m4' from '--freeze-state=file.m4'
+    dec arg_index
+    inc len_value
+    substr arg, arg_index, len_value, ''
+    opt[arg] = value
+    VALUE_OF_OPTION_IS_NOW_KNOWN:
+    # Is this a known option?
+    # TODO: make this work for nonbinary options
+    defined is_known_option, type[arg]
+    unless is_known_option goto UNKNOWN_OPTION
+    # Tell the caller that the option 'arg' has been passed
+    goto CHECK_PARSE_ARGV 
+    UNKNOWN_OPTION:
+    # TODO: handle unknown options
+    printerr 'unknown option: !'
+    printerr  arg
+    printerr "!\n"
   
-CHECK_PARSE_ARGV:
-  num_remaining_args = argv
-  if num_remaining_args > 0 goto NEXT_PARSE_ARGV
-FINISH_PARSE_ARGV:
+  CHECK_PARSE_ARGV:
+    num_remaining_args = argv
+    if num_remaining_args > 0 goto NEXT_PARSE_ARGV
+  FINISH_PARSE_ARGV:
   # Nothing to do here
 
   .pcc_begin_return
     .return opt 
   .pcc_end_return
 .end
+
+=head1 TODO
+
+Make it work for all cases, short options, long options and bundling
+Recognise type of return value: string, integer, binary, array, hash
+error reporting, more options
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+The Perl5 module L<Getopt::Long>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 The Perl Foundation.  All rights reserved.
+This program is free software. It is subject to the same
+license as The Parrot Interpreter.
+
+=cut
