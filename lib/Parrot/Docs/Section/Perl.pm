@@ -41,6 +41,7 @@ sub new
 		$self->new_group('Operations', '',
 			$self->new_item('Ops to C Code Generation', 
 			    'lib/Parrot/OpsFile.pm', 'lib/Parrot/Op.pm',
+			    'lib/Parrot/OpLib',
 			    'lib/Parrot/OpTrans.pm', 'lib/Parrot/OpTrans'),
 		),
 		$self->new_group('Data Types', '',

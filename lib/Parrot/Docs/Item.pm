@@ -258,7 +258,9 @@ sub file_paths_relative_to_source
 	{
 		my $dir = $source->directory_with_relative_path($rel_path);
 		
-		foreach my $file ($dir->files(1))
+		# There may be editor scratch files to ignore.
+		
+		foreach my $file ($dir->files(1, '^\.'))
 		{
 			push @rel_paths, $source->relative_path($file->path);
 		}

@@ -241,7 +241,7 @@ sub process_file_start_token
     
     if ( $next->type eq 'text' )
     {
-        my $text = esc($next->text);
+        my $text = $next->text;
         my $dist = Parrot::Distribution->new;
         
         # Only link to files that will have HTML pages.
@@ -257,11 +257,13 @@ sub process_file_start_token
             $path = $self->{DOCS_FILE}->parent->relative_path($file);
     
             print {$self->{'output_fh'}} 
-                $self->{'Tagmap'}{$tagname} . "<a href='$path'>$text</a>";
+                $self->{'Tagmap'}{$tagname} . "<a href='$path'>" .
+                esc($text) . "</a>";
         }
         else
         {
-            print {$self->{'output_fh'}} $self->{'Tagmap'}{$tagname} . $text;
+            print {$self->{'output_fh'}} 
+                $self->{'Tagmap'}{$tagname} . esc($text);
         }
     }
     else
