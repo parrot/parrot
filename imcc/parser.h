@@ -25,6 +25,9 @@ EXTERN int yydebug;
 
 SymReg * macro(char *name);
 int yyerror(char *);
+int yyparse(void);
+void op_fullname(char * dest, const char * name, SymReg * args[], int nargs);
+void open_comp_unit(void);
 
 #endif
 

@@ -1,0 +1,151 @@
+=head1 NAME
+
+IMCC - parsing
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1 intital
+
+=back
+
+=head1 OVERVIEW
+
+This document describes the basic parsing functionality of imcc.
+
+=head1 DESCRIPTION
+
+Imcc parses and generates code in terms of I<compilation units>. These
+are self contained blocks of code very similar to subroutines.
+
+Code for a compilation unit is created as soon as the end of the unit
+is reached.
+
+=head1 General imcc syntax
+
+	program: statements ...
+
+where a statement is a simple statement like B<if ...>	or a
+I<compilation unit> containing statements. This allows e.g. nested
+subs.
+
+
+=head1 Compilation units
+
+=head2 Subroutines .sub ... .end
+
+	.sub _name
+		statements
+		...
+	.end
+
+defines a subroutine with the entry point B<_name>. Subroutine entry
+points (as all global labels) have to start with an underscore. The
+statements may contain valid PIR or PASM statements.
+
+=head2 Assembly blocks .emit ... .eom
+
+	.emit
+	_sub1:
+		pasm_statements
+		...
+		ret
+	...
+	.eom
+
+defines a compilation unit containing PASM statements only. Typical
+usage is for language initialization and builtins code.
+
+=head2 Code outside compilation units
+
+	stmt1
+	.sub _main
+	   stmt2
+	   ret
+	.end
+	stmt3
+
+This generates the following PASM equivalent:
+
+	_main:
+		stmt2
+		ret
+
+		stmt1
+		stmt3
+
+which is basically a sequence of unreachable code after the B<ret>. To
+really use code outside compilation units, the first statement should
+have a global label.
+
+	_outside:
+	    stmt1
+	.sub _main
+	    stmt2
+	    call _outside
+	    ret
+	.end
+	    stmt3
+	    ret
+
+This generates the following PASM equivalent:
+
+	_main:
+		stmt2
+		bsr _outside
+		ret
+	_outside:
+		stmt1
+		stmt3
+		ret
+
+=head2 Nested subs
+
+As code is produced as soon as a I<compilation unit> is closed, the
+code for nested subroutines appears before the outer subroutine:
+
+	.sub _outer
+	    stmt1
+	    .sub _inner
+		stmt2
+		ret
+	    .end
+	    call _inner
+	    ret
+	.end
+
+generates code like this:
+
+	_inner:
+	    stmt2
+	    ret
+	_ounter:
+	    stmt1
+	    bsr _inner
+	    ret
+
+=head1 Symbols, constants and labels
+
+I<Compilation units> maintain their own symbol table containing local
+labels and variable symbols. This symbol table I<hash> is not visible
+to code in different units. So lexicals (e.g. for nested subs) have to
+be managed by means of PASM statements. This might change in future if
+needed.
+
+Global labels and constants are kept in the global symbol table
+I<ghash>, which is the symbol table of the outmost compilation unit.
+
+This allows for global constant folding beyond subroutine scope.
+
+Local labels in different I<compilation units> with the same name are
+allowed, though running the generated PASM through F<assemble.pl>
+doesn't work. Running this code inside imcc is ok.
+
+=head1 FILES
+
+F<imcc.y>, F<instructions.c>, F<t/syn/sub.t>, F<t/imcpasm/sub.t>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>

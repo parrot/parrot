@@ -101,3 +101,12 @@ Instruction * INS(char * name, char *fmt, SymReg **regs, int n,
     return iANY(name, fmt, regs, emit);
 }
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

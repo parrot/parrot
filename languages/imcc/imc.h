@@ -1,7 +1,7 @@
 #ifndef __IMC_H
 #define __IMC_H
 
-#define IMCC_VERSION "0.0.9.6"
+#define IMCC_VERSION "0.0.9.7"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,6 +88,7 @@ struct imcc_ostat {
 	int branch_branch;
 	int invariants_moved;
 	int deleted_ins;
+	int used_once;
 } ;
 
 EXTERN struct imcc_ostat ostat;

@@ -1,3 +1,11 @@
+- 2002-12-09	leo
+
+	* version 0.0.9.7
+	* docs/*.pod
+	* nested subs
+	* _global label
+	* imcpasm tests
+
 - 2002-12-07	leo
 
 	* version 0.0.9.6

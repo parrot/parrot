@@ -440,6 +440,8 @@ build_key(SymReg *reg)
 
 static void add_1_const(SymReg *r)
 {
+    if (r->color >= 0)
+        return;
     switch (r->set) {
         case 'I':
             if (r->name[0] == '0' && r->name[1] == 'x')
@@ -470,12 +472,11 @@ static void add_1_const(SymReg *r)
 static void constant_folding()
 {
     SymReg * r;
-    int i, l;
-    char *buf;
+    int i;
 
     /* go through all consts of current sub */
     for(i = 0; i < HASH_SIZE; i++)
-        for(r = hash[i]; r; r = r->next) {
+        for(r = ghash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(r);
             }

@@ -1,0 +1,231 @@
+=head1 NAME
+
+IMCC - syntax
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1 intital
+
+=back
+
+=head1 OVERVIEW
+
+This document describes the imcc syntax.
+
+=head1 DESCRIPTION
+
+=head1 Comments and empty lines
+
+Comments start with B<#> and last until the following newline. These
+and empty lines are ignored.
+
+=head1 Statements
+
+A valid imcc program consists of a sequence of I<statements>. A
+I<statement> is terminated by a newline (<NL>).
+
+=head2 General statement format
+
+  [label:] [instruction] <NL>
+
+=head2 Labels
+
+Optional label for the given instruction, can stand on its own line.
+Global labels start with an underscore, local labels shouldn't.
+
+=head1 INSTRUCTIONS
+
+=head2 Terms used here
+
+=over 4
+
+=item <identifier>
+
+Start with a letter or underscore, then may contain additionally
+digits.
+
+=item <type>
+
+B<int>, B<float>, B<string> or a valid parrot PMC type like
+B<PerlArray>.
+
+=item <reg>
+
+A PASM register I0..I31, S0..S31, N0..N31, P0..P31, or a IMCC temporary
+register $In, $Sn, $Nn, $Pn, where B<n> consits of digit(s) only.
+The parrot register B<P31> is reserved for spilling and should not be
+used in complex code sections, which might need spilling (s.
+F<operation.pod>).
+
+=item <var>
+
+A local B<identifier> or a B<reg> or a constant (when allowed).
+
+=back
+
+=head2 Constants
+
+=over 4
+
+=item "string constants"
+
+Are delimited by B<">. A B<"> inside a string must be escaped by
+B<\">.
+
+=item 'char constant'
+
+Are delimited by B<'>.
+
+=item numeric constants
+
+B<0x> and B<0b> denote hex and binary constants.
+
+=head2 Directive instructions
+
+=over 4
+
+=item .sub <_indentifier>
+
+=item .end
+
+Define a I<compilation unit> with the label B<_identifier:>.
+
+=item .emit
+
+=item .eom
+
+Define a I<compilation unit> containing PASM code.
+
+=item .local <type> <identifier>
+
+Define a local name B<identifier> for this I<compilation unit> and of
+the given B<type>.
+
+=item .namespace <identifier>
+
+=item .endnamespace <identifier>
+
+Defines the range of a namespace. Local variables inside a namespace
+are mangled as <namespaceidentifier::varidentifier>.
+
+=item .param <type> <identifier>
+
+Like B<.local> and generates PASM B<restore identifier>.
+
+=item .param <reg>
+
+=item .result <var>
+
+B<restore> from stack.
+
+=item .arg <var>
+
+=item .return <var>
+
+B<save> on stack.
+
+=back
+
+=head2 Instructions
+
+Instructions may be a valid PASM instruction or anything listed here
+below:
+
+=over 4
+
+=item call <identifier>
+
+B<bsr> <identifier>.
+
+=item goto <identifier>
+
+B<branch> <identifier>.
+
+=item if <var> goto <identifer>
+
+=item unless <var> goto <identifer>
+
+Translate to B<if x, identifier> or B<unless ..>.
+
+=item if <var> <relop> <var> goto <identifer>
+
+The B<relop> B<<, <=, ==, != E<gt>= E<gt>> translate to the PASM opcodes
+B<lt>, B<le>, B<eq>, B<ne>, B<ge> or B<gt> B<var>, B<var>,
+B<identifier>.
+
+=item <var> = <var>
+
+B<set var, var>
+
+=item <var> = <unary> <var>
+
+The B<unary>s B<!>, B<-> and B<~> generate B<not>, B<neg> and B<bnot> ops.
+
+=item <var> = <var> <binary> <var>
+
+The B<binary>s B<+>, B<->, B<*>, B</>, B<%> and B<**> generate
+B<add>, B<sub>, B<mul>, B<div>, B<mod> and B<pow> arithmentic ops.
+B<binary> B<.> is B<concat> and valid for string arguments.
+
+B<<<> and B<E<gt>E<gt>> are arithmetic shifts B<shl> and B<shr>.
+B<E<gt>E<gt>E<gt>> is the logical shift B<lsr>.
+
+B<&&>, B<||> and B<~~> are logic B<and>, B<or> and B<xor>.
+
+B<&>, B<|> and B<~> are binary B<band>, B<bor> and B<bxor>.
+
+=item <var> = <var> [ <var> ]
+
+This generates either a keyed B<set> operation or B<substr var, var,
+var, 1> for string arguments and an integer key.
+
+=item <var> [ <var> ] = <var>
+
+A keyed B<set> operation or the assign B<substr> op with a length of
+1.
+
+=item <var> = new <type>
+
+B<new var, .type>
+
+=item <var> = defined <var>
+
+B<defined var, var>
+
+=item <var> = defined <var> [ <var> ]
+
+B<defined var, var[var]> the keyed op.
+
+=item global "string" = <var>
+
+B<store_global "string", var>
+
+=item <var> = global "string"
+
+B<find_global var, "string">
+
+=item <var> = clone <var>
+
+B<clone var, var>
+
+=item <var> = addr <var>
+
+B<set_addr var, var>
+
+=back
+
+=head1 SEE ALSO
+
+F<parsing.pod>
+
+=head1 FILES
+
+F<imcc.l>, F<imcc.y>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
+
+

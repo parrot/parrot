@@ -35,6 +35,9 @@ sub generate_functions {
     local $/ = undef;
     my $file = <SLURP> . '';
     $file =~ s/\cM\cJ/\n/g;
+    $file =~ s/^\s*$//gm if ($_[1]);
+    $file =~ s/[\t ]+/ /gm if ($_[1]);
+    $file =~ s/[\t ]+$//gm if ($_[1]);
     close SLURP;
     return $file;
   }
@@ -53,9 +56,19 @@ sub generate_functions {
 	    $desc = "($file line $line)";
 	}
 
-	$output =~ s/\cM\cJ/\n/g;
-
 	my $by_f = per_test('.imc',$count);
+	my $gen_pasm;
+	$gen_pasm = 1 if ($by_f =~ m!/imcpasm/!);
+	my $opt = '';
+	$opt = "-O$1" if ($by_f =~ m!/imcpasm/opt(.)!);
+
+	$output =~ s/\cM\cJ/\n/g;
+	if ($gen_pasm) {
+	    $output =~ s/^\s*$//gm;
+	    $output =~ s/[\t ]+/ /gm;
+	    $output =~ s/[\t ]+$//gm;
+	}
+
 	open IM, "> $by_f" or die "Unable to open '$by_f'";
 	print IM $assembly;
 	close IM;
@@ -63,10 +76,17 @@ sub generate_functions {
 	my $out_f = per_test('.out',$count);
 
 	my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-	system("./imcc -r ${TEST_PROG_ARGS} $by_f >$out_f");
+
+	if ($gen_pasm) {
+	    system("./imcc ${TEST_PROG_ARGS} $opt -o $out_f $by_f");
+	}
+	else {
+	    system("./imcc -r ${TEST_PROG_ARGS} $by_f >$out_f");
+	}
 
 	my $meth = $Test_Map{$func};
-	my $pass = $Builder->$meth( slurp_file($out_f), $output, $desc );
+	my $pass = $Builder->$meth( slurp_file($out_f, $gen_pasm),
+	$output, $desc );
 
 	unless($ENV{POSTMORTEM}) {
 	    unlink $out_f;

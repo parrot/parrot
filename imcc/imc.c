@@ -22,14 +22,14 @@ static void print_stat();
 /* Globals: */
 
 static IMCStack nodeStack;
-static int lastbranch;
-
-
 
 /* allocate is the main loop of the allocation algorithm */
 void allocate() {
     int to_spill;
     int todo;
+
+    if (!instructions)
+        return;
 
     debug(2, "\n------------------------\n");
     debug(1, "processing sub %s\n", function);
@@ -141,6 +141,8 @@ static void print_stat()
     info(1, "\t%d labels, %d lines deleted, %d if_branch, %d branch_branch\n",
             ostat.deleted_labels, ostat.deleted_ins, ostat.if_branch,
             ostat.branch_branch);
+    info(1, "\t%d used once deleted\n",
+            ostat.used_once);
     info(1, "\t%d invariants_moved\n", ostat.invariants_moved);
     info(1, "\tregisters needed:\t I%d, N%d, S%d, P%d\n",
             sets[0], sets[1], sets[2], sets[3]);
@@ -265,8 +267,9 @@ void compute_du_chain() {
 
     lastbranch = 0;
 
-    /* Compute last branch in this procedure */
-    for( ins = instructions; ins; ins = ins->next) {
+    /* Compute last branch in this procedure, update instruction index */
+    for(i = 0, ins = instructions; ins; ins = ins->next) {
+        ins->index = i++;
         if(ins->type == ITBRANCH)
             lastbranch = ins;
     }

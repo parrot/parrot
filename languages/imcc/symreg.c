@@ -7,7 +7,7 @@
 /* Globals: */
 /* Code: */
 
-static void delete_sym(const char * name);
+void delete_sym(const char * name);
 
 /* namespaces */
 
@@ -137,7 +137,7 @@ SymReg * _mk_const(SymReg *hash[], char * name, char t) {
 }
 
 SymReg * mk_const(char * name, char t) {
-    return _mk_const(hash, name, t);
+    return _mk_const(ghash, name, t);
 }
 
 /* Makes a new address */
@@ -170,10 +170,11 @@ SymReg * _mk_address(SymReg *hash[], char * name, int uniq) {
     return r;
 }
 
-SymReg * mk_address(char * name, int uniq) {
-    return _mk_address(hash, name, uniq);
-}
 
+SymReg * mk_address(char * name, int uniq) {
+    SymReg ** h = *name == '_' ? ghash : hash;
+    return _mk_address(h, name, uniq);
+}
 /* link keys to a keys structure = SymReg
  *
  * we might have
@@ -340,19 +341,19 @@ static void _delete_sym(SymReg * hash[], const char * name) {
         }
     }
 
-    fprintf(stderr, "Tried to delete nonexistent symbol '%s'\n", name);
-    abort();
+    fatal(1, "_delete_sym", "Tried to delete nonexistent symbol '%s'\n", name);
 }
 
-static void delete_sym(const char * name) {
-    return _delete_sym(hash, name);
+void delete_sym(const char * name) {
+    _delete_sym(hash, name);
 }
 
 /* Deletes all symbols */
 void clear_tables() {
     int i;
     SymReg * p, *next;
-    while (namespace) pop_namespace(NULL);
+    if (namespace)
+        fatal(1, "clear_tables", "namespace %s not closed\n", namespace->name);
     for(i = 0; i < HASH_SIZE; i++) {
 	for(p = hash[i]; p; ) {
 	    next = p->next;

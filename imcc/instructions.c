@@ -21,6 +21,49 @@
 
 /* Global variables , forward def */
 
+/* all code is collected in compilation units, which may be:
+ * - .sub/.end
+ * - .emit/.eom
+ * - stuff outside of these
+ */
+
+static Instruction * last_ins;
+
+typedef struct comp_unit_t {
+    Instruction * instructions;
+    Instruction * last_ins;
+    SymReg * hash[HASH_SIZE];
+} comp_unit_t;
+
+static comp_unit_t *comp_unit;
+static int n_comp_units;
+
+void
+open_comp_unit(void)
+{
+    comp_unit = realloc(comp_unit, sizeof(n_comp_units+1) *
+            sizeof(comp_unit_t));
+    comp_unit[n_comp_units].last_ins = last_ins;
+    comp_unit[n_comp_units].instructions = instructions;
+    last_ins = instructions = NULL;
+    memset(comp_unit[n_comp_units].hash, 0, HASH_SIZE * sizeof(SymReg*));
+    hash = comp_unit[n_comp_units].hash;
+    if (!n_comp_units)
+        ghash = hash;
+    n_comp_units++;
+}
+
+
+void
+close_comp_unit(void)
+{
+    if (!n_comp_units)
+        fatal(1, "close_comp_unit", "non existent comp_unit\n");
+    n_comp_units--;
+    instructions = comp_unit[n_comp_units].instructions;
+    last_ins = comp_unit[n_comp_units].last_ins;
+    hash = comp_unit[n_comp_units].hash;
+}
 
 /* Creates a new instruction */
 
@@ -74,7 +117,6 @@ inline
 #endif
 int instruction_writes(Instruction* ins, SymReg* r) {
     int f, i;
-    SymReg *key;
 
     f = ins->flags;
 
@@ -148,8 +190,6 @@ Instruction *move_ins(Instruction *ins, Instruction *to)
 
 
 /* Emits the instructions buffered in 'instructions' */
-static Instruction * last_ins;
-static int n_instructions;
 Instruction * emitb(Instruction * i) {
 
     if (!i)
@@ -162,7 +202,6 @@ Instruction * emitb(Instruction * i) {
 	last_ins = i;
     }
 
-    i->index = n_instructions++;
     return i;
 }
 
@@ -252,6 +291,7 @@ int e_file_open(char *file)
     output = file;
     return 1;
 }
+
 int e_file_close() {
     printf("\n\n");
     fclose(stdout);
@@ -273,7 +313,9 @@ Emitter emitters[2] = {
     {e_file_open, e_file_emit, e_file_close},
     {e_pbc_open, e_pbc_emit, e_pbc_close},
 };
+
 static int emitter;
+
 int emit_open(int type, char *file)
 {
     emitter = type;
@@ -288,7 +330,7 @@ int emit_flush() {
      * _after_ subroutine entry.  And after the "saveall", or any
      * other assortment of pushes. */
 
-    if (n_spilled > 0 && n_instructions > 0) {
+    if (n_spilled > 0 && instructions) {
         SymReg *p31;
         Instruction *spill;
         p31 = mk_pasm_reg(str_dup("P31"));
@@ -309,8 +351,7 @@ int emit_flush() {
         free_ins(ins);
         ins = next;
     }
-    instructions = NULL;
-    n_instructions = 0;
+    close_comp_unit();
     return 0;
 }
 int emit_close()

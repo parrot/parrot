@@ -1,0 +1,91 @@
+=head1 NAME
+
+IMCC - running
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1 intital
+
+=back
+
+=head1 OVERVIEW
+
+This document describes imccs command line option.
+
+=head1 SYNOPSIS
+
+ imcc [-options] <file> [arguments ...]
+
+=head1 OPTIONS
+
+=head2 Imcc options
+
+=item -c, --create-pbc
+
+=item -d, --debug
+
+More I<-d> give more debug output
+
+=item -h --help
+
+=item -o outputfile
+
+=item -r, --run-pbc
+
+=item -v, --verbose
+
+One I<-v> shows, which files are worked on, two give you a summary
+over register usage and optimization stats perl I<compilation unit>.
+
+=item -y, --yydebug
+
+Turn on yydebug in F<yacc>/F<bison>.
+
+=item -V, --version
+
+=item -Ox
+
+Optimize
+
+ -O0 no opimization
+ -O1 optimizations w/o life info (e.g. branches)
+ -O2 optimizations with life info
+
+This will probably change.
+
+=head2 Parrot Options
+
+s. parrot -h for description, used, when running a program inside
+imcc.
+
+=head1 <file>
+
+If the file ends in B<.pasm> it is parsed as PASM code else as PIR
+code.
+
+=head2 Generated files
+
+If B<-r> or B<-c> are not present, a PASM file is generated. If the
+B<-o> option is not used, either F<a.pasm> or F<a.pbc> in the current
+working dir are created.
+
+=head1 [arguments ...]
+
+Optional arguments passed to the running program as ARGV, only useful
+for the B<-r> option.
+
+=head1 BUGS
+
+The long options are unimplemented.
+
+=head1 FILES
+
+F<main.c>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
+
+

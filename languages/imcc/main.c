@@ -23,21 +23,22 @@
 static int pbc, write_pbc;
 static void usage(FILE *fp)
 {
-    fprintf(fp, "imcc [-h|--help] [-V|--version] [-v|--verbose] "
+    fprintf(fp, "imcc\t[-h|--help] [-V|--version] [-v|--verbose] "
 	    "[-<parrot-switch>] \n"
 	    "\t[-d|--debug] [-y|--yydebug]\n"
-	    "\t[-c|--create-pbc] [-r|--run-pbc] [-O[012] ]"
-	    "[-o outfile] infile\n");
-    exit(fp != stdout);
+	    "\t[-c|--create-pbc] [-r|--run-pbc] [-O[012]]\n"
+	    "\t[-o outfile] infile [arguments ...]\n");
 }
 
 
-static void help()
+static void help(void)
 {
     usage(stdout);
+    fprintf(stdout, "\n\tlong options N/Y\n");
+    exit(0);
 }
 
-static void version()
+static void version(void)
 {
     printf("imcc version " IMCC_VERSION "\n");
     exit(0);
@@ -51,8 +52,9 @@ static char *
 parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 {
     if (*argc == 1) {
-        usage(stderr);
-	}
+	usage(stderr);
+	exit(1);
+    }
 
     /* skip the program name arg */
     (*argc)--;
@@ -63,90 +65,90 @@ parseflags(Parrot_Interp interpreter, int *argc, char **argv[])
 #endif
 
     while ((*argc) && (*argv)[0][0] == '-') {
-        switch ((*argv)[0][1]) {
-        case 'b':
-            setopt(PARROT_BOUNDS_FLAG);
-            break;
-        case 'j':
-            setopt(PARROT_JIT_FLAG);
-            break;
-        case 'p':
-            setopt(PARROT_PROFILE_FLAG);
-            break;
-        case 'P':
-            setopt(PARROT_PREDEREF_FLAG);
-            break;
-        case 'g':
-            unsetopt(PARROT_CGOTO_FLAG);
-            break;
-        case 't':
-            setopt(PARROT_TRACE_FLAG);
-            break;
-        case 'd':
-            if (!Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
-            setopt(PARROT_DEBUG_FLAG);
-            else
-            IMCC_DEBUG++;
-            break;
-        case 'w':
-            Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
-            break;
-        case 'G':
-            gc_off = 1;
-            break;
-        case '.':  /* Give Windows Parrot hackers an opportunity to
-                    * attach a debuggger. */
-            fgetc(stdin);
-            break;
-        case 'h':
-            usage(stdout);
-            break;
-        case 'V':
-            version();
-            break;
-        case 'r':
-            pbc = 1;
-            break;
-        case 'c':
-            write_pbc = 1;
-            break;
-        case 'v':
-	    IMCC_VERBOSE++;
-            break;
-        case 'y':
-	    yydebug = 1;
-            break;
-        case 'o':
-            if ((*argv)[0][2])
-                output = str_dup((*argv)[0]+2);
-            else {
-                (*argc)--;
-                output = str_dup((++(*argv))[0]);
+	switch ((*argv)[0][1]) {
+	    case 'b':
+		setopt(PARROT_BOUNDS_FLAG);
+		break;
+	    case 'j':
+		setopt(PARROT_JIT_FLAG);
+		break;
+	    case 'p':
+		setopt(PARROT_PROFILE_FLAG);
+		break;
+	    case 'P':
+		setopt(PARROT_PREDEREF_FLAG);
+		break;
+	    case 'g':
+		unsetopt(PARROT_CGOTO_FLAG);
+		break;
+	    case 't':
+		setopt(PARROT_TRACE_FLAG);
+		break;
+	    case 'd':
+		if (!Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+		    setopt(PARROT_DEBUG_FLAG);
+		else
+		    IMCC_DEBUG++;
+		break;
+	    case 'w':
+		Parrot_setwarnings(interpreter, PARROT_WARNINGS_ALL_FLAG);
+		break;
+	    case 'G':
+		gc_off = 1;
+		break;
+	    case '.':  /* Give Windows Parrot hackers an opportunity to
+			* attach a debuggger. */
+		fgetc(stdin);
+		break;
+	    case 'h':
+		help();
+		break;
+	    case 'V':
+		version();
+		break;
+	    case 'r':
+		pbc = 1;
+		break;
+	    case 'c':
+		write_pbc = 1;
+		break;
+	    case 'v':
+		IMCC_VERBOSE++;
+		break;
+	    case 'y':
+		yydebug = 1;
+		break;
+	    case 'o':
+		if ((*argv)[0][2])
+		    output = str_dup((*argv)[0]+2);
+		else {
+		    (*argc)--;
+		    output = str_dup((++(*argv))[0]);
+		}
+		break;
+
+	    case 'O':
+		strncpy(optimizer_opt, (*argv)[0]+2,sizeof(optimizer_opt));
+		optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
+		break;
+	    case '-':
+		/* XXX long options */
+		(*argc)--;
+		(*argv)++;
+
+		goto DONE;
+	    case '\0':             /* bare '-' means read from stdin */
+		goto DONE;
+	    default:
+		fatal(1, "main", "Invalid flag '%s' used."
+			"\n\ns. imcc -h\n", (*argv)[0]);
 	}
-	break;
 
-        case 'O':
-	    strncpy(optimizer_opt, (*argv)[0]+2,sizeof(optimizer_opt));
-	    optimizer_opt[sizeof(optimizer_opt)-1] = '\0';
-            break;
-        case '-':
-            /* XXX long options */
-            (*argc)--;
-            (*argv)++;
-
-            goto DONE;
-        case '\0':             /* bare '-' means read from stdin */
-            goto DONE;
-        default:
-            fatal(1, "main", "Invalid flag %s used\n", (*argv)[0]);
-            exit(1);
+	(*argc)--;
+	(*argv)++;
     }
 
-        (*argc)--;
-        (*argv)++;
-    }
-
-  DONE:
+DONE:
 
     return (*argv)[0];
 }
@@ -246,3 +248,12 @@ int main(int argc, char * argv[])
 }
 
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

@@ -1,0 +1,181 @@
+=head1 NAME
+
+IMCC - operation
+
+=head1 VERSION
+
+=over 4
+
+=item 0.1 intital
+
+=back
+
+=head1 OVERVIEW
+
+This document describes the principles of imcc operation.
+
+=head1 DESCRIPTION
+
+The main features of imcc are:
+
+=item Source file parsing
+
+=item Register allocation
+
+=item Optimization
+
+=item Code generation
+
+=item Running the code
+
+=head1 Source file parsing
+
+S. F<parsing.pod> and F<syntax.pod> for more.
+
+=head1 Register allocation
+
+Register allocation is done per I<compilation unit>.
+
+Imcc I<identifiers> and I<temporary variables> e.g. $I0 are assigned a
+phsyical parrot register depending on the life range of these
+variables. If the life range of one variable doesn't overlap the range
+of another variable, these might get the same parrot register.
+
+   $I0 = 10
+   $I1 = 20
+
+will translate to
+
+   set I0, 10
+   set I0, 20
+
+when $I0 is not used after these lines.
+
+The first redundant assignment will be optimized away with B<-O2>.
+
+I<PASM registers> keep their register. During the usage of a I<PASM
+register> this register will be not get assigned to. So don't use
+these over long code pieces and only when really needed.
+
+=head2 Basic blocks
+
+To determine the life range of variables, the code gets separated into
+pieces, called B<basic block>s. A B<basic block> starts at a label,
+which can get jumped to, and ends at a branch instruction.
+
+=head2 Call graph
+
+All connection between the B<basic block>s are calculated. This allows
+for:
+
+=head2 Loop detection
+
+where the range and depth of loops is calculated.
+
+=head2 Life analysis
+
+Whenever an operand is marked as an B<OUT> argument, this
+operand starts with a new value. This means, that at this point the
+life range of the symbol ends and a new life range is started, which
+allows the allocation of a different register to the same variable or
+the same register to a different variable.
+
+Variables used as B<IN> parameters must keep their parrot register
+over their usage range.
+
+=head2 Interference graph
+
+With above information calculated, the next step is to look, which
+variable does interfer with which other. Non interfering variables can
+be given the same parrot register.
+
+=head2 Spilling
+
+When there are too many interferences, so that not all variables can be
+allocated to a parrot register, the least used variables are spilled,
+or stored in a B<PerlArray> when they are not used.
+
+  set $I1,1
+  set $I2,2
+  ...
+  set $I33, 33
+  ...
+  print $I1
+
+and usage of all these variables after this point makes it necessary,
+to spill.
+
+  new P31, .PerlArray
+  ...
+  set I0, 1
+  set P31[0], I0	# store $I1
+  set I0, 2
+  set P31[1], I0	# store $I2
+  ...
+  set I0, P31[0]	# fetch $I1
+  print I0
+
+When $I1 or $I2 are accessed then, code is generated to fetch the
+value from the spill array.
+
+
+=head1 Optimization
+
+Currently not much is done.
+
+=head2 If branch optimization
+
+A sequence of code:
+
+    if cond, L1
+    branch L2
+ L1:
+ ...
+ L2:
+
+will be converted to
+
+    unless cond, L2
+    ...
+ L2:
+
+The same is done for other conditional branches B<gt>, B<ge>, B<eq>
+and their reverse meanings.
+
+=head2 Unused labels
+
+Labels not referenced somewhere get deleted.
+
+=head2 Used LHS once
+
+For a sequence of code
+
+   $I0 = 10
+   $I1 = 20
+
+where B<$I0> is not used beyond, the first assignment will be tossed,
+resulting in code like:
+
+   set I0, 20
+
+
+
+=head1 Code generation
+
+Imcc either generates PASM output ready to get assembled by
+F<assemble.pl> or directly a PBC file, for running with parrot.
+
+=head1 Running code
+
+Additionally the generated code can be run immediately inside imcc.
+All parrot runtime options like B<-j> or B<-t> are available.
+
+=head1 FILES
+
+F<imc.c>, F<cfg.c>, F<optimizer.c>, F<pbc.c>
+
+=head1 AUTHOR
+
+Leopold Toetsch <lt@toetsch.at>
+
+

@@ -71,6 +71,11 @@ C-based parsers are pretty darn fast. Currently assembling
 Parrot on the fly is still relatively slow.
 
 
+More documentation
+
+  s. the docs subdir
+
+
 Language Reference
 
 Variables, Registers and Constants

@@ -24,9 +24,9 @@
  *
  *      if x, L1          unless x, L2
  *      branch L2         ---
- *    L1:               L1:
- *    ...               ...
- *    L2:               L2:
+ *    L1:               L2:
+ *    ...
+ *    L2:
  *
  * unused_label ... deletes them (as L1 above)
  *
@@ -52,6 +52,7 @@
 static void if_branch();
 static void branch_branch();
 static void unused_label();
+static int used_once();
 static int loop_optimization();
 static int clone_remove();
 
@@ -70,6 +71,8 @@ int optimize() {
         /* constant_propagation(); N/Y */
         if (clone_remove())
             return 1;
+        if (used_once())
+            return 1;
         if (loop_optimization())
             return 1;
     }
@@ -77,19 +80,21 @@ int optimize() {
 }
 
 /* get negated opterator for op */
-static char * get_neg_op(char *op)
+static char * get_neg_op(char *op, int *nargs)
 {
     static struct br_pairs {
         char *op;
         char *nop;
+        int nargs;
     } br_pairs[] = {
-    { "if", "unless" },
-    { "eq", "ne" },
-    { "gt", "le" },
-    { "ge", "lt" },
+    { "if", "unless", 2 },
+    { "eq", "ne", 3 },
+    { "gt", "le", 3 },
+    { "ge", "lt", 3 },
     };
     int i;
     for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
+        *nargs = br_pairs[i].nargs;
         if (strcmp(op, br_pairs[i].op) == 0)
             return br_pairs[i].nop;
         if (strcmp(op, br_pairs[i].nop) == 0)
@@ -101,7 +106,7 @@ static char * get_neg_op(char *op)
 
 /* if cond L1        => unless cond L2
  * branch L2            ---
- * L1:                  L1:
+ * L1:                  L2:
  */
 static void if_branch()
 {
@@ -124,12 +129,14 @@ static void if_branch()
                     ins->next->r[0] == br_dest) {
                 char * neg_op;
                 SymReg * go = get_branch_reg(ins);
+                int args;
+
                 debug(1,"if_branch %s ... %s\n", last->op, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
-                if ((neg_op = get_neg_op(last->op)) != 0) {
+                if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
                     last->r[reg] = go;
-                    tmp = INS(neg_op, "", last->r, 2, 0, 0);
+                    tmp = INS(neg_op, "", last->r, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
                     free(last->op);
@@ -174,7 +181,7 @@ static void branch_branch()
     }
 }
 
-void unused_label()
+static void unused_label()
 {
     Instruction *ins, *ins2, *last;
     SymReg * addr;
@@ -204,6 +211,28 @@ void unused_label()
         }
         last = ins;
     }
+}
+
+static int used_once()
+{
+    Instruction *ins;
+    SymReg * r;
+    int opt = 0;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        if (!ins->r)
+            continue;
+        r = ins->r[0];
+        if (!r)
+            continue;
+        if (r->use_count == 1 && r->lhs_use_count == 1) {
+            delete_ins(ins, 1);
+            ostat.deleted_ins++;
+            ostat.used_once++;
+            opt++;
+        }
+    }
+    return opt;
 }
 
 static int

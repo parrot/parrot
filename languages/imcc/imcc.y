@@ -171,7 +171,7 @@ multi_keyed(char *name, SymReg ** regs, int nr, int emit)
     static int p = 0;
     SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
     SymReg *nreg[IMCC_MAX_REGS];
-    Instruction * ins, *last;
+    Instruction * ins;
 
     /* count keys in keyvec */
     kv = keyvec;
@@ -378,7 +378,7 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 %token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO
 %token <s> PARROT_OP
 %type <t> type
-%type <i> program subs sub sub_start emit
+%type <i> program sub sub_start emit
 %type <s> classname relop newtype
 %type <i> labels _labels label statements statement
 %type <i> instruction assignment if_statement labeled_inst
@@ -391,12 +391,14 @@ Instruction * iANY(char * name, char *fmt, SymReg **regs, int emit) {
 
 
 %start program
-%expect 2
 
 %%
 
-program:
-    subs  { $$ = 0; }
+program:                         { open_comp_unit(); }
+    statements  { $$ = 0;
+	  allocate();
+	  emit_flush();
+        }
     ;
 
 
@@ -416,33 +418,27 @@ pasm_args:
     ;
 
 emit:
-      EMIT   pasmcode                    { $$ = 0;}
-       EOM 				{ emit_flush(); clear_tables();$$=0;}
+      EMIT                              { open_comp_unit(); }
+      pasmcode
+      EOM 				{ emit_flush(); $$=0;}
     ;
 
-nls:
-    '\n'
-    | nls '\n'
-    ;
 
-subs:	subs sub
-    |   sub
-    ;
 
-sub:	sub_start statements ESUB
+sub:	sub_start
+        statements ESUB
         {
           $$ = 0;
 	  allocate();
 	  emit_flush();
-	  clear_tables();
         }
-        | emit{ $$=0; }
-        | nls { $$=0; }
+        | emit { $$=0; }
     ;
 
-sub_start: SUB IDENTIFIER '\n'
+sub_start: SUB                           { open_comp_unit(); }
+           IDENTIFIER '\n'
         { $$ = 0;
-          iSUBROUTINE(mk_address($2, U_add_uniq_sub));
+          iSUBROUTINE(mk_address($3, U_add_uniq_sub));
         }
     ;
 
@@ -460,7 +456,6 @@ labels:	/* none */         { $$ = NULL; }
 
 _labels: _labels label
     |   label
-    | label '\n'
     ;
 
 label:  LABEL		{ $$ = iLABEL(mk_address($1, U_add_uniq_label)); }
@@ -468,6 +463,7 @@ label:  LABEL		{ $$ = iLABEL(mk_address($1, U_add_uniq_label)); }
 
 instruction:
 	labels  labeled_inst '\n'  { $$ = $2; }
+    |  sub
     ;
 labeled_inst:
 	assignment
