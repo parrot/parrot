@@ -315,8 +315,7 @@ Resizes the array to C<size> elements.
 
         PMC_int_val(SELF) = size;
         PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
-        PMC_data(SELF) = mem_sys_allocate(PMC_int_val2(SELF) / BITS_PER_CHAR);
-        PObj_active_destroy_SET(SELF);
+        PMC_data(SELF) = mem_sys_allocate_zeroed(PMC_int_val2(SELF) / BITS_PER_CHAR);
     }
 
 /*
@@ -475,6 +474,49 @@ the array.
         DYNSELF.set_integer_keyed_int(nextix, value);
     }
 
+/*
+
+=back
+
+=head2 Freeze/thaw Interface
+
+=over 4
+
+=item C<void freeze(visit_info *info)>
+
+Used to archive the string.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        io->vtable->push_integer(INTERP, io, PMC_int_val(SELF));
+        STRING * s = string_from_cstring(INTERP, PMC_data(SELF), PMC_int_val2(SELF)/BITS_PER_CHAR);
+        io->vtable->push_string(INTERP, io, s);
+    }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Used to unarchive the string.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        IMAGE_IO *io = info->image_io;
+        SUPER(info);
+        if (info->extra_flags == EXTRA_IS_NULL) {
+            INTVAL size = io->vtable->shift_integer(INTERP, io);
+            STRING * s  = io->vtable->shift_string(INTERP, io);
+            PMC_int_val(SELF) = size;
+            PMC_int_val2(pmc) = s->bufused * BITS_PER_CHAR;
+            PMC_data(pmc) = mem_sys_allocate_zeroed(s->bufused);
+            mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
+        }
+    }
 }
 
 /*

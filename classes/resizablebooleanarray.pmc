@@ -107,8 +107,6 @@ Resizes the array to C<size> elements.
             PMC_int_val(SELF) = size;
             return;
         }
-
-        PObj_active_destroy_SET(SELF);
     }
 
 }
