@@ -5,8 +5,20 @@ use constant FALSE => 0;
 
 sub tokenize {
     my $data = shift;
-    my @tokens = split(//, $data);
-    my @types = map { /[a-zA-Z_ ]/ ? 'CHAR' : (/\d/ ? 'NUM' : $_) } @tokens;
+    my @tokens = $data =~ /(\\.|.)/g;
+    my @types;
+    foreach (@tokens) {
+        if (/^\\(.)/) {
+            $_ = $1;
+            push @types, 'CHAR';
+        } elsif (/\d/) {
+            push @types, 'NUM';
+        } elsif (/\w/) {
+            push @types, 'CHAR';
+        } else {
+            push @types, $_;
+        }
+    }
     return \@tokens, \@types;
 }
 
