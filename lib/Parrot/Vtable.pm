@@ -20,9 +20,36 @@ my (%types)  = (
     str   => ["PMC *", "STRING *", "STRING *", "STRING *", "PMC *"]
 );
 
+#
+# Handle the special argument names 'value', 'src_value', and 'dst_value'.
+#
+sub munge_arguments {
+    my ($vtable,$func_name,$cur_param,$arg_ref) = @_;
+    for(@$arg_ref) {
+	my $type = $_->{type};
+	if($_->{name} eq 'value') {
+	    $type = $cur_param ne '' ? $cur_param : $_->{type};
+	}
+
+	push @{$vtable->{$func_name}{args}}, {
+	    type => $type,
+	    name => $_->{name}
+	};
+
+	if($_->{name} =~ /_value/) {
+	    my $key_name;
+	    ($key_name = $_->{name}) =~ s/^(.*)_value/${1}_key/;
+	    push @{$vtable->{$func_name}{args}}, {
+		type => 'KEY *',
+		name => 'src_key',
+	    };
+	}
+    }
+}
+
 sub parse_vtable {
     my $file = defined $_[0] ? shift() : 'vtable.tbl';
-    my %vtable;
+    my $vtable;
     open INPUT, "< $file" or die "Can't open < $file: $!\n";
     while(<INPUT>) {
 	chomp;
@@ -65,33 +92,27 @@ sub parse_vtable {
 	    }
 	    my $proto =
 "$return_value (*$func_name)(struct Parrot_Interp* interpreter, PMC* pmc";
-	    $vtable{$func_name} = {
+	    $vtable->{$func_name} = {
 	        type  => $return_value,
 	        proto => $proto,
             };
-	    push @{$vtable{order}},$func_name;
+	    push @{$vtable->{order}},$func_name;
 	    if(@args>0) {
 		#
-		# Gets rid of aliasing in the data structure.
+		# Hnadle the special 'value' and '{src,dst}_value' tags.
 		#
-	        for(@args) {
-  	            push @{$vtable{$func_name}{args}},{
-		        type => $_->{type}, name => $_->{name}
-    	    	    };
-	        }
-	        $vtable{$func_name}{args}[0]{type} = $cur_param
-		    if $cur_param ne '';
+		munge_arguments($vtable,$func_name,$cur_param,\@args);
 	        my $params = join ", ",
 	    		       map { "$_->{type} $_->{name}" }
-	    		       @{$vtable{$func_name}{args}};
-	        $vtable{$func_name}{proto} .= ", $params";
+	    		       @{$vtable->{$func_name}{args}};
+	        $vtable->{$func_name}{proto} .= ", $params";
 	    }
-	    $vtable{$func_name}{proto} .= ')';
+	    $vtable->{$func_name}{proto} .= ')';
 	}
     }
     close INPUT;
 
-    return %vtable;
+    return %$vtable;
 }
 
 sub vtbl_struct {
