@@ -371,16 +371,6 @@ pmclass PerlUndef {
         dest->vtable->set_string_native(INTERP, dest, value);
     }
 
-    void concatenate_unicode (STRING * value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
-        dest->vtable->set_string_native(INTERP, dest, value);
-    }
-
-    void concatenate_other (STRING * value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
-        dest->vtable->set_string_native(INTERP, dest, value);
-    }
-
     void concatenate_same (PMC * value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in concatenation");
         dest->vtable->set_string_native(INTERP, dest, NULL);
@@ -420,16 +410,6 @@ pmclass PerlUndef {
     }
 
     void repeat_native (STRING* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
-        dest->vtable->set_string(INTERP, dest, NULL);
-    }
-
-    void repeat_unicode (STRING* value,  PMC* dest) {
-        Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
-        dest->vtable->set_string(INTERP, dest, NULL);
-    }
-
-    void repeat_other (STRING* value,  PMC* dest) {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in repeat");
         dest->vtable->set_string(INTERP, dest, NULL);
     }
