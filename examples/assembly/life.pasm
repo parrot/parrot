@@ -5,11 +5,11 @@
 # of life
 #
 	# First the generation count
-	set I2, 200
+	set I2, 500
 	# Note the time
 	time N5
 	# If true, we don't print
-	set I12, 0
+	set I12, 1
 	set S0,  "               "
 	set S1,  "    *          "
 	set S2,  "    *      *   "

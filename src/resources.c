@@ -15,6 +15,8 @@
 #include "parrot/parrot.h"
 #include "assert.h"
 
+static void do_dod_run(struct Parrot_Interp *);
+
 PMC *new_pmc_header(struct Parrot_Interp *interpreter) {
   UNUSED (interpreter);
 
@@ -53,6 +55,7 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
   }
 
   /* Okay, so there's space. Add the header on */
+  ((Buffer *)to_add)->flags = BUFFER_on_free_list_FLAG;
   temp_ptr = pool->pool_buffer.bufstart;
   temp_ptr += pool->entries_in_pool;
   *temp_ptr = to_add;
@@ -60,8 +63,149 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
   
 }
 
+/* Mark all the PMCs as not in use.
+
+   Not implemented yet
+
+*/
+static void
+mark_PMCs_unused(struct Parrot_Interp *interpreter) {
+
+  return;
+}
+
+/* Mark all the buffers as unused */
+static void
+mark_buffers_unused(struct Parrot_Interp *interpreter) {
+  struct STRING_Arena *cur_arena;
+  UINTVAL i;
+
+  /* Run through all the buffer header pools and mark */
+  for (cur_arena = interpreter->arena_base->last_STRING_Arena;
+       NULL != cur_arena;
+       cur_arena = cur_arena->prev) {
+    STRING *string_array = cur_arena->start_STRING;
+    for (i = 0; i < cur_arena->used; i++) {
+      /* Tentatively unused, unless it's a constant */
+      if (!(string_array[i].flags & BUFFER_constant_FLAG)) {
+	string_array[i].flags &= ~BUFFER_live_FLAG;
+      }
+    }
+  }
+}
+
+/* Do a full trace run and mark all the PMCs as active if they are
+
+   Not implemented yet
+
+*/
+static void
+trace_active_PMCs(struct Parrot_Interp *interpreter) {
+  return;
+}
+
+/* Scan any buffers in S registers and other non-PMC places and mark
+   them as active */
+static void
+trace_active_buffers(struct Parrot_Interp *interpreter) {
+  UINTVAL i, j, chunks_traced;
+  struct Stack_chunk_t *cur_stack, *start_stack;
+  struct SRegChunk *cur_chunk;
+
+  /* First mark the current set. We assume that all pointers in S
+     registers are pointing to valid buffers. This is not a good
+     assumption, but it'll do for now */
+  for (i=0; i < NUM_REGISTERS; i++) {
+    if (interpreter->string_reg.registers[i]) {
+      buffer_lives((Buffer *)interpreter->string_reg.registers[i]);
+    }
+  }
+
+  /* Now walk the string stack */
+  for (cur_chunk = interpreter->string_reg_top; cur_chunk;
+       cur_chunk = cur_chunk->prev) {
+    for (j = 0; j < cur_chunk->used; j++) {
+      for (i=0; i < NUM_REGISTERS; i++) {
+	if(cur_chunk->SReg[j].registers[i]) {
+	  buffer_lives((Buffer *)cur_chunk->SReg[j].registers[i]);
+	}
+      }
+    }
+  }
+
+  /* Finally the general stack */
+  start_stack = cur_stack = interpreter->user_stack;
+  chunks_traced = 0;
+  /* The general stack's circular, so we need to be careful */
+  while(cur_stack && ((start_stack != cur_stack) || (chunks_traced == 0))) {
+    for (i = 0; i < STACK_CHUNK_DEPTH; i++) {
+      if (STACK_ENTRY_STRING == cur_stack->entry[i].flags) {
+	buffer_lives((Buffer *)cur_stack->entry[i].entry.string_val);
+      }
+    }
+
+    chunks_traced++;
+    cur_stack = cur_stack->prev;
+  }
+}
+
+/* Free up any PMCs that aren't in use
+
+   Not yet implemented
+
+*/
+static void
+free_unused_PMCs(struct Parrot_Interp *interpreter) {
+  return;
+}
+
+/* Put any free buffers that aren't on the free list on the free list
+ */
+static void
+free_unused_buffers(struct Parrot_Interp *interpreter) {
+  struct STRING_Arena *cur_arena;
+  UINTVAL i;
+
+  /* Run through all the buffer header pools and mark */
+  for (cur_arena = interpreter->arena_base->last_STRING_Arena;
+       NULL != cur_arena;
+       cur_arena = cur_arena->prev) {
+    STRING *string_array = cur_arena->start_STRING;
+    for (i = 0; i < cur_arena->used; i++) {
+      /* If it's not live or on the free list, put it on the free list */
+      if (!(string_array[i].flags & (BUFFER_live_FLAG |
+				     BUFFER_on_free_list_FLAG))) {
+	add_header_to_free(interpreter,
+			   interpreter->arena_base->string_header_pool,
+			   &string_array[i]);
+      }
+    }
+  }
+
+}
+
 /* See if we can find some unused headers */
-static void do_dod_run(struct Parrot_Interp *interpreter) {
+static void
+do_dod_run(struct Parrot_Interp *interpreter) {
+
+  /* First go mark all PMCs as unused */
+  mark_PMCs_unused(interpreter);  
+
+  /* Then mark the buffers as unused */
+  mark_buffers_unused(interpreter);
+
+  /* Now go trace the PMCs */
+  trace_active_PMCs(interpreter);
+
+  /* And the buffers */
+  trace_active_buffers(interpreter);
+
+  /* Now put unused PMCs on the free list */
+  free_unused_PMCs(interpreter);
+
+  /* And unused buffers on the free list */
+  free_unused_buffers(interpreter);
+
   return;
 }
 
@@ -146,10 +290,13 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
   }
 }
 
-/* Mark the string as unused. The GC will find it later and put it on
+/* Mark the string as unused. The GC will later find it and put it on
    the free list */
 void free_string(STRING *string) {
   if (string) {
+    if (string->flags & BUFFER_sysmem_FLAG) {
+      mem_sys_free(string->bufstart);
+    }
     string->bufstart = NULL;
     string->buflen = 0;
     string->flags = 0;

@@ -35,32 +35,32 @@ struct PReg {
 };
 
 struct IRegChunk {
-    INTVAL used;
-    INTVAL free;
+    UINTVAL used;
+    UINTVAL free;
     struct IRegChunk *next;
     struct IRegChunk *prev;
     struct IReg IReg[FRAMES_PER_CHUNK];
 };
 
 struct NRegChunk {
-    INTVAL used;
-    INTVAL free;
+    UINTVAL used;
+    UINTVAL free;
     struct NRegChunk *next;
     struct NRegChunk *prev;
     struct NReg NReg[FRAMES_PER_CHUNK];
 };
 
 struct SRegChunk {
-    INTVAL used;
-    INTVAL free;
+    UINTVAL used;
+    UINTVAL free;
     struct SRegChunk *next;
     struct SRegChunk *prev;
     struct SReg SReg[FRAMES_PER_CHUNK];
 };
 
 struct PRegChunk {
-    INTVAL used;
-    INTVAL free;
+    UINTVAL used;
+    UINTVAL free;
     struct PRegChunk *next;
     struct PRegChunk *prev;
     struct PReg PReg[FRAMES_PER_CHUNK];

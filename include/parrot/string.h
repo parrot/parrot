@@ -55,7 +55,11 @@ typedef enum BUFFER_flag {
        far as the GC's concerned */
     BUFFER_live_FLAG       = 1 << 4,
     /* Mark the bufffer as needing GC */
-    BUFFER_needs_GC_FLAG   = 1 << 5
+    BUFFER_needs_GC_FLAG   = 1 << 5,
+    /* Mark the buffer as on the free list */
+    BUFFER_on_free_list_FLAG = 1 << 6,
+    /* This is a constant--don't kill it! */
+    BUFFER_constant_FLAG = 1 << 7
 } BUFFER_flags;
 
 #define STRING struct parrot_string_t

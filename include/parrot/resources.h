@@ -35,7 +35,7 @@ void *Parrot_alloc_new_block(struct Parrot_Interp *, UINTVAL, UINTVAL);
 
 void buffer_lives(Buffer *);
 
-#define STRING_HEADERS_PER_ALLOC 32
+#define STRING_HEADERS_PER_ALLOC 128
 
 struct PMC_Arena {
     UINTVAL free;         /* Count of PMCs free in this arena */

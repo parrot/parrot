@@ -1492,11 +1492,15 @@ PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
     if (encoding == 0) {
         self->string = string_make(interpreter, cursor, size, NULL, flags,
                                    NULL); /* fixme */
+        /* This is a constant string */
+        self->string->flags |= BUFFER_constant_FLAG;
     }
     else if (encoding == 3) {
         self->string = string_make(interpreter, cursor, size,
                                    encoding_lookup("utf32"), flags,
                                    chartype_lookup("unicode")); /* fixme */
+        /* This is a constant string */
+        self->string->flags |= BUFFER_constant_FLAG;
     }
     else {
       return 0;
