@@ -253,7 +253,7 @@ sub main() {
       file--;
       rank  = queen_rank(board, file);
       board = clear_file(board, file);
-      rank++
+      rank++;
     } else {
       board = place_queen(board, rank, file);
       file++;
@@ -276,5 +276,4 @@ sub main() {
 #
 
 main();
-end;
 
