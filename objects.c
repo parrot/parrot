@@ -94,7 +94,6 @@ Parrot_new_class(Parrot_Interp interpreter, STRING *class_name) {
   PMC *new_class;
   PMC *new_class_array;
   PMC *classname_pmc;
-  PMC *temp_pmc;
 
   new_class = pmc_new(interpreter, enum_class_ParrotClass);
   new_class_array = PMC_data(new_class);
