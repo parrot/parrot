@@ -11,6 +11,9 @@
  * References:
  */
 
+#if !defined(PARROT_MIPS_JIT_EMIT_H_GUARD)
+#define PARROT_MIPS_JIT_EMIT_H_GUARD
+
 typedef enum {
     zero,
     at,
@@ -484,6 +487,7 @@ sync_cache (void *_start, void *_end)
 }
 
 #endif
+#endif /* PARROT_MIPS_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

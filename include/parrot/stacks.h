@@ -87,7 +87,7 @@ Stack_entry_type get_entry_type(Interp *interpreter, Stack_Entry_t *entry);
 #define ERROR_STACK_SHALLOW 1
 #define ERROR_BAD_STACK_TYPE 1
 
-#endif
+#endif /* PARROT_STACKS_H_GUARD */
 
 /*
  * Local variables:

@@ -69,7 +69,7 @@ typedef struct MMD_table mmd_table;
 #define MMD_SXOR 22
 
 /* &end_gen */
-#endif
+#endif /* PARROT_MMD_H_GUARD */
 
 /*
  * Local variables:

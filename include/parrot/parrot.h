@@ -22,7 +22,7 @@
 #  define VAR_SCOPE
 #else
 #  define VAR_SCOPE extern
-#endif
+#endif /* INSIDE_GLOBAL_SETUP */
 
 #define PARROT_IN_CORE
 
@@ -49,56 +49,56 @@
 
 #ifdef PARROT_HAS_HEADER_SYSTYPES
 #  include <sys/types.h>
-#endif
+#endif /* PARROT_HAS_HEADER_SYSTYPES */
 
 #ifdef PARROT_HAS_HEADER_SYSSOCKET
 #include <sys/socket.h>
-#endif
+#endif /* PARROT_HAS_HEADER_SYSSOCKET */
 
 #ifdef PARROT_HAS_HEADER_NETINETIN
 #  include <netinet/in.h>
-#endif
+#endif /* PARROT_HAS_HEADER_NETINETIN */
 
 #ifdef PARROT_HAS_HEADER_ARPAINET
 #  include <arpa/inet.h>
-#endif
+#endif /* PARROT_HAS_HEADER_ARPAINET */
 
 #ifdef PARROT_HAS_HEADER_UNISTD
 #  include <unistd.h>
-#endif
+#endif /* PARROT_HAS_HEADER_UNISTD */
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
-#endif
+#endif /* PARROT_HAS_HEADER_SYSMMAN */
 
 #ifdef PARROT_HAS_HEADER_SYSTIME
 #  include <sys/time.h>
-#endif
+#endif /* PARROT_HAS_HEADER_SYSTIME */
 
 #ifdef PARROT_HAS_HEADER_TIME
 #  include <time.h>
-#endif
+#endif /* PARROT_HAS_HEADER_TIME */
 
 #ifdef PARROT_HAS_HEADER_FCNTL
 #  include <fcntl.h>
-#endif
+#endif /* PARROT_HAS_HEADER_FCNTL */
 
 #ifdef PARROT_HAS_HEADER_NETDB
 #  include <netdb.h>
-#endif
+#endif /* PARROT_HAS_HEADER_NETDB */
 
 #ifdef PARROT_HAS_HEADER_SYSSTAT
 #  include <sys/stat.h>
-#endif
+#endif /* PARROT_HAS_HEADER_SYSSTAT */
 
 #ifdef PARROT_HAS_HEADER_SETJMP
 #  include <setjmp.h>
 typedef jmp_buf Parrot_jump_buff;
-#endif
+#endif /* PARROT_HAS_HEADER_SETJMP */
 
 #ifdef PARROT_HAS_HEADER_PTHREAD
 #  include <pthread.h>
-#endif
+#endif /* PARROT_HAS_HEADER_PTHREAD */
 
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
@@ -125,7 +125,7 @@ typedef void BIGNUM;
 #else
 #  define SET_NULL(x)
 #  define SET_NULL_P(x, s)
-#endif
+#endif /* HAS_NON_ZERO_NULL */
 
 /*  Casting between pointers and integers:  If pointers and integers
     are the same size, then direct casting is fine.  If pointers and
@@ -148,8 +148,8 @@ typedef void BIGNUM;
 #  else
 #    define INTVAL2PTR(any,d)    (any)(unsigned int)(d)
 #    define UINTVAL2PTR(any,d)    (any)(unsigned int)(d)
-#  endif
-#endif
+#  endif /* PTR_SIZE == LONG_SIZE */
+#endif /* PTR_SIZE == INTVAL_SIZE */
 #define PTR2INTVAL(p)    INTVAL2PTR(INTVAL,p)
 #define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL,p)
 
@@ -163,8 +163,8 @@ typedef void BIGNUM;
 #    define OPCODE_T2PTR(any,d)    (any)(unsigned long)(d)
 #  else
 #    define OPCODE_T2PTR(any,d)    (any)(unsigned int)(d)
-#  endif
-#endif
+#  endif /* PTR_SIZE == LONG_SIZE */
+#endif /* OPCODE_T_SIZE == PTR_SIZE */
 #define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t,p)
 
 /*
@@ -175,7 +175,7 @@ typedef void BIGNUM;
 #define LVALUE_CAST(type, val) ((type)(val))
 #else
 #define LVALUE_CAST(type, val) (*((type *)&(val)))
-#endif
+#endif /* __GCC__ */
 
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is
@@ -201,7 +201,7 @@ typedef void (*funcptr_t)(void);
  */
 #ifndef O_BINARY
 #  define O_BINARY 0
-#endif
+#endif /* O_BINARY */
 
 /* define a macro to acknowledge an unused argument, and silence a "helpful"
    compiler warning. gcc will emit a warning on an empty if body unless {} is
@@ -214,7 +214,7 @@ typedef void (*funcptr_t)(void);
  * to occur more frequently. It does significantly reduce performance. */
 #ifndef DISABLE_GC_DEBUG
 #  define DISABLE_GC_DEBUG 0
-#endif
+#endif /* DISABLE_GC_DEBUG */
 
 /* Helpful internal macro for testing whether we are currently
  * debugging garbage collection and memory management. See also the
@@ -223,7 +223,7 @@ typedef void (*funcptr_t)(void);
 #  define GC_DEBUG(interp) 0
 #else
 #  define GC_DEBUG(interp) Interp_flags_TEST((interp), PARROT_GC_DEBUG_FLAG)
-#endif
+#endif /* DISABLE_GC_DEBUG */
 
 #include "parrot/enums.h"
 #include "parrot/platform.h"
@@ -267,7 +267,8 @@ typedef void (*funcptr_t)(void);
 #include "parrot/objects.h"
 #include "parrot/vtables.h"
 #include "parrot/mmd.h"
-#endif
+
+#endif /* PARROT_PARROT_H_GUARD */
 
 /*
  * Local variables:

@@ -20,7 +20,7 @@
 
 void init_world(Interp * interp);
 
-#endif
+#endif /* PARROT_GLOBAL_SETUP_H_GUARD */
 
 /*
  * Local variables:

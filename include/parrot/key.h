@@ -54,7 +54,7 @@ PMC *key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2);
 
 void key_mark(struct Parrot_Interp *interpreter, PMC *key);
 
-#endif
+#endif /* PARROT_KEY_H_GUARD */
 
 /*
  * Local variables:

@@ -44,7 +44,7 @@ typedef enum {
 
 /* &end_gen */
 
-#endif
+#endif /* PARROT_ENUMS_H_GUARD */
 
 /*
  * Local variables:

@@ -61,7 +61,7 @@ typedef pthread_t Parrot_thread;
 
 typedef void (*Cleanup_Handler)(void *);
 
-#endif
+#endif /* PARROT_THR_PTHREAD_H_GUARD */
 
 /*
  * Local variables:

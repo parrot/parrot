@@ -25,7 +25,7 @@ opcode_t *runops_cgoto_core(struct Parrot_Interp *, opcode_t *);
 opcode_t *runops_slow_core(struct Parrot_Interp *, opcode_t *);
 opcode_t *runops_profile_core(struct Parrot_Interp *, opcode_t *);
 
-#endif
+#endif /* PARROT_RUNOPS_CORES_H_GUARD */
 
 /*
  * Local variables:

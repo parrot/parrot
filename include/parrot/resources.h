@@ -1,4 +1,4 @@
-/* register.h
+/* resources.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$
@@ -85,7 +85,7 @@ struct Stash {
 
 /* &end_gen */
 
-#endif /* PARROT_RESOURCES_H */
+#endif /* PARROT_RESOURCES_H_GUARD */
 
 /*
  * Local variables:

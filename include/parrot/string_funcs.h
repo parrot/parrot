@@ -95,9 +95,8 @@ void string_upcase_inplace(struct Parrot_Interp *, STRING *);
 void string_downcase_inplace(struct Parrot_Interp *, STRING *);
 void string_titlecase_inplace(struct Parrot_Interp *, STRING *);
 
-#endif
-
-#endif
+#endif /* PARROT_IN_CORE */
+#endif /* PARROT_STRING_FUNCS_H_GUARD */
 
 /*
  * Local variables:

@@ -347,7 +347,7 @@ extern PMC *PIO_STDERR(theINTERP);
 
 
 
-#endif
+#endif /* PARROT_IO_H_GUARD */
 
 /*
  * Local variables:

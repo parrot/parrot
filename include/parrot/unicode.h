@@ -83,7 +83,7 @@ extern const char Parrot_utf8skip[256];
 #define UTF8_MAXLEN 4
 #define UTF16_MAXLEN 4
 
-#endif
+#endif /* PARROT_UNICODE_H_GUARD */
 
 /*
  * Local variables:

@@ -48,7 +48,7 @@ int longopt_get(Parrot_Interp, int argc, char* argv[],
                 const struct longopt_opt_decl options[],
                 struct longopt_opt_info* info_buf);
 
-#endif
+#endif /* PARROT_LONGOPT_H_GUARD */
 
 /*
  * Local variables:

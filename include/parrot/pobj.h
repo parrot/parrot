@@ -69,7 +69,7 @@ typedef struct pobj_t {
     Parrot_UInt flags;
 #if ! DISABLE_GC_DEBUG
     UINTVAL _pobj_version;
-#endif
+#endif /* ! DISABLE_GC_DEBUG */
 } pobj_t;
 
 /* plain Buffer is the smallest Parrot Obj */
@@ -99,7 +99,7 @@ typedef Buffer PObj;
 #  define pobj_version obj._pobj_version
 /* END DEPRECATED POBJ ACCESSOR */
 #  define PObj_version(pobj)  (pobj)->obj._pobj_version
-#endif
+#endif /* ! DISABLE_GC_DEBUG */
 
 typedef enum {
 		enum_stringrep_unknown = 0,
@@ -130,7 +130,7 @@ struct PMC {
     VTABLE *vtable;
 #if ! PMC_DATA_IN_EXT
     DPOINTER *data;
-#endif
+#endif /* ! PMC_DATA_IN_EXT */
     struct PMC_EXT *pmc_ext;
 };
 
@@ -139,7 +139,7 @@ struct _Sync;   /* forward decl */
 struct PMC_EXT {
 #if PMC_DATA_IN_EXT
     DPOINTER *data;
-#endif
+#endif /* PMC_DATA_IN_EXT */
     PMC *_metadata;      /* properties */
     /*
      * PMC access synchronization for shared PMCs
@@ -172,7 +172,7 @@ typedef struct PMC_EXT PMC_EXT;
 #  define PMC_data(pmc)       (pmc)->pmc_ext->data
 #else
 #  define PMC_data(pmc)       (pmc)->data
-#endif
+#endif /* PMC_DATA_IN_EXT */
 #define PMC_metadata(pmc)     (pmc)->pmc_ext->_metadata
 #define PMC_next_for_GC(pmc)  (pmc)->pmc_ext->_next_for_GC
 #define PMC_sync(pmc)         (pmc)->pmc_ext->_synchronize
@@ -317,7 +317,7 @@ typedef enum PObj_enum {
 # define ALL_FREE_MASK 0x2222222222222222
 #else
 # error Unsupported INTVAL_SIZE
-#endif
+#endif /* INTVAL_SIZE == 4 */
 # define ARENA_OBJECTS(_pool) ( ARENA_SIZE / _pool->object_size )
 # define ARENA_FLAG_SIZE(_pool) \
      (4*sizeof(INTVAL) + sizeof(INTVAL) * \
@@ -377,7 +377,7 @@ typedef enum PObj_enum {
 #  define DOD_flag_SET(flag, o)       PObj_flag_SET(flag, o)
 #  define DOD_flag_CLEAR(flag, o)     PObj_flag_CLEAR(flag, o)
 
-#endif
+#endif /* ARENA_DOD_FLAGS */
 
 #define PObj_get_FLAGS(o) ((o)->obj.flags)
 
@@ -523,7 +523,7 @@ typedef enum PObj_enum {
         PObj_active_destroy_SET(o); \
 } while(0)
 
-#endif
+#endif /* PARROT_POBJ_H_GUARD */
 
 /*
  * Local variables:

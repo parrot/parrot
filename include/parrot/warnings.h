@@ -55,9 +55,8 @@ INTVAL Parrot_warn(Parrot_Interp, INTVAL warnclass, const char *message, ...);
 
 INTVAL Parrot_warn_s(Parrot_Interp, INTVAL warnclass, STRING *message, ...);
 
-#endif
-
-#endif
+#endif /* PARROT_IN_CORE */
+#endif /* PARROT_WARNINGS_H_GUARD */
 
 /*
  * Local variables:

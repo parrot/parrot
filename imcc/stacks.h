@@ -1,3 +1,5 @@
+#if !defined(PARROT_IMCC_STACKS_H_GUARD)
+#define PARROT_IMCC_STACKS_H_GUARD
 
 /* Stack declarations. Stolen from rxstacks.h */
 
@@ -20,3 +22,6 @@ void imcstack_free(IMCStack);
 int imcstack_depth(IMCStack);
 void imcstack_push(IMCStack, int);
 int imcstack_pop(IMCStack);
+
+#endif /* PARROT_IMCC_STACKS_H_GUARD */
+

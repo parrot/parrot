@@ -56,9 +56,8 @@ typedef struct string_iterator_t {
 /* &end_gen */
 #define STRING struct parrot_string_t
 
-#endif
-
-#endif
+#endif /* PARROT_IN_CORE */
+#endif /* PARROT_STRING_H_GUARD */
 
 /*
  * Local variables:

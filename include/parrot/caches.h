@@ -67,7 +67,7 @@ void mark_stack_reusable(Parrot_Interp, struct Parrot_Context *ctx);
 void mark_saved_regs(Parrot_Interp interpreter);
 
 
-#endif   /* header guard */
+#endif   /* PARROT_CACHES_H_GUARD */
 
 /*
  * Local variables:

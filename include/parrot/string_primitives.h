@@ -47,9 +47,8 @@ INTVAL Parrot_char_is_space(struct Parrot_Interp *interpreter, UINTVAL character
 INTVAL Parrot_char_is_upper(struct Parrot_Interp *interpreter, UINTVAL character);
 INTVAL Parrot_char_is_xdigit(struct Parrot_Interp *interpreter, UINTVAL character);
 
-#endif
-
-#endif
+#endif /* PARROT_IN_CORE */
+#endif /* PARROT_STRING_PRIMITIVES_H_GUARD */
 
 /*
  * Local variables:

@@ -12,8 +12,8 @@
  */
 
 #if EXEC_CAPABLE
-#  ifndef EXEC_H_GUARD
-#   define EXEC_H_GUARD
+#  if !defined(PARROT_EXEC_H_GUARD)
+#   define PARROT_EXEC_H_GUARD
 
 #   if PARROT_EXEC_OS_OPENBSD
 #     ifdef PARROT_OPENBSD_ELF
@@ -113,7 +113,7 @@ void Parrot_exec_emit_mov_rm(struct Parrot_Interp * interpreter, int reg,
                              char *mem);
 void Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter, int reg,
                              char *mem);
-#  endif /* EXEC_H_GUARD */
+#  endif /* PARROT_EXEC_H_GUARD */
 #endif /* EXEC_CAPABLE */
 
 /*

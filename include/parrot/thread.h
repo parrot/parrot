@@ -56,13 +56,13 @@ struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#  endif
+#  endif /* _STRUCT_TIMESPEC */
 
-#endif
+#endif /* PARROT_SYNC_PRIMITIVES_DEFINED */
 
 #ifndef YIELD
 #  define YIELD
-#endif
+#endif /* YIELD */
 
 typedef enum {
     THREAD_STATE_JOINABLE,              /* default */
@@ -137,7 +137,7 @@ void pt_DOD_start_mark(Parrot_Interp);
 void pt_DOD_mark_root_finished(Parrot_Interp);
 void pt_DOD_stop_mark(Parrot_Interp);
 
-#endif
+#endif /* PARROT_THREAD_H_GUARD */
 
 /*
  * Local variables:

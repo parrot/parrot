@@ -1,5 +1,5 @@
-#ifndef __IMC_H
-#define __IMC_H
+#if !defined(PARROT_IMCC_IMC_H_GUARD)
+#define PARROT_IMCC_IMC_H_GUARD
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,7 +197,7 @@ typedef struct _imc_info_t {
 
 extern IMC_Unit * cur_unit;
 
-#endif
+#endif /* PARROT_IMCC_IMC_H_GUARD */
 
 
 /*

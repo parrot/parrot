@@ -63,6 +63,9 @@ void Parrot_set_class_constructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_destructor(Parrot_Interp, STRING *, INTVAL, STRING *);
 void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 
+/* XXX kwoo:  Can the code in the #if 0 get removed now, or is it historically
+ *      important?
+ */
 /* Get and set attributes. */
 #if 0
 /* Old way */
@@ -85,8 +88,8 @@ void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 #define set_attrib_array_size(x, y) Parrot_allocate_zeroed(interpreter, x, (sizeof(PMC *)*(y)))
 #define resize_attrib_array(x, y) Parrot_reallocate(interpreter, x, (sizeof(PMC *)*(y)))
 #define SLOTTYPE Buffer
-#endif
-#endif
+#endif /* 0 */
+#endif /* PARROT_OBJECTS_H_GUARD */
 
 #if 0
 /*
@@ -108,7 +111,7 @@ void Parrot_set_class_fallback(Parrot_Interp, STRING *, INTVAL, STRING *);
 #  define GET_CLASS(arr, obj) PObj_bufstart(obj)
 #  define ATTRIB_COUNT(obj) PObj_buflen(obj)
 
-#endif
+#endif /* 0 */
 
 /*
  * Local variables:

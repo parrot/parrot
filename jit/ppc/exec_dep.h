@@ -11,8 +11,8 @@
  * References:
  */
 
-#ifndef EXEC_DEP_H_GUARD
-#  define EXEC_DEP_H_GUARD
+#ifndef PARROT_PPC_EXEC_DEP_H_GUARD
+#  define PARROT_PPC_EXEC_DEP_H_GUARD
 
 #  ifdef JIT_CGP
 
@@ -97,7 +97,7 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     }
 }
 
-#endif
+#endif /* PARROT_PPC_EXEC_DEP_H_GUARD */
 
 /*
  * Local variables:

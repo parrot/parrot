@@ -2,6 +2,9 @@
 /* Data structures: */
 
 /* Two-way linked list of predecessors and successors */
+#if !defined(PARROT_CFG_H_GUARD)
+#define PARROT_CFG_H_GUARD
+
 typedef struct _edge {
     struct _basic_block *from;
     struct _edge *pred_next;
@@ -54,4 +57,6 @@ void clear_basic_blocks(struct _IMC_Unit *);
 Life_range* make_life_range(SymReg*, int);
 int blocks_are_connected(Basic_block *from, Basic_block *to);
 int edge_count(struct _IMC_Unit *);
+
+#endif /* PARROT_CFG_H_GUARD */
 

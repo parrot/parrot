@@ -457,17 +457,44 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
     size_t copysize;
     size_t alloc_size = tosize;
     void *mem;
+    struct Memory_Pool *pool = interpreter->arena_base->memory_pool;
 
     buffer = from;
+    /*
+     * do we want to shrink buffers?
+     */
+    if (tosize == PObj_buflen(buffer))
+        return PObj_bufstart(buffer);
+
+    /*
+     * same as below but barely used and tested - only 3 list related
+     * tests do use true reallocation
+     *
+     * hash.c and list.c, which do _reallocate, have both 2 reallocations
+     * normally, which play ping pong with buffers.
+     * The normal case is therefore always to allocate a new block
+     */
+    if (pool->top_block) {
+        size_t new_size, needed, old_size;
+        new_size = aligned_size(tosize, BUFFER_ALIGNMENT - 1);
+        old_size = aligned_size(PObj_buflen(buffer), BUFFER_ALIGNMENT - 1);
+        needed = new_size - old_size;
+        if (pool->top_block->free >= needed &&
+                pool->top_block->top == (char*)PObj_bufstart(buffer) +
+                old_size) {
+            pool->top_block->free -= needed;
+            pool->top_block->top  += needed;
+            PObj_buflen(buffer) = tosize;
+            return PObj_bufstart(buffer);
+        }
+    }
     copysize = (PObj_buflen(buffer) > tosize ? tosize : PObj_buflen(buffer));
     if (!PObj_COW_TEST(buffer)) {
-        interpreter->arena_base->memory_pool->guaranteed_reclaimable +=
-                PObj_buflen(buffer);
+        pool->guaranteed_reclaimable += PObj_buflen(buffer);
     }
-    interpreter->arena_base->memory_pool->possibly_reclaimable +=
-            PObj_buflen(buffer);
+    pool->possibly_reclaimable += PObj_buflen(buffer);
     mem = mem_allocate(interpreter, &alloc_size,
-            interpreter->arena_base->memory_pool, BUFFER_ALIGNMENT - 1);
+            pool, BUFFER_ALIGNMENT - 1);
 
     if (!mem) {
         return NULL;

@@ -1,3 +1,5 @@
+#if !defined(PARROT_IMCC_SETS_H_GUARD)
+#define PARROT_IMCC_SETS_H_GUARD
 
 typedef struct _Set {
    int length;
@@ -16,3 +18,6 @@ int set_contains(Set*, int);
 Set* set_union(Set*, Set*);
 Set* set_intersec(Set*, Set*);
 void set_intersec_inplace(Set*, Set*);
+
+#endif /* PARROT_IMCC_SETS_H_GUARD */
+

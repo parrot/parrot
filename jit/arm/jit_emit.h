@@ -6,11 +6,14 @@
  * $Id$
  */
 
+#if !defined(PARROT_ARM_JIT_EMIT_H_GUARD)
+#define PARROT_ARM_JIT_EMIT_H_GUARD
+
 #ifdef ARM
 #  ifdef __linux
 #    include <asm/unistd.h>
 #  endif
-#endif
+#endif /* ARM */
 
 /*  Registers
  *
@@ -966,7 +969,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG15_pc, REG12_ip);
-#endif
+#endif /* ARM_K_BUG */
     jit_info->native_ptr
         = emit_word (jit_info->native_ptr, (int) jit_info->cur_op);
     jit_info->native_ptr
@@ -1089,8 +1092,8 @@ arm_sync_d_i_cache (void *start, void *end) {
 }
 
 #endif
-
 #endif /* JIT_EMIT == 0 */
+#endif /* PARROT_ARM_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

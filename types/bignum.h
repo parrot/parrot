@@ -16,6 +16,9 @@ removed for back-porting.
 
 */
 
+#if !defined(PARROT_TYPES_BIGNUM_H_GUARD)
+#define PARROT_TYPES_BIGNUM_H_GUARD
+
 /* Stuff to be parrot-like in source, even if not being used in parrot */
 #ifdef PARROT_IN_CORE
 #define PINT_ interpreter,
@@ -188,6 +191,7 @@ int BN_set_sNAN(PINTD_ BIGNUM* bn);
 int BN_set_inf(PINTD_ BIGNUM* bn);
 int BN_really_zero(PINTD_ BIGNUM* bn, int);
 
+#endif /* PARROT_TYPES_BIGNUM_H_GUARD */
 /*
  * Local variables:
  * c-indentation-style: bsd

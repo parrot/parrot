@@ -11,8 +11,8 @@
  * References:
  */
 
-#ifndef EXEC_DEP_H_GUARD
-#  define EXEC_DEP_H_GUARD
+#ifndef PARROT_I386_EXEC_DEP_H_GUARD
+#  define PARROT_I386_EXEC_DEP_H_GUARD
 
 #ifdef JIT_CGP
 
@@ -77,7 +77,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
 
         /* else call normal funtion */
         emitm_pushl_i(jit_info->native_ptr, 0x0);
-        Parrot_exec_add_text_rellocation(jit_info->objfile, 
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
             jit_info->native_ptr, RTYPE_COM, "interpre", -4);
         emitm_pushl_i(jit_info->native_ptr,
             jit_info->objfile->bytecode_header_size +
@@ -163,7 +163,7 @@ Parrot_exec_emit_mov_rm(struct Parrot_Interp * interpreter, int reg, char *mem)
     *(long *)(nptr) = (long)mem;
     nptr += 4;
     Parrot_exec_add_text_rellocation(
-        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr, 
+        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr,
             RTYPE_COM, "interpre", -4);
     ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr = nptr;
 }
@@ -181,7 +181,7 @@ Parrot_exec_emit_mov_mr(struct Parrot_Interp * interpreter, char *mem,int reg)
     *(long *)(nptr) = (long)mem;
     nptr += 4;
     Parrot_exec_add_text_rellocation(
-        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr, 
+        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr,
             RTYPE_COM, "interpre", -4);
     ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr = nptr;
 }
@@ -196,7 +196,7 @@ Parrot_exec_emit_mov_rm_n(struct Parrot_Interp * interpreter,int reg,char *mem)
     *(long *)(nptr) = (long)mem;
     nptr += 4;
     Parrot_exec_add_text_rellocation(
-        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr, 
+        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr,
             RTYPE_COM, "interpre", -4);
     emitm_fstp((nptr), (reg+1));
     ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr = nptr;
@@ -213,7 +213,7 @@ Parrot_exec_emit_mov_mr_n(struct Parrot_Interp * interpreter,char *mem,int reg)
     *(long *)(nptr) = (long)mem;
     nptr += 4;
     Parrot_exec_add_text_rellocation(
-        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr, 
+        (*(Parrot_jit_info_t *)(interpreter->jit_info)).objfile, nptr,
             RTYPE_COM, "interpre", -4);
     ((Parrot_jit_info_t *)(interpreter->jit_info))->native_ptr = nptr;
 }
@@ -228,12 +228,12 @@ offset_fixup(Parrot_exec_objfile_t *obj)
 #ifdef EXEC_A_OUT
         obj->symbol_table[i].value = obj->text.size;
 #endif
-        for (j = 0; j < i; j++) 
+        for (j = 0; j < i; j++)
             obj->symbol_table[i].value += obj->data_size[j];
     }
 }
 
-#endif
+#endif /* PARROT_I386_EXEC_DEP_H_GUARD */
 
 /*
  * Local variables:

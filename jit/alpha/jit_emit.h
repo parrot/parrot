@@ -33,6 +33,9 @@
  *
  */
 
+#if !defined(PARROT_ALPHA_JIT_EMIT_H_GUARD)
+#define PARROT_ALPHA_JIT_EMIT_H_GUARD
+
 typedef enum {
     REG0_v0,
     REG1_t0,
@@ -541,9 +544,9 @@ Parrot_jit_extend_arena(Parrot_jit_info_t *jit_info)
     jit_info->arena.start = new_arena;
 }
 
-#endif
-
-#endif
+#endif /* JITIMCC */
+#endif /* JIT_EMIT */
+#endif /* PARROT_ALPHA_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

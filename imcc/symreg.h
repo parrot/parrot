@@ -1,5 +1,5 @@
-#ifndef __SYMREG_H
-#define __SYMREG_H
+#if !defined(PARROT_IMCC_SYMREG_H_GUARD)
+#define PARROT_IMCC_SYMREG_H_GUARD
 
 /* constants */
 
@@ -189,5 +189,5 @@ void pop_namespace(char * name);
 */
 EXTERN SymReg * ghash[HASH_SIZE];
 
-#endif
+#endif /* PARROT_IMCC_SYMREG_H_GUARD */
 

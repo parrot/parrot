@@ -10,6 +10,9 @@
  *  References:
  */
 
+#if !defined(PARROT_PERLTYPES_H_GUARD)
+#define PARROT_PERLTYPES_H_GUARD
+
 /*
  * Change PMC "thing" to scalar type "type", updating vtable and flags
  * as necessary.
@@ -24,6 +27,8 @@
 	PObj_is_buffer_ptr_SET(thing); \
     } \
 }
+
+#endif /* PARROT_PERLTYPES_H_GUARD */
 
 /*
  * Local variables:

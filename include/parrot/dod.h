@@ -67,7 +67,7 @@ extern int CONSERVATIVE_POINTER_CHASING;
 #endif
 
 
-#endif /* PARROT_DOD_H */
+#endif /* PARROT_DOD_H_GUARD */
 
 /*
  * Local variables:

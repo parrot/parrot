@@ -1,3 +1,5 @@
+#if !defined(PARROT_IMCC_INSTRUCTIONS_H_GUARD)
+#define PARROT_IMCC_INSTRUCTIONS_H_GUARD
 
 /* Types */
 
@@ -121,3 +123,6 @@ int emit_close(void *param);
 
 void open_comp_unit(void);
 void close_comp_unit(Parrot_Interp);
+
+#endif /* PARROT_IMCC_INSTRUCTIONS_H_GUARD */
+

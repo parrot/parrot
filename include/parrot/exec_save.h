@@ -11,12 +11,12 @@
  * References:
  */
 
-#ifndef EXEC_SAVE_H_GUARD
-#  define EXEC_SAVE_H_GUARD
+#if !defined(PARROT_EXEC_SAVE_H_GUARD)
+#  define PARROT_EXEC_SAVE_H_GUARD
 
 void Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file);
 
-#endif /* EXEC_SAVE_H_GUARD */
+#endif /* PARROT_EXEC_SAVE_H_GUARD */
 
 /*
  * Local variables:

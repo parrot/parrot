@@ -21,7 +21,7 @@ void Parrot_vtable_set_type(Parrot_Interp, VTABLE *, INTVAL);
 void Parrot_vtable_set_name(Parrot_Interp, VTABLE *, STRING *);
 void Parrot_vtable_set_data(Parrot_Interp, VTABLE *, void *);
 
-#endif
+#endif /* PARROT_VTABLES_H_GUARD */
 
 /*
  * Local variables:

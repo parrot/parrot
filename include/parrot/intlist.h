@@ -61,7 +61,7 @@ INTVAL intlist_get(Interp*, IntList*, INTVAL idx);
 /* Debugging use only */
 void intlist_dump(FILE* fp, IntList* list, int verbose);
 
-#endif
+#endif /* PARROT_INTLIST_H_GUARD */
 
 /*
  * Local variables:

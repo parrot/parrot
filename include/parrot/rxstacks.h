@@ -1,4 +1,4 @@
-/* stacks.h
+/* rxstacks.h
  *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
  *  CVS Info
  *     $Id$

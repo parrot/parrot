@@ -160,9 +160,8 @@ STRING *Parrot_psprintf(struct Parrot_Interp *interpreter, STRING *pat,
     STRING *Parrot_sprintf_format(struct Parrot_Interp *interpreter,
                                   STRING *pat, SPRINTF_OBJ * obj);
 
-#endif
-
-#endif
+#endif /* IN_SPF_SYSTEM */
+#endif /* PARROT_MISC_H_GUARD */
 
 /*
  * Local variables:

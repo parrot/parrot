@@ -2,12 +2,12 @@
 ** interp_guts.h
 */
 
-#ifndef INTERP_GUTS_H
-#  define INTERP_GUTS_H
+#if !defined(PARROT_INTERP_GUTS_H_GUARD)
+#  define PARROT_INTERP_GUTS_H_GUARD
 
 #  define DO_OP(PC,INTERP) (PC = ((INTERP->op_func_table)[*PC])(PC,INTERP))
 
-#endif /* INTERP_GUTS_H */
+#endif /* PARROT_INTERP_GUTS_H_GUARD */
 
 /*
  * Local variables:

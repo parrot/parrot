@@ -28,7 +28,7 @@ void mem_setup_allocator(struct Parrot_Interp *);
 #define mem_sys_memcopy memcpy
 #define mem_sys_memmove memmove
 
-#endif
+#endif /* PARROT_MEMORY_H_GUARD */
 
 /*
  * Local variables:

@@ -11,8 +11,8 @@
  * References:
  */
 
-#ifndef PDB_H_GUARD
-#define PDB_H_GUARD
+#if !defined(PARROT_PDB_H_GUARD)
+#define PARROT_PDB_H_GUARD
 
 enum {
     PDB_NO_RUN      = 1 << 0,
@@ -315,7 +315,7 @@ void PDB_help(struct Parrot_Interp *interpreter, const char *command);
 #define c_continue      1053405
 #define c_disassemble   1903830
 
-#endif
+#endif /* PARROT_PDB_H_GUARD */
 
 /*
  * Local variables:

@@ -9,8 +9,8 @@
  * XXX FIXME: This should really be a library since symbol management is so common.
  */
 
-#ifndef __SYMBOL_H
-#define __SYMBOL_H
+#if !defined(PARROT_IMCC_SYMBOL_H_GUARD)
+#define PARROT_IMCC_SYMBOL_H_GUARD
 
 
 /*
@@ -75,7 +75,7 @@ extern SymbolList * symtab_to_symlist(SymbolTable * st);
 
 extern SymbolTable global_symbol_table;
 
-#endif
+#endif /* PARROT_IMCC_SYMBOL_H_GUARD */
 
 /*
  * Local variables:

@@ -17,7 +17,7 @@
 int Parrot_on_exit(void (*function)(int , void *), void *arg);
 void Parrot_exit(int status);
 
-#endif
+#endif /* PARROT_EXIT_H_GUARD */
 
 /*
  * Local variables:

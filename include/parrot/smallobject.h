@@ -11,7 +11,7 @@ struct Small_Object_Arena {
     UINTVAL * dod_flags;
     struct Small_Object_Pool * pool;
     size_t live_objects;
-#endif
+#endif /* ARENA_DOD_FLAGS */
     struct Small_Object_Arena *prev;
     struct Small_Object_Arena *next;
     void *start_objects;
@@ -32,7 +32,7 @@ typedef struct {
     UINTVAL flag_shift;         /* shift inside dod_flags */
 } Dead_PObj;
 
-#endif
+#endif /* ARENA_DOD_FLAGS */
 /* Tracked resource pool */
 struct Small_Object_Pool {
     struct Small_Object_Arena *last_Arena;
@@ -85,7 +85,7 @@ struct Small_Object_Pool * new_small_object_pool(struct Parrot_Interp *,
 
 int Parrot_is_const_pmc(Parrot_Interp, PMC *);
 
-#endif /* PARROT_SMALLOBJECT_H */
+#endif /* PARROT_SMALLOBJECT_H_GUARD */
 
 /*
  * Local variables:

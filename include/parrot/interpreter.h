@@ -193,6 +193,7 @@ typedef struct Parrot_Interp {
     int         n_libs;                  /* count of libs below */
     op_lib_t  **all_op_libs;             /* all loaded opcode libraries */
 
+/* XXX kwoo:  Is this for future, or is it safe to remove? */
 #if 0
     str_func_t *string_funcs;
 #endif
@@ -321,7 +322,7 @@ extern PMC * PMCNULL;                     /* Holds single Null PMC         */
 #else
 #  define PMCNULL NULL
 #  define PMC_IS_NULL(p) (!(p))
-#endif
+#endif /* PARROT_CATCH_NULL */
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
@@ -390,9 +391,8 @@ typedef void * *(*native_func_t)(struct Parrot_Interp *interpreter,
                                  void *cur_opcode,
                                  void *start_code);
 
-#endif   /* Parrot core */
-
-#endif   /* header guard */
+#endif   /* PARROT_IN_CORE */
+#endif   /* PARROT_INTERPRETER_H_GUARD */
 
 /*
  * Local variables:

@@ -4,8 +4,8 @@
  * $Id$
  */
 
-#ifndef JIT_H_GUARD
-#define JIT_H_GUARD
+#if !defined(PARROT_JIT_H_GUARD)
+#define PARROT_JIT_H_GUARD
 
 typedef void (*jit_f)(struct Parrot_Interp *interpreter, opcode_t *pc);
 
@@ -192,7 +192,7 @@ typedef struct {
     Parrot_exec_objfile_t           *objfile;
 #  else
     void                            *objfile;
-#  endif
+#  endif /* EXEC_CAPABLE */
 } Parrot_jit_info_t;
 
 #define Parrot_jit_fixup_target(jit_info, fixup) \
@@ -255,7 +255,7 @@ void Parrot_jit_emit_mov_rm(
 
 void *Parrot_jit_build_call_func(struct Parrot_Interp *, PMC *, String *);
 
-#endif /* JIT_H_GUARD */
+#endif /* PARROT_JIT_H_GUARD */
 
 /*
  * Local variables:

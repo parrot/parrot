@@ -1,5 +1,5 @@
-#ifndef __PARSER_H
-#define __PARSER_H
+#if !defined(PARROT_IMCC_PARSER_H_GUARD)
+#define PARROT_IMCC_PARSER_H_GUARD
 
 #ifdef PARSER_MAIN
 #define EXTERN
@@ -35,7 +35,8 @@ Instruction * multi_keyed(struct Parrot_Interp *interpreter, IMC_Unit *, char *n
     SymReg ** r, int nr, int keyvec, int emit);
 
 extern void compile_file(Interp *interp, FILE *file);
-#endif
+
+#endif /* PARROT_IMCC_PARSER_H_GUARD */
 
 /*
  * Local variables:

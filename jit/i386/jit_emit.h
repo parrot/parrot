@@ -6,6 +6,9 @@
  * $Id$
  */
 
+#if !defined(PARROT_I386_JIT_EMIT_H_GUARD)
+#define PARROT_I386_JIT_EMIT_H_GUARD
+
 #include <assert.h>
 
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && defined USE_CGP
@@ -56,7 +59,7 @@ extern UINTVAL ld(UINTVAL);
 #    define EXEC_RD \
        if (Parrot_exec_rel_addr && Parrot_exec_rel_count) \
          Parrot_exec_rel_count--;
-#  endif
+#  endif /* EXEC_CAPABLE */
 
 #  define emit_b00 0
 #  define emit_b01 1
@@ -126,7 +129,7 @@ emit_disp8_32(char *pc, int disp)
         *(long *)pc = disp;
 #  if EXEC_CAPABLE
         EXEC_RA(pc);
-#  endif
+#  endif /* EXEC_CAPABLE */
         return pc + 4;
     }
 }
@@ -199,7 +202,7 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
         *(long *)pc = disp;
 #  if EXEC_CAPABLE
         EXEC_RA(pc);
-#  endif
+#  endif /* EXEC_CAPABLE */
         return pc + 4;
     }
 
@@ -347,13 +350,14 @@ emit_pushl_m(char *pc, int base, int i, int scale, long disp)
 static char *
 emit_popl_r(char *pc, int reg)
 {
+/* XXX kwoo:  I side with valgrind.  Is it safe to remove the obsolete code? */
 #if 0
     /* valgrind doesn't like this and the version below is smaller anyway */
     *(pc++) = (char) 0x8f;
     *(pc++) = (char) emit_alu_X_r(emit_b000, reg);
 #else
     *(pc++) = (char) 0x58 | (reg - 1);
-#endif
+#endif /* 0 */
     return pc;
 }
 
@@ -3209,6 +3213,7 @@ char floatval_map[] = { 1,2,3,4 };
 #  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
 
 #endif /* JIT_EMIT */
+#endif /* PARROT_I386_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

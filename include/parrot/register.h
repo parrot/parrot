@@ -75,7 +75,7 @@ void mark_pmc_register_stack(struct Parrot_Interp* interpreter,
 void mark_string_register_stack(struct Parrot_Interp* interpreter,
                                 struct Stack_Chunk* stack);
 
-#endif /* PARROT_REGISTER_H */
+#endif /* PARROT_REGISTER_H_GUARD */
 
 /*
  * Local variables:

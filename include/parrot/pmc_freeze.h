@@ -88,7 +88,7 @@ PMC*    Parrot_thaw_constants(Parrot_Interp, STRING*);
 
 PMC*    Parrot_clone(Parrot_Interp, PMC*);
 
-#endif
+#endif /* PARROT_PMC_FREEZE_H_GUARD */
 
 /*
  * Local variables:

@@ -1,5 +1,5 @@
-#ifndef __DEBUG_H
-#define __DEBUG_H
+#if !defined(PARROT_IMCC_DEBUG_H_GUARD)
+#define PARROT_IMCC_DEBUG_H_GUARD
 
 #define DEBUG_PARROT 0x0001
 #define DEBUG_LEXER  0x0002
@@ -30,4 +30,4 @@ void dump_dominators(IMC_Unit *);
 void dump_liveness_status(IMC_Unit *);
 void dump_liveness_status_var(IMC_Unit *, SymReg*);
 
-#endif
+#endif /* PARROT_IMCC_DEBUG_H_GUARD */

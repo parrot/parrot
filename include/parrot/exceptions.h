@@ -124,7 +124,7 @@ void rethrow_c_exception(Parrot_Interp interpreter);
 void do_exception(Parrot_Interp, exception_severity severity, long error);
 void new_internal_exception(Parrot_Interp);
 
-#endif
+#endif /* PARROT_EXCEPTIONS_H_GUARD */
 
 /*
  * Local variables:

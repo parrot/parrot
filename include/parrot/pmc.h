@@ -69,7 +69,7 @@ void mmd_fallback_stringor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_stringand_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 void mmd_fallback_stringxor_pmc(Parrot_Interp, PMC *left, PMC *right, PMC *dest);
 
-#endif
+#endif /* PARROT_PMC_H_GUARD */
 
 /*
  * Local variables:

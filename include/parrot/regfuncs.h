@@ -38,7 +38,7 @@ void Parrot_pop_p(struct Parrot_Interp *, void *where);
 void Parrot_push_on_stack(void *thing, INTVAL size, INTVAL type);
 void Parrot_pop_off_stack(void *thing, INTVAL type);
 
-#endif /* PARROT_REGISTER_FUNCS_H */
+#endif /* PARROT_REGISTER_FUNCS_H_GUARD */
 
 /*
  * Local variables:

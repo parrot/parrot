@@ -89,7 +89,7 @@ typedef struct {
 } op_info_t;
 
 
-#endif
+#endif /* PARROT_OP_H_GUARD */
 
 /*
  * Local variables:

@@ -36,7 +36,7 @@ Some ideas from AT&T SFIO.
  * I'm sticking here rather than parrot.h
  */
 #include <sys/socket.h>
-#endif
+#endif /* PARROT_NET_DEVEL */
 
 /* IO object flags */
 #define PIO_F_READ      00000001
@@ -88,7 +88,7 @@ struct _ParrotIO {
 #if PARROT_NET_DEVEL
     struct sockaddr_in local;
     struct sockaddr_in remote;
-#endif
+#endif /* PARROT_NET_DEVEL */
     /* ParrotIOFilter * filters; */
 };
 
@@ -145,7 +145,7 @@ INTVAL    PIO_send_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *b
 INTVAL    PIO_connect_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *address);
 
 
-#endif /* !defined(PARROT_IO_PRIVATE_H_GUARD) */
+#endif /* PARROT_IO_PRIVATE_H_GUARD */
 
 /*
 

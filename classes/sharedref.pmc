@@ -120,6 +120,7 @@ Marks the reference as live.
 
     PMC* get_pmc () {
         internal_exception(1, "deref not allowed");
+        return NULL;
     }
 
 /*

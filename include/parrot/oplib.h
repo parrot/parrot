@@ -57,7 +57,7 @@ typedef enum {
 } special_core_ops_enum;
 
 
-#endif
+#endif /* PARROT_OPLIB_H_GUARD */
 
 /*
  * Local variables:

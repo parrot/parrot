@@ -11,8 +11,8 @@
  * References:
  */
 
-#ifndef EXEC_DEP_H_GUARD
-#  define EXEC_DEP_H_GUARD
+#if !defined(PARROT_ARM_EXEC_DEP_H_GUARD)
+#  define PARROT_ARM_EXEC_DEP_H_GUARD
 
 #  ifdef JIT_CGP
 
@@ -46,7 +46,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                                         REG14_lr,
                                         reg2mask(0) | reg2mask(REG12_ip));
     jit_info->native_ptr = emit_mov (jit_info->native_ptr, REG15_pc, REG12_ip);
-#   endif
+#   endif /* ARM_K_BUG */
     Parrot_exec_add_text_rellocation(jit_info->objfile,
         jit_info->native_ptr, RTYPE_DATA, "program_code", 0);
     jit_info->native_ptr
@@ -112,7 +112,7 @@ offset_fixup(Parrot_exec_objfile_t *obj)
     }
 }
 
-#endif
+#endif /* PARROT_ARM_EXEC_DEP_H_GUARD */
 
 /*
  * Local variables:

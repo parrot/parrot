@@ -6,6 +6,9 @@
 ** $Id$
 **/
 
+#if !defined(PARROT_SUN4_JIT_EMIT_H_GUARD)
+#define PARROT_SUN4_JIT_EMIT_H_GUARD
+
 /*
  * SPARC JIT overview:
  *
@@ -779,6 +782,7 @@ char floatval_map[] =
 #define PRESERVED_FLOAT_REGS 0
 
 #endif
+#endif /* PARROT_SUN4_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

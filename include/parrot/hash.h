@@ -92,7 +92,7 @@ void mark_hash(Interp * interpreter, Hash *hash);
 void hash_visit(Interp * interpreter, Hash *hash, void*);
 void dump_hash(Interp * interpreter, Hash *hash);
 
-#endif
+#endif /* PARROT_HASH_H_GUARD */
 
 /*
  * Local variables:

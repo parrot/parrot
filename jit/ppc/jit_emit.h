@@ -6,6 +6,9 @@
  * $Id$
  */
 
+#if !defined(PARROT_PPC_JIT_EMIT_H_GUARD)
+#define PARROT_PPC_JIT_EMIT_H_GUARD
+
 #include <unistd.h>
 #include <sys/mman.h>
 #include <limits.h>
@@ -870,8 +873,8 @@ ppc_sync_cache (void *_start, void *_end)
 }
 
 #endif /* JIT_EMIT == 0 */
-
 #endif
+#endif /* PARROT_PPC_JIT_EMIT_H_GUARD */
 
 /*
  * Local variables:

@@ -11,8 +11,11 @@
  *  References:
  */
 
-#if !defined(PARROT_BUFFERS_H_GUARD)
-#define PARROT_BUFFERS_H_GUARD
+/* XXX kwoo:  This was formerly mis-defined as PARROT_BUFFERS_H_GUARD -- if
+ *      any weirdness goes forth, check for clashes with that header.
+ */
+#if !defined(PARROT_HEADERS_H_GUARD)
+#define PARROT_HEADERS_H_GUARD
 
 #include "parrot/parrot.h"
 
@@ -52,7 +55,7 @@ Buffer * buffer_copy_if_diff(struct Parrot_Interp *, Buffer *src, Buffer *dst);
 void Parrot_initialize_header_pools(struct Parrot_Interp *);
 void Parrot_destroy_header_pools(struct Parrot_Interp *interpreter);
 
-#endif /* PARROT_HEADERS_H */
+#endif /* PARROT_HEADERS_H_GUARD */
 
 /*
  * Local variables:

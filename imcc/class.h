@@ -8,8 +8,8 @@
  * Class management
  */
 
-#ifndef __IMCC_CLASS_H
-#define __IMCC_CLASS_H
+#if !defined(PARROT_IMCC_CLASS_H_GUARD)
+#define PARROT_IMCC_CLASS_H_GUARD
 
 typedef struct _Field {
 
@@ -42,7 +42,7 @@ Symbol * lookup_field_symbol(Class *cl, const char * name);
 Symbol * lookup_method_symbol(Class *cl, const char * name);
 
 
-#endif
+#endif /* PARROT_IMCC_CLASS_H_GUARD */
 
 /*
  * Local variables:

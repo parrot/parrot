@@ -17,7 +17,7 @@
 
 void *build_call_func(struct Parrot_Interp *, PMC *, String *);
 
-#endif
+#endif /* PARROT_NCI_H_GUARD */
 
 /*
  * Local variables:

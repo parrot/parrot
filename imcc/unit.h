@@ -1,7 +1,5 @@
-
-
-#ifndef IMCC_UNIT_H
-#define IMCC_UNIT_H
+#if !defined(PARROT_IMCC_UNIT_H_GUARD)
+#define PARROT_IMCC_UNIT_H_GUARD
 
 /* A IMC compilation unit or atomic metadata item.
  * The unit holds the instruction list as well as
@@ -47,5 +45,5 @@ IMC_Unit * imc_new_unit(IMC_Unit_Type);
 void imc_free_unit(Parrot_Interp, IMC_Unit *);
 IMC_Unit * imc_order_for_emit(IMC_Unit * list);
 
-#endif
+#endif /* PARROT_IMCC_UNIT_H_GUARD */
 

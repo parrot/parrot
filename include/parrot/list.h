@@ -66,7 +66,7 @@ typedef enum {
 #  define MIN_ITEMS 16		/* smallest chunk can hold */
 #  define LD_MAX 10               /* log2(MAX_ITEMS) */
 #  define MAX_ITEMS 1024  	/* biggest chunk can hold */
-#endif
+#endif /* LIST_TEST */
 #define MAX_MASK (MAX_ITEMS-1)
 
 /*
@@ -93,7 +93,7 @@ void list_delete(Interp *interpreter, List *list, INTVAL idx, INTVAL n_items);
 void list_splice(Interp *interpreter, List *list, PMC* value, INTVAL offset,
                  INTVAL count);
 
-#endif
+#endif /* PARROT_LIST_H_GUARD */
 
 
 /*
