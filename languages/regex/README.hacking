@@ -6,7 +6,7 @@ step-by-step description of how to implement that optimization, but
 can be used as a general walkthrough for any modifications to this
 code.
 
-=====================================================================
+---------------------------------------------------------------------
 
 I talk about precisely this optimization in the section "Longer-term
 optimization vague ideas". (Heh.) I thought a bunch more about this a

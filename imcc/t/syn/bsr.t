@@ -299,31 +299,35 @@ CODE
 foo
 OUT
 
-output_is(<<'CODE', <<'OUT', "pod before");
-=head1 BLA
+# This is a workaround to suppress errors from POD::Checker.
+my $head1 = '=head1';
+my $cut = '=cut';
+
+output_is(<<"CODE", <<'OUT', "pod before");
+$head1 BLA
 
  fasel
 
-=cut
+$cut
 .sub _main
-	print "ok 1\n"
+	print "ok 1\\n"
 	end
 .end
 CODE
 ok 1
 OUT
 
-output_is(<<'CODE', <<'OUT', "pod before, after");
-=head1 FOO
+output_is(<<"CODE", <<'OUT', "pod before, after");
+$head1 FOO
 
  fasel
 
-=cut
+$cut
 .sub _main
-	print "ok 1\n"
+	print "ok 1\\n"
 	end
 .end
-=head1 BAR
+$head1 BAR
 
  junk
 
