@@ -28,6 +28,7 @@ use vars qw(@steps);
 	auto/jit.pl
 	auto/funcptr.pl
 	auto/cgoto.pl
+	auto/inline.pl
 	auto/gc.pl
 	auto/memalign.pl
 	auto/signal.pl

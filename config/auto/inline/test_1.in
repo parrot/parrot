@@ -1,0 +1,14 @@
+/*
+ * test to check if compiler supports inline
+ */
+
+#include <stdio.h>
+inline f(void) {
+   puts("inline");
+}
+
+int main() {
+   f();
+   return 0;
+}
+

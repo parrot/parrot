@@ -93,6 +93,21 @@ if (${unsetenv}) {
 EOP
 }
 
+print OUT <<EOP;
 
+/* from config/auto/inline */
+EOP
+if (${inline} ne '') {
+    my $inl = ${inline};
+    print OUT <<EOP;
+#define PARROT_INLINE $inl
+#define PARROT_HAS_INLINE
+EOP
+}
+else {
+    print OUT <<EOP;
+#define PARROT_INLINE
+EOP
+}
 #endif guard
 print OUT "\n\n#endif\n"
