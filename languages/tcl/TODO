@@ -34,18 +34,9 @@ based on the latest Tcl man pages will *really* help.
 The current list to string logic in C<dynclasses/tcllist.pmc> is missing logic
 to properly escape string elements.
 
-=item PMC based parser
-
-a TclParser PMC has been added to dynclasses. All uses of _Tcl::__parse now
-use this PMC instead (which calls a hidden PIR version of the original parse.)
-
-Next step: eliminate lib/parse.imc and run this functionality directly in C
-in the TclParser PMC.  (Will is working on this)
-
 =item string to list 
 
-Should be moved to tcllist's set_string method. (but this requires first
-moving the parser into a pmc.)
+Should be moved to tcllist's set_string method.
 
 =item tclword
 
@@ -86,7 +77,8 @@ source per-user settings. L<tclsh>
 
 =item misc
 
-hex & unicode escapes are not supported in C<lib/parser.imc>
+hex & unicode escapes are not currently supported in 
+C<dynclasses/tclparser.pmc>'s C<parse>.
 
 =item unimplemented commands/subcommands
 
@@ -203,14 +195,6 @@ PIR (ala parrot's -o option) or we can compile and run it.
 Caveat: how to support -o with user defined procs - right now, proc is defining
 the sub on the fly, where, with a compiler, we may want to defer compilation,
 and simply be able to extract the generated PIR.
-
-=item (LOW) speed
-
-Comparing examples/fact.tcl with parrot vs. tclsh (OSX)
-
- ??/??/??: 8-12 x slower, single call
- 05/14/04: 500 calls in a loop slows us down to 60x!
- 11/22/04: 500 calls in a loop: only 10x slower!
 
 =item expr
 
