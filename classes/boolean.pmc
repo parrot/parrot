@@ -32,6 +32,8 @@ pmclass Boolean extends PerlInt {
 
 Define 3 pythonic globals C<True>, C<False>, and C<__debug__>.
 
+XXX are these generally useful or should they be moved to src/py_func.c?
+
 =cut
 
 */

@@ -447,11 +447,20 @@ create_exception(Parrot_Interp interpreter)
     opcode_t *dest;     /* absolute address of handler */
     Parrot_exception *the_exception = interpreter->exceptions;
 
-    /* create an exception object */
-    exception = pmc_new(interpreter, enum_class_Exception);
-    /* exception type */
-    VTABLE_set_integer_keyed_int(interpreter, exception, 1,
-            the_exception->error);
+    /*
+     * if the exception number is in the range of our known exceptions
+     * use the precreated exception
+     */
+    if (the_exception->error <= E_LAST_PYTHON_E) {
+        exception = interpreter->exception_list[the_exception->error];
+    }
+    else {
+        /* create an exception object */
+        exception = pmc_new(interpreter, enum_class_Exception);
+        /* exception type */
+        VTABLE_set_integer_keyed_int(interpreter, exception, 1,
+                the_exception->error);
+    }
     /* exception severity */
     VTABLE_set_integer_keyed_int(interpreter, exception, 2,
             (INTVAL)the_exception->severity);

@@ -35,6 +35,10 @@ pmclass Undef extends default {
     return 0;
   }
 
+  INTVAL defined() {
+    return 0;
+  }
+
   void set_integer_native(INTVAL value) {
     VTABLE_morph(INTERP, SELF, enum_class_Integer);
     VTABLE_set_integer_native(INTERP, SELF, value);

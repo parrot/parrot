@@ -146,14 +146,24 @@ static void
 parrot_py_create_exceptions(Interp *interpreter)
 {
     PMC *ex;
+    PMC **ex_list;
     STRING *s;
 
-    ex = pmc_new(interpreter, enum_class_Exception);
+    ex_list = interpreter->exception_list;
+
+    /*
+     * TODO remember pythonic class inheritance
+     */
+    ex = ex_list[E_Exception];
     s = CONST_STRING(interpreter, "Exception");
     Parrot_store_global(interpreter, NULL, s, ex);
 
-    ex = pmc_new(interpreter, enum_class_Exception);
+    ex = ex_list[E_RuntimeError];
     s = CONST_STRING(interpreter, "RuntimeError");
+    Parrot_store_global(interpreter, NULL, s, ex);
+
+    ex = ex_list[E_NameError];
+    s = CONST_STRING(interpreter, "NameError");
     Parrot_store_global(interpreter, NULL, s, ex);
 }
 

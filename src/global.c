@@ -27,6 +27,13 @@ tdb
 =item C<PMC *
 Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
 
+Return NULL if the global isn't found or the global.
+
+=item C<PMC *
+Parrot_get_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)>
+
+If the global exists, return it. If not either throw an exception or return an C<Undef> depeneding on the interpreter's error settings.
+
 =cut
 
 */
@@ -85,6 +92,24 @@ Parrot_find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
     return VTABLE_get_pmc_keyed_str(interpreter,
             stash, globalname);
 #endif
+}
+
+PMC *
+Parrot_get_global(Parrot_Interp interpreter, STRING *class,
+        STRING *name, void *next)
+{
+    PMC *g = Parrot_find_global(interpreter, class, name);
+    if (g)
+        return g;
+    if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
+        real_exception(interpreter, next, E_NameError,
+               Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE) ?
+                "global name '%Ss' is not defined" :
+                "Global '%Ss' not found",
+                name);
+    }
+
+    return pmc_new(interpreter, enum_class_Undef);
 }
 
 /*

@@ -292,64 +292,24 @@ s. B<errorson>.
 =cut
 
 op find_global(out PMC, in STR) {
-    /* XXX: All globals should go through an API */
     opcode_t * next;
-    PMC * globals = interpreter->globals->stash_hash;
     if (!$2)
 	internal_exception(1, "Tried to get null global.");
 
     next = expr NEXT();
-    if (!VTABLE_exists_keyed_str(interpreter, globals, $2)) {
-	if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
-	    real_exception(interpreter, next, GLOBAL_NOT_FOUND,
-		    "Global '%Ss' not found\n", $2);
-	}
-	else {
-	    $1 = pmc_new(interpreter, enum_class_PerlUndef);
-	}
-    }
-    else {
-	$1 = VTABLE_get_pmc_keyed_str(interpreter, globals, $2);
-    }
+    $1 = Parrot_get_global(interpreter, NULL, $2, next);
     goto ADDRESS(next);
 }
 
 op find_global(out PMC, in STR, in STR) {
-    /* XXX: All globals should go through an API */
     opcode_t * next;
-    PMC * globals = interpreter->globals->stash_hash;
-    PMC * stash = NULL; /* -O unit warn */
     if (!$2)
-	internal_exception(1, "Tried to get null global.");
+	internal_exception(1, "Tried to get null class.");
     if (!$3)
 	internal_exception(1, "Tried to get null global.");
 
     next = expr NEXT();
-    if (!VTABLE_exists_keyed_str(interpreter, globals, $2)) {
-	if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
-	    real_exception(interpreter, next, GLOBAL_NOT_FOUND,
-		    "Global '%Ss' not found\n", $2);
-	}
-	else {
-	    stash = pmc_new(interpreter, enum_class_OrderedHash);
-	    VTABLE_set_pmc_keyed_str(interpreter, globals, $2, stash);
-	}
-    }
-    else {
-	stash = VTABLE_get_pmc_keyed_str(interpreter, globals, $2);
-    }
-    if (!VTABLE_exists_keyed_str(interpreter, stash, $3)) {
-	if (PARROT_ERRORS_test(interpreter, PARROT_ERRORS_GLOBALS_FLAG))  {
-	    real_exception(interpreter, next, GLOBAL_NOT_FOUND,
-		    "Global '%Ss' not found\n", $3);
-	}
-	else {
-	    $1 = pmc_new(interpreter, enum_class_PerlUndef);
-	}
-    }
-    else {
-	$1 = VTABLE_get_pmc_keyed_str(interpreter, stash, $3);
-    }
+    $1 = Parrot_get_global(interpreter, $2, $3, next);
     goto ADDRESS(next);
 }
 
