@@ -357,6 +357,8 @@ Returns whether the value for key C<*key> is defined in the hash.
 
 =item C<void delete_keyed(PMC *key)>
 
+=item C<void delete_keyed_str(STRING *key)>
+
 Deletes the key C<*key> from the hash.
 
 =cut
@@ -380,6 +382,17 @@ Deletes the key C<*key> from the hash.
         }
     }
 
+    void delete_keyed_str(STRING* key) {
+        PMC *new_undef = undef(INTERP);
+        /* fetch index into the PerlArray
+           and delete the key in the PerlHash afterward */
+        INTVAL n = PerlHash.SELF.get_integer_keyed_str(key);
+        PerlHash.SUPER(key);
+        /* remove the value from the PerlArray,
+           but don't splice the PerlArray. We don't want to mess up
+           the mapping from the PerlHash to the PerlArray */
+        DYNSELF.set_pmc_keyed_int(n,new_undef);
+    }
 /*
 
 =item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>

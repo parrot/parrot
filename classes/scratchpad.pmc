@@ -10,7 +10,7 @@ classes/scratchpad.pmc - Lexical Scrachpad
 
 These are the vtable functions for the Scratchpad base class.
 
-Currently a simple array of Parrot_Lexicals.
+A ScratchPad PMC is a FixedPMCArray of OrderedHashes.
 
 =head2 Methods
 
@@ -22,105 +22,7 @@ Currently a simple array of Parrot_Lexicals.
 
 #include "parrot/parrot.h"
 
-pmclass Scratchpad need_ext {
-
-/*
-
-=item C<void init()>
-
-Initializes the scratchpad.
-
-=cut
-
-*/
-
-    void init () {
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_int_val(SELF) = 0;
-    }
-
-/*
-
-=item C<void mark()>
-
-Marks the scratchpad as live.
-
-=cut
-
-*/
-
-    void mark () {
-        int j;
-        struct Parrot_Lexicals * lex;
-    
-        for (j = 0; j < PMC_int_val(SELF); j++) {
-            lex = &(((struct Parrot_Lexicals *)PMC_data(SELF))[j]);
-            lexicals_mark(INTERP, lex);
-        }
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the scratchpad.
-
-=cut
-
-*/
-
-    void destroy () {
-        if (PMC_data(SELF))
-            mem_sys_free(PMC_data(SELF));
-    }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a copy of the scratchpad.
-
-=cut
-
-*/
-
-    PMC* clone () {
-        PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_data(ret) = mem_sys_allocate(PMC_int_val(SELF) *
-                                         sizeof(struct Parrot_Lexicals));
-        PMC_int_val(ret) = PMC_int_val(SELF);
-        mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
-                        PMC_int_val(SELF) * sizeof(struct Parrot_Lexicals));
-        return ret;
-    }
-
-/*
-
-=item C<INTVAL elements()>
-
-Returns the number of lexical variables in the scratchpad.
-
-=cut
-
-*/
-
-    INTVAL elements () {
-        return PMC_int_val(SELF);
-    }
-
-/*
-
-=item C<PMC *get_pmc()>
-
-Returns the scratchpad itself.
-
-=cut
-
-*/
-
-    PMC* get_pmc () {
-        return SELF;
-    }
+pmclass Scratchpad need_ext extends FixedPMCArray {
 
 /*
 
@@ -177,16 +79,30 @@ A scope, and a lexical position in that scope.
             else {
                 internal_exception(-1, "Invalid key");
             }
-            ret = scratchpad_get_index(INTERP, SELF, pad_index,
-                                       name, position);
+            if (name)
+                ret = scratchpad_get_by_name(INTERP, SELF, pad_index,
+                                       name);
+            else
+                ret = scratchpad_get_by_index(INTERP, SELF, pad_index,
+                                       position);
         }
         else {
-            ret = scratchpad_get(INTERP, SELF, name, position);
+            if (name)
+                ret = scratchpad_find(INTERP, SELF, name);
+            else
+                ret = scratchpad_get_by_index(INTERP, SELF, -1, position);
         }
 
         return ret;
     }
 
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        return scratchpad_get_by_index(INTERP, SELF, -1, key);
+    }
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        return scratchpad_find(INTERP, SELF, key);
+    }
 /*
 
 =item C<void set_pmc_keyed(PMC *key, PMC *value)>
@@ -221,12 +137,27 @@ C<get_pmc_keyed()> supports are supported here.
             else {
                 internal_exception(-1, "Invalid key");
             }
-            scratchpad_store_index(INTERP, SELF, pad_index, name,
-                                   position, value);
+            if (name)
+                scratchpad_store_by_name(INTERP, SELF, pad_index, name,
+                                   value);
+            else
+                scratchpad_store_by_index(INTERP, SELF, pad_index, position,
+                                   value);
         }
         else {
-            scratchpad_store(INTERP, SELF, name, position, value);
+            if (name)
+                scratchpad_store(INTERP, SELF, name, value);
+            else
+                scratchpad_store_by_index(INTERP, SELF, -1, position, value);
         }
+    }
+
+    void set_pmc_keyed_int (INTVAL key, PMC *value) {
+        scratchpad_store_by_index(INTERP, SELF, -1, key, value);
+    }
+
+    void set_pmc_keyed_str (STRING *key, PMC *value) {
+        scratchpad_store(INTERP, SELF, key, value);
     }
 
 /*

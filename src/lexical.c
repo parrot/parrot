@@ -8,7 +8,10 @@ src/lexical.c - Lexical Pads
 
 =head1 DESCRIPTION
 
-Lexical pad aka scratchpad functions.
+Lexical pad aka scratchpad functions. One lexical pad is a FixedPMCArray of
+OrderedHashes per statically nesting depth. The OrderedHash has lexical names
+as keys pointing to indices into the contained array. Mixing store_by_name and
+store_by_index isn't supported by the OrderedHash.
 
 =head2 Functions
 
@@ -30,10 +33,10 @@ Uses C<scope_index> to find and return the appropriate scope.
 
 */
 
-static struct Parrot_Lexicals *
-scratchpad_index(Interp* interpreter, PMC* pad,
-                 INTVAL scope_index)
+static PMC*
+scratchpad_index(Interp* interpreter, PMC* pad, INTVAL scope_index)
 {
+    PMC **data;
     /* if scope_index is negative we count out from current pad */
     scope_index = scope_index < 0 ?
         PMC_int_val(pad) + scope_index : scope_index;
@@ -43,7 +46,8 @@ scratchpad_index(Interp* interpreter, PMC* pad,
         return NULL;
     }
 
-    return &(((struct Parrot_Lexicals *)PMC_data(pad))[scope_index]);
+    data = (PMC **)PMC_data(pad);
+    return data[scope_index];
 }
 
 /*
@@ -61,70 +65,6 @@ PMC *
 scratchpad_get_current(Interp * interp)
 {
     return (PMC *)stack_peek(interp, interp->ctx.pad_stack, NULL);
-}
-
-/*
-
-=item C<static INTVAL
-lexicals_get_position(Interp * interp,
-                      struct Parrot_Lexicals *lex, STRING* name)>
-
-Returns the position of the lexical variable corresponding to C<*name>.
-If such a variable can not be found the length of the list is returned
-(i.e. the position that this new lexical should be stored in).
-
-=cut
-
-*/
-
-static INTVAL
-lexicals_get_position(Interp * interp,
-                      struct Parrot_Lexicals *lex, STRING* name)
-{
-    STRING * cur;
-    INTVAL pos;
-
-    for (pos = 0; pos < list_length(interp, lex->names); pos++) {
-        cur = *(STRING**)list_get(interp, lex->names, pos, enum_type_STRING);
-        if (cur && string_compare(interp, cur, name) == 0) {
-            break;
-        }
-    }
-
-    return pos;
-}
-
-/*
-
-=item C<static struct Parrot_Lexicals *
-scratchpad_find(Interp* interp, PMC* pad, STRING * name,
-                INTVAL * position)>
-
-Returns first lexical scope and position where C<*name> is found, or
-C<NULL> if it can not be found.
-
-=cut
-
-*/
-
-static struct Parrot_Lexicals *
-scratchpad_find(Interp* interp, PMC* pad, STRING * name,
-                INTVAL * position)
-{
-    INTVAL i, pos = 0;
-    struct Parrot_Lexicals * lex = NULL;
-
-    for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
-        lex = &(((struct Parrot_Lexicals *)PMC_data(pad))[i]);
-        pos = lexicals_get_position(interp, lex, name);
-        if (pos == list_length(interp, lex->names))
-            lex = NULL;
-        else
-            break;
-    }
-
-    *position = pos;
-    return lex;
 }
 
 /*
@@ -157,27 +97,14 @@ scratchpad_new(Interp * interp, PMC * base, INTVAL depth)
         return NULL;
     }
 
-    /* XXX JPS: should we use a List * here instead? */
-    PMC_data(pad_pmc) = mem_sys_allocate((depth + 1) *
-                                     sizeof(struct Parrot_Lexicals));
+    VTABLE_set_integer_native(interp, pad_pmc, depth + 1);
 
     if (base) {
-        /* XXX JPS: I guess this is copying the front, when it should
-           be copying the end of the parent (base) */
-        memcpy(PMC_data(pad_pmc), PMC_data(base), depth *
-               sizeof(struct Parrot_Lexicals));
+        memcpy(PMC_data(pad_pmc), PMC_data(base), PMC_int_val(base) *
+               sizeof(PMC*));
     }
 
-    PMC_int_val(pad_pmc) = depth + 1;
-
-    /* in case call to list_new triggers gc */
-    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].values = NULL;
-    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].names = NULL;
-
-    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].values =
-        list_new(interp, enum_type_PMC);
-    ((struct Parrot_Lexicals *)PMC_data(pad_pmc))[depth].names =
-        list_new(interp, enum_type_STRING);
+    ((PMC**)PMC_data(pad_pmc))[depth] = pmc_new(interp, enum_class_OrderedHash);
 
     Parrot_unblock_DOD(interp);
 
@@ -187,47 +114,44 @@ scratchpad_new(Interp * interp, PMC * base, INTVAL depth)
 /*
 
 =item C<void
-scratchpad_store(Interp * interp, PMC * pad,
-                 STRING * name, INTVAL position, PMC* value)>
+scratchpad_store(Interp *, PMC *pad, STRING * name, PMC* value)>
 
-Routines for storing and reading lexicals in C<Scratchpad> PMCs. These
-take both a name and a position, however in general only one of these
-will be considered. This is to support both by name access and by
-position (which is faster). If by position access is intended name
-should be passed as C<NULL>.
+Store lexical name C<name>. It has to exist at some statical depth already.
 
 =cut
 
 */
 
 void
-scratchpad_store(Interp * interp, PMC * pad,
-                 STRING * name, INTVAL position, PMC* value)
+scratchpad_store(Interp * interp, PMC *pad, STRING * name, PMC* value)
 {
-    struct Parrot_Lexicals * lex;
+    PMC *ohash;
+    HashBucket *b;
+    INTVAL i;
 
-    if (name) {
-        /* use name to find lex and position */
-        lex = scratchpad_find(interp, pad, name, &position);
-        if (!lex)
-            internal_exception(-1, "Lexical '%s' not found",
+    for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
+        ohash = ((PMC**)PMC_data(pad))[i];
+        b = hash_get_bucket(interp, (Hash*) PMC_struct_val(ohash), name);
+        if (b) {
+            VTABLE_set_pmc_keyed_int(interp, ohash,
+                PMC_int_val((PMC*)b->value), value);
+            return;
+        }
+    }
+
+    internal_exception(-1, "Lexical '%s' not found",
                                (name == NULL) ? "???"
                                : string_to_cstring(interp, name));
-    }
-    else {
-        /* assume current lexical pad */
-        lex = scratchpad_index(interp, pad, -1);
-    }
-
-    list_assign(interp, lex->values, position, value, enum_type_PMC);
 }
 
 /*
 
 =item C<void
-scratchpad_store_index(Interp * interp, PMC * pad,
-                       INTVAL scope_index, STRING * name, INTVAL position,
-                       PMC* value)>
+scratchpad_store_by_index(Interp * interp, PMC *pad,
+                       INTVAL scope_index, INTVAL position, PMC* value)>
+
+scratchpad_store_by_name(Interp * interp, PMC *pad,
+                       INTVAL scope_index, STRING *name, PMC* value)>
 
 Stores C<*value> with name C<*name> or index C<position> in the
 scratchpad at C<scope_index>.
@@ -237,96 +161,112 @@ scratchpad at C<scope_index>.
 */
 
 void
-scratchpad_store_index(Interp * interp, PMC * pad,
-                       INTVAL scope_index, STRING * name, INTVAL position,
-                       PMC* value)
+scratchpad_store_by_index(Interp * interp, PMC *pad,
+                       INTVAL scope_index, INTVAL position, PMC* value)
 {
-    struct Parrot_Lexicals * lex;
+    PMC *ohash;
 
-    lex = scratchpad_index(interp, pad, scope_index);
+    ohash = scratchpad_index(interp, pad, scope_index);
+    VTABLE_set_pmc_keyed_int(interp, ohash, position, value);
+}
 
-    if (name) {
-        position = lexicals_get_position(interp, lex, name);
+void
+scratchpad_store_by_name(Interp * interp, PMC *pad,
+                       INTVAL scope_index, STRING* name, PMC* value)
+{
+    PMC *ohash;
+
+    ohash = scratchpad_index(interp, pad, scope_index);
+    VTABLE_set_pmc_keyed_str(interp, ohash, name, value);
+}
+
+/*
+
+=item C<PMC* scratchpad_find(Interp* interp, STRING * name)>
+
+Returns the lexical C<*name> at any depth or
+C<NULL> if it can not be found.
+
+=cut
+
+*/
+
+PMC*
+scratchpad_find(Interp* interp, PMC *pad, STRING * name)
+{
+    PMC *ohash;
+    HashBucket *b;
+    INTVAL i;
+
+    if (!pad)
+        return NULL;
+    for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
+        ohash = ((PMC**)PMC_data(pad))[i];
+        b = hash_get_bucket(interp, (Hash*) PMC_struct_val(ohash), name);
+        if (b)
+            return VTABLE_get_pmc_keyed_int(interp, ohash,
+                PMC_int_val((PMC*)b->value));
     }
 
-    if (position == list_length(interp, lex->names)) {
-        if (!name) {
-            /* no name for new variable, give it a default name of "" */
-            /* XXX JPS: is this the way to make an empty string? */
-            name = string_make(interp, "        ", 9,"iso-8859-1",0);
-        }
-        list_assign(interp, lex->names, position, name, enum_type_STRING);
-    }
-
-    list_assign(interp, lex->values, position, value, enum_type_PMC);
+    return NULL;
 }
 
 /*
 
 =item C<PMC *
-scratchpad_get(Interp * interp, PMC * pad, STRING * name,
-               INTVAL position)>
+scratchpad_get_by_name(Interp *, PMC *pad, INTVAL depth, STRING * name)>
 
-Finds and returns the value for name C<*name> in scratchpad C<*pad>.
+Get lexical at C<depth> by C<name>.
 
 =cut
 
 */
 
 PMC *
-scratchpad_get(Interp * interp, PMC * pad, STRING * name,
-               INTVAL position)
+scratchpad_get_by_name(Interp * interp, PMC *pad, INTVAL depth, STRING * name)
 {
-    struct Parrot_Lexicals * lex = NULL;
+    PMC *ohash;
+    HashBucket *b;
 
     if (!pad)
         return NULL;
-    if (name) lex = scratchpad_find(interp, pad, name, &position);
-    else lex = scratchpad_index(interp, pad, -1);
 
-    if (!lex)
+    ohash = scratchpad_index(interp, pad, depth);
+    b = hash_get_bucket(interp, (Hash*) PMC_struct_val(ohash), name);
+
+    if (!b)
         return NULL;
-
-    return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
+    return VTABLE_get_pmc_keyed_int(interp, ohash,
+                PMC_int_val((PMC*)b->value));
 }
 
 /*
 
 =item C<PMC *
-scratchpad_get_index(Interp * interp, PMC * pad,
-                     INTVAL scope_index, STRING * name, INTVAL position)>
+scratchpad_get_by_index(Interp *, INTVAL scope_index, INTVAL position)>
 
-Finds and returns the value for name C<*name> in scratchpad C<*pad>.
+Get the lexical at depth C<scope_index> and C<position>.
 
 =cut
 
 */
 
 PMC *
-scratchpad_get_index(Interp * interp, PMC * pad,
-                     INTVAL scope_index, STRING * name, INTVAL position)
+scratchpad_get_by_index(Interp * interp, PMC *pad, INTVAL depth, INTVAL pos)
 {
-    struct Parrot_Lexicals * lex;
+    PMC *ohash;
 
     if (!pad)
         return NULL;
-    lex = scratchpad_index(interp, pad, scope_index);
 
-    if (name) {
-        position = lexicals_get_position(interp, lex, name);
-    }
-
-    if (!lex || position < 0 || position >= list_length(interp, lex->values)) {
-        return NULL;
-    }
-
-    return *(PMC **)list_get(interp, lex->values, position, enum_type_PMC);
+    ohash = scratchpad_index(interp, pad, depth);
+    return VTABLE_get_pmc_keyed_int(interp, ohash, pos);
 }
 
 /*
 
 =item C<void
-lexicals_mark(Interp * interp, struct Parrot_Lexicals *lex)>
+lexicals_mark(Interp * interp, PMC *lex)>
 
 Calls C<list_mark()> on the lexical's names and values.
 
@@ -335,12 +275,9 @@ Calls C<list_mark()> on the lexical's names and values.
 */
 
 void
-lexicals_mark(Interp * interp, struct Parrot_Lexicals *lex)
+lexicals_mark(Interp * interp, PMC *lex)
 {
-    if (lex->names)
-        list_mark(interp, lex->names);
-    if (lex->values)
-        list_mark(interp, lex->values);
+    pobject_lives(interp, (PObj*)lex);
 }
 
 /*
@@ -357,10 +294,18 @@ Deletes scratchpad C<*pad>.
 void
 scratchpad_delete(Parrot_Interp interp, PMC *pad, STRING *name)
 {
-    INTVAL pos;
-    struct Parrot_Lexicals *lex = scratchpad_find(interp, pad, name, &pos);
-    if (lex)
-        list_assign(interp, lex->names, pos, NULL, enum_type_STRING);
+    PMC *ohash;
+    HashBucket *b;
+    INTVAL i;
+
+    for (i = PMC_int_val(pad) - 1; i >= 0; i--) {
+        ohash = ((PMC**)PMC_data(pad))[i];
+        b = hash_get_bucket(interp, (Hash*) PMC_struct_val(ohash), name);
+        if (b) {
+            VTABLE_delete_keyed_str(interp, ohash, name);
+            return;
+        }
+    }
 }
 /*
 
@@ -373,7 +318,7 @@ F<include/parrot/lexical.h>.
 =head1 HISTORY
 
   Initial version by Melvin on 2002/06/6.
-  Splitted into separate file by leo.
+  Splitted into separate file by leo on 20.06.2004.
 
 =cut
 

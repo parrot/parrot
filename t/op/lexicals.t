@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
@@ -72,7 +72,7 @@ output_is(<<CODE, <<OUTPUT, "nested scopes");
   set P0, 0
   set P1, 1
   set P2, 2
-  
+
   # outer most lexical scope
   new_pad 0
   store_lex 0, "a", P0
@@ -234,7 +234,7 @@ CODE
 12
 7
 OUTPUT
- 
+
 output_is(<<CODE, <<OUTPUT, "access by position");
 	new_pad 0
         new_pad 1
@@ -307,7 +307,7 @@ output_is(<<CODE, <<OUTPUT, "access by position");
         print P6
         print "\\n"
 
-     
+
 
         end
 CODE
@@ -326,5 +326,28 @@ CODE
 15
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "store by name, get by idx");
+	new_pad 0
+	new P0, .PerlString
+	set P0, "ok 1\n"
+	store_lex -1, "a", P0
+	new P0, .PerlString
+	set P0, "ok 2\n"
+	store_lex -1, "b", P0
+	new P0, .PerlString
+	set P0, "ok 3\n"
+	store_lex -1, "c", P0
+	find_lex P1, 0
+	print P1
+	find_lex P1, 1
+	print P1
+	find_lex P1, 2
+	print P1
+	end
+CODE
+ok 1
+ok 2
+ok 3
+OUTPUT
 1;
 

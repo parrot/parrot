@@ -117,32 +117,34 @@ created at some static depth.
 Store object $3 as lexical $2 at depth $1.  If [$1, $2] does not
 exist, it will be created.  If $1 is negative, count out from the
 current lexical scope; otherwise, count in from the outermost scope.
-So store_lex -1, .... will operate on the current pad.
+So store_lex -1, .... will operate on the current pad. Lexicals can
+be restrieved by index too: the index is generated in storage order.
 
 =item B<store_lex>(in INT, in INT, in PMC)
 
 Store object $3 at lexical position $2 at depth $1.  If [$1, $2] does
 not exist, it will be created.  If $1 is negative, count out from the
 current lexical scope; otherwise, count in from the outermost scope.
-So store_lex -1, .... will operate on the current pad.
+So store_lex -1, .... will operate on the current pad. Lexicals stored
+by index can only be retrieved by this index.
 
 =cut
 
 op store_lex(in STR, in PMC) {
-    PMC * pad = scratchpad_get_current(interpreter);
-    scratchpad_store(interpreter, pad, $1, 0, $2);
+    PMC *pad = scratchpad_get_current(interpreter);
+    scratchpad_store(interpreter, pad, $1, $2);
     goto NEXT();
 }
 
 op store_lex(in INT, in STR, in PMC) {
-    PMC * pad = scratchpad_get_current(interpreter);
-    scratchpad_store_index(interpreter, pad, $1, $2, 0, $3);
+    PMC *pad = scratchpad_get_current(interpreter);
+    scratchpad_store_by_name(interpreter, pad, $1, $2, $3);
     goto NEXT();
 }
 
 op store_lex(in INT, in INT, in PMC) {
-    PMC * pad = scratchpad_get_current(interpreter);
-    scratchpad_store_index(interpreter, pad, $1, NULL, $2, $3);
+    PMC *pad = scratchpad_get_current(interpreter);
+    scratchpad_store_by_index(interpreter, pad, $1, $2, $3);
     goto NEXT();
 }
 
@@ -158,6 +160,10 @@ Find the lexical variable named $3 at depth $2 and store it in $1.
 If $2 is negative the, count out from the current lexical scope;
 otherwise, count up from the outermost scope.
 
+=item B<find_lex>(out PMC, in INT)
+
+Find the lexical number $2 at the topmost pad.
+
 =item B<find_lex>(out PMC, in INT, in INT)
 
 Find the lexical variable at position $3 at depth $2 and store it in
@@ -167,11 +173,9 @@ otherwise, count up from the outermost scope.
 =cut
 
 op find_lex(out PMC, in STR) {
-    opcode_t * next;
-    if (!$2)
-        internal_exception(1, "Tried to get null lexical.");
-    $1 = scratchpad_get(interpreter, scratchpad_get_current(interpreter), $2, 0);
-    next = expr NEXT();
+    opcode_t * next = expr NEXT();
+    PMC *pad = scratchpad_get_current(interpreter);
+    $1 = scratchpad_find(interpreter, pad, $2);
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical '%Ss' not found", $2);
@@ -179,22 +183,19 @@ op find_lex(out PMC, in STR) {
 }
 
 op find_lex(out PMC, in INT) {
-    PMC * pad = scratchpad_get_current(interpreter);
-    PMC * lex = $1 = scratchpad_get(interpreter, pad, NULL, $2);
-    opcode_t *next = expr NEXT();
-    if (!lex)
+    opcode_t * next = expr NEXT();
+    PMC *pad = scratchpad_get_current(interpreter);
+    $1 = scratchpad_get_by_index(interpreter, pad, -1, $2);
+    if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $2);
     goto ADDRESS(next);
 }
 
 op find_lex(out PMC, in INT, in STR) {
-    opcode_t * next;
-    if (!$3)
-        internal_exception(1, "Tried to get null lexical.");
-    $1 = scratchpad_get_index(interpreter, scratchpad_get_current(interpreter),
-                              $2, $3, 0);
-    next = expr NEXT();
+    opcode_t * next = expr NEXT();
+    PMC *pad = scratchpad_get_current(interpreter);
+    $1 = scratchpad_get_by_name(interpreter, pad, $2, $3);
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical '%Ss' not found", $3);
@@ -202,10 +203,10 @@ op find_lex(out PMC, in INT, in STR) {
 }
 
 op find_lex(out PMC, in INT, in INT) {
-    PMC * pad = scratchpad_get_current(interpreter);
-    PMC *lex = $1 = scratchpad_get_index(interpreter, pad, $2, NULL, $3);
-    opcode_t *next = expr NEXT();
-    if (!lex)
+    opcode_t * next = expr NEXT();
+    PMC *pad = scratchpad_get_current(interpreter);
+    $1 = scratchpad_get_by_index(interpreter, pad, $2, $3);
+    if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $3);
     goto ADDRESS(next);
