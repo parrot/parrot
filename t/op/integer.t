@@ -268,13 +268,18 @@ OUTPUT
 output_is(<<CODE, <<OUTPUT, "cmod_i");
 	set	I0, 5
 	set	I1, 3
-	mod	I2, I0, I1
+	cmod_i	I2, I0, I1
 	print	I2
 	print	"\\n"
-
+	print	I0
+	print	"\\n"
+	print	I1
+	print	"\\n"
         end
 CODE
 2
+5
+3
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "eq_i_ic");
