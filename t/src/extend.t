@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlInt");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     value = 101010;
     Parrot_PMC_set_intval(interpreter, testpmc, value);
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlInt");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     value = -123;
     Parrot_PMC_set_intval(interpreter, testpmc, value);
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlNum");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     value = 3.1415927;
     Parrot_PMC_set_numval(interpreter, testpmc, value);
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlString");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     value = Parrot_new_string(interpreter, "Pumpking", 8, NULL, NULL, 0, 0);
     Parrot_PMC_set_string(interpreter, testpmc, value);
@@ -266,7 +266,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlString");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     Parrot_PMC_set_cstring(interpreter, testpmc, "Wibble");
     new_value = Parrot_PMC_get_cstring(interpreter, testpmc);
@@ -290,7 +290,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_cstringn");
 int main(int argc, char* argv[]) {
     Parrot_Interp interpreter;
     Parrot_Int type, length;
-    Parrot_Int* new_len; 
+    Parrot_Int new_len;
     Parrot_PMC testpmc;
     char* new_value;
 
@@ -300,15 +300,15 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     type = Parrot_PMC_typenum(interpreter, "PerlString");
-    testpmc = Parrot_PMC_new(interpreter, type); 
+    testpmc = Parrot_PMC_new(interpreter, type);
 
     length = 6;
 
     Parrot_PMC_set_cstringn(interpreter, testpmc, "Wibble", length);
-    new_value = Parrot_PMC_get_cstringn(interpreter, testpmc, new_len);
+    new_value = Parrot_PMC_get_cstringn(interpreter, testpmc, &new_len);
 
     printf("%s\n", new_value);
-    printf("%d\n", (int)(*new_len));
+    printf("%d\n", (int)(new_len));
 
     Parrot_free_cstring(new_value);
 
