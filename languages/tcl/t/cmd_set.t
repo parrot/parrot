@@ -23,7 +23,7 @@ language_output_is("tcl",$tcl,$expected,"get");
 $tcl = <<'EOTCL';
  puts -nonewline $a
 EOTCL
-$expected = "can't read \"a\": no such variable";
+$expected = "can't read \"a\": no such variable\n";
 language_output_is("tcl",$tcl,$expected,"missing lexical");
 
 $tcl = <<'EOTCL';

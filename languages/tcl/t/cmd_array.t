@@ -2,54 +2,91 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 11;
+use vars qw($TODO);
 
-my($tcl,$expected);
-
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array exists yes");
  set b(c) 2
  puts [array exists b]
-EOTCL
-$expected = "1\n";
-language_output_is("tcl",$tcl,$expected,"array exists yes");
+TCL
+1
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array exists no");
  set a 2
  puts [array exists a]
-EOTCL
-$expected = "0\n";
-language_output_is("tcl",$tcl,$expected,"array exists no");
+TCL
+0
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array exists missing");
  puts [array exists a]
-EOTCL
-$expected = "0\n";
-language_output_is("tcl",$tcl,$expected,"array exists missing");
+TCL
+0
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array size 1");
  set a(1) 1
  puts [array size a]
-EOTCL
-$expected = "1\n";
-language_output_is("tcl",$tcl,$expected,"array size 1");
+TCL
+1
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array size 2");
  set a(1) 1; set a(2) 2
  puts [array size a]
-EOTCL
-$expected = "2\n";
-language_output_is("tcl",$tcl,$expected,"array size 2");
+TCL
+2
+OUT
 
-$tcl = <<'EOTCL';
+language_output_is("tcl",<<'TCL',<<OUT,"array size not array");
  set a 1
  puts [array size a]
-EOTCL
-$expected = "0\n";
-language_output_is("tcl",$tcl,$expected,"array size not array");
+TCL
+0
+OUT
 
-$tcl = <<'EOTCL';
- puts [array size a]
-EOTCL
-$expected = "0\n";
-language_output_is("tcl",$tcl,$expected,"array size no var");
+TODO: {
+local $TODO = "array set currently misimplemented - needs to take list, not N elements";
+language_output_is("tcl",<<'TCL',<<OUT,"array set");
+ array set a {a b}
+ puts $a(a)
+TCL
+b
+OUT
 
+language_output_is("tcl",<<'TCL',<<OUT,"array set list");
+ array set a [list a b]
+ puts $a(a)
+TCL
+b
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array set multi");
+ array set a {a b c d e f}
+ puts $a(a)
+ puts $a(c)
+ puts $a(e)
+TCL
+b
+d
+f
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array set multi list");
+ array set a [list a b c d e f]
+ puts $a(a)
+ puts $a(c)
+ puts $a(e)
+TCL
+b
+d
+f
+OUT
+
+language_output_is("tcl",<<'TCL',<<OUT,"array set uneven");
+ array set a a
+TCL
+list must have an even number of elements
+OUT
+}

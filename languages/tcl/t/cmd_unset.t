@@ -14,7 +14,7 @@ language_output_is("tcl",<<'TCL',<<'OUT',"unset something");
 TCL
 OUT
 
-language_output_is("tcl",<<'TCL','can\'t read "a": no such variable',"unset something, use it again");
+language_output_is("tcl",<<'TCL',"can't read \"a\": no such variable\n","unset something, use it again");
  set a 2
  unset a
  puts $a

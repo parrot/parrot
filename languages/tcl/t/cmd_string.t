@@ -2,7 +2,7 @@
 
 use strict;
 use lib qw(tcl/t t . ../lib ../../lib ../../../lib);
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 35;
 use vars qw($TODO);
 
 my($tcl,$expected);
@@ -161,3 +161,78 @@ $tcl = <<'EOTCL';
 EOTCL
 $expected = "abcde";
 language_output_is("tcl",$tcl,$expected,"range, overextended");
+
+language_output_is("tcl",<<TCL,<<OUT,"string match * only");
+  puts [string match * foo]
+TCL
+1
+OUT
+
+TODO: {
+local $TODO = "? doesn't work. PGE issue?\n";
+language_output_is("tcl",<<TCL,<<OUT,"string match ?");
+  puts [string match a?c abc]
+TCL
+1
+OUT
+}
+
+TODO: {
+local $TODO = "[] doesn't work. PGE issue.\n";
+language_output_is("tcl",<<TCL,<<OUT,"string match charset");
+  puts [string match {a[bc]c} abc]
+TCL
+1
+OUT
+}
+
+language_output_is("tcl",<<TCL,<<OUT,"string match charset, fail");
+  puts [string match {a[ac]c} abc]
+TCL
+0
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string match \*");
+  puts [string match {\*} *]
+TCL
+1
+OUT
+
+TODO: {
+local $TODO = "Issue with \? - PGE issue?";
+language_output_is("tcl",<<TCL,<<OUT,"string match \?");
+  puts [string match {\?} ?]
+TCL
+1
+OUT
+}
+
+TODO: {
+local $TODO = "Parser error";
+language_output_is("tcl",<<TCL,<<OUT,"string match \[");
+  puts [string match {\[} {[}]
+TCL
+1
+OUT
+
+language_output_is("tcl",<<TCL,<<OUT,"string match \]");
+  puts [string match {\]} {]}]
+TCL
+1
+OUT
+}
+
+language_output_is("tcl",<<TCL,<<OUT,"string match case failure");
+  puts [string match ABC abc]
+TCL
+0
+OUT
+
+TODO: {
+local $TODO = "-nocase isn't implemented, pending PGE support";
+language_output_is("tcl",<<TCL,<<OUT,"string match nocase");
+  puts [string match -nocase ABC abc ]
+TCL
+1
+OUT
+}
