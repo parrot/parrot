@@ -1,0 +1,141 @@
+VERSION
+-------
+$Id$
+
+DESCRIPTION
+-----------
+This is an initial release of a BASIC interpreter hand written 
+entirely in Parrot bytecode.  The NOTES below are intended for Parrot 
+developers.
+
+This README will always reflect the *current* state of things.
+
+This BASIC is of the fairly old school.  Line numbers are required, and
+the following keywords are recognized:
+
+	LIST
+	LIST expr-expr
+	RUN
+	LOAD progname [loads in progname.bas]
+	PRINT
+	PRINT expr
+	PRINT expr;   [supress newline]
+	DIM           [a no-op]
+	LET var=expr
+	INPUT var    
+	FOR var=expr TO expr
+	FOR var=expr TO expr STEP expr
+	GOSUB expr
+	RETURN
+	GOTO expr
+	GO TO expr    [syn with GOTO]
+	IF expr THEN STATEMENT
+	READ var
+	DATA val, val, val, val
+	RESTORE
+	END
+	REM
+	NEW
+	QUIT          [exits interpreter]
+
+The following functions are supported in the full expression parser:
+
+	RND(X)	Random number between 0 and X
+	ABS(X)  Absolute value of X
+	LEN(X)  Length of string in X
+	MID(X,Y,Z)
+		Return the string of X, starting at position Y (1-based),
+	        for length Z.
+	ASC(X)  Return the ASCII code for the character X
+	CHR(X)  Return the ASCII character for the code X
+
+Additionally, the expression parser understands:
+	*+/-    Operators, will perform them
+	+	Between two things that don't both look like numbers will
+		cause concatenation instead.
+	-       Unary minus
+	,       Construction of tuples.  5,I+34*2,"FOO",A$ will be
+		reduced to a 4-element list (comma-separaed) with all
+		possible evaluations done.
+	AND,OR  Logical
+	><<>=   Comparison (returns 1 or 0)
+
+
+BASIC NOTES
+-----------
+   Variable name width: 12
+   Multidimensional variables: Numeric--total name length w/subscripts, 12
+   String delimiters: ' and ", interchangeable
+   Conditionals: < > = and <> (not equal)
+   Math: Integer arithmetic only
+   Case sensitive: All statements and keywords
+   Line numbers: Required, up to 12 digits in length
+   
+* GOSUB/FOR-NEXT may be nested to arbitrary depths.  Cross-nesting loops, returning
+  from within a loop, or NEXT within a subroutine will cause the stack to be cleared
+  back to the appropriate point.
+* The values in DATA statements are evaluated at RUNTIME.  Thus, it's
+  entirely possible to put variables in DATA statements
+* Anywhere var is indicated, a multidimensional variable (string or array) is allowed.
+* Strings do not have to be pre-DIMensioned any longer.
+* For IF statements, 0 or empty string is false everything else is true.
+* Line lookups are now fast.   Well, as reasonably fast as they can be without hashes.
+
+
+This was intended as a true interactive BASIC (see NOTES below) so that
+any of the variables and statements work from the prompt as well as in the
+body of the stored program.  Entering in a new line number overwrites the line
+in the existing program
+
+DISTRIBUTION
+------------
+Included in this distribution are the following files, some of which may be
+of general interest, some only apply to BASIC:
+
+	alpha.pasm		Alpha/Numeric library
+	dumpstack.pasm		Diagnostic stack dumping
+	expr.pasm		Expression evaluator
+	stackops.pasm		Stack operations
+	tokenize.pasm	  	A simple string tokenizer
+
+	basic.pasm		The instruction dispatcher
+	basicvar.pasm		Storage/Retrieval of BASIC strings, numbers, 
+				code
+	instructions.pasm	BASIC instructions
+	sample.bas		Small BASIC example.
+	sample2.bas		Shows off some of the BASIC syntax and instructions
+	sample3.bas		More showing off.
+
+	basic.pl		Perl Harness for compiling, starting BASIC 
+				in interactive mode.
+	wumpus.bas		Hunt the Wumpus in BASIC
+
+NOTES
+-----
+Very large programs or very, very large expressions will expose Parrot's GC bugs
+quickly.  This will manifest itself in a SEGV (likely, hang, garbled output, 
+or "wrong type on stack" messages.
+
+The expr.pasm module contains a full expression evaluator.  It's tied to BASIC through a 
+few subroutines (to do variable and function resolution) but otherwise it's a general-purpose
+evaluator.  Of special note is the Infix to Postfix notation conversion function.
+
+TODO
+-----
+* Implement SAVE
+* Optimize variable lookups.  They're O(N) now.  If the interpreter seems
+  slow, THIS is why.  
+    That and it's not compiling anything ahead of time.  
+    All runtime interpretation, baby!
+
+
+CONTACT
+-------
+Clinton Pierce <clintp@geeksalad.org>
+"clintp" irc.rhizomatic.net #perl or #parrot
+
+LICENSE
+-------
+Redistributable under the terms of any current version of Perl
+
+

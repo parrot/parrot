@@ -1,0 +1,97 @@
+# tokenizer
+#   Input: string to be parsed on the stack (will be removed)
+#  Output: stack contains number of tokens first,
+#          then the tokens as seen right to left 
+#          ** leftmost on bottom **
+# Quotes (single or double) are *preserved* so that
+#     Foo "bar hlaghalg"
+#   is two tokens, and the second is "bar hlaghalg"
+# Consecutive non-alphabetic characters are each considered a token
+#
+# $Id$
+# $Log$
+# Revision 1.1  2002/04/11 01:25:59  jgoff
+# Adding clintp's BASIC interpreter.
+#
+# Revision 1.2  2002/03/31 05:13:44  Clinton
+# Id Keywords
+#
+#
+TOKENIZER:
+	pushi
+	pushs
+	set I3, 0    # Inquote
+	set I4, 0    # ALPHA
+	set S0, ""   # Playground
+	set S2, ""
+	restore S2  # String to tokenize
+	set I5, 0    # Stack pointer
+
+TOKLOOP: length I0, S2
+	eq I0, 0, ENDTOK
+	set S1, ""
+	substr S1, S2, 0, 1
+	dec I0
+	substr S2, S2, 1, I0
+	
+	eq S1, "'", QUOTE
+	eq S1, '"', QUOTE
+	branch CKQUOTED
+
+QUOTE:  ne I3, 0, EOTOK
+	length I0,S0
+	eq I0, 0, FINQUOT
+	save S0
+	inc I5
+FINQUOT:set I3, 1
+	set S0, S1
+	branch TOKLOOP
+EOTOK:  set I3, 0
+	concat S0, S1
+	save S0
+	inc I5
+	set S0, ""
+	branch TOKLOOP
+CKQUOTED:
+	eq I3, 0, NOTQUOTED
+	concat S0, S1
+	branch TOKLOOP
+NOTQUOTED:
+	save S1
+	bsr ISWHITE
+	restore I2
+	ne I2, 1, NOTSPACE  # Spaces will end a token
+	length I0, S0
+	eq I0, 0, TOKLOOP
+	save S0
+	inc I5
+	set S0, ""
+	branch TOKLOOP
+NOTSPACE:
+	save S1
+	bsr ISALPHA
+	restore I0
+	length I1, S0
+	ne I1, 0, NOTEMPTY
+	set S0, S1
+	set I4, I0
+	branch TOKLOOP
+NOTEMPTY:
+	eq I4, 0, TOKCHANGED
+	ne I0, I4, TOKCHANGED
+	concat S0, S1
+	branch TOKLOOP
+TOKCHANGED:
+	save S0
+	inc I5
+	set S0, S1
+	set I4, I0
+	branch TOKLOOP
+ENDTOK: length I0, S0
+	eq I0, 0, TOKBAIL
+	save S0
+	inc I5
+TOKBAIL:save I5
+	popi
+	pops
+	ret
