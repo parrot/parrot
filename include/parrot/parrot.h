@@ -107,7 +107,7 @@ typedef jmp_buf Parrot_jump_buff;
 #define OPCODE_TYPE_PERL 0x5045524c
 #define OPCODE_TYPE_PYTHON 0x5045524b
 #define OPCODE_TYPE_JAVA 4871757
-#define OPCODE_TYPE_MSNET 2e4e4554
+#define OPCODE_TYPE_MSNET 0x2e4e4554
 
 typedef struct PMC PMC;
 typedef void STRING_FUNCS;
