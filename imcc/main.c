@@ -405,6 +405,7 @@ main(int argc, char * argv[])
 {
     struct PackFile *pf;
     int obj_file;
+    Run_Cores core;
 
     Interp *interpreter = Parrot_new(NULL);
 
@@ -416,6 +417,9 @@ main(int argc, char * argv[])
     imcc_init(interpreter);
 
     sourcefile = parseflags(interpreter, &argc, &argv);
+    /* can't run JIT or prederefed yet */
+    core = interpreter->run_core;
+    interpreter->run_core = 0;
 
     /* default optimizations, s. optimizer.c, imc.h */
     if (!*optimizer_opt) {
@@ -539,6 +543,8 @@ main(int argc, char * argv[])
         load_pbc = 1;
     }
     if (run_pbc) {
+
+        interpreter->run_core = core;
         if (interpreter->imc_info->imcc_warn)
             PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
         else

@@ -3063,7 +3063,7 @@ Parrot_load_bytecode(Interp *interpreter, STRING *name)
 {
     char *ext;
     char* filename;
-    
+
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
 #endif
@@ -3079,7 +3079,7 @@ void
 Parrot_load_bytecode_direct(Interp *interpreter, char *filename)
 {
     char *ext;
-    
+
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
 #endif
