@@ -629,7 +629,14 @@ int main() {
 		w.w = 0x04030201;
 	}
 	else {
-		w.w = 0x0807060504030201;
+#if 1
+		/* See if tcc eats this */
+                w.w = 0x08070605; 
+                w.w <<= 32; 
+                w.w |= 0x04030201;
+#else
+		w.w = (0x0807060 << 32) | 0x504030201;
+#endif
 	}
 
 	for(i = 0; i < sizeof(w.b); i++) {
