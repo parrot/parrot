@@ -1,4 +1,8 @@
+Automate numbering of opcodes - this is paramount
+Add a configure system - this is relatively paramount
+
 grep docs/strings.pod for unimplemented functions and implement them
+
 Implement transcoding
 
 Automate string vtable generation
@@ -9,3 +13,7 @@ Fix assembler to allow you to use something like:
 	add I4, I4, 3
 rather than:
 	add_i_ic I4, I4, 3
+
+Fix disassembler to recognise new bytecode format. If possible, abstract
+out bytecode-reading/writing stuff to a separate Perl module so we can
+change the format without breaking the (dis)assembler.
