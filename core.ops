@@ -993,7 +993,7 @@ op dlvar (out PMC, in PMC, in STR) {
 
   PMC *final_destination = pmc_new(interpreter, enum_class_UnManagedStruct);
 
-  void *p = Parrot_dlsym(PMC_data($2), name);
+  void *p = Parrot_dlsym($2 ? PMC_data($2) : NULL, name);
   string_cstring_free(name);
   if(p == NULL) {
     const char * err = Parrot_dlerror();
