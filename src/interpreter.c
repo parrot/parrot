@@ -392,6 +392,8 @@ init_prederef(Interp *interpreter, int which)
 stop_prederef(Interp *interpreter)>
 
 Restore the interpreter's op function tables to their initial state.
+Also the event function pointers are re-created. This is only necessary
+for run-core changes, but we don't know the old run core.
 
 =cut
 
@@ -400,14 +402,12 @@ Restore the interpreter's op function tables to their initial state.
 static void
 stop_prederef(Interp *interpreter)
 {
-    if (interpreter->resume_flag & RESUME_RESTART) {
-        interpreter->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
-        if (interpreter->evc_func_table) {
-            mem_sys_free(interpreter->evc_func_table);
-            interpreter->evc_func_table = NULL;
-        }
-        setup_event_func_ptrs(interpreter);
+    interpreter->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
+    if (interpreter->evc_func_table) {
+        mem_sys_free(interpreter->evc_func_table);
+        interpreter->evc_func_table = NULL;
     }
+    setup_event_func_ptrs(interpreter);
 }
 
 #if EXEC_CAPABLE
@@ -637,7 +637,6 @@ runops_prederef(Interp *interpreter, opcode_t *pc)
                                                            interpreter);
     }
 
-    stop_prederef(interpreter);
     return 0;
 }
 
@@ -661,7 +660,6 @@ runops_cgp(Interp *interpreter, opcode_t *pc)
     init_prederef(interpreter, PARROT_CGP_CORE);
     pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
-    stop_prederef(interpreter);
     return pc;
 #else
     PIO_eprintf(interpreter,
@@ -690,7 +688,6 @@ runops_switch(Interp *interpreter, opcode_t *pc)
     init_prederef(interpreter, PARROT_SWITCH_CORE);
     pc_prederef = interpreter->prederef.code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
-    stop_prederef(interpreter);
     return pc;
 }
 
@@ -814,9 +811,11 @@ runops_int(Interp *interpreter, size_t offset)
          * is ok.
          */
         interpreter->lo_var_ptr = old_lo_var_ptr;
-        if ((interpreter->resume_flag & RESUME_RESTART) &&
-                (int)interpreter->resume_offset < 0)
+        if (interpreter->resume_flag & RESUME_RESTART) {
+            if ((int)interpreter->resume_offset < 0)
                 internal_exception(1, "branch_cs: illegal resume offset");
+            stop_prederef(interpreter);
+        }
     }
 }
 
@@ -1094,6 +1093,7 @@ notify_func_table(Parrot_Interp interpreter, void* table, int on)
     switch (interpreter->run_core) {
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */
+        case PARROT_CGOTO_CORE:      /* cgoto address list  */
             interpreter->op_func_table = table;
             break;
         case PARROT_PREDEREF_CORE:  /* predrefed cores except switch */
