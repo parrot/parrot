@@ -22,12 +22,12 @@ a string
 
 =item VARIABLE
 
-a perlArray suitable for passing to C<_Tcl::_get_var>
+an array suitable for passing to C<_Tcl::_get_var>
 
 =item COMMAND
 
 the result of a the parse step for a [] command, i.e.
-a PerlArray of TclWords. 
+a TclList of TclWords. 
 
 =back
 
@@ -71,10 +71,13 @@ Initialize the attributes for an instance of the class
 .sub __init
   .local pmc emptyArray
   .local pmc constant
-  emptyArray = new PerlArray
+  .local int TclList,TclInt
+  TclInt = find_type "TclInt" 
+  TclList = find_type "TclList" 
+  emptyArray = new TclList
   # P2 is our instance
   setattribute P2, "TclWord\x00chunks", emptyArray
-  constant = new Integer
+  constant = new TclInt
   constant = 1
   setattribute P2, "TclWord\x00constant", constant
 .end
@@ -144,7 +147,8 @@ Add a constant character to a TclWord
   
   str = chr arg
 
-  chunk = new PerlArray
+  chunk = new FixedPMCArray
+  chunk = 2
   chunk[0] = 0
   chunk[1] = str
 
@@ -165,7 +169,8 @@ Add a constant string to a TclWord
   .local pmc chunks
 
   if arg == "" goto end
-  chunk = new PerlArray
+  chunk = new FixedPMCArray
+  chunk = 2
   chunk[0] = 0
   chunk[1] = arg
 
@@ -190,7 +195,7 @@ of the var, and an optional index for array variables.
   .local pmc chunks
   .local pmc constant
 
-  chunk = new PerlArray
+  chunk = new ResizablePMCArray
   chunk[0] = 1
   chunk[1] = var
   # I2 == # string params.
@@ -223,7 +228,8 @@ later interpretation.
   parser = find_global "_Tcl", "__parse"
   parsed_cmd  = parser(cmd,0,0)
 
-  chunk = new PerlArray
+  chunk = new FixedPMCArray
+  chunk = 2
   chunk[0] = 2
   chunk[1] = parsed_cmd
 
@@ -241,6 +247,7 @@ the results and return a Stringy PMC.
 =cut
 
 .sub __get_pmc method
+
   .local pmc chunks
   chunks = getattribute self, "TclWord\x00chunks"
  
@@ -287,7 +294,8 @@ variable:
   .local pmc get_var
   get_var = find_global "_Tcl", "__get_var"
   .local int return_type
-  $P1 = new PerlArray
+  $P1 = new FixedPMCArray
+  $P1 = 2
   $S1 = chunk_value
   $P1[0] = $S1
   $S2 = chunk[2]
@@ -368,7 +376,6 @@ loop:
   if $I2 == 2 goto command
 
 command:
-  #print "RETURNING COMMAND\n"
   $P1 = $P0[1]
   $S1 = typeof $P1
   ($I0, $P9) = interpret( $P1 )
@@ -379,45 +386,31 @@ command:
   goto loop_done
 
 variable:
-  #print "RETURNING VARIABLE\n"
-  $P1 = new PerlArray
+  $P1 = new FixedPMCArray
+  $P1 = 2
   $S1 = $P0[1]
   $P1[0] = $S1
-  #print "$S1 is"
-  #print $S1
-  #print "\n"
   $S2 = $P0[2]
   if $S2 == "" goto get_variable
-  #print "Setting S2\n"
   $P1[1] = $S2
 get_variable:
-  #print "get_variable:\n"
   ($I2,$P9) = get_var($P1)
   $S0 = $P9
-  #print "here?\n"
   if $I2 == 0 goto loop_next 
-  #print "there?\n"
   return_type = $I2
   retval = $S0
   goto loop_done 
 
 constant:
-  #print "RETURNING CONSTANT\n"
   $S0 = $P0[1]
   # goto loop_next 
 
 loop_next:
-  #print "loop next\n"
   retval .= $S0
   inc $I0
   goto loop
 
 loop_done:  
-  #print "(tcl_word, return_type="
-  #print return_type
-  #print ",retval="
-  #print retval
-  #print ")\n"  
   .pcc_begin_return
     .return return_type
     .return retval
@@ -472,6 +465,7 @@ skip:
 
 command:
   $P1 = $P0[1]
+  # XXX This will need to change.
   dumper.pmcPerlArray($P1)
   goto loop_next
 
