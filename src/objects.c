@@ -294,6 +294,8 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
 {
     PMC *class_array;
     PMC *classname_pmc;
+    PMC *vtable_pmc;
+    INTVAL new_class_number;
 
     /* Hang an array off the data pointer, empty of course */
     class_array = PMC_data(class) = pmc_new(interpreter, enum_class_SArray);
@@ -311,6 +313,9 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_CLASS_ATTRIBUTES,
             pmc_new(interpreter, enum_class_Array));
 
+    VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_OBJECT_VTABLE,
+            vtable_pmc = pmc_new(interpreter, enum_class_VtableCache));
+
 
     /* Set the classname, if we have one */
     classname_pmc = pmc_new(interpreter, enum_class_PerlString);
@@ -318,7 +323,7 @@ Parrot_new_class(Parrot_Interp interpreter, PMC *class, STRING *class_name)
     VTABLE_set_pmc_keyed_int(interpreter, class_array, PCD_CLASS_NAME,
             classname_pmc);
 
-    Parrot_class_register(interpreter, class_name, class);
+    new_class_number = Parrot_class_register(interpreter, class_name, class);
     rebuild_attrib_stuff(interpreter, class);
 }
 
@@ -346,7 +351,7 @@ Parrot_class_lookup(Parrot_Interp interpreter, STRING *class_name)
 
 /*
 
-=item C<void
+=item C<INTVAL
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
         PMC *new_class)>
 
@@ -360,7 +365,7 @@ you can create a new C<foo> in PASM like this: C<new Px, foo>.
 
 */
 
-void
+INTVAL
 Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
         PMC *new_class)
 {
@@ -400,6 +405,8 @@ Parrot_class_register(Parrot_Interp interpreter, STRING *class_name,
 
     /* Put our new vtable in the global table */
     Parrot_base_vtables[new_type] = new_vtable;
+
+    return new_type;
 }
 
 /*

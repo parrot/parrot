@@ -39,7 +39,7 @@ typedef enum {
 PMC *Parrot_single_subclass(Parrot_Interp, PMC *, STRING *);
 void Parrot_new_class(Parrot_Interp, PMC *, STRING *);
 PMC *Parrot_class_lookup(Parrot_Interp, STRING *);
-void Parrot_class_register(Parrot_Interp, STRING *, PMC *);
+INTVAL Parrot_class_register(Parrot_Interp, STRING *, PMC *);
 PMC *Parrot_add_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_remove_parent(Parrot_Interp, PMC *, PMC *);
 PMC *Parrot_multi_subclass(Parrot_Interp, PMC *, STRING *);
