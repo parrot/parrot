@@ -23,8 +23,8 @@ PMC to the stream with the C<assign> op.
     load_bytecode "library/Stream/ParrotIO.imc"
 
     # create the ParrotIO stream    
-    find_type I0, "Stream::ParrotIO"
-    new stream, I0
+    find_type $I0, "Stream::ParrotIO"
+    new stream, $I0
 
     # open this file
     stream."open"( "examples/streams/ParrotIO.imc", "<" )

@@ -22,9 +22,9 @@ Simple sub calls with 1 return value.
   i = 7
   $I1 = 8
   s = "nine"
-  I0 = _foo(i, $I1, s)
+  $I0 = _foo(i, $I1, s)
   print "return: "
-  print I0
+  print $I0
   print "\n"
   end
 .end

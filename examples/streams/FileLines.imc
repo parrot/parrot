@@ -40,24 +40,24 @@ NO_NAME:
     load_bytecode "library/Stream/Combiner.imc"
 
     # create a file stream
-    find_type I0, "Stream::ParrotIO"
-    new file, I0
+    find_type $I0, "Stream::ParrotIO"
+    new file, $I0
     file."open"( name, "<" )
 
     # process it one line per read
-    find_type I0, "Stream::Lines"
-    new lines, I0
+    find_type $I0, "Stream::Lines"
+    new lines, $I0
     assign lines, file
 
     # endless counter
-    find_type I0, "Stream::Sub"
-    new counter, I0
+    find_type $I0, "Stream::Sub"
+    new counter, $I0
     newsub temp, .Sub, _counter
     assign counter, temp
 
     # combine the counter and the file's lines
-    find_type I0, "Stream::Combiner"
-    new combiner, I0
+    find_type $I0, "Stream::Combiner"
+    new combiner, $I0
     assign combiner, counter
     assign combiner, lines
 

@@ -21,15 +21,15 @@ Creates a stream and pipes it through a Stream::Lines stream.
     load_bytecode "library/Stream/Lines.imc"
     
     # create a text stream
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    find_type $I0, "Stream::Sub"
+    new stream, $I0
     # set the source
     newsub temp, .Sub, _text
     assign stream, temp
 
     # create a lines stream
-    find_type I0, "Stream::Lines"
-    new lines, I0
+    find_type $I0, "Stream::Lines"
+    new lines, $I0
     # set the source
     assign lines, stream
     

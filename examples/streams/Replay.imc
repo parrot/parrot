@@ -4,10 +4,10 @@
     load_bytecode "library/Stream/Writer.imc"
     load_bytecode "library/Stream/Replay.imc"
     
-    find_type I0, "Stream::Writer"
-    new stream, I0
-    P0 = global "_reader"
-    assign stream, P0
+    find_type $I0, "Stream::Writer"
+    new stream, $I0
+    $P0 = global "_reader"
+    assign stream, $P0
     
     stream."write"( "1" )
     stream."write"( "2" )
@@ -26,8 +26,8 @@
     .local pmc stream3
     .local string str
 
-    find_type I0, "Stream::Replay"
-    new stream1, I0
+    find_type $I0, "Stream::Replay"
+    new stream1, $I0
     assign stream1, self
     
     print "reader start\n"

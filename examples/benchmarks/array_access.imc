@@ -99,10 +99,10 @@ Y_LOOP:   # 1000 iterations
     z_index = max_index
 Z_LOOP:   # arr_size iterations
     if z_index < 0 goto Z_DONE
-    set I3, arr_2[z_index]
-    set I4, arr_1[z_index]
-    add I3, I4
-    arr_2[z_index] = I3
+    set $I3, arr_2[z_index]
+    set $I4, arr_1[z_index]
+    add $I3, $I4
+    arr_2[z_index] = $I3
     dec z_index
     branch Z_LOOP
 Z_DONE:

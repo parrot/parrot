@@ -35,21 +35,21 @@ Creates the 3 Stream objects and dumps the combined stream.
     load_bytecode "library/Stream/Sub.imc"
 
     # create the counter stream
-    find_type I0, "Stream::Sub"
-    new counter, I0
+    find_type $I0, "Stream::Sub"
+    new counter, $I0
     newsub temp, .Sub, _counter
     assign counter, temp
     
     # create the text stream
-    find_type I0, "Stream::Sub"
-    new text, I0
+    find_type $I0, "Stream::Sub"
+    new text, $I0
     # set its source
     newsub temp, .Sub, _text
     assign text, temp
 
     # create a combiner stream
-    find_type I0, "Stream::Combiner"
-    new combined, I0
+    find_type $I0, "Stream::Combiner"
+    new combined, $I0
     # add the streams
     assign combined, counter
     assign combined, text

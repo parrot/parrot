@@ -28,8 +28,8 @@ Creates a coroutine stream and dumps it.
     load_bytecode "library/Stream/Coroutine.imc"
 
     # create the coroutine stream    
-    find_type I0, "Stream::Coroutine"
-    new stream, I0
+    find_type $I0, "Stream::Coroutine"
+    new stream, $I0
 
     # set the stream's source coroutine
     newsub temp, .Coroutine, _coro

@@ -77,8 +77,8 @@ Returns the created board.
     self."fill"( 0 )
 
     # setup the cache
-    find_type I0, "Tetris::BoardData"
-    new temp, I0
+    find_type $I0, "Tetris::BoardData"
+    new temp, $I0
     temp."init"( w, h )
     temp."fill"( -1 )
     setprop self, "cache", temp

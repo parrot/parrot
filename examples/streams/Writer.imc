@@ -18,8 +18,8 @@ Creates a C<Stream::Writer> and writes to it.
 
     load_bytecode "library/Stream/Writer.imc"
 
-    find_type I0, "Stream::Writer"
-    new stream, I0
+    find_type $I0, "Stream::Writer"
+    new stream, $I0
 
     # set the stream's source sub
     newsub temp, .Sub, _reader

@@ -18,8 +18,8 @@ Creates a counter stream and dumps it.
 
     load_bytecode "library/Stream/Sub.imc"
     
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    find_type $I0, "Stream::Sub"
+    new stream, $I0
 
     # set the stream's source sub
     newsub temp, .Sub, _counter
@@ -58,8 +58,8 @@ LOOP:
     .local pmc temp
     .local pmc func
     
-    find_type I0, "Stream::Sub"
-    new temp, I0
+    find_type $I0, "Stream::Sub"
+    new temp, $I0
 
     newsub func, .Sub, _included
     assign temp, func
@@ -91,8 +91,8 @@ writes "world".
     self."write"( "hello" )
 
     # create another stream
-    find_type I0, "Stream::Sub"
-    new temp, I0
+    find_type $I0, "Stream::Sub"
+    new temp, $I0
     newsub func, .Sub, _counter2
     assign temp, func
     
@@ -120,9 +120,9 @@ Writes the letters "A" till "F" into the stream.
 LOOP:
     self."write"( str )
 
-    ord I0, str
-    inc I0
-    chr str, I0
+    ord $I0, str
+    inc $I0
+    chr str, $I0
     
     if str != "G" goto LOOP
 

@@ -16,11 +16,11 @@ Call a sub with multiple return values.
 =cut
 
 .sub _main
-  (I0, I1, $I99) = _foo(7, 8, "nine")
+  ($I0, $I1, $I99) = _foo(7, 8, "nine")
   print "return: "
-  print I0
+  print $I0
   print " "
-  print I1
+  print $I1
   print " "
   print $I99
   print "\n"

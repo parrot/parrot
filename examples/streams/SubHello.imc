@@ -18,8 +18,8 @@ Creates a C<Stream::Sub> and dumps it.
 
     load_bytecode "library/Stream/Sub.imc"
 
-    find_type I0, "Stream::Sub"
-    new stream, I0
+    find_type $I0, "Stream::Sub"
+    new stream, $I0
 
     # set the stream's source sub
     newsub temp, .Sub, _hello

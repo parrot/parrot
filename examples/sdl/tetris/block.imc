@@ -5,8 +5,8 @@ block.imc - a tetris block class
 =head1 SYNOPSIS
 
     # create a new block
-    find_type I0, "Tetris::Block"
-    new block, I0
+    find_type $I0, "Tetris::Block"
+    new block, $I0
     block."init"( board )
     
     # let the block fall down fast
