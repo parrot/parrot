@@ -482,12 +482,11 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
         (opcode_t *(*) (struct Parrot_Interp *, opcode_t *)) 0;
 
     /*
-     * if we are entering the run-loop first-time, set the stack limit
+     * setup event function ptrs and set the stack limit
      */
-    if (interpreter->resume_flag & RESUME_INITIAL) {
-        setup_event_func_ptrs(interpreter);
-        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
-    }
+    setup_event_func_ptrs(interpreter);
+    interpreter->lo_var_ptr = (void *)&lo_var_ptr;
+
     interpreter->resume_offset = offset;
     interpreter->resume_flag |= RESUME_RESTART;
 

@@ -243,9 +243,9 @@ typedef enum PObj_enum {
 #  define d_PObj_needs_early_DOD_FLAG   0x08
 
 /*
- * arenas are constant sized ~32 byte object size, ~128K objects
+ * arenas are constant sized ~32 byte object size, ~16K objects
  */
-# define ARENA_SIZE (32*1024*128)
+# define ARENA_SIZE (32*1024*16)
 # define ARENA_ALIGN ARENA_SIZE
 # define ARENA_MASK (~ (ARENA_SIZE-1) )
 #if INTVAL_SIZE == 4

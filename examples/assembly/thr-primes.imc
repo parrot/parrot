@@ -40,15 +40,20 @@ From perldoc perlthrtut
 
 # translate to PIR by leo
 
-# Runs currently only with DOD turned off
-# and SIGSEGVs at prime 193 here
+# Runs here (i386/linux 256MB mem) w.
+#  ARENA_DOD_FLAGS = 1    MAX=500   (~  95 threads)
+#  ARENA_DOD_FLAGS = 0    MAX=1000  (~ 168 threads)
+
 
 .sub _main
+    .const int MAX = 500
     .sym pmc kid
     .sym pmc Check_num
     .sym pmc stream
     #sweepoff
+#       9  my $stream = new Thread::Queue;
     stream = new TQueue
+#       10 my $kid    = new threads(\&check_num, $stream, 2);
     Check_num = global "_check_num"
     kid = new ParrotThread
     $P2 = new PerlInt
@@ -63,18 +68,23 @@ From perldoc perlthrtut
     .nci_call Thread_new
     .pcc_end
 
+#       12 for my $i ( 3 .. 1000 ) {
     .sym int i
     i = 3
 lp:
+#       13     $stream->enqueue($i);
     $P3 = new PerlInt
     $P3 = i
     push stream, $P3
     inc i
-    if i <= 100 goto lp
+    if i <= MAX goto lp
+#       14 }
 
+#       16 $stream->enqueue(undef);
     $P4 = new PerlUndef
     push stream, $P4
 
+#       17 $kid->join;
     .sym int tid
     tid = kid
     .sym pmc Thread_join
@@ -86,34 +96,45 @@ lp:
     end
 .end
 
+#       19 sub check_num {
+#       20     my ($upstream, $cur_prime) = @_;
+# XXX still no comments inside pcc param block
 .sub _check_num prototyped
    .param pmc self
    .param pmc sub
    .param pmc upstream
    .param pmc cur_prime
 
-    sweepoff
-    .sym pmc downstream
-    downstream = new TQueue
-    .sym pmc Num
+#       21     my $kid;
     .sym pmc kid
     kid = new PerlUndef
+#       22     my $downstream = new Thread::Queue;
+    .sym pmc downstream
+    downstream = new TQueue
+#       23     while (my $num = $upstream->dequeue) {
+    .sym pmc Num		# num is a reserved word
 lp:
     shift Num, upstream
     $I0 = defined Num
     unless $I0 goto ewhile
+#       24         next unless $num % $cur_prime;
     $P0 = new PerlInt
     $P0 = Num % cur_prime
     unless $P0 goto lp
+#       25         if ($kid) {
     $I1 = defined kid
     unless $I1 goto no_kid1
+#       26            $downstream->enqueue($num);
     push downstream, Num
     goto lp
+#       27                  } else {
 no_kid1:
+#       28            print "Found prime $num\n";
     print "Found prime "
     print Num
     print "\n"
 
+#       29                $kid = new threads(\&check_num, $downstream, $num);
     kid = new ParrotThread
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread"
@@ -125,14 +146,17 @@ no_kid1:
     .nci_call Thread_new
     .pcc_end
     goto lp
+#       31     }
 ewhile:
 
+#       32     $downstream->enqueue(undef) if $kid;
     $I1 = defined kid
     unless $I1 goto no_kid2
 
     $P4 = new PerlUndef
     push downstream, $P4
 
+#       33     $kid->join           if $kid;
     .sym int tid
     tid = kid
     .sym pmc Thread_join
@@ -143,6 +167,8 @@ ewhile:
     .pcc_end
 
 no_kid2:
+#       34 }
+    # sleep 1	# turn on for watching memory usage
    .pcc_begin_return
    .pcc_end_return
 .end

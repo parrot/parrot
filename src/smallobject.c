@@ -249,7 +249,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
     size = ARENA_SIZE;
     /*
      * [ Note: Linux ]
-     * Albeit we reserve 8 pools with 4MB each, the memory footprint
+     * Albeit we reserve x pools with 500KB each, the memory footprint
      * of a running program is much smaller, if only a few objects per pool
      * are used. The unused pages of the arenas are only mapped (they use space
      * in the page tables, but no physical memory).
@@ -260,6 +260,8 @@ alloc_objects(struct Parrot_Interp *interpreter,
      * or turn off ARENA_DOD_FLAGS.
      */
     new_arena = Parrot_memalign(ARENA_ALIGN, size);
+    if (!new_arena)
+        internal_exception(ALLOCATION_ERROR, "Out of arena memory");
     /* offset in bytes of whole Objects */
     offset = ( 1 + sizeof(struct Small_Object_Arena) / pool->object_size) *
         pool->object_size;

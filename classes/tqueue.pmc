@@ -46,6 +46,8 @@ pmclass TQueue need_ext {
         entry = queue->head;
         while (entry) {
             pobject_lives(INTERP, (PObj*) entry->data);
+            if (entry == queue->tail)
+                break;
             entry = entry->next;
         }
         queue_unlock(queue);
@@ -115,6 +117,7 @@ pmclass TQueue need_ext {
         ret = entry->data;
         mem_sys_free(entry);
         return ret;
+        /* return VTABLE_clone(INTERP, ret);         XXX */
     }
 
 
