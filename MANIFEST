@@ -114,6 +114,8 @@ include/parrot/unicode.h
 interpreter.c
 io/io.c
 io/io_os.c
+io/io_stdio.c
+io/TODO
 jit.c
 jit/i386/core.jit
 jit/i386/lib.jit

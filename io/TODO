@@ -1,0 +1,27 @@
+Add IO tables, right now IO's just float around.
+
+Finish pmc
+
+The "stdio" layer
+	-buffering
+	-seek/random access
+	-shared streams
+	-thread safe
+
+Localize IO stuff to per-interpreter
+
+Copy-on-write IO stacks
+
+Filters
+
+Portable fcntl() replacement for platforms without it
+
+mmap support
+
+Bottom level socket/pipe/process support in API 
+
+UTF layers (or should we not bother and do as a filter?)
+
+Sample programs and test suite
+
+Documentation! :)
