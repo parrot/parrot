@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Configure.pl
+# Configure.pl 2.0
 #
 # $Id$
 #
@@ -10,846 +10,74 @@
 use 5.005_02;
 
 use strict;
+use vars qw($parrot_version @parrot_version);
 use lib 'lib';
 
-use Config;
-use Getopt::Long;
-use ExtUtils::Manifest qw(manicheck);
-use File::Copy;
-
 use Parrot::BuildUtil;
+use Parrot::Configure::RunSteps;
 
-#
-# Read the array and scalar forms of the version.
-# from the VERSION file.
-#
+$parrot_version = parrot_version();
+@parrot_version = parrot_version();
 
-my $parrot_version = parrot_version();
-my @parrot_version = parrot_version();
+# Handle options
 
+my %args;
 
-#
-# Handle options:
-#
+for(@ARGV) {
+  my($key, $value)=/--(\w+)(?:=(.*))?/;
+  $value = 1 unless defined $value;
+  
+  for($key) {
+    /version/ && do {
+      my $cvsid='$Id$';
+      print <<"END";
+Parrot Version $parrot_version Configure 2.0
+$cvsid
+END
+      exit;
+    };
 
-my $reconfig = 0;
-
-my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
-my(%opt_defines);
-
-if (@ARGV and $ARGV[0] eq '--reconfig') {
-  print STDERR "Configure.pl: Reconfiguring based on config.opt file...\n";
-  open OPTS, "<config.opt" or die "Can't --reconfig. Could not open config.opt for reading!";
-
-  foreach my $opt (<OPTS>) {
-    chomp $opt;
-
-    if ($opt =~ m/^\s*debugging\s*$/) {
-      $opt_debugging = 1;
-      $opt = 'debugging';
-    }
-    elsif ($opt =~ m/^\s*defaults\s*$/) {
-      $opt_defaults = 1;
-      $opt = 'defaults';
-    }
-    elsif ($opt =~ m/^\s*define\s+(.*)\s*=\s*(.*)\s*$/) {
-      $opt_defines{$1} = $2;
-      $opt = "define $1=$2";
-    }
-    else {
-      die "Unrecognized option in config.opt: '$opt'!";
-    }
-
-    print "  $opt\n";
-  }
-
-  close OPTS;
-  $reconfig = 1;
-}
-
-my $result = GetOptions(
-    'debugging!' => \$opt_debugging,
-    'defaults!'  => \$opt_defaults,
-    'version'    => \$opt_version,
-    'help'       => \$opt_help,
-    'define=s'   => \%opt_defines,
-);
-
-if($opt_version) {
-    print "Parrot Version $parrot_version Configure\n";
-    print '$Id$' . "\n";
-    exit;
-}
-
-if($opt_help) {
-        print <<"EOT";
-$0 - Parrot Configure
+    /help/    && do {
+      print <<"EOT";
+$0 - Parrot Configure 2.0
 Options:
-   --reconfig           Reconfigure with saved options
-   --debugging          Enable debugging
-   --defaults           Accept all default values
-   --define name=value  Defines value name as value
-   --help               This text
-   --version            Show version
+   --help               Show this text
+   --version            Show version information
+   
+   Steps may take additional options of the form --name or --name=value.
+   Popular ones include:
+
+   --ask                Have Configure ask for commonly-changed info
+   --nomanicheck        Don't check the MANIFEST
+   --debugging          Enable debugging (NYI)
+   --cc=(compiler)      Use the given compiler
+   --ld=(linker)        Use the given linker
+   --intval=(type)      Use the given type for INTVAL
+   --floatval=(type)    Use the given type for FLOATVAL
 EOT
-        exit;
+      exit;
+    };
+    $args{$key}=$value;
+  }
 }
-
-
-#
-# If we didn't just reconfig, store the config options out to config.opt.
-#
-
-if (!$reconfig) {
-  open OPTS, ">config.opt" or die "Could not open config.opt for writing!";
-  print OPTS "debugging\n" if $opt_debugging;
-  print OPTS "defaults\n" if $opt_defaults;
-  print(OPTS map { sprintf "define %s=%s\n", $_, $opt_defines{$_}; } keys %opt_defines) if %opt_defines;
-  close OPTS;
-}
-
-
-#
-#
-#
-
-my($DDOK)=undef;
-eval {
-        require Data::Dumper;
-        Data::Dumper->import();
-        $DDOK=1;
-};
-
-#
-# print the header
-#
 
 print <<"END";
-Parrot Version $parrot_version Configure
+Parrot Version $parrot_version Configure 2.0
 Copyright (C) 2001-2002 Yet Another Society
 
-Since you're running this script, you obviously have
-Perl 5--I'll be pulling some defaults from its configuration.
-
-Checking the MANIFEST to make sure you have a complete Parrot kit...
-END
-
-check_manifest();
-
-#
-# Some versions don't seem to have ivtype or nvtype--provide
-# defaults for them.
-# XXX Figure out better defaults
-#
-
-my ($archname,    $cpuarch,    $osname);
-my ($jitarchname, $jitcpuarch, $jitosname, $jitcapable);
-
-$archname                 =  $Config{archname};
-($cpuarch, $osname)       =  split('-', $archname);
-if (!defined $osname) {
-    ($osname, $cpuarch) = ($cpuarch, "");
-}
-
-if($cpuarch =~ /MSWin32/){
-    $cpuarch = 'i386';
-    $osname = 'MSWin32';
-}
-if(($osname =~ /cygwin/i) || ($cpuarch =~ /cygwin/i)){
-    $cpuarch = 'i386';
-}
-$cpuarch                  =~ s/i[456]86/i386/i;
-$cpuarch                  =~ s/sparc/sun4/i;
-$jitarchname              =  "$cpuarch-$osname";
-$jitarchname              =~ s/-(net|free|open)bsd$/-bsd/i;
-$jitcapable               = 0;
-
-if (-e "jit/$cpuarch") {
-    $jitcapable = 1;
-}
-
-$jitcapable = $opt_defines{jitcapable} if exists $opt_defines{jitcapable};
-
-unless($jitcapable){
-    $jitarchname = 'nojit';
-}
-
-($jitcpuarch, $jitosname) =  split('-', $jitarchname);
-
-my(%c)=(
-    iv            => ($Config{ivtype} || 'long'),
-    intvalsize    => undef,
-
-    nv            => ($Config{nvtype} || 'double'),
-    numvalsize    => undef,
-
-    opcode_t      => ($Config{ivtype} || 'long'),
-    longsize      => undef,
-    perl5byteorder => $Config{byteorder},
-
-    intvalfmt     => '%ld',
-    floatvalfmt     => '%f',
-
-    cc            => $Config{cc},
-
-    #
-    # ADD C COMPILER FLAGS HERE
-    #
-
-    ccflags       => $Config{ccflags},
-    cc_inc	  => "-I./include",
-    libs          => $Config{libs},
-    cc_debug      => '-g',
-    cc_warn       => '',
-    o             => '.o',                # object files extension
-    exe           => $Config{_exe},       # executable files extension
-    cc_o_out      => '-o ',               # cc object output file
-    cc_exe_out    => '-o ',               # cc executable output file (different on Win32)
-    
-    cc_ldflags    => '',                  # prefix for ldflags (necessary for Win32)
-    
-    cc_ldflags    => '',                  # prefix for ldflags (necessary for Win32)
-
-    ld            => $Config{ld},
-    ldflags	  => $Config{ldflags},
-    ld_out        => '-o ',               # ld output file
-    ld_debug      => '',                  # include debug info in executable
-    ld_shared     => '-shared',
-
-    perl          => $^X,
-    test_prog     => 'parrot',
-    debugging     => $opt_debugging,
-    rm_f          => 'rm -f',
-    rm_rf         => 'rm -rf',
-    stacklow      => '(~0xfffu)',
-    intlow        => '(~0xfffu)',
-    numlow        => '(~0xfffu)',
-    strlow        => '(~0xfffu)',
-    pmclow        => '(~0xfffu)',
-    make          => $Config{make},
-    make_set_make => $Config{make_set_make},
-        
-    platform      => $^O,
-
-    cpuarch       => $cpuarch,
-    osname        => $osname,
-    archname      => $archname,
-
-    jitcpuarch    => $jitcpuarch,
-    jitosname     => $jitosname,
-    jitarchname   => $jitarchname,
-    jitcapable    => $jitcapable,
-    cc_hasjit     => '',
-    jit_h         => '',
-    jit_o         => '',
-
-    cp            => 'cp',
-    slash         => '/',
-
-    cg_h          => '$(INC)/oplib/core_ops_cg.h',
-    cg_c          => <<'EOF',
-core_ops_cg$(O): $(GENERAL_H_FILES) core_ops_cg.c
-
-core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) ops2cgc.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm
-	$(PERL) ops2cgc.pl CGoto $(OPS_FILES)
-EOF
-    cg_o          => 'core_ops_cg$(O)',
-    cg_r          => '$(RM_F) $(INC)/oplib/core_ops_cg.h core_ops_cg.c',
-    cg_flag       => '-DHAVE_COMPUTED_GOTO',
-
-    VERSION       => $parrot_version,
-    MAJOR         => $parrot_version[0],
-    MINOR         => $parrot_version[1],
-    PATCH         => $parrot_version[2],
-    DEVEL         => (-e 'DEVELOPING' ? '-devel' : ''),
-
-    ops		  => "",
-    
-    configdate    => scalar localtime,
-    expnetworking => 'N',
-);
-
-# What's the platform shell quote character?
-if ($^O eq 'VMS' || $^O =~ /MSWin/i) {
-    $c{PQ} = '"';
-} else {
-    $c{PQ} = "'";
-}
-
-#
-# If using gcc, crank up its warnings as much as possible and make it behave
-# ansi-ish.
-#
-# Some Perl versions put this in Config variable 'ccname', others in 'cc'. We
-# prefer the former, but accept the latter.
-#
-
-my $ccname = $Config{ccname} || $Config{cc};
-
-# Make one more check before allowing the use of the JIT code.
-# make sure that their choice of compiler and cflags will allow our JIT's
-# non-ansi use of function pointers.
-#
-
-# Add the -DHAS_JIT if we're jitcapable
-if ($jitcapable) {
-    $c{cc_hasjit} = " -DHAS_JIT -D" . uc $jitcpuarch;
-    $c{jit_h} = "\$(INC)/jit.h";
-    $c{jit_struct_h} = "\$(INC)/jit_struct.h";
-    $c{jit_o} = "jit\$(O) jit_cpu\$(O)";
-}
-
-#
-# Copy the things from --define foo=bar
-#
-
-@c{keys %opt_defines}=values %opt_defines;
-
-# There are some libraries which perl tends to include, but we aren't
-# really interested in them yet.  (We'll need our own probes for some
-# of these.)
-if ($^O ne 'VMS' && $^O !~ /MSWin/i) {
-  my $unwanted = join("|",qw(c gdbm dbm ndbm db));
-  $c{libs} = (join " ",
-	      map { "$_" }
-	      grep {!/^-l(?:$unwanted)$/}
-	      split /\s/, $c{libs});
-}
-
-#
-# Set up default values
-#
-
-my $hints = "hints/" . lc($^O) . ".pl";
-if(-f $hints) {
-    local($/);
-    open HINT, "< $hints" or die "Unable to open hints file '$hints'";
-    my $hint = <HINT>;
-    close HINT;
-    eval $hint; die "Error in hints file $hints: '$@/$!'" if $@;
-}
-
-
-#
-# Ask questions
-#
-
-prompt("What C compiler do you want to use?", 'cc');
-prompt("How about your linker?", 'ld');
-prompt("What flags would you like passed to your C compiler?", 'ccflags');
-prompt("What flags would you like passed to your linker?", 'ldflags');
-prompt("Which libraries would you like your C compiler to include?", 'libs');
-prompt("How big would you like integers to be?", 'iv');
-prompt("And your floats?", 'nv');
-prompt("What is your native opcode type?", 'opcode_t');
-print "\n\n  Experimental (unstable) features.\n\n";
-prompt("Would you like to enable the network API?", 'expnetworking');
-
-
-{
-	my(@ops)=glob("*.ops");
-
-	$c{ops}=join ' ', sort {
-		if   ($a eq 'core.ops') { -1 }
-		elsif($b eq 'core.ops') {  1 }
-		else             { $a cmp $b }
-	} grep {!/obscure\.ops/ && !/vtable\.ops/} @ops;
-
-	my $msg;
-
-	chomp($msg=<<"END");
-
-Now I have to find out what opcode files you would like to compile into your
-Parrot.
-
-The following opcode files are available:
-@ops
-
-WARNING: Bad Things may happen if the first file on the list isn't core.ops.
-
-WARNING: These file names will not be checked for spelling, and typing them
-         wrong will force you to run Configure again.
-
-WARNING: I worry way too much about Configure users.
-
-Which opcode files would you like?
-END
-
-	prompt($msg, 'ops');
-}
-
-
-print <<"END";
-
-Determining if your C compiler is actually gcc (this could take a while):
-
-END
-
-{
-    my %gnuc;
-
-    compiletestc("test_gnuc");
-    %gnuc=eval(runtestc("test_gnuc")) or die "Can't run the test program: $!";
-    cleantestc("test_gnuc");
-
-    unless (exists $gnuc{__GNUC__}) {
-        print <<'END';
-
-The test program didn't give the expected result - assuming your compiler is
-not gcc.
-
-END
-
-    } else {
-	my $major = $gnuc{__GNUC__};
-        my $minor = $gnuc{__GNUC_MINOR__};
-        unless (defined $major) {
-            print <<'END';
-
-Your C compiler is not gcc.
-
-END
-        } else {
-	    print "Your C compiler reports itself as gcc, major version $major";
-            print ", minor version $minor" if defined $minor;
-
-            print ".\n\n";
-            if ($major =~ tr/0-9//c) {
-                print "major version '$major' is not an integer",
-                    " - I don't think that this is gcc.";
-                undef $major; # Don't use it
-            }
-            if (defined $minor and $minor =~ tr/0-9//c) {
-                print "minor version '$minor' is not an integer.";
-                undef $minor; # Don't use it
-            }
-            if (defined $major) {
-                $c{gccversion} = $major;
-                $c{gccversion} .= ".$minor" if defined $minor;
-            }
-        }
-    }
-}
-
-if ($c{gccversion}) {
-    # If using gcc, crank up its warnings as much as possible and make it
-    # behave  ansi-ish.
-    # Here's an attempt at a list of nasty things we can use for a given
-    # version of gcc. The earliest documentation I currently have access to is
-    # for 2.95, so I don't know what version everything came in at. If it turns
-    # out that you're using 2.7.2 and -Wfoo isn't recognised there, move it up
-    # into the next version becone (2.8)
-
-    # Don't use -ansi -pedantic.  It makes it much harder to compile
-    # using the system headers, which may well be tuned to a
-    # non-strict environment -- especially since we are using perl5
-    # compilation flags determined in a non-strict environment.
-    # An example is Solaris 8.
-
-    my @opt_and_vers = 
-        (0 => "-Wall -Wstrict-prototypes -Wmissing-prototypes -Winline -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Waggregate-return -Winline -W -Wno-unused",
-        # others; ones we might like marked with ?
-        # ? -Wundef for undefined idenfiers in #if
-        # ? -Wbad-function-cast
-        #   Warn whenever a function call is cast to a non-matching type
-        # ? -Wmissing-declarations
-        #   Warn if a global function is defined without a previous declaration
-        # -Wmissing-noreturn
-        # ? -Wredundant-decls
-        #    Warn if anything is declared more than once in the same scope,
-        # ? -Wnested-externs
-        #    Warn if an `extern' declaration is encountered within an function.
-        # -Wlong-long
-        # Ha. this is the default! with -pedantic.
-        # -Wno-long-long for the nicest bit of C99
-         2.7 => "",
-         2.8 => "-Wsign-compare",
-         2.95 => "",
-         3.0 => "-Wformat-nonliteral -Wformat-security -Wpacked -Wpadded -Wdisabled-optimization",
-        # -Wsequence-point is part of -Wall
-        # -Wfloat-equal may not be what we want
-        # We shouldn't be using __packed__, but I doubt -Wpacked will harm us
-        # -Wpadded may prove interesting, or even noisy.
-        # -Wunreachable-code might be useful in a non debugging version
-    );
-    my $warns = "";
-    while (my ($vers, $opt) = splice @opt_and_vers, 0, 2) {
-        last if $vers > $c{gccversion};
-        next unless $opt; # Ignore blank lines
-        $warns .= " $opt";
-    }
-    $c{cc_warn} = $warns . " " . $c{cc_warn};
-    
-    prompt("What gcc warning flags do you want to use?", 'cc_warn');
-}
-
-#
-# Copy the appropriate platform-specific file over
-#
-
-if (-e "platforms/$c{platform}.h") {
-    copy("platforms/$c{platform}.h", "include/parrot/platform.h");
-    copy("platforms/$c{platform}.c", "platform.c");
-}
-else {
-    copy("platforms/generic.h", "include/parrot/platform.h");
-    copy("platforms/generic.c", "platform.c");
-}
-
-my $now = time;
-utime $now, $now, "include/parrot/platform.h", "platform.c";
-
-unless( $c{debugging} ) {
-    $c{ld_debug} = ' ';
-    $c{cc_debug} = ' ';
-}
-
-print <<"END";
-
-Probing Perl 5's configuration to determine which headers you have (this could
-take a while on slow machines)...
+Hello, I'm Configure.  My job is to poke and prod your system to figure out 
+how to build Parrot.  The process is completely automated, unless you passed in
+the `--ask' flag on the command line, in which case it'll prompt you for a few
+pieces of info.
+
+Since you're running this script, you obviously have Perl 5--I'll be pulling 
+some defaults from its configuration.
 END
 
 
-#
-# Set up HAS_HEADER_
-#
+#Run the actual steps
+Parrot::Configure::RunSteps->runsteps(%args);
 
-foreach(grep {/^i_/} keys %Config) {
-    $c{$_}=$Config{$_};
-    $c{headers}.=defineifdef((/^i_(.*)$/));
-}
-
-print <<"END";
-
-Determining C data type sizes by compiling and running a small C program (this
-could take a while):
-
-END
-
-{
-    my %newc;
-
-    buildfile("test_c");
-    compiletestc("test");
-    %newc=eval(runtestc("test")) or die "Can't run the test program: $!";
-
-    @c{keys %newc}=values %newc;
-
-    cleantestc("test");
-    unlink('test.c');
-}
-
-if($c{ptrsize} != $c{intvalsize}) {
-    print <<"END";
-
-Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot should
-still compile and run, but you may see a ton of warnings.
-
-END
-
-print <<"END";
-
-Figuring out the formats to pass to pack() for the various Parrot internal
-types...
-END
-}
-
-
-#
-# Alas perl5.7.2 doesn't have an INTVAL flag for pack().
-# The ! modifier only works for perl 5.6.x or greater.
-#
-
-foreach ('intvalsize', 'opcode_t_size') {
-    my $which = $_ eq 'intvalsize' ? 'packtype_i' : 'packtype_op';
-    my $format;
-    if (($] >= 5.006) && ($c{$_} == $c{longsize}) && ($c{$_} == $Config{longsize}) ) {
-        $format = 'l!';
-    }
-    elsif ($c{$_} == 4) {
-        $format = 'l';
-    }
-    elsif ($c{$_} == 8 || $Config{use64bitint} eq 'define') {
-         # pp_pack is annoying, and this won't work unless sizeof(UV) >= 8
-        $format = 'q';
-    }
-    die "Configure.pl:  Unable to find a suitable packtype for $_.\n"
-        unless $format;
-
-    my $test = eval {pack $format, 0};
-    unless (defined $test) {
-        die <<"AARGH"
-Configure.pl:  Unable to find a functional packtype for $_.
-               '$format' failed: $@
-AARGH
-    }
-    unless (length $test == $c{$_}) {
-        die sprintf <<"AARGH", $c{$_}, length $test;
-Configure.pl:  Unable to find a functional packtype for $_.
-               Need a format for %d bytes, but '$format' gave %d bytes.
-AARGH
-    }
-    $c{$which} = $format;
-}
-
-$c{packtype_b} = 'C';
-$c{packtype_n} = 'd';
-
-#
-# Find out what integer constant type we can use
-# for pointers.
-#
-
-print "Figuring out what integer type we can mix with pointers...\n";
-
-if ($c{intsize} == $c{ptrsize}) {
-    print "We'll use 'unsigned int'.\n";
-    $c{ptrconst} = "u";
-} elsif ($c{longsize} == $c{ptrsize}) {
-    print "We'll use 'unsigned long'.\n";
-    $c{ptrconst} = "ul";
-} else {
-    die <<"AARGH";
-Configure.pl:  Unable to find an integer type that fits a pointer.
-AARGH
-}
-
-
-print <<"END";
-
-Computing native byteorder for Parrot's wordsize...
-
-Ignore warning about overflow...
-
-END
-
-{
-    my $testc = "testbyteorder.c";
-    my $int = $c{iv};
-    open TESTC, ">$testc" or die "Error opening $testc for byteorder config: $!";
-print TESTC<<"END";
-int main() {
-	int i;
-	union W {
-		unsigned char b[sizeof($int)/sizeof(unsigned char)];
-		$int w;
-	} w;
-	if(sizeof(w) == 4) {
-		w.w = 0x04030201;
-	}
-	else {
-                w.w = 0x08070605; 
-                w.w <<= 32; 
-                w.w |= 0x04030201;
-	}
-
-	for(i = 0; i < sizeof(w.b); i++) {
-		printf("%1u", w.b[i]);
-	}
-	printf("\\n");
-	exit(0);
-	return 0;
-}
-END
-    close(TESTC);
-
-    compiletestc("testbyteorder");
-    $c{byteorder}=runtestc("testbyteorder") or die "Can't run the testbyteorder program: $!";
-    chop $c{byteorder};
-    print "\nNative byte-order appears to be [", $c{byteorder}, "]\n";
-    if($c{byteorder} =~ /^1234/) {
-        print "Configuring for little-endian\n";
-        $c{bigendian} = 0;
-    }
-    elsif($c{byteorder} =~ /^(8765|4321)/) {
-        print "Configuring for big-endian\n";
-        $c{bigendian} = 1;
-    }
-    else {
-        die "Unsupported byte-order!";
-    }
-    
-    if(length($c{byteorder}) != length($c{perl5byteorder})) {
-        print "Note, the sizeof Perl5 INTs appear to be different from Parrot's\n";
-        print "for this configuration, if this is expected, ignore this.\n";
-    }
-    
-    unlink 'testbyteorder.c';
-}
-
-
-#"
-# Determine format strings for INTVAL and FLOATVAL.
-#
-
-if ($c{iv} eq "int") {
-    $c{intvalfmt} = "%d";
-} elsif (($c{iv} eq "long") || ($c{iv} eq "long int")) {
-    $c{intvalfmt} = "%ld";
-} elsif (($c{iv} eq "long long") || ($c{iv} eq "long long int")) {
-    $c{intvalfmt} = "%lld";
-} else {
-    die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{iv}\"\n";
-}
-
-$c{nvsize} = $c{floatsize};
-if ($c{nv} eq "double") {
-    $c{nvsize} = $c{doublesize};
-    $c{floatvalfmt} = "%f";
-} elsif ($c{nv} eq "long double") {
-    # Stay way from long double for now (it may be 64 or 80 bits)
-    die "long double not supported at this time, use double.";
-    $c{nvsize} = $c{longdoublesize};
-    $c{floatvalfmt} = "%lf";
-} else {
-    die "Configure.pl:  Can't find a printf-style format specifier for type \"$c{nv}\"\n";
-}
-
-#
-# Build config.h, the Makfefiles and Types.pm:
-#
-# Also build Parrot/Config.pm
-#
-
-if($c{expnetworking} =~ /y/i) {
-	$c{expnetworking} = 1;
-}
-else {
-	$c{expnetworking} = 0;
-}
-
-print <<"END";
-
-Building a preliminary version of include/parrot/config.h, your Makefiles, and
-other files:
-
-END
-
-buildfile("config_h", "include/parrot");
-
-buildfile("Makefile");
-buildfile("classes/Makefile");
-buildfile("docs/Makefile");
-buildfile("languages/Makefile");
-buildfile("languages/jako/Makefile");
-buildfile("languages/miniperl/Makefile");
-buildfile("languages/scheme/Makefile");
-
-buildfile("Types_pm", "lib/Parrot");
-
-buildconfigpm();
-print "\n";
-
-
-if ($jitcapable) {
-    print "Verifying that the compiler supports function pointer casts...\n";
-    eval { compiletestc("testparrotfuncptr"); };
-
-    if ($@ || runtestc("testparrotfuncptr") !~ /OK/) {
-        print <<"END";
-Although it is not required by the ANSI C standard,
-Parrot requires the ability to cast from void pointers to function
-pointers for its JIT support.
-
-Your compiler does not appear to support this behavior with the
-flags you have specified.  You must adjust your settings in order
-to use the JIT code.
-
-If you wish to continue without JIT support, please re-run this script
-With the '--define jitcapable=0' argument.
-END
-	exit(-1);
-    }    
-    cleantestc("testparrotfuncptr");
-}
-
-
-#
-# And now we figure out how big our things are
-#
-
-print <<"END";
-
-Checking some things by compiling and running another small C program (this
-could take a while):
-
-END
-
-{
-    my %newc;
-
-    open NEEDED, ">include/parrot/vtable.h";
-    print NEEDED "/* dummy */ struct _vtable { int a; };\n";
-    close NEEDED;
-
-    buildfile("testparrotsizes_c");
-    compiletestc("testparrotsizes");
-
-    %newc=eval(runtestc("testparrotsizes"))
-      or die "Can't run the test program: $!";
-
-    @c{keys %newc}=values %newc;
-
-    @c{qw(stacklow intlow numlow strlow pmclow)} = lowbitmask(@c{qw(stackchunk iregchunk nregchunk sregchunk pregchunk)});
-
-    cleantestc("testparrotsizes");
-
-    unlink('testparrotsizes.c');
-
-    unlink("include/parrot/vtable.h");
-}
-
-
-# and now test if we can use computed goto
-print <<"END";
-
-Still everything ok, let's check if we can use computed goto,
-don't worry if you see some errors, it will be all right,
-This could take a bit...
-END
-
-{
- buildfile("testcomputedgoto_c");
- my $test = system("$c{cc} $c{ccflags} -o testcomputedgoto$c{exe} testcomputedgoto.c");
- 
- if ($test != 0) {
-   $c{"cg_h"}='';
-   $c{"cg_c"}='';
-   $c{"cg_o"}='';
-   $c{"cg_r"}='';
-   $c{"cg_flag"}='';
- }
-
- unlink('testcomputedgoto.c', "testcomputedgoto$c{exe}", "testcomputedgoto$c{o}");
-}
-
-# rewrite the Makefile with the updated info
-buildfile("Makefile");
-
-#
-# Rewrite the config file with the updated info
-#
-
-print <<"END";
-
-Updating include/parrot/config.h:
-
-END
-
-buildfile("config_h", "include/parrot");
-
-# Toss old .o files
-foreach my $dir ("./", "classes/", "encodings/", "chartypes/") {
-    foreach my $file (glob($dir . "*". $c{o})) {
-	1 while unlink $file;
-    }
-}
-
-
-#
-# Wrap up:
-#
 
 print <<"END";
 
@@ -859,7 +87,6 @@ You can now use `make' (or your platform's equivalent to `make') to build your
 Parrot. After that, you can use `make test' to run the test suite.
 
 Happy Hacking,
-
         The Parrot Team
 
 END
@@ -867,214 +94,219 @@ END
 exit(0);
 
 
-###############################################################################
-###############################################################################
-##
-## Support Subroutines
-##
-###############################################################################
-###############################################################################
+=head1 TITLE
 
+parrotconfig - Parrot Configure
 
-#
-# defineifdef()
-#
-# Give us the #define we may need for header X
-#
+=head1 NOTE
 
-sub defineifdef {
-    my $thing=shift;
+This document is NOT about how to use Configure--it's about Configure's design.  For
+information on using Configure, type C<perl Configure.pl --help> (or your platform's
+equivalent) at a command line prompt.
 
-    if($Config{"i_$thing"}) {
-        return "#define HAS_HEADER_\U$thing\E\n";
-    }
-    else {
-        return "#undef HAS_HEADER_\U$thing\E\n"; #XXX do we want this?
-    }
-}
+=head1 DESCRIPTION
 
+B<I<U<THIS NEEDS TO BE UPDATED!!!>>>
 
-#
-# prompt()
-#
-# Prompt for something from the user.
-#
+Configure is broken up into I<steps>.  Each step contains several related I<prompts>, 
+I<probes>, or I<generations>.  Steps should be mostly of a single type, though some overlap
+is allowed (for example, allowing a probe to ask the user what to do in an exceptional
+situation).
 
-sub prompt {
-    return if $opt_defaults;
+The directory F<config> contains subdirectories for each type of step.  Each step should
+consist of I<exactly one> .pl file and any number of supporting .c, .in, etc. files.  Any
+supporting files should be in a folder whose name is the same as the basename of the step's
+.pl file; for example, if F<foo.pl> uses F<bar_c.in>, F<bar_c.in> should be in a directory
+called F<foo>; the full path might be F<config/auto/foo/bar_c.in>.
 
-    my($message, $field)=(@_);
-    my($input);
-    print "$message [$c{$field}] ";
-    chomp($input=<STDIN>);
+Generally, when adding a new test you should add a new step unless a test I<clearly> belongs
+in a current step.  For example, if we added a new user-configurable type called C<FOOVAL>,
+you should add the test for its size in F<auto/sizes.pl>; however, if you were testing
+what dynaloading capabilities are available, you should create a new step.
 
-    if($input =~ s/^\+//) {
-        $input="$c{$field} $input";
-    }
-    else {
-        if($input =~ s/:rem\{(.*?)\}//) {
-            $c{$field} =~ s/$_//g for split / /, $1;
-        }
+=head2 Initialization Steps
 
-        if($input =~ s/:add\{(.*?)\}//) {
-            $input="$c{$field} $1 $input";
-        }
-    }
+I<Initialization steps> are run before any other steps.  They do tasks such as preparing
+Configure's data structures and checking the MANIFEST.  These will rarely be added; when
+they are, it usually means that Configure is getting significant new capabilities.  
+They're kept in the directory F<config/init>.
 
-    $c{$field}=$input||$c{$field};
-}
+Initialization steps usually do not output anything under normal circumstances.
 
+=head2 Prompts
 
-#
-# buildfile()
-#
+Prompts ask the user for some information.  These should be used sparingly.  A step 
+containing prompts is an I<interactive step>.  Interactive steps should be in the 
+F<config/inter> folder.
 
-sub buildfile {
-    my($source_filename, $path)=@_;
-    $path||='.';
+Interactive steps often include simple probes to determine good guesses of what the user
+will answer.  See L</Prompt or Probe?> for more information.
 
-    my $target_filename = $source_filename;
-    $target_filename =~ s/_/./;        #config_h => config.h
+Interactive steps virtually always output something.
 
-    printf "  Building %-30s from %s...\n", "$path/$target_filename",
-        "$source_filename.in";
+=head2 Probes
 
-    local $/;
-    open(IN, "<$source_filename.in") or die "Can't open $source_filename.in: $!";
-    my $text=<IN>;
-    close(IN) or die "Can't close $source_filename.in: $!";
+Probes are automated tests of some feature of the computer.  These should be used wherever a value
+will not often need to be modified by the user.  A step containing probes is an I<automatic step>.
+Automatic steps should be in the F<config/auto> folder.
 
-    $text =~ s/\$\{(\w+)\}/$c{$1}/g;
-    $text =~ s/\cM//g;                 # Potental drek on Win32
-    open(OUT, ">$path/$target_filename") or die "Can't open $path/$target_filename: $!";
-    print OUT $text;
-    close(OUT) or die "Can't close $target_filename: $!";
-}
+Automatic steps usually do not output anything under normal circumstances.
 
+=head2 Generations
 
-#
-# buildconfigpm()
-#
+Generations create files needed after Configure has completed, such as Makefiles and configuration
+headers.  A step containing generations is a I<generation step>.  Generation steps should be in the
+F<config/gen> folder.
 
-sub buildconfigpm {
-    unless($DDOK) {
-        print <<"END";
+Generation steps usually do not output anything under normal circumstances.
 
-Your system doesn't have Data::Dumper installed, so I couldn't
-build Parrot::Config.  If you want Parrot::Config installed,
-use CPAN.pm to install Data::Dumper and run this script again.
-END
+=head2 Prompt or Probe?
 
-        return;
-    }
+It can sometimes be hard to decide whether a given step should be an automatic or an interactive
+step.  The guiding question is I<Would a user ever want to change this?>, or conversely, I<Is this
+something that can be completely determined without user intervention?>  A step figuring out what
+the compiler's command is would probably be an interactive step; conversely, a step figuring out
+if that command is connected to a specific compiler (like gcc) would be an automatic step.
 
-    printf "  Building %-30s from %s...\n", "lib/Parrot/Config.pm",
-        "Config_pm.in";
+=head2 Adding Steps
 
-    my %C=%c;
-    delete $C{headers};
-    my $dd=new Data::Dumper([\%C]);
-    $dd->Names(['*PConfig']);
+New steps should be added in one of the three folders mentioned above.  They should include the 
+C<Parrot::Configure::Step> module, described below.
 
-    local $/;
-    open(IN, "<Config_pm.in") or die "Can't open Config_pm.in: $!";
-    my $text=<IN>;
-    close(IN) or die "Can't close Config.pm_in: $!";
+All steps are really modules; they should start with a declaration setting the current package
+to C<Configure::Step>.  They should define the following:
 
-    $text =~ s/#DUMPER OUTPUT HERE/$dd->Dump()/eg;
+=over 4
 
-    open(OUT, ">lib/Parrot/Config.pm") or die "Can't open file lib/Parrot/Config.pm: $!";
-    print OUT $text;
-    close(OUT) or die "Can't close file lib/Parrot/Config.pm: $!";
-}
+=item C<$description>
 
+A short descriptive message that should be printed before the step executes.  Usually, interactive
+steps have long, friendly descriptions and other steps have terse descriptions ending in "...".
+Some example descriptions:
 
-#
-# check_manifest()
-#
+=over 4
 
-sub check_manifest {
-    print "\n";
+=item F<inter/progs.pl>
 
-    my(@missing)=manicheck();
+	Okay, I'm going to start by asking you a couple questions about your
+	compiler and linker.  Default values are in square brackets;
+	you can hit ENTER to accept them.  If you don't understand a question,
+	the default will usually work--they've been intuited from your Perl 5
+	configuration.
 
-    if(@missing) {
-        print <<"END";
+=item F<auto/cgoto.pl>
 
-Ack, some files were missing!  I can't continue running
-without everything here.  Please try to find the above
-files and then try running Configure again.
+	Determining if your compiler supports computed goto...
 
-END
+=item F<gen/config_h.pl>
 
-        exit 1;
-    }
-    else {
-                print <<"END";
-Okay, we found everything.  Next you'll need to answer
-a few questions about your system.  Defaults are in square
-brackets, and you can hit enter to accept them.  If you
-don't want the default, type a new value in.  If that new
-value starts with a '+', it will be concatenated to the
-default value.
+	Generating a config.h header for Parrot...
 
-END
-    }
-}
+=back
 
+Note that on non-interactive steps, the text C<"done."> will be printed after the description when the step
+finishes executing; for example, the user will see:
 
-#
-# compiletestc()
-#
+	Determining if your compiler supports computed goto...done.
 
-sub compiletestc {
-    my ($name) = @_;
+=item C<@args>
 
-    my $cmd = "$c{cc} $c{ccflags} -I./include -c $c{ld_out}$name$c{o} $name.c";
-    system($cmd) and die "C compiler died!  Command was '$cmd'\n";
+This contains the names of any command-line arguments the step cares about.  Command-line arguments
+are standardized in Configure; this will be described later in more detail.
 
-    $cmd = "$c{ld} $c{ldflags} $name$c{o} $c{cc_exe_out}$name$c{exe} $c{libs}";
-    system($cmd) and die "Linker died!  Command was '$cmd'\n";
-}
+=item C<Configure::Step::runstep>
 
+This is called to actually execute the step.  The command-line arguments that your module said it
+cared about are passed in; they come in the same order as in C<@args>, and any that weren't specified
+are passed as C<undef>.
 
-#
-# runtestc()
-#
+=back
 
-sub runtestc {
-    my ($name) = @_;
+Configure won't execute your step by default unless it's specifically told to.  To do this, edit the
+C<Parrot::Configure::RunSteps> module's C<@steps> array.  Steps are run in the sequence in which
+they appear in C<@steps>.
 
-    my $cmd = "$name$c{exe}";
-    `./$cmd`;
-}
+A template for a new step might look like this:
 
-#
-# cleantestc
-#
+	package Configure::Step;
 
-sub cleantestc {
-    my ($name) = @_;
+	use strict;
+	use vars qw($description @args);
+	use Parrot::Configure::Step;
 
-    unlink(grep {!/\.c$/} glob("$name.*"));
-}
+	$description="<description>";
+	@args=qw(<args>);
 
-#
-# lowbitmas()
-#
-# Find the bitmask for the low bits of any passed-in size.
-#
+	sub runstep {
+		<code>
+	}
 
-sub lowbitmask {
-    my @returns;
+=head2 Command-line Arguments
 
-    foreach (@_) {
-        my $vector = unpack("b*", pack("V", $_));
-        my $offset = rindex($vector, "1")+1;
-        my $mask = 2**$offset - 1;
-        push @returns, "(~0x".sprintf("%x", $mask).$c{ptrconst}.")";
-    }
+Command-line arguments look like C</--\w+(=.*)?/>; the equals sign separates the name and the value.
+If the value is omitted, it's assumed to be 1.  The options "--help" and "--version" are built in to
+Configure; any others are defined by steps.  "--help" lists some common options.
 
-    return @returns;
-}
+Steps use the C<@args> array to list any options they're interested in.  They should be listed without
+the dashes.
 
+=head2 Building Up Configuration Data
+
+The second step is F<config/init/data.pl>, which sets up a C<Configure::Data> package.  You get and set 
+Configure's data by calling methods on this package.  The methods are listed below.
+
+=over 4
+
+=item C<< Configure::Data->get(keys) >>
+
+Returns the values for the given keys.
+
+=item C<< Configure::Data->set(key, value, key, value, ...) >>
+
+Sets the given keys to the given values.
+
+=item C<< Configure::Data->keys() >>
+
+Returns a list of all keys.
+
+=item C<< Configure::Data->dump() >>
+
+Returns a string that can be C<eval>ed by Perl to create a hash representing Configure's data.
+
+=back
+
+=head2 C<Parrot::Configure::Step>
+
+The C<Parrot::Configure::Step> module contains utility functions for steps to use.  They include the following:
+
+=over 4
+
+=item C<prompt(message, default)>
+
+Prints out "message [default] " and waits for the user's response.  Returns the response, or the default if the
+user just hit ENTER.
+
+=item C<cc_gen(file)>
+
+Calls C<genfile(file, 'test.c')>.
+
+=item C<cc_build()>
+
+Calls the compiler and linker on F<test.c>.
+
+=item C<cc_run()>
+
+Calls the F<test> (or F<test.exe>) executable.
+
+=item C<cc_clean()>
+
+Cleans up all files in the root folder that match the glob I<test.*>.
+
+=item C<genfile(infile, outfile)>
+
+Takes the given I<infile>, substitutes any sequences matching C</\$\{\w+\}/> for the given key's value in 
+Configure's data, and writes the results to I<outfile>.
+
+=back
+
+=cut

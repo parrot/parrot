@@ -1,4 +1,5 @@
 config.h
+has_header.h
 vtable.h
 platform.h
 jit_struct.h

@@ -7,7 +7,10 @@
 #if !defined(PARROT_CONFIG_H_GUARD)
 #define PARROT_CONFIG_H_GUARD
 
-/* ONLY PUT EMBEDDER-ACCESSIBLE SYMBOLS HERE!!! */
+/*
+** ONLY PUT EMBEDDER-ACCESSIBLE SYMBOLS UP HERE!!!
+** Other symbols may go below.
+*/
 
 #define PARROT_VERSION         "${VERSION}${DEVEL}"
 #define PARROT_CONFIG_DATE     "${configdate}"
@@ -93,7 +96,7 @@ typedef SYNC     Sync;
 #define INTVAL_FMT "${intvalfmt}"
 #define FLOATVAL_FMT "${floatvalfmt}"
 
-${headers}
+#include "parrot/has_header.h"
 
 #endif
 

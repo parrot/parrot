@@ -3,10 +3,10 @@
 /\.cvsignore$
 CVS/[^/]+$
 ^include/parrot/config\.h$
+^include/parrot/has_header\.h$
 ^include/parrot/platform\.h$
 ^Makefile$
 /Makefile$
-^lib/Parrot/Types\.pm$
 ^lib/Parrot/Config\.pm$
 ^platform\.c$
 ^config.opt$
@@ -31,6 +31,7 @@ CVS/[^/]+$
 ^docs/packfile-c\.pod$
 ^docs/packfile-perl\.pod$
 ^docs/core_ops\.pod$
+^docs/io_ops\.pod$
 
 ^parrot$
 ^pdump$

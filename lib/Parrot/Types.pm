@@ -11,6 +11,7 @@ package Parrot::Types;
 use strict;
 use Exporter;
 use Carp;
+use Parrot::Config;
 
 @Parrot::Types::ISA = qw(Exporter);
 @Parrot::Types::EXPORT = qw(
@@ -40,10 +41,10 @@ use Carp;
 );
 
 my %pack_type = (
-    b  => q/${packtype_b}/,
-    i  => q/${packtype_i}/,
-    n  => q/${packtype_n}/,
-    op => q/${packtype_op}/,
+    b  => $PConfig{packtype_b},
+    i  => $PConfig{packtype_i},
+    n  => $PConfig{packtype_n},
+    op => $PConfig{packtype_op},
 );
 
 my %how_to_pack = (

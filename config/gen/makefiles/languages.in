@@ -1,0 +1,21 @@
+MAKE = ${make}
+
+all : jako scheme
+
+jako: jako.dummy
+
+jako.dummy:
+	cd jako && $(MAKE) && cd ..
+
+scheme: scheme.dummy
+
+scheme.dummy:
+	cd scheme && $(MAKE) && cd ..
+
+clean:
+	cd jako && $(MAKE) clean && cd ..
+	cd scheme && $(MAKE) clean && cd ..
+
+update:
+	cvs -q update -dP
+

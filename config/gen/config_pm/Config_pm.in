@@ -8,6 +8,6 @@ use vars qw(@ISA @EXPORT %PConfig);
 
 @EXPORT=qw(%PConfig);
 
-#DUMPER OUTPUT HERE
+<<HERE>>
 
 1;
