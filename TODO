@@ -81,3 +81,4 @@ Debugger
     Disassemble the pbc by default
     Read core dumps
     Attach to a running program
+    List breakpoints.
