@@ -131,15 +131,26 @@ handle_flags(struct Parrot_Interp *interpreter,
             fill = cstr2pstr(" ");
         }
 
-        if (info->width > len - 1)
-            string_repeat(interpreter, fill, info->width - (len - 1), &fill);
+        if (info->width > len)
+            string_repeat(interpreter, fill, info->width - len, &fill);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
             string_append(interpreter, str, fill, 0);
         }
         else {                  /* right-align */
-            string_set(interpreter, str, string_concat(interpreter,
-                                                       fill, str, 0));
+            /* signed and zero padded */
+            if (info->flags & FLAG_ZERO 
+                && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
+                STRING *temp;
+                string_substr(interpreter, str, 1, len-1, &temp);
+                string_chopn(str, -1);
+                string_append(interpreter, str, fill, 0);
+                string_append(interpreter, str, temp, 0);
+            }
+            else {
+                string_set(interpreter, str, 
+                           string_concat(interpreter, fill, str, 0));
+            }
         }
     }
 }
@@ -496,8 +507,8 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'x':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 16);
+                            theuint = obj->getuint(interpreter, info.type, obj);
+                            uint_to_str(interpreter, ts, tc, theuint, 16);
 
                             handle_flags(interpreter, &info, ts, 1, "0x");
 
@@ -505,8 +516,9 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'X':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 16);
+                            theuint = 
+                                obj->getuint(interpreter, info.type, obj);
+                            uint_to_str(interpreter, ts, tc, theuint, 16);
 
                             handle_flags(interpreter, &info, ts, 1, "0X");
 
@@ -514,8 +526,9 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             break;
 
                         case 'b':
-                            theint = obj->getint(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc, theint, 2);
+                            theuint = 
+                                obj->getuint(interpreter, info.type, obj);
+                            uint_to_str(interpreter, ts, tc, theuint, 2);
 
                             handle_flags(interpreter, &info, ts, 1, "0b");
 
@@ -543,7 +556,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
 
                         case 'p':
                             ptr = obj->getptr(interpreter, info.type, obj);
-                            int_to_str(interpreter, ts, tc,
+                            uint_to_str(interpreter, ts, tc,
                                        (HUGEINTVAL) (size_t) ptr, 16);
 
                             handle_flags(interpreter, &info, ts, 1, "0x");

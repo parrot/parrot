@@ -84,9 +84,30 @@ TODO: {
 	        printf("0x%x %s", (int) ival,
             string_to_cstring(interpreter, S));
 
+                /* test several flags */
+                ival = 25;
+                S = Parrot_sprintf_c(interpreter, "== % 5d\n", ival);
+                printf("% 5d %s", (int) ival,
+                       string_to_cstring(interpreter, S));
+                S = Parrot_sprintf_c(interpreter, "== %-5d|\n", ival);
+                printf("%-5d %s", (int) ival,
+                       string_to_cstring(interpreter, S));
+                S = Parrot_sprintf_c(interpreter, "== %05d\n", ival);
+                printf("%05d %s", (int) ival,
+                       string_to_cstring(interpreter, S));
+
+                ival = -1;
+                S = Parrot_sprintf_c(interpreter, "== %#x\n", ival);
+                printf("0x%x %s", (int) ival, 
+                       string_to_cstring(interpreter, S));
+                S = Parrot_sprintf_c(interpreter, "== %08d\n", ival);
+                printf("%08d %s", (int) ival,
+                       string_to_cstring(interpreter, S));
+
 		    /* Test we've not left junk behind on the stack */
 	        S = Parrot_sprintf_c(interpreter, "That's all, %s\n", "folks!");
 	        printf(string_to_cstring(interpreter, S));
+
 	        return 0;
        }
 CODE
@@ -105,6 +126,11 @@ Hello, Hello, Pa!
 1e+06 == 1e+06
 0.5 == 0.5
 0x20 == 0x20
+   25 ==    25
+25    == 25   |
+00025 == 00025
+0xffffffff == 0xffffffff
+-0000001 == -0000001
 That's all, folks!
 OUTPUT
 }
