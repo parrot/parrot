@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 56;
 use Test::More;
 
 # Tests for stack operations, currently push*, push_*_c and pop*
@@ -84,9 +84,9 @@ CODE
 3031
 OUTPUT
 
-output_is(<<"CODE", <<OUTPUT, "poptopi");
+output_is(<<"CODE", <<OUTPUT, "pushtopi & poptopi");
 @{[ set_int_regs( sub { $_[0]} )]}
-	pushi
+	pushtopi
 @{[ set_int_regs( sub {-$_[0]} )]}
 	poptopi
 @{[ print_int_regs() ]}
@@ -99,6 +99,137 @@ CODE
 2021222324
 2526272829
 3031
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "pushbottomi & popbottomi");
+@{[ set_int_regs( sub { $_[0]} )]}
+	pushbottomi
+@{[ set_int_regs( sub {-$_[0]} )]}
+	popbottomi
+@{[ print_int_regs() ]}
+        end
+CODE
+01234
+56789
+1011121314
+15-16-17-18-19
+-20-21-22-23-24
+-25-26-27-28-29
+-30-31
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining pushi with poptopi, popbottomi");
+@{[ set_int_regs( sub { $_[0]} )]}
+	pushi
+@{[ set_int_regs( sub {-$_[0]} )]}
+	poptopi
+@{[ print_int_regs() ]}
+        print "\\n"
+        popbottomi
+@{[ print_int_regs() ]}
+        print "\\n"
+
+        cleari
+
+@{[ set_int_regs( sub { $_[0]} )]}
+	pushi
+@{[ set_int_regs( sub {-$_[0]} )]}
+	popbottomi
+@{[ print_int_regs() ]}
+        print "\\n"
+        poptopi
+@{[ print_int_regs() ]}
+        end
+CODE
+0-1-2-3-4
+-5-6-7-8-9
+-10-11-12-13-14
+-1516171819
+2021222324
+2526272829
+3031
+
+01234
+56789
+1011121314
+1516171819
+2021222324
+2526272829
+3031
+
+1617181920
+2122232425
+2627282930
+31-16-17-18-19
+-20-21-22-23-24
+-25-26-27-28-29
+-30-31
+
+1617181920
+2122232425
+2627282930
+310123
+45678
+910111213
+1415
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining popi with pushtopi, pushbottomi");
+@{[ set_int_regs( sub {$_[0]} ) ]}
+	pushtopi
+@{[ set_int_regs( sub {-$_[0]} ) ]}
+        pushbottomi
+@{[ set_int_regs( sub {0} ) ]}
+@{[ print_int_regs() ]}
+	print "\\n"
+	popi
+@{[ print_int_regs() ]}
+	print "\\n"
+
+        cleari
+
+@{[ set_int_regs( sub {$_[0]} ) ]}
+	pushbottomi
+@{[ set_int_regs( sub {-$_[0]} ) ]}
+        pushtopi
+@{[ set_int_regs( sub {0} ) ]}
+@{[ print_int_regs() ]}
+	print "\\n"
+	popi
+@{[ print_int_regs() ]}
+	end
+CODE
+00000
+00000
+00000
+00000
+00000
+00000
+00
+
+1617181920
+2122232425
+2627282930
+310-1-2-3
+-4-5-6-7-8
+-9-10-11-12-13
+-14-15
+
+00000
+00000
+00000
+00000
+00000
+00000
+00
+
+01234
+56789
+1011121314
+15-16-17-18-19
+-20-21-22-23-24
+-25-26-27-28-29
+-30-31
 OUTPUT
 
 my ($code, $output);
@@ -133,9 +264,9 @@ CODE
 01010101010101010101010101010101
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'poptopss');
+output_is(<<"CODE", <<'OUTPUT', 'pushtops & poptops');
 @{[ set_str_regs( sub {$_[0]%2} ) ]}
-	pushs
+	pushtops
 @{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
 @{[ print_str_regs() ]}
 	print "\\n"
@@ -146,6 +277,90 @@ output_is(<<"CODE", <<'OUTPUT', 'poptopss');
 CODE
 10101010101010101010101010101010
 10101010101010100101010101010101
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'pushbottoms & popbottoms');
+@{[ set_str_regs( sub {$_[0]%2} ) ]}
+	pushbottoms
+@{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_str_regs() ]}
+	print "\\n"
+	popbottoms
+@{[ print_str_regs() ]}
+	print "\\n"
+	end
+CODE
+10101010101010101010101010101010
+01010101010101011010101010101010
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining pushs with poptops, popbottoms");
+@{[ set_str_regs( sub {$_[0]%2} ) ]}
+	pushs
+@{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_str_regs() ]}
+	print "\\n"
+	poptops
+@{[ print_str_regs() ]}
+	print "\\n"
+	popbottoms
+@{[ print_str_regs() ]}
+	print "\\n"
+
+        clears
+
+@{[ set_str_regs( sub {$_[0]%2} ) ]}
+	pushs
+@{[ set_str_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_str_regs() ]}
+	print "\\n"
+	popbottoms
+@{[ print_str_regs() ]}
+	print "\\n"
+	poptops
+@{[ print_str_regs() ]}
+	print "\\n"
+
+	end
+CODE
+10101010101010101010101010101010
+10101010101010100101010101010101
+01010101010101010101010101010101
+10101010101010101010101010101010
+01010101010101011010101010101010
+01010101010101010101010101010101
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining pops with pushtops, pushbottoms");
+@{[ set_str_regs( sub {$_[0]} ) ]}
+	pushtops
+@{[ set_str_regs( sub {-$_[0]} ) ]}
+        pushbottoms
+@{[ set_str_regs( sub {0} ) ]}
+@{[ print_str_regs() ]}
+	print "\\n"
+	pops
+@{[ print_str_regs() ]}
+	print "\\n"
+
+        clears
+
+@{[ set_str_regs( sub {$_[0]} ) ]}
+	pushbottoms
+@{[ set_str_regs( sub {-$_[0]} ) ]}
+        pushtops
+@{[ set_str_regs( sub {0} ) ]}
+@{[ print_str_regs() ]}
+	print "\\n"
+	pops
+@{[ print_str_regs() ]}
+	print "\\n"
+	end
+CODE
+00000000000000000000000000000000
+161718192021222324252627282930310-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+00000000000000000000000000000000
+0123456789101112131415-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31
 OUTPUT
 
 ($code, $output) = ();
@@ -176,24 +391,105 @@ output_is(<<"CODE", <<'OUTPUT', 'pushn & popn');
 	print "Seem to have positive Nx after pop\\n"
 	branch ALLOK
 ERROR:	print "not ok\\n"
+@{[ print_num_regs() ]}
 ALLOK:	end
 CODE
 Seem to have negative Nx
 Seem to have positive Nx after pop
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'poptopn');
+output_is(<<"CODE", <<'OUTPUT', 'pushtopn & poptopn');
+@{[ set_num_regs( sub { "1.0".$_ } ) ]}
+	pushtopn
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+	poptopn
+@{[ check_num_regs(1) ]}
+	print "all ok\\n"
+	branch ALLOK
+ERROR:	print "not ok\\n"
+@{[ print_num_regs() ]}
+ALLOK:	end
+CODE
+all ok
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'pushbottomn & popbottomn');
+@{[ set_num_regs( sub { "1.0".$_ } ) ]}
+	pushbottomn
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+	popbottomn
+@{[ check_num_regs(0) ]}
+	print "all ok\\n"
+	branch ALLOK
+ERROR:	print "not ok\\n"
+@{[ print_num_regs() ]}
+ALLOK:	end
+CODE
+all ok
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining pushn with poptopn, popbottomn");
 @{[ set_num_regs( sub { "1.0".$_ } ) ]}
 	pushn
 @{[ set_num_regs( sub { "-1.0".$_} ) ]}
 	poptopn
-@{[ check_num_regs() ]}
-	print "all ok\\n"
+@{[ check_num_regs(1) ]}
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+	popbottomn
+@{[ check_num_regs(0) ]}
+
+	print "ok 1\\n"
+        clearn
+
+@{[ set_num_regs( sub { "1.0".$_ } ) ]}
+	pushn
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+	popbottomn
+@{[ check_num_regs(0) ]}
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+	poptopn
+@{[ check_num_regs(1) ]}
+
+	print "ok 2\\n"
 	branch ALLOK
 ERROR:	print "not ok\\n"
+@{[ print_num_regs() ]}
 ALLOK:	end
 CODE
-all ok
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining popn with pushtopn, pushbottomn");
+@{[ $fp_equality_macro ]}
+@{[ set_num_regs( sub { "1.0".$_ } ) ]}
+	pushtopn
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+        pushbottomn
+        popn
+@{[ check_num_regs(0) ]}
+        .fp_ne(N15, 1.031, ERROR)
+        .fp_ne(N16, -1.000, ERROR)
+ 
+        print "ok 1\\n"
+
+@{[ set_num_regs( sub { "1.0".$_ } ) ]}
+	pushbottomn
+@{[ set_num_regs( sub { "-1.0".$_} ) ]}
+        pushtopn
+        popn
+@{[ check_num_regs(0) ]}
+        .fp_ne(N15, 1.015, ERROR)
+        .fp_ne(N16, -1.016, ERROR)
+
+	print "ok 2\\n"
+	branch ALLOK
+ERROR:	print "not ok\\n"
+@{[ print_num_regs() ]}
+ALLOK:	end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', 'pushp & popp');
@@ -210,9 +506,9 @@ CODE
 THERE'LL BE NO BUTTER IN HELL!
 OUTPUT
 
-output_is(<<"CODE", <<'OUTPUT', 'poptopp');
+output_is(<<"CODE", <<'OUTPUT', 'pushtopp & poptopp');
 @{[ set_pmc_regs( sub {$_[0]%2} ) ]}
-	pushp
+	pushtopp
 @{[ set_pmc_regs( sub {($_[0]+1) %2} ) ]}
 @{[ print_pmc_regs() ]}
 	print "\\n"
@@ -223,6 +519,90 @@ output_is(<<"CODE", <<'OUTPUT', 'poptopp');
 CODE
 10101010101010101010101010101010
 10101010101010100101010101010101
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', 'pushbottomp & popbottomp');
+@{[ set_pmc_regs( sub {$_[0]%2} ) ]}
+	pushbottomp
+@{[ set_pmc_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	popbottomp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	end
+CODE
+10101010101010101010101010101010
+01010101010101011010101010101010
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining pushp with poptopp, popbottomp");
+@{[ set_pmc_regs( sub {$_[0]%2} ) ]}
+	pushp
+@{[ set_pmc_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	poptopp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	popbottomp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+
+        clearp
+
+@{[ set_pmc_regs( sub {$_[0]%2} ) ]}
+	pushp
+@{[ set_pmc_regs( sub {($_[0]+1) %2} ) ]}
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	popbottomp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	poptopp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+
+	end
+CODE
+10101010101010101010101010101010
+10101010101010100101010101010101
+01010101010101010101010101010101
+10101010101010101010101010101010
+01010101010101011010101010101010
+01010101010101010101010101010101
+OUTPUT
+
+output_is(<<"CODE", <<OUTPUT, "combining popp with pushtopp, pushbottomp");
+@{[ set_pmc_regs( sub {$_[0]} ) ]}
+	pushtopp
+@{[ set_pmc_regs( sub {-$_[0]} ) ]}
+        pushbottomp
+@{[ set_pmc_regs( sub {0} ) ]}
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	popp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+
+        clearp
+
+@{[ set_pmc_regs( sub {$_[0]} ) ]}
+	pushbottomp
+@{[ set_pmc_regs( sub {-$_[0]} ) ]}
+        pushtopp
+@{[ set_pmc_regs( sub {0} ) ]}
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	popp
+@{[ print_pmc_regs() ]}
+	print "\\n"
+	end
+CODE
+00000000000000000000000000000000
+161718192021222324252627282930310-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15
+00000000000000000000000000000000
+0123456789101112131415-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31
 OUTPUT
 
 output_is(<<"CODE", <<'OUTPUT', 'poptopp, aggregate PMCs');
@@ -791,6 +1171,71 @@ CODE
 test ok
 OUTPUT
 
+output_is(<<"CODE", <<'OUTPUT', "savetop/restoretop");
+@{[ $fp_equality_macro ]}
+        new P15, .PerlHash
+        new P16, .PerlHash
+        set I15, 1
+        set I16, 2
+        set N15, 1.0
+        set N16, 2.0
+        set S15, "one"
+        set S16, "two"
+        set P15["one"], 1
+        set P16["two"], 2
+
+        savetop
+
+        new P15, .PerlHash
+        new P16, .PerlHash
+        set I15, 3
+        set I16, 4
+        set N15, 3.0
+        set N16, 4.0
+        set S15, "three"
+        set S16, "four"
+        set P15["three"], 3
+        set P16["four"], 4
+
+        restoretop
+
+        ne I15, 3, ERROR
+        ne I16, 2, ERROR
+        .fp_ne(N15, 3.0, ERROR)
+        .fp_ne(N16, 2.0, ERROR)
+        ne S15, "three", ERROR
+        ne S16, "two", ERROR
+        set I1, P15["three"]
+        ne I1, 3, ERROR 
+        set I2, P16["two"]
+        ne I2, 2, ERROR
+
+        print "all ok\\n"
+        branch DONE
+
+ERROR:  print "not ok\\n"
+        print I15
+        print "\\n"
+        print I16
+        print "\\n"
+        print N15
+        print "\\n"
+        print N16
+        print "\\n"
+        print S15
+        print "\\n"
+        print S16
+        print "\\n"
+        print I1
+        print "\\n"
+        print I2
+        print "\\n"
+
+DONE:   end
+CODE
+all ok
+OUTPUT
+
 $code = $fp_equality_macro;
 $output = "";
 for (0..1024) {
@@ -995,15 +1440,40 @@ sub clt_num_regs {
   return $rt;
 }
 
-# first half like clt_num_regs, second half like cgt_num_regs
-# (for testing poptopn op)
+# Compare num regs with zero -- half should be less than zero, half
+# should be greater than zero. Pass in $lower to determine which half.
+# If $lower is true, it's the lower half; otherwise, it's the upper half
+
 sub check_num_regs {
+  my $lower = shift;
   my $rt;
-  for (0..15) {
-    $rt .= "\tgt N$_, 0.0, ERROR\n";
+
+# lower half negative
+  if ($lower) {
+    for (0..15) {
+      $rt .= "\tgt N$_, 0.0, ERROR\n";
+    }
+    for (16..31) {
+      $rt .= "\tlt N$_, 0.0, ERROR\n";
+    }
   }
-  for (16..31) {
-    $rt .= "\tlt N$_, 0.0, ERROR\n";
+# upper half negative
+  else {
+    for (0..15) {
+      $rt .= "\tlt N$_, 0.0, ERROR\n";
+    }
+    for (16..31) {
+      $rt .= "\tgt N$_, 0.0, ERROR\n";
+    }
   }
   return $rt;
 }
+
+sub print_num_regs {
+  my $rt;
+  for (0..31) {
+    $rt .= "\tprint N$_\n";
+  }
+  return $rt;
+}
+
