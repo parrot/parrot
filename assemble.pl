@@ -21,8 +21,10 @@ GetOptions(\%options,('checksyntax',
 		      'listing=s',
 		      'include=s@'));
 
-my @include = qw(.);
-push @include,  @{$options{'include'}} if $options{'include'};
+my(@include)=('.');
+if($options{'include'}) {
+    unshift(@include,@{$options{'include'}});
+}
 
 if($options{'version'}) {
     print $0,'Version $Id$ ',"\n";
