@@ -71,7 +71,7 @@ config/gen/core_pmcs.pl
 config/gen/libparrot_def.pl
 config/gen/libparrot_def/libparrot_def.in
 config/gen/makefiles.pl
-config/gen/makefiles/brainfuck.in
+config/gen/makefiles/bf.in
 config/gen/makefiles/classes.in
 config/gen/makefiles/docs.in
 config/gen/makefiles/imcc.in
@@ -1299,7 +1299,7 @@ languages/befunge/maths.pasm
 languages/befunge/stack.pasm
 languages/befunge/test.bef
 languages/bf/README
-languages/bf/brainfuck.pasm
+languages/bf/bf.pasm
 languages/bf/countdown.bf
 languages/bf/helloworld.bf
 languages/bf/test.bf
