@@ -135,7 +135,7 @@ static Instruction * iSUBROUTINE(SymReg * r0) {
     i =  iLABEL(r0);
     i->line = line - 1;
     if (*r0->name != '_')
-        fataly(EX_SOFTWARE, "iSUBROUTINE", line,
+        fataly(EX_SOFTWARE, sourcefile, line,
         "illegal local label '%s'\n", r0->name);
     return i;
 }
@@ -172,105 +172,11 @@ iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
 	MK_I(interp, "set %s[%s], %s", R3(r0,r1,r2));
     }
     else {
-        fataly(EX_SOFTWARE, "iINDEXSET", line,"unsupported indexed set op\n");
+        fataly(EX_SOFTWARE, sourcefile, line,"unsupported indexed set op\n");
     }
     return 0;
 }
 
-static Instruction *
-multi_keyed(struct Parrot_Interp *interpreter,char *name,
-SymReg ** r, int nr, int emit)
-{
-    int i, keyf, kv, n;
-    char buf[16];
-    static int p = 0;
-    SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
-    SymReg *nreg[IMCC_MAX_REGS];
-    Instruction *ins = 0;
-
-    /* count keys in keyvec */
-    kv = keyvec;
-    for (i = keyf = 0; i < nr; i++, kv >>= 1)
-        if (kv & 1)
-            keyf++;
-    if (keyf <= 1)
-        return 0;
-    /* XXX what to do, if we don't emit instruction? */
-    assert(emit);
-    /* OP  _p_k    _p_k_p_k =>
-     * set      py, p_k
-     * set      pz,     p_k
-     * new px, .PerlUndef
-     * OP  px, py, pz
-     * set _p_k_px
-     */
-
-    kv = keyvec;
-    for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
-        if (kv & 1) {
-            fataly(EX_SOFTWARE, "multi_keyed", line,"illegal key operand\n");
-        }
-        /* make a new P symbol */
-        while (1) {
-            sprintf(buf, "$P%d", ++p);
-            if (get_sym(buf) == 0)
-                break;
-        }
-        preg[n] = mk_symreg(str_dup(buf), 'P');
-        kv >>= 1;
-        if (kv & 1) {
-            /* we have a keyed operand */
-            if (r[i]->set != 'P') {
-                fataly(EX_SOFTWARE, "multi_keyed", line,"not an aggregate\n");
-            }
-            nargs = 3;
-            /* don't emit LHS yet */
-            if (i == 0) {
-                keyvec = 1 << 1;
-                nreg[0] = r[i];
-                nreg[1] = r[i+1];
-                nreg[2] = preg[n];
-                /* set p_k px */
-                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
-            }
-            else {
-                keyvec = 1 << 2;
-                nreg[0] = preg[n];
-                nreg[1] = r[i];
-                nreg[2] = r[i+1];
-                /* set py|z p_k */
-                iANY(interpreter, str_dup("set"), 0, nreg, 1);
-            }
-            i++;
-        }
-        /* non keyed */
-        else {
-            nargs = 2;
-            keyvec = 0;
-            if (i == 0) {
-                nreg[0] = r[i];
-                nreg[1] = preg[n];
-                /* set n, px */
-                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
-            }
-            else {
-                nreg[0] = preg[n];
-                nreg[1] = r[i];
-                /* set px, n */
-                iANY(interpreter, str_dup("set"), 0, nreg, 1);
-            }
-        }
-    }
-    /* make a new undef */
-    iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
-    /* emit the operand */
-    nargs = 3;
-    keyvec = 0;
-    iANY(interpreter, name, 0, preg, 1);
-    /* emit the LHS op */
-    emitb(ins);
-    return ins;
-}
 
 Instruction *
 iANY(struct Parrot_Interp *interpreter, char * name,
@@ -397,7 +303,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         if (emit)
              emitb(ins);
     } else {
-        fataly(EX_SOFTWARE, "iANY", line,"op not found '%s' (%s<%d>)\n",
+        fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, nargs);
     }
     return ins;
@@ -604,7 +510,7 @@ pcc_ret: PCC_BEGIN_RETURN '\n' {
                 SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
-                    fataly(EX_SOFTWARE, "pcc_ret", line,
+                    fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_return not inside pcc subroutine\n");
                 sprintf(name, "#pcc_sub_ret_%d", line - 1);
                 $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
@@ -620,7 +526,7 @@ pcc_yield: PCC_BEGIN_YIELD '\n' {
                 SymReg *r;
                 char name[128];
                 if (!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
-                    fataly(EX_SOFTWARE, "pcc_yield", line,
+                    fataly(EX_SOFTWARE, sourcefile, line,
                         "pcc_yield not inside pcc subroutine\n");
                 ins->r[1]->pcc_sub->calls_a_sub = 1;
                 sprintf(name, "#pcc_sub_yield_%d", line - 1);

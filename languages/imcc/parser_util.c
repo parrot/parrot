@@ -307,6 +307,101 @@ try_find_op(Parrot_Interp interpreter, char *name, SymReg ** r, int n, int emit)
     }
     return -1;
 }
+
+Instruction *
+multi_keyed(struct Parrot_Interp *interpreter,char *name,
+SymReg ** r, int nr, int emit)
+{
+    int i, keyf, kv, n;
+    char buf[16];
+    static int p = 0;
+    SymReg *preg[IMCC_MAX_REGS];    /* px,py,pz */
+    SymReg *nreg[IMCC_MAX_REGS];
+    Instruction *ins = 0;
+
+    /* count keys in keyvec */
+    kv = keyvec;
+    for (i = keyf = 0; i < nr; i++, kv >>= 1)
+        if (kv & 1)
+            keyf++;
+    if (keyf <= 1)
+        return 0;
+    /* XXX what to do, if we don't emit instruction? */
+    assert(emit);
+    /* OP  _p_k    _p_k_p_k =>
+     * set      py, p_k
+     * set      pz,     p_k
+     * new px, .PerlUndef
+     * OP  px, py, pz
+     * set _p_k_px
+     */
+
+    kv = keyvec;
+    for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
+        if (kv & 1) {
+            fataly(EX_SOFTWARE, "multi_keyed", line,"illegal key operand\n");
+        }
+        /* make a new P symbol */
+        while (1) {
+            sprintf(buf, "$P%d", ++p);
+            if (get_sym(buf) == 0)
+                break;
+        }
+        preg[n] = mk_symreg(str_dup(buf), 'P');
+        kv >>= 1;
+        if (kv & 1) {
+            /* we have a keyed operand */
+            if (r[i]->set != 'P') {
+                fataly(EX_SOFTWARE, "multi_keyed", line,"not an aggregate\n");
+            }
+            nargs = 3;
+            /* don't emit LHS yet */
+            if (i == 0) {
+                keyvec = 1 << 1;
+                nreg[0] = r[i];
+                nreg[1] = r[i+1];
+                nreg[2] = preg[n];
+                /* set p_k px */
+                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
+            }
+            else {
+                keyvec = 1 << 2;
+                nreg[0] = preg[n];
+                nreg[1] = r[i];
+                nreg[2] = r[i+1];
+                /* set py|z p_k */
+                iANY(interpreter, str_dup("set"), 0, nreg, 1);
+            }
+            i++;
+        }
+        /* non keyed */
+        else {
+            nargs = 2;
+            keyvec = 0;
+            if (i == 0) {
+                nreg[0] = r[i];
+                nreg[1] = preg[n];
+                /* set n, px */
+                ins = iANY(interpreter, str_dup("set"), 0, nreg, 0);
+            }
+            else {
+                nreg[0] = preg[n];
+                nreg[1] = r[i];
+                /* set px, n */
+                iANY(interpreter, str_dup("set"), 0, nreg, 1);
+            }
+        }
+    }
+    /* make a new undef */
+    iNEW(interpreter, preg[0], str_dup("PerlUndef"), NULL, 1);
+    /* emit the operand */
+    nargs = 3;
+    keyvec = 0;
+    iANY(interpreter, name, 0, preg, 1);
+    /* emit the LHS op */
+    emitb(ins);
+    return ins;
+}
 /*
  * Local variables:
  * c-indentation-style: bsd
