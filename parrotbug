@@ -206,15 +206,7 @@ EOF
     exit;
 }
 
-=begin DEVELOPER
-
-=item C<version()>
-
-Print version information (of the parrotbug program) and exit.
-
-=end DEVELOPER
-
-=cut
+# Print version information (of the parrotbug program) and exit.
 
 sub version {
     print <<"EOF";
@@ -231,15 +223,7 @@ EOF
 #------------------------------------------------------------#
 #                        Utils subs.                         #
 
-=begin DEVELOPER
-
-=item C<generate_filename()>
-
-Generate random filename to edit report.
-
-=end DEVELOPER
-
-=cut
+# Generate random filename to edit report.
 
 sub generate_filename {
     my $dir = File::Spec->tmpdir();
@@ -249,18 +233,10 @@ sub generate_filename {
     return $filename;
 }
 
-=begin DEVELOPER
-
-=item C<trivial_subject($subject)>
-
-Check whether a subject is trivial. A subject is not considered trivial
-if it's an ok or a nok report.
-
-Return 1 if trivial, 0 otherwise (subject acceptable).
-
-=end DEVELOPER
-
-=cut
+# Check whether a subject is trivial. A subject is not considered trivial
+# if it's an ok or a nok report.
+# 
+# Return 1 if trivial, 0 otherwise (subject acceptable).
 
 sub trivial_subject {
     my $subject = shift;
@@ -282,19 +258,11 @@ sub trivial_subject {
 #------------------------------------------------------------#
 #                         Init subs.                         #
 
-=begin DEVELOPER
-
-=item C<init()>
-
-Initialize the program. 
-
-Get parrot information, process the options, create the message
-information (subject, to, body, etc.) depending on the type of report
-(ok, nok or bug report).
-
-=end DEVELOPER
-
-=cut
+# Initialize the program. 
+# 
+# Get parrot information, process the options, create the message
+# information (subject, to, body, etc.) depending on the type of report
+# (ok, nok or bug report).
 
 sub init {
     $is_linux   = lc($^O) eq 'linux';
@@ -427,15 +395,7 @@ sub init {
 #------------------------------------------------------------#
 #                       Querying subs.                       #
 
-=begin DEVELOPER
-
-=item C<query_info()>
-
-Query missing information in order to have a complete report.
-
-=end DEVELOPER
-
-=cut
+# Query missing information in order to have a complete report.
 
 sub query_info {
     $subject = "" if trivial_subject( $subject );
@@ -450,22 +410,14 @@ sub query_info {
     ask_for_body()           unless $use_file || $body;
 }
 
-=begin DEVELOPER
-
-=item C<ask_for_alternative($what, $choices, $default)>
-
-Prompt for alternatives from a set of choices.
-
-The arguments are: the name of alternative, the choices (as an array
-ref), and the default answer.
-
-Return the lowercased alternative chosen.
-
-Die if more than 5 wrong answers.
-
-=end DEVELOPER
-
-=cut
+# Prompt for alternatives from a set of choices.
+# 
+# The arguments are: the name of alternative, the choices (as an array
+# ref), and the default answer.
+# 
+# Return the lowercased alternative chosen.
+# 
+# Die if more than 5 wrong answers.
 
 sub ask_for_alternative {
     my ( $what, $choices, $default ) = @_;
@@ -490,15 +442,7 @@ EOF
     return lc $alt;
 }
 
-=begin DEVELOPER
-
-=item C<ask_for_body()>
-
-Prompt for body, through an external editor.
-
-=end DEVELOPER
-
-=cut
+# Prompt for body, through an external editor.
 
 sub ask_for_body {
     print <<EOF;
@@ -534,15 +478,7 @@ EOF
     edit_bug_report( $opts{f} );
 }
 
-=begin DEVELOPER
-
-=item C<ask_for_editor()>
-
-Prompt for editor to use.
-
-=end DEVELOPER
-
-=cut
+# Prompt for editor to use.
 
 sub ask_for_editor {
     print shift() . "Editor [$editor]: ";
@@ -551,15 +487,7 @@ sub ask_for_editor {
     $editor = $entry if $entry ne "";
 }
 
-=begin DEVELOPER
-
-=item C<ask_for_return_address()>
-
-Prompt for return address.
-
-=end DEVELOPER
-
-=cut
+# Prompt for return address.
 
 sub ask_for_return_address {
     print <<EOF;
@@ -595,15 +523,7 @@ EOF
     print "\n\n\n";
 }
 
-=begin DEVELOPER
-
-=item C<ask_for_subject()>
-
-Prompt for subject of message.
-
-=end DEVELOPER
-
-=cut
+# Prompt for subject of message.
 
 sub ask_for_subject {
     print <<EOF;
@@ -625,15 +545,7 @@ EOF
     print "\n\n\n";
 }
 
-=begin DEVELOPER
-
-=item C<edit_bug_report($filename)>
-
-Launch an editor in which to edit the bug report.
-
-=end DEVELOPER
-
-=cut
+# Launch an editor in which to edit the bug report.
 
 sub edit_bug_report {
     my $filename = shift;
@@ -663,15 +575,7 @@ EOF
 #------------------------------------------------------------#
 #                        Action subs.                        #
 
-=begin DEVELOPER
-
-=item C<dump_info()>
-
-Dump everything collected on the specified glob.
-
-=end DEVELOPER
-
-=cut
+# Dump everything collected on the specified glob.
 
 sub dump_info {
     local (*OUT) = @_;
@@ -712,17 +616,7 @@ EOF
     }
 }
 
-=begin DEVELOPER
-
-=item C<send_msg()>
-
-Send message to final recipient.
-
-The body of this method is currently commented out.
-
-=end DEVELOPER
-
-=cut
+# Send message to final recipient.
 
 sub send_msg {
     # Get the body.
