@@ -5,6 +5,15 @@ use strict;
 use lib 'lib';
 use Test::Harness qw(runtests);
 
+#
+# Suck the switches into the TEST_PROG_ARGS evar:
+#
+
+use Getopt::Std;
+my %opts;
+getopts('jP', \%opts);
+$ENV{TEST_PROG_ARGS} = join(' ', map { "-$_" } keys %opts );
+
 # Pass in a list of tests to run on the command line, else run all the tests.
 my @tests = @ARGV ? @ARGV : map { glob( "t/$_/*.t" ) } ( qw(op pmc) );
 runtests(@tests);

@@ -159,7 +159,7 @@ blib_lib:
 
 shared: blib_lib blib/lib/libparrot$(SO) blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO)
 
-blib/lib/libparrot$(SO).${VERSION}: $(O_FILES)
+blib/lib/libparrot$(SO).${VERSION}: blib_lib $(O_FILES)
 	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) -o blib/lib/libparrot$(SO).${VERSION} $(O_FILES)
 
 blib/lib/libparrot$(SO).${MAJOR}.${MINOR}: blib/lib/libparrot$(SO).${VERSION}
@@ -174,7 +174,7 @@ blib/lib/libparrot$(SO): blib/lib/libparrot$(SO).${MAJOR}
 	rm -f $@
 	cd blib/lib; ln -s libparrot$(SO).${MAJOR} libparrot$(SO)
 
-blib/lib/libcore_prederef$(SO).${VERSION}: core_ops_prederef$(O)
+blib/lib/libcore_prederef$(SO).${VERSION}: blib_lib core_ops_prederef$(O)
 	$(LD) -shared -Wl,-soname,libparrot$(SO).${MAJOR} $(LDFLAGS) -o blib/lib/libcore_prederef$(SO).${VERSION} core_ops_prederef$(O)
 
 blib/lib/libcore_prederef$(SO).${MAJOR}.${MINOR}: blib/lib/libcore_prederef$(SO).${VERSION}
@@ -365,6 +365,16 @@ test: $(TEST_PROG) assemble.pl .test_dummy
 
 .test_dummy:
 	$(PERL) t/harness
+
+testp: $(TEST_PROG) assemble.pl blib/lib/libcore_prederef$(SO) $(TEST_PROG_SO) .test_dummy_p
+
+.test_dummy_p:
+	$(PERL) t/harness -P
+
+testj: $(TEST_PROG) assemble.pl .test_dummy_j
+
+.test_dummy_j:
+	$(PERL) t/harness -j
 
 mopstest: $(TEST_PROG) examples/assembly/mops.pbc
 	$(TEST_PROG) examples/assembly/mops.pbc

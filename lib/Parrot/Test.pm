@@ -4,6 +4,8 @@ use strict;
 use vars qw(@EXPORT @ISA);
 use Parrot::Config;
 
+use Env qw($TEST_PROG_ARGS);
+
 require Exporter;
 require Test::Builder;
 my $Builder = Test::Builder->new;
@@ -67,7 +69,7 @@ foreach my $func ( keys %Test_Map ) {
     close ASSEMBLY;
 
     _run_command( "$PConfig{perl} assemble.pl $as_f --output $by_f" );
-    _run_command( "./$PConfig{test_prog} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
+    _run_command( "./$PConfig{test_prog} ${TEST_PROG_ARGS} $by_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
     my $prog_output;
     open OUTPUT, "< $out_f";
