@@ -11,6 +11,7 @@
  */
 
 #include "parrot/runops_cores.h"
+#include "parrot/trace.h"
 
 #include "parrot/interp_guts.h"
 
