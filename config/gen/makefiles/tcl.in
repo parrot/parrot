@@ -6,7 +6,6 @@ MYPATH  = languages${slash}tcl${slash}
 LIBPATH  = $(MYPATH)lib${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
-lib/backslash_newline_subst.imc \
 lib/commands/append.imc \
 lib/commands/array.imc \
 lib/commands/break.imc \
@@ -31,23 +30,9 @@ lib/commands/time.imc \
 lib/commands/unset.imc \
 lib/commands/while.imc \
 lib/expression.imc \
-lib/functions/abs.imc \
-lib/functions/acos.imc \
-lib/functions/asin.imc \
-lib/functions/atan.imc \
-lib/functions/cos.imc \
-lib/functions/cosh.imc \
-lib/functions/exp.imc \
-lib/functions/log.imc \
-lib/functions/log10.imc \
-lib/functions/sin.imc \
-lib/functions/sinh.imc \
-lib/functions/sqrt.imc \
-lib/functions/tan.imc \
-lib/functions/tanh.imc \
 lib/get_var.imc \
 lib/interpret.imc \
-lib/macros/debug.imc \
+lib/macros/boolean.imc \
 lib/macros/is_space.imc \
 lib/match_close.imc \
 lib/parse.imc \
