@@ -95,7 +95,7 @@ int ins_reads2(Instruction *, int);
 int ins_writes2(Instruction *, int);
 
 void free_ins(Instruction *);
-int ins_print(FILE *fd, Instruction * ins);
+int ins_print(Interp *, FILE *fd, Instruction * ins);
 
 Instruction *delete_ins(struct _IMC_Unit *, Instruction *ins, int needs_freeing);
 void insert_ins(struct _IMC_Unit *, Instruction *ins, Instruction * tmp);
@@ -109,18 +109,18 @@ SymReg *get_branch_reg(Instruction * ins);
 /* Globals */
 
 typedef struct _emittert {
-	int (*open)(void *param);
-	int (*emit)(void *param, struct _IMC_Unit *, Instruction *ins);
-	int (*new_sub)(void *param, struct _IMC_Unit *);
-	int (*end_sub)(void *param, struct _IMC_Unit *);
-	int (*close)(void *param);
+    int (*open)(Interp *, void *param);
+    int (*emit)(Interp *, void *param, struct _IMC_Unit *, Instruction *ins);
+    int (*new_sub)(Interp *, void *param, struct _IMC_Unit *);
+    int (*end_sub)(Interp *, void *param, struct _IMC_Unit *);
+    int (*close)(Interp *, void *param);
 } Emitter;
 
 enum Emitter_type { EMIT_FILE, EMIT_PBC };
 
-int emit_open(int type, void *param);
-int emit_flush(void *param, struct _IMC_Unit *);
-int emit_close(void *param);
+int emit_open(Interp *, int type, void *param);
+int emit_flush(Interp *, void *param, struct _IMC_Unit *);
+int emit_close(Interp *, void *param);
 
 void open_comp_unit(void);
 void close_comp_unit(Parrot_Interp);

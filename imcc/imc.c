@@ -11,64 +11,21 @@
 #include "imc.h"
 #include "optimizer.h"
 
-
-void imc_check_units(Interp *interp, char * caller);
-
-/*
- * A sanity checking function used for debugging only.
- * Useful for tracking down memory corruptions by inserting
- * validation calls between compilation steps.
- */
-void imc_check_units(Interp *interp, char * caller)
-{
-#if IMC_TRACE
-    IMC_Unit * unit, *unit_next;
-    static int ncheck;
-    int i = 1;
-#endif
-    UNUSED(interp);
-    UNUSED(caller);
-#if IMC_TRACE
-    fprintf(stderr, "imc.c: unit check pass %d from %s\n", ++ncheck, caller);
-    for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
-        unit_next = unit->next;
-        {
-            Instruction *ins = unit->instructions;
-            if (ins->r[1] && ins->r[1]->pcc_sub) {
-#if IMC_TRACE_HIGH
-                fprintf(stderr, "UNIT[%d] : pcc_sub %s (nargs=%d)\n",
-                     i, ins->r[1]->name, ins->r[1]->pcc_sub->nargs);
-#endif
-            }
-        }
-
-        i++;
-    }
-#endif
-}
-
+#define COMPILE_IMMEDIATE 1
+static void imc_free_unit(Parrot_Interp interp, IMC_Unit * unit);
 
 void
 imc_compile_all_units(Interp *interp)
 {
     IMC_Unit *unit, *unit_next;
     Instruction *ins, *ins_next;
-#if IMC_TRACE
-    int i = 1;
-
-    fprintf(stderr, "imc.c:  imc_compile_all_units()\n");
-#endif
+#if ! COMPILE_IMMEDIATE
     for (unit = interp->imc_info->imc_units; unit; unit = unit_next) {
         unit_next = unit->next;
-#if IMC_TRACE
-        fprintf(stderr, "compiling unit %d\n", i++);
-#endif
         imc_compile_unit(interp, unit);
-        emit_flush(interp, unit);
-        imc_close_unit(interp, unit);
     }
-
-    emit_close(interp);
+#endif
+    emit_close(interp, NULL);
     /* All done with compilation, now free instructions and other structures */
 
     for (unit = interp->imc_info->imc_units; unit;) {
@@ -94,11 +51,8 @@ imc_compile_unit(Interp *interp, IMC_Unit * unit) {
     /* Not much here for now except the allocator */
     cur_unit = unit;
 
-#if IMC_TRACE
-    imc_check_units(interp, "imc_compile_unit");
-#endif
-
     imc_reg_alloc(interp, unit);
+    emit_flush(interp, NULL, unit);
 }
 
 
@@ -109,19 +63,20 @@ imc_compile_unit(Interp *interp, IMC_Unit * unit) {
 void
 imc_cleanup(Interp *interp)
 {
-     UNUSED(interp);
-     clear_globals();
+     clear_globals(interp);
+     mem_sys_free(interp->imc_info->ghash);
+     interp->imc_info->ghash = NULL;
 }
 
 
 /*
  * Create a new IMC_Unit.
  */
-IMC_Unit *
+static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
    IMC_Unit * unit = calloc(1, sizeof(IMC_Unit));
-   unit->hash = calloc(HASH_SIZE, sizeof(SymReg*));
+   unit->hash = mem_sys_allocate_zeroed(HASH_SIZE * sizeof(SymReg*));
    unit->type = t;
    return unit;
 }
@@ -135,34 +90,36 @@ IMC_Unit *
 imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
 {
     IMC_Unit * unit;
+    imc_info_t *imc_info;
+
     unit = imc_new_unit(t);
-    if (!interp->imc_info->imc_units)
-       interp->imc_info->imc_units = unit;
-    unit->prev = interp->imc_info->last_unit;
-    if (interp->imc_info->last_unit)
-       interp->imc_info->last_unit->next = unit;
-    interp->imc_info->last_unit = unit;
-    interp->imc_info->n_comp_units++;
-#if IMC_TRACE
-    fprintf(stderr, "imc_open_unit()\n");
-#endif
-    return interp->imc_info->last_unit;
+    imc_info = interp->imc_info;
+    if (!imc_info->imc_units)
+       imc_info->imc_units = unit;
+    if (!imc_info->ghash)
+       imc_info->ghash = mem_sys_allocate_zeroed(HASH_SIZE * sizeof(SymReg*));
+    unit->prev = imc_info->last_unit;
+    if (imc_info->last_unit)
+       imc_info->last_unit->next = unit;
+    imc_info->last_unit = unit;
+    imc_info->n_comp_units++;
+    unit->pasm_file = imc_info->state->pasm_file;
+    return unit;
 }
 
 /*
  * Close a unit from compilation.
  * Does not destroy the unit, leaves it on the
- * list. This appends a invoke P1 if its a PCC sub and it doesn't
- * have a return.
+ * list.
  */
 void
 imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
-#if IMC_TRACE
-    fprintf(stderr, "imc_close_unit()\n");
-#endif
     UNUSED(interp);
     if (unit) {
+#if COMPILE_IMMEDIATE
+        imc_compile_unit(interp, unit);
+#endif
     }
     cur_unit = NULL;
 }
@@ -172,7 +129,7 @@ imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
  * yet due to interaction between units. One unit may hold a reference
  * to another (subs). Garbage collection would solve this.
  */
-void
+static void
 imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
     imc_info_t *imc = interp->imc_info;
@@ -187,7 +144,7 @@ imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 
     clear_basic_blocks(unit);       /* and cfg ... */
     if (!imc->n_comp_units)
-        fatal(1, "imc_free_unit", "non existent unit\n");
+        IMCC_fatal(interp, 1, "imc_free_unit: non existent unit\n");
     imc->n_comp_units--;
 
     clear_locals(unit);

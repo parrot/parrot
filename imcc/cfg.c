@@ -17,8 +17,8 @@
 
 /* #define ALIAS */
 
-static void add_instruct_reads(Instruction *ins, SymReg *r0);
-static void add_instruct_writes(Instruction *ins, SymReg *r0);
+static void add_instruct_reads(Interp *, Instruction *ins, SymReg *r0);
+static void add_instruct_writes(Interp *, Instruction *ins, SymReg *r0);
 static void propagate_need(Basic_block *bb, SymReg* r, int i);
 static void bb_findadd_edge(Parrot_Interp, IMC_Unit *, Basic_block*, SymReg*);
 static void mark_loop(Parrot_Interp, IMC_Unit *, Edge*);
@@ -26,7 +26,7 @@ static void init_basic_blocks(IMC_Unit *);
 static void analyse_life_symbol(Parrot_Interp, IMC_Unit *, SymReg*);
 static void analyse_life_block(Parrot_Interp, Basic_block*, SymReg*);
 static void bb_add_edge(IMC_Unit *, Basic_block*, Basic_block*);
-static Basic_block* make_basic_block(IMC_Unit *, Instruction*);
+static Basic_block* make_basic_block(Interp *, IMC_Unit *, Instruction*);
 
 /* Code: */
 
@@ -36,7 +36,7 @@ static Basic_block* make_basic_block(IMC_Unit *, Instruction*);
 #define INVOKE_SUB_OTHER 4
 
 static int
-check_invoke_type(IMC_Unit * unit, Instruction *ins)
+check_invoke_type(Interp *interp, IMC_Unit * unit, Instruction *ins)
 {
     /*
      * 1) pcc sub call or yield
@@ -54,8 +54,8 @@ check_invoke_type(IMC_Unit * unit, Instruction *ins)
         return INVOKE_SUB_RET;
     /* 4) other usage */
 
-    dont_optimize = 1;  /* too complex, to follow */
-    optimizer_level &= ~OPT_PASM;
+    IMCC_INFO(interp)->dont_optimize = 1;  /* too complex, to follow */
+    IMCC_INFO(interp)->optimizer_level &= ~OPT_PASM;
     return INVOKE_SUB_OTHER;
 }
 
@@ -67,7 +67,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
     int nu = 0;
     int i;
 
-    info(interpreter, 2, "find_basic_blocks\n");
+    IMCC_info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
     for (i = 0; i < HASH_SIZE; i++) {
         SymReg * r;
@@ -81,13 +81,13 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
     /* XXX FIXME: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
     if (first && ins->type == ITLABEL && ins->r[1]) {
-        debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
+        IMCC_debug(interpreter, DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->r[0]->name, ins->r[1]->pcc_sub->nargs);
         expand_sub(interpreter, unit, ins);
     }
     ins->index = i = 0;
 
-    bb = make_basic_block(unit, ins);
+    bb = make_basic_block(interpreter, unit, ins);
     if (ins->type & ITBRANCH) {
         SymReg * addr = get_branch_reg(bb->end);
         if (addr)
@@ -103,18 +103,18 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
          */
         if ( !strcmp(ins->op, "invoke") || !strcmp(ins->op, "invokecc")) {
             if (ins->opsize == 1) {
-                SymReg * p0 = mk_pasm_reg(str_dup("P0"));
-                add_instruct_reads(ins, p0);
-                check_invoke_type(unit, ins);
+                SymReg * p0 = get_pasm_reg(interpreter, "P0");
+                add_instruct_reads(interpreter, ins, p0);
+                check_invoke_type(interpreter, unit, ins);
                 p0->use_count++;
             }
             ins->type |= IF_r0_branch | ITBRANCH;
         }
         else if ( !strcmp(ins->op, "newsub") && ins->opsize == 5) {
-            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
-            SymReg * p1 = mk_pasm_reg(str_dup("P1"));
-            add_instruct_writes(ins, p0);
-            add_instruct_writes(ins, p1);
+            SymReg * p0 = get_pasm_reg(interpreter, "P0");
+            SymReg * p1 = get_pasm_reg(interpreter, "P1");
+            add_instruct_writes(interpreter, ins, p0);
+            add_instruct_writes(interpreter, ins, p1);
         }
 
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
@@ -143,7 +143,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
             nu = 0;
         else if ( (ins->type & ITLABEL)) {
             bb->end = ins->prev;
-            bb = make_basic_block(unit, ins);
+            bb = make_basic_block(interpreter, unit, ins);
         }
         /* a branch is the end of a basic block
          * so start a new with the next ins */
@@ -166,7 +166,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
                 if (*ins->op == 'b') {  /* bsr */
                     Instruction * lab;
                     found = r != NULL && r->first_ins;
-                    debug(interpreter, DEBUG_CFG, "bsr %s local:%s\n",
+                    IMCC_debug(interpreter, DEBUG_CFG, "bsr %s local:%s\n",
                             name, found ? "yes": "no");
                     if (r) {
                         int j;
@@ -177,7 +177,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
                                 if (!strcmp(lab->op, "saveall")) {
                                     ins->type |= ITSAVES;
                                     lab->type |= ITSAVES;
-                                    debug(interpreter, DEBUG_CFG, "\ttype saveall\n");
+                                    IMCC_debug(interpreter, DEBUG_CFG, "\ttype saveall\n");
                                     break;
                                 }
                             }
@@ -190,14 +190,14 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
             }
             if (found) {
                 if (ins->next)
-                    bb = make_basic_block(unit, ins->next);
+                    bb = make_basic_block(interpreter, unit, ins->next);
                 nu = 1;
             }
         }
     }
 
     if (interpreter->imc_info->debug & DEBUG_CFG) {
-        dump_instructions(unit);
+        dump_instructions(interpreter, unit);
         dump_labels(unit);
     }
 }
@@ -213,7 +213,7 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
     Basic_block *last = NULL, *bb;
     Edge *pred;
 
-    info(interpreter, 2, "build_cfg\n");
+    IMCC_info(interpreter, 2, "build_cfg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
         bb = unit->bb_list[i];
 
@@ -226,12 +226,13 @@ build_cfg(Parrot_Interp interpreter, IMC_Unit * unit)
             bb_findadd_edge(interpreter, unit, bb, addr);
         else if (!strcmp(bb->start->op, "invoke") ||
                 !strcmp(bb->start->op, "invokecc")) {
-            if (check_invoke_type(unit, bb->start) == INVOKE_SUB_LOOP)
+            if (check_invoke_type(interpreter, unit, bb->start) ==
+                    INVOKE_SUB_LOOP)
                 bb_add_edge(unit, bb, unit->bb_list[0]);
         }
         if (!strcmp(bb->end->op, "ret")) {
             Instruction * sub;
-            debug(interpreter, DEBUG_CFG, "found ret in bb %d\n", i);
+            IMCC_debug(interpreter, DEBUG_CFG, "found ret in bb %d\n", i);
             /* now go back, find labels and connect these with
              * bsrs
              */
@@ -267,7 +268,7 @@ invok:
                     j = pred->from->index;
                     if (found) {
                         int saves = 0;
-                        debug(interpreter, DEBUG_CFG,
+                        IMCC_debug(interpreter, DEBUG_CFG,
                                 "\tcalled from bb %d '%I'\n",
                                 j, pred->from->end);
                         for (; sub && sub != bb->end; sub = sub->next) {
@@ -285,7 +286,7 @@ invok:
                         if (!saves)
                             bb_add_edge(unit, bb,
                                     unit->bb_list[j+1]);
-                        debug(interpreter, DEBUG_CFG, "\tand does saveall %s\n",
+                        IMCC_debug(interpreter, DEBUG_CFG, "\tand does saveall %s\n",
                                 saves ? "yes" : "no");
                     }
                 }
@@ -295,7 +296,7 @@ invok:
                     goto invok;
                 }
                 if (!found)
-                    debug(interpreter, DEBUG_CFG, "\tcalled from unknown!\n");
+                    IMCC_debug(interpreter, DEBUG_CFG, "\tcalled from unknown!\n");
             }
         }
 
@@ -310,13 +311,13 @@ static void
 bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit, Basic_block *from, SymReg *label)
 {
     Instruction *ins;
-    SymReg *r = find_sym(label->name);
+    SymReg *r = find_sym(interpreter, label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(unit, from,
                 unit->bb_list[r->first_ins->bbindex]);
     else {
-        debug(interpreter, DEBUG_CFG, "register branch %I ",
+        IMCC_debug(interpreter, DEBUG_CFG, "register branch %I ",
                 from->end);
         /* XXX is probably only ok, if the invoke is "near" the
          *     set_addr ins
@@ -326,11 +327,11 @@ bb_findadd_edge(Parrot_Interp interpreter, IMC_Unit * unit, Basic_block *from, S
                     ins->r[1]->first_ins) {
                 bb_add_edge(unit, from, unit->
                                 bb_list[ins->r[1]->first_ins->bbindex]);
-                debug(interpreter, DEBUG_CFG, "(%s) ", ins->r[1]->name);
+                IMCC_debug(interpreter, DEBUG_CFG, "(%s) ", ins->r[1]->name);
                 break;
             }
         }
-        debug(interpreter, DEBUG_CFG, "\n");
+        IMCC_debug(interpreter, DEBUG_CFG, "\n");
     }
 }
 
@@ -358,10 +359,7 @@ bb_add_edge(IMC_Unit * unit, Basic_block *from, Basic_block *to)
        on the predecessors of 'from', it won't be on the successors
        of 'to'. */
 
-    e = malloc(sizeof(Edge));
-    if (e==NULL) {
-        fatal(1, "bb_add_edge", "Out of mem looking for %i bytes", sizeof(Edge));
-    }
+    e = mem_sys_allocate(sizeof(Edge));
 
     e->succ_next = from->succ_list;
     e->from = from;
@@ -404,14 +402,15 @@ edge_count(IMC_Unit * unit)
 }
 
 static void
-add_instruct_reads(Instruction *ins, SymReg *r0)
+add_instruct_reads(Interp *interp, Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
         if (r0 == ins->r[i])
             return;
     if (i == IMCC_MAX_REGS) {
-        fatal(1, "add_instruct_reads","out of registers with %s\n", r0->name);
+        IMCC_fatal(interp, 1,
+                "add_instruct_reads: out of registers with %s\n", r0->name);
     }
     /* append reg */
     ins->r[i] = r0;
@@ -420,14 +419,15 @@ add_instruct_reads(Instruction *ins, SymReg *r0)
 }
 
 static void
-add_instruct_writes(Instruction *ins, SymReg *r0)
+add_instruct_writes(Interp *interp, Instruction *ins, SymReg *r0)
 {
     int i;
     for (i = 0; i < IMCC_MAX_REGS && ins->r[i]; i++)
         if (r0 == ins->r[i])
             return;
     if (i == IMCC_MAX_REGS) {
-        fatal(1, "add_instruct_writes","out of registers with %s\n", r0->name);
+        IMCC_fatal(interp, 1,
+        "add_instruct_writes: out of registers with %s\n", r0->name);
     }
     /* append reg */
     ins->r[i] = r0;
@@ -467,12 +467,12 @@ propagate_alias(Parrot_Interp interpreter)
 			break;
 		    else if (instruction_reads(ins, r0) &&
 			   !instruction_reads(ins, r1)) {
-			add_instruct_reads(ins, r1);
+			add_instruct_reads(interpreter, ins, r1);
                         any = 1;
 		    }
 		    else if (instruction_reads(ins, r1) &&
 			   !instruction_reads(ins, r0)) {
-			add_instruct_reads(ins, r0);
+			add_instruct_reads(interpreter, ins, r0);
                         any = 1;
 		    }
 		ins = curr;
@@ -480,8 +480,8 @@ propagate_alias(Parrot_Interp interpreter)
 	}
     }
     if (any && (interpreter->imc_info->debug & DEBUG_CFG)) {
-	debug(interpreter, DEBUG_CFG, "\nAfter propagate_alias\n");
-	dump_instructions(unit);
+	IMCC_debug(interpreter, DEBUG_CFG, "\nAfter propagate_alias\n");
+	dump_instructions(interpreter, unit);
     }
 }
 #endif
@@ -492,7 +492,7 @@ life_analysis(Parrot_Interp interpreter, IMC_Unit * unit)
     int i;
     SymReg** reglist = unit->reglist;
 
-    info(interpreter, 2, "life_analysis\n");
+    IMCC_info(interpreter, 2, "life_analysis\n");
 #ifdef ALIAS
     propagate_alias(interpreter);
 #endif
@@ -511,11 +511,8 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
 
     if (r->life_info)
         free_life_info(unit, r);
-    r->life_info = calloc(unit->n_basic_blocks,
+    r->life_info = mem_sys_allocate_zeroed(unit->n_basic_blocks *
             sizeof(Life_range*));
-    if (r->life_info == NULL) {
-        fatal(1, "analyse_life_symbol","Out of mem trying for %i basic blocks (%i bytes)", unit->n_basic_blocks, unit->n_basic_blocks * sizeof(Life_range*));
-    }
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
@@ -588,7 +585,7 @@ analyse_life_block(Parrot_Interp interpreter, Basic_block* bb, SymReg* r)
     special = NULL;
     for (ins = bb->start; ins ; ins = ins->next) {
         if (ins==NULL) {
-            fatal(1,"analyse_life_block",
+            IMCC_fatal(interpreter, 1,"analyse_life_block: "
                     "Index %i of %i has NULL instruction\n",
                     ins->index, bb->end->index);
         }
@@ -741,7 +738,7 @@ compute_dominators (Parrot_Interp interpreter, IMC_Unit * unit)
     Set** dominators;
 
     n = unit->n_basic_blocks;
-    info(interpreter, 2, "compute_dominators\n");
+    IMCC_info(interpreter, 2, "compute_dominators\n");
     dominators = unit->dominators = malloc(sizeof(Set*) * n);
 
 
@@ -866,13 +863,13 @@ sort_loops(Parrot_Interp interpreter, IMC_Unit * unit)
         for (j = i + 1; j < n_loops; j++) {
             if (set_contains(loop_info[i]->loop, first) &&
                     !set_contains(loop_info[i]->loop, last)) {
-                debug(interpreter, DEBUG_CFG, "sort_loops",
+                IMCC_debug(interpreter, DEBUG_CFG, "sort_loops",
                         "loop %d contains first but not"
                         "last of outer loop %d\n", j, i);
             }
             if (set_contains(loop_info[i]->loop, last) &&
                     !set_contains(loop_info[i]->loop, first)) {
-                debug(interpreter, DEBUG_CFG, "sort_loops",
+                IMCC_debug(interpreter, DEBUG_CFG, "sort_loops",
                         "loop %d contains last but not"
                         "first of outer loop %d\n", j, i);
             }
@@ -894,7 +891,7 @@ find_loops (Parrot_Interp interpreter, IMC_Unit * unit)
     Set* dom;
     Edge* edge;
 
-    info(interpreter, 2, "find_loops\n");
+    IMCC_info(interpreter, 2, "find_loops\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
 	dom = unit->dominators[i];
 
@@ -944,17 +941,17 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
             i++;
         }
 
-    debug(interpreter, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
+    IMCC_debug(interpreter, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
             footer->index, header->index, enter ? enter->index : -1 );
     if (i != 1) {
         if (i==0) {
             if (header->index)
-                debug(interpreter, DEBUG_CFG,"\tdead code\n");
+                IMCC_debug(interpreter, DEBUG_CFG,"\tdead code\n");
             else
-                debug(interpreter, DEBUG_CFG, "\tsub start\n");
+                IMCC_debug(interpreter, DEBUG_CFG, "\tsub start\n");
         }
         else
-            debug(interpreter, DEBUG_CFG,
+            IMCC_debug(interpreter, DEBUG_CFG,
                     "\tcan't determine loop entry block (%d found)\n" ,i);
     }
 
@@ -973,12 +970,13 @@ mark_loop (Parrot_Interp interpreter, IMC_Unit * unit, Edge* e)
     */
     n_loops = unit->n_loops;
     loop_info = unit->loop_info;
-    loop_info = unit->loop_info = realloc(loop_info, (n_loops+1)*sizeof(Loop_info *));
     if (!loop_info)
-        fatal(1, "mark_loop", "Out of mem reallocing %i bytes\n", (n_loops+1)*sizeof(Loop_info *));
-    loop_info[n_loops] = malloc(sizeof(Loop_info));
-    if (!loop_info[n_loops])
-        fatal(1, "mark_loop", "Out of mem trying for %i bytes\n", sizeof(Loop_info));
+        loop_info = unit->loop_info = mem_sys_allocate(
+                (n_loops+1)*sizeof(Loop_info *));
+    else
+        loop_info = unit->loop_info = mem_sys_realloc(loop_info,
+                (n_loops+1)*sizeof(Loop_info *));
+    loop_info[n_loops] = mem_sys_allocate(sizeof(Loop_info));
     loop_info[n_loops]->loop = loop;
     loop_info[n_loops]->depth = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
@@ -1047,19 +1045,16 @@ clear_basic_blocks(IMC_Unit * unit)
 }
 
 static Basic_block*
-make_basic_block(IMC_Unit * unit, Instruction* ins)
+make_basic_block(Interp *interpreter, IMC_Unit * unit, Instruction* ins)
 {
     Basic_block *bb;
     int n;
 
     if (ins == NULL) {
-        fatal(1, "make_basic_block", "called with NULL argument\n");
+        PANIC("make_basic_block: called with NULL argument\n");
     }
 
-    bb = malloc(sizeof(Basic_block));
-    if (bb==NULL) {
-        fatal(1, "make_basic_block","Out of mem getting a basic block, %i bytes\n", sizeof(Basic_block));
-    }
+    bb = mem_sys_allocate(sizeof(Basic_block));
 
     bb->start = ins;
     bb->end = ins;
@@ -1072,11 +1067,8 @@ make_basic_block(IMC_Unit * unit, Instruction* ins)
     if (n == unit->bb_list_size) {
         unit->bb_list_size *= 2;
         unit->bb_list =
-            realloc(unit->bb_list,
+            mem_sys_realloc(unit->bb_list,
                 unit->bb_list_size*sizeof(Basic_block*) );
-        if (unit->bb_list == 0) {
-            fatal(1, "make_basic_block","Out of mem reallocating bb_list to %i bytes\n",  unit->bb_list_size*sizeof(Basic_block*));
-        }
     }
     unit->bb_list[n] = bb;
     unit->n_basic_blocks++;
@@ -1089,10 +1081,7 @@ make_life_range(SymReg *r, int idx)
 {
    Life_range *l;
 
-   l = calloc(1, sizeof(Life_range));
-   if (l == NULL) {
-       fatal(1, "make_life_range","Out of mem calloc-ing %i bytes\n", sizeof(Life_range));
-   }
+   l = mem_sys_allocate_zeroed(sizeof(Life_range));
    r->life_info[idx] = l;
    return l;
 }

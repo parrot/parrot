@@ -29,15 +29,15 @@ int n_comp_units;
 #endif
 
 
-static int e_file_open(void *);
-static int e_file_close(void *);
-static int e_file_emit(void *param, IMC_Unit *, Instruction *);
+static int e_file_open(Interp *, void *);
+static int e_file_close(Interp *, void *);
+static int e_file_emit(Interp *, void *param, IMC_Unit *, Instruction *);
 
 Emitter emitters[2] = {
     {e_file_open,
      e_file_emit,
-     (int (*)(void *, IMC_Unit *))NULLfunc,
-     (int (*)(void *, IMC_Unit *))NULLfunc,
+     (int (*)(Interp *, void *, IMC_Unit *))NULLfunc,
+     (int (*)(Interp *, void *, IMC_Unit *))NULLfunc,
      e_file_close},
 
     {e_pbc_open,
@@ -47,7 +47,7 @@ Emitter emitters[2] = {
      e_pbc_close},
 };
 
-static int emitter;
+static int emitter;     /* XXX */
 
 
 /* Creates a new instruction */
@@ -374,7 +374,7 @@ free_ins(Instruction *ins)
 
 
 int
-ins_print(FILE *fd, Instruction * ins)
+ins_print(Interp *interp, FILE *fd, Instruction * ins)
 {
     char regb[IMCC_MAX_REGS][256];      /* XXX */
     /* only long key constants can overflow */
@@ -404,7 +404,9 @@ ins_print(FILE *fd, Instruction * ins)
 	    sprintf(regb[i], "%c%d", p->set, (int)p->color);
 	    regstr[i] = regb[i];
 	}
-        else if (allocated && (optimizer_level & OPT_J) && p->set != 'K' &&
+        else if (IMCC_INFO(interp)->allocated &&
+                (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
+                p->set != 'K' &&
                 p->color < 0 && (p->type & VTREGISTER)) {
 	    sprintf(regb[i], "r%c%d", tolower(p->set), -1 - (int)p->color);
 	    regstr[i] = regb[i];
@@ -415,7 +417,9 @@ ins_print(FILE *fd, Instruction * ins)
                 if (k->reg && k->reg->color >= 0)
                     sprintf(regb[i]+strlen(regb[i]), "%c%d",
                             k->reg->set, (int)k->reg->color);    /* XXX */
-                else if (allocated && (optimizer_level & OPT_J) &&  k->reg &&
+                else if (IMCC_INFO(interp)->allocated &&
+                        (IMCC_INFO(interp)->optimizer_level & OPT_J) &&
+                        k->reg &&
                         k->reg->color < 0)
                     sprintf(regb[i]+strlen(regb[i]), "r%c%d",
                             tolower(k->reg->set), -1 - (int)k->reg->color);
@@ -471,10 +475,11 @@ ins_print(FILE *fd, Instruction * ins)
 /* for debug */
 static char *output;
 static int
-e_file_open(void *param)
+e_file_open(Interp *interp, void *param)
 {
     char *file = (char *) param;
 
+    UNUSED(interp);
     if (strcmp(file, "-"))
         freopen(file, "w", stdout);
     output = file;
@@ -482,17 +487,17 @@ e_file_open(void *param)
 }
 
 static int
-e_file_close(void *param)
+e_file_close(Interp *interpreter, void *param)
 {
-    Interp *interpreter = (Interp *)param;
+    UNUSED(param);
     printf("\n\n");
     fclose(stdout);
-    info(interpreter, 1, "assembly module %s written.\n", output);
+    IMCC_info(interpreter, 1, "assembly module %s written.\n", output);
     return 0;
 }
 
 static int
-e_file_emit(void *param, IMC_Unit * unit, Instruction * ins)
+e_file_emit(Interp *interp, void *param, IMC_Unit * unit, Instruction * ins)
 {
     UNUSED(param);
     UNUSED(unit);
@@ -500,53 +505,43 @@ e_file_emit(void *param, IMC_Unit * unit, Instruction * ins)
     PIO_eprintf(NULL, "e_file_emit\n");
 #endif
     if ((ins->type & ITLABEL) || ! *ins->op)
-	ins_print(stdout, ins);
+	ins_print(interp, stdout, ins);
     else {
-	imcc_fprintf(stdout, "\t%I ",ins);
+	imcc_fprintf(interp, stdout, "\t%I ",ins);
     }
     printf("\n");
     return 0;
 }
 
 int
-emit_open(int type, void *param)
+emit_open(Interp *interp, int type, void *param)
 {
     emitter = type;
-    has_compile = 0;
-    dont_optimize = 0;
-#if IMC_TRACE
-    fprintf(stderr, "imc.c: emit_open (%d)\n", emitter);
-#endif
-    return (emitters[emitter]).open(param);
+    IMCC_INFO(interp)->has_compile = 0;
+    IMCC_INFO(interp)->dont_optimize = 0;
+    return (emitters[emitter]).open(interp, param);
 }
 
 int
-emit_flush(void *param, IMC_Unit * unit)
+emit_flush(Interp *interp, void *param, IMC_Unit * unit)
 {
     Instruction * ins;
-    Interp *interpreter = (Interp *)param;
-    UNUSED(unit);
-#if IMC_TRACE
-    fprintf(stderr, "instructions.c: emit_flush\n");
-#endif
+
     if (emitters[emitter].new_sub)
-        (emitters[emitter]).new_sub(param, unit);
+        (emitters[emitter]).new_sub(interp, param, unit);
     for (ins = unit->instructions; ins; ins = ins->next) {
-        debug(interpreter, DEBUG_IMC, "emit %I\n", ins);
-        (emitters[emitter]).emit(param, unit, ins);
+        IMCC_debug(interp, DEBUG_IMC, "emit %I\n", ins);
+        (emitters[emitter]).emit(interp, param, unit, ins);
     }
     if (emitters[emitter].end_sub)
-        (emitters[emitter]).end_sub(param, unit);
+        (emitters[emitter]).end_sub(interp, param, unit);
     return 0;
 }
 
 int
-emit_close(void *param)
+emit_close(Interp *interp, void *param)
 {
-#if IMC_TRACE
-    fprintf(stderr, "instructions.c: emit_close()\n");
-#endif
-    return (emitters[emitter]).close(param);
+    return (emitters[emitter]).close(interp, param);
 }
 
 /*

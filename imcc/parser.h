@@ -12,27 +12,13 @@ typedef struct _IdList {
     struct _IdList*  next;
 } IdList;
 
-typedef enum _AsmState {
-    AsmDefault,
-    AsmInDef,
-    AsmInReturn,
-    AsmInYield
-} AsmState;
-
-
-
-
-
 #include "imcparser.h"
 
-EXTERN SymReg* sr_return;
-EXTERN AsmState asm_state;
+/* short ranged globals for lexer state */
 EXTERN int expect_pasm;
-EXTERN int pasm_file;
 EXTERN int is_def;
-EXTERN int IMCC_DEBUG;
-EXTERN int gc_off;
-EXTERN char* output;
+
+/* bison */
 EXTERN int yydebug;
 
 #define KEY_BIT(argnum) (1 << (argnum))
@@ -52,6 +38,7 @@ Instruction * multi_keyed(Interp *interpreter, IMC_Unit *, char *name,
     SymReg ** r, int nr, int keyvec, int emit);
 
 extern void compile_file(Interp *interp, FILE *file);
+extern void compile_string(Interp *interp, char *);
 
 #endif /* PARROT_IMCC_PARSER_H_GUARD */
 

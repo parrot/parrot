@@ -39,14 +39,12 @@ typedef struct _IMC_Unit {
     struct _IMC_Unit * next;
     int local_count;
     SymReg *namespace;
+    int pasm_file;
 } IMC_Unit;
 
 
 IMC_Unit * imc_open_unit(Parrot_Interp, IMC_Unit_Type);
 void imc_close_unit(Parrot_Interp, IMC_Unit *);
-IMC_Unit * imc_new_unit(IMC_Unit_Type);
-void imc_free_unit(Parrot_Interp, IMC_Unit *);
-IMC_Unit * imc_order_for_emit(IMC_Unit * list);
 
 #endif /* PARROT_IMCC_UNIT_H_GUARD */
 

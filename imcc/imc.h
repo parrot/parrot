@@ -62,8 +62,6 @@
  */
 void imc_compile_all_units(Interp *);
 void imc_compile_unit(Interp *, IMC_Unit * unit);
-void imc_close_unit(Interp *, IMC_Unit *);
-void imc_free_unit(Interp *, IMC_Unit *);
 void imc_cleanup(Interp *);
 void imc_pragma(char * str);
 
@@ -92,8 +90,8 @@ int check_op(Interp *, char * fullname, char *op, SymReg *r[],
 int is_op(Interp *, char *);
 char *str_dup(const char *);
 char *str_cat(const char *, const char *);
-int imcc_vfprintf(FILE *fd, const char *format, va_list ap);
-int imcc_fprintf(FILE *fd, const char *fmt, ...);
+int imcc_vfprintf(Interp *, FILE *fd, const char *format, va_list ap);
+int imcc_fprintf(Interp *, FILE *fd, const char *fmt, ...);
 
 
 /* Call convention independant API */
@@ -141,13 +139,7 @@ struct _imc_pragmas {
 
 EXTERN struct _imc_pragmas pragmas;
 
-EXTERN const char * sourcefile;	/* current file */
-EXTERN const char * function;	/* current function */
 EXTERN int        line;	/* and line */
-EXTERN int optimizer_level;
-EXTERN int dont_optimize;
-EXTERN int has_compile;
-EXTERN int allocated;
 
 
 EXTERN enum {
@@ -172,16 +164,48 @@ EXTERN struct imcc_ostat ostat;
 
 struct nodeType_t;
 
-typedef struct _imc_info_t {
+/*
+ * see also imcc/imcc.l struct macro_frame_t
+ */
+struct parser_state_t {
+    struct parser_state_t *next;
+    Interp *interpreter;
+    const char *file;
+    int line;
+    int pasm_file;      /* pasm_file mode of this frame */
+};
 
+typedef enum _AsmState {
+    AsmDefault,
+    AsmInDef,
+    AsmInReturn,
+    AsmInYield
+} AsmState;
+
+void IMCC_push_parser_state(Interp*);
+
+typedef struct _imc_info_t {
+    struct _imc_info_t *prev;
     IMC_Unit * imc_units;
     IMC_Unit * last_unit;
+    int n_comp_units;
     int imcc_warn;
     int verbose;
     int debug;
-    int n_comp_units;
+    int IMCC_DEBUG;
+    int gc_off;
+    char* output;
+    SymReg* sr_return;
+    AsmState asm_state;
+    int optimizer_level;
+    int dont_optimize;
+    int has_compile;
+    int allocated;
+    SymReg ** ghash;
     SymReg  *  cur_namespace;
     struct nodeType_t *top_node;
+
+    struct parser_state_t *state;
 
 } imc_info_t;
 

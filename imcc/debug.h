@@ -18,14 +18,14 @@
 #define DEBUG_PBC_CONST    0x2000
 #define DEBUG_PBC_FIXUP    0x4000
 
-void fatal(int code, const char *func, const char *fmt, ...);
-void fataly(int code, const char *func, int line, const char *fmt, ...);
-void print_inc(const char *file, int lin);
-void warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...);
-void debug(Parrot_Interp interpreter, int level, const char *fmt, ...);
-void info(Parrot_Interp interpreter, int level, const char *fmt, ...);
+void IMCC_fatal(Interp *, int code,  const char *fmt, ...);
+void IMCC_fataly(Interp *, int code, const char *fmt, ...);
+void IMCC_print_inc(Interp *);
+void IMCC_warning(Interp*, const char *fmt, ...);
+void IMCC_debug(Interp*, int level, const char *fmt, ...);
+void IMCC_info(Interp*, int level, const char *fmt, ...);
 
-void dump_instructions(IMC_Unit *);
+void dump_instructions(Interp *, IMC_Unit *);
 void dump_cfg(IMC_Unit *);
 void dump_loops(IMC_Unit *);
 void dump_labels(IMC_Unit *);

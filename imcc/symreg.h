@@ -105,20 +105,20 @@ struct _IMC_Unit;
 
 /* functions */
 
-SymReg * mk_symreg(char *, int t);
-SymReg * mk_temp_reg(int t);
-SymReg * mk_ident(char *, int t);
-SymReg * mk_const(char *, int t);
-SymReg * mk_const_ident(char *, int t, SymReg *, int);
+SymReg * mk_symreg(Interp *, char *, int t);
+SymReg * mk_temp_reg(Interp *, int t);
+SymReg * mk_ident(Interp *, char *, int t);
+SymReg * mk_const(Interp *, char *, int t);
+SymReg * mk_const_ident(Interp *, char *, int t, SymReg *, int);
 
 /* Eventually make mk_address static */
-SymReg * mk_address(char *, int uniq);
+SymReg * mk_address(Interp *, char *, int uniq);
 /* Expose API through these */
-SymReg * mk_sub_label(char *);
-SymReg * mk_sub_address(char *);
-SymReg * mk_local_label(struct _IMC_Unit *, char *);
-SymReg * mk_label_address(struct _IMC_Unit *, char *);
-SymReg * mk_pcc_sub(char *, int proto);
+SymReg * mk_sub_label(Interp *, char *);
+SymReg * mk_sub_address(Interp *, char *);
+SymReg * mk_local_label(Interp *, char *);
+SymReg * mk_label_address(Interp *, char *);
+SymReg * mk_pcc_sub(Interp *, char *, int proto);
 
 char * symreg_to_str(SymReg *);
 void add_pcc_arg(SymReg *r, SymReg * arg);
@@ -163,38 +163,34 @@ enum uniq_t {
 	U_add_uniq_label,
 	U_add_uniq_sub,
 	U_add_all };
-SymReg * mk_pasm_reg(char *);
+SymReg * mk_pasm_reg(Interp*, char *);
 
 
 void free_sym(SymReg *r);
 void store_symreg(SymReg * r);
-SymReg * find_sym(const char * name);
+SymReg * find_sym(Interp *, const char * name);
 SymReg * get_sym(const char * name);
+SymReg* get_pasm_reg(Interp* interpreter, char *name);
+SymReg* get_const(Interp *interpreter, const char *name, int type);
 SymReg * _get_sym(SymReg * hash[], const char * name);
 SymReg * _mk_symreg(SymReg* hash[],char * name, int t);
 SymReg * _mk_const(SymReg *hash[], char * name, int t);
 void _store_symreg(SymReg *hash[], SymReg * r);
-SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
-SymReg * link_keys(int nargs, SymReg *keys[]);
+SymReg * _mk_address(Interp *, SymReg *hash[], char * name, int uniq);
+SymReg * link_keys(Interp *, int nargs, SymReg *keys[]);
 void clear_locals(struct _IMC_Unit *);
 void clear_sym_hash(SymReg **);
-void clear_globals(void);
+void clear_globals(Interp *);
 unsigned int  hash_str(const char * str);
-void _delete_sym(struct _IMC_Unit *, const char * name);
+void _delete_sym(Interp *, struct _IMC_Unit *, const char * name);
 SymReg * dup_sym(SymReg *r);
 
-SymReg * _find_sym(Namespace * ns, SymReg * hash[], const char * name);
+SymReg * _find_sym(Interp *,Namespace * ns, SymReg * hash[], const char * name);
 char * _mk_fullname(Namespace * ns, const char * name);
 char * mk_fullname(const char * name);
 void push_namespace(char * name);
 void pop_namespace(char * name);
 
-/* globals */
-
-/* Now local to each unit
-  EXTERN SymReg * hash[HASH_SIZE];
-*/
-EXTERN SymReg * ghash[HASH_SIZE];
 
 #endif /* PARROT_IMCC_SYMREG_H_GUARD */
 

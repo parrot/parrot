@@ -119,8 +119,9 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     int len;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
-        if (pasm_file) {
-            fataly(EX_UNAVAILABLE, sourcefile, line, "Ident as PMC constant",
+        if (IMCC_INFO(interp)->state->pasm_file) {
+            IMCC_fataly(interp, E_SyntaxError,
+            "Ident as PMC constant",
                 " %s\n", left->name);
         }
         left->type = VTIDENTIFIER;
@@ -133,15 +134,15 @@ mk_pmc_const(Parrot_Interp interp, IMC_Unit *unit,
     constant[len - 1] = '\0';
     strcpy(name, constant + 1);
     free(constant);
-    rhs = mk_const(name, 'p');
+    rhs = mk_const(interp, name, 'p');
     r[1] = rhs;
     switch (type_enum) {
         case enum_class_Sub:
             rhs->usage = U_FIXUP;
             return INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
     }
-    fataly(EX_UNAVAILABLE, sourcefile, line, "Unknown PMC constant",
-        " type %d", type_enum);
+    IMCC_fataly(interp, E_SyntaxError,
+        "Unknown PMC constant type %d", type_enum);
     return NULL;
 }
 
@@ -199,7 +200,6 @@ static Instruction * iLABEL(IMC_Unit * unit, SymReg * r0) {
 
 static Instruction * iSUBROUTINE(IMC_Unit * unit, SymReg * r0) {
     Instruction *i;
-    function = r0->name;
     i =  iLABEL(unit, r0);
     i->line = line - 1;
     return i;
@@ -213,7 +213,7 @@ iINDEXFETCH(Interp *interp, IMC_Unit * unit, SymReg * r0, SymReg * r1,
     SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * r3 = mk_const(str_dup("1"), 'I');
+        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
         return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
     }
     keyvec |= KEY_BIT(2);
@@ -229,7 +229,7 @@ iINDEXSET(Interp *interp, IMC_Unit * unit,
           SymReg * r0, SymReg * r1, SymReg * r2)
 {
     if(r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * r3 = mk_const(str_dup("1"), 'I');
+        SymReg * r3 = mk_const(interp, str_dup("1"), 'I');
         MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1,r3, r2);
     }
     else if (r0->set == 'P') {
@@ -237,7 +237,8 @@ iINDEXSET(Interp *interp, IMC_Unit * unit,
 	MK_I(interp, unit, "set %s[%s], %s", 3, r0,r1,r2);
     }
     else {
-        fataly(EX_SOFTWARE, sourcefile, line,"unsupported indexed set op\n");
+        IMCC_fataly(interp, E_SyntaxError,
+            "unsupported indexed set op\n");
     }
     return 0;
 }
@@ -254,9 +255,8 @@ IMCC_create_itcall_label(Interp* interpreter)
     SymReg * r;
     Instruction *i;
 
-    UNUSED(interpreter);
     sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
-    r = mk_pcc_sub(str_dup(name), 0);
+    r = mk_pcc_sub(interpreter, str_dup(name), 0);
     current_call = i = iLABEL(cur_unit, r);
     i->type = ITCALL | ITPCCSUB;
     return i;
@@ -264,25 +264,24 @@ IMCC_create_itcall_label(Interp* interpreter)
 
 
 static SymReg *
-mk_sub_address_fromc(char * name)
+mk_sub_address_fromc(Interp *interp, char * name)
 {
     /* name is a quoted sub name */
     SymReg *r;
 
     name[strlen(name) - 1] = '\0';
-    r = mk_sub_address(str_dup(name + 1));
+    r = mk_sub_address(interp, str_dup(name + 1));
     mem_sys_free(name);
     return r;
 }
 
 void
-IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
+IMCC_itcall_sub(Interp* interp, SymReg* sub)
 {
-   UNUSED(interpreter);
    current_call->r[0]->pcc_sub->sub = sub;
    if (cur_obj) {
        if (cur_obj->set != 'P')
-          fataly(1, sourcefile, line, "object isn't a PMC");
+        IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
        current_call->r[0]->pcc_sub->object = cur_obj;
        cur_obj = NULL;
    }
@@ -295,21 +294,21 @@ IMCC_itcall_sub(Interp* interpreter, SymReg* sub)
 }
 
 static void
-begin_return_or_yield(int yield)
+begin_return_or_yield(Interp *interp, int yield)
 {
     Instruction *i, *ins;
     char name[128];
     ins = cur_unit->instructions;
     if(!ins || !ins->r[1] || ins->r[1]->type != VT_PCC_SUB)
-       fataly(EX_SOFTWARE, sourcefile, line,
+        IMCC_fataly(interp, E_SyntaxError,
               "yield or return directive outside pcc subroutine\n");
     if(yield)
        ins->r[1]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
     sprintf(name, yield ? "%cpcc_sub_yield_%d" : "%cpcc_sub_ret_%d", IMCC_INTERNAL_CHAR, cnr++);
-    sr_return = mk_pcc_sub(str_dup(name), 0);
-    i = iLABEL(cur_unit, sr_return);
+    interp->imc_info->sr_return = mk_pcc_sub(interp, str_dup(name), 0);
+    i = iLABEL(cur_unit, interp->imc_info->sr_return);
     i->type = yield ? ITPCCSUB | ITLABEL | ITPCCYIELD : ITPCCSUB | ITLABEL ;
-    asm_state = yield ? AsmInYield : AsmInReturn;
+    interp->imc_info->asm_state = yield ? AsmInYield : AsmInReturn;
 }
 
 
@@ -413,26 +412,28 @@ compilation_unit:
    | sub           { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
    | pcc_sub       { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
    | emit          { $$ = $1; imc_close_unit(interp, cur_unit); cur_unit = 0; }
-   | MACRO '\n'    { $$ = 0;  imc_close_unit(interp, cur_unit); cur_unit = 0; }
+   | MACRO '\n'    { $$ = 0;  }
    | '\n'          { $$ = 0; }
    ;
 
 global:
      GLOBAL type IDENTIFIER
          {
-            fataly(EX_SOFTWARE, sourcefile, line, ".global not implemented yet\n");
+            IMCC_fataly(interp, E_SyntaxError,
+                ".global not implemented yet\n");
             $$ = 0;
          }
    | GLOBAL type IDENTIFIER '=' const
          {
-            fataly(EX_SOFTWARE, sourcefile, line, ".global not implemented yet\n");
+            IMCC_fataly(interp, E_SyntaxError,
+                ".global not implemented yet\n");
             $$ = 0;
          }
    ;
 
 constdef:
      CONST { is_def=1; } type IDENTIFIER '=' const
-                                    { mk_const_ident($4, $3, $6, 1);is_def=0; }
+                { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
    ;
 
 pmc_const:
@@ -459,8 +460,8 @@ pasm_inst:         { clear_state(); }
                      free($2); }
    | PCC_SUB pcc_sub_proto LABEL
                    {
-                     $$ = iSUBROUTINE(cur_unit, mk_sub_label($3));
-                     $$->r[1] = mk_pcc_sub(str_dup($$->r[0]->name), 0);
+                     $$ = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
+                     $$->r[1] = mk_pcc_sub(interp, str_dup($$->r[0]->name), 0);
                      add_namespace(interp, cur_unit);
                      $$->r[1]->pcc_sub->pragma = $2;
                    }
@@ -472,12 +473,11 @@ pasm_args:
    ;
 
 emit:
-     EMIT          { cur_unit = imc_open_unit(interp, IMC_PASM);
-                     function = "(emit)"; }
+     EMIT          { cur_unit = imc_open_unit(interp, IMC_PASM); }
      opt_pasmcode
      EOM           { /*
                       if (optimizer_level & OPT_PASM)
-                         imc_compile_unit(interp, IMC_INFO(interp)->cur_unit);
+                         imc_compile_unit(interp, IMCC_INFO(interp)->cur_unit);
                          emit_flush(interp);
                      */
                      $$=0; }
@@ -493,7 +493,7 @@ class_namespace:
                 {
                     int re_open = 0;
                     $$=0;
-                    if (pasm_file && cur_namespace) {
+                    if (IMCC_INFO(interp)->state->pasm_file && cur_namespace) {
                         imc_close_unit(interp, cur_unit);
                         re_open = 1;
                     }
@@ -541,7 +541,7 @@ field_decl:
                    {
                       Symbol * sym = new_symbol($3);
                       if(lookup_field_symbol(current_class, $3)) {
-                         fataly(EX_SOFTWARE, sourcefile, line,
+                        IMCC_fataly(interp, E_SyntaxError,
                             "field '%s' previously declared in class '%s'\n",
                             $3, current_class->sym->name);
                       }
@@ -556,7 +556,7 @@ method_decl:
            Method * meth;
            Symbol * sym = new_symbol($2);
            if(lookup_method_symbol(current_class, $2)) {
-              fataly(EX_SOFTWARE, sourcefile, line,
+                IMCC_fataly(interp, E_SyntaxError,
                  "method '%s' previously declared in class '%s'\n",
                     $2, current_class->sym->name);
            }
@@ -575,7 +575,7 @@ sub:
      sub_label_op_c pcc_sub_proto '\n'
         {
           Instruction *i = iSUBROUTINE(cur_unit, $3);
-          i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+          i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
           add_namespace(interp, cur_unit);
           i->r[1]->pcc_sub->pragma = $4;
         }
@@ -591,7 +591,7 @@ sub_params:
 
 sub_param:
      PARAM                             { is_def=1; }
-     type IDENTIFIER                   { $$ = mk_ident($4, $3); is_def=0; }
+     type IDENTIFIER          { $$ = mk_ident(interp, $4, $3); is_def=0; }
    ;
 
 sub_body:
@@ -603,8 +603,8 @@ pcc_sub:
      PCC_SUB       { cur_unit = imc_open_unit(interp, IMC_PCCSUB); }
      IDENTIFIER pcc_sub_proto '\n'
          {
-            Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label($3));
-            i->r[1] = $<sr>$ = mk_pcc_sub(str_dup(i->r[0]->name), 0);
+            Instruction *i = iSUBROUTINE(cur_unit, mk_sub_label(interp, $3));
+            i->r[1] = $<sr>$ = mk_pcc_sub(interp, str_dup(i->r[0]->name), 0);
             add_namespace(interp, cur_unit);
             i->r[1]->pcc_sub->pragma = $4;
          }
@@ -620,7 +620,7 @@ pcc_params:
 
 pcc_param:
      PARAM                             { is_def=1; }
-     type IDENTIFIER                   { $$ = mk_ident($4, $3); is_def=0; }
+     type IDENTIFIER            { $$ = mk_ident(interp, $4, $3); is_def=0; }
    ;
 
 pcc_sub_call:
@@ -631,7 +631,7 @@ pcc_sub_call:
             Instruction *i;
 
             sprintf(name, "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR, cnr++);
-            $<sr>$ = r = mk_pcc_sub(str_dup(name), 0);
+            $<sr>$ = r = mk_pcc_sub(interp, str_dup(name), 0);
             r->pcc_sub->pragma = $2;
             /* this mid rule action has the semantic value of the
              * sub SymReg.
@@ -701,13 +701,13 @@ pcc_call:
    | METH_CALL target '\n'
          {  add_pcc_sub(current_call->r[0], $2); }
    | METH_CALL STRINGC '\n'
-         {  add_pcc_sub(current_call->r[0], mk_const($2,'S')); }
+         {  add_pcc_sub(current_call->r[0], mk_const(interp, $2,'S')); }
    | METH_CALL target COMMA var '\n'
          {  add_pcc_sub(current_call->r[0], $2);
             add_pcc_cc(current_call->r[0], $4);
          }
    | METH_CALL STRINGC COMMA var '\n'
-         {  add_pcc_sub(current_call->r[0], mk_const($2,'S'));
+         {  add_pcc_sub(current_call->r[0], mk_const(interp, $2,'S'));
             add_pcc_cc(current_call->r[0], $4);
          }
    ;
@@ -731,7 +731,7 @@ pcc_result:
      RESULT target
          {  $$ = $2; }
    | LOCAL { is_def=1; } type IDENTIFIER
-         {  mk_ident($4, $3); is_def=0; $$=0; }
+         {  mk_ident(interp, $4, $3); is_def=0; $$=0; }
    ;
 
 begin_ret_or_yield:
@@ -746,11 +746,11 @@ end_ret_or_yield:
 
 pcc_ret:
     begin_ret_or_yield   '\n'
-    { begin_return_or_yield($1); }
+    { begin_return_or_yield(interp, $1); }
      pcc_returns
      end_ret_or_yield
-         { $$ = 0;  asm_state = AsmDefault; }
-   | pcc_return_many { asm_state = AsmDefault; $$ = 0;  }
+         { $$ = 0;   IMCC_INFO(interp)->asm_state = AsmDefault; }
+   | pcc_return_many {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
 
    ;
 
@@ -758,9 +758,9 @@ pcc_ret:
 pcc_returns:
      /* empty */   {  $$ = 0; }
    | pcc_returns '\n'
-                   {  if($1) add_pcc_return(sr_return, $1); }
+                   {  if($1) add_pcc_return(IMCC_INFO(interp)->sr_return, $1); }
    | pcc_returns pcc_return '\n'
-                   {  if($2) add_pcc_return(sr_return, $2); }
+                   {  if($2) add_pcc_return(IMCC_INFO(interp)->sr_return, $2); }
    ;
 
 pcc_return:
@@ -768,14 +768,26 @@ pcc_return:
    ;
 
 pcc_return_many:
-    RETURN  '(' {  if(asm_state == AsmDefault)   begin_return_or_yield(0); } var_returns  ')' { asm_state = AsmDefault; $$ = 0;  }
-  | YIELDT  '(' {  if(asm_state == AsmDefault)   begin_return_or_yield(1); } var_returns  ')' { asm_state = AsmDefault; $$ = 0;  }
+    RETURN  '('
+        {
+            if ( IMCC_INFO(interp)->asm_state == AsmDefault)
+                begin_return_or_yield(interp, 0);
+        }
+    var_returns  ')'
+        {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
+  | YIELDT  '('
+        {
+            if ( IMCC_INFO(interp)->asm_state == AsmDefault)
+                begin_return_or_yield(interp, 1);
+        }
+    var_returns  ')'
+        {  IMCC_INFO(interp)->asm_state = AsmDefault; $$ = 0;  }
   ;
 
 var_returns:
     /* empty */ { $$ = 0; }
-  | var                     {  add_pcc_return(sr_return, $1);    }
-  | var_returns COMMA var   {  add_pcc_return(sr_return, $3);    }
+  | var                     {  add_pcc_return(IMCC_INFO(interp)->sr_return, $1);    }
+  | var_returns COMMA var   {  add_pcc_return(IMCC_INFO(interp)->sr_return, $3);    }
   ;
 
 
@@ -816,8 +828,7 @@ _labels:
 
 label:
      LABEL         {
-                     /* $$ = iLABEL(cur_unit, mk_address($1, U_add_uniq_label)); */
-                     $$ = iLABEL(cur_unit, mk_local_label(cur_unit, $1));
+                     $$ = iLABEL(cur_unit, mk_local_label(interp, $1));
                    }
    ;
 
@@ -852,7 +863,7 @@ labeled_inst:
         IdList* l = $4;
          while(l) {
              IdList* l1;
-             mk_ident(l->id, $3);
+             mk_ident(interp, l->id, $3);
              l1 = l;
              l = l->next;
              free(l1);
@@ -861,12 +872,13 @@ labeled_inst:
 
    }
    | CONST { is_def=1; } type IDENTIFIER '=' const
-                                    { mk_const_ident($4, $3, $6, 0);is_def=0; }
+                    { mk_const_ident(interp, $4, $3, $6, 0);is_def=0; }
    | pmc_const
    | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
-                                    { mk_const_ident($4, $3, $6, 1);is_def=0; }
-   | PARAM { is_def=1; } type IDENTIFIER { $$ = MK_I(interp, cur_unit, "restore",
-		                            1, mk_ident($4, $3));is_def=0; }
+                    { mk_const_ident(interp, $4, $3, $6, 1);is_def=0; }
+   | PARAM { is_def=1; } type IDENTIFIER
+                    { $$ = MK_I(interp, cur_unit, "restore",
+                                1, mk_ident(interp, $4, $3));is_def=0; }
    | PARAM reg                        { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
    | RESULT var                       { $$ = MK_I(interp, cur_unit, "restore", 1, $2); }
    | ARG var                          { $$ = MK_I(interp, cur_unit, "save", 1, $2); }
@@ -906,7 +918,8 @@ classname:
          {
             if (( cur_pmc_type = pmc_type(interp,
                   string_from_cstring(interp, $1, 0))) <= 0) {
-               fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", $1);
+                IMCC_fataly(interp, E_SyntaxError,
+                   "Unknown PMC type '%s'\n", $1);
             }
          }
    ;
@@ -960,17 +973,17 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "new", 3, $1, $4, $6); }
    | target '=' newsub IDENTIFIER
                         { $$ = iNEWSUB(interp, cur_unit, $1, $3,
-                                          mk_sub_address($4), NULL, 1); }
+                                  mk_sub_address(interp, $4), NULL, 1); }
    | target '=' newsub IDENTIFIER COMMA IDENTIFIER
                         { /* XXX: Fix 4arg version of newsub PASM op
                               * to use $1 instead of implicit P0
                               */
                               $$ = iNEWSUB(interp, cur_unit, NULL, $3,
-                                           mk_sub_address($4),
-                                           mk_sub_address($6), 1); }
+                                           mk_sub_address(interp, $4),
+                                           mk_sub_address(interp, $6), 1); }
    | target '=' ADDR IDENTIFIER
                         { $$ = MK_I(interp, cur_unit, "set_addr",
-                                    2, $1, mk_label_address(cur_unit, $4)); }
+                            2, $1, mk_label_address(interp, $4)); }
    | target '=' GLOBALOP string
                         { $$ = MK_I(interp, cur_unit, "find_global",2,$1,$4);}
    | GLOBALOP string '=' var
@@ -1040,14 +1053,15 @@ func_assign:
                    }
    ;
 
-the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
-       | STRINGC  { $$ = mk_sub_address_fromc($1); }
+the_sub: IDENTIFIER  { $$ = mk_sub_address(interp, $1); }
+       | STRINGC  { $$ = mk_sub_address_fromc(interp, $1); }
        | target   { $$ = $1;
                        if ($1->set != 'P')
-                          fataly(1, sourcefile, line, "Sub isn't a PMC");
+                            IMCC_fataly(interp, E_SyntaxError,
+                                  "Sub isn't a PMC");
                      }
        | target ptr sub_label_op  { cur_obj = $1; $$ = $3; }
-       | target ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
+       | target ptr STRINGC    { cur_obj = $1; $$ = mk_const(interp, $3, 'S'); }
        | target ptr target     { cur_obj = $1; $$ = $3; }
    ;
 
@@ -1133,17 +1147,17 @@ _var_or_i:
    ;
 sub_label_op_c:
      sub_label_op
-   | STRINGC       { $$ = mk_sub_address_fromc($1); }
+   | STRINGC       { $$ = mk_sub_address_fromc(interp, $1); }
    ;
 
 sub_label_op:
-     IDENTIFIER    { $$ = mk_sub_address($1); }
-   | PARROT_OP     { $$ = mk_sub_address($1); }
+     IDENTIFIER    { $$ = mk_sub_address(interp, $1); }
+   | PARROT_OP     { $$ = mk_sub_address(interp, $1); }
    ;
 
 label_op:
-     IDENTIFIER    { $$ = mk_label_address(cur_unit, $1); }
-   | PARROT_OP     { $$ = mk_label_address(cur_unit, $1); }
+     IDENTIFIER    { $$ = mk_label_address(interp, $1); }
+   | PARROT_OP     { $$ = mk_label_address(interp, $1); }
    ;
 
 var_or_i:
@@ -1157,7 +1171,7 @@ var:
    ;
 
 keylist:           {  nkeys=0; in_slice = 0; }
-     _keylist      {  $$ = link_keys(nkeys, keys); }
+     _keylist      {  $$ = link_keys(interp, nkeys, keys); }
    ;
 
 _keylist:
@@ -1182,23 +1196,23 @@ key:
    ;
 
 reg:
-     IREG          {  $$ = mk_symreg($1, 'I'); }
-   | NREG          {  $$ = mk_symreg($1, 'N'); }
-   | SREG          {  $$ = mk_symreg($1, 'S'); }
-   | PREG          {  $$ = mk_symreg($1, 'P'); }
-   | REG           {  $$ = mk_pasm_reg($1); }
+     IREG          {  $$ = mk_symreg(interp, $1, 'I'); }
+   | NREG          {  $$ = mk_symreg(interp, $1, 'N'); }
+   | SREG          {  $$ = mk_symreg(interp, $1, 'S'); }
+   | PREG          {  $$ = mk_symreg(interp, $1, 'P'); }
+   | REG           {  $$ = mk_pasm_reg(interp, $1); }
    ;
 
 const:
-     INTC          {  $$ = mk_const($1, 'I'); }
-   | FLOATC        {  $$ = mk_const($1, 'N'); }
-   | STRINGC       {  $$ = mk_const($1, 'S'); }
-   | USTRINGC      {  $$ = mk_const($1, 'U'); }
+     INTC          {  $$ = mk_const(interp, $1, 'I'); }
+   | FLOATC        {  $$ = mk_const(interp, $1, 'N'); }
+   | STRINGC       {  $$ = mk_const(interp, $1, 'S'); }
+   | USTRINGC      {  $$ = mk_const(interp, $1, 'U'); }
    ;
 
 string:
-     SREG          {  $$ = mk_symreg($1, 'S'); }
-   | STRINGC       {  $$ = mk_const($1, 'S'); }
+     SREG          {  $$ = mk_symreg(interp, $1, 'S'); }
+   | STRINGC       {  $$ = mk_const(interp, $1, 'S'); }
    ;
 
 
@@ -1208,8 +1222,9 @@ string:
 
 int yyerror(char * s)
 {
+    /* XXX */
+    IMCC_fataly(NULL, E_SyntaxError, s);
     /* fprintf(stderr, "last token = [%s]\n", yylval.s); */
-    fataly(EX_UNAVAILABLE, sourcefile, line, "%s\n", s);
     return 0;
 }
 

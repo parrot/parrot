@@ -30,8 +30,9 @@
 void imcc_init(Parrot_Interp interpreter);
 PMC * imcc_compile_pir(Parrot_Interp interp, const char *s);
 PMC * imcc_compile_pasm(Parrot_Interp interp, const char *s);
-PMC * imcc_compile(Parrot_Interp interp, const char *s);
 void *imcc_compile_file(Parrot_Interp interp, const char *s);
+
+static PMC * imcc_compile(Parrot_Interp interp, const char *s, int pasm);
 static const char * try_rev_cmp(Parrot_Interp, IMC_Unit * unit, char *name,
         SymReg ** r);
 
@@ -54,10 +55,11 @@ iNEW(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
             string_from_cstring(interpreter, *type == '.' ?type+1:type, 0));
 
     sprintf(fmt, "%d", pmc_num);
-    pmc = mk_const(str_dup(fmt), 'I');
+    pmc = mk_const(interpreter, str_dup(fmt), 'I');
 
     if (pmc_num <= 0)
-        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", type);
+        IMCC_fataly(interpreter, E_SyntaxError,
+                "Unknown PMC type '%s'\n", type);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage = U_NEW;
     if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
@@ -109,7 +111,7 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
        case NEWCOR: classnm = "Coroutine"; break;
        case NEWCONT: classnm = "Continuation"; break;
        default:
-          fataly(1, sourcefile, line,
+        IMCC_fataly(interpreter, E_SyntaxError,
              "iNEWSUB: unimplemented classtype '%d'\n", type);
     }
 
@@ -117,10 +119,11 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
             string_from_cstring(interpreter, classnm, 0));
 
     sprintf(fmt, "%d", pmc_num);
-    subpmc = mk_const(str_dup(fmt), 'I');
+    subpmc = mk_const(interpreter, str_dup(fmt), 'I');
 
     if (pmc_num <= 0)
-        fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", classnm);
+        IMCC_fataly(interpreter, E_SyntaxError,
+            "Unknown PMC type '%s'\n", classnm);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, classnm);
 
     /* 1st form:   px = newsub _foo */
@@ -141,7 +144,8 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
      */
     else {
         if (!subinit) { /* sanity check */
-            fataly(1, sourcefile, line, "iNEWSUB: NULL $0 for newsub\n");
+            IMCC_fataly(interpreter, E_SyntaxError,
+                "iNEWSUB: NULL $0 for newsub\n");
         }
 
         /* The return continuation */
@@ -149,7 +153,7 @@ iNEWSUB(Interp *interpreter, IMC_Unit * unit, SymReg * r0,
                 string_from_cstring(interpreter, "RetContinuation", 0));
 
         sprintf(fmt, "%d", pmc_num);
-        retpmc = mk_const(str_dup(fmt), 'I');
+        retpmc = mk_const(interpreter, str_dup(fmt), 'I');
 
         regs[0] = subpmc;
         regs[1] = retpmc;
@@ -332,7 +336,8 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
     else
         strcpy(fullname, name);
     if (op < 0) {
-        fataly(EX_SOFTWARE, sourcefile, line,"op not found '%s' (%s<%d>)\n",
+        IMCC_fataly(interpreter, E_SyntaxError,
+            "op not found '%s' (%s<%d>)\n",
                 fullname, name, n);
     }
     op_info = &interpreter->op_info_table[op];
@@ -342,7 +347,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
      * build instruction format
      * set LV_in / out flags */
     if (n != op_info->arg_count-1)
-        fataly(EX_SOFTWARE, sourcefile, line,
+        IMCC_fataly(interpreter, E_SyntaxError,
                 "arg count mismatch: op #%d '%s' needs %d given %d",
                 op, fullname, op_info->arg_count-1, n);
     for (i = 0; i < op_info->arg_count-1; i++) {
@@ -378,7 +383,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         strcpy(format, fmt);
     memset(r + n, 0, sizeof(*r) * (IMCC_MAX_REGS - n));
 #if 1
-    debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
+    IMCC_debug(interpreter, DEBUG_PARSER,"%s %s\t%s\n", name, format, fullname);
 #endif
     /* make the instruction */
 
@@ -423,7 +428,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             ins->type |= ITBRANCH | (1 << i);
         else {
             if (r[i]->type == VTADDRESS)
-                fataly(EX_SOFTWARE, sourcefile, line,
+                IMCC_fataly(interpreter, E_SyntaxError,
                         "undefined identifier '%s'\n", r[i]->name);
         }
     }
@@ -435,7 +440,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
                 !strcmp(fullname, "jsr_i") ||
                 !strcmp(fullname, "branch_i") ||
                 !strcmp(fullname, "bsr_i"))
-            dont_optimize = 1;
+            IMCC_INFO(interpreter)->dont_optimize = 1;
     }
     else if (!strcmp(name, "set") && n == 2) {
         /* set Px, Py: both PMCs have the same address */
@@ -444,7 +449,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
             ins->type |= ITALIAS;
     }
     else if (!strcmp(name, "compile"))
-        ++has_compile;
+        ++IMCC_INFO(interpreter)->has_compile;
 found_ins:
     if (emit)
         emitb(unit, ins);
@@ -464,49 +469,61 @@ extern SymReg *cur_namespace; /* s. imcc.y */
 
 
 PMC *
-imcc_compile(Parrot_Interp interp, const char *s)
+imcc_compile(Parrot_Interp interp, const char *s, int pasm_file)
 {
     /* imcc always compiles to interp->code->byte_code
      * save old cs, make new
      */
-    const char *source = sourcefile;
     char name[64];
     struct PackFile_ByteCode *old_cs, *new_cs;
     PMC *sub;
     parrot_sub_t sub_data;
+    struct _imc_info_t *imc_info = NULL;
+    union {
+        const void * __c_ptr;
+        void * __ptr;
+    } __ptr_u;
+
+    if (interp->imc_info->last_unit) {
+        /* got a reentrant compile */
+        imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+        imc_info->ghash = interp->imc_info->ghash;
+        imc_info->prev = interp->imc_info;
+        interp->imc_info = imc_info;
+    }
 
     sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->eval_nr);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;
-    sourcefile = name;
     /* spit out the sourcefile */
     if (Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) {
-        FILE *fp = fopen(sourcefile, "w");
+        FILE *fp = fopen(name, "w");
         if (fp) {
             fputs(s, fp);
             fclose(fp);
         }
     }
-    /* reset line number */
-    line = 1;
-    yy_scan_string(s);
-    /* s. also e_pbc_open for reusing code/consts ... */
-    emit_open(1, interp);
-    /* XXX where to put constants */
-    yyparse((void *) interp);
-    imc_compile_all_units(interp);
+    IMCC_push_parser_state(interp);
+    if (imc_info)
+        interp->imc_info->state->next = NULL;
+    IMCC_INFO(interp)->state->pasm_file = pasm_file;
+    IMCC_INFO(interp)->state->file = name;
+    expect_pasm = 0;
+
+    compile_string(interp, const_cast(s));
 
     PackFile_fixup_subs(interp, PBC_MAIN);
     if (old_cs) {
         /* restore old byte_code, */
         (void)Parrot_switch_to_cs(interp, old_cs, 0);
     }
-    sourcefile = source;
 
     /*
      * create sub PMC
+     *
+     * TODO if a sub was denoted @MAIN return that instead
      */
     sub = pmc_new(interp, enum_class_Eval);
     sub_data = PMC_sub(sub);
@@ -515,35 +532,28 @@ imcc_compile(Parrot_Interp interp, const char *s)
     sub_data->end = new_cs->base.data + new_cs->base.size;
     sub_data->name = string_from_cstring(interp, name, 0);
 
+    if (imc_info) {
+        interp->imc_info = imc_info->prev;
+        mem_sys_free(imc_info);
+        imc_info = interp->imc_info;
+        cur_unit = imc_info->last_unit;
+        cur_namespace = imc_info->cur_namespace;
+    }
+    else
+        imc_cleanup(interp);
     return sub;
 }
 
 PMC *
 imcc_compile_pasm(Parrot_Interp interp, const char *s)
 {
-    int pasm = pasm_file;
-    PMC *sub;
-
-    pasm_file = 1;
-    expect_pasm = 0;
-    sub = imcc_compile(interp, s);
-    imc_cleanup(interp);
-    pasm_file = pasm;
-    return sub;
+    return imcc_compile(interp, s, 1);
 }
 
 PMC *
 imcc_compile_pir (Parrot_Interp interp, const char *s)
 {
-    int pasm = pasm_file;
-    PMC *sub;
-
-    pasm_file = 0;
-    expect_pasm = 0;
-    sub = imcc_compile(interp, s);
-    imc_cleanup(interp);
-    pasm_file = pasm;
-    return sub;
+    return imcc_compile(interp, s, 0);
 }
 
 
@@ -555,21 +565,26 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 {
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf;
-    const char *source = sourcefile;
     char *ext, *fullname = NULL;   /* gc uninit warning */
-    int pasm = pasm_file;
-    FILE *new;
-    union {
-        const void * __c_ptr;
-        void * __ptr;
-    } __ptr_u;
+    FILE *fp;
+    struct _imc_info_t *imc_info = NULL;
+
+    if (interp->imc_info->last_unit) {
+        /* got a reentrant compile */
+        imc_info = mem_sys_allocate_zeroed(sizeof(imc_info_t));
+        imc_info->ghash = interp->imc_info->ghash;
+        imc_info->prev = interp->imc_info;
+        interp->imc_info = imc_info;
+    }
 
     fullname = Parrot_locate_runtime_file(interp, s, PARROT_RUNTIME_FT_SOURCE);
     if (!fullname)
-        fatal(1, "imcc_compile_file", "couldn't find '%s'\n", s);
-    if (!(new = fopen(fullname, "r"))) {
-        fatal(1, "imcc_compile_file", "couldn't open '%s'\n", fullname);
-	string_cstring_free(fullname);
+        IMCC_fatal(interp, E_IOError,
+                "imcc_compile_file: couldn't find '%s'\n", s);
+    if (!(fp = fopen(fullname, "r"))) {
+        IMCC_fatal(interp, E_IOError,
+                "imcc_compile_file: couldn't open '%s'\n", fullname);
+        string_cstring_free(fullname);
         return NULL;
     }
 
@@ -581,31 +596,35 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     IMCC_INFO(interp)->cur_namespace = NULL;
     pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
-    sourcefile = const_cast(s);
+    IMCC_push_parser_state(interp);
+    IMCC_INFO(interp)->state->file = s;
     ext = strrchr(fullname, '.');
     line = 1;
 
     if (ext && strcmp (ext, ".pasm") == 0) {
-        pasm_file = 1;
+        IMCC_INFO(interp)->state->pasm_file = 1;
         /* see imcc.l */
-        compile_file(interp, new);
+        compile_file(interp, fp);
     }
     else if (ext && strcmp (ext, ".past") == 0) {
-        IMCC_ast_compile(interp, new);
+        IMCC_ast_compile(interp, fp);
     }
     else {
-        pasm_file = 0;
-        compile_file(interp, new);
+        IMCC_INFO(interp)->state->pasm_file = 0;
+        compile_file(interp, fp);
     }
 
     imc_cleanup(interp);
+    fclose(fp);
 
     if (pf_save)
         (void)Parrot_switch_to_cs(interp, pf_save->cur_cs, 0);
-    sourcefile = source;
-    pasm_file = pasm;
-    fclose(new);
     string_cstring_free(fullname);
+
+    if (imc_info) {
+        interp->imc_info = imc_info->prev;
+        mem_sys_free(imc_info);
+    }
     return pf;
 }
 
@@ -636,7 +655,7 @@ change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
-        s = mk_const(str_dup(r[num]->name), 'N');
+        s = mk_const(interpreter, str_dup(r[num]->name), 'N');
         r[num] = s;
         changed = 1;
     }
@@ -649,13 +668,13 @@ change_op(Interp *interpreter, IMC_Unit *unit, SymReg **r, int num, int emit)
          */
         SymReg *rr[IMCC_MAX_REGS];
 
-        rr[0] = mk_temp_reg('N');
+        rr[0] = mk_temp_reg(interpreter, 'N');
         rr[1] = r[num];
         INS(interpreter, unit, "set", NULL, rr, 2, 0, 1);
         r[num] = rr[0];
         changed = 1;
         /* need to allocate the temp - run reg_alloc */
-        optimizer_level |= OPT_PASM;
+        IMCC_INFO(interpreter)->optimizer_level |= OPT_PASM;
     }
     return changed;
 }
@@ -809,7 +828,8 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
     kv = keyvec;
     for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
         if (kv & 1) {
-            fataly(EX_SOFTWARE, sourcefile, line,"illegal key operand\n");
+            IMCC_fataly(interpreter, E_SyntaxError,
+                "illegal key operand\n");
         }
         /* make a new P symbol */
         while (1) {
@@ -817,12 +837,13 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
             if (get_sym(buf) == 0)
                 break;
         }
-        preg[n] = mk_symreg(str_dup(buf), 'P');
+        preg[n] = mk_symreg(interpreter, str_dup(buf), 'P');
         kv >>= 1;
         if (kv & 1) {
             /* we have a keyed operand */
             if (r[i]->set != 'P') {
-                fataly(EX_SOFTWARE, sourcefile, line,"not an aggregate\n");
+                IMCC_fataly(interpreter, E_SyntaxError,
+                    "not an aggregate\n");
             }
             /* don't emit LHS yet */
             if (i == 0) {
@@ -867,19 +888,19 @@ multi_keyed(Interp *interpreter, IMC_Unit * unit, char *name,
 }
 
 int
-imcc_fprintf(FILE *fd, const char *fmt, ...)
+imcc_fprintf(Interp *interp, FILE *fd, const char *fmt, ...)
 {
     va_list ap;
     int len;
 
     va_start(ap, fmt);
-    len = imcc_vfprintf(fd, fmt, ap);
+    len = imcc_vfprintf(interp, fd, fmt, ap);
     va_end(ap);
     return len;
 }
 
 int
-imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
+imcc_vfprintf(Interp *interp, FILE *fd, const char *format, va_list ap) {
     int len;
     const char *cp;
     const char *fmt;
@@ -956,7 +977,7 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
             case 'I':
                 _ins = va_arg(ap, Instruction *);
                 len += fprintf(fd, "%s ", _ins->op);
-                len += ins_print(fd, _ins);
+                len += ins_print(interp, fd, _ins);
                 break;
         }
     }
@@ -970,10 +991,7 @@ imcc_vfprintf(FILE *fd, const char *format, va_list ap) {
 char *
 str_dup(const char * old)
 {
-    char * copy = (char *)malloc(strlen(old) + 1);
-    if (copy == NULL) {
-        fatal(1, "str_dup", "Out of mem\n");
-    }
+    char * copy = mem_sys_allocate(strlen(old) + 1);
     strcpy(copy, old);
 #ifdef MEMDEBUG
     debug(interpreter, 1,"line %d str_dup %s [%x]\n", line, old, copy);
@@ -985,10 +1003,7 @@ char *
 str_cat(const char * s1, const char * s2)
 {
     int len = strlen(s1) + strlen(s2) + 1;
-    char * s3 = malloc(len);
-    if (s3 == NULL) {
-        fatal(1, "str_cat", "Out of mem\n");
-    }
+    char * s3 = mem_sys_allocate(len);
     strcpy(s3, s1);
     strcat(s3, s2);
     return s3;

@@ -118,7 +118,7 @@ expand_fast_sub_call(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins)
 
     for (i = 0; i < sub->pcc_sub->nret; i++) {
         ret = sub->pcc_sub->ret[i];
-        regs[0] = mk_temp_reg(ret->set);
+        regs[0] = mk_temp_reg(interp, ret->set);
         ins = insINS(interp, unit, ins, "restore", regs, 1);
     }
 }

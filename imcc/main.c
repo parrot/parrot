@@ -22,7 +22,7 @@
 
 #define IMCC_VERSION "0.1.1"
 
-static int load_pbc, run_pbc, write_pbc, pre_process;
+static int load_pbc, run_pbc, write_pbc, pre_process, pasm_file;
 static char optimizer_opt[20];
 extern FILE *yyin;
 
@@ -204,7 +204,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 interp->imc_info->imcc_warn = 1;
                 break;
             case 'G':
-                gc_off = 1;
+                interp->imc_info->gc_off = 1;
                 break;
             case '.':  /* Give Windows Parrot hackers an opportunity to
                         * attach a debuggger. */
@@ -241,13 +241,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
             case 'o':
                 run_pbc = 0;
-                output = str_dup(opt.opt_arg);
+                interp->imc_info->output = str_dup(opt.opt_arg);
                 break;
 
             case OPT_PBC_OUTPUT:
                 run_pbc = 0;
                 write_pbc = 1;
-                if (!output) output = str_dup("-");
+                if (!interp->imc_info->output)
+                    interp->imc_info->output = str_dup("-");
                 break;
 
             case 'O':
@@ -259,9 +260,9 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     strcpy(optimizer_opt, "1");
                 }
                 if (strchr(optimizer_opt, 'p'))
-                    optimizer_level |= OPT_PASM;
+                    IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
                 if (strchr(optimizer_opt, 'c'))
-                    optimizer_level |= OPT_SUB;
+                    IMCC_INFO(interp)->optimizer_level |= OPT_SUB;
 #if 0
                 /* currently not ok due to different register allocation */
                 if (strchr(optimizer_opt, 'j')) {
@@ -271,14 +272,14 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 }
 #endif
                 if (strchr(optimizer_opt, '1')) {
-                    optimizer_level |= OPT_PRE;
+                    IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
                 }
                 if (strchr(optimizer_opt, '2')) {
                     /* FIXME -O2 is borken */
 #if 0
                     optimizer_level |= (OPT_CFG | OPT_PRE);
 #else
-                    optimizer_level |= OPT_PRE;
+                    IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
 #endif
                 }
                 if (strchr(optimizer_opt, 't')) {
@@ -308,7 +309,7 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 break;
 
             default:
-                fatal(1, "main", "Invalid flag '%s' used."
+                IMCC_fatal(interp, 1, "main: Invalid flag '%s' used."
                         "\n\nhelp: parrot -h\n", (*argv)[0]);
         }
     }
@@ -324,12 +325,12 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
 }
 
 static void
-do_pre_process(Parrot_Interp interpreter)
+do_pre_process(Parrot_Interp interp)
 {
     int c;
     YYSTYPE val;
 
-    while ( (c = yylex(&val, interpreter)) ) {
+    while ( (c = yylex(&val, interp)) ) {
         switch (c) {
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;
@@ -345,7 +346,7 @@ do_pre_process(Parrot_Interp interpreter)
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            case MACRO:         yylex(&val, interpreter);
+            case MACRO:         yylex(&val, interp);
                                 break; /* swallow nl */
 
             case END:           printf("end");break;
@@ -402,38 +403,40 @@ do_pre_process(Parrot_Interp interpreter)
     }
 }
 
-extern void imcc_init(Parrot_Interp interpreter);
+extern void imcc_init(Parrot_Interp interp);
 
 int
 main(int argc, char * argv[])
 {
     struct PackFile *pf;
     int obj_file, ast_file = 0;
+    char *sourcefile;
+    char *output;
 
-    Interp *interpreter = Parrot_new(NULL);
+    Interp *interp = Parrot_new(NULL);
 
-    Parrot_init(interpreter);
+    Parrot_init(interp);
 
-    Parrot_block_DOD(interpreter);
-    Parrot_block_GC(interpreter);
+    Parrot_block_DOD(interp);
+    Parrot_block_GC(interp);
 
+    imcc_init(interp);
+    IMCC_ast_init(interp);
 
-    imcc_init(interpreter);
-    IMCC_ast_init(interpreter);
+    sourcefile = parseflags(interp, &argc, &argv);
+    output = interp->imc_info->output;
 
-    sourcefile = parseflags(interpreter, &argc, &argv);
-
-    if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE))
-        Parrot_py_init(interpreter);
+    if (Interp_flags_TEST(interp, PARROT_PYTHON_MODE))
+        Parrot_py_init(interp);
 
     /* default optimizations, s. optimizer.c, imc.h */
     if (!*optimizer_opt) {
         strcpy(optimizer_opt, "0");
-        optimizer_level = 0;
+        IMCC_INFO(interp)->optimizer_level = 0;
     }
 
     if (!sourcefile || !*sourcefile) {
-        fatal(EX_NOINPUT, "main", "No source file specified.\n" );
+        IMCC_fatal(interp, 1, "main: No source file specified.\n" );
     }
     else if (!strcmp(sourcefile, "-")) {
         yyin = stdin;
@@ -447,7 +450,8 @@ main(int argc, char * argv[])
         }
         else if (!load_pbc) {
             if (!(yyin = fopen(sourcefile, "r")))    {
-                fatal(EX_IOERR, "main", "Error reading source file %s.\n",
+                IMCC_fatal(interp, E_IOError,
+                    "Error reading source file %s.\n",
                         sourcefile);
             }
             if (ext && strcmp (ext, ".pasm") == 0) {
@@ -459,15 +463,15 @@ main(int argc, char * argv[])
         }
     }
     if (pre_process) {
-        do_pre_process(interpreter);
-        Parrot_destroy(interpreter);
+        do_pre_process(interp);
+        Parrot_destroy(interp);
         Parrot_exit(0);
     }
 
     obj_file = 0;
-    if (output) {
+    if (interp->imc_info->output) {
         char *ext;
-        ext = strrchr(output, '.');
+        ext = strrchr(interp->imc_info->output, '.');
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
@@ -477,107 +481,116 @@ main(int argc, char * argv[])
             write_pbc = 0;
             run_pbc = 1;
             obj_file = 1;
-            Parrot_setup_opt(interpreter, 0, output);
-            Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
+            Parrot_setup_opt(interp, 0, output);
+            Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
             fatal(1, "main", "can't produce object file");
 #endif
         }
         if (!strcmp(sourcefile, output) && strcmp(sourcefile, "-"))
-            fatal(1, "main", "outputfile is sourcefile\n");
+            IMCC_fatal(interp, 1,
+                "main: outputfile is sourcefile\n");
     }
 
-    if (interpreter->imc_info->verbose) {
-        info(interpreter, 1,"debug = 0x%x\n", interpreter->imc_info->debug);
-        info(interpreter, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
+    if (interp->imc_info->verbose) {
+        IMCC_info(interp, 1,"debug = 0x%x\n", interp->imc_info->debug);
+        IMCC_info(interp, 1,"Reading %s\n", yyin == stdin ? "stdin":sourcefile);
     }
     if (load_pbc) {
-        pf = Parrot_readbc(interpreter, sourcefile);
+        pf = Parrot_readbc(interp, sourcefile);
         if (!pf)
-            fatal(1, "main", "Packfile loading failed\n");
-        Parrot_loadbc(interpreter, pf);
+            IMCC_fatal(interp, 1,
+                "main: Packfile loading failed\n");
+        Parrot_loadbc(interp, pf);
     }
     else {
         int per_pbc = (write_pbc | run_pbc) != 0;
-        info(interpreter, 1, "using optimization '%s' (%x) \n", optimizer_opt,
-                optimizer_level);
+        IMCC_info(interp, 1, "using optimization '%s' (%x) \n", optimizer_opt,
+                IMCC_INFO(interp)->optimizer_level);
         pf = PackFile_new(0);
-        Parrot_loadbc(interpreter, pf);
+        Parrot_loadbc(interp, pf);
 
-        line = 1;
-        emit_open(per_pbc, per_pbc ? (void*)interpreter : (void*)output);
+        IMCC_push_parser_state(interp);
+        IMCC_INFO(interp)->state->file = sourcefile;
 
-        info(interpreter, 1, "Starting parse...\n");
+        emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output);
+
+        IMCC_info(interp, 1, "Starting parse...\n");
 
         if (ast_file) {
-            IMCC_ast_compile(interpreter, yyin);
+            IMCC_ast_compile(interp, yyin);
         }
         else {
-            yyparse((void *) interpreter);
+            IMCC_INFO(interp)->state->pasm_file = pasm_file;
+            yyparse((void *) interp);
         }
 
-        imc_compile_all_units(interpreter);
-        imc_cleanup(interpreter);
+        imc_compile_all_units(interp);
+        imc_cleanup(interp);
 
         fclose(yyin);
 
-        info(interpreter, 1, "%ld lines compiled.\n", line);
+        IMCC_info(interp, 1, "%ld lines compiled.\n", line);
     }
     if (write_pbc) {
         size_t size;
         opcode_t *packed;
         FILE *fp;
-        info(interpreter, 1, "Writing %s\n", output);
+        IMCC_info(interp, 1, "Writing %s\n", output);
 
-        size = PackFile_pack_size(interpreter->code) * sizeof(opcode_t);
-        info(interpreter, 1, "packed code %d bytes\n", size);
+        size = PackFile_pack_size(interp->code) * sizeof(opcode_t);
+        IMCC_info(interp, 1, "packed code %d bytes\n", size);
         packed = (opcode_t*) mem_sys_allocate(size);
-        if (!packed)
-            fatal(1, "main", "Out of mem\n");
-        PackFile_pack(interpreter->code, packed);
+        PackFile_pack(interp->code, packed);
         if (strcmp (output, "-") == 0)
             fp = stdout;
         else if ((fp = fopen(output, "wb")) == 0)
-            fatal(1, "main", "Couldn't open %s\n", output);
+            IMCC_fatal(interp, E_IOError,
+                "Couldn't open %s\n", output);
 
         if ((1 != fwrite(packed, size, 1, fp)) )
-            fatal(1, "main", "Couldn't write %s\n", output);
+            IMCC_fatal(interp, E_IOError,
+                "Couldn't write %s\n", output);
         fclose(fp);
-        info(interpreter, 1, "%s written.\n", output);
+        IMCC_info(interp, 1, "%s written.\n", output);
         free(packed);
+        /* TODO */
+        if (run_pbc != 2)
+            PackFile_fixup_subs(interp, PBC_POSTCOMP);
     }
     /* load the file written above */
     if (run_pbc == 2 && write_pbc && strcmp(output, "-")) {
-        info(interpreter, 1, "Loading %s\n", output);
-        pf = Parrot_readbc(interpreter, output);
+        IMCC_info(interp, 1, "Loading %s\n", output);
+        pf = Parrot_readbc(interp, output);
         if (!pf)
-            fatal(1, "main", "Packfile loading failed\n");
-        Parrot_loadbc(interpreter, pf);
+            IMCC_fatal(interp, 1,
+            "Packfile loading failed\n");
+        Parrot_loadbc(interp, pf);
         load_pbc = 1;
     }
     if (run_pbc) {
 
-        if (interpreter->imc_info->imcc_warn)
-            PARROT_WARNINGS_on(interpreter, PARROT_WARNINGS_ALL_FLAG);
+        if (interp->imc_info->imcc_warn)
+            PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
         else
-            PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
-        if (!gc_off) {
-            Parrot_unblock_DOD(interpreter);
-            Parrot_unblock_GC(interpreter);
+            PARROT_WARNINGS_off(interp, PARROT_WARNINGS_ALL_FLAG);
+        if (!interp->imc_info->gc_off) {
+            Parrot_unblock_DOD(interp);
+            Parrot_unblock_GC(interp);
         }
         if (obj_file)
-            info(interpreter, 1, "Writing %s\n", output);
+            IMCC_info(interp, 1, "Writing %s\n", output);
         else
-            info(interpreter, 1, "Running...\n");
+            IMCC_info(interp, 1, "Running...\n");
         if (!load_pbc)
-            PackFile_fixup_subs(interpreter, PBC_MAIN);
-        Parrot_runcode(interpreter, argc, argv);
+            PackFile_fixup_subs(interp, PBC_MAIN);
+        Parrot_runcode(interp, argc, argv);
         /* XXX no return value :-( */
     }
-    Parrot_destroy(interpreter);
+    Parrot_destroy(interp);
     if (output)
         free(output);
-    mem_sys_free(interpreter->imc_info);
+    mem_sys_free(interp->imc_info);
     Parrot_exit(0);
 
     return 0;

@@ -29,7 +29,7 @@ PMC * ast_compile_past(Interp *interpreter, const char *src_string);
 PMC *
 ast_compile_past(Interp *interpreter, const char *src_string)
 {
-    fatal(1, "ast_compile_past", "unimplemented");
+    IMCC_fatal(interpreter, 1, "ast_compile_past: unimplemented");
     return NULL;
 }
 

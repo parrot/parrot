@@ -142,10 +142,10 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
             for (k = 0; k < to_map[typ]; k++) {
                 char name[16];
                 sprintf(name, "%c%d#c", types[typ], k);
-                cpu[typ][k] = mk_pasm_reg(str_dup(name));
+                cpu[typ][k] = mk_pasm_reg(interpreter, str_dup(name));
                 cpu[typ][k]->color = -1 - k;
                 sprintf(name, "%c%d#p", types[typ], k);
-                par[typ][k] = mk_pasm_reg(str_dup(name));
+                par[typ][k] = mk_pasm_reg(interpreter, str_dup(name));
             }
     }
     prev = last = NULL;
@@ -155,7 +155,8 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
      * TODO not the compile is the problem, but the invoke of
      * compiled code - so track PMCs and invokes too
      */
-    if (!has_compile && !dont_optimize) {
+    if (!IMCC_INFO(interpreter)->has_compile &&
+            !IMCC_INFO(interpreter)->dont_optimize) {
         for (j = 0; j < unit->n_symbols; j++) {
             r = reglist[j];
             if (r->set == 'K')
@@ -227,7 +228,8 @@ allocate_jit(Interp *interpreter, IMC_Unit * unit)
                         if (0 && !strcmp(ins->op, "bsr") &&
                                 (ins->type & ITSAVES)) {
                             int bb_sub =
-                                find_sym(ins->r[0]->name)->first_ins->bbindex;
+                                find_sym(interpreter,
+                                        ins->r[0]->name)->first_ins->bbindex;
                             if (max_used(unit, bb_sub, types[typ],
                                         typ, to_map))
                                 reads[typ][c] = writes[typ][c] = nr = nw = 1;

@@ -85,9 +85,10 @@ _mk_symreg(SymReg* hsh[], char * name, int t)
 }
 
 SymReg *
-mk_symreg(char * name, int t)
+mk_symreg(Interp *interp, char * name, int t)
 {
-    return _mk_symreg(cur_unit->hash, name, t);
+    IMC_Unit *unit = IMCC_INFO(interp)->last_unit;
+    return _mk_symreg(unit->hash, name, t);
 }
 
 /*
@@ -115,17 +116,18 @@ symreg_to_str(SymReg * s)
 
 
 SymReg *
-mk_temp_reg(int t)
+mk_temp_reg(Interp *interp, int t)
 {
     char buf[128];
     static int temp;
     sprintf(buf, "__imcc_temp_%d", ++temp);
-    return mk_symreg(str_dup(buf), t);
+    return mk_symreg(interp, str_dup(buf), t);
 }
 
 SymReg *
-mk_pcc_sub(char * name, int proto) {
-    SymReg *r = _mk_symreg(cur_unit->hash, name, proto);
+mk_pcc_sub(Interp *interp, char * name, int proto) {
+    IMC_Unit *unit = IMCC_INFO(interp)->last_unit;
+    SymReg *r = _mk_symreg(unit->hash, name, proto);
     r->type = VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     return r;
@@ -135,9 +137,9 @@ mk_pcc_sub(char * name, int proto) {
  * add current namespace to sub decl
  */
 void
-add_namespace(Parrot_Interp interpreter, IMC_Unit *unit)
+add_namespace(Parrot_Interp interp, IMC_Unit *unit)
 {
-    SymReg *ns = IMCC_INFO(interpreter)->cur_namespace;
+    SymReg *ns = IMCC_INFO(interp)->cur_namespace;
     SymReg *r, *g;
 
     if (!ns || strlen(ns->name) <= 2)
@@ -151,8 +153,9 @@ add_namespace(Parrot_Interp interpreter, IMC_Unit *unit)
         unit->namespace = g;
         g->reg = ns;
         g->type = VT_CONSTP;
-        if (! (r = _get_sym(ghash, g->name)) || r->type != VT_CONSTP )
-            _store_symreg(ghash, g);
+        if (! (r = _get_sym(IMCC_INFO(interp)->ghash, g->name)) ||
+                r->type != VT_CONSTP )
+            _store_symreg(IMCC_INFO(interp)->ghash, g);
     }
 }
 
@@ -205,18 +208,18 @@ add_pcc_cc(SymReg *r, SymReg * arg)
 }
 
 SymReg *
-mk_pasm_reg(char * name)
+mk_pasm_reg(Interp *interp, char * name)
 {
     SymReg * r;
     if ((r = _get_sym(cur_unit->hash, name))) {
 	free(name);
         return r;
     }
-    r = mk_symreg(name, *name);
+    r = mk_symreg(interp, name, *name);
     r->type = VTPASM;
     r->color = atoi(name+1);
     if (r->color < 0 || r->color > 31)
-        fataly(1, sourcefile, line,
+        IMCC_fataly(interp, E_SyntaxError,
                 "register number out of range '%s'\n", name);
     return r;
 }
@@ -241,7 +244,7 @@ mk_fullname(const char * name)
 extern int cur_pmc_type;
 /* Makes a new identifier */
 SymReg *
-mk_ident(char * name, int t)
+mk_ident(Interp *interp, char * name, int t)
 {
     char * fullname = _mk_fullname(namespace, name);
     Identifier * ident;
@@ -252,7 +255,7 @@ mk_ident(char * name, int t)
         ident->next = namespace->idents;
         namespace->idents = ident;
     }
-    r = mk_symreg(fullname, t);
+    r = mk_symreg(interp, fullname, t);
     r->type = VTIDENTIFIER;
     free(name);
     if (t == 'P') {
@@ -264,13 +267,15 @@ mk_ident(char * name, int t)
 
 /* Makes a new identifier constant with value val */
 SymReg *
-mk_const_ident(char *name, int t, SymReg *val, int global)
+mk_const_ident(Interp *interp,
+        char *name, int t, SymReg *val, int global)
 {
     SymReg *r;
+
     if (global)
-        r = _mk_symreg(ghash, name, t);
+        r = _mk_symreg(IMCC_INFO(interp)->ghash, name, t);
     else
-        r = mk_ident(name, t);
+        r = mk_ident(interp, name, t);
     r->type = VT_CONSTP;
     r->reg = val;
     return r;
@@ -291,9 +296,13 @@ _mk_const(SymReg *hsh[], char * name, int t)
 }
 
 SymReg *
-mk_const(char * name, int t)
+mk_const(Interp *interp, char * name, int t)
 {
-    return _mk_const(ghash, name, t);
+    SymReg **h = IMCC_INFO(interp)->ghash;
+    if (!h)
+        h = IMCC_INFO(interp)->ghash =
+            mem_sys_allocate_zeroed(HASH_SIZE * sizeof(SymReg*));
+    return _mk_const(h, name, t);
 }
 
 extern SymReg *cur_namespace; /* ugly hack for mk_address */
@@ -330,7 +339,7 @@ add_ns(char *name)
 
 /* Makes a new address */
 SymReg *
-_mk_address(SymReg *hsh[], char * name, int uniq)
+_mk_address(Interp *interp, SymReg *hsh[], char * name, int uniq)
 {
     SymReg * r;
     if (uniq == U_add_all) {
@@ -349,11 +358,11 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
             r->lhs_use_count            /* we use this for labels/subs */
       ) {
         if (uniq == U_add_uniq_label) {
-            fataly(1, sourcefile, line,
+            IMCC_fataly(interp, E_SyntaxError,
                    "Label '%s' already defined\n", name);
         }
         else if (uniq == U_add_uniq_sub)
-            fataly(1, sourcefile, line,
+            IMCC_fataly(interp, E_SyntaxError,
                     "Subroutine '%s' already defined\n", name);
     }
     r = _mk_symreg(hsh, name, 0);
@@ -364,11 +373,11 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
 }
 
 SymReg *
-mk_address(char * name, int uniq)
+mk_address(Interp *interp, char * name, int uniq)
 {
     SymReg * s;
-    SymReg ** h = *name == '_' ? ghash : cur_unit->hash;
-    s = _mk_address(h, name, uniq);
+    SymReg ** h = *name == '_' ? IMCC_INFO(interp)->ghash : cur_unit->hash;
+    s = _mk_address(interp, h, name, uniq);
     if (*name == '_')
        s->usage |= U_FIXUP;
     return s;
@@ -379,9 +388,10 @@ mk_address(char * name, int uniq)
  * Label gets a fixup entry.
  */
 SymReg *
-mk_sub_label(char * name)
+mk_sub_label(Interp *interp, char * name)
 {
-    SymReg * s = _mk_address(ghash, name, U_add_uniq_sub);
+    SymReg * s = _mk_address(interp, IMCC_INFO(interp)->ghash,
+            name, U_add_uniq_sub);
     s->usage |= U_FIXUP;
     return s;
 }
@@ -390,9 +400,10 @@ mk_sub_label(char * name)
  * Make a symbol for a label, symbol gets a fixup entry.
  */
 SymReg *
-mk_sub_address(char * name)
+mk_sub_address(Interp *interp, char * name)
 {
-    SymReg * s = _mk_address(ghash, name, U_add_once);
+    SymReg * s = _mk_address(interp, IMCC_INFO(interp)->ghash,
+            name, U_add_once);
     s->usage |= U_FIXUP;
     return s;
 }
@@ -401,18 +412,20 @@ mk_sub_address(char * name)
  * Make a local symbol, no fixup entry.
  */
 SymReg *
-mk_local_label(IMC_Unit * unit, char * name)
+mk_local_label(Interp *interp, char * name)
 {
-    return _mk_address(unit->hash, name, U_add_uniq_label);
+    IMC_Unit *unit = IMCC_INFO(interp)->last_unit;
+    return _mk_address(interp, unit->hash, name, U_add_uniq_label);
 }
 
 /*
  *
  */
 SymReg *
-mk_label_address(IMC_Unit * unit, char * name)
+mk_label_address(Interp *interp, char * name)
 {
-    return _mk_address(unit->hash, name, U_add_once);
+    IMC_Unit *unit = IMCC_INFO(interp)->last_unit;
+    return _mk_address(interp, unit->hash, name, U_add_once);
 }
 
 
@@ -457,25 +470,24 @@ mk_label_address(IMC_Unit * unit, char * name)
 SymReg *
 dup_sym(SymReg *r)
 {
-    SymReg * new = malloc(sizeof(SymReg));
-    if (!new)
-        fatal(1, "dup_sym", "Out of mem\n");
+    SymReg * new = mem_sys_allocate(sizeof(SymReg));
     memcpy(new, r, sizeof(SymReg));
     new->name = str_dup(r->name);
     return new;
 }
 
 SymReg *
-link_keys(int nargs, SymReg * keys[])
+link_keys(Interp *interp, int nargs, SymReg * keys[])
 {
     SymReg * first, *key, *keychain;
     int i, len, any_slice;
     char *key_str;
     /* namespace keys are global consts - no cur_unit */
-    SymReg **h = cur_unit ? cur_unit->hash : ghash;
+    SymReg **h = cur_unit ? cur_unit->hash : IMCC_INFO(interp)->ghash;
 
     if (nargs == 0)
-        fatal(1, "link_keys", "hu? no keys\n");
+        IMCC_fataly(interp, E_SyntaxError,
+            "link_keys: hu? no keys\n");
     first = keys[0];
     if (nargs == 1 && !(keys[0]->type & VT_SLICE_BITS))
         return first;
@@ -506,9 +518,7 @@ link_keys(int nargs, SymReg * keys[])
         return keychain;
     }
     /* no, need a new one */
-    keychain = calloc(1, sizeof(SymReg));
-    if (!keychain)
-        fatal(1, "link_keys", "Out of mem\n");
+    keychain = mem_sys_allocate_zeroed(sizeof(SymReg));
     keychain->type = VTCONST;
     ++keychain->use_count;
     key = keychain;
@@ -600,7 +610,8 @@ get_sym(const char * name)
 
 /* find a symbol hash or ghash */
 SymReg *
-_find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
+_find_sym(Interp *interp, Namespace * nspace, SymReg * hsh[],
+        const char * name)
 {
     Namespace * ns;
     SymReg *p;
@@ -615,7 +626,7 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
     p = _get_sym(hsh, name);
     if (p)
         return p;
-    p = _get_sym(ghash, name);
+    p = _get_sym(IMCC_INFO(interp)->ghash, name);
     if (p)
         return p;
     return 0;
@@ -623,16 +634,16 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
 
 
 SymReg *
-find_sym(const char * name)
+find_sym(Interp *interp, const char * name)
 {
     if (cur_unit)
-        return _find_sym(namespace, cur_unit->hash, name);
+        return _find_sym(interp, namespace, cur_unit->hash, name);
     return NULL;
 }
 
 
 void
-_delete_sym(IMC_Unit * unit, const char * name)
+_delete_sym(Interp* interp, IMC_Unit * unit, const char * name)
 {
     SymReg ** p;
     int i = hash_str(name) % HASH_SIZE;
@@ -648,7 +659,8 @@ _delete_sym(IMC_Unit * unit, const char * name)
         }
     }
 
-    fatal(1, "_delete_sym", "Tried to delete nonexistent symbol '%s'\n", name);
+    IMCC_fatal(interp, 1,
+            "_delete_sym: tried to delete nonexistent symbol '%s'\n", name);
 }
 
 
@@ -689,20 +701,22 @@ clear_locals(IMC_Unit * unit)
 
 /* Clear global symbols */
 void
-clear_globals()
+clear_globals(Interp *interp)
 {
     int i;
     SymReg * p, *next;
 
+    if (!IMCC_INFO(interp)->ghash)
+        return;
     for (i = 0; i < HASH_SIZE; i++) {
-        for (p = ghash[i]; p; ) {
+        for (p = IMCC_INFO(interp)->ghash[i]; p; ) {
 	    next = p->next;
             if (p->type & VTADDRESS)
                 p->first_ins = p->last_ins = NULL;
             free_sym(p);
             p = next;
         }
-        ghash[i] = NULL;
+        IMCC_INFO(interp)->ghash[i] = NULL;
     }
 }
 

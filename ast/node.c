@@ -323,38 +323,14 @@ insINS(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
     return tmp;
 }
 
-/*
- * get or create the SymReg
- */
-static SymReg*
-get_pasm_reg(char *name)
-{
-    SymReg *r;
-
-    if ((r = _get_sym(cur_unit->hash, name)))
-        return r;
-    return mk_pasm_reg(str_dup(name));
-}
-
-static SymReg*
-get_const(const char *name, int type)
-{
-    SymReg *r;
-
-    if ((r = _get_sym(ghash, name)) && r->set == type)
-        return r;
-    return mk_const(str_dup(name), type);
-}
-
 static SymReg *
 new_temp_var(Interp* interp, int set)
 {
     char buf[128];
     static int temp;
 
-    UNUSED(interp);
     sprintf(buf, "$%c%d", set, ++temp);
-    return mk_symreg(str_dup(buf), set);
+    return mk_symreg(interp, str_dup(buf), set);
 }
 
 /*
@@ -370,7 +346,7 @@ insert_new(Interp* interpreter, SymReg *var, const char *pmy_type)
 
     ins = cur_unit->last_ins;
     sprintf(ireg, "%d", type);
-    r = mk_const(str_dup(ireg), 'I');
+    r = mk_const(interpreter, str_dup(ireg), 'I');
 
     regs[0] = var;
     regs[1] = r;
@@ -389,7 +365,7 @@ insert_find_global(Interp* interpreter, nodeType *var)
 
     ins = cur_unit->last_ins;
     sprintf(name, "\"%s\"", var->u.r->name);
-    r = mk_const(str_dup(name), 'S');
+    r = mk_const(interpreter, str_dup(name), 'S');
 
     regs[0] = var->u.r;
     var->u.r->type = VTIDENTIFIER;
@@ -441,9 +417,9 @@ insert_find_lex(Interp* interpreter, nodeType *var)
 
     ins = cur_unit->last_ins;
     regs[0] = new_temp_var(interpreter, 'P');
-    regs[1] = get_const("-1", 'I');
+    regs[1] = get_const(interpreter, "-1", 'I');
     sprintf(buf, "\"%s\"", var->u.r->name);
-    regs[2] = get_const(buf, 'S');
+    regs[2] = get_const(interpreter, buf, 'S');
     insINS(interpreter, cur_unit, ins, "find_lex", regs, 3);
     return regs[0];
 }
@@ -548,9 +524,9 @@ exp_Assign(Interp* interpreter, nodeType *p)
         ins = insINS(interpreter, cur_unit, ins, "set", regs, 2);
     }
     if (need_store) {
-        regs[0] = get_const("-1", 'I');
+        regs[0] = get_const(interpreter, "-1", 'I');
         sprintf(buf, "\"%s\"", var->u.r->name);
-        regs[1] = get_const(buf, 'S');
+        regs[1] = get_const(interpreter, buf, 'S');
         regs[2] = lr;
         insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
     }
@@ -693,7 +669,7 @@ exp_Compare(Interp* interpreter, nodeType *p)
     regs[2] = rr;
     insINS(interpreter, cur_unit, ins, op->u.r->name, regs, 3);
     if (last->next)
-        fatal(1, "ext_Compare", "unimplemented");
+        IMCC_fatal(interpreter, 1, "ext_Compare: unimplemented");
     return regs[0];
 }
 
@@ -732,14 +708,14 @@ exp_Function(Interp* interpreter, nodeType *p)
     name = CHILD(p);
     params = name->next;
     body = params->next;
-    sub = mk_sub_address(str_dup(name->u.r->name));
+    sub = mk_sub_address(interpreter, str_dup(name->u.r->name));
     ins = INS_LABEL(cur_unit, sub, 1);
 
-    ins->r[1] = mk_pcc_sub(str_dup(ins->r[0]->name), 0);
+    ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
     ins->r[1]->pcc_sub->pragma = P_PROTOTYPED ;
 
-    regs[0] = get_const("-1", 'I');
+    regs[0] = get_const(interpreter, "-1", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
 
     body->expand(interpreter, body);
@@ -755,7 +731,7 @@ gen_label(Interp *interpreter, const char *prefix)
     char buf[128];
 
     sprintf(buf, "%s_%d", prefix, ++nr);
-    return mk_local_label(cur_unit, str_dup(buf));
+    return mk_local_label(interpreter, str_dup(buf));
 }
 
 /*
@@ -866,9 +842,9 @@ exp_Py_Local(Interp* interpreter, nodeType *var)
      * now create a scratchpad slot for this var
      */
     ins = cur_unit->last_ins;
-    regs[0] = get_const("-1", 'I');
+    regs[0] = get_const(interpreter, "-1", 'I');
     sprintf(buf, "\"%s\"", var->u.r->name);
-    regs[1] = get_const(buf, 'S');
+    regs[1] = get_const(interpreter, buf, 'S');
     regs[2] = temp;
     /* TODO remember locals and idx of local := cur_unit->local_count++; */
     insINS(interpreter, cur_unit, ins, "store_lex", regs, 3);
@@ -892,14 +868,14 @@ exp_Py_Module(Interp* interpreter, nodeType *p)
     SymReg *regs[IMCC_MAX_REGS];
 
     if (!cur_unit)
-        fatal(1, "exp_Py_Module", "no cur_unit");
-    sub = mk_sub_address(str_dup("__main__"));
+        IMCC_fatal(interpreter, 1, "exp_Py_Module: no cur_unit");
+    sub = mk_sub_address(interpreter, str_dup("__main__"));
     ins = INS_LABEL(cur_unit, sub, 1);
 
-    ins->r[1] = mk_pcc_sub(str_dup(ins->r[0]->name), 0);
+    ins->r[1] = mk_pcc_sub(interpreter, str_dup(ins->r[0]->name), 0);
     add_namespace(interpreter, cur_unit);
     ins->r[1]->pcc_sub->pragma = P_MAIN|P_PROTOTYPED ;
-    regs[0] = get_const("0", 'I');
+    regs[0] = get_const(interpreter, "0", 'I');
     insINS(interpreter, cur_unit, ins, "new_pad", regs, 1);
     /*
      * TODO create locals for __builtins__, __name__, __doc__
@@ -919,7 +895,7 @@ exp_Py_Print(Interp* interpreter, nodeType *p)
     SymReg *regs[IMCC_MAX_REGS], *d;
     nodeType * child = CHILD(p);
     if (!child)
-        fatal(1, "exp_Py_Print", "nothing to print");
+        IMCC_fatal(interpreter, 1, "exp_Py_Print: nothing to print");
     for (; child; child = child->next) {
         d = child->expand(interpreter, child);
         /* TODO file handle node */
@@ -1148,7 +1124,7 @@ nodeType *
 IMCC_new_const_node(Interp* interp, char *name, int set, YYLTYPE *loc)
 {
     nodeType *p = new_con(loc);
-    SymReg *r = mk_const(name, set);
+    SymReg *r = mk_const(interp, name, set);
     p->u.r = r;
     return p;
 }
@@ -1159,8 +1135,8 @@ IMCC_new_var_node(Interp* interpreter, char *name, int set, YYLTYPE *loc)
     nodeType *p = new_node(loc);
     SymReg *r;
     if (!cur_unit)
-        fatal(1, "IMCC_new_var_node", "no cur_unit");
-    p->u.r = r = mk_symreg(name, set);
+        IMCC_fatal(interpreter, 1, "IMCC_new_var_node: no cur_unit");
+    p->u.r = r = mk_symreg(interpreter, name, set);
     if (r->type != VTADDRESS)
         r->type = VTIDENTIFIER;
     p->expand = exp_Var;
@@ -1178,7 +1154,7 @@ IMCC_new_temp_node(Interp* interp, int set, YYLTYPE *loc)
     char buf[128];
     static int temp;
     sprintf(buf, "$%c%d", set, ++temp);
-    r = mk_symreg(str_dup(buf), set);
+    r = mk_symreg(interp, str_dup(buf), set);
     p->u.r = r;
     return p;
 }

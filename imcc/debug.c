@@ -8,73 +8,72 @@
 #include "imc.h"
 
 void
-fatal(int code, const char *func, const char *fmt, ...)
+IMCC_fatal(Interp *interp, int code, const char *fmt, ...)
 {
     va_list ap;
 
+    UNUSED(interp);
     va_start(ap, fmt);
-    fprintf(stderr, "error:imcc:%s: ", func);
-    imcc_vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
     Parrot_exit(code);
 }
 
 
 void
-fataly(int code, const char *file, int lin, const char *fmt, ...)
+IMCC_fataly(Interp *interp, int code, const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
     fprintf(stderr, "error:imcc:");
-    imcc_vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
-    print_inc(file, lin);
+    IMCC_print_inc(interp);
     /* TODO through compiler exception */
     Parrot_exit(code);
 }
 
 
 void
-warning(Parrot_Interp interpreter, const char *func, const char *fmt, ...)
+IMCC_warning(Parrot_Interp interp, const char *fmt, ...)
 {
     va_list ap;
-    if (IMCC_INFO(interpreter)->imcc_warn)
+    if (IMCC_INFO(interp)->imcc_warn)
         return;
 
     va_start(ap, fmt);
-    fprintf(stderr, "warning:imcc:%s: ", func);
-    imcc_vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
 }
 
 void
-info(Parrot_Interp interpreter, int level, const char *fmt, ...)
+IMCC_info(Parrot_Interp interp, int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if(level > IMCC_INFO(interpreter)->verbose)
+    if(level > IMCC_INFO(interp)->verbose)
 	return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
 }
 
 void
-debug(Parrot_Interp interpreter, int level, const char *fmt, ...)
+IMCC_debug(Parrot_Interp interp, int level, const char *fmt, ...)
 {
     va_list ap;
 
-    if ( !(level & IMCC_INFO(interpreter)->debug))
+    if ( !(level & IMCC_INFO(interp)->debug))
 	return;
     va_start(ap, fmt);
-    imcc_vfprintf(stderr, fmt, ap);
+    imcc_vfprintf(interp, stderr, fmt, ap);
     va_end(ap);
 }
 
 void
-dump_instructions(IMC_Unit * unit)
+dump_instructions(Interp *interpreter, IMC_Unit * unit)
 {
     Instruction *ins;
     Basic_block *bb;
@@ -96,7 +95,7 @@ dump_instructions(IMC_Unit * unit)
 	     fprintf(stderr, "\t");
 	}
 
-	imcc_fprintf(stderr, "%I\n", ins);
+	imcc_fprintf(interpreter, stderr, "%I\n", ins);
         pc += ins->opsize;
     }
     fprintf(stderr, "\n");

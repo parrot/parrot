@@ -1,18 +1,19 @@
 
 #include "imc.h"
 
+/* XXX */
+#define fatal(e, s1, s2) do { \
+    fprintf(stderr, "%s: %s", s1, s2); \
+    exit(e); \
+} while (0)
+
 Set*
 set_make (int length)
 {
-	Set *s = malloc(sizeof(Set));
-    if (!s)
-        fatal(1, "set_make", "Out of mem\n");
-	s->length = length;
-	s->bmp = calloc(sizeof(char), length/8 + 1);
-    if (!s->bmp)
-        fatal(1, "set_make", "Out of mem\n");
-
-	return s;
+    Set *s = mem_sys_allocate(sizeof(Set));
+    s->length = length;
+    s->bmp = mem_sys_allocate_zeroed(length/8 + 1);
+    return s;
 }
 
 Set*
@@ -87,10 +88,10 @@ set_contains(Set *s, int element)
 #ifdef __LCC__
     /* workaround for another lcc bug.. */
     int tmp = (1 << (element & 7));
-    return s->bmp[element >> 3] & tmp;         
+    return s->bmp[element >> 3] & tmp;
 #else
     return s->bmp[element >> 3] & (1 << (element & 7));
-#endif   
+#endif
 }
 
 Set *
@@ -98,7 +99,7 @@ set_union(Set *s1, Set *s2)
 {
     int i;
     Set *s = set_make(s1->length);
-	
+
     if (s1->length != s2->length) {
         fatal(1, "set_union", "Sets don't have the same length\n");
     }
@@ -116,7 +117,7 @@ set_intersec(Set *s1, Set *s2)
 {
     int i;
     Set *s = set_make(s1->length);
-	
+
     if (s1->length != s2->length) {
         fatal(1, "set_intersec", "Sets don't have the same length\n");
     }
@@ -131,7 +132,7 @@ void
 set_intersec_inplace(Set *s1, Set *s2)
 {
     int i;
-	
+
     if (s1->length != s2->length) {
         fatal(1, "set_intersec_inplace", "Sets don't have the same length\n");
     }
