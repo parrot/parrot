@@ -435,12 +435,11 @@ sub fixup {
 
     $exp =~ s/([A-Za-z_][A-Za-z0-9_]*)/$label{$1}/g;
 
-    my $result = (eval $exp) / sizeof('op');
+    my $result = (eval $exp) / sizeof('intval');
 
     while (scalar(@{$fixup{$label}})) {
       my $offset = shift @{$fixup{$label}};
-      my $const = constantize_integer( $result );
-      substr($bytecode, $offset, sizeof('op')) = pack_arg('op', $const);
+      substr($bytecode, $offset, sizeof('intval')) = pack_arg('intval', $result);
     }
 
     delete $fixup{$label};
@@ -576,11 +575,13 @@ sub process_program_lines {
       next if( handle_asm_directive($code, @program) );
     }
 
-    $code = replace_string_constants($code);
+    $code = replace_constants($code);
+
     while ($code =~ s/\[([^\] \t]*)\s+/[$1/) { };  # Erase all space within label arithmetic
+
     $code =~ s/,/ /g;
     $code =~ s/#.*$//; # strip end of line comments
-           
+
     my ($opcode, @args) = split( /\s+/, $code );
 
     if( exists( $macros{$opcode} ) ) {
@@ -600,8 +601,10 @@ sub process_program_lines {
     # add line to listing
 
     my $odata;
-           
-    foreach ( unpack_ops( substr($bytecode, $op_pc) ) ) {
+
+    # TODO XXX FIXME This can't be right!
+
+    foreach (unpack('l*', substr($bytecode, $op_pc) ) ) {
       $odata .= sprintf( "%08x ", $_ );
     }
 
@@ -641,17 +644,18 @@ sub has_label {
 
 ###############################################################################
 
-=head2 replace_string_constants
+=head2 replace_constants
 
-This function strips out string constants and replaces them with the
-string [sc N] (for string constants), where N
+This function strips out string and number constants and replaces them with the
+string [sc N] (for string constants) or [nc N] (for numeric constants), where N
 is the index into the constants table where the constant is located.
 
 =cut
 
-sub replace_string_constants {
+sub replace_constants {
   my $code = shift;
   $code =~ s/\"([^\\\"]*(?:\\.[^\\\"]*)*)\"/constantize_string($1)/eg;
+  $code =~ s/([-+]?\d+\.\d+([eE][+-]?\d+)?)/constantize_number($1)/eg;
   return $code;
 }
 
@@ -742,10 +746,10 @@ sub handle_label {
       while(scalar(@{$local_fixup{$label}})) {
         my $op_pc=shift(@{$local_fixup{$label}});
         my $offset=shift(@{$local_fixup{$label}});
-        my $const = constantize_integer( ($pc - $op_pc) / sizeof('op') );
-        substr($bytecode,$offset,sizeof('op')) = pack_arg('op', $const);
+        substr($bytecode,$offset,sizeof('i')) = pack_arg('i', ($pc-$op_pc)/sizeof('i'));
       }
-      delete($local_fixup{$label});
+
+      delete($local_fixup{$label});  
     }
 
     $local_label{$label} = $pc;
@@ -765,8 +769,7 @@ sub handle_label {
       while( scalar( @{ $fixup{ $label } } ) ) {
         my $op_pc = shift( @{ $fixup{ $label } } );
         my $offset = shift( @{ $fixup{ $label } } );
-        my $const = constantize_integer( ($pc - $op_pc) / sizeof('op') );
-        substr($bytecode,$offset,sizeof('op')) = pack_arg('op', $const);
+        substr($bytecode,$offset,sizeof('i')) = pack_arg('i', ($pc-$op_pc)/sizeof('i'));
       }
 
       delete($fixup{$label});  
@@ -887,7 +890,7 @@ sub find_correct_opcode {
       } else {
         $_=$equate{$_};
       }
-      $_ = replace_string_constants($_);
+      $_ = replace_constants($_);
     }
 
     #
@@ -896,10 +899,8 @@ sub find_correct_opcode {
 
     if      (m/^([INPS])\d+$/) {                       # a register.
       push @arg_t,lc($1);
-    } elsif (m/^\[([a-z]+):(\d+)\s*\]$/) {             # string constant
+    } elsif (m/^\[([a-z]+):(\d+)\s*\]$/) {             # constant (sc or nc for now)
       push @arg_t, $1;
-    } elsif (m/^[-+]?\d+\.\d+([eE][+-]?\d+)?$/i) {     # number
-      push @arg_t, 'nc';
     } elsif(m/^((-?\d+)|(0b[01]+)|(0x[0-9a-f]+))$/i) { # integer
       push @arg_t,'ic';
     } elsif(m/^\[.*\]$/) {                                      # label arithmetic
@@ -1070,8 +1071,8 @@ sub handle_arguments {
       #
 
       if ($args[$_] =~ m/^\[(.*)\]$/) {
-        my $mult = sizeof('op');
-        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded opcode_t offsets ---> byte offsets
+        my $mult = sizeof('intval');
+        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded INTVAL offsets ---> byte offsets
         $args[$_] =~ s/[\@]/$op_pc/;                         # Map '@' to $op_pc
 
         push @{$fixup{$args[$_]}}, $pc;
@@ -1088,8 +1089,8 @@ sub handle_arguments {
           push(@{$local_fixup{$args[$_]}},$op_pc,$pc);
           $args[$_] = 0xffffffff;
         }
-        else {
-          $args[$_] = constantize_integer( ($local_label{$args[$_]}-$op_pc)/sizeof('op') );
+        else {                    
+          $args[$_] = ($local_label{$args[$_]}-$op_pc)/sizeof('i');
         }
       }
 
@@ -1104,7 +1105,7 @@ sub handle_arguments {
           $args[$_] = 0xffffffff;
         }
         else {                    
-          $args[$_] = constantize_integer( ($local_label{$args[$_]}-$op_pc)/sizeof('op') );
+          $args[$_] = ($label{$args[$_]}-$op_pc) / sizeof('i');
         }
       }
     }
@@ -1116,9 +1117,15 @@ sub handle_arguments {
     elsif ($rtype eq 's') {
       $args[$_] =~ s/[\[]sc:(.*)[\]]/$1/;
     }
-    elsif($rtype eq 'n') {
-      $args[$_] = constantize_number( $args[$_] );
+
+    #
+    # Number arguments:
+    #
+
+    elsif ($rtype eq 'n') {
+      $args[$_] =~ s/[\[]nc:(.*)[\]]/$1/;
     }
+
     #
     # Integer arguments:
     #
@@ -1129,8 +1136,8 @@ sub handle_arguments {
       #
 
       if ($args[$_] =~ m/^\[(.*)\]$/) {
-        my $mult = sizeof('op');
-        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded opcode_t offsets ---> byte offsets
+        my $mult = sizeof('intval');
+        $args[$_] =~ s/(\d+)/$mult * $1/eg;                  # Hard-coded INTVAL offsets ---> byte offsets
         $args[$_] =~ s/[\@]/$op_pc/;                         # Map '@' to $op_pc
 
         push @{$fixup{$args[$_]}}, $pc;
@@ -1140,10 +1147,15 @@ sub handle_arguments {
       #
       # Handle conversions of hexadecimal and octal:
       #
-      else {
-        $args[$_] = constantize_integer( $args[$_] );
+
+      elsif ($args[$_] =~ /^0b[01]+$/i) {
+        $args[$_] = from_binary( $args[$_] );
+      }
+      elsif ($args[$_] =~ /^0x?[0-9a-f]*$/i) {
+        $args[$_] = oct($args[$_]);
       }
     }
+
     #
     # Unknown argument types:
     #
@@ -1157,6 +1169,7 @@ sub handle_arguments {
     #
     # NOTE: Too bad $rtype wouldn't be visible in a continue block...
     #
+
     $pc       += sizeof($rtype);
     $bytecode .= pack_arg($rtype, $args[$_]);
   }
@@ -1244,31 +1257,9 @@ sub constantize_number {
 	push(@constants, ['n', $n]);
 	$constants{$n}{n} = $#constants;
     }
-    return $constants{$n}{n};
+    return "[nc:".$constants{$n}{n}."]";
 }
 
-###############################################################################
-
-=head2 constantize_integer
-
-TODO: Document this.
-
-=cut
-
-sub constantize_integer {
-    my $i = shift;
-    if ($i =~ /^[+-]?0b[01]+$/i) {
-      $i = from_binary( $i );
-    }
-    elsif ($i =~ /^[+-]?0x?[0-9a-f]*$/i) {
-      $i = oct($i);
-    }
-# XXX parrot cannot currently handle integers over 2 ** 31
-    if( $i > (2 ** 31) || $i < -(2**31) ) {
-      error( "Cannot have integer $i because it is greater than 2 ** 31.\n", $file, $line );
-    }
-    return $i;
-}
 
 ###############################################################################
 

@@ -8,6 +8,9 @@ my %opcode;
 my $fingerprint;
 my $revision;
 
+my $nvivsize;
+$nvivsize = $PConfig{numvalsize}/$PConfig{intvalsize};
+
 sub _load {
     my $file = @_ ? shift : "opcode_table";
 
@@ -43,7 +46,7 @@ sub _load {
 
 	my $num_i = () = grep {/i/} @params;
 	my $num_n = () = grep {/n/} @params;
-	$opcode{$name}{RETURN_OFFSET} = 1 + scalar(@params);
+	$opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * $nvivsize;
     }
 }
 
@@ -112,3 +115,4 @@ used to ensure that bytecode is only executed if it was generated for
 a version of parrot supporting the appropriate opcodes.
 
 =cut
+

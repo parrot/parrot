@@ -289,8 +289,8 @@ ok 2
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_i_ic");
-	set	I0, 0xa0b0c0d
-	set	I1, 0xa0b0c0d
+	set	I0, 0xa0b0c0d0
+	set	I1, 0xa0b0c0d0
 	set	I2, 0
 
 	ne	I0, I2, ONE
@@ -745,38 +745,38 @@ CODE
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "clear_i");
-	set	I0, 0xdeadbee
-	set	I1, 0xdeadbee
-	set	I2, 0xdeadbee
-	set	I3, 0xdeadbee
-	set	I4, 0xdeadbee
-	set	I5, 0xdeadbee
-	set	I6, 0xdeadbee
-	set	I7, 0xdeadbee
-	set	I8, 0xdeadbee
-	set	I9, 0xdeadbee
-	set	I10, 0xdeadbee
-	set	I11, 0xdeadbee
-	set	I12, 0xdeadbee
-	set	I13, 0xdeadbee
-	set	I14, 0xdeadbee
-	set	I15, 0xdeadbee
-	set	I16, 0xdeadbee
-	set	I17, 0xdeadbee
-	set	I18, 0xdeadbee
-	set	I19, 0xdeadbee
-	set	I20, 0xdeadbee
-	set	I21, 0xdeadbee
-	set	I22, 0xdeadbee
-	set	I23, 0xdeadbee
-	set	I24, 0xdeadbee
-	set	I25, 0xdeadbee
-	set	I26, 0xdeadbee
-	set	I27, 0xdeadbee
-	set	I28, 0xdeadbee
-	set	I29, 0xdeadbee
-	set	I30, 0xdeadbee
-	set	I31, 0xdeadbee
+	set	I0, 0xdeadbeef
+	set	I1, 0xdeadbeef
+	set	I2, 0xdeadbeef
+	set	I3, 0xdeadbeef
+	set	I4, 0xdeadbeef
+	set	I5, 0xdeadbeef
+	set	I6, 0xdeadbeef
+	set	I7, 0xdeadbeef
+	set	I8, 0xdeadbeef
+	set	I9, 0xdeadbeef
+	set	I10, 0xdeadbeef
+	set	I11, 0xdeadbeef
+	set	I12, 0xdeadbeef
+	set	I13, 0xdeadbeef
+	set	I14, 0xdeadbeef
+	set	I15, 0xdeadbeef
+	set	I16, 0xdeadbeef
+	set	I17, 0xdeadbeef
+	set	I18, 0xdeadbeef
+	set	I19, 0xdeadbeef
+	set	I20, 0xdeadbeef
+	set	I21, 0xdeadbeef
+	set	I22, 0xdeadbeef
+	set	I23, 0xdeadbeef
+	set	I24, 0xdeadbeef
+	set	I25, 0xdeadbeef
+	set	I26, 0xdeadbeef
+	set	I27, 0xdeadbeef
+	set	I28, 0xdeadbeef
+	set	I29, 0xdeadbeef
+	set	I30, 0xdeadbeef
+	set	I31, 0xdeadbeef
 	clear_i
 	print	I0
 	print	I1
