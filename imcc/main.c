@@ -493,6 +493,7 @@ main(int argc, char * argv[])
         yyparse((void *) interpreter);
 
         imc_compile_all_units(interpreter);
+        imc_cleanup(interpreter);
 
         emit_close(interpreter);
         fclose(yyin);

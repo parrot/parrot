@@ -88,9 +88,9 @@ imcc_globals_destroy(int ex, void *param)
         while (s) {
             prev_s = s->prev;
             h = s->labels;
-            clear_tables(NULL, h);
+            clear_sym_hash(s->labels);
             h = s->bsrs;
-            clear_tables(NULL, h);
+            clear_sym_hash(s->bsrs);
             mem_sys_free(s);
             s = prev_s;
         }
@@ -154,7 +154,7 @@ e_pbc_open(void *param)
     /* free previous cached key constants if any */
     if (globals.cs) {
         SymReg **h = globals.cs->key_consts;
-        clear_tables(NULL, h);
+        clear_sym_hash(h);
     }
     cs->next = NULL;
     cs->subs = NULL;
@@ -598,6 +598,10 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
     opcode_t *rc;
     struct PackFile_Constant *pfc;
 
+#if IMC_TRACE
+    PIO_eprintf(interpreter, "pbc.c: add_const_pmc_sub '%s'\n", r->name);
+#endif
+
     debug(interpreter, DEBUG_PBC_CONST, "add_const_pmc_sub '%s'\n", r->name);
     /*
      * TODO use serialize api if that is done
@@ -772,9 +776,10 @@ add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
                 r->name, r->color, r->use_count);
 
 }
+
 /* store a constants idx for later reuse */
 static void
-constant_folding(struct Parrot_Interp *interpreter)
+constant_folding(struct Parrot_Interp *interpreter, IMC_Unit * unit)
 {
     SymReg * r;
     int i;
@@ -787,10 +792,10 @@ constant_folding(struct Parrot_Interp *interpreter)
                 add_1_const(interpreter, r);
             }
         }
-        /* ... but keychains 'K' are in hash, they may contain
+        /* ... but keychains 'K' are in local hash, they may contain
          * variables and constants
          */
-        for(r = hash[i]; r; r = r->next) {
+        for(r = unit->hash[i]; r; r = r->next) {
             if (r->type & VTCONST) {
                 add_1_const(interpreter, r);
             }
@@ -834,7 +839,7 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
         code_size = store_labels(interpreter, unit, &ins_size, oldsize);
         debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
-        constant_folding(interpreter);
+        constant_folding(interpreter, unit);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
         interpreter->code->byte_code =
@@ -853,6 +858,9 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
         }
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->r[1] && ins->r[1]->pcc_sub) {
+#if IMC_TRACE
+            PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n", ins->r[1]->name);
+#endif
             add_const_pmc_sub(interpreter, ins->r[1], oldsize,
                     oldsize+code_size);
         }
@@ -940,7 +948,7 @@ e_pbc_close(void *param)
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
 
     fixup_bsrs(interpreter);
-    clear_tables(NULL, ghash);
+    clear_globals();
     return 0;
 }
 

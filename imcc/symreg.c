@@ -82,7 +82,7 @@ _mk_symreg(SymReg* hsh[],char * name, int t)
 SymReg *
 mk_symreg(char * name, int t)
 {
-    return _mk_symreg(hash, name, t);
+    return _mk_symreg(cur_unit->hash, name, t);
 }
 
 SymReg *
@@ -96,7 +96,7 @@ mk_temp_reg(int t)
 
 SymReg *
 mk_pcc_sub(char * name, int proto) {
-    SymReg *r = _mk_symreg(hash, name, proto);
+    SymReg *r = _mk_symreg(cur_unit->hash, name, proto);
     r->type = VT_PCC_SUB;
     r->pcc_sub = calloc(1, sizeof(struct pcc_sub_t));
     return r;
@@ -165,7 +165,7 @@ add_pcc_cc(SymReg *r, SymReg * arg)
 SymReg * mk_pasm_reg(char * name)
 {
     SymReg * r;
-    if((r = _get_sym(hash, name))) {
+    if((r = _get_sym(cur_unit->hash, name))) {
 	free(name);
         return r;
     }
@@ -278,7 +278,7 @@ _mk_address(SymReg *hsh[], char * name, int uniq)
 
 SymReg * mk_address(char * name, int uniq)
 {
-    SymReg ** h = *name == '_' ? ghash : hash;
+    SymReg ** h = *name == '_' ? ghash : cur_unit->hash;
     return _mk_address(h, name, uniq);
 }
 
@@ -429,7 +429,7 @@ _store_symreg(SymReg *hsh[], SymReg * r)
 void
 store_symreg(SymReg * r)
 {
-    _store_symreg(hash, r);
+    _store_symreg(cur_unit->hash, r);
 }
 
 /* Gets a symbol from the hash */
@@ -445,10 +445,11 @@ _get_sym(SymReg * hsh[], const char * name)
     return 0;
 }
 
+/* Gets a symbol from the current unit symbol table */
 SymReg *
 get_sym(const char * name)
 {
-    return _get_sym(hash, name);
+    return _get_sym(cur_unit->hash, name);
 }
 
 /* find a symbol hash or ghash */
@@ -478,20 +479,22 @@ _find_sym(Namespace * nspace, SymReg * hsh[], const char * name)
 SymReg *
 find_sym(const char * name)
 {
-    return _find_sym(namespace, hash, name);
+    if(cur_unit)
+        return _find_sym(namespace, cur_unit->hash, name);
+    return NULL;
 }
 
 
 void
-_delete_sym(IMC_Unit * unit, SymReg * hsh[], const char * name)
+_delete_sym(IMC_Unit * unit, const char * name)
 {
     SymReg ** p;
     int i = hash_str(name) % HASH_SIZE;
-    for(p = &hsh[i]; *p; p = &(*p)->next) {
+    for(p = &unit->hash[i]; *p; p = &(*p)->next) {
         SymReg * deadmeat = *p;
 	if(!strcmp(name, deadmeat->name)) {
             *p = deadmeat->next;
-            if (unit && deadmeat->life_info){
+            if (deadmeat->life_info){
 	        free_life_info(unit, deadmeat);
             }
             free_sym(deadmeat);
@@ -503,12 +506,28 @@ _delete_sym(IMC_Unit * unit, SymReg * hsh[], const char * name)
 }
 
 
-/* Deletes all symbols */
 void
-clear_tables(IMC_Unit * unit, SymReg * hsh[])
+clear_sym_hash(SymReg **hsh)
 {
     int i;
     SymReg * p, *next;
+    for(i = 0; i < HASH_SIZE; i++) {
+	for(p = hsh[i]; p; ) {
+	    next = p->next;
+	    free_sym(p);
+	    p = next;
+	}
+        hsh[i] = NULL;
+    }
+}
+
+/* Deletes all local symbols and clears life info */
+void
+clear_locals(IMC_Unit * unit)
+{
+    int i;
+    SymReg * p, *next;
+    SymReg **hsh = unit->hash;
     for(i = 0; i < HASH_SIZE; i++) {
 	for(p = hsh[i]; p; ) {
 	    next = p->next;
@@ -520,6 +539,15 @@ clear_tables(IMC_Unit * unit, SymReg * hsh[])
 	}
         hsh[i] = NULL;
     }
+}
+
+/* Clear global symbols */
+void
+clear_globals()
+{
+    int i;
+    SymReg * p, *next;
+
     for(i = 0; i < HASH_SIZE; i++) {
         for(p = ghash[i]; p; p = p->next)
             if (p->type & VTADDRESS)

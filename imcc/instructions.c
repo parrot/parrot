@@ -456,6 +456,9 @@ emit_open(int type, void *param)
     emitter = type;
     has_compile = 0;
     dont_optimize = 0;
+#if IMC_TRACE
+    fprintf(stderr, "imc.c: emit_open (%d)\n", emitter);
+#endif
     return (emitters[emitter]).open(param);
 }
 
@@ -464,24 +467,24 @@ emit_flush(void *param, IMC_Unit * unit)
 {
     Instruction * ins, *next;
     struct Parrot_Interp *interpreter = (struct Parrot_Interp *)param;
+#if IMC_TRACE
+    fprintf(stderr, "instructions.c: emit_flush\n");
+#endif
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(param, unit);
     for (ins = unit->instructions; ins; ins = ins->next) {
         debug(interpreter, DEBUG_IMC, "emit %I\n", ins);
         (emitters[emitter]).emit(param, unit, ins);
     }
-    for (ins = unit->instructions; ins; ) {
-        next = ins->next;
-        free_ins(ins);
-        ins = next;
-    }
-    /*imc_close_unit(interpreter);*/
     return 0;
 }
 
 int
 emit_close(void *param)
 {
+#if IMC_TRACE
+    fprintf(stderr, "instructions.c: emit_close()\n");
+#endif
     return (emitters[emitter]).close(param);
 }
 

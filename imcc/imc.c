@@ -12,19 +12,83 @@
 #include "optimizer.h"
 
 
-static IMC_Unit * imc_units;
-static IMC_Unit * cur_unit;
+void imc_check_units(struct Parrot_Interp *interp, char * caller);
+
+/*
+ * A sanity checking function used for debugging only.
+ * Useful for tracking down memory corruptions by inserting
+ * validation calls between compilation steps.
+ */
+void imc_check_units(struct Parrot_Interp *interp, char * caller)
+{
+    UNUSED(interp);
+    UNUSED(caller);
+#if IMC_TRACE
+    IMC_Unit * unit, *unit_next;
+    int i = 1;
+    static int ncheck;
+    fprintf(stderr, "imc.c: unit check pass %d from %s\n", ++ncheck, caller);
+    for(unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+        unit_next = unit->next;
+        {
+            Instruction *ins = unit->instructions;
+            if(ins->r[1] && ins->r[1]->pcc_sub) {
+                fprintf(stderr, "UNIT[%d] : pcc_sub %s (nargs=%d)\n",
+                     i, ins->r[1]->name, ins->r[1]->pcc_sub->nargs);
+            }
+        }
+
+        i++;
+    }
+#endif
+}
 
 
 void
 imc_compile_all_units(struct Parrot_Interp *interp)
 {
-    IMC_Unit * unit;
-    for(unit = interp->imc_info->imc_units; unit; unit = unit->next) {
+    IMC_Unit *unit, *unit_next;
+    Instruction *ins, *ins_next;
+#if IMC_TRACE
+    int i = 1;
+
+    fprintf(stderr, "imc.c:  imc_compile_all_units()\n");
+#endif
+    UNUSED(ins_next);
+    UNUSED(ins);
+    for(unit = interp->imc_info->imc_units; unit; unit = unit_next) {
+        unit_next = unit->next;
+#if IMC_TRACE
+        fprintf(stderr, "compiling unit %d\n", i++);
+#endif
         imc_compile_unit(interp, unit);
         emit_flush(interp, unit);
         imc_close_unit(interp, unit);
     }
+
+    /* All done with compilation, now free instructions and other structures */
+
+    /* XXX FIXME: Can't free instructions yet without causing memory problems
+     * in the symbol tables.
+     */
+#if 1
+    for(unit = interp->imc_info->imc_units; unit;) {
+        unit_next = unit->next;
+#if 0
+        for (ins = unit->instructions; ins; ) {
+            ins_next = ins->next;
+            free_ins(ins);
+            ins = ins_next;
+        }
+#endif
+        imc_free_unit(interp, unit);
+        unit = unit_next;
+    }
+#endif
+
+    /* XXX: Memory leak */
+    interp->imc_info->imc_units = NULL;
+    interp->imc_info->last_unit = NULL;
 }
 
 /* imc_compile_unit is the main loop of the IMC compiler for each unit. It operates
@@ -34,8 +98,25 @@ void
 imc_compile_unit(struct Parrot_Interp *interp, IMC_Unit * unit)
 {
     /* Not much here for now except the allocator */
+    cur_unit = unit;
+
+#if IMC_TRACE
+    imc_check_units(interp, "imc_compile_unit");
+#endif
 
     imc_reg_alloc(interp, unit);
+}
+
+
+/*
+ * Any activity required to cleanup the compiler state and be
+ * ready for a new compiler invokation goes here.
+ */
+void
+imc_cleanup(struct Parrot_Interp *interp)
+{
+     UNUSED(interp);
+     clear_globals();
 }
 
 
@@ -46,6 +127,7 @@ IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
    IMC_Unit * unit = calloc(1, sizeof(IMC_Unit));
+   unit->hash = calloc(HASH_SIZE, sizeof(SymReg*));
    unit->type = t;
    return unit;
 }
@@ -60,48 +142,62 @@ imc_open_unit(Parrot_Interp interp, IMC_Unit_Type t)
 {
     IMC_Unit * unit;
     unit = imc_new_unit(t);
-    if(!interp->imc_info->cur_unit)
+    if(!interp->imc_info->imc_units)
        interp->imc_info->imc_units = unit;
-    unit->prev = cur_unit;
-    if(interp->imc_info->cur_unit)
-       interp->imc_info->cur_unit->next = unit;
-    interp->imc_info->cur_unit = unit;
+    unit->prev = interp->imc_info->last_unit;
+    if(interp->imc_info->last_unit)
+       interp->imc_info->last_unit->next = unit;
+    interp->imc_info->last_unit = unit;
     interp->imc_info->n_comp_units++;
-#if 0
+#if IMC_TRACE
     fprintf(stderr, "imc_open_unit()\n");
 #endif
-    return interp->imc_info->cur_unit;
+    return interp->imc_info->last_unit;
 }
 
+/*
+ * Close a unit from compilation. 
+ * Does not destroy the unit, leaves it on the
+ * list. Right now this does nothing.
+ */
 void
 imc_close_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
-    imc_info_t *imc = interp->imc_info;
-
-    free_reglist(unit);
-    clear_basic_blocks(unit);       /* and cfg ... */
-    if (!imc->n_comp_units)
-        fatal(1, "close_comp_unit", "non existent comp_unit\n");
-    imc->n_comp_units--;
-    clear_tables(unit, hash);
-#if 0
+    UNUSED(interp);
+    UNUSED(unit);
+#if IMC_TRACE
     fprintf(stderr, "imc_close_unit()\n");
 #endif
+    cur_unit = NULL;
+}
+
 /*
-    imc->cur_unit->instructions = imc->cur_unit->last_ins = NULL;
-*/
-}
-
-
-IMC_Unit *
-imc_cur_unit(Parrot_Interp interp)
+ * XXX FIXME: Memory leakage. Can't call free_reglist or clear_tables()
+ * yet due to interaction between units. One unit may hold a reference
+ * to another (subs). Garbage collection would solve this.
+ */
+void
+imc_free_unit(Parrot_Interp interp, IMC_Unit * unit)
 {
-   /* Have to put this here as yacc and bison have problems
-    * with the null pointer deref
-    */
-   return interp->imc_info->cur_unit;
-}
+    imc_info_t *imc = interp->imc_info;
 
+#if IMC_TRACE
+    fprintf(stderr, "imc_free_unit()\n");
+#endif
+
+    /* XXX See above
+    free_reglist(unit);
+    */
+
+    clear_basic_blocks(unit);       /* and cfg ... */
+    if (!imc->n_comp_units)
+        fatal(1, "imc_free_unit", "non existent unit\n");
+    imc->n_comp_units--;
+
+    clear_locals(unit);
+
+    free(unit);
+}
 
 
 

@@ -401,6 +401,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
     emit_open(1, interp);
     /* XXX where to put constants */
     yyparse((void *) interp);
+    imc_compile_all_units(interp);
     emit_close(interp);
 
 #ifdef EVAL_TEST
@@ -427,6 +428,7 @@ imcc_compile_pasm(Parrot_Interp interp, const char *s)
     pasm_file = 1;
     expect_pasm = 0;
     pf = imcc_compile(interp, s);
+    imc_cleanup(interp);
     pasm_file = pasm;
     return pf;
 }
@@ -440,11 +442,15 @@ imcc_compile_pir (Parrot_Interp interp, const char *s)
     pasm_file = 0;
     expect_pasm = 0;
     pf = imcc_compile(interp, s);
+    imc_cleanup(interp);
     pasm_file = pasm;
     return pf;
 }
 
 
+/*
+ * Compile a file by filename (can be either PASM or IMCC code)
+ */
 static void *
 imcc_compile_file (Parrot_Interp interp, const char *s)
 {
@@ -464,6 +470,11 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         fatal(1, "imcc_compile_file", "couldn't open '%s'\n", s);
         return NULL;
     }
+
+#if IMC_TRACE
+    fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", s);
+#endif
+
     pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
@@ -478,6 +489,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
 
     /* see imcc.l */
     compile_file(interp, new);
+    imc_cleanup(interp);
 
     (void)Parrot_switch_to_cs(interp, pf_save->cur_cs);
     sourcefile = source;
@@ -486,7 +498,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     return pf;
 }
 
-/* tell the parrot core, which compilers we provide */
+/* Register additional compilers with the interpreter */
 void
 register_compilers(Parrot_Interp interp)
 {

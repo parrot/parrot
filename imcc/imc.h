@@ -56,7 +56,9 @@
  */
 void imc_compile_all_units(struct Parrot_Interp *);
 void imc_compile_unit(struct Parrot_Interp *, IMC_Unit * unit);
-IMC_Unit * imc_cur_unit(struct Parrot_Interp *);
+void imc_close_unit(struct Parrot_Interp *, IMC_Unit *);
+void imc_free_unit(struct Parrot_Interp *, IMC_Unit *);
+void imc_cleanup(struct Parrot_Interp *);
 
 /*
  * instructions.c
@@ -134,7 +136,7 @@ EXTERN struct imcc_ostat ostat;
 typedef struct _imc_info_t {
 
     IMC_Unit * imc_units;
-    IMC_Unit * cur_unit;
+    IMC_Unit * last_unit;
     int imcc_warn;
     int verbose;
     int debug;
@@ -143,6 +145,12 @@ typedef struct _imc_info_t {
 } imc_info_t;
 
 #define IMCC_INFO(i) ((i)->imc_info)
+
+#define IMC_TRACE 0
+
+
+extern IMC_Unit * cur_unit;
+
 #endif
 
 

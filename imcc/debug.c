@@ -158,7 +158,7 @@ dump_labels(IMC_Unit * unit)
     fprintf(stderr, "name\tpos\tlast ref\n"
             "-----------------------\n");
     for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = hash[i];
+        SymReg * r = unit->hash[i];
         if (r && (r->type & VTADDRESS))
             fprintf(stderr, "%s\t%d\t%d\n",
                     r->name,

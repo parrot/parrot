@@ -138,9 +138,11 @@ SymReg * _mk_const(SymReg *hash[], char * name, int t);
 void _store_symreg(SymReg *hash[], SymReg * r);
 SymReg * _mk_address(SymReg *hash[], char * name, int uniq);
 SymReg * link_keys(int nargs, SymReg *keys[]);
-void clear_tables(struct _IMC_Unit *, SymReg *h[]);
+void clear_locals(struct _IMC_Unit *);
+void clear_sym_hash(SymReg **);
+void clear_globals(void);
 unsigned int  hash_str(const char * str);
-void _delete_sym(struct _IMC_Unit *, SymReg * hsh[], const char * name);
+void _delete_sym(struct _IMC_Unit *, const char * name);
 
 SymReg * _find_sym(Namespace * ns, SymReg * hash[], const char * name);
 char * _mk_fullname(Namespace * ns, const char * name);
@@ -150,7 +152,10 @@ void pop_namespace(char * name);
 
 /* globals */
 
-EXTERN SymReg * hash[HASH_SIZE], *ghash[HASH_SIZE];
+/* Now local to each unit
+  EXTERN SymReg * hash[HASH_SIZE];
+*/
+EXTERN SymReg * ghash[HASH_SIZE];
 
 #endif
 

@@ -69,7 +69,7 @@ find_basic_blocks (Parrot_Interp interpreter, IMC_Unit * unit, int first)
     info(interpreter, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
     for(i = 0; i < HASH_SIZE; i++) {
-        SymReg * r = hash[i];
+        SymReg * r = unit->hash[i];
         if (r && (r->type & VTADDRESS)) {
             r->last_ins = NULL;
         }
@@ -480,6 +480,10 @@ analyse_life_symbol(Parrot_Interp interpreter, IMC_Unit * unit, SymReg* r)
 {
     int i;
 
+#if IMC_TRACE
+    fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
+#endif
+
     if (r->life_info)
         free_life_info(unit, r);
     r->life_info = calloc(unit->n_basic_blocks,
@@ -514,6 +518,9 @@ void
 free_life_info(IMC_Unit * unit, SymReg *r)
 {
     int i;
+#if IMC_TRACE
+    fprintf(stderr, "free_life_into(%s)\n", r->name);
+#endif
     if (r->life_info) {
         for (i=0; i < unit->n_basic_blocks; i++) {
             if (r->life_info[i])
