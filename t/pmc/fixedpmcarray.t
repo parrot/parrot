@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 use Test::More;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -97,6 +97,35 @@ CODE
 FixedPMCArray: Can't resize!
 OUTPUT
 #VIM's syntax highlighter needs this line
+
+output_is(<<'CODE', <<'OUTPUT', "Truth and falsehood");
+        new P0, .FixedPMCArray
+
+        set P0, 0
+        if P0, NOK_1
+        branch OK_1
+NOK_1:  print "not "
+OK_1:   print "ok 1\n"
+        unless P0, OK_2
+        print "not "
+OK_2:   print "ok 2\n"
+
+        set P0, 1
+        unless P0, NOK_3
+        branch OK_3
+NOK_3:  print "not "
+OK_3:   print "ok 3\n"
+        if P0, OK_4
+        print "not "
+OK_4:   print "ok 4\n"
+
+        end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "Setting first element");
         new P0, .FixedPMCArray
