@@ -583,7 +583,7 @@ print_profile(int status, void *p)
 
                 k = profile->data[j].op;
                 jit = ' ';
-#ifdef JIT_CAPABLE
+#if JIT_CAPABLE
                 if (k >= PARROT_PROF_EXTRA)
                     jit = op_jit[k - PARROT_PROF_EXTRA].extcall != 1 ?
                         'j' : ' ';
