@@ -21,11 +21,54 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 10;
+   plan tests => 12;
 }
 else {
    plan skip_all => "No BigInt Lib configured";
 }
+
+my $fp_equality_macro = <<'ENDOFMACRO';
+.macro fp_eq (	J, K, L )
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, .$FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+.endm
+.macro fp_ne(	J,K,L)
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, .$FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+.endm
+ENDOFMACRO
 
 output_is(<<'CODE', <<'OUT', "create");
    new P0, .BigInt
@@ -44,6 +87,40 @@ output_is(<<'CODE', <<'OUT', "set/get int");
    end
 CODE
 999999
+OUT
+
+output_is(<<"CODE", <<'OUT', "set int, get double");
+@{[ $fp_equality_macro ]}
+     new P0, .BigInt
+     set P0, 999999
+     set N1, P0
+     .fp_eq(N1, 999999.0, OK1)
+     print "not "
+OK1: print "ok 1\\n"
+
+     set P0, -999999
+     set N1, P0
+     .fp_eq(N1, -999999.0, OK2)
+     print "not "
+OK2: print "ok 2\\n"
+
+     set P0, 2147483646
+     set N1, P0
+     .fp_eq(N1, 2.147483646e9, OK3)
+     print "not "
+OK3: print "ok 3\\n"
+
+     set P0, -2147483646
+     set N1, P0
+     .fp_eq(N1, -2.147483646e9, OK4)
+     print "not "
+OK4: print "ok 4\\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUT
 
 output_is(<<'CODE', <<'OUT', "set double, get str");
@@ -119,6 +196,47 @@ output_is(<<'CODE', <<'OUT', "mul_int");
    end
 CODE
 999999000000
+OUT
+
+output_is(<<'CODE', <<'OUT', "div");
+     new P0, .BigInt
+     set P0, "100000000000000000000"
+     new P1, .BigInt
+     set P1, "100000000000000000000"
+     new P2, .BigInt
+     div P2, P0, P1
+     set I0, P2
+     eq I0, 1, OK1
+     print "not "
+OK1: print "ok 1\n"
+
+     new P3, .BigInt
+     set P3, "10000000000000"
+     set P1, 10000000
+     div P2, P0, P1
+     eq  P2, P3, OK2
+     print "not "
+OK2: print "ok 2\n"
+
+     set P1, 10
+     set P3, "10000000000000000000"
+     div P2, P0, P1
+     eq  P2, P3, OK3
+     print "not "
+OK3: print "ok 3\n"
+
+     set P1, -1
+     set P3, "-100000000000000000000"
+     div P2, P0, P1
+     eq  P2, P3, OK4
+     print "not "
+OK4: print "ok 4\n"
+     end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
 OUT
 
 use Parrot::Config;
