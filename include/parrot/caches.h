@@ -56,7 +56,6 @@ typedef struct _Caches {
     UINTVAL mc_size;            /* sizeof table */
     Meth_cache_entry ***idx;    /* bufstart idx */
     /* PMC **hash */            /* for non-constant keys */
-    void *stack_chunk_cache;    /* stack chunk recycling */
 
     Regs_cache regs_cache;      /* runops_fromc reg save cache */
 } Caches;

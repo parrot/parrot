@@ -37,9 +37,14 @@ Initializes the continuation.
 */
 
     void init () {
-        PMC_cont(SELF) = new_ret_continuation(INTERP);
-        PMC_struct_val(SELF) = NULL;
-        PObj_active_destroy_SET(SELF);
+        /*
+         * Use Continuation init. This implies that RetContinuations
+         * now mark their context too. This is needed in the presence of
+         * Coroutines and other Continuations, because the RetContinuation
+         * can be the only visible part of the root-set that marks the
+         * context i.e. the register backing stacks.
+         */
+        SUPER();
     }
 
 }

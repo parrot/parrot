@@ -71,13 +71,13 @@ pmclass Coroutine extends Sub {
         }
     }
 
-    /*
+/*
 
-       =item C<void init()>
+=item C<void init()>
 
-       Initializes the co-routine.
+Initializes the co-routine.
 
-       =cut
+=cut
 
 */
 
@@ -90,13 +90,13 @@ pmclass Coroutine extends Sub {
             PObj_get_FLAGS(SELF) |= PObj_private3_FLAG;
     }
 
-    /*
+/*
 
-       =item C<void *invoke(void *next)>
+=item C<void *invoke(void *next)>
 
-       Swaps the "context".
+Swaps the "context".
 
-       =cut
+=cut
 
 */
 
@@ -140,19 +140,19 @@ pmclass Coroutine extends Sub {
         return dest;
     }
 
-    /*
+/*
 
-       =item C<PMC* shift_pmc>)
+=item C<PMC* shift_pmc>)
 
-       Run the coroutine until it yields a value. The call to the coroutine
-       is actually done via the C<call_hook> below, a piece of code at the
-       end of a coroutine:
+Run the coroutine until it yields a value. The call to the coroutine
+is actually done via the C<call_hook> below, a piece of code at the
+end of a coroutine:
 
-       set P0, P5    # get the real coroutine
-       invokecc      # run that code
-       end           # terminate the runloop
+set P0, P5    # get the real coroutine
+invokecc      # run that code
+end           # terminate the runloop
 
-       =cut
+=cut
 
 */
 
@@ -188,13 +188,13 @@ pmclass Coroutine extends Sub {
         return res;
     }
 
-    /*
+/*
 
-       Iterator interface
+Iterator interface
 
-       =item C<INTVAL elements ()>
+=item C<INTVAL elements ()>
 
-       Return much, we don't know.
+Return much, we don't know.
 
 */
 
@@ -222,13 +222,13 @@ pmclass Coroutine extends Sub {
         return 1;
     }
 
-    /*
+/*
 
-       =item C<void mark()>
+=item C<void mark()>
 
-       Marks the coroutine as live.
+Marks the coroutine as live.
 
-       =cut
+=cut
 
 */
 

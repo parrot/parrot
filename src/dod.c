@@ -331,7 +331,6 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     mark_const_subs(interpreter);
 
     /* mark caches and freelists */
-    mark_stack_chunk_cache(interpreter);
     mark_object_cache(interpreter);
     mark_saved_regs(interpreter);
 

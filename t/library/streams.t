@@ -34,10 +34,10 @@ output_is(<<"CODE", <<"OUT", "load and create a Stream::$a");
     print "loading '$a'...\\n"
     load_bytecode "library/Stream/$a.imc"
     print "loaded\\n"
-    
+
     find_type \$I0, "Stream::$a"
     \$P0 = new \$I0
-    
+
     \$S0 = classname \$P0
     print "classname: '"
     print \$S0
@@ -116,7 +116,7 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
     find_type $I0,"Stream::Replay"
     stream = new $I0
     assign stream, $P0
-    
+
     $S0 = stream."read_bytes"( 3 )
     print "["
     print $S0
@@ -124,7 +124,7 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
 
     stream = clone stream
     $P0 = clone stream
-    
+
     $S0 = stream."read_bytes"( 4 )
     print "["
     print $S0
@@ -134,7 +134,7 @@ output_is(<<'CODE', <<'OUT', "Stream::read_bytes");
     print "["
     print $S0
     print "]\n"
-    
+
     $S0 = stream."read"()
     print "["
     print $S0
@@ -189,7 +189,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     new counter, I0
     newsub temp, .Sub, _counter
     assign counter, temp
-    
+
     # create the text stream
     find_type I0, "Stream::Sub"
     new text, I0
@@ -203,11 +203,11 @@ output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     # add the streams
     assign combined, counter
     assign combined, text
-    
+
     # specify our own combiner sub
     newsub temp, .Sub, _combiner
     combined."combiner"( temp )
-    
+
     # dump the combined stream
     combined."dump"()
 
@@ -222,7 +222,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Combiner");
     .param pmc stream
     .local int i
     .local string str
-    
+
     i = 0
 LOOP:
     inc i
@@ -266,7 +266,6 @@ OUT
 #
 # 13
 #
-TODO: { local $TODO = "fix GC bug";
 output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
 ##PIR##
 .sub _main
@@ -276,7 +275,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
     load_bytecode "library/Stream/Base.imc"
     load_bytecode "library/Stream/Coroutine.imc"
 
-    # create the coroutine stream    
+    # create the coroutine stream
     find_type I0, "Stream::Coroutine"
     new stream, I0
 
@@ -284,10 +283,10 @@ output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
     newsub temp, .Coroutine, _coro
     assign stream, temp
     #stream."source"( temp )
-    
+
     # dump the stream
     stream."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -303,7 +302,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Coroutine");
     i = 0
 LOOP:
     str = i
-    
+
     .pcc_begin_yield
     .return str
     .pcc_end_yield
@@ -315,7 +314,7 @@ LOOP:
     # you can also close it explicitly with
     # stream."close"()
     # in which case it doesn't matter what you are returning.
-    
+
     null str
     .pcc_begin_return
     .return str
@@ -335,7 +334,6 @@ read:[9]
 done
 finished
 OUT
-};
 
 #
 # 14
@@ -712,7 +710,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Filter");
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Filter.imc"
-    
+
     # create the counter stream
     find_type I0, "Stream::Sub"
     new stream, I0
@@ -728,10 +726,10 @@ output_is(<<'CODE', <<'OUT', "Stream::Filter");
     # set the filter sub
     newsub temp, .Sub, _filter
     filter."filter"( temp )
-    
+
     # dump the stream
     filter."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -743,7 +741,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Filter");
     .param pmc stream
     .local string str
     .local int i
-    
+
     i = 0
 
 LOOP:
@@ -806,17 +804,17 @@ output_is(<<'CODE', <<'OUT', "Stream::include");
     .local pmc temp
 
     load_bytecode "library/Stream/Sub.imc"
-    
+
     find_type I0, "Stream::Sub"
     new stream, I0
 
     # set the stream's source sub
     newsub temp, .Sub, _counter
     assign stream, temp
-    
+
     # dump the stream
     stream."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -827,7 +825,7 @@ output_is(<<'CODE', <<'OUT', "Stream::include");
 .sub _counter method
     .local string str
     .local int i
-    
+
     i = 0
 
 LOOP:
@@ -839,13 +837,13 @@ LOOP:
     if i != 4 goto SKIP
     .local pmc temp
     .local pmc func
-    
+
     find_type I0, "Stream::Sub"
     new temp, I0
 
     newsub func, .Sub, _included
     assign temp, func
-    
+
     # include it
     self."include"( temp )
 SKIP:
@@ -860,7 +858,7 @@ SKIP:
 .sub _included method
     .local pmc temp
     .local pmc func
-    
+
     self."write"( "hello" )
 
     # create another stream
@@ -868,12 +866,12 @@ SKIP:
     new temp, I0
     newsub func, .Sub, _counter2
     assign temp, func
-    
+
     # include it
     self."include"( temp )
 
     self."write"( "world" )
-    
+
     .pcc_begin_return
     .pcc_end_return
 .end
@@ -888,7 +886,7 @@ LOOP:
     ord I0, str
     inc I0
     chr str, I0
-    
+
     if str != "G" goto LOOP
 
     .pcc_begin_return
@@ -929,7 +927,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Lines");
 
     load_bytecode "library/Stream/Sub.imc"
     load_bytecode "library/Stream/Lines.imc"
-    
+
     # create a text stream
     find_type I0, "Stream::Sub"
     new stream, I0
@@ -942,10 +940,10 @@ output_is(<<'CODE', <<'OUT', "Stream::Lines");
     new lines, I0
     # set the source
     assign lines, stream
-    
+
     # dump the stream
     lines."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -978,19 +976,19 @@ output_is(<<'CODE', <<'OUT', "Stream::ParrotIO");
 
     load_bytecode "library/Stream/ParrotIO.imc"
 
-    # create the ParrotIO stream    
+    # create the ParrotIO stream
     find_type I0, "Stream::ParrotIO"
     new stream, I0
 
     # open this file
     stream."open"( "t/library/perlhist.txt", "<" )
-    
+
     # you can specifiy a custom block size with
     # stream."blockSize"( 10 )
-    
+
     # dump the stream
     stream."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -1276,20 +1274,19 @@ OUT
 #
 # 19
 #
-TODO: { local $TODO = "fix GC bug";
 output_is(<<'CODE', <<'OUT', "Stream::Replay");
 ##PIR##
 .sub _main @MAIN
     .local pmc stream
-    
+
     load_bytecode "library/Stream/Writer.imc"
     load_bytecode "library/Stream/Replay.imc"
-    
+
     find_type I0, "Stream::Writer"
     new stream, I0
     P0 = global "_reader"
     assign stream, P0
-    
+
     stream."write"( "1" )
     stream."write"( "2" )
     stream."write"( "A" )
@@ -1315,7 +1312,7 @@ output_is(<<'CODE', <<'OUT', "Stream::Replay");
     find_type I0, "Stream::Replay"
     new stream1, I0
     assign stream1, self
-    
+
     print "reader start\n"
 
     print "1:'"
@@ -1324,10 +1321,10 @@ output_is(<<'CODE', <<'OUT', "Stream::Replay");
     str = stream1."read"()
     print str
     print "'\n"
-    
+
     stream2 = clone stream1
     stream3 = clone stream1
-    
+
     print "2:'"
     str = stream2."read"()
     print str
@@ -1335,17 +1332,17 @@ output_is(<<'CODE', <<'OUT', "Stream::Replay");
     print str
     stream2."close"()
     print "'\n1:'"
-    
+
     str = stream1."read"()
     print str
     str = stream1."read"()
     print str
-    
+
     str = stream1."read"()
     print str
     str = stream1."read"()
     print str
-    
+
     print "\n3:'"
 
     str = stream3."read"()
@@ -1359,9 +1356,9 @@ output_is(<<'CODE', <<'OUT', "Stream::Replay");
 
     str = stream3."read"()
     print str
-    
+
     print "'\n"
-    
+
     print "reader done\n"
 .end
 CODE
@@ -1374,7 +1371,6 @@ reader done
 done
 finished
 OUT
-};
 
 
 #
@@ -1388,17 +1384,17 @@ output_is(<<'CODE', <<'OUT', "Stream::Sub");
 
     load_bytecode "library/Stream/Base.imc"
     load_bytecode "library/Stream/Sub.imc"
-    
+
     find_type I0, "Stream::Sub"
     new stream, I0
 
     # set the stream's source sub
     newsub temp, .Sub, _counter
     assign stream, temp
-    
+
     # dump the stream
     stream."dump"()
-    
+
     print "done\n"
     sweep 1
     collect
@@ -1409,14 +1405,14 @@ output_is(<<'CODE', <<'OUT', "Stream::Sub");
 .sub _counter method
     .local string str
     .local int i
-    
+
     i = 0
 
 LOOP:
     # streams are using strings,
     # so we have to convert the number into a string
     str = i
-    
+
     # write the string
     self."write"( str )
 

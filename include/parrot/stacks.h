@@ -25,10 +25,12 @@ typedef struct Stack_Entry {
 
 typedef struct Stack_Chunk {
     pobj_t obj;
-    int size_class;
+    int size;
     const char * name;
     struct Stack_Chunk *prev;
-    struct Stack_Chunk *free_p;
+#if ! DISABLE_GC_DEBUG
+    void * dummy;   /* force 8 byte align */
+#endif
     void *data;
 } Stack_Chunk_t;
 

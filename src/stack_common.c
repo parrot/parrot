@@ -24,17 +24,6 @@ These stacks all differ only in the size of items.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-typedef struct {
-    size_t size;
-    Stack_Chunk_t *free_list;
-} Stack_cache_entry;
-
-#define MAX_CACHED_STACKS 10
-
-typedef struct {
-    Stack_cache_entry stack_cache[MAX_CACHED_STACKS];
-} Stack_cache;
-
 /*
 
 =item C<void stack_system_init(Interp *interpreter)>
@@ -49,59 +38,8 @@ register stacks.
 void
 stack_system_init(Interp *interpreter)
 {
-    /*
-     * TODO cleanup in Parrot_really_destroy
-     */
-    interpreter->caches->stack_chunk_cache =
-        mem_sys_allocate_zeroed(sizeof(Stack_cache));
 }
 
-static int
-get_size_class(Parrot_Interp interpreter, size_t item_size)
-{
-    int i;
-    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
-
-    item_size += offsetof(Stack_Chunk_t, data);
-    for (i = 0; i < MAX_CACHED_STACKS; ++i) {
-        if (!sc->stack_cache[i].size)
-            break;
-        if (sc->stack_cache[i].size == item_size)
-            return i;
-    }
-    if (i == MAX_CACHED_STACKS)
-        PANIC("Too many cached stacks");
-    make_bufferlike_pool(interpreter, item_size);
-    sc->stack_cache[i].size = item_size;
-    sc->stack_cache[i].free_list = NULL;
-    return i;
-}
-
-/*
-
-=item C<void mark_stack_chunk_cache(Interp *interpreter)>
-
-Mark items in the chunk cache live during DOD.
-
-=cut
-
-*/
-void
-mark_stack_chunk_cache(Parrot_Interp interpreter)
-{
-    int i;
-    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
-    Stack_cache_entry *e;
-    Stack_Chunk_t *chunk;
-
-    for (i = 0; i < MAX_CACHED_STACKS; ++i) {
-        e = sc->stack_cache + i;
-        if (!e->size)
-            break;
-        for (chunk = e->free_list; chunk; chunk = chunk->free_p)
-            pobject_lives(interpreter, (PObj*) chunk);
-    }
-}
 
 /*
 
@@ -118,15 +56,17 @@ debugging/error reporting.
 Stack_Chunk_t *
 register_new_stack(Interp *interpreter, const char *name, size_t item_size)
 {
-    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
-    int s = get_size_class(interpreter, item_size);
-    Stack_cache_entry *e = sc->stack_cache + s;
-    Stack_Chunk_t *chunk = new_bufferlike_header(interpreter, e->size);
+    Stack_Chunk_t *chunk;
 
+    item_size += offsetof(Stack_Chunk_t, data);
+    item_size += 7;
+    item_size &= ~7;    /* round up to 8 so that the chunk is aligned at
+                           the same size - the aligned MMX memcpy needs it */
+    make_bufferlike_pool(interpreter, item_size);
+    chunk = new_bufferlike_header(interpreter, item_size);
     chunk->prev = chunk;        /* mark the top of the stack */
-    chunk->free_p = NULL;
     chunk->name = name;
-    chunk->size_class = s;
+    chunk->size = item_size;    /* TODO store the pool instead the size */
     return chunk;
 }
 
@@ -144,31 +84,8 @@ Get a new chunk either from the freelist or allocate one.
 Stack_Chunk_t *
 cst_new_stack_chunk(Parrot_Interp interpreter, Stack_Chunk_t *chunk)
 {
-    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
-    int s = chunk->size_class;
-    Stack_cache_entry *e = sc->stack_cache + s;
-    Stack_Chunk_t * new_chunk;
-
-    assert(s < MAX_CACHED_STACKS);
-    if (e->free_list) {
-        new_chunk = e->free_list;
-        assert(new_chunk->size_class == s);
-        assert(new_chunk->size_class == chunk->size_class);
-        e->free_list = new_chunk->free_p;
-        /* PObj_report_SET(new_chunk);  XXX */
-        /*
-         * freeP- is used as a flag too to avoid tracing into
-         * the free list in mark_pmc_register_stack
-         */
-
-      /*
-       * fprintf(stderr, "** GET %d %p free %p\n", s, new_chunk, e->free_list);        */
-    }
-    else {
-        new_chunk = new_bufferlike_header(interpreter, e->size);
-        new_chunk->size_class = s;
-    }
-    new_chunk->free_p = NULL;
+    Stack_Chunk_t *new_chunk = new_bufferlike_header(interpreter, chunk->size);
+    new_chunk->size = chunk->size;
     new_chunk->name = chunk->name;
     return new_chunk;
 }
@@ -210,9 +127,6 @@ void*
 stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
 {
     Stack_Chunk_t *chunk = *stack_p;
-    Stack_cache *sc = interpreter->caches->stack_chunk_cache;
-    int s = chunk->size_class;
-    Stack_cache_entry *e = sc->stack_cache + s;
     /*
      * the first entry (initial top) refers to itself
      */
@@ -221,21 +135,6 @@ stack_prepare_pop(Parrot_Interp interpreter, Stack_Chunk_t **stack_p)
                 chunk->name);
     }
     *stack_p = chunk->prev;
-
-    /*
-     * is it reusable?
-     */
-    if ((PObj_get_FLAGS(chunk) & PObj_private2_FLAG)) {
-        assert(s < MAX_CACHED_STACKS);
-     /* fprintf(stderr, "** ADD %d %p free = %p\n", s, chunk, e->free_list); */
-        chunk->free_p = e->free_list;
-        chunk->name = "free";
-        e->free_list = chunk;
-        /* PObj_on_free_list_SET(chunk); */
-        /* clear reuse flag */
-        PObj_get_FLAGS(chunk) &= ~PObj_private2_FLAG;
-    }
-
     return STACK_DATAP(chunk);
 }
 

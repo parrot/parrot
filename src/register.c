@@ -81,7 +81,7 @@ mark_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
 {
     for (; ; chunk = chunk->prev) {
         pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev || chunk->free_p)
+        if (chunk == chunk->prev)
             break;
     }
 }
@@ -94,7 +94,7 @@ mark_pmc_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
         struct PRegFrame *pf = (struct PRegFrame *)STACK_DATAP(chunk);
 
         pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev || chunk->free_p)
+        if (chunk == chunk->prev)
             break;
         /* TODO for variable sized chunks use buflen */
         for (j = 0; j < NUM_REGISTERS/2; j++) {
@@ -124,7 +124,7 @@ mark_string_register_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
         struct SRegFrame *sf = (struct SRegFrame *)STACK_DATAP(chunk);
 
         pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev || chunk->free_p)
+        if (chunk == chunk->prev)
             break;
         for (j = 0; j < NUM_REGISTERS/2; j++) {
             PObj* reg = (PObj*) sf->registers[j];
