@@ -291,7 +291,7 @@ sub ops_addr_decl
 {
     my ($self, $bs) = @_;
 
-    return "static void **${bs}ops_addr;\n\n";
+    return "static void *const* ${bs}ops_addr;\n\n";
 }
 
 =item C<run_core_func_start()>
@@ -309,7 +309,7 @@ sub run_core_func_start
     opcode_t *cur_opcode = cur_op;
 #endif
 
-    static void *l_ops_addr[] = {
+    static void *const l_ops_addr[] = {
 END_C
 }
 
@@ -339,7 +339,11 @@ sub run_core_after_addr_table
     if (!${bs}ops_addr)
 	${bs}ops_addr = l_ops_addr;
     if (cur_opcode == 0) {
-        return (opcode_t *)${bs}ops_addr ;
+	union {
+	    const void * __c_ptr;
+	    void * __ptr;
+	} __ptr_u;
+        return (opcode_t *)const_cast(${bs}ops_addr);
     }
 END_C
 }
