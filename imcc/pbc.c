@@ -232,6 +232,7 @@ make_new_sub(struct Parrot_Interp *interpreter, IMC_Unit * unit)
     }
 #else
     UNUSED(interpreter);
+    UNUSED(unit);
 #endif
 }
 
