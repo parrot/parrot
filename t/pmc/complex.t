@@ -524,6 +524,8 @@ output_is(<<'CODE', <<'OUTPUT', "abs");
     abs P1, P0
     print P1
     print "\n"
+
+    end
 CODE
 5
 OUTPUT
