@@ -32,35 +32,35 @@ ParrotIOLayer pio_buf_layer = {
  * file.
  */
 
-INTVAL PIO_buf_init(theINTERP, ParrotIOLayer *l);
-ParrotIO *PIO_buf_open(theINTERP, ParrotIOLayer *l,
-                         const char *path, INTVAL flags);
-INTVAL PIO_buf_setbuf(theINTERP, ParrotIOLayer *l,
-                        ParrotIO *io, size_t bufsize);
-INTVAL PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-ParrotIO *PIO_buf_fdopen(theINTERP, ParrotIOLayer *l,
-                           PIOHANDLE fd, INTVAL flags);
-INTVAL PIO_buf_close(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-INTVAL PIO_buf_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-size_t PIO_buf_read(theINTERP, ParrotIOLayer *l,
-                      ParrotIO *io, void *buffer, size_t len);
-size_t PIO_buf_write(theINTERP, ParrotIOLayer *l,
-                       ParrotIO *io, const void *buffer, size_t len);
-INTVAL PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                      const char *s);
-INTVAL PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                      INTVAL hi, INTVAL lo, INTVAL whence);
-PIOOFF_T PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
-size_t PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                            ParrotIOBuf *b);
-size_t PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                        void *buffer, size_t len);
+static INTVAL    PIO_buf_init(theINTERP, ParrotIOLayer *l);
+static ParrotIO *PIO_buf_open(theINTERP, ParrotIOLayer *l,
+                              const char *path, INTVAL flags);
+static INTVAL    PIO_buf_setbuf(theINTERP, ParrotIOLayer *l,
+                                ParrotIO *io, size_t bufsize);
+static INTVAL    PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static ParrotIO *PIO_buf_fdopen(theINTERP, ParrotIOLayer *l,
+                                PIOHANDLE fd, INTVAL flags);
+static INTVAL    PIO_buf_close(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static INTVAL    PIO_buf_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static size_t    PIO_buf_read(theINTERP, ParrotIOLayer *l,
+                              ParrotIO *io, void *buffer, size_t len);
+static size_t    PIO_buf_write(theINTERP, ParrotIOLayer *l,
+                               ParrotIO *io, const void *buffer, size_t len);
+static INTVAL    PIO_buf_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                              const char *s);
+static INTVAL    PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                              INTVAL hi, INTVAL lo, INTVAL whence);
+static PIOOFF_T  PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static size_t    PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *l,
+                                      ParrotIO *io, ParrotIOBuf *b);
+static size_t    PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                                  void *buffer, size_t len);
 
 
 /* XXX: This is not portable */
 #define IS_EOL(c) ((*c) == '\n')
 
-INTVAL
+static INTVAL
 PIO_buf_init(theINTERP, ParrotIOLayer *layer)
 {
     if (PIO_STDOUT(interpreter))
@@ -73,7 +73,7 @@ PIO_buf_init(theINTERP, ParrotIOLayer *layer)
 }
 
 
-ParrotIO *
+static ParrotIO *
 PIO_buf_open(theINTERP, ParrotIOLayer *layer,
                const char *path, INTVAL flags)
 {
@@ -100,7 +100,7 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
  * think about the mechanism for buffer control or if it even
  * makes sense this way. Most layers will not implement setbuf()...
  */
-INTVAL
+static INTVAL
 PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 {
     ParrotIOLayer *l = layer;
@@ -138,7 +138,7 @@ PIO_buf_setbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io, size_t bufsize)
 }
 
 
-INTVAL
+static INTVAL
 PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     int err;
@@ -158,7 +158,7 @@ PIO_buf_setlinebuf(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 }
 
 
-ParrotIO *
+static ParrotIO *
 PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
@@ -179,7 +179,7 @@ PIO_buf_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 }
 
 
-INTVAL
+static INTVAL
 PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     ParrotIOLayer *l = PIO_DOWNLAYER(layer);
@@ -189,7 +189,7 @@ PIO_buf_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-INTVAL
+static INTVAL
 PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     long wrote;
@@ -229,7 +229,8 @@ PIO_buf_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
     return -1;
 }
 
-size_t
+
+static size_t
 PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                      ParrotIOBuf *b)
 {
@@ -249,7 +250,8 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return got;
 }
 
-size_t
+
+static size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                void *buffer, size_t len)
 {
@@ -323,7 +325,8 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return current + len;
 }
 
-size_t
+
+static size_t
 PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                  void *buffer, size_t len)
 {
@@ -363,7 +366,8 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return l;
 }
 
-size_t
+
+static size_t
 PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 const void *buffer, size_t len)
 {
@@ -422,7 +426,7 @@ PIO_buf_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-INTVAL
+static INTVAL
 PIO_buf_puts(theINTERP, ParrotIOLayer *layer, ParrotIO *io, const char *s)
 {
     ParrotIOLayer *l = layer;
@@ -435,7 +439,7 @@ PIO_buf_puts(theINTERP, ParrotIOLayer *layer, ParrotIO *io, const char *s)
 }
 
 
-INTVAL
+static INTVAL
 PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                INTVAL hi, INTVAL lo, INTVAL whence)
 {
@@ -461,7 +465,7 @@ PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 }
 
 
-PIOOFF_T
+static PIOOFF_T
 PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     return io->fpos;
@@ -507,4 +511,4 @@ ParrotIOLayerAPI pio_buf_layer_api = {
  * End:
  *
  * vim: expandtab shiftwidth=4:
-*/
+ */

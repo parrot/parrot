@@ -33,29 +33,29 @@ ParrotIOLayer pio_unix_layer = {
 
 
 /*
- * Currently keeping layer prototypes local to each layer
- * file.
+ * static function declarations
  */
-INTVAL flags_to_unix(INTVAL flags);
+static INTVAL    flags_to_unix(INTVAL flags);
 
-INTVAL PIO_unix_init(theINTERP, ParrotIOLayer *layer);
-ParrotIO *PIO_unix_open(theINTERP, ParrotIOLayer *layer,
-                        const char *spath, INTVAL flags);
-ParrotIO *PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer,
-                          PIOHANDLE fd, INTVAL flags);
-INTVAL PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
-INTVAL PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
-size_t PIO_unix_read(theINTERP, ParrotIOLayer *layer,
-                     ParrotIO *io, void *buffer, size_t len);
-size_t PIO_unix_write(theINTERP, ParrotIOLayer *layer,
-                      ParrotIO *io, const void *buffer, size_t len);
-INTVAL PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s);
-INTVAL PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                     PIOOFF_T offset, INTVAL whence);
-PIOOFF_T PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static INTVAL    PIO_unix_init(theINTERP, ParrotIOLayer *layer);
+static ParrotIO *PIO_unix_open(theINTERP, ParrotIOLayer *layer,
+                               const char *spath, INTVAL flags);
+static ParrotIO *PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer,
+                                 PIOHANDLE fd, INTVAL flags);
+static INTVAL    PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
+static INTVAL    PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
+static size_t    PIO_unix_read(theINTERP, ParrotIOLayer *layer,
+                               ParrotIO *io, void *buffer, size_t len);
+static size_t    PIO_unix_write(theINTERP, ParrotIOLayer *layer,
+                                ParrotIO *io, const void *buffer, size_t len);
+static INTVAL    PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                               const char *s);
+static INTVAL    PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                               PIOOFF_T offset, INTVAL whence);
+static PIOOFF_T  PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
-INTVAL
+static INTVAL
 flags_to_unix(INTVAL flags)
 {
     INTVAL oflags;
@@ -84,7 +84,7 @@ flags_to_unix(INTVAL flags)
 /*
  * Setup standard streams, etc.
  */
-INTVAL
+static INTVAL
 PIO_unix_init(theINTERP, ParrotIOLayer *layer)
 {
     ParrotIOData *d = GET_INTERP_IOD(interpreter);
@@ -113,7 +113,7 @@ PIO_unix_init(theINTERP, ParrotIOLayer *layer)
  * Open modes (read, write, append, etc.) are done in pseudo-Perl
  * style using <, >, etc.
  */
-ParrotIO *
+static ParrotIO *
 PIO_unix_open(theINTERP, ParrotIOLayer *layer,
               const char *spath, INTVAL flags)
 {
@@ -192,7 +192,7 @@ PIO_unix_open(theINTERP, ParrotIOLayer *layer,
 }
 
 
-ParrotIO *
+static ParrotIO *
 PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
@@ -227,7 +227,7 @@ PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 }
 
 
-INTVAL
+static INTVAL
 PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     if (io->fd >= 0)
@@ -277,16 +277,18 @@ PIO_unix_getblksize(PIOHANDLE fd)
 #  endif
 }
 
-/* At lowest layer all we can do for flush is ask kernel to sync().
+/* 
+ * At lowest layer all we can do for flush is ask kernel to sync().
+ * XXX: Is it necessary to sync here?
  */
-INTVAL
+static INTVAL
 PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     return fsync(io->fd);
 }
 
 
-size_t
+static size_t
 PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
               void *buffer, size_t len)
 {
@@ -318,7 +320,7 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-size_t
+static size_t
 PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                const void *buffer, size_t len)
 {
@@ -358,7 +360,7 @@ PIO_unix_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-INTVAL
+static INTVAL
 PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 {
     size_t len;
@@ -381,12 +383,11 @@ PIO_unix_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 /*
  * Hard seek
  */
-INTVAL
+static INTVAL
 PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
               PIOOFF_T offset, INTVAL whence)
 {
     PIOOFF_T pos;
-    errno = 0;
     if ((pos = lseek(io->fd, offset, whence)) >= 0) {
         io->lpos = io->fpos;
         io->fpos = pos;
@@ -397,7 +398,7 @@ PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 }
 
 
-PIOOFF_T
+static PIOOFF_T
 PIO_unix_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     PIOOFF_T pos;

@@ -40,26 +40,26 @@ ParrotIOLayer pio_win32_layer = {
  * file.
  */
 
-INTVAL PIO_win32_init(theINTERP, ParrotIOLayer *layer);
-ParrotIO *PIO_win32_open(theINTERP, ParrotIOLayer *layer,
-                         const char *spath, INTVAL flags);
-ParrotIO *PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer,
-                           PIOHANDLE fd, INTVAL flags);
-INTVAL PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
-void PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
-size_t PIO_win32_read(theINTERP, ParrotIOLayer *layer,
-                      ParrotIO *io, void *buffer, size_t len);
-size_t PIO_win32_write(theINTERP, ParrotIOLayer *layer,
-                       ParrotIO *io, const void *buffer, size_t len);
-INTVAL PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                      const char *s);
-INTVAL PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                      PIOOFF_T off, INTVAL whence);
-PIOOFF_T PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
+static INTVAL    PIO_win32_init(theINTERP, ParrotIOLayer *layer);
+static ParrotIO *PIO_win32_open(theINTERP, ParrotIOLayer *layer,
+                                const char *spath, INTVAL flags);
+static ParrotIO *PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer,
+                                  PIOHANDLE fd, INTVAL flags);
+static INTVAL PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
+static INTVAL PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
+static size_t    PIO_win32_read(theINTERP, ParrotIOLayer *layer,
+                                ParrotIO *io, void *buffer, size_t len);
+static size_t    PIO_win32_write(theINTERP, ParrotIOLayer *layer,
+                                 ParrotIO *io, const void *buffer, size_t len);
+static INTVAL    PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                                const char *s);
+static INTVAL    PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                                PIOOFF_T off, INTVAL whence);
+static PIOOFF_T  PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 
 
 /* Convert to platform specific bit open flags */
-INTVAL
+static INTVAL
 flags_to_win32(INTVAL flags, DWORD * fdwAccess,
                DWORD * fdwShareMode, DWORD * fdwCreate)
 {
@@ -93,7 +93,7 @@ flags_to_win32(INTVAL flags, DWORD * fdwAccess,
 /*
  * Setup standard streams.
  */
-INTVAL
+static INTVAL
 PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 {
     HANDLE h;
@@ -123,7 +123,7 @@ PIO_win32_init(theINTERP, ParrotIOLayer *layer)
 }
 
 
-INTVAL
+static INTVAL
 PIO_win32_getblksize(PIOHANDLE fd)
 {
     /* Hard coded for now */
@@ -131,7 +131,7 @@ PIO_win32_getblksize(PIOHANDLE fd)
 }
 
 
-ParrotIO *
+static ParrotIO *
 PIO_win32_open(theINTERP, ParrotIOLayer *layer,
                const char *spath, INTVAL flags)
 {
@@ -171,7 +171,7 @@ PIO_win32_open(theINTERP, ParrotIOLayer *layer,
 }
 
 
-ParrotIO *
+static ParrotIO *
 PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 {
     ParrotIO *io;
@@ -186,7 +186,7 @@ PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer, PIOHANDLE fd, INTVAL flags)
 }
 
 
-INTVAL
+static INTVAL
 PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     if (io && io->fd != INVALID_HANDLE_VALUE) {
@@ -197,7 +197,7 @@ PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-INTVAL
+static INTVAL
 PIO_win32_isatty(PIOHANDLE fd)
 {
     DWORD ftype = GetFileType(fd);
@@ -207,7 +207,7 @@ PIO_win32_isatty(PIOHANDLE fd)
 }
 
 
-void
+static void
 PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 {
     /*
@@ -223,7 +223,7 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 }
 
 
-size_t
+static size_t
 PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                void *buffer, size_t len)
 {
@@ -241,7 +241,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 }
 
 
-size_t
+static size_t
 PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                 const void *buffer, size_t len)
 {
@@ -276,7 +276,7 @@ PIO_win32_write(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
  * I suppose this is saving a function call since puts is probably
  * used for consoles a lot.
  */
-INTVAL
+static INTVAL
 PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 {
     DWORD len, countwrote;
@@ -305,7 +305,7 @@ PIO_win32_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s)
 /*
  * Hard seek
  */
-INTVAL
+static INTVAL
 PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                PIOOFF_T off, INTVAL whence)
 {
@@ -323,7 +323,7 @@ PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
 }
 
 
-PIOOFF_T
+static PIOOFF_T
 PIO_win32_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io)
 {
     LARGE_INTEGER p;
