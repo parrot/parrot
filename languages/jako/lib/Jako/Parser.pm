@@ -393,10 +393,10 @@ sub parse
       $prefix = $namespace unless defined $prefix;
 
       if ($kind eq 'while') {
-        $loop = Jako::Construct::Block::Loop::While->new($block, $namespace, $prefix, $left, $op, $right);
+        $loop = Jako::Construct::Block::Loop::While->new($block, $prefix, $left, $op, $right);
       }
       elsif ($kind eq 'until') {
-        $loop = Jako::Construct::Block::Loop::Until->new($block, $namespace, $prefix, $left, $op, $right);
+        $loop = Jako::Construct::Block::Loop::Until->new($block, $prefix, $left, $op, $right);
       }
       else {
         $self->INTERNAL_ERROR("Unexpected loop kind %s!", $kind);

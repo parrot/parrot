@@ -14,14 +14,11 @@ use warnings;
 package Jako::Lexer;
 
 use Carp;
+use FileHandle;
 
 use Jako::Token;
 
-our @CARP_NOT = qw(Jako::Compiler::Message);
-
 use base qw(Jako::Processor);
-
-use FileHandle;
 
 
 #

@@ -14,17 +14,9 @@ use warnings;
 package Jako::Construct::Block::Conditional;
 
 use Carp;
-
 use Jako::Compiler;
 
 use base qw(Jako::Construct::Block);
-
-sub kind      { return shift->{KIND};      }
-sub prefix    { return shift->{PREFIX};    }
-sub left      { return shift->{LEFT};      }
-sub op        { return shift->{OP};        }
-sub right     { return shift->{RIGHT};     }
-sub namespace { return shift->{NAMESPACE}; }
 
 
 #
@@ -36,9 +28,20 @@ sub compile
   my $self = shift;
   my ($compiler) = @_;
 
-  my $prefix    = $self->prefix;
-  my $namespace = $self->namespace;
-  my $kind      = $self->kind;
+  my $kind        = $self->kind;
+  my $peer        = $self->peer;
+
+  my $prefix;
+
+  if ($self->prefix) {
+    $prefix = $self->prefix;
+  }
+  else {
+    $prefix = $self->peer ? $peer->prefix : $compiler->block_label($kind);
+    $self->prefix($prefix);
+  }
+
+  my $namespace = $prefix;
 
   my $left;
   my $op;
@@ -51,7 +54,7 @@ sub compile
   }
 
   if ($kind eq 'if') {
-    $op = Jako::Compiler::invert_relop($op);
+    $op = $compiler->invert_relop($op);
   }
   elsif ($kind eq 'unless') {
     $kind = 'if';

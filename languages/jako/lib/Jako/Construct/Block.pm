@@ -26,13 +26,11 @@ sub new
 
   return bless {
     BLOCK   => $block,  # Parent block
-    KIND    => $kind,   # (need one for 'root' or 'file'?), sub, if, else, while, etc.
-    TYPE    => $type,   # Return type
-    PREFIX  => $prefix, # label?
 
-    CONT    => undef,   # line # of continue block (to prevent multiples)
-    ELSE    => undef,   # line # of else block (to prevent multiples)
-    SCOPE   => undef,   # The IMCC name for the block's scope
+    PEER    => undef,   # Peer block (if any).
+    KIND    => $kind,   # One of file, sub, if, else, while, etc.
+    TYPE    => $type,   # Return type, if any.
+    PREFIX  => $prefix, # Prefix, if given in source code.
     SYMBOLS => { },     # Identifiers
     CONTENT => [ ]      # Constructs
   }, $class;
@@ -43,14 +41,26 @@ sub new
 # ACCESSORS:
 #
 
-sub kind   { return shift->{KIND};   }
+sub peer      { return shift->{PEER};  }
+sub kind      { return shift->{KIND};  }
 sub type   { return shift->{TYPE};   }
-sub prefix { return shift->{PREFIX}; }
 
-sub cont   { my $self = shift; $self->{CONT} = shift if @_; return $self->{CONT}; }
-sub else   { my $self = shift; $self->{ELSE} = shift if @_; return $self->{ELSE}; }
+sub left      { return shift->{LEFT};  }
+sub op        { return shift->{OP};    }
+sub right     { return shift->{RIGHT}; }
 
-sub scope  { return shift->{SCOPE};  } # TODO: Better
+sub prefix
+{
+  my $self = shift;
+  $self->{PREFIX} = shift if @_;
+  return $self->{PREFIX};
+}
+
+
+
+#
+# symbol()
+#
 
 sub symbol
 {
@@ -61,6 +71,11 @@ sub symbol
 
   return $self->{SYMBOLS}{$name};
 }
+
+
+#
+# find_symbol()
+#
 
 sub find_symbol
 {
@@ -100,6 +115,10 @@ sub find_block
 }
 
 
+#
+# type_of_ident()
+#
+
 sub type_of_ident
 {
   my $self = shift;
@@ -109,6 +128,11 @@ sub type_of_ident
 
   return $found ? $found->type : undef;
 }
+
+
+#
+# access_of_ident()
+#
 
 sub access_of_ident
 {
@@ -120,6 +144,11 @@ sub access_of_ident
   return $found ? $found->kind : undef;
 }
 
+
+#
+# content()
+#
+
 sub content
 {
   my $self = shift;
@@ -127,12 +156,22 @@ sub content
   return @{$self->{CONTENT}};
 }
 
+
+#
+# push_content()
+#
+
 sub push_content
 {
   my $self = shift;
 
   push @{$self->{CONTENT}}, @_;
 }
+
+
+#
+# compile()
+#
 
 sub compile
 {
@@ -154,5 +193,5 @@ sub compile
   $compiler->emit("  ret") if $self->kind eq 'file';
 }
 
-1;
 
+1;

@@ -36,18 +36,14 @@ sub new
   confess "Op is not scalar!" if ref $op;
   confess "Right is not Value!" unless UNIVERSAL::isa($right, 'Jako::Construct::Expression::Value');
 
-  my $index = ++$Jako::Compiler::block_count; # TODO: YUCK!
-
-  my $prefix    = "_IF_$index";
-
   my $self = bless {
     BLOCK     => $block,
+
     KIND      => 'if',
-    PREFIX    => $prefix,
-    NAMESPACE => $prefix,
     LEFT      => $left,
     OP        => $op,
     RIGHT     => $right,
+
     CONTENT   => [ ]
   }, $class;
 
@@ -56,5 +52,5 @@ sub new
   return $self;
 }
 
-1;
 
+1;

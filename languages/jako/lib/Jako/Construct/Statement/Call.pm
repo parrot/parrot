@@ -94,7 +94,7 @@ sub compile
       unless defined $actual_arg_type;
 
     if ($formal_arg_type->name ne $actual_arg_type->name) {
-      my $temp = Jako::Compiler::temp_reg($formal_arg_type);
+      my $temp = $compiler->temp_reg($formal_arg_type);
       my $value = $args[$i]->compile($compiler);
       $compiler->emit("  $temp = $value");
       $args[$i] = $temp;

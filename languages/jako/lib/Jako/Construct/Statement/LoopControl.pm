@@ -115,7 +115,7 @@ sub compile
     $compiler->emit("  goto $label");
   } else {
     if ($cond eq 'unless') {
-      $op = Jako::Compiler->invert_relop($op);
+      $op = $compiler->invert_relop($op);
       $cond = 'if';
     }
 

@@ -99,13 +99,13 @@ sub compile
     $right = $right->compile($compiler);
 
     if ($cond eq 'if') {
-      $op = Jako::Compiler::invert_relop($op);
+      $op = $compiler->invert_relop($op);
     }
     else {
       $cond = 'if';
     }
 
-    $anon = Jako::Compiler::anon_lbl();
+    $anon = $compiler->anon_lbl();
 
     $compiler->emit("  $cond $left $op $right goto $anon");
   }
@@ -122,7 +122,7 @@ sub compile
     my $ret_val = $value->compile($compiler);
 
     if ($arg_type->name ne $return_type->name) { # TODO: Yuck! should be able to compare directly.
-      my $temp = Jako::Compiler::temp_reg($return_type);
+      my $temp = $compiler->temp_reg($return_type);
       $compiler->emit("  $temp = $ret_val");
       $ret_val = $temp;
     }

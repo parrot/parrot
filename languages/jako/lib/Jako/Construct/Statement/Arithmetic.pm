@@ -113,7 +113,7 @@ sub compile
 
   unless ($left_type->name eq $calc_type->name) {
 #    $self->DEBUG(0, "   ...converting left...");
-    my $temp = Jako::Compiler::temp_reg($calc_type);
+    my $temp = $compiler->temp_reg($calc_type);
     $left = $left->compile($compiler);
     $compiler->emit("  $temp = $left");
     $left = $temp;
@@ -124,7 +124,7 @@ sub compile
 
   unless ($right_type->name eq $calc_type->name) {
 #    $self->DEBUG(0, "   ...converting right...");
-    my $temp = Jako::Compiler::temp_reg($calc_type);
+    my $temp = $compiler->temp_reg($calc_type);
     $right = $right->compile($compiler);
     $compiler->emit("  $temp = $right");
     $right = $temp;
@@ -136,7 +136,7 @@ sub compile
   $dest = $dest->value;
 
   unless ($dest_type->name eq $calc_type->name) {
-    my $temp = Jako::Compiler::temp_reg($calc_type);
+    my $temp = $compiler->temp_reg($calc_type);
     $compiler->emit("  $temp = $left $op $right");
     $compiler->emit("  $dest = $temp");
   }

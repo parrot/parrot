@@ -92,7 +92,7 @@ sub compile
     $right = $right->compile($compiler);
 
     if ($cond eq 'unless') {
-      $op = Jako::Compiler::invert_relop($op);
+      $op = $compiler->invert_relop($op);
       $cond = 'if';
     }
 

@@ -15,8 +15,6 @@ package Jako::Construct::Expression::Value::Literal;
 
 use Carp;
 
-use Jako::Compiler;
-
 use base qw(Jako::Construct::Expression::Value);
 
 sub new
@@ -64,7 +62,7 @@ sub compile
   my $self = shift;
   my ($compiler) = @_;
 
-  confess "No file Compiler!" unless defined $compiler;
+  confess "No Compiler!" unless defined $compiler;
 
   my $type = $self->type;
 
@@ -79,7 +77,7 @@ sub compile
 
     $string = substr($string, 1, -1); # Without the surrounding double quotes.
 
-    my $temp = Jako::Compiler::temp_str();          # Allocate and clear a temporary string register
+    my $temp = $compiler->temp_str(); # Allocate and clear a temporary string register
 
     $compiler->emit("  $temp = \"\"");
 
@@ -99,7 +97,7 @@ sub compile
         unless $sym;
 
       if (not UNIVERSAL::isa($sym->type, 'Jako::Construct::Type::String')) {
-        my $temp2 = Jako::Compiler::temp_str();
+        my $temp2 = $compiler->temp_str();
         $compiler->emit("  $temp2 = $interp");
         $interp = $temp2;
       }

@@ -32,10 +32,10 @@ sub new
 
   my $self = bless {
     BLOCK     => $block,
-    PEER      => $peer,
-    NAMESPACE => $peer->namespace,
-    PREFIX    => $peer->prefix,
+
     KIND      => 'continue',
+    PEER      => $peer,
+
     CONTENT   => [ ]
   }, $class;
 

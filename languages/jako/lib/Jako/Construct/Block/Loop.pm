@@ -15,50 +15,34 @@ package Jako::Construct::Block::Loop;
 
 use Carp;
 
+use Jako::Compiler;
+
 use base qw(Jako::Construct::Block);
 
-=no
 
-my %comp_ops = (
-  'eq' => sub { $_[0] == $_[1] },
-  'ne' => sub { $_[0] != $_[1] },
-  'le' => sub { $_[0] <= $_[1] },
-  'lt' => sub { $_[0] <  $_[1] },
-  'ge' => sub { $_[0] >= $_[1] },
-  'gt' => sub { $_[0] >  $_[1] },
-
-  '==' => '',
-  '!=' => 'ne',
-  '<=' => 'le',
-  '<'  => 'lt',
-  '>=' => 'ge',
-  '>'  => 'gt',
-
-  '!eq' => 'ne',
-  '!ne' => 'eq',
-  '!le' => 'gt',
-  '!lt' => 'ge',
-  '!ge' => 'lt',
-  '!gt' => 'le',
-);
-
-=cut
-
-sub left      { return shift->{LEFT};      }
-sub op        { return shift->{OP};        }
-sub right     { return shift->{RIGHT};     }
-sub kind      { return shift->{KIND};      }
-sub namespace { return shift->{NAMESPACE}; }
-sub prefix    { return shift->{PREFIX};    }
+#
+# compile()
+#
 
 sub compile
 {
   my $self = shift;
   my ($compiler) = @_;
 
-  my $namespace = $self->namespace;
-  my $prefix    = $self->prefix;
-  my $kind      = $self->kind;
+  my $kind        = $self->kind;
+  my $peer        = $self->peer;
+
+  my $prefix;
+
+  if ($self->prefix) {
+    $prefix = $self->prefix;
+  }
+  else {
+    $prefix = $self->peer ? $peer->prefix : $compiler->block_label($kind);
+    $self->prefix($prefix);
+  }
+
+  my $namespace = $prefix;
 
   my $left;
   my $op;
@@ -71,7 +55,7 @@ sub compile
   }
 
   if ($kind eq 'while') {
-    $op = Jako::Compiler::invert_relop($op); # Invert the sense for 'while' loops.
+    $op = $compiler->invert_relop($op); # Invert the sense for 'while' loops.
   }
 
   if ($kind eq 'while' or $kind eq 'until') {
@@ -110,4 +94,3 @@ sub compile
 
 
 1;
-
