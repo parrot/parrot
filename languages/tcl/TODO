@@ -175,19 +175,11 @@ Move TclWord namespace into _Tcl::Word, less clutter?
 
 =item multiple level lists
 
-This will be much easier to do when we can call into the parser from
-the TclList PMC. (is this already doable?)
-
 =item compiler vs. interpreter
 
 it should be possible to further extend our interpreter
 this to make an actual compiler,
-where the _compiler emits PIR. So, the resulting call from, say, [source]
-would be:
-
-	# Note this a change from _parse's current signature 
-	(parsed_data_structure,tcl_status,error) = _parse(tcl_code)
-	(pir_code,tcl_status,error) = _compile(parsed_data_structure)
+where the _compiler emits PIR. 
 
 And now that we have the pir_code, we can either emit the necessary
 PIR (ala parrot's -o option) or we can compile and run it.
@@ -198,12 +190,11 @@ and simply be able to extract the generated PIR.
 
 =item expr
 
-Clean up expr. MUUUUCH room for improvement there.
+Clean up [expr]. MUUUUCH room for improvement there. [expr] is the source
+of most of our abysmal performance in bench.tcl.
 
-expr - parse/interpret split - This is working for expr - change any other 
-thing that calls __expression to use the _p, _i variants, delete the original 
-proc. Once we've done that, determine a better structure to use as the inter
-mediate representation between the two.
+the expr AST could use a rework. Be nice if it just passed around something
+invokable, neh?
 
 clean up expr so that it's not passing around
 type indicators. - just use PMCs everywhere. (Though we may still need
