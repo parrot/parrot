@@ -6,13 +6,14 @@ O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes
 
 C_FLAGS = -Wall -g -o $@
 
+LIBS = -lm
 
 CC = gcc $(C_FLAGS)
 
 all : $(O_FILES) test_prog
 
 test_prog: test_main$(O) $(O_FILES)
-	gcc -o test_prog $(O_FILES) test_main$(O)
+	gcc -o test_prog $(O_FILES) test_main$(O) $(LIBS)
 
 test_main$(O): $(H_FILES)
 

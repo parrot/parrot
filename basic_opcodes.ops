@@ -219,7 +219,7 @@ AUTO_OP inc_n {
 
 // INC Nx, nnn
 AUTO_OP inc_n_nc {
-  (NV)NUM_REG(P1) += P2;
+  NUM_REG(P1) += P2;
 }
 
 // DEC Nx
