@@ -65,7 +65,7 @@ of the bytecode can define a set of custom operations that it will use.
 These areas will roughly map to compilation units of the original
 source; each precompiled module will have its own opcode table.
 
-For a closer look at Parrot ops, see L<opcodes>.
+For a closer look at Parrot ops, see L<parrot_assembly>.
 
 =head1 PMCs
 
