@@ -31,8 +31,10 @@
    hackish, but that's just fine */
 
 /* Return void, take nothing */
-static void pcf_v_v(struct Parrot_Interp *interpreter, PMC *self) {
-  void (*pointer)();
+static void
+pcf_v_v(struct Parrot_Interp *interpreter, PMC *self) 
+{
+  void (*pointer)(void);
   pointer = self->cache.struct_val;
   (void)(*pointer)();
   interpreter->ctx.int_reg.registers[0] = 0;
@@ -44,8 +46,10 @@ static void pcf_v_v(struct Parrot_Interp *interpreter, PMC *self) {
 }
 
 /* Return int, take nothing */
-static void pcf_i_v(struct Parrot_Interp *interpreter, PMC *self) {
-  int (*pointer)();
+static void
+pcf_i_v(struct Parrot_Interp *interpreter, PMC *self)
+{
+  int (*pointer)(void);
   int return_data;
   pointer = self->cache.struct_val;
   return_data = (int)(*pointer)();
@@ -58,9 +62,11 @@ static void pcf_i_v(struct Parrot_Interp *interpreter, PMC *self) {
   return;
 }
 
-/* Return int, take nothing */
-static void pcf_i_i(struct Parrot_Interp *interpreter, PMC *self) {
-  int (*pointer)();
+/* Return int, take int */
+static void
+pcf_i_i(struct Parrot_Interp *interpreter, PMC *self)
+{
+  int (*pointer)(INTVAL);
   int return_data;
   pointer = self->cache.struct_val;
   return_data = (int)(*pointer)(INT_REG(5));
@@ -74,8 +80,10 @@ static void pcf_i_i(struct Parrot_Interp *interpreter, PMC *self) {
 }
 
 /* Return double, take nothing */
-static void pcf_d_v(struct Parrot_Interp *interpreter, PMC *self) {
-  double (*pointer)();
+static void
+pcf_d_v(struct Parrot_Interp *interpreter, PMC *self)
+{
+  double (*pointer)(void);
   double return_data;
   pointer = self->cache.struct_val;
   return_data = (double)(*pointer)();
@@ -89,12 +97,14 @@ static void pcf_d_v(struct Parrot_Interp *interpreter, PMC *self) {
 }
 
 /* Return double, take double */
-static void pcf_d_d(struct Parrot_Interp *interpreter, PMC *self) {
-  double (*pointer)();
+static void
+pcf_d_d(struct Parrot_Interp *interpreter, PMC *self)
+{
+  double (*pointer)(FLOATVAL);
   double return_data;
 
   pointer = self->cache.struct_val;
-  return_data = (double)(*pointer)(interpreter->ctx.num_reg.registers[5]);
+  return_data = (double)(*pointer)(NUM_REG(5));
   interpreter->ctx.num_reg.registers[5] = return_data;
   interpreter->ctx.int_reg.registers[0] = 0;
   interpreter->ctx.int_reg.registers[1] = 0;
@@ -120,14 +130,18 @@ void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
   /* And in here is the platform-independent way. Which is to say
      "here there be hacks" */
   if (0 == string_length(signature)) return pcf_v_v;
-  if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "i", 1)))
-    return pcf_i_v;
-  if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "ii", 1)))
-    return pcf_i_i;
-  if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "d", 1)))
-    return pcf_d_v;
-  if (!string_compare(interpreter, signature, string_from_c_string(interpreter, "dd", 2)))
-    return pcf_d_d;
+  if (!string_compare(interpreter, signature,
+    string_from_c_string(interpreter, "i", 1)))
+        return pcf_i_v;
+  if (!string_compare(interpreter, signature,
+    string_from_c_string(interpreter, "ii", 1)))
+        return pcf_i_i;
+  if (!string_compare(interpreter, signature,
+    string_from_c_string(interpreter, "d", 1)))
+        return pcf_d_v;
+  if (!string_compare(interpreter, signature,
+    string_from_c_string(interpreter, "dd", 2)))
+        return pcf_d_d;
 
   return NULL;
 #endif
