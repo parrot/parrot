@@ -5,7 +5,7 @@ INC=../include/parrot
 
 H_FILES = $(INC)/parrot.h
 
-O_FILES = perlint$(O) perlstring$(O) perlnum$(O)
+O_FILES = perlint$(O) perlstring$(O) perlnum$(O) perlundef$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -37,11 +37,13 @@ perlstring.c: perlstring.pmc
 
 perlstring$(O): $(H_FILES)
 
+perlundef.c: perlundef.pmc 
+	$(PERL) pmc2c.pl perlundef.pmc
+
+perlundef$(O): $(H_FILES)
+
 clean:
 	$(RM_F) *.c *$(O)
-
-distclean:
-	perl -MExtUtils::Manifest=filecheck -le '$$ExtUtils::Manifest::Quiet=1;unlink $$_ for filecheck()'
 
 update:
 	cvs -q update -dP

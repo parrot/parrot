@@ -1,0 +1,283 @@
+/* perlundef.pmc
+ *  Copyright: (When this is determined...it will go here)
+ *  CVS Info
+ *     $Id: genclass.pl,v 1.6 2001/11/25 12:56:01 simon Exp   Overview:
+ *     These are the vtable functions for the perlundef base class
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+
+pmclass PerlUndef {
+
+   INTVAL type () {
+   }
+
+   STRING* name () {
+        return whoami;
+   }
+
+   void init () {
+        /* Nothing */
+   }
+
+   void clone (PMC* dest) {
+        dest->vtable = pmc->vtable;
+   }
+
+   void morph (INTVAL type) {
+   }
+
+   BOOLVAL move_to (void * destination) {
+        /* Nothing */
+   }
+
+   INTVAL real_size () {
+        return 0;
+   }
+
+   void destroy () {
+        /* Nothing */
+   }
+
+   INTVAL get_integer () {
+      return 0;
+   }
+
+   FLOATVAL get_number () {
+      return 0;
+   }
+
+   STRING* get_string () {
+      return NULL;
+   }
+
+   BOOLVAL get_bool () {
+      return 0;
+   }
+
+   void* get_value () {
+      return NULL;
+   }
+
+   BOOLVAL is_same (PMC* pmc2) {
+      return pmc2->vtable == pmc->vtable;
+   }
+
+   void set_integer (PMC * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+      pmc->vtable->set_integer(interpreter, pmc, value);
+   }
+
+   void set_integer_native (INTVAL value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+      pmc->vtable->set_integer_native(interpreter, pmc, value);
+   }
+
+   void set_integer_bigint (BIGINT value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlInt];
+      pmc->vtable->set_integer_bigint(interpreter, pmc, value);
+   }
+
+   void set_integer_same (PMC * value) {
+      /* Do nothing; Can't happen? */ 
+   }
+
+   void set_number (PMC * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+      pmc->vtable->set_number(interpreter, pmc, value);
+   }
+
+   void set_number_native (FLOATVAL value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+      pmc->vtable->set_number_native(interpreter, pmc, value);
+   }
+
+   void set_number_bigfloat (BIGFLOAT value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
+      pmc->vtable->set_number_bigfloat(interpreter, pmc, value);
+   }
+
+   void set_number_same (PMC * value) {
+      /* Do nothing; Can't happen? */ 
+   }
+
+   void set_string (PMC * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+      pmc->vtable->set_string(interpreter, pmc, value);
+   }
+
+   void set_string_native (STRING * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+      pmc->vtable->set_string_native(interpreter, pmc, value);
+   }
+
+   void set_string_unicode (STRING * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+      pmc->vtable->set_string_unicode(interpreter, pmc, value);
+   }
+
+   void set_string_other (STRING * value) {
+      pmc->vtable = &Parrot_base_vtables[enum_class_PerlString];
+      pmc->vtable->set_string_other(interpreter, pmc, value);
+   }
+
+   void set_string_same (PMC * value) {
+      /* Do nothing; Can't happen? */ 
+   }
+
+   void set_value (void* value) {
+      /* Do nothing; Can't happen? */ 
+   }
+
+   void add (PMC * value,  PMC* dest) {
+   }
+
+   void add_int (INTVAL value,  PMC* dest) {
+   }
+
+   void add_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void add_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void add_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void add_same (PMC * value,  PMC* dest) {
+   }
+
+   void subtract (PMC * value,  PMC* dest) {
+   }
+
+   void subtract_int (INTVAL value,  PMC* dest) {
+   }
+
+   void subtract_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void subtract_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void subtract_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void subtract_same (PMC * value,  PMC* dest) {
+   }
+
+   void multiply (PMC * value,  PMC* dest) {
+   }
+
+   void multiply_int (INTVAL value,  PMC* dest) {
+   }
+
+   void multiply_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void multiply_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void multiply_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void multiply_same (PMC * value,  PMC* dest) {
+   }
+
+   void divide (PMC * value,  PMC* dest) {
+   }
+
+   void divide_int (INTVAL value,  PMC* dest) {
+   }
+
+   void divide_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void divide_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void divide_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void divide_same (PMC * value,  PMC* dest) {
+   }
+
+   void modulus (PMC * value,  PMC* dest) {
+   }
+
+   void modulus_int (INTVAL value,  PMC* dest) {
+   }
+
+   void modulus_bigint (BIGINT value,  PMC* dest) {
+   }
+
+   void modulus_float (FLOATVAL value,  PMC* dest) {
+   }
+
+   void modulus_bigfloat (BIGFLOAT value,  PMC* dest) {
+   }
+
+   void modulus_same (PMC * value,  PMC* dest) {
+   }
+
+   void concatenate (PMC * value,  PMC* dest) {
+   }
+
+   void concatenate_native (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_unicode (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_other (STRING * value,  PMC* dest) {
+   }
+
+   void concatenate_same (PMC * value,  PMC* dest) {
+   }
+
+   BOOLVAL is_equal (PMC* value) {
+   }
+
+   void logical_or (PMC* value,  PMC* dest) {
+   }
+
+   void logical_and (PMC* value,  PMC* dest) {
+   }
+
+   void logical_not (PMC* value) {
+   }
+
+   void match (PMC * value,  REGEX* re) {
+   }
+
+   void match_native (STRING * value,  REGEX* re) {
+   }
+
+   void match_unicode (STRING * value,  REGEX* re) {
+   }
+
+   void match_other (STRING * value,  REGEX* re) {
+   }
+
+   void match_same (PMC * value,  REGEX* re) {
+   }
+
+   void repeat (PMC * value,  PMC* dest) {
+   }
+
+   void repeat_native (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_unicode (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_other (STRING * value,  PMC* dest) {
+   }
+
+   void repeat_same (PMC * value,  PMC* dest) {
+   }
+
+}

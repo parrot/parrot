@@ -15,7 +15,8 @@ core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) encoding$(O) \
 chartype$(O) runops_cores$(O) trace$(O) pmc$(O) \
 encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O) chartypes/unicode$(O) chartypes/usascii$(O) resources$(O) \
-platform$(O) classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O)
+platform$(O) classes/perlint$(O) classes/perlstring$(O) classes/perlnum$(O) \
+classes/perlundef$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the

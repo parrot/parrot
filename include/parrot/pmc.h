@@ -14,6 +14,7 @@
 #define PARROT_PMC_H_GUARD
 
 enum {
+    enum_class_PerlUndef,
     enum_class_PerlInt,
     enum_class_PerlNum,
     enum_class_PerlString,

@@ -9,6 +9,7 @@ classes/pmc2c.pl
 classes/perlint.pmc
 classes/perlnum.pmc
 classes/perlstring.pmc
+classes/perlundef.pmc
 config_h.in
 Config_pm.in
 Configure.pl
