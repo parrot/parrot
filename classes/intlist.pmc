@@ -251,11 +251,15 @@ list.elements == 1.
         INTVAL k = DYNSELF.elements();
         INTVAL i, elem;
         IntList *l = PMC_struct_val(SELF);
+        List *n;
         if (k != 1)
             internal_exception(1, "multiply_int: unimplemented list size");
         elem = intlist_get(INTERP, l, 0);
-        for (i = 1; i < value; ++i)
-            intlist_assign(INTERP, l, i, elem);
+        n = list_new(INTERP, enum_type_INTVAL);
+        PMC_struct_val(SELF) = n;
+        list_set_length(INTERP, n, value);
+        for (i = 0; i < value; ++i)
+            list_assign(INTERP, n, i, INTVAL2PTR(void *, elem), enum_type_INTVAL);
     }
 
 }
