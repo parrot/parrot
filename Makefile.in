@@ -7,12 +7,13 @@ H_FILES = $(INC)/config.h $(INC)/exceptions.h $(INC)/io.h $(INC)/op.h \
 $(INC)/register.h $(INC)/string.h $(INC)/events.h $(INC)/interpreter.h \
 $(INC)/memory.h $(INC)/parrot.h $(INC)/stacks.h $(INC)/packfile.h \
 $(INC)/global_setup.h $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-$(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h $(INC)/pmc.h
+$(INC)/runops_cores.h $(INC)/trace.h $(INC)/oplib/vtable_ops.h \
+$(INC)/pmc.h $(INC)/resources.h
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) \
 core_ops$(O) memory$(O) packfile$(O) stacks$(O) string$(O) strnative$(O) \
 strutf8$(O) strutf16$(O) strutf32$(O) transcode$(O) runops_cores$(O) \
-trace$(O) vtable_ops$(O) classes/intclass$(O)
+trace$(O) vtable_ops$(O) classes/intclass$(O) resources$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -63,6 +64,8 @@ examples/assembly/mops${exe}: examples/assembly/mops$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 global_setup$(O): $(H_FILES)
+
+resources$(O): $(H_FILES)
 
 string$(O): $(H_FILES)
 

@@ -40,6 +40,7 @@ include/parrot/packfile.h
 include/parrot/parrot.h
 include/parrot/pmc.h
 include/parrot/register.h
+include/parrot/resources.h
 include/parrot/runops_cores.h
 include/parrot/stacks.h
 include/parrot/string.h
@@ -88,6 +89,7 @@ pbc2c.pl
 pdump.c
 README
 register.c
+resources.c
 runops_cores.c
 stacks.c
 string.c

@@ -28,18 +28,18 @@
 =cut
 */
 
-PMC* pmc_new(PMC* pmc, INTVAL base_type) {
+PMC* pmc_new(struct Perl_Interp *interpreter, PMC* pmc, INTVAL base_type) {
     if (pmc) { /* We've got some memory */
         if (pmc->vtable && pmc->vtable->new) { /* And it even looks like a PMC */
-            PMC* newpmc = pmc->vtable->new(pmc);
+            PMC* newpmc = pmc->vtable->new(interpreter, pmc);
             /* Ensure it's the type we want */
-            if (newpmc->vtable->type(newpmc) == base_type)
+            if (newpmc->vtable->type(interpreter, newpmc) == base_type)
                 return newpmc;
             else
-                return newpmc->vtable->morph(newpmc, base_type);
+                return newpmc->vtable->morph(interpreter, newpmc, base_type);
         }
     } else {
-        pmc = mem_allocate_aligned(sizeof(PMC));
+      pmc = new_pmc_header(interpreter);
     }
     pmc->flags = 0;
     pmc->data  = 0;
