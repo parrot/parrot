@@ -123,15 +123,6 @@ struct _ParrotIOLayer {
 #define PIO_DOWNLAYER(x)   x->down
 #define PIO_UPLAYER(x)     x->up
 
-/*
- * Terminal layer can't be pushed on top of other layers;
- * vice-versa, non-terminal layers be pushed on an empty io stack
- * An OS layer would be a terminal layer, non-terminals might be
- * buffering, translation, compression or encryption layers.
- */
-#define PIO_L_TERMINAL          0x0001
-#define PIO_L_FASTGETS          0x0002
-
 
 /* Others to come */
 #ifdef PIO_OS_UNIX
@@ -145,102 +136,11 @@ extern ParrotIOLayer pio_stdio_layer;
 #endif
 extern ParrotIOLayer pio_buf_layer;
 
-/* This is list of valid layers */
-extern ParrotIOLayer *pio_registered_layers;
-
-/* This is the actual (default) layer stack which is used for IO */
-extern ParrotIOLayer *pio_default_stack;
 
 
 #ifndef theINTERP
 #  define theINTERP      struct Parrot_Interp * interpreter
 #endif
-
-/*
- * By default, any layer not implementing an interface (ie. leaving
- * null value for a function) implicitly passes calls to the
- * next layer. To override or shadow an API the layer must implement
- * the specific call.
- */
-struct _ParrotIOLayerAPI {
-    INTVAL          (*Init)(theINTERP, ParrotIOLayer * l);
-    ParrotIOLayer * (*New)(ParrotIOLayer * proto);
-    void            (*Delete)(ParrotIOLayer * l);
-    INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
-    INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io);
-    ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
-                            const char * name, INTVAL flags);
-    ParrotIO *      (*Open2_Unused)(theINTERP);
-    ParrotIO *      (*Open3_Unused)(theINTERP);
-    ParrotIO *      (*Open_ASync)(theINTERP, ParrotIOLayer * l,
-                                  const char * name, const char * mode,
-                                  DummyCodeRef *);
-    ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
-                              PIOHANDLE fd, INTVAL flags);
-    INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
-                                ParrotIO * io);
-    size_t          (*Write)(theINTERP, ParrotIOLayer * l,
-                             ParrotIO * io, const void * buf,
-                             size_t len);
-    size_t          (*Write_ASync)(theINTERP, ParrotIOLayer * layer,
-                                   ParrotIO * io, void * buf, size_t len,
-                                   DummyCodeRef *);
-    size_t          (*Read)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, void * buf, size_t len);
-    size_t          (*Read_ASync)(theINTERP, ParrotIOLayer * layer,
-                                  ParrotIO * io, void * buf, size_t len,
-                                  DummyCodeRef *);
-    INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
-                             ParrotIO * io);
-    size_t          (*Peek)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, void * buf);
-    PIOOFF_T        (*Seek)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, PIOOFF_T offset, INTVAL whence);
-    PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io);
-    INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
-                              ParrotIO * io, size_t bufsize);
-    INTVAL          (*SetLineBuf)(theINTERP, ParrotIOLayer * layer,
-                                  ParrotIO * io);
-    INTVAL          (*GetCount)(theINTERP, ParrotIOLayer * layer);
-    INTVAL          (*Fill)(theINTERP, ParrotIOLayer * layer);
-    INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
-                           ParrotIO * io);
-    /* Network API */
-    INTVAL          (*Poll)(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                            int which, int sec, int usec);
-    ParrotIO *      (*Socket)(theINTERP, ParrotIOLayer *,
-                            int dom, int type, int proto);
-    INTVAL          (*Connect)(theINTERP, ParrotIOLayer *, ParrotIO *,
-                            STRING *);
-    INTVAL          (*Send)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *);
-    INTVAL          (*Recv)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING **);
-};
-
-/* these are defined rather than using NULL because strictly-speaking, ANSI C
- * doesn't like conversions between function and non-function pointers. */
-#define PIO_null_push_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_pop_layer (INTVAL (*)(ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_open (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char*, INTVAL))0
-#define PIO_null_open2 (ParrotIO * (*)(theINTERP))0
-#define PIO_null_open3 (ParrotIO * (*)(theINTERP))0
-#define PIO_null_open_async (ParrotIO * (*)(theINTERP, ParrotIOLayer *, const char *, const char *, DummyCodeRef *))0
-#define PIO_null_fdopen (ParrotIO * (*)(theINTERP, ParrotIOLayer *, PIOHANDLE, INTVAL))0
-#define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
-#define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
-#define PIO_null_read (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, const void *, size_t))0
-#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
-#define PIO_null_flush (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_seek (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
-#define PIO_null_tell (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_setbuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, size_t))0
-#define PIO_null_setlinebuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_getcount (INTVAL (*)(theINTERP, ParrotIOLayer *))0
-#define PIO_null_fill (INTVAL (*)(theINTERP, ParrotIOLayer *))0
-#define PIO_null_eof (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_socket (ParrotIO * (*)(theINTERP, ParrotIOLayer *, int, int, int))0
-
 
 extern INTVAL pio_errno;
 

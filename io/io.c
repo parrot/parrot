@@ -33,9 +33,10 @@ Parrot ops. The C<ParrotIO struct> is defined in F<io/io_private.h>.
 #include "io_private.h"
 
 #include <stdarg.h>
+#include <assert.h>
 
 /* This is list of valid layers */
-ParrotIOLayer *pio_registered_layers;
+ParrotIOLayer **pio_registered_layers;
 
 /* This is the default stack used for IO. Copy this to each new interp */
 /*
@@ -312,6 +313,7 @@ INTVAL
 PIO_init_stacks(theINTERP)
 {
     ParrotIOLayer *p;
+    int fill, n, i;
 
     /* First push the platform specific OS layer */
     /* Optimize this to keep a default stack and just
@@ -328,8 +330,21 @@ PIO_init_stacks(theINTERP)
 #endif
     PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), PMCNULL);
 
+    fill = 0;
+    if (!pio_registered_layers) {
+        n = 2;  /* 2 default layers for now */
+        pio_registered_layers = mem_sys_allocate(
+                sizeof(ParrotIOLayer *) * (n + 1));
+        fill = 1;
+    }
+
     /* Note: All layer pushes should be done before init calls */
-    for (p = interpreter->piodata->default_stack; p; p = p->down) {
+    for (i = 0, p = interpreter->piodata->default_stack; p; p = p->down) {
+        if (fill) {
+            assert(i < n);
+            pio_registered_layers[i++] = p;
+            pio_registered_layers[i] = NULL;
+        }
         if (p->api->Init) {
             if ((*p->api->Init) (interpreter, p) != 0) {
                 char buf[1024];
