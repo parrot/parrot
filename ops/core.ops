@@ -4544,7 +4544,7 @@ inline op invoke() {
   opcode_t *dest;
   PMC * p = interpreter->ctx.pmc_reg.registers[0];
 
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, CUR_OPCODE + 1);
 
   goto ADDRESS(dest);
 }
