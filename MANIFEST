@@ -29,6 +29,7 @@ Parrot/String.pm
 Parrot/Test.pm
 Parrot/Vtable.pm
 README
+README.OS_X
 TODO
 Test/More.pm
 Test/Simple.pm

@@ -1,0 +1,9 @@
+Notes for Mac OS X builders
+---------------------------
+
+At the moment, Parrot requires fink (fink.sourceforge.net) to be
+installed. This is purely a stopgap measure, as fink provides some
+headers and functions that made a first port simpler. Once Parrot's
+adapted to the native interface (it's all the dynamic loading of
+libraries code) the need for Fink will be removed.
+
