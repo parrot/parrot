@@ -17,7 +17,7 @@ use P6C::Parser;
 use vars '%builtin_names';
 BEGIN {
     my @names = qw(print1 exit warn die print sleep time substr length
-		   index map grep join reverse);
+		   index map grep join reverse defined);
     @builtin_names{@names} = (1) x @names;
 }
 

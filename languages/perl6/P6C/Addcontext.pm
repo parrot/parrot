@@ -411,6 +411,7 @@ sub foreach_context {
 
 BEGIN {
     $P6C::Context::CONTEXT{'-'} = new P6C::Context type => 'PerlUndef';
+    $P6C::Context::CONTEXT{defined} = new P6C::Context type => 'PerlUndef';
     $P6C::Context::CONTEXT{if}
 	= $P6C::Context::CONTEXT{unless} =  \&ifunless_context;
     $P6C::Context::CONTEXT{'for'} = \&for_context;
@@ -768,22 +769,51 @@ sub P6C::loop::ctx_right {
 }
 
 ##############################
+BEGIN {
+    %P6C::context::names = qw(% PerlHash
+			      @ PerlArray
+			      $ PerlUndef
+			      _ PerlString
+			      ? bool
+			      + PerlInt);
+}
+
+sub P6C::context::ctx_right {
+    my ($x, $ctx) = @_;
+    $x->{ctx} = $ctx->copy;
+    $ctx->type($P6C::context::names{$x->ctx});
+    $x->ctx_right($ctx);
+}
+
+##############################
 sub P6C::label::ctx_right { }
 sub P6C::debug_info::ctx_right { }
 
 ##############################
+my %modmap;
+BEGIN {
+    %modmap = qw(w word
+		 word word);
+}
+
 sub P6C::rule::ctx_right {
     my ($x, $ctx) = @_;
+    for (keys %{$x->mod}) {
+	# Expand and check modifier names:
+	unimp 'regex modifier '.$_ unless exists $modmap{$_};
+	$x->mod($modmap{$_}, $x->mod($_));
+    }
+    $ctx->{rx_mod} = $x->mod if defined $x->mod;
     $x->{ctx} = $ctx->copy;
+    local $::capture_number = 0;
     $x->pat->ctx_right($ctx);
-    # XXX: need to do context for mod, probably process it as well,
-    # but that's non-trivial.
 }
 
 sub P6C::rx_alt::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
-    my $rectx = new P6C::Context type => 'str';	# XXX: should be regex context?
+    my $rectx = $ctx->copy;
+    $rectx->type('str');	# XXX: should be regex context?
     for (@{$x->branches}) {
 	$_->ctx_right($rectx);
 	for (@{$_->things}) {
@@ -799,25 +829,59 @@ sub P6C::rx_seq::ctx_right {
     my ($x, $ctx) = @_;
     my $prev;
     $x->{ctx} = $ctx->copy;
-    for (@{$x->things}) {
-	$_->ctx_right($ctx);
-	if ($prev && $_->isa('P6C::rx_cut') && $_->level == 1) {
-	    $_->{ctx}{rx_unwind} = $prev;
+    if ($x->{ctx}{rx_mod}{word}) {
+	my $i = 1;
+	while ($i <= $#{$x->things}) {
+	    splice @{$x->things}, $i, 0, new P6C::rx_wordsep;
+	    $i += 2;
+	}
+    }
+    for my $i (0 .. $#{$x->things}) {
+	my $cur = $x->things($i);
+	if ($i == $#{$x->things}) {
+	    $ctx->{rx_lastitem} = 1
+	} else {
+	    delete $ctx->{rx_lastitem}
+	}
+	eval {$cur->ctx_right($ctx); };
+	Carp::confess "$cur: $@" if $@;
+	if ($prev && $cur->isa('P6C::rx_cut') && $cur->level == 1) {
+	    $cur->{ctx}{rx_unwind} = $prev;
 	    $prev->{ctx}{rx_canfail} = 1;
 	}
-	$prev = $_;
+	$prev = $cur;
     }
 }
 
 sub P6C::rx_hypo::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
+    unless (defined $x->var) {
+	$x->var(new P6C::variable
+		name => '$'.(++$::capture_number),
+		type => 'PerlString');
+    }
+    if ($x->var->type eq 'PerlArray') {
+	# Array capture
+	error 'Array capture on a non-repeating regex element.'
+	    unless $x->val->isa('P6C::rx_repeat');
+	unless ($x->val->thing->isa('P6C::rx_hypo')) {
+	    # Pretend the repeated item is a capture group.
+	    $x->val->thing(new P6C::rx_hypo(
+			   var => new P6C::variable(
+			    name => '$'.(++$::capture_number),
+			    type => 'PerlString'),
+			   val => $x->val->thing));
+	}
+	$ctx->{rx_capture_array} = $x->var;
+    }
     $x->var->ctx_left($x->val);
-    $x->var->ctx_right($ctx);
+    $x->val->ctx_right($ctx);
+#    $x->var->ctx_right($ctx);
 }
 
-sub P6C::rx_beg::ctx_right { }
-sub P6C::rx_end::ctx_right { }
+sub P6C::rx_zerowidth::ctx_right { }
+sub P6C::rx_wordsep::ctx_right { }
 sub P6C::rx_cut::ctx_right {
     my ($x, $ctx) = @_;
     $x->{ctx} = $ctx->copy;
@@ -854,6 +918,14 @@ sub P6C::rx_repeat::ctx_right {
     $x->min->ctx_right($numctx) if ref $x->min;
     $x->max->ctx_right($numctx) if ref $x->max;
     $x->thing->ctx_right($ctx);
+    if ($x->{ctx}{rx_mod}{word}) {
+	if ($x->thing->isa('P6C::rx_seq')) {
+	    push @{$x->thing->things}, new P6C::rx_wordsep;
+	} else {
+	    $x->thing(new P6C::rx_seq
+		      things => [$x->thing, new P6C::rx_wordsep]);
+	}
+    }
 }
 
 sub P6C::rx_assertion::ctx_right {

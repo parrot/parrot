@@ -46,6 +46,19 @@ END
     }
 }
 
+sub rxdebug {
+    my ($x, $ctx, $msg) = @_;
+    $msg ||= '';
+    my $foo = gentmp 'int';
+    code(<<END) if $::OPT{'debug-regex'};
+	rx_stackdepth $foo
+	print $ctx->{pos}
+	print " depth = "
+	print $foo
+	print ", $x $msg\\n"
+END
+}
+
 # top-level regex
 sub P6C::IMCC::rule::rx_val {
     my $x = shift;
@@ -113,7 +126,6 @@ sub P6C::rx_alt::rx_val {
     my @nextlabel = map { genlabel 'alt_'.$_ } 0..$#{$x->branches};
     my @bt_labels;
     my %subctx = %$ctx;
-    $subctx{succ} = undef;
 
     # We need a success label, so define one if we're expected to fall
     # through.
@@ -130,12 +142,13 @@ sub P6C::rx_alt::rx_val {
 END
     }
 
+    rxdebug $x, $ctx, 'alt start';
     code(<<END);
-	rx_pushmark
 	rx_pushindex $ctx->{pos}
 END
     # setup -- push our index onto the intstack.
     for my $i (0..$#{$x->branches}) {
+	$subctx{succ} = undef;
 	$subctx{fail} = $nextlabel[$i];
 	$bt_labels[$i] = $x->branches($i)->rx_val({ %subctx });
 	code(<<END);
@@ -146,11 +159,11 @@ END
     }
 
     # Failure branch:
+    rxdebug $x, $ctx, 'alt fail';
     code(<<END);
 	rx_popindex $ctx->{pos}, $ctx->{fail}
 	goto $ctx->{fail}
 END
-
     if ($x->{ctx}{rx_fail_label}) {
 	code(<<END);
 $x->{ctx}{rx_fail_label}:
@@ -166,6 +179,7 @@ $bt:
 	rx_popindex $ctx->{pos}, $ctx->{fail}
 	rx_pushindex $ctx->{pos}
 END
+    rxdebug $x, $ctx, 'alt back';
     for my $i (0..$#bt_labels) {
 	code(<<END);
 	if $which == $i goto $bt_labels[$i]
@@ -179,6 +193,7 @@ END
 	code(<<END);
 $ctx->{succ}:
 END
+	rxdebug $x, $ctx, 'alt succ';
     }
     return $bt;
 }
@@ -242,6 +257,75 @@ END
     return $bt;    
 }
 
+sub begin_capture {
+    my ($x, $ctx) = @_;
+    $ctx->{cap_pos} = gentmp 'int';
+    $ctx->{cap_succ} = $ctx->{succ};
+    unless(localvar($x->var->name)) {
+	print STDERR "Declared capture var ", $x->var->name,"\n";
+	add_localvar($x->var->name, $x->var->type);
+    }
+    code(<<END);
+	$ctx->{cap_pos} = $ctx->{pos}
+END
+    undef $ctx->{succ};
+}
+
+sub end_capture {
+    my ($x, $ctx, $bt, @vars) = @_;
+    my $len = gentmp 'int';
+    my $str = gentmp 'str';
+    my $ptmp = gentmp 'PerlString';
+    my $hashname = $x->var->name;
+    if ($hashname =~ /^\$([\w\d_]+)$/) {
+	$hashname = $1;
+    }
+    code(<<END);
+	$len = $ctx->{pos} - $ctx->{cap_pos}
+	substr $str, $ctx->{str}, $ctx->{cap_pos}, $len
+	$ptmp = new PerlString
+	$ptmp = $str
+	$x->{ctx}{rx_matchobj}\["$hashname"] = $ptmp
+END
+    for my $var (@vars) {
+	my $reg = localvar($var->name) || add_localvar($var->name, $var->type);
+	code(<<END);
+	$reg = $ptmp
+END
+    }
+    maybe_fallthrough($ctx->{cap_succ});
+    return $bt;
+}
+
+# Word separation (for m:w//)
+#
+#   require word-boundary unless we're at the beginning of the string,
+#   or we just saw a non-word char.  Slurp whitespace.
+#
+sub P6C::rx_wordsep::rx_val {
+    my ($x, $ctx) = @_;
+    my $bt = genlabel 'wordsep';
+    my $loop = genlabel;
+    my $preloop = genlabel;
+    my $itmp = gentmp 'int';
+    code(<<END);
+	if $ctx->{pos} == 0 goto $preloop
+	$itmp = $ctx->{pos} - 1
+	rx_is_w $ctx->{str}, $itmp, $preloop
+	rx_zwa_boundary $ctx->{str}, $ctx->{pos}, $ctx->{fail}
+$preloop:
+	rx_pushmark
+$loop:
+	rx_pushindex $ctx->{pos}
+	rx_is_s $ctx->{str}, $ctx->{pos}, $bt
+	goto $loop
+$bt:
+	rx_popindex $ctx->{pos}, $ctx->{fail}
+END
+    maybe_fallthrough($ctx->{succ});
+    return $bt;
+}
+
 # Any atom.
 #
 #   For regex-aware items, just emit their code.
@@ -250,10 +334,6 @@ END
 #   against that.
 sub P6C::rx_atom::rx_val {
     my ($x, $ctx) = @_;
-    if ($x->capture) {
-	unimp "Capturing group";
-    }
-
     my $startdepth;
     if ($x->{ctx}{rx_canfail}) {
 	$x->{ctx}{rx_fail_label} = genlabel 'failatom';
@@ -267,21 +347,23 @@ END
     }
 
     my %ctx = %$ctx;
+    $ctx{fail} = $x->{ctx}{rx_fail_label} if $x->{ctx}{rx_canfail};
     if (UNIVERSAL::can($x->atom, 'rx_val')) {	# XXX: blech
-	$ctx{fail} = $x->atom->rx_val({ %ctx });
+	return $x->atom->rx_val({ %ctx });
+
     } elsif (ref($x->atom) eq 'ARRAY') {
 	# codeblock
 	$_->val for @{$x->atom};
+
+    } elsif (UNIVERSAL::can($x->atom, 'type')
+	     && $x->atom->type eq 'PerlArray') {
+	return rx_alt_array($x, \%ctx);
 
     } else {
 	my $lit;
 	if ($x->atom->isa('P6C::sv_literal') && is_string($x->atom->type)) {
 	    # Literal string => avoid going through temporaries.
 	    $lit = $x->atom->lval;
-
-	} elsif (UNIVERSAL::can($x->atom, 'type')
-		 && $x->atom->type eq 'PerlArray') {
-	    return rx_alt_array($x, $ctx);
 
 	} else {
 	    $lit = gentmp 'str';
@@ -291,11 +373,11 @@ END
 END
 	}
 	code(<<END);
-	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $ctx->{fail}
+	rx_literal $ctx->{str}, $ctx->{pos}, $lit, $ctx{fail}
 END
     }
-    maybe_fallthrough($ctx->{succ});
-    return $startdepth ? $x->{ctx}{rx_fail_label} : $ctx{fail};
+    maybe_fallthrough($ctx{succ});
+    return $ctx{fail};
 }
 
 # Greedy repeat <$n,$m>
@@ -335,7 +417,16 @@ sub do_var_repeat {
     my $maxdone = genlabel 'max';
     my $zerocnt = genlabel 'zero';
     my %loopctx = %$ctx;	# context for min loop
-    $loopctx{succ} = $loop;
+    my ($cap_from, $cap_to, $arylen);
+    if ($x->{ctx}{rx_capture_array}) {
+	print STDERR "capture array\n";
+	undef $loopctx{succ};
+	$cap_from = findvar $x->thing->var->name;
+	$cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	$arylen = gentmp 'int';
+    } else {
+	$loopctx{succ} = $loop;
+    }
     $loopctx{fail} = $loopfail;
 
     code(<<END);
@@ -350,10 +441,22 @@ $loop:
 	inc $count
 END
     $bt = $x->thing->rx_val({ %loopctx });
+    code(<<END) if $cap_to;
+	$arylen = $cap_to
+	$cap_to\[$arylen] = $cap_from
+	goto $loop
+END
     code(<<END);
 $loopfailex:
 	rx_popindex $count, $ctx->{fail}
 	rx_popindex $ctx->{pos}, $ctx->{fail}
+END
+    code(<<END) if $cap_to;
+	$arylen = $cap_to
+	dec $arylen
+	$cap_to = $arylen
+END
+    code(<<END);
 # XXX: reinitialize:
 	$m = $mv
 	$n = $nv
@@ -413,9 +516,19 @@ sub do_frugal_rep {
 
     my $loopfail = genlabel 'rep';
     my $loopfailex = genlabel 'max';
+    my $incr = genlabel 'incr';
     my $enough = genlabel 'enough';
     my %loopctx = %$ctx;	# context for min loop
-    $loopctx{succ} = $loop;
+    my ($cap_from, $cap_to, $arylen);
+    if ($x->{ctx}{rx_capture_array}) {
+	print STDERR "capture array\n";
+	undef $loopctx{succ};
+	$cap_from = findvar $x->thing->var->name;
+	$cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	$arylen = gentmp 'int';
+    } else {
+	$loopctx{succ} = $loop;
+    }
     $loopctx{fail} = $loopfail;
 
     code(<<END);
@@ -431,12 +544,23 @@ $loop:
 	inc $count
 END
     $bt = $x->thing->rx_val({ %loopctx });
-    my $incr = genlabel 'incr';
+    code(<<END) if $cap_to;
+	$arylen = $cap_to
+	$cap_to\[$arylen] = $cap_from
+	goto $loop
+END
     code(<<END);
 $loopfailex:
 	rx_popindex $n, $ctx->{fail}
 	rx_popindex $count, $ctx->{fail}
 	rx_popindex $ctx->{pos}, $ctx->{fail}
+END
+    code(<<END) if $cap_to;
+	$arylen = $cap_to
+	dec $arylen
+	$cap_to = $arylen
+END
+    code(<<END);
 	$m = $mv
 	if $n == 0 goto $incr
 	goto $bt
@@ -489,53 +613,79 @@ sub P6C::rx_repeat::rx_val {
     }
     
     my %ctx = %$ctx;
+    unless ($ctx->{succ}) {
+	$needend = 1;
+	$ctx->{succ} = genlabel 'repeat';
+    }
     if (ref($x->min) || ref($x->max) || (defined($x->max) && $x->max != 1)) {
 	# <$n, $m>
-	unless ($ctx->{succ}) {
-	    $needend = 1;
-	    $ctx->{succ} = genlabel 'repeat';
-	}
 	$bt = do_var_repeat($x, $ctx);
     } elsif (!defined($x->max)) {
 	# Star or plus
-	if ($x->min == 1) {
-	    $ctx{fail} = $x->thing->rx_val({ %ctx });
-	}
 	my $loop = genlabel 'star';
 	my $loopfail = genlabel 'star_infail';
 	my $loopfailex = genlabel 'star_back';
 	my $end = genlabel 'star_end';
 	my $itmp = gentmp 'int';
 	my $initdepth = gentmp 'int';
+
 	my %loopctx = %$ctx;
-	$loopctx{succ} = $loop;
+	my ($cap_from, $cap_to, $arylen);
+	if ($x->{ctx}{rx_capture_array}) {
+	    print STDERR "capture array\n";
+	    undef $loopctx{succ};
+	    $cap_from = findvar $x->thing->var->name;
+	    $cap_to = findvar $x->{ctx}{rx_capture_array}->name;
+	    $arylen = gentmp 'int';
+	} else {
+	    $loopctx{succ} = $loop;
+	}
 	$loopctx{fail} = $loopfail;
 
+	if ($x->min == 1) {
+	    $ctx{fail} = $x->thing->rx_val({ %ctx });
+	    if ($cap_to) {
+		code(<<END);
+	$arylen = $cap_to
+	$cap_to\[$arylen] = $cap_from
+END
+	    }
+	}
 	code(<<END);
 	rx_pushmark
 	$itmp = 0
 $loop:
-	rx_pushindex $ctx->{pos}
 	rx_pushindex $itmp
+	rx_pushindex $ctx->{pos}
 	$itmp = 1
 END
 	$bt = $x->thing->rx_val({ %loopctx });
+	code(<<END) if $cap_to;
+	$arylen = $cap_to
+	$cap_to\[$arylen] = $cap_from
+	goto $loop
+END
 	code(<<END);
 $loopfailex:
-	rx_popindex $itmp, $ctx{fail}
 	rx_popindex $ctx->{pos}, $ctx{fail}
-	if $itmp != 0 goto $bt
+	rx_popindex $itmp, $ctx{fail}
+END
+	rxdebug $x, $ctx, 'star back';
+	code(<<END) if $cap_to;
+	$arylen = $cap_to
+	dec $arylen
+	$cap_to = $arylen
+END
+	code(<<END);
+	if $itmp == 1 goto $bt
 $loopfail:
+	rx_popindex $ctx->{pos}, $ctx{fail}
+	rx_pushindex $ctx->{pos}
 END
 	$bt = $loopfailex;
 
     } else {
 	# ?
-	unless ($ctx->{succ}) {
-	    $needend = 1;
-	    $ctx->{succ} = genlabel 'repeat';
-	}
-
 	$ctx{fail} = genlabel 'opt';
 	$ctx{succ} = $ctx->{succ};
 	code(<<END);
@@ -553,7 +703,8 @@ END
     code(<<END) if $needend;
 $ctx->{succ}:
 END
-
+    rxdebug $x, $ctx, 'star succ';
+    
     return $bt;
 }
 
@@ -672,24 +823,70 @@ END
     return $ctx->{fail};
 }
 
-# Beginning of string
-sub P6C::rx_beg::rx_val {
+# Zero-width assertions
+sub P6C::rx_zerowidth::rx_val {
     my ($x, $ctx) = @_;
-    code(<<END);
+    if ($x->name eq '^') {
+	# Beginning
+	code(<<END);
 	if $ctx->{pos} != 0 goto $ctx->{fail}
 END
-    maybe_fallthrough($ctx->{succ});
-    return $ctx->{fail};
-}
+	maybe_fallthrough($ctx->{succ});
+	return $ctx->{fail};
 
-# End of string
-sub P6C::rx_end::rx_val {
-    my ($x, $ctx) = @_;    
-    code(<<END);
+    } elsif ($x->name eq '$') {
+	# End of string
+	code(<<END);
 	rx_zwa_atend $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
-    maybe_fallthrough($ctx->{succ});
-    return $ctx->{fail};
+	maybe_fallthrough($ctx->{succ});
+	return $ctx->{fail};
+
+    } elsif ($x->name eq '^^') {
+	# Beginning of line:
+	# pos == 0 || str[pos-1] == '\n'
+	my $succ;
+	my $itmp = gentmp 'int';
+	unless ($ctx->{succ}) {
+	    $succ = $ctx->{succ} = genlabel ;
+	}
+	my $ordnl = ord("\n");
+	code(<<END);
+	if $ctx->{pos} == 0 goto $ctx->{succ}
+	$itmp = $ctx->{pos} - 1
+	ord $itmp, $ctx->{str}, $itmp
+	if $itmp == $ordnl goto $ctx->{succ}
+	goto $ctx->{fail}
+END
+	code(<<END) if ($succ);
+$succ:
+END
+	return $ctx->{fail};
+	
+    } elsif ($x->name eq '$$') {
+	# end of line:
+	# pos == length || str[pos+1] == '\n'
+	my $succ;
+	my $itmp = gentmp 'int';
+	unless ($ctx->{succ}) {
+	    $succ = $ctx->{succ} = genlabel ;
+	}
+	my $ordnl = ord("\n");
+	code(<<END);
+	length $itmp, $ctx->{str}
+	if $ctx->{pos} == $itmp goto $ctx->{succ}
+	$itmp = $ctx->{pos} + 1
+	ord $itmp, $ctx->{str}, $itmp
+	if $itmp == $ordnl goto $ctx->{succ}
+	goto $ctx->{fail}
+END
+	code(<<END) if ($succ);
+$succ:
+END
+	return $ctx->{fail};
+    } else {
+	unimp "Zero-width assertion ".$x->name;
+    }
 }
 
 # non-trivial character class
@@ -778,6 +975,7 @@ $bt:
 $start:
 	push $ctx->{str}
 END
+    rxdebug $x, $ctx, "before call @{[$x->name]}";
     if (ref $x->name) {
 	call_closure($x->name, $x->args);
     } else {
@@ -786,8 +984,34 @@ END
     code(<<END);
 	rx_popindex $ctx->{pos}, $ctx->{fail}
 END
+    rxdebug $x, $ctx, "after call @{[$x->name]}";
     maybe_fallthrough($ctx->{succ});
     return $bt;
+}
+
+# Hypothetical
+sub P6C::rx_hypo::rx_val {
+    my ($x, $ctx) = @_;
+    if ($x->var->type eq 'PerlArray') {
+	# Array capture...
+	begin_capture($x, $ctx);
+	my $foo = $x->val->thing->var;
+	unless (localvar($foo->name)) {
+	    # Declare capture var for repeated item. XXX: shouldn't be needed.
+	    add_localvar($foo->name, $foo->type);
+	}
+	my $array = localvar($x->var->name);
+	code(<<END);
+	$array = 0
+END
+	my $bt = $x->val->rx_val($ctx);
+#	return end_capture($x, $ctx, $bt);
+	return $bt;
+    } else {
+	begin_capture($x, $ctx);
+	my $bt = $x->val->rx_val($ctx);
+	return end_capture($x, $ctx, $bt, $x->var);
+    }
 }
 
 ############################################################

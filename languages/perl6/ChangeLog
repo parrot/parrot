@@ -320,3 +320,29 @@
 	* Fixes:
 	    - remove a few unneeded grammar rules.
 	    - reset parser state on compiler init.
+	    - parse "@x := pattern" better
+
+	* Additions:
+	    - capturing groups and hypotheticals (some).
+	    - bol and eol
+
+2002-09-08
+
+	* Fixes:
+	    - parse sub declarations correctly
+	    - remove a level of regex parsing rules
+	    - !~ forces boolean result (not e.g. match object)
+	    - no longer require explicit sub main
+	    - given no longer looks in sub-blocks for associated "when"
+	      statements.
+
+	* Additions:
+	    - --debug-regex to compile "noisy" regexes
+	    - context-forcing operators (e.g. "_(expression)")
+	    - builtin defined
+	    - m:w//
+	    - examples/bnf.p6: BNF parser (thanks to languages/conversion)
+
+	* Test-failures:
+	    - still compiler/{1_11,3_7}.
+

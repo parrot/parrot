@@ -80,10 +80,8 @@ sub output_tree {
     }
     $x = $x->tree;
     if ($o{imc}) {
-	if (!defined $o{batch}) {
-	    P6C::IMCC::add_function('main');
-	    P6C::IMCC::set_function('main');
-	}
+	P6C::IMCC::add_function('main');
+	P6C::IMCC::set_function('main');
 	compile($x);
 	emit();
     } else {

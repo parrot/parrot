@@ -20,5 +20,5 @@ $ENV{PARROT_QUICKTEST} = grep $_ eq 'quick', @ARGV;
 @ARGV = grep $_ ne 'quick', @ARGV;
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @tests = @ARGV ? @ARGV : map { glob( "t/$_/*.t" ) } ( qw(compiler rx) );
+my @tests = @ARGV ? @ARGV : grep !m{^t/parser/}, glob( "t/*/*.t" );
 runtests(@tests);

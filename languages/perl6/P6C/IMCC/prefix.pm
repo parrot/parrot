@@ -48,6 +48,8 @@ BEGIN {
  'redo' => \&simple_control,
  'skip' => \&simple_control,
  'continue' => \&simple_control,
+
+ 'defined' => \&prefix_defined,
 );
 }
 
@@ -643,15 +645,16 @@ sub prefix_given {
     my $label = $x->{ctx}{label};
     my ($given, $block) = @{$x->args->vals};
 
-	# Make sure "when" clauses can name their skip labels.
-	# REMEMBER: we may be labeling other people's "when's" -- it's
-	# their responsibility to re-label them later.
-    map_preorder {
+    # Make sure "when" clauses can name their skip labels.
+
+    # NOTE: this doesn't relabel whens hidden in sub-blocks.  This is
+    # deliberate.
+
+    for (@{$block->block}) {
 	if ($_->isa('P6C::prefix') && $_->name eq 'when') {
 	    $_->{ctx}{label} = $label;
 	}
-    } $block;
-
+    }
     push_scope;
     declare_label name => $label, type => 'break';
 
@@ -682,6 +685,16 @@ sub prefix_given {
 
     emit_label name => $label, type => 'break';
     pop_scope;
+}
+
+sub prefix_defined {
+    my ($x) = @_;
+    my $v = $x->args->val;
+    my $res = gentmp 'int';
+    code(<<END);
+	$res = defined $v
+END
+    return primitive_in_context($res, 'int', $x->{ctx});
 }
 
 1;

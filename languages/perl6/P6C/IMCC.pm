@@ -137,8 +137,8 @@ sub init {			# reset state
     $lastsym = 0;
     $lasttmp = 0;
     $lastlabel = 0;
-    P6C::Builtins::declare(\%funcs);
     P6C::Parser::Reset();
+    P6C::Builtins::declare(\%funcs);
 }
 
 sub compile {			# compile input (don't emit)
@@ -1098,8 +1098,9 @@ sub do_array {
 }
 
 sub do_reverse_match {
-     my $v = do_smartmatch($_[0]->l, $_[0]->r, $_[0]->{ctx});
-     code(<<END);
+    $_[0]->{ctx}->type('bool');
+    my $v = do_smartmatch($_[0]->l, $_[0]->r, $_[0]->{ctx});
+    code(<<END);
 	$v = ! $v
 END
     return $v;
@@ -1992,9 +1993,35 @@ sub P6C::debug_info::val {
 }
 
 ######################################################################
+sub P6C::context::val {
+    my $x = shift;
+    my $v = $x->val;
+    my $type = $P6C::context::names{$x->ctx};
+    if ($type eq 'PerlAray') {
+	return array_in_context($v, $x->{ctx});
+    } elsif ($type eq 'PerlHash') {
+	unimp 'hash context';
+    } else {
+	return scalar_in_context($v, $x->{ctx});
+    }
+}
+
+######################################################################
 package P6C::rule;
 use P6C::IMCC::rule;
 use P6C::IMCC ':all';
+require P6C::Util;
+
+sub prepare_match_object {
+    my $r = shift;
+    my $ret = newtmp 'PerlHash';
+    P6C::Util::map_preorder {
+	if (UNIVERSAL::isa($_, 'P6C::rx_hypo')) {
+	    $_->{ctx}{rx_matchobj} = $ret;
+	}
+    } $r;
+    return $ret;
+}
 
 sub val {
     my $x = shift;
@@ -2011,15 +2038,16 @@ END
     $x->{ctx}{rx_pos} = $rxpos;
     $x->{ctx}{rx_thing} = $rxstr;
     $x->{ctx}{rx_fail} = $fail;
-    my $ret = newtmp 'PerlUndef';
+    my $ret = $x->prepare_match_object;
     my $back = P6C::IMCC::rule::rx_val($x);
     my $end = genlabel 'end';
     fixup_label($fake_back, $back);
     code(<<END);
 	rx_pushindex $rxpos
-	$ret = $rxpos
+#	$ret = $rxpos
 	goto $end
 $fail:
+	$ret = new PerlUndef
 	rx_pushmark
 $end:
 END

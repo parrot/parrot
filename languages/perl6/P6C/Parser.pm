@@ -495,7 +495,7 @@ bitand:		  <leftop: compare bitand_op compare>
 bitand_op:	  /$HYPE&(?!&)/o
 
 bitor:		  <leftop: bitand bitor_op bitand>
-bitor_op:	  /$HYPE([|~])(?!\1)/o
+bitor_op:	  /$HYPE(?:\|(?!\|)|~(?!~))/o
 
 logand:		  <leftop: bitor logand_op bitor>
 logand_op:	  /$HYPE&&/o
@@ -662,7 +662,7 @@ stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| scope(?) /(?:sub|rule)\b/ <commit> name params
 			{ add_function(@item[4,5], $thisparser);1 }
 			props['is']
-		(';' | <matchrule:@{[$arg[0] eq 'sub'?'block':'rule']}>)[$item[2]]
+		(...';' | <matchrule:@{[$arg[0] eq 'sub'?'block':'rule']}>)[$item[2]]
 		| scope(?) 'class' <commit> name { add_class($item[4]);1 }
 			props['is'] block
 		| expr guard(?)
@@ -771,19 +771,17 @@ pattern:	  /(?:m|rx)\b/ <commit> rx_mod(s?) /$SPECIAL_DELIM/o rx_alt
 
 rx_alt:		  <leftop: rx_seq '|' rx_seq>
 
-rx_seq:		  rx_maybe_hypo(s?)
+rx_seq:		  rx_element(s?)
 
-rx_maybe_hypo:	  scalar_var    ':=' <commit> rx_element
-		| nonscalar_var ':=' <commit> '[' rx_alt ']' rx_repeat(?)
-		| rx_element
-		| /$RXASSERTION/o
-
-rx_element:	  ...'{' <commit> block
+rx_element:	  scalar_var    ':=' <commit> rx_atom
+		| nonscalar_var ':=' <commit> rx_atom rx_repeat
+		| ...'{' <commit> block
 		| rx_atom rx_repeat(?)
+		| rx_mod
+		| /$RXASSERTION/o
 
 rx_atom:	  '(' <commit> rx_alt ')'
 		| '[' <commit> rx_alt ']'
-		| ...':' <commit> rx_mod
 		| '<' <commit> /!?/ rx_assertion '>'
 		| '.'
 		| /$RXESCAPED/o

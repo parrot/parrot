@@ -296,7 +296,7 @@ sub sm_expr_pattern {
     my $pos = $r->{ctx}{rx_pos} = gentmp 'int';
     my $basepos = gentmp 'int';
     my $fail = genlabel 'rx_fail';
-    my $ret = newtmp 'PerlUndef';
+    my $end = genlabel 'rx_end';
     code(<<END);
 	rx_clearstack		# XXX: good old non-reentrant engine.
 	rx_initstack
@@ -311,14 +311,24 @@ $adv:
 	inc $basepos
 $begin:
 END
+    my $ret = $r->prepare_match_object;
     $r->{ctx}{rx_pos} = $pos;
     $r->{ctx}{rx_thing} = $str;
     $r->{ctx}{rx_fail} = $adv;
     P6C::IMCC::rule::rx_val($r);
     code(<<END);
-	$ret = 1
+	goto $end
 $fail:
+	$ret = new PerlUndef
+$end:
 END
+    if ($ctx->type eq 'bool') {
+	my $itmp = gentmp 'int';
+	code(<<END);
+	$itmp = defined $ret
+END
+	return primitive_in_context($itmp, 'int', $ctx);
+    }
     return scalar_in_context($ret, $ctx);
 }
 
@@ -339,7 +349,7 @@ $loop:
 	$vtmp = $aval\[$i]
 END
     my $ret = sm_expr_pattern(P6C::Register->new(reg => $vtmp,
-						 $type => 'PerlUndef'),
+						 type => 'PerlUndef'),
 			      $r, $ctx);
     code(<<END);
 	if $ret goto $done

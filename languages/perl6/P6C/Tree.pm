@@ -850,7 +850,8 @@ sub P6C::nothing::tree {
 ##############################
 sub P6C::rule::tree {
     my $x = shift;
-    return new P6C::rule mod => maybe_tree($x->[1]), pat => $x->[3]->tree;
+    my $mod = { map { my $t = $_->tree; ($t->mod, $t) } @{$x->[1]} };
+    return new P6C::rule mod => $mod, pat => $x->[3]->tree;
 }
 
 sub P6C::pattern::tree {
@@ -863,8 +864,8 @@ sub P6C::pattern::tree {
 	    return new P6C::closure params => undef, block => $rule;
 	}
     } else {
-	my $rule = new P6C::rule mod => maybe_tree($x->[3]),
-	    pat => $x->[5]->tree;
+	my $mod = { map { my $t = $_->tree; ($t->mod, $t) } @{$x->[3]} };
+	my $rule = new P6C::rule mod => $mod, pat => $x->[5]->tree;
 	if ($x->[1] eq 'm') {
 	    return $rule;
 	} else {
@@ -883,63 +884,54 @@ sub P6C::rx_seq::tree {
     return new P6C::rx_seq things => [map { $_->tree } @{$x->[1]} ];
 }
 
-sub P6C::rx_maybe_hypo::tree {
+sub P6C::rx_element::tree {
     my $x = shift;
     if (@$x == 2) {
-	if (ref $x->[1]) {
-	    # rx_element
+	if (ref($x->[1])) {
+	    # Modifier
 	    return $x->[1]->tree;
-	} elsif ($x->[1] eq '^') {
-	    return new P6C::rx_beg;
-	} elsif ($x->[1] eq '$') {
-	    return new P6C::rx_end;
-	} elsif ($x->[1] eq '^^' || $x->[1] eq '$$') {
-	    unimp 'BOL or EOL';
+	} elsif ($x->[1] =~ /^(?:\^\^?|\$\$?)$/) {
+	    return new P6C::rx_zerowidth name => $x->[1];
 	} else {
 	    # Cut
 	    return new P6C::rx_cut level => length($x->[1]);
 	}
+    } elsif (@$x == 3) {
+	# atom with optional repeat
+	my $ret = $x->[1]->tree;
+	if (@{$x->[2]}) {
+	    my $rep = $x->[2][0]->tree;
+	    $rep->thing($ret);
+	    $ret = $rep;
+	}
+	return $ret;
+    } elsif (@$x == 4) {
+	# codeblock
+	return new P6C::rx_atom atom => $x->[3]->tree;
     } elsif (@$x == 5) {
 	# Scalar hypo
 	return new P6C::rx_hypo var => $x->[1]->tree,
 	    val => $x->[4]->tree;
     } else {
 	# array hypo
-	return new P6C::rx_hypo var => $x->[1]->tree,
-	    val => new P6C::rx_atom(repeat => $x->[6]->tree,
-				    atom => $x->[4]->tree);
+	my $rep = $x->[5]->tree;
+	$rep->thing($x->[4]->tree);
+	return new P6C::rx_hypo var => $x->[1]->tree, val => $rep;
     }
-}
-
-sub P6C::rx_element::tree {
-    my $x = shift;
-    my $ret;
-    if (@$x == 4) {
-	# codeblock
-	$ret = new P6C::rx_atom atom => $x->[3]->tree;
-    } else {
-	# atom
-	$ret = $x->[1]->tree;
-	if (@{$x->[2]}) {
-	    my $rep = $x->[2][0]->tree;
-	    $rep->thing($ret);
-	    $ret = $rep;
-	}
-    }
-    return $ret;
 }
 
 sub P6C::rx_atom::tree {
     my $x = shift;
-    my ($atom, $capture);
+    my $atom;
     if (@$x == 5) {
-	if ($x->[1] =~ /\[\(/) {
-	    # group, capturing or otherwise.
-	    $atom = $x->[3]->tree;
-	    $capture = $x->[1] eq '(';
+	$atom = $x->[3]->tree;
+	if ($x->[1] eq '(') {
+	    return new P6C::rx_hypo(val => new P6C::rx_atom(atom => $atom));
+	} elsif ($x->[1] eq '[') {
+	    return new P6C::rx_atom(atom => $atom);
 	} else {
 	    # modifiers
-	    return $x->[3]->tree;
+	    return $atom;
 	}
     } elsif (@$x == 6) {
 	# assertion
@@ -960,23 +952,25 @@ sub P6C::rx_atom::tree {
 	} else {
 	    $atom = $x->[1]->tree;
 	}
+	return new P6C::rx_atom atom => $atom;
     } elsif ($x->[1] eq '.') {
 	# metachar
-	$atom = new P6C::rx_any;
+	return new P6C::rx_any;
 
     } elsif ($x->[1] =~ /^\\(.+)/) {
 	# metachar
-	$atom = new P6C::rx_meta name => $1;
+	return new P6C::rx_meta name => $1;
     } else {
-	$atom = new P6C::sv_literal type => 'PerlString', lval => qq{"$x->[1]"};
+	return new P6C::rx_atom
+	    atom => new P6C::sv_literal type => 'PerlString',
+		lval => qq{"$x->[1]"};
     }
-    return new P6C::rx_atom capture => $capture, atom => $atom;
 }
 
 sub P6C::rx_mod::tree {
     my $x = shift;
-    my $ret = new P6C::rx_mod mod => $x->[2];
-    if (@{$x->[4]} > 0) {
+    my $ret = new P6C::rx_mod mod => substr($x->[1], 1);
+    if (@{$x->[2]} > 0) {
 	$ret->args($x->[4][2]->tree);
     }
     return $ret;
