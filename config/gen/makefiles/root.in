@@ -500,7 +500,7 @@ fulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS)
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS)
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS)
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(TEST_PROG_ARGS)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS)
 
 quickfulltest : $(TEST_PROG) test_prep quickfulltest_dummy
 
@@ -509,7 +509,7 @@ quickfulltest_dummy :
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(TEST_PROG_ARGS) quick
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(TEST_PROG_ARGS) quick
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -P $(TEST_PROG_ARGS) quick
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(TEST_PROG_ARGS) quick
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(TEST_PROG_ARGS) quick
 
 # Common prep for all test targets
 test_prep : ${blib_lib_libparrot_a} assemble.pl

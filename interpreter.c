@@ -29,31 +29,6 @@
 
 static void setup_default_compreg(Parrot_Interp interpreter);
 
-/*=for api interpreter runops_core
- * TODO: Not really part of the API, but here's the docs.
- * Generic runops, which takes a function pointer for the core.
- */
-static void
-runops_core(opcode_t *(*core) (struct Parrot_Interp *, opcode_t *),
-               struct Parrot_Interp *interpreter, opcode_t *pc)
-{
-    opcode_t *code_start;
-    UINTVAL code_size;          /* in opcodes */
-    opcode_t *code_end;
-
-    code_start = interpreter->code->byte_code;
-    code_size = interpreter->code->byte_code_size / sizeof(opcode_t);
-    code_end = interpreter->code->byte_code + code_size;
-
-    pc = core(interpreter, pc);
-
-    if (pc && (pc < code_start || pc >= code_end)) {
-        internal_exception(INTERP_ERROR,
-       "Error: Control left bounds of byte-code block (now at location %d)!\n",
-       (int)(pc - code_start));
-    }
-}
-
 /*=for api interpreter load_oplib
  *
  * dynamically load an op_lib extension
@@ -289,14 +264,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     }
 
     stop_prederef(interpreter);
-
-    if (pc_prederef == 0) {
-        pc = 0;
-    }
-    else {
-        pc = code_start + (pc_prederef - code_start_prederef);
-    }
-    return pc;
+    return 0;
 }
 
 
@@ -365,7 +333,7 @@ runops(struct Parrot_Interp *interpreter, size_t offset)
 
 
         /* run it finally */
-        runops_core(core, interpreter, pc);
+        core(interpreter, pc);
         /* if we have fallen out with resume and we were running CGOTO, set
          * the stacktop again to a sane value, so that restarting the runloop
          * is ok.

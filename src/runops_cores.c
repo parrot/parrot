@@ -139,6 +139,11 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
     }
 #endif
 
+    if (pc && (pc < code_start || pc >= code_end)) {
+        internal_exception(INTERP_ERROR,
+       "Error: Control left bounds of byte-code block (now at location %d)!\n",
+       (int)(pc - code_start));
+    }
     return pc;
 }
 
