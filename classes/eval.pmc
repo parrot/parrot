@@ -61,18 +61,6 @@ pmclass Eval extends Closure need_ext {
         sub_data->seg = NULL;
     }
 
-    void mark() {
-        parrot_sub_t sub_data;
-        PObj *name;
-
-        sub_data = PMC_sub(SELF);
-        if (!sub_data)
-            return;
-        name = (PObj*)sub_data->name;
-        if (name)
-            pobject_lives(INTERP, name);
-    }
-
     void destroy() {
         /*
          * If the compiled code contained any .sub (or .pcc.sub)

@@ -119,7 +119,7 @@ Initializes the subroutine.
     void init () {
         PMC_sub(SELF) = new_sub(INTERP);
         PMC_pmc_val(SELF) = NULL;
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
 #if 0
         if (Interp_flags_TEST(INTERP, PARROT_DEBUG_FLAG))
             printf("Address of base segment is %p\n",
