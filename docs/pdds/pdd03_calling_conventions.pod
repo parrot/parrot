@@ -4,22 +4,26 @@ Parrot Calling Conventions
 
 =head1 VERSION
 
-1
+1.4
 
 =head2 CURRENT
 
     Maintainer: Dan Sugalski
     Class: Internals
     PDD Number: 03
-    Version: 1.3
+    Version: 1.4
     Status: Developing
-    Last Modified: 2 May 2003
+    Last Modified: 17 November 2003
     PDD Format: 1
     Language: English
 
 =head2 HISTORY
 
 =over 4
+
+=item Version 1.4
+
+17 November 2003
 
 =item Version 1.3
 
@@ -42,6 +46,10 @@ None. First version
 =head1 CHANGES
 
 =over 4
+
+=item Version 1.4
+
+Unified call and return, tossed useless stuff
 
 =item Version 1.3
 
@@ -106,6 +114,18 @@ be of any particular class, it just needs to I<act> like an
 array. It specifically does I<not> need to be able to extend itself,
 and may be considered (and actually be) a constant array.
 
+Since Parrot's calling conventions are continuation-based, there is
+arguably very little difference between a call and a return. Because
+of this, the registers are set the same regardless of whether code is
+invoking a subroutine or a return continuation.
+
+Please note that, in the interest of speed, there is a count-free
+version of sub calling. This mechanism should only be used when
+calling a static subroutine (never a method) with a fixed-arg-count
+signature that is known at compile time and guaranteed not to
+change. It should not be used when writing code for/in dynamic
+languages.
+
 =head2 Responsibility for environment preservation
 
 The caller is responsible for preserving any environment it is
@@ -149,16 +169,17 @@ The fully qualified name of the method or sub being called
 
 =item I0
 
-True if the sub is being called with prototyped parameters.
+1 if the sub is being called with fully prototyped parameters,
+including P/I/S/N counts.
+
+0 if all the parameters are jammed in P registers and the overflow
+array, with a count of parameters passed in PMC registers
+
+-1 if the count registers aren't filled in.
 
 =item I1
 
-The number of items pushed onto the parameter list held in P3. Since
-the parameter list is all the parameters that won't fit into
-registers, the count in I1 should reflect I<only> those items held in
-the list in P3. If there are 14 parameters and 11 of them are in PMC
-registers (as they should be) then there will be three parameters in
-the overflow list, and I1 will be set to 3.
+The number of params in integer registers
 
 =item I2
 
@@ -166,15 +187,11 @@ The number of parameters in PMC registers.
 
 =item I3
 
-The return type expected. This is the identifier number for the
-class. A return type of 0 is void context, -1 is unknown, and -2 and
-down are the number of expected return variables, negated, minus
-one. (So -2 means we expect 1 variable, -3 means we expect 2, -4
-means we expect 3, and so forth)
+The number of string parameters
 
 =item I4
 
-Hash value of method or sub name. 0 means no hash value
+The number of numeric parameters
 
 =back
 
@@ -250,62 +267,5 @@ If we were calling without prototyping, all five parameters would be
 passed in as PMCs, in registers P5 through P9. If, on the other hand,
 we were calling with prototyping, a would be in I5, b in I6, c in S5,
 d in P5, and e in N5. 
-
-=head2 Return conventions
-
-On return from a function, the following registers are set. Return
-values are placed in I, S, and N registers only if the function is
-prototyped to do so. It is unlikely that more than one of these
-registers is set, but you never know. (Perl 6 having fancier return
-types if nothing else). If a prototyped return is indicated then
-register I0 B<must> be set to 1. If I0 is set to 0, then this is a
-non-prototyped return and only the PMC registers and overflow in P3
-may be set.
-
-Overflow return values are put in the array PMC in register P3.
-
-=over 4
-
-=item I0
-
-True if prototyped return, false otherwise
-
-=item I1
-
-Holds the number of return values in integer registers.
-
-=item I2
-
-Holds the number of return values in string registers.
-
-=item I3
-
-Holds the number of return values in PMC registers.
-
-=item I4
-
-Holds the number of return values in numeric registers.
-
-=item P3
-
-Holds the overflow return values in an array PMC
-
-=item P5-P15
-
-PMC return values
-
-=item I5-I15
-
-Integer return values
-
-=item S5-S15
-
-String return values
-
-=item N5-N15
-
-Numeric return values
-
-=back
 
 =head1 REFERENCES
