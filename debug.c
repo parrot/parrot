@@ -380,7 +380,10 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
 }
 
 /* PDB_trace
- * execute the next instruction
+ *
+ * Execute the next N operations; if no number is specified, it
+ * defaults to 1.
+ *
  */
 void
 PDB_trace(struct Parrot_Interp *interpreter,
@@ -763,7 +766,10 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
 }
 
 /* PDB_continue
- * continue running the program
+ *
+ * Continue running the program. If a number is specified, skip
+ * that many breakpoints.
+ *
  */
 void
 PDB_continue(struct Parrot_Interp *interpreter,
