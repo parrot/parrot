@@ -7,12 +7,6 @@
 #include "parrot/parrot.h"
 #include <math.h>
 
-/* DEFINES to make true mod work right */
-
-#define OPP_SIGNS(x,y)     ((((x)<0)&&((y)>0))||(((x)>0)&&((y)<0)))
-#define REM_INC(x,y)       (((x)%(y))?1:0)
-#define INT_FLOOR_DIV(x,y) (OPP_SIGNS(x,y)?(-((-x)/(y)+REM_INC((-x),(y)))):((x)/(y)))
-#define INT_MOD(x,y)       (((y)==0)?(x):((x)-(y)*INT_FLOOR_DIV((x),(y))))
 
 /* SET Ix, CONSTANT */
 AUTO_OP set_i_ic {
