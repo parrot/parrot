@@ -185,6 +185,14 @@ Example:
   (pdb) b 7 if S2 == "stop"
   Breakpoint 5 at line 7
 
+=item watch (w)
+
+Add a watchpoint. The syntax is:
+
+  w CONDITION
+
+The conditions has the same format as in C<break>
+
 =item delete (d)
 
 Delete a breakpoint. The syntax is:
