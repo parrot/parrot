@@ -10,4 +10,6 @@
 
 void* init_bytecode(void* program_code);
 
+VAR_SCOPE STRING** Parrot_string_constants;
+
 #endif

@@ -8,6 +8,8 @@ my %pack_type;
 %pack_type = (i => 'l',
 	      n => 'd',
 	  );
+my $sizeof_packi = length(pack($pack_type{i},1024));
+
 
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
@@ -90,8 +92,6 @@ sub constantize {
     return $constants{$s} = $#constants;
 }
 
-my $sizeof_packi = length(pack($pack_type{i},1024));
-
 sub emit_magic { print pack($pack_type{i}, 0x13155a1) }
 
 # Dummy for now.
@@ -101,13 +101,24 @@ sub emit_constants_section {
     # First, compute how big it's going to be.
     # The fields we'll need to fill in are: strlen, flags, encoding, type
     my $size =0 ;
-    $size += length($_)+4*$sizeof_packi for @constants;
+    for (@constants) {
+        $size += 4*$sizeof_packi;
+        $size += length($_);
+        $size += length($_) % $sizeof_packi; # Padding
+    }
+
+    $size += $sizeof_packi if @constants; # That's for the number of constants
     print pack($pack_type{i}, $size);
+    return unless @constants; # Zero means end of segment.
+
+    # Then spit out how many constants there are, so we can allocate
+    print pack($pack_type{i}, scalar @constants);
     
     # Now emit each constant
     for (@constants) {
         print pack($pack_type{i},0) x 3; # Flags, encoding, type
         print pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
         print $_;
+        print "\0" x (length($_) % $sizeof_packi); # Padding;
     }
 }

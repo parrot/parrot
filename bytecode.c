@@ -64,8 +64,39 @@ static void
 read_constants_table(void** program_code)
 {
     IV len = GRAB_IV(program_code);
-    /* For now, just skip over it */
-    ((IV*)*program_code) += len;
+    IV num;
+    IV i = 0;
+    if (len == 0) 
+       return;
+
+    num = GRAB_IV(program_code);
+    len -= sizeof(IV);
+    
+    Parrot_string_constants = Allocate_Aligned(num * sizeof(STRING*));
+
+    while (len > 0) {
+        IV flags    = GRAB_IV(program_code);
+        IV encoding = GRAB_IV(program_code);
+        IV type     = GRAB_IV(program_code);
+        IV buflen   = GRAB_IV(program_code);
+
+        len -= 4 * sizeof(IV);
+
+        Parrot_string_constants[i++] = string_make(*program_code /* ouch */, buflen, encoding, flags, type);
+        (char*)*program_code += buflen;
+        len -= buflen;
+
+        /* Padding */
+        if (buflen % sizeof(IV)) {
+            len -= buflen % sizeof(IV);
+            (char*)*program_code += buflen % sizeof(IV);
+        }
+        num--;
+        if (len < 0 || (len > 0 && num == 0)) {
+            printf("Bytecode error: string constant segment corrupted: %i, %i\n", len, num);
+            exit(1);
+        }
+    }
 }
 
 /* 
@@ -114,8 +145,8 @@ init_bytecode(void* program_code)
         exit(1);
     }
 
-    read_constants_table(&program_code);
     read_fixup_table(&program_code);
+    read_constants_table(&program_code);
     return program_code;
 }
 
