@@ -817,11 +817,15 @@ m
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
+.include "pmctypes.pasm"
+.include "mmd.pasm"
     newclass P1, "Foo"
     find_global P2, "set_i"
     store_global "Foo", "__set_integer_native", P2
     find_global P2, "add"
     store_global "Foo", "__add", P2
+    find_type I1, "Foo"
+    mmdvtregister .MMD_ADD, I1, I1, P2
     find_global P2, "get_s"
     store_global "Foo", "__get_string", P2
     # must add attributes before object instantiation
@@ -853,12 +857,12 @@ output_is(<<'CODE', <<'OUTPUT', "overriden vtables");
     invoke P1
 .pcc_sub add:
     print "in add\n"
-    classoffset I0, P2, "Foo"
-    getattribute P10, P2, I0
-    getattribute P11, P5, I0
+    classoffset I0, P5, "Foo"
+    getattribute P10, P5, I0
+    getattribute P11, P6, I0
     new P12, .PerlInt
     add P12, P10, P11
-    setattribute P6, I0, P12
+    setattribute P7, I0, P12
     invoke P1
 .pcc_sub get_s:
     print "in get_string\n"
