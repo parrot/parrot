@@ -20,7 +20,7 @@
 
 typedef int Parrot_flag;
 typedef int Parrot_warnclass;
-typedef void * Parrot_flag_val;
+typedef void *Parrot_flag_val;
 
 Parrot Parrot_new(void);
 

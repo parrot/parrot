@@ -16,13 +16,11 @@
 #include "parrot/parrot.h"
 #include "parrot/op.h"
 
-typedef opcode_t * (*runops_core_f)(struct Parrot_Interp *, opcode_t *);
+typedef opcode_t *(*runops_core_f)(struct Parrot_Interp *, opcode_t *);
 
-opcode_t *
-runops_fast_core(struct Parrot_Interp *, opcode_t *);
+opcode_t *runops_fast_core(struct Parrot_Interp *, opcode_t *);
 
-opcode_t *
-runops_slow_core(struct Parrot_Interp *, opcode_t *);
+opcode_t *runops_slow_core(struct Parrot_Interp *, opcode_t *);
 
 #endif
 

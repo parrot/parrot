@@ -32,7 +32,7 @@ typedef struct {
     int (*op_code)(const char * name);
 } op_lib_t;
 
-typedef op_lib_t * (*oplib_init_f)(void);
+typedef op_lib_t *(*oplib_init_f)(void);
 
 #endif
 

@@ -14,11 +14,11 @@
 #define PARROT_WARNINGS_off(interp, flag)  ((interp)->warns->classes &= ~(flag))
 #define PARROT_WARNINGS_test(interp, flag) ((interp)->warns->classes & (flag))
 
-INTVAL
-Parrot_warn(struct Parrot_Interp *, INTVAL warnclass, const char* message, ...);
+INTVAL Parrot_warn(struct Parrot_Interp *, INTVAL warnclass,
+                   const char *message, ...);
 
-INTVAL
-Parrot_warn_s(struct Parrot_Interp *, INTVAL warnclass, STRING* message, ...);
+INTVAL Parrot_warn_s(struct Parrot_Interp *, INTVAL warnclass,
+		     STRING *message, ...);
 
 #endif
 

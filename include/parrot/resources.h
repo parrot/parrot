@@ -115,5 +115,3 @@ struct Stash {
  *
  * vim: expandtab shiftwidth=4:
 */
-
-

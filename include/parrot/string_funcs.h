@@ -17,48 +17,30 @@
 
 /* Declarations of accessors */
 
-INTVAL
-Parrot_string_compute_strlen(STRING *);
-STRING *
-Parrot_string_concat(Parrot, const STRING *, const STRING *,
-              UINTVAL);
-STRING *
-Parrot_string_repeat(Parrot, const STRING *, UINTVAL,
-              STRING **);
-STRING *
-Parrot_string_chopn(STRING *, INTVAL);
-STRING *
-Parrot_string_substr(Parrot, const STRING *, INTVAL,
-              INTVAL, STRING **);
-INTVAL
-Parrot_string_compare(Parrot, const STRING *, const STRING *);
-Parrot_Bool
-Parrot_string_bool(const STRING *);
+INTVAL Parrot_string_compute_strlen(STRING *);
+STRING *Parrot_string_concat(Parrot, const STRING *, const STRING *, UINTVAL);
+STRING *Parrot_string_repeat(Parrot, const STRING *, UINTVAL, STRING **);
+STRING *Parrot_string_chopn(STRING *, INTVAL);
+STRING *Parrot_string_substr(Parrot, const STRING *, INTVAL,
+                             INTVAL, STRING **);
+INTVAL Parrot_string_compare(Parrot, const STRING *, const STRING *);
+Parrot_Bool Parrot_string_bool(const STRING *);
 
 /* Declarations of other functions */
-UINTVAL
-Parrot_string_length(const STRING *);
-INTVAL
-Parrot_string_ord(const STRING *, INTVAL idx);
-FLOATVAL
-Parrot_string_to_num (const STRING *);
-INTVAL
-Parrot_string_to_int (const STRING *);
-void
-Parrot_string_destroy(STRING *);
-STRING *
-Parrot_string_make(struct Parrot_Interp *, const void *buffer, UINTVAL buflen, 
-                   const ENCODING *, UINTVAL flags,
-                   const CHARTYPE *);
-STRING *
-Parrot_string_copy(struct Parrot_Interp *, const STRING *);
-STRING *
-Parrot_string_transcode(struct Parrot_Interp *, const STRING *src,
-                 const ENCODING *, const CHARTYPE *, STRING **dest_ptr);
-void
-Parrot_string_init(void);
-INTVAL
-Parrot_string_index(const STRING *, UINTVAL idx);
+UINTVAL Parrot_string_length(const STRING *);
+INTVAL Parrot_string_ord(const STRING *, INTVAL idx);
+FLOATVAL Parrot_string_to_num(const STRING *);
+INTVAL Parrot_string_to_int(const STRING *);
+void Parrot_string_destroy(STRING *);
+STRING *Parrot_string_make(struct Parrot_Interp *, const void *buffer,
+                           UINTVAL buflen, const ENCODING *, UINTVAL flags,
+                           const CHARTYPE *);
+STRING *Parrot_string_copy(struct Parrot_Interp *, const STRING *);
+STRING *Parrot_string_transcode(struct Parrot_Interp *, const STRING *src,
+                                const ENCODING *, const CHARTYPE *,
+                                STRING **dest_ptr);
+void Parrot_string_init(void);
+INTVAL Parrot_string_index(const STRING *, UINTVAL idx);
 
 #ifdef PARROT_IN_CORE
 

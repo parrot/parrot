@@ -27,8 +27,7 @@ void Parrot_PerlHash_class_init(INTVAL);
 void Parrot_ParrotPointer_class_init(INTVAL);
 void Parrot_IntQueue_class_init(INTVAL);
 
-void
-init_world(void);
+void init_world(void);
 
 #endif
 

@@ -70,8 +70,8 @@ typedef struct PMC PMC;
 typedef unsigned char BOOLVAL;
 typedef void STRING_FUNCS;
 typedef void REGEX;
-typedef void* BIGINT;
-typedef void* BIGFLOAT;
+typedef void *BIGINT;
+typedef void *BIGFLOAT;
 
 /* define some shortcuts for dealing with function pointers */
 /* according to ANSI C, casting between function and non-function pointers is

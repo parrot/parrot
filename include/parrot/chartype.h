@@ -26,8 +26,7 @@ struct parrot_chartype_t {
 
 #define Parrot_CharType struct parrot_chartype_t *
 
-const Parrot_CharType
-Parrot_chartype_lookup(const char *name);
+const Parrot_CharType Parrot_chartype_lookup(const char *name);
 
 #ifdef PARROT_IN_CORE
 
@@ -36,8 +35,7 @@ typedef Parrot_CharType_Transcoder CHARTYPE_TRANSCODER;
 
 #define chartype_lookup Parrot_chartype_lookup
 
-CHARTYPE_TRANSCODER
-chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
+CHARTYPE_TRANSCODER chartype_lookup_transcoder(const CHARTYPE *from, const CHARTYPE *to);
 
 #endif
 

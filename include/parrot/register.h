@@ -24,10 +24,10 @@ struct NReg {
 };
 
 struct SReg {
-    STRING *registers[NUM_REGISTERS]; /* Yes, this lame, but a STRING *
-                                       here throws undeclared struct
-                                       errors or something. That needs
-                                       fixing */
+    STRING *registers[NUM_REGISTERS];   /* Yes, this lame, but a STRING *
+                                         * here throws undeclared struct
+                                         * errors or something. That needs
+                                         * fixing */
 };
 
 struct PReg {

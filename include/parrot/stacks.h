@@ -28,47 +28,38 @@ typedef struct Stack_entry_t {
     INTVAL entry_type;
     INTVAL flags;
     void (*cleanup)(struct Stack_entry_t *);
-}* Stack_Entry;
+} *Stack_Entry;
 
 typedef struct Stack_chunk_t {
-  INTVAL used;
-  struct Stack_chunk_t *next;
-  struct Stack_chunk_t *prev;
-  struct Stack_entry_t entry[STACK_CHUNK_DEPTH];
-}* Stack_Chunk;
+    INTVAL used;
+    struct Stack_chunk_t *next;
+    struct Stack_chunk_t *prev;
+    struct Stack_entry_t entry[STACK_CHUNK_DEPTH];
+} *Stack_Chunk;
 
 typedef Stack_Chunk Stack;
 
 typedef void (*stack_cleanup_method_t)(Stack_Entry);
 #define STACK_CLEANUP_NULL (stack_cleanup_method_t)NULLfunc
 
-Stack
-new_stack(struct Parrot_Interp *);
+Stack new_stack(struct Parrot_Interp *);
 
-INTVAL
-stack_depth(struct Parrot_Interp *, Stack);
+INTVAL stack_depth(struct Parrot_Interp *, Stack);
 
-Stack_Entry
-stack_entry(struct Parrot_Interp *, Stack, INTVAL);
+Stack_Entry stack_entry(struct Parrot_Interp *, Stack, INTVAL);
 
-void
-rotate_entries(struct Parrot_Interp *, Stack, INTVAL depth);
+void rotate_entries(struct Parrot_Interp *, Stack, INTVAL depth);
 
-void
-stack_push(struct Parrot_Interp *, Stack,
-           void *thing, INTVAL type, stack_cleanup_method_t cleanup);
+void stack_push(struct Parrot_Interp *, Stack,
+                void *thing, INTVAL type, stack_cleanup_method_t cleanup);
 
-void *
-stack_pop(struct Parrot_Interp *, Stack, void *where, INTVAL type);
+void *stack_pop(struct Parrot_Interp *, Stack, void *where, INTVAL type);
 
-void *
-pop_dest(struct Parrot_Interp *interpreter);
+void *pop_dest(struct Parrot_Interp *interpreter);
 
-void *
-stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL* type);
+void *stack_peek(struct Parrot_Interp *interpreter, Stack stack, INTVAL *type);
 
-INTVAL
-get_entry_type(struct Parrot_Interp *interpreter, Stack_Entry entry);
+INTVAL get_entry_type(struct Parrot_Interp *interpreter, Stack_Entry entry);
 
 #define STACK_ENTRY_INT 1
 #define STACK_ENTRY_FLOAT 2

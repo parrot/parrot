@@ -50,10 +50,10 @@
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
 enum {
-        PIO_TYPE_FILE,
-        PIO_TYPE_PIPE,
-        PIO_TYPE_SOCKET,
-        PIO_TYPE_MAX
+    PIO_TYPE_FILE,
+    PIO_TYPE_PIPE,
+    PIO_TYPE_SOCKET,
+    PIO_TYPE_MAX
 };
 
 /* IO object flags */
@@ -77,24 +77,24 @@ enum {
 
 
 #define PIO_ACCMODE     0000003
-#define PIO_DEFAULTMODE DEFAULT_OPEN_MODE 
+#define PIO_DEFAULTMODE DEFAULT_OPEN_MODE
 #define PIO_UNBOUND     (size_t)-1
 
 /* This is temporary until subs/code refs are done..*/
-typedef void *   DummyCodeRef;
-                            
-            
+typedef void *DummyCodeRef;
+
+
 struct _ParrotIOBuf {
-        UINTVAL         flags;          /* Buffer specific flags        */
-        size_t          size;
-        unsigned char * startb;         /* Start of buffer              */
-        unsigned char * endb;           /* End of buffer                */
-        unsigned char * next;           /* Current read/write pointer   */
+    UINTVAL flags;              /* Buffer specific flags        */
+    size_t size;
+    unsigned char *startb;      /* Start of buffer              */
+    unsigned char *endb;        /* End of buffer                */
+    unsigned char *next;        /* Current read/write pointer   */
 };
 
 
 #ifdef WIN32
-typedef HANDLE PIOHANDLE; 
+typedef HANDLE PIOHANDLE;
 typedef LARGE_INTEGER PIOOFF_T;
 #else
 typedef int PIOHANDLE;
@@ -103,38 +103,38 @@ typedef off_t PIOOFF_T;
 
 extern PIOOFF_T piooffsetzero;
 
-typedef struct _ParrotIOLayerAPI        ParrotIOLayerAPI;
-typedef struct _ParrotIOLayer           ParrotIOLayer;
-typedef struct _ParrotIOFilter          ParrotIOFilter;
-typedef struct _ParrotIOBuf             ParrotIOBuf;
-typedef struct _ParrotIO                ParrotIO;
-typedef struct _ParrotIOData            ParrotIOData;
-typedef struct _ParrotIO **             ParrotIOTable;
+typedef struct _ParrotIOLayerAPI ParrotIOLayerAPI;
+typedef struct _ParrotIOLayer ParrotIOLayer;
+typedef struct _ParrotIOFilter ParrotIOFilter;
+typedef struct _ParrotIOBuf ParrotIOBuf;
+typedef struct _ParrotIO ParrotIO;
+typedef struct _ParrotIOData ParrotIOData;
+typedef struct _ParrotIO **ParrotIOTable;
 
 struct _ParrotIO {
-        PIOHANDLE       fd;             /* Low level OS descriptor      */
-        UINTVAL         mode;           /* Read/Write/etc.              */
-        UINTVAL         flags;          /* Da flags                     */
-        PIOOFF_T        fsize;          /* Current file size            */
-        PIOOFF_T        fpos;           /* Current real file pointer    */
-        PIOOFF_T        lpos;           /* Last file position           */
-        ParrotIOBuf     b;              /* Buffer structure             */
-        ParrotIOLayer * stack;
-        /* ParrotIOFilter * filters; */
+    PIOHANDLE fd;               /* Low level OS descriptor      */
+    UINTVAL mode;               /* Read/Write/etc.              */
+    UINTVAL flags;              /* Da flags                     */
+    PIOOFF_T fsize;             /* Current file size            */
+    PIOOFF_T fpos;              /* Current real file pointer    */
+    PIOOFF_T lpos;              /* Last file position           */
+    ParrotIOBuf b;              /* Buffer structure             */
+    ParrotIOLayer *stack;
+    /* ParrotIOFilter * filters; */
 };
 
 struct _ParrotIOLayer {
-        void                    * this; /* Instance specific data       */
-        const char              * name;
-        UINTVAL                   flags;
-        ParrotIOLayerAPI        * api;
-        ParrotIOLayer           * up;
-        ParrotIOLayer           * down;
+    void *this;                 /* Instance specific data       */
+    const char *name;
+    UINTVAL flags;
+    ParrotIOLayerAPI *api;
+    ParrotIOLayer *up;
+    ParrotIOLayer *down;
 };
 
 struct _ParrotIOData {
-        ParrotIOTable           table;        
-        ParrotIOLayer           * default_stack;
+    ParrotIOTable table;
+    ParrotIOLayer *default_stack;
 };
 
 
@@ -160,23 +160,22 @@ struct _ParrotIOData {
 
 /* Others to come */
 #ifndef WIN32
-extern ParrotIOLayer    pio_unix_layer;
+extern ParrotIOLayer pio_unix_layer;
 #else
-extern ParrotIOLayer    pio_win32_layer;
+extern ParrotIOLayer pio_win32_layer;
 #endif
-extern ParrotIOLayer    pio_stdio_layer;
+extern ParrotIOLayer pio_stdio_layer;
 
 /* This is list of valid layers */
-extern ParrotIOLayer    * pio_registered_layers;
+extern ParrotIOLayer *pio_registered_layers;
 
 /* This is the actual (default) layer stack which is used for IO */
-extern ParrotIOLayer    * pio_default_stack;
+extern ParrotIOLayer *pio_default_stack;
 
 
 #ifndef theINTERP
 # define theINTERP      struct Parrot_Interp * interpreter
 #endif
-
 
 /*
  * By default, any layer not implementing an interface (ie. leaving
@@ -185,52 +184,52 @@ extern ParrotIOLayer    * pio_default_stack;
  * the specific call.
  */
 struct _ParrotIOLayerAPI {
-        INTVAL          (*Init)(theINTERP, ParrotIOLayer * l);
-        ParrotIOLayer * (*New)(ParrotIOLayer * proto);
-        void            (*Delete)(ParrotIOLayer * l);
-        INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
-        INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io); 
-        ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
-                                const char * name, UINTVAL flags);
-        ParrotIO *      (*Open2_Unused)(theINTERP);
-        ParrotIO *      (*Open3_Unused)(theINTERP);
-        ParrotIO *      (*Open_ASync)(theINTERP, ParrotIOLayer * l,
-                                const char * name, const char * mode,
-                                        DummyCodeRef *);
-        ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
-                                PIOHANDLE fd, UINTVAL flags);
-        INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
+    INTVAL          (*Init)(theINTERP, ParrotIOLayer * l);
+    ParrotIOLayer * (*New)(ParrotIOLayer * proto);
+    void            (*Delete)(ParrotIOLayer * l);
+    INTVAL          (*Pushed)(ParrotIOLayer * l, ParrotIO * io);
+    INTVAL          (*Popped)(ParrotIOLayer * l, ParrotIO * io); 
+    ParrotIO *      (*Open)(theINTERP, ParrotIOLayer * l,
+                            const char * name, UINTVAL flags);
+    ParrotIO *      (*Open2_Unused)(theINTERP);
+    ParrotIO *      (*Open3_Unused)(theINTERP);
+    ParrotIO *      (*Open_ASync)(theINTERP, ParrotIOLayer * l,
+                                  const char * name, const char * mode,
+                                  DummyCodeRef *);
+    ParrotIO *      (*FDOpen)(theINTERP, ParrotIOLayer * l,
+                              PIOHANDLE fd, UINTVAL flags);
+    INTVAL          (*Close)(theINTERP, ParrotIOLayer * l,
                                 ParrotIO * io); 
-        size_t          (*Write)(theINTERP, ParrotIOLayer * l,
-                                ParrotIO * io, const void * buf,
-                                size_t len);
-        size_t          (*Write_ASync)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, void * buf, size_t len,
-                                        DummyCodeRef *);
-        size_t          (*Read)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, void * buf, size_t len);
-        size_t          (*Read_ASync)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, void * buf, size_t len,
-                                        DummyCodeRef *);
-        INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io);
-        INTVAL          (*Seek)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, INTVAL hi, INTVAL lo,
-                                INTVAL whence);
-        PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io);
-        INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, size_t bufsize);
-        INTVAL          (*SetLineBuf)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io);
-        INTVAL          (*GetCount)(theINTERP, ParrotIOLayer * layer);
-        INTVAL          (*Fill)(theINTERP, ParrotIOLayer * layer);
-        INTVAL          (*PutS)(theINTERP, ParrotIOLayer * l,
-                                ParrotIO * io, const char * s);
-        INTVAL          (*GetS)(theINTERP, ParrotIOLayer * layer,
-                                ParrotIO * io, char * s, INTVAL maxlen);
-        INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
-                                ParrotIO * io);
+    size_t          (*Write)(theINTERP, ParrotIOLayer * l,
+                             ParrotIO * io, const void * buf,
+                             size_t len);
+    size_t          (*Write_ASync)(theINTERP, ParrotIOLayer * layer,
+                                   ParrotIO * io, void * buf, size_t len,
+                                   DummyCodeRef *);
+    size_t          (*Read)(theINTERP, ParrotIOLayer * layer,
+                            ParrotIO * io, void * buf, size_t len);
+    size_t          (*Read_ASync)(theINTERP, ParrotIOLayer * layer,
+                                  ParrotIO * io, void * buf, size_t len,
+                                  DummyCodeRef *);
+    INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
+                             ParrotIO * io);
+    INTVAL          (*Seek)(theINTERP, ParrotIOLayer * layer,
+                            ParrotIO * io, INTVAL hi, INTVAL lo,
+                            INTVAL whence);
+    PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
+                            ParrotIO * io);
+    INTVAL          (*SetBuf)(theINTERP, ParrotIOLayer * layer,
+                              ParrotIO * io, size_t bufsize);
+    INTVAL          (*SetLineBuf)(theINTERP, ParrotIOLayer * layer,
+                                  ParrotIO * io);
+    INTVAL          (*GetCount)(theINTERP, ParrotIOLayer * layer);
+    INTVAL          (*Fill)(theINTERP, ParrotIOLayer * layer);
+    INTVAL          (*PutS)(theINTERP, ParrotIOLayer * l,
+                            ParrotIO * io, const char * s);
+    INTVAL          (*GetS)(theINTERP, ParrotIOLayer * layer,
+                            ParrotIO * io, char * s, INTVAL maxlen);
+    INTVAL          (*Eof)(theINTERP, ParrotIOLayer * l,
+                           ParrotIO * io);
 };
 
 /* these are defined rather than using NULL because strictly-speaking, ANSI C 
@@ -258,41 +257,41 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_gets (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, char *, INTVAL))0
 #define PIO_null_eof (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 
-extern INTVAL           pio_errno;
+extern INTVAL pio_errno;
 
 /* io.c - If you add new layers, register them in init_layers() */
-extern void             PIO_init(theINTERP);
-extern INTVAL           PIO_init_stacks(theINTERP);
-extern void             PIO_atexit(theINTERP);
-extern INTVAL           PIO_push_layer(theINTERP, ParrotIOLayer *, ParrotIO *);
-extern ParrotIOLayer *  PIO_pop_layer(theINTERP, ParrotIO *);
-extern ParrotIOLayer *  PIO_copy_stack(ParrotIOLayer *);
+extern void PIO_init(theINTERP);
+extern INTVAL PIO_init_stacks(theINTERP);
+extern void PIO_atexit(theINTERP);
+extern INTVAL PIO_push_layer(theINTERP, ParrotIOLayer *, ParrotIO *);
+extern ParrotIOLayer *PIO_pop_layer(theINTERP, ParrotIO *);
+extern ParrotIOLayer *PIO_copy_stack(ParrotIOLayer *);
 
 
-extern struct PMC *     new_io_pmc(struct Parrot_Interp *, ParrotIO *);
-extern void             free_io_header(ParrotIO *);
-extern ParrotIOTable    alloc_pio_array(int);
-extern int              realloc_pio_array(ParrotIOTable *, int);
-extern ParrotIO *       PIO_new(struct Parrot_Interp *, ParrotIO *,
-                                INTVAL, UINTVAL, UINTVAL);
+extern struct PMC *new_io_pmc(struct Parrot_Interp *, ParrotIO *);
+extern void free_io_header(ParrotIO *);
+extern ParrotIOTable alloc_pio_array(int);
+extern int realloc_pio_array(ParrotIOTable *, int);
+extern ParrotIO *PIO_new(struct Parrot_Interp *, ParrotIO *,
+                         INTVAL, UINTVAL, UINTVAL);
 
-extern INTVAL           PIO_base_init(theINTERP, ParrotIOLayer * proto);
-extern ParrotIOLayer *  PIO_base_new_layer(ParrotIOLayer * proto);
-extern void             PIO_base_delete_layer(ParrotIOLayer * proto);
+extern INTVAL PIO_base_init(theINTERP, ParrotIOLayer *proto);
+extern ParrotIOLayer *PIO_base_new_layer(ParrotIOLayer *proto);
+extern void PIO_base_delete_layer(ParrotIOLayer *proto);
 
-extern UINTVAL          PIO_parse_open_flags(const char * flagstr);
-extern ParrotIO *       PIO_open(theINTERP, const char *, const char *);
-extern ParrotIO *       PIO_fdopen(theINTERP, PIOHANDLE, const char *);
-extern INTVAL           PIO_close(theINTERP, ParrotIO *);
-extern void             PIO_flush(theINTERP, ParrotIO *);
-extern INTVAL           PIO_read(theINTERP, ParrotIO *, void *, size_t);
-extern INTVAL           PIO_write(theINTERP, ParrotIO *, void *, size_t);
-extern INTVAL           PIO_setbuf(theINTERP, ParrotIO *, size_t);
-extern INTVAL           PIO_setlinebuf(theINTERP, ParrotIO *);
-extern INTVAL           PIO_puts(theINTERP, ParrotIO *, const char *);
-extern INTVAL           PIO_seek(theINTERP, ParrotIO *, INTVAL hi,
-                                INTVAL lo, INTVAL whence);
-extern INTVAL           PIO_eof(theINTERP, ParrotIO *);
+extern UINTVAL PIO_parse_open_flags(const char *flagstr);
+extern ParrotIO *PIO_open(theINTERP, const char *, const char *);
+extern ParrotIO *PIO_fdopen(theINTERP, PIOHANDLE, const char *);
+extern INTVAL PIO_close(theINTERP, ParrotIO *);
+extern void PIO_flush(theINTERP, ParrotIO *);
+extern INTVAL PIO_read(theINTERP, ParrotIO *, void *, size_t);
+extern INTVAL PIO_write(theINTERP, ParrotIO *, void *, size_t);
+extern INTVAL PIO_setbuf(theINTERP, ParrotIO *, size_t);
+extern INTVAL PIO_setlinebuf(theINTERP, ParrotIO *);
+extern INTVAL PIO_puts(theINTERP, ParrotIO *, const char *);
+extern INTVAL PIO_seek(theINTERP, ParrotIO *, INTVAL hi,
+                       INTVAL lo, INTVAL whence);
+extern INTVAL PIO_eof(theINTERP, ParrotIO *);
 
 
 /* Put platform specific macros here if you must */

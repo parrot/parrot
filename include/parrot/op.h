@@ -18,22 +18,22 @@
 #define PARROT_MAX_ARGS 10
 
 typedef enum {
-  PARROT_INLINE_OP,
-  PARROT_FUNCTION_OP
+    PARROT_INLINE_OP,
+    PARROT_FUNCTION_OP
 } op_type_t;
 
 typedef enum {
-  PARROT_ARG_OP,
+    PARROT_ARG_OP,
 
-  PARROT_ARG_IC,
-  PARROT_ARG_NC,
-  PARROT_ARG_PC,
-  PARROT_ARG_SC,
+    PARROT_ARG_IC,
+    PARROT_ARG_NC,
+    PARROT_ARG_PC,
+    PARROT_ARG_SC,
 
-  PARROT_ARG_I,
-  PARROT_ARG_N,
-  PARROT_ARG_P,
-  PARROT_ARG_S
+    PARROT_ARG_I,
+    PARROT_ARG_N,
+    PARROT_ARG_P,
+    PARROT_ARG_S
 } arg_type_t;
 
 #define PARROT_ARG_OP 0
@@ -54,13 +54,13 @@ typedef void **(*op_func_prederef_t)(void **, struct Parrot_Interp *);
 */
 
 typedef struct {
-    op_type_t    type;
-    const char * name;
-    const char * full_name;
-    const char * func_name;
-    const char * body;
-    INTVAL       arg_count; /* Includes opcode as one arg */
-    arg_type_t   types[PARROT_MAX_ARGS];
+    op_type_t type;
+    const char *name;
+    const char *full_name;
+    const char *func_name;
+    const char *body;
+    INTVAL arg_count;           /* Includes opcode as one arg */
+    arg_type_t types[PARROT_MAX_ARGS];
 } op_info_t;
 
 

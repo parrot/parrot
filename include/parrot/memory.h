@@ -13,25 +13,19 @@
 #if !defined(PARROT_MEMORY_H_GUARD)
 #define PARROT_MEMORY_H_GUARD
 
-void *
-mem_allocate_aligned(UINTVAL);
+void *mem_allocate_aligned(UINTVAL);
 
-void *
-mem_sys_allocate(UINTVAL);
+void *mem_sys_allocate(UINTVAL);
 
-void *
-mem_realloc(struct Parrot_Interp *, void *, UINTVAL, UINTVAL);
+void *mem_realloc(struct Parrot_Interp *, void *, UINTVAL, UINTVAL);
 
 #define gc_used mem_realloc
 
-void *
-mem_sys_realloc(void *, UINTVAL);
+void *mem_sys_realloc(void *, UINTVAL);
 
-void
-mem_sys_free(void *);
+void mem_sys_free(void *);
 
-void
-mem_setup_allocator(struct Parrot_Interp *);
+void mem_setup_allocator(struct Parrot_Interp *);
 
 #define mem_allocate_new_stash() NULL
 #define mem_allocate_new_stack() NULL

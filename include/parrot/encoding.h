@@ -16,17 +16,16 @@
 struct parrot_encoding_t {
     const char *name;
     Parrot_UInt max_bytes;
-    Parrot_UInt (*characters)(const void *ptr, Parrot_UInt bytes);
-    Parrot_UInt (*decode)(const void *ptr);
-    void *(*encode)(void *ptr, Parrot_UInt c);
-    void *(*skip_forward)(const void *ptr, Parrot_UInt n);
-    void *(*skip_backward)(const void *ptr, Parrot_UInt n);
+     Parrot_UInt(*characters) (const void *ptr, Parrot_UInt bytes);
+     Parrot_UInt(*decode) (const void *ptr);
+    void *(*encode) (void *ptr, Parrot_UInt c);
+    void *(*skip_forward) (const void *ptr, Parrot_UInt n);
+    void *(*skip_backward) (const void *ptr, Parrot_UInt n);
 };
 
 #define Parrot_Encoding struct parrot_encoding_t *
 
-const Parrot_Encoding
-Parrot_encoding_lookup(const char *name);
+const Parrot_Encoding Parrot_encoding_lookup(const char *name);
 
 #ifdef PARROT_IN_CORE
 

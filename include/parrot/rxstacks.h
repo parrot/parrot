@@ -19,28 +19,24 @@
 
 typedef struct rxStack_entry_t {
     INTVAL value;
-}* rxStack_Entry;
+} *rxStack_Entry;
 
 typedef struct rxStack_chunk_t {
-  INTVAL used;
-  struct rxStack_chunk_t *next;
-  struct rxStack_chunk_t *prev;
-  struct rxStack_entry_t entry[STACK_CHUNK_DEPTH];
-}* rxStack_Chunk;
+    INTVAL used;
+    struct rxStack_chunk_t *next;
+    struct rxStack_chunk_t *prev;
+    struct rxStack_entry_t entry[STACK_CHUNK_DEPTH];
+} *rxStack_Chunk;
 
 typedef rxStack_Chunk rxStack;
 
-rxStack
-rxstack_new(struct Parrot_Interp *);
+rxStack rxstack_new(struct Parrot_Interp *);
 
-INTVAL
-rxstack_depth(struct Parrot_Interp *, rxStack);
+INTVAL rxstack_depth(struct Parrot_Interp *, rxStack);
 
-void
-rxstack_push(struct Parrot_Interp *, rxStack, INTVAL);
+void rxstack_push(struct Parrot_Interp *, rxStack, INTVAL);
 
-INTVAL
-rxstack_pop(struct Parrot_Interp *, rxStack);
+INTVAL rxstack_pop(struct Parrot_Interp *, rxStack);
 
 #endif
 
