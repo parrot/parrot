@@ -338,7 +338,7 @@ sub make_arg {
               };
     /i/ && do {my $regnum = $reg_ref->{i}++;
 	       my $tempnum = $tempcounter++;
-	       push @extra_preamble, "int *tempvar$tempnum = (int)REG_INT($regnum);\n";
+	       push @extra_preamble, "int tempvar$tempnum = (int)REG_INT($regnum);\n";
 	       return "tempvar$tempnum";
               };
     /3/ && do {my $regnum = $reg_ref->{p}++;
