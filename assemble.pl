@@ -827,6 +827,7 @@ if(exists $args{-o}) {
   close FILE;
 }
 else {
+  binmode STDOUT;
   print $bytecode;
 }
 

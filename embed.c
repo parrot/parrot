@@ -110,6 +110,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, char *filename)
         INTVAL read_result;
         
         program_code = (char *)malloc(program_size + 1024);
+        program_size = 0;
         if (NULL == program_code) {
             fprintf(stderr,
                     "Parrot VM: Could not allocate buffer to read packfile from PIO.\n");
