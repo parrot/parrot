@@ -299,7 +299,7 @@ sub dump_default {
 }
 
 sub count_newlines {
-    return scalar(() = $_[0] =~ /\n/g);
+    return scalar $_[0] =~ tr/\n//;
 }
 
 sub extract_balanced {
