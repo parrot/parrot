@@ -98,6 +98,93 @@ inline op open(out PMC, in STR, in STR) {
   goto NEXT();
 }
 
+########################################
+
+=item B<print>(in INT)
+
+=item B<print>(in NUM)
+
+=item B<print>(in PMC)
+
+=item B<print>(in STR)
+
+Print $1 to standard output.
+
+=item B<print>(in INT, in INT)
+
+=item B<print>(in INT, in NUM)
+
+=item B<print>(in INT, in STR)
+
+=item B<print>(in INT, in PMC)
+
+Print $2 to the file specified by file descriptor $1; for $1 equal to
+0, 1 or 2, we use stdin, stdout or stderr respectively.
+
+=cut
+
+inline op print(in INT) {
+  PIO_printf(interpreter, INTVAL_FMT, (INTVAL)$1);
+  goto NEXT();
+}
+
+inline op print(in NUM) {
+  PIO_printf(interpreter, FLOATVAL_FMT, $1);
+  goto NEXT();
+}
+
+op print(in STR) {
+  STRING *s = $1;
+  if (s && string_length(s)) {
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+  }
+  goto NEXT();
+}
+
+op print(in PMC) {
+  PMC *p = $1;
+  STRING *s = (p->vtable->get_string(interpreter, p));
+  if (s) {
+    PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
+  }
+  goto NEXT();
+}
+
+
+op print(in INT, in INT) {
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
+  STRING *s = Parrot_sprintf_c(interpreter, INTVAL_FMT, $2);
+  PIO_putps(interpreter, io, s);
+  goto NEXT();
+}
+
+op print(in INT, in NUM) {
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
+  STRING *s = Parrot_sprintf_c(interpreter, FLOATVAL_FMT, $2);
+  PIO_putps(interpreter, io, s);
+  goto NEXT();
+}
+
+op print(in INT, in STR) {
+  STRING *s = $2;
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
+  if (s && string_length(s)) {
+    PIO_putps(interpreter, io, s);
+  }
+  goto NEXT();
+}
+
+op print(in INT, in PMC) {
+  PMC *p = $2;
+  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$1];
+  STRING *s = (p->vtable->get_string(interpreter, p));
+  if (s) {
+    PIO_putps(interpreter, io, s);
+  }
+  goto NEXT();
+}
+
+
 ##########################################
 
 =item B<print>(in PMC, in STR)
@@ -164,7 +251,7 @@ op puts(in INT) {
 }
 
 op puts(in NUM) {
-  STRING * s = Parrot_sprintf_c(interpreter, "%Vf", $1);
+  STRING * s = Parrot_sprintf_c(interpreter, "%f", $1);
   if (string_length(s)) {
     PIO_write(interpreter, PIO_STDOUT(interpreter), s->strstart,
 			string_length(s));

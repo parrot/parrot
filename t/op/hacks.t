@@ -1,6 +1,7 @@
 #! perl -w
 
 use Parrot::Test tests => 3;
+use Test::More;
 
 # It would be very embarrassing if these didn't work...
 open FOO, ">temp.file";
@@ -19,6 +20,9 @@ CODE
 1
 2
 OUTPUT
+
+SKIP: {
+  skip("open not already ported to PIO", 1);
 
 open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
@@ -49,6 +53,7 @@ OUTPUT
 
 open FOO, ">temp.file";  # Clobber previous contents
 close FOO;
+}
 
 output_is(<<'CODE', <<'OUTPUT', "3-arg open");
        open I1, "temp.file", "w"
