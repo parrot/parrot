@@ -26,7 +26,7 @@ static INTVAL key_hash(struct Parrot_Interp *interpreter, STRING* value) {
   INTVAL len    = value->buflen;
   INTVAL hash   = 5893;
 
-  while(*buffptr) {
+  while(len--) {
     hash = hash * 33 + *buffptr++;
   }
   return hash;
