@@ -72,35 +72,26 @@ imc_compile_all_units(Interp *interp)
 
     /* All done with compilation, now free instructions and other structures */
 
-    /* XXX FIXME: Can't free instructions yet without causing memory problems
-     * in the symbol tables.
-     */
-#if 1
     for (unit = interp->imc_info->imc_units; unit;) {
         unit_next = unit->next;
-#if 1
         for (ins = unit->instructions; ins; ) {
             ins_next = ins->next;
             free_ins(ins);
             ins = ins_next;
         }
-#endif
         imc_free_unit(interp, unit);
         unit = unit_next;
     }
-#endif
 
-    /* XXX: Memory leak */
     interp->imc_info->imc_units = NULL;
     interp->imc_info->last_unit = NULL;
 }
 
-/* imc_compile_unit is the main loop of the IMC compiler for each unit. It operates
- * on a single compilation unit at a time.
+/* imc_compile_unit is the main loop of the IMC compiler for each unit. It
+ * operates on a single compilation unit at a time.
  */
 void
-imc_compile_unit(Interp *interp, IMC_Unit * unit)
-{
+imc_compile_unit(Interp *interp, IMC_Unit * unit) {
     /* Not much here for now except the allocator */
     cur_unit = unit;
 
