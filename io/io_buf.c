@@ -481,19 +481,6 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     return current + len;
 }
 
-/*
-
-=item C<static size_t
-PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-                 void *buffer, size_t len)>
-
-This is called from C<PIO_buf_read()> to do line buffered reading if
-that is what is required.
-
-=cut
-
-*/
-
 static size_t
 PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
@@ -540,6 +527,19 @@ ret_string:
     goto ret_string;
 }
 
+/*
+
+=item C<static size_t
+PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
+                 void *buffer, size_t len)>
+
+This is called from C<PIO_buf_read()> to do line buffered reading if
+that is what is required.
+
+=cut
+
+*/
+
 
 static size_t
 PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
@@ -572,6 +572,11 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         if (IS_EOL(io, b->next++)) {
             break;
         }
+        /* if there is a buffer, readline is called by the read opcode
+         * - return just that part
+         */
+        if (s->bufused && l == s->bufused)
+            break;
         /* buffer completed; copy out and refill */
         if (b->next == b->endb) {
             len = b->endb - buf_start;
