@@ -2037,11 +2037,12 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     int next_s = 5;
     int next_i = 5;
     int st = 0;
+    int size = 100 + signature->bufused * 20;
 
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate((size_t)256);
+    jit_info.native_ptr = jit_info.arena.start = mem_sys_allocate(size);
     pc = jit_info.native_ptr;
 
     /* make stack frame */
@@ -2187,8 +2188,8 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
 
     jit_emit_stack_frame_leave(pc);
     emitm_ret(pc);
-    assert(pc - jit_info.arena.start < 256);
-
+    assert(pc - jit_info.arena.start <= size);
+    /* could shrink arena.start here to used size */
     return (jit_f)D2FPTR(jit_info.arena.start);
 }
 
