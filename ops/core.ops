@@ -1291,6 +1291,11 @@ inline op add(out NUM, in NUM, in NUM) {
   goto NEXT();
 }
 
+inline op add(out PMC, in PMC, in INT) {
+  $2->vtable->add_int(interpreter, $2, $3, $1);
+  goto NEXT();
+}
+
 
 ########################################
 
@@ -1378,6 +1383,8 @@ inline op cmod(out NUM, in NUM, in NUM) {
 
 =item B<dec>(inout NUM)
 
+=item B<dec>(inout PMC)
+
 Decrease $1 by one.
 
 =cut
@@ -1392,6 +1399,10 @@ inline op dec(inout NUM) {
   goto NEXT();
 }
 
+inline op dec(inout PMC) {
+  $1->vtable->dec_native(interpreter, $1, 1, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -1408,8 +1419,13 @@ inline op dec(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op dec(inout NUM, in NUM) {
+inline op dec(inout NUM, in INT) {
   $1 -= $2;
+  goto NEXT();
+}
+
+inline op dec(inout PMC, in INT) {
+  $1->vtable->dec_native(interpreter, $1, $2, $1);
   goto NEXT();
 }
 
@@ -1442,6 +1458,8 @@ inline op div(out NUM, in NUM, in NUM) {
 
 =item B<inc>(inout NUM)
 
+=item B<inc>(inout PMC)
+
 Increase $1 by one.
 
 =cut
@@ -1456,12 +1474,17 @@ inline op inc(inout NUM) {
   goto NEXT();
 }
 
+inline op inc(inout PMC) {
+  $1->vtable->inc_native(interpreter, $1, 1, $1);
+  goto NEXT();
+}
+
 
 ########################################
 
 =item B<inc>(inout INT, in INT)
 
-=item B<inc>(inout NUM, in NUM)
+=item B<inc>(inout NUM, in INT)
 
 Increase $1 by the amount in $2.
 
@@ -1472,11 +1495,15 @@ inline op inc(inout INT, in INT) {
   goto NEXT();
 }
 
-inline op inc(inout NUM, in NUM) {
+inline op inc(inout NUM, in INT) {
   $1 += $2;
   goto NEXT();
 }
 
+inline op inc(inout PMC, in INT) {
+  $1->vtable->inc_native(interpreter, $1, $2, $1);
+  goto NEXT();
+}
 
 ########################################
 
@@ -2912,16 +2939,39 @@ Ops to manipulate the symbol table
 
 ########################################
 
+=item B<store_global>(in STR, in PMC)
+
+Store global $2 as global symbol $1
+
 =item B<find_global>(out PMC, in STR)
 
 Find the global named $2 and store it in $1
 
 =cut
 
-op find_global(out PMC, in STR) {
-/*  $1 = interpreter->perl_stash->stash_hash->vtable->get_string_index_s(interpreter, interpreter->perl_stash->stash_hash, $2);
+op store_global(in STR, in PMC) {
+/*
+    Alas, I had written the STR, INT and NUM versions of these,
+    but Dan whispers, "We only need the PMC ones...."
+    which of course aren't ready...
+    Have to fix set/get_keyed of PMCs first.
+
+    KEY key;
+    PMC * globals = interpreter->perl_stash->stash_hash;
+    MAKE_KEY(key, $1, enum_key_string, struct_val);
+    globals->vtable->set_pmc_keyed(interpreter, globals, &key, $2);
+    goto NEXT();
 */
-  goto NEXT();
+}
+
+op find_global(out PMC, in STR) {
+/*
+    KEY key;
+    PMC * globals = interpreter->perl_stash->stash_hash;
+    MAKE_KEY(key, $2, enum_key_string, struct_val);
+    $1 = globals->vtable->get_pmc_keyed(interpreter, globals, &key);
+    goto NEXT();
+*/
 }
 
 =back
