@@ -362,18 +362,6 @@ Draws the field, then the LCDs and the smiley button.
     $P0 = getattribute self, $I0
     debug = $P0
 
-    # mines_lcd
-    inc $I0
-    mines_lcd = getattribute self, $I0
-
-    # watch
-    inc $I0
-    watch = getattribute self, $I0
-
-    # status
-    inc $I0
-    status = getattribute self, $I0
-
     minx = width * FIELD_WIDTH
     miny = height * FIELD_HEIGHT
     maxx = 0
@@ -475,13 +463,14 @@ NO_SCREEN_UPDATE:
     # update the LCDs
     self.'update_stats'()
 
-    # XXX: does not work if this is commented out???
-    $P0 = find_global "Data::Dumper", "dumper"
-    $P0( mines_lcd )
+    $P0 = getattribute self, "Mines::Field\x0mines_lcd"
+    $P0.'draw'( screen )
 
-    mines_lcd.'draw'( screen )
-    watch.'draw'( screen )
-    status.'draw'( screen )
+    $P0 = getattribute self, "Mines::Field\x0watch"
+    $P0.'draw'( screen )
+
+    $P0 = getattribute self, "Mines::Field\x0status_button"
+    $P0.'draw'( screen )
 .end
 
 =item reveal( x, y )
@@ -901,6 +890,12 @@ END:
     .pcc_end_return
 .end
 
+=item lost()
+
+Called if a mine is revealed.
+Shows the position of all mines on the field.
+
+=cut
 
 .sub lost method
     .local pmc field
@@ -939,9 +934,21 @@ NEXT:
 END:
 .end
 
+=item won()
+
+Called when you have won.
+
+=cut
+
 .sub won method
     self."setStatus"( STATUS_WON )
 .end
+
+=item check_end()
+
+Checks if you have won.
+
+=cut
 
 .sub check_end method
     .local pmc field
@@ -976,9 +983,15 @@ END:
     .pcc_end_return
 .end
 
+=item setStatus( newStatus )
+
+Sets a new game status.
+
+=cut
+
 .sub setStatus method
     .param int s
-    .param pmc screen
+    .local pmc screen
     .local pmc watch
     .local pmc status
     
@@ -996,16 +1009,12 @@ END:
     inc $I0
     status = getattribute self, $I0
     
-#    $I0 = status
-#    if $I0 == s goto DONE
-
-    if s == STATUS_PLAYING goto START
-    if s == STATUS_CHOOSING goto START
+    if s == STATUS_PLAYING goto OK
+    if s == STATUS_CHOOSING goto OK
+    # not playing at the moment, stop the watch
     watch.'stop'()
-    branch OK
-START:
-    watch.'start'()
 OK:
+    # no need to start the watch here
 
     status = s    
     self."undo_mark"( 1 )
@@ -1013,6 +1022,12 @@ OK:
     
 DONE:
 .end
+
+=item update_stats()
+
+Counts the unrevealed mines and updates the LCD.
+
+=cut
 
 .sub update_stats method
     .local pmc field
@@ -1052,14 +1067,6 @@ END:
     $I0 += $I4
     $I0 += $I5
     mines_lcd = $I0
-.end
-
-.sub _button_clicked
-    .param pmc field
-
-    $I0 = time
-    field.'newLevel'( $I0 )
-    field.'draw'()
 .end
 
 =back
@@ -1212,6 +1219,21 @@ MINE:
     .pcc_begin_return
     .return 1
     .pcc_end_return
+.end
+
+=item _button_clicked( onField )
+
+Called if you click the smiley button.
+It starts a new level.
+
+=cut
+
+.sub _button_clicked
+    .param pmc field
+
+    $I0 = time
+    field.'newLevel'( $I0 )
+    field.'draw'()
 .end
 
 =back
