@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 output_is( <<'CODE', <<OUTPUT, "macro, zero parameters" );
 answer	macro
