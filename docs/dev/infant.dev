@@ -31,9 +31,9 @@ before creating the PMC. But many situations are not so simple, and
 the set of operations which could conceivably require more memory is
 vast. This problem is referred to as the "infant mortality" problem.
 
-Peter Gibbs, Mike Lambert, Dan Sugalski, and others have considered
+Peter Gibbs, Mike Lambert, Dan Sugalski and others have considered
 various solutions to this problem. Most of those solutions have been
-implemented in some form or other. This document is my attempt to
+implemented in some form or other. This document is an attempt to
 compare and contrast all such proposals.
 
 =head1 Solution 1: Stack Walking
@@ -44,6 +44,10 @@ will be found on the stack and treated as live. Actually, the C stack
 is insufficient -- you must also scan through all processor registers,
 and for some processors there may be a separate backing store for
 those registers (eg the Sparc's register windows).
+Uninitialized data on the stack and high alignment requirements for
+stackframes can fool the DOD system with left over pointers from 
+previous calls. This is especially a problem for objects which need 
+early destruction.
 
  + No slowdown in the common case of no DOD
  + Convenient: the programmer does not need to code differently to
@@ -172,9 +176,30 @@ conservative bit mask as a preliminary test.
  - Can temporarily use more memory (dead objects accumulate during all
    current generations)
 
+=head2 Variant 6: Generation based on stack depth
+
+Another similar idea is to use a generational system, with the
+"current generation" as a value on the C stack, passed as an extra
+argument after the interpreter. If a function creates temporary
+objects it calls other functions with an increased generational count.
+During a DOD run, any PMC with a generation less than the
+current generation is considered live.  Any PMC with a generation
+greater than the current generation is considered free. This works
+through longjmps and recursive run_cores.
+
+ + Simple
+ + No stack-walking
+ + Works through longjmps and recursive run_cores
+ + No explicit setting and clearing of flags
+ - Needs to change to change the signature of every Parrot function
+ - Nested temporaries can survive if there is no DOD-run between two 
+   function calls with increased generation count
+
 =head1 Solution 3: Explicit root set augmentation
 
-A final possible solution is to provide a mechanism to temporarily
+=head2 Variant 1: Temporarily anchor objects
+
+Provide a mechanism to temporarily
 anchor an otherwise unanchored object to the root set. (eg, have an
 array of objects associated with the interpreter that are all
 considered to be part of the root set.) This has pretty much the same
@@ -193,6 +218,38 @@ advantages and disadvantages of explicit neonate flag setting:
 Many of the same or similar variations also apply: objects could be
 automatically removed from the temporary anchoring at generation
 boundaries, etc.
+
+=head2 Variant 2: Anchor early, anchor often
+
+First place a new PMC in the root set (e.g. a register), then initialise
+it. If that's too cumbersome, disable DOD; if that's suboptimal, use
+active anchoring to some root set linked list for temporary PMCs.
+
+ + Simple
+ + Fast DOD (No stack-walking)
+ - DOD might be turned off for a long time (Maybe a recursive run_core
+   is called)
+ - Easy to forget to reenable DOD
+ - longjmp() can bypass reenabling of DOD (this might be hidden in the
+   wrapper functions as only one value needs to be restored)
+
+=head2 Variant 3: Use a linked list of frames
+
+The signature of every Parrot function is extended with an extra
+parameter which is a parameter to a frame structure. All temporary
+PMCs needs to put into such a frame structure. The first parameter of
+this frame structure is a link to the previously used frame
+structure. If a function that can do a DOD run is called a pointer to
+the current frame is applied. The linked list of frames represents
+always an exact list of the active temporaries on the C-stack.
+
+ + Fast DOD-runs (only the known PMC-pointers are walked)
+ + Exact
+ + works through recursive run_cores and longjmp()
+ - signature of every Parrot function changes
+ - Creation of temporaries is complicated (Need to create a frame
+   first)
+
 
 =head1 REFERENCES
 
@@ -228,6 +285,8 @@ http://groups.google.com/groups?th=d2cd475367fc81aa
 
 http://groups.google.com/groups?th=66fe6f12e11a5f8d
 
+This thread also includes Benjamin Goldberg Variant 6
+
 =item Dan thinks the stackwalk is unavoidable
 
 http://groups.google.com/groups?th=f7e270609ef93161
@@ -252,8 +311,15 @@ http://groups.google.com/groups?th=808f38c656a49806
 Early discussion that has some stuff I didn't go over here. Mostly
 involves generational schemes.
 
+=item Problems with stack-walking
+
+http://groups.google.com/groups?th=f9fc9c6d28eae2b5
+
+This thread also includes Juergen Boemmels Variant 3 of Solution 3
+
 =back
 
 =head1 CHANGES
 
 2002-Dec-30: Initial Version by Steve Fink
+2003-Aug-04: Some extra variants added by Juergen Boemmels
