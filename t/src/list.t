@@ -192,9 +192,9 @@ int main(int argc, char* argv[]) {
     }
     list_shift(interpreter, list, enum_type_char);
     list_insert(interpreter, list, 0, 3);
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++) {
 	int c = 'A' + i;
-	list_push(interpreter, list, (void*) c, enum_type_char);
+	list_assign(interpreter, list, i, (void*) c, enum_type_char);
     }
     j = *(char*) list_get(interpreter, list, 0, enum_type_char);
     printf("insert 2 %s\n", (j == 'A') ? "ok" : "nok");
