@@ -17,7 +17,8 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
     Buffer* buffer = (Buffer *) self->data;
     if(buffer != NULL) {
 	if(size >= 0) {
-	    buffer->bufstart = mem_realloc(interpreter, buffer->bufstart, oldsize*sizeof(PMC *), size*sizeof(PMC*));
+	    Parrot_reallocate(interpreter, buffer, size * sizeof(PMC *));
+	    size = buffer->buflen / sizeof(PMC *);
             if (size > oldsize)
                 memset((char *)buffer->bufstart + oldsize * sizeof(PMC *), 0, (size - oldsize) * sizeof(PMC *));
 	}
@@ -28,9 +29,10 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
     }
     else {
 	buffer = (Buffer *) (self->data = new_buffer_header(interpreter));
+	
         self->flags |= PMC_is_buffer_ptr_FLAG;
         self->flags |= PMC_is_PMC_ptr_FLAG;
-	buffer->bufstart = Parrot_allocate(interpreter, sizeof(PMC*)*size);
+	Parrot_allocate(interpreter, buffer, sizeof(PMC*)*size);
         memset(buffer->bufstart, 0, size * sizeof(PMC *));
     }
 

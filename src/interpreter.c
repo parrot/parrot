@@ -480,6 +480,7 @@ struct Parrot_Interp *
 make_interpreter(Interp_flags flags)
 {
     struct Parrot_Interp *interpreter;
+
     /* Get an empty interpreter from system memory */
     interpreter = mem_sys_allocate((UINTVAL)sizeof(struct Parrot_Interp));
 

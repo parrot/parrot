@@ -17,10 +17,6 @@ void *mem_allocate_aligned(size_t);
 
 void *mem_sys_allocate(size_t);
 
-void *mem_realloc(struct Parrot_Interp *, void *, size_t, size_t);
-
-#define gc_used mem_realloc
-
 void *mem_sys_realloc(void *, size_t);
 
 void mem_sys_free(void *);

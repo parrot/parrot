@@ -29,13 +29,16 @@ void free_bigint(void);
 void *new_bignum_header(struct Parrot_Interp *);
 void free_bignum(void);
 
-void *Parrot_allocate(struct Parrot_Interp *, size_t size);
+void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
+void *mem_allocate(struct Parrot_Interp *, size_t *req_size);
 void *Parrot_alloc_new_block(struct Parrot_Interp *, size_t, UINTVAL);
 
 void Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter);
 
 void Parrot_do_dod_run(struct Parrot_Interp *);
 void Parrot_go_collect(struct Parrot_Interp *);
+
+void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize);
 
 void buffer_lives(Buffer *);
 

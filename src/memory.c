@@ -71,7 +71,7 @@ mem_allocate_aligned(size_t size)
 void *
 mem_sys_allocate(size_t size)
 {
-    return malloc((size_t)size);
+    return calloc(1, (size_t)size);
 }
 
 /*=for api mem mem_sys_realloc
@@ -98,6 +98,7 @@ mem_sys_free(void *from)
 void
 mem_setup_allocator(struct Parrot_Interp *interpreter)
 {
+    size_t temp_len;
     interpreter->arena_base = mem_sys_allocate(sizeof(struct Arenas));
     interpreter->arena_base->memory_pool = NULL;
     interpreter->arena_base->last_STRING_Arena = NULL;
@@ -110,47 +111,34 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
     /* Init the string header pool */
     interpreter->arena_base->string_header_pool =
         mem_sys_allocate(sizeof(struct free_pool));
+    temp_len = 1024;
     interpreter->arena_base->string_header_pool->pool_buffer.bufstart =
-        Parrot_allocate(interpreter, 1024);
+        mem_allocate(interpreter, &temp_len);
     interpreter->arena_base->string_header_pool->pool_buffer.flags =
         BUFFER_live_FLAG;
-    interpreter->arena_base->string_header_pool->pool_buffer.buflen = 1024;
+    interpreter->arena_base->string_header_pool->pool_buffer.buflen = temp_len;
     interpreter->arena_base->string_header_pool->entries_in_pool = 0;
     
     /* Init the buffer header pool */
     interpreter->arena_base->buffer_header_pool =
         mem_sys_allocate(sizeof(struct free_pool));
     interpreter->arena_base->buffer_header_pool->pool_buffer.bufstart =
-        Parrot_allocate(interpreter, 1024);
+        mem_allocate(interpreter, &temp_len);
     interpreter->arena_base->buffer_header_pool->pool_buffer.flags =
         BUFFER_live_FLAG;
-    interpreter->arena_base->buffer_header_pool->pool_buffer.buflen = 1024;
+    interpreter->arena_base->buffer_header_pool->pool_buffer.buflen = temp_len;
     interpreter->arena_base->buffer_header_pool->entries_in_pool = 0;
     
     /* Init the PMC header pool */
     interpreter->arena_base->pmc_pool =
         mem_sys_allocate(sizeof(struct free_pool));
     interpreter->arena_base->pmc_pool->pool_buffer.bufstart =
-        Parrot_allocate(interpreter, 1024);
+        mem_allocate(interpreter, &temp_len);
     interpreter->arena_base->pmc_pool->pool_buffer.flags =
         BUFFER_live_FLAG;
-    interpreter->arena_base->pmc_pool->pool_buffer.buflen = 1024;
+    interpreter->arena_base->pmc_pool->pool_buffer.buflen = temp_len;
     interpreter->arena_base->pmc_pool->entries_in_pool = 0;
     Parrot_new_pmc_header_arena(interpreter);
-}
-
-void *
-mem_realloc(struct Parrot_Interp *interpreter, void *from, size_t fromsize,
-            size_t tosize)
-{
-    size_t copysize = (fromsize > tosize ? tosize : fromsize);
-    void *mem;
-    mem = Parrot_allocate(interpreter, tosize);
-    if (!mem) {
-        return NULL;
-    }
-    memcpy(mem, from, copysize);
-    return mem;
 }
 
 /*

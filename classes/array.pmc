@@ -31,7 +31,9 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
     int old_size = self->cache.int_val;
     if(self->data != NULL) {
 	if(size >= 0) {
-	    ((Buffer *)self->data)->bufstart = (DPOINTER*)mem_realloc(interpreter, ((Buffer *)self->data)->bufstart,self->cache.int_val*sizeof(PMC *), sizeof(PMC*)*size);
+
+	    Parrot_reallocate(interpreter, ((Buffer *)self->data), sizeof(PMC *) * size);
+	    size = ((Buffer *)self->data)->buflen / sizeof(PMC *);
 	    self->cache.int_val = size;
 	}
 	else {
@@ -40,7 +42,8 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
 	}
     }
     else {
-	((Buffer *)self->data)->bufstart = Parrot_allocate(interpreter, sizeof(PMC*)*size);
+	(Buffer *)self->data = new_buffer_header(interpreter);
+	Parrot_allocate(interpreter, (Buffer *)self->data, sizeof(PMC*)*size);
         self->cache.int_val = size;
     }
 
@@ -63,8 +66,9 @@ pmclass Array {
     }
 
     void init (INTVAL size) {
-	SELF->data = new_pmc_header(interpreter);
+	SELF->data = new_buffer_header(interpreter);
 	((Buffer *)SELF->data)->bufstart = NULL;
+	((Buffer *)SELF->data)->buflen = 0;
 	SELF->flags |= (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG);
 	SELF->cache.int_val = 0;
     }

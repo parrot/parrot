@@ -27,11 +27,9 @@ static void add_pmc_to_free(struct Parrot_Interp *interpreter,
   if (pool->entries_in_pool * sizeof(PMC *) >=
       pool->pool_buffer.buflen - sizeof(PMC *)) {
     /* If not, make the free pool bigger. We enlarge it by 20% */
-    pool->pool_buffer.bufstart = mem_realloc(interpreter,
-                                             pool->pool_buffer.bufstart,
-                                             pool->pool_buffer.buflen,
-                                             (UINTVAL)(pool->pool_buffer.buflen * 1.2));
-    pool->pool_buffer.buflen = (UINTVAL)(pool->pool_buffer.buflen * 1.2);
+    Parrot_reallocate(interpreter,
+                      &pool->pool_buffer,
+                      (UINTVAL)(pool->pool_buffer.buflen * 1.2));
 
   }
 #ifdef GC_DEBUG
@@ -221,7 +219,7 @@ new_buffer_header(struct Parrot_Interp *interpreter) {
      yet */
   if (interpreter == NULL) {
     return_me = mem_sys_allocate(sizeof(Buffer));
-    return_me->flags = BUFFER_live_FLAG | BUFFER_sysmem_FLAG;
+    return_me->flags = BUFFER_live_FLAG;
     return return_me;
   }
 
@@ -285,11 +283,9 @@ static void add_header_to_free(struct Parrot_Interp *interpreter,
   if (pool->entries_in_pool * sizeof(STRING *) >=
       pool->pool_buffer.buflen - sizeof(STRING *)) {
     /* If not, make the free pool bigger. We enlarge it by 20% */
-    pool->pool_buffer.bufstart = mem_realloc(interpreter,
-                                             pool->pool_buffer.bufstart,
-                                             pool->pool_buffer.buflen,
-                                             (UINTVAL)(pool->pool_buffer.buflen * 1.2));
-    pool->pool_buffer.buflen = (UINTVAL)(pool->pool_buffer.buflen * 1.2);
+    Parrot_reallocate(interpreter,
+                      &pool->pool_buffer,
+                      (UINTVAL)(pool->pool_buffer.buflen * 1.2));
 
   }
 #ifdef GC_DEBUG
@@ -334,18 +330,31 @@ mark_PMCs_unused(struct Parrot_Interp *interpreter) {
 /* Mark all the buffers as unused */
 static void
 mark_buffers_unused(struct Parrot_Interp *interpreter) {
-  struct STRING_Arena *cur_arena;
+  struct STRING_Arena *cur_string_arena;
+  struct Buffer_Arena *cur_buffer_arena;
   UINTVAL i;
 
   /* Run through all the buffer header pools and mark */
-  for (cur_arena = interpreter->arena_base->last_STRING_Arena;
-       NULL != cur_arena;
-       cur_arena = cur_arena->prev) {
-    STRING *string_array = cur_arena->start_STRING;
-    for (i = 0; i < cur_arena->used; i++) {
+  for (cur_string_arena = interpreter->arena_base->last_STRING_Arena;
+       NULL != cur_string_arena;
+       cur_string_arena = cur_string_arena->prev) {
+    STRING *string_array = cur_string_arena->start_STRING;
+    for (i = 0; i < cur_string_arena->used; i++) {
       /* Tentatively unused, unless it's a constant */
       if (!(string_array[i].flags & BUFFER_constant_FLAG)) {
         string_array[i].flags &= ~BUFFER_live_FLAG;
+      }
+    }
+  }
+
+  for (cur_buffer_arena = interpreter->arena_base->last_Buffer_Arena;
+       NULL != cur_buffer_arena;
+       cur_buffer_arena = cur_buffer_arena->prev) {
+    Buffer *buffer_array = cur_buffer_arena->start_Buffer;
+    for (i = 0; i < cur_buffer_arena->used; i++) {
+      /* Tentatively unused, unless it's a constant */
+      if (!(buffer_array[i].flags & BUFFER_constant_FLAG)) {
+        buffer_array[i].flags &= ~BUFFER_live_FLAG;
       }
     }
   }
@@ -353,6 +362,7 @@ mark_buffers_unused(struct Parrot_Interp *interpreter) {
 
 static PMC *
 mark_used(PMC *used_pmc, PMC *current_end_of_list) {
+
 
     /* If the PMC we've been handed has already been marked as live
        (ie we put it on the list already) we just return. Otherwise we
@@ -452,6 +462,8 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
                     /* The only thing left is "buffer of PMCs" */
                     Buffer *trace_buf = current->data;
                     PMC **cur_pmc = trace_buf->bufstart;
+                    /* Mark the damn buffer as used! */
+                    trace_buf->flags |= BUFFER_live_FLAG;
                     for (i = 0; i < trace_buf->buflen; i++) {
                         if (cur_pmc[i]) {
                             last = mark_used(cur_pmc[i], last);
@@ -647,12 +659,12 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
      yet */
   if (interpreter == NULL) {
     return_me = mem_sys_allocate(sizeof(STRING));
-    return_me->flags = BUFFER_live_FLAG | BUFFER_sysmem_FLAG;
+    return_me->flags = BUFFER_live_FLAG;
     return return_me;
   }
 
   if (!interpreter->arena_base->string_header_pool->entries_in_pool) {
-    alloc_more_string_headers(interpreter);
+      alloc_more_string_headers(interpreter);
   }
 #ifdef GC_DEBUG
   else {
@@ -710,7 +722,8 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
   struct Memory_Pool *new_block;        /* A pointer to our working pool */
   char *cur_spot;               /* Where we're currently copying to */
   UINTVAL cur_size;     /* How big our chunk is going to be */
-  struct STRING_Arena *cur_arena; /* The string arena we're working on */
+  struct STRING_Arena *cur_string_arena; /* The string arena we're working on */
+  struct Buffer_Arena *cur_buffer_arena;
 
   /* Bail if we're blocked */
   if (interpreter->GC_block_level) {
@@ -766,13 +779,14 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
   }
   cur_spot += cur_size;
 
-  /* Run through all the buffer header pools and copy */
-  for (cur_arena = interpreter->arena_base->last_STRING_Arena;
-       NULL != cur_arena;
-       cur_arena = cur_arena->prev) {
+  /* Run through all the STRING header pools and copy */
+  for (cur_string_arena = interpreter->arena_base->last_STRING_Arena;
+       NULL != cur_string_arena;
+       cur_string_arena = cur_string_arena->prev) {
     UINTVAL i;
-    STRING *string_array = cur_arena->start_STRING;
-    for (i = 0; i < cur_arena->used; i++) {
+    STRING *string_array = cur_string_arena->start_STRING;
+
+    for (i = 0; i < cur_string_arena->used; i++) {
       /* Is the string live, and can we move it? */
       if (string_array[i].flags & BUFFER_live_FLAG
           && !(string_array[i].flags & BUFFER_immobile_FLAG)
@@ -781,6 +795,30 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
                string_array[i].buflen);
         string_array[i].bufstart = cur_spot;
         cur_size = string_array[i].buflen;
+        if (cur_size & 0x0f) {
+          cur_size &= ~0x0f;
+          cur_size += 16;
+        }
+        cur_spot += cur_size;
+      }
+    }
+  }
+
+  /* Run through all the Buffer header pools and copy */
+  for (cur_buffer_arena = interpreter->arena_base->last_Buffer_Arena;
+       NULL != cur_buffer_arena;
+       cur_buffer_arena = cur_buffer_arena->prev) {
+    UINTVAL i;
+    Buffer *buffer_array = cur_buffer_arena->start_Buffer;
+    for (i = 0; i < cur_buffer_arena->used; i++) {
+      /* Is the string live, and can we move it? */
+      if (buffer_array[i].flags & BUFFER_live_FLAG
+          && !(buffer_array[i].flags & BUFFER_immobile_FLAG)
+          && buffer_array[i].bufstart) {
+        memcpy(cur_spot, buffer_array[i].bufstart,
+               buffer_array[i].buflen);
+        buffer_array[i].bufstart = cur_spot;
+        cur_size = buffer_array[i].buflen;
         if (cur_size & 0x0f) {
           cur_size &= ~0x0f;
           cur_size += 16;
@@ -864,12 +902,55 @@ Parrot_alloc_new_block(struct Parrot_Interp *interpreter,
   return new_pool;
 }
 
+/* Takes an interpreter, a buffer pointer, and a new size. The buffer
+   pointer is in as a void * because we may take a STRING or
+   something, and C doesn't subclass */
+void *
+Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
+{
+    /* Put our void * pointer into something we don't have to cast
+       around with */
+    Buffer *buffer;
+    size_t copysize;
+    size_t alloc_size = tosize;
+    void *mem;
+
+    buffer = from;
+    copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
+
+    mem = mem_allocate(interpreter, &alloc_size);
+    if (!mem) {
+        return NULL;
+    }
+    /* We shouldn't ever have a 0 from size, but we do. If we can
+       track down those bugs, this can be removed which would make
+       things cheaper */
+    if (copysize) {
+        memcpy(mem, buffer->bufstart, copysize);
+    }
+    buffer->bufstart = mem;
+    buffer->buflen = tosize;
+    return mem;
+}
 
 void *
-Parrot_allocate(struct Parrot_Interp *interpreter, size_t size) {
+Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
+{
+    size_t req_size = size;
+    ((Buffer *)buffer)->buflen = 0;
+    ((Buffer *)buffer)->bufstart = NULL;
+    ((Buffer *)buffer)->bufstart = mem_allocate(interpreter, &req_size);
+    ((Buffer *)buffer)->buflen = size;
+    return buffer;
+}
+
+void *
+mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size) {
   char *return_val;
+  size_t size = *req_size;
   if (NULL == interpreter) {
-    return mem_sys_allocate(size);
+    void *mem = mem_sys_allocate(size);
+    return mem;
   }
 #ifdef GC_DEBUG
   Parrot_go_collect(interpreter);
@@ -911,6 +992,7 @@ Parrot_allocate(struct Parrot_Interp *interpreter, size_t size) {
       }
     }
   }
+  *req_size = size;
   return (void *)return_val;
 }
 
