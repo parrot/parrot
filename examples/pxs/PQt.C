@@ -2,8 +2,8 @@
  * Qt Native interface for Parrot - Sample for playing with the
  * extension design.
  *
- * compile with:  g++ -fPIC -I$QTDIR/include -L$QTDIR -I./include -c pqt.C -lqt
- *                gcc -shared -o libpqt.so pqt.o $QTDIR/lib/libqt.so
+ * compile with:  g++ -fPIC -I$QTDIR/include -L$QTDIR -I./include -c PQt.C -lqt
+ *                gcc -shared -o libPQt.so PQt.o $QTDIR/lib/libqt.so
  *
  * Or something like that... 
  */
