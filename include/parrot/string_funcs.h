@@ -81,7 +81,7 @@ STRING *string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2, STRING **dest);
 STRING *string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
                STRING **dest);
-//void string_iterator_init(struct string_iterator_t *i, const STRING *s);
+/*void string_iterator_init(struct string_iterator_t *i, const STRING *s);*/
 UINTVAL string_decode_and_advance(struct string_iterator_t *i);
 
 size_t string_hash(Interp *interpreter, Hash *hash, STRING *s);

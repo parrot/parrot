@@ -17,7 +17,7 @@ Tests Parrot's unicode string system.
 =cut
 #'
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "angstrom" );
@@ -54,4 +54,13 @@ output_is( <<'CODE', <<OUTPUT, " escaped angstrom 3" );
     end
 CODE
 aaaaaa\xe2\x84\xab-aaaaaa
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A");
+    set S0, "aaaaaa\x{1d400}-aaaaaa"
+    print S0
+    print "\n"
+    end
+CODE
+aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT

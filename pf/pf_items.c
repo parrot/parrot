@@ -542,7 +542,7 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
         {
             encoding_name = "UTF16_OppositeEndian";
         }
-        else // representation == enum_stringrep_four
+        else /* representation == enum_stringrep_four */
         {
             encoding_name = "UTF32_OppositeEndian";
         }

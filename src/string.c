@@ -2948,6 +2948,65 @@ char16_at(Parrot_Int4 offs, void* context)
 
 }
 
+static Parrot_UInt2
+char32_at(Parrot_Int4 offs, void* context)
+{
+    return ((Parrot_UInt4*)((STRING *)context)->strstart)[offs];
+
+}
+
+static void
+set_char8_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
+{
+    ((char*)s->strstart)[offs] = c;
+}
+
+static void
+set_char16_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
+{
+    ((Parrot_UInt2*)s->strstart)[offs] = c;
+}
+
+static void
+set_char32_at(Parrot_Int4 offs, STRING *s, Parrot_UInt4 c)
+{
+    ((Parrot_UInt4*)s->strstart)[offs] = c;
+}
+
+typedef void (*char_setter_func)(Parrot_Int4, STRING*, Parrot_UInt4);
+
+static char_setter_func
+set_char_setter(STRING *s)
+{
+    switch (s->representation) {
+        case enum_stringrep_one:
+            return set_char8_at;
+        case enum_stringrep_two:
+            return set_char16_at;
+        case enum_stringrep_four:
+            return set_char32_at;
+        default:
+            internal_exception(1, "Unhandled string representation");
+    }
+    return (char_setter_func)NULLfunc;
+}
+
+static Parrot_unescape_cb
+set_char_getter(STRING *s)
+{
+    switch (s->representation) {
+        case enum_stringrep_one:
+            return char8_at;
+        case enum_stringrep_two:
+            return char16_at;
+        case enum_stringrep_four:
+            return char32_at;
+        default:
+            internal_exception(1, "Unhandled string representation");
+    }
+    return (Parrot_unescape_cb)NULLfunc;
+}
+
 STRING *
 string_unescape_cstring(struct Parrot_Interp * interpreter,
     char *cstring, char delimiter)
@@ -2956,19 +3015,17 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
     STRING *result;
     int offs, d;
     Parrot_UInt4 r;
-    int had_int16 = 0;
-    Parrot_unescape_cb char_at = char8_at;
+    Parrot_unescape_cb char_at;
+    char_setter_func set_char_at;
 
     if (delimiter && clength)
         --clength;
     result = string_make(interpreter, cstring, clength, "iso-8859-1",
             PObj_constant_FLAG);
-    if (result->representation == enum_stringrep_two) {
-        had_int16 = 1;
-        char_at = char16_at;
-    }
+    char_at     = set_char_getter(result);
+    set_char_at = set_char_setter(result);
 
-    for (offs = d =  0; ; ++offs) {
+    for (offs = d = 0; ; ++offs) {
         r = (char_at)(offs, result);
         if (!r || r == (Parrot_UInt4)delimiter)
             break;
@@ -2976,26 +3033,34 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
             ++offs;
             r = string_unescape_one(char_at, &offs, result->strlen, result);
             --offs;
-            /* TODO r = 0xffffffff for error */
-            if (r >= 0x100 && !had_int16) {
-                assert(r <= 0xffff);    /* TODO */
-                /* current result is this */
-                result->strlen = result->bufused = clength;
-                _string_upscale(interpreter, result,
-                        enum_stringrep_two, clength);
-                had_int16 = 1;
-                char_at = char16_at;
+            if (r > 0xff) {
+                parrot_string_representation_t needed_rep;
+
+                if (r == 0xffffffff)
+                    internal_exception(1, "Illegal escape sequence in '%s'",
+                            string_to_cstring(interpreter, result));
+                needed_rep = enum_stringrep_two;
+                if (r > 0xffff)
+                    needed_rep = enum_stringrep_four;
+                if (result->representation < needed_rep) {
+
+                    /* current result is this */
+                    result->strlen = clength;
+                    result->bufused = string_max_bytes(interpreter,
+                            result, clength);
+                    /* we need d + 1 + todo_length */
+                    _string_upscale(interpreter, result,
+                            needed_rep, d + clength - offs);
+                    char_at     = set_char_getter(result);
+                    set_char_at = set_char_setter(result);
+                }
             }
         }
         if (d == offs) {
             ++d;
             continue;
         }
-        /* TODO create set functions too */
-        if (had_int16)
-            ((Parrot_UInt2*)result->strstart)[d++] = r;
-        else
-            ((char*)result->strstart)[d++] = r;
+        set_char_at(d++, result, r);
     }
     result->strlen = d;
     result->bufused = string_max_bytes(interpreter, result, d);

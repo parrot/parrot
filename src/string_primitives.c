@@ -130,7 +130,7 @@ string_fill_from_buffer(struct Parrot_Interp *interpreter, const void *buffer,
     ucnv_close(conv);
 
     if (icuError != U_ZERO_ERROR) {
-        //handle error
+        /* handle error */
         internal_exception(ICU_ERROR,
                 "string_fill_from_buffer: ICU error from ucnv_toUnicode()");
     }
