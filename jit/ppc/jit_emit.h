@@ -549,13 +549,13 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
 
 
 /*
- * Load a 32-bit immediate value.  If the lower 16 bits are bigger than
- * 0x8000 we clear the higher 16 bits.  If the immediate only uses the
- * lower 16 bits, the third instruction is not necessary.
+ * Load a 32-bit immediate value.  
  */
+
 #  define jit_emit_mov_ri_i(pc, D, imm) \
-    jit_emit_oris(pc, D, r31, (long)imm >> 16); \
-      jit_emit_ori(pc, D, D, (long)imm & 0xffff);
+    jit_emit_ori(pc, D, r31, (long)imm & 0xffff); \
+    if ((long)imm >> 16 != 0) { \
+      jit_emit_oris(pc, D, D, (long)imm >> 16); }
 
 #  define curop_disp(pc, D, disp) \
     jit_emit_addis(pc, D, r15, (long)disp >> 16); \
