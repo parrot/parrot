@@ -1,4 +1,4 @@
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 use Parrot::Config;
 
 print STDERR $PConfig{jitcpuarch}, " JIT CPU\n";
@@ -489,6 +489,60 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_i - char*");
 CODE
 hello
 20
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "nci_p_i - nested struct *");
+  loadlib P1, "libnci"
+  dlfunc P0, P1, "nci_pi", "pi"
+  # this test function returns a struct { char; x->{int, double} }
+  set I5, 4
+  invoke
+.include "datatypes.pasm"
+  # the contained structure
+  new P3, .PerlArray
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  push P3, .DATATYPE_INT
+  push P3, 0
+  push P3, 0
+  push P3, .DATATYPE_DOUBLE
+  push P3, 0
+  push P3, 0
+  new P4, .UnManagedStruct, P3
+  # outer structure
+  new P2, .PerlArray
+  push P2, .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
+  push P2, .DATATYPE_PTR
+  # attach the unmanged struct as property
+  set P1, P2[-1]
+  setprop P1, "_struct", P4
+  push P2, 0
+  push P2, 0
+  # attach struct initializer
+  assign P5, P2
+  set I0, P5[0]
+  print I0
+  print "\n"
+  # get item x->int
+  set I0, P5[1;0]
+  print I0
+  print "\n"
+  set I0, P5[1;1]
+  print I0
+  print "\n"
+  # get item x->double
+  set N0, P5[1;2]
+  print N0
+  print "\n"
+  end
+CODE
+10
+100
+77
+200.000000
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_i_p");

@@ -145,6 +145,22 @@ void * nci_pi(int test) {
                 };
                 return &t;
             }
+        case 4:
+            {
+                static struct _x {
+                    int i;
+                    int j;
+                    double d;
+                } xx = { 100, 77, 200.0 };
+                static struct {
+                    char c;
+                    struct _x *x;
+                } t = {
+                     10,
+                     &xx
+                };
+                return &t;
+            }
     }
     return NULL;
 }

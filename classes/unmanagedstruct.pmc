@@ -18,6 +18,8 @@
  */
 
 #include "parrot/parrot.h"
+#include <assert.h>
+
 
 INTVAL key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key);
 
@@ -27,12 +29,16 @@ char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
     size_t offs, n;
 
     ix *= 3;
+    if (!PMC_pmc_val(pmc))
+	internal_exception(1, "Missing struct initializer");
     n = (size_t)VTABLE_elements(interpreter, PMC_pmc_val(pmc));
     if ((size_t)ix >= n)
 	internal_exception(1, "Non existent elements in struct");
     /* use structure init */
-    *type = (int) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix);
-    offs = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix + 2);
+    *type = (int) VTABLE_get_integer_keyed_int(interpreter,
+	    PMC_pmc_val(pmc), ix);
+    offs = (size_t) VTABLE_get_integer_keyed_int(interpreter,
+	    PMC_pmc_val(pmc), ix + 2);
     return ((char *)PMC_data(pmc)) + offs;
 }
 
@@ -40,6 +46,9 @@ INTVAL
 key_2_idx(Parrot_Interp interpreter, PMC *pmc, PMC *key)
 {
     int ix;
+
+    if (!PMC_pmc_val(pmc))
+	internal_exception(1, "Missing struct initializer");
     if (PObj_get_FLAGS(key) & KEY_string_FLAG) {
 	PMC *types = PMC_pmc_val(pmc);
 	if (types->vtable->base_type == enum_class_OrderedHash) {
@@ -63,7 +72,7 @@ static char *
 char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
 {
     size_t offs, n, count, size, max;
-    PMC *next;
+    PMC *next, *init;
     int ix;
     char *p;
 
@@ -74,7 +83,26 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     if (!next)
 	return p;
     count = (size_t) key_integer(interpreter, next);
-    max = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix + 1);
+    init = PMC_pmc_val(pmc);
+    max = (size_t) VTABLE_get_integer_keyed_int(interpreter, init, ix + 1);
+    /* TODO make that _struct_ptr */
+    if (*type == enum_type_ptr) {
+	PMC *ptr;
+	/* for now ignore count */
+	assert((int)max <= 1);
+	/* the struct PMC is hanging off the initializer element
+	 * as property "_struct"
+	 */
+	ptr = VTABLE_get_pmc_keyed_int(interpreter, init, ix);
+	init = VTABLE_getprop(interpreter, ptr,
+		string_from_cstring(interpreter, "_struct", 0));
+	assert(init && init->vtable->base_type == enum_class_UnManagedStruct);
+	/*
+	 * now point PMC_data of this struct to the real data
+	 */
+	PMC_data(init) = *(void**)p;
+	return char_offset_key(interpreter, init, next, type);
+    }
     if (count >= max)
 	internal_exception(1, "Non existent array element in struct");
     size = data_types[*type - enum_first_type].size;
@@ -277,9 +305,12 @@ pmclass UnManagedStruct extends default need_ext {
 	PMC_pmc_val(SELF) = value;
 
 	for (i = 0; i < n; i += 3) {
-	    int type = (int) VTABLE_get_integer_keyed_int(interpreter, value, i);
-	    int count= (int) VTABLE_get_integer_keyed_int(interpreter, value, i+1);
-	    int offs = (int) VTABLE_get_integer_keyed_int(interpreter, value, i+2);
+	    int type = (int) VTABLE_get_integer_keyed_int(interpreter,
+		    value, i);
+	    int count= (int) VTABLE_get_integer_keyed_int(interpreter,
+		    value, i+1);
+	    int offs = (int) VTABLE_get_integer_keyed_int(interpreter,
+		    value, i+2);
 
 	    if (type < enum_first_type || type >= enum_last_type)
 		internal_exception(1, "Illegal type in initializer for struct");
@@ -294,7 +325,8 @@ pmclass UnManagedStruct extends default need_ext {
 	    else
 		toff = offs;
 	    toff += count * (data_types[type - enum_first_type].size);
-	    if (i == n - 3 && pmc->vtable->base_type == enum_class_ManagedStruct)
+	    if (i == n - 3 &&
+		    pmc->vtable->base_type == enum_class_ManagedStruct)
 		DYNSELF.set_integer_native(toff);
 	}
 	PObj_custom_mark_SET(SELF);
@@ -306,7 +338,8 @@ pmclass UnManagedStruct extends default need_ext {
     }
 
     INTVAL is_equal (PMC* value) {
-	return (SELF->vtable == value->vtable && PMC_data(SELF) == PMC_data(value));
+	return (SELF->vtable == value->vtable &&
+		PMC_data(SELF) == PMC_data(value));
     }
 
     INTVAL defined () {
