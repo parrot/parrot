@@ -137,6 +137,11 @@ Parrot_Int Parrot_PMC_typenum(Parrot_INTERP interp, const char *class) {
     return pmc_type(interp, string_from_cstring(interp, class, 0));
 }
 
+Parrot_PMC Parrot_PMC_null() {
+    return PMCNULL;
+}
+
+
 /*=for api extend Parrot_free_cstring
  *
  * Deallocate a C string that the interpreter has handed to you
