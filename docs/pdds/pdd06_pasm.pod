@@ -254,9 +254,13 @@ The control flow opcodes check conditions and manage program flow.
 
 =over 4
 
-=item if tx, X
+=item if tx, ix
 
-Check register tx. (Px, Sx, Ix, or Nx) If true, branch by X.
+Check register tx. If true, branch by X.
+
+=item unless tx, ix
+
+Check register tx. If false, branch by X.
 
 =item jump tx
 
@@ -289,7 +293,7 @@ These ops handle manipulating the data in registers
 
 =over 4
 
-=item new Px, Iy
+=item new Px, iy
 
 Create a new PMC of class y stored in PMC register x.
 
@@ -375,7 +379,7 @@ Put the length of string y into integer register x.
 
 Add string y to the end of string x.
 
-=item repeat Sx, Sy, Iz
+=item repeat Sx, Sy, iz
 
 Copies string y z times into string x.
 
@@ -609,7 +613,7 @@ Put the type of generic stack entry Y into integer register X
 
 Get the current depth of the generic stack
 
-=item lookback tx, Iy
+=item lookback tx, iy
 
 Fetch the entry that's at position Y from the top of the generic stack. This
 does not remove an entry from the stack, merely fetches the entry off it.
@@ -760,12 +764,12 @@ Find the method Z for object Y, and return a PMC for it in X.
 
 =item set_attribute Px, ty, tz
 
-=item can Ix, Py, Sz
+=item can Ix, Py, sz
 
 Sets X to TRUE if object Y can perform method Z; otherwise, X is set to
 FALSE.
 
-=item does Ix, Py, Sz
+=item does Ix, Py, sz
 
 Sets X to TRUE if object Y can implements interface Z; otherwise, X is 
 set to FALSE.
@@ -1049,16 +1053,16 @@ metadata that may change. They are not for object attributes.
 
 =over 4
 
-=item setprop Px, Sy, Pz
+=item setprop Px, sy, Pz
 
 Set the property named Y of PMC X to the PMC in Z
 
-=item getprop Px, Sy, Pz
+=item getprop Px, sy, Pz
 
 Get the property named Y from PMC Z and put the result in register
 X. Returns a NULL if the property doesn't exist.
 
-=item delprop Px, Sy
+=item delprop Px, sy
 
 Delete the property Y from PMC X
 
