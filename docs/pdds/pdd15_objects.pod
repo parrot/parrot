@@ -486,8 +486,8 @@ would be:
 Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
   newclass $P0, "Foo"
-  addattr $P0, "a", "Foo::a" # This is offset 0
-  addattr $P0, "b", "Foo::b" # This is offset 1
+  addattribute $P0, "a", "Foo::a" # This is offset 0
+  addattribute $P0, "b", "Foo::b" # This is offset 1
 
 =head2 Instantiating an object
 
@@ -503,11 +503,11 @@ Assuming we want an object of class C<Foo>:
 Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
 conventions are respected:
 
-  callmeth "Xyzzy"
+  callmethod "Xyzzy"
 
 Or, if a return continuation needs constructing:
 
-  callmethcc "Xyzzy"
+  callmethodcc "Xyzzy"
 
 =head2 Accessing attributes from within a class
 
@@ -518,7 +518,7 @@ want to get attribute C<b> out of it:
   .local int BOffset
   classoffset BaseOffset, $P0, "Foo"
   BOffset = BaseOffset + 1
-  getattr $P1, $P0, BOffset
+  getattribute $P1, $P0, BOffset
 
 =head1 TRANSLATION AND GLOSSARY
 
