@@ -30,8 +30,41 @@ my @parrot_version = parrot_version();
 # Handle options:
 #
 
+my $reconfig = 0;
+
 my($opt_debugging, $opt_defaults, $opt_version, $opt_help) = (0, 0, 0, 0);
 my(%opt_defines);
+
+if (@ARGV and $ARGV[0] eq '--reconfig') {
+  print STDERR "Configure.pl: Reconfiguring based on config.opt file...\n";
+  open OPTS, "<config.opt" or die "Can't --reconfig. Could not open config.opt for reading!";
+
+  foreach my $opt (<OPTS>) {
+    chomp $opt;
+
+    if ($opt =~ m/^\s*debugging\s*$/) {
+      $opt_debugging = 1;
+      $opt = 'debugging';
+    }
+    elsif ($opt =~ m/^\s*defaults\s*$/) {
+      $opt_defaults = 1;
+      $opt = 'defaults';
+    }
+    elsif ($opt =~ m/^\s*define\s+(.*)\s*=\s*(.*)\s*$/) {
+      $opt_defines{$1} = $2;
+      $opt = "define $1=$2";
+    }
+    else {
+      die "Unrecognized option in config.opt: '$opt'!";
+    }
+
+    print "  $opt\n";
+  }
+
+  close OPTS;
+  $reconfig = 1;
+}
+
 my $result = GetOptions(
     'debugging!' => \$opt_debugging,
     'defaults!'  => \$opt_defaults,
@@ -50,6 +83,7 @@ if($opt_help) {
         print <<"EOT";
 $0 - Parrot Configure
 Options:
+   --reconfig           Reconfigure with saved options
    --debugging          Enable debugging
    --defaults           Accept all default values
    --define name=value  Defines value name as value
@@ -58,6 +92,24 @@ Options:
 EOT
         exit;
 }
+
+
+#
+# If we didn't just reconfig, store the config options out to config.opt.
+#
+
+if (!$reconfig) {
+  open OPTS, ">config.opt" or die "Could not open config.opt for writing!";
+  print OPTS "debugging\n" if $opt_debugging;
+  print OPTS "defaults\n" if $opt_defaults;
+  print(OPTS map { sprintf "define %s=%s\n", $_, $opt_defines{$_}; } keys %opt_defines) if %opt_defines;
+  close OPTS;
+}
+
+
+#
+#
+#
 
 my($DDOK)=undef;
 eval {

@@ -26,7 +26,7 @@ languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h Parrot/Config.pm \
 Parrot/Types.pm platform.c
 
-STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES)
+STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 
 
 ###############################################################################
@@ -377,6 +377,8 @@ distclean:
 cvsclean:
 	$(PERL) -MExtUtils::Manifest=filecheck -le ${PQ}$$ExtUtils::Manifest::Quiet=1; do { unlink $$_ unless $$_ =~ m!(?:CVS/|\.cvs)! } for filecheck()${PQ}
 
+reconfig:
+	$(MAKE) clean; $(PERL) Configure.pl --reconfig
 
 
 ###############################################################################
@@ -394,3 +396,4 @@ status:
 lint: ${test_prog}
 	$(LINT) ${cc_inc} -Iclasses $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
 	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
+
