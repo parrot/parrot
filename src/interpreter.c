@@ -981,7 +981,7 @@ Parrot_runops_fromc(Parrot_Interp interpreter, PMC *sub)
     old_c = REG_PMC(1);
     dod_register_pmc(interpreter, old_c);
     /* we need one return continuation with a NULL offset */
-    ret_c = pmc_new(interpreter, enum_class_RetContinuation);
+    ret_c = new_ret_continuation_pmc(interpreter, NULL);
 #if GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
 #endif
@@ -1710,6 +1710,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* null out the root set registry */
     SET_NULL_P(interpreter->DOD_registry, PMC *);
+
+    /* create method cache structure */
+    init_object_cache(interpreter);
 
     /* register assembler/compilers */
     setup_default_compreg(interpreter);

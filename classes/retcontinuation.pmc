@@ -24,6 +24,9 @@ has pointers to the context, that are restored on invoke.
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
+/* XXX s. objects.c */
+void add_to_retc_free_list(Parrot_Interp, PMC*);
+
 pmclass RetContinuation extends Continuation {
 
 /*
@@ -40,8 +43,19 @@ Initializes the continuation.
         PMC_sub(SELF) = new_ret_continuation(INTERP);
         PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
     }
 
+    void* invoke (void* next) {
+        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        restore_context(interpreter, &cc->ctx);
+        if (interpreter->code->cur_cs != cc->seg) {
+            Parrot_switch_to_cs(interpreter, cc->seg, 1);
+        }
+        next = PMC_struct_val(SELF);
+        add_to_retc_free_list(interpreter, SELF);
+        return next;
+    }
 /*
 
 =item C<PMC *clone()>

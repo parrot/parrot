@@ -225,6 +225,8 @@ GC.
 
 */
 
+/* XXX . objects.c */
+void mark_object_cache(Parrot_Interp);
 
 static int
 trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
@@ -262,6 +264,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     /* s. packfile.c */
     mark_const_subs(interpreter);
 
+    mark_object_cache(interpreter);
     /* mark NCI meth hash */
     for (i = 0; i < interpreter->nci_method_table_size; ++i) {
         PMC *h = interpreter->nci_method_table[i];

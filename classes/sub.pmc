@@ -74,10 +74,15 @@ Initializes the subroutine.
      * Sub PMC's flags uage:
      * - private0 ... Coroutine flip/flop
      * - private1 ... Fixup is done
+     * - private2 ... put RetCont on free list
      * - private4 ... @MAIN
      * - private5 ... @LOAD
      * - private6 ... @IMMEDIATE
      * - private7 ... @POSTCOMP
+     *
+     * Data used:
+     *   PMC_struct_val ... Sub address
+     *   PMC_pmc_val    ... Parrot_Sub structure
      */
     void init () {
         PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));

@@ -7,6 +7,7 @@
 #
 src/spf_render.c -{-Wformat-nonliteral}   # noisy
 src/tsq.c        -{${optimize}}           # never optimize tsq.c!
+ops/core_ops_cg.c   -{${optimize}}       # takes too long
 
 # io should be -Wunsed clean
 {^io/}              s/-Wno-unused/-Wunused/

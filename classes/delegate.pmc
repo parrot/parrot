@@ -147,7 +147,7 @@ Finds and returns the delegated method with C string C<name>.
 
 PARROT_INLINE static PMC *
 find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
-    STRING *meth = string_from_cstring(interpreter, name, 0);
+    STRING *meth = const_string(interpreter, name);
     PMC *class = pmc;
 
     if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
