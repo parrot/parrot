@@ -66,15 +66,46 @@ mmd_dispatch_numval(struct Parrot_Interp *interpreter,
     return ((*real_function)(left, right));
 }
 
-/*
+static void
+mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL new_x) {
+}
 
-*/
+static void
+mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL new_x) {
+}
+
+
+/*
+ * Add a new function to the table. This can be interestingly
+ * non-trivial, so we get to be tricky.
+ *
+ * If the left or right types are larger than anything we've seen so
+ * far, it means that we have to expand the table. Making Y larger is
+ * simple--just realloc with some more rows. Making X larger is less
+ * simple. In either case, we punt to other functions.
+ */
 void
 mmd_register(struct Parrot_Interp *interpreter,
              INTVAL type, INTVAL func_num,
              INTVAL left_type, INTVAL right_type,
              funcptr_t funcptr) {
-    
+
+    INTVAL cur_x, cur_y;
+    INTVAL offset;
+    cur_x = interpreter->binop_mmd_funcs->x[type];
+    cur_y = interpreter->binop_mmd_funcs->y[type];
+
+    if (cur_x < left_type) {
+        mmd_expand_x(interpreter, left_type);
+    }
+
+    if (cur_y < right_type) {
+        mmd_expand_y(interpreter, right_type);
+    }
+
+    offset = interpreter->binop_mmd_funcs->x[type] * right_type + left_type;
+    *(interpreter->binop_mmd_funcs->mmd_funcs[FLOAT_OFFSET] + offset) = funcptr;
+
 }
 
 
