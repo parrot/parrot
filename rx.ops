@@ -194,7 +194,7 @@ Pushes the current index onto the stack contained in the info structure.
 
 =cut
 
-op rx_pushindex(out int) {
+op rx_pushindex(in int) {
 	intstack_push(interpreter, interpreter->ctx.intstack, $1);
 	
 	goto NEXT();
