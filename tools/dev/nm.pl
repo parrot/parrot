@@ -167,6 +167,8 @@ in the object or archive files.  The options can be used to limit the symbols:
 --data|-d	data symbols (Dd, Bb)
 --init|-i	initialised data symbols (Dd)
 --uninit|-u	uninitialised data symbols (Bb)
+--local|-l	local symbols (tdbruf)
+--global|-g	global symbols (TDBRUF)
 --const|-C	const (read-only) data symbols (Rr) [1]
 --undef|-U	undefined symbols (Uu)
 --def|-D	defined symbols (not Uu)
