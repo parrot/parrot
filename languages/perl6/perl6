@@ -10,7 +10,12 @@
 # TODO's:
 # s. pod
 BEGIN{$SIG{__WARN__}=sub{print STDERR @_;$DB::single=1;}}
-use 5.005_03;	# _02 might work too, untested.
+
+# With 5.005, you get: Can't locate object method "new" via package
+# "P6C::IMCC::ExtRegex::CodeGen" at P6C/IMCC/ExtRegex.pm line 68.
+# when running the tests in t/rx/
+use 5.006;
+
 use strict;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";

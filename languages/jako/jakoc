@@ -13,6 +13,11 @@
 
 use strict;
 
+# perl5.005 complains:
+# Can't locate object method "block" via package
+# "Jako::Construct::Block::File" at lib/Jako/Construct/Block.pm line 243.
+require 5.006;
+
 use Carp;
 use Data::Dumper;
 

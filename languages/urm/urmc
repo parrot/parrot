@@ -6,14 +6,13 @@
 
 ## See if we can do pasm:
 
-use warnings;
 use strict;
 
 use Getopt::Long;
 use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 use Parrot::Config;
-use Time::HiRes qw(time);
+BEGIN { eval " use Time::HiRes qw(time); " }
 
 use vars qw($filename
 	    $compile
