@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "set/getprop");
@@ -53,6 +53,31 @@ output_is(<<'CODE', <<'OUTPUT', "Property values are references");
 CODE
 No
 No
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "resetting a property");
+    new P0, .PerlArray
+    new P1, .PerlString
+    new P2, .PerlString
+    new P3, .PerlString
+
+    set S0, "Type"
+    set P1, "Integer"
+    setprop P0, S0, P1
+    getprop P2, S0, P0
+    print P2     
+    print "\n"
+
+    set P3, "Float"
+    setprop P0, S0, P3
+    getprop P2, S0, P0
+    print P2     
+    print "\n"
+
+    end
+CODE
+Integer
+Float
 OUTPUT
 
 
