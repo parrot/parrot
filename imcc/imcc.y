@@ -246,6 +246,7 @@ program:                         { open_comp_unit(); $$ = 0;}
 compilation_unit:    sub
         | pcc_sub
         | emit
+        | MACRO '\n'                  { $$ = 0; }
         | '\n'  { $$ = 0; }
     ;
 

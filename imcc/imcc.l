@@ -45,6 +45,7 @@ struct macro_frame_t {
     char *file;
     int line;
     int pasm_file;      /* pasm_file mode of previous frame */
+    int is_macro;
 };
 
 struct macro_frame_t *frames = NULL;
@@ -668,6 +669,11 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
     m = find_macro(name);
     frame->params = &m->params;
     if (m) {
+        /* remember macro name for error reporting
+         * properly
+         */
+        sourcefile = name;
+        frame->is_macro = 1;
 	/* whitespace can be savely ignored */
 	do {
 	    c = input();
@@ -784,10 +790,14 @@ compile_file(Interp *interp, FILE *file)
 }
 
 void
-print_inc(void)
+print_inc(const char *file, int lin)
 {
     struct macro_frame_t *f;
 
+    if (frames->is_macro)
+        fprintf(stderr, "\nin macro '.%s' line %d\n", file, lin);
+    else
+        fprintf(stderr, "\nin file '%s' line %d\n", file, lin);
     for (f = frames; f; f = f->next) {
         if (f->file && strcmp(f->file, sourcefile))
             f->next ?

@@ -316,7 +316,8 @@ do_pre_process(Parrot_Interp interpreter)
             case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            case MACRO:         break;
+            case MACRO:         yylex(&val, interpreter);
+                                break; /* swallow nl */
 
             case END:           printf("end");break;
             case GOTO:          printf("goto ");break;
