@@ -50,6 +50,7 @@ enum ASTTYPE {
     ASTT_CALL,
     ASTT_BOOLEAN,
     ASTT_COMPARISON,
+    ASTT_CONDITIONAL_EXPR,
     ASTT_PREINC,
     ASTT_POSTINC,
     ASTT_NEW_OBJECT
@@ -174,7 +175,8 @@ extern int          scope;
 extern Symbol       *t_void,
                     *t_string,
                     *t_int,
-                    *t_float;
+                    *t_float,
+                    *t_method;
 
 void                assert(void * p);
 
@@ -247,7 +249,7 @@ void                gen_method_decl(AST * ast);
 void                gen_block(AST * ast);
 void                gen_statement(AST * ast);
 void                gen_assign(AST * ast);
-void                gen_expr(AST * ast, Symbol * lval);
+void                gen_expr(AST * ast, Symbol * lval, Symbol * type);
 void                gen_call(AST *);
 void                gen_if(AST *);
 void                gen_while(AST *);
@@ -267,11 +269,11 @@ char                *make_label();
 char                *op_name(int);
 int                 op_inverse(int);
 
-#define EVAL_SYM(x) (x->literal == NULL ? x->name : x->literal->name)
+#define NAME(x) (x->literal == NULL ? x->name : x->literal->name)
 #define IS_LVAL(x)  (x->is_lval)
 #define IS_RVAL(x)  (!x->is_lval)
 #define SWITCH_OR_LOOP() (primary_block > 0 ? 1 : 0)
-
+#define eval_expr(x) ((x->asttype == ASTT_LITERAL || x->asttype == ASTT_IDENTIFIER) ? (x->targ = x->sym, 1) : 0)
 
 extern long         line;
 

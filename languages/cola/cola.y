@@ -657,8 +657,9 @@ conditional_expression:
     conditional_or_expression
     |   conditional_or_expression '?' expression ':' expression
     {
-        fprintf(stderr, "Ternary conditional operator not yet supported.\n");
-        exit(0);
+        /* Ternary is just a if/then/else statement which can return a value */
+        $$ = new_if($1, $3, $5);
+        $$->asttype = ASTT_CONDITIONAL_EXPR;
     }
     ;
 
@@ -910,7 +911,6 @@ param_array:
     attributes PARAMS array_type IDENTIFIER
     ;
 */
-    
     
 member_name:
     IDENTIFIER

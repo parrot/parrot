@@ -83,6 +83,22 @@ Supported Constructs
 
   Bitwise operators:  <<, >>, |, &, ^, and ~ are now supported in 0.0.4
 
+  Conditional expressions:  Commonly known as the ternary conditional...
+    As I understand the Java and C# language spec,
+    conditional expressions must be on the right hand side of an
+    assignment or anywhere that uses the return value, however you
+    cannot use ternaries standalone as a statement. So in Cola you can
+    say:
+           max = i > j ? i : j;
+    or:
+           max = i > j ? foo() : bar();
+
+    But it is not proper (although C allows you) to say:
+
+           i > j ? printf("max=i\n") : printf("max=j\n");
+
+    If you think I have misread the C# grammar spec, please email me.
+
   Boolean: The boolean ! operator isn't yet supported.
  
   Methods:  
@@ -225,7 +241,6 @@ Optimization
 
 
 Coming Soon
-  Ternary conditionals:   i = (j > 0 ? 1 : 0);
   Some form of a printf()
   Full array support
     

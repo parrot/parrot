@@ -1,0 +1,37 @@
+// expressions.cola
+//
+// Samples of legal Cola expressions and syntaxes 
+//
+// Copyright (C) 2002 Melvin Smith
+
+using System;
+
+class Expressions {
+	public int foo() {
+		puts("foo\n");
+		return 1;
+	}
+
+	public int bar() {
+		puts("bar\n");
+		return 2;
+	}
+
+	public static void Main() {
+		// Declaration with initialization
+		int i = 10, j = 7;
+
+		// Declaration with conditional expression initialization
+		int min = i < j ? i : j;
+		puti(min);
+
+		// Conditional expression as argument
+		puti( i > j ? i : j );
+
+		// Methods as conditional expression arguments
+		min = foo() < bar() ? foo() : bar();
+		puti(min);
+	}
+}
+
+

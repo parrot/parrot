@@ -136,6 +136,7 @@ STRINGCONSTANT    \"[^"\n]*["\n]
 "/"             {    return('/');    }
 "*"             {    return('*');    }
 "!"             {    return('!');    }
+"?"             {    return('?');    }
 "%"             {    return('%');    }
 "|"             {    return('|');    }
 "&"             {    return('&');    }
