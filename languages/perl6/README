@@ -159,13 +159,15 @@ is, of course, the tests and the code.
 Contributors
 ============
 
-Sean O'Rourke		Initial and ongoing development.  Bugs.
-  seano@cpan.org
-
 John Kingsley		Numerous bug fixes to the parser, parser
 			tests, parse error messages.
 
-Leopold Toetsch		5.005_03 compatibility fixes, test driver
-			cleanup, new driver program, many bug fixes
+Sean O'Rourke		Initial development.  Primary contact. Bugs.
+  seano@cpan.org
 
-Joseph Ryan		Compiler overview doc, builtin functions
+Joseph Ryan		Compiler overview doc, builtin functions.
+
+Allison Randal		Conversion to CPS subroutine calling.
+
+Leopold Toetsch		5.005_03 compatibility fixes, test driver
+			cleanup, new driver program, many bug fixes.

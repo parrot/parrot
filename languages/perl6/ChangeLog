@@ -379,3 +379,8 @@
 	    - debugging.pod (Leo Toetsch)
 	    - moved debugging.pod, overview.pod to doc subdirectory
 	    - "perl6 --version" prints imcc version as well
+
+2003-08-19
+
+	* Fixes:
+	    - use CPS (Allison Randal)
