@@ -697,7 +697,15 @@ read:[  286                  5.8.2-RC2     2003-Nov-03]
 read:[  287                  5.8.2         2003-Nov-05]
 read:[  288                  5.8.3-RC1     2004-Jan-07]
 read:[  289                  5.8.3         2004-Jan-14]
-read:[  290         Hugo     5.9.0         2003-Oct-27]
+read:[  290                  5.8.4-RC1     2004-Apr-05]
+read:[  291                  5.8.4-RC2     2004-Apr-15]
+read:[  292                  5.8.4         2004-Apr-21]
+read:[  293                  5.8.5-RC1     2004-Jul-06]
+read:[  294                  5.8.5-RC2     2004-Jul-08]
+read:[  295                  5.8.5         2004-Jul-19]
+read:[  296 ]
+read:[  297         Hugo     5.9.0         2003-Oct-27]
+read:[  298         Rafael   5.9.1         2004-Mar-16]
 done
 finished
 OUT
@@ -1253,8 +1261,14 @@ read:[     Nicholas 5.8.2-RC1     2003-Oct-27\n          ]
 read:[       5.8.2-RC2     2003-Nov-03\n                 ]
 read:[5.8.2         2003-Nov-05\n                 5.8.3-R]
 read:[C1     2004-Jan-07\n                 5.8.3         ]
-read:[2004-Jan-14\n        Hugo     5.9.0         2003-Oc]
-read:[t-27\n]
+read:[2004-Jan-14\n                 5.8.4-RC1     2004-Ap]
+read:[r-05\n                 5.8.4-RC2     2004-Apr-15\n  ]
+read:[               5.8.4         2004-Apr-21\n         ]
+read:[        5.8.5-RC1     2004-Jul-06\n                ]
+read:[ 5.8.5-RC2     2004-Jul-08\n                 5.8.5 ]
+read:[        2004-Jul-19\n\n        Hugo     5.9.0       ]
+read:[  2003-Oct-27\n        Rafael   5.9.1         2004-]
+read:[Mar-16\n]
 done
 finished
 OUT
