@@ -178,7 +178,7 @@ pmclass PerlArray {
     void set_integer_keyed (KEY * key, INTVAL value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* pmc2;
 
         if (!key) {
             return 0;
@@ -194,8 +194,8 @@ pmclass PerlArray {
             ix += SELF->cache.int_val;
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_integer_native(INTERP, pmc, value);
+        pmc2 = ((PMC**)(SELF->data))[ix];
+        pmc2->vtable->set_integer_native(INTERP, pmc2, value);
     }
 
     void set_number (PMC * value) {
@@ -218,7 +218,7 @@ pmclass PerlArray {
     void set_number_keyed (KEY * key, FLOATVAL value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* pmc2;
 
         if (!key) {
             return 0;
@@ -234,8 +234,8 @@ pmclass PerlArray {
             ix += SELF->cache.int_val;
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_number_native(INTERP, pmc, value);
+        pmc2 = ((PMC**)(SELF->data))[ix];
+        pmc2->vtable->set_number_native(INTERP, pmc2, value);
     }
 
     void set_string (PMC * value) {
@@ -256,7 +256,7 @@ pmclass PerlArray {
     void set_string_keyed (KEY * key, STRING * value) {
         KEY_PAIR* kp;
         INTVAL ix;
-        PMC* pmc;
+        PMC* pmc2;
 
         if (!key) {
             return 0;
@@ -272,8 +272,8 @@ pmclass PerlArray {
             ix += SELF->cache.int_val;
         }
 
-        pmc = ((PMC**)(SELF->data))[ix];
-        pmc->vtable->set_string_native(INTERP, pmc, value);
+        pmc2 = ((PMC**)(SELF->data))[ix];
+        pmc2->vtable->set_string_native(INTERP, pmc2, value);
     }
 
     void set_value (void* value) {
