@@ -11,7 +11,7 @@ pmc2c.pl - PMC compiler
 
 =head1 SYNOPSIS
 
-perl pmc2c.pl [--no-lines] foo.pmc [foo2.pmc...]
+perl pmc2c.pl [--no-lines] [--tree] foo.pmc [foo2.pmc...]
 
 The first class.pmc should be the name of the class you wish to
 create. Normally, the pmc2c.pl translator uses #line pragmas to tell
@@ -20,6 +20,9 @@ number). This allows the compiler to issue warnings and errors based
 on the .pmc file instead of on the .c file which should not be edited.
 However, there are times when this is not desirable and therefore the
 --no-lines option is provided.
+
+If --tree is set, the inheritance tree of given classes is printed, no
+further processing is done. The common base class 'default' is not printed.
 
 =head1 DESCRIPTION
 
@@ -119,6 +122,7 @@ use Parrot::Vtable;
 use strict;
 
 my $default = parse_vtable("$FindBin::Bin/../vtable.tbl");
+my $print_tree;
 
 # The signature regex is used to parse a function signature for
 # example void func( int x ) { ... } after having applied the
@@ -241,7 +245,7 @@ data and calls parse_superpmc().
 sub superpmc_info {
     my $pmc = shift;
     my $filename = "$FindBin::Bin/\L$pmc\E.pmc";
-    print "Scanning $filename...\n";
+    print "Scanning $filename...\n" unless $print_tree;
     local $/;
     open(SUPERPMC, $filename) or die "open superpmc file $filename: $!";
     my $data = <SUPERPMC>;
@@ -264,6 +268,7 @@ sub scan_inheritance_tree {
     my ($class) = @_;
 
     my $leafclass = $class;
+    my $depth = 0;
 
     my %methods; # { methodname => class }
     my %super; # { methodname => class }
@@ -273,6 +278,9 @@ sub scan_inheritance_tree {
             $methods{$method} ||= $class;
             $super{$method} ||= $class unless $class eq $leafclass;
         }
+	if ($print_tree) {
+		print "    " x $depth++, $class, "\n";
+	}
         $class = $super;
     }
 
@@ -288,7 +296,7 @@ sub scan_inheritance_tree {
 
 sub Usage {
     print STDERR <<_EOF_;
-usage: $0 class.pmc [--no-lines] [class2.pmc ...]
+usage: $0 class.pmc [--no-lines] [--tree] [class2.pmc ...]
   --no-lines suppresses #line directives
 _EOF_
     exit 1;
@@ -305,6 +313,10 @@ if ($ARGV[0] eq '--no-lines') {
     shift(@ARGV);
 }
 
+if ($ARGV[0] eq '--tree') {
+    $print_tree = 1;
+    shift(@ARGV);
+}
 while (my $file = shift @ARGV) {
 
   my $base = $file;
@@ -320,6 +332,7 @@ while (my $file = shift @ARGV) {
   close PMC;
 
   my ($coutput, $houtput) = filter($contents, $file, $cfile); # run the filter
+  next if $print_tree;
 
   open (SOURCE, ">$cfile") || die "$0: Could not write file '$cfile'\n";
   print SOURCE $coutput;
@@ -407,6 +420,7 @@ sub filter {
 
   # $methodloc is a hash reference methodname => defining class
   my ($methodloc, $supermethodloc) = scan_inheritance_tree($classname);
+  return if $print_tree;
 
   # look through the pmc declaration header for flags such as noinit
   my $saw_extends;
@@ -555,7 +569,7 @@ void $initname (Interp * interp, int entry) {
         };
 
    whoami = string_make(interp,
-       "$classname", @{[length($classname)]}, 0, 0, 0);
+       "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;
    $class_init_code

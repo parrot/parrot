@@ -16,6 +16,7 @@
 
 typedef struct List_chunk {
     Buffer data;                /* item store */
+    UINTVAL flags;              /* chunk flags */
     UINTVAL items;              /* items in this chunk */
     UINTVAL n_chunks;           /* # of chunks with grow policy in flags */
     UINTVAL n_items;            /* # of items with grow policy in flags */

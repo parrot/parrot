@@ -632,7 +632,7 @@ extern struct mallinfo mallinfo(void);
 INTVAL
 interpinfo(struct Parrot_Interp *interpreter, INTVAL what)
 {
-    INTVAL ret;
+    INTVAL ret = 0;
     struct Small_Object_Pool *header_pool;
     int j;
 

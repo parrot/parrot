@@ -85,7 +85,8 @@ pmclass default abstract noinit {
 
     PMC* getprops() {
 	if (!SELF->metadata) {
-	  SELF->metadata = pmc_new(interpreter, enum_class_PerlHash);
+	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
+	  SELF->metadata->vtable->init(interpreter, SELF->metadata);
 	}
     	return SELF->metadata;
     }

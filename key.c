@@ -14,7 +14,6 @@
 
 #include "parrot/parrot.h"
 
-#define flags obj.flags
 
 PMC *
 key_new(struct Parrot_Interp *interpreter)
@@ -29,7 +28,7 @@ key_new_integer(struct Parrot_Interp *interpreter, INTVAL value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
-    key->flags |= KEY_integer_FLAG;
+    PObj_get_FLAGS(key) |= KEY_integer_FLAG;
     key->cache.int_val = value;
 
     return key;
@@ -40,7 +39,7 @@ key_new_number(struct Parrot_Interp *interpreter, FLOATVAL value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
-    key->flags |= KEY_number_FLAG;
+    PObj_get_FLAGS(key) |= KEY_number_FLAG;
     key->cache.num_val = value;
 
     return key;
@@ -51,7 +50,7 @@ key_new_string(struct Parrot_Interp *interpreter, STRING *value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
-    key->flags |= KEY_string_FLAG;
+    PObj_get_FLAGS(key) |= KEY_string_FLAG;
     key->cache.string_val = value;
 
     return key;
@@ -62,7 +61,7 @@ key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
 {
     PMC *key = pmc_new(interpreter, enum_class_Key);
 
-    key->flags |= KEY_pmc_FLAG;
+    PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     key->cache.pmc_val = value;
 
     return key;
@@ -71,8 +70,8 @@ key_new_pmc(struct Parrot_Interp *interpreter, PMC *value)
 void
 key_set_integer(struct Parrot_Interp *interpreter, PMC *key, INTVAL value)
 {
-    key->flags &= ~KEY_type_FLAGS;
-    key->flags |= KEY_integer_FLAG;
+    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
+    PObj_get_FLAGS(key) |= KEY_integer_FLAG;
     key->cache.int_val = value;
 
     return;
@@ -82,8 +81,8 @@ void
 key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
                  INTVAL flag)
 {
-    key->flags &= ~KEY_type_FLAGS;
-    key->flags |= KEY_register_FLAG | flag;
+    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
+    PObj_get_FLAGS(key) |= KEY_register_FLAG | flag;
     key->cache.int_val = value;
 
     return;
@@ -93,8 +92,8 @@ key_set_register(struct Parrot_Interp *interpreter, PMC *key, INTVAL value,
 void
 key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)
 {
-    key->flags &= ~KEY_type_FLAGS;
-    key->flags |= KEY_number_FLAG;
+    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
+    PObj_get_FLAGS(key) |= KEY_number_FLAG;
     key->cache.num_val = value;
 
     return;
@@ -104,8 +103,8 @@ key_set_number(struct Parrot_Interp *interpreter, PMC *key, FLOATVAL value)
 void
 key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)
 {
-    key->flags &= ~KEY_type_FLAGS;
-    key->flags |= KEY_string_FLAG;
+    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
+    PObj_get_FLAGS(key) |= KEY_string_FLAG;
     key->cache.string_val = value;
 
     return;
@@ -115,8 +114,8 @@ key_set_string(struct Parrot_Interp *interpreter, PMC *key, STRING *value)
 void
 key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)
 {
-    key->flags &= ~KEY_type_FLAGS;
-    key->flags |= KEY_pmc_FLAG;
+    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
+    PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
     key->cache.pmc_val = value;
 
     return;
@@ -125,7 +124,7 @@ key_set_pmc(struct Parrot_Interp *interpreter, PMC *key, PMC *value)
 INTVAL
 key_type(struct Parrot_Interp *interpreter, PMC *key)
 {
-    return (key->flags & KEY_type_FLAGS) & ~KEY_register_FLAG;
+    return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
 
 INTVAL
@@ -133,7 +132,7 @@ key_integer(struct Parrot_Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
-    switch (key->flags & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_integer_FLAG:
         return key->cache.int_val;
     case KEY_integer_FLAG | KEY_register_FLAG:
@@ -155,7 +154,7 @@ key_number(struct Parrot_Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
-    switch (key->flags & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
         return key->cache.num_val;
     case KEY_number_FLAG | KEY_register_FLAG:
@@ -177,7 +176,7 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
 {
     PMC *reg;
 
-    switch (key->flags & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_string_FLAG:
         return key->cache.string_val;
     case KEY_string_FLAG | KEY_register_FLAG:
@@ -197,7 +196,7 @@ key_string(struct Parrot_Interp *interpreter, PMC *key)
 PMC *
 key_pmc(struct Parrot_Interp *interpreter, PMC *key)
 {
-    switch (key->flags & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG:
         return key->cache.pmc_val;
     case KEY_pmc_FLAG | KEY_register_FLAG:
@@ -231,8 +230,9 @@ key_append(struct Parrot_Interp *interpreter, PMC *key1, PMC *key2)
 void
 key_mark(struct Parrot_Interp *interpreter, PMC *key)
 {
-    if ( ((key->flags & KEY_type_FLAGS) == KEY_string_FLAG) ||
-       ((key->flags & KEY_type_FLAGS) == KEY_pmc_FLAG) )
+    pobject_lives(interpreter, (PObj *) key);
+    if ( ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_string_FLAG) ||
+       ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_pmc_FLAG) )
         pobject_lives(interpreter, (PObj *)key->cache.string_val);
 
     if (key->data)

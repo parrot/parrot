@@ -4,7 +4,7 @@
 # with its build scripts.
 #
 # This script assumes that it will run on a unix box.. it's not particularly
-# necessary to be portable, since this only has to be run when packaging 
+# necessary to be portable, since this only has to be run when packaging
 # a release, or during development.
 
 use strict;
@@ -24,10 +24,10 @@ if ($action) {
     &{$action}();
 } else {
     (-d "miniparrot") || mkdir("miniparrot");
-    
+
     print "** $0: reconfiguring parrot for miniparrot build\n";
-    run_command("perl Configure.pl --miniparrot");
-    
+    run_command("perl Configure.pl --miniparrot --floatval=double");
+
     print "** $0: initiating parrot prebuild\n";
     run_command("make miniparrot-prebuild");
 }
@@ -39,14 +39,14 @@ exit(0);
 
 sub prebuild_classes {
     my @src;
-    
+
     foreach my $obj (@ARGV) {
         my $src = $obj;
-        $src =~ s/classes\/(.*)\.o/$1\.c/g;	
+        $src =~ s/classes\/(.*)\.o/$1\.c/g;
 
 	push @src, $src;
     }
-    
+
     run_command("cd classes; make @src");
 }
 
@@ -106,10 +106,10 @@ sub write_buildscripts {
 ############################################################################
 sub run_command {
     my ($command) = @_;
-  
+
     print "- $command\n";
     system($command);
-  
+
     if ($? >> 8) {
         die "Error " . ($? >>8). " running $command\n";
     }
