@@ -3508,7 +3508,7 @@ Pop the current lexical scope pad off the stack
 
 Store object $2 as lexical symbol $1
 
-=item B<find_lex>(in PMC, in STR)
+=item B<find_lex>(out PMC, in STR)
 
 Find the lexical variable named $2 and store it in $1
 
