@@ -306,28 +306,45 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc,
 void
 runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
 {
+    int lo_var_ptr;
     opcode_t *(*core) (struct Parrot_Interp *, opcode_t *);
 
     interpreter->code = code;
     interpreter->resume_offset = offset;
     interpreter->resume_flag = 1;
+    /* Okay, we've finished doing anything that might trigger GC.
+     * Actually, we could enbale DOD/GC earlier, but here all setup is
+     * done
+     */
+    interpreter->DOD_block_level--;
+    interpreter->GC_block_level--;
 
     while (interpreter->resume_flag) {
-        unsigned int which = 0;
+        unsigned int slow;
         opcode_t *pc = (opcode_t *)
             interpreter->code->byte_code + interpreter->resume_offset;
 
         interpreter->resume_offset = 0;
         interpreter->resume_flag = 0;
 
-        which |= (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG))  ? 0x01 : 0x00;
-        which |= (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) ? 0x02 : 0x00;
-        which |= (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))   ? 0x04 : 0x00;
+        slow = Interp_flags_TEST(interpreter, (PARROT_BOUNDS_FLAG |
+                    PARROT_PROFILE_FLAG |
+                    PARROT_TRACE_FLAG));
 
-        if (which)
+        if (slow)
             core = runops_slow_core;
-        else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG))
+        else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG)) {
             core = runops_cgoto_core;
+            /* clear stacktop, it gets set in runops_cgoto_core beyond the
+             * opfunc table again, if the compiler supports nested funcs
+             */
+/* #ifdef HAVE_NESTED_FUNC */
+#ifdef __GNUC__
+            if (!Interp_flags_TEST(interpreter,
+                        (PARROT_PREDEREF_FLAG | PARROT_JIT_FLAG)))
+                interpreter->lo_var_ptr = 0;
+#endif
+        }
         else
             core = runops_fast_core;
 
@@ -345,7 +362,7 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             }
         }
 
-        if (!which && Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
+        if (!slow && Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
             offset = pc - (opcode_t *)interpreter->code->byte_code;
 
             if (!interpreter->prederef_code) {
@@ -361,12 +378,12 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
             }
 
             runops_prederef(interpreter, pc,
-                            interpreter->prederef_code + offset);
+                    interpreter->prederef_code + offset);
         }
         else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
 #if !JIT_CAPABLE
             internal_exception(JIT_UNAVAILABLE,
-                               "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
+                    "Error: PARROT_JIT_FLAG is set, but interpreter is not JIT_CAPABLE!\n");
 #endif
 
             runops_jit(interpreter, pc);
@@ -374,6 +391,11 @@ runops(struct Parrot_Interp *interpreter, struct PackFile *code, size_t offset)
         else {
             runops_generic(core, interpreter, pc);
         }
+        /* if we have fallen out with resume and we were running CGOTO, set
+         * the stacktop again to a sane value, so that restarting the runloop
+         * is ok.
+         */
+        interpreter->lo_var_ptr = (void *)&lo_var_ptr;
     }
 
     if (interpreter->prederef_code) {
@@ -524,11 +546,6 @@ make_interpreter(Interp_flags flags)
     interpreter->current_package =
         string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
 
-    /* Okay, we've finished doing anything that might trigger GC. (The
-     * top of the stack hasn't been set yet, so we cannot allow GC to
-     * run up until now -- we might miss system stack values. */
-    interpreter->DOD_block_level--;
-    interpreter->GC_block_level--;
 
     /* Set I/O data to NULL first or else PIO_init will
      * assume this interpreter is already initialized.

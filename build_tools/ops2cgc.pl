@@ -158,6 +158,17 @@ foreach my $op ($ops->ops) {
 print SOURCE <<END_C;
   NULL
 };
+/* #ifdef HAVE_NESTED_FUNC */
+#ifdef __GNUC__
+    static void _check(void);
+    static void _check(void) {
+	int lo_var_ptr;
+	if (!interpreter->lo_var_ptr)
+	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
+    }
+    _check();
+#endif
+/* #endif */
 
 goto *ops_addr[*cur_opcode];
 
@@ -189,7 +200,7 @@ sub map_arg
     'n'  => "interpreter->ctx.num_reg->registers[cur_opcode[%ld]]",
     'p'  => "interpreter->ctx.pmc_reg->registers[cur_opcode[%ld]]",
     's'  => "interpreter->ctx.string_reg->registers[cur_opcode[%ld]]",
-  
+
     'ic' => "cur_opcode[%ld]",
     'nc' => "interpreter->code->const_table->constants[cur_opcode[%ld]]->number",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",

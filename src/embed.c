@@ -41,7 +41,8 @@ Parrot_init(struct Parrot_Interp *interpreter, void* stacktop)
         init_world(interpreter);
     }
 
-    if (stacktop) interpreter->lo_var_ptr = stacktop;
+    if (stacktop)
+        interpreter->lo_var_ptr = stacktop;
 }
 
 void

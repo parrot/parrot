@@ -103,7 +103,8 @@ runops_slow_core(struct Parrot_Interp *interpreter, opcode_t *pc)
         trace_op(trace_i, code_start, code_end, pc);
     }
 #else
-    trace_op(interpreter, code_start, code_end, pc);
+    if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG))
+        trace_op(interpreter, code_start, code_end, pc);
 #endif
 
     while (pc && pc >= code_start && pc < code_end) {
