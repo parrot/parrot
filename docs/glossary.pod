@@ -163,6 +163,15 @@ that their names are pre-selected.
 =for author
 From: "Brent Dax" <brentdax@cpan.org>
 
+=head2 Warnock's Dillemma
+
+The dillemma you face when posting a message to a public forum about
+something and not even getting an acknowledgement of its
+existence. This leaves you wondering if your problem is unimportant or
+previously addressed, if everyone's waiting on someone else to answer
+you,  or if maybe your mail never actually made it to anyone else in
+the forum.
+
 =head1 CORRECTIONS
 
 Please send corrections to the perl6-internals mailing list.
