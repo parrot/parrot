@@ -62,6 +62,7 @@ config/gen/makefiles.pl
 config/gen/makefiles/classes.in
 config/gen/makefiles/docs.in
 config/gen/makefiles/jako.in
+config/gen/makefiles/imcc.in
 config/gen/makefiles/languages.in
 config/gen/makefiles/miniperl.in
 config/gen/makefiles/perl6.in
@@ -393,7 +394,7 @@ languages/perl6/t/compiler/7.t
 languages/perl6/t/compiler/8.t
 languages/perl6/t/compiler/9.t
 languages/perl6/t/compiler/a.t
-languages/perl6/t/compiler/builtins.t
+#languages/perl6/t/compiler/builtins.t
 languages/perl6/t/compiler/qsort.t
 languages/perl6/t/harness
 languages/perl6/t/parser/Makefile

@@ -6,14 +6,16 @@ use Parrot::Configure::Step ':inter';
 
 $description = 'Determining what C compiler and linker to use...';
 
-@args = qw(ask cc ld ccflags ldflags libs debugging);
+@args = qw(ask cc link ld ccflags linkflags ldflags libs debugging);
 
 sub runstep {
   my %args;
   @args{@args}=@_;
   
-  my($cc, $ld, $ccflags, $ldflags, $libs)=Configure::Data->get(qw(cc ld ccflags ldflags libs));
+  my($cc, $link, $ld, $ccflags, $linkflags, $ldflags, $libs) = 
+      Configure::Data->get(qw(cc link ld ccflags linkflags ldflags libs));
   $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
+  $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;
   my $debug='n';
   
@@ -22,8 +24,10 @@ sub runstep {
            split(' ', $libs);
   
   $cc=$args{cc}           if defined $args{cc};
+  $link=$args{link}       if defined $args{link};
   $ld=$args{ld}           if defined $args{ld};
   $ccflags=$args{ccflags} if defined $args{ccflags};
+  $linkflags=$args{linkflags} if defined $args{linkflags};
   $ldflags=$args{ldflags} if defined $args{ldflags};
   $libs=$args{libs}       if defined $args{libs};
   $debug=$args{debugging} if defined $args{debugging};
@@ -41,9 +45,12 @@ configuration.
 END
 
     $cc=prompt("What C compiler do you want to use?", $cc);
-    $ld=prompt("How about your linker?", $ld);
+    $link=prompt("How about your linker?", $link);
+    $ld=prompt("What program do you want to use to build shared libraries?", 
+	       $ld);
     $ccflags=prompt("What flags should your C compiler receive?", $ccflags);
-    $ldflags=prompt("And your linker?", $ldflags);
+    $linkflags=prompt("And your linker?", $linkflags);
+    $ldflags=prompt("And your $ld for building shared libraries?", $ldflags);
     $libs=prompt("What libraries should your C compiler use?", $libs);
     $debug=prompt("Do you want a debugging build of Parrot?", $debug);
   }
@@ -57,8 +64,10 @@ END
   
   Configure::Data->set(
     cc      => $cc,
+    link    => $link,
     ld      => $ld,
     ccflags => $ccflags,
+    linkflags => $linkflags,
     ldflags => $ldflags,
     libs    => $libs
   );

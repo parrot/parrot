@@ -14,12 +14,27 @@ sub runstep {
   package Configure::Data;
   use Config;
   use Data::Dumper;
+
+  # We need a Glossary somewhere!
   
   my(%c)=(
     debugging     => $debugging ? 1 : 0,
 
+    # Compiler -- used to turn .c files into object files.
+    # (Usually cc or cl, or something like that.)
     cc            => $Config{cc},
     ccflags       => $Config{ccflags},
+
+    # Linker, used to link object files (plus libraries) into
+    # an executable.  It is usually $cc on Unix-ish systems.
+    # VMS and Win32 might use "Link". 
+    # Perl5's Configure doesn't distinguish linking from loading, so
+    # make a reasonable guess at defaults.
+    link          => $Config{cc},
+    linkflags     => $Config{ldflags},
+
+    # ld:  Tool used to build dynamically loadable libraries.  Often
+    # $cc on Unix-ish systems, but apparently sometimes it's ld.
     ld            => $Config{ld},
     ldflags       => $Config{ldflags},
     
@@ -27,6 +42,7 @@ sub runstep {
     
     cc_inc	  => "-I./include",
     cc_debug      => '-g',
+    link_debug    => '',
     cc_warn       => '',
     o             => '.o',                # object files extension
     so            => '.so',               # dynamic link library or shared object extension

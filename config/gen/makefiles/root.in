@@ -5,6 +5,7 @@ RM_F = ${rm_f}
 RM_RF = ${rm_rf}
 AR_CR = ${ar} cr
 RANLIB = ${ranlib}
+LINK = ${link}
 LD = ${ld}
 LD_SHARED = ${ld_shared}
 LD_OUT = ${ld_out}
@@ -116,6 +117,7 @@ OPS_FILES = ${ops} $(GEN_OPSFILES)
 ###############################################################################
 
 CFLAGS = ${ccflags} ${cc_warn} ${cc_inc} ${cc_hasjit} ${cg_flag}
+LINKFLAGS = ${linkflags}
 LDFLAGS = ${ldflags}
 
 C_LIBS = ${libs}
@@ -161,7 +163,7 @@ all : $(TEST_PROG) docs
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
 $(TEST_PROG) : test_main$(O) $(GEN_HEADERS) $(O_DIRS) $(O_FILES) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
-	$(LD) ${ld_out}$(TEST_PROG) $(LDFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(O_FILES) test_main$(O) $(C_LIBS)
 
 lib_deps_object : $(O_DIRS) $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -197,7 +199,7 @@ blib/lib/libparrot$(SO) : blib/lib $(O_DIRS) $(O_FILES)
 	$(LD) $(LD_SHARED) $(LD_SHARED_FLAGS) $(LDFLAGS) $(LD_OUT)blib/lib/libparrot$(SO) $(O_FILES) $(C_LIBS)
 
 $(TEST_PROG_SO) : test_main$(O) blib/lib/libparrot$(SO) lib/Parrot/OpLib/core.pm lib/Parrot/PMC.pm
-	$(LD) $(LDFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) $(LD_OUT)$(TEST_PROG) test_main$(O) blib/lib/libparrot$(A) $(C_LIBS)
 
 # XXX The dependancies on SO.MAJOR.MINOR and SO.VERSION are removed 
 #     because those should be done at "make install" and not "make shared"
@@ -242,7 +244,7 @@ PDB=pdb
 pdb$(O) : $(GENERAL_H_FILES)
 
 $(PDB) : pdb$(O) $(O_DIRS) $(O_FILES)
-	$(LD) ${ld_out}$(PDB) pdb$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
+	$(LINK) ${ld_out}$(PDB) pdb$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
 
 #
 # Parrot Disassembler
@@ -252,14 +254,14 @@ DIS=disassemble
 disassemble$(O) : $(GENERAL_H_FILES)
 
 $(DIS) : disassemble$(O) $(O_DIRS) $(O_FILES)
-	$(LD) ${ld_out}$(DIS) disassemble$(O) $(O_FILES) $(C_LIBS) $(LDFLAGS)
+	$(LINK) ${ld_out}$(DIS) disassemble$(O) $(LINKFLAGS) $(O_FILES) $(C_LIBS)
 
 #
 # Parrot Dump
 #
 
 #$(PDUMP) : pdump$(O) packfile$(O)
-#	$(LD) ${ld_out}$(PDUMP) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS) $(LDFLAGS)
+#	$(LINK) ${ld_out}$(PDUMP) $(LINKFLAGS) pdump$(O) packfile$(O) string$(O) chartype$(O) memory$(O) $(C_LIBS)
 
 
 ###############################################################################
@@ -289,7 +291,7 @@ examples/assembly/mops.c : examples/assembly/mops.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/mops.pbc > examples/assembly/mops.c
 
 examples/assembly/mops${exe} : examples/assembly/mops$(O) $(O_DIRS) $(O_FILES)
-	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/mops${exe} examples/assembly/mops$(O) $(O_FILES) $(C_LIBS)
 
 examples/assembly/life.pbc : examples/assembly/life.pasm assemble.pl
 	cd examples && cd assembly && $(MAKE) life.pbc PERL=$(PERL) && cd .. && cd ..
@@ -298,7 +300,7 @@ examples/assembly/life.c : examples/assembly/life.pbc pbc2c.pl
 	$(PERL) pbc2c.pl examples/assembly/life.pbc > examples/assembly/life.c
 
 examples/assembly/life${exe} : examples/assembly/life$(O) $(O_DIRS) $(O_FILES)
-	$(LD) $(LDFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(O_FILES) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/assembly/life${exe} examples/assembly/life$(O) $(O_FILES) $(C_LIBS)
 
 ###############################################################################
 #
@@ -309,7 +311,7 @@ examples/assembly/life${exe} : examples/assembly/life$(O) $(O_DIRS) $(O_FILES)
 examples/mops/mops$(O) : examples/mops/mops.c
 
 examples/mops/mops${exe} : examples/mops/mops$(O) platform$(O)
-	$(LD) $(LDFLAGS) ${ld_out}examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
+	$(LINK) $(LINKFLAGS) ${ld_out}examples/mops/mops${exe} examples/mops/mops$(O) platform$(O) $(C_LIBS)
 
 
 ###############################################################################

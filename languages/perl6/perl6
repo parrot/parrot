@@ -645,7 +645,7 @@ sub pass4($$) {
 	# in advance
 	#
 	my $lib = !$o{shared} ? "libparrot$LIB" : '-L blib/lib -lparrot';
-	$cmd = "$CD $PConfig{ld} $PConfig{ldflags} ".
+	$cmd = "$CD $PConfig{link} $PConfig{linkflags} ".
 	"$PConfig{ld_out} $HERE/$filebase $HERE/$filebase$PConfig{'o'} ".
 	"$lib ".
 	"$PConfig{libs}";

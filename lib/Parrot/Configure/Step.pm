@@ -118,12 +118,12 @@ sub cc_gen {
 }
 
 sub cc_build {
-	my($cc, $ccflags, $ldout, $o, $ld, $ldflags, $cc_exe_out, $exe, $libs)=
-		Configure::Data->get( qw(cc ccflags ld_out o ld ldflags cc_exe_out exe libs) );
+	my($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
+		Configure::Data->get( qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs) );
 	
 	system("$cc $ccflags -I./include -c test.c >test.cco $redir_err") and die "C compiler failed (see test.cco)";
 	
-	system("$ld $ldflags test$o ${cc_exe_out}test$exe $libs >test.ldo $redir_err") and die "Linker failed (see test.ldo)";
+	system("$link $linkflags test$o ${cc_exe_out}test$exe $libs >test.ldo $redir_err") and die "Linker failed (see test.ldo)";
 }
 
 sub cc_run {
