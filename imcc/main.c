@@ -218,6 +218,8 @@ int main(int argc, char * argv[])
     }
     if (pbc == 2) {
         pf = Parrot_readbc(interpreter, sourcefile);
+        if (!pf)
+            fatal(1, "main", "Packfile loading failed\n");
         Parrot_loadbc(interpreter, pf);
     }
     else {
