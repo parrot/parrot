@@ -16,6 +16,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 	gen   => ['genfile']
 );
 	
+my $redir_err = ($ENV{COMSPEC} =~ /command\.com/i) ? "" : "2>&1";
 
 #Configure::Data->get('key')
 #Configure::Data->set('key', 'value')
@@ -71,9 +72,9 @@ sub cc_build {
 	my($cc, $ccflags, $ldout, $o, $ld, $ldflags, $cc_exe_out, $exe, $libs)=
 		Configure::Data->get( qw(cc ccflags ld_out o ld ldflags cc_exe_out exe libs) );
 	
-	system("$cc $ccflags -I./include -c test.c >test.cco 2>&1") and die "C compiler failed (see test.cco)";
+	system("$cc $ccflags -I./include -c test.c >test.cco $redir_err") and die "C compiler failed (see test.cco)";
 	
-	system("$ld $ldflags test$o ${cc_exe_out}test$exe $libs >test.ldo 2>&1") and die "Linker failed (see test.ldo)";
+	system("$ld $ldflags test$o ${cc_exe_out}test$exe $libs >test.ldo $redir_err") and die "Linker failed (see test.ldo)";
 }
 
 sub cc_run {
@@ -91,10 +92,10 @@ sub cc_run_capture {
 	my $exe=Configure::Data->get('exe');
     my $slash=Configure::Data->get('slash');
     if (defined($_[0]) && length($_[0])) {
-	    `.${slash}test$exe $_[0] 2>&1`;
+	    `.${slash}test$exe $_[0] $redir_err`;
     }
     else {
-	    `.${slash}test$exe 2>&1`;
+	    `.${slash}test$exe $redir_err`;
     }
 }
 
