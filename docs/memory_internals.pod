@@ -1,10 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot - Memory Internals
+=head1 NAME
 
-=head1 VERSION
-
-0.0.9 Dec 2002
+docs/memory_internals.pod - Memory Internals
 
 =head1 ABSTRACT
 
@@ -34,9 +33,9 @@ all pools not alive are considered dead.
 A overall layout of the interpreter's memory management looks like so:
 
     typedef struct Parrot_Interp {
-    	...
-	struct Arenas *arena_base;
-	...
+        ...
+        struct Arenas *arena_base;
+        ...
     } Interp;
 
 All object-like things that get allocated during the execution of
@@ -44,36 +43,36 @@ parrot bytecode are managed here.
 
 =head1 Arenas
 
-I<struct Arenas> holds pointers to different subkinds of managed memory.
+C<struct Arenas> holds pointers to different subkinds of managed memory.
 A simplification looks similar to this:
 
     struct Arenas {
-	struct Memory_Pool *memory_pool;
-	...
-	struct Small_Object_Pool * header_pool;
+        struct Memory_Pool *memory_pool;
+        ...
+        struct Small_Object_Pool * header_pool;
     }
 
-I<Memory_pool> and I<header_pool> are variable and fixed sized pool
+C<Memory_pool> and C<header_pool> are variable and fixed sized pool
 pointers respectively.
 
 =head1 Memory_Pool
 
 Here all variable sized items are allocated, managed in linked lists of
-I<Memory_Blocks> - but see below.
+C<Memory_Blocks> - but see below.
 
 =head1 Small_Object_Pool
 
-This pool manages I<Small_Object_Arena>s, linked together, which provide
+This pool manages C<Small_Object_Arena>s, linked together, which provide
 the space for the fixed sized objects.
 
 =head1 Fixed sized items
 
-These items are either objects by themselves, like a I<PMC>, or are a
-header structure of a variable sized object like a I<STRING>.  The
+These items are either objects by themselves, like a C<PMC>, or are a
+header structure of a variable sized object like a C<STRING>.  The
 general object of this kind is a buffer-like object, which consists of a
-I<Buffer> or a I<PObj> at the beginning and a variable but fixed sized
-part after the buffer structure. Examples of this are a I<STRING> or an
-I<IntList>.
+C<Buffer> or a C<PObj> at the beginning and a variable but fixed sized
+part after the buffer structure. Examples of this are a C<STRING> or an
+C<IntList>.
 
 Buffer-like objects of the same size are maintained in the
 I<sized_header_pools>, which manage objects of the same size in one slot.
@@ -93,19 +92,19 @@ interpreter, they just get reused or recycled.
 =head2 General structure of a buffer-like item
 
     struct parrot_object_t {
-	struct {
-	    void *bufstart;
-	    size_t buflen;
-	} b;
-	unsigned flags;
-	...
+    struct {
+        void *bufstart;
+        size_t buflen;
+    } b;
+    unsigned flags;
+    ...
     } PObj;
 
 This does not totally reflect the current implementation, but is the
 spirit of the abstraction of current objects. Above structure including
-I<flags> is the current I<Buffer>. With some additional fields like
-I<strstart> and I<bufused>, inserted at the ellipses, you get a I<STRING>.
-Adding a I<vtable> (and some other structure members) yields a I<PMC>.
+C<flags> is the current C<Buffer>. With some additional fields like
+C<strstart> and C<bufused>, inserted at the ellipses, you get a C<STRING>.
+Adding a I<vtable> (and some other structure members) yields a C<PMC>.
 
 =head2 ARENA_DOD_FLAGS
 
@@ -116,7 +115,7 @@ C<PObj->flags>, meaning that each PMC must be accessed during the DOD run.
 
 An alternative approach is to store the DOD-Flags in the Arenas as a packed
 array of bits. This approach will be used if the preprocessor variable 
-C<ARENA_DOD_FLAGS> is defined to 1. Here the I<struct Small_Object_Arena> is
+C<ARENA_DOD_FLAGS> is defined to 1. Here the C<struct Small_Object_Arena> is
 extended with a pointer to the packed bitarray
 
     struct Small_Object_Arena {
@@ -134,9 +133,9 @@ simply masking out the lower bits of the pointer to the object:
 
 The macro C<GET_ARENA> does the exactly this, including the necessary type
 casts to remove warnings. The dod_flags are accessed by getting the element
-number in the arena (this is possible because the object_size is fixed and
-stored in the I<struct Small_Object_Arena>), creating the appropriate
-bitmask by shifting and accessing the right element of dod_flags[].
+number in the arena (this is possible because the C<object_size> is fixed and
+stored in the C<struct Small_Object_Arena>), creating the appropriate
+bitmask by shifting and accessing the right element of C<dod_flags[]>.
 
     n = (object - arena->start_objects) / arena->object_size;
     arena->dod_flags[n >> ARENA_FLAG_SHIFT] 
@@ -149,13 +148,13 @@ DOD flags.
 
 =head1 Variable sized items
 
-These items never live alone, they are part of a I<Buffer> structure,
-described above. They are allocated at I<bufstart>. This is, for example,
-used to manage the buffer's free list, where I<bufstart> is used as a pointer
+These items never live alone, they are part of a C<Buffer> structure,
+described above. They are allocated at C<bufstart>. This is, for example,
+used to manage the buffer's free list, where C<bufstart> is used as a pointer
 to the next object.
 
-These items are managed in two different pools: the I<memory_pool> and the
-I<constant_string_pool>. The former holds all variable sized items, while the
+These items are managed in two different pools: the C<memory_pool> and the
+C<constant_string_pool>. The former holds all variable sized items, while the
 latter containing the word "string", holds constant strings only, as we
 don't have other variable sized constant items to store.
 
@@ -163,7 +162,7 @@ Here, different memory allocation schemes jump in:
 
 =head2 Copying GC
 
-A I<memory_pool> gets allocated in big blocks, namely a I<Memory_Block>.
+A C<memory_pool> gets allocated in big blocks, namely a C<Memory_Block>.
 
 When some part is needed, e.g. to store a string, this part is carved out of
 the memory block, until this block is used up. If no more space is available in
@@ -186,34 +185,34 @@ C<string_compare()>.
 =head2 Defragmentating allocator
 
 An alternative to the above is to use a memory allocator, which is as fast
-as the above and does reuse free()ed items in a memory conserving way.
-Actually, the malloc implementations in some systems' I<libc> efficiently
+as the above and does reuse C<free()>ed items in a memory conserving way.
+Actually, the malloc implementations in some systems' F<libc> efficiently
 provide this, such as the glibc malloc based on Doug Lea's allocator.
 
 Using this allocator, all variable sized items are just allocated via a
-plain malloc() call, or resized with realloc(), and after they lose
+plain C<malloc()> call, or resized with C<realloc()>, and after they lose
 their existence (ie when DOD detects that the managing buffer
-header is no longer in use) they are free()ed. That's all. The underlying
+header is no longer in use) they are C<free()>ed. That's all. The underlying
 allocator collects these pieces, coalesces them if possible to form bigger
 pieces, and then puts them on free lists, sorted by size.  Eventually, when
 a new allocation request arrives, it may give them back to Parrot.
 
-So here, the variable length I<memory_pool> is unused. You can consider this
+So here, the variable length C<memory_pool> is unused. You can consider this
 pool to live inside the allocator.
 
 Buffers allocated this way don't move around, except when reallocated of
 course.
 
-The B<Configure> option I<--gc> allows one to use either method.
+The F<Configure.pl> option C<--gc> allows one to use either method.
 
 =head2 Buffer_Tail and COW
 
-Both implementations have the same problem to solve: I<STRING>s that get
+Both implementations have the same problem to solve: C<STRING>s that get
 copied, or parts of strings as the result of a substr() call, do not
 allocate new space in the memory pool to hold this string or part of
-string. They just use a new_string_header() and set up a pointer
-(I<strstart>) pointing somewhere into the original string and remember the
-used length there in I<bufused>.
+string. They just use a C<new_string_header()> and set up a pointer
+(C<strstart>) pointing somewhere into the original string and remember the
+used length there in C<bufused>.
 
 This is all OK, as long as the original and the lazy copy of the string
 are not modified. So that's well-known and called COW (copy on write).
@@ -226,12 +225,12 @@ string more then once (your debugger will tell you why...).
 Both allocation schemes therefore use a part of the allocated string to
 do this bookkeeping.
 
-Copying GC uses a I<Buffer_Tail> after the end of the actual variable
-length string and marks such COW strings with I<TAIL_moved> and stores
+Copying GC uses a C<Buffer_Tail> after the end of the actual variable
+length string and marks such COW strings with C<TAIL_moved> and stores
 the new address in the buffer header, so other users of this string can
 be updated to reuse the same string (XXX one or all other users?).
 
-The malloc()/free() approach stores a refcount at I<bufstart>. During
+The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During
 DOD all dead users increment the refcount, living users set it to an
 huge value. When freeing the buffer, the string is only freed if the
 refcount reaches zero.
@@ -259,9 +258,9 @@ refcount reaches zero.
                 +----------+
                  Buffer          Memory Block
 
-Now consider, that the I<Interpreter> shall be a I<PMC> living in
-I<Buffer X> of the underlying interpreter and is currently running
-B<perldoc docs/memory_internals.pod>, and then redo this figure, with
+Now consider, that the I<Interpreter> shall be a C<PMC> living in
+C<Buffer X> of the underlying interpreter and is currently running
+F<perldoc docs/memory_internals.pod>, and then redo this figure, with
 all the blanks filled in ;-)
 
 =head1 FILES
@@ -281,3 +280,7 @@ up to date - thanks.
 =head1 AUTHOR
 
 Leopold Tötsch <lt@toetsch.at>
+
+=head1 VERSION
+
+0.0.9 Dec 2002

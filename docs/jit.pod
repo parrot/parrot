@@ -1,24 +1,9 @@
-#
-# This file is in POD format; if you're not used to reading POD,
-# you can run the file through "perldoc" for a plain text version.
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
+=head1 NAME
 
-=head1 TITLE
-
-Parrot JIT Subsystem
-
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Daniel Grunblatt
-    Class: Internals
-    PDD Number: 8
-    Version: 1.3
-    Status: Developing
-    Last Modified: 26 Nov 2002
-    PDD Format: 1
-    Language:English
+docs/jit.pod - Parrot JIT Subsystem
 
 =head1 ABSTRACT
 
@@ -138,21 +123,21 @@ the file and the defines must therefore follow a specific syntax.
 
 =head2 Overall structure
 
-	#if JIT_EMIT
+    #if JIT_EMIT
 
-	... emit code
+    ... emit code
 
-	#else
+    #else
 
-	... defines
+    ... defines
 
-	#ifndef JIT_IMCC
+    #ifndef JIT_IMCC
 
-	... initialization of maps
-	... and possibly private static functions
+    ... initialization of maps
+    ... and possibly private static functions
 
-	#endif
-	#endif
+    #endif
+    #endif
 
 =head2 Defines
 
@@ -205,21 +190,21 @@ for mapped registers and positive numbers for non mapped parrot
 registers. To use this feature, the definition of mapped registers can
 be redefined like so:
 
-	#define MAP(i) OMAP(i)
-	#undef MAP
-	#define MAP(i) (i) >= 0 : 0 ? OMAP(i)
+    #define MAP(i) OMAP(i)
+    #undef MAP
+    #define MAP(i) (i) >= 0 : 0 ? OMAP(i)
 
 =item EXTCALL
 
 This macro, if defined can override, what is to be considered an
 external function. The default definition is:
 
-	#  define EXTCALL(op) (op_jit[*(op)].extcall)
+    #  define EXTCALL(op) (op_jit[*(op)].extcall)
 
 JIT/i386 has jitted vtable functions, where extcall is the vtable
 entry number and redefines B<EXTCALL> to:
 
-	#  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
+    #  define EXTCALL(op) (op_jit[*(op)].extcall == 1)
 
 =back
 
@@ -335,20 +320,20 @@ for this jit function.
 Example:
 
     TEMPLATE Parrot_set_x_ic {
-	if (MAP[1]) {
-	    jit_emit_mov_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
-	}
-	else {
-	    jit_emit_mov_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
-	}
+    if (MAP[1]) {
+        jit_emit_mov_ri<_N>(NATIVECODE, MAP[1], <typ>_CONST[2]);
+    }
+    else {
+        jit_emit_mov_mi<_N>(NATIVECODE, &INT_REG[1], <typ>_CONST[2]);
+    }
     }
 
     Parrot_set_i_ic {
-	Parrot_set_x_ic s/<_N>/_i/ s/<typ>/*INT/
+    Parrot_set_x_ic s/<_N>/_i/ s/<typ>/*INT/
     }
 
     Parrot_set_n_ic {
-	Parrot_set_x_ic s/<_N>/_ni/ s/<typ>/&INT/ s/INT_R/NUM_R/
+    Parrot_set_x_ic s/<_N>/_ni/ s/<typ>/&INT/ s/INT_R/NUM_R/
     }
 
 The jit function B<Parrot_set_i_ic> is based on the template
@@ -477,51 +462,51 @@ B<Intel x86 assembly version of the Parrot ops:>
 
 B<Parrot_jit_begin>
 
-    0x817ddd0 <jit_func>:	push   %ebp
-    0x817ddd1 <jit_func+1>:	mov    %esp,%ebp
-    0x817ddd3 <jit_func+3>:	push   %ebx
-    0x817ddd4 <jit_func+4>:	push   %esi
-    0x817ddd5 <jit_func+5>:	push   %edi
+    0x817ddd0 <jit_func>:   push   %ebp
+    0x817ddd1 <jit_func+1>: mov    %esp,%ebp
+    0x817ddd3 <jit_func+3>: push   %ebx
+    0x817ddd4 <jit_func+4>: push   %esi
+    0x817ddd5 <jit_func+5>: push   %edi
 
   normal function header till here, now push interpreter
 
-    0x817ddd6 <jit_func+6>:	push   $0x8164420
+    0x817ddd6 <jit_func+6>: push   $0x8164420
 
   get jit function table to %ebp and
   jump to first instruction
 
-    0x817dddb <jit_func+11>:	mov    0xc(%ebp),%eax
-    0x817ddde <jit_func+14>:	mov    $0x81773f0,%ebp
-    0x817dde3 <jit_func+19>:	sub    $0x81774a8,%eax
-    0x817dde9 <jit_func+25>:	jmp    *%ds:0x0(%ebp,%eax,1)
+    0x817dddb <jit_func+11>:    mov    0xc(%ebp),%eax
+    0x817ddde <jit_func+14>:    mov    $0x81773f0,%ebp
+    0x817dde3 <jit_func+19>:    sub    $0x81774a8,%eax
+    0x817dde9 <jit_func+25>:    jmp    *%ds:0x0(%ebp,%eax,1)
 
 B<set_i_ic>
 
-    0x817ddee <jit_func+30>:	mov    $0x8,%edi
+    0x817ddee <jit_func+30>:    mov    $0x8,%edi
 
 B<set_i_i>
 
-    0x817ddf3 <jit_func+35>:	mov    %edi,%ebx
+    0x817ddf3 <jit_func+35>:    mov    %edi,%ebx
 
 B<Parrot_jit_save_registers>
 
-    0x817ddf5 <jit_func+37>:	mov    %edi,0x8164420
-    0x817ddfb <jit_func+43>:	mov    %ebx,0x8164428
+    0x817ddf5 <jit_func+37>:    mov    %edi,0x8164420
+    0x817ddfb <jit_func+43>:    mov    %ebx,0x8164428
 
 B<Parrot_jit_normal_op>
 
-    0x817de01 <jit_func+49>:	push   $0x81774c0
-    0x817de06 <jit_func+54>:	call   0x804be00 <Parrot_print_i>
-    0x817de0b <jit_func+59>:	add    $0x4,%esp
+    0x817de01 <jit_func+49>:    push   $0x81774c0
+    0x817de06 <jit_func+54>:    call   0x804be00 <Parrot_print_i>
+    0x817de0b <jit_func+59>:    add    $0x4,%esp
 
 B<Parrot_jit_end>
 
-    0x817de0e <jit_func+62>:	add    $0x4,%esp
-    0x817de14 <jit_func+68>:	pop    %edi
-    0x817de16 <jit_func+70>:	pop    %ebx
-    0x817de18 <jit_func+72>:	pop    %esi
-    0x817de1a <jit_func+74>:	pop    %ebp
-    0x817de1c <jit_func+76>:	ret
+    0x817de0e <jit_func+62>:    add    $0x4,%esp
+    0x817de14 <jit_func+68>:    pop    %edi
+    0x817de16 <jit_func+70>:    pop    %ebx
+    0x817de18 <jit_func+72>:    pop    %esi
+    0x817de1a <jit_func+74>:    pop    %ebp
+    0x817de1c <jit_func+76>:    ret
 
 Please note the reverse argument direction. PASM and JIT notations use
 I<dest,src,src>, while F<gdb> and the internal macros in F<jit_emit.h>
@@ -536,18 +521,18 @@ format, s. B<info stabs> for more (or less :-()
 The following script calls F<ddd> (the graphic debugger fronted) and
 attaches the symbol file, after it got built in F<build_asm>.
 
-	# dddp
-	# run ddd parrot with given file
-	# gdb confirmations should be off
-	parrot -o $1.pbc -d $1.pasm
-	echo "b runops_jit
-	r -d -j $1.pbc
-	n
-	add-symbol-file $1.o 0
-	s
-	" > .ddd
+    # dddp
+    # run ddd parrot with given file
+    # gdb confirmations should be off
+    parrot -o $1.pbc -d $1.pasm
+    echo "b runops_jit
+    r -d -j $1.pbc
+    n
+    add-symbol-file $1.o 0
+    s
+    " > .ddd
 
-	ddd --command .ddd parrot &
+    ddd --command .ddd parrot &
 
 Run this with e.g. I<dddp t/op/jit_2>, then turn on the register status,
 I<step> or I<nexti> through the source, or set break points as with any
@@ -573,24 +558,24 @@ these tests.
 
 (ddd shows above source code and assembly (startup code snipped):
 
-    0x815de46 <jit_func+30>:	mov    $0xa,%ebx
-    0x815de4b <jit_func+35>:	fldl   0x81584c0
-    0x815de51 <jit_func+41>:	fstp   %st(2)
-    0x815de53 <jit_func+43>:	mov    %ebx,0x8158098
-    0x815de59 <jit_func+49>:	fld    %st(1)
-    0x815de5b <jit_func+51>:	fstpl  0x8158120
-    0x815de61 <jit_func+57>:	push   $0x815cd90
-    0x815de66 <jit_func+62>:	call   0x804db90 <Parrot_set_s_sc>
-    0x815de6b <jit_func+67>:	add    $0x4,%esp
-    0x815de6e <jit_func+70>:	push   $0x815cd9c
-    0x815de73 <jit_func+75>:	call   0x804bcd0 <Parrot_print_sc>
-    0x815de78 <jit_func+80>:	add    $0x4,%esp
-    0x815de7b <jit_func+83>:	add    $0x4,%esp
-    0x815de81 <jit_func+89>:	pop    %edi
-    0x815de83 <jit_func+91>:	pop    %ebx
-    0x815de85 <jit_func+93>:	pop    %esi
-    0x815de87 <jit_func+95>:	pop    %ebp
-    0x815de89 <jit_func+97>:	ret
+    0x815de46 <jit_func+30>:    mov    $0xa,%ebx
+    0x815de4b <jit_func+35>:    fldl   0x81584c0
+    0x815de51 <jit_func+41>:    fstp   %st(2)
+    0x815de53 <jit_func+43>:    mov    %ebx,0x8158098
+    0x815de59 <jit_func+49>:    fld    %st(1)
+    0x815de5b <jit_func+51>:    fstpl  0x8158120
+    0x815de61 <jit_func+57>:    push   $0x815cd90
+    0x815de66 <jit_func+62>:    call   0x804db90 <Parrot_set_s_sc>
+    0x815de6b <jit_func+67>:    add    $0x4,%esp
+    0x815de6e <jit_func+70>:    push   $0x815cd9c
+    0x815de73 <jit_func+75>:    call   0x804bcd0 <Parrot_print_sc>
+    0x815de78 <jit_func+80>:    add    $0x4,%esp
+    0x815de7b <jit_func+83>:    add    $0x4,%esp
+    0x815de81 <jit_func+89>:    pop    %edi
+    0x815de83 <jit_func+91>:    pop    %ebx
+    0x815de85 <jit_func+93>:    pop    %esi
+    0x815de87 <jit_func+95>:    pop    %ebp
+    0x815de89 <jit_func+97>:    ret
   (gdb) n
   (gdb) n
   (gdb) n
@@ -603,3 +588,17 @@ these tests.
   3, strstart = 0x815ad30 "abc"}
   (gdb) p &I0
   $4 = (INTVAL *) 0x8158098
+
+=head1 VERSION
+
+=head2 CURRENT
+
+    Maintainer: Daniel Grunblatt
+    Class: Internals
+    PDD Number: 8
+    Version: 1.3
+    Status: Developing
+    Last Modified: 26 Nov 2002
+    PDD Format: 1
+    Language:English
+

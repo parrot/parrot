@@ -1,34 +1,37 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
+=head1 NAME
 
 embed.pod - Parrot embedding system
 
 =head1 SYNOPSIS
 
-	#include "parrot/embed.h"
-	
-	int main(int argc, char *argv[]) {
-		Parrot_Interp interp;
-		Parrot_PackFile pf;
-		char *bcfile="program.pbc";
+    #include "parrot/embed.h"
+    
+    int main(int argc, char *argv[]) {
+        Parrot_Interp interp;
+        Parrot_PackFile pf;
+        char *bcfile="program.pbc";
 
-		argc--; argv++;	/* skip the program name */
-		
-		interp=Parrot_new();
-		Parrot_init(interp);
+        argc--; argv++; /* skip the program name */
+        
+        interp=Parrot_new();
+        Parrot_init(interp);
 
-		if(PARROT_JIT_CAPABLE) {
-			Parrot_setflags(interp, PARROT_JIT_FLAG, NULL); /* activate JIT */
-		}
+        if(PARROT_JIT_CAPABLE) {
+            Parrot_setflags(interp, PARROT_JIT_FLAG, NULL); /* activate JIT */
+        }
 
-		pf=Parrot_readbc(interp, bcfile);
-		Parrot_loadbc(interp, pf);
+        pf=Parrot_readbc(interp, bcfile);
+        Parrot_loadbc(interp, pf);
 
-		Parrot_runcode(interp, argc, argv);	/* argc and argv as seen by the bytecode file */
+        Parrot_runcode(interp, argc, argv); /* argc and argv as seen by the bytecode file */
 
-		Parrot_destroy(interp);
-		
-		return 0;
-	}
+        Parrot_destroy(interp);
+        
+        return 0;
+    }
 
 =head1 FILES
 
@@ -212,6 +215,6 @@ B<XXX> At the moment, it just leaks most of it.
 
 F<embed.c> and F<embed.h> for the implementation.
 
-F<test_main.c> for Parrot's use of the embedding system.
+F<src/test_main.c> for Parrot's use of the embedding system.
 
 =cut

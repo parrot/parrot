@@ -1,20 +1,13 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-pdb - The Parrot Debugger
+=head1 NAME
 
-=head1 HISTORY
-
-=over 4
-
-=item Version 1.0
-
-First version (CVS debug.c revision 1.24), authored by Aldo Calpini
-
-=back
+docs/debugger.pod - The Parrot Debugger
 
 =head1 ABSTRACT
 
-This document describes the Parrot Debugger.
+This document describes F<pdb>, the Parrot Debugger.
 
 =head1 DESCRIPTION
 
@@ -436,18 +429,18 @@ If C<COMMAND> is omitted, prints a list of the available commands.
 
 =over 4
 
-=item pdb.c
+=item src/pdb.c
 
 This is the file that will produce the executable.
 Nothing fancy here, only the C<main> function.
 
-=item debug.c
+=item src/debug.c
 
 Most of the debugger is implemented here.
 You may want to start from the C<PDB_run_command>
 function and go down from there for the real meat.
 
-=item embed.c
+=item src/embed.c
 
 C<Parrot_debug>, the function which launches the debugger, is
 implemented here.
@@ -458,3 +451,14 @@ This defines all the PDB structures, which hold
 data used by the debugger.
 
 =back
+
+=head1 HISTORY
+
+=over 4
+
+=item Version 1.0
+
+First version (CVS debug.c revision 1.24), authored by Aldo Calpini
+
+=back
+

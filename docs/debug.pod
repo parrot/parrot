@@ -1,16 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Debugging Parrot
+=head1 NAME
 
-=head1 HISTORY
-
-=over 4
-
-=item Version 1.0
-
-First version by Steve Fink <steve@fink.com>
-
-=back
+docs/debug.pod - Debugging Parrot
 
 =head1 ABSTRACT
 
@@ -18,17 +11,17 @@ This document describes ways to debug various parts of Parrot.
 
 =head1 THE PARROT AND IMCC BINARIES
 
-First, you'll want to use the --debugging flag with Configure.pl to
+First, you'll want to use the C<--debugging> flag with F<Configure.pl> to
 generate debugging symbols for the parrot binary:
 
-  shell> perl Configure.pl --debugging
-  shell> make
+    % perl Configure.pl --debugging
+    % make
 
 You can then run the parrot binary under gdb.
 
 You could also run all the tests with valgrind, by running
 
- make test IMCC="valgrind -q languages/imcc/imcc"
+    % make test IMCC="valgrind -q languages/imcc/imcc"
 
 =head2 MEMORY MANAGEMENT
 
@@ -37,25 +30,25 @@ memory management in general, and garbage collection in particular.
 
 =head3 Infant mortality
 
-See L<dev/infant.dev> for details of one frequent problem: infant
+See F<docs/dev/infant.dev> for details of one frequent problem: infant
 mortality. Infant mortality is when you create a Parrot object, but
 the garbage collector runs before you put it into a Parrot register or
 in something else that is itself within a Parrot register.
 
 To help in resolving these issues, the parrot binary accepts a
---gc-debug flag that makes such problems much more likely to occur (it
+C<--gc-debug> flag that makes such problems much more likely to occur (it
 makes garbage collection occur as frequently as possible, to maximize
 the probability that any newborn objects will run afoul of the garbage
 collector if they are improperly coded.)
 
-Within the --gc-debug mode, there is another tool to help narrow down
-the problem. If you edit F<dod.c> and #define the C<GC_VERBOSE> flag to 
+Within the C<--gc-debug> mode, there is another tool to help narrow down
+the problem. If you edit F<src/dod.c> and C<#define> the C<GC_VERBOSE> flag to 
 1, then after the garbage collector has traced all objects to find which 
 ones are still alive, it will scan through all of the dead objects to see 
 if any of them believe they are alive (which will happen for infants, since 
 they come into existence marked live.) If it finds any, it will print them 
 out. You can then re-run the program with a breakpoint set on the routine 
-that allocated the object (e.g. C<get_free_object> in F<smallobject.c>). 
+that allocated the object (e.g. C<get_free_object> in F<src/smallobject.c>). 
 You'll probably want to make the breakpoint conditional on the object having 
 the version number that was reported, because the same memory location
 will probably hold many different objects over the lifetime of the
@@ -68,8 +61,8 @@ It's not working. You'd like some help in figuring out why.
 
 =head2 pdb
 
-One possible tool is C<pdb>, the Parrot Debugger. See L<debugger.pod>
-for details on it.
+One possible tool is F<pdb>, the Parrot Debugger. See
+F<docs/debugger.pod> for details on it.
 
 =head2 stabs
 
@@ -86,15 +79,15 @@ will also work if you use C<test.imc> everywhere C<test.pasm> occurs.)
 
 Step 1: Generate the .pbc file with extra debugging information.
 
-  shell> imcc -d -o test.pbc test.pasm
+  % imcc -d -o test.pbc test.pasm
 
 Step 2: Start up parrot under GDB
 
-  shell> gdb parrot
+  % gdb parrot
 
 or
 
-  shell> emacs &
+  % emacs &
   (in emacs) M-x gdb
   (in emacs) type "parrot" so it says "gdb parrot"
 
@@ -145,4 +138,15 @@ better technique, please let the mailing list know
 
 The C<imcc> binary has a bunch of debugging flags for spewing out
 information about various aspects of its processing. See
-L<languages/imcc/docs/running.pod> for a list of flags.
+F<languages/imcc/docs/running.pod> for a list of flags.
+
+=head1 HISTORY
+
+=over 4
+
+=item Version 1.0
+
+First version by Steve Fink <steve@fink.com>
+
+=back
+

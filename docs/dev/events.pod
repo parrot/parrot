@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-events.c - design notes
+=head1 NAME
+
+docs/dev/events.pod - Design Notes for Events
 
 =head1 VERSION
 

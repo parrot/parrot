@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot
+=head1 NAME
+
+docs/parrot.pod - Parrot
 
 =head1 The Parrot Bytecode Interpreter
 
@@ -152,11 +155,11 @@ See:
 
 =over 4
 
-=item * L<http://dev.perl.org/>
+=item * http://dev.perl.org/
 
-=item * L<http://cvs.perl.org/>
+=item * http://cvs.perl.org/
 
-=item * L<http://www.parrotcode.org/>
+=item * http://www.parrotcode.org/
 
 =back
 

@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Practical Parrot Notes
+=head1 NAME
+
+docs/practical_notes.pod - Practical Parrot Notes
 
 =head1 PURPOSE
 

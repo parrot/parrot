@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-pmc_freeze.c - design notes
+=head1 NAME
+
+docs/dev/pmc_freeze.pod - Freeze/Thaw Design Notes
 
 =head1 VERSION
 

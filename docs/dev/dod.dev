@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Dead object detection (DOD)
+=head1 NAME
+
+docs/dev/dod.dev - Dead object detection (DOD)
 
 =head1 Overview
 

@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-A Parrot Overview
+=head1 NAME
+
+docs/overview.pod - A Parrot Overview
 
 =head1 The Parrot Interpreter
 
@@ -68,7 +71,7 @@ of the bytecode can define a set of custom operations that it will use.
 These areas will roughly map to compilation units of the original
 source; each precompiled module will have its own opcode table.
 
-For a closer look at Parrot ops, see L<parrot_assembly>.
+For a closer look at Parrot ops, see F<docs/pdds/pdd06_pasm.pod>.
 
 =head1 PMCs
 
@@ -150,7 +153,7 @@ offset of a given character in a string, and so on. They will, of
 course, provide a transcoding function either to the other encodings or
 just to Unicode for use as a pivot.
 
-The string handling API is explained in L<strings>.
+The string handling API is explained in F<docs/strings.pod>.
 
 =head1 Bytecode format
 
@@ -176,4 +179,4 @@ As we know, the opcode segment is next. This is optionally followed by a
 code segment for debugging purposes, which contains a munged form of the
 original program file.
 
-The bytecode format is fully documented in L<parrotbyte>.
+The bytecode format is fully documented in F<docs/parrotbyte.pod>.

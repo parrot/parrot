@@ -1,30 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot FAQ - Frequently Asked Questions
+=head1 NAME
 
-=head1 VERSION
-
-=over 4
-
-=item Revision 0.5 - 04 September 2002
-
-=item Revision 0.4 - 26 August 2002
-
-Fixed up the licensing bits
-
-=item Revision 0.3 - 13 March 2002
-
-Translated to POD and added "Why aren't we using external tool or library I<X>?"
-
-=item Revision 0.2 - 03 December 2001
-
-Added the "Parrot and Perl" section and "Why Re-implement Perl".  Incorporated Dan's Q&A items.
-
-=item Revision 0.1 - 03 December 2001
-
-Adopted from Simon Cozens's article, "Parrot: A Cross-Language Virtual Machine Architecture".
-
-=back
+docs/faq.pod - Parrot FAQ
 
 =head1 GENERAL QUESTIONS
 
@@ -439,3 +418,28 @@ be there: http://www.csse.monash.edu.au/~damian/papers/#Superpositions
 Really.: http://developer.apple.com/techpubs/mac/PPCSoftware/PPCSoftware-13.html
 
 =cut
+
+=head1 VERSION
+
+=over 4
+
+=item Revision 0.5 - 04 September 2002
+
+=item Revision 0.4 - 26 August 2002
+
+Fixed up the licensing bits
+
+=item Revision 0.3 - 13 March 2002
+
+Translated to POD and added "Why aren't we using external tool or library I<X>?"
+
+=item Revision 0.2 - 03 December 2001
+
+Added the "Parrot and Perl" section and "Why Re-implement Perl".  Incorporated Dan's Q&A items.
+
+=item Revision 0.1 - 03 December 2001
+
+Adopted from Simon Cozens's article, "Parrot: A Cross-Language Virtual Machine Architecture".
+
+=back
+

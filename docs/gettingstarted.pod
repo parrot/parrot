@@ -1,29 +1,17 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
-Parrot Developer FAQ - Getting started with Parrot? Learn the ins and outs of 
-Parrot development.
-
-=head1 VERSION
-
-=over 4
-
-=item Revision 0.1 - 27 July 2002
-
-Written to prepare for the fallout from TPC 6.
-
-=back
+docs/gettingstarted.pod - Parrot Developer FAQ
 
 =head1 DEVELOPER FAQ
-
-
 
 =head2 I'm interested in helping out. What should I do?
 
 You're already on the right track. This FAQ should help you find everything 
 you need to become an active member of the Parrot community. Just look 
 through the questions below and read the ones that apply to you.
-
-
 
 =head2 Where can I get Parrot?
 
@@ -69,7 +57,6 @@ For the Parrot CVS website with the above instructions, check out:
 
 http://cvs.perl.org/
 
-
 =head2 Now that I've got Parrot, what do I do?
 
 Now that you've downloaded Parrot, you probably want to try it out. All you 
@@ -95,8 +82,6 @@ your system.
 
 =back
 
-
-
 =head2 Where's the Parrot documentation?
 
 Well, Parrot documentation is a great place to contribute, should you be 
@@ -104,6 +89,14 @@ looking for something to do. Figure out which parts were confusing, and
 either help us fix them, or let us know where we should fix them. Luckily, 
 all of the current Parrot documentation is included along with the Parrot 
 distribution, in the /docs/ directory.
+
+There is also some experimental auto-generated HTML documentation
+available by running the following command in the Parrot distribution's
+root directory:
+
+    % perl tools/docs/write_docs.pl -s -d
+
+To view the HTML documentation start with the page F<docs/html/index.html>.
 
 There are a few categories of documentation, each with different intents. 
 It'll probably help to be aware of them before you go digging in. I highly 
@@ -346,6 +339,16 @@ http://tinderbox.perl.org/bonsai/rview.cgi?cvsroot=/home/tinder/perlcvs&dir=parr
 
 
 =back
+
+=back
+
+=head1 VERSION
+
+=over 4
+
+=item Revision 0.1 - 27 July 2002
+
+Written to prepare for the fallout from TPC 6.
 
 =back
 

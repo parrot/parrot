@@ -1,6 +1,9 @@
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
+
 =head1 NAME
 
-Parrot Subsystem Porting Introduction
+docs/porting_intro.pod - Parrot Subsystem Porting Introduction
 
 =head1 OVERVIEW
 

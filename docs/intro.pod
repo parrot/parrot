@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-The Parrot Primer
+=head1 NAME
+
+docs/intro.pod - The Parrot Primer
 
 =head1 Welcome to Parrot
 

@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Multimethod dispatch for binary opcode functions
+=head1 NAME
+
+docs/mmd.pod - Multimethod dispatch for binary opcode functions
 
 =head1 SYNOPSIS
 

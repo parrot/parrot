@@ -1,25 +1,14 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot Strings
+=head1 NAME
 
-=head1 HISTORY
-
-=over
-
-=item 4 October 2003
-
-Revised to reflect changes since Buffer/PMC unification.
-
-=back
+docs/strings.pod - Parrot Strings
 
 =head1 ABSTRACT
 
 This document describes how Parrot abstracts the programmer's interface
 to string types.
-
-=head1 ABSTRACT
-
-Parrot Strings are chunked international strings.
 
 =head1 OVERVIEW
 
@@ -314,18 +303,16 @@ frequent use. The C<transcoders> array is currently not used.
 Fill this in later; if anyone wants to implement new encodings at this
 stage they must be mad.
 
-=head1 Work In Progress
+=head1 SEE ALSO
 
-Should the following functions be mentioned?
-C<string_append>,
-C<string_from_cstring>,
-C<string_from_int>,
-C<string_from_num>,
-C<string_index>,
-C<string_replace>,
-C<string_set>,
-C<string_str_index>,
-C<string_to_cstring>,
-C<string_to_int>,
-C<string_to_num>,
-C<string_transcode>.
+F<src/string.c>, F<include/parrot/string.h>, F<include/parrot/string_funcs.h>.
+
+=head1 HISTORY
+
+=over
+
+=item 4 October 2003
+
+Revised to reflect changes since Buffer/PMC unification.
+
+=back

@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Parrot Vtables
+=head1 NAME
+
+docs/vtables.pod - Parrot Vtables
 
 =head1 Implementing Variable Types with Vtables
 
@@ -70,30 +73,30 @@ now look at how one is supposed to do this.
 
 =head2 Starting out
 
-If you're adding data types to the core of Parrot, (and you've
-checked with Dan and/or Steve that you're supposed to be doing so)
-you should be creating a file in the F<classes/> subdirectory; this is
-where all the built-in PMC classes live. (And a good source of examples
-to plunder even if you're not writing a core data type.)
+If you're adding data types to the core of Parrot, (and you've checked
+with Dan that you're supposed to be doing so) you should be creating a
+file in the F<classes/> subdirectory; this is where all the built-in PMC
+classes live. (And a good source of examples to plunder even if you're
+not writing a core data type.)
 
-You should almost always start by running F<genclass.pl> found in the
-F<classes/> subdirectory to generate a skeleton for the class. Let's
-generate a number type for the beautifully non-existent Fooby language:
+You should almost always start by running F<classes/genclass.pl> to
+generate a skeleton for the class. Let's generate a number type for the
+beautifully non-existent Fooby language:
 
-    perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
+    % perl -I../lib genclass.pl FoobyNumber > foobynumber.pmc
 
 This will produce a skeleton C file (to be preprocessed by the
-F<pmc2c.pl> program) with stubs for all the methods you need to fill in.
+F<pmc2c2.pl> program) with stubs for all the methods you need to fill in.
 The function C<init> allows you to set up anything you need to set up.
 
 Now you'll have to do something a little different depending on whether
 you're writing a built-in class or an extension class. If you're writing
 a built-in class, then you'll see a reference to
 C<enum_class_FoobyNumber> in the C<init> function. For built-in classes,
-this is automatically defined in F<pmc.h> when you run Configure.pl.
+this is automatically defined in F<pmc.h> when you run F<Configure.pl>.
 If you're not writing a built-in class, you need to indicate this by
 using the 'extension' keyword after the 'pmclass YOURCLASS' declaration
-in classes/YOURCLASS.pmc. Then, change the
+in F<classes/YOURCLASS.pmc>. Then, change the
 type of the C<init> function to return C<struct _vtable>, and then
 return C<temp_base_vtable> instead of assigning to the
 C<Parrot_base_vtables> array.
@@ -108,7 +111,7 @@ Add classes/YOURCLASS.pmc to the MANIFEST
 
 =item 2.
 
-Rerun Configure.pl to add your new PMC to the set of built-in PMCs.
+Rerun F<Configure.pl> to add your new PMC to the set of built-in PMCs.
 
 =back
 
@@ -307,6 +310,6 @@ example:
 
   pmclass PackedArray extends Array { ...
 
-See the POD documentation in classes/pmc2c.pl for a list of useful
+See the POD documentation in F<classes/pmc2c2.pl> for a list of useful
 keywords that you may use in the .pmc file. (Run
-C<perldoc -F pmc2c.pl> to view the POD.)
+C<perldoc -F pmc2c2.pl> to view the POD.)

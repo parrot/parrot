@@ -1,12 +1,9 @@
-=pod
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-=head1 TITLE
+=head1 NAME
 
-Parrot Glossary
-
-=head1 ID
-
-$Id$
+docs/glossary.pod - Parrot Glossary
 
 =head1 SUMMARY
 

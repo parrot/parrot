@@ -1,6 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-Testing Parrot
+=head1 NAME
+
+docs/tests.pod - Testing Parrot
 
 =head1 A basic guide to writing tests for Parrot
 
@@ -47,7 +50,7 @@ in the test code:
     output_is(<<'CODE', <<'OUTPUT', "name for test");
     ##PIR##
         $P0 = new Integer
-	...
+    ...
 
 =head2 C source tests
 
@@ -63,18 +66,18 @@ in the test code:
         interpreter = Parrot_new();
 
         if (!interpreter)
-	    return 1;
+        return 1;
 
         Parrot_init(interpreter);
         Parrot_run_native(interpreter, the_test);
         printf("done\n");
-	fflush(stdout);
+    fflush(stdout);
         return 0;
     }
 
     static opcode_t*
     the_test(Parrot_Interp interpreter,
-	    opcode_t *cur_op, opcode_t *start)
+        opcode_t *cur_op, opcode_t *start)
     {
         /* Your test goes here. */
 

@@ -1,10 +1,9 @@
-=head1 TITLE
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
-The Parrot Bytecode (PBC) Format
+=head1 NAME
 
-=head1 VERSION
-
-2003.11.22
+docs/parrotbyte.pod - The Parrot Bytecode (PBC) Format
 
 =head1 Format of the Parrot bytecode
 
@@ -13,10 +12,11 @@ The Parrot Bytecode (PBC) Format
   | Wordsize | Byteorder|  Major   |  Minor   |
   +----------+----------+----------+----------+
 
-The wordsize (or opcode_t size) must be 4 (32-bit) or 8 (64 bit). 
-The bytecode loader is responsible for transforming the file into the
-VM native wordsize on the fly. For performance, a utility F<pdump> is 
-provided to convert PBCs on disk if they cannot be recompiled.
+The wordsize (or C<opcode_t> size) must be 4 (32-bit) or 8 (64 bit). The
+bytecode loader is responsible for transforming the file into the VM
+native wordsize on the fly. For performance, a utility F<pdump> is
+provided to convert PBCs on disk if they cannot be recompiled. See
+F<src/pdump.c> for more information.
 
 Byteorder currently supports two values:
 (0-Little Endian, 1-Big Endian)
@@ -296,3 +296,8 @@ B<pdump> utility F<pdump.c>.
 Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 
 Format 1 description by Leopold Toetsch E<lt>lt@toetsch.atE<gt>
+
+=head1 VERSION
+
+2003.11.22
+

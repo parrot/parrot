@@ -1,17 +1,9 @@
-#
-# This file is in POD format; if you're not used to reading POD,
-# you can run the file through "perldoc" for a plain text version.
+# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# $Id$
 
+=head1 NAME
 
-=head1 TITLE
-
-Parrot JIT (i386/gcc)
-
-=head1 VERSION
-
-=head2 CURRENT
-
-14.02.2003 by Leopold Toetsch
+docs/dev/jit_i386.dev - Parrot JIT (i386/gcc)
 
 =head1 ABSTRACT
 
@@ -296,4 +288,10 @@ pointer and don't use more the 4 floating point registers at once.
 =head1 AUTHOR
 
 Leopold Toetsch <lt@toetsch.at>
+
+=head1 VERSION
+
+=head2 CURRENT
+
+14.02.2003 by Leopold Toetsch
 
