@@ -103,7 +103,52 @@ key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
 static int
 STRING_compare(Parrot_Interp interp, void *a, void *b)
 {
+#if USE_STRING_COMPARE
     return string_compare(interp, (STRING *)a, (STRING *) b);
+#else
+    /*
+     * we only won't to know if strings are the same,
+     * so this is a specialized version of string_compare
+     *
+     * XXX if we have to consider string->type too, then:
+     * * as long as there are only ascii keys: noop
+     * * on first non ascii key, convert all to utf8 - doesn't change
+     *   hash values
+     * * then if key is non-ascii and non-utf8 trancode it in
+     *   find_bucket
+     */
+    STRING *s1 = (STRING*) a;
+    STRING *s2 = (STRING*) b;
+    const char *s1start;
+    const char *s2start;
+    size_t len;
+    /*
+     * both strings aren't null
+     */
+    if (s1->strlen != s2->strlen)
+        return 1;       /* we don't care which is bigger */
+    /*
+     * both strings have equal amount of chars
+     */
+    s1start = s1->strstart;
+    s2start = s2->strstart;
+    len = (size_t) s1->bufused;
+#if 1
+    /* speed up ascii, slow down general case */
+    if (s1->encoding->index == enum_encoding_singlebyte &&
+        s2->encoding->index == enum_encoding_singlebyte) {
+        return memcmp(s1start, s2start, len);
+    }
+#endif
+
+    while (len--) {
+        if (s1->encoding->decode(s1start) != s2->encoding->decode(s2start))
+            return 1;
+        s1start = s1->encoding->skip_forward(s1start, 1);
+        s2start = s2->encoding->skip_forward(s2start, 1);
+    }
+    return 0;
+#endif
 }
 
 static size_t
