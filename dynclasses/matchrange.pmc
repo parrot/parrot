@@ -1,0 +1,444 @@
+/*
+Copyright: 2004 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/matchrange.pmc - MatchRange Numbers PMC Class
+
+=head1 DESCRIPTION
+
+C<MatchRange> provides a representation of regular expression matches,
+by describing the starting and ending offsets within the input string.
+This PMC only provides the start and end values; the Match PMC is
+responsible for interpreting these values appropriately (namely, as a
+substring within the input string.)
+
+This really probably shouldn't be a top-level class; it probably ought
+to inherit from "IntPair" or something like that. (But it can't just
+*be* "IntPair", because the Match PMC uses the type to figure out
+whether it has a regular variable or something that it needs to
+interpret as a string given its value and the input string.)
+
+This PMC is used by the languages/regex rule compiler, together with
+the Match PMC.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#define RANGE_START(pmc) PMC_int_val(pmc)
+#define RANGE_END(pmc) PMC_int_val2(pmc)
+
+int MatchRange_type_id = -1;
+
+/*
+
+=item C<static INTVAL*
+matchrange_locate_keyed_int(Parrot_Interp interp, PMC* self, STRING *key)>
+
+Interpret the string C<key>; valid keys are C<start> and C<end>,
+representing the offsets of the first and last characters of the
+matching range.
+
+=cut
+
+*/
+
+static INTVAL*
+matchrange_locate_keyed_int(Parrot_Interp interp, PMC* self, STRING *key)
+{
+    STRING *start = string_from_cstring(interp, "start", 5);
+    STRING *end;
+
+    if(0 == string_equal(interp, key, start))
+        return &RANGE_START(self);
+    end = string_from_cstring(interp, "end", 3);
+    if(0 == string_equal(interp, key, end))
+        return &RANGE_END(self);
+    internal_exception(KEY_NOT_FOUND,
+        "MatchRange: key is neither 'start' nor 'end'\n");
+    return NULL;
+}
+
+pmclass MatchRange dynpmc group match_group {
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void class_init()>
+
+Class initialization. Caches the type id of the MatchRange PMC,
+because it will be used frequently here.
+
+*/
+
+    void class_init() {
+        /* class_init_code */
+        if (pass) {
+            MatchRange_type_id = entry;
+        }
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the matchrange with [-2,-2].
+
+=item C<void init_pmc (PMC* initializer)>
+
+Initializes the matchrange number with the specified values.
+(not implemented)
+
+=item C<void destroy ()>
+
+Cleans up.
+
+=item C<PMC* clone ()>
+
+Creates an identical copy of the matchrange number.
+
+=cut
+
+*/
+
+    void init () {
+        RANGE_START(SELF) = RANGE_END(SELF) = -2;
+    }
+
+    void init_pmc (PMC* initializer) {
+        /* XXX not implemented */
+        DYNSELF.init();
+    }
+
+    void destroy () {
+    }
+
+    void morph (INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        SUPER(type);
+    }
+
+    PMC* clone () {
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_active_destroy_SET(dest);
+        RANGE_START(dest) = RANGE_START(SELF);
+        RANGE_END(dest) = RANGE_END(SELF);
+        return dest;
+    }
+
+/*
+
+=item C<INTVAL get_bool ()>
+
+Returns true if the match range is defined.
+
+=cut
+
+*/
+
+    INTVAL get_bool () {
+        return (INTVAL)(RANGE_START(SELF) != -2 && RANGE_END(SELF) != -2);
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed (PMC* key)>
+
+=item C<INTVAL get_integer_keyed_str (STRING* key)>
+
+=item C<FLOATVAL get_number_keyed (PMC* key)>
+
+=item C<FLOATVAL get_number_keyed_str (STRING* key)>
+
+=item C<PMC* get_pmc_keyed (PMC* key)>
+
+=item C<PMC* get_pmc_keyed_str (STRING* key)>
+
+Returns the requested number (real part for C<real> and imaginary for C<imag>).
+
+=cut
+
+*/
+
+    INTVAL get_integer_keyed (PMC* key) {
+        if (key_type(INTERP, key) == KEY_integer_FLAG) {
+            return SELF.get_integer_keyed_int(PMC_int_val(key));
+        } else {
+            STRING* s = VTABLE_get_string(INTERP, key);
+            return DYNSELF.get_integer_keyed_str(s);
+        }
+    }
+
+    INTVAL get_integer_keyed_str (STRING* key) {
+        return (INTVAL)(DYNSELF.get_number_keyed_str(key));
+    }
+
+    FLOATVAL get_number_keyed (PMC* key) {
+        STRING* s = VTABLE_get_string(INTERP, key);
+        return DYNSELF.get_number_keyed_str(s);
+    }
+
+    FLOATVAL get_number_keyed_str (STRING* key) {
+        INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
+        if(num)
+            return *num;
+        return 0.0;
+    }
+
+    PMC* get_pmc_keyed (PMC* key) {
+        STRING* s = VTABLE_get_string(INTERP, key);
+        return DYNSELF.get_pmc_keyed_str(s);
+    }
+
+    PMC* get_pmc_keyed_str (STRING* key) {
+        PMC *ret;
+        FLOATVAL val;
+
+        ret = pmc_new(INTERP, enum_class_Float);
+        val = DYNSELF.get_number_keyed_str(key);
+        VTABLE_set_number_native(INTERP, ret, val);
+        return ret;
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Quick hack to emulate get_start() and get_end():
+
+  key = 0 ... get start offset
+  key = 1 ... get end offset
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL v)>
+
+Set start or end depending on key
+
+*/
+
+    INTVAL get_integer_keyed_int(INTVAL key) {
+        switch (key) {
+            case 0:
+                return RANGE_START(SELF);
+            case 1:
+                return RANGE_END(SELF);
+            default:
+                internal_exception(1, "MatchRange: key must be 0 or 1");
+        }
+        return -2;
+    }
+
+    void set_integer_keyed_int(INTVAL key, INTVAL v) {
+        switch (key) {
+            case 0:
+                RANGE_START(SELF) = v;
+                break;
+            case 1:
+                RANGE_END(SELF) = v;
+                break;
+            default:
+                internal_exception(1, "MatchRange: key must be 0 or 1");
+        }
+    }
+/*
+
+=item C<void set_pmc (PMC* value)>
+
+if C<value> is a MatchRange PMC then the set the range indices to the
+same values; otherwise throw an exception. This really only makes
+sense if you're using a MatchRange from the same Match, or at least
+for the same input string, but I won't worry about that for now.
+
+=cut
+
+*/
+
+    void set_pmc (PMC* value) {
+        if(value->vtable->base_type == MatchRange_type_id) {
+            RANGE_START(SELF) = RANGE_START(value);
+            RANGE_END(SELF) = RANGE_END(value);
+        }
+        else {
+            internal_exception(1, "MatchRange: cannot set from pmc");
+        }
+    }
+
+/*
+
+=item C<void set_integer_keyed (PMC* key, INTVAL value)>
+
+=item C<void set_integer_keyed_str (STRING* key, INTVAL value)>
+
+=item C<void set_number_keyed (PMC* key, FLOATVAL value)>
+
+=item C<void set_number_keyed_str (STRING* key, FLOATVAL value)>
+
+=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+
+=item C<void set_pmc_keyed (PMC* key, PMC* value)>
+
+=item C<void set_pmc_keyed_str (STRING* key, PMC* value)>
+
+Sets the requested number (start offset for C<start> and end offset for
+C<end>) to C<value>. For the keyed_int variants, 0 means RANGE_START,
+1 means RANGE_END.
+
+=cut
+
+*/
+
+    void set_integer_keyed (PMC* key, INTVAL value) {
+        if (key_type(INTERP, key) == KEY_integer_FLAG) {
+            return SELF.set_integer_keyed_int(PMC_int_val(key), value);
+        } else {
+            STRING* s = VTABLE_get_string(INTERP, key);
+            DYNSELF.set_integer_keyed_str(s, value);
+        }
+    }
+
+    void set_integer_keyed_str (STRING* key, INTVAL value) {
+        INTVAL *num = matchrange_locate_keyed_int(INTERP, SELF, key);
+        if(num)
+            *num = value;
+    }
+
+    void set_number_keyed (PMC* key, FLOATVAL value) {
+        DYNSELF.set_integer_keyed(key, (INTVAL) value);
+    }
+
+    void set_number_keyed_str (STRING* key, FLOATVAL value) {
+        DYNSELF.set_integer_keyed_str(key, (INTVAL) value);
+    }
+
+    void set_number_keyed_int (INTVAL key, FLOATVAL value) {
+        DYNSELF.set_integer_keyed_int(key, (INTVAL) value);
+    }
+
+    void set_pmc_keyed (PMC* key, PMC* value) {
+        INTVAL f = VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_keyed(key, f);
+    }
+
+    void set_pmc_keyed_str (STRING* key, PMC* value) {
+        INTVAL f = VTABLE_get_integer(INTERP, value);
+        DYNSELF.set_integer_keyed_str(key, f);
+    }
+
+/*
+
+=item C<void add (PMC* value, PMC* dest)>
+
+=item C<void add_int (INTVAL value, PMC* dest)>
+
+=item C<void add_float (FLOATVAL value, PMC* dest)>
+
+Adds C<value> to the ending offset of the match range, placing the
+result in C<dest>.
+
+=cut
+
+*/
+
+    void add (PMC* value, PMC* dest) {
+        INTVAL v = VTABLE_get_integer(INTERP, dest);
+        SELF.add_int(v, dest);
+    }
+
+    void add_int (INTVAL value, PMC* dest) {
+        VTABLE_morph(INTERP, dest, MatchRange_type_id);
+        if (RANGE_END(SELF) == -2) {
+            if (RANGE_START(SELF) == -2) {
+                internal_exception(1, "MatchRange: cannot add to nonexistent range");
+                return;
+            }
+            RANGE_END(SELF) = RANGE_START(SELF);
+        }
+        RANGE_END(dest) = RANGE_END(SELF) + value;
+    }
+
+    void add_float (FLOATVAL value, PMC* dest) {
+        SELF.add_int((INTVAL) value, dest);
+    }
+
+/*
+
+=item C<void subtract (PMC* value, PMC* dest)>
+
+=item C<void subtract_int (INTVAL value, PMC* dest)>
+
+=item C<void subtract_float (FLOATVAL value, PMC* dest)>
+
+Subtracts C<value> from the ending offset of the match range, placing
+the result in C<dest>.
+
+=cut
+
+*/
+
+    void subtract (PMC* value, PMC* dest) {
+        INTVAL v = VTABLE_get_integer(INTERP, dest);
+        SELF.subtract_int(v, dest);
+    }
+
+    void subtract_int (INTVAL value, PMC* dest) {
+        VTABLE_morph(INTERP, dest, MatchRange_type_id);
+        RANGE_END(dest) = RANGE_END(SELF) - value;
+        if (RANGE_END(dest) <= -2 || RANGE_END(dest) < RANGE_START(dest) - 1)
+            RANGE_END(dest) = -2;
+    }
+
+    void subtract_float (FLOATVAL value, PMC* dest) {
+        SELF.subtract_int((INTVAL) value, dest);
+    }
+
+/*
+
+=item C<INTVAL is_equal (PMC* value)>
+
+Compares the matchrange number with C<value> and returs true if they
+are equal.
+
+=cut
+
+*/
+
+    INTVAL is_equal (PMC* value) {
+        if(value->vtable->base_type == MatchRange_type_id)
+            return (INTVAL)(
+                    RANGE_START(SELF) == RANGE_START(value) &&
+                    RANGE_END(SELF) == RANGE_END(value)
+                );
+        return (INTVAL)0;
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
