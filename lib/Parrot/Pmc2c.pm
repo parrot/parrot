@@ -738,27 +738,34 @@ sub init_func() {
     foreach my $method (@{ $self->{vtable}{methods}} ) {
         my $meth = $method->{meth};
         my $meth_name;
+        my $defaulted = 0;
+        my $class = '';
         if ($self->implements($meth)) {
             $meth_name = "Parrot_${classname}_$meth";
         }
         elsif (exists $self->{super}{$meth}) {
-            my $class = $self->{super}{$meth};
+            $class = $self->{super}{$meth};
             $meth_name = "Parrot_${class}_$meth";
         }
         else {
             $meth_name = "Parrot_default_$meth";
         }
+        # normal vtable method}
         unless ($method->{mmd} =~ /MMD_/) {
-            push @meths, $meth_name;  # for now push even MMDs
-            # except BXOR for testing
+            push @meths, $meth_name;
         }
-        if ($method->{mmd} =~ /MMD_/) {
+        $defaulted = 1 if $meth_name =~ /_default_/;
+        $defaulted = 1 if $class =~ /^[A-Z]/;
+        # MMD method
+        if ($method->{mmd} =~ /MMD_/ && !$defaulted) {
             my ($func, $left, $right);
             $func = $method->{mmd};
             # dynamic classes need the runtime type
             # which is passed in entry to class_init
             $left = 0;  # set to 'entry' below in initialization loop.
             $right = 0;
+            $right = 'enum_type_INTVAL'   if ($func =~ /_INT$/);
+            $right = 'enum_type_FLOATVAL' if ($func =~ /_FLOAT$/);
             push @mmds, [ $func, $left, $right, $meth_name ];
             foreach my $variant (@{ $self->{mmd_variants}{$meth} }) {
                 if ($self->pmc_is_dynpmc($variant->[0])) {
@@ -915,7 +922,7 @@ EOC
     }
     $cout .= <<"EOC";
 #define N_MMD_INIT (sizeof(_temp_mmd_init)/sizeof(_temp_mmd_init[0]))
-        Parrot_mmd_register_parents(interp, entry,
+        Parrot_mmd_register_table(interp, entry,
             _temp_mmd_init, N_MMD_INIT);
     }
 } /* Parrot_${classname}_class_init */

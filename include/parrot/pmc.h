@@ -37,7 +37,6 @@ PMC *constant_pmc_new_init(Interp *, INTVAL base_type, PMC *);
 
 INTVAL pmc_register(Interp *, STRING *);
 INTVAL pmc_type(Interp *, STRING *);
-void Parrot_mmd_register_parents(Interp*, INTVAL, const MMD_init *, INTVAL);
 
 /*
  * DOD registry interface

@@ -68,6 +68,8 @@ init_world(Interp *interpreter)
 
     /* Call base vtable class constructor methods */
     Parrot_initialize_core_pmcs(interpreter);
+    /* Create MMD_table for all MMD functions */
+    Parrot_mmd_rebuild_table(interpreter, -1, -1);
 
     /* init the interpreter globals array */
     iglobals = pmc_new(interpreter, enum_class_SArray);

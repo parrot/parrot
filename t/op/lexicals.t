@@ -16,7 +16,7 @@ Tests various lexical scratchpad operations.
 
 =cut
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 output_is(<<CODE, <<OUTPUT, "simple store and fetch");
 	new_pad 0
@@ -444,5 +444,21 @@ CODE
 /Lexical 'Wibble' not found/
 OUTPUT
 
-1;
+pir_output_is(<<'CODE', <<'OUTPUT', "current pad depth");
+.sub main @MAIN
+    new_pad 0
+    new_pad -1
+    $P0 = peek_pad
+    $I0 = elements $P0
+    print $I0
+    new_pad -1
+    $P0 = peek_pad
+    $I0 = elements $P0
+    print $I0
+    print "\n"
+.end
+CODE
+23
+OUTPUT
+
 

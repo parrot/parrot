@@ -682,7 +682,7 @@ Multiplies the complex number with C<value>, placing the result in C<dest>.
 
 */
     void multiply (PMC* value, PMC* dest) {
-MMD_PerlInt: {
+MMD_Integer: {
         FLOATVAL re = RE(SELF) * PMC_int_val(value);
         FLOATVAL im = IM(SELF) * PMC_int_val(value);
         VTABLE_morph(INTERP, dest, enum_class_Complex);
@@ -802,7 +802,7 @@ MMD_Complex: {
         }
 MMD_Float: {
 /*
-        XXX: the above really should be MMD_DEFAULT, but that causes 
+        XXX: the above really should be MMD_DEFAULT, but that causes
              t/dynclass/pycomplex.t to fail.
 */
             if(IM(SELF) != 0.0)

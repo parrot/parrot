@@ -27,6 +27,15 @@ void mmd_add_function_sub(Parrot_Interp, INTVAL, PMC*);
 void mmd_destroy(Parrot_Interp);
 PMC *mmd_vtfind(Parrot_Interp, INTVAL, INTVAL, INTVAL);
 
+typedef struct _MMD_init {
+        INTVAL func_nr;
+        INTVAL left, right;
+        funcptr_t func_ptr;
+} MMD_init;
+
+void Parrot_mmd_register_table(Interp*, INTVAL, const MMD_init *, INTVAL);
+void Parrot_mmd_rebuild_table(Interp*, INTVAL class_enum, INTVAL func_nr);
+
 funcptr_t get_mmd_dispatch_type(Interp *interpreter,
         INTVAL function, UINTVAL left_type, UINTVAL right_type, int *is_pmc);
 
@@ -39,12 +48,6 @@ typedef struct _MMD_table {
     UINTVAL funcs_in_table;  /* How many functions are in the table
                                  in question */
 } MMD_table;
-
-typedef struct _MMD_init {
-        INTVAL func_nr;
-        INTVAL left, right;
-        funcptr_t func_ptr;
-} MMD_init;
 
 /* Need this for add, subtract, multiply, divide, mod, cmod, bitwise
    (and, or, xor, lshift, rshift), concat, logical (and, or, xor),

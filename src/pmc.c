@@ -447,15 +447,13 @@ create_class_pmc(Interp *interpreter, INTVAL type)
 
 /*
 
-=item C<void Parrot_mmd_register_parents(Interp*, INTVAL type,
-   MMD_init *, INTVAL)>
+=item C<void Parrot_create_mro(Interp *interpreter, INTVAL type)>
 
-Register MMD functions for this PMC type and for its parent
+Create the MRO (method resolution order) array for this type.
 
 =cut
 
 */
-
 
 void
 Parrot_create_mro(Interp *interpreter, INTVAL type)
@@ -492,104 +490,6 @@ Parrot_create_mro(Interp *interpreter, INTVAL type)
     }
 }
 
-void
-Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
-        const MMD_init *mmd_table, INTVAL n)
-{
-    INTVAL i, j;
-    VTABLE *vtable = Parrot_base_vtables[type];
-    STRING *class_name;
-    INTVAL pos, len, parent_type;
-    PMC *class;
-    UINTVAL func_nr;
-    /*
-     * register default mmds for this type
-     */
-    for (i = 0; i < n; ++i) {
-        if (!mmd_table[i].right)
-            mmd_register(interpreter,
-                    mmd_table[i].func_nr, type,
-                    type, mmd_table[i].func_ptr);
-    }
-    /*
-     * check if this PMC has parents
-     */
-    class_name = vtable->whoami;
-    assert(string_str_index(interpreter, vtable->isa_str,
-                class_name, 0) == 0);
-    for (pos = 0; ;) {
-        len = string_length(interpreter, class_name);
-        pos += len+1;
-        if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
-            break;
-        len = string_str_index(interpreter, vtable->isa_str,
-                CONST_STRING(interpreter, " "), pos);
-        if (len == -1)
-            break;
-        class_name = string_substr(interpreter, vtable->isa_str, pos,
-                len - pos, NULL, 0);
-        /* abstract class? */
-        if (((char*)class_name->strstart)[0] >= 'a')
-            break;
-        /*
-         * parent_type = pmc_type(interpreter, class_name);
-         * the classname_hash isn't created yet
-         */
-        for (parent_type = -1, i = 1; i < enum_class_max; ++i)
-            if (string_equal(interpreter, class_name,
-                        Parrot_base_vtables[i]->whoami) == 0) {
-                parent_type = i;
-                break;
-            }
-        assert(parent_type > 0);
-        /*
-         * ok, we have the parent type
-         * remember the parent in TODO vtable->parent
-         */
-        /*
-         * register mmds for parent
-         */
-        for (func_nr = 0; func_nr < MMD_USER_FIRST; ++func_nr) {
-            funcptr_t f;
-            int is_pmc;
-            MMD_table *table = interpreter->binop_mmd_funcs + func_nr;
-
-            if (table && parent_type < type) {/* XXX */
-                int has_entry = 0;
-                for (i = 0; i < n; ++i) {
-                    if (mmd_table[i].func_nr == (int)func_nr) {
-                        if (mmd_table[i].right)
-                            has_entry = 1;
-                        break;
-                    }
-                }
-                for (j = enum_class_Float; j < type; ++j) {
-                    if (j > parent_type)
-                        continue;
-                    if (j >= enum_class_core_max || j <= enum_class_Boolean) {
-                        f = get_mmd_dispatch_type(interpreter,
-                                func_nr, parent_type, j, &is_pmc);
-                        if (f != table->default_func) {
-                            mmd_register(interpreter,
-                                    func_nr, type, j, f);
-                            if (!has_entry)
-                                mmd_register(interpreter,
-                                        func_nr, type, type, f);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    /*
-     * register specific mmds for this type
-     */
-    for (i = 0; i < n; ++i) {
-        mmd_register(interpreter,
-                mmd_table[i].func_nr, type,
-                mmd_table[i].right, mmd_table[i].func_ptr);
-    }
-}
 /*
 
 =item C<static size_t

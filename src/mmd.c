@@ -542,7 +542,7 @@ mmd_add_by_class(Interp *interpreter,
 
 =item C<void
 mmd_register(Interp *interpreter,
-             INTVAL type,
+             INTVAL func_num,
              INTVAL left_type, INTVAL right_type,
              funcptr_t funcptr)>
 
@@ -1324,13 +1324,150 @@ mmd_search_builtin(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 /*
 
+=item C<void Parrot_mmd_register_table(Interp*, INTVAL type,
+   MMD_init *, INTVAL)>
+
+Register MMD functions for this PMC type.
+
+=cut
+
+*/
+
+
+void
+Parrot_mmd_register_table(Interp* interpreter, INTVAL type,
+        const MMD_init *mmd_table, INTVAL n)
+{
+    INTVAL i;
+    /*
+     * register default mmds for this type
+     */
+    for (i = 0; i < n; ++i) {
+        if (mmd_table[i].right <= 0)
+            mmd_register(interpreter,
+                    mmd_table[i].func_nr, type,
+                    type, mmd_table[i].func_ptr);
+    }
+    /*
+     * register specific mmds for this type
+     */
+    for (i = 0; i < n; ++i) {
+        INTVAL r = mmd_table[i].right < 0 ? 0 : mmd_table[i].right;
+        mmd_register(interpreter,
+                mmd_table[i].func_nr, type, r, mmd_table[i].func_ptr);
+    }
+}
+
+static void
+mmd_rebuild_1(Interp* interpreter, UINTVAL type, INTVAL func_nr)
+{
+    PMC *mro, *parent;
+    INTVAL c, nc;
+    UINTVAL offset, x_funcs, y_funcs, other, parent_type;
+    MMD_table *table;
+    funcptr_t func;
+
+    mro = Parrot_base_vtables[type]->mro;
+    nc = VTABLE_elements(interpreter, mro);
+
+    /*
+     * if class has no parents, nothing todo
+     */
+    if (nc <= 1)
+        return;
+    /*
+     * if the class doesn't provide func_nr, nothing can be
+     * inherited
+     */
+    table = interpreter->binop_mmd_funcs + func_nr;
+    x_funcs = table->x;
+    y_funcs = table->y;
+    if (type >= x_funcs)
+        return;
+    /*
+     * go through MRO and install functions
+     */
+    for (c = 1; c < nc; ++c) {
+        parent = VTABLE_get_pmc_keyed_int(interpreter, mro, c);
+        parent_type = parent->vtable->base_type;
+        for (other = 0; other < (UINTVAL)enum_class_max; ++other) {
+            if (other >= y_funcs)
+                break;
+            /* (other, parent) */
+            offset = x_funcs * other + parent_type;
+            func = table->mmd_funcs[offset];
+            if (func == table->default_func)
+                continue;
+            if (table->mmd_funcs[x_funcs * other + type] ==
+                    table->default_func) {
+                if (other == parent_type)
+                    mmd_register(interpreter, func_nr, type, type, func);
+                mmd_register(interpreter, func_nr, type, other, func);
+            }
+            /* now for (parent, other) */
+            offset = x_funcs * parent_type + other;
+            func = table->mmd_funcs[offset];
+            if (func == table->default_func)
+                continue;
+            if (table->mmd_funcs[x_funcs * type + other] ==
+                    table->default_func) {
+                mmd_register(interpreter, func_nr, other, type, func);
+            }
+        }
+    }
+}
+
+/*
+
+=item C<void Parrot_mmd_rebuild_table(Interp*, INTVAL type, INTVAL func_nr)>
+
+Rebuild the static MMD_table for the given class type and MMD function
+number. If C<type> is negative all classes are rebuilt. If C<func_nr> is
+negative all MMD functions are rebuilt.
+
+=cut
+
+*/
+
+void
+Parrot_mmd_rebuild_table(Interp* interpreter, INTVAL type, INTVAL func_nr)
+{
+    INTVAL first_type, last_type, t;
+    INTVAL first_func, last_func, f;
+
+    if (type < 0) {
+        first_type = 1;
+        last_type = enum_class_max;
+    }
+    else {
+        first_type = type;
+        last_type = type + 1;
+    }
+    if (func_nr < 0) {
+        first_func = 0;
+        last_func = MMD_USER_FIRST;
+    }
+    else {
+        first_func = func_nr;
+        last_func = func_nr + 1;
+    }
+
+    for (f = first_func; f < last_func; ++f)
+        for (t = first_type; t < last_type; ++t) {
+            mmd_rebuild_1(interpreter, (UINTVAL)t, f);
+        }
+
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
 
 F<include/parrot/mmd.h>,
-F<$perl6/doc/trunk/design/apo/A12.pod>,
-F<$perl6/doc/trunk/design/syn/S12.pod>
+F<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
+F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
 
 =cut
 

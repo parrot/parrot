@@ -615,9 +615,6 @@ Decrements the integer.
 MMD_BigInt: {
                 bigint_add_bigint(INTERP, SELF, value, dest);
             }
-MMD_PerlInt: {
-                bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
-            }
 MMD_Integer: {
                 bigint_add_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
             }
@@ -629,9 +626,6 @@ MMD_DEFAULT: {
     void subtract(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_sub_bigint(INTERP, SELF, value, dest);
-            }
-MMD_PerlInt: {
-                bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
             }
 MMD_Integer: {
                 bigint_sub_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -654,9 +648,6 @@ MMD_DEFAULT: {
 MMD_BigInt: {
                 bigint_mul_bigint(INTERP, SELF, value, dest);
             }
-MMD_PerlInt: {
-            bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
-             }
 MMD_Integer: {
             bigint_mul_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
              }
@@ -673,9 +664,6 @@ MMD_DEFAULT: {
 MMD_BigInt: {
                 bigint_div_bigint(INTERP, SELF, value, dest);
             }
-MMD_PerlInt: {
-                bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
-            }
 MMD_Integer: {
                 bigint_div_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
             }
@@ -690,9 +678,6 @@ MMD_DEFAULT: {
     void floor_divide(PMC* value, PMC* dest) {
 MMD_BigInt: {
                 bigint_fdiv_bigint(INTERP, SELF, value, dest);
-            }
-MMD_PerlInt: {
-                bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
             }
 MMD_Integer: {
                 bigint_fdiv_bigint_int(INTERP, SELF, PMC_int_val(value), dest);
@@ -734,9 +719,6 @@ MMD_DEFAULT: {
 MMD_BigInt: {
         return bigint_cmp(INTERP, SELF, value);
             }
-MMD_PerlInt: {
-        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
-            }
 MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
@@ -749,9 +731,6 @@ MMD_DEFAULT: {
     INTVAL is_equal(PMC* value) {
 MMD_BigInt: {
         return bigint_cmp(INTERP, SELF, value) == 0;
-            }
-MMD_PerlInt: {
-        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
 MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
