@@ -869,8 +869,6 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
     /* put all the parents mro on the list
      * if they're not there already
      *
-     * XXX fix diamond problem - the oldes parent of a duplicate
-     *     has to remain
      */
     for (add_on_offset = 0; add_on_offset < add_on_count;
             add_on_offset++) {
@@ -888,9 +886,30 @@ Parrot_add_parent(Parrot_Interp interpreter, PMC *current_class_obj,
                 break;
             }
         }
-        if (!found) {
-            VTABLE_push_pmc(interpreter, current_class_array, potential);
+        if (found) {
+            /*
+             * diamond problem - the deepest parent of a duplicate
+             * has to remain. We remove the already present
+             * class at current_offset
+             *
+             * TODO use splice - fow now grab array internals
+             */
+#if 1
+            PMC **data = PMC_data(current_class_array);
+            INTVAL i;
+            assert(current_class_array->vtable->base_type ==
+                    enum_class_ResizablePMCArray);
+            for (i = current_offset; i < current_count - 1; ++i)
+                data[i] = data[i + 1];
+            PMC_int_val(current_class_array)--;
+            current_count--;
+#else
+            /* splice array */
+#endif
+
         }
+        current_count++;
+        VTABLE_push_pmc(interpreter, current_class_array, potential);
     }
     rebuild_attrib_stuff(interpreter, current_class_obj);
     return NULL;

@@ -513,9 +513,6 @@ CODE
 /Method 'nada' not found/
 OUTPUT
 
-TODO: {
-  local $TODO = "wrong init order?";
-
 output_is(<<'CODE', <<'OUTPUT', "constructor - diamond parents");
 #
 # A   B A   E
@@ -652,7 +649,7 @@ C init
 F init
 done
 OUTPUT
-};
+
 
 output_is(<<'CODE', <<'OUTPUT', "constructor - parents BUILD");
     new P10, .PerlString
