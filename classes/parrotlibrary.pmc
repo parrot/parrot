@@ -43,8 +43,8 @@ pmclass ParrotLibrary need_ext does library const_too {
 	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
 	PMC_struct_val(dest) = PMC_struct_val(SELF);
 	PMC_data(dest) = PMC_data(SELF);
-	if (SELF->metadata) {
-	    dest->metadata = VTABLE_clone(INTERP, SELF->metadata);
+	if (PMC_metadata(SELF)) {
+	    PMC_metadata(dest) = VTABLE_clone(INTERP, PMC_metadata(SELF));
 	}
 	return dest;
     }

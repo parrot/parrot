@@ -57,7 +57,7 @@ pmclass PerlString extends perlscalar {
         STRING* s2 = (STRING*)PMC_str_val(other);
         return (INTVAL)( other->vtable == SELF->vtable &&
                           s1->bufused   == s2->bufused  &&
-            (memcmp(s1->strstart,s2->bufstart,(size_t)s1->bufused)==0));
+            (memcmp(s1->strstart,PObj_bufstart(s2),(size_t)s1->bufused)==0));
     }
 
     void set_integer_native (INTVAL value) {

@@ -92,7 +92,7 @@ pmclass default abstract noinit {
     void init_pmc_props (PMC* initializer, PMC* properties) {
 	if (!SELF->pmc_ext)
 	    add_pmc_ext(INTERP, SELF);
-	SELF->metadata = properties;
+	PMC_metadata(SELF) = properties;
 	if (initializer)
 	    DYNSELF.init_pmc(initializer);
 	else
@@ -105,8 +105,8 @@ pmclass default abstract noinit {
     }
 
     PMC* getprop(STRING* key) {
-	if (SELF->pmc_ext && SELF->metadata) {
-	  return VTABLE_get_pmc_keyed_str(interpreter, SELF->metadata, key);
+	if (SELF->pmc_ext && PMC_metadata(SELF)) {
+	  return VTABLE_get_pmc_keyed_str(interpreter, PMC_metadata(SELF), key);
 	}
         else {
 	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
@@ -117,25 +117,25 @@ pmclass default abstract noinit {
     void setprop(STRING* key, PMC* value) {
 
 	check_set_std_props(INTERP, SELF, key, value);
-	if (SELF->pmc_ext && SELF->metadata) {
+	if (SELF->pmc_ext && PMC_metadata(SELF)) {
 	  VTABLE_set_pmc_keyed_str(interpreter,
-			  SELF->metadata, key, value);
+			  PMC_metadata(SELF), key, value);
 	} else {
           if (!SELF->pmc_ext)
               add_pmc_ext(INTERP, SELF);
           /* first make new hash */
-	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  VTABLE_init(interpreter, SELF->metadata);
+	  PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
+	  VTABLE_init(interpreter, PMC_metadata(SELF));
 	  /* then the key, else it vanishes with --gc-debug */
 	  VTABLE_set_pmc_keyed_str(interpreter,
-			  SELF->metadata, key, value);
+			  PMC_metadata(SELF), key, value);
 	}
 	return;
     }
 
     void delprop(STRING* key) {
-	if (SELF->pmc_ext && SELF->metadata) {
-	  VTABLE_delete_keyed_str(interpreter, SELF->metadata, key);
+	if (SELF->pmc_ext && PMC_metadata(SELF)) {
+	  VTABLE_delete_keyed_str(interpreter, PMC_metadata(SELF), key);
 	}
         return;
     }
@@ -143,11 +143,11 @@ pmclass default abstract noinit {
     PMC* getprops() {
         if (!SELF->pmc_ext)
              add_pmc_ext(INTERP, SELF);
-	if (!SELF->metadata) {
-	  SELF->metadata = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  VTABLE_init(interpreter, SELF->metadata);
+	if (!PMC_metadata(SELF)) {
+	  PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
+	  VTABLE_init(interpreter, PMC_metadata(SELF));
 	}
-    	return SELF->metadata;
+    	return PMC_metadata(SELF);
     }
 
     INTVAL type () {
@@ -307,14 +307,14 @@ pmclass default abstract noinit {
 
     void visit(visit_info *info) {
 	/* default - mark prop hash */
-        if (SELF->pmc_ext && SELF->metadata &&
+        if (SELF->pmc_ext && PMC_metadata(SELF) &&
 		info->extra_flags != EXTRA_IS_PROP_HASH) {
 	    info->extra_flags = EXTRA_IS_PROP_HASH;
-	    info->extra = SELF->metadata;
+	    info->extra = PMC_metadata(SELF);
 	    /* place escape mark */
 	    (info->visit_pmc_now)(interpreter, SELF, info);
 	    /* place and the prop hash */
-	    (info->visit_pmc_now)(interpreter, SELF->metadata, info);
+	    (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
 	}
 
     }
@@ -328,8 +328,8 @@ pmclass default abstract noinit {
 	if (info->extra_flags == EXTRA_IS_PROP_HASH) {
 	    if (!SELF->pmc_ext)
 		add_pmc_ext(INTERP, SELF);
-	    info->thaw_ptr = &SELF->metadata;
-	    (info->visit_pmc_now)(interpreter, SELF->metadata, info);
+	    info->thaw_ptr = &PMC_metadata(SELF);
+	    (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
 	}
 	else
 	    DYNSELF.init();

@@ -32,30 +32,43 @@
 
 typedef union UnionVal {
     struct {                    /* Buffers structure */
-        void * bufstart;
-        size_t buflen;
-    } b;
+        void * _bufstart;
+        size_t _buflen;
+    } _b;
     struct {                    /* PMC unionval members */
         DPOINTER* _struct_val;   /* two ptrs, both are defines */
         PMC* _pmc_val;
-    } ptrs;
-    INTVAL int_val;
-    FLOATVAL num_val;
-    struct parrot_string_t * string_val;
+    } _ptrs;
+    INTVAL _int_val;
+    FLOATVAL _num_val;
+    struct parrot_string_t * _string_val;
 } UnionVal;
 
-#define struct_val ptrs._struct_val
-#define pmc_val ptrs._pmc_val
+#define UVal_ptr(u)       (u)._ptrs._struct_val
+#define UVal_pmc(u)       (u)._ptrs._pmc_val
+#define UVal_int(u)       (u)._int_val
+#define UVal_num(u)       (u)._num_val
+#define UVal_str(u)       (u)._string_val
+#define UVal_bufstart(u)  (u)._b._bufstart
+#define UVal_buflen(u)    (u)._b._buflen
 
-#define PMC_ptr1v(pmc) (pmc)->cache.struct_val
-#define PMC_ptr2p(pmc) (pmc)->cache.pmc_val
+/* BEGIN DEPRECATED UVAL ACCESSOR MACROS */
+#define num_val _num_val
+#define int_val _int_val
+#define string_val _string_val
+#define struct_val _ptrs._struct_val
+#define pmc_val _ptrs._pmc_val
+
+#define PMC_ptr1v(pmc) PMC_struct_val(pmc)
+#define PMC_ptr2p(pmc) PMC_pmc_val(pmc)
+/* END DEPRECATED UVAL ACCESSOR MACROS */
 
 /* Parrot Object - base class for all others */
 typedef struct pobj_t {
     UnionVal u;
     Parrot_UInt flags;
 #if ! DISABLE_GC_DEBUG
-    UINTVAL pobj_version;
+    UINTVAL _pobj_version;
 #endif
 } pobj_t;
 
@@ -66,11 +79,25 @@ typedef struct Buffer {
 
 typedef Buffer PObj;
 
+#define PObj_bufstart(pmc)     (pmc)->obj.u._b._bufstart
+#define PObj_buflen(pmc)       (pmc)->obj.u._b._buflen
+#define PMC_struct_val(pmc)   (pmc)->obj.u._ptrs._struct_val
+#define PMC_pmc_val(pmc)      (pmc)->obj.u._ptrs._pmc_val
+#define PMC_int_val(pmc)      (pmc)->obj.u._int_val
+#define PMC_num_val(pmc)      (pmc)->obj.u._num_val
+#define PMC_str_val(pmc)      (pmc)->obj.u._string_val
+
+/* BEGIN DEPRECATED BUFFER ACCESSORS */
 /* macros for accessing old buffer members */
-#define bufstart obj.u.b.bufstart
-#define buflen   obj.u.b.buflen
+#define bufstart obj.u._b._bufstart
+#define buflen   obj.u._b._buflen
+/* END DEPRECATED BUFFER ACCESSORS */
+
 #if ! DISABLE_GC_DEBUG
-#  define pobj_version obj.pobj_version
+/* BEGIN DEPRECATED POBJ ACCESSOR */
+#  define pobj_version obj._pobj_version
+/* END DEPRECATED POBJ ACCESSOR */
+#  define PObj_version(pobj)  (pobj)->obj._pobj_version
 #endif
 
 struct parrot_string_t {
@@ -134,13 +161,6 @@ struct PMC_EXT {
 
 typedef struct PMC_EXT PMC_EXT;
 
-#define PMC_bufstart(pmc)     (pmc)->obj.u.b.bufstart
-#define PMC_buflen(pmc)       (pmc)->obj.u.b.buflen
-#define PMC_struct_val(pmc)   (pmc)->obj.u.ptrs._struct_val
-#define PMC_pmc_val(pmc)      (pmc)->obj.u.ptrs._pmc_val
-#define PMC_int_val(pmc)      (pmc)->obj.u.int_val
-#define PMC_num_val(pmc)      (pmc)->obj.u.num_val
-#define PMC_str_val(pmc)      (pmc)->obj.u.string_val
 #if PMC_DATA_IN_EXT
 #  define PMC_data(pmc)       (pmc)->pmc_ext->data
 #else

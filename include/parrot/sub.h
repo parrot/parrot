@@ -33,7 +33,7 @@ typedef struct Parrot_Sub {
     char *packed;       /* to simplify packing Constant Subs */
 } * parrot_sub_t;
 
-#define PMC_sub(pmc) LVALUE_CAST(parrot_sub_t, (pmc)->cache.pmc_val)
+#define PMC_sub(pmc) LVALUE_CAST(parrot_sub_t, PMC_pmc_val(pmc))
 
 /* the first entries must match Parrot_Sub, so we can cast
  * these two to the other type
