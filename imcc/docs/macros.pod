@@ -14,16 +14,17 @@ This document describes the macro layer of IMCC.
 The macro support for IMCC was designed to be a drop in replacement for
 the original F<assemble.pl> macro layer.
 
-One exception is B<.constant> which is PASM mode only. Please use the
-B<.const> directive for PIR mode. Also note that you have to use B<.sym>
-inside macros to define symbols, B<.local> is used for local labels.
+One exception is the B<.constant> macro, which is only usable in PASM mode. 
+For PIR mode, please use the B<.const> directive instead. Also note that you 
+have to use B<.sym> inside macros to define symbols, as B<.local> is used for 
+local labels.
 
 The addition of the '.' preface will hopefully make things easier to
 parse, inasmuch as everything within an assembler file that needs to
 be expanded or processed by the macro engine will have a period ('.')
 prepended to it.
 
-The macro layer implements constants, macros, local labels and
+The macro layer implements constants, macros, local labels and 
 including of files.
 
 A macro definition starts with a line consisting of ".macro", the
@@ -38,24 +39,24 @@ formal parameters, preceded by a '.', are valid macros.
     set .B,.TEMP
   .endm                  # And . marks the end of the macro.
 
-Macros support labels that are local to a given macro expansion, and the syntax
-looks something like this:
+Macros support labels, defined using B<.local>, that are local to a 
+given macro expansion. The syntax looks something like this:
 
   .macro SpinForever (Count)
-    .local $LOOP: dec .COUNT # ".local $LOOP" defines a local label.
+    .local $LOOP: dec .COUNT    # ".local $LOOP" defines a local label.
                   branch .$LOOP # Jump to said label.
   .endm
 
-Include this macro as many times as you like, and the branch statement should
+Include this macro as many times as you like; the branch statement should
 do the right thing every time. To use a global label, do just as you usually do.
 
-Constants are new, and the syntax looks like:
+Constants are new and the syntax looks like:
 
   .constant Hash 6 # Again, . marks the directive
 
   new P0, .Hash # . marks the special variable for expansion.
 
-Several constants are predefined, namely the PMC-Classes.
+Several constants are predefined, namely the PMC classes, e.g.
 
   .constant Array 0
   .constant PerlUndef 1
@@ -64,8 +65,9 @@ Several constants are predefined, namely the PMC-Classes.
 The ".include" statement is followed by a string literal. The file of
 this name is include literally in the assembly.
 
-The include file is searched in the current directory and in
-F<runtime/parrot/include> in that order.
+The include file is searched for in the current directory and in
+F<runtime/parrot/include>, in that order. The first file of that name
+to be found is included.
 
 =head2 Expansion
 
