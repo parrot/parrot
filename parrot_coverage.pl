@@ -63,6 +63,12 @@ foreach my $da_file (@dafiles) {
         my $source_file = $gcov_file;
         $source_file =~ s/\.gcov$//g;
 
+        # avoid collisions where multiple files are generated from the 
+        # same back-end file (core.ops, for example)
+        if (exists($file_line_coverage{$source_file})) {
+            $source_file = "$source_file (from $da_file)";
+        }
+
         print "Processing $gcov_file ($source_file)\n";
 
         foreach (split "\n", $generated_files{$gcov_file}) {
