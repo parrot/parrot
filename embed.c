@@ -285,7 +285,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
         PIO_eprintf(interpreter,
-                "*** Parrot VM: Setting up ARGV array in P0.  Current argc: %d ***\n",
+                "*** Parrot VM: Setting up ARGV array in P5.  Current argc: %d ***\n",
                 argc);
     }
 
