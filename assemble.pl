@@ -6,7 +6,8 @@
 #
 
 use strict;
-use lib 'lib';
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Parrot::Assembler;
 
 init_assembler(@ARGV);
