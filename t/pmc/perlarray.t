@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
@@ -830,6 +830,90 @@ CODE
 0;1
 1;0
 1;1
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "push/pop");
+    new P0, .PerlArray
+    new P1, .PerlInt
+    set P1, 42
+    push P0, P1
+    set I0, 43
+    push P0, I0
+    set S0, "44"
+    push P0, S0
+    set N0, 45.4711
+    push P0, N0
+
+    pop N2, P0
+    eq N2, 45.4711, ok_1
+    print "pop num failed "
+ok_1:
+    pop S2, P0
+    eq S2, "44", ok_2
+    print "pop str failed "
+ok_2:
+    pop I2, P0
+    eq I2, 43, ok_3
+    print "pop int failed "
+ok_3:
+    pop P2, P0
+    set I2, P2
+    eq I2, 42, ok_4
+    print "pop perlint failed "
+ok_4:
+    set I0, P0
+    eq I0, 0, ok_5
+    print "len != 0 "
+
+    print "\n"
+    end
+ok_5:
+    print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "unshift/shift");
+    new P0, .PerlArray
+    new P1, .PerlInt
+    set P1, 42
+    unshift P0, P1
+    set I0, 43
+    unshift P0, I0
+    set S0, "44"
+    unshift P0, S0
+    set N0, 45.4711
+    unshift P0, N0
+
+    shift N2, P0
+    eq N2, 45.4711, ok_1
+    print "shift num failed "
+ok_1:
+    shift S2, P0
+    eq S2, "44", ok_2
+    print "shift str failed "
+ok_2:
+    shift I2, P0
+    eq I2, 43, ok_3
+    print "shift int failed "
+ok_3:
+    shift P2, P0
+    set I2, P2
+    eq I2, 42, ok_4
+    print "shift perlint failed "
+ok_4:
+    set I0, P0
+    eq I0, 0, ok_5
+    print "len != 0 "
+
+    print "\n"
+    end
+ok_5:
+    print "ok\n"
+    end
+CODE
+ok
 OUTPUT
 
 1;
