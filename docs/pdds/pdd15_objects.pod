@@ -515,6 +515,437 @@ but it will soon. The restriction on parent list changes and attribute
 addition will be lifted in future releases, though doing so will be an
 expensive operation.
 
+=head1 VTABLE OVERLOADING
+
+Classes may override the vtable methods, allowing objects of a class
+to behave like a primitive PMC. Each vtable slot has a
+corresponding named method that parrot looks for in your class
+hierarchy when an object is used in a primitive context.
+
+To use these properly at a low-level requires a good working knowledge
+of the way Parrot works--generally for higher-level languages the
+language compiler or runtime will provide easier-to-use
+wrappers. These methods are all prototyped, and take a single fixed
+argument list, and return at most a single value.
+
+While vtable methods I<may> take a continuation, those continuations
+may I<not> escape the vtable method's execution. This is due to the
+way that vtable methods are called by the interpreter--once a vtable
+method is exited any continuation taken within it is no longer valid
+and may not be used.
+
+Note that any class method that wishes to use parrot's multi-method
+dispatch system may do so. This is, in fact, encouraged, though it is
+not required. In the absence of explicit multimethod dispatch, a
+left-side wins scheme is used.
+
+The following list details the raw method names:
+
+=over 4
+
+=item __init
+
+Called when the object is first created.
+
+=item __init_pmc
+
+=item __init_pmc_props
+
+=item __morph
+
+=item __mark
+
+Called when the DOD is tracing live PMCs. If this method is called
+then the code must mark all strings and PMCs that it contains as
+live, otherwise they may be collected.
+
+This method is only called if the PMC is flagged as having a special
+mark routine, and is not necessary for normal objects.
+
+=item __destroy
+
+Called when the object is destroyed. This method is only called if
+the PMC is marked as having an active finalizer.
+
+=item __getprop
+
+=item __setprop
+
+=item __delprop
+
+=item __getprops
+
+=item __type
+
+=item __type_keyed
+
+=item __type_keyed_int
+
+=item __type_keyed_str
+
+=item __subtype
+
+=item __name
+
+=item __clone
+
+=item __find_method
+
+=item __get_integer
+
+Return the integer value of the object
+
+=item __get_integer_keyed
+
+=item __get_integer_keyed_int
+
+=item __get_integer_keyed_str
+
+=item __get_number
+
+Return the floating-point value of the object
+
+=item __get_number_keyed
+
+=item __get_number_keyed_int
+
+=item __get_number_keyed_str
+
+=item __get_bignum
+
+Return the extended precision numeric value of the PMC
+
+=item __get_bignum_keyed
+
+=item __get_bignum_keyed_int
+
+=item __get_bignum_keyed_str
+
+=item __get_string
+
+Return the string value of the PMC
+
+=item __get_string_keyed
+
+=item __get_string_keyed_int
+
+=item __get_string_keyed_str
+
+=item __get_bool
+
+Return the true/false value of the PMC
+
+=item __get_bool_keyed
+
+=item __get_bool_keyed_int
+
+=item __get_bool_keyed_str
+
+=item __get_pmc
+
+Return the PMC for this PMC. 
+
+=item __get_pmc_keyed
+
+=item __get_pmc_keyed_int
+
+=item __get_pmc_keyed_str
+
+=item __get_pointer
+
+=item __get_pointer_keyed
+
+=item __get_pointer_keyed_int
+
+=item __get_pointer_keyed_str
+
+=item __set_integer_native
+
+Set the integer value of this PMC
+
+=item __set_integer_same
+
+=item __set_integer_keyed
+
+=item __set_integer_keyed_int
+
+=item __set_integer_keyed_str
+
+=item __set_number_native
+
+Set the floating-point value of this PMC
+
+=item __set_number_same
+
+=item __set_number_keyed
+
+=item __set_number_keyed_int
+
+=item __set_number_keyed_str
+
+=item __set_bignum_native
+
+Set the extended-precision value of this PMC
+
+=item __set_bignum_same
+
+=item __set_bignum_keyed
+
+=item __set_bignum_keyed_int
+
+=item __set_bignum_keyed_str
+
+=item __set_string_native
+
+Set the string value of this PMC
+
+=item __set_string_same
+
+=item __set_string_keyed
+
+=item __set_string_keyed_int
+
+=item __set_string_keyed_str
+
+=item __set_bool
+
+Set the true/false value of this PMC
+
+=item __set_bool_keyed
+
+=item __set_bool_keyed_int
+
+=item __set_bool_keyed_str
+
+=item __set_pmc
+
+Set the PMC to the PMC passed in
+
+=item __set_pmc_keyed
+
+=item __set_pmc_keyed_int
+
+=item __set_pmc_keyed_str
+
+=item __set_pointer
+
+=item __set_pointer_keyed
+
+=item __set_pointer_keyed_int
+
+=item __set_pointer_keyed_str
+
+=item __elements
+
+Return the number of elements in the PMC, if the PMC is treated as an
+aggregate.
+
+=item __pop_integer
+
+=item __pop_float
+
+=item __pop_bignum
+
+=item __pop_string
+
+=item __pop_pmc
+
+=item __push_integer
+
+=item __push_float
+
+=item __push_bignum
+
+=item __push_string
+
+=item __push_pmc
+
+=item __shift_integer
+
+=item __shift_float
+
+=item __shift_bignum
+
+=item __shift_string
+
+=item __shift_pmc
+
+=item __unshift_integer
+
+=item __unshift_float
+
+=item __unshift_bignum
+
+=item __unshift_string
+
+=item __unshift_pmc
+
+=item __splice
+
+=item __add
+
+=item __add_int
+
+=item __add_bignum
+
+=item __add_float
+
+=item __subtract
+
+=item __subtract_int
+
+=item __subtract_bignum
+
+=item __subtract_float
+
+=item __multiply
+
+=item __multiply_int
+
+=item __multiply_bignum
+
+=item __multiply_float
+
+=item __divide
+
+=item __divide_int
+
+=item __divide_bignum
+
+=item __divide_float
+
+=item __modulus
+
+=item __modulus_int
+
+=item __modulus_bignum
+
+=item __modulus_float
+
+=item __cmodulus
+
+=item __cmodulus_int
+
+=item __cmodulus_bignum
+
+=item __cmodulus_float
+
+=item __neg
+
+=item __bitwise_or
+
+=item __bitwise_or_int
+
+=item __bitwise_and
+
+=item __bitwise_and_int
+
+=item __bitwise_xor
+
+=item __bitwise_xor_int
+
+=item __bitwise_ors
+
+=item __bitwise_ors_str
+
+=item __bitwise_ands
+
+=item __bitwise_ands_str
+
+=item __bitwise_xors
+
+=item __bitwise_xors_str
+
+=item __bitwise_not
+
+=item __bitwise_shl
+
+=item __bitwise_shl_int
+
+=item __bitwise_shr
+
+=item __bitwise_shr_int
+
+=item __concatenate
+
+=item __concatenate_native
+
+=item __is_equal
+
+=item __is_same
+
+=item __cmp
+
+=item __cmp_num
+
+=item __cmp_string
+
+=item __logical_or
+
+=item __logical_and
+
+=item __logical_xor
+
+=item __logical_not
+
+=item __repeat
+
+=item __repeat_int
+
+=item __increment
+
+=item __decrement
+
+=item __exists_keyed
+
+=item __exists_keyed_int
+
+=item __exists_keyed_str
+
+=item __defined
+
+=item __defined_keyed
+
+=item __defined_keyed_int
+
+=item __defined_keyed_str
+
+=item __delete_keyed
+
+=item __delete_keyed_int
+
+=item __delete_keyed_str
+
+=item __nextkey_keyed
+
+=item __nextkey_keyed_int
+
+=item __nextkey_keyed_str
+
+=item __substr
+
+=item __substr_str
+
+=item __invoke
+
+=item __can
+
+=item __does
+
+=item __isa
+
+=item __freeze
+
+=item __thaw
+
+=item __thawfinish
+
+=item __visit
+
+=item __share
+
+=back
+
 =head1 TRANSLATION AND GLOSSARY
 
 Since every object system on the planet shares a common set of terms

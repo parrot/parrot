@@ -380,6 +380,21 @@ implement.
 
 ###############################################################################
 
+=item B<makemmd>(in PMC, in INT)
+
+Makes vtable entry $2 use parrot's multimethod dispatch system
+
+
+=item B<mmdfunc>(in INT, in PMC, in PMC, in PMC)
+
+Make $4 the function called when MMD function $1 is called for
+types $2 and $3.
+
+=item B<mmddispatch>(out PMC, in INT, in PMC, in PMC)
+
+Do a multimethod dispatch for binary MMD function $2 on PMCs $3 and $4, and
+put the result in $1.
+
 =back
 
 =head1 COPYRIGHT
