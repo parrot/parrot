@@ -15,6 +15,15 @@ my %pack_type;
 %pack_type = (i => 'l',
 	      n => 'd',
 	  );
+
+my %real_type=('i'=>'i',
+              'n'=>'n',
+              'N'=>'i',
+              'I'=>'i',
+              'S'=>'i',
+              's'=>'i',
+              'D'=>'i');
+
 my $sizeof_packi = length(pack($pack_type{i},1024));
 
 open GUTS, "interp_guts.h";
@@ -31,8 +40,11 @@ while (<OPCODES>) {
     s/^\s+//;
     next unless $_;
     my ($name, $args, @types) = split /\s+/, $_;
+    my @rtypes=@types;
+    @types=map { $_ = $real_type{$_}} @types;
     $opcodes{$name}{ARGS} = $args;
     $opcodes{$name}{TYPES} = [@types];
+    $opcodes{$name}{RTYPES}=[@rtypes];
 }
 
 my $pc = 0;
@@ -71,25 +83,18 @@ while ($_ = shift @code) {
     if (@args != $opcodes{$opcode}{ARGS}) {
 	die "wrong arg count--got ". scalar @args. " needed " . $opcodes{$opcode}{ARGS};
     }
-
-    $args[0] = fixup($args[0])
-        if $opcode eq "branch_ic" and $args[0] =~ /[a-zA-Z]/;
-
-#    if ($opcode eq "eq_i_ic" or $opcode eq "lt_i_ic") {
-    if ($opcode =~ /^(eq|ne|lt|le|gt|ge)_i_ic$/) {
-        $args[2] = fixup($args[2]) if $args[2] =~ /[a-zA-Z]/;
-        $args[3] = fixup($args[3]) if $args[3] =~ /[a-zA-Z]/;
-    }
-    if ($opcode eq "if_i_ic") {
-        $args[1] = fixup($args[1]) if $args[1] =~ /[a-zA-Z]/;
-        $args[2] = fixup($args[2]) if $args[2] =~ /[a-zA-Z]/;
-    }
-
     $output .= pack "l", $opcodes{$opcode}{CODE};
     foreach (0..$#args) {
-	$args[$_] =~ s/^[INPS]?(\d+)$/$1/i;
-	my $type = $pack_type{$opcodes{$opcode}{TYPES}[$_]};
-	$output .= pack $type, $args[$_];
+       my($rtype)=$opcodes{$opcode}{RTYPES}[$_];
+       my($type)=$opcodes{$opcode}{TYPES}[$_];
+       if($rtype eq "I" || $rtype eq "N" || $rtype eq "P" || $rtype eq "S") {
+           # its a register argument
+           $args[$_]=~s/^[INPS](\d+)$/$1/i;
+       } elsif($rtype eq "D") {
+           # a destination
+           $args[$_]=fixup($args[$_]);
+       }
+       $output .= pack $type, $args[$_];
     }
     $pc += 1+@args;
 }
@@ -121,7 +126,10 @@ sub emit_constants_section {
     for (@constants) {
         $size += 4*$sizeof_packi;
         $size += length($_);
-        $size += length($_) % $sizeof_packi; # Padding
+	my($pad)=length($_) % $sizeof_packi;
+	if($pad) {
+	    $size+=$sizeof_packi-$pad;
+	}
     }
 
     $size += $sizeof_packi if @constants; # That's for the number of constants
@@ -136,6 +144,9 @@ sub emit_constants_section {
         $output .= pack($pack_type{i},0) x 3; # Flags, encoding, type
         $output .= pack($pack_type{i},length($_)); # Strlen followed by that many bytes.
         $output .= $_;
-        $output .= "\0" x (length($_) % $sizeof_packi); # Padding;
+	my $pad=(length($_) % $sizeof_packi);
+	if($pad) {
+	    $output .= "\0" x ($sizeof_packi-(length($_) % $sizeof_packi)); # Padding;
+       }
     }
 }

@@ -79,6 +79,7 @@ read_constants_table(void** program_code)
         IV encoding = GRAB_IV(program_code);
         IV type     = GRAB_IV(program_code);
         IV buflen   = GRAB_IV(program_code);
+	int pad;
 
         len -= 4 * sizeof(IV);
 
@@ -87,10 +88,12 @@ read_constants_table(void** program_code)
         len -= buflen;
 
         /* Padding */
-        if (buflen % sizeof(IV)) {
-            len -= buflen % sizeof(IV);
-            (char*)*program_code += buflen % sizeof(IV);
-        }
+	pad=buflen % sizeof(IV);
+	if(pad) {
+	  pad=sizeof(IV)-pad;
+	  len -= pad;
+	  (char*)*program_code += pad;       
+	}
         num--;
         if (len < 0 || (len > 0 && num == 0)) {
             printf("Bytecode error: string constant segment corrupted: %i, %i\n", (int) len, (int) num);

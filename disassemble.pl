@@ -8,12 +8,21 @@ use strict;
 
 my(%opcodes, @opcodes);
 
-my %unpack_type;
-%unpack_type = (i => 'l',
-		n => 'd',
-		);
+my %unpack_type = (i => 'l',
+		   I => 'l',
+		   n => 'd',
+		   N => 'l',
+		   D => 'l',
+		   S => 'l',
+		   s => 'l',
+                  );
 my %unpack_size = (i => 4,
 		   n => 8,
+		   I => 4,
+		   N => 4,
+		   D => 4,
+		   S => 4,
+		   s => 4,
 		   );
 
 open GUTS, "interp_guts.h";
@@ -49,18 +58,54 @@ my $fixups = unpack('l', <>);
 # No fixups yet
 
 my $constants = unpack('l', <>);
-# Skip for now
-
+if($constants) {
+    my $count=unpack('l', <>);
+    print "# Constants: $count entries ($constants bytes)\n";
+    print "# ID  Flags    Encoding Type     Size     Data\n"; 
+    foreach (1..$count) {
+       my $flags=unpack('l',<>);
+       my $encoding=unpack('l',<>);
+       my $type=unpack('l',<>);
+       my $size=unpack('l',<>);
+       my $data="";
+       while(length($data) < $size) {
+           $data.=<>;
+       }
+       # strip off any padding nulls
+       $data=substr($data,0,$size);
+       printf("%04x: %08x %08x %08x %08x %s\n",$_-1,$flags,$encoding,$type,$size,$data);
+    }
+}
+print "# Code Section\n";
+my $offset=0;
 while (<>) {
     my $code = unpack 'l', $_;
     my $args = $opcodes[$code]{ARGS};
-    print $opcodes[$code]{NAME};
+    my $op_offset=$offset;
+    print sprintf("%08x:  ",$offset),$opcodes[$code]{NAME},"\t";
+    my @args=();
+    $offset+=4;
     if ($args) {
 	foreach (1..$args) {
-	    local $/ = \$unpack_size{$opcodes[$code]{TYPES}[$_-1]};
+	    my $type=$opcodes[$code]{TYPES}[$_-1];
+	    local $/ = \$unpack_size{$type};
+	    $offset+=$unpack_size{$type};
 	    my $data = <> || die("EOF when expecting argument!\n");
-	    print " ", unpack $unpack_type{$opcodes[$code]{TYPES}[$_-1]}, $data;
+	    if($type eq "I" || $type eq "N" || $type eq "P" || $type eq "S") {
+		# register
+		push(@args,$type.unpack($unpack_type{$type},$data));
+	    } elsif($type eq "D") {
+		# destination address
+		push(@args,sprintf("%08x",$op_offset+unpack($unpack_type{$type},$data)*4));
+	    } elsif($type eq "s") {
+		# string constant
+		push(@args,sprintf("[string %04x]",unpack($unpack_type{$type},$data)));
+		
+	    } else { 
+		# constant
+		push(@args,unpack $unpack_type{$type}, $data);
+	    }
 	}
     }
-    print "\n";
+    print join(", ",@args),"\n";
 }

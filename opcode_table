@@ -10,6 +10,15 @@
 # The arg_types are the types to be packed (integer, number, whatever) 
 # not the type of the register or anything. So N3 is still an i, since that
 # 3 specifying the register should be packed as an integer.
+# Revised arg types:
+#      i       Integer constant
+#      I       Integer register
+#      n       Numeric constant
+#      N       Numeric register
+#      s       String constant?
+#      S       String register
+#      D       Destination 
+
 
 # This must be opcode zero
 
@@ -17,65 +26,66 @@ end	0
 
 # Integer ops
 
-set_i_ic	2	i i
-set_i	2	i i
-add_i	3	i i i
-sub_i	3	i i i
-mul_i	3	i i i
-div_i	3	i i i
-inc_i	1	i
-inc_i_ic	2	i i
-dec_i	1	i
-dec_i_ic	2	i i
+set_i_ic       2       I i
+set_i  2       I I
+add_i  3       I I I
+sub_i  3       I I I
+mul_i  3       I I I
+div_i  3       I I I
+inc_i  1       I
+inc_i_ic       2       I i
+dec_i  1       I
+dec_i_ic       2       I i
 
 # NUM ops
 
-set_n_nc	2	i n
-add_n	3	i i i
-sub_n	3	i i i
-mul_n	3	i i i
-div_n	3	i i i
-inc_n	1	i
-inc_n_nc	2	i n
-dec_n	1	i
-dec_n_nc	2	i n
+set_n_nc       2       N n
+add_n  3       N N N
+sub_n  3       N N N
+mul_n  3       N N N
+div_n  3       N N N
+inc_n  1       N
+inc_n_nc       2       N n
+dec_n  1       N
+dec_n_nc       2       N n
 
 # String ops
 
-set_s_sc	2	i i
-print_s	1	i
-length_i_s	2	i i
-chopn_s_ic	2	i i
+set_s_sc       2       S s
+print_s        1       S
+length_i_s     2       I S
+chopn_s_ic     2       S i
 
 # Comparators
 
-eq_i_ic	4	i i i i
-eq_n_ic	4	i i i i
-ne_i_ic	4	i i i i
-lt_i_ic	4	i i i i
-le_i_ic	4	i i i i
-gt_i_ic	4	i i i i
-ge_i_ic	4	i i i i
+eq_i_ic        4       I I D D
+eq_n_ic        4       N N D D
+ne_i_ic        4       I I D D
+lt_i_ic        4       I I D D
+le_i_ic        4       I I D D
+gt_i_ic        4       I I D D
+ge_i_ic        4       I I D D
 
 # Flow control
 
-jump_i	1	i
-branch_ic	1	i
-if_i_ic	3	i i i
-if_n_ic	3	i i i
+jump_i	1       I
+branch_ic      1       D
+if_i_ic        3       I D D
+if_n_ic        3       N D D
 
 # Convertors
 
-iton_n_i	2	i i
-ntoi_i_n	2	i i
+iton_n_i       2       N I
+ntoi_i_n       2       I N
 
 # Miscellaneous and debugging ops
 
-time_i	1	i
-print_i	1	i
-time_n	1	i
-print_n	1	i
+time_i 1       I
+print_i        1       I
+time_n 1       N
+print_n        1       N
 noop	0
+
 
 # Register ops
 push_i	0

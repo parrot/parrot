@@ -4,12 +4,12 @@ H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpret
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
 
-C_FLAGS = -Wall -o $@
+C_FLAGS = -Wall -g -o $@
 
 
 CC = gcc $(C_FLAGS)
 
-all : $(O_FILES)
+all : $(O_FILES) test_prog
 
 test_prog: test_main$(O) $(O_FILES)
 	gcc -o test_prog $(O_FILES) test_main$(O)
@@ -47,4 +47,12 @@ config.h: Configure.pl config.h.in
 	perl Configure.pl
 
 clean:
-	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog
+	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog config.h
+
+test:
+	perl assemble.pl t/test.pasm  > t/test.pbc
+	./test_prog t/test.pbc
+	perl assemble.pl t/test2.pasm > t/test2.pbc
+	./test_prog t/test2.pbc
+	perl assemble.pl t/test3.pasm > t/test3.pbc
+	./test_prog t/test3.pbc

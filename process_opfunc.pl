@@ -40,6 +40,17 @@ while (<GUTS>) {
     $opcode{$2}{OPNUM} = $1;
 }
 
+
+my %psize = (i => 1,
+	     n => 2,
+	     I => 1,
+	     N => 1,
+	     D => 1,
+	     S => 1,
+	     s => 1,
+	     );
+
+
 open OPCODE, "opcode_table" or die "Can't open opcode_table, $!/$^E";
 while (<OPCODE>) {
     s/#.*//;
@@ -50,9 +61,13 @@ while (<OPCODE>) {
     $opcode{$name}{PARAM_COUNT} = $params;
     $opcode{$name}{PARAM_ARRAY} = \@params;
 
-    my $num_i = () = grep {/i/} @params;
-    my $num_n = () = grep {/n/} @params;
-    $opcode{$name}{RETURN_OFFSET} = 1 + $num_i + $num_n * 2;
+    my $psize=0;
+    foreach (@params) {
+       $psize+=$psize{$_};
+    }
+
+
+    $opcode{$name}{RETURN_OFFSET} = 1 + $psize;
     my $count = 1;
     $opcode{$name}{PARAMETER_SUB} = ["", 
 				     map {if ($_ eq "n") { 
