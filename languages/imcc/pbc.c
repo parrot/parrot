@@ -1,12 +1,13 @@
 #include "imc.h"
 #include "pbc.h"
+#include "parrot/packfile.h"
 
 /*
  * pbc.c
  *
- * emit and or run imcc instructions in parrot interpreter
+ * emit imcc instructions into parrot interpreter
  *
- * the e_pbc_emit function is called per subroutine
+ * the e_pbc_emit function is called per instruction
  *
  * Notes:
  *
@@ -23,9 +24,7 @@
  * More weird, in global fixup reg->score is used for the opcode offset
  * into the instruction.
  *
- * TODO memory clean up, but as long as parrot (Parrot_destroy) doesn't care
- * I currently don't - i'm lazy.
- *
+ * TODO memory clean up
  *
  * And finally: there might be some issues on 64bit systems with
  * my mixing of int and opcode_t, which will be looked at, when this
@@ -36,82 +35,127 @@
  */
 
 /* globals store the state between individual e_pbc_emit calls
- * which happen per subroutine.
- *
- * These are per subroutine data:
- *   opcode size
- *   global labels
- *   bsr & set_addr (for closures)
- *
- * And
- *   {num,str}_const idx
- *   key const idx
  *
  */
 
 struct subs {
-    size_t size;
-    int ins_line;
-    SymReg * labels[HASH_SIZE];
-    SymReg * bsrs[HASH_SIZE];
+    size_t size;                        /* code size in ops */
+    int ins_line;                       /* line# for debug */
+    SymReg * labels[HASH_SIZE];         /* label names */
+    SymReg * bsrs[HASH_SIZE];           /* bsr, set_addr locations */
+    struct subs *prev;
+    struct subs *next;
+};
+
+/* subs are kept per code segment */
+struct cs_t {
+    struct PackFile_ByteCode *seg;      /* bytecode seg */
+    struct subs *subs;                  /* current sub data */
+    struct subs *first;                 /* first sub of code seg */
+    struct cs_t *prev;                  /* prev cs */
 };
 
 static struct globals {
     SymReg * str_consts[HASH_SIZE];
     SymReg * num_consts[HASH_SIZE];
     SymReg * key_consts[HASH_SIZE];
-    struct subs **subs;
+    struct cs_t *cs;
 } globals;
 
-static int nsubs;
+
+void imcc_globals_destroy(int ex, void *param);
+void imcc_globals_destroy(int ex, void *param)
+{
+    struct cs_t *cs, *prev_cs;
+    struct subs *s, *prev_s;
+
+    UNUSED(ex);
+    UNUSED(param);
+    cs = globals.cs;
+    while (cs) {
+        s = cs->subs;
+        while (s) {
+            prev_s = s->prev;
+            hash = s->labels;
+            clear_tables();
+            hash = s->bsrs;
+            clear_tables();
+            mem_sys_free(s);
+            s = prev_s;
+        }
+        prev_cs = cs->prev;
+        mem_sys_free(cs);
+        cs = prev_cs;
+    }
+    hash = globals.str_consts;
+    clear_tables();
+    hash = globals.num_consts;
+    clear_tables();
+    hash = globals.key_consts;
+    clear_tables();
+    globals.cs = NULL;
+}
 
 int e_pbc_open(char *dummy) {
-    /* TODO check code segment
-     * if different, start new subs, remember old for intersegment branches
+    struct cs_t *cs;
+    /* make a new code segment
      */
     UNUSED(dummy);
-#if 1
-    globals.subs = NULL;
-    nsubs = 0;
-#endif
+    if (!globals.cs) {
+        /* register cleanup code */
+        Parrot_on_exit(imcc_globals_destroy, NULL);
+    }
+    cs = mem_sys_allocate(sizeof(struct cs_t));
+    cs->prev = globals.cs;
+    cs->subs = NULL;
+    cs->first = NULL;
+    cs->seg = interpreter->code->cur_cs;
+    globals.cs = cs;
     return 0;
 }
+
+/* allocate a new globals.cs->subs structure */
+static void make_new_sub(void)
+{
+    struct subs *s = mem_sys_allocate_zeroed(sizeof(struct subs));
+    if (!s)
+        fatal(1, "get_old_size", "Out of mem");
+    s->prev = globals.cs->subs;
+    s->next = NULL;
+    if (globals.cs->subs)
+        globals.cs->subs->next = s;
+    if (!globals.cs->first)
+        globals.cs->first = s;
+    globals.cs->subs = s;
+}
+
 
 /* get size/line of bytecode in ops till now */
 static int get_old_size(int *ins_line)
 {
-    int i;
     size_t size;
-    *ins_line = 0;
-    if (globals.subs == 0 || interpreter->code->byte_code == NULL)
+    struct subs *s;
+
+    size = *ins_line = 0;
+    if (!globals.cs || interpreter->code->byte_code == NULL)
         return 0;
-    for (i = 0, size = 0; i < nsubs; i++) {
-        size += globals.subs[i]->size;
-        *ins_line += globals.subs[i]->ins_line;
+    for (s = globals.cs->subs; s; s = s->prev) {
+        size += s->size;
+        *ins_line += s->ins_line;
     }
     return size;
 }
 
-/* allocate a new globals.sub structure */
-static void make_new_sub(void)
-{
-    globals.subs = realloc(globals.subs, (nsubs+1) * sizeof(struct subs*));
-    if (!globals.subs)
-        fatal(1, "get_old_size", "Out of mem");
-    globals.subs[nsubs++] = calloc(1, sizeof(struct subs));
-    if (!globals.subs[nsubs-1])
-        fatal(1, "get_old_size", "Out of mem");
-}
 
 static void store_sub_size(size_t size)
 {
-    globals.subs[nsubs-1]->size = size;
+    globals.cs->subs->size = size;
 }
 
 static void store_label(SymReg * r, int pc)
 {
     SymReg * label;
-    label = _mk_address(globals.subs[nsubs-1]->labels, str_dup(r->name),
+    label = _mk_address(globals.cs->subs->labels, str_dup(r->name),
             U_add_uniq_label);
     label->color = pc;
 }
@@ -119,7 +163,7 @@ static void store_label(SymReg * r, int pc)
 static void store_bsr(SymReg * r, int pc, int offset)
 {
     SymReg * bsr;
-    bsr = _mk_address(globals.subs[nsubs-1]->bsrs, str_dup(r->name), U_add_all);
+    bsr = _mk_address(globals.cs->subs->bsrs, str_dup(r->name), U_add_all);
     bsr->color = pc;
     bsr->score = offset;        /* bsr = 1, addr I,x = 2 */
 }
@@ -196,14 +240,15 @@ static int store_labels(void)
 /* get a globale label, return the pc (absolute) */
 static SymReg * find_global_label(char *name, int *pc)
 {
-    int l;
     SymReg * r;
-    for (*pc = l = 0; l < nsubs; l++) {
-        if ( (r = _get_sym(globals.subs[l]->labels, name)) ) {
+    struct subs *s;
+    *pc = 0;
+    for (s = globals.cs->first; s; s = s->next) {
+        if ( (r = _get_sym(s->labels, name)) ) {
             *pc += r->color;    /* here pc was stored */
             return r;
         }
-        *pc += globals.subs[l]->size;
+        *pc += s->size;
     }
     return 0;
 }
@@ -211,12 +256,14 @@ static SymReg * find_global_label(char *name, int *pc)
 /* fix global branches */
 void fixup_bsrs()
 {
-    int i,l, pc, addr;
+    int i, pc, addr;
     SymReg * bsr, *lab;
+    struct subs *s;
     int jumppc = 0;
-    for (l = 0; l < nsubs; l++) {
+
+    for (s = globals.cs->first; s; s = s->next) {
         for(i = 0; i < HASH_SIZE; i++) {
-            for(bsr = globals.subs[l]->bsrs[i]; bsr; bsr = bsr->next ) {
+            for(bsr = s->bsrs[i]; bsr; bsr = bsr->next ) {
                 lab = find_global_label(bsr->name, &pc);
                 if (!lab)
                     fatal(1, "fixup_bsrs", "couldn't find addr of sub '%s'\n",
@@ -228,7 +275,7 @@ void fixup_bsrs()
                 interpreter->code->byte_code[addr+bsr->score] = pc - addr;
             }
         }
-        jumppc += globals.subs[l]->size;
+        jumppc += s->size;
     }
 }
 
@@ -497,7 +544,7 @@ static void constant_folding(void)
 
 
 /*
- * now let the fun begin, actually emit code for one sub
+ * now let the fun begin, actually emit code for one ins
  */
 
 int e_pbc_emit(Instruction * ins) {
@@ -535,7 +582,7 @@ int e_pbc_emit(Instruction * ins) {
         /* fixup local jumps */
         SymReg *addr, *r;
         if ((addr = get_branch_reg(ins)) != 0) {
-            SymReg *label = _get_sym(globals.subs[nsubs-1]->labels, addr->name);
+            SymReg *label = _get_sym(globals.cs->subs->labels, addr->name);
             /* maybe global */
             if (label) {
                 addr->color = label->color - npc;
@@ -585,16 +632,8 @@ int e_pbc_emit(Instruction * ins) {
 }
 
 int e_pbc_close(){
-    int i;
 
     fixup_bsrs();
-    /* TODO XXX free labels and consts at end of prog, not here */
-    for (i = 0; i < nsubs; i++) {
-        mem_sys_free(globals.subs[i]);
-    }
-    mem_sys_free(globals.subs);
-    globals.subs = NULL;
-    nsubs = 0;
     return 0;
 }
 

@@ -286,7 +286,8 @@ int main(int argc, char * argv[])
         /* XXX no return value :-( */
     }
     Parrot_destroy(interpreter);
-    free(output);
+    if (output)
+        free(output);
     Parrot_exit(0);
 
     return 0;
