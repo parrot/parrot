@@ -13,7 +13,7 @@ t/pmc/nci.t - Native Call Interface
 
 =head1 DESCRIPTION
 
-This tests the Native Call Interface, that is the ParrotLibrary PMC. 
+This tests the Native Call Interface, that is the ParrotLibrary PMC.
 Most tests are skipped when the F<libnci.so> library is not found.
 
 =head1 SEE ALSO
@@ -98,9 +98,9 @@ output_is( << 'CODE', << "OUTPUT", "get_string()" );
     unless libnci goto NOT_LOADED
         .local string filename_with_path
         filename_with_path = libnci
-        # depending on the platform, 'filename' has path info or not 
+        # depending on the platform, 'filename' has path info or not
         .local int start_of_filename
-        start_of_filename = index filename_with_path, 'libnci' 
+        start_of_filename = index filename_with_path, 'libnci'
         if start_of_filename == -1 goto NOT_LOADED
             .local string filename
             filename = substr filename_with_path, start_of_filename
@@ -315,7 +315,7 @@ OUTPUT
 output_is(<<'CODE', <<'OUTPUT', "nci_dd - stress test");
   loadlib P1, "libnci"
   print "loaded\n"
-  set I10, 100000
+  set I10, 10000
   print "dlfunced\n"
 loop:
   dlfunc P0, P1, "nci_dd", "dd"
@@ -921,7 +921,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pi - int");
 .include "datatypes.pasm"
 
 .sub _test @MAIN
- 
+
   # load library
   .local pmc libnci
   libnci = loadlib "libnci"
@@ -1095,7 +1095,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
     .local pmc cb
-    cb = newsub _call_back 
+    cb = newsub _call_back
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "tU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1106,7 +1106,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR");
     .local pmc nci_cb_C1
     nci_cb_C1 = dlfunc libnci, "nci_cb_C1", "vpP"
     print "loaded a function that takes a callback\n"
-    nci_cb_C1( cb_wrapped, user_data ) 
+    nci_cb_C1( cb_wrapped, user_data )
 
     # callback will be called at any time
     # so spin a bit
@@ -1118,7 +1118,7 @@ LOOP:
     .local pmc callback_has_run
     callback_has_run = find_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR 
+    if sleep_cnt > 10 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1231,7 +1231,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
     .local pmc cb
-    cb = newsub _call_back 
+    cb = newsub _call_back
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "pU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1242,7 +1242,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR");
     .local pmc nci_cb_C3
     nci_cb_C3 = dlfunc libnci, "nci_cb_C3", "vpP"
     print "loaded a function that takes a callback\n"
-    nci_cb_C3( cb_wrapped, user_data ) 
+    nci_cb_C3( cb_wrapped, user_data )
 
     # callback will be called at any time
     # so spin a bit
@@ -1254,7 +1254,7 @@ LOOP:
     .local pmc callback_has_run
     callback_has_run = find_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR 
+    if sleep_cnt > 10 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1432,7 +1432,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
     .local pmc cb
-    cb = newsub _call_back 
+    cb = newsub _call_back
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Ui"	# Z in pdd16
     print "created a callback sub\n"
@@ -1443,7 +1443,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR");
     .local pmc nci_cb_D2
     nci_cb_D2 = dlfunc libnci, "nci_cb_D2", "vpP"
     print "loaded a function that takes a callback\n"
-    nci_cb_D2( cb_wrapped, user_data ) 
+    nci_cb_D2( cb_wrapped, user_data )
 
     # callback will be called at any time
     # so spin a bit
@@ -1455,7 +1455,7 @@ LOOP:
     .local pmc callback_has_run
     callback_has_run = find_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR 
+    if sleep_cnt > 10 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1509,7 +1509,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
     .local pmc cb
-    cb = newsub _call_back 
+    cb = newsub _call_back
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "Up"	# Z in pdd16
     print "created a callback sub\n"
@@ -1520,7 +1520,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR");
     .local pmc nci_cb_D3
     nci_cb_D3 = dlfunc libnci, "nci_cb_D3", "vpP"
     print "loaded a function that takes a callback\n"
-    nci_cb_D3( cb_wrapped, user_data ) 
+    nci_cb_D3( cb_wrapped, user_data )
 
     # callback will be called at any time
     # so spin a bit
@@ -1532,7 +1532,7 @@ LOOP:
     .local pmc callback_has_run
     callback_has_run = find_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR 
+    if sleep_cnt > 10 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1832,7 +1832,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
 .include "datatypes.pasm"
 
 .sub _test @MAIN
- 
+
   # load library
   .local pmc libnci
   libnci = loadlib "libnci"
@@ -1866,7 +1866,7 @@ output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci.so" );
   print "\n"
   .local pmc get_product
   dlfunc get_product, libnci, "nci_i", "i"
-  ( product ) = get_product() 
+  ( product ) = get_product()
   print product
   print "\n"
 

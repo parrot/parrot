@@ -150,6 +150,9 @@ extern struct mallinfo mallinfo(void);
 =item C<INTVAL
 interpinfo(Interp *interpreter, INTVAL what)>
 
+=item C<PMC*
+interpinfo_p(Interp *interpreter, INTVAL what)>
+
 C<what> specifies the type of information you want about the
 interpreter.
 
@@ -222,10 +225,33 @@ interpinfo(Interp *interpreter, INTVAL what)
         case EXTENDED_PMCS:
             ret = arena_base->num_extended_PMCs;
             break;
+        default:        /* or a warning only? */
+            internal_exception(UNIMPLEMENTED,
+                    "illegal argument in interpinfo");
     }
     return ret;
 }
 
+PMC*
+interpinfo_p(Interp *interpreter, INTVAL what)
+{
+    switch (what) {
+        case CURRENT_SUB:
+            return interpreter->ctx.current_sub;
+        case CURRENT_CONT:
+            return interpreter->ctx.current_cont;
+        case CURRENT_OBJECT:
+            return interpreter->ctx.current_object;
+        case CURRENT_NAMESPACE_ROOT: /* XXX */
+            return interpreter->globals->stash_hash;
+        case CURRENT_LEXPAD:
+            return scratchpad_get_current(interpreter);
+        default:        /* or a warning only? */
+            internal_exception(UNIMPLEMENTED,
+                    "illegal argument in interpinfo");
+    }
+    return PMCNULL;
+}
 
 /*
 

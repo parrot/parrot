@@ -186,6 +186,11 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     /* A regex stack would be nice too. */
     interpreter->ctx.intstack = intstack_new(interpreter);
 
+    /* clear context introspection vars */
+    SET_NULL_P(interpreter->ctx.current_sub, PMC*);
+    SET_NULL_P(interpreter->ctx.current_cont, PMC*);
+    SET_NULL_P(interpreter->ctx.current_object, PMC*);
+
     /* Load the core op func and info tables */
     interpreter->op_lib = PARROT_CORE_OPLIB_INIT(1);
     interpreter->op_count = interpreter->op_lib->op_count;

@@ -147,6 +147,15 @@ typedef struct Parrot_Context {
                                     currently found method */
     UINTVAL recursion_depth;    /* Sub call resursion depth */
     int runloop_level;                  /* for reentering run loop */
+    /*
+     * new call scheme and introspective variables
+     */
+    PMC *current_sub;           /* the Sub we are executing */
+    /*
+     * for now use a return continuation PMC
+     */
+    PMC *current_cont;          /* the return continuation PMC */
+    PMC *current_object;        /* current object if a method call */
 } parrot_context_t;
 
 struct _Thread_data;    /* in thread.h */
@@ -310,7 +319,9 @@ extern PMC * PMCNULL;                     /* Holds single Null PMC         */
 struct Parrot_Interp *make_interpreter(Parrot_Interp parent, Interp_flags);
 void Parrot_init(Parrot_Interp);
 void Parrot_destroy(Parrot_Interp);
+
 INTVAL interpinfo(struct Parrot_Interp *interpreter, INTVAL what);
+PMC*   interpinfo_p(struct Parrot_Interp *interpreter, INTVAL what);
 
 void runops(struct Parrot_Interp *, size_t offset);
 void runops_int(struct Parrot_Interp *, size_t offset);

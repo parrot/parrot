@@ -692,40 +692,20 @@ inline op gc_debug(in INT) {
 
 =item B<interpinfo>(out INT, in INT)
 
+=item B<interpinfo>(out PMC, in INT)
+
 Fetch some piece of information about the interpreter and put it in $1.
-Possible values for $2 are:
-
-=over 4
-
-=item 1 The total amount of allocatable memory allocated. This figure
-does not include memory used for headers or for the interpreter's internal
-structures.
-
-=item 2 The number of dead object detection runs performed.
-
-=item 3 The number of garbage collection runs performed.
-
-=item 4 The number of active PMCs.
-
-=item 5 The number of active buffers.
-
-=item 6 The total number of PMCs allocated.
-
-=item 7 The total number of buffers allocated.
-
-=item 8 The number of headers (PMC or buffer) that have been allocated
-since the last DOD run.
-
-=item 9 The number of new blocks of memory allocated since the last GC run.
-
-=item 10 The total amount of memory copied during garbage collections.
-
-=back
+Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
 
 =cut
 
 op interpinfo(out INT, in INT) {
   $1 = interpinfo(interpreter, $2);
+  goto NEXT();
+}
+
+op interpinfo(out PMC, in INT) {
+  $1 = interpinfo_p(interpreter, $2);
   goto NEXT();
 }
 

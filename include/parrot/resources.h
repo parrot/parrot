@@ -117,21 +117,30 @@ struct Stash {
     struct Stash *parent_stash;
 };
 
-/* &gen_from_def(interpinfo.pasm) prefix(INTERPINFO_) */
+/* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
-#define TOTAL_MEM_ALLOC 1
-#define DOD_RUNS 2
-#define COLLECT_RUNS 3
-#define ACTIVE_PMCS 4
-#define ACTIVE_BUFFERS 5
-#define TOTAL_PMCS 6
-#define TOTAL_BUFFERS 7
-#define HEADER_ALLOCS_SINCE_COLLECT 8
-#define MEM_ALLOCS_SINCE_COLLECT 9
-#define TOTAL_COPIED 10
-#define IMPATIENT_PMCS 11
-#define LAZY_DOD_RUNS 12
-#define EXTENDED_PMCS 13
+typedef enum {
+    TOTAL_MEM_ALLOC = 1,
+    DOD_RUNS,
+    COLLECT_RUNS,
+    ACTIVE_PMCS,
+    ACTIVE_BUFFERS,
+    TOTAL_PMCS,
+    TOTAL_BUFFERS,
+    HEADER_ALLOCS_SINCE_COLLECT,
+    MEM_ALLOCS_SINCE_COLLECT,
+    TOTAL_COPIED,
+    IMPATIENT_PMCS,
+    LAZY_DOD_RUNS,
+    EXTENDED_PMCS,
+
+    /* interpinfo_p constants */
+    CURRENT_SUB,
+    CURRENT_CONT,
+    CURRENT_OBJECT,
+    CURRENT_NAMESPACE_ROOT,
+    CURRENT_LEXPAD
+} Interpinfo_enum;
 
 /* &end_gen */
 

@@ -1490,3 +1490,5 @@ fdiv_p_p_n      1462
 fdiv_p_p_nc     1463
 fdiv_p_p_p      1464
 elements_i_p    1465
+interpinfo_p_i  1466
+interpinfo_p_ic 1467

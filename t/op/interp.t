@@ -12,11 +12,12 @@ t/op/interp.t - Running the Interpreter
 
 =head1 DESCRIPTION
 
-Tests the old and new styles of running the Parrot interpreter.
+Tests the old and new styles of running the Parrot interpreter and the
+C<interpinfo> opcode.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -263,5 +264,17 @@ hello from 2 clone
 from 1 interp
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "interpinfo lexpad");
+    .include "interpinfo.pasm"
+    new_pad 0
+    peek_pad P10
+    interpinfo P11, .INTERPINFO_CURRENT_LEXPAD
+    eq_addr P10, P11, ok
+    print "not "
+ok: print "ok\n"
+    end
+CODE
+ok
+OUTPUT
 
 1;
