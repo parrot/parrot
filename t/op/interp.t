@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 output_is(<<'CODE', <<'OUTPUT', "runinterp - new style");
 	new P0, .ParrotInterpreter
@@ -242,7 +242,7 @@ from 1 interp
 OUTPUT
 
 SKIP: {
-  skip("No thread config yet" ,1) unless $^O eq 'linux';
+  skip("No thread config yet" ,2) unless $^O eq 'linux';
 
 output_is(<<'CODE', <<'OUTPUT', "thread 1");
     set I5, 1
@@ -303,6 +303,41 @@ ParrotThread tid 1
 Sub
 from 1 interp
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "thread - kill");
+    bounds 1	# assert slow core -S and -g are fine too
+    find_global P6, "_foo"
+    new P5, .ParrotThread
+    set I10, P5
+    print "start "
+    print I10
+    print "\n"
+    find_method P0, P5, "thread"
+    invoke	# start the thread
+    sleep 1
+
+    set I5, I10
+    getinterp P2
+    find_method P0, P2, "kill"
+    invoke
+
+    print "done\n"
+    end
+
+.pcc_sub _foo:
+    print "in thread\n"
+    # run a endless loop
+lp:
+    noop
+    branch lp
+    print "never\n"
+    invoke P1
+CODE
+start 1
+in thread
+done
+OUTPUT
+
 }
 
 1;

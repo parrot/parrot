@@ -151,6 +151,19 @@ Parrot_new_timer_event(Parrot_Interp interpreter, FLOATVAL diff,
     Parrot_schedule_event(interpreter, ev);
 }
 
+/*
+ * create a terminate event, interpreter will leave runloop
+ * when this event arrives
+ */
+void
+Parrot_new_terminate_event(Parrot_Interp interpreter)
+{
+    parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
+    ev->type = EVENT_TYPE_TERMINATE;
+    ev->data = NULL;
+    Parrot_schedule_event(interpreter, ev);
+}
+
 void
 Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
 {
@@ -271,11 +284,12 @@ again:
 /*
  * explicitely sync called by the check_event opcode from run loops
  */
-void
-Parrot_do_check_events(Parrot_Interp interpreter)
+void*
+Parrot_do_check_events(Parrot_Interp interpreter, void *next)
 {
     if (peek_entry(interpreter->task_queue))
-        Parrot_do_handle_events(interpreter, 0);
+        return Parrot_do_handle_events(interpreter, 0, next);
+    return next;
 }
 
 /*
@@ -283,8 +297,8 @@ Parrot_do_check_events(Parrot_Interp interpreter)
  * When called from the check_events__ opcode, we have to restore
  * the op_func_table
  */
-void
-Parrot_do_handle_events(Parrot_Interp interpreter, int restore)
+void *
+Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)
 {
     QUEUE_ENTRY *entry;
     parrot_event* event;
@@ -292,13 +306,16 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore)
     if (restore)
         disable_event_checking(interpreter);
     if (!peek_entry(interpreter->task_queue))
-        return;
+        return next;
     while (peek_entry(interpreter->task_queue)) {
         entry = pop_entry(interpreter->task_queue);
         event = (parrot_event* )entry->data;
         mem_sys_free(entry);
 
         switch (event->type) {
+            case EVENT_TYPE_TERMINATE:
+                next = NULL;
+                break;
             case EVENT_TYPE_TIMER:
                 /* run ops, save registers */
                 Parrot_runops_fromc_save(interpreter, event->u.timer_event.sub);
@@ -309,6 +326,7 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore)
         }
         mem_sys_free(event);
     }
+    return next;
 }
 
 /*

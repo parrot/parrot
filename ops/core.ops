@@ -115,13 +115,13 @@ inline op cpu_ret() {
 
 inline op check_events() {
   opcode_t *next = expr NEXT();
-  CHECK_EVENTS(interpreter);
+  next = CHECK_EVENTS(interpreter, next);
   goto ADDRESS(next);	/* force this being a branch op */
 }
 
 inline op check_events__() {
   opcode_t *this = CUR_OPCODE;
-  HANDLE_EVENTS(interpreter);
+  this = HANDLE_EVENTS(interpreter, this);
   goto ADDRESS(this);	/* force this being a branch op */
 }
 

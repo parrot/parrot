@@ -32,6 +32,7 @@ thread_func(void *arg)
 
     /*
      * TODO pass return value
+     * TODO set state and clear interp array
      */
     return NULL;
 }
@@ -109,6 +110,23 @@ pt_thread_yield(void)
 }
 
 /*
+ * helper, check if tid is valid - call holds mutex
+ * return interpreter for tid
+ */
+static Parrot_Interp
+pt_check_tid(UINTVAL tid)
+{
+    if (tid >= n_interpreters) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "join: illegal thread tid %d", tid);
+    }
+    if (!interpreter_array[tid]) {
+        UNLOCK(interpreter_array_mutex);
+        internal_exception(1, "join: illegal thread tid %d - empty", tid);
+    }
+    return interpreter_array[tid];
+}
+/*
  * join (wait for) a joinable thread
  */
 void*
@@ -118,15 +136,7 @@ pt_thread_join(UINTVAL tid)
     int state;
 
     LOCK(interpreter_array_mutex);
-    if (tid >= n_interpreters) {
-        UNLOCK(interpreter_array_mutex);
-        internal_exception(1, "join: illegal thread tid %d", tid);
-    }
-    if (!interpreter_array[tid]) {
-        UNLOCK(interpreter_array_mutex);
-        internal_exception(1, "join: illegal thread tid %d - empty", tid);
-    }
-    interpreter = interpreter_array[tid];
+    interpreter = pt_check_tid(tid);
     if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
         void *retval;
         UNLOCK(interpreter_array_mutex);
@@ -147,11 +157,34 @@ pt_thread_join(UINTVAL tid)
 
 /*
  * detach (make non-joinable) thread
- * returns whatever the Sub returned
  */
 void
 pt_thread_detach(UINTVAL tid)
 {
+}
+
+/*
+ * kill a thread
+ */
+void
+pt_thread_kill(UINTVAL tid)
+{
+    Parrot_Interp interpreter;
+
+    LOCK(interpreter_array_mutex);
+    interpreter = pt_check_tid(tid);
+    /*
+     * if interpreter is joinable, we detach em
+     */
+    if (interpreter->thread_data->state == THREAD_STATE_JOINABLE) {
+        DETACH(interpreter->thread_data->thread);
+        interpreter->thread_data->state = THREAD_STATE_DETACHED;
+    }
+    UNLOCK(interpreter_array_mutex);
+    /*
+     * schedule a terminate event for that interpreter
+     */
+    Parrot_new_terminate_event(interpreter);
 }
 
 /*

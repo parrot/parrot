@@ -99,6 +99,8 @@ pmclass ParrotInterpreter need_ext {
                          F2DPTR(pt_thread_join), "join", "vi");
         enter_nci_method(INTERP, method_table,
                          F2DPTR(pt_thread_detach), "detach", "vi");
+        enter_nci_method(INTERP, method_table,
+                         F2DPTR(pt_thread_kill), "kill", "vi");
 
         Parrot_base_vtables[enum_class_ParrotInterpreter]->method_table =
 	    method_table;

@@ -103,9 +103,9 @@ sub run_core_func_start {
 
     do {
 SWITCH_AGAIN:
+    cur_opcode = CHECK_EVENTS(interpreter, cur_opcode);
     if (!cur_opcode)
         break;
-    CHECK_EVENTS(interpreter);
     switch (*cur_opcode) {
 END_C
 }
