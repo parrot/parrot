@@ -2,6 +2,8 @@
 #
 # jit2h.pl
 #
+# $Id$
+#
 
 use strict;
 use Parrot::Jit;
@@ -22,7 +24,7 @@ my ($i,$j,$k,$n);
 
 my ($function, $body, $line);
 
-my ($position, $bytecode, $type, $number, $size, $char, $move, $strflag);
+my ($position, $bytecode, $type, $number, $size, $char, $move, $strflag, $asm);
 
 my (%core_ops, %string, %lib, $arg, $tmp, $which, $argc, $argv, $syscall, $tmp_bytecode, $nargop);
 
@@ -44,25 +46,58 @@ my %Call = (
 open (IN,"jit/$cpuarch/core.jit");
 while ($line = <IN>) {
     next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    ($function, $body) = split(":",$line);
-    $body =~ s/\s+//g;
-    $core_ops{$function} = $body;
+    if (!defined($function)) {
+        $line =~ m/([^\s]*)\s*{/;
+        $function = $1;
+        $asm = "";
+        next;
+    }
+    if ($line =~ m/}/) {
+        $body = Parrot::Jit::Assemble($asm);
+        $body =~ s/\s+//g;
+        $core_ops{$function} = $body;
+        $function = undef;
+        $body = undef;
+    }
+    $asm .= $line;
 }
 
 open (IN,"jit/$cpuarch/string.jit");
 while ($line = <IN>) {
     next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    ($function, $body) = split(":",$line);
-    $body =~ s/\s+//g;
-    $string{$function} = $body;
+    if (!defined($function)) {
+        $line =~ m/([^\s]*)\s*{/;
+        $function = $1;
+        $asm = "";
+        next;
+    }
+    if ($line =~ m/}/) {
+        $body = Parrot::Jit::Assemble($asm);
+        $body =~ s/\s+//g;
+        $string{$function} = $body;
+        $function = undef;
+        $body = undef;
+    }
+    $asm .= $line;
 }
 
 open (IN,"jit/$cpuarch/lib.jit");
 while ($line = <IN>) {
     next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
-    ($function, $body) = split(":",$line);
-    $body =~ s/\s+//g;
-    $lib{$function} = $body;
+    if (!defined($function)) {
+        $line =~ m/([^\s]*)\s*{/;
+        $function = $1;
+        $asm = "";
+        next;
+    }
+    if ($line =~ m/}/) {
+        $body = Parrot::Jit::Assemble($asm);
+        $body =~ s/\s+//g;
+        $lib{$function} = $body;
+        $function = undef;
+        $body = undef;
+    }
+    $asm .= $line;
 }
 
 for ($i = 0; $i < $core_numops; $i++) {
@@ -178,7 +213,7 @@ for ($i = 0; $i < $core_numops; $i++) {
             for($k = 0; $k < $argc; $k++) {
                 $argv =~ s/([\&\*][a-zA-Z_]+\[\d+\])//; 
                 $arg = $1;
-                $tmp_bytecode =~ s/ARG/$arg/;
+                $tmp_bytecode =~ s/[\&\*]ARG\[\d+\]/$arg/;
             }
             $body =~ s/F[a-zA-Z_]*\([^\)]*\)/$tmp_bytecode/;
         }

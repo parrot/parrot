@@ -8,4 +8,8 @@ sub system_call($$$) {
   return "\\x00\\x00\\x00\\x00";
 }
 
+sub Assemble($) { 
+  return "\\x00\\x00\\x00\\x00";
+}
+
 1;

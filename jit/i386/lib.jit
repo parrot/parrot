@@ -1,10 +1,32 @@
 ;
-; Some handly functions
+; Some handy functions
+;
+; $Id$
 ;
 
-jump: \xb8 ARG \x8b \x00 \x89 \xc2 \x8d \x04 \x95 \x00 \x00 \x00 \x00 \xba *CONST_INTVAL[2] \xff \x24 \x10 
+jump {
+    movl &ARG[0],%eax
+    mov    %eax,%edx
+    lea    0x0(,%edx,4),%eax
+    movl    *CONST_INTVAL[2],%edx
+    jmp    *(%eax,%edx,1)
+}
 
-move: \xb9 *CUR_OPCODE[0] \xa1 ARG \x01 \xc8 \x89 \xc2 \x8d \x04 \x95 \x00 \x00 \x00 \x00 \xba *CONST_INTVAL[2] \xff \x24 \x10 
+move {
+    movl *CUR_OPCODE[0],%ecx
+    movl &ARG[0],%eax
+    add %ecx,%eax
+    mov %eax,%edx
+    lea 0x0(,%edx,4),%eax
+    movl *CONST_INTVAL[2] ,%edx
+    jmp *(%eax,%edx,1)
+}
 
-get_interpreter: \xa1 ARG
-get_interpreter_control_stack_top: \xa1 ARG \x05 \x14 \x00 \x00 \x00
+get_interpreter {
+    mov &ARG[0],%eax
+}
+
+get_interpreter_control_stack_top {
+    mov &ARG[0],%eax 
+    addl $0x14,%eax
+}

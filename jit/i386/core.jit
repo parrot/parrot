@@ -1,64 +1,241 @@
 ;
 ;   i386_core.jit 
 ;
+; $Id$
+;
 
-Parrot_noop: \x90
+Parrot_noop {
+    nop
+}
 
-Parrot_set_i_ic: \xc7 \x05 &INT_REG[1] *INT_CONST[2]
+Parrot_set_i_ic {
+    movl *INT_CONST[2],&INT_REG[1]
+}
 
-Parrot_set_i_i: \x8b \x0d &INT_REG[2] \x89 \x0d &INT_REG[1]
+Parrot_set_i_i {
+    movl &INT_REG[2],%eax
+    movl %eax,&INT_REG[1]
+}
 
-Parrot_set_n_nc: \xdd \x05 &NUM_CONST[2] \xdd \x1d &NUM_REG[1]
+Parrot_set_n_nc {
+    fldl &NUM_CONST[2] 
+    fstpl &NUM_REG[1]
+}
 
-Parrot_set_n_n: \xdd \x05 &NUM_REG[2] \xdd \x1d &NUM_REG[1]
+Parrot_set_n_n {
+    fldl &NUM_REG[2]
+    fstpl &NUM_REG[1]
+}
 
-Parrot_mul_i_i_i: \xa1 &INT_REG[2] \x0f \xaf \x05 &INT_REG[3] \xa3 &INT_REG[1]
+Parrot_mul_i_i_i {
+    movl &INT_REG[2],%eax
+    imul &INT_REG[3],%eax 
+    movl %eax,&INT_REG[1]
+}
 
-Parrot_sub_i_i_i: \xa1 &INT_REG[2] \x2b \x05 &INT_REG[3] \xa3 &INT_REG[1]
+Parrot_sub_i_i_i {
+    movl &INT_REG[2],%eax
+    sub &INT_REG[3],%eax
+    movl %eax,&INT_REG[1]
+}
 
-Parrot_iton_n_i: \xdb \x05 &INT_REG[2] \xdd \x1d &NUM_REG[1]
+Parrot_iton_n_i {
+    fildl &INT_REG[2]
+    fstpl &NUM_REG[1]
+}
 
-Parrot_div_n_n_n: \xdd \x05 &NUM_REG[2] \xdd \x05 &NUM_REG[3] \xde \xf9 \xdd \x1d &NUM_REG[1]
+Parrot_div_n_n_n {
+    fldl &NUM_REG[2]
+    fldl &NUM_REG[3] 
+    fdivrp %st,%st(1)
+    fstpl &NUM_REG[1]
+}
 
-Parrot_sub_n_n_n: \xdd \x05 &NUM_REG[2] \xdd \x05 &NUM_REG[3] \xde \xe9 \xdd \x1d &NUM_REG[1]
+Parrot_sub_n_n_n {
+    fldl &NUM_REG[2]
+    fldl &NUM_REG[3] 
+    fsubrp  %st,%st(1)
+    fstpl &NUM_REG[1]
+}
 
-Parrot_print_sc: \xc7 \x05 &TEMP_INT[1] \x01 \x00 \x00 \x00 S(WRITE,3, A&TEMP_INT[1] V&STRING_CONST_bufstart[1] V*STRING_CONST_strlen[1])
+Parrot_print_sc {
+    movl $1,&TEMP_INT[1]
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] V&STRING_CONST_bufstart[1] V*STRING_CONST_strlen[1])
+}
 
-Parrot_print_s: \xc7 \x05 &TEMP_INT[1] \x01 \x00 \x00 \x00 F(get_bufstart, &STRING_REG[1]) \xa3 &TEMP_INT[0] F(get_strlen, &STRING_REG[1]) \xa3 &TEMP_INT[2] S(WRITE,3, A&TEMP_INT[1] A&TEMP_INT[0] A&TEMP_INT[2])
+Parrot_print_s {
+    movl $1,&TEMP_INT[1]
+    F(get_bufstart, &STRING_REG[1]) 
+    movl %eax,&TEMP_INT[0]
+    F(get_strlen, &STRING_REG[1]) 
+    movl %eax, &TEMP_INT[2] 
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[1] A&TEMP_INT[0] A&TEMP_INT[2])
+}
 
-Parrot_if_i_ic: \xa1 &INT_REG[1] \x3d \x00 \x00 \x00 \x00 \x0f \x85 JUMP(INT_CONST[2])
+Parrot_if_i_ic {
+    movl &INT_REG[1],%eax 
+    cmp $0,%eax
+    jne ($0x0)
+    JUMP(INT_CONST[2])
+}
 
-Parrot_branch_ic: \xe9 JUMP(INT_CONST[1])
+Parrot_branch_ic {
+    jmp ($0x0)
+    JUMP(INT_CONST[1])
+}
 
 ; I'm not quite sure if this's ok
 
-Parrot_time_n: SYSCALL(GETTIMEOFDAY, 2, V&TEMP_INT[0] V&TEMP_INT[2]) \xdb\x05 &TEMP_INT[0] \xdb\x05 &TEMP_INT[1] \xdd\x05 &CONST_FLOAT[0] \xde\xf9\xde\xc1\xdd\x1d &NUM_REG[1]
+Parrot_time_n {
+    SYSTEMCALL(GETTIMEOFDAY, 2, V&TEMP_INT[0] V&TEMP_INT[2])
+    fildl &TEMP_INT[0]
+    fildl &TEMP_INT[1] 
+    fldl &CONST_FLOAT[0]
+    fdivrp %st,%st(1)
+    faddp %st,%st(1)
+    fstpl &NUM_REG[1]
+}
 
-Parrot_end: \xc9\xc3
+Parrot_end {
+    leave
+    ret
+}
 
-Parrot_add_i_i_i: \xa1 &INT_REG[2] \x03 \x05 &INT_REG[3] \xa3 &INT_REG[1]
+Parrot_add_i_i_i {
+    movl &INT_REG[2],%eax 
+    addl &INT_REG[3],%eax
+    movl %eax,&INT_REG[1]
+}
 
-Parrot_add_i_i_ic: \xa1 &INT_REG[2] \x03 \x05 &INT_CONST[3] \xa3 &INT_REG[1]
+Parrot_add_i_i_ic {
+    movl &INT_REG[2],%eax 
+    addl &INT_CONST[3],%eax
+    movl %eax,&INT_REG[1]
+}
 
 ; OK, I really dislike these ones
 
 ; I'm sure there is a faster way (that's what we are searching, right?)
 
-Parrot_print_ic: \x68 &TEMP_CHAR[15] \x68\x00\x00\x00\x00\x8d\x5c\x24\x04\x83\x2b\x01\xa1 &INT_CONST[1] \x6a\x0a\x89\xe1\x83\x41\x04\x01\x83\xf8\x0a\x7c\x0f\x99\xf7\x39\x83\x2b\x01\x8b\x0b\x80\xc2\x30\x88\x11\xe2\xe6\x83\x2b\x01\x8b\x0b\x04\x30\x88\x01\x89\xe1\x83\x41\x04\x01\x8b\x49\x04 \x89 \x0d &TEMP_INT[0] \x8b \x0b \x89 \x0d &TEMP_INT[1] \xc7 \x05 &TEMP_INT[2] \x01 \x00 \x00 \x00 SYSCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
+Parrot_print_ic {
+    pushl L&TEMP_CHAR[15]
+    pushl $0x0
+    lea 0x4(%esp,1),%ebx
+    subl $0x1,(%ebx)
+    movl &INT_CONST[1],%eax
+    pushl $0xa
+again:    movl %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    cmp $0xa,%eax
+    jl next
+    cltd
+    idiv (%ecx),%eax
+    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    add $0x30,%dl
+    mov %dl,(%ecx)
+    loop again
+next:    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    addb $0x30,%al
+    movb %al,(%ecx)
+    mov %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    mov 0x4(%ecx),%ecx
+    movl %ecx,&TEMP_INT[0]
+    mov (%ebx),%ecx
+    mov %ecx, &TEMP_INT[1]
+    movl $1,&TEMP_INT[2]
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
+}
 
-Parrot_print_i: \x68 &TEMP_CHAR[15] \x68\x00\x00\x00\x00\x8d\x5c\x24\x04\x83\x2b\x01\xa1 &INT_REG[1] \x6a\x0a\x89\xe1\x83\x41\x04\x01\x83\xf8\x0a\x7c\x0f\x99\xf7\x39\x83\x2b\x01\x8b\x0b\x80\xc2\x30\x88\x11\xe2\xe6\x83\x2b\x01\x8b\x0b\x04\x30\x88\x01\x89\xe1\x83\x41\x04\x01\x8b\x49\x04 \x89 \x0d &TEMP_INT[0] \x8b \x0b \x89 \x0d &TEMP_INT[1] \xc7 \x05 &TEMP_INT[2] \x01 \x00 \x00 \x00 SYSCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
+Parrot_print_i {
+    pushl L&TEMP_CHAR[15]
+    pushl $0x0
+    lea 0x4(%esp,1),%ebx
+    subl $0x1,(%ebx)
+    movl &INT_REG[1],%eax
+    pushl $0xa
+again:    movl %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    cmp $0xa,%eax
+    jl next
+    cltd
+    idiv (%ecx),%eax
+    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    add $0x30,%dl
+    mov %dl,(%ecx)
+    loop again
+next:    subl $0x1,(%ebx)
+    mov (%ebx),%ecx
+    addb $0x30,%al
+    movb %al,(%ecx)
+    mov %esp,%ecx
+    addl $0x1,0x4(%ecx)
+    mov 0x4(%ecx),%ecx
+    movl %ecx,&TEMP_INT[0]
+    mov (%ebx),%ecx
+    mov %ecx, &TEMP_INT[1]
+    movl $1,&TEMP_INT[2]
+    SYSTEMCALL(WRITE,3, A&TEMP_INT[2] A&TEMP_INT[1] A&TEMP_INT[0]) 
+}
 
 ;
 ; Down here are the ops to be changed
 ;
 
-Parrot_print_n: \x83 \xec \x0c \xdd \x05 &NUM_REG[1] \xdd \x1c \x24 C(printf, V&CONST_CHAR[0]) C(fflush, V*CONST_INTVAL[0])
+Parrot_print_n {
+    sub $0xc,%esp
+    fldl &NUM_REG[1]
+    fstpl (%esp,1)
+    CALL(printf, V&CONST_CHAR[0])
+    CALL(fflush, V*CONST_INTVAL[0])
+}
 
-Parrot_print_nc: \x83 \xec \x0c \xdd \x05 &NUM_CONST[1] \xdd \x1c \x24 C(printf, V&CONST_CHAR[0]) C(fflush, V*CONST_INTVAL[0]) 
+Parrot_print_nc {
+    sub $0xc,%esp
+    fldl &NUM_REG[1]
+    fstpl (%esp,1)
+    CALL(printf, V&CONST_CHAR[0])
+    CALL(fflush, V*CONST_INTVAL[0])
+}
 
-Parrot_set_s_s: F(get_interpreter, &INTERPRETER[0]) \xa3 &TEMP_INT[0] C(string_copy, A&TEMP_INT[0] A&STRING_REG[2]) \xa3 &STRING_REG[1] 
-Parrot_set_s_sc: F(get_interpreter, &INTERPRETER[0]) \xa3 &TEMP_INT[0] C(string_copy, A&TEMP_INT[0] V&STRING_CONST[2]) \xa3 &STRING_REG[1] 
+Parrot_set_s_s {
+    F(get_interpreter, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[0]
+    CALL(string_copy, A&TEMP_INT[0] A&STRING_REG[2])
+    mov %eax,&STRING_REG[1] 
+}
 
-Parrot_eq_s_sc: F(get_interpreter, &INTERPRETER[0]) \xa3 &TEMP_INT[0] CALL(string_compare, A&TEMP_INT[0] A&STRING_REG[1] V&STRING_CONST[2]) \x83 \xf8 \x00 \x0f \x85 JUMP(END) F(get_interpreter, &INTERPRETER[0]) \xa3 &TEMP_INT[0] F(get_interpreter_control_stack_top, &INTERPRETER[0]) \xa3 &TEMP_INT[1] CALL(pop_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V&TEMP_INT[2] V*CONST_INTVAL[1]) F(jump, &TEMP_INT[2]) 
+Parrot_set_s_sc {
+    F(get_interpreter, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[0] 
+    C(string_copy, A&TEMP_INT[0] V&STRING_CONST[2])
+    mov %eax,&STRING_REG[1] 
+}
 
-Parrot_bsr_i: F(get_interpreter, &INTERPRETER[0]) \xa3 &TEMP_INT[0] F(get_interpreter_control_stack_top, &INTERPRETER[0]) \xa3 &TEMP_INT[1] \x68 \x00 \x00 \x00 \x00 CALL(push_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V*CUR_OPCODE[2] V*CONST_INTVAL[1]) F(move, &INT_REG[1]) 
+Parrot_eq_s_sc {
+    F(get_interpreter, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[0]
+    CALL(string_compare, A&TEMP_INT[0] A&STRING_REG[1] V&STRING_CONST[2])
+    cmp $0,%eax
+    jne ($0x0) 
+    JUMP(END) 
+    F(get_interpreter, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[0] 
+    F(get_interpreter_control_stack_top, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[1] 
+    CALL(pop_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V&TEMP_INT[2] V*CONST_INTVAL[1]) 
+    F(jump, &TEMP_INT[2]) 
+}
+
+Parrot_bsr_i {
+    F(get_interpreter, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[0] 
+    F(get_interpreter_control_stack_top, &INTERPRETER[0])
+    mov %eax,&TEMP_INT[1] 
+    pushl $0
+    CALL(push_generic_entry, A&TEMP_INT[0] A&TEMP_INT[1] V*CUR_OPCODE[2] V*CONST_INTVAL[1]) 
+    F(move, &INT_REG[1]) 
+}
