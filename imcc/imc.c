@@ -76,7 +76,7 @@ imc_compile_unit(Interp *interp, IMC_Unit * unit) {
 
 /*
  * Any activity required to cleanup the compiler state and be
- * ready for a new compiler invokation goes here.
+ * ready for a new compiler invocation goes here.
  */
 void
 imc_cleanup(Interp *interp)

@@ -4,7 +4,7 @@
  * Calling Conventions API for generating subs definitions, calls, etc.
  *
  * Called by the code generators, optimizers and flow graph code which
- * are mostly independant of the low-level call conventions.
+ * are mostly independent of the low-level call conventions.
  *
  * Depending on compiler pragmas this API will callout to one of several
  * supported code generators. (see pcc.c or fastcall.c)
@@ -23,7 +23,7 @@
  *
  * Currently the only fully functional convention is PCC but the generic
  * API allows us to experiment with calling conventions side by
- * side without completely breaking IMCC everytime we tweak something.
+ * side without completely breaking IMCC every time we tweak something.
  * The side effect is the subroutine code generators and optimizers can be
  * very modular and less interlocked to a specific convention.
  *

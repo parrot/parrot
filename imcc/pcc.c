@@ -1,7 +1,7 @@
 /*
  * pcc.c
  *
- * A specific call convention implementation. Called by the generic
+ * A specific calling convention implementation. Called by the generic
  * API for subs (see sub.c).
  *
  * FASTCALL convention can be enabled with:
@@ -63,7 +63,7 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
 
 
 /*
- * Utilty instruction routine. Creates and inserts an instruction
+ * Utility instruction routine. Creates and inserts an instruction
  * into the current block in one call.
  */
 static Instruction *
@@ -172,7 +172,7 @@ pcc_get_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
              *
              * if this subroutine calls another subroutine
              * new registers are assigned so that
-             * they don't interfer with this sub's params
+             * they don't interfere with this sub's params
              *
              * And in a return sequence too, as the usage of
              * returns and args might conflict.
@@ -218,24 +218,24 @@ pcc_put_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
         next[i] = FIRST_PARAM_REG;
     for (i = 0; i < n; i++) {
         /*
-         * if prototyped, first 11 I,S,N go into regs
+         * If prototyped, first 11 I,S,N arguments go into registers
          */
         arg = args[i];
         for (j = 0; j < REGSET_MAX; j++) {
             set = j;
             /*
-             * if this is non-prototyped, register set is always P
+             * If this is non-prototyped, register set is always P
              */
             if (arg->set != regsets[set])
                 continue;
             /*
-             * non-prototyped reg sets don't match
+             * Non-prototyped register sets don't match
              */
             if (!proto && arg->set != 'P') {
                 set = REGSET_P;
                 if (next[REGSET_P] > LAST_PARAM_REG)
                     goto overflow;
-                /* make a new P reg and assign value */
+                /* Make a new P register and assign value */
                 sprintf(buf, "P%d", next[set]++);
                 reg = get_pasm_reg(interp, buf);
                 tmp = iNEW(interp, unit, reg, str_dup("Undef"), NULL, 0);
@@ -273,7 +273,7 @@ pcc_put_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
                  * to parrot calling conventions.
                  *
                  * Currently these assigned colors are used if
-                 * allocate_wante_regs() is turned on with -Oc.
+                 * allocate_wanted_regs() is turned on with -Oc.
                  *
                  * But with allocate regs a call that doesn't
                  * want return results breaks:
@@ -299,7 +299,7 @@ pcc_put_args(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
             regs[0] = reg;
             regs[1] = arg;
             ins = insINS(interp, unit, ins, "set", regs, 2);
-            /* remember reg for life analysis */
+            /* remember register for life analysis */
             arg->used = reg;
 
             continue;
@@ -682,7 +682,7 @@ pcc_emit_flatten(Parrot_Interp interp, IMC_Unit * unit, Instruction *ins,
     char buf[128];
     char * s;
     /*
-     * emited code is
+     * emitted code is
      *   $I2 = i+5    # once
      *   ============
      *   $I0 = 0

@@ -16,8 +16,8 @@ typedef struct _edge {
 
 
 typedef struct _basic_block {
-    Instruction *start;
-    Instruction *end;
+    Instruction *start;         /* First instruction in basic block */
+    Instruction *end;           /* Last  instruction in basic block */
     Edge *pred_list;
     Edge *succ_list;
     int loop_depth;

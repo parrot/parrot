@@ -389,7 +389,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
 
     ins = _mk_instruction(name, format, r, dirs);
     ins->keys |= keyvec;
-    /* fill iin oplib's info */
+    /* fill in oplib's info */
     ins->opnum = op;
     ins->opsize = op_info->arg_count;
     /* mark end as absolute branch */
