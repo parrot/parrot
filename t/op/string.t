@@ -150,320 +150,150 @@ CODE
 done
 OUTPUT
 
+my @strings = (
+  "hello", "hello",
+  "hello", "world",
+  "world", "hello",
+  "hello", "hellooo",
+  "hellooo", "hello",
+  "hello", "hella",
+  "hella", "hello",
+  "hella", "hellooo",
+  "hellooo", "hella",
+  "hElLo", "HeLlO",
+  "hElLo", "hElLo"
+);
+
 output_is(<<CODE, <<OUTPUT, "eq_s_ic");
-    set S0, "hello"
-    set S1, "hello"
-    set S2, "world"
-    eq S0, S1, ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    eq S0, S2, ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
+@{[ compare_strings( 0, "eq", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "eq_sc_ic");
-    set S0, "hello"
-    eq S0, "hello", ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    eq S0, "world", ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
+@{[ compare_strings( 1, "eq", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_s_ic");
-    set S0, "Hello"
-    set S1, "Hello"
-    set S2, "World"
-    ne S0, S1, ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    ne S0, S2, TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
+@{[ compare_strings( 0, "ne", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ne_sc_ic");
-    set S0, "Hello"
-    ne S0, "Hello", ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    ne S0, "World", TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
+@{[ compare_strings( 1, "ne", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_s_ic");
-    set S0, "hElLo"
-    set S1, "hElLo"
-    set S2, "wOrLd"
-    lt S0, S2, ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    lt S2, S0, ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    lt S0, S1, ERROR
-    branch THREE
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 0, "lt", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "lt_sc_ic");
-    set S0, "hElLo"
-    set S1, "wOrLd"
-    lt S0, "wOrLd", ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    lt S1, "hElLo", ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    lt S0, "hElLo", ERROR
-    branch THREE
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 1, "lt", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "le_s_ic");
-    set S0, "hello"
-    set S1, "hello"
-    set S2, "planet"
-    le S0, S2, ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    le S2, S0, ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    le S0, S1, THREE
-    branch ERROR
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 0, "le", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "le_sc_ic");
-    set S0, "hello"
-    set S1, "planet"
-    le S0, "planet", ONE
-    branch ERROR
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    le S1, "hello", ERROR
-    branch TWO
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    le S0, "hello", THREE
-    branch ERROR
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 1, "le", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "gt_s_ic");
-    set S0, "hello"
-    set S1, "hello"
-    set S2, "hellooo"
-    gt S0, S2, ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    gt S2, S0, TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    gt S0, S1, ERROR
-    branch THREE
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 0, "gt", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "gt_sc_ic");
-    set S0, "hello"
-    set S1, "hellooo"
-    gt S0, "hellooo", ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    gt S1, "hello", TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    gt S0, "hello", ERROR
-    branch THREE
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 1, "gt", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ge_s_ic");
-    set S0, "hello"
-    set S1, "hello"
-    set S2, "world"
-    ge S0, S2, ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    ge S2, S0, TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    ge S0, S1, THREE
-    branch ERROR
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 0, "ge", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "ge_sc_ic");
-    set S0, "hello"
-    set S1, "world"
-    ge S0, "world", ERROR
-    branch ONE
-    print "bad\\n"
-ONE:
-    print "ok 1\\n"
-    ge S1, "hello", TWO
-    branch ERROR
-    print "bad\\n"
-TWO:
-    print "ok 2\\n"
-    ge S0, "hello", THREE
-    branch ERROR
-    print "bad\\n"
-THREE:
-    print "ok 3\\n"
+@{[ compare_strings( 1, "ge", @strings ) ]}
+    print "ok\\n"
     end
 ERROR:
     print "bad\\n"
     end
 CODE
-ok 1
-ok 2
-ok 3
+ok
 OUTPUT
 
 # Set all string registers to values given by &$_[0](reg num)
@@ -480,6 +310,37 @@ sub print_str_regs {
   my $rt;
   for (0..31) {
     $rt .= "\tprint S$_\n";
+  }
+  return $rt;
+}
+# Generate code to compare each pair of strings in a list
+sub compare_strings {
+  my $const = shift;
+  my $op = shift;
+  my @strings = @_;
+  my $i = 1;
+  my $rt;
+  while (@strings) {
+    my $s1 = shift @strings;
+    my $s2 = shift @strings;
+    my $arg;
+    $rt .= "    set S0, \"$s1\"\n";
+    if ($const) {
+      $arg = "\"$s2\"";
+    }
+    else {
+      $rt .= "    set S1, \"$s2\"\n";
+      $arg = "S1";
+    }
+    if (eval "\"$s1\" $op \"$s2\"") {
+      $rt .= "    $op S0, $arg, OK$i\n";
+      $rt .= "    branch ERROR\n";
+    }
+    else {
+      $rt .= "    $op S0, $arg, ERROR\n";
+    }
+    $rt .= "OK$i:\n";
+    $i++;
   }
   return $rt;
 }
