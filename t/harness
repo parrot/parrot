@@ -6,5 +6,5 @@ use lib 'lib';
 use Test::Harness qw(runtests);
 
 # Pass in a list of tests to run on the command line, else run all the tests.
-my @tests = @ARGV ? @ARGV : map { glob( "t/$_/*.t" ) } ( qw(op op/pmc) );
+my @tests = @ARGV ? @ARGV : map { glob( "t/$_/*.t" ) } ( qw(op pmc) );
 runtests(@tests);
