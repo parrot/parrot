@@ -8,12 +8,13 @@
 use strict;
 use Getopt::Std;
 
-my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func);
-$DIS = 'python -i mydis.py';
+my ($DIS, @dis, @source, $file, %opt, $DEFVAR, $cur_func, $lambda_count);
+$DIS = 'python mydis.py';
 $DEFVAR = 'PerlInt';
 
 getopts('dnD', \%opt);
 $file = $ARGV[0];
+$lambda_count = 0;
 
 my %builtin_ops = (
     abs => 'o',
@@ -78,53 +79,10 @@ sub parse_dis
     @diff;
 }
 
-# return disassembly of file
-# Pfew
-sub get_dis2 {
-    my ($cmd, $f, @syms) = @_;
-    use FileHandle;
-    use IPC::Open3;
-    my ($mod, $dir1, $dir2);
-    $f =~ /(\w+)/;
-    $mod = $1;
-    open3(*Wr, *Rd, *Er, "$cmd $f");
-    print Wr qq!print\n!;
-    print Wr "from $mod import *\n";
-    for my $s (@syms) {
-	$s =~ s/[\s']//g;
-	print Wr qq!print\n!;
-	print Wr qq!print "Disassembly of $s"\n!;
-	print Wr "dis($s)\n";
-	print STDERR "dis($s)\n" if $opt{d};
-    }
-    close Wr;
-    @dis = <Rd>;
-    close Er;
-    close Rd;
-    print @dis if $opt{d};
-    @dis;
-}
 sub get_dis {
     my ($cmd, $f) = @_;
-    use FileHandle;
-    use IPC::Open3;
-    my ($mod, $dir1, $dir2);
-    $f =~ /(\w+)/;
-    $mod = $1;
-    open3(*Wr, *Rd, *Er, "$cmd $f");
-    # print Wr "import $mod\n";
-    # print Wr "dis($mod)\n";
-    print Wr "dir()\n";
-    print Wr "from $mod import *\n";
-    print Wr "dir()\n";
-    close Wr;
-    my @d = <Rd>;
-    close Er;
-    close Rd;
-    #@dis = qx($cmd $f);
-    #print @dis if $opt{d};
-    my (@syms) = parse_dis(@d);
-    get_dis2($cmd, $f, @syms);
+    @dis = qx($cmd $f);
+    print @dis if $opt{d};
 }
 
 sub get_source {
@@ -140,7 +98,7 @@ my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
 sub decode_line {
     my $l = shift;
     my ($pc, $line ,$opcode, $arg, $rest);
-    if ($l =~ /Disassembly of (\w+)/) {
+    if ($l =~ /Disassembly of <?(\w+)>?/) {
 	push @code, [ 0, 0, "New_func", 0, $1, undef ];
 	return;
     }
@@ -162,6 +120,23 @@ sub decode_line {
 	    $source = $source[$line-1];
 	    if ($source =~ /def (\w+)\s*\((.*)\)/) {
 		my ($f, $args) = ($1, $2);
+		my @args = split(/,/, $args);
+		my $n = @args;
+		$arg_count{$f} = $n;
+		for (my $i = 0; $i < $n; $i++) {
+		    my ($a, $def) = split(/=/, $args[$i]);
+		    $a =~ s/\s//g;
+		    $a = qq!"$a"!;   # quote argument
+		    $def_arg_names{$f}{$a} = $i;
+		    # print STDERR "def $f($a = $i)\n";
+		}
+		push @code, [$line, $pc, "ARG_count", $n, $f, $source];
+	    }
+	    elsif ($source =~ /lambda\s(.*?):/) {
+		my $f = "lambda_$lambda_count";
+		print "#xxxxxxxxx $f\n";
+		my $args = $1;
+		++$lambda_count;
 		my @args = split(/,/, $args);
 		my $n = @args;
 		$arg_count{$f} = $n;
@@ -279,7 +254,7 @@ EOC
 	my $cmt = "";
 	print "## $src" if  $src;
 
-	if ($rest =~ /(<code object \w+)/) {
+	if ($rest =~ /(<code> \w+)/) {
 	    $rest = "$1 ..>";
 	}
 	$cmt = "\t\t# $opcode\t$arg $rest" unless $opt{n};
@@ -320,7 +295,7 @@ sub is_imag {
 sub typ {
     my $c = $_[0];
     my $t = 'P';
-    if ($c =~ /code object/) {
+    if ($c =~ /<code>/) {
 	$t = 'c';
     }
     elsif ($c =~ /^[+-]?\d+$/) {	# int
@@ -346,6 +321,12 @@ sub promote {
     my $v = $_[0];
     my $n = $v->[1];
     if ($v->[2] ne 'P') {
+	if ($v->[2] eq 'c') {
+	    if ($v->[1] =~ /<code> (lambda_\d+)/) {
+		$n = $1;
+		return $n;
+	    }
+	}
 	$n = temp('P');
 	print <<"EOC";
 	$n = new $DEFVAR
@@ -454,8 +435,8 @@ EOC
 EOC
 	return;
     }
-    # a temp - store it
-    if ($pmc =~ /^\$/) {
+    # a temp - store it - XXX or a global dunno
+    if (1||$pmc =~ /^\$/) {
 	print <<"EOC";
 	global "$c" = $pmc \t# case 2
 	$c = $pmc
@@ -574,7 +555,7 @@ sub MAKE_FUNCTION
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
     my $f;
-    $tos->[1] =~ /code object (\w+)/;
+    $tos->[1] =~ /<code> (\S+)/;
     $f = $1;
     print "\t\t$cmt\n";
     if ($n) {
@@ -591,8 +572,8 @@ EOC
 	    unshift @{$def_args{$f}}, $gn;
 	}
     }
-    $pir_functions{$1} = 1;
-    $make_f = 1;
+    $pir_functions{$f} = 1;
+    $make_f = 1 unless $f =~ /lambda/;
 }
 
 sub binary

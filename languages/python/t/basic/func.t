@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -282,3 +282,7 @@ if __name__ == '__main__':
 	#f(17, j=4)
 CODE
 
+test(<<'CODE', 'lambda(x)')
+if __name__ == '__main__':
+    print filter(lambda x: x < 5, range(10)) == range(5)
+CODE

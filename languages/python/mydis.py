@@ -1,11 +1,11 @@
 import sys
-from dis import *
+from mdis import *
 
 def _test():
     """Simple test program to disassemble a file."""
     if sys.argv[1:]:
         if sys.argv[2:]:
-            sys.stderr.write("usage: python dis.py [-|file]\n")
+            sys.stderr.write("usage: python mdis.py [-|file]\n")
             sys.exit(2)
         fn = sys.argv[1]
         if not fn or fn == "-":
