@@ -795,11 +795,11 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 STRING *
 PIO_reads(theINTERP, PMC *pmc, size_t len)
 {
-    STRING *res = new_string_header(interpreter, 0);
+    STRING *res = NULL;
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
 
-    res->representation = enum_stringrep_one;
+    res = PIO_make_io_string(interpreter, &res, len );
 
     if (!io)
         return res;

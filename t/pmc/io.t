@@ -16,7 +16,7 @@ Tests the Parrot IO operations.
 
 =cut
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Test::More;
 
 sub file_content_is {
@@ -497,3 +497,47 @@ CODE
 01234
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "multiple substr after reading from file");
+##PIR##
+.sub _main 
+    # Write something into a file
+    .local pmc out
+    out = open "temp.file", ">"
+    print out, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
+    close out
+
+    .local pmc in
+    .local string line
+    in = open 'temp.file', '<'
+    line = read in, 50000
+    close in
+
+    .local string sub_1
+    sub_1 = ''
+    .local string sub_2
+    sub_2 = ''
+    .local string sub_3
+    sub_3 = ''
+    substr sub_1, line, 0, 3
+    substr sub_2, line, 0, 3, ''
+    substr sub_3, line, 0, 3, ''
+    print "line: "
+    print line
+    print "sub_1: "
+    print sub_1
+    print "\n"
+    print "sub_2: "
+    print sub_2
+    print "\n"
+    print "sub_3: "
+    print sub_3
+    print "\n"
+
+  end
+.end
+CODE
+line: 6789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+sub_1: 012
+sub_2: 012
+sub_3: 345
+OUTPUT
