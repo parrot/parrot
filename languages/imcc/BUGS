@@ -1,7 +1,7 @@
 BUGS:
 
- - lexer doesn't impose limits on identfiers, this could lead
+ - lexer doesn't impose limits on identifiers, this could lead
    to buffer overflows.
-   So there a bunch of strcats and sprintf's, some of them
+   So there are a bunch of strcats and sprintf's, some of them
    marked XXX, that are unsafe.
 
