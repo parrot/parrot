@@ -96,11 +96,21 @@ Swaps the "context".
     void* invoke (void* next) {
         struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
         void * dest = PMC_struct_val(SELF);
+        int argcP = REG_INT(3);
         /* python calls the coroutine initially during
          * setup
          */
         if (PObj_get_FLAGS(SELF) & PObj_private3_FLAG) {
-            REG_PMC(5) = SELF.get_iter();
+            PMC *ret = SELF.get_iter();
+            struct Parrot_Sub *cor = PMC_sub(ret);
+            struct Stack_Chunk *pad_stack = cor->ctx.pad_stack;
+            PMC *pad = stack_peek(INTERP, pad_stack, NULL);
+            INTVAL i;
+
+            for (i = 0; i < argcP; ++i) {
+                scratchpad_store_by_index(INTERP, pad, -1, i, REG_PMC(5+i));
+            }
+            REG_PMC(5) = ret;
             return next;
         }
         PMC_struct_val(SELF) = next;
@@ -140,10 +150,11 @@ end of a coroutine:
         call_hook = sub->end - 5;
         offset = call_hook - interpreter->code->byte_code;
         /*
-         * we should also catch exceptions here, so that register
-         * frames are restored - same as with all such code
+         * running via runops creates an exception frame
+         *  but we should catch exceptions here to free the register
+         *  frame
          */
-        runops_int(interpreter, offset);
+        runops(interpreter, offset);
         res = REG_PMC(5);
         /*
          * the generator returned None, when it's finished

@@ -128,7 +128,7 @@ sub get_source {
 }
 
 my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
-    @code, %globals, %classes, @loops, %def_arg_names);
+    @code, %globals, %classes, @loops, %def_arg_names, %func_info);
 
 sub decode_line {
     my $l = shift;
@@ -223,8 +223,16 @@ EOC
     print <<EOC;
 	$params
 EOC
+    if ($func_info{$arg}{flags} & 0x20) {  # GENERATOR flag
+	for (my $i = 0; $i < @params; ++$i) {
+	    my $p = $params[$i];
+	    print <<EOC;
+	$p = find_lex -1, $i
+EOC
+	}
+    }
     print <<EOC;
-	new_pad -1
+	# new_pad -1
 	.local pmc None
 	None = new .None
 EOC
@@ -264,7 +272,7 @@ sub ARG_count {
 EOC
 }
 
-my (@stack, $temp, $make_f, %pir_functions, %func_info);
+my (@stack, $temp, $make_f, %pir_functions);
 
 sub gen_code {
     $cur_func = 'test::main';
@@ -293,13 +301,24 @@ EOC
 	    if (/^#/) {
 		if (/# getargs\s+\(\[(.*)\], (.*?), (.*?)\)/) {
 		    my ($args, $ar, $kw) = ($1, $2, $3);
-		    $args =~ s/'//g;
+		    $args =~ s/[\s']//g;
 		    $ar =~ s/'//g;
 		    $kw =~ s/'//g;
 		    print "# $cur_f: args='$args' ar= '$ar' kw='$kw'\n";
 		    $func_info{$cur_f}{'args'} = $args;
 		    $func_info{$cur_f}{'ar'} = $ar;
 		    $func_info{$cur_f}{'kw'} = $kw;
+		}
+		elsif (/# flags\s+(\S*)/) {
+		    my $f = eval($1);
+		    $func_info{$cur_f}{flags} = $f;
+		    print "# $cur_f; flags=$f\n";
+		}
+		elsif (/# varnames\s+\((.*)\)/) {
+		    my $vars = $1;
+		    $vars =~ s/[\s']//g;
+		    $func_info{$cur_f}{varnames} = $vars;
+		    print "# $cur_f; vars=$vars\n";
 		}
 	    }
 	    else {
@@ -1175,11 +1194,13 @@ sub POP_TOP
     print "\t\t$cmt\n";
     #pop @stack;
 }
+my @fast;
 sub LOAD_FAST
 {
     my ($n, $c, $cmt) = @_;
     my $p;
     if ($p=$lexicals{$c}) {
+	$n = $fast[$n]->[0];
 	print <<EOC;
 	\t # '$c' := $p $cmt
 EOC
@@ -1201,6 +1222,7 @@ sub STORE_FAST
 {
     my ($n, $c, $cmt) = @_;
     my $tos = pop @stack;
+    $fast[$n] = $tos;
     my $p;
     if ($p = $lexicals{$c}) {
 	if ($p eq $tos->[1]) {

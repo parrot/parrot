@@ -150,6 +150,8 @@ static void
 set_slice_next(Interp *interpreter, PMC *self, PMC *agg)
 {
     parrot_range_t *r = PMC_struct_val(self);
+    if (!r || (INTVAL) r == -1)
+        real_exception(interpreter, NULL, E_StopIteration, "StopIteratrion");
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
         if (RVal_int(r->step) > 0) {
@@ -235,7 +237,13 @@ C<xrange> object.
 
     void init () {
         PMC_struct_val(SELF) = NULL;
-        PObj_active_destroy_SET(SELF);
+        PMC_pmc_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    void mark () {
+        if (PMC_pmc_val(SELF))
+            pobject_lives(interpreter, (PObj*) PMC_pmc_val(SELF));
     }
 
     void init_pmc (PMC* key) {
@@ -281,6 +289,8 @@ Get the next string key from the current slice range.
 
     INTVAL get_integer() {
         parrot_range_t *r = PMC_struct_val(SELF);
+        if (!r || (INTVAL) r == -1)
+            real_exception(INTERP, NULL, E_StopIteration, "StopIteratrion");
         return RVal_int(r->cur);
     }
 

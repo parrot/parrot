@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -92,4 +92,9 @@ if __name__ == '__main__':
     except StopIteration:
 	pass
     print "Ok"
+CODE
+
+test(<<'CODE', 'map with constructor');
+a = map(int, (1.2, 3.4))
+print a
 CODE

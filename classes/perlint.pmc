@@ -86,7 +86,7 @@ C<int> object according to 2.1. Built-in Functions.
     void* invoke(void* next) {
         int argcP = REG_INT(3);
         int base;
-        PMC *res;
+        PMC *res, *arg;
         STRING *num;
 
         if (!argcP) {
@@ -98,7 +98,18 @@ C<int> object according to 2.1. Built-in Functions.
         if (argcP == 2)
             base = VTABLE_get_integer(INTERP, REG_PMC(6));
         res = pmc_new(interpreter, enum_class_BigInt);
-        num = VTABLE_get_string(interpreter, REG_PMC(5));
+        arg = REG_PMC(5);
+        if (arg->vtable->base_type == enum_class_PerlNum) {
+            FLOATVAL d = VTABLE_get_number(INTERP, arg);
+            const char *sign = "-";
+            d = floor(d);
+            if (!signbit(d))
+                sign = "";
+            d = fabs(d);
+            num = Parrot_sprintf_c(interpreter, "%s%.12g", sign, d);
+        }
+        else
+            num = VTABLE_get_string(interpreter, arg);
         VTABLE_set_string_keyed_int(interpreter, res, base, num);
         if (num->strlen < 9) {  /* XXX */
             /* TODO not if it would overflow */

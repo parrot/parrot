@@ -88,8 +88,8 @@ Parrot_py_fill_dict(Interp *interpreter, PMC *dict, PMC *arg)
 {
     switch (arg->vtable->base_type) {
         case enum_class_FixedPMCArray:  /* sequence from BUILD_TUPLE */
-        case enum_class_PerlArray:      /* sequence from BUILD_LIST */
-        case enum_class_ResizablePMCArray:
+        case enum_class_PerlArray:
+        case enum_class_ResizablePMCArray:/* sequence from BUILD_LIST */
             dict_from_tuple_array(interpreter, dict, arg);
             break;
         default:
@@ -283,8 +283,17 @@ parrot_py_map(Interp *interpreter, PMC *func, PMC *list)
             /* run filter func -
              * TODO save registers once around loop
              */
+            if (func->vtable->data == func) {
+                REG_PMC(5) = item;
+                REG_INT(3) = 1;
+                VTABLE_invoke(interpreter, func, 0);
+                item = REG_PMC(5);
+                /* an object constructor */
+            }
+            else {
             item = Parrot_runops_fromc_args_save(interpreter, func,
                     "PP", item);
+            }
         }
         VTABLE_set_pmc_keyed_int(interpreter, res, i++, item);
     }
