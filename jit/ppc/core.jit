@@ -195,7 +195,7 @@ Parrot_band_i_i {
 
 Parrot_bor_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
-
+}
 
 Parrot_bxor_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
