@@ -477,7 +477,7 @@ build_call_func(Interp *interpreter, PMC *pmc_nci,
             IGLOBALS_NCI_FUNCS);
 
     if (!HashPointer) {
-        HashPointer = pmc_new(interpreter, enum_class_PerlHash);
+        HashPointer = pmc_new(interpreter, enum_class_Hash);
 
 $put_pointer
 
