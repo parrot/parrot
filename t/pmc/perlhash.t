@@ -1192,7 +1192,7 @@ two
 three
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "check wether interface is done");
+output_is(<< 'CODE', << 'OUTPUT', "check whether interface is done");
 ##PIR##
 .sub _main
     .local pmc pmc1
@@ -1224,6 +1224,9 @@ output_is(<< 'CODE', << 'OUTPUT', "iter");
     shift P2, P1
     print P2
     print "\n"
+    unless P1 goto ok
+    print "Surprise!\n"
+ok:
     end
 .end
 CODE
