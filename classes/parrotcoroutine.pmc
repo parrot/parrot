@@ -19,10 +19,10 @@ pmclass ParrotCoroutine {
        return enum_class_ParrotCoroutine;
    }
 
-/*
    STRING* name () {
+	return whoami;
    }
-*/
+
    void init (INTVAL address) {
        SELF->data = new_coroutine(INTERP, (opcode_t*)address);
    }

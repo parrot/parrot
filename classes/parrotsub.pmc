@@ -19,10 +19,11 @@ pmclass ParrotSub {
        return enum_class_ParrotSub;
    }
 
-/*
+
    STRING* name () {
+	return whoami;
    }
-*/
+
    void init (INTVAL address) {
        SELF->data = new_sub(INTERP, (opcode_t*)address);
    }

@@ -686,10 +686,16 @@ new_tracked_header(struct Parrot_Interp *interpreter, size_t size)
     struct Resource_Pool* pool;
     Buffer * buffer;
     size = (size + sizeof(void*) - 1) & ~(sizeof(void*) - 1);
-    pool = new_sized_resource_pool(interpreter, size);
+    /* Just malloc one if we don't have something. Which I don't like */
+    if (NULL == interpreter) {
+        buffer = mem_sys_allocate(size);
+    }
+    else {
+        pool = new_sized_resource_pool(interpreter, size);
     
-    buffer = get_from_free_pool(interpreter, pool);
-    interpreter->active_Buffers++;
+        buffer = get_from_free_pool(interpreter, pool);
+        interpreter->active_Buffers++;
+    }
     buffer->flags = 0;
     buffer->bufstart = NULL;
     buffer->buflen = 0;
@@ -1011,10 +1017,17 @@ Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 
     buffer = from;
     copysize = (buffer->buflen > tosize ? tosize : buffer->buflen);
-    interpreter->arena_base->memory_pool->reclaimable += buffer->buflen;
+    if (interpreter) {
+        interpreter->arena_base->memory_pool->reclaimable +=
+            buffer->buflen;
+        mem = mem_allocate(interpreter, &alloc_size, 
+                           interpreter->arena_base->memory_pool);
+    }
+    else {
+        mem = mem_allocate(NULL, &alloc_size, NULL);
+    }
 
-    mem = mem_allocate(interpreter, &alloc_size, 
-                       interpreter->arena_base->memory_pool);
+
     if (!mem) {
         return NULL;
     }
