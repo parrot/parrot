@@ -314,10 +314,6 @@ sub main() {
 
   board = new_board();
 
-  print_board(board);
-  board = place_queen(board, 3, 3);
-  print_board(board);
-
   #
   # Scan over the files, placing queens:
   #
