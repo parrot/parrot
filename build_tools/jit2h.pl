@@ -279,7 +279,7 @@ for ($i = 0; $i < $core_numops; $i++) {
 	$tmp    =  $bytecode;
 	$tmp    =~ s/[^x]//g;
 	$size   =  length($tmp);
-    $nargop =  $op->size - 1; # Op size includes 1 for op itself
+    $nargop =  $op->size;
 
 #    print STDERR "Shipping out code for " . $op->func_name . "...\n";
 
