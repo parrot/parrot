@@ -506,13 +506,6 @@ make_interpreter(Interp_flags flags)
     memset(interpreter->warns, 0, sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
-    /* Set up defaults for line/package/file */
-    interpreter->current_line = 0;
-    interpreter->current_file =
-        string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
-    interpreter->current_package =
-        string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
-
     /* Set up the initial register chunks */
     interpreter->int_reg_base = mem_allocate_aligned(sizeof(struct IRegChunk));
     interpreter->num_reg_base = mem_allocate_aligned(sizeof(struct NRegChunk));
@@ -576,6 +569,13 @@ make_interpreter(Interp_flags flags)
      */
     interpreter->piodata = NULL;
     PIO_init(interpreter);
+
+    /* Set up defaults for line/package/file */
+    interpreter->current_line = 0;
+    interpreter->current_file =
+        string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
+    interpreter->current_package =
+        string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
 
     /* Done. Return and be done with it */
 
