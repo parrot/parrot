@@ -66,7 +66,7 @@ sub goto_offset
 sub goto_pop
 {
   my ($self) = @_;
-  return "return pop_dest(interpreter)";
+  return "return (((opcode_t *)pop_dest(interpreter) - (opcode_t *)interpreter->code->byte_code) + interpreter->prederef_code)";
 }
 
 
@@ -86,7 +86,7 @@ sub access_arg
     'p'  => "(*(PMC **)cur_opcode[%ld])",
     's'  => "(*(STRING **)cur_opcode[%ld])",
 
-    'ic' => "(*(INTVAL *)&cur_opcode[%ld])",
+    'ic' => "(*(INTVAL *)cur_opcode[%ld])",
     'nc' => "(*(FLOATVAL *)cur_opcode[%ld])",
     'pc' => "%ld /* ERROR: Don't know how to handle PMC constants yet! */",
     'sc' => "(*(STRING **)cur_opcode[%ld])",
