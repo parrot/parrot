@@ -1,6 +1,6 @@
-=head1 Name
+=head1 TITLE
 
-    byteorder.dev
+    Byteorder conversion functions
 
 =head1 Overview
 
@@ -8,19 +8,18 @@ The byteorder code will check the endianness of an C<INTVAL> or
 an C<opcode_t> value and swap from little to big, or big to little
 when appropriate.  Functions also exist to convert a 4, 8, 12,
 or 16 byte character buffer to big or little endian.
-The functions will be placed in the PackFile
-vtable and will be called when necessary.  It is hoped that
-the Parrot interpreter will not call these functions when
-converting from and to the same byteorder.
+The functions will be placed in the PackFile vtable and will be called 
+when necessary. The Parrot interpreter should be smart enough to avoid
+calling these functions when converting from and to the same byteorder.
 
 =head1 Data Structures and Algorithms
 
-The algorithm to change from one endian to another is
-identical and simplistic to understand.  Basically,
+The algorithm to change from one endianness to another is
+identical and simple to understand.  Basically,
 the size of an C<INTVAL> or C<opcode_t> is used to
 determine at compile time how many bits should
-be shifted around.  Then, the correct bits are shifted
-the correct amounts (please look at source code for
+be shifted around.  Then the correct bits are shifted
+by the correct amounts (please look at source code for
 exact amounts).  The buffer change functions are implemented
 by a straight forward algorithm that assigns swaps all
 of the bytes.
@@ -41,17 +40,17 @@ This function will convert an C<INTVAL> into
 big endian format. It is a no-op if the native
 format is already big endian.
 
-=item C<fetch_op_be>
-
-This function will convert an C<opcode_t> into
-big endian format. It is a no-op if the native
-format is already big endian.
-
 =item C<fetch_op_le>
 
 This function will convert an C<opcode_t> into
 little endian format. It is a no-op if the native
 format is already little endian.
+
+=item C<fetch_op_be>
+
+This function will convert an C<opcode_t> into
+big endian format. It is a no-op if the native
+format is already big endian.
 
 =item C<fetch_buf_le_>(4,8,12,16)
 
@@ -75,11 +74,11 @@ if the native format is already big endian.
 
 =item C<endianize_fetch_int>
 
-fetch an C<INTVAL> directly from a bytestream
+Fetch an C<INTVAL> directly from a bytestream
 
 =item C<endianize_put_int>
 
-put an C<INTVAL> directly on a bytestream
+Put an C<INTVAL> directly on a bytestream
 
 =back
 
