@@ -58,7 +58,7 @@ rec:
     n2 = n - 2
     r1 = self."fibA"(n1)
     r2 = self."fibB"(n2)
-    #n = new PerlInt	# not really needed???
+    n = new PerlInt
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -82,7 +82,7 @@ rec:
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibB"(n2)
-    #n = new PerlInt	# not really needed
+    n = new PerlInt
     n = r1 + r2
     .pcc_begin_return
     .return n
@@ -108,7 +108,7 @@ rec:
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibA"(n2)
-    #n = new PerlInt	# not really needed
+    n = new PerlInt
     n = r1 + r2
     .pcc_begin_return
     .return n
