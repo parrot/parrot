@@ -70,131 +70,74 @@ typedef struct PDB {
     int                     state;
 } PDB_t;
 
-void
-PDB_run_command(struct Parrot_Interp *,
-                const char *);
+void PDB_run_command(struct Parrot_Interp *, const char *);
 
-void
-PDB_get_command(struct Parrot_Interp *);
+void PDB_get_command(struct Parrot_Interp *);
 
-void
-PDB_print(struct Parrot_Interp *,
-          const char *);
+void PDB_print(struct Parrot_Interp *, const char *);
 
-void
-PDB_print_int(struct IReg *,
-              const char *);
+void PDB_print_int(struct IReg *, const char *);
 
-void
-PDB_print_num(struct NReg *,
-              const char *);
+void PDB_print_num(struct NReg *, const char *);
 
-void
-PDB_print_string(struct Parrot_Interp *interpreter,
-                 struct SReg *,
-                 const char *);
+void PDB_print_string(struct Parrot_Interp *interpreter,
 
-void
-PDB_print_pmc(struct Parrot_Interp *interpreter,
-              struct PReg *,
-              const char *);
+                      struct SReg *, const char *);
 
-void
-PDB_debug(struct Parrot_Interp *);
+void PDB_print_pmc(struct Parrot_Interp *interpreter,
+                   struct PReg *, const char *);
 
-void
-PDB_next(struct Parrot_Interp *,
-         const char *);
+void PDB_debug(struct Parrot_Interp *);
 
-void
-PDB_trace(struct Parrot_Interp *,
-          const char *);
+void PDB_next(struct Parrot_Interp *, const char *);
 
-void
-PDB_eval(struct Parrot_Interp *,
-         const char *);
+void PDB_trace(struct Parrot_Interp *, const char *);
 
-int
-PDB_extend_const_table(struct Parrot_Interp *);
+void PDB_eval(struct Parrot_Interp *, const char *);
 
-void
-PDB_init(struct Parrot_Interp *,
-         const char *);
+int PDB_extend_const_table(struct Parrot_Interp *);
 
-void
-PDB_continue(struct Parrot_Interp *,
-             const char *);
+void PDB_init(struct Parrot_Interp *, const char *);
 
-char
-PDB_break(struct Parrot_Interp *);
+void PDB_continue(struct Parrot_Interp *, const char *);
 
-void
-PDB_delete_breakpoint(struct Parrot_Interp *,
-                      const char *);
+char PDB_break(struct Parrot_Interp *);
 
-void
-PDB_skip_breakpoint(struct Parrot_Interp *interpreter,
-                    long i);
+void PDB_delete_breakpoint(struct Parrot_Interp *, const char *);
 
-char *
-PDB_escape(const char *);
+void PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i);
 
-int
-PDB_unescape(char *);
+char * PDB_escape(const char *);
 
-void
-PDB_disassemble(struct Parrot_Interp *,
-                const char *);
+int PDB_unescape(char *);
 
-long
-PDB_add_label(PDB_file_t *,
-              opcode_t *,
-              opcode_t);
+void PDB_disassemble(struct Parrot_Interp *, const char *);
 
-void
-PDB_load_source(struct Parrot_Interp *,
-                const char *);
+long PDB_add_label(PDB_file_t *, opcode_t *, opcode_t);
 
-void
-PDB_list(struct Parrot_Interp *,
-         const char *);
+void PDB_load_source(struct Parrot_Interp *, const char *);
 
-void
-PDB_set_break(struct Parrot_Interp *,
-              const char *);
+void PDB_list(struct Parrot_Interp *, const char *);
 
-char
-PDB_program_end(struct Parrot_Interp *);
+void PDB_set_break(struct Parrot_Interp *, const char *);
 
-char
-PDB_hasinstruction(char *);
+char PDB_program_end(struct Parrot_Interp *);
 
-void
-PDB_print_stack(struct Parrot_Interp *,
-                const char *);
+char PDB_hasinstruction(char *);
 
-void
-PDB_print_user_stack(struct Parrot_Interp *interpreter,
-                     const char *command);
+void PDB_print_stack(struct Parrot_Interp *, const char *);
 
-void
-PDB_print_stack_int(struct Parrot_Interp *,
-                    const char *);
+void PDB_print_user_stack(struct Parrot_Interp *, const char *);
 
-void
-PDB_print_stack_num(struct Parrot_Interp *,
-                    const char *);
+void PDB_print_stack_int(struct Parrot_Interp *, const char *);
 
-void
-PDB_print_stack_string(struct Parrot_Interp *,
-                       const char *);
+void PDB_print_stack_num(struct Parrot_Interp *, const char *);
 
-void
-PDB_print_stack_pmc(struct Parrot_Interp *,
-                    const char *);
+void PDB_print_stack_string(struct Parrot_Interp *, const char *);
 
-void
-PDB_help(const char *);
+void PDB_print_stack_pmc(struct Parrot_Interp *, const char *);
+
+void PDB_help(const char *);
 
 #define valid_chunk(chunk,c,d,s,i) { \
     if (*c) { \
