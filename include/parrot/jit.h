@@ -232,6 +232,8 @@ void Parrot_jit_emit_mov_rm_n(
 void Parrot_jit_emit_mov_rm(
     struct Parrot_Interp *interpreter, int reg, char *mem);
 
+void *Parrot_jit_build_call_func(struct Parrot_Interp *, String *signature);
+
 #endif /* JIT_H_GUARD */
 
 /*

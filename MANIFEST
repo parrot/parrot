@@ -1571,6 +1571,7 @@ lib/Test/Builder.pm
 lib/Test/More.pm
 lib/Test/Simple.pm
 lib/Text/Balanced.pm
+libnci.def
 list.c
 make.pl
 malloc.c
@@ -1579,6 +1580,7 @@ math.ops
 memory.c
 method_util.c
 misc.c
+nci_test.c
 obscure.ops
 ops2c.pl
 ops2cgc.pl

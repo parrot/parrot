@@ -1,0 +1,12 @@
+LIBRARY libnci
+DESCRIPTION 'Parrot nci test support lib'
+EXPORTS
+    nci_dd
+    nci_ssc
+    nci_csc
+    nci_isc
+    nci_fff
+    nci_ip
+    nci_it
+    nci_tt
+    nci_pp

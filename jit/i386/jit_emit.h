@@ -2034,6 +2034,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     char *sig, *pc;
     int next_n = 5;
     int next_p = 5;
+    int next_s = 5;
     int next_i = 5;
     int st = 0;
 
@@ -2091,6 +2092,14 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
             case 'v':
                 st -= 4;        /* undo default stack usage */
                 break;
+            case 't':   /* string, pass a cstring */
+                jit_emit_mov_rm_i(pc, emit_EAX, &STR_REG(next_s++));
+                emitm_pushl_r(pc, emit_EAX);
+                emitm_pushl_i(pc, interpreter);
+                emitm_calll(pc, (char*)string_to_cstring - pc - 4);
+                emitm_addb_i_r(pc, 8, emit_ESP);
+                emitm_pushl_r(pc, emit_EAX);
+                break;
             default:
                 internal_exception(1,
                         "Parrot_jit_build_call_func: unimp argument\n");
@@ -2110,7 +2119,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
         emitm_addb_i_r(pc, st, emit_ESP);
 
     /* now place return value in registers */
-    next_i = next_n = next_p = 5;
+    next_i = next_n = next_p = next_s = 5;
     /* first in signature is the return value */
     switch (*sig) {
         case 'f':
@@ -2146,8 +2155,22 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
             emitm_popl_r(pc, emit_EDX);
             /* stuff return value into pmc->data */
             emitm_movl_r_m(pc, emit_EDX, emit_EAX, 0, 1,
-                        offsetof(struct PMC, data));
+                    offsetof(struct PMC, data));
             jit_emit_mov_mr_i(pc, &PMC_REG(next_p++), emit_EAX);
+            break;
+        case 't':   /* string, determine length, make string */
+            emitm_pushl_i(pc, 0);
+            emitm_pushl_i(pc, 0);
+            emitm_pushl_i(pc, 0);
+            emitm_pushl_r(pc, emit_EAX);
+            emitm_calll(pc, (char*)strlen - pc - 4);
+            emitm_popl_r(pc, emit_EDX);
+            emitm_pushl_r(pc, emit_EAX);
+            emitm_pushl_r(pc, emit_EDX);
+            emitm_pushl_i(pc, interpreter);
+            emitm_calll(pc, (char*)string_make - pc - 4);
+            emitm_addb_i_r(pc, 24, emit_ESP);
+            jit_emit_mov_mr_i(pc, &STR_REG(next_s++), emit_EAX);
             break;
         default:
             internal_exception(1,
@@ -2158,7 +2181,7 @@ Parrot_jit_build_call_func(struct Parrot_Interp *interpreter,
     jit_emit_mov_mi_i(pc, &INT_REG(0), 0);
     /* set return values in I,S,P,N regs */
     jit_emit_mov_mi_i(pc, &INT_REG(1), next_i-5);
-    jit_emit_mov_mi_i(pc, &INT_REG(2), 0);
+    jit_emit_mov_mi_i(pc, &INT_REG(2), next_s-5);
     jit_emit_mov_mi_i(pc, &INT_REG(3), next_p-5);
     jit_emit_mov_mi_i(pc, &INT_REG(4), next_n-5);
 

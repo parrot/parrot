@@ -90,6 +90,11 @@ print NCI <<'HEAD';
 #define PMC_REG(x) interpreter->ctx.pmc_reg.registers[x]
 #endif
 
+#if defined(HAS_JIT) && defined(I386)
+# include "parrot/jit.h"
+# define CAN_BUILD_CALL_FRAMES
+#endif
+
 #if !defined(CAN_BUILD_CALL_FRAMES)
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that's just fine */
@@ -139,7 +144,9 @@ void *build_call_func(struct Parrot_Interp *interpreter, String *signature) {
 #if defined(CAN_BUILD_CALL_FRAMES)
   /* This would be a good place to put the code that builds the
      frames. Undoubtedly painfully platform-dependent */
-  abort("Oh, no you can't!");
+
+   return Parrot_jit_build_call_func(interpreter, signature);
+
 #else
   /* And in here is the platform-independent way. Which is to say
      "here there be hacks" */
