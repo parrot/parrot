@@ -164,7 +164,7 @@ sub generate_functions {
       close SOURCE;
 
       _run_command("$PConfig{cc} $PConfig{ccflags} -I./include -c $PConfig{ld_out}$obj_f $source_f");
-      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{cc_exe_out}$exe_f $PConfig{libs} blib/lib/libparrot$PConfig{a}");
+      _run_command("$PConfig{link} $PConfig{linkflags} $obj_f $PConfig{cc_exe_out}$exe_f blib/lib/libparrot$PConfig{a} $PConfig{libs}");
       my $prog_output;
       _run_command(".$PConfig{slash}$exe_f", 'STDOUT' => $out_f, 'STDERR' => $out_f);
 
