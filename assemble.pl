@@ -18,7 +18,10 @@ GetOptions(\%options,('checksyntax',
 		      'version',
 		      'verbose',
 		      'output=s',
-		      'listing=s'));
+		      'listing=s',
+		      'include=s@'));
+
+my @include=(@{$options{'include'}},'.');
 
 if($options{'version'}) {
     print $0,'Version $Id$ ',"\n";
@@ -31,6 +34,7 @@ Options:
    --checksyntax        Check assembler syntax only, no output
    --help               This text
    --listing            Dump assembly listing to file
+   --include            Directory to search for included files
    --output             File to dump bytecode into
    --verbose            Show what's going on
    --version            Show assembler version
@@ -86,13 +90,15 @@ while(my $l=shift(@program)) {
 	if($pline=~m/^endm$/i) {
 	    # end of the macro
 	    $in_macro=0;
+	} elsif($pline=~m/^\S+\s+macro/) {
+	    error("Cannot define a macro inside of another macro");
 	} else {
 	    push(@{$macros{$cur_macro}[1]},$l);
 	}
 	$pline="";
     }
     if($pline=~m/^\#/ || $pline eq "") {
-	# its a comment, do nothing
+	# its a comment or blank, do nothing
 	$code=undef;
     } else {
 	my($label);
@@ -458,7 +464,14 @@ sub read_source {
     my($line)=1;
     my(@lines);
     my($handle)=gensym;
-    open($handle,$file) || error("Cannot open $file for input!",$ofile,$oline);
+    my($found);
+    foreach my $path (@include) {
+	open($handle,"$path/$file") && do {
+	    $found=1;
+	    last;
+	}
+    }
+    error("Cannot open $file for input!",$ofile,$oline) if(!$found);
     while(<$handle>) {
 	chomp;
 	my($sline)=$_;
