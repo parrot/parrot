@@ -11,8 +11,8 @@ all: doc-prep packfile-c.pod packfile-perl.pod $(POD)
 doc-prep:
 	$(MKDIR) ops
 
-packfile-c.pod: ../packfile.c
-	perldoc -u ../packfile.c > packfile-c.pod
+packfile-c.pod: ../src/packfile.c
+	perldoc -u ../src/packfile.c > packfile-c.pod
 
 packfile-perl.pod: ../lib/Parrot/PackFile.pm
 	perldoc -u ../lib/Parrot/PackFile.pm > packfile-perl.pod
