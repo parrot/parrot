@@ -245,38 +245,13 @@ and may go away). This is intended to return information about the
 PMC--what type of number or string it is, whether it's a scalar, hash,
 array, or list, and suchlike things.
 
-=item UINTVAL subtype_keyed(INTERP, PMC* self, PMC* key, INTVAL type)
-
-=item UINTVAL subtype_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL type)
-
-Return the subtype of the PMC indexed by B<key>.  The B<key> parameter
-is guaranteed not to be NULL for this method.
-
 =item STRING* name(INTERP, PMC* self)
 
 Return the name of the class for the PMC.
 
-=item STRING* name_keyed(INTERP, PMC* self, PMC* key)
+=item PMC* clone(INTERP, PMC* self)
 
-=item STRING* name_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the name of the class of the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
-
-=item void clone(INTERP, PMC* self, PMC *dest)
-
-Make B<dest> a clone of yourself. B<dest> is a PMC of the same type,
-created via B<pmc_new_noinit>.
-
-=item void clone_keyed(INTERP, PMC* self, PMC* key, PMC *dest)
-
-=item void clone_keyed_int(INTERP, PMC* self, INTVAL key, PMC *dest)
-
-Make B<dest> a clone of the PMC indexed by B<key>. If the PMC is fake,
-for example we're asking for a clone of an element of an integer
-array, this must return an appropriate real PMC that holds the fake
-information.  The B<key> parameter is guaranteed not to be NULL for
-this method.
+Return a clone of yourself. 
 
 =item PMC* find_method(INTERP, PMC* self, STRING* method_name)
 
@@ -284,16 +259,6 @@ Return a subroutine PMC for the passed method name. This subroutine
 PMC may be cached, so the method I<must> return an equivalent sub PMC
 each time, or be capable of dealing with the returned sub PMCs being
 reused.
-
-=item PMC* find_method_keyed(INTERP, PMC* self, PMC* key, STRING* method_name)
-
-=item PMC* find_method_keyed_int(INTERP, PMC* self, INTVAL key, STRING* method_name)
-
-Return a subroutine PMC for the passed method name. This subroutine
-PMC may be cached, so the method I<must> return an equivalent sub PMC
-each time, or be capable of dealing with the returned sub PMCs being
-reused.
-The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL get_integer(INTERP, PMC* self)
 
@@ -392,11 +357,6 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 Return a pointer to some data. The details of the data (type, location
 etc.) depend on the PMC. 
 
-=item void set_integer(INTERP, PMC* self, PMC* value)
-
-Sets the PMC to the integer value of the PMC in B<value>.
-What the PMC does with the passed in integer depends on the class.
-
 =item void set_integer_native(INTERP, PMC* self, INTVAL value)
 
 Sets the PMC to the integer value passed.
@@ -415,10 +375,6 @@ as B<self> so optimizations may be made.
 
 Sets the PMC indexed by B<key> to the integer value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
-
-=item void set_number(INTERP, PMC* self, PMC* value)
-
-Sets the PMC to the floating-point value of the PMC in B<value>.
 
 =item void set_number_native(INTERP, PMC* self, FLOATVAL value)
 
@@ -439,10 +395,6 @@ as B<self> so optimizations may be made.
 Sets the PMC indexed by B<key> to the floating-point value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
-=item void set_bignum(INTERP, PMC* self, PMC* value)
-
-Sets the PMC to the bignum value of B<value>.
-
 =item void set_bignum_native(INTERP, PMC* self, BIGNUM* value)
 
 Sets the PMC to the passed in bignum value.
@@ -461,10 +413,6 @@ as B<self> so optimizations may be made.
 
 Sets the PMC indexed by B<key> to the bignum value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
-
-=item void set_string(INTERP, PMC* self, PMC* value)
-
-Sets the PMC to the string value of B<value>.
 
 =item void set_string_native(INTERP, PMC* self, STRING* value)
 
@@ -522,34 +470,9 @@ is guaranteed not to be NULL.
 
 Sets a pointer inside the PMC. The details depend on the PMC.
 
-=item void set_same(INTERP, PMC* self, PMC* value)
-
-A shortcut version of C<set_pmc> in those cases where the interpreter
-knows the source and destination PMCs are of the same type.
-
-=item void set_same_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key)
-
-=item void set_same_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key)
-
-Sets the value keyed by B<key> to the value of B<value> keyed by B<value_key>.
-Both B<self> and B<value> are guaranteed to be of the same type so optimizations
-may be made.
-
-At least one of the two keys is guaranteed not to be NULL.
-
-Because the two PMCs are guaranteed to be of the same type, this method may
-throw an exception if the PMC class is a non-aggregate type.
-
 =item INTVAL elements(INTERP, PMC* self)
 
 Return the number of elements in the PMC.
-
-=item INTVAL elements_keyed(INTERP, PMC* self, PMC* key)
-
-=item INTVAL elements_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the number of elements in the PMC indexed by B<key>.
-The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL pop_integer(INTERP, PMC* self)
 
@@ -821,13 +744,6 @@ Add B<self> to B<value> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be
 made.
 
-=item void add_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Add B<self> to B<value> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.  In this case, it is guaranteed that B<self> and B<value> are of
-the same type.
-
 =item void add_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void add_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -847,13 +763,6 @@ At least one of the three keys is guaranteed to not be NULL.
 
 Subtract B<value> from B<self> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
-
-=item void subtract_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Subtract B<value> from B<self> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.  In this case, it is guaranteed that B<self> and B<value> are of
-the same type.
 
 =item void subtract_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
@@ -876,13 +785,6 @@ Multiply B<value> by B<self> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be
 made.
 
-=item void multiply_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Multiply B<value> by B<self> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.  In this case, it is guaranteed that B<self> and B<value> are of
-the same type.
-
 =item void multiply_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void multiply_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -904,13 +806,6 @@ Divide B<self> by B<value> and store the result in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be
 made.
 
-=item void divide_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Divide B<self> by B<value> and store the result in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.  In this case, it is guaranteed that B<self> and B<value> are of
-the same type.
-
 =item void divide_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void divide_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -931,13 +826,6 @@ At least one of the three keys is guaranteed to not be NULL.
 Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
 B<dest> may be equal to B<self>; in that case optimizations I<may> be
 made.
-
-=item void modulus_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
-B<dest> may be equal to B<self>; in that case optimizations I<may> be
-made.  In this case, it is guaranteed that B<self> and B<value> are of
-the same type.
 
 =item void modulus_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
@@ -981,13 +869,6 @@ Calculate the bitwise-OR of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
-=item void bitwise_or_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Calculate the bitwise-OR of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
-optimizations I<may> be made.  In this case, it is guaranteed that
-B<self> and B<value> are of the same type.
-
 =item void bitwise_or_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void bitwise_or_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -1005,13 +886,6 @@ Calculate the bitwise-AND of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
 
-=item void bitwise_and_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Calculate the bitwise-AND of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
-optimizations I<may> be made.  In this case, it is guaranteed that
-B<self> and B<value> are of the same type.
-
 =item void bitwise_and_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void bitwise_and_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -1028,13 +902,6 @@ At least one of the keys is guaranteed to be non-NULL.
 Calculate the bitwise-XOR of B<self> and B<value> and store the result
 in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
 optimizations I<may> be made.
-
-=item void bitwise_xor_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Calculate the bitwise-XOR of B<self> and B<value> and store the result
-in B<dest>.   Note that B<dest> may be equal to B<self>; in that case
-optimizations I<may> be made.  In this case, it is guaranteed that
-B<self> and B<value> are of the same type.
 
 =item void bitwise_xor_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
@@ -1091,13 +958,6 @@ Apply a leftward shift of B<value> bits to the number stored in B<self>,
 and place the resulting value in B<dest>. Note that B<self> and B<dest> may
 refer to the same PMC; in that case optimizations I<may> be made.
 
-=item void bitwise_shl_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Apply a leftward shift of B<value> bits to the number stored in B<self>,
-and place the resulting value in B<dest>. Note that B<self> and B<dest> may
-refer to the same PMC; in that case optimizations I<may> be made. In this
-case, it is guaranteed that B<self> and B<value> are of the same type.
-
 =item void bitwise_shl_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
 =item void bitwise_shl_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key, PMC* dest, INTVAL* dest_key)
@@ -1114,13 +974,6 @@ At least one key is guaranteed to be non-NULL.
 Applies a rightward shift of B<value> bits to the number stored in B<self>,
 and places the resulting value in B<dest>. Note that B<self> and B<dest> may
 refer to the same PMC; in that case optimizations I<may> be made.
-
-=item void bitwise_shr_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Applies a rightward shift of B<value> bits to the number stored in B<self>,
-and places the resulting value in B<dest>. Note that B<self> and B<dest> may
-refer to the same PMC; in that case optimizations I<may> be made. In this
-case, it is guaranteed that B<self> and B<value> are of the same type.
 
 =item void bitwise_shr_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
@@ -1143,14 +996,6 @@ Concatenate the strings in B<self> and B<value> and store the result
 in B<dest>.
 Note that B<self> and B<dest> may refer to the same PMC; in that case
 optimizations I<may> be made.
-
-=item void concatenate_same(INTERP, PMC* self, PMC* value, PMC* dest)
-
-Concatenate the strings in B<self> and B<value> and store the result
-in B<dest>.
-Note that B<self> and B<dest> may refer to the same PMC; in that case
-optimizations I<may> be made.  In this case, B<self> and B<value>
-are guaranteed to be of the same type.
 
 =item void concatenate_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key, PMC* dest, PMC* dest_key)
 
@@ -1177,14 +1022,6 @@ FALSE if they aren't.
 Return TRUE if the PMCs are the same, and FALSE if
 they're not. In this case, "the same" means identical at a low
 level. For plain equality, use the is_equal method.
-
-=item INTVAL is_same_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key)
-
-=item INTVAL is_same_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key)
-
-Return TRUE if the PMC keyed by B<key> is the same as the
-PMC in B<value> keyed by B<value_key>.  At least one of the
-two keys is guaranteed not to be NULL.
 
 =item INTVAL cmp(INTERP, PMC* self, PMC* value)
 
@@ -1441,24 +1278,10 @@ XXX: I still don't understand what *next does.
 Determine whether the PMC can perform the method specified by name in
 B<method>. Returns TRUE if it can; otherwise, returns FALSE.
 
-=item INTVAL can_keyed(INTERP, PMC* self, PMC* key, STRING* method)
-=item INTVAL can_keyed_int(INTERP, PMC* self, INTVAL key, STRING* method)
-
-Determine whether the PMC in B<self> keyed by B<key> can perform the method
-specified by name in B<method>. Returns TRUE if it can; otherwise, returns
-FALSE.
-
 =item INTVAL does(INTERP, PMC* self, STRING* method)
 
 Determine whether the PMC implements the interface specified by name in
 B<method>. Returns TRUE if it can; otherwise, returns FALSE.
-
-=item INTVAL does_keyed(INTERP, PMC* self, PMC* key, STRING* method)
-=item INTVAL does_keyed_int(INTERP, PMC* self, INTVAL key, STRING* method)
-
-Determine whether the PMC in B<self> keyed by B<key> implements the interface
-specified by name in B<method>. Returns TRUE if it can; otherwise, returns
-FALSE.
 
 =item INTVAL isa(INTERP, PMC* self, STRING* _class)
 
