@@ -1022,7 +1022,13 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     Parrot_init_events(interpreter);
 
 #ifdef ATEXIT_DESTROY
-    Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
+    /*
+     * if this is not a threaded interpreter, push the interpreter
+     * destruction.
+     * Threaded interpreters are destructed when the thread ends
+     */
+    if (!Interp_flags_TEST(interpreter, PARROT_IS_THREAD))
+        Parrot_on_exit(Parrot_really_destroy, (void*)interpreter);
 #endif
 
     return interpreter;

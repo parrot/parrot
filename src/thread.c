@@ -19,6 +19,7 @@
 #include <assert.h>
 
 
+void Parrot_really_destroy(int exit_code, void *interpreter);
 /*
  * the actual thread function
  */
@@ -39,11 +40,12 @@ thread_func(void *arg)
     tid = interpreter->thread_data->tid;
     if (interpreter != interpreter_array[tid]) {
         UNLOCK(interpreter_array_mutex);
-        internal_exception(1, "thread finished: interpreter mismatch");
+        PANIC("thread finished: interpreter mismatch");
     }
     if ((interpreter->thread_data->state & THREAD_STATE_DETACHED) ||
         (interpreter->thread_data->state & THREAD_STATE_JOINED)) {
         interpreter_array[tid] = NULL;
+        Parrot_really_destroy(0, interpreter);
     }
     UNLOCK(interpreter_array_mutex);
 
@@ -192,28 +194,27 @@ pt_join_threads(Parrot_Interp interpreter)
 {
     size_t i;
 
-    LOCK(interpreter_array_mutex);
     /*
      * if no threads where started - fine
      */
     if (!n_interpreters) {
-        UNLOCK(interpreter_array_mutex);
         return;
     }
     /*
      * only the first interpreter waits for other threads
      */
     if (interpreter != interpreter_array[0]) {
-        UNLOCK(interpreter_array_mutex);
         return;
     }
+    LOCK(interpreter_array_mutex);
 
     for (i = 1; i < n_interpreters; ++i) {
         Parrot_Interp thread_interp = interpreter_array[i];
         if (thread_interp == NULL)
             continue;
         if (thread_interp->thread_data->state == THREAD_STATE_JOINABLE ||
-                thread_interp->thread_data->state == THREAD_STATE_FINISHED) {
+            (thread_interp->thread_data->state & THREAD_STATE_FINISHED)) {
+
             void *retval;
             thread_interp->thread_data->state |= THREAD_STATE_JOINED;
             UNLOCK(interpreter_array_mutex);

@@ -25,7 +25,8 @@ typedef enum {
     PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
     PARROT_GC_DEBUG_FLAG = 0x10,  /* We're debugging memory management */
     PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
-    PARROT_DESTROY_FLAG  = 0x200  /* the last interpreter shall cleanup */
+    PARROT_DESTROY_FLAG  = 0x200,  /* the last interpreter shall cleanup */
+    PARROT_IS_THREAD     = 0x400   /* true if interpreter is a thread */
 } Parrot_Interp_flag;
 
 /* &end_gen */

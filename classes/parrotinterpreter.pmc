@@ -107,6 +107,21 @@ void Parrot_NCI_class_init(Parrot_Interp, int);
 void Parrot_PerlHash_class_init(Parrot_Interp, int);
 void Parrot_PerlUndef_class_init(Parrot_Interp, int);
 
+static void
+create_interp(PMC *self, Parrot_Interp parent)
+{
+    Interp_flags flag  = 0;
+    Parrot_Interp new_interp;
+
+    if (self->vtable->base_type == enum_class_ParrotThread)
+        flag = PARROT_IS_THREAD;
+
+    new_interp = make_interpreter(parent, flag);
+    PMC_data(self) = new_interp;
+    VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
+            (INTVAL) IGLOBALS_INTERPRETER, self);
+}
+
 pmclass ParrotInterpreter need_ext {
 
     void class_init () {
@@ -141,10 +156,7 @@ pmclass ParrotInterpreter need_ext {
          * so we check, if the interpreter is already setup
          */
         if (!PMC_data(SELF)) {
-            Parrot_Interp new_interp = make_interpreter(INTERP, 0);
-            PMC_data(SELF) = new_interp;
-            VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
-                    (INTVAL) IGLOBALS_INTERPRETER, SELF);
+            create_interp(SELF, INTERP);
         }
         SELF->cache.struct_val = NULL;
     }
@@ -153,10 +165,7 @@ pmclass ParrotInterpreter need_ext {
         Parrot_Interp p = PMC_data(parent);
 
         if (!PMC_data(SELF)) {
-            Parrot_Interp new_interp = make_interpreter(p, 0);
-            PMC_data(SELF) = new_interp;
-            VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
-                    (INTVAL) IGLOBALS_INTERPRETER, SELF);
+            create_interp(SELF, p);
         }
         SELF->cache.struct_val = NULL;
     }
