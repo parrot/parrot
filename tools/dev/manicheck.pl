@@ -8,7 +8,8 @@
 
 use strict;
 
-my @base_patterns = qw(^core$ ^.*\.o$); # CVS built-in patterns
+# CVS built-in patterns
+my @base_patterns = qw(^CVS$ ^\.cvsignore$ ^core$ ^.*\.o$);
 
 use ExtUtils::Manifest;
 
@@ -99,26 +100,25 @@ exit scalar(@missing) or scalar(@extra) ? 1 : 0;
 sub ignore
 {
   my $file = shift;
-  my $dir;
+  my @path = split(/\//, $file);
+  my $dir = "";
 
-  if ($file =~ m|/|) {
-    ($dir, $file) =  m/^(.*)\/(.*)$/;
-  } else {
-    $dir = '';
-  }
-
-  return 1 if ($file eq '.cvsignore');
-  return 1 if ($dir =~ m#(^|/)CVS$#);
-
-  if ($ignore_dirs{$dir}) {
-    foreach my $pattern (@{$ignore_dirs{$dir}}) {
-      return 1 if $file =~ m/$pattern/;
-    }
-  } else {
-    foreach my $pattern (@base_patterns) {
-      return 1 if $file =~ m/$pattern/;
+  foreach my $element (@path) {  
+    if ($ignore_dirs{$dir}) {
+      foreach my $pattern (@{$ignore_dirs{$dir}}) {
+	return 1 if $element =~ m/$pattern/;
+      }
+    } else {
+      foreach my $pattern (@base_patterns) {
+	return 1 if $element =~ m/$pattern/;
+      }
     }
 
+    if ($dir eq "") {
+      $dir = $element;
+    } else {
+      $dir = "$dir/$element";
+    }
   }
 
   return 0;
