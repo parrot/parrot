@@ -131,7 +131,7 @@ get_entry(PMC *self, INTVAL key)
 
 pmclass SArray const_too need_ext does array {
     void init () {
-	SELF->cache.int_val = 0;
+	PMC_int_val(SELF) = 0;
         PMC_data(SELF) = NULL;
     }
 
@@ -178,8 +178,8 @@ pmclass SArray const_too need_ext does array {
 
 	if (!PMC_data(SELF))
 	    return dest;
-	size = SELF->cache.int_val;
-	dest->cache.int_val = size;
+	size = PMC_int_val(SELF);
+	PMC_int_val(dest) = size;
 	PMC_data(dest) = mem_sys_allocate_zeroed((2 + size) *
 		sizeof(HashEntry));
 	e = (HashEntry *) PMC_data(SELF);
@@ -297,9 +297,9 @@ pmclass SArray const_too need_ext does array {
     }
 
     void set_integer_native (INTVAL size) {
-	if (SELF->cache.int_val)
+	if (PMC_int_val(SELF))
 	    internal_exception(OUT_OF_BOUNDS, "SArray: Can't resize!\n");
-	SELF->cache.int_val = size;
+	PMC_int_val(SELF) = size;
 	PMC_data(SELF) = mem_sys_allocate_zeroed((2 + size) *
 		sizeof(HashEntry));
 	PObj_custom_mark_destroy_SETALL(SELF);
@@ -307,7 +307,7 @@ pmclass SArray const_too need_ext does array {
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         HashEntry *e;
-	if (key < 0 || key >= SELF->cache.int_val)
+	if (key < 0 || key >= PMC_int_val(SELF))
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HashEntry *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_int;
@@ -329,7 +329,7 @@ pmclass SArray const_too need_ext does array {
 
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         HashEntry *e;
-	if (key < 0 || key >= SELF->cache.int_val)
+	if (key < 0 || key >= PMC_int_val(SELF))
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HashEntry *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_num;
@@ -351,7 +351,7 @@ pmclass SArray const_too need_ext does array {
 
     void set_string_keyed_int (INTVAL key, STRING* value) {
         HashEntry *e;
-	if (key < 0 || key >= SELF->cache.int_val)
+	if (key < 0 || key >= PMC_int_val(SELF))
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HashEntry *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_string;
@@ -373,7 +373,7 @@ pmclass SArray const_too need_ext does array {
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
         HashEntry *e;
-	if (key < 0 || key >= SELF->cache.int_val)
+	if (key < 0 || key >= PMC_int_val(SELF))
 	    internal_exception(OUT_OF_BOUNDS, "SArray index out of bounds!\n");
 	e = (HashEntry *) PMC_data(SELF) + (2 + key);
 	e->type = enum_hash_pmc;
@@ -403,7 +403,7 @@ pmclass SArray const_too need_ext does array {
 	PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
 	if (!n) {
-	    ret->cache.int_val = -1;
+	    PMC_int_val(ret) = -1;
 	    return ret;
 	}
 	e = (HashEntry *) PMC_data(SELF);
@@ -412,22 +412,22 @@ pmclass SArray const_too need_ext does array {
 
 	switch (what) {
 	    case ITERATE_FROM_START:	/* reset key, iterate from start */
-		ret->cache.int_val = start_index;
+		PMC_int_val(ret) = start_index;
 		break;
 	    case ITERATE_GET_NEXT:
-		if (ret->cache.int_val < end_index - 1)
-		    ++ret->cache.int_val;
+		if (PMC_int_val(ret) < end_index - 1)
+		    ++PMC_int_val(ret);
 		else
-		    ret->cache.int_val = -1;
+		    PMC_int_val(ret) = -1;
 		break;
 	    case ITERATE_GET_PREV:
-		if (ret->cache.int_val >= start_index)
-		    --ret->cache.int_val;
+		if (PMC_int_val(ret) >= start_index)
+		    --PMC_int_val(ret);
 		else
-		    ret->cache.int_val = -1;
+		    PMC_int_val(ret) = -1;
 		break;
 	    case ITERATE_FROM_END:
-		ret->cache.int_val = end_index - 1;
+		PMC_int_val(ret) = end_index - 1;
 		break;
 	}
 	return ret;

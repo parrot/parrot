@@ -18,7 +18,7 @@ pmclass Sub {
 
     void init () {
 	PMC_sub(SELF) = new_sub(INTERP, sizeof(struct Parrot_Sub));
-	SELF->cache.struct_val = NULL;
+	PMC_struct_val(SELF) = NULL;
 	PObj_custom_mark_destroy_SETALL(SELF);
 	PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 	if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
@@ -39,11 +39,11 @@ pmclass Sub {
 
     void set_pointer (void* value) {
 	PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
-	SELF->cache.struct_val = value;
+	PMC_struct_val(SELF) = value;
     }
 
     void* get_pointer () {
-	return SELF->cache.struct_val;
+	return PMC_struct_val(SELF);
     }
 
     /* This just unconditionally returns the start of bytecode. It's
@@ -54,7 +54,7 @@ pmclass Sub {
     }
 
     INTVAL defined () {
-	return SELF->cache.struct_val != NULL;
+	return PMC_struct_val(SELF) != NULL;
     }
 
     void* invoke (void* next) {
@@ -63,7 +63,7 @@ pmclass Sub {
 	if (interpreter->code->cur_cs != sub->seg) {
 	    Parrot_switch_to_cs(interpreter, sub->seg);
 	}
-	return SELF->cache.struct_val;
+	return PMC_struct_val(SELF);
     }
 
     PMC* clone () {
@@ -73,18 +73,18 @@ pmclass Sub {
 	sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
 	buffer_mark_COW(sub->ctx.warns);
-	ret->cache.struct_val = SELF->cache.struct_val;
+	PMC_struct_val(ret) = PMC_struct_val(SELF);
 	return ret;
     }
 
     void set_same (PMC* value) {
-	SELF->cache.struct_val = value->cache.struct_val;
+	PMC_struct_val(SELF) = PMC_struct_val(value);
 
     }
 
     INTVAL is_equal (PMC* value) {
 	return SELF->vtable == value->vtable &&
-	    SELF->cache.struct_val == value->cache.struct_val;
+	    PMC_struct_val(SELF) == PMC_struct_val(value);
     }
 
     void freeze(visit_info *info) {
@@ -107,13 +107,13 @@ pmclass Sub {
 	if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG) {
 	    ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
-	    start_offs = ((ptrdiff_t) SELF->cache.struct_val - code) /
+	    start_offs = ((ptrdiff_t) PMC_struct_val(SELF) - code) /
 		sizeof(opcode_t*);
 	    end_offs = ((ptrdiff_t)sub->end - code) /
 		sizeof(opcode_t*);
 	}
 	else {
-	    start_offs = (size_t)SELF->cache.struct_val;
+	    start_offs = (size_t)PMC_struct_val(SELF);
 	    end_offs =   (size_t)sub->end;
 	}
 	io->vtable->push_integer(INTERP, io, (INTVAL) start_offs);
@@ -133,7 +133,7 @@ pmclass Sub {
 	    PObj_get_FLAGS(SELF) &= ~PObj_private1_FLAG;
 	    start_offs = (size_t) io->vtable->shift_integer(INTERP, io);
 	    end_offs   = (size_t) io->vtable->shift_integer(INTERP, io);
-	    SELF->cache.struct_val = (opcode_t*) start_offs;
+	    PMC_struct_val(SELF) = (opcode_t*) start_offs;
 	    sub->end = (opcode_t*) end_offs;
 	}
     }
@@ -153,9 +153,9 @@ pmclass Sub {
 	 * XXX actually the sub might be in a different code segment
 	 */
 	code = INTERP->code->cur_cs->base.data;
-	start_offs = code + (size_t) SELF->cache.struct_val;
+	start_offs = code + (size_t) PMC_struct_val(SELF);
 	end_offs =   code + (size_t) sub->end;
-	SELF->cache.struct_val = start_offs;
+	PMC_struct_val(SELF) = start_offs;
 	sub->end = end_offs;
 	PObj_get_FLAGS(SELF) |= PObj_private1_FLAG;
     }

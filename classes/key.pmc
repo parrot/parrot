@@ -118,7 +118,7 @@ pmclass Key need_ext {
 		if (PMC_data(key))
 		    ret = key_next(interpreter, key);
 		else
-		    ret->cache.int_val = -1;
+		    PMC_int_val(ret) = -1;
 		break;
 	    default:
 		internal_exception(1, "Key can't iterate backwards");

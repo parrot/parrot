@@ -59,7 +59,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
      */
     INTVAL elements() {
 	PMC* data_array = (PMC*) PMC_data(SELF);
-	return VTABLE_elements(interpreter, data_array) - SELF->cache.int_val;
+	return VTABLE_elements(interpreter, data_array) - PMC_int_val(SELF);
     }
 
     INTVAL get_integer() {
@@ -73,7 +73,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     INTVAL get_integer_keyed_int (INTVAL idx) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	return VTABLE_get_integer_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val);
+		idx + PMC_int_val(SELF));
     }
 
     INTVAL get_integer_keyed_str (STRING* attr) {
@@ -104,7 +104,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     void set_integer_keyed_int (INTVAL idx, INTVAL value) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	VTABLE_set_integer_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val, value);
+		idx + PMC_int_val(SELF), value);
     }
 
     void set_integer_keyed_str (STRING* attr, INTVAL value) {
@@ -130,7 +130,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     FLOATVAL get_number_keyed_int (INTVAL idx) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	return VTABLE_get_number_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val);
+		idx + PMC_int_val(SELF));
     }
 
     FLOATVAL get_number_keyed_str (STRING* attr) {
@@ -156,7 +156,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     void set_number_keyed_int (INTVAL idx, FLOATVAL value) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	VTABLE_set_number_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val, value);
+		idx + PMC_int_val(SELF), value);
     }
 
     void set_number_keyed_str (STRING* attr, FLOATVAL value) {
@@ -183,7 +183,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     STRING* get_string_keyed_int (INTVAL idx) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	return VTABLE_get_string_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val);
+		idx + PMC_int_val(SELF));
     }
 
     STRING* get_string_keyed_str (STRING* attr) {
@@ -208,7 +208,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     void set_string_keyed_int (INTVAL idx, STRING* value) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	VTABLE_set_string_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val, value);
+		idx + PMC_int_val(SELF), value);
     }
 
     void set_string_keyed_str (STRING* attr, STRING* value) {
@@ -234,7 +234,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     PMC* get_pmc_keyed_int (INTVAL idx) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	return VTABLE_get_pmc_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val);
+		idx + PMC_int_val(SELF));
     }
 
     PMC* get_pmc_keyed_str (STRING* attr) {
@@ -260,7 +260,7 @@ pmclass ParrotObject extends ParrotClass need_ext {
     void set_pmc_keyed_int (INTVAL idx, PMC* value) {
 	PMC* data_array = (PMC*) PMC_data(SELF);
 	VTABLE_set_pmc_keyed_int(interpreter, data_array,
-		idx + SELF->cache.int_val, value);
+		idx + PMC_int_val(SELF), value);
     }
 
     void set_pmc_keyed_str (STRING* attr, PMC* value) {

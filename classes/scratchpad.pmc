@@ -17,14 +17,14 @@ pmclass Scratchpad need_ext {
 
     void init () {
         PObj_custom_mark_destroy_SETALL(SELF);
-        SELF->cache.int_val = 0;
+        PMC_int_val(SELF) = 0;
     }
 
     void mark () {
 	int j;
         struct Parrot_Lexicals * lex;
 
-	for (j = 0; j < SELF->cache.int_val; j++) {
+	for (j = 0; j < PMC_int_val(SELF); j++) {
             lex = &(((struct Parrot_Lexicals *)PMC_data(SELF))[j]);
             lexicals_mark(INTERP, lex);
         }
@@ -37,16 +37,16 @@ pmclass Scratchpad need_ext {
 
     PMC* clone () {
 	PMC* ret = pmc_new(INTERP, SELF->vtable->base_type);
-	PMC_data(ret) = mem_sys_allocate(SELF->cache.int_val *
+	PMC_data(ret) = mem_sys_allocate(PMC_int_val(SELF) *
                                      sizeof(struct Parrot_Lexicals));
-	ret->cache.int_val = SELF->cache.int_val;
+	PMC_int_val(ret) = PMC_int_val(SELF);
 	mem_sys_memcopy(PMC_data(ret), PMC_data(SELF),
-			SELF->cache.int_val * sizeof(struct Parrot_Lexicals));
+			PMC_int_val(SELF) * sizeof(struct Parrot_Lexicals));
 	return ret;
     }
 
     INTVAL elements () {
-	return SELF->cache.int_val;
+	return PMC_int_val(SELF);
     }
 
     PMC* get_pmc () {

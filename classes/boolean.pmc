@@ -19,41 +19,41 @@ pmclass Boolean extends PerlInt {
 
 
     void set_integer_native (INTVAL value) {
-        SELF->cache.int_val = (value != 0);
+        PMC_int_val(SELF) = (value != 0);
     }
 
     void set_number_native (FLOATVAL value) {
-	SELF->cache.int_val = (value!=0);
+	PMC_int_val(SELF) = (value!=0);
     }
 
     void set_string_native (STRING* value) {
-	SELF->cache.int_val = string_bool(value);
+	PMC_int_val(SELF) = string_bool(value);
     }
 
     void neg (PMC* dest) {
 	if (!dest)
-	    SELF->cache.int_val = -SELF->cache.int_val;
+	    PMC_int_val(SELF) = -PMC_int_val(SELF);
 	else
-	    VTABLE_set_integer_native(INTERP, dest, -SELF->cache.int_val);
+	    VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
     }
 
     void logical_or (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-					 SELF->cache.int_val ||
+					 PMC_int_val(SELF) ||
 					 VTABLE_get_bool(INTERP, value)
 	    );
     }
 
     void logical_and (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-					 SELF->cache.int_val &&
+					 PMC_int_val(SELF) &&
 					 VTABLE_get_bool(INTERP, value)
 	    );
     }
 
     void logical_xor (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-            ( SELF->cache.int_val ? 1 : 0 ) ^
+            ( PMC_int_val(SELF) ? 1 : 0 ) ^
 					 VTABLE_get_bool(INTERP, value)
 	    );
     }

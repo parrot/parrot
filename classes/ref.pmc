@@ -24,7 +24,7 @@ pmclass Ref does ref {
 
     void init_pmc (PMC* initializer) {
 	if (initializer) {
-	    PMC_ptr2p(SELF) = initializer; /* the refered PMC itself */
+	    PMC_pmc_val(SELF) = initializer; /* the refered PMC itself */
 	    PObj_custom_mark_SET(SELF);
 	    /*
 	     * if referred PMC needs active destruction
@@ -51,7 +51,7 @@ pmclass Ref does ref {
     }
 
     void mark () {
-	 pobject_lives(INTERP, (PObj *) PMC_ptr2p(SELF));
+	 pobject_lives(INTERP, (PObj *) PMC_pmc_val(SELF));
     }
 
     /* must implement these - they are not delegated */

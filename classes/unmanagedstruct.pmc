@@ -24,12 +24,12 @@ char_offset_int(Parrot_Interp interpreter, PMC *pmc, INTVAL ix, int *type)
     size_t offs, n;
 
     ix *= 3;
-    n = (size_t)VTABLE_elements(interpreter, PMC_ptr2p(pmc));
+    n = (size_t)VTABLE_elements(interpreter, PMC_pmc_val(pmc));
     if ((size_t)ix >= n)
 	internal_exception(1, "Non existent elements in struct");
     /* use structure init */
-    *type = (int) VTABLE_get_integer_keyed_int(interpreter, PMC_ptr2p(pmc), ix);
-    offs = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_ptr2p(pmc), ix + 2);
+    *type = (int) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix);
+    offs = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix + 2);
     return ((char *)PMC_data(pmc)) + offs;
 }
 
@@ -47,7 +47,7 @@ char_offset_key(Parrot_Interp interpreter, PMC *pmc, PMC *key, int *type)
     if (!next)
 	return p;
     count = (size_t) key_integer(interpreter, next);
-    max = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_ptr2p(pmc), ix + 1);
+    max = (size_t) VTABLE_get_integer_keyed_int(interpreter, PMC_pmc_val(pmc), ix + 1);
     if (count >= max)
 	internal_exception(1, "Non existent array element in struct");
     size = data_types[*type - enum_first_type].size;
@@ -130,7 +130,7 @@ set_float(char *p, int type, FLOATVAL value)
 pmclass UnManagedStruct extends default need_ext {
 
     void init() {
-	PMC_ptr2p(SELF) = NULL;
+	PMC_pmc_val(SELF) = NULL;
     }
 
     /* Initialize the struct with some data. This should be an array
@@ -150,7 +150,7 @@ pmclass UnManagedStruct extends default need_ext {
 
 	if (n % 3)
 	    internal_exception(1, "Illegal initializer for struct");
-	PMC_ptr2p(SELF) = value;
+	PMC_pmc_val(SELF) = value;
 
 	for (i = 0; i < n; i += 3) {
 	    int type = (int) VTABLE_get_integer_keyed_int(interpreter, value, i);
@@ -177,8 +177,8 @@ pmclass UnManagedStruct extends default need_ext {
     }
 
     void mark() {
-	if (PMC_ptr2p(SELF))
-	    pobject_lives(interpreter, (PObj *) PMC_ptr2p(SELF));
+	if (PMC_pmc_val(SELF))
+	    pobject_lives(interpreter, (PObj *) PMC_pmc_val(SELF));
     }
 
     INTVAL is_equal (PMC* value) {
@@ -196,7 +196,7 @@ pmclass UnManagedStruct extends default need_ext {
 	if (ix < 0)
             return -1;
 	/* assume char array */
-	if (!PMC_ptr2p(SELF)) {
+	if (!PMC_pmc_val(SELF)) {
 	    type = enum_type_char;
 	    p = ((char *)PMC_data(SELF)) + ix;
 	}
@@ -214,7 +214,7 @@ pmclass UnManagedStruct extends default need_ext {
 	char *p;
 
 	/* assume char array */
-	if (!PMC_ptr2p(SELF)) {
+	if (!PMC_pmc_val(SELF)) {
 	    ix = key_integer(INTERP, key);
 	    if (ix < 0)
 		return -1;
@@ -253,7 +253,7 @@ pmclass UnManagedStruct extends default need_ext {
     void set_integer_keyed_int (INTVAL ix, INTVAL value) {
 	int type;
 	char *p;
-	if (!PMC_ptr2p(SELF)) {
+	if (!PMC_pmc_val(SELF)) {
 	    if (ix < 0)
 		return;
 	    type = enum_type_char;
@@ -270,7 +270,7 @@ pmclass UnManagedStruct extends default need_ext {
 	int type;
 	char *p;
 
-	if (!PMC_ptr2p(SELF)) {
+	if (!PMC_pmc_val(SELF)) {
 	    ix = key_integer(INTERP, key);
 	    if (ix < 0)
 		return;

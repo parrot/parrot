@@ -19,7 +19,7 @@ pmclass Closure extends Sub {
 
    void init () {
        PMC_sub(SELF) = new_closure(INTERP);
-       SELF->cache.struct_val = NULL;
+       PMC_struct_val(SELF) = NULL;
        PObj_custom_mark_destroy_SETALL(SELF);
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
        printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
@@ -49,12 +49,12 @@ pmclass Closure extends Sub {
 
     void set_same (PMC* value) {
 	PMC_sub(SELF) = PMC_sub(value);
-	SELF->cache.struct_val = value->cache.struct_val;
+	PMC_struct_val(SELF) = PMC_struct_val(value);
     }
 
     INTVAL is_equal (PMC* value) {
 	return (SELF->vtable == value->vtable &&
-		SELF->cache.struct_val == value->cache.struct_val &&
+		PMC_struct_val(SELF) == PMC_struct_val(value) &&
 		memcmp(PMC_sub(value), PMC_sub(SELF),
 		    sizeof(struct Parrot_Sub)) == 0);
     }

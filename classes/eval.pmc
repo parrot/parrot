@@ -64,7 +64,7 @@ pmclass Eval extends Closure {
     }
 
     INTVAL get_integer_keyed (PMC* key) {
-	opcode_t *code =  ((struct PackFile *)SELF->cache.struct_val)->byte_code;
+	opcode_t *code =  ((struct PackFile *)PMC_struct_val(SELF))->byte_code;
 /*	int i = 0;
 	for (i=0; i < 16; i++) {
   	  printf("At %p there is an %i\n", code+i, *(code+i));
@@ -76,7 +76,7 @@ pmclass Eval extends Closure {
 	size_t size;
 	opcode_t *packed;
 
-	struct PackFile *pf = (struct PackFile *) SELF->cache.struct_val;
+	struct PackFile *pf = (struct PackFile *) PMC_struct_val(SELF);
 	STRING *s;
 
 	size = PackFile_pack_size(pf) * sizeof(opcode_t);

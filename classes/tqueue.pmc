@@ -32,7 +32,7 @@
 pmclass TQueue need_ext is_shared {
 
     void init () {
-        SELF->cache.int_val = 0;
+        PMC_int_val(SELF) = 0;
         PMC_data(SELF) = queue_init(0);
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -86,7 +86,7 @@ pmclass TQueue need_ext is_shared {
         INTVAL items;
         QUEUE *queue = PMC_data(SELF);
 
-        items = SELF->cache.int_val;
+        items = PMC_int_val(SELF);
         return items;
     }
 
@@ -110,7 +110,7 @@ pmclass TQueue need_ext is_shared {
         entry->type = QUEUE_ENTRY_TYPE_NONE;
         /* s. tsq.c:quene_push */
         queue_lock(queue);
-        ++SELF->cache.int_val;
+        ++PMC_int_val(SELF);
         /* Is there something in the queue? */
         if (queue->tail) {
             queue->tail->next = entry;
@@ -133,7 +133,7 @@ pmclass TQueue need_ext is_shared {
             queue_wait(queue);
         }
         entry = nosync_pop_entry(queue);
-        --SELF->cache.int_val;
+        --PMC_int_val(SELF);
         queue_unlock(queue);
         ret = entry->data;
         mem_sys_free(entry);

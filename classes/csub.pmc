@@ -18,7 +18,7 @@ pmclass CSub {
 
     PMC* clone () {
 	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	dest->cache.struct_val = SELF->cache.struct_val;
+	PMC_struct_val(dest) = PMC_struct_val(SELF);
 	return dest;
     }
 
@@ -31,21 +31,21 @@ pmclass CSub {
     }
 
     void set_same (PMC* value) {
-        SELF->cache.struct_val = value->cache.struct_val;
+        PMC_struct_val(SELF) = PMC_struct_val(value);
     }
 
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
-                && SELF->cache.struct_val == value->cache.struct_val);
+                && PMC_struct_val(SELF) == PMC_struct_val(value));
     }
 
     INTVAL defined () {
-        return SELF->cache.struct_val != NULL;
+        return PMC_struct_val(SELF) != NULL;
     }
 
     void* invoke (void * next) {
         Parrot_csub_t func =
-		(Parrot_csub_t)D2FPTR(SELF->cache.struct_val);
+		(Parrot_csub_t)D2FPTR(PMC_struct_val(SELF));
         func(INTERP, SELF);
         return next;
     }

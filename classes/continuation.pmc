@@ -18,7 +18,7 @@ pmclass Continuation extends Closure {
 
     void init () {
         PMC_sub(SELF) = new_continuation(INTERP);
-	SELF->cache.struct_val = NULL;
+	PMC_struct_val(SELF) = NULL;
 	PObj_custom_mark_destroy_SETALL(SELF);
     }
 

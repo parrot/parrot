@@ -31,7 +31,7 @@
 pmclass OrderedHash extends PerlArray need_ext does array does hash {
     void init () {
         /* clear the Hash ptr - its not yet existing */
-        PMC_ptr1v(SELF) = NULL;
+        PMC_struct_val(SELF) = NULL;
 	SUPER();
 	PerlHash.SUPER();
     }
@@ -43,7 +43,7 @@ pmclass OrderedHash extends PerlArray need_ext does array does hash {
 
     PMC* clone () {
         PMC* dest = SUPER();
-	hash_clone(INTERP, (Hash *)PMC_ptr1v(SELF), (Hash**)&PMC_ptr1v(dest));
+	hash_clone(INTERP, (Hash *)PMC_struct_val(SELF), (Hash**)&PMC_struct_val(dest));
         return dest;
     }
 

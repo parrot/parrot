@@ -73,7 +73,7 @@ pmclass ParrotIO need_ext {
 	 * If we have different IO layers, we might copy these structures
 	 */
 	PMC_data(dest) = PMC_data(SELF);
-	dest->cache.struct_val = SELF->cache.struct_val;
+	PMC_struct_val(dest) = PMC_struct_val(SELF);
 	return dest;
     }
 

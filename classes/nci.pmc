@@ -20,12 +20,12 @@
 pmclass NCI need_ext {
 
     void init() {
-	SELF->cache.struct_val = NULL;
+	PMC_struct_val(SELF) = NULL;
     }
 
     void set_string_keyed (PMC* func, STRING* value) {
 	/* key = func_ptr, value = signature */
-	SELF->cache.struct_val = (DPOINTER *)func;
+	PMC_struct_val(SELF) = (DPOINTER *)func;
 	PMC_data(SELF) = build_call_func(INTERP, SELF, value);
     }
 
@@ -36,7 +36,7 @@ pmclass NCI need_ext {
 
     PMC* clone () {
 	PMC* ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        ret->cache.struct_val = SELF->cache.struct_val;
+        PMC_struct_val(ret) = PMC_struct_val(SELF);
 	/* FIXME if data is malloced (JIT/i386!) then we need
 	 * the length of data here, to memcpy it
 	 * ManagedStruct or Buffer?

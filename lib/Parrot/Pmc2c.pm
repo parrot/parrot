@@ -533,7 +533,7 @@ sub body
     my $arg = '';
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$meth(interpreter, PMC_ptr2p(pmc)$arg)";
+    my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
     my $ret = gen_ret($method, $body);
     my $decl = $self->decl($self->{class}, $method, 0);
     my $l = "";
@@ -582,7 +582,7 @@ sub body
     my $arg = '';
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$meth(interpreter, PMC_ptr2p(pmc)$arg)";
+    my $body = "VTABLE_$meth(interpreter, PMC_pmc_val(pmc)$arg)";
     my $ret = '';
     my $decl = $self->decl($self->{class}, $method, 0);
     my $l = "";

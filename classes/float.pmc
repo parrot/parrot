@@ -20,30 +20,30 @@ pmclass Float extends mmd_default {
     }
 
     void set_integer_native(INTVAL value) {
-      SELF->cache.num_val = value;
+      PMC_num_val(SELF) = value;
     } 
 
     void set_number_native(FLOATVAL value) {
-      SELF->cache.num_val = value;
+      PMC_num_val(SELF) = value;
     }
 
     void set_string_native(STRING* value) {
-      SELF->cache.num_val = string_to_num(value);
+      PMC_num_val(SELF) = string_to_num(value);
     }
 
     void set_pmc(PMC *value) {
-      SELF->cache.num_val = VTABLE_get_number(INTERP, value);
+      PMC_num_val(SELF) = VTABLE_get_number(INTERP, value);
     }
 
     FLOATVAL get_number() {
-      return SELF->cache.num_val;
+      return PMC_num_val(SELF);
     }
 
    INTVAL get_integer() {
-      return (INTVAL)SELF->cache.num_val;
+      return (INTVAL) PMC_num_val(SELF);
    }
 
    STRING* get_string() {
-      return string_from_num(INTERP, SELF->cache.num_val);
+      return string_from_num(INTERP, PMC_num_val(SELF));
    }
 }

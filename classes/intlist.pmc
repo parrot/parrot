@@ -25,7 +25,7 @@ pmclass IntList need_ext {
 
     void init () {
         PMC_data(SELF) = intlist_new(INTERP);
-        SELF->cache.int_val = 0;
+        PMC_int_val(SELF) = 0;
         PObj_custom_mark_SET(SELF);
     }
 

@@ -31,7 +31,7 @@ pmclass ParrotClass need_ext {
 
     void init () {
 	/* No attributes to start with */
-	SELF->cache.int_val = 0;
+	PMC_int_val(SELF) = 0;
 	/* But we are a class, really */
 	PObj_is_class_SET(SELF);
 	/* And, coincidentally, data points to a PMC. Fancy that... */

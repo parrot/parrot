@@ -253,7 +253,7 @@ pmclass default abstract noinit {
 
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
-                && SELF->cache.struct_val == value->cache.struct_val
+                && PMC_struct_val(SELF) == PMC_struct_val(value)
 		&& PMC_data(SELF) == PMC_data(value));
     }
 

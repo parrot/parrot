@@ -7,8 +7,8 @@
  *  Data Structure and Algorithms:
  *
  *     PMC data
- *       SELF->cache.struct_val  oplib init function
- *       PMC_data(SELF)          DLL handle
+ *       PMC_struct_val(SELF)  oplib init function
+ *       PMC_data(SELF)        DLL handle
  *
  *     Properties:
  *       _filename               full path/file of lib
@@ -32,7 +32,7 @@
 pmclass ParrotLibrary need_ext does library const_too {
 
     void init() {
-	 SELF->cache.struct_val = NULL;
+	 PMC_struct_val(SELF) = NULL;
     }
 
     void morph(INTVAL type) {
@@ -41,7 +41,7 @@ pmclass ParrotLibrary need_ext does library const_too {
 
     PMC* clone() {
 	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	dest->cache.struct_val = SELF->cache.struct_val;
+	PMC_struct_val(dest) = PMC_struct_val(SELF);
 	PMC_data(dest) = PMC_data(SELF);
 	if (SELF->metadata) {
 	    dest->metadata = VTABLE_clone(INTERP, SELF->metadata);

@@ -18,15 +18,15 @@ pmclass Coroutine extends Continuation {
 
     void init () {
         PMC_sub(SELF) = new_coroutine(INTERP);
-        SELF->cache.struct_val = NULL;
+        PMC_struct_val(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
     }
 
 
     void* invoke (void* next) {
-        void * dest = SELF->cache.struct_val;
-        SELF->cache.struct_val = next;
+        void * dest = PMC_struct_val(SELF);
+        PMC_struct_val(SELF) = next;
 	swap_context(interpreter, SELF);
 
         return dest;

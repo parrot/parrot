@@ -564,7 +564,7 @@ sub standard_ref_body($$$$$$) {
     my $arg = '';
     $arg = ", ". join(' ', @args) if @args;
     $parameters = ", $parameters" if $parameters;
-    my $body = "VTABLE_$methodname(interpreter, PMC_ptr2p(pmc)$arg)";
+    my $body = "VTABLE_$methodname(interpreter, PMC_pmc_val(pmc)$arg)";
     my $ret = $type eq 'void' ? "$body;" : "return $body;" ;
     my $ln = 1 + ($OUT =~ tr/\n/\n/);
     my $line = $suppress_lines ? '' : "#line $ln \"$cfile\"\n";

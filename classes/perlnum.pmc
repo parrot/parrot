@@ -16,11 +16,11 @@
 pmclass PerlNum extends perlscalar {
 
     void init () {
-        SELF->cache.num_val = 0.0;
+        PMC_num_val(SELF) = 0.0;
     }
 
     INTVAL get_integer () {
-        return (INTVAL)SELF->cache.num_val;
+        return (INTVAL)PMC_num_val(SELF);
     }
 
 
@@ -33,9 +33,9 @@ pmclass PerlNum extends perlscalar {
         char* buff = mem_sys_allocate(80);
         STRING* s;
 #ifdef HAS_SNPRINTF
-        snprintf(buff,80,FLOATVAL_FMT,SELF->cache.num_val);
+        snprintf(buff,80,FLOATVAL_FMT,PMC_num_val(SELF));
 #else
-        sprintf(buff,FLOATVAL_FMT,SELF->cache.num_val);  /* XXX buffer overflow! */
+        sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
 #endif
         s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
         mem_sys_free(buff);
@@ -43,7 +43,7 @@ pmclass PerlNum extends perlscalar {
     }
 
     INTVAL get_bool () {
-        return (INTVAL)(SELF->cache.num_val != 0.0);
+        return (INTVAL)(PMC_num_val(SELF) != 0.0);
     }
 
     void set_integer_native (INTVAL value) {
@@ -54,13 +54,13 @@ pmclass PerlNum extends perlscalar {
     void set_number_native (FLOATVAL value) {
 	INTVAL vali = (INTVAL) value;
 
-        SELF->cache.num_val = value;
+        PMC_num_val(SELF) = value;
 	if (value == vali)
 	    DYNSELF.set_integer_native(vali);
     }
 
     void set_number_same (PMC* value) {
-        SELF->cache.num_val = value->cache.num_val;
+        PMC_num_val(SELF) = PMC_num_val(value);
     }
 
     void set_bignum_native (BIGNUM* value) {
@@ -76,14 +76,14 @@ pmclass PerlNum extends perlscalar {
 
     void add (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-	    SELF->cache.num_val +
+	    PMC_num_val(SELF) +
 	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void add_int (INTVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-	SELF->cache.num_val + value);
+	PMC_num_val(SELF) + value);
     }
 
     void add_bignum (BIGNUM* value, PMC* dest) {
@@ -91,19 +91,19 @@ pmclass PerlNum extends perlscalar {
 
     void add_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-	SELF->cache.num_val + value);
+	PMC_num_val(SELF) + value);
     }
 
     void subtract (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-	    SELF->cache.num_val -
+	    PMC_num_val(SELF) -
 	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void subtract_int (INTVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-            SELF->cache.num_val - (FLOATVAL)value
+            PMC_num_val(SELF) - (FLOATVAL)value
         );
     }
 
@@ -112,19 +112,19 @@ pmclass PerlNum extends perlscalar {
 
     void subtract_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-	SELF->cache.num_val - value);
+	PMC_num_val(SELF) - value);
     }
 
     void multiply (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-	    SELF->cache.num_val *
+	    PMC_num_val(SELF) *
 	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void multiply_int (INTVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-            SELF->cache.num_val * value
+            PMC_num_val(SELF) * value
         );
     }
 
@@ -133,79 +133,79 @@ pmclass PerlNum extends perlscalar {
 
     void multiply_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-	SELF->cache.num_val * value);
+	PMC_num_val(SELF) * value);
     }
 
     void divide (PMC* value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-	    SELF->cache.num_val /
+	    PMC_num_val(SELF) /
 	    VTABLE_get_number(INTERP, value)
 	);
     }
 
     void divide_int (INTVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-            SELF->cache.num_val / value
+            PMC_num_val(SELF) / value
         );
     }
 
     void divide_float (FLOATVAL value, PMC* dest) {
         VTABLE_set_number_native(INTERP, dest,
-            SELF->cache.num_val / value
+            PMC_num_val(SELF) / value
         );
     }
 
     void cmodulus (PMC* value, PMC* dest) {
 	FLOATVAL f = VTABLE_get_number(INTERP, value);
 	VTABLE_set_number_native(INTERP, dest,
-		fmod(SELF->cache.num_val, f));
+		fmod(PMC_num_val(SELF), f));
     }
 
     void cmodulus_float (FLOATVAL value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-		fmod(SELF->cache.num_val, value));
+		fmod(PMC_num_val(SELF), value));
     }
     void cmodulus_int (INTVAL value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-		fmod(SELF->cache.num_val, value));
+		fmod(PMC_num_val(SELF), value));
     }
 
     void modulus (PMC* value, PMC* dest) {
 	FLOATVAL f = VTABLE_get_number(INTERP, value);
 	VTABLE_set_number_native(INTERP, dest,
-		floatval_mod(SELF->cache.num_val, f));
+		floatval_mod(PMC_num_val(SELF), f));
     }
 
     void modulus_float (FLOATVAL value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-		floatval_mod(SELF->cache.num_val, value));
+		floatval_mod(PMC_num_val(SELF), value));
     }
     void modulus_int (INTVAL value, PMC* dest) {
 	VTABLE_set_number_native(INTERP, dest,
-		floatval_mod(SELF->cache.num_val, value));
+		floatval_mod(PMC_num_val(SELF), value));
     }
 
     void neg (PMC * dest) {
 	if (!dest)
-	    SELF->cache.num_val = -SELF->cache.num_val;
+	    PMC_num_val(SELF) = -PMC_num_val(SELF);
 	else
-	    VTABLE_set_number_native(INTERP, dest, -SELF->cache.num_val);
+	    VTABLE_set_number_native(INTERP, dest, -PMC_num_val(SELF));
     }
 
     /* == operation */
     INTVAL is_equal (PMC* value) {
-        return (INTVAL)(SELF->cache.num_val == VTABLE_get_number(INTERP, value));
+        return (INTVAL)(PMC_num_val(SELF) == VTABLE_get_number(INTERP, value));
     }
 
     INTVAL cmp(PMC* value) {
         FLOATVAL diff;
-        diff = SELF->cache.num_val - VTABLE_get_number(INTERP, value);
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
     INTVAL cmp_num(PMC* value) {
         FLOATVAL diff;
-        diff = SELF->cache.num_val - VTABLE_get_number(INTERP, value);
+        diff = PMC_num_val(SELF) - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
@@ -220,11 +220,11 @@ pmclass PerlNum extends perlscalar {
     }
 
     void increment () {
-        SELF->cache.num_val ++;
+        PMC_num_val(SELF) ++;
     }
 
     void decrement () {
-        SELF->cache.num_val --;
+        PMC_num_val(SELF) --;
     }
 
 }

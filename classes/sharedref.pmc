@@ -42,8 +42,8 @@
  * TODO we should catch exceptions around these locks
  *      if the vtable meth throws the lock is never unlocked
  */
-#define LOCK_PMC(interp, pmc) LOCK(pmc->synchronize->pmc_lock);
-#define UNLOCK_PMC(interp, pmc) UNLOCK(pmc->synchronize->pmc_lock);
+#define LOCK_PMC(interp, pmc) LOCK(PMC_sync(pmc)->pmc_lock);
+#define UNLOCK_PMC(interp, pmc) UNLOCK(PMC_sync(pmc)->pmc_lock);
 
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 
@@ -64,10 +64,10 @@ pmclass SharedRef does ref need_ext is_shared extends Ref {
 	 * so we shouldn't leak unshared PMCs into different threads
 	 */
 	SUPER(init);
-	SELF->synchronize =
+	PMC_sync(SELF) =
 		mem_sys_allocate(sizeof(*SELF->synchronize) + RWL);
-	SELF->synchronize->owner = INTERP;
-	MUTEX_INIT(SELF->synchronize->pmc_lock);
+	PMC_sync(SELF)->owner = INTERP;
+	MUTEX_INIT(PMC_sync(SELF)->pmc_lock);
 	PObj_active_destroy_SET(SELF);
     }
 
@@ -84,12 +84,12 @@ pmclass SharedRef does ref need_ext is_shared extends Ref {
     }
 
     void destroy() {
-	PMC *ref = PMC_ptr2p(SELF);
+	PMC *ref = PMC_pmc_val(SELF);
 	if (PObj_active_destroy_TEST(ref))
 	    VTABLE_destroy(INTERP, ref);
-	if (SELF->synchronize->owner != INTERP)
+	if (PMC_sync(SELF)->owner != INTERP)
 	    PANIC("SharedRef destroyed by wrong interpreter");
-	MUTEX_DESTROY(SELF->synchronize->pmc_lock);
-	mem_sys_free(SELF->synchronize);
+	MUTEX_DESTROY(PMC_sync(SELF)->pmc_lock);
+	mem_sys_free(PMC_sync(SELF));
     }
 }

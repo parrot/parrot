@@ -66,7 +66,7 @@ typedef enum {
 static void
 add_timer(Parrot_Interp interpreter, PMC *pmc)
 {
-    parrot_timer_event *t = pmc->cache.struct_val;
+    parrot_timer_event *t = PMC_struct_val(pmc);
     if (!PMC_IS_NULL(t->sub))
 	Parrot_new_timer_event(interpreter, pmc, t->abs_time,
 			t->interval, t->repeat, t->sub, EVENT_TYPE_TIMER);
@@ -88,7 +88,7 @@ pmclass Timer does event {
 	 */
 	parrot_timer_event *t =
 	    mem_sys_allocate_zeroed(sizeof(parrot_timer_event));
-	SELF->cache.struct_val = t;
+	PMC_struct_val(SELF) = t;
 	PObj_active_destroy_SET(SELF);
  	++interpreter->num_early_DOD_PMCs;
     }
@@ -130,13 +130,13 @@ pmclass Timer does event {
     }
 
     void destroy() {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 	del_timer(INTERP, SELF);
 	mem_sys_free(t);
     }
 
     INTVAL get_integer_keyed_int(INTVAL key) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 
 	switch(key) {
 	    case PARROT_TIMER_SEC:
@@ -152,7 +152,7 @@ pmclass Timer does event {
     }
 
     PMC* get_pmc_keyed_int(INTVAL key) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 	switch(key) {
 	    case PARROT_TIMER_HANDLER:
 		return t->sub;
@@ -164,7 +164,7 @@ pmclass Timer does event {
     }
 
     FLOATVAL get_number_keyed_int(INTVAL key) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 
 	switch(key) {
 	    case PARROT_TIMER_NSEC:
@@ -175,7 +175,7 @@ pmclass Timer does event {
     }
 
     void set_integer_keyed_int(INTVAL key, INTVAL value) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 
 	switch(key) {
 	    case PARROT_TIMER_SEC:
@@ -199,7 +199,7 @@ pmclass Timer does event {
     }
 
     void set_pmc_keyed_int(INTVAL key, PMC* value) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 	switch(key) {
 	    case PARROT_TIMER_HANDLER:
 		t->sub = value;
@@ -215,7 +215,7 @@ pmclass Timer does event {
     }
 
     void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-	parrot_timer_event *t = SELF->cache.struct_val;
+	parrot_timer_event *t = PMC_struct_val(SELF);
 
 	switch(key) {
 	    case PARROT_TIMER_NSEC:

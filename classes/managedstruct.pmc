@@ -19,7 +19,7 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
     void init () {
 	SUPER();
 	PObj_active_destroy_SET(SELF);
-	SELF->cache.int_val = 0;
+	PMC_int_val(SELF) = 0;
     }
 
     void init_pmc (PMC* value) {
@@ -41,14 +41,14 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
 	if (!key)
             return -1;
         ix = key_integer(INTERP, key);
-        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
+        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
 	    return -1;
 	return SUPER(key);
 
     }
 
     INTVAL get_integer_keyed_int(INTVAL ix) {
-        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
+        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
 	    return -1;
 	return SUPER(ix);
     }
@@ -60,34 +60,34 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
         if (!key)
             return;
         ix = key_integer(INTERP, key);
-        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
+        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
             return;
         SUPER(key, value);
     }
 
     void set_integer_keyed_int (INTVAL ix, INTVAL value) {
-        if (!PMC_ptr2p(SELF) && (ix < 0 || ix >= SELF->cache.int_val))
+        if (!PMC_pmc_val(SELF) && (ix < 0 || ix >= PMC_int_val(SELF)))
             return;
         SUPER(ix, value);
     }
 
     INTVAL get_integer () {
-        return(SELF->cache.int_val);
+        return(PMC_int_val(SELF));
     }
 
     void set_integer_native (INTVAL value) {
         if (PMC_data(SELF) && (! value)) {
             mem_sys_free(PMC_data(SELF));
             PMC_data(SELF) = NULL;
-            SELF->cache.int_val = 0;
+            PMC_int_val(SELF) = 0;
         }
         else if (value && (! PMC_data(SELF))) {
             PMC_data(SELF) = mem_sys_allocate_zeroed(value);
-            SELF->cache.int_val = value;
+            PMC_int_val(SELF) = value;
         }
         else if (value && PMC_data(SELF)) {
             PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF), value);
-            SELF->cache.int_val = value;
+            PMC_int_val(SELF) = value;
         }
         return;
     }

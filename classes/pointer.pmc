@@ -24,10 +24,10 @@ pmclass Pointer need_ext {
     void mark () {
         void (*mark_function)(struct Parrot_Interp*, void*) =
             (void (*)(struct Parrot_Interp*, void*))
-	    	D2FPTR(SELF->cache.struct_val);
+	    	D2FPTR(PMC_struct_val(SELF));
         if (PMC_data(SELF) == NULL)
 		return;
-        if (SELF->cache.struct_val == NULL)
+        if (PMC_struct_val(SELF) == NULL)
 		return;
         (*mark_function)(INTERP, PMC_data(SELF));
     }

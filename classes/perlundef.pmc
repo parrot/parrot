@@ -336,13 +336,13 @@ pmclass PerlUndef extends PerlInt {
     }
     void increment () {
 	DYNSELF.morph(enum_class_PerlInt);
-        SELF->cache.int_val = 1;
+        PMC_int_val(SELF) = 1;
     }
 
 
     void decrement () {
 	DYNSELF.morph(enum_class_PerlInt);
-        SELF->cache.int_val = -1;
+        PMC_int_val(SELF) = -1;
     }
 
 

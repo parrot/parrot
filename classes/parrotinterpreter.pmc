@@ -208,7 +208,7 @@ pmclass ParrotInterpreter need_ext {
         if (!PMC_data(SELF)) {
             create_interp(SELF, INTERP);
         }
-        SELF->cache.struct_val = NULL;
+        PMC_struct_val(SELF) = NULL;
     }
 
     void init_pmc (PMC *parent) {
@@ -217,15 +217,15 @@ pmclass ParrotInterpreter need_ext {
         if (!PMC_data(SELF)) {
             create_interp(SELF, p);
         }
-        SELF->cache.struct_val = NULL;
+        PMC_struct_val(SELF) = NULL;
     }
 
     void set_pointer (void* value) {
-	SELF->cache.struct_val = value;
+	PMC_struct_val(SELF) = value;
     }
 
     void* get_pointer () {
-	return SELF->cache.struct_val;
+	return PMC_struct_val(SELF);
     }
 
     INTVAL get_integer () {
@@ -241,7 +241,7 @@ pmclass ParrotInterpreter need_ext {
 	 */
 	pt_thread_prepare_for_run(new_interp, interpreter);
 	/* calculate offset and run */
-	runops(new_interp, (opcode_t *)SELF->cache.struct_val -
+	runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
 		(opcode_t *)interpreter->code->byte_code);
 	return next;
     }

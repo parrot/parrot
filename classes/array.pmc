@@ -512,22 +512,22 @@ pmclass Array need_ext does array {
 	PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
 	switch (what) {
 	    case ITERATE_FROM_START:	/* reset key */
-		ret->cache.int_val = 0;
+		PMC_int_val(ret) = 0;
 		if (!n)
-		    ret->cache.int_val = -1;
+		    PMC_int_val(ret) = -1;
 		break;
 	    case ITERATE_GET_NEXT:
-		if (ret->cache.int_val < n - 1)
-		    ++ret->cache.int_val;
+		if (PMC_int_val(ret) < n - 1)
+		    ++PMC_int_val(ret);
 		else
-		    ret->cache.int_val = -1;
+		    PMC_int_val(ret) = -1;
 		break;
 	    case ITERATE_GET_PREV:
-		if (ret->cache.int_val >= 0)
-		    --ret->cache.int_val;
+		if (PMC_int_val(ret) >= 0)
+		    --PMC_int_val(ret);
 		break;
 	    case ITERATE_FROM_END:
-		ret->cache.int_val = n - 1;
+		PMC_int_val(ret) = n - 1;
 		break;
 	}
 	return ret;

@@ -16,7 +16,7 @@
 pmclass mmd_default extends default {
 
     void init() {
-	SELF->cache.num_val = 0.0;
+	PMC_num_val(SELF) = 0.0;
     }
 
   void add(PMC* value, PMC* dest) {

@@ -18,28 +18,28 @@ pmclass scalar abstract noinit {
 
     PMC* clone () {
 	PMC* dest = pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(&dest->cache, &SELF->cache, sizeof(UnionVal));
+        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof(UnionVal));
 	return dest;
     }
 
     INTVAL get_integer () {
-        return SELF->cache.int_val;
+        return PMC_int_val(SELF);
     }
 
     FLOATVAL get_number () {
-        return SELF->cache.num_val;
+        return PMC_num_val(SELF);
     }
 
     BIGNUM* get_bignum () {
-        return (BIGNUM*)SELF->cache.struct_val;
+        return (BIGNUM*) PMC_struct_val(SELF);
     }
 
     STRING* get_string () {
-        return (STRING*)SELF->cache.string_val;
+        return (STRING*) PMC_str_val(SELF);
     }
 
     INTVAL get_bool () {
-        return SELF->cache.int_val != 0;
+        return PMC_int_val(SELF) != 0;
     }
 
 
@@ -48,19 +48,19 @@ pmclass scalar abstract noinit {
       exercise for the inheriting class. */
 
     void set_integer_native (INTVAL value) {
-        SELF->cache.int_val = value;
+        PMC_int_val(SELF) = value;
     }
 
     void set_number_native (FLOATVAL value) {
-        SELF->cache.num_val = value;
+        PMC_num_val(SELF) = value;
     }
 
     void set_bignum_native (BIGNUM* value) {
-        SELF->cache.struct_val = (DPOINTER*)value;
+        PMC_struct_val(SELF) = (DPOINTER*)value;
     }
 
     void set_string_native (STRING* value) {
-        SELF->cache.string_val = string_copy(INTERP, value);
+        PMC_str_val(SELF) = string_copy(INTERP, value);
     }
 
     void add_int (INTVAL value, PMC* dest) {
@@ -236,7 +236,7 @@ pmclass scalar abstract noinit {
 
     void neg (PMC* dest) {
 	if (!dest)
-	    SELF->cache.int_val = -DYNSELF.get_integer();
+	    PMC_int_val(SELF) = -DYNSELF.get_integer();
 	else
 	    VTABLE_set_integer_native(INTERP, dest, -DYNSELF.get_integer());
     }
@@ -441,12 +441,12 @@ pmclass scalar abstract noinit {
 
 
     void increment () {
-        SELF->cache.int_val = DYNSELF.get_integer() + 1;
+        PMC_int_val(SELF) = DYNSELF.get_integer() + 1;
     }
 
 
     void decrement () {
-        SELF->cache.int_val = DYNSELF.get_integer() - 1;
+        PMC_int_val(SELF) = DYNSELF.get_integer() - 1;
     }
 
 

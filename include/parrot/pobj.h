@@ -100,24 +100,18 @@ struct PMC {
     struct PMC_EXT *pmc_ext;
 };
 
-#if PMC_DATA_IN_EXT
-#  define PMC_data(pmc) (pmc)->pmc_ext->data
-#else
-#  define PMC_data(pmc) (pmc)->data
-#endif
-
 struct _Sync;   /* forward decl */
 
 struct PMC_EXT {
 #if PMC_DATA_IN_EXT
     DPOINTER *data;
 #endif
-    PMC *metadata;      /* properties */
+    PMC *_metadata;      /* properties */
     /*
      * PMC access synchronization for shared PMCs
      * s. parrot/thread.h
      */
-    struct _Sync *synchronize;
+    struct _Sync *_synchronize;
 
     /* This flag determines the next PMC in the 'used' list during
        dead object detection in the GC. It is a linked list, which is
@@ -125,7 +119,7 @@ struct PMC_EXT {
        guaranteed to have the tail element's next_for_GC point to itself,
        which makes much of the logic and checks simpler. We then have to
        check for PMC->next_for_GC == PMC to find the end of list. */
-    PMC *next_for_GC;
+    PMC *_next_for_GC;
 
     /* Yeah, the GC data should be out of
        band, but that makes things really slow when actually marking
@@ -140,11 +134,28 @@ struct PMC_EXT {
 
 typedef struct PMC_EXT PMC_EXT;
 
+#define PMC_bufstart(pmc)     (pmc)->obj.u.b.bufstart
+#define PMC_buflen(pmc)       (pmc)->obj.u.b.buflen
+#define PMC_struct_val(pmc)   (pmc)->obj.u.ptrs._struct_val
+#define PMC_pmc_val(pmc)      (pmc)->obj.u.ptrs._pmc_val
+#define PMC_int_val(pmc)      (pmc)->obj.u.int_val
+#define PMC_num_val(pmc)      (pmc)->obj.u.num_val
+#define PMC_str_val(pmc)      (pmc)->obj.u.string_val
+#if PMC_DATA_IN_EXT
+#  define PMC_data(pmc)       (pmc)->pmc_ext->data
+#else
+#  define PMC_data(pmc)       (pmc)->data
+#endif
+#define PMC_metadata(pmc)     (pmc)->pmc_ext->_metadata
+#define PMC_next_for_GC(pmc)  (pmc)->pmc_ext->_next_for_GC
+#define PMC_sync(pmc)         (pmc)->pmc_ext->_synchronize
+#define PMC_union(pmc)        (pmc)->obj.u
+
 /* macro for accessing union data */
 #define cache obj.u
-#define metadata pmc_ext->metadata
-#define next_for_GC pmc_ext->next_for_GC
-#define synchronize pmc_ext->synchronize
+#define next_for_GC pmc_ext->_next_for_GC
+#define metadata pmc_ext->_metadata
+#define synchronize pmc_ext->_synchronize
 
 /* PObj flags */
 typedef enum PObj_enum {
