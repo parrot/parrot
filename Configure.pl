@@ -52,7 +52,6 @@ Since you're running this script, you obviously have
 Perl 5--I'll be pulling some defaults from its configuration.
 
 First, I'm gonna check the manifest, to make sure you got a
-First, I'm gonna check the manifest, to make sure you got a
 complete Parrot kit.
 END
 
