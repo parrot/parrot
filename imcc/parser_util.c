@@ -463,7 +463,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
     yyparse((void *) interp);
     imc_compile_all_units(interp);
 
-    PackFile_fixup_subs(interp);
+    PackFile_fixup_subs(interp, PBC_MAIN);
     if (old_cs) {
         /* restore old byte_code, */
         (void)Parrot_switch_to_cs(interp, old_cs, 0);

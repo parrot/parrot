@@ -187,13 +187,6 @@ make_code_pointers(struct PackFile_Segment *seg)
     }
 }
 
-typedef enum {
-    PBC_MAIN   = 1,
-    PBC_LOADED = 2,
-    PBC_PBC    = 4,
-    PBC_IMMEDIATE = 8
-} pbc_action_enum_t;
-
 
 /*
 
@@ -3209,7 +3202,7 @@ Parrot_load_bytecode(Interp *interpreter, const char *filename)
 /*
 
 =item C<void
-PackFile_fixup_subs(Interp *interpreter)>
+PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t)>
 
 I<What does this do?>
 
@@ -3218,9 +3211,9 @@ I<What does this do?>
 */
 
 void
-PackFile_fixup_subs(Interp *interpreter)
+PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t what)
 {
-    fixup_subs(interpreter, interpreter->code, PBC_MAIN);
+    fixup_subs(interpreter, interpreter->code, what);
 }
 
 /*

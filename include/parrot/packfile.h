@@ -234,7 +234,15 @@ opcode_t PackFile_unpack(Interp *interpreter,
                          struct PackFile *self, opcode_t *packed,
                          size_t packed_size);
 
-void PackFile_fixup_subs(Interp *interpreter);
+typedef enum {
+    PBC_MAIN   = 1,
+    PBC_LOADED = 2,
+    PBC_PBC    = 4,
+    PBC_IMMEDIATE = 8,
+    PBC_POSTCOMP  = 16
+} pbc_action_enum_t;
+
+void PackFile_fixup_subs(Interp *interpreter, pbc_action_enum_t);
 /*
  * directory functions
  */

@@ -207,7 +207,7 @@ instruction_writes(Instruction* ins, SymReg* r) {
                 return 1;
             if ((ins->r[i]->type & VT_REGP) && ins->r[i]->reg == r)
                 return 1;
-    }
+        }
 
     if (ins->type & ITPCCSUB)
         return pcc_sub_writes(ins, r);

@@ -865,7 +865,7 @@ e_pbc_end_sub(void *param, IMC_Unit * unit)
     if (pragma & P_IMMEDIATE) {
         debug(interpreter, DEBUG_PBC, "immediate sub '%s'",
                 ins->r[1]->name);
-        PackFile_fixup_subs(interpreter);
+        PackFile_fixup_subs(interpreter, PBC_IMMEDIATE);
     }
     return 0;
 }
@@ -1021,6 +1021,8 @@ e_pbc_close(void *param)
 
     fixup_bsrs(interpreter);
     clear_globals();
+
+    PackFile_fixup_subs(interpreter, PBC_POSTCOMP);
     return 0;
 }
 

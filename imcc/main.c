@@ -574,7 +574,7 @@ main(int argc, char * argv[])
         else
             info(interpreter, 1, "Running...\n");
         if (!load_pbc)
-            PackFile_fixup_subs(interpreter);
+            PackFile_fixup_subs(interpreter, PBC_MAIN);
         Parrot_runcode(interpreter, argc, argv);
         /* XXX no return value :-( */
     }
