@@ -21,6 +21,11 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include <assert.h>
 
+/* Get entry y from the attribute array of PMC x */
+#define get_attrib_num(x, y) ((PMC *)PObj_bufstart((Buffer *)PMC_data(x)))+y
+/* Set entry y of PMC x to z */
+#define set_attrib_num(x, y, z) ((PMC *)PObj_bufstart((Buffer *)PMC_data(x)))+y = z
+
 static PMC *
 clone_array(Parrot_Interp interpreter, PMC *source_array) {
     PMC *new_array;
@@ -45,7 +50,7 @@ This should be public, but for right now it's internal.
 
 =cut
 
-*/
+v*/
 
 static PMC *
 find_global(Parrot_Interp interpreter, STRING *class, STRING *globalname)
