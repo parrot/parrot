@@ -22,6 +22,7 @@ static STRING* Parrot_PerlInt_name (struct Parrot_Interp *interpreter, PMC* pmc)
 }
 
 static void Parrot_PerlInt_init (struct Parrot_Interp *interpreter, PMC* pmc) {
+    pmc->cache.int_val = 0;
     
 }
 
@@ -32,6 +33,7 @@ static void Parrot_PerlInt_morph (struct Parrot_Interp *interpreter, PMC* pmc, I
 }
 
 static BOOLVAL Parrot_PerlInt_move_to (struct Parrot_Interp *interpreter, PMC* pmc, void * destination) {
+    return 0; /* You can't move me, I don't have anything to move! */
 }
 
 static INTVAL Parrot_PerlInt_real_size (struct Parrot_Interp *interpreter, PMC* pmc) {
@@ -74,12 +76,16 @@ static void Parrot_PerlInt_set_integer (struct Parrot_Interp *interpreter, PMC* 
 }
 
 static void Parrot_PerlInt_set_integer_native (struct Parrot_Interp *interpreter, PMC* pmc, INTVAL value) {
+    pmc->cache.int_val = value;
 }
 
 static void Parrot_PerlInt_set_integer_bigint (struct Parrot_Interp *interpreter, PMC* pmc, BIGINT value) {
+    pmc->cache.struct_val = value; /* Maybe we need a copy */
+    /* pmc->vtable = &(Parrot_base_vtables[enum_class_PerlBigInt]); */
 }
 
 static void Parrot_PerlInt_set_integer_same (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value) {
+    pmc->cache.int_val = value->cache.int_val;
 }
 
 static void Parrot_PerlInt_set_number (struct Parrot_Interp *interpreter, PMC* pmc, PMC * value) {
