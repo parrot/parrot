@@ -321,7 +321,7 @@ key_number(Interp *interpreter, PMC *key)
     case KEY_number_FLAG:
         return PMC_num_val(key);
     case KEY_number_FLAG | KEY_register_FLAG:
-        return interpreter->num_reg.registers[PMC_int_val(key)];
+        return REG_NUM(PMC_int_val(key));
     case KEY_pmc_FLAG:
         return VTABLE_get_number(interpreter, key);
                                                  /*  PMC_pmc_val(key)); */

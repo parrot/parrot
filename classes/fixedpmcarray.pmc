@@ -58,7 +58,7 @@ sort_ext_compare(void *a, void *b)
 #else
     Parrot_runops_fromc_args(the_interp, sort_cmp_pmc, "IPP", pa, pb);
 #endif
-    return the_interp->int_reg.registers[5];
+    return INTERP_REG_INT(the_interp, 5);
 }
 
 pmclass FixedPMCArray need_ext does array {
@@ -733,7 +733,7 @@ Return a new iterator for SELF.
 
 =back
 
-=head1 TODO 
+=head1 TODO
 
 currently this uses Perl types.
 

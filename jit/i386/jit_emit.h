@@ -2032,11 +2032,6 @@ static void call_func(Parrot_jit_info_t *jit_info, void *addr)
 #    undef Parrot_jit_vtable_unlessp_op
 #    undef Parrot_jit_vtable_newp_ic_op
 
-#    define EXR(m, s) (int *)(offsetof(Interp, m) + s)
-#    define IREG(i) EXR(int_reg.registers, i * sizeof(INTVAL))
-#    define NREG(i) EXR(num_reg.registers, i * sizeof(FLOATVAL))
-#    define PREG(i) EXR(pmc_reg.registers, i * sizeof(PMC *))
-#    define SREG(i) EXR(string_reg.registers, i * sizeof(STRING *))
 #    define CONST(i) (int *)(jit_info->cur_op[i] * \
        sizeof(struct PackFile_Constant) + \
        offsetof(struct PackFile_Constant, u))

@@ -239,13 +239,13 @@ mark_saved_regs(Parrot_Interp interpreter)
         struct PReg *pf = &p->regs.pmc_reg;
         struct SReg *sf = &p->regs.string_reg;
         for (j = 0; j < NUM_REGISTERS; j++) {
-            offs = offsetof(Interp, pmc_reg.registers[j]);
+            offs = REG_OFFS_PMC(j);
             if (offs >= p->size)
                 break;
             reg = (PObj*) pf->registers[j];
             if (reg)
                 pobject_lives(interpreter, reg);
-            offs = offsetof(Interp, string_reg.registers[j]);
+            offs = REG_OFFS_STR(j);
             if (offs >= p->size)
                 break;
             reg = (PObj*) sf->registers[j];

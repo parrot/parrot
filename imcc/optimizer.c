@@ -492,11 +492,11 @@ eval_ins(Interp *interpreter, Instruction *ins, size_t ops)
                 if (i > 1) {    /* fill source regs */
                     switch (ins->r[i-1]->set) {
                         case 'I':
-                            interpreter->int_reg.registers[i-1] =
+                            REG_INT(i-1) =
                                 (INTVAL)atoi(ins->r[i-1]->name);
                             break;
                         case 'N':
-                            interpreter->num_reg.registers[i-1] =
+                            REG_NUM(i-1) =
                                 (FLOATVAL)atof(ins->r[i-1]->name);
                             break;
                     }
@@ -589,10 +589,10 @@ subst_constants(Interp *interpreter, IMC_Unit * unit)
         /* result is in I0/N0 */
         switch (ins->r[0]->set) {
             case 'I':
-                sprintf(b, INTVAL_FMT, interpreter->int_reg.registers[0]);
+                sprintf(b, INTVAL_FMT, REG_INT(0));
                 break;
             case 'N':
-                sprintf(b, fmt, interpreter->num_reg.registers[0]);
+                sprintf(b, fmt, REG_NUM(0));
                 break;
         }
         r = mk_const(str_dup(b), ins->r[0]->set);

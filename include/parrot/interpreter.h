@@ -130,7 +130,20 @@ typedef struct _RunProfile {
 /* Forward decl for imc_info_t */
 struct _imc_info_t;
 
+#if INDIRECT_REGS
+/*
+ * move regs out of interpreter - see what all breaks ;)
+ */
+struct parrot_regs_t {
+    struct IReg int_reg;
+    struct NReg num_reg;
+    struct SReg string_reg;
+    struct PReg pmc_reg;
+};
+#endif
+
 typedef struct Parrot_Context {
+    struct parrot_regs_t *bp;           /* indirect reg base pointer */
     struct Stack_Chunk *int_reg_stack;  /* register frame stacks */
     struct Stack_Chunk *num_reg_stack;
     struct Stack_Chunk *string_reg_stack;
@@ -173,15 +186,18 @@ typedef struct _Prederef {
     size_t n_allocated;                 /* allocated size of it */
 } Prederef;
 
+
+
 /*
- * TODO: Parrot_Interp can use a Parrot_Context inline and we
- * can save/restore context with a single memcpy
+ * The actual interpreter structure
  */
 struct parrot_interp_t {
+#if !INDIRECT_REGS
     struct IReg int_reg;
     struct NReg num_reg;
     struct SReg string_reg;
     struct PReg pmc_reg;
+#endif
     struct Parrot_Context ctx;          /* All the registers and stacks that
                                            matter when context switching */
 
@@ -260,8 +276,8 @@ struct parrot_interp_t {
     UINTVAL recursion_limit;    /* Sub call resursion limit */
 };
 
-/* typedef struct parrot_interp_t Interp;    done in parrot.h so that 
-                                             interpreter.h's prereq headers can 
+/* typedef struct parrot_interp_t Interp;    done in parrot.h so that
+                                             interpreter.h's prereq headers can
                                              use 'Interp' */
 
 typedef enum {
@@ -288,10 +304,25 @@ typedef enum {
 /*
  * Macros to make accessing registers more convenient/readable.
  */
+#if INDIRECT_REGS
+
+#define INTERP_REG_INT(i, x) i->ctx.bp->int_reg.registers[x]
+#define INTERP_REG_NUM(i, x) i->ctx.bp->num_reg.registers[x]
+#define INTERP_REG_STR(i, x) i->ctx.bp->string_reg.registers[x]
+#define INTERP_REG_PMC(i, x) i->ctx.bp->pmc_reg.registers[x]
+
+#define REG_BASE struct parrot_regs_t
+
+#else
+
 #define INTERP_REG_INT(i, x) i->int_reg.registers[x]
 #define INTERP_REG_NUM(i, x) i->num_reg.registers[x]
 #define INTERP_REG_STR(i, x) i->string_reg.registers[x]
 #define INTERP_REG_PMC(i, x) i->pmc_reg.registers[x]
+
+#define REG_BASE Interp
+
+#endif
 
 /*
  * same with the default name interpreter
@@ -307,7 +338,6 @@ typedef enum {
  * The offsets are relative to REG_BASE, which is currently REG_INT(0)
  */
 
-#define REG_BASE Interp
 
 #define REG_OFFS_INT(x) offsetof(REG_BASE, int_reg.registers[x])
 #define REG_OFFS_NUM(x) offsetof(REG_BASE, num_reg.registers[x])

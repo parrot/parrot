@@ -45,30 +45,30 @@ static void
 clone_regs_interp(Parrot_Interp d, Parrot_Interp s, PMC *dest)
 {
     int i;
-    mem_sys_memcopy(d->int_reg.registers,
-        s->int_reg.registers, sizeof(struct IReg));
-    mem_sys_memcopy(d->num_reg.registers,
-        s->num_reg.registers, sizeof(struct NReg));
+    mem_sys_memcopy(&INTERP_REG_INT(d, 0),
+        &INTERP_REG_INT(s, 0), sizeof(struct IReg));
+    mem_sys_memcopy(&INTERP_REG_NUM(d, 0),
+        &INTERP_REG_NUM(s, 0), sizeof(struct NReg));
     for (i = 0; i < NUM_REGISTERS; i++) {
-        if (s->string_reg.registers[i])
-            d->string_reg.registers[i] =
-            string_copy(d, s->string_reg.registers[i]);
+        if (INTERP_REG_STR(s, i))
+            INTERP_REG_STR(d, i) =
+            string_copy(d, INTERP_REG_STR(s, i));
         /*
          * clone PMCS and strings
          */
-        if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
-            PMC *sp = s->pmc_reg.registers[i];
+        if (!PMC_IS_NULL(INTERP_REG_PMC(s, i))) {
+            PMC *sp = INTERP_REG_PMC(s, i);
             /* special case, dont clone SELF again - ugly */
             if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
                 sp->vtable->base_type == enum_class_ParrotThread))
-                d->pmc_reg.registers[i] = dest;
+                INTERP_REG_PMC(d, i) = dest;
             else {
                 /*
                  * XXX clone isn't quite right here, it can't
                  * work on self-referential structures
                  */
                 PMC* dp = VTABLE_clone(d, sp);
-                d->pmc_reg.registers[i] = dp;
+                INTERP_REG_PMC(d, i) = dp;
             }
         }
     }
@@ -90,7 +90,7 @@ need_reg(Parrot_Interp s, int i, int i3)
 {
     if (i >= 0 && i <= 2)       /* Sub, RetCont, object */
         return 1;
-    if (i == 3 && i3 >= 11 && !PMC_IS_NULL(s->pmc_reg.registers[i]))
+    if (i == 3 && i3 >= 11 && !PMC_IS_NULL(INTERP_REG_PMC(s, i)))
         return 1;               /* overflow if present */
     if (i >= 5 && i < 5 + i3)   /* i3 params */
         return 1;
@@ -116,7 +116,7 @@ clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
     /*
      * I3 has the number of PMCs
      */
-    int i3 = s->int_reg.registers[3];
+    int i3 = INTERP_REG_INT(s, 3);
 
     for (i = 0; i < NUM_REGISTERS/2; i++) {
         /*
@@ -130,18 +130,18 @@ clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
         if (!need_reg(s, i, i3))
             continue;
 #endif
-        if (!PMC_IS_NULL(s->pmc_reg.registers[i])) {
-            PMC *sp = s->pmc_reg.registers[i];
+        if (!PMC_IS_NULL(INTERP_REG_PMC(s, i))) {
+            PMC *sp = INTERP_REG_PMC(s, i);
             /* special case, dont clone SELF again - ugly */
             if ((sp->vtable->base_type == enum_class_ParrotInterpreter ||
                      sp->vtable->base_type == enum_class_ParrotThread))
-            d->pmc_reg.registers[i] = dest;
+            INTERP_REG_PMC(d, i) = dest;
             else if (PObj_is_PMC_shared_TEST(sp)) {
                 /*
                  * if PMC is a shared PMC, don't clone it, just
                  * pass it over
                  */
-                d->pmc_reg.registers[i] = sp;
+                INTERP_REG_PMC(d, i) = sp;
             }
             else {
                 /*
@@ -149,7 +149,7 @@ clone_regs_thread(Parrot_Interp d, Parrot_Interp s, PMC *dest)
                  * work on self-referential structures
                  */
                 PMC* dp = VTABLE_clone(d, sp);
-                d->pmc_reg.registers[i] = dp;
+                INTERP_REG_PMC(d, i) = dp;
             }
         }
     }

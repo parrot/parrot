@@ -14,6 +14,12 @@
 #define PARROT_SETTINGS_H_GUARD
 
 /*
+ * interpreter register layout - only during conversion
+ */
+
+#define INDIRECT_REGS 0
+
+/*
  * DOD/GC switches
  */
 

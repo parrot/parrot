@@ -169,6 +169,14 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
     init_object_cache(interpreter);
     /* allocate stack chunk cache */
     stack_system_init(interpreter);
+#if INDIRECT_REGS
+    /*
+     * XXX create mem for regs - intermediate step
+     *     to check indirect accressing
+     */
+    interpreter->ctx.bp = mem_sys_allocate(sizeof(struct parrot_regs_t));
+#endif
+
     /* Set up the initial register chunks */
     setup_register_stacks(interpreter, &interpreter->ctx);
 

@@ -31,12 +31,12 @@ static void exec_init(Parrot_exec_objfile_t *obj);
 static void add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len);
 static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
 
-/*                          
+/*
  * Parrot_exec_run must be 0 while the program runs.
  * It will be set to 2 inside eval (s. eval.pmc)
  * to switch to runops_jit (s. interpreter.c:runops_exec()).
  * Must be 1 while starting the compiled code to have make_interpreter
- * return the address of the global interpreter (s. interpreter.c) 
+ * return the address of the global interpreter (s. interpreter.c)
  * and PackFile_ConstTable_unpack use the global const_table (s. packfile.c).
  * Must also be 1 while generating the executable.
  */
@@ -92,7 +92,7 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     j = (int)cgp_core;
     j = (int)((op_func_t*)interpreter->op_lib->op_func_table)[2] - j;
     k = (int *)interpreter->code->cur_cs->prederef.code;
-    for (i = 0; i < (int)interpreter->code->cur_cs->base.size; i++) { 
+    for (i = 0; i < (int)interpreter->code->cur_cs->base.size; i++) {
         if (k[i] != j)
             k[i] = 0;
     }
@@ -110,8 +110,8 @@ Parrot_exec(Interp *interpreter, opcode_t *pc,
     obj->text.size += (4 - obj->text.size % 4);
     obj->data.size += (4 - obj->data.size % 4);
     offset_fixup(obj);
-    output = (interpreter->string_reg.registers[0]) ?
-        (const char *)interpreter->string_reg.registers[0] : "exec_output.o";
+    output = REG_STR(0) ?
+        (const char *)REG_STR(0) : "exec_output.o";
     Parrot_exec_save(obj, output);
 }
 
@@ -134,7 +134,7 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
     int *nds, i = 0;
 
     if (obj->data.size == 0) {
-        obj->data.code = (char *)mem_sys_allocate(len); 
+        obj->data.code = (char *)mem_sys_allocate(len);
         obj->data_size = (int *)mem_sys_allocate(sizeof(int));
     }
     else {
@@ -211,7 +211,7 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
 {
     int symbol_number;
     Parrot_exec_symbol_t *new_symbol;
-    
+
     symbol_number = symbol_list_find(obj, symbol);
     if (symbol_number == -1) {
         symbol_number = obj->symbol_count;
@@ -238,7 +238,7 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
             new_symbol->value = 0;
         }
     }
-    return symbol_number; 
+    return symbol_number;
 }
 
 /*
@@ -344,7 +344,7 @@ static int
 symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
 {
     int i;
-    
+
     for (i = 0; i < obj->symbol_count; i++)
         if (!strcmp(symbol, obj->symbol_table[i].symbol))
             return i;
