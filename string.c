@@ -1044,7 +1044,6 @@ string_from_num(struct Parrot_Interp *interpreter, FLOATVAL f)
 const char *
 string_to_cstring(struct Parrot_Interp *interpreter, STRING *s)
 {
-
     unmake_COW(interpreter, s);
 
     if (s->buflen == s->bufused) {
