@@ -263,6 +263,14 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
                 ins = insINS(interpreter, unit, ins, "set", regs, 2);
                 break;
             }
+            if (next[REGSET_P] == LAST_PARAM_REG) {
+                /* clear P3 */
+                if (!p3)
+                    p3 = get_pasm_reg("P3");
+                regs[0] = p3;
+                ins = insINS(interpreter, unit, ins, "null", regs, 1);
+                p3 = NULL;
+            }
             if (next[set] > LAST_PARAM_REG) {
                 goto overflow;
             }
@@ -290,7 +298,7 @@ pcc_put_args(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins,
             continue;
 overflow:
             if (!p3) {
-                p3 = mk_pasm_reg(str_dup("P3"));
+                p3 = get_pasm_reg("P3");
                 tmp = iNEW(interpreter, unit, p3, str_dup("PerlArray"), NULL, 0);
                 insert_ins(unit, ins, tmp);
                 ins = tmp;
