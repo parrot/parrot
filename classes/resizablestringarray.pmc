@@ -84,7 +84,6 @@ Resizes the array to C<size> elements.
 */
 
     void set_integer_native (INTVAL size) {
-        int i;
         SizeStringData *sd;
 
         if (size < 0)
@@ -94,18 +93,19 @@ Resizes the array to C<size> elements.
         sd = (SizeStringData *)PMC_data(SELF);
         PMC_int_val(SELF) = size;
         if(sd == NULL) {
-            i = 0;
-            sd = mem_sys_allocate(NEEDED_SIZE(size));
+            /* The parent class makes the assumption that NULL pointers are all
+               bits zero, so we might as well too.  */
+            sd = mem_sys_allocate_zeroed(NEEDED_SIZE(size));
             sd->size = size;
         } else if(size >= sd->size) {
-            i = sd->size;
+            int i = sd->size;
             sd->size =  size < 2*sd->size ? sd->size*2 : size;
             sd = mem_sys_realloc(sd, NEEDED_SIZE(sd->size));
+            for(; i < sd->size; i++)
+                sd->data[i] = NULL;
         } else {
             return;
         }
-        for(; i < sd->size; i++)
-            sd->data[i] = NULL;
 
         PMC_data(SELF) = sd;
         PObj_custom_mark_destroy_SETALL(SELF);
