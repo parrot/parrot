@@ -19,7 +19,7 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
 	if(size >= 0) {
 	    buffer->bufstart = mem_realloc(interpreter, buffer->bufstart, oldsize*sizeof(PMC *), size*sizeof(PMC*));
             if (size > oldsize)
-                memset(buffer->bufstart + oldsize * sizeof(PMC *), 0, (size - oldsize) * sizeof(PMC *));
+                memset((char *)buffer->bufstart + oldsize * sizeof(PMC *), 0, (size - oldsize) * sizeof(PMC *));
 	}
 	else {
             internal_exception(OUT_OF_BOUNDS,
@@ -27,7 +27,7 @@ static void resize_array ( struct Parrot_Interp *interpreter, PMC* self, INTVAL 
 	}
     }
     else {
-	buffer = (Buffer *) self->data = new_buffer_header(interpreter);
+	buffer = (Buffer *) (self->data = new_buffer_header(interpreter));
         self->flags |= PMC_is_buffer_ptr_FLAG;
         self->flags |= PMC_is_PMC_ptr_FLAG;
 	buffer->bufstart = Parrot_allocate(interpreter, sizeof(PMC*)*size);
