@@ -124,7 +124,7 @@ void build_cfg() {
     Edge *pred;
 
     info(2, "build_cfg\n");
-    for (i = 0; bb_list[i]; i++) {
+    for (i = 0; i < n_basic_blocks; i++) {
         bb = bb_list[i];
 
         /* if the block can fall-through */
@@ -233,7 +233,7 @@ void bb_add_edge(Basic_block *from, Basic_block *to) {
 
     from->succ_list = to->pred_list = e;
 
-    /* mempory housekeeping */
+    /* memory housekeeping */
     e->next = 0;
     if (edge_list == 0)
 	edge_list = e;
@@ -313,8 +313,8 @@ static void propagate_alias(void)
 		ins = curr;
 	    }
 	}
-        /* invoke implicitely uses P0, so mark it doin so */
-        else if (!strcmp(ins->op, "invoke")) {
+        /* invoke w/o arg implicitely uses P0, so mark it doin so */
+        else if (ins->opsize == 1 && !strcmp(ins->op, "invoke")) {
             SymReg * p0 = mk_pasm_reg("P0");
             add_instruc_reads(ins, p0);
             p0->use_count++;
@@ -567,6 +567,38 @@ sort_loops(void)
                 loop_info[i+1] = li;
                 changed = 1;
             }
+    }
+    /* set depth, it's incorrect til now, as it did depend on the
+     * order of finding loops
+     */
+    for (i = 0; i < n_loops-1; i++) {
+        int first = -1, last;
+        loop_info[i]->depth = 1;
+        /* we could also take the depth of the first contained
+         * block, but below is a check, that a inner loop is fully
+         * contained in a outer loop
+         */
+        for (j = 0; j < n_basic_blocks; j++)
+            if (set_contains(loop_info[i+1]->loop, j)) {
+                if (first < 0)
+                    first = j;
+                last = j;
+            }
+        for (j = i + 1; j < n_loops; j++) {
+            if (set_contains(loop_info[i]->loop, first) &&
+                    !set_contains(loop_info[i]->loop, last)) {
+                if (optimizer_level)
+                    fatal(1, "sort_loops", "loop %d contains first but not"
+                            "last of outer loop %d\n", j, i);
+            }
+            if (set_contains(loop_info[i]->loop, last) &&
+                    !set_contains(loop_info[i]->loop, first)) {
+                if (optimizer_level)
+                    fatal(1, "sort_loops", "loop %d contains last but not"
+                            "first of outer loop %d\n", j, i);
+            }
+            loop_info[j]->depth = loop_info[i]->depth + 1;
+        }
     }
 }
 

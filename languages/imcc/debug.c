@@ -97,7 +97,7 @@ void dump_cfg() {
     Edge *e;
 
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
-    for (i=0; bb_list[i]; i++) {
+    for (i=0; i < n_basic_blocks; i++) {
 	bb = bb_list[i];
 	fprintf(stderr, "%d (%d)\t -> ", bb->index, bb->loop_depth);
 	for (e=bb->succ_list; e != NULL; e=e->succ_next) {

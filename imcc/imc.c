@@ -335,14 +335,14 @@ static void compute_one_du_chain(SymReg * r) {
     r->first_ins = 0;
     r->use_count = r->lhs_use_count = 0;
     for(ins = instructions; ins; ins = ins->next) {
-	int ro, rw;
+        int ro, rw;
         ro = instruction_reads(ins, r);
         rw = instruction_writes(ins, r);
         if(ro || rw) {
-	    if (!r->first_ins) {
-		r->first_ins = ins;
-	    }
-	    r->last_ins = ins;
+            if (!r->first_ins) {
+                r->first_ins = ins;
+            }
+            r->last_ins = ins;
             if (rw)
                 r->lhs_use_count++;
             r->use_count++;
@@ -353,32 +353,58 @@ static void compute_one_du_chain(SymReg * r) {
                 r->lhs_use_count++;
                 r->use_count++;
             }
-	}
+        }
     }
-    /* TODO score high if r is a array/hash key */
-    /* TODO score high if -Oj and register is used in JITtable instruction */
-
-    r->score = r->use_count + (r->lhs_use_count << 2);
-    /* r->score *= (r->jit_usage - r->use_count + 1) */
 }
 
 /* Computes the cost of spilling each symbol. This is estimated by the number
- * of times the symbol appears, weighted by 8**loop_depth */
+ * of times the symbol appears, weighted by X*loop_depth */
 
 void compute_spilling_costs () {
-    int depth, i;
-    Instruction *ins;
+    int depth, i, j, k, max_depth;
+    SymReg *r;
+    Instruction * ins;
 
-    for (ins = instructions; ins; ins = ins->next) {
+    for(i = 0; i < n_symbols; i++) {
+        r = reglist[i];
+        r->score = r->use_count + (r->lhs_use_count << 2);
+        /* TODO score high if -Oj and register is used in
+         * JITtable instruction
+         */
+        /* r->score *= (r->jit_usage - r->use_count + 1) */
+        /* TODO rewrite this O(n_ins * n_reg) alg:
+         * - store max_depth in reg
+         * - store a flag, when this reg was already spilled
+         */
+        for (j = max_depth = 0; j < n_basic_blocks; j++) {
+            Life_range *l;
+            int used = 0;
 
-        depth = bb_list[ins->bbindex]->loop_depth;
+            l = r->life_info[j];
+            if (!l->first_ins)
+                continue;
+            for (ins = l->first_ins ; ins; ins = ins->next) {
+                for (k = 0; k < IMCC_MAX_REGS && ins->r[k]; k++)
+                    if (ins->r[k] == r) {
+                        used = 1;
+                        break;
+                    }
+                if (used && ins->flags & ITSPILL) {
+                    r->score = 100000;
+                    goto done;
+                }
+                if (ins == l->last_ins)
+                    break;
+            }
 
-        for (i = 0; ins->r[i] && i < IMCC_MAX_REGS; i++) {
-            ins->r[i]->score += 1 << (depth * 3);
-            if (ins->flags & ITSPILL)
-                ins->r[i]->score = 100000;
+            if (used) {
+                depth = bb_list[j]->loop_depth;
+                if (depth > max_depth)
+                    max_depth = depth;
+            }
         }
-
+        r->score += 1000 * max_depth;
+done:
     }
 
     if (IMCC_DEBUG & DEBUG_IMC)

@@ -755,13 +755,15 @@ static int unused_label()
     int i;
 
     info(2, "\tunused_label\n");
-    for (i=1; bb_list[i]; i++) {
+    for (i=1; i < n_basic_blocks; i++) {
 	ins = bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
             if (has_compile)
                 used = 1;
+            if (!lab->first_ins)
+                continue;
 #if 1
             else if (lab->last_ins)
                 used = 1;
@@ -796,7 +798,7 @@ static int unused_label()
 #endif
             if (!used) {
                 ostat.deleted_labels++;
-                debug(DEBUG_OPT1, "label %s deleted\n", lab->name);
+                debug(DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
                 delete_ins(ins, 1);
                 return 1;
@@ -818,7 +820,7 @@ static int dead_code_remove(void)
     if (!(optimizer_level & OPT_PRE))
         return 0;
     info(2, "\tdead_code_remove\n");
-    for (i=1; bb_list[i]; i++) {
+    for (i=1; i < n_basic_blocks; i++) {
 	bb = bb_list[i];
         if ((bb->start->type & ITLABEL) && *bb->start->r[0]->name == '_')
             continue;

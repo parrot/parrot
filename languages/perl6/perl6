@@ -643,7 +643,7 @@ sub pass2($$) {
     }
     my $debug = join(' ', map { defined $OPT{$_} && $OPT{$_} ? "-$_" : '' }
 		qw(debug yydebug verbose runpbc c G));
-    # TODO $debug .= ' -O'.$OPT{optimize}.' ' if ($OPT{optimize});
+    $debug .= ' -O'.$OPT{optimize}.' ' if ($OPT{optimize});
     if($OPT{runpbc} || $OPT{'c'}) {
 	# compile per imcc, run .pbc through parrot
 	if ($OPT{'c'}) {
@@ -762,20 +762,22 @@ sub pass4($$) {
     else {
 	my @opt = map { "-$_" } split(//, $OPT{'parrot-options'});
 	push(@opt, '--gc-debug') if ($OPT{'gc-debug'});
+	push(@opt, '-O'.$OPT{optimize})
+	    if ($OPT{optimize} && $PARROT eq $IMCC);
 	my $cmd = "$PARROT @opt $file @ARGV";
 	verbose(1, "running: $cmd");
 
-        local *SAVEOUT;
-        open(SAVEOUT, ">&STDOUT");
-        if (defined($ARGV[0]) && $ARGV[0] =~ /> (.*)/) {
-            open(STDOUT, $ARGV[0]);
-            shift(@ARGV);
-        }
+	local *SAVEOUT;
+	open(SAVEOUT, ">&STDOUT");
+	if (defined($ARGV[0]) && $ARGV[0] =~ /> (.*)/) {
+	    open(STDOUT, $ARGV[0]);
+	    shift(@ARGV);
+	}
 	if (system($PARROT, @opt, $file, @ARGV) && !$OPT{'ignore-exitcode'}) {
-            open(STDOUT, ">&SAVEOUT");
+	    open(STDOUT, ">&SAVEOUT");
 	    mydie($?, $cmd);
 	}
-        open(STDOUT, ">&SAVEOUT");
+	open(STDOUT, ">&SAVEOUT");
     }
 }
 
