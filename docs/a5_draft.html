@@ -1,0 +1,2239 @@
+<html><head>
+
+<title>Apocalypse 5: Pattern Matching</title><link rev="made" href="mailto:bhcompile@daffy.perf.redhat.com"></head>
+<body>
+
+
+<h1><a name="apocalypse 5: pattern matching">Apocalypse 5: Pattern Matching</a></h1>
+<p>This is the Apocalypse on Pattern Matching, generally having to do
+with what we call "regular expressions", which are only marginally
+related to real regular expressions.  Nevertheless, the term has
+grown with the capabilities of our pattern matching engines, so
+I'm not going to try to fight linguistic necessity here.  I will,
+however, generally call them "regexes" (or "regexen", when I'm in
+an Anglo-Saxon mood).</p>
+<p>Here are the RFCs covered in this Apocalypse.  PSA stands for "problem,
+solution, acceptance", my private rating of how this RFC will fit
+into Perl 6.  Doubtless I have misclassified <em>your</em> RFC, though
+the other ratings are pretty accurate.  <code>:-)</code></p>
+<pre>    RFC   PSA   Title
+    ---   ---   -----
+    072   aaa   Variable-length lookbehind. 
+    093   abb   Regex: Support for incremental pattern matching
+    110   bbb   counting matches
+    112   acc   Assignment within a regex
+    135   acr   Require explicit m on matches, even with ?? and // as delimiters.
+    144   aaa   Behavior of empty regex should be simple
+    145   acr   Brace-matching for Perl Regular Expressions
+    150   acc   Extend regex syntax to provide for return of a hash of matched subpatterns
+    156   aaa   Replace first match function (C&lt;?...?&gt;) with a flag to the match command.
+    164   ccr   Replace =~, !~, m//, s///, and tr// with match(), subst(), and trade()
+    165   acc   Allow Variables in tr///
+    166   abc   Alternative lists and quoting of things
+    191   bbc   smart container slicing
+    197   cdr   Numeric Value Ranges In Regular Expressions
+    198   adr   Boolean Regexes
+    261   dbr   Pattern matching on perl values
+    274   acc   Generalised Additions to Regexs
+    276   aaa   Localising Paren Counts in qr()s.
+    308   dar   Ban Perl hooks into regexes
+    316   bcr   Regex modifier for support of chunk processing and prefix matching
+    317   aaa   Access to optimisation information for regular expressions
+    331   acc   Consolidate the $1 and \1 notations
+    332   abc   Regex: Make /$/ equivalent to /\z/ under the '/s' modifier
+    348   bcc   Regex assertions in plain Perl code
+    360   acb   Allow multiply matched groups in regexes to return a listref of all matches
+    361   abb   Simplifying split()</pre>
+<p>Interestingly, there were no withdrawn RFCs for pattern
+matching.  That means either that there were no cork-brained ideas
+proposed, or that regex culture is so cork-brained already that the
+cork-brained ideas blend right in.  I know where my money is...  <code>:-)</code></p>
+<p>In fact, regular expression culture is a mess, and I share some of
+the blame for making it that way.  Since my mother always told me to
+clean up my own messes, I suppose I'll have to do just that.</p>
+<p>For prior Apocalypses, I've used the RFCs as a springboard for
+discussion of my thinking, but this one is special, because none of
+the RFCs were courageous enough (or foolhardy enough) to look at the big
+picture and propose radical change where it's needed.  But Perl has
+often been tagged as a language in which it's easy to write programs
+that are difficult to read, and it's no secret that regular expression
+syntax that has been the chief culprit.  Funny that other languages have
+been borrowing Perl's regular expressions as fast as they can...</p>
+<p>That's primarily because we took several large steps in Perl 5 to
+enhance regex capabilities.  We took one large step forwards with the
+<code>/x</code> option, which allowed whitespace between regex tokens.  But we
+also took several large steps sideways with the <code>(?...)</code> extension
+syntax.  I call them steps sideways, but they were simultaneously
+steps forward in terms of functionality and steps backwards in terms
+of readability.  At the time, I rationalized it all in the name of
+backward compatibility, and perhaps that approach was correct for that
+time and place.  It's not correct now, since the Perl 6 approach is
+to break everything that needs breaking all at once.</p>
+<p>And unfortunately, there's a lot of regex culture that needs breaking.</p>
+<p>Regex culture has gone wrong in a variety of ways, but it's not
+my intent to assign blame--there's plenty of blame to go around,
+and plenty of things that have gone wrong that are nobody's fault
+in particular.  For example, it's nobody's fault that you can't
+realistically complement a character set anymore.  It's just an
+accident of the way Unicode defines combining characters.  The whole
+notion of character classes is mutating, and that will have some
+bearing on the future of regular expression syntax.</p>
+<p>Given all this, I need to warn you that this Apocalypse is going to
+be somewhat radical.  We'll be proposing changes to certain "sacred"
+features of regex culture, and this is guaranteed to result in future
+shock for some of our more conservative citizens.  Do not be alarmed.
+We will provide ways for you to continue programming in old-fashioned
+regular expressions if you desire.  But I hope that once you've
+thought about it a little and worked through some examples, you'll
+like most of the changes we're proposing here.</p>
+<p>So although the RFCs did contribute greatly to my thinking for
+this Apocalypse, I'm going to present my own vision first for where
+regex culture should go, and then analyze the RFCs with respect to
+that vision.</p>
+<p>First, let me enumerate some of the things that are wrong with current
+regex culture.</p>
+<ul>
+<li>
+Too much history
+<p></p>
+</li><li>
+Too compact and "cute"
+<p></p>
+</li><li>
+Poor Huffman coding
+<p></p>
+</li><li>
+Too much reliance on too few metacharacters
+<p></p>
+</li><li>
+Different things look too similar
+<p></p>
+</li><li>
+Poor end-weight design
+<p></p>
+</li><li>
+Too much reliance on modifiers
+<p></p>
+</li><li>
+Too many special rules and boobytraps
+<p></p>
+</li><li>
+Backreferences not useful enough
+<p></p>
+</li><li>
+Too hard to match a literal string
+<p></p>
+</li><li>
+Two-level interpretation is problematic
+<p></p>
+</li><li>
+Too little abstraction
+<p></p>
+</li><li>
+Little support for named captures
+<p></p>
+</li><li>
+Difficult to use nested patterns
+<p></p>
+</li><li>
+Little support for grammars
+<p></p>
+</li><li>
+Inability to define variants
+<p></p>
+</li><li>
+Poor integration with "real" language
+<p></p>
+</li><li>
+Missing backtracking controls
+<p></p>
+</li><li>
+Difficult to define assertions
+<p></p></li></ul>
+<p>I'm sure there are other problems, but that'll do for starters.  Let's
+look at each of these in more detail.</p>
+<p>
+</p><h2><a name="too much history">Too much history</a></h2>
+<p>Most of the other problems stem from trying to deal with a rich history.
+Now there's nothing wrong with history per se, but those of us who are doomed
+to repeat it find that many parts of history are suboptimal and contradictory.
+Perl has always tried to err on the side of incorporating as much history
+as possible, and sometimes Perl has succeeded in that endeavor.</p>
+<p>Cultural continuity has much to be said for it, but what can you do when
+the culture you're trying to be continuous with is itself discontinuous?  As
+it says in Ecclesiastes, there's a time to build up, and a time to tear down.
+The first five versions of Perl mostly built up without tearing down, so
+now we're trying to redress that omission.</p>
+<p>
+</p><h2><a name="too compact and cute">Too compact and "cute"</a></h2>
+<p>Regular expressions were invented by computational linguists who love to
+write examples like <code>/aa*b*(cd)*ee/</code>.  While these are conducive to reasoning
+about pattern matching in the abstract, they aren't so good for pattern matching
+in the concrete.  In real life, most atoms are longer than "<code>a</code>" or "<code>b</code>".  In real
+life, tokens are more recognizable if they are separated by whitespace.  In the
+abstract, <code>/a+/</code> is reducible to <code>/aa*/</code>.  In real life, nobody wants to
+repeat a 15 character token merely to satisfy somebody's idea of theoretical
+purity.  So we have shortcuts like the <code>+</code> quantifier to say "one or more".</p>
+<p>Now, you may rightly point out that <code>+</code> is something we already have,
+and we already introduced <code>/x</code> to allow whitespace, so why is this
+bullet point here?  Well, there's a lot of inertia in culture, and
+the problem with <code>/x</code> is that it's not the default, so people don't think
+to turn it on when it would probably do a lot of good.  The culture
+is biased in the wrong direction.  Whitespace around tokens should
+be the norm, not the exception.  It should be acceptable to use
+whitespace to separate tokens that could be confused.  It should not be
+considered acceptable to define new constructs that contain a plethora
+of punctuation, but we've become accustomed to constructs like <code>(?&lt;=...)</code>
+and <code>(??{...})</code> and <code>[\r\n\ck\p{Zl}\p{Zp}]</code>,
+so we don't complain.  We're frogs who are getting boiled in a pot
+full of single-character morphemes, and we don't notice.</p>
+<p>
+</p><h2><a name="poor huffman coding">Poor Huffman coding</a></h2>
+<p>Huffman invented a method of data compaction in which common characters are
+represented by a small number of bits, and rarer characters are represented by
+more bits.  The principle is more general, however, and language designers
+would do well to pay attention to the "other" Perl slogan: Easy things should
+be easy, and hard things should be possible.  However, we haven't always taken
+our own advice.  Consider those two regex constructs we just saw:</p>
+<pre>    (?&lt;=...)
+    (??{...})</pre>
+<p>Which one do you think is likely to be the most common in everyday use?
+Guess which one is longer...</p>
+<p>There are many examples of poor Huffman coding in current regexes.  Consider
+these:</p>
+<pre>    (...)
+    (?:...)</pre>
+<p>Is it really the case that grouping is rarer than capturing?
+And by two gobbledygooky character's worth?  Likewise there are
+many constructs that are the same length that shouldn't be:</p>
+<pre>    (?:...)
+    (?#...)</pre>
+<p>Grouping is much more important than the ability to embed a comment.
+Yet they're the same length currently.</p>
+<p>
+</p><h2><a name="too much reliance on too few metacharacters">Too much reliance on too few metacharacters</a></h2>
+<p>A lot of our Huffman troubles came about because we were trying to
+shoehorn new capabilities into an old syntax without breaking anything.
+The <code>(?...)</code> construct succeeded at that goal, but it was new
+wine in old wineskins, as they say.  More successful was the <code>*?</code>
+minimal matching hack, but it's still symptomatic of the problem
+that we only had three characters to choose from that would have
+worked at that point in the grammar.  We've pretty nearly exhausted
+the available backslash sequences.</p>
+<p>The waterbed theory of linguistic complexity says that if you push
+down one place, it goes up somewhere else.  If you arbitrarily
+limit yourself to too few metacharacters, the complexity comes out
+somewhere else.  So it seems obvious to me that the way out of this
+mess is to grab a few more metacharacters.  And the metacharacters
+I want to grab are...well, we'll see in a moment.</p>
+<p>
+</p><h2><a name="different things look too similar">Different things look too similar</a></h2>
+<p>Consider these constructs:</p>
+<pre>    (??{...})
+    (?{...})
+    (?#...)
+    (?:...)
+    (?i:...)
+    (?=...)
+    (?!...)
+    (?&lt;=...)
+    (?&lt;!...)
+    (?&gt;...)
+    (?(...)...|...)</pre>
+<p>These all look quite similar, but some of them do radically different things.
+In particular, the <code>(?&lt;...)</code> does not mean the opposite of the <code>(?&gt;...)</code>.  The
+underlying visual problem is the overuse of parentheses, as in Lisp.
+Programs are more readable if different things look different.</p>
+<p>
+</p><h2><a name="poor endweight design">Poor end-weight design</a></h2>
+<p>In linguistics, the notion of end-weight is the idea that people tend
+to prefer sentences where the short things come first and the long
+things come last.  That minimizes the amount of stuff you have to
+remember while you're reading or listening.  Perl violates this with
+regex modifiers.  It's okay when you say something short like this:</p>
+<pre>    s/foo/bar/g</pre>
+<p>But when you say something like we find in RFC 360:</p>
+<pre>    while ($text =~ /name:\s*(.*?)\n\s*
+                    children:\s*(?:(?@\S+)[, ]*)*\n\s*
+                    favorite\ colors:\s*(?:(?@\S+)[, ]*)*\n/sigx) {...}</pre>
+<p>it's not until you read the <code>/sigx</code> at the end that you know how to
+read the regex.  This actually causes problems for the Perl 5 parser,
+which has to defer parsing the regular expression till it sees
+the <code>/x</code>, because that changes how whitespace and comments work.</p>
+<p>
+</p><h2><a name="too much reliance on modifiers">Too much reliance on modifiers</a></h2>
+<p>The <code>/s</code> modifier in the previous example changes the meaning of
+the <code>.</code> metacharacter.  We could, in fact, do away with the <code>/s</code> modifier
+entirely if we only had two different representations for "any character",
+one of which matched a newline, and one which didn't.  A similar argument
+applies to the <code>/m</code> modifier.  The whole notion of something outside
+the regex changing the meaning of the regex is just a bit bogus, not because
+we're afraid of context sensitivity, but because we need to have better
+control within the regex of what we mean, and in this case the context
+supplied outside the regex is not precise enough.  (Perl 5 has a way
+to control the inner contexts, but it uses the self-obfuscating <code>(?...)</code>
+notation.)</p>
+<p>Modifiers that control how the regex is used as a whole do make some
+sense outside the regex.  But they still have the end-weight problem.</p>
+<p>
+</p><h2><a name="too many special rules and boobytraps">Too many special rules and boobytraps</a></h2>
+<p>Without knowing the context, you cannot know what the pattern <code>//</code> will do.
+It might match a null string, or it might match the previously successful match.</p>
+<p>The <code>local</code> operator behaves differently inside regular expressions than
+it does outside.</p>
+<p>It's too easy to write a null pattern accidentally.  For instance,
+the following will never match anything but the null string:</p>
+<pre>    /
+    | foo
+    | bar
+    | baz
+    /x</pre>
+<p>Even when it's intentional, it may not look intentional:</p>
+<pre>    (a|b|c|)</pre>
+<p>That's hard to read because it's difficult to make the absence of something visible.</p>
+<p>It's too easy to confuse the multiple meanings of dot.  Or the multiple
+meanings of <code>^</code>, and <code>$</code>.  And the opposite of <code>\A</code> is frequently
+not <code>\Z</code>, but <code>\z</code>.  Tell me again, when do I say <code>\1</code>, and when
+do I say <code>$1</code>?  Why are they different?</p>
+<p>
+</p><h2><a name="backreferences not useful enough">Backreferences not useful enough</a></h2>
+<p>Speaking of <code>\1</code>, backreferences have a number of shortcomings.
+The first is actually getting ahold of the right backreference.
+Since captures are numbered from the beginning, you have to count,
+and you can easily count wrong.  For many purposes it would be better if you
+could ask for the last capture, or the one before that.  Or perhaps
+if there were a way to restart the numbering part way through...</p>
+<p>Another major problem with backreferences is that you can't easily
+modify one to search for a variant.  Suppose you match an opening parenthesis,
+bracket, or curly.  You'll like to search for everything up to the corresponding
+closing parenthesis, bracket, or curly, but there's no way to transmogrify
+the opening version to the closing version, because the backref search
+is hardwired independently of ordinary variable matching.  And that's because
+Perl doesn't instantiate <code>$1</code> soon enough.  And that's because Perl relies on
+variable interpolation to get subexpressions into regexes.  Which leads us
+to...</p>
+<p>
+</p><h2><a name="too hard to match a literal string">Too hard to match a literal string</a></h2>
+<p>Since regexes undergo an interpolation pass before they're compiled,
+anything you interpolate is forced to be treated as a regular
+expression.  Often that's not what you want, so we have the klunky
+<code>\Q$string\E</code> mechanism to hide regex metacharacters.  And that's
+because...</p>
+<p>
+</p><h2><a name="twolevel interpretation is problematic">Two-level interpretation is problematic</a></h2>
+<p>The problem with <code>\Q$string\E</code> arises because of the fundamental
+mistake of using interpolation to build regexes instead of letting
+the regex control how it treats the variables it references.  Regexes
+aren't strings, they're programs.  Or, rather, they're strings only in the sense
+that any piece of program is a string.  Just as you have to work to
+eval a string as a program, you should have to work to eval a string
+as a regular expression.  Most people tend to expect a variable in
+a regular expression to match its contents literally.  Perl violates
+that expectation.  And because it violates that expectation, we can't
+make <code>$1</code> synonymous with <code>\1</code>.  And interpolated parentheses throw
+off the capture count, so you can't easily use interpolation to call
+subrules, so we invented <code>(??{$var})</code> to get around that.  But then
+you can't actually get at the parentheses captured by the subrule.
+The ramifications go on and on.</p>
+<p>
+</p><h2><a name="too little abstraction">Too little abstraction</a></h2>
+<p>Historically, regular expressions were considered a very low-level
+language, a kind of glorified assembly language for the regex engine.
+When you're only dealing with ASCII, there is little need for abstraction,
+since the shortest way to say <code>[a-z]</code> is just that.  With the advent
+of the eighth bit, we started getting into a little bit of trouble,
+and POSIX started thinking about names like <code>[:alpha:]</code> to deal with
+locale difficulties.  But as with the problem of conciseness, the
+culture was still biased away from naming abstractly anything that could be
+expressed concretely.</p>
+<p>However, it's almost impossible to write a parser without naming things,
+because you have to be able to name the separate grammar rules
+so that the various rules can refer to each other.</p>
+<p>It's difficult to deal with any subset of Unicode without naming it.
+These days, if you see <code>[a-z]</code> in a program, it's probably an
+outright bug.  It's much better to use a named character property so
+that your program will work right in areas that don't just use ASCII.</p>
+<p>Even where we do allow names, it tends to be awkward because of the
+cultural bias against it.  To call a subrule by name in Perl 5 you
+have to say this:</p>
+<pre>    (??{$rule})</pre>
+<p>That has 4 or 5 more characters than it ought to.  Dearth of
+abstraction produces bad Huffman coding.</p>
+<p>
+</p><h2><a name="little support for named captures">Little support for named captures</a></h2>
+<p>Make that "no support" in Perl, unless you include assignment to a list.
+This is just a part of the bias against naming things.  Instead we
+are forced to number our capturing parens and count.  That works okay
+for the top-level regular expression, when we can do list assignment
+or assign <code>$1</code> to <code>$foo</code>.  But it breaks down as soon as you start
+trying to use nested regexes.  It also breaks down when the capturing
+parentheses match more than once.  Perl handles this currently by
+returning only the last match.  This is slightly better than useless,
+but not by much.</p>
+<p>
+</p><h2><a name="difficult to use nested patterns">Difficult to use nested patterns</a></h2>
+<p>For many of the reasons we've mentioned, it's difficult to make regexes
+refer to each other, and even if you do, it's almost impossible to
+get the nested information back out of them.  And there are entire
+classes of parsing problems that are not solvable without
+recursive definitions.</p>
+<p>
+</p><h2><a name="little support for grammars">Little support for grammars</a></h2>
+<p>Even if it were easier for regexes to refer to other regexes, we'd
+still have the problem that those other regexes aren't organized in
+any meaningful way.  They might be off in variables that come and go
+at the whim of the surrounding context.</p>
+<p>When we have an organized system of parsing rules, we call it a
+grammar.  One advantage of having a grammar is that you can optimize
+based on the assumption that the rules maintain their relationship to
+each other.  For instance, if you think of grammar rules as a funny
+kind of subroutine, you can write an optimizer to inline some of the
+subrules--but only if you know the subrule is fixed in the grammar.</p>
+<p>Without support for grammar classes, there's no decent way to think
+of deriving one grammar from another.  And if you can't derive one
+grammar from another, you can't easily evolve your language to handle
+new kinds of problems.</p>
+<p>
+</p><h2><a name="inability to define variants">Inability to define variants</a></h2>
+<p>If we want to have variant grammars for Perl dialects, then what about
+regex dialects?  Can regexes be extended either at compile time or at
+run time?  Perl 5 has some rudimentary overloading magic for rewriting
+regex strings, but that's got the same problems as source filters
+for Perl code; namely that you just get the raw regex source text and
+have to parse it yourself.  Once again the fundamental assumption is
+that a regex is a funny kind of string, existing only at the behest
+of the surrounding program.</p>
+<p>Do we think of regexes as a real, living language?</p>
+<p>
+</p><h2><a name="poor integration with rich languages">Poor integration with rich languages</a></h2>
+<p>Let's face it, in the culture of computing, regex languages are mostly
+considered second-class citizens, or worse.  "Real" languages like
+C and C++ will exploit regexes, but only through a strict policy of
+apartheid.  Regular expressions are our servants or slaves; we tell them
+what to do, they go and do it, and then they come back to say whether
+they succeeded or not.</p>
+<p>At the other extreme, we have languages like Prolog or Snobol where
+the pattern matching is built into the very control structure of the language.
+These languages don't succeed in the long run because thinking about
+that kind of control structure is rather difficult in actual fact, and
+one gets tired of doing it constantly.  The path to freedom is not to
+make everyone a slave.</p>
+<p>However, I would like to think that there is some happy medium between
+those two extremes.  Coming from a C background, Perl has historically
+treated regexes as servants.  True, Perl has treated them as trusted
+servants, letting them move about in Perl society better than any other
+C-like language to date.  Nevertheless, if we emancipate regexes to
+serve as co-equal control structures, and if we can rid ourselves of
+the regexist attitudes that many of us secretly harbor, we'll have
+a much more productive society than we currently do.  We need to
+empower regexes with a sense of control (structure).  It needs to
+be just as easy for a regex to call Perl code as it is for Perl
+code to call a regex.</p>
+<p>
+</p><h2><a name="missing backtracking controls">Missing backtracking controls</a></h2>
+<p>Perl 5 started to give regexes more control of their own destiny with
+the "grab" construct, <code>(?&gt;...)</code>, which tells the regex engine
+that when it fails to match the rest of the pattern, it should not
+backtrack into the innards of the grab, but skip back to before it.  That's
+a useful notion, but there are problems.  First, the notation sucks, but
+you knew that already.  Second, it doesn't go far enough.  There's no
+way to backtrack out of just the current grouping.  There's no way to backtrack
+out of just the current rule.  Both of these are crucial for giving first-class
+status to the control flow of regexes.</p>
+<p>
+</p><h2><a name="difficult to define assertions">Difficult to define assertions</a></h2>
+<p>Notionally, a regex is an organization of assertions that either
+succeed or fail.  Some assertions are easily expressed in traditional
+regex language, while others are more easily expressed in a procedural
+language like Perl.</p>
+<p>The natural (but wrong) solution is to try to reinvent Perl expressions
+within regex language.  So, for instance, I'm rejecting those RFCs that
+propose special assertion syntax for numerics or booleans.  The better
+solution is to make it easier to embed Perl assertions within regexes.</p>
+<p>
+</p><hr>
+<h1><a name="brave new world">Brave New World</a></h1>
+<p>I've just made a ton of negative assertions about the current state
+of regex culture.  Now I'd like you to perform a cool mental trick
+and turn all those negatives assertions into positive assertions about
+what I'm going to say, because I'm not intending to give the rationale
+again, but just present the design as it stands.  Damian will discuss
+an extended example in his Exegesis 5, which will show the big picture
+of how these various features work together to produce a much more
+readable whole.</p>
+<p>So anyway, here's what's new.</p>
+<p>
+</p><h2><a name="metacharacter reform">Metacharacter Reform</a></h2>
+<p>Some things stay the same: <code>(...)</code> captures text just as it
+did before, and the quantifiers <code>*</code>, <code>+</code>, and <code>?</code> are also unchanged.
+The vertical bar <code>|</code> still separates alternatives.  The backslash
+<code>\</code> still protects the following character from its ordinary
+interpretation.  The <code>?</code> suffix character still does minimal matching.
+(Note that these are by far the most commonly used metacharacters, so many
+ordinary regexes will look nearly identical in Perl 5 and Perl 6.)</p>
+<p>Since <code>/x</code> extended syntax is now the default, <code>#</code> is now always
+a metacharacter indicating a comment, and whitespace is now always
+"meta".  Whitespace is now the standard way to separate regex tokens that
+would otherwise be confused as a single token.</p>
+<p>Even in character classes, whitespace is not taken literally any more.
+Backwhack the space if you mean it literally, or use <code>&lt;sp</code>&gt;, or <code>\040</code>, or
+<code>\x20</code>, or <code>\c[SPACE]</code>.  But speaking of character classes...</p>
+<p>Perhaps the most radical change is that I've taken <code>[...]</code> away from
+character classes and made it the non-capturing grouping operator,
+because grouping is more fundamental than character classes, and
+explicit character classes are becoming less common than named
+character classes.  (You can still do character classes, just not
+with bare square brackets.)</p>
+<p>I've also stolen <code>{...}</code> from generalized quantifiers and made them into
+closure delimiters.  (Use <code>&lt;n,m&gt;</code> for the generalized quantifier now.)</p>
+<p>I've stolen three new metacharacters.  The new extensible metasyntax
+for assertions uses angle brackets, <code>&lt;...&gt;</code>.  And the
+colon <code>:</code> is now used for declaration and backtracking control.
+(Recall Larry's 2nd Law of Language Redesign: Larry gets the colon.)
+The colon always introduces a token that controls the meaning of what
+is around it.  The nature of the token depends on what follows
+the colon.  Both the colon syntax and angle syntax are extensible.
+(Backslash syntax is also extensible.)</p>
+<p>This may sound like we're complexifying things, but we're really
+simplifying.  We now have the following regex invariants:</p>
+<pre>    (...)       # always delimits a capturing group
+    [...]       # always delimits a non-capturing group
+    {...}       # always delimits a closure
+    &lt;...&gt;       # always delimits an assertion
+    :...        # always introduces a metasyntactic token</pre>
+<p>(Note that we're using "assertion" here in the broad sense of
+anything that either matches or fails, whether or not it has a width.)</p>
+<p>The nature of the angle assertion is controlled by the first character
+inside it.  If the first character is alphabetic, it's a grammatical
+assertion, and the entire first word controls the meaning.  The word
+is first looked up in the current grammar, if any.  If not found
+there, it is checked to see if it is one of the built-in grammar
+rules such as those defined by the Unicode property classes.  If the
+first character is not alphabetic, there will be special rules
+in the current grammar or in the Perl grammar for looking up the
+parse rule.  For instance, by default, any assertion that begins with
+<code>!</code> is simply negated.  Assertions that start with a digit are assumed
+to be a range assertion (<code>&lt;n,m&gt;</code>) regarding the previous atom.
+(Taking the last two together, you can say <code>&lt;!n,m&gt;</code> to exclude a range.)
+Assertions that start with <code>$</code>, <code>@</code>, <code>%</code>, or <code>&amp;</code> are assumed to
+interpolate an indirect regex rule stored in a variable or returned by
+a subroutine.  An assertion that starts with a parenthesis is a closure being
+used as an assertion.  An assertion that starts with a square bracket
+or another angle bracket is a character class.  An assertion that
+starts with a quote asserts the match of a literal string.  And so on.</p>
+<p>Some metacharacters are still used but have a slightly different
+meaning, in part to get rid of the <code>/s</code> and <code>/m</code> modifiers, and
+in part because most strings in Perl 6 will come from the filehandle
+pre-chomped.  So anchors <code>^</code> and <code>$</code> now always mean the <em>real</em> beginning
+and ending of the string.  Use <code>^^</code> and <code>$$</code> to match the beginnings
+and endings of lines <em>within</em> a string.  (They're doubled because
+they're "fancier", because they can match in multiple places, and
+because they'll be rarer, so Huffman says they should be longer.)
+The <code>^^</code> and <code>$$</code> also match where <code>^</code> and <code>$</code> would.</p>
+<p>The dot <code>.</code> now always matches any character including newline.  (Use <code>\N</code>
+to match a non-newline.  Or better, use an autochomping filehandle,
+if you're processing line-by-line.)</p>
+<p>In a sense, the sigils <code>$</code>, <code>@</code>, <code>%</code>, and <code>&amp;</code> are different metacharacters
+because they don't interpolate, but are now subject to the interpretation
+of the regex engine.  This allows us to change the default behavior of
+ordinary "interpolation" to a literal match, and also lets us put in
+lvalue-ish constructs like:</p>
+<pre>    / $name := (\S+) /
+    / @kids := [(\S+) \s+]* /
+    / %pets := [(\S+) \: (\S+) \s+]* /</pre>
+<p>(Notice also the delicate interplay of quantified non-capturing
+brackets with capturing parens, particularly for gathering multiple
+values or even multiple key/value pairs.)</p>
+<p>Here are some of the metacharacter differences in table form:</p>
+<pre>    Old                   New
+    ---                   ---
+    /pat pat #text        /pat pat #text
+        pat/x                 pat/              # Look Ma, no /x!
+    /patpat(?#text)/       /pat pat &lt;('text')&gt;/ # can always use whitespace</pre>
+<pre>    /pat pat/             / pat\ pat /          # match whitespace literally
+                          / pat \s* pat /       # or generically
+                          / pat \h* pat /       # or horizontally
+                          / pat &lt;' '&gt; pat /     # or as a literal string
+                          / pat &lt;sp&gt; pat /      # or by explicit rule
+                          /:w pat pat/          # or by implicit rule</pre>
+<pre>    /^pat$/               /^pat\n?$/            # ^ and $ mean string
+    /^pat$/m              /^^pat$$/             # no more /m
+    /\A...(^pat$)*...\z/m /^...(^^pat$$)*...$/  # no more \A or \z
+    /.*\n/                /\N*\n/               # \N is negated \n
+                          /.*?\n/               # this still works
+    /.*/s                 /.*/                  # . always matches "any"</pre>
+<pre>    \Q$string\E           $string               # interpret literally</pre>
+<pre>    (?{ code })           { code }              # call code, ignore return
+                          { code or fail }      # use code as an assertion</pre>
+<pre>    (??{$rule})           &lt;$var&gt;                # call $var as regex
+                          &lt;name&gt;                # call rule from current grammar
+                          &lt;Other::rule&gt;         # call rule from some Other grammar
+                          &lt;*rule&gt;               # bypass local rule to call built-in
+                          &lt;@array&gt;              # call array of alternate rules
+                          &lt;%hash&gt;               # parse keyword as key to rule
+                          &lt;@array[1]&gt;           # call a rule from an array
+                          &lt;%hash{"x"}&gt;          # call a rule from a hash
+                          &lt;&amp;sub(1,2,3)&gt;         # call a rule returned by a sub
+                          &lt;{ code }&gt;            # call return value as anonymous rule
+                          &lt;( code )&gt;            # call code as boolean assertion</pre>
+<pre>                          &lt;name(expr)&gt;          # call rule, passing Perl args
+                          { .name(expr) }       # same thing.</pre>
+<pre>                          &lt;$var(expr)&gt;          # call rule indirectly by name
+                          { .$var(expr) }       # same thing.</pre>
+<pre>                          &lt;name pat&gt;            # call rule, passing regex arg
+                          { .name(/pat/) }      # same thing.</pre>
+<pre>                          # maybe...
+                          &lt;name: text&gt;          # call rule, passing string
+                          { .name(q&lt;text&gt;) }    # same thing.</pre>
+<pre>    [\040\t\p{Zs}]        \h                    # horizontal whitespace
+    [\r\n\ck\p{Zl}\p{Zp}] \v                    # vertical whitespace
+    [a-z]                 &lt;[a-z]&gt;               # equivalently non-international
+                          &lt;alpha&gt;               # more international
+    [[:alpha:][:digit:]   &lt;&lt;alpha&gt;&lt;digit&gt;&gt;      # POSIX classes are built-in rules</pre>
+<pre>    {n,m}                 &lt;n,m&gt;                 # assert repeat count
+    {$n,$m}               &lt;$n,$m&gt;               # indirect repeat counts</pre>
+<pre>    (?&gt;.*)                [.*]:                 # don't backtrack through [.*]
+                          .*:                   # brackets not necessary on atom
+                          (.*):                 # same, but capture
+                          &lt;xyz&gt;:                # don't backtrack into subrule</pre>
+<pre>                          :                     # skip previous atom when backtracking
+                          ::                    # fail all |'s when backtracking
+                          :::                   # fail current rule when backtracking</pre>
+<pre>                          :=                    # bind a name to following atom
+    my ($x) = /(.*)/      my $x; / $x:=(.*) /   # may now bind it inside regex</pre>
+<pre>    (?i)                  :i                    # ignore case in the following
+                          :ignorecase           # same thing, self-documenting form
+    (?i:...)              [:i ...]              # can limit scope without capture
+                          (:i ...)              # can limit scope with capture</pre>
+<p>Declarations like <code>:i</code> are lexically scoped and do not pass to
+any subrules.  Each rule maintains its own sensitivity.  There is no
+built-in operator to turn case ignorance back off--just call a different rule and
+it's automatically case sensitive again.  (If you want a parameterized
+subrule, that can be arranged.  It's just a method, after all.  Proof of
+this assertion is left to future generations of hackers.)</p>
+<p>
+</p><h2><a name="backslash reform">Backslash Reform</a></h2>
+<p>There are some changes to backslash sequences.  Character properties
+<code>\p</code> and <code>\P</code> are no longer needed--predefined character classes
+are just considered intrinsic grammar rules.  (You can negate any <code>&lt;...&gt;</code>
+assertion by using <code>&lt;!...&gt;</code> instead.)  As mentioned in
+a previous Apocalypse, the <code>\L</code>, <code>\U</code>, and <code>\Q</code> sequences no longer
+use <code>\E</code> to terminate--they now require bracketing characters of some
+sort.  And <code>\Q</code> will rarely be needed due to regex policy changes.
+In fact, they may all go away since it's easy to say things like:</p>
+<pre>    $(lc $foo)</pre>
+<p>For any bracketing construct, square brackets are preferred,
+but others are allowed:</p>
+<pre>    \x[...]     # preferred, indicates simple bracketing
+    \x(...)     # okay, but doesn't capture.
+    \x{...}     # okay, but isn't a closure.
+    \x&lt;...&gt;     # okay, but isn't an assertion</pre>
+<p>The <code>\c</code> sequence is now a bracketing construct, having been
+extended from representing control characters to any named character.</p>
+<p>Backreferences such as <code>\1</code> are gone in favor of the corresponding
+variable <code>$1</code>.  <code>\A</code>, <code>\Z</code>, and <code>\z</code> are gone with the
+disappearance of <code>/s</code> and <code>/m</code>.  The position assertion <code>\G</code> is
+gone in favor of a <code>:c</code> modifier that forces continuation from where
+the last match left off.  That's because <code>\G</code> was almost never used
+except at the front of a regex.  In the unlikely event that you want to
+assert that you're at the old final position elsewhere in your regex,
+you can always test the current position (via the <code>.pos</code> method)
+with an assertion:</p>
+<pre>    $oldpos = pos $string;
+    $string =~ m/... &lt;( .pos == $oldpos )&gt; .../;</pre>
+<p>You may be thinking of <code>.pos</code> as the final position of the previous
+match, but that's not what it is.  It's the <em>current</em> position of the
+current match.  It's just that, between matches, the current position
+of the current match happens to be the same as the final position of
+the current match, which happens to be the last match, which happens
+to be done.  But as soon as you start another match, the last match is no
+longer the current match.</p>
+<p>Note that the <code>:c</code> continuation is needed only on constructs that
+ordinarily force the search to start from the beginning.  Subrules
+automatically continue at the current location, since their initial
+position is controlled by some other rule.</p>
+<p>There are two new backslash sequences, <code>\h</code> and <code>\v</code>, which match
+horizontal and vertical whitespace respectively, including Unicode
+spacing characters and control codes.  Note that <code>\r</code> is considered
+vertical even though it theoretically moves the carriage sideways.
+Finally, <code>\n</code> matches a logical newline, which is not necessarily
+a linefeed character on all architectures.  After all, that's why it's an "n",
+not an "l".  Your program should not break just because you happened to
+run it on a file from a partition mounted from a Windows machine.
+(Within an interpolated string, <code>\n</code> still produces whatever
+is the normal newline for the current architecture.)</p>
+<pre>    Old                 New
+    ---                 ---
+    \x0a                \x0a                    # same
+    \x{263a}            \x263a                  # brackets required only if ambiguous
+    \x{263a}abc         \x[263a]abc             # brackets required only if ambiguous
+    \0123               \0123                   # same (no ambiguity with $123 now)
+    \0123               \0[123]                 # can use brackets here too</pre>
+<pre>    \p{prop}            &lt;prop&gt;                  # properties are just grammar rules
+    \P{prop}            &lt;!prop&gt;</pre>
+<pre>    [\040\t\p{Zs}]      \h                      # horizontal whitespace
+    space               \h                      # not exact, but often more correct
+    [\r\n\ck\p{Zl}\p{Zp}] \v                    # vertical whitespace</pre>
+<pre>    \Qstring\E          \q[string]
+                        &lt;'string with spaces'&gt;  # match literal string
+                        &lt;' '&gt;                   # match literal space</pre>
+<pre>    \E                  gone                    # use \Q[...] instead</pre>
+<pre>    \A                  ^                       # ^ now invariant
+    \a                  \c[BEL]                 # alarm (bell)</pre>
+<pre>    \Z                  \n?$                    # clearer
+    \z                  $                       # $ now invariant
+    \G                  &lt;( .pos == $oldpos )&gt;   # match at particular position
+                                                # typically just use m:c/pat/</pre>
+<pre>    \N{CENT SIGN}       \c[CENT SIGN]           # named character
+    \c[                 \e                      # escape
+    \cX                 \c[^X]                  # control char
+    \n                  \c[LF]                  # specifically a linefeed
+    \x0a\x0d            \x[0a;0d]               # CRLF
+    \x0a\x0d            \c[CR;LF]               # CRLF (conjectural)
+    \C                  [:u0 .]                 # forced byte in utf8 (dangerous)
+    [^\N[CENT SIGN]]    \C[CENT SIGN]           # match any char but CENT SIGN</pre>
+<pre>    \Q$var\E            $var                    # always assumed literal,
+    \1                  $1                      # so $1 is literal backref
+    /$1/                my $old1 = $1; /$old1/  # must use temporary here</pre>
+<pre>    \r?\n               \n                      # \n asserts logical newline</pre>
+<pre>    [^\n]               \N                      # not a logical newline
+                        \C[LF]                  # not a linefeed</pre>
+<pre>    [^\t]               \T                      # not a tab (these are conjectural)
+    [^\r]               \R                      # not a return
+    [^\f]               \F                      # not a form feed
+    [^\e]               \E                      # not an escape
+    [^\x1B]             \X1B                    # not specified hex char
+    [^\x{263a}]         \X[263a]                # not a Unicode SMILEY</pre>
+<pre>    \X                  &lt;.&gt;                     # a grapheme (combining char seq)
+                        [:u2 .]                 # At level 2+, dot means grapheme</pre>
+<p>Under level 2 Unicode support, a character is assumed to mean a grapheme,
+that is, a sequence consisting of a base character followed by 0 or more
+combining characters.  That not only affects the meaning of the <code>.</code> character, but
+also any negated character, since a negated character is really a negative
+lookahead assertion followed by the traversal of a single character.  For
+instance, <code>\N</code> really means:</p>
+<pre>    [&lt;!before \n&gt; . ]</pre>
+<p>So it doesn't really matter how many characters <code>\n</code> actually matches.  <code>\N</code> always
+matches a single character--whatever that is...</p>
+<p>
+</p><h2><a name="modifier reform">Modifier Reform</a></h2>
+<p>You can't use colon for a regex delimiter any more.  That's because
+regex modifiers may now be placed in front of a regex construct:</p>
+<pre>    s:w:i:e /foo/bar/           # :words :ignorecase :each</pre>
+<p>That can also be written:</p>
+<pre>    s/:w:i:e foo/bar/           # :words :ignorecase :each</pre>
+<p>Single character modifiers may be bundled like this:</p>
+<pre>    s:wie /foo/bar/             # :words :ignorecase :each</pre>
+<p>...but only if the sequence as a whole is not already defined as
+a long modifier, since ambiguity will be resolved in favor of
+the long modifier. Long modifiers may <em>not</em> be bundled with any other
+modifier.  So this is legal:</p>
+<pre>    s:once:wie /foo/bar/</pre>
+<p>but not these (unless you've defined them):</p>
+<pre>    s:wieonce /foo/bar/
+    s:oncewie /foo/bar/</pre>
+<p>Not only is colon disallowed as a regex delimiter, but
+you may no longer use parentheses as the delimiters either.
+This will allow us to parameterize modifiers:</p>
+<pre>    s:myoption($x) /foo/bar/</pre>
+<p>This rule also allows us to differentiate <code>s///</code> from an <code>s()</code> function,
+<code>tr///</code> from <code>tr()</code>, etc.  If you want matching brackets for the
+delimiters I'd suggest that you use square brackets, since they now
+mean grouping without capturing.</p>
+<p>Several modifiers, <code>/x</code>, <code>/s</code>, and <code>/m</code>, are no longer needed and have
+been retired.  It's unclear whether <code>/o</code> is necessary any more.  We will
+assume it's gone unless it's shown that caching can't handle the
+problem.  Note that the regex now has more control over when to cache subrules
+because it is no longer subject to the vagaries of standard interpolation.</p>
+<p>The old <code>/c</code> modifier is gone because regexes never reset the position
+on failure any more.  To do that, set <code>$string.pos = 0</code> explicitly.
+But note also that assigning to a string automatically resets its position
+to <code>0</code>, so any string in your typical loop is going to start with its current
+search position already set <code>0</code>.  Modifying a string in place causes the position
+to move to the end of the replacement section by default, if the position
+was within the span replaced.  (This is consistent with <code>s///</code> semantics.)</p>
+<p>The <code>/e</code> modifier is also gone, since it did reverse parsing magic, and
+<code>:e</code> will be short for <code>:each</code>--see below.  It's still easy to substitute
+the value of an expression though:</p>
+<pre>    s/pat/$( code )/;</pre>
+<p>or even</p>
+<pre>    s(/pat/, { code });</pre>
+<p>There's a new modifier, <code>:once</code>, that causes a match to succeed only
+once (like the old <code>?...?</code> construct).  To reset it, use the <code>.reset</code>
+method on the regex object.  (If you haven't named the regex object,
+too bad...)</p>
+<p>Another new modifier is <code>:w</code>, which causes an implicit match of
+whitespace wherever there's literal whitespace in a pattern.
+In other words, it replaces every sequence of actual whitespace
+in the pattern with a <code>\s+</code> (between two identifiers) or a <code>\s*</code>
+(between anything else). So
+</p>
+<pre>
+    m:w/ foo bar \: ( baz )*/</pre>
+<p>really means (expressed in Perl 5 form):
+</p>
+<pre>
+    m:p5/\s*foo\s+bar\s*:(\s*baz\s*)*/</pre>
+<p>You can still control the handling of whitespace under <code>:w</code>, since
+we extend the rule to say that any explicit whitespace-matching token can't
+match whitespace implicitly on either side. So:</p>
+<pre>    m:w/ foo\ bar \h* \: (baz)*/</pre>
+<p>really means (expressed in Perl 5 form):
+</p>
+<pre>
+    m:p5/\s*foo bar[\040\t\p{Zs}]*:\s*(baz)*/</pre>
+<p>The first space in</p>
+<pre>    /[:w foo bar]/</pre>
+<p>matches <code>\s*</code> before "<code>foo</code>".  That's usually what you want, but if
+it's not what you want, you have a little problem.  Unfortunately you
+can't just say:</p>
+<pre>    /[:wfoo bar]/</pre>
+<p>That won't work because it'll look for the <code>:wfoo</code> modifier.
+However, there are several ways to get the effect you want:</p>
+<pre>    /[:w()foo bar]/ 
+    /[:w[]foo bar]/ 
+    /[:w\bfoo bar]/ 
+    /[:w::foo bar]/</pre>
+<p>That last one is just our friend the <code>::</code> operator in disguise.
+If you backtrack into it, you're leaving the brackets anyway, so it's
+essentially a no-op.</p>
+<p>The new <code>:c</code>/<code>:cont</code> modifier forces the regex to continue
+at the current "pos" of the string.  It may only be used outside
+the regex. (Well, it could be used inside but it'd be redundant.)
+The modifier also forces the regex to match only the next available
+thing.  That's not quite the same as the <code>^</code> anchor, though,
+because it not only disables the implicit scanning done by <code>m//</code>
+and <code>s///</code>, but it also works on more than the first iteration.
+It forces all matches to be contiguous, in other words.  So <code>:c</code>
+is short for both "continue" and "contiguous".  If you say</p>
+<pre>    $_ = "foofoofoo foofoofoo";
+    s:each:cont/foo/FOO/;</pre>
+<p>you get:</p>
+<pre>    FOOFOOFOO foofoofoo</pre>
+<p>This may seem odd, but it's precisely the semantics of any
+embedded regex:</p>
+<pre>    $_ = "foofoofoo foofoofoo";
+    $rx = rx/foo/;
+    m/&lt;$rx&gt;*/;          # matches "foofoofoo"</pre>
+<p>A modifier that starts with a number causes the pattern to match that
+many times.  It may only be used outside the regex.  It may not be
+bundled, because ordinals are distinguished from cardinals.  That is,
+how it treats those multiple matches depends on the next character.
+If you say</p>
+<pre>    s:3x /foo/bar/</pre>
+<p>then it changes the first 3 instances.  But if you say</p>
+<pre>    s:3rd /foo/bar/</pre>
+<p>it changes only the 3rd instance.  You can say</p>
+<pre>    s:1st /foo/bar/</pre>
+<p>but that's just the default, and should not be construed
+as equivalent to <code>:once</code>, which matches only once, ever.
+(Unless you <code>.reset</code> it, of course.)</p>
+<p>You can combine cardinals and ordinals:</p>
+<pre>    s:3x:3rd /foo/bar/</pre>
+<p>That changes the 3rd, 6th, and 9th occurrences.  To change every other
+quote character, say</p>
+<pre>    s:each:2nd /"/\&amp;rquot;/;</pre>
+<p><code>:each</code> is synonymous with <code>:3x</code> (for large values of <code>3</code>).  Note that
+<code>:each</code> does not, in fact, generate every possible match, because it
+disallows overlaps.  To get every possible match, use the <code>:any</code>
+modifier.  Saying:</p>
+<pre>    $_ = "abracadabra";
+    @all = m:any /a[^a]+a/;</pre>
+<p>produces:</p>
+<pre>    abra aca ada abra</pre>
+<p>It can even match multiple times at the same spot as long as the
+rest of the regex progresses somehow.  Saying:</p>
+<pre>    @all = m:any /a.*?a/;</pre>
+<p>produces:</p>
+<pre>    abra abraca abracada abracadabra aca acada acadabra ada adabra abra</pre>
+<p>If you say</p>
+<pre>    $sentence.m:any /^ &lt;english&gt; $/</pre>
+<p>you'll get every possible parsing of the sentence according to the rules
+of <code>english</code> (not to be confused with the rules of English, which are already
+confusing enough, except when they aren't).</p>
+<p>To indicate varying levels of Unicode support we have these modifiers, which may
+be used either inside or outside a regex:</p>
+<pre>    :u0         # use bytes       (. is byte)
+    :u1         # level 1 support (. is codepoint)
+    :u2         # level 1 support (. is grapheme)
+    :u3         # level 1 support (. is language dependent)</pre>
+<p>These modifiers say nothing about the state of the data, but in general internal
+Perl data will already be in Normalization Form C, so even under <code>:u1</code>, the precomposed
+characters will usually do the right thing.  Note that these modifiers
+are for overriding the default support level, which was probably set by pragma
+at the top of the file.</p>
+<p>Finally, there's the <code>:p5</code> modifier, which causes the rest of the regex (or group) to
+be parsed as a Perl 5 regular expression, including any interpolated strings.
+(But it still doesn't enable Perl 5's trailing modifiers.)</p>
+<pre>    Old                 New
+    ---                 ---
+    ?pat?               m:once/pat/             # match once only
+    /pat/i              m:i/pat/                # ignorecase
+                        /:i pat/                # ignorecase
+    /pat/x              /pat/                   # always extended
+    /pat\s*pat/         /:w pat pat/            # match word sequence
+    /(?i)$p5pat/        m:p5/(?i)$p5pat/        # use Perl 5 syntax
+    $n = () = /.../g    $n = +/.../;            # count occurrences
+    for $i (1..3){s///} s:3///;                 # do 3 times
+    /^pat$/m            /^^pat$$/               # no more /m
+    /./s                /./                     # no more /s
+    /./                 /\N/                    # . now works like /s</pre>
+<p>
+</p><h2><a name="keyword and context reform">Keyword and Context Reform</a></h2>
+<p>Deferred regex rules are now defined with <code>rx//</code> rather than <code>qr//</code>,
+because a regular expression is no longer a kind of quoted string.</p>
+<p>Actually, just as you can define closures without an explicit <code>sub</code>,
+any <code>//</code> or <code>rx//</code> declares a deferred regex if it's not in a context
+that executes it immediately.  A regex is executed automatically if
+it's in a boolean, numeric, or string context.  But assignment to
+an untyped variable is not such a context, nor is passing the regex
+as an untyped parameter to a function.  (Of course, an explicitly
+declared RULE parameter doesn't provide an evaluating context either.)</p>
+<p>So these are equivalent:</p>
+<pre>    my $foo = /.../;            # create regex object
+    my $foo = rx[...];          # create regex object
+    my $foo = rule {...};       # create regex object</pre>
+<p>Likewise, these are equivalent:</p>
+<pre>    @x = split /.../;
+    @x = split rx[...];
+    @x = split rule {...};</pre>
+<p>The "rule" syntax is just a way of declaring a deferred regex as if it were a subroutine
+or method.  More on that later.</p>
+<p>To force an immediate evaluation of a deferred regex where it wouldn't ordinarily
+be, you can use the appropriate unary operator:</p>
+<pre>    my $foo = ?/.../;   # boolean context, return whether matched, 
+    my $foo = +/.../;   # numeric context, return count of matches
+    my $foo = _/.../;   # string context, return captured/matched string</pre>
+<p>The standard match and substitution forms also force immediate evaluation
+regardless of context:</p>
+<pre>    $result = m/.../;           # do match on topic string
+    $result = s/.../.../;       # do substitution on topic string</pre>
+<p>These forms also force the regex to start matching at the beginning
+of the string in question and scan forward through the string for
+the match, as if there were an implicit <code>.*?</code> in front of every
+iteration.  (Both of these behaviors are suppressed if you use
+the <code>:c</code>/<code>:cont</code> modifier).  In contrast, the meaning of the
+deferred forms is dependent on context.  In particular, a deferred
+regex naturally assumes <code>:c</code> when used as a subrule.  That is,
+it continues where the last match left off, and the next thing has
+to match right there at the head of the string.</p>
+<p>In any other context, including list context, a deferred regex is <em>not</em> immediately evaluated,
+but produces a reference to the regex object:</p>
+<pre>    my $rx = /.../;     # not evaluated
+    my @foo = $rx;      # ERROR: type mismatch.
+    my @foo = ($rx);    # One element, a regex object.
+    my @foo = (/.../);  # Same thing.
+    my @foo := $rx;     # Set autogrow rule for @foo.</pre>
+<p>To evaluate repeatedly in list context, treat the regex object as you would any other iterator:</p>
+<pre>    my @foo = &lt;$rx&gt;;</pre>
+<p>You can also use the more explicit form:</p>
+<pre>    my @foo = m/&lt;$rx&gt;/;</pre>
+<p>Those aren't identical, since the former assumes <code>:c</code> and starts up at the current
+position of the unmentioned topic, while the latter explicitly resets
+the position to the beginning before scanning.  Also, since the deferred
+regex assumes a <code>:c</code> modifier, <code>&lt;$rx&gt;</code> won't scan through the string
+like <code>m//</code>.  It can return multiple values to the list, but they
+have to be contiguous.  You can get the scanning effect of <code>m//</code>
+by prepending the pattern with <code>.*?</code>.</p>
+<p>But it's vitally important to understand this fundamental change, that
+<code>//</code> is no longer a short form of <code>m//</code>, but rather a short form of <code>rx//</code>.
+If you want to add modifiers to a <code>//</code>, you have to turn it into an <code>rx//</code>, not
+an <code>m//</code>.  It's now <em>wrong</em> to call <code>split</code> like this:</p>
+<pre>    split m/.../</pre>
+<p>(That is, it's wrong unless you actually want the return value of the
+pattern match to be used as the literal split delimiter.)</p>
+<p>The old <code>?...?</code> syntax is gone.  Indeed, it has to go for us to get
+the unary <code>?</code> operator.</p>
+<pre>    Old                 New
+    ---                 ---
+    ?pat?               m:once/pat/
+    qr//                rx//
+                        rule { }</pre>
+<p>
+</p><h2><a name="null string reform">Null String Reform</a></h2>
+<p>The null pattern is now illegal.  To match whatever you used to match
+with a null pattern, use one of these:</p>
+<pre>    Old                 New
+    ---                 ---
+    //                  /&lt;prior&gt;/       # match what prior match did
+    //                  /&lt;null&gt;/        # match the null string between chars
+    (a|b|)              (a|b|&lt;null&gt;)    # match a null alternative</pre>
+<p>Note that, as an assertion, &lt;null&gt; always succeeds.  You never want to say:</p>
+<pre>    / &lt;null&gt; | single | double | triple | home run /</pre>
+<p>because you'll never get to first base.</p>
+<p>
+</p><h2><a name="extension syntax reform">Extension Syntax Reform</a></h2>
+<p>There are no longer any <code>(?...)</code> sequences, because parens now always
+capture.  Some of the replacement sequences take their intrinsic
+scoping from <code>&lt;...&gt;</code>, while others are associated with other
+bracketing characters, or with any arbitrary atom that could be a
+bracketed construct.  Looking at the metasyntax problem from the
+perspective of a Perl5-to-Perl6 translator, here's what the various
+Perl 5 extension constructs translate to:</p>
+<pre>    Old                 New
+    ---                 ---
+    (??{$rule})         &lt;$rule&gt;         # call regex in variable
+    (?{ code })         { code }        # call Perl code, ignore result
+    (?#...)             &lt;('...')&gt;       # in-line comment, rarely needed
+    (?:...)             [...]           # non-capturing brackets
+    (?=...)             &lt;before ...&gt;    # positive lookahead
+    (?!...)             &lt;!before ...&gt;   # negative lookahead
+    (?&lt;=...)            &lt;after ...&gt;     # positive lookbehind
+    (?&lt;!...)            &lt;!after ...&gt;    # negative lookbehind
+    (?&gt;...)             [...]:          # grab (any atom)</pre>
+<pre>    (?(cond)yes|no)     [ cond :: yes | no ]
+    (?(1)yes|no)        [ &lt;(defined $1)&gt; :: yes | no ]</pre>
+<p>The <code>&lt;$rule&gt;</code> construct does a "delayed" call of another
+regular expression stored in the <code>$rule</code> variable.  If it is
+a regex object, it's just called as if it were a subroutine,
+so there's no performance problem.  If it's a string, it is
+compiled as a regex and executed.  The compiled form is cached
+as a property of the string, so it doesn't have to be recompiled
+unless the string changes.  (This implies that we can have properties
+that invalidate themselves when their base object is modified.)
+In either case, the evaluated regex is treated as a subrule, and
+any captures it does are invisible to the outer regex unless the
+outer regex takes steps to retrieve them.  In any event, subrule
+parens never change the paren count of the outer rule.</p>
+<p>The <code>{code}</code> form doesn't return anything meaningful--it is used for
+its side effects.  Any such closure may behave as an assertion.  It merely
+has to throw an exception in order to fail.  To throw such an exception
+(on purpose) one may use <code>fail</code>:</p>
+<pre>    $_ = "666";
+    / (\d+) { $1 &lt; 582 or fail }/</pre>
+<p>As with any assertion, the failing closure starts backtracking at the
+location of the closure.  In this case, it backtracks into the <code>\d+</code>
+and ends up matching "<code>66</code>" rather than "<code>666</code>".  If you didn't
+want that, use <code>\d+:</code> instead.</p>
+<p>It's more succinct, however, to use the code assertion syntax.  Just put
+angles around a parenthesized Perl expression:</p>
+<pre>    / (\d+) &lt;( $1 &lt; 582 )&gt; /</pre>
+<p>I find the parens to be vaguely reminiscent of the parentheses you
+have to put around conditionals in C (but not Perl (anymore)).  Also,
+the parentheses are meant to remind you that you only want to put an
+expression there, not a full statement.</p>
+<p>Don't use a bare closure to try to interpolate a calculated regex, since the
+result will be ignored.  Instead, use the <code>&lt;{expr}&gt;</code> form to do that.
+As with <code>&lt;&amp;rule()&gt;</code>, the result will be interpreted as a subrule, not as
+if it were interpolated.</p>
+<p>Since a string is usually true, you can just assert it to get the effect of
+an inline comment: <code>&lt;("this is a comment")&gt;</code>.  But I've never used one
+except to show it as an example.  Line ending comments are usually much
+clearer.  (Just bear in mind you can't put the final regex delimiter on the
+same line, because it won't be seen in the comment.)  You could also use
+the <code>{'...'}</code> construct for comments, but then you risk warnings about
+"useless use of a string in void context".</p>
+<p>The <code>[...]</code> is the new non-capturing bracket notation.  It seems to work
+very well for this purpose--I tried the other brackets and they tend
+to "disappear" faster than square brackets.  So we reserve <code>(...)</code> and
+<code>&lt;...&gt;</code> for constructs where the visual distance between opening and closing is
+typically shorter than for square brackets or curlies.  The square brackets also work
+nicely when lined up vertically with vertical bars.  Here's a declaration
+of a named rule from the class Perl6Grammar.  It parses Perl 6 statements.
+(Think of it as a funny looking method declaration.)</p>
+<pre>    rule state  { &lt;label&gt;
+                    [ &lt;control&gt;          {.control}
+                    | &lt;sideff&gt; &lt;eostate&gt; {.sideff}
+                    | &lt;@other_statements&gt;
+                    ]
+                };</pre>
+<p>Huffman coding says that rarer forms should be longer, and that's the
+case with the lookahead and lookbehind assertions, <code>&lt;before ...&gt;</code>
+and <code>&lt;after ...&gt;</code>.  (The negations are formed via the general
+<code>&lt;!...&gt;</code> rule.)  Note that these prepositions are interpreted
+as assertions, not operations.  For example, <code>&lt;before X&gt;</code> is
+to be read "Assert that we are before X" rather than "Look before
+where we are for X".</p>
+<p>The new <code>:</code> operator replaces the <code>(?&gt;...)</code> construct.  It modifies
+whatever comes before it, much like <code>*</code> does, so it's naturally scoped
+if the preceding atom (or quantified atom) is a bracketed construct.
+Parsers can use this every time they commit to the parsing of a token
+or phrase to tell the regex engine that there's no point in backtracking
+through the atom in question, so backtracking will skip backwards over
+the atom and continue with some earlier branch point.  The following takes
+a long time to fail if it has to look at every sequence of "<code>a</code>" to see if
+there is a "<code>b</code>" after it:</p>
+<pre>    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaac" =~ /^ a* b /</pre>
+<p>But we already know that the only possible match is the longest one.
+So if you put in the colon, it fails in one pass because the <code>*</code> grabs everything
+and gives nothing back on backtracking.</p>
+<pre>    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaac" =~ /^ a*: b /</pre>
+<p>You can use colon on a longer sequence too.  The following might match a list of
+expressions separated by comma:</p>
+<pre>    / &lt;expr&gt; [ , &lt;expr&gt; ]*: /</pre>
+<p>It is an error to use <code>:</code> on any atom that does no backtracking.  This will
+help to catch errors where you've forgotten to backslash a literal colon in
+things like:</p>
+<pre>    /^From: (.*)/</pre>
+<p>Perl 6 has no need for a special conditional construct like Perl 5's <code>(?(cond)yes|no)</code>. 
+That's because with a slight tweak, ordinary alternation can do the same thing.
+That tweak is our next backtracking modifier, the <code>::</code> operator.  If you backtrack
+across it, it fails all the way out of the current list of alternatives.  Consider
+an ordinary list of alternatives:</p>
+<pre>    [ &lt;A&gt; &lt;X&gt; | &lt;B&gt; &lt;Y&gt; | &lt;C&gt; &lt;Z&gt; ]</pre>
+<p>The way the rules of backtracking work, if either <code>&lt;A&gt;</code> or <code>&lt;X&gt;</code>
+ fail, it backtracks to the next alternative.  Likewise for
+<code>&lt;B&gt;</code> and <code>&lt;Y&gt;</code>.  In the case of <code>&lt;C&gt;</code> or <code>&lt;Z&gt;</code>,
+ there is no next alternative, so it naturally fails out of the
+entire construct.  That's not how a conditional is supposed to work,
+because in the conditional, only the condition determines which case
+is executed.  Once you've committed to a particular case, it has to
+stand or fall as if the conditional hadn't been there.  So all we
+need for our purposes is to have is something that separates the
+assertions that matter from those that don't.  That's what <code>::</code>
+does, and it reads rather well as a "then", or as a "corresponds to".  If you write</p>
+<pre>    [ &lt;A&gt; :: &lt;X&gt;
+    | &lt;B&gt; :: &lt;Y&gt;
+    | &lt;C&gt; :: &lt;Z&gt;
+    ]</pre>
+<p>then the failure of <code>&lt;A&gt;</code>, <code>&lt;B&gt;</code>, or <code>&lt;C&gt;</code> proceeds
+to the next case (if any), while any failure in <code>&lt;X&gt;</code>, <code>&lt;Y&gt;</code>,
+or <code>&lt;Z&gt;</code> is guaranteed to backtrack out of the front of the
+alternative list and revise a former choice (just as the success of
+<code>&lt;X&gt;</code>, <code>&lt;Y&gt;</code>, or <code>&lt;Z&gt;</code> is guaranteed to "forward track"
+out of the end of the alternative list and try to match more).  It's a
+natural mapping to existing regex semantics.  Here's a more realistic
+example from the Perl 6 grammar.  It parses statement modifiers.
+(The <code>&lt;ws&gt;</code> rule parses optional whitespace.)</p>
+<pre>    rule modifier { if     &lt;ws&gt; :: &lt;expr&gt; { .new_cond(0,$expr) }
+                  | unless &lt;ws&gt; :: &lt;expr&gt; { .new_cond(1,$expr) }
+                  | while  &lt;ws&gt; :: &lt;expr&gt; { .new_loop(0,$expr) }
+                  | until  &lt;ws&gt; :: &lt;expr&gt; { .new_loop(1,$expr) }
+                  | for    &lt;ws&gt; :: &lt;expr&gt; { .new_for($expr)   }
+                  | &lt;@other_modifiers&gt;  # user defined
+                  | &lt;null&gt;              # no modifier
+                  }</pre>
+<p>In each case, once we recognize a keyword (and its following
+whitespace), we need to look for an expression, and then call a closure
+that builds the syntax tree.  If either of those fails, the entire
+modifier rule fails.  We only get to the last two alternatives on
+failure of assertions before the <code>::</code>.</p>
+<p>Note that the <code>::</code> only says that we can't backtrack from the "then"
+into the "if".  It says nothing about backtracking into the alternative
+list as a whole.  The alternatives are still choice points, so the
+regex engine is allowed to backtrack into the alternative list and
+try another alternative.  (To disable that, simply put a <code>:</code> after
+the closing bracket of the alternative list.)</p>
+<p>There is nothing in Perl 5 corresponding to the <code>:::</code> operator, but
+it works just like <code>::</code>, only more so.  If you backtrack across it,
+it fails all the way out of the current rule definition (though not
+out of any rule invoking this definition).  That is, it fails all the
+way out of the innermost lexically enclosing <code>/.../</code>, <code>m/.../</code>, <code>s/...//</code>,
+<code>rx/.../</code>, or <code>rule {...}</code>, skipping out through any enclosing
+nestings of <code>&lt;...&gt;</code>, <code>[...]</code>, or <code>(...)</code>.  (A pattern nested
+within a closure is classified as its own rule, however, so it never gets
+the chance to pass out of a <code>{...}</code> closure.)</p>
+<p>Since the alternatives in our last example are at the top level of the
+regex, we could have used the <code>:::</code> operator to get the same effect
+as <code>::</code>, because terminating the rule and terminating the alternation
+amount to the same thing in that case.  You can think of all of these
+as variants on Prolog's "cut" operator.</p>
+<p>If you backtrack over the <code>::::</code> operator, it will delete your program
+from the disk.  <code>;-)</code></p>
+<p>Actually, the real name of the real <code>::::</code> operator is <code>&lt;commit&gt;</code>.
+It fails the entire match if you backtrack over it, not just the
+current rule.  That is, it fails all the way out of the <em>outermost</em>
+dynamically enclosing <code>/.../</code>, <code>m/.../</code>, <code>s/...//</code>, <code>rx/.../</code>,
+or <code>rule {...}</code> that is executing on the current string.</p>
+<p>There is one "cut" operator that is beyond <code>&lt;commit&gt;</code>; it is
+appropriately named <code>&lt;cut&gt;</code>, for two reasons.  First of all, it's
+a real cut operator in that, if you backtrack over it, the current
+match fails completely, just like <code>&lt;commit&gt;</code>.  But that's
+just a side effect of the other reason, which is that <code>&lt;cut&gt;</code>
+cuts off the front of the string that you're currently matching on,
+turning the current position into the new beginning of the string.
+When you're matching on a potentially infinite string, it's important
+that you have a way of discarding that part of the match that you've
+already committed to.  In Perl 5, the only way to do that was with
+a coordinated system of <code>s/^pat//</code> operations.  With the <code>&lt;cut&gt;</code>
+assertion, however, you can just match normally, and cut at one
+spot in your top-level rule when you reach an "accept" state.</p>
+<p>In the realm of idle speculation, we could go as far as to define a
+variant of <code>&lt;cut&gt;</code> that would render <code>s///</code> slightly redundant:</p>
+<pre>    s/foo/bar/;
+    m/foo &lt;replace("bar")&gt; /</pre>
+<p>Note that we don't need any special forms for controlling the scope of
+a "fail" in a closure.  Just prefix the closure with the appropriate
+backtracking operator:</p>
+<pre>    / pattern ::: { code() or fail } /  # fails entire rule</pre>
+<p>
+</p><h2><a name="character class reform">Character Class Reform</a></h2>
+<p>As we mentioned earlier, character classes are becoming more like standard
+grammar rules, because the definition of "character" is getting fuzzier.
+This is part of the motivation for demoting enumerated character classes
+and stealing the square brackets for another purpose.  Actually, for old
+times' sake you still use square brackets on enumerated character classes,
+but you have to put an extra set of angles around it.  But this actually
+tends to save keystrokes when you want to use any named character classes or
+Unicode properties, particularly when you want to combine them:</p>
+<pre>    Old                 New
+    ---                 ---
+    [a-z]               &lt;[a-z]&gt;
+    [[:alpha:]]         &lt;alpha&gt;
+    [^[:alpha:]]        &lt;-alpha&gt;
+    [[:alpha:][:digit]] &lt;&lt;alpha&gt;&lt;digit&gt;&gt;</pre>
+<p>The outer <code>&lt;...&gt;</code> also naturally serves as a container for any
+extra syntax we decide to come up with for character set manipulation:</p>
+<pre>    &lt;[_]+&lt;alpha&gt;+&lt;digit&gt;-&lt;Swedish&gt;&gt;</pre>
+<p>
+</p><h2><a name="state">State</a></h2>
+<p>[This section gets pretty abstruse.  It's okay if your eyes glaze over.]</p>
+<p>Every regex match maintains a state object, and any closure within the
+regex is actually an anonymous method of that object, which means
+in turn that the closure's topic is the current state object.  Since a
+unary dot introduces a method call on the current topic, it follows
+that you can call any method in the state object that way:</p>
+<pre>    /(.*) { print .pos }/       # print current position</pre>
+<p>The state object may in fact be an instance of a grammar class.  A grammar
+object has additional methods that know how to build a parse tree.
+Its rules also know how to refer to each other or to rules of related
+grammars.</p>
+<p>Note that <code>$_</code> within the closure refers to this state object, not the
+original search string.  If you search on the state object, however, it
+pretends that you wanted to continue the search on the original string.
+If the internal search succeeds, the position of the external state is
+updated as well, just as if the internal search had been a rule invoked
+directly from the outer regex.</p>
+<p>Because the state object is aware of how the tree is being built,
+when backtracking occurs the object can destroy parts of the parse tree
+that were conjectured in error.  Because the grammar's action methods
+have control of the regex state, they can access named fields in
+the regex without having to explicitly pass them to the method call.</p>
+<p>For instance, in our earlier example we passed <code>$expr</code> explicitly
+to build the parse tree, but the method can actually figure that
+out itself.  So we could have just written:</p>
+<pre>    rule modifier { if     &lt;ws&gt; :: &lt;expr&gt; { .new_cond(0) }
+                  | unless &lt;ws&gt; :: &lt;expr&gt; { .new_cond(1) }
+                  | while  &lt;ws&gt; :: &lt;expr&gt; { .new_loop(0) }
+                  | until  &lt;ws&gt; :: &lt;expr&gt; { .new_loop(1) }
+                  | for    &lt;ws&gt; :: &lt;expr&gt; { .new_for }
+                  | &lt;@other_modifiers&gt;  # user defined
+                  | &lt;null&gt;              # no modifier
+                  },</pre>
+<p>See Variable Scoping below for where <code>@other_modifiers</code> gets looked up.</p>
+<p>Within a closure, <code>$_</code> represents the current state of the current
+regex, and by extension, the current state of all the regexes
+participating in the current match.  (The type of the state object
+is the current grammar class, which may be an anonymous type if
+the current grammar has no name.  If the regex is not a member of a
+grammar, it's of type RULE.)  Part of the state of the current regex
+is the current node of the parse tree that is being built.  When the
+current regex succeeds, the state object becomes a result object,
+and is returned to the calling regex.  The calling regex can refer to the
+returned object as a "hypothetical" variable, the name of which is either
+implicitly generated from the name of the rule, or explicitly bound
+using <code>:=</code>.  Through that variable you can get at anything captured
+by the subrule.  (That is what <code>$expr</code> was doing earlier.)</p>
+<p>When the entire match succeeds, the top-level node is returned as a
+result object that has various values in various contexts, whether
+boolean, numeric, or string context.  The name of the result object
+is <code>$0</code>.  The result object contains all the other information, such
+as <code>$1</code>, <code>$2</code>, etc.  Unlike <code>$&amp;</code> in Perl 5, <code>$0</code> is lexically scoped
+to the enclosing block.  By extension, <code>$1</code>, etc. are also lexically
+scoped.</p>
+<p>As a kind of iterator, a regex stored in a variable doesn't expand
+in list context unless you put angles around it or use it with <code>m//</code>:</p>
+<pre>    $rx = /(xxx)/;
+    print 1,2,&lt;$rx($_)&gt;;</pre>
+<pre>    print 1,2,&lt;/(xxx)/&gt;;</pre>
+<pre>    my &amp;rx := /(xxx)/;
+    print 1,2,&lt;rx($_)&gt;;</pre>
+<p><code>$0</code>, <code>$1</code>, etc. are not set in iterated cases like this.  Each list
+item is a result object, though, and you can still get at the
+internal values that way.</p>
+<p>
+</p><h2><a name="hypothetical variables, er values">Hypothetical Variables, er Values</a></h2>
+<p>Values that are determined within a regular expression should usually
+be viewed as speculative, subject to cancellation if backtracking
+occurs.  This applies not only to the values captured by <code>(...)</code>
+within the regex, but also to values determined within closures
+embedded in the regex.  The scope of these values is rather strange,
+compared to ordinary variables.  They are dynamically scoped, but
+not like <code>temp</code> variables.  A temporary variable is restored at
+the end of the current block.  A hypothetical variable keeps its
+value after the current block exits, and in fact keeps that value
+clear to the end of its natural lifetime if the regex succeeds
+(where the natural lifetime depends on where it's declared).
+But if failure causes backtracking over where the variable was set,
+then it is restored to its previous state.  Perl 5 actually coerced
+the <code>local</code> operator into supporting this behavior, but that was
+a mistake.  In Perl 6 <code>temp</code> will keep consistent semantics, and
+restore values on exit from the current block.  A new word, <code>let</code>,
+will indicate the desire to set a variable to a hypothetical value.
+(I was tempted to use "suppose", but "let" is shorter, and tends to
+mean the same thing, at least to mathematicians.)</p>
+<pre>    my $x;
+    / (\S*) { let $x = .pos } \s* foo /</pre>
+<p>After this pattern, <code>$x</code> will be set to the ending position of <code>$1</code>--but only
+if the pattern succeeds.  If it fails, <code>$x</code> is restored to <code>undef</code> when the closure
+is backtracked.  It's possible to do things in a closure that the regex
+engine doesn't know how to backtrack, of course, but a hypothetical
+value doesn't fall into that category.  For things that do fall into
+that category, perhaps we need to define a <code>BACK</code> block that is like
+<code>UNDO</code>, but scoped to backtracking.</p>
+<p>Sometimes we'll talk about declaring a hypothetical variable, but as with
+<code>temp</code> variables, we're not actually declaring the variable itself, but the
+dynamic scope of its new value.  In Perl 6, you can in fact say:</p>
+<pre>    my $x = 0;
+    ...
+    {
+        temp $x = 1;    # temporizes the lexical variable
+        ...
+    }
+    # $x restored to 0</pre>
+<p>(This is primarily useful for dynamically scoping a file-scoped lexical, which
+is slightly safer than temporizing a package variable since nobody can see
+it outside the file.)</p>
+<p>You may declare a hypothetical variable only when the topic is a regex state.
+This is not as much of a hardship as it might seem.  Suppose your closure
+calls out to some other routine, and passes the regex state as an argument, <code>$rx_state</code>.
+It suffices to say:</p>
+<pre>    given $rx_state { let $x = .pos }</pre>
+<p>As it happens, <code>$1</code> and friends are all simply hypothetical variables.
+When we say "hypothetical variable", we aren't speaking of where the
+variable is stored, but rather how its contents are treated dynamically.
+If a regex sets a hypothetical variable that was declared with either
+<code>my</code> or <code>our</code> beforehand, then the regex modifies that lexical or
+package variable, and <code>let</code> is purely a run-time operation.</p>
+<p>On the other hand, if the variable is not pre-declared, it's actually
+stored in the regex state object.  In this case, the <code>let</code> also serves
+to declare the variable as lexically scoped to the rest of the regex,
+in addition to its run-time action.  Such a variable is not directly
+visible outside the regex, but you can get at it through the <code>$0</code> object
+(always presuming the match succeeded).  For a regex variable named
+<code>$maybe</code>, its external name is <code>$0._var_{'maybe'}</code>.  The <code>$0</code> object
+can behave as a hash, so <code>$0{maybe}</code> is the short way to say that.</p>
+<p>All other variable names are stored with their sigil, so the
+external name for <code>@maybe</code> is <code>$0{'@maybe'}</code>, and for <code>%maybe</code>
+is <code>$0{'%maybe'}</code>.</p>
+<p><code>$1</code> is a special case--it's visible outside the regex, not because
+it's predeclared, but because Perl already knows that the numbered variable
+<code>$1</code> is really stored as a subarray of the $0 object: <code>$0[1]</code>.  The
+numbered variables are available only through the array, not the hash.</p>
+<p>Since <code>$0</code> represents the state of the currently executing regex,
+you can't use it within a rule to get at the result of a completed
+subrule.  When you successfully call a subrule named <code>&lt;somerule&gt;</code>,
+the regex state is automatically placed in a hypothetical variable
+named <code>$somerule</code>.  (Rules accessed indirectly must be captured
+explicitly, or they won't have a name by which you can get to them.
+More on that in the next section.)</p>
+<p>As the current recursive regex executes, it automatically builds a
+tree of hashes corresponding to all captured hypothetical variables.
+So from outside the regex, you could get at the <code>$1</code> of the subrule
+<code>&lt;somerule&gt;</code> by saying <code>$0{somerule}[1]</code>.</p>
+<p>
+</p><h2><a name="named captures">Named Captures</a></h2>
+<p>Suppose you want to use a hypothetical variable to bind a name to a capture:</p>
+<pre>    / (\S+) { let $x := $1 } /</pre>
+<p>A shorthand for that is:</p>
+<pre>    / $x:=(\S+) /</pre>
+<p>The parens are numbered independently of any name, so <code>$x</code> is an alias for <code>$1</code>.</p>
+<p>You may also use arrays to capture appropriately quantified patterns:</p>
+<pre>    / @x := (\S+ \s*)* /                # including space
+    / @x := [ (\S+) \s* ]* /            # excluding space
+    / @x := [ (\S+) (\s*) ]* /          # each element is [word, space]</pre>
+<p>Note that in general, naming square brackets doesn't cause the square
+brackets to capture, but rather provides a destination for the parens
+within the square brackets.  Only parens and rules can capture.  It's
+illegal to name square brackets that don't capture something inside.</p>
+<p>You can also capture to a hash:</p>
+<pre>    / %x := [ (\S+)\: \s* (.*) ]* /     # key/value pairs</pre>
+<p>After that match, <code>$1</code> returns a list of keys, and <code>$2</code> returns a list of values.
+You can capture just the keys:</p>
+<pre>    / %x := [ (\S+) \s* ]* /            # just enter keys, values are undef</pre>
+<p>You can capture a closure's return value too:</p>
+<pre>    / $x := { "I'm in scalar context" } /
+    / @x := { "I", "am", "in", "list", "context" } /
+    / %x := { "I" =&gt; "am in hash context" } /</pre>
+<p>Note that these do not use parens.  If you say:</p>
+<pre>    / $x := ({ code }) /</pre>
+<p>it would capture whatever text was traversed by the closure, but ignore
+the closure's actual return value.</p>
+<p>You can reorder paren groups by naming them with numeric variables:</p>
+<pre>    / $2:=(.*?), \h* $1:=(.*) /</pre>
+<p>If you use a numeric variable, the numeric variables will start
+renumbering from that point, so subsequent captures can be of a
+known number (which clobbers any previous association with that number).
+So for instance you can reset the numbers for each alternative:</p>
+<pre>    / $1 := (.*?) (\:)  (.*) { process $1, $2, $3 }
+    | $1 := (.*?) (=\&gt;) (.*) { process $1, $2, $3 }
+    | $1 := (.*?) (-\&gt;) (.*) { process $1, $2, $3 }
+    /</pre>
+<p>It's also possible to refer to captures relative to the current
+location.  <code>$-1</code> refers to the immediately preceding capture (what
+used to be known as <code>$+</code>).  <code>$-2</code> refers to the one before that.
+If you use anything above <code>$-3</code> we'll come and take you away to the
+insane asylum.</p>
+<p>Subrules called via <code>&lt;rule&gt;</code> also capture their result in
+hypothetical variables.  It's possible to name the results of any
+<code>&lt;...&gt;</code>, but grammar rules already have a name by default, so
+you don't have to give them names unless you call the same rule more
+than once.  So, presuming you have grammar rules defining "key" and
+"value", you can say:</p>
+<pre>    / &lt;key&gt; \: &lt;value&gt; { let %hash{$key} = $value } /</pre>
+<p>Of course, in a typical grammar the typical rule may not return a
+string, but a reference to an anonymous object representing a node
+of the parse tree.  But that depends on what the subrule decides
+to capture.  If the only thing captured in the subrule is a single
+string, that's what you get.  (If nothing is captured, you get the
+entire match.)</p>
+<p>Any capture that will capture multiple items will, if asked to put
+it into a scalar variable, produce an anonymous list automatically.
+This should rarely be a surprise, since it's obvious by inspection
+whether you've quantified the capture or not.  So if you say any of:</p>
+<pre>    / $x := &lt;word&gt;*/
+    / $x := &lt;word&gt;+/
+    / $x := &lt;word&gt;&lt;1,3&gt;/</pre>
+<p>then you've "pluralized" the naming, and you can expect to get some
+number of values in <code>$x</code> as an anonymous list.  However, the <code>?</code>
+quantifier specifically doesn't pluralize.  If you say:</p>
+<pre>    / $x := &lt;word&gt;?/</pre>
+<p>then <code>$x</code> will either be the result of the subrule or <code>undef</code>.</p>
+<p>You can name the results of a zero-width assertion, but you'd typically
+only get the null string out of it.  This can still be useful, since it
+contrasts with the undefined value you'd have if the assertion fails.
+(It is possible with an explicit capture to return a non-zero-width
+string from a zero-width assertion, however.)</p>
+<p>
+</p><h2><a name="variable scoping">Variable Scoping</a></h2>
+<p>When you refer to a variable <code>@foo</code> as an rvalue in a regex, it
+searches for an existing variable in the following places:</p>
+<ol>
+<li>
+We first look to see if the variable is already declared lexically
+with either <code>my @foo</code> or <code>our @foo</code>.  If so declared, we're done.
+<p></p>
+</li><li>
+Next we look for <code>@foo</code> in the current regex's name table.  The name
+of the variable is really <code>$0{'@foo'}</code>.
+<p></p>
+</li><li>
+If the regex belongs to a grammar, we next look for <code>@foo</code>
+in the grammar object.  If there, its real name is
+<code>@.foo</code>, or some such.  (It might be objected that
+the grammar object is not yet constructed when the regex is compiled.
+After all, the regex is probably being passed to the grammar object's
+constructor.  But I think if such a variable is declared as an object
+attribute we know that there <em>will</em> be such a variable/accessor later
+when we have finished constructing, and that seems like enough info
+to know how to compile the regex.)
+<p></p>
+</li><li>
+Next we look for <code>@foo</code> as a declared core global variable <code>@*foo</code>.
+<p></p>
+</li><li>
+Finally, if "strict vars" is not in effect, we assume that <code>@foo</code>
+is stored in the current package.  Otherwise it's a stricture error.
+<p></p></li></ol>
+<p>
+</p><h2><a name="variable interpretation">Variable Interpretation</a></h2>
+<p>As we mentioned earlier, bare scalars match their contents literally.
+(Use <code>&lt;$var&gt;</code> instead to match a regex defined in <code>$var</code>.)
+Subscripted arrays and hashes behave just like a scalar as long
+as the subscripts aren't slices.</p>
+<p>If you use a bare array (unsubscripted), it will
+match if <em>any</em> element of the array matches literally at that point.
+(A slice of an array or hash also behaves this way.)
+If you say</p>
+<pre>    @array = ("^", "$", ".");
+    / @array /</pre>
+<p>it's as if you said</p>
+<pre>    / \^ | \$ | \. /</pre>
+<p>But if you you slice it like this:</p>
+<pre>    / @array[0..1] /</pre>
+<p>it won't match the dot.</p>
+<p>If you want the array to be considered as a set of regex alternatives, enclose in
+angles:</p>
+<pre>    @array = ("^foo$", "^bar$", "^baz$");
+    / &lt;@array&gt; /</pre>
+<p>Bare hashes in a regex provide a sophisticated match-via-lookup mechanism.
+Bare hashes are matched as follows:</p>
+<ol>
+<li>
+Match a key at the current point in the string.
+<dl><dt></dt><dd>
+1a. If the hash has its <code>keymatch</code> property set to some regex, use that
+regex to match the key.
+<p></p>
+</dd><dt></dt><dd>
+1b. Otherwise, use <code>/\w+:/</code> to match the key.
+<p></p></dd></dl>
+</li><li>
+If a key isn't found at the current position in the string, the
+match fails.
+<p></p>
+</li><li>
+Otherwise, get the value in the hash corresponding to the matched
+key.
+<p></p>
+</li><li>
+If the is no entry for that key, the match fails.
+<p></p>
+</li><li>
+If the hash doesn't have a <code>valuematch</code> property, the match
+succeeds immediately.
+<p></p>
+</li><li>
+Otherwise use the hash's <code>valuematch</code> property
+(typically itself a regex) to extract the value at the current point
+in the string.
+<p></p>
+</li><li>
+If no value can be extracted, matching of the hash fails.
+<p></p>
+</li><li>
+If the extracted value string is <code>eq</code> to the key's actual value,
+matching of the original hash immediately succeeds.
+<p></p>
+</li><li>
+Otherwise, matching of the original hash fails.
+<p></p></li></ol>
+<p>So matching a bare hash is equivalent to:</p>
+<pre>    rule {
+        $key := &lt;{ %hash.prop{keymatch} // /\w+:/ }&gt;    # find key
+        &lt;( exists %hash{$key} )&gt;                        # if exists
+        [ &lt;( not defined %hash.prop{valuematch} )&gt; ::   # done?
+            &lt;null&gt;                                      # succeed
+        |                                               # else
+            $val := &lt;%hash.prop{valuematch}&gt;            # find value
+                &lt;( $val eq %hash{$val} )&gt;               # assert eq
+        ]
+    }</pre>
+<p>A typical <code>valuematch</code> might look like:</p>
+<pre>    rule {
+        \s* =\&gt; \s*             # match =&gt; 
+        $q:=(&lt;["']&gt;)            # match initial quote 
+        $0:=( [ \\. | . ]*? )   # return matched value
+        $q                      # match trailing quote 
+    }</pre>
+<p>In essence, the presence or absence of the <code>valuematch</code> property
+controls whether the hash tries to match only keys, or both keys
+and values.</p>
+<p>A hash may be used inside angles as well.  In that case, it finds
+the key by the same method (steps 1 and 2 above), but always
+treats the corresponding hash value as a regex (regardless of any
+properties the hash might have).  The parse then continues according to
+the rule found in the hash.  For example, we could parse a set
+of control structures with:</p>
+<pre>    rule { &lt;%controls&gt; }</pre>
+<p>The <code>%controls</code> hash can have keys like "<code>if</code>" and "<code>while</code>" in it. The
+corresponding entry says how to parse the rest of an <code>if</code> or a
+<code>while</code> statement.  For example:</p>
+<pre>        %controls = ( 
+            if     =&gt; / &lt;condition&gt;      &lt;closure&gt; /,
+            unless =&gt; / &lt;condition&gt;      &lt;closure&gt; /,
+            while  =&gt; / &lt;condition&gt;      &lt;closure&gt; /,
+            until  =&gt; / &lt;condition&gt;      &lt;closure&gt; /,
+            for    =&gt; / &lt;list_expr&gt;      &lt;closure&gt; /,
+            loop   =&gt; / &lt;loop_controls&gt;? &lt;closure&gt; /,
+        );</pre>
+<p>So saying:</p>
+<pre>    &lt;%controls&gt;</pre>
+<p>is really much as if we'd said:</p>
+<pre>    [ if     \b &lt;%controls{if}&gt;
+    | unless \b &lt;%controls{unless}&gt; 
+    | while  \b &lt;%controls{while}&gt;
+    | until  \b &lt;%controls{until}&gt; 
+    | for    \b &lt;%controls{for}&gt; 
+    | loop   \b &lt;%controls{loop}&gt;
+    ]</pre>
+<p>Only it actually works more like</p>
+<pre>    / $k=&lt;{ %controls.prop{keymatch} // /\w+:/ }&gt; &lt;%controls{$k}&gt; /</pre>
+<p>Note that in Perl 6 it's perfectly valid to use <code>//</code> inside an expression embedded in a regex
+delimited by slashes.  That's because a regex is no longer considered
+a string, so we don't have to find the end of it before we parse it.
+Since we can parse it in one pass, the expression parser can handle
+the <code>//</code> when it gets to it without worrying about the outer slash, and
+the final slash is recognized as the terminator by the regex parser
+without having to worry about anything the expression parser saw.</p>
+<p>A bare subroutine call may be used in a regex, provided it starts with
+<code>&amp;</code> and uses parentheses around the arguments.  The return value of the
+subroutine is matched literally.  The subroutine may have side effects,
+and may throw an exception to fail.</p>
+<p>
+</p><h2><a name="defining your own rules">Defining Your Own Rules</a></h2>
+<p>Suppose your name is Hugo and you don't like to use <code>!</code> to negate an assertion.
+You can define your own assertion like this:</p>
+<pre>    my rule not (str $rx) { &lt;!&lt;{"&lt;$rx&gt;"}&gt;&gt; }            # define Hugo not
+    / &lt;not [a-z]&gt; /     # same as &lt;![a-z]&gt;</pre>
+<p>That rule would be lexically scoped because of the <code>my</code>.  If you think it looks like a <code>sub</code> declaration,
+you're right.  In fact, it's possible you could even declare it anonymously like a closure:</p>
+<pre>    my $not = rule (str $rx) { &lt;!&lt;{"&lt;$rx&gt;"}&gt;&gt; };
+    / &lt;$not tonight dear&gt; /</pre>
+<p>But maybe you don't want it lexically scoped because you're writing
+a grammar for general use:</p>
+<pre>    grammar HugoGrammar {
+         rule not ($rx) { &lt;!$rx&gt; }
+         rule identifier { &lt;not before \d&gt; \w+ }
+         rule \j { \c[LF] }
+         rule parse { ^ &lt;identifier&gt; \j $ }
+    }</pre>
+<pre>    HugoGrammar.parse($line);</pre>
+<p>In this case a rule is simply a method in a grammar class, and a
+grammar class is any class derived implicitly or explicitly from the
+universal RULE grammar class.  The built-in regex assertions like
+<code>&lt;before \w&gt;</code> are really just calls to methods in the RULE class.
+The namespace of a grammar is simply the method namespace of the current
+class, which is the class's methods plus all inherited methods.</p>
+<p>In addition to normal subrules, we allow some funny looking method
+names like:</p>
+<pre>    rule :a { ... }
+    rule \a { ... }</pre>
+<p>Modules that mutate Perl's grammar on the fly can do so by deriving an
+anonymous grammar class from the default Perl6Grammar, and installing
+extra rules on the fly.  The current regex state then continues
+parsing the rest of the lexical scope using some rule from the new
+rule set.  Subsequent grammatical mutations will be derived from the
+current anonymous grammar unless you switch explicitly to an entirely
+different grammar.</p>
+<p>Since we're writing grammar rules as if they were methods, we have
+access to the full syntax of method declaration, including formal
+parameter lists and compile-time properties.  So we can easily annotate
+rules with pragmatic information such as operator precedence levels
+when you don't want to write a strictly recursive-descent parser, for
+instance.  (And we don't want to, for Perl.)</p>
+<p>
+</p><hr>
+<h1><a name="accepted rfcs">Accepted RFCs</a></h1>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/72.html" name="rfc 072: variablelength lookbehind.">RFC 072: Variable-length lookbehind.</a></h2>
+<p>This seems good to me.  It's just a SMOP to reverse the ordering of
+nodes in the syntax tree, and I think we can pretty well determine
+when it's impossible to reverse the tree.  The operation of a reversed
+syntax tree will not be totally transparent, however, so it will
+be necessary to document that quantifiers will actually be working
+right-to-left rather than left-to-right.  (It's probably also a good
+idea to document that many syntactic constructs can't actually be
+reliably recognized in reverse.  An attempt to do so probably means
+you needed to do a lookahead earlier, rather than a lookbehind later.)</p>
+<p>The syntax of lookbehind uses the new assertion syntax:</p>
+<pre>    &lt;after ...&gt;         # positive lookbehind
+    &lt;!after ...&gt;        # negative lookbehind</pre>
+<p>Yes, the <code>pos()</code> function could return multiple values in list context,
+but I think it's more reasonable for the individual captured elements
+to know where their positions are.  The <code>pos</code> function is really
+just a special case of a more general data structure contained in the
+regex result object from the last successful match.  In which case,
+maybe it really needs to have a better name than <code>pos</code>.  Maybe <code>$0</code>
+or something.  Then we get <code>$0.beg</code> and <code>$0.end</code>, <code>$1.beg</code>,
+and <code>$1.end</code>, etc.  Since <code>@$0</code> returns a list of captures, you
+can do <code>@$0^.beg</code> and <code>@$0^.end</code> if you want a list of beginnings
+and endings.  Did I mention that the magical <code>@+</code> and <code>@-</code> arrays
+are gonna be real dead?  Never could remember which one was which
+anyway...</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/93.html" name="rfc 093: regex: support for incremental pattern matching">RFC 093: Regex: Support for incremental pattern matching</a></h2>
+<p>I don't think this proposal is powerful enough.  "Infinite" strings are
+a more powerful concept.  But I don't think infinite strings are
+powerful enough either!</p>
+<p>We're certainly going to have "infinite" arrays for which missing
+elements are defined by a generator (where the action could be as simple as
+reading more data from some other source).  We could do the same thing for strings
+directly, or we could define strings that are implemented underneath
+via arrays (of strings or of stringifiable objects), and achieve
+infinitude that way.  This latter approach has the benefit that the
+array element boundaries could be meaningful as zero-width boundaries
+between, say, tokens in a token stream.  We're thinking that <code>&lt;,&gt;</code>
+could match such a boundary.</p>
+<p>But beyond that, such arrays-as-strings could allow us to associate
+hidden metadata with the tokens, if the abstract string
+is constructed from a list of objects, or a list of strings with
+properties.  This is typically how a parser would receive data from
+a lexical analyzer.  It's the parser's job to transform the linear
+stream of objects into a parse tree of objects.</p>
+<p>Matching against such boundaries or metadata would not be possible
+unless ether the regex engine is aware that it is matching against an
+array, or the string emulation provides visibility through the abstract
+string into the underlying array.  The latter may be preferable,
+since (by the rules of the <code>=~</code> matrix discussed in Apocalypse 4)
+<code>@array =~ /regex/</code> is currently interpreted as matching against
+each element of the array individually rather than sequentially, and
+there are other uses for a string that's really an array.  In fact,
+<code>@array =~ /regex/</code> could conceivably be matching against a set of
+infinite strings in parallel, though that seems a bit scary.</p>
+<p>Even if we don't care about the boundaries between array elements, this
+approach gives us the ability to read a file in chunks and not worry
+that the pattern won't match because it happens to span a boundary.</p>
+<p>It might be objected that matching against a subroutine rather than
+an infinite string or array has the benefit of not promising to keep
+around the entire string or array in memory.  But this is not really
+a feature, since in general a regex can potentially backtrack all
+the way to the beginning of the string.  And there's nothing to say
+that the front of the infinite string or array has to stay around
+anyway.  Whether to throw away the head of a string or array should
+really depend on the programmer, and I don't think there's a more
+intuitive way to manage that than to simply let the programmer whack
+off the front of the string or array using operators like <code>substr</code>
+or <code>splice</code>, or the new <code>&lt;cut&gt;</code> assertion.</p>
+<p>Indeed, the very existence of the string/array precludes the caching
+problem that RFC 316 complains about.</p>
+<p>The question remains how to declare such a string/array.  If we decided
+to do a magical name identification, we could conceivably declare</p>
+<pre>    my $@array;</pre>
+<p>and then both <code>$array</code> and <code>@array</code> refer to the same object, but treated
+as a string when you say <code>$array</code> and as an array when you say <code>@array)</code>.
+One is tempted to set up the input routine by saying</p>
+<pre>    my $@array is from { &lt;$input&gt; };</pre>
+<p>Additional lines (or chunks) would then come from the <code>&lt;$input&gt;</code> iterator.</p>
+<p>But really, the infinite nature of the array is a feature of the underlying
+object, not the variable.  After all, we want to be able to say</p>
+<pre>    @array := 1..Inf;</pre>
+<p>even with an ordinary array.</p>
+<p>So we could even make this work:</p>
+<pre>    my $@array := &lt;$input&gt;;</pre>
+<p>But I think we need to break the aliasing down, which will give us more flexibility
+at the expense of more verbiage:</p>
+<pre>    my @array := &lt;$input&gt;;              # @array now bound to iterator
+    my $array is ArrayString(@array);   # an ordinary tie</pre>
+<p>That would let us do cool and/or sick things like this:</p>
+<pre>    my @lines := &lt;$article&gt;;
+    my $_ is ArrayString(@lines);</pre>
+<pre>    s/^ .*? \n&lt;2,&gt; //;  # delete header from $_ AND @lines!
+    for @lines { ... }  # process remaining lines</pre>
+<p>The <code>for</code> loop potentially runs forever, since <code>@lines</code> is implicitly
+extended from an iterator.  The array is automatically extended on
+the end, but it's not automatically shifted on the front.  So if you
+really did want the loop to run forever without exhausting memory,
+you'd need to say something like:</p>
+<pre>    substr($_, 0, $_.pos, "");</pre>
+<p>The same effect can be effected within a regex by asserting <code>&lt;cut&gt;</code>, which makes the
+current position the new string beginning.  (If you backtrack over <code>&lt;cut&gt;</code>, the entire
+match will fail.)</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/110.html" name="rfc 110: counting matches">RFC 110: counting matches</a></h2>
+<p>I think we can avoid using any options if we make a pattern count matches
+when used in a numeric context.  If in doubt, make it explicit:</p>
+<pre>    $count = +/foo/;</pre>
+<p>If it turns out we do need an option, it'll probably be <code>:n</code>.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/112.html" name="rfc 112: assignment within a regex">RFC 112: Assignment within a regex</a></h2>
+<p>This RFC is basically covered by the <code>$foo:=(...)</code> notation, plus
+variations.  The RFC claims that such assignments are not done till
+the end, except that they are done ahead of closures.  I'd rather
+state it the other way around: it always appears that the current
+hypothetical binding is assigned if you check, but as long as the
+optimizer can determine that you aren't looking, it doesn't have to
+keep up appearances.  Contrariwise, if <code>$foo</code> is just a fancy way
+of saying <code>$1</code>, there may in fact be no more overhead in maintaining
+<code>$foo</code> than <code>$1</code>.  Either is really just pointing into a table of offsets
+into the string.  That's assuming we get the scoping right on
+hypothetical variables.</p>
+<p>Some excerpts from the RFC:</p>
+<dl><dt></dt><dd>
+<em>The camel and the docs include this example:</em>
+<pre>       if (/Time: (..):(..):(..)/) {
+            $hours = $1;
+            $minutes = $2;
+            $seconds = $3;
+        }</pre>
+<p><em>This then becomes:</em></p>
+<pre>      /Time: (?$hours=..):(?$minutes=..):(?$seconds=..)/</pre>
+<p></p></dd></dl>
+<p>Now that looks like this:</p>
+<pre>      /Time\: $hours:=(..) \: $minutes:=(..) \: $seconds:=(..)/</pre>
+<dl><dt></dt><dd>
+<em>It may be appropriate for any assignments made before a code callout
+to be localized so they can unrolled should the expression finally fail.</em>
+<p></p></dd></dl>
+<p>Rather than localized (or temporized), they are hypothesized.</p>
+<dl><dt></dt><dd>
+<em>The first versions of this RFC did not allow for backrefs.  I now think this
+was a shortcoming.  It can be done with <code>(??{quotemeta $foo})</code>, but I find this
+clumsy, a better way of using a named back ref might be <code>(?\$foo)</code>.</em>
+<p></p></dd></dl>
+<p>Backrefs are now unified with hypothetical variables, so the issue doesn't arise.
+Just use <code>$foo</code>.</p>
+<dl><dt></dt><dd>
+<em>Using this method for capturing wanted content, it might be desirable to stop
+ordinary brackets capturing, and needing to use <code>(?:...)</code>.  I therefore suggest
+that as an enhancement to regexes that /b (bracket?) ordinary brackets just
+group, without capture - in effect they all behave as <code>(?:...)</code>.</em>
+<p></p></dd></dl>
+<p>There's no need for a <code>/b</code> now that we have <code>[...]</code> for non-capturing brackets.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/144.html" name="rfc 144: behavior of empty regex should be simple">RFC 144: Behavior of empty regex should be simple</a></h2>
+<p>I agree, the behavior should be simple.  However, rather than always
+matching, I propose to make it an error to actually have a null
+pattern, or a null choice in a list of alternatives.  Use an explicit
+<code>&lt;null&gt;</code> if that's what you mean.  (It's not a problem if <code>$foo</code> is null
+in <code>/$foo/</code>, since variables are now managed by the regex engine and
+not by interpolation.)</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/150.html" name="rfc 150: extend regex syntax to provide for return of a hash of matched subpatterns">RFC 150: Extend regex syntax to provide for return of a hash of matched subpatterns</a></h2>
+<p>The <code>$foo:=(...)</code> notation essentially covers that case.  One can say:</p>
+<pre>    / %hash{foo}:=(...) %hash{bar}:=(...) /</pre>
+<p>Fancier things can be done with closures.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/156.html" name="rfc 156: replace first match function (...) with a flag to the match command.">RFC 156: Replace first match function (<code>?...?</code>) with a flag to the match command.</a></h2>
+<p>Having a <code>:f</code> modifier seems like a reasonable way to do it:</p>
+<pre>    m:f/.../</pre>
+<p>Though it's vaguely possible we should be having a set of verbs that
+parse like <code>split</code>:</p>
+<pre>    split /.../
+    count /.../
+    first /.../</pre>
+<p>It's not clear whether those are actually methods, and if so, on
+which object, the string or the regex.  In any event, I don't think
+we have to nail that down quite yet.  I'm accepting the basic premise
+of this RFC that the <code>?...?</code> construct is going away, one way or another.</p>
+<p>At the moment, it looks like this option is spelled <code>:once</code>.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/165.html" name="rfc 165: allow variables in tr///">RFC 165: Allow Variables in tr///</a></h2>
+<p>If interpolation of patterns by default is wrong, I think extending the <code>tr///</code>
+interface via scalar interpolation is doubly wrong.  Run-time
+generated transliterations should be based on mappings that aren't
+so position dependent.  That is, rather than specifying it as two
+long lists:</p>
+<pre>    abc12xyz =&gt; ABC34XYZ</pre>
+<p>we specify something more like this:</p>
+<pre>    abc =&gt; ABC
+    12  =&gt; 34
+    xyz =&gt; XYZ</pre>
+<p>That looks more like a list of pairs of scalars than a pair of scalars.
+In fact, internally, it's done like a funny parallel substitution:</p>
+<pre>    s:e(/a/A/,
+        /b/B/,
+        /c/C/,
+        /1/3/,
+        /2/4/,
+        /x/X/,
+        /y/Y/,
+        /z/Z/)</pre>
+<p>In any event, it's more like <code>tr/@foo/@bar/</code> than <code>tr/$foo/$bar/</code>.
+But then, why stick with the fake string notation?  Why not just say
+<code>tr(@foo,@bar)</code> if that's what we mean?  Then we're not limited
+to character substitutions:</p>
+<pre>    $string.tr [ " "     , "&lt;"   , "&gt;"   , "\n"   ],
+               [ "&amp;nbsp;", "&amp;lt;", "&amp;gt;", "&lt;br&gt;" ];</pre>
+<p>Or how about <code>tr(%trans)</code>?</p>
+<pre>    %upper = {
+        "a-z" =&gt; "A-Z",
+    }
+    $string.tr %upper;</pre>
+<p>or just pair lists of some sort:</p>
+<pre>    $string.tr("a-c" =&gt; "x-z",
+               "1-2" =&gt; "3-4",
+               "A-C" =&gt; "X-Z",
+              );</pre>
+<pre>    @trans = [
+        "a-z" =&gt; "A-Z",
+        @tr_danish,
+    ];</pre>
+<pre>    $string.tr(@trans)</pre>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/166.html" name="rfc 166: alternative lists and quoting of things">RFC 166: Alternative lists and quoting of things</a></h2>
+<p>Alternative lists of literals are included simply by mentioning the
+array:</p>
+<pre>    /@names/</pre>
+<p>Alternative lists of subrules are included with:</p>
+<pre>    /&lt;@names&gt;/</pre>
+<p>There's no longer any need for quoting constructs because variables
+match as literals by default.  You have to use angle brackets to get
+interpretation of a string as a subrule.  (But it's still preferable
+to precompile your regexen.)</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/191.html" name="rfc 191: smart container slicing">RFC 191: smart container slicing</a></h2>
+<p>As proposed, this might prevent us from using a regex object as a
+key to a hash.  However, with some tweaking, it'll fit in with
+how slicing is done in Perl 6.</p>
+<p>Perl 6 will DWIM subscripts based on their appearance.  Obviously,</p>
+<pre>    %hash{"foo"}</pre>
+<p>has a single subscript.  And just as obviously,</p>
+<pre>    %hash{"a" .. "z"}</pre>
+<p>has 26 subscripts or so.  In the absence of any scalar guidance, a subscript
+will be interpreted in list context.  So</p>
+<pre>    %hash{ @array }</pre>
+<p>will automatically slice on the list of keys in the array.
+Any function will be called in a list context by default, giving it
+the opportunity to return multiple values.  Perl 6 subscripts are
+naturally biased toward slicing.  To unbias it, here are some of the
+specifically recognized subscripts:</p>
+<pre>    %hash{"foo"}        # scalar literal
+    %hash{bar}          # scalar literal
+    %hash{1}            # scalar literal
+    %hash{$x}           # scalar variable
+    %hash{\$x}          # scalar reference
+    %hash{["a", "b"]}   # array reference
+    %hash{{"a" =&gt; "b"}} # hash reference
+    %hash{ "a" =&gt; "b" } # pair reference
+    %hash{ /pat/ }      # rule reference
+    %hash{ _ expr }     # force expr to return a single string
+    %hash{ + expr }     # force expr to return a single number</pre>
+<p>Boolean expressions and closures look like singular values but cause
+a match against all possible values of the subscript.</p>
+<pre>    %hash{ ?1 }         # select all subscripts
+    %hash{ ?/pat/ }     # select subscripts for which pat matches
+    %hash{ $_ =~ /pat/ }# select subscripts for which pat matches
+    %hash{ $_ ge "a" }  # select lowercase keys (assuming ASCII)
+    %hash{ .ge "a" }    # same thing, maybe
+    %hash{ { expr } }   # select subscripts for which closure returns true</pre>
+<p>Multiple slice subscripts are separated by semicolons, so that you can
+use commas within each slice subscript for list building.  This is more
+important for multi-dimensional arrays:</p>
+<pre>    my @array is dim(9,9,9) = cubic();</pre>
+<pre>    @3d_slice = @array[ @x; @y; @z ];
+    @3d_slice = @array[ 0,1,3,8 ; 0,1,3,8; ?1 ];
+    @3d_slice = @array[ 0..9 ; 0..9:-1; ?test($_) ];
+    @3d_slice = @array[ !($_ % 2) ; 0..9:3; ?test($_) ];</pre>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/274.html" name="rfc 274: generalized additions to regexs">RFC 274: Generalized Additions to Regexs</a></h2>
+<p>This proposal has significant early/late binding issues.  A definition
+that forces run-time overhead is not as useful as it might be.
+On the other hand, a pure compile-time mechanism is not as general
+as it might be--but a compile-time mechanism can always compile in
+a run-time mechanism if it chooses to defer evaluation.</p>
+<p>So it seems like this is a good place for syntactic warpage of some
+sort or other.  That would make it possible to do both compile-time
+and run-time bindings.  We'll be using the <code>&lt;...&gt;</code> notation
+for our extensible syntax, and the grammar rules for parsing that
+particular part of Perl syntax will be just as easy to tweak as any
+other Perl grammar rule.</p>
+<p>That being said, the very fact that we can associate a grammar with
+the regex means that it's easy to define any instance of <code>&lt;word&gt;</code>
+to mean whatever you want it to.  (In a sense, these subrules are
+the very callbacks that the RFC proposes.)  These subrules can be
+bound either at Perl compile time or at Perl run time.  They can
+be defined to take a string, regex, or Perl expression as an argument.  The latter
+two cases are efficient because they come in as a regex or code reference
+respectively.</p>
+<dl><dt></dt><dd>
+<em>Following on, if (?{...}) etc code is evaluated in forward match, it would be
+a good idea to likewise support some code block that is ignored on a forward
+match but is executed when the code is unwound due to backtracking.</em>
+<p></p></dd></dl>
+<p>Yes, though hypothetical values take some of the pressure off for this.
+But if a closure contained a BACK block, it could be automatically fired
+off on backtracking.  As with LAST et al., I suppose there's a corresponding <code>back</code> property
+on variables.  In a sense, saying</p>
+<pre>    let $var = $newval</pre>
+<p>is much like saying</p>
+<pre>    our $var is back { .set($oldval) } = $newval</pre>
+<p>except that <code>$var</code> may well be stored in the regex state object rather than
+in a global symbol table.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/276.html" name="rfc 276: localising paren counts in qr()s.">RFC 276: Localising Paren Counts in qr()s.</a></h2>
+<p>I agree totally.  As for the problem of pulling captures out of
+a subrule, it's up to the subrule to determine what it "returns".
+We could make some intelligent defaults, though different kinds of
+rules might want different defaults.  One approach might be to say
+that if there is a single capture, that is returned as the result.
+If there is no capture, it's as if the entire subpattern were captured.
+If there are multiple captures, they are returned as an anonymous list.
+So <code>$1</code> from such a subrule might come through like this:</p>
+<pre>    / $sub:=&lt;subrule&gt; { print $sub[1] } /</pre>
+<p>or just:</p>
+<pre>    / &lt;subrule&gt; { print $subrule[1] } /</pre>
+<p>But named captures and named rules intrude on this idyllic picture.
+You'd also like a default anonymous hash value returned that is keyed
+by all the named captures or rules.  The question is whether that forces
+numbered captures to come through the hash interface.  Or maybe that's
+just always the case, so to get at <code>$1</code> of a subrule, you'd say:</p>
+<pre>    / $sub:=&lt;subrule&gt; { print $sub{'1'} } /</pre>
+<p>But there are reasons for wanting to treat the result object as an array, so that</p>
+<pre>    / $sub:=&lt;subrule&gt; { process(@$sub) } /</pre>
+<p>processes all the numbered captures from the subrule.  So I think the
+return object behaves either like a hash or an array as appropriate.
+(Note that such an array might be declared to have an origin at 1 rather
+than 0.)</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/317.html" name="rfc 317: access to optimisation information for regular expressions">RFC 317: Access to optimisation information for regular expressions</a></h2>
+<p>Seems like a no-brainer.  All such information is likely to be
+available to Perl anyway, given that we'd like to do the parser,
+optimizers, and code generators in Perl if at all possible.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/331.html" name="rfc 331: consolidate the $1 and \1 notations">RFC 331: Consolidate the <code>$1</code> and <code>\1</code> notations</a></h2>
+<p>I like the title of this RFC.  It fits in with the new <code>my</code> policy of
+immediate introduction.  However, there are certain difficulties with
+the proposed implementation.  The statement-by-statement setting of
+the <code>@/</code> array looks pretty ugly to me.  I'd rather have a consistent
+view of hypothetical variables that can live on outside the regex in
+question without regard to statement boundaries.  In the rare event
+that someone needs to refer to <code>$1</code> (or anything else) from a prior
+regex, a temporary variable should be used.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/332.html" name="rfc 332: regex: make /$/ equivalent to /\z/ under the '/s' modifier">RFC 332: Regex: Make /$/ equivalent to /\z/ under the '/s' modifier</a></h2>
+<p>Another RFC that is accepted in principle, but that doesn't go far enough.
+The <code>/s</code> modifier is going away, along with <code>/m</code>.
+A <code>$</code> will always mean end-of-string, and <code>$$</code> will match
+at the end of any line.  (The current process id is now <code>$*PID</code>, by the way,
+so there's no conflict there.  But how often to you want to write a
+pattern to match the current process id anyway?)</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/348.html" name="rfc 348: regex assertions in plain perl code">RFC 348: Regex assertions in plain Perl code</a></h2>
+<p>This RFC makes some good points, though the code assertion syntax will be:</p>
+<pre>    &lt;( code )&gt;</pre>
+<p>The RFC also makes a case for getting rid of the special behavior of
+<code>local</code> in Perl 5, which treated <code>local</code> differently within a regex.
+However, something very like the <code>local</code> behavior will still be
+needed for making hypotheses, though the RFC is correct that it's
+not needed in the typical code assertion,  In Perl 6, localization is
+done with <code>temp</code>, and it will not do the hypothetical variable hack
+that Perl 5 did.  Instead there will be an explicit lvalue modifier,
+<code>let</code>, which specifically requests a variable's value to be scoped
+to the success of the current point in the regex.  These hypothetical
+variables actually have much broader use than this RFC suggests.</p>
+<p>Perl 5's hardwired use of <code>$^R</code> just translates to an appropriately
+named hypothetical variable in Perl 6.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/360.html" name="rfc 360: allow multiply matched groups in regexes to return a listref of all matches">RFC 360: Allow multiply matched groups in regexes to return a listref of all matches</a></h2>
+<p>I think that parens that can potentially match multiple times will
+automatically produce a list rather than matching the final one.
+It's not as if we can't tell whether something's inside a quantifier...</p>
+<p>Here's the RFC's proposed solution:</p>
+<pre>    while ($text =~ /name:\s*(.*?)\n\s*
+                    children:\s*(?:(?@\S+)[, ]*)*\n\s*
+                    favorite\ colors:\s*(?:(?@\S+)[, ]*)*\n/sigx) {
+        # now we have:
+        #  $1 = "John Abajace";
+        #  $2 = ["Tom", "Dick", "Harry"]
+        #  $3 = ["red", "green", "blue"]
+    }</pre>
+<p>Apart from the change in behavior of <code>(...)</code> within a quantifier, I have
+the urge to rewrite this example for several reasons:</p>
+<ul>
+<li>
+<pre>    The C&lt;/x&gt; and C&lt;/s&gt; flags no longer exist.</pre>
+</li><li>
+<pre>    The C&lt;/i&gt; and C&lt;/g&gt; flags must be pulled out to the front for visibility.
+    (And the C&lt;/g&gt; flag is renamed C&lt;:e&gt;).</pre>
+</li><li>
+<pre>    There's now a C&lt;\h&gt; for horizontal whitespace, and C&lt;\H&gt; for the negation
+    of that.  (Not that RFC is incorrect to use C&lt;\s&gt;.)</pre>
+</li><li>
+<pre>    The negation of C&lt;\n&gt; is now C&lt;\N&gt;.</pre>
+</li><li>
+<pre>    The C&lt;:&gt; character is now a metacharacter, and so must be backslashed.</pre>
+</li><li>
+<pre>    Character classes are now represented with C&lt;&lt; &lt;[...]&gt; &gt;&gt;.</pre>
+</li><li>
+<pre>    Grouping is now represented with C&lt;[...]&gt;.</pre>
+</li></ul>
+<p>With these changes, and making better use of whitespace, the sample
+regex ends up looking like this:</p>
+<pre>    for ($text =~ m:ie[
+                            name             \: \h*   (\N*?)            \n
+                        \h* children         \: \h* [ (\S+) &lt;[,\h]&gt;* ]* \n
+                        \h* favorite\ colors \: \h* [ (\S+) &lt;[,\h]&gt;* ]* \n
+                      ]
+          )
+    {
+             # now we have:
+             #  $1 = "John Abajace";
+             #  $2 = ["Tom", "Dick", "Harry"]
+             #  $3 = ["red", "green", "blue"]
+    }</pre>
+<p>I think in the long run people will find this more readable once
+they're used to it.  Certainly tabularizing the parallelisms will
+make any typing errors stand out.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/361.html" name="rfc 361: simplifying split()">RFC 361: Simplifying <code>split()</code></a></h2>
+<p>The RFC makes five suggestions.  I'll consider them one by one.</p>
+<dl><dt></dt><dd>
+<em>The first argument to split is currently interpreted as a
+regexp, regardless of whether or not it actually is one.  (Yes,
+<code>split '.', $foo</code> doesn't split on dot -- it's currently the same an
+<code>split /./, $foo</code>.)  I suggest that split be changed to treat only
+regexps as regexps, and everything else as literals.</em>
+<p></p></dd></dl>
+<p>Fine, I think.  If the first argument to <code>split</code> is untyped, it
+should parse correctly, either evaluating a quoted string immediately
+or deferring interpretation of a regex.  One could even do something
+like split on the first delimiter matched by another pattern:</p>
+<pre>    split _/(,|;)/;</pre>
+<p>That would split on either all commas or all semicolons, depending on
+which it found first in the string.  The _ forces the regex to return
+a string, which is whatever was captured by the parens in this case.</p>
+<dl><dt></dt><dd>
+<em>Empty trailing fields are currently suppressed (although a
+-1 as the third argument disables this).  I suggest that empty trailing
+fields be retained by default.</em>
+<p></p></dd></dl>
+<p>Probably okay, though we need a way to translate old code.  It was
+originally done this way because split on whitespace would typically
+return an extra field after the newline.  But most newlines will
+be prechomped in Perl 6.</p>
+<dl><dt></dt><dd>
+<em>When not in list context, split currently splits into <code>@_</code>.  I
+suggest that this side-effect be removed.</em>
+<p></p></dd></dl>
+<p>Fine.  It's easy enough to translate to an explicit assignment.</p>
+<dl><dt></dt><dd>
+<em><code>split ?pat?</code> in any context currently splits into <code>@_</code>.  I suggest
+that this side-effect be removed.</em>
+<p></p></dd></dl>
+<p>Fine.  I don't think anyone uses that.</p>
+<dl><dt></dt><dd>
+<em><code>split ' '</code> (but not <code>split / /</code>) currently splits on whitespace,
+but also removes leading empty fields.  I suggest that this
+irregularity be removed.</em>
+<p></p></dd></dl>
+<p>The question is, what to replace it with, since it's a very handy
+construct.  We could use a different conventional pattern:</p>
+<pre>    @array = split /&lt;ws&gt;/, $string;</pre>
+<p>Or we could say that it's now a split on whitespace only if
+the split argument is unspecified.  That wouldn't work very well with
+the old syntax, where we often have to supply the second argument.
+But given that the <code>=~</code> operator now serves as a topicalizer for any term,
+we could translate:</p>
+<pre>    @array = split ' ', $string;</pre>
+<p>to this:</p>
+<pre>    @array = $string =~ split;</pre>
+<p>Oddly, this probably also works:</p>
+<pre>    $string =~ (@array = split);</pre>
+<p>or maybe even this:</p>
+<pre>    @array = split given $string;</pre>
+<p>But I think I like the OO notation better here anyway:</p>
+<pre>    @array = $string.split;</pre>
+<p>In fact, split may not be a function at all.  The default split might
+just be a string method and use unary dot:</p>
+<pre>    @array = .split;</pre>
+<p>We still have the third argument to deal with, but that's likely to be specified
+like this:</p>
+<pre>    @array = $string.split(limit =&gt; 3);</pre>
+<p>We could conceivably make a different method for word splitting, much like REXX does:</p>
+<pre>    @array = .words;</pre>
+<p>Then a limit could be the first argument:</p>
+<pre>    @array = .words(3);</pre>
+<p>But there almost doesn't need to be such a method, since</p>
+<pre>    @array = m/ [ (\S*) \s* ]* /;</pre>
+<p>will do the right thing.  Admittedly, a <code>.words</code> method would be much more readable...</p>
+<p>Fortunately, <code>split</code> is a function, so I can put off that decision till Apocalypse 29.  <code>:-)</code></p>
+<p>
+</p><hr>
+<h1><a name="rejected rfcs">Rejected RFCs</a></h1>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/135.html" name="rfc 135: require explicit m on matches, even with  and // as delimiters.">RFC 135: Require explicit m on matches, even with ?? and // as delimiters.</a></h2>
+<p>Squish that gnat...  <code>:-)</code></p>
+<p>A decent Perl parser is still going to have to keep track of whether
+a term or an operator is expected.  And while we're simplifying
+the grammar in many ways, it's also the case that we're letting
+users install their own grammar rules to perform syntactic warpage.
+Besides, people <em>like</em> to write patterns with <code>/.../</code>.  So rather
+than impoverishing Perl's syntax artificially, let's make the standard
+parser more accessible by writing it all in Perl 6 regexes.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/145.html" name="rfc 145: bracematching for perl regular expressions">RFC 145: Brace-matching for Perl Regular Expressions</a></h2>
+<p>Good problem, not-so-good solution from a complexity point of view.  I'd like
+to leverage existing character class and backref notations maybe.  If there were
+simply some way to tell a backref to invert any match characters, that might do it.
+Or maybe reverse them when you remember them, and leave the backref ignorant?
+(Downside is nested brackets would probably need recursive patterns.)</p>
+<p>Recursion might be advisable anyway--you can't really pick up the arguments to a
+function, for instance, without also handling things like quoted strings, which may
+have different bracketing rules than outside of strings.  Certainly matching <code>\"</code>
+would be dependent on whether you're inside or outside of a string.  Given that
+recursion is often necessary, I'm not sure making this construct recurse itself
+is all that useful.</p>
+<p>Along the lines of how <code>tr///</code> works (or ought to work), I think it'd
+be more generally useful to have character remapping facility within
+a backref generator:</p>
+<pre>    (
+     &lt;[ \( \[ \{ \&lt; ] =&gt;
+      [ \) \] \} \&gt; ]&gt; )</pre>
+<p>That might match a left bracket of some sort but return the corresponding right bracket as <code>$1</code>.
+But maybe we should just use an "existing" mechanism to translate strings:</p>
+<pre>    my %closing = {
+        '[' =&gt; ']',
+        '(' =&gt; ')',
+        '{' =&gt; '}',
+        '&lt;' =&gt; '&gt;',
+    };
+    rule balanced {
+        &lt;![\[\(\{\&lt;\]\)\}\&gt;]&gt;*  # any non-brackets
+        [                       # followed by either
+            $                   #   end of string
+        |                       # or
+            $b := &lt;[[({&lt;]&gt;      #   an opening bracket
+            &lt;self&gt;              #   containing a balanced expr
+            %closing{$b}        #   followed by corresponding close bracket
+            &lt;self&gt;              #   followed by a balanced expr
+        ]
+     }</pre>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/164.html" name="rfc 164: replace =~, !~, m//, s///, and tr// with match(), subst(), and trade()">RFC 164: Replace =~, !~, m//, s///, and tr// with match(), subst(), and <code>trade()</code></a></h2>
+<p>All operators will have a way to name them, which means it's
+possible to alias them to any other name.  Rearranging the formal
+order of parameters would be a little harder, however.  We need
+inlining to do that efficiently.  Still, now that <code>//</code> doesn't
+evaluate in a typeless context, it's relatively straightforward
+to define a subroutine or method that does</p>
+<pre>    subst $string, /foo/, {"bar"}</pre>
+<p>in whatever order you like.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/197.html" name="rfc 197: numeric value ranges in regular expressions">RFC 197: Numeric Value Ranges In Regular Expressions</a></h2>
+<p>If we go down this road, eventually we reinvent all of Perl syntax in
+regular expressions.  Not that I'm against TMTOWTDI, but I'd rather
+have a better way to run Perl code from within a regex and have it
+"succeed" or "fail", and maybe better ways to test ranges from
+Perl code.  Anything beyond that could be done with syntactic
+warpage.</p>
+<p>In any event, overloading <code>()</code> and <code>[]</code> for this would be mentally treacherous,
+not to mention completely opaque to non-mathematicians.  We'll stick
+with the standard boolean assertion:</p>
+<pre>    / (\d+) &lt;( $1 =~ 1..10 )&gt; /</pre>
+<p>Interestingly, that can also be written:</p>
+<pre>    / &lt;( _/\d+/ =~ 1..10 )&gt; /</pre>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/198.html" name="rfc 198: boolean regexes">RFC 198: Boolean Regexes</a></h2>
+<p>Again, I'm not much in favor of inventing new regex syntax that duplicates
+ordinary Perl syntax.  I think we need richer ways of interconnecting
+related regexes via ordinary Perl syntax.  Certainly it helps to
+have an easy way to specify a Perl assertion:</p>
+<pre>    / (\w+) &lt;( %count{$1} &gt; 3 )&gt; /</pre>
+<p>But there's something to be said for forcing submatch assertions to be
+defined externally to the current regex, much like we discourage
+inline code where subroutine calls are in order.</p>
+<p>So anyway, I think most of the submatches like onion rings should
+be handled simply by searching on captured strings within a closure.
+Booleans can be put into closures as well, but the new <code>::</code> operator
+makes it pretty easy to AND and OR assertions together in a more
+regexly fashion without reinventing the wheel.</p>
+<p>As proposed, there will be a "fail" token, but it's spelled <code>&lt;fail&gt;</code>, not <code>\F</code>.
+And the "true" token is spelled <code>&lt;null&gt;</code>.  <code>:-)</code></p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/261.html" name="rfc 261: pattern matching on perl values">RFC 261: Pattern matching on perl values</a></h2>
+<p>This reminds me a bit of unification in Prolog.  It's not explained
+very well here, and I'm wondering if it will be too hard to explain
+in general.  I think this is probably too powerful a concept for
+the typical Perl programmer, who is lucky to understand simple lvalues
+that always do what they're told.</p>
+<p>This sort of matching can probably be provided as syntactic warpage,
+though I'm not sure if that prevents useful optimizations.  Anyway,
+this sort of thing is unlikely to make it into the Perl 6 core unless it
+generalizes usefully to function argument lists, and it may be too
+powerful for there too.  For that purpose it would resemble a form
+of overloading, but with the "types" specified by keys.  I suspect
+real types are more useful.</p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/308.html" name="rfc 308: ban perl hooks into regexes">RFC 308: Ban Perl hooks into regexes</a></h2>
+<p>We must be able to call back into Perl code if we want to write parsers
+conveniently in Perl.  Think of how yacc works.  Certainly the way that
+Perl 5 does it is ugly, I'll admit.  We can beautify that.</p>
+<p>But the whole point of Perl is to have all the most useful "Krakken
+tentacles".  And I don't really care if it makes it hard to put the
+Perl regex engine into some other language.  <code>:-)</code></p>
+<p>
+</p><h2><a href="http://dev.perl.org/rfc/316.html" name="rfc 316: regex modifier for support of chunk processing and prefix matching">RFC 316: Regex modifier for support of chunk processing and prefix matching</a></h2>
+<p>Infinite strings (via infinite arrays) seem like a more useful concept.
+It would be easy for the extension subroutine to fail and produce the
+results desired in this RFC, but without the necessity of the extra
+syntax specified by the RFC.  A match naturally fails when it gets to
+the end of its string without finishing the pattern.  Incremental matching
+can also easily be done via infinite strings, and the user interface
+can be a simple as we like, as long as extension rule is somehow associated
+with the string in question.</p>
+<p>I think <code>pos()</code> is rather too low-level a concept for general use.
+Certainly it needs to be there, but I think we need some way of
+implying that one regex is a continuation of a previous one, but within
+some higher-level syntactic construct, so that it's easy to write
+parsers without invoking <code>pos()</code> or <code>\g</code> or <code>/c</code> all over the place.</p>
+<p>
+</p><hr>
+<h1><a name="&lt;cut&gt;"><code>&lt;cut&gt;</code></a></h1>
+<p>Well, I could say a lot more, but that's it for this time.  I hope
+you're excited by all this, in a positive sort of way.  But if your
+jaw lost all of its bounce when it hit the table, I expect Damian's upcoming
+Exegesis 5 will do a better job of showing how this all fits together
+into a pretty picture.</p>
+
+</body></html>
