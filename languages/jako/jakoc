@@ -1191,20 +1191,21 @@ sub void_func
       if (reg_q($arg)) {
         emit_code('save', [ $arg ]);
       } elsif (int_q($arg)) {
-        emit_code('set', [ 'I0', $arg ]);
-        emit_code('save', [ 'I0' ]);
+        emit_code('save', [ $arg ]);
       } elsif (num_q($arg)) {
-        emit_code('set', [ 'N0', $arg ]);
-        emit_code('save', [ 'N0' ]);
+        emit_code('save', [ $arg ]);
       } elsif (str_q($arg)) {
-        emit_code('set', [ 'S0', $arg ]);
-        emit_code('save', [ 'S0' ]);
+        emit_code('save', [ $arg ]);
       } else {
         confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
       }
     }
 
+    emit_code 'save', [  scalar(@args) ]; # Push the arg count.
+
     emit_code "bsr", [ $name ];
+
+    emit_code 'restore', [ 'I0' ]; # Pop off the result count.
   } else {
     printf(STDERR "jakoc: Call to unrecognized void function '%s' on line %d (Not in {%s}).\n",
       $name, $line, join(", ", sort keys %subs));
@@ -1252,18 +1253,17 @@ sub assign_func
       if (reg_q($arg)) {
         emit_code('save', [ $arg ]);
       } elsif (int_q($arg)) {
-        emit_code('set', [ 'I0', $arg ]);
-        emit_code('save', [ 'I0' ]);
+        emit_code('save', [ $arg ]);
       } elsif (num_q($arg)) {
-        emit_code('set', [ 'N0', $arg ]);
-        emit_code('save', [ 'N0' ]);
+        emit_code('save', [ $arg ]);
       } elsif (str_q($arg)) {
-        emit_code('set', [ 'S0', $arg ]);
-        emit_code('save', [ 'S0' ]);
+        emit_code('save', [ $arg ]);
       } else {
         confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
       }
     }
+
+    emit_code('save', [ scalar(@args) ]); # Save the arg count.
 
     #
     # Now, we can jump to the subroutine's entry point:
@@ -1276,6 +1276,7 @@ sub assign_func
     # the result will be on the top of the stack.
     #
 
+    emit_code('restore', [ 'I0' ]);     # Pop off the result count
     emit_code('restore', [ $dest ]);
   } else {
     printf(STDERR "jakoc: Call to unrecognized assign function '%s' on line %d (Not in {%s}).\n",
@@ -1439,17 +1440,18 @@ sub begin_sub_block
   #
   # Generate code to load the arguments into their registers:
   #
-  # First, we rotate the stack so that the return address which starts out on
-  # the top ends up on the bottom of the portion of the stack relevant to this
-  # call.
+  # First, we pop the argument count off the top of the stack, then we pop the
+  # arguments off the stack.
   #
   # NOTE: We restore them in their order of declaration, which means they must
   # be saved in reverse order. This will come in handy later for being able to
   # handle variable numbers of arguments, since we'll be able to restore an
   # arg count before having to restore the variable args themselves.
   #
+  # TODO: Should we bother checking that argc is what we expected?
+  #
 
-  emit_code 'rotate', [ scalar(@formal_args) + 1];
+  emit_code 'restore', [ 'I0' ]; # Pop off the arg count.
 
   foreach my $formal_arg (@formal_args) {
     my ($arg_type, $arg_name) = @$formal_arg;
@@ -1641,28 +1643,22 @@ sub end_block
 
     #
     # On subroutine entry, we cloned the incoming registers.
-    # Now, we save off the zero regs, pop the cloned
-    # register values back into place, and restore the zero regs.
-    # Thus, the registers except for the zero registers are in
-    # the same state they were in before subroutine entry.
+    # Now, we push the result count, restore the incoming regs
+    # and return to our caller.
     #
     # TODO: Enable the 'P' regs when we start dealing with PMCs.
     #
+    # TODO: Complain if we haven't seen 'return' statement in a
+    # subroutine that returns results (else we are going to be
+    # very unhappy later...)
+    #
 
-    emit_code 'save', [ 'I0' ];
-    emit_code 'save', [ 'N0' ];
-#    emit_code 'save', [ 'P0' ];
-    emit_code 'save', [ 'S0' ];
+    emit_code "save", [ defined($block->{RETURN}) ? 1 : 0 ]; # Push the result count.
 
     emit_code 'popi', [ ];
     emit_code 'popn', [ ];
 #    emit_code 'popp', [ ];
     emit_code 'pops', [ ];
-
-    emit_code 'restore', [ 'S0' ];
-#    emit_code 'restore', [ 'P0' ];
-    emit_code 'restore', [ 'N0' ];
-    emit_code 'restore', [ 'I0' ];
 
     #
     # Now, actually return.
@@ -1858,9 +1854,7 @@ sub do_return
   #
 
   if (defined $return) {
-    emit_code('set', [ uc $return . "0", $arg ]);
-    emit_code('save', [ uc $return . "0" ]);
-    emit_code('rotate', [ 2 ]);
+    emit_code('save', [ $arg ]); # Push the result. Result count comes later.
   }
 
   #

@@ -1613,21 +1613,27 @@ These operations effect individual registers.
 
 =item B<save>(i)
 
+=item B<save>(ic)
+
 =item B<save>(n)
+
+=item B<save>(nc)
 
 =item B<save>(p)
 
 =item B<save>(s)
 
-Save register $1 onto the appropriate register stack.
+=item B<save>(sc)
+
+Save register or constant $1 onto the stack.
 
 =cut
 
-AUTO_OP save(i) {
+AUTO_OP save(i|ic) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_INT, NULL);
 }
 
-AUTO_OP save(n) {
+AUTO_OP save(n|nc) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, &($1), STACK_ENTRY_FLOAT, NULL);
 }
 
@@ -1635,7 +1641,7 @@ AUTO_OP save(p) {
   push_generic_entry(interpreter, &interpreter->user_stack_top, $1, STACK_ENTRY_PMC, NULL);
 }
 
-AUTO_OP save(s) {
+AUTO_OP save(s|sc) {
   push_generic_entry(interpreter,  &interpreter->user_stack_top, $1, STACK_ENTRY_STRING, NULL);
 }
 
