@@ -543,8 +543,8 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
             return 0;
         }
 
-        /* Segment size is in bytes */
-        ((unsigned char *)cursor) += header->const_ss;
+        /* Segment size is in bytes => ops */
+        cursor += header->const_ss/sizeof(opcode_t);
 
         /*
          * Unpack the Byte Code Segment:
