@@ -88,7 +88,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
     SymReg *pmc;
     int i, nargs;
     int pmc_num;
-    const char * classnm;
+    const char * classnm = NULL;
     switch(type) {
        case NEWSUB: classnm = "Sub"; break;
        case NEWCLOSURE: classnm = "Closure"; break;
@@ -100,8 +100,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
     }
 
     pmc_num = pmc_type(interpreter,
-            string_from_cstring(interpreter,
-                      *classnm == '.' ?classnm+1:classnm, 0));
+            string_from_cstring(interpreter, classnm, 0));
 
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
@@ -122,7 +121,7 @@ iNEWSUB(struct Parrot_Interp *interpreter, SymReg * r0, int type,
     i = nargs;
     while (i < IMCC_MAX_REGS)
 	regs[i++] = NULL;
-    return INS(interpreter, "newsub", fmt, regs, nargs,0, emit);
+    return INS(interpreter, "newsub", NULL, regs, nargs,0, emit);
 }
 
 void
