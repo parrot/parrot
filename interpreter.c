@@ -14,6 +14,24 @@ runops (struct Perl_Interp *interpreter, IV *code) {
      time through */
   IV *(*func)();
   void **temp; 
+
+  if (Parrot_num_string_constants == 0) {
+    printf("Warning: Bytecode does not include opcode table fingerprint!\n");
+  } else {
+    const char * fp_data;
+    IV           fp_len;
+
+    fp_data = Parrot_string_constants[0]->bufstart;
+    fp_len  = Parrot_string_constants[0]->buflen;
+
+    if (strncmp(OPCODE_FINGERPRINT, fp_data, fp_len)) {
+      printf("Error: Opcode table fingerprint in bytecode does not match interpreter!\n");
+      printf("       Bytecode:    %*s\n", -fp_len, fp_data);
+      printf("       Interpreter: %s\n", OPCODE_FINGERPRINT);
+      exit(1);
+    }
+  }
+
   while (*code) {
     DO_OP(code, temp, func, interpreter);
   }

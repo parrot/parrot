@@ -5,6 +5,7 @@
 # Brian Wheeler (bdwheele@indiana.edu)
 
 use strict;
+use Digest::MD5 qw(&md5_hex);
 use Getopt::Long;
 
 my %options;
@@ -68,7 +69,9 @@ close GUTS;
 
 # get opcodes and their arg lists
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
+my $opcode_table;
 while (<OPCODES>) {
+    $opcode_table .= $_;
     next if /^\s*#/;
     chomp;
     s/^\s+//;
@@ -81,6 +84,8 @@ while (<OPCODES>) {
     $opcodes{$name}{RTYPES}=[@rtypes];
 }
 close OPCODES;
+my $opcode_fingerprint = md5_hex($opcode_table);
+constantize($opcode_fingerprint); # Make it constant zero.
 
 my $listing="PARROT ASSEMBLY LISTING - ".scalar(localtime)."\n\n";
 
@@ -282,7 +287,7 @@ if(@constants) {
 $output.=$bytecode;
 
 if(!$options{'checksyntax'}) {
-    if($options{'output'} ne "") {
+    if(defined $options{'output'} and $options{'output'} ne "") {
 	open O,">$options{'output'}" || die $!;
 	print O $output;
 	close O;

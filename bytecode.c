@@ -66,6 +66,8 @@ read_constants_table(void** program_code)
     IV len = GRAB_IV(program_code);
     IV num;
     IV i = 0;
+
+    Parrot_num_string_constants = len;
     if (len == 0) 
        return;
 

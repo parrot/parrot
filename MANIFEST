@@ -1,6 +1,7 @@
 Configure.pl
+Config_pm.in
+Makefile.in
 MANIFEST
-Makefile
 README
 TODO
 assemble.pl
@@ -8,7 +9,7 @@ basic_opcodes.ops
 build_interp_starter.pl
 bytecode.c
 bytecode.h
-config.h.in
+config_h.in
 disassemble.pl
 docs/opcodes.pod
 docs/overview.pod

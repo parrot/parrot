@@ -1,5 +1,6 @@
 # !/usr/bin/perl -w
 use strict;
+use Digest::MD5 qw(&md5_hex);
 
 open INTERP, "> interp_guts.h" or die "Can't open interp_guts.h, $!/$^E";
 
@@ -18,8 +19,10 @@ print INTERP <<CONST;
 #define BUILD_TABLE(x) do { \\
 CONST
 
+my $opcode_table;
 my $count = 1;
 while (<OPCODES>) {
+    $opcode_table .= $_;
     chomp;
     s/#.*$//;
     s/^\s+//;
@@ -30,7 +33,10 @@ while (<OPCODES>) {
     print INTERP "\tx[$num] = $name; \\\n";
     $count++ unless $name eq 'end';
 }
+close OPCODES;
+my $opcode_fingerprint = md5_hex($opcode_table);
 print INTERP "} while (0);\n";
+
 
 # Spit out the DO_OP function
 print INTERP <<EOI;
@@ -40,4 +46,10 @@ print INTERP <<EOI;
     (void *)y = x[*w]; \\
     w = (y)(w,z); \\
  } while (0);
+EOI
+
+# Spit out the OPCODE_FINGERPRINT macro
+print INTERP <<EOI
+
+#define OPCODE_FINGERPRINT "$opcode_fingerprint"
 EOI

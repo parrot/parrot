@@ -4,16 +4,17 @@ H_FILES = config.h exceptions.h io.h op.h register.h string.h events.h interpret
 
 O_FILES = global_setup$(O) interpreter$(O) parrot$(O) register$(O) basic_opcodes$(O) memory$(O) bytecode$(O) string$(O) strnative$(O)
 
-C_FLAGS = -Wall -g -o $@
+C_FLAGS = ${ccflags}
 
-LIBS = -lm
+C_LIBS = ${libs}
 
-CC = gcc $(C_FLAGS)
 
-all : $(O_FILES) test_prog
+CC = ${cc} $(C_FLAGS)
+
+all : $(O_FILES)
 
 test_prog: test_main$(O) $(O_FILES)
-	gcc -o test_prog $(O_FILES) test_main$(O) $(LIBS)
+	$(CC) $(C_LIBS) -o test_prog $(O_FILES) test_main$(O)
 
 test_main$(O): $(H_FILES)
 
@@ -44,18 +45,8 @@ basic_opcodes.c: basic_opcodes.ops process_opfunc.pl interp_guts.h
 op.h: opcode_table make_op_header.pl
 	perl make_op_header.pl opcode_table > op.h
 
-config.h: Configure.pl config.h.in
+config.h: Configure.pl config_h.in
 	perl Configure.pl
 
 clean:
-	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog config.h
-
-test:
-	perl assemble.pl t/test.pasm  > t/test.pbc
-	./test_prog t/test.pbc > t/test.out
-	perl assemble.pl t/test2.pasm > t/test2.pbc
-	./test_prog t/test2.pbc > t/test2.out
-	perl assemble.pl t/test3.pasm > t/test3.pbc
-	./test_prog t/test3.pbc > t/test3.out
-	perl assemble.pl t/euclid.pasm > t/euclid.pbc
-	./test_prog t/euclid.pbc > t/euclid.out
+	rm -f *$(O) *.s basic_opcodes.c interp_guts.h op.h test_prog

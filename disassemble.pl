@@ -5,6 +5,7 @@
 # Turn a parrot bytecode file into text
 
 use strict;
+use Digest::MD5 qw(&md5_hex);
 
 my(%opcodes, @opcodes);
 
@@ -32,8 +33,10 @@ while (<GUTS>) {
     $opcodes{$2}{CODE} = $1;
 }
 
+my $opcode_table;
 open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
 while (<OPCODES>) {
+    $opcode_table .= $_;
     next if /^\s*#/;
     s/^\s+//;
     chomp;
@@ -48,6 +51,7 @@ while (<OPCODES>) {
 		       TYPES => [@types]
 		       }
 }
+my $opcode_fingerprint = md5_hex($opcode_table);
 
 $/ = \4;
 
@@ -62,6 +66,7 @@ if($constants) {
     my $count=unpack('l', <>);
     print "# Constants: $count entries ($constants bytes)\n";
     print "# ID  Flags    Encoding Type     Size     Data\n"; 
+    my $constant_num = 0;
     foreach (1..$count) {
        my $flags=unpack('l',<>);
        my $encoding=unpack('l',<>);
@@ -74,7 +79,12 @@ if($constants) {
        # strip off any padding nulls
        $data=substr($data,0,$size);
        printf("%04x: %08x %08x %08x %08x %s\n",$_-1,$flags,$encoding,$type,$size,$data);
+
+	die "Cannot disassemble (differing opcode table)!" if $constant_num == 0 and $data ne $opcode_fingerprint;
+	$constant_num++;
     }
+} else {
+    warn "Disassembling without opcode table fingerprint!";
 }
 print "# Code Section\n";
 my $offset=0;

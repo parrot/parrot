@@ -1,0 +1,14 @@
+package Parrot::Config;
+
+use strict;
+use warnings;
+use Exporter;
+
+use vars qw(@ISA @EXPORT %PConfig);
+@ISA=qw(Exporter);
+
+@EXPORT=qw(%PConfig);
+
+#DUMPER OUTPUT HERE
+
+1;
