@@ -538,7 +538,6 @@ output_is(<<'CODE', <<'OUT', "dumping objects");
 
 .sub __dump method
     .param pmc dumper
-    .param string name
     .local string subindent
     .local string indent
     .local string name

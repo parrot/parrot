@@ -123,15 +123,15 @@ BUFFER_END:
 
 .sub buffer method
     .local pmc temp
-    .local string buffer
+    .local string _buffer
 
     classoffset I0, self, "Stream::Lines"
     getattribute temp, self, I0
-    buffer = temp
+    _buffer = temp
 
     .pcc_begin_return
     .return temp
-    .return buffer
+    .return _buffer
     .pcc_end_return
 .end
 

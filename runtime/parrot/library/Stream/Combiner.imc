@@ -73,13 +73,13 @@ Sets (or just returns) the combiner sub.
 =cut
 
 .sub combiner method
-    .param pmc combiner
+    .param pmc _combiner
     .local pmc ret
     
     classoffset I0, self, "Stream::Combiner"
     if argcP == 0 goto GET    
-    setattribute self, I0, combiner
-    ret = combiner
+    setattribute self, I0, _combiner
+    ret = _combiner
     branch END
 GET:
     getattribute ret, self, I0

@@ -87,18 +87,18 @@ END:
 
 .sub write method
     .param string str
-    .local pmc write
+    .local pmc _write
     .local pmc ret
 
     classoffset I0, self, "Stream::Sub"
-    getattribute write, self, I0
+    getattribute _write, self, I0
 
     newsub ret, .Continuation, _sub_write_ret
     assign self, ret
 
     .pcc_begin prototyped
     .arg str
-    .pcc_call write, ret
+    .pcc_call _write, ret
 _sub_write_ret:
     .pcc_end
 

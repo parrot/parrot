@@ -455,9 +455,9 @@ output_is(<< 'CODE', << 'OUTPUT', "Index access for Iterator on PerlArray");
     iter_2 = .ITERATE_FROM_END
 
     print 'Iterator shift_float: '
-    .local float elem_2
-    shift elem_2, iter_2
-    print elem_2
+    .local float felem_2
+    shift felem_2, iter_2
+    print felem_2
     print "\n"
 
     print 'Iterator get_integer: '
