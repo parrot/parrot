@@ -339,7 +339,8 @@ void* Parrot_runops_fromc_args_save(Parrot_Interp, PMC *, const char *, ...);
 
 void Parrot_callback_C(void *external_data, PMC *callback_info);
 void Parrot_callback_D(PMC *callback_info, void *external_data);
-PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data);
+PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
+        STRING* cb_signature);
 
 typedef opcode_t *(*native_func_t)(struct Parrot_Interp * interpreter,
                                   opcode_t * cur_opcode,

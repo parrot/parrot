@@ -400,7 +400,7 @@ Parrot_new_timer_event(Parrot_Interp interpreter, PMC* timer, FLOATVAL diff,
 /*
 
 =item C<void
-Parrot_new_cb_event(Parrot_Interp, PMC*sub, PMC*user, void*ext)>
+Parrot_new_cb_event(Parrot_Interp, PMC*sub, void*ext)>
 
 Prepare and schedul a callback event
 
@@ -409,12 +409,11 @@ Prepare and schedul a callback event
 */
 
 void
-Parrot_new_cb_event(Parrot_Interp interpreter, PMC* sub, PMC* user, void* ext)
+Parrot_new_cb_event(Parrot_Interp interpreter, PMC* sub, void* ext)
 {
     parrot_event* ev = mem_sys_allocate(sizeof(parrot_event));
     ev->type = EVENT_TYPE_CALL_BACK;
     ev->u.call_back.sub = sub;
-    ev->u.call_back.user_data = user;
     ev->u.call_back.external_data = ext;
     Parrot_schedule_event(interpreter, ev);
 }
@@ -1094,9 +1093,7 @@ do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
             break;
         case EVENT_TYPE_CALL_BACK:
             edebug((stderr, "starting user cb\n"));
-            Parrot_runops_fromc_args_save(interpreter, event->u.call_back.sub,
-                    "PP",
-                    event->u.call_back.user_data,
+            Parrot_run_callback(interpreter, event->u.call_back.sub,
                     event->u.call_back.external_data);
             break;
         case EVENT_TYPE_SLEEP:

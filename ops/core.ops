@@ -1089,6 +1089,11 @@ XXX: leo: N/Y how would we get the C-subroutine?
 Register the PASM sub at address $2 as a compiler for source type $1.
 XXX: leo N/Y
 
+=item B<new_callback>(out PMC, in PMC, in PMC, in STR)
+
+Create a callback stub $1 for PASM subroutine $2 with userdata $3 and
+function signature $4.
+
 =cut
 
 inline op loadlib(out PMC, in STR) {
@@ -1153,6 +1158,11 @@ inline op compreg(out PMC, in STR) {
 }
 
 inline op bogus() {
+  goto NEXT();
+}
+
+op new_callback(out PMC, in PMC, in PMC, in STR) {
+  $1 = Parrot_make_cb(interpreter, $2, $3, $4);
   goto NEXT();
 }
 

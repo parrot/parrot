@@ -23,6 +23,9 @@ void  nci_vP(void *pmc);
 typedef void (*cb_C1_func)(const char*, void*);
 void nci_cb_C1(cb_C1_func, void*);
 
+typedef void (*cb_D1_func)(void*, const char*);
+void nci_cb_D1(cb_D1_func, void*);
+
 double nci_dd(double d) {
     return d * 2.0;
 }
@@ -231,9 +234,17 @@ void nci_vP(void *pmc)
 void
 nci_cb_C1(cb_C1_func cb, void* user_data)
 {
-    const char *result = "succeded";
+    const char *result = "succeeded";
     /* call the cb synchronously */
     (cb)(result, user_data);
+}
+
+void
+nci_cb_D1(cb_D1_func cb, void* user_data)
+{
+    const char *result = "succeeded";
+    /* call the cb synchronously */
+    (cb)(user_data, result);
 }
 
 #ifdef TEST

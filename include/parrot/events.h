@@ -79,7 +79,8 @@ void Parrot_new_terminate_event(Parrot_Interp);
 void disable_event_checking(Parrot_Interp);
 void enable_event_checking(Parrot_Interp);
 
-void Parrot_new_cb_event(Parrot_Interp, PMC*sub, PMC*user, void*ext);
+void Parrot_new_cb_event(Parrot_Interp, PMC*sub, void*ext);
+void Parrot_run_callback(Parrot_Interp, PMC*sub, void*ext);
 
 void Parrot_kill_event_loop(void);
 void* Parrot_sleep_on_event(Parrot_Interp, FLOATVAL t, void* next);

@@ -1133,18 +1133,22 @@ Parrot_runops_fromc_args_save(Parrot_Interp interpreter, PMC *sub,
 
 /*
 
-=item C<PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user)>
+=item C<PMC* Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user
+        STRING* cb_signature)>
 
-Register a callback function according to pdd16
+Create a callback function according to pdd16.
 
 =cut
 
 */
 
 PMC*
-Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
+Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data,
+        STRING *cb_signature)
 {
-    PMC* interp_pmc, *cb;
+    PMC* interp_pmc, *cb, *cb_sig;
+    int type;
+    char * sig_str;
     /*
      * we stuff all the information into the Sub PMC and pass that
      * on to the external sub
@@ -1152,11 +1156,32 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
     interp_pmc = VTABLE_get_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
     VTABLE_setprop(interpreter, sub,
-            string_make(interpreter, "_interpreter", 12, NULL,
-                PObj_external_FLAG, NULL), interp_pmc);
+            const_string(interpreter, "_interpreter"),
+            interp_pmc);
     VTABLE_setprop(interpreter, sub,
-            string_make(interpreter, "_user_data", 10, NULL,
-                PObj_external_FLAG, NULL), user_data);
+            const_string(interpreter, "_user_data"),
+            user_data);
+    /* only ASCII sigs supported */
+    sig_str = cb_signature->strstart;
+    if (*sig_str == 'U') {
+        type = 'D';
+    }
+    else {
+        ++sig_str;
+        if (*sig_str == 'U') {
+            type = 'C';
+        }
+        else {
+            internal_exception(1, "unhandled signature '%Ss' in make_cb",
+                    cb_signature);
+        }
+    }
+
+    cb_sig = pmc_new(interpreter, enum_class_PerlString);
+    VTABLE_set_string_native(interpreter, cb_sig, cb_signature);
+    VTABLE_setprop(interpreter, sub,
+            const_string(interpreter, "_signature"),
+            cb_sig);
     /*
      * we are gonna passing this PMC to external code, the PMCs
      * might get out of scope until the callback is called -
@@ -1172,7 +1197,15 @@ Parrot_make_cb(Parrot_Interp interpreter, PMC* sub, PMC* user_data)
      * it can be passed on with signature 'p'
      */
     cb = pmc_new(interpreter, enum_class_UnManagedStruct);
-    PMC_data(cb) = F2DPTR(Parrot_callback_C);
+    /*
+     * we handle currently 2 types only:
+     * _C ... user_data is 2nd param
+     * _D ... user_data is 1st param
+     */
+    if (type == 'C')
+        PMC_data(cb) = F2DPTR(Parrot_callback_C);
+    else
+        PMC_data(cb) = F2DPTR(Parrot_callback_D);
     dod_register_pmc(interpreter, cb);
 
     return cb;
@@ -1263,17 +1296,14 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
 {
 
     PMC *passed_interp;         /* the interp that originated the CB */
-    PMC *user_data;             /* user really intended to get that back */
     int async = 1;              /* cb is hitting this sub somewhen inmidst */
     /*
      * 3) extract user_data, func signature, check interpreter ...
      */
     passed_interp = VTABLE_getprop(interpreter, callback_info,
-            string_from_cstring(interpreter, "_interpreter", 0));
+            const_string(interpreter, "_interpreter"));
     if (PMC_data(passed_interp) != interpreter)
         PANIC("callback gone to wrong interpreter");
-    user_data = VTABLE_getprop(interpreter, callback_info,
-            string_from_cstring(interpreter, "_user_data", 0));
     /*
      * 4) check if the call_back is synchronous:
      *    - if yes we are inside the NCI call
@@ -1290,8 +1320,7 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
          * then wait for the CB_EVENT_xx to finish and return the
          * result
          */
-        Parrot_new_cb_event(interpreter, callback_info,
-                user_data, external_data);
+        Parrot_new_cb_event(interpreter, callback_info, external_data);
     }
     else {
         /*
@@ -1300,6 +1329,66 @@ callback_CD(Parrot_Interp interpreter, void *external_data, PMC *callback_info)
     }
 }
 
+void
+Parrot_run_callback(Parrot_Interp interpreter, PMC* sub, void* ext)
+{
+    PMC* user_data, *sig;
+    STRING* sig_str;
+    char *p;
+    char pasm_sig[4];
+    FLOATVAL d_param;
+    INTVAL   i_param;
+    void*    param;
+
+    user_data = VTABLE_getprop(interpreter, sub,
+            const_string(interpreter, "_user_data"));
+    sig = VTABLE_getprop(interpreter, sub,
+            const_string(interpreter, "_signature"));
+    sig_str = VTABLE_get_string(interpreter, sig);
+    p = sig_str->strstart;
+
+    pasm_sig[0] = 'v';  /* no return value supported yet */
+    pasm_sig[1] = 'P';
+    if (*p == 'U') /* user_data Z in pdd16 */
+        ++p;    /* p is now type of external data */
+    switch (*p) {
+        case 'v':
+            pasm_sig[2] = 'v';
+            break;
+        case '2':
+        case '3':
+        case '4':
+        case 'l':
+        case 'i':
+        case 's':
+        case 'c':
+            pasm_sig[2] = 'I';
+            i_param = *(INTVAL*) ext;
+            param = &i_param;
+            break;
+        case 'f':
+        case 'd':
+            pasm_sig[2] = 'N';
+            d_param = *(FLOATVAL*) ext;
+            param = &d_param;
+            break;
+#if 0
+        case 'p':
+        case 'P':
+            pasm_sig[2] = 'P';
+            break;
+#endif
+        case 't':
+            pasm_sig[2] = 'S';
+            param = string_from_cstring(interpreter, ext, 0);
+            break;
+        default:
+            internal_exception(1, "unhandled sig char '%c' in run_cb");
+    }
+    pasm_sig[3] = '\0';
+    Parrot_runops_fromc_args_save(interpreter, sub, pasm_sig,
+            user_data, param);
+}
 /*
 
 =item C<void Parrot_callback_C(void *external_data, PMC *callback_info)>
