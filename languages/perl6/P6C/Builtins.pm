@@ -12,9 +12,19 @@ supply their function bodies.
 use P6C::Context;
 use P6C::Parser;
 
+use vars '%builtin_names';
+BEGIN {
+    my @names = qw(print1 exit warn die print sleep time time0);
+    @builtin_names{@names} = (1) x @names;
+}
+
+sub is_builtin {
+    return exists $builtin_names{+shift};
+}
+
 sub declare {
     my $hash = shift;
-    for (qw(print1 exit)) {
+    for (qw(print1 exit sleep time)) {
 	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlUndef', 'a']];
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'PerlUndef';
     }
@@ -22,6 +32,10 @@ sub declare {
     for (qw(print warn die)) {
 	$P6C::Context::CONTEXT{$_} = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlArray', '_']];
+    }
+    for (qw(time0)) {
+	$hash->{$_} = new P6C::IMCC::Sub args => [];
+	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'PerlUndef';
     }
 }
 
@@ -34,6 +48,37 @@ sub emit {
 
 print <<'END';
 .emit
+
+_time:
+pushn
+pushp
+restore P1
+time N30
+set P1, N30
+popp
+popn
+ret
+
+_time0:
+pushn
+pushp
+time N0
+new P0, .PerlUndef
+set P0, N0
+store_global P0, "_SV_t"
+popp
+popn
+ret
+
+_sleep:
+pushp
+pushi
+restore P0
+set I0, P0
+sleep I0
+popi
+popp
+ret
 
 _print1:
 pushp
