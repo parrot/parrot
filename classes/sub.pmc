@@ -24,7 +24,10 @@ pmclass Sub {
 	return whoami;
    }
 
-   void init (INTVAL address) {
+   void init () {
+       INTVAL address = 0; /* XXX this was originally passed as a
+                            * parameter, but that's not valid.  So
+                            * this is totally broken now. */
        SELF->data = new_sub(INTERP, (opcode_t*)address);
    }
 
