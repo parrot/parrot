@@ -1,6 +1,6 @@
 #perl -w
 
-use Parrot::Test tests=>1;
+use Parrot::Test tests => 2;
 
 output_is(<<'CODE', <<'OUTPUT', "data type names");
 	# first (native) type
@@ -47,6 +47,15 @@ nok5:   print "invalid typename not 'illegal'\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "find_type with invalid type");
+        find_type I0, "Smurf"
+        print I0
+        print "\n"
+        end
+CODE
+0
 OUTPUT
 
 1;
