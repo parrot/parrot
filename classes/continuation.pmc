@@ -1,47 +1,106 @@
-/* Continuation.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Continuation base class
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by sean 2002/08/04
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/continuation.pmc - Continuation PMC
+
+=head1 DESCRIPTION
+
+C<Continuation> extends C<Closure> to provide a subroutine with
+associated "context". See the L<Glossary|docs/glossary.pod> for more
+information.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass Continuation extends Closure {
 
-    void init () {
+/*
+
+=item C<void init()>
+
+Initializes the continuation.
+
+=cut
+
+*/
+
+void init () {
         PMC_sub(SELF) = new_continuation(INTERP);
-	PMC_struct_val(SELF) = NULL;
-	PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_struct_val(SELF) = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+/*
+
+=item C<void mark()>
+
+Marks the continuation as live.
+
+=cut
+
+*/
 
     void mark () {
-        struct Parrot_Sub * cc
-            = (struct Parrot_Sub*)PMC_sub(SELF);
+        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
         mark_context(INTERP, &cc->ctx);
-	SUPER();	/* mark pad_stack, warns in closure */
+        SUPER();    /* mark pad_stack, warns in closure */
     }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the continuation.
+
+=cut
+
+*/
 
     PMC* clone() {
-	struct Parrot_Sub * sub;
-	PMC* ret = SUPER();
-	sub = PMC_sub(ret);
-	stack_mark_cow(sub->ctx.user_stack);
-	stack_mark_cow(sub->ctx.control_stack);
-	return ret;
+        struct Parrot_Sub * sub;
+        PMC* ret = SUPER();
+        sub = PMC_sub(ret);
+        stack_mark_cow(sub->ctx.user_stack);
+        stack_mark_cow(sub->ctx.control_stack);
+        return ret;
     }
 
+/*
+
+=item C<void *invoke(void *next)>
+
+Restores the "context" and calls the superclass's C<invoke()>.
+
+=cut
+
+*/
+
     void* invoke (void* next) {
-	struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
-	restore_context(interpreter, &cc->ctx);
-	return SUPER(next);
+        struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
+        restore_context(interpreter, &cc->ctx);
+        return SUPER(next);
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/

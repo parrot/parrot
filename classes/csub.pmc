@@ -1,15 +1,18 @@
-/* CSub.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the CSub base class
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by sean 2002/08/04
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/csub.pmc - C Subroutine PMC
+
+=head1 DESCRIPTION
+
+This class has been superceeded by C<NCI>.
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
@@ -17,9 +20,9 @@
 pmclass CSub {
 
     PMC* clone () {
-	PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-	PMC_struct_val(dest) = PMC_struct_val(SELF);
-	return dest;
+        PMC* dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC_struct_val(dest) = PMC_struct_val(SELF);
+        return dest;
     }
 
     PMC* get_pmc () {
@@ -45,8 +48,18 @@ pmclass CSub {
 
     void* invoke (void * next) {
         Parrot_csub_t func =
-		(Parrot_csub_t)D2FPTR(PMC_struct_val(SELF));
+        (Parrot_csub_t)D2FPTR(PMC_struct_val(SELF));
         func(INTERP, SELF);
         return next;
     }
 }
+
+/*
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/

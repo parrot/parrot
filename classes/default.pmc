@@ -1,15 +1,25 @@
-/* default.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *     These are the vtable functions for the default PMC class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *    All methods which are not defined here get a default implementaion
- *    generate  from vtable.tbl by classes/pmc2c.pl
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/default.pmc - Abstract root class
+
+head1 DESCRIPTION
+
+These are the vtable functions for the default PMC class.
+
+All methods which are not defined here get a default implementaion
+generated from F<vtable.tbl> by F<classes/pmc2c2.pl>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -17,11 +27,32 @@
 
 static const char * caller(Parrot_Interp interp, PMC * pmc);
 
+/*
+
+=item C<static const char *caller(Parrot_Interp interp, PMC *pmc)>
+
+Returns a C string for the name of C<*pmc>. 
+
+=cut
+
+*/
+
 static const char * caller(Parrot_Interp interp, PMC * pmc)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
-	VTABLE_name(interp, pmc)->strstart : "(null)";
+    VTABLE_name(interp, pmc)->strstart : "(null)";
 }
+
+/*
+
+=item C<static void
+check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)>
+
+Called from C<setprop()>.
+
+=cut
+
+*/
 
 static void
 check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
@@ -33,8 +64,8 @@ check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
      */
     static STRING *ro;
     if (!ro)
-	ro = string_make(interp, "_ro", 3, NULL,
-		PObj_constant_FLAG|PObj_external_FLAG , 0);
+        ro = string_make(interp, "_ro", 3, NULL,
+            PObj_constant_FLAG|PObj_external_FLAG , 0);
     if (!string_compare(interp, key, ro)) {
 #else
 
@@ -42,17 +73,28 @@ check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
      * s2 in string_compare is freed here
      */
     if (!string_compare(interp, key,
-		string_from_cstring(interp, "_ro", 0))) {
+        string_from_cstring(interp, "_ro", 0))) {
 #endif
-	/* pmc should set/clear readonly */
-	INTVAL on = VTABLE_get_bool(interp, value);
-	/* morph to Const/normal class */
-	if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
-	    pmc->vtable = Parrot_base_vtables[pmc->vtable->base_type + 1];
-	else if (!on && (pmc->vtable->flags & VTABLE_IS_CONST_FLAG))
-	    VTABLE_morph(interp, pmc, pmc->vtable->base_type - 1);
+        /* pmc should set/clear readonly */
+        INTVAL on = VTABLE_get_bool(interp, value);
+        /* morph to Const/normal class */
+        if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
+            pmc->vtable = Parrot_base_vtables[pmc->vtable->base_type + 1];
+        else if (!on && (pmc->vtable->flags & VTABLE_IS_CONST_FLAG))
+            VTABLE_morph(interp, pmc, pmc->vtable->base_type - 1);
     }
 }
+
+/*
+
+=item C<static INTVAL
+does_isa(Parrot_Interp interp, STRING *method, STRING *what)>
+
+Compares C<*method> and C<*what>.
+
+=cut
+
+*/
 
 static INTVAL
 does_isa (Parrot_Interp interp, STRING *method, STRING *what)
@@ -61,281 +103,709 @@ does_isa (Parrot_Interp interp, STRING *method, STRING *what)
 
     do {
         pos = string_str_index(interp, what, method, pos);
-	if (pos < 0)
-	    return 0;
-	if (pos >= (INTVAL)string_length(what))
-	    return 0;
-	len = string_length(method);
-	if (pos && string_index(what, pos - 1) != 32) {
-	    pos += len;
-	    continue;
-	}
-
-	if (pos+len < (INTVAL)string_length(what) && string_index(what, pos + len) != 32) {
-	    pos += len;
-	    continue;
-	}
-	return 1;
+        if (pos < 0)
+            return 0;
+        if (pos >= (INTVAL)string_length(what))
+            return 0;
+        len = string_length(method);
+        if (pos && string_index(what, pos - 1) != 32) {
+            pos += len;
+            continue;
+        }
+    
+        if (pos+len < (INTVAL)string_length(what) && 
+            string_index(what, pos + len) != 32) {
+            pos += len;
+            continue;
+        }
+        return 1;
     } while(1);
     return 0;
 }
 
 pmclass default abstract noinit {
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void init()>
+
+Does nothing.
+
+=cut
+
+*/
+
     void init () {
     }
+
+/*
+
+=item C<void init_pmc(PMC *value)>
+
+Calls C<init()>. C<*value> is ignored.
+
+=cut
+
+*/
 
     void init_pmc (PMC* value) {
         DYNSELF.init();
     }
 
+/*
+
+=item C<void init_pmc_props (PMC* initializer, PMC* properties)>
+
+Sets C<properties> as the PMC's metadata, and calls C<init_pmc()> with
+C<initializer> if it is supplied, otherwise C<init()> is called.
+
+=cut
+
+*/
+
     void init_pmc_props (PMC* initializer, PMC* properties) {
-	if (!SELF->pmc_ext)
-	    add_pmc_ext(INTERP, SELF);
-	PMC_metadata(SELF) = properties;
-	if (initializer)
-	    DYNSELF.init_pmc(initializer);
-	else
-	    DYNSELF.init();
+        if (!SELF->pmc_ext)
+            add_pmc_ext(INTERP, SELF);
+        PMC_metadata(SELF) = properties;
+        if (initializer)
+            DYNSELF.init_pmc(initializer);
+        else
+            DYNSELF.init();
     }
 
+/*
+
+=item C<void mark()>
+
+Panics with a "no custom mark routine defined" error message.
+
+=cut
+
+*/
 
     void mark () {
         PANIC("custom_mark flag set but no custom mark routine defined");
     }
 
+/*
+
+=item C<PMC *getprop(STRING *key)>
+
+Returns the property for C<*key>. If no property is defined then an
+"undef" PMC is returned.
+
+=cut
+
+*/
+
     PMC* getprop(STRING* key) {
-	if (SELF->pmc_ext && PMC_metadata(SELF)) {
-	  return VTABLE_get_pmc_keyed_str(interpreter, PMC_metadata(SELF), key);
-	}
+        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+          return VTABLE_get_pmc_keyed_str(interpreter, PMC_metadata(SELF), key);
+        }
         else {
-	  PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
-	  return undef;
-	}
+          PMC* undef = pmc_new(INTERP, enum_class_PerlUndef);
+          return undef;
+        }
     }
+
+/*
+
+=item C<void setprop(STRING *key, PMC *value)>
+
+Sets the property for C<*key> to C<*value>.
+
+=cut
+
+*/
 
     void setprop(STRING* key, PMC* value) {
-
-	check_set_std_props(INTERP, SELF, key, value);
-	if (SELF->pmc_ext && PMC_metadata(SELF)) {
-	  VTABLE_set_pmc_keyed_str(interpreter,
-			  PMC_metadata(SELF), key, value);
-	} else {
-          if (!SELF->pmc_ext)
-              add_pmc_ext(INTERP, SELF);
-          /* first make new hash */
-	  PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  VTABLE_init(interpreter, PMC_metadata(SELF));
-	  /* then the key, else it vanishes with --gc-debug */
-	  VTABLE_set_pmc_keyed_str(interpreter,
-			  PMC_metadata(SELF), key, value);
-	}
-	return;
-    }
-
-    void delprop(STRING* key) {
-	if (SELF->pmc_ext && PMC_metadata(SELF)) {
-	  VTABLE_delete_keyed_str(interpreter, PMC_metadata(SELF), key);
-	}
+        check_set_std_props(INTERP, SELF, key, value);
+        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+            VTABLE_set_pmc_keyed_str(interpreter,
+                PMC_metadata(SELF), key, value);
+        } else {
+            if (!SELF->pmc_ext)
+                add_pmc_ext(INTERP, SELF);
+            /* first make new hash */
+            PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
+            VTABLE_init(interpreter, PMC_metadata(SELF));
+            /* then the key, else it vanishes with --gc-debug */
+            VTABLE_set_pmc_keyed_str(interpreter,
+                PMC_metadata(SELF), key, value);
+        }
         return;
     }
 
+/*
+
+=item C<void delprop(STRING *key)>
+
+Deletes the property for C<*key>.
+
+=cut
+
+*/
+
+    void delprop(STRING* key) {
+        if (SELF->pmc_ext && PMC_metadata(SELF)) {
+            VTABLE_delete_keyed_str(interpreter, PMC_metadata(SELF), key);
+        }
+        return;
+    }
+
+/*
+
+=item C<PMC *getprops()>
+
+Returns the PMC's properties.
+
+=cut
+
+*/
+
     PMC* getprops() {
         if (!SELF->pmc_ext)
-             add_pmc_ext(INTERP, SELF);
-	if (!PMC_metadata(SELF)) {
-	  PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
-	  VTABLE_init(interpreter, PMC_metadata(SELF));
-	}
-    	return PMC_metadata(SELF);
+            add_pmc_ext(INTERP, SELF);
+        if (!PMC_metadata(SELF)) {
+            PMC_metadata(SELF) = pmc_new_noinit(interpreter, enum_class_PerlHash);
+            VTABLE_init(interpreter, PMC_metadata(SELF));
+        }
+        return PMC_metadata(SELF);
     }
+
+/*
+
+=item C<INTVAL type()>
+
+Returns the PMC's type.
+
+=cut
+
+*/
 
     INTVAL type () {
         return SELF->vtable->base_type;
     }
 
+/*
+
+=item C<INTVAL type_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<type_keyed()> with it.
+
+=cut
+
+*/
 
     INTVAL type_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.type_keyed(r_key);
     }
 
+/*
+
+=item C<STRING *name()>
+
+Returns the name of the PMC.
+
+=cut
+
+*/
+
     STRING* name () {
         return SELF->vtable->whoami;
     }
 
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+Looks up the method for C<*method_name> and returns it. If no method is
+found then C<NULL> is returned.
+
+=cut
+
+*/
+
     PMC* find_method(STRING* method_name) {
-	PMC *meth_hash;
-	int type = SELF->vtable->base_type;
-
-	if (type >= (int)INTERP->nci_method_table_size)
-	    return NULL;
-
-	meth_hash = INTERP->nci_method_table[type];
-	if (!meth_hash)
-	    return NULL;
-	return VTABLE_get_pmc_keyed_str(INTERP, meth_hash, method_name);
+        PMC *meth_hash;
+        int type = SELF->vtable->base_type;
+    
+        if (type >= (int)INTERP->nci_method_table_size)
+            return NULL;
+    
+        meth_hash = INTERP->nci_method_table[type];
+        if (!meth_hash)
+            return NULL;
+        return VTABLE_get_pmc_keyed_str(INTERP, meth_hash, method_name);
     }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_integer_keyed()> with it.
+
+=cut
+
+*/
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_integer_keyed(r_key);
     }
 
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_number_keyed()> with it.
+
+=cut
+
+*/
+
     FLOATVAL get_number_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_number_keyed(r_key);
     }
 
+/*
+
+=item C<BIGNUM *get_bignum_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_bignum_keyed()> with it.
+
+=cut
+
+*/
 
     BIGNUM* get_bignum_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bignum_keyed(r_key);
     }
 
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_string_keyed()> with it.
+
+=cut
+
+*/
+
     STRING* get_string_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_string_keyed(r_key);
     }
+
+/*
+
+=item C<INTVAL get_bool_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_bool_keyed()> with it.
+
+=cut
+
+*/
 
     INTVAL get_bool_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_bool_keyed(r_key);
     }
 
+/*
+
+=item C<INTVAL elements_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<elements_keyed()> with it.
+
+=cut
+
+*/
+
     INTVAL elements_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.elements_keyed(r_key);
     }
 
+/*
+
+=item C<PMC* get_pmc()>
+
+Returns the PMC itself.
+
+=cut
+
+*/
+
     PMC* get_pmc () {
         return SELF;
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<get_pmc_keyed()> with it.
+
+=cut
+
+*/
 
     PMC* get_pmc_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.get_pmc_keyed(r_key);
     }
 
+/*
+
+=item C<INTVAL is_same(PMC *value)>
+
+Returns whether the PMC is numerically equal to C<value>.
+
+=cut
+
+*/
+
     INTVAL is_same (PMC* value) {
         return SELF == value;
     }
+
+/*
+
+=item C<void set_integer_keyed_int (INTVAL key, INTVAL value)>
+
+Converts C<key> to a PMC key and calls C<set_integer_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_integer_keyed(r_key, value);
     }
 
+/*
+
+=item C<void set_number_keyed_int (INTVAL key, FLOATVAL value)>
+
+Converts C<key> to a PMC key and calls C<set_number_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
+
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_number_keyed(r_key, value);
     }
+
+/*
+
+=item C<void set_bignum_keyed_int(INTVAL key, BIGNUM *value)>
+
+Converts C<key> to a PMC key and calls C<set_bignum_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
 
     void set_bignum_keyed_int (INTVAL key, BIGNUM* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_bignum_keyed(r_key, value);
     }
 
+/*
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *string)>
+
+Converts C<key> to a PMC key and calls C<set_string_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
+
     void set_string_keyed_int (INTVAL key, STRING* string) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_string_keyed(r_key, string);
     }
+
+/*
+
+=item C<void set_bool_keyed_int(INTVAL key, INTVAL value)>
+
+Converts C<key> to a PMC key and calls C<set_bool_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
 
     void set_bool_keyed_int (INTVAL key, INTVAL value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_bool_keyed(r_key, value);
     }
 
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Converts C<key> to a PMC key and calls C<set_pmc_keyed()> with it
+and C<value>.
+
+=cut
+
+*/
+
     void set_pmc_keyed_int (INTVAL key, PMC* value) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.set_pmc_keyed(r_key, value);
     }
 
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+Returns whether the PMC is equal to C<*value>.
+
+=cut
+
+*/
+
     INTVAL is_equal (PMC* value) {
         return (SELF->vtable == value->vtable
-                && PMC_struct_val(SELF) == PMC_struct_val(value)
-		&& PMC_data(SELF) == PMC_data(value));
+            && PMC_struct_val(SELF) == PMC_struct_val(value)
+            && PMC_data(SELF) == PMC_data(value));
     }
+
+/*
+
+=item C<INTVAL exists_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<exists_keyed()> with it.
+
+=cut
+
+*/
 
     INTVAL exists_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.exists_keyed(r_key);
     }
 
+/*
+
+=item C<INTVAL defined()>
+
+Returns true.
+
+=cut
+
+*/
+
     INTVAL defined () {
         return 1;
     }
 
+
+/*
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<defined_keyed()> with it.
+
+=cut
+
+*/
 
     INTVAL defined_keyed_int (INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.defined_keyed(r_key);
     }
 
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
+
+=cut
+
+*/
+
     void delete_keyed_int(INTVAL key) {
         PMC* r_key = INT2KEY(INTERP, key);
         DYNSELF.delete_keyed(r_key);
     }
 
+/*
+
+=item C<PMC *nextkey_keyed_int(INTVAL key, INTVAL w)>
+
+Converts C<key> to a PMC key and returns the result of calling
+C<nextkey_keyed()> with it.
+
+=cut
+
+*/
 
     PMC* nextkey_keyed_int (INTVAL key, INTVAL w) {
         PMC* r_key = INT2KEY(INTERP, key);
         return DYNSELF.nextkey_keyed(r_key, w);
     }
 
+/*
+
+=item C<INTVAL can(STRING *method)>
+
+Returns whether the PMC "can" perform C<*method>.
+
+=cut
+
+*/
+
     INTVAL can (STRING* method) {
-	PMC *meth_hash;
-	int type = SELF->vtable->base_type;
-
-	if (type >= (int)INTERP->nci_method_table_size)
-	    return 0;
-
-	meth_hash = INTERP->nci_method_table[type];
-	if (!meth_hash)
-	    return 0;
+        PMC *meth_hash;
+        int type = SELF->vtable->base_type;
+    
+        if (type >= (int)INTERP->nci_method_table_size)
+            return 0;
+    
+        meth_hash = INTERP->nci_method_table[type];
+        if (!meth_hash)
+            return 0;
         return VTABLE_exists_keyed_str(INTERP, meth_hash, method);
     }
 
+/*
 
-    INTVAL does (STRING* method) {
-	return does_isa(INTERP, method, SELF->vtable->does_str);
+=item C<INTVAL does(STRING *method)>
+
+Returns whether the PMC "does" perform C<*method>.
+
+=cut
+
+*/
+
+    INTVAL does(STRING* method) {
+        return does_isa(INTERP, method, SELF->vtable->does_str);
     }
+
+/*
+
+=item C<INTVAL isa(STRING *method)>
+
+Returns whether the PMC "isa" C<*method>.
+
+=cut
+
+*/
 
     INTVAL isa (STRING* method) {
-	return does_isa(INTERP, method, SELF->vtable->isa_str);
+        return does_isa(INTERP, method, SELF->vtable->isa_str);
     }
+
+/*
+
+=item C<void visit(visit_info *info)>
+
+Used by DOD to mark the PMC.
+
+=cut
+
+*/
 
     void visit(visit_info *info) {
-	/* default - mark prop hash */
+        /* default - mark prop hash */
         if (SELF->pmc_ext && PMC_metadata(SELF) &&
-		info->extra_flags != EXTRA_IS_PROP_HASH) {
-	    info->extra_flags = EXTRA_IS_PROP_HASH;
-	    info->extra = PMC_metadata(SELF);
-	    /* place escape mark */
-	    (info->visit_pmc_now)(interpreter, SELF, info);
-	    /* place and the prop hash */
-	    (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
-	}
-
+            info->extra_flags != EXTRA_IS_PROP_HASH) {
+            info->extra_flags = EXTRA_IS_PROP_HASH;
+            info->extra = PMC_metadata(SELF);
+            /* place escape mark */
+            (info->visit_pmc_now)(interpreter, SELF, info);
+            /* place and the prop hash */
+            (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
+        }
     }
+
+/*
+
+=item C<void freeze(visit_info *info)>
+
+Does nothing.
+
+=cut
+
+*/
 
     void freeze(visit_info *info) {
-	/* default - no action */
+        /* default - no action */
     }
+
+/*
+
+=item C<void thaw(visit_info *info)>
+
+Initializes the PMC during unarchiving.
+
+=cut
+
+*/
 
     void thaw(visit_info *info) {
-	/* default - initialize the PMC */
-	if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-	    if (!SELF->pmc_ext)
-		add_pmc_ext(INTERP, SELF);
-	    info->thaw_ptr = &PMC_metadata(SELF);
-	    (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
-	}
-	else
-	    DYNSELF.init();
+        /* default - initialize the PMC */
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            if (!SELF->pmc_ext)
+            add_pmc_ext(INTERP, SELF);
+            info->thaw_ptr = &PMC_metadata(SELF);
+            (info->visit_pmc_now)(interpreter, PMC_metadata(SELF), info);
+        }
+        else
+            DYNSELF.init();
     }
 
+/*
+
+=item C<void thawfinish(visit_info *info)>
+
+Does nothing.
+
+=cut
+
+*/
+
     void thawfinish(visit_info *info) {
-	/* default - no action */
+        /* default - no action */
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/

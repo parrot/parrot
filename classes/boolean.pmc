@@ -1,61 +1,146 @@
-/* boolean.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Boolean base class
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     Albeit Boolean is derived from PerlInt, it doesn't morph
- *     to other types, its value is changed only.
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/boolean.pmc - Boolean PMC
+
+=head1 DESCRIPTION
+
+This class implements a boolean value variable.
+
+Albeit C<Boolean> is derived from C<PerlInt>, it doesn't morph to other
+types, its value is changed only.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/perltypes.h"
 
 pmclass Boolean extends PerlInt {
 
+/*
+
+=item C<void set_integer_native (INTVAL value)>
+
+=cut
+
+*/
 
     void set_integer_native (INTVAL value) {
         PMC_int_val(SELF) = (value != 0);
     }
 
+/*
+
+=item C<void set_number_native (FLOATVAL value)>
+
+Sets the value to C<value> evaluated in a boolean context.
+
+=cut
+
+*/
+
     void set_number_native (FLOATVAL value) {
-	PMC_int_val(SELF) = (value!=0);
+        PMC_int_val(SELF) = (value!=0);
     }
+
+/*
+
+=item C<void set_string_native (STRING* value)>
+
+Sets the value to C<*value> evaluated in a boolean context.
+
+=cut
+
+*/
 
     void set_string_native (STRING* value) {
-	PMC_int_val(SELF) = string_bool(value);
+        PMC_int_val(SELF) = string_bool(value);
     }
 
+/*
+
+=item C<void neg(PMC* dest)>
+
+If C<*dest> is supplied then the negation of the boolean is set in
+C<*dest>, otherwise the value of the boolean itself is negated.
+
+=cut
+
+*/
+
     void neg (PMC* dest) {
-	if (!dest)
-	    PMC_int_val(SELF) = -PMC_int_val(SELF);
-	else
-	    VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
+        if (!dest)
+            PMC_int_val(SELF) = -PMC_int_val(SELF);
+        else
+            VTABLE_set_integer_native(INTERP, dest, -PMC_int_val(SELF));
     }
+
+/*
+
+=item C<void logical_or(PMC* value, PMC* dest)>
+
+Sets the logical C<OR> of the boolean and C<*value> as the value of
+C<*dest>.
+
+=cut
+
+*/
 
     void logical_or (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-					 PMC_int_val(SELF) ||
-					 VTABLE_get_bool(INTERP, value)
-	    );
+            PMC_int_val(SELF) ||
+            VTABLE_get_bool(INTERP, value));
     }
+
+/*
+
+=item C<>
+
+Sets the logical C<AND> of the boolean and C<*value> as the value of
+C<*dest>.
+
+=cut
+
+*/
 
     void logical_and (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
-					 PMC_int_val(SELF) &&
-					 VTABLE_get_bool(INTERP, value)
-	    );
+            PMC_int_val(SELF) &&
+            VTABLE_get_bool(INTERP, value));
     }
+
+/*
+
+=item C<void logical_xor(PMC* value, PMC* dest)>
+
+Sets the logical C<XOR> of the boolean and C<*value> as the value of
+C<*dest>.
+
+=cut
+
+*/
 
     void logical_xor (PMC* value, PMC* dest) {
         VTABLE_set_integer_native(INTERP, dest,
             ( PMC_int_val(SELF) ? 1 : 0 ) ^
-					 VTABLE_get_bool(INTERP, value)
-	    );
+            VTABLE_get_bool(INTERP, value));
     }
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,62 +1,140 @@
-/* Closure.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Closure (subroutine) base class.
- *     This are subroutines which take a context structure.
- *  Data Structure and Algorithms:
- *  History:
- *     Initial version by Leo.
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/closure.pmc - Closure PMC
+
+=head1 DESCRIPTION
+
+This class implements a closure, i.e. a subroutine which take a context
+structure.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass Closure extends Sub {
 
-   void init () {
-       PMC_sub(SELF) = new_closure(INTERP);
-       PMC_struct_val(SELF) = NULL;
-       PObj_custom_mark_destroy_SETALL(SELF);
-    if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
-       printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
-   }
+/*
 
-   void mark () {
-        struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-        mark_stack(INTERP, sub->ctx.pad_stack);
-        SUPER();	/* mark warns ... in class Sub */
-   }
+=item C<void init()>
 
+Initializes the closure.
 
+=cut
 
-   void* invoke (void* next) {
-       struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
-       INTERP->ctx.pad_stack = sub->ctx.pad_stack;
-       return SUPER(next);
-   }
+*/
 
-   PMC* clone () {
-       struct Parrot_Sub * sub;
-       PMC* ret = SUPER();
-       sub = PMC_sub(ret);
-       stack_mark_cow(sub->ctx.pad_stack);
-       return ret;
-   }
+	void init () {
+		PMC_sub(SELF) = new_closure(INTERP);
+		PMC_struct_val(SELF) = NULL;
+		PObj_custom_mark_destroy_SETALL(SELF);
+		if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG))
+			printf("Address of base segment is %p\n", ((struct Parrot_Sub *)PMC_sub(SELF))->seg->base.pf->byte_code);
+	}
 
-    void set_same (PMC* value) {
-	PMC_sub(SELF) = PMC_sub(value);
-	PMC_struct_val(SELF) = PMC_struct_val(value);
-    }
+/*
 
-    INTVAL is_equal (PMC* value) {
-	return (SELF->vtable == value->vtable &&
+=item C<void mark()>
+
+Marks the closure as live.
+
+=cut
+
+*/
+
+	void mark () {
+		struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+		mark_stack(INTERP, sub->ctx.pad_stack);
+		SUPER();	/* mark warns ... in class Sub */
+	}
+	
+	
+/*
+
+=item C<void* invoke(void* next)>
+
+Invokes the closure.
+
+=cut
+
+*/
+
+	void* invoke (void* next) {
+		struct Parrot_Sub * sub = (struct Parrot_Sub *)PMC_sub(SELF);
+		INTERP->ctx.pad_stack = sub->ctx.pad_stack;
+		return SUPER(next);
+	}
+	
+/*
+
+=item C<PMC* clone()>
+
+Creates a clone of the closure and returns it.
+
+=cut
+
+*/
+
+	PMC* clone () {
+		struct Parrot_Sub * sub;
+		PMC* ret = SUPER();
+		sub = PMC_sub(ret);
+		stack_mark_cow(sub->ctx.pad_stack);
+		return ret;
+	}
+	
+/*
+
+=item C<void set_same(PMC* value)>
+
+Makes the closure the same as C<*value>.
+
+=cut
+
+*/
+
+	void set_same (PMC* value) {
+		PMC_sub(SELF) = PMC_sub(value);
+		PMC_struct_val(SELF) = PMC_struct_val(value);
+	}
+	
+/*
+
+=item C<INTVAL is_equal(PMC* value)>
+
+Returns whether the closure is the same as C<*value>.
+
+=cut
+
+*/
+
+	INTVAL is_equal (PMC* value) {
+		return (SELF->vtable == value->vtable &&
 		PMC_struct_val(SELF) == PMC_struct_val(value) &&
 		memcmp(PMC_sub(value), PMC_sub(SELF),
-		    sizeof(struct Parrot_Sub)) == 0);
-    }
-
+		sizeof(struct Parrot_Sub)) == 0);
+	}
+	
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version by Leo.
+
+=cut
+
+*/

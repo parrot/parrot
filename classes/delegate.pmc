@@ -1,30 +1,38 @@
-/* delegate.pmc
- *  Copyright: 2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info $Id$
- *  Overview:
- *     Delegate each and every function to parrot bytecode
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *     Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
- *  References:
- */
+/*
+Copyright: 2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/delegate.pmc - Delegate PMC
+
+=head1 DESCRIPTION
+
+Delegate each and every function to parrot bytecode.
+
+Almost all methods are auto-generated in lib/Parrot/Pmc2c.pm
+
+=head2 Register Save/Restore Functions
+
+The following bit is a fast register save/restore pair. They currently
+count on the registers in the interpreter structure being in the same
+order as in the C<regsave struct>, and that the registers are at the
+beginning of the interpreter structure.
+
+Yes, it's damned evil, but it's what we need, since we have to preserve
+the registers -- vtable methods can't change them.
+
+Also note that if the vtable method clobbers a register that contains a
+string or PMC not otherwise rooted it could be collected too early.
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
-/* The following bit is a fast register save/restore pair. They
-   currently count on the registers in the interpreter structure being
-   in the same order as in the regsave struct, and that the registers
-   are at the beginning of the interpreter structure.
-
-   Yes, it's damned evil, but it's what we need, since we have to
-   preserve the registers--vtable methods can't change them.
-
-   Also note that if the vtable method clobbers a register that
-   contains a string or PMC not otherwise rooted it could be collected
-   too early
-
-*/
 static struct regsave {
     struct IReg int_reg;
     struct NReg num_reg;
@@ -32,22 +40,55 @@ static struct regsave {
     struct PReg pmc_reg;
 } regsave;
 
+/*
+
+=item C<PARROT_INLINE static struct regsave *
+save_regs(Parrot_Interp interp)>
+
+Returns a copy of the registers.
+
+=cut
+
+*/
+
 PARROT_INLINE static struct regsave *
 save_regs(Parrot_Interp interp) {
     struct regsave *save;
     save = mem_sys_allocate(sizeof(struct regsave));
     if (!save) {
-	internal_exception(ALLOCATION_ERROR, "No memory for save struct");
+		internal_exception(ALLOCATION_ERROR, "No memory for save struct");
     }
     mem_sys_memcopy(save, interp, sizeof(struct regsave));
     return save;
 }
+
+/*
+
+=item C<PARROT_INLINE static void
+restore_regs(Parrot_Interp interp, struct regsave *data)>
+
+Restores the registers saved in C<*data>. Frees C<*data>.
+
+=cut
+
+*/
 
 PARROT_INLINE static void
 restore_regs(Parrot_Interp interp, struct regsave *data) {
     mem_sys_memcopy(interp, data, sizeof(struct regsave));
     mem_sys_free(data);
 }
+
+/*
+
+=item C<PARROT_INLINE static PMC *
+find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name)>
+
+Finds the C<*name> method.
+
+=cut
+
+*/
 
 PARROT_INLINE static PMC *
 find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
@@ -56,6 +97,18 @@ find_meth(Parrot_Interp interpreter, PMC *pmc, const char *name) {
 
     return Parrot_find_method_with_cache(interpreter, pmc, meth);
 }
+
+/*
+
+=item C<PARROT_INLINE static PMC *
+find_or_die(Parrot_Interp interp, PMC *pmc, const char *name)>
+
+Attempts to find the C<*name> method, raising an exception if it fails
+to find it.
+
+=cut
+
+*/
 
 PARROT_INLINE static PMC *
 find_or_die(Parrot_Interp interp, PMC *pmc, const char *name) {
@@ -67,19 +120,35 @@ find_or_die(Parrot_Interp interp, PMC *pmc, const char *name) {
     return returnPMC;
 }
 
-/* All these functions to run code can leak a full parrot register
-   file, as well as potentially permanently unroot some PMCs or
-   strings, if the vtable method throws an exception. It really ought
-   be caught rather than let flow through.
+/*
+
+=back
+
+=head2 Method-Call Functions
+
+All these functions to run code can leak a full parrot register file, as
+well as potentially permanently unroot some PMCs or strings, if the
+vtable method throws an exception. It really ought be caught rather than
+let flow through.
+
+=over 4
+
+=item C<PARROT_INLINE static void
+noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die)>
+
+Runs method C<*meth> with no arguments and no return value.
+
+=cut
+
 */
 
 PARROT_INLINE static void
 noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die) {
     struct regsave *data = save_regs(interpreter);
     PMC *method = die ? find_or_die(interpreter, obj, meth) :
-	                find_meth  (interpreter, obj, meth);
+		find_meth  (interpreter, obj, meth);
     if (PMC_IS_NULL(method))
-	return;
+		return;
     REG_PMC(2) = obj;
     REG_INT(0) = 1;	/* prototyped */
     REG_INT(1) = 0;
@@ -89,6 +158,18 @@ noarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth, int die) {
     Parrot_runops_fromc(interpreter, method);
     restore_regs(interpreter, data);
 }
+
+/*
+
+=item C<PARROT_INLINE static void
+pmcarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth,
+		PMC *arg)>
+
+Runs method C<*meth> with a PMC argument C<*arg> and no return value.
+
+=cut
+
+*/
 
 PARROT_INLINE static void
 pmcarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth,
@@ -106,6 +187,17 @@ pmcarg_noreturn(Parrot_Interp interpreter, PMC *obj, const char *meth,
     restore_regs(interpreter, data);
 }
 
+/*
+
+=item C<PARROT_INLINE static PMC *
+noarg_pmcreturn(Parrot_Interp interpreter, PMC *obj, const char *meth)>
+
+Runs method C<*meth> with no argument and a PMC return value.
+
+=cut
+
+*/
+
 PARROT_INLINE static PMC *
 noarg_pmcreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
     struct regsave *data = save_regs(interpreter);
@@ -119,14 +211,25 @@ noarg_pmcreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
     REG_INT(4) = 0;
     Parrot_runops_fromc(interpreter, method);
     if (REG_INT(3) == 1) {
-	returndata = REG_PMC(5);
+		returndata = REG_PMC(5);
     } else {
-	returndata = PMCNULL;
+		returndata = PMCNULL;
     }
     restore_regs(interpreter, data);
 
     return returndata;
 }
+
+/*
+
+=item C<PARROT_INLINE static STRING *
+noarg_strreturn(Parrot_Interp interpreter, PMC *obj, const char *meth)>
+
+Runs method C<*meth> with no argument and a Parrot string return value.
+
+=cut
+
+*/
 
 PARROT_INLINE static STRING *
 noarg_strreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
@@ -141,14 +244,25 @@ noarg_strreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
     REG_INT(4) = 0;
     Parrot_runops_fromc(interpreter, method);
     if (REG_INT(2) == 1) {
-	returndata = REG_STR(5);
+		returndata = REG_STR(5);
     } else {
-	returndata = NULL;
+		returndata = NULL;
     }
     restore_regs(interpreter, data);
 
     return returndata;
 }
+
+/*
+
+=item C<PARROT_INLINE static INTVAL
+noarg_intreturn(Parrot_Interp interpreter, PMC *obj, const char *meth)>
+
+Runs method C<*meth> with no argument and an integer return value.
+
+=cut
+
+*/
 
 PARROT_INLINE static INTVAL
 noarg_intreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
@@ -163,14 +277,25 @@ noarg_intreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
     REG_INT(4) = 0;
     Parrot_runops_fromc(interpreter, method);
     if (REG_INT(1) == 1) {
-	returndata = REG_INT(5);
+		returndata = REG_INT(5);
     } else {
-	returndata = 0;
+		returndata = 0;
     }
     restore_regs(interpreter, data);
 
     return returndata;
 }
+
+/*
+
+=item C<PARROT_INLINE static FLOATVAL
+noarg_numreturn(Parrot_Interp interpreter, PMC *obj, const char *meth)>
+
+Runs method C<*meth> with no argument and an floating-point return value.
+
+=cut
+
+*/
 
 PARROT_INLINE static FLOATVAL
 noarg_numreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
@@ -185,9 +310,9 @@ noarg_numreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
     REG_INT(4) = 0;
     Parrot_runops_fromc(interpreter, method);
     if (REG_INT(4) == 1) {
-	returndata = REG_NUM(5);
+		returndata = REG_NUM(5);
     } else {
-	returndata = 0;
+		returndata = 0;
     }
     restore_regs(interpreter, data);
 
@@ -196,25 +321,80 @@ noarg_numreturn(Parrot_Interp interpreter, PMC *obj, const char *meth) {
 
 pmclass delegate {
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void init()>
+
+Delegates the C<init()> method.
+
+=cut
+
+*/
+
     void init () {
-	noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
+		noarg_noreturn(INTERP, SELF, PARROT_VTABLE_INIT_METHNAME, 0);
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+Delegates the C<get_integer()> method.
+
+=cut
+
+*/
 
     INTVAL get_integer() {
 	return noarg_intreturn(INTERP, SELF,
 		PARROT_VTABLE_GET_INTEGER_METHNAME);
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Delegates the C<get_number()> method.
+
+=cut
+
+*/
+
     FLOATVAL get_number() {
 	return noarg_numreturn(INTERP, SELF,
 		PARROT_VTABLE_GET_NUMBER_METHNAME);
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+Delegates the C<get_string()> method.
+
+=cut
+
+*/
+
     STRING* get_string() {
 	return noarg_strreturn(INTERP, SELF,
 		PARROT_VTABLE_GET_STRING_METHNAME);
     }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Delegates the C<get_pmc()> method.
+
+=cut
+
+*/
 
     PMC* get_pmc() {
 	return noarg_pmcreturn(INTERP, SELF,
@@ -222,3 +402,11 @@ pmclass delegate {
     }
 
 }
+
+/*
+
+=back
+
+=cut
+
+*/

@@ -1,20 +1,39 @@
-/* Coroutine.pmc
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     These are the vtable functions for the Coroutine base class
- *  Data Structure and Algorithms:
- *  History:
- *     Initial version by Melvin on 2002/06/6
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+classes/coroutine.pmc - Co-Routine PMC
+
+=head1 DESCRIPTION
+
+C<Coroutine> extends C<Continuation> to provide a subroutine that can
+stop in the middle, and start back up later at the point at which it
+stopped. See the L<Glossary|docs/glossary.pod> for more information.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 pmclass Coroutine extends Continuation {
+
+/*
+
+=item C<void init()>
+
+Initializes the co-routine.
+
+=cut
+
+*/
 
     void init () {
         PMC_sub(SELF) = new_coroutine(INTERP);
@@ -23,13 +42,34 @@ pmclass Coroutine extends Continuation {
         PObj_get_FLAGS(SELF) &= ~PObj_private0_FLAG;
     }
 
+/*
+
+=item C<void *invoke(void *next)>
+
+Swaps the "context".
+
+=cut
+
+*/
 
     void* invoke (void* next) {
         void * dest = PMC_struct_val(SELF);
         PMC_struct_val(SELF) = next;
-	swap_context(interpreter, SELF);
+        swap_context(interpreter, SELF);
 
         return dest;
     }
 
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial version by Melvin on 2002/06/6.
+
+=cut
+
+*/
