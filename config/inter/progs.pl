@@ -17,7 +17,7 @@ sub runstep {
      $yacc) =
        Configure::Data->get(qw(cc link ld ccflags ccwarn linkflags ldflags
 			       libs lex yacc));
-  $ccflags =~ s/-D(PERL|HAVE)_\w+\s*//g;
+  $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
   $ccflags =~ s/-fno-strict-aliasing//g;
   $linkflags =~ s/-libpath:\S+//g;
   $ldflags =~ s/-libpath:\S+//g;

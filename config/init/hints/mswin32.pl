@@ -25,9 +25,9 @@
 		# This will prevent the 'optimization is not available in the
 		# standard edition compiler' warning each time we compile.
 		# The logo gets printed to STDERR; hence the redirection.
-		my $cc_output = `$cc 2>&1`;
+		my $cc_output = `$cc /? 2>&1`;
 		$ccflags =~ s/-O1 // if $cc_output =~ m/Standard/;
-                $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
+        $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
 		
 
 		Configure::Data->set(
@@ -38,7 +38,7 @@
 			cc_exe_out => '-Fe',
 			cc_ldflags => '/link',
 			              #Use Edit and Continue debugging if available
-			cc_debug   => ($cc_output =~ /-ZI/? '-ZI' : '-Zi'),
+			cc_debug   => ($cc_output =~ m{/ZI} ? '-ZI' : '-Zi'),
 			ld_debug   => '-debug',
 			ld_shared  => '-dll',
 			ld_shared_flags=> '-def:libparrot.def',
@@ -49,7 +49,8 @@
 			ar_flags   => '',
 			ar_out     => '-out:',
 			slash      => '\\',
-			ccflags    => $ccflags
+			ccflags    => $ccflags,
+            ccwarn     => ''
 		);
 		# 'link' needs to be link.exe, not cl.exe.
 		# This makes 'link' and 'ld' the same.
