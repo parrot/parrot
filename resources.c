@@ -1123,11 +1123,16 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
     }
     if (pool->top_block->free < size) {
         /* Compact the pool if allowed and worthwhile */
-        if (pool->compact &&
-            (pool->reclaimable > 
-             (size_t)(pool->total_allocated * pool->reclaim_factor))) 
-        {
-              (*pool->compact)(interpreter, pool);
+        if (pool->compact) {
+            /* Parrot_do_dod_run(interpreter); */
+            if (pool->reclaimable >
+                (size_t)(pool->total_allocated * pool->reclaim_factor)) {
+                /* Parrot_do_dod_run(interpreter); */
+                (*pool->compact)(interpreter, pool);
+            }
+            else {
+                Parrot_do_dod_run(interpreter);
+            }
         }
         if (pool->top_block->free < size) {
             alloc_new_block(interpreter, size, pool);
