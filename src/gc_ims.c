@@ -490,8 +490,7 @@ gc_ims_alloc_objects(Interp *interpreter,
     /* Setup memory for the new objects */
     new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
     size = ALLOCATION_BLOCK_SIZE;
-    /* could be mem_sys_allocate too, but calloc is fast */
-    new_arena->start_objects = mem_sys_allocate_zeroed(size);
+    new_arena->start_objects = mem_sys_allocate(size);
 
     Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
 
