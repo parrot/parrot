@@ -12,10 +12,12 @@
  *     set I0, P0[x]		# interpinfo I0, x
  *     set I0, P0[-1]		# get interpreter flags
  *     set P0[-1], x		# set flags on interpreter
+ *                              # NOTE: this doesn't restart
  *  References:
  */
 
 #include "parrot/parrot.h"
+#include "parrot/embed.h"
 
 pmclass ParrotInterpreter need_ext {
 
@@ -70,13 +72,9 @@ pmclass ParrotInterpreter need_ext {
 		    PARROT_TRACE_FLAG |
 		    PARROT_BOUNDS_FLAG |
 		    PARROT_PROFILE_FLAG |
-		    PARROT_PREDEREF_FLAG |
-		    PARROT_JIT_FLAG   |
-		    PARROT_CGOTO_FLAG  |
-		    PARROT_GC_DEBUG_FLAG |
-		    PARROT_SWITCH_FLAG;
-		Interp_flags_CLEAR(new_interp, allowed);
-		Interp_flags_SET(new_interp, val & allowed);
+		    PARROT_GC_DEBUG_FLAG;
+		Parrot_clear_flag(new_interp, allowed);
+		Parrot_set_flag(new_interp, val & allowed);
 		break;
 	}
     }

@@ -20,13 +20,16 @@
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 
 typedef int Parrot_warnclass;
-typedef void *Parrot_Interp_flag_val;
 
 Parrot_Interp Parrot_new(void);
 
 void Parrot_init(Parrot_Interp);
 
-void Parrot_setflag(Parrot_Interp, Parrot_Interp_flag, Parrot_Interp_flag_val);
+void Parrot_set_flag(Parrot_Interp, Parrot_Interp_flag);
+void Parrot_clear_flag(Parrot_Interp, Parrot_Interp_flag);
+Parrot_Int Parrot_test_flag(Parrot_Interp, Parrot_Interp_flag);
+
+void Parrot_set_run_core( Parrot_Interp, Parrot_Run_core_t core);
 
 void Parrot_setwarnings(Parrot_Interp, Parrot_warnclass);
 

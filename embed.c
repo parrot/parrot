@@ -24,6 +24,7 @@ Parrot_new(void)
 }
 
 extern void Parrot_initialize_core_pmcs(Interp *interp);
+
 void
 Parrot_init(struct Parrot_Interp *interpreter)
 {
@@ -39,17 +40,38 @@ Parrot_init(struct Parrot_Interp *interpreter)
 }
 
 void
-Parrot_setflag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag,
-               Parrot_Interp_flag_val value)
+Parrot_set_flag(struct Parrot_Interp *interpreter, Parrot_Interp_flag flag)
 {
     /* These two macros (from interpreter.h) do exactly what they look like. */
 
-    if (value) {
-        Interp_flags_SET(interpreter, flag);
+    Interp_flags_SET(interpreter, flag);
+    switch (flag) {
+        case PARROT_BOUNDS_FLAG:
+        case PARROT_PROFILE_FLAG:
+        case PARROT_TRACE_FLAG:
+            Interp_core_SET(interpreter, PARROT_SLOW_CORE);
+            break;
+        default:
+            break;
     }
-    else {
-        Interp_flags_CLEAR(interpreter, flag);
-    }
+}
+
+void
+Parrot_clear_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
+{
+    Interp_flags_CLEAR(interpreter, flag);
+}
+
+Parrot_Int
+Parrot_test_flag(Parrot_Interp interpreter, Parrot_Interp_flag flag)
+{
+    return Interp_flags_TEST(interpreter, flag);
+}
+
+void
+Parrot_set_run_core(struct Parrot_Interp *interpreter, Parrot_Run_core_t core)
+{
+    Interp_core_SET(interpreter, core);
 }
 
 void
@@ -383,51 +405,42 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 {
     /* Debugging mode nonsense. */
     if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
-        PIO_eprintf(interpreter, "*** Parrot VM: Debugging enabled. ***\n");
-
         if (Interp_flags_TEST(interpreter, PARROT_BOUNDS_FLAG)) {
             PIO_eprintf(interpreter,
                     "*** Parrot VM: Bounds checking enabled. ***\n");
         }
-        if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            PIO_eprintf(interpreter,
-                    "*** Parrot VM: Predereferencing enabled. ***\n");
-        }
-        if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG)) {
-            PIO_eprintf(interpreter,
-                    "*** Parrot VM: Switched core enabled. ***\n");
-        }
-        if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-            PIO_eprintf(interpreter, "*** Parrot VM: JIT enabled. ***\n");
-        }
         if (Interp_flags_TEST(interpreter, PARROT_TRACE_FLAG)) {
             PIO_eprintf(interpreter, "*** Parrot VM: Tracing enabled. ***\n");
         }
+        PIO_eprintf(interpreter, "*** Parrot VM: ");
+        switch (interpreter->run_core) {
+            case PARROT_SLOW_CORE:
+                PIO_eprintf(interpreter, "Slow core");
+                break;
+            case PARROT_FAST_CORE:
+                PIO_eprintf(interpreter, "Fast core");
+                break;
+            case PARROT_PREDEREF_CORE:
+                PIO_eprintf(interpreter, "Predereferencing core");
+                break;
+            case PARROT_SWITCH_CORE:
+                PIO_eprintf(interpreter, "Switch core");
+                break;
+            case PARROT_CGP_CORE:
+                PIO_eprintf(interpreter, "CGP core");
+                break;
+            case PARROT_CGOTO_CORE:
+                PIO_eprintf(interpreter, "CGoto core");
+                break;
+            case PARROT_JIT_CORE:
+                PIO_eprintf(interpreter, "JIT core");
+                break;
+            case PARROT_EXEC_CORE:
+                PIO_eprintf(interpreter, "EXEC core");
+                break;
+        }
+        PIO_eprintf(interpreter, " ***\n");
     }
-
-#if !defined(PARROT_JIT_CAPABLE) || !PARROT_JIT_CAPABLE
-
-    /* No JIT here--make sure they didn't ask for it. */
-
-    if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-        PIO_eprintf(interpreter, "Parrot VM: Platform " PARROT_ARCHNAME
-                " is not JIT-capable.\n");
-        Parrot_exit(1);
-    }
-
-#endif
-
-#if !PARROT_EXEC_CAPABLE
-
-    /* No EXEC here--make sure they didn't ask for it. */
-
-    if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
-        PIO_eprintf(interpreter, "Parrot VM: Platform " PARROT_ARCHNAME
-                " is not EXEC-capable.\n");
-        Parrot_exit(1);
-    }
-
-#endif
 
     /* Set up @ARGS (or whatever this language calls it).
        XXX Should this be Array or PerlArray?             */
@@ -437,7 +450,7 @@ Parrot_runcode(struct Parrot_Interp *interpreter, int argc, char *argv[])
 #if EXEC_CAPABLE
 
     /* s. runops_exec interpreter.c */
-    if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
+    if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE)) {
         extern int Parrot_exec_run;
         Parrot_exec_run = 1;
     }

@@ -3,6 +3,7 @@
 */
 
 #include "parrot/dynext.h"
+#include "parrot/embed.h"
 #include "parrot/interp_guts.h"
 
 VERSION = PARROT_VERSION;
@@ -594,7 +595,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 =cut
 
 inline op bounds(in INT) {
-  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_BOUNDS_FLAG); }
+  if ($1 != 0) { Parrot_set_flag(interpreter,   PARROT_BOUNDS_FLAG); }
   else         { Interp_flags_CLEAR(interpreter, PARROT_BOUNDS_FLAG); }
   restart NEXT();
 }
@@ -609,7 +610,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 =cut
 
 inline op profile(in INT) {
-  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_PROFILE_FLAG); }
+  if ($1 != 0) { Parrot_set_flag(interpreter,   PARROT_PROFILE_FLAG); }
   else         { Interp_flags_CLEAR(interpreter, PARROT_PROFILE_FLAG); }
   restart NEXT();
 }
@@ -624,7 +625,7 @@ If $1 is zero, turn off tracing. Otherwise turn it on.
 =cut
 
 inline op trace(in INT) {
-  if ($1 != 0) { Interp_flags_SET(interpreter,   PARROT_TRACE_FLAG); }
+  if ($1 != 0) { Parrot_set_flag(interpreter,   PARROT_TRACE_FLAG); }
   else         { Interp_flags_CLEAR(interpreter, PARROT_TRACE_FLAG); }
   restart NEXT();
 }

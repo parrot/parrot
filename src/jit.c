@@ -788,7 +788,7 @@ static char *
 reg_addr(struct Parrot_Interp * interpreter, int typ, int i)
 {
 #ifdef PARROT_I386
-    if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG))
+    if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE))
         switch (typ) {
             case 0:
                 return (char*)

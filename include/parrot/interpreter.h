@@ -23,19 +23,26 @@ typedef enum {
     PARROT_TRACE_FLAG    = 0x02,  /* We're tracing execution */
     PARROT_BOUNDS_FLAG   = 0x04,  /* We're tracking byte code bounds */
     PARROT_PROFILE_FLAG  = 0x08,  /* We're gathering profile information */
-    PARROT_PREDEREF_FLAG = 0x10,  /* We're using the prederef runops */
-    PARROT_JIT_FLAG      = 0x20,  /* We're using the jit runops */
-    PARROT_CGOTO_FLAG    = 0x40,  /* We're using the computed goto runops */
-    PARROT_GC_DEBUG_FLAG = 0x80,  /* We're debugging memory management */
+    PARROT_GC_DEBUG_FLAG = 0x10,  /* We're debugging memory management */
     PARROT_EXTERN_CODE_FLAG = 0x100,    /* reusing anothers interps code */
-    PARROT_SWITCH_FLAG   = 0x200, /* We're using the switched runops */
-    PARROT_DESTROY_FLAG  = 0x400, /* the last interpreter shall cleanup */
-    PARROT_EXEC_FLAG     = 0x800, /* We're emiting a native executable */
-    PARROT_RUN_CORE_FLAGS= 0x270  /* flags denoting run core */
+    PARROT_DESTROY_FLAG  = 0x200  /* the last interpreter shall cleanup */
 } Parrot_Interp_flag;
 
 /* &end_gen */
 
+/* &gen_from_enum(interpcores.pasm) */
+typedef enum {
+    PARROT_SLOW_CORE,           /* slow bounds/trace/profile core */
+    PARROT_FAST_CORE,           /* fast DO_OP core */
+    PARROT_PREDEREF_CORE,       /*  P   = prederefed */
+    PARROT_SWITCH_CORE,         /*  P                */
+    PARROT_CGP_CORE,            /* CP                */
+    PARROT_CGOTO_CORE,          /* C    = cgoto      */
+    PARROT_JIT_CORE,
+    PARROT_EXEC_CORE         /* TODO Parrot_exec_run variants */
+} Parrot_Run_core_t;
+
+/* &end_gen */
 struct Parrot_Interp;
 
 typedef struct Parrot_Interp *Parrot_Interp;
@@ -43,10 +50,14 @@ typedef struct Parrot_Interp *Parrot_Interp;
 #if defined(PARROT_IN_CORE)
 
 typedef Parrot_Interp_flag Interp_flags;
+typedef Parrot_Run_core_t Run_Cores;
 
 #define Interp_flags_SET(interp, flag)   (/*@i1@*/ (interp)->flags |= (flag))
 #define Interp_flags_CLEAR(interp, flag) (/*@i1@*/ (interp)->flags &= ~(flag))
 #define Interp_flags_TEST(interp, flag)  (/*@i1@*/ (interp)->flags & (flag))
+
+#define Interp_core_SET(interp, core)   (/*@i1@*/ (interp)->run_core = (core))
+#define Interp_core_TEST(interp, core)  (/*@i1@*/ (interp)->run_core == (core))
 
 #include "parrot/register.h"
 #include "parrot/parrot.h"
@@ -137,9 +148,8 @@ typedef struct Parrot_Interp {
     str_func_t *string_funcs;
 #endif
 
-    Interp_flags flags;         /* Various interpreter flags that
-                                 * signal that runops should do
-                                 * something */
+    Interp_flags flags;         /* Various interpreter flags that */
+    Run_Cores run_core;         /* type of core to run the ops */
 
     RunProfile *profile;        /* The structure and array where we keep the
                                  * profile counters */

@@ -29,7 +29,7 @@ extern FILE *yyin;
 static void usage(FILE* fp)
 {
     fprintf(fp,
-    "parrot -[abcgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
+    "parrot -[abcCEfgGhjpPrStvVwy.] [-d [FLAGS]] [-O [level]] [-o FILE] <file>\n");
 }
 
 static void help_debug(void)
@@ -56,14 +56,17 @@ static void help(void)
     "  Options:\n"
     "    -h --help\n"
     "    -V --version\n"
-    "   <VM options>\n"
-    "    -b --bounds-checks\n"
-    "    -j --jit\n"
+    "   <Run core options>\n"
+    "    -b --bounds-checks|--slow-core\n"
+    "    -C --CGP-core\n"
+    "    -f --fast-core\n"
+    "    -g --computed-goto-core\n"
+    "    -j --jit-core\n"
     "    -p --profile\n"
     "    -P --predereferenced-core\n"
     "    -S --switched-core\n"
-    "    -g --no-computed-goto\n"
     "    -t --trace\n"
+    "   <VM options>\n"
     "    -d --debug[=HEXFLAGS]\n"
     "       --help-debug\n"
     "    -w --warnings\n"
@@ -103,8 +106,8 @@ the GNU General Public License or the Artistic License for more details.\n\n");
     Parrot_exit(0);
 }
 
-#define setopt(flag) Parrot_setflag(interp, flag, (*argv)[0]+2)
-#define unsetopt(flag) Parrot_setflag(interp, flag, 0)
+#define setopt(flag)   Parrot_set_flag(interp, flag)
+#define setcore(core)  Parrot_set_run_core(interp, core)
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
@@ -112,6 +115,7 @@ the GNU General Public License or the Artistic License for more details.\n\n");
 #define OPT_PBC_OUTPUT   131
 static struct longopt_opt_decl options[] = {
     { '.', '.', 0, { "--wait" } },
+    { 'C', 'C', 0, { "--CGP-core" } },
     { 'E', 'E', 0, { "--pre-precess-only" } },
     { 'G', 'G', 0, { "--no-gc" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
@@ -121,13 +125,14 @@ static struct longopt_opt_decl options[] = {
     { '\0', OPT_DESTROY_FLAG, 0,   { "--leak-test", "--destroy-at-end" } },
     { '\0', OPT_GC_DEBUG, 0, { "--gc-debug" } },
     { 'a', 'a', 0, { "--pasm" } },
-    { 'b', 'b', 0, { "--bounds-checks" } },
+    { 'b', 'b', 0, { "--bounds-checks", "--slow-core" } },
     { 'c', 'c', 0, { "--pbc" } },
     { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
     { '\0', OPT_HELP_DEBUG, 0, { "--help-debug" } },
-    { 'g', 'g', 0, { "--no-computed-goto" } },
+    { 'f', 'f', 0, { "--fast-core" } },
+    { 'g', 'g', 0, { "--computed-goto-core" } },
     { 'h', 'h', 0, { "--help" } },
-    { 'j', 'j', 0, { "--jit" } },
+    { 'j', 'j', 0, { "--jit-core" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { '\0', OPT_PBC_OUTPUT, 0, { "--output-pbc" } },
     { 'p', 'p', 0, { "--profile" } },
@@ -151,32 +156,34 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
     }
     run_pbc = 1;
 
-#ifdef HAVE_COMPUTED_GOTO
-    setopt(PARROT_CGOTO_FLAG);
-#endif
-
     while ((status = longopt_get(interp, *argc, *argv, options, &opt)) > 0) {
-	switch (opt.opt_id) {
+        switch (opt.opt_id) {
             case 'b':
                 setopt(PARROT_BOUNDS_FLAG);
-                break;
-            case 'j':
-                setopt(PARROT_JIT_FLAG);
                 break;
             case 'p':
                 setopt(PARROT_PROFILE_FLAG);
                 break;
-            case 'P':
-                setopt(PARROT_PREDEREF_FLAG);
-                break;
-            case 'S':
-                setopt(PARROT_SWITCH_FLAG);
-                break;
-            case 'g':
-                unsetopt(PARROT_CGOTO_FLAG);
-                break;
             case 't':
                 setopt(PARROT_TRACE_FLAG);
+                break;
+            case 'j':
+                setcore(PARROT_JIT_CORE);
+                break;
+            case 'P':
+                setcore(PARROT_PREDEREF_CORE);
+                break;
+            case 'S':
+                setcore(PARROT_SWITCH_CORE);
+                break;
+            case 'C':
+                setcore(PARROT_CGP_CORE);
+                break;
+            case 'f':
+                setcore(PARROT_FAST_CORE);
+                break;
+            case 'g':
+                setcore(PARROT_CGOTO_CORE);
                 break;
             case 'd':
                 if (opt.opt_arg) {
@@ -247,12 +254,10 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                 else {
                     strcpy(optimizer_opt, "1");
                 }
-                if (strchr(optimizer_opt, '1'))
-                    optimizer_level |= OPT_PRE;
+                if (strchr(optimizer_opt, 'p'))
+                    optimizer_level |= OPT_PASM;
                 if (strchr(optimizer_opt, 'c'))
                     optimizer_level |= OPT_SUB;
-                if (strchr(optimizer_opt, '2'))
-                    optimizer_level |= (OPT_CFG | OPT_PRE);
 #if 0
                 /* currently not ok due to different register allocation */
                 if (strchr(optimizer_opt, 'j')) {
@@ -261,27 +266,39 @@ parseflags(Parrot_Interp interp, int *argc, char **argv[])
                     Parrot_setflag(interp, PARROT_JIT_FLAG, &one);
                 }
 #endif
-                if (strchr(optimizer_opt, 'p'))
-                    optimizer_level |= OPT_PASM;
-
+                if (strchr(optimizer_opt, '1')) {
+                    optimizer_level |= OPT_PRE;
+                    goto opt_t;
+                }
+                if (strchr(optimizer_opt, '2')) {
+                    optimizer_level |= (OPT_CFG | OPT_PRE);
+                    goto opt_t;
+                }
+                if (strchr(optimizer_opt, 't')) {
+opt_t:
+                    setcore(PARROT_SWITCH_CORE);
+#ifdef HAVE_COMPUTED_GOTO
+                    setcore(PARROT_CGP_CORE);
+#endif
+                }
                 break;
 
             case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
-                    Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                            "PARROT_GC_DEBUG is set but the binary was "
-                            "compiled with DISABLE_GC_DEBUG.");
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "PARROT_GC_DEBUG is set but the binary was "
+                        "compiled with DISABLE_GC_DEBUG.");
 #endif
-                    setopt(PARROT_GC_DEBUG_FLAG);
-                    break;
+                setopt(PARROT_GC_DEBUG_FLAG);
+                break;
             case OPT_DESTROY_FLAG:
                 setopt(PARROT_DESTROY_FLAG);
                 break;
 
             default:
                 fatal(1, "main", "Invalid flag '%s' used."
-                        "\n\nhelp: imcc -h\n", (*argv)[0]);
-	}
+                        "\n\nhelp: parrot -h\n", (*argv)[0]);
+        }
     }
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
@@ -429,16 +446,18 @@ int main(int argc, char * argv[])
         if (ext && strcmp (ext, ".pbc") == 0) {
             write_pbc = 1;
         }
-#if EXEC_CAPABLE
         else if (ext && strcmp (ext, ".o") == 0) {
+#if EXEC_CAPABLE
             load_pbc = 1;
             write_pbc = 0;
             run_pbc = 1;
             obj_file = 1;
             Parrot_setup_opt(interpreter, 0, output);
-            Parrot_setflag(interpreter, PARROT_EXEC_FLAG, ext);
-        }
+            Parrot_set_run_core(interpreter, PARROT_EXEC_CORE);
+#else
+            fatal(1, "main", "can't produce object file");
 #endif
+        }
         if (!strcmp(sourcefile, output) && strcmp(sourcefile, "-"))
             fatal(1, "main", "outputfile is sourcefile\n");
     }

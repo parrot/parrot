@@ -29,8 +29,6 @@
 
 #define ATEXIT_DESTROY
 
-#define PARROT_CGP_FLAG   (PARROT_PREDEREF_FLAG | PARROT_CGOTO_FLAG)
-
 #if EXEC_CAPABLE
 struct Parrot_Interp interpre;
 #endif
@@ -73,7 +71,8 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
 
         switch (opinfo->types[i]) {
         case PARROT_ARG_OP:
-            pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[arg];
+            if (prederef_op_func)
+                pc_prederef[i] = (void *)(ptrcast_t)prederef_op_func[arg];
             break;
 
         case PARROT_ARG_KI:
@@ -142,9 +141,12 @@ prederef(void **pc_prederef, struct Parrot_Interp *interpreter)
         }
 
         if (pc_prederef[i] == 0) {
-            internal_exception(INTERP_ERROR,
+            if (prederef_op_func || i) {
+                /* switched core has no func_table, so a NULL op is ok */
+                internal_exception(INTERP_ERROR,
                     "Prederef generated a NULL pointer for arg of type %d!\n",
                     opinfo->types[i]);
+            }
         }
     }
 
@@ -168,20 +170,20 @@ fill_prederef(struct Parrot_Interp *interpreter, int which,
     for (i = 0; i < N; ) {
         is_ret = 0;
         switch (which) {
-            case PARROT_EXEC_FLAG:
+            case PARROT_EXEC_CORE:
                 if (*temp)
                     is_ret = 1;
                 break;
         }
         prederef(temp, interpreter);
         switch (which) {
-            case PARROT_SWITCH_FLAG:
+            case PARROT_SWITCH_CORE:
                 *temp = (void**) *pc;
                 break;
-            case PARROT_CGP_FLAG:
+            case PARROT_CGP_CORE:
                 *temp = ((void**)(prederef_op_func)) [*pc];
                 break;
-            case PARROT_EXEC_FLAG:
+            case PARROT_EXEC_CORE:
                 if (is_ret)
                     *temp = (void *)(ptrcast_t)prederef_op_func[2];
                 else
@@ -205,16 +207,22 @@ get_op_lib_init(int core_op, int which, PMC *lib)
     oplib_init_f init_func = (oplib_init_f)NULL;
     if (core_op) {
         switch (which) {
-            case PARROT_SWITCH_FLAG:
-            case PARROT_PREDEREF_FLAG:
+            case PARROT_SWITCH_CORE:
+                init_func = PARROT_CORE_SWITCH_OPLIB_INIT;
+                break;
+            case PARROT_PREDEREF_CORE:
                 init_func = PARROT_CORE_PREDEREF_OPLIB_INIT;
                 break;
 #ifdef HAVE_COMPUTED_GOTO
-            case PARROT_CGP_FLAG:
+            case PARROT_CGP_CORE:
                 init_func = PARROT_CORE_CGP_OPLIB_INIT;
                 break;
+            case PARROT_CGOTO_CORE:
+                init_func = PARROT_CORE_CG_OPLIB_INIT;
+                break;
 #endif
-            case NO_FLAGS:      /* normal func core */
+            case PARROT_SLOW_CORE:      /* normal func core */
+            case PARROT_FAST_CORE:      /* normal func core */
                 init_func = PARROT_CORE_OPLIB_INIT;
                 break;
         }
@@ -266,7 +274,7 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
                 N * sizeof(void *));
 #endif
 
-        if (which == PARROT_PREDEREF_FLAG) {
+        if (which == PARROT_PREDEREF_CORE) {
             for (i = 0; i < N; i++) {
                 temp[i] = (void *)(ptrcast_t)prederef;
             }
@@ -275,7 +283,7 @@ init_prederef(struct Parrot_Interp *interpreter, int which)
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
 
-        if (which != PARROT_PREDEREF_FLAG)
+        if (which != PARROT_PREDEREF_CORE)
             fill_prederef(interpreter, which, N, temp);
     }
 }
@@ -303,10 +311,11 @@ stop_prederef(struct Parrot_Interp *interpreter)
 void
 exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 {
-    int which = 0;
+    int which = PARROT_PREDEREF_CORE;
 #if HAVE_COMPUTED_GOTO
-    which = PARROT_CGOTO_FLAG | PARROT_PREDEREF_FLAG;
+    which = PARROT_CGP_CORE;
 #endif
+    /* XXX do we need to prederef if no CGP is available */
     load_prederef(interpreter, which);
 
     if (!interpreter->prederef_code) {
@@ -318,7 +327,7 @@ exec_init_prederef(struct Parrot_Interp *interpreter, void *prederef_arena)
 
         interpreter->prederef_code = temp;
         interpreter->code->cur_cs->prederef_code = temp;
-        fill_prederef(interpreter, PARROT_EXEC_FLAG, N, temp);
+        fill_prederef(interpreter, PARROT_EXEC_CORE, N, temp);
     }
 }
 #endif
@@ -341,7 +350,7 @@ init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
-    init_prederef(interpreter, PARROT_CGP_FLAG);
+    init_prederef(interpreter, PARROT_CGP_CORE);
 #      endif
 #    endif
 #  endif
@@ -357,12 +366,18 @@ init_jit(struct Parrot_Interp *interpreter, opcode_t *pc)
 void
 prepare_for_run(Parrot_Interp interpreter)
 {
-    if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG))
-        (void) init_jit(interpreter, interpreter->code->byte_code);
-    else if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG))
-        init_prederef(interpreter, PARROT_SWITCH_FLAG);
-    else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG))
-        init_prederef(interpreter, interpreter->flags &PARROT_RUN_CORE_FLAGS);
+    switch (interpreter->run_core) {
+        case PARROT_JIT_CORE:
+            (void) init_jit(interpreter, interpreter->code->byte_code);
+            break;
+        case PARROT_PREDEREF_CORE:
+        case PARROT_SWITCH_CORE:
+        case PARROT_CGP_CORE:
+            init_prederef(interpreter, interpreter->run_core);
+            break;
+        default:
+            break;
+    }
 }
 
 static opcode_t *
@@ -390,15 +405,15 @@ runops_exec(struct Parrot_Interp *interpreter, opcode_t *pc)
 #  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
 #    ifdef __GNUC__
 #      ifdef PARROT_I386
-    init_prederef(interpreter, PARROT_CGP_FLAG);
+    init_prederef(interpreter, PARROT_CGP_CORE);
 #      endif
 #    endif
 #  endif
     if (Parrot_exec_run == 2) {
         Parrot_exec_run = 0;
-        Interp_flags_CLEAR(interpreter, PARROT_EXEC_FLAG);
+        Interp_core_SET(interpreter, PARROT_JIT_CORE);
         runops_jit(interpreter, pc);
-        Interp_flags_SET(interpreter, PARROT_EXEC_FLAG);
+        Interp_core_SET(interpreter, PARROT_EXEC_CORE);
     }
     else if (Parrot_exec_run == 1) {
         Parrot_exec(interpreter, pc, code_start, code_end);
@@ -435,7 +450,7 @@ runops_prederef(struct Parrot_Interp *interpreter, opcode_t *pc)
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
 
-    init_prederef(interpreter, PARROT_PREDEREF_FLAG);
+    init_prederef(interpreter, PARROT_PREDEREF_CORE);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
 
     while (pc_prederef) {
@@ -454,7 +469,7 @@ runops_cgp(struct Parrot_Interp *interpreter, opcode_t *pc)
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, PARROT_CGP_FLAG);
+    init_prederef(interpreter, PARROT_CGP_CORE);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = cgp_core((opcode_t*)pc_prederef, interpreter);
     return pc;
@@ -471,7 +486,7 @@ runops_switch(struct Parrot_Interp *interpreter, opcode_t *pc)
 {
     opcode_t *code_start = (opcode_t *)interpreter->code->byte_code;
     void **pc_prederef;
-    init_prederef(interpreter, PARROT_SWITCH_FLAG);
+    init_prederef(interpreter, PARROT_SWITCH_CORE);
     pc_prederef = interpreter->prederef_code + (pc - code_start);
     pc = switch_core((opcode_t*)pc_prederef, interpreter);
     return pc;
@@ -500,62 +515,60 @@ runops_int(struct Parrot_Interp *interpreter, size_t offset)
         interpreter->lo_var_ptr = (void *)&lo_var_ptr;
         interpreter->resume_offset = 0;
         interpreter->resume_flag = 0;
+        switch (interpreter->run_core) {
+            case PARROT_SLOW_CORE:
 
-        slow = Interp_flags_TEST(interpreter, (PARROT_BOUNDS_FLAG |
-                    PARROT_PROFILE_FLAG |
-                    PARROT_TRACE_FLAG));
+                core = runops_slow_core;
 
-        if (slow) {
-            core = runops_slow_core;
-
-            if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
-                if (interpreter->profile == NULL) {
-                    interpreter->profile = (RunProfile *)
-                        mem_sys_allocate(sizeof(RunProfile));
-                    interpreter->profile->data = (ProfData *)
-                        mem_sys_allocate_zeroed((interpreter->op_count +
-                                    PARROT_PROF_EXTRA) * sizeof(ProfData));
+                if (Interp_flags_TEST(interpreter, PARROT_PROFILE_FLAG)) {
+                    if (interpreter->profile == NULL) {
+                        interpreter->profile = (RunProfile *)
+                            mem_sys_allocate(sizeof(RunProfile));
+                        interpreter->profile->data = (ProfData *)
+                            mem_sys_allocate_zeroed((interpreter->op_count +
+                                        PARROT_PROF_EXTRA) * sizeof(ProfData));
+                    }
                 }
-            }
-        }
-        /* CGOTO is set per default, so test other cores first */
-        else if (Interp_flags_TEST(interpreter, PARROT_SWITCH_FLAG)) {
-            core = runops_switch;
-        }
-        else if (Interp_flags_TEST(interpreter, PARROT_PREDEREF_FLAG)) {
-            if  (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG))
-                core = runops_cgp;
-            else
-                core = runops_prederef;
-        }
-        else if (Interp_flags_TEST(interpreter, PARROT_JIT_FLAG)) {
-#if !JIT_CAPABLE
-            internal_exception(JIT_UNAVAILABLE,
-                    "Error: PARROT_JIT_FLAG is set, "
-                    "but interpreter is not JIT_CAPABLE!\n");
-#endif
-            core = runops_jit;
-        }
-        else if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
-#if !EXEC_CAPABLE
-            internal_exception(EXEC_UNAVAILABLE,
-                    "Error: PARROT_EXEC_FLAG is set, "
-                    "but interpreter is not EXEC_CAPABLE!\n");
-#endif
-            core = runops_exec;
-        }
-        else if (Interp_flags_TEST(interpreter, PARROT_CGOTO_FLAG)) {
-            core = runops_cgoto_core;
-            /* clear stacktop, it gets set in runops_cgoto_core beyond the
-             * opfunc table again, if the compiler supports nested funcs
-             */
-/* #ifdef HAVE_NESTED_FUNC */
+                break;
+            case PARROT_FAST_CORE:
+                core = runops_fast_core;
+                break;
+            case PARROT_CGOTO_CORE:
+                core = runops_cgoto_core;
+                /* clear stacktop, it gets set in runops_cgoto_core beyond the
+                 * opfunc table again, if the compiler supports nested funcs
+                 */
+                /* #ifdef HAVE_NESTED_FUNC */
 #ifdef __GNUC__
-            interpreter->lo_var_ptr = 0;
+                interpreter->lo_var_ptr = 0;
 #endif
+                break;
+            case PARROT_CGP_CORE:
+                core = runops_cgp;
+                break;
+            case PARROT_SWITCH_CORE:
+                core = runops_switch;
+                break;
+            case PARROT_PREDEREF_CORE:
+                core = runops_prederef;
+                break;
+            case PARROT_JIT_CORE:
+#if !JIT_CAPABLE
+                internal_exception(JIT_UNAVAILABLE,
+                        "Error: PARROT_JIT_FLAG is set, "
+                        "but interpreter is not JIT_CAPABLE!\n");
+#endif
+                core = runops_jit;
+                break;
+            case PARROT_EXEC_CORE:
+#if !EXEC_CAPABLE
+                internal_exception(EXEC_UNAVAILABLE,
+                        "Error: PARROT_EXEC_FLAG is set, "
+                        "but interpreter is not EXEC_CAPABLE!\n");
+#endif
+                core = runops_exec;
+                break;
         }
-        else
-            core = runops_fast_core;
 
 
         /* run it finally */

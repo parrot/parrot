@@ -215,8 +215,10 @@ dest2offset(Parrot_Interp interpreter, opcode_t *dest)
     /* translate an absolute location in byte_code to an offset
      * used for resuming after an exception had occured
      */
-    switch (interpreter->flags) {
-        case PARROT_PREDEREF_FLAG:
+    switch (interpreter->run_core) {
+        case PARROT_PREDEREF_CORE:
+        case PARROT_SWITCH_CORE:
+        case PARROT_CGP_CORE:
             offset = (void **)dest - interpreter->prederef_code;
         default:
             offset = dest - interpreter->code->byte_code;

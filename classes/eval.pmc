@@ -31,7 +31,7 @@ pmclass Eval extends Closure {
 	    SUPER(next);	/* invoke on Sub returns the address */
 #if EXEC_CAPABLE
 	extern int Parrot_exec_run;
-	if (Interp_flags_TEST(interpreter, PARROT_EXEC_FLAG)) {
+	if (Interp_core_TEST(interpreter, PARROT_EXEC_CORE)) {
 	    Parrot_exec_run = 2;
 	}
 #endif
