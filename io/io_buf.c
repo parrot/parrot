@@ -62,9 +62,6 @@ size_t PIO_buf_writethru(theINTERP, ParrotIOLayer *layer,
 size_t PIO_buf_readthru(theINTERP, ParrotIOLayer *layer,
                            ParrotIO *io, void *buffer, size_t len);
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 /* XXX: This is not portable */
 #define IS_EOL(c) ((*c) == '\n')
 
@@ -292,7 +289,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (b->flags & PIO_BF_READBUF) {
         size_t avail = b->endb - b->next;
 
-        current = MIN(avail, len);
+        current = avail < len ? avail : len;
         memcpy(out_buf, b->next, current);
         b->next += current;
 
@@ -323,7 +320,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
         got = PIO_buf_fill_readbuf(interpreter, l, io, b);
 
-        len = MIN(len, got);
+        len = len < got ? len : got;
     }
 
     /* read from the read_buffer */
