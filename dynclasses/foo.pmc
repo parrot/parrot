@@ -9,7 +9,7 @@
  */
 #define enum_class_Foo -1
 
-pmclass Foo {
+pmclass Foo dynpmc {
 
     STRING* name () {
 	return whoami;

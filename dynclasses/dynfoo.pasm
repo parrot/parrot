@@ -1,0 +1,11 @@
+	load_pmc "foo", P0
+	print "ok 1\n"
+	find_type I0, "Foo"
+	print I0
+	print "\n"
+	new P0, .Foo
+	print "ok 2\n"
+	set I0, P0
+	print I0
+	print "\n"
+	end

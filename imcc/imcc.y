@@ -20,6 +20,7 @@
 #include "imc.h"
 #include "pbc.h"
 #include "parser.h"
+#include "parrot/dynext.h"
 
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
@@ -344,6 +345,12 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         /* mark end as absolute branch */
         if (!strcmp(name, "end")) {
             ins->type |= ITBRANCH | IF_goto;
+        }
+        if (!strcmp(name, "load_pmc")) {
+            SymReg *r0 = r[0];   /* lib name */
+            STRING *lib = string_from_cstring(interpreter, r0->name + 1,
+                strlen(r0->name) - 2);
+            Parrot_load_pmc(interpreter, lib, NULL);
         }
         /* set up branch flags */
         if (op_info->jump) {

@@ -104,7 +104,7 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
             /* put it on the end of the list */
             if (interpreter->mark_ptr)
                 interpreter->mark_ptr->next_for_GC = (PMC *)obj;
-            else 
+            else
                 children = (PMC *)obj;
             /* Explicitly make the tail of the linked list be
              * self-referential */
@@ -293,7 +293,7 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
         pobject_lives(interpreter, (Buffer *)interpreter->current_file);
     if (interpreter->current_package)
         pobject_lives(interpreter, (Buffer *)interpreter->current_package);
-    for (i = 1; i < enum_class_max; i++)
+    for (i = 1; i < (UINTVAL)enum_class_max; i++)
         pobject_lives(interpreter, (Buffer *)Parrot_base_vtables[i].name
                 (interpreter, 0));
 

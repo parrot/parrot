@@ -6,4 +6,24 @@ providing the Foo pmc class.
 2) edit Makefile (or much better provide a script that generates
    a platform independent Makefile ;-)
 
+$ make -s
+$ make shared
 $ make -C dynclasses
+
+3) copy/link your extension to the runtime dir
+
+$ cd runtime/parrot/dynext/
+$ ln -s ../../../dynclasses/foo_pmc.so
+$ cd -
+
+$ ./parrot dynclasses/dynfoo.pasm
+ok 1
+34
+ok 2
+42
+
+4) If anything changes inside parrot don't forget:
+
+$ make -C dynclasses clean
+
+and repeat above steps.

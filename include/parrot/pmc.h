@@ -16,7 +16,9 @@
 #include "parrot/core_pmcs.h"
 #include "parrot/pobj.h"
 
-VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
+#define PARROT_MAX_CLASSES 100
+VAR_SCOPE VTABLE Parrot_base_vtables[PARROT_MAX_CLASSES];
+VAR_SCOPE INTVAL enum_class_max;
 
 
 /* Prototypes */

@@ -33,7 +33,7 @@ END
     print OUT "    enum_class_default,\n";
     print OUT "    enum_class_$_,\n" foreach (@pmcs);
     print OUT <<"END";
-    enum_class_max
+    enum_class_core_max
 };
 
 /* &end_gen */

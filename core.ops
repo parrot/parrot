@@ -2,6 +2,7 @@
 ** core.ops
 */
 
+#include "parrot/dynext.h"
 VERSION = PARROT_VERSION;
 
 =head1 NAME
@@ -899,10 +900,11 @@ Opcodes for interfacing with C functions in shared libraries.
 
 ########################################
 
-=item B<loadext>(in STR, in STR)
+=item B<load_pmc>(in STR, in PMC)
 
-Load in an extension. $1 is the name of the extension library, $2 is the
-initialization routine for it.
+Load in a pmc extension library. $1 is the name of the extension library,
+$2 is an initializer that may have additional information for the PMCs
+in that extension.
 
 =item B<loadlib>(out PMC, in STR)
 
@@ -934,22 +936,10 @@ XXX: leo N/Y
 
 =cut
 
-inline op loadext(in STR, in STR) {
-  void * p;
-  void (*func)(void);
-  string_to_cstring(interpreter, ($2));
-  string_to_cstring(interpreter, ($1));
-  p = Parrot_dlopen($1->strstart);
-  if(p == NULL) {
-     const char * err = Parrot_dlerror();
-     fprintf(stderr, "%s\n", err);
-     PANIC("Failed to load native library");
-  }
-  func = D2FPTR(Parrot_dlsym(p, $2->strstart));
-  if (NULL == func) {
-    PANIC("Failed to find symbol in native library");
-  }
-  (*func)();
+inline op load_pmc(in STR, in PMC) {
+  int err = Parrot_load_pmc(interpreter, $1, $2);
+  if (err)
+      internal_exception(-1, "Failed to load dynamic PMC extension");
   goto NEXT();
 }
 

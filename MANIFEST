@@ -203,7 +203,9 @@ dod.c                                             []
 dotgnu.ops                                        []
 dynclasses/Makefile                               [devel]
 dynclasses/README                                 [devel]
+dynclasses/dynfoo.pasm                            [devel]
 dynclasses/foo.pmc                                [devel]
+dynext.c                                          []
 editor/pasm.el                                    [devel]
 editor/pasm.vim                                   [devel]
 embed.c                                           []
@@ -1289,6 +1291,7 @@ include/parrot/chartype.h                         [devel]include
 include/parrot/datatypes.h                        [devel]include
 include/parrot/debug.h                            [devel]include
 include/parrot/dod.h                              [devel]include
+include/parrot/dynext.h                           [devel]include
 include/parrot/embed.h                            [devel]include
 include/parrot/encoding.h                         [devel]include
 include/parrot/enums.h                            [devel]include

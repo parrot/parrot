@@ -59,7 +59,7 @@ A preamble, consisting of code to be copied directly to the .c file
 
 =item 2.
 
-pmclass PMCNAME [extends PMCNAME] [abstract] [extension] [noinit] {
+pmclass PMCNAME [extends PMCNAME] [abstract] [dynpmc] [noinit] {
 
 =item 3.
 
@@ -587,12 +587,66 @@ void $initname (Interp * interp, int entry) {
         $methodlist
         };
 
-   whoami = string_make(interp,
-       "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
+   if (!whoami)
+       whoami = string_make(interp,
+	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
 
    Parrot_base_vtables[entry] = temp_base_vtable;
    $class_init_code
 }
+EOC
+  }
+
+  if (exists $flags{dynpmc}) {
+      my $lc_classname = lc $classname;
+      $OUT .= <<EOC;
+/*
+ * This init function will be called to setup/init/whatever
+ * is needed to get this extension running
+ */
+#include "parrot/dynext.h"
+
+int Parrot_dynext_${lc_classname}_init(Interp *interp, int action, void *param)
+{
+    dynext_pmc_info_t *info = (dynext_pmc_info_t*) param;
+    int ok;
+    int i;
+
+    /*
+     * These are globals. As the shared lib is linked against libparrot
+     * the shared libs has its own globals, so we must initialize these
+     * yep, that's ugly
+     */
+    for (i = 1; i < *(info->class_max); i++)
+	Parrot_base_vtables[i] = info->base_vtable[i];
+    enum_class_max = *info->class_max;
+    switch (action) {
+	case DYNEXT_SETUP_PMC:
+	    string_init();	/* default type/encoding */
+	    /* one time setup code */
+
+	    /* for all PMCs we want to register:
+	     */
+	    if (!whoami)
+		whoami = string_make(interp,
+		"$classname", @{[length($classname)]}, 0,
+		PObj_constant_FLAG, 0);
+	    info->class_name = whoami;
+	    ok = Parrot_dynext_setup_pmc(interp, info);
+	    $initname(interp, info->class_enum);
+	    /* set our class enum */
+	    Parrot_base_vtables[info->class_enum].base_type = info->class_enum;
+	    /* copy vtable back to caller */
+	    info->base_vtable[info->class_enum] =
+		Parrot_base_vtables[info->class_enum];
+	    return ok;
+	case DYNEXT_INIT_PMC:
+	    /* per interpreter/thread init code */
+	    return Parrot_dynext_init_pmc(interp, info);
+    }
+    return DYNEXT_INIT_ERR;	/* error, unsupported action */
+}
+
 EOC
   }
 
