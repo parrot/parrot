@@ -147,8 +147,8 @@ static void compact_pool(struct Parrot_Interp *interpreter,struct Memory_Pool *p
 
     /* total-reclaimable == currently used. Add a minimum block to the current amount, 
 	 * so we can avoid having to allocate it in the future. */
-    //total_size = pool->total_allocated - pool->reclaimable + pool->minimum_block_size;
-    total_size = pool->total_allocated;
+    total_size = pool->total_allocated - pool->reclaimable + pool->minimum_block_size;
+    /* total_size = pool->total_allocated; */
 	/* TODO: can reduce this by pool->total_reclaimable if we want to be precise */
     /* Snag a block big enough for everything */
     new_block = alloc_new_block(interpreter, total_size, pool);
@@ -205,7 +205,6 @@ static void compact_pool(struct Parrot_Interp *interpreter,struct Memory_Pool *p
             }
         }
     }
-//printf("Total collected %i\n",total);
 
     /* Okay, we're done with the copy. Set the bits in the pool struct */
     /* First, where we allocate next */
