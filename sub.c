@@ -34,8 +34,8 @@ new_sub(struct Parrot_Interp * interp, opcode_t * address)
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub * newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
     newsub->init = address;
-    newsub->user_stack = (struct stack_chunk *)new_stack(interp);
-    newsub->control_stack = (struct stack_chunk *)new_stack(interp);
+    newsub->user_stack = new_stack(interp);
+    newsub->control_stack = new_stack(interp);
     newsub->lex_pad = NULL;
     return newsub;
 }
@@ -49,8 +49,8 @@ new_coroutine(struct Parrot_Interp * interp, opcode_t * address)
         mem_sys_allocate(sizeof(struct Parrot_Coroutine));
     newco->init = address;
     newco->resume = NULL;
-    newco->ctx.user_stack = (struct stack_chunk *)new_stack(interp);
-    newco->ctx.control_stack = (struct stack_chunk *)new_stack(interp);
+    newco->ctx.user_stack = new_stack(interp);
+    newco->ctx.control_stack = new_stack(interp);
     newco->lex_pad = NULL;
     return newco;
 }
