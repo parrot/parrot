@@ -195,13 +195,20 @@ pmclass PerlInt extends perlscalar {
 	FLOATVAL valf;
 	FLOATVAL divf;
 
+        /* TODO: Is this the appropriate way to throw the exception? */
+
 	pmci = SELF->cache.int_val;
 	if (vtype == enum_class_PerlUndef) {
-            VTABLE_set_integer_native(INTERP, dest, pmci);
+            internal_exception(DIV_BY_ZERO, "division by zero!\n");
 	    return;
 	}
 
 	valf = VTABLE_get_number(INTERP, value);
+        if (valf == 0.0) {
+            internal_exception(DIV_BY_ZERO, "division by zero!\n");
+	    return;
+	}
+
 	divf = pmci / valf;
 	if (vtype == enum_class_PerlNum) {
             VTABLE_set_number_native(INTERP, dest, divf);

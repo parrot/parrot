@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 21;
 use Parrot::PMC '%pmc_types';
 my $perlint = $pmc_types{'PerlInt'};
 my $ok = '"ok 1\n"';
@@ -400,6 +400,41 @@ CODE
 6
 3
 1.500000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "division by zero, #1");
+    new P0, .PerlInt
+    new P1, .PerlInt
+    new P2, .PerlUndef
+    set P0, 12
+    set P1, 0
+    div P2, P0, P1
+    end
+CODE
+division by zero!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "division by zero, #2");
+    new P0, .PerlInt
+    new P1, .PerlUndef
+    new P2, .PerlUndef
+    set P0, 12
+    div P2, P0, P1
+    end
+CODE
+division by zero!
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "division by zero, #3");
+    new P0, .PerlInt
+    new P1, .PerlNum
+    new P2, .PerlUndef
+    set P0, 12
+    set P1, 0.0
+    div P2, P0, P1
+    end
+CODE
+division by zero!
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "subtract native integer from PerlInt");
