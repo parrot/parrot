@@ -21,7 +21,7 @@ linux-x86-gcc2.95.2          Y    Y    Y     Y   Y      Y       Y
 linux-x86-gcc3.3.3           Y    Y    Y     Y   Y      Y       Y
 linux-x86-gcc3.3.3 *3        Y    Y    Y     Y   Y      Y       Y*3
 linux-x86-icc8               Y    Y    Y     Y   Y      Y       Y
-netbsd                                                  Y       Y*1
+netbsd                                 Y                Y       Y*1
 openbsd                      Y    Y/5  Y     Y   -      Y       Y
 os2
 solaris8-sparc-cc       B    -    Y/84 -     -   -      Y       Y
