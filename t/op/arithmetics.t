@@ -854,6 +854,7 @@ OK3:    print "ok 3\n"
 NOK4:
         print " not "
 OK4:    print "ok 4\n"
+	end
 CODE
 ok 1
 ok 2
