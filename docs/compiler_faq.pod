@@ -37,9 +37,31 @@ You can also get return value(s):
 
 =head2 How do I generate a method call in PIR?
 
+Similar to function calls, just append C<.> and the method:
+
+  ret_val = some_obj."some_meth"(arg)
+
+The method name may also be a string variable representing a method name:
+
+  .local string m
+  n = "bold"
+  curses_obj.m()
+
 =head2 How do I generate a sub call with a variable-length parameter list in PIR?
 
+Use unprototyped calls and functions and pass as many arguments as you have.
+
 =head2 How to I retrieve the contents of a variable-length parameter list being passed to me?
+
+You can check the passed parameter count in the subroutine with the C<argcP>
+variable. A simpler way is to use the C<foldup> opcode, which creates an array
+of all passed arguments.
+
+=head2 How do I create nested subroutines?
+
+PIR doesn't support nested subroutines. You have to emit subroutines one by
+one. If lexicals of the outer subroutine are visible inside the nested
+sub, you have to include the outer pad depth in C<new_pad> opcodes.
 
 =head1 Variables
 
@@ -48,11 +70,11 @@ You can also get return value(s):
 There are two possible ways.  Either use the special PIR syntax:
 
     $P0 = global "name_of_the_global"
-    
+
 or the C<find_global> op:
 
     find_global $P0, "name_of_the_global"
-    
+
 =head2 How do I use lexical pads to have both a function scope and a global scope?
 
 To create lexical variables, you'll need to keep track of how deeply
@@ -68,7 +90,7 @@ nested each block of code is.  Say you have some HLL code like so:
       $foo = 5     # foo at depth 1
       {
          # depth 2
-         lexical $bar   
+         lexical $bar
          $foo = 7  # also foo at depth 1
          $bar = 2  # bar at depth 2
       }
@@ -84,10 +106,15 @@ its parent block, note its depth, and keep a list of all its lexical
 variables.  At the opening of each block (that has lexical
 variables), emit code to push a lexical pad:
 
-    new_pad 2
+    new_pad n
 
-where C<2> is the lexical depth of the block. At any point that you exit
-a block, you should emit
+where C<n> is the lexical depth of the block. You can also use
+
+    new_pad -1
+
+to create a new pad with a nesting of C<outer + 1>.
+
+At any point that you exit a block, you should emit
 
     pop_pad
 
@@ -135,6 +162,23 @@ Use lexical depth -1:
 
     find_lex $P0, -1, "foo"
 
+=head2 How do I fetch a variable from any nesting depth?
+
+Omit the depth parameter:
+
+    find_lex $P0, "foo"
+
+This finds a C<foo> variable at any depth starting from the top.
+
+=head2 How can I produce more efficient code for lexicals?
+
+Use numeric indices instead of variable names for lexical retrieval. Lexicals
+of one pad depth are numbered from 0..n-1 in the order of their declaration.
+
+    find_lex $P0, -1, 0       # get first lexical from top pad
+    find_lex $P1, -2, 3       # get forth lexical from next inner pad
+    ...
+
 =head1 Modules, Classes, and Objects
 
 =head2 How do I create a module?
@@ -143,20 +187,50 @@ Use lexical depth -1:
 
 With the C<newclass> op:
 
-    newclass $P0, "ClassA"
+    newclass $P0, "Animal"
 
 =head2 How do I add instance methods to a class?
+
+Methods are declared as functions in the class namespace with the
+C<method> keyword appended to the function declaration:
+
+  .namespace [ "Animal" ]
+
+  .sub initialise method
+    setattribute self, ...
+    ...
+  .end
+  .sub run method
+    ...
+  .end
 
 =head2 How do I add instance variables/attributes?
 
 Each class knows what attribute its object can have. You can add
 attributes to a class (not to individual objects) like so:
 
-    addattribute $P0, "shinyness"
+    addattribute $P0, "legs"
 
 =head2 How do I access attributes?
 
+Attributes can be access by a fully qualified name or by index.
+
+  $P0 = getattribute self, "Animal\0legs"
+  assign $P0, 4                   # set attribute's value
+
+or
+
+  .local int offs
+  offs = classoffset "Animal"
+  $I0 = offs + 0                  # 1st attribute
+  $P0 = getattribute self, $I0
+  $I0 = offs + 1                  # 2nd attribute
+  $P0 = getattribute self, $I0
+
 =head2 When should I use properties vs. attributes?
+
+Properties aren't inherited. If you have some additional data that
+don't fit into the classes hierarchy, you could use properties.
 
 =head2 How do I create a class that is a subclass of another class?
 
@@ -164,15 +238,14 @@ You first have to get the class PMC of the class you want to subclass.
 Either you use the PMC returned by the C<newclass> op if you created
 the class, or use the C<getclass> op:
 
-    getclass $P0, "ClassA"
-    
+    getclass $P0, "Animal"
+
 Then you can use the C<subclass> op to create a new class that is a subclass
 of this class:
 
-    subclass $P1, $P0, "classname"
+    subclass $P1, $P0, "Dog"
 
-This stores the newly created class PMC in $P1, but you can use $P0 as the
-first and second argument if you do not need the parent class PMC anymore.
+This stores the newly created class PMC in $P1.
 
 =head2 How do I create a class that has more than one parent class?
 
@@ -185,31 +258,32 @@ Please refer to the next question for an example.
 If you have a class PMC (created with C<newclass> or by C<subclass>), you can
 add more parent classes to it with the C<addparent> op:
 
-    newclass $P0, "Foo" # create a class Foo
-    getclass $P1, "Bar" # get Bar's class PMC
-    addparent $P0, $P1  # make Foo a subclass of Bar
-    getclass $P1, "Qux" # get Qux's class PMC
-    addparent $P0, $P1  # make Foo also a subclass of Qux
-    
-=head2 How do I instantiate a class?
-
-First, you have to retive the type id of class you want to instantiate:
-    
-    find_type $I0, "Foo"
-
-Then, you can create an instance of Foo with the new op:
-    
-    new $P0, $I0    # creates a Foo object and stores it in register $P0
+    getclass $P1, "Dog"
+    subclass $P2, $P1, "SmallDog"
+    getclass $P3, "Pet"
+    addparent $P2, $P3  # make "SmallDog" also a "Pet"
 
 =head2 How can I specify the constructor of a class?
 
 You can specify the constructor method by setting the BUILD property of
 the class PMC:
 
-    newclass $P0, "Foo"         # create a class named Foo
+    newclass $P0, "Dog"         # create a class named Dog
     new $P1, .PerlString        # create a string
     set $P1, "initialise"       # set it to the name of the constructor method
     setprop $P0, "BUILD", $P1   # set the BUILD property
+
+=head2 How do I instantiate a class?
+
+First, you have to retrieve the type id of class you want to instantiate:
+
+    find_type $I0, "Dog"
+
+Then, you can create an instance of Dog with the new op:
+
+    new $P0, $I0    # creates a Dog object and stores it in register $P0
+
+During the C<new> opcode the constructor is called.
 
 =head2 How can I pass arguments to an constructor?
 
@@ -220,7 +294,7 @@ the arguments as key/value pairs:
     new $P0, .PerlHash
     set $P0["greeting"], "hello"
     set $P0["size"], 1.23
-    
+
     find_type $I0, "Alien"
     new $P1, $I0, $P0           # create an Alien object and pass
                                 # the hash to the constructor
