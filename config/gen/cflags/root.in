@@ -5,9 +5,12 @@
 #
 # Note, empty regex/options are just ignored.
 #
-spf_render.c -{-Wformat-nonliteral}   # noisy
-tsq.c -{${optimize}} 		      # never optimize tsq.c!
+src/spf_render.c -{-Wformat-nonliteral}   # noisy
+src/tsq.c        -{${optimize}}           # never optimize tsq.c!
 
 # imcc file settings
-{imcc} -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/ -{-Wformat-nonliteral}
-
+{^imcc/}            -{-Wwrite-strings -Wcast-qual} s/-Wno-unused/-Wunused/
+imcc/instructions.c -{-Wformat-nonliteral} # noisy
+imcc/debug.c        -{-Wformat-nonliteral} # noisy
+imcc/optimizer.c    -{-Wformat-nonliteral} # noisy
+imcc/parser_util.c  -{-Wformat-nonliteral} # noisy

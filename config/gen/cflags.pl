@@ -11,8 +11,6 @@ $description="Generating CFLAGS...";
 sub runstep {
   genfile('config/gen/cflags/root.in',      'CFLAGS',
           commentType => '#');
-  genfile('config/gen/cflags/imcc.in',      'imcc/CFLAGS',
-          commentType => '#');
 
   open(CFLAGS, ">> CFLAGS") or die "open >> CFLAGS: $!";
 
