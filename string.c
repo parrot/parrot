@@ -979,6 +979,11 @@ string_compare(struct Parrot_Interp *interpreter, STRING *s1,
         else if (s2start < s2end)
             cmp = -1;
     }
+    else if (cmp > 0) {
+        cmp = 1;
+    }
+    else
+        cmp = -1;
 
     return cmp;
 }
