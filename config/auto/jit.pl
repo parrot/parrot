@@ -40,7 +40,7 @@ sub runstep {
     ($osname, $cpuarch) = ($cpuarch, "");
   }
 
-  if($osname =~ /darwin/) {
+  if(($osname =~ /darwin/) || ($archname =~ /powerpc/)) {
     $cpuarch = 'ppc';
   }
 
