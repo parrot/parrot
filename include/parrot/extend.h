@@ -44,6 +44,7 @@ typedef const void * Parrot_Const_CharType;
 #endif
 
 Parrot_STRING Parrot_PMC_get_string(Parrot_INTERP, Parrot_PMC);
+void *Parrot_PMC_get_pointer(Parrot_INTERP, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval(Parrot_INTERP, Parrot_PMC);
 Parrot_Int Parrot_PMC_get_intval_intkey(Parrot_INTERP, Parrot_PMC, Parrot_Int);
 Parrot_Float Parrot_PMC_get_numval(Parrot_INTERP, Parrot_PMC);
@@ -51,6 +52,7 @@ char *Parrot_PMC_get_cstring(Parrot_INTERP, Parrot_PMC);
 char *Parrot_PMC_get_cstringn(Parrot_INTERP, Parrot_PMC, Parrot_Int *);
 
 void Parrot_PMC_set_string(Parrot_INTERP, Parrot_PMC, Parrot_STRING);
+void Parrot_PMC_set_pointer(Parrot_INTERP, Parrot_PMC, void *);
 void Parrot_PMC_set_cstring(Parrot_INTERP, Parrot_PMC, const char *);
 void Parrot_PMC_set_cstringn(Parrot_INTERP, Parrot_PMC, const char *, Parrot_Int);
 void Parrot_PMC_set_intval(Parrot_INTERP, Parrot_PMC, Parrot_Int);
