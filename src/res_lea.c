@@ -41,10 +41,10 @@ count.
 void
 Parrot_go_collect(Interp *interpreter)
 {
-    if (interpreter->GC_block_level) {
+    if (interpreter->arena_base->GC_block_level) {
         return;
     }
-    interpreter->collect_runs++;        /* fake it */
+    interpreter->arena_base->collect_runs++;        /* fake it */
 }
 
 /*
