@@ -22,9 +22,9 @@ Outstanding Parrot archicture/design issues/major todos:
   Multiple inheritance (Parrot)
   MMD
   Bound vs Unbound methods
-  Dictionaries with non-string keys
+  "Const"-ness (particularly for dictionaries)
   isinstance VTABLE entry?
-  DOES
+  DOES for dynclasses
   bounds checking
 
 - Sam Ruby

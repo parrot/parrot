@@ -21,7 +21,7 @@ These are the vtable functions for the Python Dictionary class
 #include "parrot/parrot.h"
 #include "pyconsts.h"
 
-STRING * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
+PMC * hash_get_idx(Interp *interpreter, Hash *hash, PMC *key);
 
 /*
 
@@ -37,13 +37,7 @@ Return the hashed value of the object C<value>.
 static size_t
 key_hash_object(Interp *interpreter, Hash *hash, void *value)
 {
-    STRING *s = value;
-
-    if (s->hashval) {
-        return s->hashval ^ hash->seed;
-    }
-
-    return string_hash(interpreter, s) ^ hash->seed;
+    return VTABLE_hash(interpreter, (PMC*)value) ^ hash->seed;
 }
 
 /*
@@ -62,7 +56,7 @@ C<a> is the search key, C<b> is the bucket key.
 static int
 object_compare(Parrot_Interp interp, void *a, void *b)
 {
-    return string_equal(interp, (STRING *)a, (STRING *) b);
+    return !mmd_dispatch_i_pp(interp, (PMC *)a, (PMC *)b, MMD_EQ);
 }
 
 pmclass PyDict extends PyObject need_ext does hash dynpmc group python_group {
@@ -131,16 +125,14 @@ Deletes the element associated with C<*key>.
 */
 
     void delete_keyed(PMC* key) {
-        STRING * sx;
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
         PMC *nextkey = key_next(INTERP, key);
-        sx = key_string(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
+        b = hash_get_bucket(INTERP, h, key);
         if (b == NULL)
                 return;  /* no such key */
         else if (nextkey == NULL)
-            hash_delete(INTERP, h, sx);
+            hash_delete(INTERP, h, key);
         else
             VTABLE_delete_keyed(INTERP, (PMC*)b->value, nextkey);
     }
@@ -170,12 +162,10 @@ Returns whether a key C<*key> exists in the hash.
 */
 
     INTVAL exists_keyed(PMC* key) {
-        STRING * sx;
         Hash * h = (Hash *)PMC_struct_val(SELF);
         HashBucket *b;
         PMC *nextkey = key_next(INTERP, key);
-        sx = key_string(INTERP, key);
-        b = hash_get_bucket(INTERP, h, sx);
+        b = hash_get_bucket(INTERP, h, key);
         if (b == NULL)
             return 0;       /* no such key */
         if (nextkey == NULL)
@@ -270,35 +260,19 @@ Returns the PMC value for the element at C<*key>.
 
     PMC* get_pmc_keyed (PMC* key) {
         PMC* valpmc;
-        STRING* keystr;
         Hash *hash = PMC_struct_val(SELF);
         HashBucket *b;
         PMC* nextkey;
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
-            PMC *ret;
-            STRING *s = hash_get_idx(INTERP, hash, key);
-            if (s->obj.flags & KEY_integer_FLAG) {
-                INTVAL i;
-                ret = pmc_new(INTERP, PyBuiltin_PyInt);
-                i = string_to_int(INTERP, s);
-                VTABLE_set_integer_native(INTERP, ret, i);
-            }
-            else {
-                ret = pmc_new(INTERP, PyBuiltin_PyString);
-                VTABLE_set_string_native(INTERP, ret, s);
-            }
-            return ret;
+            return hash_get_idx(INTERP, hash, key);
         }
 
-        keystr = key_string(INTERP, key);
         b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        keystr);
+                                        key);
         if (b == NULL) {
-            STRING *message = Parrot_sprintf_c(INTERP, "KeyError: %s",
-                string_to_cstring(INTERP, keystr));
             real_exception(INTERP, NULL, E_KeyError,
-                string_to_cstring(INTERP, message));
+                "KeyError: %Ss", VTABLE_get_string(INTERP, key));
         }
         nextkey = key_next(INTERP, key);
         if (!nextkey)
@@ -315,15 +289,9 @@ Returns the PMC value for the element at C<*key>.
 */
 
     PMC* get_pmc_keyed_str (STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        if (b == NULL) {
-            STRING *message = Parrot_sprintf_c(INTERP, "KeyError: %s",
-                string_to_cstring(INTERP, key));
-            real_exception(INTERP, NULL, E_KeyError,
-                string_to_cstring(INTERP, message));
-        }
-        return b->value;
+        PMC *pmckey = pmc_new(INTERP, PyBuiltin_PyString);
+        VTABLE_set_string_native(INTERP, pmckey, key);
+        return VTABLE_get_pmc_keyed(INTERP, SELF, pmckey);
     }
 
 /*
@@ -375,8 +343,8 @@ Returns the big number value for the element at C<*key>.
 */
 
     STRING* get_string_keyed (PMC* key) {
-        PMC* valpmc = VTABLE_get_pmc_keyed(INTERP, SELF, key);
-        return VTABLE_get_string(INTERP, valpmc);
+        PMC *value = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        return VTABLE_get_string(INTERP, value);
     }
 
 /*
@@ -437,9 +405,9 @@ Create a new dictionary from a sequence
 */
 
     void set_integer_keyed (PMC* key, INTVAL value) {
-         PMC *ivalue = pmc_new(INTERP, PyBuiltin_PyInt);
-         VTABLE_set_integer_native(INTERP, ivalue, value);
-         VTABLE_set_pmc_keyed(INTERP, SELF, key, ivalue);
+        PMC *ivalue = pmc_new(INTERP, PyBuiltin_PyInt);
+        VTABLE_set_integer_native(INTERP, ivalue, value);
+        VTABLE_set_pmc_keyed(INTERP, SELF, key, ivalue);
     }
 
 /*
@@ -464,32 +432,18 @@ Check if two dictionaries hold the same keys and values.
         if (VTABLE_elements(INTERP, value) != n)
             return 0;
         for (j = 0; j < n; ++j) {
-            STRING *key = VTABLE_shift_string(INTERP, iter);
+            PMC *key = VTABLE_shift_pmc(INTERP, iter);
             PMC *item1, *item2;
-            if (!VTABLE_exists_keyed_str(INTERP, value, key))
+            if (!VTABLE_exists_keyed(INTERP, value, key))
                 return 0;
-            item1 = SELF.get_pmc_keyed_str(key);
-            item2 = VTABLE_get_pmc_keyed_str(INTERP, value, key);
+            item1 = SELF.get_pmc_keyed(key);
+            item2 = VTABLE_get_pmc_keyed(INTERP, value, key);
             if (item1 == item2)
                 continue;
             if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
                 return 0;
         }
         return 1;
-    }
-
-/*
-
-=item C<INTVAL exists_keyed_str(STRING *key)>
-
-=cut
-
-*/
-
-    INTVAL exists_keyed_str(STRING* key) {
-        HashBucket *b = hash_get_bucket(INTERP, (Hash*) PMC_struct_val(SELF),
-                                        key);
-        return b != NULL;
     }
 
 /*
@@ -501,27 +455,42 @@ Check if two dictionaries hold the same keys and values.
 */
 
     void set_pmc_keyed (PMC* key, PMC* value) {
-        STRING* keystr;
         PMC* nextkey;
         PMC* box;
         PMC* val;
 
         if (!key) return;
-        keystr = key_string(INTERP, key);
 
-        /* XXX: set the integer flat on the keystr itself */
-        keystr->obj.flags &= ~KEY_integer_FLAG;
-        if (key->vtable->base_type == PyBuiltin_PyInt)
-            keystr->obj.flags |= KEY_integer_FLAG;
-        else if (key->vtable->base_type == enum_class_Key)
-            keystr->obj.flags |= (key->obj.flags & KEY_integer_FLAG);
+        if (key->vtable->base_type == enum_class_Key) {
+            PMC *key2;
+            switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+                case KEY_integer_FLAG:
+                    key2 = pmc_new(INTERP, PyBuiltin_PyInt);
+                    VTABLE_set_integer_native(INTERP, key2, PMC_int_val(key));
+                    break;
+                case KEY_number_FLAG:
+                    key2 = pmc_new(INTERP, PyBuiltin_PyFloat);
+                    VTABLE_set_number_native(INTERP, key2, PMC_num_val(key));
+                    break;
+                case KEY_string_FLAG:
+                    key2 = pmc_new(INTERP, PyBuiltin_PyString);
+                    VTABLE_set_string_native(INTERP, key2, PMC_str_val(key));
+                    break;
+                case KEY_pmc_FLAG:
+                    key2 = PMC_pmc_val(SELF);
+                    break;
+                default:
+                    internal_exception(1, "Unknown key type");
+            }
+            key = key2;
+        }
 
         nextkey = key_next(INTERP, key);
         if (nextkey == NULL) {
-            hash_put(INTERP, PMC_struct_val(SELF), keystr, value);
+            hash_put(INTERP, PMC_struct_val(SELF), key, value);
             return;
         }
-        box = SELF.get_pmc_keyed_str(keystr);
+        box = SELF.get_pmc_keyed(key);
         if (box == NULL) {
             /* autovivify an PyDict */
             box = pmc_new(INTERP, DYNSELF.type());
@@ -538,9 +507,9 @@ Check if two dictionaries hold the same keys and values.
 */
 
     void set_string_keyed (PMC* key, STRING* value) {
-         PMC *svalue = pmc_new(INTERP, PyBuiltin_PyString);
-         VTABLE_set_string_native(INTERP, svalue, value);
-         VTABLE_set_pmc_keyed(INTERP, SELF, key, svalue);
+        PMC *svalue = pmc_new(INTERP, PyBuiltin_PyString);
+        VTABLE_set_string_native(INTERP, svalue, value);
+        VTABLE_set_pmc_keyed(INTERP, SELF, key, svalue);
     }
 
 /*

@@ -89,6 +89,24 @@ Return the class of this object.
 
 /*
 
+=item <PMC* get_pmc_keyed(PMC* key)>
+
+Returns the PMC value of the element at index C<key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed (PMC* key) {
+        INTVAL next = VTABLE_get_integer(INTERP, SUPER(key));
+        PMC *res = pmc_new(INTERP, PyBuiltin_PyInt);
+        VTABLE_set_integer_native(INTERP, res, next);
+        return res;
+    }
+
+
+/*
+
 =item C<void* invoke(void*)>
 
 Invoke is not supported by instances.
