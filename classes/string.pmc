@@ -8,7 +8,7 @@ classes/string.pmc - String PMC Class
 
 =head1 DESCRIPTION
 
-C<String> extends C<mmd_default> to provide a string for languages
+C<String> extends C<scalar> to provide a string for languages
 that want a C<string> type without going to an S register. Acts as a
 wrapper for the functions in /src/string.c
 
@@ -22,7 +22,7 @@ wrapper for the functions in /src/string.c
 
 #include "parrot/parrot.h"
 
-pmclass String {
+pmclass String extends scalar {
 
 /*
 
@@ -40,6 +40,25 @@ Initializes the string.
         PObj_custom_mark_SET(SELF);
     }
 
+/*
+
+=item C<PMC* instantiate()>
+
+Create a new Float from the passed in argument. This is a class method,
+arguments are passed according to pdd03.
+
+=cut
+
+*/
+    PMC* instantiate() {
+        int argcP = REG_INT(3);
+        PMC *class = REG_PMC(2);
+        PMC *res = pmc_new(interpreter, class->vtable->base_type);
+        if (argcP)
+            VTABLE_set_string_native(interpreter, res,
+                    VTABLE_get_string(interpreter, REG_PMC(5)));
+        return res;
+    }
 /*
 
 =item C<void mark()>
@@ -267,23 +286,23 @@ the specified C<PMC>.
 /*
 
 =item C<VOID bitwise_or(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_and(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_xor(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_ors(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_ors_str(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_ands(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_ands_str(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_xors(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_xors_str(PMC* value, PMC* dest)>
-=cut
+
 =item C<VOID bitwise_nots(PMC* value)>
 
 These functions perform bitwise operations on entire
@@ -602,17 +621,92 @@ numbers count from the end.
 Returns the C<key>'th character in the string. Negative numbers count
 from the end.
 
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Returns the integer value (ord) at C<*key>.
+
 =cut
 
 */
 
     STRING* get_string_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-        INTVAL k = VTABLE_get_integer(INTERP, key);
+        INTVAL k = key_integer(INTERP, key);
         return string_substr(INTERP, s, k, 1, NULL, 0);
     }
 
+    INTVAL get_integer_keyed(PMC* key) {
+        STRING *s = PMC_str_val(SELF);
+
+        return string_ord(INTERP, s, key_integer(INTERP, key));
+    }
+
 /*
+
+=back
+
+=head2 Iterator Interface
+
+=over 4
+
+=item C<PMC* slice (PMC *key, INTVAL f)>
+
+Return a new iterator for the slice PMC C<key> if f==0.
+
+Return a new pythonic slice if f == 1.
+
+=item C<PMC* get_iter (PMC *key)>
+
+Return a new iterator for this string.
+
+
+=item C<INTVAL elements ()>
+
+Return length of the string.
+
+
+=cut
+
+*/
+
+    INTVAL elements () {
+	return string_length(INTERP, PMC_str_val(SELF));
+    }
+
+    PMC* slice (PMC* key, INTVAL f) {
+        switch (f) {
+            case 0:
+                {
+                    PMC *iter = pmc_new_init(interpreter,
+                            enum_class_Iterator, SELF);
+                    PMC_struct_val(iter) = key;
+                    return iter;
+                }
+            case 1:
+                return Parrot_py_get_slice(INTERP, SELF, key);
+        }
+        internal_exception(1, "PerlString: Unknown slice type");
+        return NULL;
+    }
+
+    PMC* get_iter () {
+	PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, SELF);
+        PMC *key =  pmc_new(interpreter, enum_class_Key);
+        PMC_struct_val(iter) = key;
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+        PMC_int_val(key) = 0;
+        if (!string_length(INTERP, PMC_str_val(SELF)))
+            PMC_int_val(key) = -1;
+        return iter;
+    }
+
+/*
+
+=back
+
+=head2 Freeze/thaw Interface
+
+=over 4
 
 =item C<void freeze(visit_info *info)>
 
@@ -641,6 +735,29 @@ Used to unarchive the string.
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
             PMC_str_val(SELF) = io->vtable->shift_string(INTERP, io);
+    }
+/*
+
+=back
+
+=head2 NCI methods
+
+=over 4
+
+=item C<PMC* lower()>
+
+Downcase this string
+
+=cut
+
+*/
+
+    METHOD PMC* lower() {
+        STRING *s = string_downcase(interpreter, PMC_str_val(SELF));
+        PMC *ret = pmc_new_noinit(interpreter, SELF->vtable->base_type);
+        PMC_str_val(ret) = s;
+        PObj_custom_mark_SET(ret);
+        return ret;
     }
 }
 

@@ -1252,11 +1252,17 @@ output_is(<< 'CODE', << 'OUTPUT', "lower method");
 ##PIR##
 .sub _main @MAIN
     .local pmc pmc1
+    pmc1 = new String
+    pmc1 = "ABCdef\n"
+    $P0 = pmc1."lower"()
+    print $P0
+    # PerlString should inherit the method
     pmc1 = new PerlString
     pmc1 = "ABCdef\n"
     $P0 = pmc1."lower"()
     print $P0
 .end
 CODE
+abcdef
 abcdef
 OUTPUT
