@@ -254,6 +254,7 @@ examples/assembly/mandel.pasm                     [main]doc
 examples/assembly/mops.pasm                       [main]doc
 examples/assembly/mops_p.pasm                     [main]doc
 examples/assembly/ncurses_life.imc		  [main]doc
+examples/assembly/pcre.imc                        [main]doc
 examples/assembly/pmcmops.pasm                    [main]doc
 examples/assembly/queens.pasm                     [main]doc
 examples/assembly/slurp.pasm                      [main]doc

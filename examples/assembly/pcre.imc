@@ -1,0 +1,140 @@
+# experimental string match with pcre
+
+.pcc_sub _main prototyped
+    .param var argv
+
+    .sym string s
+    .sym string pat
+
+    .sym int argc
+    argc = argv
+    if argc < 3 goto usage
+
+    s = argv[1]
+    pat = argv[2]
+    print s
+    print " =~ /"
+    print pat
+    print "/\n"
+
+    .sym var PCRE
+    .sym var COMPILE
+    .sym var EXEC
+    .sym var COPY_SUBSTRING
+
+    # you should have installed that
+    loadlib PCRE, "libpcre"
+
+    # pcre *pcre_compile(const char *pattern, int options,
+    #            const char **errptr, int *erroffset,
+    #            const unsigned char *tableptr
+    dlfunc COMPILE, PCRE, "pcre_compile", "ptiB3P"
+
+    #int pcre_exec(const pcre *code, const pcre_extra *extra,
+    #        const char *subject, int length, int startoffset,
+    #        int options, int *ovector, int ovecsize);
+    dlfunc EXEC, PCRE, "pcre_exec", "ipPtiiipi"
+
+    #int pcre_copy_substring(const char *subject, int *ovector,
+    #        int stringcount, int stringnumber, char *buffer,
+    #        int buffersize);
+    dlfunc COPY_SUBSTRING, PCRE, "pcre_copy_substring", "itpiibi"
+
+
+    .sym var NULL
+    .sym var code
+    .sym string error
+    repeat error, " ", 500	# could be enough
+    .sym int errptr
+    null NULL
+    .pcc_begin prototyped
+    .arg pat
+    .arg 0
+    .arg error
+    .arg errptr
+    .arg NULL
+    .nci_call COMPILE
+    .result code
+    .pcc_end
+
+    .sym int len
+    length len, s
+    .sym var ovector
+    ovector = new ManagedStruct
+    ovector = 80	# 4 * 2 * 10 for 10 result pairs
+
+    .pcc_begin prototyped
+    .arg code		# p code
+    .arg NULL		# P extra
+    .arg s		# t subject
+    .arg len		# i length
+    .arg 0		# i start
+    .arg 0		# i options
+    .arg ovector	# p ovector
+    .arg 10		# i ovecsize
+    .nci_call EXEC
+    .local int ok
+    .result ok
+    .pcc_end
+
+    .local int ovec0s
+    .local int ovec0e
+    # a hackish way to extract string (index is per char)
+    ovec0s = ovector[0]
+    ovec0e = ovector[4]
+
+    if ok <= 0 goto nomatch
+
+    print "ok: "
+    print ok
+    print " from "
+    print ovec0s
+    print " to "
+    print ovec0e
+    $I0 = ovec0e - ovec0s
+    substr $S1, s, ovec0s, $I0
+    print " matched: '"
+    print $S1
+    print "'\n"
+
+no_hack:
+
+    .sym int i
+    i = 0
+    .sym string match
+    repeat match, " ", 500
+loop:
+    .pcc_begin prototyped
+    .arg s
+    .arg ovector
+    .arg ok
+    .arg i
+    .arg match
+    .arg 500
+    .nci_call COPY_SUBSTRING
+    .pcc_end
+    if i goto subp
+    print "all "
+    goto all
+subp:
+    print "("
+    print i
+    print ") "
+all:
+    print "matched: '"
+    print match
+    print "'\n"
+    inc i
+    if i < ok goto loop
+    end
+nomatch:
+    print "no match\n"
+    end
+usage:
+    .sym string prog
+    prog = argv[0]
+    print prog
+    print " string pattern\n"
+    exit 1
+.end
+
