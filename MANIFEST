@@ -168,6 +168,7 @@ config/gen/platform/win32/exec.c                  []
 config/gen/platform/win32/io.h                    []
 config/gen/platform/win32/misc.c                  []
 config/gen/platform/win32/misc.h                  []
+config/gen/platform/win32/signal.c                []
 config/gen/platform/win32/signal.h                []
 config/gen/platform/win32/time.c                  []
 config/init/data.pl                               []
@@ -215,6 +216,7 @@ docs/intro.pod                                    [main]doc
 docs/jit.pod                                      [main]doc
 docs/memory_internals.pod                         [main]doc
 docs/mmd.pod                                      [main]doc
+docs/native_exec.pod                              [main]doc
 docs/overview.pod                                 [main]doc
 docs/parrot.pod                                   [main]doc
 docs/parrotbyte.pod                               [main]doc

@@ -1096,7 +1096,7 @@ exec : $(SRC)/exec_start$(O) $(LIBPARROT)
 	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) $(LIBPARROT) $(C_LIBS)
 
 exec_so : $(SRC)/exec_start$(O) blib/lib/libparrot$(SO)
-	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) -lparrot $(C_LIBS) -pthread
+	$(LINK) ${ld_out}$(EXEC) $(LINKFLAGS) $(EXEC)$(O) $(SRC)/exec_start$(O) -lparrot $(C_LIBS)
 
 ###### OS depend targets ##########
 # libnci.so used by t/pmc/nci.t
@@ -1130,10 +1130,10 @@ hello.pasm:
 	echo  'end' >> hello.pasm
 
 hello.pbc:	hello.pasm
-	parrot -o hello.pbc hello.pasm
+	./parrot -o hello.pbc hello.pasm
 
 hello$(O):	hello.pbc
-	parrot -o hello$(O) hello.pbc
+	./parrot -o hello$(O) hello.pbc
 
 hello:	hello$(O)
 	$(MAKE) EXEC=hello exec
