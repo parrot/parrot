@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 4;
+use TestCompiler tests => 7;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "goto 1");
@@ -80,4 +80,41 @@ FOO:    print "in function\n"
 CODE
 in main
 in function
+OUT
+
+output_is(<<'CODE', <<'OUT', "perlish func label");
+.sub _main::test
+	print "ok 1\n"
+	end
+.end
+
+CODE
+ok 1
+OUT
+
+output_is(<<'CODE', <<'OUT', "perlish func label - .pcc_sub");
+.pcc_sub _main::test prototyped
+	print "ok 1\n"
+	end
+.end
+
+CODE
+ok 1
+OUT
+
+output_is(<<'CODE', <<'OUT', "perlish func label - bsr");
+.sub _main::test
+        bsr _main::sub
+	print "ok 2\n"
+	end
+.end
+.sub _main::sub
+	print "ok 1\n"
+	ret
+.end
+
+
+CODE
+ok 1
+ok 2
 OUT

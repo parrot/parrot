@@ -329,7 +329,7 @@ SP              [ ]
             fataly(1, sourcefile, line, "unknown macro '%s'", yytext);
     }
 
-<emit,INITIAL>{LETTER}{LETTERDIGIT}* {
+<emit,INITIAL>{ID} {
 	if (!is_def) {
 		SymReg *r = find_sym(yytext);
 		if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
