@@ -28,8 +28,7 @@ sub output_is() {
   my $parrotdir = dirname $self->{parrot};
 
   $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-  # Force any tcl tests to run with -G
-  my $args = "-G " . $TEST_PROG_ARGS;
+  my $args = $TEST_PROG_ARGS;
 
   # flatten filenames (don't use directories)
   $lang_f = (File::Spec->splitpath($lang_f))[2];
