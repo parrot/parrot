@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 6;
+use TestCompiler tests => 7;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "eval pasm");
@@ -121,4 +121,24 @@ LAB:
 .end
 CODE
 8
+OUT
+
+output_is(<<'CODE', <<'OUT', "eval - same constants");
+.sub _test
+        print "hello"
+	print "\n"
+	$S0 = 'print "hello"'
+	concat $S0, "\n"
+	concat $S0, 'print "\n"'
+	concat $S0, "\nend\n"
+	compreg $P0, "PASM"
+	compile P0, $P0, $S0
+	invoke
+	print "back\n"
+	end
+.end
+CODE
+hello
+hello
+back
 OUT

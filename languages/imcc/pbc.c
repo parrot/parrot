@@ -56,19 +56,17 @@ struct cs_t {
     struct subs *first;                 /* first sub of code seg */
     struct cs_t *prev;                  /* prev cs */
     struct cs_t *next;                  /* next cs */
+    SymReg * key_consts[HASH_SIZE];     /* cached key constants for this seg */
 };
 
 static struct globals {
-    SymReg * str_consts[HASH_SIZE];
-    SymReg * num_consts[HASH_SIZE];
-    SymReg * key_consts[HASH_SIZE];
     struct cs_t *cs;                     /* current cs */
     struct cs_t *first;                  /* first cs */
     int inter_seg_n;
 } globals;
 
 
-static int add_const_str(struct Parrot_Interp *, char *str, int dup_sym);
+static int add_const_str(struct Parrot_Interp *, char *str);
 
 static void imcc_globals_destroy(int ex, void *param);
 
@@ -97,12 +95,6 @@ static void imcc_globals_destroy(int ex, void *param)
         mem_sys_free(cs);
         cs = prev_cs;
     }
-    h = globals.str_consts;
-    clear_tables(interpreter, h);
-    h = globals.num_consts;
-    clear_tables(interpreter, h);
-    h = globals.key_consts;
-    clear_tables(interpreter, h);
     globals.cs = NULL;
 }
 
@@ -152,8 +144,13 @@ int e_pbc_open(void *param) {
         /* register cleanup code */
         Parrot_on_exit(imcc_globals_destroy, interpreter);
     }
-    cs = mem_sys_allocate(sizeof(struct cs_t));
+    cs = mem_sys_allocate_zeroed(sizeof(struct cs_t));
     cs->prev = globals.cs;
+    /* free previous cached key constants if any */
+    if (globals.cs) {
+        SymReg **h = globals.cs->key_consts;
+        clear_tables(interpreter, h);
+    }
     cs->next = NULL;
     cs->subs = NULL;
     cs->first = NULL;
@@ -276,28 +273,13 @@ static void store_bsr(SymReg * r, int pc, int offset)
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
 }
 
-static void
-store_str_const(Parrot_Interp interpreter, char * str, int idx)
-{
-    SymReg * c;
-    c  = _mk_const(globals.str_consts, str_dup(str), 0);
-    debug(interpreter, DEBUG_PBC_CONST, "store_str #%d »%s«\n", idx, str);
-    c->color = idx;
-}
-
-static void store_num_const(char * str, int idx)
-{
-    SymReg * c;
-    c  = _mk_const(globals.num_consts, str_dup(str), 0);
-    c->color = idx;
-}
-
 static void store_key_const(char * str, int idx)
 {
     SymReg * c;
-    c  = _mk_const(globals.key_consts, str_dup(str), 0);
+    c  = _mk_const(globals.cs->key_consts, str_dup(str), 0);
     c->color = idx;
 }
+
 
 /* find a label in interpreters fixup table
  */
@@ -423,7 +405,7 @@ store_labels(struct Parrot_Interp *interpreter, int *src_lines, int oldsize)
             code_size += 2;
             /* add inter_segment jump */
             r[0] = mk_const(glabel, 'S');
-            r[0]->color = add_const_str(interpreter, glabel, 1);
+            r[0]->color = add_const_str(interpreter, glabel);
             INS(interpreter, "branch_cs", "", r, 1, 0, 1);
         }
     }
@@ -479,6 +461,9 @@ void fixup_bsrs(struct Parrot_Interp *interpreter)
     }
 }
 
+/*
+ * the string can't grow, so its done in place
+ */
 static int unescape(char *string)
 {
     char *start, *p;
@@ -541,14 +526,16 @@ static int unescape(char *string)
     return p - start;
 }
 
-/* add constant string to constants */
+/* add constant string to constant_table */
 static int
-add_const_str(struct Parrot_Interp *interpreter, char *str, int dup_sym) {
+add_const_str(struct Parrot_Interp *interpreter, char *str) {
     int k, l;
-    SymReg * r;
     char *o;
     char *buf = o = str_dup(str);
 
+    /*
+     * TODO strip delimiters in lexer, this needs adjustment in printint strings
+     */
     if (*buf == '"') {
         buf++;
         l = unescape(buf);
@@ -565,19 +552,12 @@ add_const_str(struct Parrot_Interp *interpreter, char *str, int dup_sym) {
         l = unescape(buf);
     }
 
-    if (!dup_sym) {
-        if ( (r = _get_sym(globals.str_consts, buf)) != 0) {
-            free(o);
-            return r->color;
-        }
-    }
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type =
         PFC_STRING;
     interpreter->code->const_table->constants[k]->u.string =
         string_make(interpreter, buf, (UINTVAL) l, NULL,
                 PObj_constant_FLAG, NULL);
-    store_str_const(interpreter, buf, k);
     free(o);
     return k;
 }
@@ -585,17 +565,13 @@ add_const_str(struct Parrot_Interp *interpreter, char *str, int dup_sym) {
 static int
 add_const_num(struct Parrot_Interp *interpreter, char *buf) {
     int k;
-    SymReg * r;
 
-    if ( (r = _get_sym(globals.num_consts, buf)) != 0)
-        return r->color;
     k = PDB_extend_const_table(interpreter);
 
     interpreter->code->const_table->constants[k]->type =
         PFC_NUMBER;
     interpreter->code->const_table->constants[k]->u.number =
         (FLOATVAL)atof(buf);
-    store_num_const(buf, k);
     return k;
 }
 
@@ -603,8 +579,6 @@ static int
 add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
         int offs, int len) {
     int k;
-#if 1
-    /* N/Y */
     char buf[256];
     opcode_t *rc;
     struct PackFile_Constant *pfc;
@@ -633,11 +607,10 @@ add_const_pmc_sub(struct Parrot_Interp *interpreter, SymReg *r,
      * the offset is the index in the constant table of this Sub
      */
     PackFile_FixupTable_new_entry(interpreter, r->name, enum_fixup_sub, k);
-#endif
     return k;
 }
-/* add constant key to constants */
 
+/* add constant key to constant_table */
 static int
 add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
         int size, char *s_key) {
@@ -646,7 +619,7 @@ add_const_key(struct Parrot_Interp *interpreter, opcode_t key[],
     struct PackFile_Constant *pfc;
     opcode_t *rc;
 
-    if ( (r = _get_sym(globals.key_consts, s_key)) != 0)
+    if ( (r = _get_sym(globals.cs->key_consts, s_key)) != 0)
         return r->color;
     pfc = malloc(sizeof(struct PackFile_Constant));
     rc = PackFile_Constant_unpack_key(interpreter,
@@ -765,7 +738,7 @@ static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
                 r->color = atoi(r->name);
             break;
         case 'S':
-            r->color = add_const_str(interpreter, r->name, 0);
+            r->color = add_const_str(interpreter, r->name);
             break;
         case 'N':
             r->color = add_const_num(interpreter, r->name);
