@@ -615,7 +615,9 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     intstack_free(interpreter, interpreter->ctx.intstack);
 
     PIO_destroy(interpreter);
+#ifdef HAS_JIT
     Parrot_destroy_jit(interpreter);
+#endif
 
     mem_sys_free(interpreter);
 }
