@@ -330,7 +330,7 @@ op find_global(out PMC, in PMC, in STR) {
 		    "Global '%Ss' not found\n", $3);
 	}
 	else {
-	    stash = pmc_new(interpreter, enum_class_PerlUndef);
+	    stash = pmc_new(interpreter, enum_class_Undef);
 	    VTABLE_set_pmc_keyed(interpreter, globals, $2, stash);
 	}
     }
@@ -343,7 +343,7 @@ op find_global(out PMC, in PMC, in STR) {
 		    "Global '%Ss' not found\n", $3);
 	}
 	else {
-	    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+	    $1 = pmc_new(interpreter, enum_class_Undef);
 	}
     }
     else {

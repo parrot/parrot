@@ -58,7 +58,7 @@ inline op fdopen(out PMC, in INT, in STR) :filesys_open {
 
   $1 = PIO_fdopen(interpreter, NULL, (PIOHANDLE)$2, mode);
   if (!$1) {
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+    $1 = pmc_new(interpreter, enum_class_Undef);
   }
   /* string_cstring_free(mode); */
   /* TODO all results from string_to_cstring() need freeing
@@ -155,7 +155,7 @@ inline op open(out PMC, in STR, in STR) :filesys_open {
   /* string_cstring_free(mode); */
   /* string_cstring_free(path); */
   if(!$1 || !PMC_struct_val($1)) {
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+    $1 = pmc_new(interpreter, enum_class_Undef);
   }
   goto NEXT();
 }
@@ -169,7 +169,7 @@ inline op open(out PMC, in STR) :filesys_open {
   $1 = PIO_open(interpreter, NULL, path, "+<");
   /* string_cstring_free(path); */
   if(!$1) {
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+    $1 = pmc_new(interpreter, enum_class_Undef);
   }
   goto NEXT();
 }
@@ -526,7 +526,7 @@ op tell(out INT, out INT, in PMC) :base_io {
 op socket(out PMC, in INT, in INT, in INT) :base_network {
   $1 = PIO_socket(interpreter, $2, $3, $4);
   if(!$1) {
-    $1 = pmc_new(interpreter, enum_class_PerlUndef);
+    $1 = pmc_new(interpreter, enum_class_Undef);
   }
   goto NEXT();
 }

@@ -1124,7 +1124,7 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
 	 "Symbol '%s' not found: %s\n", name, err ? err : "unkown reason");
-      $1 = pmc_new(interpreter, enum_class_PerlUndef);
+      $1 = pmc_new(interpreter, enum_class_Undef);
   }
   else {
       $1 = pmc_new(interpreter, enum_class_NCI);
@@ -1142,7 +1142,7 @@ op dlvar (out PMC, in PMC, in STR) {
       const char * err = Parrot_dlerror();
       Parrot_warn(interpreter, PARROT_WARNINGS_UNDEF_FLAG,
 	 "Symbol '%s' not found: %s\n", name, err ? err : "unkown reason");
-      $1 = pmc_new(interpreter, enum_class_PerlUndef);
+      $1 = pmc_new(interpreter, enum_class_Undef);
   }
   else {
       /* At this point we have the symbol's address. We just need to build
