@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Test::More; # Included for skip().
 
 my $fp_equality_macro = <<'ENDOFMACRO';
@@ -456,4 +456,81 @@ CODE
 foo
 foofoo
 OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "cmp");
+	new P1, .PerlString
+	new P2, .PerlString
+
+        set P1, "abc"
+        set P2, "abc"
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+
+        set P1, "abcde"
+        set P2, "abc"
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+ 
+        set P1, "abc"
+        set P2, "abcde"
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+
+        end
+CODE
+0
+1
+-1
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "cmp with PerlInt");
+	new P1, .PerlInt
+	new P2, .PerlString
+        set P2, "10"
+
+# Int. vs Str.
+        set P1, 10
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+
+        set P1, 20
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+ 
+        set P1, 0
+        cmp I0, P1, P2
+        print I0
+        print "\n"
+
+# Str. vs Int. 
+        set P1, 0
+        cmp I0, P2, P1
+        print I0
+        print "\n"
+
+        set P1, 20
+        cmp I0, P2, P1
+        print I0
+        print "\n"
+
+        set P1, 10
+        cmp I0, P2, P1
+        print I0
+        print "\n"
+
+        end
+CODE
+0
+1
+-1
+1
+-1
+0
+OUTPUT
+
 1;
