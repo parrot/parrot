@@ -1,3 +1,4 @@
+	       
 ChangeLog
 Configure.pl
 DEVELOPING
@@ -37,6 +38,8 @@ config/auto/funcptr/test_c.in
 config/auto/gcc.pl
 config/auto/gcc/test_c.in
 config/auto/headers.pl
+config/auto/headers/test_c.in
+config/auto/headers2.pl
 config/auto/jit.pl
 config/auto/pack.pl
 config/auto/sizes.pl
@@ -54,6 +57,10 @@ config/gen/makefiles/miniperl.in
 config/gen/makefiles/root.in
 config/gen/makefiles/scheme.in
 config/gen/platform.pl
+config/gen/platform/ansi.c
+config/gen/platform/ansi.h
+config/gen/platform/darwin.c
+config/gen/platform/darwin.h
 config/gen/platform/generic.c
 config/gen/platform/generic.h
 config/gen/platform/win32.c
@@ -67,6 +74,7 @@ config/init/hints/mswin32.pl
 config/init/hints/os2.pl
 config/init/hints/vms.pl
 config/init/manifest.pl
+config/init/miniparrot.pl
 config/inter/exp.pl
 config/inter/ops.pl
 config/inter/progs.pl
@@ -190,8 +198,8 @@ io.ops
 io/TODO
 io/io.c
 io/io_buf.c
-io/io_unix.c
 io/io_stdio.c
+io/io_unix.c
 io/io_win32.c
 jit.c
 jit/alpha/core.jit
