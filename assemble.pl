@@ -51,21 +51,17 @@ When the Assembler class is separated out, tests can use the Assembler class to
 accept a simple array of instructions and generate bytecode directly from that.
 This should eliminate the intermediary .pasm file and speed things up.
 
-=head2 NEWS
+=head2 Keyed access
 
-Keyed access. We now support the following (tested) code:
+ We now support the following (tested) code:
 
-  new P0, 6 # Index of PerlHash. Clumsy, but necessary until the macro processor
-            # layer is added.
+  new P0, .PerlHash    # (See the discussion of macros above)
   set S0, "one"
-  set_keyed P0[S0],1
-  get_keyed I0,P0[S0]
+  set P0[S0],1
+  set I0,P0[S0]
   print I0
   print "\n"
   end
-
-Local labels. Not supported yet. The macro processor layer probably will do this
-for us, once it's added.
 
 =cut
 
