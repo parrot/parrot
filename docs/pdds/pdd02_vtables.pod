@@ -55,8 +55,8 @@ generally referred to as a PMC, or Perl Magic Cookie. Nothing outside
 the core of perl (in fact, nothing outside the data type's vtable
 routines) should infer anything about a PMC. (hence the Magic part)
 
-The first parameter to all of these should be the destination PMC.  The
-second parameeter should be the current interpreter.
+The first parameter to all of these should be the current interpreter.
+The second parameter should be the destination PMC.
 
 vtables are neat because they decouple the interface and
 implementation of various object functions. This does mean, though,
