@@ -627,7 +627,7 @@ PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
  * Iterate down the stack to the first layer implementing "Write" API
  */
 INTVAL
-PIO_write(theINTERP, PMC *pmc, void *buffer, size_t len)
+PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);

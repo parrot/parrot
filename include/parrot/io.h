@@ -267,7 +267,7 @@ extern PMC *PIO_fdopen(theINTERP, PIOHANDLE, const char *);
 extern INTVAL PIO_close(theINTERP, PMC *);
 extern void PIO_flush(theINTERP, PMC *);
 extern INTVAL PIO_read(theINTERP, PMC *, void *, size_t);
-extern INTVAL PIO_write(theINTERP, PMC *, void *, size_t);
+extern INTVAL PIO_write(theINTERP, PMC *, const void *, size_t);
 extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
 extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
 extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
