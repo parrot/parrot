@@ -28,7 +28,7 @@ use the Parrot Grammar Engine.
     newclass $P0, "PGE::Match"
     addattribute $P0, ".target"            # string to be matched
     addattribute $P0, ".rulecor"           # match coroutine
-    addattribute $P0, ".state"             # result of the match
+    addattribute $P0, ".pos"               # current pos (-1==start, -2==fail)
     addattribute $P0, ".rephash"           # repeats hash (key=groupid)
     addattribute $P0, ".caphash"           # captures hash (key=groupid)
 .end
@@ -144,7 +144,7 @@ the subroutine.
 .sub _init method
     .param string target
     .param pmc rulecor
-    .local pmc state, rephash, caphash
+    .local pmc pos, rephash, caphash
     
     $P0 = new .PerlString                  # set .target
     $P0 = target
@@ -152,10 +152,10 @@ the subroutine.
     setattribute self, $I0, $P0              
     inc $I0                                # set .rulecor
     setattribute self, $I0, rulecor               
-    state = new .PerlInt                   # set .state attribute
-    state = -1
+    pos = new .PerlInt                     # set .pos attribute
+    pos = -1                               
     inc $I0
-    setattribute self, $I0, state         
+    setattribute self, $I0, pos         
     rephash = new .PerlHash                # set .rep hash
     inc $I0
     setattribute self, $I0, rephash
@@ -167,36 +167,35 @@ the subroutine.
 .sub __get_bool method
     classoffset $I0, self, "PGE::Match"
     $I0 += 2
-    getattribute $P0, self, $I0            # ".status"
-    $I1 = $P0
+    getattribute $P0, self, $I0            # ".pos"
+    $I1 = 1
+    if $P0 >= 0 goto bool_return
+    $I1 = 0
+  bool_return:
     .return($I1)
 .end
 
 .sub _next method
     .local pmc target
     .local pmc rulecor
-    .local pmc status
+    .local pmc pos
     .local string target_s
-    .local int target_len
-    .local int pos
+    .local int pos_i
+    .local int lastpos_i
     classoffset $I0, self, "PGE::Match"
     getattribute target, self, $I0         # ".target" string to match
     inc $I0
     getattribute rulecor, self, $I0        # ".rulecor" coroutine
     inc $I0
-    getattribute status, self, $I0         # ".status"
-    if status == 0 goto next_end           # already failed, so fail
-    target_s = target
-    target_len = length target_s
-    pos = 0
-    (pos) = rulecor(self, target_s, pos, target_len) 
-    if pos < 0 goto next_fail
-    status = 1
-    goto next_end
-  next_fail:
-    status = 0
-  next_end:
-    .return(pos)
+    getattribute pos, self, $I0            # ".pos"
+    if pos == -2 goto next_end             # already failed, so fail
+    pos_i = pos                            # where do we start
+    target_s = target                      # what shall we match
+    lastpos_i = length target_s         
+  next_match:
+    (pos_i) = rulecor(self, target_s, pos_i, lastpos_i) 
+    pos = pos_i                            # save .pos
+    .return(pos_i)
 .end
 
 .sub _print method
