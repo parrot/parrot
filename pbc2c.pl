@@ -134,10 +134,6 @@ END_C
 	    my $offset = $1;
 	    $is_branch = 1;
 	}
-       # -lt capturecc
-       if ($src =~ /{{\^\+(.*?)}}/g) {
-           $is_branch = 1;
-       }
 	# relative branch
 	while($src =~ /{{(\-|\+)=(.*?)}}/g){
 	    my $dir = $1;
@@ -222,6 +218,9 @@ int
 main(int argc, char **argv) {
     struct Parrot_Interp *     interpreter;
     struct PackFile *          pf;
+    INTVAL i;
+    PMC *userargv;
+    KEY key;
 
     init_world();
   
@@ -235,7 +234,30 @@ main(int argc, char **argv) {
 	return 1;
     }
     interpreter->code = pf;
-    run_compiled(interpreter, program_code, program_code);
+
+    /* setup P0, stolen from embed.c */
+    userargv = pmc_new(interpreter, enum_class_PerlArray);
+    /* immediately anchor pmc to root set */
+    interpreter->ctx.pmc_reg.registers[0] = userargv;
+
+    key.atom.type = enum_key_int;
+    key.next = NULL;
+
+    for (i = 0; i < argc; i++) {
+        /* Run through argv, adding everything to @ARGS. */
+        STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
+                                  0, BUFFER_external_FLAG, 0);
+
+        if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
+            fprintf(stderr, "\t" INTVAL_FMT ": %s\n", i, argv[i]);
+        }
+
+        key.atom.val.int_val = i;
+        userargv->vtable->set_string_keyed(interpreter, userargv, &key, arg);
+    }
+
+//    runops(interpreter, pf, 0);
+    run_compiled(interpreter, (opcode_t *)program_code, (opcode_t *)program_code);
     exit(0);
 }
 
