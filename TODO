@@ -1,0 +1,4 @@
+grep docs/strings.pod for unimplemented functions and implement them
+Implement transcoding
+Automate string vtable generation
+Implement PMCs (!) [ This isn't actually that bad, just needs thought. ]
