@@ -15,11 +15,14 @@
 
 typedef Parrot_UInt (*Parrot_CharType_Transcoder)(Parrot_UInt c);
 
+/* &gen_from_enum(chartypes.pasm) subst(s/enum_(\w+)/uc($1)/e) */
 enum {
     enum_chartype_usascii,
     enum_chartype_unicode,
     enum_chartype_MAX
 };
+
+/* &end_gen */
 
 struct parrot_chartype_t {
     INTVAL index;

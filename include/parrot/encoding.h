@@ -13,6 +13,7 @@
 #if !defined(PARROT_ENCODING_H_GUARD)
 #define PARROT_ENCODING_H_GUARD
 
+/* &gen_from_enum(encodings.pasm) subst(s/enum_(\w+)/uc($1)/e) */
 enum {
     enum_encoding_singlebyte,
     enum_encoding_utf8,
@@ -20,6 +21,8 @@ enum {
     enum_encoding_utf32,
     enum_encoding_MAX
 };
+
+/* &end_gen */
 
 struct parrot_encoding_t {
     INTVAL index;

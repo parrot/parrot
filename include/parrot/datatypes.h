@@ -15,6 +15,7 @@
 #if !defined(PARROT_DATATYPES_H_GUARD)
 #define PARROT_DATATYPES_H_GUARD
 
+/* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
     enum_type_undef,            /* illegal */
     enum_first_type = -100,
@@ -63,6 +64,8 @@ typedef enum {
     enum_last_type              /* + one */
 
 } PARROT_DATA_TYPES;
+
+/* &end_gen */
 
 #if defined(INSIDE_GLOBAL_SETUP)
 const char *datatype_names[] = {

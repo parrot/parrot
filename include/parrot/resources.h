@@ -70,6 +70,8 @@ struct Stash {
     struct Stash *parent_stash;
 };
 
+/* &gen_from_def(interpinfo.pasm) prefix(INTERPINFO_) */
+
 #define TOTAL_MEM_ALLOC 1
 #define DOD_RUNS 2
 #define COLLECT_RUNS 3
@@ -80,6 +82,8 @@ struct Stash {
 #define HEADER_ALLOCS_SINCE_COLLECT 8
 #define MEM_ALLOCS_SINCE_COLLECT 9
 #define TOTAL_COPIED 10
+
+/* &end_gen */
 
 #endif /* PARROT_RESOURCES_H */
 

@@ -4,6 +4,7 @@
 /* These should be visible to embedders. */
 
 /* Warning flags */
+/* &gen_from_enum(warnings.pasm)  */
 typedef enum {
     PARROT_WARNINGS_ALL_FLAG      = 0xFF,
     PARROT_WARNINGS_NONE_FLAG     = 0x00,
@@ -11,6 +12,8 @@ typedef enum {
     PARROT_WARNINGS_IO_FLAG       = 0x02,
     PARROT_WARNINGS_PLATFORM_FLAG = 0x04
 } Warnings_classes;
+
+/* &end_gen */
 
 #define PARROT_WARNINGS_on(interp, flag) do { \
     (interp)->ctx.warns = buffer_unmake_COW(interp, (interp)->ctx.warns); \

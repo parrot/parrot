@@ -50,9 +50,13 @@
 #  define STDERR_FILENO 2
 #endif
 
+/* &gen_from_def(stdio.pasm) */
+
 #define PIO_STDIN_FILENO 0
 #define PIO_STDOUT_FILENO 1
 #define PIO_STDERR_FILENO 2
+
+/* &end_gen */
 
 #ifndef O_ACCMODE
 #  define O_ACCMODE 0003
@@ -69,12 +73,14 @@
 
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
+/* &gen_from_enum(iotypes.pasm) */
 enum {
     PIO_TYPE_FILE,
     PIO_TYPE_PIPE,
     PIO_TYPE_SOCKET,
     PIO_TYPE_MAX
 };
+/* &end_gen */
 
 /* IO object flags */
 #define PIO_F_READ      00000001

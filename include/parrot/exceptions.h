@@ -23,6 +23,8 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
         do_panic(interpreter, message, __FILE__, __LINE__)
 
 /* Exception Types */
+/* &gen_from_def(except_types.pasm) prefix(EXCEPTION_) */
+
 #define NO_REG_FRAMES 1
 #define SUBSTR_OUT_OF_STRING 1
 #define ORD_OUT_OF_STRING 1
@@ -54,6 +56,10 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 #define ILL_INHERIT 2
 #define NO_PREV_CS 3
 
+/* &end_gen */
+
+/* &gen_from_enum(except_severity.pasm) subst(s/(\w+)/uc($1)/e) */
+
 typedef enum {
     EXCEPT_normal = 0,
     EXCEPT_warning = 1,
@@ -62,6 +68,8 @@ typedef enum {
     EXCEPT_fatal = 4,
     EXCEPT_doomed = 5
 } exception_severity;
+
+/* &end_gen */
 
 /* Right now there's nothing special for the jump buffer, but there might be one later, so we wrap it in a struct so that we can expand it later */
 struct parrot_exception_t {

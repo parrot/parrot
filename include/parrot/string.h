@@ -37,6 +37,9 @@ typedef enum TAIL_flag {
 
 
 /* stringinfo parameters */
+
+/* &gen_from_def(stringinfo.pasm) */
+
 #define STRINGINFO_HEADER   1
 #define STRINGINFO_STRSTART 2
 #define STRINGINFO_BUFLEN   3
@@ -44,6 +47,7 @@ typedef enum TAIL_flag {
 #define STRINGINFO_BUFUSED  5
 #define STRINGINFO_STRLEN   6
 
+/* &end_gen */
 #define STRING struct parrot_string_t
 
 #endif

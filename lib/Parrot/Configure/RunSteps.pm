@@ -23,7 +23,7 @@ use vars qw(@steps);
 	auto/pack.pl
 	auto/format.pl
 	auto/gcc.pl
-	auto/isreg.pl    
+	auto/isreg.pl
 	auto/jit.pl
 	auto/funcptr.pl
 	auto/cgoto.pl
@@ -36,7 +36,8 @@ use vars qw(@steps);
 	gen/myconfig.pl
 	gen/platform.pl
 	gen/libparrot_def.pl
-    gen/core_pmcs.pl
+        gen/core_pmcs.pl
+	gen/parrot_include.pl
 );
 
 sub runsteps {

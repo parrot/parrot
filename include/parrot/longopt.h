@@ -19,10 +19,12 @@
  */
 typedef const char* longopt_string_t;
 
+/* &gen_from_enum(longopt.pasm) subst(s/(\w+)/uc($1)/e) */
 typedef enum {
     OPTION_required_FLAG = 0x1,
     OPTION_optional_FLAG = 0x2
 } OPTION_flags;
+/* &end_gen */
 
 struct longopt_opt_decl {
     int               opt_short;
@@ -42,7 +44,7 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
-int longopt_get(Parrot_Interp, int argc, char* argv[], 
+int longopt_get(Parrot_Interp, int argc, char* argv[],
                 const struct longopt_opt_decl options[],
                 struct longopt_opt_info* info_buf);
 

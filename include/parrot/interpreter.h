@@ -16,6 +16,7 @@
 /* These should be visible to embedders. */
 
 /* General flags */
+/* &gen_from_enum(interpflags.pasm) prefix(INTERPFLAG_) */
 typedef enum {
     NO_FLAGS             = 0x00,
     PARROT_DEBUG_FLAG    = 0x01,  /* We're debugging */
@@ -30,6 +31,8 @@ typedef enum {
     PARROT_SWITCH_FLAG   = 0x200, /* We're using the switched runops */
     PARROT_DESTROY_FLAG  = 0x400  /* the last interpreter shall cleanup */
 } Parrot_Interp_flag;
+
+/* &end_gen */
 
 struct Parrot_Interp;
 
@@ -185,6 +188,8 @@ typedef struct Parrot_Interp {
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
+/* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
+
 #define PARROT_INTSIZE               1
 #define PARROT_FLOATSIZE             2
 #define PARROT_POINTERSIZE           3
@@ -193,6 +198,8 @@ typedef struct Parrot_Interp {
 #define PARROT_OS_VERSION_NUMBER     6
 #define CPU_ARCH                     7
 #define CPU_TYPE                     8
+
+/* &end_gen */
 
 struct Parrot_Interp *make_interpreter(Interp_flags);
 void Parrot_init(Parrot_Interp, void*);

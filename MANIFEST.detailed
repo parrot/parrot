@@ -104,6 +104,7 @@
 []		config/gen/makefiles/scheme.in
 []		config/gen/myconfig.pl
 []		config/gen/myconfig/myconfig.in
+[]		config/gen/parrot_include.pl
 []		config/gen/platform.pl
 []		config/gen/platform/ansi.c
 []		config/gen/platform/ansi.h
@@ -1785,6 +1786,7 @@
 []		res_lea.c
 []		resources.c
 []		runops_cores.c
+[devel]include	runtime/parrot/include/README
 []		rx.c
 []		rx.ops
 []		rxstacks.c
