@@ -198,7 +198,7 @@ C<initializer> if it is supplied, otherwise C<init()> is called.
 
 /*
 
-=item C<PMC* new_extended()>
+=item C<PMC* instantiate()>
 
 Default fallback. Creates a new PMC of the type of the class SELF and
 calls init().
@@ -207,7 +207,7 @@ calls init().
 
 */
 
-    PMC* new_extended() {
+    PMC* instantiate() {
         INTVAL type = SELF->vtable->base_type;
         PMC* ret = pmc_new_noinit(INTERP, type);
         VTABLE_init(INTERP, ret);

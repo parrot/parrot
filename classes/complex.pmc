@@ -196,7 +196,7 @@ pmclass Complex {
 
 /*
 
-=item C<PMC* new_extended()>
+=item C<PMC* instantiate()>
 
 Create a new complex PMC with passed arguments according to pdd03.
 
@@ -204,7 +204,7 @@ Create a new complex PMC with passed arguments according to pdd03.
 
 */
 
-    PMC* new_extended() {
+    PMC* instantiate() {
         PMC *res = pmc_new(interpreter, enum_class_Complex);
         FLOATVAL re = 0.0, im = 0.0;
         int argcI = REG_INT(1);

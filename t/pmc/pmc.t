@@ -2605,11 +2605,11 @@ CODE
 1001
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_extended - no args");
+output_is(<<'CODE', <<'OUTPUT', "instantiate - no args");
     getclass P2, "Integer"
     set I0, 0	# unproto
     set I3, 0	# no P args
-    new_extended P3
+    instantiate P3
     typeof S0, P3
     print S0
     print "\n"

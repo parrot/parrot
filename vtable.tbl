@@ -5,7 +5,7 @@ void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 void init_pmc_props(PMC* initializer, PMC* properties)
-PMC* new_extended()
+PMC* instantiate()
 void morph(INTVAL type)
 void mark()
 void destroy()
@@ -27,6 +27,8 @@ STRING* name()
 PMC* clone()
 
 PMC* find_method(STRING* method_name)
+
+INTVAL hash()
 
 [FETCH]
 INTVAL get_integer()
@@ -162,6 +164,9 @@ void modulus_float(FLOATVAL value, PMC* dest) MMD_MOD_FLOAT
 void cmodulus(PMC* value, PMC* dest)        MMD_CMOD
 void cmodulus_int(INTVAL value, PMC* dest)  MMD_CMOD_INT
 void cmodulus_float(FLOATVAL value, PMC* dest) MMD_CMOD_FLOAT
+
+void pow(PMC* value, PMC* dest)        MMD_POW
+void pow_float(FLOATVAL value, PMC* dest) MMD_POW_FLOAT
 
 void neg(PMC* dest)
 

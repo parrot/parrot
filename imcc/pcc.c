@@ -930,7 +930,7 @@ move_sub:
      * insert a tailcall opcode
      */
     if (tail_call) {
-        if (!(meth_call && strcmp(s0->name, "\"new_extended\"") == 0)) {
+        if (!(meth_call && strcmp(s0->name, "\"instantiate\"") == 0)) {
             insert_tail_call(interp, unit, ins, sub, meth_call, s0);
             return;
         }
@@ -958,16 +958,16 @@ move_sub:
 #endif
 
     /*
-     * special case - new_extended looks like a method call
-     * but is actually the new_extended object constructor opcode that
+     * special case - instantiate looks like a method call
+     * but is actually the instantiate object constructor opcode that
      * takes method-like arguments according to pdd03
      *
      * so convert to opcode and await the returned PMC as P5
      */
-    if (meth_call && strcmp(s0->name, "\"new_extended\"") == 0) {
+    if (meth_call && strcmp(s0->name, "\"instantiate\"") == 0) {
         SymReg *p5 = get_pasm_reg(interp, "P5");
         regs[0] = p5;
-        ins = insINS(interp, unit, ins, "new_extended", regs, 1);
+        ins = insINS(interp, unit, ins, "instantiate", regs, 1);
     }
     else {
         /*

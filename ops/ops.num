@@ -746,7 +746,7 @@ neg_p                           715
 neg_p_p                         716
 new_callback_p_p_p_s            717
 new_callback_p_p_p_sc           718
-new_extended_p                  719
+instantiate_p                   719
 new_p_i                         720
 new_p_i_p                       721
 new_p_i_p_p                     722
@@ -1353,3 +1353,6 @@ xor_i_i_i                      1322
 xor_i_i_ic                     1323
 xor_i_ic_i                     1324
 xor_p_p_p                      1325
+pow_p_p_n                      1326
+pow_p_p_nc                     1327
+pow_p_p_p                      1328

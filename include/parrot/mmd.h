@@ -71,6 +71,8 @@ typedef enum {
         MMD_CMOD,
         MMD_CMOD_INT,
         MMD_CMOD_FLOAT,
+        MMD_POW,
+        MMD_POW_FLOAT,
         MMD_BAND,
         MMD_BAND_INT,
         MMD_BOR,
@@ -99,7 +101,7 @@ typedef enum {
         MMD_SAND,
         MMD_SAND_STR,
         MMD_SXOR,
-        MMD_SXOR_STR,
+        MMD_SXOR_STR,   /* must be last due to init sequence */
 
         MMD_USER_FIRST
 } parrot_mmd_func_enum;

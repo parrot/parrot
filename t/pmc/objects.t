@@ -1655,18 +1655,18 @@ ok 2
 Foo
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_extended");
+output_is(<<'CODE', <<'OUTPUT', "instantiate");
     subclass P2, "Integer", "Foo"
     set I0, 0
     set I3, 1
     new P5, .Integer
     set P5, 42
-    new_extended P1
+    instantiate P1
     print P1
     print "\n"
     end
 .namespace [ "Foo" ]
-.pcc_sub __new_extended:	# create object the hard way
+.pcc_sub __instantiate:	# create object the hard way
     find_type I0, "Foo"
     new P10, I0			# should inspect passed arguments
     classoffset I0, P10, "Foo"	# better should clone the argument
@@ -1679,19 +1679,19 @@ CODE
 42
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "new_extended - PIR");
+output_is(<<'CODE', <<'OUTPUT', "instantiate - PIR");
 ##PIR##
 .sub main @MAIN
     .local pmc cl
     cl = subclass "Integer", "Foo"
     .local pmc i
-    i = cl."new_extended"(42)
+    i = cl."instantiate"(42)
     print i
     print "\n"
 .end
 
 .namespace ["Foo"]
-.sub __new_extended method
+.sub __instantiate method
     .param int val		# in realiter check what is passed
     $I0 = find_type "Foo"
     .local pmc obj

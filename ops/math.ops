@@ -797,12 +797,28 @@ inline op neg(in PMC, in PMC) :base_core {
 
 =item B<pow>(out NUM, in NUM, in NUM)
 
+=item B<pow>(in PMC, in PMC, in PMC)
+
+=item B<pow>(in PMC, in PMC, in NUM)
+
+=item B<pow>(in PMC, in PMC, in INT)
+
 Set $1 to $2 raised to the power $3.
 
 =cut
 
 inline op pow(out NUM, in NUM, in NUM) :base_core {
    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+  goto NEXT();
+}
+
+inline op pow(in PMC, in PMC, in NUM) :base_core {
+  mmd_dispatch_v_pnp(interpreter, $2, $3, $1, MMD_POW_FLOAT);
+  goto NEXT();
+}
+
+inline op pow(in PMC, in PMC, in PMC) :base_core {
+  mmd_dispatch_v_ppp(interpreter, $2, $3, $1, MMD_POW);
   goto NEXT();
 }
 

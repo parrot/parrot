@@ -552,7 +552,7 @@ CODE
 0
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "new_extended, PASM, I");
+output_is(<< 'CODE', << 'OUTPUT', "instantiate, PASM, I");
     set I0, 1
     set I1, 2
     set I2, 0
@@ -561,7 +561,7 @@ output_is(<< 'CODE', << 'OUTPUT', "new_extended, PASM, I");
     set I5, 10
     set I6, 20
     getclass P2, "Complex"
-    new_extended P1
+    instantiate P1
     print P1
     print "\n"
     end
@@ -569,11 +569,11 @@ CODE
 10+20i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, N");
+output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, N");
 ##PIR##
 .sub main
     $P0 = getclass "Complex"
-    $P1 = $P0."new_extended"(2.0, 3.0)
+    $P1 = $P0."instantiate"(2.0, 3.0)
     print $P1
     print "\n"
     end
@@ -582,7 +582,7 @@ CODE
 2+3i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, P");
+output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, P");
 ##PIR##
 .sub main
     $P0 = getclass "Complex"
@@ -590,7 +590,7 @@ output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, P");
     $P1 = 2.0
     $P2 = new Float
     $P2 = 3.0
-    $P1 = $P0."new_extended"($P1, $P2)
+    $P1 = $P0."instantiate"($P1, $P2)
     print $P1
     print "\n"
     end
@@ -599,11 +599,11 @@ CODE
 2+3i
 OUTPUT
 
-output_is(<< 'CODE', << 'OUTPUT', "new_extended, PIR, S");
+output_is(<< 'CODE', << 'OUTPUT', "instantiate, PIR, S");
 ##PIR##
 .sub main
     $P0 = getclass "Complex"
-    $P1 = $P0."new_extended"("2 + 3i")
+    $P1 = $P0."instantiate"("2 + 3i")
     print $P1
     print "\n"
     end
