@@ -517,52 +517,59 @@ END
 
 sub wrap_with_catch {
     my ($block, $catcher) = @_;
-    my $ptmp = gentmp 'PerlUndef';
-    my $died = genlabel 'death';
-    my $endblock = genlabel 'block_end';
+    my $ptmp = newtmp 'PerlInt';
+    my $endblock = genlabel 'end_try';
+    my $try = genlabel 'try';
     code(<<END);
+	$ptmp = 1
+	global "_SV_catch_setup" = $ptmp
 	call __install_catch
-	$ptmp = global "_SV__BANG_"
-	if $ptmp goto $died
-END
-    val_noarg($block);
-    code(<<END);
-# wrap_with_catch
-	goto $endblock
-$died:
+	$ptmp = global "_SV_catch_setup"
+	if $ptmp goto $try
 END
     if ($catcher) {
 	push_scope ;
 	declare_label type => 'break'; # because we're kind of a "given"
+
+	# Set up $! as the topic:
 	my $bang = new P6C::variable name => '$!', type => 'PerlUndef';
 	$bang->{ctx} = new P6C::Context;
 	set_topic $bang;
-	# Set up $! as the topic:
+
 	val_noarg($catcher);
 
-	# If we make it here, the CATCH failed.
-	# XXX: this is a bit of a hack.
+	# If we make it here, the CATCH failed.  Add implicit re-throw.
 	my $ptmp = newtmp 'PerlArray';
 	my $ptmp2 = gentmp 'PerlUndef';
 	code(<<END);
-	call __pop_catch
 # DIE AGAIN!
  	$ptmp = 1
  	$ptmp2 = global "_SV__BANG_"
  	$ptmp\[0] = $ptmp2
  	.arg $ptmp
  	call _die
-	print "ohshit\\n"
-#	goto $endblock
 END
+	# Put in break label after implicit rethrow, but inside CATCH scope.
 	emit_label type => 'break';
 	pop_scope ;
     }
+    # Clean catch => reset exception state
     code(<<END);
 	$ptmp = new PerlUndef
 	global "_SV__BANG_" = $ptmp
-$endblock:
+	goto $endblock
+END
+    
+    code(<<END);
+$try:
+	$ptmp = new PerlUndef
+	global "_SV_catch_setup" = $ptmp
+END
+    val_noarg($block);
+    # Reached end of block => no exception.  Pop the continuation.
+    code(<<END);
 	call __pop_catch
+$endblock:
 END
     return undef;
 }

@@ -47,6 +47,8 @@ sub add_code {
 sub emit {
 
 print <<'END';
+# -*- pasm -*- 
+
 .emit
 
 _time:
@@ -116,7 +118,8 @@ ret
 _die:
     pushp
     pushi
-    # setup $!:
+
+    # setup $!: ####################
     new P0, .PerlString
     restore P3
     set I0, P3
@@ -133,17 +136,19 @@ _die_unknown:
     set P0, "Unknown error."
 _die_loopend:
     store_global P0, "_SV__BANG_"
-    # Look for a CATCH handler:
+
+    # Look for a CATCH handler: ###
     find_global P1, "_AV_catchers"
     set I0, P1
     eq I0, 0, _die_nohandler
 
+    # Remove top catch handler
     dec I0
     set P0, P1[I0]
     set P1, I0
-    store_global P1, "_AV_catchers"
-    callcc P0
-    print "shouldn't be here\n"
+    store_global P1, "_AV_catchers"   
+# Implicitly refers to continuation in P0
+    invoke
 _die_nohandler:
     print P0
     print "\nDied (no handler).\n"
@@ -159,7 +164,7 @@ pushp
 restore P0
 restore P1
 save P1
-call
+invoke
 popp
 ret
 
@@ -175,11 +180,18 @@ __setup:
 __install_catch:
     pushp
     pushi
-    capturecc P0
+    # gross continuation-creating sequence:
+    new P0, .Continuation
+    set_addr I0, __install_catch_endcont
+    set P0, I0
+__install_catch_endcont:
+    find_global P2, "_SV_catch_setup"
+    unless P2, __install_catch_end
     find_global P2, "_AV_catchers"
     set I1, P2
     set P2[I1], P0
     store_global P2, "_AV_catchers"
+__install_catch_end:
     popi
     popp
     ret

@@ -645,19 +645,27 @@ sub do_flatten_array {
 	$offset = 0
 END
     for my $i (0..$#{$vals}) {
-	my $item = $vals->[$i]->val;
-	code(<<END);
+	if ($vals->[$i]->isa('P6C::sv_literal')) {
+	    my $itemval = $vals->[$i]->lval;
+	    code(<<END);
+	$tmp\[$offset] = $itemval
+	$offset = $offset + 1
+END
+	} else {
+	    my $item = $vals->[$i]->val;
+	    code(<<END);
 	$len = $item
 END
-	code(gen_counted_loop($len, <<END));
+	    code(gen_counted_loop($len, <<END));
 	$ptmp = $item\[$len]
 	$tmpindex = $offset + $len
 	$tmp\[$tmpindex] = $ptmp
 END
-	code(<<END);
+	    code(<<END);
 	$len = $item
 	$offset = $offset + $len
 END
+	}
     }
     code("# END array flattening\n");
     return $tmp;
@@ -1033,8 +1041,7 @@ sub val {
 	    my $val = $x->thing->val;
 	    $ret = gentmp 'PerlUndef';
 	    code(<<END);
-	$ret = $val
-	$val = clone $val
+	$ret = clone $val
 	$val = $val $op
 END
 	} else {
@@ -1429,6 +1436,7 @@ package P6C::variable;
 use P6C::IMCC ':all';
 use P6C::Context;
 use P6C::Util qw(is_scalar same_type unimp is_pmc);
+use Data::Dumper;
 
 # XXX: need to redo this when we get globals.
 sub val {
@@ -1494,7 +1502,12 @@ sub assign {
     my $tmpv = $thing->val;
     if ($global) {
 	my $clonev;
-	if (is_scalar($x->type)) {
+	if (is_scalar($x->type)
+	    && !($thing->can('type') && !is_scalar($thing->type))) {
+	    # If $thing is non-scalar and we're assigning to a scalar,
+	    # there's no need to clone (either we'll get something
+	    # like an array-length, or it will become an
+	    # auto-reference).
 	    $clonev = gentmp 'PerlUndef';
 	    code(<<END)
 	$clonev = clone $tmpv
@@ -1507,16 +1520,18 @@ END
 END
 	}
 	return $clonev;	# XXX: is this okay?
+
     } else {
-	if (is_scalar($x->type)) {
-	    code(<<END);
-# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
-	$name = clone $tmpv
-END
-	} else {
-	    # XXX: can't clone arrays!
+	if (is_scalar($x->type) &&
+	    ($thing->can('type') && !is_scalar($thing->type))) {
+	    # assign non-scalar to scalar => no need to clone.
 	    code(<<END);
 	$name = $tmpv
+END
+	} else {
+		code(<<END);
+# ASSIGN TO @{[$x->name(), $global ? " (global)" : ""]}
+	$name = clone $tmpv
 END
 	}
 	return $name;
