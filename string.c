@@ -45,6 +45,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     }
 
     s = mem_sys_allocate(sizeof(STRING)+buflen);
+    s->bufstart = mem_sys_allocate(buflen+1);
     s->encoding = encoding;
     s->flags = flags;
     s->type = type;
@@ -60,7 +61,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
     }
 
     /* Make it null terminate. This will simplify making a native string */
-    s->bufstart[s->bufused]='\0';
+    memset(s->bufstart+s->bufused,0,1);
 
     return s;
 }
@@ -184,7 +185,7 @@ string_transcode(struct Parrot_Interp *interpreter,
 
     dest->bufused = destend - deststart;
     dest->strlen = src->strlen;
-    dest->bufstart[dest->bufused]='\0';
+    memset(dest->bufstart+dest->bufused,0,1);
 
     if (dest_ptr) {
         *dest_ptr = dest;
@@ -225,7 +226,7 @@ string_concat(struct Parrot_Interp *interpreter, const STRING* a,
                             b->bufstart, b->bufused);
             result->strlen = a->strlen + b->strlen;
             result->bufused = a->bufused + b->bufused;
-            result->bufstart[result->bufused]='\0';
+            memset(result->bufstart+result->bufused,0,1);
         }
         else {
             return string_copy(interpreter, a);
@@ -310,7 +311,7 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     mem_sys_memcopy(dest->bufstart, substart, subend - substart);
     dest->bufused = subend - substart;
     dest->strlen = length;
-    dest->bufstart[dest->bufused]='\0';
+    memset(dest->bufstart+dest->bufused,0,1);
 
     if (d != NULL) {
         *d = dest;
@@ -334,7 +335,7 @@ string_chopn(STRING* s, INTVAL n) {
     bufend = s->encoding->skip_backward(bufend, n);
     s->bufused = bufend - bufstart;
     s->strlen = s->strlen - n;
-    s->bufstart[s->bufused] = '\0';
+    memset(s->bufstart+s->bufused,0,1);
     return s;
 }
 

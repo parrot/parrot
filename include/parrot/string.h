@@ -16,6 +16,7 @@
 #include "parrot/parrot.h"
 
 typedef struct {
+    void *bufstart;
     INTVAL buflen;
     INTVAL flags;
     INTVAL bufused;
@@ -23,7 +24,6 @@ typedef struct {
     const ENCODING *encoding;
     const CHARTYPE *type;
     INTVAL language;
-    char bufstart[1];
 } STRING;
 
 
