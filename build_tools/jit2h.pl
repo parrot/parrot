@@ -321,6 +321,14 @@ for ($i = 0; $i < $core_numops; $i++) {
         $precompiled = 1;
         $extern = 1;
         my $opbody = $op->body;
+	# retranslate VTABLE_macro to the expanded form
+	$opbody =~ s/
+	    \bVTABLE_(\w+)
+	    \s*\(
+	    interpreter,\s*
+	    {{\@(\d)}}/
+	    {{\@$2}}->vtable->$1(interpreter, {{\@$2}}/x;
+
         if ($op->full_name eq 'new_p_ic') {
             $jit_func = "Parrot_jit_vtable_newp_ic_op";
             $opbody =~ /vtable->(\w+)/;
