@@ -14,12 +14,12 @@
 
 static CHARTYPE_TRANSCODER
 unicode_transcode_from(const char *from) {
-    return from ? NULL : NULL; /* NOTE: This cheat silences unused var warnings on gcc */
+    return from ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL; /* NOTE: This cheat silences unused var warnings on gcc */
 }
 
 static CHARTYPE_TRANSCODER
 unicode_transcode_to(const char *to) {
-    return to ? NULL : NULL; /* NOTE: This cheat silences unused var warnings on gcc */
+    return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL; /* NOTE: This cheat silences unused var warnings on gcc */
 }
 
 static BOOLVAL
