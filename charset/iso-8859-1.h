@@ -41,10 +41,6 @@ static INTVAL find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL
 static INTVAL is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset);
-static INTVAL is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
-static INTVAL find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset);
-static INTVAL find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset);
 static size_t compute_hash(Interp *interpreter, STRING *source_string);
 CHARSET *Parrot_charset_iso_8859_1_init(Interp *interpreter);
 

@@ -21,21 +21,26 @@ charset functionality for similar charsets like iso-8859-1.
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
 
+#define WHITESPACE 1
+#define WORDCHAR 2
+#define PUNCTUATION 4
+#define DIGIT 8
+
 static const unsigned char typetable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
-    1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 32-47 */
-    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, /* 48-63 */
-    3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, /* 80-95 */
-    3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 0, /* 112-127 */
+    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 32-47 */
+    0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 4, 4, 4, 4, 4, 4, /*48.*/
+    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 2, /* 80-95 */
+    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 0, /* 112-127 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 128-143 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 144-159 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 160-175 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 176-191 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 192-207 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 207-223 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 208-223 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 224-239 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  /* 240-255 */
 };
@@ -44,19 +49,13 @@ INTVAL
 ascii_find_thing(Interp *interpreter, STRING *string, UINTVAL start,
         unsigned char type, const unsigned char *table)
 {
-    INTVAL retval = -1;
-    INTVAL found = 0;
 
     for (; start < string->strlen; start++) {
         if (table[ENCODING_GET_CODEPOINT(interpreter, string, start)] == type) {
-            found = 1;
-            break;
+            return start;
         }
     }
-    if (found) {
-        retval = start;
-    }
-    return retval;
+    return -1;
 }
 
 INTVAL
@@ -251,112 +250,175 @@ cs_rindex(Interp *interpreter, const STRING *source_string,
     return -1;
 }
 
-/* Binary's always valid */
 static UINTVAL
-validate(Interp *interpreter, STRING *source_string)
+validate(Interp *interpreter, STRING *src)
 {
+    UINTVAL codepoint, offset;
+
+    for (offset = 0; offset < string_length(interpreter, src); ++offset) {
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, src, offset);
+        if (codepoint >= 0x80)
+            return 0;
+    }
     return 1;
 }
 
-/* No word chars in binary data */
+
 static INTVAL
 is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return 0;
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    return (typetable[codepoint] & WORDCHAR) ? 1 : 0;
 }
 
 static INTVAL
 find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return -1;
+    return ascii_find_thing(interpreter, source_string, offset, WORDCHAR,
+            typetable);
 }
 
 static INTVAL
 find_not_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return offset;
+    return ascii_find_not_thing(interpreter, source_string, offset, WORDCHAR,
+            typetable);
 }
 
 static INTVAL
 is_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return 0;
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    return (typetable[codepoint] == WHITESPACE);
 }
 
 static INTVAL
 find_whitespace(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return -1;
+    return ascii_find_thing(interpreter, source_string, offset, WHITESPACE,
+            typetable);
 }
 
 static INTVAL
 find_not_whitespace(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
-    return offset;
+    return ascii_find_not_thing(interpreter, source_string, offset,
+            WHITESPACE, typetable);
 }
 
 static INTVAL
 is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return 0;
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    return (typetable[codepoint] & DIGIT) ? 1 : 0;
 }
 
 static INTVAL
 find_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return -1;
+    return ascii_find_thing(interpreter, source_string, offset, DIGIT,
+            typetable);
 }
 
 static INTVAL
 find_not_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return offset;
+    return ascii_find_not_thing(interpreter, source_string, offset, DIGIT,
+            typetable);
 }
 
 static INTVAL
 is_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return 0;
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    return (typetable[codepoint] == PUNCTUATION);
 }
 
 static INTVAL
 find_punctuation(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return -1;
+    return ascii_find_thing(interpreter, source_string, offset, PUNCTUATION,
+            typetable);
 }
 
 static INTVAL
 find_not_punctuation(Interp *interpreter, STRING *source_string,
         UINTVAL offset)
 {
-    return offset;
+    return ascii_find_not_thing(interpreter, source_string, offset,
+            PUNCTUATION, typetable);
 }
 
-static INTVAL
-is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+INTVAL
+ascii_is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return 0;
+    UINTVAL codepoint;
+    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
+    return codepoint == 10;
 }
 
-static INTVAL
-find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+
+INTVAL
+ascii_find_newline(Interp *interpreter, STRING *string, UINTVAL start)
 {
+    for (; start < string->strlen; start++) {
+        if (ENCODING_GET_CODEPOINT(interpreter, string, start) == 10) {
+            return start;
+        }
+    }
     return -1;
 }
 
-static INTVAL
-find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
+INTVAL
+ascii_find_not_newline(Interp *interpreter, STRING *string, UINTVAL start)
 {
-    return offset;
+    for (; start < string->strlen; start++) {
+        if (ENCODING_GET_CODEPOINT(interpreter, string, start) != 10) {
+            return start;
+        }
+    }
+    return -1;
+}
+
+INTVAL
+ascii_find_word_boundary(Interp *interpreter, STRING *string,
+        UINTVAL offset, const unsigned char *table)
+{
+    UINTVAL c, len;
+    int is_wc1, is_wc2;
+
+    len = string->strlen;
+    if (!len)
+        return -1;
+    c = ENCODING_GET_CODEPOINT(interpreter, string, offset);
+    is_wc1 = (table[c] & WORDCHAR) ? 1 : 0;
+    /* begin of string */
+    if (!offset && is_wc1)
+        return 0;
+    for (++offset; offset < len; offset++) {
+        c = ENCODING_GET_CODEPOINT(interpreter, string, offset);
+        is_wc2 = (table[c] & WORDCHAR) ? 1 : 0;
+        if (is_wc1 ^ is_wc2)
+            return offset - 1;
+        is_wc1 = is_wc2;
+    }
+    /* end of string */
+    if (is_wc1 && offset == len)
+        return offset - 1;
+    return -1;
 }
 
 static INTVAL
 find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return -1;
+  return ascii_find_word_boundary(interpreter, source_string,
+          offset, typetable);
 }
-
 static STRING *
 string_from_codepoint(Interp *interpreter, UINTVAL codepoint)
 {
@@ -419,9 +481,9 @@ Parrot_charset_ascii_init(Interp *interpreter)
       is_punctuation,
       find_punctuation,
       find_not_punctuation,
-      is_newline,
-      find_newline,
-      find_not_newline,
+      ascii_is_newline,
+      ascii_find_newline,
+      ascii_find_not_newline,
       find_word_boundary,
       string_from_codepoint,
       compute_hash,

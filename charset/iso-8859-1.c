@@ -23,22 +23,22 @@ static ENCODING *preferred_encoding;
 
 #define WHITESPACE 1
 #define WORDCHAR 2
-#define PUNCTUATION 3
-#define DIGIT 4
+#define PUNCTUATION 4
+#define DIGIT 8
 
 static const unsigned char typetable[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, /* 0-15 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 16-31 */
-    1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 32-47 */
-    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, /* 48-63 */
-    3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, /* 80-95 */
-    3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 0, /* 112-127 */
+    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 32-47 */
+    0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 4, 4, 4, 4, 4, 4, /* 48 */
+    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 64-79 */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 2, /* 80-95 */
+    4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 95-111 */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 0, /* 112-127 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 128-143 */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 144-159 */
-    1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* 160-175 */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, /* 176-191 */
+    1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, /* 160-175 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, /* 176-191 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 192-207 */
     2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, /* 208-223 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* 224-239 */
@@ -274,26 +274,33 @@ cs_rindex(Interp *interpreter, const STRING *source_string,
     return retval;
 }
 
-/* Binary's always valid */
+
 static UINTVAL
-validate(Interp *interpreter, STRING *source_string)
+validate(Interp *interpreter, STRING *src)
 {
+    UINTVAL codepoint, offset;
+
+    for (offset = 0; offset < string_length(interpreter, src); ++offset) {
+        codepoint = ENCODING_GET_CODEPOINT(interpreter, src, offset);
+        if (codepoint >= 0x100)
+            return 0;
+    }
     return 1;
 }
 
-/* No word chars in binary data */
 static INTVAL
 is_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == WORDCHAR);
+    return (typetable[codepoint] & WORDCHAR) ? 1 : 0;
 }
 
 static INTVAL
 find_wordchar(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-    return ascii_find_thing(interpreter, source_string, offset, WORDCHAR, typetable);
+    return ascii_find_thing(interpreter, source_string, offset, WORDCHAR,
+            typetable);
 }
 
 static INTVAL
@@ -331,7 +338,7 @@ is_digit(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
     UINTVAL codepoint;
     codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return (typetable[codepoint] == DIGIT);
+    return (typetable[codepoint] & DIGIT) ? 1 : 0;
 }
 
 static INTVAL
@@ -372,20 +379,6 @@ find_not_punctuation(Interp *interpreter, STRING *source_string,
 }
 
 static INTVAL
-is_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-    UINTVAL codepoint;
-    codepoint = ENCODING_GET_CODEPOINT(interpreter, source_string, offset);
-    return codepoint == 13;
-}
-
-static INTVAL
-find_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
-{
-  return -1;
-}
-
-static INTVAL
 find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
   return offset;
@@ -394,7 +387,8 @@ find_not_newline(Interp *interpreter, STRING *source_string, UINTVAL offset)
 static INTVAL
 find_word_boundary(Interp *interpreter, STRING *source_string, UINTVAL offset)
 {
-  return -1;
+  return ascii_find_word_boundary(interpreter, source_string,
+          offset, typetable);
 }
 
 static STRING *
@@ -460,9 +454,9 @@ Parrot_charset_iso_8859_1_init(Interp *interpreter)
         is_punctuation,
         find_punctuation,
         find_not_punctuation,
-        is_newline,
-        find_newline,
-        find_not_newline,
+        ascii_is_newline,
+        ascii_find_newline,
+        ascii_find_not_newline,
         find_word_boundary,
         string_from_codepoint,
         compute_hash,

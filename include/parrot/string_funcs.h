@@ -102,6 +102,12 @@ void string_upcase_inplace(Interp *, STRING *);
 void string_downcase_inplace(Interp *, STRING *);
 void string_titlecase_inplace(Interp *, STRING *);
 
+INTVAL Parrot_string_is_whitespace(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_is_digit(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_is_wordchar(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_is_punctuation(Interp *, STRING *, INTVAL offset);
+INTVAL Parrot_string_is_newline(Interp *, STRING *, INTVAL offset);
+
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */
 

@@ -16,7 +16,7 @@ Tests charset support.
 
 =cut
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 12;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "basic syntax" );
@@ -91,4 +91,92 @@ output_is( <<'CODE', <<OUTPUT, "titlecase" );
 CODE
 Zaeiou_הצü
 OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "is_whitespace");
+    set S0, "a\t\n \xa0"
+    is_whitespace I0, S0, 0
+    is_whitespace I1, S0, 1
+    is_whitespace I2, S0, 2
+    is_whitespace I3, S0, 3
+    set I4, 4
+    is_whitespace I4, S0, I4
+    print I0
+    print I1
+    print I2
+    print I3
+    print I4
+    print "\n"
+    set S0, ascii:"a\t\n "
+    is_whitespace I0, S0, 0
+    is_whitespace I1, S0, 1
+    is_whitespace I2, S0, 2
+    is_whitespace I3, S0, 3
+    print I0
+    print I1
+    print I2
+    print I3
+    print "\n"
+    end
+CODE
+01111
+0111
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "is_wordchar");
+    set S0, "az019-,._"
+    length I1, S0
+    set I2, 0
+lp:
+    is_wordchar I0, S0, I2
+    print I0
+    inc I2
+    lt I2, I1, lp
+    print "\n"
+    end
+CODE
+111110001
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "is_digit");
+    set S0, "az019-,._"
+    length I1, S0
+    set I2, 0
+lp:
+    is_digit I0, S0, I2
+    print I0
+    inc I2
+    lt I2, I1, lp
+    print "\n"
+    end
+CODE
+001110000
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "is_punctuation");
+    set S0, "az019-,._"
+    length I1, S0
+    set I2, 0
+lp:
+    is_punctuation I0, S0, I2
+    print I0
+    inc I2
+    lt I2, I1, lp
+    print "\n"
+    end
+CODE
+000001110
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "is_newline");
+    set S0, "a\n"
+    is_newline I0, S0, 0
+    print I0
+    is_newline I0, S0, 1
+    print I0
+    print "\n"
+    end
+CODE
+01
+OUTPUT
+
 

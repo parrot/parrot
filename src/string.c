@@ -2503,6 +2503,46 @@ string_increment(Interp *interpreter, const STRING *s)
     return NULL;
 }
 
+INTVAL
+Parrot_string_is_whitespace(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return 0;
+    return CHARSET_IS_WHITESPACE(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_is_digit(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return 0;
+    return CHARSET_IS_DIGIT(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_is_wordchar(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return 0;
+    return CHARSET_IS_WORDCHAR(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_is_punctuation(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return 0;
+    return CHARSET_IS_PUNCTUATION(interpreter, s, offset);
+}
+
+INTVAL
+Parrot_string_is_newline(Interp *interpreter, STRING *s, INTVAL offset)
+{
+    if (!s)
+        return 0;
+    return CHARSET_IS_NEWLINE(interpreter, s, offset);
+}
+
 /*
 
 =back

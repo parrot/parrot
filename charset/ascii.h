@@ -27,6 +27,11 @@ STRING *ascii_get_graphemes(Interp *, STRING *source_string,
         UINTVAL offset, UINTVAL count);
 STRING *ascii_get_graphemes_inplace(Interp *, STRING *source_string,
         STRING *dest_string, UINTVAL offset, UINTVAL count);
+INTVAL ascii_is_newline(Interp *, STRING *source_string, UINTVAL offset);
+INTVAL ascii_find_newline(Interp *, STRING *source_string, UINTVAL offset);
+INTVAL ascii_find_not_newline(Interp *, STRING *source_string, UINTVAL offset);
+INTVAL ascii_find_word_boundary(Interp *, STRING *source_string,
+        UINTVAL offset, const unsigned char *typetable);
 
 static void set_graphemes(Interp *, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string);
 static void to_charset(Interp *, STRING *source_string, CHARSET *new_charset);
@@ -56,10 +61,6 @@ static INTVAL find_not_digit(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL is_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_punctuation(Interp *, STRING *source_string, UINTVAL offset);
 static INTVAL find_not_punctuation(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL is_newline(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_newline(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_not_newline(Interp *, STRING *source_string, UINTVAL offset);
-static INTVAL find_word_boundary(Interp *, STRING *source_string, UINTVAL offset);
 static size_t compute_hash(Interp *, STRING *source_string);
 CHARSET *Parrot_charset_ascii_init(Interp *);
 

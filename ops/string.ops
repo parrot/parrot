@@ -655,6 +655,54 @@ op find_charset(out INT, in STR) :base_core {
   goto NEXT();
 }
 
+=item B<is_whitespace>(out INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of string $2 at offset $3 is whitespace.
+
+=item B<is_wordchar>(out INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of string $2 at offset $3 is a wordchar.
+
+=item B<is_digit>(out INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of string $2 at offset $3 is a digit.
+
+=item B<is_punctuation>(out INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of string $2 at offset $3 is a punctuation char.
+
+=item B<is_newline>(out INT, in STR, in INT)
+
+Set $1 to 1 if the codepoint of string $2 at offset $3 is a newline char.
+
+=cut
+
+op is_whitespace(out INT, in STR, in INT) {
+  $1 = Parrot_string_is_whitespace(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op is_wordchar(out INT, in STR, in INT) {
+  $1 = Parrot_string_is_wordchar(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op is_digit(out INT, in STR, in INT) {
+  $1 = Parrot_string_is_digit(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op is_punctuation(out INT, in STR, in INT) {
+  $1 = Parrot_string_is_punctuation(interpreter, $2, $3);
+  goto NEXT();
+}
+
+op is_newline(out INT, in STR, in INT) {
+  $1 = Parrot_string_is_newline(interpreter, $2, $3);
+  goto NEXT();
+}
+
+
 =back
 
 =head1 COPYRIGHT
