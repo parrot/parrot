@@ -59,7 +59,9 @@ foreach (keys(%real_type)) {
                 
 
 # get opcodes from guts.
-open GUTS, "interp_guts.h";
+open(GUTS, "<interp_guts.h") or
+  open(GUTS, "<../interp_guts.h") or
+  die "Can't get opcodes from guts, $!/$^E";
 my %opcodes;
 while (<GUTS>) {
     next unless /\tx\[(\d+)\] = ([a-z0-9_]+);/;
@@ -68,7 +70,9 @@ while (<GUTS>) {
 close GUTS;
 
 # get opcodes and their arg lists
-open OPCODES, "<opcode_table" or die "Can't get opcode table, $!/$^E";
+open(OPCODES, "<opcode_table") or
+  open(OPCODES, "<../opcode_table") or
+  die "Can't get opcode table, $!/$^E";
 my $opcode_table;
 while (<OPCODES>) {
     $opcode_table .= $_;
