@@ -214,9 +214,9 @@ use Class::Struct P6C::prefix => { qw(name $ args $) };
 
 =item B<context>
 
-A single context operator.
+A single context operator (eg the * in *@arr).
 
-=over 
+=over
 
 =item B<ctx>
 
@@ -236,7 +236,7 @@ use Class::Struct P6C::context => { qw(ctx $ thing $) };
 
 A pair (e.g. C<< a => "pair" >>).
 
-=over 
+=over
 
 =item B<l>, B<r>
 
@@ -490,13 +490,19 @@ use Class::Struct P6C::initializer => { qw(op $ expr $) };
 
 =item B<sub_def>
 
-A subroutine definition or declaration.
+A subroutine definition or declaration. This is created for all of:
+ method X ...
+ sub X ...
+ rule X ...
+
+The sub_def contains only the name and properties; the signature and
+body are stored in a P6C::closure object.
 
 =over
 
 =item B<qual>
 
-Sub scope.
+Sub scope. (my/our/...)
 
 =item B<name>
 
@@ -512,12 +518,16 @@ The closure associated with this name.
 
 =cut
 
-use Class::Struct P6C::sub_def => { qw(qual $ name $ props @ closure $) };
+use Class::Struct P6C::sub_def => { qw(qual $
+                                       name $
+                                       props @
+                                       closure P6C::closure)
+                                  };
 
 =item B<closure>
 
 A closure, which may be either an anonymous function or the parameters
-and body of a named subroutine.
+and body of a named subroutine -- or merely a bare block.
 
 =over
 
@@ -534,7 +544,15 @@ C<...> definitions, or undef for a declaration.
 
 =item B<bare>
 
-FIXME: I don't know.
+True only for bare blocks, eg
+  $x = { print "hi!" }
+or just
+  { print "hi!" }
+
+Appears to be used only to determine that a particular block is an
+anonymous subroutine (Addcontext.pm's is_anon_sub() says that it is an
+anonymous subroutine unless it is marked noreturn, or it is a sub_def,
+or it's both a bare block and in a "last statement" context. Urk?)
 
 =item B<is_rule>
 
