@@ -675,12 +675,10 @@ is the index into the constants table where the constant is located.
 
 sub replace_string_constants {
   my $code = shift;
-  $code =~ s{ ([NU])?
-              (?: "( (?:[^\\"]|(?:\\(?>["tnr\\])))* )" |
-                  '( (?:[^\\']|(?:\\(?>['tnr\\])))* )'
-              )
-            }
-            {constantize_string(defined $2 ? $2 : $3,$1)}egx;
+
+  $code =~ s{([NU])?"(((\\")|[^"])*)"}{constantize_string($2, $1)}egx;
+  $code =~ s{([NU])?'(((\\')|[^'])*)'}{constantize_string($2, $1)}egx;
+
   return $code;
 }
 
@@ -1340,19 +1338,31 @@ constants table.
 
 =cut
 
+my %escape = (
+    'a'  => "\a",
+    'n'  => "\n",
+    'r'  => "\r",
+    't'  => "\t",
+    '\\' => '\\'
+);
+
 sub constantize_string {
     my $s = shift;
     my $p = shift || "";
     my $e = $encodings{$p};
+
+    confess if !defined $s;
+    confess if !defined $e;
+
     $s=~s/\\(0\d*)/chr(oct($1))/eg;
-    # handle \ characters in the constant
-    my %escape = ('a'=>"\a",'n'=>"\n",'r'=>"\r",'t'=>"\t",'\\'=>'\\',);
-    $s=~s/\\([anrt\\])/$escape{$1}/g;
     $s=~s/\\x([0-9a-fA-F]{1,2})/chr(hex($1))/ge;
+    $s=~s/\\([anrt\\])/$escape{$1}/ge;
+
     if(!exists($constants{$s}{s}{$e})) {
 	push(@constants, ['s', $s, $e]);
 	$constants{$s}{s}{$e}=$#constants;
     }
+
     return "[sc:".$constants{$s}{s}{$e}."]";
 }
 
