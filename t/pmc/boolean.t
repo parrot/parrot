@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "Initialization, and integer tests");
@@ -209,6 +209,25 @@ ok 8
 ok 9
 OUTPUT
 
+output_is(<<'CODE', <<'OUTPUT', "neg");
+	new P0, .Boolean
+        set P0, 1
+        neg P0
+        if P0, OK1
+        print "not "
+OK1:    print "ok 1\n"
+
+        set P0, 0
+        neg P0
+        unless P0, OK2
+        print "not "
+OK2:    print "ok 2\n"
+
+        end
+CODE
+ok 1
+ok 2
+OUTPUT
 
 1;
 

@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 84;
+use Parrot::Test tests => 85;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -1980,7 +1980,7 @@ ok 5
 ok 6
 OUTPUT
 
-output_is(<<'CODE', <<OUTPUT, "neg");
+output_is(<<'CODE', <<OUTPUT, "neg_p_p");
       new P0, .PerlInt
       new P1, .PerlInt
 
@@ -2035,6 +2035,26 @@ CODE
 -1.234567
 -25
 12.098765
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "neg_p");
+      new P0, .PerlInt
+      set P0, 12
+      neg P0
+      print P0
+      print "\n"
+
+      new P0, .PerlNum
+      set N0, -12.345678
+      set P0, N0
+      neg P0
+      print P0
+      print "\n"
+
+      end
+CODE
+-12
+12.345678
 OUTPUT
 
 output_is(<<'CODE', <<OUTPUT, "assign Px,Py");
