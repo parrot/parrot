@@ -1351,7 +1351,7 @@ visit_loop_todo_list(Parrot_Interp interpreter, PMC *current,
     List *todo = PMC_data(info->todo);
     PMC *finish_list_pmc;
     int i, n;
-    List *finish_list;
+    List *finish_list = NULL;   /* gcc -O3 warning */
     int thawing;
     int finished_first = 0;
 

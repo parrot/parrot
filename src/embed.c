@@ -215,6 +215,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
         io = stdin;
         /* read 1k at a time */
         program_size = 0;
+        fullname = filename;    /* gcc -O3 warn */
     }
     else {
 
