@@ -203,7 +203,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
     INTVAL program_size, wanted;
     char *program_code;
     struct PackFile *pf;
-    PMC * io = NULL;
+    FILE * io = NULL;
     INTVAL is_mapped = 0;
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     int fd = -1;
@@ -211,7 +211,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
         /* read from STDIN */
-        io = PIO_STDIN(interpreter);
+        io = stdin;
         /* read 1k at a time */
         program_size = 0;
     }
@@ -232,18 +232,12 @@ Parrot_readbc(Interp *interpreter, const char *filename)
         program_size = Parrot_stat_info_intval(interpreter, fs, STAT_FILESIZE);
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
-        io = PIO_open(interpreter, NULL, filename, "<");
+        io = fopen(filename, "rb");
         if (!io) {
             PIO_eprintf(interpreter, "Parrot VM: Can't open %s, code %i.\n",
                     filename, errno);
             return NULL;
         }
-
-#else   /* PARROT_HAS_HEADER_SYSMMAN */
-
-        /* the file wasn't from stdin, and we have mmap available- use it */
-        io = NULL;
-
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
     }
@@ -251,7 +245,7 @@ Parrot_readbc(Interp *interpreter, const char *filename)
 again:
 #endif
     /* if we've opened a file (or stdin) with PIO, read it in */
-    if (io != NULL) {
+    if (io) {
         size_t chunk_size;
         char *cursor;
         INTVAL read_result;
@@ -263,7 +257,7 @@ again:
         cursor = (char *)program_code;
 
         while ((read_result =
-                PIO_read(interpreter, io, cursor, chunk_size)) > 0) {
+                fread(cursor, 1, chunk_size, io)) > 0) {
             program_size += read_result;
             if (program_size == wanted)
                 break;
@@ -285,7 +279,7 @@ again:
                     "Parrot VM: Problem reading packfile from PIO.\n");
             return NULL;
         }
-        PIO_close(interpreter, io);
+        fclose(io);
     }
     else {
         /* if we've gotten here, we opted not to use PIO to read the file.
@@ -308,7 +302,7 @@ again:
                     "Parrot VM: Can't mmap file %s, code %i.\n",
                     filename, errno);
             /* try again, now with IO reading the file */
-            io = PIO_open(interpreter, NULL, filename, "<");
+            io = fopen(filename, "rb");
             if (!io) {
                 PIO_eprintf(interpreter,
                         "Parrot VM: Can't open %s, code %i.\n",
