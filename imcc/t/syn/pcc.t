@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 34;
+use TestCompiler tests => 35;
 
 ##############################
 # Parrot Calling Conventions
@@ -1296,8 +1296,8 @@ OUT
 
 output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 12 args");
 .sub _main
-    P3 = new .PerlArray
-    # call with 11 parameters
+    null P3
+    # call with 12 parameters
     _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12)
     end
 .end
@@ -1308,6 +1308,8 @@ output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 12 args");
     $I0 = P3
     print $I0
     print "\n"
+    print I3
+    print "\n"
     goto return
 p3_is_null:
     print "P3 is NULL\n"
@@ -1316,5 +1318,33 @@ return:
 CODE
 P3 is not NULL
 1
+11
+OUT
+
+output_is(<<'CODE', <<'OUT', "P3 isnt NULL - 13 args");
+.sub _main
+    null P3
+    # call with 13 parameters
+    _foo($P1, $P2, $P3, $P4, $P5, $P6, $P7, $P8, $P9, $P10, $P11, $P12, $P13)
+    end
+.end
+
+.sub _foo
+    isnull P3, p3_is_null
+    print "P3 is not NULL\n"
+    $I0 = P3
+    print $I0
+    print "\n"
+    print I3
+    print "\n"
+    goto return
+p3_is_null:
+    print "P3 is NULL\n"
+return:
+.end
+CODE
+P3 is not NULL
+2
+11
 OUT
 
