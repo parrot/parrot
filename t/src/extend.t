@@ -362,6 +362,7 @@ int main(int argc, char* argv[]) {
 				interpreter->perl_stash->stash_hash, key);
     Parrot_call(interpreter, sub, 0);
     fprintf(stderr, "back\n");
+    fflush(stderr);	/* win32 seems to buffer stderr */
 
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
