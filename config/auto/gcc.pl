@@ -88,7 +88,7 @@ sub runstep {
   }
 
   Configure::Data->set(
-    cc_warn    => "$cc_warn $warns",
+    cc_warn    => "$warns $cc_warn",
     gccversion => $gccversion
   );
 }

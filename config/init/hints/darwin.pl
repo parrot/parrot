@@ -9,5 +9,6 @@ $libs    .= " -ldl ";
 Configure::Data->set(
   ccflags => $ccflags,
   ldflags => $ldflags,
-  cc_warn => " -Wno-shadow "
+  cc_warn => "-Wno-shadow",
+  libs => $libs
 );
