@@ -80,8 +80,8 @@ static int prev_state;
 LETTER          [a-zA-Z_@]
 DIGIT           [0-9]
 DIGITS          {DIGIT}+
-HEX		0x[0-9A-Fa-f]+
-BIN             0b[01]+
+HEX		0[xX][0-9A-Fa-f]+
+BIN             0[bB][01]+
 DOT		[.]
 SIGN            [-+]
 BIGINT          {SIGN}?{DIGITS}"L"
