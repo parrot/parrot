@@ -16,7 +16,7 @@ Tests the object/class subsystem.
 
 =cut
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 21;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "findclass (base class)");
@@ -354,13 +354,14 @@ output_is(<<'CODE', <<'OUTPUT', "set/get object attribs");
     addattribute P1, "i"
     find_type I0, "Foo"
     new P2, I0
+    classoffset I1, P2, "Foo"
 
     new P3, .PerlInt
     set P3, 1024
-    setattribute P2, 2, P3
+    setattribute P2, I1, P3
 
     new P4, .PerlInt
-    getattribute P4, P2, 2
+    getattribute P4, P2, I1
     print P4
     print "\n"
     end
@@ -374,19 +375,21 @@ output_is(<<'CODE', <<'OUTPUT', "set/get multiple object attribs");
     addattribute P1, "j"
     find_type I0, "Foo"
     new P2, I0
+    classoffset I1, P2, "Foo"
 
     new P3, .PerlInt
     set P3, 4201
     new P4, .PerlHash
     set P4["Key"], "Value" 
 
-    setattribute P2, 2, P3
-    setattribute P2, 3, P4
+    setattribute P2, I1, P3
+    add I2, I1, 1
+    setattribute P2, I2, P4
 
-    getattribute P5, P2, 2
+    getattribute P5, P2, I1
     print P5
     print "\n"
-    getattribute P6, P2, 3
+    getattribute P6, P2, I2
     set S0, P6["Key"]
     print S0
     print "\n"
@@ -400,8 +403,11 @@ output_like(<<'CODE', <<'OUTPUT', "setting non-existant attribute");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
+    classoffset I1, P2, "Foo"
+    add I2, I1, 6
+
     new P3, .PerlInt
-    setattribute P2, 8, P3
+    setattribute P2, I2, P3
     end
 CODE
 /No such attribute/
@@ -411,7 +417,10 @@ output_like(<<'CODE', <<'OUTPUT', "getting non-existant attribute");
     newclass P1, "Foo"
     find_type I0, "Foo"
     new P2, I0
-    getattribute P3, P2, 8
+    classoffset I1, P2, "Foo"
+    add I2, I1, 6
+
+    getattribute P3, P2, I2
     end
 CODE
 /No such attribute/
@@ -423,19 +432,21 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values are specific to objects");
     addattribute P1, "i"
     find_type I0, "Foo"
     new P2, I0
+    classoffset I1, P2, "Foo"
     new P3, I0
+    classoffset I2, P3, "Foo"
 
     new P4, .PerlInt
     set P4, 100
-    setattribute P2, 2, P4
+    setattribute P2, I1, P4
     new P5, .PerlString
     set P5, "One hundred"
-    setattribute P3, 2, P5
+    setattribute P3, I2, P5
 
-    getattribute P6, P2, 2
+    getattribute P6, P2, I1
     print P6
     print "\n"
-    getattribute P6, P3, 2
+    getattribute P6, P3, I2
     print P6
     print "\n"
     end
@@ -454,31 +465,35 @@ output_is(<<'CODE', <<'OUTPUT', "attribute values and subclassing");
 
     find_type I0, "Bar"
     new P2, I0
+    classoffset I1, P2, "Foo"
     new P3, I0
+    classoffset I3, P3, "Bar"
  
 # Note that setattribute holds the actual PMC, not a copy, so
 # in this test both attributes get the PMC from P4, and should
 # both have the same value, despite the C<inc>.
     new P4, .PerlInt
     set P4, 10
-    setattribute P2, 2, P4
+    setattribute P2, I1, P4
     inc P4
-    setattribute P2, 3, P4
+    add I2, I1, 1
+    setattribute P2, I2, P4
 
     new P5, .PerlInt
     set P5, 100
-    setattribute P3, 2, P5
+    setattribute P3, I3, P5
     inc P5
-    setattribute P3, 3, P5
+    add I4, I3, 1
+    setattribute P3, I4, P5
 
-    getattribute P6, P2, 2
+    getattribute P6, P2, I1
     bsr l1
-    getattribute P6, P2, 3
+    getattribute P6, P2, I2
     bsr l1
 
-    getattribute P6, P3, 2
+    getattribute P6, P3, I3
     bsr l1
-    getattribute P6, P3, 3
+    getattribute P6, P3, I4
     bsr l1
     branch end
 l1:
@@ -494,15 +509,4 @@ CODE
 101
 OUTPUT
 
-output_is(<<'CODE', <<'OUTPUT', "classoffset (single class)");
-    newclass P1, "Foo"
-    addattribute P1, "i"
-    find_type I0, "Foo"
-    new P2, I0
-    classoffset I1, P2, "Foo"
-    print I1
-    print "\n"
-    end
-CODE
-2
-OUTPUT
+
