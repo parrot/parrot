@@ -6,13 +6,13 @@
 # from: http://www2.hursley.ibm.com/decimal/dectest.html
 
 my ($test, $one, $two, $result, $prec, $round, $maxexp,
-    $extended, $skip ,$op, @conds, $line);
+    $extended, $skip ,$op, @conds, $line, $arrow);
 
 my ($testsrun, $testspass, $testsfail) = (0,0,0);
 $maxexp = 10000;
 while (<>) {
     chomp;
-    next if /^--/;
+    next if /^\s*--/;
     next unless /\S/;
     /^precision:\s+(\d+)/ && do {
 	$precision = $1; next;
@@ -28,7 +28,22 @@ while (<>) {
 	$expskip = 1 if $1 > $maxexp; next;
     };
 
-    ($test, $op, $one, $two,undef, $result, @conds) = split(/\s+/, $_);
+    ($test, $op, $one, $two,$arrow, $result, @conds) = split(/\s+/, $_);
+
+
+    if ($round !~ /^(half_up|half_even|down)$/) {
+	print "$test ok \# skip, $round not available\n";
+	next;
+    }
+
+    if ($op =~ /^(power|rescale)$/) {
+	print "$test ok \# skip, $op not implemented\n";
+	next;
+    }
+
+    if ($two eq '->') { # unary op
+	($two, $result, @conds) = ('0', $arrow, @conds);
+    }
 
     if (!defined($result)) {
 	print "$test skip\n";
