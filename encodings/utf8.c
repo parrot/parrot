@@ -171,7 +171,7 @@ utf8_decode_and_advance(struct string_iterator_t *i)
 static void
 utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
 {
-    const utf8_t *u8ptr = (char *)i->str->strstart;
+    const utf8_t *u8ptr = (utf8_t *)i->str->strstart;
 
     i->charpos = pos;
     while (pos-- > 0) {

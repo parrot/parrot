@@ -109,7 +109,7 @@ dbcs_decode_and_advance(struct string_iterator_t *i)
 static void
 dbcs_set_position(struct string_iterator_t *i, Parrot_Int pos)
 {
-    const byte_t *bptr = (char *)i->str->strstart;
+    const byte_t *bptr = (byte_t *)i->str->strstart;
 
     i->charpos = pos;
     while (pos--) {

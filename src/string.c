@@ -332,32 +332,35 @@ static INTVAL
 string_str_index_multibyte(struct Parrot_Interp *interpreter,
         const STRING *str, const STRING *find, UINTVAL start)
 {
-    const void* const lastmatch = str->encoding->skip_backward(
-            (char*)str->strstart + str->buflen,  find->strlen);
-    const void* const lastfind  = find->encoding->skip_forward(
-            find->strstart, find->strlen);
-    const void* sp;
-    const void* fp;
-    const void* ip;
-    INTVAL pos = start;
+    struct string_iterator_t fp;
+    struct string_iterator_t ip;
+    struct string_iterator_t sp;
+    int match;
+    UINTVAL lastmatch = str->strlen - find->strlen;
 
-    sp = str->encoding->skip_forward(str->strstart, start);
-    while (sp <= lastmatch) {
-        fp = find->strstart;
-        ip = sp;
+    string_iterator_init(&sp, str);
+    string_iterator_init(&fp, find);
+    string_iterator_init(&ip, str);
+    sp.set_position(&sp, start);
+    while (sp.charpos <= lastmatch) {
+        fp.set_position(&fp, 0);
+        /* XXX need a function for this? */
+        ip.charpos = sp.charpos;
+        ip.bytepos = sp.bytepos;
 
-        for (; fp < lastfind; fp = find->encoding->skip_forward(fp, 1),
-                              ip =  str->encoding->skip_forward(ip, 1)) {
-            if (find->encoding->decode(fp) != str->encoding->decode(ip))
+        match = 1;
+        for (; fp.charpos < find->strlen; ) {
+            if (fp.decode_and_advance(&fp) != ip.decode_and_advance(&ip)) {
+                match = 0;
                 break;
+            }
+        }
+        if (match) {
+            return sp.charpos;
         }
 
-        if (fp == lastfind) {
-            return pos;
-        }
-
-        sp = str->encoding->skip_forward(sp, 1);
-        pos++;
+        /* XXX advance-only not yet implemented */
+        sp.decode_and_advance(&sp);
     }
 
     return -1;
@@ -1646,7 +1649,7 @@ string_unpin(struct Parrot_Interp * interpreter, STRING * s) {
 }
 
 void
-string_iterator_init(struct string_iterator_t *i, STRING *s)
+string_iterator_init(struct string_iterator_t *i, const STRING *s)
 {
     i->str = s;
     i->bytepos = 0;
