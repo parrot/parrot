@@ -208,7 +208,7 @@ void *
 build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
                 STRING *signature)
 {
-   
+
     STRING *ns;
     STRING *message;
     char *c;
@@ -225,8 +225,8 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     UNUSED(pmc_nci);
     if (0 == string_length(signature)) return F2DPTR(pcf_v_v);
     $icky_global_bit
- 
- 
+
+
     /*
       These three lines have been added to aid debugging. I want to be able to
       see which signature has an unknown type. I am sure someone can come up
@@ -234,7 +234,7 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
      */
     ns = string_make(interpreter, " is an unknown signature type", 30, NULL, 0, NULL);
     message = string_concat(interpreter, signature, ns, 0);
-   
+
     /*
      * I think there may be memory issues with this but if we get to here we are
      * aborting.
@@ -314,8 +314,14 @@ sub make_arg {
 
 sub set_return_count {
     my ($stack, $int, $string, $pmc, $num) = @_;
+
+    my $pmc_string;
+
+    if( $pmc ) { $pmc_string = "return_data ? $pmc : 0" }
+    else { $pmc_string = 0 }
+
     print NCI <<FOOTER;
-    set_return_val(interpreter, $stack, $int, $string, $pmc, $num);
+    set_return_val(interpreter, $stack, $int, $string, $pmc_string, $num);
     return;
 }
 
