@@ -733,7 +733,6 @@ include_file (char *file_name)
     char *ext;
 
     frame = new_frame();
-    sourcefile = file_name;
 
     file = fopen(file_name, "r");
     if (!file) {
@@ -751,11 +750,15 @@ include_file (char *file_name)
         }
 #endif
         file = fopen(s, "r");
-        sourcefile = s;
         /* free(s); FIXME leak */
+        if (!file)
+            fataly(EX_SOFTWARE, sourcefile, line, strerror(errno));
+        sourcefile = s;
     }
-    if (!file)
-        fataly(EX_SOFTWARE, file_name, line, strerror(errno));
+    else {
+        sourcefile = file_name;
+    }
+
     ext = strrchr(file_name, '.');
     if (ext) {
         if (strcmp (ext, ".pasm") == 0) {

@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 11;
+use TestCompiler tests => 12;
 use Parrot::Config;
 
 my $PARROT = "..$PConfig{slash}parrot$PConfig{exe}";
@@ -324,6 +324,29 @@ sub1
 sub2
 back
 OUT
+
+
+##############################
+# include a non-existent file
+open FOO, ">temp.imc" or die "Cant write temp.imc\n";
+print FOO <<'END_PIR';
+# Including a non-existent file should produce an error
+.include "non_existent.imc"
+# An error should have been raises
+.sub _main
+# dummy, because a main function is expected
+.end
+END_PIR
+close FOO;
+# compile it
+
+use Test::More;
+is(`$PARROT temp.imc 2>&1`, <<OUT, "calling a non-existent file");
+error:imcc:No such file or directory
+in file 'temp.imc' line 2
+OUT
+unlink "temp.pasm";
+
 
 SKIP:
 {
