@@ -15,21 +15,21 @@
 
 #include "parrot/parrot.h"
 
-typedef void (*encoding_to_encoding_t)(Interp* interpreter, STRING *string);
-typedef STRING *(*encoding_copy_to_encoding_t)(Interp* interpreter, STRING *string);
-typedef UINTVAL (*encoding_get_codepoint_t)(Interp* interpreter, const STRING *source_string, UINTVAL offset);
-typedef void (*encoding_set_codepoint_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
-typedef UINTVAL (*encoding_get_byte_t)(Interp* interpreter, const STRING *source_string, UINTVAL offset);
-typedef void (*encoding_set_byte_t)(Interp* interpreter, const STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_codepoints_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_bytes_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_codepoints_inplace_t)(Interp* interpreter, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_bytes_inplace_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
-typedef void (*encoding_set_codepoints_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
-typedef void (*encoding_set_bytes_t)(Interp* interpreter, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
-typedef void (*encoding_become_encoding_t)(Interp* interpreter, STRING *source_string);
-typedef UINTVAL (*encoding_codepoints_t)(Interp* interpreter, STRING *source_string);
-typedef UINTVAL (*encoding_bytes_t)(Interp* interpreter, STRING *source_string);
+typedef void (*encoding_to_encoding_t)(Interp*, STRING *string);
+typedef STRING *(*encoding_copy_to_encoding_t)(Interp*, STRING *string);
+typedef UINTVAL (*encoding_get_codepoint_t)(Interp*, const STRING *source_string, UINTVAL offset);
+typedef void (*encoding_set_codepoint_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL codepoint);
+typedef UINTVAL (*encoding_get_byte_t)(Interp*, const STRING *source_string, UINTVAL offset);
+typedef void (*encoding_set_byte_t)(Interp*, const STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*encoding_get_codepoints_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*encoding_get_bytes_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*encoding_get_codepoints_inplace_t)(Interp*, STRING *source_string, STRING *dest_string, UINTVAL offset, UINTVAL count);
+typedef STRING *(*encoding_get_bytes_inplace_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string);
+typedef void (*encoding_set_codepoints_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
+typedef void (*encoding_set_bytes_t)(Interp*, STRING *source_string, UINTVAL offset, UINTVAL count, STRING *new_bytes);
+typedef void (*encoding_become_encoding_t)(Interp*, STRING *source_string);
+typedef UINTVAL (*encoding_codepoints_t)(Interp*, STRING *source_string);
+typedef UINTVAL (*encoding_bytes_t)(Interp*, STRING *source_string);
 
 struct _encoding {
     const char *name;
@@ -61,14 +61,14 @@ extern ENCODING *Parrot_fixed_8_encoding_ptr;
 #define PARROT_FIXED_8_ENCODING Parrot_fixed_8_encoding_ptr
 #define PARROT_DEFAULT_FOR_UNICODE_ENCODING NULL
 
-ENCODING *Parrot_new_encoding(Interp* interpreter);
-ENCODING *Parrot_load_encoding(Interp* interpreter, const char *encoding_name);
-ENCODING *Parrot_find_encoding(Interp *interpreter, const char *encodingname);
-INTVAL Parrot_register_encoding(Interp *interpreter, const char *encodingname, ENCODING *encoding);
-INTVAL Parrot_make_default_encoding(Interp *interpreter, const char *encodingname, ENCODING *encoding);
-ENCODING *Parrot_default_encoding(Interp *interpreter);
-typedef INTVAL (*encoding_converter_t)(Interp *interpreter, ENCODING *lhs, ENCODING *rhs);
-encoding_converter_t Parrot_find_encoding_converter(Interp *interpreter, ENCODING *lhs, ENCODING *rhs);
+ENCODING *Parrot_new_encoding(Interp*);
+ENCODING *Parrot_load_encoding(Interp*, const char *encoding_name);
+ENCODING *Parrot_find_encoding(Interp *, const char *encodingname);
+INTVAL Parrot_register_encoding(Interp *, const char *encodingname, ENCODING *encoding);
+INTVAL Parrot_make_default_encoding(Interp *, const char *encodingname, ENCODING *encoding);
+ENCODING *Parrot_default_encoding(Interp *);
+typedef INTVAL (*encoding_converter_t)(Interp *, ENCODING *lhs, ENCODING *rhs);
+encoding_converter_t Parrot_find_encoding_converter(Interp *, ENCODING *lhs, ENCODING *rhs);
 
 
 #define ENCODING_MAX_BYTES_PER_CODEPOINT(interp, source) ((ENCODING *)source->encoding)->max_bytes_per_codepoint

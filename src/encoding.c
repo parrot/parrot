@@ -22,23 +22,32 @@ ENCODING *Parrot_fixed_8_encoding_ptr;
    encodings and such for strings if we can't be sure we've got enough
    info set up to actually build strings... */
 
-ENCODING *Parrot_new_encoding(Interp *interpreter) {
-  return mem_sys_allocate(sizeof(ENCODING));
+ENCODING *
+Parrot_new_encoding(Interp *interpreter)
+{
+    return mem_sys_allocate(sizeof(ENCODING));
 }
 
-ENCODING *Parrot_find_encoding(Interp *interpreter, const char *encodingname) {
+ENCODING *
+Parrot_find_encoding(Interp *interpreter, const char *encodingname)
+{
     if (!strcmp("fixed_8", encodingname)) {
         return Parrot_fixed_8_encoding_ptr;
     }
     return NULL;
 }
 
-ENCODING *Parrot_load_encoding(Interp *interpreter, const char *encodingname) {
+ENCODING *
+Parrot_load_encoding(Interp *interpreter, const char *encodingname)
+{
     internal_exception(UNIMPLEMENTED, "Can't load encodings yet");
     return NULL;
 }
 
-INTVAL Parrot_register_encoding(Interp *interpreter, const char *encodingname, ENCODING *encoding) {
+INTVAL
+Parrot_register_encoding(Interp *interpreter, const char *encodingname,
+        ENCODING *encoding)
+{
     if (!strcmp("fixed_8", encodingname)) {
         Parrot_fixed_8_encoding_ptr = encoding;
         if (!Parrot_default_encoding_ptr) {
@@ -50,16 +59,24 @@ INTVAL Parrot_register_encoding(Interp *interpreter, const char *encodingname, E
     return 0;
 }
 
-INTVAL Parrot_make_default_encoding(Interp *interpreter, const char *encodingname, ENCODING *encoding) {
+INTVAL
+Parrot_make_default_encoding(Interp *interpreter, const char *encodingname,
+        ENCODING *encoding)
+{
     Parrot_default_encoding_ptr = encoding;
     return 1;
 }
 
-ENCODING *Parrot_default_encoding(Interp *interpreter) {
+ENCODING *
+Parrot_default_encoding(Interp *interpreter)
+{
     return Parrot_default_encoding_ptr;
 }
 
-encoding_converter_t Parrot_find_encoding_converter(Interp *interpreter, ENCODING *lhs, ENCODING *rhs) {
+encoding_converter_t
+Parrot_find_encoding_converter(Interp *interpreter, ENCODING *lhs,
+        ENCODING *rhs)
+{
     return NULL;
 }
 
