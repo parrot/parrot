@@ -47,7 +47,7 @@ if ($ARGV[0] =~ /recompile/) {
     system("make");
 
     #### Now run the tests
-    system("make test");
+    system("make fulltest");
 }
 
 #### And generate the reports.
@@ -63,7 +63,7 @@ my %totals = (
     lines            => 0,
     covered_lines    => 0,
     branches         => 0,
-    covered_branches => 0,	      
+    covered_branches => 0,              
     calls            => 0,
     covered_calls    => 0
 );
@@ -71,22 +71,33 @@ my %totals = (
 foreach my $da_file (@dafiles) {
     my $dirname   = dirname($da_file) || ".";
     my $filename  = basename($da_file);
-
-    my $cmd = "cd $dirname; gcov -f -b $filename";
+    my $objectfilename = $da_file;
+    $objectfilename =~ s/\.da$//g;
+    
+    #gcov must be run from the directory that the compiler was invoked from.
+    #Currently, this is the parrot root directory.
+    #However, it also leaves it output file in this directory, which we need
+    #to move to the appropriate place, alongside the sourcefile that produced it.
+    #Hence, as soon as we know the true name of the object file being profiled, 
+    #we rename the gcov log file.
+    #The -o flag is necessary to help gcov locate it's basic block (.bb) files.
+    my $cmd = "gcov -f -b -o $da_file $objectfilename";
     print "Running $cmd..\n" if $DEBUG;
     open (GCOVSUMMARY, "$cmd|") || die "Error invoking '$cmd': $!";
     my $tmp;
     my %generated_files;
     while (<GCOVSUMMARY>) {
         if (/^Creating (.*)\./) {
-            my $path = "$dirname/$1"; $path =~ s/\Q$SRCDIR\E//g;
+            my $path = "$dirname/$1";
+            rename($1, "$dirname/$1") || die("Couldn't rename $1 to $dirname/$1.");
+            $path =~ s/\Q$SRCDIR\E//g;
             $generated_files{$path} = $tmp;
             $tmp = '';
         } else {
             $tmp .= $_;
         }
     }
-    close(GCOVSUMARY);
+    close(GCOVSUMMARY);
 
     foreach my $gcov_file (keys %generated_files) {
         my $source_file = $gcov_file;
@@ -101,7 +112,7 @@ foreach my $da_file (@dafiles) {
         print "Processing $gcov_file ($source_file)\n";
 
         foreach (split "\n", $generated_files{$gcov_file}) {
-            my ($percent, $total_lines, $real_filename) = /\s*([^%]+)% of (\d+) source lines executed in file (.*)/;
+            my ($percent, $total_lines, $real_filename) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in file (.*)/;
             if ($total_lines) {
                 my $covered_lines = int(($percent/100) * $total_lines);
                 $totals{lines} += $total_lines;
@@ -111,7 +122,7 @@ foreach my $da_file (@dafiles) {
                 next;
             }
 
-            my ($percent, $total_lines, $function) = /\s*([^%]+)% of (\d+) source lines executed in function (.*)/;
+            my ($percent, $total_lines, $function) = /\s*([^%]+)% of (\d+)(?: source)? lines executed in function (.*)/;
             if ($total_lines) {
                 $function_line_coverage{$source_file}{$function} = $percent;
                 next;
@@ -210,12 +221,13 @@ sub write_file_coverage_summary {
                   <th>Line Coverage</th>
                   <th>Branch Coverage</th>
                   <th>Call Coverage</th>
+                </tr>
     );
-
+    
     foreach my $source_file (sort keys %file_line_coverage) {
         my $outfile_base = $source_file;
         $outfile_base =~ s/\//_/g;
-
+        
         print OUT qq(
            <tr>
              <td>$source_file</td>
@@ -226,7 +238,7 @@ sub write_file_coverage_summary {
           </tr>
        );
     }
-
+    
     print OUT qq(
             </tbody>
           </table>
@@ -292,7 +304,7 @@ sub write_function_coverage_summary {
 
 sub filter_gcov {
     my ($infile) = @_;
-
+    
     my $source_file = $infile;
     $source_file =~ s/\.gcov$//g;
 
@@ -358,18 +370,18 @@ sub filter_gcov {
 
     sub do_filter {
         my ($skip_func) = @_;
-
+        
         while (<IN>) {
             s/&/&amp;/g;
             s/</&lt;/g;
             s/>/&gt;/g;
 
             next if (&{$skip_func}($_));
-
-            my $atag;
+            
+            my $atag="";
             if (/^\s*([^\(\s]+)\(/) {
                 $atag="<a name=\"$1\"></a>";
-            }
+            } 
 
             my ($initial) = substr($_, 0, 16);
             if ($initial =~ /^\s*\d+\s*$/) {
@@ -385,7 +397,7 @@ sub filter_gcov {
             } elsif ($initial =~ /\#\#\#/) {
                 print OUT qq($atag<font color="red">$_</font>)
             } else {
-                print OUT "$atag$_";
+                print OUT $_;
             }
         }
     }
