@@ -9,14 +9,17 @@ while (<DATA>) {
     die "Can't find $vtable_entry in vtable, line $.\n"
         unless exists $vtable{$vtable_entry};
     print "AUTO_OP $params[1] (".(join ", ", ("p")x$params[0]).") {\n";
+    print "\t\$2->vtable->vtable_funcs[VTABLE_";
+    print uc $vtable_entry;
+    print multimethod($vtable_entry);
     if ($params[0] == 3) {
         # Three-address function
-        print "\t\$2->vtable->vtable_funcs[VTABLE_";
-        print uc $vtable_entry;
-        print multimethod($vtable_entry);
         print ']($2,$3,$1);';
-        print "\n}\n";
+    } elsif ($params[0] == 2) {
+        # Unary function
+        print ']($2,$1);';
     }
+    print "\n}\n";
 }
 
 sub multimethod {
@@ -36,3 +39,7 @@ __DATA__
 3 div divide
 3 mod modulus
 3 concat concatenate
+3 and logical_and
+3 or logical_or
+# Unary functions
+2 not logical_not
