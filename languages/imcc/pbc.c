@@ -610,6 +610,8 @@ static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
 {
     if (r->color >= 0)
         return;
+    if (r->use_count <= 0)
+        return;
     switch (r->set) {
         case 'I':
             if (r->name[0] == '0' && r->name[1] == 'x')
@@ -633,7 +635,8 @@ static void add_1_const(struct Parrot_Interp *interpreter, SymReg *r)
             break;
     }
     if (r /*&& r->set != 'I' */)
-        debug(DEBUG_PBC_CONST,"const %s\tcolor %d\n", r->name, r->color);
+        debug(DEBUG_PBC_CONST,"const %s\tcolor %d use_count %d\n",
+                r->name, r->color, r->use_count);
 
 }
 /* store a constants idx for later reuse */

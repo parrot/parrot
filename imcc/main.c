@@ -216,8 +216,7 @@ int main(int argc, char * argv[])
         }
         ext = strrchr(sourcefile, '.');
         if (ext && strcmp (ext, ".pasm") == 0) {
-            if (*optimizer_opt == '0')
-                pasm_file = 1;
+            pasm_file = 1;
             if (output)
                 write_pbc = 1;
         }

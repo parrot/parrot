@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 6;
+use TestCompiler tests => 47;
 use Test::More qw(skip);
 
 # these tests are run with -O1 by TestCompiler and show
@@ -98,3 +98,404 @@ _test:
    end
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "constant add");
+   add I0, 10, 15
+   add N0, 10.0, 15.0
+   end
+CODE
+   set I0, 25
+   set N0, 25.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant sub");
+   sub I0, 10, 15
+   sub N0, 10.0, 15.0
+   end
+CODE
+   set I0, -5
+   set N0, -5.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant mul");
+   mul I0, 10, 15
+   mul N0, 10.0, 15.0
+   end
+CODE
+   set I0, 150
+   set N0, 150.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant div");
+   div I0, 10, 5
+   div N0, 10.0, 5.0
+   end
+CODE
+   set I0, 2
+   set N0, 2.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant cmod");
+   cmod I0, 33, 10
+   cmod N0, 33.0, 10.0
+   end
+CODE
+   set I0, 3
+   set N0, 3.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant mod");
+   mod I0, 33, 10
+   mod N0, 33.0, 10.0
+   end
+CODE
+   set I0, 3
+   set N0, 3.000000
+   end
+OUT
+
+##############################
+SKIP: {
+skip("constant concat N/Y", 1);
+output_is(<<'CODE', <<'OUT', "constant concat");
+   concat S0, "Parrot ", "rocks"
+   end
+CODE
+   set S0, "Parrot rocks"
+   end
+OUT
+}
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq taken");
+   eq 10, 10, L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq not taken");
+   eq 10, 20, L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq taken");
+   eq 10.0, 10.0, L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq not taken");
+   eq 10.0, 20.0, L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq taken");
+   eq "xy", "xy", L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant eq not taken");
+   eq "ab", "ba", L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant ne taken");
+   ne 10, 20, L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant ne not taken");
+   ne 10, 10, L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant gt taken");
+   gt "xy", "ap", L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant gt not taken");
+   gt "ab", "ba", L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant ge taken");
+   ge "xy", "xy", L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant ge not taken");
+   gt "ab", "ba", L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant lt taken");
+   lt "xx", "xy", L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant lt not taken");
+   lt "ba", "ba", L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant le taken");
+   le "xy", "xy", L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant le not taken");
+   le "bb", "ba", L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant if taken");
+   if 10, L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant if not taken");
+   if 0, L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant unless taken");
+   unless 0, L1
+   set I0, 5
+L1:end
+CODE
+L1:
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant unless not taken");
+   unless 1, L1
+   set I0, 5
+L1:end
+CODE
+   set I0, 5
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant mix add");
+   add N0, 10.0, 15
+   end
+CODE
+   set N0, 25.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant unary abs");
+   abs I0, -10
+   end
+CODE
+   set I0, 10
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "constant set");
+   set N0, 5
+   end
+CODE
+   set N0, 5.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, 0");
+   mul I0, 0
+   end
+CODE
+   set I0, 0
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, I, 0");
+   mul I0, I1, 0
+   end
+CODE
+   set I0, 0
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, 0, I");
+   mul I0, 0, I1
+   end
+CODE
+   set I0, 0
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul N, 0, N");
+   mul N0, 0.0, N1
+   end
+CODE
+   set N0, 0.000000
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, 1");
+   mul I0, 1
+   end
+CODE
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, I, 1");
+   mul I0, I1, 1
+   end
+CODE
+   set I0, I1
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul I, 1, I");
+   mul I0, 1, I1
+   end
+CODE
+   set I0,  I1
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength mul N, 1, N");
+   mul N0, 1.0, N1
+   end
+CODE
+   set N0, N1
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength div I, 1");
+   div I0, 1
+   end
+CODE
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength div I, I, 1");
+   div I0, I1, 1
+   end
+CODE
+   set I0, I1
+   end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "strength div N, N, 1");
+   div N0, N1, 1
+   end
+CODE
+   set N0, N1
+   end
+OUT

@@ -127,6 +127,7 @@ mk_const_ident(char *name, char t, SymReg *val)
 SymReg * _mk_const(SymReg *hsh[], char * name, char t) {
     SymReg * r = _mk_symreg(hsh, name, t);
     r->type = VTCONST;
+    r->use_count++;
     return r;
 }
 
@@ -150,9 +151,10 @@ SymReg * _mk_address(SymReg *hsh[], char * name, int uniq) {
             r->type == VTADDRESS &&
             r->lhs_use_count            /* we use this for labes/subs */
       ) {
-        if (uniq == U_add_uniq_label)
+        if (uniq == U_add_uniq_label) {
             fataly(1, "mk_address", line,
-                    "Label '%s' already defined\n", name);
+                   "Label '%s' already defined\n", name);
+        }
         else if (uniq == U_add_uniq_sub)
             fataly(1, "mk_address", line,
                     "Subroutine '%s' already defined\n", name);
@@ -242,6 +244,7 @@ SymReg * link_keys(int nargs, SymReg * keys[])
     if (!keychain)
         fatal(1, "link_keys", "Out of mem\n");
     keychain->type = VTCONST;
+    ++keychain->use_count;
     key = keychain;
     for (i = 0; i < nargs; i++) {
         /* if any component is a variable, we need to track it in

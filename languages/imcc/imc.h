@@ -54,6 +54,7 @@ int try_allocate(void);
 void restore_interference_graph(void);
 void free_reglist(void);
 int neighbours(int node);
+int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type);
 
 
 int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);

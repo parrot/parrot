@@ -169,6 +169,7 @@ iINDEXSET(struct Parrot_Interp *interp, SymReg * r0, SymReg * r1, SymReg * r2)
     return 0;
 }
 
+#if 0
 /* return the index of a PMC class */
 static int
 get_pmc_num(struct Parrot_Interp *interpreter, char *pmc_type)
@@ -191,6 +192,7 @@ macro(struct Parrot_Interp *interp, char *name)
     r =  mk_const(str_dup(buf), 'I');
     return r;
 }
+#endif
 
 static Instruction *
 multi_keyed(struct Parrot_Interp *interpreter,char *name,
@@ -408,14 +410,14 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 
 %token <t> CALL GOTO ARG IF UNLESS NEW END SAVEALL RESTOREALL
 %token <t> SUB NAMESPACE ENDNAMESPACE CLASS ENDCLASS SYM LOCAL CONST PARAM
-%token <t> INC DEC
+%token <t> CONSTANT INC DEC
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV DEFINED LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
 %token <t> GLOBAL ADDR CLONE RESULT RETURN POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB
 %token <s> LABEL
 %token <t> EMIT EOM
-%token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO
+%token <s> IREG NREG SREG PREG IDENTIFIER STRINGC INTC FLOATC REG MACRO ENDM
 %token <s> PARROT_OP
 %type <t> type
 %type <i> program sub sub_start emit
@@ -425,7 +427,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist newtype
 %type <sr> vars _vars var_or_i _var_or_i
-%type <i> pasmcode pasmline pasm_inst
+%type <i> pasmcode pasmline pasm_inst constant_def
 %type <sr> pasm_args lhs
 %token <sr> VAR
 
@@ -448,14 +450,19 @@ pasmcode: pasmline
     ;
 
 pasmline: labels  pasm_inst '\n'  { $$ = 0; }
+    | MACRO '\n'                  { $$ = 0; }
+    | constant_def
     ;
+
 pasm_inst: {clear_state();}
        PARROT_OP pasm_args	        { $$ = iANY(interp, $2,0,regs,1); free($2); }
     | /* none */                               { $$ = 0;}
-
     ;
 pasm_args:
     vars
+    ;
+
+constant_def: CONSTANT IDENTIFIER const { /* printf ("%s\n", $1); */ }
     ;
 
 emit:
@@ -586,8 +593,7 @@ assignment:
     ;
 
 newtype:
-     MACRO                             { $$ = macro(interp, $1); free($1); }
-    | const
+    const
     ;
 
 if_statement:
@@ -638,7 +644,6 @@ var_or_i:
        IDENTIFIER			{ $$ = mk_address($1, U_add_once); }
     |  PARROT_OP                        { $$ = mk_address($1, U_add_once); }
     |  var
-    | MACRO                             { $$ = macro(interp, $1); free($1); }
     ;
 
 var:   VAR

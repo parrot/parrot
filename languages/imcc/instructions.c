@@ -212,7 +212,10 @@ Instruction * delete_ins(Instruction *ins, int needs_freeing)
 
     next = ins->next;
     prev = ins->prev;
-    prev->next = next;
+    if (prev)
+        prev->next = next;
+    else
+        instructions = next;
     if (next)
         next->prev = prev;
     if (needs_freeing)
@@ -244,6 +247,8 @@ void subst_ins(Instruction *ins, Instruction * tmp, int needs_freeing)
     Instruction *prev = ins->prev;
     if (prev)
         prev->next = tmp;
+    else
+        instructions = tmp;
     tmp->prev = prev;
     tmp->next = ins->next;
     if (ins->next)

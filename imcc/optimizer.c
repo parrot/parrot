@@ -12,36 +12,31 @@
 
 
 /*
- * current default optimization is -O1 (s. imcc.y)
- *
- *
  * pre_optimizer
  * -------------
  *
  * runs before CFG is built
  *
  * if_branch ... converts if/branch/label like so:
- *
- *      if x, L1          unless x, L2
- *      branch L2         ---
- *    L1:               L2:
- *    ...
- *    L2:
- *
  * unused_label ... deletes them (as L1 above)
- *
- * stages currently not needed by ocde from perl6:
- * jump optimization (jumps to jumps ...)
- *
+ * branch_branch ... jump optimization (jumps to jumps ...)
+ * strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
+ * subst_constants ... rewrite e.g. add_i_ic_ic
  *
  * optimizer
  * ---------
  *
+ * runs with CFG and life info
+ *
+ * used_once ... deletes assignments, when LHS is unused
+ * dead_code_remove ... deletes e.g. blocks that are not entered from
+ *                      somewhere or ins after a branch, which aren't
+ *                      reachable
+ * loop_optimization ... pull invariants out of loops
  * TODO e.g. constant_propagation
  *
- *
- *  post_optimizer
- *  ---------------
+ * TODO post_optimizer
+ * ---------------
  *
  *  runs after register alloocation
  *
@@ -53,6 +48,11 @@ static void if_branch(struct Parrot_Interp *);
 static void branch_branch(void);
 static void unused_label(void);
 static void strength_reduce(struct Parrot_Interp *interp);
+static void subst_constants_mix(struct Parrot_Interp *interp);
+static void subst_constants_umix(struct Parrot_Interp *interp);
+static void subst_constants(struct Parrot_Interp *interp);
+static void subst_constants_c(struct Parrot_Interp *interp);
+static void subst_constants_if(struct Parrot_Interp *interp);
 
 static int used_once(void);
 static int loop_optimization(struct Parrot_Interp *);
@@ -60,11 +60,16 @@ static int clone_remove(void);
 
 void pre_optimize(struct Parrot_Interp *interp) {
     if (*optimizer_opt != '0') {      /* XXX */
+        subst_constants_mix(interp);
+        subst_constants_umix(interp);
+        subst_constants(interp);
+        subst_constants_c(interp);
+        subst_constants_if(interp);
+        strength_reduce(interp);
         if_branch(interp);
         branch_branch();
         /* XXX cfg / loop detection breaks e.g. in t/compiler/5_3 */
         unused_label();
-        strength_reduce(interp);
     }
 }
 
@@ -123,18 +128,19 @@ static void if_branch(struct Parrot_Interp *interp)
     if (!last->next)
         return;
     for (ins = last->next; ins; ) {
-        if ((last->type & ITBRANCH) &&          /* if ...Lx */
-                (ins->type & IF_goto) &&        /* branch Ly*/
+        if ((last->type & ITBRANCH) &&          /* if ...L1 */
+                (ins->type & IF_goto) &&        /* branch L2*/
                 (reg = get_branch_regno(last)) >= 0) {
             SymReg * br_dest = last->r[reg];
             if (ins->next &&
-                    (ins->next->type & ITLABEL) &&    /* Lx */
+                    (ins->next->type & ITLABEL) &&    /* L1 */
                     ins->next->r[0] == br_dest) {
                 const char * neg_op;
                 SymReg * go = get_branch_reg(ins);
                 int args;
 
-                debug(DEBUG_OPT1,"if_branch %s ... %s\n", last->op, br_dest->name);
+                debug(DEBUG_OPT1,"if_branch %s ... %s\n",
+                        last->op, br_dest->name);
                 /* find the negated op (e.g if->unless, ne->eq ... */
                 if ((neg_op = get_neg_op(last->op, &args)) != 0) {
                     Instruction * tmp;
@@ -232,28 +238,518 @@ static void unused_label()
     }
 }
 
+/* these are run after constant simplification, so it is
+ * guaranteed, that one operand is non constant, if opsize == 4
+ */
 static void strength_reduce(struct Parrot_Interp *interp)
 {
     Instruction *ins, *tmp;
     const char *ops[] = { "add", "sub", "mul", "div" };
-    int i;
+    int i, found;
+    SymReg *r;
 
     for (ins = instructions; ins; ins = ins->next) {
         /*
+         * add Ix, Ix, Iy => add Ix, Iy
          * sub Ix, Ix, Iy => sub Ix, Iy
+         * ...
          */
-        for (i = 0; i < 4; i++)
-            if (!strcmp(ins->op, ops[i]) && ins->opsize == 4 &&
-                    ins->r[0] == ins->r[1]) {
+        found = 0;
+        for (i = 0; i < 4; i++) {
+            if (ins->opsize == 4 &&
+                    ins->r[0] == ins->r[1] &&
+                    !strcmp(ins->op, ops[i])) {
                 debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
                 ins->r[1] = ins->r[2];
                 tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
                 debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
                 subst_ins(ins, tmp, 1);
+                found = 1;
+                break;
             }
+        }
+        if (found)
+            continue;
+        /*
+         * mul Ix, Iy, 0 => set Ix, 0
+         * mul Ix, 0, Iy => set Ix, 0
+         * mul Ix, 0     => set Ix, 0
+         */
+        if ( ( ( ins->opsize >= 3 &&
+                        ins->r[1]->type == VTCONST &&
+                        atof(ins->r[1]->name) == 0.0) ||
+                    (ins->opsize == 4 &&
+                     ins->r[2]->type == VTCONST &&
+                     atof(ins->r[2]->name) == 0.0)) &&
+                !strcmp(ins->op, "mul")) {
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            r = mk_const(ins->r[0]->set == 'I' ? str_dup("0") :
+                    str_dup("0.000000"),
+                    ins->r[0]->set);
+            --ins->r[1]->use_count;
+            if (ins->opsize == 4)
+                --ins->r[2]->use_count;
+            ins->r[1] = r;
+            tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
+            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            subst_ins(ins, tmp, 1);
+            continue;
+        }
+        /*
+         * mul Ix, Iy, 1 => set Ix, Iy
+         * mul Ix, 1, Iy => set Ix, Iy
+         * mul Ix, 1     => delete
+         */
+        if ( ( ( ins->opsize >= 3 &&
+                        ins->r[1]->type == VTCONST &&
+                        atof(ins->r[1]->name) == 1.0) ||
+                    (ins->opsize == 4 &&
+                     ins->r[2]->type == VTCONST &&
+                     atof(ins->r[2]->name) == 1.0)) &&
+                !strcmp(ins->op, "mul")) {
+set_it:
+            debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+            if (ins->opsize == 3) {
+                /* mul Ix, 1 */
+                delete_ins(ins, 1);
+                debug(DEBUG_OPT1, "deleted\n");
+                continue;
+            }
+            if (ins->r[1]->type == VTCONST) {
+                --ins->r[1]->use_count;
+                ins->r[1] = ins->r[2];
+            }
+            else {
+                --ins->r[2]->use_count;
+            }
+            tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
+            debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+            subst_ins(ins, tmp, 1);
+            continue;
+        }
+        /*
+         * div Ix, Iy, 1 => set Ix, Iy
+         * div Ix, 1     => delete
+         */
+        if ( ( ( ins->opsize == 3 &&
+                        ins->r[1]->type == VTCONST &&
+                        atof(ins->r[1]->name) == 1.0) ||
+                    (ins->opsize == 4 &&
+                     ins->r[2]->type == VTCONST &&
+                     atof(ins->r[2]->name) == 1.0)) &&
+                !strcmp(ins->op, "div")) {
+            goto set_it;
+        }
+    }
+}
+
+/*
+ * rewrite e.g. add_n_nc_ic => add_n_nc_nc
+ */
+static void
+subst_constants_mix(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = {
+        "add", "sub", "mul", "div", "pow", "atan"
+    };
+    size_t i;
+    char b[128];
+    SymReg *r;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+            /* TODO compare ins->opnum with a list of instructions
+             * containing add_n_nc_ic, ...
+             */
+            if (!strcmp(ins->op, ops[i]) && ins->opsize == 4 &&
+                    ins->r[1]->type == VTCONST &&
+                    ins->r[1]->set == 'N' &&
+                    ins->r[2]->type == VTCONST &&
+                    ins->r[2]->set == 'I') {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                sprintf(b, FLOATVAL_FMT,
+                        (FLOATVAL)atof(ins->r[2]->name));
+                r = mk_const(str_dup(b), 'N');
+                --ins->r[2]->use_count;
+                ins->r[2] = r;
+                tmp = INS(interp, ins->op, "", ins->r, 3, 0, 0);
+                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                subst_ins(ins, tmp, 1);
+            }
+        }
+    }
+}
+
+/*
+ * rewrite e.g. add_n_ic => add_n_nc
+ */
+static void
+subst_constants_umix(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = {
+        "add", "div", "mul", "sub", "set"
+    };
+    size_t i;
+    char b[128];
+    SymReg *r;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+            /* TODO compare ins->opnum with a list of instructions
+             * containing add_n_ic, ...
+             */
+            if (ins->opsize == 3 &&
+                    ins->r[0]->set == 'N' &&
+                    ins->r[1]->type == VTCONST &&
+                    ins->r[1]->set == 'I' &&
+                    !strcmp(ins->op, ops[i])) {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                sprintf(b, FLOATVAL_FMT,
+                        (FLOATVAL)atof(ins->r[1]->name));
+                r = mk_const(str_dup(b), 'N');
+                --ins->r[1]->use_count;
+                ins->r[1] = r;
+                tmp = INS(interp, ins->op, "", ins->r, 2, 0, 0);
+                debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                subst_ins(ins, tmp, 1);
+            }
+        }
+    }
+}
+
+static void
+eval_ins(struct Parrot_Interp *interpreter, Instruction *ins, size_t ops)
+{
+    opcode_t eval[4];
+    char op[20];
+    int opnum;
+    size_t i;
+
+    /*
+     * find instruction e.g. add_i_ic_ic => add_i_i_i
+     */
+    if (ops == 4)
+        sprintf(op, "%s_%c_%c_%c", ins->op, tolower(ins->r[0]->set),
+                tolower(ins->r[1]->set), tolower(ins->r[2]->set));
+    else
+        sprintf(op, "%s_%c_%c", ins->op, tolower(ins->r[0]->set),
+                tolower(ins->r[1]->set));
+    opnum = interpreter->op_lib->op_code(op, 1);
+    if (opnum < 0)
+        fatal(1, "eval_ins", "op '%s' not found\n", op);
+    /* now fill registers */
+    for (i = 0; i < ops; i++) {
+        switch (interpreter->op_info_table[opnum].types[i]) {
+            case PARROT_ARG_OP:
+                eval[i] = opnum;
+                break;
+            case PARROT_ARG_I:
+            case PARROT_ARG_N:
+                eval[i] = i - 1;        /* result in I0/N0 */
+                if (i > 1) {    /* fill source regs */
+                    switch (ins->r[i-1]->set) {
+                        case 'I':
+                            interpreter->ctx.int_reg.registers[i-1] =
+                                (INTVAL)atoi(ins->r[i-1]->name);
+                            break;
+                        case 'N':
+                            interpreter->ctx.num_reg.registers[i-1] =
+                                (FLOATVAL)atof(ins->r[i-1]->name);
+                            break;
+                    }
+                }
+                break;
+            default:
+                fatal(1, "eval_ins", "invalid arg #%d for op '%s' not found\n",
+                        i, op);
+        }
     }
 
+    /* eval the opcode */
+    (interpreter->op_func_table[opnum]) (eval, interpreter);
 }
+
+/*
+ * rewrite e.g. add_n_nc_nc => set_n_nc
+ *          or  abs_i_ic => set_i_ic
+ */
+static void
+subst_constants(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = {
+        "add", "sub", "mul", "div", "cmod", "mod", "pow", "atan"
+        "shr", "srl", "lsr",
+        "band", "bor", "bxor",
+        "and", "or", "xor"
+    };
+    const char *ops2[] = {
+        "abs", "neg", "acos", "asec", "asin",
+        "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
+        "sech", "sin", "sinh", "tan", "tanh", "fact"
+    };
+    size_t i;
+    char b[128];
+    SymReg *r;
+    struct Parrot_Context *ctx;
+    int found;
+
+    /* save interpreter ctx */
+    ctx = mem_sys_allocate(sizeof(struct Parrot_Context));
+    mem_sys_memcopy(ctx, &interp->ctx, sizeof(struct Parrot_Context));
+
+    for (ins = instructions; ins; ins = ins->next) {
+        found = 0;
+        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+            /* TODO compare ins->opnum with a list of instructions
+             * containing add_i_ic_ic, add_n_nc_nc ...
+             */
+            if (ins->opsize == 4 &&
+                    ins->r[1]->type == VTCONST &&
+                    ins->r[2]->type == VTCONST &&
+                    !strcmp(ins->op, ops[i])) {
+                found = 1;
+                break;
+            }
+        }
+        for (i = 0; !found && i < sizeof(ops2)/sizeof(ops2[0]); i++) {
+            if (ins->opsize == 3 &&
+                    ins->r[1]->type == VTCONST &&
+                    !strcmp(ins->op, ops2[i])) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found)
+            break;
+        debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+        /* we construct a parrot instruction
+         * here and let parrot do the calculation in a
+         * separate context and make a constant
+         * from the result
+         */
+        eval_ins(interp, ins, ins->opsize);
+        /* result is in I0/N0 */
+        switch (ins->r[0]->set) {
+            case 'I':
+                sprintf(b, INTVAL_FMT, interp->ctx.int_reg.registers[0]);
+                break;
+            case 'N':   /* FIXME precision/exponent */
+                sprintf(b, FLOATVAL_FMT, interp->ctx.num_reg.registers[0]);
+                break;
+        }
+        r = mk_const(str_dup(b), ins->r[0]->set);
+        --ins->r[1]->use_count;
+        if (ins->opsize == 4)
+            --ins->r[2]->use_count;
+        ins->r[1] = r;
+        tmp = INS(interp, "set", "", ins->r, 2, 0, 0);
+        debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+        subst_ins(ins, tmp, 1);
+    }
+    mem_sys_memcopy(&interp->ctx, ctx, sizeof(struct Parrot_Context));
+    mem_sys_free(ctx);
+}
+
+/*
+ * rewrite e.g. eq_ic_ic_ic => branch_ic/nothing
+ */
+static void
+subst_constants_c(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = { "eq", "ne", "gt", "ge", "lt", "le" };
+    size_t i;
+    int res;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+            /* TODO s. above */
+            if (ins->opsize == 4 &&
+                    ins->r[0]->type == VTCONST &&
+                    ins->r[1]->type == VTCONST &&
+                    !strcmp(ins->op, ops[i])) {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                switch (i) {
+                    case 0:     /* eq */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) ==
+                                        atoi(ins->r[1]->name));
+do_res:
+                                --ins->r[0]->use_count;
+                                --ins->r[1]->use_count;
+                                if (res) {
+                                    ins->r[0] = ins->r[2];
+                                    tmp = INS(interp, "branch", "", ins->r,
+                                            1, 0, 0);
+                                    debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    subst_ins(ins, tmp, 1);
+                                }
+                                else {
+                                    debug(DEBUG_OPT1, "deleted\n");
+                                    delete_ins(ins, 1);
+                                }
+                                break;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) ==
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = !strcmp(ins->r[0]->name,
+                                        ins->r[1]->name);
+                                goto do_res;
+                        }
+                        break;
+                    case 1:     /* ne */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) !=
+                                        atoi(ins->r[1]->name));
+                                goto do_res;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) !=
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = strcmp(ins->r[0]->name,
+                                        ins->r[1]->name);
+                                goto do_res;
+                        }
+                        break;
+                    case 2:     /* gt */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) >
+                                        atoi(ins->r[1]->name));
+                                goto do_res;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) >
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = strcmp(ins->r[0]->name,
+                                        ins->r[1]->name) > 0;
+                                goto do_res;
+                        }
+                        break;
+                    case 3:     /* ge */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) >=
+                                        atoi(ins->r[1]->name));
+                                goto do_res;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) >=
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = strcmp(ins->r[0]->name,
+                                        ins->r[1]->name) >= 0;
+                                goto do_res;
+                        }
+                        break;
+                    case 4:     /* lt */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) <
+                                        atoi(ins->r[1]->name));
+                                goto do_res;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) <
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = strcmp(ins->r[0]->name,
+                                        ins->r[1]->name) < 0;
+                                goto do_res;
+                        }
+                        break;
+                    case 5:     /* le */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = (atoi(ins->r[0]->name) <=
+                                        atoi(ins->r[1]->name));
+                                goto do_res;
+                            case 'N':
+                                res = (atof(ins->r[0]->name) <=
+                                        atof(ins->r[1]->name));
+                                goto do_res;
+                            case 'S':
+                                res = strcmp(ins->r[0]->name,
+                                        ins->r[1]->name) <= 0;
+                                goto do_res;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+}
+
+/*
+ * rewrite e.g. if_ic_ic => branch_ic/nothing
+ */
+static void
+subst_constants_if(struct Parrot_Interp *interp)
+{
+    Instruction *ins, *tmp;
+    const char *ops[] = { "if", "unless" };
+    size_t i;
+    int res;
+    char *s;
+
+    for (ins = instructions; ins; ins = ins->next) {
+        for (i = 0; i < sizeof(ops)/sizeof(ops[0]); i++) {
+            /* TODO s. above */
+            if (ins->opsize == 3 &&
+                    ins->r[0]->type == VTCONST &&
+                    !strcmp(ins->op, ops[i])) {
+                debug(DEBUG_OPT1, "opt1 %s => ", ins_string(ins));
+                switch (i) {
+                    case 0:     /* if */
+                    case 1:     /* unless */
+                        switch (ins->r[0]->set) {
+                            case 'I':
+                                res = atoi(ins->r[0]->name);
+do_res:
+                                --ins->r[0]->use_count;
+                                if (i)
+                                    res = !res;
+                                if (res) {
+                                    ins->r[0] = ins->r[1];
+                                    tmp = INS(interp, "branch", "", ins->r,
+                                            1, 0, 0);
+                                    debug(DEBUG_OPT1, "%s\n", ins_string(tmp));
+                                    subst_ins(ins, tmp, 1);
+                                }
+                                else {
+                                    debug(DEBUG_OPT1, "deleted\n");
+                                    delete_ins(ins, 1);
+                                }
+                                break;
+                            case 'N':
+                                res = atof(ins->r[1]->name) != 0.0;
+                                goto do_res;
+                            case 'S':
+                                break;
+                                /* TODO strings have quote marks around them,
+                                 * strip these in lexer
+                                 */
+                                s = ins->r[0]->name;
+                                res = *s && (*s != '0' || s[1]);
+                                goto do_res;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+}
+
+
 /* optimizations with CFG built */
 int dead_code_remove(void)
 {

@@ -29,10 +29,13 @@ Instruction *
 iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type, int emit)
 {
     char fmt[256];
-    SymReg *pmc = macro(interpreter, type);
+    SymReg *pmc;
+    int pmc_num = get_pmc_num(interpreter, type);
+    sprintf(fmt, "%d", pmc_num);
+    pmc = mk_const(str_dup(fmt), 'I');
     /* XXX check, if type exists, but aove keyed search
      * gives 0 for non existing  PMCs */
-    sprintf(fmt, "%%s, %d\t # .%s", atoi(pmc->name), type);
+    sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage = U_NEW;
     if (!strcmp(type, "PerlArray") || !strcmp(type, "PerlHash"))
         r0->usage |= U_KEYED;
