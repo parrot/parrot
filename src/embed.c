@@ -245,7 +245,7 @@ Parrot_readbc(struct Parrot_Interp *interpreter, const char *filename)
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
         interpreter->current_file = string_make(interpreter, filename,
-                strlen(filename), NULL, 0, NULL);
+                strlen(filename), "iso-8859-1", 0);
     }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 again:
@@ -414,7 +414,7 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING *arg = string_make(interpreter, argv[i], strlen(argv[i]),
-                                  0, PObj_external_FLAG, 0);
+                                  "iso-8859-1", PObj_external_FLAG);
 
         if (Interp_flags_TEST(interpreter, PARROT_DEBUG_FLAG)) {
             PIO_eprintf(interpreter, "\t%vd: %s\n", i, argv[i]);

@@ -209,6 +209,7 @@ IMCC_O_FILES = \
 
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${TEMP_cg_h}
 
+ICU_H_FILES = ${icu_headers}
 
 ALL_H_FILES = $(GENERAL_H_FILES)
 
@@ -217,13 +218,7 @@ CLASS_PMC_FILES = ${TEMP_pmc_classes_pmc}
 CLASS_O_FILES = ${TEMP_pmc_classes_o}
 
 ENCODING_O_FILES = \
-    encodings/singlebyte$(O) \
-    encodings/utf8$(O) \
-    encodings/utf16$(O) \
-    encodings/utf32$(O) \
-    encodings/dbcs$(O)
-
-CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
+    encodings/utf8$(O)
 
 IO_O_FILES = \
     io/io$(O) \
@@ -244,9 +239,8 @@ INTERP_O_FILES = \
     $(SRC)/stacks$(O) \
     $(SRC)/stack_common$(O) \
     $(SRC)/string$(O) \
+    $(SRC)/string_primitives$(O) \
     $(SRC)/sub$(O) \
-    $(SRC)/encoding$(O) \
-    $(SRC)/chartype$(O) \
     $(SRC)/runops_cores$(O) \
     $(SRC)/trace$(O) \
     $(SRC)/pmc$(O) \
@@ -299,7 +293,6 @@ O_FILES = \
     $(INTERP_O_FILES) \
     $(IO_O_FILES) $(CLASS_O_FILES) \
     $(ENCODING_O_FILES) \
-    $(CHARTYPE_O_FILES) \
     $(IMCC_O_FILES)
 
 OPS_FILES = ${ops} $(GEN_OPSFILES)
@@ -350,6 +343,8 @@ LINTOPTS =
 TEST_PROG = ${test_prog}${exe}
 TEST_PROG_SO = ${test_prog}_so${exe}
 LIBPARROT = ${blib_lib_libparrot_a}
+LIBICUCORE = ${blib_lib_libsicuuc_a}
+LIBICUDATA =  ${blib_lib_libsicudata_a}
 # utils
 DIS=disassemble${exe}
 PDUMP = pdump${exe}
@@ -466,8 +461,8 @@ library/config.fpmc: myconfig config_lib.pasm $(TEST_PROG)
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
-$(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm
-	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(C_LIBS)
+$(TEST_PROG) : $(PARROT_MAIN)$(O) $(GEN_HEADERS) $(LIBPARROT) lib/Parrot/OpLib/core.pm $(LIBICUCORE) $(LIBICUDATA)
+	$(LINK) ${ld_out}$(TEST_PROG) $(LINKFLAGS) $(PARROT_MAIN)$(O) $(LIBPARROT) $(LIBICUCORE) $(LIBICUDATA) $(C_LIBS)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -683,29 +678,15 @@ $(SRC)/method_util$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/string$(O) : $(GENERAL_H_FILES)
 
+$(SRC)/string_primitives$(O) : $(GENERAL_H_FILES) $(ICU_H_FILES)
+
 $(SRC)/longopt$(O) : $(GENERAL_H_FILES)
-
-$(SRC)/chartype$(O) : $(GENERAL_H_FILES)
-
-$(SRC)/encoding$(O) : $(GENERAL_H_FILES)
-
-chartype/usascii$(O) : $(GENERAL_H_FILES)
-
-chartype/unicode$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/dynext$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/exceptions$(O) : $(GENERAL_H_FILES)
 
-encoding/singlebyte$(O) : $(GENERAL_H_FILES)
-
 encoding/utf8$(O) : $(GENERAL_H_FILES)
-
-encoding/utf16$(O) : $(GENERAL_H_FILES)
-
-encoding/utf32$(O) : $(GENERAL_H_FILES)
-
-encoding/dbcs$(O) : $(GENERAL_H_FILES)
 
 $(SRC)/events$(O) : $(GENERAL_H_FILES)
 

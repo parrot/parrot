@@ -14,8 +14,6 @@
 #define PARROT_STRING_H_GUARD
 
 #include "parrot/config.h"
-#include "parrot/encoding.h"
-#include "parrot/chartype.h"
 #include "parrot/pobj.h"
 
 struct parrot_string_t;

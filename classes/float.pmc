@@ -77,7 +77,7 @@ Sets the value of the number by converting C<*value> to a number.
 */
 
     void set_string_native(STRING* value) {
-        PMC_num_val(SELF) = string_to_num(value);
+        PMC_num_val(SELF) = string_to_num(INTERP, value);
     }
 
 /*

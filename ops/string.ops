@@ -37,12 +37,12 @@ If $3 is less than the negative of the length, throws an exception.
 =cut
 
 inline op ord (out INT, in STR) :base_core {
-  $1 = string_ord($2,0);
+  $1 = string_ord(interpreter,$2,0);
   goto NEXT();
 }
 
 inline op ord (out INT, in STR, in INT) :base_core {
-  $1 = string_ord($2,$3);
+  $1 = string_ord(interpreter,$2,$3);
   goto NEXT();
 }
 
@@ -55,9 +55,7 @@ character set.
 
 inline op chr (out STR, in INT) :base_core {
   STRING *s;
-  s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
-  *(unsigned char *)s->strstart = (unsigned char) $2;
-  s->strlen = 1;
+  s = string_chr(interpreter, (UINTVAL)$2);
   $1 = s;
   goto NEXT();
 }
@@ -76,13 +74,13 @@ in $1
 =cut
 
 inline op chopn(inout STR, in INT) :base_core {
-  (void)string_chopn($1, $2);
+  (void)string_chopn(interpreter,$1, $2);
   goto NEXT();
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
   $1 = string_copy(interpreter, $2);
-  (void)string_chopn($1,$3);
+  (void)string_chopn(interpreter, $1,$3);
   goto NEXT();
 }
 
@@ -160,7 +158,7 @@ Set $1 to the length (in characters) of the string in $2.
 =cut
 
 inline op length(out INT, in STR) :base_mem {
-  $1 = string_length($2);
+  $1 = string_length(interpreter, $2);
   goto NEXT();
 }
 
@@ -232,7 +230,7 @@ do not create a new string in the destination register.
 
 inline op substr(out STR, in STR, in INT) :base_core {
   INTVAL len;
-  len = string_length($2);
+  len = string_length(interpreter, $2);
   $1 = string_substr(interpreter, $2, $3, len, &$1, 0);
   goto NEXT();
 }
@@ -313,7 +311,7 @@ inline op pack(inout STR, in INT, in INT) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
     $1 = string_concat(interpreter, $1, s, 1);
 
     goto NEXT();
@@ -323,7 +321,7 @@ inline op pack(inout STR, in INT, in NUM) :base_core {
     char *c = (char *)&$3;
     STRING *s;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
+    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
     $1 = string_concat(interpreter, $1, s, 1);
 
     goto NEXT();
@@ -334,12 +332,18 @@ inline op pack(inout STR, in INT, in STR) :base_core {
     UINTVAL len = (UINTVAL)$2;
     char buf[3];
 
-    if (PObj_buflen(s) < len) {
-        t = string_make(interpreter, buf, (UINTVAL)(len - PObj_buflen(s)), NULL, 0, NULL);
-        $1 = string_concat(interpreter, $1, s, 1);
+    if (s->strlen < len) { /* XXXX: what is this supposed to do? */
+    	STRING *temp;
+		temp = string_repeat(interpreter, 
+							string_from_cstring(interpreter, " ", 1), 
+							(UINTVAL)(len - s->strlen),
+							NULL);
+     /*   $1 = string_concat(interpreter, $1, s, 1); */
+        t = string_concat(interpreter, s, temp, 1);
     } else {
-        t = string_make(interpreter, s->strstart, (UINTVAL)len, NULL, 0, NULL);
+		t = string_substr(interpreter, s, 0, len, NULL, 0);
     }
+
     $1 = string_concat(interpreter, $1, t, 1);
 
     goto NEXT();
@@ -353,8 +357,8 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     const char *t;
     int i;
 
-    s = string_make(interpreter, c, (UINTVAL)$2, NULL, 0, NULL);
-    ln = string_length($1);
+    s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
+    ln = string_length(interpreter, $1);
     if (ln < $4 + $2)
     {
        PObj_buflen($1) = $1->strlen;
@@ -420,125 +424,27 @@ Allocate a new empty string, of length $2 (optional), encoding $3
 =cut
 
 inline op new(out STR) :base_mem {
-  $1 = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+  $1 = string_make_empty(interpreter, enum_stringrep_one, 0);
   goto NEXT();
 }
 
 inline op new(out STR, in INT) :base_mem {
-  $1 = string_make(interpreter, NULL, $2, NULL, 0, NULL);
+  $1 = string_make_empty(interpreter, enum_stringrep_one, $2);
   goto NEXT();
 }
 
-inline op new(out STR, in INT, in INT) :base_mem {
-  $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
-  goto NEXT();
-}
-
-inline op new(out STR, in INT, in INT, in INT) :base_mem {
-  internal_exception(INVALID_CHARTYPE,
-                     "new_s_i_i_i op not yet implemented\n");
-  $1 = string_make(interpreter, NULL, $2, encoding_lookup_index($3), 0, NULL);
-  goto NEXT();
-}
-
-=item B<transcode>(inout STR, in INT)
-
-Transcode a string from its current encoding to the encoding in $2. $1
-becomes a new string. (Transcoding is not inplace)
-
-=item B<transcode>(out STR, in STR, in INT)
-
-Put a transcoded version of $2 in $1, turning it to the encoding in $3
-
-=item B<transcode>(out STR, in STR, in INT, in INT)
-
-Put a transcoded version of $2 in $1, turning it to the encoding in $3
-and the chartype in $4.
-
-=cut
-
-op transcode(inout STR, in INT) :base_core {
-  $1 = string_transcode(interpreter, $1, encoding_lookup_index($2), NULL, NULL);
-  goto NEXT();
-}
-
-op transcode(out STR, in STR, in INT) :base_core {
-  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3), NULL, NULL);
-  goto NEXT();
-}
-
-op transcode(out STR, in STR, in INT, in INT) :base_core {
-  $1 = string_transcode(interpreter, $2, encoding_lookup_index($3),
-                        chartype_lookup_index($4), NULL);
-  goto NEXT();
-}
-
-=item B<find_encoding>(out INT, in STR)
-
-Find the encoding named in $2 and return its number in $1
-
-=cut
-
-op find_encoding(out INT, in STR) :base_core {
-  char *encoding = string_to_cstring(interpreter, $2);
-  $1 = encoding_find_encoding(encoding);
-  string_cstring_free(encoding);
-  goto NEXT();
-}
-
-=item B<string_encoding>(out INT, in STR)
-
-Find the encoding type for $2 and put it in $1
-
-=cut
-
-op string_encoding(out INT, in STR) :base_core {
-   $1 = $2->encoding->index;
-   goto NEXT();
-}
-
-=item B<find_chartype>(out INT, in STR)
-
-Find the chartype named in $2 and return its number in $1
-
-=cut
-
-op find_chartype(out INT, in STR) :base_core {
-  char *chartype = string_to_cstring(interpreter, $2);
-  $1 = chartype_find_chartype(chartype);
-  string_cstring_free(chartype);
-  goto NEXT();
-}
-
-=item B<string_chartype>(out INT, in STR)
-
-Find the chartype type for $2 and put it in $1
-
-=cut
-
-op string_chartype(out INT, in STR) :base_core {
-   $1 = $2->type->index;
-   goto NEXT();
-}
-
-########################################
-
-=item B<set_encoding>(in STR, in INT)
-=item B<set_chartype>(in STR, in INT)
-
-Temporary ops to set the encoding and chartype of a string
-
-=cut
-
-inline op set_encoding(in STR, in INT) :base_core {
-   $1->encoding = encoding_lookup_index($2);
-   goto NEXT();
-}
-
-inline op set_chartype(in STR, in INT) :base_core {
-   $1->type = chartype_lookup_index($2);
-   goto NEXT();
-}
+//=item B<find_encoding>(out INT, in STR)
+//
+//Find the encoding named in $2 and return its number in $1
+//
+//=cut
+//
+//op find_encoding(out INT, in STR) :base_core {
+//  char *encoding = string_to_cstring(interpreter, $2);
+//  $1 = encoding_find_encoding(encoding);
+//  string_cstring_free(encoding);
+//  goto NEXT();
+//}
 
 ########################################
 
@@ -663,7 +569,7 @@ op join(out STR, in STR, in PMC) :base_core {
     int i, ar_len = VTABLE_elements(interpreter, ar);
 
     if (ar_len == 0) {
-	$1 = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+	$1 = string_make_empty(interpreter, enum_stringrep_one, 0);
 	goto NEXT();
     }
     s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
@@ -681,12 +587,12 @@ op split(out PMC, in STR, in STR) :base_core {
     PMC *res = $1 = pmc_new(interpreter, enum_class_PerlArray);
     STRING *r = $2;
     STRING *s = $3;
-    int slen = string_length(s);
+    int slen = string_length(interpreter, s);
     int i;
 
     if (!slen)
 	goto NEXT();
-    if (string_length(r))
+    if (string_length(interpreter, r))
 	internal_exception(1, "Unimplemented split by regex");
     for (i = 0; i < slen; ++i) {
 	STRING *p = string_substr(interpreter, s, i, 1, NULL, 0);

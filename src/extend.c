@@ -703,14 +703,11 @@ void Parrot_set_pmcreg(Parrot_INTERP interpreter, Parrot_Int regnum, Parrot_PMC 
 
 =item C<Parrot_STRING Parrot_new_string(Parrot_INTERP interpreter,
                                 char *buffer, int length,
-                                Parrot_Encoding encoding,
-                                Parrot_CharType charset,
-                                Parrot_Language language,
+                                const char * const encoding_name,
                                 Parrot_Int flags)>
 
-Create a new Parrot string from a passed-in buffer. If the encoding,
-charset, or language are 0, then use the default. Pass in a 0 for flags
-for right now.
+Create a new Parrot string from a passed-in buffer. Pass in a 0 for 
+flags for right now.
 
 A copy of the buffer is made.
 
@@ -720,11 +717,9 @@ A copy of the buffer is made.
 
 Parrot_STRING Parrot_new_string(Parrot_INTERP interpreter,
                                 char *buffer, int length,
-                                Parrot_Encoding encoding,
-                                Parrot_CharType charset,
-                                Parrot_Language language,
+                                const char * const encoding_name,
                                 Parrot_Int flags) {
-    return string_make(interpreter, buffer, length, encoding, flags, charset);
+    return string_make(interpreter, buffer, length, encoding_name, flags);
 }
 
 /*
@@ -737,11 +732,11 @@ Find the magic token for an encoding, by name.
 =cut
 
 */
-
+/*
 Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP interpreter, char *encoding_name) {
     return Parrot_encoding_lookup(encoding_name);
 }
-
+*/
 /*
 
 =item C<Parrot_Language
@@ -755,21 +750,6 @@ Find the magic language token for a language, by language name.
 
 Parrot_Language Parrot_find_language(Parrot_INTERP interpreter, char *language) {
     return 0;
-}
-
-/*
-
-=item C<Parrot_Const_CharType
-Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype)>
-
-Find the magic token for a chartype, by name.
-
-=cut
-
-*/
-
-Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP interpreter, char *chartype) {
-    return Parrot_chartype_lookup(chartype);
 }
 
 /*

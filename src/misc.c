@@ -87,34 +87,13 @@ Parrot_vsprintf_c(struct Parrot_Interp *interpreter, const char *pat,
     STRING *realpat, *ret;
 
     realpat = string_make(interpreter, pat, strlen(pat),
-                                  NULL, PObj_external_FLAG, NULL);
+                                  "iso-8859-1", PObj_external_FLAG);
+
+	Parrot_block_GC(interpreter); /* don't allow realpat to get collected; need a better way to ensure that.... */
     ret = Parrot_vsprintf_s(interpreter, realpat, args);
+	Parrot_unblock_GC(interpreter);
 
     return ret;
-}
-
-/*
-
-=item C<void
-Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
-                va_list args)>
-
-Similar to C<Parrot_vsprintf_c()> but returns the result as a C string
-via C<targ>.
-
-=cut
-
-*/
-
-void
-Parrot_vsprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
-                va_list args)
-{
-    STRING *ret = Parrot_vsprintf_c(interpreter, pat, args);
-    string_transcode(interpreter, ret, NULL, NULL, &ret);
-
-    memcpy(targ, ret->strstart, ret->bufused);
-    targ[ret->bufused] = '\0';
 }
 
 /*
@@ -140,7 +119,7 @@ Parrot_vsnprintf(struct Parrot_Interp *interpreter, char *targ,
     len--;
     if (len) {
         ret = Parrot_vsprintf_c(interpreter, pat, args);
-        string_transcode(interpreter, ret, NULL, NULL, &ret);
+        /* string_transcode(interpreter, ret, NULL, NULL, &ret); */
 
         if (len > ret->bufused) {
             len = ret->bufused;
@@ -202,31 +181,6 @@ Parrot_sprintf_c(struct Parrot_Interp *interpreter, const char *pat, ...)
     va_end(args);
 
     return ret;
-}
-
-/*
-
-=item C<void
-Parrot_sprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
-               ...)>
-
-Calls C<Parrot_vsprintf()> with the C<va_list> obtained from C<...>.
-
-=cut
-
-*/
-
-void
-Parrot_sprintf(struct Parrot_Interp *interpreter, char *targ, const char *pat,
-               ...)
-{
-    va_list args;
-
-    va_start(args, pat);
-
-    Parrot_vsprintf(interpreter, targ, pat, args);
-
-    va_end(args);
 }
 
 /*

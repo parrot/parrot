@@ -833,12 +833,10 @@ char floatval_map[FLOAT_REGISTERS_TO_MAP] =
       r22, r23, r24, r25, r26, r27, r28, r29, r30,
       r31, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10 };
 
-#ifdef __IBMC__
-
 void ppc_flush_line(char *_sync);
 void ppc_sync(void);
 
-#else
+#ifndef __IBMC__
 
 void
 ppc_flush_line(char *_sync)

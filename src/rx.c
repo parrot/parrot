@@ -62,7 +62,7 @@ rx_is_word_character(struct Parrot_Interp *interpreter, INTVAL ch)
         bmp = bitmap_make_cstr(interpreter, RX_WORDCHARS);
     }
 
-    return bitmap_match(bmp, ch);
+    return bitmap_match(interpreter, bmp, ch);
 }
 
 /*
@@ -112,7 +112,7 @@ rx_is_whitespace_character(struct Parrot_Interp *interpreter, INTVAL ch)
         bmp = bitmap_make_cstr(interpreter, RX_SPACECHARS);
     }
 
-    return bitmap_match(bmp, ch);
+    return bitmap_match(interpreter, bmp, ch);
 }
 
 /*
@@ -135,7 +135,7 @@ rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch)
         bmp = bitmap_make_cstr(interpreter, RX_NEWLINES);
     }
 
-    return bitmap_match(bmp, ch);
+    return bitmap_match(interpreter, bmp, ch);
 }
 
 /*
@@ -162,14 +162,14 @@ bitmap_make(struct Parrot_Interp *interpreter, STRING *str)
         bmp->bmp[i] = 0;
     }
 
-    for (i = 0; i < string_length(str); i++) {
-        ch = string_ord(str, (INTVAL)i);
+    for (i = 0; i < string_length(interpreter, str); i++) {
+        ch = string_ord(interpreter, str, (INTVAL)i);
 
         if (ch > 255) {
             bmp->bigchars =
                 string_concat(interpreter, bmp->bigchars,
-                              string_make(interpreter, (void *)&ch, 1, 0, 0,
-                                          0), 0);
+                              string_make(interpreter, (void *)&ch, 1,
+                                          "iso-8859-1", 0), 0);
         }
         else {
             bmp->bmp[ch >> 3] |= (1 << (ch & 7));
@@ -228,7 +228,7 @@ bitmap_add(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
     if (ch > 255) {
         bmp->bigchars =
             string_concat(interpreter, bmp->bigchars,
-                          string_make(interpreter, (void *)&ch, 1, 0, 0, 0),
+                          string_make(interpreter, (void *)&ch, 1, "iso-8859-1", 0),
                           0);
     }
     else {
@@ -248,13 +248,13 @@ Checks if supplied character is in supplied bitmap.
 */
 
 INTVAL
-bitmap_match(Bitmap bmp, INTVAL ch)
+bitmap_match(struct Parrot_Interp *interpreter, Bitmap bmp, INTVAL ch)
 {
     if (ch > 255) {
         UINTVAL i;
 
-        for (i = 0; i < string_length(bmp->bigchars); i++) {
-            if (string_ord(bmp->bigchars, (INTVAL)i) == ch) {
+        for (i = 0; i < string_length(interpreter, bmp->bigchars); i++) {
+            if (string_ord(interpreter, bmp->bigchars, (INTVAL)i) == ch) {
                 return 1;
             }
         }
@@ -277,7 +277,7 @@ Frees up memory the bitmap allocated.
 */
 
 void
-bitmap_destroy(Bitmap bmp)
+bitmap_destroy(struct Parrot_Interp *interpreter, Bitmap bmp)
 {
     /* XXX */
     if (bmp->bigchars && PObj_bufstart(bmp->bigchars))

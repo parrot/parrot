@@ -200,7 +200,7 @@ inline op print(in NUM) :base_io {
 
 op print(in STR) :base_io {
   STRING *s = $1;
-  if (s && string_length(s)) {
+  if (s && string_length(interpreter, s)) {
     PIO_putps(interpreter, PIO_STDOUT(interpreter), s);
   }
   goto NEXT();
@@ -249,7 +249,7 @@ op printerr(in NUM) :base_io {
 
 op printerr(in STR) :base_io {
   STRING *s = $1;
-  if (s && string_length(s)) {
+  if (s && string_length(interpreter, s)) {
     PIO_putps(interpreter, PIO_STDERR(interpreter), s);
   }
   goto NEXT();
@@ -341,36 +341,21 @@ Warning: This is a quick hack.
 
 op read(out STR, in INT) :base_io {
   UINTVAL n;
-  INTVAL nr;
   if($2 >= 65535)
     n = 65535;
   else
     n = $2;
-  $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
-  memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, PIO_STDIN(interpreter),
-                ($1)->strstart, (size_t)n);
-  if(nr > 0)
-    ($1)->strlen = ($1)->bufused = nr;
-  else
-    ($1)->strlen = ($1)->bufused = 0;
+  $1 = PIO_reads(interpreter, PIO_STDIN(interpreter), (size_t)n);
   goto NEXT();
 }
 
 op read(out STR, in PMC, in INT) :base_io {
   UINTVAL n;
-  INTVAL nr;
   if($3 >= 65535)
     n = 65535;
   else
     n = $3;
-  $1 = string_make(interpreter, NULL, n, NULL, 0, NULL);
-  memset(($1)->strstart, 0, n);
-  nr = PIO_read(interpreter, $2, ($1)->strstart, (size_t)n);
-  if(nr > 0)
-    ($1)->strlen = ($1)->bufused = nr;
-  else
-    ($1)->strlen = ($1)->bufused = 0;
+  $1 = PIO_reads(interpreter, $2, (size_t)n);
   goto NEXT();
 }
 
@@ -391,7 +376,7 @@ inline op readline(out STR, in PMC) :base_io {
   if (!ok)
       real_exception(interpreter, resume, PIO_ERROR,
           "File not found");
-  $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
+  $1 = string_make_empty(interpreter, enum_stringrep_one, 65535);
   memset(($1)->strstart, 0, 65535);
 
   if ($2) {
@@ -419,7 +404,7 @@ remove it from the stream.
 op peek(out STR) :base_io {
   INTVAL nr;
 
-  $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
+  $1 = string_make_empty(interpreter, enum_stringrep_one, 1);
   memset(($1)->strstart, 0, 1);
   nr = PIO_peek(interpreter, PIO_STDIN(interpreter),
                 ($1)->strstart);
@@ -433,7 +418,7 @@ op peek(out STR) :base_io {
 op peek(out STR, in PMC) :base_io {
   INTVAL nr;
 
-  $1 = string_make(interpreter, NULL, 1, NULL, 0, NULL);
+  $1 = string_make_empty(interpreter, enum_stringrep_one, 1);
   memset(($1)->strstart, 0, 1);
   nr = PIO_peek(interpreter, $2, ($1)->strstart);
   if(nr > 0)

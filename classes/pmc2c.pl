@@ -579,11 +579,11 @@ void $initname (Interp * interp, int entry) {
      */
     if (!Parrot_base_vtables[entry]) {
 	temp_base_vtable.whoami = string_make(interp,
-	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+	   "$classname", @{[length($classname)]}, "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG);
 	temp_base_vtable.isa_str = string_make(interp,
-	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+	   "$isa", @{[length($isa)]}, "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG);
 	temp_base_vtable.does_str = string_make(interp,
-	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+	   "$does", @{[length($does)]}, "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG);
 
 	Parrot_base_vtables[entry] =
 	   Parrot_clone_vtable(interp, &temp_base_vtable);

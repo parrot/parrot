@@ -1319,6 +1319,8 @@ CODE
 -1
 OUTPUT
 
+SKIP: {
+skip("Pending rework of creating non-ascii literals",2);
 output_is(<<'CODE',<<OUTPUT,"index, multibyte matching");
     set S0, "\xAB"
     find_chartype I0, "8859-1"
@@ -1371,6 +1373,7 @@ CODE
 -1
 4
 OUTPUT
+}
 
 output_is(<<'CODE',<<OUTPUT,"num to string");
     set N0, 80.43
@@ -1728,6 +1731,8 @@ String #0
 String #2
 OUTPUT
 
+SKIP: {
+skip("Peding reimplementation of find_encoding", 1);
 output_is(<<'CODE', <<OUTPUT, "find_encoding");
       find_encoding I0, "singlebyte"
       print I0
@@ -1748,7 +1753,10 @@ CODE
 2
 3
 OUTPUT
+}
 
+SKIP: {
+skip("no more visible encoding", 1);
 output_is(<<'CODE', <<OUTPUT, "string_encoding");
       set I0, 0
       new S0, 0, I0
@@ -1785,6 +1793,7 @@ ok 2
 ok 3
 ok 4
 OUTPUT
+}
 
 output_is( <<'CODE', <<'OUTPUT', "substr_r_s_s|sc_i|ic_i|ic" );
 	set	S4, "12345JAPH01"
@@ -2219,8 +2228,8 @@ output_is( <<'CODE', <<OUTPUT, "bnots 2");
  end
 CODE
 a2c
-\x9E\xCD\x9C
-\x9E\xCD\x9C
+\xC2\x9E\xC3\x8D\xC2\x9C
+\xC2\x9E\xC3\x8D\xC2\x9C
 a2c
 OUTPUT
 
@@ -2235,6 +2244,8 @@ CODE
 foo
 OUTPUT
 
+SKIP: {
+skip("no more transcode", 1);
 output_is( <<'CODE', <<OUTPUT, "transcode to utf8");
   set S1, "ASCII is the same as UTF8\n"
   find_encoding I1, "utf8"
@@ -2246,7 +2257,10 @@ CODE
 ASCII is the same as UTF8
 ASCII is the same as UTF8
 OUTPUT
+}
 
+SKIP: {
+skip("no more chartype", 1);
 output_is(<<'CODE', <<OUTPUT, "string_chartype");
     set S0, "Test String"
     find_chartype I0, "usascii"
@@ -2263,6 +2277,7 @@ OK: print "ok\n"
 CODE
 ok
 OUTPUT
+}
 
 # Set all string registers to values given by &$_[0](reg num)
 sub set_str_regs {

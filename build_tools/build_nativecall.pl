@@ -258,7 +258,7 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     UNUSED(pmc_nci);
-    if (0 == string_length(signature)) return F2DPTR(pcf_v_v);
+    if (0 == string_length(interpreter, signature)) return F2DPTR(pcf_v_v);
     $icky_global_bit
 
 
@@ -267,7 +267,7 @@ build_call_func(struct Parrot_Interp *interpreter, PMC *pmc_nci,
       see which signature has an unknown type. I am sure someone can come up
       with a neater way to do this.
      */
-    ns = string_make(interpreter, " is an unknown signature type", 30, NULL, 0, NULL);
+    ns = string_make(interpreter, " is an unknown signature type", 30, "iso-8859-1", 0);
     message = string_concat(interpreter, signature, ns, 0);
 
     /*

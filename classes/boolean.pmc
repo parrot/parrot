@@ -63,7 +63,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 */
 
     void set_string_native (STRING* value) {
-        PMC_int_val(SELF) = string_bool(value);
+        PMC_int_val(SELF) = string_bool(INTERP, value);
     }
 
 /*

@@ -17,45 +17,54 @@
 
 /* Declarations of accessors */
 
-INTVAL string_compute_strlen(STRING *);
-INTVAL string_max_bytes(STRING*, INTVAL);
+INTVAL string_compute_strlen(struct Parrot_Interp *, STRING *);
+INTVAL string_max_bytes(struct Parrot_Interp *, STRING*, INTVAL);
 STRING *string_concat(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_append(struct Parrot_Interp *, STRING *, STRING *, UINTVAL);
 STRING *string_repeat(struct Parrot_Interp *, const STRING *, UINTVAL,
                       STRING **);
-STRING *string_chopn(STRING *, INTVAL);
+STRING *string_chopn(struct Parrot_Interp *, STRING *, INTVAL);
 STRING *string_substr(struct Parrot_Interp *, STRING *, INTVAL,
                       INTVAL, STRING **, int replace_dest);
 STRING *string_replace(struct Parrot_Interp *, STRING *, INTVAL, INTVAL,
                        STRING *, STRING **);
 STRING *string_nprintf(struct Parrot_Interp *,
                        STRING *, INTVAL, const char *, ...);
+STRING *string_printf(struct Parrot_Interp *interpreter, 
+					  const char *format, ...);
 INTVAL string_compare(struct Parrot_Interp *, STRING *, STRING *);
 INTVAL string_equal(struct Parrot_Interp *, STRING *, STRING *);
-INTVAL hash_string_equal(struct Parrot_Interp *, STRING *, STRING *);
-INTVAL string_bool(const STRING *);
+INTVAL string_bool(struct Parrot_Interp *, const STRING *);
 const char *Parrot_string_cstring(const STRING *);
 
 /* Declarations of other functions */
-UINTVAL string_length(const STRING *);
-INTVAL string_ord(const STRING *, INTVAL idx);
-FLOATVAL string_to_num(const STRING *);
-INTVAL string_to_int(const STRING *);
+UINTVAL string_length(struct Parrot_Interp *, const STRING *);
+INTVAL string_ord(struct Parrot_Interp *, const STRING *, INTVAL idx);
+STRING *string_chr(struct Parrot_Interp *, UINTVAL character);
+FLOATVAL string_to_num(struct Parrot_Interp *, const STRING *);
+INTVAL string_to_int(struct Parrot_Interp *, const STRING *);
 STRING *string_from_int(struct Parrot_Interp *, INTVAL i);
 STRING *int_to_str(struct Parrot_Interp *,
            char *tc, HUGEINTVAL num, char base);
 STRING *string_from_num(struct Parrot_Interp *, FLOATVAL f);
 STRING *string_grow(struct Parrot_Interp *, STRING *s, INTVAL addlen);
-STRING *string_make(struct Parrot_Interp *, const void *buff,
-                    UINTVAL len, const ENCODING *, UINTVAL flags,
-                    const CHARTYPE *);
+const char* string_primary_encoding_for_representation(struct Parrot_Interp *,
+					parrot_string_representation_t representation);
+STRING *string_make(struct Parrot_Interp *interpreter, const void *buffer,
+            UINTVAL len, const char *encoding_name, UINTVAL flags);
+STRING * string_make_empty(struct Parrot_Interp *interpreter,
+					parrot_string_representation_t representation,
+					UINTVAL capacity);
 STRING *string_copy(struct Parrot_Interp *, STRING *);
 STRING *string_set(struct Parrot_Interp *, STRING *d, STRING *s);
-STRING *string_transcode(struct Parrot_Interp *, STRING *src,
+/* STRING *string_transcode(struct Parrot_Interp *, STRING *src,
                          const ENCODING *, const CHARTYPE *,
-                         STRING **dest_ptr);
+                         STRING **dest_ptr); */
 void string_init(void);
-INTVAL string_index(const STRING *, UINTVAL idx);
+UINTVAL string_capacity(struct Parrot_Interp *interpreter, STRING *s);
+void *string_pointer_to_index(struct Parrot_Interp *, 
+								const STRING *s, UINTVAL idx);
+INTVAL string_index(struct Parrot_Interp *, const STRING *, UINTVAL idx);
 INTVAL string_str_index(struct Parrot_Interp *interpreter, const STRING *s,
         const STRING *s2, UINTVAL start);
 STRING *string_from_cstring(struct Parrot_Interp *, const void *, UINTVAL);
@@ -72,8 +81,12 @@ STRING *string_bitwise_xor(struct Parrot_Interp *interpreter, STRING *s1,
                STRING *s2, STRING **dest);
 STRING *string_bitwise_not(struct Parrot_Interp *interpreter, STRING *s,
                STRING **dest);
-void string_iterator_init(struct string_iterator_t *i, const STRING *s);
+//void string_iterator_init(struct string_iterator_t *i, const STRING *s);
 UINTVAL string_decode_and_advance(struct string_iterator_t *i);
+
+size_t string_hash(Interp *interpreter, Hash *hash, STRING *s);
+STRING * string_unescape_cstring(struct Parrot_Interp *, char *cstring,
+									char delimiter);
 
 STRING *string_upcase(struct Parrot_Interp *, const STRING *);
 STRING *string_downcase(struct Parrot_Interp *, const STRING *);

@@ -497,8 +497,7 @@ STRING *
 PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
 {
     UINTVAL flags;
-    opcode_t encoding;
-    opcode_t type;
+    opcode_t representation;
     size_t size;
     STRING *s;
     int wordsize = pf ? pf->header->wordsize : sizeof(opcode_t);
@@ -506,24 +505,37 @@ PF_fetch_string(Parrot_Interp interp, struct PackFile *pf, opcode_t **cursor)
     flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */
     flags &= PObj_constant_FLAG;
-    encoding = PF_fetch_opcode(pf, cursor);
-    type = PF_fetch_opcode(pf, cursor);
+    representation = PF_fetch_opcode(pf, cursor);
 
     /* These may need to be separate */
     size = (size_t)PF_fetch_opcode(pf, cursor);
 
+/* #define TRACE_PACKFILE 1 */
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "Constant_unpack_string(): flags are 0x%04x...\n", flags);
-    PIO_eprintf(NULL, "Constant_unpack_string(): encoding is %ld...\n",
-            encoding);
-    PIO_eprintf(NULL, "Constant_unpack_string(): type is %ld...\n", type);
-    PIO_eprintf(NULL, "Constant_unpack_string(): size is %ld...\n", size);
+    PIO_eprintf(NULL, "PF_fetch_string(): flags are 0x%04x...\n", flags);
+    PIO_eprintf(NULL, "PF_fetch_string(): representation is %ld...\n",
+           representation);
+    PIO_eprintf(NULL, "PF_fetch_string(): size is %ld...\n", size);
 #endif
 
+    if( size == 0 && representation == enum_stringrep_unknown )
+    {
+        representation = enum_stringrep_one;
+    }
+    
     s = string_make(interp, *cursor, size,
+           string_primary_encoding_for_representation(interp, representation),
+           flags);
+
+#if TRACE_PACKFILE
+    PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
+	PIO_putps(interp, PIO_STDERR(interp), s);
+    PIO_eprintf(NULL, "\n");
+#endif
+
+/*    s = string_make(interp, *cursor, size,
             encoding_lookup_index(encoding),
-            flags,
-            chartype_lookup_index(type));
+                               flags); */
 
     size = ROUND_UP_B(size, wordsize);
     *((unsigned char **) (cursor)) += size;
@@ -548,13 +560,14 @@ PF_store_string(opcode_t *cursor, STRING *s)
     char *charcursor;
     size_t i;
 
+/*    PIO_eprintf(NULL, "PF_store_string(): size is %ld...\n", s->bufused); */
+
     if (padded_size % sizeof(opcode_t)) {
         padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
     }
 
     *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG */
-    *cursor++ = s->encoding->index;
-    *cursor++ = s->type->index;
+    *cursor++ = s->representation;
     *cursor++ = s->bufused;
 
     /* Switch to char * since rest of string is addressed by
@@ -597,8 +610,8 @@ PF_size_string(STRING *s)
         padded_size += sizeof(opcode_t) - (padded_size % sizeof(opcode_t));
     }
 
-    /* Include space for flags, encoding, type, and size fields.  */
-    return 4 + (size_t)padded_size / sizeof(opcode_t);
+    /* Include space for flags, representation, and size fields.  */
+    return 3 + (size_t)padded_size / sizeof(opcode_t);
 }
 
 /*

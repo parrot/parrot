@@ -47,7 +47,7 @@ getchr_va(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     /* char promoted to int */
     char ch = (char)va_arg(*arg, int);
 
-    return string_make(interpreter, &ch, 1, NULL, 0, NULL);
+    return string_make(interpreter, &ch, 1, "iso-8859-1", 0);
 }
 
 /*
@@ -314,7 +314,7 @@ getchr_pmc(struct Parrot_Interp *interpreter, INTVAL size, SPRINTF_OBJ *obj)
     obj->index++;
     s = VTABLE_get_string(interpreter, tmp);
     /* XXX string_copy like below? + adjusting bufused */
-    return string_make(interpreter, s->strstart, 1, 0, 0, 0);
+    return string_substr(interpreter, s, 0, 1, NULL, 0);
 }
 
 /*

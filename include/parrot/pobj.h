@@ -101,14 +101,20 @@ typedef Buffer PObj;
 #  define PObj_version(pobj)  (pobj)->obj._pobj_version
 #endif
 
+typedef enum { 
+		enum_stringrep_unknown = 0,
+		enum_stringrep_one = 1,
+		enum_stringrep_two = 2,
+		enum_stringrep_four = 4
+	} parrot_string_representation_t;
+
 struct parrot_string_t {
     pobj_t obj;
     UINTVAL bufused;
     void *strstart;
     UINTVAL strlen;
-    const ENCODING *encoding;
-    const CHARTYPE *type;
-    INTVAL language;
+	parrot_string_representation_t representation;
+    UINTVAL hashval; /* cached hash value computation; not yet used */
 };
 
     /* cache.* is intended to just be *shortcuts* to*/

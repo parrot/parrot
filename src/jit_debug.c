@@ -258,8 +258,8 @@ debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
     STRING *ret;
     ret = string_copy(interpreter, file);
     ret = string_append(interpreter, ret,
-            string_make(interpreter, ext, strlen(ext), 0,
-                PObj_external_FLAG, 0),
+            string_make(interpreter, ext, strlen(ext), "iso-8859-1",
+                PObj_external_FLAG),
             0);
     return ret;
 }
@@ -289,24 +289,24 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     if (interpreter->code->cur_cs->debugs) {
         char *ext;
         char *src = interpreter->code->cur_cs->debugs->filename;
-        pasmfile = string_make(interpreter, src, strlen(src), NULL,
-                PObj_external_FLAG, NULL);
+        pasmfile = string_make(interpreter, src, strlen(src), "iso-8859-1",
+                PObj_external_FLAG);
         file = string_copy(interpreter, pasmfile);
         /* chop pasm/imc */
 
         ext = strrchr(src, '.');
         if (ext && strcmp (ext, ".pasm") == 0)
-            file = string_chopn(file, 4);
+            file = string_chopn(interpreter, file, 4);
         else if (ext && strcmp (ext, ".imc") == 0)
-            file = string_chopn(file, 3);
+            file = string_chopn(interpreter, file, 3);
         else if (!ext) /* EVAL_n */
             file = string_append(interpreter, file,
-                    string_make(interpreter, ".", 1, 0, PObj_external_FLAG, 0),
+                    string_make(interpreter, ".", 1, "iso-8859-1", PObj_external_FLAG),
                     0);
     }
     else {
         /* chop pbc */
-        file = string_chopn(file, 3);
+        file = string_chopn(interpreter, file, 3);
         pasmfile = debug_file(interpreter, file, "pasm");
     }
     stabsfile = debug_file(interpreter, file, "stabs.s");

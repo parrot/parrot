@@ -137,7 +137,7 @@ print_warning(struct Parrot_Interp *interpreter, STRING *msg)
         PIO_puts(interpreter, PIO_STDERR(interpreter), "Unknown warning\n");
     else {
         PIO_putps(interpreter, PIO_STDERR(interpreter), msg);
-        if (string_ord(msg, -1) != '\n')
+        if (string_ord(interpreter, msg, -1) != '\n')
             PIO_eprintf(interpreter, "%c", '\n');
     }
     print_pbc_location(interpreter);

@@ -127,7 +127,7 @@ inline op set(out INT, in NUM) :base_core {
 }
 
 inline op set(out INT, in STR) :base_core {
-  $1 = string_to_int($2);
+  $1 = string_to_int(interpreter, $2);
   goto NEXT();
 }
 
@@ -142,7 +142,7 @@ inline op set(out NUM, in INT) :base_core {
 }
 
 inline op set(out NUM, in STR) :base_core {
-  $1 = string_to_num($2);
+  $1 = string_to_num(interpreter, $2);
   goto NEXT();
 }
 

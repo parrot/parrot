@@ -69,7 +69,7 @@ Parrot_get_datatype_name(Interp *interpreter, INTVAL type)
         s = "illegal";
     else
         s = data_types[type - enum_first_type].name;
-    return string_make(interpreter, s, strlen(s), 0, PObj_external_FLAG, 0);
+    return string_make(interpreter, s, strlen(s), "iso-8859-1", PObj_external_FLAG);
 }
 
 /*

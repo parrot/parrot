@@ -156,11 +156,28 @@ XXX no string delimiters - so no space allowed.
 
 */
 
+void *Parrot_utf8_encode(void *ptr, UINTVAL c);
+
 static void
 push_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io, STRING *s)
 {
-    str_append(interpreter, io->image, s->strstart, s->bufused);
+	UINTVAL length = string_length(interpreter, s);
+	char *buffer = malloc(4*length);
+	char *cursor = buffer;
+	UINTVAL index = 0;
+	INTVAL temp = 0;
+	
+	/* temporary--write out in UTF-8 */
+	for( index = 0; index < length; ++index )
+	{
+/*		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, index)); */
+		*cursor++ = (unsigned char)string_index(interpreter, s, index);
+	}
+
+    str_append(interpreter, io->image, buffer, cursor - buffer);
     str_append(interpreter, io->image, " ", 1);
+
+    free(buffer);   
 }
 
 /*
@@ -262,7 +279,8 @@ shift_ascii_string(Parrot_Interp interpreter, IMAGE_IO *io)
     io->image->strstart = p;
     io->image->bufused -= (p - start);
     assert((int)io->image->bufused >= 0);
-    s = string_make(interpreter, start, p - start - 1, NULL, 0, NULL);
+    s = string_make(interpreter, start, p - start - 1, "iso-8859-1", 0);
+/*    s = string_make(interpreter, start, p - start - 1, "UTF-8", 0); */
     return s;
 }
 
@@ -1350,7 +1368,7 @@ create_image(Parrot_Interp interpreter, PMC *pmc, visit_info *info)
         len = items * FREEZE_BYTES_PER_ITEM;
     }
 
-    info->image = string_make(interpreter, NULL, len, NULL, 0, NULL);
+    info->image = string_make_empty(interpreter, enum_stringrep_one, len);
 }
 
 /*
@@ -1389,7 +1407,7 @@ run_thaw(Parrot_Interp interpreter, STRING* image, visit_enum_type what)
      * a DOD run first and then block DOD - the limit should be
      * chosen so that no more then one DOD run would be triggered
      */
-    if (string_length(image) > THAW_BLOCK_DOD_SIZE) {
+    if (string_length(interpreter, image) > THAW_BLOCK_DOD_SIZE) {
         Parrot_do_dod_run(interpreter, 1);
         Parrot_block_DOD(interpreter);
         Parrot_block_GC(interpreter);

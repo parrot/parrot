@@ -58,7 +58,7 @@ END
 	my $v=Configure::Data->get($k);
 	if(defined $v) {
           $v =~ s/(["\\])/\\$1/g;
-          $v =~ s/\n/\\\n/g;
+          $v =~ s/\n/\\n/g;
           print OUT qq(\tset P0["$k"], "$v"\n);
         }
         else {

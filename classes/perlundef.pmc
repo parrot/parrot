@@ -88,7 +88,7 @@ string.
     STRING* get_string () {
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in string context");
-        return string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+        return string_make_empty(INTERP,enum_stringrep_one,0);
     }
 
 /*
@@ -724,7 +724,7 @@ All these methods simply return undef itself.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in repeat");
 
-        empty_string = string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+        empty_string = string_make_empty(INTERP,enum_stringrep_one,0);
         VTABLE_set_string_native(INTERP, dest, empty_string);
     }
 
@@ -744,7 +744,7 @@ C<PerlString> in C<*dest>.
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
         "Use of uninitialized value in repeat");
 
-        empty_string = string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+        empty_string = string_make_empty(INTERP,enum_stringrep_one,0);
         VTABLE_set_string_native(INTERP, dest, empty_string);
     }
 

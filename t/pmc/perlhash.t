@@ -958,6 +958,8 @@ value for key1
 0
 OUTPUT
 
+SKIP: {
+skip("no more chartype", 1);
 output_is(<<'CODE', <<OUTPUT, "compare keys with different type");
     set S0, "\xA4"	# currency/euro depending on type
     clone S1, S0
@@ -995,6 +997,7 @@ not equal
 currency
 euro
 OUTPUT
+}
 
 output_is(<< 'CODE', << 'OUTPUT', "PerlHash in PIR");
 ##PIR##
@@ -1140,3 +1143,5 @@ changed inner_hash:133
 135.135000
 -135.135000
 OUTPUT
+
+1;

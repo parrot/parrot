@@ -286,7 +286,7 @@ Returns the Parrot string value of the element at index C<key>.
                 Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
                             "Use of uninitialized value");
             }
-            return string_make(interpreter,  NULL, 0, NULL, 0, NULL);
+            return string_make_empty(interpreter,  enum_stringrep_one, 0);
         }
         else
             return SUPER(key);

@@ -182,11 +182,6 @@ generated. Needs a working parser and lexer.
 
 Build parrot assuming only pure ANSI C is available.
 
-=item C<--buildicu>
-
-Build Parrot and ICU. Runs F<icu/source/configure> with the options in
-F<icu/README.parrot>.
-
 =item C<--expnetwork>
 
 Enable experimental networking. This is an unused option and should
@@ -285,7 +280,6 @@ Other Options (may not be implemented):
    --maintainer         Create imcc's parser and lexer files. Needs a working
                         parser and lexer.
    --miniparrot         Build parrot assuming only pure ANSI C is available
-   --buildicu           Build Parrot and ICU
    --expnetwork         Enable experimental networking (unused)
 
 EOT

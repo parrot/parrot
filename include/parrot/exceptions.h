@@ -27,6 +27,12 @@ void do_panic(struct Parrot_Interp *interpreter, const char *message,
 /* Exception Types */
 /* &gen_from_def(except_types.pasm) prefix(EXCEPTION_) */
 
+#define BAD_BUFFER_SIZE 1
+#define MISSING_ENCODING_NAME 1
+#define INVALID_STRING_REPRESENTATION 1
+#define ICU_ERROR 1
+#define UNIMPLEMENTED 1
+
 #define NULL_REG_ACCESS 1
 #define NO_REG_FRAMES 1
 #define SUBSTR_OUT_OF_STRING 1

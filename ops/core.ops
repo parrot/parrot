@@ -307,7 +307,7 @@ inline op if(in NUM, labelconst INT) {
 }
 
 op if (in STR, labelconst INT) {
-  if (string_bool($1)) {
+  if (string_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
   goto NEXT();
@@ -349,7 +349,7 @@ inline op unless(in NUM, labelconst INT) {
 }
 
 op unless (in STR, labelconst INT) {
-  if (!string_bool($1)) {
+  if (!string_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
   goto NEXT();

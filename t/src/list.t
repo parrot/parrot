@@ -100,7 +100,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     f = *(FLOATVAL*) list_get(interpreter, list, 20, enum_type_FLOATVAL);
     PIO_eprintf(interpreter, "num " FLOATVAL_FMT "\n",  f);
 
-    s = string_make(interpreter, "Seems ok\n", 9, 0, 0,0);
+    s = string_make(interpreter, "Seems ok\n", 9, "iso-8859-1", 0);
 
     list = list_new(interpreter, enum_type_PMC);
 
@@ -116,7 +116,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     i = list_length(interpreter, list);
     PIO_eprintf(interpreter, "len now %d\n", i);
 
-    s = string_make(interpreter, "list\n", 5, 0, 0,0);
+    s = string_make(interpreter, "list\n", 5, "iso-8859-1",0);
     p1 = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list, 0, p1, enum_type_PMC);
@@ -124,7 +124,7 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     /* clone */
     list2 = list_clone(interpreter, list);
 
-    s = string_make(interpreter, "list 2\n", 7, 0, 0,0);
+    s = string_make(interpreter, "list 2\n", 7, "iso-8859-1",0);
     p1 = pmc_new(interpreter, enum_class_PerlString);
     VTABLE_set_string_native(interpreter, p1, s);
     list_assign(interpreter, list2, 0, p1, enum_type_PMC);
@@ -138,12 +138,12 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     PIO_eprintf(interpreter, "string %s", string_to_cstring(interpreter, s));
 
     list = list_new(interpreter, enum_type_STRING);
-    s = string_make(interpreter, "list\n", 5, 0, 0,0);
+    s = string_make(interpreter, "list\n", 5, "iso-8859-1",0);
     list_assign(interpreter, list, 0, s, enum_type_STRING);
 
     list2 = list_clone(interpreter, list);
 
-    s = string_make(interpreter, "list 2\n", 7, 0, 0,0);
+    s = string_make(interpreter, "list 2\n", 7, "iso-8859-1",0);
     list_assign(interpreter, list2, 0, s, enum_type_STRING);
     s = *(STRING**) list_shift(interpreter, list, enum_type_STRING);
     PIO_eprintf(interpreter, "string %s", string_to_cstring(interpreter, s));

@@ -135,7 +135,7 @@ Returns the pointer value as a Parrot string.
         (and if you do, you have too comfortable a life and
         deserve to be tormented by coredumps). */
         sprintf(target, "Pointer=0x%p", PMC_data(SELF));
-        ret=string_make(interpreter, target, strlen(target), 0, 0, 0);
+        ret=string_make(interpreter, target, strlen(target), "iso-8859-1", 0);
 
         mem_sys_free(target);
         return ret;

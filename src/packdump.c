@@ -85,10 +85,8 @@ PackFile_Constant_dump(struct Parrot_Interp *interpreter,
         PIO_printf(interpreter, "    [ 'PFC_STRING', {\n");
         PIO_printf(interpreter, "        FLAGS    => 0x%04lx,\n",
                    (long)PObj_get_FLAGS(self->u.string));
-        PIO_printf(interpreter, "        ENCODING => %s,\n",
-                   self->u.string->encoding->name);
-        PIO_printf(interpreter, "        TYPE     => %s,\n",
-                   self->u.string->type->name);
+        PIO_printf(interpreter, "        REPRESENTATION => %ld,\n",
+                   self->u.string->representation);
         PIO_printf(interpreter, "        SIZE     => %ld,\n",
                    (long)self->u.string->bufused);
         /* TODO: Won't do anything reasonable for most encodings */

@@ -487,106 +487,36 @@ fixup_bsrs(struct Parrot_Interp *interpreter)
     }
 }
 
-/*
- * the string can't grow, so its done in place
- */
-static int
-unescape(char *string)
-{
-    char *start, *p;
-    char hexdigits[] = "0123456789abcdef";
-
-    for (start = p = string ; *string; string++) {
-        if (*string == '\\' && string[1]) {
-            switch (*++string) {
-                case 'n':
-                    *p++ = '\n';
-                    break;
-                case 'r':
-                    *p++ = '\r';
-                    break;
-                case 't':
-                    *p++ = '\t';
-                    break;
-                case 'a':
-                    *p++ = '\a';
-                    break;
-                case 'f':
-                    *p++ = '\f';
-                    break;
-                case 'e':
-                    *p++ = '\033';
-                    break;
-                case '\\':
-                    *p++ = '\\';
-                    break;
-                case 'x':       /* XXX encoding??? */
-                    {
-                        int c1 = tolower(*++string);
-                        char *p1 = strchr(hexdigits, c1);
-                        char *p2;
-                        if (p1) {
-                            int c2 = tolower(*++string);
-                            p2 = strchr(hexdigits, c2);
-                            if (p2)
-                                *p++ = ((p1-hexdigits) << 4) | (p2-hexdigits);
-                            else {
-                                --string;
-                                *p++ = (p1-hexdigits);
-                            }
-                        }
-                        else {
-                            /* XXX warning? */
-                            *p++ = *--string;
-                        }
-                    }
-                    break;
-                default:
-                    *p++ = *string;
-                    break;
-            }
-        }
-        else
-            *p++ = *string;
-    }
-    *p = 0;
-    return p - start;
-}
-
 /* add constant string to constant_table */
 static int
 add_const_str(struct Parrot_Interp *interpreter, char *str)
 {
-    int k, l;
-    char *o;
-    char *buf = o = str_dup(str);
+    int k;
+    char *buf = str;
+    STRING *s = NULL;
 
     /*
      * TODO strip delimiters in lexer, this needs adjustment in printint strings
      */
     if (*buf == '"') {
         buf++;
-        l = unescape(buf);
-        if (l)
-        buf[--l] = '\0';
+        s = string_unescape_cstring(interpreter, buf, '"');
     }
     else if (*buf == '\'') {
         buf++;
-        l = strlen(buf);
-        if (l)
-            buf[--l] = '\0';
+        buf[strlen(buf) - 1] = '\0'; /* get rid of trailing quote */
+        s = string_make(interpreter, buf, strlen(buf), "iso-8859-1",
+						PObj_constant_FLAG);
     }
     else {
-        l = unescape(buf);
+        s = string_unescape_cstring(interpreter, buf, 0);
     }
 
     k = PDB_extend_const_table(interpreter);
     interpreter->code->const_table->constants[k]->type =
         PFC_STRING;
-    interpreter->code->const_table->constants[k]->u.string =
-        string_make(interpreter, buf, (UINTVAL) l, NULL,
-                PObj_constant_FLAG, NULL);
-    free(o);
+    interpreter->code->const_table->constants[k]->u.string = s;
+
     return k;
 }
 
@@ -602,7 +532,7 @@ add_const_num(struct Parrot_Interp *interpreter, char *buf)
         PFC_NUMBER;
     s = string_from_cstring(interpreter, buf, 0);
     interpreter->code->const_table->constants[k]->u.number =
-        string_to_num(s);
+        string_to_num(interpreter, s);
     return k;
 }
 

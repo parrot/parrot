@@ -584,7 +584,8 @@ real_exception(struct Parrot_Interp *interpreter, void *ret_addr,
     }
     else
         msg = string_make(interpreter, format, strlen(format),
-                NULL, PObj_external_FLAG, NULL);
+							"iso-8859-1", PObj_external_FLAG);
+			/* string_from_cstring(interpreter, format, strlen(format)); */
     /*
      * FIXME classify errors
      */

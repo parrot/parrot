@@ -646,8 +646,7 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
     sa.sin_port = htons(port);
 
     fprintf(stderr, "sockaddr_in: port %d\n", port);
-    return string_make(interpreter, &sa, sizeof(struct sockaddr), NULL, 0,
-            NULL);
+    return string_make(interpreter, &sa, sizeof(struct sockaddr), "iso-8859-1", 0);
 }
 
 

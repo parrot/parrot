@@ -1778,9 +1778,9 @@ make_interpreter(Parrot_Interp parent, Interp_flags flags)
 
     /* Set up defaults for line/package/file */
     interpreter->current_file =
-        string_make(interpreter, "(unknown file)", 14, NULL, 0, NULL);
+        string_make(interpreter, "(unknown file)", 14, "iso-8859-1", 0);
     interpreter->current_package =
-        string_make(interpreter, "(unknown package)", 18, NULL, 0, NULL);;
+        string_make(interpreter, "(unknown package)", 18, "iso-8859-1", 0);;
 
     SET_NULL_P(interpreter->code, struct PackFile *);
     SET_NULL_P(interpreter->profile, ProfData *);
@@ -1954,8 +1954,10 @@ Parrot_really_destroy(int exit_code, void *vinterp)
 
     /* chartype, encodings */
     if (!interpreter->parent_interpreter) {
+/*
         chartype_destroy();
         encoding_destroy();
+*/
     }
 
     else {
@@ -2519,11 +2521,11 @@ enter_nci_method(Parrot_Interp interpreter, int type,
     method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_string_keyed(interpreter, method, func,
             string_make(interpreter, proto, strlen(proto),
-                NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
+                "iso-8859-1", PObj_constant_FLAG|PObj_external_FLAG));
     VTABLE_set_pmc_keyed_str(interpreter, method_table,
             string_make(interpreter, name,
-                strlen(name), NULL,
-                PObj_constant_FLAG|PObj_external_FLAG, NULL),
+                strlen(name), "iso-8859-1",
+                PObj_constant_FLAG|PObj_external_FLAG),
             method);
 }
 

@@ -249,8 +249,8 @@ ret_string(Parrot_Interp interpreter, char *p, int type)
         case enum_type_cstr:
             cstr = *(char **) p;
             len = strlen(cstr);
-            return string_make(interpreter, cstr, len, NULL,
-                PObj_external_FLAG, NULL);
+            return string_make(interpreter, cstr, len, "iso-8859-1",
+                PObj_external_FLAG);
         default:
             internal_exception(1, "returning unhandled string type in struct");
     }

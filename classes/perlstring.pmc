@@ -36,7 +36,7 @@ Initializes the string.
 */
 
     void init () {
-        PMC_str_val(SELF) = string_make(INTERP,NULL,0,NULL,0,NULL);
+        PMC_str_val(SELF) = string_make_empty(INTERP,enum_stringrep_one,0);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -84,7 +84,7 @@ Returns the integer value of the string.
 
     INTVAL get_integer () {
         STRING* s = (STRING*) PMC_str_val(SELF);
-        return string_to_int(s);
+        return string_to_int(INTERP, s);
     }
 
 /*
@@ -99,7 +99,7 @@ Returns the floating-point value for the string.
 
     FLOATVAL get_number () {
         STRING* s = (STRING*) PMC_str_val(SELF);
-        return string_to_num(s);
+        return string_to_num(INTERP, s);
     }
 
 /*
@@ -128,7 +128,7 @@ Returns the boolean value of the string.
 */
 
     INTVAL get_bool () {
-        return string_bool(PMC_str_val(SELF));
+        return string_bool(INTERP, PMC_str_val(SELF));
     }
 
 /*
@@ -662,7 +662,7 @@ C<what>.
     PMC* nextkey_keyed (PMC* key, INTVAL what) {
         PMC *ret = key;
         STRING *s = PMC_str_val(SELF);
-        INTVAL n = string_length(s);
+        INTVAL n = string_length(INTERP, s);
         union {
             const void * __c_ptr;
             void * __ptr;
@@ -673,22 +673,10 @@ C<what>.
         switch (what) {
             case ITERATE_FROM_START:    /* reset key */
                 PMC_int_val(ret) = 0;
-                if (!n)
-                    PMC_int_val(ret) = -1;
-                PMC_data(key) = s->strstart;
                 break;
             case ITERATE_GET_NEXT:
                 if (PMC_int_val(ret) < n - 1) {
                     ++PMC_int_val(ret);
-                    if ((char *)PMC_data(key) >= (char *)s->strstart &&
-                    (char *)PMC_data(key) <= (char *)s->strstart +
-                        s->bufused)
-                    PMC_data(key) = const_cast(
-                        s->encoding->skip_forward( PMC_data(key), 1));
-                    else
-                    PMC_data(key) = const_cast(
-                        s->encoding->skip_forward(s->strstart,
-                        PMC_int_val(ret)));
                 }
                 else
                     PMC_int_val(ret) = -1;
@@ -696,26 +684,20 @@ C<what>.
             case ITERATE_GET_PREV:
                 if (PMC_int_val(ret) >= 0) {
                     --PMC_int_val(ret);
-                    if (PMC_int_val(ret) >= 0) {
-                    if ((char *)PMC_data(key) >= (char *)s->strstart &&
-                        (char *)PMC_data(key) <= (char *)s->strstart +
-                        s->bufused)
-                        PMC_data(key) = const_cast(
-                        s->encoding->skip_backward( PMC_data(key), 1));
-                    else
-                        PMC_data(key) = const_cast(
-                        s->encoding->skip_forward(s->strstart,
-                            PMC_int_val(ret)));
-                    }
                 }
                 break;
             case ITERATE_FROM_END:
                 PMC_int_val(ret) = n-1;
-                PMC_data(key) = (char *)s->strstart + s->bufused;
-                PMC_data(key) = const_cast(
-                        s->encoding->skip_backward( PMC_data(key), 1));
                 break;
         }
+        
+        if (!n)
+            ret->cache.int_val = -1;
+    
+        if (ret->cache.int_val > 0)
+            PMC_data(key) = string_pointer_to_index(INTERP, s, ret->cache.int_val);
+         /* else do what? */
+    
         return ret;
     }
 
@@ -730,25 +712,9 @@ Returns the string value for C<*key>.
 */
 
     STRING* get_string_keyed(PMC* key) {
-        STRING *res;
         STRING *s = PMC_str_val(SELF);
-        union {
-            const void * __c_ptr;
-            void * __ptr;
-        } __ptr_u;
-        if ((char*)PMC_data(key) >= (char *)s->strstart &&
-            (char *)PMC_data(key) <= (char *)s->strstart + s->bufused)
-            ;
-        else
-            PMC_data(key) = const_cast(s->encoding->skip_forward(
-             s->strstart, PMC_int_val(key)));
-        res = string_copy(interpreter, s);
-        res->strstart = PMC_data(key);
-        res->strlen = 1;
-        res->bufused = (const char *)res->encoding->skip_forward(
-            res->strstart, 1) - (const char *)res->strstart;
-        return res;
     
+        return string_substr(INTERP, s, PMC_int_val(key), 1, NULL, 0);
     }
         
 /*
@@ -763,16 +729,8 @@ Returns the integer value for C<*key>.
 
     INTVAL get_integer_keyed(PMC* key) {
         STRING *s = PMC_str_val(SELF);
-        if ((char*)PMC_data(key) >= (char *)s->strstart &&
-            (char *)PMC_data(key) <= (char *)s->strstart + s->bufused) {
-            if (s->encoding->index == enum_encoding_singlebyte)
-            return *(unsigned char*) PMC_data(key);
-            else
-            return s->encoding->decode(PMC_data(key));
-        }
-        else
-            return s->encoding->decode(s->encoding->skip_forward(s->strstart,
-                PMC_int_val(key)));
+        
+        return string_ord(INTERP, s, PMC_int_val(key));
     }
 
 /*

@@ -30,7 +30,7 @@ extern const char *RX_NUMCHARS;
 extern const char *RX_SPACECHARS;
 extern const char *RX_NEWLINES;
 
-#define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), 0, 0, 0)
+#define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), "iso-8859-1", 0)
 
 INTVAL rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
 INTVAL rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
@@ -40,8 +40,8 @@ INTVAL rx_is_newline(struct Parrot_Interp *, INTVAL ch);
 Bitmap bitmap_make(struct Parrot_Interp *, STRING *);
 Bitmap bitmap_make_cstr(struct Parrot_Interp *, const char *);
 void bitmap_add(struct Parrot_Interp *, Bitmap, INTVAL);
-INTVAL bitmap_match(Bitmap, INTVAL);
-void bitmap_destroy(Bitmap);
+INTVAL bitmap_match(struct Parrot_Interp*, Bitmap, INTVAL);
+void bitmap_destroy(struct Parrot_Interp*, Bitmap);
 
 #endif /* PARROT_RX_H_GUARD */
 

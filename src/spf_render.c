@@ -66,7 +66,7 @@ uint_to_str(struct Parrot_Interp *interpreter,
     } while (num /= base);
     if (minus)
         *--p = '-';
-    return string_make(interpreter, p, tail - p, NULL, 0, NULL);
+    return string_make(interpreter, p, tail - p, "iso-8859-1", 0);
 }
 
 /*
@@ -114,11 +114,11 @@ static STRING *
 handle_flags(struct Parrot_Interp *interpreter,
              SpfInfo info, STRING *str, INTVAL is_int_type, const char *prefix)
 {
-    UINTVAL len = string_length(str);
+    UINTVAL len = string_length(interpreter, str);
 
     if (is_int_type) {
         /* +, space */
-        if (string_ord(str, 0) != '-') {
+        if (string_ord(interpreter, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
                 str = string_concat(interpreter, cstr2pstr("+"), str, 0);
                 len++;
@@ -144,7 +144,7 @@ handle_flags(struct Parrot_Interp *interpreter,
         /* precision */
         if (info->flags & FLAG_PREC) {
             info->flags |= FLAG_WIDTH;
-            if (string_ord(str, 0) == '-' || string_ord(str, 0) == '+') {
+            if (string_ord(interpreter, str, 0) == '-' || string_ord(interpreter, str, 0) == '+') {
                 info->width = info->prec + 1;
             }
             else {
@@ -155,7 +155,7 @@ handle_flags(struct Parrot_Interp *interpreter,
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec < len) {
-            string_chopn(str, -(INTVAL)(info->prec));
+            string_chopn(interpreter, str, -(INTVAL)(info->prec));
             len = info->prec;
         }
     }
@@ -178,10 +178,10 @@ handle_flags(struct Parrot_Interp *interpreter,
         else {                  /* right-align */
             /* signed and zero padded */
             if (info->flags & FLAG_ZERO
-                && (string_ord(str,0) == '-' || string_ord(str,0) == '+')) {
+                && (string_ord(interpreter, str,0) == '-' || string_ord(interpreter, str,0) == '+')) {
                 STRING *temp = 0;
                 string_substr(interpreter, str, 1, len-1, &temp, 0);
-                string_chopn(str, -1);
+                string_chopn(interpreter, str, -1);
                 string_append(interpreter, str, fill, 0);
                 string_append(interpreter, str, temp, 0);
             }
@@ -287,7 +287,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
      * start with some allocated buffer
      * this speeds up tracing mandel.pasm by a factor of 3
      */
-    STRING *targ = string_make(interpreter, NULL, 128, NULL, 0, NULL);
+    STRING *targ = string_make_empty(interpreter, enum_stringrep_one, 128);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by uint_to_string and
@@ -298,15 +298,15 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
 
 
-    for (i = old = len = 0; i < (INTVAL) string_length(pat); i++) {
-        if (string_ord(pat, i) == '%') {        /* % */
+    for (i = old = len = 0; i < (INTVAL) string_length(interpreter, pat); i++) {
+        if (string_ord(interpreter, pat, i) == '%') {        /* % */
             if (len) {
                 string_substr(interpreter, pat, old, len, &substr, 1);
                 string_append(interpreter, targ, substr, 0);
             }
             len = 0;
             old = i;
-            if (string_ord(pat, i + 1) == '%') {
+            if (string_ord(interpreter, pat, i + 1) == '%') {
                 /* skip this one, make next the first char
                  * of literal sequence, starting at old */
                 i++;
@@ -421,9 +421,9 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
  *  set flags--the last does all the work.
  */
 
-                for (i++; i < (INTVAL) string_length(pat)
+                for (i++; i < (INTVAL) string_length(interpreter, pat)
                      && info.phase != PHASE_DONE; i++) {
-                    INTVAL ch = string_ord(pat, i);
+                    INTVAL ch = string_ord(interpreter, pat, i);
 
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:

@@ -21,10 +21,8 @@ use Parrot::Configure::Step ':gen';
 $description="Generating runtime/parrot/include...";
 
 my @files = qw(
-    include/parrot/chartype.h
     include/parrot/core_pmcs.h
     include/parrot/datatypes.h
-    include/parrot/encoding.h
     include/parrot/enums.h
     include/parrot/exceptions.h
     include/parrot/interpreter.h

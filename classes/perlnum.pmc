@@ -84,7 +84,7 @@ Returns the number as a Parrot string.
 #else
         sprintf(buff,FLOATVAL_FMT,PMC_num_val(SELF));  /* XXX buffer overflow! */
 #endif
-        s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
+        s = string_make(INTERP,buff,strlen(buff),"iso-8859-1",0);
         mem_sys_free(buff);
         return s;
     }

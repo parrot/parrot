@@ -90,11 +90,9 @@ void Parrot_set_numreg(Parrot_INTERP, Parrot_Int, Parrot_Float);
 void Parrot_set_strreg(Parrot_INTERP, Parrot_Int, Parrot_STRING);
 void Parrot_set_pmcreg(Parrot_INTERP, Parrot_Int, Parrot_PMC);
 
-Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, Parrot_Encoding, Parrot_CharType, Parrot_Language, Parrot_Int);
+Parrot_STRING Parrot_new_string(Parrot_INTERP, char *, int, const char * const, Parrot_Int);
 
-Parrot_Const_CharType Parrot_find_chartype(Parrot_INTERP, char*);
 Parrot_Language Parrot_find_language(Parrot_INTERP, char*);
-Parrot_Const_Encoding Parrot_find_encoding(Parrot_INTERP, char*);
 
 void Parrot_register_pmc(Parrot_INTERP, Parrot_PMC);
 void Parrot_unregister_pmc(Parrot_INTERP, Parrot_PMC);

@@ -20,4 +20,5 @@ Configure::Data->set(
   ccwarn => "-Wno-shadow",
   libs => $libs,
   so => '.dylib',
+  link => 'c++',
 );

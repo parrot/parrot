@@ -149,18 +149,7 @@ Return the hashed value of the string C<value>.
 static size_t
 key_hash_STRING(Interp *interpreter, Hash *hash, void *value)
 {
-    char *buffptr = ((STRING* )value)->strstart;
-    UINTVAL len = ((STRING* )value)->bufused;
-    register size_t h = hash->seed;
-
-    UNUSED(interpreter);
-
-    while (len--) {
-        h += h << 5;
-        h += *buffptr++;
-    }
-
-    return h;
+	return string_hash(interpreter, hash, (STRING *)value);
 }
 
 /*
@@ -179,108 +168,8 @@ C<a> is the search key, C<b> is the bucket key.
 static int
 STRING_compare(Parrot_Interp interp, void *a, void *b)
 {
-#if USE_STRING_EQUAL
     return string_equal(interp, (STRING *)a, (STRING *) b);
-#else
-    return hash_string_equal(interp, (STRING *)a, (STRING *) b);
-#endif
 }
-
-#if USE_STRING_EQUAL
-#  define promote_hash_key(i,h,k,f) (k)
-#else
-
-/*
-
-=item C<static void
-convert_hash_keys_to_utf8(Parrot_Interp interpreter, Hash *hash)>
-
-Converts the hash's key type to UTF-8.
-
-It is assumeed that until this function is called all keys are ASCII, so
-the hash values of existing keys will not change.
-
-If any allocation is done inside the loop, that might trigger GC and the
-C<HashBucket> must be refetched.
-
-=cut
-
-*/
-
-static void
-convert_hash_keys_to_utf8(Parrot_Interp interpreter, Hash *hash)
-{
-    HashIndex i;
-    const ENCODING * enc = encoding_lookup_index(enum_encoding_utf8);
-    const CHARTYPE * typ = chartype_lookup_index(enum_chartype_unicode);
-
-    for (i = 0; i <= hash->max_chain; i++) {
-        BucketIndex bi = lookupBucketIndex(hash, i);
-        while (bi != NULLBucketIndex) {
-            HashBucket *b = getBucket(hash, bi);
-            STRING *key = (STRING*) b->key;
-            assert(key->type->index == enum_chartype_usascii);
-            assert(key->encoding->index == enum_encoding_singlebyte);
-            key->type = typ;
-            key->encoding = enc;
-            bi = b->next;
-        }
-    }
-    hash->key_type = Hash_key_type_utf8;
-}
-
-/*
-
-=item C<static void*
-promote_hash_key(Interp *interpreter, Hash *hash, void *key, int for_insert)>
-
-Check and possibly promote a hash key to UTF-8.
-
-If C<< hash->key_type >> matches C<key> then it is ok and doesn't need promotion.
-
-If the hash's key type is ASCII and C<for_insert> is true, then this
-calls C<convert_hash_keys_to_utf8()> to convert the hash's key type to
-UTF-8.
-
-=cut
-
-*/
-
-static void*
-promote_hash_key(Interp *interpreter, Hash *hash, void *key, int for_insert)
-{
-    STRING *s;
-    const ENCODING * enc;
-    const CHARTYPE * typ;
-
-    assert(key);
-    switch (hash->key_type) {
-        case Hash_key_type_int:
-        case Hash_key_type_cstring:
-            return key;
-        case Hash_key_type_ascii:
-            s = (STRING*) key;
-            if (s->type->index == enum_chartype_usascii)
-                return key;
-            if (for_insert)
-                convert_hash_keys_to_utf8(interpreter, hash);
-            enc = encoding_lookup_index(enum_encoding_utf8);
-            typ = chartype_lookup_index(enum_chartype_unicode);
-            return string_transcode(interpreter, s, enc, typ, NULL);
-        case Hash_key_type_utf8:
-            s = (STRING*) key;
-            if (s->encoding->index != enum_encoding_utf8) {
-                enc = encoding_lookup_index(enum_encoding_utf8);
-                typ = chartype_lookup_index(enum_chartype_unicode);
-                return string_transcode(interpreter, s, enc, typ, NULL);
-            }
-            return key;
-        default:
-            internal_exception(1, "Illegal key_type");
-    }
-    return key;
-}
-#endif
 
 /*
 
@@ -829,7 +718,7 @@ Returns the bucket for C<okey>.
 HashBucket *
 hash_get_bucket(Interp *interpreter, Hash *hash, void *okey)
 {
-    void *key = promote_hash_key(interpreter, hash, okey, 0);
+    void *key = okey;
     UINTVAL hashval = (hash->hash_val)(interpreter, hash, key);
     HashIndex *table = (HashIndex *) PObj_bufstart(&hash->buffer);
     BucketIndex chain = table[hashval & hash->max_chain];
@@ -893,7 +782,7 @@ hash_put(Interp *interpreter, Hash *hash, void *okey, void *value)
     BucketIndex chain;
     HashBucket *bucket;
 
-    void *key = promote_hash_key(interpreter, hash, okey, 1);
+    void *key = okey;
 
     /*      dump_hash(interpreter, hash); */
 
@@ -941,7 +830,7 @@ hash_delete(Interp *interpreter, Hash *hash, void *okey)
     HashIndex slot;
     HashBucket *bucket;
     HashBucket *prev = NULL;
-    void *key = promote_hash_key(interpreter, hash, okey, 0);
+    void *key = okey;
 
     hashval = (hash->hash_val)(interpreter, hash, key);
     slot = hashval & hash->max_chain;

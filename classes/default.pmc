@@ -64,8 +64,8 @@ check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
      */
     static STRING *ro;
     if (!ro)
-        ro = string_make(interp, "_ro", 3, NULL,
-            PObj_constant_FLAG|PObj_external_FLAG , 0);
+        ro = string_make(interp, "_ro", 3, "iso-8859-1",
+            PObj_constant_FLAG|PObj_external_FLAG);
     if (!string_compare(interp, key, ro)) {
 #else
 
@@ -105,16 +105,16 @@ does_isa (Parrot_Interp interp, STRING *method, STRING *what)
         pos = string_str_index(interp, what, method, pos);
         if (pos < 0)
             return 0;
-        if (pos >= (INTVAL)string_length(what))
+        if (pos >= (INTVAL)string_length(interp, what))
             return 0;
-        len = string_length(method);
-        if (pos && string_index(what, pos - 1) != 32) {
+        len = string_length(interp, method);
+        if (pos && string_index(interp, what, pos - 1) != 32) {
             pos += len;
             continue;
         }
 
-        if (pos+len < (INTVAL)string_length(what) &&
-            string_index(what, pos + len) != 32) {
+        if (pos+len < (INTVAL)string_length(interp, what) && 
+            string_index(interp, what, pos + len) != 32) {
             pos += len;
             continue;
         }

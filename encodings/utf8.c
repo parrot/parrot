@@ -148,6 +148,16 @@ utf8_encode(void *ptr, UINTVAL c)
     return u8ptr + len;
 }
 
+/* temporary */
+void * Parrot_utf8_encode(void *ptr, UINTVAL c);
+
+void *
+Parrot_utf8_encode(void *ptr, UINTVAL c)
+{
+	return utf8_encode(ptr, c);
+}
+
+
 /*
 
 =item C<static const void *
@@ -274,27 +284,12 @@ utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
     i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
 }
 
-const ENCODING utf8_encoding = {
-    enum_encoding_utf8,
-    "utf8",
-    UTF8_MAXLEN,
-    utf8_characters,
-    utf8_decode,
-    utf8_encode,
-    utf8_skip_forward,
-    utf8_skip_backward,
-    utf8_decode_and_advance,
-    utf8_set_position
-};
-
 /*
 
 =back
 
 =head1 SEE ALSO
 
-F<encodings/dbcs.c>,
-F<encodings/singlebyte.c>,
 F<encodings/utf16.c>,
 F<encodings/utf32.c>,
 F<src/string.c>,

@@ -130,7 +130,7 @@ Returns the PMC's code as a Parrot string.
         size = PackFile_pack_size(pf) * sizeof(opcode_t);
         packed = (opcode_t*) mem_sys_allocate(size);
         PackFile_pack(pf, packed);
-        s = string_make(interpreter, packed, size, NULL,0,NULL);
+        s = string_make(interpreter, packed, size, "iso-8859-1", 0);
         mem_sys_free(packed);
         return s;
     }

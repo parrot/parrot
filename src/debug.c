@@ -152,7 +152,7 @@ parse_string(struct Parrot_Interp *interpreter,
             str++;
     }
 
-    *strP = string_make(interpreter, string, str - string, NULL, 0, NULL);
+    *strP = string_make(interpreter, string, str - string, "iso-8859-1", 0);
 
     if (*str)
         str++;
@@ -683,7 +683,7 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
             str[i - 1] = command[i];
         str[i - 1] = '\0';
         condition->value = string_make(interpreter,
-            str, i - 1, NULL, PObj_external_FLAG, NULL);
+            str, i - 1, "iso-8859-1", PObj_external_FLAG);
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_pmc) {
@@ -890,7 +890,7 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
         c[i] = '\0';
         na(command);
 
-        arg = string_make(interpreter, c, i, NULL, 0, NULL);
+        arg = string_make(interpreter, c, i, "iso-8859-1", 0);
         VTABLE_push_string(interpreter, userargv, arg);
     }
 
@@ -1552,7 +1552,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                         strcpy(&dest[size], temp);
                         string_cstring_free(temp);
                     }
-                    size += string_length(PMC_str_val(k));
+                    size += string_length(interpreter, PMC_str_val(k));
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:

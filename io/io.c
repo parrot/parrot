@@ -904,6 +904,27 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 
 */
 
+/* temporary */
+void Parrot_string_downscale(struct Parrot_Interp *interpreter, STRING *s,
+				parrot_string_representation_t representation);
+
+STRING *
+PIO_reads(theINTERP, PMC *pmc, size_t len)
+{
+	char *buffer = malloc(len);
+	UINTVAL length_read = 0;
+	STRING *temp = NULL;
+	
+	length_read = PIO_read(interpreter, pmc, buffer, len);
+	temp = string_make(interpreter, buffer, length_read, "UTF-8", 0);
+	/* this is temporary, to make freeze/thaw work */
+	Parrot_string_downscale(interpreter, temp, enum_stringrep_one); /* squish it */
+
+	free(buffer);
+	
+	return temp;
+}
+
 INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
@@ -1031,6 +1052,8 @@ PIO_puts(theINTERP, PMC *pmc, const char *s)
     return PIO_write(interpreter, pmc, s, strlen(s));
 }
 
+void *Parrot_utf8_encode(void *ptr, UINTVAL c);
+
 /*
 
 =item C<INTVAL
@@ -1045,7 +1068,23 @@ Writes C<*s> tp C<*pmc>. Parrot string version.
 INTVAL
 PIO_putps(theINTERP, PMC *pmc, STRING *s)
 {
-    return PIO_write(interpreter, pmc, s->strstart, s->bufused);
+	UINTVAL length = string_length(interpreter, s);
+	char *buffer = malloc(4*length);
+	char *cursor = buffer;
+	UINTVAL index = 0;
+	INTVAL temp = 0;
+	
+	/* temporary--write out in UTF-8 */
+	for( index = 0; index < length; ++index )
+	{
+		cursor = Parrot_utf8_encode(cursor, string_index(interpreter, s, index));
+	}
+	
+    temp = PIO_write(interpreter, pmc, buffer, cursor - buffer);
+    
+    free(buffer);
+    
+    return temp;
 }
 
 /*

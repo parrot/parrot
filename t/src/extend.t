@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
     if ( interpreter == NULL ) return 1;
     Parrot_init(interpreter);
 
-    output = Parrot_new_string(interpreter, "Test", 4, NULL, NULL, 0, 0);
+    output = Parrot_new_string(interpreter, "Test", 4, "iso-8859-1", 0);
     PIO_eprintf(interpreter, "%S\n", output);
 
     Parrot_exit(0);
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
     Parrot_init(interpreter);
 
     parrot_reg = 2;
-    value = Parrot_new_string(interpreter, "Test", 4, NULL, NULL, 0, 0);
+    value = Parrot_new_string(interpreter, "Test", 4, "iso-8859-1", 0);
     Parrot_set_strreg(interpreter, parrot_reg, value);
     new_value = Parrot_get_strreg(interpreter, parrot_reg);
     PIO_eprintf(interpreter, "%S\n", new_value);
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
     type = Parrot_PMC_typenum(interpreter, "PerlString");
     testpmc = Parrot_PMC_new(interpreter, type);
 
-    value = Parrot_new_string(interpreter, "Pumpking", 8, NULL, NULL, 0, 0);
+    value = Parrot_new_string(interpreter, "Pumpking", 8, "iso-8859-1", 0);
     Parrot_PMC_set_string(interpreter, testpmc, value);
     new_value = Parrot_PMC_get_string(interpreter, testpmc);
 

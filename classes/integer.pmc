@@ -106,7 +106,7 @@ number.
 */
 
     void set_string_native(STRING* value) {
-        PMC_int_val(SELF) = string_to_num(value);
+		PMC_int_val(SELF) = string_to_num(INTERP, value);
     }
 
 /*

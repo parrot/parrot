@@ -167,7 +167,7 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
     while (recp->name != NULL) {
         PMC *csub = Parrot_new_csub(interp, recp->sub);
         STRING *name = string_make(interp, recp->name, strlen(recp->name),
-                                   NULL, 0, NULL);
+                                   "iso-8859-1", 0);
         key_set_string(interp, k, name);
         VTABLE_set_pmc_keyed(interp, hash, k, csub);
         ++recp;

@@ -2726,6 +2726,7 @@ PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
 
     type = PF_fetch_opcode(pf, &cursor);
 
+/* #define TRACE_PACKFILE 1 */
 #if TRACE_PACKFILE
     PIO_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
             type, (char)type);
@@ -2826,7 +2827,7 @@ global_ns:
         switch (pfc_const->type) {
             case PFC_STRING:
                 names = pfc_const->u.string;
-                if (!string_length(names))
+                if (!string_length(interpreter, names))
                     goto global_ns;
                 stash = add_global(interpreter, globals, names);
                 VTABLE_set_pmc_keyed_str(interpreter, stash, key, sub_pmc);

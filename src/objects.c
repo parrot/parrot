@@ -277,7 +277,7 @@ Parrot_single_subclass(Parrot_Interp interpreter, PMC *base_class,
     }
     else {
         child_class_name = string_make(interpreter,
-                "\0\0anonymous", 11, NULL, 0, NULL);
+                "\0\0anonymous", 11, "iso-8859-1", 0);
         VTABLE_set_string_native(interpreter, classname_pmc,
                 child_class_name );
     }
