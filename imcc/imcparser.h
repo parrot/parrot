@@ -41,75 +41,77 @@
      IF = 264,
      UNLESS = 265,
      NEW = 266,
-     END = 267,
-     SAVEALL = 268,
-     RESTOREALL = 269,
-     NAMESPACE = 270,
-     ENDNAMESPACE = 271,
-     CLASS = 272,
-     ENDCLASS = 273,
-     FIELD = 274,
-     METHOD = 275,
-     SUB = 276,
-     SYM = 277,
-     LOCAL = 278,
-     CONST = 279,
-     INC = 280,
-     DEC = 281,
-     GLOBAL_CONST = 282,
-     SHIFT_LEFT = 283,
-     SHIFT_RIGHT = 284,
-     INTV = 285,
-     FLOATV = 286,
-     STRINGV = 287,
-     DEFINED = 288,
-     LOG_XOR = 289,
-     RELOP_EQ = 290,
-     RELOP_NE = 291,
-     RELOP_GT = 292,
-     RELOP_GTE = 293,
-     RELOP_LT = 294,
-     RELOP_LTE = 295,
-     GLOBAL = 296,
-     ADDR = 297,
-     CLONE = 298,
-     RESULT = 299,
-     RETURN = 300,
-     POW = 301,
-     SHIFT_RIGHT_U = 302,
-     LOG_AND = 303,
-     LOG_OR = 304,
-     COMMA = 305,
-     ESUB = 306,
-     PCC_BEGIN = 307,
-     PCC_END = 308,
-     PCC_CALL = 309,
-     PCC_SUB = 310,
-     PCC_BEGIN_RETURN = 311,
-     PCC_END_RETURN = 312,
-     PCC_BEGIN_YIELD = 313,
-     PCC_END_YIELD = 314,
-     NCI_CALL = 315,
-     PROTOTYPED = 316,
-     NON_PROTOTYPED = 317,
-     LABEL = 318,
-     EMIT = 319,
-     EOM = 320,
-     IREG = 321,
-     NREG = 322,
-     SREG = 323,
-     PREG = 324,
-     IDENTIFIER = 325,
-     STRINGC = 326,
-     INTC = 327,
-     FLOATC = 328,
-     REG = 329,
-     MACRO = 330,
-     ENDM = 331,
-     PARROT_OP = 332,
-     VAR = 333,
-     LINECOMMENT = 334,
-     FILECOMMENT = 335
+     NEWSUB = 267,
+     NEWCLOSURE = 268,
+     END = 269,
+     SAVEALL = 270,
+     RESTOREALL = 271,
+     NAMESPACE = 272,
+     ENDNAMESPACE = 273,
+     CLASS = 274,
+     ENDCLASS = 275,
+     FIELD = 276,
+     METHOD = 277,
+     SUB = 278,
+     SYM = 279,
+     LOCAL = 280,
+     CONST = 281,
+     INC = 282,
+     DEC = 283,
+     GLOBAL_CONST = 284,
+     SHIFT_LEFT = 285,
+     SHIFT_RIGHT = 286,
+     INTV = 287,
+     FLOATV = 288,
+     STRINGV = 289,
+     DEFINED = 290,
+     LOG_XOR = 291,
+     RELOP_EQ = 292,
+     RELOP_NE = 293,
+     RELOP_GT = 294,
+     RELOP_GTE = 295,
+     RELOP_LT = 296,
+     RELOP_LTE = 297,
+     GLOBAL = 298,
+     ADDR = 299,
+     CLONE = 300,
+     RESULT = 301,
+     RETURN = 302,
+     POW = 303,
+     SHIFT_RIGHT_U = 304,
+     LOG_AND = 305,
+     LOG_OR = 306,
+     COMMA = 307,
+     ESUB = 308,
+     PCC_BEGIN = 309,
+     PCC_END = 310,
+     PCC_CALL = 311,
+     PCC_SUB = 312,
+     PCC_BEGIN_RETURN = 313,
+     PCC_END_RETURN = 314,
+     PCC_BEGIN_YIELD = 315,
+     PCC_END_YIELD = 316,
+     NCI_CALL = 317,
+     PROTOTYPED = 318,
+     NON_PROTOTYPED = 319,
+     LABEL = 320,
+     EMIT = 321,
+     EOM = 322,
+     IREG = 323,
+     NREG = 324,
+     SREG = 325,
+     PREG = 326,
+     IDENTIFIER = 327,
+     STRINGC = 328,
+     INTC = 329,
+     FLOATC = 330,
+     REG = 331,
+     MACRO = 332,
+     ENDM = 333,
+     PARROT_OP = 334,
+     VAR = 335,
+     LINECOMMENT = 336,
+     FILECOMMENT = 337
    };
 #endif
 #define LOW_PREC 258
@@ -121,75 +123,77 @@
 #define IF 264
 #define UNLESS 265
 #define NEW 266
-#define END 267
-#define SAVEALL 268
-#define RESTOREALL 269
-#define NAMESPACE 270
-#define ENDNAMESPACE 271
-#define CLASS 272
-#define ENDCLASS 273
-#define FIELD 274
-#define METHOD 275
-#define SUB 276
-#define SYM 277
-#define LOCAL 278
-#define CONST 279
-#define INC 280
-#define DEC 281
-#define GLOBAL_CONST 282
-#define SHIFT_LEFT 283
-#define SHIFT_RIGHT 284
-#define INTV 285
-#define FLOATV 286
-#define STRINGV 287
-#define DEFINED 288
-#define LOG_XOR 289
-#define RELOP_EQ 290
-#define RELOP_NE 291
-#define RELOP_GT 292
-#define RELOP_GTE 293
-#define RELOP_LT 294
-#define RELOP_LTE 295
-#define GLOBAL 296
-#define ADDR 297
-#define CLONE 298
-#define RESULT 299
-#define RETURN 300
-#define POW 301
-#define SHIFT_RIGHT_U 302
-#define LOG_AND 303
-#define LOG_OR 304
-#define COMMA 305
-#define ESUB 306
-#define PCC_BEGIN 307
-#define PCC_END 308
-#define PCC_CALL 309
-#define PCC_SUB 310
-#define PCC_BEGIN_RETURN 311
-#define PCC_END_RETURN 312
-#define PCC_BEGIN_YIELD 313
-#define PCC_END_YIELD 314
-#define NCI_CALL 315
-#define PROTOTYPED 316
-#define NON_PROTOTYPED 317
-#define LABEL 318
-#define EMIT 319
-#define EOM 320
-#define IREG 321
-#define NREG 322
-#define SREG 323
-#define PREG 324
-#define IDENTIFIER 325
-#define STRINGC 326
-#define INTC 327
-#define FLOATC 328
-#define REG 329
-#define MACRO 330
-#define ENDM 331
-#define PARROT_OP 332
-#define VAR 333
-#define LINECOMMENT 334
-#define FILECOMMENT 335
+#define NEWSUB 267
+#define NEWCLOSURE 268
+#define END 269
+#define SAVEALL 270
+#define RESTOREALL 271
+#define NAMESPACE 272
+#define ENDNAMESPACE 273
+#define CLASS 274
+#define ENDCLASS 275
+#define FIELD 276
+#define METHOD 277
+#define SUB 278
+#define SYM 279
+#define LOCAL 280
+#define CONST 281
+#define INC 282
+#define DEC 283
+#define GLOBAL_CONST 284
+#define SHIFT_LEFT 285
+#define SHIFT_RIGHT 286
+#define INTV 287
+#define FLOATV 288
+#define STRINGV 289
+#define DEFINED 290
+#define LOG_XOR 291
+#define RELOP_EQ 292
+#define RELOP_NE 293
+#define RELOP_GT 294
+#define RELOP_GTE 295
+#define RELOP_LT 296
+#define RELOP_LTE 297
+#define GLOBAL 298
+#define ADDR 299
+#define CLONE 300
+#define RESULT 301
+#define RETURN 302
+#define POW 303
+#define SHIFT_RIGHT_U 304
+#define LOG_AND 305
+#define LOG_OR 306
+#define COMMA 307
+#define ESUB 308
+#define PCC_BEGIN 309
+#define PCC_END 310
+#define PCC_CALL 311
+#define PCC_SUB 312
+#define PCC_BEGIN_RETURN 313
+#define PCC_END_RETURN 314
+#define PCC_BEGIN_YIELD 315
+#define PCC_END_YIELD 316
+#define NCI_CALL 317
+#define PROTOTYPED 318
+#define NON_PROTOTYPED 319
+#define LABEL 320
+#define EMIT 321
+#define EOM 322
+#define IREG 323
+#define NREG 324
+#define SREG 325
+#define PREG 326
+#define IDENTIFIER 327
+#define STRINGC 328
+#define INTC 329
+#define FLOATC 330
+#define REG 331
+#define MACRO 332
+#define ENDM 333
+#define PARROT_OP 334
+#define VAR 335
+#define LINECOMMENT 336
+#define FILECOMMENT 337
 
 
 
@@ -206,7 +210,7 @@ typedef union {
     SymbolTable * symtab;
 } yystype;
 /* Line 1281 of /usr/local/share/bison/yacc.c.  */
-#line 210 "imcc/imcparser.h"
+#line 214 "imcc/imcparser.h"
 # define YYSTYPE yystype
 #endif
 
