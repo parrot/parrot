@@ -640,7 +640,7 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 
     /* Allocate the new break point */
     newbreak = (PDB_breakpoint_t *)mem_sys_allocate(sizeof(PDB_breakpoint_t));
-  
+
     na(command);
     condition = NULL;
 
@@ -811,7 +811,7 @@ void
 PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
                        const char *command)
 {
-    PDB_breakpoint_t *breakpoint;    
+    PDB_breakpoint_t *breakpoint;
 
     breakpoint = PDB_find_breakpoint(interpreter, command);
 
@@ -832,7 +832,7 @@ void
 PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
 {
-    PDB_breakpoint_t *breakpoint;    
+    PDB_breakpoint_t *breakpoint;
 
     breakpoint = PDB_find_breakpoint(interpreter, command);
     if (breakpoint && breakpoint->skip == -1) {
@@ -870,7 +870,7 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         }
         else if (breakpoint->prev && !breakpoint->next) {
             breakpoint->prev->next = NULL;
-        }            
+        }
         else if (!breakpoint->prev && breakpoint->next) {
             breakpoint->next->prev = NULL;
             interpreter->pdb->breakpoint = breakpoint->next;
@@ -878,7 +878,7 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
         else {
             interpreter->pdb->breakpoint = NULL;
         }
-        /* Kill the breakpoint */ 
+        /* Kill the breakpoint */
         mem_sys_free(breakpoint);
     }
 }
@@ -1220,7 +1220,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
         case PARROT_ARG_NC:
             /* Convert the float to a string */
             f = interpreter->code->const_table->constants[op[j]]->u.number;
-            Parrot_snprintf(interpreter, buf, sizeof(buf), "%f", (double)f);
+            Parrot_snprintf(interpreter, buf, sizeof(buf), FLOATVAL_FMT, f);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
@@ -1243,7 +1243,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_K:
             dest[size-1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf), 
+            Parrot_snprintf(interpreter, buf, sizeof(buf),
                             "P" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1257,13 +1257,13 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                 case 0:
                     break;
                 case KEY_integer_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     INTVAL_FMT, k->cache.int_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     "%f", (double)k->cache.num_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1280,25 +1280,25 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     "I" INTVAL_FMT, k->cache.int_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     "N" INTVAL_FMT, k->cache.int_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_string_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     "S" INTVAL_FMT, k->cache.int_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_pmc_FLAG|KEY_register_FLAG:
-                    Parrot_snprintf(interpreter, buf, sizeof(buf), 
+                    Parrot_snprintf(interpreter, buf, sizeof(buf),
                                     "P" INTVAL_FMT, k->cache.int_val);
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
@@ -1314,7 +1314,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KI:
             dest[size - 1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf), 
+            Parrot_snprintf(interpreter, buf, sizeof(buf),
                             "I" INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -1322,7 +1322,7 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
             break;
         case PARROT_ARG_KIC:
             dest[size - 1] = '[';
-            Parrot_snprintf(interpreter, buf, sizeof(buf), 
+            Parrot_snprintf(interpreter, buf, sizeof(buf),
                             INTVAL_FMT, op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
@@ -2334,16 +2334,16 @@ PDB_help(struct Parrot_Interp *interpreter, const char *command)
             PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_list:
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
             "List the source code.\n\n\
 Optionally specify the line number to begin the listing from and the number\n\
-of lines to display.\n"); 
+of lines to display.\n");
             break;
         case c_run:
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
             "Run (or restart) the program being debugged.\n\n\
 Arguments specified after \"run\" are passed as command line arguments to\n\
-the program.\n"); 
+the program.\n");
             break;
         case c_break:
             PIO_eprintf(interpreter,
@@ -2410,7 +2410,7 @@ the -t option.\n");
             PIO_eprintf(interpreter,"No documentation yet");
             break;
         case c_info:
-            PIO_eprintf(interpreter, 
+            PIO_eprintf(interpreter,
                     "Print information about the current interpreter\n");
             break;
         case c_quit:

@@ -728,19 +728,16 @@ PIO_printf(theINTERP, const char *s, ...) {
 
     va_start(args, s);
 
-    str=Parrot_vsprintf_c(interpreter, s, args);
-
     if(interpreter) {
+        str=Parrot_vsprintf_c(interpreter, s, args);
         ret=PIO_putps(interpreter,
-                      new_io_pmc(interpreter, PIO_STDOUT(interpreter)), str);
+                new_io_pmc(interpreter, PIO_STDOUT(interpreter)), str);
     }
     else {
         /* Be nice about this...
-        **   XXX BD Should this use the default PIO_STDOUT or something?
-        */
-        char *temp = string_to_cstring(interpreter, str);
-        ret=printf("%s", temp);
-        string_cstring_free(temp);
+         **   XXX BD Should this use the default PIO_STDOUT or something?
+         */
+        ret=vfprintf(stdout, s, args);
     }
 
     va_end(args);

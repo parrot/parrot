@@ -454,6 +454,7 @@ Parrot_sprintf_format(struct Parrot_Interp *interpreter, STRING *pat,
                             info.type = SIZE_LONG;
                             continue;
 
+                        case 'L':
                         case 'H':
                             info.type = SIZE_HUGE;
                             continue;

@@ -1,6 +1,19 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
+
+c_output_like(<<'CODE', <<'OUTPUT', "xxxVAL_FMT");
+#include "parrot/parrot.h"
+int main(int argc, char* argv[]) {
+    PIO_printf(NULL, INTVAL_FMT "\n", (INTVAL) 42);
+    PIO_printf(NULL, FLOATVAL_FMT "\n", (FLOATVAL) 42.0);
+    return 0;
+}
+CODE
+/42\n
+42\.0+\n
+/x
+OUTPUT
 
 c_output_is(<<'CODE', <<'OUTPUT', "hello world");
 #include <stdio.h>
