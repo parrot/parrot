@@ -952,6 +952,7 @@ ok4:
     print "not "
 ok5:
     print "ok 5\n"
+    end
 CODE
 ok 1
 ok 2
