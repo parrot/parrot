@@ -26,7 +26,7 @@
 static void
 check_fingerprint(struct Parrot_Interp *interpreter)
 {
-/*    if (PNCONST == 0) { */
+    /* if (PNCONST == 0) { */
     UNUSED(interpreter);
     return;
 

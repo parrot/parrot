@@ -169,7 +169,6 @@ string_transcode(struct Parrot_Interp *interpreter,
                  const STRING *src, const ENCODING *encoding,
                  const CHARTYPE *type, STRING **dest_ptr)
 {
-
     STRING *dest;
     CHARTYPE_TRANSCODER transcoder1 = (CHARTYPE_TRANSCODER)NULLfunc;
     CHARTYPE_TRANSCODER transcoder2 = (CHARTYPE_TRANSCODER)NULLfunc;

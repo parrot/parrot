@@ -9,17 +9,16 @@
 #include "parrot/parrot.h"
 
 int main(int argc, char **argv) {
-	printf("(");
-	
-	printf("\tiregchunk=> %d,\n",		sizeof(struct IRegChunk));
-	printf("\tsregchunk=> %d,\n",		sizeof(struct SRegChunk));
-	printf("\tnregchunk=> %d,\n",		sizeof(struct NRegChunk));
-	printf("\tpregchunk=> %d,\n",		sizeof(struct PRegChunk));
-	printf("\tstackchunk=> %d,\n",		sizeof(struct Stack_chunk_t));
-	
-	
-	printf(");");
-	
-	return 0;
+    printf("(");
+
+    printf("\tiregchunk=> %d,\n",  sizeof(struct IRegChunk));
+    printf("\tsregchunk=> %d,\n",  sizeof(struct SRegChunk));
+    printf("\tnregchunk=> %d,\n",  sizeof(struct NRegChunk));
+    printf("\tpregchunk=> %d,\n",  sizeof(struct PRegChunk));
+    printf("\tstackchunk=> %d,\n", sizeof(struct Stack_chunk_t));
+
+    printf(");");
+
+    return 0;
 }
 
