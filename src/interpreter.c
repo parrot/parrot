@@ -467,6 +467,7 @@ make_interpreter(INTVAL flags) {
     /* Initialize interpreter's flags */
     interpreter->flags = flags;
     interpreter->warns = mem_sys_allocate(sizeof(struct warnings_t));
+    memset(interpreter->warns, 0, sizeof(struct warnings_t));
     PARROT_WARNINGS_off(interpreter, PARROT_WARNINGS_ALL_FLAG);
 
     interpreter->pmc_count = 0;
