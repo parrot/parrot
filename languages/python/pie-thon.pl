@@ -24,24 +24,84 @@ get_source($file);
 exit if $opt{D};
 gen_code();
 
+sub parse_dis
+{
+    my @d = @_;
+    my ($dir1, $dir2);
+    for (@d) {
+	if (/^\[/) {
+	    if ($dir1) {
+		$dir2 = $_;
+	    }
+	    else {
+		$dir1 = $_;
+	    }
+	}
+    }
+    $dir1 =~ s/^\[//;
+    $dir2 =~ s/^\[//;
+    $dir1 =~ s/\[$//;
+    $dir2 =~ s/\[$//;
+    my @dir1 = split(/,/, $dir1);
+    my @dir2 = split(/,/, $dir2);
+    my (%dir1, %dir2);
+    @dir1{@dir1} = (1) x scalar @dir1;
+    @dir2{@dir2} = (1) x scalar @dir2;
+    my @diff;
+    foreach (keys(%dir2)) {
+	push @diff, $_ unless $dir1{$_};
+    }
+    print "diff @diff\n" if $opt{d};
+    @diff;
+}
+
 # return disassembly of file
 # Pfew
+sub get_dis2 {
+    my ($cmd, $f, @syms) = @_;
+    use FileHandle;
+    use IPC::Open3;
+    my ($mod, $dir1, $dir2);
+    $f =~ /(\w+)/;
+    $mod = $1;
+    open3(*Wr, *Rd, *Er, "$cmd $f");
+    print Wr qq!print\n!;
+    print Wr "from $mod import *\n";
+    for my $s (@syms) {
+	$s =~ s/[\s']//g;
+	print Wr qq!print\n!;
+	print Wr qq!print "Disassembly of $s"\n!;
+	print Wr "dis($s)\n";
+	print STDERR "dis($s)\n" if $opt{d};
+    }
+    close Wr;
+    @dis = <Rd>;
+    close Er;
+    close Rd;
+    print @dis if $opt{d};
+    @dis;
+}
 sub get_dis {
     my ($cmd, $f) = @_;
     use FileHandle;
     use IPC::Open3;
-    my $mod;
+    my ($mod, $dir1, $dir2);
     $f =~ /(\w+)/;
     $mod = $1;
     open3(*Wr, *Rd, *Er, "$cmd $f");
-    print Wr "import $mod\n";
-    print Wr "dis($mod)\n";
+    # print Wr "import $mod\n";
+    # print Wr "dis($mod)\n";
+    print Wr "dir()\n";
+    print Wr "from $mod import *\n";
+    print Wr "dir()\n";
     close Wr;
+    my @d = <Rd>;
     close Er;
-    @dis = <Rd>;
     close Rd;
     #@dis = qx($cmd $f);
-    print @dis if $opt{d};
+    #print @dis if $opt{d};
+    my (@syms) = parse_dis(@d);
+    get_dis2($cmd, $f, @syms);
 }
 
 sub get_source {
@@ -51,7 +111,8 @@ sub get_source {
     close(IN);
 }
 
-my ($code_l, %params, %lexicals, %names, %def_args, %arg_count, @code);
+my ($code_l, %params, %lexicals, %names, %def_args, %arg_count,
+    @code, %classes);
 
 sub decode_line {
     my $l = shift;
@@ -72,6 +133,7 @@ sub decode_line {
 	(?:(\d+)(?:\s+\((.*)\))?)? # oparg rest
 	/x) {
 	($line, $pc, $opcode, $arg, $rest) = ($1, $2, $3, $4, $5);
+	## print STDERR "Op: '$opcode'\n";
 	if ($line) {
 	    $source = $source[$line-1];
 	    if ($source =~ /def (\w+)\s*\((.*)\)/) {
@@ -85,8 +147,8 @@ sub decode_line {
 	$arg = '' unless defined $arg;
 	$rest = '' unless defined $rest;
     }
-    else {
-	push @code, [0,0, "XXX", 0, $l, ''];
+    else {  # program output from import - really ugly
+	push @code, [0,0, undef, 0, $l, ''];
 	return;
     }
     push @code, [$line, $pc, $opcode, $arg, $rest, $source];
@@ -163,8 +225,13 @@ EOC
     while ($code_l < @code) {
 	my $l = $code[$code_l++];
 	my ($opcode, $arg, $rest, $src) = ($l->[2], $l->[3], $l->[4], $l->[5]);
+	next unless $opcode;
 	my $cmt = "";
 	print "## $src" if  $src;
+
+	if ($rest =~ /(<code object \w+)/) {
+	    $rest = "$1 ..>";
+	}
 	$cmt = "\t\t# $opcode\t$arg $rest" unless $opt{n};
 	gen_pir($opcode, $arg, $rest, $cmt);
     }
@@ -271,7 +338,7 @@ EOC
     }
     else {
 	print <<EOC;
-	$cmt
+	\t$cmt
 EOC
     }
     push @stack, [$n, $c, typ($c)];
@@ -280,24 +347,44 @@ sub STORE_NAME {
     my ($n, $c, $cmt) = @_;
     if ($make_f) {
 	$make_f = 0;
+	print "\t\t$cmt\n";
 	return;
     }
     my $tos = pop @stack;
-    if ($globals{$c}) {
+    my $pmc;
+    print "\t\t$cmt\n";
+    unless ($names{$c}) {
 	print <<"EOC";
-	assign $c, $tos->[1] $cmt
+	.local pmc $c \t# case 0
+EOC
+	if ($tos->[2] eq 'P' && $tos->[1] =~ /^\$/) {
+	    $pmc = $tos->[1];
+	}
+	else {
+	    print <<"EOC";
+	$c = new $DEFVAR \t# case 1
+EOC
+	    $pmc = $c
+	}
+    }
+    if ($tos->[2] eq 'P') {
+	$pmc = $tos->[1];
+    }
+    else {
+	$pmc = promote($tos);
+    }
+    $globals{$c} = 1;
+    $names{$c} = 1;
+    # a temp - store it
+    if ($pmc =~ /^\$/) {
+	print <<"EOC";
+	global "$c" = $pmc \t# case 2
+	$c = $pmc
 EOC
     }
     else {
-	$globals{$c} = 1;
-	$names{$c} = 1;
-	my $typ = $DEFVAR;
-	my $const = $tos->[1];
 	print <<"EOC";
-        .local pmc $c $cmt
-	$c = new $typ
-	$c = $const
-	global "$c" = $c
+	assign $c, $pmc \t# case 3
 EOC
     }
 }
@@ -392,6 +479,11 @@ sub RETURN_VALUE
 	.pcc_end_return
 EOC
     }
+    else {
+	print <<EOC;
+	# $cmt
+EOC
+    }
 }
 
 sub MAKE_FUNCTION
@@ -401,7 +493,7 @@ sub MAKE_FUNCTION
     my $f;
     $tos->[1] =~ /code object (\w+)/;
     $f = $1;
-    print "$cmt\n";
+    print "\t\t$cmt\n";
     if ($n) {
 	for (my $i=0; $i < $n; ++$i) {
 	    my $arg = pop @stack;
@@ -520,7 +612,7 @@ sub UNARY_NOT
 	$code[$code_l]->[3],$code[$code_l]->[4]);
 
     if ($opcode eq 'JUMP_IF_FALSE') {
-	print "$cmt\n";
+	print "\t\t$cmt\n";
 	$code_l++;
 	JUMP_IF_TRUE($arg, $rest);
     }
@@ -579,7 +671,7 @@ sub COMPARE_OP
 	($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     }
     if ($opcode eq 'JUMP_IF_FALSE') {
-	print "$cmt\n";
+	print "\t\t$cmt\n";
 	$code_l++;
 	$cmt ="\t\t# $opcode\t $rest";
 	if ($rest =~ /to (\d+)/) {
@@ -587,7 +679,7 @@ sub COMPARE_OP
 	}
     }
     elsif ($opcode eq 'JUMP_IF_TRUE') {
-	print "$cmt\n";
+	print "\t\t$cmt\n";
 	$code_l++;
 	$cmt ="\t\t# $opcode\t $rest";
 	if ($rest =~ /to (\d+)/) {
@@ -655,6 +747,14 @@ sub CALL_FUNCTION
 {
     my ($n, $c, $cmt) = @_;
     my @args;
+    if ($make_f) {
+	$make_f = 0;
+	print <<EOC;
+	\t$cmt
+EOC
+	pop @stack;
+	return;
+    }
     # arguments = $n & 0xff
     # named args: = $n >> 8 # ???
     $n =  ($n & 0xff) + 2*($n >> 8);	# XXX ???
@@ -711,7 +811,7 @@ EOC
 sub POP_TOP
 {
     my ($n, $c, $cmt) = @_;
-    print "$cmt\n";
+    print "\t\t$cmt\n";
     #pop @stack;
 }
 sub LOAD_FAST
@@ -882,7 +982,7 @@ EOC
 sub ROT_THREE
 {
     my ($n, $c, $cmt) = @_;
-    print "$cmt\n";
+    print "\t\t$cmt\n";
     my $v = pop @stack;
     my $w = pop @stack;
     my $x = pop @stack;
@@ -943,7 +1043,11 @@ EOC
 sub BUILD_CLASS
 {
     my ($n, $c, $cmt) = @_;
+    my $tos = pop @stack;
+    my $cl = temp('P');
+    $classes{$tos->[1]} = 1;
     print <<EOC;
-	# TODO $cmt
+	$cl = newclass $tos->[1] $cmt
 EOC
+    push @stack, ['class $tos->[1]', $cl, 'P'];
 }

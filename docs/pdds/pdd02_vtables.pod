@@ -733,6 +733,11 @@ Auto-increment the PMC.
 
 Auto-decrement the PMC.
 
+=item void abs(INTERP, PMC* self, PMC* dest)
+
+Set C<dest> to the absolute value of C<SELF>. Note: C<dest> may be
+C<SELF>.
+
 =item INTVAL exists_keyed(INTERP, PMC* self, PMC* key)
 
 =item INTVAL exists_keyed_int(INTERP, PMC* self, INTVAL key)
@@ -781,6 +786,17 @@ The key is guaranteed to be non-NULL.
 Given the passed in key for the PMC, return the next key.
 
 The key is guaranteed to be non-NULL.
+
+=item PMC* get_iter(INTERP, PMC* self)
+
+Return a new iterator for this aggregate. The iterator should be
+initialized so that iterations starts at the first element of the
+aggregate. If the aggregate is empty, set PMC_int_val() of the
+iterator key to -1.
+
+=item PMC* slice(INTERP, PMC* self, PMC* key)
+
+Return a new iterator for this aggregate and the given Slice key.
 
 =item void substr(INTERP, PMC* self, INTVAL offset, INTVAL length, PMC* dest)
 
