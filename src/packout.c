@@ -192,7 +192,7 @@ PackFile_Constant_pack(struct PackFile_Constant *self, opcode_t *cursor)
         packed_size = 4 + padded_size / sizeof(opcode_t);
 
         *cursor++ = packed_size;
-        *cursor++ = PObj_get_FLAGS(self->u.string); /* XXX useless info -leo */
+        *cursor++ = PObj_get_FLAGS(self->u.string); /* only constant_FLAG */
         *cursor++ = self->u.string->encoding->index;
         *cursor++ = self->u.string->type->index;
         *cursor++ = self->u.string->bufused;

@@ -281,7 +281,7 @@ opcode_t PackFile_FixupTable_pack_size(struct PackFile_FixupTable * self);
 void PackFile_FixupTable_pack(struct PackFile_FixupTable * self,
                               opcode_t * packed);
 
-void PackFile_Fixup_dump(struct Parrot_Interp *, 
+void PackFile_Fixup_dump(struct Parrot_Interp *,
                          struct PackFile_FixupTable *ft);
 
 /* create new fixup entry */
@@ -335,25 +335,20 @@ void PackFile_Constant_destroy(struct PackFile_Constant * self);
 opcode_t * PackFile_Constant_unpack(struct Parrot_Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
-opcode_t * PackFile_Constant_unpack_number(struct Parrot_Interp *interpreter,
-        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
-
-opcode_t * PackFile_Constant_unpack_string(struct Parrot_Interp *interpreter,
-        struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
-
 opcode_t * PackFile_Constant_unpack_key(struct Parrot_Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
 opcode_t * PackFile_Constant_unpack_pmc(struct Parrot_Interp *interpreter,
         struct PackFile_ConstTable *, struct PackFile_Constant *, opcode_t *);
 
-opcode_t PackFile_fetch_op(struct PackFile *pf, opcode_t **stream);
-
-INTVAL PackFile_fetch_iv(struct PackFile *pf, opcode_t **stream);
-
-FLOATVAL PackFile_fetch_nv(struct PackFile *pf, opcode_t **stream);
-
-char * PackFile_fetch_cstring(struct PackFile *pf, opcode_t **stream);
+/*
+ * pf_items low level Parrot items fetch routines
+ */
+opcode_t PF_fetch_opcode(struct PackFile *pf, opcode_t **stream);
+INTVAL   PF_fetch_integer(struct PackFile *pf, opcode_t **stream);
+FLOATVAL PF_fetch_number(struct PackFile *pf, opcode_t **stream);
+STRING*  PF_fetch_string(Parrot_Interp, struct PackFile *pf, opcode_t **stream);
+char *   PF_fetch_cstring(struct PackFile *pf, opcode_t **stream);
 
 void PackFile_assign_transforms(struct PackFile *pf);
 
