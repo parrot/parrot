@@ -43,6 +43,7 @@ sub runstep {
       TEMP_cg_c          => <<'EOF',
 $(OPS)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cg.c
 $(OPS)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(OPS)/core_ops_cgp.c
+$(SRC)/runops_cores.c: $(INC)/oplib/core_ops_cgp.h
 
 $(OPS)/core_ops_cg.c $(INC)/oplib/core_ops_cg.h: $(OPS_FILES) $(BUILD_TOOL)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm lib/Parrot/OpLib/core.pm
 	$(PERL) $(BUILD_TOOL)/ops2c.pl CGoto --core
