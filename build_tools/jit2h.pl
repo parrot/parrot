@@ -208,6 +208,7 @@ sub vtable_num($) {
     my $i = 0;
     $vjit++;
     for my $entry (@{$vtable}) {
+	next if  $entry->[4] =~ /MMD_BXOR/;  # TODO all
 	return $i if ($entry->[1] eq $meth);
 	$i++;
     }
