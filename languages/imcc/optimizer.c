@@ -110,12 +110,12 @@ int optimize(struct Parrot_Interp *interp) {
 }
 
 /* get negated opterator for op */
-static const char * get_neg_op(char *op, int *nargs)
+const char * get_neg_op(char *op, int *n)
 {
     static struct br_pairs {
         const char *op;
         const char *nop;
-        int nargs;
+        int n;
     } br_pairs[] = {
     { "if", "unless", 2 },
     { "eq", "ne", 3 },
@@ -124,7 +124,7 @@ static const char * get_neg_op(char *op, int *nargs)
     };
     unsigned int i;
     for (i = 0; i < sizeof(br_pairs)/sizeof(br_pairs[0]); i++) {
-        *nargs = br_pairs[i].nargs;
+        *n= br_pairs[i].n;
         if (strcmp(op, br_pairs[i].op) == 0)
             return br_pairs[i].nop;
         if (strcmp(op, br_pairs[i].nop) == 0)

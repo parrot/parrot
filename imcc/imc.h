@@ -57,6 +57,7 @@ void free_reglist(void);
 int neighbours(int node);
 int get_pmc_num(struct Parrot_Interp *interp, char *pmc_type);
 
+const char * get_neg_op(char *op, int *nargs);
 
 int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);
 int is_op(struct Parrot_Interp *, char *);

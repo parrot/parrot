@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 7;
+use TestCompiler tests => 8;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -25,6 +25,32 @@ ok 1
 ok 2
 OUT
 
+output_is(<<'CODE', <<'OUT', "if/unless");
+.sub _test
+	$I0 = 0
+	$I1 = 1
+	if $I0 == $I1 goto nok1
+	print "ok 1\n"
+nok1:
+	unless $I0 == $I1 goto ok1
+	print "nok 1\n"
+ok1:
+	if I0, nok2
+	print "ok 2\n"
+nok2:
+	unless I0 goto ok2
+	print "nok 2\n"
+ok2:
+	unless $I0 > $I1 goto ok3
+	print "not "
+ok3:	print "ok 3\n"
+	end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+OUT
 ##############################
 output_is(<<'CODE', <<'OUT', "new");
 .sub _test

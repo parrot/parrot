@@ -399,6 +399,11 @@ iANY(struct Parrot_Interp *interpreter, char * name,
     return ins;
 }
 
+static char * inv_op(char *op) {
+    int n;
+    return (char *) get_neg_op(op, &n);
+}
+
 %}
 
 %union {
@@ -735,6 +740,8 @@ assignment:
 
 if_statement:
        IF var relop var GOTO label_op {$$=MK_I(interp, $3,R3($2,$4, $6)); }
+    |  UNLESS var relop var GOTO label_op {$$=MK_I(interp, inv_op($3),
+                                            R3($2,$4, $6)); }
     |  IF var GOTO label_op           {$$= MK_I(interp, "if", R2($2, $4)); }
     |  UNLESS var GOTO label_op       {$$= MK_I(interp, "unless",R2($2, $4)); }
     |  IF var COMMA label_op          {$$= MK_I(interp, "if", R2($2, $4)); }

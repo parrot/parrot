@@ -1,3 +1,23 @@
+- 2003-08-09	leo
+
+	* PCC: fix nestes subs (resperve ret continuation)
+	* PCC: fix multiple return blocks
+
+	* SYNTAX:
+
+	  NEW: unless arg1 relop arg2 goto label
+
+	  works like if (with reversed relop), so that $HL can
+	  directly translate:
+	    if (a < b)
+	      {block}
+	    [skip:]
+	  to
+	    unless a < b goto skip
+	      block
+	      ...
+	    skip:
+
 - 2003-08-08	leo
 
 	* try_find_op: e.g. add_n_i_n => add_n_n_i
