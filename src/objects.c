@@ -1053,10 +1053,12 @@ mark_object_cache(Parrot_Interp interpreter)
 {
     /* mark register frame cache */
     Stack_Chunk_t *chunk = interpreter->caches->frame_cache;
+
     while (chunk) {
         pobject_lives(interpreter, (PObj*)chunk);
         chunk = PObj_bufstart(chunk);
     }
+    mark_retc_cache(interpreter);
 }
 
 void
@@ -1067,6 +1069,7 @@ init_object_cache(Parrot_Interp interpreter)
     mc = interpreter->caches = mem_sys_allocate_zeroed(sizeof(*mc));
     SET_NULL(mc->idx);
     SET_NULL(mc->frame_cache);
+    SET_NULL(mc->retc_cache);
 }
 
 

@@ -331,12 +331,61 @@ new_coroutine(Interp *interp)
     return co;
 }
 
+
+/*
+ * Return continuation PMCs are re-used.
+ * In the cache they are chained together by this pointer:
+ */
+#if PMC_DATA_IN_EXT
+#  define PREV_RETC(p) (PMC*)((p)->pmc_ext)
+#else
+#  define PREV_RETC(p) PMC_data(p)
+#endif
+
+/*
+
+=item C<void mark_retc_cache(Interp *)>
+
+Mark the objects in the return continuation cache being alive.
+
+=item C<void
+add_to_retc_cache(Interp *interpreter, PMC *pmc)>
+
+Add the return continuation C<pmc> to the cache and turn off custom
+marking, so that it's context isn't marked.
+
+Note: the context structure in C<PMC_cont(pmc)> remains allocated.
+
+*/
+void
+mark_retc_cache(Interp *interpreter)
+{
+    PMC *pmc = interpreter->caches->retc_cache;
+
+    while (pmc) {
+        pobject_lives(interpreter, (PObj*)pmc);
+        pmc = PREV_RETC(pmc);
+    }
+}
+
+void
+add_to_retc_cache(Interp *interpreter, PMC *pmc)
+{
+    Caches *mc = interpreter->caches;
+
+    if (mc->retc_cache)
+        PREV_RETC(mc->retc_cache) = mc->retc_cache;
+    mc->retc_cache = pmc;
+    /* XXX expensive w. ARENA_DOD_FLAGS */
+    PObj_custom_mark_CLEAR(pmc);
+}
+
 /*
 
 =item C<PMC *
 new_ret_continuation_pmc(Interp * interp, opcode_t * address)>
 
-Returns a new C<RetContinuation> PMC.
+Returns a new C<RetContinuation> PMC if possible from the cache.
 
 =cut
 
@@ -346,12 +395,23 @@ PMC *
 new_ret_continuation_pmc(Interp * interpreter, opcode_t * address)
 {
     PMC* continuation;
+    Caches *mc = interpreter->caches;
 
-    continuation = pmc_new(interpreter, enum_class_RetContinuation);
+    if (mc->retc_cache) {
+        continuation = mc->retc_cache;
+        mc->retc_cache = PREV_RETC(mc->retc_cache);
+        /* XXX expensive w. ARENA_DOD_FLAGS */
+        PObj_custom_mark_SET(continuation);
+        /* copy interpreter context into continuation */
+        save_context(interpreter, &PMC_cont(continuation)->ctx);
+    }
+    else {
+        continuation = pmc_new(interpreter, enum_class_RetContinuation);
+    }
     VTABLE_set_pointer(interpreter, continuation, address);
     return continuation;
 }
-
+#undef PREV_RETC
 
 /*
 
@@ -416,6 +476,13 @@ invalidate_retc_context(Interp *interpreter, PMC* self)
 
     cont = interpreter->ctx.current_cont;
     while (!PMC_IS_NULL(cont) && PMC_struct_val(cont)) {
+        /*
+         * we could stop if we enocunter a true continuation, because
+         * if one were created, everything up the chain would have been
+         * invalidated earlier.
+         * But as long as Continuation usage can be considered being rare,
+         * the tests are probably more expensive then to stop early.
+         */
         cont->vtable = Parrot_base_vtables[enum_class_Continuation];
         cc = PMC_cont(cont);
         cont = cc->ctx.current_cont;

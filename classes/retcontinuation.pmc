@@ -24,6 +24,7 @@ because that's just some previous state of the interpreter.
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
+
 pmclass RetContinuation extends Continuation {
 
 /*
@@ -81,6 +82,7 @@ the frame pointer in the stack frame cache.
         stack_p = interpreter->ctx.reg_stack;
         next = SUPER(next);
         add_to_fp_cache(INTERP, stack_p);
+        add_to_retc_cache(INTERP, SELF);
         return next;
     }
 

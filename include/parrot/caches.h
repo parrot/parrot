@@ -35,6 +35,7 @@ typedef struct _Caches {
     Meth_cache_entry ***idx;    /* bufstart idx */
     /* PMC **hash */            /* for non-constant keys */
     struct Stack_Chunk * frame_cache; /* register frame cache */
+    PMC* retc_cache;            /* return contiunations recyling */
 } Caches;
 
 void init_object_cache(Parrot_Interp interpreter);

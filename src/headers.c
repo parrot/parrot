@@ -573,15 +573,16 @@ int
 is_buffer_ptr(Interp *interpreter, void *ptr)
 {
     UINTVAL i;
+    struct Arenas *arena_base = interpreter->arena_base;;
 
     if (contained_in_pool(interpreter,
-                    interpreter->arena_base->constant_string_header_pool, ptr))
+                    arena_base->constant_string_header_pool, ptr))
         return 1;
 
-    for (i = 0; i < interpreter->arena_base->num_sized; i++) {
-        if (interpreter->arena_base->sized_header_pools[i] &&
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i] &&
                 contained_in_pool(interpreter,
-                        interpreter->arena_base->sized_header_pools[i], ptr))
+                        arena_base->sized_header_pools[i], ptr))
             return 1;
     }
 
