@@ -595,6 +595,14 @@ op rx_setprops(in pmc, in str, in int) {
 		switch((char)string_ord($2, (INTVAL)i)) {
 			case 'i':
 				RxCaseInsensitive_on(rx);
+				
+				if(!RxFlagTest(rx, enum_rxflags_is_copy)) {
+					RxFlagOn(rx, enum_rxflags_is_copy);
+					rx->string=string_copy(interpreter, rx->string);
+				}
+				
+				/* string_lc(interpreter, rx->string); */
+				
 				break;
 			case 's':
 				RxSingleLine_on(rx);
@@ -835,7 +843,6 @@ matches any character at all.)
 =cut
 
 op rx_dot(in pmc, in int) {
-	static Bitmap bmp;
 	RX_dUNPACK($1);
 
 	RxAssertMore(rx, $2);
@@ -845,11 +852,7 @@ op rx_dot(in pmc, in int) {
 		goto NEXT();
 	}
 	else {
-		if(!bmp) {
-			bmp=bitmap_make_cstr(interpreter, "\r\n");
-		}
-
-		if(!bitmap_match(bmp, RxCurChar(rx))) {
+		if(!rx_is_newline(interpreter, RxCurChar(rx))) {
 			RxAdvance(rx);
 			goto NEXT();
 		}
@@ -897,9 +900,16 @@ B<XXX> Currently does not honor the C<m> modifier.
 
 op rx_zwa_atbeginning(in pmc, in int) {
 	RX_dUNPACK($1);
-
-	if(rx->index != 0) {
-		goto OFFSET($2);
+	
+	if(RxMultiline_test(rx)) {
+		if(!rx_is_newline(interpreter, string_ord(rx->string, rx->index-1))) {
+			goto OFFSET($2);
+		}
+	}
+	else {
+		if(rx->index != 0) {
+			goto OFFSET($2);
+		}
 	}
 	
 	goto NEXT();
@@ -919,8 +929,15 @@ B<XXX> Currently does not honor the C<m> modifier.
 op rx_zwa_atend(in pmc, in int) {
 	RX_dUNPACK($1);
 
-	if((UINTVAL)rx->index != string_length(rx->string)) {
-		goto OFFSET($2);
+	if(RxMultiline_test(rx)) {
+		if(!rx_is_newline(interpreter, RxCurChar(rx))) {
+			goto OFFSET($2);
+		}
+	}
+	else {
+		if((UINTVAL)rx->index != string_length(rx->string)) {
+			goto OFFSET($2);
+		}
 	}
 	
 	goto NEXT();

@@ -1,4 +1,4 @@
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 22;
 
 sub gentest($$;$$) {
 	$_[2] ||= "";
@@ -108,19 +108,6 @@ CODE
 no match
 OUTPUT
 
-output_is(gentest('ba', <<'CODE', 'r'), <<'OUTPUT', 'reversed regexen (/r)');
-		rx_dot P0, $advance
-CODE
-<b><a><>
-OUTPUT
-
-output_is(gentest('\n', <<'CODE', 's'), <<'OUTPUT', 'single-line regexen (/s)');
-		rx_dot P0, $advance
-CODE
-<><
-><>
-OUTPUT
-
 output_is(gentest('a', <<'CODE'), <<'OUTPUT', 'stack (pushindex/popindex)');
 		rx_pushindex P0
 		rx_literal P0, "a", $advance
@@ -196,5 +183,42 @@ output_is(gentest('ab', <<'CODE'), <<'OUTPUT', 'ZWA: \b (failure)');
 CODE
 no match
 OUTPUT
+
+
+output_is(gentest('ba', <<'CODE', 'r'), <<'OUTPUT', 'reversed regexen (/r)');
+		rx_dot P0, $advance
+CODE
+<b><a><>
+OUTPUT
+
+output_is(gentest('\n', <<'CODE', 's'), <<'OUTPUT', 'single-line regexen (/s)');
+		rx_dot P0, $advance
+CODE
+<><
+><>
+OUTPUT
+
+output_is(gentest('\n\n', <<'CODE', 'm'), <<'OUTPUT', 'multiline regexen (/m)');
+		rx_literal P0, "\n", $advance
+		rx_zwa_atbeginning P0, $advance
+		rx_zwa_atend P0, $advance
+CODE
+<><
+><
+>
+OUTPUT
+
+TODO: {
+	local $TODO="Pending some sort of lowercasing op";
+	output_is(gentest('HeLlO', <<'CODE', 'i'), <<'OUTPUT', 'case-insensitive regexen (/i)');
+		rx_literal P0, "hel", $advance
+		rx_oneof P0, "lmno", $advance
+		rx_oneof P0, "lmno", $advance
+CODE
+<><HeLlO><>
+OUTPUT
+warn "# Don't worry about above warning--the test in question is a TODO\n";
+}
+
 
 1;

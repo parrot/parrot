@@ -5,7 +5,7 @@
  *  Overview:
  *     Supporting file for the regular expression engine
  *  Data Structure and Algorithms:
- *	   rxinfo is the main structure involved in regular expressions; it's stuffed 
+ *     rxinfo is the main structure involved in regular expressions; it's stuffed 
  *     into a Handle PMC and passed to all regular expression opcodes.
  *  History:
  *  Notes:
@@ -28,7 +28,11 @@ typedef enum rxflags {
 	enum_rxflags_case_insensitive=1,
 	enum_rxflags_single_line=2,
 	enum_rxflags_multiline=4,
-	enum_rxflags_reverse=8
+	enum_rxflags_reverse=8,
+	
+	
+	
+	enum_rxflags_is_copy=128
 } rxflags;
 
 typedef enum rxdirection {
@@ -40,6 +44,7 @@ extern const INTVAL RX_MARK;
 extern const char * RX_WORDCHARS;
 extern const char * RX_NUMCHARS;
 extern const char * RX_SPACECHARS;
+extern const char * RX_NEWLINES;
 
 #define cstr2pstr(cstr) string_make(interpreter, cstr, strlen(cstr), 0, 0, 0)
 
@@ -72,6 +77,7 @@ rxinfo * rx_allocate_info(struct Parrot_Interp *, STRING *);
 INLINE BOOLVAL  rx_is_word_character(struct Parrot_Interp *, INTVAL ch);
 INLINE BOOLVAL  rx_is_number_character(struct Parrot_Interp *, INTVAL ch);
 INLINE BOOLVAL  rx_is_whitespace_character(struct Parrot_Interp *, INTVAL ch);
+INLINE BOOLVAL	rx_is_newline(struct Parrot_Interp *, INTVAL ch);
 
 Bitmap bitmap_make(struct Parrot_Interp *, STRING*);
 Bitmap bitmap_make_cstr(struct Parrot_Interp *, const char*);

@@ -18,6 +18,7 @@ const INTVAL RX_MARK=-1;
 const char * RX_WORDCHARS="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 const char * RX_NUMCHARS="0123456789";
 const char * RX_SPACECHARS="\r\n\t ";
+const char * RX_NEWLINES="\r\n";	/* XXX Unicode defines a few more. */
 
 /*************************************************************
  * Parrot Regular Expression Engine, version 3.0 alpha (Rx3) *
@@ -70,6 +71,16 @@ INLINE BOOLVAL rx_is_whitespace_character(struct Parrot_Interp *interpreter, INT
 	
 	if(!bmp) {
 		bmp=bitmap_make_cstr(interpreter, RX_SPACECHARS);
+	}
+
+	return bitmap_match(bmp, ch);
+}
+
+INLINE BOOLVAL rx_is_newline(struct Parrot_Interp *interpreter, INTVAL ch) {
+	static Bitmap bmp=NULL;
+	
+	if(!bmp) {
+		bmp=bitmap_make_cstr(interpreter, RX_NEWLINES);
 	}
 
 	return bitmap_match(bmp, ch);
