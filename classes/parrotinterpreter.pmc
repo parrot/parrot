@@ -148,11 +148,20 @@ pmclass ParrotInterpreter need_ext {
     void* invoke (void* next) {
 	struct Parrot_Interp * new_interp =
 	    (struct Parrot_Interp *)PMC_data(SELF);
+	/*
+	 * provide a return continuation, so that CPS returns
+	 * are working
+	 */
+	PMC *ret_c = pmc_new(interpreter, enum_class_RetContinuation);
+	new_interp->pmc_reg.registers[1] = ret_c;
+	/*
+	 * setup code
+	 */
 	Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
 	new_interp->code = interpreter->code;
-	/* calculate offset */
+	/* calculate offset and run */
 	runops(new_interp, (opcode_t *)SELF->cache.struct_val -
-			(opcode_t *)interpreter->code->byte_code);
+		(opcode_t *)interpreter->code->byte_code);
 	return next;
     }
 

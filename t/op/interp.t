@@ -216,9 +216,6 @@ output_is(<<'CODE', <<'OUTPUT', "clone and invoke interp - ret via invoke");
     new P0, .PerlString
     set P0, "from "
 
-    new P1, .RetContinuation
-    set_addr P1, cont
-
     getinterp P2
     clone P3, P2
     print "ok 1\n"

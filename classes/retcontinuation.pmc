@@ -28,6 +28,7 @@ pmclass RetContinuation extends Continuation {
 	struct Parrot_Sub * sub;
 	sub = PMC_sub(ret) = mem_sys_allocate(sizeof(struct Parrot_Sub));
 	memcpy(sub, PMC_sub(SELF), sizeof(struct Parrot_Sub));
+	ret->cache.struct_val = SELF->cache.struct_val;
 	PObj_custom_mark_destroy_SETALL(ret);
     }
 }
