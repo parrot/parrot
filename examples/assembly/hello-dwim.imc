@@ -11,9 +11,9 @@ examples/assembly/hello-dwim.pasm - Parrot's confusing opcodes made easy
 
 =head1 DESCRIPTION
 
-The first time you run this program 
+The first time you run this program
 
-    .pcc_sub _main prototyped
+    .sub _main
         .include "DWIM.imc"
         print "The answer is\n"
         add $I0, 20, 23
@@ -29,7 +29,7 @@ the new DWIM comment: C<# DWIM> and runs normally.
 The code continues to work exactly as it did before, but now it looks
 like this:
 
-    .pcc sub  main prototyped
+    .sub _main
        .include "DWIM.imc"
       # DWIM  "The answer is\n"
       # DWIM  $I0, 20, 23
@@ -41,7 +41,7 @@ like this:
 
 =cut
 
-.pcc_sub _main prototyped
+.sub _main
     .include "DWIM.imc"
     print "The answer is\n"
     add $I0, 20, 23

@@ -1,4 +1,4 @@
-    .param var argv		# main is a pcc_sub, so we can use .param
+    .param pmc argv		# main is a pcc_sub, so we can use .param
     .sym string me
     me = argv[0]		# the filename of the calling prog
     .include "iterator.pasm"	# we need iterator constants
@@ -202,9 +202,9 @@ l1:
 iter_end:
     #print r
     #print "\n============\n"
-    .local var comp
-    .local var code
-    .local var interp
+    .local pmc comp
+    .local pmc code
+    .local pmc interp
     compreg comp, "PIR"		# get a PIR compiler
     compile code, comp, r	# compile source
     getinterp interp		# setup argv for eval
@@ -219,7 +219,7 @@ iter_end:
     .sym ParrotIO file
     open file, me, "<"
     unless file, err_open
-    .sym ParrotArray ar
+    .sym PerlArray ar
     .sym string line
     .sym PerlString pline
     ar = new PerlArray

@@ -49,7 +49,7 @@ From C<perldoc perlthrtut>:
     32     $downstream->enqueue(undef) if $kid;
     33     $kid->join           if $kid;
     34 }
-       
+
 =cut
 
 # translate to PIR by leo
@@ -85,10 +85,10 @@ no_arg:
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
     .pcc_begin prototyped
-    .arg kid
     .arg Check_num
     .arg stream
     .arg $P2
+    .invocant kid
     .nci_call Thread_new
     .pcc_end
 
@@ -124,7 +124,6 @@ lp:
 #       20     my ($upstream, $cur_prime) = @_;
 # XXX still no comments inside pcc param block
 .sub _check_num prototyped
-   .param pmc self
    .param pmc sub
    .param pmc upstream
    .param pmc cur_prime
@@ -163,10 +162,10 @@ no_kid1:
     .sym pmc Thread_new
     find_method Thread_new, kid, "thread3"
     .pcc_begin prototyped
-    .arg kid
     .arg sub
     .arg downstream
     .arg Num
+    .invocant kid
     .nci_call Thread_new
     .pcc_end
     goto lp
