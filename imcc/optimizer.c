@@ -188,7 +188,7 @@ static void unused_label()
     int used;
 
     for (last = 0, ins = instructions; ins; ins = ins->next) {
-        if (ins->type & ITLABEL) {
+        if ((ins->type & ITLABEL) && *ins->r[0]->name != '_') {
             SymReg * lab = ins->r[0];
             used = 0;
             for (ins2 = instructions; ins2; ins2 = ins2->next) {

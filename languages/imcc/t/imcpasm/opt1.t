@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 2;
+use TestCompiler tests => 5;
 use Test::More qw(skip);
 
 ##############################
@@ -35,3 +35,40 @@ L2:
 	end
 OUT
 
+##############################
+output_is(<<'CODE', <<'OUT', "unreachable 3");
+.sub _test
+  goto L
+  print "ok\n"
+L:
+  end
+  noop
+  noop
+.end
+CODE
+_test:
+  end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "unused local label");
+.sub _main
+	branch L2
+L2:	end
+.end
+CODE
+_main:
+	end
+OUT
+
+##############################
+output_is(<<'CODE', <<'OUT', "unused global label");
+.sub _main
+	branch _L2
+_L2:	end
+.end
+CODE
+_main:
+_L2:
+	end
+OUT

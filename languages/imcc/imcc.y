@@ -112,15 +112,16 @@ static void clear_state(void)
 Instruction * INS_LABEL(SymReg * r0, int emit)
 {
     Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
+    i->type = ITLABEL;
     if (emit)
         emitb(i);
-    i->type = ITLABEL;
     return i;
 }
 
 static Instruction * iLABEL(SymReg * r0) {
-    Instruction *i = emitb(_mk_instruction("","%s:", R1(r0), 0));
+    Instruction *i = _mk_instruction("","%s:", R1(r0), 0);
     i->type = ITLABEL;
+    i = emitb(i);
     clear_state();
     return i;
 }
@@ -353,8 +354,6 @@ iANY(struct Parrot_Interp *interpreter, char * name,
         /* make the instruction */
 
         ins = _mk_instruction(name, format, r, dirs);
-        if (emit)
-             emitb(ins);
         ins->keys |= keyvec;
         /* fill iin oplib's info */
         ins->opnum = op;
@@ -389,6 +388,8 @@ iANY(struct Parrot_Interp *interpreter, char * name,
             /* XXX probably a CATCH block */
             ins->type = ITADDR | IF_r1_branch | ITBRANCH;
         }
+        if (emit)
+             emitb(ins);
     } else {
         fataly(EX_SOFTWARE, "iANY", line,"op not found '%s' (%s<%d>)\n",
                 fullname, name, nargs);
