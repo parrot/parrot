@@ -58,7 +58,7 @@ Parrot_pop_i(struct Parrot_Interp *interpreter) {
             /* Do so. We don't need to adjust used/free, since they're
                already OK for the "We're full" case */
             chunk_base = chunk_base->prev;
-            interpreter->int_reg = &chunk_base->IReg[chunk_base->used];
+            interpreter->int_reg = &chunk_base->IReg[chunk_base->used - 1];
         }
         /* Nope. So pitch a fit */
         else {
@@ -127,7 +127,7 @@ Parrot_pop_s(struct Parrot_Interp *interpreter) {
             /* Do so. We don't need to adjust used/free, since they're
                already OK for the "We're full" case */
             chunk_base = chunk_base->prev;
-            interpreter->string_reg = &chunk_base->SReg[chunk_base->used];
+            interpreter->string_reg = &chunk_base->SReg[chunk_base->used - 1];
         }
         /* Nope. So pitch a fit */
         else {
@@ -193,7 +193,7 @@ Parrot_pop_n(struct Parrot_Interp *interpreter) {
             /* Do so. We don't need to adjust used/free, since they're
                already OK for the "We're full" case */
             chunk_base = chunk_base->prev;
-            interpreter->num_reg = &chunk_base->NReg[chunk_base->used];
+            interpreter->num_reg = &chunk_base->NReg[chunk_base->used - 1];
         }
         /* Nope. So pitch a fit */
         else {
@@ -261,7 +261,7 @@ Parrot_pop_p(struct Parrot_Interp *interpreter) {
             /* Do so. We don't need to adjust used/free, since they're
                already OK for the "We're full" case */
             chunk_base = chunk_base->prev;
-            interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used];
+            interpreter->pmc_reg = &chunk_base->PReg[chunk_base->used - 1];
         }
         /* Nope. So pitch a fit */
         else {
