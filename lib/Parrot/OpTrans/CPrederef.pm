@@ -1,6 +1,8 @@
 #
 # CPrederef.pm
 #
+# Inherits from C.pm
+#
 
 use strict;
 #use warnings;
@@ -9,7 +11,8 @@ package Parrot::OpTrans::CPrederef;
 
 use Parrot::OpTrans;
 use vars qw(@ISA);
-@ISA = qw(Parrot::OpTrans);
+use Parrot::OpTrans::C;
+@ISA = qw(Parrot::OpTrans::C);
 
 
 #
@@ -36,39 +39,35 @@ sub suffix
 
 sub opsarraytype { return 'void *' };
 
-
+# expr_pop
 #
-# goto_address()
-#
-
-sub goto_address
-{
-  my ($self, $addr) = @_;
-  return "return $addr";
-}
-
-
-#
-# goto_offset()
+# Addresses on the stack are pointers into the bytecode array, and so
+# must be converted to pointers into the prederef array.
 #
 
-sub goto_offset
-{
-  my ($self, $offset) = @_;
-  return "return cur_opcode + $offset";
-}
-
-
-#
-# goto_pop()
-#
-
-sub goto_pop
+sub expr_pop
 {
   my ($self) = @_;
-  return "return (((opcode_t *)pop_dest(interpreter) - (opcode_t *)interpreter->code->byte_code) + interpreter->prederef_code)";
+  return "(((opcode_t *)pop_dest(interpreter) - (opcode_t *)interpreter->code->byte_code) + interpreter->prederef_code)";
 }
 
+# expr_offset and goto_offset
+#
+# CPrederef is funky in that expr OFFSET(n) uses a pointer to the
+# original bytecode, but goto OFFSET(n) returns a pointer into the
+# prederef array. (see expr_pop, above, for a description of why this
+# works.)
+#
+
+sub expr_offset {
+    my ($self, $offset) = @_;
+    return "CUR_OPCODE + $offset";
+}
+
+sub goto_offset {
+    my ($self, $offset) = @_;
+    return "return cur_opcode + $offset";
+}
 
 #
 # access_arg()
@@ -97,29 +96,6 @@ sub access_arg
 
   return sprintf($arg_maps{$type}, $num);
 }
-
-
-#
-# restart_offset()
-#
-
-sub restart_offset
-{
-  my ($self, $offset) = @_;
-  return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
-}
-
-
-#
-# restart_address()
-#
-
-sub restart_address
-{
-  my ($self, $addr) = @_;
-  return "interpreter->resume_offset = $addr; interpreter->resume_flag = 1";
-}
-
 
 1;
 

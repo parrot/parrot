@@ -67,7 +67,6 @@ sub arg
   return $self->{ARGS}[shift];
 }
 
-
 #
 # goto_address()
 #
@@ -79,6 +78,11 @@ sub goto_address
   return "cur_opcode = $addr;\ngoto switch_label";
 }
 
+
+sub expr_offset {
+    my ($self, $offset) = @_;
+    return sprintf("&&PC_%d", $self->pc + $offset);
+}
 
 #
 # goto_offset()

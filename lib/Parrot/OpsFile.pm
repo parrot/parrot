@@ -173,7 +173,7 @@ sub read_ops
       foreach my $arg (@args) {
 	my ($use, $type) = $arg =~ m/^(in|out|inout)\s+(INT|NUM|STR|PMC)$/i;
 
-        die "Unrecognized arg format '$arg'!" unless defined($use) and defined($type);
+        die "Unrecognized arg format '$arg' in '$_'!" unless defined($use) and defined($type);
 
         $type = lc substr($type, 0, 1);
 
@@ -255,6 +255,9 @@ sub make_op
       #   goto NEXT()        {{+=S}}  PC' = PC + S  Where S is op size
       #   goto ADDRESS(X)    {{=X}}   PC' = X       Used for absolute jumps
       #   goto POP()         {{=*}}   PC' = <pop>   Pop address off control stack
+      #   expr OFFSET(X)     {{^+X}}  PC + X        Relative address
+      #   expr NEXT()        {{^+S}}  PC + S        Where S is op size
+      #   expr ADDRESS(X)    {{^X}}   X             Absolute address
       #
       #   HALT()             {{=0}}   PC' = 0       Halts run_ops loop, no resume
       #
@@ -263,6 +266,13 @@ sub make_op
       #
       #   $X                 {{@X}}   Argument X    $0 is opcode, $1 is first arg
       #
+      # For ease of parsing, if the argument to one of the above
+      # notations in a .ops file contains parentheses, then double the
+      # enclosing parentheses and add a space around the argument,
+      # like so:
+      #
+      #    goto OFFSET(( (void*)interpreter->happy_place ))
+      #
       # Later transformations turn the Op body notations into C code, based
       # on the mode of operation (function calls, switch statements, gotos
       # with labels, etc.).
@@ -270,15 +280,24 @@ sub make_op
       # TODO: Complain about using, e.g. $3 in an op with only 2 args.
       #
 
-      $body =~ s/goto\s+OFFSET\((.*)\)/{{+=$1}}/mg;
-      $body =~ s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;
-      $body =~ s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
-      $body =~ s/goto\s+POP\(\)/{{=*}}/mg;
+      $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
+      $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
+      $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+      $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
 
-      $body =~ s/HALT\(\)/{{=0}}/mg;
+      $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+      $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+      $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+      $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
+      $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+      $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+      $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+      $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+
+      $body =~ s/\bHALT\(\)/{{=0}}/mg;
       
-      $body =~ s/restart\s+OFFSET\((.*)\)/{{=0,+=$1}}/mg;
-      $body =~ s/restart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+      $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
+      $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
       
       $body =~ s/\$(\d+)/{{\@$1}}/mg;
       
@@ -371,6 +390,10 @@ sub preamble
     s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
     s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
     s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
+    s/{{\^\*}}/     $trans->expr_pop();       /mge;
+    s/{{\^(.*?)}}/  $trans->expr_address($1); /mge;
+    s/{{\^\+(.*?)}}/$trans->expr_offset($1);  /mge;
+    s/{{\^-(.*?)}}/ $trans->expr_offset(-$1); /mge;
   }
 
   return $_;

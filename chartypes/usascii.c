@@ -47,7 +47,7 @@ usascii_transcode_to(const char *to) {
 
 static BOOLVAL
 usascii_is_digit(INTVAL c) {
-    return (BOOLVAL)(isdigit(c));
+    return (BOOLVAL)(isdigit(c) ? 1 : 0);
 }
 
 static INTVAL

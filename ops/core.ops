@@ -2402,7 +2402,7 @@ stack for later returning.
 =cut
 
 inline op bsr (in INT) {
-  stack_push(interpreter, interpreter->control_stack, CUR_OPCODE + 2,  STACK_ENTRY_DESTINATION, NULL);
+  stack_push(interpreter, interpreter->control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, NULL);
   goto OFFSET($1);
 }
 
@@ -2478,7 +2478,7 @@ op runinterp(inout PMC, in INT) {
 }
 
 op enternative() {
-  goto ADDRESS(run_native(interpreter, CUR_OPCODE, (opcode_t *)interpreter->code->byte_code));
+  goto ADDRESS(( run_native(interpreter, CUR_OPCODE, (opcode_t *)interpreter->code->byte_code) ));
 }
 
 ########################################

@@ -163,9 +163,13 @@ sub source
 
   $full_body =~ s/{{=\*}}/      $trans->goto_pop();       /mge; # NOTE: MUST BE FIRST
 
-  $full_body =~ s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
   $full_body =~ s/{{\+=(.*?)}}/ $trans->goto_offset($1);  /mge;
   $full_body =~ s/{{-=(.*?)}}/  $trans->goto_offset(-$1); /mge;
+  $full_body =~ s/{{=(.*?)}}/   $trans->goto_address($1); /mge;
+
+  $full_body =~ s/{{\^\+(.*?)}}/ $trans->expr_offset($1);  /mge;
+  $full_body =~ s/{{\^-(.*?)}}/  $trans->expr_offset(-$1); /mge;
+  $full_body =~ s/{{\^(.*?)}}/   $trans->expr_address($1); /mge;
 
   return $full_body;
 }

@@ -124,6 +124,8 @@ print SOURCE $preamble;
 print SOURCE <<END_C;
 #include "$include"
 
+${defines}
+
 END_C
 
 print SOURCE $ops->preamble($trans);
@@ -153,8 +155,6 @@ foreach my $op ($ops->ops) {
 }
 
 print SOURCE <<END_C;
-
-${defines}
 
 /*
 ** Op Function Definitions:

@@ -26,39 +26,25 @@ sub defines
 END
 }
 
+sub gen_goto {
+    my ($self, $where_str) = @_;
+    return "return $where_str";
+}
 
-#
-# goto_address()
-#
-
-sub goto_address
-{
+sub expr_address {
   my ($self, $addr) = @_;
-  return "return $addr";
+  return $addr;
 }
 
-
-#
-# goto_offset()
-#
-
-sub goto_offset
-{
-  my ($self, $offset) = @_;
-  return "return cur_opcode + $offset";
+sub expr_offset {
+    my ($self, $offset) = @_;
+    return "cur_opcode + $offset";
 }
 
-
-#
-# goto_pop()
-#
-
-sub goto_pop
-{
-  my ($self) = @_;
-  return "return pop_dest(interpreter)";
+sub expr_pop {
+    my ($self) = @_;
+    return "pop_dest(interpreter)";
 }
-
 
 #
 # access_arg()
