@@ -29,13 +29,13 @@ shared: libparrot.so
 libparrot.so: $(O_FILES)
 	$(CC) -shared $(C_LIBS) -o $@ $(O_FILES)
 
-$(TEST_PROG): test_main$(O) $(O_FILES)
-	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) test_main$(O) $(C_LIBS)
+$(TEST_PROG): test_main$(O) $(O_FILES) interp_guts$(O) op_info$(O)
+	$(CC) $(CFLAGS) -o $(TEST_PROG) $(O_FILES) interp_guts$(O) op_info$(O) test_main$(O) $(C_LIBS)
+	
+$(PDUMP): pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O)
+	$(CC) $(CFLAGS) -o $(PDUMP) pdump$(O) packfile$(O) memory$(O) global_setup$(O) string$(O) strnative$(O) $(C_LIBS)
 
-$(PDUMP): pdump$(O) $(O_FILES)
-	$(CC) $(CFLAGS) -o $(PDUMP) $(O_FILES) pdump$(O) $(C_LIBS)
-
-test_main$(O): $(H_FILES)
+test_main$(O): $(H_FILES) $(INC)/interp_guts.h
 
 global_setup$(O): $(H_FILES)
 
@@ -43,7 +43,7 @@ string$(O): $(H_FILES)
 
 strnative$(O): $(H_FILES)
 
-$(INC)/interp_guts.h: opcode_table build_interp_starter.pl
+$(INC)/interp_guts.h interp_guts.c $(INC)/op_info.h op_info.c: opcode_table build_interp_starter.pl
 	$(PERL) build_interp_starter.pl
 
 interpreter$(O): interpreter.c $(H_FILES) $(INC)/interp_guts.h
@@ -76,6 +76,7 @@ docs/.dummy:
 	cd docs; make
 
 clean:
+	$(RM_F) *$(O) *.s basic_opcodes.c interp_guts.c $(INC)/interp_guts.h $(INC)/op.h op_info.c $(INC)op_info.h $(TEST_PROG) $(PDISASM) $(PDUMP)
 	$(RM_F) *$(O) *.s basic_opcodes.c $(INC)/interp_guts.h $(INC)/op.h $(TEST_PROG)
 	cd docs; make clean
 

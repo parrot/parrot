@@ -12,9 +12,11 @@
 
 #include "parrot/parrot.h"
 #include "parrot/interp_guts.h"
+#include "parrot/op_info.h"
 
-char *op_names[2048];
-int   op_args[2048];
+
+/* char * op_names[2048]; */
+/* op_t   op_info[2048]; */
 
 /*=for api interpreter check_fingerprint
  * TODO: Not really part of the API, but here's the docs.
@@ -47,10 +49,6 @@ check_fingerprint(struct Parrot_Interp *interpreter) {
  */
 opcode_t *
 runops_notrace_core (struct Parrot_Interp *interpreter) {
-    /* Move these out of the inner loop. No need to redeclare 'em each
-       time through */
-    opcode_t *(* func)();
-    opcode_t *(**temp)();
     opcode_t * code_start;
     INTVAL         code_size;
     opcode_t * code_end;
@@ -63,7 +61,7 @@ runops_notrace_core (struct Parrot_Interp *interpreter) {
     pc = code_start;
 
     while (pc >= code_start && pc < code_end && *pc) {
-        DO_OP(pc, temp, func, interpreter);
+        DO_OP(pc, interpreter);
     }
 
     return pc;
@@ -75,14 +73,16 @@ runops_notrace_core (struct Parrot_Interp *interpreter) {
  * and ARGS. Used by runops_trace.
  */
 void
-trace_op(opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
+trace_op(struct Parrot_Interp * interpreter, opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
     int i;
 
     if (pc >= code_start && pc < code_end) {
-        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc, op_names[*pc]);
-        if (op_args[*pc]) {
+        fprintf(stderr, "PC=%ld; OP=%ld (%s)", (long)(pc - code_start), *pc,
+            interpreter->opcode_info[*pc].name);
+
+        if (interpreter->opcode_info[*pc].nargs) {
             fprintf(stderr, "; ARGS=(");
-            for(i = 0; i < op_args[*pc]; i++) {
+            for(i = 0; i < interpreter->opcode_info[*pc].nargs; i++) {
                 if (i) { fprintf(stderr, ", "); }
                 fprintf(stderr, "%ld", (long) *(pc + i + 1));
             }
@@ -101,10 +101,6 @@ trace_op(opcode_t * code_start, opcode_t * code_end, opcode_t *pc) {
  */
 opcode_t *
 runops_trace_core (struct Parrot_Interp *interpreter) {
-    /* Move these out of the inner loop. No need to redeclare 'em each
-       time through */
-    opcode_t *( *func)();
-    opcode_t *(**temp)();
     opcode_t * code_start;
     INTVAL         code_size;
     opcode_t * code_end;
@@ -116,12 +112,11 @@ runops_trace_core (struct Parrot_Interp *interpreter) {
 
     pc = code_start;
 
-    trace_op(code_start, code_end, pc);
-    
-    while (pc >= code_start && pc < code_end && *pc) {
-        DO_OP(pc, temp, func, interpreter);
+    trace_op(interpreter, code_start, code_end, pc);
 
-        trace_op(code_start, code_end, pc);
+    while (pc >= code_start && pc < code_end && *pc) {
+        DO_OP(pc, interpreter);
+        trace_op(interpreter, code_start, code_end, pc);
     }
 
     return pc;
@@ -233,18 +228,9 @@ make_interpreter() {
     /* Need an empty stash */
     interpreter->perl_stash = mem_allocate_new_stash();
     
-    /* The default opcode function table would be a good thing here... */
-    {
-        opcode_t *(**foo)();
-        foo = mem_sys_allocate(2048 * sizeof(void *));
-        
-        BUILD_TABLE(foo);
-        
-        interpreter->opcode_funcs = (void*)foo;
-
-        BUILD_NAME_TABLE(op_names);
-        BUILD_ARG_TABLE(op_args);
-    }
+    /* Load the builtin op func and info tables */
+    interpreter->opcode_funcs = builtin_op_func_table;
+    interpreter->opcode_info  = builtin_op_info_table;
     
     /* In case the I/O system needs something */
     Init_IO(interpreter);

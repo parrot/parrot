@@ -1,4 +1,7 @@
 basic_opcodes.c
+interp_guts.c
+Makefile
+op_info.c
 test_prog
 pdump
 Makefile

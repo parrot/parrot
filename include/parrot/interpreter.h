@@ -15,6 +15,9 @@
 
 #include "parrot/parrot.h"
 
+#include "parrot/op_info.h"
+#include "parrot/interp_guts.h"
+
 struct Parrot_Interp {
     struct IReg *int_reg;            /* Current top of int reg stack */
     struct NReg *num_reg;            /* Current top of the float reg stack */
@@ -30,14 +33,15 @@ struct Parrot_Interp {
                                           /* variable area */
     struct Arenas *arena_base;            /* Pointer to this */
                                           /* interpreter's arena */
+
+    op_info_t * opcode_info;              /* Opcode info table (name, nargs, arg types) */
     opcode_t     *(**opcode_funcs)();     /* Opcode function table */
     STRING_FUNCS *(**string_funcs)();     /* String function table */
     INTVAL flags;				  /* Various interpreter flags
                                            that signal that runops
                                            should do something */
 
-    struct PackFile * code;                      /* The code we are executing */
-
+    struct PackFile * code;               /* The code we are executing */
 };
 
 #define PARROT_DEBUG_FLAG 0x01		/* Bit in the flags that says
