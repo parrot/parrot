@@ -168,6 +168,44 @@ PMC is an acronym for Parrot Magic Cookie. (Or Cracker, your choice.)
 PMC classes are the primitives that Parrot-based languages use
 to represent their fundamental types, such as Perl's scalar values.
 
+=head2 Predereferencing
+
+A bytecode transformation technique which reduces the amount of
+pointer dereferencing done in the inner loop of the interpreter
+by pre-converting opcode numbers into pointers to their opfuncs,
+and also converting the register numbers and constant numbers in
+the arguments to the ops into pointers.
+
+The original implementation by Gregor Purdy was posted on 2001-12-11.
+On one test system, it resulted in a 22% speed increase on a test
+program with a tight inner loop.
+
+http://archive.develooper.com/perl6-internals@perl.org/msg06941.html
+
+On 2001-12-18, predereferencing got a speed boost (to about 47% faster
+than the regular DO_OP inner loop -- without compiler optimizations
+turned on). This was due to an off-list (actually over lunch)
+suggestion by John Kennedy that instead of pre-initializing the new
+copy of the bytecode with NULL pointers, we pre-initialize it with
+pointers to a pseudo-opfunc that does the predereferencing whenever
+it is encountered.
+
+On 2002-04-11, Jason Gloudon suggested combining aspects of the Computed
+Goto Core and the Prederef[erencing] Core.
+
+http://archive.develooper.com/perl6-internals@perl.org/msg07064.html
+
+The week of 2003-02-09, Leopold Totsch combined Computed Goto and
+Predereferencing to produce the CGP core.
+
+http://dev.perl.org/perl6/list-summaries/2003/p6summary.2003-02-09.html#Week_of_the_alternative_runloops
+
+Later, on 2003-02-14, Leopold Totsch and Nicholas Clark combined the
+JIT and the Computed Goto Prederef cores to great effect.
+
+http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html
+
+
 =head2 Vtable
 
 A table of operations attached to some data types, such as PMCs and
