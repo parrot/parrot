@@ -17,6 +17,7 @@
 
 /* Declarations of accessors */
 
+void Parrot_unmake_COW(Interp *, STRING *);
 INTVAL string_compute_strlen(Interp *, STRING *);
 INTVAL string_max_bytes(Interp *, STRING*, INTVAL);
 STRING *string_concat(Interp *, STRING *, STRING *, UINTVAL);

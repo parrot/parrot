@@ -52,7 +52,7 @@ static parrot_string_representation_t _string_smallest_representation(
 =over 4
 
 =item C<static void
-unmake_COW(Interp *interpreter, STRING *s)>
+Parrot_unmake_COW(Interp *interpreter, STRING *s)>
 
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
@@ -61,8 +61,8 @@ copied over and the copy-on-write flag is cleared.
 
 */
 
-static void
-unmake_COW(Interp *interpreter, STRING *s)
+void
+Parrot_unmake_COW(Interp *interpreter, STRING *s)
 {
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
@@ -549,7 +549,7 @@ string_append(Interp *interpreter,
                     (total_length - a_capacity) + EXTRA_SIZE);
         }
         else {
-            unmake_COW(interpreter, a);
+            Parrot_unmake_COW(interpreter, a);
         }
 
         /* A is now ready to receive the contents of B */
@@ -854,7 +854,7 @@ Grows the Parrot string's buffer by the specified number of characters.
 STRING *
 string_grow(Interp * interpreter, STRING * s, INTVAL addlen)
 {
-    unmake_COW(interpreter,s);
+    Parrot_unmake_COW(interpreter,s);
 
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interpreter,
@@ -1571,7 +1571,7 @@ string_replace(Interp *interpreter, STRING *src,
 
     if(diff >= 0
             || ((INTVAL)src->bufused - (INTVAL)PObj_buflen(src)) <= diff) {
-        unmake_COW(interpreter, src);
+        Parrot_unmake_COW(interpreter, src);
 
         if(diff != 0) {
             mem_sys_memmove((char*)src->strstart + substart_off + rep->bufused,
@@ -1879,7 +1879,7 @@ make_writable(Interp *interpreter, STRING **s,
     else if ((*s)->strlen < len)
         string_grow(interpreter, *s, len - (*s)->strlen);
     else if (PObj_is_cowed_TESTALL(*s))
-        unmake_COW(interpreter, *s);
+        Parrot_unmake_COW(interpreter, *s);
 }
 
 #define BITWISE_AND_STRINGS(type1, type2, restype, s1, s2, res, minlen) \
@@ -2772,7 +2772,7 @@ string_to_cstring(Interp * interpreter, STRING * s)
         string_grow(interpreter, s, 1);
     }
     else
-        unmake_COW(interpreter, s);
+        Parrot_unmake_COW(interpreter, s);
 
     /* PObj_immobile_SET(s);
      *
@@ -2857,7 +2857,7 @@ string_pin(Interp * interpreter, STRING * s) {
      *          not work for these
      *          so probably only sysmem should be tested
      */
-    unmake_COW(interpreter, s);
+    Parrot_unmake_COW(interpreter, s);
     size = PObj_buflen(s);
     memory = mem_sys_allocate(size);
     mem_sys_memcopy(memory, PObj_bufstart(s), size);
@@ -2892,7 +2892,7 @@ string_unpin(Interp * interpreter, STRING * s) {
         return;
     }
 
-    /* unmake_COW(interpreter, s); XXX -lt: can not be cowed ??? */
+    /* Parrot_unmake_COW(interpreter, s); XXX -lt: can not be cowed ??? */
     size = PObj_buflen(s);
     /* We need a handle on the fixed memory so we can get rid of it
        later */
@@ -3181,7 +3181,7 @@ string_upcase_inplace(Interp *interpreter, STRING *s)
 
     if (!s)
         return;
-    unmake_COW(interpreter, s);
+    Parrot_unmake_COW(interpreter, s);
     set_char_at = set_char_setter(s);
     for (i = 0; i < s->strlen; ++i) {
         o = string_ord(interpreter, s, i);
@@ -3241,7 +3241,7 @@ string_downcase_inplace(Interp *interpreter, STRING *s)
 
     if (!s)
         return;
-    unmake_COW(interpreter, s);
+    Parrot_unmake_COW(interpreter, s);
     set_char_at = set_char_setter(s);
     for (i = 0; i < s->strlen; ++i) {
         o = string_ord(interpreter, s, i);
@@ -3301,7 +3301,7 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)
 
     if (!s)
         return;
-    unmake_COW(interpreter, s);
+    Parrot_unmake_COW(interpreter, s);
     set_char_at = set_char_setter(s);
     o = string_ord(interpreter, s, 0);
     if (o >= 'a' && o <= 'z')

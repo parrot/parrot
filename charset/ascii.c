@@ -15,21 +15,22 @@ This file implements the charset functions for ascii data
 */
 
 #include "parrot/parrot.h"
-#include "binary.h"
+#include "ascii.h"
 
 /* The encoding we prefer, given a choice */
 static ENCODING *preferred_encoding;
 
 static STRING *get_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL count) {
-  STRING *return_string = NULL;
-
-  return return_string;
+    return ENCODING_GET_BYTES(interpreter, source_string, offset, count);
 }
 
 static void set_graphemes(Interp *interpreter, STRING *source_string, UINTVAL offset, UINTVAL replace_count, STRING *insert_string) {
+    ENCODING_SET_BYTES(interpreter, source_string, offset, replace_count, insert_string);
+
 }
 
 static void to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
+    internal_exception(UNIMPLEMENTED, "to_charset for ascii not implemented");
 }
 
 static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARSET *new_charset) {
@@ -39,39 +40,87 @@ static STRING *copy_to_charset(Interp *interpreter, STRING *source_string, CHARS
 }
 
 static void to_unicode(Interp *interpreter, STRING *source_string) {
-    internal_exception(UNIMPLEMENTED, "to_unicode for binary not implemented");
+    internal_exception(UNIMPLEMENTED, "to_unicode for ascii not implemented");
 }
 
-/* A noop. can't compose binary */
+/* A noop. can't compose ascii */
 static void compose(Interp *interpreter, STRING *source_string) {
 }
 
-/* A noop. can't decompose binary */
+/* A noop. can't decompose ascii */
 static void decompose(Interp *interpreter, STRING *source_string) {
 }
 
 static void upcase(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't upcase binary data");
+    char *buffer;
+    UINTVAL offset = 0;
+
+    if (!source_string->strlen) {
+        return;
+    }
+
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    for (offset = 0; offset < source_string->strlen; offset++) {
+        buffer[offset] = toupper(buffer[offset]);
+    }
 }
 
 static void downcase(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't downcase binary data");
+    UINTVAL offset = 0;
+    char *buffer;
+    if (!source_string->strlen) {
+        return;
+    }
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    for (offset = 0; offset < source_string->strlen; offset++) {
+        buffer[offset] = tolower(buffer[offset]);
+    }
 }
 
 static void titlecase(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't titlecase binary data");
+    char *buffer;
+    UINTVAL offset = 0;
+    if (!source_string->strlen) {
+        return;
+    }
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    buffer[0] = toupper(buffer[0]);
+    for (offset = 1; offset < source_string->strlen; offset++) {
+        buffer[offset] = tolower(buffer[offset]);
+    }
 }
 
 static void upcase_first(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't upcase binary data");
+    char *buffer;
+    if (!source_string->strlen) {
+        return;
+    }
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    buffer[0] = toupper(buffer[0]);
 }
 
 static void downcase_first(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't downcase binary data");
+    char *buffer;
+    if (!source_string->strlen) {
+        return;
+    }
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    buffer[0] = toupper(buffer[0]);
 }
 
 static void titlecase_first(Interp *interpreter, STRING *source_string) {
-    internal_error(INVALID_CHARTYPE, "Can't titlecase binary data");
+    char *buffer;
+    if (!source_string->strlen) {
+        return;
+    }
+    Parrot_unmake_COW(interpreter, source_string);
+    buffer = source_string->strstart;
+    buffer[0] = toupper(buffer[0]);
 }
 
 static INTVAL compare(Interp *interpreter, STRING *lhs, STRING *rhs) {
