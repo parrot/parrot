@@ -1290,6 +1290,7 @@ include/parrot/encoding.h                         [devel]include
 include/parrot/enums.h                            [devel]include
 include/parrot/events.h                           [devel]include
 include/parrot/exceptions.h                       [devel]include
+include/parrot/exec.h                             [devel]include
 include/parrot/exit.h                             [devel]include
 include/parrot/global_setup.h                     [devel]include
 include/parrot/hash.h                             [devel]include
