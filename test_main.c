@@ -59,13 +59,22 @@ main(int argc, char **argv) {
         int i;
         time_t foo;
         
-        printf("String %p has length %i: %.*s\n", s, (int) string_length(s), (int) string_length(s), (char *) s->bufstart);
+        printf("String %p has length %i: %.*s\n", (void *) s, 
+                (int) string_length(s), s->bufused,
+                (char *) s->bufstart);
         string_concat(s, t, 0);
-        printf("String %p has length %i: %.*s\n", s, (int) string_length(s), (int) string_length(s), (char *) s->bufstart);
+        printf("String %p has length %i: %.*s\n", (void *) s, 
+                (int) string_length(s), s->bufused,
+                (char *) s->bufstart);
         string_chopn(s, 4);
-        printf("String %p has length %i: %.*s\n", s, (int) string_length(s), (int) string_length(s), (char *) s->bufstart);
+        printf("String %p has length %i: %.*s\n", (void *) s, 
+                (int) string_length(s), s->bufused,
+                (char *) s->bufstart);
         string_chopn(s, 4);
-        printf("String %p has length %i: %.*s\n", s, (int) string_length(s), (int) string_length(s), (char *) s->bufstart);
+        printf("String %p has length %i: %.*s\n", (void *) s, 
+                (int) string_length(s), s->bufused,
+                (char *) s->bufstart);
+
         foo = time(0);
         for (i = 0; i < 100000000; i++) {
             string_concat(s, t, 0);

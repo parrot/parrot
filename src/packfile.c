@@ -1689,10 +1689,15 @@ PackFile_Constant_dump(struct PackFile_Constant * self) {
         case PFC_STRING:
             printf("    [ 'PFC_STRING', {\n");
             printf("        FLAGS    => 0x%04x,\n", self->string->flags);
-            printf("        ENCODING => %ld,\n",  (long) self->string->encoding->which);
-            printf("        TYPE     => %ld,\n",  (long) self->string->type);
-            printf("        SIZE     => %ld,\n",  (long) self->string->bufused);
-            printf("        DATA     => '%s'\n",  self->string->bufstart); /* TODO: Not a good idea in general */
+            printf("        ENCODING => %ld,\n", 
+                    (long) self->string->encoding->which);
+            printf("        TYPE     => %ld,\n",  
+                    (long) self->string->type);
+            printf("        SIZE     => %ld,\n",  
+                    (long) self->string->bufused);
+            /* TODO: Won't do anything reasonable for most encodings */
+            printf("        DATA     => '%.*s'\n",  
+                    self->string->bufused, (char *) self->string->bufstart); 
             printf("    } ],\n");
             break;
 
