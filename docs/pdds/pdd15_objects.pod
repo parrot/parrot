@@ -476,8 +476,8 @@ To create a new class C<Foo> which has no parent classes:
 To create a class C<Foo> with the parents C<A> and C<B>, the code
 would be:
 
-   findclass $P0, "A"
-   findclass $P1, "B"
+   getclass $P0, "A"
+   getclass $P1, "B"
    subclass $P2, $P0, "Foo"
    addparent $P2, $P1
 
