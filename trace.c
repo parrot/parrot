@@ -24,7 +24,7 @@ trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
     if(pmc) {
         if(pmc->vtable) {
             if (pmc->vtable == Parrot_base_vtables + enum_class_PerlString) {
-                PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%PS\")",
+                PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%Ps\")",
                         pmc->vtable->name(interpreter, pmc), pmc, pmc);
             }
             else if (pmc->vtable == Parrot_base_vtables + enum_class_PerlUndef
