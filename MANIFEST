@@ -392,8 +392,6 @@ examples/benchmarks/vpm.imc                       [main]doc
 examples/benchmarks/vpm.pl                        [main]doc
 examples/benchmarks/vpm.py                        [main]doc
 examples/benchmarks/vpm.rb                        [main]doc
-examples/benchmarks/vpm1.imc                      [main]doc
-examples/benchmarks/vpm2.imc                      [main]doc
 examples/compilers/Makefile                       [main]doc
 examples/compilers/japhc.c                        [main]doc
 examples/io/echo_client.imc                       [main]doc
