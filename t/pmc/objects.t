@@ -97,7 +97,7 @@ output_like(<<'CODE', <<'OUTPUT', "getclass");
 CODE
 /Foo
 FooBar
-Class doesn't exist/
+Class 'NoSuch' doesn't exist/
 OUTPUT
 # ' for vim
 
@@ -999,7 +999,7 @@ output_like(<<'CODE', <<'OUTPUT', "subclassing a non-existant class");
     print "Uh-oh...\n"
     end
 CODE
-/Class doesn't exist/
+/Class 'Nemo' doesn't exist/
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
@@ -1007,7 +1007,7 @@ output_like(<<'CODE', <<'OUTPUT', "anon. subclass of non-existant class");
     print "Uh-oh...\n"
     end
 CODE
-/Class doesn't exist/
+/Class 'Character' doesn't exist/
 OUTPUT
 
 output_like(<<'CODE', <<'OUTPUT', "anon. subclass classname");
