@@ -20,6 +20,7 @@ Python functions.
 
 #include "parrot/parrot.h"
 #include "py_func.str"
+#include <assert.h>
 
 /*
 
@@ -734,6 +735,18 @@ Parrot_py_init(Interp *interpreter)
     parrot_py_create_default_meths(interpreter);
 }
 
+int PIO_softspace(theINTERP, PMC *pmc, int new); /* io/io.c */
+void
+Parrot_py_exit(Interp *interpreter)
+{
+    /*
+     * python seems to provide a newline, if there was none
+     */
+    PMC *io = PIO_STDOUT(interpreter);
+    if (PIO_softspace(interpreter, io, 0))
+        PIO_puts(interpreter, io, "\n");
+}
+
 /*
  * convert a key chain PMC to a range slice with end adjusted to
  * the aggregate.
@@ -945,11 +958,40 @@ parrot_py_set_attr_str(Interp* interpreter, PMC *obj, STRING *name, PMC *v)
     Parrot_default_setprop(interpreter, obj, name, v);
 }
 
+/*
+ * TODO self.super()
+ * for now use delegate directly
+ */
+PMC* Parrot_delegate_get_iter(Parrot_Interp interpreter, PMC* pmc);
+
+static PMC*
+parrot_py_get_iter(Interp* interpreter, PMC *obj)
+{
+    /*
+     * need an iterator - that's the original construction code
+     */
+    PMC *iter = pmc_new_init(interpreter, enum_class_Iterator, obj);
+    PMC *next, *obj_iter;
+    STRING *next_meth = CONST_STRING(interpreter, "next");
+    STRING *class_name;
+
+    PMC_struct_val(iter) = obj_iter =
+        Parrot_delegate_get_iter(interpreter, obj);
+
+    next = Parrot_find_method_with_cache(interpreter, obj_iter, next_meth);
+    assert(next);
+    class_name = VTABLE_name(interpreter, obj);
+    Parrot_store_global(interpreter, class_name, next_meth, next);
+    return iter;
+}
+
 void
 parrot_py_set_vtable(Parrot_Interp interpreter, PMC* class, PMC *object)
 {
     object->vtable->get_attr_str = parrot_py_get_attr_str;
     object->vtable->set_attr_str = parrot_py_set_attr_str;
+    object->vtable->get_iter     = parrot_py_get_iter;
+
 }
 /*
 

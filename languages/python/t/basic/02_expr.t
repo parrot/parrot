@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -44,4 +44,23 @@ test( <<'CODE', 'subscr' );
 print "abcde"[2]
 i =3
 print "abcde"[i]
+CODE
+
+test( <<'CODE', 'in hash' );
+tests = {
+ 2: 22,
+ 3: 33,
+ 7: 77
+}
+
+def main():
+    for x in range(5):
+	if x in tests:
+	    print 1,
+	else:
+	    print 0,
+    print
+
+if __name__ == '__main__':
+    main()
 CODE

@@ -303,6 +303,8 @@ Parrot_really_destroy(int exit_code, void *vinterp)
      */
     if (!interpreter->parent_interpreter) {
         pt_join_threads(interpreter);
+        if (Interp_flags_TEST(interpreter, PARROT_PYTHON_MODE))
+            Parrot_py_exit(interpreter);
     }
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:

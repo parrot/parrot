@@ -222,7 +222,9 @@ sub New_func {
     my $nst = "";
     my $ns = $namespace{$arg};
     my $real_name = $arg;
+    my $meth = '';
     if ($ns) {
+	$meth = ', method';
 	$nst = qq!.namespace [$ns]!;
 	if ($vtables{$arg}) {
 	    $real_name = $vtables{$arg};
@@ -233,13 +235,23 @@ sub New_func {
 .namespace [""]
 
 $nst
-.sub $real_name prototyped $cmt
+.sub $real_name prototyped$meth $cmt
 EOC
     my (@params, $k, $v, $params);
     while ( ($k, $v) = each(%{$def_arg_names{$arg}})) {
 	$k =~ s/[\*"]//g;
 	$params[$v] = $k;
     }
+    if ($meth ne '') {
+	my $self = shift @params;
+	if ($self ne 'self') {
+	    print <<EOC;
+	    .local pmc $self
+	    $self = self
+EOC
+	}
+    }
+
     $params = join("\n\t", map {".param pmc $_"} @params);
     print <<EOC;
 	$params
@@ -997,18 +1009,29 @@ plain:
 	    '<=' => 'isle',
 	    'is' => 'issame',
 	    'is not' => 'issame',
+	    'in'   => 'exists'
 	);
 	my $res = temp('I');
 	my $pres = temp('P');
 	$op = $is_map{$c};
 	my $isnot = '';
-	if ($c eq 'is not') {
+	if ($c eq 'is not' || $c eq 'not in') {
 	    $isnot = qq!\n\t$res = not $res!;
 	}
-	my $lp = promote($l);
-	my $rp = promote($r);
-	print <<EOC;
+	if ($op eq 'exists') {
+	    my $lk = $l->[1];
+	    print <<EOC;
+	$res = exists $r->[1]\[$lk\]
+EOC
+	}
+	else {
+	    my $lp = promote($l);
+	    my $rp = promote($r);
+	    print <<EOC;
 	$res = $op $lp, $rp $cmt$isnot
+EOC
+	}
+	print <<EOC;
 	$pres = new .Boolean
 	$pres = $res # ugly
 EOC

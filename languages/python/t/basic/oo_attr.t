@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -116,6 +116,27 @@ def main():
     c = C()
     i = iter(c)
     print i.next()
+    print i.next()
+    print "ok"
+
+main()
+CODE
+
+test(<<'CODE', 'override __iter__  next, self.a');
+class C(object):
+    def __iter__(self):
+	print "in iter"
+	self.a = 42
+	yield 1
+	yield 2
+	yield 3
+	yield 4
+
+def main():
+    c = C()
+    i = iter(c)
+    print i.next()
+    print c.a
     print i.next()
     print "ok"
 

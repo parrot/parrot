@@ -151,6 +151,7 @@ end of a coroutine:
         void * regs = Parrot_save_register_frames(interpreter, SELF);
         opcode_t offset, *call_hook;
         PMC *ex;
+        PMC *p5 = REG_PMC(5);
 
         REG_PMC(5) = SELF;
         assert(sub->end);
@@ -163,6 +164,7 @@ end of a coroutine:
          */
         runops(interpreter, offset);
         res = REG_PMC(5);
+        REG_PMC(5) = p5;
         /*
          * the generator returned None, when it's finished
          */
