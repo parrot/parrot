@@ -149,6 +149,76 @@ parrot_py_list(Interp *interpreter, PMC *argv)
     return list;
 }
 
+#define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
+static PMC *
+parrot_py_max(Interp *interpreter, PMC *argv)
+{
+    PMC *arg, *max, *iter;
+    INTVAL i, n;
+    /*
+     * no arguments: bail out
+     */
+    if ((n = VTABLE_elements(interpreter, argv)) == 0)
+        real_exception(interpreter, NULL, E_TypeError,
+                "TypeError: max expected 1 arguments, got 0");
+    if (n == 1) {
+        /* argument must be iterable */
+        arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+        iter = pmc_new_init(interpreter, enum_class_Iterator, arg);
+        VTABLE_set_integer_native(interpreter, iter, 0);
+        max = VTABLE_shift_pmc(interpreter, iter);
+        while (VTABLE_get_bool(interpreter, iter)) {
+            PMC *item = VTABLE_shift_pmc(interpreter, iter);
+            if (VTABLE_cmp(interpreter, max, item) < 0)
+                max = item;
+        }
+        return max;
+    }
+    /* got n items */
+    max = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+    for (i = 1; i < n; ++i) {
+        PMC *item = VTABLE_get_pmc_keyed_int(interpreter, argv, i);
+        if (VTABLE_cmp(interpreter, max, item) < 0)
+            max = item;
+    }
+    return max;
+
+}
+
+static PMC *
+parrot_py_min(Interp *interpreter, PMC *argv)
+{
+    PMC *arg, *min, *iter;
+    INTVAL i, n;
+    /*
+     * no arguments: bail out
+     */
+    if ((n = VTABLE_elements(interpreter, argv)) == 0)
+        real_exception(interpreter, NULL, E_TypeError,
+                "TypeError: min expected 1 arguments, got 0");
+    if (n == 1) {
+        /* argument must be iterable */
+        arg = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+        iter = pmc_new_init(interpreter, enum_class_Iterator, arg);
+        VTABLE_set_integer_native(interpreter, iter, 0);
+        min = VTABLE_shift_pmc(interpreter, iter);
+        while (VTABLE_get_bool(interpreter, iter)) {
+            PMC *item = VTABLE_shift_pmc(interpreter, iter);
+            if (VTABLE_cmp(interpreter, min, item) > 0)
+                min = item;
+        }
+        return min;
+    }
+    /* got n items */
+    min = VTABLE_get_pmc_keyed_int(interpreter, argv, 0);
+    for (i = 1; i < n; ++i) {
+        PMC *item = VTABLE_get_pmc_keyed_int(interpreter, argv, i);
+        if (VTABLE_cmp(interpreter, min, item) > 0)
+            min = item;
+    }
+    return min;
+}
+
 static PMC *
 parrot_py_enumerate(Interp *interpreter, PMC *list)
 {
@@ -430,6 +500,8 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *hash     = CONST_STRING(interpreter, "hash");
     STRING *list     = CONST_STRING(interpreter, "list");
     STRING *map      = CONST_STRING(interpreter, "map");
+    STRING *max      = CONST_STRING(interpreter, "max");
+    STRING *min      = CONST_STRING(interpreter, "min");
     STRING *range    = CONST_STRING(interpreter, "range");
     STRING *reduce   = CONST_STRING(interpreter, "reduce");
     STRING *tuple    = CONST_STRING(interpreter, "tuple");
@@ -442,6 +514,8 @@ parrot_py_create_funcs(Interp *interpreter)
     parrot_py_global(interpreter, F2DPTR(parrot_py_hash), hash, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_list), list, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_map), map, pipp);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_max), max, pip);
+    parrot_py_global(interpreter, F2DPTR(parrot_py_min), min, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_range), range, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_reduce), reduce, pipp);
     parrot_py_global(interpreter, F2DPTR(parrot_py_tuple), tuple, pipp);

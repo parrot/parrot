@@ -3,7 +3,7 @@
 use strict;
 use lib '../../lib';
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 30;
 
 sub test {
     language_output_is('python', $_[0], '', $_[1]);
@@ -239,5 +239,33 @@ test(<<'CODE', 'list()');
 if __name__ == '__main__':
     for i in list("abc"):
         print i
+CODE
+
+test(<<'CODE', 'max(x,...)');
+if __name__ == '__main__':
+	print max(1,2)
+	print max(1,2,3,4,5)
+	print max(list("bcaBCA"))
+CODE
+
+test(<<'CODE', 'max(seq)');
+if __name__ == '__main__':
+	print max([1,2])
+	print max([1,2,3,4,5])
+	print max("bcaBCA")
+CODE
+
+test(<<'CODE', 'min(x,...)');
+if __name__ == '__main__':
+	print min(1,2)
+	print min(1,2,3,4,5)
+	print min(list("bcaBCA"))
+CODE
+
+test(<<'CODE', 'min(seq)');
+if __name__ == '__main__':
+	print min([1,2])
+	print min([1,2,3,4,5])
+	print min("bcaBCA")
 CODE
 
