@@ -263,6 +263,12 @@ pasmline: labels  pasm_inst '\n'  { $$ = 0; }
 pasm_inst: {clear_state();}
        PARROT_OP pasm_args	 { $$ = INS(interp, $2,0,regs,nargs,keyvec,1);
                                           free($2); }
+    | PCC_SUB LABEL              {
+                                          char *name = str_dup($2);
+                                          $$ = iSUBROUTINE(
+                                          mk_address($2, U_add_uniq_sub));
+                                          $$->r[1] =  mk_pcc_sub(name, 0);
+                                        }
     | /* none */                        { $$ = 0;}
     ;
 pasm_args:

@@ -38,6 +38,8 @@
  *
  */
 
+EXTERN int pasm_file;
+
 struct subs {
     size_t size;                        /* code size in ops */
     int ins_line;                       /* line# for debug */
@@ -815,7 +817,8 @@ e_pbc_emit(void *param, Instruction * ins)
 
         oldsize = get_old_size(interpreter, &ins_line);
         code_size = store_labels(interpreter, &ins_size, oldsize);
-        debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n", code_size, oldsize);
+        debug(interpreter, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
+                code_size, oldsize);
         constant_folding(interpreter);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
@@ -838,6 +841,10 @@ e_pbc_emit(void *param, Instruction * ins)
             add_const_pmc_sub(interpreter, ins->r[1], oldsize,
                     oldsize+code_size);
         }
+    }
+    if (pasm_file && ins->r[1] && ins->r[1]->pcc_sub) {
+        /* we can only set the offset for PASM code */
+        add_const_pmc_sub(interpreter, ins->r[1], npc, npc);
     }
     if (ins->op && *ins->op) {
         /* fixup local jumps */

@@ -33,7 +33,8 @@ I<statement> is terminated by a newline (<NL>).
 =head2 Labels
 
 Optional label for the given instruction, can stand on its own line.
-Global labels start with an underscore, local labels shouldn't.
+Global labels start with an underscore, local labels shouldn't. A label must
+conform to the syntax of B<identifier> described below.
 
 =head1 INSTRUCTIONS
 
@@ -44,7 +45,14 @@ Global labels start with an underscore, local labels shouldn't.
 =item <identifier>
 
 Start with a letter or underscore, then may contain additionally
-digits.
+digits and B<::>.
+
+Example:
+
+    a
+    _a
+    A42
+    a::b_c
 
 =item <type>
 

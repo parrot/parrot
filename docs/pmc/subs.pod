@@ -8,6 +8,10 @@ Parrot comes with different subroutine and alike classes which implement
 CPS (Continuation Passing Style) and PCC (Parrot Calling Conventions)
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
+Please note, that this document refers to PASM assembler only. The PIR
+assembler has a more HLL-like syntax for Parrot Calling Conventions.
+S. F<languages/imcc/docs/calling_conventions.pod>
+
 =head2 Class Tree
 
   Sub
@@ -103,6 +107,37 @@ matches that of the interpreter:
     updatecc
     invoke
     ...
+
+=head2 Generating a Subroutine Symbol Table Entry
+
+Whem a subroutine label is prefixed by B<.pcc_sub>, the name of the
+subroutine (i.e. the label) gets stored in the global stash.
+
+    find_global P0, "_the_sub"
+    invokecc
+    print "back\n"
+    end
+
+  .pcc_sub _the_sub:
+    print "in sub\n"
+    invoke P1
+
+=head2 Optimized Tail Calls
+
+    find_global P0, "_the::sub"
+    invokecc
+    print "back\n"
+    end
+
+  .pcc_sub _the::sub:
+    print "in sub\n"			# must preserve P1
+    find_global P0, "_next::sub"
+    set I0, P0				# get the absolute address
+    jump I0				# jump to absolute address
+
+  .pcc_sub _next::sub: 			# must preserve P1
+    print "in next sub\n"
+    invoke P1				# return to main
 
 =head1 FILES
 

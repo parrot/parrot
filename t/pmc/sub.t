@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 41;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -437,5 +437,73 @@ _func:
     invoke P1
 CODE
 /^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pcc sub");
+    find_global P0, "_the_sub"
+    defined I0, P0
+    if I0, ok
+    print "not "
+ok:
+    print "ok 1\n"
+    invokecc
+    print "back\n"
+    end
+.pcc_sub _the_sub:
+    print "in sub\n"
+    invoke P1
+CODE
+ok 1
+in sub
+back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pcc sub, tail call");
+    find_global P0, "_the_sub"
+    defined I0, P0
+    if I0, ok
+    print "not "
+ok:
+    print "ok 1\n"
+    invokecc
+    print "back\n"
+    end
+
+.pcc_sub _the_sub:
+    print "in sub\n"
+    find_global P0, "_next_sub"
+    set I0, P0
+    jump I0
+    print "never here\n"
+
+.pcc_sub _next_sub:
+    print "in next sub\n"
+    invoke P1
+    print "never here\n"
+    end
+CODE
+ok 1
+in sub
+in next sub
+back
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax");
+    find_global P0, "_the::sub::some::where"
+    defined I0, P0
+    if I0, ok
+    print "not "
+ok:
+    print "ok 1\n"
+    invokecc
+    print "back\n"
+    end
+.pcc_sub _the::sub::some::where:
+    print "in sub\n"
+    invoke P1
+CODE
+ok 1
+in sub
+back
 OUTPUT
 

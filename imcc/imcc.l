@@ -86,7 +86,8 @@ DOT		[.]
 SIGN            [-+]
 FLOATNUM        {SIGN}?{DIGITS}{DOT}{DIGIT}*([eE]{SIGN}?{DIGITS})?
 LETTERDIGIT     [a-zA-Z0-9_]
-ID              {LETTER}{LETTERDIGIT}*
+LABELLETTERDIGIT     ([a-zA-Z0-9_]|"::")
+ID              {LETTER}{LABELLETTERDIGIT}*
 STRINGCONSTANT  \"(\\\"|[^"\n]*)*\"
 CHARCONSTANT    \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
@@ -185,7 +186,7 @@ SP              [ ]
 ".pcc_begin"    return(PCC_BEGIN);
 ".pcc_end"      return(PCC_END);
 ".pcc_call"     return(PCC_CALL);
-".pcc_sub"      return(PCC_SUB);
+<emit,INITIAL>".pcc_sub"      return(PCC_SUB);
 ".pcc_begin_return"    return(PCC_BEGIN_RETURN);
 ".pcc_end_return"      return(PCC_END_RETURN);
 ".pcc_begin_yield"    return(PCC_BEGIN_YIELD);
