@@ -18,7 +18,6 @@ $lambda_count = 0;
 
 my %builtin_ops = (
     abs => 'o',
-    iter => 'o',
 );
 
 my %builtins = (
@@ -34,6 +33,7 @@ my %builtins = (
     hash => 1,
     hex => 1,
     id => 1,
+    iter => 1,
     filter => 1,
     list => 1,
     long => 1,
@@ -59,6 +59,8 @@ my %type_map = (
     dict  => 'Py_dict',
     list  => 'Py_list',
     tuple => 'Py_tuple',
+
+    iter  => 'Py_iter',
 );
 
 
@@ -908,59 +910,6 @@ sub print_stack {
     }
 }
 
-# python func to opcode translations
-sub OPC_bool {
-    my ($n, $c, $cmt) = @_;
-    my $b = temp('I');
-    my $p = temp('P');
-    my $arg = promote(pop @stack);
-    my $self = pop @stack;
-    print <<EOC;
-	$b = istrue $arg $cmt
-	# TODO create true P, false P opcodes
-	$p = new .Boolean
-	$p = $b
-EOC
-    push @stack, [-1, $p, 'I'];
-}
-
-sub OPC_complex {
-    my ($n, $c, $cmt) = @_;
-    my $p = temp('P');
-    my $im = pop @stack;
-    my $re = pop @stack; # TODO 1 argument only
-    my $self = pop @stack;
-    print "\t# stack messed $c ne $self->[1]\n" if ($c ne $self->[1]);
-    print <<EOC;
-	# cmplx($re->[1], $im->[1]) $cmt
-	$p = new .Complex
-EOC
-    if ($re->[2] eq 'P') {
-	my $n = temp('N');
-	print <<EOC;
-	$n = $re->[1]
-	$p = $n
-EOC
-    }
-    else {
-	print <<EOC;
-	$p = $re->[1]
-EOC
-    }
-    if ($im->[2] eq 'P') {
-	my $n = temp('N');
-	print <<EOC;
-	$n = $im->[1]
-	$p\["imag"\] = $n
-EOC
-    }
-    else {
-	print <<EOC;
-	$p\["imag"\] = $im->[1]
-EOC
-    }
-    push @stack, [-1, $p, 'I'];
-}
 
 sub ret_val {
     my $a = shift;
@@ -1150,7 +1099,6 @@ EOC
 sub BUILD_TUPLE
 {
     my ($n, $c, $cmt, $type) = @_;
-    # TODO iter for FixedPMCArray
     $type = "FixedPMCArray" unless defined $type;
     my ($opcode, $rest) = ($code[$code_l]->[2],$code[$code_l]->[4]);
     if ($opcode eq 'UNPACK_SEQUENCE') {

@@ -566,6 +566,9 @@ parrot_py_create_funcs(Interp *interpreter)
     STRING *Py_dict  = CONST_STRING(interpreter, "Py_dict");
     STRING *Py_list  = CONST_STRING(interpreter, "Py_list");
     STRING *Py_tuple = CONST_STRING(interpreter, "Py_tuple");
+
+    STRING *Py_iter  = CONST_STRING(interpreter, "Py_iter");
+
     PMC* class;
     /*
      * new types interface, just place a class object as global
@@ -590,6 +593,9 @@ parrot_py_create_funcs(Interp *interpreter)
     Parrot_store_global(interpreter, NULL, Py_list, class);
     class = Parrot_base_vtables[enum_class_PerlHash]->data;
     Parrot_store_global(interpreter, NULL, Py_dict, class);
+
+    class = Parrot_base_vtables[enum_class_Iterator]->data;
+    Parrot_store_global(interpreter, NULL, Py_iter, class);
 
     parrot_py_global(interpreter, F2DPTR(parrot_py_assert_e), assert_e, pip);
     parrot_py_global(interpreter, F2DPTR(parrot_py_callable), callable, pip);

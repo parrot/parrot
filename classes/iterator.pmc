@@ -456,6 +456,16 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         PMC *agg, *key, *res;
         INTVAL ires;
 
+        if (REG_INT(3) == 1) {       /* iterator constructor */
+            PMC *iter;
+            REG_PMC(5) = iter = pmc_new_init(INTERP,
+                    enum_class_Iterator, REG_PMC(5));
+            VTABLE_set_integer_native(INTERP, iter, 0);
+            return next;
+        }
+        else if (REG_INT(3) == 2)   /* TODO function+sentinel */
+            internal_exception(1, "Iterator: invoke 2 args");
+
         REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         key = PMC_struct_val(SELF);
         agg = PMC_pmc_val(SELF);

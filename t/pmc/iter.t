@@ -1064,7 +1064,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - string");
     str = new PerlString
     str = "abcdef"
     hash = new PerlHash
-    hash."fromkeys"(str)
+    hash = hash."fromkeys"(str)
     $I0 = hash
     print $I0
     print " "
@@ -1097,7 +1097,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array");
     push ar, "d"
     push ar, "e"
     hash = new PerlHash
-    hash."fromkeys"(ar)
+    hash = hash."fromkeys"(ar)
     $I0 = hash
     print $I0
     print " "
@@ -1159,7 +1159,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - array slice");
     .local pmc sl
     sl = slice ar[1 ..]
     hash = new PerlHash
-    hash."fromkeys"(sl)
+    hash = hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "
@@ -1188,7 +1188,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange");
     .local pmc sl
     sl = new Iterator, xr
     hash = new PerlHash
-    hash."fromkeys"(sl)
+    hash = hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "
@@ -1252,7 +1252,7 @@ output_like(<<'CODE', <<'OUTPUT', "hash fromkeys - xrange get_iter");
     .local pmc sl
     sl = new Iterator, xr
     hash = new PerlHash
-    hash."fromkeys"(sl)
+    hash = hash."fromkeys"(sl)
     $I0 = hash
     print $I0
     print " "
