@@ -24,6 +24,8 @@
 #define emitm_i(n) ((n) + 24)
 #define emitm_f(n) (n)
 
+#if JIT_EMIT
+
 #define emitm_FP emitm_i(6)
 #define emitm_SP emitm_o(6)
 
@@ -568,6 +570,29 @@ void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info,
     emitm_jumpl_i(jit_info->native_ptr, emitm_o(0), 0, emitm_g(0));
     emitm_nop(jit_info->native_ptr);
 }
+
+void
+Parrot_jit_load_registers(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp *interpreter)
+{
+/* TODO write me */
+}
+
+void
+Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
+    struct Parrot_Interp * interpreter)
+{
+/* TODO write me */
+}
+
+#else
+
+#  define REQUIRES_CONSTANT_POOL 0
+#  define MAX_REGITERS_TO_MAP 1
+
+char register_map[MAX_REGITERS_TO_MAP] = { emitm_l(0) }; 
+
+#endif
 
 /*
  * Local variables:

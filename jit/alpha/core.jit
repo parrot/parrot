@@ -1,42 +1,134 @@
 ;
 ; alpha/core.jit
 ;
+;
 ; $Id$
 ;
 
 Parrot_noop {
-    emit_nop(jit_info->native_ptr);
+    emit_nop(NATIVECODE);
 }
 
 Parrot_set_i_i {
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[2]);
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
+    if (MAP[1] && MAP[2]) {
+        emit_mov(NATIVECODE, MAP[2], MAP[1]);
+    }
+    else if (MAP[1]) {
+        emit_ldq(NATIVECODE, MAP[1], &INT_REG[2]);
+    }
+    else if (MAP[2]) {
+        emit_stq(NATIVECODE, MAP[2], &INT_REG[1]);
+    }
+    else {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[2]);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
 }
 
 Parrot_set_i_ic {
-    jit_info->native_ptr = emit_l_c(jit_info, REG7_t6, &INT_CONST[2]);
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
+    if (MAP[1]) {
+        emit_lc(NATIVECODE, MAP[1], *INT_CONST[2]);
+    }
+    else {
+        emit_lc(NATIVECODE, REG0_v0, *INT_CONST[2]);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+}
+
+Parrot_sub_i_i_i {
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_subq(NATIVECODE, MAP[2], MAP[3], MAP[1]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_subq(NATIVECODE, MAP[2], REG0_v0, MAP[1]);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[2]);
+        emit_subq(NATIVECODE, REG0_v0, MAP[3], MAP[1]);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_subq(NATIVECODE, MAP[2], MAP[3], REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_ldq(NATIVECODE, REG8_t7, &INT_REG[2]);
+        emit_subq(NATIVECODE, REG8_t7, REG0_v0, MAP[1]);
+    }
+    else if (MAP[2]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_subq(NATIVECODE, MAP[2], REG0_v0, REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[2]);
+        emit_subq(NATIVECODE, REG0_v0, MAP[3], REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_ldq(NATIVECODE, REG8_t7, &INT_REG[2]);
+        emit_subq(NATIVECODE, REG0_v0, REG8_t7, REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
 }
 
 Parrot_add_i_i_i {
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[3]);
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG8_t7, REG6_t5, &INT_REG[2]);
-    jit_info->native_ptr = emit_arithmetic(jit_info->native_ptr, ADDQ, REG7_t6, REG7_t6, REG8_t7);
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, STQ, REG7_t6, REG6_t5, &INT_REG[1]);
+    if (MAP[1] && MAP[2] && MAP[3]) {
+        emit_addq(NATIVECODE, MAP[2], MAP[3], MAP[1]);
+    }
+    else if (MAP[1] && MAP[2]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_addq(NATIVECODE, MAP[2], REG0_v0, MAP[1]);
+    }
+    else if (MAP[1] && MAP[3]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[2]);
+        emit_addq(NATIVECODE, REG0_v0, MAP[3], MAP[1]);
+    }
+    else if (MAP[2] && MAP[3]) {
+        emit_addq(NATIVECODE, MAP[2], MAP[3], REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else if (MAP[1]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_ldq(NATIVECODE, REG8_t7, &INT_REG[2]);
+        emit_addq(NATIVECODE, REG8_t7, REG0_v0, MAP[1]);
+    }
+    else if (MAP[2]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_addq(NATIVECODE, MAP[2], REG0_v0, REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else if (MAP[3]) {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[2]);
+        emit_addq(NATIVECODE, REG0_v0, MAP[3], REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
+    else {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[3]);
+        emit_ldq(NATIVECODE, REG8_t7, &INT_REG[2]);
+        emit_addq(NATIVECODE, REG0_v0, REG8_t7, REG0_v0);
+        emit_stq(NATIVECODE, REG0_v0, &INT_REG[1]);
+    }
 }
 
 Parrot_if_i_ic {
-    jit_info->native_ptr = emit_l_s_r(jit_info->native_ptr, interpreter, LDQ, REG7_t6, REG6_t5, &INT_REG[1]);
-    jit_info->native_ptr = emit_b(jit_info, BNE, REG7_t6, *INT_CONST[2]);
+    if (MAP[1]) {
+        emit_bne(NATIVECODE, MAP[1], *INT_CONST[2]);
+    }
+    else {
+        emit_ldq(NATIVECODE, REG0_v0, &INT_REG[1]);
+        emit_bne(NATIVECODE, REG0_v0, *INT_CONST[2]);
+    }
 }
 
 Parrot_end {
-    emit_mov(jit_info->native_ptr, REG15_s6, REG30_sp);
-    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDQ, REG26_ra, REG30_sp, 0);
-
-    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDQ, REG15_s6, REG30_sp, 8);
-    jit_info->native_ptr = emit_l_s_c(jit_info->native_ptr, LDA, REG30_sp, REG30_sp, 16);
-    emit_ret(jit_info->native_ptr);
+;   emit_mov(NATIVECODE, REG15_s6, REG30_sp);
+    emit_ldq_b(NATIVECODE, REG26_ra, 0, REG30_sp);
+    emit_ldq_b(NATIVECODE, REG15_s6, 8, REG30_sp);
+    emit_lda_b(NATIVECODE, REG30_sp, 16, REG30_sp);
+    emit_ret(NATIVECODE);
 }
 
 /*

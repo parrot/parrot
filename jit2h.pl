@@ -23,12 +23,18 @@ my %type_to_arg = (
 
 my $core_numops = scalar(@$Parrot::OpLib::core::ops);
 my @core_opfunc = map { $_->func_name } @$Parrot::OpLib::core::ops;
+my %opcodes;
+
+for(@$Parrot::OpLib::core::ops) {
+    my $name = $_->{NAME} . '_' .join '_',@{$_->{ARGS}}[1..$#{$_->{ARGS}}];
+    $opcodes{$name} = $_->{CODE};
+}
 
 my $cpuarch = shift @ARGV;
 
 my ($i,$j,$k,$n);
 
-my ($function, $body, $line, $extern);
+my ($function, $body, $line, $extern, $header);
 
 my ($asm, $precompiled);
 
@@ -41,23 +47,28 @@ sub readjit($) {
 
     open (IN,$file) or die "Can't open file $file: $!";
     while ($line = <IN>) {
+        if ($line =~ m/^#define/) {
+            $line =~ s/PREV_OP\s(..?)\s(\w+)/(jit_info->prev_op) && (*jit_info->prev_op $1 $opcodes{$2})/g;
+            $header .= $line;
+            next;
+        }
         next if (($line =~ m/^[#;]/) || ($line =~ m/^\s*$/));
         if (!defined($function)) {
             $line =~ m/(extern\s*)?([^\s]*)\s*{/;
             $extern = (defined($1))? 1 : 0;
             $function = $2;
             $asm = "";
-            print STDERR "Ignoring JIT definition for non-existent op: $function\n"
-                if defined $function && !grep { $_ eq $function } @core_opfunc;
             next;
         }
         if ($line =~ m/^}/) {
             $asm =~ s/([\&\*])([a-zA-Z_]+)\[(\d+)\]/make_subs($1,$2,$3)/ge;
             $asm =~ s/NEW_FIXUP/Parrot_jit_newfixup(jit_info)/g;
-            $asm =~ s/CUR_FIXUP/jit_info->fixups/g;
+            $asm =~ s/CUR_FIXUP/jit_info->arena.fixups/g;
             $asm =~ s/NATIVECODE/jit_info->native_ptr/g;
             $asm =~ s/CUR_OPCODE/jit_info->cur_op/g;
             $asm =~ s/cur_opcode/jit_info->cur_op/g;
+            $asm =~ s/MAP\[(\d)\]/jit_info->optimizer->map_branch[jit_info->op_i + $1]/g;
+            $asm =~ s/PUSH_MAPPED_REG\((\d)\)/Parrot_jit_push_registers(jit_info,$1)/g;
             $ops{$function} = [ $asm , $extern ];
             $function = undef;
         }
@@ -81,17 +92,20 @@ print JITCPU<<END_C;
 
 #include<parrot/parrot.h>
 #include"parrot/jit.h"
+#define JIT_EMIT 1
 #include"parrot/jit_emit.h"
 
 END_C
 
 %core_ops = readjit("jit/$cpuarch/core.jit");
 
+print JITCPU $header if ($header);
+
 my @jit_funcs;
-push @jit_funcs, "jit_fn_info_t op_jit[$core_numops]= {\n";
+push @jit_funcs, "Parrot_jit_fn_info_t op_jit[$core_numops] = {\n";
 
 my $jit_fn_retn = "void";
-my $jit_fn_params = "(Parrot_jit_info *jit_info, struct Parrot_Interp * interpreter)";
+my $jit_fn_params = "(Parrot_jit_info_t *jit_info, struct Parrot_Interp * interpreter)";
 
 for ($i = 0; $i < $core_numops; $i++) {
     $body = $core_ops{$core_opfunc[$i]}[0];
@@ -118,9 +132,8 @@ for ($i = 0; $i < $core_numops; $i++) {
     unless($precompiled){
     print JITCPU "\nstatic $jit_fn_retn " . $core_opfunc[$i] . "_jit" . $jit_fn_params . "{\n$body}\n";
     }
-    my $op_args = $op->size;
     push @jit_funcs, "/* op $i: $core_opfunc[$i] */\n";
-    push @jit_funcs, "{ $jit_func, $op_args, $extern }, \n";
+    push @jit_funcs, "{ $jit_func, $extern }, \n";
 }
 
 print JITCPU @jit_funcs, "};\n";
