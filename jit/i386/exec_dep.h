@@ -330,7 +330,9 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
       current_offset += (4 - s % 4); \
    }
 
-#  define SHSTRTABSIZE 0x48
+#  define SHSTRTABSIZE  0x48
+#  define PDFS          4
+#  define NSECTIONS     8
 
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
@@ -375,12 +377,12 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     header.e_phentsize = 0;
     header.e_phnum = 0;
     header.e_shentsize = sizeof(Elf32_Shdr);
-    header.e_shnum = 10;
+    header.e_shnum = NSECTIONS;
     header.e_shstrndx = 1;
 
     save_struct(fp, &header, sizeof(Elf32_Ehdr));
 
-    current_offset = sizeof(Elf32_Ehdr) + 10 * sizeof(Elf32_Shdr);
+    current_offset = sizeof(Elf32_Ehdr) + NSECTIONS * sizeof(Elf32_Shdr);
 
     /* Sections */
     bzero(&shst, SHSTRTABSIZE);
@@ -409,17 +411,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     /* 
      * Symbol table.
      * Link is the strtab section header index.
-     * Info is self section header index.
+     * Info is the index of the first symbol in the symbol table.
      */
-    sh_add(".symtab", SHT_SYMTAB, 0, (obj->symbol_count + 6) *
-        sizeof(Elf32_Sym), 7, 6, 4, sizeof(Elf32_Sym));
+    sh_add(".symtab", SHT_SYMTAB, 0, (obj->symbol_count + PDFS) *
+        sizeof(Elf32_Sym), 7, PDFS - 1, 4, sizeof(Elf32_Sym));
     /* String Table */
     obj->symbol_list_size += 1; /* Trailing \0 */
     sh_add(".strtab", SHT_STRTAB, 0, obj->symbol_list_size, 0, 0, 1, 0);
-    /* Read Only data */
-    sh_add(".rodata", SHT_PROGBITS, SHF_ALLOC, 0, 0, 0, 1, 0);
-    /* Comment */
-    sh_add(".comment", SHT_PROGBITS, 0, 0x28, 0, 0, 1, 0);
 
     /* Section header string table */
     save_struct(fp, &shst, SHSTRTABSIZE);
@@ -433,13 +431,13 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
             case RTYPE_FUNC:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + 6, 2);
+                        obj->text_rellocation_table[i].symbol_number + PDFS, 2);
                 break;
             case RTYPE_DATA:
             case RTYPE_COM:
                 rellocation.r_info =
                     ELF32_R_INFO(
-                        obj->text_rellocation_table[i].symbol_number + 6, 1);
+                        obj->text_rellocation_table[i].symbol_number + PDFS, 1);
                 break;
             default:
                 break;
@@ -464,16 +462,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     bzero(&symlst, sizeof(Elf32_Sym));
     symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
     symlst.st_shndx = 4;
-    save_struct(fp, &symlst, sizeof(Elf32_Sym));
-    /* rodata */
-    bzero(&symlst, sizeof(Elf32_Sym));
-    symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
-    symlst.st_shndx = 8;
-    save_struct(fp, &symlst, sizeof(Elf32_Sym));
-    /* Comment */
-    bzero(&symlst, sizeof(Elf32_Sym));
-    symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
-    symlst.st_shndx = 9;
     save_struct(fp, &symlst, sizeof(Elf32_Sym));
 
     for (i = 0; i < obj->symbol_count; i++) {
@@ -512,9 +500,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
     /* PAD */
     for (i = 0; i < (4 - obj->symbol_list_size % 4); i++)
         save_zero(fp);
-    save_zero(fp);
-    fprintf(fp,"GCC: (GNU) c 2.95.4 20020320 [FreeBSD]");
-    save_zero(fp);
     fclose(fp);
 }
 
