@@ -1,8 +1,8 @@
-RM_F = ${rm_f}
-PERL = ${perl}
-PARROT = parrot${exe}
-RELPATH = ../../
-MYPATH = languages/tcl/
+RM_F    = ${rm_f}
+PERL    = ${perl}
+PARROT  = .${slash}parrot${exe}
+RELPATH = ..${slash}..${slash}
+MYPATH  = languages${slash}tcl${slash}
 
 DEPS = $(RELPATH)$(PARROT) \
 lib/backslash_newline_subst.imc \

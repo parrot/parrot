@@ -19,7 +19,7 @@ sub output {
   my $pir = shift;
   my $sl = $::PConfig{slash};
   my $exe = $::PConfig{exe};
-  my $PARROT = "parrot$exe";
+  my $PARROT = ".${sl}parrot${exe}";
   open (PIR,">$file");
   print PIR $pir;
   close (PIR);
