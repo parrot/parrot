@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 output_is(<<CODE, <<OUTPUT, "set_n_nc");
 	set	N0, 1.0
@@ -151,6 +151,29 @@ output_is(<<CODE, <<OUTPUT, "sub_i");
         end
 CODE
 420042.000000
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)");
+	set	I0, -1
+	abs	N0, I0
+	abs	N1, -1
+	set	N2, -1
+	abs	N2, N2
+	abs	N3, -1.0
+	print N0
+	print "\n"
+	print N1
+	print "\n"
+	print N2
+	print "\n"
+	print N3
+	print "\n"
+	end
+CODE
+1.000000
+1.000000
+1.000000
+1.000000
 OUTPUT
 
 output_is(<<CODE, <<OUTPUT, "mul_i");
