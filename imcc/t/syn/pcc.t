@@ -290,8 +290,8 @@ output_like(<<'CODE', <<'OUT', "wrong param count exception P arg");
 .end
 
 .pcc_sub _sub
-    .param var k
-    .param var l
+    .param pmc k
+    .param pmc l
     print k
     print l
    .pcc_begin_return
@@ -695,7 +695,7 @@ ret1:
 
 # g from line 1
 .pcc_sub _sub0 non_prototyped
-    .local object res0            # (visitReturn:528)
+    .local pmc res0               # (visitReturn:528)
     res0 = new PerlInt            # (expressConstant:153)
     res0 = 42                     # (expressConstant:154)
     .pcc_begin_return             # (visitReturn:530)
@@ -706,7 +706,7 @@ ret1:
 
 # f from line 3
 .pcc_sub _sub1 non_prototyped
-    .local object res1            # (visitReturn:528)
+    .local pmc res1               # (visitReturn:528)
     find_lex $P2, 'g'             # (callingExpression:325)
     newsub $P3, .Continuation, ret0 # (callingExpression:331)
     .pcc_begin non_prototyped     # (callingExpression:332)
@@ -742,7 +742,7 @@ output_is(<<'CODE', <<'OUT', "coroutine generator throwing exception");
     newsub count, .Sub, _count
 
     # here's where we'll store it
-    .local object generator
+    .local pmc generator
 
     # call count and get the generator
     .local PerlInt start
@@ -786,8 +786,8 @@ endtry0:
 # here is count(), which returns the generator
 .pcc_sub _count non_prototyped
    .param PerlInt start
-   .local object gen_fun
-   .local object gen_obj
+   .local pmc gen_fun
+   .local pmc gen_obj
    store_lex -1, "start", start
    newsub gen_fun, .Coroutine, _count_g
    .pcc_begin_return
@@ -808,8 +808,8 @@ endtry0:
     goto _count_g
 
 stop:
-    .local object ex0
-    .local object msg0
+    .local pmc ex0
+    .local pmc msg0
     ex0 = new Exception
     msg0 = new PerlString
     msg0 = 'StopIteration'
@@ -909,7 +909,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 1");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var ar
+    .local pmc ar
     ar = new PerlArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
@@ -921,8 +921,8 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 1");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
+    .param pmc a
+    .param pmc b
     print a
     print b
     end
@@ -936,8 +936,8 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 2");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var ar
-    .local var x
+    .local pmc ar
+    .local pmc x
     x = new PerlString
     x = "first\n"
     ar = new PerlArray
@@ -952,8 +952,8 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 2");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
+    .param pmc a
+    .param pmc b
     print a
     print b
     end
@@ -967,11 +967,11 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 3");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var ar
-    .local var x
+    .local pmc ar
+    .local pmc x
     x = new PerlString
     x = "first\n"
-    .local var y
+    .local pmc y
     y = new PerlString
     y = "last\n"
     ar = new PerlArray
@@ -987,10 +987,10 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 3");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
-    .param var c
-    .param var d
+    .param pmc a
+    .param pmc b
+    .param pmc c
+    .param pmc d
     print a
     print b
     print c
@@ -1008,20 +1008,20 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var x
+    .local pmc x
     x = new PerlString
     x = "first\n"
-    .local var y
+    .local pmc y
     y = new PerlString
     y = "middle\n"
-    .local var z
+    .local pmc z
     z = new PerlString
     z = "last\n"
-    .local var ar
+    .local pmc ar
     ar = new PerlArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    .local var ar2
+    .local pmc ar2
     ar2 = new PerlArray
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
@@ -1038,14 +1038,14 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg 4");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
-    .param var c
-    .param var d
-    .param var e
-    .param var f
-    .param var g
-    .param var h
+    .param pmc a
+    .param pmc b
+    .param pmc c
+    .param pmc d
+    .param pmc e
+    .param pmc f
+    .param pmc g
+    .param pmc h
     print "Got "
     print I2
     print " params\n"
@@ -1075,20 +1075,20 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var x
+    .local pmc x
     x = new PerlString
     x = "first\n"
-    .local var y
+    .local pmc y
     y = new PerlString
     y = "middle\n"
-    .local var z
+    .local pmc z
     z = new PerlString
     z = "last\n"
-    .local var ar
+    .local pmc ar
     ar = new PerlArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
-    .local var ar2
+    .local pmc ar2
     ar2 = new PerlArray
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
@@ -1112,21 +1112,21 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg - overflow");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
-    .param var c
-    .param var d
-    .param var e
-    .param var f
-    .param var g
-    .param var h
-    .param var i
-    .param var j
-    .param var k
-    .param var l
-    .param var m
-    .param var n
-    .param var o
+    .param pmc a
+    .param pmc b
+    .param pmc c
+    .param pmc d
+    .param pmc e
+    .param pmc f
+    .param pmc g
+    .param pmc h
+    .param pmc i
+    .param pmc j
+    .param pmc k
+    .param pmc l
+    .param pmc m
+    .param pmc n
+    .param pmc o
     print "Got "
     print I2
     print " params\n"
@@ -1170,7 +1170,7 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
 .pcc_sub _main prototyped
     .local Sub sub
     newsub sub, .Sub, _sub
-    .local var ar
+    .local pmc ar
     ar = new PerlArray
     push ar, "ok 1\n"
     push ar, "ok 2\n"
@@ -1187,8 +1187,8 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
     end
 .end
 .pcc_sub _sub non_prototyped
-    .param var a
-    .param var b
+    .param pmc a
+    .param pmc b
     print a
     print b
    .pcc_begin_return
