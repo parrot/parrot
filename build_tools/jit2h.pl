@@ -21,8 +21,16 @@ my %type_to_arg = (
     STRING_REG => 's',
 );
 
+load_op_map_file();
+
+
+
 my $core_numops = scalar(@$Parrot::OpLib::core::ops);
-my @core_opfunc = map { $_->func_name } @$Parrot::OpLib::core::ops;
+my @core_opfunc;
+foreach my $op (@$Parrot::OpLib::core::ops) {
+  $core_opfunc[find_op_number($op->func_name)] = $op->func_name;
+}
+#my @core_opfunc = map { $_->func_name } @$Parrot::OpLib::core::ops;
 my %opcodes;
 
 for(@$Parrot::OpLib::core::ops) {
@@ -428,4 +436,48 @@ print("jit2h: $njit (+ $vjit vtable) of $core_numops ops are JITed.\n");
 sub make_subs {
     my ($ptr, $type, $index) = @_;
     return(($ptr eq '&' ? '&' : '') . sprintf($argmaps{$type_to_arg{$type}}, $index));
+}
+
+
+sub find_op_number {
+  my $opname = shift;
+  if (exists $ParrotOps::optable{$opname}) {
+    return $ParrotOps::optable{$opname};
+  } else {
+    $ParrotOps::optable{$opname} = ++$ParrotOps::max_op_num;
+    return $ParrotOps::optable{$opname};
+  }
+}
+  
+sub load_op_map_file {
+  my $file = shift;
+
+  if (!defined $file) {
+    $file = "ops.num";
+  }
+
+  my ($name, $number);
+
+  if (!defined $ParrotOps::max_op_num) {
+    $ParrotOps::max_op_num = 0;
+  }
+
+  local *OP;
+  open OP, "< $file" or die "Can't open $file, error $!";
+  
+  while (<OP>) {
+    chomp;
+    s/#.*$//;
+    s/\s*$//;
+    s/^\s*//;
+    next unless $_;
+    ($name, $number) = split(/\s+/, $_);
+    $name = "Parrot_" . $name;
+    $ParrotOps::optable{$name} = $number;
+    if ($number > $ParrotOps::max_op_num) {
+      $ParrotOps::max_op_num = $number;
+    }
+  }
+  close OP;
+  return;
 }
