@@ -792,11 +792,11 @@ met, the branch happens, otherwise control falls to the next operation.
 
 =item B<eq>(in STR, in STR)
 
-=item B<eq>(in INT, in INT, in INT)
+=item B<eq>(in INT, in INT, inconst INT)
 
-=item B<eq>(in NUM, in NUM, in INT)
+=item B<eq>(in NUM, in NUM, inconst INT)
 
-=item B<eq>(in STR, in STR, in INT)
+=item B<eq>(in STR, in STR, inconst INT)
 
 Branch if $1 is equal to $2.
 
@@ -825,21 +825,21 @@ op eq (in STR, in STR) {
   goto NEXT();
 }
 
-inline op eq(in INT, in INT, in INT) {
+inline op eq(in INT, in INT, inconst INT) {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op eq(in NUM, in NUM, in INT) {
+inline op eq(in NUM, in NUM, inconst INT) {
   if ($1 == $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op eq(in STR, in STR, in INT) {
+op eq(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) == 0) {
     goto OFFSET($3);
   }
@@ -855,11 +855,11 @@ op eq(in STR, in STR, in INT) {
 
 =item B<ne>(in STR, in STR)
 
-=item B<ne>(in INT, in INT, in INT)
+=item B<ne>(in INT, in INT, inconst INT)
 
-=item B<ne>(in NUM, in NUM, in INT)
+=item B<ne>(in NUM, in NUM, inconst INT)
 
-=item B<ne>(in STR, in STR, in INT)
+=item B<ne>(in STR, in STR, inconst INT)
 
 Branch if $1 is not equal to $2.
 
@@ -888,21 +888,21 @@ op ne (in STR, in STR) {
   goto NEXT();
 }
 
-inline op ne(in INT, in INT, in INT) {
+inline op ne(in INT, in INT, inconst INT) {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ne(in NUM, in NUM, in INT) {
+inline op ne(in NUM, in NUM, inconst INT) {
   if ($1 != $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ne(in STR, in STR, in INT) {
+op ne(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) != 0) {
     goto OFFSET($3);
   }
@@ -912,33 +912,33 @@ op ne(in STR, in STR, in INT) {
 
 ########################################
 
-=item B<lt>(in INT, in INT, in INT)
+=item B<lt>(in INT, in INT, inconst INT)
 
-=item B<lt>(in NUM, in NUM, in INT)
+=item B<lt>(in NUM, in NUM, inconst INT)
 
-=item B<lt>(in PMC, in PMC, in INT)
+=item B<lt>(in PMC, in PMC, inconst INT)
 
-=item B<lt>(in STR, in STR, in INT)
+=item B<lt>(in STR, in STR, inconst INT)
 
 Branch if $1 is less than $2.
 
 =cut
 
-inline op lt(in INT, in INT, in INT) {
+inline op lt(in INT, in INT, inconst INT) {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op lt(in NUM, in NUM, in INT) {
+inline op lt(in NUM, in NUM, inconst INT) {
   if ($1 < $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op lt(in STR, in STR, in INT) {
+op lt(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) < 0) {
     goto OFFSET($3);
   }
@@ -948,31 +948,31 @@ op lt(in STR, in STR, in INT) {
 
 ########################################
 
-=item B<le>(in INT, in INT, in INT)
+=item B<le>(in INT, in INT, inconst INT)
 
-=item B<le>(in NUM, in NUM, in INT)
+=item B<le>(in NUM, in NUM, inconst INT)
 
-=item B<le>(in STR, in STR, in INT)
+=item B<le>(in STR, in STR, inconst INT)
 
 Branch if $1 is less than or equal to $2.
 
 =cut
 
-inline op le(in INT, in INT, in INT) {
+inline op le(in INT, in INT, inconst INT) {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op le(in NUM, in NUM, in INT) {
+inline op le(in NUM, in NUM, inconst INT) {
   if ($1 <= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op le(in STR, in STR, in INT) {
+op le(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) <= 0) {
     goto OFFSET($3);
   }
@@ -982,31 +982,31 @@ op le(in STR, in STR, in INT) {
 
 ########################################
 
-=item B<gt>(in INT, in INT, in INT)
+=item B<gt>(in INT, in INT, inconst INT)
 
-=item B<gt>(in NUM, in NUM, in INT)
+=item B<gt>(in NUM, in NUM, inconst INT)
 
-=item B<gt>(in STR, in STR, in INT)
+=item B<gt>(in STR, in STR, inconst INT)
 
 Branch if $1 is greater than $2.
 
 =cut
 
-inline op gt(in INT, in INT, in INT) {
+inline op gt(in INT, in INT, inconst INT) {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op gt(in NUM, in NUM, in INT) {
+inline op gt(in NUM, in NUM, inconst INT) {
   if ($1 > $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op gt(in STR, in STR, in INT) {
+op gt(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) > 0) {
     goto OFFSET($3);
   }
@@ -1016,31 +1016,31 @@ op gt(in STR, in STR, in INT) {
 
 ########################################
 
-=item B<ge>(in INT, in INT, in INT)
+=item B<ge>(in INT, in INT, inconst INT)
 
-=item B<ge>(in NUM, in NUM, in INT)
+=item B<ge>(in NUM, in NUM, inconst INT)
 
-=item B<ge>(in STR, in STR, in INT)
+=item B<ge>(in STR, in STR, inconst INT)
 
 Branch if $1 is greater than or equal to $2.
 
 =cut
 
-inline op ge(in INT, in INT, in INT) {
+inline op ge(in INT, in INT, inconst INT) {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-inline op ge(in NUM, in NUM, in INT) {
+inline op ge(in NUM, in NUM, inconst INT) {
   if ($1 >= $2) {
     goto OFFSET($3);
   }
   goto NEXT();
 }
 
-op ge(in STR, in STR, in INT) {
+op ge(in STR, in STR, inconst INT) {
   if (string_compare(interpreter, $1, $2) >= 0) {
     goto OFFSET($3);
   }
@@ -1049,40 +1049,40 @@ op ge(in STR, in STR, in INT) {
 
 ########################################
 
-=item B<if>(in INT, in INT)
+=item B<if>(in INT, inconst INT)
 
-=item B<if>(in NUM, in INT)
+=item B<if>(in NUM, inconst INT)
 
-=item B<if>(in PMC, in INT)
+=item B<if>(in PMC, inconst INT)
 
-=item B<if>(in STR, in INT)
+=item B<if>(in STR, inconst INT)
 
 Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(in INT, in INT) {
+inline op if(in INT, inconst INT) {
   if ($1 != 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op if(in NUM, in INT) {
+inline op if(in NUM, inconst INT) {
   if ($1 != 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if (in STR, in INT) {
+op if (in STR, inconst INT) {
   if (string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op if(in PMC, in INT) {
+op if(in PMC, inconst INT) {
   if ($1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -1096,40 +1096,40 @@ op if(in PMC, in INT) {
 
 ###############################################################################
 
-=item B<unless>(in INT, in INT)
+=item B<unless>(in INT, inconst INT)
 
-=item B<unless>(in NUM, in INT)
+=item B<unless>(in NUM, inconst INT)
 
-=item B<unless>(in PMC, in INT)
+=item B<unless>(in PMC, inconst INT)
 
-=item B<unless>(in STR, in INT)
+=item B<unless>(in STR, inconst INT)
 
 Check register $1. If false, branch by $2.
 
 =cut
 
-inline op unless(in INT, in INT) {
+inline op unless(in INT, inconst INT) {
   if ($1 == 0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-inline op unless(in NUM, in INT) {
+inline op unless(in NUM, inconst INT) {
   if ($1 == 0.0) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless (in STR, in INT) {
+op unless (in STR, inconst INT) {
   if (!string_bool($1)) {
     goto OFFSET($2);
   }
   goto NEXT();
 }
 
-op unless(in PMC, in INT) {
+op unless(in PMC, inconst INT) {
   if (!$1->vtable->get_bool(interpreter, $1)) {
     goto OFFSET($2);
   }
@@ -2632,7 +2632,7 @@ Jump to the address held in register $1.
 
 =cut
 
-inline op jump(out INT) {
+inline op jump(in INT) {
   goto OFFSET($1);
 }
 
