@@ -13,7 +13,6 @@
 #if !defined(PARROT_REGISTER_H_GUARD)
 #define PARROT_REGISTER_H_GUARD
 
-//#include "parrot/parrot.h"
 #include "parrot/string.h"
 
 struct IReg {
