@@ -56,7 +56,7 @@ Run faster.
 
 =cut
 
-.pcc_sub _MAIN prototyped
+.sub _MAIN @MAIN
 	.param pmc argv
 	# the command line
         load_bytecode "library/ncurses.pasm"
@@ -91,7 +91,7 @@ Run faster.
 	# 15 * sizef is real size of world
 	.const int sizef = 8
 	# delay in usec
-	.sym int delay
+	.local int delay
 	delay = 20000
 
 	# Note the time
@@ -112,76 +112,24 @@ Run faster.
 
 	$I0 = argv
 	if $I0 <= 1 goto def_world
-	.sym Sub load
-	newsub load, .Sub, _load_file
-	.pcc_begin prototyped
-	.arg argv
-	.arg size
-	.pcc_call load
-retl:
-	.result S15
-	.result err
-	.pcc_end
+	(S15, err) = _load_file(argv, size)
 	length $I0, err
 	if $I0, print_err
 	goto start_curses
 
 def_world:
-	.sym Sub default
-	newsub default, .Sub, _def_world
-	.pcc_begin prototyped
-	.arg sizef
-	.arg size
-	.arg COLLIDE
-	.pcc_call default
-retd:
-	.result S15
-	.pcc_end
+	S15 = _def_world(sizef, size, COLLIDE)
 
 start_curses:
-	.sym Sub init_curses
-	newsub init_curses, .Sub, _init_curses
-	.pcc_begin prototyped
-	.pcc_call init_curses
-	.result STDSCR
-	.pcc_end
+	STDSCR = _init_curses()
 
 	GEN_COUNT = 0
 
-	.sym Sub dump
-	newsub dump, .Sub, _dump
-
-	.sym Sub generate
-	newsub generate, .Sub, _generate
-	.sym Sub check_key
-	newsub check_key, .Sub, _check_key
-
 loop:
-	.pcc_begin prototyped
-	.arg S15
-	.arg SUPRESS_PRINT
-	.arg x_offs
-	.arg y_offs
-	.arg size
-	.arg GEN_COUNT
-	.arg STDSCR
-	.arg delay
-	.pcc_call dump
-	.pcc_end
+	_dump(S15, SUPRESS_PRINT, x_offs, y_offs, size, GEN_COUNT, STDSCR, delay)
 
-         if GEN_COUNT >= MAX_GEN goto getout
-	.pcc_begin prototyped
-	.arg stop
-	.arg x_offs
-	.arg y_offs
-	.arg delay
-	.pcc_call check_key
-ret:
-	.result stop
-	.result x_offs
-	.result y_offs
-	.result delay
-	.pcc_end
+	if GEN_COUNT >= MAX_GEN goto getout
+	(stop, x_offs, y_offs, delay) = _check_key(stop, x_offs, y_offs, delay)
 
 	if stop != -2 goto not_one
 	stop = -1
@@ -196,24 +144,13 @@ gen_one:
 	printerr "."
 
 skip:
-	.pcc_begin prototyped
-	.arg S15
-	.arg size
-	.arg stop
-	.pcc_call generate
-retk:
-	.result S15
-	.result stop
-	.pcc_end
+	(S15, stop) = _generate(S15, size, stop)
 no_gen:
 	branch loop
 
 getout:
-	P0 = CURS_SET
-	I5 = 1
-	invoke
-	P0 = ENDWIN
-	invoke
+	CURS_SET(1)
+	ENDWIN()
 	time CUR_TIME
 	TIME_DIFF = CUR_TIME - START_TIME
 
@@ -269,8 +206,8 @@ print_err:
 
 
 # S15 has the incoming string, S0 is scratch
-.pcc_sub _dump prototyped
-        .param string world
+.sub _dump
+	.param string world
 	.param int SUPRESS_PRINT
 	.param int x_offs
 	.param int y_offs
@@ -291,27 +228,10 @@ print_err:
 	MVWADDCH   = global "ncurses::mvwaddch"
 	WREFRESH   = global "ncurses::wrefresh"
 
-	.pcc_begin prototyped
-	.arg STDSCR
-	.nci_call WCLEAR
-	.pcc_end
-
-	.pcc_begin prototyped
-	.arg STDSCR
-	.arg 0
-	.arg 0
-	.arg "Generation: "
-	.nci_call MVWADDSTR
-	.pcc_end
-
+	WCLEAR(STDSCR)
+	MVWADDSTR(STDSCR, 0, 0, "Generation: ")
 	$S0 = GEN_COUNT
-	.pcc_begin prototyped
-	.arg STDSCR
-	.arg 0
-	.arg 13
-	.arg $S0
-	.nci_call MVWADDSTR
-	.pcc_end
+	MVWADDSTR(STDSCR, 0, 13, $S0)
 
 	$I0 = size * y_offs
 	$I0 = $I0 + x_offs
@@ -319,11 +239,11 @@ print_err:
 	CHARACTER_OFFSET = $I0
 	.local int CHAR_POS
 	CHAR_POS = 0
-	.sym int total
+	.local int total
 	total = size * size
-	.sym int cols
-	.sym int rows
-	.sym pmc ENV
+	.local int cols
+	.local int rows
+	.local pmc ENV
 	ENV = new Env
 	$S0 = ENV["COLUMNS"]
 	cols = $S0
@@ -348,44 +268,31 @@ printloop:
 	Y_COORD = Y_COORD + 2
 	if X_COORD > cols goto incit
 	if Y_COORD > rows goto dumpend
-	.pcc_begin prototyped
-	.arg STDSCR
-	.arg Y_COORD
-	.arg X_COORD
-	.arg 42				# Behold, the lowly star
-	.nci_call MVWADDCH
-	.pcc_end
+	MVWADDCH(STDSCR, Y_COORD, X_COORD, 42) # behold, the lowly star
 
 incit:	inc CHARACTER_OFFSET
         inc CHAR_POS
 	if  CHARACTER_OFFSET < total goto printloop
 
-	.pcc_begin prototyped
-	.arg STDSCR
-	.nci_call WREFRESH
-	.pcc_end
+	WREFRESH(STDSCR)
 
 	if delay < 100 goto dumpend
 	# as we gonna sleep here, lets burn some cycles to
 	# check if usleep is available
 	null $P0
-	.sym pmc USLEEP
+	.local pmc USLEEP
 	dlfunc USLEEP, $P0, "usleep", "vi"
 	$I0 = defined USLEEP
 	if $I0 goto usleep
 	sleep 1
 	goto dumpend
 usleep:
-	.pcc_begin prototyped
-	.arg delay
-	.nci_call USLEEP
-	.pcc_end
+	USLEEP(delay)
 dumpend:
-	.pcc_begin_return
-	.pcc_end_return
+	.return()
 .end
 
-.pcc_sub _init_curses prototyped
+.sub _init_curses
 	.local pmc INITSCR
 	.local pmc START_COLOR
 	.local pmc INIT_PAIR
@@ -405,50 +312,29 @@ dumpend:
 	NODELAY     = global "ncurses::nodelay"
 	KEYPAD      = global "ncurses::keypad"
 
-	P0 = INITSCR
-	invoke
-	STDSCR = P5
+	STDSCR = INITSCR()
 
-	P0 = START_COLOR
-	invoke
-
-	P0 = INIT_PAIR
-	I5 = 1		# Color pair 1
-	I6 = 2 		# dark green fg
-	I7 = 0		# Black background
-	invoke
-
-	P0 = COLOR_PAIR
-	I5 = 1
-	invoke
-
+	START_COLOR()
+	
+	# Color pair 1, dark green fg, black background
+	INIT_PAIR(1, 2, 0)
+	$I0 = COLOR_PAIR(1)
+	
 	# We pass what's returned from COLOR_PAIR straight on
-	P0 = WATTRON
-	invoke
+	WATTRON($I0)
 
-	P0 = CURS_SET	# turn off cursor
-	I5 = 0
-	invoke
-
-	P0 = NODELAY	# set nodelay mode
-	P5 = STDSCR
-	I5 = 1
-	invoke
-
-	P0 = KEYPAD	# set keypad mode
-	P5 = STDSCR
-	I5 = 1
-	invoke
-	.pcc_begin_return
-	.return STDSCR
-	.pcc_end_return
+	CURS_SET(0)			# turn off cursor
+	NODELAY(STDSCR, 1)	# set nodelay mode
+	KEYPAD(STDSCR, 1)	# set keypad mode
+	
+	.return(STDSCR)
 .end
 
 # in: world (string)
 #     size
 # out new world
 #     stop
-.pcc_sub _generate prototyped
+.sub _generate
 	.param string world
 	.param int size
 	.param int stop
@@ -458,11 +344,11 @@ dumpend:
 #print "\n"
 #sleep 3
 
-	.sym int len
-	.sym int pos
-	.sym int count
-	.sym int check	# pos in world
-	.sym string new_world
+	.local int len
+	.local int pos
+	.local int count
+	.local int check	# pos in world
+	.local string new_world
 	length len, world
 	# allocate new world with all space
 	repeat new_world, " ", len
@@ -560,13 +446,10 @@ done:
 	   sleep 2
            stop = 1
 dif:
-	.pcc_begin_return
-	.return new_world
-	.return stop
-	.pcc_end_return
+	.return(new_world, stop)
 .end
 
-.pcc_sub _def_world prototyped
+.sub _def_world
 	.param int sizef
 	.param int size
 	.param int COLLIDE
@@ -598,7 +481,7 @@ col:
 	set S13, "              *"
  	set S14, "            ***"
 nocol:
-	.sym string world
+	.local string world
 	set world, ""
 	concat world, S0
 	concat world, S16
@@ -633,40 +516,38 @@ nocol:
 	$I1 = size * $I0
 	repeat S16, S17, $I1
 	concat world, S16
-	.pcc_begin_return
-	.return world
-	.pcc_end_return
+	.return(world)
 .end
 
-.pcc_sub _load_file prototyped
+.sub _load_file
 	.param pmc argv
 	.param int size
 
-	.sym string world
-	.sym string err
+	.local string world
+	.local string err
 	world = ""
-	.sym string file
+	.local string file
 	file = argv[1]
 	err = "File not found " . file
-	.sym pmc io
+	.local pmc io
 	open io, file, "<"
 	$I0 = defined io
 	unless $I0 goto nok
 	null err
-	.sym string line
+	.local string line
 	$I0 = size * size
 	repeat world, " ", $I0
-	.sym int pos
+	.local int pos
 	$I0 = size / 2
 	$I1 = $I0 * $I0
 	pos = $I0 + $I1
-	.sym int len
-	.sym int format
+	.local int len
+	.local int format
 	format = 0
 	.const int PICTURE = 1
 	.const int ABS     = 2
 	.const int REL     = 3
-	.sym   pmc points
+	.local   pmc points
 
 loop:
 	readline line, io
@@ -688,9 +569,9 @@ not_abs:
 do_rel:
 	# parse \s(\d+) (\d+)
 	# I really want PCRE or better inside Parrot :)
-	.sym int s
-	.sym int start
-	.sym int in_digit
+	.local int s
+	.local int start
+	.local int in_digit
 	in_digit = 0
 	s = 0
 get_d:
@@ -766,17 +647,17 @@ out:
 	if format == PICTURE goto done
 	# we have an array of x,y pairs now
 	# find min, max
-	.sym int min_x
-	.sym int min_y
-	.sym int max_x
-	.sym int max_y
+	.local int min_x
+	.local int min_y
+	.local int max_x
+	.local int max_y
 	min_x = 99999
 	min_y = 99999
 	max_x = -99999
 	max_y = -99999
-	.sym int x
-	.sym int y
-	.sym int len
+	.local int x
+	.local int y
+	.local int len
 	len = points
 	s = 0
 lp:
@@ -820,7 +701,7 @@ lp2:
 #	printerr ", "
 #	printerr y
 #	printerr "\n"
-	.sym int c
+	.local int c
 	c = y * size
 	c = x + c
 	# TODO abs/rel and bounds checking
@@ -828,26 +709,19 @@ lp2:
 	if s < len goto lp2
 done:
 nok:
-	.pcc_begin_return
-	.return world
-	.return err
-	.pcc_end_return
+	.return(world, err)
 .end
 
-.pcc_sub _check_key prototyped
+.sub _check_key
 	.param int stop
 	.param int x_offs
 	.param int y_offs
 	.param int delay
 
-	.sym int key
-	.sym pmc GETCH
-	pushi
+	.local int key
+	.local pmc GETCH
 	GETCH = global "ncurses::getch"
-	invoke GETCH
-	save I5
-	popi
-	restore key
+	key = GETCH()
 	if key == KEY_LEFT goto is_4
 	if key == KEY_RIGHT goto is_6
 	if key == KEY_UP goto is_8
@@ -914,12 +788,7 @@ no_s:
 no_f:
 
 key_done:
-	.pcc_begin_return
-	.return stop
-	.return x_offs
-	.return y_offs
-	.return delay
-	.pcc_end_return
+	.return(stop, x_offs, y_offs, delay)
 .end
 
 =head1 SEE ALSO
