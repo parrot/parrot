@@ -124,7 +124,7 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 #if PARROT_GC_GMS
 #  define DOD_WRITE_BARRIER(interp, agg, old, new) do { \
     UINTVAL gen_agg, gen_new; \
-    if (PMC_IS_NULL(new)) \
+    if (!(new) || (new) == (void*)PMCNULL) \
         break; \
     gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
     gen_new = PObj_to_GMSH(new)->gen->gen_no; \
@@ -134,7 +134,7 @@ void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
 
 #  define DOD_WRITE_BARRIER_KEY(interp, agg, old, old_key, new, new_key) do { \
     UINTVAL gen_agg, gen_new, gen_key; \
-    if (PMC_IS_NULL(new)) \
+    if (!(new) || (new) == (void*)PMCNULL) \
         break; \
     gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
     gen_new = PObj_to_GMSH(new)->gen->gen_no; \
