@@ -126,7 +126,14 @@ mark_hash(Interp *interpreter, HASH *hash, PMC *end_of_used_list)
     HashIndex i;
 
     buffer_lives((Buffer *)hash);
-    buffer_lives(hash->bucket_pool);
+
+    if(hash->bucket_pool){
+        buffer_lives(hash->bucket_pool);
+    }
+
+    if (hash->buffer.bufstart == NULL || hash->bucket_pool->bufstart == NULL) {
+        return end_of_used_list;
+    }
 
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET *bucket = lookupBucket(hash, i);
@@ -281,10 +288,12 @@ find_bucket(Interp *interpreter, HASH* hash, BucketIndex head, STRING *key)
     return NULL;
 }
 
-HASH *
-new_hash(Interp *interpreter)
+void
+new_hash(Interp *interpreter, HASH **hash_ptr)
 {
     HASH *hash = (HASH *)new_bufferlike_header(interpreter, sizeof(*hash));
+    *hash_ptr = hash;
+
     /*      hash->buffer.flags |= BUFFER_report_FLAG; */
 
     /* We rely on the fact that expand_hash() will be called before
@@ -295,11 +304,13 @@ new_hash(Interp *interpreter)
     hash->max_chain = (HashIndex) -1;
 
     hash->entries = 0;
+
+    /* Ensure mark_hash doesn't try to mark the buffer live */
+    hash->bucket_pool = NULL;
     hash->bucket_pool = new_buffer_header(interpreter);
     /*      hash->bucket_pool->flags |= BUFFER_report_FLAG; */
     hash->free_list = NULLBucketIndex;
     expand_hash(interpreter, hash);
-    return hash;
 }
 
 /*=for api key hash_size
@@ -412,9 +423,10 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
 
 HASH *
 hash_clone(struct Parrot_Interp * interp, HASH * hash) {
-    HASH * ret = new_hash(interp);
+    HASH *ret;
     BucketIndex* table = (BucketIndex*) hash->buffer.bufstart;
     BucketIndex i;
+    new_hash(interp, &ret);
     for (i = 0; i <= hash->max_chain; i++) {
         HASHBUCKET * b = lookupBucket(hash, i);
         while (b) {

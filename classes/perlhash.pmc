@@ -61,7 +61,7 @@ pmclass PerlHash {
             undef->flags |= PMC_constant_FLAG;
         }
         SELF->flags |= PMC_custom_mark_FLAG;
-        SELF->data = new_hash(INTERP);
+        new_hash(INTERP, (HASH **)&SELF->data);
     }
 
     /* The end of used parameter is passed into the mark_used function of

@@ -20,7 +20,7 @@ typedef struct _hashbucket HASHBUCKET;
 /* HASH is really a hashtable, but 'hash' is standard perl nomenclature. */
 typedef struct _hash HASH;
 
-HASH *new_hash(Interp * interpreter);
+void new_hash(Interp * interpreter, HASH **hash_ptr);
 HASH *hash_clone(Interp * interpreter, HASH * hash);
 INTVAL hash_size(Interp * interpreter, HASH *hash);
 void hash_set_size(Interp * interpreter, HASH *hash, UINTVAL size);
