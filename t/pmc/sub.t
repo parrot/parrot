@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 46;
 use Test::More;
 
 output_is(<<'CODE', <<'OUTPUT', "PASM subs - newsub");
@@ -438,4 +438,199 @@ _func:
 CODE
 /^Use of uninitialized value in integer context at.*:main:back:Use of un.*$/sm
 OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - clear_eh");
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    print "ok 1\n"
+    clear_eh
+    print "ok 2\n"
+    end
+_handler:
+    end
+CODE
+ok 1
+ok 2
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "catched it\n"
+    end
+CODE
+main
+catched it
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]	# P5 is the exception object
+    print S0
+    print "\n"
+    end
+CODE
+main
+catched it
+something happend
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - message, check P5");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    new P5, .PerlUndef
+    set P5, "a string\n"
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]	# P5 is the exception object
+    print S0
+    print "\n"
+    save P0		# preserve reg
+    set P0, P5["_P5"]	# original P5
+    print P0
+    restore P0
+    end
+CODE
+main
+catched it
+something happend
+a string
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical");
+    print "main\n"
+    new_pad 0
+    new P0, .PerlInt
+    set P0, 42
+    store_lex -1, "$a", P0
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "catched it\n"
+    find_lex P0, "$a"
+    print P0
+    print "\n"
+    end
+CODE
+main
+catched it
+42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - lexical 2");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    new_pad 0
+    new P0, .PerlInt
+    set P0, 42
+    store_lex -1, "$a", P0
+    throw P30
+    print "not reached\n"
+    end
+_handler:
+    print "catched it\n"
+    find_lex P0, "$a"
+    print P0
+    print "\n"
+    end
+CODE
+main
+catched it
+42
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "back again\n"
+    end
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]	# P5 is the exception object
+    print S0
+    print "\n"
+    set P2, P5["_invoke_cc"]	# the return continuation
+    invoke P2
+CODE
+main
+catched it
+something happend
+back again
+OUTPUT
+
+output_is(<<'CODE', <<'OUTPUT', "set_eh - throw - return, lexical");
+    print "main\n"
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+
+    new_pad 0
+    new P0, .PerlInt
+    set P0, 42
+    store_lex -1, "$a", P0
+    new P30, .Exception
+    set P30["_message"], "something happend"
+    throw P30
+    print "back again\n"
+    find_lex P0, "$a"
+    print P0
+    print "\n"
+    end
+_handler:
+    print "catched it\n"
+    set S0, P5["_message"]	# P5 is the exception object
+    print S0
+    print "\n"
+    find_lex P0, "$a"
+    print P0
+    print "\n"
+    inc P0
+    set P2, P5["_invoke_cc"]	# the return continuation
+    invoke P2
+CODE
+main
+catched it
+something happend
+42
+back again
+43
+OUTPUT
+
 1;
+

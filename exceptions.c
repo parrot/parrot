@@ -86,21 +86,68 @@ describe them as well.\n\n");
 void
 push_exception(Parrot_Interp interpreter, PMC *handler)
 {
+    if (handler->vtable->base_type != enum_class_Exception_Handler)
+        PANIC("Tried to set_eh a non Exception_Handler");
+    stack_push(interpreter, &interpreter->ctx.control_stack, handler,
+            STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 }
 
 void
 pop_exception(Parrot_Interp interpreter)
 {
+    Stack_entry_type type;
+    PMC *handler;
+
+    handler = stack_peek(interpreter, interpreter->ctx.control_stack, &type);
+    if (type != STACK_ENTRY_PMC ||
+            handler->vtable->base_type != enum_class_Exception_Handler)
+        PANIC("Tried to clear_eh a non Exception_Handler");
+    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, handler,
+                    STACK_ENTRY_PMC);
 }
 
-void
-throw_exception(Parrot_Interp interpreter, PMC *handler)
+void *
+throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
 {
+    Stack_entry_type type;
+    PMC *handler;
+    struct Parrot_Sub * cc;
+    PMC* key;
+    STRING *s;
+
+    Parrot_block_DOD(interpreter);
+    handler = stack_peek(interpreter, interpreter->ctx.control_stack, &type);
+    if (type != STACK_ENTRY_PMC ||
+            handler->vtable->base_type != enum_class_Exception_Handler)
+        PANIC("Tried to clear_eh a non Exception_Handler");
+    (void)stack_pop(interpreter, &interpreter->ctx.control_stack, &handler,
+                    STACK_ENTRY_PMC);
+    cc = (struct Parrot_Sub*)PMC_data(handler);
+    /* preserve P5 register */
+    s = string_make(interpreter, "_P5", 3, NULL,0,NULL);
+    key = key_new_string(interpreter, s);
+    VTABLE_set_pmc_keyed(interpreter, exception, key, REG_PMC(5));
+    /* generate and place return continuation */
+    s = string_make(interpreter, "_invoke_cc", 10, NULL,0,NULL);
+    key = key_new_string(interpreter, s);
+    VTABLE_set_pmc_keyed(interpreter, exception, key,
+            new_continuation_pmc(interpreter, dest));
+    /* TODO update the whole context */
+    cc->ctx.pad_stack = interpreter->ctx.pad_stack;
+    stack_mark_cow(cc->ctx.pad_stack);
+    /* put the continuation in the interpreter */
+    restore_context(interpreter, &cc->ctx);
+    /* put exception object in P5 */
+    REG_PMC(5) = exception;
+    Parrot_unblock_DOD(interpreter);
+    /* return the address of the handler */
+    return handler->cache.struct_val;
 }
 
-void
-rethrow_exception(Parrot_Interp interpreter, PMC *handler)
+void *
+rethrow_exception(Parrot_Interp interpreter, PMC *exception)
 {
+    return NULL;
 }
 
 /*

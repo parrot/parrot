@@ -1120,13 +1120,14 @@ inline op clear_eh() {
 }
 
 inline op throw(in PMC) {
-  throw_exception(interpreter, $1);
-  restart NEXT();
+  opcode_t *ret = expr NEXT();
+  opcode_t *dest = (opcode_t *)throw_exception(interpreter, $1, ret);
+  goto ADDRESS(dest);
 }
 
 inline op rethrow(in PMC) {
-  rethrow_exception(interpreter, $1);
-  goto NEXT();
+  opcode_t *dest = (opcode_t *)rethrow_exception(interpreter, $1);
+  goto ADDRESS(dest);
 }
 
 ########################################
