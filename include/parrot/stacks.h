@@ -38,6 +38,10 @@ struct StackChunk {
   struct Stack_Entry entry[STACK_CHUNK_DEPTH];
 };
 
+void push_entry(struct Parrot_Interp *, struct Stack_Entry *);
+void pop_entry(struct Parrot_Interp *,  struct Stack_Entry *);
+void swap_entry(struct Parrot_Interp *);
+
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, void *thing, INTVAL type, void *cleanup);
 void *pop_generic_entry(struct Parrot_Interp *, void *where, INTVAL type);
 void toss_generic_entry(struct Parrot_Interp *, INTVAL type);

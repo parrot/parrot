@@ -1754,9 +1754,25 @@ MANUAL_OP ret() {
   RETABS(dest);
 } 
 
+
+########################################
+
+=item B<swap>()
+
+Swap the top two stack entries. Used to get at arguments below the return
+address in the stack.
+
+=cut
+
+AUTO_OP swap() {
+  swap_entry(interpreter);
+} 
+
+
 =back
 
 =cut
+
 
 ###############################################################################
 

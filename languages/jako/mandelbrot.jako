@@ -29,17 +29,9 @@
 #
 
 var str b = " .:,;!/>)|&IH%*#";
-var int x;
-var int y;
-var int k;
 
-var num r;
-var num i;
-var num z;
-var num Z;
-var num t;
-var num c;
-var num C;
+var int x, y, k;
+var num r, i, z, Z, t, c, C;
 
 y = 30;
 

@@ -3,18 +3,16 @@
 #
 # Based on Bench.java posted to perl6-internals@perl.org by
 # Leon Brocard <acme@astray.com> on 2001-09-15. Note that the
-# only differences between the Java version and the Jako
-# version are:
+# only substantive differences between the Java version and the
+# Jako version are:
 #
 #   * 'var int ...' vs 'int ...' for variable declaration.
 #
 #   * The commented-out print line (which is simpler in Jako).
 #
-#   * The presence of the 'end' statement at the...well...at the
-#     end.
-#
-#   * The use of the variable n instead of the constant 10000
-#     in the conditions of the while loops.
+#   * The use of the named constant N (value 100) instead of
+#     the literal constant 10000 in the conditions of the while
+#     loops.
 #
 # Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
 # This program is free software. It is subject to the same
@@ -23,15 +21,13 @@
 # $Id$
 #
 
-var int q = 1;
-var int w = 1;
-var int i = 1;
-var int j = 1;
+const int N = 100;
+var   int q = 1;
 
-while (q < 100) {
-  w = 1;
+while (q < N) {
+  var int i, j, w = 1;
 
-  while (w < 100) {
+  while (w < N) {
     i++;
     j += i;
     w++;
@@ -40,3 +36,4 @@ while (q < 100) {
 
   q++;
 }
+

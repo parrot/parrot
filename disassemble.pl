@@ -28,6 +28,11 @@ $Data::Dumper::Useqq  = 1;
 $Data::Dumper::Terse  = 1;
 $Data::Dumper::Indent = 0;
 
+use Getopt::Std;
+
+my %opts;
+
+getopts('x', \%opts);
 
 #
 # GLOBAL VARIABLES:
@@ -211,8 +216,22 @@ sub disassemble_byte_code {
     foreach my $pc (sort { $a <=> $b } keys %pasm) {
         my ($label, $code, $op_name, $args) = @{$pasm{$pc}};
         $label = defined $label ? "$label:" : '';
-	printf "  %08x [%08x]:  %-48s  %-6s  %-15s  ", $pc / 4, $pc,
- 	    join('  ', map { sprintf "%08x", $_ } @$code), $label, $op_name;
+        my $words;
+
+        if ($opts{x}) {
+          $words = join('  ', map { sprintf "%08x", $_ } @$code);
+        } else {
+          $words = join('  ', map { sprintf "%08d", $_ } @$code);
+        }
+
+        my @print_args = ($pc / 4, $pc, $words, $label, $op_name);
+
+        if ($opts{x}) {
+	  printf "  %08x [%08x]:  %-48s  %-6s  %-15s  ", @print_args;
+        } else {
+	  printf "  %08d [%08d]:  %-48s  %-6s  %-15s  ", @print_args;
+        }
+
 	print join(", ", @$args), "\n";
     }
 }

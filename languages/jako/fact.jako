@@ -12,17 +12,36 @@
 # $Id$
 #
 
-const int n = 15;
+const int N = 15;
 
-var   int i =  0;
-var   int f =  1;
 
-print("Algorithm F1 (The factorial function)\n");
-print("    Calculating fact($n) = ...\n");
+#
+# fact()
+#
 
-while(i <= n) {
-  i++;
-  f *= i;
+sub int fact(int n) {
+  var int i =  0;
+  var int f =  1;
+
+  while(i <= n) {
+    i++;
+    f *= i;
+  }
+
+  return f;
 }
 
+
+#
+# MAIN PROGRAM:
+#
+
+var int f;
+
+print("Algorithm F1 (The factorial function)\n");
+print("    Calculating fact($N) = ...\n");
+
+f= fact(N);
+
 print("    ... = $f\n");
+

@@ -36,10 +36,10 @@ my $line;    # Current source line number
 my %ident;   # Identifiers
 
 my %regs = ( # Registers
-  I => [ undef ], # $regs{I}[0] reserved for integral  temporaries
-  N => [ undef ], # $regs{N}[0] reserved for numeric   temporaries
-  P => [ undef ], # $regs{P}[0] reserved for polytypic temporaries
-  S => [ undef ], # $regs{S}[0] reserved for string    temporaries
+  I => [ { USE => 'temp' } ], # $regs{I}[0] reserved for int  temporaries
+  N => [ { USE => 'temp' } ], # $regs{N}[0] reserved for num  temporaries
+  P => [ { USE => 'temp' } ], # $regs{P}[0] reserved for poly temporaries
+  S => [ { USE => 'temp' } ], # $regs{S}[0] reserved for str  temporaries
 );
 
 my %types = (
@@ -49,8 +49,144 @@ my %types = (
  'S' => 'str',
 );
 
+
+###############################################################################
+###############################################################################
+##
+## The Block Stack
+##
+##   $block_count         The total number of blocks begun (used for labels)
+##   @block_stack         The stack of active blocks. We keep a block on the
+##                          stack for the file scope.
+##
+## NOTE: Do NOT access the block stack directly. Access it via routines in
+## this section of code.
+##
+###############################################################################
+###############################################################################
+
+
 my $block_count = 0;
-my @block_stack = ();
+
+my @block_stack = ( {
+    TYPE   => 'file',
+    LINE   => 0,
+    IDENT  => { },
+});
+
+
+#
+# block_depth()
+#
+# Block depth zero is when the only block on the block stack is the file
+# scope block. Therefore, we return one less than the number of blocks on
+# the stack.
+#
+
+sub block_depth
+{
+  return scalar(@block_stack - 1);
+}
+
+
+#
+# top_block()
+#
+# Returns the block on the top of the block stack.
+#
+
+sub top_block
+{
+  return  $block_stack[-1];
+}
+
+
+#
+# push_block()
+#
+# Push a block on the top of the block stack.
+#
+
+sub push_block
+{
+  push @block_stack, shift;
+}
+
+
+#
+# pop_block()
+#
+# Pop the top block off the block stack and return it. Bounds checks the block
+# stack to make sure we don't pop off the file scope block.
+#
+
+sub pop_block
+{
+  confess "jakoc: Internal error! Attempt to pop file-scope block off block stack!"
+    if @block_stack == 1;
+
+  return pop @block_stack;
+}
+
+
+#
+# find_ident()
+#
+# Scans through the block stack, from the top down, looking for the identifier.
+# If it is found, returns a hashref containing the number of levels away the
+# identifier is declared and the definition of the identifier.
+#
+
+sub find_ident
+{
+  my ($name) = @_;
+
+  my $count = 0;
+
+  foreach my $block (reverse @block_stack) {
+    return { LEVELS => $count, IDENT => $block->{IDENT}{$name} }
+      if exists $block->{IDENT}{$name};
+    $count++;
+  }
+
+  return undef;
+}
+
+
+#
+# find_block()
+#
+# Scans through the block stack, from the top down, looking for a block of
+# the appropriate type (and, if label is given, with a matching label. If
+# it is found, returns a hashref containing the number of levels away the
+# block was found and the block info hashref. If it is not found, then
+# undef is returned.
+#
+
+sub find_block
+{
+  my ($type, $label) = @_;
+
+  my $count = 0;
+
+  foreach my $block (reverse @block_stack) {
+    next unless $block->{TYPE} eq $type;
+    next unless !defined($label) or $block->{PREFIX} eq $label;
+ 
+    return { LEVELS => $count, BLOCK => $block };
+  }
+
+  return undef;
+}
+
+
+###############################################################################
+###############################################################################
+##
+## Miscellany
+##
+###############################################################################
+###############################################################################
 
 my %subs;
 
@@ -89,11 +225,22 @@ my %assign_funcs = (
 #
 # Regular Expressions:
 #
+# NOTE: These are not in use right now.
+#
 
 my $t_ident   = qr{[A-Za-z][A-Za-z0-9_]*};
 my $t_integer = qr{-?\d+};
 my $t_string  = qr{\"[^\\\"]*(?:\\.[^\\\"]*)*\"};
 my $t_number  = qr{-?\d+\.\d+};
+
+
+###############################################################################
+###############################################################################
+##
+## Assembly Code Output
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -139,7 +286,7 @@ sub push_comment
 
 sub push_source
 {
-  my $block_indent = '  ' x scalar(@block_stack);
+  my $block_indent = '  ' x block_depth();
   push_comment map { $block_indent . $_ } @_;
 }
 
@@ -251,6 +398,16 @@ sub emit_code
 }
 
 
+###############################################################################
+###############################################################################
+##
+## Typing Predicates
+##
+## These are used throughout the code to check the type of an argument.
+##
+###############################################################################
+###############################################################################
+
 #
 # int_q()
 #
@@ -282,6 +439,18 @@ sub int_or_num_q
   my ($value) = @_;
   return $value =~ m/^-?\d+(\.\d+)?$/;
 }
+
+
+#
+# str_q()
+#
+
+sub str_q
+{
+  my ($value) = @_;
+  return $value =~ m/^"/;
+}
+
 
 
 #
@@ -338,6 +507,14 @@ sub str_reg_q
   return $value =~ m/^S\d+$/;
 }
 
+
+###############################################################################
+###############################################################################
+##
+## Operation Support
+##
+###############################################################################
+###############################################################################
 
 #
 # op_comp()
@@ -620,36 +797,94 @@ sub op_gt
 }
 
 
+
+###############################################################################
+###############################################################################
+##
+## Identifier Declarations
+##
+###############################################################################
+###############################################################################
+
+
 #
 # declare_var()
+#
+# Assign a register to the identifier within the scope of the current block.
 #
 
 sub declare_var
 {
-  my ($name, $type) = @_;
+  my ($ident, $type) = @_;
 
-#  printf(STDERR "jakoc: debug: Declaring variable '%s' of type '%s'...\n", $name, $type);
+  #
+  # Check for a few bad conditions.
+  #
+  # NOTE: These are compiler internal consistency checks. They really should not be
+  # triggered in normal operation, even with bad source code as input.
+  #
 
-  if ($ident{$name}) {
+  my $type_name = $types{$type};
+
+  confess "jakoc: Internal error: Variable declaration involves undefined type code!"
+    unless defined $type;
+
+  confess "jakoc: Internal error: Variable declaration involves undefined type name!"
+    unless defined $type_name;
+
+  confess "jakoc: Internal error: Variable declaration involves undefined variable name!"
+    unless defined $ident;
+
+  #
+  # Lookup the identifier:
+  #
+  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+  # the LEVELS away the definition was found, and IDENT with the actual info
+  # about the identifier.
+  #
+
+  my $ident_info = find_ident($ident);
+
+  #
+  # If the identifier is already defined at this lexical scope, we want to complain
+  # about the redefinition. Otherwise, we assume the programmer wanted to shadow the
+  # previous definition.
+  #
+
+  if (defined $ident_info and $ident_info->{LEVELS} == 0) {
     printf STDERR "jakoc: Redeclaration of identifier '%s' on line %d. Previous declaration on line %d.\n",
-      $name, $line, $ident{$name}{LINE};
+      $ident, $line, $ident_info->{IDENT}{LINE};
     return 0;
-  } else {
-    my $num = scalar @{$regs{$type}};
-
-    $ident{$name}{LINE}  = $line;
-    $ident{$name}{TYPE}  = $type;
-    $ident{$name}{NUM}   = $num;
-    $ident{$name}{REG}   = "$type$num";
-    $ident{$name}{VALUE} = "$type$num";
-
-    $regs{$type}[$num]{LINE} = $line;
-    $regs{$type}[$num]{NAME} = $name;
-
-    push_source "var $types{$type} $name;";
-
-    return 1;
   }
+
+  #
+  # Now that we've decided to actually declare the variable, we will place its
+  # definition into the block at the top of the block stack. First, we assign
+  # it a register number, then we fill in the IDENT entry within the block,
+  # and then we link the register to the identifier and the block.
+  #
+
+  my $block = top_block();
+
+  my $reg_num = scalar @{$regs{$type}};
+
+  $block->{IDENT}{$ident}{LINE}  = $line;
+  $block->{IDENT}{$ident}{TYPE}  = $type;
+  $block->{IDENT}{$ident}{NUM}   = $reg_num;
+  $block->{IDENT}{$ident}{REG}   = "$type$reg_num";
+  $block->{IDENT}{$ident}{VALUE} = "$type$reg_num";
+
+  $regs{$type}[$reg_num]{LINE}  = $line;
+  $regs{$type}[$reg_num]{NAME}  = $ident;
+  $regs{$type}[$reg_num]{BLOCK} = $block;
+
+  #
+  # Push the source comment about the variable declaration.
+  #
+
+  push_source "var $types{$type} $ident;";
+
+  return 1;
 }
 
 
@@ -659,40 +894,82 @@ sub declare_var
 
 sub declare_const
 {
-  my ($name, $type, $value) = @_;
+  my ($ident, $type, $value) = @_;
 
-#  printf(STDERR "jakoc: debug: Declaring constant '%s' of type '%s'...\n", $name, $type);
+  #
+  # Check for a few bad conditions.
+  #
+  # NOTE: These are compiler internal consistency checks. They really should not be
+  # triggered in normal operation, even with bad source code as input.
+  #
 
-  if ($ident{$name}) {
+  my $type_name = $types{$type};
+
+  confess "jakoc: Internal error: Constant definition involves undefined type code!"
+    unless defined $type;
+
+  confess "jakoc: Internal error: Constant definition involves undefined type name!"
+    unless defined $type_name;
+
+  confess "jakoc: Internal error: Constant definition involves undefined constant name!"
+    unless defined $ident;
+
+  confess "jakoc: Internal error: Constant definition involves undefined value!"
+    unless defined $value;
+
+  #
+  # Lookup the identifier:
+  #
+  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+  # the LEVELS away the definition was found, and IDENT with the actual info
+  # about the identifier.
+  #
+
+  my $ident_info = find_ident($ident);
+
+  #
+  # If the identifier is already defined at this lexical scope, we want to complain
+  # about the redefinition. Otherwise, we assume the programmer wanted to shadow the
+  # previous definition.
+  #
+
+  if (defined $ident_info and $ident_info->{LEVELS} == 0) {
     printf STDERR "jakoc: Redeclaration of identifier '%s' on line %d. Previous declaration on line %d.\n",
-      $name, $line, $ident{$name}{LINE};
+      $ident, $line, $ident_info->{IDENT}{LINE};
     return 0;
-  } else {
-    $ident{$name}{LINE}  = $line;
-    $ident{$name}{TYPE}  = $type;
-    $ident{$name}{NUM}   = undef;
-    $ident{$name}{REG}   = undef;
-    $ident{$name}{VALUE} = $value;
-
-    my $type_name = $types{$type};
-
-    confess "jakoc: Internal error: Constant declaration involves undefined type code!"
-      unless defined $type;
-
-    confess "jakoc: Internal error: Constant declaration involves undefined type name!"
-      unless defined $type_name;
-
-    confess "jakoc: Internal error: Constant declaration involves undefined constant name!"
-      unless defined $name;
-
-    confess "jakoc: Internal error: Constant declaration involves undefined value!"
-      unless defined $value;
-
-    push_source "const $type_name $name = $value;";
-
-    return 1;
   }
+
+  #
+  # Now that we've decided to actually declare the constant, we will place its
+  # definition into the block at the top of the block stack. We fill in the
+  # IDENT entry within the block.
+  #
+
+  my $block = top_block();
+
+  $block->{IDENT}{$ident}{LINE}  = $line;
+  $block->{IDENT}{$ident}{TYPE}  = $type;
+  $block->{IDENT}{$ident}{NUM}   = undef;
+  $block->{IDENT}{$ident}{REG}   = undef;
+  $block->{IDENT}{$ident}{VALUE} = $value;
+
+  #
+  # Push the source comment about the constant definition.
+  #
+
+  push_source "const $type_name $ident = $value;";
+
+  return 1;
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Variable Assignments
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -701,20 +978,38 @@ sub declare_const
 
 sub assign_var
 {
-  my ($name, $type, $value) = @_;
+  my ($ident, $type, $value) = @_;
 
   #
-  # Reject cases where LHS isn't a variable:
+  # Lookup the identifier:
+  #
+  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+  # the LEVELS away the definition was found, and IDENT with the actual info
+  # about the identifier.
   #
 
-  if (!$ident{$name}) {
-    printf(STDERR "jakoc: Assignment to undefined variable '%s' on line %d.\n",
-      $name, $line);
+  my $ident_info = find_ident($ident);
+
+  #
+  # Reject cases where LHS isn't a variable (either it is undeclared or a constant):
+  #
+
+  unless (defined $ident_info) {
+    printf(STDERR "jakoc: Assignment to undeclared variable '%s' on line %d.\n",
+      $ident, $line);
     return;
   }
 
-  if (!defined $ident{$name}{REG}) {
-    printf(STDERR "jakoc: Cannot assign to constant '%s' on line %d.\n", $name, $line);
+  $ident_info = $ident_info->{IDENT};
+
+  #
+  # Now that we've confirmed we could find the identifier, we make sure it is
+  # bound to a variable, not a constant.
+  #
+
+  unless (defined $ident_info->{REG}) {
+    printf(STDERR "jakoc: Cannot assign to constant '%s' on line %d.\n",
+      $ident, $line);
     return;
   }
 
@@ -722,7 +1017,7 @@ sub assign_var
   # Remember the source code:
   #
 
-  push_source "$name = $value";
+  push_source "$ident = $value";
 
   #
   # Handle var-const (for manifest constants) assignments:
@@ -732,8 +1027,8 @@ sub assign_var
   # str_var = "foo";
   #
 
-  if ($ident{$name}{TYPE} eq $type) {
-    emit_code('set', [$ident{$name}{VALUE}, $value]);
+  if ($ident_info->{TYPE} eq $type) {
+    emit_code('set', [$ident_info->{VALUE}, $value]);
     return;
   }
 
@@ -743,24 +1038,32 @@ sub assign_var
 
   if ($type ne '*') {
     printf(STDERR "jakoc: Assignment of '%s' variable from '%s' value not allowed on line %d.\n", 
-      $ident{$name}{TYPE}, $type, $line);
+      $ident_info->{TYPE}, $type, $line);
   }
 
   #
   # If what remains is not an identifier we've seen, we've got trouble:
   #
+  # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+  # the LEVELS away the definition was found, and IDENT with the actual info
+  # about the identifier.
+  #
 
-  if (!$ident{$value}) {
-    printf(STDERR "jakoc: Assignment from undefined variable '%s' on line %d.\n",
+  my $value_ident_info = find_ident($value);
+
+  if (! defined $value_ident_info) {
+    printf(STDERR "jakoc: Assignment from undeclared identifier  '%s' on line %d.\n",
       $value, $line);
   }
+
+  $value_ident_info = $value_ident_info->{IDENT};
 
   #
   # Emit code if the types are the same:
   #
 
-  if ($ident{$name}{TYPE} eq $ident{$value}{TYPE}) {
-    emit_code('set', [$ident{$name}{VALUE}, $ident{$value}{VALUE}]);
+  if ($ident_info->{TYPE} eq $value_ident_info->{TYPE}) {
+    emit_code('set', [$ident_info->{VALUE}, $value_ident_info->{VALUE}]);
     return;
   }
 
@@ -768,17 +1071,26 @@ sub assign_var
   # Handle conversion cases:
   #
 
-  if ($ident{$name}{TYPE} eq "N" and $ident{$value}{TYPE} eq "I") {
-    emit_code('iton', ["$ident{$name}{VALUE}, $ident{$value}{VALUE}"]);
-  } elsif ($ident{$name}{TYPE} eq "I" and $ident{$value}{TYPE} eq "N") {
-    emit_code('ntoi', ["$ident{$name}{VALUE}, $ident{$value}{VALUE}"]);
+  if ($ident_info->{TYPE} eq "N" and $value_ident_info->{TYPE} eq "I") {
+    emit_code('iton', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
+  } elsif ($ident_info->{TYPE} eq "I" and $value_ident_info->{TYPE} eq "N") {
+    emit_code('ntoi', [ $ident_info->{VALUE}, $value_ident_info->{VALUE} ]);
   } else {
     printf(STDERR "jakoc: Cannot assign type '%s' to type '%s' on line %d.\n", 
-      $ident{$value}{TYPE}, $ident{$name}{TYPE}, $line);
+      $value_ident_info->{TYPE}, $ident_info->{TYPE}, $line);
   }
 
   return;
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Argument Handling
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -796,10 +1108,25 @@ sub map_args
     $arg =~ s/^\s+//;
     $arg =~ s/\s+$//;
 
-    if ($ident{$arg}) {
+    #
+    # Attempt to find the argument as an identifier.
+    #
+    # NOTE: This lookup doesn't give the info itself, but rather a hashref with
+    # the LEVELS away the definition was found, and IDENT with the actual info
+    # about the identifier.
+    #
+    # TODO: This isn't the most efficient way to do this. We really should do
+    # some pattern matches first, and *then* the lookup.
+    #
+
+    my $arg_ident_info = find_ident($arg);
+
+    if (defined $arg_ident_info) {
+      $arg_ident_info = $arg_ident_info->{IDENT};
+
       confess "jakoc: Internal compiler error: Unable to fetch value for identifier '$arg'!"
-        unless defined $ident{$arg}{VALUE};
-      push @result, $ident{$arg}{VALUE};
+        unless defined $arg_ident_info->{VALUE};
+      push @result, $arg_ident_info->{VALUE};
     } elsif ($arg =~ m/^"/) {
       push @result, $arg;
     } elsif (int_q($arg)) {
@@ -816,6 +1143,15 @@ sub map_args
 }
 
 
+###############################################################################
+###############################################################################
+##
+## Function Calls
+##
+###############################################################################
+###############################################################################
+
+
 #
 # void_func()
 #
@@ -826,22 +1162,52 @@ sub void_func
 
   push_source "$name(...);";
 
+  (@args) = map_args(@args);
+
   if ($name eq 'print') {
-    @args = map_args(@args);
     foreach my $arg (@args) {
       emit_code($name, [$arg]);
     }
-  } elsif ($name eq 'time') {
-    if ($ident{$name}{TYPE} =~ m/^[IN]$/) {
-      emit_code($name, [$ident{$name}{VALUE}]);
-    } else {
-      printf(STDERR "jakoc: Function 'time' returns only 'num' or 'int'  on line %d.\n", $name, $line);
+  } elsif (exists $subs{$name}) {
+    #
+    # First, we make sure everything is in order for the call:
+    #
+
+    printf(STDERR "jakoc: Call to non-void function %s in void context on line %d!\n", $name, $line)
+      if defined $subs{$name}{RETURN};
+
+    #
+    # Now, we have to push (save) the arguments onto the stack in reverse
+    # order. That way they can be pulled off by the subroutine in declaration
+    # order, which will be convenient later for handling variable argument
+    # subroutines.
+    #
+    # Arguments that are already in registers are easy. Constant arguments
+    # have to be placed in the appropriate zero (temporary) register and then
+    # saved.
+    #
+
+    foreach my $arg (reverse @args) {
+      if (reg_q($arg)) {
+        emit_code('save', [ $arg ]);
+      } elsif (int_q($arg)) {
+        emit_code('set', [ 'I0', $arg ]);
+        emit_code('save', [ 'I0' ]);
+      } elsif (num_q($arg)) {
+        emit_code('set', [ 'N0', $arg ]);
+        emit_code('save', [ 'N0' ]);
+      } elsif (str_q($arg)) {
+        emit_code('set', [ 'S0', $arg ]);
+        emit_code('save', [ 'S0' ]);
+      } else {
+        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
+      }
     }
-  } elsif ($subs{$name}) {
-    emit_code "set", [ "I31", "[ $name - @ - 3 ]" ];
-    emit_code "jump", [ "I31" ];
+
+    emit_code "bsr", [ $name ];
   } else {
-    printf(STDERR "jakoc: Call to unrecognized function '%s' on line %d.\n", $name, $line);
+    printf(STDERR "jakoc: Call to unrecognized void function '%s' on line %d (Not in {%s}).\n",
+      $name, $line, join(", ", sort keys %subs));
   }
 }
 
@@ -854,14 +1220,79 @@ sub assign_func
 {
   my ($dest, $name, @args) = @_;
 
+  push_source "$dest = $name(" . join(", ", @args) . ");";
+
+  ($dest, @args) = map_args($dest, @args);
+
   if ($assign_funcs{$name}) {
-    push_source "$dest = $name(" . join(", ", @args) . ");";
-    @args = map_args($dest, @args);
-    emit_code($name, [@args]);
+    emit_code($name, [$dest, @args]);
+  } elsif (exists $subs{$name}) {
+    #
+    # First, we make sure everything is in order for the call:
+    #
+
+    printf(STDERR "jakoc: Call to void function %s in non-void context on line %d!\n", $name, $line)
+      unless defined $subs{$name}{RETURN};
+
+    printf(STDERR "jakoc: Type mismatch in destination type and call to %s on line %d!\n", $name, $line)
+      if uc substr($dest, 0, 1) ne uc $subs{$name}{RETURN};
+
+    #
+    # Now, we have to push (save) the arguments onto the stack in reverse
+    # order. That way they can be pulled off by the subroutine in declaration
+    # order, which will be convenient later for handling variable argument
+    # subroutines.
+    #
+    # Arguments that are already in registers are easy. Constant arguments
+    # have to be placed in the appropriate zero (temporary) register and then
+    # saved.
+    #
+
+    foreach my $arg (reverse @args) {
+      if (reg_q($arg)) {
+        emit_code('save', [ $arg ]);
+      } elsif (int_q($arg)) {
+        emit_code('set', [ 'I0', $arg ]);
+        emit_code('save', [ 'I0' ]);
+      } elsif (num_q($arg)) {
+        emit_code('set', [ 'N0', $arg ]);
+        emit_code('save', [ 'N0' ]);
+      } elsif (str_q($arg)) {
+        emit_code('set', [ 'S0', $arg ]);
+        emit_code('save', [ 'S0' ]);
+      } else {
+        confess "jakoc: Internal error. Unrecognized argument '$arg' when preparing call to subroutine '$name'!";
+      }
+    }
+
+    #
+    # Now, we can jump to the subroutine's entry point:
+    #
+
+    emit_code('bsr', [ $name ]);
+
+    #
+    # Our calling convention dictates that upon return from the subroutine,
+    # the result will be in the zero register of the appropriate type.
+    # Therefore, we need to copy the result from there to its final resting
+    # place.
+    #
+
+    emit_code('set', [ $dest, uc $subs{$name}{RETURN} . "0" ]);
   } else {
-    printf(STDERR "jakoc: Unrecognized function '%s' on line %d.\n", $name, $line);
+    printf(STDERR "jakoc: Call to unrecognized assign function '%s' on line %d (Not in {%s}).\n",
+      $name, $line, join(", ", sort keys %assign_funcs));
   }
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Block Handling
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -870,7 +1301,7 @@ sub assign_func
 
 sub begin_cond_block
 {
-  my ($name, $type, $cond) = @_;
+  my ($block, $name, $type, $cond) = @_;
 
 #  my $next   = $block_types{$type}{NEXT};
 #  my $redo   = $block_types{$type}{REDO};
@@ -906,25 +1337,138 @@ sub begin_cond_block
 # begin_sub_block()
 #
 
+my %type_name = (
+  'i' => 'int',
+  'n' => 'num',
+  's' => 'str',
+);
+
 sub begin_sub_block
 {
-  my ($name) = @_;
+  my ($block, $name, $return_type, @formal_args) = @_;
 
-  emit_code; # Flush anything pending.
+  #
+  # Flush any pending comments or labels.
+  #
 
-  push_source "sub $name {";
+  emit_code();
+
+  #
+  # Generate the source code comment for the assembly listing.
+  #
+
+  my $arg_source = join(', ', map({ join(' ', @$_) } @formal_args));
+
+  if (defined $return_type) {
+    push_source "sub $type_name{$return_type} $name ($arg_source) {";
+  } else {
+    push_source "sub $name ($arg_source) {";
+  }
+
+  #
+  # Emit code to jump over the subroutine.
+  #
+  # NOTE: We do this because we don't have a calling convention for starting
+  # the program anywhere other than the first byte code op. Therefore, since
+  # subroutines have to be defined before being called, the main program
+  # will be at the end of the file, and we need to jump over the subroutines
+  # to get there.
+  #
+  # This also implies that we can actually have code interspersed with
+  # subroutine definitions just like Perl.
+  #
+
   push_label "${name}_BEFORE";
   emit_code 'branch', [ "${name}_AFTER" ];
+
+  #
+  # Here we have the actual subroutine entry point:
+  #
 
   push_label $name;
   push_label "${name}_ENTER";
 
-  $subs{$name} = $line;
+  #
+  # As part of the subroutine calling convention, the subroutine is
+  # expected to leave everything except the zero registers as it
+  # was found. Therefore, we start out by cloning all the registers.
+  # In future, we could be smarter about this based on the registers
+  # actually used by the subroutine, but for now this will do.
+  #
+  # TODO: Enable the 'P' regs when we start doing PMCs.
+  #
+
+  emit_code 'clonei', [ ];
+  emit_code 'clonen', [ ];
+#  emit_code 'clonep', [ ];
+  emit_code 'clones', [ ];
+
+  #
+  # Record the subroutine information.
+  #
+  # We track the line number of definition, the return type, and the info
+  # about the formal arguments.
+  #
+
+  $subs{$name} = {
+    LINE   => $line,
+    RETURN => $return_type,
+    ARGS   => \@formal_args
+  };
+
+  $block->{RETURN}    = $return_type;
+
+  #
+  # Declare the formal arguments as variables:
+  #
+  # We need to have registers assigned to the formal arguments just like we do
+  # for any other variable, and they need to go out of scope at the end of the
+  # subroutine, so we put them through the standard variable declaration
+  # procedure.
+  #
+  # TODO: When we make declared variables auto-initialize to zero, this will
+  # be inefficient, since we are going to grab the value from the stack as
+  # our next step. So eventually, we'll want an internal way to declare the
+  # variable uninitialized without having it auto initialize to zero.
+  #
+
+  foreach my $formal_arg (@formal_args) {
+    my ($arg_type, $arg_name) = @$formal_arg;
+
+    declare_var($arg_name, uc substr($arg_type, 0, 1));
+  }
+
+  #
+  # Generate code to load the arguments into their registers:
+  #
+  # NOTE: We restore them in their order of declaration, which means they must
+  # be saved in reverse order. This will come in handy later for being able to
+  # handle variable numbers of arguments, since we'll be able to restore an
+  # arg count before having to restore the variable args themselves.
+  #
+  # TODO: This sucks. Destinations being on the same stack as args is a pain.
+  # We have to swap the top two stack entries to move the return address down
+  # and expose the argument, then retore the argument off the stack.
+  #
+
+  foreach my $formal_arg (@formal_args) {
+    my ($arg_type, $arg_name) = @$formal_arg;
+
+    my $ident_info = find_ident($arg_name);
+    $ident_info = $ident_info->{IDENT};
+
+    push_comment "(argument " . $arg_name . ")";
+
+    emit_code 'swap', [ ];
+    emit_code 'restore', [ $ident_info->{REG} ];
+  }
 }
 
 
 #
 # begin_block()
+#
+# return_type is used by subroutines.
 #
 # TODO: bare, until, unless, elsif
 #
@@ -939,7 +1483,7 @@ my %block_names = ( );
 
 sub begin_block
 {
-  my ($name, $type, $cond) = @_;
+  my ($name, $type, $cond, $return_type, @formal_args) = @_;
   $block_count++;
 
   my $prefix;
@@ -958,17 +1502,24 @@ sub begin_block
 
   $block_names{$name} = $line;
 
+  my $block = {
+    TYPE   => $type,
+    NEXT   => $line,
+    PREFIX => $prefix,
+    IDENT  => { },
+  };
+
+  push_block($block);
+
   if ($type eq 'if') {
-    begin_cond_block($name, $type, $cond);
+    begin_cond_block($block, $name, $type, $cond);
   } elsif ($type eq 'while') {
-    begin_cond_block($name, $type, $cond);
+    begin_cond_block($block, $name, $type, $cond);
   } elsif ($type eq 'sub') {
-    begin_sub_block($name);
+    begin_sub_block($block, $name, $return_type, @formal_args);
   } else {
     confess "jakoc: Internal error: Unknown block type '$type' in begin_block()!\n";
   }
-
-  push @block_stack, { TYPE => $type, NEXT => $line, PREFIX => $prefix };
 }
 
 
@@ -982,13 +1533,43 @@ sub end_block
 {
   my ($continue) = @_;
 
-  unless (@block_stack) {
+  #
+  # If we are not currently 'inside' a block, then we've got no business
+  # seeing a close-brace.
+  #
+
+  unless (block_depth()) {
     printf(STDERR "jakoc: Syntax error. Closing brace without open block on line %d.\n", $line);
     return;
   }
 
-  my $block  = pop @block_stack;
+  #
+  # Pop the block info off the block stack and cache its prefix for use
+  # in what follows. At this point we are no longer 'inside' a block.
+  # Although, we may re-enter the block in certain cases (see below).
+  #
+
+  my $block  = pop_block();
   my $prefix = $block->{PREFIX};
+
+  #
+  # 'while' blocks:
+  #
+  # When we are ending the 'while' block, we might be beginning the
+  # 'continue' block, so we check for that case. The while block and
+  # the continue block form one logical block, with the identifiers
+  # delcared in the former available in the latter. This means that
+  # semantically, the 'continue' block is really like a 'continue'
+  # label, since control falls through the 'while' block into the
+  # 'continue' block by default, and we get to the 'continue' block
+  # via a 'next' statement in the 'while' block's body, which is
+  # essentially a 'goto my_continue' statement.
+  #
+  # NOTE: This is different from some languages. Some languages
+  # treat the continue block as a truly separate block, and the
+  # identifiers declared in the 'while' portion are *not* available
+  # in the 'continue' portion.
+  #
 
   if ($block->{TYPE} eq 'while') {
     if (defined $continue) {
@@ -1000,32 +1581,146 @@ sub end_block
 
       push_label "${prefix}_CONT";
       push_source "} continue {";
-      push @block_stack, $block; # Push it back on for a minute...
+
+      push_block($block);        # Push it back on for a minute...
+      undef $block;              # ... and forget about it.
     } else {
       push_source "}";
       push_label "${prefix}_CONT" unless defined $block->{CONT};
       emit_code('branch', ["${prefix}_NEXT"]);
       push_label "${prefix}_LAST";
     }
-  } elsif ($block->{TYPE} eq 'if') {
+  }
+
+  #
+  # 'if' blocks:
+  #
+  # Continuation of 'if' blocks happens by $continue being 'else'. In that
+  # case, we push the block back on the stack.
+  #
+
+  elsif ($block->{TYPE} eq 'if') {
+    if (defined $continue) { # for 'else'
+      if (defined $block->{ELSE}) {
+        printf(STDERR "jakoc: Syntax error. No more than one else block allowed on line %d.\n", $line);
+      } else {
+        $block->{ELSE} = $line;
+      }
+
+      emit_code("branch", [ "${prefix}_LAST" ]); # Jump over the 'else'.
+      push_label "${prefix}_ELSE";
+      push_source "} else {";
+
+      #
+      # We push the block back onto the block stack, since we are
+      # ending up still in a block.
+      #
+      # NOTE: We are not doing 'undef $block' here because we want
+      # the code below to undeclare the variables from the 'if' block.
+      #
+      # TODO: Should we really be allocating a whole new block? Its
+      # nice to reuse this one (and we set ELSE in it to know we
+      # can't have *another* else continuation).
+      #
+
+      push_block($block);
+    } else {
+      push_source "}";
+      emit_code();
+      push_label "${prefix}_ELSE" unless defined $block->{ELSE};
+      push_label "${prefix}_LAST";
+    }
+  }
+
+  #
+  # Handle the ending of subroutine blocks:
+  #
+
+  elsif ($block->{TYPE} eq 'sub') {
     push_source "}";
-    emit_code();
-    push_label "${prefix}_ELSE";
-  } elsif ($block->{TYPE} eq 'sub') {
-    push_source "}";
-    emit_code;
     push_label "${prefix}_LEAVE";
-    emit_code "set", [ "I0", "I31" ];
-    emit_code "set", [ "I31", 0 ];
-    emit_code "sub", [ "I31", "I31", "I0" ];
-    emit_code "inc", [ "I31", "[ ${prefix} - @ - 1 ]" ];
-    emit_code "jump", [ "I31" ];
+
+    #
+    # On subroutine entry, we cloned the incoming registers.
+    # Now, we save off the zero regs, pop the cloned
+    # register values back into place, and restore the zero regs.
+    # Thus, the registers except for the zero registers are in
+    # the same state they were in before subroutine entry.
+    #
+    # TODO: Enable the 'P' regs when we start dealing with PMCs.
+    #
+
+    emit_code 'save', [ 'I0' ];
+    emit_code 'save', [ 'N0' ];
+#    emit_code 'save', [ 'P0' ];
+    emit_code 'save', [ 'S0' ];
+
+    emit_code 'popi', [ ];
+    emit_code 'popn', [ ];
+#    emit_code 'popp', [ ];
+    emit_code 'pops', [ ];
+
+    emit_code 'restore', [ 'S0' ];
+#    emit_code 'restore', [ 'P0' ];
+    emit_code 'restore', [ 'N0' ];
+    emit_code 'restore', [ 'I0' ];
+
+    #
+    # Now, actually return.
+    #
+
+    emit_code "ret", [ ];
+
     push_label "${prefix}_AFTER";
     emit_code;
-  } else {
+  }
+
+  #
+  # If there is any other kind of block, we have an internal compiler error.
+  #
+
+  else {
     confess "jakoc: Internal compiler error. End of unknown block type " . $block->{TYPE} . "!";
   }
+
+  #
+  # If $block is still defined, then we didn't push it back on the block
+  # stack and we need to 'undeclare' the variables in the block, since
+  # they are going out of scope.
+  #
+
+  if (defined $block) {
+    foreach my $ident (keys %{$block->{IDENT}}) {
+      my $ident_info = $block->{IDENT}{$ident};
+
+      if (defined $ident_info->{NUM}) {
+        undef $regs{$ident_info->{TYPE}}[$ident_info->{NUM}];
+      }
+    }
+
+    $regs{'I'} = [ grep { defined } @{$regs{I}} ];
+    $regs{'N'} = [ grep { defined } @{$regs{N}} ];
+#    $regs{'P'} = [ grep { defined } @{$regs{P}} ];
+    $regs{'S'} = [ grep { defined } @{$regs{S}} ];
+
+    #
+    # Erase all the identifiers. Since the block might have been pushed
+    # back onto the block stack, we need to forget our block-specific
+    # identifiers.
+    #
+
+    $block->{IDENT} = { };
+  }
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Flow Control Statements
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -1034,37 +1729,155 @@ sub end_block
 
 sub do_loop_control
 {
-  my ($control_op, $loop_label) = @_;
+  my ($control_op, $loop_label, $cond, $left, $test, $right) = @_;
 
-  foreach (reverse @block_stack) {
-    my $type   = $_->{TYPE};
-    my $prefix = $_->{PREFIX};
+  my $type = 'while';
 
-    next unless $type eq 'while';
-    next unless !defined($loop_label) or $prefix eq $loop_label;
+  #
+  # Locate the block we'll be applying the control statement to:
+  #
 
-    my $which = $block_types{$type}{uc $control_op};
+  my $block = find_block($type, $loop_label);
 
-    push_source "$control_op ${prefix}";
-
-    if (defined $_->{CONT} and $control_op eq 'next') {
-      $which = $block_types{$type}{NEXT};                   # Hard-coded to NEXT in continue { ... }
-      emit_code('branch', ["${prefix}_$which"]);
+  unless (defined $block) {
+    if (defined $loop_label) {
+      printf STDERR "jakoc: No loop '%s' in loop control on line %d!\n", $loop_label, $line;
     } else {
-      emit_code('branch', ["${prefix}_$which"]);
+      printf STDERR "jakoc: No loop active in loop control on line %d!\n", $line;
     }
 
+    emit_code('err');
+  }
+
+  $block = $block->{BLOCK};
+
+  #
+  # Generate the code:
+  #
+
+  my $prefix = $block->{PREFIX};
+  my $which  = $block_types{$type}{uc $control_op};
+
+  if (defined $cond) {
+    push_source "$control_op ${prefix} $cond ($left $test $right)";
+  } else {
+    push_source "$control_op ${prefix}";
+  }
+
+  if (defined $block->{CONT} and $control_op eq 'next') {
+    $which = $block_types{$type}{NEXT};      # Hard-coded to NEXT in continue { ... }
+  }
+
+  my $label = "${prefix}_$which";
+
+  if (!defined $cond) {
+    emit_code('branch', [ $label ]);
+  } else {
+    op_comp $cond, $test, map_args($left, $right), $label, undef;
+  }
+}
+
+
+#
+# do_return()
+#
+
+sub do_return
+{
+  my ($arg_type, $arg) = @_;
+
+  if (defined $arg) {
+    push_source "return $arg";
+  } else {
+    push_source "return";
+  }
+
+  ($arg) = map_args($arg);
+
+  #
+  # Find the enclosing subroutine block:
+  #
+
+  my $block = find_block('sub');
+
+  unless (defined $block) {
+    emit_code('<err>', []);
+    printf STDERR "jakoc: 'return' outside of subroutine on line %d!\n", $line;
     return;
   }
 
-  if (defined $loop_label) {
-    printf STDERR "jakoc: No loop '%s' in loop control on line %d!\n", $loop_label, $line;
-  } else {
-    printf STDERR "jakoc: No loop active in loop control on line %d!\n", $line;
+  $block = $block->{BLOCK};
+
+  #
+  # Generate code:
+  #
+
+  my $prefix = $block->{PREFIX};
+  my $return = $block->{RETURN};
+
+  if (defined $return and not defined $arg_type) {
+    printf STDERR "jakoc: 'return' without argument in subroutine that returns a value on line %d!\n", $line;
+    return;
   }
 
-  emit_code('err');
+  if (not defined $return and defined $arg_type) {
+    printf STDERR "jakoc: 'return' with argument in subroutine that does not return a value on line %d!\n", $line;
+    return;
+  }
+
+  #
+  # Determine the type of the return value.
+  #
+
+  if (defined $arg_type and $arg_type eq '*') {
+    if ($arg =~ m/^([INPS])\d+$/) {
+      $arg_type = $1;
+    } elsif ($arg =~ m/^-?\d+$/) {
+      $arg_type = 'i';
+    } elsif ($arg =~ m/^->\d+\.\d+$/) {
+      $arg_type = 'n';
+    } elsif ($arg =~ m/^"$/) {
+      $arg_type = 's';
+    } else {
+      confess "Couldn't determine argument type!";
+    }
+  }
+
+  #
+  # Make sure what we are returning is of the appropriate type.
+  #
+
+  if (defined $return and defined $arg_type and uc $return ne uc $arg_type) {
+    printf STDERR "jakoc: 'return' with argument of incorrect type ('%s') on line %d (expected '%s')!\n",
+      $arg_type, $line, $return;
+    last;
+  }
+
+  #
+  # According to our calling conventions, any return value gets put into
+  # the zero register of the appropriate type.
+  #
+
+  if (defined $return) {
+    emit_code('set', [ uc $return . "0", $arg ]);
+  }
+
+  #
+  # The *_LEAVE label for the subroutine is where the assembly code to
+  # actually complete the return portion of the calling convention lives.
+  #
+
+  emit_code('branch', ["${prefix}_LEAVE"]);
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Arithmetic Operations
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -1327,14 +2140,46 @@ sub do_mod
 
 
 #
+# do_bit_and()
+#
+
+sub do_bit_and
+{
+  my ($dest, $a, $b) = map_args(@_);
+  emit_code("and", [$dest, $a, $b]);
+}
+
+
+#
+# do_bit_or()
+#
+
+sub do_bit_or
+{
+  my ($dest, $a, $b) = map_args(@_);
+  emit_code("or", [$dest, $a, $b]);
+}
+
+
+#
 # do_shift()
 #
 
 sub do_shift
 {
-  my ($dir, $dest, $a, $amount) = map_args(@_);
+  my $dir = shift;
+  my ($dest, $a, $amount) = map_args(@_);
   emit_code("sh$dir", [$dest, $a, $amount]);
 }
+
+
+###############################################################################
+###############################################################################
+##
+## Argument Handling
+##
+###############################################################################
+###############################################################################
 
 
 #
@@ -1391,9 +2236,20 @@ sub parse_args
 }
 
 
-#
-# MAIN PROGRAM:
-#
+###############################################################################
+###############################################################################
+##
+## MAIN PROGRAM
+##
+## This is where the parsing happens. We can through the lines of source code
+## one line at a time, recognizing certain patterns and using them to drive
+## calls to the support routines above. This makes the syntax for Jako pretty
+## rigid right now.
+##
+## TODO: Have a real parser so we can be a more free-form language.
+##
+###############################################################################
+###############################################################################
 
 print "###############################################################################\n";
 print "# This Parrot assembler file was produced by the Jako compiler.               #\n";
@@ -1433,62 +2289,45 @@ while(<>) {
   #
   # Variable declarations:
   #
-  # var int      foo;
-  # var integer  foo;
-  # var int      foo = 5;
-  # var integer  foo = 5;
+  # var int foo;
+  # var int foo = 5;
   #
-  # var num      bar;
-  # var number   bar;
-  # var num      bar = 3.14;
-  # var number   bar = 3.14;
+  # var num bar;
+  # var num bar = 3.14;
   #
-  # var str      splee;
-  # var string   splee;
-  # var str      splee = "Howdy";
-  # var string   splee = "Howdy";
+  # var str splee;
+  # var str splee = "Howdy";
   #
 
-  if ((m/^var\s+(i)nt(eger)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+))?$/) ||
-      (m/^var\s+(n)um(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
-      (m/^var\s+(s)tr(ing)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
+  if ((m/^var\s+(i)nt\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
+      (m/^var\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
+      (m/^var\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) { 
-    declare_var($3, uc($1));
-    assign_var($3, uc($1), $5) if defined $5;
+    declare_var($2, uc($1));
+    assign_var($2, uc($1), $4) if defined $4;
     next;
   }
 
   #
   # Variable declarations:
   #
-  # var int      foo, bar;
-  # var integer  foo, bar;
-  # var int      foo, bar = 5;
-  # var integer  foo, bar = 5;
+  # var int foo, bar;
+  # var int foo, bar = 5;
   #
-  # var num      bar, splee;
-  # var number   bar, splee;
-  # var num      bar, splee = 3.14;
-  # var number   bar, splee = 3.14;
+  # var num bar, splee;
+  # var num bar, splee = 3.14;
   #
-  # var str      splee, quux;
-  # var string   splee, quux;
-  # var str      splee, quux = "Howdy";
-  # var string   splee, quux = "Howdy";
+  # var str splee, quux;
+  # var str splee, quux = "Howdy";
   #
 
-  if ((m/^var\s+(i)nt(eger)?\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(-?\d+))?$/) ||
-      (m/^var\s+(n)um(ber)?\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
-      (m/^var\s+(s)tr(ing)?\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
-
-#  if ((m/^var\s+(i)nt(eger)?\s+(($t_ident)(\s*,$t_ident*)+)(\s*=\s*($t_integer))?$/) ||
-#      (m/^var\s+(n)um(ber)?\s+(($t_ident)(\s*,$t_ident*)+)(\s*=\s*($t_number))?$/) ||
-#      (m/^var\s+(s)tr(ing)?\s+(($t_ident)(\s*,$t_ident*)+)(\s*=\s*($t_string))?$/)
-
+  if ((m/^var\s+(i)nt\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
+      (m/^var\s+(n)um\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(-?\d+(\.\d+)))?$/) ||
+      (m/^var\s+(s)tr\s+(([A-Za-z][A-Za-z0-9_]*)(\s*,\s*[A-Za-z][A-Za-z0-9_]*)+)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))?$/)
   ) {
-    foreach my $var (split(/\s*,\s*/, $3)) {
+    foreach my $var (split(/\s*,\s*/, $2)) {
       declare_var($var, uc($1));
-      assign_var($var, uc($1), $7) if defined $7;
+      assign_var($var, uc($1), $6) if defined $6;
     }
     next;
   }
@@ -1496,11 +2335,10 @@ while(<>) {
   #
   # Variable declarations:
   #
-  # var poly     quux;
-  # var polytype quux;
+  # var poly quux;
   #
 
-  if (m/^var\s+poly(type)?\s+([A-Za-z][A-Za-z0-9_]*)$/) {
+  if (m/^var\s+poly\s+([A-Za-z][A-Za-z0-9_]*)$/) {
     declare_var($2, 'P');
     next;
   }
@@ -1508,20 +2346,15 @@ while(<>) {
   #
   # Constant declarations:
   #
-  # const int      foo = 5;
-  # const integer  foo = 5;
-  #
-  # const num      bar = 3.14;
-  # const number   bar = 3.14;
-  #
-  # const str      splee = "Howdy";
-  # const string   splee = "Howdy";
+  # const int foo   = 5;
+  # const num bar   = 3.14;
+  # const str splee = "Howdy";
   #
 
-  if ((m/^const\s+(i)nt(eger)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+))$/) ||
-      (m/^const\s+(n)um(ber)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))$/) ||
-      (m/^const\s+(s)tr(ing)?\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))$/)) { 
-    declare_const($3, uc($1), $5);
+  if ((m/^const\s+(i)nt\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))?$/) ||
+      (m/^const\s+(n)um\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(-?\d+(\.\d+)))$/) ||
+      (m/^const\s+(s)tr\s+([A-Za-z][A-Za-z0-9_]*)(\s*=\s*(\"[^\\\"]*(?:\\.[^\\\"]*)*\"))$/)) { 
+    declare_const($2, uc($1), $4);
     next;
   }
 
@@ -1534,7 +2367,7 @@ while(<>) {
   # a = b;
   #
  
-  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(-?\d+)$/) {
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
     assign_var($1, 'I', $2);
     next;
   }
@@ -1563,7 +2396,7 @@ while(<>) {
   # a = b = c;
   #
  
-  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*(-?\d+)$/) {
+  if (m/^(([A-Za-z][A-Za-z0-9_]*)(\s*=\s*[A-Za-z][A-Za-z0-9_]*)+)\s*=\s*((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
     foreach my $var (split(/\s*=\s*/, $1)) {
       assign_var($var, 'I', $4);
     }
@@ -1659,11 +2492,20 @@ while(<>) {
   #
   # Subroutines:
   #
-  # sub NAME {
+  # sub     NAME (...) {
+  # sub int NAME (...) {
+  # sub num NAME (...) {
+  # sub str NAME (...) {
   #
 
-  if (m/^sub\s+([A-Za-z][A-Za-z0-9_]*)\s*{$/) {
-    begin_block($1, 'sub', undef);
+  if (m/^sub\s+((int|num|str)\s+)?([A-Za-z][A-Za-z0-9_]*)\s*\((.*)\)\s*{$/) {
+    my $block_label = $3;
+    my $block_type  = 'sub';
+    my $return_type = defined($2) ? substr($2, 0, 1) : undef;
+    my @formal_args = map { [ split(/\s+/, $_) ] } split(/\s*,\s*/, $4);
+
+    begin_block($block_label, $block_type, undef, $return_type, @formal_args);
+
     next;
   }
 
@@ -1684,19 +2526,71 @@ while(<>) {
   # Loop Control Statements:
   #
   # next
+  # next          if (...)
+  # next          unless (...)
   # next LOOPNAME
+  # next LOOPNAME if (...)
+  # next LOOPNAME unless (...)
   #
   # last
+  # last          if (...)
+  # last          unless (...)
   # last LOOPNAME
+  # last LOOPNAME if (...)
+  # last LOOPNAME unless (...)
   #
   # redo
+  # redo          if (...)
+  # redo          unless (...)
   # redo LOOPNAME
+  # redo LOOPNAME if (...)
+  # redo LOOPNAME unless (...)
   #
   # NOTE: A LOOPNAME is just the label used when introducing a LOOP.
   #
 
-  if (m/^(next|last|redo)(\s+([A-Za-z][A-Za-z0-9_]*))?$/) {
-    do_loop_control($1, $3);
+  if (m/^(next|last|redo)(\s+([A-Za-z][A-Za-z0-9_]*))?(\s+(if|unless)\s+\((\S+)\s*(==|!=|<=|<|>=|>)\s*(\S+)\s*\))?$/) {
+    do_loop_control($1, $3, $5, $6, $7, $8);
+    next;
+  }
+
+  #
+  # Subroutine Return Statements:
+  #
+  # return
+  # return 0
+  # return 0.0
+  # return "foo"
+  # return bar
+  #
+
+  if (m/^return\s+((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+))$/) {
+    do_return('i', $1);
+    next;
+  }
+ 
+  if (m/^return\s+(-?\d+\.\d+)$/) {
+    do_return('n', $1);
+    next;
+  }
+
+  if (m/^return\s+(\"[^\\\"]*(?:\\.[^\\\"]*)*\")$/) {
+    do_return('s', $1);
+    next;
+  }
+
+  if (m/^return\s+([A-Za-z][A-Za-z0-9_]*)$/) {
+    do_return('*', $1);
+    next;
+  }
+
+  if (m/^return$/) {
+    do_return();
+    next;
+  }
+
+  if (m/^(return)(\s+([A-Za-z][A-Za-z0-9_]*)(\s+(if|unless)\s+\((\S+)\s*(==|!=|<=|<|>=|>)\s*(\S+)\s*\))?)?$/) {
+    do_return('i', $3, $5, $6, $7, $8);
     next;
   }
 
@@ -1985,6 +2879,8 @@ while(<>) {
   #
   # a = b << 4;
   # a <<= 4;
+  # a = b & c;
+  # a = b | c;
   #
   # TODO: Can't really support shift amount as arg until sh[lr]_i_i ops are implemented.
   #
@@ -1998,6 +2894,30 @@ while(<>) {
 
   if (m/^([A-Za-z][A-Za-z0-9_]*)\s*((<<|>>)=)\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
     do_shift($4 eq '<<' ? 'l' : 'r', $1, $2, $5);
+    next;
+  }
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))\s*[&]\s*(([A-Za-z][A-Za-z0-9_]*)|((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))$/) {
+    push_source "$1 = $2 \& $5";
+    do_bit_and($1, $2, $5);
+    next;
+  }
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[&]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
+    push_source "$1 \&= $2";
+    do_bit_and($1, $1, $2);
+    next;
+  }
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))\s*[|]\s*(([A-Za-z][A-Za-z0-9_]*)|((-?\d+)|(0b[01]+)|(0[0-7]+)|(0x[0-9a-f]+)))$/) {
+    push_source "$1 = $2 | $5";
+    do_bit_or($1, $2, $5);
+    next;
+  }
+
+  if (m/^([A-Za-z][A-Za-z0-9_]*)\s*[|]=\s*(([A-Za-z][A-Za-z0-9_]*)|(-?\d+))$/) {
+    push_source "$1 |= $2";
+    do_bit_or($1, $1, $2);
     next;
   }
 

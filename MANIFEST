@@ -19,6 +19,7 @@ examples/assembly/jump.pasm
 examples/assembly/local_label.pasm
 examples/assembly/Makefile
 examples/assembly/mops.pasm
+examples/assembly/queens.pasm
 examples/assembly/stack.pasm
 examples/assembly/substr.pasm
 examples/assembly/trace.pasm
@@ -58,6 +59,7 @@ languages/jako/Makefile
 languages/jako/mandelbrot.jako
 languages/jako/mops.jako
 languages/jako/primes.jako
+languages/jako/queens.jako
 languages/jako/sub.jako
 Makefile.in
 MANIFEST

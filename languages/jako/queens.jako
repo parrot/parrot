@@ -1,0 +1,280 @@
+#
+# queens.jako
+#
+# A program to find solutions to the 8-queens problem.
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Perl itself.
+#
+# $Id$
+#
+
+
+# 4 bits per file, represent the rank of the queen, 0xf for none
+
+const int BITS_PER_FILE = 4;
+const int NO_QUEEN      = 0xf;
+
+const int NUM_FILES     = 8;
+const int NUM_RANKS     = 8;
+
+
+#
+# clear_file()
+#
+# Clears the queen from the current file. Makes no assumption about current
+# nybble contents.
+#
+
+sub int clear_file (int board, int file) {
+  var int amount;
+  var int temp;
+
+  amount = BITS_PER_FILE * file;
+  temp   = NO_QUEEN << amount;
+  board  = board | temp;
+
+  return board;
+}
+
+
+#
+# place_queen()
+#
+# Places a queen at the current rank of the current file. Assumes no queen for
+# the file yet (which means its nybble is 0xf).
+#
+
+sub int place_queen (int board, int rank, int file) {
+  var int amount;
+  var int temp;
+
+  amount = BITS_PER_FILE * file;
+  temp   = NO_QUEEN << amount;
+  temp   = not(temp);
+  board  = board & temp;
+  temp   = rank << amount;
+  board  = board | temp;
+
+  return board;
+}
+
+
+#
+# queen_rank()
+#
+# Fetches the queen's rank.
+#
+# Input:  file
+# Ouptut: rank = queen's rank in that file
+#
+
+sub int queen_rank (int board, int file) {
+  var int amount;
+  var int temp;
+
+  amount = BITS_PER_FILE *  file;
+  temp   = NO_QUEEN      << amount;
+  temp   = temp          &  board;
+  temp   = temp          >> amount;
+
+  return temp;
+}
+
+
+#
+# queen_at()
+#
+# Determines whether or not there is a queen at a given location.
+#
+# Input:  rank, file
+# Ouptut: queen
+#
+
+sub int queen_at (int board, int rank, int file) {
+  var int amount;
+  var int temp;
+
+  if (rank < 0) {
+    return 0;
+  }
+
+  if (rank >= NUM_RANKS) {
+    return 0;
+  }
+
+  if (file < 0) {
+    return 0;
+  }
+
+  if (file >= NUM_FILES) {
+    return 0;
+  }
+
+
+  amount = BITS_PER_FILE * file;
+  temp   = NO_QUEEN << amount;
+  temp   = temp &  board;
+  temp   = temp >> amount;
+
+  if (temp == rank) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+
+#
+# free_space()
+#
+# Determines whether or not the current space is free for placing a queen.
+#
+
+sub int free_space (int board, int rank, int file) {
+  var int i = 1;
+
+  while (i <= file) {
+    var int temp_file;
+    var int temp_rank;
+    var int result;
+
+    temp_file = file - i;
+
+    temp_rank = rank;
+    result = queen_at(board, temp_rank, temp_file);
+    if (result == 1) {
+      return 0; 
+    }
+
+    temp_rank = rank + i;
+    result = queen_at(board, temp_rank, temp_file);
+    if (result == 1) {
+      return 0; 
+    }
+
+    temp_rank = rank - i;
+    result = queen_at(board, temp_rank, temp_file);
+    if (result == 1) {
+      return 0; 
+    }
+
+    i++;
+  } 
+
+  return 1;
+}
+
+
+#
+# print_board()
+#
+
+sub print_board (int board) {
+  var int rank, file;
+  var int temp;
+
+  rank = 7;
+
+  print("  +---+---+---+---+---+---+---+---+\n");
+
+  while(rank >= 0) {
+    temp = rank + 1;
+    file = 0;
+
+    print("$temp |");
+
+    while(file < 8) {
+      var int result;
+
+      result = queen_at(board, rank, file);
+
+      if (result == 1) {
+        print(" Q |");
+      } else {
+        temp = rank + file;
+        temp %= 2;
+ 
+        if (temp == 1) {
+          print("   |");
+        } else {
+          print(" * |");
+        }
+      }
+      file++;
+    }
+
+    print("\n");
+    print("  +---+---+---+---+---+---+---+---+\n");
+    rank--;
+  }
+
+  print("    A   B   C   D   E   F   G   H  \n");
+}
+
+
+#
+# main()
+#
+
+sub main() {
+  var int board;
+  var int rank;
+  var int file;
+
+  #
+  # Clear the files:
+  #
+
+  file = 0;
+
+  while(file < NUM_FILES) {
+    board = clear_file(board, file);
+    file++;
+  }
+
+  #
+  # Scan over the files, placing queens:
+  #
+
+  file = 0;
+  rank = 0;
+
+  while (file < NUM_FILES) {
+    while (rank < NUM_RANKS) {
+      var int result;
+      result = free_space(board, rank, file);
+      last if (result == 1);
+      rank++;
+    }
+
+    if (rank == NUM_RANKS) {
+      file--;
+      rank  = queen_rank(board, file);
+      board = clear_file(board, file);
+      rank++
+    } else {
+      board = place_queen(board, rank, file);
+      file++;
+      rank = 0;
+    }
+
+    last if (file < 0);
+  }
+
+  #
+  # Print the result:
+  #
+
+  print_board(board);
+}
+
+
+#
+# MAIN PROGRAM:
+#
+
+main();
+end;
+

@@ -12,6 +12,70 @@
 
 #include "parrot/parrot.h"
 
+/* Push an already formed entry on the generic stack. Return a pointer to the entry */
+void push_entry(struct Parrot_Interp *interpreter, struct Stack_Entry * entry) {
+    struct StackChunk *chunk_base;
+    
+    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
+    /* Do we have any slots left in the current chunk? */
+    if (chunk_base->free) {
+        chunk_base->used++;
+        chunk_base->free--;
+        interpreter->stack_top = &chunk_base->entry[chunk_base->used-1];
+    }
+    /* Nope, so plan B time. Allocate a new chunk of stack entries */
+    else {
+        struct StackChunk *new_chunk;
+        new_chunk = mem_allocate_aligned(sizeof(struct StackChunk));
+        new_chunk->used = 1;
+        new_chunk->free = STACK_CHUNK_DEPTH - 1;
+        new_chunk->next = NULL;
+        new_chunk->prev = chunk_base;
+        chunk_base->next = new_chunk;
+        interpreter->stack_top = &new_chunk->entry[0];
+    }
+
+    /* Copy the entry */
+
+    chunk_base->entry[chunk_base->used-1] = *entry;
+}
+
+/* Pop off an entry, copying it over an existing Stack_Entry structure */
+void pop_entry(struct Parrot_Interp *interpreter, struct Stack_Entry * entry) {
+    struct StackChunk *chunk_base;
+    
+    chunk_base = STACK_CHUNK_BASE(interpreter->stack_top);
+    /* Quick sanity check */
+    if (chunk_base->used == 0) {
+        INTERNAL_EXCEPTION(ERROR_STACK_EMPTY, "No entries on stack!\n");
+    }
+
+    *entry = *(interpreter->stack_top);
+
+    /* Now decrement the SP */
+    chunk_base->used--;
+    chunk_base->free++;
+    /* Can we toss a whole chunk? */
+    if (0 == chunk_base->used && chunk_base->prev) {
+        chunk_base = chunk_base->prev;
+    } 
+    if (chunk_base->used) {
+        interpreter->stack_top = &chunk_base->entry[chunk_base->used - 1];
+    }
+}
+
+/* Swap the top two entries on the stack */
+void swap_entry(struct Parrot_Interp *interpreter) {
+    struct Stack_Entry top;
+    struct Stack_Entry next;
+
+    pop_entry(interpreter, &top);
+    pop_entry(interpreter, &next);
+
+    push_entry(interpreter, &top);
+    push_entry(interpreter, &next);
+}
+
 /* Push something on the generic stack. Return a pointer to the entry */
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *interpreter, void *thing, INTVAL type, void *cleanup) {
     struct StackChunk *chunk_base;
@@ -118,7 +182,6 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, void *where, INTVAL t
     if (chunk_base->used) {
         interpreter->stack_top = &chunk_base->entry[chunk_base->used - 1];
     }
-        
     
     return where;
 }

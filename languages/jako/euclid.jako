@@ -17,9 +17,10 @@
 # $Id$
 #
 
-var int m    = 96;
-var int n    = 64;
-var int r;
+var int m, n, r;
+
+m = 96;
+n = 64;
 
 print("Algorithm E (Euclid's algorithm)\n");
 print("  Calculating gcd($m, $n) = ...\n");

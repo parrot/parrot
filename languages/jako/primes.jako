@@ -30,15 +30,12 @@ NUMBER: while (i <= n) {
 
     x = i % j;
 
-    if (x == 0) {
-        next NUMBER;
-    }
+    next NUMBER if (x == 0);
 
     j++;
   }
 
   print("$i  ");
-
 } continue {
   i++;
 }

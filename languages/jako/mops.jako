@@ -1,3 +1,7 @@
+#
+# mops.jako
+#
+
 var num start_time;
 var num end_time;
 var num elapsed_time;
@@ -20,14 +24,12 @@ elapsed_time   = end_time - start_time;
 num_ops        = num_iter * ops_per_iter;
 ops_per_sec    = num_ops / elapsed_time;
 
-print("Iterations:                  $num_iter\n");
-print("Start time:                  $start_time\n");
-print("End time:                    $end_time\n");
-print("Count:                       $loop_counter\n");
-print("Elapsed time:                $elapsed_time\n");
-print("Estimated ops:               $num_ops\n");
-print("Elapsed time:                $elapsed_time\n");
-print("Ops/sec:                     $ops_per_sec\n");
-
-end;
+print("Iterations:    $num_iter\n");
+print("Start time:    $start_time\n");
+print("End time:      $end_time\n");
+print("Count:         $loop_counter\n");
+print("Elapsed time:  $elapsed_time\n");
+print("Estimated ops: $num_ops\n");
+print("Elapsed time:  $elapsed_time\n");
+print("Ops/sec:       $ops_per_sec\n");
 

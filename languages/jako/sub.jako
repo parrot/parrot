@@ -13,13 +13,13 @@
 
 var int x;
 
-sub printit {
+sub printit (int x) {
   print("$x\n");
 }
 
 x = 42;
-printit();
+printit(x);
 
 x = 1234;
-printit();
+printit(x);
 
