@@ -121,11 +121,12 @@ mark_reg_stack(Parrot_Interp interpreter, Stack_Chunk_t* chunk)
         struct parrot_regs_t *regs = (struct parrot_regs_t *)STACK_DATAP(chunk);
 
         pobject_lives(interpreter, (PObj*)chunk);
+
         for (j = 0; j < NUM_REGISTERS; j++) {
-            obj = (PObj*) regs->pmc_reg.registers[j];
+            obj = (PObj*) BP_REG_PMC(regs, j);
             if (obj)
                 pobject_lives(interpreter, obj);
-            obj = (PObj*) regs->string_reg.registers[j];
+            obj = (PObj*) BP_REG_STR(regs, j);
             if (obj)
                 pobject_lives(interpreter, obj);
         }

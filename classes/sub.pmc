@@ -261,10 +261,10 @@ Invokes the subroutine.
              */
             interpreter->ctx.current_sub = REG_PMC(0) = SELF;
             interpreter->ctx.current_cont = REG_PMC(1) =
-                caller_regs->pmc_reg.registers[1];
+                BP_REG_PMC(caller_regs, 1);
             interpreter->ctx.current_object = REG_PMC(2) =
-                caller_regs->pmc_reg.registers[2];
-            REG_STR(0) = caller_regs->string_reg.registers[0];
+                BP_REG_PMC(caller_regs, 2);
+            REG_STR(0) = BP_REG_STR(caller_regs, 0);
         }
         return sub->address;
     }

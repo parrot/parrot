@@ -312,23 +312,23 @@ set_retval(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
      *     by the subroutine or both if possible, i.e. extract
      *     e.g. an INTVAL from a returned PMC?
      */
-    if (bp->int_reg.registers[3] == 1) {
+    if (BP_REG_INT(bp, 3) == 1) {
         /*
          * pythons functions from pie-thon always return a PMC
          */
         switch (sig_ret) {
             case 'S':
-                return VTABLE_get_string(interpreter, bp->pmc_reg.registers[5]);
+                return VTABLE_get_string(interpreter, BP_REG_PMC(bp,5));
             case 'P':
             case 0:
-                return (void*) bp->pmc_reg.registers[5];
+                return (void*) BP_REG_PMC(bp,5);
         }
     }
     switch (sig_ret) {
         case 0:
         case 'v': break;
-        case 'S': retval = (void* ) bp->string_reg.registers[5]; break;
-        case 'P': retval = (void* ) bp->pmc_reg.registers[5]; break;
+        case 'S': retval = (void* ) BP_REG_STR(bp, 5); break;
+        case 'P': retval = (void* ) BP_REG_PMC(bp,5); break;
         default:
             internal_exception(1,
                     "unhandle signature '%c' in set_retval", sig_ret);
@@ -340,10 +340,10 @@ static INTVAL
 set_retval_i(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
 {
     if (sig_ret == 'I') {
-        if (bp->int_reg.registers[3] == 1)
-            return VTABLE_get_integer(interpreter, bp->pmc_reg.registers[5]);
-        /* else if (bp->int_reg.registers[1] == 1) */
-            return bp->int_reg.registers[5];
+        if (BP_REG_INT(bp, 3) == 1)
+            return VTABLE_get_integer(interpreter, BP_REG_PMC(bp,5));
+        /* else if (BP_REG_INT(bp, 1) == 1) */
+            return BP_REG_INT(bp, 5);
     }
     Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "argument mismatch");
     return 0;
@@ -353,10 +353,10 @@ static FLOATVAL
 set_retval_f(Parrot_Interp interpreter, int sig_ret, struct parrot_regs_t *bp)
 {
     if (sig_ret == 'N') {
-        if (bp->int_reg.registers[3] == 1)
-            return VTABLE_get_number(interpreter, bp->pmc_reg.registers[5]);
-        /* else if (bp->int_reg.registers[4] == 1) */
-            return bp->num_reg.registers[5];
+        if (BP_REG_INT(bp, 3) == 1)
+            return VTABLE_get_number(interpreter, BP_REG_PMC(bp,5));
+        /* else if (BP_REG_INT(bp, 4) == 1) */
+            return BP_REG_NUM(bp, 5);
     }
     Parrot_warn(interpreter, PARROT_WARNINGS_ALL_FLAG, "argument mismatch");
     return 0;

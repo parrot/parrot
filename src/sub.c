@@ -171,7 +171,7 @@ swap_context(Interp *interpreter, struct PMC *sub)
         if (!interpreter->ctx.current_sub) {
             copy_regs(interpreter, ctx->bp);
             ctx->current_sub = interpreter->ctx.current_sub = sub;
-            interpreter->ctx.current_cont = ctx->bp->pmc_reg.registers[1];
+            interpreter->ctx.current_cont = BP_REG_PMC(ctx->bp,1);
             REG_PMC(0) = sub;
             REG_PMC(1) = interpreter->ctx.current_cont;
             /*
@@ -421,39 +421,39 @@ Copy function arguments or return values from C<caller_regs> to interpreter.
 */
 
 void
-copy_regs(Interp *interpreter, struct parrot_regs_t *caller_regs)
+copy_regs(Interp *interpreter, struct parrot_regs_t *bp)
 {
     int i, n, proto, overflow;
 
-    proto = caller_regs->int_reg.registers[0];
+    proto = BP_REG_INT(bp, 0);
     overflow = 0;
     if (proto) {
-        n = caller_regs->int_reg.registers[1];
+        n = BP_REG_INT(bp, 1);
         overflow = n == 11;
         for (i = 0; i < 5 + n; ++i)
-            REG_INT(i) = caller_regs->int_reg.registers[i];
-        n = caller_regs->int_reg.registers[2];
+            REG_INT(i) = BP_REG_INT(bp, i);
+        n = BP_REG_INT(bp, 2);
         overflow |= n == 11;
         for (i = 0; i < n; ++i)
-            REG_STR(i + 5) = caller_regs->string_reg.registers[i + 5];
-        n = caller_regs->int_reg.registers[3];
+            REG_STR(i + 5) = BP_REG_STR(bp, i + 5);
+        n = BP_REG_INT(bp, 3);
         overflow |= n == 11;
         for (i = 0; i < n; ++i)
-            REG_PMC(i + 5) = caller_regs->pmc_reg.registers[i + 5];
-        n = caller_regs->int_reg.registers[4];
+            REG_PMC(i + 5) = BP_REG_PMC(bp,i + 5);
+        n = BP_REG_INT(bp, 4);
         overflow |= n == 11;
         for (i = 0; i < n; ++i)
-            REG_NUM(i + 5) = caller_regs->num_reg.registers[i + 5];
+            REG_NUM(i + 5) = BP_REG_NUM(bp, i + 5);
     }
     else {
         REG_INT(0) = 0;
-        REG_INT(3) = n = caller_regs->int_reg.registers[3];
+        REG_INT(3) = n = BP_REG_INT(bp, 3);
         overflow = n == 11;
         for (i = 0; i < n; ++i)
-            REG_PMC(i + 5) = caller_regs->pmc_reg.registers[i + 5];
+            REG_PMC(i + 5) = BP_REG_PMC(bp,i + 5);
     }
     if (overflow)
-        REG_PMC(3) = caller_regs->pmc_reg.registers[3];
+        REG_PMC(3) = BP_REG_PMC(bp,3);
 }
 
 /*
