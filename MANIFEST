@@ -1393,6 +1393,7 @@ languages/jako/docs/jako.pod
 languages/jako/elem.jako
 languages/jako/io.jako
 languages/jako/examples/bench.jako
+languages/jako/examples/board.jako
 languages/jako/examples/euclid.jako
 languages/jako/examples/fact.jako
 languages/jako/examples/fib.jako
