@@ -901,30 +901,26 @@ string_replace(struct Parrot_Interp *interpreter, STRING *src,
 STRING *
 string_chopn(STRING *s, INTVAL n)
 {
-    const char *strstart = s->strstart;
-    const char *bufend = strstart + s->bufused;
-    UINTVAL true_n;
+    UINTVAL new_length;
+    struct string_iterator_t it;
 
-    true_n = (UINTVAL)n;
     if (n < 0) {
-        n = -n;
-        true_n = (UINTVAL)n;
-        if (true_n > s->strlen)
-            true_n = s->strlen;
-        bufend = s->encoding->skip_forward(strstart, true_n);
-        s->bufused = bufend - strstart;
-        s->strlen = true_n;
+        new_length = -n;
+        if (new_length > s->strlen)
+            return s;
     }
     else {
-        if (true_n > s->strlen)
-            true_n = s->strlen;
-
-        bufend = s->encoding->skip_backward(bufend, true_n);
-
-        s->bufused = bufend - strstart;
-        s->strlen = s->strlen - true_n;
+        if (s->strlen > (UINTVAL)n)
+            new_length = s->strlen - n;
+        else
+            new_length = 0;
     }
 
+    string_iterator_init(&it, s);
+    if (new_length > 0)
+        it.set_position(&it, new_length);
+    s->strlen = new_length;
+    s->bufused = it.bytepos;
     return s;
 }
 
@@ -1655,7 +1651,9 @@ string_iterator_init(struct string_iterator_t *i, STRING *s)
     i->str = s;
     i->bytepos = 0;
     i->charpos = 0;
+    /* XXX change this to a bulk copy */
     i->decode_and_advance = s->encoding->decode_and_advance;
+    i->set_position = s->encoding->set_position;
 }
 
 /*

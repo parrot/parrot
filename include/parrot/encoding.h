@@ -37,6 +37,7 @@ struct parrot_encoding_t {
     const void *(*skip_forward) (const void *ptr, Parrot_UInt n);
     const void *(*skip_backward) (const void *ptr, Parrot_UInt n);
     Parrot_UInt(*decode_and_advance) (struct string_iterator_t *i);
+    void (*set_position)(struct string_iterator_t *i, Parrot_Int pos);
 };
 
 typedef struct parrot_encoding_t* Parrot_Encoding;

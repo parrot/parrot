@@ -106,6 +106,21 @@ dbcs_decode_and_advance(struct string_iterator_t *i)
     }
 }
 
+static void
+dbcs_set_position(struct string_iterator_t *i, Parrot_Int pos)
+{
+    const byte_t *bptr = (char *)i->str->strstart;
+
+    i->charpos = pos;
+    while (pos--) {
+        if (*bptr > 127)
+            bptr += 2;
+        else
+            bptr++;
+    }
+    i->bytepos = (const char *)bptr - (const char *)i->str->strstart;
+}
+
 const ENCODING dbcs_encoding = {
     enum_encoding_dbcs,
     "dbcs",
@@ -115,7 +130,8 @@ const ENCODING dbcs_encoding = {
     dbcs_encode,
     dbcs_skip_forward,
     dbcs_skip_backward,
-    dbcs_decode_and_advance
+    dbcs_decode_and_advance,
+    dbcs_set_position
 };
 
 /*

@@ -68,6 +68,12 @@ singlebyte_decode_and_advance(struct string_iterator_t *i)
     return *ptr;
 }
 
+static void
+singlebyte_set_position(struct string_iterator_t *i, Parrot_Int pos)
+{
+    i->bytepos = i->charpos = pos;
+}
+
 const ENCODING singlebyte_encoding = {
     enum_encoding_singlebyte,
     "singlebyte",
@@ -77,7 +83,8 @@ const ENCODING singlebyte_encoding = {
     singlebyte_encode,
     singlebyte_skip_forward,
     singlebyte_skip_backward,
-    singlebyte_decode_and_advance
+    singlebyte_decode_and_advance,
+    singlebyte_set_position
 };
 
 /*

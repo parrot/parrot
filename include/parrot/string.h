@@ -37,10 +37,11 @@ typedef enum TAIL_flag {
 
 /* String iterator */
 typedef struct string_iterator_t {
-  String *str;
-  UINTVAL bytepos;
-  UINTVAL charpos;
-  UINTVAL (*decode_and_advance)(struct string_iterator_t *i);
+    String *str;
+    UINTVAL bytepos;
+    UINTVAL charpos;
+    UINTVAL (*decode_and_advance)(struct string_iterator_t *i);
+    void (*set_position)(struct string_iterator_t *i, INTVAL pos);
 } string_iterator;
 
 /* stringinfo parameters */

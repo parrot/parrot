@@ -136,16 +136,14 @@ utf8_skip_backward(const void *ptr, UINTVAL n)
 static UINTVAL
 utf8_decode_and_advance(struct string_iterator_t *i)
 {
-    const utf8_t *u8ptr = (char *)i->str->strstart + i->bytepos;
+    const utf8_t *u8ptr = (utf8_t *)((char *)i->str->strstart + i->bytepos);
     UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
         UINTVAL len = UTF8SKIP(u8ptr);
-        UINTVAL count;
 
         c &= UTF8_START_MASK(len);
         i->bytepos += len;
-//      for (count = 1; count < len; count++) {
         for (len--; len; len--) {
             u8ptr++;
             if (!UTF8_IS_CONTINUATION(*u8ptr)) {
@@ -169,6 +167,19 @@ utf8_decode_and_advance(struct string_iterator_t *i)
     return c;
 }
 
+/* XXX Should use quickest direction */
+static void
+utf8_set_position(struct string_iterator_t *i, Parrot_Int pos)
+{
+    const utf8_t *u8ptr = (char *)i->str->strstart;
+
+    i->charpos = pos;
+    while (pos-- > 0) {
+        u8ptr += UTF8SKIP(u8ptr);
+    }
+    i->bytepos = (const char *)u8ptr - (const char *)i->str->strstart;
+}
+
 const ENCODING utf8_encoding = {
     enum_encoding_utf8,
     "utf8",
@@ -178,7 +189,8 @@ const ENCODING utf8_encoding = {
     utf8_encode,
     utf8_skip_forward,
     utf8_skip_backward,
-    utf8_decode_and_advance
+    utf8_decode_and_advance,
+    utf8_set_position
 };
 
 /*

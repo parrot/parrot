@@ -73,6 +73,13 @@ utf32_decode_and_advance(struct string_iterator_t *i)
     return *u32ptr;
 }
 
+static void
+utf32_set_position(struct string_iterator_t *i, Parrot_Int pos)
+{
+    i->charpos = pos;
+    i->bytepos = pos * 4;
+}
+
 const ENCODING utf32_encoding = {
     enum_encoding_utf32,
     "utf32",
@@ -82,7 +89,8 @@ const ENCODING utf32_encoding = {
     utf32_encode,
     utf32_skip_forward,
     utf32_skip_backward,
-    utf32_decode_and_advance
+    utf32_decode_and_advance,
+    utf32_set_position
 };
 
 /*
