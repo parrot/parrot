@@ -12,9 +12,9 @@ These are the vtable functions for the PMCArray class.
 This array holds only PMC pointers. Right now it just wraps PerlArray,
 so there's something that works.
 
-*/
-
 =cut
+
+*/
 
 #include "parrot/parrot.h"
 
