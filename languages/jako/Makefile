@@ -15,7 +15,7 @@ INTERP=./test_prog
 # Default target:
 #
 
-all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc leibniz.pbc mandelbrot.pbc mops.pbc primes.pbc queens.pbc sub.pbc
+all: bench.pbc euclid.pbc fact.pbc fib.pbc hello.pbc leibniz.pbc mandelbrot.pbc mandelzoom.pbc mops.pbc primes.pbc queens.pbc sub.pbc
 
 
 #
@@ -42,6 +42,9 @@ leibniz.pasm: leibniz.jako jakoc
 
 mandelbrot.pasm: mandelbrot.jako jakoc
 	$(JAKOC) mandelbrot.jako > mandelbrot.pasm
+
+mandelzoom.pasm: mandelzoom.jako jakoc
+	$(JAKOC) mandelzoom.jako > mandelzoom.pasm
 
 mops.pasm: mops.jako jakoc
 	$(JAKOC) mops.jako > mops.pasm
@@ -81,6 +84,9 @@ leibniz.pbc: leibniz.pasm
 mandelbrot.pbc: mandelbrot.pasm
 	cd $(TOOL_DIR); $(ASM) --listing $(DIR)/mandelbrot.list $(DIR)/mandelbrot.pasm > $(DIR)/mandelbrot.pbc
 
+mandelzoom.pbc: mandelzoom.pasm
+	cd $(TOOL_DIR); $(ASM) --listing $(DIR)/mandelzoom.list $(DIR)/mandelzoom.pasm > $(DIR)/mandelzoom.pbc
+
 mops.pbc: mops.pasm
 	cd $(TOOL_DIR); $(ASM) --listing $(DIR)/mops.list $(DIR)/mops.pasm > $(DIR)/mops.pbc
 
@@ -114,6 +120,7 @@ test: all
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/hello.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/leibniz.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/mandelbrot.pbc
+	cd $(TOOL_DIR); $(INTERP) $(DIR)/mandelzoom.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/mops.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/primes.pbc
 	cd $(TOOL_DIR); $(INTERP) $(DIR)/queens.pbc

@@ -1,0 +1,192 @@
+#
+# mandelzoom.jako
+#
+# Print the Mandlebrot set.
+#
+# Translated from Parrot assembler to Jako by Gregor Purdy <gregor@focusresearch.com>.
+# Translated from C to Parrot assembler by Leon Brocard <acme@astray.com>.
+# Original C version by Glenn Rhodes.
+#
+# The C code is:
+#
+# main(){
+#  int x, y, k;
+#  char *b = " .:,;!/>)|&IH%*#";
+#  float r, i, z, Z, t, c, C;
+#
+#  for (y=30; puts(""), C = y*0.1 - 1.5, y--;){
+#     for (x=0; c = x*0.04 - 2, z=0, Z=0, x++ < 75;){
+#        for (r=c, i=C, k=0; t = z*z - Z*Z + r, Z = 2*z*Z + i, z=t, k<112; k++)
+#           if (z*z + Z*Z > 10) break;
+#        printf ("%c", b[k%16]);
+#        }
+#     }
+# }
+#
+# Copyright (C) 2001 Gregor N. Purdy. All rights reserved.
+# This program is free software. It is subject to the same
+# license as Parrot itself.
+#
+
+
+const str CHARS = " .:,;!/>)|&IH%*#";
+const int DEPTH = 112;
+const str CLS   = "\033[H\033[2J\0";
+
+
+#
+# print_mandel()
+#
+# width  - Width in 'pixels'
+# height - Height in 'pixels'
+# cx     - Center X coordinate
+# cy     - Center Y coordinate
+# sx     - Scale in X direction
+# sy     - Scale in Y direction
+#
+
+sub print_mandel(int width, int height, num cx, num cy, num sx, num sy) {
+  var num x, y;
+  var int k;
+  var num r, i, z, Z, t;
+
+  var num width2;
+  var num height2;
+
+  width2  = width;
+  height2 = height;
+
+  #
+  # Calculate the image boundaries:
+  #
+
+  var num hx;
+  var num min_x;
+  var num max_x;
+  var num inc_x;
+
+  hx    = sx / 2.0;
+  min_x = cx - hx;
+  max_x = cx + hx;
+  inc_x = sx / width2;
+
+  var num hy;
+  var num min_y;
+  var num max_y;
+  var num inc_y;
+
+  hy    = sy / 2.0;
+  min_y = cy - hy;
+  max_y = cy + hy;
+  inc_y = sy / height2;
+
+  #
+  # Y Loop:
+  #
+
+  y = max_y;
+
+  while (y > min_y) {
+    x = min_x;
+
+    while (x < max_x) {
+      z = 0.0;
+      Z = 0.0;
+
+      r = x;
+      i = y;
+      k = 0;
+
+      while (k < DEPTH) {
+        var num temp;
+        var num temp2;
+
+        t      = z * z;
+        temp   = Z * Z;
+        t     -= temp;
+        t     += r;
+
+        Z     *= 2.0;
+        Z     *= z;
+        Z     += i;
+
+        z      = t;
+       
+        temp   = z * z;
+        temp2  = Z * Z;
+        temp  += temp2;
+
+        last if (temp > 10.0);
+      } continue {
+        k++;
+      }
+
+      var int temp_int_4;
+      var int temp_int_5;
+
+      temp_int_4 = k % 16;
+      temp_int_5 = 1;
+
+      var str ch;
+
+      ch = substr(CHARS, temp_int_4, temp_int_5);
+      print(ch);
+    } continue {
+      x += inc_x;
+    }
+
+    print("\n");
+  } continue {
+    y -= inc_y;
+  }
+}
+
+
+#
+# MAIN PROGRAM:
+#
+
+const int WIDTH    = 75;
+const int HEIGHT   = 30;
+
+const int N        = 30;
+
+const num cx       =  0.12;
+const num cy       =  0.66;
+
+const num start_sx =  2.0;
+const num start_sy =  1.5;
+
+
+#
+# MAIN LOOP:
+#
+
+var int i = 1;
+
+while (i < N) {
+  var num I, sx, sy;
+
+  I  = i;
+  I *= 4.0;
+
+  sx  = start_sx / I;
+  sy  = start_sy / I;
+
+  print(CLS);
+  
+  print("I:      $I\n");
+  print("WIDTH:  $WIDTH\n");
+  print("HEIGHT: $HEIGHT\n");
+  print("cx:     $cx\n");
+  print("cy:     $cy\n");
+  print("sx:     $sx\n");
+  print("sy:     $sy\n");
+  print("\n");
+ 
+  print_mandel(WIDTH, HEIGHT, cx, cy, sx, sy);
+
+  i++;
+#  sleep(1);
+}
+
