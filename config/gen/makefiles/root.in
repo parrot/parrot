@@ -1,3 +1,12 @@
+VERSION=${VERSION}${DEVEL}
+
+BUILDPREFIX =
+PREFIX = /usr/local/parrot/0.0.10
+EXEC_PREFIX = $(PREFIX)
+BINDIR = $(EXEC_PREFIX)/bin
+LIBDIR = $(EXEC_PREFIX)/lib
+INCLUDEDIR = $(EXEC_PREFIX)/include
+
 O = ${o}
 SO = ${so}
 A = ${a}
@@ -188,6 +197,9 @@ lib_deps : lib_deps_object lib_deps_source
 
 check_source : $(GENERAL_H_FILES)
 	$(PERL) tools/dev/check_source_standards.pl all_source
+
+MANIFEST : MANIFEST.detailed
+	$(PERL) -lane ${PQ}next if $$F[0]=~/\052/; print $$F[1]${PQ} MANIFEST.detailed > MANIFEST
 
 ###############################################################################
 #
@@ -609,13 +621,22 @@ status :
 	cvs -n -q upd -dP
 
 lint : ${test_prog}
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
+	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) ${cc_inc} $(LINTFLAGS) test_main.c
 
 lint2 : ${test_prog}
-	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) `echo $(O_FILES) | sed 's/\.o/\.c/g'`
+	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS2) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`
 	$(LINT) ${cc_inc} $(LINTFLAGS2) test_main.c
 
+
+###############################################################################
+#
+# installation
+#
+###############################################################################
+
+install :
+	$(PERL) tools/dev/install_files.pl --buildprefix=$(BUILDPREFIX) --prefix=$(PREFIX) --exec-prefix=$(EXEC_PREFIX) --bindir=$(BINDIR) --libdir=$(LIBDIR) --includedir=$(INCLUDEDIR) MANIFEST.detailed | sh
 
 ###############################################################################
 #
@@ -623,11 +644,15 @@ lint2 : ${test_prog}
 #
 ###############################################################################
 
-release :
-	@if [ -z "$(VERSION)" ]; then echo "You must specify a version when building a release"; echo "Example: make release VERSION=0.1.3"; exit 1; fi
+release : MANIFEST
 	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	tar zcvf ../parrot-$(VERSION).tar.gz $$(perl -lne 'print"parrot-$(VERSION)/$$_"' MANIFEST)
+	tar zcvf parrot-$(VERSION).tar.gz $$(perl -lne 'print"parrot-$(VERSION)/$$_"' MANIFEST)
 	rm parrot-$(VERSION)
+
+rpms : release
+	sudo cp parrot-$(VERSION).tar.gz /usr/src/*/SOURCES
+	sudo cp parrot.spec /usr/src/*/SPECS
+	cd /usr/src/*/SPECS && sudo rpm -ba parrot.spec
 
 ###############################################################################
 #
