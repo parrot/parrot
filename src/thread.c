@@ -405,7 +405,7 @@ pt_join_threads(Parrot_Interp interpreter)
      * if no threads where started - fine
      */
     LOCK(interpreter_array_mutex);
-    if (!n_interpreters) {
+    if (n_interpreters <= 1) {
         UNLOCK(interpreter_array_mutex);
         return;
     }
@@ -606,7 +606,7 @@ TODO - Evaluate, if a interpreter lock is cheaper, when C<dod_mark_ptr>
 is updated.
 
 =cut
- 
+
 */
 
 void

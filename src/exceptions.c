@@ -202,6 +202,22 @@ find_exception_handler(Parrot_Interp interpreter, PMC *exception)
     }
     if (print_location)
         print_pbc_location(interpreter);
+    /*
+     * returning NULL from here returns resume address NULL to the
+     * runloop, which will terminate the thread function finally
+     *
+     * XXX this check should better be in Parrot_exit
+     */
+    if (interpreter->thread_data && interpreter->thread_data->tid) {
+        /*
+         * we should probably detach the thread here
+         */
+        return NULL;
+    }
+    /*
+     * only main should run the destroy functions - exit handler chain
+     * is freed during Parrot_exit
+     */
     Parrot_exit(exit_status);
 
     return NULL;
@@ -288,6 +304,8 @@ throw_exception(Parrot_Interp interpreter, PMC *exception, void *dest)
     struct Parrot_Sub * cc;
 
     handler = find_exception_handler(interpreter, exception);
+    if (!handler)
+        return NULL;
     cc = (struct Parrot_Sub*)PMC_sub(handler);
     /* preserve P5 register */
     VTABLE_set_pmc_keyed_int(interpreter, exception, 3, REG_PMC(5));
@@ -503,7 +521,8 @@ execution then resumes.
 
 =cut
 
-*/void
+*/
+void
 do_exception(Parrot_Interp interpreter,
         exception_severity severity, long error)
 {

@@ -5,7 +5,7 @@ use Test::More;
 use strict;
 
 if ($^O eq 'linux') {
-    plan tests => 2 * 2;
+    plan tests => 3 * 2;
 }
 else {
     plan skip_all => 'No events yet';
@@ -28,7 +28,7 @@ sub send_SIGINT {
 	if ($io_thread =~ /^\s*(\d+)/) {
 	    $pid = $1;
 	    # send a SIGINT
-	    kill 2, $pid;
+	    kill 'SIGINT', $pid;
 	}
 	else {
 	    die 'no pid found for parrot';
@@ -81,3 +81,37 @@ OUTPUT
 
 check_running;
 
+
+SKIP: {
+  skip("works standalone but not in test", 2);
+send_SIGINT;
+
+output_is(<<'CODE', <<'OUTPUT', "SIGINT event - sleep, catch");
+    newsub P20, .Exception_Handler, _handler
+    set_eh P20
+    print "start\n"
+    sleep 2
+    print "never\n"
+    end
+_handler:
+.include "signal.pasm"
+    print "catched "
+    set I0, P5["_type"]
+    neg I0, I0
+    ne I0, .SIGINT, nok
+    print "SIGINT\n"
+    end
+nok:
+    print "something _type = "
+    neg I0, I0
+    print I0
+    print "\n"
+    end
+
+CODE
+start
+catched SIGINT
+OUTPUT
+
+check_running;
+}

@@ -36,7 +36,7 @@ dispatches these to one or all interpreters.
 #endif
 
 #if EVENT_DEBUG
-#  define edebug(x) puts(x)
+#  define edebug(x) fprintf x
 #else
 #  define edebug(x)
 #endif
@@ -49,6 +49,7 @@ static void* do_event(Parrot_Interp, parrot_event*, void*);
 static void stop_io_thread(void);
 static void schedule_signal_event(int signum);
 void Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry);
+static QUEUE_ENTRY* dup_entry(QUEUE_ENTRY* entry);
 
 /*
  * we have exactly one global event_queue
@@ -448,7 +449,14 @@ Parrot_schedule_interp_qentry(Parrot_Interp interpreter, QUEUE_ENTRY* entry)
      * do push_entry last - this signales the queue condition so the
      * interpreter might starting process that event immediately
      */
-    push_entry(interpreter->task_queue, entry);
+    switch (event->type) {
+        case EVENT_TYPE_SIGNAL:
+            unshift_entry(interpreter->task_queue, entry);
+            break;
+        default:
+            push_entry(interpreter->task_queue, entry);
+            break;
+    }
 }
 
 /*
@@ -467,11 +475,12 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
 {
     Parrot_Interp interp;
     parrot_event* event;
+    size_t i;
 
     event = entry->data;
     switch (event->type) {
         case EVENT_TYPE_SIGNAL:
-            edebug(("broadcast signal"));
+            edebug((stderr, "broadcast signal\n"));
             /*
              * we don't have special signal handlers in usercode yet
              * e.g.:
@@ -489,12 +498,19 @@ Parrot_schedule_broadcast_qentry(QUEUE_ENTRY* entry)
              */
             switch(event->u.signal) {
                 case SIGINT:
-                    /* for now send an exit event to the
-                     * first interpreter
-                     */
-                    event->type = EVENT_TYPE_TERMINATE;
+                    if (n_interpreters) {
+                        LOCK(interpreter_array_mutex);
+                        for (i = 1; i < n_interpreters; ++i) {
+                            edebug((stderr, "deliver SIGINT to %d\n", i));
+                            interp = interpreter_array[i];
+                            Parrot_schedule_interp_qentry(interp,
+                                    dup_entry(entry));
+                        }
+                        UNLOCK(interpreter_array_mutex);
+                    }
                     interp = interpreter_array[0];
                     Parrot_schedule_interp_qentry(interp, entry);
+                    edebug((stderr, "deliver SIGINT to 0\n"));
                     break;
                 default:
                     mem_sys_free(entry);
@@ -554,9 +570,9 @@ io_thread(void *data)
         switch (retval) {
             case -1:
                 if (errno == EINTR) {
-                    edebug(("select EINTR"));
+                    edebug((stderr, "select EINTR\n"));
                     if (sig_int) {
-                        edebug(("int arrived"));
+                        edebug((stderr, "int arrived\n"));
                         sig_int = 0;
                         /*
                          * signal the event thread
@@ -568,13 +584,13 @@ io_thread(void *data)
                 break;
             default:
                 if (retval > 0) {
-                    edebug(("IO ready"));
+                    edebug((stderr, "IO ready\n"));
                     if (FD_ISSET(PIPE_READ_FD, &rfds)) {
                         int buf[3];
                         /*
                          * a command arrived
                          */
-                        edebug(("msg arrived"));
+                        edebug((stderr, "msg arrived\n"));
                         if (read(PIPE_READ_FD, buf, MSG_SIZE) != MSG_SIZE)
                             internal_exception(1,
                                     "read error from msg pipe");
@@ -604,7 +620,7 @@ io_thread(void *data)
                 }
         }
     }
-    edebug(("IO thread terminated"));
+    edebug((stderr, "IO thread terminated\n"));
     close(PIPE_READ_FD);
     close(PIPE_WRITE_FD);
     return NULL;
@@ -644,6 +660,31 @@ stop_io_thread(void)
 =over 4
 
 =item C<static QUEUE_ENTRY*
+dup_entry(QUEUE_ENTRY* entry)>
+
+Duplicate queue entry.
+
+=cut
+
+*/
+
+static QUEUE_ENTRY*
+dup_entry(QUEUE_ENTRY* entry)
+{
+    parrot_event *event;
+    QUEUE_ENTRY *new_entry;
+
+    new_entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+    new_entry->next = NULL;
+    new_entry->type = entry->type;
+    event = new_entry->data = mem_sys_allocate(sizeof(parrot_event));
+    mem_sys_memcopy(event, entry->data, sizeof(parrot_event));
+    return new_entry;
+}
+
+/*
+
+=item C<static QUEUE_ENTRY*
 dup_entry_interval(QUEUE_ENTRY* entry, FLOATVAL now)>
 
 Duplicate timed entry and add interval to C<abs_time>.
@@ -656,13 +697,9 @@ static QUEUE_ENTRY*
 dup_entry_interval(QUEUE_ENTRY* entry, FLOATVAL now)
 {
     parrot_event *event;
-    QUEUE_ENTRY *new_entry;
+    QUEUE_ENTRY *new_entry = dup_entry(entry);
 
-    new_entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
-    new_entry->next = NULL;
-    new_entry->type = entry->type;
-    event = new_entry->data = mem_sys_allocate(sizeof(parrot_event));
-    mem_sys_memcopy(event, entry->data, sizeof(parrot_event));
+    event = new_entry->data;
     event->u.timer_event.abs_time = now + event->u.timer_event.interval;
     return new_entry;
 }
@@ -808,7 +845,7 @@ event_thread(void *data)
     UNLOCK(event_q->queue_mutex);
     queue_destroy(event_q);
     stop_io_thread();
-    edebug(("event thread stopped"));
+    edebug((stderr, "event thread stopped\n"));
     return NULL;
 }
 
@@ -842,7 +879,8 @@ wait_for_wakeup(Parrot_Interp interpreter, void *next)
         mem_sys_free(entry);
         if (event->type == EVENT_TYPE_SLEEP && event->data == next)
             sleeping = 0;
-        else if (event->type == EVENT_TYPE_TERMINATE)
+        else if (event->type == EVENT_TYPE_TERMINATE ||
+                event->type == EVENT_TYPE_SIGNAL)
             sleeping = 0;
         next = do_event(interpreter, event, next);
     }
@@ -908,6 +946,36 @@ Parrot_do_check_events(Parrot_Interp interpreter, void *next)
 
 /*
 
+=item C<static void
+event_to_exception(Parrot_Interp interpreter, parrot_event* event)>
+
+Convert event to exception and throw it.
+
+=cut
+
+*/
+
+static void
+event_to_exception(Parrot_Interp interpreter, parrot_event* event)
+{
+    int exit_code = -event->u.signal;
+
+    switch (event->u.signal) {
+        case SIGINT:
+            /*
+             * SIGINT is silent, if no exception handler is
+             * installed: set severiy to EXCEPT_exit
+             */
+            do_exception(interpreter, EXCEPT_exit, exit_code);
+            break;
+        default:
+            do_exception(interpreter, EXCEPT_error, exit_code);
+            break;
+    }
+}
+
+/*
+
 =item C<static void*
 do_event(Parrot_Interp interpreter, parrot_event* event, void *next)>
 
@@ -920,9 +988,15 @@ Run user code or such.
 static void*
 do_event(Parrot_Interp interpreter, parrot_event* event, void *next)
 {
+    edebug((stderr, "do_event %d\n", event->type));
     switch (event->type) {
         case EVENT_TYPE_TERMINATE:
             next = NULL;        /* this will terminate the run loop */
+            break;
+        case EVENT_TYPE_SIGNAL:
+            /* generate exception */
+            event_to_exception(interpreter, event);
+            /* not reached - will longjmp */
             break;
         case EVENT_TYPE_TIMER:
             /* run ops, save registers */
