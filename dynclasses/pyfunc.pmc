@@ -150,7 +150,7 @@ Invoke a function.  Defaults are filled in first.
             if (func_defaults && VTABLE_defined(INTERP, func_defaults)) {
                 INTVAL nd = VTABLE_elements(INTERP, func_defaults);
                 for (j=n-nd+REG_INT(3); j<n && j<11; j++) {
-                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP, 
+                    REG_PMC(5+j) = VTABLE_get_pmc_keyed_int(INTERP,
                         func_defaults, j+nd-n);
                 }
 
@@ -187,7 +187,7 @@ Add an argument to the func_args list
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *func_args = VTABLE_getprop(INTERP, SELF, FUNC_ARGS);
         VTABLE_set_string_keyed_int(INTERP, func_args, key, value);
-        INTVAL n = VTABLE_elements(INTERP, func_args);
+        /* INTVAL n = VTABLE_elements(INTERP, func_args); ??? -leo */
 
     }
 
