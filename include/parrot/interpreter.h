@@ -175,8 +175,7 @@ typedef struct Parrot_Interp {
     PMC *mark_ptr;             /* last PMC marked used in DOD runs */
     PMC *Parrot_base_classname_hash;    /* hash containing name->base_type */
     PMC *Parrot_compreg_hash;   /* hash containing assembler/compilers */
-    UINTVAL impatient_things;   /* Number of things that want
-                                   immediate destruction */
+    int has_early_DOD_PMCs;   /* Flag that some want immediate destruction */
 } Interp;
 
 #define PCONST(i) PF_CONST(interpreter->code, (i))

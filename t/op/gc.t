@@ -1,12 +1,48 @@
 #! perl -w
 
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 8;
 
-output_is( <<'CODE', '1', "sweep" );
+output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
-      sweep
+      sweep 1
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
+      print I3
+      end
+CODE
+
+output_is( <<'CODE', '0', "sweep 0" );
+      interpinfo I1, 2   # How many DOD runs have we done already?
+      sweep 0
+      interpinfo I2, 2   # Should be same
+      sub I3, I2, I1
+      print I3
+      end
+CODE
+
+output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
+      interpinfo I1, 2   # How many DOD runs have we done already?
+      new P0, .PerlUndef
+      needs_destroy P0
+      sweep 0
+      interpinfo I2, 2   # Should be one more now
+      sub I3, I2, I1
+      print I3
+      end
+CODE
+
+output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy");
+      interpinfo I1, 2   # How many DOD runs have we done already?
+      new P0, .PerlUndef
+      needs_destroy P0
+      sweep 0
+      interpinfo I2, 2   # Should be one more now
+      sub I3, I2, I1
+      print I3
+      new P0, .PerlUndef # kill 1st object
+      sweep 0
+      interpinfo I4, 2   # Should be same as last
+      sub I3, I4, I2
       print I3
       end
 CODE
@@ -79,7 +115,7 @@ LOOP: new P0, .PerlString
     lt I0, 127, LOOP
 
     print "ending\n"
-	
+
     end
 CODE
 starting

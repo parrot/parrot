@@ -198,7 +198,7 @@ typedef enum PObj_enum {
      */
     b_PObj_is_special_PMC_FLAG = 1 << 26,
 
-    b_PObj_is_impatient_FLAG = 1 << 27
+    b_PObj_needs_early_DOD_FLAG = 1 << 27
 
 } PObj_flags;
 
@@ -215,7 +215,7 @@ typedef enum PObj_enum {
 #  define d_PObj_live_FLAG              0x01
 #  define d_PObj_on_free_list_FLAG      0x02
 #  define d_PObj_is_special_PMC_FLAG    0x04
-#  define d_PObj_is_impatient_FLAG      0x08
+#  define d_PObj_needs_early_DOD_FLAG   0x08
 
 /*
  * arenas are constant sized ~32 byte object size, ~128K objects
@@ -267,14 +267,14 @@ typedef enum PObj_enum {
 #  define PObj_live_FLAG              d_PObj_live_FLAG
 #  define PObj_on_free_list_FLAG      d_PObj_on_free_list_FLAG
 #  define PObj_is_special_PMC_FLAG    d_PObj_is_special_PMC_FLAG
-#  define PObj_is_impatient_FLAG      d_PObj_is_impatient_FLAG
+#  define PObj_needs_early_DOD_FLAG   d_PObj_needs_early_DOD_FLAG
 
 #else
 
 #  define PObj_live_FLAG              b_PObj_live_FLAG
 #  define PObj_on_free_list_FLAG      b_PObj_on_free_list_FLAG
 #  define PObj_is_special_PMC_FLAG    b_PObj_is_special_PMC_FLAG
-#  define PObj_is_impatient_FLAG      b_PObj_is_impatient_FLAG
+#  define PObj_needs_early_DOD_FLAG   b_PObj_needs_early_DOD_FLAG
 
 #  define DOD_flag_TEST(flag, o)      PObj_flag_TEST(flag, o)
 #  define DOD_flag_SET(flag, o)       PObj_flag_SET(flag, o)
@@ -331,9 +331,9 @@ typedef enum PObj_enum {
 #define PObj_sysmem_SET(o) PObj_flag_SET(sysmem, o)
 #define PObj_sysmem_CLEAR(o) PObj_flag_CLEAR(sysmem, o)
 
-#define PObj_is_impatient_TEST(o) DOD_flag_TEST(is_impatient, o)
-#define PObj_is_impatient_SET(o) DOD_flag_SET(is_impatient, o)
-#define PObj_is_impatient_CLEAR(o) DOD_flag_CLEAR(is_impatient, o)
+#define PObj_needs_early_DOD_TEST(o) DOD_flag_TEST(needs_early_DOD, o)
+#define PObj_needs_early_DOD_SET(o) DOD_flag_SET(needs_early_DOD, o)
+#define PObj_needs_early_DOD_CLEAR(o) DOD_flag_CLEAR(needs_early_DOD, o)
 
 #define PObj_special_SET(flag, o) do { \
     PObj_flag_SET(flag, o); \

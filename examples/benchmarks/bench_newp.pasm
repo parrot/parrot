@@ -12,7 +12,7 @@ fill:	new P1, .PerlInt
 	lt I1, I3, fill
 	dec I0
 	if I0, loop
-	sweep
+	sweep 1
 	time N6
 	sub N7, N6, N5
 	print N7

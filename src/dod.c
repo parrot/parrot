@@ -436,7 +436,7 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
 #endif
 
     /* We have no impatient things. Yet. */
-    interpreter->impatient_things = 0;
+    interpreter->has_early_DOD_PMCs = 0;
 
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena;
@@ -480,12 +480,12 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
                 /* its live */
                 total_used++;
 #if ARENA_DOD_FLAGS
-                if ((*dod_flags & (PObj_is_impatient_FLAG << nm)))
-                    interpreter->impatient_things = 1;
+                if ((*dod_flags & (PObj_needs_early_DOD_FLAG << nm)))
+                    interpreter->has_early_DOD_PMCs = 1;
 #else
                 PObj_live_CLEAR(b);
-                if (PObj_is_impatient_TEST(b))
-                    interpreter->impatient_things = 1;
+                if (PObj_needs_early_DOD_TEST(b))
+                    interpreter->has_early_DOD_PMCs = 1;
 #endif
             }
             else {
