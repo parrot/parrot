@@ -5,10 +5,11 @@
 
 /* Warning flags */
 typedef enum {
-    PARROT_WARNINGS_ALL_FLAG   = 0xFF,
-    PARROT_WARNINGS_NONE_FLAG  = 0x00,
-    PARROT_WARNINGS_UNDEF_FLAG = 0x01,
-    PARROT_WARNINGS_IO_FLAG    = 0x02
+    PARROT_WARNINGS_ALL_FLAG      = 0xFF,
+    PARROT_WARNINGS_NONE_FLAG     = 0x00,
+    PARROT_WARNINGS_UNDEF_FLAG    = 0x01,
+    PARROT_WARNINGS_IO_FLAG       = 0x02,
+    PARROT_WARNINGS_PLATFORM_FLAG = 0x04
 } Warnings_classes;
 
 #define PARROT_WARNINGS_on(interp, flag) \
