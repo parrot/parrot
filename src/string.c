@@ -320,8 +320,6 @@ string_make_empty(struct Parrot_Interp *interpreter,
     Parrot_allocate_string(interpreter,
         s, string_max_bytes(interpreter, s, capacity));
 
-    s->strlen = s->bufused = 0;
-
     return s;
 }
 
@@ -345,6 +343,7 @@ _string_upscale(struct Parrot_Interp *interpreter, STRING *s,
         temp = string_make_empty(interpreter, representation, needed_length);
         string_append(interpreter, temp, s, s->obj.flags);
         string_set(interpreter, s, temp);
+        s->hashval = 0;
 
         /*
         s->representation = temp->representation;
@@ -1393,6 +1392,7 @@ string_substr(struct Parrot_Interp *interpreter, STRING *src,
     dest->bufused = string_max_bytes(interpreter, dest, true_length);
 
     dest->strlen = true_length;
+    dest->hashval = 0;
 
     if (d != NULL) {
         *d = dest;
@@ -1591,6 +1591,7 @@ string_chopn(struct Parrot_Interp *interpreter, STRING *s, INTVAL n)
 
     s->strlen = new_length;
     s->bufused = string_max_bytes(interpreter, s, new_length);
+    s->hashval = 0;
 
     return s;
 }
@@ -1767,7 +1768,19 @@ string_equal(struct Parrot_Interp *interpreter, STRING *s1, STRING *s2)
     else if (s1->hashval != s2->hashval && s1->hashval && s2->hashval) {
         return 1;
     }
-    else if (!s1->strlen && !s2->strlen) {
+    else if (!s1->strlen) {   /* s2->strlen is the same here */
+        return 0;
+    }
+
+    else if (s1->strstart == s2->strstart) { /* COWed strings */
+        /*
+         * XXX when compiled -O3 this added compare makes suddenly
+         * t/pmc/threads 6, 8-9 fail with --gc-debug
+         * It segfaults in thread.c:67 with a destroyed interpreter
+         * gcc error?
+         *
+         * -leo
+         */
         return 0;
     }
 
