@@ -3024,7 +3024,7 @@ PackFile_Constant_unpack_key(Interp *interpreter,
 /*
 
 =item C<static struct PackFile *
-PackFile_append_pbc(Interp *interpreter, char *filename)>
+PackFile_append_pbc(Interp *interpreter, const char *filename)>
 
 Read a PBC and append it to the current directory
 Fixup local label and sub addresses in newly loaded bytecode.
@@ -3034,7 +3034,7 @@ Fixup local label and sub addresses in newly loaded bytecode.
 */
 
 static struct PackFile *
-PackFile_append_pbc(Interp *interpreter, char *filename)
+PackFile_append_pbc(Interp *interpreter, const char *filename)
 {
     struct PackFile * pf = Parrot_readbc(interpreter, filename);
     if (!pf)
@@ -3059,26 +3059,9 @@ directory.
 */
 
 void
-Parrot_load_bytecode(Interp *interpreter, STRING *name)
+Parrot_load_bytecode(Interp *interpreter, const char *filename)
 {
-    char *ext;
-    char* filename;
-
-#if TRACE_PACKFILE
-    fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");
-#endif
-
-#if defined(_PARROTLIB)
-    name = Parrot_library_query(interpreter, "bytecode_location", name );
-#endif
-    filename = string_to_cstring(interpreter, name);
-    Parrot_load_bytecode_direct(interpreter, filename);
-}
-
-void
-Parrot_load_bytecode_direct(Interp *interpreter, char *filename)
-{
-    char *ext;
+    const char *ext;
 
 #if TRACE_PACKFILE
     fprintf(stderr, "packfile.c: parrot_load_bytecode()\n");

@@ -37,7 +37,7 @@ library_init(Parrot_Interp interpreter)
 {
     /* XXX TODO: file location not known at runtime, should
        be linked with parrot (or use the upcoming config system) */
-    Parrot_load_bytecode_direct(interpreter, "runtime/parrot/include/parrotlib.pbc");
+    Parrot_load_bytecode(interpreter, "runtime/parrot/include/parrotlib.pbc");
 }
 
 /*
@@ -99,6 +99,44 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     /* done */
     interpreter->resume_flag = resume;
     return ret;
+}
+
+STRING*
+Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, const char **incl)
+{
+    char *s;
+    const char** ptr;
+    int length = 0;
+    int i, ok = 0;
+    STRING *str;
+    
+    /* calculate the length of the largest include directory */
+    for( ptr = incl; *ptr != 0; ++ptr ) {
+        i = strlen(*ptr);
+        length = (i > length) ? i : length;
+    }
+
+    s = malloc(strlen(file_name) + length + 1);
+
+    for( ptr = incl; (!ok) && (*ptr != 0); ++ptr ) {
+        strcpy(s, *ptr);
+        strcat(s, file_name);
+
+#ifdef WIN32
+        {
+            char *p;
+            while ( (p = strchr(s, '/')) )
+                *p = '\\';
+        }
+#endif
+	str = string_from_cstring(interp, s, strlen(s));
+	ok = Parrot_stat_info_intval(interp, str, STAT_EXISTS);
+    }
+    if (!ok) {
+	str = NULL;
+    }
+    free( s );
+    return str;
 }
 
 /*

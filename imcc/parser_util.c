@@ -29,6 +29,14 @@
  */
 void imcc_init(Parrot_Interp interpreter);
 
+/* includes to use if parrotlib is not available */
+const char *Parrot_imcc_include_paths[] = {
+    "./",
+    "runtime/parrot/include/",
+    "runtime/parrot/",
+    0,
+};
+
 /*
  * P = new type, [init]
  * PASM like:
@@ -508,7 +516,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     struct PackFile *pf_save = interp->code;
     struct PackFile *pf;
     const char *source = sourcefile;
-    char *ext;
+    char *ext, *fullname;
     int pasm = pasm_file;
     FILE *new;
     union {
@@ -516,13 +524,23 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
         void * __ptr;
     } __ptr_u;
 
-    if (!(new = fopen(s, "r"))) {
-        fatal(1, "imcc_compile_file", "couldn't open '%s'\n", s);
+#if defined(_PARROTLIB)
+    STRING *str = string_from_cstring(interp, s, strlen(s));
+    STRING *path = Parrot_library_query(interp, "imcc_compile_file_location", str);
+#else
+    STRING *str = Parrot_library_fallback_locate(interp, s, Parrot_imcc_include_paths);
+#endif
+    if (str) {
+	fullname = string_to_cstring(interp, str);
+    }
+    if (!str || !(new = fopen(fullname, "r"))) {
+        fatal(1, "imcc_compile_file", "couldn't open '%s'\n", fullname);
+	string_cstring_free(fullname);
         return NULL;
     }
 
 #if IMC_TRACE
-    fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", s);
+    fprintf(stderr, "parser_util.c: imcc_compile_file '%s'\n", fullname);
 #endif
 
     cur_namespace = NULL;
@@ -530,7 +548,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     pf = PackFile_new(0);
     interp->code = pf;  /* put new packfile in place */
     sourcefile = const_cast(s);
-    ext = strrchr(s, '.');
+    ext = strrchr(fullname, '.');
     if (ext && strcmp (ext, ".pasm") == 0) {
         pasm_file = 1;
     }
@@ -547,6 +565,7 @@ imcc_compile_file (Parrot_Interp interp, const char *s)
     sourcefile = source;
     pasm_file = pasm;
     fclose(new);
+    string_cstring_free(fullname);
     return pf;
 }
 

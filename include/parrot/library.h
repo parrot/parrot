@@ -14,6 +14,7 @@
 #define PARROT_LIBRARY_H_GUARD
 
 void* Parrot_library_query(Parrot_Interp, const char *func_name, ...);
+STRING* Parrot_library_fallback_locate(Parrot_Interp interp, const char *file_name, const char **incl);
 
 #endif /* PARROT_LIBRARY_H_GUARD */
 

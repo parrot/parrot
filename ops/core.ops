@@ -141,8 +141,10 @@ inline op reserved(in INT) {
 }
 
 inline op load_bytecode(in STR) :load_file {
-  Parrot_load_bytecode(interpreter, $1);
-  goto NEXT();
+    char * file = string_to_cstring(interpreter, $1);
+    Parrot_load_bytecode(interpreter, file);
+    string_cstring_free(file);
+    goto NEXT();
 }
 
 =back

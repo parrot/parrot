@@ -3599,63 +3599,27 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 /* _PARROTLIB is now the default; XXX: "make testr" is not working yet */
 /*#define _PARROTLIB*/
 
-/* XXX: use this code for miniparrot */
-#if !defined(_PARROTLIB)
-static FILE*
-open_file (char *file_name, const char **incl)
-{
-    FILE* file = 0;
-    char *s;
-    const char** ptr;
-    int length = 0;
-    int i;
-
-    /* calculate the length of the largest include directory */
-    for( ptr = incl; *ptr != 0; ++ptr ) {
-	i = strlen(*ptr);
-	length = (i > length) ? i : length;
-    }
-
-    s = malloc(strlen(file_name) + length + 1);
-
-    for( ptr = incl; (file == 0) && (*ptr != 0); ++ptr ) {
-	strcpy(s, *ptr);
-	strcat(s, file_name);
-
-#ifdef WIN32
-        {
-            char *p;
-            while ( (p = strchr(s, '/')) )
-                *p = '\\';
-        }
-#endif
-	file = fopen(s, "r");
-    }
-
-    if (file)
-        sourcefile = strdup(s); /* FIXME: leak */
-
-    free(s);
-
-    return file;
-}
-#endif
-
 static void
 include_file (void* interp, char *file_name)
 {
     struct macro_frame_t *frame;
     FILE *file = 0;
     char *ext;
-#if !defined(_PARROTLIB)
-    const char *incl_paths[] = {
-	"./",
-	"runtime/parrot/include/",
-	"runtime/parrot/",
-	0,
-    };
 
-    file = open_file(file_name, incl_paths);
+/* XXX: use this code for miniparrot */
+#if !defined(_PARROTLIB)
+    extern const char* Parrot_imcc_include_paths[];
+    STRING *str = Parrot_library_fallback_locate(interp, file_name, Parrot_imcc_include_paths);
+    
+    if (str) {
+	char* s = string_to_cstring(interp, str);
+	
+	file = fopen(s, "r");
+	if (file)
+	    sourcefile = s;
+	else
+	    string_cstring_free(s);
+    }
 #else
     STRING* name = string_from_cstring(interp, file_name, strlen(file_name));
     STRING* result = Parrot_library_query(interp, "include_file_location", name);
