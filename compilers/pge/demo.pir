@@ -33,6 +33,7 @@
     $I0 = index x, "\n"
   get_cmd:
     $S0 = substr x, 0, $I0
+    chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "rule" goto make_p6rule
     if $S0 == "glob" goto make_glob
@@ -40,7 +41,7 @@
     if $S0 == "pir" goto print_pir
     if $S0 == "trace" goto toggle_trace
 
-    chopn x,1
+    isnull rulesub, match_nopattern
     match = rulesub(x)
   match_result:
     unless match goto match_fail
@@ -49,6 +50,9 @@
     goto read_loop
   match_fail:
     print "match failed\n"
+    goto read_loop
+  match_nopattern:
+    print "no pattern entered yet\n"
     goto read_loop
 
   match_next:
