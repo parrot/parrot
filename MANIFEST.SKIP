@@ -1,6 +1,7 @@
 \.o$
 ^\.cvsignore$
 /\.cvsignore$
+\.cvsignore$
 CVS/[^/]+$
 ^include/parrot/config\.h$
 ^include/parrot/has_header\.h$

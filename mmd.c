@@ -140,8 +140,15 @@ mmd_expand_x(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_x) {
         new_table[i] = default_func;
     }
 
-    /* Then copy the old table over. */
-    
+    /* Then copy the old table over. We have to do this row by row,
+       because the rows in the old and new tables are different
+       lengths */
+    for (i = 0; i < y; i++) {
+        INTVAL newoffset, oldoffset;
+        newoffset = i * new_x;
+        oldoffset = i * x;
+        memcpy(new_table + newoffset, interpreter->binop_mmd_funcs->mmd_funcs[function] + oldoffset, sizeof(funcptr_t) * x);
+    }
 }
 
 static void
