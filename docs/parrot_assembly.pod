@@ -468,6 +468,10 @@ Restore register X from the generic stack
 
 Restore register X from the generic stack
 
+=item entrytype Ix, iy
+
+Put the type of stack entry Y into integer register X
+
 =item set_warp string
 
 Sets a named marker for the stacks for later use.

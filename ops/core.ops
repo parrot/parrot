@@ -1611,6 +1611,26 @@ These operations effect individual registers.
 
 ########################################
 
+=item B<entrytype>(i, i|ic)
+
+Gets the type of entry $2 of the stack and puts in in $1
+
+=cut
+
+AUTO_OP entrytype(i, i|ic) {
+  INTVAL depth;
+  struct Stack_Entry *entry;
+  depth = stack_depth(interpreter, interpreter->user_stack_base);
+  if (depth < $2) {
+    INTERNAL_EXCEPTION(99, "Stack Depth wrong");
+  }
+
+  entry = stack_entry(interpreter, interpreter->user_stack_base, $2);
+  $1 = get_entry_type(interpreter, entry);
+}
+
+########################################
+
 =item B<save>(i)
 
 =item B<save>(ic)

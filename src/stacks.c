@@ -22,7 +22,6 @@ stack_depth(struct Parrot_Interp *interpreter, struct StackChunk *chunk) {
     chunk = chunk->next;
     depth += chunk->used;
   }
-
   return depth;
 }
 
@@ -36,7 +35,6 @@ stack_entry(struct Parrot_Interp *interpreter, struct StackChunk *chunk, INTVAL 
       depth -= chunk->used;
       chunk = chunk->prev; /* Expect caller to have checked bounds */
     }
-
     return &(chunk->entry[chunk->used - depth - 1]);
 }
 
@@ -182,6 +180,11 @@ void *pop_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **
 void toss_generic_entry(struct Parrot_Interp *interpreter, struct Stack_Entry **top, INTVAL type) {
     void *foo;
     pop_generic_entry(interpreter, top, &foo, type);
+}
+
+/* get the type of  the topmost stack entry */
+INTVAL get_entry_type(struct Parrot_Interp *interpreter, struct Stack_Entry *entry) {
+    return( entry->entry_type);
 }
 
 /*

@@ -45,6 +45,7 @@ void rotate_stack(struct Parrot_Interp *, INTVAL);
 struct Stack_Entry *push_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *thing, INTVAL type,  void (*cleanup)(struct Stack_Entry *));
 void *pop_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, void *where, INTVAL type);
 void toss_generic_entry(struct Parrot_Interp *, struct Stack_Entry **top, INTVAL type);
+INTVAL get_entry_type(struct Parrot_Interp *, struct Stack_Entry *entry);
 
 #define STACK_ENTRY_INT 1
 #define STACK_ENTRY_FLOAT 2
