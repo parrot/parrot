@@ -1,5 +1,8 @@
-#include <stdio.h>
 #include <${testheader}>
+
+/* Don't want stdio influencing our ability to include headers. Some day soon
+   we won't be using stdio  */
+#include <stdio.h>
 
 int main (int argc, char* argv[]) {
     printf("${testheader} OK\n");
