@@ -53,7 +53,7 @@ CODE
 OUT
 ##############################
 output_is(<<'CODE', <<'OUT', "array/hash consts");
-.sub MAIN
+.sub _MAIN
    .local PerlArray ar
    .local PerlHash ha
    .local string key1
@@ -84,7 +84,7 @@ OUT
 
 ##############################
 output_is(<<'CODE', <<'OUT', "escaped");
-.sub MAIN
+.sub _MAIN
    $S0 = "\""
    print $S0
    print "\\"

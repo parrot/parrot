@@ -132,8 +132,11 @@ static Instruction * iLABEL(SymReg * r0) {
 static Instruction * iSUBROUTINE(SymReg * r0) {
     Instruction *i;
     function = r0->name;
-    i =  iLABEL(r0); /* XXX mark label global */
+    i =  iLABEL(r0);
     i->line = line - 1;
+    if (*r0->name != '_')
+        fataly(EX_SOFTWARE, "iSUBROUTINE", line,
+        "illegal local label '%s'\n", r0->name);
     return i;
 }
 
