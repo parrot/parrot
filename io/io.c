@@ -79,6 +79,53 @@ new_io_pmc(theINTERP, ParrotIO *io)
 
 /*
 
+=item C<STRING *PIO_make_io_string(Interp *, STRING **buf, size_t default_len)>
+
+Create a STRING* suitable for returning results from IO read functions.
+The passed in C<buf> parameter can be either:
+
+  1) Point to a NULL STRING
+  2) Point to a real STRING
+  3) Point to a fake STRING with (strstart, bufused) holding the *buffer
+     information.
+
+In case 3) the buffer or STRING must be able to hold the required
+amount of data. For case 1) or 2) with a NULL strstart the STRING memory
+gets allocated.
+
+=cut
+
+*/
+
+STRING *
+PIO_make_io_string(Interp *interpreter, STRING **buf, size_t default_len)
+{
+    size_t len;
+    STRING *s;
+    /*
+     * when we get a NULL string, we read a default len
+     */
+    if (*buf == NULL) {
+	*buf = new_string_header(interpreter, 0);
+        (*buf)->bufused = default_len;
+    }
+    s = *buf;
+    len = s->bufused;
+    if (!s->strstart && len) {
+        PObj_bufstart(s) = s->strstart = mem_sys_allocate(len);
+        PObj_buflen(s) = len;
+        PObj_sysmem_SET(s);
+        s->representation = enum_stringrep_one;
+        /*
+         * TODO encoding = raw
+         */
+    }
+    return s;
+}
+
+
+/*
+
 =item C<ParrotIOTable
 alloc_pio_array(int numhandles)>
 
@@ -492,7 +539,7 @@ PIO_peek(theINTERP, PMC *pmc, void *buffer)>
 */
 
 INTVAL
-PIO_peek(theINTERP, PMC *pmc, void *buffer)
+PIO_peek(theINTERP, PMC *pmc, STRING **buffer)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
@@ -730,6 +777,11 @@ PIO_flush(theINTERP, PMC *pmc)
 
 /*
 
+=item C<STRING *
+PIO_reads(theINTERP, PMC *pmc, size_t len)>
+
+Return a new C<STRING*> holding up to C<len> bytes.
+
 =item C<INTVAL
 PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)>
 
@@ -743,16 +795,17 @@ Reads up to C<len> bytes from C<*pmc> and copys them into C<*buffer>.
 STRING *
 PIO_reads(theINTERP, PMC *pmc, size_t len)
 {
-	char *buffer = malloc(len);
-	UINTVAL length_read = 0;
-	STRING *temp = NULL;
+    STRING *res = new_string_header(interpreter, 0);
+    ParrotIOLayer *l = PMC_struct_val(pmc);
+    ParrotIO *io = PMC_data(pmc);
 
-	length_read = PIO_read(interpreter, pmc, buffer, len);
-	temp = string_make(interpreter, buffer, length_read, "iso-8859-1", 0);
+    if (!io)
+        return res;
 
-	free(buffer);
+    res->bufused = len;
+    PIO_read_down(interpreter, l, io, &res);
 
-	return temp;
+    return res;
 }
 
 INTVAL
@@ -760,10 +813,14 @@ PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = PMC_struct_val(pmc);
     ParrotIO *io = PMC_data(pmc);
-    if(!io)
+    STRING *res = new_string_header(interpreter,
+            PObj_bufstart_external_FLAG|PObj_external_FLAG);
+    if (!io)
         return -1;
 
-    return PIO_read_down(interpreter, l, io, buffer, len);
+    res->strstart = buffer;
+    res->bufused = len;
+    return PIO_read_down(interpreter, l, io, &res);
 }
 
 /*

@@ -58,7 +58,7 @@ static ParrotIO *PIO_win32_fdopen(theINTERP, ParrotIOLayer *layer,
 static INTVAL PIO_win32_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static INTVAL PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_win32_read(theINTERP, ParrotIOLayer *layer,
-                                ParrotIO *io, void *buffer, size_t len);
+                                ParrotIO *io, STRING **);
 static size_t    PIO_win32_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, STRING *);
 static PIOOFF_T  PIO_win32_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
@@ -359,7 +359,7 @@ PIO_win32_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
 =item C<static size_t
 PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               void *buffer, size_t len)>
+               STRING ** buf)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -369,17 +369,24 @@ descriptor to the memory starting at C<buffer>.
 */
 
 static size_t
-PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               void *buffer, size_t len)
+PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
     DWORD countread;
+    void *buffer;
+    size_t len;
+    STRING *s;
 
-    UNUSED(interpreter);
     UNUSED(layer);
 
+    s = PIO_make_io_string(interpreter, buf, 2048);
+    len = s->bufused;
+    buffer = s->strstart;
+
     if (ReadFile(io->fd, (LPVOID) buffer, (DWORD) len, &countread, NULL)) {
-        if (countread > 0)
+        if (countread > 0) {
+            s->bufused = s->strlen = countread;
             return (size_t)countread;
+        }
         else if (len > 0)
             /* EOF if read 0 and bytes were requested */
             io->flags |= PIO_F_EOF;
@@ -388,6 +395,7 @@ PIO_win32_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         /* FIXME : An error occured */
     }
 
+    s->bufused = s->strlen = 0;
     return 0;
 }
 

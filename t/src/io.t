@@ -655,11 +655,15 @@ the_test(Interp *interpreter,
     ParrotIO *io;
     char peekbuf[1024], readbuf[1024];
     UINTVAL len;
+    STRING fake, *s;
 
     io = PIO_open(interpreter, NULL, "temp.file", "<");
 
     do {
-      len = PIO_peek(interpreter, io, peekbuf);
+      fake.strstart = peekbuf;
+      fake.bufused = 1;
+      s = &fake;
+      len = PIO_peek(interpreter, io, &s);
       peekbuf[len] = '\0';
 
       len = PIO_read(interpreter, io, readbuf, 1);

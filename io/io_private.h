@@ -125,6 +125,7 @@ struct _ParrotIOData {
 /* functions internal to the subsystem */
 extern ParrotIOTable alloc_pio_array(int);
 extern int realloc_pio_array(ParrotIOTable *, int);
+extern STRING * PIO_make_io_string(Interp *interpreter, STRING **buf, size_t);
 
 /* redefine PIO_STD* for internal use */
 #define PIO_STDIN(i)   (((ParrotIOData*)i->piodata)->table[PIO_STDIN_FILENO])
@@ -148,11 +149,11 @@ size_t    PIO_write_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
 size_t    PIO_write_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                                STRING *, DummyCodeRef *);
 size_t    PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                        void * buf, size_t len);
+                        STRING **);
 size_t    PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                              void * buf, size_t len, DummyCodeRef *);
+                              STRING **, DummyCodeRef *);
 size_t    PIO_peek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                        void * buf);
+                        STRING **);
 INTVAL    PIO_flush_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io);
 PIOOFF_T  PIO_seek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
                         PIOOFF_T offset, INTVAL whence);
@@ -197,14 +198,13 @@ struct _ParrotIOLayerAPI {
     size_t          (*Write_ASync)(theINTERP, ParrotIOLayer * layer,
                                    ParrotIO * io, STRING *, DummyCodeRef *);
     size_t          (*Read)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, void * buf, size_t len);
+                            ParrotIO * io, STRING **);
     size_t          (*Read_ASync)(theINTERP, ParrotIOLayer * layer,
-                                  ParrotIO * io, void * buf, size_t len,
-                                  DummyCodeRef *);
+                                  ParrotIO * io, STRING **, DummyCodeRef *);
     INTVAL          (*Flush)(theINTERP, ParrotIOLayer * layer,
                              ParrotIO * io);
     size_t          (*Peek)(theINTERP, ParrotIOLayer * layer,
-                            ParrotIO * io, void * buf);
+                            ParrotIO * io, STRING ** buf);
     PIOOFF_T        (*Seek)(theINTERP, ParrotIOLayer * layer,
                             ParrotIO * io, PIOOFF_T offset, INTVAL whence);
     PIOOFF_T        (*Tell)(theINTERP, ParrotIOLayer * layer,
@@ -241,11 +241,10 @@ struct _ParrotIOLayerAPI {
 #define PIO_null_close (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_write (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING*))0
 #define PIO_null_write_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING *,DummyCodeRef *))0
-#define PIO_null_read (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t))0
-#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
+#define PIO_null_read (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
+#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING **, DummyCodeRef *))0
 #define PIO_null_flush (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
-#define PIO_null_peek (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *))0
-#define PIO_null_read_async (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, void *, size_t, DummyCodeRef *))0
+#define PIO_null_peek (size_t (*)(theINTERP, ParrotIOLayer *, ParrotIO *, STRING**))0
 #define PIO_null_seek (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *, PIOOFF_T, INTVAL))0
 #define PIO_null_tell (PIOOFF_T (*)(theINTERP, ParrotIOLayer *, ParrotIO *))0
 #define PIO_null_setbuf (INTVAL (*)(theINTERP, ParrotIOLayer *, ParrotIO *, size_t))0

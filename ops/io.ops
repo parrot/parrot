@@ -341,21 +341,12 @@ Warning: This is a quick hack.
 
 op read(out STR, in INT) :base_io {
   UINTVAL n;
-  if($2 >= 65535)
-    n = 65535;
-  else
-    n = $2;
-  $1 = PIO_reads(interpreter, PIO_STDIN(interpreter), (size_t)n);
+  $1 = PIO_reads(interpreter, PIO_STDIN(interpreter), (size_t)$2);
   goto NEXT();
 }
 
 op read(out STR, in PMC, in INT) :base_io {
-  UINTVAL n;
-  if($3 >= 65535)
-    n = 65535;
-  else
-    n = $3;
-  $1 = PIO_reads(interpreter, $2, (size_t)n);
+  $1 = PIO_reads(interpreter, $2, (size_t)$3);
   goto NEXT();
 }
 
@@ -373,16 +364,14 @@ inline op readline(out STR, in PMC) :base_io {
   opcode_t * resume = expr NEXT();
   /* experimental error handling, mainly for t/pmc/io_5.pasm */
   int ok = VTABLE_get_bool(interpreter, $2);
+  $1 = NULL;
   if (!ok)
       real_exception(interpreter, resume, PIO_ERROR,
           "File not found");
-  $1 = string_make_empty(interpreter, enum_stringrep_one, 65535);
-  memset(($1)->strstart, 0, 65535);
 
   if ($2) {
     PIO_setlinebuf(interpreter, $2);
-    len = PIO_read(interpreter, $2, ($1)->strstart, 65534);
-    ($1)->strlen = ($1)->bufused = len;
+    $1 = PIO_reads(interpreter, $2, 0);
   }
   goto NEXT();
 }
@@ -402,29 +391,18 @@ remove it from the stream.
 =cut
 
 op peek(out STR) :base_io {
-  INTVAL nr;
+  STRING **s = &$1;
 
-  $1 = string_make_empty(interpreter, enum_stringrep_one, 1);
-  memset(($1)->strstart, 0, 1);
-  nr = PIO_peek(interpreter, PIO_STDIN(interpreter),
-                ($1)->strstart);
-  if(nr > 0)
-    ($1)->strlen = ($1)->bufused = nr;
-  else
-    ($1)->strlen = ($1)->bufused = 0;
+  *s = NULL;
+  PIO_peek(interpreter, PIO_STDIN(interpreter), s);
   goto NEXT();
 }
 
 op peek(out STR, in PMC) :base_io {
-  INTVAL nr;
+  STRING **s = &$1;
 
-  $1 = string_make_empty(interpreter, enum_stringrep_one, 1);
-  memset(($1)->strstart, 0, 1);
-  nr = PIO_peek(interpreter, $2, ($1)->strstart);
-  if(nr > 0)
-    ($1)->strlen = ($1)->bufused = nr;
-  else
-    ($1)->strlen = ($1)->bufused = 0;
+  *s = NULL;
+  PIO_peek(interpreter, $2, s);
   goto NEXT();
 }
 

@@ -20,6 +20,7 @@ The "buf" layer of Parrot IO. Buffering and all the fun stuff.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include <assert.h>
 
 /* Defined at bottom */
 extern ParrotIOLayerAPI pio_buf_layer_api;
@@ -48,18 +49,18 @@ static ParrotIO *PIO_buf_fdopen(theINTERP, ParrotIOLayer *l,
 static INTVAL    PIO_buf_close(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static INTVAL    PIO_buf_flush(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static size_t    PIO_buf_read(theINTERP, ParrotIOLayer *l,
-                              ParrotIO *io, void *buffer, size_t len);
+                              ParrotIO *io, STRING **);
 static size_t    PIO_buf_write(theINTERP, ParrotIOLayer *l,
                                ParrotIO *io, STRING *s);
 static size_t    PIO_buf_peek(theINTERP, ParrotIOLayer *l,
-                              ParrotIO *io, void *buffer);
+                              ParrotIO *io, STRING **);
 static PIOOFF_T  PIO_buf_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                               PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_buf_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);
 static size_t    PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *l,
                                       ParrotIO *io, ParrotIOBuf *b);
 static size_t    PIO_buf_readline(theINTERP, ParrotIOLayer *l, ParrotIO *io,
-                                  void *buffer, size_t len);
+                                  STRING **);
 
 
 /* XXX: This is not portable */
@@ -349,9 +350,13 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 {
     size_t got;
     PIOOFF_T pos = io->fpos;
+    STRING fake, *s;
+    fake.strstart = b->startb;
+    fake.bufused  = b->size;
+    s = &fake;
 
     got = PIO_read_down(interpreter, PIO_DOWNLAYER(layer),
-                        io, b->startb, b->size);
+                        io, &s);
     /* buffer-filling does not change fileposition */
     io->fpos = pos;
 
@@ -371,7 +376,7 @@ PIO_buf_fill_readbuf(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
 =item C<static size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               void *buffer, size_t len)>
+               STRING **buf)>
 
 The buffer layer's C<Read> function.
 
@@ -381,11 +386,13 @@ The buffer layer's C<Read> function.
 
 static size_t
 PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-               void *buffer, size_t len)
+               STRING **buf)
 {
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
-    unsigned char *out_buf = buffer;
+    unsigned char *out_buf;
+    STRING *s;
+    size_t len;
     size_t current = 0;
 
     /* write buffer flush */
@@ -397,9 +404,20 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     /* line buffered read */
     if (io->flags & PIO_F_LINEBUF) {
-        return PIO_buf_readline(interpreter, layer, io, buffer, len);
+        return PIO_buf_readline(interpreter, layer, io, buf);
     }
 
+    if (*buf == NULL) {
+	*buf = new_string_header(interpreter, 0);
+        (*buf)->bufused = len = 2048;
+    }
+    s = *buf;
+    len = s->bufused;
+    if (!s->strstart) {
+        PObj_bufstart(s) = s->strstart = mem_sys_allocate(len);
+        PObj_sysmem_SET(s);
+    }
+    out_buf = s->strstart;
     /* read Data from buffer */
     if (b->flags & PIO_BF_READBUF) {
         size_t avail = b->endb - b->next;
@@ -418,6 +436,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
         }
 
         if (len == current) {
+            s->strlen = s->bufused = len;
             return current;
         }
         else {
@@ -431,8 +450,12 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (!(b->flags & PIO_BF_READBUF)) {
         size_t got;
         if (len >= io->b.size) {
-            got = PIO_read_down(interpreter, PIO_DOWNLAYER(l),
-                                           io, out_buf, len);
+            STRING fake, *sf;
+            fake.strstart = out_buf;
+            fake.bufused  = len;
+            sf = &fake;
+            got = PIO_read_down(interpreter, PIO_DOWNLAYER(l), io, &sf);
+            s->strlen = s->bufused = current + got;
             io->fpos += got;
             return current + got;
         }
@@ -444,6 +467,7 @@ PIO_buf_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
 
     /* read from the read_buffer */
     memcpy(out_buf, io->b.next, len);
+    s->strlen = s->bufused = current + len;
     io->b.next += len;
     io->fpos += len;
 
@@ -471,12 +495,14 @@ that is what is required.
 */
 
 static size_t
-PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
+PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
-    unsigned char *out_buf = buffer;
     ParrotIOLayer *l = layer;
     ParrotIOBuf *b;
     size_t len = 1;
+    STRING *s;
+
+    s = PIO_make_io_string(interpreter, buf, 1);
 
     /* write buffer flush */
     if (io->b.flags & PIO_BF_WRITEBUF) {
@@ -491,7 +517,9 @@ PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
 
         /* if we have data available, copy out the next byte */
         if (avail) {
-            memcpy(out_buf, b->next, len);
+ret_string:
+            memcpy(s->strstart, b->next, len);
+            s->bufused = s->strlen = len;
             return len;
         }
     }
@@ -508,20 +536,28 @@ PIO_buf_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
     }
 
     /* if we got any data, then copy out the next byte */
-    memcpy(out_buf, io->b.next, len);
-
-    return len;
+    goto ret_string;
 }
 
 
 static size_t
 PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-                 void *buffer, size_t len)
+                 STRING **buf)
 {
-    size_t l = 0;
-    unsigned char *out_buf = buffer;
+    size_t l;
+    unsigned char *out_buf;
     unsigned char *buf_start;
     ParrotIOBuf *b = &io->b;
+    size_t len;
+    STRING *s;
+    int may_realloc;
+
+    if (*buf == NULL) {
+        *buf = new_string_header(interpreter, PObj_sysmem_FLAG);
+    }
+    s = *buf;
+    s->strlen = 0;
+    may_realloc = s->strstart == NULL;
 
     /* fill empty buffer */
     if (!(b->flags & PIO_BF_READBUF)) {
@@ -530,21 +566,45 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     }
 
     buf_start = b->next;
-    while (l < len) {
+    for (l = 0; ; ) {
         l++;
         if (IS_EOL(io, b->next++)) {
             break;
         }
         /* buffer completed; copy out and refill */
         if (b->next == b->endb) {
-            memcpy(out_buf, buf_start, b->endb - buf_start);
-            out_buf += b->endb - buf_start;
+            len = b->endb - buf_start;
+            if (s->bufused < l) {
+                if (may_realloc) {
+                    s->representation = enum_stringrep_one;
+                    PObj_bufstart(s) = s->strstart =
+                        mem_sys_realloc(s->strstart, l);
+                    PObj_buflen(s) = l;
+                }
+                else
+                    internal_exception(1, "readline: buffer too short");
+            }
+            out_buf = (char*)s->strstart + s->strlen;
+            memcpy(out_buf, buf_start, len);
+            s->strlen = l;
             if (PIO_buf_fill_readbuf(interpreter, layer, io, b) == 0)
                 return l;
             buf_start = b->startb;
         }
     }
-    memcpy(out_buf, buf_start, b->next - buf_start);
+    if (s->bufused < l) {
+        if (may_realloc) {
+            s->representation = enum_stringrep_one;
+            PObj_bufstart(s) = s->strstart = mem_sys_realloc(s->strstart, l);
+            PObj_buflen(s) = l;
+        }
+        else
+            internal_exception(1, "readline: buffer too short");
+    }
+    out_buf = (char*)s->strstart + s->strlen;
+    len = b->next - buf_start;
+    memcpy(out_buf, buf_start, len);
+    s->strlen = s->bufused = l;
 
     /* check if buffer is finished */
     if (b->next == b->endb) {

@@ -53,11 +53,11 @@ static ParrotIO *PIO_stdio_fdopen(theINTERP, ParrotIOLayer *layer,
 static INTVAL PIO_stdio_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static INTVAL PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_stdio_read(theINTERP, ParrotIOLayer *layer,
-                                ParrotIO *io, void *buffer, size_t len);
+                                ParrotIO *io, STRING **);
 static size_t    PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
                                  ParrotIO *io, STRING *s);
 static size_t    PIO_stdio_peek(theINTERP, ParrotIOLayer *layer,
-                                ParrotIO *io, void *buffer);
+                                ParrotIO *io, STRING **);
 static PIOOFF_T  PIO_stdio_seek(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
                                 PIOOFF_T offset, INTVAL whence);
 static PIOOFF_T  PIO_stdio_tell(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
@@ -265,20 +265,25 @@ PIO_stdio_isatty(PIOHANDLE fptr)
 }
 
 static size_t
-PIO_stdio_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, void *buffer)
+PIO_stdio_peek(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING **buf)
 {
     FILE *fptr = (FILE *)io->fd;
     size_t bytes;
+    STRING *s;
 
-    UNUSED(interpreter);
     UNUSED(layer);
+    s = PIO_make_io_string(interpreter, buf, 1);
 
     /* read the next byte into the buffer */
-    bytes = fread((char *)buffer, 1, 1, fptr);
+    bytes = fread(s->strstart, 1, 1, fptr);
 
     /* if we got anything from the stream, push it back on */
-    if (bytes)
-        ungetc(((char *)buffer)[0], fptr);
+    if (bytes) {
+        s->bufused = s->strlen = 1;
+        ungetc(*(char*)s->strstart, fptr);
+    }
+    else
+        s->bufused = s->strlen = 1;
 
     return bytes;
 }
@@ -328,7 +333,7 @@ PIO_stdio_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
 =item C<static size_t
 PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-              void *buffer, size_t len)>
+              STRING **)>
 
 Desc.
 
@@ -338,15 +343,22 @@ Desc.
 
 static size_t
 PIO_stdio_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-              void *buffer, size_t len)
+              STRING ** buf)
 {
     size_t bytes;
     FILE *fptr = (FILE *)io->fd;
+    void *buffer;
+    size_t len;
+    STRING *s;
 
-    UNUSED(interpreter);
     UNUSED(layer);
 
+    s = PIO_make_io_string(interpreter, buf, 2048);
+    len = s->bufused;
+    buffer = s->strstart;
+
     bytes = fread(buffer, 1, len, fptr);
+    s->bufused = s->strlen = bytes;
 
     if (bytes != len) {
         if (feof(fptr)) {

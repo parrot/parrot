@@ -57,7 +57,7 @@ static ParrotIO *PIO_unix_fdopen(theINTERP, ParrotIOLayer *layer,
 static INTVAL    PIO_unix_close(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static INTVAL    PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io);
 static size_t    PIO_unix_read(theINTERP, ParrotIOLayer *layer,
-                               ParrotIO *io, void *buffer, size_t len);
+                               ParrotIO *io, STRING **);
 static size_t    PIO_unix_write(theINTERP, ParrotIOLayer *layer,
                                 ParrotIO *io, STRING *);
 static PIOOFF_T  PIO_unix_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
@@ -442,7 +442,7 @@ PIO_unix_flush(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
 
 =item C<static size_t
 PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-              void *buffer, size_t len)>
+              STRING ** buf)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -453,22 +453,31 @@ C<buffer>.
 
 static size_t
 PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
-              void *buffer, size_t len)
+              STRING **buf)
 {
     int bytes;
+    void *buffer;
+    size_t len;
+    STRING *s;
 
-    UNUSED(interpreter);
     UNUSED(layer);
+
+    s = PIO_make_io_string(interpreter, buf, 2048);
+    len = s->bufused;
+    buffer = s->strstart;
 
     for (;;) {
         bytes = read(io->fd, buffer, len);
-        if (bytes > 0)
+        if (bytes > 0) {
+            s->bufused = s->strlen = bytes;
             return bytes;
+        }
         else if (bytes < 0) {
             switch (errno) {
             case EINTR:
                 continue;
             default:
+                s->bufused = s->strlen = 0;
                 return bytes;
             }
         }
@@ -476,6 +485,7 @@ PIO_unix_read(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             /* Read returned 0, EOF if len requested > 0 */
             if (len > 0)
                 io->flags |= PIO_F_EOF;
+            s->bufused = s->strlen = 0;
             return bytes;
         }
     }
@@ -950,12 +960,14 @@ AGAIN:
 #if PIO_TRACE
                 PIO_eprintf(interpreter, "recv: Connection reset by peer\n");
 #endif
+                *s = string_make_empty(interpreter, enum_stringrep_one, 0);
                 return -1;
             default:
                 close(io->fd);
 #if PIO_TRACE
                 PIO_eprintf(interpreter, "recv: errno = %d\n", errno);
 #endif
+                *s = string_make_empty(interpreter, enum_stringrep_one, 0);
                 return -1;
         }
     }

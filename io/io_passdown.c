@@ -124,7 +124,7 @@ Returns C<-1> if no implementation is found.
 */
 
 size_t
-PIO_peek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, void * buf)
+PIO_peek_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
 {
     while (layer) {
         if (layer->api->Peek) {
@@ -223,12 +223,11 @@ Returns C<0> if no implementation is found.
 */
 
 size_t
-PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, void * buf,
-              size_t len)
+PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, STRING ** buf)
 {
     while (layer) {
         if (layer->api->Read) {
-            return layer->api->Read(interpreter, layer, io, buf, len);
+            return layer->api->Read(interpreter, layer, io, buf);
         }
         layer = PIO_DOWNLAYER(layer);
     }
@@ -240,7 +239,7 @@ PIO_read_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io, void * buf,
 
 =item C<size_t
 PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                    void * buf, size_t len, DummyCodeRef *dummy)>
+                    STRING ** buf, DummyCodeRef *dummy)>
 
 Looks for the implementation of C<Read_ASync> and calls it if found,
 returning its return value.
@@ -253,12 +252,11 @@ Returns C<0> if no implementation is found.
 
 size_t
 PIO_read_async_down(theINTERP, ParrotIOLayer * layer, ParrotIO * io,
-                    void * buf, size_t len, DummyCodeRef *dummy)
+                    STRING ** buf, DummyCodeRef *dummy)
 {
     while (layer) {
         if (layer->api->Read_ASync) {
-            return layer->api->Read_ASync(interpreter, layer, io, buf, len,
-                                          dummy);
+            return layer->api->Read_ASync(interpreter, layer, io, buf, dummy);
         }
         layer = PIO_DOWNLAYER(layer);
     }

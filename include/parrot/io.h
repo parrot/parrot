@@ -174,7 +174,7 @@ extern INTVAL PIO_write(theINTERP, PMC *, const void *, size_t);
 extern INTVAL PIO_setbuf(theINTERP, PMC *, size_t);
 extern INTVAL PIO_setlinebuf(theINTERP, PMC *);
 extern INTVAL PIO_puts(theINTERP, PMC *, const char *);
-extern INTVAL PIO_peek(theINTERP, PMC *, void *);
+extern INTVAL PIO_peek(theINTERP, PMC *, STRING **);
 extern PIOOFF_T PIO_seek(theINTERP, PMC *, PIOOFF_T offset, INTVAL whence);
 extern INTVAL PIO_eof(theINTERP, PMC *);
 extern INTVAL PIO_pioctl(theINTERP, PMC *, INTVAL cmd, INTVAL arg);
