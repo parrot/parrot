@@ -1,11 +1,25 @@
-VERSION=${VERSION}${DEVEL}
+###############################################################################
+#
+# INSTALL CONFIGURATIONS:
+#
+###############################################################################
+
+VERSION     = ${VERSION}${DEVEL}
 
 BUILDPREFIX =
-PREFIX = /usr/local/parrot/${VERSION}
+PREFIX      = /usr/local/parrot/${VERSION}
 EXEC_PREFIX = $(PREFIX)
-BINDIR = $(EXEC_PREFIX)/bin
-LIBDIR = $(EXEC_PREFIX)/lib
-INCLUDEDIR = $(EXEC_PREFIX)/include
+BINDIR      = $(EXEC_PREFIX)/bin
+LIBDIR      = $(EXEC_PREFIX)/lib
+INCLUDEDIR  = $(EXEC_PREFIX)/include
+
+###############################################################################
+#
+# SOURCE CONFIGURATIONS:
+#
+# Set up information about directies, where the sources can be found.
+#
+###############################################################################
 
 # imcc dir
 IMCC_DIR = imcc
@@ -22,26 +36,32 @@ BUILD_TOOL = build_tools
 # file containing main
 PARROT_MAIN = $(IMCC_DIR)/main
 
+###############################################################################
+#
+# COMMANDS CONFIGURATIONS:
+#
+# Set up some commands which are used below.
+#
+###############################################################################
 
 # programs and utils used for build
-RM_F = ${rm_f}
-RM_RF = ${rm_rf}
-AR_CR = ${ar} ${ar_flags}
-RANLIB = ${ranlib}
-LINK = ${link}
-LD = ${ld}
+RM_F      = ${rm_f}
+RM_RF     = ${rm_rf}
+AR_CR     = ${ar} ${ar_flags}
+RANLIB    = ${ranlib}
+LINK      = ${link}
+LD        = ${ld}
 LD_SHARED = ${ld_shared}
-TOUCH  = $(PERL) -e ${PQ}open(A,qq{>>$$_}) or die foreach @ARGV${PQ}
-YACC = ${yacc}
-LEX = ${lex}
+TOUCH     = $(PERL) -e ${PQ}open(A,qq{>>$$_}) or die foreach @ARGV${PQ}
+YACC      = ${yacc}
+LEX       = ${lex}
 
 # file extensions and util flags
-O = ${o}
-SO = ${so}
-A = ${a}
-LD_OUT = ${ld_out}
-LD_SHARED_FLAGS=${ld_shared_flags}
-
+O               = ${o}
+SO              = ${so}
+A               = ${a}
+LD_OUT          = ${ld_out}
+LD_SHARED_FLAGS = ${ld_shared_flags}
 
 INC=./${inc}
 
@@ -61,27 +81,41 @@ NONGEN_HEADERS = ${nongen_headers}
 #
 ###############################################################################
 
-GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
-	languages/jako/Makefile languages/miniperl/Makefile \
-	languages/scheme/Makefile languages/befunge/Makefile \
-	languages/bf/Makefile imcc/Makefile \
-	languages/ook/Makefile languages/perl6/Makefile \
-	languages/urm/Makefile languages/tcl/Makefile
+GEN_MAKEFILES = \
+    Makefile \
+    classes/Makefile \
+    languages/Makefile \
+    docs/Makefile \
+    languages/jako/Makefile \
+    languages/miniperl/Makefile \
+    languages/scheme/Makefile \
+    languages/befunge/Makefile \
+    languages/bf/Makefile \
+    imcc/Makefile \
+    languages/ook/Makefile \
+    languages/perl6/Makefile \
+    languages/urm/Makefile \
+    languages/tcl/Makefile
 
-GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
-	include/parrot/platform_interface.h \
-	include/parrot/has_header.h \
-	include/parrot/feature.h \
-	lib/Parrot/Config.pm lib/Parrot/PMC.pm $(SRC)/platform.c \
-	include/parrot/core_pmcs.h $(SRC)/core_pmcs.c \
-	CFLAGS imcc/CFLAGS \
-	libparrot.def
+GEN_CONFIGS = \
+    include/parrot/config.h \
+    include/parrot/platform.h \
+    include/parrot/platform_interface.h \
+    include/parrot/has_header.h \
+    include/parrot/feature.h \
+    include/parrot/core_pmcs.h \
+    lib/Parrot/Config.pm \
+    lib/Parrot/PMC.pm \
+    $(SRC)/platform.c \
+    $(SRC)/core_pmcs.c \
+    CFLAGS imcc/CFLAGS \
+    libparrot.def
 
 # most of these are generatey by config/gen/parrot_include.pl
 
 GEN_PASM_INCLUDES = \
-	runtime/parrot/include/signal.pasm	\
-	${gen_pasm_includes}
+    runtime/parrot/include/signal.pasm \
+    ${gen_pasm_includes}
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig $(GEN_PASM_INCLUDES)
 
@@ -98,18 +132,31 @@ STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) myconfig $(GEN_PASM_INCLUDES)
 
 GEN_OPSFILES =
 
-GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
-	$(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h
+GEN_HEADERS = \
+    $(INC)/vtable.h \
+    $(INC)/oplib/core_ops.h \
+    $(INC)/oplib/core_ops_prederef.h \
+    $(INC)/oplib/core_ops_switch.h
 
-GEN_SOURCES = $(SRC)/core_ops.c $(SRC)/core_ops_prederef.c $(SRC)/fingerprint.c $(SRC)/nci.c \
-              $(SRC)/core_ops_switch.c $(SRC)/jit_cpu.c $(SRC)/exec_cpu.c
+GEN_SOURCES = \
+    $(SRC)/core_ops.c \
+    $(SRC)/core_ops_prederef.c  \
+    $(SRC)/fingerprint.c \
+    $(SRC)/nci.c \
+    $(SRC)/core_ops_switch.c \
+    $(SRC)/jit_cpu.c \
+    $(SRC)/exec_cpu.c
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
 # the dependencies of jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causses unnecessary recompile of all
-FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES) $(INC)/jit_emit.h
+FLUID_FILES = \
+    $(GEN_OPSFILES) \
+    $(GEN_HEADERS) \
+    $(GEN_SOURCES) \
+    $(GEN_MODULES) \
+    $(INC)/jit_emit.h
 
 
 ###############################################################################
@@ -120,40 +167,40 @@ FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES) $(INC
 
 # these are private to the imcc subsystem
 IMCC_H_FILES = \
-	$(IMCC_DIR)/imc.h 	\
-	$(IMCC_DIR)/stacks.h 	\
-	$(IMCC_DIR)/cfg.h 	\
-	$(IMCC_DIR)/class.h 	\
-	$(IMCC_DIR)/instructions.h 	\
-	$(IMCC_DIR)/debug.h 	\
-	$(IMCC_DIR)/sets.h 	\
-	$(IMCC_DIR)/symbol.h 	\
-	$(IMCC_DIR)/symreg.h 	\
-	$(IMCC_DIR)/pbc.h 	\
-	$(IMCC_DIR)/optimizer.h 	\
-	$(IMCC_DIR)/parser.h 	\
-	$(IMCC_DIR)/imcparser.h
+    $(IMCC_DIR)/imc.h \
+    $(IMCC_DIR)/stacks.h \
+    $(IMCC_DIR)/cfg.h \
+    $(IMCC_DIR)/class.h \
+    $(IMCC_DIR)/instructions.h \
+    $(IMCC_DIR)/debug.h \
+    $(IMCC_DIR)/sets.h \
+    $(IMCC_DIR)/symbol.h \
+    $(IMCC_DIR)/symreg.h \
+    $(IMCC_DIR)/pbc.h \
+    $(IMCC_DIR)/optimizer.h \
+    $(IMCC_DIR)/parser.h \
+    $(IMCC_DIR)/imcparser.h
 
 IMCC_O_FILES = \
-	$(IMCC_DIR)/imcparser$(O) 	\
-	$(IMCC_DIR)/imclexer$(O) 	\
-	$(IMCC_DIR)/imc$(O) 	\
-	$(IMCC_DIR)/stacks$(O) 	\
-	$(IMCC_DIR)/symbol$(O) 	\
-	$(IMCC_DIR)/class$(O) 	\
-	$(IMCC_DIR)/symreg$(O) 	\
-	$(IMCC_DIR)/instructions$(O) 	\
-	$(IMCC_DIR)/cfg$(O) 	\
-	$(IMCC_DIR)/reg_alloc$(O) 	\
-	$(IMCC_DIR)/sets$(O) 	\
-	$(IMCC_DIR)/debug$(O) 	\
-	$(IMCC_DIR)/optimizer$(O) 	\
-	$(IMCC_DIR)/pbc$(O) 	\
-	$(IMCC_DIR)/parser_util$(O)	\
-	$(IMCC_DIR)/jit$(O) 	\
-	$(IMCC_DIR)/sub$(O) 	\
-	$(IMCC_DIR)/fastcall$(O) 	\
-	$(IMCC_DIR)/pcc$(O)
+    $(IMCC_DIR)/imcparser$(O) \
+    $(IMCC_DIR)/imclexer$(O) \
+    $(IMCC_DIR)/imc$(O) \
+    $(IMCC_DIR)/stacks$(O) \
+    $(IMCC_DIR)/symbol$(O) \
+    $(IMCC_DIR)/class$(O) \
+    $(IMCC_DIR)/symreg$(O) \
+    $(IMCC_DIR)/instructions$(O) \
+    $(IMCC_DIR)/cfg$(O) \
+    $(IMCC_DIR)/reg_alloc$(O) \
+    $(IMCC_DIR)/sets$(O) \
+    $(IMCC_DIR)/debug$(O) \
+    $(IMCC_DIR)/optimizer$(O) \
+    $(IMCC_DIR)/pbc$(O) \
+    $(IMCC_DIR)/parser_util$(O) \
+    $(IMCC_DIR)/jit$(O) \
+    $(IMCC_DIR)/sub$(O) \
+    $(IMCC_DIR)/fastcall$(O) \
+    $(IMCC_DIR)/pcc$(O)
 
 GENERAL_H_FILES = $(NONGEN_HEADERS) $(GEN_HEADERS) ${cg_h}
 
@@ -164,34 +211,89 @@ CLASS_PMC_FILES = ${pmc_classes_pmc}
 
 CLASS_O_FILES = ${pmc_classes_o}
 
-ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) \
-	encodings/utf16$(O) encodings/utf32$(O) encodings/dbcs$(O)
+ENCODING_O_FILES = \
+    encodings/singlebyte$(O) \
+    encodings/utf8$(O) \
+    encodings/utf16$(O) \
+    encodings/utf32$(O) \
+    encodings/dbcs$(O)
 
 CHARTYPE_O_FILES = chartypes/unicode$(O) chartypes/usascii$(O)
 
-IO_O_FILES = io/io$(O) io/io_buf$(O) io/io_unix$(O) io/io_win32$(O) \
-	io/io_stdio$(O) io/io_passdown$(O)
+IO_O_FILES = \
+    io/io$(O) \
+    io/io_buf$(O) \
+    io/io_unix$(O) \
+    io/io_win32$(O) \
+    io/io_stdio$(O) \
+    io/io_passdown$(O)
 
-INTERP_O_FILES = $(SRC)/exceptions$(O) $(SRC)/global_setup$(O) $(SRC)/interpreter$(O)  \
-	$(SRC)/register$(O) $(SRC)/core_ops$(O) $(SRC)/core_ops_prederef$(O) $(SRC)/core_ops_switch$(O) \
-	$(SRC)/memory$(O) $(SRC)/objects$(O) ${exec_o} \
-	$(SRC)/packfile$(O) pf/pf_items$(O) \
-	$(SRC)/stacks$(O) $(SRC)/string$(O) $(SRC)/sub$(O) $(SRC)/encoding$(O) \
-	$(SRC)/chartype$(O) $(SRC)/runops_cores$(O) $(SRC)/trace$(O) \
-	$(SRC)/pmc$(O) $(SRC)/pmc_freeze$(O) $(SRC)/key$(O) $(SRC)/hash$(O) \
-	$(SRC)/core_pmcs$(O) $(SRC)/platform$(O) ${jit_o} \
-	${gc_o} $(SRC)/rx$(O) $(SRC)/rxstacks$(O) $(SRC)/intlist$(O) $(SRC)/list$(O) \
-	$(SRC)/embed$(O) $(SRC)/warnings$(O)  ${cg_o} \
-	$(SRC)/packout$(O) $(SRC)/byteorder$(O) $(SRC)/debug$(O) $(SRC)/smallobject$(O) \
-	$(SRC)/headers$(O) $(SRC)/dod$(O) $(SRC)/method_util$(O) $(SRC)/exit$(O) \
-	$(SRC)/misc$(O) $(SRC)/spf_render$(O) $(SRC)/spf_vtable$(O) $(SRC)/datatypes$(O) $(SRC)/fingerprint$(O) \
-	$(SRC)/nci$(O) $(SRC)/cpu_dep$(O) ${asmfun_o} $(SRC)/tsq$(O) $(SRC)/longopt$(O) $(SRC)/events$(O) \
-	$(SRC)/dynext$(O) $(SRC)/utils$(O) $(SRC)/vtables$(O) $(SRC)/mmd$(O) $(SRC)/extend$(O)
+INTERP_O_FILES = \
+    $(SRC)/exceptions$(O) \
+    $(SRC)/global_setup$(O) \
+    $(SRC)/interpreter$(O)  \
+    $(SRC)/register$(O) \
+    $(SRC)/core_ops$(O) \
+    $(SRC)/core_ops_prederef$(O) \
+    $(SRC)/core_ops_switch$(O) \
+    $(SRC)/memory$(O) \
+    $(SRC)/objects$(O) \
+    $(SRC)/packfile$(O) \
+    $(SRC)/stacks$(O) \
+    $(SRC)/string$(O) \
+    $(SRC)/sub$(O) \
+    $(SRC)/encoding$(O) \
+    $(SRC)/chartype$(O) \
+    $(SRC)/runops_cores$(O) \
+    $(SRC)/trace$(O) \
+    $(SRC)/pmc$(O) \
+    $(SRC)/pmc_freeze$(O) \
+    $(SRC)/key$(O) \
+    $(SRC)/hash$(O) \
+    $(SRC)/core_pmcs$(O) \
+    $(SRC)/platform$(O) ${jit_o} \
+    $(SRC)/rx$(O) \
+    $(SRC)/rxstacks$(O) \
+    $(SRC)/intlist$(O) \
+    $(SRC)/list$(O) \
+    $(SRC)/embed$(O) \
+    $(SRC)/warnings$(O) \
+    $(SRC)/packout$(O) \
+    $(SRC)/byteorder$(O) \
+    $(SRC)/debug$(O) \
+    $(SRC)/smallobject$(O) \
+    $(SRC)/headers$(O) \
+    $(SRC)/dod$(O) \
+    $(SRC)/method_util$(O) \
+    $(SRC)/exit$(O) \
+    $(SRC)/misc$(O) \
+    $(SRC)/spf_render$(O) \
+    $(SRC)/spf_vtable$(O) \
+    $(SRC)/datatypes$(O) \
+    $(SRC)/fingerprint$(O) \
+    $(SRC)/nci$(O) \
+    $(SRC)/cpu_dep$(O) \
+    $(SRC)/tsq$(O) \
+    $(SRC)/longopt$(O) \
+    $(SRC)/events$(O) \
+    $(SRC)/dynext$(O) \
+    $(SRC)/utils$(O) \
+    $(SRC)/vtables$(O) \
+    $(SRC)/mmd$(O) \
+    $(SRC)/extend$(O) \
+    pf/pf_items$(O) \
+    ${asmfun_o} \
+    ${cg_o} \
+    ${exec_o} \
+    ${gc_o}
 
-O_FILES = $(INTERP_O_FILES) $(IO_O_FILES) $(CLASS_O_FILES) \
-	$(ENCODING_O_FILES) $(CHARTYPE_O_FILES) \
-	$(IMCC_O_FILES)
-
+O_FILES = \
+    $(INTERP_O_FILES) \
+    $(IO_O_FILES) $(CLASS_O_FILES) \
+    $(ENCODING_O_FILES) \
+    $(CHARTYPE_O_FILES) \
+    $(IMCC_O_FILES)
+    
 OPS_FILES = ${ops} $(GEN_OPSFILES)
 
 ###############################################################################
@@ -217,21 +319,6 @@ PERL = ${perl}
 # Make directory; do not die if dir exists.
 MKDIR = $(PERL) -e ${PQ}-d or mkdir $$_,0777 or die foreach @ARGV${PQ}
 
-###############################################################################
-#
-# BUILD TARGET CONFIGURATIONS:
-#
-###############################################################################
-
-TEST_PROG = ${test_prog}${exe}
-TEST_PROG_SO = ${test_prog}_so${exe}
-LIBPARROT = ${blib_lib_libparrot_a}
-# utils
-DIS=disassemble${exe}
-PDUMP = pdump${exe}
-PINFO = pbc_info${exe}
-PDB = pdb${exe}
-
 # lclint has changed name to splint at v3.0
 LINT = splint
 
@@ -248,30 +335,108 @@ LINTOPTS =
 
 ###############################################################################
 #
+# BUILD TARGET CONFIGURATIONS:
+#
+###############################################################################
+
+TEST_PROG = ${test_prog}${exe}
+TEST_PROG_SO = ${test_prog}_so${exe}
+LIBPARROT = ${blib_lib_libparrot_a}
+# utils
+DIS=disassemble${exe}
+PDUMP = pdump${exe}
+PINFO = pbc_info${exe}
+PDB = pdb${exe}
+
+###############################################################################
+#
 # MAKE CONFIGURATION:
 #
 ###############################################################################
 
-#
 # This is set to  MAKE=$make if your $make command doesn't
 # do it for you.
-#
 ${make_set_make}
 MAKE_C = ${make_c}
 
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
+###############################################################################
+#
+# USER TARGETS:
+#
+# These targets are supposed to be called by the user.
+#
+###############################################################################
+
 all : flags_dummy $(TEST_PROG) docs
+
+# This should be a listing of all targets, that art meant to be called users
+help:
+	@echo ""
+	@echo "Following targets are available for the user:"
+	@echo ""
+	@echo "Executables:"
+	@echo "  all:               'parrot' and the documentation." 
+	@echo "                     This is the default."
+	@echo "  world:             'all' and 'parrot_utils'." 
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO) and $(PDB)" 
+	@echo "  $(PDUMP):             Parrot Dumper"
+	@echo "  $(DIS):       Parrot Disassembler"
+	@echo "  $(PINFO):          Information about Parrot Bypte Code"
+	@echo "  $(PDB):               Parrot Debugger"
+	@echo ""
+	@echo "Installation:"
+	@echo "  install:           Install under '/usr/local/parrot' on Unix systems"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  docs:              Generate documentation from POD in the sources."
+	@echo ""
+	@echo "Testing:"
+	@echo "  test:              Run the test suite."
+	@echo "  fulltest:          Run a fuller test suite."
+	@echo ""
+	@echo "Cleaning:"
+	@echo "  clean:             Basic cleaning up."
+	@echo "  realclean:         Removes also files generated by 'Configure.pl'"
+	@echo "  distclean:         Remove everything not in MANIFEST."
+	@echo "  cvsclean:          Like 'distclean', but keep CVS files."
+	@echo "  reconfig:          'clean' and redo configuration."
+	@echo "  manitest:          Check for new files."
+	@echo ""
+	@echo "Language implementations:"
+	@echo "  languages:         Proxy for default target of languages/Makefile"
+	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
+	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
+	@echo ""
+	@echo "fetch from source repository:"
+	@echo "  update:            cvs update."
+	@echo "  status:            cvs status."
+	@echo "  patch:             create a patc for sending to bugs-parrot."
+	@echo "  rsync:             update with rsync."
+	@echo ""
+	@echo "Development:"
+	@echo "  lint:              code checking with lint."
+	@echo "  lint2:             another code checking whit lint."
+	@echo ""
+	@echo "Release:"
+	@echo "  release:           create a TAR ball."
+	@echo "  rpm:               create RPMs."
+	@echo ""
+	@echo "Misc:"
+	@echo "  help:              Print this help message."
+	@echo "  hello:             'Hello World' in PASM"
+	@echo "  mops:              Currently not working???"
+	@echo ""
 
 world: all parrot_utils
 
 parrot_utils: $(PDUMP) $(DIS) $(PINFO) $(PDB)
 
 flags_dummy:
-	echo Compiling with:
+	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) xx$(O) -c xx.c
-
 
 mops : examples/assembly/mops${exe} examples/mops/mops${exe}
 
@@ -636,12 +801,25 @@ $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c: $(IMCC_DIR)/imcc.l
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 
 
-################ docs, test and maintainer targets
+###############################################################################
+#
+# Documentation targets:
+#
+###############################################################################
 
 docs : docs.dummy
 
 docs.dummy :
 	$(MAKE_C) docs
+
+docs-clean :
+	$(MAKE_C) docs clean
+
+###############################################################################
+#
+# language implementation targets:
+#
+###############################################################################
 
 languages : languages.dummy
 
@@ -651,8 +829,13 @@ languages.dummy :
 languages-test :
 	$(MAKE_C) languages test
 
+languages-clean :
+	$(MAKE_C) languages clean
+
+#
 # If anything in the classes directory is out of date,
 # then run `make` in sub-dir to rebuild only the out of date files.
+#
 $(CLASS_O_FILES) : $(CLASS_PMC_FILES) $(NONGEN_HEADERS)
 	$(MAKE_C) classes
 
@@ -675,7 +858,6 @@ test : $(TEST_PROG) test_prep testb test_imcc src_tests
 
 fulltest : $(TEST_PROG) test_prep fulltest_dummy fulltest_imcc
 
-.PHONY: fulltest_dummy
 fulltest_dummy : src_tests testg testP testj testS testb testr
 
 # Common prep for all test targets
@@ -744,15 +926,13 @@ nokfile:
 #
 ###############################################################################
 
-clean : testclean progclean
+clean : testclean progclean languages-clean docs-clean 
 	${cg_r}
 	$(RM_F) *.s *~ $(FLUID_FILES) \
 	        examples/assembly/mops${exe} examples/assembly/mops.c \
 	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
 	        examples/mops/mops$(O) examples/mops/mops${exe}
-	$(MAKE_C) docs clean
 	$(MAKE_C) classes clean
-	$(MAKE_C) languages clean
 
 progclean:
 	$(RM_F) $(O_FILES) \
@@ -800,6 +980,10 @@ rsync :
 
 status :
 	cvs -n -q upd -dP
+
+patch :
+	cvs -q diff -u
+
 
 lint : ${test_prog}
 	$(LINT) ${cc_inc} ${cc_hasjit} "-Iclasses" $(LINTFLAGS) $(LINTOPTS) `echo $(O_FILES) | sed ${PQ}s/\.o/\.c/g${PQ}`

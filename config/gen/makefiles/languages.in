@@ -96,6 +96,7 @@ urm.test:
 	$(MAKE_C) urm test
 
 clean:
+	$(MAKE_C) befunge clean
 	$(MAKE_C) jako clean
 	$(MAKE_C) scheme clean
 
