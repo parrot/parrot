@@ -202,6 +202,8 @@ op unpin(inout STR) {
 
 =item B<substr>(inout STR, in INT, in INT, in STR)
 
+=item B<substr>(out STR, in PMC, in INT, in INT)
+
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4.
 
@@ -245,6 +247,10 @@ inline op substr(inout STR, in INT, in INT, in STR) {
   goto NEXT();
 }
 
+inline op substr(out STR, in PMC, in INT, in INT) {
+  $1 = $2->vtable->substr_str(interpreter, $2, $3, $4);
+  goto NEXT();
+}
 
 =cut
 
