@@ -164,7 +164,8 @@ initializers with arguments to be run.
             restore_context(interpreter, &ctx);
         }
 
-        REG_INT(3) = 1;
+        REG_INT(0) = REG_INT(3) = 1;
+        REG_INT(1) = REG_INT(2) = REG_INT(4) = 0;
         REG_PMC(5) = proxy;
         return next;
     }

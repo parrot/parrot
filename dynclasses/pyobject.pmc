@@ -148,6 +148,13 @@ Returns the result of comparing C<self> with C<*value>.
 
     METHOD PMC* __cmp__(PMC *self, PMC *value) {
         PMC * ret = pmc_new(INTERP, dynclass_PyInt);
+
+        /* XXX: quick hack: class method called directly */
+        if (REG_INT(3)>2) {
+            self = REG_PMC(6);
+            value = REG_PMC(7);
+        }
+
         VTABLE_set_integer_native(INTERP, ret,
             mmd_dispatch_i_pp(INTERP, self, value, MMD_CMP));
         return ret;

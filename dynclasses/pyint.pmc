@@ -443,7 +443,12 @@ MMD_PyFloat: {
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;
         }
 MMD_PyInt: {
-            /* int or undef */
+            INTVAL diff = PMC_int_val(SELF)
+                - VTABLE_get_integer(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+MMD_PyClass: {
+            /* XXX: redispatch if proxy? */
             INTVAL diff = PMC_int_val(SELF)
                 - VTABLE_get_integer(INTERP, value);
             return diff > 0 ? 1 : diff < 0 ? -1 : 0;

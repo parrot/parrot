@@ -463,7 +463,8 @@ Returns the hex representation of C<value>.
 
     METHOD PMC* hex(PMC *value) {
         PMC * meth = VTABLE_find_method(INTERP, value, HEX);
-        REG_INT(3) = 0;
+        REG_INT(0) = 1;
+        REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         REG_PMC(2) = value;
         VTABLE_invoke(INTERP, meth, REG_PMC(1));
         return REG_PMC(5);
@@ -741,7 +742,8 @@ Returns the octal representation of C<value>.
 
     METHOD PMC* oct(PMC *value) {
         PMC * meth = VTABLE_find_method(INTERP, value, OCT);
-        REG_INT(3) = 0;
+        REG_INT(0) = 1;
+        REG_INT(1) = REG_INT(2) = REG_INT(3) = REG_INT(4) = 0;
         REG_PMC(2) = value;
         VTABLE_invoke(INTERP, meth, REG_PMC(1));
         return REG_PMC(5);
