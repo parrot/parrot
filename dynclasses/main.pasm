@@ -14,7 +14,8 @@ _main:
 	new P4, .Key
 	set P4, "_ext_main"	# sub label
 	push P3, P4
-	new P0, .SubProxy
+	find_type I0, "SubProxy"
+	new P0, I0
 	assign P0, P3
 
 	invokecc

@@ -365,9 +365,17 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
         }
         else if (!strcmp(name, "loadlib")) {
             SymReg *r1 = r[1];   /* lib name */
-            STRING *lib = string_from_cstring(interpreter, r1->name + 1,
-                    strlen(r1->name) - 2);
-            Parrot_load_lib(interpreter, lib, NULL);
+            STRING *lib;
+            if (r1->type == VTCONST) {
+                /*
+                 * XXX we should not read in dynamic PMC classes
+                 *     OTOH we have to load dynamic opcodes
+                 *     to get at the opcode information
+                 */
+                lib = string_from_cstring(interpreter, r1->name + 1,
+                        strlen(r1->name) - 2);
+                Parrot_load_lib(interpreter, lib, NULL);
+            }
         }
         else if (!memcmp(name, "invoke", 6) ||
                 !memcmp(name, "callmethod", 10)) {

@@ -4,7 +4,7 @@
 	find_type I0, "Foo"
 	print I0
 	print "\n"
-	new P0, .Foo
+	new P0, I0
 	print "ok 2\n"
 	set I0, P0
 	print I0
