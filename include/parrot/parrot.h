@@ -149,6 +149,12 @@ typedef void (*funcptr_t)(void);
    used to make an empty block.  */
 #define UNUSED(a) if (a) {}
 
+/* If you are trying to debug GC problems which only occur on large test cases,
+ * turning on GC_DEBUG should help make the problem appear with smaller data 
+ * samples by reducing various numbers, and causing DOD and allocation runs 
+ * to occur more frequently. It does significantly reduce performance. */
+#define GC_DEBUG 0
+
 #include "parrot/platform.h"
 #include "parrot/global_setup.h"
 #include "parrot/interpreter.h"

@@ -14,8 +14,13 @@
 
 #include "parrot/parrot.h"
 
-#define REPLENISH_LEVEL_FACTOR 0.8
-#define UNITS_PER_ALLOC_GROWTH_FACTOR 4
+#if GC_DEBUG
+#    define REPLENISH_LEVEL_FACTOR 0.0
+#    define UNITS_PER_ALLOC_GROWTH_FACTOR 1
+#else
+#    define REPLENISH_LEVEL_FACTOR 0.8
+#    define UNITS_PER_ALLOC_GROWTH_FACTOR 4
+#endif
 
 INTVAL
 contained_in_pool(struct Parrot_Interp *interpreter,
@@ -74,6 +79,10 @@ get_free_object(struct Parrot_Interp *interpreter,
     /* if we don't have any objects */
     if (!pool->free_list)
         (*pool->more_objects)(interpreter, pool);
+#if GC_DEBUG
+    else
+        (*pool->more_objects)(interpreter, pool);
+#endif
 
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;

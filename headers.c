@@ -15,9 +15,15 @@
 
 #include "parrot/parrot.h"
 
-#define PMC_HEADERS_PER_ALLOC 256
-#define BUFFER_HEADERS_PER_ALLOC 256
-#define STRING_HEADERS_PER_ALLOC 256
+#if GC_DEBUG
+#    define PMC_HEADERS_PER_ALLOC 1
+#    define BUFFER_HEADERS_PER_ALLOC 1
+#    define STRING_HEADERS_PER_ALLOC 1
+#else
+#    define PMC_HEADERS_PER_ALLOC 256
+#    define BUFFER_HEADERS_PER_ALLOC 256
+#    define STRING_HEADERS_PER_ALLOC 256
+#endif
 
 /** PMC Header Functions for small-object lookup table **/
 
@@ -40,6 +46,10 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     PMC *pmc;
     if (!pool->free_list)
         (*pool->more_objects)(interpreter, pool);
+#if GC_DEBUG
+    else
+        (*pool->more_objects)(interpreter, pool);
+#endif
     pmc = pool->free_list;
     pool->free_list = *(void **)pmc;
     
@@ -81,6 +91,10 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     Buffer *buffer;
     if (!pool->free_list)
         (*pool->more_objects)(interpreter, pool);
+#if GC_DEBUG
+    else
+        (*pool->more_objects)(interpreter, pool);
+#endif
     buffer = pool->free_list;
     pool->free_list = *(void **)buffer;
     

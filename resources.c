@@ -89,6 +89,12 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
         alloc_new_block(interpreter, size, pool);
         interpreter->mem_allocs_since_last_collect++;
     }
+#if GC_DEBUG
+    Parrot_do_dod_run(interpreter);
+    if (pool->compact) {
+        (*pool->compact)(interpreter, pool);
+	}
+#endif
     if (pool->top_block->free < size) {
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
