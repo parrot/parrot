@@ -4,16 +4,17 @@ platforms:
 Platform                Runloops         Feature        Compile  Tests
                      CGoto JIT EXEC   Threads Signals
 ---------------------------------------------------------------------
-aix
+aix                    -    Y    -       Y      -          Y       Y
 darwin
 freebsd
 hpux
 ?-ia64
 irix6.5                                  Y                 Y       Y/2
+linux-ppc-gcc3.2.3          Y    Y       Y      Y          Y       Y
 linux-x86-gcc2.92.2    Y    Y    Y       Y      Y          Y       Y
 linux-x86-gcc3.3.3     Y    Y    Y       Y      Y          Y       Y
 linux-x64
-openbsd
+openbsd                Y    Y/5  Y       Y      -          Y       Y
 os2
 solaris
 tru64
