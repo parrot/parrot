@@ -27,7 +27,7 @@ GEN_MAKEFILES = Makefile classes/Makefile languages/Makefile docs/Makefile \
 languages/jako/Makefile languages/miniperl/Makefile languages/scheme/Makefile
 
 GEN_CONFIGS  = include/parrot/config.h include/parrot/platform.h \
-			   lib/Parrot/Config.pm lib/Parrot/Types.pm platform.c
+			   lib/Parrot/Config.pm platform.c
 
 STICKY_FILES = $(GEN_CONFIGS) $(GEN_MAKEFILES) config.opt
 
