@@ -75,10 +75,6 @@ static opcode_t * pf_debug_unpack (struct Parrot_Interp *,
         struct PackFile_Segment *self, opcode_t *);
 static void pf_debug_destroy (struct PackFile_Segment *self);
 
-/*
- * round val up to whole opcode_t, return result in opcodes
- */
-#define ROUND_UP(val,size) (((val) + ((size) - 1))/(size))
 
 /******************************************************************************
 
@@ -173,60 +169,6 @@ make_code_pointers(struct PackFile_Segment *seg)
     }
 }
 
-/***************************************
-
-=item unpack
-
-Unpack a PackFile from a block of memory. The format is:
-
-  byte     wordsize
-  byte     byteorder
-  byte     major
-  byte     minor
-  byte     intvalsize
-  byte     floattype
-  byte     pad[10] = fingerprint
-
-  opcode_t magic
-  opcode_t language type
-
-  opcode_t segment_length
-  *  fixup_segment
-
-  if fixup segment_length != 0, a directory is here and used for
-  the rest of the file
-    directory segment
-    * segment
-    ....
-
-  All new segments have this common header:
-  - op_count    ... total segment size incl. this count
-  - itype       ... internal type of data
-  - id          ... id of data e.g. byte code nr.
-  - size        ... size of data oparray
-  - data[size]  ... data array e.g. bytecode
-  segment specific data follow here
-
-
-  else:
-
-  opcode_t segment_length
-  *  const_segment
-
-  opcode_t segment_length
-  *  byte_code
-
-
-Checks to see if the magic matches the Parrot magic number for
-Parrot PackFiles.
-
-Returns one (1) if everything is OK, else zero (0).
-
-=back
-
-=cut
-
-***************************************/
 static void
 fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
 {
@@ -278,6 +220,49 @@ fixup_subs(struct Parrot_Interp *interpreter, struct PackFile *self)
         }
     }
 }
+
+/***************************************
+
+=item unpack
+
+Unpack a PackFile from a block of memory. The format is:
+
+  byte     wordsize
+  byte     byteorder
+  byte     major
+  byte     minor
+  byte     intvalsize
+  byte     floattype
+  byte     pad[10] = fingerprint
+
+  opcode_t magic
+  opcode_t language type
+
+  opcode_t dir_format
+  opcode_t padding
+
+  directory segment
+    * segment
+    ....
+
+  All segments have this common header:
+  - op_count    ... total segment size incl. this count
+  - itype       ... internal type of data
+  - id          ... id of data e.g. byte code nr.
+  - size        ... size of data oparray
+  - data[size]  ... data array e.g. bytecode
+  segment specific data follow here
+
+Checks to see if the magic matches the Parrot magic number for
+Parrot PackFiles.
+
+Returns size of unpacked if everything is OK, else zero (0).
+
+=back
+
+=cut
+
+***************************************/
 
 opcode_t
 PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
@@ -351,39 +336,36 @@ PackFile_unpack(struct Parrot_Interp *interpreter, struct PackFile *self,
 #endif
 
     /*
-     * Unpack the Fixup Table Segment:
+     * Unpack the dir_format
      */
 
     header->dir_format = PF_fetch_opcode(self, &cursor);
 
-    if (header->dir_format == 0) {
+    /* dir_format 1 use directory */
+    if (header->dir_format != PF_DIR_FORMAT ) {
         PIO_eprintf(NULL,
-                "PackFile_unpack: Dir format 0 no longer supported!\n");
+                "PackFile_unpack: Unknowm dir format found %d!\n",
+                (int)header->dir_format);
         return 0;
     }
-    else {
-        /* new format use directory */
-        if (header->dir_format != PF_DIR_FORMAT ) {
-            PIO_eprintf(NULL,
-                    "PackFile_unpack: Unknowm dir format found %d!\n",
-                    (int)header->dir_format);
-            return 0;
-        }
-        (void)PF_fetch_opcode(self, &cursor); /* pad */
-        self->directory.base.file_offset = (size_t)(cursor - self->src);
-        cursor = PackFile_Segment_unpack(interpreter,
-                &self->directory.base, cursor);
-        /* shortcut */
-        self->byte_code = self->cur_cs->base.data;
-        /*
-         * fixup constant subroutine objects
-         */
-        fixup_subs(interpreter, self);
-        /*
-         * TODO JIT and/or prederef the sub/the bytecode
-         */
+    (void)PF_fetch_opcode(self, &cursor); /* pad */
+    self->directory.base.file_offset = (size_t)(cursor - self->src);
+    /*
+     * now unpack dir, which unpacks its contents ...
+     */
+    cursor = PackFile_Segment_unpack(interpreter,
+            &self->directory.base, cursor);
+    /* shortcut */
+    self->byte_code = self->cur_cs->base.data;
+    /*
+     * fixup constant subroutine objects
+     */
+    fixup_subs(interpreter, self);
+    /*
+     * JITting and/or prederefing the sub/the bytecode is done
+     * in switch_to_cs before actual usage of the segment
+     */
 
-    }
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (self->is_mmap_ped && (
                 self->need_endianize || self->need_wordsize)) {
@@ -667,8 +649,8 @@ static opcode_t * default_unpack (struct Parrot_Interp *interpreter,
     return cursor;
 }
 
-void default_dump_header (struct Parrot_Interp *interpreter,
-        struct PackFile_Segment *self)
+void
+default_dump_header (Parrot_Interp interpreter, struct PackFile_Segment *self)
 {
     PIO_printf(interpreter, "%s => [ # offs 0x%x(%d)",
             self->name, (int)self->file_offset, (int)self->file_offset);
@@ -677,8 +659,8 @@ void default_dump_header (struct Parrot_Interp *interpreter,
             (int)self->id, (int)self->size);
 }
 
-static void default_dump (struct Parrot_Interp *interpreter,
-        struct PackFile_Segment *self)
+static void
+default_dump (Parrot_Interp interpreter, struct PackFile_Segment *self)
 {
     size_t i;
 
@@ -1023,10 +1005,8 @@ directory_packed_size (struct PackFile_Segment *self)
     /* number of segments + default, we need it for the offsets */
     size = 1 + default_packed_size(self);
     for (i = 0; i < dir->num_segments; i++) {
-        UINTVAL str_len;
         size += 3;        /* type, offset, size */
-        str_len = strlen (dir->segments[i]->name);
-        size += ROUND_UP(str_len + 1, sizeof(opcode_t));
+        size += PF_size_cstring(dir->segments[i]->name);
     }
     if (align && size % align)
         size += (align - size % align);   /* pad/align it */
@@ -1057,10 +1037,8 @@ directory_pack (struct PackFile_Segment *self, opcode_t *cursor)
 
     for (i = 0; i < num_segs; i++) {
         struct PackFile_Segment *seg = dir->segments[i];
-        size_t str_len = strlen (seg->name);
         *cursor++ = seg->type;
-        strcpy ((char *)cursor, seg->name);
-        cursor += ROUND_UP(str_len + 1, sizeof(opcode_t));
+        cursor = PF_store_cstring(cursor, seg->name);
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
     }
@@ -1432,8 +1410,7 @@ fixup_pack (struct PackFile_Segment *self, opcode_t *cursor)
         switch (ft->fixups[i]->type) {
             case enum_fixup_label:
             case enum_fixup_sub:
-                strcpy ((char *)cursor, ft->fixups[i]->name);
-                cursor += PF_size_cstring(ft->fixups[i]->name);
+                cursor = PF_store_cstring(cursor, ft->fixups[i]->name);
                 *cursor++ = ft->fixups[i]->offset;
                 break;
             default:
