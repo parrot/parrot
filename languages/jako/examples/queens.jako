@@ -25,22 +25,25 @@ const int NUM_RANKS = 8;
 
 sub str remove_queen (str board, int rank, int file)
 {
-  board = clear_file(board, file);
 
   var int i;
   i  = rank * NUM_FILES;
   i += file;
 
   var int x;
-  x = i - 1;
+  x = i;
 
   var int y;
   y = i + 1;
 
+  var int z;
+  z = length(board);
+  z = z - y;
+
   var str prefix;
   prefix = substr(board, 0, x);
   var str suffix;
-  suffix = substr(board, y, -1);
+  suffix = substr(board, y, z);
 
   var str temp;
   temp = prefix;
@@ -87,15 +90,19 @@ sub str place_queen (str board, int rank, int file)
   i += file;
 
   var int x;
-  x = i - 1;
+  x = i;
 
   var int y;
   y = i + 1;
 
+  var int z;
+  z = length(board);
+  z = z - y;
+
   var str prefix;
   prefix = substr(board, 0, x);
   var str suffix;
-  suffix = substr(board, y, -1);
+  suffix = substr(board, y, z);
 
   var str temp;
   temp = prefix;
@@ -142,7 +149,7 @@ sub int queen_rank (str board, int file)
 sub str at (str board, int rank, int file) {
   var str temp;
 
-  print("Fetching contents of square at $rank, $file...\n");
+#  print("Fetching contents of square at $rank, $file...\n");
 
   return 0 if (rank < 0);
   return 0 if (rank >= NUM_RANKS);
@@ -156,7 +163,7 @@ sub str at (str board, int rank, int file) {
   var int l;
   l = length(board);
 
-  print("Board is $l characters long. Fetching character at index $i.\n");
+#  print("Board is $l characters long. Fetching character at index $i.\n");
 
   temp = substr(board, i, 1);
 
@@ -176,7 +183,7 @@ sub str at (str board, int rank, int file) {
 sub int queen_at (str board, int rank, int file) {
   var str temp;
 
-  print("Looking for queen at $rank, $file...\n");
+#  print("Looking for queen at $rank, $file...\n");
 
   temp = at(board, rank, file);
 
@@ -234,10 +241,10 @@ sub print_board (str board) {
 
   while(rank >= 0) {
     temp = rank + 1;
-    file = 0;
 
     print("$temp |");
 
+    file = 0;
     while(file < 8) {
       var int result;
 
@@ -280,6 +287,7 @@ sub str new_board()
   print("Making new board with $NUM_RANKS ranks and $NUM_FILES files...\n");
 
   while (rank < NUM_RANKS) {
+    file = 0;
     while (file < NUM_FILES) {
       board = concat(board, " ");
       file++;
@@ -307,7 +315,7 @@ sub main() {
   board = new_board();
 
   print_board(board);
-  place_queen(board, 3, 3);
+  board = place_queen(board, 3, 3);
   print_board(board);
 
   #
