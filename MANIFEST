@@ -384,6 +384,7 @@ t/harness
 t/op/basic.t
 t/op/bitwise.t
 t/op/debuginfo.t
+t/op/globals.t
 t/op/hacks.t
 t/op/ifunless.t
 t/op/integer.t
