@@ -645,7 +645,7 @@ PIO_accept_down(theINTERP, ParrotIOLayer *layer, ParrotIO *io)
         }
         layer = PIO_DOWNLAYER(layer);
     }
-    return -1;
+    return NULL;
 }
 
 /*

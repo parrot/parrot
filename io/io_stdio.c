@@ -474,7 +474,10 @@ const ParrotIOLayerAPI pio_stdio_layer_api = {
     0, /* no socket */
     0, /* no connect */
     0, /* no send */
-    0 /* no recv */
+    0, /* no recv */
+    0, /* no bind */
+    0, /* no listen */
+    0  /* no accept */
 };
 
 /*
