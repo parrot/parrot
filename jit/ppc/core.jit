@@ -70,6 +70,19 @@ Parrot_neg_i_i {
     }
 }
 
+TEMPLATE Parrot_binop_i_ic {
+    if (MAP[1]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]); 
+        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[1], ISR1);
+    }
+    else {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]);
+        jit_emit_mov_ri_i(NATIVECODE, ISR2, *INT_CONST[2]);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+}
+
 TEMPLATE Parrot_binop_x_x {
     if (MAP[1] && MAP[2]) {
         jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[1], MAP[2]);
@@ -130,13 +143,59 @@ TEMPLATE Parrot_binop_x_x_x {
     }
 }
 
+TEMPLATE Parrot_binop_i_ic_i {
+    if (MAP[1] && MAP[3]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        jit_emit_<op>_rrr(NATIVECODE, MAP[1], ISR1, MAP[3]);
+    }
+    else if (MAP[1]) {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_ri_i(NATIVECODE, ISR2, *INT_CONST[2]);
+        jit_emit_<op>_rrr(NATIVECODE, MAP[1], ISR2, ISR1);
+    }
+    else if (MAP[3]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[2]);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR1, MAP[3]);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+    else {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[3]);
+        jit_emit_mov_ri_i(NATIVECODE, ISR2, *INT_CONST[2]);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+}
+
+TEMPLATE Parrot_binop_i_i_ic {
+    if (MAP[1] && MAP[2]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]); 
+        jit_emit_<op>_rrr(NATIVECODE, MAP[1], MAP[2], ISR1);
+    }
+    else if (MAP[1]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_<op>_rrr(NATIVECODE, MAP[1], ISR2, ISR1);
+    }
+    else if (MAP[2]) {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, MAP[2], ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+    else {
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, *INT_CONST[3]);
+        jit_emit_mov_rm_i(NATIVECODE, ISR2, &INT_REG[2]);
+        jit_emit_<op>_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
+    }
+}
+
 Parrot_band_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
 Parrot_bor_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/or/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
-}
+
 
 Parrot_bxor_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/xor/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
@@ -158,6 +217,34 @@ Parrot_div_i_i {
     Parrot_binop_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
 
+Parrot_band_i_ic {
+    Parrot_binop_i_ic s/<op>/and/
+}
+
+Parrot_bor_i_ic {
+    Parrot_binop_i_ic s/<op>/or/
+}
+
+Parrot_bxor_i_ic {
+    Parrot_binop_i_ic s/<op>/xor/
+}
+
+Parrot_add_i_ic {
+    Parrot_binop_i_ic s/<op>/add/
+}
+
+Parrot_sub_i_ic {
+    Parrot_binop_i_ic s/<op>/sub/
+}
+
+Parrot_mul_i_ic {
+    Parrot_binop_i_ic s/<op>/mul/
+}
+
+Parrot_div_i_ic {
+    Parrot_binop_i_ic s/<op>/div/
+}
+
 Parrot_add_n_n {
     Parrot_binop_x_x s/<_N>/_n/ s/<op>/fadd/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
@@ -173,6 +260,7 @@ Parrot_mul_n_n {
 Parrot_sub_n_n {
     Parrot_binop_x_x s/<_N>/_n/ s/<op>/fsub/ s/<s1>/FSR1/ s/<s2>/FSR2/ s/<T>/NUM/
 }
+
 Parrot_band_i_i_i {
     Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/and/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
 }
@@ -199,6 +287,62 @@ Parrot_mul_i_i_i {
 
 Parrot_div_i_i_i {
     Parrot_binop_x_x_x s/<_N>/_i/ s/<op>/div/ s/<s1>/ISR1/ s/<s2>/ISR2/ s/<T>/INT/
+}
+
+Parrot_band_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/and/
+}
+
+Parrot_bor_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/or/
+}
+
+Parrot_bxor_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/xor/
+}
+
+Parrot_add_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/add/
+}
+
+Parrot_sub_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/sub/
+}
+
+Parrot_mul_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/mul/
+}
+
+Parrot_div_i_i_ic {
+    Parrot_binop_i_i_ic s/<op>/div/
+}
+
+Parrot_band_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/and/
+}
+
+Parrot_bor_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/or/
+}
+
+Parrot_bxor_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/xor/
+}
+
+Parrot_add_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/add/
+}
+
+Parrot_sub_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/sub/
+}
+
+Parrot_mul_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/mul/
+}
+
+Parrot_div_i_ic_i {
+    Parrot_binop_i_ic_i s/<op>/div/
 }
 
 Parrot_add_n_n_n {
