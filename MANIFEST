@@ -157,7 +157,6 @@ t/op/basic.t
 t/op/bitwise.t
 t/op/integer.t
 t/op/interp.t
-t/op/key.t
 t/op/macro.t
 t/op/number.t
 t/op/pmc.t
