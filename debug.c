@@ -2389,7 +2389,7 @@ PDB_help(struct Parrot_Interp *interpreter, const char *command)
         case c_list:
             PIO_eprintf(interpreter, 
             "List the source code.\n\n\
-Optionally specify the line number to begin the listing from and the number
+Optionally specify the line number to begin the listing from and the number\n\
 of lines to display.\n"); 
             break;
         case c_run:
@@ -2404,10 +2404,10 @@ the program.\n");
 Optionally, specify a condition, in which case the breakpoint will only\n\
 activate if the condition is met. Conditions take the form:\n\n\
            if [REGISTER] [COMPARISON] [REGISTER or CONSTANT]\n\n\
-
+\
 For example:\n\n\
            break 10 if I4 > I3\n\n\
-           break 45 if S1 == \"foo\"\n\n
+           break 45 if S1 == \"foo\"\n\n\
 The command returns a number which is the breakpoint identifier.");
             break;
         case c_watch:
