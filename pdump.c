@@ -11,6 +11,10 @@
  */
 
 #include "parrot/packfile.h"
+#include "parrot/interpreter.h"
+
+void PackFile_dump (struct Parrot_Interp *interpreter,
+                    struct PackFile *pf);
 
 int
 main(int argc, char **argv)
@@ -20,7 +24,7 @@ main(int argc, char **argv)
     opcode_t *packed;
     size_t packed_size;
     struct PackFile *pf;
-    struct Parrot_Interp *interpreter = make_interpreter(NO_FLAGS);
+    struct Parrot_Interp *interpreter;
 
     if (argc != 2) {
         fprintf(stderr, "pdump: usage: pdump FILE\n");
@@ -37,9 +41,8 @@ main(int argc, char **argv)
         return 1;
     }
 
-    init_world();
-
     interpreter = make_interpreter(NO_FLAGS);
+    Parrot_init (interpreter, (void *) &file_stat);
 
     packed_size = file_stat.st_size;
 
@@ -68,8 +71,8 @@ main(int argc, char **argv)
         printf("Can't unpack.\n");
         return 1;
     }
-    PackFile_dump(pf);
-    PackFile_DELETE(pf);
+    PackFile_dump(interpreter, pf);
+    Parrot_destroy(interpreter);
 
     pf = NULL;
 
@@ -80,7 +83,7 @@ main(int argc, char **argv)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:
