@@ -791,6 +791,8 @@ add_to_retc_free_list(Parrot_Interp interpreter, PMC *sub)
         return;
     PMC_struct_val(sub) = mc->retc_free_list;
     mc->retc_free_list = sub;
+    /* don't mark the continuation context */
+    PObj_custom_mark_CLEAR(sub);
     /* fprintf(stderr, "** add %p\n", sub); */
 }
 
@@ -804,6 +806,7 @@ get_retc_from_free_list(Parrot_Interp interpreter)
         return NULL;
     retc = mc->retc_free_list;
     mc->retc_free_list = PMC_struct_val(retc);
+    PObj_custom_mark_SET(retc);
     /* fprintf(stderr, "** get %p free = %p\n", retc, mc->retc_free_list );*/
     return retc;
 }

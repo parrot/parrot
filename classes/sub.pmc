@@ -71,7 +71,7 @@ Initializes the subroutine.
 */
 
     /*
-     * Sub PMC's flags uage:
+     * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop
      * - private1 ... Fixup is done
      * - private2 ... put RetCont on free list

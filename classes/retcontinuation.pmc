@@ -46,6 +46,23 @@ Initializes the continuation.
         PObj_get_FLAGS(SELF) &= ~PObj_private2_FLAG;
     }
 
+    void mark () {
+       /*
+        * s. imcc/t/syn/pcc_16 and t/op/gc_12
+        *
+        * marking a RetContinuation context segfaults in these tests
+        * the coroutine has a reference to the return continuation,
+        * which is recreated in main by invokecc. When now this
+        * retcontinuation is marked its context isn't pointing to
+        * the interpreter context anymore - its garbage.
+        *
+        * When this all proves true turn off the custom_mark flag
+        * for return contiuations
+        *
+        * -leo
+        */
+    }
+
     void* invoke (void* next) {
         struct Parrot_Sub * cc = (struct Parrot_Sub*)PMC_sub(SELF);
         restore_context(interpreter, &cc->ctx);

@@ -16,7 +16,7 @@ Tests garbage collection with the C<interpinfo> operation.
 
 =cut
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -253,4 +253,32 @@ buffer_ok:
 CODE
 hello
 hello
+OUTPUT
+
+# this is a stripped down version of imcc/t/syn/pcc_16
+# s. also classes/retcontinuation.pmc
+output_is(<<'CODE', <<OUTPUT, "coro context and invalid return continuations");
+    newsub P0, .Coroutine, co1
+l:
+    savetop
+    invokecc
+    restoretop
+    inc I20
+    lt I20, 3, l
+    print "done\n"
+    end
+co1:
+    set P17, P1
+col:
+    print "coro\n"
+    sweep 1
+    savetop
+    invoke P0
+    restoretop
+    branch col
+CODE
+coro
+coro
+coro
+done
 OUTPUT

@@ -87,7 +87,7 @@ mark_stack(struct Parrot_Interp *interpreter,
     for (; ; chunk = chunk->prev) {
 
         pobject_lives(interpreter, (PObj*)chunk);
-        if (chunk == chunk->prev)
+        if (chunk == chunk->prev || chunk->free_p)
             break;
         entry = (Stack_Entry_t *)STACK_DATAP(chunk);
         switch (entry->entry_type) {
