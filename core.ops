@@ -113,51 +113,6 @@ op err(out STR) {
 
 ########################################
 
-########################################
-
-=item B<ord>(out INT, in STR)
-
-Two-argument form returns the 0th character of string $2 in register $1.
-If $2 is empty, throws an exception.
-
-=item B<ord>(out INT, in STR, in INT)
-
-Three-argument form returns character $3 of string $2 in register $1.
-If $2 is empty, throws an exception.
-If $3 is greater than the length of string $2, throws an exception.
-If $3 is less then zero but greater than the negative of the length, counts
-backwards through the string, such that -1 is the last character, -2 is the
-second-to-last character, and so on.
-If $3 is less than the negative of the length, throws an exception.
-
-=cut
-
-inline op ord (out INT, in STR) {
-  $1 = string_ord($2,0);
-  goto NEXT();
-}
-
-inline op ord (out INT, in STR, in INT) {
-  $1 = string_ord($2,$3);
-  goto NEXT();
-}
-
-=item B<chr>(out STR, in INT)
-
-Returns the character represented by the $2 number in the ASCII
-character set.
-
-=cut
-
-inline op chr (out STR, in INT) {
-  STRING *s;
-  s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
-  *(char *)s->strstart = $2;
-  s->strlen = 1;
-  $1 = s;
-  goto NEXT();
-}
-
 
 ########################################
 
@@ -687,6 +642,102 @@ inline op clone(out PMC, in PMC) {
 
 ###############################################################################
 
+=head2 Control flow
+
+The control flow opcodes check conditions and manage program flow.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<branch>(in INT)
+
+Branch forward or backward by the amount in $1.
+
+=cut
+
+inline op branch (in INT) {
+  goto OFFSET($1);
+}
+
+
+=item B<branch_cs>(in INT)
+
+Intersegment branch to location in fixup table $1.
+
+=cut
+
+inline op branch_cs (in INT) {
+  interpreter->resume_offset = $1;
+  interpreter->resume_flag = 2;
+  goto ADDRESS(0);
+}
+
+
+########################################
+
+=item B<bsr>(in INT)
+
+Branch to the location specified by $1. Push the current location onto the call
+stack for later returning.
+
+=cut
+
+inline op bsr (in INT) {
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  goto OFFSET($1);
+}
+
+=item B<ret>()
+
+Pop the location off the top of the call stack and go there.
+
+=cut
+
+inline op ret() {
+  goto POP();
+}
+
+
+########################################
+
+=item B<jsr>(in INT)
+
+Jump to the location specified by register $1. Push the current
+location onto the call stack for later returning.
+
+=cut
+
+inline op jsr(in INT) {
+  opcode_t * loc;
+  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+  loc = INTVAL2PTR(opcode_t *, $1);
+  goto ADDRESS(loc);
+}
+
+
+########################################
+
+=item B<jump>(in INT)
+
+Jump to the address held in register $1.
+
+=cut
+
+inline op jump(in INT) {
+  opcode_t * loc;
+  loc = INTVAL2PTR(opcode_t *, $1);
+  goto ADDRESS(loc);
+}
+
+=back
+
+=cut
+
+###############################################################################
+
 =head2 Conditional branch operations
 
 These operations perform a conditional relative branch. If the condition is
@@ -1066,8 +1117,65 @@ op unless(in PMC, inconst INT) {
 =cut
 
 
+=item B<invoke>()
+
+Call the subroutine in P0, with parrot calling convention as
+described in PDD03.
+
+=item B<invoke>(in PMC)
+
+Call the subroutine in $1 with no defined calling convention or invoke
+a continuation for returnin from a subroutine
+
+=item B<invokecc>()
+
+Call the subroutine in P0 and generate a new return continuation in P1.
+
+=item B<invokecc>(in PMC)
+
+Call the subroutine in $1 and generate a new return continuation in P1.
+
+=cut
+
+inline op invoke() {
+  opcode_t *dest;
+  PMC * p = interpreter->pmc_reg.registers[0];
+
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+
+  goto ADDRESS(dest);
+}
+
+inline op invoke(in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
+
+  goto ADDRESS(dest);
+}
+
+inline op invokecc() {
+  opcode_t *dest;
+  PMC * p = interpreter->pmc_reg.registers[0];
+  dest = expr NEXT();
+  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+
+  goto ADDRESS(dest);
+}
+
+inline op invokecc(in PMC) {
+  opcode_t *dest;
+  PMC * p = $1;
+  dest = expr NEXT();
+  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
+  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
+  goto ADDRESS(dest);
+}
 
 ###############################################################################
+
 =head2 Arithmetic operations
 
 These operations store the results of arithmetic on other registers and
@@ -1854,6 +1962,51 @@ These operations operate on STRINGs.
 =over 4
 
 =cut
+
+########################################
+
+=item B<ord>(out INT, in STR)
+
+Two-argument form returns the 0th character of string $2 in register $1.
+If $2 is empty, throws an exception.
+
+=item B<ord>(out INT, in STR, in INT)
+
+Three-argument form returns character $3 of string $2 in register $1.
+If $2 is empty, throws an exception.
+If $3 is greater than the length of string $2, throws an exception.
+If $3 is less then zero but greater than the negative of the length, counts
+backwards through the string, such that -1 is the last character, -2 is the
+second-to-last character, and so on.
+If $3 is less than the negative of the length, throws an exception.
+
+=cut
+
+inline op ord (out INT, in STR) {
+  $1 = string_ord($2,0);
+  goto NEXT();
+}
+
+inline op ord (out INT, in STR, in INT) {
+  $1 = string_ord($2,$3);
+  goto NEXT();
+}
+
+=item B<chr>(out STR, in INT)
+
+Returns the character represented by the $2 number in the ASCII
+character set.
+
+=cut
+
+inline op chr (out STR, in INT) {
+  STRING *s;
+  s = string_make(interpreter, &$1, (UINTVAL)1, NULL, 0, NULL);
+  *(char *)s->strstart = $2;
+  s->strlen = 1;
+  $1 = s;
+  goto NEXT();
+}
 
 
 ########################################
@@ -3873,92 +4026,6 @@ inline op splice(in PMC, in PMC, in INT, in INT) {
 
 ###############################################################################
 
-=head2 Control flow
-
-The control flow opcodes check conditions and manage program flow.
-
-=over 4
-
-=cut
-
-########################################
-
-=item B<branch>(in INT)
-
-Branch forward or backward by the amount in $1.
-
-=cut
-
-inline op branch (in INT) {
-  goto OFFSET($1);
-}
-
-
-=item B<branch_cs>(in INT)
-
-Intersegment branch to location in fixup table $1.
-
-=cut
-
-inline op branch_cs (in INT) {
-  interpreter->resume_offset = $1;
-  interpreter->resume_flag = 2;
-  goto ADDRESS(0);
-}
-
-
-########################################
-
-=item B<bsr>(in INT)
-
-Branch to the location specified by $1. Push the current location onto the call
-stack for later returning.
-
-=cut
-
-inline op bsr (in INT) {
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-  goto OFFSET($1);
-}
-
-
-########################################
-
-=item B<jsr>(in INT)
-
-Jump to the location specified by register $1. Push the current
-location onto the call stack for later returning.
-
-=cut
-
-inline op jsr(in INT) {
-  opcode_t * loc;
-  stack_push(interpreter, &interpreter->ctx.control_stack, expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-  loc = INTVAL2PTR(opcode_t *, $1);
-  goto ADDRESS(loc);
-}
-
-
-########################################
-
-=item B<jump>(in INT)
-
-Jump to the address held in register $1.
-
-=cut
-
-inline op jump(in INT) {
-  opcode_t * loc;
-  loc = INTVAL2PTR(opcode_t *, $1);
-  goto ADDRESS(loc);
-}
-
-=back
-
-=cut
-
-###############################################################################
-
 =head2 Symbol table ops
 
 Ops to manipulate the symbol table
@@ -4595,18 +4662,6 @@ op valid_type(out INT, in INT) {
     goto NEXT();
 }
 
-########################################
-
-=item B<ret>()
-
-Pop the location off the top of the call stack and go there.
-
-=cut
-
-inline op ret() {
-  goto POP();
-}
-
 
 ########################################
 
@@ -4710,16 +4765,6 @@ Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
 
-=item B<invoke>()
-
-Call the subroutine in P0, with parrot calling convention as
-described in PDD03.
-
-=item B<invoke>(in PMC)
-
-Call the subroutine in $1 with no defined calling convention, as
-described in the PDD03 in the first chapters of DESCRIPTION.
-
 =item B<compile>(out PMC, in PMC, in STR)
 
 Compile source code $3 with compiler $2 into PMC $1.
@@ -4793,42 +4838,6 @@ op dlfunc (out PMC, in PMC, in STR, in STR) {
   goto NEXT();
 }
 
-inline op invoke() {
-  opcode_t *dest;
-  PMC * p = interpreter->pmc_reg.registers[0];
-
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
-
-  goto ADDRESS(dest);
-}
-
-inline op invoke(in PMC) {
-  opcode_t *dest;
-  PMC * p = $1;
-
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
-
-  goto ADDRESS(dest);
-}
-
-inline op invokecc() {
-  opcode_t *dest;
-  PMC * p = interpreter->pmc_reg.registers[0];
-  dest = expr NEXT();
-  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
-
-  goto ADDRESS(dest);
-}
-
-inline op invokecc(in PMC) {
-  opcode_t *dest;
-  PMC * p = $1;
-  dest = expr NEXT();
-  interpreter->pmc_reg.registers[1] = new_continuation_pmc(interpreter, dest);
-  dest = (opcode_t *)p->vtable->invoke(interpreter, p, dest);
-  goto ADDRESS(dest);
-}
 
 inline op compile(OUT PMC, in PMC, in STR) {
   $1 = $2->vtable->invoke(interpreter, $2, $3);
