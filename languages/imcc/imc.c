@@ -53,13 +53,20 @@ void allocate(struct Parrot_Interp *interpreter) {
     nodeStack = imcstack_new();
     dont_optimize = n_spilled = 0;
 
-    todo = 1;
+    todo = first = 1;
     while (todo) {
         find_basic_blocks();
         build_cfg();
+
+        if (first && (IMCC_DEBUG & DEBUG_CFG))
+            dump_cfg();
+        first = 0;
         todo = cfg_optimize(interpreter);
     }
-    first = todo = 1;
+
+    if (IMCC_DEBUG & DEBUG_CFG)
+        dump_cfg();
+    todo = first = 1;
     while (todo) {
         if (!first) {
             find_basic_blocks();
@@ -151,7 +158,7 @@ static int imcsets[4];
 static void imc_stat_init() {
     imcsets[0] = imcsets[1] = imcsets[2] = imcsets[3] = 0;
     make_stat(imcsets, 0);
-    ostat.invariants_moved = 0;
+    memset(&ostat, 0, sizeof(ostat));
 }
 
 /* and final */

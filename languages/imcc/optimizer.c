@@ -138,9 +138,6 @@ static void if_branch(struct Parrot_Interp *interp)
     Instruction *ins, *last;
     int reg;
 
-    /* reset statistic globals */
-    ostat.if_branch = 0;
-
     last = instructions;
     if (!last->next)
         return;
@@ -722,10 +719,10 @@ static int branch_branch()
 {
     Instruction *ins, *next;
     SymReg * r;
+    int changed = 0;
 
     info(2, "\tbranch_branch\n");
     /* reset statistic globals */
-    ostat.branch_branch = 0;
     for (ins = instructions; ins; ins = ins->next) {
         if ((ins->type & IF_goto) && !strcmp(ins->op, "branch")) {
             r = get_sym(ins->r[0]->name);
@@ -740,12 +737,12 @@ static int branch_branch()
                             r->first_ins->r[0]->name, ins_string(next));
                     ostat.branch_branch++;
                     ins->r[0] = next->r[0];
-                    return 1;
+                    changed = 1;
                 }
             }
         }
     }
-    return 0;
+    return changed;
 }
 
 static int unused_label()
@@ -753,6 +750,7 @@ static int unused_label()
     Instruction *ins;
     int used;
     int i;
+    int changed = 0;
 
     info(2, "\tunused_label\n");
     for (i=1; i < n_basic_blocks; i++) {
@@ -801,12 +799,12 @@ static int unused_label()
                 debug(DEBUG_OPT1, "block %d label %s deleted\n", i, lab->name);
                 ostat.deleted_ins++;
                 delete_ins(ins, 1);
-                return 1;
+                changed = 1;
             }
 
         }
     }
-    return 0;
+    return changed;
 }
 
 static int dead_code_remove(void)
@@ -828,19 +826,15 @@ static int dead_code_remove(void)
         if (!bb->pred_list) {
             int bbi = bb->index;
             debug(DEBUG_OPT1, "found dead block %d\n", bb->index);
-            for (ins = bb->start; ins && ins->index == bbi; ) {
-                debug(DEBUG_OPT1, "unreachable ins deleted (dead block) %s\n",
+            for (ins = bb->start; ins && ins->bbindex == bbi; ) {
+                debug(DEBUG_OPT1, "\tins deleted (dead block) %s\n",
                     ins_string(ins));
                 ins = delete_ins(ins, 1);
                 ostat.deleted_ins++;
                 changed++;
-                if (!ins || ins == bb->end->next)
-                    break;
             }
         }
     }
-    if (changed)
-        return changed;
     for (last = instructions, ins=last->next; last && ins; ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL)) {
             debug(DEBUG_OPT1, "unreachable ins deleted (after branch) %s\n",

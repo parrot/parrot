@@ -163,9 +163,6 @@ void build_cfg() {
 
         last = bb;
     }
-
-    if (IMCC_DEBUG & DEBUG_CFG)
-        dump_cfg();
 }
 
 
