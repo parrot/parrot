@@ -116,7 +116,9 @@ Parser options:
         --force-grammar
                      Rebuild grammar even if it exists.
       Misc:
-        --add-main     suround code by the main() function
+        -e|--eval 'command'
+                       evaluate perl6 command (implies --add-main)
+        --add-main     surround code by the main() function
         --rule NAME    start with rule NAME (default = "prog")
                            (only useful in interactive mode)
 END
@@ -154,7 +156,7 @@ Getopt::Long::Configure(qw(bundling));
 GetOptions(\%OPT,qw{
     test-parser test
     trace hitem tree raw-tree
-    add-main rule=s grammar=s force-grammar
+    eval|e=s add-main rule=s grammar=s force-grammar
     debug yydebug life-info
     debug-info|g
     verbose|v+
@@ -188,6 +190,7 @@ $OPT{grammar} ||= 'Perl6grammar';
 $OPT{'parrot-options'} ||= '';
 $OPT{verbose} = 0 unless (defined $OPT{verbose});
 $OPT{tree} = 1 if $OPT{'test-parser'};
+$OPT{'add-main'} = 1 if defined $OPT{'eval'};
 
 my $filebase = 'a';		# basename for output files.
 
@@ -386,14 +389,19 @@ END
     $parser;
 }
 
-sub pass1($$$) {
-    my ($parser, $f, $fw) = @_;
+sub pass1($$$;$) {
+    my ($parser, $f, $fw, $expr) = @_;
     my $in = '';
     local $/ = undef;
     verbose(1, "P6C '$f'");
-    open(IN, $f) or die("Can't read '$f': $!");
-    $in = <IN>;
-    close(IN);
+    if ($f eq '__eval__') {
+        $in = $expr;
+    }
+    else {
+        open(IN, $f) or die("Can't read '$f': $!");
+        $in = <IN>;
+        close(IN);
+    }
     verbose(2, "Parsing");
     P6C::IMCC::init() unless $OPT{tree};
     my $result = warnings(sub {$parser->$::rule($in,0,$f)}, $fw);
@@ -415,6 +423,7 @@ sub p6_is_newer($) {
     my $mt  = (stat("$test.t"))[9];
     return $mp6 >= $mt;
 }
+
 sub run {
     my $parser;
 
@@ -422,45 +431,44 @@ sub run {
 	run_interactive();
 	return;
     }
-    $ARGV[0] = '-' unless(@ARGV);
+    unshift(@ARGV, "__eval__") if defined($OPT{'eval'});
     while (@ARGV) {
-    my $f = shift @ARGV;
-    print STDERR "processing file '$f'\n" if($OPT{verbose}>1);
-    if ($f eq '-') {
-	$filebase = 'a';
-    } else {
-	($filebase = $f) =~ s/\.[^.]*$//;
-    }
+        my $f = shift @ARGV;
+        print STDERR "processing file '$f'\n" if($OPT{verbose}>1);
+        if ($f eq '-') {
+            $filebase = 'a';
+        } else {
+            ($filebase = $f) =~ s/\.[^.]*$//;
+        }
 	# special, clean all generated files
-    if ($OPT{clean}) {
+        if ($OPT{clean}) {
 	    clean_files($filebase) if ($f =~ /\.p6$/ || $f eq '-');
-	next;
-    }
+            next;
+        }
 
 	# normal processing, passes rest of ARGV to running prog
-    # run next passes
-    my $fw = "$filebase.warn";
-    unlink($fw);
-    if ($OPT{quick} && -e "$filebase.pbc" && pbc_is_newer($filebase)) {
-	pass4("$filebase.pbc", $fw);
-    }
-    elsif ($f =~ /\.imc$/) {
-	pass2($f, $fw);
-    }
-    elsif ($f =~ /\.pasm$/) {
-	pass3($f, $fw);
-    }
-    elsif ($f =~ /\.(?:pb)?c$/) {
-	pass4($f, $fw);
-    }
-    else {
-	$parser = get_parser() unless ($parser);
-	pass1($parser, $f, $fw);
-    }
+        # run next passes
+        my $fw = "$filebase.warn";
+        unlink($fw);
+        if ($OPT{quick} && -e "$filebase.pbc" && pbc_is_newer($filebase)) {
+            pass4("$filebase.pbc", $fw);
+        }
+        elsif ($f =~ /\.imc$/) {
+            pass2($f, $fw);
+        }
+        elsif ($f =~ /\.pasm$/) {
+            pass3($f, $fw);
+        }
+        elsif ($f =~ /\.(?:pb)?c$/) {
+            pass4($f, $fw);
+        }
+        else {
+            $parser = get_parser() unless ($parser);
+            pass1($parser, $f, $fw, $OPT{'eval'});
+        }
 	return;
     }
 }
-
 
 # run tests like "make test"
 sub output_is($$;$);
@@ -690,9 +698,18 @@ sub pass4($$) {
 	my @opt = map { "-$_" } split(//, $OPT{'parrot-options'});
 	my $cmd = "$PARROT @opt $file @ARGV";
 	verbose(1, "running: $cmd");
+
+        local *SAVEOUT;
+        open(SAVEOUT, ">&STDOUT");
+        if (defined($ARGV[0]) && $ARGV[0] =~ /> (.*)/) {
+            open(STDOUT, $ARGV[0]);
+            shift(@ARGV);
+        }
 	if (system($PARROT, @opt, $file, @ARGV) && !$OPT{'ignore-exitcode'}) {
+            open(STDOUT, ">&SAVEOUT");
 	    mydie($?, $cmd);
 	}
+        open(STDOUT, ">&SAVEOUT");
     }
 }
 

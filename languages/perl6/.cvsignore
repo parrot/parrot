@@ -1,3 +1,4 @@
 Makefile
 Perl6grammar.pm
 perl6-config
+*.tmp

@@ -4,3 +4,5 @@
 *.pbc
 *.out
 *.err
+*.warn
+*.test

@@ -64,6 +64,7 @@ C<P6C::Builtins>).  C<emit> will fail if you have not defined C<main>.
 
 package P6C::IMCC;
 use strict;
+use vars '%OPT';
 use Carp 'confess';
 use P6C::Builtins;
 use P6C::Util qw(warning unimp error);
@@ -124,12 +125,20 @@ use vars '$curfunc';		# currently compiling function
 use vars '%funcs';		# all known functions
 use vars '%globals';		# global variables
 use vars '%labels';		# named labels
+my $lastsym;
+my $lasttmp;
+my $lastlabel;
 
 sub init {			# reset state
     %funcs = ();
     %globals = ();
+    %labels = ();
     undef $curfunc;
+    $lastsym = 0;
+    $lasttmp = 0;
+    $lastlabel = 0;
     P6C::Builtins::declare(\%funcs);
+    P6C::Parser::Reset();
 }
 
 sub compile {			# compile input (don't emit)
@@ -222,7 +231,9 @@ parameter-passing scheme, not just this interface.
 
 sub code {			# add code to current function
     die "Code must live within a function" unless defined $curfunc;
-    $funcs{$curfunc}->{code} .= join "\n", @_;
+    my $to_add = join "\n", @_;
+    $to_add .= "\n" unless substr($to_add, -1, 1) eq "\n";
+    $funcs{$curfunc}->{code} .= $to_add;
 }
 
 sub fixup_label {
@@ -401,9 +412,9 @@ Get the current topic variable.
 sub globalvar($) {
     my $name = shift;
     if (!exists $globals{$name}) {
-# 	if ($P6C::o{strict}) {
+ 	if ($OPT{strict}) {
 	    warning "Reference to global $name";
-# 	}
+ 	}
 	add_globalvar($name);
     }
     return 'global "'.mangled_name($name).'"';
@@ -532,9 +543,6 @@ Generate an uninitialized temporary register.
 
 =cut
 
-my $lastsym = 0;
-my $lasttmp = 0;
-my $lastlabel = 0;
 sub gensym(;*) {
     'S'.$_[0] . ++$lastsym
 }
