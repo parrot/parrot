@@ -80,7 +80,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
         /* if op_info->jump is not 0 this opcode may jump,
          * so mark this opcode as a branch source */
         if (op_info->jump)
-            branch[cur_op - code_start] = JIT_BRANCH_SOURCE;
+            branch[cur_op - code_start] |= JIT_BRANCH_SOURCE;
         /* If it's not a constant, no joy */
         if (op_info->types[op_info->arg_count - 1] == PARROT_ARG_IC) {
             /* The branch target is relative, the offset is in last argument */
@@ -88,7 +88,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                 /* Set the branch target */
                 optimizer->branch_list[cur_op - code_start] =
                     cur_op + cur_op[op_info->arg_count - 1];
-                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] =
+                branch[cur_op - code_start + cur_op[op_info->arg_count - 1]] |=
                     JIT_BRANCH_TARGET;
             }
             /* The branch target is absolute, the address is in last argument */
@@ -96,13 +96,13 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                 /* Set the branch target */
                 optimizer->branch_list[cur_op - code_start] =
                     cur_op + cur_op[op_info->arg_count - 1];
-                branch[cur_op[op_info->arg_count - 1]] = JIT_BRANCH_TARGET;
+                branch[cur_op[op_info->arg_count - 1]] |= JIT_BRANCH_TARGET;
             }
         }
         /* The address of the next opcode */
         if ((op_info->jump & PARROT_JUMP_ENEXT) ||
             (op_info->jump & PARROT_JUMP_GNEXT))
-            branch[cur_op + op_info->arg_count - code_start] =
+            branch[cur_op + op_info->arg_count - code_start] |=
                 JIT_BRANCH_TARGET;
         if (op_info->jump & PARROT_JUMP_UNPREDICTABLE)
             optimizer->has_unpredictable_jump = 1;
@@ -145,7 +145,11 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
              * We move from the end since we need to check if the first opcode
              * using the register will read or write it. */
             for (argn = op_info->arg_count - 1; argn > 0; argn--) {
-                if (op_info->types[argn] == PARROT_ARG_I) {
+                if (op_info->types[argn] == PARROT_ARG_I ||
+                    op_info->types[argn] == PARROT_ARG_KI ) {
+                    /* keyed OPs are currently not JITed, so this code
+                     * is not reached and will not harm, but ...
+                     */
                     if ((!cur_section->int_reg_count[*(cur_op + argn)]++) &&
                         (op_info->dirs[argn] & PARROT_ARGDIR_IN))
                         cur_section->int_reg_dir[*(cur_op + argn)] |=
@@ -153,6 +157,21 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                     if (op_info->dirs[argn] & PARROT_ARGDIR_OUT)
                         cur_section->int_reg_dir[*(cur_op + argn)] |=
                             PARROT_ARGDIR_OUT;
+                }
+                /* key constants may have register keys */
+                else if (op_info->types[argn] == PARROT_ARG_KC) {
+                    PMC *key = interpreter->code->const_table->constants[
+                        *(cur_op + argn)]->key;
+                    while (key) {
+                        if ((key->flags & KEY_integer_FLAG) &&
+                                (key->flags & KEY_register_FLAG)) {
+                            INTVAL n = key->cache.int_val;
+                            if (!cur_section->int_reg_count[n]++)
+                                cur_section->int_reg_dir[n] |=
+                                    PARROT_ARGDIR_IN;
+                        }
+                        key = key_next(interpreter, key);
+                    }
                 }
 #if FLOAT_REGISTERS_TO_MAP
                 else if (op_info->types[argn] == PARROT_ARG_N) {
@@ -181,9 +200,9 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
          * in other words if the opcode jumps, or if the next opcode is
          * a branch target, allocate a new section only if it's not the
          * last opcode */
-        if ((branch[cur_op - code_start] == JIT_BRANCH_SOURCE)
+        if ((branch[cur_op - code_start] & JIT_BRANCH_SOURCE)
             || (next_op < code_end &&
-                (branch[next_op - code_start] == JIT_BRANCH_TARGET))
+                (branch[next_op - code_start] & JIT_BRANCH_TARGET))
             || (next_op >= code_end)) {
           END_SECTION:
             /* Set the type, depending on whether the current
