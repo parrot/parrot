@@ -15,7 +15,8 @@
 
 
 void 
-save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) {
+save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) 
+{
     /*
      * TODO:
      * Once interp contains a context struct, this all becomes a single memcpy()
@@ -39,7 +40,8 @@ save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) {
 }
 
 void 
-restore_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) {
+restore_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) 
+{
     /*
      * TODO: This is way too expensive.
      * Once interp contains a context struct, this all becomes a single memcpy()
@@ -61,32 +63,37 @@ restore_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx) {
 }
 
 struct Parrot_Sub *
-new_sub(struct Parrot_Interp * interp, opcode_t * address) {
+new_sub(struct Parrot_Interp * interp, opcode_t * address) 
+{
     /* Using system memory until I figure out GC issues */
     struct Parrot_Sub * newsub = mem_sys_allocate(sizeof(struct Parrot_Sub));
     newsub->init = address;
-    newsub->user_stack = new_stack(interp);
-    newsub->control_stack = new_stack(interp);
+    newsub->user_stack = (struct stack_chunk *)new_stack(interp);
+    newsub->control_stack = (struct stack_chunk *)new_stack(interp);
     newsub->lex_pad = NULL;
     return newsub;
 }
 
 
 struct Parrot_Coroutine *
-new_coroutine(struct Parrot_Interp * interp, opcode_t * address) {
+new_coroutine(struct Parrot_Interp * interp, opcode_t * address) 
+{
     /* Using system memory until I figure out GC issues */
-    struct Parrot_Coroutine * newco = mem_sys_allocate(sizeof(struct Parrot_Coroutine));
+    struct Parrot_Coroutine * newco = 
+        mem_sys_allocate(sizeof(struct Parrot_Coroutine));
     newco->init = address;
     newco->resume = NULL;
-    newco->user_stack = new_stack(interp);
-    newco->control_stack = new_stack(interp);
+    newco->user_stack = (struct stack_chunk *)new_stack(interp);
+    newco->control_stack = (struct stack_chunk *)new_stack(interp);
     newco->lex_pad = NULL;
     return newco;
 }
 
 struct Parrot_Continuation *
-new_continuation(struct Parrot_Interp * interp, opcode_t * address) {
-    struct Parrot_Continuation * cc = mem_sys_allocate(sizeof(struct Parrot_Continuation));
+new_continuation(struct Parrot_Interp * interp, opcode_t * address) 
+{
+    struct Parrot_Continuation * cc = 
+        mem_sys_allocate(sizeof(struct Parrot_Continuation));
     cc->continuation = address;
     save_context(interp, &cc->ctx);
 /*
