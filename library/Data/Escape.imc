@@ -1,6 +1,6 @@
 =head1 TITLE
 
-Data::Escaoe - simple string escaping implemented in PIR
+Data::Escape - simple string escaping implemented in PIR
 
 =head1 SYNOPSIS
 
@@ -19,6 +19,8 @@ Data::Escaoe - simple string escaping implemented in PIR
 
 =head1 DESCRIPTION
 
+This library escapes data to make it usable in PIR and C code.
+
 =cut
 
 =head1 FUNCTIONS
@@ -29,7 +31,7 @@ This library provides the following function:
 
 =item str = String( str, char )
 
-A simple array sort function.
+A simple string escaping function.
 
 =over 4
 
