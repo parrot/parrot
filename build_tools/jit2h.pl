@@ -117,13 +117,6 @@ sub readjit($) {
             }
         }
         if ($line =~ m/^}/) { #{
-            # end of template definition?
-            if (defined($template)) {
-                $templates{$template} = $asm;
-                $template = undef;
-                next;
-            }
-            # no, end of function
             # 1. check templates
             while (my($t, $body) = each(%templates)) {
                 if ($asm =~ /$t\s+/) {
@@ -140,6 +133,14 @@ sub readjit($) {
                     last;
                 }
             }
+
+            # end of template definition?
+            if (defined($template)) {
+                $templates{$template} = $asm;
+                $template = undef;
+                next;
+            }
+            # no, end of function
 
             # then do other substitutions
             $asm =~ s/([\&\*])([a-zA-Z_]+)\[(\d+)\]/make_subs($1,$2,$3)/ge;

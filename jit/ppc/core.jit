@@ -13,6 +13,11 @@ Parrot_end {
     jit_emit_blr(NATIVECODE);
 }
 
+Parrot_noop {
+; preferred no-op on ppc
+    jit_emit_ori(NATIVECODE, r0, r0, 0);
+}
+
 Parrot_set_i_ic {
     if (MAP[1]) {
         jit_emit_mov_ri_i(NATIVECODE, MAP[1], *INT_CONST[2]);
@@ -484,6 +489,52 @@ Parrot_neg_n_n {
         jit_emit_mov_rm_n(NATIVECODE, FSR1, &NUM_REG[2]);
         jit_emit_fneg_rrr(NATIVECODE, FSR1, FSR1);
         jit_emit_mov_mr_n(NATIVECODE, &NUM_REG[1], FSR1);
+    }
+}
+
+TEMPLATE Parrot_unaryop_x {
+    if (MAP[1]) {
+        jit_emit_<op>(NATIVECODE, MAP[1], MAP[1]);
+    }
+    else {
+        jit_emit_mov_rm<_N>(NATIVECODE, SCRATCH1, &SOME_REG[1]);
+        jit_emit_<op>(NATIVECODE, SCRATCH1, SCRATCH1);
+        jit_emit_mov_mr<_N>(NATIVECODE, &SOME_REG[1], SCRATCH1);
+    }
+}
+
+TEMPLATE Parrot_unaryop_i {
+    Parrot_unaryop_x s/<_N>/_i/ s/SOME_R/INT_R/ s/SCRATCH1/ISR1/
+}
+
+TEMPLATE Parrot_unaryop_n {
+    Parrot_unaryop_x s/<_N>/_n/ s/SOME_R/NUM_R/ s/SCRATCH1/FSR1/
+}
+
+Parrot_neg_i {
+    Parrot_unaryop_i s/<op>/neg_rr/
+}
+
+Parrot_neg_n {
+    Parrot_unaryop_n s/<op>/fneg_rrr/
+}
+
+Parrot_abs_n {
+    Parrot_unaryop_n s/<op>/fabs_rrr/
+}
+
+Parrot_abs_i {
+    if (MAP[1]) {
+        jit_emit_srawi(NATIVECODE, ISR1, MAP[1], 31);
+        jit_emit_add_rrr(NATIVECODE, ISR2, ISR1, MAP[1]);
+        jit_emit_xor_rrr(NATIVECODE, MAP[1], ISR2, ISR1);
+    }
+    else {
+        jit_emit_mov_rm_i(NATIVECODE, ISR1, &INT_REG[1]);
+        jit_emit_srawi(NATIVECODE, ISR2, ISR1, 31);
+        jit_emit_add_rrr(NATIVECODE, ISR1, ISR2, ISR1);
+        jit_emit_xor_rrr(NATIVECODE, ISR1, ISR1, ISR2);
+        jit_emit_mov_mr_i(NATIVECODE, &INT_REG[1], ISR1);
     }
 }
 

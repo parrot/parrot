@@ -284,6 +284,9 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
 #  define jit_emit_xor_rrr(pc, D, A, B) \
     jit_emit_3reg_x(pc, 31, A, D, B, 316, 0)
 
+#  define jit_emit_srawi(pc, D, A, immediate) \
+    jit_emit_3reg_x(pc, 31, A, D, immediate, 824, 0)
+
 /* 2 register and immediate operation.
  *
  *  +--------------------------------------------------------------------+
