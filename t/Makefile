@@ -3,5 +3,8 @@
 
 .SUFFIXES: .pbc .pasm
 
+clean:
+	rm *.pbc
+
 .pasm.pbc:
 	perl -I.. ../assemble.pl $< > $@
