@@ -310,9 +310,9 @@ static void propagate_alias(void)
 		ins = curr;
 	    }
 	}
-        /* invoke w/o arg implicitely uses P0, so mark it doin so */
+        /* invoke w/o arg implicitly uses P0, so mark it as doing so */
         else if (ins->opsize == 1 && !strcmp(ins->op, "invoke")) {
-            SymReg * p0 = mk_pasm_reg("P0");
+            SymReg * p0 = mk_pasm_reg(str_dup("P0"));
             add_instruc_reads(ins, p0);
             p0->use_count++;
         }
