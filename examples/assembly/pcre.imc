@@ -77,41 +77,53 @@
     .result ok
     .pcc_end
 
-    .local int ovec0s
-    .local int ovec0e
-    .sym var struct
-    struct = new SArray
-    struct = 6
-.include "datatypes.pasm"
-    struct[0] = .DATATYPE_INT
-    struct[1] = 1
-    struct[2] = 0
-    struct[3] = .DATATYPE_INT
-    struct[4] = 1
-    struct[5] = 0
-    assign ovector, struct
-    ovec0s = ovector[0]
-    ovec0e = ovector[1]
-
     if ok <= 0 goto nomatch
 
-    print "ok: "
-    print ok
-    print " from "
-    print ovec0s
-    print " to "
-    print ovec0e
-    $I0 = ovec0e - ovec0s
-    substr $S1, s, ovec0s, $I0
-    print " matched: '"
-    print $S1
-    print "'\n"
-
-no_hack:
-
+    print "direct access\n"
+    # access unmananged struct directly
+    .local int ovecs
+    .local int ovece
+    .sym var struct
+    struct = new SArray
+    struct = 3
+.include "datatypes.pasm"
+    struct[0] = .DATATYPE_INT
+    $I0 = ok * 2
+    struct[1] = $I0
+    struct[2] = 0
+    assign ovector, struct
     .sym int i
-    i = 0
     .sym string match
+    i = 0
+lp0:
+    $I0 = i * 2
+    ovecs = ovector[0;$I0]
+    inc $I0
+    ovece = ovector[0;$I0]
+    $I0 = ovece - ovecs
+    if ovecs >= 0 goto m1
+    match = ""
+    goto m0
+m1:
+    substr match, s, ovecs, $I0
+m0:
+    if i goto subp0
+    print "all "
+    goto all0
+subp0:
+    print "("
+    print i
+    print ") "
+all0:
+    print "matched: '"
+    print match
+    print "'\n"
+    inc i
+    if i < ok goto lp0
+
+    # or use convinience function
+    print "copy_substring\n"
+    i = 0
     repeat match, " ", 500
 loop:
     .pcc_begin prototyped

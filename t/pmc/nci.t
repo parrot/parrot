@@ -381,21 +381,23 @@ OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "nci_p_i");
   loadlib P1, "libnci"
-  # this test function returns an array of int
   dlfunc P0, P1, "nci_pi", "pi"
-  set I5, 10
+  # this test function returns a struct { int[2]; char }
+  set I5, 0
   invoke
   new P2, .PerlArray
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
-  push P2, 1
+  push P2, 2	# 2 elem array
   push P2, 0
-  push P2, .DATATYPE_INT
-  push P2, 1
-  sizeof I10, .DATATYPE_INT
-  push P2, I10
+  push P2, .DATATYPE_CHAR
+  push P2, 0
+  push P2, 0
   assign P5, P2
-  set I0, P5[0]
+  set I0, P5[0;0]
+  print I0
+  print "\n"
+  set I0, P5[0;1]
   print I0
   print "\n"
   set I0, P5[1]
@@ -405,6 +407,7 @@ output_is(<<'CODE', <<'OUTPUT', "nci_p_i");
 CODE
 42
 100
+66
 OUTPUT
 
 } # SKIP

@@ -76,12 +76,21 @@ int nci_ii3(int a, int *b) {
     return r;
 }
 
-int * nci_pi(int i) {
-    int *a = calloc(i, sizeof(int));
-    a[0] = 42;
-    a[1] = 100;
-    a[2] = 200;
-    return a;
+void * nci_pi(int test) {
+    switch (test) {
+        case 0:
+            {
+                static struct {
+                    int i[2];
+                    char c;
+                } t = {
+                    {42, 100},
+                    'B'
+                };
+                return &t;
+            }
+    }
+    return NULL;
 }
 
 #ifdef TEST
