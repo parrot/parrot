@@ -13,25 +13,8 @@
 #if !defined(PARROT_PMC_H_GUARD)
 #define PARROT_PMC_H_GUARD
 
-enum {
-    enum_class_Array,
-    enum_class_Boolean,
-    enum_class_PerlUndef,
-    enum_class_PerlInt,
-    enum_class_PerlNum,
-    enum_class_PerlString,
-    enum_class_PerlArray,
-    enum_class_PerlHash,
-    enum_class_Pointer,
-    enum_class_IntQueue,
-    enum_class_Sub,
-    enum_class_Coroutine,
-    enum_class_Continuation,
-    enum_class_CSub,
-    enum_class_MultiArray,
-    enum_class_Key,
-    enum_class_max = 100
-};
+#include "parrot/core_pmcs.h"
+
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
 VAR_SCOPE PMC *Parrot_base_classname_hash;
 

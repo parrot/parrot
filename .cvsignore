@@ -16,3 +16,5 @@ vtable.ops
 vtable_ops.c
 platform.c
 jit_cpu.c
+core_pmcs.c
+*.tmp

@@ -58,6 +58,7 @@ config/gen/config_h.pl
 config/gen/config_h/config_h.in
 config/gen/config_pm.pl
 config/gen/config_pm/Config_pm.in
+config/gen/core_pmcs.pl
 config/gen/libparrot_def.pl
 config/gen/libparrot_def/libparrot_def.in
 config/gen/makefiles.pl
@@ -557,7 +558,6 @@ pbc2c.pl
 pdb.c
 pdump.c
 pmc.c
-pmc_pm.pl
 pxs.c
 register.c
 resources.c

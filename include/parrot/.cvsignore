@@ -4,3 +4,4 @@ vtable.h
 platform.h
 jit_struct.h
 jit_emit.h
+core_pmcs.h

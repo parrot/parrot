@@ -13,7 +13,7 @@
 
 #define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
 
-pmclass default noinit {
+pmclass default abstract noinit {
 
     void init () {
     }

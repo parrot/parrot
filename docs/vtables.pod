@@ -26,7 +26,7 @@ runtime error.
 
 =item *
 
-To be perfect honest, this is a slightly flawed example, since it's
+To be perfectly honest, this is a slightly flawed example, since it's
 unlikely that there will be a distinct "Python scalar" PMC class.
 The Python compiler could well type-inference variables such that
 C<a> would be a C<PythonString> and C<b> would be a C<PythonNumber>.
@@ -91,9 +91,11 @@ containing all the methods.
 Now you'll have to do something a little different depending on whether
 you're writing a built-in class or an extension class. If you're writing
 a built-in class, then you'll see a reference to
-C<enum_class_FoobyNumber> in the C<init> function. This is something
-that you need to add to the C<enum> of built-in classes located in
-F<pmc.h>. If you're not writing a built-in class, you need to change the
+C<enum_class_FoobyNumber> in the C<init> function. For built-in classes,
+this is automatically defined in F<pmc.h> when you run Configure.pl.
+If you're not writing a built-in class, you need to indicate this by 
+using the 'extension' keyword after the 'pmclass YOURCLASS' declaration
+in classes/YOURCLASS.pmc. Then, change the
 type of the C<init> function to return C<struct _vtable>, and then
 return C<temp_base_vtable> instead of assigning to the
 C<Parrot_base_vtables> array.
@@ -108,25 +110,7 @@ Add classes/YOURCLASS.pmc to MANIFEST.
 
 =item 2.
 
-Add enum_class_YOURCLASS to the enumeration in include/parrot/pmc.h.
-
-=item 3.
-
-Add Parrot_YOURCLASS_class_init to the list in include/parrot/global_setup.h.
-
-=item 4.
-
-Add a call to Parrot_YOURCLASS_class_init() to init_world() in
-global_setup.c.
-
-=item 5.
-
-Add your PMC class to the classname hash at the end of global_setup.c.
-
-=item 6.
-
-Rerun perl Configure.pl (or perl Configure.pl --debugging) to
-regenerate the makefiles with your new PMC.
+Rerun Configure.pl to add your new PMC to the set of built-in PMCs.
 
 =back
 

@@ -364,7 +364,7 @@ A preamble, consisting of code to be copied directly to the .c file
 
 =item 2.
 
-pmclass PMCNAME [extends PMCNAME] {
+pmclass PMCNAME [extends PMCNAME] [abstract] [extension] [noinit] {
 
 =item 3.
 

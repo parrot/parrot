@@ -43,9 +43,33 @@ END
   }eg;
   # build list of libraries for link line in Makfile
   (my $pmc_classes_o = $pmc_o) =~ s/^| / classes\//g;
-  
+
+  # Gather the actual names (with MixedCase) of all of the
+  # non-abstract built-in PMCs (which currently means everything but
+  # 'default'.)
+  my @names;
+  PMC: foreach my $pmc_file (split(/ /, $pmc)) {
+      my $name;
+      open(PMC, "classes/$pmc_file") or die "open classes/$pmc_file: $!";
+      while (<PMC>) {
+          if (/^pmclass (\w+)(.*)/) {
+              $name = $1;
+              my $decl = $2;
+              $decl .= <PMC> until ($decl =~ s/\{.*//);
+              next PMC if $decl =~ /\babstract\b/;
+              next PMC if $decl =~ /\bextension\b/;
+              last;
+          }
+      }
+      close PMC;
+      die "No pmclass declaration found in $pmc_file"
+        if ! defined $name;
+      push @names, $name;
+  }
+
   Configure::Data->set(
     pmc           => $pmc,
+    pmc_names     => join(" ", @names),
     pmc_o         => $pmc_o,
     pmc_build     => $pmc_build,
     pmc_classes_o => $pmc_classes_o
