@@ -14,6 +14,10 @@ use vars qw(@ISA);
 @ISA = qw(Parrot::OpTrans);
 
 sub suffix { return "_cg"; }
+sub core_prefix {
+    return "cg_";
+}
+
 
 sub core_type {
     return 'PARROT_CGOTO_CORE';
@@ -177,5 +181,74 @@ sub restart_offset
   return "interpreter->resume_offset = REL_PC + $offset; interpreter->resume_flag = 1";
 }
 
+#############################################
+# ops2c code generation functions
+#
+# the run core function
+sub run_core_func_decl {
+    my ($self, $core) = @_;
+    "opcode_t * " .
+    $self->core_prefix .
+    "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
+}
+
+sub ops_addr_decl {
+    "static void **ops_addr;\n\n";
+}
+
+sub run_core_func_start {
+    return <<END_C;
+#if defined(__GNUC__) && defined(I386)
+    register opcode_t *cur_opcode asm ("esi") = cur_op;
+#else
+    opcode_t *cur_opcode = cur_op;
+#endif
+
+    static void *l_ops_addr[] = {
+END_C
+}
+
+sub run_core_after_addr_table {
+    return <<END_C;
+
+/* #ifdef HAVE_NESTED_FUNC */
+#ifdef __GNUC__
+    static void _check(void);
+    static void _check(void) {
+	int lo_var_ptr;
+	if (!interpreter->lo_var_ptr)
+	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
+    }
+#endif
+/* #endif */
+
+    if (!ops_addr)
+	ops_addr = l_ops_addr;
+    if (cur_opcode == 0) {
+        return (opcode_t *)ops_addr ;
+    }
+END_C
+}
+
+sub run_core_finish {
+    my ($self, $base) = @_;
+    return "\n} /* " . $self->core_prefix . "$base */\n\n";
+
+}
+
+sub init_func_init1 {
+    my ($self, $base) = @_;
+    my $cg_func = $self->core_prefix . $base;
+    return <<END_C;
+ 	if (!op_lib.op_func_table)
+            op_lib.op_func_table = (op_func_t *) $cg_func(0, 0);
+END_C
+}
+
+sub init_set_dispatch {
+    return <<END_C;
+        ops_addr = (void**) init;
+END_C
+}
 1;
 

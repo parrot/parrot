@@ -23,6 +23,7 @@ sub core_type {
     return 'PARROT_SWITCH_CORE';
 }
 
+sub core_prefix { return "switch_"; }
 
 #
 # suffix()
@@ -83,4 +84,42 @@ sub goto_pop
 {
   my ($self) = @_;
   return "{ cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter));\n  goto SWITCH_AGAIN; }";
+}
+
+#############################################
+# ops2c code generation functions
+#
+# the run core function
+sub run_core_func_decl {
+    my ($self, $core) = @_;
+    "opcode_t * " .
+    $self->core_prefix .
+    "$core(opcode_t *cur_op, Parrot_Interp interpreter)";
+}
+
+sub run_core_func_start {
+    return <<END_C;
+    opcode_t *cur_opcode = cur_op;
+
+    do {
+SWITCH_AGAIN:
+    if (!cur_opcode)
+        break;
+    switch (*cur_opcode) {
+END_C
+}
+
+sub run_core_finish {
+    my ($self, $base) = @_;
+    my $c = <<END_C;
+	default:
+	    internal_exception(1, "illegal opcode\\n");
+	    break;
+	} /* switch */
+    } while (1);
+    return NULL;
+}
+END_C
+    $c .= " /* " . $self->core_prefix . "$base */\n\n";
+    $c;
 }

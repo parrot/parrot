@@ -143,14 +143,12 @@ print HEADER <<END_C;
 extern op_lib_t *$init_func(int init);
 
 END_C
-my $cg_func = $suffix =~ /cgp/ ? 'cgp_' :
-              $suffix =~ /switch/ ? 'switch_' : 'cg_';
+my $cg_func = $trans->core_prefix . $base;
 
-if ($suffix =~ /cg/ || $suffix =~ /switch/) {
-	print HEADER <<END_C;
 
-opcode_t *$cg_func${base}(opcode_t *, struct Parrot_Interp *);
-END_C
+if ($trans->can("run_core_func_decl")) {
+    my $run_core_func = $trans->run_core_func_decl($base);
+    print HEADER "$run_core_func;\n";
 }
 
 print SOURCE $preamble;
@@ -164,36 +162,14 @@ END_C
 print SOURCE $ops->preamble($trans);
 
 
-if ($suffix =~ /cg/) {
-	print SOURCE <<END_C;
-
-static void **ops_addr;
-
-opcode_t *
-$cg_func$base(opcode_t *cur_op, struct Parrot_Interp *interpreter)
-{
-#if defined(__GNUC__) && defined(I386)
-    register opcode_t *cur_opcode asm ("esi") = cur_op;
-#else
-    opcode_t *cur_opcode = cur_op;
-#endif
-
-    static void *l_ops_addr[] = {
-END_C
-
-} elsif ($suffix =~ /switch/) {
-	print SOURCE <<END_C;
-opcode_t *
-$cg_func$base(opcode_t *cur_opcode, struct Parrot_Interp *interpreter)
-{
-    do {
-SWITCH_AGAIN:
-    if (!cur_opcode)
-        break;
-    switch (*cur_opcode) {
-END_C
+if ($trans->can("ops_addr_decl")) {
+    print SOURCE $trans->ops_addr_decl;
 }
-
+if ($trans->can("run_core_func_decl")) {
+    print SOURCE $trans->run_core_func_decl($base);
+    print SOURCE "\n{\n";
+    print SOURCE $trans->run_core_func_start;
+}
 
 #
 # Iterate over the ops, appending HEADER and SOURCE fragments:
@@ -284,26 +260,11 @@ EOF
 if ($suffix =~ /cg/) {
     print SOURCE @cg_jump_table;
     print SOURCE <<END_C;
-  NULL
-};
-
-/* #ifdef HAVE_NESTED_FUNC */
-#ifdef __GNUC__
-    static void _check(void);
-    static void _check(void) {
-	int lo_var_ptr;
-	if (!interpreter->lo_var_ptr)
-	    interpreter->lo_var_ptr = (void*)&lo_var_ptr;
-    }
-#endif
-/* #endif */
-
-    if (!ops_addr)
-	ops_addr = l_ops_addr;
-    if (cur_opcode == 0) {
-        return (opcode_t *)ops_addr ;
-    }
+        NULL
+    };
 END_C
+    print SOURCE $trans->run_core_after_addr_table;
+
 }
 
 if ($suffix =~ /cgp/) {
@@ -343,23 +304,10 @@ END_C
 #
 print SOURCE @op_funcs;
 
-if ($suffix =~ /cg/) {
-    print SOURCE <<END_C;
-} /* $cg_func$base */
-
-END_C
-} elsif ($suffix =~ /switch/) {
-    print SOURCE <<END_C;
-    default:
-        internal_exception(1, "illegal opcode\\n");
-	break;
-} /* switch */
-} while (1);
-    return NULL;
-} /* $cg_func$base */
-
-END_C
+if ($trans->can("run_core_finish")) {
+    print SOURCE $trans->run_core_finish($base);
 }
+
 
 #
 # reset #line in the SOURCE file.
@@ -571,6 +519,7 @@ else {
 static void hop_deinit(void) {}
 END_C
 }
+
 print SOURCE <<END_C;
 
 /*
@@ -590,32 +539,40 @@ static op_lib_t op_lib = {
   $getop		/* op_code() */
 };
 
+END_C
+
+# generate initfunc
+my $init1_code = "";
+if ($trans->can("init_func_init1")) {
+    $init1_code = $trans->init_func_init1($base);
+}
+
+my $init_set_dispatch = "";
+if ($trans->can("init_set_dispatch")) {
+    $init_set_dispatch = $trans->init_set_dispatch;
+}
+
+print SOURCE <<END_C;
 op_lib_t *
 $init_func(int init) {
-    if (init) {
-END_C
-
-if ($suffix =~ /cg/) {
-print SOURCE <<END_C;
-        if (init == 1) {
-	    if (!op_lib.op_func_table)
-	        op_lib.op_func_table = (op_func_t *) $cg_func$base(0, 0);
-	}
-	else
-	    ops_addr = (void**) init;
-END_C
-}
-
-print SOURCE <<END_C;
+    /* initialize and return op_lib ptr */
+    if (init == 1) {
+$init1_code
 	return &op_lib;
     }
+    /* set op_lib to the passed ptr (in init) */
+    else if (init) {
+$init_set_dispatch
+    }
+    /* deinit - free resources */
     else {
 	hop_deinit();
-	return NULL;
     }
+    return NULL;
 }
 
 END_C
+
 if ($dynamic) {
     my $load_func = "Parrot_lib_${base}${suffix}_ops_load";
     print SOURCE <<END_C;

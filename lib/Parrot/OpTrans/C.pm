@@ -17,6 +17,9 @@ sub core_type {
     return 'PARROT_FUNCTION_CORE';
 }
 
+sub core_prefix {
+    "";
+}
 #
 # defines()
 #

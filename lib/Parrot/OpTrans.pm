@@ -42,5 +42,10 @@ sub goto_pop {
     return $self->gen_goto($self->expr_pop(@_));
 }
 
+#############################################
+# ops2c code generation functions
+#
+
+
 1;
 

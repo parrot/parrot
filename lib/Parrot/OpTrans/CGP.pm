@@ -16,8 +16,9 @@ package Parrot::OpTrans::CGP;
 
 use Parrot::OpTrans;
 use Parrot::OpTrans::CPrederef;
+use Parrot::OpTrans::CGoto;
 use vars qw(@ISA);
-@ISA = qw(Parrot::OpTrans::CPrederef);
+@ISA = qw(Parrot::OpTrans::CPrederef Parrot::OpTrans::CGoto);
 
 
 sub core_type {
@@ -31,6 +32,10 @@ sub core_type {
 sub suffix
 {
   return "_cgp";
+}
+
+sub core_prefix {
+    return "cgp_";
 }
 
 sub defines
@@ -87,3 +92,8 @@ sub goto_pop
   my ($self) = @_;
   return "goto ** (cur_opcode = (opcode_t*)opcode_to_prederef(interpreter,pop_dest(interpreter)))";
 }
+
+#############################################
+# ops2c code generation functions
+#
+
