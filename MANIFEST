@@ -1508,6 +1508,7 @@ imcc/docs/running.pod                   [main]doc
 imcc/docs/syntax.pod                    [main]doc
 imcc/examples/README                    [main]doc
 imcc/examples/sample.imc                [main]doc
+imcc/examples/sub.imc                   [main]doc
 imcc/examples/test_allocate.imc         [main]doc
 imcc/examples/test_spilling.imc         [main]doc
 imcc/imc.c                              []
