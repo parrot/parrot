@@ -5,10 +5,10 @@ DESTDIR = ${build_dir}${slash}runtime${slash}parrot${slash}dynext
 O = ${o}
 
 # add your dynamic pmcs here
-
-PMCS = foo subproxy \
-tclobject tclstring tclint tclfloat \
-tcllist tclarray \
+# gdbmhash is only built when 'libgdbm.so' is available
+PMCS = \
+foo \
+${gdbmhash} \
 match matchrange \
 pybuiltin \
 pyclass \
@@ -35,7 +35,9 @@ pyobject \
   pytuple \
 pyproxytype \
 pyproxyclass \
-pyiter
+pyiter \
+subproxy \
+tclobject tclstring tclint tclfloat tcllist tclarray
 
 BUILD = ${perl} build.pl
 

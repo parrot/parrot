@@ -171,6 +171,10 @@ The class is part of a group of interrelated PMCs that should be
 compiled together into a single shared library of the given name. Only
 valid for dynamic PMCs.
 
+=item C<lib LIB>
+
+The class needs an external library.
+
 =back
 
 =item 3.
@@ -320,7 +324,7 @@ sub parse_flags {
     my $c = shift;
     $$c =~ s/^(.*?^\s*)pmclass ([\w]*)//ms;
     my ($pre, $classname) = ($1, $2);
-    my %has_value = ( does => 1, extends => 1, group => 1 );
+    my %has_value = ( does => 1, extends => 1, group => 1, lib => 1 );
 
     my %flags;
     # look through the pmc declaration header for flags such as noinit

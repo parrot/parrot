@@ -1,5 +1,5 @@
 #! perl -w
-# Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
@@ -73,8 +73,6 @@ Debugging is turned on by default. Use this to disable it.
 =item C<--profile>
 
 Turn on profiled compile (gcc only for now)
-
-Tell the compiler to do an optimization phase.
 
 =item C<--optimize>
 
@@ -276,13 +274,13 @@ $parrot_version = parrot_version();
 
 my %args;
 
-for(@ARGV) {
-  my($key, $value)=/--([-\w]+)(?:=(.*))?/;
+for (@ARGV) {
+  my($key, $value) = m/--([-\w]+)(?:=(.*))?/;
   $key   = 'help' unless defined $key;
   $value = 1      unless defined $value;
 
-  for($key) {
-    /version/ && do {
+  for ($key) {
+    m/version/ && do {
       my $cvsid='$Id$';
       print <<"END";
 Parrot Version $parrot_version Configure 2.0
@@ -291,7 +289,7 @@ END
       exit;
     };
 
-    /help/    && do {
+    m/help/    && do {
       print <<"EOT";
 $0 - Parrot Configure 2.0
 
@@ -381,7 +379,7 @@ Other Options (may not be implemented):
 EOT
       exit;
     };
-    $args{$key}=$value;
+    $args{$key} = $value;
   }
 }
 
@@ -389,10 +387,10 @@ $args{debugging} = 1 unless ((exists $args{debugging}) && !$args{debugging});
 
 print <<"END";
 Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright (C) 2001-2005 The Perl Foundation.  All Rights Reserved.
 
-Hello, I'm Configure.  My job is to poke and prod your system to figure out
-how to build Parrot.  The process is completely automated, unless you passed in
+Hello, I'm Configure. My job is to poke and prod your system to figure out
+how to build Parrot. The process is completely automated, unless you passed in
 the `--ask' flag on the command line, in which case it'll prompt you for a few
 pieces of info.
 
@@ -400,11 +398,8 @@ Since you're running this script, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
 
-
 #Run the actual steps
 Parrot::Configure::RunSteps->runsteps(%args);
-
-
 
 print <<"END";
 

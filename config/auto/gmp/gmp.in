@@ -1,6 +1,9 @@
-#include <gmp.h>
+/* Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved. */
+/* $Id$ */
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <gmp.h>
 
 int main(int argc, char *argv[])
 {

@@ -312,7 +312,7 @@ sub cc_gen {
 	genfile($source, "test.c");
 }
 
-=item C<cc_build($cc_args)>
+=item C<cc_build($cc_args, $link_args)>
 
 These items are used from current config settings:
 
@@ -323,8 +323,10 @@ Calls the compiler and linker on F<test.c>.
 =cut
 
 sub cc_build {
-  my ($cc_args) = shift;
+  my ($cc_args, $link_args) = @_;
   $cc_args = '' unless defined $cc_args;
+  $link_args = '' unless defined $link_args;
+
   my ($cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs)=
   Configure::Data->get( qw(cc ccflags ld_out o link linkflags
                         cc_exe_out exe libs) );
@@ -333,7 +335,7 @@ sub cc_build {
       'test.cco', 'test.cco')
     and confess "C compiler failed (see test.cco)";
 
-  _run_command("$link $linkflags test$o ${cc_exe_out}test$exe $libs",
+  _run_command("$link $linkflags $link_args test$o ${cc_exe_out}test$exe $libs",
       'test.ldo', 'test.ldo')
     and confess "Linker failed (see test.ldo)";
 }

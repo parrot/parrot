@@ -21,10 +21,10 @@ use Test::More;
 use Parrot::Config;
 
 if ($PConfig{gmp}) {
-   plan tests => 21;
+    plan tests => 21;
 }
 else {
-   plan skip_all => "No BigInt Lib configured";
+    plan skip_all => "No BigInt Lib configured";
 }
 
 my $fp_equality_macro = <<'ENDOFMACRO';

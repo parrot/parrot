@@ -1,0 +1,382 @@
+/* gdbmhash.pmc
+ *  Copyright: 2005 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     These are the vtable functions for the GDBMHash PMC
+ *  Data Structure and Algorithms:
+ *  History:
+ *  Notes:
+ *     Please remove unneeded entries.
+ *  References:
+
+=head1 NAME
+
+dynclasses/gdbmhash.pmc - GDBM PMC
+
+=head1 DESCRIPTION
+
+This is an interface to the GNU dbm library.
+
+=head1 keys
+
+On inserted and fetch, keys are converted to STRINGs.
+
+=head2 store
+
+PMC insert values are convered to STRINGs.
+TODO: Integer insert values are converted to STRINGs.
+TODO: Number insert values are converted to STRINGs.
+
+=head2 fetch
+
+get_integer_keyed() and get_number_keyed() make propably no sense,
+as integers usually can't be converted.
+
+When a PMC is requested, a String PMC is returned.
+
+TODO: return None PMC for nonexisting keys.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+ */
+
+#include "parrot/parrot.h"
+#include <gdbm.h>
+
+/*
+
+=item C<static STRING* make_hash_key(Interp *interpreter, PMC *key)>
+
+Returns a Parrot string for C<*key>.
+
+=cut
+
+*/
+
+static STRING* make_hash_key(Interp* interpreter, PMC * key)
+{
+    if (key == NULL) {
+        internal_exception(OUT_OF_BOUNDS, "Hash: Cannot use NULL key");
+        return NULL;
+    }
+    return key_string(interpreter, key);
+}
+
+
+pmclass GDBMHash does hash dynpmc lib gdbm {
+
+/*
+
+=item C<void class_init()>
+
+Class initialization. Allocates the memory for the hash.
+
+=cut
+
+*/
+
+    void class_init() {
+        /* XXX: Name of the lib should be configurable */
+        STRING *slib = string_from_cstring(INTERP, "libgdbm", 0);
+
+        /* XXX: What if libgdbm.so cannot be loaded */
+        Parrot_load_lib(INTERP, slib, NULL);
+    }
+
+    void init () {
+        PMC_struct_val(SELF) = NULL;
+    }
+
+    void* get_pointer() {
+        return PMC_struct_val(SELF);
+    }
+
+    void set_pointer(void* p) {
+        PMC_struct_val(SELF) = p;
+    }
+
+/*
+
+=item C<VOID set_string_native(STRING* value)>
+
+Open a or create a new dbm file. 
+
+=cut
+
+*/
+
+    void set_string_native (STRING* value) {
+        char *c_db_name = string_to_cstring(INTERP, value);
+        GDBM_FILE dbf = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
+
+        PMC_struct_val(SELF) = dbf;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the number of pairs in the hash.
+A uninitialized GDBMHash returns 0.
+
+=cut
+
+XXX: This can be optimized by keeping track of number of elements
+
+*/
+
+    INTVAL get_integer() {
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        if ( ! dbf ) {
+            return 0;
+        }
+        else {
+            INTVAL cnt = 0;
+            datum key, nextkey;
+            for ( key = gdbm_firstkey( dbf ); key.dptr; key = nextkey ) {
+                cnt++;
+                nextkey = gdbm_nextkey( dbf, key );
+                free( key.dptr );
+            }
+            
+            return cnt;
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if the hash size is not zero.
+
+=cut
+
+*/
+
+    INTVAL get_bool() {
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        if ( ! dbf ) {
+            return 0;
+        }
+        else {
+            datum key = gdbm_firstkey ( dbf );
+            if ( key.dptr ) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+    }
+
+/*
+
+=item C<void set_string_keyed(PMC *key, STRING *value)>
+
+=cut
+
+*/
+
+    void set_string_keyed (PMC* key, STRING* value) {
+        STRING* keystr;
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        datum key_gdbm, val_gdbm;
+
+        if (!key) return;
+        if (!dbf) return;
+        keystr = make_hash_key(INTERP, key);
+
+        key_gdbm.dsize = keystr->strlen;
+        key_gdbm.dptr  = keystr->strstart;
+        val_gdbm.dsize = value->strlen;
+        val_gdbm.dptr  = value->strstart;
+
+        gdbm_store( dbf, key_gdbm, val_gdbm, GDBM_REPLACE );
+
+        return;
+    }
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Returns the string value for the element at C<*key>.
+
+=cut
+
+*/
+
+    STRING* get_string_keyed (PMC* key) {
+        STRING* keystr, *val;
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        datum key_gdbm, val_gdbm;
+
+        if (!key) return NULL;
+        if (!dbf) return NULL;
+        keystr = make_hash_key(INTERP, key);
+
+        key_gdbm.dsize = keystr->strlen;
+        key_gdbm.dptr  = keystr->strstart;
+        val_gdbm = gdbm_fetch (dbf, key_gdbm);
+
+        val = string_from_cstring(INTERP, val_gdbm.dptr, val_gdbm.dsize);
+        free( val_gdbm.dptr );
+        
+        return val;
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed(PMC* key, PMC *value)>
+
+Convert C<value> to a string and set the string for the C<key>.
+
+=cut
+
+*/
+
+    void set_pmc_keyed(PMC* key, PMC* value) {
+        STRING *temp;
+
+        temp = VTABLE_get_string(INTERP, value);
+        DYNSELF.set_string_keyed(key, temp);
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the PMC value for the element at C<*key>.
+
+=cut
+
+*/
+
+    PMC* get_pmc_keyed (PMC* key) {
+        STRING * ret_string = DYNSELF.get_string_keyed(key);
+        PMC *ret_pmc = pmc_new(INTERP, enum_class_String);
+
+        VTABLE_set_string_native(INTERP, ret_pmc, ret_string);
+
+        return ret_pmc;
+    }
+
+/*
+
+=item C<void set_integer_keyed(PMC* key, INTVAL value)>
+
+Convert C<value> to a string and set the string for the C<key>.
+
+=cut
+
+*/
+
+    void set_integer_keyed(PMC* key, INTVAL value) {
+        PMC *temp;
+
+        temp = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_integer_native(INTERP, temp, value);
+        DYNSELF.set_pmc_keyed( key, temp);
+    }
+
+
+/*
+
+=item C<void set_number_keyed(PMC* key, FLOATVAL value)>
+
+Convert C<value> to a string and set the string for the C<key>.
+
+=cut
+
+*/
+
+    void set_number_keyed(PMC* key, FLOATVAL value) {
+        PMC *temp;
+
+        temp = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_number_native(INTERP, temp, value);
+        DYNSELF.set_pmc_keyed( key, temp);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Returns whether a key C<*key> exists in the hash.
+
+=cut
+
+*/
+
+    INTVAL exists_keyed(PMC* key) {
+        STRING* keystr;
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        datum key_gdbm;
+
+        if (!key) return 0;
+        if (!dbf) return 0;
+        keystr = make_hash_key(INTERP, key);
+
+        key_gdbm.dsize = keystr->strlen;
+        key_gdbm.dptr  = keystr->strstart;
+        
+        return gdbm_exists(dbf, key_gdbm);
+    }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+Deletes the element associated with C<*key>.
+
+=cut
+
+*/
+
+    void delete_keyed(PMC* key) {
+        STRING* keystr;
+        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        datum key_gdbm;
+
+        if (!key) return;
+        if (!dbf) return;
+        keystr = make_hash_key(INTERP, key);
+
+        key_gdbm.dsize = keystr->strlen;
+        key_gdbm.dptr  = keystr->strstart;
+        
+        if ( gdbm_exists(dbf, key_gdbm) ) {
+           gdbm_delete(dbf, key_gdbm);
+        }
+
+        return;
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd08_keys.pod>, L<http://gdbm.gnu.org>
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

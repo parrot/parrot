@@ -57,6 +57,7 @@ use vars qw(@steps);
     auto/env.pl
     auto/aio.pl
     auto/gmp.pl
+    auto/gdbm.pl
     auto/snprintf.pl
     auto/perldoc.pl
     gen/icu.pl

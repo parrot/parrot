@@ -1,13 +1,14 @@
-# Copyright: 2001-2004 The Perl Foundation.  All Rights Reserved.
+# Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 # $Id$
 
 =head1 NAME
 
-config/auto/gmp.pl - Test for GNU MP (GMP) Math library
+config/auto/gdbm.pl - Test for GNU dbm (gdbm) library
 
 =head1 DESCRIPTION
 
-Determines whether the platform supports GMP.
+Determines whether the platform supports gdbm.
+This is needed for the dynamic GDBMHash PMC.
 
 =cut
 
@@ -17,7 +18,7 @@ use strict;
 use vars qw($description @args);
 use Parrot::Configure::Step ':auto';
 
-$description="Determining if your platform supports GMP...";
+$description="Determining if your platform supports gdbm...";
 
 @args=qw(verbose);
 
@@ -27,7 +28,6 @@ sub runstep {
     my $libs = Configure::Data->get('libs');
     my $linkflags = Configure::Data->get('linkflags');
     my $ccflags = Configure::Data->get('ccflags');
-    Configure::Data->add(' ', 'libs', '-lgmp');
     
     my $archname = $Config{archname};
     my ($cpuarch, $osname) = split('-', $archname);
@@ -35,34 +35,35 @@ sub runstep {
         ($osname, $cpuarch) = ($cpuarch, "");
     }
 
-    # On OS X check the presence of the gmp header in the standard
+    # On OS X check the presence of the gdbm header in the standard
     # Fink location. TODO: Need a more generalized way for finding 
     # where Fink lives.
     if($osname =~ /darwin/) {
-        if( -f "/sw/include/gmp.h") {
+        if( -f "/sw/include/gdbm.h") {
             Configure::Data->add(' ', 'linkflags', '-L/sw/lib');
             Configure::Data->add(' ', 'ldflags', '-L/sw/lib');
             Configure::Data->add(' ', 'ccflags', '-I/sw/include');
         }
     }
 
-    cc_gen('config/auto/gmp/gmp.in');
-    eval { cc_build(); };
-    my $has_gmp = 0;
+    cc_gen('config/auto/gdbm/gdbm.in');
+    eval { cc_build('', '-lgdbm'); };
+    my $has_gdbm = 0;
     if (! $@) {
 	my $test = cc_run();
-	if ($test eq "499999500000\n") {
-            $has_gmp = 1;
+        unlink "gdbm_test_db";
+	if ($test eq "gdbm is working.\n") {
+            $has_gdbm = 1;
 	    print " (yes) " if $verbose;
             $Configure::Step::result = 'yes';
 
 	    Configure::Data->set(
-		gmp     => 'define',
-		HAS_GMP => $has_gmp,
+		has_gdbm => '1',         # for gdbmhash.t
+		gdbmhash => 'gdbmhash',  # for dynclasses.in
 	    );
 	}
     }
-    unless ( $has_gmp ) {
+    unless ($has_gdbm) {
         # The Config::Data settings might have changed for the test 
         Configure::Data->set('libs', $libs);
         Configure::Data->set('ccflags', $ccflags);
@@ -71,4 +72,3 @@ sub runstep {
         $Configure::Step::result = 'no';
     }
 }
-

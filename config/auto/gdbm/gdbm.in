@@ -1,0 +1,38 @@
+/* Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved. */
+/* $Id$ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <gdbm.h>
+
+int main(int argc, char *argv[])
+{
+    GDBM_FILE dbf;
+    datum key, val_in, val_out;
+
+    dbf = gdbm_open( "gdbm_test_db", 0, GDBM_NEWDB, 0666, 0);
+    if (!dbf)
+    {
+        fprintf (stderr, "File %s could not be created.\n", argv[1]);
+        exit (2);
+    }
+
+    key.dptr  = "Is gdbm funktional?";
+    key.dsize = 19;
+    val_in.dptr  = "gdbm is working.";
+    val_in.dsize = 17;
+
+    gdbm_store( dbf, key, val_in, GDBM_INSERT );
+
+    val_out = gdbm_fetch(dbf, key);
+
+    if (val_out.dsize > 0) {
+        printf ("%s\n", val_out.dptr);
+        free(val_out.dptr);
+    } else {
+        printf("Key not found.\n");
+    }
+    gdbm_close (dbf);
+
+    return 0;
+}
