@@ -22,14 +22,18 @@ mem_sys_allocate(UINTVAL);
 void *
 mem_realloc(void *, UINTVAL, UINTVAL);
 
+void *
+mem_sys_realloc(void *, UINTVAL);
+
+void
+mem_sys_free(void *);
+
 void
 mem_setup_allocator(struct Parrot_Interp *);
 
 #define mem_allocate_new_stash() NULL
 #define mem_allocate_new_stack() NULL
 #define mem_sys_memcopy memcpy
-#define mem_sys_realloc realloc
-#define mem_sys_free free
 
 #endif
 

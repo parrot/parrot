@@ -72,6 +72,22 @@ mem_sys_allocate(UINTVAL size) {
     return malloc((size_t)size);
 }
 
+/*=for api mem mem_sys_realloc
+   resize a chunk of system memory
+*/
+void *
+mem_sys_realloc(void *from, UINTVAL size) {
+    return realloc(from, size);
+}
+
+/*=for api mem mem_sys_free
+   free a chunk of memory back to the system
+*/
+void
+mem_sys_free(void *from) {
+    free(from);
+}
+
 /*=for api mem mem_setup_allocator
    initializes the allocator
 */
