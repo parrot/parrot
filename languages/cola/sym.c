@@ -357,10 +357,10 @@ Symbol * split(const char * pattern, const char * s) {
     int len;
     if(!strstr(s, pattern))
 	return new_symbol(s);
+    p = s;
 AGAIN:
-    for(p = s, len = 0; p[len] && p[len] != c; p++) {
-        len++;
-    }
+    for(len = 0; p[len] && p[len] != c; len++)
+        ;
     if(len) {
         Symbol * n = new_symbol("");
 	n->name = malloc(len+1);
@@ -368,9 +368,10 @@ AGAIN:
 	n->name[len] = '\0';
         tunshift_sym(&l, n);
     }
-    if(!p[len])
+    if(!len || !p[len])
         return l;
     else {
+        len++;
 	p += len;
 	goto AGAIN;
     }
@@ -382,7 +383,6 @@ Symbol * lookup_symbol(const char * name) {
     Symbol * ns = current_namespace;
     Symbol * list = split(".", name);
     Symbol * s;
-    fprintf(stderr, "lookup_symbol: %s split to (%s,...)\n", name, list->name); 
     for(ns = current_namespace; ns; ) {
         if((s = lookup_symbol_in_tab(ns->table, list->name))) {
 	    ns = s;
@@ -401,6 +401,11 @@ Symbol * lookup_symbol(const char * name) {
 Symbol * lookup_symbol_in_tab(SymbolTable * tab, const char * name) {
     Symbol * sym_ptr;
     unsigned int index = hash_str(name) % HASH_SIZE;
+    if(!tab) {
+        fprintf(stderr, "Internal error: NULL symbol table\n");
+        fprintf(stderr, "while resolving [%s]\n", name);
+        abort();
+    }
     for(sym_ptr = tab->table[ index ]; sym_ptr; sym_ptr = sym_ptr->next)    {
         if(!strcmp(name, sym_ptr->name))
             return sym_ptr;
@@ -446,13 +451,13 @@ Symbol * lookup_symbol_scope(SymbolTable * tab, const char * name, int scope_lev
 Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     unsigned int index = hash_str(sym->name) % HASH_SIZE;
 #if 0
-    printf("#store_symbol(%s)\n", sym->name);
+    fprintf(stderr, "#store_symbol(%s)\n", sym->name);
     if(sym->table && sym->table == tab) {
-        printf("Internal error, namespace->symbol table loop.\n");
-        printf("Symbol [%s] contains loopback namespace.\n", sym->name);
+        fprintf(stderr, "Internal error, namespace->symbol table loop.\n");
+        fprintf(stderr, "Symbol [%s] contains loopback namespace.\n", sym->name);
         abort();
     } else if(sym == global_namespace) {
-        printf("Internal error, can't store global namespace.\n");
+        fprintf(stderr, "Internal error, can't store global namespace.\n");
         abort();
     }
 #endif
@@ -460,7 +465,7 @@ Symbol * store_symbol(SymbolTable * tab, Symbol * sym) {
     sym->next = tab->table[index];
     tab->table[index] = sym;
 #ifdef DEBUG
-    printf("storing[%s] scope %d\n", sym->name, scope);
+    fprintf(stderr, "storing[%s] scope %d\n", sym->name, scope);
 #endif
     return sym;
 }
