@@ -442,9 +442,13 @@ STRING *
 PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
 {
     struct sockaddr_in sa;
+    /* Hard coded to IPv4 for now */
+    int family = AF_INET;
+
     /* XXX: Fixme, inet_addr obsolete, replace with inet_aton */
     char * s = string_to_cstring(interpreter, addr);
-    if(inet_aton(s, &sa.sin_addr) != 0) {
+    /*if(inet_aton(s, &sa.sin_addr) != 0) {*/
+    if(inet_pton(family, s, &sa.sin_addr) != 0) {
         /* Success converting numeric IP */
     }
     else {
@@ -470,8 +474,8 @@ PIO_sockaddr_in(theINTERP, unsigned short port, STRING * addr)
             NULL);
 }
 
-#if PARROT_NET_DEVEL
 
+#if PARROT_NET_DEVEL
 
 static ParrotIO *
 PIO_unix_socket(theINTERP, ParrotIOLayer *layer, int fam, int type, int proto)
@@ -499,15 +503,23 @@ PIO_unix_connect(theINTERP, ParrotIOLayer *layer, ParrotIO *io, STRING *r)
         io->remote.sin_port = sa.sin_port;
     }
 AGAIN:
-    fprintf(stderr, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));
+    PIO_eprintf(interpreter, "connect: fd = %d port = %d\n", io->fd, ntohs(io->remote.sin_port));
     if((connect(io->fd, (struct sockaddr*)&io->remote,
                    sizeof(struct sockaddr))) != 0) {
         switch(errno) {
             case EINTR:        goto AGAIN;
             case EINPROGRESS:  goto AGAIN;
             case EISCONN:      return 0;
+            case ECONNREFUSED:
+#if PIO_TRACE
+                               PIO_eprintf(interpreter, "PIO_unix_connect: connect refused\n");
+#endif
             case EINVAL:
-            default:           perror("connect:"); return -1;
+            default:          
+#if PIO_TRACE
+                               PIO_eprintf(interpreter, "PIO_unix_connect: errno = %d\n", errno);
+#endif
+                               return -1;
         }
     }
 
@@ -638,6 +650,9 @@ AGAIN:
         if(!*s) {
             PANIC("PIO_recv: Failed to allocate string");
         }
+#if PIO_TRACE
+        PIO_eprintf(interpreter, "PIO_unix_revc: %d bytes\n", bytesread);
+#endif
         return bytesread;
     } else {
         switch(errno) {
@@ -648,8 +663,14 @@ AGAIN:
             case EGAIN:        goto AGAIN;
 #endif
             case ECONNRESET:   close(io->fd);
+#if PIO_TRACE
+            PIO_eprintf(interpreter, "recv: Connection reset by peer\n"); 
+#endif
                                return -1;
             default:           close(io->fd);
+#if PIO_TRACE
+            PIO_eprintf(interpreter, "recv: errno = %d\n", errno); 
+#endif
                                return -1;
         }
     }
