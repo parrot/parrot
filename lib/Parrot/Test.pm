@@ -215,7 +215,7 @@ sub generate_functions {
       $libparrot =~ s/\$\(A\)/$PConfig{a}/;
 
       my ($cmd, $exit_code);
-      $cmd = "$PConfig{cc} $PConfig{ccflags} -I./include -c " .
+      $cmd = "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} -I./include -c " .
              "$PConfig{cc_o_out}$obj_f $source_f";
       $exit_code = _run_command($cmd, 'STDOUT' => $build_f, 'STDERR' => $build_f);
       $Builder->diag("'$cmd' failed with exit code $exit_code") if $exit_code;
