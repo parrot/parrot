@@ -1,3 +1,4 @@
+.pcc_sub @LOAD __postgres_init:
 saveall
 loadlib P1, 'libpq'
 dlfunc P2, P1, 'PQconnectStart', 'pt'
