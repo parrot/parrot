@@ -6,7 +6,7 @@ use constant FALSE => 0;
 sub tokenize {
     my $data = shift;
     my @tokens = split(//, $data);
-    my @types = map { /[a-zA-Z_]/ ? 'CHAR' : (/\d/ ? 'NUM' : $_) } @tokens;
+    my @types = map { /[a-zA-Z_ ]/ ? 'CHAR' : (/\d/ ? 'NUM' : $_) } @tokens;
     return \@tokens, \@types;
 }
 
@@ -69,6 +69,8 @@ range : '{' number ',' number '}'
    { return { min => $_[2], max => $_[4] }; }
       | '{' ',' number '}'
    { return { min => 0, max => $_[3] }; }
+      | '{' number '}'
+   { return { min => $_[2], max => $_[2] }; }
       | '{' number ',' '}'
    { return { min => $_[2], max => -1 }; }
 ;
@@ -90,6 +92,10 @@ classpieces : classpieces classpiece { push @{$_[1]}, $_[2]; return $_[1]; }
 classpiece : CHAR '-' CHAR
     { return [ $_[1], $_[3] ] }
            | CHAR
+    { return $_[1]; }
+           | NUM '-' NUM
+    { return [ $_[1], $_[3] ] }
+           | NUM
     { return $_[1]; }
 ;
 
