@@ -239,6 +239,8 @@ typedef enum {
 #define PCONST(i) PF_CONST(interpreter->code, (i))
 #define PNCONST   PF_NCONST(interpreter->code)
 
+/* Make this a config option */
+#define PARROT_CATCH_NULL 0
 
 #if PARROT_CATCH_NULL
 extern PMC * PMCNULL;                     /* Holds single Null PMC         */
