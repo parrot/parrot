@@ -433,6 +433,7 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
     for (bucket = lookupBucket(hash, slot);
          bucket != NULL; bucket = getBucket(hash, bucket->next)) {
         if (string_compare(interpreter, key, bucket->key) == 0) {
+            BucketIndex bi;
             /* FIXME: If string_compare triggers a collection, both
              * bucket and prev will end up pointing to junk memory.
              * They need to be BucketIndexes or refetched. */
@@ -443,6 +444,10 @@ hash_delete(Interp *interpreter, HASH *hash, STRING *key)
                 table[slot] = bucket->next;
             }
             hash->entries--;
+            /* put bucket on free list */
+            bi = bucket - ((HASHBUCKET *)hash->bucket_pool->bufstart);
+            bucket->next = hash->free_list;
+            hash->free_list = bi;
             return;
         }
         prev = bucket;

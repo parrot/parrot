@@ -1,6 +1,6 @@
 #! perl
 
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -881,6 +881,44 @@ ok 5
 ok 6
 OUTPUT
 
+output_is(<<'CODE', <<OUTPUT, "delete and free_list");
+    set I2, 10
+    set I1, 1
+    new P0, .SArray
+    set P0, 1
+    new P1, .PerlHash
+outer:
+    set P0[0], I1
+    sprintf S0, "ok %vd\n", P0
+    set P1[S0], S0
+    set I0, 100000
+lp:
+    set P1["key"], 1
+    delete P1["key"]
+    dec I0
+    if I0, lp
 
+    set S1, P1[S0]
+    print S1
+    inc I1
+    le I1, I2, outer
+    set I0, P1
+    print I0
+    print "\n"
+    end
+
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+ok 10
+10
+OUTPUT
 1;
 
