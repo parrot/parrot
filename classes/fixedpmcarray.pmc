@@ -498,7 +498,7 @@ Sets the integer value of the element at index C<key> to C<value>.
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, enum_class_PerlInt);
+        val = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(key, val);
     }
@@ -533,7 +533,7 @@ C<value>.
     void set_number_keyed_int (INTVAL key, FLOATVAL value) {
         PMC *val;
 
-        val = pmc_new(INTERP, enum_class_PerlNum);
+        val = pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(key, val);
     }
@@ -568,7 +568,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     void set_string_keyed_int (INTVAL key, STRING* value) {
         PMC *val;
 
-        val = pmc_new(INTERP, enum_class_PerlString);
+        val = pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, val, value);
         DYNSELF.set_pmc_keyed_int(key, val);
     }
