@@ -89,7 +89,8 @@ void bitmap_destroy(Bitmap);
 
 #define RxCaseInsensitive_on(rx)   RxFlagOn(rx, enum_rxflags_case_insensitive)
 #define RxCaseInsensitive_off(rx)  RxFlagOff(rx, enum_rxflags_case_insensitive)
-#define RxCaseInsensitive_test(rx) RxFlagTest(rx, enum_rxflags_case_insensitive)
+#define RxCaseInsensitive_test(rx) RxFlagTest(rx, \
+                                              enum_rxflags_case_insensitive)
 
 #define RxSingleLine_on(rx)        RxFlagOn(rx, enum_rxflags_single_line)
 #define RxSingleLine_off(rx)       RxFlagOff(rx, enum_rxflags_single_line)

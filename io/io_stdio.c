@@ -49,7 +49,8 @@ size_t PIO_stdio_read(theINTERP, ParrotIOLayer *layer,
                      ParrotIO *io, void *buffer, size_t len);
 size_t PIO_stdio_write(theINTERP, ParrotIOLayer *layer,
                       ParrotIO *io, const void *buffer, size_t len);
-INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io, const char *s);
+INTVAL PIO_stdio_puts(theINTERP, ParrotIOLayer *l, ParrotIO *io,
+                      const char *s);
 INTVAL PIO_stdio_seek(theINTERP, ParrotIOLayer *l, ParrotIO *io,
                      INTVAL hi, INTVAL lo, INTVAL whence);
 PIOOFF_T PIO_stdio_tell(theINTERP, ParrotIOLayer *l, ParrotIO *io);

@@ -48,8 +48,10 @@ void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
 void Parrot_do_dod_run(struct Parrot_Interp *);
 void Parrot_go_collect(struct Parrot_Interp *);
 
-void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize);
-void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *, size_t tosize);
+void *Parrot_reallocate(struct Parrot_Interp *interpreter, void *from,
+                        size_t tosize);
+void *Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *,
+                               size_t tosize);
 
 /* Functions needed for custom DOD routines */
 PMC * mark_used(PMC *used_pmc, PMC *current_end_of_list);

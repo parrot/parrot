@@ -15,19 +15,22 @@
 static CHARTYPE_TRANSCODER
 unicode_transcode_from(const char *from)
 {
-    return from ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;        /* NOTE: This cheat silences unused var warnings on gcc */
+    /* NOTE: This cheat silences unused var warnings on gcc */
+    return from ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL; 
 }
 
 static CHARTYPE_TRANSCODER
 unicode_transcode_to(const char *to)
 {
-    return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;  /* NOTE: This cheat silences unused var warnings on gcc */
+    /* NOTE: This cheat silences unused var warnings on gcc */
+    return to ? (CHARTYPE_TRANSCODER)NULL : (CHARTYPE_TRANSCODER)NULL;
 }
 
 static Parrot_Int
 unicode_is_digit(UINTVAL c)
 {
-    return (INTVAL)(isdigit((int)c) ? 1 : 0);  /* FIXME - Other code points are also digits */
+    /* FIXME - Other code points are also digits */
+    return (INTVAL)(isdigit((int)c) ? 1 : 0);  
 }
 
 static Parrot_Int

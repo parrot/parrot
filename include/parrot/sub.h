@@ -39,12 +39,20 @@ typedef struct Parrot_Continuation {
     opcode_t            *continuation;
 } * parrot_continuation_t;
 
-struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, opcode_t * address);
-struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp, opcode_t * address);
-struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp, opcode_t * address);
+struct Parrot_Sub * new_sub(struct Parrot_Interp * interp, 
+                            opcode_t * address);
 
-void save_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
-void restore_context(struct Parrot_Interp * interp, struct Parrot_Context * ctx);
+struct Parrot_Coroutine * new_coroutine(struct Parrot_Interp * interp,
+                                        opcode_t * address);
+
+struct Parrot_Continuation * new_continuation(struct Parrot_Interp * interp,
+                                              opcode_t * address);
+
+void save_context(struct Parrot_Interp * interp,
+                  struct Parrot_Context * ctx);
+
+void restore_context(struct Parrot_Interp * interp, 
+                     struct Parrot_Context * ctx);
 
 #endif /* PARROT_SUB_H_GUARD */
 

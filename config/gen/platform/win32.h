@@ -14,8 +14,11 @@
 #endif
 
 /* These disable certain Level 4 Warnings */
-#pragma warning( disable: 4100 )        /* disables 'unreferenced formal parameter' warnings */
-#pragma warning( disable: 4115 )        /* disables 'named type definition in parentheses' warnings triggered in VC98 include files */
+#pragma warning( disable: 4100 ) /* disables 'unreferenced formal parameter'
+                                  * warnings */
+#pragma warning( disable: 4115 ) /* disables 'named type definition in
+                                  * parentheses' warnings triggered in VC98 
+                                  * include files */
 
 /*
 ** Miscellaneous:
