@@ -27,6 +27,7 @@ main(int argc, char **argv) {
     int from_stdin;
     int from_file;
     char *filename;
+    char **argp;
 
     struct Parrot_Interp *interpreter;
     init_world();
@@ -40,10 +41,10 @@ main(int argc, char **argv) {
     **   -p  profiling
     **   -P  predereferencing
     **   -t  tracing
+    **   -f  filename or stdin
     **
-    ** We really should use getopt, but are we allowed?
     */
-
+    argp             = argv+1;
     flags            = 0;
     bounds_checking  = 0;
     profiling        = 0;
@@ -55,102 +56,63 @@ main(int argc, char **argv) {
     from_file        = 0;
     filename         = NULL;
 
-    while (argc > 1 && argv[1][0] == '-') {
-        if (argv[1][1] == 'b' && argv[1][2] == '\0') {
-            bounds_checking = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
+    while (*argp && (*argp)[0] == '-') {
+        if((*argp)[2] != '\0')
+            internal_exception(PARROT_USAGE_ERROR,
+                        "%s: Invalid switch: %s\n", argv[0], (*argp));
+ 
+        switch((*argp)[1]) {
+            case 'd':   debugging = 1;
+                        argp++; break;
+            case 'b':   bounds_checking = 1;
+                        argp++; break;
+            case 'j':   jit = 1;
+                        argp++; break;
+            case 'p':   profiling = 1;
+                        argp++; break;
+            case 'P':   predereferencing = 1;
+                        argp++; break;
+            case 't':   tracing = 1;
+                        argp++; break;
+            case 'f':   if(*(++argp) == NULL)
+                                internal_exception(PARROT_USAGE_ERROR,
+                                        "%s: -f requires an argument\n",
+                                                argv[0]);
+
+                        if(strcmp("-", (*argp)) == 0) {
+                            from_stdin = 1;
+                        } else {
+                            filename = malloc(strlen((*argp))+1);
+                            filename = strcpy(filename, (*argp));
+                        }
+                        argp++; break;
+            default:
+                        internal_exception(PARROT_USAGE_ERROR,
+                                "%s: Invalid switch: %s\n",
+                                        argv[0], (*argp));
         }
-        else if (argv[1][1] == 'j' && argv[1][2] == '\0') {
-            jit = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
-        }
-        else if (argv[1][1] == 'p' && argv[1][2] == '\0') {
-            profiling = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
-        }
-        else if (argv[1][1] == 'P' && argv[1][2] == '\0') {
-            predereferencing = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
-        }
-        else if (argv[1][1] == 't' && argv[1][2] == '\0') {
-            tracing = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
-        }
-        else if (argv[1][1] == 'd' && argv[1][2] == '\0') {
-            debugging = 1;
-            for(i = 2; i < argc; i++) {
-                argv[i-1] = argv[i];
-            }
-            argc--;
-        }
-        else if (argv[1][1] == 'f') {
-            if (strcmp("-", argv[2]) == 0) {
-                from_stdin = 1;
-            }
-            else {
-                filename = malloc(strlen(argv[2])+1);
-                filename = strcpy(filename, argv[2]);
-            }
-            for (i = 3; i < argc; i++) {
-                argv[i-2] = argv[i];
-            }
-            argc -= 2;
-        }
-        else {
-            internal_exception(PARROT_USAGE_ERROR, "%s: Invalid switch: %s\n", argv[0], argv[1]);
-        } 
     }
 
-
-    if (debugging) {
-        fprintf(stderr, "Parrot VM: Debugging enabled.\n");
-        flags |= PARROT_DEBUG_FLAG;
-    }
-
-    if (bounds_checking) {
-        flags |= PARROT_BOUNDS_FLAG;
-    }
-
-    if (jit) {
+    if (debugging)              flags |= PARROT_DEBUG_FLAG;
+    if (profiling)              flags |= PARROT_PROFILE_FLAG;
+    if (predereferencing)       flags |= PARROT_PREDEREF_FLAG;
+    if (tracing)                flags |= PARROT_TRACE_FLAG;
+    if (bounds_checking)        flags |= PARROT_BOUNDS_FLAG;
+    if (jit)                    flags |= PARROT_JIT_FLAG;
+ 
 #if !JIT_CAPABLE
-		internal_exception( JIT_UNAVAILABLE, "%s: Cannot use the '-j' JIT-enabling flag on this architecture: " JIT_ARCHNAME "\n", argv[0]);
-#else
-        flags |= PARROT_JIT_FLAG;
+    if(jit)
+        internal_exception( JIT_UNAVAILABLE, "%s: Cannot use the '-j' JIT-enabling flag on this architecture: " JIT_ARCHNAME "\n", argv[0]);
 #endif
-    }
 
-    if (profiling) {
-        flags |= PARROT_PROFILE_FLAG;
-    }
-
-    if (predereferencing) {
-        flags |= PARROT_PREDEREF_FLAG;
-    }
-
-    if (tracing) {
-        flags |= PARROT_TRACE_FLAG;
-    }
+    if(debugging)
+        fprintf(stderr, "Parrot VM: Debugging enabled.\n");
 
     interpreter = make_interpreter(flags);
     
     /* If we got only the program name, complain */
 
-    if (argc == 1 && !filename && !from_stdin) {
+    if (*argp == NULL && !filename && !from_stdin) {
         internal_exception(PARROT_USAGE_ERROR, "%s: usage: %s prog\n", argv[0], argv[0]);
     }
     /* Otherwise load in the program they gave and try that, or - */
@@ -194,12 +156,12 @@ main(int argc, char **argv) {
         }
         else { /* read from file */
             if (!filename) {
-                filename = malloc(strlen(argv[1])+1);
-                strcpy(filename, argv[1]);
+                filename = malloc(strlen((*argp))+1);
+                strcpy(filename, (*argp));
             }
 
             if (stat(filename, &file_stat)) {
-                printf("can't stat %s, code %i\n", argv[1], errno);
+                printf("can't stat %s, code %i\n", filename, errno);
                 return 1;
             }
             fd = open(filename, O_RDONLY);
