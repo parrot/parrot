@@ -1452,7 +1452,8 @@ PDB_free_file(struct Parrot_Interp *interpreter)
     mem_sys_free(interpreter->pdb->file->source);
     /* Free the file structure */
     mem_sys_free(interpreter->pdb->file);
-
+    /* Make sure we don't end up pointing at garbage memory */
+    interpreter->pdb->file = NULL;
 }
 
 /* PDB_load_source
@@ -1564,6 +1565,11 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
     unsigned long i,n = 10;
     PDB_t *pdb = interpreter->pdb;
     PDB_line_t *line;
+
+    if (!pdb->file) {
+        PIO_eprintf(interpreter, "No source file loaded\n");
+        return;
+    }
 
     /* set the list line if provided */
     if (isdigit((int) *command)) {
