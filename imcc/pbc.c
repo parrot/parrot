@@ -860,8 +860,13 @@ e_pbc_emit(void *param, IMC_Unit * unit, Instruction * ins)
         constant_folding(interpreter, unit);
         store_sub_size(code_size, ins_size);
         bytes = (oldsize + code_size) * sizeof(opcode_t);
-        interpreter->code->byte_code =
-            mem_sys_realloc(interpreter->code->byte_code, bytes);
+        if (interpreter->code->byte_code) {
+            interpreter->code->byte_code =
+                mem_sys_realloc(interpreter->code->byte_code, bytes);
+        } else {
+            interpreter->code->byte_code =
+                mem_sys_allocate(bytes);
+        }
         interpreter->code->cur_cs->base.size = oldsize + code_size;
         interpreter->code->cur_cs->base.data = interpreter->code->byte_code;
         pc = (opcode_t*) interpreter->code->byte_code + oldsize;

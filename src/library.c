@@ -96,6 +96,8 @@ Parrot_library_query(Parrot_Interp interpreter, const char *func_name, ...)
     ret = Parrot_runops_fromc_arglist_save(interpreter, sub, csig, args);
     va_end(args);
     
+    string_cstring_free(csig);
+
     /* done */
     interpreter->resume_flag = resume;
     return ret;

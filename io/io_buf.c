@@ -578,8 +578,13 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
             if (s->bufused < l) {
                 if (may_realloc) {
                     s->representation = enum_stringrep_one;
-                    PObj_bufstart(s) = s->strstart =
-                        mem_sys_realloc(s->strstart, l);
+                    if (s->strstart) {
+                        PObj_bufstart(s) =
+                            s->strstart = 
+                            mem_sys_realloc(s->strstart, l);
+                    } else {
+                        PObj_bufstart(s) = s->strstart = mem_sys_allocate(l);
+                    }
                     PObj_buflen(s) = l;
                 }
                 else
@@ -596,7 +601,11 @@ PIO_buf_readline(theINTERP, ParrotIOLayer *layer, ParrotIO *io,
     if (s->bufused < l) {
         if (may_realloc) {
             s->representation = enum_stringrep_one;
-            PObj_bufstart(s) = s->strstart = mem_sys_realloc(s->strstart, l);
+            if (s->strstart) {
+                PObj_bufstart(s) = s->strstart = mem_sys_realloc(s->strstart, l);
+            } else {
+                PObj_bufstart(s) = s->strstart = mem_sys_allocate(l);
+            }
             PObj_buflen(s) = l;
         }
         else

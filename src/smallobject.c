@@ -386,7 +386,7 @@ gc_ms_alloc_objects(Interp *interpreter,
      */
     memset(new_arena->start_objects, 0xff, size); /* simulate dirty */
 #endif
-    new_arena->dod_flags = mem_sys_allocate(ARENA_FLAG_SIZE(pool));
+    new_arena->dod_flags = mem_internal_allocate(ARENA_FLAG_SIZE(pool));
     new_arena->pool = pool;
 
     /* not the first one - put all on free list */
@@ -418,12 +418,12 @@ gc_ms_alloc_objects(Interp *interpreter,
     UINTVAL start, end;
 
     /* Setup memory for the new objects */
-    new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
+    new_arena = mem_internal_allocate(sizeof(struct Small_Object_Arena));
     if (!new_arena)
         PANIC("Out of arena memory");
     size = pool->object_size * pool->objects_per_alloc;
-    /* could be mem_sys_allocate too, but calloc is fast */
-    new_arena->start_objects = mem_sys_allocate_zeroed(size);
+    /* could be mem_internal_allocate too, but calloc is fast */
+    new_arena->start_objects = mem_internal_allocate_zeroed(size);
 
     Parrot_append_arena_in_pool(interpreter, pool, new_arena, size);
 
@@ -471,7 +471,7 @@ new_small_object_pool(Interp *interpreter,
 {
     struct Small_Object_Pool *pool;
 
-    pool = mem_sys_allocate_zeroed(sizeof(struct Small_Object_Pool));
+    pool = mem_internal_allocate_zeroed(sizeof(struct Small_Object_Pool));
     SET_NULL(pool->last_Arena);
     SET_NULL(pool->free_list);
     SET_NULL(pool->mem_pool);

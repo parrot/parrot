@@ -1136,8 +1136,12 @@ find_it:
     if (store_it) {
         UINTVAL i;
         if (type >= mc->mc_size) {
-            mc->idx = mem_sys_realloc(mc->idx,
-                    sizeof(UINTVAL*) * (type + 1));
+            if (mc->idx) {
+                mc->idx = mem_sys_realloc(mc->idx,
+                                          sizeof(UINTVAL*) * (type + 1));
+            } else {
+                mc->idx = mem_sys_allocate(sizeof(UINTVAL*) * (type + 1));
+            }
             for (i = mc->mc_size; i <= type; ++i)
                 mc->idx[i] = NULL;
             mc->mc_size = type + 1;

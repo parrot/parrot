@@ -460,7 +460,7 @@ Parrot_mmd_register_parents(Interp* interpreter, INTVAL type,
         if (pos >= (INTVAL)string_length(interpreter, vtable->isa_str))
             break;
         len = string_str_index(interpreter, vtable->isa_str,
-                const_string(interpreter, " "), pos);
+                               string_from_const_cstring(interpreter, " ", 1), pos);
         if (len == -1)
             break;
         class_name = string_substr(interpreter, vtable->isa_str, pos,

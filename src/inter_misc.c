@@ -121,7 +121,7 @@ Parrot_compreg(Parrot_Interp interpreter, STRING *type, PMC *func)
     VTABLE_set_pmc_keyed_str(interpreter, hash, type, nci);
     /* build native call interface fir the C sub in "func" */
     VTABLE_set_pointer_keyed_str(interpreter, nci,
-            const_string(interpreter, "pIt"), func);
+                                 string_from_const_cstring(interpreter, "pIt", 0), func);
 }
 
 

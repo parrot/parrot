@@ -618,6 +618,10 @@ Resizes the array to C<size> elements.
         if (PMC_int_val(SELF))
             internal_exception(OUT_OF_BOUNDS, "SArray: Can't resize!\n");
         PMC_int_val(SELF) = size;
+        /* Probably ought to actually copy this... */
+        if (PMC_data(SELF)) {
+          mem_sys_free(PMC_data(SELF));
+        }
         PMC_data(SELF) = mem_sys_allocate_zeroed((2 + size) *
             sizeof(HashEntry));
         PObj_custom_mark_destroy_SETALL(SELF);

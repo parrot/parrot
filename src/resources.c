@@ -55,7 +55,7 @@ alloc_new_block(Interp *interpreter,
 
     /* Allocate a new block. Header info's on the front, plus a fudge factor
      * for good measure */
-    new_block = mem_sys_allocate_zeroed(sizeof(struct Memory_Block) +
+    new_block = mem_internal_allocate_zeroed(sizeof(struct Memory_Block) +
             alloc_size + 32);
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size+32);
@@ -393,7 +393,7 @@ compact_pool(Interp *interpreter, struct Memory_Pool *pool)
             arena_base->memory_allocated -= cur_block->size;
             /* We know the pool body and pool header are a single chunk, so
              * this is enough to get rid of 'em both */
-            mem_sys_free(cur_block);
+            mem_internal_free(cur_block);
             cur_block = next_block;
         }
 
@@ -679,7 +679,7 @@ new_memory_pool(size_t min_block, compact_f compact)
 {
     struct Memory_Pool *pool;
 
-    pool = mem_sys_allocate(sizeof(struct Memory_Pool));
+    pool = mem_internal_allocate(sizeof(struct Memory_Pool));
     if (pool) {
         pool->top_block = NULL;
         pool->compact = compact;
@@ -748,11 +748,11 @@ Parrot_destroy_memory_pools(Interp *interpreter)
         cur_block = pool->top_block;
         while (cur_block) {
             next_block = cur_block->prev;
-            mem_sys_free(cur_block);
+            mem_internal_free(cur_block);
             cur_block = next_block;
         }
 
-        mem_sys_free(pool);
+        mem_internal_free(pool);
     }
 }
 

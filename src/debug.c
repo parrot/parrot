@@ -2070,9 +2070,14 @@ PDB_extend_const_table(Interp *interpreter)
 
     /* Update the constant count and reallocate */
     k = ++interpreter->code->const_table->const_count;
-    interpreter->code->const_table->constants =
-        mem_sys_realloc(interpreter->code->const_table->constants,
-            k * sizeof(struct PackFile_Constant *));
+    if (interpreter->code->const_table->constants) {
+        interpreter->code->const_table->constants =
+            mem_sys_realloc(interpreter->code->const_table->constants,
+                            k * sizeof(struct PackFile_Constant *));
+    } else {
+        interpreter->code->const_table->constants =
+            mem_sys_allocate(k * sizeof(struct PackFile_Constant *));
+    }
 
     /* Allocate a new constant */
     interpreter->code->const_table->constants[--k] = PackFile_Constant_new();

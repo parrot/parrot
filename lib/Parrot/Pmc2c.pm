@@ -167,7 +167,7 @@ EOC
 EOC
     foreach my $class (@classes) {
         $cout .= <<"EOC";
-    whoami = string_from_cstring(interpreter, "$class", 0);
+    whoami = string_from_const_cstring(interpreter, "$class", 0);
     type${class} = pmc_register(interpreter, whoami);
 EOC
     }
@@ -1328,7 +1328,7 @@ EOC
 $l
 ${decl} {
     $ret_def
-    STRING *meth = const_string(interpreter, $delegate_meth);
+    STRING *meth = string_from_cstring(interpreter, $delegate_meth, 0);
     PMC *sub = find_or_die(interpreter, pmc, meth);
     ${func_ret}Parrot_run_meth_fromc_args_save$ret_type(interpreter, sub,
         pmc, meth, "$sig"$arg);

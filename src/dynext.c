@@ -269,6 +269,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     if (path) {
 	char* cpath = string_to_cstring(interpreter, path);
 	handle = Parrot_dlopen(cpath);
+        string_cstring_free(cpath);
     }
 #else
     UNUSED(initializer);
@@ -316,7 +317,7 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
          * but currently only ops files have struct_val set
          */
         type = const_string(interpreter,
-                PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
+                               PMC_struct_val(lib_pmc) ? "Ops" : "PMC");
     }
     /*
      * remember lib_pmc in iglobals

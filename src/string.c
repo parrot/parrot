@@ -631,6 +631,28 @@ string_from_cstring(Interp *interpreter,
 
 /*
 
+=item C<
+STRING *
+string_from_const_cstring(Interp *interpreter,
+    const void *buffer, UINTVAL len)>
+
+Make a Parrot string from a specified C string.
+
+=cut
+
+*/
+
+STRING *
+string_from_const_cstring(Interp *interpreter,
+    const void *buffer, UINTVAL len)
+{
+    return string_make(interpreter, buffer, len ? len :
+            buffer ? strlen(buffer) : 0,
+                       "iso-8859-1", PObj_external_FLAG); /* make this utf-8 eventually? */
+}
+
+/*
+
 =item C<const char*
 string_primary_encoding_for_representation(Interp *interpreter,
     parrot_string_representation_t representation)>
@@ -2765,7 +2787,7 @@ sorts of leak potential otherwise.
 
 void
 string_cstring_free(void *ptr) {
-    free(ptr);
+    mem_sys_free(ptr);
 }
 
 /*

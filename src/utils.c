@@ -518,7 +518,7 @@ Parrot_make_la(Interp *interpreter, PMC *array) {
     */
     out_array = mem_sys_allocate((sizeof(long)) * (arraylen + 1));
     out_array[arraylen] = 0;
-
+    //    printf("Long array has %i elements\n", arraylen);
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] = VTABLE_get_integer_keyed_int(interpreter, array, cur);
     }
@@ -571,8 +571,10 @@ Parrot_make_cpa(Interp *interpreter, PMC *array) {
     out_array = mem_sys_allocate((sizeof(char *)) * (arraylen + 1));
     out_array[arraylen] = 0;
 
+    //    printf("String array has %i elements\n", arraylen);
     for (cur = 0; cur < arraylen; cur++) {
         out_array[cur] = string_to_cstring(interpreter, VTABLE_get_string_keyed_int(interpreter, array, cur));
+        //        printf("Offset %i is %s\n", cur, out_array[cur]);
     }
 
     return out_array;

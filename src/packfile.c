@@ -719,8 +719,13 @@ PackFile_add_segment (struct PackFile_Directory *dir,
         struct PackFile_Segment *seg)
 {
 
-    dir->segments = mem_sys_realloc (dir->segments,
-                  sizeof (struct PackFile_Segment *) * (dir->num_segments+1));
+    if (dir->segments) {
+        dir->segments =
+            mem_sys_realloc(dir->segments,
+                            sizeof (struct PackFile_Segment *) * (dir->num_segments+1));
+    } else {
+        dir->segments = mem_sys_allocate(sizeof (struct PackFile_Segment *) * (dir->num_segments+1));
+    }
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
     seg->dir = dir;
@@ -1361,8 +1366,14 @@ directory_unpack (Interp *interpreter,
     opcode_t *pos;
 
     dir->num_segments = PF_fetch_opcode (pf, &cursor);
-    dir->segments = mem_sys_realloc (dir->segments,
-            sizeof(struct PackFile_Segment *) * dir->num_segments);
+    if (dir->segments) {
+        dir->segments = 
+            mem_sys_realloc (dir->segments,
+                             sizeof(struct PackFile_Segment *) * dir->num_segments);
+    } else {
+        dir->segments = 
+            mem_sys_allocate(sizeof(struct PackFile_Segment *) * dir->num_segments);
+    }
 
     for (i=0; i < dir->num_segments; i++) {
         struct PackFile_Segment *seg;
@@ -2320,9 +2331,14 @@ void PackFile_FixupTable_new_entry(Interp *interpreter,
     }
     i = self->fixup_count;
     self->fixup_count++;
-    self->fixups =
-        mem_sys_realloc(self->fixups, self->fixup_count *
-                         sizeof(struct PackFile_FixupEntry *));
+    if (self->fixups) {
+        self->fixups =
+            mem_sys_realloc(self->fixups, self->fixup_count *
+                            sizeof(struct PackFile_FixupEntry *));
+    } else {
+        self->fixups = 
+            mem_sys_allocate(sizeof(struct PackFile_FixupEntry *));
+    }
     self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
     self->fixups[i]->type = type;
     self->fixups[i]->name = mem_sys_allocate(strlen(label) + 1);

@@ -354,7 +354,7 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     char *c = (char *)&$3, *n;
     STRING *s;
     INTVAL ln;
-    const char *t;
+    char *t;
     int i;
 
     s = string_make(interpreter, c, (UINTVAL)$2, "iso-8859-1", 0);
@@ -371,6 +371,7 @@ inline op pack(inout STR, in INT, in INT, in INT) :base_core {
     t = string_to_cstring(interpreter, s);
     for (i = $4; i < $4 + $2; i++)
         n[i] = t[i - $4];
+    string_cstring_free(t);
 
 
     goto NEXT();

@@ -353,9 +353,14 @@ mmd_add_function(Interp *interpreter,
 {
     INTVAL i;
     if (func_nr >= (INTVAL)interpreter->n_binop_mmd_funcs) {
-        interpreter->binop_mmd_funcs = mem_sys_realloc(
-                interpreter->binop_mmd_funcs,
-                (func_nr + 1) * sizeof(MMD_table));
+        if (interpreter->binop_mmd_funcs) {
+            interpreter->binop_mmd_funcs =
+                mem_sys_realloc(interpreter->binop_mmd_funcs,
+                                (func_nr + 1) * sizeof(MMD_table));
+        } else {
+            interpreter->binop_mmd_funcs =
+                mem_sys_allocate((func_nr + 1) * sizeof(MMD_table));
+        }
 
         for (i = interpreter->n_binop_mmd_funcs; i <= func_nr; ++i)  {
             MMD_table *table = interpreter->binop_mmd_funcs + i;

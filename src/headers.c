@@ -192,7 +192,7 @@ make_bufferlike_pool(Interp *interpreter, size_t buffer_size)
     /* Expand the array of sized resource pools, if necessary */
     if (num_old <= idx) {
         UINTVAL num_new = idx + 1;
-        sized_pools = mem_sys_realloc(sized_pools, num_new * sizeof(void *));
+        sized_pools = mem_internal_realloc(sized_pools, num_new * sizeof(void *));
         memset(sized_pools + num_old, 0, sizeof(void *) * (num_new - num_old));
 
         interpreter->arena_base->sized_header_pools = sized_pools;
@@ -263,7 +263,7 @@ new_pmc_header(Interp *interpreter, UINTVAL flags)
 #endif
         pmc->pmc_ext = new_pmc_ext(interpreter);
         if (flags & PObj_is_PMC_shared_FLAG) {
-            PMC_sync(pmc) = mem_sys_allocate(sizeof(*PMC_sync(pmc)));
+            PMC_sync(pmc) = mem_internal_allocate(sizeof(*PMC_sync(pmc)));
             PMC_sync(pmc)->owner = interpreter;
             MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
         }
@@ -348,7 +348,6 @@ STRING *
 new_string_header(Interp *interpreter, UINTVAL flags)
 {
     STRING *string;
-
     string = get_free_buffer(interpreter, (flags & PObj_constant_FLAG)
             ? interpreter->
             arena_base->constant_string_header_pool :
@@ -714,14 +713,14 @@ Parrot_destroy_header_pools(Interp *interpreter)
                 for (cur_arena = pool->last_Arena; cur_arena;) {
                     next = cur_arena->prev;
 #if ARENA_DOD_FLAGS
-                    mem_sys_free(cur_arena->dod_flags);
+                    mem_internal_free(cur_arena->dod_flags);
 #else
-                    mem_sys_free(cur_arena->start_objects);
+                    mem_internal_free(cur_arena->start_objects);
 #endif
-                    mem_sys_free(cur_arena);
+                    mem_internal_free(cur_arena);
                     cur_arena = next;
                 }
-                free(pool);
+                mem_internal_free(pool);
             }
 
         }
@@ -730,15 +729,15 @@ Parrot_destroy_header_pools(Interp *interpreter)
     for (cur_arena = pool->last_Arena; cur_arena;) {
         next = cur_arena->prev;
 #if ARENA_DOD_FLAGS
-        mem_sys_free(cur_arena->dod_flags);
+        mem_internal_free(cur_arena->dod_flags);
 #else
-        mem_sys_free(cur_arena->start_objects);
+        mem_internal_free(cur_arena->start_objects);
 #endif
-        mem_sys_free(cur_arena);
+        mem_internal_free(cur_arena);
         cur_arena = next;
     }
-    mem_sys_free(interpreter->arena_base->pmc_ext_pool);
-    mem_sys_free(interpreter->arena_base->sized_header_pools);
+    mem_internal_free(interpreter->arena_base->pmc_ext_pool);
+    mem_internal_free(interpreter->arena_base->sized_header_pools);
 }
 
 #if 0
