@@ -13,9 +13,9 @@
 
 #define INT2KEY(i,k) ((k) ? key_new_integer((i), *(k)) : NULL)
 
-static char * caller(Parrot_Interp interp, PMC * pmc);
+static const char * caller(Parrot_Interp interp, PMC * pmc);
 
-static char * caller(Parrot_Interp interp, PMC * pmc)
+static const char * caller(Parrot_Interp interp, PMC * pmc)
 {
     return pmc && pmc->vtable && pmc->vtable->name ?
 	pmc->vtable->name(interp, pmc)->strstart : "(null)";
