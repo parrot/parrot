@@ -537,15 +537,13 @@ interferes(Parrot_Interp interpreter, SymReg * r0, SymReg * r1) {
          */
         if (l0->first_ins->index == l1->last_ins->index &&
                 instruction_writes(l0->first_ins, r0) &&
-                ((instruction_reads(l1->last_ins, r1) &&
-                !instruction_reads(l0->first_ins, r0)) ||
-                instruction_writes(l1->first_ins, r1)))
+                instruction_reads(l1->last_ins, r1) &&
+                !instruction_reads(l0->first_ins, r0))
             continue;
         if (l1->first_ins->index == l0->last_ins->index &&
                 instruction_writes(l1->first_ins, r1) &&
-                ((instruction_reads(l0->last_ins, r0) &&
-                !instruction_reads(l1->first_ins, r1)) ||
-                instruction_writes(l0->first_ins, r0)))
+                instruction_reads(l0->last_ins, r0) &&
+                !instruction_reads(l1->first_ins, r1))
             continue;
 #endif
 

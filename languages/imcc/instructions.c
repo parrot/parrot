@@ -458,7 +458,7 @@ int emit_flush(void *param) {
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(param);
     for (ins = instructions; ins; ins = ins->next) {
-        debug(interpreter, DEBUG_IMC, "emit %s %I\n", ins->op, ins);
+        debug(interpreter, DEBUG_IMC, "emit %I\n", ins);
         (emitters[emitter]).emit(param, ins);
     }
     for (ins = instructions; ins; ) {

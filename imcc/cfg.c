@@ -4,6 +4,8 @@
 #include "imc.h"
 #include "optimizer.h"
 
+/* #define ALIAS */
+
 /*
  * cfg.c
  *
@@ -410,7 +412,7 @@ static void add_instruc_writes(Instruction *ins, SymReg *r0)
  * XXX currently turned off, this extends life ranges too much
  */
 
-static void propagate_alias(void)
+static void propagate_alias(Parrot_Interp interpreter)
 {
     Instruction *ins, *curr;
     SymReg *r0, *r1;
@@ -455,7 +457,7 @@ void life_analysis(Parrot_Interp interpreter) {
 
     info(interpreter, 2, "life_analysis\n");
 #ifdef ALIAS
-    propagate_alias();
+    propagate_alias(interpreter);
 #endif
     for(i = 0; i < IMCC_INFO(interpreter)->n_symbols; i++)
         analyse_life_symbol(interpreter, reglist[i]);
