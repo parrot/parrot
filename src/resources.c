@@ -76,7 +76,7 @@ Parrot_new_pmc_header_arena(struct Parrot_Interp *interpreter) {
   /* Note it in our stats */
   interpreter->total_PMCs += PMC_HEADERS_PER_ALLOC;
   /* Yeah, this is skanky. They're not really active, but
-     add_header_to_free assumes that it's adding an active header to
+     add_pmc_to_free assumes that it's adding an active header to
      the free list */
   interpreter->active_PMCs += PMC_HEADERS_PER_ALLOC;
 
@@ -212,7 +212,7 @@ new_buffer_header(struct Parrot_Interp *interpreter) {
      yet */
   if (interpreter == NULL) {
     return_me = mem_sys_allocate(sizeof(Buffer));
-    return_me->flags = BUFFER_live_FLAG;
+    return_me->flags = BUFFER_live_FLAG | BUFFER_sysmem_FLAG;
     return return_me;
   }
 
@@ -362,7 +362,7 @@ trace_active_PMCs(struct Parrot_Interp *interpreter) {
     struct PRegChunk *cur_chunk;
     /* We have to start somewhere, and the global stash is a good
        place */
-    last = current = interpreter->perl_stash->stash_hash;;
+    last = current = interpreter->perl_stash->stash_hash;
     /* mark it as used and get an updated end of list */
     last = mark_used(current, last);
 
@@ -483,8 +483,6 @@ trace_active_buffers(struct Parrot_Interp *interpreter) {
 }
 
 /* Free up any PMCs that aren't in use
-
-   Not yet implemented
 
 */
 static void
@@ -617,7 +615,7 @@ STRING *new_string_header(struct Parrot_Interp *interpreter) {
      yet */
   if (interpreter == NULL) {
     return_me = mem_sys_allocate(sizeof(STRING));
-    return_me->flags = BUFFER_live_FLAG;
+    return_me->flags = BUFFER_live_FLAG | BUFFER_sysmem_FLAG;
     return return_me;
   }
 
@@ -783,11 +781,6 @@ Parrot_go_collect(struct Parrot_Interp *interpreter) {
 static void
 find_dead_strings(struct Parrot_Interp *interpreter) {
 }
-
-/* Trace from the root set for all used strings */
-static void
-dead_string_run(struct Parrot_Interp *interpreter) {
-}  
 
 /* Allocate a new memory block. We allocate the larger of however much
    was asked for or the default size, whichever's larger */
