@@ -167,6 +167,9 @@ static size_t cstring_packed_size(const char *s)
 static void cvt_num12_num8(unsigned char *dest, unsigned char *src)
 {
     int expo, i, s;
+#ifdef __LCC__
+    int expo2;
+#endif   
 
     memset (dest, 0, 8);
     /* exponents 15 -> 11 bits */
@@ -178,7 +181,14 @@ nul:
             dest[7] |= 0x80;
         return;
     }
+#ifdef __LCC__
+    /* Yet again, LCC blows up mysteriously until a temporary variable is 
+     * added. */
+    expo2 = expo - 16383;
+    expo  = expo2;
+#else   
     expo -= 16383;       /* - bias */
+#endif   
     expo += 1023;       /* + bias 8byte */
     if (expo <= 0)       /* underflow */
         goto nul;
