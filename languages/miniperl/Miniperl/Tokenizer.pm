@@ -3,7 +3,7 @@ package Tokenizer;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 #------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ sub new {
 
 sub tokenize {
   my $self = shift;
-  $self->{text} = $_[0] if $_[0] and $_[0] ne '';
+  $self->{text} = $_[0] || return [];
 
   my $tokref = [];
   my $in_quote = 0;
