@@ -27,14 +27,15 @@ print OUT <<'EOF';
 typedef void* (*vtable_func_t)();
 
 struct _vtable {
-  PACKAGE *package;
+  struct PACKAGE *package;
   INTVAL base_type;
   INTVAL int_type;
   INTVAL float_type;
   INTVAL num_type;
   INTVAL string_type;
   vtable_func_t vtable_funcs[VTABLE_SIZE];
-}
+};
+
 EOF
 
 print OUT vtbl_enum(%vtable);
