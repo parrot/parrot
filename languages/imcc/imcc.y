@@ -216,7 +216,7 @@ SymReg ** r, int nr, int emit)
             if (get_sym(buf) == 0)
                 break;
         }
-        preg[n] = mk_symreg(buf, 'P');
+        preg[n] = mk_symreg(str_dup(buf), 'P');
         kv >>= 1;
         if (kv & 1) {
             /* we have a keyed operand */
