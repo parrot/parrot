@@ -527,31 +527,39 @@ CODE
 
 output_is(<<'CODE', <<'OUTPUT', "set recursion limit, method call ");
 ##PIR##
+# see also t/op/gc_14.imc
+
 .sub main @MAIN
-   .local int n
-   $P0 = getinterp
-   $P0."recursion_limit"(100)
-   newclass $P0, "b"
-   $I0 = find_type "b"
-   $P0 = new $I0
-   n = $P0."b11"(0)
-   print "ok 1\n"
-   print n
-   print "\n"
+    .local pmc n
+    new_pad 0
+    $P0 = getinterp
+    $P0."recursion_limit"(100)
+    newclass $P0, "b"
+    $I0 = find_type "b"
+    $P0 = new $I0
+    $P1 = new Integer
+    $P1 = 0
+    n = $P0."b11"($P1)
+    print "ok 1\n"
+    print n
+    print "\n"
 .end
 .namespace ["b"]
 .sub b11 method
-  .param int n
-  .local int n1
-  n1 = n + 1
-  newsub $P0, .Exception_Handler, catch
-  set_eh $P0
-  n = self."b11"(n1)
-  clear_eh
+    .param pmc n
+    .local pmc n1
+    new_pad -1
+    store_lex -1, "n", n
+    n1 = new Integer
+    n1 = n + 1
+    newsub $P0, .Exception_Handler, catch
+    set_eh $P0
+    n = self."b11"(n1)
+    store_lex -1, "n", n
+    clear_eh
 catch:
-  .pcc_begin_return
-  .return n
-  .pcc_end_return
+    n = find_lex "n"
+    .return(n)
 .end
 CODE
 ok 1

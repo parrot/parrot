@@ -352,24 +352,35 @@ output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      newsub fail, .Closure, _fail
      store_lex "fail", fail
      arr1 = new PerlArray
+     store_lex 0, "arr1", arr1
      arr1[0] = 1
      arr1[1] = 3
      arr1[2] = 5
      arr2 = new PerlArray
+     store_lex 0, "arr2", arr2
      arr2[0] = 1
      arr2[1] = 5
      arr2[2] = 9
 
      x = choose(arr1)
+     store_lex 0, "x", x
      #print "Chosen "
      #print x
      #print " from arr1\n"
-     # XXX need this these closures have different state
+
+     # need to create a new closure: these closures have different state
+     #
+     # arr2 and x,y have to be lexicals as due to continuations
+     # all variables needs refetching after a subroutine call
+
      newsub choose, .Closure, _choose
+     arr2 = find_lex "arr2"
      y = choose(arr2)
+     store_lex 0, "y", y
      #print "Chosen "
      #print y
      #print " from arr2\n"
+     x = find_lex "x"
      $I1 = x
      $I2 = y
      $I0 = $I1 * $I2
@@ -379,6 +390,8 @@ output_is(<<'CODE', <<OUTPUT, "Fun with nondeterministic searches");
      print "Shouldn't get here without a failure report\n"
      branch the_end
 success:
+     x = find_lex "x"
+     y = find_lex "y"
      print x
      print " * "
      print y
@@ -454,30 +467,36 @@ output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
 # this did segfault with GC_DEBUG
 
 .sub main @MAIN
-   .local int n
-   $P0 = getinterp
-   $P0."recursion_limit"(10)
-   newclass $P0, "b"
-   $I0 = find_type "b"
-   $P0 = new $I0
-   n = $P0."b11"(0)
-   print "ok 1\n"
-   print n
-   print "\n"
+    .local pmc n
+    new_pad 0
+    $P0 = getinterp
+    $P0."recursion_limit"(10)
+    newclass $P0, "b"
+    $I0 = find_type "b"
+    $P0 = new $I0
+    $P1 = new Integer
+    $P1 = 0
+    n = $P0."b11"($P1)
+    print "ok 1\n"
+    print n
+    print "\n"
 .end
 .namespace ["b"]
 .sub b11 method
-  .param int n
-  .local int n1
-  n1 = n + 1
-  newsub $P0, .Exception_Handler, catch
-  set_eh $P0
-  n = self."b11"(n1)
-  clear_eh
+    .param pmc n
+    .local pmc n1
+    new_pad -1
+    store_lex -1, "n", n
+    n1 = new Integer
+    n1 = n + 1
+    newsub $P0, .Exception_Handler, catch
+    set_eh $P0
+    n = self."b11"(n1)
+    store_lex -1, "n", n
+    clear_eh
 catch:
-  .pcc_begin_return
-  .return n
-  .pcc_end_return
+    n = find_lex "n"
+    .return(n)
 .end
 CODE
 ok 1
