@@ -10,6 +10,18 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.8  2002/04/23 12:38:44  Clinton
+# Various bug fixes related to Eliza
+#
+# Revision 1.6  2002/04/19 00:51:38  Clinton
+# Fixed line-endings
+#
+# Revision 1.5  2002/04/15 21:22:32  Clinton
+# Added quick lookups for FOR/NEXT GOSUB/RETURN
+#
 # Revision 1.1  2002/04/11 01:25:59  jgoff
 # Adding clintp's BASIC interpreter.
 #
@@ -50,12 +62,15 @@ NOLINE: restore S0
 	save I5  # New Depth
 	save I4  # Line number
 	set I22, 0 # Error flag
+	eq I25, 0, LOAD_TABLE
 
-	#print "Dispatching "
-	#print I4
-	#print "\n"
+	print "Dispatching "	
+	print I4
+	print "\n"
+	trace I25
 
 
+LOAD_TABLE:
 	# Table of all keywords
 	ne S0, "LOAD", NOT_LOAD
 	bsr I_LOAD
@@ -145,7 +160,15 @@ NOT_READ: ne S0, "DUMP", NOT_DUMP
 	bsr I_DUMP
 	branch ENDLINE
 
-NOT_DUMP:
+NOT_DUMP: ne S0, "ON", NOT_ON
+	bsr I_ON
+	branch ENDLINE
+
+NOT_ON: ne S0, "TRACE", NOT_TRACE
+	bsr I_TRACE
+	branch ENDLINE
+
+NOT_TRACE:
 	
 
 RUN_ILL_INSTRUCTION:

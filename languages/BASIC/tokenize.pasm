@@ -1,7 +1,7 @@
 # tokenizer
 #   Input: string to be parsed on the stack (will be removed)
 #  Output: stack contains number of tokens first,
-#          then the tokens as seen right to left 
+#          then the tokens as seen right to left
 #          ** leftmost on bottom **
 # Quotes (single or double) are *preserved* so that
 #     Foo "bar hlaghalg"
@@ -10,8 +10,11 @@
 #
 # $Id$
 # $Log$
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.3  2002/04/23 12:38:44  Clinton
+# Various bug fixes related to Eliza
 #
 # Revision 1.2  2002/03/31 05:13:44  Clinton
 # Id Keywords
@@ -24,6 +27,7 @@ TOKENIZER:
 	set I4, 0    # ALPHA
 	set S0, ""   # Playground
 	set S2, ""
+	set S3, ""
 	restore S2  # String to tokenize
 	set I5, 0    # Stack pointer
 
@@ -33,8 +37,12 @@ TOKLOOP: length I0, S2
 	substr S1, S2, 0, 1
 	dec I0
 	substr S2, S2, 1, I0
-	
-	eq S1, "'", QUOTE
+
+	eq I3, 0, NORMQ
+	eq S1, S3, QUOTE
+	branch CKQUOTED
+
+NORMQ:  eq S1, "'", QUOTE
 	eq S1, '"', QUOTE
 	branch CKQUOTED
 
@@ -44,9 +52,11 @@ QUOTE:  ne I3, 0, EOTOK
 	save S0
 	inc I5
 FINQUOT:set I3, 1
+	set S3, S1
 	set S0, S1
 	branch TOKLOOP
 EOTOK:  set I3, 0
+	set S3, ""
 	concat S0, S1
 	save S0
 	inc I5
@@ -95,3 +105,4 @@ TOKBAIL:save I5
 	popi
 	pops
 	ret
+

@@ -12,8 +12,15 @@
 #
 # $Id$
 # $Log$
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.10  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.8  2002/04/21 22:58:57  Clinton
+# Made Eliza compatable
 #
 # Revision 1.6  2002/04/08 02:37:40  Clinton
 # Added conditionals and logical operators to expr and tests
@@ -40,9 +47,6 @@
 PUSHOPSTACK:
 	pushs
 	restore S0
-	#print "Pushing "
-	#print S0
-	#print "\n"
 	concat S0, TERMINATOR   # Marker
 	save S0
 	save STACKSIZE
@@ -66,9 +70,6 @@ POPOPSTACK:
 	length I0, S0
 	dec I0
 	substr S0, S0, 0, I0	# Remove trailing 
-	#print "Popping "
-	#print S0
-	#print "\n"
 	save S0
 	
 	savec S24
@@ -76,6 +77,7 @@ POPOPSTACK:
 	pops
 	restore S24
 	ret
+
 OPSTACKDEPTH:
 	pushi
 	length I0, S24
@@ -137,6 +139,9 @@ FUNCJUMP:
 	eq S0, "MID", FUNC_MID	
 	eq S0, "ASC", FUNC_ASC
 	eq S0, "CHR", FUNC_CHR
+	eq S0, "RIGHT", FUNC_RIGHT
+	eq S0, "LEFT", FUNC_LEFT
+	eq S0, "INSTR", FUNC_INSTR
 	eq S0, "TIME", FUNC_TIME
 	eq I10, 1, ENDISFUNC  # Just checking, must not have been there.
 
@@ -174,6 +179,24 @@ FUNC_ABS:
 	ge I0, 0, ENDFUNCDISPATCH
 	restore I0
 	mul I0, I0, -1
+	save I0
+	bsr ITOA
+	branch ENDFUNCDISPATCH
+
+# instr(string, substring)  0=not found, otherwise offset
+FUNC_INSTR:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 2, FUNC_ERR
+	restore S0	# thing to look in
+	restore S1   	# thing to look for
+	save S0
+	save S1
+	save 0
+	bsr STRSTR
+	restore I0
+	inc I0
 	save I0
 	bsr ITOA
 	branch ENDFUNCDISPATCH
@@ -239,6 +262,38 @@ FUNC_MID:
 	substr S2, S1, I0, I1
 	save S2
 	branch ENDFUNCDISPATCH
+
+FUNC_LEFT:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 2, FUNC_ERR
+	restore S1		# String
+	bsr ATOI
+	restore I0		# length
+	substr S0, S1, 0, I0
+	save S0
+	branch ENDFUNCDISPATCH
+
+FUNC_RIGHT:
+	inc I10
+	gt I10, 1, ENDISFUNC
+	restore I5
+	ne I5, 2, FUNC_ERR
+	restore S0		# String
+	bsr ATOI
+	restore I0		# Length
+	
+	length I1, S0
+	ge I0, I1, F_R_TOOSHORT
+	sub I1, I1, I0
+	substr S1, S0, I1, I0
+	save S1
+	branch ENDFUNCDISPATCH
+F_R_TOOSHORT:
+	save S0
+	branch ENDFUNCDISPATCH
+	
 
 FUNC_CHR: 
 	inc I10
@@ -584,7 +639,6 @@ SPECIAL:
 OPENPAREN:
 	save "("
 	bsr PUSHOPSTACK
-	#print "Saved (\n"
 	branch GETTOP
 
 CLOSEPARENCK:
@@ -598,9 +652,6 @@ CLOSECOMMA:
 	bsr POPOPSTACK
 	restore S1
 	eq S1, "(", FINISHCOMMA
-	#print "Concatting "
-	#print S7
-	#print "\n"
 	concat S0, S7
 	concat S0, SEPARATOR
 	branch CLOSECOMMA
@@ -617,19 +668,11 @@ FC2:
 CLOSEPAREN:
 	bsr OPSTACKDEPTH
 	restore I0
-	#print "In closeparen, Stack depth: "
-	#print I0
-	#print " "
-	#print S24
-	#print "\n"
 	eq I0, 0, GETTOP
 	bsr POPOPSTACK
 	set S1, ""
 	restore S1
 	eq S1, "(", TILDECK
-	#print "Adding "
-	#print S1
-	#print " because of closeparen\n"
 	concat S0, S1
 	concat S0, SEPARATOR
 	branch CLOSEPAREN
@@ -652,9 +695,6 @@ GOTTILDE:
 	branch GETTOP
 
 CANPUSH:
-	#print "In canpush with "
-	#print S7
-	#print "\n"
 	bsr OPSTACKDEPTH
 	restore I0
 	ne I0, 0, NOTMTSTACK
@@ -834,8 +874,7 @@ NOTBUILTIN:
 	eq S1, "'", STRING
 	eq S1, '"', STRING
 	branch NOTSTRINGLIT
-STRING:
-	length I0, S0
+STRING: length I0, S0
 	sub I0, I0, 2
 	substr S0, S0, 1, I0
 	save S0
@@ -1040,14 +1079,15 @@ PULLOP: bsr OPSTACKDEPTH
 	eq S1, ",", PULLOP
 	length I1, S1
 	dec I1
+	lt I1, 0, NOTOP
 	substr S2, S1, I1, 1   # Last char
 	eq S2, "!", RUNFUNC
+NOTOP:
 	save S1
 	inc I4
 	branch PULLOP
 
-RUNFUNC:
-	length I1, S1
+RUNFUNC:length I1, S1
 	dec I1
 	substr S1, S1, 0, I1
 	save S1

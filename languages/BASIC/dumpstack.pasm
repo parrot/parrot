@@ -1,6 +1,6 @@
 # User Stack Dump (Debugging.)
-#  Inputs: Top of stack should contain the depth
-# Outputs: Top of stack should (still) contain the depth.  :)
+#  Inprint: Top of stack should contain the depth
+# Outprint: Top of stack should (still) contain the depth.  :)
 # Types
 #      1 is an int
 #      2 is a  num
@@ -9,8 +9,12 @@
 #
 # $Id$
 # $Log$
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.5  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
 #
 # Revision 1.3  2002/03/31 05:15:31  Clinton
 # Adjusted
@@ -24,69 +28,61 @@ DUMPSTACK:
 	pushn
 	pushs
 	pushp
-	puts "Stack Dump: (top to bottom)\n"
-	restore I5
+	print "Stack Dump: (top to bottom)\n"
+	depth I5
 	set I0, I5
 	gt I5, 0, DUMPLOOP
-	puts "  -empty-\n"
+	print "  -empty-\n"
 	branch DUMPEND
 DUMPLOOP: 
 	entrytype I1, 0
-	puts "   "
+	print "   "
 	sub I2, I5, I0
 
-	save I2
-	bsr ITOA
-	restore S31	 # Convert for puts
-	puts S31
+	print I2
 
-	puts "  "
+	print "  "
 	ne I1, 1, DUMPNOTINT
-	puts "Int "
+	print "Int "
 	restore I1
 	save I1
 
-	save I1
-	bsr ITOA
-	restore S31	# Convert for puts
-	puts S31
-
+	print I1
 
 	branch DUMPANOTHER
 DUMPNOTINT:
 	ne I1, 2, DUMPNOTNUM
-	puts "Num "
+	print "Num "
 	restore N0
 	save N0
 	#print N0
 	branch DUMPANOTHER
 DUMPNOTNUM: 
 	ne I1, 3, DUMPNOTSTRING
-	puts "Str "
+	print "Str "
 	restore S1
 	save S1
-	puts S1
+	print S1
 	branch DUMPANOTHER
 DUMPNOTSTRING:
 	ne I1, 4, DUMPERR
-	puts "PMC "
+	print "PMC "
 	restore P0
 	save P0
 	#print P0
 	branch DUMPANOTHER
 DUMPANOTHER:
-	puts "\n"
+	print "\n"
 	rotate_up I5
 	dec I0
 	eq I0, 0, DUMPEND
 	branch DUMPLOOP
 DUMPEND:
-	save I5
 	popi
 	popn
 	pops
 	popp
 	ret
 DUMPERR:
-	puts "UNKNOWN TYPE\n"
+	print "UNKNOWN TYPE\n"
 	end

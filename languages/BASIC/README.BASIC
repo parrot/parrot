@@ -8,7 +8,8 @@ This is an initial release of a BASIC interpreter hand written
 entirely in Parrot bytecode.  The NOTES below are intended for Parrot 
 developers.
 
-This README will always reflect the *current* state of things.
+This README will always reflect the *current* state of things.  You can 
+find the most recent version of BASIC at http://geeksalad.org/basic.
 
 This BASIC is of the fairly old school.  Line numbers are required, and
 the following keywords are recognized:
@@ -29,10 +30,14 @@ the following keywords are recognized:
 	RETURN
 	GOTO expr
 	GO TO expr    [syn with GOTO]
+	ON expr GOSUB line, line, line
+	ON expr GOTO line, line, line
 	IF expr THEN STATEMENT
 	READ var
 	DATA val, val, val, val
-	RESTORE
+	RESTORE 
+	RESTORE expr
+	TRACE expr    [sets execution trace =1 on =0 off]
 	END
 	REM
 	NEW
@@ -40,12 +45,17 @@ the following keywords are recognized:
 
 The following functions are supported in the full expression parser:
 
+	TIME()  Time since the epoch in seconds
 	RND(X)	Random number between 0 and X
 	ABS(X)  Absolute value of X
 	LEN(X)  Length of string in X
 	MID(X,Y,Z)
 		Return the string of X, starting at position Y (1-based),
 	        for length Z.
+	RIGHT(X,Y) Return rightmost Y charaters of X
+	LEFT(X,Y) Return leftmost Y characters of X
+	INSTR(X,Y) Return the position (1-based) where substring Y 
+	        begins in X
 	ASC(X)  Return the ASCII code for the character X
 	CHR(X)  Return the ASCII character for the code X
 
@@ -79,8 +89,6 @@ BASIC NOTES
 * Anywhere var is indicated, a multidimensional variable (string or array) is allowed.
 * Strings do not have to be pre-DIMensioned any longer.
 * For IF statements, 0 or empty string is false everything else is true.
-* Line lookups are now fast.   Well, as reasonably fast as they can be without hashes.
-
 
 This was intended as a true interactive BASIC (see NOTES below) so that
 any of the variables and statements work from the prompt as well as in the
@@ -107,18 +115,26 @@ of general interest, some only apply to BASIC:
 	sample3.bas		More showing off.
 
 	basic.pl		Perl Harness for compiling, starting BASIC 
-				in interactive mode.
-	wumpus.bas		Hunt the Wumpus in BASIC
+				in interactive mode.  Run this.
+
+	wumpus.bas		Hunt the Wumpus
+	eliza.bas  		Eliza
 
 NOTES
 -----
-Very large programs or very, very large expressions will expose Parrot's GC bugs
-quickly.  This will manifest itself in a SEGV (likely, hang, garbled output, 
-or "wrong type on stack" messages.
+Very large programs or very, very large expressions may expose Parrot's GC bugs
+quickly.  This will manifest itself in a SEGV, hang, garbled output).
 
 The expr.pasm module contains a full expression evaluator.  It's tied to BASIC through a 
 few subroutines (to do variable and function resolution) but otherwise it's a general-purpose
 evaluator.  Of special note is the Infix to Postfix notation conversion function.
+
+A drastic speedup will happen in BASIC when hashes are implemented in Parrot, and is very
+easy to do.  Beware of premature micro-optimizations until then.
+
+BUGS
+----
+Negative numeric literals in DATA statements must be quoted.  :(
 
 TODO
 -----
@@ -127,7 +143,6 @@ TODO
   slow, THIS is why.  
     That and it's not compiling anything ahead of time.  
     All runtime interpretation, baby!
-
 
 CONTACT
 -------

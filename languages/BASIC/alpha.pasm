@@ -7,8 +7,15 @@
 #
 # $Id$
 # $Log$
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.7  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.5  2002/04/17 03:17:09  Clinton
+# Added RIGHT(), LEFT(), and INSTR()
 #
 # Revision 1.3  2002/03/31 05:15:31  Clinton
 # Adjusted
@@ -131,28 +138,29 @@ ITOA: 	pushi
 #  Inputs: string on stack
 # Outputs: string on stack, less trailing spaces
 STRIPSPACE:
-	pushi
-	pushs
-	restore S0
-	length I0, S0
-	eq I0, 0, SSDONE
-	dec I0
+        pushi
+        pushs
+        restore S0
+        length I0, S0
+        eq I0, 0, SSDONE
+        dec I0
+        set S1, ""
 SSCHECK:
-	set S1, ""
-	substr S1, S0, I0, 1
-	save S1
-	bsr ISWHITE
-	restore I1
-	eq I1, 0, SSDONE
-	substr S0, S0, 0, I0
-	eq  I0, 0, SSDONE
-	dec I0
-	branch SSCHECK
+        substr S1, S0, I0, 1
+        save S1
+        bsr ISWHITE
+        restore I1
+        eq I1, 0, SSDONE
+        dec I0
+        eq I0, 0, SSDONE
+        branch SSCHECK
 SSDONE:
-	save S0
-	popi
-	pops
-	ret
+        inc I0
+        substr S0, S0, 0, I0
+        save S0
+        popi
+        pops
+        ret
 
 STRIPLEADSPACE:
 	pushi
@@ -280,3 +288,31 @@ ENDISNUM:
 	popi
 	pops
 	ret
+
+# strstr  -- is this string inside of the other string?
+#  Inputs: push the source string
+#          push the substring you're looking for
+#          offset to start looking
+# Outputs: The offset of the substring within the string.
+STRSTR: pushi
+	pushs
+	restore I0	# Start position
+	restore S0	# Substring
+	restore S1	# Source string
+	set I3, -1	# default return value
+	length I1, S0
+	length I2, S1
+
+STRLOOK:add I4, I0, I1
+	gt I4, I2, STREND	# Length exhausted
+	substr S2, S1, I0, I1
+	eq S2, S0, GOTSTR
+	inc I0
+	branch STRLOOK
+GOTSTR: set I3, I0
+STREND: save I3
+	popi
+	pops
+	ret
+
+

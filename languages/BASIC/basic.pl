@@ -3,6 +3,16 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.8  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.6  2002/04/14 20:51:17  Clinton
+# Fixed pathname for inclusion as languages\basic
+#
 # Revision 1.2  2002/04/11 02:21:15  jgoff
 # Altered system() calls to point to the correct directory.
 #
@@ -26,6 +36,16 @@
 #
 # $Id$
 # $Log$
+# Revision 1.3  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.8  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.6  2002/04/14 20:51:17  Clinton
+# Fixed pathname for inclusion as languages\basic
+#
 # Revision 1.2  2002/04/11 02:21:15  jgoff
 # Altered system() calls to point to the correct directory.
 #
@@ -81,18 +101,20 @@ MAINLOOPNR:
 	read S0, 256
 	length I1, S0
 	eq I1, 1, MAINLOOPR
-	clone S1, S0
-	set S0, S1
 	save S0
 	bsr STRIPSPACE
-
-	restore S0  # This *should* be a no-op, it's not.  *puzzle*
-	save S0     #   without it the string retains a trailing CR
-
 	bsr TOKENIZER
 	bsr REVERSESTACK
 	restore I5
 	eq I5, 0, ENDMAINLOOPNR  # No tokens!
+
+	# When the I/O GC bug gets fixed
+	# remove the next three print lines. 
+	#  They're magic.
+	print "Got and processing "
+	print S0
+	print "\n"
+
 	bsr ISNUM
 	restore I1
 	dec I5
@@ -135,5 +157,4 @@ unlink "out.pbc";
 system("perl -I../../lib ../../assemble.pl test.pasm > out.pbc");
 
 system("../../parrot out.pbc");
-
 

@@ -4,8 +4,12 @@
 #
 # $Id$
 # $Log$
-# Revision 1.1  2002/04/11 01:25:59  jgoff
-# Adding clintp's BASIC interpreter.
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.5  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
 #
 # Revision 1.3  2002/03/31 05:15:31  Clinton
 # Adjusted
@@ -19,23 +23,19 @@
 #  Outputs: the string
 # Non-Destructive!
 # Does *not* test for bounds conditions
+# FAST!
 PEEK:   pushi
+	pushs
 	restore I0
-	set I3, I0
-	inc I0
-	set I2 0
-PLOOP:  ge I2, I3, POL
+	mul I0, I0, -1
 	rotate_up I0
-	inc I2
-	branch PLOOP
-POL:
 	restore S0
 	save S0
-	eq I0, 0, EOP
+	mul I0, I0, -1
 	rotate_up I0
-
-EOP:	save S0
+	savec S0
 	popi
+	pops
 	ret
 
 # REPLACE -- replace thing at stack position X
@@ -48,19 +48,15 @@ REPLACE: pushi
 	pushs
 	restore S1
 	restore I0
-	set I3, I0
-	inc I0
-	set I2, 0
-RLOOP:	ge I2, I3, ROL
+
+	mul I0, I0, -1
 	rotate_up I0
-	inc I2
-	branch RLOOP
-ROL:	restore S0
-	save S1
-	eq I0, 0, ENDOFREPLACE
+	restore S0
+	savec S1
+	mul I0, I0, -1
 	rotate_up I0
-ENDOFREPLACE:
-	save S0
+	savec S0
+
 	popi
 	pops
 	ret
@@ -94,10 +90,10 @@ SWAP:	pushi
 	pops
 	ret
 
-# Reverse the stack 
+# Reverse the stack
 #   Inputs: Stack depth on top of the stack
 #  Outputs: Stack depth on top of the stack
-REVERSESTACK: 
+REVERSESTACK:
 	pushi
 	restore I5
 	set I0, I5
@@ -127,45 +123,87 @@ CLEAREND:
 	pops
 	ret
 
+#
+.const CS_GAP I0
+.const CS_SWAPPED I1
+.const CS_FORI  I2
+.const CS_FORJ       I3
+.const CS_ALENGTH I5
 # SORTSTACK
+# NSORTSTACK
 #  Inputs: A well-formed stack
 # Outputs: Another well-formed stack
 # Ported from suggestions at http://www.perlmonks.org/index.pl?node_id=153974
 #   as an improvement over the bubble sort.
-SORTSTACK:
+
+NSORTSTACK:	# Entry point for *numeric* sort
 	pushi
 	pushs
-	# Assume that rotate_up as defined in the original problem
-	# statement has been defined.
-	restore I5	# local $len = pop(@stack);
-    	set I6, I5	# local $bum = $len;
-    			# local ($x, $y, $limit);
-SORTMORE:
-	le I6,1,ENDSORT # while ($bum > 1) {
-	set I7, I6	#      $limit = $bum;
-SHUFFLE:	
-	dec I7
-	eq I7, 0, ALMOSTDONE	# while (--$limit) {
-	restore S2		#     $x = pop(@stack);
-	restore S3		#     $y = pop(@stack);
-	le S2, S3, SORTSWAP 	# if ($x gt $y) {
-	save S2			#     push(@stack, $x);
-	save S3			#     push(@stack, $y);
-	branch ROT		# }
-SORTSWAP:			# else {
-	save S3			#     push(@stack, $y);
-	save S2			#     push(@stack, $x); }
-ROT:
-        rotate_up I6		# rotate_up($bum);
-	branch SHUFFLE		# }
-ALMOSTDONE:		        # At end of the $limit loop, top element is the max, and
-				# top+1 to end is semi-sorted. One more rotate_up()
-				# is needed before moving the floor up one notch.
-	rotate_up I6		# rotate_up($bum);
-	dec I6 			# $bum--; }
-	branch SORTMORE
-ENDSORT:
-	save I5
-	popi
+	set I10, 1
+	branch DOSORT
+SORTSTACK:
+# Now aliased to COMBSORT.... a vast improvement over earlier schemes.
+# Implements a combsort in PASM
+#  Inputs: depth on top of stack, stack of strings under
+# Outputs: Stack, intact but sorted.
+#
+COMBSORT:
+	pushi
+	pushs
+	set I10, 0
+
+DOSORT: restore CS_ALENGTH
+	set CS_GAP, CS_ALENGTH
+COMBTOP:mul CS_GAP, CS_GAP, 10
+	div CS_GAP, CS_GAP 13
+	eq CS_GAP, 9, COMBNEWGAP
+	eq CS_GAP, 10, COMBNEWGAP
+	branch COMBREST
+COMBNEWGAP:
+	set CS_GAP, 11
+COMBREST:
+	lt CS_GAP, 1 COMBNEWGAP2
+	branch COMBREST2
+COMBNEWGAP2:
+	set CS_GAP, 1
+COMBREST2:
+	set CS_SWAPPED, 0
+	set CS_FORI, 1
+COMBTOPCS_FOR:
+	set I6, CS_ALENGTH
+	sub I6, I6, CS_GAP
+	gt CS_FORI, I6, AFTERCS_FOR
+	set CS_FORJ, CS_GAP
+	add CS_FORJ, CS_FORJ, CS_FORI
+
+	save CS_FORI
+	bsr PEEK
+	restore S0
+	save CS_FORJ
+	bsr PEEK
+	restore S1
+	eq I10, 1, COMBNSORT
+	le S0, S1, COMBENDCS_FOR
+	branch SORTSWAP
+
+COMBNSORT:
+	set I7, S0
+	set I8, S1
+	le I7, I8, COMBENDCS_FOR
+	branch SORTSWAP
+
+SORTSWAP:	
+	save CS_FORI
+	save CS_FORJ
+	bsr SWAP
+	set CS_SWAPPED, 1
+COMBENDCS_FOR:
+	inc CS_FORI
+	branch COMBTOPCS_FOR
+AFTERCS_FOR:
+	eq CS_SWAPPED, 1, COMBTOP
+	ne CS_GAP, 1, COMBTOP
+	save CS_ALENGTH
 	pops
+	popi
 	ret

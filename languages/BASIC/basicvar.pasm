@@ -8,9 +8,6 @@
 #	  3 bytes (width)  N=12
 #     width bytes (value)
 #
-#   I18  Cached line number
-#   I19  Cached line position
-#
 # Subscripted variables are stored independently of each other as:
 #   varname|subscr,subscr   (the subscripts will be reversed)
 #   The limit to subscripting is:
@@ -19,6 +16,16 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.14  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.12  2002/04/21 22:58:57  Clinton
+# Made Eliza compatable
+#
 # Revision 1.1  2002/04/11 01:25:59  jgoff
 # Adding clintp's BASIC interpreter.
 #
@@ -77,8 +84,6 @@ VFIND:  pushi
 VSEARCH:
 	set I0, -1
 	set I1, 0
-	ne I5, CTYPE, VFINDL
-	set I1, I18
 
 VFINDL:
 	set S2, ""
@@ -97,10 +102,7 @@ VNOTFOUND:
 	add I1, I1, NAMEWIDTH
 	set S2, ""
 	substr S2, S15, I1, VARWIDTH
-	save S2
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I2
+	set I2, S2
 	add I1, I1, VARWIDTH
 	add I1, I1, I2
 	branch VFINDL
@@ -115,6 +117,9 @@ VFINDTOOLONG:
 	print "SYMBOL NAME TOO LONG: "
 	print S5
 	print "\n"
+	end
+VFINDERR:
+	print "(internal) Cached line position exceeds length\n"
 	end
 
 # Create a variable  UNINITIALIZED
@@ -204,11 +209,12 @@ VSTORE:
 	set S15, S22  # Code then
 VSSTART:
 	add I0, I0, NAMEWIDTH
+
+	length I2, S15
+	gt I0, I2, VSTOREERR_SNH
+
 	substr S1, S15, I0, VARWIDTH
-	save S1
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I1
+	set I1, S1
 	ne I1, I6, VSTOREERR2
 
 	add I0, I0, VARWIDTH
@@ -244,6 +250,18 @@ VSTOREERR:
 VSTOREERR2:
 	print "WIDTH MISMATCH for STORE\n"
 	end
+VSTOREERR_SNH:
+	print "VSTORE ERROR, substring exceeds length\n"
+	print S15
+	print "\n"
+	print "Start "
+	print I0
+	print " length "
+	print VARWIDTH
+	print "\n"
+	end
+
+
 
 # Fetch variables
 #  Inputs: Name is on the stack
@@ -269,10 +287,7 @@ VFETCH:
 VFSTART:
 	add I0, I0, NAMEWIDTH
 	substr S1, S15, I0, VARWIDTH
-	save S1
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I1    # Width of data
+	set I1, S1
 	add I0, I0, VARWIDTH
 	substr S1, S15, I0, I1
 	save S1
@@ -310,10 +325,7 @@ VDESTROY:
 VDSTART:
 	add I1, I0, NAMEWIDTH
 	substr S1, S15, I1, VARWIDTH
-	save S1
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I2    # Width of var storage entry
+	set I2, S1
 
 	add I2, I2, NAMEWIDTH
 	add I2, I2, VARWIDTH
@@ -441,8 +453,9 @@ NFCREATED:
 	save S0
 	save NTYPE
 	bsr VFETCH
-	bsr STRIPSPACE
-	bsr ATOI
+	restore S0
+	set I1, S0
+	save I1
 	save S20
 	popi
 	pops
@@ -508,14 +521,7 @@ SSTORE:
 	eq I0, -1, NODIMERR
 	add I0, I0, NAMEWIDTH
 	substr S2, S21, I0, 3
-	save S2
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I1   # Allowable width
-
-	#save S1
-	#bsr STRIPSPACE
-	#restore S1
+	set I1, S2
 
 	length I0, S1
 	ge I0, I1, STRTOOLONG
@@ -600,14 +606,9 @@ RETSVAL:save S1
 # Line lookups now *start* where the last one left off.  For forward
 #   jumps, this means that only backwards jumps are O(n)
 #  
-#   I18 is the offset where the last line was found.
-#   I19 is the last line number found.
-#
 CFETCH: pushi
 	pushs
 	restore I1   # Line number we want
-	gt I1, I19, INCACHE
-	set I18, 0
 
 INCACHE:
 	save I1
@@ -617,20 +618,12 @@ INCACHE:
 	restore I0   # Offset, line that was found.
 	eq I0, -1, CNOLINE
 
-	set I18, I0  # Where to start next time
-
 	substr S3, S22, I0, NAMEWIDTH
-	save S3
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I3
+	set I3, S3
 
 	add I0, I0, NAMEWIDTH
 	substr S4, S22, I0, VARWIDTH
-	save S4
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I1  # Length
+	set I1, S4
 
 	add I0, I0, VARWIDTH
 	substr S4, S22, I0, I1
@@ -645,20 +638,11 @@ INCACHE:
 	save S4		# The line
 	save I3		# The line number
 
-	set I19, I3     # Remember me.
-
-
-	save I19
-	save I18
 	popi
 	pops
-	restore I18
-	restore I19
 	ret
 
 CNOLINE:
-	set I18, 0
-	set I19, 0
 	save -1
 	popi
 	pops
@@ -709,10 +693,7 @@ CNEXT:
 	add I0, I0, NAMEWIDTH
 	set S4, ""
 	substr S4, S22, I0, VARWIDTH
-	save S4
-	bsr STRIPSPACE
-	bsr ATOI
-	restore I1
+	set I1, S4
 
 	add I0, I0, VARWIDTH
 	set S4, ""
@@ -734,13 +715,13 @@ CNEXT:
 	# At this point the stack is full of stuff
 	# Sort it.
 CEND:   save I2
+	set S22, "#"
 CENDLOAD:		# Entry point for LOAD
 	bsr REVERSESTACK
-	bsr LSORTSTACK
+	bsr NSORTSTACK
 	bsr REVERSESTACK
 
 	# Take the stack and re-insert it as lines
-	set S22, "#"
 	set I0, 0
 	restore I1
 	set I0, I1
@@ -786,77 +767,6 @@ ENOTVALIDLINE:
 	print "BAD LINE NUMBER\n"
 	end
 
-
-# Sort whatever's on the stack.
-# This is a modified version of sortstack, sorts numerically by the first field
-#
-LSORTSTACK:
-	pushi
-	pushs
-	# Assume that rotate_up as defined in the original problem
-	# statement has been defined.
-	restore I5	# local $len = pop(@stack);
-    	set I6, I5	# local $bum = $len;
-    			# local ($x, $y, $limit);
-LSORTMORE:
-	le I6,1,LENDSORT # while ($bum > 1) {
-	set I7, I6	#      $limit = $bum;
-LSHUFFLE:	
-	dec I7
-	eq I7, 0, LALMOSTDONE	# while (--$limit) {
-	bsr GETLINENO	
-	restore I2
-	restore S2		#     $x = pop(@stack);
-	bsr GETLINENO
-	restore I3
-	restore S3		#     $y = pop(@stack);
-
-#	le S2, S3, LSORTSWAP
-	le I2, I3, LSORTSWAP 	# if ($x gt $y) {
-
-	savec S2			#     push(@stack, $x);
-	savec S3			#     push(@stack, $y);
-	branch LROT		# }
-LSORTSWAP:			# else {
-	savec S3			#     push(@stack, $y);
-	savec S2			#     push(@stack, $x); }
-LROT:
-        rotate_up I6		# rotate_up($bum);
-	branch LSHUFFLE		# }
-LALMOSTDONE:		        # At end of the $limit loop, top element is the max, and
-				# top+1 to end is semi-sorted. One more rotate_up()
-				# is needed before moving the floor up one notch.
-	rotate_up I6		# rotate_up($bum);
-	dec I6 			# $bum--; }
-	branch LSORTMORE
-LENDSORT:
-	save I5
-	popi
-	pops
-	ret
-
-#  Inputs: Code line
-# Outputs: Line number on stack as integer
-#          Code line underneath
-GETLINENO:
-	pushi
-	pushs
-	restore S2
-	save S2
-	save " "
-	save 0
-	bsr STRNCHR
-	restore I3
-	set S7, ""
-	substr S7, S2, 0, I3
-	save S7
-	bsr ATOI
-	restore I0
-	savec S2
-	save I0
-	popi
-	pops
-	ret
 
 # Vardecode
 # All-purpose variable decoder.  It's kinda blind though, so when you call it
@@ -919,4 +829,3 @@ VARDECODED:
 	popi
 	pops
 	ret
-

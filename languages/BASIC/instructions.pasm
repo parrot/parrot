@@ -1,4 +1,4 @@
-# This is where all of the instructions are 
+# This is where all of the instructions are
 # for the BASIC interpreter
 #
 #  On the way into *EVERY ONE* of these the stack looks like
@@ -14,6 +14,22 @@
 #
 # $Id$
 # $Log$
+# Revision 1.2  2002/04/29 01:10:04  clintp
+# Speed changes, new language features
+#
+# Revision 1.15  2002/04/28 01:09:36  Clinton
+# Added speedups by using set Ix, Sx and avoiding a lot of
+# STRIPSPACE calls.  Compensated for weird read-data bug.
+#
+# Revision 1.13  2002/04/21 22:58:57  Clinton
+# Made Eliza compatable
+#
+# Revision 1.12  2002/04/17 20:10:49  Clinton
+# Fixed?
+#
+# Revision 1.11  2002/04/15 21:22:32  Clinton
+# Added quick lookups for FOR/NEXT GOSUB/RETURN
+#
 # Revision 1.1  2002/04/11 01:25:59  jgoff
 # Adding clintp's BASIC interpreter.
 #
@@ -80,14 +96,43 @@ I_DUMP: pushi
 	ret
 
 # RESTORE
+# RESTORE expr
 # (Resets read/data)
-I_RESTORE: 
+I_RESTORE:
+	pushi
+	pushs
 	restore I0   # Line number
+
+	restore I5
+	restore S0   # "RESTORE"
+	dec I5
+	le I5, 0, RESTEXPR
+
+	# Hey, there's something here.
+	save I5
+	save "REM"
+	bsr EVAL_EXPR
+	bsr ATOI
+	restore I26
+	bsr CLEAR
+	restore I0
+	set I27, 0
+	branch END_I_RESTORE
+
+RESTEXPR:
+	save I5
 	bsr CLEAR
 	restore I0   # Empty pointer
 	set I26, 0
 	set I27, 0
+
 END_I_RESTORE:
+	save I27
+	save I26
+	popi
+	pops
+	restore I26
+	restore I27
 	ret
 
 # DATA
@@ -121,8 +166,8 @@ I_READ: pushi
 	restore I3   # Type
 	restore S0   # Variable name
 	bsr CLEAR
-	restore I0
-	
+	restore I0   # Stack's clean
+
 DO_READ_DATA:
 	save I26   # Current indexed line number
 	bsr CFETCH
@@ -135,76 +180,49 @@ DO_READ_DATA:
 	restore I5
 	restore S1 # Line number
 	dec I5
-	restore S2 # Statement 
+	restore S2 # Statement
 	dec I5
-	save I5
-
-	bsr CLEAR
-	restore I6	# Dummy
+	save I5    # Stack's cool.
 
 	set I26, I0  # Line number, exactly
-	ne S2, "DATA", DO_READ_DATA_AGAIN
-	eq I5, 0, DO_READ_DATA_AGAIN	  # Empty data statement?
+	ne S2, "DATA", BAD_READ
+	eq I5, 0, BAD_READ	  # Empty data statement?
+	branch DATA_FOUND
 
-
-	# Woo!  Got the line.  It's in S3
-	set I0, 0
-	save S3
-	save " "
-	save I0
-	bsr STRNCHR
-	restore I0  # First space
-	inc I0
-	save S3
-	save " "
-	save I0
-	bsr STRNCHR
-	restore I0  # Next space.
-	inc I0
-	length I1, S3
-	sub I1, I1, I0
-	substr S1, S3, I0, I1
-	# S1 has the DATA "data".  Go evaluate.  Build a "token stack"
-
-	save S1
-	bsr TOKENIZER
-	bsr REVERSESTACK
-	save "REM"
-	bsr EVAL_EXPR
-	restore S1
+BAD_READ:
 	bsr CLEAR
-	restore I5   # Dummy
+	restore I6	# Dummy
+	branch DO_READ_DATA_AGAIN
 
-	set I4, 0    # Data things seen
-	set I0, 0    # Start place
-
-LOOP_DATA:
-	save S1     # Result
-	save ","
-	save I0
-	bsr STRNCHR
-	restore I1
-	eq I1, -1, GET_LAST
-	sub I2, I1, I0
-	substr S2, S1, I0, I2
-	ge I4, I27, GOT_DATA
-	set I0, I1
+DATA_FOUND:
+	# Woo!  The tokens we want are on the stack
+	# Get the I27th thing on the stack and store it
+	# in S2
+	restore I5
+	mul I0, I27, 2
+	ge I5, I0, READ_PEEK
+	save I5
+	branch BAD_READ  # Exhausted
+READ_PEEK:
 	inc I0
-	inc I4
-	branch LOOP_DATA
+	save I0
+	bsr PEEK
+	restore S2
 
-GET_LAST:
-	length I2, S1
-	sub I2, I2, I0
-	substr S2, S1, I0, I2
-	ge I4, I27, GOT_DATA
-	branch DO_READ_DATA_AGAIN   # Next line
+	save I5
+	bsr CLEAR
+	restore I6  # Dummy
 
+	save S2
+	save 1
+	save ""
+	bsr EVAL_EXPR
+	restore S2
+	restore I6  # Another Dummy
 
-GOT_DATA:
 	# So store S2 into variable S0 type I3 (N=1 A=0)
 	inc I4
-	set I27, I4
+	inc I27
 	save S0  # Name
 	save S2  # Value
 	eq I3, STYPE, DATA_STR
@@ -220,7 +238,7 @@ DO_READ_DATA_AGAIN:
 	inc I26
 	set I27, 0   # Index to use, reset
 	branch DO_READ_DATA
-	
+
 END_I_READ:
 	save S20
 	save S21
@@ -233,7 +251,6 @@ END_I_READ:
 	restore S21
 	restore S20
 	ret
-
 
 # PRINT		 (just a newline)
 # PRINT expr     (anything else)
@@ -278,7 +295,7 @@ FIGURETYPE:
 PRINTNL:
 	eq I6, 0, I_PRINT_EXIT
 	print "\n"
-I_PRINT_EXIT:	
+I_PRINT_EXIT:
 	save I24
 	popi
 	pops
@@ -308,10 +325,10 @@ I_LET:  pushi
 	dec I5
 	ne S2, "=", ERR_I_LET
 
-	save I5		
-	save "REM"    
+	save I5
+	save "REM"
 	bsr EVAL_EXPR
-	restore S0	
+	restore S0
 	eq I3, NTYPE, LETNUM
 	save S1
 	save S0
@@ -382,6 +399,80 @@ END_I_GOTO:
 	restore I23
 	ret
 
+# ON expr GOTO
+# ON expr GOSUB
+I_ON:	pushi
+	pushs
+	restore I10 # My line # (important here)
+
+	restore I5
+	restore S0  # "ON"
+	dec I5
+
+	set I0, 0
+ON_OPTYP:
+	gt I0, I5, ERR_SYN_CLEAR
+	save I0
+	bsr PEEK
+	restore S12
+	eq S12, "GOSUB", GOTOP
+	eq S12, "GOTO", GOTOP
+	inc I0
+	branch ON_OPTYP
+
+GOTOP:  save I5
+	save S12	# Stopword
+	bsr EVAL_EXPR
+	bsr ATOI
+	restore I0      # Which branch to take
+	le I0, 0, ERR_ON_FAIL
+
+	restore I5
+	restore S1    # Goto or Gosub
+	dec I5
+	save I5
+	save "REM"
+	bsr EVAL_EXPR
+	restore S2    # List of lines
+	bsr CLEAR
+	restore I5    # Dummy
+
+	save S2
+	bsr TOKENIZER
+	bsr REVERSESTACK
+	restore I5
+
+	dec I0
+	mul I0, I0, 2
+	save I5
+	gt I0, I5, ERR_ON_FAIL
+	restore I5
+
+	save I0
+	bsr PEEK
+	restore S1   	# Line number for jump
+
+	save I5
+	bsr CLEAR
+	restore I0
+
+	save S1
+	bsr ATOI	# ... as a number
+
+	# Thing on the stack is where we're going
+	# Now to determine *how* we're going there.
+	restore I23
+
+	# Needs I10, I23 (set)
+	eq S12, "GOSUB", ON_GOSUB_ENTRY
+
+	save I23
+	popi
+	pops
+	restore I23
+	ret
+
+
 # IF EXPR COND EXPR THEN STATEMENT
 # (This should be a total mindfuck)
 I_IF:	pushi
@@ -408,7 +499,7 @@ I_IF:	pushi
 	eq I0, 1, IF_WORKED
 
 	# The stack *is* kosher at this point
-IF_FAILED: 
+IF_FAILED:
 	bsr CLEAR
 	restore I0	  # BAIL!
 	branch END_I_IF   # The assertion failed
@@ -455,12 +546,13 @@ IFERR:  print "FATAL: Unexpected comparison operator mismatch\n"
 
 
 # All of these instructions deal with the runtime stack.
-# The runtime stack lives *just below* the stack used by the 
+# The runtime stack lives *just below* the stack used by the
 #    program counter, tokenizer, etc..
 # Format (top to bottom, all strings)
 #
 #      "GOS"                 "FOR"
 #      LINECALLED	     LINECALLED
+# *new LINEPOS (int)         LINEPOS (int)
 #      ""                    TESTVAR
 #      ""                    FINAL
 #      ""                    STEP
@@ -489,7 +581,7 @@ I_FOR:	pushi
 
 	save S0	     # Variable name
 	save I0      # Begin value
-	bsr NSTORE  
+	bsr NSTORE
 
 	restore I5
 	restore S1   # "TO"
@@ -553,14 +645,17 @@ NOSTEP:
 	save S0    # Var
 	inc I5
 
+	save 0     # Cached position  (*unused)
+	bsr ITOA
+
 	inc I10
 	save I10
 	bsr ITOA   # Line number +1
-	inc I5	
+	inc I5
 
 	save "FOR"
 	inc I5
-	
+
 	save I5
 
 END_I_FOR:
@@ -599,17 +694,20 @@ I_NEXT: pushi
 	bsr STACKSEARCH
 
 	# Okay, now dip into the runtime stack
-	restore I5     
+	restore I5
 	le I5, 0, ERR_I_UNDERFLOW
 	# Remove 5!
 
 	restore S7
-	dec I5 
+	dec I5
 	ne S7, "FOR", ERR_I_NEXT_MS
 
 	bsr ATOI
 	restore I11  # Potential new line #
 	dec I5
+
+	bsr ATOI
+	restore I4   # Cached position
 
 	restore S1   # Variable expected (sanity only)
 	dec I5
@@ -626,7 +724,7 @@ I_NEXT: pushi
 	dec I5
 	bsr CLEAR
 	restore I1   # dummy
-	
+
 	bsr ATOI
 	restore I3   # Step
 	dec I5
@@ -653,13 +751,15 @@ I_NEXT: pushi
 FOR_BACK:
 	lt I0, I2, GO_FORWARD
 	branch GO_BACK
-	
+
 GO_BACK:
 	save I3  # Step
 	bsr ITOA
 
 	save S8  # Final Expr
 	save S0  # Var name
+	save I4  # Cached position
+	bsr ITOA
 	save I11
 	bsr ITOA # Line number
 	save "FOR"
@@ -667,11 +767,12 @@ GO_BACK:
 	save I5  # Stack's back to kosher
 
 	set I23, I11  # New line #
+
 	save I23
 	save S20
 	save I24
 	popi
-	pops	
+	pops
 	restore I24
 	restore S20
 	restore I23
@@ -681,7 +782,7 @@ GO_FORWARD:
 	save I5   # Put the runtime stack back (forget the FOR)
 	#save S20 # Uncomment to change the after-loop value of the index
 	save I24
-	popi  
+	popi
 	pops
 	restore I24
 	#restore S20
@@ -705,12 +806,17 @@ I_GOSUB:
 	bsr CLEAR
 	restore I0   # dummy
 
+
 	# Build the return information
+	# Also the on-gosub entry point
+ON_GOSUB_ENTRY:
+	restore I5	# Runtime stack depth
 	inc I10		# Return to my followers
-	restore I5
 	save ""
 	save ""
 	save ""
+	save 0          # Cached position
+	bsr ITOA
 	save I10
 	bsr ITOA	# Return target
 	save "GOS"
@@ -741,10 +847,13 @@ I_RETURN:
 	ne S0, "GOS", ERR_I_NEXT_MS
 	bsr ATOI
 	restore I23
+	bsr ATOI
+	restore I18     # Cached position (*unused)
 	restore S0
 	restore S0
 	restore S0
 	sub I5, I5, 4
+
 	save I5
 	save I23
 	popi
@@ -779,14 +888,14 @@ LIST_ONE_LINE:
 	branch DO_I_LIST
 
 LIST_RANGE:
-	restore S0  	# -  
+	restore S0  	# -
 	dec I5
 	save I5
 	save ""
 	bsr EVAL_EXPR
 	bsr ATOI
 	restore I3
-	
+
 DO_I_LIST:
 	set I0, I2
 
@@ -802,7 +911,7 @@ LIST_LOOP:
 	eq I3, -1 LIST_LOOP  # Go to the end
 	gt I0, I3, END_LIST
 	branch LIST_LOOP
-	
+
 
 END_LIST:
 	popi
@@ -822,9 +931,6 @@ I_RUN:  restore I10   # Line number
 	set I26, -1   # Reset READ/DATA line number
 	set I27, 0    # And thingy.
 
-	set I18, 0    # Reset line cache
-	set I19, 0
-
 CODELOOP:
         save I23
         bsr CFETCH
@@ -838,7 +944,7 @@ CODELOOP:
         ne I1, 0, ERROR
         branch CODELOOP
 
-	
+
 ERROR:  # Okay, it's not actually an error branch anymore.
 
 END:    set I20, 0   # Normal mode
@@ -858,7 +964,7 @@ I_NEW:  pushi
 	ret
 
 # LOAD
-# This isn't particularly robust until the I/O gets 
+# This isn't particularly robust until the I/O gets
 #   more rounded out.  It's particularly strange becase there's
 #   no line-based I/O from filehandles.  Instead buffer it all and
 #   split based on \n's
@@ -906,9 +1012,7 @@ MAKELINES:
 
         sub I2, I1, I0
 	print ""
-	#print "<makelinesubstr>"
         substr S2, S1, I0, I2
-	#print "</makelinesubstr>"
 
         save S2		# The line
 	inc I5
@@ -921,6 +1025,10 @@ FIN_LINES:
 ENDLINES:
 	close P0
 	save I5
+	eq I20, 1, ENDLINES2
+	set S22, "#"
+
+ENDLINES2:
 	bsr CENDLOAD
 	print "DONE\n"
 	ret
@@ -968,15 +1076,33 @@ INPSTRING:
 
 ENDINPUT:
 	save S20
-	save S21	
+	save S21
 	popi
 	pops
 	restore S21
 	restore S20
 	ret
 
+# TRACE
+I_TRACE:
+	pushi
+	pushs
+	restore I10  # Line #
+	save ""
+	bsr EVAL_EXPR
+	bsr ATOI
+	restore I25
+	bsr CLEAR
+	restore I0
+
+	save I25
+	popi
+	pops
+	restore I25
+	ret
+
 # Runtime stack mgmt.
-#   Put two things on the stack.  A type FOR/GOS and 
+#   Put two things on the stack.  A type FOR/GOS and
 #   a marker (variable name/"").  This will search down
 #   through the stack.
 # Called by "RETURN" and "NEXT"
@@ -989,8 +1115,9 @@ STACKSEARCH:
 KEEPLOOKING:
 	restore I5   # Stack depth
 	eq I5, 0, ENDSEARCH
-	restore S2   # Type 
+	restore S2   # Type
 	restore S3   # Line #
+	restore S7   # Cached position...
 	restore S4   # Marker     (FOR)
 	restore S5   # Expression (FOR)
 	restore S6   # Step       (FOR)
@@ -1004,6 +1131,7 @@ PUTBACK:
 	save S6
 	save S5
 	save S4
+	save S7     # Cached position
 	save S3
 	save S2
 	add I5, I5, 5
@@ -1022,7 +1150,7 @@ ERR_IO:
 	print S0
 	print "\n"
 	branch ALL_ERR
-	
+
 ERR_I_NEXT_MS:	# This is a Should Not Happen error now.
 	save I5
 	bsr CLEAR
@@ -1064,6 +1192,12 @@ ERR_DATA_EXHAUSTED:
 	print "DATA EXHAUSTED AT READ "
 	branch ALL_ERR
 
+ERR_ON_FAIL:
+	print "ON GOTO/GOSUB OFFSET OUT OF RANGE "
+	bsr CLEAR
+	restore I0
+	branch ALL_ERR
+
 ERR_IF:
 	print "Error in IF statement at line "
 	dec I23
@@ -1078,7 +1212,7 @@ ERR_IF:
 ALL_ERR:
 	dec I23
 	print " at line "
-	
+
 	save I23
 	bsr ITOA
 	restore S31	# Convert for puts
@@ -1090,6 +1224,6 @@ ALL_ERR:
 	popi
 	pops
 	restore I22
-	ret
 
+	ret
 
