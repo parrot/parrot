@@ -53,7 +53,7 @@ development.
 
 But don't let that put you off! Parrot is still very much usable; we've
 already seen two mini-languages emerge which compile down to Parrot
-bytecode (more on that later) and Leon Brocard has been working on
+bytecode (more on that later), and Leon Brocard has been working on
 automatically converting Java bytecode to Parrot.
 
 At the moment, it's possible to write simple programs in Parrot
