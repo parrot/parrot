@@ -531,6 +531,7 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
     SymReg *i0, *i1, *i2, *py, *p3, *ic16;
     SymReg *loop, *next, *over, *over1;
     Instruction *tmp;
+    int lin;
     char buf[128];
     /*
      * emited code is
@@ -581,13 +582,14 @@ pcc_emit_flatten(Parrot_Interp interpreter, Instruction *ins,
         regs[1] = mk_const(str_dup(buf), 'I');
         ins = insINS(interpreter, ins, "set", regs, 2);
     }
-    sprintf(buf, "#arg_loop_%d", i);
+    lin = ins->line;
+    sprintf(buf, "#arg_loop_%d_%d", lin, i);
     loop = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#next_arg_%d", i);
+    sprintf(buf, "#next_arg_%d_%d", lin, i);
     next = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#over_flow_1_%d", i);
+    sprintf(buf, "#over_flow_%d_1_%d", lin, i);
     over1 = mk_address(str_dup(buf), U_add_uniq_label);
-    sprintf(buf, "#over_flow_%d", i);
+    sprintf(buf, "#over_flow_%d_%d", lin, i);
     over = mk_address(str_dup(buf), U_add_uniq_label);
 
     if (arg->type & VT_FLATTEN) {

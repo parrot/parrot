@@ -1165,6 +1165,8 @@ output_is(<<'CODE', <<'OUT', ".flatten_arg multiple instances");
     .param var b
     print a
     print b
+   .pcc_begin_return
+   .pcc_end_return
     end
 .end
 CODE
