@@ -3327,6 +3327,8 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
 
     UNUSED(valp);
     frame = new_frame();
+    /* When an error occurs, then report it as being in a macro */
+    frame->is_macro = 1;
 
     expansion = find_macro_param(name);
     if (expansion) {
@@ -3340,7 +3342,6 @@ expand_macro (YYSTYPE *valp, void *interp, const char *name)
         /* remember macro name for error reporting
          */
         sourcefile = const_cast(name);
-        frame->is_macro = 1;
 	/* whitespace can be savely ignored */
 	do {
 	    c = input();
