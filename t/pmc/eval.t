@@ -58,6 +58,7 @@ output_is(<<'CODE', <<'OUTPUT', "call 2 subs in evaled code ");
     concat S5, "invoke P1\n"
     compreg P1, "PASM"
     compile P0, P1, S5
+    set P6, P0		# keep Sub PMC segment alive
     find_global P0, "_foo"
     invokecc
     print "back\n"
@@ -72,9 +73,6 @@ bar
 fin
 OUTPUT
 
-SKIP: {
-  skip("wrong stack handling", 1);
-
 output_is(<<'CODE', <<'OUTPUT', "nano forth sub");
 _main:
     load_bytecode "examples/assembly/nanoforth2.pasm"
@@ -86,14 +84,25 @@ _main:
 ok2:
     print "ok 2\n"
     set S5, "1 7 + . 2 3 - .\n"
-    pushp
+    set I0, 1
+    set I1, 0
+    set I2, 1
+    set I3, 0
+    set I4, 0
     invokecc
-    popp
     set S5, ": i 1 + ; 5 i .\n"
-    pushp
+    set I0, 1
+    set I1, 0
+    set I2, 1
+    set I3, 0
+    set I4, 0
     invokecc
-    popp
     set S5, ": i 1 + ; : j i i ; 9 j .\n"
+    set I0, 1
+    set I1, 0
+    set I2, 1
+    set I3, 0
+    set I4, 0
     invokecc
     end
 CODE
@@ -104,7 +113,7 @@ ok 2
 6
 11
 OUTPUT
-}
+
 output_is(<<'CODE', <<'OUTPUT', "PIR compiler sub");
 ##PIR##
 .sub test @MAIN

@@ -255,6 +255,9 @@ INTVAL PackFile_map_segments (struct PackFile_Directory *dir,
 struct PackFile_Segment * PackFile_Segment_new_seg(struct PackFile_Directory *,
         UINTVAL type, const char *name, int add);
 
+struct PackFile_ByteCode * PF_create_default_segs(Interp*,
+        const char *file_name, int add);
+
 void Parrot_load_bytecode(Interp *, const char *filename);
 /*
 ** PackFile_Segment Functions:

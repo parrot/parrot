@@ -12,6 +12,11 @@ code and understands:
  : x  compile single-letter word x
  ; end compile
 
+This code uses the same compile/call scheme as Dan's languages/forth
+compiler and is therefor equally broken. The C<jsr> opcode does not allow
+to branch into different code segments, or better it works only if bounds
+checking is disabled.
+
 =cut
 
 .macro core(op, label)

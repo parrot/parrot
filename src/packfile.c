@@ -748,6 +748,8 @@ PackFile_find_segment (struct PackFile_Directory *dir, const char *name,
 {
     size_t i;
 
+    if (!dir)
+        return NULL;
     for (i=0; i < dir->num_segments; i++) {
         struct PackFile_Segment *seg = dir->segments[i];
         if (seg && strcmp (seg->name, name) == 0) {
@@ -1152,6 +1154,58 @@ PackFile_Segment_new_seg(struct PackFile_Directory *dir, UINTVAL type,
     return seg;
 }
 
+static struct PackFile_Segment *
+create_seg(struct PackFile_Directory *dir, pack_file_types t,
+        const char *name, const char *file_name, int add)
+{
+    char *buf;
+    struct PackFile_Segment *seg;
+    size_t len;
+
+    len = strlen(name) + strlen(file_name) + 2;
+    buf = malloc(len);
+    sprintf(buf, "%s_%s", name, file_name);
+    seg = PackFile_Segment_new_seg(dir, t, buf, add);
+    free(buf);
+    return seg;
+}
+
+/*
+
+=item C<struct PackFile_ByteCode *
+PF_create_default_segs(Interp*, const char *file_name, int add)>
+
+Create bytecode, constant, and fixup segment for C<file_nam>. If C<add>
+is true, the current packfile becomes the owner of these segments by
+adding the segments to the directory.
+
+=cut
+
+*/
+
+struct PackFile_ByteCode *
+PF_create_default_segs(Interp* interpreter, const char *file_name, int add)
+{
+    struct PackFile_Segment *seg;
+    struct PackFile *pf = interpreter->code;
+    struct PackFile_ByteCode *cur_cs;
+
+    seg = create_seg(&pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME,
+            file_name, add);
+    cur_cs = (struct PackFile_ByteCode*)seg;
+
+    seg = create_seg(&pf->directory, PF_FIXUP_SEG, FIXUP_TABLE_SEGMENT_NAME,
+            file_name, add);
+    cur_cs->fixups = (struct PackFile_FixupTable *)seg;
+    cur_cs->fixups->code = cur_cs;
+
+    seg = create_seg(&pf->directory, PF_CONST_SEG, CONSTANT_SEGMENT_NAME,
+            file_name, add);
+    cur_cs->consts = pf->const_table = (struct PackFile_ConstTable*) seg;
+    cur_cs->consts->code = cur_cs;
+
+    return cur_cs;
+}
 /*
 
 =item C<void
@@ -1809,6 +1863,7 @@ byte_code_new (struct PackFile *pf, const char * name, int add)
     struct PackFile_ByteCode *byte_code;
 
     byte_code = mem_sys_allocate(sizeof(struct PackFile_ByteCode));
+    byte_code->base.dir = NULL;
 
     byte_code->prederef.code = NULL;
     byte_code->prederef.branches = NULL;
@@ -2067,7 +2122,8 @@ Parrot_switch_to_cs(Interp *interpreter,
     interpreter->prederef.n_branches = new_cs->prederef.n_branches;
     interpreter->prederef.n_allocated= new_cs->prederef.n_allocated;
     interpreter->jit_info = new_cs->jit_info;
-    prepare_for_run(interpreter);
+    if (really)
+        prepare_for_run(interpreter);
     return cur_cs;
 }
 
@@ -2076,7 +2132,7 @@ Parrot_switch_to_cs(Interp *interpreter,
 =item C<void
 Parrot_pop_cs(Interp *interpreter)>
 
-Destroy current byte code segment and switch to previous.
+Remove current byte code segment from directory and switch to previous.
 
 =cut
 
@@ -2090,6 +2146,7 @@ Parrot_pop_cs(Interp *interpreter)
 
     Parrot_switch_to_cs(interpreter, new_cs, 1);
     PackFile_remove_segment_by_name (cur_cs->base.dir, cur_cs->base.name);
+    /* FIXME delete returned segment */
 }
 
 /*

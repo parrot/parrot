@@ -427,9 +427,6 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
 extern void* yy_scan_string(const char *);
 extern SymReg *cur_namespace; /* s. imcc.y */
 
-/* XXX */
-struct PackFile_ByteCode *
-PF_create_default_segs(Parrot_Interp interpreter, int add);
 
 static void *
 imcc_compile(Parrot_Interp interp, const char *s)
@@ -444,7 +441,7 @@ imcc_compile(Parrot_Interp interp, const char *s)
     parrot_sub_t sub_data;
 
     sprintf(name, "EVAL_" INTVAL_FMT, ++interp->code->eval_nr);
-    new_cs = PF_create_default_segs(interp, 0);
+    new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
     cur_namespace = NULL;
     IMCC_INFO(interp)->cur_namespace = NULL;

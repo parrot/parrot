@@ -24,12 +24,43 @@ evaluation and execution.
 pmclass Eval extends Closure {
 
     void init() {
+        parrot_sub_t sub_data;
         SUPER();
-        PObj_active_destroy_SET(SELF);
+        sub_data = PMC_sub(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
+        sub_data->seg = NULL;
+    }
+
+    void mark() {
+        parrot_sub_t sub_data;
+        PObj *name;
+
+        sub_data = PMC_sub(SELF);
+        name = (PObj*)sub_data->name;
+        if (name)
+            pobject_lives(INTERP, name);
     }
 
     void destroy() {
-        /* TODO destroy bytecode in seg */
+        parrot_sub_t sub_data;
+        struct PackFile_Segment *seg;
+        struct PackFile_ByteCode *cur_cs;
+
+        sub_data = PMC_sub(SELF);
+        cur_cs = sub_data->seg;
+        if (!cur_cs)
+            return;
+
+        seg = (struct PackFile_Segment *)cur_cs->consts;
+        PackFile_Segment_destroy(seg);
+        seg = (struct PackFile_Segment *)cur_cs->debugs;
+        if (seg)
+            PackFile_Segment_destroy(seg);
+        seg = (struct PackFile_Segment *)cur_cs->fixups;
+        PackFile_Segment_destroy(seg);
+        seg = (struct PackFile_Segment *)cur_cs;
+        PackFile_Segment_destroy(seg);
+        sub_data->seg = NULL;
     }
 
 
