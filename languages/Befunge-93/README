@@ -1,0 +1,82 @@
+DESCRIPTION
+-----------
+This is a Befunge interpreter written in Parrot assembler, version 0.01
+
+This interpreter should be Befunge-93 compliant. This means the
+playfield is limited to 80x25 and can hold *only bytes*. This means
+that you can't fetch/store numbers greater than 255 or less than 0 in
+the torus.
+
+You should compile the files with:
+
+     $ make build
+     $ make test
+
+Then you can run your Befunge program with: 
+
+     $ ../../parrot  befunge.pbc [-v] foo.bef
+
+The -v flag makes the befunge interpreter more verbose.
+
+
+NOTES
+-----
+The files are the following:
+        befunge.pasm    the main loop
+        load.pasm       function to load the code from source file
+        flow.pasm       handles the flow-control instructions
+        io.pasm         handles the io related instructions
+        maths.pasm      handles all the maths instructions
+        stack.pasm      handles the stack operations as well as stack
+                        instructions
+        Makefile        a tiny, little Makefile to help (me) during
+                        developement
+        test.bef        a befunge script that test almost all the instructions
+
+
+BUGS
+----
+* The befunge program *should* be properly newline terminated because
+  of Parrot's I/O...
+* The "input char" and "input int" instructions are a bit broken since
+  Parrot does not handle I/O very well...
+
+
+TODO
+----
+* more error checking
+* better rand()/chr() methods
+* more tests (with Perl and Test::Harness)
+* debugging options
+* use an array of arrays instead of an array of strings
+* implement Befunge 98
+
+
+AUTHOR
+------
+Jerome Quelin, <jquelin@cpan.org>
+
+
+ACKNOWLEDGEMENTS
+----------------
+I would like to thank:
+* Chris Pressey, creator of Befunge, who gave a whole new dimension to
+  both coding and obfuscating.
+* Leon Brocard and Rafael Garcia-Suarez, for giving me this crazy
+  idea.
+* Leon Brocard (again), because he told me he will help me with the
+  Befunge-98 version :o)
+* Dan Sugalski and all the parrot folks for providing such a nice toy
+  to play with.
+
+
+COPYRIGHT
+---------
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SEE ALSO
+--------
+* http://www.parrotcode.org
+* http://www.catseye.mb.ca/esoteric/befunge/
+
