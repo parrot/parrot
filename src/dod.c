@@ -154,6 +154,9 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
         stash = stash->parent_stash;
     }
 
+    /* Now mark the class hash */
+    pobject_lives(interpreter, (PObj *)interpreter->class_hash);
+
     /* Now walk the pmc stack. Make sure to walk from top down since stack may
      * have segments above top that we shouldn't walk. */
     for (cur_chunk = interpreter->ctx.pmc_reg_top; cur_chunk;
