@@ -69,3 +69,15 @@ Performance
 Documentation
 -------------
     Parrotguts currently too difficult to approach
+
+Debugger
+--------
+    Print the interpreter info
+    Add commands history and completition
+    Load the commands from a file
+    Make breakpoints at labels
+    Conditional breakpoints
+    Watchpoints
+    Disassemble the pbc by default
+    Read core dumps
+    Attach to a running program
