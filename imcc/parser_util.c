@@ -395,7 +395,7 @@ INS(Interp *interpreter, IMC_Unit * unit, char *name,
                             "undefined identifier '%s'\n", r[i]->name);
             }
         }
-        if (op_info->jump) {
+        if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
             ins->type |= ITBRANCH;
             if (!strcmp(name, "branch"))
                 ins->type |= IF_goto;

@@ -179,7 +179,7 @@ op find_lex(out PMC, in STR) {
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical '%Ss' not found", $2);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 op find_lex(out PMC, in INT) {
@@ -189,7 +189,7 @@ op find_lex(out PMC, in INT) {
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $2);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 op find_lex(out PMC, in INT, in STR) {
@@ -199,7 +199,7 @@ op find_lex(out PMC, in INT, in STR) {
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical '%Ss' not found", $3);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 op find_lex(out PMC, in INT, in INT) {
@@ -209,7 +209,7 @@ op find_lex(out PMC, in INT, in INT) {
     if (!$1)
         real_exception(interpreter, next, LEX_NOT_FOUND,
             "Lexical #'%d' not found", (int) $3);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 =back
@@ -298,7 +298,7 @@ op find_global(out PMC, in STR) {
 
     next = expr NEXT();
     $1 = Parrot_get_global(interpreter, NULL, $2, next);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 op find_global(out PMC, in STR, in STR) {
@@ -310,7 +310,7 @@ op find_global(out PMC, in STR, in STR) {
 
     next = expr NEXT();
     $1 = Parrot_get_global(interpreter, $2, $3, next);
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 op find_global(out PMC, in PMC, in STR) {
@@ -349,7 +349,7 @@ op find_global(out PMC, in PMC, in STR) {
     else {
 	$1 = VTABLE_get_pmc_keyed_str(interpreter, stash, $3);
     }
-    goto ADDRESS(next);
+    goto NEXT();
 }
 
 =back
