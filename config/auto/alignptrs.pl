@@ -15,7 +15,7 @@ sub runstep {
   cc_clean();
 
   #if there are warnings, they are in $results
-  if ($results =~ /^\d+OK$/) {
+  if ($results =~ /^(\d+)OK$/ and $1 ne "0") {
     Configure::Data->set(
       aligned_ptrs => 0,
     );
