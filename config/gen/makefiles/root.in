@@ -164,6 +164,33 @@ GEN_SOURCES = \
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
+GEN_LIBRARY = \
+    runtime/parrot/library/config.pbc \
+    runtime/parrot/library/Data/Dumper/Base.pbc \
+    runtime/parrot/library/Data/Dumper/Default.pbc \
+    runtime/parrot/library/Data/Dumper.pbc \
+    runtime/parrot/library/Data/Escape.pbc \
+    runtime/parrot/library/Data/Sort.pbc \
+    runtime/parrot/library/dumper.pbc \
+    runtime/parrot/library/Getopt/Long.pbc \
+    runtime/parrot/library/ncurses.pbc \
+    runtime/parrot/library/parrotlib.pbc \
+    runtime/parrot/library/pcre.pbc \
+    runtime/parrot/library/Stream/Base.pbc \
+    runtime/parrot/library/Stream/Buffer.pbc \
+    runtime/parrot/library/Stream/Combiner.pbc \
+    runtime/parrot/library/Stream/Coroutine.pbc \
+    runtime/parrot/library/Stream/Filter.pbc \
+    runtime/parrot/library/Stream/Lines.pbc \
+    runtime/parrot/library/Stream/ParrotIO.pbc \
+    runtime/parrot/library/Stream/Replay.pbc \
+    runtime/parrot/library/Stream/Sub.pbc \
+    runtime/parrot/library/Stream/Writer.pbc
+# XXX Why don't these build?
+    #runtime/parrot/library/libpcre.pbc \
+    #runtime/parrot/library/Data/Replace.pbc \
+    #runtime/parrot/library/postgres.pbc \
+
 # the dependencies of jit_emit.h are done explicitely
 # including this file in GEN_HEADERS causses unnecessary recompile of all
 FLUID_FILES = \
@@ -171,8 +198,10 @@ FLUID_FILES = \
     $(GEN_HEADERS) \
     $(GEN_SOURCES) \
     $(GEN_MODULES) \
+    $(GEN_LIBRARY) \
     $(INC)/jit_emit.h \
     runtime/parrot/include/parrotlib.pbc
+
 
 
 ###############################################################################
@@ -410,7 +439,10 @@ MAKE_C = ${make_c}
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
 .c$(O) :
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
+	$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
+
+%.pbc:%.imc
+	.${slash}$(TEST_PROG) -o $@ $<
 
 ###############################################################################
 #
@@ -420,7 +452,7 @@ MAKE_C = ${make_c}
 #
 ###############################################################################
 
-all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_SO)
+all : flags_dummy $(TEST_PROG) runtime/parrot/include/parrotlib.pbc runtime/parrot/include/config.fpmc docs $(LIBNCI_SO) $(GEN_LIBRARY)
 
 .SUFFIXES : .c .h .pmc .dump $(O) .str
 
