@@ -996,14 +996,14 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
         "pushtopp",
         "pushtopn"
     };
-    char *new_restore[] = {
+    char *new_rest[] = {
         "poptopi",
         "poptops",
         "poptopp",
         "poptopn"
     };
     int needs_save[4], nsave;
-    int i, t;
+    int i, t, first;
 
     for (i = 0; i < 4; i++)
         needs_save[i] = 0;
@@ -1034,20 +1034,44 @@ optc_savetop(Parrot_Interp interpreter, IMC_Unit * unit, Instruction *ins)
             ostat.deleted_ins++;
             break;
         case 1:
+        case 2:
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            for (i = 0; i < 4; i++)
-                if (needs_save[i])
-                    break;
-            tmp = INS(interpreter, unit, new_save[i], NULL, regs, 0, 0, 0);
-            subst_ins(unit, ins, tmp, 1);
-            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
-            for (ins = tmp; ins ; ins = ins->next)
+            first = 1;
+            for (i = 0; i < 4; i++) {
+                if (!needs_save[i])
+                    continue;
+                tmp = INS(interpreter, unit, new_save[i], NULL, regs, 0, 0, 0);
+                if (first) {
+                    subst_ins(unit, ins, tmp, 1);
+                    ins = tmp;
+                }
+                else {
+                    insert_ins(unit, ins, tmp);
+                    ins = tmp;
+                }
+                first = 0;
+                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            }
+            for ( ; ins ; ins = ins->next)
                 if (!strcmp(ins->op, "restoretop"))
                     break;
+            first = 1;
             debug(interpreter, DEBUG_OPT1, "opt1 %I => ", ins);
-            tmp = INS(interpreter, unit, new_restore[i], NULL, regs, 0, 0, 0);
-            subst_ins(unit, ins, tmp, 1);
-            debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            for (i = 0; i < 4; i++) {
+                if (!needs_save[i])
+                    continue;
+                tmp = INS(interpreter, unit, new_rest[i], NULL, regs, 0, 0, 0);
+                if (first) {
+                    subst_ins(unit, ins, tmp, 1);
+                    ins = tmp;
+                }
+                else {
+                    insert_ins(unit, ins, tmp);
+                    ins = tmp;
+                }
+                first = 0;
+                debug(interpreter, DEBUG_OPT1, "%I\n", tmp);
+            }
             break;
     }
 }
