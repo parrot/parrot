@@ -99,7 +99,7 @@ alloc_objects(struct Parrot_Interp *interpreter,
     new_arena = mem_sys_allocate(sizeof(struct Small_Object_Arena));
 
     /* Setup memory for the new objects */
-    new_arena->start_objects = mem_sys_allocate(size);
+    new_arena->start_objects = mem_sys_allocate_zeroed(size);
 
     /* Maintain the *_arena_memory invariant for stack walking code. Set it
      * regardless if we're the first pool to be added. */
@@ -149,18 +149,12 @@ new_small_object_pool(struct Parrot_Interp *interpreter,
 {
     struct Small_Object_Pool *pool;
 
-    pool = mem_sys_allocate(sizeof(struct Small_Object_Pool));
-    pool->last_Arena = NULL;
+    pool = mem_sys_allocate_zeroed(sizeof(struct Small_Object_Pool));
     pool->object_size = object_size;
     pool->objects_per_alloc = objects_per_alloc;
-    pool->total_objects = 0;
-    pool->num_free_objects = 0;
-    pool->replenish_level = 0;
-    pool->free_list = NULL;
     pool->add_free_object = add_free_object;
     pool->get_free_object = get_free_object;
     pool->alloc_objects = alloc_objects;
-    pool->mem_pool = NULL;
     return pool;
 }
 

@@ -280,14 +280,10 @@ void *
 new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 {
     struct Small_Object_Pool *pool;
-    Buffer *buffer;
 
     pool = get_bufferlike_pool(interpreter, size);
 
-    buffer = get_free_buffer(interpreter, pool);
-    buffer->bufstart = NULL;
-    buffer->buflen = 0;
-    return buffer;
+    return get_free_buffer(interpreter, pool);
 }
 
 

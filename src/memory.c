@@ -18,6 +18,15 @@
 void *
 mem_sys_allocate(size_t size)
 {
+    return malloc((size_t)size);
+}
+
+/*=for api mem mem_sys_allocate_zeroed
+   uses calloc to allocate system memory
+*/
+void *
+mem_sys_allocate_zeroed(size_t size)
+{
     return calloc(1, (size_t)size);
 }
 
@@ -57,7 +66,7 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: nil 
+ * indent-tabs-mode: nil
  * End:
  *
  * vim: expandtab shiftwidth=4:

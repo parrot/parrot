@@ -42,7 +42,7 @@ alloc_new_block(struct Parrot_Interp *interpreter,
 
     /* Allocate a new block. Header info's on the front, plus a fudge factor
      * for good measure */
-    new_block = mem_sys_allocate(sizeof(struct Memory_Block) +
+    new_block = mem_sys_allocate_zeroed(sizeof(struct Memory_Block) +
             alloc_size + 32);
     if (!new_block) {
         return NULL;
@@ -50,8 +50,6 @@ alloc_new_block(struct Parrot_Interp *interpreter,
 
     new_block->free = alloc_size;
     new_block->size = alloc_size;
-    new_block->next = NULL;
-    new_block->prev = NULL;
     new_block->start = (char *)new_block + sizeof(struct Memory_Block);
     new_block->top = new_block->start;
 
@@ -87,7 +85,7 @@ mem_allocate(struct Parrot_Interp *interpreter, size_t *req_size,
     char *return_val;
     size_t size = *req_size;
 
-    /* Ensure that our minimum size requirements are met, so that we have room 
+    /* Ensure that our minimum size requirements are met, so that we have room
      * for a forwarding COW pointer */
     if (size < sizeof(void *))
         size = sizeof(void *);
@@ -180,7 +178,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
     interpreter->header_allocs_since_last_collect = 0;
     interpreter->collect_runs++;
 
-    /* total-reclaimable == currently used. Add a minimum block to the current 
+    /* total-reclaimable == currently used. Add a minimum block to the current
      * amount, so we can avoid having to allocate it in the future. */
     {
         struct Memory_Block *cur_block;
@@ -267,7 +265,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
                             /* No guaranatees that our data is still COW, so
                              * assume not, and let the above code fix-up */
                             b->flags &= ~BUFFER_COW_FLAG;
-                            /* Finally, let the tail know that we've moved, so 
+                            /* Finally, let the tail know that we've moved, so
                              * that any other references can know to look for
                              * us and not re-copy */
                             tail->flags |= TAIL_moved_FLAG;
@@ -290,7 +288,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
     /* Run through all the out-of-band Buffer header pools and copy */
     /* This code ignores COW, for now. This essentially means that if any
-     * other buffers COW-reference data with the buffers below, that data will 
+     * other buffers COW-reference data with the buffers below, that data will
      * get duplicated during this collection run. */
     for (j = 0;
             j < (INTVAL)(interpreter->arena_base->extra_buffer_headers.buflen /
@@ -335,7 +333,7 @@ compact_pool(struct Parrot_Interp *interpreter, struct Memory_Pool *pool)
 
     interpreter->memory_collected += (new_block->top - new_block->start);
 
-    /* Now we're done. We're already on the pool's free list, so let us be the 
+    /* Now we're done. We're already on the pool's free list, so let us be the
      * only one on the free list and free the rest */
     {
         struct Memory_Block *cur_block, *next_block;
@@ -380,7 +378,7 @@ Parrot_go_collect(struct Parrot_Interp *interpreter)
 void *
 Parrot_reallocate(struct Parrot_Interp *interpreter, void *from, size_t tosize)
 {
-    /* Put our void * pointer into something we don't have to cast around with 
+    /* Put our void * pointer into something we don't have to cast around with
      */
     Buffer *buffer;
     size_t copysize;
@@ -461,6 +459,12 @@ Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
     ((Buffer *)buffer)->buflen = size;
     return buffer;
 }
+void *
+Parrot_allocate_zeroed(struct Parrot_Interp *interpreter,
+        void *buffer, size_t size)
+{
+    return Parrot_allocate(interpreter, buffer, size);
+}
 
 /* Allocate at least as much memory as they asked for. We round the
  * amount up to the allocation quantum */
@@ -510,7 +514,7 @@ void
 Parrot_initialize_memory_pools(struct Parrot_Interp *interpreter)
 {
     /* Buffers */
-    /* setting min_size to 16384 makes this assert: assert(new_block->size >= 
+    /* setting min_size to 16384 makes this assert: assert(new_block->size >=
      * (size_t)new_block->top - (size_t)new_block->start); fail. 16 bytes
      * seem to be missing, or where copied and not accounted elsewhere. This
      * breaks 2 tests: t/op/string_29 and _94, when run with --gc-debug */

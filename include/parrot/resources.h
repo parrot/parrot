@@ -39,6 +39,7 @@ struct Memory_Pool {
 
 
 void *Parrot_allocate(struct Parrot_Interp *, void *, size_t size);
+void *Parrot_allocate_zeroed(struct Parrot_Interp *, void *, size_t size);
 void *Parrot_allocate_string(struct Parrot_Interp *, STRING *, size_t size);
 void *Parrot_reallocate(struct Parrot_Interp *interpreter,
                         void *from, size_t tosize);

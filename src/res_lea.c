@@ -36,10 +36,21 @@ void *
 Parrot_allocate(struct Parrot_Interp *interpreter, void *buffer, size_t size)
 {
     Buffer * b = buffer;
+    b->bufstart = malloc(size);
+    b->buflen = size;
+    return b;
+}
+
+void *
+Parrot_allocate_zeroed(struct Parrot_Interp *interpreter, void *buffer,
+        size_t size)
+{
+    Buffer * b = buffer;
     b->bufstart = calloc(1, size);
     b->buflen = size;
     return b;
 }
+
 
 void *
 Parrot_reallocate_string(struct Parrot_Interp *interpreter, STRING *str,
