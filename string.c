@@ -42,7 +42,8 @@ static const CHARTYPE *string_unicode_type;
 static void
 unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
 {
-    if (s->flags & (BUFFER_COW_FLAG|BUFFER_constant_FLAG)) {
+    if (s->flags &
+            (BUFFER_COW_FLAG|BUFFER_constant_FLAG|BUFFER_external_FLAG)) {
         void *p;
         UINTVAL size, bsize;
         if (interpreter) {
@@ -62,7 +63,7 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         Parrot_allocate_string(interpreter, s, bsize);
         mem_sys_memcopy(s->strstart, p, size);
         s->flags &= ~(UINTVAL)(BUFFER_COW_FLAG | BUFFER_external_FLAG |
-                BUFFER_bufstart_external_FLAG);
+                BUFFER_bufstart_external_FLAG | BUFFER_immobile_FLAG);
         if (interpreter) {
             Parrot_unblock_GC(interpreter);
             Parrot_unblock_DOD(interpreter);
@@ -170,8 +171,7 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
     }
 
     /* Is A real? */
-    /* XXX w/o test for a->strlen s. below */
-    if (a != NULL && a->strlen != 0) {
+    if (a != NULL) {
         /* If the destination's constant, then just fall back to
            string_concat */
         if (a->flags & BUFFER_constant_FLAG) {
@@ -197,40 +197,6 @@ string_append(struct Parrot_Interp *interpreter, STRING *a,
         a->bufused += b->bufused;
         a->strlen += b->strlen;
         return a;
-    }
-    else {
-        /* A isn't real. Does it exist at all? */
-        if (a != NULL) {
-/* XXX
- * Why should appending an ascii string to an empty unicode string
- * yield an ascii string (above transcodes b, which is always correct)?
- * Why are the flags copied?
- * I would just drop this and handle a->strlen == 0 like above
- * -leo
- */
-            if (a->flags & BUFFER_constant_FLAG) {
-                return string_concat(interpreter, a, b, Uflags);
-            }
-            /* There's at least a string header for A. Make it a copy
-               of B */
-            if (a->buflen < b->bufused) {
-                a = string_grow(interpreter, a, b->bufused + EXTRA_SIZE);
-            }
-            else
-                unmake_COW(interpreter, a);
-            a->flags = b->flags;
-            a->flags &= ~(UINTVAL)(BUFFER_constant_FLAG
-                                   |BUFFER_COW_FLAG
-                                   |BUFFER_bufstart_external_FLAG
-                                   |BUFFER_external_FLAG);
-            a->bufused = b->bufused;
-            a->strlen = b->strlen;
-            a->encoding = b->encoding;
-            a->type = b->type;
-            a->language = b->language;
-            memcpy(a->strstart, b->strstart, b->bufused);
-            return a;
-        }
     }
     /* If we got here, A was NULL. So clone B. */
     return string_copy(interpreter, b);
@@ -1095,7 +1061,17 @@ string_to_cstring(struct Parrot_Interp * interpreter, STRING * s)
     else
         unmake_COW(interpreter, s);
 
-    s->flags |= BUFFER_immobile_FLAG;
+    /* s->flags |= BUFFER_immobile_FLAG;
+     *
+     * XXX we don't know, how this cstring gets used by external code
+     * so setting the string to immobile would be the best thing, but
+     * immobile strings don't get moved - yes - but they get freed in
+     * compact_pool :-(
+     * The correct way to handle this is probably to malloc the memory
+     * and set the BUFFER_sysmem_FLAG
+     * -leo
+     */
+
     ((char *)s->strstart)[s->bufused] = 0;
     /* don't return local vars, return the right thing */
     return (char*)s->strstart;
