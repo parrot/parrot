@@ -47,7 +47,11 @@ new_io_pmc(theINTERP, ParrotIO *io)
     PMC *new_pmc;
     new_pmc = pmc_new(interpreter, enum_class_ParrotIO);
     PMC_data(new_pmc) = io;
-    new_pmc->cache.struct_val = io->stack;
+    /* io could be NULL */
+    if(io)
+       new_pmc->cache.struct_val = io->stack;
+    else
+       new_pmc->cache.struct_val = NULL;
     return new_pmc;
 }
 
@@ -101,6 +105,8 @@ PIO_destroy(theINTERP, PMC *pmc)
     ParrotIO *io = PMC_data(pmc);
     UNUSED(interpreter);
 
+    if(!io)
+        return;
     if (io->b.startb && (io->b.flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->b.startb);
         io->b.startb = NULL;
@@ -208,15 +214,15 @@ PIO_init_stacks(theINTERP)
      * call copy stack.
      */
 #ifdef PIO_OS_UNIX
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_unix_layer), NULL);
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_unix_layer), PMCNULL);
 #endif
 #ifdef PIO_OS_WIN32
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer), NULL);
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_win32_layer), PMCNULL);
 #endif
 #ifdef PIO_OS_STDIO
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), NULL);
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_stdio_layer), PMCNULL);
 #endif
-    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), NULL);
+    PIO_push_layer(interpreter, PIO_base_new_layer(&pio_buf_layer), PMCNULL);
 
     /* Note: All layer pushes should be done before init calls */
     for (p = interpreter->piodata->default_stack; p; p = p->down) {
@@ -293,7 +299,7 @@ PIO_push_layer(theINTERP, ParrotIOLayer *layer, PMC *pmc)
 
     if (layer == NULL)
         return -1;
-    if (pmc != NULL) {
+    if (!PMC_IS_NULL(pmc)) {
         ParrotIO *io = PMC_data(pmc);
 
         if (io->stack == NULL && (layer->flags & PIO_L_TERMINAL) == 0) {
@@ -527,7 +533,8 @@ PIO_setbuf(theINTERP, PMC *pmc, size_t bufsize)
 {
     ParrotIOLayer *layer = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
-
+    if(!io)
+        return -1;
     PIO_flush(interpreter, pmc);
     return PIO_setbuf_down(interpreter, layer, io, bufsize);
 }
@@ -538,6 +545,8 @@ PIO_setlinebuf(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
 
     return PIO_setlinebuf_down(interpreter, l, io);
 }
@@ -551,13 +560,15 @@ PIO_open(theINTERP, const char *spath, const char *sflags)
     INTVAL flags = PIO_parse_open_flags(sflags);
 
     io = PIO_open_down(interpreter, l, spath, flags);
+    /* io could be null here but we still have to
+     * to create a PMC for the caller, no PMCNULL here
+     * as that would cause an exception upon access.
+     */
     if (io) {
         io->stack = l;
-        return new_io_pmc(interpreter, io);
     }
-    else {
-        return NULL;
-    }
+
+    return new_io_pmc(interpreter, io);
 }
 
 
@@ -575,13 +586,15 @@ PIO_fdopen(theINTERP, PIOHANDLE fd, const char *sflags)
 
     flags = PIO_parse_open_flags(sflags);
     io = PIO_fdopen_down(interpreter, l, fd, flags);
+    /* io could be null here but we still have to
+     * to create a PMC for the caller, no PMCNULL here
+     * as that would cause an exception upon access.
+     */
     if (io) {
         io->stack = l;
-        return new_io_pmc(interpreter, io);
     }
-    else {
-        return NULL;
-    }
+
+    return new_io_pmc(interpreter, io);
 }
 
 
@@ -591,7 +604,8 @@ PIO_close(theINTERP, PMC *pmc)
     INTVAL res;
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
-
+    if(!io)
+        return -1;
     PIO_flush(interpreter, pmc); /* XXX boe: is this neccessary here? */
     res =  PIO_close_down(interpreter, l, io);
     PIO_destroy(interpreter, pmc);
@@ -605,6 +619,8 @@ PIO_flush(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return;
 
     PIO_flush_down(interpreter, l, io);
 }
@@ -618,6 +634,8 @@ PIO_read(theINTERP, PMC *pmc, void *buffer, size_t len)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
 
     return PIO_read_down(interpreter, l, io, buffer, len);
 }
@@ -631,6 +649,8 @@ PIO_write(theINTERP, PMC *pmc, const void *buffer, size_t len)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
 
     if (io->flags & PIO_F_WRITE)
         return PIO_write_down(interpreter, l, io, buffer, len);
@@ -647,6 +667,8 @@ PIO_seek(theINTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
 
     return PIO_seek_down(interpreter, l, io, offset, w);
 }
@@ -660,6 +682,8 @@ PIO_tell(theINTERP, PMC *pmc)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
 
     return PIO_tell_down(interpreter, l, io);
 }
@@ -673,6 +697,9 @@ PIO_eof(theINTERP, PMC *pmc)
 {
     ParrotIO *io = PMC_data(pmc);
 
+    /* io could be null here, but rather than return a negative error
+     * we just fake EOF since eof test is usually in a boolean context.
+     */
     if (io) {
         return (io->flags & (PIO_F_EOF)) != 0;
     }
@@ -860,9 +887,12 @@ PIO_socket(theINTERP, INTVAL fam, INTVAL type, INTVAL proto)
     ParrotIO *io;
     ParrotIOLayer *l = interpreter->piodata->default_stack;
     io = PIO_socket_down(interpreter, l, fam, type, proto);
-    if(io)
-        return new_io_pmc(interpreter, io);
-    return NULL;
+    /* We have to create a PMC here even if the IO handle
+     * didn't create because caller has to be able to
+     * check with a bool test. Can't use a NULL PMC in a bool
+     * test as that will cause an exception.
+     */
+    return new_io_pmc(interpreter, io);
 }
 
 INTVAL
@@ -870,6 +900,9 @@ PIO_recv(theINTERP, PMC *pmc, STRING **buf)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+
     return PIO_recv_down(interpreter, l, io, buf);
 }
 
@@ -878,6 +911,9 @@ PIO_send(theINTERP, PMC *pmc, STRING *buf)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+
     return PIO_send_down(interpreter, l, io, buf);
 }
 
@@ -886,6 +922,9 @@ PIO_connect(theINTERP, PMC *pmc, STRING *address)
 {
     ParrotIOLayer *l = pmc->cache.struct_val;
     ParrotIO *io = PMC_data(pmc);
+    if(!io)
+        return -1;
+
     return PIO_connect_down(interpreter, l, io, address);
 }
 
