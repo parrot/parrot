@@ -79,7 +79,7 @@ Returns the integer value of the number.
 
 =item C<BIGNUM *get_bignum()>
 
-Unimplimented. Returns C<NULL>.
+Unimplemented. Returns C<NULL>.
 
 =cut
 

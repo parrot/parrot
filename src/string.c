@@ -3165,7 +3165,7 @@ string_downcase(Interp *interpreter, const STRING *s)>
 Returns a copy of the specified Parrot string converted to lower case.
 Non-caseable characters are left unchanged.
 
-TODO - Not yet implimented.
+TODO - Not yet implemented.
 
 =cut
 
@@ -3190,7 +3190,7 @@ string_downcase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to lower case.
 
-TODO - Not yet implimented.
+TODO - Not yet implemented.
 
 =cut
 
@@ -3225,7 +3225,7 @@ string_titlecase(Interp *interpreter, const STRING *s)>
 Returns a copy of the specified Parrot string converted to title case.
 Non-caseable characters are left unchanged.
 
-TODO - Not yet implimented.
+TODO - Not yet implemented.
 
 =cut
 
@@ -3250,7 +3250,7 @@ string_titlecase_inplace(Interp *interpreter, STRING *s)>
 
 Converts the specified Parrot string to title case.
 
-TODO - Not yet implimented.
+TODO - Not yet implemented.
 
 =cut
 
