@@ -21,9 +21,11 @@ F<docs/pdds/pdd03_calling_conventions.pod>.
   Subtype	Controlstack	PadStack   UserStack  Warnings
   ------------------------------------------------------------
   Sub                -             -           -         X
-  Closure                          X                     X
+  Closure            -             X           -         X
   Continuation       X             X           X         X
   Coroutine          X             X           X         X
+
+"X" ... is in context, "-" ... isn't.
 
 =head1 SYNOPSIS
 
@@ -85,9 +87,10 @@ performance is an issue:
     # do_something
     invoke P1
 
-If items in the interpreter context are changed between creation of the
-subroutine/return continuation and its invocation, the C<updatecc> opcode
-should be used:
+If items in the interpreter context are changed between creation of
+the subroutine/return continuation and its invocation, the C<updatecc>
+opcode should be used, so that the state of the return continuation
+matches that of the interpreter:
 
     newsub .Sub, .Continuation, _sub_label, ret_label
     ...
@@ -100,8 +103,12 @@ should be used:
 =head1 FILES
 
 F<classes/sub.pmc>, F<classes/closure.pmc>, F<classes/continuation.pmc>,
-F<classes/coroutine.pmc>,
-F<docs/pdds/pdd03_calling_conventions.pod>, F<t/pmc/sub.t>
+F<classes/coroutine.pmc>, F<sub.c>, F<t/pmc/sub.t>
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>
+F<languages/imcc/docs/calling_conventions.pod>
 
 =head1 AUTHOR
 
