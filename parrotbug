@@ -617,7 +617,8 @@ EOF
 
     } else {
 	my $sendmail = "";
-	for ( qw[ /usr/lib/sendmail /usr/sbin/sendmail /usr/ucblib/sendmail ] ) {
+	for ( qw[ /usr/lib/sendmail /usr/sbin/sendmail 
+                  /usr/ucblib/sendmail /var/qmail/bin/sendmail ] ) {
 	    $sendmail = $_, last if -e $_;
 	}
 
