@@ -279,6 +279,8 @@ new_buffer_header(struct Parrot_Interp *interpreter)
     return_me->flags = 0;
     /* Don't let it point to garbage memory */
     return_me->bufstart = NULL;
+    /* Use the right length */
+    return_me->buflen = 0;
     /* Return it */
     return return_me;
 }
