@@ -349,9 +349,10 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
     if (offset == (INTVAL)string_length(src) || length < 1) {
-        return NULL;
+        return string_make(interpreter, NULL, 0, src->encoding, 0, src->type);
     }
 
+    true_length = (UINTVAL)length;
     if (offset < 0) {
         true_offset = (UINTVAL)(src->strlen + offset);
     }
@@ -359,10 +360,6 @@ string_substr(struct Parrot_Interp *interpreter, const STRING *src,
     if (true_offset > src->strlen - 1) {        /* 0 based... */
         internal_exception(SUBSTR_OUT_OF_STRING,
                            "Cannot take substr outside string");
-    }
-    true_length = (UINTVAL)length;
-    if (length < 0) {
-        true_length = 0;
     }
     if (true_length > (src->strlen - true_offset)) {
         true_length = (UINTVAL)(src->strlen - true_offset);

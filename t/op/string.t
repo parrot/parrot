@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 64;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
 	set	S4, "JAPH\n"
@@ -18,6 +18,15 @@ output_is( <<'CODE', '4', "length_i_s" );
 	set	S4, "JAPH"
 	length	I4, S4
 	print	I4
+	end
+CODE
+
+output_is( <<'CODE', '0', "0 length substr" );
+	set	I4, 0
+	set	S4, "JAPH"
+        substr  S3, S4, 1, 0
+	length  I4, S3
+        print I4
 	end
 CODE
 
