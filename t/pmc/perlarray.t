@@ -1,7 +1,50 @@
 #! perl -w
 
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 26;
 use Test::More;
+
+my $fp_equality_macro = <<'ENDOFMACRO';
+.macro fp_eq (	J, K, L )
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	gt	N2, 0.000001, .$FPEQNOK
+
+	restore N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPEQNOK:
+	restore N2
+	restore	N1
+	restore	N0
+.endm
+.macro fp_ne(	J,K,L)
+	save	N0
+	save	N1
+	save	N2
+
+	set	N0, .J
+	set	N1, .K
+	sub	N2, N1,N0
+	abs	N2, N2
+	lt	N2, 0.000001, .$FPNENOK
+
+	restore	N2
+	restore	N1
+	restore	N0
+	branch	.L
+.local $FPNENOK:
+	restore	N2
+	restore	N1
+	restore	N0
+.endm
+ENDOFMACRO
 
 output_is(<<'CODE', <<'OUTPUT', "size of the array");
 	new P0,.PerlArray
@@ -1264,5 +1307,69 @@ CODE
 PerlArray
 20202020
 OUT
+
+
+output_is(<<"CODE", <<OUTPUT, "Fetching undefined values (no warnings)");
+@{[ $fp_equality_macro ]}
+      warningsoff 1
+      new P0, .PerlArray
+      set I0, P0[0]
+      eq I0, 0, OK1
+      print "not "
+OK1:  print "ok 1\\n"
+      set N0, P0[1]
+      .fp_eq(N0, 0.0, OK2)
+      print "not "
+OK2:  print "ok 2\\n"
+      set S0, P0[2]
+      eq S0, "", OK3
+      print "not "
+OK3:  print "ok 3\\n"
+      set P1, P0[3]
+      typeof S1, P1
+      eq S1, "PerlUndef", OK4
+      print "not "
+OK4:  print "ok 4\\n"
+      end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+OUTPUT
+
+output_is(<<"CODE", <<'OUTPUT', "Fetching undefined values (with warnings)");
+@{[ $fp_equality_macro ]}
+      warningson 1
+      new P0, .PerlArray
+      set I0, P0[0]
+      eq I0, 0, OK1
+      print "not "
+OK1:  print "ok 1\\n"
+      set N0, P0[1]
+      .fp_eq(N0, 0.0, OK2)
+      print "not "
+OK2:  print "ok 2\\n"
+      set S0, P0[2]
+      eq S0, "", OK3
+      print "not "
+OK3:  print "ok 3\\n"
+      set P1, P0[3]
+      typeof S1, P1
+      eq S1, "PerlUndef", OK4
+      print "not "
+OK4:  print "ok 4\\n"
+      end
+CODE
+Use of uninitialized value at (unknown file) line 0.
+ok 1
+Use of uninitialized value at (unknown file) line 0.
+ok 2
+Use of uninitialized value at (unknown file) line 0.
+ok 3
+Use of uninitialized value at (unknown file) line 0.
+ok 4
+OUTPUT
+
 1;
-1;
+

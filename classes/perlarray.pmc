@@ -103,8 +103,12 @@ pmclass PerlArray extends Array {
 
     INTVAL get_integer_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            PMC* temp = undef(INTERP);
-            return VTABLE_get_integer(INTERP, temp);
+            if (PARROT_WARNINGS_test(interpreter, 
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return 0;
         }
         else
             return SUPER(key);
@@ -112,8 +116,12 @@ pmclass PerlArray extends Array {
 
     FLOATVAL get_number_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            PMC* temp = undef(INTERP);
-            return VTABLE_get_number(INTERP, temp);
+            if (PARROT_WARNINGS_test(interpreter, 
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return 0.0;
         }
         else
             return SUPER(key);
@@ -125,16 +133,26 @@ pmclass PerlArray extends Array {
 
     STRING* get_string_keyed_int (INTVAL key) {
         if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
-            PMC* value = undef(INTERP);
-            return VTABLE_get_string(INTERP, value);
+            if (PARROT_WARNINGS_test(interpreter, 
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
+            return string_make(interpreter,  NULL, 0, NULL, 0, NULL);
         }
         else
             return SUPER(key);
     }
 
     PMC* get_pmc_keyed_int (INTVAL key) {
-        if (key >= DYNSELF.elements() || key < -DYNSELF.elements())
+        if (key >= DYNSELF.elements() || key < -DYNSELF.elements()) {
+            if (PARROT_WARNINGS_test(interpreter, 
+                                     PARROT_WARNINGS_UNDEF_FLAG)) {
+                Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
+                            "Use of uninitialized value");
+            }
             return undef(INTERP);
+        }
         else
             return SUPER(key);
     }
