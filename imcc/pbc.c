@@ -11,7 +11,7 @@
  *
  * Notes:
  *
- * I' using existing data structure here (SymReg*) to store
+ * I'm using existing data structure here (SymReg*) to store
  * various global items e.g. bsr fixups and constants.
  * The index in the constant table is in SymReg* ->color
  * data member. This looks odd, but the register number
@@ -34,8 +34,8 @@
  *
  */
 
-/* globals store the state between individual e_pbc_emit calls
- *
+/* 
+ * globals store the state between individual e_pbc_emit calls
  */
 
 struct subs {
@@ -52,18 +52,18 @@ struct subs {
 
 /* subs are kept per code segment */
 struct cs_t {
-    struct PackFile_ByteCode *seg;      /* bytecode seg */
+    struct PackFile_ByteCode *seg;      /* bytecode segment */
     struct PackFile_Segment *jit_info;  /* bblocks, register usage */
     struct subs *subs;                  /* current sub data */
-    struct subs *first;                 /* first sub of code seg */
-    struct cs_t *prev;                  /* prev cs */
-    struct cs_t *next;                  /* next cs */
+    struct subs *first;                 /* first sub of code segment */
+    struct cs_t *prev;                  /* previous code segment */
+    struct cs_t *next;                  /* next code segment */
     SymReg * key_consts[HASH_SIZE];     /* cached key constants for this seg */
 };
 
 static struct globals {
-    struct cs_t *cs;                     /* current cs */
-    struct cs_t *first;                  /* first cs */
+    struct cs_t *cs;                     /* current code segment */
+    struct cs_t *first;                  /* first code segment */
     int inter_seg_n;
 } globals;
 
@@ -247,7 +247,7 @@ store_bsr(Interp *interpreter, SymReg * r, int pc, int offset)
         bsr->set = 'p';
     bsr->color = pc;
     bsr->score = offset;        /* bsr = 1, set_addr I,x = 2, newsub = 3 */
-    /* This is hackish but its better to have it here than in the
+    /* This is hackish but it's better to have it here than in the
      * fixup code until we decide if we need the _globallabel semantic.
      */
     if (r->name[0] == '_' || (r->usage & U_FIXUP))
@@ -263,7 +263,8 @@ store_key_const(char * str, int idx)
 }
 
 
-/* find a label in interpreters fixup table
+/* 
+ * find a label in the interpreter's fixup table
  */
 static int
 find_label_cs(Interp *interpreter, char *name)
@@ -283,8 +284,8 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
     int code_size;
     opcode_t pc;
 
-    /* run through instructions,
-     * 1. pass
+    /* run through instructions:
+     * 1st pass:
      * - sanity check
      * - calc code size
      * - calc nr of src lines for debug info
@@ -304,10 +305,10 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
                     "non instruction with size found\n");
     }
 
-    /* 2. pass
+    /* 2nd pass:
      * remember subroutine calls (bsr, addr (closures)) and labels
      * for fixup
-     * */
+     */
     for (pc = 0, ins = unit->instructions; ins ; ins = ins->next) {
         if (ins->type & ITLABEL) {
             store_label(interpreter, ins->r[0], pc);
@@ -334,7 +335,7 @@ store_labels(Interp *interpreter, IMC_Unit * unit, int *src_lines, int oldsize)
         pc += ins->opsize;
     }
 
-    /* 3. pass, look for intersegment jumps
+    /* 3rd pass: look for intersegment jumps
      * if found, rewrite code:
      *
      *   if x, non_local1
@@ -464,7 +465,7 @@ fixup_bsrs(Interp *interpreter)
                      */
                     lab = find_global_label(bsr->name, s, &pc, &s1);
                     /*
-                     * if failed use any matching name
+                     * if failed, use any matching name
                      */
                     if (!lab)
                         lab = find_global_label(bsr->name, NULL, &pc, &s1);
@@ -675,8 +676,8 @@ slice_deb(int bits) {
  *
  * for the rest, please consult PDD08_KEYS(1)
  *
- * additionaly I build a string representation of the key,
- * which get's cached in the globals.keys
+ * additionally, I build a string representation of the key,
+ * which gets cached in the globals.keys
  *
  */
 
@@ -788,7 +789,7 @@ IMCC_int_from_reg(Interp *interpreter, SymReg *r)
     /*
      * TODO
      * - is this portable?
-     * - reset errnor first?
+     * - reset errno first?
      * - there are some more atol()s in this file
      */
     if (errno == ERANGE)

@@ -16,7 +16,7 @@
  * After the register allocation is resolved, the instructions
  * array is flushed.
  *
- * This functions operate over this array and its contents.
+ * These functions operate over this array and its contents.
  */
 
 
@@ -113,7 +113,7 @@ imcc_init_tables(Interp * interpreter)
     }
 }
 
-/* return TRUE, if ins reads register of type t */
+/* return TRUE, if instruction ins reads from a register of type t */
 int
 ins_reads2(Instruction *ins, int t)
 {
@@ -134,7 +134,7 @@ ins_reads2(Instruction *ins, int t)
     return 0;
 }
 
-/* return TRUE, if ins writes register of type t */
+/* return TRUE, if instruction ins writes to a register of type t */
 int
 ins_writes2(Instruction *ins, int t)
 {
@@ -231,7 +231,7 @@ get_branch_reg(Instruction * ins)
     return 0;
 }
 
-/* some usefule instruction routines */
+/* some useful instruction routines */
 
 /*
  * delete and free *ins
@@ -315,7 +315,7 @@ prepend_ins(IMC_Unit *unit, Instruction *ins, Instruction * tmp)
 }
 
 /*
- * subst tmp for ins
+ * Substitute tmp for ins. Free ins if needs_freeing is true.
  */
 
 void
@@ -364,6 +364,9 @@ emitb(IMC_Unit * unit, Instruction * i)
     return i;
 }
 
+/*
+ * Free the Instruction structure ins.
+ */
 void
 free_ins(Instruction *ins)
 {
