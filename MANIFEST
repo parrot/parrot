@@ -18,6 +18,7 @@ examples/assembly/bsr.pasm
 examples/assembly/call.pasm
 examples/assembly/euclid.pasm
 examples/assembly/jump.pasm
+examples/assembly/life.pasm
 examples/assembly/local_label.pasm
 examples/assembly/Makefile
 examples/assembly/mops.pasm
