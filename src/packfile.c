@@ -246,8 +246,7 @@ run_sub(Parrot_Interp interpreter, PMC* sub_pmc)
      * turn off JIT and prederef - both would act on the whole
      * PackFile which isn't worth the effort - probably
      */
-    if (interpreter->run_core != PARROT_SWITCH_CORE &&
-        interpreter->run_core != PARROT_CGOTO_CORE  &&
+    if (interpreter->run_core != PARROT_CGOTO_CORE  &&
         interpreter->run_core != PARROT_SLOW_CORE  &&
         interpreter->run_core != PARROT_FAST_CORE)
         interpreter->run_core = PARROT_FAST_CORE;
