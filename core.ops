@@ -4215,7 +4215,7 @@ inline op invoke() {
 
   dest = (opcode_t *)p->vtable->invoke(interpreter, p, expr NEXT());
 
-    goto ADDRESS(dest);
+  goto ADDRESS(dest);
 }
 
 =item B<find_method>(out PMC, in PMC, in STR)

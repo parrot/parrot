@@ -3,3 +3,6 @@ are admittedly hackish stopgap measures.
 
 - 'long doubles' don't work.  It's a packfile thing, which
 will eventually change.  They'll be fixed then.
+- Continuations don't yet play well with the garbage collector
+  Turn GC off if you want to have fun.
+
