@@ -401,7 +401,7 @@ static int find_op(const char * name) {
 	int op;
 	int i = 2;
 	if((op = op_hash_jump[bucket]) == 0) {
-		printf("Invalid bucket for %s\n", name);
+		printf("Invalid bucket for %s\\n", name);
 		exit(0);
 	}
 	for(;;) {
