@@ -5,7 +5,8 @@ INC=../include/parrot
 
 H_FILES = $(INC)/parrot.h default.h
 
-O_FILES = default$(O) perlint$(O) perlstring$(O) perlnum$(O) perlarray$(O) perlundef$(O)
+O_FILES = default$(O) perlint$(O) perlstring$(O) perlnum$(O) perlarray$(O) \
+perlhash$(O) perlundef$(O)
 
 #DO NOT ADD C COMPILER FLAGS HERE
 #Add them in Configure.pl--look for the
@@ -47,6 +48,11 @@ perlarray.c perlarray.h: perlarray.pmc
 	$(PERL) pmc2c.pl perlarray.pmc
 
 perlarray$(O): $(H_FILES)
+
+perlhash.c perlhash.h: perlhash.pmc 
+	$(PERL) pmc2c.pl perlhash.pmc
+
+perlhash$(O): $(H_FILES)
 
 perlundef.c perlundef.h: perlundef.pmc 
 	$(PERL) pmc2c.pl perlundef.pmc

@@ -44,11 +44,17 @@ pmclass default noinit {
    INTVAL get_integer_index (INTVAL index) {
    }
 
+   INTVAL get_integer_index_s (STRING* index) {
+   }
+
    FLOATVAL get_number () {
      return SELF->cache.num_val;
    }
 
    FLOATVAL get_number_index (INTVAL index) {
+   }
+
+   FLOATVAL get_number_index_s (STRING* index) {
    }
 
    STRING* get_string () {
@@ -57,6 +63,9 @@ pmclass default noinit {
    }
 
    STRING* get_string_index (INTVAL index) {
+   }
+
+   STRING* get_string_index_s (STRING* index) {
    }
 
    BOOLVAL get_bool () {
@@ -106,6 +115,9 @@ pmclass default noinit {
    void set_integer_index (INTVAL value, INTVAL index) {
    }
 
+   void set_integer_index_s (INTVAL value, STRING* index) {
+   }
+
    void set_number (PMC * value) {
      SELF->cache.num_val = value->vtable->get_number(INTERP, value);
    }
@@ -124,6 +136,9 @@ pmclass default noinit {
    }
 
    void set_number_index (FLOATVAL value, INTVAL index) {
+   }
+
+   void set_number_index_s (FLOATVAL value, STRING* index) {
    }
 
    void set_string (PMC * value) {
@@ -147,6 +162,9 @@ pmclass default noinit {
    }
 
    void set_string_index (STRING * string, INTVAL index) {
+   }
+
+   void set_string_index_s (STRING * string, STRING* index) {
    }
 
    void set_value (void* value) {

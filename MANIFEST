@@ -38,6 +38,7 @@ classes/Makefile.in
 classes/default.pmc
 classes/genclass.pl
 classes/perlarray.pmc
+classes/perlhash.pmc
 classes/perlint.pmc
 classes/perlnum.pmc
 classes/perlstring.pmc

@@ -66,7 +66,8 @@ $(INC)/pmc.h $(INC)/key.h $(INC)/resources.h $(INC)/platform.h \
 $(INC)/interp_guts.h ${jit_h} ${jit_struct_h}
 
 CLASS_O_FILES = classes/default$(O) classes/perlint$(O) classes/perlstring$(O) \
-classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O)
+classes/perlnum$(O) classes/perlarray$(O) classes/perlundef$(O) \
+classes/perlhash$(O)
 
 ENCODING_O_FILES = encodings/singlebyte$(O) encodings/utf8$(O) encodings/utf16$(O) \
 encodings/utf32$(O)

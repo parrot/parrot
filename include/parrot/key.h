@@ -13,6 +13,8 @@
 #if !defined(PARROT_KEY_H_GUARD)
 #define PARROT_KEY_H_GUARD
 
+#define NUM_BUCKETS 128
+
 typedef enum {
   enum_key_int,
   enum_key_num,

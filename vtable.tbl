@@ -25,19 +25,25 @@ unique	INTVAL real_size
 unique	void destroy	
 unique	INTVAL get_integer	 
 unique	INTVAL get_integer_index	INTVAL index
+unique	INTVAL get_integer_index_s	STRING* index
 unique	FLOATVAL get_number	 
 unique	FLOATVAL get_number_index	INTVAL index
+unique	FLOATVAL get_number_index_s	STRING* index
 unique	STRING* get_string	 
 unique	STRING* get_string_index	INTVAL index
+unique	STRING* get_string_index_s	STRING* index
 unique	BOOLVAL get_bool	 
 unique	void* get_value	
 unique	BOOLVAL is_same		PMC* pmc2
 int	void set_integer	INTVAL value
 unique	void set_integer_index	INTVAL value	INTVAL index
+unique	void set_integer_index_s	INTVAL value	STRING* index
 float	void set_number		FLOATVAL value
 unique	void set_number_index	FLOATVAL value	INTVAL index
+unique	void set_number_index_s	FLOATVAL value	STRING* index
 str	void set_string		STRING* value
 unique	void set_string_index	STRING* value	INTVAL index
+unique	void set_string_index_s	STRING* value	STRING* index
 unique	void set_value		void* value
 num	void add		PMC* value	 PMC* dest 
 num	void subtract		PMC* value	 PMC* dest 

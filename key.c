@@ -14,6 +14,25 @@
 
 #include "parrot/parrot.h"
 
+/*=for api key key_hash
+
+Return the hashed value of the string
+
+=cut
+*/
+
+static INTVAL key_hash(struct Parrot_Interp *interpreter, STRING* value) {
+  char* buffptr = value->bufstart;
+  INTVAL len    = value->buflen;
+  INTVAL hash   = 5893;
+
+  while(*buffptr) {
+    hash = hash * 33 + *buffptr++;
+  }
+  return hash;
+}
+
+
 /*=for api key key_new
 
 Return a pointer to a new KEY structure
@@ -172,22 +191,17 @@ KEY_PAIR* key_element_value_i(struct Parrot_Interp *interpreter, KEY* key,
 KEY_PAIR* key_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
                               STRING* index) {
   if(key != NULL) {
-/*
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
-      if(pair != NULL) {
-        return pair->cache.struct_val;
-      }
-      else {
-        fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
-      }
+    INTVAL hash = key_hash(interpreter,index);
+    KEY_PAIR* pair;
+    hash = hash % NUM_BUCKETS;
+    pair = &key->keys[hash];
+    if(pair != NULL) {
+      return pair;
     }
     else {
-      fprintf(stderr,"*** key_element_value_s checking out of bounds\n");
+      fprintf(stderr,"*** key_element_value_s pair returning a null key\n");
     }
-*/
   }
-  fprintf(stderr,"*** key_element_value_s not implemented yet\n");
   return NULL;
 }
 
@@ -224,15 +238,13 @@ Set the value of index <index> of key <key> to string <value>
 void key_set_element_value_s(struct Parrot_Interp *interpreter, KEY* key, 
                              STRING* index, KEY_PAIR* value) {
   if(key != NULL) {
-/*
-    if((index >= 0) || (index < key->size)) {
-      KEY_PAIR* pair = &key->keys[index];
-      pair->cache.struct_val = value;
-      pair->type = enum_key_string;
-    }
-*/
+    INTVAL hash = key_hash(interpreter,index);
+    hash = hash % NUM_BUCKETS;
+    memcpy(&key->keys[hash],value,sizeof(KEY_PAIR));
   }
-  fprintf(stderr,"*** key_set_element_value_s not implemented yet\n");
+  else {
+    fprintf(stderr,"*** key_set_element_value_s given a NULL key\n");
+  }
 }
 
 /*=for api key key_chop

@@ -19,6 +19,7 @@ enum {
     enum_class_PerlNum,
     enum_class_PerlString,
     enum_class_PerlArray,
+    enum_class_PerlHash,
     enum_class_max
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];

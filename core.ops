@@ -536,9 +536,10 @@ These operations load registers from constants or other registers.
 
 =item B<set>(i, p)
 
+Set $1 to $2.
+
 =item B<clone>(p, p)
 
-Set $1 to $2.
 
 =item B<set>(i, p, i|ic)
 
@@ -552,7 +553,21 @@ Set $1 to $2.
 
 =item B<set>(p, s|sc, i|ic)
 
-Set $1 to $2.
+Set $1 to index $1 of array $2
+
+=item B<set>(i, p, i|ic)
+
+=item B<set>(n, p, i|ic)
+
+=item B<set>(s, p, i|ic)
+
+=item B<set>(p, i|ic, i|ic)
+
+=item B<set>(p, n|nc, i|ic)
+
+=item B<set>(p, s|sc, i|ic)
+
+Set $1 to index $3 of hash $2
 
 =cut
 
@@ -641,6 +656,36 @@ inline op set(n, p, i|ic) {
 
 inline op set(s, p, i|ic) {
   $1 = $2->vtable->get_string_index(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op set(p, i|ic, s|sc) {
+  $1->vtable->set_integer_index_s(interpreter, $1, $2, $3);
+  goto NEXT();
+}
+
+inline op set(p, n|nc, s|sc) {
+  $1->vtable->set_number_index_s(interpreter, $1, $2, $3);
+  goto NEXT();
+}
+
+inline op set(p, s|sc, s|sc) {
+  $1->vtable->set_string_index_s(interpreter, $1, $2, $3);
+  goto NEXT();
+}
+
+inline op set(i, p, s|sc) {
+  $1 = $2->vtable->get_integer_index_s(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op set(n, p, s|sc) {
+  $1 = $2->vtable->get_number_index_s(interpreter, $2, $3);
+  goto NEXT();
+}
+
+inline op set(s, p, s|sc) {
+  $1 = $2->vtable->get_string_index_s(interpreter, $2, $3);
   goto NEXT();
 }
 

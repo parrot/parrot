@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 
 my $fp_equality_macro = <<'ENDOFMACRO';
 fp_eq	macro	J,K,L
@@ -947,6 +947,34 @@ ok 6
 ok 7
 ok 8
 ok 9
+OUTPUT
+
+output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
+	new	P0, PerlHash
+
+	set	P0, -7,"foo"
+	set	P0, 3.5,"bar"
+	set	P0, "value","baz"
+
+	set	I0, P0, "foo"
+	set	N0, P0, "bar"
+	set	S0, P0, "baz"
+
+	eq	I0,-7,OK_1
+	print	"not "
+OK_1:	print	"ok 1\\n"
+	eq	N0,3.500000,OK_2
+	print	N0
+OK_2:	print	"ok 2\\n"
+	eq	S0,"value",OK_3
+	print	S0
+OK_3:	print	"ok 3\\n"
+
+	end
+CODE
+ok 1
+ok 2
+ok 3
 OUTPUT
 
 1;
