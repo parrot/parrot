@@ -296,6 +296,16 @@ if ($jitcapable) {
 
 @c{keys %opt_defines}=values %opt_defines;
 
+# There are some libraries which perl tends to include, but we aren't
+# really interested in them yet.  (We'll need our own probes for some
+# of these.)
+if ($^O ne 'VMS' && $^O !~ /MSWin/i) {
+  my $unwanted = join("|",qw(c gdbm dbm ndbm db));
+  $c{libs} = (join " ",
+	      map { "$_" }
+	      grep {!/-l(?:$unwanted)/}
+	      split /\s/, $c{libs});
+}
 
 #
 # Set up default values
