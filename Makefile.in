@@ -51,7 +51,7 @@ t/test1.c: t/test.pbc
 	$(PERL) pbc2c.pl t/test.pbc > t/test1.c
 
 t/test1$(O): t/test1.c
-	$(CC) -o t/test1$(O) -c -I ./include t/test1.c
+	$(CC) -o t/test1$(O) -c -I./include t/test1.c
 
 t/test1${exe}: t/test1$(O) $(O_FILES)
 	$(CC) $(CFLAGS) -o t/test1${exe} t/test1$(O) $(O_FILES) $(C_LIBS)
