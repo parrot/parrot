@@ -6,6 +6,12 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <signal.h>
+/* Try to catch bus errors */
+#ifdef SIGBUS
+void bletch(s) int s; { exit(1); }
+#endif
 
 int main(int argc, char **argv) {
 
@@ -16,6 +22,9 @@ int main(int argc, char **argv) {
     void **ptr;
     
     int align = 0;
+#ifdef SIGBUS
+    signal(SIGBUS, bletch);
+#endif
 
     for (i = 0; i < 32; i ++) space[i] = 0;
 
