@@ -300,9 +300,15 @@ string_substr(struct Parrot_Interp *interpreter, const STRING* src, INTVAL offse
     UINTVAL true_length;
 
     true_offset = (UINTVAL)offset;
+
+    if (offset == string_length(src) || length < 1) {
+        return NULL;
+    }
+
     if (offset < 0) {
         true_offset = (UINTVAL) (src->strlen + offset);
     }
+
     if (true_offset > src->strlen-1) { /* 0 based... */
         INTERNAL_EXCEPTION(SUBSTR_OUT_OF_STRING,
                            "Cannot take substr outside string")

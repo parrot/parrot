@@ -109,6 +109,7 @@ include/parrot/parrot.h
 include/parrot/pmc.h
 include/parrot/register.h
 include/parrot/resources.h
+include/parrot/rx.h
 include/parrot/runops_cores.h
 include/parrot/stacks.h
 include/parrot/string.h
@@ -186,7 +187,10 @@ pmc.c
 pmc_pm.pl
 register.c
 resources.c
+rx.c
+rx.ops
 runops_cores.c
+rx.c
 stacks.c
 string.c
 t/harness
