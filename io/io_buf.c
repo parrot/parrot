@@ -96,6 +96,10 @@ PIO_buf_open(theINTERP, ParrotIOLayer *layer,
     }
 
     io = (*l->api->Open) (interpreter, l, path, flags);
+    if (!io) {
+        /* error creating IO stream */
+        return NULL;
+    }
     /*
      * We have an IO stream now setup stuff
      * for our layer before returning it.

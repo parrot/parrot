@@ -339,6 +339,10 @@ The 68K emulator Apple ships with all its PPC-enabled versions of Mac OS.
 
 L<Really.|"LINKS">
 
+=head2 You're not using reference counting. Why not?
+
+=head2 Could we do a partial refcounting scheme?
+
 =head1 LINKS
 
 April Fool's Joke: http://www.perl.com/pub/a/2001/04/01/parrot.htm

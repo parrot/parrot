@@ -144,10 +144,15 @@ Close file opened on file descriptor $1.
 =cut
 
 inline op close(inout INT) {
-  ParrotIOTable table = ((ParrotIOData*)interpreter->piodata)->table;
-  ParrotIO *io = table[$1];
-  table[$1] = NULL;
-  PIO_close(interpreter, io);
+  ParrotIOTable table;
+  ParrotIO     *io;
+
+  if ($1 >= 0) {
+    table = ((ParrotIOData*)interpreter->piodata)->table;
+    io = table[$1];
+    table[$1] = NULL;
+    PIO_close(interpreter, io);
+  }
   goto NEXT();
 }
 
@@ -379,15 +384,17 @@ If for some reason the line's longer than 64K you get only 64K
 =cut
 
 inline op readline(out STR, in INT) {
-  ParrotIO *io = ((ParrotIOData*)interpreter->piodata)->table[$2];
-  size_t len;
-  
+  ParrotIO *io;
+  size_t len = 0;
   $1 = string_make(interpreter, NULL, 65535, NULL, 0, NULL);
   memset(($1)->strstart, 0, 65535);
 
-  PIO_setlinebuf(interpreter, io);
-  len = PIO_read(interpreter, io, ($1)->strstart, 65534);
-  ($1)->strlen = ($1)->bufused = len;
+  if ($2 >= 0) {
+    io = ((ParrotIOData*)interpreter->piodata)->table[$2];
+    PIO_setlinebuf(interpreter, io);
+    len = PIO_read(interpreter, io, ($1)->strstart, 65534);
+    ($1)->strlen = ($1)->bufused = len;
+  }
   goto NEXT();
 }
 
