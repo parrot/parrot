@@ -709,6 +709,15 @@ MaybeInterpretWord:
     eq .CurrentWord, "0", PushInt
 
 NotInt:
+    ne .CurrentWord, "'", NotTick
+    bsr EatLeadingWhitespace
+    eq .Commands, "", DoneInterpretWord
+    bsr CollectWord
+    set .IntStack, .CoreOps[.CurrentWord]
+    .PushInt
+    branch DoneInterpretWord
+    
+NotTick:
     set .TempInt, .CoreOps[.CurrentWord]
     eq .TempInt, 0, UserWord
     jsr .TempInt
