@@ -190,6 +190,12 @@ char *PDB_escape(const char *string, INTVAL length);
 
 int PDB_unescape(char *string);
 
+size_t PDB_disassemble_op(struct Parrot_Interp *interpreter,
+                          char* dest, int space,
+                          op_info_t* info, opcode_t* op,
+                          PDB_file_t *file, opcode_t* code_start,
+                          int full_name);
+
 void PDB_disassemble(struct Parrot_Interp *interpreter, const char *command);
 
 long PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset);
