@@ -1,8 +1,9 @@
 #! /usr/bin/perl -w
 #
-# ops2c.pl
+# pmc2c.pl
 #
-# Generate a C source file from the methods defined in a .pmc file.
+# Generate a C source and a header
+# file from the methods defined in a .pmc file.
 #
 
 =head1 NAME
@@ -505,8 +506,8 @@ EOC
      $HOUT .= "extern $decl;\n";
 
      $methodbody{ $methodname } =
-		$decl .
 		( $suppress_lines ? '' : "\n#line $lineno \"$pmcfile\"\n   " ) .
+		$decl .
 		$methodblock;
 
      $lineno += count_newlines($methodblock);
