@@ -214,8 +214,12 @@ static void
 itcall_sub(SymReg* sub)
 {
    current_call->r[0]->pcc_sub->sub = sub;
-   current_call->r[0]->pcc_sub->object = cur_obj;
-   cur_obj = NULL;
+   if (cur_obj) {
+       if (cur_obj->set != 'P')
+          fataly(1, sourcefile, line, "object isn't a PMC");
+       current_call->r[0]->pcc_sub->object = cur_obj;
+       cur_obj = NULL;
+   }
    /* FIXME use the default settings from .pragma */
    current_call->r[0]->pcc_sub->pragma = P_PROTOTYPED;
    if(cur_unit->type == IMC_PCCSUB)
