@@ -350,10 +350,7 @@ Called after the subroutine as been unarchived.
         /* its absolute */
         if (PObj_get_FLAGS(SELF) & PObj_private1_FLAG)
             return;
-        /*
-         * XXX actually the sub might be in a different code segment
-         */
-        code = INTERP->code->cur_cs->base.data;
+        code = sub->seg->base.data;
         start_offs = code + (size_t) PMC_struct_val(SELF);
         end_offs =   code + (size_t) sub->end;
         PMC_struct_val(SELF) = start_offs;

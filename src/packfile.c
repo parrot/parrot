@@ -287,8 +287,9 @@ do_1_sub_pragma(Parrot_Interp interpreter, PMC* sub_pmc, int action)
                         interpreter->resume_offset == 0) {
                     ptrdiff_t code = (ptrdiff_t) sub->seg->base.data;
 
-                    start_offs = ((ptrdiff_t) PMC_struct_val(sub_pmc) - code) /
-                        sizeof(opcode_t*);
+                    start_offs =
+                        ((ptrdiff_t) VTABLE_get_pointer(interpreter, sub_pmc)
+                            - code) / sizeof(opcode_t*);
                     interpreter->resume_offset = start_offs;
                     PObj_get_FLAGS(sub_pmc) &= ~PObj_private4_FLAG;
                 }
@@ -415,8 +416,6 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
     struct PackFile_FixupTable *ft;
     struct PackFile_ConstTable *ct;
     PMC *sub_pmc;
-    struct Parrot_sub *sub;
-    INTVAL rel;
     int again = 0;
 
 #if TRACE_PACKFILE
@@ -441,17 +440,7 @@ fixup_subs(Interp *interpreter, struct PackFile *self, int action)
                     case enum_class_Sub:
                     case enum_class_Closure:
                     case enum_class_Coroutine:
-                        if (PObj_get_FLAGS(sub_pmc) & PObj_private1_FLAG)
-                            continue;
-                        rel = (INTVAL) PMC_struct_val(sub_pmc) *
-                            sizeof(opcode_t);
-                        rel += (INTVAL) self->cur_cs->base.data;
-                        PMC_struct_val(sub_pmc) = (void*) rel;
-                        sub = PMC_sub(sub_pmc);
-                        rel = (INTVAL) sub->end * sizeof(opcode_t);
-                        rel += (INTVAL) self->cur_cs->base.data;
-                        sub->end = (opcode_t *) rel;
-                        PObj_get_FLAGS(sub_pmc) |= PObj_private1_FLAG;
+                        VTABLE_thawfinish(interpreter, sub_pmc, NULL);
                         if (PObj_get_FLAGS(sub_pmc) & 0xf0) {
                             /*
                              * private4-7 are sub pragmas LOAD ...
@@ -1367,11 +1356,11 @@ directory_unpack (Interp *interpreter,
 
     dir->num_segments = PF_fetch_opcode (pf, &cursor);
     if (dir->segments) {
-        dir->segments = 
+        dir->segments =
             mem_sys_realloc (dir->segments,
                              sizeof(struct PackFile_Segment *) * dir->num_segments);
     } else {
-        dir->segments = 
+        dir->segments =
             mem_sys_allocate(sizeof(struct PackFile_Segment *) * dir->num_segments);
     }
 
@@ -2336,7 +2325,7 @@ void PackFile_FixupTable_new_entry(Interp *interpreter,
             mem_sys_realloc(self->fixups, self->fixup_count *
                             sizeof(struct PackFile_FixupEntry *));
     } else {
-        self->fixups = 
+        self->fixups =
             mem_sys_allocate(sizeof(struct PackFile_FixupEntry *));
     }
     self->fixups[i] = mem_sys_allocate(sizeof(struct PackFile_FixupEntry));
