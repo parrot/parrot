@@ -33,17 +33,11 @@ pmclass Iterator {
     }
 
     PMC* getprop (STRING* key) {
-#if 0
-        return VTABLE_getprop(INTERP,
-		(PMC *)SELF->data, key);
-#else
 	return VTABLE_getprop(INTERP, (PMC*) SELF->data, key);
-#endif
     }
 
     void setprop (STRING* key, PMC* value) {
-        VTABLE_setprop(INTERP,
-					     (PMC *)SELF->data, key, value);
+        VTABLE_setprop(INTERP, (PMC *)SELF->data, key, value);
     }
 
     void delprop (STRING* key) {
