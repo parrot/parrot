@@ -210,7 +210,8 @@ imc_pragma(char * str)
 #if IMC_TRACE
     fprintf(stderr, "imc_pragma %s\n", str);
 #endif
-    if(!strcmp(str, "fastcall")) pragmas.fastcall = 1;
+    if     (!strcmp(str, "fastcall"))   pragmas.fastcall = 1;
+    else if(!strcmp(str, "prototyped")) pragmas.prototyped = 1;
     else return;
     /* More options here */
 }

@@ -130,6 +130,7 @@ struct _imc_pragmas {
   int fastcall;          /* Use low level branch op, pass/return on stack 
                           * as opposed to pcc convention and invoke */
                          /* more to come */
+  int prototyped;        /* Currently undefined which will be the default */
 };
 
 EXTERN struct _imc_pragmas pragmas;
