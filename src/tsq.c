@@ -77,7 +77,7 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
         queue->head = entry;
         queue->tail = entry;
     }
-    queue_signal(queue);
+    queue_signal(queue);        /* assumes only one waiter */
     queue_unlock(queue);
 }
 

@@ -1,0 +1,105 @@
+/* tqueue.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     Threadsafe queue class
+ *  Data Structure and Algorithms:
+ *  History:
+ *     2003.12.19 leo initial rev
+ *  Notes:
+ *
+ *     new P0, .TQueue
+ *     push P0, some
+ *     new P2, .ParrotThread
+ *     ...
+ *
+ *     and in other thread (at least, when shared PMCs work :)
+ *
+ *     shift P1, P0
+ *
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+pmclass TQueue need_ext {
+
+    void init () {
+        SELF->cache.int_val = 0;
+        PMC_data(SELF) = queue_init(0);
+    }
+
+    void mark () {
+        /* TODO */
+    }
+
+    void destroy () {
+        /* TODO */
+    }
+
+    INTVAL defined () {
+        return SELF.get_integer() != 0;
+    }
+
+    INTVAL get_integer () {
+        INTVAL items;
+        QUEUE *queue = PMC_data(SELF);
+
+        queue_lock(queue);
+        items = SELF->cache.int_val;
+        queue_unlock(queue);
+        return items;
+    }
+
+    void push_pmc(PMC *item) {
+        QUEUE_ENTRY* entry = mem_sys_allocate(sizeof(QUEUE_ENTRY));
+        QUEUE *queue = PMC_data(SELF);
+
+        entry->data = item;
+        entry->type = QUEUE_ENTRY_TYPE_NONE;
+        /* s. tsq.c:quene_push */
+        queue_lock(queue);
+        ++SELF->cache.int_val;
+        /* Is there something in the queue? */
+        if (queue->tail) {
+            queue->tail->next = entry;
+            queue->tail = entry;
+        } else {
+            queue->head = entry;
+            queue->tail = entry;
+        }
+        queue_broadcast(queue);        /* signal all waiters */
+        queue_unlock(queue);
+    }
+
+    PMC* shift_pmc() {
+        QUEUE_ENTRY *entry;
+        QUEUE *queue = PMC_data(SELF);
+        PMC *ret;
+
+        queue_lock(queue);
+        while (queue->head == NULL) {
+            queue_wait(queue);
+        }
+        entry = nosync_pop_entry(queue);
+        --SELF->cache.int_val;
+        queue_unlock(queue);
+        ret = entry->data;
+        mem_sys_free(entry);
+        return ret;
+    }
+
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

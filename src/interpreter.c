@@ -1047,6 +1047,11 @@ Parrot_really_destroy(int exit_code, void *vinterp)
     struct Stash *stash, *next_stash;
 
     UNUSED(exit_code);
+
+    /*
+     * wait for threads to complete if needed
+     */
+    pt_join_threads(interpreter);
     /* if something needs destruction (e.g. closing PIOs)
      * we must destroy it now:
      * no DOD run, so everything is considered dead

@@ -72,6 +72,11 @@ init_events_first(Parrot_Interp interpreter)
 {
     Parrot_thread    the_thread;
     /*
+     * we need a global mutex to protect the interpreter array
+     */
+
+    MUTEX_INIT(interpreter_array_mutex);
+    /*
      * init event queue - be sure its done only once
      * we could use pthread_once for queue_init
      */

@@ -177,6 +177,49 @@ pt_thread_join(UINTVAL tid)
 }
 
 /*
+ * possibly wait for other running threads - called when destructing
+ * the passed interpreter
+ */
+void
+pt_join_threads(Parrot_Interp interpreter)
+{
+    size_t i;
+
+    LOCK(interpreter_array_mutex);
+    /*
+     * if no threads where started - fine
+     */
+    if (!n_interpreters) {
+        UNLOCK(interpreter_array_mutex);
+        return;
+    }
+    /*
+     * only the first interpreter waits for other threads
+     */
+    if (interpreter != interpreter_array[0]) {
+        UNLOCK(interpreter_array_mutex);
+        return;
+    }
+
+    for (i = 1; i < n_interpreters; ++i) {
+        Parrot_Interp thread_interp = interpreter_array[i];
+        if (thread_interp == NULL)
+            continue;
+        if (thread_interp->thread_data->state == THREAD_STATE_JOINABLE ||
+                thread_interp->thread_data->state == THREAD_STATE_FINISHED) {
+            void *retval;
+            thread_interp->thread_data->state |= THREAD_STATE_JOINED;
+            UNLOCK(interpreter_array_mutex);
+            JOIN(thread_interp->thread_data->thread, retval);
+            LOCK(interpreter_array_mutex);
+        }
+    }
+    UNLOCK(interpreter_array_mutex);
+    MUTEX_DESTROY(interpreter_array_mutex);
+    return;
+}
+
+/*
  * detach (make non-joinable) thread
  */
 void

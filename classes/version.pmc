@@ -1,0 +1,34 @@
+/* version.pmc
+ *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+ *  CVS Info
+ *     $Id$
+ *  Overview:
+ *     Parrot and module version data
+ *  Data Structure and Algorithms:
+ *  History:
+ *     2003.12.19 leo initial rev
+ *  Notes:
+ *     Parrot and each module SHOULD have a version. This class
+ *     implements version comparison (number and string).
+ *     A version can be a simple string (0.13.1-devel) or a list
+ *     of pairs of version strings.
+ *  References:
+ */
+
+#include "parrot/parrot.h"
+#include <assert.h>
+
+pmclass Version need_ext {
+
+
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/
