@@ -13,7 +13,7 @@
 # Note that we don't include the source "PMC* pmc" - that's done implicitly.
 
 unique	INTVAL type	
-unique	STRING name
+unique	STRING* name
 unique	PMC* new
 unique	void clone		PMC* dest
 unique	void morph		INTVAL type
@@ -22,13 +22,13 @@ unique	INTVAL real_size
 unique	void destroy	
 unique	INTVAL get_integer	 
 unique	FLOATVAL get_number	 
-unique	STRING get_string	 
+unique	STRING* get_string	 
 unique	BOOL get_bool	 
 unique	void* get_value	
 unique	BOOL is_same		PMC* pmc2
 int	void set_integer	INTVAL integer
 float	void set_number		FLOATVAL number
-str	void set_string		STRING string
+str	void set_string		STRING* string
 unique	void set_value		void* value
 num	void add		PMC* left	 PMC* right 
 num	void subtract		PMC* left	 PMC* right 

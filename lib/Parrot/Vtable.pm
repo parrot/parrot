@@ -24,7 +24,7 @@ sub parse_vtable {
         my ($type, $name) = $tn =~ /(.*?)\s+(\w+)/;
         $vtbl{$name}{type} = $type;
 	$vtbl{$name}{meth_type} = $meth_type;
-        $vtbl{$name}{proto} = "$type (*$name)(PMC* pmc";
+        $vtbl{$name}{proto} = "$type (*$name)(struct Parrot_Interp *interpreter, PMC* pmc";
         for (@line) {
             my ($argtype, $argname) = /(.*?)\s+(\w+)/;
             push @{$vtbl{$name}{args}},
@@ -77,31 +77,22 @@ sub vtbl_struct {
 
 EOF
     for (vtbl_enumerate(%vtbl)) {
-        $rv.= "\t$_->[0] $_->[1];\n";
+        $rv.= "\t$_->[0] $_->[1]";
+        $rv .= "[$_->[3]]" if ($_->[3] > 1);
+        $rv.= ";\n";
     }
     $rv .= "};\n";
     return $rv;
 }
 
-# Returns an array of [type, name, prototype] arrays
+# Returns an array of [type, name, prototype, variations] arrays
 sub vtbl_enumerate {
     my %vtbl = @_;
     my @rv;
     for (@{$vtbl{order}}) {
-        if ($vtbl{$_}{meth_type} eq "unique") {
-            my $proto = $vtbl{$_}{proto};
-            # Dirty hack
-            $proto =~ s/\(\*$_\)/$_ /;
-            push @rv, [ "${_}_method_t", $_, $proto];
-        } else {
-            my $name = $_;
-            for (1..$type_counts{$vtbl{$name}{meth_type}}) {
-                # And another one.
-                my $proto = $vtbl{$name}{proto};
-                $proto =~ s/\(\*$name\)/${name}_$_ /;
-                push @rv, ["${name}_method_t", "${name}_$_", $proto];
-            }
-        }
+        my $proto = $vtbl{$_}{proto};
+        $proto =~ s/\(\*$_\)/$_ /;
+        push @rv, [ "${_}_method_t", $_, $proto, $type_counts{$vtbl{$_}{meth_type}}];
     }
     return @rv;
 }

@@ -15,6 +15,7 @@
 
 enum {
     enum_class_int,
+    enum_class_scalar,
     enum_class_max
 };
 VAR_SCOPE VTABLE Parrot_base_vtables[enum_class_max];
