@@ -146,7 +146,8 @@ sub cvs_id
 {
 	my $self = shift;
 	my $content = $self->read;
-	my ($id) = $content =~ /(\$Id$]+\$)/s;
+	# Break up the $Id to prevent CVS messing with it.
+	my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
 	
 	return $id;
 }
@@ -161,7 +162,8 @@ sub has_cvs_id
 {
 	my $self = shift;
 	my $content = $self->read;
-	my $has_id = $content =~ /\$Id$]+\$/s;
+	# Break up the $Id to prevent CVS messing with it.
+	my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
 	
 	return $has_id;
 }
