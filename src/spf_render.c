@@ -654,7 +654,7 @@ Parrot_sprintf_format(Interp *interpreter, STRING *pat,
                                 char *tempstr = string_to_cstring(interpreter,
                                                                   ts);
 
-#ifdef HAS_SNPRINTF
+#ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                          tempstr,
                                          (double)thefloat);

@@ -1,0 +1,20 @@
+#include <stdio.h>
+#ifdef _WIN32
+#  define snprintf _snprintf
+#endif
+
+int
+main(int argc, char* argv[])
+{
+    char buf[10];
+    int n;
+
+    n = snprintf(buf, 2, "%s", "01234");
+    if (n == -1)
+	puts("old snprintf");
+    else if (n == 5)
+	puts("C99 snprintf");
+    else
+	printf("borken snprintf: n = %d\n", n);
+    return 0;
+}
