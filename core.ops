@@ -3663,13 +3663,13 @@ Find the global named $2 and store it in $1
 
 op new_pad() {
     PMC* hash = pmc_new(interpreter, enum_class_PerlHash);
-    stack_push(interpreter, &interpreter->ctx.pad_stack, hash, STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
+    stack_push(interpreter, &interpreter->ctx.pad_stack, hash, STACK_ENTRY_PMC, STACK_CLEANUP_NULL);
 
     goto NEXT();
 }
 
 op pop_pad() {
-    stack_pop(interpreter, &interpreter->ctx.pad_stack, NULL, STACK_ENTRY_DESTINATION);
+    stack_pop(interpreter, &interpreter->ctx.pad_stack, NULL, STACK_ENTRY_PMC);
     goto NEXT();
 }
 

@@ -68,7 +68,11 @@ pmclass PerlHash {
      * the garbage collector.
      */
     PMC* mark (PMC *end_of_used_list) {
-        return mark_hash(INTERP, SELF->data, end_of_used_list);
+        if (SELF->data) {
+            return mark_hash(INTERP, SELF->data, end_of_used_list);
+        } else {
+            return end_of_used_list;
+        }
     }
 
     INTVAL type () {

@@ -96,16 +96,15 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
     cur_stack = interpreter->ctx.pad_stack;
     while (cur_stack) {
         if (cur_stack->buffer) {
-	    buffer_lives(cur_stack->buffer);
-	    entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
-	    for (i = 0; i < cur_stack->used; i++) {
+            buffer_lives(cur_stack->buffer);
+            entry = (Stack_Entry_t *)(cur_stack->buffer->bufstart);
+            for (i = 0; i < cur_stack->used; i++) {
                 if (STACK_ENTRY_PMC == entry[i].entry_type &&
                     entry[i].entry.pmc_val) {
                     last = mark_used(entry[i].entry.pmc_val, last);
                 }
-	    }
-	}
-        
+            }
+        }
         cur_stack = cur_stack->prev;
     }
 
@@ -179,12 +178,14 @@ trace_active_PMCs(struct Parrot_Interp *interpreter)
             else if (bits == (PMC_is_buffer_ptr_FLAG | PMC_is_PMC_ptr_FLAG)) {
                 /* buffer of PMCs */
                 Buffer *trace_buf = current->data;
-                PMC **cur_pmc = trace_buf->bufstart;
-                /* Mark the damn buffer as used! */
-                buffer_lives(trace_buf);
-                for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
-                    if (cur_pmc[i]) {
-                        last = mark_used(cur_pmc[i], last);
+                if (trace_buf) {
+                    PMC **cur_pmc = trace_buf->bufstart;
+                    /* Mark the damn buffer as used! */
+                    buffer_lives(trace_buf);
+                    for (i = 0; i < trace_buf->buflen / sizeof(*cur_pmc); i++) {
+                        if (cur_pmc[i]) {
+                            last = mark_used(cur_pmc[i], last);
+                        }
                     }
                 }
             }
