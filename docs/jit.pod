@@ -340,8 +340,7 @@ $7,0($27)>.
 
 =head1 i386 Notes
 
-Only 32 bit INTVALs are supported. Long double FLOATVALs could work,
-though this is untested currently.
+Only 32 bit INTVALs are supported. Long double FLOATVALs are ok.
 
 There are four mapped integer registers B<%edi>, B<%ebx>, B<%esi> and
 B<%edx>. The first 3 of these are callee saved, they preserve their
@@ -460,10 +459,54 @@ other language. Though - as we don't have line number info currently -
 you might delete empty lines and join labels with ops in the pasm file
 before.
 
-Examining parrot registers via the debugger is not working yet, but you
-can always step into external opcode and look at I<*interpreter>.
+You can examine parrot registers via the debugger or even set them and
+you can always step into external opcode and look at I<*interpreter>.
 
 The tests F<t/op/jit*.t> have some test cases for testing register allocation.
 These tests are written for a mapping of 4 processor registers. If your
 processor architecture has more mapped registers, reduce them to 4 and run
 these tests.
+
+=head2 Example for a debug session
+
+  $ cat j.pasm
+        set I0, 10
+        set N1, 1.1
+        set S2, "abc"
+        print "\n"
+        end
+  $ perl assemble.pl j.pasm > j.pbc
+  $ dddp j
+
+(ddd shows above source code and assembly (startup code snipped):
+
+    0x815de46 <jit_func+30>:	mov    $0xa,%ebx
+    0x815de4b <jit_func+35>:	fldl   0x81584c0
+    0x815de51 <jit_func+41>:	fstp   %st(2)
+    0x815de53 <jit_func+43>:	mov    %ebx,0x8158098
+    0x815de59 <jit_func+49>:	fld    %st(1)
+    0x815de5b <jit_func+51>:	fstpl  0x8158120
+    0x815de61 <jit_func+57>:	push   $0x815cd90
+    0x815de66 <jit_func+62>:	call   0x804db90 <Parrot_set_s_sc>
+    0x815de6b <jit_func+67>:	add    $0x4,%esp
+    0x815de6e <jit_func+70>:	push   $0x815cd9c
+    0x815de73 <jit_func+75>:	call   0x804bcd0 <Parrot_print_sc>
+    0x815de78 <jit_func+80>:	add    $0x4,%esp
+    0x815de7b <jit_func+83>:	add    $0x4,%esp
+    0x815de81 <jit_func+89>:	pop    %edi
+    0x815de83 <jit_func+91>:	pop    %ebx
+    0x815de85 <jit_func+93>:	pop    %esi
+    0x815de87 <jit_func+95>:	pop    %ebp
+    0x815de89 <jit_func+97>:	ret
+  (gdb) n
+  (gdb) n
+  (gdb) n
+  (gdb) p I0
+  $1 = 10
+  (gdb) p N1
+  $2 = 1.1000000000000001
+  (gdb) p *S2
+  $3 = {bufstart = 0x815ad30, buflen = 15, flags = 336128, bufused =
+  3, strstart = 0x815ad30 "abc"}
+  (gdb) p &I0
+  $4 = (INTVAL *) 0x8158098
