@@ -117,33 +117,43 @@ int main(int argc, char* argv[]) {
 
     /* delete test */
     list = list_new(interpreter, enum_type_char);
-    for (i = 0; i < 20; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+    for (i = 0; i < 20; i++) {
+	int c = 'a' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     list_delete(interpreter, list, 1, 1);
     list_delete(interpreter, list, 1, 4);
     j = *(char*) list_get(interpreter, list, 1, enum_type_char);
     printf("delete 1 %s\n", (j == 6+'a') ? "ok" : "nok");
 
     list = list_new(interpreter, enum_type_char);
-    for (i = 0; i < 26; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+    for (i = 0; i < 26; i++) {
+	int c = 'a' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     list_delete(interpreter, list, 1, 20);
     j = *(char*) list_get(interpreter, list, 1, enum_type_char);
     printf("delete 2 %s\n", (j == 21+'a') ? "ok" : "nok");
 
     list = list_new(interpreter, enum_type_char);
-    for (i = 0; i < 26; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+    for (i = 0; i < 26; i++) {
+	int c = 'a' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     list_delete(interpreter, list, 2, 30);
-    for (i = 0; i < 26; i++)
-	list_push(interpreter, list, (void*) 'A'+i, enum_type_char);
+    for (i = 0; i < 26; i++) {
+	int c = 'A' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     j = *(char*) list_get(interpreter, list, 6, enum_type_char);
     printf("delete 3 %s\n", (j == 'E' && list_length(interpreter, list) == 28)
 	? "ok" : "nok");
 
     list = list_new(interpreter, enum_type_char);
-    for (i = 0; i < 5; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+    for (i = 0; i < 5; i++) {
+	int c = 'a' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     list_assign(interpreter, list, 2000 ,(void*)'Y', enum_type_char);
     list_assign(interpreter, list, 4000 ,(void*)'Z', enum_type_char);
     list_delete(interpreter, list, 5, 3000);
@@ -176,12 +186,16 @@ int main(int argc, char* argv[]) {
 #endif
 
     list = list_new(interpreter, enum_type_char);
-    for (i = 0; i < 6; i++)
-	list_push(interpreter, list, (void*) 'a'+i, enum_type_char);
+    for (i = 0; i < 6; i++) {
+	int c = 'a' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     list_shift(interpreter, list, enum_type_char);
     list_insert(interpreter, list, 0, 3);
     for (i = 0; i < 5; i++)
-        list_assign(interpreter, list, i ,(void*)'A'+i, enum_type_char);
+	int c = 'A' + i;
+	list_push(interpreter, list, (void*) c, enum_type_char);
+    }
     j = *(char*) list_get(interpreter, list, 0, enum_type_char);
     printf("insert 2 %s\n", (j == 'A') ? "ok" : "nok");
 
