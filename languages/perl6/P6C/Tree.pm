@@ -91,7 +91,7 @@ BEGIN {
     no strict 'refs';
     for (qw(apply match muldiv addsub bitshift bitand
 	    bitor logand logor log_AND log_OR comma semi
-	    _closure_args)) {
+	    _closure_args rx_charclass)) {
 	*{'P6C::'.$_.'::tree'} = sub {
 	    my $x = shift;
 	    my $ret = infix_left_seq($x->[1]);
@@ -220,13 +220,13 @@ sub P6C::sv_literal::tree {
     } elsif (!ref($x->[1])) {
 	$x->[1] =~ s/_//g;
 	if ($x->[1] =~ /\./) {
-	    $type = 'PerlNum';
+	    $type = 'num';
 	} else {
-	    $type = 'PerlInt';
+	    $type = 'int';
 	}
 	$val = $x->[1];
     } else {
-	$type = 'PerlString';
+	$type = 'str';
 	$val = qq{"$x->[1][2]"};	# XXX: they're all just strings.
     }
     return new P6C::sv_literal type => $type, lval => $val;
@@ -967,7 +967,7 @@ sub P6C::rx_assertion::tree {
     my $x = shift;
     if (@$x == 2) {
 	if (ref $x->[1]) {
-	    # Variable => runtime-interpolated pattern
+	    # Variable, subrule, or character class
 	    return $x->[1]->tree;
 	} elsif ($x->[1] eq '.') {
 	    # Single grapheme
@@ -976,15 +976,7 @@ sub P6C::rx_assertion::tree {
 	    return new P6C::rx_assertion
 		thing => P6C::sv_literal->new(type => 'str', lval => $x->[1]);
 	} else {
-	    # Character class.
-	    my $neg;
-	    if (substr($x->[1], 0, 1) eq '-') {
-		$neg = 1;
-		$x->[1] = substr($x->[1], 1);
-	    }
-	    return new P6C::rx_oneof
-			   rep => substr($x->[1], 1, length($x->[1]) - 2),
-			       negated => $neg;
+	    die "internal error";
 	}
     } elsif ($x->[1] eq '-') {
 	# Negated assertion
@@ -1024,6 +1016,31 @@ sub P6C::rx_call::tree {
 	    $args = new P6C::ValueList vals => [];
 	}
 	return new P6C::rx_call name => $pat, args => $args;
+    }
+}
+
+sub P6C::rx_cc_neg::tree {
+    my $x = shift;
+    my $neg = @{$x->[1]} > 0;
+    my $class = $x->[2];
+    if (@$class == 4) {
+	# Bracketed assertion
+	my $ret = $class->[2]->tree;
+	$ret->negated(!$ret->negated) if $neg;
+	return $ret;
+
+    } elsif (ref $class->[1]) {
+	# Non-bracketed assertion
+	return new P6C::rx_assertion
+	    thing => new P6C::rx_call(name => $class->[1]->tree,
+				      args => new P6C::ValueList(vals => [])),
+	    negated => $neg;
+
+    } else {
+	# enumerated class
+	return new P6C::rx_oneof
+	    rep => substr($x->[1], 1, length($x->[1]) - 2),
+	    negated => $neg;
     }
 }
 

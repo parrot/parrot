@@ -14,7 +14,7 @@ use P6C::Parser;
 
 use vars '%builtin_names';
 BEGIN {
-    my @names = qw(print1 exit warn die print sleep time time0);
+    my @names = qw(print1 exit warn die print sleep time substr length);
     @builtin_names{@names} = (1) x @names;
 }
 
@@ -44,6 +44,18 @@ sub declare {
 	    rettype => [];
 	$P6C::Parser::WANT{$_} = 'bare_arglist';
     }
+    for (qw(substr)) {
+	$P6C::Context::CONTEXT{$_} = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
+	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlArray', '_']],
+	    rettype => 'PerlString';
+	$P6C::Parser::WANT{$_} = 'bare_arglist';
+    }
+    for (qw(length)) {
+	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'PerlUndef';
+	$hash->{$_} = new P6C::IMCC::Sub args => [['PerlString', '_']],
+	    rettype => 'PerlInt';
+	$P6C::Parser::WANT{$_} = 'bare_arglist';
+    }
 }
 
 sub add_code {
@@ -56,6 +68,74 @@ sub emit {
 print <<'END';
 
 .emit
+
+_substr:
+pushp
+pushi
+pushs
+# get arr
+restore P0
+# n paras
+set I0, P0
+set S0, P0[0]
+set I1, P0[1]
+eq I0, 2, __substr_2
+set I2, P0[2]
+gt I0, 4, __substr_die
+lt I0, 2, __substr_die
+length I3, S0
+set I4, I3
+ge I2, 0, __substr_34
+# len negative, leave -len of string
+sub I3, I3, I1
+add I3, I3, I2
+set I2, I3
+__substr_34:
+set S1, ""
+# # offset >= len?
+ge I1, I4, __substr_ret
+eq I0, 4, __substr_4
+__substr_3:
+substr S1, S0, I1, I2
+__substr_ret:
+new P1, .PerlString
+set P1, S1
+save P1
+pops
+popi
+popp
+ret
+__substr_4:
+set S2, P0[3]
+substr S1, S0, I1, I2, S2
+set P0[2], S1
+branch __substr_ret
+__substr_2:
+length I2, S0
+sub I2, I2, I1
+branch __substr_3
+__substr_die:
+set S0, "wrong number of args for substr"
+new P0, .PerlArray
+set P0[0], S0
+save P0
+bsr _die
+branch __substr_ret
+
+_length:
+pushp
+pushs
+pushi
+restore P0
+set S0, P0
+length I0, S0
+new P1, .PerlInt
+set P1, I0
+save P1
+popi
+pops
+popp
+ret
 
 _time:
 pushn

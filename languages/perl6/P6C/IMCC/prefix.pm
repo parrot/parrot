@@ -215,7 +215,7 @@ sub gen_sub_call_imcc {
 	$func->rettype($rettype = 'PerlArray');
     }
     if (ref($rettype) eq 'ARRAY') {
-	my @results = map { gentmp $_ } @{$ctx->type};
+	my @results = map { gentmp $_ } @$rettype;
 	for my $i (0 .. $#results) {
 	    code(<<END);
 	.result $results[$i]
@@ -437,7 +437,7 @@ sub prefix_neg {
     code(<<END);
 	$res = - $tmp
 END
-    return $res;
+    return scalar_in_context($res, $x->{ctx});
 }
 
 sub val_noarg {
@@ -604,7 +604,7 @@ sub prefix_when {
     my $label = $x->{ctx}{label};
     push_scope;
     declare_label name => $label, type => 'skip';
-    my $testval = do_smartmatch(topic, $test);
+    my $testval = do_smartmatch(topic, $test, $x->{ctx});
     my $next = genlabel 'when';
     code(<<END);
 	if $testval goto $next

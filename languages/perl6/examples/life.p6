@@ -76,14 +76,12 @@ sub main() {
     ;
 
     my $j;
-    my $new;
     my $gen = @ARGS[0] || 518;
     # for $j (0 .. 499) => imcc error releated to closure?
     print "Running " _ $gen _ " generations\n";
     Print($world);
     loop( $j= 0 ; $j < $gen; $j++) {
-	$new = Generate($world);
-	$world = $new;
+	$world = Generate($world)[0];
     }
     Print($world);
 }

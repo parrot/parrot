@@ -52,7 +52,8 @@ use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
 @EXPORT_OK = qw(unimp diag error warning
 		flatten_leftop map_preorder map_postorder
 		deep_copy
-		is_scalar is_array_expr same_type is_pmc is_numeric is_string);
+		is_scalar is_scalar_expr is_array_expr same_type
+		is_pmc is_numeric is_string);
 %EXPORT_TAGS = (all => [@EXPORT_OK] );
 @ISA = qw(Exporter);
 
@@ -222,6 +223,10 @@ sub is_array_expr {		# hack to do guess at value types of
 		 || $x->op eq '..'))
 	    || ($x->isa('P6C::variable') && $x->type eq 'PerlArray')
 	    || ($x->isa('P6C::ValueList')));
+}
+
+sub is_scalar_expr {
+    return !is_array_expr(@_);
 }
 
 my %pmc_scalar;

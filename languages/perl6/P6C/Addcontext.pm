@@ -266,10 +266,8 @@ sub P6C::subscript_exp::ctx_right {
 	# Closure.
 	my $ictx;
 	if ($x->thing->can('name')) {
-	    print STDERR $x->thing->name, "\n";
 	    $ictx = arg_context($x->thing->name);
 	} else {
-	    print STDERR Data::Dumper::Dumper($x->thing);
 	    $ictx = $P6C::Context::DEFAULT_ARGUMENT_CONTEXT;
 	}
 	$x->thing->ctx_right(new P6C::Context type => 'PerlUndef');
@@ -419,6 +417,7 @@ BEGIN {
     $P6C::Context::CONTEXT{when}
 	= $P6C::Context::CONTEXT{given}
 	= new P6C::Context type => [undef, 'void'];
+
     $P6C::Context::CONTEXT{while}
 	= $P6C::Context::CONTEXT{until}
 	= new P6C::Context type => ['bool', 'void'];
@@ -430,7 +429,7 @@ BEGIN {
 	$P6C::Context::CONTEXT{$_} = new P6C::Context type => 'void';
 	$P6C::Context::CONTEXT{$_}{noreturn} = 1;
     }
-    for (qw(while when)) {
+    for (qw(while when given)) {
 	$P6C::Context::CONTEXT{$_}{noreturn} = 1;
     }
 }
@@ -456,7 +455,7 @@ sub P6C::prefix::ctx_right {
 	# blech.
 	$proto->($x, $ctx);
     } elsif (ref $x->args) {
-	$x->args->ctx_right($proto);
+	$x->args->ctx_right($proto->copy);
     }
 }
 

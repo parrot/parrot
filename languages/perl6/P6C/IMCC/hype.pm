@@ -138,7 +138,7 @@ sub hype_array_scalar {
 END
     my $code = hype_body($op, "$dest\[$len]", "$lval\[$len]", $rval);
     code(gen_counted_loop($len, $code));
-    return $dest;
+    return $op->{ctx} ? array_in_context($dest, $op->{ctx}) : $dest;
 }
 
 # $x ^op @ys
@@ -157,7 +157,7 @@ sub hype_scalar_array {
 END
     my $code = hype_body($op, "$dest\[$len]", $lval, "$rval\[$len]");
     code(gen_counted_loop($len, $code));
-    return $dest;
+    return $op->{ctx} ? array_in_context($dest, $op->{ctx}) : $dest;
 }
 
 # @xs ^op @ys
@@ -165,7 +165,8 @@ END
 # Currently iterates over the number of elements in the _shorter_ of
 # the two arrays, rather than the longer.  This is useful for working
 # with infinite lists, but may not be the behavior in the Apocalypses
-# (XXX: check this).
+# (XXX: actually, the Official Word is that the shorter value should
+# be extended).
 #
 sub hype_array_array {
     my ($op, $l, $r) = @_;
@@ -192,6 +193,6 @@ END
     my $code
 	= hype_body($op, "$dest\[$rlen]", "$lval\[$rlen]", "$rval\[$rlen]");
     code(gen_counted_loop($rlen, $code));
-    return $dest;
+    return $op->{ctx} ? array_in_context($dest, $op->{ctx}) : $dest;
 }
 

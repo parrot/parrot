@@ -4,7 +4,6 @@ use P6C::TestCompiler tests => 12;
 use Test::More qw(skip);
 
 ##############################
-SKIP: { skip "testing", 1;
 output_is(<<'CODE', <<'OUT', "Basic hello.");
 sub main() {
     print1("Hello, " _ "world");
@@ -12,7 +11,6 @@ sub main() {
 CODE
 Hello, world
 OUT
-}
 
 ##############################
 output_is(<<'CODE', <<'OUT', "Binary math ops");

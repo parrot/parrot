@@ -98,7 +98,8 @@ sub import {
 		  add_function set_function exists_function_def
 		  exists_function_decl set_function_params set_function_return
 		  gen_counted_loop scalar_in_context do_flatten_array
-		  array_in_context tuple_in_context undef_in_context);
+		  array_in_context tuple_in_context undef_in_context
+		  primitive_in_context);
     my @external = qw(init compile emit);
     my $caller = caller;
     no strict 'refs';
@@ -624,10 +625,13 @@ END
 sub scalar_in_context {
     my ($x, $ctx) = @_;
     if ($ctx->type eq 'void') {
-	return undef;
+#	return undef;
+	return $x; # XXX:
     } elsif ($ctx->is_array) {
 	my $a = newtmp 'PerlArray';
+	my $id = 'scalar_in_context from '.((caller 1)[3]);
 	code(<<END);
+# $id
 	$a = 1
 	$a\[0] = $x
 END
@@ -639,12 +643,28 @@ END
     }
 }
 
+sub primitive_in_context {
+    my ($x, $type, $ctx) = @_;
+    if ($type eq $ctx->type) {
+	return $x;
+    } else {
+	my $tmp = newtmp 'PerlUndef';
+	my $id = 'primitive_in_context from '.((caller 1)[3]);
+	code(<<END);
+# $id
+	$tmp = $x
+END
+	return scalar_in_context($tmp, $ctx);
+    }
+}
+
 sub array_in_context {
     my ($x, $ctx) = @_;
-    if ($ctx->type eq 'void') {
-	return undef;
-    } elsif ($ctx->is_array) {
+    if (!$ctx->type || $ctx->is_array) {
 	return $x;
+    } elsif ($ctx->type eq 'void') {
+#	return undef;
+	return $x;		# XXX:
     } elsif ($ctx->is_tuple) {
 	my $len = gentmp 'int';
 	my $end = genlabel;
@@ -666,10 +686,8 @@ END
 	my $itmp = gentmp 'int';
 	code(<<END);
 	$itmp = $x
-	$x = new PerlInt
-	$x = $itmp
 END
-	return $x;
+	return primitive_in_context($itmp, 'int', $ctx);
     } else {
 	unimp "Return type ".$ctx->type;
     }
@@ -978,7 +996,7 @@ sub val {
 	# In array context, the list's value is an array of all its
 	# elements.
 	my $tmp = newtmp 'PerlArray';
-	code("\t$tmp = ".@{$x->vals}."\n");
+	code("# ValueList in array context\n\t$tmp = ".@{$x->vals}."\n");
 	for my $i (0..$#{$x->vals}) {
 	    my $item = $x->vals($i)->val;
 	    confess Data::Dumper::Dumper($x->vals($i)) unless $item;
@@ -1079,13 +1097,13 @@ BEGIN {
  ','	=> \&do_array,
  'x'	=> \&do_repeat,
  '..'	=> \&do_range,
- '=~'	=> sub { do_smartmatch($_[0]->l, $_[0]->r) },
+ '=~'	=> sub { do_smartmatch($_[0]->l, $_[0]->r, $_[0]->{ctx}) },
 );
 }
 
 use vars '%op_is_array';
 BEGIN {
-    my @arrayops = qw(= .. x // ~~ && ||);
+    my @arrayops = qw(= .. x // ~~ && || _);
     push(@arrayops, ',');
     @op_is_array{@arrayops} = (1) x @arrayops;
 }
@@ -1269,34 +1287,11 @@ sub val {
     my $x = shift;
     return undef if $x->{ctx}->type && $x->{ctx}->type eq 'void';
     my $type = $x->type;
-    my $ctx = $x->{ctx};
 
     # XXX: these are actually _references_.  But we don't support them
     # anyways.
     die "Don't support ".$type if $type =~ /Perl(Hash|Array)/;
-    my $val = $x->lval;
-    my $ret;
-    if (!$ctx->type
-	|| $ctx->type eq 'void'
-	|| same_type($ctx->type, $type)
-	|| (is_scalar($ctx->type) && is_scalar($type))) {
-	$ret = newtmp 'PerlUndef';
-	code(<<END);
-	$ret = $val
-END
-
-    } elsif ($ctx->is_array || $ctx->is_tuple) {
-	return scalar_in_context($val, $ctx);
-
-    } else {
- 	unimp "Context ", Dumper($ctx);
-	# XXX: bogus
-	$ret = newtmp 'PerlUndef';
-	code(<<END);
-	$ret = $val
-END
-    }
-    return $ret;
+    return primitive_in_context($x->lval, $type, $x->{ctx});
 }
 
 ######################################################################
@@ -1442,9 +1437,9 @@ END
     code(<<END);
 	$result = 1
 $fail:
-    $res = $result
+	$res = $result
 END
-    return $res;
+    return scalar_in_context($res, $self->{ctx});
 }
 
 ######################################################################
@@ -1458,6 +1453,7 @@ sub P6C::sub_def::val {
     my $ofunc = set_function($x->name);
     $x->closure->val;
     set_function($ofunc);
+    return undef;
 }
 
 ######################################################################
@@ -1571,6 +1567,7 @@ END
 	$itmp = addr _$name
 	$ret = $itmp
 END
+	$ret = scalar_in_context($ret, $x->{ctx});
     }
     pop_scope;
     return $ret;
@@ -1581,7 +1578,18 @@ package P6C::variable;
 use Data::Dumper;
 use P6C::IMCC ':all';
 use P6C::Context;
-use P6C::Util qw(is_scalar same_type unimp is_pmc);
+use P6C::Util qw(is_scalar is_scalar_expr same_type unimp is_pmc);
+
+sub val_in_context {
+    my ($v, $type, $ctx) = @_;
+    if (is_scalar($type)) {
+	return scalar_in_context($v, $ctx);
+    } elsif ($type eq 'PerlArray') {
+	return array_in_context($v, $ctx);
+    } else {
+	return $v;
+    }
+}
 
 # XXX: need to redo this when we get globals.
 sub val {
@@ -1596,48 +1604,7 @@ sub val {
 END
 	$v = $reg;
     }
-
-    if (!$ctx->type) {
-	# XXX: undefined context is our way of punting.  Used by
-	# e.g. "when", for which context isn't that well-defined.
-	return $v;
-    } elsif (is_scalar($x->type)) {
-	return scalar_in_context($v, $ctx);
-
-    } elsif (!$ctx->type
-	     || same_type($x->type, $ctx->type)
-	     || $ctx->type eq 'void') {
-	return $v;
-
-    } elsif ($ctx->is_tuple) {
-	my @ret;
-	my $itmp = gentmp 'int';
-	my $len = gentmp 'int';
-	my $nomore = genlabel 'array_to_tuple';
-	code(<<END);
-	$len = $v
-	$itmp = 0
-END
-	for (@{$ctx->type}) {
-	    my $vtmp = gentmp 'PerlUndef';
-	    code(<<END);
-	if $itmp >= $len goto $nomore
-	$vtmp = $v\[$itmp]
-	inc $itmp
-END
-	    push @ret, $vtmp;
-	}
-	code(<<END);
-$nomore:
-END
-	return [@ret];
-
-    } elsif ($ctx->is_scalar && $x->type eq 'PerlArray') {
-	return $v;
-
-    } else {
-	unimp "Variable of type ", $x->type, " in context ", $ctx->type;
-    }
+    return val_in_context $v, $x->type, $x->{ctx};
 }
 
 sub need_cloning {
@@ -1676,7 +1643,7 @@ END
 	$name = $tmpv
 END
 	}
-	return $clonev;		# XXX: is this okay?
+	return val_in_context $clonev, $x->type, $x->{ctx};
 
     } else {
 	if ($do_clone) {
@@ -1690,7 +1657,7 @@ END
 	$name = $tmpv
 END
 	}
-	return $name;
+	return val_in_context $name, $x->type, $x->{ctx};
     }
 }
 
@@ -1715,6 +1682,7 @@ sub val {
     } else {
 	add_localvar($x->vars->name, $x->vars->type);
     }
+    return undef;
 }
 
 # A declaration with initializers shows up as assigning to a decl.
@@ -1761,8 +1729,8 @@ sub assign {
 	for my $i ($min .. $#vars) {
 	    add_localvar($vars[$i]->name, $vars[$i]->type);
 	}
-	return undef;
     }
+    return undef;
 }
 
 ######################################################################
@@ -1810,7 +1778,9 @@ sub val {
     }
     if ($x->subscripts(0)->type eq 'Sub') {
 	# Function call
-	return call_closure($x->thing, $x->subscripts(0)->indices);
+	return array_in_context(call_closure($x->thing,
+					     $x->subscripts(0)->indices),
+				$x->{ctx});
     }
     code("# Base for indexing\n");
     my $thing = $x->thing->val;
@@ -1890,7 +1860,8 @@ sub assign {
 	$itmp = $indexval
 	$lhs\[$itmp] = $rhs
 END
-	return $rhs;	# XXX: should return $lhs[$itmp] ?
+	# XXX: should return $lhs[$itmp]...
+	return scalar_in_context($rhs, $x->{ctx});
 
     } elsif ($lctx->is_tuple) {
 	my $itmp = gentmp $temptype{$type};
@@ -1900,6 +1871,7 @@ END
 	$lhs\[$itmp] = $rhs->[$i]
 END
 	}
+	return tuple_in_context($rhs, $x->{ctx});
 
     } elsif ($lctx->is_array) {
 	my $index = gentmp $temptype{$type};
@@ -1938,6 +1910,8 @@ $start2:
 $end2:
 	if $short < $long goto $start2
 END
+	unimp 'rvalue of assignment to slice' unless $x->{ctx}->type eq 'void';
+	return undef;
     } else {
 	unimp 'Assignment to multi-element slice: '.Dumper($lctx);
     }
@@ -1990,6 +1964,7 @@ sub P6C::debug_info::val {
     my $x = shift;
     my ($f, $l, $c, $txt) = @$x;
     code( qq{#line $l "$f"\n#@@@@ $txt\n}) if ($P6C::IMCC::curfunc);
+    return undef;
 }
 
 ######################################################################
@@ -2016,7 +1991,7 @@ END
 	push $x->{ctx}{rx_pos}
 END
     }
-    return $ret;
+    return scalar_in_context($ret, $x->{ctx});
 }
 
 1;

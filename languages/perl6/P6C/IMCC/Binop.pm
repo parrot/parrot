@@ -36,7 +36,6 @@ package P6C::IMCC::Binop;
 # XXX: exponentiation in a loop.  Will be replaced once IMCC allows more ops.
 sub do_pow {
     my $x = shift;
-    my $dest = newtmp;
     my $lv = $x->l->val;
     my $rv = $x->r->val;
     my $cnt = gentmp 'int';
@@ -47,12 +46,12 @@ sub do_pow {
        $ln = $lv
        $rn = $rv
        $dn = $ln ** $rn
-       $dest = $dn
 END
-    return $dest;
+    return primitive_in_context($dn, 'num', $x->{ctx});
 }
 
 # short-circuit logical '&&' operator
+# XXX: returns scalar undef when false in array context.  Bad.
 sub do_logand {
     my $x = shift;
     my $dest = newtmp 'PerlUndef';
@@ -120,16 +119,14 @@ sub do_concat {
     my $lt = gentmp 'str';
     my $rt = gentmp 'str';
     my $restmp = gentmp 'str';
-    my $res = newtmp;
     my $lval = $x->l->val;
     my $rval = $x->r->val;
     code(<<END);
 	$lt = $lval
 	$rt = $rval
 	$restmp = $lt . $rt
-	$res = $restmp
 END
-    return $res;
+    return primitive_in_context($restmp, 'str', $x->{ctx});
 }
 
 # 'x' operator.  Waiting for IMCC development, since it's just a
@@ -218,8 +215,9 @@ sub smartmatch_type {
 }
 
 sub sm_array_num {
-    my ($a, $n) = @_;
+    my ($a, $n, $ctx) = @_;
     $n->{ctx}->type('num');
+    $a->{ctx}->type('PerlArray');
     my $av = $a->val;
     my $nv = $n->val;
     my $ntmp = gentmp 'int';
@@ -229,11 +227,11 @@ sub sm_array_num {
 	$ntmp = $nv
 	$res = $av\[$ntmp]
 END
-    return $res;
+    return scalar_in_context($res, $ctx);
 }
 
 sub sm_hash_scalar {
-    my ($h, $k) = @_;
+    my ($h, $k, $ctx) = @_;
     $k->{ctx}->type('PerlUndef');
     my $hv = $h->val;
     my $kv = $k->val;
@@ -244,11 +242,11 @@ sub sm_hash_scalar {
 	$stmp = $kv
 	$res = $hv\[$stmp]
 END
-    return $res;
+    return scalar_in_context($res, $ctx);
 }
 
 sub sm_expr_num {
-    my ($e, $n) = @_;
+    my ($e, $n, $ctx) = @_;
     $n->{ctx}->type('num');
     $e->{ctx}->type('num');
     my $ev = $e->val;
@@ -265,11 +263,11 @@ sub sm_expr_num {
 	$res = 1
 $end:
 END
-    return $res;
+    return scalar_in_context($res, $ctx);
 }
 
 sub sm_expr_str {
-    my ($e, $s) = @_;
+    my ($e, $s, $ctx) = @_;
     $s->{ctx}->type('str');
     $e->{ctx}->type('str');
     my $ev = $e->val;
@@ -286,11 +284,11 @@ sub sm_expr_str {
 	$res = 1
 $end:
 END
-    return $res;
+    return scalar_in_context($res, $ctx);
 }
 
 sub sm_expr_pattern {
-    my ($e, $r) = @_;
+    my ($e, $r, $ctx) = @_;
     my $val = $e->val;
     my $begin = genlabel 'startre';
     my $adv = $r->{ctx}{rx_fail} = genlabel 'advance';
@@ -306,62 +304,63 @@ $adv:
 	rx_advance $str, $pos, $fail
 $begin:
 END
-     my $ret = $r->val;
+    my $ret = $r->val;
     code(<<END);
 $fail:
 END
-    return $ret;
+    return scalar_in_context($ret, $ctx);
 }
 
 sub sm_array_pattern {
-    my ($a, $r) = @_;
+    my ($a, $r, $ctx) = @_;
     unimp '@a =~ /regex/';
 }
 
 sub sm_hash_pattern {
-    my ($h, $r) = @_;
+    my ($h, $r, $ctx) = @_;
     unimp '%h =~ /regex/';
 }
 
 sub do_smartmatch {
-    my ($a, $b) = @_;
+    my ($a, $b, $ctx) = @_;
+    die unless $ctx;
     my $atype = smartmatch_type $a;
     my $btype = smartmatch_type $b;
     my $val;
     if ($atype eq 'PerlArray' && is_numeric($btype)) {
-	$val = sm_array_num($a, $b);
+	$val = sm_array_num($a, $b, $ctx);
     } elsif ($btype eq 'PerlArray' && is_numeric($atype)) {
-	$val = sm_array_num($b, $a);
+	$val = sm_array_num($b, $a, $ctx);
 
     } elsif ($atype eq 'PerlHash' && is_scalar($btype)) {
-	$val = sm_hash_scalar($a, $b);
+	$val = sm_hash_scalar($a, $b, $ctx);
     } elsif ($btype eq 'PerlHash' && is_scalar($atype)) {
-	$val = sm_hash_scalar($b, $a);
+	$val = sm_hash_scalar($b, $a, $ctx);
 
     } elsif ($atype eq 'PerlHash' && $btype eq 'pattern') {
-	$val = sm_hash_pattern($a, $b);
+	$val = sm_hash_pattern($a, $b, $ctx);
     } elsif ($btype eq 'PerlHash' && $atype eq 'pattern') {
-	$val = sm_hash_pattern($b, $a);
+	$val = sm_hash_pattern($b, $a, $ctx);
 
     } elsif ($atype eq 'PerlArray' && $btype eq 'pattern') {
-	$val = sm_array_pattern($a, $b);
+	$val = sm_array_pattern($a, $b, $ctx);
     } elsif ($btype eq 'PerlArray' && $atype eq 'pattern') {
-	$val = sm_array_pattern($b, $a);
+	$val = sm_array_pattern($b, $a, $ctx);
 
     } elsif ($btype eq 'pattern') {
-	$val = sm_expr_pattern($a, $b);
+	$val = sm_expr_pattern($a, $b, $ctx);
     } elsif ($atype eq 'pattern') {
-	$val = sm_expr_pattern($b, $a);
+	$val = sm_expr_pattern($b, $a, $ctx);
 
     } elsif (is_numeric($btype)) {
-	$val = sm_expr_num($a, $b);
+	$val = sm_expr_num($a, $b, $ctx);
     } elsif (is_numeric($atype)) {
-	$val = sm_expr_num($b, $a);
+	$val = sm_expr_num($b, $a, $ctx);
 
     } elsif (is_string($btype)) {
-	$val = sm_expr_str($a, $b);
+	$val = sm_expr_str($a, $b, $ctx);
     } elsif (is_string($atype)) {
-	$val = sm_expr_str($b, $a);
+	$val = sm_expr_str($b, $a, $ctx);
 
     } else {
 	error "Can't smartmatch $atype vs $btype";

@@ -5,6 +5,37 @@ that may inhabit regexen should define an C<rx_val> method that takes
 a single regex context hash-ref as an argument, and returns a
 backtracking label.
 
+The regex context contains at least the following:
+
+=over
+
+=item pos
+
+Register holding match offset.
+
+=item str
+
+Register holding object against which we're matching.
+
+=item succ
+
+Branch destination on success, or C<undef> for fallthrough.
+
+=item fail
+
+Branch destination on failure, or C<undef> for fallthrough.
+
+=item failatom, failgroup, failrule
+
+Branch destination for a failed atom, group, or rule, to be used by
+backtracking control ops (currently broken).
+
+=item failatom_depth, failgroup_depth, failrule_depth
+
+Number of marks pushed since the start of the current atom, group, or rule.
+
+=back
+
 =cut
 
 package P6C::IMCC::rule;
@@ -26,10 +57,9 @@ sub P6C::IMCC::rule::rx_val {
     my $x = shift;
     my $pos  = $x->{ctx}{rx_pos};
     my $thing = $x->{ctx}{rx_thing};
-    my $succ = genlabel 'endrule_yes';
     my $fail = $x->{ctx}{rx_fail} || genlabel 'endrule_no';
     my $ret = newtmp 'PerlUndef';
-    $x->pat->rx_val({ succ => $succ,
+    $x->pat->rx_val({ succ => undef,
 		      fail => $fail,
 		      failgroup => $fail,
 		      failgroup_depth => 0,
@@ -39,8 +69,7 @@ sub P6C::IMCC::rule::rx_val {
 		      failatom_depth => 0,
 		      pos => $pos,
 		      str => $thing });
-    code(<<END);
-$succ:
+    code(<<END); # Success
 	$ret = 1
 END
     code(<<END) unless $x->{ctx}{rx_fail};
@@ -512,7 +541,7 @@ sub P6C::rx_meta::rx_val {
 	rx_advance $ctx->{str}, $ctx->{pos}, $ctx->{fail}
 END
 
-    } elsif ($x->name =~ /^(.)$/) {
+    } elsif (length $x->name == 1) {
 	my %rx_not = (N => ord("\n"), T => ord("\t"),
 		      R => ord("\r"), F => ord("\f"),
 		      E => 27);
@@ -522,7 +551,7 @@ END
 			 b rx_zwa_boundary);
 	if (exists $rx_not{$1}) {
 	    # XXX: doesn't handle "\r\n".
-	    rx_not($ctx, sub { rx_char(@_, $rx_not{$1}) });
+	    rx_not($ctx, sub { rx_char($ctx, $rx_not{$1}) });
 
 	} elsif (exists $meta_op{$1}) {
 	    code(<<END);
@@ -532,14 +561,17 @@ END
 	    unimp "Regex escape sequence $1" unless exists $meta_op{$1};
 	}
 
-    } elsif ($x->name =~ /^X([\da-fA-F]+)/) {
-	rx_not($ctx, sub { rx_char(@_, hex $1) });
+    } elsif ($x->name =~ /^X\{?([\da-fA-F0-9]+)/) {
+	rx_not($ctx, sub { rx_char($ctx, hex $1) });
 	
-    } elsif ($x->name =~ /^x([\da-fA-F]+)/) {
+    } elsif ($x->name =~ /^x\{?([\da-fA-F0-9]+)/) {
 	rx_char($ctx, hex $1);
 	
+    } elsif ($x->name =~ /^0([0-7]+)/) {
+	rx_char($ctx, oct $1);
+	
     } else {
-	unimp "Regex meta-sequence `".$x->name."'";
+	unimp "Regex meta-sequence `\\".$x->name."'";
     }
     maybe_fallthrough($ctx->{succ});
     return $ctx->{fail};
@@ -608,6 +640,11 @@ END
 $ctx->{succ}:
 END
     return $bt;
+}
+
+sub P6C::rx_charclass::rx_val {
+    my ($x, $ctx) = @_;
+    unimp 'Complex or named character class.';
 }
 
 sub P6C::rx_oneof::rx_val {

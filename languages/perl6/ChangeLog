@@ -207,3 +207,20 @@
 
 	* Fixes:
 	    - no-arg subs were failing with '()'.
+
+2002-08-24
+	
+	* Additions:
+	    - substr() and length() (Leo).
+	    - examples: life, mandel, life-ar (Leo).
+	    - examples/qsort.p6
+	    - $::RD_NO_HITEM and $::RD_NO_TRACE on by default
+
+	* Fixes:
+	    - make sure keywords don't match prefixes of sub names.
+	    - better handling of returns to various contexts using
+	      standard functions (TYPE_in_context()).
+	    - tidied up examples.
+	
+	* Test-failures:
+	    - none.  That's right.  None (on Linux/PPC, w/imcc patch).

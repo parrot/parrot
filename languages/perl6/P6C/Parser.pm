@@ -214,7 +214,8 @@ $grammar = <<'ENDSUPPORT';
     use vars qw(%KEYWORDS %CLASSES %WANT);
     use vars qw($NAMEPART $COMPARE $CONTEXT $MULDIV $PREFIX $ADDSUB $INCR
 		$LOG_OR $LOGOR $FILETEST $ASSIGN $HYPE $MATCH $BITSHIFT
-		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS $RXODELIM);
+		$SOB $FLUSH $NUMPART $RXATOM $RXMETA $RXCHARCLASS $RXODELIM
+		$RXESCAPED $HEXCHAR $RXASSERTION);
     use vars '%CDELIM';
 
 # Things from P6C::* used during the parse:
@@ -230,7 +231,7 @@ BEGIN {
     $SOB	= qr|$Parse::RecDescent::skip(?<![^\n\s]){|o;
     $HYPE	= qr/\^?/;
     $NAMEPART	= qr/[a-zA-Z_][\w_]*/;
-    $COMPARE	= qr{cmp|eq|[gnl]e|[gl]t|<=>|[<>=!]=|<|>};
+    $COMPARE	= qr{(?:cmp|eq|[gnl]e|[gl]t)\b|<=>|[<>=!]=|<|>};
     $CONTEXT	= qr{[\%\@\$\&*_?]|\+(?!\+)};
     $MULDIV	= qr{[\%*x]|/(?!/)};
     $MATCH	= qr{[=!]~};
@@ -238,17 +239,19 @@ BEGIN {
     $PREFIX	= qr{[!~\\]|-(?![->])};
     $ADDSUB	= qr{[-+_]};
     $BITSHIFT	= qr{<<|>>};
-    $LOG_OR	= qr{x?or|err};
+    $LOG_OR	= qr{(?:x?or|err)\b};
     $LOGOR	= qr{\|\||~~|//};
-    $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+};
+    $FILETEST	= qr{-[rwxoRWXOezsfdlpSbctugkTBMAC]+\b};
     $ASSIGN	= qr{(?:!|:|//|&&?|\|\|?|~~?|<<|>>|$ADDSUB|$MULDIV|\*\*)?=};
     # Used for flushing syntax errors
     $FLUSH	= qr/\w+|[^\s\w;}#'"]+/;
     $NUMPART	= qr/(?!_)[\d_]+(?<!_)/;
-    $RXMETA	= qr/\./;
-    $RXATOM	= qr/(?:[\w_=]|\\.)+/;
-    $RXCHARCLASS= qr/-?\[(?:[^\]\\]|\\.)+\]/;
-    $RXODELIM	= qr/./;
+    $HEXCHAR	= qr/[a-fA-F0-9]{2,4}/;
+    $RXESCAPED	= qr/\\(?:[Xx]$HEXCHAR|0[0-7]{1,3}|[Xx]\{$HEXCHAR\}|[Pp]\{\w+\})/o;
+    $RXASSERTION= qr/:{1,3}|\^{1,2}|\${1,2}/;
+    $RXATOM	= qr/(?:[\w_]|\\.)+/;
+    $RXCHARCLASS= qr/\[(?:[^\]\\]|\\.)+\]/;
+    $RXODELIM	= qr/[\[{(<\/!?=>)}\]#]|\s+\S/;
 }
 
 # HACK to distinguish between "my ($a, $b) ..." and "foo ($a, $b)".
@@ -261,7 +264,8 @@ BEGIN {
 
 # Matching delimiters:
 BEGIN {
-    %CDELIM = qw|( ) { } [ ] < >|;
+    %CDELIM = qw|( )  { }  [ ]  < >
+		 ) (  } {  ] [  > <|;
 }
 
 # (see Parse::RecDescent::Consumer)
@@ -536,7 +540,7 @@ adverb:		  comma adv_clause(?)
 adv_clause:	  /:(?!:)/ comma['scalar_expr']
 
 log_AND:	  <leftop: adverb log_AND_op adverb>
-log_AND_op:	  /${HYPE}and/o
+log_AND_op:	  /${HYPE}and\b/o
 
 log_OR:		  <leftop: log_AND log_OR_op log_AND>
 # log_OR_op:	  'or' | 'xor' | 'err'
@@ -633,13 +637,13 @@ stmt_sep:	  ';'
 
 stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| directive <commit> name comma(?)
-		| 'method' <commit> name params props['is'] block
-		| 'loop' <commit>
+		| /method\b/ <commit> name params props['is'] block
+		| /loop\b/ <commit>
 			'(' comma(?)
 			';' comma(?)
 			';' comma(?) ')'
 			block
-		| scope(?) /sub|rule/ <commit> name params
+		| scope(?) /(?:sub|rule)\b/ <commit> name params
 			{ add_function(@item[4,5], $thisparser);1 }
 			props['is']
 		(';' | <matchrule:@{[$arg[0] eq 'sub'?'block':'rule']}>)[$item[2]]
@@ -648,9 +652,9 @@ stmt:		  label /:(?!:)/ { mark_end('label', $text);1 } ''
 		| expr guard(?)
 		| ...';'
 
-directive:	  /package|module|use/
+directive:	  /(?:package|module|use)\b/
 guard:		  { check_end('block', $text) ? undef : 1 } _guard
-_guard:		  /if|unless|while|until/ <commit> scalar_expr
+_guard:		  /(?:if|unless|while|until)\b/ <commit> scalar_expr
 		| 'for' expr
 
 maybe_label:	  label(?)
@@ -696,12 +700,14 @@ no_args:	  ...!'('
 ##############################
 # Regexes:
 
-rule:	 	  rx_mod(?) start_block rx_alt '}'
+rule:	 	  rx_mod(s?) start_block rx_alt '}'
 			{ mark_end('block', $text);1; } ''
 
 pattern:	  <rulevar:$cdelim>
-pattern:	  /m|qr/ <commit> rx_mod(?) /$RXODELIM/o rx_alt
-			{ $cdelim = $CDELIM{$item[-2]} || $item[-2] } "$cdelim"
+pattern:	  /m|qr/ <commit> rx_mod(s?) <skip:''> /$RXODELIM/o
+			<skip:$item[-2]> rx_alt
+			{ $item[-2] =~ s/^\s*//;
+			  $cdelim = $CDELIM{$item[-2]} || $item[-2] } "$cdelim"
 		| '/' rx_alt '/'
 
 rx_alt:		  <leftop: rx_seq '|' rx_seq>
@@ -711,7 +717,7 @@ rx_seq:		  rx_maybe_hypo(s?)
 rx_maybe_hypo:	  scalar_var    ':=' <commit> rx_element
 		| nonscalar_var ':=' <commit> '[' rx_alt ']' rx_repeat(?)
 		| rx_element
-		| /:{1,3}|\^|\$/
+		| /$RXASSERTION/o
 
 rx_element:	  ...'{' <commit> block
 		| rx_atom rx_repeat(?)
@@ -720,11 +726,12 @@ rx_atom:	  '(' <commit> rx_alt ')'
 		| '[' <commit> rx_alt ']'
 		| ...':' <commit> rx_mod
 		| '<' <commit> /!?/ rx_assertion '>'
-		| /$RXMETA/o
+		| '.'
+		| /$RXESCAPED/o
 		| variable
 		| /$RXATOM/o
 
-rx_mod:		  <skip:''> /:\S+/ <skip:$item[1]> ( '(' maybe_comma ')' )(?)
+rx_mod:		  /:[\w_]+/ ( '(' maybe_comma ')' )(?)
 
 rx_repeat:	  _rx_repeat /\??/
 
@@ -736,16 +743,21 @@ _rx_repspec:	  scalar_var <commit> ',' scalar_var
 		| /\d+/
 
 rx_assertion:	  variable
-		| '(' expr ')'
-		| '{' expr '}'
-		| /$RXCHARCLASS/o
-		| '-' '<' rx_assertion '>'
-		| /'(?:[^']|\\.)*'/
 		| '.'
+		| /~?'(?:[^']|\\.)*'/
+		| '(' <commit> expr ')'
+		| '{' <commit> expr '}'
 		| rx_call
+		| rx_charclass
+
+rx_charclass:	  <leftop: rx_cc_neg /[+\-]/ rx_cc_neg>
+rx_cc_neg:	  /-?/ rx_cc_atom
+rx_cc_atom:	  /$RXCHARCLASS/o
+		| '<' rx_assertion '>'
+		| namepart
 
 rx_call:	  rx_rulename '(' <commit> maybe_comma ')'
-		| rx_rulename ':' <commit> /(?:[^>]|\\>)*/
+		| rx_rulename ':' <commit> /(?:[^>]|\\.)*/
 		| rx_rulename rx_alt(?)
 
 rx_rulename:	  name

@@ -66,12 +66,12 @@ sub usage($) {
     		     .p6 source file
 
     Parse::RecDescent control:
-    --trace          set $::RD_TRACE
-    --no-hitem       don't keep track of %item hash
-    --no-trace       don't insert tracing code
-    (only useful when constructing parser)
-    --force-grammar  Rebuild grammar even if it exists.
+    --trace          set $::RD_TRACE (or construct trace-enabled parser)
     --grammar NAME   use precompiled grammar NAME (default = Perl6grammar)
+
+        only useful when constructing parser:
+    --hitem          keep track of %item hash
+    --force-grammar  Rebuild grammar even if it exists.
 
     Misc:
     --add-main       suround code by the main() function
@@ -118,7 +118,7 @@ use vars '%o';
 Getopt::Long::Configure(qw(bundling));
 GetOptions(\%o,qw{
     test-parser
-    trace no-trace no-hitem tree raw-tree
+    trace hitem tree raw-tree
     add-main rule=s grammar=s force-grammar
     debug
     debug-info|g
@@ -136,8 +136,8 @@ GetOptions(\%o,qw{
 usage(\*STDOUT) if ($o{help});
 
 $::RD_TRACE = $o{trace};
-$::RD_NO_HITEM = $o{"no-hitem"};
-$::RD_NO_TRACE = $o{"no-trace"};
+$::RD_NO_HITEM = !$o{hitem};
+$::RD_NO_TRACE = !$o{trace};
 $::rule = $o{rule} || 'prog';
 $o{grammar} ||= 'Perl6grammar';
 $o{'parrot-options'} ||= '';

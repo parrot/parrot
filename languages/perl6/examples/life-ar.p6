@@ -21,13 +21,9 @@ sub Generate(@input, @output) {
     #my str $birth = "   *     ";
     #my str $death = "  **     ";
     my @death = (0,0,1,1,0,0,0,0,0);
-    # string output = input;
-    # ^= unimp
-    #for $i (0 .. $len) {
-    loop ($i = 0; $i < $len; $i++) {
-	@output[$i] = @input[$i];
-    }
-    #for $cell (0..$len) {
+
+    @output = @input;
+
     loop ($cell = 0; $cell < $len; $cell++) {
 	$neighbours = 0;
 	$i = $cell + $len;
@@ -51,10 +47,8 @@ sub Generate(@input, @output) {
 
 sub Print(@world) {
     my ($i, $j);
-    # for $i (0 .. 15) => imcc error releated to closure?
-    loop ($i = 0; $i < 16; $i++) {
-	# same here ?
-	loop ($j = 0; $j < 16; $j++) {
+    for 0..15 -> $i {
+	for 0..15 -> $j {
 	    print( @world[$i * 16 + $j] ?? '*' :: ' ');
 	}
 	print "\n" ;
@@ -83,20 +77,14 @@ sub main() {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     );
 
-    my ($i, $j);
-    my (@new);
-    my $gen = 518;
-    # for $j (0 .. 499) => imcc error releated to closure?
-    print "Running " , $gen , " generations\n";
+    my ($i, $j, @new);
+    my $gen = @ARGS[0] || 512;
+    print "Running ", $gen, " generations\n";
     Print(@world);
     my $ts = time;
     loop( $j= 0 ; $j < $gen; $j++) {
 	Generate(@world, @new);
-	# @world ^= @new; unimp
-	loop ($i = 0; $i<256; $i++) {
-	    @world[$i] = @new[$i];
-	}
-
+	@world = @new;
     }
     Print(@world);
 }

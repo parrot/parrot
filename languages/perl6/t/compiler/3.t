@@ -98,20 +98,20 @@ sub foo {
 sub main() {
     my @a = 1..4;
     my $b = 23;
-    my @c = (@a[0], $b, @a);
+    my @c = (@a[0], -$b, @a);
     my @d = @a;
     foo @a;
-    foo @a[0], @a[2], $b;
+    foo @a[0], @a[2], -$b;
     foo @a[1..3];
-    foo $b, @a;
+    foo -$b, @a;
     foo @c;
     foo @d;
 }
 CODE
 1 3
-1 23
+1 -23
 2 4
-23 2
+-23 2
 1 1
 1 3
 OUT
