@@ -130,6 +130,10 @@ sub generate_functions {
 	$pbc_generator->( $assembly, $directory, $count );
 	if (($imcc = $ENV{IMCC})) {
 	    my $as_f = per_test('.pasm',$count);
+
+	    if ($as_f =~ /native_pbc/) {
+		$as_f = per_test('.pbc',$count);
+	    }
 	    _run_command( "$imcc ${TEST_PROG_ARGS} $as_f",
 	    'STDOUT' => $out_f, 'STDERR' => $out_f);
 	}
