@@ -58,6 +58,26 @@ mmd_fallback_add_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 /*
 
 =item C<void
+mmd_fallback_add_int(Parrot_Interp interp, PMC *left, INTVAL right, PMC *dest)>
+
+Gets number from C<left> add to C<right>, and save the result in
+C<dest>.
+
+=cut
+
+*/
+
+static void
+mmd_fallback_add_int(Parrot_Interp interp, PMC *left, INTVAL right, PMC *dest)
+{
+    FLOATVAL result = (VTABLE_get_number(interp, left) +
+                       right);
+    VTABLE_set_number_native(interp, dest, result);
+}
+
+/*
+
+=item C<void
 mmd_fallback_subtract_pmc(Parrot_Interp interp,
         PMC *left, PMC *right, PMC *dest)>
 
@@ -576,6 +596,7 @@ register_fallback_methods(Parrot_Interp interp) {
        the table doesn't have to keep being re-malloc'd */
     mmd_add_function(interp, MMD_SXOR, (funcptr_t)mmd_fallback_stringxor_pmc);
     mmd_add_function(interp, MMD_ADD, (funcptr_t)mmd_fallback_add_pmc);
+    mmd_add_function(interp, MMD_ADD_INT, (funcptr_t)mmd_fallback_add_int);
     mmd_add_function(interp, MMD_SUBTRACT,
             (funcptr_t)mmd_fallback_subtract_pmc);
     mmd_add_function(interp, MMD_MULTIPLY,

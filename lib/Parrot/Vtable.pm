@@ -105,7 +105,7 @@ sub vtbl_defs {
     my $entry;
 
     for $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_(BXOR|ADD|SUBTRACT|MULTIPLY|DIVIDE|MOD|CMOD|SXOR|BSR|BSL|SOR|SAND|BAND|BOR|CONCAT|LOR|LAND|LXOR|REPEAT)/);	# XXX test one only first
+	next if ($entry->[4] =~ /MMD_/);
         my $args = join(", ", 'Interp* interpreter', 'PMC* pmc', split(/\s*,\s*/, $entry->[2]));
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
     }
@@ -148,7 +148,7 @@ struct _vtable {
 
 EOF
     for $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_(BXOR|ADD|SUBTRACT|MULTIPLY|DIVIDE|MOD|CMOD|SXOR|BSR|BSL|SOR|SAND|BAND|BOR|CONCAT|LOR|LAND|LXOR|REPEAT)/);	# XXX test one only first
+	next if ($entry->[4] =~ /MMD_/);
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
 
@@ -176,7 +176,7 @@ sub vtbl_macros {
 
 EOM
     for my $entry (@{$vtable}) {
-	next if ($entry->[4] =~ /MMD_(BXOR|ADD|SUBTRACT|MULTIPLY|DIVIDE|MOD|CMOD|SXOR|BSR|BSL|SOR|SAND|BAND|BOR|CONCAT|LOR|LAND|LXOR|REPEAT)/);	# XXX test one only first
+	next if ($entry->[4] =~ /MMD_/);
 	my @args = split /,\s*/, $entry->[2];
 	unshift @args, "i interp", "p pmc";
 	my $args = join ', ', map { (split / /, $args[$_])[1] } (0..$#args);

@@ -61,6 +61,12 @@ we can relax that a bit.
 #define VTABLE_logical_and(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_LAND)
 #define VTABLE_logical_xor(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_LXOR)
 #define VTABLE_repeat(i,l,r,d) mmd_dispatch_v_ppp(i,l,r,d,MMD_REPEAT)
+#define VTABLE_cmp(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_CMP)
+#define VTABLE_cmp_num(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_NUMCMP)
+#define VTABLE_cmp_string(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_STRCMP)
+#define VTABLE_is_equal(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_EQ)
+#define VTABLE_is_equal_num(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_NUMEQ)
+#define VTABLE_is_equal_str(i,l,r) mmd_dispatch_i_pp(i,l,r,MMD_STREQ)
 pmclass SharedRef does ref need_ext is_shared extends Ref {
 
 

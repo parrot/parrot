@@ -532,7 +532,7 @@ sub init_func() {
         else {
             $meth_name = "Parrot_default_$meth";
         }
-        unless ($method->{mmd} =~ /MMD_(BXOR|ADD|SUBTRACT|MULTIPLY|DIVIDE|MOD|CMOD|SXOR|BSR|BSL|SOR|SAND|BAND|BOR|CONCAT|LOR|LAND|LXOR|REPEAT)/) {
+        unless ($method->{mmd} =~ /MMD_/) {
             push @meths, $meth_name;  # for now push even MMDs
             # except BXOR for testing
         }
