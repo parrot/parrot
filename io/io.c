@@ -584,6 +584,9 @@ PIO_eof(theINTERP, ParrotIO *io)
 }
 
 
+/* Don't use this on a standard Parrot string, unless you
+ * have null terminated it.
+ */
 INTVAL
 PIO_puts(theINTERP, ParrotIO *io, const char *s)
 {
