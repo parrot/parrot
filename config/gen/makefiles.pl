@@ -75,6 +75,8 @@ sub makefiles {
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/tcl.in',       'languages/tcl/Makefile',
           commentType => '#', replace_slashes => 1);
+  genfile('config/gen/makefiles/tcl_examples.in', 'languages/tcl/examples/Makefile',
+          commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynclasses.in',   'dynclasses/Makefile',
           commentType => '#', replace_slashes => 1);
   genfile('config/gen/makefiles/dynoplibs.in',   'dynoplibs/Makefile',

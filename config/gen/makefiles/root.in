@@ -97,7 +97,8 @@ GEN_MAKEFILES = \
     languages/m4/Makefile \
     languages/perl6/Makefile \
     languages/urm/Makefile \
-    languages/tcl/Makefile
+    languages/tcl/Makefile \
+    languages/tcl/examples/Makefile
 
 GEN_CONFIGS = \
     include/parrot/config.h \
