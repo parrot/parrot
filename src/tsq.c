@@ -122,7 +122,6 @@ nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
             queue->tail = entry;
     }
     entry->next = cur;
-    queue_signal(queue);
 }
 
 void
@@ -130,6 +129,7 @@ insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 {
     queue_lock(queue);
     nosync_insert_entry(queue, entry);
+    queue_signal(queue);
     queue_unlock(queue);
 }
 

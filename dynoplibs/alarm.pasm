@@ -3,7 +3,7 @@
 
     loadlib P1, "myops_ops"
     find_global P0, "_alarm"
-    alarm 3.5, P0
+    alarm 2.0, P0
     set I0, 1
 loop:
     sleep 1
@@ -11,7 +11,7 @@ loop:
     print "\n"
     inc I0
     # check_events
-    le I0, 5, loop
+    le I0, 3, loop
     print "done.\n"
     end
 .pcc_sub _alarm:

@@ -58,7 +58,7 @@ Parrot_init_signals(void)
      */
 #ifdef SIGFPE
     /*
-     * SIGFPE is architecture specific - some singal an error
+     * SIGFPE is architecture specific - some signal an error
      * some don't, so we have to use direct checks if we are dividing
      * by zero
      */
@@ -228,7 +228,7 @@ event_thread(void *data)
         }
         else {
             /* we shouldn't get here probably */
-            internal_exception(1, "Spurious event is event queue");
+            internal_exception(1, "Spurious event in event queue");
         }
         /*
          * one or more entries arrived - we hold the mutex again
@@ -327,7 +327,8 @@ Parrot_do_handle_events(Parrot_Interp interpreter, int restore, void *next)
                 break;
             case EVENT_TYPE_TIMER:
                 /* run ops, save registers */
-                Parrot_runops_fromc_save(interpreter, event->u.timer_event.sub);
+                Parrot_runops_fromc_save(interpreter,
+                        event->u.timer_event.sub);
                 break;
             default:
                 fprintf(stderr, "Unhandled event type %d\n", event->type);

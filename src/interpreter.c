@@ -1503,6 +1503,9 @@ disable_event_checking(Parrot_Interp interpreter)
 /*
  * replace func table with one that does event checking for all
  * opcodes
+ * NOTE: enable_event_checking is called async by the event handler
+ *       thread. All action done from here has to be async safe.
+ *
  * XXX plain core only
  */
 void
