@@ -2,13 +2,18 @@
 
 use strict;
 use Getopt::Long;
+use File::Basename;
 
 use vars qw($VERSION);
 
 require 5.005;
 
-$VERSION = sprintf "%d.%d", q$Revision$ =~ /(\d+)/g; # jhi@iki.fi
+$VERSION = sprintf "%d.%d", q$Revision$ =~ /(\d+)/g; # jhi@iki.fi;
 
+my $ME = basename($0);
+my $RCS_DATE = q$Date$;
+
+my $nm_cmd = 'nm';
 my $nm_opt = '';
 my $nm_try = qx(nm -V 2>&1);
 my $nm_gnu;
@@ -16,39 +21,38 @@ my $nm_ro; # can tell apart read-only (const) data sections
 
 my ($Code, $Data, $Init, $Uninit, $Const, $Mutable,
     $Global, $Local, $Undef, $Def, $File,
-    $FileName, $Type, $LongType, $Help, $Version);
+    $ObjectName, $Type, $LongType, $Help, $Version);
 
-sub help {
+sub show_version {
+    print "$ME: $VERSION ( $RCS_DATE)\n";
+}
+
+sub show_help {
 print <<__EOF__;
-$0: Usage: $0 [options] [ foo.o ... | bar.a | other_library_format ]
-Portable frontend for nm(1); by default lists the code and data symbols
-of the object or archive files.
-Options:
---code		only code/text symbols (Tt)
---data		only data symbols (Dd, Bb)
---init		only initialised data symbols (Dd)
---uninit	only uninitialised data symbols (Bb)
---const		only const (read-only) data symbols (Rr) [1]
---mutable	only modifiable (read-write) data symbols (Dd, Bb) [1]
---undef		only undefined symbols (Uu)
---def		only defined symbols (not Uu)
---file		only file(name) symbols (Ff)
-
+$ME: Usage: $ME [options] [ foo.o ... | bar.a | other_library_format ]
+Portable frontend for nm(1); by default lists all the code and data symbols
+in the object or archive files.  The options can be used to limit the symbols:
+--code		code/text symbols (Tt)
+--data		data symbols (Dd, Bb)
+--init		initialised data symbols (Dd)
+--uninit	uninitialised data symbols (Bb)
+--const		const (read-only) data symbols (Rr) [1]
+--undef		undefined symbols (Uu)
+--def		defined symbols (not Uu)
+--file		file(name) symbols (Ff)
 If more than one of all the above options are given, they are ANDed.
 They can also be negated with a "no", for example --noconst.
 [1] Not all platforms support this, a warning will be given if not.
-
---filename	prepend the object filename before the symbol name
+    You can try GNU nm if you want this feature.
+--objectname	prepend the object name before the symbol name
 --t		append the short BSD-style type (in parentheses above)
---type=long	append a long type (e.g. "global_const_init_data" cf. "R")
---type=terse	same as --t
+--type=bsd	same as --t
+--type=long	append a long type (e.g. "global_const_init_data" versus "R")
 --help		show this help
 --version	show version
-
 All the options can be shortened to their unique prefixes,
 and one leading dash ("-") can be used instead of two ("--").
 __EOF__
-    exit(1);
 }
 
 if ($^O eq 'solaris'      && $nm_try =~ /Solaris/) {
@@ -73,65 +77,72 @@ if ($^O eq 'solaris'      && $nm_try =~ /Solaris/) {
     # Hope for BSD-style nm output.
 }
 
-help()
-    unless
-      GetOptions('code!'      => \$Code,
-                 'data!'      => \$Data,
-                 'init!'      => \$Init,
-                 'uninit!'    => \$Uninit,
-                 'const!'     => \$Const,
-                 'mutable!'   => \$Mutable,
-                 'global!'    => \$Global,
-                 'local!'     => \$Local,
-                 'undef!'     => \$Undef,
-                 'def!'       => \$Def,
-                 'file!'      => \$File,
-                 'filename'   => \$FileName,
-                 't'          => \$Type,
-                 'type:s'     => \$Type,
-                 'help'       => \$Help,
-                 'version'    => \$Version,
-                 );
-
-if ($Const && !$nm_ro) {
-    warn "$0: the native nm cannot tell apart const data sections\n";
+unless (GetOptions('code!'      => \$Code,
+		   'data!'      => \$Data,
+		   'init!'      => \$Init,
+		   'uninit!'    => \$Uninit,
+		   'const!'     => \$Const,
+		   'global!'    => \$Global,
+		   'local!'     => \$Local,
+		   'undef!'     => \$Undef,
+		   'def!'       => \$Def,
+		   'file!'      => \$File,
+		   'objectname' => \$ObjectName,
+		   't'          => \$Type,
+		   'type:s'     => \$Type,
+		   'help'       => \$Help,
+		   'version'    => \$Version,
+		  )) {
+    show_help();
+    exit(1);
 }
 
-help() if $Help;
+if ($Const && !$nm_ro) {
+    warn "$ME: the native nm cannot tell apart const data sections\n";
+}
 
 if ($Version) {
-    print "$0: $VERSION\n";
+    show_version();
     exit(0);
 }
 
-sub warnboth {
+if ($Help) {
+    show_help();
+    exit(0);
+}
+
+unless (@ARGV) {
+    show_help();
+    exit(1);
+}
+
+sub warn_if_both {
     my ($a, $b, $sa, $sb) = @_;
     if (defined $a && defined $b && $a == $b) {
-	warn "$0: both --$sa and --$sb used\n";
+	warn "$ME: both --$sa and --$sb used\n";
     }
 }
 
-warnboth($Code,   $Data,    'code',   'data' );
-warnboth($Global, $Local,   'global', 'local');
-warnboth($Init,   $Uninit,  'init',   'uninit');
-warnboth($Const,  $Mutable, 'const',  'mutable');
-warnboth($Def,    $Undef,   'def',    'undef');
+warn_if_both($Code,   $Data,    'code',   'data' );
+warn_if_both($Global, $Local,   'global', 'local');
+warn_if_both($Init,   $Uninit,  'init',   'uninit');
+warn_if_both($Def,    $Undef,   'def',    'undef');
 
-$Const ||= !$Mutable if defined $Mutable && !defined $Const;
-$Undef ||= !$Def     if defined $Def     && !defined $Undef;
-my %Type; @Type{qw(terse long)} = ();
-$Type = 'terse' if $Type eq '1'; # So they used --t.
-die "$0: --type=$Type unknown\n"
+$Undef ||= !$Def if defined $Def && !defined $Undef;
+
+my %Type; @Type{qw(bsd long)} = ();
+$Type = 'bsd' if defined $Type && $Type eq '1'; # So they used --t.
+die "$ME: --type=$Type unknown\n"
     if defined $Type && $Type ne '' && !exists $Type{$Type};
 
 my $TypeLong = defined $Type && $Type eq 'long';
 
 for my $f (@ARGV) {
     unless (-f $f) {
-	warn "$0: No such file: $f\n";
+	warn "$ME: No such file: $f\n";
 	next;
     }
-    if (open(NM, "nm $nm_opt $f |")) {
+    if (open(NM, "$nm_cmd $nm_opt $f |")) {
 	my $o = "?";
 	$o = $f if $f =~ /\.o$/;
 	my $file;
@@ -142,6 +153,7 @@ for my $f (@ARGV) {
 	    } elsif (/ ([A-Za-z]) \.?(\w+)$/) {
 		# Especially text symbols are sometimes prefixed by a ".".
 		my ($type, $name) = ($1, $2);
+		# The following are assumed to work Everywhere.
 		my $absolute = ($type =~ /^[Aa]$/  ) ? 1 : 0;
 		my $uninit   = ($type =~ /^[BbCc]$/) ? 1 : 0;
 		my $init     = ($type =~ /^[DdGg]$/) ? 1 : 0;
@@ -194,10 +206,10 @@ for my $f (@ARGV) {
 			}
 		    }
 		}
-		my $data = $uninit || $init;
+		my $data = ($uninit || $init) && !$code;
 		my $global = !$local;
 		my $show = 1;
-		sub wantshow {
+		sub want_show {
 		    my ($show, $Got, $got) = @_;
 		    if (defined $Got) {
 			if ($Got == $got) {
@@ -207,17 +219,17 @@ for my $f (@ARGV) {
 			}
 		    }
 		}
-		wantshow(\$show, $Code,   $code  ) if $show;
-		wantshow(\$show, $Data,   $data  ) if $show;
-		wantshow(\$show, $Init,   $init  ) if $show;
-		wantshow(\$show, $Uninit, $uninit) if $show;
-		wantshow(\$show, $Const,  $const ) if $show;
-		wantshow(\$show, $Global, $global) if $show;
-		wantshow(\$show, $Local,  $local ) if $show;
-		wantshow(\$show, $Undef,  $undef ) if $show;
-		wantshow(\$show, $File,   $file  ) if $show;
+		want_show(\$show, $Code,   $code  ) if $show;
+		want_show(\$show, $Data,   $data  ) if $show;
+		want_show(\$show, $Init,   $init  ) if $show;
+		want_show(\$show, $Uninit, $uninit) if $show;
+		want_show(\$show, $Const,  $const ) if $show;
+		want_show(\$show, $Global, $global) if $show;
+		want_show(\$show, $Local,  $local ) if $show;
+		want_show(\$show, $Undef,  $undef ) if $show;
+		want_show(\$show, $File,   $file  ) if $show;
 		if ($show) {
-		    $show = $FileName ? "$o\t$name" : $name;
+		    $show = $ObjectName ? "$o\t$name" : $name;
 		    if (defined $Type) {
 			$show .= "\t";
 			my $symbol;
@@ -253,7 +265,7 @@ for my $f (@ARGV) {
 	}
 	close(NM);
     } else {
-	warn "$0: 'nm $nm_opt $f' failed: $!\n";
+	warn "$ME: '$nm_cmd $nm_opt $f' failed: $!\n";
     }
 }
 
