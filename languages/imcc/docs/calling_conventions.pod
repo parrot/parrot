@@ -113,7 +113,7 @@ branch from the B<ret> statement back is ignored in the CFG.
   .result r
   .pcc_end
 
-  .pcc_sub _sub_label   # prototyped|non_prototyped
+  .pcc_sub _sub_label [prototyped|non_prototyped]
    .param int a # I5
    .param int b # I6
    .param int c # I7
@@ -128,10 +128,10 @@ Notes:
 
 =over 4
 
-=item * B<prototyped>, B<pnon_rototyped>
+=item * B<prototyped>, B<non_rototyped>
 
-Specifying these in the B<subroutine> is unimplemented.
-This must currently be empty.
+If a subroutine doesn't have any prototyped specifier, code gets
+emitted to receieve parameters by both flavors.
 
 =item * B<newsub>
 

@@ -7,34 +7,6 @@
  *
  */
 
-void
-expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
-{
-    SymReg *arg, *sub;
-    int next[4], i, j, n;
-    char types[] = "INSP";
-
-    UNUSED(interpreter);
-    for (i = 0; i < 4; i++)
-        next[i] = 5;
-    sub = ins->r[1];
-    /* insert params */
-    n = sub->pcc_sub->nargs;
-    for (i = 0; i < n; i++) {
-        arg = sub->pcc_sub->args[i];
-        for (j = 0; j < 4; j++) {
-            if (arg->set == types[j]) {
-                if (arg->color == next[j]) {
-                    next[j]++;
-                    break;
-                }
-                arg->reg->color = next[j]++;
-                break;
-            }
-        }
-    }
-}
-
 static Instruction *
 insINS(struct Parrot_Interp *interpreter, Instruction *ins,
         char *name, char *fmt, SymReg **regs, int n, int keys)
@@ -42,6 +14,76 @@ insINS(struct Parrot_Interp *interpreter, Instruction *ins,
     Instruction *tmp = INS(interpreter, name, fmt, regs, n, keys, 0);
     insert_ins(ins, tmp);
     return tmp;
+}
+
+void
+expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins)
+{
+    SymReg *arg, *sub;
+    int next[4], i, j, n;
+    char types[] = "INSP";
+    int proto, ps, pe;
+    Instruction *tmp;
+    SymReg *p3, *i0, *regs[IMCC_MAX_REGS], *label1;
+    char buf[128];
+
+    sub = ins->r[1];
+    p3 = NULL;
+    ps = pe = sub->pcc_sub->prototyped;
+    if (ps == -1) {
+	ps = 0; pe = 1;
+	/* subroutine can handle both */
+	i0 = mk_pasm_reg(str_dup("I0"));
+	regs[0] = i0;
+	sprintf(buf, "#sub_%s_p1", sub->name);
+	regs[1] = label1 = mk_address(str_dup(buf), U_add_uniq_label);
+	ins = insINS(interpreter, ins, "if", NULL, regs, 2, 0);
+
+    }
+    for (proto = ps; proto <= pe; ++proto) {
+	for (i = 0; i < 4; i++)
+	    next[i] = 5;
+	/* insert params */
+	n = sub->pcc_sub->nargs;
+	for (i = 0; i < n; i++) {
+	    arg = sub->pcc_sub->args[i];
+	    if (proto == 1 ||
+		    (arg->set == 'P' && next[3] < 15)) {
+		for (j = 0; j < 4; j++) {
+		    if (arg->set == types[j]) {
+			if (next[j] == 15)
+			    goto overflow;
+			if (arg->color == next[j]) {
+			    next[j]++;
+			    break;
+			}
+			/* assign register to that param */
+			arg->reg->color = next[j]++;
+			break;
+		    }
+		}
+	    }
+	    else {
+                /*
+                 * TODO handle overflow
+                 */
+overflow:
+		if (!p3)
+		    p3 = mk_pasm_reg(str_dup("P3"));
+		regs[0] = sub->pcc_sub->args[i];
+		regs[1] = p3;
+		ins = insINS(interpreter, ins, "shift", NULL, regs, 2, 0);
+	    }
+	} /* n params */
+        /*
+         * TODO branch to end
+         */
+        if (ps != pe && !proto) {
+            tmp = INS_LABEL(label1, 0);
+            insert_ins(ins, tmp);
+            ins = tmp;
+        }
+    } /* proto */
 }
 
 void
@@ -273,3 +315,12 @@ move_cc:
     }
 }
 
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+*/

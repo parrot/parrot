@@ -1,11 +1,11 @@
 #!perl
 use strict;
-use TestCompiler tests => 6;
+use TestCompiler tests => 9;
 
 ##############################
 # parrot calling conventions
 #
-output_like(<<'CODE', <<'OUT', "basic syntax - invokecc");
+output_like(<<'CODE', <<'OUT', "proto call, proto sub, invokecc");
 .sub _main
     .local Sub sub
     newsub sub, .Sub, _sub
@@ -16,7 +16,7 @@ output_like(<<'CODE', <<'OUT', "basic syntax - invokecc");
     .pcc_end
     end
 .end
-.pcc_sub _sub
+.pcc_sub _sub prototyped
     .param int a
     print a
     end
@@ -54,7 +54,7 @@ output_like(<<'CODE', <<'OUT', "basic syntax - constants");
     .pcc_end
     end
 .end
-.pcc_sub _sub
+.pcc_sub _sub prototyped
     .param int a
     .param int b
     .local int c
@@ -219,5 +219,116 @@ CODE
   invokecc
 ret:
   restoretop
+  end/
+OUT
+
+output_like(<<'CODE', <<'OUT', "proto call, non proto sub, invokecc");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .arg 10
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub non_prototyped
+    .param int a
+    print a
+    end
+.end
+CODE
+/_main:
+  newsub P16, \d+, _sub
+#pcc_sub_call_\d:
+  set I5, 10
+  set P0, P16
+  set I0, 1
+  set I1, 0
+  set I2, 0
+  savetop
+  invokecc
+ret:
+  restoretop
+  end
+_sub:
+  shift I16, P3
+  print I16
+  end/
+OUT
+
+output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .arg 10
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub
+    .param int a
+    print a
+    end
+.end
+CODE
+/_main:
+  newsub P16, \d+, _sub
+#pcc_sub_call_\d:
+  set I5, 10
+  set P0, P16
+  set I0, 1
+  set I1, 0
+  set I2, 0
+  savetop
+  invokecc
+ret:
+  restoretop
+  end
+_sub:
+  if I0, (\S+)
+  shift I5, P3
+\1:
+  print I5
+  end/
+OUT
+
+output_like(<<'CODE', <<'OUT', "proto call, un proto sub, invokecc, P param");
+.sub _main
+    .local Sub sub
+    newsub sub, .Sub, _sub
+    .pcc_begin prototyped
+    .arg $P0
+    .pcc_call sub
+    ret:
+    .pcc_end
+    end
+.end
+.pcc_sub _sub
+    .param PerlUndef a
+    print a
+    end
+.end
+CODE
+/_main:
+  newsub P16, \d+, _sub
+#pcc_sub_call_\d:
+  set P5, P17
+  set P0, P16
+  set I0, 1
+  set I1, 0
+  set I2, 1
+  savetop
+  invokecc
+ret:
+  restoretop
+  end
+_sub:
+  if I0, (\S+)
+\1:
+  print P5
   end/
 OUT

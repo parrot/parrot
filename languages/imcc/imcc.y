@@ -421,7 +421,7 @@ iANY(struct Parrot_Interp *interpreter, char * name,
 %type <i> pcc_sub_call
 %type <sr> pcc_arg pcc_result pcc_args pcc_results pcc_params pcc_param
 %type <sr> pcc_returns pcc_return pcc_call
-%type <t> pcc_proto
+%type <t> pcc_proto pcc_sub_proto
 %type <i> instruction assignment if_statement labeled_inst
 %type <sr> target reg const var rc string
 %type <sr> key keylist _keylist
@@ -494,11 +494,12 @@ sub_start: SUB                           { open_comp_unit(); }
         }
     ;
 pcc_sub: PCC_SUB   { open_comp_unit(); }
-       IDENTIFIER '\n'
+       IDENTIFIER pcc_sub_proto '\n'
         {
           char *name = str_dup($3);
           Instruction *i = iSUBROUTINE(mk_address($3, U_add_uniq_sub));
           i->r[1] = $<sr>$ = mk_pcc_sub(name, 0);
+          i->r[1]->pcc_sub->prototyped = $4;
         }
        pcc_params
        sub_body { $$ = 0; }
@@ -538,6 +539,10 @@ pcc_sub_call: PCC_BEGIN pcc_proto '\n' {
 
 pcc_proto: PROTOTYPED           { $$ = 1; }
          | NON_PROTOTYPED       { $$ = 0; }
+    ;
+
+pcc_sub_proto: /* empty */      { $$ = -1; }
+         | pcc_proto
     ;
 
 pcc_call: PCC_CALL var COMMA var '\n' {
