@@ -185,9 +185,15 @@ pmc_register(Parrot_Interp interp, STRING *name)
     PMC *key;
     /* If they're looking to register an existing class, return that
        class' type number */
-    if ((type = pmc_type(interp, name)) != enum_type_undef) {
+    if ((type = pmc_type(interp, name)) > enum_type_undef) {
         return type;
     }
+    if (type < enum_type_undef) {
+        internal_exception("native type with name '%s' already exists - "
+                "can't register PMC", datatype_names[type]);
+        return 0;
+    }
+
     /* We don't have one, so lets add one. We need to get a lock for
        this, though */
     LOCK(class_count_mutex);
