@@ -1,0 +1,191 @@
+=head1 INFORMATION
+
+This is the parrot bytecode library.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+.namespace ["_parrotlib"]
+
+=item HASH = __lib_init()
+
+__lib_init is the initialization function. It creates an hash with function 
+names as keys, and signatures as values. If you use
+
+        C<Parrot_library_query(interpreter, "foo", ...)>
+
+this hash is used to lookup the signature of "foo", and if one is found the 
+method with the same name is called with this signature. The return value of 
+the bytecode function will be the value returned by Parrot_library_query.
+
+=cut
+
+.sub __lib_init
+    .local pmc sig
+    .local pmc includes
+    
+    # setup include paths
+    # XXX: use subs
+    includes = new .PerlArray
+    push includes, "runtime/parrot"
+    push includes, "."
+    push includes, "runtime/parrot/include"
+    store_global "_parrotlib", "include_paths", includes
+    
+    # setup signatures
+    sig = new .PerlHash
+    sig["include_file_location"] = "SS"
+    sig["bytecode_location"] = "SS"
+    sig["dynext_location"] = "SS"
+    
+    # return signatures
+    .pcc_begin_return
+    .return sig
+    .pcc_end_return
+.end
+
+=item STRING = include_file_location( STRING )
+
+Is called by IMCC when it encounters an C<.include> statement.
+The string parameter the argument of this statement.
+
+This function returns the absolute filename of the requested file.
+
+=cut
+
+.sub include_file_location
+    .param string name
+    
+    $S0 = file_path( name )
+    .pcc_begin_return
+    .return $S0
+    .pcc_end_return
+.end
+
+=item STRING = bytecode_location( STRING )
+
+Is called by Parrot_load_bytecode.
+The string parameter is the name of the file to be loaded.
+
+This function returns the absolute filename of the requested file.
+
+=cut
+
+.sub bytecode_location
+    .param string name
+    
+    $S0 = file_path( name )
+    .pcc_begin_return
+    .return $S0
+    .pcc_end_return
+.end
+
+=item STRING = dynext_location( STRING )
+
+Returns the location of a dynamic extension.
+
+=cut
+
+.sub dynext_location
+    .param string request
+    .local string name
+    .local string ext
+    
+    # XXX: how can I get "PARROT_DLL_EXTENSION"?
+    ext = ".so"
+        
+    name = request
+    $I0 = file_exists( name )
+    if $I0 goto END
+
+    name = clone request
+    concat name, ext
+    $I0 = file_exists( name )
+    if $I0 goto END
+
+    name = "runtime/parrot/dynext/"
+    concat name, request
+    $I0 = file_exists( name )
+    if $I0 goto END
+
+    name = "runtime/parrot/dynext/"
+    concat name, request
+    concat name, ext
+    $I0 = file_exists( name )
+    if $I0 goto END
+
+    print "Couldn't load '"
+    print request
+    print "'\n"
+    null name
+    
+END:
+    .pcc_begin_return
+    .return name
+    .pcc_end_return
+.end
+
+
+.namespace ["_parrotlib::internal"]
+
+.sub file_path
+    .param string name
+    .local string ret
+    .local pmc iter
+    
+    find_global $P0, "_parrotlib", "include_paths"
+    iter = new .Iterator, $P0
+    iter = 0
+    #ITERATE_FROM_START
+
+NEXT:
+    unless iter goto END
+
+    $P0 = shift iter
+    ret = $P0
+
+    concat ret, "/"
+    concat ret, name
+    
+    $I0 = file_exists( ret )
+    unless $I0 goto NEXT
+END:
+
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+# XXX: use stat op
+.sub file_exists
+    .param string name
+    .local int ret
+    
+    ret = 0
+    open $P0, name, "<"
+    $I0 = typeof $P0
+    if $I0 == .PerlUndef goto END
+    ret = 1
+    close $P0
+END:
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+
+=back
+
+=head1 AUTHOR
+
+Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
+and maintainer.
+Please send patches and suggestions to the Perl 6 Internals mailing list.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, the Perl Foundation.
+
+=cut
