@@ -26,8 +26,10 @@ loop:
   if ii == argc goto done
   $S0 = argv[ii]
 
-  find_lex $P1, 0, $S0
-  store_lex -1, $S0, $P1
+  push_eh catch
+    find_lex $P1, 0, $S0
+    store_lex -1, $S0, $P1
+  clear_eh
 
   inc ii
   goto loop
@@ -39,4 +41,9 @@ badargs:
 
 done:
   .return(return_type,retval)
+
+catch:
+  P4 = P5["_invoke_cc"]
+  invoke P4
+
 .end

@@ -169,7 +169,7 @@ tests so they're consistent.
 
 tclword.imc tcl*.pmc
 [concat] [join] [list] [llength] [lappend] [linsert] [lrepeat]
-[lrange] [array set]
+[lrange] [array set] [global]
 the macros?
 expr's precedence and parens
 [puts]'s ability to write to other channels.
@@ -196,8 +196,6 @@ who don't play nice with the new tests...
 
 [array anymore], [array donesearch] [array nextelement], [array startsearch]
  { use iterators }
-
-[global]
 
 [string repeat], [string replace], [string tolower],
 [string totitle], [string toupper], [string trim], [string trimleft],
