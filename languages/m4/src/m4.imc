@@ -22,13 +22,13 @@ Looks at the command line arguments and acts accordingly.
   .param PerlArray argv
 
   # name of the program
-  .sym string program_name
+  .local string program_name
   shift program_name, argv
 
   # Specification of known command line arguments.
   # The args are parsed with Getopt_Long.imc which should work 
   # somewhat like the Perl5 module Getopt::Long.
-  .sym pmc opt_spec      
+  .local pmc opt_spec      
   opt_spec = new PerlArray
   # --version, boolean
   push opt_spec, "version"
@@ -76,13 +76,13 @@ Looks at the command line arguments and acts accordingly.
 
   # Make a copy of argv, because this can easier be handled in get_options
   # TODO: eliminate need for copy
-  .sym pmc cloned_argv
+  .local pmc cloned_argv
   cloned_argv = clone argv
 
   # Now call get_options
-  .sym Sub get_options
+  .local Sub get_options
   get_options = newsub _get_options
-  .sym pmc opt
+  .local pmc opt
   .pcc_begin prototyped
     .arg cloned_argv
     .arg opt_spec
@@ -92,19 +92,19 @@ Looks at the command line arguments and acts accordingly.
   .pcc_end
 
   # Now dow what the options want
-  .sym int is_defined
+  .local int is_defined
 
   # Was '--version' passed ?
   is_defined = defined opt["version"]
   unless is_defined goto NO_VERSION_FLAG
-    print "Parrot m4 snapshot 2004-01-05\n"
+    print "Parrot m4 0.0.2\n"
     end
   NO_VERSION_FLAG: 
 
   # Was '--help' passed ?
   is_defined = defined opt["help"]
   unless is_defined goto NO_HELP_FLAG
-    .sym Sub usage
+    .local Sub usage
     usage = newsub _usage
     .pcc_begin prototyped
       .arg program_name
@@ -115,7 +115,8 @@ Looks at the command line arguments and acts accordingly.
   NO_HELP_FLAG: 
 
   # Was a yet unimplemented option passed?
-  .sym string unimplemented_option
+  # TODO: put names of unimplemented options in an PerlArray
+  .local string unimplemented_option
 
   unimplemented_option = "traditional"
   is_defined = defined opt[unimplemented_option]
@@ -199,10 +200,10 @@ Looks at the command line arguments and acts accordingly.
 
   # TODO: In near future we propably should use objects here
   # For now let's just just use a hash with all state information
-  .sym pmc state
+  .local pmc state
   state = new PerlHash
   # init of input structures, creates state['file_stack']
-  .sym Sub input_init
+  .local Sub input_init
   input_init = newsub _input_init
   .pcc_begin prototyped
     .arg state
@@ -213,7 +214,7 @@ Looks at the command line arguments and acts accordingly.
   # TODO: init of output structures
 
   # First we set up a table of all symbols, that is macros 
-  .sym pmc symtab
+  .local pmc symtab
   symtab = new OrderedHash
   state['symtab'] = symtab    
 
@@ -231,10 +232,10 @@ Looks at the command line arguments and acts accordingly.
 
   # TODO: handle reading from STDIN, multiple input files
   # check argc, we need at least one input file
-  .sym int argc
+  .local int argc
   argc = cloned_argv
   if argc >= 1 goto ARGC_IS_OK
-    .sym Sub usage
+    .local Sub usage
     usage = newsub _usage
     .pcc_begin prototyped
       .arg program_name
@@ -244,13 +245,25 @@ Looks at the command line arguments and acts accordingly.
     end
   ARGC_IS_OK:
 
+  # We need the builtin_tab, wether '--reload_state' was passed or not
+  .local pmc builtin_tab
+  builtin_tab = new OrderedHash
+  state['builtin_tab'] = builtin_tab    
+  .local Sub builtin_tab_init
+  builtin_tab_init = newsub _builtin_tab_init
+  .pcc_begin prototyped
+    .arg state
+  .pcc_call builtin_tab_init
+    ret_builtin_tab_init_1:
+  .pcc_end
+
   # Check wether the option --reload-state was passed
-  .sym string frozen_file
+  .local string frozen_file
   frozen_file = opt['reload-state']
-  .sym int string_len
+  .local int string_len
   length string_len, frozen_file
   unless string_len > 0 goto BUILTIN_MACROS_INIT
-    .sym Sub reload_frozen_state
+    .local Sub reload_frozen_state
     reload_frozen_state = newsub _reload_frozen_state
     .pcc_begin prototyped
       .arg state
@@ -260,7 +273,7 @@ Looks at the command line arguments and acts accordingly.
     .pcc_end
     goto COMMANDLINE_MACROS_INIT
   BUILTIN_MACROS_INIT:
-  .sym Sub builtin_init
+  .local Sub builtin_init
   builtin_init = newsub _builtin_init
   .pcc_begin prototyped
     .arg state
@@ -278,8 +291,8 @@ Looks at the command line arguments and acts accordingly.
   # TODO: enable reading from STDIN
   # TODO: look for files in M4PATH
   # Name of the input file, usually with extension '.m4'
-  .sym string filename
-  .sym Sub push_file
+  .local string filename
+  .local Sub push_file
   push_file = newsub _push_file
   REDO_FILENAME_LOOP:
   argc = cloned_argv
@@ -295,7 +308,7 @@ Looks at the command line arguments and acts accordingly.
   LAST_FILENAME_LOOP:
 
   # now we start to do some work
-  .sym Sub expand_input
+  .local Sub expand_input
   expand_input = newsub _expand_input
   .pcc_begin prototyped
     .arg state
@@ -307,11 +320,11 @@ HANDLE_WRAPUP_TEXT:
   # TODO: handle wrapup text, whatever that is
 
 CHECK_FROZEN_FLAG:
-  .sym string freeze_file
+  .local string freeze_file
   freeze_file = opt["freeze-state"]
   length string_len, freeze_file
   unless string_len > 0 goto MAKE_DIVERSION
-    .sym Sub produce_frozen_state
+    .local Sub produce_frozen_state
     produce_frozen_state = newsub _produce_frozen_state
     .pcc_begin prototyped
       .arg state

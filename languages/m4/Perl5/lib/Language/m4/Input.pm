@@ -1,3 +1,5 @@
+# $Id$
+
 package Language::m4::Input;
 
 use strict;
@@ -99,7 +101,7 @@ None reported yet.
 
 =head1 SUPPORT
 
-Bernhard.Schmalhofer@biomax.de
+Bernhard.Schmalhofer!no_spam!gmx.de
 
 =head1 AUTHOR
 

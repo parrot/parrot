@@ -1,5 +1,7 @@
 #!perl
 
+# $Id$
+
 use strict;
 
 use M4::Test tests => 6;

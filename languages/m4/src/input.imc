@@ -17,7 +17,8 @@ Initialize the state hash.
 'file_stack' contains input files.
 'word_regex' recognizes words.
 'string_regex' recognizes quoted strings.
-'define_regex' recognizes the define macro
+'func_regex' recognizes the a macro with two arguments TODO: get rid of this workaround
+'func2_regex' recognizes the a macro with two arguments TODO: get rid of this workaround
 'line_regex' temporarily for line based workaraunds
 'simple_regex' recognizes TOKEN_SIMPLE
 'comment_regex' recognizes comments, returned as TOKEN_SIMPLE
@@ -29,50 +30,50 @@ TODO: recognize nested quoted strings
 .sub _input_init prototyped             
   .param PerlHash state 
 
-  .sym int does_exist
+  .local int does_exist
 
   # setup of 'file_stack'
   exists does_exist, state['file_stack']
   if does_exist goto FILE_STACK_EXISTS
-    .sym pmc empty_array
+    .local pmc empty_array
     empty_array = new PerlArray
     state['file_stack'] = empty_array
   FILE_STACK_EXISTS:
 
   # regular expressions are needed for finding words and quoted strings
-  .sym string err
+  .local string err
   repeat err, ' ', 500
-  .sym int erroffset
-  .sym pmc NULL
+  .local int erroffset
+  .local pmc NULL
   null NULL
 
-  .sym pmc pcre_lib
+  .local pmc pcre_lib
   loadlib pcre_lib, "libpcre"
 
   # pcre *pcre_compile(const char *pattern, int options,
   #            const char **errptr, int *erroffset,
   #            const unsigned char *tableptr
-  .sym pmc pcre_compile
+  .local pmc pcre_compile
   dlfunc pcre_compile, pcre_lib, "pcre_compile", "ptiB3P"
 
   #int pcre_exec(const pcre *code, const pcre_extra *extra,
   #        const char *subject, int length, int startoffset,
   #        int options, int *ovector, int ovecsize);
-  .sym pmc pcre_exec
+  .local pmc pcre_exec
   dlfunc pcre_exec, pcre_lib, "pcre_exec", "ipPtiiipi"
   state['pcre_exec'] = pcre_exec
 
   #int pcre_copy_substring(const char *subject, int *ovector,
   #        int stringcount, int stringnumber, char *buffer,
   #        int buffersize);
-  .sym pmc pcre_copy_substring
+  .local pmc pcre_copy_substring
   dlfunc pcre_copy_substring, pcre_lib, "pcre_copy_substring", "itpiibi"
   state['pcre_copy_substring'] = pcre_copy_substring
 
   # setup of 'simple_regex'
   exists does_exist, state['simple_regex']
   if does_exist goto SIMPLE_REGEX_EXISTS
-    .sym pmc simple_regex
+    .local pmc simple_regex
     .pcc_begin prototyped
       .arg "^[^`#_a-zA-Z]+"             # pattern
       .arg 0                           # options
@@ -88,7 +89,7 @@ TODO: recognize nested quoted strings
   # setup of 'comment_regex'
   exists does_exist, state['comment_regex']
   if does_exist goto COMMENT_REGEX_EXISTS
-    .sym pmc comment_regex
+    .local pmc comment_regex
     .pcc_begin prototyped
       .arg "^#[^\n]*\n"             # pattern
       .arg 0                           # options
@@ -104,7 +105,7 @@ TODO: recognize nested quoted strings
   # setup of 'word_regex'
   exists does_exist, state['word_regex']
   if does_exist goto WORD_REGEX_EXISTS
-    .sym pmc word_regex
+    .local pmc word_regex
     .pcc_begin prototyped
       .arg '^[_a-zA-Z][_a-zA-Z0-9]*'   # pattern
       .arg 0                           # options
@@ -120,7 +121,7 @@ TODO: recognize nested quoted strings
   # setup of 'string_regex'
   exists does_exist, state['string_regex']
   if does_exist goto QUOTED_STRING_REGEX_EXISTS
-    .sym pmc string_regex
+    .local pmc string_regex
     .pcc_begin prototyped
       .arg "^`[^`]*'"                  # pattern
       .arg 0                           # options
@@ -133,10 +134,10 @@ TODO: recognize nested quoted strings
     state['string_regex'] = string_regex
   QUOTED_STRING_REGEX_EXISTS:
 
-  # setup of 'define_regex'
-  exists does_exist, state['define_regex']
-  if does_exist goto DEFINE_REGEX_EXISTS
-    .sym pmc define_regex
+  # setup of 'func_regex'
+  exists does_exist, state['func_regex']
+  if does_exist goto FUNC_REGEX_EXISTS
+    .local pmc func_regex
     .pcc_begin prototyped
       .arg "^define\\(\\s*`[^']*',\\s*`[^']*'\\)" # pattern
       .arg 0                           # options
@@ -144,14 +145,30 @@ TODO: recognize nested quoted strings
       .arg erroffset                   # index in pattern, which error occurs
       .arg NULL
     .nci_call pcre_compile
-      .result define_regex
+      .result func_regex
     .pcc_end
-    state['define_regex'] = define_regex
-  DEFINE_REGEX_EXISTS:
+    state['func_regex'] = func_regex
+  FUNC_REGEX_EXISTS:
+
+  # setup of 'func2_regex'
+  exists does_exist, state['func2_regex']
+  if does_exist goto FUNC2_REGEX_EXISTS
+    .local pmc func2_regex
+    .pcc_begin prototyped
+      .arg "^define\\(\\s*`[^']*',\\s*`[^']*'\\)" # pattern
+      .arg 0                           # options
+      .arg err                         # string of length 500
+      .arg erroffset                   # index in pattern, which error occurs
+      .arg NULL
+    .nci_call pcre_compile
+      .result func2_regex
+    .pcc_end
+    state['func2_regex'] = func2_regex
+  FUNC2_REGEX_EXISTS:
 
   exists does_exist, state['line_regex']
   if does_exist goto LINE_REGEX_EXISTS
-    .sym pmc line_regex
+    .local pmc line_regex
     .pcc_begin prototyped
       .arg '^[^\n]*\n'                  # pattern
       .arg 0                           # options
@@ -182,7 +199,7 @@ TODO: open these files and complain when they don't or pass filehandles
   .param string   filename    
 
   # state['file_stack'] has been created in input_init 
-  .sym pmc file_stack
+  .local pmc file_stack
   file_stack = state['file_stack']
   push file_stack, filename
 
@@ -201,22 +218,22 @@ Uses regular expressions for finding tokens.
 .sub _next_token prototyped            
   .param PerlHash state 
 
-  .sym string current_file    
+  .local string current_file    
   current_file = state['current_file']
-  .sym int current_file_len
+  .local int current_file_len
   length current_file_len, current_file    
-  .sym pmc pcre_exec    
+  .local pmc pcre_exec    
   pcre_exec = state['pcre_exec']
-  .sym pmc NULL
+  .local pmc NULL
   null NULL
-  .sym pmc ovector
+  .local pmc ovector
   ovector = new ManagedStruct
   ovector = 120       # 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-  .sym int ok
-  .sym pmc regex    
-  .sym string token_type
+  .local int ok
+  .local pmc regex    
+  .local string token_type
   token_type = 'TOKEN_EOF'
-  .sym string token_data
+  .local string token_data
   token_data = ''
     
   # look for 'TOKEN_SIMPLE'
@@ -274,25 +291,6 @@ Uses regular expressions for finding tokens.
   if ok ==  1 goto MATCH
   if ok != -1 goto MATCH_FAILED
 
-  # look for 'TOKEN_DEFINE'
-  # temporary workaround, should be 'TOKEN_WORD'
-  regex = state['define_regex']
-  token_type = 'TOKEN_DEFINE'
-  .pcc_begin prototyped
-    .arg regex
-    .arg NULL           # P extra
-    .arg current_file   # t subject
-    .arg current_file_len    
-    .arg 0
-    .arg 0
-    .arg ovector        # p ovector
-    .arg 10             # i ovecsize
-  .nci_call pcre_exec
-    .result ok
-  .pcc_end
-  if ok ==  1 goto MATCH
-  if ok != -1 goto MATCH_FAILED
-
   # look for 'TOKEN_WORD'
   # this will be checked for macro substitution
   regex = state['word_regex']
@@ -319,9 +317,9 @@ Uses regular expressions for finding tokens.
 
   MATCH:
     # ovector is an int arrary containing start stop coords
-    .sym int start_line
-    .sym int end_line
-    .sym pmc struct
+    .local int start_line
+    .local int end_line
+    .local pmc struct
     struct = new SArray
     struct = 3
     .include "datatypes.pasm"

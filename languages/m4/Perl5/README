@@ -1,3 +1,5 @@
+# $Id$
+
 pod2text Language::m4.pm > README
 
 If this is still here it means the programmer was too lazy to create the readme file.

@@ -14,6 +14,7 @@ Reading and writing state files. Invoced with the command line parameters
 
 =cut
 
+# Some named constants
 .include 'iterator.pasm'
 
 =head1 SUBROUTINES
@@ -28,33 +29,33 @@ Dump a state file.
   .param PerlHash   state
   .param string     frozen_file    
 
-  .sym pmc symtab
+  .local pmc symtab
   symtab = state['symtab']
 
-  .sym PerlArray macro
-  .sym int       len
-  .sym string    name
-  .sym string    substitution
+  .local PerlHash  symbol
+  .local int       len
+  .local string    name
+  .local string    text
 
-  .sym pmc frozen_fh
+  .local pmc frozen_fh
   open frozen_fh, frozen_file, ">"
-  .sym pmc iterator
+  .local pmc iterator
   iterator = new Iterator, symtab
   set iterator, .ITERATE_FROM_START
   iter_loop:
   unless iterator, end_iter
-    shift macro, iterator
-    name         = macro[0]
-    substitution = macro[1]
+    shift symbol, iterator
+    name         = symbol['name']
+    text = symbol['text']
     print frozen_fh, 'T'
     length len, name
     print frozen_fh, len
     print frozen_fh, ','
-    length len, substitution
+    length len, text
     print frozen_fh, len
     print frozen_fh, "\n"
     print frozen_fh, name
-    print frozen_fh, substitution
+    print frozen_fh, text
     print frozen_fh, "\n"
 
     branch iter_loop
@@ -84,9 +85,9 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   .param string     frozen_file    
 
   # Read the file into the string file
-  .sym string content
+  .local string content
   # TODO: M4PATH
-  .sym pmc frozen_fh
+  .local pmc frozen_fh
   open frozen_fh, frozen_file, "<"
   if frozen_fh, READ_CONTENT
     printerr "'"
@@ -100,19 +101,24 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   close frozen_fh
 
   # We have read in a file, now let's parse it.
-  .sym int    pos             # position in file
-  .sym string token           # interesting substring in file
+  .local int    pos             # position in file
+  .local string token           # interesting substring in file
 
   # vars which will contain the extracted info
-  .sym int    name_len
-  .sym int    substitution_len   
-  .sym string name
-  .sym string substitution
+  .local int    name_len
+  .local int    substitution_len   
+  .local string name
+  .local string text
+
+  # We need to look up builtin functions
+  .local pmc builtin_tab
+  builtin_tab = state['builtin_tab']
+  .local pmc builtin
 
   # Set up some subroutines, which might get called in the parse loop
-  .sym Sub    define_builtin
+  .local Sub define_builtin
   define_builtin = newsub _define_builtin
-  .sym Sub    define_user_macro
+  .local Sub    define_user_macro
   define_user_macro = newsub _define_user_macro
 
   # start the parse loop
@@ -169,16 +175,24 @@ For now we just worry about the flags 'F', 'T' and 'V'.
     rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
     pos = 0
-    substr name, content, 0, name_len, '' 
-    substr substitution, content, 0, substitution_len, '' 
     # We know the length, so we can extract the strings
+    substr name, content, 0, name_len, '' 
+    substr text, content, 0, substitution_len, '' 
+    builtin = builtin_tab[name]
+    unless builtin goto BUILTIN_NOT_FOUND
     .pcc_begin prototyped
       .arg state
       .arg name
-      .arg substitution
+      .arg builtin
     .pcc_call define_builtin
       ret_define_builtin_1:
     .pcc_end
+    goto BUILTIN_HAS_BEEN_HANDLED
+    BUILTIN_NOT_FOUND:
+      printerr "`"
+      printerr name
+      printerr "' from frozen file not found in builtin table!\n" 
+    BUILTIN_HAS_BEEN_HANDLED:
     pos = 0
     rx_literal content, pos, "\n", UNEXPECTED
     substr content, 0, pos, '' 
@@ -218,14 +232,14 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   # print name
   # print " OK5\n"
   # print "--------------------\n"
-    substr substitution, content, 0, substitution_len, '' 
+    substr text, content, 0, substitution_len, '' 
     # We know the length, so we can extract the strings
     .pcc_begin prototyped
       .arg state
       .arg name
-      .arg substitution
+      .arg text
     .pcc_call define_user_macro
-      ret_user_macro_1:
+      ret_define_user_macro_1:
     .pcc_end
     pos = 0
     rx_literal content, pos, "\n", UNEXPECTED

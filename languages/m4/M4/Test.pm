@@ -1,3 +1,5 @@
+# $Id$
+
 package M4::Test;
 
 use 5.008;
@@ -148,7 +150,7 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer, E<lt>bernhard@biomax.deE<gt>
+Bernhard Schmalhofer, E<lt>bernhard!no_spam!gmx.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

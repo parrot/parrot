@@ -1,5 +1,7 @@
 #!perl
 
+# $Id$
+
 use strict;
 
 use Test::More tests => 27; 
@@ -29,7 +31,7 @@ END_OUT
 #--------------------------------------------
 $real_out     = `$parrot_m4 --version 2>&1`; 
 is( $real_out, << 'END_OUT', '--version' );
-Parrot m4 snapshot 2004-01-05
+Parrot m4 0.0.2
 END_OUT
 
 

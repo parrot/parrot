@@ -21,22 +21,22 @@ TODO: read files in next_token()
 .sub _expand_input prototyped             
   .param PerlHash  state    
 
-  .sym Sub expand_token
+  .local Sub expand_token
   expand_token = newsub _expand_token
-  .sym Sub next_token
+  .local Sub next_token
   next_token = newsub _next_token
 
   # loop over the lines of a list of of files
   # TODO: implement a lexer which does m4 stuff correctly
-  .sym PerlArray file_stack
+  .local PerlArray file_stack
   file_stack = state['file_stack']
-  .sym string filename
+  .local string filename
   NEXT_FILE:
-  .sym int num_files
+  .local int num_files
   num_files = file_stack
   if num_files <= 0 goto ALL_FILES_EXPANDED
     shift filename, file_stack
-    .sym pmc in                 # input file handle
+    .local pmc in                 # input file handle
     open in, filename, "<"
     if in, PROCESS_SINGLE_FILE
       printerr filename
@@ -45,16 +45,17 @@ TODO: read files in next_token()
         .return 0       
       .pcc_end_return
     PROCESS_SINGLE_FILE:
-    .sym string current_file    # input file handle
+    .local string current_file    # input file handle
     read current_file, in, 50000
     state['current_file'] = current_file
     close in
     # now go through the file, token for token 
-    .sym string token_data         
-    .sym string token_type         
+    .local string token_data         
+    .local string token_type         
   goto NEXT_TOKEN
 
   EXPAND_TOKEN:
+
   .pcc_begin prototyped
     .arg state
     .arg token_type
@@ -76,7 +77,7 @@ TODO: read files in next_token()
 
   ALL_FILES_EXPANDED:
   .pcc_begin_return
-    # nothing to be returned
+    # void
   .pcc_end_return
 .end
 
@@ -88,8 +89,6 @@ Expand one token, according to its type.  Potential macro names
 macro definition.  If they have, they are expanded as macros, otherwise
 the text are just copied to the output.
 
-TODO: get rid of workaround TOKEN_DEFINE
-
 =cut
 
 .sub _expand_token prototyped            
@@ -97,171 +96,83 @@ TODO: get rid of workaround TOKEN_DEFINE
   .param string    token_type
   .param string    token_data
 
-  .sym PerlArray symtab
-  symtab = state['symtab']
-
 =for skip
 
-  print "------------ start --------\n"
+  print "------- expand_token -------------\n"
   print "token_type: "
   print token_type
-  print "\n!"
+  print "\ntoken_data: "
   print token_data
-  print "!\n"
-  print "------------ end -----------\n"
+  print "\n----------------------------------\n"
 
 =cut
 
-  .sym Sub expand_macro
-  expand_macro = newsub _expand_macro
-  .sym Sub define_user_macro
-  define_user_macro = newsub _define_user_macro
-  .sym Sub shipout_text
-  shipout_text = newsub _shipout_text
+  .local OrderedHash symtab
+  symtab = state['symtab']
+  .local string current_file    
+  current_file = state['current_file']
 
   eq token_type, 'TOKEN_EOF',    FINISH_EXPAND_TOKEN
   eq token_type, 'TOKEN_MACDEF', FINISH_EXPAND_TOKEN
 
-  ne token_type, 'TOKEN_DEFINE', NO_TOKEN_DEFINE
-  #print "got a TOKEN_DEFINE\n"
-  # a line has already successfully been read in
-  # We want match something like:
-  # "define('furcht', 'Hallo Welt')"
-  # and capture the name 'furcht' and the substitution 'Hallo Welt'.
-  # Thus we need to remenber the start and the length of these two captures
-  .sym int start_capture_name
-  .sym int len_capture_name
-  .sym int start_capture_substitution
-  .sym int len_capture_substitution
-  .sym int start_index
-  start_index = 0
-  .sym int current_index
-  rx_search token_data, current_index, start_index, "define(", NO_DEFINE_1  
-  # TODO skip only blanks
-  start_index = current_index
-  rx_search token_data, current_index, start_index, "`", NO_DEFINE_1  
-  start_index = current_index
-  start_capture_name = current_index
-  rx_search token_data, current_index, start_index, "'", NO_DEFINE_1  
-  start_index = current_index
-  len_capture_name = current_index - start_capture_name
-  dec len_capture_name
-  rx_search token_data, current_index, start_index, ",", NO_DEFINE_1  
-  start_index = current_index
-  rx_search token_data, current_index, start_index, "`", NO_DEFINE_1  
-  start_index = current_index
-  start_capture_substitution = current_index
-  rx_search token_data, current_index, start_index, "'", NO_DEFINE_1  
-  start_index = current_index
-  len_capture_substitution = start_index - start_capture_substitution
-  dec len_capture_substitution
-  rx_search token_data, current_index, start_index, ")", NO_DEFINE_1  
-  start_index = current_index
-  # All needed matches were successfull,
-  # so we can assemble the input for 'define_user_macro'
-  .sym string name
-  substr name, token_data, start_capture_name, len_capture_name
-  .sym string substitution
-  substr substitution, token_data, start_capture_substitution, len_capture_substitution
-
-=for skip
-
-  print "------------\n"
-  print token_data
-  print start_capture_name
-  print "\n"
-  print len_capture_name
-  print "\n"
-  print name
-  print "\n"
-  print start_capture_substitution
-  print "\n"
-  print len_capture_substitution
-  print "\n"
-  print substitution
-  print "\n"
-  print " OK3\n"
-  print "------------\n"
-
-=cut
-
-  ## Output the rest of the token_data, which has not been consumed
-  .sym string rest
-  .sym int len_rest
-  length len_rest, token_data
-  len_rest = len_rest - current_index
-  substr rest, token_data, current_index, len_rest
-  .pcc_begin prototyped
-    .arg state
-    .arg rest
-  .pcc_call shipout_text
-    ret_shipout_text_4:
-  .pcc_end
-  .pcc_begin prototyped
-    .arg state
-    .arg name
-    .arg substitution
-  .pcc_call define_user_macro
-    ret_define_user_macro_1:
-  .pcc_end
-  goto FINISH_EXPAND_TOKEN
-
-  NO_DEFINE_1:
-  printerr "Strange\n"
-  goto FINISH_EXPAND_TOKEN
-  NO_TOKEN_DEFINE:
-
   # 'TOKEN_STRING' is the same as 'TOKEN_SIMPLE', 
   # besides cutting left and right delimiters
   ne token_type, 'TOKEN_STRING', NO_TOKEN_STRING 
-  # Get rid of starting `
-  substr token_data, 0, 1, ''
-  # Get rid of trailing '
-  chopn token_data, 1
-  goto TOKEN_SIMPLE_OR_STRING
+    # Get rid of starting `
+    substr token_data, 0, 1, ''
+    # Get rid of trailing '
+    chopn token_data, 1
+    goto SHIPOUT_TEXT
   NO_TOKEN_STRING:
-  ne token_type, 'TOKEN_SIMPLE', NO_TOKEN_SIMPLE
-  TOKEN_SIMPLE_OR_STRING:
-    .pcc_begin prototyped
-      .arg state
-      .arg token_data
-    .pcc_call shipout_text
-      ret_shipout_text_3:
-    .pcc_end
-    goto FINISH_EXPAND_TOKEN
-  NO_TOKEN_SIMPLE:
+
+  eq token_type, 'TOKEN_SIMPLE', SHIPOUT_TEXT
 
   ne token_type, 'TOKEN_WORD', NO_TOKEN_WORD
-    .sym int sym_exists
-    exists sym_exists, symtab[token_data] 
-    unless sym_exists goto sym_not_found
-      .sym pmc macro
-      macro = symtab[token_data] 
-      .pcc_begin prototyped
-        .arg macro
-        .arg token_data
-      .pcc_call expand_macro
-        ret_expand_macro_1:
-        .result token_data
-      .pcc_end
-    sym_not_found:
-    .pcc_begin prototyped
-      .arg state
-      .arg token_data
-    .pcc_call shipout_text
-      ret_shipout_text_6:
-    .pcc_end
-  goto FINISH_EXPAND_TOKEN
-  NO_TOKEN_WORD:
+    .local int symbol_exists
+    exists symbol_exists, symtab[token_data] 
+    unless symbol_exists goto SHIPOUT_TEXT
+      .local pmc symbol
+      symbol = symtab[token_data] 
+      .local string symbol_type
+      symbol_type = symbol['type']
+      eq token_type, 'TOKEN_VOID', SHIPOUT_TEXT
+        ne symbol_type, 'TOKEN_FUNC', EXPAND_MACRO
+          .local string first_char
+          substr first_char, current_file, 0, 1
+          ne first_char, '(', SHIPOUT_TEXT
+          goto EXPAND_MACRO
 
+  EXPAND_MACRO:
+  .local Sub expand_macro
+  expand_macro = newsub _expand_macro
+  .pcc_begin prototyped
+    .arg state
+    .arg symbol
+    .arg token_data
+  .pcc_call expand_macro
+    ret_expand_macro_6:
+    .result token_data
+  .pcc_end
+  goto SHIPOUT_TEXT
+
+  NO_TOKEN_WORD:
   printerr "unknown token type: "
   printerr token_type
-  printerr "\n"
-  goto FINISH_EXPAND_TOKEN
+  end
 
+  SHIPOUT_TEXT:
+  .local Sub shipout_text
+  shipout_text = newsub _shipout_text
+  .pcc_begin prototyped
+    .arg state
+    .arg token_data
+  .pcc_call shipout_text
+    ret_shipout_text_6:
+  .pcc_end
+  
   FINISH_EXPAND_TOKEN:
   .pcc_begin_return
-    # nothing to be returned
+    # void
   .pcc_end_return
 .end
 
@@ -270,28 +181,160 @@ TODO: get rid of workaround TOKEN_DEFINE
 
 Apply macro to a token.
 
+TODO: look for TOKEN_FUNC
+
 =cut
 
 .sub _expand_macro prototyped            
-  # receive arguments from left to right
-  .param PerlArray macro 
+  .param PerlHash  state
+  .param PerlHash  symbol 
   .param string    token_data         
 
-  .sym string    substitution
-  substitution = macro[1]
+  .local string current_file    
+  current_file = state['current_file']
+  .local string symbol_type
+  symbol_type = symbol['type']
 
 =for skip
 
+  print "------- expand_macro -------------\n"
   print "token_data: "
   print token_data
-  print "\n"
-  print "substitution: "
-  print substitution
-  print "\n"
+  print "\nsymbol_type: "
+  print symbol_type
+  print "\ncurrent_file: "
+  print current_file
+  print "\n----------------------------------\n"
 
 =cut
 
+  .local string arg_1
+  arg_1 = ''
+  .local string arg_2
+  arg_2 = ''
+
+  ne symbol_type, 'TOKEN_FUNC', NO_TOKEN_FUNC 
+    # print "got a TOKEN_FUNC or a TOKEN_TEXT\n"
+    # a line has already successfully been read in
+    # We want match something like:
+    # "define('furcht', 'Hallo Welt')"
+    # and capture the name 'furcht' and the substitution 'Hallo Welt'.
+    # Thus we need to remenber the start and the length of these two captures
+    .local int len_arg_1
+    .local int start_arg_1
+    .local int len_arg_1
+    .local int starg_arg_2
+    .local int len_arg_2
+    .local int start_index
+    start_index = 0
+    .local int current_index
+    rx_search current_file, current_index, start_index, "(", NO_TOKEN_FUNC  
+    # TODO skip only blanks
+    start_index = current_index
+    rx_search current_file, current_index, start_index, "`", NO_TOKEN_FUNC  
+    start_index = current_index
+    start_arg_1 = current_index
+    rx_search current_file, current_index, start_index, "'", NO_TOKEN_FUNC  
+    start_index = current_index
+    len_arg_1 = current_index - start_arg_1
+    dec len_arg_1
+    rx_search current_file, current_index, start_index, ",", NO_TOKEN_FUNC  
+    start_index = current_index
+    rx_search current_file, current_index, start_index, "`", NO_TOKEN_FUNC  
+    start_index = current_index
+    starg_arg_2 = current_index
+    rx_search current_file, current_index, start_index, "'", NO_TOKEN_FUNC  
+    start_index = current_index
+    len_arg_2 = start_index - starg_arg_2
+    dec len_arg_2
+    rx_search current_file, current_index, start_index, ")", NO_TOKEN_FUNC  
+    start_index = current_index
+    # All needed matches were successfull,
+    # so we can assemble the input for 'call_macro'
+    substr arg_1, current_file, start_arg_1, len_arg_1
+    substr arg_2, current_file, starg_arg_2, len_arg_2
+    # The parsed stuff can be deleted from 'current_file'
+    substr current_file, 0, current_index, ''
+
+  NO_TOKEN_FUNC:
+
+  .local string text
+  .local Sub call_macro
+  call_macro = newsub _call_macro
+  .pcc_begin prototyped
+    .arg state
+    .arg symbol 
+    .arg arg_1
+    .arg arg_2
+  .pcc_call call_macro
+    ret_call_macro_1:
+    .result text
+  .pcc_end
+
   .pcc_begin_return
-    .return substitution
+    .return text
+  .pcc_end_return
+.end
+
+
+=head2 string processed_token _call_macro( PerlArray macro, string token )
+
+Apply macro to a token.
+
+TODO: distinguish between TOKEN_FUNC and TOKEN_WORD
+
+=cut
+
+.sub _call_macro prototyped            
+  .param PerlHash state
+  .param pmc      symbol
+  .param string   arg_1
+  .param string   arg_2
+
+  .local string symbol_type
+  symbol_type = symbol['type']
+  .local string symbol_name
+  symbol_name = symbol['name']
+
+=for skip
+
+  print "------- call_macro -------------\n"
+  print "symbol_name: "
+  print symbol_name
+  print "\nsymbol_type: "
+  print symbol_type
+  print "\narg_1: "
+  print arg_1
+  print "\narg_2: "
+  print arg_2
+  print "\n----------------------------------\n"
+
+=cut
+
+  .local string    text
+
+  ne symbol_type, 'TOKEN_TEXT', NO_TOKEN_TEXT
+    text = symbol['text']
+    goto FINISH_CALL_MACRO
+  NO_TOKEN_TEXT:
+
+  eq symbol_type, 'TOKEN_FUNC', TOKEN_FUNC
+    printerr "INTERNAL ERROR: Bad symbol type in call_macro"
+    end
+  TOKEN_FUNC:
+  .local pmc func
+  func = symbol['func']
+  .pcc_begin prototyped
+    .arg state
+    .arg arg_1
+    .arg arg_2
+  .pcc_call func
+    ret_func_1:
+    .result text
+  .pcc_end
+
+  FINISH_CALL_MACRO:
+  .pcc_begin_return
+    .return text
   .pcc_end_return
 .end

@@ -1,8 +1,11 @@
 #!perl
 
+# $Id$
+
 use strict;
 use lib '../../lib';             # Finding Parrot/Config.pm
 use lib '../../imcc';            # Finding imcc/TestCompiler.pm
+
 use TestCompiler tests => 4;
 
 my $parrot_home = '../..';
@@ -13,36 +16,36 @@ $ENV{PARROT} = "$parrot_home/parrot";
 .include "library/pcre.imc"
 .sub _main prototyped
   print	"\n"
-  .sym pmc lib
+  .local pmc lib
   .PCRE_INIT(lib)
-  .sym string error
-  .sym int errptr
-  .sym string pat
+  .local string error
+  .local int errptr
+  .local string pat
 
-  .sym pmc regex
+  .local pmc regex
   pat = 'as'
   .PCRE_COMPILE(pat, 0, regex, error, errptr)
   $I0 = defined regex
   unless $I0 goto match_err
 
-  .sym pmc regex_2
+  .local pmc regex_2
   #pat = 'df'
   #.PCRE_COMPILE(pat, 0, regex, error, errptr)
   #$I0 = defined regex_2
   #unless $I0 goto match_err
 
-  .sym int ok
-  .sym pmc result
-  .sym string s
+  .local int ok
+  .local pmc result
+  .local string s
   s = "asdf"
   .PCRE_MATCH(regex, s, 0, 0, ok, result)
   if ok < 0 goto nomatch
   print ok
   print " match(es):\n"
-  .sym int i
+  .local int i
   i = 0
-  .sym string match
-  .sym string s
+  .local string match
+  .local string s
 lp: .PCRE_DOLLAR(s, ok, result, i, match)
   print match
   print "\n"
@@ -75,38 +78,38 @@ OUTPUT
 .sub _main prototyped
 
   # Loading shared lib
-  .sym pmc pcre_lib
+  .local pmc pcre_lib
   loadlib pcre_lib, "libpcre"
 
   # pcre *pcre_compile(const char *pattern, int options,
   #            const char **errptr, int *erroffset,
   #            const unsigned char *tableptr
-  .sym pmc pcre_compile
+  .local pmc pcre_compile
   dlfunc pcre_compile, pcre_lib, "pcre_compile", "ptiB3P"
 
   #int pcre_exec(const pcre *code, const pcre_extra *extra,
   #        const char *subject, int length, int startoffset,
   #        int options, int *ovector, int ovecsize);
-  .sym pmc pcre_exec
+  .local pmc pcre_exec
   dlfunc pcre_exec, pcre_lib, "pcre_exec", "ipPtiiipi"
 
-  .sym string error
+  .local string error
   repeat error, " ", 500      # could be enough
-  .sym int    errptr
-  .sym string s
+  .local int    errptr
+  .local string s
   s = "asdf"
-  .sym int s_len
+  .local int s_len
   length s_len, s
-  .sym pmc NULL
+  .local pmc NULL
   null NULL
-  .sym int ok
-  .sym pmc ovector
+  .local int ok
+  .local pmc ovector
   ovector = new ManagedStruct
   ovector = 120       # 1/(2/3) * 4  * 2 * 10 for 10 result pairs
-  .sym int is_defined
+  .local int is_defined
 
   # compile regular expression 'as'
-  .sym pmc re_as
+  .local pmc re_as
   .pcc_begin prototyped
     .arg 'as'
     .arg 0
@@ -121,7 +124,7 @@ OUTPUT
   unless is_defined goto COMPILE_FAILED
 
   # compile regular expression 'df'
-  .sym pmc re_df
+  .local pmc re_df
   .pcc_begin prototyped
     .arg 'df'
     .arg 0
@@ -191,36 +194,36 @@ OUTPUT
 .include "library/pcre.imc"
 .sub _main prototyped
   print	"\n"
-  .sym pmc lib
+  .local pmc lib
   .PCRE_INIT(lib)
-  .sym string error
-  .sym int errptr
-  .sym string pat
+  .local string error
+  .local int errptr
+  .local string pat
 
-  .sym pmc regex
+  .local pmc regex
   pat = 'as'
   .PCRE_COMPILE(pat, 0, regex, error, errptr)
   $I0 = defined regex
   unless $I0 goto match_err
 
-  .sym pmc regex_2
+  .local pmc regex_2
   pat = 'df'
   .PCRE_COMPILE(pat, 0, regex_2, error, errptr)
   $I0 = defined regex_2
   unless $I0 goto match_err
 
-  .sym int ok
-  .sym pmc result
-  .sym string s
+  .local int ok
+  .local pmc result
+  .local string s
   s = "asdf"
   .PCRE_MATCH(regex, s, 0, 0, ok, result)
   if ok < 0 goto nomatch
   print ok
   print " match(es):\n"
-  .sym int i
+  .local int i
   i = 0
-  .sym string match
-  .sym string s
+  .local string match
+  .local string s
 lp: .PCRE_DOLLAR(s, ok, result, i, match)
   print match
   print "\n"
@@ -255,40 +258,40 @@ OUTPUT
 .include "library/pcre.imc"
 .sub _main prototyped
   print	"\n"
-  .sym pmc lib
+  .local pmc lib
   .PCRE_INIT(lib)
-  .sym string error
-  .sym int errptr
-  .sym string pat
+  .local string error
+  .local int errptr
+  .local string pat
 
-  .sym pmc regex
+  .local pmc regex
   pat = 'as'
   .PCRE_COMPILE(pat, 0, regex, error, errptr)
   $I0 = defined regex
   unless $I0 goto match_err
 
-  .sym int ok
-  .sym pmc result
-  .sym string s
-  .sym int i
+  .local int ok
+  .local pmc result
+  .local string s
+  .local int i
   s = "asdf"
   .PCRE_MATCH(regex, s, 0, 0, ok, result)
   if ok < 0 goto nomatch
   print ok
   print " match(es):\n"
   i = 0
-  .sym string match
+  .local string match
 lp: .PCRE_DOLLAR(s, ok, result, i, match)
   print match
   print "\n"
   inc i
   if i < ok goto lp
 
-  .sym pmc regex_2
-  .sym string pat_2
+  .local pmc regex_2
+  .local string pat_2
   pat_2 = 'df'
-  .sym string error_2
-  .sym int errptr_2
+  .local string error_2
+  .local int errptr_2
   #.PCRE_COMPILE(pat_2, 0, regex_2, error_2, errptr_2)
   #------ Start of PCRE_COMPILE ------------------
     $P1 = global "_pcre_compile"     # This sub is defined in libpcre.imc
@@ -304,10 +307,10 @@ lp: .PCRE_DOLLAR(s, ok, result, i, match)
   $I0 = defined regex_2
   unless $I0 goto match_err
 
-  .sym int ok_2
-  .sym pmc result_2
-  .sym string s_2
-  .sym int i_2
+  .local int ok_2
+  .local pmc result_2
+  .local string s_2
+  .local int i_2
   s_2 = "asdf"
 
   end

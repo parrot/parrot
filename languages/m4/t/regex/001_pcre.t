@@ -1,8 +1,11 @@
 #!perl
 
+# $Id$
+
 use strict;
 use lib '../../lib';             # Finding Parrot/Config.pm
 use lib '../../imcc';            # Finding imcc/TestCompiler.pm
+
 use TestCompiler tests => 2;
 
 my $parrot_home = '../..';
@@ -27,29 +30,29 @@ OUTPUT
 .include "library/pcre.imc"
 .pcc_sub _main prototyped
   print	"\n"
-  .sym pmc lib
+  .local pmc lib
   .PCRE_INIT(lib)
-  .sym string error
-  .sym int errptr
-  .sym pmc code
-  .sym string pat
+  .local string error
+  .local int errptr
+  .local pmc code
+  .local string pat
   pat = "asdf"
   .PCRE_COMPILE(pat, 0, code, error, errptr)
   $I0 = defined code
   unless $I0 goto match_err
 
-  .sym int ok
-  .sym pmc result
-  .sym string s
+  .local int ok
+  .local pmc result
+  .local string s
   s = "0123asdf89"
   .PCRE_MATCH(code, s, 0, 0, ok, result)
   if ok < 0 goto nomatch
   print ok
   print " match(es):\n"
-  .sym int i
+  .local int i
   i = 0
-  .sym string match
-  .sym string s
+  .local string match
+  .local string s
 lp: .PCRE_DOLLAR(s, ok, result, i, match)
   print match
   print "\n"

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Language::m4::Macro 
