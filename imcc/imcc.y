@@ -276,7 +276,7 @@ itcall_sub(SymReg* sub)
 %type <sr> key keylist _keylist
 %type <sr> vars _vars var_or_i _var_or_i label_op
 %type <i> pasmcode pasmline pasm_inst
-%type <sr> pasm_args lhs
+%type <sr> pasm_args
 %type <symlist> targetlist arglist
 %token <sr> VAR
 %token <t> LINECOMMENT
@@ -788,7 +788,7 @@ assignment:
                         { $$ = MK_I(interp, cur_unit, "bxor", 3, $1, $3, $5); }
    | target '=' var '[' keylist ']'
                         { $$ = iINDEXFETCH(interp, cur_unit, $1, $3, $5); }
-   | var '[' keylist ']' '=' var
+   | target '[' keylist ']' '=' var
                         { $$ = iINDEXSET(interp, cur_unit, $1, $3, $6); }
    | target '=' NEW classname COMMA var
                         { $$ = iNEW(interp, cur_unit, $1, $4, $6, 1); }
@@ -854,9 +854,9 @@ the_sub: IDENTIFIER  { $$ = mk_sub_address($1); }
                        if ($1->set != 'P')
                           fataly(1, sourcefile, line, "Sub isn't a PMC");
                      }
-       | lhs ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
-       | lhs ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
-       | lhs ptr target     { cur_obj = $1; $$ = $3; }
+       | target ptr IDENTIFIER { cur_obj = $1; $$ = mk_sub_address($3); }
+       | target ptr STRINGC    { cur_obj = $1; $$ = mk_const($3, 'S'); }
+       | target ptr target     { cur_obj = $1; $$ = $3; }
    ;
 
 ptr:    POINTY { $$=0; }
@@ -920,11 +920,6 @@ target:
    | reg
    ;
 
-lhs:
-     VAR        /* duplicated because of reduce conflict */
-   | reg
-   ;
-
 vars:
      /* empty */   {  $$ = NULL; }
    | _vars         {  $$ = $1; }
@@ -937,7 +932,7 @@ _vars:
 
 _var_or_i:
      var_or_i      {  regs[nargs++] = $1; }
-   | lhs '[' keylist ']'
+   | target '[' keylist ']'
                    {
                       regs[nargs++] = $1;
                       keyvec |= KEY_BIT(nargs);
@@ -956,8 +951,7 @@ var_or_i:
    ;
 
 var:
-     VAR
-   | reg
+     target
    | const
    ;
 
