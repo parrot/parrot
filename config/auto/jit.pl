@@ -34,6 +34,10 @@ sub runstep {
     ($osname, $cpuarch) = ($cpuarch, "");
   }
 
+  if($osname =~ /darwin/) {
+    $cpuarch = 'ppc';
+  }
+
   if($cpuarch =~ /MSWin32/) {
     $cpuarch = 'i386';
     $osname  = 'MSWin32';
