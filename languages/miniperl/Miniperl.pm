@@ -8,15 +8,18 @@ use Miniperl::Generator;
 
 sub new {
   my ($class,$file) = @_;
-  bless { file => $file },$class;
+  bless {
+    file => $file
+  },$class;
 }
 
 sub compile {
   my $self = shift;
   $self->{tokens} = tokenize($self->{file});
 #print Dumper($self->{tokens});exit;
-  $self->{tree}   = parse($self->{tokens});
-#print Dumper($self->{tree});exit;
+  my $parser = Miniperl::Parser->new();
+  $self->{tree} = $parser->parse($self->{tokens});
+print Dumper($self->{tree});exit;
   Miniperl::Generator->new($self->{tree})->generate();
 }
 
