@@ -71,12 +71,34 @@ int Parrot_dod_trace_root(Interp *, int trace_stack);
 int Parrot_dod_trace_children(Interp *, size_t how_many);
 void Parrot_dod_sweep(Interp *, struct Small_Object_Pool *pool);
 void Parrot_dod_ms_run_init(Interp *interpreter);
+void Parrot_dod_clear_live_bits(Interp*);
 
 /* GC subsystem init functions */
 void Parrot_gc_ms_init(Interp* interpreter);
 void Parrot_gc_ims_init(Interp* interpreter);
 /* synchron entry point, mainly for lazy sweeps */
 void Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags);
+
+void Parrot_dod_ims_wb(Interp*, PMC *, PMC *);
+/*
+ * write barrier
+ */
+#if PARROT_GC_IMS
+#  define DOD_WRITE_BARRIER(interp, agg, old, new) \
+    do { \
+        if ( \
+                PObj_live_TEST(agg) && \
+                (PObj_get_FLAGS(agg) & PObj_custom_GC_FLAG) && \
+                !PObj_live_TEST(new)) { \
+            Parrot_dod_ims_wb(interp, agg, new); \
+        } \
+    } while (0)
+
+#endif
+
+#if PARROT_GC_MS
+#  define DOD_WRITE_BARRIER(interp, agg, old, new)
+#endif
 
 #endif /* PARROT_DOD_H_GUARD */
 

@@ -634,6 +634,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
                 "FixedPMCArray: index out of bounds!\n");
 
         data = (PMC**)PMC_data(SELF);
+        DOD_WRITE_BARRIER(INTERP, SELF, data[key], src);
         data[key] = src;
     }
 

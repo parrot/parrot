@@ -132,13 +132,8 @@ mem_allocate(Interp *interpreter, size_t *req_size,
         alloc_new_block(interpreter, size, pool);
         interpreter->arena_base->mem_allocs_since_last_collect++;
     }
-    if (0 && GC_DEBUG(interpreter)) {
-        Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
-        if (pool->compact) {
-            (*pool->compact) (interpreter, pool);
-        }
-    }
     if (pool->top_block->free < size) {
+#if PARROT_GC_MS
         Parrot_do_dod_run(interpreter, DOD_trace_stack_FLAG);
         /* Compact the pool if allowed and worthwhile */
         if (pool->compact) {
@@ -152,6 +147,7 @@ mem_allocate(Interp *interpreter, size_t *req_size,
             }
 
         }
+#endif
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536*16)
                 pool->minimum_block_size *= 2;

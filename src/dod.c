@@ -279,8 +279,10 @@ Parrot_dod_trace_root(Interp *interpreter, int trace_stack)
     if (interpreter->profile)
         profile_dod_start(interpreter);
     /* We have to start somewhere, the interpreter globals is a good place */
-    arena_base->dod_mark_start = arena_base->dod_mark_ptr =
-        interpreter->iglobals;
+    if (!arena_base->dod_mark_start) {
+        arena_base->dod_mark_start = arena_base->dod_mark_ptr =
+            interpreter->iglobals;
+    }
 
     /* mark it as used  */
     pobject_lives(interpreter, (PObj *)interpreter->iglobals);
@@ -379,7 +381,7 @@ Returns whether the tracing process wasn't aborted.
 int
 Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
 {
-    PMC *prev = NULL, *next;
+    PMC *next;
     struct Arenas *arena_base = interpreter->arena_base;
     INTVAL i = 0;
     UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
@@ -400,7 +402,7 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
         profile_dod_start(interpreter);
     pt_DOD_mark_root_finished(interpreter);
 
-    for (; current != prev; current = PMC_next_for_GC(current)) {
+    for (; ; current = next) {
         UINTVAL bits = PObj_get_FLAGS(current) & mask;
 
         if (lazy_dod && arena_base->num_early_PMCs_seen >=
@@ -409,13 +411,17 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
         }
         arena_base->dod_trace_ptr = current;
         /*
+         * short-term hack to color objects black
+         */
+        PObj_get_FLAGS(current) |= PObj_custom_GC_FLAG;
+        /*
          * clearing the flag is much more expensive then testing
          */
         if (!PObj_needs_early_DOD_TEST(current)
 #if ARENA_DOD_FLAGS
                 && PObj_high_priority_DOD_TEST(current)
 #endif
-                )
+           )
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark properties */
@@ -444,14 +450,16 @@ Parrot_dod_trace_children(Interp *interpreter, size_t how_many)
             }
         }
 
+        next = PMC_next_for_GC(current);
+        if (next == current)
+            break;
         if (--how_many == 0) {
-            if (current != PMC_next_for_GC(current))
-                current = PMC_next_for_GC(current);
+            current = next;
             break;
         }
-        prev = current;
     }
     arena_base->dod_mark_start = current;
+    arena_base->dod_trace_ptr = NULL;
     if (interpreter->profile)
         profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
     return 1;
@@ -762,6 +770,7 @@ Parrot_dod_sweep(Interp *interpreter,
                 total_used++;
 #if !ARENA_DOD_FLAGS
                 PObj_live_CLEAR(b);
+                PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
 #endif
             }
             else {
@@ -989,7 +998,7 @@ trace_mem_block(Interp *interpreter,
 
 /*
 
-=item C<static void clear_live_bits(Parrot_Interp interpreter)>
+=item C<static void Parrot_dod_clear_live_bits(Parrot_Interp interpreter)>
 
 Run through all PMC arenas and clear live bits.
 
@@ -997,8 +1006,9 @@ Run through all PMC arenas and clear live bits.
 
 */
 
-static void
-clear_live_bits(Parrot_Interp interpreter)
+void Parrot_dod_clear_live_bits(Parrot_Interp interpreter);
+void
+Parrot_dod_clear_live_bits(Parrot_Interp interpreter)
 {
     struct Small_Object_Pool *pool = interpreter->arena_base->pmc_pool;
     struct Small_Object_Arena *arena;
@@ -1098,6 +1108,7 @@ Parrot_dod_ms_run_init(Interp *interpreter)
     int j;
 
     arena_base->dod_trace_ptr = NULL;
+    arena_base->dod_mark_start = NULL;
     arena_base->num_early_PMCs_seen = 0;
     arena_base->num_extended_PMCs = 0;
 #if ARENA_DOD_FLAGS
@@ -1139,6 +1150,8 @@ parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interpreter, flags & DOD_trace_stack_FLAG)) {
 
+        arena_base->dod_trace_ptr = NULL;
+        arena_base->dod_mark_ptr = NULL;
         /*
          * mark is now finished
          */
@@ -1176,7 +1189,7 @@ parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
          * the live bits, but e.g. t/pmc/timer_7 succeeds w/o this
          */
 #if 1
-        clear_live_bits(interpreter);
+        Parrot_dod_clear_live_bits(interpreter);
 #endif
         if (interpreter->profile)
             profile_dod_end(interpreter, PARROT_PROF_DOD_p2);
@@ -1184,7 +1197,6 @@ parrot_dod_ms_run(Interp *interpreter, UINTVAL flags)
     pt_DOD_stop_mark(interpreter);
     /* Note it */
     arena_base->dod_runs++;
-    arena_base->dod_trace_ptr = NULL;
     --arena_base->DOD_block_level;
     return;
 }

@@ -17,7 +17,7 @@ DOD/GC related bugs.
 
 =cut
 
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 output_is( <<'CODE', '1', "sweep 1" );
       interpinfo I1, 2   # How many DOD runs have we done already?
@@ -473,4 +473,56 @@ output_is(<<'CODE', <<OUTPUT, "Recursion and exceptions");
 CODE
 ok 1
 10
+OUTPUT
+
+output_is(<<'CODE', <<OUTPUT, "write barrier 1");
+    null I2
+    set I3, 100
+lp3:
+    null I0
+    set I1, 1000
+    new P1, .ResizablePMCArray
+lp1:
+    new P2, .ResizablePMCArray
+    new P0, .Integer
+    set P0, I0
+    set P2[0], P0
+    set P1[I0], P2
+    if I0, not_0
+    needs_destroy P0
+    # force marking past P2[0]
+    sweep 0
+not_0:
+    new P3, .Undef
+    new P4, .Undef
+    inc I0
+    lt I0, I1, lp1
+
+    null I0
+    # trace 1
+lp2:
+    set P2, P1[I0]
+    set P2, P2[0]
+    eq P2, I0, ok
+    print "nok\n"
+    print "I0: "
+    print I0
+    print " P2: "
+    print P2
+    print " type: "
+    typeof S0, P2
+    print S0
+    print " I2: "
+    print I2
+    print "\n"
+    exit 1
+ok:
+    inc I0
+    lt I0, I1, lp2
+    inc I2
+    lt I2, I3, lp3
+    print "ok\n"
+    end
+CODE
+ok
 OUTPUT

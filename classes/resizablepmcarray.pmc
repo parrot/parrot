@@ -24,6 +24,7 @@ TODO currently this uses PerlString instead of String PMCs.
 
 #include "parrot/parrot.h"
 
+
 pmclass ResizablePMCArray extends FixedPMCArray need_ext does array {
     void class_init () {
         /* this should be autmatically done - probably */
@@ -152,6 +153,7 @@ If key is a slice, do a splice as set that item.
 */
 
     void set_pmc_keyed_int (INTVAL key, PMC* src) {
+        PMC **data;
         /*
          * TODO in python mode, only .append is allowed
          */
@@ -162,7 +164,9 @@ If key is a slice, do a splice as set that item.
                 "ResizablePMCArray: index out of bounds!\n");
         if (key >= PMC_int_val(SELF))
             DYNSELF.set_integer_native(key+1);
-        ((PMC**)PMC_data(SELF))[key] = src;
+        data = (PMC**)PMC_data(SELF);
+        DOD_WRITE_BARRIER(INTERP, SELF, data[key], src);
+        data[key] = src;
     }
 
     void set_pmc_keyed (PMC* key, PMC* src) {

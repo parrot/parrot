@@ -337,6 +337,7 @@ a sleep opcode.
 */
 
 #include "parrot/parrot.h"
+#include <assert.h>
 
 /*
  * size of one arena
@@ -360,11 +361,18 @@ a sleep opcode.
  */
 #define REFILL_FACTOR         0.5
 
+#if 0
+#  define IMS_DEBUG(x) fprintf x
+#else
+#  define IMS_DEBUG(x)
+#endif
+
 typedef enum {          /* these states have to be in execution order */
     GC_IMS_INITIAL,     /* memory subsystem setup */
     GC_IMS_STARTING,    /* wait for DOD_block to clear */
     GC_IMS_RE_INIT,     /* start of normal operation - mark root */
     GC_IMS_MARKING,     /* mark children */
+    GC_IMS_START_SWEEP, /* mark finished, start sweep buffers */
     GC_IMS_SWEEP,       /* sweep buffers */
     GC_IMS_COLLECT,     /* collect buffer memory */
     GC_IMS_FINISHED,    /* update statistics */
@@ -385,12 +393,42 @@ typedef struct {
 
 static void parrot_gc_ims_run_increment(Interp*);
 
+/*
+
+=item C<static void gc_ims_add_free_object(Interp *interpreter,
+        struct Small_Object_Pool *pool, void *to_add)>
+
+Add object C<to_add> to the free_list in the given pool.
+C<pool->num_free_objects> has to be updated by the caller.
+
+=item C<static void *
+gc_ims_get_free_object(Interp *, struct Small_Object_Pool *pool)>
+
+Get a new object off the free_list in the given pool.
+
+=item C<static void
+gc_ims_alloc_objects(Interp *, struct Small_Object_Pool *pool)>
+
+Allocate new objects for the given pool.
+
+=cut
+
+*/
+
 static void
 gc_ims_add_free_object(Interp *interpreter,
         struct Small_Object_Pool *pool, void *to_add)
 {
     *(void **)to_add = pool->free_list;
     pool->free_list = to_add;
+#if ! DISABLE_GC_DEBUG
+    if (GC_DEBUG(interpreter)) {
+        if (pool == interpreter->arena_base->pmc_pool) {
+            PMC *p = to_add;
+            p->vtable = Parrot_base_vtables[enum_class_Null];
+        }
+    }
+#endif
 }
 
 
@@ -407,6 +445,7 @@ gc_ims_get_free_object(Interp *interpreter,
     ptr = pool->free_list;
     pool->free_list = *(void **)ptr;
     PObj_on_free_list_CLEAR((PObj*) ptr);
+    PObj_get_FLAGS((PObj*)ptr) &= ~PObj_custom_GC_FLAG;
     --pool->num_free_objects;
 #if ! DISABLE_GC_DEBUG
     if (GC_DEBUG(interpreter))
@@ -490,7 +529,11 @@ parrot_gc_ims_reinit(Interp* interpreter)
     arena_base->lazy_dod = 0;
     g_ims = arena_base->gc_private;
     Parrot_dod_ms_run_init(interpreter);
+    /*
+     * trace root set w/o system areas
+     */
     Parrot_dod_trace_root(interpreter, 0);
+    g_ims->state = GC_IMS_MARKING;
 
 }
 
@@ -500,9 +543,8 @@ parrot_gc_ims_reinit(Interp* interpreter)
 
 Mark a bunch of children.
 
-TODO gather stats of items with and without a next_for_GC field.
+The work depends on item counts with and without a next_for_GC field.
 The former are marked immediately, only the latter need real work here.
-Then adjust throttle on this data, so that we don't work too fast.
 
 =cut
 
@@ -515,19 +557,28 @@ parrot_gc_ims_mark(Interp* interpreter)
     size_t todo;
     struct Arenas *arena_base;
     double work_factor;
+    PMC *next;
 
     arena_base = interpreter->arena_base;
     g_ims = arena_base->gc_private;
+    /*
+     * use statistics from the previous run
+     */
     if (g_ims->n_objects) {
         work_factor = (double)g_ims->n_extended_PMCs / g_ims->n_objects;
     }
     else
         work_factor = 1.0;
     todo = (double)g_ims->alloc_trigger * g_ims->throttle * work_factor;
+    assert(arena_base->lazy_dod == 0);
     Parrot_dod_trace_children(interpreter, todo);
-    if (arena_base->dod_trace_ptr ==
-            PMC_next_for_GC(arena_base->dod_trace_ptr)) {
-        g_ims->state = GC_IMS_SWEEP;
+    /*
+     * check if we are finished with marking - the end is
+     * self-referential
+     */
+    next = arena_base->dod_mark_start;
+    if (next == PMC_next_for_GC(next)) {
+        g_ims->state = GC_IMS_START_SWEEP;
     }
 }
 
@@ -551,16 +602,15 @@ parrot_gc_ims_sweep(Interp* interpreter)
     int j;
     size_t n_objects;
 
+    IMS_DEBUG((stderr, "\nSWEEP\n"));
     g_ims = arena_base->gc_private;
     /*
      * as we are now gonna kill objects, make sure that we
      * have traced the current stack
      * except for a lazy run, which is invoked from the run loop
      */
-    if (!g_ims->lazy) {
-        /* no BARRIER yet - ark all roots */
-        Parrot_dod_trace_root(interpreter, 1);
-    }
+    /* no BARRIER yet - mark all roots */
+    Parrot_dod_trace_root(interpreter, g_ims->lazy ? 0 : 1);
     /*
      * mark (again) rest of children
      */
@@ -636,6 +686,7 @@ parrot_gc_ims_run_increment(Interp* interpreter)
     g_ims = arena_base->gc_private;
     g_ims->allocations = 0;
     ++g_ims->increments;
+    IMS_DEBUG((stderr, "state = %d => ", g_ims->state));
 
     switch (g_ims->state) {
         case GC_IMS_INITIAL:
@@ -649,12 +700,15 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             /* else fall through and start */
         case GC_IMS_RE_INIT:
             parrot_gc_ims_reinit(interpreter);
-            g_ims->state = GC_IMS_MARKING;
             break;
 
         case GC_IMS_MARKING:
             parrot_gc_ims_mark(interpreter);
             break;
+
+        case GC_IMS_START_SWEEP:
+            g_ims->state = GC_IMS_SWEEP;
+            /* fall through */
         case GC_IMS_SWEEP:
             parrot_gc_ims_sweep(interpreter);
             break;
@@ -666,14 +720,25 @@ parrot_gc_ims_run_increment(Interp* interpreter)
             g_ims->state = GC_IMS_CONSUMING;
             /* fall through */
         case GC_IMS_CONSUMING:
+            /*
+             * This currently looks only at PMCs and string_headers.
+             * There shouldn't be other pools that could run out of
+             * headers independent of PMCs
+             */
             if (arena_base->pmc_pool->num_free_objects <
                     arena_base->pmc_pool->total_objects * REFILL_FACTOR) {
-                g_ims->state = GC_IMS_RE_INIT;
+                g_ims->state = GC_IMS_STARTING;
+            }
+            else if (arena_base->string_header_pool->num_free_objects <
+                    arena_base->string_header_pool->total_objects *
+                    REFILL_FACTOR) {
+                g_ims->state = GC_IMS_STARTING;
             }
             break;
         default:
             PANIC("Unknown state in gc_ims");
     }
+    IMS_DEBUG((stderr, "%d\n", g_ims->state));
 }
 
 /*
@@ -683,7 +748,7 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)>
 
 Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 
-  DOD_lazy_FLAG  ... timely destruction
+  DOD_lazy_FLAG   ... timely destruction
   DOD_finish_FLAG ... run until live bits are clear
 
 =cut
@@ -704,13 +769,17 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
 
     if (flags & DOD_finish_FLAG) {
         /*
-         * run until live flags are clear
+         * called from really_destroy. This interpreter is gonna die.
+         * The destruction includes a sweep over PMCs, so that
+         * destructors/finalizers are called.
+         *
+         * Be sure live bits are clear.
          */
-        if (g_ims->state < GC_IMS_MARKING)
+        if (g_ims->state < GC_IMS_RE_INIT)
             return;
-        while (g_ims->state <= GC_IMS_COLLECT) {
-            parrot_gc_ims_run_increment(interpreter);
-        }
+        if (g_ims->state >= GC_IMS_FINISHED)
+            return;
+        Parrot_dod_clear_live_bits(interpreter);
         return;
     }
     /* make the test happy that checks the count ;) */
@@ -720,20 +789,63 @@ Parrot_dod_ims_run(Interp *interpreter, UINTVAL flags)
         parrot_gc_ims_run_increment(interpreter);
         return;
     }
-    g_ims->lazy = lazy;
     /*
-     * XXX this a short-term hack
-     *     num_early_DOD_PMCs can change any time during operation
-     *     need a high-prio queue that is always marked first
+     * lazy DOD handling
+     */
+    IMS_DEBUG((stderr, "\nLAZY state = %d\n", g_ims->state));
+    g_ims->lazy = lazy;
+    if (g_ims->state >= GC_IMS_COLLECT) {
+        /* we are beyond sweep, timely destruction is done */
+        if (arena_base->num_early_PMCs_seen >= arena_base->num_early_DOD_PMCs)
+            return;
+        /* when not all seen, start a fresh cycle */
+        g_ims->state = GC_IMS_RE_INIT;
+        /* run init, which clears lazy seen counter */
+        parrot_gc_ims_run_increment(interpreter);
+    }
+    /*
+     *  run through all steps until we see enough PMCs that need timely
+     *  destruction or we finished sweeping
      */
     while (arena_base->num_early_PMCs_seen < arena_base->num_early_DOD_PMCs) {
         parrot_gc_ims_run_increment(interpreter);
         if (g_ims->state >= GC_IMS_COLLECT)
             break;
     }
+    /*
+     * if we stopped early, the lazy run was successful
+     */
     if (g_ims->state < GC_IMS_COLLECT)
         ++arena_base->lazy_dod_runs;
     g_ims->lazy = 0;
+}
+
+/*
+
+=item C<void Parrot_dod_ims_wb(Interp*, PMC *agg, PMC *new)>
+
+Write barriere called by the DOD_WRITE_BARRIER macro. Always when a
+white object gets store into a black aggregate, either the object must
+be greyed or the aggregate must be rescanned - by greying it.
+
+=cut
+
+*/
+
+#define DOD_IMS_GREY_NEW 1
+
+
+void
+Parrot_dod_ims_wb(Interp* interpreter, PMC *agg, PMC *new)
+{
+#if DOD_IMS_GREY_NEW
+    IMS_DEBUG((stderr, "%d ", ((Gc_ims_private *)interpreter->arena_base->
+                gc_private)->state));
+    pobject_lives(interpreter, (PObj*)new);
+#else
+    PObj_get_FLAGS(agg) &= ~ (PObj_live_FLAG|PObj_custom_GC_FLAG);
+    pobject_lives(interpreter, (PObj*)agg);
+#endif
 }
 
 /*
