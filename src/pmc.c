@@ -285,33 +285,57 @@ mmd_fallback_concat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 void
 mmd_fallback_land_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    PMC *truth;
+    if (!VTABLE_get_bool(interp, left)) {
+        truth = left;
+    } else {
+        truth = right;
+    }
+    VTABLE_set_pmc(interp, dest, truth);
 }
 
 void
 mmd_fallback_lor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    PMC *truth;
+    if (VTABLE_get_bool(interp, left)) {
+        truth = left;
+    } else {
+        truth = right;
+    }
+    VTABLE_set_pmc(interp, dest, truth);
 }
 
 void
 mmd_fallback_lxor_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    INTVAL left_truth, right_truth;
+    PMC *true;
+    left_truth = VTABLE_get_bool(interp, left);
+    right_truth = VTABLE_get_bool(interp, left);
+    /* Are they both false? That's the easy case */
+    if ((left_truth && right_truth) || (!left_truth && !right_truth)) {
+        true = constant_pmc_new_noinit(interp, enum_class_PerlUndef);
+    } else {
+        if (left_truth) {
+            true = left;
+        } else {
+            true = right;
+        }
+    }
+    VTABLE_set_pmc(interp, dest, true);
 }
 
 void
 mmd_fallback_repeat_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
-    VTABLE_set_integer_native(interp, dest,
-                              VTABLE_get_integer(interp, left) >>
-                              VTABLE_get_integer(interp, right));
+    STRING *base, *total;
+    INTVAL count;
+
+    base = VTABLE_get_string(interp, left);
+    count = VTABLE_get_integer(interp, right);
+
+    VTABLE_set_string_native(interp, dest, total);
 }
 
 void
@@ -334,10 +358,11 @@ void
 mmd_fallback_numcmp_pmc(Parrot_Interp interp, PMC *left, PMC *right, PMC *dest)
 {
     FLOATVAL left_float, right_float;
+    INTVAL cmp_val;
+
     left_float = VTABLE_get_number(interp, left);
     right_float = VTABLE_get_number(interp, right);
 
-    INTVAL cmp_val;
 
 
     VTABLE_set_integer_native(interp, dest,
