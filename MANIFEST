@@ -260,7 +260,7 @@ docs/pmc/subs.pod                                 [main]doc
 docs/porting_intro.pod                            [main]doc
 docs/practical_notes.pod                          [main]doc
 docs/resources/parrot.small.png                   [devel]
-docs/resources/perl-styles.css                    [devel]
+docs/resources/perl.css                           [devel]
 docs/resources/up.gif                             [devel]
 docs/running.pod                                  [main]doc
 docs/strings.pod                                  [main]doc
