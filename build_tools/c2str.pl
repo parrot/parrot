@@ -128,7 +128,7 @@ sub create_c_include {
  * Any changes made here will be lost!
  *
  */
-static struct _cstrings {
+static const struct _cstrings {
     UINTVAL len;
     Parrot_UInt4 hash_val;
     const char *string;

@@ -19,7 +19,7 @@ well.
 
 =cut
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 output_is(<<CODE, <<OUTPUT, "Initial PerlHash tests");
@@ -1142,6 +1142,34 @@ changed inner_hash:133
 -134.134000
 135.135000
 -135.135000
+OUTPUT
+
+output_is(<< 'CODE', << 'OUTPUT', "mutating the lookup string");
+    new P0, .PerlHash
+    set P0["a"], "one"
+    set P0["ab"], "two"
+    set P0["abc"], "three"
+
+	set S0, "a"
+    set S1, P0[S0]
+	print S1
+	print "\n"
+
+	concat S0, "b"
+    set S1, P0[S0]
+	print S1
+	print "\n"
+
+	concat S0, "c"
+    set S1, P0[S0]
+	print S1
+	print "\n"
+
+	end
+CODE
+one
+two
+three
 OUTPUT
 
 1;

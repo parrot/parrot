@@ -27,8 +27,6 @@ strings.
 #include "parrot/parrot.h"
 #include <assert.h>
 
-#define USE_HASH_VAL 1
-
 /*
  * this extra size is in the hope, that some concat ops might
  * follow in a sequence.
@@ -106,6 +104,8 @@ unmake_COW(struct Parrot_Interp *interpreter, STRING *s)
         /* COW_FLAG | external_FLAG | bufstart_external_FLAG immobile_FLAG */
         PObj_is_external_CLEARALL(s);
     }
+
+    s->hashval = 0;
 }
 
 /*
@@ -753,13 +753,7 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
                 PObj_bufstart(s) = s->strstart = const_cast(buffer);
                 PObj_buflen(s)   = s->strlen = s->bufused = len;
                 PObj_bufstart_external_SET(s);
-#if USE_HASH_VAL
-                if (flags & PObj_constant_FLAG) {
-                    Hash hash;
-                    hash.seed = 0;
-                    s->hashval = string_hash(interpreter, &hash, s);
-                }
-#endif
+
                 return s;
             }
         }
@@ -784,13 +778,6 @@ string_make(struct Parrot_Interp *interpreter, const void *buffer,
             else {
                 s->strlen = s->bufused = 0;
             }
-#if USE_HASH_VAL
-                if (flags & PObj_constant_FLAG) {
-                    Hash hash;
-                    hash.seed = 0;
-                    s->hashval = string_hash(interpreter, &hash, s);
-                }
-#endif
         }
         else {
             string_fill_from_buffer(interpreter, buffer, len, encoding_name, s);
@@ -2838,29 +2825,28 @@ do { \
 =item C<size_t
 string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)>
 
-Returns a hash value for the specified Parrot string.
-
-TODO - Cache this value in C<s->hashval>? Make the seed global, but
-random at start time?
+Returns the hash value for the specified Parrot string, caching it in
+C<s->hashval>.
 
 =cut
 
 */
 
 size_t
-string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
+string_hash(struct Parrot_Interp * interpreter, STRING *s)
 {
-#if USE_HASH_VAL
-    register size_t h = 0;
-#else
-    register size_t h = hash->seed;
-#endif
+    register size_t h;
 
     UNUSED(interpreter);
 
     if (!s)
         return 0;
 
+    if (s->hashval) {
+        return s->hashval;
+    }
+
+    h = 0;
     switch (s->representation) {
         case enum_stringrep_one:
             HASH_STRING(Parrot_UInt1, s, h);
@@ -2876,11 +2862,9 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
             break;
     }
 
-#if USE_HASH_VAL
-    return h ^ hash->seed;
-#else
+    s->hashval = h;
+
     return h;
-#endif
 }
 
 
@@ -3035,13 +3019,7 @@ string_unescape_cstring(struct Parrot_Interp * interpreter,
     }
     result->strlen = d;
     result->bufused = string_max_bytes(interpreter, result, d);
-#if USE_HASH_VAL
-    {
-        Hash hash;
-        hash.seed = 0;
-        result->hashval = string_hash(interpreter, &hash, result);
-    }
-#endif
+
     return result;
 }
 
