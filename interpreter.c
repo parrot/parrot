@@ -706,7 +706,7 @@ static void setup_default_compreg(Parrot_Interp interpreter)
 {
     STRING *pasm1 = string_make(interpreter, "PASM1", 5, NULL,0,NULL);
     PMC * nci;
-    Parrot_csub_t p = (Parrot_csub_t) F2DPTR(PDB_compile);
+    Parrot_csub_t p = (Parrot_csub_t) PDB_compile;
     nci = pmc_new(interpreter, enum_class_Compiler);
     /* register the nci ccompiler object */
     Parrot_compreg(interpreter, pasm1, nci);
