@@ -148,11 +148,11 @@ sub unpack
 
   if($const_length) {
     $const = unpack("a$const_length", $string);
-    $string = substr($string, $const_length);
     $self->{CONST}->unpack($const);
   } else {
     $self->{CONST}->clear;
   }
+  $string = substr($string, $const_length);
 
   #
   # Read the byte code:

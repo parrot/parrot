@@ -88,11 +88,13 @@ sub pack
   my $self = shift;
   my $string = '';
 
-  $string .= pack('l', scalar(@{$self->{CONST}}));
+  $string = pack('l', $self->const_count);
 
   foreach (@{$self->{CONST}}) {
     $string .= $_->pack;
   }
+
+  $string = pack('l', length($string)) . $string;
 
   return $string;
 }
@@ -134,6 +136,18 @@ sub constants
 }
 
 
+#
+# add()
+#
+
+sub add
+{
+  my $self = shift;
+  my $const = shift;
+  die unless ref $const eq "Parrot::PackFile::Constant";
+  push @{$self->{CONST}}, $const;
+}
+
 1;
 
 __END__
@@ -149,6 +163,8 @@ Parrot::PackFile::ConstTable
 =head1 DESCRIPTION
 
 Constant tables from Parrot pack files.
+
+=head2 add
 
 =head2 clear
 
