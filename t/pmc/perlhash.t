@@ -696,14 +696,18 @@ output_is(<< 'CODE', << 'OUTPUT', "Getting PMCs from string;int compound keys");
     new P1, .PerlHash
     new P2, .PerlInt
     set P2, 4
-    set P1[0], P2
+    set P1[9], P2
+    set I0, P1[9]
+    print I0
+    print "\n"
     set P0["a"], P1
-    set I0, P0["a";0]
+    set I0, P0["a";9]
     print "Four is "
     print I0
     print "\n"
     end
 CODE
+4
 Four is 4
 OUTPUT
 
@@ -1050,44 +1054,44 @@ output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     outer_hash['inner_array'] = inner_array
     elem_string = outer_hash['inner_array';128]
     print elem_string
-    print "\n" 
+    print "\n"
     outer_hash['inner_array';128] = 'changed inner_array:128'
     elem_string = outer_hash['inner_array';128]
     print elem_string
-    print "\n" 
+    print "\n"
 
     # setting and retrieving strings in an inner PerlHash
     inner_hash['129'] = 'inner_hash:129'
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'129']
     print elem_string
-    print "\n" 
+    print "\n"
     outer_hash['inner_hash';'129'] = 'changed inner_hash:129'
     elem_string = outer_hash['inner_hash';'129']
     print elem_string
-    print "\n" 
+    print "\n"
 
     # setting and retrieving integer in an inner PerlArray
     inner_array[130] = 130
     outer_hash['inner_array'] = inner_array
     elem_int = outer_hash['inner_array';130]
     print elem_int
-    print "\n" 
+    print "\n"
     outer_hash['inner_array';130] = -130
     elem_int = outer_hash['inner_array';130]
     print elem_int
-    print "\n" 
+    print "\n"
 
     # setting and retrieving integer in an inner PerlHash
     inner_hash['131'] = 131
     outer_hash['inner_hash'] = inner_hash
     elem_int = outer_hash['inner_hash';'131']
     print elem_int
-    print "\n" 
+    print "\n"
     outer_hash['inner_hash';'131'] = -131
     elem_int = outer_hash['inner_hash';'131']
     print elem_int
-    print "\n" 
+    print "\n"
 
     # setting and retrieving a PMC in an inner PerlArray
     .local pmc in_pmc
@@ -1097,12 +1101,12 @@ output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     outer_hash['inner_array'] = inner_array
     elem_pmc = outer_hash['inner_array';132]
     print elem_pmc
-    print "\n" 
+    print "\n"
     in_pmc = 'changed inner_array:132'
     outer_hash['inner_array';132] = in_pmc
     elem_pmc = outer_hash['inner_array';132]
     print elem_pmc
-    print "\n" 
+    print "\n"
 
     # setting and retrieving a PMC in an inner PerlHash
     in_pmc = 'inner_array:133'
@@ -1110,34 +1114,34 @@ output_is(<< 'CODE', << 'OUTPUT', "Setting with compound keys");
     outer_hash['inner_hash'] = inner_hash
     elem_string = outer_hash['inner_hash';'133']
     print elem_string
-    print "\n" 
+    print "\n"
     in_pmc = 'changed inner_hash:133'
     outer_hash['inner_hash';'133'] = in_pmc
     elem_string = outer_hash['inner_hash';'133']
     print elem_string
-    print "\n" 
+    print "\n"
 
     # setting and retrieving a float in an inner PerlArray
     inner_array[134] = 134.134
     outer_hash['inner_array'] = inner_array
     elem_num = outer_hash['inner_array';134]
     print elem_num
-    print "\n" 
+    print "\n"
     outer_hash['inner_array';134] = -134.134
     elem_num = outer_hash['inner_array';134]
     print elem_num
-    print "\n" 
+    print "\n"
 
     # setting and retrieving a float in an inner PerlHash
     inner_hash['135'] = 135.135
     outer_hash['inner_hash'] = inner_hash
     elem_num = outer_hash['inner_hash';'135']
     print elem_num
-    print "\n" 
+    print "\n"
     outer_hash['inner_hash';'135'] = -135.135
     elem_num = outer_hash['inner_hash';'135']
     print elem_num
-    print "\n" 
+    print "\n"
 
     end
 .end

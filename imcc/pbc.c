@@ -753,9 +753,10 @@ add_1_const(Interp *interpreter, SymReg *r)
         return;
     switch (r->set) {
         case 'I':
-            if (r->name[0] == '0' && r->name[1] == 'x')
+            if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
                 r->color = strtoul(r->name+2, 0, 16);
-            else if (r->name[0] == '0' && r->name[1] == 'b')
+            else if (r->name[0] == '0' &&
+                    (r->name[1] == 'b' || r->name[1] == 'B'))
                 r->color = strtoul(r->name+2, 0, 2);
             else
                 r->color = strtol(r->name, 0, 10);

@@ -314,6 +314,8 @@ Returns the size of the hash.
 
 =item C<INTVAL get_integer_keyed_str(STRING *key)>
 
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
 =cut
 
 */
@@ -328,6 +330,10 @@ Returns the size of the hash.
         return VTABLE_get_integer(INTERP, (PMC*) b->value);
     }
 
+    INTVAL get_integer_keyed_int (INTVAL key) {
+        STRING *s = string_from_int(interpreter, key);
+        return SELF.get_integer_keyed_str(s);
+    }
 /*
 
 =item C<INTVAL get_integer_keyed(PMC *key)>
@@ -376,6 +382,8 @@ Returns the integer value for the element at C<*key>.
 
 =item C<FLOATVAL get_number_keyed_str(STRING *key)>
 
+=item C<FLOATVAL get_number_keyed_int(INTVAL key)>
+
 =cut
 
 */
@@ -390,6 +398,10 @@ Returns the integer value for the element at C<*key>.
         return VTABLE_get_number(INTERP, (PMC*) b->value);
     }
 
+    FLOATVAL get_number_keyed_int (INTVAL key) {
+        STRING *s = string_from_int(interpreter, key);
+        return SELF.get_number_keyed_str(s);
+    }
 /*
 
 =item C<FLOATVAL get_number_keyed(PMC *key)>
@@ -481,6 +493,8 @@ For Python returns its repr.
 
 =item C<STRING *get_string_keyed_str(STRING *key)>
 
+=item C<STRING *get_string_keyed_int(INTVAL key)>
+
 =cut
 
 */
@@ -495,6 +509,10 @@ For Python returns its repr.
         return VTABLE_get_string(INTERP, (PMC*) b->value);
     }
 
+    STRING* get_string_keyed_int (INTVAL key) {
+        STRING *s = string_from_int(interpreter, key);
+        return SELF.get_string_keyed_str(s);
+    }
 /*
 
 =item C<STRING *get_string_keyed(PMC *key)>
@@ -567,6 +585,8 @@ Returns the number of elements in the hash.
 
 =item C<PMC *get_pmc_keyed_str(STRING *key)>
 
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
 =cut
 
 */
@@ -580,6 +600,11 @@ Returns the number of elements in the hash.
             return new_undef;
         }
         return b->value;
+    }
+
+    PMC* get_pmc_keyed_int (INTVAL key) {
+        STRING *s = string_from_int(interpreter, key);
+        return SELF.get_pmc_keyed_str(s);
     }
 
 /*
