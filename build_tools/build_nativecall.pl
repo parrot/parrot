@@ -232,7 +232,7 @@ sub make_arg {
 	       return "(short)INT_REG($regnum)";
               };
     /2/ && do {my $regnum = $reg_ref->{i}++;
-	       return "(short)INT_REG($regnum)";
+	       return "&(short)INT_REG($regnum)";
               };
     /f/ && do {my $regnum = $reg_ref->{n}++;
 	       return "(float)NUM_REG($regnum)";
