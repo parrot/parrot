@@ -10,7 +10,7 @@
 #include <sys/mman.h>
 #include <limits.h>
 #ifndef PAGESIZE
-#  define PAGESIZE 4096
+#  define PAGESIZE 10
 #endif
 
 typedef enum {
@@ -430,11 +430,6 @@ ppc_sync_cache (void *_start, void *_end)
     char *start = (char*)(((int)_start) &~(PAGESIZE - 1));
     char *end = (char *)((((int)_end) + PAGESIZE - 1) &~(PAGESIZE - 1));
 
-    /* XXX: these are just temporaries for the asm, but I can't seem
-     * to use literal registers.
-     */
-    unsigned a, b, c;
-
     /* It seems like this isn't ppc-specific -- should other systems
      * do this, too?
      */
@@ -442,41 +437,39 @@ ppc_sync_cache (void *_start, void *_end)
         internal_exception(-1, "Can't mprotect jit code %x - %x: %s\n",
                            start, end, strerror(errno));
     }
+static void
+ppc_sync_cache (void *_start, void *_end)
+{   
+    char *start = (char*)(((int)_start) &~(PAGESIZE - 1));
+    char *end = (char *)((((int)_end) + PAGESIZE - 1) &~(PAGESIZE - 1));
+    char *_sync;
+    
+    /* It seems like this isn't ppc-specific -- should other systems
+     * do this, too?
+     */ 
+    if (mprotect(start, end - start, PROT_READ|PROT_WRITE|PROT_EXEC) < 0) {
+        internal_exception(-1, "Can't mprotect jit code %x - %x: %s\n",
+                           start, end, strerror(errno));
+    }
 
-    /* XXX stolen from Linux kernel */
-    __asm__ __volatile__ (
+    for (_sync = start; _sync < end; _sync += PAGESIZE) {
+        __asm__ __volatile__ (
 /* for 601, do nothing: */
         "
-    mfspr    %4, 0x11f
-    rlwinm    %4,%4,16,16,31
-    cmpi    0,%4,1
-        beq    3f
-    li    %2,15
-    andc    %0,%0,%2
-    subf    %1,%0,%1
-    add    %1,%1,%2
-    srwi.    %1,%1,4
-    beq    3f
-    mtctr    %1
-    mr    %3,%0
-    mr    %4,%0
-1:    dcbst    0,%4
-    addi    %4,%4,16
-    bdnz    1b
-    sync"                   /* wait for dcbst's to get to ram */
+        dcbst 0,%0
+        sync
+        dcbf 0,%0
+        sync
+        icbi 0,%0
+        sync
+        isync
         "
-    mtctr    %1
-2:    icbi    0,%3
-    addi    %3,%3,16
-    bdnz    2b
-    sync"                    /* additional sync needed on g4 */
-        "
-    isync
-3:
-"
         :
-        : "r" ((long)_start), "r" ((long)_end), "r" (a), "r"(b), "r" (c)
-        );
+        : "r" ((long)_sync)
+        );  
+    }
+}
+
 }
 
 #endif
