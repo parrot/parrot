@@ -76,7 +76,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             escaped = PDB_escape(s->bufstart, s->strlen);
             PIO_eprintf(interpreter, "\"%s\"", escaped?escaped:"(null)");
                 if (escaped)
-                    free(escaped);
+                    mem_sys_free(escaped);
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "I%vd=%vd", key->cache.int_val,
@@ -92,7 +92,7 @@ trace_key_dump(struct Parrot_Interp *interpreter, PMC *key)
             PIO_eprintf(interpreter, "S%vd=\"%s\"", key->cache.int_val,
                     escaped ? escaped : "(null");
                 if (escaped)
-                    free(escaped);
+                    mem_sys_free(escaped);
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
             PIO_eprintf(interpreter, "P%vd=", key->cache.int_val);
@@ -122,8 +122,9 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
     INTVAL i;
     char *escaped;
 
-    PIO_eprintf(interpreter, "PC=%vu; OP=%Ou (%s)", (UINTVAL)(pc - code_start), *pc,
-            interpreter->op_info_table[*pc].full_name);
+    PIO_eprintf(interpreter, "PC=%vu; OP=%Ou (%s)", 
+                (UINTVAL)(pc - code_start), *pc,
+                interpreter->op_info_table[*pc].full_name);
 
     if (interpreter->op_info_table[*pc].arg_count > 1) {
         PIO_eprintf(interpreter, "; ARGS=(");
@@ -150,7 +151,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                                      constants[*(pc + i)]->u.string->bufused);
                 PIO_eprintf(interpreter, "\"%s\"", escaped ? escaped : "(null)");
                 if (escaped)
-                    free(escaped);
+                    mem_sys_free(escaped);
                 break;
             case PARROT_ARG_KC:
                 trace_key_dump(interpreter, interpreter->code->const_table->
@@ -187,7 +188,7 @@ trace_op_dump(struct Parrot_Interp *interpreter, opcode_t *code_start,
                     PIO_eprintf(interpreter, "S%vd=\"%s\"", *(pc + i),
                             escaped ? escaped : "(null)");
                     if (escaped)
-                        free(escaped);
+                        mem_sys_free(escaped);
                 }
                 else {
                     PIO_eprintf(interpreter, "S%vd=(null)", *(pc + i));
