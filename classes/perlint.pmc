@@ -55,7 +55,11 @@ pmclass PerlInt {
     STRING* get_string () {
 	char* buff = mem_sys_allocate(80);
 	STRING* s;
-	snprintf(buff,80,"%d",SELF->cache.int_val);
+#ifdef HAS_SNPRINTF
+        snprintf(buff,80,"%ld",SELF->cache.int_val);
+#else
+        sprintf(buff,"%ld",SELF->cache.int_val);  /* XXX buffer overflow! */
+#endif
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);
 	return s;
