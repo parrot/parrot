@@ -2238,7 +2238,7 @@ entry in that range.
 =cut
 
 AUTO_OP rotate(i|ic) {
-  rotate_entries(interpreter, $1);
+  rotate_entries(interpreter, &interpreter->user_stack_base, &interpreter->user_stack_top, $1);
 }
 
 
