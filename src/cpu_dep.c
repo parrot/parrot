@@ -1,14 +1,30 @@
-/* cpu_dep.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     CPU dependent functions
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/cpu_dep.c - CPU-dependent functions
+
+=head1 DESCRIPTION
+
+These functions are called while stackwalking during dead object
+destruction. They implement conditional CPU-specific behaviour related
+to register windowing.
+
+Register windowing is a technique which avoids having to empty registers
+by moving a virtual window up/down the register stack restricting the
+number of registers which are visible.
+
+Remember you read somethng about it in F<docs/infant.dev>?
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -21,6 +37,16 @@ extern void *flush_reg_store(void);
 #endif
 
 static void trace_system_stack(struct Parrot_Interp *interpreter);
+
+/*
+
+=item C<void trace_system_areas(struct Parrot_Interp *interpreter)>
+
+Traces the system stack and any additional CPU-specific areas.
+
+=cut
+
+*/
 
 void
 trace_system_areas(struct Parrot_Interp *interpreter)
@@ -72,6 +98,17 @@ trace_system_areas(struct Parrot_Interp *interpreter)
     trace_system_stack(interpreter);
 }
 
+/*
+
+=item C<static void
+trace_system_stack(struct Parrot_Interp *interpreter)>
+
+Traces the memory block starting at C<<interpreter->lo_var_ptr>>.
+
+=cut
+
+*/
+
 static void
 trace_system_stack(struct Parrot_Interp *interpreter)
 {
@@ -80,6 +117,18 @@ trace_system_stack(struct Parrot_Interp *interpreter)
     trace_mem_block(interpreter, (size_t)lo_var_ptr,
 			   (size_t)&lo_var_ptr);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/dod.c>, F<include/parrot/dod.h> and F<docs/infant.dev>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,17 +1,18 @@
-/* headers.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Header management functions. Handles getting of various headers,
- *     and pool creation
- *  Data Structure and Algorithms:
- *
- *  History:
- *     Initial version by Mike Lambert on 2002.05.27
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/headers.c - Header management functions
+
+=head1 DESCRIPTION
+
+Handles getting of various headers, and pool creation.
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
@@ -29,7 +30,22 @@
 #endif /* GC_IS_MALLOC */
 
 #  define CONSTANT_PMC_HEADERS_PER_ALLOC 64
-/** PMC Header Functions for small-object lookup table **/
+
+/*
+
+=head2 PMC Header Functions for small-object lookup table
+
+=over 4
+
+=item C<void *
+get_free_pmc(struct Parrot_Interp *interpreter, 
+             struct Small_Object_Pool *pool)>
+
+Gets a free PMC from C<pool> and returns it.
+
+=cut
+
+*/
 
 void *
 get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
@@ -46,7 +62,23 @@ get_free_pmc(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool)
     return pmc;
 }
 
-/** Buffer Header Functions for small-object lookup table **/
+/*
+
+=back
+
+=head2 Buffer Header Functions for small-object lookup table
+
+=over 4
+
+=item C<void *
+get_free_buffer(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+Gets a free C<Buffer> from C<pool> and returns it.
+
+=cut
+
+*/
 
 void *
 get_free_buffer(struct Parrot_Interp *interpreter,
@@ -59,7 +91,22 @@ get_free_buffer(struct Parrot_Interp *interpreter,
     return buffer;
 }
 
-/** Header Pool Creation Functions **/
+/*
+
+=back
+
+=head2 Header Pool Creation Functions
+
+=over 4
+
+=item C<struct Small_Object_Pool *
+new_pmc_pool(struct Parrot_Interp *interpreter)>
+
+Creates an new pool for PMCs and returns it.
+
+=cut
+
+*/
 
 struct Small_Object_Pool *
 new_pmc_pool(struct Parrot_Interp *interpreter)
@@ -75,9 +122,19 @@ new_pmc_pool(struct Parrot_Interp *interpreter)
     return pmc_pool;
 }
 
-/* Creates a new pool for buffer-like structures.
- * Usually you would need make_bufferlike_pool.
- */
+/*
+
+=item C<struct Small_Object_Pool *
+new_bufferlike_pool(struct Parrot_Interp *interpreter,
+        size_t actual_buffer_size)>
+
+Creates a new pool for buffer-like structures. Usually you would need
+C<make_bufferlike_pool()>.
+
+=cut
+
+*/
+
 struct Small_Object_Pool *
 new_bufferlike_pool(struct Parrot_Interp *interpreter,
         size_t actual_buffer_size)
@@ -96,14 +153,33 @@ new_bufferlike_pool(struct Parrot_Interp *interpreter,
     return pool;
 }
 
-/* non constant strings and plain Buffers are in the sized header
- * pools
- */
+/*
+
+=item C<struct Small_Object_Pool *
+new_buffer_pool(struct Parrot_Interp *interpreter)>
+
+Non-constant strings and plain Buffers are in the sized header pools.
+
+=cut
+
+*/
+
 struct Small_Object_Pool *
 new_buffer_pool(struct Parrot_Interp *interpreter)
 {
     return make_bufferlike_pool(interpreter, sizeof(Buffer));
 }
+
+/*
+
+=item C<struct Small_Object_Pool *
+new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)>
+
+Creates a new pool for C<STRINGS> and returns it.
+
+=cut
+
+*/
 
 struct Small_Object_Pool *
 new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)
@@ -121,7 +197,17 @@ new_string_pool(struct Parrot_Interp *interpreter, INTVAL constant)
     return pool;
 }
 
-/* make and return a bufferlike header pool */
+/*
+
+=item C<struct Small_Object_Pool *
+make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)>
+
+Make and return a bufferlike header pool.
+
+=cut
+
+*/
+
 struct Small_Object_Pool *
 make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 {
@@ -149,7 +235,17 @@ make_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
     return sized_pools[idx];
 }
 
-/* return a bufferlike header pool, it must exist */
+/*
+
+=item C<struct Small_Object_Pool *
+get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)>
+
+Return a bufferlike header pool, it must exist.
+
+=cut
+
+*/
+
 struct Small_Object_Pool *
 get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 {
@@ -160,7 +256,16 @@ get_bufferlike_pool(struct Parrot_Interp *interpreter, size_t buffer_size)
 }
 
 
-/** Get a header **/
+/*
+
+=item C<PMC *
+new_pmc_header(struct Parrot_Interp *interpreter)>
+
+Get a header.
+
+=cut
+
+*/
 
 PMC *
 new_pmc_header(struct Parrot_Interp *interpreter)
@@ -168,6 +273,16 @@ new_pmc_header(struct Parrot_Interp *interpreter)
     return get_free_pmc(interpreter, interpreter->arena_base->pmc_pool);
 }
 
+/*
+
+=item C<PMC_EXT *
+new_pmc_ext(struct Parrot_Interp *interpreter)>
+
+Creates a new C<PMC_EXT> and returns it.
+
+=cut
+
+*/
 
 static PARROT_INLINE PMC_EXT *
 new_pmc_ext(struct Parrot_Interp *interpreter)
@@ -178,6 +293,17 @@ new_pmc_ext(struct Parrot_Interp *interpreter)
     return ptr;
 }
 
+/*
+
+=item C<void
+add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc)>
+
+Adds a new C<PMC_EXT> to C<pmc>.
+
+=cut
+
+*/
+
 void
 add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc)
 {
@@ -185,6 +311,16 @@ add_pmc_ext(struct Parrot_Interp *interpreter, PMC *pmc)
     PObj_is_PMC_EXT_SET(pmc);
 }
 
+/*
+
+=item C<STRING *
+new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)>
+
+Returns a new C<STRING> header.
+
+=cut
+
+*/
 
 STRING *
 new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
@@ -200,6 +336,17 @@ new_string_header(struct Parrot_Interp *interpreter, UINTVAL flags)
     return string;
 }
 
+/*
+
+=item C<Buffer *
+new_buffer_header(struct Parrot_Interp *interpreter)>
+
+Creates and returns a new C<Buffer>.
+
+=cut
+
+*/
+
 Buffer *
 new_buffer_header(struct Parrot_Interp *interpreter)
 {
@@ -207,11 +354,34 @@ new_buffer_header(struct Parrot_Interp *interpreter)
             interpreter->arena_base->buffer_header_pool);
 }
 
+/*
+
+=item C<void
+buffer_mark_COW(Buffer *b)>
+
+Marks C<b> as COW.
+
+=cut
+
+*/
+
 void
 buffer_mark_COW(Buffer *b)
 {
     PObj_COW_SET(b);
 }
+
+/*
+
+=item C<Buffer *
+buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)>
+
+If C<src> is COW then a new C<Buffer> is created by copying from C<src>
+and returned. Otherwise C<src> is returned.
+
+=cut
+
+*/
 
 Buffer *
 buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
@@ -224,6 +394,18 @@ buffer_unmake_COW(struct Parrot_Interp *interpreter, Buffer *src)
     }
     return src;
 }
+
+/*
+
+=item C<Buffer *
+buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, 
+                    Buffer *dst)>
+
+Returns a copy of C<src> if it differs from C<dst>.
+
+=cut
+
+*/
 
 Buffer *
 buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, Buffer *dst)
@@ -240,6 +422,17 @@ buffer_copy_if_diff(struct Parrot_Interp *interpreter, Buffer *src, Buffer *dst)
     return b;
 }
 
+/*
+
+=item C<void *
+new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)>
+
+Creates and returns a new buffer-like header.
+
+=cut
+
+*/
+
 void *
 new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
 {
@@ -250,6 +443,16 @@ new_bufferlike_header(struct Parrot_Interp *interpreter, size_t size)
     return get_free_buffer(interpreter, pool);
 }
 
+/*
+
+=item C<size_t
+get_max_buffer_address(struct Parrot_Interp *interpreter)>
+
+Calculates the maximum buffer address and returns it.
+
+=cut
+
+*/
 
 size_t
 get_max_buffer_address(struct Parrot_Interp *interpreter)
@@ -270,6 +473,17 @@ get_max_buffer_address(struct Parrot_Interp *interpreter)
     return max;
 }
 
+/*
+
+=item C<size_t
+get_min_buffer_address(struct Parrot_Interp *interpreter)>
+
+Calculates the minimum buffer address and returns it.
+
+=cut
+
+*/
+
 size_t
 get_min_buffer_address(struct Parrot_Interp *interpreter)
 {
@@ -289,17 +503,50 @@ get_min_buffer_address(struct Parrot_Interp *interpreter)
     return min;
 }
 
+/*
+
+=item C<size_t
+get_max_pmc_address(struct Parrot_Interp *interpreter)>
+
+Calculates the maximum PMC address and returns it.
+
+=cut
+
+*/
+
 size_t
 get_max_pmc_address(struct Parrot_Interp *interpreter)
 {
     return interpreter->arena_base->pmc_pool->end_arena_memory;
 }
 
+/*
+
+=item C<size_t
+get_min_pmc_address(struct Parrot_Interp *interpreter)>
+
+Calculates the maximum PMC address and returns it.
+
+=cut
+
+*/
+
 size_t
 get_min_pmc_address(struct Parrot_Interp *interpreter)
 {
     return interpreter->arena_base->pmc_pool->start_arena_memory;
 }
+
+/*
+
+=item C<int
+is_buffer_ptr(struct Parrot_Interp *interpreter, void *ptr)>
+
+Checks that C<ptr> is actually a C<Buffer>.
+
+=cut
+
+*/
 
 int
 is_buffer_ptr(struct Parrot_Interp *interpreter, void *ptr)
@@ -320,12 +567,34 @@ is_buffer_ptr(struct Parrot_Interp *interpreter, void *ptr)
     return 0;
 }
 
+/*
+
+=item C<int
+is_pmc_ptr(struct Parrot_Interp *interpreter, void *ptr)>
+
+Checks that C<ptr> is actually a PMC.
+
+=cut
+
+*/
+
 int
 is_pmc_ptr(struct Parrot_Interp *interpreter, void *ptr)
 {
     return contained_in_pool(interpreter,
             interpreter->arena_base->pmc_pool, ptr);
 }
+
+/*
+
+=item C<void
+add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)>
+
+Adds an extre header to C<buffer> (I<?>).
+
+=cut
+
+*/
 
 void
 add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)
@@ -338,8 +607,17 @@ add_extra_buffer_header(struct Parrot_Interp *interpreter, void *buffer)
     *ptr = buffer;
 }
 
+/*
 
-/* Initialize the pools for the tracked resources */
+=item C<void
+Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)>
+
+Initialize the pools for the tracked resources.
+
+=cut
+
+*/
+
 void
 Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
 {
@@ -390,6 +668,17 @@ Parrot_initialize_header_pools(struct Parrot_Interp *interpreter)
     interpreter->arena_base->constant_pmc_pool->objects_per_alloc =
        CONSTANT_PMC_HEADERS_PER_ALLOC;
 }
+
+/*
+
+=item C<void
+Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)>
+
+Destroys the header pools.
+
+=cut
+
+*/
 
 void
 Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
@@ -467,7 +756,17 @@ Parrot_destroy_header_pools(struct Parrot_Interp *interpreter)
 
 #if 0
 
-/* if we want these names, they must be added in DOD */
+/*
+
+=item C<void
+Parrot_initialize_header_pool_names(struct Parrot_Interp *interpreter)>
+
+If we want these names, they must be added in DOD.
+
+=cut
+
+*/
+
 void
 Parrot_initialize_header_pool_names(struct Parrot_Interp *interpreter)
 {
@@ -490,6 +789,22 @@ Parrot_initialize_header_pool_names(struct Parrot_Interp *interpreter)
 }
 
 #endif
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/headers.h>.
+
+=head1 HISTORY
+
+Initial version by Mike Lambert on 2002.05.27.
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,14 +1,32 @@
 /*
- * jit_debug.c
- *
- * $Id$
- *
- * write stabs file for jit code
- * when debugging jit code with gdb, do:
- *
- * add-symbol-file <file.o> 0
- *
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/jit_debug.c - Write stabs file for JIT code
+
+=head1 SYNOPSIS
+
+When debugging JIT code with C<gdb>, do:
+
+    add-symbol-file <file.o> 0
+
+=head1 DESCRIPTION
+
+Stabs is a file format for information that describes a program to a
+debugger. 
+
+For more information see the stabs documentation at
+http://sources.redhat.com/gdb/current/onlinedocs/stabs_toc.html.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
@@ -71,6 +89,17 @@ typedef struct {
     const char *name;
     const char *spec;
 } BaseTypes;
+
+/*
+
+=item C<static void write_types(FILE *stabs)>
+
+Writes the types to C<stabs>.
+
+=cut
+
+*/
+
 static void
 write_types(FILE *stabs)
 {
@@ -184,6 +213,17 @@ write_types(FILE *stabs)
 
 }
 
+/*
+
+=item C<static void
+write_vars(FILE *stabs, struct Parrot_Interp *interpreter)>
+
+Writes the contents of the registers to C<stabs>.
+
+=cut
+
+*/
+
 static void
 write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
 {
@@ -201,6 +241,17 @@ write_vars(FILE *stabs, struct Parrot_Interp *interpreter)
     }
 }
 
+/*
+
+=item C<static STRING *
+debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)>
+
+Returns C<file> with C<ext> appended.
+
+=cut
+
+*/
+
 static STRING *
 debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
 {
@@ -212,6 +263,17 @@ debug_file(struct Parrot_Interp *interpreter, STRING *file, const char *ext)
             0);
     return ret;
 }
+
+/*
+
+=item C<static void
+Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)>
+
+Writes the JIT debugging stabs.
+
+=cut
+
+*/
 
 static void
 Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
@@ -304,6 +366,17 @@ Parrot_jit_debug_stabs(struct Parrot_Interp *interpreter)
     }
 }
 
+/*
+
+=item C<void
+Parrot_jit_debug(struct Parrot_Interp* interpreter)>
+
+Writes the JIT debugging stabs. Just calls C<Parrot_jit_debug_stabs()>.
+
+=cut
+
+*/
+
 void
 Parrot_jit_debug(struct Parrot_Interp* interpreter)
 {
@@ -312,6 +385,18 @@ Parrot_jit_debug(struct Parrot_Interp* interpreter)
 
 
 #endif
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/jit.c>, F<include/parrot/jit.h>, F<docs/jit.pod>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

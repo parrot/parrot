@@ -1,15 +1,27 @@
 /*
- * exec_start.c
- *
- * CVS Info
- *    $Id$
- * Overview:
- *    Call compiled code.
- * History:
- *      Initial version by Daniel Grunblatt on 2003.6.9
- * Notes:
- * References:
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/exec_start.c - Call compiled code
+
+=head1 SYNOPSIS
+
+I<What goes here?>
+
+=head1 DESCRIPTION
+
+Exec is a tool for using the JIT at compile time to generate native
+executables.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/string.h"
@@ -22,7 +34,17 @@
 opcode_t* run_compiled(struct Parrot_Interp *interpreter,
     opcode_t *cur_opcode, opcode_t *code_start);
 
-/* Stolen from embed.c */
+/*
+
+=item C<static void
+setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)>
+
+Stolen from F<embed.c>.
+
+=cut
+
+*/
+
 static void
 setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
 {
@@ -56,6 +78,15 @@ setup_argv(struct Parrot_Interp *interpreter, int argc, char ** argv)
     }
 }
 
+/*
+
+=item C<int main(int argc, char **argv)>
+
+The run-loop.
+
+=cut
+
+*/
 
 int
 main(int argc, char **argv) {
@@ -122,6 +153,23 @@ main(int argc, char **argv) {
      */
     exit(0);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/exec.h>, F<include/parrot/exec_save.h>, F<src/exec.c>
+and F<src/exec_start.c>.
+
+=head1 HISTORY
+
+Initial version by Daniel Grunblatt on 2003.6.9
+
+=cut
+
+*/
 
 /*
  * Local variables:

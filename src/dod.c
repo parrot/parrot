@@ -1,16 +1,28 @@
-/* dod.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Handles dead object destruction of the various headers
- *  Data Structure and Algorithms:
- *
- *  History:
- *     Initial version by Mike Lambert on 2002.05.27
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/dod.c - Dead object destruction of the various headers
+
+=head1 DESCRIPTION
+
+This file implements I<dead object destruction>. This is documented in
+PPD 9 with suplementary notes in F<docs/dev/dod.dev>.
+
+It's possible to turn on/off the checking of the system stack and
+processor registers. The actual checking is implemented in F<src/cpu_dep.c>.
+
+There's also a verbose mode for garbage collection.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #define DOD_C_SOURCE
 #include "parrot/parrot.h"
@@ -31,14 +43,20 @@ static size_t find_common_mask(size_t val1, size_t val2);
 static int trace_children(struct Parrot_Interp *interpreter, PMC *current);
 
 /*
- * mark a special PMC
- * - if it has a PMC_ECT structure append or prepend the
- *   next_for_GC pointer
- * - else do custom mark directly
- *
- * this should really be inline, so if inline isn't available, it
- * should better be a macro
- */
+
+=item C<static PARROT_INLINE void
+mark_special(Parrot_Interp interpreter, PMC* obj)>
+
+Mark a special PMC, if it has a C<PMC_ECT> structure append or prepend
+the C<next_for_GC pointer>, else do custom mark directly.
+
+This should really be inline, so if inline isn't available, it would
+be better if it was a macro.
+
+=cut
+
+*/
+
 static PARROT_INLINE void
 mark_special(Parrot_Interp interpreter, PMC* obj)
 {
@@ -81,6 +99,20 @@ mark_special(Parrot_Interp interpreter, PMC* obj)
 
 #if ARENA_DOD_FLAGS
 
+/*
+
+=item C<void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)>
+
+Tag C<obj> as alive. 
+
+Used by the GC system when tracing the root set, and used by the PMC GC
+handling routines to tag their individual pieces if they have private
+ones.
+
+=cut
+
+*/
+
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
 
@@ -106,9 +138,6 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 
 #else
 
-/* Tag a buffer header as alive. Used by the GC system when tracing
- * the root set, and used by the PMC GC handling routines to tag their
- * individual pieces if they have private ones */
 void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 {
     /* if object is live or on free list return */
@@ -148,10 +177,19 @@ void pobject_lives(struct Parrot_Interp *interpreter, PObj *obj)
 
 #endif
 
+/*
 
-/* Do a full trace run and mark all the PMCs as active if they are.
- * Returns whether the run wasn't aborted; i.e. whether it's safe to
- * proceed with GC */
+=item C<static int
+trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)>
+
+Do a full trace run and mark all the PMCs as active if they are. Returns
+whether the run wasn't aborted; i.e. whether it's safe to proceed with
+GC.
+
+=cut
+
+*/
+
 static int
 trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
 {
@@ -220,7 +258,17 @@ trace_active_PMCs(struct Parrot_Interp *interpreter, int trace_stack)
     return trace_children(interpreter, current);
 }
 
-/* Returns whether the tracing process wasn't aborted */
+/*
+
+=item C<static int
+trace_children(struct Parrot_Interp *interpreter, PMC *current)>
+
+Returns whether the tracing process wasn't aborted.
+
+=cut
+
+*/
+
 static int
 trace_children(struct Parrot_Interp *interpreter, PMC *current)
 {
@@ -287,8 +335,18 @@ trace_children(struct Parrot_Interp *interpreter, PMC *current)
     return 1;
 }
 
-/* Scan any buffers in S registers and other non-PMC places and mark
- * them as active */
+/*
+
+=item C<static void
+trace_active_buffers(struct Parrot_Interp *interpreter)>
+
+Scan any buffers in string registers and other non-PMC places and mark
+them as active.
+
+=cut
+
+*/
+
 static void
 trace_active_buffers(struct Parrot_Interp *interpreter)
 {
@@ -313,7 +371,18 @@ trace_active_buffers(struct Parrot_Interp *interpreter)
 
 #ifdef GC_IS_MALLOC
 
-/* clear ref count */
+/*
+
+=item C<void
+clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+        int cleanup)>
+
+Clear the COW ref count.
+
+=cut
+
+*/
+
 void
 clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)
@@ -352,7 +421,18 @@ clear_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
     }
 }
 
-/* find other users of COW's bufstart */
+/*
+
+=item C<void
+used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
+        int cleanup)>
+
+Find other users of COW's C<bufstart>.
+
+=cut
+
+*/
+
 void
 used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
         int cleanup)
@@ -385,6 +465,19 @@ used_cow(struct Parrot_Interp *interpreter, struct Small_Object_Pool *pool,
 #endif /* GC_IS_MALLOC */
 
 #if ARENA_DOD_FLAGS
+
+/*
+
+=item C<static void
+clear_live_counter(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+Clear the live counter.
+
+=cut
+
+*/
+
 static void
 clear_live_counter(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -412,6 +505,19 @@ clear_live_counter(struct Parrot_Interp *interpreter,
 #else
 #define debug(x)
 #endif
+
+/*
+
+=item C<static void
+reduce_arenas(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool, UINTVAL free_arenas)>
+
+Reduce the number of memory arenas by freeing any that have no live
+objects.
+
+=cut
+
+*/
 
 static void
 reduce_arenas(struct Parrot_Interp *interpreter,
@@ -453,9 +559,20 @@ reduce_arenas(struct Parrot_Interp *interpreter,
 #  endif
 #endif
 
-/* Put any buffers/PMCs that are now unused, on to the pools free list.
- * If GC_IS_MALLOC bufstart gets freed too if possible.
- * Avoid buffers that are immune from collection (ie, constant) */
+/*
+
+=item C<void
+free_unused_pobjects(struct Parrot_Interp *interpreter,
+        struct Small_Object_Pool *pool)>
+
+Put any buffers/PMCs that are now unused, on to the pools free list. If
+C<GC_IS_MALLOC> bufstart gets freed too if possible. Avoid buffers that
+are immune from collection (ie, constant).
+
+=cut
+
+*/
+
 void
 free_unused_pobjects(struct Parrot_Interp *interpreter,
         struct Small_Object_Pool *pool)
@@ -628,7 +745,17 @@ free_unused_pobjects(struct Parrot_Interp *interpreter,
 
 #ifndef PLATFORM_STACK_WALK
 
-/* Find a mask covering the longest common bit-prefix of val1 and val2 */
+/*
+
+=item C<static size_t find_common_mask(size_t val1, size_t val2)>
+
+Find a mask covering the longest common bit-prefix of C<val1> and
+C<val2>.
+
+=cut
+
+*/
+
 static size_t
 find_common_mask(size_t val1, size_t val2)
 {
@@ -647,6 +774,18 @@ find_common_mask(size_t val1, size_t val2)
             "Unexpected condition in find_common_mask()!\n");
     return 0;
 }
+
+/*
+
+=item C<void
+trace_mem_block(struct Parrot_Interp *interpreter,
+                size_t lo_var_ptr, size_t hi_var_ptr)>
+
+Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
+
+=cut
+
+*/
 
 void
 trace_mem_block(struct Parrot_Interp *interpreter,
@@ -705,7 +844,16 @@ trace_mem_block(struct Parrot_Interp *interpreter,
 }
 #endif
 
-/* Run through all PMC arenas and clear live bits */
+/*
+
+=item C<static void clear_live_bits(Parrot_Interp interpreter)>
+
+Run through all PMC arenas and clear live bits.
+
+=cut
+
+*/
+
 static void
 clear_live_bits(Parrot_Interp interpreter)
 {
@@ -732,6 +880,17 @@ clear_live_bits(Parrot_Interp interpreter)
     }
 }
 
+/*
+
+=item C<static PARROT_INLINE void
+profile_dod_start(Parrot_Interp interpreter)>
+
+Records the start time of a DOD run when profiling is enabled.
+
+=cut
+
+*/
+
 static PARROT_INLINE void
 profile_dod_start(Parrot_Interp interpreter)
 {
@@ -739,6 +898,17 @@ profile_dod_start(Parrot_Interp interpreter)
         interpreter->profile->dod_time = Parrot_floatval_time();
     }
 }
+
+/*
+
+=item C<static PARROT_INLINE void
+profile_dod_end(Parrot_Interp interpreter)>
+
+Records the end time of a DOD run when porfiling is enabled.
+
+=cut
+
+*/
 
 static PARROT_INLINE void
 profile_dod_end(Parrot_Interp interpreter)
@@ -753,7 +923,17 @@ profile_dod_end(Parrot_Interp interpreter)
     }
 }
 
-/* See if we can find some unused headers */
+/*
+
+=item C<void
+Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)>
+
+See if we can find some unused headers.
+
+=cut
+
+*/
+
 void
 Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
 {
@@ -824,6 +1004,22 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter, UINTVAL flags)
     return;
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/dod.h>, F<src/cpu_dep.c>, F<docs/dev/dod.dev> and
+F<docs/pdds/pdd09_gc.pod>.
+
+=head1 HISTORY
+
+Initial version by Mike Lambert on 2002.05.27.
+
+=cut
+
+*/
 
 /*
  * Local variables:

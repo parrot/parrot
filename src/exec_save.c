@@ -1,16 +1,23 @@
 /*
- * exec_save.c
- *
- * CVS Info
- *    $Id$
- * Overview:
- *    Save the Parrot_exec_objfile_t to the native format
- * History:
- *      Initial version by Daniel Grunblatt on 2003.6.9
- * Notes:
- * References:
- */
- 
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/exec_save.c - Save object file in native format
+
+=head1 DESCRIPTION
+
+Save the C<Parrot_exec_objfile_t> to the native format.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
 #include <parrot/parrot.h>
 #include "parrot/exec.h"
 #include "parrot/exec_save.h"
@@ -24,6 +31,17 @@ static void save_struct(FILE *fp, void *sp, size_t size);
 
 #  include <a.out.h>
 #  include <link.h>
+
+/*
+
+=item C<void
+Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)>
+
+Save the C<Parrot_exec_objfile_t> to C<file>.
+
+=cut
+
+*/
 
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
@@ -442,8 +460,6 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #ifdef EXEC_MACH_O
 
-/* This is a hack. */
- 
 void
 Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 {
@@ -556,6 +572,16 @@ Parrot_exec_save(Parrot_exec_objfile_t *obj, const char *file)
 
 #endif /* EXEC_MACH_O */
 
+/*
+
+=item C<static void save_struct(FILE *fp, void *sp, size_t size)>
+
+Writes the C<struct> C<sp> to the file.
+
+=cut
+
+*/
+
 static void
 save_struct(FILE *fp, void *sp, size_t size)
 {
@@ -565,6 +591,16 @@ save_struct(FILE *fp, void *sp, size_t size)
         fprintf(fp, "%c", ((char *)sp)[i]);
 }
 
+/*
+
+=item C<static void save_zero(FILE *fp)>
+
+Writes 0 to the file.
+
+=cut
+
+*/
+
 static void
 save_zero(FILE *fp)
 {
@@ -573,12 +609,32 @@ save_zero(FILE *fp)
 
 #if PARROT_BIGENDIAN
 
+/*
+
+=item C<static void save_int(FILE *fp, int i)>
+
+Writes C<i> to the file.
+
+=cut
+
+*/
+
 static void
 save_int(FILE *fp, int i)
 {
     fprintf(fp, "%c%c%c%c", (char)(i >> 24), (char)(i >> 16),
                             (char)(i >> 8), (char)i);
 }
+
+/*
+
+=item C<static void save_short(FILE *fp, short s)>
+
+Writes C<s> to the file.
+
+=cut
+
+*/
 
 static void
 save_short(FILE *fp, short s)
@@ -602,6 +658,23 @@ save_int(FILE *fp, int i)
 }
 
 #endif /* PARROT_BIGENDIAN */
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/exec.h>, F<include/parrot/exec_save.h>, F<src/exec.c>
+and F<src/exec_start.c>.
+
+=head1 HISTORY
+
+Initial version by Daniel Grunblatt on 2003.6.9.
+
+=cut
+
+*/
 
 /*
  * Local variables:

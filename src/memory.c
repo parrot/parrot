@@ -1,23 +1,41 @@
-/* memory.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     The memory (mem) API handles memory allocation
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/memory.c - Memory allocation
+
+=head1 DESCRIPTION
+
+The memory (mem) API handles memory allocation,
+
+Basically just a wrapper C<around malloc/calloc/realloc/free()> with an
+setup function to initialize the memory pools.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
-/*=for api mem mem_sys_allocate
-   uses malloc to allocate system memory
-*/
-
 /* for PANIC */
 #define interpreter NULL
+
+/*
+
+=item C<void *
+mem_sys_allocate(size_t size)>
+
+Uses C<malloc> to allocate system memory.
+
+=cut
+
+*/
 
 void *
 mem_sys_allocate(size_t size)
@@ -28,9 +46,17 @@ mem_sys_allocate(size_t size)
     return ptr;
 }
 
-/*=for api mem mem_sys_allocate_zeroed
-   uses calloc to allocate system memory
+/*
+
+=item C<void *
+mem_sys_allocate_zeroed(size_t size)>
+
+Uses C<calloc> to allocate system memory.
+
+=cut
+
 */
+
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
@@ -40,9 +66,17 @@ mem_sys_allocate_zeroed(size_t size)
     return ptr;
 }
 
-/*=for api mem mem_sys_realloc
-   resize a chunk of system memory
+/*
+
+=item C<void *
+mem_sys_realloc(void *from, size_t size)>
+
+Resize a chunk of system memory.
+
+=cut
+
 */
+
 void *
 mem_sys_realloc(void *from, size_t size)
 {
@@ -53,18 +87,34 @@ mem_sys_realloc(void *from, size_t size)
 }
 #undef interpreter
 
-/*=for api mem mem_sys_free
-   free a chunk of memory back to the system
+/*
+
+=item C<void
+mem_sys_free(void *from)>
+
+Free a chunk of memory back to the system.
+
+=cut
+
 */
+
 void
 mem_sys_free(void *from)
 {
     free(from);
 }
 
-/*=for api mem mem_setup_allocator
-   initializes the allocator
+/*
+
+=item C<void
+mem_setup_allocator(struct Parrot_Interp *interpreter)>
+
+Initializes the allocator.
+
+=cut
+
 */
+
 void
 mem_setup_allocator(struct Parrot_Interp *interpreter)
 {
@@ -75,6 +125,14 @@ mem_setup_allocator(struct Parrot_Interp *interpreter)
     Parrot_initialize_memory_pools(interpreter);
     Parrot_initialize_header_pools(interpreter);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1,15 +1,23 @@
 /*
- * debug.c
- *
- * CVS Info
- *    $Id$
- * Overview:
- *    Parrot debugger
- * History:
- *      Initial version by Daniel Grunblatt on 2002.5.19
- * Notes:
- * References:
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/debug.c - Parrot debugging
+
+=head1 DESCRIPTION
+
+This file implements Parrot debugging and is used by C<pdb>, the Parrot
+debugger, and the C<debug> ops.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <assert.h>
 #include <stdio.h>
@@ -30,11 +38,18 @@
     while(*c && isspace((int) *c)) \
         c++; }
 
-/* nextarg
- *
- * Returns the position just past the current argument in a PASM
- * instruction. This is not the same as na(), above, which is intended
- * for debugger commands. This function is used for eval. */
+/*
+
+=item C<static char* nextarg(char* command)>
+
+Returns the position just past the current argument in a PASM
+instruction. This is not the same as C<na()>, above, which is intended
+for debugger commands. This function is used for C<eval>.
+
+=cut
+
+*/
+
 static char*
 nextarg(char* command)
 {
@@ -46,9 +61,15 @@ nextarg(char* command)
     return command;
 }
 
-/* skip_ws
- *
- * Returns the pointer past any whitespace */
+/*
+
+=item C<static const char* skip_ws(const char* str)>
+
+Returns the pointer past any whitespace.
+
+=cut
+
+*/
 
 static const char*
 skip_ws(const char* str)
@@ -58,10 +79,16 @@ skip_ws(const char* str)
     return str;
 }
 
-/* skip_command
- *
- * Returns the pointer past the current debugger command. (This is an
- * alternative to the na() macro above.) */
+/*
+
+=item C<static const char* skip_command(const char* str)>
+
+Returns the pointer past the current debugger command. (This is an
+alternative to the C<na()> macro above.)
+
+=cut
+
+*/
 
 static const char*
 skip_command(const char* str)
@@ -73,10 +100,16 @@ skip_command(const char* str)
     return str;
 }
 
-/* parse_int
- *
- * Parse an integer out of a string and return a pointer to just after
- * the int. */
+/*
+
+=item C<static const char* parse_int(const char* str, int* intP)>
+
+Parse an C<int> out of a string and return a pointer to just after the
+C<int>.
+
+=cut
+
+*/
 
 static const char*
 parse_int(const char* str, int* intP)
@@ -88,11 +121,20 @@ parse_int(const char* str, int* intP)
     return end;
 }
 
-/* parse_string
- *
- * Parse a double-quoted string out of a C string and return a pointer
- * to just after the string. The parsed string is converted to a
- * Parrot STRING. */
+/*
+
+=item C<static const char*
+parse_string(struct Parrot_Interp *interpreter,
+             const char* str, STRING** strP)>
+
+Parse a double-quoted string out of a C string and return a pointer to
+just after the string. The parsed string is converted to a Parrot
+C<STRING>.
+
+=cut
+
+*/
+
 static const char*
 parse_string(struct Parrot_Interp *interpreter,
              const char* str, STRING** strP)
@@ -117,11 +159,18 @@ parse_string(struct Parrot_Interp *interpreter,
     return str;
 }
 
-/* parse_key
- *
- * Parse an aggregate key out of a string and return a pointer to just
- * after the key. Currently only string and integer keys are
- * allowed. */
+/*
+
+=item C<static const char*
+parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)>
+
+Parse an aggregate key out of a string and return a pointer to just
+after the key. Currently only string and integer keys are allowed.
+
+=cut
+
+*/
+
 static const char*
 parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)
 {
@@ -148,10 +197,18 @@ parse_key(struct Parrot_Interp *interpreter, const char* str, PMC** keyP)
     return ++str;
 }
 
-/* parse_command
- *
- * Convert the command at the beginning of a string into a numeric
- * value that can be used as a switch key for fast lookup. */
+/*
+
+=item C<static const char*
+parse_command(const char* command, unsigned long* cmdP)>
+
+Convert the command at the beginning of a string into a numeric value
+that can be used as a switch key for fast lookup.
+
+=cut
+
+*/
+
 static const char*
 parse_command(const char* command, unsigned long* cmdP)
 {
@@ -175,19 +232,25 @@ parse_command(const char* command, unsigned long* cmdP)
     return command;
 }
 
-/* PDB_get_command(struct Parrot_Interp *interpreter)
- *
- * Get a command from the user input to execute.
- *
- * It saves the last command executed (in pdb->last_command), so it first
- * frees the old one and updates it with the current one.
- *
- * Also prints the next line to run if the program is still active.
- *
- * The user input can't be longer than 255 characters.
- *
- * The input is saved in pdb->cur_command.
- */
+/*
+
+=item C<void PDB_get_command(struct Parrot_Interp *interpreter)>
+
+Get a command from the user input to execute.
+
+It saves the last command executed (in C<<pdb->last_command>>), so it
+first frees the old one and updates it with the current one.
+
+Also prints the next line to run if the program is still active.
+
+The user input can't be longer than 255 characters.
+
+The input is saved in C<<pdb->cur_command>>.
+
+=cut
+
+*/
+
 void
 PDB_get_command(struct Parrot_Interp *interpreter)
 {
@@ -245,12 +308,19 @@ PDB_get_command(struct Parrot_Interp *interpreter)
     pdb->cur_command = c;
 }
 
-/* PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
- *
- * Run a command.
- *
- * Hash the command to make a simple switch calling the correct handler.
- */
+/*
+
+=item C<void
+PDB_run_command(struct Parrot_Interp *interpreter, const char *command)>
+
+Run a command.
+
+Hash the command to make a simple switch calling the correct handler.
+
+=cut
+
+*/
+
 void
 PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -347,14 +417,19 @@ PDB_run_command(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-/* PDB_next(struct Parrot_Interp *interpreter, const char *command)
- *
- * Execute the next N operation(s).
- *
- * Inits the program if needed, runs the next N >= 1 operations and
- * stops.
- *
- */
+/*
+
+=item C<void
+PDB_next(struct Parrot_Interp *interpreter, const char *command)>
+
+Execute the next N operation(s).
+
+Inits the program if needed, runs the next N >= 1 operations and stops.
+
+=cut
+
+*/
+
 void
 PDB_next(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -384,12 +459,19 @@ PDB_next(struct Parrot_Interp *interpreter, const char *command)
         (void)PDB_program_end(interpreter);
 }
 
-/* PDB_trace
- *
- * Execute the next N operations; if no number is specified, it
- * defaults to 1.
- *
- */
+/*
+
+=item C<void
+PDB_trace(struct Parrot_Interp *interpreter,
+          const char *command)>
+
+Execute the next N operations; if no number is specified, it defaults to
+1.
+
+=cut
+
+*/
+
 void
 PDB_trace(struct Parrot_Interp *interpreter,
           const char *command)
@@ -423,10 +505,17 @@ PDB_trace(struct Parrot_Interp *interpreter,
         (void)PDB_program_end(interpreter);
 }
 
-/*  PDB_cond
- *
- *  Analyzes a condition from the user input.
- */
+/*
+
+=item C<PDB_condition_t *
+PDB_cond(struct Parrot_Interp *interpreter, const char *command)>
+
+Analyzes a condition from the user input.
+
+=cut
+
+*/
+
 PDB_condition_t *
 PDB_cond(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -607,9 +696,17 @@ WRONG_REG:      PIO_eprintf(interpreter, "Register types don't agree\n");
     return condition;
 }
 
-/* PDB_watchpoint
- * set a watchpoint.
- */
+/*
+
+=item C<void
+PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)>
+
+Set a watchpoint.
+
+=cut
+
+*/
+
 void
 PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -626,9 +723,17 @@ PDB_watchpoint(struct Parrot_Interp *interpreter, const char *command)
     pdb->watchpoint = condition;
 }
 
-/* PDB_set_break
- * set a break point, the source code file must be loaded.
- */
+/*
+
+=item C<void
+PDB_set_break(struct Parrot_Interp *interpreter, const char *command)>
+
+Set a break point, the source code file must be loaded.
+
+=cut
+
+*/
+
 void
 PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -719,9 +824,17 @@ PDB_set_break(struct Parrot_Interp *interpreter, const char *command)
     PIO_eprintf(interpreter, "Breakpoint %li at line %li\n",i,line->number);
 }
 
-/* PDB_init
- * init the program
- */
+/*
+
+=item C<void
+PDB_init(struct Parrot_Interp *interpreter, const char *command)>
+
+Init the program.
+
+=cut
+
+*/
+
 void
 PDB_init(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -770,12 +883,19 @@ PDB_init(struct Parrot_Interp *interpreter, const char *command)
     pdb->state |= PDB_RUNNING;
 }
 
-/* PDB_continue
- *
- * Continue running the program. If a number is specified, skip
- * that many breakpoints.
- *
- */
+/*
+
+=item C<void
+PDB_continue(struct Parrot_Interp *interpreter,
+             const char *command)>
+
+Continue running the program. If a number is specified, skip that many
+breakpoints.
+
+=cut
+
+*/
+
 void
 PDB_continue(struct Parrot_Interp *interpreter,
              const char *command)
@@ -804,6 +924,19 @@ PDB_continue(struct Parrot_Interp *interpreter,
  * exist or if no breakpoint was specified
  *
  */
+/*
+
+=item C<PDB_breakpoint_t *
+PDB_find_breakpoint(struct Parrot_Interp *interpreter,
+                      const char *command)>
+
+Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
+exist or if no breakpoint was specified.
+
+=cut
+
+*/
+
 PDB_breakpoint_t *
 PDB_find_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
@@ -834,11 +967,18 @@ PDB_find_breakpoint(struct Parrot_Interp *interpreter,
     }
 }
 
-/* PDB_disable_breakpoint
- *
- * Disable a breakpoint; it can be reenabled with the enable command
- *
- */
+/*
+
+=item C<void
+PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
+                       const char *command)>
+
+Disable a breakpoint; it can be reenabled with the enable command.
+
+=cut
+
+*/
+
 void
 PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
                        const char *command)
@@ -854,12 +994,19 @@ PDB_disable_breakpoint(struct Parrot_Interp *interpreter,
     return;
 }
 
-/* PDB_enable_breakpoint
- *
- * Reenable a disabled breakpoint; if the breakpoint was not
- * disabled, has no effect
- *
- */
+/*
+
+=item C<void
+PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
+                      const char *command)>
+
+Reenable a disabled breakpoint; if the breakpoint was not disabled, has
+no effect.
+
+=cut
+
+*/
+
 void
 PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
@@ -873,9 +1020,18 @@ PDB_enable_breakpoint(struct Parrot_Interp *interpreter,
     return;
 }
 
-/* PDB_delete_breakpoint
- * delete a breakpoint
- */
+/*
+
+=item C<void
+PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
+                      const char *command)>
+
+Delete a breakpoint.
+
+=cut
+
+*/
+
 void
 PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
                       const char *command)
@@ -915,9 +1071,18 @@ PDB_delete_breakpoint(struct Parrot_Interp *interpreter,
     }
 }
 
-/* PDB_delete_condition
- * delete a condition associated with a breakpoint
- */
+/*
+
+=item C<void
+PDB_delete_condition(struct Parrot_Interp *interpreter,
+                     PDB_breakpoint_t *breakpoint)>
+
+Delete a condition associated with a breakpoint.
+
+=cut
+
+*/
+
 void
 PDB_delete_condition(struct Parrot_Interp *interpreter,
                      PDB_breakpoint_t *breakpoint)
@@ -938,9 +1103,17 @@ PDB_delete_condition(struct Parrot_Interp *interpreter,
     mem_sys_free(breakpoint->condition);
 }
 
-/* PDB_skip_breakpoint
- * skip i times all breakpoints.
- */
+/*
+
+=item C<void
+PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)>
+
+Skip C<i> times all breakpoints.
+
+=cut
+
+*/
+
 void
 PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
 {
@@ -952,9 +1125,17 @@ PDB_skip_breakpoint(struct Parrot_Interp *interpreter, long i)
     }
 }
 
-/* PDB_program_end
- * end the program
- */
+/*
+
+=item C<char
+PDB_program_end(struct Parrot_Interp *interpreter)>
+
+End the program.
+
+=cut
+
+*/
+
 char
 PDB_program_end(struct Parrot_Interp *interpreter)
 {
@@ -966,10 +1147,18 @@ PDB_program_end(struct Parrot_Interp *interpreter)
     return 1;
 }
 
-/* PDB_check_condition
- *
- * Returns TRUE if the condition was met.
- */
+/*
+
+=item C<char
+PDB_check_condition(struct Parrot_Interp *interpreter,
+    PDB_condition_t *condition)>
+
+Returns true if the condition was met.
+
+=cut
+
+*/
+
 char
 PDB_check_condition(struct Parrot_Interp *interpreter,
     PDB_condition_t *condition)
@@ -1032,9 +1221,16 @@ PDB_check_condition(struct Parrot_Interp *interpreter,
     return 0;
 }
 
-/* PDB_break
- * return true if we have to stop running
- */
+/*
+
+=item C<char PDB_break(struct Parrot_Interp *interpreter)>
+
+Returns true if we have to stop running.
+
+=cut
+
+*/
+
 char
 PDB_break(struct Parrot_Interp *interpreter)
 {
@@ -1088,9 +1284,16 @@ PDB_break(struct Parrot_Interp *interpreter)
     return 0;
 }
 
-/* PDB_escape
- * escapes " \r \n \t \a and \\
- */
+/*
+
+=item C<char * PDB_escape(const char *string, INTVAL length)>
+
+Escapes C<">, C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
+
+=cut
+
+*/
+
 char *
 PDB_escape(const char *string, INTVAL length)
 {
@@ -1145,9 +1348,16 @@ PDB_escape(const char *string, INTVAL length)
     return new;
 }
 
-/* PDB_unescape
- * do inplace unescape of \r \n \t \a and \\
- */
+/*
+
+=item C<int PDB_unescape(char *string)>
+
+Do inplace unescape of C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
+
+=cut
+
+*/
+
 int
 PDB_unescape(char *string)
 {
@@ -1184,6 +1394,19 @@ PDB_unescape(char *string)
     }
     return l;
 }
+
+/*
+
+=item C<size_t
+PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
+                   op_info_t* info, opcode_t* op,
+                   PDB_file_t *file, opcode_t* code_start, int full_name)>
+
+Disassembles C<op>.
+
+=cut
+
+*/
 
 size_t
 PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
@@ -1372,9 +1595,17 @@ PDB_disassemble_op(struct Parrot_Interp *interpreter, char* dest, int space,
     return ++size;
 }
 
-/* PDB_disassemble
- * Disassemble the bytecode
- */
+/*
+
+=item C<void
+PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)>
+
+Disassemble the bytecode.
+
+=cut
+
+*/
+
 void
 PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1453,9 +1684,17 @@ PDB_disassemble(struct Parrot_Interp *interpreter, const char *command)
     pdb->file = pfile;
 }
 
-/* PDB_add_label
- * Add a label to the label list
- */
+/*
+
+=item C<long
+PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)>
+
+Add a label to the label list.
+
+=cut
+
+*/
+
 long
 PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
 {
@@ -1485,9 +1724,16 @@ PDB_add_label(PDB_file_t *file, opcode_t *cur_opcode, opcode_t offset)
     return new->number;
 }
 
-/* PDB_free_file
- * Frees any allocated source files.
- */
+/*
+
+=item C<void PDB_free_file(struct Parrot_Interp *interpreter)>
+
+Frees any allocated source files.
+
+=cut
+
+*/
+
 void
 PDB_free_file(struct Parrot_Interp *interpreter)
 {
@@ -1526,9 +1772,17 @@ PDB_free_file(struct Parrot_Interp *interpreter)
     interpreter->pdb->file = NULL;
 }
 
-/* PDB_load_source
- * load a source code file
- */
+/*
+
+=item C<void
+PDB_load_source(struct Parrot_Interp *interpreter, const char *command)>
+
+Load a source code file.
+
+=cut
+
+*/
+
 void
 PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1599,14 +1853,27 @@ PDB_load_source(struct Parrot_Interp *interpreter, const char *command)
     pdb->file = pfile;
 }
 
-/* PDB_hasinstruction
- * return true if the line has an instruction
- * XXX TODO:
- *  1- This should take the line get an instruction, get
- *     the opcode for that instruction and check that is
- *     the correct one.
- *  2- Decide what to do with macros if anything.
- */
+/*
+
+=item C<char PDB_hasinstruction(char *c)>
+
+Return true if the line has an instruction.
+
+XXX TODO:
+
+=over 4
+
+=item * This should take the line get an instruction, get the opcode for
+that instruction and check that is the correct one.
+
+=item * Decide what to do with macros if anything.
+
+=back
+
+=cut
+
+*/
+
 char
 PDB_hasinstruction(char *c)
 {
@@ -1623,9 +1890,17 @@ PDB_hasinstruction(char *c)
     return h;
 }
 
-/* PDB_list
- * show lines from the source code file
- */
+/*
+
+=item C<void 
+PDB_list(struct Parrot_Interp *interpreter, const char *command)>
+
+Show lines from the source code file.
+
+=cut
+
+*/
+
 void
 PDB_list(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1690,9 +1965,17 @@ PDB_list(struct Parrot_Interp *interpreter, const char *command)
         pdb->file->list_line += n;
 }
 
-/* PDB_eval
- * evals an instruction
- */
+/*
+
+=item C<void
+PDB_eval(struct Parrot_Interp *interpreter, const char *command)>
+
+C<eval>s an instruction.
+
+=cut
+
+*/
+
 void
 PDB_eval(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1711,13 +1994,22 @@ PDB_eval(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-/* PDB_compile
- * compiles instructions with the PASM compiler
- * append an "end" op
- *
- * this may be called from PDB_eval above or from the compile opcode
- * which generates a malloced string
- */
+/*
+
+=item C<struct PackFile *
+PDB_compile(struct Parrot_Interp *interpreter, const char *command)>
+
+Compiles instructions with the PASM compiler.
+
+Appends an C<end> op.
+
+This may be called from C<PDB_eval> above or from the compile opcode
+which generates a malloced string.
+
+=cut
+
+*/
+
 struct PackFile *
 PDB_compile(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1739,9 +2031,17 @@ PDB_compile(struct Parrot_Interp *interpreter, const char *command)
     return code->cache.struct_val;
 }
 
-/* PDB_extend_const_table
- * extend the constant table
- */
+/*
+
+=item C<int
+PDB_extend_const_table(struct Parrot_Interp *interpreter)>
+
+Extend the constant table.
+
+=cut
+
+*/
+
 int
 PDB_extend_const_table(struct Parrot_Interp *interpreter)
 {
@@ -1758,9 +2058,17 @@ PDB_extend_const_table(struct Parrot_Interp *interpreter)
     return k;
 }
 
-/* PDB_print_stack
- * print entries in the stack
- */
+/*
+
+=item C<void
+PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)>
+
+Print entries in the stack.
+
+=cut
+
+*/
+
 void
 PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1801,9 +2109,17 @@ PDB_print_stack(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-/* PDB_print_stack_int
- * print the integer register stuck
- */
+/*
+
+=item C<void
+PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)>
+
+Print the integer register stack.
+
+=cut
+
+*/
+
 void
 PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1828,9 +2144,17 @@ PDB_print_stack_int(struct Parrot_Interp *interpreter, const char *command)
                 atoi(command));
 }
 
-/* PDB_print_stack_num
- * print the float register stack
- */
+/*
+
+=item C<void
+PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)>
+
+Print the float register stack.
+
+=cut
+
+*/
+
 void
 PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1854,9 +2178,17 @@ PDB_print_stack_num(struct Parrot_Interp *interpreter, const char *command)
                 atoi(command));
 }
 
-/* PDB_print_stack_string
- * print the string register stack
- */
+/*
+
+=item C<void
+PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)>
+
+Print the string register stack.
+
+=cut
+
+*/
+
 void
 PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1881,9 +2213,17 @@ PDB_print_stack_string(struct Parrot_Interp *interpreter, const char *command)
                 atoi(command));
 }
 
-/* PDB_print_stack_pmc
- * print the pmc register stack
- */
+/*
+
+=item C<void
+PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)>
+
+Print the pmc register stack.
+
+=cut
+
+*/
+
 void
 PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1907,6 +2247,17 @@ PDB_print_stack_pmc(struct Parrot_Interp *interpreter, const char *command)
                 atoi(command), NULL);
 }
 
+/*
+
+=item C<static void
+dump_string(struct Parrot_Interp *interpreter, STRING* s)>
+
+Description.
+
+=cut
+
+*/
+
 static void
 dump_string(struct Parrot_Interp *interpreter, STRING* s)
 {
@@ -1921,9 +2272,17 @@ dump_string(struct Parrot_Interp *interpreter, STRING* s)
     }
 }
 
-/* PDB_print_user_stack
- * print an entry from the user stack
- */
+/*
+
+=item C<void
+PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)>
+
+Print an entry from the user stack.
+
+=cut
+
+*/
+
 void
 PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -1970,9 +2329,17 @@ PDB_print_user_stack(struct Parrot_Interp *interpreter, const char *command)
     }
 }
 
-/* PDB_print
- * print interpreter registers
- */
+/*
+
+=item C<void
+PDB_print(struct Parrot_Interp *interpreter, const char *command)>
+
+Print interpreter registers.
+
+=cut
+
+*/
+
 void
 PDB_print(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -2026,9 +2393,18 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
 
 }
 
-/* PDB_print_int
- * print the whole or a specific value of a integer register structure.
- */
+/*
+
+=item C<void
+PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
+              int regnum)>
+
+Print the whole or a specific value of a integer register structure.
+
+=cut
+
+*/
+
 void
 PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
               int regnum)
@@ -2053,9 +2429,19 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg,
     }
 }
 
-/* PDB_print_int_frame
- * print the whole or a specific value of a integer register frame structure.
- */
+/*
+
+=item C<void
+PDB_print_int_frame(struct Parrot_Interp *interpreter,
+                    struct IRegFrame *int_reg, int regnum)>
+
+Print the whole or a specific value of a integer register frame
+structure.
+
+=cut
+
+*/
+
 void
 PDB_print_int_frame(struct Parrot_Interp *interpreter,
                     struct IRegFrame *int_reg, int regnum)
@@ -2080,9 +2466,18 @@ PDB_print_int_frame(struct Parrot_Interp *interpreter,
     }
 }
 
-/* PDB_print_num
- * print the whole or a specific value of a float register structure.
- */
+/*
+
+=item C<void
+PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
+              int regnum)>
+
+Print the whole or a specific value of a float register structure.
+
+=cut
+
+*/
+
 void
 PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
               int regnum)
@@ -2110,6 +2505,18 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg,
 /* PDB_print_num_frame
  * print the whole or a specific value of a float register frame structure.
  */
+/*
+
+=item C<void
+PDB_print_num_frame(struct Parrot_Interp *interpreter,
+                    struct NRegFrame *num_reg, int regnum)>
+
+Print the whole or a specific value of a float register frame structure.
+
+=cut
+
+*/
+
 void
 PDB_print_num_frame(struct Parrot_Interp *interpreter,
                     struct NRegFrame *num_reg, int regnum)
@@ -2134,9 +2541,18 @@ PDB_print_num_frame(struct Parrot_Interp *interpreter,
     }
 }
 
-/* PDB_print_string
- * print the whole or a specific value of a string register structure.
- */
+/*
+
+=item C<void
+PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
+                 int regnum)>
+
+Print the whole or a specific value of a string register structure.
+
+=cut
+
+*/
+
 void
 PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
                  int regnum)
@@ -2161,9 +2577,18 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
     }
 }
 
-/* PDB_print_string_frame
- * print the whole or a specific value of a string register frame structure.
- */
+/*
+
+=item C<void
+PDB_print_string_frame(struct Parrot_Interp *interpreter,
+                       struct SRegFrame *string_reg, int regnum)>
+
+Print the whole or a specific value of a string register frame structure.
+
+=cut
+
+*/
+
 void
 PDB_print_string_frame(struct Parrot_Interp *interpreter,
                        struct SRegFrame *string_reg, int regnum)
@@ -2188,6 +2613,17 @@ PDB_print_string_frame(struct Parrot_Interp *interpreter,
     }
 }
 
+/*
+
+=item C<static void
+print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)>
+
+Prints out a human-readable description of C<pmc>.
+
+=cut
+
+*/
+
 static void
 print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
 {
@@ -2204,9 +2640,18 @@ print_pmc(struct Parrot_Interp *interpreter, PMC* pmc)
     }
 }
 
-/* PDB_print_pmc
- * print the whole or a specific value of a PMC register structure.
- */
+/*
+
+=item C<void
+PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
+              int regnum, PMC* key)>
+
+Print the whole or a specific value of a PMC register structure.
+
+=cut
+
+*/
+
 void
 PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
               int regnum, PMC* key)
@@ -2237,9 +2682,18 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
     }
 }
 
-/* PDB_print_pmc_frame
- * print the whole or a specific value of a PMC register frame structure.
- */
+/*
+
+=item C<void
+PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
+                    struct PRegFrame *pmc_reg, int regnum, PMC* key)>
+
+Print the whole or a specific value of a PMC register frame structure.
+
+=cut
+
+*/
+
 void
 PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
                     struct PRegFrame *pmc_reg, int regnum, PMC* key)
@@ -2270,9 +2724,16 @@ PDB_print_pmc_frame(struct Parrot_Interp *interpreter,
     }
 }
 
-/* PDB_info
- * print the interpreter info.
- */
+/*
+
+=item C<void PDB_info(struct Parrot_Interp *interpreter)>
+
+Print the interpreter info.
+
+=cut
+
+*/
+
 void
 PDB_info(struct Parrot_Interp *interpreter)
 {
@@ -2298,10 +2759,18 @@ PDB_info(struct Parrot_Interp *interpreter)
             interpinfo(interpreter, MEM_ALLOCS_SINCE_COLLECT));
 }
 
-/* PDB_help
- * Print the help text. "Help" with no arguments prints a list of commands.
- * "Help xxx" prints information on command xxx.
- */
+/*
+
+=item C<void
+PDB_help(struct Parrot_Interp *interpreter, const char *command)>
+
+Print the help text. "Help" with no arguments prints a list of commands.
+"Help xxx" prints information on command xxx.
+
+=cut
+
+*/
+
 void
 PDB_help(struct Parrot_Interp *interpreter, const char *command)
 {
@@ -2432,6 +2901,22 @@ Type \"help\" followed by a command name for full documentation.\n\n");
             break;
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/debug.h>, F<src/pdb.c> and F<ops/debug.ops>.
+
+=head1 HISTORY
+
+Initial version by Daniel Grunblatt on 2002.5.19.
+
+=cut
+
+*/
 
 /*
  * Local variables:

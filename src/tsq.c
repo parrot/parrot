@@ -1,19 +1,35 @@
-/* tsq.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Thread-safe queues
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/tsq.c - Thread-safe queues
+
+=head1 DESCRIPTION
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include <assert.h>
 
-/* A synchronized entry popper - actuall shift from front */
+/*
+
+=item C<QUEUE_ENTRY *
+pop_entry(QUEUE *queue)>
+
+Does a synchronized removal of the head entry off the queue and returns it.
+
+=cut
+
+*/
+
 QUEUE_ENTRY *
 pop_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
@@ -24,18 +40,35 @@ pop_entry(QUEUE *queue) {
 }
 
 /*
- * this does not locking, so the result might have changed already
- * but the synched pop_entry checks again and returns NULL, if
- * queue is empty
- */
+
+=item C<QUEUE_ENTRY *
+peek_entry(QUEUE *queue)>
+
+This does no locking, so the result might have changed by the time you
+get the entry, but a synchronized C<pop_entry()> will check again and
+return C<NULL> if the queue is empty.
+
+=cut
+
+*/
 QUEUE_ENTRY *
 peek_entry(QUEUE *queue) {
     return queue->head;
 }
 
-/* Grab an entry off the queue with no synchronization. Internal only,
-   because it's darned evil and shouldn't be used outside the
-   module. It's in here so we don't have to duplicate pop code */
+/*
+
+=item C<QUEUE_ENTRY *
+nosync_pop_entry(QUEUE *queue)>
+
+Grab an entry off the queue with no synchronization. Internal only,
+because it's darned evil and shouldn't be used outside the module. It's
+in here so we don't have to duplicate pop code.
+
+=cut
+
+*/
+
 QUEUE_ENTRY *
 nosync_pop_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
@@ -53,6 +86,18 @@ nosync_pop_entry(QUEUE *queue) {
     return returnval;
 }
 
+/*
+
+=item C<QUEUE_ENTRY *
+wait_for_entry(QUEUE *queue)>
+
+Does a synchronized removal of the head entry off the queue, waiting if
+necessary until there is an entry, and then returns it.
+
+=cut
+
+*/
+
 QUEUE_ENTRY *
 wait_for_entry(QUEUE *queue) {
     QUEUE_ENTRY *returnval;
@@ -65,6 +110,17 @@ wait_for_entry(QUEUE *queue) {
     return returnval;
 
 }
+
+/*
+
+=item C<void
+push_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+
+Does a synchronized insertion of C<entry> onto the tail of the queue.
+
+=cut
+
+*/
 
 void
 push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
@@ -80,6 +136,17 @@ push_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
     queue_signal(queue);        /* assumes only one waiter */
     queue_unlock(queue);
 }
+
+/*
+
+=item C<void
+unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+
+Does a syncronized insertion of C<entry> into the head of the queue.
+
+=cut
+
+*/
 
 void
 unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
@@ -101,9 +168,17 @@ unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry) {
 }
 
 /*
- * insert a timed event according to abstime
- * caller has to hold the queue mutex
- */
+
+=item C<void
+nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+
+Inserts a timed event according to C<abstime>. The caller has to hold the
+queue mutex.
+
+=cut
+
+*/
+
 void
 nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 {
@@ -143,6 +218,17 @@ nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
     entry->next = cur;
 }
 
+/*
+
+=item C<void
+insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
+
+Does a syncronized insert of C<entry>.
+
+=cut
+
+*/
+
 void
 insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
 {
@@ -152,36 +238,112 @@ insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)
     queue_unlock(queue);
 }
 
+/*
+
+=item C<void
+queue_lock(QUEUE *queue)>
+
+Locks the queue's mutex.
+
+=cut
+
+*/
+
 void
 queue_lock(QUEUE *queue) {
     LOCK(queue->queue_mutex);
 }
+
+/*
+
+=item C<void
+queue_unlock(QUEUE *queue)>
+
+Unlocks the queue's mutex.
+
+=cut
+
+*/
 
 void
 queue_unlock(QUEUE *queue) {
     UNLOCK(queue->queue_mutex);
 }
 
-/* This function wakes up *every* thread waiting on the queue */
+/*
+
+=item C<void
+queue_broadcast(QUEUE *queue)>
+
+This function wakes up I<every> thread waiting on the queue.
+
+=cut
+
+*/
+
 void
 queue_broadcast(QUEUE *queue) {
     COND_BROADCAST(queue->queue_condition);
 }
+
+/*
+
+=item C<void
+queue_signal(QUEUE *queue)>
+
+Description.
+
+=cut
+
+*/
 
 void
 queue_signal(QUEUE *queue) {
     COND_SIGNAL(queue->queue_condition);
 }
 
+/*
+
+=item C<void
+queue_wait(QUEUE *queue)>
+
+Instructs the queue to wait.
+
+=cut
+
+*/
+
 void
 queue_wait(QUEUE *queue) {
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
 }
 
+/*
+
+=item C<void
+queue_timedwait(QUEUE *queue, struct timespec *abs_time)>
+
+Instructs the queue to wait for C<abs_time> seconds (?).
+
+=cut
+
+*/
+
 void
 queue_timedwait(QUEUE *queue, struct timespec *abs_time) {
     COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
+
+/*
+
+=item C<QUEUE*
+queue_init(UINTVAL prio)>
+
+Initializes the queue, setting C<prio> as the queue's priority.
+
+=cut
+
+*/
 
 QUEUE*
 queue_init(UINTVAL prio)
@@ -194,15 +356,38 @@ queue_init(UINTVAL prio)
     return queue;
 }
 
+/*
+
+=item C<void
+queue_destroy(QUEUE *queue)>
+
+Destroys the queue, raising an exception if it is not empty.
+
+=cut
+
+*/
+
 void
 queue_destroy(QUEUE *queue)
 {
     if (peek_entry(queue))
-        internal_exception(1, "Queue not emty on destroy");
+        internal_exception(1, "Queue not empty on destroy");
     COND_DESTROY(queue->queue_condition);
     MUTEX_DESTROY(queue->queue_mutex);
     mem_sys_free(queue);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/tsq.h>.
+
+=cut
+
+*/
 
 /*
  * Local variables:

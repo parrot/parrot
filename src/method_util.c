@@ -1,26 +1,40 @@
-/* method_util.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Utility functions to handle Parrot calling conventions, lookup
- *     methods, etc.
- *  Data Structure and Algorithms:
- *  History:
- *     Initial revision by Sean, 2002/08/04
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/method_util.c - Utility functions for methods
+
+=head1 DESCRIPTION
+
+Utility functions to handle Parrot calling conventions, lookup methods, etc.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/method_util.h"
 
 /*
- * Create a new native sub. - Obsolete use NCI
- *
- * s. core.ops B<dlfunc> and interpreter.c:Parrot_compreg() for examples
- *
- */
+
+=item C<PMC *
+Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)>
+
+Create a new native sub. 
+
+B<OBSOLETE> Use NCI instead. See F<ops/core.ops>CB<dlfunc> and
+F<src/interpreter.c:Parrot_compreg()> for examples.
+
+=cut
+
+*/
+
 PMC *
 Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)
 {
@@ -30,8 +44,16 @@ Parrot_new_csub(struct Parrot_Interp *interp, Parrot_csub_t func)
 }
 
 /*
- * Push non-prototyped arguments.
- */
+
+=item C<void
+Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])>
+
+Push non-prototyped arguments.
+
+=cut
+
+*/
+
 void
 Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])
 {
@@ -44,8 +66,16 @@ Parrot_push_argv(struct Parrot_Interp *interp, INTVAL argc, PMC *argv[])
 }
 
 /*
- * Pop non-prototyped arguments.
- */
+
+=item C<INTVAL
+Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)>
+
+Pop non-prototyped arguments.
+
+=cut
+
+*/
+
 INTVAL
 Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
 {
@@ -61,6 +91,20 @@ Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
     return nret;
 }
 
+/*
+
+=item C<void
+Parrot_push_proto(struct Parrot_Interp *interp,
+                  INTVAL intc, INTVAL *intv,
+                  INTVAL numc, FLOATVAL *numv,
+                  INTVAL strc, STRING **strv, INTVAL pmcc, PMC **pmcv)>
+
+Push prototyped arguments.
+
+=cut
+
+*/
+
 /* XXX: blech, blech, blech.  This is ugly. */
 #define push_these(npush, interp, regs, argc, arg, arg2, stacktype) { \
     int i; \
@@ -75,9 +119,6 @@ Parrot_pop_argv(struct Parrot_Interp *interp, PMC ***argv)
     npush += (i < 27 ? 0 : i - 27); \
 }
 
-/*
- * Push prototyped arguments.
- */
 void
 Parrot_push_proto(struct Parrot_Interp *interp,
                   INTVAL intc, INTVAL *intv,
@@ -100,8 +141,17 @@ Parrot_push_proto(struct Parrot_Interp *interp,
 }
 
 /*
- * Initialize a method stash.
- */
+
+=item C<void
+Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
+                  struct Stash *stash)>
+
+Initialize a method stash.
+
+=cut
+
+*/
+
 void
 Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
                   struct Stash *stash)
@@ -125,8 +175,17 @@ Parrot_init_stash(struct Parrot_Interp *interp, struct method_rec_t *recp,
 }
 
 /*
- * Lookup a method in a method stash.
- */
+
+=item C<PMC *
+Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, 
+                   PMC *key)>
+
+Lookup a method in a method stash.
+
+=cut
+
+*/
+
 PMC *
 Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
 {
@@ -142,8 +201,17 @@ Parrot_find_method(struct Parrot_Interp *interp, struct Stash *stash, PMC *key)
 }
 
 /*
- * Mark entries in a stack structure during GC.
- */
+
+=item C<void
+mark_stack(struct Parrot_Interp *interpreter,
+           Stack_Chunk_t *cur_stack)>
+
+Mark entries in a stack structure during GC.
+
+=cut
+
+*/
+
 void
 mark_stack(struct Parrot_Interp *interpreter,
            Stack_Chunk_t *cur_stack)
@@ -175,6 +243,18 @@ mark_stack(struct Parrot_Interp *interpreter,
         }
     }
 }
+
+/*
+
+=back
+
+=head1 HISTORY
+
+Initial revision by Sean, 2002/08/04.
+
+=cut
+
+*/
 
 /*
  * Local variables:

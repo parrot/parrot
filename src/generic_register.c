@@ -1,36 +1,51 @@
-/* generic_register.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     This the generalized register handling routines, it uses macros
- *	to define the things that are not common to all of the register
- *	stacks, and then undefines the macros at the end of the file.
- *
- *  Uage:
- *	#define REG_PUSH Parrot_push_p
- *	#define REG_POP Parrot_pop_p
- *	#define REG_CLEAR Parrot_clear_p
- *	#define REG_STACK pmc_reg_stack
- *	#define REG_TYPE pmc_reg
- *	#define REG_CHUNK_BUF PRegChunkBuf
- *	#define REG_FRAME PRegFrame
- *	#define REG_EXCEPTION_STRING "No more P register frames to pop!"
- *	#define REG_NULL PMCNULL
- *	#include "generic_register.c"
- *
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/generic_register.c - Generalized register handling routines
+
+=head1 SYNOPSIS
+
+    #define REG_PUSH Parrot_push_p
+    #define REG_POP Parrot_pop_p
+    #define REG_CLEAR Parrot_clear_p
+    #define REG_STACK pmc_reg_stack
+    #define REG_TYPE pmc_reg
+    #define REG_CHUNK_BUF PRegChunkBuf
+    #define REG_FRAME PRegFrame
+    #define REG_EXCEPTION_STRING "No more P register frames to pop!"
+    #define REG_NULL PMCNULL
+    #include "generic_register.c"
+
+=head1 DESCRIPTION
+
+This the generalized register handling routines, it uses macros to
+define the things that are not common to all of the register stacks, and
+then undefines the macros at the end of the file.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 
+/*
 
-/*=for api register REG_PUSH
-  pushes a new register frame onto the corresponding frame stack
+=item C<void
+REG_PUSH(struct Parrot_Interp *interpreter, void *where)>
+
+Pushes a new register frame onto the corresponding frame stack.
+
+=cut
+
 */
+
 void
 REG_PUSH(struct Parrot_Interp *interpreter, void *where)
 {
@@ -42,9 +57,17 @@ REG_PUSH(struct Parrot_Interp *interpreter, void *where)
 	    sizeof(struct REG_FRAME));
 }
 
-/*=for api register REG_POP
-  pops a register frame from the corresponding frame stack
+/*
+
+=item C<void
+REG_POP(struct Parrot_Interp *interpreter, void *where)>
+
+Pops a register frame from the corresponding frame stack.
+
+=cut
+
 */
+
 void
 REG_POP(struct Parrot_Interp *interpreter, void *where)
 {
@@ -63,9 +86,17 @@ REG_POP(struct Parrot_Interp *interpreter, void *where)
     }
 }
 
-/*=for api register REG_CLEAR
-  sets each register in the current set to REG_NULL
+/*
+
+=item C<void
+REG_CLEAR(struct Parrot_Interp *interpreter)>
+
+Sets each register in the current set to C<REG_NULL>.
+
+=cut
+
 */
+
 void
 REG_CLEAR(struct Parrot_Interp *interpreter)
 {
@@ -84,3 +115,16 @@ REG_CLEAR(struct Parrot_Interp *interpreter)
 #undef REG_FRAME
 #undef REG_EXCEPTION_STRING
 #undef REG_NULL
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/register.h>, F<include/parrot/regfuncs.h> and F<src/register.c>.
+
+=cut
+
+*/
+

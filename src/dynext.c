@@ -1,22 +1,37 @@
-/* dynext.c
- *  Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
- *  CVS Info
- *     $Id$
- *  Overview:
- *     Dynamic extension stuff
- *  Data Structure and Algorithms:
- *  History:
- *     Initial rev by leo 2003.08.06
- *  Notes:
- *  References:
- */
+/*
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/dynext.c - Dynamic extensions to Parrot
+
+=head1 DESCRIPTION
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 
 /*
- * set a property
- */
+
+=item C<static void
+set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
+        STRING *name)>
+
+Set a property C<name> with value C<what> on the C<ParrotLibrary>
+C<lib_pmc>.
+
+=cut
+
+*/
+
 static void
 set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
         STRING *name)
@@ -31,8 +46,17 @@ set_cstring_prop(Parrot_Interp interpreter, PMC *lib_pmc, const char *what,
 }
 
 /*
- * store a library PMC in interpreter iglobals
- */
+
+=item C<static void
+store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
+        STRING *type)>
+
+Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
+
+=cut
+
+*/
+
 static void
 store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
         STRING *type)
@@ -56,10 +80,17 @@ store_lib_pmc(Parrot_Interp interpreter, PMC* lib_pmc, STRING *path,
 }
 
 /*
- * check if a library PMC with the filename path exists
- * if yes return it
- *
- */
+
+=item C<static PMC*
+is_loaded(Parrot_Interp interpreter, STRING *path)>
+
+Check if a C<ParrotLibrary> PMC with the filename path exists, if yes
+return it.
+
+=cut
+
+*/
+
 static PMC*
 is_loaded(Parrot_Interp interpreter, STRING *path)
 {
@@ -87,8 +118,16 @@ is_loaded(Parrot_Interp interpreter, STRING *path)
 }
 
 /*
- * return path and handle of a dynamic lib
- */
+
+=item C<static STRING *
+get_path(Interp *interpreter, STRING *lib, void **handle)>
+
+Return path and handle of a dynamic lib.
+
+=cut
+
+*/
+
 static STRING *
 get_path(Interp *interpreter, STRING *lib, void **handle)
 {
@@ -154,13 +193,21 @@ get_path(Interp *interpreter, STRING *lib, void **handle)
 }
 
 /*
- * dynamic library loader
- * the initializer is currently unused
- *
- * calls Parrot_lib_load_%s which performs the registration of the lib once
- *       Parrot_lib_init_%s gets called (if exists) to perform
- *                          thread specific setup
- */
+
+=item C<PMC *
+Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)>
+
+Dynamic library loader.
+
+C<initializer> is currently unused.
+
+Calls C<Parrot_lib_%s_load()> which performs the registration of the lib
+once C<Parrot_lib_%s_init()> gets called (if exists) to perform thread
+specific setup. In both functions C<%s> is the name of the library.
+
+=cut
+
+*/
 
 PMC *
 Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
@@ -232,6 +279,22 @@ Parrot_load_lib(Interp *interpreter, STRING *lib, PMC *initializer)
     /* UNLOCK */
     return lib_pmc;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/dynext.h> and F<classes/parrotlibrary.pmc>.
+
+=head1 HISTORY
+
+Initial rev by leo 2003.08.06.
+
+=cut
+
+*/
 
 /*
  * Local variables:

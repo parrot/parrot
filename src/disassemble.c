@@ -1,15 +1,30 @@
 /*
- * disassemble.c
- *
- * CVS Info
- *    $Id$
- * Overview:
- *    Parrot disassembler
- * History:
- *      Initial version by Daniel Grunblatt on 2002.5.26
- * Notes:
- * References:
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/disassemble.c - Parrot disassembler
+
+=head1 SYNOPSIS
+
+    % make disassemble
+
+    % ./disassemble file.pbc
+
+=head1 DESCRIPTION
+
+This uses the C<Parrot_disassemble()> function from F<src/embed.c>,
+which in turn uses the C<PDB_disassemble()> function from
+F<src/debug.c>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <parrot/parrot.h>
 #include "parrot/embed.h"
@@ -22,6 +37,17 @@
         c++; }
 
 static void do_dis(Parrot_Interp);
+
+/*
+
+=item C<int main(int argc, char *argv[])>
+
+The run-loop. Starts up an interpreter, loads the bytecode from the
+command-line and disassembles it.
+
+=cut
+
+*/
 
 int
 main(int argc, char *argv[])
@@ -62,11 +88,38 @@ main(int argc, char *argv[])
     return 0;
 }
 
+/*
+
+=item C<static void do_dis(Parrot_Interp interpreter)>
+
+Do the disassembling.
+
+=cut
+
+*/
+
 static void
 do_dis(Parrot_Interp interpreter)
 {
     Parrot_disassemble(interpreter);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/embed.c> and F<src/debug.c>.
+
+=head1 HISTORY
+
+Initial version by Daniel Grunblatt on 2002.5.26.
+
+=cut
+
+*/
+
 /*
  * Local variables:
  * c-indentation-style: bsd

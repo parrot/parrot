@@ -1,15 +1,20 @@
 /*
- * exec.c
- *
- * CVS Info
- *    $Id$
- * Overview:
- *    Generate an object file.
- * History:
- *      Initial version by Daniel Grunblatt on 2003.6.9
- * Notes:
- * References:
- */
+Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+$Id$
+
+=head1 NAME
+
+src/exec.c - Generate an object file
+
+=head1 DESCRIPTION
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include <parrot/parrot.h>
 #if HAVE_COMPUTED_GOTO
@@ -38,12 +43,18 @@ static int symbol_list_find(Parrot_exec_objfile_t *obj, const char *func_name);
 
 int Parrot_exec_run = 0;
 
-/* Parrot_exec
- *
- *  Call the jit to get the program code.
- *  Adds the members of the data section.
- *  And emits the executable.
- */
+/*
+
+=item C<void
+Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
+        opcode_t *code_start, opcode_t *code_end)>
+
+Call the jit to get the program code. Adds the members of the data
+section. And emits the executable.
+
+=cut
+
+*/
 
 void
 Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
@@ -104,11 +115,17 @@ Parrot_exec(struct Parrot_Interp *interpreter, opcode_t *pc,
     Parrot_exec_save(obj, output);
 }
 
-/*  add_data_member
- *
- *      Adds a member to the data section, storing the size of it at
- *      obj->data_size[N].
- */
+/*
+
+=item C<static void
+add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)>
+
+Adds a member to the data section, storing the size of it at
+C<<obj->data_size[N]>>.
+
+=cut
+
+*/
 
 static void
 add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
@@ -135,10 +152,16 @@ add_data_member(Parrot_exec_objfile_t *obj, void *src, size_t len)
     obj->data.size += len;
 }
 
-/*  exec_init
- *
- *      Initialize the obj structure.
- */
+/*
+
+=item C<static void
+exec_init(Parrot_exec_objfile_t *obj)>
+
+Initialize the obj structure.
+
+=cut
+
+*/
 
 static void
 exec_init(Parrot_exec_objfile_t *obj)
@@ -168,10 +191,17 @@ exec_init(Parrot_exec_objfile_t *obj)
     Parrot_exec_add_symbol(obj, "run_compiled", STYPE_FUNC);
 }
 
-/*  Parrot_exec_add_symbol
- *
- *      Adds a symbol to the object file.
- */
+/*
+
+=item C<int
+Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
+    int stype)>
+
+Adds a symbol to the object file.
+
+=cut
+
+*/
 
 int
 Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
@@ -209,6 +239,16 @@ Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char *symbol,
     return symbol_number; 
 }
 
+/*
+
+=item C<int *
+Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj, char *nptr,
+    const char *var, int offset, int disp)>
+
+=cut
+
+*/
+
 int *
 Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj, char *nptr,
     const char *var, int offset, int disp)
@@ -217,6 +257,16 @@ Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj, char *nptr,
     return (int *)offset;
 }
 
+/*
+
+=item C<void
+Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj, char *nptr,
+    const char *func_name)>
+
+=cut
+
+*/
+
 void
 Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj, char *nptr,
     const char *func_name)
@@ -224,10 +274,17 @@ Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj, char *nptr,
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
 }
 
-/*  Parrot_exec_add_text_rellocation
- *
- *      Adds a text rellocation to the object file.
- */
+/*
+
+=item C<void
+Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
+    int type, const char *symbol, int disp)>
+
+Adds a text rellocation to the object file.
+
+=cut
+
+*/
 
 void
 Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
@@ -267,6 +324,20 @@ Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char *nptr,
     new_relloc->type = type;
 }
 
+/*
+
+=item C<static int
+symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)>
+
+Returns the index of C<symbol> in the symbol list. Returns -1 if it is
+not in the list.
+
+Used by C<Parrot_exec_add_symbol()>.
+
+=cut
+
+*/
+
 static int
 symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
 {
@@ -277,6 +348,23 @@ symbol_list_find(Parrot_exec_objfile_t *obj, const char *symbol)
             return i;
     return -1;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/exec.h>, F<src/exec_cpu.c>, F<include/parrot/exec_save.h>
+and F<src/exec_start.c>.
+
+=head1 HISTORY
+
+Initial version by Daniel Grunblatt on 2003.6.9.
+
+=cut
+
+*/
 
 /*
  * Local variables:
