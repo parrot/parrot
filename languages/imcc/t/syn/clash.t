@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use TestCompiler tests => 8;
+use TestCompiler tests => 9;
 
 ##############################
 output_is(<<'CODE', <<'OUT', "if/unless");
@@ -164,6 +164,15 @@ err:
 CODE
 ok
 OUT
+
+output_like(<<'CODE', <<'OUTPUT', "new with a native type");
+.sub _main
+        $P1 = new INTVAL
+	print "never\n"
+	end
+.end
+CODE
+/error:\w+:Unknown PMC type 'INTVAL'/
+OUTPUT
+
 1;
-
-

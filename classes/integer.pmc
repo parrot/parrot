@@ -15,4 +15,7 @@
 
 pmclass Integer extends mmd_default {
 
+    void init() {	/* pmc2c doesn't like empty classes */
+	SUPER();
+    }
 }

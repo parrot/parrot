@@ -22,17 +22,20 @@ mmd_dispatch_pmc(struct Parrot_Interp *interpreter,
 		 PMC *left, PMC *right, PMC *dest, INTVAL function)
 {
     pmc_mmd_f real_function;
-    INTVAL left_type, right_type;
+    UINTVAL left_type, right_type;
     UINTVAL offset;
     left_type = VTABLE_type(interpreter, left);
     right_type = VTABLE_type(interpreter, right);
 
     if ((left_type > interpreter->binop_mmd_funcs->x[function]) ||
         (right_type > interpreter->binop_mmd_funcs->y[function])) {
-        real_function = interpreter->binop_mmd_funcs->default_func[function];
+        real_function = (pmc_mmd_f)interpreter->binop_mmd_funcs->default_func[
+            function];
     } else {
-        offset = interpreter->binop_mmd_funcs->x[function] * right_type + left_type;
-        real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[function] + offset);
+        offset = interpreter->binop_mmd_funcs->x[function] *
+            right_type + left_type;
+        real_function = (pmc_mmd_f)(interpreter->binop_mmd_funcs->mmd_funcs[
+                function] + offset);
     }
     (*real_function)(interpreter, left, right, dest);
 }
@@ -212,7 +215,7 @@ mmd_expand_y(struct Parrot_Interp *interpreter, INTVAL function, INTVAL new_y)
 }
 
 /* Add a function to the MMD table by class name, rather than class
- * number. Handles the case where the named class isn't loaded yet. 
+ * number. Handles the case where the named class isn't loaded yet.
  */
 void
 mmd_add_by_class(struct Parrot_Interp *interpreter,

@@ -320,7 +320,7 @@ SP              [ ]
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
         int type = pmc_type(interp, string_from_cstring(interp, yytext+1, 0));
 
-        if (type) {
+        if (type > 0) {
             char *buf = malloc(16);
 	    sprintf(buf, "%d", type);
 	    valp->s = buf;

@@ -44,7 +44,7 @@ iNEW(struct Parrot_Interp *interpreter, SymReg * r0, char * type,
     sprintf(fmt, "%d", pmc_num);
     pmc = mk_const(str_dup(fmt), 'I');
 
-    if (pmc_num == 0)
+    if (pmc_num <= 0)
         fataly(1, sourcefile, line, "Unknown PMC type '%s'\n", type);
     sprintf(fmt, "%%s, %d\t # .%s", pmc_num, type);
     r0->usage = U_NEW;

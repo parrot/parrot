@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 75;
+use Parrot::Test tests => 76;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 my $max_pmc = scalar(keys(%pmc_types)) + 1;
@@ -2129,6 +2129,14 @@ output_is(<<"CODE", <<OUTPUT, "find_method");
 	end
 CODE
 Method 'no_such_meth' not found
+OUTPUT
+
+output_like(<<'CODE', <<'OUTPUT', "new with a native type");
+        new P1, .INTVAL
+	print "never\n"
+	end
+CODE
+/error:\w+:unknown macro '\.INTVAL'/
 OUTPUT
 
 1;
