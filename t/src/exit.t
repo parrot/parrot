@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 c_output_is(<<'CODE', <<'OUTPUT', "Parrot_exit");
         #include <stdio.h>
@@ -21,7 +21,7 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parrot_on_exit / Parrot_exit");
 
         void print_message(int status, void* arg) {
             printf("%s", (char*)arg);
-        }       
+        }
 
         int main(int argc, char* argv[]) {
             Parrot_on_exit(print_message, "exit1\n");
@@ -33,8 +33,50 @@ c_output_is(<<'CODE', <<'OUTPUT', "Parrot_on_exit / Parrot_exit");
         }
 CODE
 pre-exit
-exit1
-exit2
 exit3
+exit2
+exit1
+OUTPUT
+
+c_output_is(<<'CODE', <<'OUTPUT', "on_exit - interpreter");
+#include <stdio.h>
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+
+void ex1(int x, void*p)
+{
+    printf("ex1\n");
+}
+
+void ex2(int x, void*p)
+{
+    printf("ex2\n");
+}
+
+void ex3(int x, void*p)
+{
+    Parrot_Interp interpreter = (Parrot_Interp) p;
+    PIO_printf(interpreter, "ex3\n");
+}
+
+int main(int argc, char* argv[])
+{
+    struct Parrot_Interp *     interpreter;
+
+    interpreter = Parrot_new();
+    if (!interpreter) {
+        return 1;
+    }
+    Parrot_init(interpreter);
+    Parrot_on_exit(ex1, 0);
+    Parrot_on_exit(ex2, 0);
+    Parrot_on_exit(ex3, interpreter);
+    Parrot_exit(0);
+    exit(0);
+}
+CODE
+ex3
+ex2
+ex1
 OUTPUT
 1;
