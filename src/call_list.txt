@@ -51,7 +51,83 @@ i	lsp
 i	pll
 i	ilsp
 i	pl
-p	B
+#p	b
+p	iiiiii
+p	pii
+i	p333333
+i	p333
+i	pi
+i	pii
+i	pit
+i	pp
+l	p
+t	pi
+i	p33
+t	i
+t	ii
+t	v
+t
+i	ti
+i	l
+v	l
+v	illllllll
+l
+i	s222
+i	sp
+i	ppiiiiiiii
+v	p
+p	piiii
+c
+v
+i	li
+v	pl
+p
+i	ssss
+i	sss
+l	pi
+i	iil
+i	ii4i
+i	ii4
+i	iiti
+i	iit
+i	iiilsp
+i	iiii
+i	iili
+l	ii
+i	piil
+i	pii4i
+i	pii4
+i	piiti
+i	piit
+i	piiilsp
+i	piili
+l	pii
+p	ii
+p	tpp
+p	iiii
+i	s22
+i	piiiiii
+i	iip
+i	s
+i	iti
+t	t
+v	i
+i	p4i
+i	p4
+i	pti
+i	pt
+i	p42p
+i	plp
+i	plsp
+i	pllllllll
+i	pilsp
+i	psp
+i	pli
+v	pi
+i	piii
+l	l4
+l	p33l
+l	33l
 
 # These are needed for parrotio.pmc
 i	IP
