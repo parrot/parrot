@@ -113,11 +113,40 @@ may have a property attached to it.
 
 =item Attribute
 
-An attribute 
+An attribute is a slot in an object that contains a value, generally a
+PMC. (Containing non-PMCs leads to interesting garbage collection
+issues at the moment) Attributes are referenced either
+by slot number or by class name/attribute name pairs. (At least
+conceptually)
+
+Attributes are set on a class-wide basis, and all the objects of a
+class will have the same set of attributes. Generally attributes
+aren't added or removed from classes at runtime, as this would require
+resizing and moving the elements of the attribute arrays of existing
+objects, and potentially recompiling code with fixed attribute offsets
+embedded in it. Most OO languages don't allow attribute changes to
+existing classes, though parrot's base attribute system does allow
+this.
 
 =item Method
 
+In its strictest sense, a method is a chunk of code that you call with
+an object in the object slot of the calling conventions.
+
+More generally, a method is some piece of code that you invoke by name
+through an object. You call the object's "Invoke a method" vtable
+entry, passing in the method name (Assuming we don't just get it from
+the sub name register, per calling conventions). The object is then
+responsible for doing something with the method being
+requested. Presumably it calls the method, though this isn't strictly
+required.
+
 =item Delegate
+
+An object that is transparently (to the user) embedded in another
+object. Delegate objects are used in those cases where we can't
+inherit from a class because the class is from a different object
+universe. 
 
 =item Parent class
 
