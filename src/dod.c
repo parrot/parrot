@@ -504,17 +504,19 @@ Parrot_do_dod_run(struct Parrot_Interp *interpreter)
     /* And the buffers */
     trace_active_buffers(interpreter);
 #if !TRACE_SYSTEM_AREAS
+# if GC_VERBOSE
     /* whe, we don't trace stack and registers, we check after
      * marking everything, if something was missed
      * not - these could also be stale objects
      */
-#if ! DISABLE_GC_DEBUG
+#  if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 1;
-#endif
+#  endif
     trace_system_areas(interpreter);
-#if ! DISABLE_GC_DEBUG
+#  if ! DISABLE_GC_DEBUG
     CONSERVATIVE_POINTER_CHASING = 0;
-#endif
+#  endif
+# endif
 #endif
 
     /* Now put unused PMCs on the free list */
