@@ -97,6 +97,16 @@ methods one with r/o set methods.
 
 The class needs a PMC_EXT structure (its using e.g. PMC_data).
 
+=item does interface
+
+The class does the given interfaces (the collection of methods
+which the class implements).
+
+The default is "scalar". Other currently used interfaces are:
+
+ array
+ hash
+
 =back
 
 =item 3.
@@ -547,15 +557,25 @@ sub filter {
   return if $print_tree || $print_meth;
 
   # look through the pmc declaration header for flags such as noinit
-  my $saw_extends;
+  my ($saw_extends, $saw_does);
   my $superpmc = 'default';
   while ($contents =~ s/^(\s*)(\w+)//s) {
       $lineno += count_newlines($1);
       if ($saw_extends) {
           $superpmc = $2;
           $saw_extends = 0;
+      } elsif ($saw_does) {
+	  if ($flags{does}) {
+	      $flags{does} = "$flags{does},$2";
+	  }
+	  else {
+	      $flags{does} = $2;
+	  }
+          $saw_does = 0;
       } elsif ($2 eq 'extends') {
           $saw_extends = 1;
+      } elsif ($2 eq 'does') {
+          $saw_does = 1;
       } else {
           $flags{$2}++;
       }
@@ -730,6 +750,13 @@ EOC
       }
   }
 
+  my $isa = join(" ", grep { $_ ne 'default' } (keys %visible_supers));
+
+  my $does = "scalar";
+  if ($flags{does}) {
+      $does = join(" ", split/,/, $flags{does});
+  }
+
   # this collapses the array and makes sure the spacing is right for
   # the vtable
   my $methodlist = join (",\n        ", @methods);
@@ -751,27 +778,28 @@ void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
-        0,	/* base_type */
+        enum_class_$classname,	/* base_type */
         NULL,	/* whoami */
         NULL,	/* method_table */
         $vtbl_flag, /* flags */
-        0, /* reserved */
-        0, /* extra data */
+        NULL,   /* does_str */
+        NULL,   /* isa_str */
+        NULL, /* extra data */
         $methodlist
         };
-    /* must set it here:
-     * Sun's Workshop compiler complains about the use of a non-constant
-     * initializer
-     */
-    temp_base_vtable.base_type = entry;
 
     /*
      * parrotio calls some class_init functions during its class_init
      * code, so some of the slots might already be allocated
+     * class isa '$isa'
      */
     if (!Parrot_base_vtables[entry]) {
 	temp_base_vtable.whoami = string_make(interp,
 	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
+	temp_base_vtable.isa_str = string_make(interp,
+	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG, 0);
+	temp_base_vtable.does_str = string_make(interp,
+	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG, 0);
 
 	Parrot_base_vtables[entry] =
 	   Parrot_clone_vtable(interp, &temp_base_vtable);
@@ -797,20 +825,27 @@ void $initname (Interp * interp, int entry) {
 
     struct _vtable temp_base_vtable = {
         NULL,	/* package */
-        enum_class_Const$classname,
+        enum_class_Const$classname, /* base_type */
         NULL,	/* whoami */
         NULL,	/* method_table */
         $vtbl_flag, /* flags */
-        0, /* reserved */
-        0, /* extra data */
+        NULL,   /* does_str */
+        NULL,   /* isa_str */
+        NULL,   /* extra data */
         $cmethodlist
         };
 
-   if (!temp_base_vtable.whoami)
+   if (!temp_base_vtable.whoami) {
        temp_base_vtable.whoami = string_make(interp,
 	   "Const$classname", @{[length("Const$classname")]}, 0, PObj_constant_FLAG, 0);
+	temp_base_vtable.isa_str = string_make(interp,
+	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG, 0);
+	temp_base_vtable.does_str = string_make(interp,
+	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG, 0);
 
-   Parrot_base_vtables[entry] = Parrot_clone_vtable(interp, &temp_base_vtable);
+       Parrot_base_vtables[entry] =
+	    Parrot_clone_vtable(interp, &temp_base_vtable);
+   }
    $class_init_code
 }
 EOC

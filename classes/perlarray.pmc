@@ -36,7 +36,7 @@ Parrot_PerlArray_set_pmc_ptr(Interp *interp, List *list, INTVAL key)
     return value;
 }
 
-pmclass PerlArray extends Array need_ext {
+pmclass PerlArray extends Array need_ext does array {
 
     void set_integer_keyed_int (INTVAL key, INTVAL value) {
         PMC *src = pmc_new_noinit(INTERP, enum_class_PerlInt);

@@ -76,13 +76,14 @@ typedef enum {
     VTABLE_DATA_IS_PMC   = 0x08
 } vtable_flags_t;
 
-struct _vtable {    
+struct _vtable {
     struct PACKAGE *package; /* Pointer to package this vtable belongs to */
     INTVAL base_type;        /* 'type' value for MMD */
     STRING* whoami;          /* Name of class this vtable is for */
     PMC* method_table;       /* Method table PMC (?) */
     UINTVAL flags;           /* Flags. Duh */
-    INTVAL reserved;         /* For later use */
+    STRING* does_str;	     /* space separated list of interfaces */
+    STRING* isa_str;	     /* space separated list of classes */
     void *data;              /* To hang data off this vtable */
 
     /* Vtable Functions */

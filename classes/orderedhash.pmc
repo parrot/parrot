@@ -28,7 +28,7 @@
 #include "parrot/parrot.h"
 #include "pmc_perlhash.h"
 
-pmclass OrderedHash extends PerlArray need_ext {
+pmclass OrderedHash extends PerlArray need_ext does array does hash {
     void init () {
 	SUPER();
 	PerlHash.SUPER();

@@ -56,8 +56,11 @@ inline op can(out INT, in PMC, in STR) {
 
 =item B<does>(out INT, in PMC, in STR)
 
-Sets $1 to true or false, depending on whether $2 ->does the interface in
-$3
+Sets $1 to true or false, depending on whether $2 ->does the interface in $3.
+
+=item B<isa>(out INT, in PMC, in STR)
+
+Sets $1 to true or false, depending on whether $2 isa $3.
 
 =cut
 
@@ -66,13 +69,18 @@ inline op does(out INT, in PMC, in STR) {
   goto NEXT();
 }
 
+inline op isa(out INT, in PMC, in STR) {
+  $1 = $2->vtable->isa(interpreter, $2, $3);
+  goto NEXT();
+}
+
 ###############################################################################
 
 =item B<newclass>(out PMC, in STR)
 
 Creates a new Parrot-style class, named $2, and puts the new PMC for it
-into $1. (This is a real out--the contents of $1 are ignored and the 
-pointer for the new PMC is put in there). 
+into $1. (This is a real out--the contents of $1 are ignored and the
+pointer for the new PMC is put in there).
 
 =cut
 
@@ -158,7 +166,7 @@ inline op getclass(out PMC, in STR) {
   goto NEXT();
 }
 
-=item B<singleton>(in PMC) 
+=item B<singleton>(in PMC)
 
 Take the object in $1 and put it into its own singleton class, which is
 an anonymous subclass of the object's current class.
@@ -169,7 +177,7 @@ inline op singleton(in PMC) {
   goto NEXT();
 }
 
-=item B<class>(out PMC, in PMC) 
+=item B<class>(out PMC, in PMC)
 
 Get the class PMC for the object in $2 and put it in $1.
 
@@ -188,13 +196,13 @@ Get the class name for the class in $2 and put it in $1
 inline op classname(out STR, in PMC) {
   PMC* classname_pmc;
 
-  classname_pmc = VTABLE_get_pmc_keyed_int(interpreter, 
+  classname_pmc = VTABLE_get_pmc_keyed_int(interpreter,
                   (PMC *)PMC_data($2), 4);
   if (classname_pmc) {
       $1 = VTABLE_get_string(interpreter, classname_pmc);
   }
   else {
-      internal_exception(NO_CLASS, "Class doesn't exist"); 
+      internal_exception(NO_CLASS, "Class doesn't exist");
   }
 
   goto NEXT();

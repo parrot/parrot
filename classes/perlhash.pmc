@@ -31,7 +31,7 @@ static STRING* make_hash_key(Interp* interpreter, PMC * key)
 /* Albeit PerlHash doesn't use PMC_data, it needs the next_fo_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
-pmclass PerlHash need_ext {
+pmclass PerlHash need_ext does hash {
 
     void class_init() {
         /* class_init_code */

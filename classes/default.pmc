@@ -37,6 +37,22 @@ check_set_std_props(Parrot_Interp interp, PMC *pmc, STRING *key, PMC *value)
     }
 }
 
+static INTVAL
+does_isa (Parrot_Interp interp, STRING *method, STRING *what)
+{
+    INTVAL pos = string_str_index(interp, what, method, 0);
+    INTVAL len;
+
+    if (pos < 0)
+	return 0;
+    if (pos && string_index(what, pos - 1) != 32)
+	return 0;
+    len = string_length(method);
+    if (pos + len < (INTVAL)string_length(what) && string_index(what, pos + len) != 32)
+	return 0;
+    return 1;
+}
+
 pmclass default abstract noinit {
 
     void init () {
@@ -278,10 +294,11 @@ pmclass default abstract noinit {
 
 
     INTVAL does (STRING* method) {
-	internal_exception(ILL_INHERIT,
-		"does() not implemented in class '%s'\n",
-		caller(INTERP, SELF));
-        return 0;
+	return does_isa(INTERP, method, SELF->vtable->does_str);
     }
 
+    INTVAL isa (STRING* method) {
+	return does_isa(INTERP, method, SELF->vtable->isa_str);
+
+    }
 }
