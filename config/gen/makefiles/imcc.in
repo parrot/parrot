@@ -14,7 +14,7 @@ H_FILES = $(INC)/parrot.h imc.h stacks.h cfg.h \
 
 IMCC_O_FILES = imcparser$(O) imclexer$(O) imc$(O) stacks$(O) symreg$(O) \
 	instructions$(O) cfg$(O) sets$(O) debug$(O) \
-	optimizer$(O) pbc$(O) main$(O) parser_util$(O) jit$(O)
+	optimizer$(O) pbc$(O) main$(O) parser_util$(O) jit$(O) pcc$(O)
 
 
 O_FILES = $(IMCC_O_FILES) ../../$(PARROTLIB)

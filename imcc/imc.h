@@ -62,6 +62,11 @@ int check_op(struct Parrot_Interp *, char * fullname, char *op, SymReg *r[]);
 int is_op(struct Parrot_Interp *, char *);
 void init_tables(struct Parrot_Interp * interp);
 
+/* pcc protos */
+void expand_pcc_sub(Parrot_Interp interpreter, Instruction *ins);
+void expand_pcc_sub_call(Parrot_Interp interpreter, Instruction *ins);
+void expand_pcc_sub_ret(Parrot_Interp interpreter, Instruction *ins);
+
 /* This should be common with Cola */
 
 char *str_dup(const char *);

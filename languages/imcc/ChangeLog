@@ -3,6 +3,7 @@
 	* PCC stuff:
 	* prototyped calling sequence
 	* overflow array
+	* put all in a separate file: pcc.c
 
 - 2003-07-29	leo
 
