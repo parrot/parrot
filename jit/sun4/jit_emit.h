@@ -301,7 +301,7 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 #define Parrot_jit_regoff(a, i) (unsigned)(a) - (unsigned)(Parrot_jit_regbase_ptr(i))
 
 /* Generate conditional branch to offset from current parrot op */
-static void Parrot_jit_bicc(Parrot_jit_info *jit_info, int cond, int annul,
+static void Parrot_jit_bicc(Parrot_jit_info_t *jit_info, int cond, int annul,
                             opcode_t disp)
 {
     int offset;
@@ -327,7 +327,7 @@ static void Parrot_jit_bicc(Parrot_jit_info *jit_info, int cond, int annul,
 }
 
 /* This function loads a value */
-static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
+static void Parrot_jit_int_load(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -379,7 +379,7 @@ static void Parrot_jit_int_load(Parrot_jit_info *jit_info,
     }
 }
 
-static void Parrot_jit_int_store(Parrot_jit_info *jit_info,
+static void Parrot_jit_int_store(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -409,7 +409,7 @@ static void Parrot_jit_int_store(Parrot_jit_info *jit_info,
     }
 }
 
-static void Parrot_jit_float_load(Parrot_jit_info *jit_info,
+static void Parrot_jit_float_load(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -439,7 +439,7 @@ static void Parrot_jit_float_load(Parrot_jit_info *jit_info,
     }
 }
 
-static void Parrot_jit_float_store(Parrot_jit_info *jit_info,
+static void Parrot_jit_float_store(Parrot_jit_info_t *jit_info,
                              struct Parrot_Interp *interpreter,
                              int param,
                              int hwreg)
@@ -470,7 +470,7 @@ static void Parrot_jit_float_store(Parrot_jit_info *jit_info,
 }
 
 
-void Parrot_jit_dofixup(Parrot_jit_info *jit_info,
+void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
     Parrot_jit_fixup *fixup;
@@ -505,7 +505,7 @@ void Parrot_jit_dofixup(Parrot_jit_info *jit_info,
     }
 }
 
-void Parrot_jit_begin(Parrot_jit_info *jit_info,
+void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                       struct Parrot_Interp * interpreter)
 {
     int ireg0_offset;
@@ -534,7 +534,7 @@ void Parrot_jit_begin(Parrot_jit_info *jit_info,
         emitm_i(3), emitm_lo10(jit_info->op_map), Parrot_jit_opmap);
 }
 
-void Parrot_jit_normal_op(Parrot_jit_info *jit_info,
+void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                           struct Parrot_Interp * interpreter)
 {
     emitm_sethi(jit_info->native_ptr, emitm_hi22(jit_info->cur_op), emitm_o(0));
@@ -550,7 +550,7 @@ void Parrot_jit_normal_op(Parrot_jit_info *jit_info,
     emitm_mov(jit_info->native_ptr, Parrot_jit_intrp, emitm_o(1));
 }
 
-void Parrot_jit_cpcf_op(Parrot_jit_info *jit_info,
+void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         struct Parrot_Interp * interpreter)
 {
     Parrot_jit_normal_op(jit_info, interpreter);
