@@ -16,7 +16,7 @@ Tests Parrot's string registers and operations.
 
 =cut
 
-use Parrot::Test tests => 131;
+use Parrot::Test tests => 132;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2386,6 +2386,40 @@ a
 a--b
 OUTPUT
 
+output_is( <<'CODE', <<OUTPUT, "join: __get_string returns a null string");
+##PIR##
+.sub _main
+    newclass P0, "Foo"
+
+    new P0, .PerlArray
+
+    find_type I0, "Foo"
+    new P1, I0
+
+    push P0, P1
+
+    print "a"
+    join S0, "", P0
+    print "b"
+    print S0
+    print "c\n"
+    end
+.end
+
+.namespace ["Foo"]
+
+.sub __get_string method
+    .local string ret
+
+    null ret
+    .pcc_begin_return
+    .return ret
+    .pcc_end_return
+.end
+CODE
+abc
+OUTPUT
+
 output_is( <<'CODE', <<OUTPUT, "eq_addr/ne_addr");
         set S0, "Test"
         set S1, S0
@@ -2430,4 +2464,3 @@ ok 2
 OUTPUT
 
 1;
-

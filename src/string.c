@@ -146,6 +146,9 @@ static STRING *
 make_COW_reference(struct Parrot_Interp *interpreter, STRING *s)
 {
     STRING *d;
+    if (s == NULL) {
+        return NULL;
+    }
     if (PObj_constant_TEST(s)) {
         PObj_constant_CLEAR(s);
         d = new_string_header(interpreter, PObj_get_FLAGS(s));
@@ -2810,15 +2813,25 @@ random at start time?
 
 */
 
+#define USE_HASH_VAL 0
 size_t
 string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
 {
+#if USE_HASH_VAL
+    register size_t h = 0;
+#else
     register size_t h = hash->seed;
+#endif
 
     UNUSED(interpreter);
 
     if (!s)
         return 0;
+#if USE_HASH_VAL
+    if (PObj_constant_TEST(s) && s->hashval) {
+        return s->hashval ^ hash->seed;
+    }
+#endif
 
     switch (s->representation) {
         case enum_stringrep_one:
@@ -2835,7 +2848,11 @@ string_hash(struct Parrot_Interp * interpreter, Hash *hash, STRING *s)
             break;
     }
 
+#if USE_HASH_VAL
+    return h ^ hash->seed;
+#else
     return h;
+#endif
 }
 
 
