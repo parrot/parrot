@@ -364,7 +364,6 @@ languages/regex/lib/Regex/Optimize.pm
 languages/regex/lib/Regex/Parse.pm
 languages/regex/lib/Regex/PreOptimize.pm
 languages/regex/lib/Regex/Rewrite.pm
-languages/regex/lib/Regex/Rewrite/Rx.pm
 languages/regex/lib/Regex/Rewrite/Stackless.pm
 languages/regex/regex.pl
 languages/regex/t/a.t
