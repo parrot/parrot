@@ -31,9 +31,8 @@ my ( $is_linux, $is_macos, $is_mswin32, $is_os2, $is_vms );
 my ( $parrot_version, $parrot_myconfig ) ;
 
 
-#-------------------------------------------#
-#               Main program.               #
-
+#------------------------------------------------------------#
+#                       Main program.                        #
 BEGIN {
     eval "use Mail::Send;";
     $have_send = ($@ eq "");
@@ -54,8 +53,8 @@ exit;
 
 
 
-#-----------------------------------#
-#               Subs.               #
+#------------------------------------------------------------#
+#                           Subs.                            #
 
 
 # Print synopsis + help message and exit.
@@ -275,9 +274,39 @@ EOF
     ## Prompt for return address, if needed.
     ## 
     unless ( $from ) {
-        print "blah";
+        print <<EOF;
+
+
+Your e-mail address will be useful if you need to be contacted. If the
+default shown below is not your full internet e-mail address, please
+correct it.
+EOF
+
+	# Try and guess return address
+        my $guess;
+        if ( $is_macos ) {
+            require Mac::InternetConfig;
+            $guess = $Mac::InternetConfig::InternetConfig{
+                Mac::InternetConfig::kICEmail()
+            };
+        } else {
+            $guess = $ENV{REPLY-TO} || $ENV{REPLYTO} || "";
+        }
+
+	if ( ! $guess ) {
+            # Use $domain if we can.
+            if ( $domain ) {
+                $guess = $is_vms && !$Config{d_socket} ?
+                  "$domain\:\:$user" : "$user\@$domain";
+	    }
+	}
+
+        # Verify our guess.
+        print "Your address [$guess]: ";
+        $from = <>;
+        chomp $from;
+        $from = $guess if $from eq '';
     }
-    
 }
 
 
