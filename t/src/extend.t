@@ -175,26 +175,17 @@ OUTPUT
 c_output_is(<<'CODE', <<'OUTPUT', "PMC_set/get_intval_intkey");
 
 #include <stdio.h>
+#include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
 
-int main(int argc, char* argv[]) {
-    Parrot_Interp interpreter;
+static opcode_t*
+the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
+{
     Parrot_Int type, value, key, new_value;
     Parrot_PMC array;
-
-    /* Interpreter set-up */
-    interpreter = Parrot_new(NULL);
-    if ( interpreter == NULL ) return 1;
-    Parrot_init(interpreter);
-
     type = Parrot_PMC_typenum(interpreter, "PerlArray");
     array = Parrot_PMC_new(interpreter, type);
- 
-    /* Allocation to the array may trigger a DOD sweep, so we need
-       to ensure that the array is registered beforehand */
-
-    Parrot_register_pmc(interpreter, array);
 
     value = 12345;
     key   = 10;
@@ -202,10 +193,18 @@ int main(int argc, char* argv[]) {
 
     new_value = Parrot_PMC_get_intval_intkey(interpreter, array, key);
 
-    Parrot_unregister_pmc(interpreter, array);
-
     printf("%ld\n", (long)new_value);
+    return NULL;
+}
 
+int main(int argc, char* argv[]) {
+    Parrot_Interp interpreter;
+
+    /* Interpreter set-up */
+    interpreter = Parrot_new(NULL);
+    if ( interpreter == NULL ) return 1;
+    Parrot_init(interpreter);
+    Parrot_run_native(interpreter, the_test);
     Parrot_exit(0);
     return 0;
 }
@@ -442,8 +441,8 @@ the_test(Parrot_Interp interpreter, opcode_t *cur_op, opcode_t *start)
     Parrot_call(interpreter, sub, 0);
     PIO_eprintf(interpreter, "back\n");
 
-    /* win32 seems to buffer stderr ? */ 
-    PIO_flush(interpreter, PIO_STDERR(interpreter)); 
+    /* win32 seems to buffer stderr ? */
+    PIO_flush(interpreter, PIO_STDERR(interpreter));
 
     key = key_new_cstring(interpreter, "_sub2");
     sub = VTABLE_get_pmc_keyed(interpreter,
