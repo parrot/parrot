@@ -29,7 +29,7 @@ tru64-alpha-gcc          8                   Y          Y       Y
 tru64-alpha-dec_c_v5.6   8                              Y       Y/7
 vms
 win32-bcc
-win32-cygwin
+win32-cygwin                                            Y*2     Y/49
 win32-mingw
 win32-ms-cl_13.00.9466       -    Y/2  -     -   -      Y       Y/2
 
