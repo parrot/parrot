@@ -140,6 +140,28 @@ sub rewrite_check {
     return ($R_back, @ops);
 }
 
+sub rewrite_charclass {
+    my ($self, $op, $incexc, $lastback) = @_;
+
+    my @ops;
+    push @ops, aop('check', [ 1, $lastback ])
+      unless ($op->{nocheck});
+
+    my $back = $self->genlabel('undo_charclass');
+    my $next = $self->genlabel('after_charclass');
+
+    push @ops, (
+                         aop('charclass', [ $incexc, $lastback ]),
+                         aop('increment', [ 1, $lastback ]),
+                         aop('goto', [ $next ]),
+                $back => aop('increment', [ -1, $lastback ]),
+                         aop('goto', [ $lastback ]),
+                $next =>
+               );
+
+    return ($back, @ops);
+}
+
 sub rewrite_other {
     my ($self, $op, $lastback) = @_;
     return aop($op->{name}, [ @{ $op->{args} }, $lastback ]);
@@ -467,6 +489,16 @@ sub rewrite_seq {
     }
 
     return ($fallback, @ops);
+}
+
+sub rewrite_external {
+    my ($self, $op, $extname, $extargs, $lastback) = @_;
+    my $handler = "external_$extname";
+    if ($self->{$handler}) {
+        return $self->{$handler}->($op, $extargs, $lastback);
+    } else {
+        return ($lastback, aop('external' => [ $extname, $extargs, $lastback ]));
+    }
 }
 
 sub describe_seq { undef };

@@ -1,11 +1,12 @@
 package Regex::Rewrite;
 use Regex::Ops::Tree;
 use Regex::Ops::List;
+require 'Regex.pm';
 use strict;
 
 sub new {
-    my ($proto, %opts) = @_;
-    my $self = bless \%opts, (ref($proto) || $proto);
+    my ($proto, %options) = @_;
+    my $self = bless \%options, (ref($proto) || $proto);
     $self->init();
     return $self;
 }
@@ -14,6 +15,7 @@ sub init {
     my $self = shift;
     $self->{_markers} = {};
     $self->{_temp_int_count} = 3;
+    $self->{state} ||= Regex->global_state();
 }
 
 sub aop {
@@ -22,10 +24,7 @@ sub aop {
 
 sub genlabel {
     my ($self, $desc) = @_;
-    $desc ||= '';
-    my $number = ++$self->{_markers}->{$desc};
-    $number = '' if ($number == 1) && ($desc ne '');
-    return Regex::Ops::List->mark("\@$desc$number");
+    return $self->{state}->genlabel($desc);
 }
 
 sub alloc_temp_int {

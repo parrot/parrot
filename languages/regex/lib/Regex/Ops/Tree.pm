@@ -3,8 +3,7 @@ use base 'Exporter';
 use strict;
 use Carp qw(confess);
 
-use vars qw(@RegexOps @EXPORT);
-@EXPORT = qw(rop);
+@Regex::Ops::Tree::EXPORT = qw(rop);
 
 # Tree operators
 #
@@ -22,6 +21,7 @@ use vars qw(@RegexOps @EXPORT);
 # group : Capture a group
 # scan : Scan through input until R matches
 # atend : At the end of the input?
+# advance : Unconditionally advance 1 char
 
 # Stuff that is used for optimization
 # -----------------------------------
@@ -39,6 +39,7 @@ use vars qw(@RegexOps @EXPORT);
 @Regex::Ops::Tree::group::ISA        = qw(Regex::Ops::Tree::_onearg);
 @Regex::Ops::Tree::scan::ISA         = qw(Regex::Ops::Tree::_onearg);
 @Regex::Ops::Tree::atend::ISA        = qw(Regex::Ops::Tree);
+@Regex::Ops::Tree::advance::ISA      = qw(Regex::Ops::Tree::_atom);
 
 @Regex::Ops::Tree::nop::ISA          = qw(Regex::Ops::Tree);
 @Regex::Ops::Tree::check::ISA        = qw(Regex::Ops::Tree);
@@ -48,7 +49,7 @@ sub op {
     my ($class, $name, $args, %opts) = @_;
 
     $class = ref($class) if ref $class;
-    $class = "Regex::Ops::Tree::$name";
+    $class = "${class}::$name";
     my $self = bless { name => $name,
                        args => $args || [],
                        %opts }, $class;

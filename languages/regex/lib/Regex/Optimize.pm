@@ -1,46 +1,115 @@
+=head1 PACKAGE
+
+Regex::Optimize
+
+=head1 ABSTRACT
+
+Optimize a sequence of list ops.
+
+=head1 INTERNAL ROUTINES
+
+=over 4
+
+=cut
+
 package Regex::Optimize;
-use Regex::Rewrite;
+
 use Regex::Ops::List;
+use Regex::State;
 use strict;
+require 'Regex.pm';
 
 sub new {
-    my ($proto, %opts) = @_;
-    my $self = bless \%opts, (ref($proto) || $proto);
+    my ($proto, %options) = @_;
+    my $self = bless \%options, (ref($proto) || $proto);
     $self->init();
     return $self;
 }
 
 sub init {
-}
-
-my $newlabelctr = 1;
-sub mklabelnum {
-    return '@L' . $newlabelctr++;
+    my $self = shift;
+    $self->{state} ||= Regex->global_state();
 }
 
 sub mklabel {
-    Regex::Ops::List->mark(mklabelnum());
+    my ($self) = @_;
+    $DB::single = 1;
+    return $self->{state}->genlabel("L");
 }
+
+sub is_label {
+    return UNIVERSAL::isa(shift(), 'Regex::Ops::Label');
+}
+
+=item method label_indices(op)
+
+Figure out which arguments of an op are labels, and return an array of
+their indices.
+
+=cut
 
 sub label_indices {
     my ($self, $op) = @_;
     my @indices;
     for my $i (0..$#{ $op->{args} }) {
-        push(@indices, $i) if ref($op->{args}->[$i])
-                              && $op->{args}->[$i]->{name} eq 'LABEL';
+        my $arg = $op->{args}->[$i];
+        push(@indices, $i) if is_label($arg);
     }
     return @indices;
 }
+
+=item method combineLabels(label1, label2, ...)
+
+Creates a new label to represent a group of label objects. Also
+remembers what the original names are so a comment giving them can be
+generated later.
+
+=cut
 
 sub combineLabels {
     my $self = shift;
     my @names = map { $_->{label} =~ /(\w+)/; $1 } @_;
     my %names;
     @names{@names} = ();
-    my $label = mklabelnum();
-    $self->{_label_comments}{$label} = join(", ", keys %names);
-    return $label;
+    my $label = $self->mklabel();
+    $self->{_label_comments}{$label->{label}} = join(", ", keys %names);
+    return $label->{label};
 }
+
+=item method optimize(ops...)
+
+ 1. Merge equivalent labels
+ 2. Jump threading: Replace goto X; ...; X: goto Y; with goto Y.
+ 3. Eliminate unreachable code.
+ 4. Eliminate jumps to the following address.
+ 5. Eliminate unused labels.
+
+TODO:
+
+ 1. I would like to optimize
+
+     B1: sub x, 1
+         goto S0
+     B2: sub x, 1
+         goto B1
+     B3: sub x, 1
+         goto B2
+
+ to
+
+     B1: sub x, 1
+         goto S0
+     B2: sub x, 2
+         goto S0
+     B3: sub x, 3
+         goto S0
+
+since this commonly occurs in regex code, due to sequence of
+single-character matches (eg /a[bB]c/).
+
+But perhaps this should be handled in the Tree -> List rewrite??
+
+=cut
 
 sub optimize {
     my $self = shift;
@@ -123,7 +192,7 @@ sub optimize {
     # 3rd element of the labels.
 
     # But first, make *all* basic blocks begin with a label.
-    $output2[0]->{label} ||= mklabel();
+    $output2[0]->{label} ||= $self->{state}->genlabel("beginning");
 
     # Stick in a next_stmt ref in every statement to make it easier to
     # move around.
@@ -215,3 +284,5 @@ sub optimize {
 }
 
 1;
+
+=back

@@ -7,25 +7,7 @@ use strict;
 
 use vars qw(@AsmOps @EXPORT);
 
-#  advance
-#  delete
-#  end
-#  goto
-#  if
-#  match_failed
-#  match_succeeded
-#  nop
-#  op
-#  pop_reg
-#  popindex
-#  preamble
-#  push_reg
-#  pushindex
-#  pushmark
-#  seq
-#  start
-#  terminate
-#  test
+@Regex::Ops::Label::ISA = qw(Regex::Ops::List);
 
 @AsmOps =
   ( [ "scan(R)" => "scan for R at every position" ],
@@ -77,11 +59,6 @@ sub op {
 
 sub init {
     # Nothing to do
-}
-
-sub mark {
-    my ($class, $name) = @_;
-    return bless { name => 'LABEL', label => $name }, (ref($class)||$class);
 }
 
 1;

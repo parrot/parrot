@@ -1,16 +1,17 @@
 package Regex::CodeGen;
+require 'Regex.pm';
 use strict;
 
 sub new {
-    my ($proto, %opts) = @_;
-    my $self = bless \%opts, (ref($proto) || $proto);
+    my ($proto, %options) = @_;
+    my $self = bless \%options, (ref($proto) || $proto);
     $self->init();
     return $self;
 }
 
 sub init {
     my $self = shift;
-    $self->{_markers} = {};
+    $self->{state} ||= Regex->global_state();
 }
 
 sub render {
@@ -44,7 +45,12 @@ sub output {
                     push @r, $label;
                     $label = '';
                 }
-                push @r, "$label\t$line";
+                if (ref($line)) {
+                    push @r, "$label";
+                    push @r, $line;
+                } else {
+                    push @r, "$label\t$line";
+                }
                 $label = '';
             }
         }

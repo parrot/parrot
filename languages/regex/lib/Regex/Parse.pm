@@ -2,6 +2,7 @@ package Regex::Parse;
 
 use Regex::Grammar;
 use strict;
+require 'Regex.pm';
 
 sub new {
     my ($proto, %opts) = @_;
@@ -11,6 +12,8 @@ sub new {
 }
 
 sub init {
+    my $self = shift;
+    $self->{state} ||= Regex->global_state();
 }
 
 # R (seq, R, S, ...) : return R && S && ...

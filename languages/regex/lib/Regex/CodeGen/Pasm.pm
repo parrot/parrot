@@ -202,12 +202,13 @@ sub output_unless {
 }
 
 sub output_check {
-    my ($self, $needed, $failLabel) = @_;
+    my ($self, $needed, $failLabel, $lenvar) = @_;
+    $lenvar ||= "?R_LEN";
     my $fail = $self->output_label_use($failLabel);
-    if ($needed == 1) {
-        return "ge ?R_POS, ?R_LEN, $fail # need $needed more chars";
+    if ($needed eq "1") {
+        return "ge ?R_POS, $lenvar, $fail # need $needed more chars";
     } else {
-        return "sub ?R_TMP, ?R_LEN, ?R_POS # need $needed more chars",
+        return "sub ?R_TMP, $lenvar, ?R_POS # need $needed more chars",
                "lt ?R_TMP, $needed, $fail";
     }
 }
@@ -219,6 +220,33 @@ sub output_match {
             "ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]",
             "ne ?R_TMP, $code, ".$self->output_label_use($failLabel).$comment,
            );
+}
+
+sub output_classmatch {
+    my ($self, $incexc, $failLabel) = @_;
+
+    my $passLabel = $self->{state}->genlabel("pass_charclass");
+    my @ops = ("ord ?R_TMP, ?R_INPUT, ?R_POS # tmp = INPUT[pos]");
+    my $fail = $self->output_label_use($failLabel);
+    my $pass = $self->output_label_use($passLabel);
+
+    while (@$incexc) {
+        my $first = shift(@$incexc);
+        my $last = shift(@$incexc);
+        if (defined($last) && ($first != $last)) {
+            push @ops, "lt ?R_TMP, $first, $fail"
+              unless $first == 0;
+            push @ops, "le ?R_TMP, $last, $pass";
+        } else {
+            push @ops, "eq ?R_TMP, $first, $pass";
+            if (!defined($last)) {
+                push @ops, "branch $fail";
+            }
+        }
+    }
+
+    push @ops, $self->output_label_def($passLabel);
+    return @ops;
 }
 
 sub output_setstart {
