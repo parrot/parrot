@@ -1818,6 +1818,7 @@ t/pmc/boolean.t
 t/pmc/coroutine.t
 t/pmc/eval.t
 t/pmc/intlist.t
+t/pmc/iter.t
 t/pmc/managedstruct.t
 t/pmc/multiarray.t
 t/pmc/nci.t
