@@ -6,8 +6,10 @@ taken responsibility for.
 Release pumpking		Leo Toetsch
 JIT				Daniel Grunblatt, Leopold Toetsch
 Configure			Brent Dax
+Garbage Collector               ** volunteers?? **
 I/O				Melvin Smith, Juergen Boemmels
 Vtables 			David Lloyd
-IMCC (active maintainer)        Leopold Toetsch
+IMCC & PIR                      Melvin Smith, Leopold Toetsch
+PNI                             Leopold Toetsch
 Perl6                           Sean O'Rourke
 Jako				Gregor Purdy
