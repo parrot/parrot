@@ -36,7 +36,7 @@ DONE:   time   N5
         print  N2
         print  "\n"
 
-        iton   N1, I5
+        set    N1, I5
         div    N1, N1, N2
         set    N2, 1000000.0
         div    N1, N1, N2
