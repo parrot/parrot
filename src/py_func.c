@@ -728,7 +728,7 @@ Initialize Python builtin object methods.
 
 */
 
-#include "pmc_default.h"
+#include "../classes/pmc_default.h"
 
 static void
 integer_divide(Interp* interp, PMC* self, PMC* value, PMC* destination)
