@@ -313,6 +313,7 @@ output_is(<<'CODE', <<'OUTPUT', "multiply");
 	new P0, .Complex
 	new P1, .Complex
 	new P2, .Float
+        new P3, .PerlInt
 
     set P0, "2 + 3i"
     mul P0, P0, P0
@@ -351,6 +352,11 @@ output_is(<<'CODE', <<'OUTPUT', "multiply");
     print P1
     print "\n"
 
+    set P0, "1 + i"
+    set P3, 10
+    mul P1, P0, P3
+    print P1
+    print "\n"
     end
 CODE
 -5+12i
@@ -361,6 +367,7 @@ CODE
 1-1i
 2-2i
 1-1i
+10+10i
 OUTPUT
 
 output_is(<<'CODE', <<'OUTPUT', "divide");
