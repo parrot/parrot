@@ -468,11 +468,15 @@ MAKE_C = ${make_c}
 .c$(O) :
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) ${cc_o_out}$@ -c $<
 
-.imc.pbc:
+.imc.pbc :
 	.${slash}$(PARROT) -o $@ $<
 
-.pir.pbc:
+.pir.pbc :
 	.${slash}$(PARROT) -o $@ $<
+
+.pbc$(O) :
+	.${slash}$(PARROT) -o $@ $<
+
 
 ###############################################################################
 #
@@ -596,7 +600,7 @@ help :
 	@echo ""
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
-	@echo "  hello:             'Hello World' in PASM"
+	@echo "  hello:             'Hello World' as an executable."
 	@echo "  mops:              Currently not working???"
 	@echo ""
 
@@ -1385,23 +1389,23 @@ tags.dummy:
 
 # test the EXEC stuff
 
-testexec: hello-parrot hello-clean
+testexec: hello 
 
 hello-clean:
-	@$(RM_F) hello.pasm hello$(O) hello
+	$(RM_F) hello.pasm hello.pbc hello$(O) hello
 
-hello-parrot: hello
+hello.pasm :
+	echo '# This is used for testing EXEC.' > hello.pasm
+	echo 'print "Hello World\n"'            >> hello.pasm
+	echo  'end'                             >> hello.pasm
 
-hello.pasm:
-	echo 'print "Hello World\n"' > hello.pasm
-	echo  'end' >> hello.pasm
+hello.pbc: hello.pasm
+	.${slash}$(PARROT) -o hello.pbc hello.pasm
 
-hello.pbc:	hello.pasm
-	./parrot -o hello.pbc hello.pasm
+hello$(O): hello.pbc
+	.${slash}$(PARROT) -o hello$(O) hello.pbc
 
-hello$(O):	hello.pbc
-	./parrot -o hello$(O) hello.pbc
-
-hello:	hello$(O)
+hello:	test_prep hello$(O)
 	$(MAKE) EXEC=hello exec
 	./hello
+

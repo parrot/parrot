@@ -1,5 +1,5 @@
 /*
-Copyright: 2001-2003 The Perl Foundation.  All Rights Reserved.
+Copyright: 2001-2005 The Perl Foundation.  All Rights Reserved.
 $Id$
 
 =head1 NAME
@@ -59,7 +59,7 @@ setup_argv(Interp *interpreter, int argc, char ** argv)
 
     userargv = pmc_new_noinit(interpreter, enum_class_SArray);
     /* immediately anchor pmc to root set */
-    interpreter->pmc_reg.registers[5] = userargv;
+    REG_PMC(5) = userargv;
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);
     VTABLE_init(interpreter, userargv);
