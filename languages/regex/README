@@ -11,6 +11,28 @@ To compile an arbitrary regexp down to code:
 
   perl regex.pl '(a*|b)a'
 
+To turn off optimization so you tell what's going on a little better:
+
+  perl regex.pl --no-optimize '(a*|b)a'
+
+Actually, there are two optimization phases: one for tree-based
+optimizations (reorganizing the parse tree, adding and deleting nodes)
+and list-based optimizations (really just peephole optimizations). You
+can enable just one or the other using 't' for Tree and 'l' for List:
+
+  perl regex.pl --optimize=t '(a*|b)a'
+  perl regex.pl --optimize=l '(a*|b)a'
+
+For development, it may also be useful to dump out the tree (remember,
+by default it will be the optimized tree):
+
+  perl regex.pl '(a*|b)a' dump
+
+Or you can have it render the tree back to a regular expression:
+
+  perl regex.pl '(a*|b)a' render
+
+All of this really ought to be in a usage message.
 
 STATUS
 ======
@@ -63,9 +85,20 @@ rx_* set of opcodes. P0 and P1 are PerlArrays containing the starting
 and ending indexes, respectively, of () groups. The user stack is used
 as the backtracking stack. See rx.ops for a good description of how
 operators are converted to code sequences (except I don't use the rx_*
-ops that it describes. You can work it out.) Marks are the value -1;
-indices are nonnegative integers. (Except in debugging mode, when
-marks are instead strings describing what they're marking.)
+ops that it describes). Marks are the value -1; indices are
+nonnegative integers. (Except in debugging mode, when marks are
+instead strings describing what they're marking.) For details on
+exactly how things are translated with this compiler, read Rewrite.pm
+and Rewrite/Stackless.pm.
+
+Register Usage:
+ I0 - temporary, not preserved between tree op rewrites
+      (it's just a very short-term temp register)
+ I1 - current position within the input string
+ I2 - length of the input string
+ P0 - array of start indices for parenthesis matches
+ P1 - array of end indices for parenthesis matches
+ I3.. - callee-saved temporary registers
 
 Optimizations implemented (notation: parentheses here are non-capturing):
 
@@ -75,23 +108,19 @@ Optimizations implemented (notation: parentheses here are non-capturing):
 
 Future plans:
 
-Primary plan is to stop messing up the user stack! Right now, the
-compiler is generating invalid subroutines because they don't put
-things back the way they found them. I'm still undecided on whether to
-clean up the stack when done (not so good for reentrant regexen), make
-a new PMC, or reuse array.pmc or perlarray.pmc. Or a hybrid -- use the
-user stack, but stuff it into a PMC before returning.
+test.pl generates stack cleanup code, but regex.pl does not. I'm still
+not sure exactly where that code ought to go, because especially when
+I really start on Perl6 regular expressions, the ability to resume a
+match will be critical.
 
 Relatively soon, I would like to add array-based regular
 expressions. A simple cut of this should be nearly trivial.
 
 I'd really like to put in recursive regular expressions. See
-<http://www.puffinry.freeserve.co.uk/regex-extension.html>.
+<http://www.puffinry.freeserve.co.uk/regex-extension.html>. UPDATE:
+looks like Larry liked the idea too. Perl6 has 'em.
 
 Near-term optimizations planned:
-
- Length-check suppression: /xyz/ should check the length of the string
- once, not three times.
 
  Simple subexpression alternation: the code for alternations can be
  simplified if the subexpressions do not contain backtrack points.
@@ -126,13 +155,9 @@ Longer-term optimization vague ideas:
 BUGS
 ====
 
-Trashing the user stack is a bug.
-
-The miserable lack of documentation is a bug.
-
-The ad-hoc list op data structure is a bug.
-
-The lack of complex test cases is a bug.
+- The miserable state of documentation
+- The ad-hoc list op data structure
+- The lack of complex test cases
 
 DEVELOPER NOTES
 ===============

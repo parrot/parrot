@@ -33,7 +33,7 @@ sub need_group_setup {
 }
 
 sub rewrite_try {
-    my ($self, $R, $lastback) = @_;
+    my ($self, $op, $R, $lastback) = @_;
     return $self->rewrite($R, $lastback);
 }
 
@@ -58,7 +58,7 @@ sub rewrite_try {
 # Cost: 3 + 4rs + 2rf + 2ff
 #
 sub rewrite_group {
-    my ($self, $R, $group, $lastback) = @_;
+    my ($self, $op, $R, $group, $lastback) = @_;
     my $iback = $self->mark("group_iback");
     my $back = $self->mark("group_back");
     my $next = $self->mark("after_group");
@@ -87,21 +87,39 @@ sub rewrite_group {
     return ($back, @ops);
 }
 
+# Cost: 4 + 2ff (insanely high!) if we need to check the length
+#       3 + 2ff otherwise
+# 1 of that is a goto that could be eliminated pretty easily.
 sub rewrite_match {
-    my ($self, $char, $lastback) = @_;
+    my ($self, $op, $char, $lastback) = @_;
 
     my $back = $self->mark('undo_match');
     my $next = $self->mark('after_match');
 
-    return ($back,
-            aop('check', [ 1, $lastback ]),
-            aop('match', [ $char, $lastback ]),
-            aop('increment', [ 1, $lastback ]),
-            aop('goto', [ $next ]),
-   $back => aop('increment', [ -1, $lastback ]),
-            aop('goto', [ $lastback ]),
-   $next =>
-            );
+    my @check = ();
+    unless ($op->{nocheck}) {
+        @check = (aop('check', [ 1, $lastback ]));
+    }
+
+    return (
+            $back => @check,
+                     aop('match', [ $char, $lastback ]),
+                     aop('increment', [ 1, $lastback ]),
+                     aop('goto', [ $next ]),
+            $back => aop('increment', [ -1, $lastback ]),
+                     aop('goto', [ $lastback ]),
+            $next =>
+           );
+}
+
+sub rewrite_check {
+    my ($self, $op, $amount, $R, $lastback) = @_;
+    my ($R_back, @R_body) = $self->rewrite($R, $lastback);
+    my @ops = (
+               aop('check', [ $amount, $lastback ]),
+               @R_body
+              );
+    return ($R_back, @ops);
 }
 
 sub rewrite_other {
@@ -110,7 +128,7 @@ sub rewrite_other {
 }
 
 sub rewrite_scan {
-    my ($self, $R, $lastback) = @_;
+    my ($self, $op, $R, $lastback) = @_;
 
     my $scan = $self->mark('scan_start');
     my $advance = $self->mark('scan_advance');
@@ -129,7 +147,7 @@ sub rewrite_scan {
 }
 
 sub rewrite_simple_or_simple {
-    my ($self, $R, $S, $lastback) = @_;
+    my ($self, $op, $R, $S, $lastback) = @_;
 
     my $nextalt = $self->mark('nextalt');
     my $back = $self->mark('alt_back');
@@ -154,7 +172,7 @@ sub rewrite_simple_or_simple {
 }
 
 sub rewrite_alternate {
-    my ($self, $R, $S, $lastback) = @_;
+    my ($self, $op, $R, $S, $lastback) = @_;
 
     my $back = $self->mark('alt_back');
     my $fail = $self->mark('RS_fail');
@@ -180,7 +198,7 @@ sub rewrite_alternate {
 }
 
 sub rewrite_star {
-    my ($self, $R, $greedy, $lastback) = @_;
+    my ($self, $op, $R, $greedy, $lastback) = @_;
 
     my $back = $self->mark('star_back');
     my $next = $self->mark('next');
@@ -212,7 +230,7 @@ sub rewrite_star {
 }
 
 sub rewrite_plus {
-    my ($self, $R, $greedy, $lastback) = @_;
+    my ($self, $op, $R, $greedy, $lastback) = @_;
     my $back = $self->mark('plus_back');
 
     my @ops;
@@ -235,15 +253,13 @@ sub rewrite_plus {
 }
 
 sub rewrite_optional {
-    my ($self, $R, $greedy, $lastback) = @_;
-    return $greedy ? $self->rewrite_greedy_optional($R, $lastback)
-                   : $self->rewrite_nongreedy_optional($R, $lastback);
+    my ($self, $op, $R, $greedy, $lastback) = @_;
+    return $greedy ? $self->rewrite_greedy_optional($op, $R, $lastback)
+                   : $self->rewrite_nongreedy_optional($op, $R, $lastback);
 }
 
 sub rewrite_greedy_optional {
-    my ($self, $R, $lastback) = @_;
-
-    $DB::single = 1;
+    my ($self, $op, $R, $lastback) = @_;
 
     my $back = $self->mark('greedy_optional_back');
     my $next = $self->mark('after_greedy_optional');
@@ -262,7 +278,7 @@ sub rewrite_greedy_optional {
 }
 
 sub rewrite_nongreedy_optional {
-    my ($self, $R, $lastback) = @_;
+    my ($self, $op, $R, $lastback) = @_;
 
     my $back = $self->mark('nongreedy_opt_back');
     my $next = $self->mark('after_greedy_opt');
@@ -287,6 +303,7 @@ sub rewrite_nongreedy_optional {
 # fallback points together.
 sub rewrite_seq {
     my $self = shift;
+    my $op = shift;
     my $fallback = pop;
 
     my @ops;
@@ -305,7 +322,7 @@ sub rewrite {
     if (UNIVERSAL::isa($op, 'Regex::Ops::Tree')) {
         my $method = "rewrite_" . $op->{name};
         if ($self->can($method)) {
-            return $self->$method(@{ $op->{args} }, $lastback);
+            return $self->$method($op, @{ $op->{args} }, $lastback);
         } else {
             return ($lastback, $self->rewrite_other($op, $lastback));
         }

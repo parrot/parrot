@@ -38,7 +38,6 @@ sub output {
         if ($op->{name} eq 'LABEL') {
             $label .= $self->output_label_def($op);
         } else {
-            $DB::single = 1 if $op->{name} eq 'match';
             foreach my $line ($self->render($op)) {
                 if (length($label) >= 8) {
                     push @r, $label;

@@ -51,18 +51,18 @@ sub get_temp {
 ######################## Default rewrite rules #######################
 
 sub rewrite_terminate {
-    my ($self, $R) = @_;
+    my ($self, $op, $R) = @_;
     return $R, aop('goto', [ $self->{_return} ]);
 }
 
 sub rewrite_goto {
-    my ($self, $R, $lastback) = @_;
+    my ($self, $op, $R, $lastback) = @_;
     return aop('goto', [ $R ]) if $R->{name} eq 'LABEL';
     return $self->rewrite($R, $lastback);
 }
 
 sub rewrite_test {
-    my ($self, $op1, $test, $op2, $dest, $lastback) = @_;
+    my ($self, $op, $op1, $test, $op2, $dest, $lastback) = @_;
     my $continue = $self->mark('after_test');
     my $rev_test = { "==" => "!=",
 		     "!=" => "==",
@@ -86,8 +86,8 @@ sub rewrite_test {
 }
 
 sub rewrite_seq {
-    my $self = shift;
-    return @_;
+    my ($self, $op, @nodes) = @_;
+    return @nodes;
 }
 
 sub rewrite_other {
@@ -98,23 +98,23 @@ sub rewrite_other {
 # TODO: can_match_empty (so s/a*/x/g doesn't go into infinite loop)
 # This is sometimes a runtime property.
 sub rewrite_multi_match {
-    my ($self, $min, $max, $greedy, $R, @rest) = @_;
+    my ($self, $op, $min, $max, $greedy, $R, @rest) = @_;
 
     if (($min == 0) && ($max == 1)) {
-        return $self->rewrite_optional($R, $greedy, @rest);
+        return $self->rewrite_optional($op, $R, $greedy, @rest);
     } elsif (($min == 0) && ($max == -1)) {
-        return $self->rewrite_star($R, $greedy, @rest);
+        return $self->rewrite_star($op, $R, $greedy, @rest);
     } elsif (($min == 1) && ($max == -1) && $self->can('rewrite_plus')) {
-        return $self->rewrite_plus($R, $greedy, @rest);
+        return $self->rewrite_plus($op, $R, $greedy, @rest);
     } elsif ($min > 0) {
         my $newmax = ($max == -1) ? -1 : $max - $min;
         # Hmm... this duplicates R. That could make the code huge.
         return (
-                $self->rewrite_finite($R, $min, @rest),
-                $self->rewrite_multi_match(0, $newmax, $greedy, $R, @rest)
+                $self->rewrite_finite($op, $R, $min, @rest),
+                $self->rewrite_multi_match($op, 0, $newmax, $greedy, $R, @rest)
                );
     } else {
-        return $self->rewrite_upto($R, $max, $greedy, @rest);
+        return $self->rewrite_upto($op, $R, $max, $greedy, @rest);
     }
 }
 
@@ -146,7 +146,7 @@ sub rewrite {
             my $opname = shift(@args);
             my $method = "rewrite_$opname";
             if ($self->can($method)) {
-                push @r, $self->rewrite($self->$method(@args));
+                push @r, $self->rewrite($self->$method($op, @args));
             } else {
                 push @r, $self->rewrite_other($op);
             }

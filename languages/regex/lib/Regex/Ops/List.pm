@@ -1,3 +1,5 @@
+# This file is rotting and needs a cleanup desperately.
+
 package Regex::Ops::List;
 use Regex::Grammar;
 use base 'Exporter';

@@ -1,60 +1,49 @@
 #!/usr/bin/perl -w
 
 use lib 'lib';
-use Regex::Parse;
-use Regex::PreOptimize;
-use Regex::Optimize;
-use Regex::Generate;
-
-use Regex::Rewrite::Stackless;
-use Regex::CodeGen::Pasm;
+use Regex;
 use strict;
 
-my $parser = Regex::Parse->new();
-my $opt1 = Regex::PreOptimize->new();
-my $rewrite = Regex::Rewrite::Stackless->new();
-my $opt2 = Regex::Optimize->new();
-my $cgen = Regex::CodeGen::Pasm->new();
-
-#my $top = compile("^foo");
-#my $top = compile("(.+)+");
-#my $top = compile("^.{1,3}");
-#my $top = compile("^.*");
-#my $top = compile("^.{3,}");
-#my $top = compile("^a|b");
-#my $top = compile("^tour|to|tournament");
-#my $top = Parse::compile("^hell|hello|help");
-
-my $expr = shift || "hell|hello|help\$";
-
-my $tree = $parser->compile($expr);
-$tree = $opt1->pre_rewrite_optimize($tree);
-#$DB::single = 1; print $tree->render(), "\n"; exit;
-
-# dumpTree($tree);
-
-my @code = $rewrite->run($tree);
-my @asm = $cgen->output(@code);
-print join("\n", @asm), "\n";
-
-print "================= OPTIMIZED ===============\n";
-my @optcode = $opt2->optimize(@code);
-my @optasm = $cgen->output(@optcode);
-print join("\n", @optasm), "\n";
-
-sub dumpTree {
-    my ($tree, $indent) = @_;
-    $indent ||= '';
-    my ($op, @args) = @$tree;
-    my @children = grep { ref($_) && ref($_) eq 'regex_op' } @args;
-    my @params = map { ref($_) ? '' : $_ } @args;
-    print "$indent$op(".join(",",@params).")\n";
-    return if @children == 0;
-
-    $indent =~ s/`-/  /;
-    $indent =~ s/-/ /g;
-    for (@children[0..$#children-1]) {
-        dumpTree($_, "$indent|-");
+my $operation;
+my $expr;
+my $tree_opt = 1;
+my $list_opt = 1;
+foreach (@ARGV) {
+    if (/--no(-?)optimize/) {
+        $tree_opt = 0;
+        $list_opt = 0;
+    } elsif (/--optimize=(.*)/) {
+        my $opts = $1;
+        $tree_opt = ($opts =~ /t/i);
+        $list_opt = ($opts =~ /l/i);
+    } elsif (! defined $expr) {
+        $expr = $_;
+    } elsif (! defined $operation) {
+        $operation = $_;
+    } else {
+        die "too many args!";
     }
-    dumpTree($children[-1], "$indent`-");
 }
+
+die "need expression!" if ! defined $expr;
+$operation ||= "compile";
+
+my %options;
+$options{'no-tree-optimize'} = 1 if ! $tree_opt;
+$options{'no-list-optimize'} = 1 if ! $list_opt;
+
+my $tree = Regex::expr_to_tree($expr, %options);
+
+if ($operation eq 'unparse' || $operation eq 'render') {
+    print $tree->render(), "\n";
+    exit;
+} elsif ($operation eq 'dump') {
+    print $tree->dump_tree(), "\n";
+    exit;
+}
+
+my @code = Regex::tree_to_list($tree, %options);
+
+my @asm = Regex::list_to_pasm(\@code, %options);
+
+print join("\n", @asm), "\n";

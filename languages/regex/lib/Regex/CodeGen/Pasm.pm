@@ -63,7 +63,7 @@ sub output_check {
         return "ge $R_POS, $R_LEN, $fail # need $needed more chars";
     } else {
         return "sub I0, $R_LEN, $R_POS # need $needed more chars",
-               "le I0, ".($needed+1).", $fail";
+               "lt I0, $needed, $fail";
     }
 }
 
