@@ -2049,7 +2049,8 @@ PDB_print(struct Parrot_Interp *interpreter, const char *command)
  * print the whole or a specific value of a integer register structure.
  */
 void
-PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnum)
+PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, 
+              int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
@@ -2075,7 +2076,8 @@ PDB_print_int(struct Parrot_Interp *interpreter, struct IReg *int_reg, int regnu
  * print the whole or a specific value of a integer register frame structure.
  */
 void
-PDB_print_int_frame(struct Parrot_Interp *interpreter, struct IRegFrame *int_reg, int regnum)
+PDB_print_int_frame(struct Parrot_Interp *interpreter, 
+                    struct IRegFrame *int_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
 
@@ -2101,7 +2103,8 @@ PDB_print_int_frame(struct Parrot_Interp *interpreter, struct IRegFrame *int_reg
  * print the whole or a specific value of a float register structure.
  */
 void
-PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnum)
+PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, 
+              int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS;
 
@@ -2127,7 +2130,8 @@ PDB_print_num(struct Parrot_Interp *interpreter, struct NReg *num_reg, int regnu
  * print the whole or a specific value of a float register frame structure.
  */
 void
-PDB_print_num_frame(struct Parrot_Interp *interpreter, struct NRegFrame *num_reg, int regnum)
+PDB_print_num_frame(struct Parrot_Interp *interpreter, 
+                    struct NRegFrame *num_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
 
@@ -2177,11 +2181,11 @@ PDB_print_string(struct Parrot_Interp *interpreter, struct SReg *string_reg,
 }
 
 /* PDB_print_string_frame
- * print the whole or a specific value of a string register structure.
+ * print the whole or a specific value of a string register frame structure.
  */
 void
-PDB_print_string_frame(struct Parrot_Interp *interpreter, struct SRegFrame *string_reg,
-                 int regnum)
+PDB_print_string_frame(struct Parrot_Interp *interpreter, 
+                       struct SRegFrame *string_reg, int regnum)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
 
@@ -2256,8 +2260,8 @@ PDB_print_pmc(struct Parrot_Interp *interpreter, struct PReg *pmc_reg,
  * print the whole or a specific value of a PMC register frame structure.
  */
 void
-PDB_print_pmc_frame(struct Parrot_Interp *interpreter, struct PRegFrame *pmc_reg,
-              int regnum, PMC* key)
+PDB_print_pmc_frame(struct Parrot_Interp *interpreter, 
+                    struct PRegFrame *pmc_reg, int regnum, PMC* key)
 {
     int i,j = 0, k = NUM_REGISTERS/2;
 
