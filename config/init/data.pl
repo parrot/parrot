@@ -121,6 +121,8 @@ sub runstep {
     icu_make      => '# Building of ICU disabled',
     buildicu      => 0,
 
+    ncilib_link_extra => '',              # Extra flags needed for libnci.so
+
   );
   # add profiling if needed
   # FIXME gcc syntax

@@ -18,7 +18,8 @@
 		rm_f  => '$(PERL) -MExtUtils::Command -e rm_f',
 		rm_rf => '$(PERL) -MExtUtils::Command -e rm_rf',
                 PQ    => '"',
-                make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"'
+                make_c=> '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
+		ncilib_link_extra => '-def:libnci.def',
 	);
 
 	if( $is_msvc ) {
