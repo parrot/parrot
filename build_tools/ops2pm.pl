@@ -47,7 +47,14 @@ $file = shift @ARGV;
 die "$0: Could not read ops file '$file'!\n" unless -e $file;
 my $ops = new Parrot::OpsFile $file;
 
+my %seen;
 for $file (@ARGV) {
+    if ($seen{$file}) {
+      print STDERR "$0: Ops file '$file' mentioned more than once!\n";
+      next;
+    }
+    $seen{$file} = 1;
+
     die "$0: Could not read ops file '$file'!\n" unless -e $file;
     my $temp_ops = new Parrot::OpsFile $file;
     for(@{$temp_ops->{OPS}}) {
