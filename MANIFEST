@@ -200,9 +200,6 @@ languages/BASIC/eliza.bas
 languages/BASIC/expr.pasm
 languages/BASIC/instructions.pasm
 languages/BASIC/sampleb.bas
-languages/BASIC/sample2.bas
-languages/BASIC/sample3.bas
-languages/BASIC/sample4.bas
 languages/BASIC/stackops.pasm
 languages/BASIC/tokenize.pasm
 languages/BASIC/wumpus.bas
