@@ -221,15 +221,6 @@ END_SECTION:cur_section->end = cur_op;
 
     /* While there is section */
     while (cur_section) {
-        /* Tried:
-            - If the number of jitted opcodes is bigger or equal to the number
-              of non-jitted ones then the section will be jitted, otherwise
-              it will run on the normal interpreter. 
-              But can't go in and out from the interpreter yet.
-           Current way:
-              All the bytecode gets jitted, yuppy!
-         */
-
         /* Test register 0 first */
         if (cur_section->int_reg_count[0])
             cur_section->registers_used = 1;
@@ -265,13 +256,6 @@ END_SECTION:cur_section->end = cur_op;
                 }
             }
         }
-#if 0
-        /* Calculate the number of required hardware register for the opcodes 
-           that didn't get so lucky to have their Parrot registers mapped */
-        cur_op = cur_section->begin; 
-        while (cur_op <= cur_section->end) {
-            op_info = &interpreter->op_info_table[*cur_op];
-#endif
         /* Set the branch target of this section, that is the section where
            the program execution continues, if it ends in a branch source we
            use the branch target and not the next section. */
@@ -324,10 +308,6 @@ END_SECTION:cur_section->end = cur_op;
             /* Move to the next opcode */
             cur_op += op_info->arg_count;
         }
-
-        /* TODO: Now we need to see if the first opcode that uses the mapped register
-           will require its value or will just overwrite it. And if the value of
-           the registers used weren't modified into the section don't save them back.*/
 
         /* Move to the next section */
         cur_section = cur_section->next;

@@ -131,7 +131,7 @@ typedef struct Parrot_jit_optimizer_section {
  *                          or isn't related with a control flow opcode at all,
  *                          and which register was allocated for each opcode 
  *                          argument if any.
- *  has_unpredictable_jump: The horror, the horror...
+ *  has_unpredictable_jump: XXX need to define how to handle this.
  */
 
 typedef struct {
