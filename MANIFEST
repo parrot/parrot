@@ -327,6 +327,10 @@ examples/benchmarks/stress1.pl                    [main]doc
 examples/benchmarks/stress2.pasm                  [main]doc
 examples/benchmarks/stress2.pl                    [main]doc
 examples/benchmarks/stress3.pasm                  [main]doc
+examples/benchmarks/vpm.pl                        [main]doc
+examples/benchmarks/vpm.imc                       [main]doc
+examples/benchmarks/vpm1.imc                      [main]doc
+examples/benchmarks/vpm2.imc                      [main]doc
 examples/io/echo_client.imc                       [main]doc
 examples/io/http.imc                              [main]doc
 examples/io/net_smtp.pasm                         [main]doc

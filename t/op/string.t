@@ -1,6 +1,6 @@
 #! perl -w
 
-use Parrot::Test tests => 124;
+use Parrot::Test tests => 126;
 use Test::More;
 
 output_is( <<'CODE', <<OUTPUT, "set_s_s|sc" );
@@ -2250,6 +2250,42 @@ sub compare_strings {
   }
   return $rt;
 }
+
+output_is( <<'CODE', <<OUTPUT, "split");
+_main:
+    split P0, "", "ab"
+    set I0, P0
+    print I0
+    print "\n"
+    set S0, P0[0]
+    print S0
+    set S0, P0[1]
+    print S0
+    print "\n"
+    end
+CODE
+2
+ab
+OUTPUT
+
+output_is( <<'CODE', <<OUTPUT, "join");
+_main:
+    new P0, .PerlArray
+    push P0, "a"
+    join S0, "--", P0
+    print S0
+    print "\n"
+    new P0, .PerlArray
+    push P0, "a"
+    push P0, "b"
+    join S0, "--", P0
+    print S0
+    print "\n"
+    end
+CODE
+a
+a--b
+OUTPUT
 
 1;
 

@@ -647,6 +647,59 @@ inline op titlecase(inout STR) {
 
 =back
 
+=item B<join>(out STR, in STR, in PMC)
+
+Create a new PerlString $1 by joining array elements from array $3
+with string $2.
+
+=item B<split>(out PMC, in STR, in STR)
+
+Create a new PerlArray PMC $1 by splitting the string $3 with
+regexp $2. Currently implemented only for the empty string $2.
+
+=cut
+
+op join(out STR, in STR, in PMC) {
+    STRING *res;
+    PMC *ar = $3;
+    STRING *j = $2;
+    STRING *s;
+    int i, ar_len = VTABLE_elements(interpreter, ar);
+
+    if (ar_len == 0) {
+	$1 = string_make(interpreter, NULL, 0, NULL, 0, NULL);
+	goto NEXT();
+    }
+    s = VTABLE_get_string_keyed_int(interpreter, ar, 0);
+    res = string_copy(interpreter, s);
+    for (i = 1; i < ar_len; ++i) {
+	res = string_append(interpreter, res, j, 0);
+	s = VTABLE_get_string_keyed_int(interpreter, ar, i);
+	res = string_append(interpreter, res, s, 0);
+    }
+    $1 = res;
+    goto NEXT();
+}
+
+op split(out PMC, in STR, in STR) {
+    PMC *res = $1 = pmc_new(interpreter, enum_class_PerlArray);
+    STRING *r = $2;
+    STRING *s = $3;
+    int slen = string_length(s);
+    int i;
+
+    if (!slen)
+	goto NEXT();
+    if (string_length(r))
+	internal_exception(1, "Unimplemented join by regex");
+    for (i = 0; i < slen; ++i) {
+	STRING *p = string_substr(interpreter, s, i, 1, NULL, 0);
+	/* TODO first set empty string, then replace */
+	VTABLE_set_string_keyed_int(interpreter, res, i, p);
+    }
+    goto NEXT();
+}
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2003 The Perl Foundation.  All rights reserved.
