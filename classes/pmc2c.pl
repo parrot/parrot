@@ -556,6 +556,47 @@ $line
     }
 EOC
 }
+
+sub class_trailer {
+    my ($classname, $vtbl_flag, $methodlist, $isa, $does, $class_init_code) = @_;
+    my $initname = "Parrot_$classname" . "_class_init";
+    my $OUT = <<EOC;
+void $initname (Interp * interp, int entry) {
+
+    struct _vtable temp_base_vtable = {
+        NULL,	/* package */
+        enum_class_$classname,	/* base_type */
+        NULL,	/* whoami */
+        NULL,	/* method_table */
+        $vtbl_flag, /* flags */
+        NULL,   /* does_str */
+        NULL,   /* isa_str */
+        NULL, /* extra data */
+        $$methodlist
+        };
+
+    /*
+     * parrotio calls some class_init functions during its class_init
+     * code, so some of the slots might already be allocated
+     * class isa '$isa'
+     */
+    if (!Parrot_base_vtables[entry]) {
+	temp_base_vtable.whoami = string_make(interp,
+	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+	temp_base_vtable.isa_str = string_make(interp,
+	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+	temp_base_vtable.does_str = string_make(interp,
+	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG|PObj_external_FLAG , 0);
+
+	Parrot_base_vtables[entry] =
+	   Parrot_clone_vtable(interp, &temp_base_vtable);
+    }
+    $class_init_code
+}
+EOC
+    $OUT;
+}
+
 =head2 filter
 
 The filter function choreographs the previous functions actions on the
@@ -777,88 +818,30 @@ EOC
       my $initline = 1+count_newlines($OUT)+1;
       $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
       $HOUT .= <<EOH;
-void $initname (Interp *, int);
+      void $initname (Interp *, int);
 EOH
       my $vtbl_flag = exists $flags{const_too} ? 'VTABLE_HAS_CONST_TOO' : 0;
       if (exists $flags{need_ext}) {
 	  $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
       }
-      $OUT .= <<EOC;
-void $initname (Interp * interp, int entry) {
+      $OUT .= class_trailer($classname, $vtbl_flag, \$methodlist,
+      $isa, $does, $class_init_code);
 
-    struct _vtable temp_base_vtable = {
-        NULL,	/* package */
-        enum_class_$classname,	/* base_type */
-        NULL,	/* whoami */
-        NULL,	/* method_table */
-        $vtbl_flag, /* flags */
-        NULL,   /* does_str */
-        NULL,   /* isa_str */
-        NULL, /* extra data */
-        $methodlist
-        };
 
-    /*
-     * parrotio calls some class_init functions during its class_init
-     * code, so some of the slots might already be allocated
-     * class isa '$isa'
-     */
-    if (!Parrot_base_vtables[entry]) {
-	temp_base_vtable.whoami = string_make(interp,
-	   "$classname", @{[length($classname)]}, 0, PObj_constant_FLAG, 0);
-	temp_base_vtable.isa_str = string_make(interp,
-	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG, 0);
-	temp_base_vtable.does_str = string_make(interp,
-	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG, 0);
-
-	Parrot_base_vtables[entry] =
-	   Parrot_clone_vtable(interp, &temp_base_vtable);
-    }
-    $class_init_code
-}
-EOC
-  }
-
-  if (exists $flags{const_too}) {
-      my $initline = 1+count_newlines($OUT)+1;
-      $initname = "Parrot_Const$classname" . "_class_init";
-      $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
-      $HOUT .= <<EOH;
-void $initname (Interp *, int);
+      if (exists $flags{const_too}) {
+	  my $initline = 1+count_newlines($OUT)+1;
+	  $initname = "Parrot_Const$classname" . "_class_init";
+	  $OUT .= qq(#line $initline "$cfile"\n) unless $suppress_lines;
+	  $HOUT .= <<EOH;
+      void $initname (Interp *, int);
 EOH
-      my $vtbl_flag = 'VTABLE_IS_CONST_FLAG';
-      if (exists $flags{need_ext}) {
-	  $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
+	  my $vtbl_flag = 'VTABLE_IS_CONST_FLAG';
+	  if (exists $flags{need_ext}) {
+	      $vtbl_flag .= '|VTABLE_PMC_NEEDS_EXT';
+	  }
+	  $OUT .= class_trailer("Const$classname", $vtbl_flag, \$cmethodlist,
+	  $isa, $does, $class_init_code);
       }
-      $OUT .= <<EOC;
-void $initname (Interp * interp, int entry) {
-
-    struct _vtable temp_base_vtable = {
-        NULL,	/* package */
-        enum_class_Const$classname, /* base_type */
-        NULL,	/* whoami */
-        NULL,	/* method_table */
-        $vtbl_flag, /* flags */
-        NULL,   /* does_str */
-        NULL,   /* isa_str */
-        NULL,   /* extra data */
-        $cmethodlist
-        };
-
-   if (!temp_base_vtable.whoami) {
-       temp_base_vtable.whoami = string_make(interp,
-	   "Const$classname", @{[length("Const$classname")]}, 0, PObj_constant_FLAG, 0);
-	temp_base_vtable.isa_str = string_make(interp,
-	   "$isa", @{[length($isa)]}, 0, PObj_constant_FLAG, 0);
-	temp_base_vtable.does_str = string_make(interp,
-	   "$does", @{[length($does)]}, 0, PObj_constant_FLAG, 0);
-
-       Parrot_base_vtables[entry] =
-	    Parrot_clone_vtable(interp, &temp_base_vtable);
-   }
-   $class_init_code
-}
-EOC
   }
   if (exists $flags{dynpmc}) {
       my $lc_classname = lc $classname;

@@ -24,14 +24,14 @@ enter_nci_method(struct Parrot_Interp *interpreter, PMC *method_table,
 
     method = pmc_new(interpreter, enum_class_NCI);
     VTABLE_set_string_keyed(interpreter, method, func,
-			    string_make(interpreter, proto, strlen(proto),
-					NULL, 0, NULL));
+	    string_make(interpreter, proto, strlen(proto),
+		NULL, PObj_constant_FLAG|PObj_external_FLAG, NULL));
     VTABLE_set_pmc_keyed(interpreter, method_table,
-			 key_new_string(interpreter,
-					string_make(interpreter, name,
-						    strlen(name), NULL,
-						    0, NULL)),
-			 method);
+	    key_new_string(interpreter,
+		string_make(interpreter, name,
+		    strlen(name), NULL,
+		    PObj_constant_FLAG|PObj_external_FLAG, NULL)),
+	    method);
 }
 
 void Parrot_NCI_class_init(Parrot_Interp, int);
