@@ -63,7 +63,7 @@ if ($opts{T}) {
 
 unless ($opts{c}) { # -c means "Check", like with Perl.
   my $fh = FileHandle->new('>-');
-  $root->compile($fh);
+  $compiler->compile($root, $fh);
 }
 
 exit 0;
