@@ -149,6 +149,7 @@ longopt_get_shortopt(Parrot_Interp interp, int argc, char* argv[],
                 }
                 else {
                     info_buf->opt_arg = argv[dex+1];
+                    ++info_buf->opt_index;
                 }
                 info_buf->_shortopt_pos = NULL;
                 ++info_buf->opt_index;
