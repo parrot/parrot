@@ -17,6 +17,8 @@ A high-level overview of the Parrot system
 
 =head2 HISTORY
 
+=over
+
 =item 1.1
 
 12 Aug 2003
@@ -25,7 +27,11 @@ A high-level overview of the Parrot system
 
 02 Jan 2001
 
+=back
+
 =head1 CHANGES
+
+=over
 
 =item 1.1
 
@@ -35,6 +41,8 @@ reflect the language agnostic nature of the project.
 =item 1.0
 
 None. First version
+
+=back
 
 =head1 ABSTRACT
 

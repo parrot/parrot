@@ -17,13 +17,11 @@ and C<rxstacks.h>.
 
 Initializes a regular expression object and allocates the memory.
 
-=back
+=item B<rx_is_word_character>
 
-B<rx_is_word_character>
+=item B<rx_is_number_character>
 
-B<rx_is_number_character>
-
-B<rx_is_whitespace_character>
+=item B<rx_is_whitespace_character>
 
 =item B<rx_is_newline>
 
@@ -99,9 +97,7 @@ This deallocates the memory for the bitmap.
 
 =back
 
-=head1 rx.h
-
-=over 4
+=head2 rx.h
 
 Here is the definition for rxinfo (all comments are mine)
 
@@ -131,6 +127,8 @@ rx.h also sets up a series of macros for setting/unsetting flags in each regex,
 advancing the regex one char (or a given number of chars), and finding the
 current index.  Here is the list of the macros, check the rx.h file for their
 definitions.
+
+=over 4
 
 =item B<RX_dUNPACK(pmc)>
 
