@@ -588,27 +588,28 @@ nokfile:
 
 clean : testclean progclean
 	${cg_r}
-	$(RM_F) *.s
-	$(RM_F) $(FLUID_FILES)
-	$(RM_F) examples/assembly/mops${exe} examples/assembly/mops.c
-	$(RM_F) examples/assembly/mops$(O) examples/assembly/mops.pbc
-	$(RM_F) examples/mops/mops$(O) examples/mops/mops${exe}
-	$(RM_F) *~
+	$(RM_F) *.s *~ $(FLUID_FILES) \
+	        examples/assembly/mops${exe} examples/assembly/mops.c \
+	        examples/assembly/mops$(O) examples/assembly/mops.pbc \
+	        examples/mops/mops$(O) examples/mops/mops${exe} 
 	cd docs && $(MAKE) clean && cd ..
 	cd classes && $(MAKE) clean && cd ..
 	cd languages && $(MAKE) clean && cd ..
 
 progclean:
-	$(RM_F) $(O_FILES)
-	$(RM_F) $(TEST_PROG) test_main$(O) $(PDUMP) pdump$(O)
+	$(RM_F) $(O_FILES) \
+	        $(TEST_PROG) test_main$(O) \
+	        $(PDUMP) pdump$(O) packdump$(O) \
+	        $(PDB) pdb$(O) \
+	        $(DIS) disassemble$(O)
 	$(RM_RF) blib
 	cd classes && $(MAKE) progclean && cd ..
 
 testclean :
-	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out
-	$(RM_F) t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out
-	$(RM_F) t/stress/*.pasm t/stress/*.pbc t/stress/*.out
-	$(RM_F) t/src/*.o t/src/*.c
+	$(RM_F) t/op/*.pasm t/op/*.pbc t/op/*.out \
+	        t/pmc/*.pasm t/pmc/*.pbc t/pmc/*.out \
+	        t/stress/*.pasm t/stress/*.pbc t/stress/*.out \
+	        t/src/*.o t/src/*.c
 
 realclean : clean
 	$(RM_F) $(STICKY_FILES)

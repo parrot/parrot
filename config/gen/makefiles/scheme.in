@@ -59,12 +59,11 @@ foo.pbc: foo.pasm
 all: test.pbc and.pbc foo.pbc
 
 clean:
-	$(RM_F) \
-foo.pasm foo.pbc \
-t/*/*.pasm \
-t/*/*.pbc \
-t/*/*.scheme \
-t/*/*.out
+	$(RM_F) foo.pasm foo.pbc \
+	        t/*/*.pasm \
+	        t/*/*.pbc \
+	        t/*/*.scheme \
+	        t/*/*.out
 
 over:
 	@$(MAKE) clean

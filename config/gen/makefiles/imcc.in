@@ -60,16 +60,16 @@ imclexer.c : imcc.l FORCE
 $(IMCC_O_FILES) : $(H_FILES)
 
 clean:
-	$(RM_F) core
-	$(RM_F) $(IMCC_O_FILES)
-	$(RM_F) imcparser.output
-	$(RM_F) imcc${exe}
-	$(RM_F) t/*/*.out t/*/*.imc
+	$(RM_F) core \
+	        $(IMCC_O_FILES) \
+	        imcparser.output \
+	        imcc${exe} \
+	        t/*/*.out t/*/*.imc \
 
 realclean: clean
-	$(RM_F) a.pasm
-	$(RM_F) imcparser.*
-	$(RM_F) imclexer.*
+	$(RM_F) a.pasm \
+	        imcparser.* \
+	        imclexer.*
 
 imcc${exe}: $(O_FILES)
 	$(LINK) $(LD_OUT)imcc${exe} $(LINKFLAGS) $(O_FILES) $(C_LIBS)
