@@ -22,9 +22,21 @@ void
 trace_pmc_dump(struct Parrot_Interp *interpreter, PMC* pmc)
 {
     if(pmc) {
-        if (pmc->vtable) {
-            PIO_putps(interpreter, PIO_STDERR(interpreter),
-                    do_dump(interpreter, pmc));
+        if(pmc->vtable) {
+            if (pmc->vtable->base_type == enum_class_PerlString) {
+                PIO_eprintf(interpreter, "%S=PMC(%#p Str:\"%Ps\")",
+                        VTABLE_name(interpreter, pmc), pmc, pmc);
+            }
+            else if (pmc->vtable->base_type == enum_class_PerlUndef
+                 ||  pmc->vtable->base_type == enum_class_PerlInt
+                 ||  pmc->vtable->base_type == enum_class_PerlNum) {
+                PIO_eprintf(interpreter, "%S=PMC(%#p Num:%Pg Int:%Pd)",
+                        VTABLE_name(interpreter, pmc), pmc, pmc, pmc);
+            }
+            else {
+                PIO_eprintf(interpreter, "%S=PMC(%#p)",
+                        VTABLE_name(interpreter, pmc), pmc);
+            }
         }
         else {
             PIO_eprintf(interpreter, "PMC(NULL)");

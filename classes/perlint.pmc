@@ -480,10 +480,4 @@ pmclass PerlInt extends perlscalar {
         SELF->cache.int_val --;
     }
 
-    void dump(traverse_info* info) {
-	STRING *s = Parrot_sprintf_c(INTERP, ":%vi", SELF->cache.int_val);
-	SUPER(info);
-	info->image = string_append(interpreter, info->image, s, 0);
-    }
-
 }

@@ -412,11 +412,4 @@ pmclass PerlString extends perlscalar {
 	    return s->encoding->decode(s->encoding->skip_forward(s->strstart,
 			key->cache.int_val));
     }
-    void dump(traverse_info* info) {
-	/* TODO PDB_escape */
-	STRING *s = Parrot_sprintf_c(INTERP, ":\"%Ss\"",
-		SELF->cache.string_val);
-	SUPER(info);
-	info->image = string_append(interpreter, info->image, s, 0);
-    }
 }

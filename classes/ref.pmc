@@ -43,16 +43,5 @@ pmclass Ref {
     STRING* name() {
 	return SUPER();
     }
-
-    void traverse(traverse_info* info) {
-	SUPER(info);
-	todo_traverse(INTERP, info, PMC_ptr2p(SELF));
-    }
-
-    void dump(traverse_info* info) {
-	STRING *s = string_from_cstring(INTERP, " -> ", 0);
-	SUPER(info);
-	info->image = string_append(interpreter, info->image, s, 0);
-    }
 }
 
