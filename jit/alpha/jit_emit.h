@@ -502,10 +502,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #else
 
 #  define REQUIRES_CONSTANT_POOL 1
-#  define INT_IREGITERS_TO_MAP 21
-#  define FLOAT_REGITERS_TO_MAP 0
+#  define INT_REGISTERS_TO_MAP 21
+#  define FLOAT_REGISTERS_TO_MAP 0
 
-char intval_map[INT_REGITERS_TO_MAP] =
+char intval_map[INT_REGISTERS_TO_MAP] =
     { REG1_t0, REG2_t1, REG3_t2, REG4_t3, REG5_t4, REG6_t5, REG7_t6, REG12_s3,
       REG13_s4, REG14_s5, REG16_a0, REG17_a1, REG18_a2, REG19_a3, REG20_a4,
       REG21_a5, REG22_t8, REG23_t9, REG24_t10, REG25_t11, REG28_at };

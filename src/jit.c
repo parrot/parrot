@@ -124,7 +124,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
     /* Init the register usage */ 
     for (i = 0; i < NUM_REGISTERS; i++) {
         cur_section->int_reg_usage[i] = i;
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
         cur_section->float_reg_usage[i] = i;
 #endif
     }
@@ -159,7 +159,7 @@ optimize_jit(struct Parrot_Interp *interpreter, opcode_t *cur_op,
                         cur_section->int_reg_dir[*(cur_op + argn)] |= 
                             PARROT_ARGDIR_OUT;
                 }
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
                 else if (op_info->types[argn] == PARROT_ARG_N) {
                     if ((!cur_section->float_reg_count[*(cur_op + argn)]++) &&
                         (op_info->dirs[argn] & PARROT_ARGDIR_IN)) 
@@ -209,7 +209,7 @@ END_SECTION:cur_section->end = cur_op;
             /* Set to 0 the register count, just in case ... */
             memset(cur_section->int_reg_count, 0, 
                 NUM_REGISTERS * sizeof(INTVAL));
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
             memset(cur_section->float_reg_count, 0, 
                 NUM_REGISTERS * sizeof(INTVAL));
 #endif
@@ -220,7 +220,7 @@ END_SECTION:cur_section->end = cur_op;
             /* Init the register usage */ 
             for (i = 0; i < NUM_REGISTERS; i++) {
                 cur_section->int_reg_usage[i] = i;
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
                 cur_section->float_reg_usage[i] = i;
 #endif
             }
@@ -244,7 +244,7 @@ END_SECTION:cur_section->end = cur_op;
         /* Test register 0 first */
         if (cur_section->int_reg_count[0])
             cur_section->int_registers_used = 1;
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
         if (cur_section->float_reg_count[0])
             cur_section->float_registers_used = 1;
 #endif
@@ -257,10 +257,10 @@ END_SECTION:cur_section->end = cur_op;
                 continue;
             /* Count the number of hardware registers that is going to be
                used in this section */
-            if (cur_section->int_registers_used < INT_REGITERS_TO_MAP)
+            if (cur_section->int_registers_used < INT_REGISTERS_TO_MAP)
                 cur_section->int_registers_used++;
-#if FLOAT_REGITERS_TO_MAP
-            if (cur_section->float_registers_used < FLOAT_REGITERS_TO_MAP)
+#if FLOAT_REGISTERS_TO_MAP
+            if (cur_section->float_registers_used < FLOAT_REGISTERS_TO_MAP)
                 cur_section->float_registers_used++;
 #endif
             
@@ -282,7 +282,7 @@ END_SECTION:cur_section->end = cur_op;
                     /* Continue with the next register */
                     break;
                 }
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
                 if (cur_section->float_reg_count[i] > 
                   cur_section->float_reg_count[cur_section->float_reg_usage[j]])
                 {
@@ -336,7 +336,7 @@ END_SECTION:cur_section->end = cur_op;
                 /* If the argument is an integer register */
                 if (op_info->types[op_arg] == PARROT_ARG_I) {
                     /* If the argument is in most used list */
-                    for (i = 0; i < INT_REGITERS_TO_MAP; i++)
+                    for (i = 0; i < INT_REGISTERS_TO_MAP; i++)
                         if (cur_op[op_arg] == 
                             (opcode_t)cur_section->int_reg_usage[i])
                         {
@@ -346,11 +346,11 @@ END_SECTION:cur_section->end = cur_op;
                             break;
                         }
                 }
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
                 /* If the argument is a float register */
                 if (op_info->types[op_arg] == PARROT_ARG_N) {
                     /* If the argument is in most used list */
-                    for (i = 0; i < FLOAT_REGITERS_TO_MAP; i++)
+                    for (i = 0; i < FLOAT_REGISTERS_TO_MAP; i++)
                         if (cur_op[op_arg] == 
                             (opcode_t)cur_section->float_reg_usage[i])
                         {
@@ -429,7 +429,7 @@ build_asm(struct Parrot_Interp *interpreter, opcode_t *pc,
 
     /* Attach the register map to the jit_info structure */
     jit_info.intval_map = intval_map;
-#if FLOAT_REGITERS_TO_MAP
+#if FLOAT_REGISTERS_TO_MAP
     jit_info.floatval_map = floatval_map;
 #endif
 

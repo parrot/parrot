@@ -1022,10 +1022,10 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #else /* JIT_EMIT */
 
 #  define REQUIRES_CONSTANT_POOL 0
-#  define INT_REGITERS_TO_MAP 4
-#  define FLOAT_REGITERS_TO_MAP 0
+#  define INT_REGISTERS_TO_MAP 4
+#  define FLOAT_REGISTERS_TO_MAP 0
 
-char intval_map[INT_REGITERS_TO_MAP] =
+char intval_map[INT_REGISTERS_TO_MAP] =
     { emit_EDI, emit_EBX, emit_EDX, emit_ECX };
 
 #endif /* JIT_EMIT */
