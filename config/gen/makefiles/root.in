@@ -90,14 +90,16 @@ GEN_OPSFILES =
 
 GEN_HEADERS = $(INC)/vtable.h $(INC)/oplib/core_ops.h \
 	$(INC)/oplib/core_ops_prederef.h \
-	$(INC)/oplib/core_ops_switch.h $(INC)/jit_emit.h
+	$(INC)/oplib/core_ops_switch.h
 
 GEN_SOURCES = core_ops.c core_ops_prederef.c fingerprint.c nci.c \
               core_ops_switch.c jit_cpu.c exec_cpu.c
 
 GEN_MODULES = lib/Parrot/OpLib/core.pm
 
-FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES)
+# the dependencies of jit_emit.h are done explicitely
+# including this file in GEN_HEADERS causses unnecessary recompile of all
+FLUID_FILES = $(GEN_OPSFILES) $(GEN_HEADERS) $(GEN_SOURCES) $(GEN_MODULES) $(INC)/jit_emit.h
 
 
 ###############################################################################
