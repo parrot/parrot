@@ -364,19 +364,15 @@ Parrot_add_i_ic_i {
 
 Parrot_add_i_i_i {
     if (MAP[1] && MAP[2] && MAP[3]) {
-        /* micro optimization, saves some cycles in life.pasm */
-        if(MAP[2] != MAP[1])
-            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emitm_addl_r_r(NATIVECODE, MAP[3], MAP[1]);
     }
     else if (MAP[1] && MAP[2]) {
-        if(MAP[2] != MAP[1])
-            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
-        if(MAP[3] != MAP[1])
-            emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
+        emitm_movl_r_r(NATIVECODE, MAP[3], MAP[1]);
         emit_addl_r_m(NATIVECODE, MAP[1], &INT_REG[2]);
     }
     else if (MAP[2] && MAP[3]) {
@@ -507,14 +503,12 @@ Parrot_sub_i_i_i {
             emitm_movl_r_r(NATIVECODE, emit_EAX, MAP[1]);
         }
         else {
-            if (MAP[1] != MAP[2])
-                emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
             emitm_subl_r_r(NATIVECODE, MAP[3], MAP[1]);
         }
     }
     else if (MAP[1] && MAP[2]) {
-        if (MAP[1] != MAP[2])
-            emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
+        emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
         emit_subl_r_m(NATIVECODE, MAP[1], &INT_REG[3]);
     }
     else if (MAP[1] && MAP[3]) {
@@ -1166,8 +1160,6 @@ Parrot_bnot_i_ic {
 }
 
 Parrot_shl_i_i_i {
-; TODO check if we really needs this.
-    emit_pushl_r(NATIVECODE,emit_ECX);
     if (MAP[1] && MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_ECX);
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
@@ -1212,7 +1204,6 @@ Parrot_shl_i_i_i {
         emitm_shll_r_r(NATIVECODE, emit_ECX, emit_EAX);
         emit_movl_r_m(NATIVECODE, emit_EAX,  &INT_REG[1]);
     }
-    emitm_popl_r(NATIVECODE,emit_ECX);
 }
 
 Parrot_shl_i_i_ic {
@@ -1237,7 +1228,6 @@ Parrot_shl_i_i_ic {
 }
 
 Parrot_shl_i_ic_i {
-    emit_pushl_r(NATIVECODE,emit_ECX);
     if (MAP[1] && MAP[3]) {
         if (MAP[1] == MAP[3]) {
             emitm_movl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
@@ -1268,7 +1258,6 @@ Parrot_shl_i_ic_i {
         emitm_shll_r_r(NATIVECODE, emit_ECX, emit_EAX);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
-    emitm_popl_r(NATIVECODE,emit_ECX);
 }
 
 Parrot_shl_i_ic_ic {
@@ -1281,8 +1270,6 @@ Parrot_shl_i_ic_ic {
 }
 
 Parrot_shr_i_i_i {
-; TODO check if we really needs this.
-    emit_pushl_r(NATIVECODE,emit_ECX);
     if (MAP[1] && MAP[2] && MAP[3]) {
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_ECX);
         emitm_movl_r_r(NATIVECODE, MAP[2], MAP[1]);
@@ -1327,7 +1314,6 @@ Parrot_shr_i_i_i {
         emitm_shrl_r_r(NATIVECODE, emit_ECX, emit_EAX);
         emit_movl_r_m(NATIVECODE, emit_EAX,  &INT_REG[1]);
     }
-    emitm_popl_r(NATIVECODE,emit_ECX);
 }
 
 Parrot_shr_i_i_ic {
@@ -1352,7 +1338,6 @@ Parrot_shr_i_i_ic {
 }
 
 Parrot_shr_i_ic_i {
-    emit_pushl_r(NATIVECODE,emit_ECX);
     if (MAP[1] && MAP[3]) {
         emitm_movl_i_r(NATIVECODE, *INT_CONST[2], emit_EAX);
         emitm_movl_r_r(NATIVECODE, MAP[3], emit_ECX);
@@ -1376,7 +1361,6 @@ Parrot_shr_i_ic_i {
         emitm_shrl_r_r(NATIVECODE, emit_ECX, emit_EAX);
         emit_movl_r_m(NATIVECODE, emit_EAX, &INT_REG[1]);
     }
-    emitm_popl_r(NATIVECODE,emit_ECX);
 }
 
 Parrot_shr_i_ic_ic {

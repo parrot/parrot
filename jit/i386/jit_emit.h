@@ -72,7 +72,7 @@
 static int
 emit_is8bit(long disp)
 {
-    return (disp & 0xff) == disp;
+    return disp >= -128 && disp <= 127;
 }
 
 static char *
@@ -131,8 +131,8 @@ emit_r_X(char *pc, int reg_opcode, int base, int i, int scale, long disp)
             return emit_disp8_32(pc, disp);
         }
         /* modrm sib disp */
-        else { 
-            *(pc++) = (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 ) 
+        else {
+            *(pc++) = (emit_is8bit(disp) ? emit_Mod_b01 : emit_Mod_b10 )
                 | reg_opcode | emit_b100;
             emit_sib(pc++, scale, i, base);
             return emit_disp8_32(pc, disp);
@@ -303,8 +303,7 @@ emit_movb_r_r(char *pc, int reg1, int reg2)
     *(pc++) = emit_alu_r_r(reg1, reg2);
     return pc;
 }
-
-#define emitm_movl_r_r(pc, reg1, reg2) { \
+#define emitm_movl_r_r(pc, reg1, reg2) if (reg1 != reg2) { \
   *(pc++) = 0x89; \
   *(pc++) = emit_alu_r_r(reg1, reg2); }
 
@@ -962,8 +961,8 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
      * the stack this will stop working !!! */
     emitm_pushl_i(jit_info->native_ptr, interpreter);
 
-    /* Point ESI to the opcode-native code map array */
-    emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_ESI);
+    /* Point EBP to the opcode-native code map array */
+    emitm_movl_i_r(jit_info->native_ptr, jit_info->arena.op_map, emit_EBP);
 
     /* emit 5 noops. when JIT restarts a long jump will be patched in here */
     for (i = 0; i < 5; i++)
@@ -1034,8 +1033,9 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     /* This calculates (INDEX into op_map * 4) */
     emitm_subl_i_r(jit_info->native_ptr, interpreter->code->byte_code,emit_EAX);
 
-    /* This jumps to the address in op_map[ESI + sizeof(void *) * INDEX] */
-    emitm_jumpm(jit_info->native_ptr, emit_ESI, emit_EAX,
+    /* This jumps to the address in op_map[EBP + sizeof(void *) * INDEX] */
+    *jit_info->native_ptr++ = 0x3e;     /* DS:0(EBP, EAX, 1) */
+    emitm_jumpm(jit_info->native_ptr, emit_EBP, emit_EAX,
                         sizeof(*jit_info->arena.op_map) / 4, 0);
 }
 
@@ -1081,7 +1081,9 @@ Parrot_jit_save_registers(Parrot_jit_info_t *jit_info,
 #  define FLOAT_REGISTERS_TO_MAP 0
 
 char intval_map[INT_REGISTERS_TO_MAP] =
-    { emit_EDI, emit_EBX, emit_EDX, emit_ECX };
+/* we can't use ECX, shift ops need it, push ECX before shift doesn't
+ * because, when ECX is mapped you get shrl %cl, %ecx */
+    { emit_EDI, emit_EBX, emit_ESI, emit_EDX };
 
 #endif /* JIT_EMIT */
 
