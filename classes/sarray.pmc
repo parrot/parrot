@@ -26,6 +26,7 @@
 pmclass SArray {
     void init () {
 	SELF->cache.int_val = 0;
+        PMC_data(SELF) = NULL;
     }
 
     void mark () {
@@ -54,9 +55,11 @@ pmclass SArray {
     }
 
     void destroy () {
-        free(PMC_data(SELF));
-	PMC_data(SELF) =  NULL;
+        if (PMC_data(SELF))
+            mem_sys_free(PMC_data(SELF));
+	PMC_data(SELF) = NULL;
     }
+
     STRING* name() {
         return whoami;
     }
