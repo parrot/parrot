@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/12 15:00:44  clintp
+# Removed temporary print statements for GC workaround
+#
 # Revision 1.3  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -36,6 +39,9 @@
 #
 # $Id$
 # $Log$
+# Revision 1.4  2002/05/12 15:00:44  clintp
+# Removed temporary print statements for GC workaround
+#
 # Revision 1.3  2002/04/29 01:10:04  clintp
 # Speed changes, new language features
 #
@@ -111,9 +117,9 @@ MAINLOOPNR:
 	# When the I/O GC bug gets fixed
 	# remove the next three print lines. 
 	#  They're magic.
-	print "Got and processing "
-	print S0
-	print "\n"
+	#print "Got and processing "
+	#print S0
+	#print "\n"
 
 	bsr ISNUM
 	restore I1
