@@ -10,7 +10,7 @@ asm=$(PERL) ..${slash}..${slash}assemble.pl
 all: imcc perl6-config
 
 perl6-config: ../../Makefile pconfig.pl
-       $(myperl) pconfig.pl ../../Makefile perl6-config
+	$(myperl) pconfig.pl ../../Makefile perl6-config
 
 test:
 	$(PERL) t/harness
