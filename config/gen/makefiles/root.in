@@ -588,6 +588,9 @@ flags_dummy :
 	@echo Compiling with:
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) ${cc_o_out} xx$(O) -c xx.c
 
+dynclasses_dummy :
+	cd dynclasses && $(MAKE_C)
+
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.imc $(TEST_PROG)
 	./parrot -o $@ runtime/parrot/library/parrotlib.imc
 
