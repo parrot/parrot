@@ -233,6 +233,8 @@ interpreter-specific, non-public types.
 
 =item INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item INTVAL type_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the type of the PMC indexed by B<key>.  The B<key> parameter
 is guaranteed not to be NULL for this method.
 
@@ -301,6 +303,8 @@ Return the native integer value of the PMC.
 
 =item INTVAL get_integer_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item INTVAL get_integer_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the native integer value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -311,6 +315,8 @@ Return the native floating-point value of the PMC.
 =item FLOATVAL get_number_keyed(INTERP, PMC* self, PMC* key)
 
 =item FLOATVAL get_number_keyed_int(INTERP, PMC* self, INTVAL key)
+
+=item FLOATVAL get_number_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the native floating-point value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
@@ -323,6 +329,8 @@ Return the value of the PMC as a bignum.
 
 =item BIGNUM* get_bignum_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item BIGNUM* get_bignum_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the bignum value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -334,6 +342,8 @@ encoding of the PMC's choice.
 =item STRING* get_string_keyed(INTERP, PMC* self, PMC* key)
 
 =item STRING* get_string_keyed_int(INTERP, PMC* self, INTVAL key)
+
+=item STRING* get_string_keyed_str(INTERP, PMC* self, STRING* key)
 
 Return the string value of the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
@@ -349,19 +359,10 @@ and any other value being true.
 
 =item INTVAL get_bool_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item INTVAL get_bool_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the constant TRUE if the PMC indexed by B<key> is true,
 or FALSE if the PMC indexed by B<key> is false.
-The B<key> parameter is guaranteed not to be NULL for this method.
-
-=item INTVAL elements(INTERP, PMC* self)
-
-Return the number of elements in the PMC.
-
-=item INTVAL elements_keyed(INTERP, PMC* self, PMC* key)
-
-=item INTVAL elements_keyed_int(INTERP, PMC* self, INTVAL key)
-
-Return the number of elements in the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item PMC* get_pmc(INTERP, PMC* self)
@@ -375,6 +376,8 @@ value different from the PMC that get_pmc is being called on.
 
 =item PMC* get_pmc_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item PMC* get_pmc_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return the PMC indexed by B<key>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -384,21 +387,10 @@ The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item void* get_pointer_keyed_int(INTERP, PMC* self, INTVAL key)
 
-Return some data of the PMC. Its up the PMC, what is returned.
+=item void* get_pointer_keyed_str(INTERP, PMC* self, STRING* key)
 
-=item INTVAL is_same(INTERP, PMC* self, PMC* value)
-
-Return TRUE if the PMCs are the same, and FALSE if
-they're not. In this case, "the same" means identical at a low
-level. For plain equality, use the is_equal method.
-
-=item INTVAL is_same_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key)
-
-=item INTVAL is_same_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key)
-
-Return TRUE if the PMC keyed by B<key> is the same as the
-PMC in B<value> keyed by B<value_key>.  At least one of the
-two keys is guaranteed not to be NULL.
+Return a pointer to some data. The details of the data (type, location
+etc.) depend on the PMC. 
 
 =item void set_integer(INTERP, PMC* self, PMC* value)
 
@@ -418,6 +410,8 @@ as B<self> so optimizations may be made.
 =item void set_integer_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
 
 =item void set_integer_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
+
+=item void set_integer_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
 
 Sets the PMC indexed by B<key> to the integer value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
@@ -440,6 +434,8 @@ as B<self> so optimizations may be made.
 
 =item void set_number_keyed_int(INTERP, PMC* self, INTVAL key, FLOATVAL value)
 
+=item void set_number_keyed_str(INTERP, PMC* self, STRING* key, FLOATVAL value)
+
 Sets the PMC indexed by B<key> to the floating-point value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
 
@@ -460,6 +456,8 @@ as B<self> so optimizations may be made.
 =item void set_bignum_keyed(INTERP, PMC* self, PMC* key, BIGNUM* value)
 
 =item void set_bignum_keyed_int(INTERP, PMC* self, INTVAL key, BIGNUM* value)
+
+=item void set_bignum_keyed_str(INTERP, PMC* self, STRING* key, BIGNUM* value)
 
 Sets the PMC indexed by B<key> to the bignum value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
@@ -482,8 +480,25 @@ as B<self> so optimizations may be made.
 
 =item void set_string_keyed_int(INTERP, PMC* self, INTVAL key, STRING* value)
 
+=item void set_string_keyed_str(INTERP, PMC* self, STRING* key, STRING* value)
+
 Sets the PMC indexed by B<key> to the string value passed in B<value>.
 The B<key> parameter is guaranteed not to be NULL for this method.
+
+=item void set_bool(INTERP, PMC* self, INTVAL value)
+
+Sets the boolean state of the PMC to TRUE if B<value> is TRUE, or FALSE if
+B<value> is FALSE.
+
+Note that this is currently unimplemented for any PMC, and it is not clear 
+how it will work in practice.
+
+=item void set_bool_keyed(INTERP, PMC* self, PMC* key, INTVAL value)
+=item void set_bool_keyed_int(INTERP, PMC* self, INTVAL key, INTVAL value)
+=item void set_bool_keyed_str(INTERP, PMC* self, STRING* key, INTVAL value)
+
+Keyed versions of set_bool. The B<key> parameter is guaranteed not to be 
+NULL for this method.
 
 =item void set_pmc(INTERP, PMC* self, PMC* value)
 
@@ -503,7 +518,9 @@ is guaranteed not to be NULL.
 
 =item void set_pointer_keyed_int(INTERP, PMC* self, INTVAL key, void* value)
 
-Set some pointer inside the PMC. Its up the the PMC which pointer that is.
+=item void set_pointer_keyed_str(INTERP, PMC* self, STRING* key, void* value)
+
+Sets a pointer inside the PMC. The details depend on the PMC.
 
 =item void set_same(INTERP, PMC* self, PMC* value)
 
@@ -522,6 +539,17 @@ At least one of the two keys is guaranteed not to be NULL.
 
 Because the two PMCs are guaranteed to be of the same type, this method may
 throw an exception if the PMC class is a non-aggregate type.
+
+=item INTVAL elements(INTERP, PMC* self)
+
+Return the number of elements in the PMC.
+
+=item INTVAL elements_keyed(INTERP, PMC* self, PMC* key)
+
+=item INTVAL elements_keyed_int(INTERP, PMC* self, INTVAL key)
+
+Return the number of elements in the PMC indexed by B<key>.
+The B<key> parameter is guaranteed not to be NULL for this method.
 
 =item INTVAL pop_integer(INTERP, PMC* self)
 
@@ -924,6 +952,21 @@ B<NOTE>: the _keyed and _keyed_int variants of B<add>, B<subtract>,
 B<multiply>, B<divide> and B<modulus> are not currently implemented and may
 go away.
 
+=item void cmodulus(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void cmodulus_int(INTERP, PMC* self, INTVAL value, PMC* dest)
+
+=item void cmodulus_bignum(INTERP, PMC* self, BIGNUM* value, PMC* dest)
+
+=item void cmodulus_float(INTERP, PMC* self, FLOATVAL value, PMC* dest)
+
+Divide B<self> by B<value> and store the remainder in B<dest>.  Note that
+B<dest> may be equal to B<self>; in that case optimizations I<may> be made.
+
+B<Note>: C<modulus> uses the Knuth's "corrected mod" algorithm, as 
+implemented in F<src/utils.c>, while C<cmodulus> uses the C-style fmod
+function.
+
 =item void neg(INTERP, PMC* self, PMC* dest)
 
 Negate the sign of B<self> and store the result in B<dest>.  Note that
@@ -1001,6 +1044,30 @@ Calculate the bitwise-XOR of B<self> keyed by B<key> and B<value> keyed
 by B<value_key>, and store the result in B<dest> keyed by B<dest_key>.
 
 At least one of the keys is guaranteed to be non-NULL.
+
+=item void bitwise_ors(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_ors_str(INTERP, PMC* self, STRING* value, PMC* dest)
+
+Calculate the bitwise-OR of the strings in B<self> and B<value> and store 
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+case optimizations I<may> be made.
+
+=item void bitwise_ands(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_ands_str(INTERP, PMC* self, STRING* value, PMC* dest)
+
+Calculate the bitwise-AND of the strings in B<self> and B<value> and store 
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+case optimizations I<may> be made.
+
+=item void bitwise_xors(INTERP, PMC* self, PMC* value, PMC* dest)
+
+=item void bitwise_xors_str(INTERP, PMC* self, STRING* value, PMC* dest)
+
+Calculate the bitwise-XOR of the strings in B<self> and B<value> and store 
+the result in B<dest>. Note that B<dest> may be equal to B<self>; in that 
+case optimizations I<may> be made.
 
 =item void bitwise_not(INTERP, PMC* self, PMC* dest)
 
@@ -1104,6 +1171,20 @@ FALSE if they aren't.
 Return TRUE if the PMC at B<self> keyed by B<key> is generally
 equivalent to the PMC at B<value> keyed by B<value_key>, or
 FALSE if they aren't.
+
+=item INTVAL is_same(INTERP, PMC* self, PMC* value)
+
+Return TRUE if the PMCs are the same, and FALSE if
+they're not. In this case, "the same" means identical at a low
+level. For plain equality, use the is_equal method.
+
+=item INTVAL is_same_keyed(INTERP, PMC* self, PMC* key, PMC* value, PMC* value_key)
+
+=item INTVAL is_same_keyed_int(INTERP, PMC* self, INTVAL key, PMC* value, INTVAL* value_key)
+
+Return TRUE if the PMC keyed by B<key> is the same as the
+PMC in B<value> keyed by B<value_key>.  At least one of the
+two keys is guaranteed not to be NULL.
 
 =item INTVAL cmp(INTERP, PMC* self, PMC* value)
 
@@ -1266,8 +1347,12 @@ guaranteed to be non-NULL.
 
 =item INTVAL exists_keyed_int(INTERP, PMC* self, INTVAL key)
 
-This is only valid for keyed access. Return TRUE if the key exists
-in the aggregate being queried; otherwise, return FALSE.
+=item INTVAL exists_keyed_str(INTERP, PMC* self, STRING* key)
+
+Only valid for keyed access.
+
+Returns TRUE if the key exists in the aggregate being queried; otherwise, 
+return FALSE. 
 
 The key is guaranteed to be non-NULL.
 
@@ -1280,6 +1365,8 @@ return FALSE.
 
 =item INTVAL defined_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item INTVAL defined_keyed_str(INTERP, PMC* self, STRING* key)
+
 Return TRUE if the value of B<self> keyed by B<key> is defined;
 otherwise, return FALSE.
 
@@ -1289,6 +1376,8 @@ The key is guaranteed to be non-NULL.
 
 =item void delete_keyed_int(INTERP, PMC* self, INTVAL key)
 
+=item void delete_keyed_str(INTERP, PMC* self, STRING* key)
+
 Delete the specified entry from the aggregate.
 
 The key is guaranteed to be non-NULL.
@@ -1296,6 +1385,8 @@ The key is guaranteed to be non-NULL.
 =item PMC* nextkey_keyed(INTERP, PMC* self, PMC* key)
 
 =item PMC* nextkey_keyed_int(INTERP, PMC* self, INTVAL key)
+
+=item PMC* nextkey_keyed_str(INTERP, PMC* self, STRING* key, INTVAL what)
 
 Given the passed in key for the PMC, return the next key.
 
@@ -1329,7 +1420,6 @@ string in B<self> that is keyed by B<key>.
 The key is guaranteed to be not NULL.
 
 =item void* invoke(INTERP, PMC* self, void* next)
-=item void* invoke_pmc(INTERP, PMC* self, PMC* sub, void* next)
 
 Invoke the subroutine/method in the given PMC.
 
@@ -1345,7 +1435,6 @@ before calling this method.
 See F<pdd03_calling_conventions.pod> for more details.
 
 XXX: I still don't understand what *next does.
-XXX: Is invoke_pmc used?
 
 =item INTVAL can(INTERP, PMC* self, STRING* method)
 
@@ -1371,7 +1460,24 @@ Determine whether the PMC in B<self> keyed by B<key> implements the interface
 specified by name in B<method>. Returns TRUE if it can; otherwise, returns
 FALSE.
 
+=item INTVAL isa(INTERP, PMC* self, STRING* _class)
+
+Is the PMC a member of B<_class> or one of its subclasses.
+
 See also F<pdd15_objects.pod>.
+
+=item void freeze(INTERP, PMC* self, visit_info* info)
+=item void thaw  (INTERP, PMC* self, visit_info* info)
+=item void thawfinish (INTERP, PMC* self, visit_info* info)
+=item void visit (INTERP, PMC* self, visit_info* info)
+
+Serialization functions.
+
+XXX: these need documenting by somebody who understands them.
+
+=item void share(INTERP, PMC* self)
+
+XXX: needs documenting
 
 =back
 
