@@ -62,18 +62,18 @@ program: nodes          { top_node = $$; }
      | error { pr_error(@1, "Bug"); YYABORT; }
      ;
 nodes: node
-     | nodes node       { $$ = IMCC_append_node($1, $2, &@1); }
+     | nodes node       { $$ = IMCC_append_node(interp, $1, $2, &@1); }
      | term
      ;
 
-node: IDENTIFIER '(' nodes ')'   { $$ = IMCC_new_node($1, $3, &@1); }
+node: IDENTIFIER '(' nodes ')'   { $$ = IMCC_new_node(interp, $1, $3, &@1); }
 	;
 
 term: /* empty */	{ $$ = 0; }
-    | STRINGC		{ $$ = IMCC_new_const_node($1, 'S', &@1); }
-    | INTC              { $$ = IMCC_new_const_node($1, 'I', &@1); }
-    | FLOATC            { $$ = IMCC_new_const_node($1, 'N', &@1); }
-    | USTRINGC          { $$ = IMCC_new_const_node($1, 'U', &@1); }
+    | STRINGC		{ $$ = IMCC_new_const_node(interp, $1, 'S', &@1); }
+    | INTC              { $$ = IMCC_new_const_node(interp, $1, 'I', &@1); }
+    | FLOATC            { $$ = IMCC_new_const_node(interp, $1, 'N', &@1); }
+    | USTRINGC          { $$ = IMCC_new_const_node(interp, $1, 'U', &@1); }
     ;
 
 %%

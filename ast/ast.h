@@ -27,8 +27,9 @@ typedef struct nodeType_t {
     context_type up_ctx;	/* ctx coming from upper */
     context_type ctx;
     const char* d;
-    struct nodeType_t *up;
-    struct nodeType_t *next;
+    struct nodeType_t *up;	/* parent */
+    struct nodeType_t *next;	/* next statement */
+    struct nodeType_t *dest;	/* destination or result */
     YYLTYPE loc;
     union {
 	    struct _SymReg *r;
@@ -57,12 +58,15 @@ SymReg * mk_symreg(char * name, int t);
 
 #endif
 
-nodeType * IMCC_new_const_node(char *name, int set, YYLTYPE *loc);
-nodeType * IMCC_new_node(int nr, nodeType *child, YYLTYPE *loc);
-nodeType * IMCC_append_node(nodeType *head, nodeType *tail, YYLTYPE *loc);
+nodeType * IMCC_new_const_node(Interp*, char *name, int set, YYLTYPE *loc);
+nodeType * IMCC_new_node(Interp*, int nr, nodeType *child, YYLTYPE *loc);
+nodeType * IMCC_append_node(Interp*, nodeType *head, nodeType *tail,
+		YYLTYPE *loc);
+nodeType * IMCC_new_temp_node(Interp*, int set, YYLTYPE *loc);
 
 void IMCC_dump_nodes(nodeType *);
-void IMCC_expand_nodes(Interp*, nodeType *);
+nodeType * IMCC_expand_nodes(Interp*, nodeType *);
+void IMCC_free_nodes(Interp*, nodeType *);
 
 int IMCC_find_node_type(const char *name);
 

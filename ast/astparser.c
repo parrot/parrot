@@ -997,12 +997,12 @@ yyreduce:
 
   case 5:
 #line 65 "ast/ast.y"
-    { yyval.n = IMCC_append_node(yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
+    { yyval.n = IMCC_append_node(interp, yyvsp[-1].n, yyvsp[0].n, &yylsp[-1]); }
     break;
 
   case 7:
 #line 69 "ast/ast.y"
-    { yyval.n = IMCC_new_node(yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
+    { yyval.n = IMCC_new_node(interp, yyvsp[-3].t, yyvsp[-1].n, &yylsp[-3]); }
     break;
 
   case 8:
@@ -1012,22 +1012,22 @@ yyreduce:
 
   case 9:
 #line 73 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'S', &yylsp[0]); }
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'S', &yylsp[0]); }
     break;
 
   case 10:
 #line 74 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'I', &yylsp[0]); }
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'I', &yylsp[0]); }
     break;
 
   case 11:
 #line 75 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'N', &yylsp[0]); }
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'N', &yylsp[0]); }
     break;
 
   case 12:
 #line 76 "ast/ast.y"
-    { yyval.n = IMCC_new_const_node(yyvsp[0].s, 'U', &yylsp[0]); }
+    { yyval.n = IMCC_new_const_node(interp, yyvsp[0].s, 'U', &yylsp[0]); }
     break;
 
 
