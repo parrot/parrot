@@ -45,11 +45,7 @@ pmclass default noinit {
      return SELF->cache.int_val;
    }
 
-   INTVAL get_integer_index (INTVAL idx) {
-     return 0;
-   }
-
-   INTVAL get_integer_index_s (STRING* idx) {
+   INTVAL get_integer_keyed (KEY * key) {
      return 0;
    }
 
@@ -57,11 +53,7 @@ pmclass default noinit {
      return SELF->cache.num_val;
    }
 
-   FLOATVAL get_number_index (INTVAL idx) {
-     return 0.0;
-   }
-
-   FLOATVAL get_number_index_s (STRING* idx) {
+   FLOATVAL get_number_keyed (KEY * key) {
      return 0.0;
    }
 
@@ -70,11 +62,7 @@ pmclass default noinit {
      return s;
    }
 
-   STRING* get_string_index (INTVAL idx) {
-     return NULL;
-   }
-
-   STRING* get_string_index_s (STRING* idx) {
+   STRING* get_string_keyed (KEY * key) {
      return NULL;
    }
 
@@ -122,10 +110,7 @@ pmclass default noinit {
      SELF->cache.int_val = value->vtable->get_integer(INTERP, value);
    }
 
-   void set_integer_index (INTVAL value, INTVAL idx) {
-   }
-
-   void set_integer_index_s (INTVAL value, STRING* idx) {
+   void set_integer_keyed (KEY * key, INTVAL value) {
    }
 
    void set_number (PMC * value) {
@@ -145,10 +130,7 @@ pmclass default noinit {
      SELF->cache.num_val = value->vtable->get_number(INTERP, value);
    }
 
-   void set_number_index (FLOATVAL value, INTVAL idx) {
-   }
-
-   void set_number_index_s (FLOATVAL value, STRING* idx) {
+   void set_number_keyed (KEY * key, FLOATVAL value) {
    }
 
    void set_string (PMC * value) {
@@ -171,10 +153,7 @@ pmclass default noinit {
      SELF->cache.struct_val = value->vtable->get_string(INTERP, value);
    }
 
-   void set_string_index (STRING * string, INTVAL idx) {
-   }
-
-   void set_string_index_s (STRING * string, STRING* idx) {
+   void set_string_keyed (KEY * key, STRING * string) {
    }
 
    void set_value (void* value) {
@@ -235,6 +214,10 @@ pmclass default noinit {
      dest->vtable->set_number_native(INTERP, dest, result);
    }
 
+   void add_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                              PMC * dest_value, KEY * dest_value_key) {
+   }
+
    void subtract (PMC * value,  PMC* dest) {
      /* XXX: overflow detection, bignum promotion? */
 
@@ -289,6 +272,10 @@ pmclass default noinit {
      dest->vtable->set_number_native(INTERP, dest, result);
    }
 
+   void subtract_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                   PMC * dest_value, KEY * dest_value_key) {
+   }
+
    void multiply (PMC * value,  PMC* dest) {
      /* XXX: overflow detection, bignum promotion? */
 
@@ -338,6 +325,10 @@ pmclass default noinit {
              * value->vtable->get_number(INTERP, value);
 
      dest->vtable->set_number_native(INTERP, dest, result);
+   }
+
+   void multiply_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                   PMC * dest_value, KEY * dest_value_key) {
    }
 
    void divide (PMC * value,  PMC* dest) {
@@ -394,6 +385,10 @@ pmclass default noinit {
      dest->vtable->set_number_native(INTERP, dest, result);
    }
 
+   void divide_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                 PMC * dest_value, KEY * dest_value_key) {
+   }
+
    void modulus (PMC * value,  PMC* dest) {
      /* This does perl-like modulus */
 
@@ -442,6 +437,10 @@ pmclass default noinit {
      dest->vtable->set_integer_native(INTERP, dest, result);
    }
 
+   void modulus_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                  PMC * dest_value, KEY * dest_value_key) {
+   }
+
    void concatenate (PMC * value,  PMC* dest) {
      STRING *s =
        string_concat( INTERP, SELF->vtable->get_string(INTERP, SELF),
@@ -483,6 +482,10 @@ pmclass default noinit {
 		      value->vtable->get_string(INTERP, value), 0);
 
      dest->vtable->set_string_native(INTERP, dest, s);
+   }
+
+   void concatenate_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                      PMC * dest_value, KEY * dest_value_key) {
    }
 
    BOOLVAL is_equal (PMC* value) {

@@ -120,16 +120,8 @@ pmclass IntQueue {
 	return dequeue((CONTAINER*)SELF->data);
     }
 
-    INTVAL get_integer_index (INTVAL idx) {
-        return 0;
-    }
-
     FLOATVAL get_number () {
         return (FLOATVAL)SELF->cache.int_val;
-    }
-
-    FLOATVAL get_number_index (INTVAL idx) {
-        return 0.0;
     }
 
     STRING* get_string () {
@@ -143,10 +135,6 @@ pmclass IntQueue {
 	s = string_make(INTERP,buff,strlen(buff),NULL,0,NULL);
 	free(buff);
 	return s;
-    }
-
-    STRING* get_string_index (INTVAL idx) {
-        return NULL;
     }
 
     BOOLVAL get_bool () {
@@ -180,9 +168,6 @@ pmclass IntQueue {
         SELF->cache.int_val = value->cache.int_val;
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-    }
-
     void set_number (PMC * value) {
         SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = value->cache.num_val;
@@ -200,9 +185,6 @@ pmclass IntQueue {
     void set_number_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlNum]);
 	SELF->cache.num_val = (FLOATVAL)value->cache.int_val;
-    }
-
-    void set_number_index (FLOATVAL value, INTVAL idx) {
     }
 
     void set_string (PMC * value) {
@@ -228,9 +210,6 @@ pmclass IntQueue {
     void set_string_same (PMC * value) {
 	SELF->vtable = &(Parrot_base_vtables[enum_class_PerlString]);
 	SELF->cache.struct_val = value->cache.struct_val;
-    }
-
-    void set_string_index (STRING * value, INTVAL idx) {
     }
 
     void set_value (void* value) {

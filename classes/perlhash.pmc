@@ -49,42 +49,90 @@ pmclass PerlHash {
 	return key_size(INTERP,SELF->data);
     }
 
-    INTVAL get_integer_keyed ( KEY* key ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.int_val;
-    }
+    INTVAL get_integer_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
 
-    INTVAL get_integer_index_s ( STRING* idx ) {
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,SELF->data,idx);
-	return key_pair->cache.int_val;
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_integer(INTERP, value);
     }
 
     FLOATVAL get_number () {
 	return (FLOATVAL)key_size(INTERP,SELF->data);
     }
 
-    FLOATVAL get_number_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.int_val;
-    }
+    FLOATVAL get_number_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
 
-    FLOATVAL get_number_index_s ( STRING* idx ) {
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,SELF->data,idx);
-	return key_pair->cache.num_val;
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_number(INTERP, value);
     }
 
     STRING* get_string () {
 	return (STRING*)SELF->cache.struct_val;
     }
 
-    STRING* get_string_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.struct_val;
-    }
+    STRING* get_string_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+        internal_exception(OUT_OF_BOUNDS, "Hash not implemented yet!\n");
 
-    STRING* get_string_index_s ( STRING* idx ) {
-	KEY_PAIR* key_pair = key_element_value_s(INTERP,SELF->data,idx);
-	return key_pair->cache.struct_val;
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_string(INTERP, value);
     }
 
     BOOLVAL get_bool () {
@@ -119,21 +167,29 @@ pmclass PerlHash {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	if(idx >= key_size(INTERP,SELF->data)) {
-	    key_set_size(INTERP,SELF->data,idx+1);
-	}
-	key_pair.type = enum_key_int;
-	key_pair.cache.int_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
-    }
+    void set_integer_keyed (KEY * key, INTVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
 
-    void set_integer_index_s (INTVAL value, STRING* idx) {
-	KEY_PAIR key_pair;
-	key_pair.type = enum_key_int;
-	key_pair.cache.int_val = value;
-	key_set_element_value_s(INTERP,SELF->data,idx,&key_pair);
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_integer_native(INTERP, pmc, value);
     }
 
     void set_number (PMC * value) {
@@ -153,21 +209,29 @@ pmclass PerlHash {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_number_index (FLOATVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	if(idx >= key_size(INTERP,SELF->data)) {
-	    key_set_size(INTERP,SELF->data,idx);
-	}
-	key_pair.type = enum_key_num;
-	key_pair.cache.num_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
-    }
+    void set_number_keyed (KEY * key, FLOATVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
 
-    void set_number_index_s (FLOATVAL value, STRING* idx) {
-	KEY_PAIR key_pair;
-	key_pair.type = enum_key_num;
-	key_pair.cache.num_val = value;
-	key_set_element_value_s(INTERP,SELF->data,idx,&key_pair);
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_number_native(INTERP, pmc, value);
     }
 
     void set_string (PMC * value) {
@@ -185,21 +249,29 @@ pmclass PerlHash {
     void set_string_same (PMC * value) {
     }
 
-    void set_string_index (STRING * value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	if(idx >= key_size(INTERP,SELF->data)) {
-	    key_set_size(INTERP,SELF->data,idx);
-	}
-	key_pair.type = enum_key_string;
-	key_pair.cache.struct_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
-    }
+    void set_string_keyed (KEY * key, STRING * value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
 
-    void set_string_index_s (STRING * value, STRING* idx) {
-	KEY_PAIR key_pair;
-	key_pair.type = enum_key_string;
-	key_pair.cache.struct_val = value;
-	key_set_element_value_s(INTERP,SELF->data,idx,&key_pair);
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_string_native(INTERP, pmc, value);
     }
 
     void set_value (void* value) {

@@ -51,7 +51,7 @@ pmclass Array {
 	return key_size(INTERP,SELF->data);
     }
 
-    INTVAL get_integer_keyed(KEY* key) {
+    INTVAL get_integer_keyed (KEY * key) {
         KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
@@ -63,7 +63,7 @@ pmclass Array {
         kp = (key->keys)[0];
         ix = kp->cache.int_val;
 
-        if (ix > SELF->cache.int_val) {
+        if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -75,7 +75,7 @@ pmclass Array {
 	return (FLOATVAL)(SELF->cache.int_val);
     }
 
-    FLOATVAL get_number_keyed (KEY* key) {
+    FLOATVAL get_number_keyed (KEY * key) {
         KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
@@ -87,7 +87,7 @@ pmclass Array {
         kp = (key->keys)[0];
         ix = kp->cache.int_val;
 
-        if (ix > SELF->cache.int_val) {
+        if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -99,7 +99,7 @@ pmclass Array {
 	return NULL;
     }
 
-    STRING* get_string_keyed ( KEY* key) {
+    STRING* get_string_keyed (KEY * key) {
         KEY_PAIR* kp;
         INTVAL ix;
         PMC* value;
@@ -111,7 +111,7 @@ pmclass Array {
         kp = (key->keys)[0];
         ix = kp->cache.int_val;
 
-        if (ix > SELF->cache.int_val) {
+        if (ix > SELF->cache.int_val || ix < 0) {
             internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
         }
 
@@ -151,12 +151,24 @@ pmclass Array {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	key_pair.type = enum_key_int;
-	key_pair.cache.int_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+    void set_integer_keyed (KEY * key, INTVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_integer_native(INTERP, pmc, value);
     }
 
     void set_number (PMC * value) {
@@ -176,11 +188,24 @@ pmclass Array {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_number_index (FLOATVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	key_pair.type = enum_key_num;
-	key_pair.cache.num_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+    void set_number_keyed (KEY * key, FLOATVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_number_native(INTERP, pmc, value);
     }
 
     void set_string (PMC * value) {
@@ -198,11 +223,24 @@ pmclass Array {
     void set_string_same (PMC * value) {
     }
 
-    void set_string_keyed (STRING * value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	key_pair.type = enum_key_string;
-	key_pair.cache.struct_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+    void set_string_keyed (KEY * key, STRING * value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val || ix < 0) {
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_string_native(INTERP, pmc, value);
     }
 
     void set_value (void* value) {

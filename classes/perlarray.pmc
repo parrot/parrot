@@ -49,14 +49,29 @@ pmclass PerlArray {
 	return key_size(INTERP,SELF->data);
     }
 
-    INTVAL get_integer_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx<0) {
-	    idx += size;
-	}
-	key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.int_val;
+    INTVAL get_integer_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_integer(INTERP, value);
     }
 
     FLOATVAL get_number () {
@@ -64,28 +79,58 @@ pmclass PerlArray {
 	return (FLOATVAL)size;
     }
 
-    FLOATVAL get_number_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx<0) {
-	    idx += size;
-	}
-	key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.num_val;
+    FLOATVAL get_number_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_number(INTERP, value);
     }
 
     STRING* get_string () {
 	return NULL;
     }
 
-    STRING* get_string_index ( INTVAL idx ) {
-	KEY_PAIR* key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx<0) {
-	    idx += size;
-	}
-	key_pair = key_element_value_i(INTERP,SELF->data,idx);
-	return key_pair->cache.struct_val;
+    STRING* get_string_keyed (KEY * key) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* value;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        value = ((PMC**)(SELF->data))[ix];
+        return value->vtable->get_string(INTERP, value);
     }
 
     BOOLVAL get_bool () {
@@ -121,18 +166,29 @@ pmclass PerlArray {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_integer_index (INTVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx >= size) {
-	    key_set_size(INTERP,SELF->data,idx+1);
-	}
-	else if(idx < 0) {
-	    idx += size;
+    void set_integer_keyed (KEY * key, INTVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
         }
-	key_pair.type = enum_key_int;
-	key_pair.cache.int_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_integer_native(INTERP, pmc, value);
     }
 
     void set_number (PMC * value) {
@@ -152,18 +208,29 @@ pmclass PerlArray {
 	key_set_size(INTERP,SELF->data,size);
     }
 
-    void set_number_index (FLOATVAL value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx >= key_size(INTERP,SELF->data)) {
-	    key_set_size(INTERP,SELF->data,idx+1);
-	}
-	else if(idx < 0) {
-	    idx += size;
-	}
-	key_pair.type = enum_key_num;
-	key_pair.cache.num_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+    void set_number_keyed (KEY * key, FLOATVAL value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_number_native(INTERP, pmc, value);
     }
 
     void set_string (PMC * value) {
@@ -181,18 +248,29 @@ pmclass PerlArray {
     void set_string_same (PMC * value) {
     }
 
-    void set_string_index (STRING * value, INTVAL idx) {
-	KEY_PAIR key_pair;
-	INTVAL size = key_size(INTERP,SELF->data);
-	if(idx >= key_size(INTERP,SELF->data)) {
-	    key_set_size(INTERP,SELF->data,idx+1);
-	}
-	else if(idx < 0) {
-	    idx += size;
-	}
-	key_pair.type = enum_key_string;
-	key_pair.cache.struct_val = value;
-	key_set_element_value_i(INTERP,SELF->data,idx,&key_pair);
+    void set_string_keyed (KEY * key, STRING * value) {
+        KEY_PAIR* kp;
+        INTVAL ix;
+        PMC* pmc;
+
+        if (!key) {
+            return 0;
+        }
+
+        kp = (key->keys)[0];
+        ix = kp->cache.int_val;
+
+        if (ix > SELF->cache.int_val) {
+            /* XXX I don't think this will work quite yet */
+            /* key_set_size(kp,ix); */
+            internal_exception(OUT_OF_BOUNDS, "Array element out of bounds!\n");
+        }
+        if (ix < 0) {
+            ix += key_size(kp);
+        }
+
+        pmc = ((PMC**)(SELF->data))[ix];
+        pmc->vtable->set_string_native(INTERP, pmc, value);
     }
 
     void set_value (void* value) {
@@ -242,6 +320,10 @@ pmclass PerlArray {
     void add_same (PMC * value, PMC* dest) {
     }
 
+    void add_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                               PMC * dest_value, KEY * dest_value_key) {
+    }
+
     void subtract (PMC * value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
@@ -284,6 +366,10 @@ pmclass PerlArray {
     }
 
     void subtract_same (PMC * value, PMC* dest) {
+    }
+
+    void subtract_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                    PMC * dest_value, KEY * dest_value_key) {
     }
 
     void multiply (PMC * value, PMC* dest) {
@@ -330,6 +416,10 @@ pmclass PerlArray {
     void multiply_same (PMC * value, PMC* dest) {
     }
 
+    void multiply_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                    PMC * dest_value, KEY * dest_value_key) {
+    }
+
     void divide (PMC * value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
@@ -374,6 +464,10 @@ pmclass PerlArray {
     void divide_same (PMC * value, PMC* dest) {
     }
 
+    void divide_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                  PMC * dest_value, KEY * dest_value_key) {
+    }
+
     void modulus (PMC * value, PMC* dest) {
 	if(value->vtable == &Parrot_base_vtables[enum_class_PerlInt]) {
 	    dest->vtable = &Parrot_base_vtables[enum_class_PerlInt];
@@ -404,6 +498,10 @@ pmclass PerlArray {
     }
 
     void modulus_same (PMC * value, PMC* dest) {
+    }
+
+    void modulus_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                   PMC * dest_value, KEY * dest_value_key) {
     }
 
     void concatenate (PMC * value, PMC* dest) {
@@ -449,6 +547,10 @@ pmclass PerlArray {
 			  value->cache.struct_val,
 			  0
 			 );
+    }
+
+    void concatenate_keyed (KEY * key, PMC * src_value, KEY * src_value_key,
+                                       PMC * dest_value, KEY * dest_value_key) {
     }
 
     /* == operation */

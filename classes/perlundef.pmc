@@ -50,25 +50,13 @@ pmclass PerlUndef {
       return 0;
    }
 
-   INTVAL get_integer_index (INTVAL idx) {
-      return 0;
-   }
-
    FLOATVAL get_number () {
       Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in numeric context");
       return 0;
    }
 
-   FLOATVAL get_number_index (INTVAL idx) {
-      return 0;
-   }
-
    STRING* get_string () {
       Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, "Use of uninitialized value in string context");
-      return NULL;
-   }
-
-   STRING* get_string_index (INTVAL idx) {
       return NULL;
    }
 
@@ -105,9 +93,6 @@ pmclass PerlUndef {
       /* Do nothing; Can't happen? */ 
    }
 
-   void set_integer_index (INTVAL value, INTVAL idx) {
-   }
-
    void set_number (PMC * value) {
       pmc->vtable = &Parrot_base_vtables[enum_class_PerlNum];
       pmc->vtable->set_number(interpreter, pmc, value);
@@ -125,9 +110,6 @@ pmclass PerlUndef {
 
    void set_number_same (PMC * value) {
       /* Do nothing; Can't happen? */ 
-   }
-
-   void set_number_index (FLOATVAL value, INTVAL idx) {
    }
 
    void set_string (PMC * value) {
@@ -152,9 +134,6 @@ pmclass PerlUndef {
 
    void set_string_same (PMC * value) {
       /* Do nothing; Can't happen? */ 
-   }
-
-   void set_string_index (STRING * value, INTVAL idx) {
    }
 
    void set_value (void* value) {
