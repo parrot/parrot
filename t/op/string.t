@@ -1318,6 +1318,7 @@ equal:
     index I0, S1, S0
     print I0
     print "\n"
+    end
 CODE
 equal
 0
@@ -1342,6 +1343,7 @@ output_is(<<'CODE',<<OUTPUT,"index, multibyte matching 2");
     index I0, S1, S0
     print I0
     print "\n"
+    end
 CODE
 -1
 4
