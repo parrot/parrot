@@ -699,6 +699,9 @@ MMD_BigInt: {
 MMD_PerlInt: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
             }
+MMD_Integer: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value));
+            }
 MMD_DEFAULT: {
                  internal_exception(1, "unimp cmp");
                  return 0;
@@ -710,6 +713,9 @@ MMD_BigInt: {
         return bigint_cmp(INTERP, SELF, value) == 0;
             }
 MMD_PerlInt: {
+        return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
+            }
+MMD_Integer: {
         return bigint_cmp_int(INTERP, SELF, PMC_int_val(value)) == 0;
             }
 MMD_DEFAULT: {

@@ -575,6 +575,26 @@ Multiplies the integer by C<value> and returns the result in C<*dest>.
 =cut
 
 */
+    void pow_int (INTVAL b, PMC* dest) {
+        INTVAL a = PMC_int_val(SELF);
+        INTVAL i;
+        VTABLE_set_integer_native(INTERP, dest, a);
+        --b;
+        for (i = 0; i < b; ++i) {
+            mmd_dispatch_v_pip(interpreter, dest, a, dest, MMD_MULTIPLY_INT);
+        }
+
+    }
+
+/*
+
+=item C<void pow_int(INTVAL value, PMC *dest)>
+
+Rise SELF to the C<value>th power.
+
+=cut
+
+*/
     void multiply_int (INTVAL b, PMC* dest) {
         INTVAL a = PMC_int_val(SELF);
         double cf = (double)a * (double)b;

@@ -660,7 +660,7 @@ mmd_vtfind(Parrot_Interp interpreter, INTVAL function, INTVAL left, INTVAL right
 
 
 static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args);
-static PMC* mmd_arg_tuple_func(Interp *, STRING *signature, va_list args);
+static PMC* mmd_arg_tuple_func(Interp *, STRING *signature);
 static PMC* mmd_search_default(Interp *, STRING *meth, PMC *arg_tuple);
 static PMC* mmd_search_scopes(Interp *, STRING *meth, PMC *arg_tuple);
 static void mmd_search_classes(Interp *, STRING *meth, PMC *arg_tuple, PMC *);
@@ -692,9 +692,9 @@ C<P5> and up according to calling conventions.
  * TODO move to header, when API is sane
  */
 
-PMC *
-Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
+PMC *Parrot_MMD_search_default_inline(Interp *, STRING *meth,
         STRING *signature, ...);
+PMC *Parrot_MMD_search_default_func(Interp *, STRING *meth, STRING *signature);
 
 PMC *
 Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
@@ -714,6 +714,21 @@ Parrot_MMD_search_default_inline(Interp *interpreter, STRING *meth,
     return mmd_search_default(interpreter, meth, arg_tuple);
 }
 
+PMC *
+Parrot_MMD_search_default_func(Interp *interpreter, STRING *meth,
+        STRING *signature)
+{
+    PMC* arg_tuple;
+    /*
+     * 1) create argument tuple
+     */
+    arg_tuple = mmd_arg_tuple_func(interpreter, signature);
+    /*
+     * default search policy
+     */
+    return mmd_search_default(interpreter, meth, arg_tuple);
+}
+
 /*
 
 =item C<
@@ -721,6 +736,12 @@ static PMC* mmd_arg_tuple_inline(Interp *, STRING *signature, va_list args)>
 
 Return a list of argument types. PMC arguments are specified as function
 arguments.
+
+=item C<
+static PMC* mmd_arg_tuple_func(Interp *, STRING *signature)>
+
+Return a list of argument types. PMC arguments are take from registers
+P5 ... according to calling conventions.
 
 =cut
 
@@ -754,6 +775,51 @@ mmd_arg_tuple_inline(Interp *interpreter, STRING *signature, va_list args)
                 break;
             case 'P':
                 arg = va_arg(args, PMC *);
+                type = VTABLE_type(interpreter, arg);
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, type);
+                break;
+            default:
+                internal_exception(1,
+                        "Unknown signature type %d in mmd_arg_tuple", type);
+                break;
+        }
+
+    }
+    return arg_tuple;
+}
+
+static PMC*
+mmd_arg_tuple_func(Interp *interpreter, STRING *signature)
+{
+    INTVAL sig_len, i, type, next_p;
+    PMC* arg_tuple, *arg;
+
+    arg_tuple = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    sig_len = string_length(interpreter, signature);
+    if (!sig_len)
+        return arg_tuple;
+    VTABLE_set_integer_native(interpreter, arg_tuple, sig_len);
+    next_p = 5;
+    for (i = 0; i < sig_len; ++i) {
+        type = string_index(interpreter, signature, i);
+        switch (type) {
+            case 'I':
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_INTVAL);
+                break;
+            case 'N':
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_FLOATVAL);
+                break;
+            case 'S':
+                VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
+                        i, enum_type_STRING);
+                break;
+            case 'P':
+                if (next_p == 16)
+                    internal_exception(1, "Unimp MMD too many args");
+                arg = REG_PMC(next_p++);
                 type = VTABLE_type(interpreter, arg);
                 VTABLE_set_integer_keyed_int(interpreter, arg_tuple,
                         i, type);
@@ -828,6 +894,8 @@ mmd_search_default(Interp *interpreter, STRING *meth, PMC *arg_tuple)
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates.
 
+=cut
+
 */
 
 static void
@@ -863,7 +931,36 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
             }
         }
     }
-    return cl;
+}
+
+static INTVAL
+distance_cmp(Interp *interpreter, INTVAL a, INTVAL b)
+{
+    short da = a & 0xffff;
+    short db = b & 0xffff;
+    return da > db ? -1 : da < db ? 1 : 0;
+}
+
+extern void Parrot_FixedPMCArray_sort(Interp* , PMC* pmc, PMC *cmp_func);
+
+/*
+
+=item C<static UINTVAL mmd_distance(Interp *, PMC *pmc, PMC *arg_tuple)>
+
+Create Manhattan Distance of sub C<pmc> against given argument types.
+0xffff is the maximum distance
+
+=cut
+
+*/
+
+static UINTVAL
+mmd_distance(Interp *interpreter, PMC *pmc, PMC *arg_tuple)
+{
+    /*
+     * TODO need a signaute in the sub pmc
+     */
+    return 0;
 }
 
 /*
@@ -872,15 +969,55 @@ mmd_search_classes(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 Sort the candidate list C<cl> by Manhattan Distance
 
+=cut
+
 */
 
 static void
 mmd_sort_candidates(Interp *interpreter, PMC *arg_tuple, PMC *cl)
 {
-    INTVAL n;
+    INTVAL i, n, d;
+    PMC *nci, *pmc, *sort;
+    INTVAL *helper;
+    PMC **data;
 
     n = VTABLE_elements(interpreter, cl);
-
+    /*
+     * create a helper structure:
+     * bits 0..15  = distance
+     * bits 16..31 = idx in candidate list
+     */
+    sort = pmc_new(interpreter, enum_class_FixedIntegerArray);
+    VTABLE_set_integer_native(interpreter, sort, n);
+    helper = PMC_data(sort);
+    for (i = 0; i < n; ++i) {
+        pmc = VTABLE_get_pmc_keyed_int(interpreter, cl, i);
+        d = mmd_distance(interpreter, pmc, arg_tuple);
+        helper[i] = i << 16 | d;
+    }
+    /*
+     * need an NCI function pointer
+     */
+    nci = pmc_new(interpreter, enum_class_NCI);
+    PMC_struct_val(nci) = F2DPTR(distance_cmp);
+    /*
+     * sort it
+     */
+    Parrot_FixedPMCArray_sort(interpreter, sort, nci);
+    /*
+     * now helper has a sorted list of indices in the upper 16 bits
+     * fill helper with sorted candidates
+     */
+    data = PMC_data(cl);
+    for (i = 0; i < n; ++i) {
+        INTVAL idx = helper[i] >> 16;
+        LVALUE_CAST(PMC*, helper[i]) = data[idx];
+    }
+    /*
+     * use helper structure
+     */
+    PMC_data(cl) = helper;
+    PMC_data(sort) = data;
 }
 
 /*
@@ -947,6 +1084,8 @@ return TRUE to stop further search.
 If the candidate is a MultiSub remember all matching Subs and return FALSE
 to continue searching outer scopes.
 
+=cut
+
 */
 
 static int
@@ -990,6 +1129,8 @@ mmd_maybe_candidate(Interp *interpreter, PMC *pmc, PMC *arg_tuple, PMC *cl)
 Search the current lexical pad for matching candidates. Return TRUE if the
 MMD search should stop.
 
+=cut
+
 */
 
 static int
@@ -1019,6 +1160,8 @@ mmd_search_lexical(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 Search the current package namespace for matching candidates. Return TRUE if
 the MMD search should stop.
 
+=cut
+
 */
 
 static int
@@ -1044,6 +1187,8 @@ mmd_search_package(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 Search the global namespace for matching candidates. Return TRUE if
 the MMD search should stop.
 
+=cut
+
 */
 
 static int
@@ -1065,6 +1210,8 @@ mmd_search_global(Interp *interpreter, STRING *meth, PMC *arg_tuple, PMC *cl)
 
 Search the builtin namespace for matching candidates. Return TRUE if
 the MMD search should stop.
+
+=cut
 
 */
 

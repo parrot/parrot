@@ -172,9 +172,17 @@ If key is a slice, do a splice as set that item.
     void delete_keyed (PMC* key) {
         if (key->vtable->base_type == enum_class_Slice)
             Parrot_py_set_slice(INTERP, SELF, key, NULL);
-        else
-            internal_exception(OUT_OF_BOUNDS,
-                "ResizablePMCArray: unimplemented delete!");
+        else {
+            PMC **data;
+            INTVAL idx = key_integer(INTERP, key);
+            INTVAL i;
+            INTVAL n = PMC_int_val(SELF);
+            data = PMC_data(SELF);
+            for (i = idx; i < n - 1; ++i)
+                data[i] = data[i + 1];
+            PMC_int_val(SELF)--;
+        }
+
     }
 
 /*
